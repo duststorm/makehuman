@@ -18,9 +18,9 @@ The MakeHuman development project is hosted on sourceforge at http://code.google
     *  A Pre-Alpha Technical Preview of Version 1.0 was released on March 4th 2009 as a compressed archive available for Windows and 32-bit Ubuntu. See http://www.makehuman.org/blog/index.php?post=s1210866244. See the Release RoadMap for further estimated release dates.
     * Joel Palmius is generously providing nightly builds of the current development deck for 32-bit Ubuntu systems at http://mh.jwp.se/ . These builds are not officially supported, but may give an impression of how the development effort is progressing between formal builds.
     * This 'work in progress' development deck is also available as source code. It is controlled using Subversion (SVN) and can be freely downloaded from SourceForge here. The Developers Guide provides instructions on setting up an environment to enable you to build this source. Recent developments include:
-          o January 2009 - Performance enhancements were added to the code and face group documentation has been added to this Wiki (see Full API in the Developers Documentation).
-          o February 2009 - Ethnicity (Africa only), Gender, Age and Muscle Tone controls have been implemented in the source deck. Other ethnic groups are under development.
-          o March 2009 - Implementing Macro and Detail editor controls for manipulating the anatomy of the figure.
+          ** January 2009 - Performance enhancements were added to the code and face group documentation has been added to this Wiki (see Full API in the Developers Documentation).
+          ** February 2009 - Ethnicity (Africa only), Gender, Age and Muscle Tone controls have been implemented in the source deck. Other ethnic groups are under development.
+          ** March 2009 - Implementing Macro and Detail editor controls for manipulating the anatomy of the figure.
     * The MakeHuman© 0.9.1 Release Candidate was published way back in December 2007 with prebuilt installers for Windows, Mac OS X and Linux. These prebuilt installers and the 0.9.1 source code can be downloaded here. Community feedback resulted in quite a change of track for the development team. As a consequence all development effort is now focused on this new direction and any incomplete 0.9.1 features will not now be completed.
 
 
