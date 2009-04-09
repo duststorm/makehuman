@@ -1,0 +1,24 @@
+#######################################################################
+# Makefile to build MH Phoenix for Mac OS-X
+# ---------------------------------------------------------------------
+# This Makefile requires a installation of the Apple Developer-Tools
+# Which are available at http://developer.apple.com/technology/xcode.html
+#######################################################################
+
+build: debug
+
+release:
+	xcodebuild -project os-x/MHPhoenix.xcodeproj -configuration Release build
+	hdiutil create -srcfolder os-x/build/Release/ -ov -volname MH_Phoenix MH_Phoenix.dmg
+
+debug:
+	xcodebuild -project os-x/MHPhoenix.xcodeproj -configuration Debug build
+
+# ---------------------------------------------------------------------
+# Cleanup unused stuff
+# ---------------------------------------------------------------------
+clean:
+	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~
+	xcodebuild -project os-x/MHPhoenix.xcodeproj -configuration Debug   clean
+	xcodebuild -project os-x/MHPhoenix.xcodeproj -configuration Release clean
+
