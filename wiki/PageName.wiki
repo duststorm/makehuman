@@ -1,0 +1,28 @@
+#summary One-sentence summary of this page.
+
+= Welcome to the MakeHuman Wiki=
+
+This Wiki is a community resource for users of the MakeHuman software. This Wiki relates to MakeHuman 1.0, which at present has only been released as a Pre-Alpha Technical Preview and is not a fully functioning releas. The older Wiki at http://makewiki.aleppax.it/pmwiki/pmwiki.php covers the old 0.9.1 Release Candidate. If you wish to help edit this Wiki please contact us here.
+
+The MakeHuman team is currently looking to enlist more Blender artists to help with the creation of the full set of morph targets required to model the different ethnic groups around the world. If you're intersted please see the Blog at http://www.makehuman.org/blog/index.php and contact us.
+
+
+MakeHuman is a free, Open Source, interactive modelling tool for creating custom 3D human characters. These characters can be modelled in minutes and can then be used with many other modelling and rendering programs to incorporate realistic human figures into computer generated images and animations. Features that make this software unique include the tetra-parametric GUI© and the Natural Pose System©, for advanced muscular simulation.
+
+The home page for MakeHuman© is at http://www.makehuman.org/ . 
+The MakeHuman development project is hosted on sourceforge at http://code.google.com/p/makehuman
+
+
+= Current Status =
+
+    *  A Pre-Alpha Technical Preview of Version 1.0 was released on March 4th 2009 as a compressed archive available for Windows and 32-bit Ubuntu. See http://www.makehuman.org/blog/index.php?post=s1210866244. See the Release RoadMap for further estimated release dates.
+    * Joel Palmius is generously providing nightly builds of the current development deck for 32-bit Ubuntu systems at http://mh.jwp.se/ . These builds are not officially supported, but may give an impression of how the development effort is progressing between formal builds.
+    * This 'work in progress' development deck is also available as source code. It is controlled using Subversion (SVN) and can be freely downloaded from SourceForge here. The Developers Guide provides instructions on setting up an environment to enable you to build this source. Recent developments include:
+          o January 2009 - Performance enhancements were added to the code and face group documentation has been added to this Wiki (see Full API in the Developers Documentation).
+          o February 2009 - Ethnicity (Africa only), Gender, Age and Muscle Tone controls have been implemented in the source deck. Other ethnic groups are under development.
+          o March 2009 - Implementing Macro and Detail editor controls for manipulating the anatomy of the figure.
+    * The MakeHuman© 0.9.1 Release Candidate was published way back in December 2007 with prebuilt installers for Windows, Mac OS X and Linux. These prebuilt installers and the 0.9.1 source code can be downloaded here. Community feedback resulted in quite a change of track for the development team. As a consequence all development effort is now focused on this new direction and any incomplete 0.9.1 features will not now be completed.
+
+
+The software currently under development incorporates many new innovations. Previews of some of the new GUI design elements can be seen on the blog here. The blog also links to a number of very interesting companies such as LOOXIS that have donated source code and tools to the project.
+
