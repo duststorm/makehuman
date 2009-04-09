@@ -1,4 +1,5 @@
 #summary Welcome
+#sidebar TableOfContents
 
 = Welcome to the MakeHuman Wiki=
 
