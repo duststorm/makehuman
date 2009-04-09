@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Welcome
 
 = Welcome to the MakeHuman Wiki=
 
@@ -25,4 +25,3 @@ The MakeHuman development project is hosted on sourceforge at http://code.google
 
 
 The software currently under development incorporates many new innovations. Previews of some of the new GUI design elements can be seen on the blog here. The blog also links to a number of very interesting companies such as LOOXIS that have donated source code and tools to the project.
-
