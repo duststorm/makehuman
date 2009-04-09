@@ -1,0 +1,9 @@
+# Blender3D v245 OBJ File: icons.blend
+# www.blender3d.org
+v 14.8 14.8 -0.000001
+v 14.8 -14.8 0.000001
+v -14.8 -14.8 0.000001
+v -14.8 14.8 -0.000001
+usemtl (null)
+s off
+f 1 4 3 2
