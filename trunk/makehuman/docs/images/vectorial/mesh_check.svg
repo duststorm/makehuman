@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docbase="/home/manuel/myworks/mh_phoenix/docs/images/vectorial"
+   sodipodi:docname="mesh_check.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="547.05507"
+     inkscape:cy="674.02502"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="1024"
+     inkscape:window-height="693"
+     inkscape:window-x="0"
+     inkscape:window-y="25" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Livello 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:black;stroke-width:3.24069047;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6.48138103, 3.24069051;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 297.48992,345.31328 L 297.48992,368.43105"
+       id="path2302"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:black;stroke-width:3.24069047;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6.48138103, 3.24069051;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 377.34984,266.96858 L 400.46761,266.96858"
+       id="path2300"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#000000;fill-opacity:0;fill-rule:evenodd;stroke:#000000;stroke-width:0.28371203px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="rect2520"
+       width="145.00197"
+       height="144.19351"
+       x="265.35617"
+       y="236.28975"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.18707705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 297.60496,344.10099 L 378.93143,266.82432"
+       id="path1874"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.35115957;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 377.71863,238.71961 L 377.71863,375.39166"
+       id="path2789"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.24069047;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 270.06866,344.27235 L 407.33367,344.27235"
+       id="path3678"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path7459"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.5659432,0,0,0.5659432,56.222821,52.97908)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path7461"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.5659432,0,0,0.5659432,56.508679,130.15708)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       sodipodi:type="arc"
+       style="fill:red;fill-opacity:1;stroke:black;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path7465"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.565943,0,0,0.565943,-17.67095,58.62206)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path7467"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.5659432,0,0,0.5659432,-24.385317,131.01465)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <text
+       xml:space="preserve"
+       style="font-size:9.84515667px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="263.51065"
+       y="230.83826"
+       id="text2304"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       transform="scale(1.003352,0.99666)"><tspan
+         sodipodi:role="line"
+         id="tspan2306"
+         x="263.51065"
+         y="230.83826">no v.he = isolated vert</tspan></text>
+    <rect
+       style="fill:red;fill-opacity:1;stroke:black;stroke-width:1.11898983;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2308"
+       width="6.2078271"
+       height="41.962097"
+       x="-281.18039"
+       y="312.23325"
+       transform="matrix(0,-1,1,0,0,0)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <rect
+       style="fill:red;fill-opacity:1;stroke:black;stroke-width:0.88686711;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2310"
+       width="6.43995"
+       height="25.408506"
+       x="-311.07712"
+       y="-263.10214"
+       transform="scale(-1,-1)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <rect
+       style="fill:red;fill-opacity:1;stroke:black;stroke-width:0.72658563;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2312"
+       width="6.6002312"
+       height="16.640215"
+       x="-272.09085"
+       y="276.67987"
+       transform="matrix(0,-1,1,0,0,0)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <rect
+       style="fill:red;fill-opacity:1;stroke:black;stroke-width:0.88686711;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2314"
+       width="6.43995"
+       height="25.408506"
+       x="-303.93427"
+       y="-308.2807"
+       transform="scale(-1,-1)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <g
+       id="g2342"
+       transform="translate(-20.23202,47.68187)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150">
+      <rect
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(-0.5,-0.866025,0.866025,-0.5,0,0)"
+         y="169.31223"
+         x="-341.26254"
+         height="26.308109"
+         width="3.891993"
+         id="rect2344"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154989;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <rect
+         inkscape:transform-center-x="3.3926598"
+         inkscape:transform-center-y="-5.8765231"
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(0.5,-0.866026,0.866026,0.5,0,0)"
+         y="371.58481"
+         x="-12.762891"
+         height="26.30809"
+         width="3.8919902"
+         id="rect2346"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154941;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <g
+       id="g2348"
+       transform="translate(5.482266,75.53901)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150">
+      <rect
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(-0.5,-0.866025,0.866025,-0.5,0,0)"
+         y="169.31223"
+         x="-341.26254"
+         height="26.308109"
+         width="3.891993"
+         id="rect2350"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154989;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <rect
+         inkscape:transform-center-x="3.3926598"
+         inkscape:transform-center-y="-5.8765231"
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(0.5,-0.866026,0.866026,0.5,0,0)"
+         y="371.58481"
+         x="-12.762891"
+         height="26.30809"
+         width="3.8919902"
+         id="rect2352"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154941;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <g
+       id="g2354"
+       transform="translate(-28.08917,95.53901)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150">
+      <rect
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(-0.5,-0.866025,0.866025,-0.5,0,0)"
+         y="169.31223"
+         x="-341.26254"
+         height="26.308109"
+         width="3.891993"
+         id="rect2356"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154989;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <rect
+         inkscape:transform-center-x="3.3926598"
+         inkscape:transform-center-y="-5.8765231"
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(0.5,-0.866026,0.866026,0.5,0,0)"
+         y="371.58481"
+         x="-12.762891"
+         height="26.30809"
+         width="3.8919902"
+         id="rect2358"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154941;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <g
+       id="g2360"
+       transform="translate(-45.58917,66.96758)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150">
+      <rect
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(-0.5,-0.866025,0.866025,-0.5,0,0)"
+         y="169.31223"
+         x="-341.26254"
+         height="26.308109"
+         width="3.891993"
+         id="rect2362"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154989;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <rect
+         inkscape:transform-center-x="3.3926598"
+         inkscape:transform-center-y="-5.8765231"
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(0.5,-0.866026,0.866026,0.5,0,0)"
+         y="371.58481"
+         x="-12.762891"
+         height="26.30809"
+         width="3.8919902"
+         id="rect2364"
+         style="fill:black;fill-opacity:1;stroke:black;stroke-width:0.70154941;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.24069047;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6.48138103, 3.24069051;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 452.28686,345.34251 L 452.28686,368.46028"
+       id="path3179"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.24069047;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:6.48138103, 3.24069051;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 532.14678,266.99781 L 555.26455,266.99781"
+       id="path3181"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:#000000;fill-opacity:0;fill-rule:evenodd;stroke:#000000;stroke-width:0.28371203px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="rect3183"
+       width="145.00197"
+       height="144.19351"
+       x="420.15308"
+       y="236.31897"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.18707705;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 452.4019,344.13022 L 533.72837,266.85355"
+       id="path3185"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.35115957;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 532.51557,238.74884 L 532.51557,375.42089"
+       id="path3187"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:3.24069047;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 424.8656,344.30158 L 562.13061,344.30158"
+       id="path3189"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3191"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.5659432,0,0,0.5659432,211.01976,53.008305)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3193"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.5659432,0,0,0.5659432,211.30562,130.18631)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3197"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.5659432,0,0,0.5659432,130.41162,131.04388)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <text
+       xml:space="preserve"
+       style="font-size:9.84516048px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="417.79062"
+       y="230.86766"
+       id="text3199"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       transform="scale(1.0033516,0.9966596)"><tspan
+         sodipodi:role="line"
+         id="tspan3201"
+         x="417.79062"
+         y="230.86766">no he.twin = boundary edge</tspan></text>
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1.11898983;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3203"
+       width="6.207829"
+       height="41.962112"
+       x="-576.5658"
+       y="126.91901"
+       transform="matrix(-0.6886444,-0.7250993,0.7250993,-0.6886444,0,0)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <rect
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1.11898983;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect3235"
+       width="6.2078295"
+       height="41.962116"
+       x="-549.65039"
+       y="127.95321"
+       transform="matrix(-0.6886444,-0.7250993,0.7250993,-0.6886444,0,0)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <path
+       style="fill:#ffc200;fill-opacity:1;stroke:#000000;stroke-width:1.05497408;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 517.25696,305.42186 L 501.33345,288.31515 L 502.60235,287.03194 L 494.64096,283.11532 L 498.15626,291.52816 L 499.42516,290.24495 L 515.34867,307.35167 L 517.25696,305.42186 z "
+       id="path7587"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       style="fill:#ffc200;fill-opacity:1;stroke:#000000;stroke-width:1.05497408;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 473.31269,303.24723 L 489.2362,320.35394 L 487.9673,321.63715 L 495.92869,325.55377 L 492.41339,317.14093 L 491.14449,318.42414 L 475.22098,301.31742 L 473.31269,303.24723 z "
+       id="path3688"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <g
+       id="g3690"
+       transform="matrix(0.6909767,0.7228771,-0.7228771,0.6909767,402.54925,-84.894517)"
+       inkscape:transform-center-y="4.5456864"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150">
+      <rect
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(-0.5,-0.866025,0.866025,-0.5,0,0)"
+         y="169.31223"
+         x="-341.26254"
+         height="26.308109"
+         width="3.891993"
+         id="rect3692"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.70154989;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <rect
+         inkscape:transform-center-x="3.3926598"
+         inkscape:transform-center-y="-5.8765231"
+         inkscape:export-ydpi="150.05013"
+         inkscape:export-xdpi="150.05013"
+         inkscape:export-filename="/home/manuel/myworks/mhProto20032008/docs/images/hedge_next.png"
+         transform="matrix(0.5,-0.866026,0.866026,0.5,0,0)"
+         y="371.58481"
+         x="-12.762891"
+         height="26.30809"
+         width="3.8919902"
+         id="rect3694"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.70154941;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 575.81589,259.87234 L 677.7125,272.18469"
+       id="path4142"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 588.29793,287.475 L 641.40537,296.92458"
+       id="path4144"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 641.94063,297.10054 L 677.49038,272.24678"
+       id="path3758"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 677.49038,273.18526 L 719.82689,322.33959"
+       id="path3760"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 641.94063,297.7469 L 687.50894,341.08401"
+       id="path3762"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 687.18576,341.05295 L 719.50371,322.33959"
+       id="path3764"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 574.71929,259.28854 L 588.97118,286.56241"
+       id="path3766"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 589.41813,287.15334 L 609.94586,345.28534"
+       id="path3770"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.59965682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 609.94586,344.9311 L 687.50894,340.76082"
+       id="path3772"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150"
+       sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4153"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.3199313,0,0,0.3199313,494.67611,152.13013)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:2.05439115;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 649.75454,247.8396 L 668.15045,254.29733 L 662.95272,239.72407 L 649.75454,247.8396 z M 641.34006,293.94656 L 645.89919,295.54698 L 661.06417,252.34693 L 656.50505,250.74649 L 641.34006,293.94656 z "
+       id="path5153"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4156"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(1.0933497,0,0,1.0933497,20.905608,-115.65898)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path2703"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.3199313,0,0,0.3199313,428.48058,223.66206)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path5171"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.3199313,0,0,0.3199313,394.38514,138.98904)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path5173"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.3199313,0,0,0.3199313,407.64311,166.29342)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path5175"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.3199313,0,0,0.3199313,538.03843,201.36268)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:2.08299994;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path5177"
+       sodipodi:cx="568.21082"
+       sodipodi:cy="377.58029"
+       sodipodi:rx="7.0710678"
+       sodipodi:ry="7.0710678"
+       d="M 561.20586,378.54498 A 7.0710678,7.0710678 0 1 1 561.21354,378.59919"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.3199313,0,0,0.3199313,506.04366,219.9455)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.97213161;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 618.05893,254.18167 L 626.13709,254.34173 L 622.32277,247.76551 L 618.05893,254.18167 z M 620.25894,279.2418 L 622.26098,279.28145 L 623.08985,254.55526 L 621.08781,254.51559 L 620.25894,279.2418 z "
+       id="path4757"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.97213161;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 697.74151,291.30036 L 703.20585,297.2521 L 705.32623,289.95143 L 697.74151,291.30036 z M 681.14066,310.20173 L 682.49492,311.67677 L 700.94654,295.19619 L 699.5923,293.72114 L 681.14066,310.20173 z "
+       id="path4759"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.97213161;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 632.94743,369.08599 L 624.8775,369.48426 L 629.13691,375.78133 L 632.94743,369.08599 z M 629.02181,344.23767 L 627.02181,344.33637 L 627.90272,369.06077 L 629.90271,368.96207 L 629.02181,344.23767 z "
+       id="path4761"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#000000;stroke:#000000;stroke-width:3.24069047;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4184"
+       sodipodi:cx="480"
+       sodipodi:cy="532.36218"
+       sodipodi:rx="4.2857141"
+       sodipodi:ry="4.2857141"
+       d="M 475.75436,532.94687 A 4.2857141,4.2857141 0 1 1 475.75901,532.97973"
+       sodipodi:start="3.0047383"
+       sodipodi:end="9.2801805"
+       sodipodi:open="true"
+       transform="matrix(0.8127798,0,0,0.8127798,236.80954,-111.80516)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150"
+       inkscape:export-ydpi="150" />
+    <g
+       id="g4760"
+       transform="matrix(0.2875354,0.2745823,-0.3978679,0.1984381,683.24457,214.58299)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013">
+      <path
+         sodipodi:nodetypes="ccsssc"
+         id="path2816"
+         d="M 159.38289,276.49997 L 151.0382,285.30272 C 148.42931,266.35866 161.68685,248.86641 180.63091,246.25753 C 199.57497,243.64864 217.06721,256.90618 219.67609,275.85024 C 222.28498,294.7943 209.02745,312.28654 190.08339,314.89542 C 186.40523,315.40196 183.22058,315.35216 179.56006,314.73085"
+         style="fill:none;stroke:#000000;stroke-width:5.80000019;stroke-miterlimit:4;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         id="path3789"
+         d="M 150.80094,289.05073 L 143.57143,272.95392"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g4440"
+       transform="matrix(-0.2875354,0.2212934,0.3978679,0.1599267,563.67643,193.34632)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013">
+      <path
+         sodipodi:nodetypes="ccsssc"
+         id="path4442"
+         d="M 159.38289,276.49997 L 151.0382,285.30272 C 148.42931,266.35866 161.68685,248.86641 180.63091,246.25753 C 199.57497,243.64864 217.06721,256.90618 219.67609,275.85024 C 222.28498,294.7943 209.02745,312.28654 190.08339,314.89542 C 186.40523,315.40196 183.22058,315.35216 179.56006,314.73085"
+         style="fill:none;stroke:#000000;stroke-width:5.80000019;stroke-miterlimit:4;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         id="path4444"
+         d="M 150.80094,289.05073 L 143.57143,272.95392"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g4446"
+       transform="matrix(-0.396392,3.07485e-2,0.1825932,0.4053841,706.99411,194.29386)"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013">
+      <path
+         sodipodi:nodetypes="ccsssc"
+         id="path4448"
+         d="M 159.38289,276.49997 L 151.0382,285.30272 C 148.42931,266.35866 161.68685,248.86641 180.63091,246.25753 C 199.57497,243.64864 217.06721,256.90618 219.67609,275.85024 C 222.28498,294.7943 209.02745,312.28654 190.08339,314.89542 C 186.40523,315.40196 183.22058,315.35216 179.56006,314.73085"
+         style="fill:none;stroke:#000000;stroke-width:5.80000019;stroke-miterlimit:4;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         id="path4450"
+         d="M 150.80094,289.05073 L 143.57143,272.95392"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <rect
+       style="fill:#000000;fill-opacity:0;fill-rule:evenodd;stroke:#000000;stroke-width:0.28371203px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="rect4452"
+       width="145.00197"
+       height="144.19351"
+       x="574.59259"
+       y="235.58081"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013" />
+    <text
+       xml:space="preserve"
+       style="font-size:9.84516048px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="570.71381"
+       y="231.15672"
+       id="text4454"
+       inkscape:export-filename="/home/manuel/myworks/mh_phoenix/docs/images/mesh_check.png"
+       inkscape:export-xdpi="150.05013"
+       inkscape:export-ydpi="150.05013"
+       transform="scale(1.0033516,0.9966596)"><tspan
+         sodipodi:role="line"
+         id="tspan4456"
+         x="570.71381"
+         y="231.15672">infinite loop = wrong norm</tspan></text>
+  </g>
+</svg>
