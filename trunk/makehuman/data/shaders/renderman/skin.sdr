@@ -1,0 +1,217 @@
+#!version 2.2.4
+surface
+#!parameters:
+uniform	string	lighttexture	=	""
+uniform	string	skintexture	=	""
+uniform	string	bumptexture	=	""
+uniform	string	refltexture	=	""
+uniform	float	Ka	=	1
+uniform	float	Kd	=	1
+uniform	float	Ks	=	1
+uniform	float	Km	=	0.1
+uniform	float	Kb	=	0
+uniform	float	bumping	=	.5
+uniform	float	roughness	=	.1
+uniform	float	contrast	=	0
+uniform	float	desaturation	=	0.5
+uniform	color	specularcolor	=	.1
+#!variables:
+varying	float	skin_sss_light
+varying	vector	skin_color
+varying	vector	skin_sss
+varying	float	skin_matte
+varying	float	skin_illum
+varying	float	skin_noise
+varying	float	skin_refl
+varying	vector	red_tone
+varying	vector	blue_tone
+varying	vector	melanin
+varying	float	amp
+varying	vector	n
+varying	vector	Nf
+varying	vector	V
+varying	float	CiR2
+varying	float	CiG2
+varying	float	CiB2
+varying	float	maxVal
+varying	float	desaturate_factor
+varying	float	angle_ramp
+varying	float	dark_area
+uniform	vector	temporary_0
+varying	float	temporary_1
+uniform	float	temporary_2
+varying	vector	P2
+varying	vector	temporary_3
+varying	vector	temporary_4
+varying	vector	temporary_5
+varying	float	temporary_6
+varying	float	temporary_7
+varying	float	temporary_8
+varying	float	temporary_9
+varying	vector	temporary_10
+varying	vector	temporary_11
+varying	vector	temporary_12
+uniform	vector	temporary_13
+#!Init:
+	return            
+#!Code:
+	vfromf            	temporary_0 0
+	vuvector           Ci temporary_0
+	vufloat            skin_sss_light 0
+	vfromf            	temporary_0 0
+	vuvector           skin_color temporary_0
+	vfromf            	temporary_0 0
+	vuvector           skin_sss temporary_0
+	vufloat            skin_matte 0
+	vufloat            skin_illum 0
+	vufloat            skin_noise 0
+	vufloat            skin_refl 1
+	vfromf            	temporary_0 0
+	vuvector           red_tone temporary_0
+	vfromf            	temporary_0 0
+	vuvector           blue_tone temporary_0
+	vfromf            	temporary_0 0.42 0.38 0.3
+	vuvector           melanin temporary_0
+	vufloat            amp 0
+	vfromf            	temporary_0 0
+	vuvector           n temporary_0
+	sneql             	temporary_2 bumptexture ""
+	vufloat            temporary_1 temporary_2
+	if                	temporary_1 #!Label9
+	normalize	("v=v")  n  N 
+	texture	("f=SFff")  amp  bumptexture  0  s  t 
+	vfromf            	temporary_5 amp
+	mulvv             	temporary_4 n temporary_5
+	vfromf            	temporary_0 Km
+	vuvector           temporary_5 temporary_0
+	mulvv             	temporary_3 temporary_4 temporary_5
+	subvv             	P2 P temporary_3
+	calculatenormal	("p=p")  N  P2 
+#!Label9:
+	endif             
+	normalize	("v=v")  temporary_3  N 
+	faceforward	("v=vv")  Nf  temporary_3  I 
+	normalize	("v=v")  temporary_3  I 
+	negv              	V temporary_3
+	diffuse	("c=n")  temporary_3  Nf 
+	vufloat            temporary_1 0
+	comp	("f=cf")  skin_matte  temporary_3  temporary_1 
+	sneql             	temporary_2 lighttexture ""
+	vufloat            temporary_1 temporary_2
+	if                	temporary_1 #!Label11
+	texture	("c=SFff")  skin_sss  lighttexture  0  s  t 
+	vufloat            temporary_6 2
+	comp	("f=cf")  skin_sss_light  skin_sss  temporary_6 
+#!Label11:
+	endif             
+	sneql             	temporary_2 skintexture ""
+	vufloat            temporary_1 temporary_2
+	if                	temporary_1 #!Label13
+	texture	("c=SFff")  skin_color  skintexture  0  s  t 
+#!Label13:
+	endif             
+	sneql             	temporary_2 refltexture ""
+	vufloat            temporary_1 temporary_2
+	if                	temporary_1 #!Label15
+	texture	("f=SFff")  skin_refl  refltexture  0  s  t 
+#!Label15:
+	endif             
+	vufloat            temporary_6 0.6
+	mix	("f=fff")  temporary_1  skin_sss_light  skin_matte  temporary_6 
+	vufloat            temporary_6 Kd
+	mulff             	skin_illum temporary_1 temporary_6
+	vfromf            	temporary_0 0.2 0.0 0.0
+	vuvector           temporary_3 temporary_0
+	vufloat            temporary_6 1
+	subff             	temporary_1 temporary_6 skin_illum
+	vfromf            	temporary_4 temporary_1
+	mulvv             	red_tone temporary_3 temporary_4
+	negf              	temporary_2 0.2
+	vfromf            	temporary_0 temporary_2 0.0 0.0
+	vuvector           temporary_3 temporary_0
+	vufloat            temporary_6 3
+	pow	("f=ff")  temporary_1  skin_illum  temporary_6 
+	vfromf            	temporary_4 temporary_1
+	mulvv             	blue_tone temporary_3 temporary_4
+	vfromf            	temporary_3 skin_illum
+	mulvv             	Ci temporary_3 skin_color
+	vufloat            temporary_1 0
+	comp	("f=cf")  CiR2  Ci  temporary_1 
+	vufloat            temporary_1 1
+	comp	("f=cf")  CiG2  Ci  temporary_1 
+	vufloat            temporary_1 2
+	comp	("f=cf")  CiB2  Ci  temporary_1 
+	max	("f=fff")  maxVal  CiR2  CiG2  CiB2 
+	vufloat            temporary_1 desaturation
+	vufloat            temporary_7 3
+	pow	("f=ff")  temporary_6  skin_sss_light  temporary_7 
+	mulff             	desaturate_factor temporary_1 temporary_6
+	subff             	temporary_6 maxVal CiR2
+	mulff             	temporary_1 desaturate_factor temporary_6
+	addff             	CiR2 temporary_1 CiR2
+	subff             	temporary_6 maxVal CiG2
+	mulff             	temporary_1 desaturate_factor temporary_6
+	addff             	CiG2 temporary_1 CiG2
+	subff             	temporary_6 maxVal CiB2
+	mulff             	temporary_1 desaturate_factor temporary_6
+	addff             	CiB2 temporary_1 CiB2
+	vufloat            temporary_1 0
+	setcomp	("o=Cff")  Ci  temporary_1  CiR2 
+	vufloat            temporary_1 1
+	setcomp	("o=Cff")  Ci  temporary_1  CiG2 
+	vufloat            temporary_1 2
+	setcomp	("o=Cff")  Ci  temporary_1  CiB2 
+	vufloat            temporary_6 0
+	vufloat            temporary_8 1
+	dot               	temporary_9 V Nf
+	subff             	temporary_7 temporary_8 temporary_9
+	max	("f=ff")  temporary_1  temporary_6  temporary_7 
+	vufloat            temporary_6 4
+	divff             	angle_ramp temporary_1 temporary_6
+	vfromf            	temporary_0 Ka
+	vuvector           temporary_11 temporary_0
+	ambient	("c=")  temporary_12 
+	mulvv             	temporary_10 temporary_11 temporary_12
+	addvv             	temporary_5 temporary_10 Ci
+	vfromf            	temporary_10 angle_ramp
+	addvv             	temporary_4 temporary_5 temporary_10
+	mulvv             	temporary_5 red_tone skin_color
+	addvv             	temporary_3 temporary_4 temporary_5
+	mulvv             	temporary_4 blue_tone skin_color
+	addvv             	Ci temporary_3 temporary_4
+	vufloat            temporary_1 0.5
+	vufloat            temporary_8 1
+	subff             	temporary_7 temporary_8 skin_illum
+	vufloat            temporary_8 3
+	pow	("f=ff")  temporary_6  temporary_7  temporary_8 
+	mulff             	dark_area temporary_1 temporary_6
+	mulvv             	temporary_3 Ci Cs
+	vfromf            	temporary_4 dark_area
+	subvv             	Ci temporary_3 temporary_4
+	vfromf            	temporary_13 Ks
+	mulvv             	temporary_0 specularcolor temporary_13
+	vuvector           temporary_5 temporary_0
+	vufloat            temporary_1 roughness
+	specular	("c=nvf")  temporary_10  Nf  V  temporary_1 
+	mulvv             	temporary_4 temporary_5 temporary_10
+	vfromf            	temporary_5 skin_refl
+	mulvv             	temporary_3 temporary_4 temporary_5
+	addvv             	Ci Ci temporary_3
+	vufloat            temporary_6 100
+	vufloat            temporary_8 4
+	pow	("f=ff")  temporary_7  angle_ramp  temporary_8 
+	mulff             	temporary_1 temporary_6 temporary_7
+	vfromf            	temporary_4 temporary_1
+	vufloat            temporary_1 roughness
+	specular	("c=nvf")  temporary_5  Nf  V  temporary_1 
+	mulvv             	temporary_3 temporary_4 temporary_5
+	addvv             	Ci Ci temporary_3
+	vfromf            	temporary_0 contrast
+	vuvector           temporary_4 temporary_0
+	mulvv             	temporary_3 Ci temporary_4
+	addvv             	Ci Ci temporary_3
+	vfromf            	temporary_0 Kb
+	vuvector           temporary_4 temporary_0
+	mulvv             	temporary_3 melanin temporary_4
+	subvv             	Ci Ci temporary_3
+	return            

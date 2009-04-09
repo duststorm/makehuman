@@ -1,0 +1,387 @@
+surface
+AQSIS_V 1.4.1
+
+
+segment Data
+
+USES 248069
+
+param uniform  string lighttexture
+param uniform  string skintexture
+param uniform  string bumptexture
+param uniform  string refltexture
+param uniform  float Ka
+param uniform  float Kd
+param uniform  float Ks
+param uniform  float Km
+param uniform  float Kb
+param uniform  float bumping
+param uniform  float roughness
+param uniform  float contrast
+param uniform  float desaturation
+param uniform  color specularcolor
+varying  float skin_sss_light
+varying  color skin_color
+varying  color skin_sss
+varying  float skin_matte
+varying  float skin_illum
+varying  float skin_noise
+varying  float skin_refl
+varying  color red_tone
+varying  color blue_tone
+varying  color melanin
+varying  float amp
+varying  normal n
+varying  point b0::P2
+varying  normal Nf
+varying  vector V
+varying  float CiR2
+varying  float CiG2
+varying  float CiB2
+varying  float maxVal
+varying  float desaturate_factor
+varying  float angle_ramp
+varying  float dark_area
+
+
+segment Init
+	pushis ""
+	pop lighttexture
+	pushis ""
+	pop skintexture
+	pushis ""
+	pop bumptexture
+	pushis ""
+	pop refltexture
+	pushif 1
+	pop Ka
+	pushif 1
+	pop Kd
+	pushif 1
+	pop Ks
+	pushif 0.1
+	pop Km
+	pushif 0
+	pop Kb
+	pushif 0.5
+	pop bumping
+	pushif 0.1
+	pop roughness
+	pushif 0
+	pop contrast
+	pushif 0.5
+	pop desaturation
+	pushif 0.1
+	setfc
+	pop specularcolor
+
+
+segment Code
+	pushif 0
+	setfc
+	pop Ci
+	pushif 0
+	pop skin_sss_light
+	pushif 0
+	setfc
+	pop skin_color
+	pushif 0
+	setfc
+	pop skin_sss
+	pushif 0
+	pop skin_matte
+	pushif 0
+	pop skin_illum
+	pushif 0
+	pop skin_noise
+	pushif 1
+	pop skin_refl
+	pushif 0
+	setfc
+	pop red_tone
+	pushif 0
+	setfc
+	pop blue_tone
+	pushif 0.3
+	pushif 0.38
+	pushif 0.42
+	settc
+	pop melanin
+	pushif 0
+	pop amp
+	pushif 0
+	setfn
+	pop n
+	S_CLEAR
+	pushis ""
+	pushv bumptexture
+	ness
+	S_GET
+	RS_PUSH
+	RS_GET
+	RS_JZ 0
+	pushv N
+	normalize
+	pop n
+	pushif 0
+	pushv bumptexture
+	pushif 0
+	ftexture1
+	pop amp
+	pushv Km
+	setfp
+	pushv amp
+	setfp
+	pushv n
+	mulpp
+	mulpp
+	pushv P
+	subpp
+	pop b0::P2
+	pushv b0::P2
+	calculatenormal
+	pop N
+:0
+	RS_POP
+	pushv I
+	pushv N
+	normalize
+	faceforward
+	pop Nf
+	pushv I
+	normalize
+	negp
+	pop V
+	pushif 0
+	pushv Nf
+	diffuse
+	comp
+	pop skin_matte
+	S_CLEAR
+	pushis ""
+	pushv lighttexture
+	ness
+	S_GET
+	RS_PUSH
+	RS_GET
+	RS_JZ 1
+	pushif 0
+	pushv lighttexture
+	pushif 0
+	ctexture1
+	pop skin_sss
+	pushif 2
+	pushv skin_sss
+	comp
+	pop skin_sss_light
+:1
+	RS_POP
+	S_CLEAR
+	pushis ""
+	pushv skintexture
+	ness
+	S_GET
+	RS_PUSH
+	RS_GET
+	RS_JZ 2
+	pushif 0
+	pushv skintexture
+	pushif 0
+	ctexture1
+	pop skin_color
+:2
+	RS_POP
+	S_CLEAR
+	pushis ""
+	pushv refltexture
+	ness
+	S_GET
+	RS_PUSH
+	RS_GET
+	RS_JZ 3
+	pushif 0
+	pushv refltexture
+	pushif 0
+	ftexture1
+	pop skin_refl
+:3
+	RS_POP
+	pushv Kd
+	pushif 0.6
+	pushv skin_matte
+	pushv skin_sss_light
+	fmix
+	mulff
+	pop skin_illum
+	pushv skin_illum
+	pushif 1
+	subff
+	setfp
+	pushif 0
+	pushif 0
+	pushif 0.2
+	settp
+	mulpp
+	setpc
+	pop red_tone
+	pushif 3
+	pushv skin_illum
+	pow
+	setfp
+	pushif 0
+	pushif 0
+	pushif 0.2
+	negf
+	settp
+	mulpp
+	setpc
+	pop blue_tone
+	pushv skin_color
+	pushv skin_illum
+	mulfc
+	pop Ci
+	pushif 0
+	pushv Ci
+	comp
+	pop CiR2
+	pushif 1
+	pushv Ci
+	comp
+	pop CiG2
+	pushif 2
+	pushv Ci
+	comp
+	pop CiB2
+	pushv CiB2
+	pushv CiG2
+	pushv CiR2
+	pushif 1
+	max
+	pop maxVal
+	pushif 3
+	pushv skin_sss_light
+	pow
+	pushv desaturation
+	mulff
+	pop desaturate_factor
+	pushv CiR2
+	pushv CiR2
+	pushv maxVal
+	subff
+	pushv desaturate_factor
+	mulff
+	addff
+	pop CiR2
+	pushv CiG2
+	pushv CiG2
+	pushv maxVal
+	subff
+	pushv desaturate_factor
+	mulff
+	addff
+	pop CiG2
+	pushv CiB2
+	pushv CiB2
+	pushv maxVal
+	subff
+	pushv desaturate_factor
+	mulff
+	addff
+	pop CiB2
+	pushv CiR2
+	pushif 0
+	pushv Ci
+	setcomp
+	pushv CiG2
+	pushif 1
+	pushv Ci
+	setcomp
+	pushv CiB2
+	pushif 2
+	pushv Ci
+	setcomp
+	pushif 4
+	pushv Nf
+	pushv V
+	dotpp
+	pushif 1
+	subff
+	pushif 0
+	pushif 0
+	max
+	divff
+	pop angle_ramp
+	pushv skin_color
+	pushv blue_tone
+	mulcc
+	pushv skin_color
+	pushv red_tone
+	mulcc
+	pushv angle_ramp
+	setfc
+	pushv Ci
+	ambient
+	pushv Ka
+	mulfc
+	addcc
+	addcc
+	addcc
+	addcc
+	pop Ci
+	pushif 3
+	pushv skin_illum
+	pushif 1
+	subff
+	pow
+	pushif 0.5
+	mulff
+	pop dark_area
+	pushv dark_area
+	setfc
+	pushv Cs
+	pushv Ci
+	mulcc
+	subcc
+	pop Ci
+	pushv skin_refl
+	setfc
+	pushv roughness
+	pushv V
+	pushv Nf
+	specular
+	pushv Ks
+	setfc
+	pushv specularcolor
+	mulcc
+	mulcc
+	mulcc
+	pushv Ci
+	addcc
+	pop Ci
+	pushv roughness
+	pushv V
+	pushv Nf
+	specular
+	pushif 4
+	pushv angle_ramp
+	pow
+	pushif 100
+	mulff
+	mulfc
+	pushv Ci
+	addcc
+	pop Ci
+	pushv contrast
+	setfc
+	pushv Ci
+	mulcc
+	pushv Ci
+	addcc
+	pop Ci
+	pushv Kb
+	setfc
+	pushv melanin
+	mulcc
+	pushv Ci
+	subcc
+	pop Ci

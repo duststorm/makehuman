@@ -1,0 +1,109 @@
+surface
+AQSIS_V 1.4.1
+
+
+segment Data
+
+USES 510215
+
+param uniform  float Ka
+param uniform  float Kd
+param uniform  float Ks
+param uniform  float roughness
+param uniform  float Km
+param uniform  color specularcolor
+param uniform  string texturename
+param uniform  string bumptexture
+varying  normal Nf
+varying  vector V
+varying  float amp
+varying  normal n
+varying  point b0::P2
+
+
+segment Init
+	pushif 1
+	pop Ka
+	pushif 0.5
+	pop Kd
+	pushif 0.5
+	pop Ks
+	pushif 0.1
+	pop roughness
+	pushif 0.5
+	pop Km
+	pushif 1
+	setfc
+	pop specularcolor
+	pushis ""
+	pop texturename
+	pushis ""
+	pop bumptexture
+
+
+segment Code
+	pushif 0
+	pop amp
+	pushif 0
+	setfn
+	pop n
+	S_CLEAR
+	pushis ""
+	pushv bumptexture
+	ness
+	S_GET
+	RS_PUSH
+	RS_GET
+	RS_JZ 0
+	pushv N
+	normalize
+	pop n
+	pushif 0
+	pushv bumptexture
+	pushif 0
+	ftexture1
+	pop amp
+	pushv Km
+	setfp
+	pushv amp
+	setfp
+	pushv n
+	mulpp
+	mulpp
+	pushv P
+	subpp
+	pop b0::P2
+	pushv b0::P2
+	calculatenormal
+	pop N
+:0
+	RS_POP
+	pushv I
+	pushv N
+	normalize
+	faceforward
+	pop Nf
+	pushv I
+	normalize
+	negp
+	pop V
+	pushv Os
+	pop Oi
+	pushv Nf
+	diffuse
+	pushv Kd
+	mulfc
+	ambient
+	pushv Ka
+	mulfc
+	addcc
+	pushv Cs
+	mulcc
+	pushv Os
+	mulcc
+	pop Ci
+	pushv Ci
+	pushv t
+	pushv s
+	pushv texturename
+	bake_3c

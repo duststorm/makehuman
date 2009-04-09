@@ -1,0 +1,22 @@
+#!version 2.2.4
+surface
+#!parameters:
+uniform	string	pointcloudname	=	""
+uniform	float	bluramt	=	0
+#!variables:
+varying	vector	Pbake
+varying	float	temporary_0
+varying	vector	temporary_1
+uniform	vector	temporary_2
+uniform	float	temporary_3
+#!Init:
+	return            
+#!Code:
+	vufloat            temporary_0 0
+	vfromf            	Pbake s t temporary_0
+	vfromf            	temporary_2 0
+	vuvector           temporary_1 temporary_2
+	addff             	temporary_3 1 bluramt
+	texture3d	("f=SpnSssfsc")  temporary_0  pointcloudname  Pbake  temporary_1  "coordsystem"  "current"  "radiusscale"  temporary_3  "BakeCol"  Ci 
+	movevv            	Oi Os
+	return            

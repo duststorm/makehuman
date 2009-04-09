@@ -1,0 +1,72 @@
+#!version 2.2.4
+surface
+#!parameters:
+uniform	float	Ka	=	1
+uniform	float	Kd	=	.5
+uniform	float	Km	=	.1
+uniform	color	specularcolor	=	1
+uniform	string	texturename	=	""
+uniform	string	bumptexture	=	""
+uniform	string	pointcloudname	=	""
+#!variables:
+varying	float	amp
+varying	vector	n
+varying	vector	Nf
+varying	vector	Pbake
+varying	float	temporary_0
+uniform	float	temporary_1
+varying	vector	temporary_2
+uniform	vector	temporary_3
+varying	vector	P2
+varying	vector	temporary_4
+varying	vector	temporary_5
+varying	vector	temporary_6
+varying	vector	temporary_7
+#!Init:
+	return            
+#!Code:
+	movevv            	Ci Cs
+	sneql             	temporary_1 texturename ""
+	vufloat            temporary_0 temporary_1
+	if                	temporary_0 #!Label5
+	texture	("c=SFff")  temporary_2  texturename  0  s  t 
+	mulvv             	Ci Ci temporary_2
+#!Label5:
+	endif             
+	vufloat            amp 0
+	vfromf            	temporary_3 0
+	vuvector           n temporary_3
+	sneql             	temporary_1 bumptexture ""
+	vufloat            temporary_0 temporary_1
+	if                	temporary_0 #!Label7
+	normalize	("v=v")  n  N 
+	texture	("f=SFff")  amp  bumptexture  0  s  t 
+	vfromf            	temporary_5 amp
+	mulvv             	temporary_4 n temporary_5
+	vfromf            	temporary_3 Km
+	vuvector           temporary_5 temporary_3
+	mulvv             	temporary_2 temporary_4 temporary_5
+	subvv             	P2 P temporary_2
+	calculatenormal	("p=p")  N  P2 
+#!Label7:
+	endif             
+	normalize	("v=v")  temporary_2  N 
+	faceforward	("v=vv")  Nf  temporary_2  I 
+	vfromf            	temporary_3 Ka
+	vuvector           temporary_5 temporary_3
+	ambient	("c=")  temporary_6 
+	mulvv             	temporary_4 temporary_5 temporary_6
+	vfromf            	temporary_3 Kd
+	vuvector           temporary_6 temporary_3
+	diffuse	("c=n")  temporary_7  Nf 
+	mulvv             	temporary_5 temporary_6 temporary_7
+	addvv             	temporary_2 temporary_4 temporary_5
+	mulvv             	Ci Ci temporary_2
+	movevv            	Oi Os
+	mulvv             	Ci Ci Oi
+	vufloat            temporary_0 0
+	vfromf            	Pbake s t temporary_0
+	vfromf            	temporary_3 0
+	vuvector           temporary_2 temporary_3
+	bake3d	("f=SSpnSssc")  temporary_0  pointcloudname  "BakeCol"  Pbake  temporary_2  "coordsystem"  "current"  "BakeCol"  Ci 
+	return            
