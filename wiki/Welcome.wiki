@@ -7,6 +7,8 @@ This Wiki is a community resource for users of the MakeHuman software. This Wiki
 
 The MakeHuman team is currently looking to enlist more Blender artists to help with the creation of the full set of morph targets required to model the different ethnic groups around the world. If you're intersted please see the Blog at http://www.makehuman.org/blog/index.php and contact us.
 
+http://lh3.ggpht.com/_U_UAchQSYOc/Sd50VI8YJAI/AAAAAAAAAEE/KgcX2VuK7no/mainscreen.jpg
+
 
 MakeHuman is a free, Open Source, interactive modelling tool for creating custom 3D human characters. These characters can be modelled in minutes and can then be used with many other modelling and rendering programs to incorporate realistic human figures into computer generated images and animations. Features that make this software unique include the tetra-parametric GUI© and the Natural Pose System©, for advanced muscular simulation.
 
