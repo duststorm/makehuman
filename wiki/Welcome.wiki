@@ -2,7 +2,7 @@
 #sidebar TableOfContents
 
 = Welcome to the MakeHuman© Wiki=
-[splash.jpg]
+[http://code.google.com/p/makehuman/w/edit/splash.jpg]
 
 This Wiki is a community resource for users of the MakeHuman software. This Wiki relates to MakeHuman 1.0, which at present has only been released as a Pre-Alpha Technical Preview and is not a fully functioning releas. The older Wiki at http://makewiki.aleppax.it/pmwiki/pmwiki.php covers the old 0.9.1 Release Candidate. If you wish to help edit this Wiki please contact us here.
 
