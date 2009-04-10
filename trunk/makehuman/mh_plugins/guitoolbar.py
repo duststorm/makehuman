@@ -88,7 +88,7 @@ class Guitoolbar:
         
         #Load all objs of default GUI
         self.bUpperbar = files3d.loadMesh(self.scene,"data/3dobjs/upperbar.obj", self.toolbarGuiObjs,0,0.39,9)
-        files3d.loadMesh(self.scene,"data/3dobjs/backgroundbox.obj", self.toolbarGuiObjs,0,0,-40)
+        files3d.loadMesh(self.scene,"data/3dobjs/backgroundbox.obj", self.toolbarGuiObjs,0,0,-72)
         self.bLowerbar = files3d.loadMesh(self.scene,"data/3dobjs/lowerbar.obj", self.toolbarGuiObjs,0,-0.39,9)        
         self.bExit = files3d.loadMesh(self.scene,"data/3dobjs/button_exit.obj",\
                         self.toolbarGuiObjs,0.5,0.39,9)

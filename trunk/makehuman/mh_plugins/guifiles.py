@@ -409,7 +409,7 @@ class Guifiles:
         self.zoom = self.scene.getCameraZoom()
         self.rotation = self.scene.getCameraRotations()
         self.scene.setCameraTranslations(0, -1)
-        self.scene.setCameraZoom(40.0)
+        self.scene.setCameraZoom(70.0)
         self.scene.setCameraRotations(0.0, 0.0)
 
     def isNotActive(self):        

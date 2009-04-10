@@ -73,6 +73,7 @@ mainScene.startWindow() #Use scene.startWindow(1) to enable animation
 splash = files3d.loadMesh(mainScene, "data/3dobjs/splash.obj", loadColors = None)
 splash.setTexture("data/images/splash.png")
 splash.setShadeless(1)
+splash.setCameraProjection(0)
 progressBar = widgets3d.ProgressBar(mainScene)
 mainScene.update()
 

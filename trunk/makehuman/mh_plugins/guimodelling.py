@@ -445,7 +445,7 @@ class Guimodelling:
 
 
 
-        self.background = files3d.loadMesh(self.scene,"data/3dobjs/background.obj", self.modellingGUIObjs,0,0,-35)
+        self.background = files3d.loadMesh(self.scene,"data/3dobjs/background.obj", self.modellingGUIObjs,0,0,-70)
         self.bRedo = files3d.loadMesh(self.scene,"data/3dobjs/button_undo.obj",\
                             self.modellingGUIObjs,0.45,0.20,9)
         self.bUndo = files3d.loadMesh(self.scene,"data/3dobjs/button_redo.obj",\

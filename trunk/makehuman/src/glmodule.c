@@ -777,6 +777,11 @@ void OnExit()
  */
 void mhSceneCameraPosition()
 {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(25, (float)G.windowWidth/G.windowHeight, 0.1, 100);
+    glMatrixMode(GL_MODELVIEW);
+
     glTranslatef(0, 0, -G.zoom);
     glTranslatef(G.translX, G.translY, 0);
     glRotatef(G.rotX, 1 ,0 , 0);
@@ -790,6 +795,11 @@ void mhSceneCameraPosition()
  */
 void mhGUICameraPosition()
 {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(G.fovAngle, (float)G.windowWidth/G.windowHeight, 0.1, 100);
+    glMatrixMode(GL_MODELVIEW);
+
     glTranslatef(0, 0, -10);
 }
 
