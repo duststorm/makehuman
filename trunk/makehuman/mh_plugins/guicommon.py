@@ -90,7 +90,11 @@ class Guicommon:
         """        
         mousePos = self.scene.getMousePosGUI()
         self.cursor.setLoc(mousePos[0],mousePos[1],self.cursor.z)        
-        self.scene.redraw()        
+        self.scene.redraw()
+        print(self.scene.mouseX, self.scene.mouseY)
+        c = self.scene.getMousePos3D()
+        print(c)
+        print(self.scene.convertToScreen(c[0], c[1], c[2], 1))
 
     def faceGroupSelection(self):
         """

@@ -240,26 +240,28 @@ static PyObject* mh_convertToScreen(PyObject *self, PyObject *args)
 
 static PyObject* mh_convertToWorld2D(PyObject *self, PyObject *args)
 {
+    double screen[2];
     double world[3];
     int camera;
-    if (!PyArg_ParseTuple(args, "ddi", world, world + 1, &camera))
+    if (!PyArg_ParseTuple(args, "ddi", screen, screen + 1, &camera))
         return NULL;
     else
     {
-        mhConvertToWorld2D(world, world, camera);
+        mhConvertToWorld2D(screen, world, camera);
         return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
     }
 }
 
 static PyObject* mh_convertToWorld3D(PyObject *self, PyObject *args)
 {
+    double screen[3];
     double world[3];
     int camera;
-    if (!PyArg_ParseTuple(args, "dddi", world, world + 1, world + 2, &camera))
+    if (!PyArg_ParseTuple(args, "dddi", screen, screen + 1, screen + 2, &camera))
         return NULL;
     else
     {
-        mhConvertToWorld3D(world, world, camera);
+        mhConvertToWorld3D(screen, world, camera);
         return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
     }
 }

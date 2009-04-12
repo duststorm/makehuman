@@ -219,7 +219,15 @@ unsigned int mhLoadTexture(const char *fname, unsigned int texture)
 int mhGrabScreen(int x, int y, int width, int height, const char *filename)
 {
   int viewport[4];
-  SDL_Surface *surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 24, 0xFF, 0xFF00, 0xFF0000, 0);
+  SDL_Surface *surface;
+
+  if (width <= 0 || height <= 0)
+  {
+    PyErr_Format(PyExc_RuntimeError, "width or height is 0");
+    return 0;
+  }
+
+  surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 24, 0xFF, 0xFF00, 0xFF0000, 0);
   glGetIntegerv(GL_VIEWPORT, viewport);
 
   if (SDL_LockSurface(surface))
@@ -551,8 +559,8 @@ void mhConvertToScreen(double world[3], double screen[3], int camera)
 void mhConvertToWorld2D(double screen[2], double world[3], int camera)
 {
   GLint viewport[4];
-  double modelview[16], projection[16];
-  double z;
+  GLdouble modelview[16], projection[16];
+  GLdouble z;
 
   glLoadIdentity();
   if (camera)

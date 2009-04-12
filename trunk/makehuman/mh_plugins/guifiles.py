@@ -355,7 +355,10 @@ class Guifiles:
         filename = self.gFileSelector.textString.split()[0]
         
         # Save the thumbnail
-        self.scene.grabScreen(225, 140, 350, 350, "models/" + filename + ".bmp")
+        leftTop = self.scene.convertToScreen(-10, 10, 0, 1)
+        rightBottom = self.scene.convertToScreen(10, -9, 0, 1)
+        print(leftTop[0], leftTop[1], rightBottom[0], rightBottom[1])
+        self.scene.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), "models/" + filename + ".bmp")
         
         # Save the model
         f = open("models/" + filename + ".mhm", 'w')
