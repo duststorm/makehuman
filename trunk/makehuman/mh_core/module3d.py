@@ -646,9 +646,8 @@ class Object3D:
         print("loading " + path);
         if path in textureCache:
             if os.stat(path).st_mtime != textureCache[path].modified:
-                texture = None
                 try:
-                    texture = mh.LoadTexture(path, textureCache[path].id)
+                    mh.LoadTexture(path, textureCache[path].id)
                 except RuntimeError, text:
                     print(text)
                     return;
@@ -671,8 +670,8 @@ class Object3D:
                     mh.setObjTexture(self.idx, texture)
                 except IndexError, text:
                     print(text)
-                    
-                
+    
+            
     def clearTexture(self):
         """
         This method is used to clear an object's texture.
@@ -1153,6 +1152,14 @@ class Scene3D:
             
 
         print "Regeneration done in" + str(time.time()-a)
+        
+    def reloadTextures(self):
+        print("Reloading textures")
+        for path in textureCache:
+            try:
+                mh.LoadTexture(path, textureCache[path].id)
+            except RuntimeError, text:
+                    print(text)
 
 
     def connect(self,eventName,functionToCall,obj = None):

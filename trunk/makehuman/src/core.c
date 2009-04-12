@@ -142,6 +142,18 @@ void callKeyDown(int key, unsigned short character)
         Py_DECREF(v);
 }
 
+void callReloadTextures()
+{
+    PyObject *main_module = PyImport_AddModule("__main__");
+    PyObject *global_dict = PyModule_GetDict(main_module);
+    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
+    PyObject *v;
+    if (!(v = PyObject_CallMethod(mainScene, "reloadTextures", "")))
+        PyErr_Print();
+    else
+        Py_DECREF(v);
+}
+
 /** \brief Re-initialise the scene contained in G.world.
  *  \param n an int specifying the number of objects in the list of objects that will replace the objects currently in G.world.
  *
