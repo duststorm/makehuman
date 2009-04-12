@@ -54,6 +54,11 @@
 
 static int g_savedx=0; /*saved x mouse position*/
 static int g_savedy=0; /*saved y mouse position*/
+static int g_desktopWidth = 0;
+static int g_desktopHeight = 0;
+static int g_windowWidth = 800;
+static int g_windowHeight = 600;
+static SDL_Surface *g_screen = NULL;
 
 typedef SDL_Surface *(*PFN_IMG_LOAD)(const char *);
 static void *g_sdlImageHandle = NULL;
@@ -979,7 +984,30 @@ void mhQueueUpdate()
  */
 void mhSetFullscreen(int fullscreen)
 {
+    if (G.fullscreen == fullscreen)
+        return;
+
     G.fullscreen = fullscreen;
+    
+    if (fullscreen)
+    {
+      G.windowWidth = g_desktopWidth;
+      G.windowHeight = g_desktopHeight;
+    }
+    else
+    {
+      G.windowWidth = g_windowWidth;
+      G.windowHeight = g_windowHeight;
+    }
+
+    if (!g_screen)
+        return;
+    
+    g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
+    OnInit();
+    mhReshape(G.windowWidth, G.windowHeight);
+    callReloadTextures();
+    mhDraw();
 }
 
 /** \brief Create SDL window.
@@ -991,9 +1019,9 @@ void mhSetFullscreen(int fullscreen)
  */
 void mhCreateWindow(int useTimer)
 {
-    SDL_Surface *screen;
     unsigned int colorkey;
     SDL_Surface *image;
+    SDL_VideoInfo *info;
 
     atexit(SDL_Quit);
 
@@ -1012,6 +1040,10 @@ void mhCreateWindow(int useTimer)
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
+    info = SDL_GetVideoInfo();
+    g_desktopWidth = info->current_w;
+    g_desktopHeight = info->current_h;
+
     // Load and set window icon
     image = SDL_LoadBMP("mh_icon.bmp");
     if (image)
@@ -1023,19 +1055,23 @@ void mhCreateWindow(int useTimer)
 
     if (G.fullscreen)
     {
-        const SDL_VideoInfo *info = SDL_GetVideoInfo();
-        G.windowWidth = info->current_w;
-        G.windowHeight = info->current_h;
+        G.windowWidth = g_desktopWidth;
+        G.windowHeight = g_desktopHeight;
+    }
+    else
+    {
+        G.windowWidth = g_windowWidth;
+        G.windowHeight = g_windowHeight;
     }
 
-    screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
-    if (screen == NULL)
+    g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
+    if (g_screen == NULL)
     {
         printf("Unable to set %dx%d antialiased video: %s\n", G.windowWidth, G.windowHeight, SDL_GetError());
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-        screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
-        if (screen == NULL)
+        g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
+        if (g_screen == NULL)
         {
             printf("Unable to set %dx%d video: %s\n", G.windowWidth, G.windowHeight, SDL_GetError());
             exit(1);
@@ -1117,7 +1153,9 @@ void mhEventLoop()
             G.pendingTimer = 0;
             break;
         case SDL_VIDEORESIZE:
-            SDL_SetVideoMode(event.resize.w, event.resize.h, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
+            G.windowWidth = g_windowWidth = event.resize.w;
+            G.windowHeight = g_windowHeight = event.resize.h;
+            g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
             OnInit();
             mhReshape(event.resize.w, event.resize.h);
             callReloadTextures();
