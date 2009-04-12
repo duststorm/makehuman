@@ -228,12 +228,13 @@ static PyObject* mh_getMousePosGUI(PyObject *self, PyObject *args)
 static PyObject* mh_convertToScreen(PyObject *self, PyObject *args)
 {
     double world[3];
+    double screen[3];
     int camera;
-    if (!PyArg_ParseTuple(args, "dddi", world, world + 1, world + 2, &camera))
+    if (!PyArg_ParseTuple(args, "dddi", screen, screen + 1, screen + 2, &camera))
         return NULL;
     else
     {
-        mhConvertToScreen(world, world, camera);
+        mhConvertToScreen(screen, world, camera);
         return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
     }
 }

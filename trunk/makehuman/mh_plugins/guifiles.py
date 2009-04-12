@@ -357,7 +357,6 @@ class Guifiles:
         # Save the thumbnail
         leftTop = self.scene.convertToScreen(-10, 10, 0, 1)
         rightBottom = self.scene.convertToScreen(10, -9, 0, 1)
-        print(leftTop[0], leftTop[1], rightBottom[0], rightBottom[1])
         self.scene.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), "models/" + filename + ".bmp")
         
         # Save the model
