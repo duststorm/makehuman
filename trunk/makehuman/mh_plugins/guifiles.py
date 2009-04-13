@@ -361,7 +361,7 @@ class Guifiles:
         
         # Save the model
         f = open("models/" + filename + ".mhm", 'w')
-        f.write("# Written by makehuman 1.0.0 alpha 1\n")
+        f.write("# Written by makehuman 1.0.0 alpha 2\n")
         f.write("version 1.0.0\n")
         f.write("tags %s\n" %(self.gFileSelector.textString))
         f.write("female %f\n" %(self.modelling.femaleVal))
