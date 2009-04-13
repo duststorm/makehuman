@@ -539,7 +539,8 @@ class Guimodelling:
 
         if leftButtonDown:
             diff = self.scene.getMouseDiff()
-            if self.scene.mouseX < 0 or self.scene.mouseX > 800 or self.scene.mouseY < 0 or self.scene.mouseY > 600:
+            windowSize = self.scene.getWindowSize()
+            if self.scene.mouseX < 0 or self.scene.mouseX > windowSize[0] or self.scene.mouseY < 0 or self.scene.mouseY > windowSize[1]:
                 pass
             else:
                 self.totalmove[0] += diff[0]
