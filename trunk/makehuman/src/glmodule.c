@@ -1029,7 +1029,7 @@ void mhCreateWindow(int useTimer)
 {
     unsigned int colorkey;
     SDL_Surface *image;
-    SDL_VideoInfo *info;
+    const SDL_VideoInfo *info;
 
     atexit(SDL_Quit);
 
