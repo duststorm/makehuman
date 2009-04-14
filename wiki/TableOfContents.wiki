@@ -1,2 +1,4 @@
-* [Welcome Welcome]
-* [artistGuideLines Guidelines ]
+  * [Welcome Welcome]
+  * [Artists]
+    * [artistGuideLines Guidelines]
+  * [Developers]
