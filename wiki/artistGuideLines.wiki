@@ -3,17 +3,17 @@
 
 = Introduction =
 
-Add your content here.
+Guidelines for artists of makehuman team.
 
 
 = Details =
 
   # Modelling of base ethnic targets (prerequisites for next release)
   # Painting texture color/bump etc..
-  # Modelling of hairs library (prerequisites for next release, but in parallel the coders  will need to be completing the hairs plugin module)
+  # Modelling of hairs library
   # Modelling of perfect low poly versions
-  # Modelling of optimized topologies (for example, male breast optimized, no genitalia, etc..)
   # Modelling of toon/anime targets
   # Use the targets to build the characters library
-  # Modelling of clothes (but the code to handle clothes will need to be ready before this can begin)
+  # Modelling of clothes
   # Demo reel
+  # Video tutorial (video compositing to show how to use MH, one for each release).
