@@ -1,4 +1,5 @@
 #summary The guidelines to follow by artists
+#sidebar TableOfContents
 
 = Introduction =
 
