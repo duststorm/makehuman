@@ -1,3 +1,5 @@
+import platform
+
 env = Environment(CPPPATH=['include','/usr/include/python2.5','/usr/include/GL','/usr/include/SDL'],
 LIBS =  ['python2.5','X11','GL','GLU','SDL'])
 conf = Configure(env)  
@@ -16,6 +18,14 @@ if not (conf.CheckHeader('Python.h')):
 if not (conf.CheckHeader('SDL.h')):
 	print "The SDL headers must be installed"
 	exit(1)
-env=conf.Finish()  
+env=conf.Finish()
+
+# Build application
 env.Program("makehuman", Glob("src/*.c"))
+
+# Build module
+moduleEnv = env.Clone(CPPDEFINES = "MAKEHUMAN_AS_MODULE", SHLIBPREFIX = "")
+if platform.system() == "Windows":
+    moduleEnv["SHLIBSUFFIX"] = ".pyd"
+moduleEnv.LoadableModule("mh", Glob("src/*.c"))
 
