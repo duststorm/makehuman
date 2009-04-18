@@ -790,6 +790,17 @@ static PyMethodDef EmbMethods[] =
  *
  *  This function returns a '1'.
  */
+#ifdef MAKEHUMAN_AS_MODULE
+PyMODINIT_FUNC initmh()
+{
+    PyObject* m;
+
+    initGlobals(); /* initialize all our globals */
+
+    m = Py_InitModule3("mh", EmbMethods,
+                       "makehuman as a module.");
+}
+#else
 int main(int argc, char *argv[])
 {
     // Need to declare variables before other statements
@@ -863,6 +874,7 @@ int main(int argc, char *argv[])
     free(G.world);
     return 1;
 }
+#endif
 
 // The following comment block is used by Doxygen to populate the main page
 
