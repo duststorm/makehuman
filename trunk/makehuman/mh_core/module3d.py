@@ -426,7 +426,7 @@ class FaceGroup:
 
         - **self.name**: *string*. The name of this FaceGroup.
         - **self.faces**: *faces list*. A list of faces. Default: empty.
-        - **self.parentName**: *string*. The name of the object3D object that contains this FaceGroup. Default: None.
+        - **self.parent**: *Object3d*. The object3D object that contains this FaceGroup. Default: None.
 
         Parameters
         ----------
@@ -437,7 +437,7 @@ class FaceGroup:
 
         self.name = name
         self.faces = []
-        self.parentName = None
+        self.parent = None
         self.elementIndex = 0
         self.elementCount = 0
 
@@ -730,7 +730,7 @@ class Object3D:
         fg:
             *faceGroups list* The FaceGroup to add.
         """
-        fg.parentName = self.name
+        fg.parent= self
         self.facesGroups.append(fg)
 
     def getFaceGroup(self, name):
@@ -2176,7 +2176,7 @@ class Scene3D:
         """
         facegroupPicked = self.getSelectedFacesGroup()
         if facegroupPicked:
-            objPicked = self.getObject(facegroupPicked.parentName)
+            objPicked = facegroupPicked.parent
             return (facegroupPicked,objPicked)
         else:
             print "no clickable zone"
