@@ -191,7 +191,7 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
                     obj.indexBuffer.append(groupVerts[v.idx][t])
                 
             f.idx = fIndex
-            f.groupName = groupName
+            f.group = fg
             fg.faces.append(f)
             obj.faces.append(f)
             fIndex += 1

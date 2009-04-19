@@ -209,7 +209,7 @@ def povrayExportArray(obj, cameraSettings, path):
   # FaceGroupIndex - Write a POV-Ray array to the output stream
   outputFileDescriptor.write("#declare MakeHuman_FaceGroupIndexArray = array[%s] {\n  " % (len(obj.faces)))
   for f in obj.faces:
-    outputFileDescriptor.write("%s," % (faceGroupIndex[f.groupName]))
+    outputFileDescriptor.write("%s," % (faceGroupIndex[f.group.name]))
   outputFileDescriptor.write("\n}\n\n")
 
   # UV Indices for each face - Write a POV-Ray array to the output stream
@@ -221,15 +221,15 @@ def povrayExportArray(obj, cameraSettings, path):
   # Joint Positions - Write a set of POV-Ray variables to the output stream
   faceGroupExtents = {}
   for f in obj.faces:
-    if "joint-" in f.groupName:
+    if "joint-" in f.group.name:
       # Compare the components of each vertex to find the min and max values for this faceGroup 
-      if f.groupName in faceGroupExtents:
-        maxX = max([f.verts[0].co[0],f.verts[1].co[0],f.verts[2].co[0],faceGroupExtents[f.groupName][3]])
-        maxY = max([f.verts[0].co[1],f.verts[1].co[1],f.verts[2].co[1],faceGroupExtents[f.groupName][4]])
-        maxZ = max([f.verts[0].co[2],f.verts[1].co[2],f.verts[2].co[2],faceGroupExtents[f.groupName][5]])
-        minX = min([f.verts[0].co[0],f.verts[1].co[0],f.verts[2].co[0],faceGroupExtents[f.groupName][0]])
-        minY = min([f.verts[0].co[1],f.verts[1].co[1],f.verts[2].co[1],faceGroupExtents[f.groupName][1]])
-        minZ = min([f.verts[0].co[2],f.verts[1].co[2],f.verts[2].co[2],faceGroupExtents[f.groupName][2]])
+      if f.group.name in faceGroupExtents:
+        maxX = max([f.verts[0].co[0],f.verts[1].co[0],f.verts[2].co[0],faceGroupExtents[f.group.name][3]])
+        maxY = max([f.verts[0].co[1],f.verts[1].co[1],f.verts[2].co[1],faceGroupExtents[f.group.name][4]])
+        maxZ = max([f.verts[0].co[2],f.verts[1].co[2],f.verts[2].co[2],faceGroupExtents[f.group.name][5]])
+        minX = min([f.verts[0].co[0],f.verts[1].co[0],f.verts[2].co[0],faceGroupExtents[f.group.name][0]])
+        minY = min([f.verts[0].co[1],f.verts[1].co[1],f.verts[2].co[1],faceGroupExtents[f.group.name][1]])
+        minZ = min([f.verts[0].co[2],f.verts[1].co[2],f.verts[2].co[2],faceGroupExtents[f.group.name][2]])
       else:
         maxX = max([f.verts[0].co[0],f.verts[1].co[0],f.verts[2].co[0]])
         maxY = max([f.verts[0].co[1],f.verts[1].co[1],f.verts[2].co[1]])
@@ -237,7 +237,7 @@ def povrayExportArray(obj, cameraSettings, path):
         minX = min([f.verts[0].co[0],f.verts[1].co[0],f.verts[2].co[0]])
         minY = min([f.verts[0].co[1],f.verts[1].co[1],f.verts[2].co[1]])
         minZ = min([f.verts[0].co[2],f.verts[1].co[2],f.verts[2].co[2]])
-      faceGroupExtents[f.groupName] = [minX,minY,minZ,maxX,maxY,maxZ]
+      faceGroupExtents[f.group.name] = [minX,minY,minZ,maxX,maxY,maxZ]
   # Write out the centre position of each joint
   for fg in obj.facesGroups:
     if "joint-" in fg.name:

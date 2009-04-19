@@ -357,12 +357,11 @@ def calcSubData(ob, scene):
     print "time to add edge verts: ", time.time()-t4
 
     fg = module3d.FaceGroup("subobj")
-    fg.parentName = subdividedObj
+    fg.parent = subdividedObj
     subdividedObj.facesGroups.append(fg)
     fullArrayIndex = 0
     groupVerts = {}
     for f in ob.faces:
-        gID = f.groupName
         v0 = subdividedObj.verts[f.verts[0].idx]
         v2 = subdividedObj.verts[f.verts[1].idx]
         v4 = subdividedObj.verts[f.verts[2].idx]
@@ -414,7 +413,7 @@ def calcSubData(ob, scene):
                 else:
                     subdividedObj.indexBuffer.append(groupVerts[v.idx][t])
               
-            f.groupName = gID
+            f.group = fg
             fg.faces.append(f)
             subdividedObj.faces.append(f)
         

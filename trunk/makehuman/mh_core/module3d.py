@@ -334,7 +334,7 @@ class Face:
         - **self.no**: *float list* The physical surface normal of the face (x,y,z). Default: [0, 0, 0].
         - **self.verts**: *verts list* A list of 3 vertices that represent the corners of this face.
         - **self.idx**: *int* The index of this face in the list of faces.
-        - **self.groupName**: *string* The name of the face group that is the parent of this face.
+        - **self.group**: *FaceGroup* The face group that is the parent of this face.
         - **self.color**: *list of list of ints*. A list of 3 lists of 4 integers (0-255)
           [[r,g,b,a],[r,g,b,a],[r,g,b,a]] used as the 3 vertex colors (including an alpha channel).
         - **self.colorID**: *list of list of ints*. A list of 3 integers (0-255) [index1,index2,index3]
@@ -361,7 +361,7 @@ class Face:
         self.color = None
         self.colorID = [255,255,255]
         self.idx = None
-        self.groupName = None
+        self.group = None
 
 
     def calcNormal(self):
@@ -412,7 +412,7 @@ class FaceGroup:
     A FaceGroup (a group of faces with a unique name).
 
     Each Face object can be part of one FaceGroup. Each face object has an
-    attribute, *groupName*, storing the name of the FaceGroup it is a member of.
+    attribute, *group*, storing the FaceGroup it is a member of.
 
     The FaceGroup object contains a list of the faces in the group and must be
     kept in sync with the FaceGroup references stored by the individual faces.
