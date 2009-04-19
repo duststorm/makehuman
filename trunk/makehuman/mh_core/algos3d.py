@@ -191,7 +191,8 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = 
     """
     if morphFactor == 0:
       return
-      
+     
+    print "***DEBUG target",targetPath,morphFactor
     t1 = time.time()
     global targetBuffer    
     if not targetBuffer.has_key(targetPath):
@@ -237,6 +238,63 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = 
 
     #print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
     return True
+    
+    
+
+
+def calcTargetNormal(obj, targetPath):
+    """
+    Sometime it's needed to recal the normals of last applied
+    target. Previously we use a workaroundl loading a target with a very
+    small morphFactor and calcNorm=1. But to have the code more readable
+    and avoid confusion, it's better to have a separate function.
+    
+    Parameters
+    ----------
+
+    obj:
+        *3d object*. The target object to which the translations are to be applied.
+        This object is read and updated by this function.
+
+    targetPath:
+        *string*. The file system path to the file containing the morphing targets. 
+        The precise format of this string will be operating system dependant.
+
+    morphFactor:
+        *float*. A factor between 0 and 1 controlling the proportion of the translations 
+        to be applied. If 0 then the object remains unmodified. If 1 the 'full' translations
+        are applied. This parameter would normally be in the range 0-1 but can be greater 
+        than 1 or less than 0 when used to produce extreme deformations (deformations 
+        that extend beyond those modelled by the original artist).
+
+    faceGroupToUpdateName:
+        *string*. Optional: The name of a single facegroup to be affected by the target.
+        If specified, then only transformations to faces contained by the specified 
+        facegroup are applied. If not specified, all transformations contained within the
+        morph target file are applied. This permits a single morph target file to contain
+        transformations that affect multiple facegroups, but to only be selectively applied 
+        to individual facegroups.
+
+    update:
+        *int flag*. A flag to indicate whether the update method on the object should be called.
+
+    calcNorm:
+        *int flag*. A flag to indicate whether the normals are to be recalculated (1/true) 
+        or not (0/false).   
+
+    """
+
+    facesToRecalculate = target.faces
+    indicesToUpdate = target.verts    
+    obj.calcNormals(indicesToUpdate,facesToRecalculate,1)
+    obj.update(indicesToUpdate)
+
+    #print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+    return True
+
+
+
+
 
 def mhloadRotationTarget2(obj,targetPath,morphFactor,calcNorm=1):
     """
@@ -568,8 +626,8 @@ def analyzeTarget(obj, targetPath):
             v.color = [255,255,255,255]
         else:
             R = int((dist/distMax)*255)
-            G = 255-int(R/3)
-            B = 255-int(R/3)
+            G = 255-int(R/10)
+            B = 255-int(R/10)
             v.color = [R,G,B,255]
             v.update(0,0,1)
 
@@ -578,23 +636,29 @@ def analyzeTarget(obj, targetPath):
 
 
 
-def colorizeTarget(obj, targetPath, color):
+def colorizeVerts(obj, color, targetPath = None ):
     """       
-    """    
-    try:
-        fileDescriptor = open(targetPath)
-    except:
-        print "Unable to open %s",(targetPath)
-        return  0         
+    """
+    if targetPath:  
+        try:
+            fileDescriptor = open(targetPath)
+        except:
+            print "Unable to open %s",(targetPath)
+            return  0         
 
-    for vData in fileDescriptor:        
-        vectorData = vData.split()
-        mainPointIndex = int(vectorData[0])        
-        v = obj.verts[mainPointIndex]
-        v.color = color
-        v.update(0,0,1)
+        for vData in fileDescriptor:        
+            vectorData = vData.split()
+            mainPointIndex = int(vectorData[0])        
+            v = obj.verts[mainPointIndex]
+            v.color = color
+            v.update(0,0,1)
 
-    fileDescriptor.close()   
+        fileDescriptor.close()
+    else:
+        for v in obj.verts:
+            v.color = color
+            v.update(0,0,1)
+            
 
     
 

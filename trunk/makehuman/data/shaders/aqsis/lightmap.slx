@@ -1,10 +1,10 @@
 surface
-AQSIS_V 1.4.1
+AQSIS_V 1.2.0
 
 
 segment Data
 
-USES 510215
+USES 522523
 
 param uniform  float Ka
 param uniform  float Kd

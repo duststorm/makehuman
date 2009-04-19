@@ -2032,6 +2032,31 @@ class Scene3D:
 
         """
         return [self.mouseXRel, self.mouseYRel]
+    
+    def getCameraFraming(self):
+        """
+        This method return a label to identify the main
+        camera framing (front, back. side, top) depending
+        the camera rotations.
+        
+        **Parameters:** This method has no parameters.
+        """
+        #TODO: top and botton view
+        xRot = mh.getCameraRotations()[0] % 360
+        yRot = mh.getCameraRotations()[1] % 360
+        
+        
+        if (315 < yRot <= 360) or (0 <= yRot < 45):
+            return "FRONTAL_VIEW"
+        if (145 < yRot < 235):
+            return "BACK_VIEW"
+        if (45 < yRot < 145):
+            return "LEFT_VIEW"
+        if (235 < yRot < 315):
+            return "RIGHT_VIEW"
+        
+        
+        
 
     def getCameraRotations(self):
         """

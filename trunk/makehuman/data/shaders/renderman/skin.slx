@@ -1,10 +1,10 @@
 surface
-AQSIS_V 1.4.1
+AQSIS_V 1.2.0
 
 
 segment Data
 
-USES 248069
+USES 260377
 
 param uniform  string lighttexture
 param uniform  string skintexture
@@ -216,25 +216,23 @@ segment Code
 	pushv skin_illum
 	pushif 1
 	subff
-	setfp
+	setfc
 	pushif 0
 	pushif 0
 	pushif 0.2
-	settp
-	mulpp
-	setpc
+	settc
+	mulcc
 	pop red_tone
 	pushif 3
 	pushv skin_illum
 	pow
-	setfp
+	setfc
 	pushif 0
 	pushif 0
 	pushif 0.2
 	negf
-	settp
-	mulpp
-	setpc
+	settc
+	mulcc
 	pop blue_tone
 	pushv skin_color
 	pushv skin_illum

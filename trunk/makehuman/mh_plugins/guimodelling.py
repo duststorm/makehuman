@@ -76,30 +76,27 @@ class Action:
     self.do = do
     self.undo = undo
 
-  #def do(self):
-  #  """
-  #  This method interprets the string assigned to its own 'do' attribute as a
-  #  function call with it's associated parameters. This can be invoked when 
-  #  a user modifies the humanoid model or when the user decides to redo a 
-  #  change previously undid using the undo function.
-  #
-  #  **Parameters:** This method has no parameters.
-  #
-  #  """
-  #  return self.do()
-  #
-  #def undo(self):
-  #  """
-  #  This method interprets the string assigned to its own 'undo' attribute as 
-  #  a function call with it's associated parameters. This is invoked when 
-  #  a user uses the undo function to reverse a change to the humanoid model.
-  #
-  #  **Parameters:** This method has no parameters.
-  #
-  #  """
-  #  return self.undo()
+   
 
-    
+class ListAction(Action):
+    def __init__(self):
+        self.actions=[]
+        self.name = "foo"
+    def append(self, action):
+        self.actions.append(action)
+    def do(self):        
+        for action in self.actions:
+            action.do()        
+    def undo(self):        
+        for action in self.actions:
+            print(action.name)             
+            action.undo()        
+    def printActions(self):        
+        for action in self.actions:
+            print "Action: ", action.name
+        
+        
+
 
 gModelling = None
 
@@ -130,13 +127,7 @@ class Guimodelling:
           tool currently active.
         - **self.modellingType**: *string*. A string to indicate the type of 
           modelling currently being performed. 
-          Initial value = "translation".
-        - **self.modellingAxis**: *string*. A string to indicate the axis  
-          currently being operated on ("x", "y" or "z"). 
-          Initial value = "x".
-        - **self.modellingSign**: *string*. A string to indicate whether an 
-          attribute of the model is being added to or reduced ("+" or "-").
-          Initial value = "-".
+          Initial value = "translation".        
         - **self.grabMode**: *??*. A?? (TBC). 
           Initial value = None.
         - **self.lastTargetTime**: *float*. A decimal value storing the time 
@@ -250,10 +241,7 @@ class Guimodelling:
           Initial value = Empty Dictionary.
         - **self.lastTargetApplied**: *index??*. A reference to the morph 
           target most recently applied (TBC). 
-          Initial value = None.
-        - **self.lastPartSelected**: *index??*. A reference to the last body 
-          part (body zone??) selected (TBC). 
-          Initial value = None.
+          Initial value = None.        
         - **self.bUndo**: *Object3D*. A reference to the GUI object 
           representing the Undo button.
         - **self.bAsia**: *Object3D*. A reference to the GUI object 
@@ -312,15 +300,36 @@ class Guimodelling:
         self.modellingGUIObjs = []
         self.modifiedGUIObjs = set()
         self.scene = globalScene
+        
+        self.listAction = ListAction()
+        
+        self.detailTargetX1a = None
+        self.detailTargetX2a = None
+        self.detailTargetY1a = None
+        self.detailTargetY2a = None
+        self.detailTargetZ1a = None
+        self.detailTargetZ2a = None
+        self.detailTargetX1b = None
+        self.detailTargetX2b = None
+        self.detailTargetY1b = None
+        self.detailTargetY2b = None
+        self.detailTargetZ1b = None
+        self.detailTargetZ2b = None
+        
+        self.detailTarget1 = None
+        self.detailTarget2 = None
+        
+        self.horizDeltaMov = []
+        self.vertiDeltaMov = []
 
         self.modellingTool =  "trans-right"
         self.modellingType = "translation"
-        self.modellingAxis = "x"
-        self.modellingSign = "-"
+        self.viewType =  "FRONT_VIEW"
 
         self.grabMode = None
         self.lastTargetTime = 0
-        self.totalmove = [0, 0]
+        self.totalmove = [0,0]
+        
 
         self.detailsMode = "macro"
         self.ethnicMode = None
@@ -352,96 +361,12 @@ class Guimodelling:
         self.lastColoredFaces = []
         self.bodyZones = {}
         self.lastTargetApplied = None
-        self.lastPartSelected = None
 
-        self.bodyZones["eyes"] = ["l-eye-ball", "r-eye-ball",\
-                            "l-pupil", "r-pupil","l-upper-inner-lid", "r-upper-inner-lid",\
-                            "l-upper-middle-lid", "r-upper-middle-lid",\
-                            "l-upper-outer-lid", "r-upper-outer-lid",\
-                            "l-lower-inner-lid", "r-lower-inner-lid",\
-                            "l-lower-middle-lid", "r-lower-middle-lid",\
-                            "l-lower-outer-lid", "r-lower-outer-lid",\
-                            "l-lower-inner-orbital", "r-lower-inner-orbital",\
-                            "l-lower-middle-orbital", "r-lower-middle-orbital",\
-                            "l-lower-outer-orbital", "r-lower-outer-orbital",\
-                            "l-upper-inner-orbital", "r-upper-inner-orbital",\
-                            "l-upper-middle-orbital", "r-upper-middle-orbital",\
-                            "l-upper-outer-orbital", "r-upper-outer-orbital"]
-        self.bodyZones["jaw"] = ["l-outer-chin", "r-outer-chin",\
-                            "head-chin", "lower-chin"]
-        self.bodyZones["nose"] = ["nose-bridge", "nose-glabella","nose-tip",\
-                            "nose-philtrum","nose-sellion",\
-                            "l-nostril", "r-nostril"]
-        self.bodyZones["ears"] = ["l-ear-inner","r-ear-inner","l-ear-helix","r-ear-helix",\
-                            "l-ear-lobe", "r-ear-lobe", "l-ear-tubercle", "r-ear-tubercle"]
-        self.bodyZones["mouth"] = ["l-upper-lip", "r-upper-lip","l-lower-lip", "r-lower-lip",\
-                            "l-lower-mouth", "r-lower-mouth","lower-middle-lip","upper-middle-lip"]
-        self.bodyZones["head"] = ["l-temple", "r-temple", "l-jaw", "r-jaw","head-upper-skull",\
-                            "l-cheek", "r-cheek", "l-cheek-arc", "r-cheek-arc","head-back-skull",\
-                            "l-eyebrow", "r-eyebrow", "l-inner-brow-ridge", "r-inner-brow-ridge",\
-                            "l-middle-brow-ridge", "r-middle-brow-ridge",\
-                            "l-outer-brow-ridge", "r-outer-brow-ridge",\
-                            "l-zygoma", "r-zygoma","l-maxilla", "r-maxilla",\
-                            "head-brow","l-upper-lash","r-upper-lash"]
 
-        self.bodyZones["neck"] = ["lower-neck", "upper-neck", "neck-adam-apple"]
-        self.bodyZones["torso"] = ["l-trapezious","r-trapezious", "l-back-shoulder",\
-                        "r-back-shoulder","l-upper-shoulder","r-upper-shoulder",\
-                        "l-front-shoulder","r-front-shoulder","l-clavicle",\
-                        "r-clavicle","l-upper-pectoralis","r-upper-pectoralis",\
-                        "l-inner-pectoralis","r-inner-pectoralis",\
-                        "l-middle-pectoralis","r-middle-pectoralis",\
-                        "l-outer-pectoralis","r-outer-pectoralis",\
-                        "l-lower-pectoralis","r-lower-pectoralis",\
-                        "l-nipple","r-nipple","l-axilla","r-axilla","spine",\
-                        "l-back-scapula","r-back-scapula","r-ribs","l-ribs",\
-                        "l-upper-middle-back","r-upper-middle-back"]
-        self.bodyZones["hip"] = ["l-upper-abdomen","r-upper-abdomen",\
-                            "l-middle-abdomen","r-middle-abdomen",\
-                            "l-lower-abdomen","r-lower-abdomen",\
-                            "l-hip","r-hip","l-lower-back","r-lower-back",\
-                            "navel"]
-        self.bodyZones["pelvis"] = ["l-gluteus","r-gluteus","genital-area"]
-        self.bodyZones["r-upperarm"] = ["r-biceps","r-triceps","r-upper-shoulder"]
-        self.bodyZones["l-upperarm"] = ["l-biceps","l-triceps","l-upper-shoulder"]
-        self.bodyZones["l-lowerarm"] = ["l-lowerarm"]
-        self.bodyZones["r-lowerarm"] = ["r-lowerarm"]
-        self.bodyZones["l-hand"] = ["l-hand-palm",\
-                    "l-hand-finger-1-1","l-hand-finger-1-2","l-hand-finger-1-3",\
-                    "l-hand-finger-2-1","l-hand-finger-2-2","l-hand-finger-2-3",\
-                    "l-hand-finger-3-1","l-hand-finger-3-2","l-hand-finger-3-3",\
-                    "l-hand-finger-4-1","l-hand-finger-4-2","l-hand-finger-4-3",\
-                    "l-hand-finger-5-1","l-hand-finger-5-2","l-hand-finger-5-3",\
-                    "l-hand-nail1","l-hand-nail2","l-hand-nail3",\
-                    "l-hand-nail4","l-hand-nail5"]
-        self.bodyZones["r-hand"] = ["r-hand-palm",\
-                    "r-hand-finger-1-1","r-hand-finger-1-2","r-hand-finger-1-3",\
-                    "r-hand-finger-2-1","r-hand-finger-2-2","r-hand-finger-2-3",\
-                    "r-hand-finger-3-1","r-hand-finger-3-2","r-hand-finger-3-3",\
-                    "r-hand-finger-4-1","r-hand-finger-4-2","r-hand-finger-4-3",\
-                    "r-hand-finger-5-1","r-hand-finger-5-2","r-hand-finger-5-3",\
-                    "r-hand-nail1","r-hand-nail2","r-hand-nail3",\
-                    "r-hand-nail4","r-hand-nail5"]
-        self.bodyZones["l-upperleg"] = ["l-frontal-thigh","l-thigh-back","l-knee"]
-        self.bodyZones["r-upperleg"] = ["r-frontal-thigh","r-thigh-back","r-knee"]
-        self.bodyZones["l-lowerleg"] = ["l-calf","l-lower-leg","l-akle"]
-        self.bodyZones["r-lowerleg"] = ["r-calf","r-lower-leg","r-akle"]
-        self.bodyZones["l-foot"] = ["l-foot-heel","l-foot-core",\
-                    "l-foot-toe-1-1","l-foot-toe-1-2","l-foot-toe-1-3",\
-                    "l-foot-toe-2-1","l-foot-toe-2-2","l-foot-toe-2-3",\
-                    "l-foot-toe-3-1","l-foot-toe-3-2","l-foot-toe-3-3",\
-                    "l-foot-toe-4-1","l-foot-toe-4-2","l-foot-toe-4-3",\
-                    "l-foot-toe-5-1","l-foot-toe-5-2","l-foot-toe-5-3",\
-                    "l-foot-nail1","l-foot-nail2","l-foot-nail3",\
-                    "l-foot-nail4","l-foot-nail5"]
-        self.bodyZones["r-foot"] = ["r-foot-heel","r-foot-core",\
-                    "r-foot-toe-1-1","r-foot-toe-1-2","r-foot-toe-1-3",\
-                    "r-foot-toe-2-1","r-foot-toe-2-2","r-foot-toe-2-3",\
-                    "r-foot-toe-3-1","r-foot-toe-3-2","r-foot-toe-3-3",\
-                    "r-foot-toe-4-1","r-foot-toe-4-2","r-foot-toe-4-3",\
-                    "r-foot-toe-5-1","r-foot-toe-5-2","r-foot-toe-5-3",\
-                    "r-foot-nail1","r-foot-nail2","r-foot-nail3",\
-                    "r-foot-nail4","r-foot-nail5"]
+        self.bodyZones =  ["eye","jaw","nose","mouth","head","neck","torso",\
+                        "hip","pelvis","r-upperarm","l-upperarm","r-lowerarm",\
+                        "l-lowerarm","l-hand", "r-hand", "r-upperleg","l-upperleg",\
+                        "r-lowerleg","l-lowerleg","l-foot","r-foot","ear"]
 
 
 
@@ -522,91 +447,125 @@ class Guimodelling:
 
         **Parameters:** This method has no parameters.
 
-        """
-        yRot = self.scene.getCameraRotations()[1]
-        angle = yRot % 360
-        if (315 < angle <= 360) or (0 <= angle < 45):
-            viewType =  "FRONTAL VIEW"
-        if (145 < angle < 235):
-            viewType =  "BACK VIEW"
-        if (45 < angle < 145):
-            viewType =  "LEFT VIEW"
-        if (235 < angle < 315):
-            viewType =  "RIGHT VIEW"
-
+        """           
+        
+        
         leftButtonDown = self.scene.mouseState & 1
 
-
         if leftButtonDown:
-            diff = self.scene.getMouseDiff()
-            windowSize = self.scene.getWindowSize()
-            if self.scene.mouseX < 0 or self.scene.mouseX > windowSize[0] or self.scene.mouseY < 0 or self.scene.mouseY > windowSize[1]:
-                pass
-            else:
-                self.totalmove[0] += diff[0]
-                self.totalmove[1] += diff[1]
-            #print(time.time(),diff)
 
-            if time.time()-self.lastTargetTime < 0.015:
-                return
-            else:
-                if viewType == "FRONTAL VIEW":
-                    if math.fabs(self.totalmove[0]) > math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "x"
-                        if self.totalmove[0] > 0:
-                            self.modellingSign = "-"
-                        else:
-                            self.modellingSign = "+"
-                    elif math.fabs(self.totalmove[0]) < math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "y"
-                        if self.totalmove[1] > 0:
-                            self.modellingSign = "-"
-                        else:
-                            self.modellingSign = "+"
-                if viewType == "BACK VIEW":
-                    if math.fabs(self.totalmove[0]) > math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "x"
-                        if self.totalmove[0] > 0:
-                            self.modellingSign = "+"
-                        else:
-                            self.modellingSign = "-"
-                    elif math.fabs(self.totalmove[0]) < math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "y"
-                        if self.totalmove[1] > 0:
-                            self.modellingSign = "-"
-                        else:
-                            self.modellingSign = "+"
-                if viewType == "LEFT VIEW":
-                    if math.fabs(self.totalmove[0]) > math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "z"
-                        if self.totalmove[0] > 0:
-                            self.modellingSign = "+"
-                        else:
-                            self.modellingSign = "-"
-                    elif math.fabs(self.totalmove[0]) < math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "y"
-                        if self.totalmove[1] > 0:
-                            self.modellingSign = "-"
-                        else:
-                            self.modellingSign = "+"
-                if viewType == "RIGHT VIEW":
-                    if math.fabs(self.totalmove[0]) > math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "z"
-                        if self.totalmove[0] > 0:
-                            self.modellingSign = "-"
-                        else:
-                            self.modellingSign = "+"
-                    elif math.fabs(self.totalmove[0]) < math.fabs(self.totalmove[1]):
-                        self.modellingAxis = "y"
-                        if self.totalmove[1] > 0:
-                            self.modellingSign = "-"
-                        else:
-                            self.modellingSign = "+"
+            #if (0 < self.scene.mouseX < 760) and (0 < self.scene.mouseY) < 560:                
+            diff = self.scene.getMouseDiff() 
+            
+            self.horizDeltaMov.append(diff[0])
+            self.vertiDeltaMov.append(diff[1])
+            
+            self.totalmove[0] = sum(self.horizDeltaMov[-5:])
+            self.totalmove[1] = sum(self.vertiDeltaMov[-5:])
 
+            horizMov = math.fabs(self.totalmove[0])
+            vertiMov = math.fabs(self.totalmove[1])
 
-                self.applyDetailsTargets()
-                self.lastTargetTime = time.time()
-                self.totalmove = [0, 0]
+            mouseDirection = None           
+            if self.viewType == "FRONTAL_VIEW":                    
+                if horizMov > vertiMov:                        
+                    if self.totalmove[0] > 0:
+                        mouseDirection = "X-"
+                    else:
+                        mouseDirection = "X+"                            
+                elif horizMov < vertiMov:                        
+                    if self.totalmove[1] > 0:
+                        mouseDirection = "Y-"
+                    else:
+                        mouseDirection = "Y+"                             
+            if self.viewType == "BACK_VIEW":
+                if horizMov > vertiMov:                        
+                    if self.totalmove[0] > 0:
+                        mouseDirection = "X+"
+                    else:
+                        mouseDirection = "X-"                            
+                elif horizMov < vertiMov:                        
+                    if self.totalmove[1] > 0:
+                        mouseDirection = "Y-"
+                    else:
+                        mouseDirection = "Y+"
+            if self.viewType == "LEFT_VIEW":
+                if horizMov > vertiMov:                       
+                    if self.totalmove[0] > 0:
+                        mouseDirection = "Z+"
+                    else:
+                        mouseDirection = "Z-"                            
+                elif horizMov < vertiMov:                        
+                    if self.totalmove[1] > 0:
+                        mouseDirection = "Y-"
+                    else:
+                        mouseDirection = "Y+"                            
+            if self.viewType == "RIGHT_VIEW":
+                if horizMov > vertiMov:                        
+                    if self.totalmove[0] > 0:
+                        mouseDirection = "Z-"
+                    else:
+                        mouseDirection = "Z+"
+                elif horizMov < vertiMov:                        
+                    if self.totalmove[1] > 0:
+                        mouseDirection = "Y-"
+                    else:
+                        mouseDirection = "Y+"
+                        
+            if mouseDirection == "X+":
+                self.detailTarget1 = self.detailTargetX1a
+                self.detailTarget2 = self.detailTargetX2a
+            elif mouseDirection == "X-":
+                self.detailTarget1 = self.detailTargetX1b
+                self.detailTarget2 = self.detailTargetX2b
+            elif mouseDirection == "Y+":
+                self.detailTarget1 = self.detailTargetY1a
+                self.detailTarget2 = self.detailTargetY2a
+            elif mouseDirection == "Y-":
+                self.detailTarget1 = self.detailTargetY1b
+                self.detailTarget2 = self.detailTargetY2b
+            elif mouseDirection == "Z+":
+                self.detailTarget1 = self.detailTargetZ1a
+                self.detailTarget2 = self.detailTargetZ2a
+            elif mouseDirection == "Z-":
+                self.detailTarget1 = self.detailTargetZ1b
+                self.detailTarget2 = self.detailTargetZ2b
+                       
+           
+                         
+        if time.time()-self.lastTargetTime > 0.025:          
+            if self.detailTarget1 and self.detailTarget2:
+                #if self.detailTarget2 is present, decrement it
+                if self.detailTarget2 in self.targetsStack.keys() and self.targetsStack[self.detailTarget2] > 0:
+                    prevVal = self.targetsStack[self.detailTarget2]
+                    newVal = max(0.0, prevVal-0.1)
+                    if newVal <= 0.0:
+                        del self.targetsStack[self.detailTarget2]
+                    actionName = self.detailTarget2
+                    act = Action(actionName,lambda:self.setDetailsTarget(actionName,newVal-prevVal,newVal),\
+                        lambda:self.setDetailsTarget(actionName,prevVal-newVal,prevVal))
+                        
+                    act.do()
+                    self.listAction.append(act)
+
+                #if value self.detailTarget2 is not present, increment the self.detailTarget1
+                else:            
+
+                    if self.detailTarget1 in self.targetsStack.keys():
+                        prevVal = self.targetsStack[self.detailTarget1]
+                        newVal = min(1.0, prevVal+0.1)
+                    else:
+                        prevVal = 0
+                        newVal = 0.1
+                    if newVal <= 1.0 and (newVal - prevVal) > 0.001:
+                        print(prevVal, newVal)
+                        actionName = self.detailTarget1                        
+                        act = Action(actionName,lambda:self.setDetailsTarget(actionName,newVal-prevVal,newVal),\
+                            lambda:self.setDetailsTarget(actionName,prevVal-newVal,prevVal))
+                        act.do()
+                        self.listAction.append(act)
+            self.lastTargetTime = time.time()
+                
 
 
     def resetScene(self):
@@ -647,18 +606,9 @@ class Guimodelling:
         self.applyCharacterTargets()
         self.applyDetailsTargets()
 
-        
+     
 
-    def grabModeOn(self):
-        """
-        This method places the application in a state ready for the user to
-        move a body part using the mouse in modelling mode.
 
-        **Parameters:** This method has no parameters.
-
-        """
-        #print "grab mode on"
-        self.grabMode = 1
 
     def releaseLeftButton(self):
         """
@@ -673,8 +623,17 @@ class Guimodelling:
         self.bRedo.setTexture("data/images/button_redo.png")
         if self.grabMode:
             self.grabMode = None
-            algos3d.loadTranslationTarget(self.basemesh, self.lastTargetApplied, 0.001,None, 1, 1)
-            print "grab mode off"
+            #algos3d.loadTranslationTarget(self.basemesh, self.lastTargetApplied, 0.001,None, 1, 1)
+            print "grab mode set to off"
+            self.undoStack.append(self.listAction)
+            self.listAction.printActions()
+            self.listAction = None    
+        self.totalmove = [0,0] 
+        self.horizDeltaMov = []
+        self.vertiDeltaMov = []
+        
+         
+
 
 
 
@@ -1141,7 +1100,7 @@ class Guimodelling:
         self.bWeight.setVisibility(1)
         self.bMuscle.setVisibility(1)
         
-        algos3d.colorizeTarget(self.basemesh, self.lastTargetApplied, [255,255,255,255])
+        algos3d.colorizeVerts(self.basemesh, [255,255,255,255], self.lastTargetApplied)
 
         self.scene.redraw()
 
@@ -1180,7 +1139,7 @@ class Guimodelling:
         self.bMuscle.setVisibility(0)
         
         self.translateModeOn()
-        algos3d.colorizeTarget(self.basemesh, self.lastTargetApplied, [255,255,255,255])
+        algos3d.colorizeVerts(self.basemesh, [255,255,255,255], self.lastTargetApplied)
         self.scene.redraw()
 
     def detailsOn(self):
@@ -1225,7 +1184,7 @@ class Guimodelling:
         self.bWeight.setVisibility(1)
         self.bMuscle.setVisibility(1)
         self.translateModeOn()
-        algos3d.colorizeTarget(self.basemesh, self.lastTargetApplied, [255,255,255,255])
+        algos3d.colorizeVerts(self.basemesh, [255,255,255,255], self.lastTargetApplied)
         self.scene.redraw()
 
     def translateModeOn(self):
@@ -1656,20 +1615,15 @@ class Guimodelling:
 
         """
         #TODO insert comment
+        print "DEBUG SETDETAILS",targetPath, incrVal
         self.targetsStack[targetPath] = totVal
-        if targetPath != self.lastTargetApplied:
-            algos3d.colorizeTarget(self.basemesh, self.lastTargetApplied, [255,255,255,255])
-            #algos3d.colorizeTarget(self.basemesh, targetPath, [255,155,155,255])
-            algos3d.analyzeTarget(self.basemesh, targetPath)
-            #To recalculate normals if target change during button pressed
-            algos3d.loadTranslationTarget(self.basemesh, targetPath, incrVal,None, 1, 1)
-        else:
-            algos3d.loadTranslationTarget(self.basemesh, targetPath, incrVal,None, 1, 0)
+        print "loading target %s with value %f"%(targetPath,incrVal)
+        algos3d.loadTranslationTarget(self.basemesh, targetPath, incrVal,None, 1, 0)
         self.lastTargetApplied = targetPath
         return True
 
 
-    def selectDetailTargetToUse(self,partName):
+    def selectDetailTarget(self):
         """
         This method .....
         
@@ -1680,102 +1634,142 @@ class Guimodelling:
             *???*. ???.
 
         """
-        #TODO insert comment
-        print "PARTNAME", partName
-        if partName != self.lastPartSelected:
-            target1 = ""
-            target2 = ""
+        
+        faceGroupName = self.scene.getSelectedFacesGroup().name
+        print "Facegroup selected",faceGroupName
+        self.grabMode = 1 
+        self.viewType =  self.scene.getCameraFraming() 
+        self.listAction = ListAction()        
+        
+        if  self.detailsMode == "macro":
+            tFolder = "data/targets/macrodetails"
+        if  self.detailsMode == "regular":
+            tFolder = "data/targets/details/"
+            for k in self.bodyZones:
+                if k in faceGroupName:                
+                    partName = k
+                    break        
+        if  self.detailsMode == "micro":
+            tFolder = "data/targets/microdetails/"
+            partName = faceGroupName
 
-            if  self.detailsMode == "macro":
-                targetFolder = "macrodetails"
-            if  self.detailsMode == "regular":
-                targetFolder = "details"
-            if  self.detailsMode == "micro":
-                targetFolder = "microdetails"
+        if self.modellingType == "scale":
+            #Targets X direction positive
+            self.detailTargetX1a = "%s%s-scale-horiz-incr.target"%(tFolder,partName)
+            self.detailTargetX2a = "%s%s-scale-horiz-decr.target"%(tFolder,partName)
+            #Targets X direction negative
+            self.detailTargetX1b = "%s%s-scale-horiz-decr.target"%(tFolder,partName)
+            self.detailTargetX2b = "%s%s-scale-horiz-incr.target"%(tFolder,partName)
+            #Targets Y direction positive
+            self.detailTargetY1a = "%s%s-scale-vert-incr.target"%(tFolder,partName)
+            self.detailTargetY2a = "%s%s-scale-vert-decr.target"%(tFolder,partName)
+            #Targets Y direction negative
+            self.detailTargetY1b = "%s%s-scale-vert-decr.target"%(tFolder,partName)
+            self.detailTargetY2b = "%s%s-scale-vert-incr.target"%(tFolder,partName)
+            #Targets Z direction positive
+            self.detailTargetZ1a = "%s%s-scale-depth-incr.target"%(tFolder,partName)
+            self.detailTargetZ2a = "%s%s-scale-depth-decr.target"%(tFolder,partName)
+            #Targets Z direction negative
+            self.detailTargetZ1b = "%s%s-scale-depth-decr.target"%(tFolder,partName)
+            self.detailTargetZ2b = "%s%s-scale-depth-incr.target"%(tFolder,partName)               
+            
+        if self.modellingType == "translation":
+            #Targets X direction positive
+            self.detailTargetX1a = "%s%s-trans-in.target"%(tFolder,partName)
+            self.detailTargetX2a = "%s%s-trans-out.target"%(tFolder,partName)
+            #Targets X direction negative
+            self.detailTargetX1b = "%s%s-trans-out.target"%(tFolder,partName)
+            self.detailTargetX2b = "%s%s-trans-in.target"%(tFolder,partName)
+            #Targets Y direction positive
+            self.detailTargetY1a = "%s%s-trans-up.target"%(tFolder,partName)
+            self.detailTargetY2a = "%s%s-trans-down.target"%(tFolder,partName)
+            #Targets Y direction negative
+            self.detailTargetY1b = "%s%s-trans-down.target"%(tFolder,partName)
+            self.detailTargetY2b = "%s%s-trans-up.target"%(tFolder,partName)
+            #Targets Z direction positive
+            self.detailTargetZ1a = "%s%s-trans-forward.target"%(tFolder,partName)
+            self.detailTargetZ2a = "%s%s-trans-backward.target"%(tFolder,partName)
+            #Targets Z direction negative
+            self.detailTargetZ1b = "%s%s-trans-backward.target"%(tFolder,partName)
+            self.detailTargetZ2b = "%s%s-trans-forward.target"%(tFolder,partName)
+            
+        #OLD-YOUNG-FAT-SKNNY-FLABBY-MUSCLE BUTTONS
+        if self.modellingType == "gender":
+            #Targets X direction positive
+            self.detailTargetX1a = "%s%s_male.target"%(tFolder,partName)
+            self.detailTargetX2a = "%s%s_female.target"%(tFolder,partName)
+            #Targets X direction positive
+            self.detailTargetX1b = "%s%s_female.target"%(tFolder,partName)
+            self.detailTargetX2b = "%s%s_male.target"%(tFolder,partName)
+            #Same targets assigned to y and z mouse movements
+            self.detailTargetY1a = self.detailTargetX1a
+            self.detailTargetY2a = self.detailTargetX2a
+            self.detailTargetY1b = self.detailTargetX1b
+            self.detailTargetY2b = self.detailTargetX2b
+            self.detailTargetZ1a = self.detailTargetZ1a
+            self.detailTargetZ2a = self.detailTargetZ2a
+            self.detailTargetZ1b = self.detailTargetZ1b
+            self.detailTargetZ2b = self.detailTargetZ2b                
 
-            if self.modellingType == "scale":
-                if self.modellingAxis == "x" and self.modellingSign == "+":
-                    target1 = "data/targets/%s/%s-scale-horiz-incr.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-scale-horiz-decr.target"%(targetFolder,partName)
-                if self.modellingAxis == "x" and self.modellingSign == "-":
-                    target1 = "data/targets/%s/%s-scale-horiz-decr.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-scale-horiz-incr.target"%(targetFolder,partName)
-                if self.modellingAxis == "y" and self.modellingSign == "+":
-                    target1 = "data/targets/%s/%s-scale-vert-incr.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-scale-vert-decr.target"%(targetFolder,partName)
-                if self.modellingAxis == "y" and self.modellingSign == "-":
-                    target1 = "data/targets/%s/%s-scale-vert-decr.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-scale-vert-incr.target"%(targetFolder,partName)
-                if self.modellingAxis == "z" and self.modellingSign == "+":
-                    target1 = "data/targets/%s/%s-scale-depth-incr.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-scale-depth-decr.target"%(targetFolder,partName)
-                if self.modellingAxis == "z" and self.modellingSign == "-":
-                    target1 = "data/targets/%s/%s-scale-depth-decr.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-scale-depth-incr.target"%(targetFolder,partName)
-                return (target1,target2)
+        if self.modellingType == "age":
+            #Targets X direction positive
+            self.detailTargetX1a = "%s%s_old.target"%(tFolder,partName)
+            self.detailTargetX2a = "%s%s_child.target"%(tFolder,partName)
+            #Targets X direction positive
+            self.detailTargetX1b = "%s%s_child.target"%(tFolder,partName)
+            self.detailTargetX2b = "%s%s_old.target"%(tFolder,partName)
+            #Same targets assigned to y and z mouse movements
+            self.detailTargetY1a = self.detailTargetX1a
+            self.detailTargetY2a = self.detailTargetX2a
+            self.detailTargetY1b = self.detailTargetX1b
+            self.detailTargetY2b = self.detailTargetX2b
+            self.detailTargetZ1a = self.detailTargetZ1a
+            self.detailTargetZ2a = self.detailTargetZ2a
+            self.detailTargetZ1b = self.detailTargetZ1b
+            self.detailTargetZ2b = self.detailTargetZ2b          
+           
+
+        if self.modellingType == "muscle":
+            #Targets X direction positive
+            self.detailTargetX1a = "%s%s_muscle.target"%(tFolder,partName)
+            self.detailTargetX2a = "%s%s_flaccid.target"%(tFolder,partName)
+            #Targets X direction positive
+            self.detailTargetX1b = "%s%s_flaccid.target"%(tFolder,partName)
+            self.detailTargetX2b = "%s%s_muscle.target"%(tFolder,partName)
+            #Same targets assigned to y and z mouse movements
+            self.detailTargetY1a = self.detailTargetX1a
+            self.detailTargetY2a = self.detailTargetX2a
+            self.detailTargetY1b = self.detailTargetX1b
+            self.detailTargetY2b = self.detailTargetX2b
+            self.detailTargetZ1a = self.detailTargetZ1a
+            self.detailTargetZ2a = self.detailTargetZ2a
+            self.detailTargetZ1b = self.detailTargetZ1b
+            self.detailTargetZ2b = self.detailTargetZ2b  
 
 
-            if self.modellingType == "translation":
-                if self.modellingAxis == "x" and self.modellingSign == "+":
-                    target1 = "data/targets/%s/%s-trans-in.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-trans-out.target"%(targetFolder,partName)
-                if self.modellingAxis == "x" and self.modellingSign == "-":
-                    target1 = "data/targets/%s/%s-trans-out.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-trans-in.target"%(targetFolder,partName)
-                if self.modellingAxis == "y" and self.modellingSign == "+":
-                    target1 = "data/targets/%s/%s-trans-up.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-trans-down.target"%(targetFolder,partName)
-                if self.modellingAxis == "y" and self.modellingSign == "-":
-                    target1 = "data/targets/%s/%s-trans-down.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-trans-up.target"%(targetFolder,partName)
-                if self.modellingAxis == "z" and self.modellingSign == "+":
-                    target1 = "data/targets/%s/%s-trans-forward.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-trans-backward.target"%(targetFolder,partName)
-                if self.modellingAxis == "z" and self.modellingSign == "-":
-                    target1 = "data/targets/%s/%s-trans-backward.target"%(targetFolder,partName)
-                    target2 = "data/targets/%s/%s-trans-forward.target"%(targetFolder,partName)
-                return (target1,target2)
+        if self.modellingType == "weight":                
+            #Targets X direction positive
+            self.detailTargetX1a = "%s%s_overweight.target"%(tFolder,partName)
+            self.detailTargetX2a = "%s%s_underweight.target"%(tFolder,partName)
+            #Targets X direction positive
+            self.detailTargetX1b = "%s%s_underweight.target"%(tFolder,partName)
+            self.detailTargetX2b = "%s%s_overweight.target"%(tFolder,partName)
+            #Same targets assigned to y and z mouse movements
+            self.detailTargetY1a = self.detailTargetX1a
+            self.detailTargetY2a = self.detailTargetX2a
+            self.detailTargetY1b = self.detailTargetX1b
+            self.detailTargetY2b = self.detailTargetX2b
+            self.detailTargetZ1a = self.detailTargetZ1a
+            self.detailTargetZ2a = self.detailTargetZ2a
+            self.detailTargetZ1b = self.detailTargetZ1b
+            self.detailTargetZ2b = self.detailTargetZ2b               
+        
+        algos3d.colorizeVerts(self.basemesh, [255,255,255,255])
+        algos3d.analyzeTarget(self.basemesh, self.detailTargetY1a)
+        
+       
 
-
-            #OLD-YOUNG-FAT-SKNNY-FLABBY-MUSCLE BUTTONS
-            if self.modellingType == "gender":
-                if self.modellingSign == "+":
-                    target1 = "data/targets/details/%s_male.target"%(partName)
-                    target2 = "data/targets/details/%s_female.target"%(partName)
-                else:
-                    target1 = "data/targets/details/%s_female.target"%(partName)
-                    target2 = "data/targets/details/%s_male.target"%(partName)
-                return (target1,target2)
-
-            if self.modellingType == "age":
-                if self.modellingSign == "+":
-                    target1 = "data/targets/details/%s_old.target"%(partName)
-                    target2 = "data/targets/details/%s_child.target"%(partName)
-                else:
-                    target1 = "data/targets/details/%s_child.target"%(partName)
-                    target2 = "data/targets/details/%s_old.target"%(partName)
-                return (target1,target2)
-
-            if self.modellingType == "muscle":
-                if self.modellingSign == "+":
-                    target1 = "data/targets/details/%s_muscle.target"%(partName)
-                    target2 = "data/targets/details/%s_flaccid.target"%(partName)
-                else:
-                    target1 = "data/targets/details/%s_flaccid.target"%(partName)
-                    target2 = "data/targets/details/%s_muscle.target"%(partName)
-                return (target1,target2)
-
-
-            if self.modellingType == "weight":
-                if self.modellingSign == "+":
-                    target1 = "data/targets/details/%s_overweight.target"%(partName)
-                    target2 = "data/targets/details/%s_underweight.target"%(partName)
-                else:
-                    target1 = "data/targets/details/%s_underweight.target"%(partName)
-                    target2 = "data/targets/details/%s_overweight.target"%(partName)
-                return (target1,target2)
-
-            self.lastPartSelected = partName
+            
 
     def applySymmetryLeft(self):
         """
@@ -1843,54 +1837,8 @@ class Guimodelling:
 
         self.scene.redraw()
 
-    def applyDetailsTargets(self):
-        """
-        This method ...
+   
         
-        **Parameters:** None.
-
-        """
-        #TODO insert comment
-        faceGroupName = self.scene.getSelectedFacesGroup().name
-        #print "Facegroup selected",faceGroupName
-        self.grabModeOn()
-        detailsData = None
-        if  self.detailsMode == "regular":
-            detailGroup = None
-            for k in self.bodyZones.keys():
-                if faceGroupName in self.bodyZones[k]:
-                    detailGroup = 1
-                    detailsData = self.selectDetailTargetToUse(k)
-                    break
-
-        if  self.detailsMode == "micro":
-            detailGroup = 1
-            detailsData = self.selectDetailTargetToUse(faceGroupName)
-
-        if detailsData:
-            target1 = detailsData[0]
-            target2 = detailsData[1]
-            if detailGroup:
-                #if target2 is present, decrement it
-                if target2 in self.targetsStack.keys() and self.targetsStack[target2] > 0:
-                    prevVal = self.targetsStack[target2]
-                    newVal = prevVal-0.1
-                    actionName = target2
-                    self.do(Action(actionName,lambda:self.setDetailsTarget(target2,-0.1,newVal),\
-                        lambda:self.setDetailsTarget(target2,0.1,prevVal)))
-
-                #if value target2 is not present, increment the target1
-                else:
-                    if target1 in self.targetsStack.keys():
-                        prevVal = self.targetsStack[target1]
-                        newVal = prevVal+0.1
-                    else:
-                        prevVal = 0
-                        newVal = 0.1
-                    if newVal < 1.0:
-                        actionName = target1
-                        self.do(Action(actionName,lambda:self.setDetailsTarget(target1,0.1,newVal),\
-                            lambda:self.setDetailsTarget(target1,-0.1,prevVal)))
 
     def isActive(self):
         """
@@ -1908,8 +1856,8 @@ class Guimodelling:
             self.ethnicIncreaseModeOn()
             targetFemale = "data/targets/macrodetails/neutral-female-young.target"
             targetMale = "data/targets/macrodetails/neutral-male-young.target"
-            algos3d.loadTranslationTarget(self.basemesh, targetFemale,0.5)
-            algos3d.loadTranslationTarget(self.basemesh, targetMale,0.5)
+            algos3d.loadTranslationTarget(self.basemesh, targetFemale,self.femaleVal)
+            algos3d.loadTranslationTarget(self.basemesh, targetMale,self.maleVal)
             self.initMeshDone = 1
 
             self.colorFaceGroup(self.bGender,str(self.maleVal))
@@ -1921,7 +1869,7 @@ class Guimodelling:
         self.scene.connect("LMOUSEP",self.ethnicIncreaseModeOn,self.bEthnicIncr)
         self.scene.connect("LMOUSEP",self.ethnicResetModeOn,self.bEthnicReset)
         self.scene.connect("LMOUSEP",self.ethnicDecreaseModeOn,self.bEthnicDecr)
-        self.scene.connect("LMOUSEP",self.grabModeOn,self.basemesh)
+        self.scene.connect("LMOUSEP",self.selectDetailTarget,self.basemesh)
         self.scene.connect("LMOUSEP",self.macroDetailsOn,self.bMacroDetails)
         self.scene.connect("LMOUSEP",self.detailsOn,self.bDetails)
         self.scene.connect("LMOUSEP",self.microDetailsOn,self.bMicroDetails)
