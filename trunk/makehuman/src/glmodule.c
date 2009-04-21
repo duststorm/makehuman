@@ -1066,14 +1066,20 @@ void mhCreateWindow(int useTimer)
     g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
     if (g_screen == NULL)
     {
-        printf("Unable to set %dx%d antialiased video: %s\n", G.windowWidth, G.windowHeight, SDL_GetError());
+        printf("No antialiasing available, turning off antialiasing.\n");
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
         if (g_screen == NULL)
         {
-            printf("Unable to set %dx%d video: %s\n", G.windowWidth, G.windowHeight, SDL_GetError());
-            exit(1);
+            printf("No 24 bit z buffer available, switching to 16 bit.\n");
+            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+            g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
+            if (g_screen == NULL)
+            {
+                printf("No 16 bit z buffer available, exiting.\n");
+                exit(1);
+            }
         }
     }
 
