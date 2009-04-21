@@ -435,7 +435,6 @@ void mhGetPickedCoords(int x, int y)
     glGetIntegerv( GL_VIEWPORT, viewport );
 
     /*Getting mouse coords in 3D scene, using z value from glReadPixels*/
-    glLoadIdentity();
     mhSceneCameraPosition();/*Applying scene matrix*/
     glGetDoublev( GL_PROJECTION_MATRIX, projection );
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
@@ -449,7 +448,6 @@ void mhGetPickedCoords(int x, int y)
     the z coord = 9.5 is normalized to 0.800801. So we use this fixed
     precalculated value.
     */
-    glLoadIdentity();
     mhGUICameraPosition();/*Applying GUI matrix*/
     glGetDoublev( GL_PROJECTION_MATRIX, projection );
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
@@ -496,12 +494,10 @@ void mhGetPickedColor(int x, int y)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // draw the objects in static camera
-    glLoadIdentity();
     mhGUICameraPosition();
     mhDrawMeshes(1, 0);
 
     // draw the objects in dynamic camera
-    glLoadIdentity();
     mhSceneCameraPosition();
     mhDrawMeshes(1, 1);
 
@@ -533,7 +529,6 @@ void mhConvertToScreen(double world[3], double screen[3], int camera)
   GLint viewport[4];
   double modelview[16], projection[16];
 
-  glLoadIdentity();
   if (camera)
       mhSceneCameraPosition();
   else
@@ -562,7 +557,6 @@ void mhConvertToWorld2D(double screen[2], double world[3], int camera)
   GLdouble modelview[16], projection[16];
   GLdouble z;
 
-  glLoadIdentity();
   if (camera)
       mhSceneCameraPosition();
   else
@@ -590,7 +584,6 @@ void mhConvertToWorld3D(double screen[3], double world[3], int camera)
   GLint viewport[4];
   double modelview[16], projection[16];
 
-  glLoadIdentity();
   if (camera)
       mhSceneCameraPosition();
   else
@@ -636,8 +629,6 @@ void mhDrawBegin()
 {
     // clear the screen & depth buffer
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-    // clear the previous transform
-    glLoadIdentity(); //TO DELETE
 }
 
 /** \brief Swap buffers following a redraw.
@@ -793,8 +784,9 @@ void mhSceneCameraPosition()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(25, (float)G.windowWidth/G.windowHeight, 0.1, 100);
-    glMatrixMode(GL_MODELVIEW);
 
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     glTranslatef(0, 0, -G.zoom);
     glTranslatef(G.translX, G.translY, 0);
     glRotatef(G.rotX, 1 ,0 , 0);
@@ -811,8 +803,9 @@ void mhGUICameraPosition()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(G.fovAngle, (float)G.windowWidth/G.windowHeight, 0.1, 100);
-    glMatrixMode(GL_MODELVIEW);
 
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     glTranslatef(0, 0, -10);
 }
 
@@ -936,15 +929,13 @@ void mhDrawMeshes(int pickMode, int cameraType)
  */
 void mhDraw(void)
 {
-    mhDrawBegin();   
+    mhDrawBegin();
 
     // draw the objects in dynamic camera
-    glLoadIdentity();
     mhSceneCameraPosition();
     mhDrawMeshes(0, 1);
 
     // draw the objects in static camera
-    glLoadIdentity();
     mhGUICameraPosition();
     mhDrawMeshes(0, 0);
 
