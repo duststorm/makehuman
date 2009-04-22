@@ -1145,6 +1145,8 @@ class Scene3D:
                 obj.setTexture(obj.texture)
                 
             mh.setObjLocation(obj.idx, obj.x, obj.y, obj.z)
+            mh.setObjRotation(obj.idx, obj.rx, obj.ry, obj.rz)
+            mh.setObjScale(obj.idx, obj.sx, obj.sy, obj.sz)
             mh.setVisibility(obj.idx, obj.visibility)
             mh.setCameraMode(obj.idx,obj.cameraMode)
             mh.setText(obj.idx, obj.text)
