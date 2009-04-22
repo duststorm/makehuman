@@ -190,9 +190,8 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = 
 
     """
     if morphFactor == 0:
-      return
-     
-    print "***DEBUG target",targetPath,morphFactor
+      return     
+    
     t1 = time.time()
     global targetBuffer    
     if not targetBuffer.has_key(targetPath):

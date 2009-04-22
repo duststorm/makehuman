@@ -143,7 +143,7 @@ class Guimodelling:
         - **self.ethnicMode**: *string*. A string indicating which 
           ethnic mode is currently selected (TBC). 
           Initial value = None.
-        - **self.ethnicTargetsValues**: *array??*. An array containing the set 
+        - **self.activeEthnicSets**: *array??*. An array containing the set 
           of ethnic targets currently applied (TBC). 
           Initial value = Empty array.
         - **self.ethnicTargetsToApply**: *dictionary*. An array containing the set 
@@ -230,7 +230,7 @@ class Guimodelling:
           Initial value = Empty List.
         - **self.redoStack**: *list of operations*. A list of
           operations that have been undone by the user. Initial value = Empty List.
-        - **self.targetsStack**: *dictionary*. A dict to all targets 
+        - **self.targetsDetailStack**: *dictionary*. A dict to all targets 
           applied, with their values. Initial value = Empty Dictionary.
         - **self.lastColoredFaces**: *list of faces*. A list of most 
           recently colored faces (TBC). Initial value = Empty List.
@@ -333,7 +333,7 @@ class Guimodelling:
 
         self.detailsMode = "macro"
         self.ethnicMode = None
-        self.ethnicTargetsValues = {}
+        self.activeEthnicSets = {}
         self.ethnicTargetsToApply = {"neutral":1.0}
         self.ethnicTargetsColors = {}
         self.ethnicIncreaseMode = 1
@@ -357,7 +357,7 @@ class Guimodelling:
         self.maleValDetails = 0
         self.undoStack = []
         self.redoStack = []
-        self.targetsStack = {}#A dict to all targets applied, with their values
+        self.targetsDetailStack = {}#A dict to all targets applied, with their values
         self.lastColoredFaces = []
         self.bodyZones = {}
         self.lastTargetApplied = None
@@ -448,99 +448,93 @@ class Guimodelling:
         **Parameters:** This method has no parameters.
 
         """           
+                       
+        diff = self.scene.getMouseDiff() 
         
+        self.horizDeltaMov.append(diff[0])
+        self.vertiDeltaMov.append(diff[1])
         
-        leftButtonDown = self.scene.mouseState & 1
+        self.totalmove[0] = sum(self.horizDeltaMov[-5:])
+        self.totalmove[1] = sum(self.vertiDeltaMov[-5:])
 
-        if leftButtonDown:
+        horizMov = math.fabs(self.totalmove[0])
+        vertiMov = math.fabs(self.totalmove[1])
 
-            #if (0 < self.scene.mouseX < 760) and (0 < self.scene.mouseY) < 560:                
-            diff = self.scene.getMouseDiff() 
-            
-            self.horizDeltaMov.append(diff[0])
-            self.vertiDeltaMov.append(diff[1])
-            
-            self.totalmove[0] = sum(self.horizDeltaMov[-5:])
-            self.totalmove[1] = sum(self.vertiDeltaMov[-5:])
-
-            horizMov = math.fabs(self.totalmove[0])
-            vertiMov = math.fabs(self.totalmove[1])
-
-            mouseDirection = None           
-            if self.viewType == "FRONTAL_VIEW":                    
-                if horizMov > vertiMov:                        
-                    if self.totalmove[0] > 0:
-                        mouseDirection = "X-"
-                    else:
-                        mouseDirection = "X+"                            
-                elif horizMov < vertiMov:                        
-                    if self.totalmove[1] > 0:
-                        mouseDirection = "Y-"
-                    else:
-                        mouseDirection = "Y+"                             
-            if self.viewType == "BACK_VIEW":
-                if horizMov > vertiMov:                        
-                    if self.totalmove[0] > 0:
-                        mouseDirection = "X+"
-                    else:
-                        mouseDirection = "X-"                            
-                elif horizMov < vertiMov:                        
-                    if self.totalmove[1] > 0:
-                        mouseDirection = "Y-"
-                    else:
-                        mouseDirection = "Y+"
-            if self.viewType == "LEFT_VIEW":
-                if horizMov > vertiMov:                       
-                    if self.totalmove[0] > 0:
-                        mouseDirection = "Z+"
-                    else:
-                        mouseDirection = "Z-"                            
-                elif horizMov < vertiMov:                        
-                    if self.totalmove[1] > 0:
-                        mouseDirection = "Y-"
-                    else:
-                        mouseDirection = "Y+"                            
-            if self.viewType == "RIGHT_VIEW":
-                if horizMov > vertiMov:                        
-                    if self.totalmove[0] > 0:
-                        mouseDirection = "Z-"
-                    else:
-                        mouseDirection = "Z+"
-                elif horizMov < vertiMov:                        
-                    if self.totalmove[1] > 0:
-                        mouseDirection = "Y-"
-                    else:
-                        mouseDirection = "Y+"
-                        
-            if mouseDirection == "X+":
-                self.detailTarget1 = self.detailTargetX1a
-                self.detailTarget2 = self.detailTargetX2a
-            elif mouseDirection == "X-":
-                self.detailTarget1 = self.detailTargetX1b
-                self.detailTarget2 = self.detailTargetX2b
-            elif mouseDirection == "Y+":
-                self.detailTarget1 = self.detailTargetY1a
-                self.detailTarget2 = self.detailTargetY2a
-            elif mouseDirection == "Y-":
-                self.detailTarget1 = self.detailTargetY1b
-                self.detailTarget2 = self.detailTargetY2b
-            elif mouseDirection == "Z+":
-                self.detailTarget1 = self.detailTargetZ1a
-                self.detailTarget2 = self.detailTargetZ2a
-            elif mouseDirection == "Z-":
-                self.detailTarget1 = self.detailTargetZ1b
-                self.detailTarget2 = self.detailTargetZ2b
+        mouseDirection = None           
+        if self.viewType == "FRONTAL_VIEW":                    
+            if horizMov > vertiMov:                        
+                if self.totalmove[0] > 0:
+                    mouseDirection = "X-"
+                else:
+                    mouseDirection = "X+"                            
+            elif horizMov < vertiMov:                        
+                if self.totalmove[1] > 0:
+                    mouseDirection = "Y-"
+                else:
+                    mouseDirection = "Y+"                             
+        if self.viewType == "BACK_VIEW":
+            if horizMov > vertiMov:                        
+                if self.totalmove[0] > 0:
+                    mouseDirection = "X+"
+                else:
+                    mouseDirection = "X-"                            
+            elif horizMov < vertiMov:                        
+                if self.totalmove[1] > 0:
+                    mouseDirection = "Y-"
+                else:
+                    mouseDirection = "Y+"
+        if self.viewType == "LEFT_VIEW":
+            if horizMov > vertiMov:                       
+                if self.totalmove[0] > 0:
+                    mouseDirection = "Z+"
+                else:
+                    mouseDirection = "Z-"                            
+            elif horizMov < vertiMov:                        
+                if self.totalmove[1] > 0:
+                    mouseDirection = "Y-"
+                else:
+                    mouseDirection = "Y+"                            
+        if self.viewType == "RIGHT_VIEW":
+            if horizMov > vertiMov:                        
+                if self.totalmove[0] > 0:
+                    mouseDirection = "Z-"
+                else:
+                    mouseDirection = "Z+"
+            elif horizMov < vertiMov:                        
+                if self.totalmove[1] > 0:
+                    mouseDirection = "Y-"
+                else:
+                    mouseDirection = "Y+"
+                    
+        if mouseDirection == "X+":
+            self.detailTarget1 = self.detailTargetX1a
+            self.detailTarget2 = self.detailTargetX2a
+        elif mouseDirection == "X-":
+            self.detailTarget1 = self.detailTargetX1b
+            self.detailTarget2 = self.detailTargetX2b
+        elif mouseDirection == "Y+":
+            self.detailTarget1 = self.detailTargetY1a
+            self.detailTarget2 = self.detailTargetY2a
+        elif mouseDirection == "Y-":
+            self.detailTarget1 = self.detailTargetY1b
+            self.detailTarget2 = self.detailTargetY2b
+        elif mouseDirection == "Z+":
+            self.detailTarget1 = self.detailTargetZ1a
+            self.detailTarget2 = self.detailTargetZ2a
+        elif mouseDirection == "Z-":
+            self.detailTarget1 = self.detailTargetZ1b
+            self.detailTarget2 = self.detailTargetZ2b
                        
            
                          
         if time.time()-self.lastTargetTime > 0.025:          
             if self.detailTarget1 and self.detailTarget2:
                 #if self.detailTarget2 is present, decrement it
-                if self.detailTarget2 in self.targetsStack.keys() and self.targetsStack[self.detailTarget2] > 0:
-                    prevVal = self.targetsStack[self.detailTarget2]
+                if self.detailTarget2 in self.targetsDetailStack.keys() and self.targetsDetailStack[self.detailTarget2] > 0:
+                    prevVal = self.targetsDetailStack[self.detailTarget2]
                     newVal = max(0.0, prevVal-0.1)
                     if newVal <= 0.0:
-                        del self.targetsStack[self.detailTarget2]
+                        del self.targetsDetailStack[self.detailTarget2]
                     actionName = self.detailTarget2
                     act = Action(actionName,lambda:self.setDetailsTarget(actionName,newVal-prevVal,newVal),\
                         lambda:self.setDetailsTarget(actionName,prevVal-newVal,prevVal))
@@ -551,8 +545,8 @@ class Guimodelling:
                 #if value self.detailTarget2 is not present, increment the self.detailTarget1
                 else:            
 
-                    if self.detailTarget1 in self.targetsStack.keys():
-                        prevVal = self.targetsStack[self.detailTarget1]
+                    if self.detailTarget1 in self.targetsDetailStack.keys():
+                        prevVal = self.targetsDetailStack[self.detailTarget1]
                         newVal = min(1.0, prevVal+0.1)
                     else:
                         prevVal = 0
@@ -596,15 +590,13 @@ class Guimodelling:
             self.bScale.setTexture("data/images/button_scale.png")
             self.cursor.setTexture("data/images/cursor_age.png")
         
-        for t in self.ethnicTargetsValues.keys():
-            self.ethnicTargetsValues[t] = 0.0            
-                
-        for t in self.targetsStack.keys():
-            self.targetsStack[t] = 0.0
-
+        self.activeEthnicSets = {}
+        self.ethnicTargetsToApply = {"neutral":1.0}
+        self.ethnicTargetsColors = {} 
         
+        #TODO: reset of colors     
         self.applyCharacterTargets()
-        self.applyDetailsTargets()
+        
 
      
 
@@ -622,8 +614,7 @@ class Guimodelling:
         self.bUndo.setTexture("data/images/button_undo.png")
         self.bRedo.setTexture("data/images/button_redo.png")
         if self.grabMode:
-            self.grabMode = None
-            #algos3d.loadTranslationTarget(self.basemesh, self.lastTargetApplied, 0.001,None, 1, 1)
+            self.grabMode = None            
             print "grab mode set to off"
             self.undoStack.append(self.listAction)
             self.listAction.printActions()
@@ -659,7 +650,8 @@ class Guimodelling:
                 trans = self.scene.getCameraTranslations()
                 self.scene.setCameraTranslations(trans[0] + 0.05 * diff[0], trans[1] - 0.05 * diff[1])
         else:
-            self.grabVerts()
+            if leftButtonDown:
+                self.grabVerts()
 
 
     def subdivideBaseMesh(self):
@@ -1160,8 +1152,7 @@ class Guimodelling:
         self.bAge.setTexture("data/images/button_age.png")
         self.bWeight.setTexture("data/images/button_weight.png")
         self.bMuscle.setTexture("data/images/button_muscle.png")
-        self.bGender.setTexture("data/images/button_gender.png")
-        #self.cursor.setTexture("data/images/cursor.png")
+        self.bGender.setTexture("data/images/button_gender.png")        
         self.colorFaceGroup(self.bMuscle,"100") #face group 100 does not exist, so it reset the color
         self.colorFaceGroup(self.bAge,"100") #face group 100 does
         self.colorFaceGroup(self.bWeight,"100") #face group 100 does
@@ -1348,9 +1339,9 @@ class Guimodelling:
 
         self.progressBar.setProgress(0.0)
         progressVal = 0.0
-        progressIncr = 0.3/(len(self.targetsStack)+1)
-        for t in self.targetsStack.keys():
-            algos3d.loadTranslationTarget(self.basemesh, t, self.targetsStack[t],None,0,0)
+        progressIncr = 0.3/(len(self.targetsDetailStack)+1)
+        for t in self.targetsDetailStack.keys():
+            algos3d.loadTranslationTarget(self.basemesh, t, self.targetsDetailStack[t],None,0,0)
             progressVal += progressIncr
             self.progressBar.setProgress(progressVal)
         a = time.time()
@@ -1450,7 +1441,9 @@ class Guimodelling:
             targetsEthnic[targetMaleYoung]= self.maleVal*youngVal*ethnicVal
 
             for k in targetsEthnic.keys():
+                
                 tVal = targetsEthnic[k]
+                print "DEBUG ethnic", k,tVal,ethnicVal
                 progressVal = progressVal + progressIncr
                 self.progressBar.setProgress(progressVal)
                 algos3d.loadTranslationTarget(self.basemesh, k,tVal,None,0,0)
@@ -1482,10 +1475,11 @@ class Guimodelling:
         for faceGroupName in self.ethnicTargetsColors.keys():
             if "neutral" not in faceGroupName:
                 faceGroup = obj.getFaceGroup(faceGroupName)
-                color = self.ethnicTargetsColors[faceGroupName]
-                for f in faceGroup.faces:
-                    f.color = [color,color,color]
-                    f.updateColors()
+                if faceGroup:
+                    color = self.ethnicTargetsColors[faceGroupName]
+                    for f in faceGroup.faces:
+                        f.color = [color,color,color]
+                        f.updateColors()
 
     def modifyEthnicFeature(self):
         """
@@ -1535,35 +1529,32 @@ class Guimodelling:
         #TODO validate comment
         modified = None
         if amount > 0.0:
-            if sum(self.ethnicTargetsValues.values()) < 1.0:
-                if ethnic in self.ethnicTargetsValues:
-                    self.ethnicTargetsValues[ethnic] = min(round(self.ethnicTargetsValues[ethnic] + amount, 1), 1.0)
+            if sum(self.activeEthnicSets.values()) < 1.0:
+                if ethnic in self.activeEthnicSets:
+                    self.activeEthnicSets[ethnic] = min(round(self.activeEthnicSets[ethnic] + amount, 1), 1.0)
                 else:
-                    self.ethnicTargetsValues[ethnic] = round(min(amount, 1.0 - sum(self.ethnicTargetsValues.values())), 1)
+                    self.activeEthnicSets[ethnic] = round(min(amount, 1.0 - sum(self.activeEthnicSets.values())), 1)
                 modified = True
         else:
-            if ethnic in self.ethnicTargetsValues:
-                self.ethnicTargetsValues[ethnic] = max(round(self.ethnicTargetsValues[ethnic] + amount, 1), 0.0)
-                if self.ethnicTargetsValues[ethnic] < 0.1:
-                    del self.ethnicTargetsValues[ethnic]
+            if ethnic in self.activeEthnicSets:
+                self.activeEthnicSets[ethnic] = max(round(self.activeEthnicSets[ethnic] + amount, 1), 0.0)
+                if self.activeEthnicSets[ethnic] < 0.1:
+                    del self.activeEthnicSets[ethnic]
                 modified = True
 
         if modified:
             self.ethnicTargetsToApply = {}
             #Calculate the ethnic target value, and store it in dictionary
-            for t in self.ethnicTargetsValues.keys():
-                self.ethnicTargetsToApply[t] = self.ethnicTargetsValues[t]
+            for t in self.activeEthnicSets.keys():
+                self.ethnicTargetsToApply[t] = self.activeEthnicSets[t]
                 #for each facegroup recalculate the color
                 self.ethnicTargetsColors[t] = [int(255*self.ethnicTargetsToApply[t]),\
                                                 1-int(255*self.ethnicTargetsToApply[t]),\
                                                 255,255]
-            self.ethnicTargetsToApply["neutral"] = 1.0 - sum(self.ethnicTargetsValues.values())
-
-            print(self.ethnicTargetsValues)
-            print(self.ethnicTargetsToApply)
+            self.ethnicTargetsToApply["neutral"] = 1.0 - sum(self.activeEthnicSets.values())
 
             #If the group was completely removed, the color is white
-            if ethnic not in self.ethnicTargetsValues:
+            if ethnic not in self.activeEthnicSets:
                 self.ethnicTargetsColors[ethnic] = [255,255,255,255]
 
             if "africa" in ethnic:
@@ -1582,7 +1573,7 @@ class Guimodelling:
         ----------
 
         ethnic:
-            *target*. A particular ethnic group.
+            *string*. The name of facegroup picked on ethnic button
 
         action:
             *string*. A string indicating whether to increase, decrease or reset 
@@ -1616,7 +1607,7 @@ class Guimodelling:
         """
         #TODO insert comment
         print "DEBUG SETDETAILS",targetPath, incrVal
-        self.targetsStack[targetPath] = totVal
+        self.targetsDetailStack[targetPath] = totVal
         print "loading target %s with value %f"%(targetPath,incrVal)
         algos3d.loadTranslationTarget(self.basemesh, targetPath, incrVal,None, 1, 0)
         self.lastTargetApplied = targetPath
@@ -1780,9 +1771,7 @@ class Guimodelling:
 
         """
         self.symmetrizeMicroDetails("l")
-        #self.do(Action("Modify Tone",\
-                #lambda:self.symmetrizeMicroDetails(newVal,faceGroupName),\
-                #lambda:self.symmetrizeMicroDetails(prevVal,str(prevVal))))
+
 
     def applySymmetryRight(self):
         """
@@ -1816,24 +1805,24 @@ class Guimodelling:
             prefix1 = "r-"
             prefix2 = "l-"
 
-        for target in self.targetsStack.keys():
+        for target in self.targetsDetailStack.keys():
             targetName = os.path.basename(target)
             #Reset previous targets on symm side
             if targetName[:2] == prefix2:
-                algos3d.loadTranslationTarget(self.basemesh, target, -self.targetsStack[target],None,1,0)
-                self.targetsStack[target] = 0
+                algos3d.loadTranslationTarget(self.basemesh, target, -self.targetsDetailStack[target],None,1,0)
+                self.targetsDetailStack[target] = 0
 
         #Apply symm target. For horiz movement the value must ve inverted
-        for target in self.targetsStack.keys():
+        for target in self.targetsDetailStack.keys():
             targetName = os.path.basename(target)
             if targetName[:2] == prefix1:
                 targetSym = os.path.join(os.path.dirname(target),prefix2+targetName[2:])
-                targetSymVal = self.targetsStack[target]
+                targetSymVal = self.targetsDetailStack[target]
                 if "trans-in" in targetSym or "trans-out" in targetName:
                     targetSymVal *= -1
 
                 algos3d.loadTranslationTarget(self.basemesh, targetSym, targetSymVal,None, 1, 1)
-                self.targetsStack[targetSym] = targetSymVal
+                self.targetsDetailStack[targetSym] = targetSymVal
 
         self.scene.redraw()
 
