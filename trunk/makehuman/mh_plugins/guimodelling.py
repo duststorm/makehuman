@@ -576,7 +576,7 @@ class Guimodelling:
         self.underweightVal = 0.0        
 
 
-        if self.detailsMode == "macro":
+        if self.detailsMode == "macro":            
             self.colorFaceGroup(self.bGender,"0.57")
             self.colorFaceGroup(self.bAge,"0.0")
             self.colorFaceGroup(self.bWeight,"0.0")
@@ -690,28 +690,14 @@ class Guimodelling:
         ----------
 
         obj:
-            *Object3D*. The humanoid object.
+            *Object3D*. The obj to colorize.
 
         faceGroupName:
             *string*. The name of the face group to apply the color to.
 
         """
-        found = False
-        for faceGroup in obj.facesGroups:
-            if float(faceGroup.name) == float(faceGroupName):
-                for f in faceGroup.faces:
-                    f.color = [[150,150,150,255], [150,150,150,255], [150,150,150,255]]
-                    f.updateColors()
-                found = True
-            else:
-                for f in faceGroup.faces:
-                    f.color = f.color = [[255,255,255,255], [255,255,255,255], [255,255,255, 255]]
-                    f.updateColors()
-        self.scene.redraw()
-        if not found:
-            print("Warning, face group " + faceGroupName + " not found in " + obj.name + " possible values are")
-            for faceGroup in obj.facesGroups:
-                print(faceGroup.name)
+        algos3d.colorizeVerts(obj, [255,255,255,255])
+        algos3d.colorizeVerts(obj, [155,155,155,255], None, faceGroupName)
 
 
 

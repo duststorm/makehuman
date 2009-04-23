@@ -279,9 +279,9 @@ class Guifiles:
                 elif lineData[0] == "ethnic":
                     self.modelling.ethnicTargetsValues[lineData[1]] = float(lineData[2])
                 elif lineData[0] == "detail":
-                    self.modelling.targetsStack["data/targets/details/" + lineData[1] + ".target"] = float(lineData[2])
+                    self.modelling.targetsDetailStack["data/targets/details/" + lineData[1] + ".target"] = float(lineData[2])
                 elif lineData[0] == "microdetail":
-                    self.modelling.targetsStack["data/targets/microdetail/" + lineData[1] + ".target"] = float(lineData[2])
+                    self.modelling.targetsDetailStack["data/targets/microdetail/" + lineData[1] + ".target"] = float(lineData[2])
                 
         f.close()
         
@@ -372,14 +372,14 @@ class Guifiles:
         f.write("muscle %f\n" %(self.modelling.muscleVal))
         f.write("overweight %f\n" %(self.modelling.overweightVal))
         f.write("underweight %f\n" %(self.modelling.underweightVal))
-        for (target, value) in self.modelling.ethnicTargetsValues.iteritems():
+        for (target, value) in self.modelling.activeEthnicSets.iteritems():
             f.write("ethnic %s %f\n" %(target, value))
                 
-        for t in self.modelling.targetsStack.keys():
+        for t in self.modelling.targetsDetailStack.keys():
             if "/details/" in t:
-                f.write("detail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.modelling.targetsStack[t]))
+                f.write("detail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.modelling.targetsDetailStack[t]))
             elif  "/microdetails/" in t:
-                f.write("microdetail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.modelling.targetsStack[t]))
+                f.write("microdetail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.modelling.targetsDetailStack[t]))
         f.close()
         
         self.gFileSelector.isNotActive()

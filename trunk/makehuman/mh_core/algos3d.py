@@ -635,7 +635,7 @@ def analyzeTarget(obj, targetPath):
 
 
 
-def colorizeVerts(obj, color, targetPath = None ):
+def colorizeVerts(obj, color, targetPath = None, faceGroupName = None ):
     """       
     """    
     if targetPath:  
@@ -653,6 +653,18 @@ def colorizeVerts(obj, color, targetPath = None ):
             v.update(0,0,1)
 
         fileDescriptor.close()
+    elif faceGroupName:
+        found = False
+        for faceGroup in obj.facesGroups:
+            if faceGroup.name == faceGroupName:
+                found = True
+                for f in faceGroup.faces:
+                    f.color = [color,color,color]
+                    f.updateColors()
+        if not found:
+            print("Warning, face group %s not found in %s possible values are")%(faceGroupName,obj.name)
+            for faceGroup in obj.facesGroups:
+                print(faceGroup.name)
     else:
         for v in obj.verts:
             v.color = color
