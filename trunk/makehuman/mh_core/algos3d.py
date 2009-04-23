@@ -637,7 +637,7 @@ def analyzeTarget(obj, targetPath):
 
 def colorizeVerts(obj, color, targetPath = None ):
     """       
-    """
+    """    
     if targetPath:  
         try:
             fileDescriptor = open(targetPath)

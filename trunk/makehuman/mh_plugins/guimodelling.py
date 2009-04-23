@@ -128,7 +128,7 @@ class Guimodelling:
         - **self.modellingType**: *string*. A string to indicate the type of 
           modelling currently being performed. 
           Initial value = "translation".        
-        - **self.grabMode**: *??*. A?? (TBC). 
+        - **self.motionMode**: *??*. A?? (TBC). 
           Initial value = None.
         - **self.lastTargetTime**: *float*. A decimal value storing the time 
           since the mouse button was pressed on a target (TBC).
@@ -326,7 +326,7 @@ class Guimodelling:
         self.modellingType = "translation"
         self.viewType =  "FRONT_VIEW"
 
-        self.grabMode = None
+        self.motionMode = None
         self.lastTargetTime = 0
         self.totalmove = [0,0]
         
@@ -595,7 +595,10 @@ class Guimodelling:
         self.ethnicTargetsToApply = {"neutral":1.0}
         self.ethnicTargetsColors = {} 
         
-        #TODO: reset of colors     
+        algos3d.colorizeVerts(self.bAfrica, [255,255,255,255])
+        algos3d.colorizeVerts(self.bAsia, [255,255,255,255])
+        algos3d.colorizeVerts(self.bEurope, [255,255,255,255])
+        algos3d.colorizeVerts(self.bAmerica, [255,255,255,255])  
         self.applyCharacterTargets()
         
 
@@ -614,8 +617,8 @@ class Guimodelling:
         """
         self.bUndo.setTexture("data/images/button_undo.png")
         self.bRedo.setTexture("data/images/button_redo.png")
-        if self.grabMode:
-            self.grabMode = None            
+        if self.motionMode:
+            self.motionMode = None            
             print "grab mode set to off"
             self.undoStack.append(self.listAction)
             self.listAction.printActions()
@@ -641,7 +644,7 @@ class Guimodelling:
         middleButtonDown = self.scene.mouseState & 2
         rightButtonDown = self.scene.mouseState & 4
 
-        if not self.grabMode:
+        if not self.motionMode:
             if (leftButtonDown and rightButtonDown) or middleButtonDown:
                 self.scene.setCameraZoom(self.scene.getCameraZoom() + 0.05 * diff[1])
             elif leftButtonDown:
@@ -651,7 +654,7 @@ class Guimodelling:
                 trans = self.scene.getCameraTranslations()
                 self.scene.setCameraTranslations(trans[0] + 0.05 * diff[0], trans[1] - 0.05 * diff[1])
         else:
-            if leftButtonDown:
+            if leftButtonDown and (self.motionMode==1):
                 self.grabVerts()
 
 
@@ -1628,14 +1631,10 @@ class Guimodelling:
         """
         
         faceGroupName = self.scene.getSelectedFacesGroup().name
-        print "Facegroup selected",faceGroupName
-
-        
-
             
         self.viewType =  self.scene.getCameraFraming() 
         self.listAction = ListAction()        
-        
+        print "GROUPS SELECTED: ",faceGroupName
         if  self.detailsMode == "macro":
             tFolder = "data/targets/macrodetails"
         if  self.detailsMode == "regular":
@@ -1646,13 +1645,7 @@ class Guimodelling:
                     break        
         if  self.detailsMode == "micro":
             tFolder = "data/targets/microdetails/"
-            partName = faceGroupName
-            
-        #With these 2 lines the first click select, the second grab
-        if partName == self.lastZoneModified:
-            self.grabMode = 1
-        else:
-            self.lastZoneModified = partName
+            partName = faceGroupName        
 
         if self.modellingType == "scale":
             #Targets X direction positive
@@ -1764,9 +1757,22 @@ class Guimodelling:
             self.detailTargetZ2a = self.detailTargetZ2a
             self.detailTargetZ1b = self.detailTargetZ1b
             self.detailTargetZ2b = self.detailTargetZ2b               
-        
+
+
         algos3d.colorizeVerts(self.basemesh, [255,255,255,255])
-        algos3d.analyzeTarget(self.basemesh, self.detailTargetY1a)
+        #With these 2 lines the first click select, the second grab
+        if partName == self.lastZoneModified:
+            #clicking on already selected part, move it             
+            self.motionMode = 1 #Mouse motion move the verts
+        else:
+            #clicking on a not selected part, just select it
+            self.lastZoneModified = partName
+            self.motionMode = 2 #Mouse Motion do nothing (no scene rotation too)
+            algos3d.analyzeTarget(self.basemesh, self.detailTargetY1a)
+
+            
+        
+        
         
         
        
