@@ -361,6 +361,7 @@ class Guimodelling:
         self.lastColoredFaces = []
         self.bodyZones = {}
         self.lastTargetApplied = None
+        self.lastZoneModified = None
 
 
         self.bodyZones =  ["eye","jaw","nose","mouth","head","neck","torso",\
@@ -1628,7 +1629,10 @@ class Guimodelling:
         
         faceGroupName = self.scene.getSelectedFacesGroup().name
         print "Facegroup selected",faceGroupName
-        self.grabMode = 1 
+
+        
+
+            
         self.viewType =  self.scene.getCameraFraming() 
         self.listAction = ListAction()        
         
@@ -1643,6 +1647,12 @@ class Guimodelling:
         if  self.detailsMode == "micro":
             tFolder = "data/targets/microdetails/"
             partName = faceGroupName
+            
+        #With these 2 lines the first click select, the second grab
+        if partName == self.lastZoneModified:
+            self.grabMode = 1
+        else:
+            self.lastZoneModified = partName
 
         if self.modellingType == "scale":
             #Targets X direction positive
@@ -1757,6 +1767,7 @@ class Guimodelling:
         
         algos3d.colorizeVerts(self.basemesh, [255,255,255,255])
         algos3d.analyzeTarget(self.basemesh, self.detailTargetY1a)
+        
         
        
 
