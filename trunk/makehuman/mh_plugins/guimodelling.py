@@ -125,7 +125,7 @@ class Guimodelling:
           passed in as a parameter to this constructor method.
         - **self.modellingTool**: *string*. A string to indicate modelling
           tool currently active.
-        - **self.modellingType**: *string*. A string to indicate the type of 
+        - **self.basemesh.modellingType**: *string*. A string to indicate the type of 
           modelling currently being performed. 
           Initial value = "translation".        
         - **self.motionMode**: *??*. A?? (TBC). 
@@ -136,7 +136,7 @@ class Guimodelling:
         - **self.totalmove**: *list of ints*. A list of 2 ints holding the x 
           and y movement since the mouse button was pressed (TBC).
           Initial value = [0,0].
-        - **self.detailsMode**: *string*. A string indicating whether 
+        - **self.basemesh.editMode**: *string*. A string indicating whether 
           the application is currently in "Macro", "Detail" or "MicroDetail" 
           Mode. 
           Initial value = "macro".
@@ -146,7 +146,7 @@ class Guimodelling:
         - **self.activeEthnicSets**: *array??*. An array containing the set 
           of ethnic targets currently applied (TBC). 
           Initial value = Empty array.
-        - **self.ethnicTargetsToApply**: *dictionary*. An array containing the set 
+        - **self.basemesh.targetsEthnicStack**: *dictionary*. An array containing the set 
           of ethnic targets to be applied (TBC). 
           Initial value = {"neutral":1.0}.
         - **self.ethnicTargetsColors**: *dictionary*. An array containing the set 
@@ -161,67 +161,67 @@ class Guimodelling:
         - **self.initMeshDone**: *string??*. An indicator showing 
           whether the mesh has been initialized. 
           Initial value = None.
-        - **self.childVal**: *float*. A value, usually between 0 
+        - **self.basemesh.childVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'child' version of the morph target. 
           Initial value = 0.0.
-        - **self.oldVal**: *float*. A value, usually between 0 
+        - **self.basemesh.oldVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'old' version of the morph target.
           Initial value = 0.0.
-        - **self.femaleVal**: *float*. A value, usually between 0 
+        - **self.basemesh.femaleVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'female' version of the morph target.
           Initial value = 0.57.
-        - **self.maleVal**: *float*. A value, usually between 0 
+        - **self.basemesh.maleVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'male' version of the morph target.
           Initial value = 0.57.
-        - **self.flaccidVal**: *float*. A value, usually between 0 
+        - **self.basemesh.flaccidVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'flaccid' version of the morph target.
           Initial value = 0.0.
-        - **self.muscleVal**: *float*. A value, usually between 0 
+        - **self.basemesh.muscleVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'muscle' version of the morph target.
           Initial value = 0.0.
-        - **self.overweightVal**: *float*. A value, usually between 0 
+        - **self.basemesh.overweightVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'overweight' version of the morph target.
           Initial value = 0.0.
-        - **self.underweightVal**: *float*. A value, usually between 0 
+        - **self.basemesh.underweightVal**: *float*. A value, usually between 0 
           and 1 showing what proportion of the features of the current figure 
           are taken from the 'underweight' version of the morph target.
           Initial value = 0.0.
-        - **self.childValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.childValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'child' version of the morph target.
           Initial value = 0.0.
-        - **self.oldValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.oldValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'old' version of the morph target.
           Initial value = 0.0.
-        - **self.flaccidValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.flaccidValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'flaccid' version of the morph target.
           Initial value = 0.0.
-        - **self.muscleValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.muscleValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'muscle' version of the morph target.
           Initial value = 0.0.
-        - **self.overweightValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.overweightValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'overweight' version of the morph target.
           Initial value = 0.0.
-        - **self.underweightValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.underweightValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'underweight' version of the morph target.
           Initial value = 0.0.
-        - **self.femaleValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.femaleValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'female' version of the morph target.
           Initial value = 0.
-        - **self.maleValDetails**: *float*. A value, usually between 0 
+        - **self.basemesh.maleValDetails**: *float*. A value, usually between 0 
           and 1 showing what proportion of the detailed features of the current 
           figure are taken from the 'male' version of the morph target.
           Initial value = 0.
@@ -230,7 +230,7 @@ class Guimodelling:
           Initial value = Empty List.
         - **self.redoStack**: *list of operations*. A list of
           operations that have been undone by the user. Initial value = Empty List.
-        - **self.targetsDetailStack**: *dictionary*. A dict to all targets 
+        - **self.basemesh.targetsDetailStack**: *dictionary*. A dict to all targets 
           applied, with their values. Initial value = Empty Dictionary.
         - **self.lastColoredFaces**: *list of faces*. A list of most 
           recently colored faces (TBC). Initial value = Empty List.
@@ -303,19 +303,6 @@ class Guimodelling:
         
         self.listAction = ListAction()
         
-        self.detailTargetX1a = None
-        self.detailTargetX2a = None
-        self.detailTargetY1a = None
-        self.detailTargetY2a = None
-        self.detailTargetZ1a = None
-        self.detailTargetZ2a = None
-        self.detailTargetX1b = None
-        self.detailTargetX2b = None
-        self.detailTargetY1b = None
-        self.detailTargetY2b = None
-        self.detailTargetZ1b = None
-        self.detailTargetZ2b = None
-        
         self.detailTarget1 = None
         self.detailTarget2 = None
         
@@ -323,7 +310,7 @@ class Guimodelling:
         self.vertiDeltaMov = []
 
         self.modellingTool =  "trans-right"
-        self.modellingType = "translation"
+        
         self.viewType =  "FRONT_VIEW"
 
         self.motionMode = None
@@ -331,43 +318,19 @@ class Guimodelling:
         self.totalmove = [0,0]
         
 
-        self.detailsMode = "macro"
+        
         self.ethnicMode = None
         self.activeEthnicSets = {}
-        self.ethnicTargetsToApply = {"neutral":1.0}
+        
         self.ethnicTargetsColors = {}
         self.ethnicIncreaseMode = 1
         self.ethnicResetMode = None
         self.initMeshDone = None
-        self.childVal = 0.0 #child
-        self.oldVal = 0.0  #old
-        self.femaleVal = 0.57 #female
-        self.maleVal = 0.57  #male
-        self.flaccidVal = 0.0
-        self.muscleVal = 0.0
-        self.overweightVal = 0.0
-        self.underweightVal = 0.0
-        self.childValDetails = 0.0 #child
-        self.oldValDetails = 0.0  #old
-        self.flaccidValDetails = 0.0
-        self.muscleValDetails = 0.0
-        self.overweightValDetails = 0.0
-        self.underweightValDetails = 0.0
-        self.femaleValDetails = 0
-        self.maleValDetails = 0
+        
         self.undoStack = []
         self.redoStack = []
-        self.targetsDetailStack = {}#A dict to all targets applied, with their values
-        self.lastColoredFaces = []
-        self.bodyZones = {}
-        self.lastTargetApplied = None
-        self.lastZoneModified = None
-
-
-        self.bodyZones =  ["eye","jaw","nose","mouth","head","neck","torso",\
-                        "hip","pelvis","r-upperarm","l-upperarm","r-lowerarm",\
-                        "l-lowerarm","l-hand", "r-hand", "r-upperleg","l-upperleg",\
-                        "r-lowerleg","l-lowerleg","l-foot","r-foot","ear"]
+        
+        self.lastColoredFaces = [] 
 
 
 
@@ -431,14 +394,15 @@ class Guimodelling:
         self.bSymmR.setTexture("data/images/button_symmright.png")
         self.bSymmL.setTexture("data/images/button_symmleft.png")
         self.bNew.setTexture("data/images/button_new.png")
-        self.progressBar = widgets3d.ProgressBar(self.scene)#TODO Verify waht happen with multiple load of same obj
-
+       
         self.bUndo.setTexture("data/images/button_undo.png")
         self.bRedo.setTexture("data/images/button_redo.png")
 
-        self.progressBar.setVisibility(0)
+
         self.prompt.setText("Info:")
-        self.basemesh = self.scene.getObject("base.obj")
+        self.basemesh = self.scene.selectedHuman
+        self.basemesh.modellingType = "translation"
+        self.basemesh.editMode = "macro"
 
 
 
@@ -508,37 +472,37 @@ class Guimodelling:
                     mouseDirection = "Y+"
                     
         if mouseDirection == "X+":
-            self.detailTarget1 = self.detailTargetX1a
-            self.detailTarget2 = self.detailTargetX2a
+            self.detailTarget1 = self.basemesh.detailTargetX1a
+            self.detailTarget2 = self.basemesh.detailTargetX2a
         elif mouseDirection == "X-":
-            self.detailTarget1 = self.detailTargetX1b
-            self.detailTarget2 = self.detailTargetX2b
+            self.detailTarget1 = self.basemesh.detailTargetX1b
+            self.detailTarget2 = self.basemesh.detailTargetX2b
         elif mouseDirection == "Y+":
-            self.detailTarget1 = self.detailTargetY1a
-            self.detailTarget2 = self.detailTargetY2a
+            self.detailTarget1 = self.basemesh.detailTargetY1a
+            self.detailTarget2 = self.basemesh.detailTargetY2a
         elif mouseDirection == "Y-":
-            self.detailTarget1 = self.detailTargetY1b
-            self.detailTarget2 = self.detailTargetY2b
+            self.detailTarget1 = self.basemesh.detailTargetY1b
+            self.detailTarget2 = self.basemesh.detailTargetY2b
         elif mouseDirection == "Z+":
-            self.detailTarget1 = self.detailTargetZ1a
-            self.detailTarget2 = self.detailTargetZ2a
+            self.detailTarget1 = self.basemesh.detailTargetZ1a
+            self.detailTarget2 = self.basemesh.detailTargetZ2a
         elif mouseDirection == "Z-":
-            self.detailTarget1 = self.detailTargetZ1b
-            self.detailTarget2 = self.detailTargetZ2b
+            self.detailTarget1 = self.basemesh.detailTargetZ1b
+            self.detailTarget2 = self.basemesh.detailTargetZ2b
                        
            
                          
         if time.time()-self.lastTargetTime > 0.025:          
             if self.detailTarget1 and self.detailTarget2:
                 #if self.detailTarget2 is present, decrement it
-                if self.detailTarget2 in self.targetsDetailStack.keys() and self.targetsDetailStack[self.detailTarget2] > 0:
-                    prevVal = self.targetsDetailStack[self.detailTarget2]
+                if self.detailTarget2 in self.basemesh.targetsDetailStack.keys() and self.basemesh.targetsDetailStack[self.detailTarget2] > 0:
+                    prevVal = self.basemesh.targetsDetailStack[self.detailTarget2]
                     newVal = max(0.0, prevVal-0.1)
                     if newVal <= 0.0:
-                        del self.targetsDetailStack[self.detailTarget2]
+                        del self.basemesh.targetsDetailStack[self.detailTarget2]
                     actionName = self.detailTarget2
-                    act = Action(actionName,lambda:self.setDetailsTarget(actionName,newVal-prevVal,newVal),\
-                        lambda:self.setDetailsTarget(actionName,prevVal-newVal,prevVal))
+                    act = Action(actionName,lambda:self.basemesh.applyDetailsTargets(actionName,newVal-prevVal,newVal),\
+                        lambda:self.basemesh.applyDetailsTargets(actionName,prevVal-newVal,prevVal))
                         
                     act.do()
                     self.listAction.append(act)
@@ -546,8 +510,8 @@ class Guimodelling:
                 #if value self.detailTarget2 is not present, increment the self.detailTarget1
                 else:            
 
-                    if self.detailTarget1 in self.targetsDetailStack.keys():
-                        prevVal = self.targetsDetailStack[self.detailTarget1]
+                    if self.detailTarget1 in self.basemesh.targetsDetailStack.keys():
+                        prevVal = self.basemesh.targetsDetailStack[self.detailTarget1]
                         newVal = min(1.0, prevVal+0.1)
                     else:
                         prevVal = 0
@@ -555,51 +519,39 @@ class Guimodelling:
                     if newVal <= 1.0 and (newVal - prevVal) > 0.001:
                         print(prevVal, newVal)
                         actionName = self.detailTarget1                        
-                        act = Action(actionName,lambda:self.setDetailsTarget(actionName,newVal-prevVal,newVal),\
-                            lambda:self.setDetailsTarget(actionName,prevVal-newVal,prevVal))
+                        act = Action(actionName,lambda:self.basemesh.applyDetailsTargets(actionName,newVal-prevVal,newVal),\
+                            lambda:self.basemesh.applyDetailsTargets(actionName,prevVal-newVal,prevVal))
                         act.do()
                         self.listAction.append(act)
             self.lastTargetTime = time.time()
                 
 
 
-    def resetScene(self):
-        
-        print "RESET THE SCENE"
-        self.childVal = 0.0 
-        self.oldVal = 0.0
-        self.femaleVal = 0.57
-        self.maleVal = 0.57
-        self.flaccidVal = 0.0
-        self.muscleVal = 0.0
-        self.overweightVal = 0.0
-        self.underweightVal = 0.0        
-
-
-        if self.detailsMode == "macro":            
+    def resetScene(self): 
+    
+        self.basemesh.resetMeshValues()
+        self.basemesh.applyAllTargets()        
+    
+        if self.basemesh.editMode == "macro":            
             self.colorFaceGroup(self.bGender,"0.57")
             self.colorFaceGroup(self.bAge,"0.0")
             self.colorFaceGroup(self.bWeight,"0.0")
-            self.colorFaceGroup(self.bMuscle,"0.0")
-            
+            self.colorFaceGroup(self.bMuscle,"0.0")            
 
-        if self.detailsMode == "regular":
+        if self.basemesh.editMode == "regular":
             self.bGender.setTexture("data/images/button_gender.png")
             self.bWeight.setTexture("data/images/button_weight.png")
             self.bMuscle.setTexture("data/images/button_muscle.png")
             self.bAge.setTexture("data/images/button_age.png")
             self.bScale.setTexture("data/images/button_scale.png")
-            self.cursor.setTexture("data/images/cursor_age.png")
+            self.cursor.setTexture("data/images/cursor_age.png")        
         
-        self.activeEthnicSets = {}
-        self.ethnicTargetsToApply = {"neutral":1.0}
-        self.ethnicTargetsColors = {} 
-        
+        self.ethnicTargetsColors = {}         
         algos3d.colorizeVerts(self.bAfrica, [255,255,255,255])
         algos3d.colorizeVerts(self.bAsia, [255,255,255,255])
         algos3d.colorizeVerts(self.bEurope, [255,255,255,255])
         algos3d.colorizeVerts(self.bAmerica, [255,255,255,255])  
-        self.applyCharacterTargets()
+
         
 
      
@@ -617,15 +569,21 @@ class Guimodelling:
         """
         self.bUndo.setTexture("data/images/button_undo.png")
         self.bRedo.setTexture("data/images/button_redo.png")
-        if self.motionMode:
-            self.motionMode = None            
+        if self.basemesh.grabMode:
+            self.basemesh.grabMode = None            
             print "grab mode set to off"
             self.undoStack.append(self.listAction)
             self.listAction.printActions()
-            self.listAction = None    
+            self.listAction = None   
+            algos3d.calcTargetNormal(self.basemesh.meshData,self.basemesh.lastTargetApplied) 
         self.totalmove = [0,0] 
         self.horizDeltaMov = []
         self.vertiDeltaMov = []
+        
+    def setDetailsTarget(self):
+        self.viewType =  self.scene.getCameraFraming() 
+        self.listAction = ListAction() 
+        self.basemesh.setDetailsTarget()  
         
          
 
@@ -644,7 +602,7 @@ class Guimodelling:
         middleButtonDown = self.scene.mouseState & 2
         rightButtonDown = self.scene.mouseState & 4
 
-        if not self.motionMode:
+        if not self.basemesh.grabMode:
             if (leftButtonDown and rightButtonDown) or middleButtonDown:
                 self.scene.setCameraZoom(self.scene.getCameraZoom() + 0.05 * diff[1])
             elif leftButtonDown:
@@ -654,32 +612,11 @@ class Guimodelling:
                 trans = self.scene.getCameraTranslations()
                 self.scene.setCameraTranslations(trans[0] + 0.05 * diff[0], trans[1] - 0.05 * diff[1])
         else:
-            if leftButtonDown and (self.motionMode==1):
+            if leftButtonDown and (self.basemesh.grabMode == 1):
                 self.grabVerts()
 
 
-    def subdivideBaseMesh(self):
-        """
-        This method toggles between displaying the standard mesh and a
-        subdivided mesh. The subdivided mesh contains 4 times the number of
-        faces as the standard mesh.
-
-        **Parameters:** None.
-
-        """
-
-        if self.basemesh.isSubdivided:
-            self.basemesh.isSubdivided = None
-            sob = self.scene.getObject(self.basemesh.name+".sub")
-            sob.setVisibility(0)
-            self.basemesh.setVisibility(1)
-        else:
-            self.basemesh.isSubdivided = 1
-            subdivision.subdivide(self.basemesh, self.scene)
-            sob = self.scene.getObject(self.basemesh.name+".sub")
-            sob.setVisibility(1)
-            self.basemesh.setVisibility(0)
-        self.scene.redraw()
+    
 
     def colorFaceGroup(self, obj,faceGroupName):
         """
@@ -749,8 +686,8 @@ class Guimodelling:
 
     def setGenderVals(self,amount,faceGroupName):
         """
-        This method applies gender attributes to a whole figure or, when 
-        in details mode, to a selected part of a figure.
+        If in macro mode, this method applies gender attributes to a whole figure or, when 
+        in details mode, just change buttons textures
 
         Parameters
         ----------
@@ -766,15 +703,12 @@ class Guimodelling:
 
         """
         #TODO validate comment
-        if self.detailsMode == "macro":
-            if self.maleVal == amount:
-                return False
-            self.maleVal =  amount
-            self.femaleVal = 1 - amount
+        if self.basemesh.editMode == "macro":            
+            self.basemesh.setGenderVals(amount)            
             self.colorFaceGroup(self.bGender,faceGroupName)
-            self.applyCharacterTargets()
+            self.basemesh.applyAllTargets()
 
-        if self.detailsMode == "regular":
+        if self.basemesh.editMode == "regular":
             self.bAge.setTexture("data/images/button_age.png")
             self.bWeight.setTexture("data/images/button_weight.png")
             self.bMuscle.setTexture("data/images/button_muscle.png")
@@ -782,7 +716,7 @@ class Guimodelling:
             self.bTranslation.setTexture("data/images/button_translation.png")
             self.bScale.setTexture("data/images/button_scale.png")
             self.cursor.setTexture("data/images/cursor_gender.png")
-            self.modellingType = "gender"
+            self.basemesh.modellingType = "gender"
         return True
 
     def setAgeVals(self,amount,faceGroupName):
@@ -804,22 +738,13 @@ class Guimodelling:
 
         """
         #TODO validate comment
-        if self.detailsMode == "macro":
-            if amount >= 0:
-                if self.oldVal == amount and self.childVal == 0:
-                    return False
-                self.oldVal = amount
-                self.childVal = 0
-            else:
-                if self.childVal == -amount and self.oldVal == 0:
-                    return False
-                self.childVal = -amount
-                self.oldVal = 0
+        if self.basemesh.editMode == "macro":
+            self.basemesh.setAgeVals(amount)
             self.modellingTool = None
-            self.applyCharacterTargets()
+            self.basemesh.applyAllTargets()
             self.colorFaceGroup(self.bAge,faceGroupName)
 
-        if self.detailsMode == "regular":
+        if self.basemesh.editMode == "regular":
             self.bGender.setTexture("data/images/button_gender.png")
             self.bWeight.setTexture("data/images/button_weight.png")
             self.bMuscle.setTexture("data/images/button_muscle.png")
@@ -827,7 +752,7 @@ class Guimodelling:
             self.bTranslation.setTexture("data/images/button_translation.png")
             self.bScale.setTexture("data/images/button_scale.png")
             self.cursor.setTexture("data/images/cursor_age.png")
-            self.modellingType = "age"
+            self.basemesh.modellingType = "age"
         return True
 
     def setWeightVals(self,amount,faceGroupName):
@@ -848,22 +773,13 @@ class Guimodelling:
         """
         #TODO validate comment
 
-        if self.detailsMode == "macro":
-            if amount >= 0:
-                if self.overweightVal == amount and self.underweightVal == 0:
-                    return False
-                self.overweightVal = amount
-                self.underweightVal = 0
-            else:
-                if self.underweightVal == -amount and self.overweightVal == 0:
-                    return False
-                self.underweightVal = -amount
-                self.overweightVal = 0
+        if self.basemesh.editMode == "macro":
+            self.basemesh.setWeightVals(amount)
             self.modellingTool = None
             self.colorFaceGroup(self.bWeight,faceGroupName)
-            self.applyCharacterTargets()
+            self.basemesh.applyAllTargets()
 
-        if self.detailsMode == "regular":
+        if self.basemesh.editMode == "regular":
             self.bGender.setTexture("data/images/button_gender.png")
             self.bAge.setTexture("data/images/button_age.png")
             self.bMuscle.setTexture("data/images/button_muscle.png")
@@ -871,7 +787,7 @@ class Guimodelling:
             self.bTranslation.setTexture("data/images/button_translation.png")
             self.bScale.setTexture("data/images/button_scale.png")
             self.cursor.setTexture("data/images/cursor_weight.png")
-            self.modellingType = "weight"
+            self.basemesh.modellingType = "weight"
         return True
 
     def setToneVals(self, amount, faceGroupName):
@@ -893,22 +809,12 @@ class Guimodelling:
         #TODO validate comment
         print("setToneVals", amount, faceGroupName)
 
-        if self.detailsMode == "macro":
-            if amount >= 0:
-                if self.muscleVal == amount and self.flaccidVal == 0:
-                    return False
-                self.muscleVal = amount
-                self.flaccidVal = 0
-            else:
-                if self.flaccidVal == -amount and self.muscleVal == 0:
-                    return False
-                self.flaccidVal = -amount
-                self.muscleVal = 0
-
+        if self.basemesh.editMode == "macro":
+            self.basemesh.setToneVals(amount)
             self.modellingTool = None
             self.colorFaceGroup(self.bMuscle,faceGroupName)
-            self.applyCharacterTargets()
-        if self.detailsMode == "regular":
+            self.basemesh.applyAllTargets()
+        if self.basemesh.editMode == "regular":
             self.bGender.setTexture("data/images/button_gender.png")
             self.bAge.setTexture("data/images/button_age.png")
             self.bWeight.setTexture("data/images/button_weight.png")
@@ -916,7 +822,7 @@ class Guimodelling:
             self.bTranslation.setTexture("data/images/button_translation.png")
             self.bScale.setTexture("data/images/button_scale.png")
             self.cursor.setTexture("data/images/cursor_tone.png")
-            self.modellingType = "muscle"
+            self.basemesh.modellingType = "muscle"
         return True
 
     def modifyGender(self):
@@ -938,7 +844,7 @@ class Guimodelling:
         """
         faceGroupName = self.scene.getSelectedFacesGroup().name
 
-        prevVal = self.maleVal
+        prevVal = self.basemesh.maleVal
         newVal = float(faceGroupName)
         self.do(Action("Modify Gender",\
                 lambda:self.setGenderVals(newVal,faceGroupName),\
@@ -964,10 +870,10 @@ class Guimodelling:
         """
         #TODO validate comment
         faceGroupName = self.scene.getSelectedFacesGroup().name
-        if self.oldVal:
-            prevVal = self.oldVal
-        elif self.childVal:
-            prevVal = -self.childVal
+        if self.basemesh.oldVal:
+            prevVal = self.basemesh.oldVal
+        elif self.basemesh.childVal:
+            prevVal = -self.basemesh.childVal
         else:
             prevVal = 0.0
         newVal = float(faceGroupName)
@@ -995,10 +901,10 @@ class Guimodelling:
         """
         #TODO validate comment
         faceGroupName = self.scene.getSelectedFacesGroup().name
-        if self.overweightVal:
-            prevVal = self.overweightVal
-        elif self.underweightVal:
-            prevVal = -self.underweightVal
+        if self.basemesh.overweightVal:
+            prevVal = self.basemesh.overweightVal
+        elif self.basemesh.underweightVal:
+            prevVal = -self.basemesh.underweightVal
         else:
             prevVal = 0.0
         newVal = float(faceGroupName)
@@ -1027,10 +933,10 @@ class Guimodelling:
         #TODO validate comment
         faceGroupName = self.scene.getSelectedFacesGroup().name
 
-        if self.muscleVal:
-            prevVal = self.muscleVal
-        elif self.flaccidVal:
-            prevVal = -self.flaccidVal
+        if self.basemesh.muscleVal:
+            prevVal = self.basemesh.muscleVal
+        elif self.basemesh.flaccidVal:
+            prevVal = -self.basemesh.flaccidVal
         else:
             prevVal = 0.0
         newVal = float(faceGroupName)
@@ -1051,7 +957,7 @@ class Guimodelling:
         #TODO validate comment
 
         self.prompt.setText("Mode: Macro Details")
-        self.detailsMode = "macro"
+        self.basemesh.editMode = "macro"
         self.bMicroDetails.setTexture("data/images/button_microdetails.png")
         self.bDetails.setTexture("data/images/button_details.png")
         self.bMacroDetails.setTexture("data/images/button_macrodetails_over.png")
@@ -1060,10 +966,10 @@ class Guimodelling:
         self.bMuscle.setTexture("data/images/button_muscle_macro.png")
         self.bGender.setTexture("data/images/button_gender_macro.png")
         self.cursor.setTexture("data/images/cursor.png")
-        self.colorFaceGroup(self.bGender,str(self.maleVal))
-        self.colorFaceGroup(self.bAge,str(self.oldVal))
-        self.colorFaceGroup(self.bWeight,str(self.overweightVal))
-        self.colorFaceGroup(self.bMuscle,str(self.muscleVal))
+        self.colorFaceGroup(self.bGender,str(self.basemesh.maleVal))
+        self.colorFaceGroup(self.bAge,str(self.basemesh.oldVal))
+        self.colorFaceGroup(self.bWeight,str(self.basemesh.overweightVal))
+        self.colorFaceGroup(self.bMuscle,str(self.basemesh.muscleVal))
 
         self.bAsia.setVisibility(1)
         self.bEurope.setVisibility(1)
@@ -1082,7 +988,7 @@ class Guimodelling:
         self.bWeight.setVisibility(1)
         self.bMuscle.setVisibility(1)
         
-        algos3d.colorizeVerts(self.basemesh, [255,255,255,255], self.lastTargetApplied)
+        algos3d.colorizeVerts(self.basemesh.meshData, [255,255,255,255], self.basemesh.lastTargetApplied)
 
         self.scene.redraw()
 
@@ -1097,7 +1003,7 @@ class Guimodelling:
         """
         #TODO validate comment
         self.prompt.setText("Mode: Micro Details")
-        self.detailsMode = "micro"
+        self.basemesh.editMode = "micro"
         self.bMicroDetails.setTexture("data/images/button_microdetails_over.png")
         self.bDetails.setTexture("data/images/button_details.png")
         self.bMacroDetails.setTexture("data/images/button_macrodetails.png")
@@ -1121,7 +1027,7 @@ class Guimodelling:
         self.bMuscle.setVisibility(0)
         
         self.translateModeOn()
-        algos3d.colorizeVerts(self.basemesh, [255,255,255,255], self.lastTargetApplied)
+        algos3d.colorizeVerts(self.basemesh.meshData, [255,255,255,255], self.basemesh.lastTargetApplied)
         self.scene.redraw()
 
     def detailsOn(self):
@@ -1135,7 +1041,7 @@ class Guimodelling:
         """
         #TODO validate comment
         self.prompt.setText("Mode: Details")
-        self.detailsMode = "regular"
+        self.basemesh.editMode = "regular"
         self.bMicroDetails.setTexture("data/images/button_microdetails.png")
         self.bDetails.setTexture("data/images/button_details_over.png")
         self.bMacroDetails.setTexture("data/images/button_macrodetails.png")
@@ -1165,7 +1071,7 @@ class Guimodelling:
         self.bWeight.setVisibility(1)
         self.bMuscle.setVisibility(1)
         self.translateModeOn()
-        algos3d.colorizeVerts(self.basemesh, [255,255,255,255], self.lastTargetApplied)
+        algos3d.colorizeVerts(self.basemesh.meshData, [255,255,255,255], self.basemesh.lastTargetApplied)
         self.scene.redraw()
 
     def translateModeOn(self):
@@ -1180,7 +1086,7 @@ class Guimodelling:
         """
         #TODO validate comment
         self.prompt.setText("Mode: Transl Mode")
-        self.modellingType = "translation"
+        self.basemesh.modellingType = "translation"
         self.bTranslation.setTexture("data/images/button_translation_on.png")
         self.bScale.setTexture("data/images/button_scale.png")
         self.cursor.setTexture("data/images/cursor_trans.png")
@@ -1197,7 +1103,7 @@ class Guimodelling:
         """
         #TODO validate comment
         self.prompt.setText("Mode: Scale Mode")
-        self.modellingType = "scale"
+        self.basemesh.modellingType = "scale"
         self.bTranslation.setTexture("data/images/button_translation.png")
         self.bScale.setTexture("data/images/button_scale_on.png")
         self.cursor.setTexture("data/images/cursor_scale.png")
@@ -1314,141 +1220,7 @@ class Guimodelling:
         self.ethnicIncreaseMode = None
         self.ethnicResetMode = 1
 
-    def applyCharacterTargets(self):
-
-        """
-        This method applies all targets, in function of age and sex
-        
-        **Parameters:** None.
-
-        """
-
-        targetName = None
-        self.progressBar.setVisibility(1)
-        algos3d.resetObj(self.basemesh)
-
-        self.progressBar.setProgress(0.0)
-        progressVal = 0.0
-        progressIncr = 0.3/(len(self.targetsDetailStack)+1)
-        for t in self.targetsDetailStack.keys():
-            algos3d.loadTranslationTarget(self.basemesh, t, self.targetsDetailStack[t],None,0,0)
-            progressVal += progressIncr
-            self.progressBar.setProgress(progressVal)
-        a = time.time()
-        #+.01 below to prevent zerodivision error
-        progressIncr = (0.6/(len(self.ethnicTargetsToApply.keys())+.01))/6
-        realAgeVal = 25
-        if self.childVal > 0:
-            realAgeVal = 25-(13*self.childVal)
-        if self.oldVal > 0:
-            realAgeVal = 25+(45*self.oldVal)
-        infoText = "Male: %.2f; Female: %.2f; Age: %.2f "% (self.maleVal,\
-                                                            self.femaleVal,\
-                                                            realAgeVal)
-        youngVal = 1-(self.oldVal + self.childVal)
-
-        #NOTE: the "universal" targets work as addition with all other targets,
-        #while the ethnic targets are absolute.
-        targetFolder = "data/targets/macrodetails"
-        targetsGeneral = {}
-
-        targetFemaleFlaccidChild = "%s/universal-female-child-flaccid.target"%(targetFolder)
-        targetFemaleFlaccidYoung = "%s/universal-female-young-flaccid.target"%(targetFolder)
-        targetFemaleFlaccidOld = "%s/universal-female-old-flaccid.target"%(targetFolder)
-        targetMaleFlaccidChild = "%s/universal-male-child-flaccid.target"%(targetFolder)
-        targetMaleFlaccidYoung = "%s/universal-male-young-flaccid.target"%(targetFolder)
-        targetMaleFlaccidOld = "%s/universal-male-old-flaccid.target"%(targetFolder)
-
-        targetFemaleMuscleChild = "%s/universal-female-child-muscle.target"%(targetFolder)
-        targetFemaleMuscleYoung = "%s/universal-female-young-muscle.target"%(targetFolder)
-        targetFemaleMuscleOld = "%s/universal-female-old-muscle.target"%(targetFolder)
-        targetMaleMuscleChild = "%s/universal-male-child-muscle.target"%(targetFolder)
-        targetMaleMuscleYoung = "%s/universal-male-young-muscle.target"%(targetFolder)
-        targetMaleMuscleOld = "%s/universal-male-old-muscle.target"%(targetFolder)
-
-        targetFemaleOverweightChild = "%s/universal-female-child-overweight.target"%(targetFolder)
-        targetFemaleOverweightYoung = "%s/universal-female-young-overweight.target"%(targetFolder)
-        targetFemaleOverweightOld = "%s/universal-female-old-overweight.target"%(targetFolder)
-        targetMaleOverweightChild = "%s/universal-male-child-overweight.target"%(targetFolder)
-        targetMaleOverweightYoung = "%s/universal-male-young-overweight.target"%(targetFolder)
-        targetMaleOverweightOld = "%s/universal-male-old-overweight.target"%(targetFolder)
-
-        targetFemaleUnderweightChild = "%s/universal-female-child-underweight.target"%(targetFolder)
-        targetFemaleUnderweightYoung = "%s/universal-female-young-underweight.target"%(targetFolder)
-        targetFemaleUnderweightOld = "%s/universal-female-old-underweight.target"%(targetFolder)
-        targetMaleUnderweightChild = "%s/universal-male-child-underweight.target"%(targetFolder)
-        targetMaleUnderweightYoung = "%s/universal-male-young-underweight.target"%(targetFolder)
-        targetMaleUnderweightOld = "%s/universal-male-old-underweight.target"%(targetFolder)
-
-        targetsGeneral[targetFemaleFlaccidChild]= self.flaccidVal*self.childVal*self.femaleVal
-        targetsGeneral[targetFemaleFlaccidYoung]= self.flaccidVal*youngVal*self.femaleVal
-        targetsGeneral[targetFemaleFlaccidOld]= self.flaccidVal*self.oldVal*self.femaleVal
-        targetsGeneral[targetMaleFlaccidChild]= self.flaccidVal*self.childVal*self.maleVal
-        targetsGeneral[targetMaleFlaccidYoung]= self.flaccidVal*youngVal*self.maleVal
-        targetsGeneral[targetMaleFlaccidOld]= self.flaccidVal*self.oldVal*self.maleVal
-
-        targetsGeneral[targetFemaleMuscleChild]= self.muscleVal*self.childVal*self.femaleVal
-        targetsGeneral[targetFemaleMuscleYoung]= self.muscleVal*youngVal*self.femaleVal
-        targetsGeneral[targetFemaleMuscleOld]= self.muscleVal*self.oldVal*self.femaleVal
-        targetsGeneral[targetMaleMuscleChild]= self.muscleVal*self.childVal*self.maleVal
-        targetsGeneral[targetMaleMuscleYoung]= self.muscleVal*youngVal*self.maleVal
-        targetsGeneral[targetMaleMuscleOld]= self.muscleVal*self.oldVal*self.maleVal
-
-        targetsGeneral[targetFemaleOverweightChild]= self.overweightVal*self.childVal*self.femaleVal
-        targetsGeneral[targetFemaleOverweightYoung]= self.overweightVal*youngVal*self.femaleVal
-        targetsGeneral[targetFemaleOverweightOld]= self.overweightVal*self.oldVal*self.femaleVal
-        targetsGeneral[targetMaleOverweightChild]= self.overweightVal*self.childVal*self.maleVal
-        targetsGeneral[targetMaleOverweightYoung]= self.overweightVal*youngVal*self.maleVal
-        targetsGeneral[targetMaleOverweightOld]= self.overweightVal*self.oldVal*self.maleVal
-
-        targetsGeneral[targetFemaleUnderweightChild]= self.underweightVal*self.childVal*self.femaleVal
-        targetsGeneral[targetFemaleUnderweightYoung]= self.underweightVal*youngVal*self.femaleVal
-        targetsGeneral[targetFemaleUnderweightOld]= self.underweightVal*self.oldVal*self.femaleVal
-        targetsGeneral[targetMaleUnderweightChild]= self.underweightVal*self.childVal*self.maleVal
-        targetsGeneral[targetMaleUnderweightYoung]= self.underweightVal*youngVal*self.maleVal
-        targetsGeneral[targetMaleUnderweightOld]= self.underweightVal*self.oldVal*self.maleVal
-
-        for k in targetsGeneral.keys():
-            tVal = targetsGeneral[k]
-            algos3d.loadTranslationTarget(self.basemesh, k,tVal,None,0,0)
-
-        for ethnicGroup in self.ethnicTargetsToApply.keys():
-            ethnicVal = self.ethnicTargetsToApply[ethnicGroup]
-            targetsEthnic = {}
-
-            targetFemaleChild = "data/targets/macrodetails/%s-female-child.target"%(ethnicGroup)
-            targetMaleChild = "data/targets/macrodetails/%s-male-child.target"%(ethnicGroup)
-            targetFemaleOld = "data/targets/macrodetails/%s-female-old.target"%(ethnicGroup)
-            targetMaleOld = "data/targets/macrodetails/%s-male-old.target"%(ethnicGroup)
-            targetFemaleYoung = "data/targets/macrodetails/%s-female-young.target"%(ethnicGroup)
-            targetMaleYoung = "data/targets/macrodetails/%s-male-young.target"%(ethnicGroup)
-
-            targetsEthnic[targetFemaleChild] = self.femaleVal*self.childVal*ethnicVal
-            targetsEthnic[targetMaleChild] = self.maleVal*self.childVal*ethnicVal
-            targetsEthnic[targetFemaleOld] = self.femaleVal*self.oldVal*ethnicVal
-            targetsEthnic[targetMaleOld]= self.maleVal*self.oldVal*ethnicVal
-            targetsEthnic[targetFemaleYoung]= self.femaleVal*youngVal*ethnicVal
-            targetsEthnic[targetMaleYoung]= self.maleVal*youngVal*ethnicVal
-
-            for k in targetsEthnic.keys():
-                
-                tVal = targetsEthnic[k]
-                print "DEBUG ethnic", k,tVal,ethnicVal
-                progressVal = progressVal + progressIncr
-                self.progressBar.setProgress(progressVal)
-                algos3d.loadTranslationTarget(self.basemesh, k,tVal,None,0,0)
-
-        #Update all verts
-        facesToRecalculate = range(len(self.basemesh.faces))
-        indicesToUpdate = range(len(self.basemesh.verts))
-        self.basemesh.calcNormals(indicesToUpdate,facesToRecalculate,1)
-        self.basemesh.update(indicesToUpdate)
-
-        self.progressBar.setProgress(1.0)
-        self.progressBar.setVisibility(0)
-        for (k,v) in self.ethnicTargetsToApply.items():
-            infoText += ", %s: %.2f"%(k,v)
-        self.prompt.setText(infoText)
+    
 
     def colorEthnicGroup(self, obj):
         """
@@ -1495,7 +1267,7 @@ class Guimodelling:
                     self.do(Action("Remove " + faceGroupName, self.modifyEthnicAction(faceGroupName, "reset"), self.modifyEthnicAction(faceGroupName, "reset")))
                 else:
                     self.do(Action("Decrease " + faceGroupName, self.modifyEthnicAction(faceGroupName, "decrease"), self.modifyEthnicAction(faceGroupName, "increase")))
-                self.applyCharacterTargets()
+                self.basemesh.applyAllTargets()
             else:
                 self.ethnicModeOff(button)
         else:
@@ -1533,15 +1305,15 @@ class Guimodelling:
                 modified = True
 
         if modified:
-            self.ethnicTargetsToApply = {}
+            self.basemesh.targetsEthnicStack = {}
             #Calculate the ethnic target value, and store it in dictionary
             for t in self.activeEthnicSets.keys():
-                self.ethnicTargetsToApply[t] = self.activeEthnicSets[t]
+                self.basemesh.targetsEthnicStack[t] = self.activeEthnicSets[t]
                 #for each facegroup recalculate the color
-                self.ethnicTargetsColors[t] = [int(255*self.ethnicTargetsToApply[t]),\
-                                                1-int(255*self.ethnicTargetsToApply[t]),\
+                self.ethnicTargetsColors[t] = [int(255*self.basemesh.targetsEthnicStack[t]),\
+                                                1-int(255*self.basemesh.targetsEthnicStack[t]),\
                                                 255,255]
-            self.ethnicTargetsToApply["neutral"] = 1.0 - sum(self.activeEthnicSets.values())
+            self.basemesh.targetsEthnicStack["neutral"] = 1.0 - sum(self.activeEthnicSets.values())
 
             #If the group was completely removed, the color is white
             if ethnic not in self.activeEthnicSets:
@@ -1578,183 +1350,10 @@ class Guimodelling:
         elif action == "reset":
             return lambda: self.modifyEthnic(ethnic, -1.0)
 
-    def setDetailsTarget(self,targetPath,incrVal,totVal):
-        """
-        This method .....
-        
-        Parameters
-        ----------
-
-        targetPath:
-            *path*. The full file system path to a target file.
-
-        incrVal:
-            *float*. The amount by which each change alters the model.
-
-        totVal:
-            *float*. ????.
-
-        """
-        #TODO insert comment
-        print "DEBUG SETDETAILS",targetPath, incrVal
-        self.targetsDetailStack[targetPath] = totVal
-        print "loading target %s with value %f"%(targetPath,incrVal)
-        algos3d.loadTranslationTarget(self.basemesh, targetPath, incrVal,None, 1, 0)
-        self.lastTargetApplied = targetPath
-        return True
+    
 
 
-    def selectDetailTarget(self):
-        """
-        This method .....
-        
-        Parameters
-        ----------
-
-        partName:
-            *???*. ???.
-
-        """
-        
-        faceGroupName = self.scene.getSelectedFacesGroup().name
-            
-        self.viewType =  self.scene.getCameraFraming() 
-        self.listAction = ListAction()        
-        print "GROUPS SELECTED: ",faceGroupName
-        if  self.detailsMode == "macro":
-            tFolder = "data/targets/macrodetails"
-        if  self.detailsMode == "regular":
-            tFolder = "data/targets/details/"
-            for k in self.bodyZones:
-                if k in faceGroupName:                
-                    partName = k
-                    break        
-        if  self.detailsMode == "micro":
-            tFolder = "data/targets/microdetails/"
-            partName = faceGroupName        
-
-        if self.modellingType == "scale":
-            #Targets X direction positive
-            self.detailTargetX1a = "%s%s-scale-horiz-incr.target"%(tFolder,partName)
-            self.detailTargetX2a = "%s%s-scale-horiz-decr.target"%(tFolder,partName)
-            #Targets X direction negative
-            self.detailTargetX1b = "%s%s-scale-horiz-decr.target"%(tFolder,partName)
-            self.detailTargetX2b = "%s%s-scale-horiz-incr.target"%(tFolder,partName)
-            #Targets Y direction positive
-            self.detailTargetY1a = "%s%s-scale-vert-incr.target"%(tFolder,partName)
-            self.detailTargetY2a = "%s%s-scale-vert-decr.target"%(tFolder,partName)
-            #Targets Y direction negative
-            self.detailTargetY1b = "%s%s-scale-vert-decr.target"%(tFolder,partName)
-            self.detailTargetY2b = "%s%s-scale-vert-incr.target"%(tFolder,partName)
-            #Targets Z direction positive
-            self.detailTargetZ1a = "%s%s-scale-depth-incr.target"%(tFolder,partName)
-            self.detailTargetZ2a = "%s%s-scale-depth-decr.target"%(tFolder,partName)
-            #Targets Z direction negative
-            self.detailTargetZ1b = "%s%s-scale-depth-decr.target"%(tFolder,partName)
-            self.detailTargetZ2b = "%s%s-scale-depth-incr.target"%(tFolder,partName)               
-            
-        if self.modellingType == "translation":
-            #Targets X direction positive
-            self.detailTargetX1a = "%s%s-trans-in.target"%(tFolder,partName)
-            self.detailTargetX2a = "%s%s-trans-out.target"%(tFolder,partName)
-            #Targets X direction negative
-            self.detailTargetX1b = "%s%s-trans-out.target"%(tFolder,partName)
-            self.detailTargetX2b = "%s%s-trans-in.target"%(tFolder,partName)
-            #Targets Y direction positive
-            self.detailTargetY1a = "%s%s-trans-up.target"%(tFolder,partName)
-            self.detailTargetY2a = "%s%s-trans-down.target"%(tFolder,partName)
-            #Targets Y direction negative
-            self.detailTargetY1b = "%s%s-trans-down.target"%(tFolder,partName)
-            self.detailTargetY2b = "%s%s-trans-up.target"%(tFolder,partName)
-            #Targets Z direction positive
-            self.detailTargetZ1a = "%s%s-trans-forward.target"%(tFolder,partName)
-            self.detailTargetZ2a = "%s%s-trans-backward.target"%(tFolder,partName)
-            #Targets Z direction negative
-            self.detailTargetZ1b = "%s%s-trans-backward.target"%(tFolder,partName)
-            self.detailTargetZ2b = "%s%s-trans-forward.target"%(tFolder,partName)
-            
-        #OLD-YOUNG-FAT-SKNNY-FLABBY-MUSCLE BUTTONS
-        if self.modellingType == "gender":
-            #Targets X direction positive
-            self.detailTargetX1a = "%s%s_male.target"%(tFolder,partName)
-            self.detailTargetX2a = "%s%s_female.target"%(tFolder,partName)
-            #Targets X direction positive
-            self.detailTargetX1b = "%s%s_female.target"%(tFolder,partName)
-            self.detailTargetX2b = "%s%s_male.target"%(tFolder,partName)
-            #Same targets assigned to y and z mouse movements
-            self.detailTargetY1a = self.detailTargetX1a
-            self.detailTargetY2a = self.detailTargetX2a
-            self.detailTargetY1b = self.detailTargetX1b
-            self.detailTargetY2b = self.detailTargetX2b
-            self.detailTargetZ1a = self.detailTargetZ1a
-            self.detailTargetZ2a = self.detailTargetZ2a
-            self.detailTargetZ1b = self.detailTargetZ1b
-            self.detailTargetZ2b = self.detailTargetZ2b                
-
-        if self.modellingType == "age":
-            #Targets X direction positive
-            self.detailTargetX1a = "%s%s_old.target"%(tFolder,partName)
-            self.detailTargetX2a = "%s%s_child.target"%(tFolder,partName)
-            #Targets X direction positive
-            self.detailTargetX1b = "%s%s_child.target"%(tFolder,partName)
-            self.detailTargetX2b = "%s%s_old.target"%(tFolder,partName)
-            #Same targets assigned to y and z mouse movements
-            self.detailTargetY1a = self.detailTargetX1a
-            self.detailTargetY2a = self.detailTargetX2a
-            self.detailTargetY1b = self.detailTargetX1b
-            self.detailTargetY2b = self.detailTargetX2b
-            self.detailTargetZ1a = self.detailTargetZ1a
-            self.detailTargetZ2a = self.detailTargetZ2a
-            self.detailTargetZ1b = self.detailTargetZ1b
-            self.detailTargetZ2b = self.detailTargetZ2b          
-           
-
-        if self.modellingType == "muscle":
-            #Targets X direction positive
-            self.detailTargetX1a = "%s%s_muscle.target"%(tFolder,partName)
-            self.detailTargetX2a = "%s%s_flaccid.target"%(tFolder,partName)
-            #Targets X direction positive
-            self.detailTargetX1b = "%s%s_flaccid.target"%(tFolder,partName)
-            self.detailTargetX2b = "%s%s_muscle.target"%(tFolder,partName)
-            #Same targets assigned to y and z mouse movements
-            self.detailTargetY1a = self.detailTargetX1a
-            self.detailTargetY2a = self.detailTargetX2a
-            self.detailTargetY1b = self.detailTargetX1b
-            self.detailTargetY2b = self.detailTargetX2b
-            self.detailTargetZ1a = self.detailTargetZ1a
-            self.detailTargetZ2a = self.detailTargetZ2a
-            self.detailTargetZ1b = self.detailTargetZ1b
-            self.detailTargetZ2b = self.detailTargetZ2b  
-
-
-        if self.modellingType == "weight":                
-            #Targets X direction positive
-            self.detailTargetX1a = "%s%s_overweight.target"%(tFolder,partName)
-            self.detailTargetX2a = "%s%s_underweight.target"%(tFolder,partName)
-            #Targets X direction positive
-            self.detailTargetX1b = "%s%s_underweight.target"%(tFolder,partName)
-            self.detailTargetX2b = "%s%s_overweight.target"%(tFolder,partName)
-            #Same targets assigned to y and z mouse movements
-            self.detailTargetY1a = self.detailTargetX1a
-            self.detailTargetY2a = self.detailTargetX2a
-            self.detailTargetY1b = self.detailTargetX1b
-            self.detailTargetY2b = self.detailTargetX2b
-            self.detailTargetZ1a = self.detailTargetZ1a
-            self.detailTargetZ2a = self.detailTargetZ2a
-            self.detailTargetZ1b = self.detailTargetZ1b
-            self.detailTargetZ2b = self.detailTargetZ2b               
-
-
-        algos3d.colorizeVerts(self.basemesh, [255,255,255,255])
-        #With these 2 lines the first click select, the second grab
-        if partName == self.lastZoneModified:
-            #clicking on already selected part, move it             
-            self.motionMode = 1 #Mouse motion move the verts
-        else:
-            #clicking on a not selected part, just select it
-            self.lastZoneModified = partName
-            self.motionMode = 2 #Mouse Motion do nothing (no scene rotation too)
-            algos3d.analyzeTarget(self.basemesh, self.detailTargetY1a)
+    
 
             
         
@@ -1765,69 +1364,7 @@ class Guimodelling:
 
             
 
-    def applySymmetryLeft(self):
-        """
-        This method applies right to left symmetry to the currently selected 
-        body parts.
-        
-        **Parameters:** None.
-
-        """
-        self.symmetrizeMicroDetails("l")
-
-
-    def applySymmetryRight(self):
-        """
-        This method applies left to right symmetry to the currently selected 
-        body parts.
-        
-        **Parameters:** None.
-
-        """
-        self.symmetrizeMicroDetails("r")
-
-    def symmetrizeMicroDetails(self,direction="r"):
-        """
-        This method applies either left to right or right to left symmetry to 
-        the currently selected body parts.
-        
-        
-        Parameters
-        ----------
-
-        direction:
-            *string*. A string indicating whether to apply left to right 
-            symmetry ("r") or right to left symmetry ("l").
-
-        """
-        #print "SYMMETRIZE START"
-        if direction == "l":
-            prefix1 = "l-"
-            prefix2 = "r-"
-        else:
-            prefix1 = "r-"
-            prefix2 = "l-"
-
-        for target in self.targetsDetailStack.keys():
-            targetName = os.path.basename(target)
-            #Reset previous targets on symm side
-            if targetName[:2] == prefix2:
-                algos3d.loadTranslationTarget(self.basemesh, target, -self.targetsDetailStack[target],None,1,0)
-                self.targetsDetailStack[target] = 0
-
-        #Apply symm target. For horiz movement the value must ve inverted
-        for target in self.targetsDetailStack.keys():
-            targetName = os.path.basename(target)
-            if targetName[:2] == prefix1:
-                targetSym = os.path.join(os.path.dirname(target),prefix2+targetName[2:])
-                targetSymVal = self.targetsDetailStack[target]
-                if "trans-in" in targetSym or "trans-out" in targetName:
-                    targetSymVal *= -1
-
-                algos3d.loadTranslationTarget(self.basemesh, targetSym, targetSymVal,None, 1, 1)
-                self.targetsDetailStack[targetSym] = targetSymVal
-
-        self.scene.redraw()
+    
 
    
         
@@ -1846,22 +1383,27 @@ class Guimodelling:
         if not self.initMeshDone:
             self.macroDetailsOn()
             self.ethnicIncreaseModeOn()
+            
+            #We can apply self.basemesh.applyAllTargets() instead, but
+            #calling directly the 2 targets is more fast.
             targetFemale = "data/targets/macrodetails/neutral-female-young.target"
             targetMale = "data/targets/macrodetails/neutral-male-young.target"
-            algos3d.loadTranslationTarget(self.basemesh, targetFemale,self.femaleVal)
-            algos3d.loadTranslationTarget(self.basemesh, targetMale,self.maleVal)
+            algos3d.loadTranslationTarget(self.basemesh.meshData, targetFemale,self.basemesh.femaleVal)
+            algos3d.loadTranslationTarget(self.basemesh.meshData, targetMale,self.basemesh.maleVal)  
+            
+                      
             self.initMeshDone = 1
 
-            self.colorFaceGroup(self.bGender,str(self.maleVal))
-            self.colorFaceGroup(self.bAge,str(self.oldVal))
-            self.colorFaceGroup(self.bWeight,str(self.overweightVal))
-            self.colorFaceGroup(self.bMuscle,str(self.muscleVal))
+            self.colorFaceGroup(self.bGender,str(self.basemesh.maleVal))
+            self.colorFaceGroup(self.bAge,str(self.basemesh.oldVal))
+            self.colorFaceGroup(self.bWeight,str(self.basemesh.overweightVal))
+            self.colorFaceGroup(self.bMuscle,str(self.basemesh.muscleVal))
 
 
         self.scene.connect("LMOUSEP",self.ethnicIncreaseModeOn,self.bEthnicIncr)
         self.scene.connect("LMOUSEP",self.ethnicResetModeOn,self.bEthnicReset)
         self.scene.connect("LMOUSEP",self.ethnicDecreaseModeOn,self.bEthnicDecr)
-        self.scene.connect("LMOUSEP",self.selectDetailTarget,self.basemesh)
+        self.scene.connect("LMOUSEP",self.setDetailsTarget,self.basemesh.meshData)
         self.scene.connect("LMOUSEP",self.macroDetailsOn,self.bMacroDetails)
         self.scene.connect("LMOUSEP",self.detailsOn,self.bDetails)
         self.scene.connect("LMOUSEP",self.microDetailsOn,self.bMicroDetails)
@@ -1874,8 +1416,8 @@ class Guimodelling:
         self.scene.connect("LMOUSEP",self.translateModeOn,self.bTranslation)
         self.scene.connect("LMOUSEP",self.doUndo,self.bUndo)
         self.scene.connect("LMOUSEP",self.doRedo,self.bRedo)
-        self.scene.connect("LMOUSEP",self.applySymmetryLeft,self.bSymmL)
-        self.scene.connect("LMOUSEP",self.applySymmetryRight,self.bSymmR)
+        self.scene.connect("LMOUSEP",self.basemesh.applySymmetryLeft,self.bSymmL)
+        self.scene.connect("LMOUSEP",self.basemesh.applySymmetryRight,self.bSymmR)
         self.scene.connect("LMOUSEP",self.resetScene,self.bNew)
 
 
@@ -1884,7 +1426,7 @@ class Guimodelling:
         self.scene.connect("LMOUSER", self.releaseLeftButton)
         self.scene.connect("MOUSEWHEELDOWN", self.zoomIn)
         self.scene.connect("MOUSEWHEELUP", self.zoomOut)
-        self.scene.connect("s", self.subdivideBaseMesh)
+        self.scene.connect("s", self.basemesh.subdivide)
         self.scene.connect("q", self.scene.shutdown)
         self.scene.connect("z", self.undo)
         self.scene.connect("y", self.redo)
@@ -1914,7 +1456,7 @@ class Guimodelling:
         self.scene.connect(".", self.resetView)
         self.scene.connect(self.scene.KP_PERIOD, self.resetView)
         self.scene.connect("g", self.grabScreen)
-        self.scene.connect("r", self.symmetrizeMicroDetails)
+        
 
 
 

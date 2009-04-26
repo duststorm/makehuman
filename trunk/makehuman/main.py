@@ -57,6 +57,7 @@ import webbrowser
 import module3d
 import files3d
 import widgets3d
+import human
 
 #GUI sections are plugins
 import guicommon
@@ -91,7 +92,8 @@ os.system("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sd
 progressBar.setProgress(0.2)
 
 # Load the base humanoid mesh
-humanMesh = files3d.loadMesh(mainScene, "data/3dobjs/base.obj", loadColors = None)
+humanMesh = human.Human(mainScene, "data/3dobjs/base.obj")
+mainScene.selectedHuman = humanMesh
 
 progressBar.setProgress(0.5)
 

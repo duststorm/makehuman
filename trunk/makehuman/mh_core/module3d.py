@@ -1061,6 +1061,8 @@ class Scene3D:
         self.RIGHT_ALT = 307
         self.LEFT_ALT= 308
         
+        self.selectedHuman = None
+        
 
     def __str__(self):
         """

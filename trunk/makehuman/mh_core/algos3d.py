@@ -257,32 +257,19 @@ def calcTargetNormal(obj, targetPath):
 
     targetPath:
         *string*. The file system path to the file containing the morphing targets. 
-        The precise format of this string will be operating system dependant.
-
-    morphFactor:
-        *float*. A factor between 0 and 1 controlling the proportion of the translations 
-        to be applied. If 0 then the object remains unmodified. If 1 the 'full' translations
-        are applied. This parameter would normally be in the range 0-1 but can be greater 
-        than 1 or less than 0 when used to produce extreme deformations (deformations 
-        that extend beyond those modelled by the original artist).
-
-    faceGroupToUpdateName:
-        *string*. Optional: The name of a single facegroup to be affected by the target.
-        If specified, then only transformations to faces contained by the specified 
-        facegroup are applied. If not specified, all transformations contained within the
-        morph target file are applied. This permits a single morph target file to contain
-        transformations that affect multiple facegroups, but to only be selectively applied 
-        to individual facegroups.
-
-    update:
-        *int flag*. A flag to indicate whether the update method on the object should be called.
-
-    calcNorm:
-        *int flag*. A flag to indicate whether the normals are to be recalculated (1/true) 
-        or not (0/false).   
+        The precise format of this string will be operating system dependant.    
 
     """
-
+    global targetBuffer
+    if not targetBuffer.has_key(targetPath):
+        pushTargetInBuffer(obj,targetPath)
+    #if the target is already buffered, just get it using
+    #the path as key
+    try:
+        target = targetBuffer[targetPath]
+    except:
+        print "Probably %s does not exist"%(targetPath)
+        return 
     facesToRecalculate = target.faces
     indicesToUpdate = target.verts    
     obj.calcNormals(indicesToUpdate,facesToRecalculate,1)
