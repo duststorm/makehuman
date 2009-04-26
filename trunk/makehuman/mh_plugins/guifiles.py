@@ -248,6 +248,9 @@ class Guifiles:
         """
         print("Loading " + self.models[self.selectedModel])
         
+        human = self.scene.selectedHuman
+        human.resetMeshValues()
+        
         # Load the model
         f = open("models/" + self.models[self.selectedModel], 'r')
         
@@ -261,35 +264,35 @@ class Guifiles:
                     for tag in lineData:
                       print("Tag " + tag)
                 elif lineData[0] == "female":
-                    self.modelling.femaleVal = float(lineData[1])
+                    human.femaleVal = float(lineData[1])
                 elif lineData[0] == "male":
-                    self.modelling.maleVal = float(lineData[1])  
+                    human.maleVal = float(lineData[1])  
                 elif lineData[0] == "child":
-                    self.modelling.childVal = float(lineData[1])
+                    human.childVal = float(lineData[1])
                 elif lineData[0] == "old":
-                    self.modelling.oldVal = float(lineData[1])      
+                    human.oldVal = float(lineData[1])      
                 elif lineData[0] == "flaccid":
-                    self.modelling.flaccidVal = float(lineData[1])
+                    human.flaccidVal = float(lineData[1])
                 elif lineData[0] == "muscle":
-                    self.modelling.muscleVal = float(lineData[1])
+                    human.muscleVal = float(lineData[1])
                 elif lineData[0] == "overweight":
-                    self.modelling.overweightVal = float(lineData[1])
+                    human.overweightVal = float(lineData[1])
                 elif lineData[0] == "underweight":
-                    self.modelling.underweightVal = float(lineData[1])
+                    human.underweightVal = float(lineData[1])
                 elif lineData[0] == "ethnic":
-                    self.modelling.ethnicTargetsValues[lineData[1]] = float(lineData[2])
+                    human.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == "detail":
-                    self.modelling.targetsDetailStack["data/targets/details/" + lineData[1] + ".target"] = float(lineData[2])
+                    human.targetsDetailStack["data/targets/details/" + lineData[1] + ".target"] = float(lineData[2])
                 elif lineData[0] == "microdetail":
-                    self.modelling.targetsDetailStack["data/targets/microdetail/" + lineData[1] + ".target"] = float(lineData[2])
+                    human.targetsDetailStack["data/targets/microdetails/" + lineData[1] + ".target"] = float(lineData[2])
                 
         f.close()
         
         # Sync macro interface
-        self.modelling.colorFaceGroup(self.modelling.bGender, str(self.modelling.maleVal))
-        self.modelling.colorFaceGroup(self.modelling.bAge, str(self.modelling.oldVal))
-        self.modelling.colorFaceGroup(self.modelling.bWeight, str(self.modelling.overweightVal))
-        self.modelling.colorFaceGroup(self.modelling.bMuscle, str(self.modelling.muscleVal))
+        self.modelling.colorFaceGroup(self.modelling.bGender, str(human.maleVal))
+        self.modelling.colorFaceGroup(self.modelling.bAge, str(human.oldVal))
+        self.modelling.colorFaceGroup(self.modelling.bWeight, str(human.overweightVal))
+        self.modelling.colorFaceGroup(self.modelling.bMuscle, str(human.muscleVal))
         
         # Sync ethnic interface
         africa = None
@@ -297,21 +300,21 @@ class Guifiles:
         for t in self.modelling.ethnicTargetsColors.keys():
             self.modelling.ethnicTargetsColors[t] = [255, 255, 255, 255]
         # Calculate the ethnic target value, and store it in dictionary
-        self.modelling.ethnicTargetsToApply = {}
-        for t in self.modelling.ethnicTargetsValues.keys():
-            self.modelling.ethnicTargetsToApply[t] = self.modelling.ethnicTargetsValues[t]
+        human.targetsEthnicStack = {}
+        for t in self.modelling.activeEthnicSets.keys():
+            human.targetsEthnicStack[t] = self.modelling.activeEthnicSets[t]
             #for each facegroup recalculate the color
-            self.modelling.ethnicTargetsColors[t] = [int(255*self.modelling.ethnicTargetsToApply[t]),\
-                                            1-int(255*self.modelling.ethnicTargetsToApply[t]),\
+            self.modelling.ethnicTargetsColors[t] = [int(255*human.targetsEthnicStack[t]),\
+                                            1-int(255*human.targetsEthnicStack[t]),\
                                             255,255]
             if "africa" in t:
                 africa = True
-        self.modelling.ethnicTargetsToApply["neutral"] = 1.0 - sum(self.modelling.ethnicTargetsValues.values())
+        human.targetsEthnicStack["neutral"] = 1.0 - sum(self.modelling.activeEthnicSets.values())
 
         if africa:
             self.modelling.colorEthnicGroup(self.modelling.bAfrica)
                 
-        self.modelling.applyCharacterTargets()
+        human.applyAllTargets()
         self.bPreviousFile.setVisibility(0)
         self.bNextFile.setVisibility(0)
         self.bFile.setVisibility(0)
