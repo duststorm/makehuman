@@ -360,26 +360,27 @@ class Guifiles:
         self.scene.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), "models/" + filename + ".bmp")
         
         # Save the model
+        human = self.scene.selectedHuman
         f = open("models/" + filename + ".mhm", 'w')
         f.write("# Written by makehuman 1.0.0 alpha 2\n")
         f.write("version 1.0.0\n")
         f.write("tags %s\n" %(self.gFileSelector.textString))
-        f.write("female %f\n" %(self.modelling.femaleVal))
-        f.write("male %f\n" %(self.modelling.maleVal))
-        f.write("child %f\n" %(self.modelling.childVal))
-        f.write("old %f\n" %(self.modelling.oldVal))
-        f.write("flaccid %f\n" %(self.modelling.flaccidVal))
-        f.write("muscle %f\n" %(self.modelling.muscleVal))
-        f.write("overweight %f\n" %(self.modelling.overweightVal))
-        f.write("underweight %f\n" %(self.modelling.underweightVal))
-        for (target, value) in self.modelling.activeEthnicSets.iteritems():
+        f.write("female %f\n" %(human.femaleVal))
+        f.write("male %f\n" %(human.maleVal))
+        f.write("child %f\n" %(human.childVal))
+        f.write("old %f\n" %(human.oldVal))
+        f.write("flaccid %f\n" %(human.flaccidVal))
+        f.write("muscle %f\n" %(human.muscleVal))
+        f.write("overweight %f\n" %(human.overweightVal))
+        f.write("underweight %f\n" %(human.underweightVal))
+        for (target, value) in human.targetsEthnicStack.iteritems():
             f.write("ethnic %s %f\n" %(target, value))
                 
-        for t in self.modelling.targetsDetailStack.keys():
+        for t in human.targetsDetailStack.keys():
             if "/details/" in t:
-                f.write("detail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.modelling.targetsDetailStack[t]))
+                f.write("detail %s %f\n" %(os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
             elif  "/microdetails/" in t:
-                f.write("microdetail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.modelling.targetsDetailStack[t]))
+                f.write("microdetail %s %f\n" %(os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
         f.close()
         
         self.gFileSelector.isNotActive()
