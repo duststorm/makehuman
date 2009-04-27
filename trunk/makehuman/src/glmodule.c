@@ -376,7 +376,7 @@ void mhMouseButtonUp(int b, int x, int y)
 #ifdef __WIN32__
     SDL_WM_GrabInput(SDL_GRAB_OFF);
 #endif
-    SDL_WarpMouse(g_savedx, g_savedy);
+    //SDL_WarpMouse(g_savedx, g_savedy);
 
     // Calculate 3d positions
     mhGetPickedCoords(x,y);

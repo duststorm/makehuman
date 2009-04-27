@@ -615,6 +615,8 @@ class Guimodelling:
             if leftButtonDown and (self.basemesh.grabMode == 1):
                 self.grabVerts()
 
+        mousePos = self.scene.getMousePosGUI()
+        self.cursor.setLoc(mousePos[0],mousePos[1],self.cursor.z)
 
     
 
