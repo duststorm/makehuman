@@ -33,7 +33,7 @@
 
 // Text and texture services
 void mhDrawText(float x, float y, const char *message);
-unsigned int mhLoadTexture(const char *fname, unsigned int texture);
+unsigned int mhLoadTexture(const char *fname, GLuint texture);
 int mhGrabScreen(int x, int y, int width, int height, const char *filename);
 
 // Input events

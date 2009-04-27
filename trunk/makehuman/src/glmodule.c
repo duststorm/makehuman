@@ -41,15 +41,15 @@
 #endif
 
 #ifdef __WIN32__
-#include <windows.h>
-#include <SDL_syswm.h>
+    #include <windows.h>
+    #include <SDL_syswm.h>
 #elif __APPLE__
-#include <AGL/agl.h>
-#include <Fonts.h>
+    #include <AGL/agl.h>
+//    #include <Fonts.h>
 #else
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
+    #include <X11/Xlib.h>
+    #include <X11/Xutil.h>
+    #include <GL/glx.h>
 #endif
 
 static int g_savedx=0; /*saved x mouse position*/
@@ -60,9 +60,11 @@ static int g_windowWidth = 800;
 static int g_windowHeight = 600;
 static SDL_Surface *g_screen = NULL;
 
+#ifndef __APPLE__
 typedef SDL_Surface *(*PFN_IMG_LOAD)(const char *);
 static void *g_sdlImageHandle = NULL;
 static PFN_IMG_LOAD IMG_Load = NULL;
+#endif
 
 /** \brief Draw text at a specified location on the screen.
  *  \param x a float specifying the horizontal position in the GUI window.
@@ -123,7 +125,7 @@ void mhFlipSurface(SDL_Surface *surface)
  *
  *  This function loads a texture from a texture file and binds it into the OpenGL textures array.
  */
-unsigned int mhLoadTexture(const char *fname, unsigned int texture)
+unsigned int mhLoadTexture(const char *fname, GLuint texture)
 {
     int mode, components;
     SDL_Surface *surface;
@@ -131,12 +133,11 @@ unsigned int mhLoadTexture(const char *fname, unsigned int texture)
     if (!texture)
         glGenTextures(1, &texture);
 
+#ifndef __APPLE__ // OS X utilizes the SDL_image framework for image loading!
     if (!g_sdlImageHandle)
     {
 #ifdef __WIN32__
         g_sdlImageHandle = SDL_LoadObject("SDL_image");
-#elif __APPLE__
-        g_sdlImageHandle = SDL_LoadObject("libSDL_image-1.2.0.dylib");
 #else
         g_sdlImageHandle = SDL_LoadObject("libSDL_image-1.2.so.0");
 #endif
@@ -155,7 +156,7 @@ unsigned int mhLoadTexture(const char *fname, unsigned int texture)
         PyErr_Format(PyExc_RuntimeError, "Could not load %s, IMG_Load not found", fname);
         return 0;
     }
-
+#endif // ifndef __APPLE__
     surface = IMG_Load(fname);
 
     if (!surface)
@@ -431,7 +432,7 @@ void mhGetPickedCoords(int x, int y)
 {
     double modelview[16], projection[16];
     float z;
-    int viewport[4];
+    GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
 
     /*Getting mouse coords in 3D scene, using z value from glReadPixels*/
@@ -1085,8 +1086,10 @@ void mhCreateWindow(int useTimer)
 
     SDL_WM_SetCaption("MakeHuman", "");
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+
 #ifdef __WIN32__
     SDL_EnableUNICODE(1);
+
 #endif
 
     if (useTimer == 1)

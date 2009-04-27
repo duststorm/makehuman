@@ -1,0 +1,391 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		686E5B9E0FA19EA3005B137C /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
+		686E5D820FA1AC91005B137C /* SDL_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
+		6894C4E20FA188D000A52097 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL.framework */; };
+		6894C50E0FA1893900A52097 /* SDL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL.framework */; };
+		6894C54C0FA18B1400A52097 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C54B0FA18B1400A52097 /* AGL.framework */; };
+		689F331E0E6192CB00E37E9F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 689F33190E6192CB00E37E9F /* InfoPlist.strings */; };
+		689F331F0E6192CB00E37E9F /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 689F331B0E6192CB00E37E9F /* MainMenu.nib */; };
+		689F332E0E6193B000E37E9F /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
+		689F332F0E6193B100E37E9F /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
+		689F33310E6193B100E37E9F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
+		689F33330E6193B600E37E9F /* MouseEventTrap.m in Sources */ = {isa = PBXBuildFile; fileRef = 689F33320E6193B600E37E9F /* MouseEventTrap.m */; };
+		689F33E60E61999C00E37E9F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
+		689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
+		689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
+		68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.m */; };
+		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6894C51A0FA1895B00A52097 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				686E5D820FA1AC91005B137C /* SDL_image.framework in CopyFiles */,
+				6894C50E0FA1893900A52097 /* SDL.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MakeHuman_Prefix.pch; path = include/MakeHuman_Prefix.pch; sourceTree = "<group>"; };
+		686E5B9D0FA19EA3005B137C /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = frameworks/SDL_image.framework; sourceTree = "<group>"; };
+		686E5CD10FA1A60D005B137C /* main.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = main.py; path = ../main.py; sourceTree = SOURCE_ROOT; };
+		686E5D340FA1AB4B005B137C /* pythonwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pythonwrapper; path = include/pythonwrapper; sourceTree = "<group>"; };
+		686E5D380FA1AB5F005B137C /* sdlwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sdlwrapper; path = include/sdlwrapper; sourceTree = "<group>"; };
+		6894C4E10FA188D000A52097 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = frameworks/SDL.framework; sourceTree = "<group>"; };
+		6894C54B0FA18B1400A52097 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
+		689F331A0E6192CB00E37E9F /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
+		689F331C0E6192CB00E37E9F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = MainMenu.nib; sourceTree = "<group>"; };
+		689F331D0E6192CB00E37E9F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = Info.plist; path = resources/Info.plist; sourceTree = "<group>"; };
+		689F332A0E6193B000E37E9F /* core.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = core.c; path = ../src/core.c; sourceTree = "<group>"; };
+		689F332B0E6193B000E37E9F /* glmodule.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = glmodule.c; path = ../src/glmodule.c; sourceTree = "<group>"; };
+		689F332D0E6193B000E37E9F /* main.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../src/main.c; sourceTree = "<group>"; };
+		689F33320E6193B600E37E9F /* MouseEventTrap.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MouseEventTrap.m; path = src/MouseEventTrap.m; sourceTree = "<group>"; };
+		689F33E50E61999C00E37E9F /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		689F33E70E6199B000E37E9F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		689F33E90E6199BD00E37E9F /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		68D8631C0FA5D1810097F73F /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDLMain.m; path = src/SDLMain.m; sourceTree = "<group>"; };
+		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
+		68F6D3CA0E63F88200D27961 /* MouseEventTrap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MouseEventTrap.h; path = include/MouseEventTrap.h; sourceTree = "<group>"; };
+		68F6D3F50E640E6A00D27961 /* AppIcon.psd */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppIcon.psd; path = resources/AppIcon.psd; sourceTree = "<group>"; };
+		68F6D3F60E640E6A00D27961 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = resources/AppIcon.icns; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* MakeHuman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeHuman.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				689F33E60E61999C00E37E9F /* Python.framework in Frameworks */,
+				689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */,
+				689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */,
+				6894C4E20FA188D000A52097 /* SDL.framework in Frameworks */,
+				6894C54C0FA18B1400A52097 /* AGL.framework in Frameworks */,
+				686E5B9E0FA19EA3005B137C /* SDL_image.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				68D8631E0FA5D1880097F73F /* SDLMain.h */,
+				68D8631C0FA5D1810097F73F /* SDLMain.m */,
+				689F332A0E6193B000E37E9F /* core.c */,
+				689F332B0E6193B000E37E9F /* glmodule.c */,
+				689F332D0E6193B000E37E9F /* main.c */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6894C4E10FA188D000A52097 /* SDL.framework */,
+				686E5B9D0FA19EA3005B137C /* SDL_image.framework */,
+				6894C54B0FA18B1400A52097 /* AGL.framework */,
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				689F33E90E6199BD00E37E9F /* GLUT.framework */,
+				689F33E70E6199B000E37E9F /* OpenGL.framework */,
+				689F33E50E61999C00E37E9F /* Python.framework */,
+				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* MakeHuman.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* MHPhoenix */ = {
+			isa = PBXGroup;
+			children = (
+				686E5CD10FA1A60D005B137C /* main.py */,
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = MHPhoenix;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */,
+				686E5D380FA1AB5F005B137C /* sdlwrapper */,
+				686E5D340FA1AB4B005B137C /* pythonwrapper */,
+				689F33320E6193B600E37E9F /* MouseEventTrap.m */,
+				68F6D3CA0E63F88200D27961 /* MouseEventTrap.h */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				68F6D3F50E640E6A00D27961 /* AppIcon.psd */,
+				68F6D3F60E640E6A00D27961 /* AppIcon.icns */,
+				689F33180E6192CB00E37E9F /* English.lproj */,
+				689F331D0E6192CB00E37E9F /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		689F33180E6192CB00E37E9F /* English.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				689F33190E6192CB00E37E9F /* InfoPlist.strings */,
+				689F331B0E6192CB00E37E9F /* MainMenu.nib */,
+			);
+			name = English.lproj;
+			path = resources/English.lproj;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D1107260486CEB800E47090 /* MakeHuman */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MakeHuman" */;
+			buildPhases = (
+				6894C51A0FA1895B00A52097 /* CopyFiles */,
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+				68F6D3510E63F23400D27961 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MakeHuman;
+			productInstallPath = "$(HOME)/Applications";
+			productName = MHPhoenix;
+			productReference = 8D1107320486CEB800E47090 /* MakeHuman.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 1;
+			mainGroup = 29B97314FDCFA39411CA2CEA /* MHPhoenix */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D1107260486CEB800E47090 /* MakeHuman */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				689F331E0E6192CB00E37E9F /* InfoPlist.strings in Resources */,
+				689F331F0E6192CB00E37E9F /* MainMenu.nib in Resources */,
+				68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		68F6D3510E63F23400D27961 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# data 3dobjs mh_plugins mh_core\n\n# Copy the data directory into the Application Folder (Resources/data)\nif [ ! -e ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data ]; then\n  mkdir -p ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\n  cp -rf ${PROJECT_DIR}/../data ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n  cd ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n# Copy the data directory into the Application Folder (Resources/mh_plugins)\nif [ ! -e ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins ]; then\n  mkdir -p ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\n  cp -rf ${PROJECT_DIR}/../mh_plugins ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n  cd ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n# Copy the data directory into the Application Folder (Resources/mh_core)\nif [ ! -e ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core ]; then\n  mkdir -p ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\n  cp -rf ${PROJECT_DIR}/../mh_core ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n  cd ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n# Copy the data directory into the Application Folder (Resources/docs)\nif [ ! -e ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs ]; then\n  mkdir -p ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\n  cp -rf ${PROJECT_DIR}/../docs ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n  cd ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\ncp -f ${PROJECT_DIR}/../main.py ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				689F332E0E6193B000E37E9F /* core.c in Sources */,
+				689F332F0E6193B100E37E9F /* glmodule.c in Sources */,
+				689F33310E6193B100E37E9F /* main.c in Sources */,
+				689F33330E6193B600E37E9F /* MouseEventTrap.m in Sources */,
+				68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		689F33190E6192CB00E37E9F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				689F331A0E6192CB00E37E9F /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		689F331B0E6192CB00E37E9F /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				689F331C0E6192CB00E37E9F /* English */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++ c";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = MakeHuman;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++ c";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = MakeHuman;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = "$(EXTRA_FRAMEWORK_SEARCH_PATHS)";
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = "$(EXTRA_FRAMEWORK_SEARCH_PATHS)";
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MakeHuman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

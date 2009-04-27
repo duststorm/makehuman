@@ -809,12 +809,6 @@ int main(int argc, char *argv[])
 
     initGlobals(); /* initialize all our globals */
 
-#ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
-    strcpy(str, "execfile(\"main.py\")");
-    adjustWorkingDir(argv[0]);
-    // Initialize the Mouse trap code in order to gain access the mouse scroll wheel...
-    initMouseScrollWheelTrap();
-#else
     if (argc >= 2 && strlen(argv[1]) < 68)
     {
         sprintf(str, "execfile(\"%s\")", argv[1]);
@@ -823,6 +817,10 @@ int main(int argc, char *argv[])
     {
         strcpy(str, "execfile(\"main.py\")");
     }
+#ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
+    adjustWorkingDir(argv[0]);
+    // Initialize the Mouse trap code in order to gain access the mouse scroll wheel...
+    initMouseScrollWheelTrap();
 #endif
 
     Py_SetProgramName(argv[0]);
