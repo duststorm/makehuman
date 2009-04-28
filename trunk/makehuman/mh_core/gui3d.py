@@ -192,6 +192,8 @@ class Application(events3d.EventHandler):
     
     self.scene3d.connect("LMOUSEP", self.lMouseDown)
     self.scene3d.connect("LMOUSER", self.lMouseUp)
+    self.scene3d.connect("MOUSEWHEELDOWN", self.mouseWheelDown)
+    self.scene3d.connect("MOUSEWHEELUP", self.mouseWheelUp)
     self.scene3d.connect("MOTION", self.mouseMove)
     self.scene3d.connect("PMOTION", self.mouseMove)
     self.scene3d.connect("KEYBOARD", self.keyDown)
@@ -209,6 +211,10 @@ class Application(events3d.EventHandler):
     self.mouseDown(1)
   def lMouseUp(self):
     self.mouseUp(1)
+  def mouseWheelDown(self):
+    self.mouseWheel(-1)
+  def mouseWheelUp(self):
+    self.mouseWheel(1)
 
   def isVisible(self):
     return True
@@ -263,9 +269,13 @@ class Application(events3d.EventHandler):
     self.callEvent(eventType, event)
     if self.currentTask:
       self.currentTask.callEvent(eventType, event)
+      
     if self.focusView:
       print("Sending", eventType, "to", self.focusView)
       self.focusView.callEvent(eventType, event)
+    elif self.currentCategory:
+      self.currentCategory.callEvent(eventType, event)
+      
     if self.focusObject:
       print("Sending", eventType, "to", self.focusObject)
       self.focusObject.callEvent(eventType, event)
@@ -283,6 +293,8 @@ class Application(events3d.EventHandler):
     
     event = events3d.Event(mousePos[0], mousePos[1], b)
     self.callPropagatedEvent("onMouseDown", event)
+    
+    # Set focus to clicked view
     if self.mouseDownObject and self.mouseDownObject.view:
       self.mouseDownObject.view.setFocus()
     
@@ -299,6 +311,11 @@ class Application(events3d.EventHandler):
     if self.mouseDownObject and self.mouseDownObject is self.focusObject:
       self.mouseDownObject.view.callEvent("onClick", event)
       self.mouseDownObject.callEvent("onClick", event)
+      
+  def mouseWheel(self, wheelDelta):
+    mousePos = self.scene3d.getMousePos2D()
+    event = events3d.Event(mousePos[0], mousePos[1], wheelDelta = wheelDelta)
+    self.callPropagatedEvent("onMouseWheel", event)
       
   def mouseMove(self):
     mousePos = self.scene3d.getMousePosGUI()
@@ -324,18 +341,22 @@ class Application(events3d.EventHandler):
 
 # Slider widget
 class Slider(View):
-  def __init__(self, parent, backgroundTexture, sliderTexture, position = [0, 0, 9]):
+  def __init__(self, parent, backgroundTexture, sliderTexture, position = [0, 0, 9], value = 0.0):
     View.__init__(self, parent)
     self.background = Object(self, "data/3dobjs/button_gender.obj",
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/button_about.obj",
       texture = sliderTexture, position = [position[0], position[1], position[2] + 0.1])
+    self.setValue(value)
     
   def setValue(self, value):
-    value = min(1, max(0, value))
+    self.__value = min(1, max(0, value))
     sliderPos = self.slider.getPosition()
-    sliderPos[0] = value * (0.45 - 0.365) - 0.45
+    sliderPos[0] = self.__value * (0.45 - 0.365) - 0.45
     self.slider.setPosition(sliderPos)
+    
+  def getValue(self, value):
+    return self.__value
   
   def onMouseMove(self, event):
     sliderPos = self.slider.getPosition()
@@ -350,19 +371,23 @@ class Slider(View):
     worldPos = self.scene.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
     sliderPos[0] = min(-0.365, max(-0.45, worldPos[0]))
     self.slider.setPosition(sliderPos)
-    value = (sliderPos[0] + 0.45) / (0.45 - 0.365)
-    print(value)
-    self.callEvent("onChange", value)
+    self.value = (sliderPos[0] + 0.45) / (0.45 - 0.365)
+    print(self.value)
+    self.callEvent("onChange", self.value)
 
 # Button widget
 class Button(View):
   def __init__(self, parent, mesh = "data/3dobjs/button_gender.obj", texture = None,
-    selectedTexture = None, position = [0, 0, 9]):
+    selectedTexture = None, position = [0, 0, 9], selected = False):
     View.__init__(self, parent)
-    self.button = Object(self, mesh, texture = texture, position = position)
+    if selectedTexture and selected:
+      t = selectedTexture
+    else:
+      t = texture
+    self.button = Object(self, mesh, texture = t, position = position)
     self.texture = texture
     self.selectedTexture = selectedTexture
-    self.selected = False
+    self.selected = selected
     
   def onMouseDown(self, event):
     self.setSelected(True)
@@ -384,8 +409,8 @@ class Button(View):
 # RadioButton widget
 class RadioButton(Button):
   def __init__(self, parent, group, mesh = "data/3dobjs/button_gender.obj",
-      texture = None, selectedTexture = None, position = [0, 0, 9]):
-    Button.__init__(self, parent, mesh, texture, selectedTexture, position)
+      texture = None, selectedTexture = None, position = [0, 0, 9], selected = False):
+    Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected)
     self.group = group
     self.group.append(self)
     
