@@ -784,7 +784,7 @@ void mhSceneCameraPosition()
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(25, (float)G.windowWidth/G.windowHeight, 0.1, 100);
+    gluPerspective(G.fovAngle, (float)G.windowWidth/G.windowHeight, 0.1, 100);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -803,7 +803,7 @@ void mhGUICameraPosition()
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(G.fovAngle, (float)G.windowWidth/G.windowHeight, 0.1, 100);
+    gluPerspective(45, (float)G.windowWidth/G.windowHeight, 0.1, 100);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

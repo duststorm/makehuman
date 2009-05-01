@@ -63,7 +63,7 @@ void initGlobals(void)
 {
     G.world = NULL;
     G.nObjs = 0;
-    G.fovAngle = 45;
+    G.fovAngle = 25;
     G.zoom = 60;
     G.rotX = 0;
     G.rotY = 0;
