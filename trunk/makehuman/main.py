@@ -60,6 +60,15 @@ class MHApplication(gui3d.Application):
   def __init__(self):
     gui3d.Application.__init__(self)
     
+    # Create aqsis shaders
+    os.system("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx")
+    os.system("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx")
+
+    # Create pixie shaders
+    os.system("sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr")
+    os.system("sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr")
+    os.system("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr")
+    
     gui3d.Object(self, "data/3dobjs/upperbar.obj", "data/images/upperbar.png", [0, 0.39, 9])
     gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -72])
     gui3d.Object(self, "data/3dobjs/lowerbar.obj", "data/images/lowerbar.png", [0, -0.39, 9])
