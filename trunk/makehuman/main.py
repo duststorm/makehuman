@@ -45,14 +45,14 @@ specific Python modules.
 __docformat__ = 'restructuredtext'
 
 import mh
-import sys, os
+import sys, os, subprocess
 import webbrowser
 
 sys.path.append("./")
 sys.path.append("./mh_plugins")
 sys.path.append("./mh_core")
 
-import gui3d
+import gui3d, widgets3d
 import human
 import guimodelling, guifiles, guirender
 
@@ -60,24 +60,35 @@ class MHApplication(gui3d.Application):
   def __init__(self):
     gui3d.Application.__init__(self)
     
+    # Dispkay the initial splash screen and the progress bar during startup 
+    self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", "data/images/splash.png", position = [0, 0, 0])
+    self.progressBar = widgets3d.ProgressBar(self.scene3d)
+    self.scene3d.update()
+    self.scene3d.redraw(0)
+    
     # Create aqsis shaders
-    os.system("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx")
-    os.system("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx")
+    subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
+    subprocess.Popen("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
 
     # Create pixie shaders
-    os.system("sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr")
-    os.system("sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr")
-    os.system("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr")
+    subprocess.Popen("sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
+    subprocess.Popen("sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
+    subprocess.Popen("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr", shell=True)
+    
+    self.progressBar.setProgress(0.2)
     
     gui3d.Object(self, "data/3dobjs/upperbar.obj", "data/images/upperbar.png", [0, 0.39, 9])
     gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -72])
     gui3d.Object(self, "data/3dobjs/lowerbar.obj", "data/images/lowerbar.png", [0, -0.39, 9])
     
+    self.progressBar.setProgress(0.3)
+    
     self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj")
     self.scene3d.selectedHuman.setTexture("data/textures/texture.tif")
-    self.scene3d.selectedHuman.applyAllTargets()
-    self.tool = None
     
+    self.progressBar.setProgress(0.6)
+    
+    self.tool = None
     self.selectedGroup = None
     
     self.undoStack = []
@@ -115,7 +126,9 @@ class MHApplication(gui3d.Application):
       self.stop()
     
     guimodelling.ModellingCategory(self)
+    self.progressBar.setProgress(0.7)
     guifiles.FilesCategory(self)
+    self.progressBar.setProgress(0.8)
     guirender.RenderingCategory(self)
     
     category = gui3d.Category(self, "Help", "data/images/button_about.png")
@@ -125,6 +138,13 @@ class MHApplication(gui3d.Application):
       webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
     
     self.switchCategory("modelling")
+    
+    self.progressBar.setProgress(1.0)
+    self.progressBar.setVisibility(0)
+    
+  def onStart(self, event):
+      self.splash.hide()
+      self.scene3d.selectedHuman.applyAllTargets()
     
   def do(self, action):
     if action.do():

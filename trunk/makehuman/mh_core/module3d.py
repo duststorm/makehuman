@@ -594,7 +594,10 @@ class Object3D:
         self.rx = rx
         self.ry = ry
         self.rz = rz
-        mh.setObjRotation(self.idx, self.rx, self.ry, self.rz)
+        try:
+            mh.setObjRotation(self.idx, self.rx, self.ry, self.rz)
+        except IndexError, text:
+            print(text)
 
     def setScale(self,sx,sy,sz):
         """
@@ -614,7 +617,10 @@ class Object3D:
         self.sx = sx
         self.sy = sy
         self.sz = sz
-        mh.setObjScale(self.idx, self.sx, self.sy, self.sz)
+        try:
+            mh.setObjScale(self.idx, self.sx, self.sy, self.sz)
+        except IndexError, text:
+            print(text)
 
     def setVisibility(self,visib):
         """

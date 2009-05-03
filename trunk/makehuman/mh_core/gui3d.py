@@ -208,6 +208,7 @@ class Application(events3d.EventHandler):
     self.cursor = Object(self, mesh = "data/3dobjs/cursor.obj",
       texture = "data/images/cursor.png", position = [0, 0, 9.5])
     self.scene3d.update()
+    self.callEvent("onStart", None)
     self.scene3d.startEventLoop()
     
   def stop(self):
