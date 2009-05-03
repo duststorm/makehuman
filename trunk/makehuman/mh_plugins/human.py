@@ -1,17 +1,18 @@
 __docformat__ = 'restructuredtext'
 
 import algos3d
-import widgets3d
+import widgets3d, gui3d
 import time
 import subdivision
 import files3d
 import os
 
-class Human:
+class Human(gui3d.Object):
     
     def __init__(self, globalScene, objFilePath):
-        
-        self.meshData = files3d.loadMesh(globalScene, objFilePath, loadColors = None)
+        gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 1, shadeless = 0, visible = True)
+        self.meshData = self.mesh
+        #self.meshData = files3d.loadMesh(globalScene, objFilePath, loadColors = None)
         self.scene = globalScene
         self.progressBar = widgets3d.ProgressBar(self.scene)
         self.progressBar.setVisibility(0)
@@ -136,7 +137,13 @@ class Human:
         if self.maleVal == amount:
             return 
         self.maleVal =  amount
-        self.femaleVal = 1 - amount  
+        self.femaleVal = 1 - amount
+    
+    def setGender(self, gender):
+        self.setGenderVals(gender)
+    
+    def getGender(self):
+        return self.maleVal
         
     def setAgeVals(self,amount):
         """
@@ -161,6 +168,17 @@ class Human:
             self.childVal = -amount
             self.oldVal = 0 
         self.youngVal = 1-(self.oldVal + self.childVal)
+    
+    def setAge(self, age):
+        self.setAgeVals(-1 + 2 * age)
+        
+    def getAge(self):
+        if self.oldVal:
+            return 0.5 + self.oldVal / 2.0
+        elif self.childVal:
+            return 0.5 - self.childVal / 2.0
+        else:
+            return 0.5
 
     def setWeightVals(self,amount):
         """
@@ -183,7 +201,18 @@ class Human:
             if self.underweightVal == -amount and self.overweightVal == 0:
                 return 
             self.underweightVal = -amount
-            self.overweightVal = 0 
+            self.overweightVal = 0
+    
+    def setWeight(self, weight):
+        self.setWeightVals(-1 + 2 * weight)
+        
+    def getWeight(self):
+        if self.overweightVal:
+            return 0.5 + self.overweightVal / 2.0
+        elif self.underweightVal:
+            return 0.5 - self.underweightVal / 2.0
+        else:
+            return 0.5
 
     def setToneVals(self, amount):
         """
@@ -208,6 +237,44 @@ class Human:
             self.flaccidVal = -amount
             self.muscleVal = 0
             
+    def setMuscle(self, muscle):
+        self.setToneVals(-1 + 2 * muscle)
+    
+    def getMuscle(self):
+        if self.muscleVal:
+            return 0.5 + self.muscleVal / 2.0
+        elif self.flaccidVal:
+            return 0.5 - self.flaccidVal / 2.0
+        else:
+            return 0.5
+            
+    def setEthnic(self, ethnic, value):
+        modified = None
+        ethnics = self.targetsEthnicStack
+        
+        # Remove the neutral ethnic, we recalculate it later
+        if "neutral" in ethnics:
+          del ethnics["neutral"]
+        
+        if value:
+            # Set the ethnic to 0, so we can can calculate the max value possible
+            ethnics[ethnic] = 0.0
+            ethnics[ethnic] = max(0.0, min(1.0 - sum(ethnics.values()), value))
+            # In the case that we couldn't set it, remove it from the dictionary
+            if ethnics[ethnic] == 0.0:
+                del ethnics[ethnic]
+        elif ethnic in ethnics:
+            # If we need to set it to 0, remove it from the dictionary
+            del ethnics[ethnic]
+        
+        # Recalculate the neutral ethnic
+        ethnics["neutral"] = 1.0 - sum(ethnics.values())
+            
+    def getEthnic(self, ethnic):
+        if ethnic in self.targetsEthnicStack:
+            return self.targetsEthnicStack[ethnic]
+        else:
+            return 0.0
             
     def applyAllTargets(self):
 
@@ -326,6 +393,11 @@ class Human:
         self.lastTargetApplied = targetPath
         return True
         
+    def getPartNameForGroupName(self, groupName):
+        for k in self.bodyZones:
+          if k in groupName:                
+            return k
+        return None
         
     def setDetailsTarget(self):
         """
@@ -341,10 +413,7 @@ class Human:
             tFolder = "data/targets/macrodetails"
         if  self.editMode == "regular":
             tFolder = "data/targets/details/"
-            for k in self.bodyZones:
-                if k in faceGroupName:                
-                    partName = k
-                    break        
+            partName = getPartNameForGroupName(faceGroupName)
         if  self.editMode == "micro":
             tFolder = "data/targets/microdetails/"
             partName = faceGroupName        

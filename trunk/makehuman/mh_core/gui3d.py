@@ -4,11 +4,12 @@ import os
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
   def __init__(self, view, mesh, texture = None, position = [0, 0, 9], camera = 0, shadeless = 1, visible = True):
-    self.scene = view.scene
+    self.app = view.app
     self.view = view
-    self.mesh = files3d.loadMesh(self.scene.scene3d, mesh, 0, position[0], position[1], position[2])
+    self.mesh = files3d.loadMesh(self.app.scene3d, mesh, 0, position[0], position[1], position[2])
+    self.texture = texture
+    self.meshName = mesh
     if texture:
-      self.texture = texture
       self.mesh.setTexture(texture)
     view.objects.append(self)
     self.mesh.setCameraProjection(camera)
@@ -26,6 +27,7 @@ class Object(events3d.EventHandler):
     self.setVisibility(True)
     
   def hide(self):
+    print("hiding ", self.meshName)
     self.visible = False
     self.setVisibility(False)
   
@@ -42,6 +44,7 @@ class Object(events3d.EventHandler):
     self.mesh.clearTexture()
   
   def setVisibility(self, visibility):
+    print("changing visibility of ", self.meshName, "to", self.view.isVisible() and self.visible and visibility)
     if self.view.isVisible() and self.visible and visibility:
       self.mesh.setVisibility(1)
     else:
@@ -56,7 +59,7 @@ class Object(events3d.EventHandler):
 # Generic view
 class View(events3d.EventHandler):
   def __init__(self, parent = None, visible = True):
-    self.scene = parent.scene
+    self.app = parent.app
     self.parent = parent
     self.children = []
     self.objects = []
@@ -78,10 +81,10 @@ class View(events3d.EventHandler):
     return self.__totalVisibility
     
   def setFocus(self):
-    self.scene.setFocus(self)
+    self.app.setFocus(self)
     
   def hasFocus(self):
-    return self.scene.focusView is self
+    return self.app.focusView is self
       
   def __updateVisibility(self):
     previousVisibility = self.__totalVisibility
@@ -91,10 +94,10 @@ class View(events3d.EventHandler):
       self.__totalVisibility = self.__visible
     if self.__totalVisibility:
       for o in self.objects:
-        o.setVisibility(1)
+        o.setVisibility(True)
     else:
       for o in self.objects:
-        o.setVisibility(0)
+        o.setVisibility(False)
     for v in self.children:
       v.__updateVisibility()
       
@@ -121,7 +124,7 @@ class TaskView(View):
     
     @self.button.event
     def onClick(event):
-      self.scene.switchTask(self.name)
+      self.app.switchTask(self.name)
 
   def onShow(self, event):
     print("onShow", self.name, event)
@@ -150,13 +153,13 @@ class Category(View):
     
     # The button is attached to the parent, as it stays visible when the category is hidden
     self.button = Object(self.parent, "data/3dobjs/button_about.obj",
-      position = [-0.5 + len(self.scene.categories) * 0.1, 0.39, 9], texture = texture)
+      position = [-0.5 + len(self.app.categories) * 0.1, 0.39, 9], texture = texture)
       
     parent.categories[name] = self
     
     @self.button.event
     def onClick(event):
-      self.scene.switchCategory(self.name)
+      self.app.switchCategory(self.name)
       
   def onShow(self, event):
     pos = self.button.getPosition()
@@ -176,7 +179,8 @@ class Category(View):
 class Application(events3d.EventHandler):
   def __init__(self):
     self.scene3d = module3d.Scene3D()
-    self.scene = self
+    self.scene3d.application = self
+    self.app = self
     self.canHaveFocus = False
     self.children = []
     self.objects = []
@@ -192,6 +196,8 @@ class Application(events3d.EventHandler):
     
     self.scene3d.connect("LMOUSEP", self.lMouseDown)
     self.scene3d.connect("LMOUSER", self.lMouseUp)
+    self.scene3d.connect("RMOUSEP", self.rMouseDown)
+    self.scene3d.connect("RMOUSER", self.rMouseUp)
     self.scene3d.connect("MOUSEWHEELDOWN", self.mouseWheelDown)
     self.scene3d.connect("MOUSEWHEELUP", self.mouseWheelUp)
     self.scene3d.connect("MOTION", self.mouseMove)
@@ -211,6 +217,10 @@ class Application(events3d.EventHandler):
     self.mouseDown(1)
   def lMouseUp(self):
     self.mouseUp(1)
+  def rMouseDown(self):
+    self.mouseDown(3)
+  def rMouseUp(self):
+    self.mouseUp(3)
   def mouseWheelDown(self):
     self.mouseWheel(-1)
   def mouseWheelUp(self):
@@ -222,10 +232,13 @@ class Application(events3d.EventHandler):
   def setFocus(self, view = None):
     if not view:
       view = self
-    if self.focusView is not view and view.canHaveFocus:
-      print("focussing ", view)
+    if (self.focusView != view) and view.canHaveFocus:
+      
       if self.focusView:
+        print("blurring ", self.focusView)
         self.focusView.callEvent("onBlur", None)
+        
+      print("focussing ", view)
       self.focusView = view
       self.focusView.callEvent("onFocus", None)
       self.focusObject = None
@@ -274,6 +287,7 @@ class Application(events3d.EventHandler):
       print("Sending", eventType, "to", self.focusView)
       self.focusView.callEvent(eventType, event)
     elif self.currentCategory:
+      print("Sending", eventType, "to", self.currentCategory)
       self.currentCategory.callEvent(eventType, event)
       
     if self.focusObject:
@@ -283,30 +297,34 @@ class Application(events3d.EventHandler):
   # called from native
   def mouseDown(self, b):
     mousePos = self.scene3d.getMousePos2D()
+    mouseDiff = self.scene3d.getMouseDiff()
     object = self.scene3d.getPickedObject()[1]
     if object:
       self.focusObject = object.object
       self.focusView = self.focusObject.view
     else:
       self.focusObject = None
+      self.focusView = None
     self.mouseDownObject = self.focusObject
     
-    event = events3d.Event(mousePos[0], mousePos[1], b)
+    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], b)
     self.callPropagatedEvent("onMouseDown", event)
     
     # Set focus to clicked view
+    self.focusObject = None
     if self.mouseDownObject and self.mouseDownObject.view:
       self.mouseDownObject.view.setFocus()
     
   def mouseUp(self, b):
     mousePos = self.scene3d.getMousePos2D()
+    mouseDiff = self.scene3d.getMouseDiff()
     object = self.scene3d.getPickedObject()[1]
     if object:
       self.focusObject = object.object
     else:
       self.focusObject = None
     
-    event = events3d.Event(mousePos[0], mousePos[1], b)
+    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], b= b)
     self.callPropagatedEvent("onMouseUp", event)
     if self.mouseDownObject and self.mouseDownObject is self.focusObject:
       self.mouseDownObject.view.callEvent("onClick", event)
@@ -319,6 +337,7 @@ class Application(events3d.EventHandler):
       
   def mouseMove(self):
     mousePos = self.scene3d.getMousePosGUI()
+    mouseDiff = self.scene3d.getMouseDiff()
     self.cursor.setPosition([mousePos[0], mousePos[1], self.cursor.mesh.z])
       
     if self.scene3d.mouseState:
@@ -328,7 +347,7 @@ class Application(events3d.EventHandler):
         self.focusObject = object.object
       else:
         self.focusObject = None
-      event = events3d.Event(mousePos[0], mousePos[1], self.scene3d.mouseState)
+      event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], self.scene3d.mouseState)
       self.callPropagatedEvent("onMouseMove", event)
     else:
       self.scene3d.redraw()
@@ -360,15 +379,15 @@ class Slider(View):
   
   def onMouseMove(self, event):
     sliderPos = self.slider.getPosition()
-    screenPos = self.scene.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
-    worldPos = self.scene.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
+    screenPos = self.app.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
+    worldPos = self.app.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
     sliderPos[0] = min(-0.365, max(-0.45, worldPos[0]))
     self.slider.setPosition(sliderPos)
     
   def onMouseUp(self, event):
     sliderPos = self.slider.getPosition()
-    screenPos = self.scene.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
-    worldPos = self.scene.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
+    screenPos = self.app.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
+    worldPos = self.app.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
     sliderPos[0] = min(-0.365, max(-0.45, worldPos[0]))
     self.slider.setPosition(sliderPos)
     self.value = (sliderPos[0] + 0.45) / (0.45 - 0.365)
@@ -396,6 +415,7 @@ class Button(View):
     self.setSelected(False)
       
   def setSelected(self, selected):
+    print("(de)selecting", self.selected, selected)
     if self.selected != selected:
       self.selected = selected
       self.onSelected(selected)
@@ -415,7 +435,7 @@ class RadioButton(Button):
     self.group.append(self)
     
   def onMouseUp(self, event):
-    if self.scene.focusObject is self.button:
+    if self.app.focusObject is self.button:
       self.setSelected(True)
     else:
       self.setSelected(False)
@@ -455,13 +475,22 @@ class FileEntryView(View):
     self.bConfirm = Object(self, mesh = "data/3dobjs/button_confirm.obj",
       texture = "data/images/button_confirm.png", position = [0.35, 0.28, 9.1])
     self.text = ""
+    
+    @self.bConfirm.event
+    def onClick(event):
+      if len(self.text):
+        self.onFileSelected(self.text)
       
   def onKeyDown(self, event):
     print(event)
     if event.key == 8:
-        self.text = self.text[:-1]
+      self.text = self.text[:-1]
+    elif event.key == 13:
+      if len(self.text):
+        self.onFileSelected(self.text)
+      return
     elif event.key < 256 and event.key != 13:
-        self.text += event.character      
+      self.text += event.character     
         
     lenText = len(self.text)
     if lenText > 100:
@@ -469,7 +498,8 @@ class FileEntryView(View):
     else:
         textToVisualize = self.text
     self.textObject.setText(textToVisualize)    
-    self.scene.scene3d.redraw()
+    self.app.scene3d.redraw()
+    
 
 # FileChooser widget
 class FileChooser(View):
@@ -488,18 +518,22 @@ class FileChooser(View):
     self.nextFileAnimation.append(animation3d.ScaleAction(self.currentFile.mesh, [1.5, 1.5, 1.5], [1.0, 1.0, 1.0]))
     self.nextFileAnimation.append(animation3d.PathAction(self.nextFile.mesh, [[3.0, 0.5, 0], [0, 0, 0]]))
     self.nextFileAnimation.append(animation3d.ScaleAction(self.nextFile.mesh, [1.0, 1.0, 1.0], [1.5, 1.5, 1.5]))
-    self.nextFileAnimation.append(animation3d.UpdateAction(self.scene.scene3d))
+    self.nextFileAnimation.append(animation3d.UpdateAction(self.app.scene3d))
     
     self.previousFileAnimation = animation3d.Timeline(0.25)
     self.previousFileAnimation.append(animation3d.PathAction(self.previousFile.mesh, [[-3.0, 0.5, 0], [0, 0, 0]]))
     self.previousFileAnimation.append(animation3d.ScaleAction(self.previousFile.mesh, [1.0, 1.0, 1.0], [1.5, 1.5, 1.5]))
     self.previousFileAnimation.append(animation3d.PathAction(self.currentFile.mesh, [[0, 0, 0], [3.0, 0.5, 0],]))
     self.previousFileAnimation.append(animation3d.ScaleAction(self.currentFile.mesh, [1.5, 1.5, 1.5], [1.0, 1.0, 1.0]))
-    self.previousFileAnimation.append(animation3d.UpdateAction(self.scene.scene3d))
+    self.previousFileAnimation.append(animation3d.UpdateAction(self.app.scene3d))
     
     @self.previousFile.event
     def onClick(event):
       self.goPrevious()
+
+    @self.currentFile.event
+    def onClick(event):
+      self.onFileSelected(self.files[self.selectedFile])
       
     @self.nextFile.event
     def onClick(event):
@@ -534,22 +568,22 @@ class FileChooser(View):
         self.nextFile.clearTexture()
         self.nextFile.hide()
             
-    self.scene.scene3d.redraw()
+    self.app.scene3d.redraw()
     
   def onKeyDown(self, event):
     if event.key == 276:
       self.goPrevious()
     elif event.key == 275:
       self.goNext()
-    elif event.key == 271:
-      self.LoadCurrent()
+    elif event.key == 271 or event.key == 13:
+      self.onFileSelected(self.files[self.selectedFile])
       
   def goPrevious(self):
     if self.selectedFile == 0:
       return
         
     # Start animation by hiding the next file
-    self.nextFile.setVisibility(0)
+    self.nextFile.hide()
     
     # Animate by moving previous and current file to current and next locations
     self.previousFileAnimation.start()
@@ -575,14 +609,14 @@ class FileChooser(View):
     self.nextFile.setTexture("models/" + self.files[self.selectedFile + 1].replace('mhm', 'bmp'))
     self.nextFile.show()
     
-    self.scene.scene3d.redraw()
+    self.app.scene3d.redraw()
     
   def goNext(self):
     if self.selectedFile + 1 == len(self.files):
       return
         
     # Start animation by hiding the previous file
-    self.previousFile.setVisibility(0)
+    self.previousFile.hide()
     
     # Animate by moving current and next file to previous and current locations
     self.nextFileAnimation.start()
@@ -608,4 +642,4 @@ class FileChooser(View):
         self.nextFile.clearTexture()
         self.nextFile.hide()
         
-    self.scene.scene3d.redraw()
+    self.app.scene3d.redraw()

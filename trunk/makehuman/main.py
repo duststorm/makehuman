@@ -44,157 +44,108 @@ specific Python modules.
 
 __docformat__ = 'restructuredtext'
 
-import sys
+import mh
+import sys, os
+import webbrowser
+
 sys.path.append("./")
 sys.path.append("./mh_plugins")
 sys.path.append("./mh_core")
 
-if 'nt' in sys.builtin_module_names:
-    sys.path.append("./pythonmodules")
-
-import os
-import webbrowser
-import module3d
-import files3d
-import widgets3d
+import gui3d
 import human
+import guimodelling, guifiles, guirender
 
-#GUI sections are plugins
-import guicommon
-import guitoolbar
-import guimodelling
-import guifiles
-import guirender
-
-# Global element shared between more than one gui section
-mainScene = module3d.Scene3D()
-mainScene.startWindow() #Use scene.startWindow(1) to enable animation
-
-# Dispkay the initial splash screen and the progress bar during startup 
-splash = files3d.loadMesh(mainScene, "data/3dobjs/splash.obj", loadColors = None)
-splash.setTexture("data/images/splash.png")
-splash.setShadeless(1)
-splash.setCameraProjection(0)
-progressBar = widgets3d.ProgressBar(mainScene)
-mainScene.update()
-
-progressBar.setProgress(0.1)
-
-# Create aqsis shaders
-os.system("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx")
-os.system("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx")
-
-# Create pixie shaders
-os.system("sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr")
-os.system("sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr")
-os.system("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr")
-
-progressBar.setProgress(0.2)
-
-# Load the base humanoid mesh
-humanMesh = human.Human(mainScene, "data/3dobjs/base.obj")
-mainScene.selectedHuman = humanMesh
-
-progressBar.setProgress(0.5)
-
-# Add GUI sections into the main Scene3D object
-gToolbar = guitoolbar.Guitoolbar(mainScene)
-progressBar.setProgress(0.6)
-gModelling = guimodelling.Guimodelling(mainScene)
-progressBar.setProgress(0.7)
-gFile = guifiles.Guifiles(mainScene, gModelling)
-progressBar.setProgress(0.8)
-gRender = guirender.Guirender(mainScene)
-progressBar.setProgress(0.9)
-gCommon = guicommon.Guicommon(mainScene)
-progressBar.setProgress(1.0)
-
-# Call the update method on the Scene3D object to send the GUI elements to 
-# the 3D engine. Then remove the splash screen and progress bar.
-mainScene.update()
-humanMesh.setTexture("data/textures/texture.tif")
-splash.setVisibility(0)
-progressBar.setVisibility(0)
-
-# Toolbar functions. 
-# The toolbar is the common GUI element present along the top of the screen in
-# all of the different GUI modes. A function for each active toolbar function 
-# needs to be declared here so that it can be invoked no matter which mode the 
-# GUI is currently in.
-#
-def exitMode():
-    """
-    This function is called when the exit toolbar button is pressed to terminate 
-    the application.
+class MHApplication(gui3d.Application):
+  def __init__(self):
+    gui3d.Application.__init__(self)
     
-    **Parameters:** This function has no parameters.
- 
-    """
-    mainScene.shutdown();
-
-def fileMode():
-    """
-    This function is called when the fileMode toolbar button is pressed to activate
-    the file mode GUI elements and to disactivate other toolbar-controlled modes. 
-  
-    **Parameters:** This function has no parameters.
- 
-    """
-    gToolbar.buttonsMotion()
-    #gToolbar.isNotActive()         
-    gRender.isNotActive()
-    gModelling.isNotActive()
-    gFile.isActive()
-
-def renderMode():
-    """
-    This function is called when the renderMode toolbar button is pressed to activate
-    the render mode GUI elements and to disactivate other toolbar-controlled modes. 
-  
-    **Parameters:** This function has no parameters.
- 
-    """
-    gToolbar.buttonsMotion()
-    #gToolbar.isNotActive() 
-    gFile.isNotActive()        
-    gModelling.isNotActive()  
-    gRender.isActive()  
-
-def modellingMode():
-    """
-    This function is called when the modellingMode toolbar button (Home) is pressed to
-    activate the modelling Mode GUI elements and to disactivate other toolbar-controlled modes. 
-  
-    **Parameters:** This function has no parameters.
- 
-    """    
-    gToolbar.buttonsMotion()
-    gToolbar.isActive() 
-    gFile.isNotActive()
-    gRender.isNotActive()    
-    gModelling.isActive()
-
-def helpMode():
-    """
-    This function is called when the help toolbar button is pressed to display the Users Guide 
-    pdf file.
+    gui3d.Object(self, "data/3dobjs/upperbar.obj", "data/images/upperbar.png", [0, 0.39, 9])
+    gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -72])
+    gui3d.Object(self, "data/3dobjs/lowerbar.obj", "data/images/lowerbar.png", [0, -0.39, 9])
     
-    **Parameters:** This function has no parameters.
- 
-    """
-    webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
+    self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj")
+    self.scene3d.selectedHuman.setTexture("data/textures/texture.tif")
+    self.scene3d.selectedHuman.applyAllTargets()
+    self.tool = None
     
-# Connect the toolbar functions to the toolbar button mouse click events.
-mainScene.connect("LMOUSEP",exitMode,gToolbar.bExit)
-mainScene.connect("LMOUSEP",fileMode,gToolbar.bFile)
-mainScene.connect("LMOUSEP",modellingMode,gToolbar.bHome)
-mainScene.connect("LMOUSEP",renderMode,gToolbar.bRend)
-mainScene.connect("LMOUSEP",helpMode,gToolbar.bAbou)
-mainScene.setTimeTimer(100)#If animation is enabled this is the framerate in millisec
-
-# Make sure the GUI toolbar is active and in modelling mode. 
-gCommon.isActive()
-modellingMode()
-
-# Initiate the main low-level event loop (controlled by OpenGL/SDL in glmodule.c)
-mainScene.startEventLoop()
+    self.selectedGroup = None
+    
+    self.undoStack = []
+    self.redoStack = []
+    
+    @self.scene3d.selectedHuman.event
+    def onMouseDown(event):
+      if not self.tool:
+        return
+        
+      self.selectedGroup = self.app.scene3d.getSelectedFacesGroup()
+      self.tool.callEvent("onMouseDown", event)
+      
+    @self.scene3d.selectedHuman.event
+    def onMouseMove(event):
+      if not self.tool:
+        return
+      
+      self.tool.callEvent("onMouseMove", event)
+      
+    @self.scene3d.selectedHuman.event
+    def onMouseUp(event):
+      if not self.tool:
+        return
+      
+      self.tool.callEvent("onMouseUp", event)
+      self.selectedGroup = None
+      
+    # Set up categories and tasks  
+    
+    # Exit button
+    category = gui3d.Category(self, "exit", "data/images/button_exit.png")
+    @category.button.event
+    def onClick(event):
+      self.stop()
+    
+    guimodelling.ModellingCategory(self)
+    guifiles.FilesCategory(self)
+    guirender.RenderingCategory(self)
+    
+    category = gui3d.Category(self, "Help", "data/images/button_about.png")
+    # Help button
+    @category.button.event
+    def onClick(event):
+      webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
+    
+    self.switchCategory("modelling")
+    
+  def do(self, action):
+    if action.do():
+      self.undoStack.append(action)
+      del self.redoStack[:]
+      print("do " + action.name)
+      self.scene3d.redraw()
+      
+  def did(self, action):
+    self.undoStack.append(action)
+    del self.redoStack[:]
+    print("did " + action.name)
+    self.scene3d.redraw()
+    
+  def undo(self):
+    if self.undoStack:
+      action = self.undoStack.pop()
+      print("undo " + action.name)
+      action.undo()
+      self.redoStack.append(action)
+      self.scene3d.redraw()
+    
+  def redo(self):
+    if self.redoStack:
+      action = self.redoStack.pop()
+      print("redo " + action.name)
+      action.do()
+      self.undoStack.append(action)
+      self.scene3d.redraw()
+    
+application = MHApplication()
+mainScene = application.scene3d # HACK: Don't remove this, it is needed to receive events from C
+application.start()

@@ -1632,7 +1632,7 @@ class Scene3D:
             ob = self.getSelectedObject()
             if ob and ob.lMousePressedCallBack:
                 ob.lMousePressedCallBack()
-        elif button == 2:
+        elif button == 3:
             if self.sceneRMousePressedCallBack:
                 self.sceneRMousePressedCallBack()
             ob = self.getSelectedObject()
