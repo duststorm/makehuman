@@ -27,7 +27,7 @@ to respect the planned roadmap. Later we will clean it or even refactorize it.**
 
 __docformat__ = 'restructuredtext'
 
-import events3d, gui3d, guimacromodelling, guidetailmodelling
+import events3d, gui3d, guimacromodelling, guidetailmodelling, mh2obj,  mh2bvh
 
 class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
