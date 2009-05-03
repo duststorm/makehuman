@@ -136,7 +136,7 @@ skeletonRoot = Joint("joint-pelvis",
                            Joint("joint-r-eye", [])
                           ])
                         ]),
-                       Joint("r-clavicle",
+                       Joint("joint-r-clavicle",
                         [Joint("joint-r-shoulder",
                           [Joint("joint-r-elbow",
                             [Joint("joint-r-hand",
@@ -169,7 +169,7 @@ skeletonRoot = Joint("joint-pelvis",
                             ])
                           ])
                         ]),
-                        Joint("l-clavicle",
+                        Joint("joint-l-clavicle",
                         [Joint("joint-l-shoulder",
                           [Joint("joint-l-elbow",
                             [Joint("joint-l-hand",
@@ -342,6 +342,7 @@ def calcJointOffsets(obj, joint, parent = None):
     # Calculate joint positions
     g = obj.getFaceGroup(joint.name)
     verts = []
+    print(joint.name)
     for f in g.faces:
         for v in f.verts:
             verts.append(v.co)
