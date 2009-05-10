@@ -42,6 +42,75 @@ class EthnicAction:
       self.postAction()
       return True
 
+class EthnicMapButton(gui3d.Button):
+  def __init__(self, parent, mesh = "data/3dobjs/button_gender.obj", texture = None,
+    selectedTexture = None, position = [0, 0, 9], selected = False):
+    gui3d.Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected)
+
+  def onSelected(self, selected):
+    if selected:
+      pos = self.button.getPosition()
+      t = animation3d.Timeline(0.250)
+      t.append(animation3d.PathAction(self.button.mesh, [pos, [pos[0] - 0.40, pos[1] - 0.15, pos[2]]]))
+      t.append(animation3d.ScaleAction(self.button.mesh, [1, 1, 1], [5, 5, 5]))
+      t.append(animation3d.UpdateAction(self.app.scene3d))
+      t.start()
+    else:
+      pos = self.button.getPosition()
+      t = animation3d.Timeline(0.250)
+      t.append(animation3d.PathAction(self.button.mesh, [pos, [pos[0] + 0.40, pos[1] + 0.15, pos[2]]]))
+      t.append(animation3d.ScaleAction(self.button.mesh, [5, 5, 5], [1, 1, 1]))
+      t.append(animation3d.UpdateAction(self.app.scene3d))
+      t.start()
+      
+  def onMouseDown(self, event):
+    human = self.app.scene3d.selectedHuman
+    if self.selected:
+      faceGroupSel = self.app.scene3d.getSelectedFacesGroup()
+      faceGroupName = faceGroupSel.name
+      if "dummy" in faceGroupName:
+        self.setSelected(False)
+      else:
+        if self.parent.ethnicIncreaseButton.selected:
+          self.app.do(EthnicAction(human, faceGroupName,
+            human.getEthnic(faceGroupName) + 0.1, self.syncEthnics))
+        elif self.parent.ethnicDecreaseButton.selected:
+          self.app.do(EthnicAction(human, faceGroupName,
+            human.getEthnic(faceGroupName) - 0.1, self.syncEthnics))
+        else:
+          self.app.do(EthnicAction(human, faceGroupName,
+            0.0, self.syncEthnics))
+    else:
+      self.setSelected(True)
+
+  def onBlur(self, event):
+    pass
+    #self.setSelected(False)
+      
+  def onMouseUp(self, event):
+    pass
+
+  def syncEthnics(self):
+    human = self.app.scene3d.selectedHuman
+    ethnics = human.targetsEthnicStack
+    
+    #Calculate the ethnic target value, and store it in dictionary
+    obj = self.button.mesh
+    # We first clear the non applied ethnics
+    for g in obj.facesGroups:
+      if g.name not in ethnics:
+        color =[255,255,255,255]
+        for f in g.faces:
+          f.color = [color,color,color]
+          f.updateColors()
+    # Then we color the applied ethnics, doing it in two steps makes sure we don't erase our coloring
+    for g in obj.facesGroups:
+      if g.name in ethnics:
+        color = [int(255*ethnics[g.name]), 1-int(255*ethnics[g.name]), 255, 255]
+        for f in g.faces:
+          f.color = [color,color,color]
+          f.updateColors()
+
 class MacroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Macro modelling", "data/images/macro.png")
@@ -79,9 +148,9 @@ class MacroModelingTaskView(gui3d.TaskView):
     # Ethnic controls
     self.asiaButton = gui3d.Button(self, mesh = "data/3dobjs/button_asia.obj",
       texture = "data/images/button_asia.png", position = [0.45, 0.12, 9])
-    self.europeButton = gui3d.Button(self, mesh = "data/3dobjs/button_europe.obj",
+    self.europeButton = EthnicMapButton(self, mesh = "data/3dobjs/button_europe.obj",
       texture = "data/images/button_europe.png", position = [0.37, 0.12, 9])
-    self.africaButton = gui3d.Button(self, mesh = "data/3dobjs/button_africa.obj",
+    self.africaButton = EthnicMapButton(self, mesh = "data/3dobjs/button_africa.obj",
       texture = "data/images/button_africa.png", position = [0.37, 0.04, 9])
     self.americaButton = gui3d.Button(self, mesh = "data/3dobjs/button_america.obj",
       texture = "data/images/button_america.png", position = [0.45, 0.04, 9])
@@ -99,53 +168,6 @@ class MacroModelingTaskView(gui3d.TaskView):
       mesh = "data/3dobjs/button_ethnreset.obj",
       texture = "data/images/button_ethnreset.png",
       selectedTexture = "data/images/button_ethnreset_on.png", position = [0.52, 0.02, 9])
-    
-    @self.africaButton.event
-    def onSelected(selected):
-      if selected:
-        pos = self.africaButton.button.getPosition()
-        t = animation3d.Timeline(0.250)
-        t.append(animation3d.PathAction(self.africaButton.button.mesh, [pos, [pos[0] - 0.40, pos[1] - 0.15, pos[2]]]))
-        t.append(animation3d.ScaleAction(self.africaButton.button.mesh, [1, 1, 1], [5, 5, 5]))
-        t.append(animation3d.UpdateAction(self.app.scene3d))
-        t.start()
-      else:
-        pos = self.africaButton.button.getPosition()
-        t = animation3d.Timeline(0.250)
-        t.append(animation3d.PathAction(self.africaButton.button.mesh, [pos, [pos[0] + 0.40, pos[1] + 0.15, pos[2]]]))
-        t.append(animation3d.ScaleAction(self.africaButton.button.mesh, [5, 5, 5], [1, 1, 1]))
-        t.append(animation3d.UpdateAction(self.app.scene3d))
-        t.start()
-        
-    @self.africaButton.event
-    def onMouseDown(event):
-      human = self.app.scene3d.selectedHuman
-      if self.africaButton.selected:
-        faceGroupSel = self.app.scene3d.getSelectedFacesGroup()
-        faceGroupName = faceGroupSel.name
-        if "dummy" in faceGroupName:
-          self.africaButton.setSelected(False)
-        else:
-          if self.ethnicIncreaseButton.selected:
-            self.app.do(EthnicAction(human, faceGroupName,
-              human.getEthnic(faceGroupName) + 0.1, self.syncEthnics))
-          elif self.ethnicDecreaseButton.selected:
-            self.app.do(EthnicAction(human, faceGroupName,
-              human.getEthnic(faceGroupName) - 0.1, self.syncEthnics))
-          else:
-            self.app.do(EthnicAction(human, faceGroupName,
-              0.0, self.syncEthnics))
-      else:
-        self.africaButton.setSelected(True)
-        
-    @self.africaButton.event
-    def onBlur(event):
-      pass
-      #self.africaButton.setSelected(False)
-        
-    @self.africaButton.event
-    def onMouseUp(event):
-      pass
       
     # Common controls
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [0, 0, -70])
@@ -185,22 +207,5 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.weightSlider.setValue(human.getWeight())
     
   def syncEthnics(self):
-    human = self.app.scene3d.selectedHuman
-    ethnics = human.targetsEthnicStack
-    
-    #Calculate the ethnic target value, and store it in dictionary
-    obj = self.africaButton.button.mesh
-    # We first clear the non applied ethnics
-    for g in obj.facesGroups:
-      if g.name not in ethnics:
-        color =[255,255,255,255]
-        for f in g.faces:
-          f.color = [color,color,color]
-          f.updateColors()
-    # Then we color the applied ethnics, doing it in two steps makes sure we don't erase our coloring
-    for g in obj.facesGroups:
-      if g.name in ethnics:
-        color = [int(255*ethnics[g.name]), 1-int(255*ethnics[g.name]), 255, 255]
-        for f in g.faces:
-          f.color = [color,color,color]
-          f.updateColors()
+    self.europeButton.syncEthnics()
+    self.africaButton.syncEthnics()
