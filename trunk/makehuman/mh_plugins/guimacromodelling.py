@@ -42,10 +42,10 @@ class EthnicAction:
       self.postAction()
       return True
 
-class EthnicMapButton(gui3d.Button):
-  def __init__(self, parent, mesh = "data/3dobjs/button_gender.obj", texture = None,
+class EthnicMapButton(gui3d.RadioButton):
+  def __init__(self, group, parent, mesh = "data/3dobjs/button_gender.obj", texture = None,
     selectedTexture = None, position = [0, 0, 9], selected = False):
-    gui3d.Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected)
+    gui3d.RadioButton.__init__(self, group, parent, mesh, texture, selectedTexture, position, selected)
 
   def onSelected(self, selected):
     if selected:
@@ -146,13 +146,14 @@ class MacroModelingTaskView(gui3d.TaskView):
       self.app.do(MacroAction(human, "setWeight", value, self.syncSliders))
     
     # Ethnic controls
-    self.asiaButton = gui3d.Button(self, mesh = "data/3dobjs/button_asia.obj",
+    self.ethnicMapButtonGroup = []
+    self.asiaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_asia.obj",
       texture = "data/images/button_asia.png", position = [0.45, 0.12, 9])
-    self.europeButton = EthnicMapButton(self, mesh = "data/3dobjs/button_europe.obj",
+    self.europeButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_europe.obj",
       texture = "data/images/button_europe.png", position = [0.37, 0.12, 9])
-    self.africaButton = EthnicMapButton(self, mesh = "data/3dobjs/button_africa.obj",
+    self.africaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_africa.obj",
       texture = "data/images/button_africa.png", position = [0.37, 0.04, 9])
-    self.americaButton = gui3d.Button(self, mesh = "data/3dobjs/button_america.obj",
+    self.americaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_america.obj",
       texture = "data/images/button_america.png", position = [0.45, 0.04, 9])
     self.ethnicButtonGroup = []
     self.ethnicIncreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
@@ -207,5 +208,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.weightSlider.setValue(human.getWeight())
     
   def syncEthnics(self):
+    self.asiaButton.syncEthnics()
     self.europeButton.syncEthnics()
     self.africaButton.syncEthnics()
+    self.americaButton.syncEthnics()
