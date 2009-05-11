@@ -122,6 +122,8 @@ class MHApplication(gui3d.Application):
       if not self.tool:
         return
         
+      self.tool.callEvent("onMouseUp", event)
+        
     @self.scene3d.selectedHuman.event
     def onMouseEntered(event):
       if not self.tool:

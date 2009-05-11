@@ -297,10 +297,8 @@ class Application(events3d.EventHandler):
       
     if (self.focusView != view) and view.canHaveFocus:
       if self.focusView:
-        print("blurring ", self.focusView)
         self.focusView.callEvent("onBlur", None)
         
-      print("focussing ", view)
       self.focusView = view
       self.focusView.callEvent("onFocus", None)
       self.focusObject = None

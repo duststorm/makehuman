@@ -12,13 +12,30 @@ class DetailAction:
     self.rightAfter = rightAfter
     
   def do(self):
-    self.human.targetsDetailStack[self.leftTarget] = self.leftAfter
-    self.human.targetsDetailStack[self.rightTarget] = self.rightAfter
+    if self.leftAfter:
+      self.human.targetsDetailStack[self.leftTarget] = self.leftAfter
+    elif self.leftTarget in self.human.targetsDetailStack:
+      del self.human.targetsDetailStack[self.leftTarget]
+      
+    if self.rightAfter:
+      self.human.targetsDetailStack[self.rightTarget] = self.rightAfter
+    elif self.rightTarget in self.human.targetsDetailStack:
+      del self.human.targetsDetailStack[self.rightTarget]
+      
     self.human.applyAllTargets()
     
   def undo(self):
-    self.human.targetsDetailStack[self.leftTarget] = self.leftBefore
-    self.human.targetsDetailStack[self.rightTarget] = self.rightBefore
+    print(self.leftBefore, self.rightBefore)
+    if self.leftBefore:
+      self.human.targetsDetailStack[self.leftTarget] = self.leftBefore
+    elif self.leftTarget in self.human.targetsDetailStack:
+      del self.human.targetsDetailStack[self.leftTarget]
+      
+    if self.rightBefore:
+      self.human.targetsDetailStack[self.rightTarget] = self.rightBefore
+    elif self.rightTarget in self.human.targetsDetailStack:
+      del self.human.targetsDetailStack[self.rightTarget]
+      
     self.human.applyAllTargets()
 
 class DetailTool(events3d.EventHandler):

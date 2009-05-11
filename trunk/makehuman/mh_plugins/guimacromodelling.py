@@ -5,18 +5,18 @@ class MacroAction:
       self.name = method
       self.human = human
       self.method = method
-      self.before = human.getGender()
+      self.before = getattr(self.human, "get" + self.method)()
       self.after = value
       self.postAction = postAction
       
     def do(self):
-      getattr(self.human, self.method)(self.after)
+      getattr(self.human, "set" + self.method)(self.after)
       self.human.applyAllTargets()
       self.postAction()
       return True
       
     def undo(self):
-      getattr(self.human, self.method)(self.before)
+      getattr(self.human, "set" + self.method)(self.before)
       self.human.applyAllTargets()
       self.postAction()
       return True
@@ -128,22 +128,22 @@ class MacroModelingTaskView(gui3d.TaskView):
     @self.genderSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
-      self.app.do(MacroAction(human, "setGender", value, self.syncSliders))
+      self.app.do(MacroAction(human, "Gender", value, self.syncSliders))
       
     @self.ageSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
-      self.app.do(MacroAction(human, "setAge", value, self.syncSliders))
+      self.app.do(MacroAction(human, "Age", value, self.syncSliders))
       
     @self.muscleSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
-      self.app.do(MacroAction(human, "setMuscle", value, self.syncSliders))
+      self.app.do(MacroAction(human, "Muscle", value, self.syncSliders))
       
     @self.weightSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
-      self.app.do(MacroAction(human, "setWeight", value, self.syncSliders))
+      self.app.do(MacroAction(human, "Weight", value, self.syncSliders))
     
     # Ethnic controls
     self.ethnicMapButtonGroup = []
