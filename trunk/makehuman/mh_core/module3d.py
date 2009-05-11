@@ -2026,6 +2026,7 @@ class Scene3D:
         try:
             groupSelected = self.faceGroupColorID[IDkey]
         except:
+            print("Color %s not found" %(IDkey))
             groupSelected = None        
         return groupSelected
 

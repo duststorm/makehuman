@@ -40,7 +40,7 @@ class RenderingCategory(gui3d.Category):
     def onHide(event):
       pass
     @aqsis.button.event
-    def onClick(event):
+    def onClicked(event):
       mh2renderman.saveScene(self.app.scene3d, "scena.rib", "renderman_output", "aqsis")
       
     pixie = gui3d.TaskView(self, "Pixie",  "data/images/button_pixie.png")
@@ -51,7 +51,7 @@ class RenderingCategory(gui3d.Category):
     def onHide(event):
       pass
     @pixie.button.event
-    def onClick(event):
+    def onClicked(event):
       mh2renderman.saveScene(self.app.scene3d, "scena.rib", "renderman_output", "pixie")
       
     povray = gui3d.TaskView(self, "Povray",  "data/images/button_povray.png")
@@ -62,7 +62,7 @@ class RenderingCategory(gui3d.Category):
     def onHide(event):
       pass
     @povray.button.event
-    def onClick(event):
+    def onClicked(event):
       reload(mh2povray)  # Avoid having to close and reopen MH for every coding change (can be removed once testing is complete)
       for obj in self.app.scene3d.objects:
           # print "POV-Ray Export test: ", obj.name

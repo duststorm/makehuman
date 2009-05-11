@@ -104,26 +104,44 @@ class MHApplication(gui3d.Application):
       self.tool.callEvent("onMouseDown", event)
       
     @self.scene3d.selectedHuman.event
-    def onMouseMove(event):
+    def onMouseMoved(event):
       if not self.tool:
         return
       
-      self.tool.callEvent("onMouseMove", event)
+      self.tool.callEvent("onMouseMoved", event)
+      
+    @self.scene3d.selectedHuman.event
+    def onMouseDragged(event):
+      if not self.tool:
+        return
+      
+      self.tool.callEvent("onMouseDragged", event)
       
     @self.scene3d.selectedHuman.event
     def onMouseUp(event):
       if not self.tool:
         return
+        
+    @self.scene3d.selectedHuman.event
+    def onMouseEntered(event):
+      if not self.tool:
+        return
       
-      self.tool.callEvent("onMouseUp", event)
-      self.selectedGroup = None
+      self.tool.callEvent("onMouseEntered", event)
+      
+    @self.scene3d.selectedHuman.event
+    def onMouseExited(event):
+      if not self.tool:
+        return
+      
+      self.tool.callEvent("onMouseExited", event)
       
     # Set up categories and tasks  
     
     # Exit button
     category = gui3d.Category(self, "exit", "data/images/button_exit.png")
     @category.button.event
-    def onClick(event):
+    def onClicked(event):
       self.stop()
     
     guimodelling.ModellingCategory(self)
@@ -135,7 +153,7 @@ class MHApplication(gui3d.Application):
     category = gui3d.Category(self, "Help", "data/images/button_about.png")
     # Help button
     @category.button.event
-    def onClick(event):
+    def onClicked(event):
       webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
     
     self.switchCategory("modelling")

@@ -55,6 +55,36 @@ class Object(events3d.EventHandler):
     
   def setText(self, text):
     self.mesh.setText(text)
+    
+  def onMouseDown(self, event):
+    self.view.callEvent("onMouseDown", event)
+    
+  def onMouseMoved(self, event):
+    self.view.callEvent("onMouseMoved", event)
+    
+  def onMouseDragged(self, event):
+    self.view.callEvent("onMouseDragged", event)
+    
+  def onMouseUp(self, event):
+    self.view.callEvent("onMouseUp", event)
+    
+  def onMouseEntered(self, event):
+    self.view.callEvent("onMouseEntered", event)
+    
+  def onMouseExited(self, event):
+    self.view.callEvent("onMouseExited", event)
+    
+  def onClicked(self, event):
+    self.view.callEvent("onClicked", event)
+    
+  def onMouseWheel(self, event):
+    self.view.callEvent("onMouseWheel", event)
+    
+  def onKeyDown(self, event):
+    self.view.callEvent("onKeyDown", event)
+    
+  def onKeyUp(self, event):
+    self.view.callEvent("onKeyDown", event)
 
 # Generic view
 class View(events3d.EventHandler):
@@ -106,6 +136,36 @@ class View(events3d.EventHandler):
         self.callEvent("onShow", None)
       else:
         self.callEvent("onHide", None)
+        
+  def onMouseDown(self, event):
+    self.parent.callEvent("onMouseDown", event)
+    
+  def onMouseMoved(self, event):
+    self.parent.callEvent("onMouseMoved", event)
+    
+  def onMouseDragged(self, event):
+    self.parent.callEvent("onMouseDragged", event)
+    
+  def onMouseUp(self, event):
+    self.parent.callEvent("onMouseUp", event)
+    
+  def onMouseEntered(self, event):
+    self.parent.callEvent("onMouseEntered", event)
+    
+  def onMouseExited(self, event):
+    self.parent.callEvent("onMouseExited", event)
+    
+  def onClicked(self, event):
+    self.parent.callEvent("onClicked", event)
+    
+  def onMouseWheel(self, event):
+    self.parent.callEvent("onMouseWheel", event)
+    
+  def onKeyDown(self, event):
+    self.parent.callEvent("onKeyDown", event)
+    
+  def onKeyUp(self, event):
+    self.parent.callEvent("onKeyUp", event)
 
 # A View representing a specific task
 class TaskView(View):
@@ -123,7 +183,7 @@ class TaskView(View):
     category.tasksByName[self.name] = self
     
     @self.button.event
-    def onClick(event):
+    def onClicked(event):
       self.app.switchTask(self.name)
 
   def onShow(self, event):
@@ -158,7 +218,7 @@ class Category(View):
     parent.categories[name] = self
     
     @self.button.event
-    def onClick(event):
+    def onClicked(event):
       self.app.switchCategory(self.name)
       
   def onShow(self, event):
@@ -191,6 +251,7 @@ class Application(events3d.EventHandler):
     self.focusObject = None
     self.focusGroup = None
     self.mouseDownObject = None
+    self.enteredObject = None
     
     self.scene3d.startWindow()
     
@@ -233,8 +294,8 @@ class Application(events3d.EventHandler):
   def setFocus(self, view = None):
     if not view:
       view = self
-    if (self.focusView != view) and view.canHaveFocus:
       
+    if (self.focusView != view) and view.canHaveFocus:
       if self.focusView:
         print("blurring ", self.focusView)
         self.focusView.callEvent("onBlur", None)
@@ -278,84 +339,106 @@ class Application(events3d.EventHandler):
     self.currentCategory.show()
     
     self.switchTask(category.tasks[0].name)
-    
-  def callPropagatedEvent(self, eventType, event):
-    self.callEvent(eventType, event)
-    if self.currentTask:
-      self.currentTask.callEvent(eventType, event)
-      
-    if self.focusView:
-      print("Sending", eventType, "to", self.focusView)
-      self.focusView.callEvent(eventType, event)
-    elif self.currentCategory:
-      print("Sending", eventType, "to", self.currentCategory)
-      self.currentCategory.callEvent(eventType, event)
-      
-    if self.focusObject:
-      print("Sending", eventType, "to", self.focusObject)
-      self.focusObject.callEvent(eventType, event)
-      
+  
+  '''
+  Rules for mouse events:
+  mousePressed -> Sent to the view under the mouse
+  mouseDragged -> Sent to the view which received mousePressed
+  mouseReleased -> Sent to the view which received mousePressed
+  mouseClicked -> Sent to the view which received mousePressed if mouseReleased happened in the same view
+  mouseEntered -> Sent to the view under the mouse, which has been entered
+  mouseExited -> Sent to the view previously entered
+  mouseMoved -> Sent to the view under the mouse
+  
+  mouseWheelMoved -> Sent to the view under the mouse or focussed view?
+  '''
+  
   # called from native
   def mouseDown(self, b):
+    # Build event
     mousePos = self.scene3d.getMousePos2D()
     mouseDiff = self.scene3d.getMouseDiff()
-    object = self.scene3d.getPickedObject()[1]
-    if object:
-      self.focusObject = object.object
-      self.focusView = self.focusObject.view
-    else:
-      self.focusObject = None
-      self.focusView = None
-    self.mouseDownObject = self.focusObject
-    
     event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], b)
-    self.callPropagatedEvent("onMouseDown", event)
     
-    # Set focus to clicked view
-    self.focusObject = None
-    if self.mouseDownObject and self.mouseDownObject.view:
-      self.mouseDownObject.view.setFocus()
+    # Get picked object
+    object = self.scene3d.getPickedObject()[1]
+    
+    # If we have an object
+    if object:
+      # Try to give its view focus
+      self.focusObject = object.object
+      self.focusObject.view.setFocus()
+      # It is the object which will receive the following mouse messages
+      self.mouseDownObject = object.object
+      # Send event to the object
+      object.object.callEvent("onMouseDown", event)
     
   def mouseUp(self, b):
+    # Build event
     mousePos = self.scene3d.getMousePos2D()
     mouseDiff = self.scene3d.getMouseDiff()
-    object = self.scene3d.getPickedObject()[1]
-    if object:
-      self.focusObject = object.object
-    else:
-      self.focusObject = None
+    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], b)
     
-    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], b= b)
-    self.callPropagatedEvent("onMouseUp", event)
-    if self.mouseDownObject and self.mouseDownObject is self.focusObject:
-      self.mouseDownObject.view.callEvent("onClick", event)
-      self.mouseDownObject.callEvent("onClick", event)
-      
-  def mouseWheel(self, wheelDelta):
-    mousePos = self.scene3d.getMousePos2D()
-    event = events3d.Event(mousePos[0], mousePos[1], wheelDelta = wheelDelta)
-    self.callPropagatedEvent("onMouseWheel", event)
+    # Get picked object
+    object = self.scene3d.getPickedObject()[1]
+    
+    if self.mouseDownObject:
+      self.mouseDownObject.callEvent("onMouseUp", event)
+      if self.mouseDownObject is object.object:
+        self.mouseDownObject.callEvent("onClicked", event)
       
   def mouseMove(self):
+    # Move cursor
     mousePos = self.scene3d.getMousePosGUI()
-    mouseDiff = self.scene3d.getMouseDiff()
     self.cursor.setPosition([mousePos[0], mousePos[1], self.cursor.mesh.z])
+    
+    # Build event
+    mousePos = self.scene3d.getMousePos2D()
+    mouseDiff = self.scene3d.getMouseDiff()
+    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], self.scene3d.mouseState)
+    
+    # Get picked object
+    group = object = self.scene3d.getPickedObject()[0]
+    object = self.scene3d.getPickedObject()[1]
+    
+    event.object = object
+    event.group = group
       
     if self.scene3d.mouseState:
-      mousePos = self.scene3d.getMousePos2D()
-      object = self.scene3d.getPickedObject()[1]
-      if object:
-        self.focusObject = object.object
-      else:
-        self.focusObject = None
-      event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], self.scene3d.mouseState)
-      self.callPropagatedEvent("onMouseMove", event)
+      if self.mouseDownObject:
+        self.mouseDownObject.callEvent("onMouseDragged", event)
     else:
+      if object and object.object:
+        if self.enteredObject != object.object:
+          if self.enteredObject:
+            self.enteredObject.callEvent("onMouseExited", event)
+          self.enteredObject = object.object
+          self.enteredObject.callEvent("onMouseEntered", event)
+        object.object.callEvent("onMouseMoved", event)
       self.scene3d.redraw()
+      
+  def mouseWheel(self, wheelDelta):
+    # Mouse wheel events, like key events are sent to the focus view
+    mousePos = self.scene3d.getMousePos2D()
+    event = events3d.Event(mousePos[0], mousePos[1], wheelDelta = wheelDelta)
+    if self.focusView:
+      self.focusView.callEvent("onMouseWheel", event)
+    else:
+      self.currentTask.callEvent("onMouseWheel", event)
     
   def keyDown(self):
     event = events3d.Event(key = self.scene3d.keyPressed, character = self.scene3d.characterPressed)
-    self.callPropagatedEvent("onKeyDown", event)
+    if self.focusView:
+      self.focusView.callEvent("onKeyDown", event)
+    else:
+      self.currentTask.callEvent("onKeyDown", event)
+    
+  def keyUp(self):
+    event = events3d.Event(key = self.scene3d.keyPressed, character = self.scene3d.characterPressed)
+    if self.focusView:
+      self.focusView.callEvent("onKeyUp", event)
+    else:
+      self.currentTask.callEvent("onKeyDown", event)
 
 #Widgets
 
@@ -375,10 +458,10 @@ class Slider(View):
     sliderPos[0] = self.__value * (0.45 - 0.365) - 0.45
     self.slider.setPosition(sliderPos)
     
-  def getValue(self, value):
+  def getValue(self):
     return self.__value
   
-  def onMouseMove(self, event):
+  def onMouseDragged(self, event):
     sliderPos = self.slider.getPosition()
     screenPos = self.app.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
     worldPos = self.app.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
@@ -394,6 +477,24 @@ class Slider(View):
     self.value = (sliderPos[0] + 0.45) / (0.45 - 0.365)
     print(self.value)
     self.callEvent("onChange", self.value)
+    
+  def onKeyDown(self, event):
+    oldValue = self.__value
+    newValue = self.__value
+    
+    if event.key == events3d.SDLK_HOME:
+      newValue = 0.0
+    if event.key == events3d.SDLK_LEFT:
+      newValue -= 0.1
+    elif event.key == events3d.SDLK_RIGHT:
+      newValue += 0.1
+    if event.key == events3d.SDLK_END:
+      newValue = 1.0
+      
+    if oldValue != newValue:
+      self.setValue(newValue)
+      if oldValue != self.__value:
+        self.callEvent("onChange", self.__value)
 
 # Button widget
 class Button(View):
@@ -435,11 +536,8 @@ class RadioButton(Button):
     self.group = group
     self.group.append(self)
     
-  def onMouseUp(self, event):
-    if self.app.focusObject is self.button:
+  def onClicked(self, event):
       self.setSelected(True)
-    else:
-      self.setSelected(False)
     
   def setSelected(self, selected):
     if selected:
@@ -478,7 +576,7 @@ class FileEntryView(View):
     self.text = ""
     
     @self.bConfirm.event
-    def onClick(event):
+    def onClicked(event):
       if len(self.text):
         self.onFileSelected(self.text)
       
@@ -529,15 +627,15 @@ class FileChooser(View):
     self.previousFileAnimation.append(animation3d.UpdateAction(self.app.scene3d))
     
     @self.previousFile.event
-    def onClick(event):
+    def onClicked(event):
       self.goPrevious()
 
     @self.currentFile.event
-    def onClick(event):
+    def onClicked(event):
       self.onFileSelected(self.files[self.selectedFile])
       
     @self.nextFile.event
-    def onClick(event):
+    def onClicked(event):
       self.goNext()
     
   def onShow(self, event):

@@ -17,6 +17,7 @@ class EventHandler:
     pass
     
   def callEvent(self, eventType, event):
+    #print("Sending", eventType, "to", self)
     if hasattr(self, eventType):
       getattr(self, eventType)(event)
       

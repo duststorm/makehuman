@@ -183,15 +183,15 @@ class MacroModelingTaskView(gui3d.TaskView):
       selectedTexture = "data/images/button_new_on.png", position = [0.52,0.20,9])
     
     @self.undoButton.event
-    def onClick(event):
+    def onClicked(event):
       self.app.undo()
       
     @self.redoButton.event
-    def onClick(event):
+    def onClicked(event):
       self.app.redo()
     
     @self.resetButton.event
-    def onClick(event):
+    def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.resetMeshValues()
       human.applyAllTargets()

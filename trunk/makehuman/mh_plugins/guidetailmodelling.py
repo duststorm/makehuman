@@ -29,6 +29,7 @@ class DetailTool(events3d.EventHandler):
     self.right = right
     self.leftTarget = None
     self.rightTarget = None
+    self.selectedGroups = []
     
   def onMouseDown(self, event):
     print("onMouseDown", self.app.selectedGroup.name)
@@ -55,8 +56,8 @@ class DetailTool(events3d.EventHandler):
     else:
       self.rightBefore = 0
     
-  def onMouseMove(self, event):
-    print("onMouseMove", self.app.selectedGroup.name)
+  def onMouseDragged(self, event):
+    print("onMouseDragged", self.app.selectedGroup.name)
     human = self.app.scene3d.selectedHuman
     
     if not (self.leftTarget and self.rightTarget):
@@ -68,20 +69,23 @@ class DetailTool(events3d.EventHandler):
     else:
       d = -event.dy
     
-    if d > 2:
+    if d > 0:
       add = self.rightTarget
       remove = self.leftTarget
-    elif d < -2:
+    elif d < 0:
       add = self.leftTarget
       remove = self.rightTarget
     else:
       return
+      
+    value = abs(d) / 20.0
+    print(d, value)
     
     # Check whether we need to add or remove from the target
     if remove in human.targetsDetailStack.keys():
       if human.targetsDetailStack[remove] > 0.1:
         prev = human.targetsDetailStack[remove]
-        next = max(0.0, human.targetsDetailStack[remove] - 0.1)
+        next = max(0.0, human.targetsDetailStack[remove] - value)
         human.targetsDetailStack[remove] = next
       else:
         prev = human.targetsDetailStack[remove]
@@ -91,10 +95,10 @@ class DetailTool(events3d.EventHandler):
     else:
       if add in human.targetsDetailStack.keys():
         prev = human.targetsDetailStack[add]
-        next = min(1.0, human.targetsDetailStack[add] + 0.1)
+        next = min(1.0, human.targetsDetailStack[add] + value)
       else:
         prev = 0.0
-        next = 0.1
+        next = min(1.0, value)
       human.targetsDetailStack[add] = next
       algos3d.loadTranslationTarget(human.meshData, add, next - prev, None, 1, 0)
     
@@ -117,6 +121,44 @@ class DetailTool(events3d.EventHandler):
       
     self.app.did(DetailAction(human, self.leftTarget, self.rightTarget,
       self.leftBefore, self.rightBefore,  leftAfter, rightAfter))
+      
+  def onMouseMoved(self, event):
+    print("onMouseMoved", event.group.name)
+    human = self.app.scene3d.selectedHuman
+    
+    groups = []
+    
+    if self.micro:
+      groups.append(event.group)
+    else:
+      part = human.getPartNameForGroupName(event.group.name)
+      print(part)
+      for g in human.mesh.facesGroups:
+        if part in g.name:
+          groups.append(g)
+      
+    for g in self.selectedGroups:
+      if g not in groups:
+        for f in g.faces:
+          f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+          f.updateColors()
+            
+    for g in groups:
+      for f in g.faces:
+        f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
+        f.updateColors()
+        
+    self.selectedGroups = groups
+    
+  def onMouseExited(self, event):
+    print("onMouseExited", event.group.name)
+    
+    for g in self.selectedGroups:
+      for f in g.faces:
+        f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+        f.updateColors()
+        
+    self.selectedGroups = []
 
 class Detail3dAction:
   def __init__(self, human,
@@ -165,6 +207,7 @@ class Detail3dAction:
 class Detail3dTool(events3d.EventHandler):
   def __init__(self, app, micro, type):
     self.app = app
+    self.micro = micro
     if type == "scale":
       self.x = DetailTool(app, micro, "-scale-horiz-decr", "-scale-horiz-incr")
       self.y = DetailTool(app, micro, "-scale-vert-decr", "-scale-vert-incr")
@@ -173,52 +216,53 @@ class Detail3dTool(events3d.EventHandler):
       self.x = DetailTool(app, micro, "-trans-in", "-trans-out")
       self.y = DetailTool(app, micro, "-trans-down", "-trans-up")
       self.z = DetailTool(app, micro, "-trans-backward", "-trans-forward")
+    self.selectedGroups = []
   
   def onMouseDown(self, event):
     self.x.onMouseDown(event)
     self.y.onMouseDown(event)
     self.z.onMouseDown(event)
     
-  def onMouseMove(self, event):
+  def onMouseDragged(self, event):
     viewType =  self.app.scene3d.getCameraFraming() 
     
     if viewType == "FRONTAL_VIEW":
       d = event.dy
       event.dy = 0.0
-      self.x.onMouseMove(event)
+      self.x.onMouseDragged(event)
       event.dy = d
       d = event.dx
       event.dx = 0.0
-      self.y.onMouseMove(event)
+      self.y.onMouseDragged(event)
       event.dx = d
     elif viewType == "BACK_VIEW":
       d = event.dy
       event.dy = 0.0
       event.dx = -event.dx
-      self.x.onMouseMove(event)
+      self.x.onMouseDragged(event)
       event.dy = d
       d = -event.dx
       event.dx = 0.0
-      self.y.onMouseMove(event)
+      self.y.onMouseDragged(event)
       event.dx = d
     elif viewType == "LEFT_VIEW":
       d = event.dy
       event.dy = 0.0
-      self.z.onMouseMove(event)
+      self.z.onMouseDragged(event)
       event.dy = d
       d = event.dx
       event.dx = 0.0
-      self.y.onMouseMove(event)
+      self.y.onMouseDragged(event)
       event.dx = d
     elif viewType == "RIGHT_VIEW":
       d = event.dy
       event.dy = 0.0
       event.dx = -event.dx
-      self.z.onMouseMove(event)
+      self.z.onMouseDragged(event)
       event.dy = d
       d = -event.dx
       event.dx = 0.0
-      self.y.onMouseMove(event)
+      self.y.onMouseDragged(event)
       event.dx = d
     
   def onMouseUp(self, event):
@@ -261,6 +305,44 @@ class Detail3dTool(events3d.EventHandler):
       self.y.leftBefore, self.y.rightBefore,  leftAfterY, rightAfterY,
       self.z.leftTarget, self.z.rightTarget,
       self.z.leftBefore, self.z.rightBefore,  leftAfterZ, rightAfterZ))
+      
+  def onMouseMoved(self, event):
+    print("onMouseMoved", event.group.name)
+    human = self.app.scene3d.selectedHuman
+    
+    groups = []
+    
+    if self.micro:
+      groups.append(event.group)
+    else:
+      part = human.getPartNameForGroupName(event.group.name)
+      print(part)
+      for g in human.mesh.facesGroups:
+        if part in g.name:
+          groups.append(g)
+      
+    for g in self.selectedGroups:
+      if g not in groups:
+        for f in g.faces:
+          f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+          f.updateColors()
+            
+    for g in groups:
+      for f in g.faces:
+        f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
+        f.updateColors()
+        
+    self.selectedGroups = groups
+    
+  def onMouseExited(self, event):
+    print("onMouseExited", event.group.name)
+    
+    for g in self.selectedGroups:
+      for f in g.faces:
+        f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+        f.updateColors()
+        
+    self.selectedGroups = []
 
 class DetailModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -282,24 +364,28 @@ class DetailModelingTaskView(gui3d.TaskView):
       selectedTexture = "data/images/button_weight_on.png", position = [-0.45,-0.20,9])
       
     @self.genderDetailButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = DetailTool(self.app, False, "_female", "_male")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.genderDetailButton, event)
       
     @self.ageDetailButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = DetailTool(self.app, False, "_child", "_old")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.ageDetailButton, event)
       
     @self.muscleDetailButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = DetailTool(self.app, False, "_flaccid", "_muscle")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.muscleDetailButton, event)
       
     @self.weightDetailButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = DetailTool(self.app, False, "_underweight", "_overweight")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.weightDetailButton, event)
       
     self.translationButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh = "data/3dobjs/button_transl.obj",
       texture = "data/images/button_translation.png",
@@ -311,14 +397,16 @@ class DetailModelingTaskView(gui3d.TaskView):
       position = [0.45, 0.12, 9])
     
     @self.translationButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = Detail3dTool(self.app, False, "translation")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.translationButton, event)
       
     @self.scaleButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = Detail3dTool(self.app, False, "scale")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.scaleButton, event)
     
     self.rightSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmright.obj",
       texture = "data/images/button_symmright.png", position = [0.37, 0.04, 9])
@@ -326,12 +414,12 @@ class DetailModelingTaskView(gui3d.TaskView):
       texture = "data/images/button_symmleft.png", position = [0.45, 0.04, 9])
       
     @self.rightSymmetryButton.event
-    def onClick(event):
+    def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.applySymmetryRight()
       
     @self.leftSymmetryButton.event
-    def onClick(event):
+    def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.applySymmetryLeft()
       
@@ -360,14 +448,16 @@ class MicroModelingTaskView(gui3d.TaskView):
       position = [0.45, 0.12, 9])
       
     @self.translationButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = Detail3dTool(self.app, True, "translation")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.translationButton, event)
       
     @self.scaleButton.event
-    def onClick(event):
+    def onClicked(event):
       self.tool = Detail3dTool(self.app, True, "scale")
       self.app.tool = self.tool
+      gui3d.RadioButton.onClicked(self.scaleButton, event)
       
     self.rightSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmright.obj",
       texture = "data/images/button_symmright.png", position = [0.37, 0.04, 9])
@@ -375,12 +465,12 @@ class MicroModelingTaskView(gui3d.TaskView):
       texture = "data/images/button_symmleft.png", position = [0.45, 0.04, 9])
       
     @self.rightSymmetryButton.event
-    def onClick(event):
+    def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.applySymmetryRight()
       
     @self.leftSymmetryButton.event
-    def onClick(event):
+    def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.applySymmetryLeft()
       

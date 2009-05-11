@@ -381,6 +381,9 @@ void mhMouseButtonUp(int b, int x, int y)
     // Calculate 3d positions
     mhGetPickedCoords(x,y);
 
+    // Check which object/group was hit
+    mhGetPickedColor(x, y);
+
     // Notify python
     callMouseButtonUp(b, x, y);
 
@@ -411,6 +414,9 @@ void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
 {
     // Calculate 3d positions
     mhGetPickedCoords(x,y);
+
+    // Check which object/group was hit
+    mhGetPickedColor(x, y);
 
     // Notify python
     callMouseMotion(s, x, y, xrel, yrel);

@@ -38,8 +38,7 @@ class ModellingCategory(gui3d.Category):
       gui3d.TaskView(self, "Anime modeling",  "data/images/button_expressions.png")
       
     # Rotate and pan the camera
-    def onMouseMove(self, event):
-      if event.b:
+    def onMouseDragged(self, event):
         diff = self.app.scene3d.getMouseDiff()
         leftButtonDown =event.b & 1
         middleButtonDown = event.b & 2
@@ -128,6 +127,7 @@ class ModellingCategory(gui3d.Category):
       elif event.key == events3d.SDLK_q:
         self.app.stop()
       elif event.key == events3d.SDLK_s:
+        print("subdividing")
         self.app.scene3d.selectedHuman.subdivide()
       elif event.key == events3d.SDLK_y:
         self.app.redo()
