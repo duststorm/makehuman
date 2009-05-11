@@ -276,6 +276,12 @@ class Human(gui3d.Object):
         else:
             return 0.0
             
+    def setDetail(self, name, value):
+        if value:
+          self.targetsDetailStack[name] = value
+        elif name in self.targetsDetailStack:
+          del self.targetsDetailStack[name]
+            
     def applyAllTargets(self):
 
         """
