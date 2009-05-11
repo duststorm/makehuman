@@ -302,6 +302,12 @@ class Application(events3d.EventHandler):
       self.focusView = view
       self.focusView.callEvent("onFocus", None)
       self.focusObject = None
+    else:
+      if self.focusView:
+        self.focusView.callEvent("onBlur", None)
+        
+      self.focusView = None
+      self.focusObject = None
     
   def switchTask(self, name):
     if self.currentTask:
