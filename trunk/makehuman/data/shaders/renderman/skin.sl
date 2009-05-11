@@ -1,11 +1,25 @@
 
 //(c) MakeHuman team 2007 - www.makehuman.org
 
-color screen (color F; color B) {
+color screen(color F; color B)
+    {
        color W = (1,1,1);
 	   color R = W - (W - F)*(W - B);
 	   return R;
-} 
+    }
+
+color powC(color ColToPow; float Factor)
+    {
+    float R1 = comp(ColToPow, 0);
+	float G1 = comp(ColToPow, 1);
+	float B1 = comp(ColToPow, 2);	
+	
+	float R2 = pow(R1,Factor);
+	float G2 = pow(G1,Factor);
+	float B2 = pow(B1,Factor);
+    
+    return color(CR2, CG2, CB2);    
+    }
 
 surface skin (
             string ssstexture = "";
@@ -16,7 +30,7 @@ surface skin (
 			float roughness = .1;
 			color specularcolor = 1;
 			float desaturation = 1;
-            float lum = 1.5;
+            float dark = 4;
             ) 
 {	
     normal Nf;
@@ -37,9 +51,9 @@ surface skin (
         Ct = color texture (ssstexture);		
     else Ct = 1;
 	
-	if (opacitytexture != "")	
-        Oi = float texture (opacitytexture) ;		
-    else Oi = 1;
+    if (opacitytexture != "")	
+        Oi = float texture (opacitytexture) * Os ;	
+	
 	
 	
 	Nf = faceforward (normalize(N),I);
@@ -53,10 +67,12 @@ surface skin (
     
     
     
-	Ci = (Cs * Ct) + specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec- angle_ramp*noise3D;	
+	Ci = (Cs * Ct) - angle_ramp*noise3D;	
 	//Ci = mix(Ci,Cd,0.5);
     Ci = screen(Ci,Cd);
-    Ci = Ci*Ci;
+    //Ci = (Ci*Ci)*(2/dark);
+    Ci = powC(Ci,dark)*(2/dark);
+    
 
 	//DESATURATE THE HIGHTLIGHTS
 	
@@ -77,10 +93,11 @@ surface skin (
 	
 	
 	Ci = Ci - (color(dark_area*.1,dark_area*.2,dark_area*.15));
-    Ci = (Ci * ambient());//+glancing_highlight*12;
-    //Ci = Ci*Cd;
+    Ci = (Ci * ambient())+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;
+       
 	Ci = Ci*Oi;
-	//printf("%f\n",Oi);
+    
+	
     
 	
 	

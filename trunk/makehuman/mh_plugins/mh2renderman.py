@@ -612,7 +612,7 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))          
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))                        
             writeSubdivisionMesh(ribPath, obj, objPath)            
-            ribfile.write('\t\tSurface "skin" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [6]\n'%("texture_opacity.tif","texture.tif","texture_ref.tif",lightMap))
+            ribfile.write('\t\tSurface "skin" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [4.5] "float dark" [2]\n'%("texture_opacity.tif","texture.tif","texture_ref.tif",lightMap))
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))               
             ribfile.write('\tAttributeEnd\n') 
     ribfile.write("WorldEnd\n")
