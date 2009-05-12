@@ -97,46 +97,46 @@ class MHApplication(gui3d.Application):
     
     @self.scene3d.selectedHuman.event
     def onMouseDown(event):
-      if not self.tool:
-        return
-        
-      self.selectedGroup = self.app.scene3d.getSelectedFacesGroup()
-      self.tool.callEvent("onMouseDown", event)
+      if self.tool:
+        self.selectedGroup = self.app.scene3d.getSelectedFacesGroup()
+        self.tool.callEvent("onMouseDown", event)
+      else:
+        self.currentTask.callEvent("onMouseDown", event)
       
     @self.scene3d.selectedHuman.event
     def onMouseMoved(event):
-      if not self.tool:
-        return
-      
-      self.tool.callEvent("onMouseMoved", event)
+      if self.tool:
+        self.tool.callEvent("onMouseMoved", event)
+      else:
+        self.currentTask.callEvent("onMouseMoved", event)
       
     @self.scene3d.selectedHuman.event
     def onMouseDragged(event):
-      if not self.tool:
-        return
-      
-      self.tool.callEvent("onMouseDragged", event)
+      if self.tool:
+        self.tool.callEvent("onMouseDragged", event)
+      else:
+        self.currentTask.callEvent("onMouseDragged", event)
       
     @self.scene3d.selectedHuman.event
     def onMouseUp(event):
-      if not self.tool:
-        return
-        
-      self.tool.callEvent("onMouseUp", event)
+      if self.tool:
+        self.tool.callEvent("onMouseUp", event)
+      else:
+        self.currentTask.callEvent("onMouseUp", event)
         
     @self.scene3d.selectedHuman.event
     def onMouseEntered(event):
-      if not self.tool:
-        return
-      
-      self.tool.callEvent("onMouseEntered", event)
+      if self.tool:
+        self.tool.callEvent("onMouseEntered", event)
+      else:
+        self.currentTask.callEvent("onMouseEntered", event)
       
     @self.scene3d.selectedHuman.event
     def onMouseExited(event):
-      if not self.tool:
-        return
-      
-      self.tool.callEvent("onMouseExited", event)
+      if self.tool:
+        self.tool.callEvent("onMouseExited", event)
+      else:
+        self.currentTask.callEvent("onMouseExited", event)
       
     # Set up categories and tasks  
     
