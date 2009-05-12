@@ -367,7 +367,6 @@ class DetailModelingTaskView(gui3d.TaskView):
       selectedTexture = "data/images/button_weight_on.png", position = [-0.45,-0.20,9])
       
     self.tool = DetailTool(self.app, False, "_female", "_male")
-    self.app.tool = self.tool
       
     @self.genderDetailButton.event
     def onClicked(event):
@@ -454,7 +453,6 @@ class MicroModelingTaskView(gui3d.TaskView):
       position = [0.45, 0.12, 9])
       
     self.tool = Detail3dTool(self.app, True, "translation")
-    self.app.tool = self.tool
       
     @self.translationButton.event
     def onClicked(event):
