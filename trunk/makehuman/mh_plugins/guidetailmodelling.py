@@ -144,9 +144,10 @@ class DetailTool(events3d.EventHandler):
           f.updateColors()
             
     for g in groups:
-      for f in g.faces:
-        f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
-        f.updateColors()
+      if g not in self.selectedGroups:
+        for f in g.faces:
+          f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
+          f.updateColors()
         
     self.selectedGroups = groups
     
@@ -328,9 +329,10 @@ class Detail3dTool(events3d.EventHandler):
           f.updateColors()
             
     for g in groups:
-      for f in g.faces:
-        f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
-        f.updateColors()
+      if g not in self.selectedGroups:
+        for f in g.faces:
+          f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
+          f.updateColors()
         
     self.selectedGroups = groups
     
