@@ -18,7 +18,7 @@ color powC(color ColToPow; float Factor)
 	float G2 = pow(G1,Factor);
 	float B2 = pow(B1,Factor);
     
-    return color(CR2, CG2, CB2);    
+    return color(R2, G2, B2);    
     }
 
 surface skin (
