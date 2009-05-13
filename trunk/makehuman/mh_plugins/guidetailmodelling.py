@@ -32,7 +32,6 @@ class DetailTool(events3d.EventHandler):
     self.selectedGroups = []
     
   def onMouseDown(self, event):
-    print("onMouseDown", self.app.selectedGroup.name)
     human = self.app.scene3d.selectedHuman
     
     # Find the target name
@@ -57,7 +56,6 @@ class DetailTool(events3d.EventHandler):
       self.rightBefore = 0
     
   def onMouseDragged(self, event):
-    print("onMouseDragged", self.app.selectedGroup.name)
     human = self.app.scene3d.selectedHuman
     
     if not (self.leftTarget and self.rightTarget):
@@ -79,7 +77,6 @@ class DetailTool(events3d.EventHandler):
       return
       
     value = abs(d) / 20.0
-    print(d, value)
     
     # Check whether we need to add or remove from the target
     if remove in human.targetsDetailStack.keys():
@@ -103,7 +100,6 @@ class DetailTool(events3d.EventHandler):
       algos3d.loadTranslationTarget(human.meshData, add, next - prev, None, 1, 0)
     
   def onMouseUp(self, event):
-    print("onMouseUp", self.app.selectedGroup.name)
     human = self.app.scene3d.selectedHuman
     
     # Recalculate
@@ -123,7 +119,6 @@ class DetailTool(events3d.EventHandler):
       self.leftBefore, self.rightBefore,  leftAfter, rightAfter))
       
   def onMouseMoved(self, event):
-    print("onMouseMoved", event.group.name)
     human = self.app.scene3d.selectedHuman
     
     groups = []
@@ -132,7 +127,6 @@ class DetailTool(events3d.EventHandler):
       groups.append(event.group)
     else:
       part = human.getPartNameForGroupName(event.group.name)
-      print(part)
       for g in human.mesh.facesGroups:
         if part in g.name:
           groups.append(g)
@@ -152,8 +146,6 @@ class DetailTool(events3d.EventHandler):
     self.selectedGroups = groups
     
   def onMouseExited(self, event):
-    print("onMouseExited", event.group.name)
-    
     for g in self.selectedGroups:
       for f in g.faces:
         f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
@@ -308,7 +300,6 @@ class Detail3dTool(events3d.EventHandler):
       self.z.leftBefore, self.z.rightBefore,  leftAfterZ, rightAfterZ))
       
   def onMouseMoved(self, event):
-    print("onMouseMoved", event.group.name)
     human = self.app.scene3d.selectedHuman
     
     groups = []
@@ -317,7 +308,6 @@ class Detail3dTool(events3d.EventHandler):
       groups.append(event.group)
     else:
       part = human.getPartNameForGroupName(event.group.name)
-      print(part)
       for g in human.mesh.facesGroups:
         if part in g.name:
           groups.append(g)
@@ -336,9 +326,7 @@ class Detail3dTool(events3d.EventHandler):
         
     self.selectedGroups = groups
     
-  def onMouseExited(self, event):
-    print("onMouseExited", event.group.name)
-    
+  def onMouseExited(self, event):    
     for g in self.selectedGroups:
       for f in g.faces:
         f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
