@@ -40,12 +40,12 @@ class Human(gui3d.Object):
         self.childVal = 0.0 #child
         self.oldVal = 0.0  #old
         self.youngVal = 1.0
-        self.femaleVal = 0.57 #female
-        self.maleVal = 0.57  #male
-        self.flaccidVal = 0.0
-        self.muscleVal = 0.0
-        self.overweightVal = 0.0
-        self.underweightVal = 0.0
+        self.femaleVal = 0.5 #female
+        self.maleVal = 0.5  #male
+        self.flaccidVal = 0.5
+        self.muscleVal = 0.5
+        self.overweightVal = 0.5
+        self.underweightVal = 0.5
         self.childValDetails = 0.0 #child
         self.oldValDetails = 0.0  #old
         self.flaccidValDetails = 0.0
@@ -63,33 +63,33 @@ class Human(gui3d.Object):
         #while the ethnic targets are absolute.
         targetFolder = "data/targets/macrodetails"        
 
-        self.targetFemaleFlaccidChild = "%s/universal-female-child-flaccid.target"%(targetFolder)
-        self.targetFemaleFlaccidYoung = "%s/universal-female-young-flaccid.target"%(targetFolder)
-        self.targetFemaleFlaccidOld = "%s/universal-female-old-flaccid.target"%(targetFolder)
-        self.targetMaleFlaccidChild = "%s/universal-male-child-flaccid.target"%(targetFolder)
-        self.targetMaleFlaccidYoung = "%s/universal-male-young-flaccid.target"%(targetFolder)
-        self.targetMaleFlaccidOld = "%s/universal-male-old-flaccid.target"%(targetFolder)
+        self.targetFemaleFlaccidHeavyChild = "%s/universal-female-child-flaccid-heavy.target"%(targetFolder)
+        self.targetFemaleFlaccidHeavyYoung = "%s/universal-female-young-flaccid-heavy.target"%(targetFolder)
+        self.targetFemaleFlaccidHeavyOld = "%s/universal-female-old-flaccid-heavy.target"%(targetFolder)
+        self.targetMaleFlaccidHeavyChild = "%s/universal-male-child-flaccid-heavy.target"%(targetFolder)
+        self.targetMaleFlaccidHeavyYoung = "%s/universal-male-young-flaccid-heavy.target"%(targetFolder)
+        self.targetMaleFlaccidHeavyOld = "%s/universal-male-old-flaccid-heavy.target"%(targetFolder)
 
-        self.targetFemaleMuscleChild = "%s/universal-female-child-muscle.target"%(targetFolder)
-        self.targetFemaleMuscleYoung = "%s/universal-female-young-muscle.target"%(targetFolder)
-        self.targetFemaleMuscleOld = "%s/universal-female-old-muscle.target"%(targetFolder)
-        self.targetMaleMuscleChild = "%s/universal-male-child-muscle.target"%(targetFolder)
-        self.targetMaleMuscleYoung = "%s/universal-male-young-muscle.target"%(targetFolder)
-        self.targetMaleMuscleOld = "%s/universal-male-old-muscle.target"%(targetFolder)
+        self.targetFemaleFlaccidLightChild = "%s/universal-female-child-flaccid-light.target"%(targetFolder)
+        self.targetFemaleFlaccidLightYoung = "%s/universal-female-young-flaccid-light.target"%(targetFolder)
+        self.targetFemaleFlaccidLightOld = "%s/universal-female-old-flaccid-light.target"%(targetFolder)
+        self.targetMaleFlaccidLightChild = "%s/universal-male-child-flaccid-light.target"%(targetFolder)
+        self.targetMaleFlaccidLightYoung = "%s/universal-male-young-flaccid-light.target"%(targetFolder)
+        self.targetMaleFlaccidLightOld = "%s/universal-male-old-flaccid-light.target"%(targetFolder)
 
-        self.targetFemaleOverweightChild = "%s/universal-female-child-overweight.target"%(targetFolder)
-        self.targetFemaleOverweightYoung = "%s/universal-female-young-overweight.target"%(targetFolder)
-        self.targetFemaleOverweightOld = "%s/universal-female-old-overweight.target"%(targetFolder)
-        self.targetMaleOverweightChild = "%s/universal-male-child-overweight.target"%(targetFolder)
-        self.targetMaleOverweightYoung = "%s/universal-male-young-overweight.target"%(targetFolder)
-        self.targetMaleOverweightOld = "%s/universal-male-old-overweight.target"%(targetFolder)
-
-        self.targetFemaleUnderweightChild = "%s/universal-female-child-underweight.target"%(targetFolder)
-        self.targetFemaleUnderweightYoung = "%s/universal-female-young-underweight.target"%(targetFolder)
-        self.targetFemaleUnderweightOld = "%s/universal-female-old-underweight.target"%(targetFolder)
-        self.targetMaleUnderweightChild = "%s/universal-male-child-underweight.target"%(targetFolder)
-        self.targetMaleUnderweightYoung = "%s/universal-male-young-underweight.target"%(targetFolder)
-        self.targetMaleUnderweightOld = "%s/universal-male-old-underweight.target"%(targetFolder)
+        self.targetFemaleMuscleHeavyChild = "%s/universal-female-child-muscle-heavy.target"%(targetFolder)
+        self.targetFemaleMuscleHeavyYoung = "%s/universal-female-young-muscle-heavy.target"%(targetFolder)
+        self.targetFemaleMuscleHeavyOld = "%s/universal-female-old-muscle-heavy.target"%(targetFolder)
+        self.targetMaleMuscleHeavyChild = "%s/universal-male-child-muscle-heavy.target"%(targetFolder)
+        self.targetMaleMuscleHeavyYoung = "%s/universal-male-young-muscle-heavy.target"%(targetFolder)
+        self.targetMaleMuscleHeavyOld = "%s/universal-male-old-muscle-heavy.target"%(targetFolder)        
+        
+        self.targetFemaleMuscleLightChild = "%s/universal-female-child-muscle-light.target"%(targetFolder)
+        self.targetFemaleMuscleLightYoung = "%s/universal-female-young-muscle-light.target"%(targetFolder)
+        self.targetFemaleMuscleLightOld = "%s/universal-female-old-muscle-light.target"%(targetFolder)
+        self.targetMaleMuscleLightChild = "%s/universal-male-child-muscle-light.target"%(targetFolder)
+        self.targetMaleMuscleLightYoung = "%s/universal-male-young-muscle-light.target"%(targetFolder)
+        self.targetMaleMuscleLightOld = "%s/universal-male-old-muscle-light.target"%(targetFolder)        
                         
                         
     def setTexture(self, texturePath):
@@ -182,7 +182,10 @@ class Human(gui3d.Object):
 
     def setWeightVals(self,amount):
         """
-        This method applies weight attributes to the human.
+        This method set the values for the weight targets variables:
+        self.overweightVal, self.underweightVal. Note that the slider return
+        a value between -1 and 1, but both self.overweightVal, self.underweightVal
+        have a value between 0 and 1.
 
         Parameters
         ----------
@@ -191,33 +194,23 @@ class Human(gui3d.Object):
             *float*. An amount, usually between 0 and 1, specifying how much
             of the attribute to apply.
         """   
-                
-        if amount >= 0:
-            if self.overweightVal == amount and self.underweightVal == 0:
-                return 
-            self.overweightVal = amount
-            self.underweightVal = 0
-        else:
-            if self.underweightVal == -amount and self.overweightVal == 0:
-                return 
-            self.underweightVal = -amount
-            self.overweightVal = 0
+        if self.overweightVal == amount:
+            return 
+        self.overweightVal =  amount
+        self.underweightVal = 1 - amount         
     
     def setWeight(self, weight):
-        self.setWeightVals(-1 + 2 * weight)
+        self.setWeightVals(weight) #Redundant TODO: remove?
         
     def getWeight(self):
-        if self.overweightVal:
-            return 0.5 + self.overweightVal / 2.0
-        elif self.underweightVal:
-            return 0.5 - self.underweightVal / 2.0
-        else:
-            return 0.5
+        return self.overweightVal
+         
 
     def setToneVals(self, amount):
         """
-        This method applies muscle tone attributes to the human
-
+        This method set the values for the tone targets variables:
+        self.flaccidVal, self.muscleVal. 
+        
         Parameters
         ----------
 
@@ -226,27 +219,18 @@ class Human(gui3d.Object):
             of the attribute to apply.
         """  
       
-        if amount >= 0:
-            if self.muscleVal == amount and self.flaccidVal == 0:
-                return 
-            self.muscleVal = amount
-            self.flaccidVal = 0
-        else:
-            if self.flaccidVal == -amount and self.muscleVal == 0:
-                return 
-            self.flaccidVal = -amount
-            self.muscleVal = 0
+        if self.muscleVal == amount:
+            return 
+        self.muscleVal =  amount
+        self.flaccidVal = 1 - amount        
             
     def setMuscle(self, muscle):
-        self.setToneVals(-1 + 2 * muscle)
+        #setMuscle function is redundant TODO: remove it?
+        self.setToneVals(muscle)
     
-    def getMuscle(self):
-        if self.muscleVal:
-            return 0.5 + self.muscleVal / 2.0
-        elif self.flaccidVal:
-            return 0.5 - self.flaccidVal / 2.0
-        else:
-            return 0.5
+    def getMuscle(self):        
+        return self.muscleVal       
+      
             
     def setEthnic(self, ethnic, value):
         modified = None
@@ -310,33 +294,34 @@ class Human(gui3d.Object):
         #Now we apply all macro targets        
         macroTargets = {}        
 
-        macroTargets[self.targetFemaleFlaccidChild]= self.flaccidVal*self.childVal*self.femaleVal
-        macroTargets[self.targetFemaleFlaccidYoung]= self.flaccidVal*self.youngVal*self.femaleVal
-        macroTargets[self.targetFemaleFlaccidOld]= self.flaccidVal*self.oldVal*self.femaleVal
-        macroTargets[self.targetMaleFlaccidChild]= self.flaccidVal*self.childVal*self.maleVal
-        macroTargets[self.targetMaleFlaccidYoung]= self.flaccidVal*self.youngVal*self.maleVal
-        macroTargets[self.targetMaleFlaccidOld]= self.flaccidVal*self.oldVal*self.maleVal
+        macroTargets[self.targetFemaleFlaccidHeavyChild]= self.flaccidVal*self.overweightVal*self.childVal*self.femaleVal
+        macroTargets[self.targetFemaleFlaccidHeavyYoung]= self.flaccidVal*self.overweightVal*self.youngVal*self.femaleVal
+        macroTargets[self.targetFemaleFlaccidHeavyOld]= self.flaccidVal*self.overweightVal*self.oldVal*self.femaleVal
+        macroTargets[self.targetMaleFlaccidHeavyChild]= self.flaccidVal*self.overweightVal*self.childVal*self.maleVal
+        macroTargets[self.targetMaleFlaccidHeavyYoung]= self.flaccidVal*self.overweightVal*self.youngVal*self.maleVal
+        macroTargets[self.targetMaleFlaccidHeavyOld]= self.flaccidVal*self.overweightVal*self.oldVal*self.maleVal
 
-        macroTargets[self.targetFemaleMuscleChild]= self.muscleVal*self.childVal*self.femaleVal
-        macroTargets[self.targetFemaleMuscleYoung]= self.muscleVal*self.youngVal*self.femaleVal
-        macroTargets[self.targetFemaleMuscleOld]= self.muscleVal*self.oldVal*self.femaleVal
-        macroTargets[self.targetMaleMuscleChild]= self.muscleVal*self.childVal*self.maleVal
-        macroTargets[self.targetMaleMuscleYoung]= self.muscleVal*self.youngVal*self.maleVal
-        macroTargets[self.targetMaleMuscleOld]= self.muscleVal*self.oldVal*self.maleVal
+        macroTargets[self.targetFemaleFlaccidLightChild]= self.flaccidVal*self.underweightVal*self.childVal*self.femaleVal
+        macroTargets[self.targetFemaleFlaccidLightYoung]= self.flaccidVal*self.underweightVal*self.youngVal*self.femaleVal
+        macroTargets[self.targetFemaleFlaccidLightOld]= self.flaccidVal*self.underweightVal*self.oldVal*self.femaleVal
+        macroTargets[self.targetMaleFlaccidLightChild]= self.flaccidVal*self.underweightVal*self.childVal*self.maleVal
+        macroTargets[self.targetMaleFlaccidLightYoung]= self.flaccidVal*self.underweightVal*self.youngVal*self.maleVal
+        macroTargets[self.targetMaleFlaccidLightOld]= self.flaccidVal*self.underweightVal*self.oldVal*self.maleVal
 
-        macroTargets[self.targetFemaleOverweightChild]= self.overweightVal*self.childVal*self.femaleVal
-        macroTargets[self.targetFemaleOverweightYoung]= self.overweightVal*self.youngVal*self.femaleVal
-        macroTargets[self.targetFemaleOverweightOld]= self.overweightVal*self.oldVal*self.femaleVal
-        macroTargets[self.targetMaleOverweightChild]= self.overweightVal*self.childVal*self.maleVal
-        macroTargets[self.targetMaleOverweightYoung]= self.overweightVal*self.youngVal*self.maleVal
-        macroTargets[self.targetMaleOverweightOld]= self.overweightVal*self.oldVal*self.maleVal
+        macroTargets[self.targetFemaleMuscleHeavyChild]= self.muscleVal*self.overweightVal*self.childVal*self.femaleVal
+        macroTargets[self.targetFemaleMuscleHeavyYoung]= self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal
+        macroTargets[self.targetFemaleMuscleHeavyOld]= self.muscleVal*self.overweightVal*self.oldVal*self.femaleVal
+        macroTargets[self.targetMaleMuscleHeavyChild]= self.muscleVal*self.overweightVal*self.childVal*self.maleVal
+        macroTargets[self.targetMaleMuscleHeavyYoung]= self.muscleVal*self.overweightVal*self.youngVal*self.maleVal
+        macroTargets[self.targetMaleMuscleHeavyOld]= self.muscleVal*self.overweightVal*self.oldVal*self.maleVal
 
-        macroTargets[self.targetFemaleUnderweightChild]= self.underweightVal*self.childVal*self.femaleVal
-        macroTargets[self.targetFemaleUnderweightYoung]= self.underweightVal*self.youngVal*self.femaleVal
-        macroTargets[self.targetFemaleUnderweightOld]= self.underweightVal*self.oldVal*self.femaleVal
-        macroTargets[self.targetMaleUnderweightChild]= self.underweightVal*self.childVal*self.maleVal
-        macroTargets[self.targetMaleUnderweightYoung]= self.underweightVal*self.youngVal*self.maleVal
-        macroTargets[self.targetMaleUnderweightOld]= self.underweightVal*self.oldVal*self.maleVal
+        macroTargets[self.targetFemaleMuscleLightChild]= self.muscleVal*self.underweightVal*self.childVal*self.femaleVal
+        macroTargets[self.targetFemaleMuscleLightYoung]= self.muscleVal*self.underweightVal*self.youngVal*self.femaleVal
+        macroTargets[self.targetFemaleMuscleLightOld]= self.muscleVal*self.underweightVal*self.oldVal*self.femaleVal
+        macroTargets[self.targetMaleMuscleLightChild]= self.muscleVal*self.underweightVal*self.childVal*self.maleVal
+        macroTargets[self.targetMaleMuscleLightYoung]= self.muscleVal*self.underweightVal*self.youngVal*self.maleVal
+        macroTargets[self.targetMaleMuscleLightOld]= self.muscleVal*self.underweightVal*self.oldVal*self.maleVal
+                 
 
         for k in macroTargets.keys():
             tVal = macroTargets[k]
