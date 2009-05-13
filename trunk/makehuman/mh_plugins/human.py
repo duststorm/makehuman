@@ -599,12 +599,12 @@ class Human(gui3d.Object):
         self.childVal = 0.0 
         self.youngVal = 1.0
         self.oldVal = 0.0
-        self.femaleVal = 0.57
-        self.maleVal = 0.57
-        self.flaccidVal = 0.0
-        self.muscleVal = 0.0
-        self.overweightVal = 0.0
-        self.underweightVal = 0.0 
+        self.femaleVal = 0.5
+        self.maleVal = 0.5
+        self.flaccidVal = 0.5
+        self.muscleVal = 0.5
+        self.overweightVal = 0.5
+        self.underweightVal = 0.5 
         
         self.activeEthnicSets = {}
         self.targetsEthnicStack = {"neutral":1.0}  
