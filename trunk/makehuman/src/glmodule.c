@@ -437,17 +437,8 @@ void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
 void mhGetPickedCoords(int x, int y)
 {
     double modelview[16], projection[16];
-    float z;
     GLint viewport[4];
-    glGetIntegerv( GL_VIEWPORT, viewport );
-
-    /*Getting mouse coords in 3D scene, using z value from glReadPixels*/
-    mhSceneCameraPosition();/*Applying scene matrix*/
-    glGetDoublev( GL_PROJECTION_MATRIX, projection );
-    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-    glReadPixels( x, viewport[3]-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
-    gluUnProject( x, viewport[3]-y, z, modelview,
-                  projection, viewport, &G.mouse3DX, &G.mouse3DY, &G.mouse3DZ );
+    glGetIntegerv(GL_VIEWPORT, viewport);
 
     /*Getting mouse 3D coords on the GUI plane, using a fixed z value.
     Assuming we use a 3D cursor in scene, with coords (x,y,9.5).
@@ -456,11 +447,10 @@ void mhGetPickedCoords(int x, int y)
     precalculated value.
     */
     mhGUICameraPosition();/*Applying GUI matrix*/
-    glGetDoublev( GL_PROJECTION_MATRIX, projection );
-    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-    z = 0.800801f;
-    gluUnProject( x, viewport[3]-y, z, modelview,
-                  projection, viewport, &G.mouseGUIX, &G.mouseGUIY, &G.mouseGUIZ );
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    gluUnProject(x, viewport[3]-y, 0.800801f, modelview,
+      projection, viewport, &G.mouseGUIX, &G.mouseGUIY, &G.mouseGUIZ);
 }
 
 /** \brief Retrieve the 'selected' color index for the specified coordinates.
@@ -549,7 +539,7 @@ void mhConvertToScreen(double world[3], double screen[3], int camera)
   screen[1] = viewport[3] - screen[1];
 }
 
-/** \brief Convert screen coordinates to 2D OpenGL world coordinates.
+/** \brief Convert 2D (x, y) screen coordinates to OpenGL world coordinates.
  *  \param screen a list of doubles that will contain the screen coordinates.
  *  \param world a list of doubles containing the 3D OpenGL world coordinates.
  *  \param camera an int indicating the camera mode (1=Scene or 0=GUI).
@@ -577,7 +567,7 @@ void mhConvertToWorld2D(double screen[2], double world[3], int camera)
   gluUnProject(screen[0], viewport[3] - screen[1], z, modelview, projection, viewport, world, world + 1, world + 2);
 }
 
-/** \brief Convert screen coordinates to 3D OpenGL world coordinates.
+/** \brief Convert 3D (x, y, depth) screen coordinates to 3D OpenGL world coordinates.
  *  \param screen a list of doubles that will contain the screen coordinates.
  *  \param world a list of doubles containing the 3D OpenGL world coordinates.
  *  \param camera an int indicating the camera mode (1=Scene or 0=GUI).

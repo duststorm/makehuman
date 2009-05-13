@@ -213,7 +213,14 @@ static PyObject* mh_getMousePos2D(PyObject *self, PyObject *args)
  */
 static PyObject* mh_getMousePos3D(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("[d,d,d]", G.mouse3DX, G.mouse3DY, G.mouse3DZ);
+    int x, y;
+    double screen[2];
+    double world[3];
+    SDL_GetMouseState(&x, &y);
+    screen[0] = x;
+    screen[1] = y;
+    mhConvertToWorld2D(screen, world, 1);
+    return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
 }
 
 /** \brief Get the current mouse x, y, z cursor position in the 3D GUI.
