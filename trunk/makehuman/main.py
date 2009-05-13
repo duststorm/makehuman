@@ -199,3 +199,6 @@ class MHApplication(gui3d.Application):
 application = MHApplication()
 mainScene = application.scene3d # HACK: Don't remove this, it is needed to receive events from C
 application.start()
+
+#import cProfile
+#cProfile.run('application.start()')

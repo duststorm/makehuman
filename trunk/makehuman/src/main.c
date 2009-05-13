@@ -648,10 +648,28 @@ static PyObject* mh_setObjScale(PyObject *self, PyObject *args)
 static PyObject* mh_setVisibility(PyObject *self, PyObject *args)
 {
     int objIdx;
-    int visib;
-    if (!PyArg_ParseTuple(args, "ii", &objIdx, &visib))
+    int visible;
+    if (!PyArg_ParseTuple(args, "ii", &objIdx, &visible))
         return NULL;
-    else if (!setVisibility(objIdx, visib))
+    else if (!setVisibility(objIdx, visible))
+        return NULL;
+    else
+        return Py_BuildValue("");
+}
+
+/** \brief Set the pickable of an object.
+ *
+ *  This function sets the pickable of a specified object by passing it
+ *  into OpenGL.
+ *  It returns a null value.
+ */
+static PyObject* mh_setPickable(PyObject *self, PyObject *args)
+{
+    int objIdx;
+    int pickable;
+    if (!PyArg_ParseTuple(args, "ii", &objIdx, &pickable))
+        return NULL;
+    else if (!setPickable(objIdx, pickable))
         return NULL;
     else
         return Py_BuildValue("");
@@ -752,6 +770,7 @@ static PyMethodDef EmbMethods[] =
     {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
     {"setText", mh_setText, METH_VARARGS, ""},
     {"setVisibility", mh_setVisibility, METH_VARARGS, ""},
+    {"setPickable", mh_setPickable, METH_VARARGS, ""},
     {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
     {"setColorCoord", mh_setColorCoord, METH_VARARGS, ""},
     {"setColorCoord2", mh_setColorCoord2, METH_VARARGS, ""},

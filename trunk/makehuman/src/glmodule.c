@@ -852,7 +852,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
     {
         if (G.world[i].inMovableCamera == cameraType)
         {
-            if (G.world[i].isVisible)
+            if (G.world[i].isVisible && (!pickMode || G.world[i].isPickable))
             {
                 //printf("draw obj n %i\n",G.world[i].nVerts/3);
                 /*Transform the current object*/

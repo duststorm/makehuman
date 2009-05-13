@@ -532,6 +532,7 @@ class Object3D:
         self.facesGroups = []
         self.cameraMode = 1
         self.visibility = 1
+        self.pickable = 1
         self.texture = None
         #self.colors = []
         self.isSelected = None
@@ -622,7 +623,7 @@ class Object3D:
         except IndexError, text:
             print(text)
 
-    def setVisibility(self,visib):
+    def setVisibility(self,visible):
         """
         This method sets the visibility of the object.
 
@@ -630,11 +631,27 @@ class Object3D:
         ----------
 
         visib:
-            *int flag*. Whether or not the object is visible. 0=Visible, 1=Invisible.
+            *int flag*. Whether or not the object is visible. 1=Visible, 0=Invisible.
         """
-        self.visibility = visib
+        self.visibility = visible
         try:
-            mh.setVisibility(self.idx, visib)
+            mh.setVisibility(self.idx, visible)
+        except IndexError, text:
+            print(text)
+            
+    def setPickable(self,pickable):
+        """
+        This method sets the pickable flag of the object.
+
+        Parameters
+        ----------
+
+        visib:
+            *int flag*. Whether or not the object is pickable. 0=not pickable, 1=pickable.
+        """
+        self.pickable = pickable
+        try:
+            mh.setPickable(self.idx, pickable)
         except IndexError, text:
             print(text)
 
@@ -1156,6 +1173,7 @@ class Scene3D:
             mh.setObjRotation(obj.idx, obj.rx, obj.ry, obj.rz)
             mh.setObjScale(obj.idx, obj.sx, obj.sy, obj.sz)
             mh.setVisibility(obj.idx, obj.visibility)
+            mh.setPickable(obj.idx, obj.pickable)
             mh.setCameraMode(obj.idx,obj.cameraMode)
             mh.setText(obj.idx, obj.text)
             #TODO add all obj attributes

@@ -41,6 +41,8 @@ struct object3D
     /**<        An int defining whether this object is currently visible or not.            */
     int inMovableCamera;        /**< \brief Whether this object uses the Movable or Fixed camera mode.                  */
     /**<        An int defining whether this object uses the Movable or Fixed camera mode.  */
+    int isPickable;             /**< \brief Whether this object can be picked.                                          */
+    /**<        An int defining whether this object can be picked.                          */
     float location[3];          /**< \brief Tthe object location.                                                       */
     /**<        Array of 3 floats defining the object location (x,y,z).                     */
     float rotation[3];          /**< \brief The object orientation.                                                     */
@@ -167,7 +169,8 @@ int setObjTexture(int objIndex, unsigned int texture);
 int setShadeless(int objIndex, int value);
 int setColorIDComponent(int objIndex, int nIdx, unsigned char r, unsigned char g, unsigned char b);
 int setColorComponent(int objIndex, int nIdx, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-int setVisibility (int objIndex, int visibility);
+int setVisibility(int objIndex, int visibility);
+int setPickable(int objIndex, int visibility);
 int setText(int objIndex, const char *objText);
 int setCamMode(int objIndex, int camMode);
 int setObjLoc(int objIndex, float locX, float locY, float locZ);

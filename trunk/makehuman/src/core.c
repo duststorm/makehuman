@@ -215,6 +215,7 @@ void addObject(int objIndex, float locX, float locY,float locZ,
         G.world[objIndex].location[1] = locY;
         G.world[objIndex].location[2] = locZ;
         G.world[objIndex].isVisible = 1;
+        G.world[objIndex].isPickable = 1;
         G.world[objIndex].rotation[0] = 0.0;
         G.world[objIndex].rotation[1] = 0.0;
         G.world[objIndex].rotation[2] = 0.0;
@@ -436,6 +437,28 @@ int setVisibility (int objIndex, int visibility)
     }
 
     G.world[objIndex].isVisible = visibility;
+    return 1;
+}
+
+/** \brief Sets a pickable flag for this object in G.world.
+ *  \param objIndex an int containing the index of the 3D object that contains this face.
+ *  \param pickable an int used as a flag to indicate whether this object is pickable or not.
+ *
+ *  This function sets the pickable flag for this G.world object.
+ *  This function is called by the setPickable Python function via the mh_setPickable function in main.c.
+ */
+int setPickable(int objIndex, int pickable)
+{
+    if (!G.world)
+        return 1;
+
+    if (objIndex < 0 || objIndex >= G.nObjs)
+    {
+        PyErr_Format(PyExc_IndexError, "index out of range, %i is not between 0 and %i", objIndex, G.nObjs);
+        return 0;
+    }
+
+    G.world[objIndex].isPickable = pickable;
     return 1;
 }
 
