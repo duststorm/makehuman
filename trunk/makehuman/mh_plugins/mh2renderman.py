@@ -661,9 +661,12 @@ def saveScene(scene, fName, ribDir, engine):
     ribfile.close()
     
     if engine == "aqsis":  
-        os.system('%s %s &'%('aqsis', fName))
+        #os.system('%s %s &'%('aqsis', fName))
+        command = '%s %s'%('aqsis', fName)        
     if engine == "pixie":  
-        os.system('%s %s &'%('rndr', fName))
+        command = '%s %s'%('rndr', fName)
+    print "COMMAND",command    
+    subprocess.Popen(command, shell=True)
     
    
 

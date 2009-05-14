@@ -454,7 +454,7 @@ class Slider(View):
     self.background = Object(self, "data/3dobjs/button_gender.obj",
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/button_about.obj",
-      texture = sliderTexture, position = [position[0], position[1], position[2] + 0.1])
+      texture = sliderTexture, position = [position[0], position[1], position[2] + 0.01])
     self.setValue(value)
     
   def setValue(self, value):

@@ -44,7 +44,7 @@ class ProgressBar:
         self.bar.setCameraProjection(0)
         self.bar.setVisibility(1)
         self.background.setLoc(0.0, -0.20, 9.1)
-        self.bar.setLoc(-0.08, -0.18, 9.2)
+        self.bar.setLoc(-0.08, -0.178, 9.2)
         self.background.setTexture("data/images/progressbar_background.png")
         self.background.setShadeless(1)
         self.bar.setTexture("data/images/progressbar.png")

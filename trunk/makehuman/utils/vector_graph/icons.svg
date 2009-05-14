@@ -1395,15 +1395,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.0506814"
-     inkscape:cx="313.48672"
-     inkscape:cy="917.84187"
+     inkscape:cx="396.50509"
+     inkscape:cy="815.28145"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1053"
      inkscape:window-height="737"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-x="22"
+     inkscape:window-y="29"
      showguides="true"
      inkscape:guide-bbox="true"
      guidetolerance="10000"
@@ -8014,5 +8014,36 @@
        inkscape:export-filename="/home/urfaust/archive/archive_makehuman/makehuman_src/data/images/slider.png"
        inkscape:export-xdpi="184.12616"
        inkscape:export-ydpi="184.12616" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;fill-opacity:1;stroke:#20262f;stroke-width:1.33496237;stroke-miterlimit:4;stroke-dasharray:4.00488706, 1.33496234;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3416"
+       sodipodi:cx="461.99588"
+       sodipodi:cy="237.04468"
+       sodipodi:rx="9.2155743"
+       sodipodi:ry="9.2155743"
+       d="M 471.21145,237.04468 A 9.2155743,9.2155743 0 1 1 452.78031,237.04468 A 9.2155743,9.2155743 0 1 1 471.21145,237.04468 z"
+       transform="matrix(0.4162833,0,0,0.4162833,182.20005,128.66454)"
+       inkscape:export-filename="C:\Documents and Settings\Segreteria\Desktop\makehuman\data\images\cursor.png"
+       inkscape:export-xdpi="254.72513"
+       inkscape:export-ydpi="254.72513" />
+    <rect
+       style="fill:none;stroke:none;stroke-width:0.80000001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4188"
+       width="22.612623"
+       height="22.612623"
+       x="363.2149"
+       y="216.03596"
+       ry="4.3192654"
+       inkscape:export-filename="C:\Documents and Settings\Segreteria\Desktop\makehuman\data\images\cursor.png"
+       inkscape:export-xdpi="254.72513"
+       inkscape:export-ydpi="254.72513" />
+    <path
+       inkscape:export-ydpi="246.02075"
+       inkscape:export-xdpi="246.02075"
+       inkscape:export-filename="/home/urfaust/makehuman/data/images/ethincr.png"
+       id="path4190"
+       d="M 361.99901,259.37799 L 361.99901,263.03424 L 358.34276,263.03424 L 358.34276,269.22174 L 361.99901,269.22174 L 361.99901,272.87799 L 368.18651,272.87799 L 368.18651,269.22174 L 371.84276,269.22174 L 371.84276,263.03424 L 368.18651,263.03424 L 368.18651,259.37799 L 361.99901,259.37799 z"
+       style="fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:0.60332555;stroke-miterlimit:4;stroke-opacity:1" />
   </g>
 </svg>
