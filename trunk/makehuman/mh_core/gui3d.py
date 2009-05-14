@@ -455,12 +455,14 @@ class Slider(View):
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/button_about.obj",
       texture = sliderTexture, position = [position[0], position[1], position[2] + 0.01])
+    self.sliderMinX = -0.5;
+    self.sliderMaxX = -0.39;
     self.setValue(value)
     
   def setValue(self, value):
     self.__value = min(1, max(0, value))
     sliderPos = self.slider.getPosition()
-    sliderPos[0] = self.__value * (0.45 - 0.365) - 0.45
+    sliderPos[0] = self.__value * (self.sliderMaxX - self.sliderMinX) + self.sliderMinX
     self.slider.setPosition(sliderPos)
     
   def getValue(self):
@@ -470,16 +472,16 @@ class Slider(View):
     sliderPos = self.slider.getPosition()
     screenPos = self.app.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
     worldPos = self.app.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
-    sliderPos[0] = min(-0.365, max(-0.45, worldPos[0]))
+    sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
     self.slider.setPosition(sliderPos)
     
   def onMouseUp(self, event):
     sliderPos = self.slider.getPosition()
     screenPos = self.app.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
     worldPos = self.app.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
-    sliderPos[0] = min(-0.365, max(-0.45, worldPos[0]))
+    sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
     self.slider.setPosition(sliderPos)
-    self.value = (sliderPos[0] + 0.45) / (0.45 - 0.365)
+    self.value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
     print(self.value)
     self.callEvent("onChange", self.value)
     
