@@ -156,7 +156,6 @@ class Human(gui3d.Object):
             *float*. An amount, usually between 0 and 1, specifying how much
             of the attribute to apply.
         """     
-        
         if amount >= 0:
             if self.oldVal == amount and self.childVal == 0:
                 return 
@@ -180,7 +179,7 @@ class Human(gui3d.Object):
         else:
             return 0.5
 
-    def setWeightVals(self,amount):
+    def setWeight(self,weight):
         """
         This method set the values for the weight targets variables:
         self.overweightVal, self.underweightVal. Note that the slider return
@@ -194,19 +193,16 @@ class Human(gui3d.Object):
             *float*. An amount, usually between 0 and 1, specifying how much
             of the attribute to apply.
         """   
-        if self.overweightVal == amount:
+        if self.overweightVal == weight:
             return 
-        self.overweightVal =  amount
-        self.underweightVal = 1 - amount         
-    
-    def setWeight(self, weight):
-        self.setWeightVals(weight) #Redundant TODO: remove?
+        self.overweightVal =  weight
+        self.underweightVal = 1 - weight
         
     def getWeight(self):
         return self.overweightVal
          
 
-    def setToneVals(self, amount):
+    def setMuscle(self, muscle):
         """
         This method set the values for the tone targets variables:
         self.flaccidVal, self.muscleVal. 
@@ -219,14 +215,10 @@ class Human(gui3d.Object):
             of the attribute to apply.
         """  
       
-        if self.muscleVal == amount:
+        if self.muscleVal == muscle:
             return 
-        self.muscleVal =  amount
-        self.flaccidVal = 1 - amount        
-            
-    def setMuscle(self, muscle):
-        #setMuscle function is redundant TODO: remove it?
-        self.setToneVals(muscle)
+        self.muscleVal =  muscle
+        self.flaccidVal = 1 - muscle
     
     def getMuscle(self):        
         return self.muscleVal       

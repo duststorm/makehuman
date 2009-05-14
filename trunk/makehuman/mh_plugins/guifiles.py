@@ -50,14 +50,10 @@ class SaveTaskView(gui3d.TaskView):
       f.write("# Written by makehuman 1.0.0 alpha 2\n")
       f.write("version 1.0.0\n")
       f.write("tags %s\n" %(tags))
-      f.write("female %f\n" %(human.femaleVal))
-      f.write("male %f\n" %(human.maleVal))
-      f.write("child %f\n" %(human.childVal))
-      f.write("old %f\n" %(human.oldVal))
-      f.write("flaccid %f\n" %(human.flaccidVal))
-      f.write("muscle %f\n" %(human.muscleVal))
-      f.write("overweight %f\n" %(human.overweightVal))
-      f.write("underweight %f\n" %(human.underweightVal))
+      f.write("gender %f\n" %(human.getGender()))
+      f.write("age %f\n" %(human.getAge()))
+      f.write("muscle %f\n" %(human.getMuscle()))
+      f.write("weight %f\n" %(human.getWeight()))
       for (target, value) in human.targetsEthnicStack.iteritems():
           f.write("ethnic %s %f\n" %(target, value))
               
@@ -112,22 +108,14 @@ class LoadTaskView(gui3d.TaskView):
               elif lineData[0] == "tags":
                   for tag in lineData:
                     print("Tag " + tag)
-              elif lineData[0] == "female":
-                  human.femaleVal = float(lineData[1])
-              elif lineData[0] == "male":
-                  human.maleVal = float(lineData[1])  
-              elif lineData[0] == "child":
-                  human.childVal = float(lineData[1])
-              elif lineData[0] == "old":
-                  human.oldVal = float(lineData[1])      
-              elif lineData[0] == "flaccid":
-                  human.flaccidVal = float(lineData[1])
+              elif lineData[0] == "gender":
+                  human.setGender(float(lineData[1]))
+              elif lineData[0] == "age":
+                  human.setAge(float(lineData[1]))
               elif lineData[0] == "muscle":
-                  human.muscleVal = float(lineData[1])
-              elif lineData[0] == "overweight":
-                  human.overweightVal = float(lineData[1])
-              elif lineData[0] == "underweight":
-                  human.underweightVal = float(lineData[1])
+                  human.setMuscle(float(lineData[1]))
+              elif lineData[0] == "weight":
+                  human.setWeight(float(lineData[1]))
               elif lineData[0] == "ethnic":
                   human.targetsEthnicStack[lineData[1]] = float(lineData[2])
               elif lineData[0] == "detail":
@@ -144,6 +132,8 @@ class LoadTaskView(gui3d.TaskView):
       self.app.categories["modelling"].tasksByName["Macro modelling"].syncEthnics()
               
       human.applyAllTargets()
+      del self.app.undoStack[:]
+      del self.app.redoStack[:]
       
       self.app.switchCategory("modelling")
       self.app.scene3d.redraw(1)
