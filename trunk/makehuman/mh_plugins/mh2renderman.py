@@ -25,7 +25,7 @@ __docformat__ = 'restructuredtext'
 import os
 import aljabr
 import files3d
-
+import subprocess
 
 def writePolyObj(fileName, mesh, referenceFile = None): 
     """
