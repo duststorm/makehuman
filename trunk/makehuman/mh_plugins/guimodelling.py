@@ -56,10 +56,10 @@ class ModellingCategory(gui3d.Category):
     # Zoom the camera
     def onMouseWheel(self, event):
       if event.wheelDelta > 0:
-        self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() + 0.65)
+        self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() - 0.65)
         self.app.scene3d.redraw()
       else:
-        self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() - 0.65)
+        self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() + 0.65)
         self.app.scene3d.redraw()
         
     def onKeyDown(self, event):
