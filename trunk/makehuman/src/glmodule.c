@@ -341,7 +341,8 @@ void mhMouseButtonDown(int b, int x, int y)
     mhGetPickedCoords(x,y);
 
     // Check which object/group was hit
-    mhGetPickedColor(x, y);
+    if (b != 4 && b != 5)
+      mhGetPickedColor(x, y);
 
     // Notify python
     callMouseButtonDown(b, x, y);
@@ -382,7 +383,8 @@ void mhMouseButtonUp(int b, int x, int y)
     mhGetPickedCoords(x,y);
 
     // Check which object/group was hit
-    mhGetPickedColor(x, y);
+    if (b != 4 && b != 5)
+      mhGetPickedColor(x, y);
 
     // Notify python
     callMouseButtonUp(b, x, y);
@@ -416,7 +418,8 @@ void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
     mhGetPickedCoords(x,y);
 
     // Check which object/group was hit
-    mhGetPickedColor(x, y);
+    if (!s)
+      mhGetPickedColor(x, y);
 
     // Notify python
     callMouseMotion(s, x, y, xrel, yrel);
