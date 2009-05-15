@@ -484,6 +484,8 @@ void mhGetPickedColor(int x, int y)
     // Viewport declaration (required before other expressions)
     GLint viewport[4];
 
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
     // Turn off lighting
     glDisable(GL_LIGHTING);
 
@@ -492,6 +494,8 @@ void mhGetPickedColor(int x, int y)
     glDisable(GL_MULTISAMPLE);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glScissor(x - 1, viewport[3] - (y + 1), 3, 3);
+    glEnable(GL_SCISSOR_TEST);
 
     // draw the objects in static camera
     mhGUICameraPosition();
@@ -501,13 +505,12 @@ void mhGetPickedColor(int x, int y)
     mhSceneCameraPosition();
     mhDrawMeshes(1, 1);
 
-    // get color information from frame buffer
-    glGetIntegerv(GL_VIEWPORT, viewport);
+    glDisable(GL_SCISSOR_TEST);
 
     /* Reading the unique object color ID */
     glReadPixels(x, viewport[3] - y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, G.color_picked);
 
-	// Turn on antialiasing
+	  // Turn on antialiasing
     glEnable (GL_BLEND);
     glEnable(GL_MULTISAMPLE);
 
