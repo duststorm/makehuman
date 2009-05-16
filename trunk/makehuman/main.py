@@ -44,8 +44,12 @@ specific Python modules.
 
 __docformat__ = 'restructuredtext'
 
+import sys
+if 'nt' in sys.builtin_module_names:
+    sys.path.append("./pythonmodules")
 import mh
-import sys, os, subprocess
+import os
+import subprocess
 import webbrowser
 
 sys.path.append("./")
