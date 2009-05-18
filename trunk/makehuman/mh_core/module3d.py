@@ -494,11 +494,6 @@ class Object3D:
         - **self.isSelected**: *int flag* A flag to indicate whether this object is currently selected.
         - **self.faceGroupSelected**: *string* The name of actually selected face group.
         - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
-        - **self.lMousePressedCallBack**:
-        - **self.rMousePressedCallBack**:
-        - **self.lMouseReleasedCallBack**:
-        - **self.rMouseReleasedCallBack**:
-        - **self.mouseMotionCallBack**:
         - **self.isSubdivided**: *int flag* A flag to indicate whether this object is subdivided or not.
         - **self.indexBuffer**: *faces list* The list of faces as indices to the vertexbuffer.
         - **self.vertexBufferSize**: *int* size in vertices of the vertexbuffer.
@@ -538,21 +533,11 @@ class Object3D:
         self.isSelected = None
         self.faceGroupSelected = None
         self.shadeless = 0
-        self.lMousePressedCallBack = None
-        self.rMousePressedCallBack = None
-        self.lMouseReleasedCallBack = None
-        self.rMouseReleasedCallBack = None
-        self.mouseWheelUpCallBack = None
-        self.mouseWheelDownCallBack = None
-        self.mouseMotionCallBack = None
         self.isSubdivided = None
         self.indexBuffer = []
         self.vertexBufferSize = None
         self.uvValues = None
         self.text = ""
-
-    #def runCallback(self):
-    #    self.callBack()
 
     def setLoc(self,locx,locy,locz):
         """
@@ -958,24 +943,6 @@ class Scene3D:
         - **self.faceGroupColorID**: *Dictionary of colors IDs* A dictionary of the color IDs used for
           selection (see MakeHuman Selectors, above).
         - **self.colorID**: *float list* A progressive color ID.
-        - **self.sceneLMousePressedCallBack**: *function* Event handling function. Initially None.
-        - **self.sceneRMousePressedCallBack**: *function* Event handling function. Initially None.
-        - **self.sceneLMouseReleasedCallBack**: *function* Event handling function. Initially None.
-        - **self.sceneRMouseReleasedCallBack**: *function* Event handling function. Initially None.
-        - **self.sceneMouseWheelUpCallBack**: *function* Event handling function. Initially None.
-        - **self.sceneMouseWheelDownCallBack**: *function* Event handling function. Initially None.
-        - **self.sceneMouseMotionCallback**: *function* Event handling function. Initially None.
-        - **self.sceneMousePassiveMotionCallback**: *function* Event handling function. Initially None.
-        - **self.sceneKeyboardCallback**: *function* Event handling function. Initially None.
-        - **self.sceneUpArrowCallback**: *function* Event handling function. Initially None.
-        - **self.sceneDownArrowCallback**: *function* Event handling function. Initially None.
-        - **self.sceneLeftArrowCallback**: *function* Event handling function. Initially None.
-        - **self.sceneRightArrowCallback**: *function* Event handling function. Initially None.
-        - **self.sceneLCTRLCallback**: *function* Event handling function. Initially None.
-        - **self.sceneRCTRLCallback**: *function* Event handling function. Initially None.
-        - **self.sceneLSHIFTCallback**: *function* Event handling function. Initially None.
-        - **self.sceneRSHIFTCallback**: *function* Event handling function. Initially None.
-        - **self.sceneLALTCallback**: *function* Event handling function. Initially None.
         - **self.sceneTimerCallback**: *function* Event handling function. Initially None.
         - **self.keyboardEventsDict**: *array* Dictionary of keyboard events. Initially empty.
         - **self.keyPressed**: *function* Event handling function. Initially None.
@@ -985,33 +952,6 @@ class Scene3D:
         - **self.mouseY**: *int* Mouse position Y value. Initially 0.
         - **self.mouseXRel**: *int* Mouse released position X value. Initially 0.
         - **self.mouseYRel**: *int* Mouse released position Y value. Initially 0.
-        - **self.KP0**: *int* Key code 256.
-        - **self.KP1**: *int* Key code 257.
-        - **self.KP2**: *int* Key code 258.
-        - **self.KP3**: *int* Key code 259.
-        - **self.KP4**: *int* Key code 260.
-        - **self.KP5**: *int* Key code 261.
-        - **self.KP6**: *int* Key code 262.
-        - **self.KP7**: *int* Key code 263.
-        - **self.KP8**: *int* Key code 264.
-        - **self.KP9**: *int* Key code 265.
-        - **self.KP_PERIOD**: *int* Key code 266.
-        - **self.KP_DIVIDE**: *int* Key code 267.
-        - **self.KP_MULTIPLY**: *int* Key code 268.
-        - **self.KP_MINUS**: *int* Key code 269.
-        - **self.KP_PLUS**: *int* Key code 270.
-        - **self.KP_ENTER**: *int* Key code 271.
-        - **self.KP_EQUALS**: *int* Key code 272.
-        - **self.UP_ARROW**: *int* Key code 273.
-        - **self.DOWN_ARROW**: *int* Key code 274
-        - **self.LEFT_ARROW**: *int* Key code 276.
-        - **self.RIGHT_ARROW**: *int* Key code 275.
-        - **self.RIGHT_SHIFT**: *int* Key code 303.
-        - **self.LEFT_SHIFT**: *int* Key code 304.
-        - **self.RIGHT_CTRL**: *int* Key code 305.
-        - **self.LEFT_CTRL**: *int* Key code 306.
-        - **self.RIGHT_ALT**: *int* Key code 307.
-        - **self.LEFT_ALT**: *int* Key code 308.
         
         The attributes *self.colorID* and *self.faceGroupColorID*
         support a technique called *Selection Using Unique Color IDs* to make each
@@ -1028,24 +968,6 @@ class Scene3D:
         self.objects = []
         self.faceGroupColorID = {}
         self.colorID = [0,0,0]
-        self.sceneLMousePressedCallBack = None
-        self.sceneRMousePressedCallBack = None
-        self.sceneLMouseReleasedCallBack = None
-        self.sceneRMouseReleasedCallBack = None
-        self.sceneMouseWheelUpCallBack = None
-        self.sceneMouseWheelDownCallBack = None
-        self.sceneMouseMotionCallback = None
-        self.sceneMousePassiveMotionCallback = None
-        self.sceneKeyboardCallback = None
-        self.sceneUpArrowCallback = None
-        self.sceneDownArrowCallback = None
-        self.sceneLeftArrowCallback = None
-        self.sceneRightArrowCallback = None
-        self.sceneLCTRLCallback = None
-        self.sceneRCTRLCallback = None
-        self.sceneLSHIFTCallback = None
-        self.sceneRSHIFTCallback = None
-        self.sceneLALTCallback = None
         self.sceneTimerCallback = None
         self.keyboardEventsDict = {}
         self.keyPressed = None
@@ -1055,34 +977,6 @@ class Scene3D:
         self.mouseY = 0
         self.mouseXRel = 0
         self.mouseYRel = 0
-        self.KP_RETURN = 13
-        self.KP0 = 256
-        self.KP1 = 257
-        self.KP2 = 258
-        self.KP3 = 259
-        self.KP4 = 260
-        self.KP5 = 261
-        self.KP6 = 262
-        self.KP7 = 263
-        self.KP8 = 264
-        self.KP9 = 265
-        self.KP_PERIOD = 266
-        self.KP_DIVIDE = 267
-        self.KP_MULTIPLY = 268
-        self.KP_MINUS = 269
-        self.KP_PLUS = 270
-        self.KP_ENTER = 271
-        self.KP_EQUALS = 272
-        self.UP_ARROW = 273
-        self.DOWN_ARROW = 274
-        self.LEFT_ARROW = 276
-        self.RIGHT_ARROW = 275
-        self.RIGHT_SHIFT = 303
-        self.LEFT_SHIFT = 304
-        self.RIGHT_CTRL = 305
-        self.LEFT_CTRL = 306
-        self.RIGHT_ALT = 307
-        self.LEFT_ALT= 308
         
         self.selectedHuman = None
         
@@ -1189,266 +1083,6 @@ class Scene3D:
             except RuntimeError, text:
                     print(text)
 
-
-    def connect(self,eventName,functionToCall,obj = None):
-        """
-        This method connects an event handling function for a specific event
-        to a specific object in the scene. This can be to one of the Object3D
-        objects within the scene, or to this Scene3D object.
-        The event is indicated using an event name passed in as a string
-        ("LMOUSEP", "RMOUSEP", "LMOUSER", "RMOUSER" or "MOTION"). The name of
-        the callback function is assigned to the corresponding callback
-        attribute on the object.
-
-        Parameters
-        ----------
-
-        eventName:
-            *string* The name of the event to connect to a callback function.
-        functionToCall:
-            *string* The name of the callback function to connect to the event.
-        obj:
-            *object reference* The object to which to connect the callback function.
-
-        """
-        if obj:
-            if eventName == "LMOUSEP":
-                if obj.lMousePressedCallBack != None:
-                    print "Warning, object %s has already LMOUSEP event"%(obj.name)
-                    print "function %s not assigned to %s"%(functionToCall,obj.name)
-                    return
-                else:
-                    obj.lMousePressedCallBack = functionToCall
-            elif eventName == "RMOUSEP":
-                if obj.rMousePressedCallBack != None:
-                    print "Warning, object %s has already RMOUSEP event"%(obj.name)
-                    print "function %s not assigned to %s"%(functionToCall,obj.name)
-                    return
-                else:
-                    obj.rMousePressedCallBack = functionToCall
-            elif eventName == "LMOUSER":
-                if obj.lMouseReleasedCallBack != None:
-                    print "Warning, object %s has already LMOUSER event"%(obj.name)
-                    print "function %s not assigned to %s"%(functionToCall,obj.name)
-                    return
-                else:
-                    obj.lMouseReleasedCallBack = functionToCall
-            elif eventName == "RMOUSER":
-                if obj.rMouseReleasedCallBack != None:
-                    print "Warning, object %s has already RMOUSER event"%(obj.name)
-                    print "function %s not assigned to %s"%(functionToCall,obj.name)
-                    return
-                else:
-                    obj.rMouseReleasedCallBack = functionToCall
-            elif eventName == "MOUSEWHEELUP":
-                if obj.mouseWheelUpCallBack != None:
-                    print "Warning, object %s has already MOUSEWHEELUP event"%(obj.name)
-                    print "function %s not assigned to %s"%(functionToCall,obj.name)
-                    return
-                else:
-                    obj.mouseWheelUpCallBack = functionToCall
-            elif eventName == "MOUSEWHEELDOWN":
-                if obj.mouseWheelDownCallBack != None:
-                    print "Warning, object %s has already MOUSEWHEELDOWN event"%(obj.name)
-                    print "function %s not assigned to %s"%(functionToCall,obj.name)
-                    return
-                else:
-                    obj.mouseWheelDownCallBack = functionToCall
-            elif eventName == "MOTION":
-                obj.mouseMotionCallBack = functionToCall
-        else:
-            if eventName == "LMOUSEP":
-                if self.sceneLMousePressedCallBack != None:
-                    print "Warning, scene has already event LMOUSEP"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneLMousePressedCallBack = functionToCall
-            elif eventName == "RMOUSEP":
-                if self.sceneRMousePressedCallBack != None:
-                    print "Warning, scene has already event RMOUSEP"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneRMousePressedCallBack = functionToCall
-            elif eventName == "LMOUSER":
-                if self.sceneLMouseReleasedCallBack != None:
-                    print "Warning, scene has already event LMOUSER"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneLMouseReleasedCallBack = functionToCall
-            elif eventName == "RMOUSER":
-                if self.sceneRMouseReleasedCallBack != None:
-                    print "Warning, scene has already event RMOUSER"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneRMouseReleasedCallBack = functionToCall
-            elif eventName == "MOUSEWHEELUP":
-                if self.sceneMouseWheelUpCallBack != None:
-                    print "Warning, scene has already event MOUSEWHEELUP"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneMouseWheelUpCallBack = functionToCall
-            elif eventName == "MOUSEWHEELDOWN":
-                if self.sceneMouseWheelDownCallBack != None:
-                    print "Warning, scene has already event MOUSEWHEELDOWN"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneMouseWheelDownCallBack = functionToCall
-            elif eventName == "MOTION":
-                if self.sceneMouseMotionCallback != None:
-                    print "Warning, scene has already event MOTION"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneMouseMotionCallback = functionToCall
-            elif eventName == "PMOTION":
-                if self.sceneMousePassiveMotionCallback != None:
-                    print "Warning, scene has already event PMOTION"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneMousePassiveMotionCallback = functionToCall
-            elif eventName == "KEYBOARD":
-                if self.sceneKeyboardCallback != None:
-                    print "Warning, scene has already event KEYBOARD"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneKeyboardCallback = functionToCall
-            elif eventName == "UP_ARROW":
-                if self.sceneUpArrowCallback != None:
-                    print "Warning, scene has already event UP_ARROW"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneUpArrowCallback = functionToCall
-            elif eventName == "DOWN_ARROW":
-                if self.sceneDownArrowCallback != None:
-                    print "Warning, scene has already event DOWN_ARROW"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneDownArrowCallback = functionToCall
-            elif eventName == "LEFT_ARROW":
-                if self.sceneLeftArrowCallback != None:
-                    print "Warning, scene has already event LEFT_ARROW"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneLeftArrowCallback = functionToCall
-            elif eventName == "RIGHT_ARROW":
-                if self.sceneRightArrowCallback != None:
-                    print "Warning, scene has already event RIGHT_ARROW"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneRightArrowCallback = functionToCall
-            elif eventName == "TIMER":
-                if self.sceneTimerCallback != None:
-                    print "Warning, scene has already event IDLE"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneTimerCallback = functionToCall
-            elif eventName == "LEFT_CTRL":
-                if self.sceneLCTRLCallback != None:
-                    print "Warning, scene has already event LEFT_CTRL"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneLCTRLCallback = functionToCall
-            elif eventName == "RIGHT_CTRL":
-                if self.sceneRCTRLCallback != None:
-                    print "Warning, scene has already event RIGHT_CTRL"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneRCTRLCallback = functionToCall
-            elif eventName == "LEFT_SHIFT":
-                if self.sceneLSHIFTCallback != None:
-                    print "Warning, scene has already event LEFT_SHIFT"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneLSHIFTCallback = functionToCall
-            elif eventName == "RIGHT_SHIFT":
-                if self.sceneRSHIFTCallback != None:
-                    print "Warning, scene has already event RIGHT_SHIFT"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneRSHIFTCallback = functionToCall
-            elif eventName == "LEFT_ALT":
-                if self.sceneLALTCallback != None:
-                    print "Warning, scene has already event LEFT_ALT"
-                    print "function %s not assigned to event"%(functionToCall)
-                else:
-                    self.sceneLALTCallback = functionToCall
-                    
-            else:
-                if type(eventName) is StringType and len(eventName) == 1:
-                    eventName = ord(eventName)
-                if type(eventName) is IntType:
-                    self.keyboardEventsDict[eventName] = functionToCall
-
-    def disconnect(self,eventName,obj = None):
-        """
-        This method disconnects an event handling function for a specific event
-        from a specific object in the scene. This can be from one of the Object3D
-        objects within the scene, or from this Scene3D object.
-        The event is indicated using an event name passed in as a string
-        ("LMOUSEP", "RMOUSEP", "LMOUSER", "RMOUSER" or "MOTION"). The name of
-        the callback function for the corresponding callback attribute on the 
-        object is set to None.
-
-        Parameters
-        ----------
-
-        eventName:
-            *string* The name of the event to disconnect from a callback function.
-        obj:
-            *object reference* The object to which the callback function is connected.
-
-        """
-        if obj:
-            if eventName == "LMOUSEP":
-                obj.lMousePressedCallBack = None
-            elif eventName == "RMOUSEP":
-                obj.rMousePressedCallBack = None
-            elif eventName == "LMOUSER":
-                obj.lMouseReleasedCallBack = None
-            elif eventName == "RMOUSER":
-                obj.rMouseReleasedCallBack = None
-            elif eventName == "MOUSEWHEELUP":
-                obj.mouseWheelUpCallBack = None
-            elif eventName == "MOUSEWHEELDOWN":
-                obj.mouseWheelDownCallBack = None
-            elif eventName == "MOTION":
-                obj.mouseMotionCallBack = None
-        else:
-            if eventName == "LMOUSEP":
-                self.sceneLMousePressedCallBack = None
-            elif eventName == "RMOUSEP":
-                self.sceneRMousePressedCallBack = None
-            elif eventName == "LMOUSER":
-                self.sceneLMouseReleasedCallBack = None
-            elif eventName == "RMOUSER":
-                self.sceneRMouseReleasedCallBack = None
-            elif eventName == "MOUSEWHEELUP":
-                self.sceneMouseWheelUpCallBack = None
-            elif eventName == "MOUSEWHEELDOWN":
-                self.sceneMouseWheelDownCallBack = None
-            elif eventName == "MOTION":
-                self.sceneMouseMotionCallback = None
-            elif eventName == "PMOTION":
-                self.sceneMousePassiveMotionCallback = None
-            elif eventName == "KEYBOARD":
-                self.sceneKeyboardCallback = None
-            elif eventName == "UP_ARROW":
-                self.sceneUpArrowCallback = None
-            elif eventName == "DOWN_ARROW":
-                self.sceneDownArrowCallback = None
-            elif eventName == "LEFT_ARROW":
-                self.sceneLeftArrowCallback = None
-            elif eventName == "RIGHT_ARROW":
-                self.sceneRightArrowCallback = None
-            elif eventName == "TIMER":
-                self.sceneTimerCallback = None
-                
-            else:
-                if type(eventName) is StringType and len(eventName) == 1:
-                    eventName = ord(eventName)
-                if type(eventName) is IntType:
-                    if eventName in self.keyboardEventsDict:
-                        del self.keyboardEventsDict[eventName]
-
     def setTimeTimer(self, millisecs):
         """
         This method calls the setTimeTimer method on the mh Python class to 
@@ -1475,37 +1109,6 @@ class Scene3D:
         """       
         if self.sceneTimerCallback:
             self.sceneTimerCallback()
-            
-
-
-    def disconnectAllEvents(self):
-        """
-        This method reinitializes the event callback functions registered
-        against the scene3D object to 'None' so that they no longer 
-        respond to events.
-
-        **Parameters:** This method has no parameters.
-
-        """
-        self.sceneLMousePressedCallBack = None
-        self.sceneRMousePressedCallBack = None
-        self.sceneLMouseReleasedCallBack = None
-        self.sceneRMouseReleasedCallBack = None
-        self.sceneMouseWheelUpCallBack = None
-        self.sceneMouseWheelDownCallBack = None
-        self.sceneMouseMotionCallback = None
-        self.sceneMousePassiveMotionCallback = None
-        self.sceneKeyboardCallback = None
-        self.keyboardEventsDict = {}
-        self.sceneUpArrowCallback = None
-        self.sceneDownArrowCallback = None
-        self.sceneLeftArrowCallback = None
-        self.sceneRightArrowCallback = None
-        self.sceneLCTRLCallback = None
-        self.sceneRCTRLCallback = None
-        self.sceneLSHIFTCallback = None
-        self.sceneRSHIFTCallback = None
-        self.sceneLALTCallback = None
 
     def getMousePos2D(self):
         """
@@ -1638,11 +1241,7 @@ class Scene3D:
         """
         This method processes a 'mouseButtonDown' event for this Scene3D
         object.
-        If the Scene3D object has a callback function defined for this event
-        it is called. Once that callback function finishes this method
-        checks whether the mouse click occurred over an object in the scene.
-        If it did, and that object has a callback function registered for this
-        event, then that object's callback function is also called.
+        It passes the event to the application object.
 
         **Parameters:** This method has no parameters.
 
@@ -1650,40 +1249,13 @@ class Scene3D:
         self.mouseX = x
         self.mouseY = y
         
-        if button == 1:
-            if self.sceneLMousePressedCallBack:
-                self.sceneLMousePressedCallBack()
-            ob = self.getSelectedObject()
-            if ob and ob.lMousePressedCallBack:
-                ob.lMousePressedCallBack()
-        elif button == 3:
-            if self.sceneRMousePressedCallBack:
-                self.sceneRMousePressedCallBack()
-            ob = self.getSelectedObject()
-            if ob and ob.rMousePressedCallBack:
-                ob.rMousePressedCallBack()
-        elif button == 4:
-            if self.sceneMouseWheelUpCallBack:
-                self.sceneMouseWheelUpCallBack()
-            ob = self.getSelectedObject()
-            if ob and ob.mouseWheelUpCallBack:
-                ob.mouseWheelUpCallBack()
-        elif button == 5:
-            if self.sceneMouseWheelDownCallBack:
-                self.sceneMouseWheelDownCallBack()
-            ob = self.getSelectedObject()
-            if ob and ob.mouseWheelDownCallBack:
-                ob.mouseWheelDownCallBack()
+        self.application.mouseDown(button, x, y)
 
     def mouseButtonUp(self, button, x, y):
         """
         This method processes a 'mouseButtonUp' event for this Scene3D
         object.
-        If the Scene3D object has a callback function defined for this event
-        it is called. Once that callback function finishes this method checks
-        whether the mouse button release occurred over an object in the scene.
-        If it did, and that object has a callback function registered for this
-        event, then that objects callback function is also called.
+        It passes the event to the application object.
 
         **Parameters:** This method has no parameters.
 
@@ -1691,26 +1263,13 @@ class Scene3D:
         self.mouseX = x
         self.mouseY = y
         
-        if button == 1:
-            if self.sceneLMouseReleasedCallBack:
-                self.sceneLMouseReleasedCallBack()
-            ob = self.getSelectedObject()
-            if ob and ob.lMouseReleasedCallBack:
-                ob.lMouseReleasedCallBack()
-        elif button == 2:
-            if self.sceneRMouseReleasedCallBack:
-                self.sceneRMouseReleasedCallBack()
-            ob = self.getSelectedObject()
-            if ob and ob.rMouseReleasedCallBack:
-                ob.rMouseReleasedCallBack()
+        self.application.mouseUp(button, x, y)
 
     def mouseMotion(self, mouseState, x, y, xRel, yRel):
         """
         This method processes a 'mouseMotion' event for this Scene3D
         object. Depending on the state of the mouse buttons, it is
-        translated to a passive or normal motion event.
-        If the Scene3D object has a callback function defined for this event
-        it is called.
+        It passes the event to the application object.
 
         **Parameters:** This method has no parameters.
 
@@ -1722,19 +1281,13 @@ class Scene3D:
         self.mouseXRel = xRel
         self.mouseYRel = yRel
         
-        if mouseState:
-            if self.sceneMouseMotionCallback:
-                self.sceneMouseMotionCallback()
-        else:
-            if self.sceneMousePassiveMotionCallback:
-                self.sceneMousePassiveMotionCallback()
+        self.application.mouseMove(mouseState, x, y, xRel, yRel)
 
     def keyDown(self, key, character):
         """
         This method processes a 'keyDown' event for this Scene3D
         object.
-        If the Scene3D object has a callback function defined for this event
-        it is called.
+        It passes the event to the application object.
 
         Parameters
         ----------
@@ -1752,29 +1305,7 @@ class Scene3D:
         print(key, character)
         self.keyPressed = key
         self.characterPressed = character
-        if self.sceneKeyboardCallback:
-            self.sceneKeyboardCallback()
-        if key in self.keyboardEventsDict:
-            function = self.keyboardEventsDict[key]
-            function()
-        if self.sceneUpArrowCallback and key == self.UP_ARROW:
-            self.sceneUpArrowCallback()
-        if self.sceneDownArrowCallback and key == self.DOWN_ARROW:
-            self.sceneDownArrowCallback()
-        if self.sceneLeftArrowCallback and key == self.LEFT_ARROW:
-            self.sceneLeftArrowCallback()
-        if self.sceneRightArrowCallback and key == self.RIGHT_ARROW:
-            self.sceneRightArrowCallback()        
-        if self.sceneLCTRLCallback and key == self.LEFT_CTRL:
-            self.sceneLCTRLCallback()
-        if self.sceneRCTRLCallback and key == self.RIGHT_CTRL:
-            self.sceneRCTRLCallback()
-        if self.sceneLSHIFTCallback and key == self.LEFT_SHIFT:
-            self.sceneLSHIFTCallback()
-        if self.sceneRSHIFTCallback and key == self.RIGHT_SHIFT:
-            self.sceneRSHIFTCallback()
-        if self.sceneLALTCallback and key == self.LEFT_ALT:
-            self.sceneLALTCallback()
+        self.application.keyDown(key, character)
 
     def shutdown(self):
         """

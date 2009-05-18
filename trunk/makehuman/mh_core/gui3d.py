@@ -254,16 +254,6 @@ class Application(events3d.EventHandler):
     self.enteredObject = None
     
     self.scene3d.startWindow()
-    
-    self.scene3d.connect("LMOUSEP", self.lMouseDown)
-    self.scene3d.connect("LMOUSER", self.lMouseUp)
-    self.scene3d.connect("RMOUSEP", self.rMouseDown)
-    self.scene3d.connect("RMOUSER", self.rMouseUp)
-    self.scene3d.connect("MOUSEWHEELDOWN", self.mouseWheelDown)
-    self.scene3d.connect("MOUSEWHEELUP", self.mouseWheelUp)
-    self.scene3d.connect("MOTION", self.mouseMove)
-    self.scene3d.connect("PMOTION", self.mouseMove)
-    self.scene3d.connect("KEYBOARD", self.keyDown)
 
   def start(self):
     self.cursor = Object(self, mesh = "data/3dobjs/cursor.obj",
@@ -275,19 +265,6 @@ class Application(events3d.EventHandler):
     
   def stop(self):
     self.scene3d.shutdown()
-    
-  def lMouseDown(self):
-    self.mouseDown(1)
-  def lMouseUp(self):
-    self.mouseUp(1)
-  def rMouseDown(self):
-    self.mouseDown(3)
-  def rMouseUp(self):
-    self.mouseUp(3)
-  def mouseWheelDown(self):
-    self.mouseWheel(-1)
-  def mouseWheelUp(self):
-    self.mouseWheel(1)
 
   def isVisible(self):
     return True
@@ -359,30 +336,37 @@ class Application(events3d.EventHandler):
   '''
   
   # called from native
-  def mouseDown(self, b):
+  def mouseDown(self, button, x, y):
+    if button == 4:
+      self.mouseWheel(1)
+    elif button == 5:
+      self.mouseWheel(-1)
+    else:
+      # Build event
+      mousePos = self.scene3d.getMousePos2D()
+      mouseDiff = self.scene3d.getMouseDiff()
+      event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], button)
+      
+      # Get picked object
+      object = self.scene3d.getPickedObject()[1]
+      
+      # If we have an object
+      if object:
+        # Try to give its view focus
+        self.focusObject = object.object
+        self.focusObject.view.setFocus()
+        # It is the object which will receive the following mouse messages
+        self.mouseDownObject = object.object
+        # Send event to the object
+        object.object.callEvent("onMouseDown", event)
+    
+  def mouseUp(self, button, x, y):
+    if button == 4 or button == 5:
+      return
     # Build event
     mousePos = self.scene3d.getMousePos2D()
     mouseDiff = self.scene3d.getMouseDiff()
-    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], b)
-    
-    # Get picked object
-    object = self.scene3d.getPickedObject()[1]
-    
-    # If we have an object
-    if object:
-      # Try to give its view focus
-      self.focusObject = object.object
-      self.focusObject.view.setFocus()
-      # It is the object which will receive the following mouse messages
-      self.mouseDownObject = object.object
-      # Send event to the object
-      object.object.callEvent("onMouseDown", event)
-    
-  def mouseUp(self, b):
-    # Build event
-    mousePos = self.scene3d.getMousePos2D()
-    mouseDiff = self.scene3d.getMouseDiff()
-    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], b)
+    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], button)
     
     # Get picked object
     object = self.scene3d.getPickedObject()[1]
@@ -392,7 +376,7 @@ class Application(events3d.EventHandler):
       if self.mouseDownObject is object.object:
         self.mouseDownObject.callEvent("onClicked", event)
       
-  def mouseMove(self):
+  def mouseMove(self, mouseState, x, y, xRel, yRel):
     # Move cursor
     mousePos = self.scene3d.getMousePosGUI()
     self.cursor.setPosition([mousePos[0], mousePos[1], self.cursor.mesh.z])
@@ -431,14 +415,14 @@ class Application(events3d.EventHandler):
     else:
       self.currentTask.callEvent("onMouseWheel", event)
     
-  def keyDown(self):
+  def keyDown(self, key, character):
     event = events3d.Event(key = self.scene3d.keyPressed, character = self.scene3d.characterPressed)
     if self.focusView:
       self.focusView.callEvent("onKeyDown", event)
     else:
       self.currentTask.callEvent("onKeyDown", event)
     
-  def keyUp(self):
+  def keyUp(self, key, character):
     event = events3d.Event(key = self.scene3d.keyPressed, character = self.scene3d.characterPressed)
     if self.focusView:
       self.focusView.callEvent("onKeyUp", event)
