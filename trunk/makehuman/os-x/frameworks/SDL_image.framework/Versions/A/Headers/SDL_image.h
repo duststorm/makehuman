@@ -1,6 +1,6 @@
 /*
     SDL_image:  An example image loading library for use with SDL
-    Copyright (C) 1997-2006 Sam Lantinga
+    Copyright (C) 1997-2009 Sam Lantinga
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -75,6 +75,8 @@ extern DECLSPEC SDL_Surface * SDLCALL IMG_Load_RW(SDL_RWops *src, int freesrc);
 extern DECLSPEC int SDLCALL IMG_InvertAlpha(int on);
 
 /* Functions to detect a file type, given a seekable source */
+extern DECLSPEC int SDLCALL IMG_isICO(SDL_RWops *src);
+extern DECLSPEC int SDLCALL IMG_isCUR(SDL_RWops *src);
 extern DECLSPEC int SDLCALL IMG_isBMP(SDL_RWops *src);
 extern DECLSPEC int SDLCALL IMG_isGIF(SDL_RWops *src);
 extern DECLSPEC int SDLCALL IMG_isJPG(SDL_RWops *src);
@@ -88,6 +90,8 @@ extern DECLSPEC int SDLCALL IMG_isXPM(SDL_RWops *src);
 extern DECLSPEC int SDLCALL IMG_isXV(SDL_RWops *src);
 
 /* Individual loading functions */
+extern DECLSPEC SDL_Surface * SDLCALL IMG_LoadICO_RW(SDL_RWops *src);
+extern DECLSPEC SDL_Surface * SDLCALL IMG_LoadCUR_RW(SDL_RWops *src);
 extern DECLSPEC SDL_Surface * SDLCALL IMG_LoadBMP_RW(SDL_RWops *src);
 extern DECLSPEC SDL_Surface * SDLCALL IMG_LoadGIF_RW(SDL_RWops *src);
 extern DECLSPEC SDL_Surface * SDLCALL IMG_LoadJPG_RW(SDL_RWops *src);
