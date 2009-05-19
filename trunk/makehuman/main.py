@@ -56,7 +56,7 @@ sys.path.append("./")
 sys.path.append("./mh_plugins")
 sys.path.append("./mh_core")
 
-import gui3d, widgets3d
+import gui3d
 import human
 import guimodelling, guifiles, guirender
 
@@ -66,7 +66,7 @@ class MHApplication(gui3d.Application):
     
     # Dispkay the initial splash screen and the progress bar during startup 
     self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", "data/images/splash.png", position = [0, 0, 0])
-    self.progressBar = widgets3d.ProgressBar(self.scene3d)
+    self.progressBar = gui3d.ProgressBar(self)
     self.scene3d.update()
     self.scene3d.redraw(0)
     
@@ -165,7 +165,7 @@ class MHApplication(gui3d.Application):
     self.switchCategory("modelling")
     
     self.progressBar.setProgress(1.0)
-    self.progressBar.setVisibility(0)
+    self.progressBar.hide()
     
   def onStart(self, event):
       self.splash.hide()

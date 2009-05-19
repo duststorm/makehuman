@@ -555,6 +555,51 @@ class ToolbarButton(RadioButton):
       self.button.setScale(1.5)
     else:
       self.button.setScale(1.0)
+      
+class ProgressBar(View):
+  """
+  A ProgressBar widget. This widget can be used to show the user the progress of a 
+  lengthy operation.
+  """
+  
+  def __init__(self, parent, backgroundMesh = "data/3dobjs/progressbar_background.obj",
+    backgroundTexture = "data/images/progressbar_background.png",
+    backgroundPosition = [0.0, -0.20, 9.1],
+    barMesh = "data/3dobjs/progressbar.obj",
+    barTexture = "data/images/progressbar.png",
+    barPosition = [-0.08, -0.178, 9.2], visible = True):
+    """
+    This is the constructor method for the ProgressBar class. It initializes the
+    following attributes:
+
+    - **self.scene**: *scene reference*. The scene the widget is part of.
+    - **self.backgroundMesh**: *String*. The background object.
+    - **self.backgroundTexture**: *String*. The background texture.
+    - **self.barMesh**: *String*. The bar object.
+    - **self.barTexture**: *String*. The bar texture.
+    """
+    
+    View.__init__(self, parent, visible)
+    self.background = Object(self, backgroundMesh, texture = backgroundTexture, position = backgroundPosition)
+    self.bar = Object(self, barMesh, texture = barTexture, position = barPosition)
+    self.bar.mesh.setScale(0.0, 1.0, 1.0);
+
+  def setProgress(self, progress, redraw = 1):
+    """
+    This method updates the progress and optionally updates the screen
+
+    Parameters
+    ----------
+
+    progress:
+        *float* The progress from 0.0 to 1.0.
+    redraw:
+        *int* 1 if a redraw is needed, 0 otherwise.
+    """
+    
+    self.bar.mesh.setScale(progress, 1.0, 1.0);
+    if redraw:
+      self.app.scene3d.redraw(0)
 
 # FileEntryView widget
 class FileEntryView(View):
