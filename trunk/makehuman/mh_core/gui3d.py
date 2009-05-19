@@ -274,15 +274,19 @@ class Application(events3d.EventHandler):
       view = self
       
     if (self.focusView != view) and view.canHaveFocus:
+      event = events3d.FocusEvent(self.focusView, view)
+      
       if self.focusView:
-        self.focusView.callEvent("onBlur", None)
+        self.focusView.callEvent("onBlur", event)
         
       self.focusView = view
-      self.focusView.callEvent("onFocus", None)
+      self.focusView.callEvent("onFocus", event)
       self.focusObject = None
     else:
+      event = events3d.FocusEvent(self.focusView, None)
+      
       if self.focusView:
-        self.focusView.callEvent("onBlur", None)
+        self.focusView.callEvent("onBlur", event)
         
       self.focusView = None
       self.focusObject = None
@@ -344,8 +348,7 @@ class Application(events3d.EventHandler):
     else:
       # Build event
       mousePos = self.scene3d.getMousePos2D()
-      mouseDiff = self.scene3d.getMouseDiff()
-      event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], button)
+      event = events3d.MouseEvent(button, mousePos[0], mousePos[1])
       
       # Get picked object
       object = self.scene3d.getPickedObject()[1]
@@ -365,8 +368,7 @@ class Application(events3d.EventHandler):
       return
     # Build event
     mousePos = self.scene3d.getMousePos2D()
-    mouseDiff = self.scene3d.getMouseDiff()
-    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], button)
+    event = events3d.MouseEvent(button, mousePos[0], mousePos[1])
     
     # Get picked object
     object = self.scene3d.getPickedObject()[1]
@@ -384,7 +386,7 @@ class Application(events3d.EventHandler):
     # Build event
     mousePos = self.scene3d.getMousePos2D()
     mouseDiff = self.scene3d.getMouseDiff()
-    event = events3d.Event(mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1], self.scene3d.mouseState)
+    event = events3d.MouseEvent(self.scene3d.mouseState, mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1])
     
     # Get picked object
     group = object = self.scene3d.getPickedObject()[0]
@@ -409,21 +411,21 @@ class Application(events3d.EventHandler):
   def mouseWheel(self, wheelDelta):
     # Mouse wheel events, like key events are sent to the focus view
     mousePos = self.scene3d.getMousePos2D()
-    event = events3d.Event(mousePos[0], mousePos[1], wheelDelta = wheelDelta)
+    event = events3d.MouseWheelEvent(wheelDelta)
     if self.focusView:
       self.focusView.callEvent("onMouseWheel", event)
     else:
       self.currentTask.callEvent("onMouseWheel", event)
     
   def keyDown(self, key, character):
-    event = events3d.Event(key = self.scene3d.keyPressed, character = self.scene3d.characterPressed)
+    event = events3d.KeyEvent(self.scene3d.keyPressed, self.scene3d.characterPressed)
     if self.focusView:
       self.focusView.callEvent("onKeyDown", event)
     else:
       self.currentTask.callEvent("onKeyDown", event)
     
   def keyUp(self, key, character):
-    event = events3d.Event(key = self.scene3d.keyPressed, character = self.scene3d.characterPressed)
+    event = events3d.KeyEvent(self.scene3d.keyPressed, self.scene3d.characterPressed)
     if self.focusView:
       self.focusView.callEvent("onKeyUp", event)
     else:

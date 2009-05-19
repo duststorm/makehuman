@@ -40,9 +40,9 @@ class ModellingCategory(gui3d.Category):
     # Rotate and pan the camera
     def onMouseDragged(self, event):
         diff = self.app.scene3d.getMouseDiff()
-        leftButtonDown =event.b & 1
-        middleButtonDown = event.b & 2
-        rightButtonDown = event.b & 4
+        leftButtonDown =event.button & 1
+        middleButtonDown = event.button & 2
+        rightButtonDown = event.button & 4
 
         if (leftButtonDown and rightButtonDown) or middleButtonDown:
             self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() + 0.05 * diff[1])

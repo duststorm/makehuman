@@ -1,16 +1,41 @@
 class Event:
-  def __init__(self, x = None, y = None, dx = None, dy = None, b = None, key = None, character = None, wheelDelta = None):
+  def __init__(self):
+    pass
+    
+  def __repr__(self):
+    return "event:"
+
+class MouseEvent(Event):
+  def __init__(self, button, x, y, dx = 0, dy = 0):
+    self.button = button
     self.x = x
     self.y = y
-    self.dx = dx
-    self.dy = dy
-    self.b = b
-    self.key = key
-    self.character = character
+    
+  def __repr__(self):
+    return "event: %s, %s, %s, %s, %s" %(self.button, self.x, self.y, self.dx, self.dy)
+    
+class MouseWheelEvent(Event):
+  def __init__(self, wheelDelta):
     self.wheelDelta = wheelDelta
     
   def __repr__(self):
-    return "event: %s, %s, %s, %s, %s, " %(self.x, self.y, self.b, self.key, self.character)
+    return "event: %s" %(self.wheelDelta)
+
+class KeyEvent(Event):
+  def __init__(self, key, character):
+    self.key = key
+    self.character = character
+    
+  def __repr__(self):
+    return "event: %s, %s" %(self.character)
+    
+class FocusEvent(Event):
+  def __init__(self, blurred, focused):
+    self.blurred = blurred
+    self.focused = focused
+    
+  def __repr__(self):
+    return "event: %s, %s" %(self.character)
     
 class EventHandler:
   def __init__(self):
