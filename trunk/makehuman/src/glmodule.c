@@ -44,8 +44,7 @@
     #include <windows.h>
     #include <SDL_syswm.h>
 #elif __APPLE__
-    #include <AGL/agl.h>
-//    #include <Fonts.h>
+    void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
 #else
     #include <X11/Xlib.h>
     #include <X11/Xutil.h>
@@ -745,12 +744,8 @@ void OnInit()
         wglUseFontBitmaps(hDC, 0, 256, G.fontOffset);
         ReleaseDC(wmi.window, hDC);
     }
-#elif __APPLE__
-    {
-        short fontNum;
-        GetFNum("\pHelvetica", &fontNum);
-        aglUseFont(aglGetCurrentContext(), fontNum, normal, 12, 0, 256, G.fontOffset);
-    }
+#elif defined(__APPLE__)
+    buildFont(G.fontOffset, 256, 0, "Lucida Grande", 10);
 #else
     {
         Display *dpy = XOpenDisplay(NULL);
@@ -884,12 +879,12 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 /*Because the selection is based on color, the color array can have 2 values*/
                 if (pickMode)
                 {
-                    /*Use color to pick ì*/
+                    /*Use color to pick i */
                     glColorPointer(3, GL_UNSIGNED_BYTE, 0, G.world[i].colors);
                 }
                 else
                 {
-                    /*Use color to draw ì*/
+                    /*Use color to draw i */
                     glColorPointer(4, GL_UNSIGNED_BYTE, 0, G.world[i].colors2);
                     /*draw text attribute if there is one; because this function
                     restores lighting, it can be used only in non picking mode*/
