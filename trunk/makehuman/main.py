@@ -56,6 +56,14 @@ sys.path.append("./")
 sys.path.append("./mh_plugins")
 sys.path.append("./mh_core")
 
+# Adjust the exe path for AQSIS and PIXIE acc. the various Operating Systems.
+if 'darwin' in sys.platform: # For MAC OS
+    aqsisPath  = "/Applications/Aqsis.app/Contents/MacOS/"
+    pixiePath  = "/Library/Pixie/bin/"
+else:
+    aqsisPath  = ""
+    pixiePath  = ""
+
 import gui3d
 import human
 import guimodelling, guifiles, guirender
@@ -71,14 +79,14 @@ class MHApplication(gui3d.Application):
     self.scene3d.redraw(0)
     
     # Create aqsis shaders
-    subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
-    subprocess.Popen("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
-    subprocess.Popen("aqsl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.slx", shell=True)
+    subprocess.Popen(aqsisPath + "aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
+    subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
+    subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.slx", shell=True)
 
     # Create pixie shaders
-    subprocess.Popen("sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
-    subprocess.Popen("sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
-    subprocess.Popen("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr", shell=True)
+    subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
+    subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
+    subprocess.Popen(pixiePath + "sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr", shell=True)
     
     self.progressBar.setProgress(0.2)
     
