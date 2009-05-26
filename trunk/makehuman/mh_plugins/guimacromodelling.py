@@ -117,13 +117,13 @@ class MacroModelingTaskView(gui3d.TaskView):
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, "data/images/button_gender_macro.png",
-      "data/images/slider.png", position = [-0.45, 0.25, 9], value = 0.5)
+      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, 0.25, 9], value = 0.5)
     self.ageSlider = gui3d.Slider(self, "data/images/button_age_macro.png",
-      "data/images/slider.png", position = [-0.45, 0.1, 9], value = 0.5)
+      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, 0.1, 9], value = 0.5)
     self.muscleSlider = gui3d.Slider(self, "data/images/button_muscle_macro.png",
-      "data/images/slider.png", position = [-0.45, -0.05, 9], value = 0.5)
+      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, -0.05, 9], value = 0.5)
     self.weightSlider = gui3d.Slider(self, "data/images/button_weight_macro.png",
-      "data/images/slider.png", position = [-0.45, -0.20, 9], value = 0.5)
+      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, -0.20, 9], value = 0.5)
       
     @self.genderSlider.event
     def onChange(value):

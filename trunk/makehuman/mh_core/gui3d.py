@@ -435,12 +435,14 @@ class Application(events3d.EventHandler):
 
 # Slider widget
 class Slider(View):
-  def __init__(self, parent, backgroundTexture, sliderTexture, position = [0, 0, 9], value = 0.0):
+  def __init__(self, parent, backgroundTexture, sliderTexture, focusedSliderTexture = None, position = [0, 0, 9], value = 0.0):
     View.__init__(self, parent)
     self.background = Object(self, "data/3dobjs/button_gender.obj",
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/button_about.obj",
       texture = sliderTexture, position = [position[0], position[1], position[2] + 0.01])
+    self.sliderTexture = sliderTexture
+    self.focusedSliderTexture = focusedSliderTexture
     self.sliderMinX = -0.5;
     self.sliderMaxX = -0.39;
     self.setValue(value)
@@ -488,6 +490,14 @@ class Slider(View):
       self.setValue(newValue)
       if oldValue != self.__value:
         self.callEvent("onChange", self.__value)
+        
+  def onFocus(self, event):
+    if self.focusedSliderTexture:
+      self.slider.setTexture(self.focusedSliderTexture)
+  
+  def onBlur(self, event):
+    if self.focusedSliderTexture:
+      self.slider.setTexture(self.sliderTexture)
 
 # Button widget
 class Button(View):
