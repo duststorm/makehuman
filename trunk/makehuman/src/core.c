@@ -126,16 +126,32 @@ void callMouseMotion(int s, int x, int y, int xrel, int yrel)
  *  This function invokes the Python keyDown function when the SDL
  *  module detects a standard keyboard event, ie. when a standard character key is pressed.
  */
-void callKeyDown(int key, unsigned short character)
+void callKeyDown(int key, unsigned short character, int modifiers)
 {
     PyObject *main_module = PyImport_AddModule("__main__");
     PyObject *global_dict = PyModule_GetDict(main_module);
     PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
     PyObject *v;
 #ifdef __WIN32__
-    if (!(v = PyObject_CallMethod(mainScene, "keyDown", "iu#", key, &character, 1)))
+    if (!(v = PyObject_CallMethod(mainScene, "keyDown", "iu#i", key, &character, 1, modifiers)))
 #else
-    if (!(v = PyObject_CallMethod(mainScene, "keyDown", "ic", key, key)))
+    if (!(v = PyObject_CallMethod(mainScene, "keyDown", "ici", key, key, modifiers)))
+#endif
+        PyErr_Print();
+    else
+        Py_DECREF(v);
+}
+
+void callKeyUp(int key, unsigned short character, int modifiers)
+{
+    PyObject *main_module = PyImport_AddModule("__main__");
+    PyObject *global_dict = PyModule_GetDict(main_module);
+    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
+    PyObject *v;
+#ifdef __WIN32__
+    if (!(v = PyObject_CallMethod(mainScene, "keyUp", "iu#i", key, &character, 1, modifiers)))
+#else
+    if (!(v = PyObject_CallMethod(mainScene, "keyUp", "ici", key, key, modifiers)))
 #endif
         PyErr_Print();
     else

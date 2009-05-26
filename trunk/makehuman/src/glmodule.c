@@ -265,9 +265,14 @@ int mhGrabScreen(int x, int y, int width, int height, const char *filename)
  *  to the event loop to await the next event.
  *
  */
-void mhKeyDown(int key, unsigned short character)
+void mhKeyDown(int key, unsigned short character, int modifiers)
 {
-    callKeyDown(key, character);
+    callKeyDown(key, character, modifiers);
+}
+
+void mhKeyUp(int key, unsigned short character, int modifiers)
+{
+    callKeyUp(key, character, modifiers);
 }
 
 /** \brief Pass a timer callback event up to Python.
@@ -1135,7 +1140,7 @@ void mhEventLoop()
             break;
         case SDL_KEYDOWN:
             G.modifiersKeyState = event.key.keysym.mod;
-            mhKeyDown(event.key.keysym.sym, event.key.keysym.unicode);
+            mhKeyDown(event.key.keysym.sym, event.key.keysym.unicode, event.key.keysym.mod);
             break;
         case SDL_KEYUP:
             G.modifiersKeyState = event.key.keysym.mod;
@@ -1143,6 +1148,8 @@ void mhEventLoop()
                 mhSetFullscreen(!G.fullscreen); // Switch fullscreen
             else if (event.key.keysym.sym == SDLK_ESCAPE)
                 mhShutDown(); // Exit
+            else
+                mhKeyUp(event.key.keysym.sym, event.key.keysym.unicode, event.key.keysym.mod);
             break;
         case SDL_MOUSEMOTION:
             mhMouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);

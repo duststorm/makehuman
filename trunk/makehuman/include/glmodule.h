@@ -37,7 +37,8 @@ unsigned int mhLoadTexture(const char *fname, GLuint texture);
 int mhGrabScreen(int x, int y, int width, int height, const char *filename);
 
 // Input events
-void mhKeyDown(int key, unsigned short character);
+void mhKeyDown(int key, unsigned short character, int modifiers);
+void mhKeyUp(int key, unsigned short character, int modifiers);
 void mhMouseButtonDown(int b, int x,int y);
 void mhMouseButtonUp(int b, int x,int y);
 void mhMouseMotion(int s, int x, int y, int xrel, int yrel);

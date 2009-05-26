@@ -1283,7 +1283,7 @@ class Scene3D:
         
         self.application.mouseMove(mouseState, x, y, xRel, yRel)
 
-    def keyDown(self, key, character):
+    def keyDown(self, key, character, modifiers):
         """
         This method processes a 'keyDown' event for this Scene3D
         object.
@@ -1293,19 +1293,37 @@ class Scene3D:
         ----------
 
         key:
+            *int* The key pressed.
+        character:
             *string* A single character string containing the key pressed.
-        x:
-            *integer* The distance, in pixels, of the mouse pointer from the
-            left edge of the viewport.
-        y:
-            *integer* The distance, in pixels, of the mouse pointer from the
-            top edge of the viewport.
+        modifiers:
+            *int* The modifier flags.
 
         """
-        print(key, character)
+        print("keyDown %d %s %d" % (key, character, modifiers))
         self.keyPressed = key
         self.characterPressed = character
-        self.application.keyDown(key, character)
+        self.application.keyDown(key, character, modifiers)
+        
+    def keyUp(self, key, character, modifiers):
+        """
+        This method processes a 'keyUp' event for this Scene3D
+        object.
+        It passes the event to the application object.
+
+        Parameters
+        ----------
+
+        key:
+            *int* The key pressed.
+        character:
+            *string* A single character string containing the key pressed.
+        modifiers:
+            *int* The modifier flags.
+
+        """
+        print("keyUp %d %s %d" % (key, character, modifiers))
+        self.application.keyUp(key, character, modifiers)
 
     def shutdown(self):
         """

@@ -270,10 +270,14 @@ class Application(events3d.EventHandler):
     return True
     
   def setFocus(self, view = None):
+    print("setFocus", view)
+    if self.focusView == view:
+      return
+      
     if not view:
       view = self
       
-    if (self.focusView != view) and view.canHaveFocus:
+    if view.canHaveFocus:
       event = events3d.FocusEvent(self.focusView, view)
       
       if self.focusView:
@@ -417,19 +421,35 @@ class Application(events3d.EventHandler):
     else:
       self.currentTask.callEvent("onMouseWheel", event)
     
-  def keyDown(self, key, character):
-    event = events3d.KeyEvent(self.scene3d.keyPressed, self.scene3d.characterPressed)
+  def keyDown(self, key, character, modifiers):
+    if key == events3d.SDLK_TAB:
+      if self.focusView:
+        #if self.focusView.wantsTab and not (modifiers & 0x0c): #control keys
+          index = self.focusView.parent.children.index(self.focusView)
+          if modifiers & 0x03: # shift keys
+            if index > 0:
+              self.focusView.parent.children[index - 1].setFocus()
+            else:
+              self.focusView.parent.children[len(self.focusView.parent.children) - 1].setFocus()
+          else:
+            if index + 1 < len(self.focusView.parent.children):
+              self.focusView.parent.children[index + 1].setFocus()
+            else:
+              self.focusView.parent.children[0].setFocus()
+          self.scene3d.redraw()
+          return
+    event = events3d.KeyEvent(key, character, modifiers)
     if self.focusView:
       self.focusView.callEvent("onKeyDown", event)
     else:
       self.currentTask.callEvent("onKeyDown", event)
     
-  def keyUp(self, key, character):
-    event = events3d.KeyEvent(self.scene3d.keyPressed, self.scene3d.characterPressed)
+  def keyUp(self, key, character, modifiers):
+    event = events3d.KeyEvent(key, character, modifiers)
     if self.focusView:
       self.focusView.callEvent("onKeyUp", event)
     else:
-      self.currentTask.callEvent("onKeyDown", event)
+      self.currentTask.callEvent("onKeyUp", event)
 
 #Widgets
 
@@ -518,6 +538,17 @@ class Button(View):
     
   def onMouseUp(self, event):
     self.setSelected(False)
+    
+  def onKeyDown(self, event):
+    if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
+      self.setSelected(True)
+      self.app.scene3d.redraw()
+      
+  def onKeyUp(self, event):
+    if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
+      self.setSelected(False)
+      self.callEvent("onClicked", event)
+      self.app.scene3d.redraw()
       
   def setSelected(self, selected):
     print("(de)selecting", self.selected, selected)

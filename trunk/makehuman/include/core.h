@@ -153,7 +153,8 @@ void callMouseButtonDown(int b, int x, int y);
 void callMouseButtonUp(int b, int x, int y);
 void callMouseMotion(int s, int x, int y, int xrel, int yrel);
 void callTimerFunct();
-void callKeyDown(int key, unsigned short character);
+void callKeyDown(int key, unsigned short character, int modifiers);
+void callKeyUp(int key, unsigned short character, int modifiers);
 void callReloadTextures();
 
 // Scene methods

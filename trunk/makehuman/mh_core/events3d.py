@@ -22,9 +22,10 @@ class MouseWheelEvent(Event):
     return "event: %s" %(self.wheelDelta)
 
 class KeyEvent(Event):
-  def __init__(self, key, character):
+  def __init__(self, key, character, modifiers):
     self.key = key
     self.character = character
+    self.modifiers = modifiers
     
   def __repr__(self):
     return "event: %s, %s" %(self.character)
