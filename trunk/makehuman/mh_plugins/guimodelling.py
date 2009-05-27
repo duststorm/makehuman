@@ -120,8 +120,10 @@ class ModellingCategory(gui3d.Category):
         self.app.scene3d.redraw()
       # Other keybindings
       elif event.key == events3d.SDLK_e:
-        mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "export.obj")
-        mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, "export.bvh")
+        if not os.path.exists("exports"):
+          os.mkdir("exports")
+        mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.obj")
+        mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.bvh")
       elif event.key == events3d.SDLK_g:
         self.app.scene3d.grabScreen(180, 80, 440, 440, "grab.bmp")
       elif event.key == events3d.SDLK_q:

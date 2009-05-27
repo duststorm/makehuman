@@ -30,7 +30,7 @@ class KeyEvent(Event):
     self.modifiers = modifiers
     
   def __repr__(self):
-    return "event: %s, %s" %(self.character)
+    return "event: %d, %s, %d" %(self.key, self.character, self.modifiers)
     
 class FocusEvent(Event):
   def __init__(self, blurred, focused):
