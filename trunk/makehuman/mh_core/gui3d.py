@@ -424,9 +424,9 @@ class Application(events3d.EventHandler):
   def keyDown(self, key, character, modifiers):
     if key == events3d.SDLK_TAB:
       if self.focusView:
-        #if self.focusView.wantsTab and not (modifiers & 0x0c): #control keys
+        #if self.focusView.wantsTab and not (modifiers & events3d.KMOD_CTRL):
           index = self.focusView.parent.children.index(self.focusView)
-          if modifiers & 0x03: # shift keys
+          if modifiers & events3d.KMOD_SHIFT:
             if index > 0:
               self.focusView.parent.children[index - 1].setFocus()
             else:
