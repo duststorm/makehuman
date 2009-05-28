@@ -212,3 +212,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.europeButton.syncEthnics()
     self.africaButton.syncEthnics()
     self.americaButton.syncEthnics()
+    
+  def onShow(self, event):
+    self.setFocus()
+    gui3d.TaskView.onShow(self, event)

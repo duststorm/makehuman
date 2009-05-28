@@ -27,11 +27,11 @@ to respect the planned roadmap. Later we will clean it or even refactorize it.**
 
 __docformat__ = 'restructuredtext'
 
-import events3d, gui3d, guimacromodelling, guidetailmodelling, mh2obj,  mh2bvh
+import events3d, gui3d, guimacromodelling, guidetailmodelling, mh2obj,  mh2bvh, os
 
 class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
-      gui3d.Category.__init__(self,  parent, "modelling", "data/images/button_home.png")
+      gui3d.Category.__init__(self,  parent, "Modelling", "data/images/button_home.png")
       guimacromodelling.MacroModelingTaskView(self)
       guidetailmodelling.DetailModelingTaskView(self)
       guidetailmodelling.MicroModelingTaskView(self)
@@ -63,75 +63,78 @@ class ModellingCategory(gui3d.Category):
         self.app.scene3d.redraw()
         
     def onKeyDown(self, event):
-      # Camera rotation
-      if event.key == events3d.SDLK_2 or event.key == events3d.SDLK_KP2:
-        rot = self.app.scene3d.getCameraRotations()
-        self.app.scene3d.setCameraRotations(rot[0] + 5.0, rot[1])
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_4 or event.key == events3d.SDLK_KP4:
-        rot = self.app.scene3d.getCameraRotations()
-        self.app.scene3d.setCameraRotations(rot[0], rot[1] - 5.0)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_6 or event.key == events3d.SDLK_KP6:
-        rot = self.app.scene3d.getCameraRotations()
-        self.app.scene3d.setCameraRotations(rot[0], rot[1] + 5.0)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_8 or event.key == events3d.SDLK_KP8:
-        rot = self.app.scene3d.getCameraRotations()
-        self.app.scene3d.setCameraRotations(rot[0] - 5.0, rot[1])
-        self.app.scene3d.redraw()
-      # Camera pan
-      elif event.key == events3d.SDLK_UP:
-        trans = self.app.scene3d.getCameraTranslations()
-        self.app.scene3d.setCameraTranslations(trans[0], trans[1] + 0.05)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_DOWN:
-        trans = self.app.scene3d.getCameraTranslations()
-        self.app.scene3d.setCameraTranslations(trans[0], trans[1] - 0.05)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_RIGHT:
-        trans = self.app.scene3d.getCameraTranslations()
-        self.app.scene3d.setCameraTranslations(trans[0] + 0.05, trans[1])
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_LEFT:
-        trans = self.app.scene3d.getCameraTranslations()
-        self.app.scene3d.setCameraTranslations(trans[0] - 0.05, trans[1])
-        self.app.scene3d.redraw()
-      # Camera zoom
-      elif event.key == events3d.SDLK_PLUS or event.key == events3d.SDLK_KP_PLUS:
-        self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() + 0.65)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_MINUS or event.key == events3d.SDLK_KP_MINUS:
-        self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() - 0.65)
-        self.app.scene3d.redraw()
-      # Camera views
-      elif event.key == events3d.SDLK_7 or event.key == events3d.SDLK_KP7:
-        self.app.scene3d.setCameraRotations(90.0, 0.0)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_1 or event.key == events3d.SDLK_KP1:
-        self.app.scene3d.setCameraRotations(0.0, 0.0)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_3 or event.key == events3d.SDLK_KP3:
-        self.app.scene3d.setCameraRotations(0.0, 90.0)
-        self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_PERIOD or event.key == events3d.SDLK_KP_PERIOD:
-        self.app.scene3d.setCameraTranslations(0.0, 0.0)
-        self.app.scene3d.setCameraZoom(60.0)
-        self.app.scene3d.redraw()
-      # Other keybindings
-      elif event.key == events3d.SDLK_e:
-        if not os.path.exists("exports"):
-          os.mkdir("exports")
-        mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.obj")
-        mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.bvh")
-      elif event.key == events3d.SDLK_g:
-        self.app.scene3d.grabScreen(180, 80, 440, 440, "grab.bmp")
-      elif event.key == events3d.SDLK_q:
-        self.app.stop()
-      elif event.key == events3d.SDLK_s:
-        print("subdividing")
-        self.app.scene3d.selectedHuman.subdivide()
-      elif event.key == events3d.SDLK_y:
-        self.app.redo()
-      elif event.key == events3d.SDLK_z:
-        self.app.undo()
+      if not event.modifiers:
+        # Camera rotation
+        if event.key == events3d.SDLK_2 or event.key == events3d.SDLK_KP2:
+          rot = self.app.scene3d.getCameraRotations()
+          self.app.scene3d.setCameraRotations(rot[0] + 5.0, rot[1])
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_4 or event.key == events3d.SDLK_KP4:
+          rot = self.app.scene3d.getCameraRotations()
+          self.app.scene3d.setCameraRotations(rot[0], rot[1] - 5.0)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_6 or event.key == events3d.SDLK_KP6:
+          rot = self.app.scene3d.getCameraRotations()
+          self.app.scene3d.setCameraRotations(rot[0], rot[1] + 5.0)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_8 or event.key == events3d.SDLK_KP8:
+          rot = self.app.scene3d.getCameraRotations()
+          self.app.scene3d.setCameraRotations(rot[0] - 5.0, rot[1])
+          self.app.scene3d.redraw()
+        # Camera pan
+        elif event.key == events3d.SDLK_UP:
+          trans = self.app.scene3d.getCameraTranslations()
+          self.app.scene3d.setCameraTranslations(trans[0], trans[1] + 0.05)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_DOWN:
+          trans = self.app.scene3d.getCameraTranslations()
+          self.app.scene3d.setCameraTranslations(trans[0], trans[1] - 0.05)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_RIGHT:
+          trans = self.app.scene3d.getCameraTranslations()
+          self.app.scene3d.setCameraTranslations(trans[0] + 0.05, trans[1])
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_LEFT:
+          trans = self.app.scene3d.getCameraTranslations()
+          self.app.scene3d.setCameraTranslations(trans[0] - 0.05, trans[1])
+          self.app.scene3d.redraw()
+        # Camera zoom
+        elif event.key == events3d.SDLK_PLUS or event.key == events3d.SDLK_KP_PLUS:
+          self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() + 0.65)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_MINUS or event.key == events3d.SDLK_KP_MINUS:
+          self.app.scene3d.setCameraZoom(self.app.scene3d.getCameraZoom() - 0.65)
+          self.app.scene3d.redraw()
+        # Camera views
+        elif event.key == events3d.SDLK_7 or event.key == events3d.SDLK_KP7:
+          self.app.scene3d.setCameraRotations(90.0, 0.0)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_1 or event.key == events3d.SDLK_KP1:
+          self.app.scene3d.setCameraRotations(0.0, 0.0)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_3 or event.key == events3d.SDLK_KP3:
+          self.app.scene3d.setCameraRotations(0.0, 90.0)
+          self.app.scene3d.redraw()
+        elif event.key == events3d.SDLK_PERIOD or event.key == events3d.SDLK_KP_PERIOD:
+          self.app.scene3d.setCameraTranslations(0.0, 0.0)
+          self.app.scene3d.setCameraZoom(60.0)
+          self.app.scene3d.redraw()
+        # Other keybindings
+        elif event.key == events3d.SDLK_e:
+            if not os.path.exists("exports"):
+              os.mkdir("exports")
+            mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.obj")
+            mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.bvh")
+        elif event.key == events3d.SDLK_g:
+          self.app.scene3d.grabScreen(180, 80, 440, 440, "grab.bmp")
+        elif event.key == events3d.SDLK_q:
+          self.app.stop()
+        elif event.key == events3d.SDLK_s:
+            print("subdividing")
+            self.app.scene3d.selectedHuman.subdivide()
+        elif event.key == events3d.SDLK_y:
+          self.app.redo()
+        elif event.key == events3d.SDLK_z:
+          self.app.undo()
+        
+      gui3d.Category.onKeyDown(self, event)

@@ -24,7 +24,7 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import files3d, animation3d, gui3d, os, mh2obj,  mh2bvh
+import files3d, animation3d, gui3d, events3d, os, mh2obj,  mh2bvh
 
 class SaveTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -191,7 +191,3 @@ class FilesCategory(gui3d.Category):
     LoadTaskView(self)
     ExportTaskView(self)
     
-
-            
-
-

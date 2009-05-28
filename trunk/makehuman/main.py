@@ -64,7 +64,7 @@ else:
     aqsisPath  = ""
     pixiePath  = ""
 
-import gui3d
+import gui3d, events3d
 import human
 import guimodelling, guifiles, guirender
 
@@ -170,7 +170,7 @@ class MHApplication(gui3d.Application):
     def onClicked(event):
       webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
     
-    self.switchCategory("modelling")
+    self.switchCategory("Modelling")
     
     self.progressBar.setProgress(1.0)
     self.progressBar.hide()
@@ -178,6 +178,30 @@ class MHApplication(gui3d.Application):
   def onStart(self, event):
       self.splash.hide()
       self.scene3d.selectedHuman.applyAllTargets()
+      
+  def onKeyDown(self, event):
+    if event.key == events3d.SDLK_m:
+      if event.modifiers & events3d.KMOD_CTRL:
+        self.app.switchCategory("Modelling")
+        self.app.scene3d.redraw()
+    elif event.key == events3d.SDLK_s:
+      if event.modifiers & events3d.KMOD_CTRL:
+        self.app.switchCategory("Files")
+        self.app.switchTask("Save")
+        self.app.scene3d.redraw()
+    elif event.key == events3d.SDLK_l:
+      if event.modifiers & events3d.KMOD_CTRL:
+        self.app.switchCategory("Files")
+        self.app.switchTask("Load")
+    elif event.key == events3d.SDLK_e:
+      if event.modifiers & events3d.KMOD_CTRL:
+        self.app.switchCategory("Files")
+        self.app.switchTask("Export")
+        self.app.scene3d.redraw()
+    elif event.key == events3d.SDLK_r:
+      if event.modifiers & events3d.KMOD_CTRL:
+        self.app.switchCategory("Rendering")
+        self.app.scene3d.redraw()
     
   def do(self, action):
     if action.do():

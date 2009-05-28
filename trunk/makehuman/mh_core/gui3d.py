@@ -660,6 +660,9 @@ class FileEntryView(View):
         self.onFileSelected(self.text)
       
   def onKeyDown(self, event):
+    if event.modifiers & events3d.KMOD_CTRL:
+      View.onKeyDown(self, event)
+      return
     print(event)
     if event.key == 8:
       self.text = self.text[:-1]
@@ -750,6 +753,9 @@ class FileChooser(View):
     self.app.scene3d.redraw()
     
   def onKeyDown(self, event):
+    if event.modifiers & events3d.KMOD_CTRL:
+      View.onKeyDown(self, event)
+      return
     if event.key == 276:
       self.goPrevious()
     elif event.key == 275:

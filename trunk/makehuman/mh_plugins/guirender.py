@@ -24,7 +24,7 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import files3d, gui3d
+import files3d, gui3d, events3d
 import mh2povray
 import mh2renderman
 
@@ -70,4 +70,7 @@ class RenderingCategory(gui3d.Category):
           if obj.name == "base.obj":
               cameraData = self.app.scene3d.getCameraSettings()
               mh2povray.povrayExport(obj, cameraData)
-              
+          
+  def onShow(self, event):
+    self.setFocus()
+    gui3d.Category.onShow(self, event)
