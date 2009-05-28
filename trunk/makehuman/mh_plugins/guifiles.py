@@ -64,7 +64,7 @@ class SaveTaskView(gui3d.TaskView):
               f.write("microdetail %s %f\n" %(os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
       f.close()
       
-      self.app.switchCategory("modelling")
+      self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
 
   def onShow(self, event):
@@ -128,14 +128,14 @@ class LoadTaskView(gui3d.TaskView):
       del human.targetsEthnicStack["neutral"]
       human.targetsEthnicStack["neutral"] = 1.0 - sum(human.targetsEthnicStack.values())
       
-      self.app.categories["modelling"].tasksByName["Macro modelling"].syncSliders()
-      self.app.categories["modelling"].tasksByName["Macro modelling"].syncEthnics()
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].syncSliders()
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].syncEthnics()
               
       human.applyAllTargets()
       del self.app.undoStack[:]
       del self.app.redoStack[:]
       
-      self.app.switchCategory("modelling")
+      self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
     
   def onShow(self, event):
@@ -163,7 +163,7 @@ class ExportTaskView(gui3d.TaskView):
       mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "exports/" + filename + ".obj")
       mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, "exports/" + filename + ".bvh")
       
-      self.app.switchCategory("modelling")
+      self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
       
   def onShow(self, event):

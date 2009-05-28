@@ -499,12 +499,14 @@ class Slider(View):
     
     if event.key == events3d.SDLK_HOME:
       newValue = 0.0
-    if event.key == events3d.SDLK_LEFT:
+    elif event.key == events3d.SDLK_LEFT:
       newValue -= 0.1
     elif event.key == events3d.SDLK_RIGHT:
       newValue += 0.1
-    if event.key == events3d.SDLK_END:
+    elif event.key == events3d.SDLK_END:
       newValue = 1.0
+    else:
+      View.onKeyDown(self, event)
       
     if oldValue != newValue:
       self.setValue(newValue)
@@ -543,6 +545,8 @@ class Button(View):
     if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
       self.setSelected(True)
       self.app.scene3d.redraw()
+    else:
+      View.onKeyDown(self, event)
       
   def onKeyUp(self, event):
     if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
