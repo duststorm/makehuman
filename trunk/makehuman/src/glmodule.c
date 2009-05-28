@@ -1146,8 +1146,6 @@ void mhEventLoop()
             G.modifiersKeyState = event.key.keysym.mod;
             if (event.key.keysym.sym == SDLK_F11 || (event.key.keysym.sym == SDLK_RETURN && event.key.keysym.mod & KMOD_ALT))
                 mhSetFullscreen(!G.fullscreen); // Switch fullscreen
-            else if (event.key.keysym.sym == SDLK_ESCAPE)
-                mhShutDown(); // Exit
             else
                 mhKeyUp(event.key.keysym.sym, event.key.keysym.unicode, event.key.keysym.mod);
             break;

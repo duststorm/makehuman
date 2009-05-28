@@ -180,28 +180,28 @@ class MHApplication(gui3d.Application):
       self.scene3d.selectedHuman.applyAllTargets()
       
   def onKeyDown(self, event):
-    if event.key == events3d.SDLK_m:
-      if event.modifiers & events3d.KMOD_CTRL:
-        self.app.switchCategory("Modelling")
-        self.app.scene3d.redraw()
-    elif event.key == events3d.SDLK_s:
-      if event.modifiers & events3d.KMOD_CTRL:
-        self.app.switchCategory("Files")
-        self.app.switchTask("Save")
-        self.app.scene3d.redraw()
-    elif event.key == events3d.SDLK_l:
-      if event.modifiers & events3d.KMOD_CTRL:
-        self.app.switchCategory("Files")
-        self.app.switchTask("Load")
-    elif event.key == events3d.SDLK_e:
-      if event.modifiers & events3d.KMOD_CTRL:
-        self.app.switchCategory("Files")
-        self.app.switchTask("Export")
-        self.app.scene3d.redraw()
-    elif event.key == events3d.SDLK_r:
-      if event.modifiers & events3d.KMOD_CTRL:
-        self.app.switchCategory("Rendering")
-        self.app.scene3d.redraw()
+    if event.modifiers & events3d.KMOD_CTRL:
+      if event.key == events3d.SDLK_m:
+          self.app.switchCategory("Modelling")
+          self.app.scene3d.redraw()
+      elif event.key == events3d.SDLK_s:
+          self.app.switchCategory("Files")
+          self.app.switchTask("Save")
+          self.app.scene3d.redraw()
+      elif event.key == events3d.SDLK_l:
+          self.app.switchCategory("Files")
+          self.app.switchTask("Load")
+      elif event.key == events3d.SDLK_e:
+          self.app.switchCategory("Files")
+          self.app.switchTask("Export")
+          self.app.scene3d.redraw()
+      elif event.key == events3d.SDLK_r:
+          self.app.switchCategory("Rendering")
+          self.app.scene3d.redraw()
+      elif event.key == events3d.SDLK_q:
+          self.app.scene3d.shutdown()
+      elif event.key == events3d.SDLK_h:
+          webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
     
   def do(self, action):
     if action.do():
