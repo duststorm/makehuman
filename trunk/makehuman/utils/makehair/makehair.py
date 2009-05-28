@@ -29,21 +29,17 @@ import subprocess
 import hairgenerator
 
 
-
-hairDiameter = Create(0.006)
-
-
-nHairs= Create(90)
-randomFact= Create(0.0)
-percOfRebels = Create(5)
-clumptype = Create(1.0)
-tuftSize= Create(0.10)
-colors1= Create(0.109, 0.037, 0.007)
-colors2= Create(0.518,0.325,0.125)
-
-
 mainPath = Blender.sys.dirname(Blender.Get('filename'))
 hairsClass = hairgenerator.hairgenerator()
+
+hairDiameter = Create(hairsClass.hairDiameter)
+nHairs= Create(hairsClass.numberOfHairs)
+randomFact= Create(hairsClass.randomFact)
+percOfRebels = Create(hairsClass.percOfRebels)
+clumptype = Create(hairsClass.clumptype)
+tuftSize= Create(hairsClass.tuftSize)
+rootColor= Create(hairsClass.rootColor[0],hairsClass.rootColor[1],hairsClass.rootColor[2])
+tipColor= Create(hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2])
 
 
 def convertCoords(obj):
@@ -228,7 +224,7 @@ def writeSubdividedObj(ribPath, mesh):
 
 def writeHairs(tuft, fileObj):
 
-    global colors1,colors2,hairDiameter,preview
+    global rootColor,tipColor,hairDiameter,preview
 
 
     hDiameter = hairDiameter.val*random.uniform(0.5,1)
@@ -236,7 +232,7 @@ def writeHairs(tuft, fileObj):
     objFile = file(fileObj,'w')
     objFile.write('\t\tDeclare "rootcolor" "color"\n')
     objFile.write('\t\tDeclare "tipcolor" "color"\n')
-    objFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]' % (colors1.val[0],colors1.val[1],colors1.val[2],colors2.val[0],colors2.val[1],colors2.val[2]))
+    objFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]' % (rootColor.val[0],rootColor.val[1],rootColor.val[2],tipColor.val[0],tipColor.val[1],tipColor.val[2]))
     objFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
     objFile.write('Curves "cubic" [')
     for hair in tuft:
@@ -356,7 +352,7 @@ def draw():
     global nHairs,randomFact
     global percOfRebels,tuftSize,subsurf
     global samples,clumptype,preview
-    global colors1,colors2
+    global rootColor,tipColor
 
 
     glClearColor(0.5, 0.5, 0.5, 0.0)
@@ -378,8 +374,8 @@ def draw():
 
 
 
-    colors1 = ColorPicker(3, 10, buttonY+240, 20, 20, colors1.val)
-    colors2 = ColorPicker(3, 40, buttonY+240, 20, 20, colors2.val)
+    rootColor = ColorPicker(3, 10, buttonY+240, 20, 20, rootColor.val)
+    tipColor = ColorPicker(3, 40, buttonY+240, 20, 20, tipColor.val)
 
 
     glColor3f(1, 1, 1)

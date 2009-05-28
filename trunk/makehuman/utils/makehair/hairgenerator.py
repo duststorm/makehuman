@@ -25,6 +25,8 @@ class hairgenerator:
         self.tuftSize = 0.150
         self.randomFact = 0.0
         self.hairDiameter = 0.006
+        self.tipColor = (0.518,0.325,0.125)
+        self.rootColor = (0.109, 0.037, 0.007)
 
 
 
