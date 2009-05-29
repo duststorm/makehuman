@@ -344,7 +344,8 @@ def saveRib(fName):
 def saveHairsFile(path):
     hairsClass.saveHairs(path)
 
-
+def loadHairsFile(path):
+    hairsClass.loadHairs(path)
 ###############################INTERFACE#####################################
 #############################################################################
 
@@ -372,7 +373,7 @@ def draw():
     rootColor = ColorPicker(3, 10, buttonY+140, 125, 20, rootColor.val,"Color of root")
     tipColor = ColorPicker(3, 135, buttonY+140, 125, 20, tipColor.val,"Color of tip")
     Button("Save", 4, 10, buttonY+200, 100, 20)
-
+    Button("Load", 5, 110, buttonY+200, 100, 20)
 
     glColor3f(1, 1, 1)
     glRasterPos2i(10, buttonY+180)
@@ -400,6 +401,8 @@ def bevent(evt):
 
     elif (evt== 4):
         Window.FileSelector (saveHairsFile, "Save hair data")
+    elif (evt== 5):
+        Window.FileSelector (loadHairsFile, "Load hair data")
 
     Window.RedrawAll()
 

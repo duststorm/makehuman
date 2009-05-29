@@ -59,8 +59,8 @@ class Hairgenerator:
         self.tuftSize = 0.150
         self.randomFact = 0.0
         self.hairDiameter = 0.006
-        self.tipColor = (0.518,0.325,0.125)
-        self.rootColor = (0.109, 0.037, 0.007)
+        self.tipColor = [0.518,0.325,0.125]
+        self.rootColor = [0.109, 0.037, 0.007]
         self.guides = []
         self.version = "1.0 alpha 2"
         self.tags = []
@@ -129,14 +129,14 @@ class Hairgenerator:
         for tag in self.tags:
             fileDescriptor.write("%s "%(tag))
         fileDescriptor.write("\n")
-        fileDescriptor.write("numberofhairs %s\n"%(self.numberOfHairs))
-        fileDescriptor.write("percofrebels %s\n"%(self.percOfRebels))
-        fileDescriptor.write("clumptype %s\n"%(self.clumptype))
-        fileDescriptor.write("tuftsize %s\n"%(self.tuftSize))
-        fileDescriptor.write("randomfact %s\n"%(self.randomFact))
-        fileDescriptor.write("hairdiameter %s\n"%(self.hairDiameter))
+        fileDescriptor.write("numberofhairs %i\n"%(self.numberOfHairs))
+        fileDescriptor.write("percofrebels %f\n"%(self.percOfRebels))
+        fileDescriptor.write("clumptype %f\n"%(self.clumptype))
+        fileDescriptor.write("tuftsize %f\n"%(self.tuftSize))
+        fileDescriptor.write("randomfact %f\n"%(self.randomFact))
+        fileDescriptor.write("hairdiameter %f\n"%(self.hairDiameter))
         fileDescriptor.write("tipcolor %f %f %f\n"%(self.tipColor[0],self.tipColor[1],self.tipColor[2]))
-        fileDescriptor.write("rootxolor %f %f %f\n"%(self.rootColor[0],self.rootColor[1],self.rootColor[2]))
+        fileDescriptor.write("rootcolor %f %f %f\n"%(self.rootColor[0],self.rootColor[1],self.rootColor[2]))
 
         for guide in self.guides:
             fileDescriptor.write("%s "%(guide.name))
@@ -144,5 +144,64 @@ class Hairgenerator:
                 fileDescriptor.write("%f %f %f "%(cP[0],cP[1],cP[2]))
             fileDescriptor.write("\n")
         fileDescriptor.close()
+    
+    def extractSubList(self,listToSplit,sublistLength):        
+        listOfLists = []
+        for i in xrange(0, len(listToSplit), sublistLength):
+            listOfLists.append(listToSplit[i: i+sublistLength])
+        return listOfLists
+
+
+    
+    def loadHairs(self, path):        
+        try:
+            fileDescriptor = open(path)
+        except:
+            print "Impossible to load %s"%(path)
+            return
+            
+        self.guides = []
+        for data in fileDescriptor:
+            datalist = data.split()
+            if datalist[0] == "written":
+                pass
+            elif datalist[0] == "version":
+                pass
+            elif datalist[0] == "tags":
+                pass
+            elif datalist[0] == "numberofhairs":
+                self.numberOfHairs = int(datalist[1])
+            elif datalist[0] == "percofrebels":
+                self.percOfRebels = float(datalist[1])
+            elif datalist[0] == "clumptype":
+                self.clumpyype = float(datalist[1])
+            elif datalist[0] == "tuftsize":
+                self.tuftSize = float(datalist[1])
+            elif datalist[0] == "randomfact":
+                self.randomFact = float(datalist[1])
+            elif datalist[0] == "hairdiameter":
+                self.hairDiameter = float(datalist[1])
+            elif datalist[0] == "tipcolor":
+                self.tipColor[0] = float(datalist[1])
+                self.tipColor[1] = float(datalist[2])
+                self.tipColor[2] = float(datalist[3])
+            elif datalist[0] == "rootcolor":
+                self.rootColor[0] = float(datalist[1])
+                self.rootColor[1] = float(datalist[2])
+                self.rootColor[2] = float(datalist[3])
+            else: 
+                controlPointsCoo = datalist[1:]
+                for i in range(len(controlPointsCoo)):
+                    controlPointsCoo[i] = float(controlPointsCoo[i])
+                guidePoints = self.extractSubList(controlPointsCoo,3)
+                self.addHairGuide(guidePoints, datalist[0])
+        fileDescriptor.close()
+                
+                
+                
+            
+                
+            
+        
 
 
