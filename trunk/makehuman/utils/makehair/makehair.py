@@ -223,21 +223,23 @@ def writeHairs(ribRepository):
 
     global rootColor,tipColor,hairDiameter,preview,hairsClass
     hDiameter = hairsClass.hairDiameter*random.uniform(0.5,1)    
-    for tuft in hairsClass.hairs:        
-        hairName = "%s/%s.rib"%(ribRepository,tuft.name)
-        print "HAIRNAME",hairName
+    for hSet in hairsClass.hairStyle:        
+        hairName = "%s/%s.rib"%(ribRepository,hSet.name)
+        
         hairFile = open(hairName,'w')        
         hairFile.write('\t\tDeclare "rootcolor" "color"\n')
         hairFile.write('\t\tDeclare "tipcolor" "color"\n')
-        hairFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]' % (rootColor.val[0],rootColor.val[1],rootColor.val[2],tipColor.val[0],tipColor.val[1],tipColor.val[2]))
+        hairFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]'%(rootColor.val[0],\
+                    rootColor.val[1],rootColor.val[2],\
+                    tipColor.val[0],tipColor.val[1],tipColor.val[2]))
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
         hairFile.write('Curves "cubic" [')    
-        for hair in tuft.hairs:
-            hairFile.write('%i ' % len(hair))
+        for hair in hSet.hairs:
+            hairFile.write('%i ' % len(hair.controlPoints))
         hairFile.write('] "nonperiodic" "P" [')
-        for hair in tuft.hairs:
-            for vert in hair:
-                hairFile.write("%s %s %s " % (vert[0],vert[1],vert[2]))
+        for hair in hSet.hairs:
+            for cP in hair.controlPoints:
+                hairFile.write("%s %s %s " % (cP[0],cP[1],cP[2]))
         hairFile.write(']  "constantwidth" [%s]' % (hDiameter))
         hairFile.close()
 
@@ -339,7 +341,8 @@ def saveRib(fName):
         command = '%s %s'%('rndr', fName)
     subprocess.Popen(command, shell=True)
 
-
+def saveHairsFile(path):
+    hairsClass.saveHairs(path)
 
 
 ###############################INTERFACE#####################################
@@ -368,6 +371,7 @@ def draw():
     tuftSize= Slider("Tuft area: ", 3, 10, buttonY+120, 250, 18, tuftSize.val, 0.0, 0.5, 0)
     rootColor = ColorPicker(3, 10, buttonY+140, 125, 20, rootColor.val,"Color of root")
     tipColor = ColorPicker(3, 135, buttonY+140, 125, 20, tipColor.val,"Color of tip")
+    Button("Save", 4, 10, buttonY+200, 100, 20)
 
 
     glColor3f(1, 1, 1)
@@ -393,6 +397,9 @@ def bevent(evt):
         hairsClass.clumptype = clumptype.val
         hairsClass.randomFact = randomFact.val
         hairsClass.hairDiameter = hairDiameter.val
+
+    elif (evt== 4):
+        Window.FileSelector (saveHairsFile, "Save hair data")
 
     Window.RedrawAll()
 
