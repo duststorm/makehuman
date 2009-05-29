@@ -18,7 +18,8 @@ import os
 import sys
 import math
 import random
-
+mainPath = Blender.sys.dirname(Blender.Get('filename'))
+sys.path.append(mainPath)
 from Blender.Draw import *
 from Blender.BGL import *
 from Blender import Scene
@@ -28,10 +29,7 @@ from Blender import Window
 import subprocess
 import hairgenerator
 
-
-mainPath = Blender.sys.dirname(Blender.Get('filename'))
-hairsClass = hairgenerator.hairgenerator()
-
+hairsClass = hairgenerator.Hairgenerator()
 hairDiameter = Create(hairsClass.hairDiameter)
 nHairs= Create(hairsClass.numberOfHairs)
 randomFact= Create(hairsClass.randomFact)
@@ -176,8 +174,7 @@ def writePolyObj(fileObj, mesh):
 			if num == 3 or num == 4:
 				for vi in range(len(face.v)):
 					objFile.write('%s %s ' % (face.uv[vi][0], 1.0 - face.uv[vi][1]))
-		objFile.write(']')
-	
+		objFile.write(']')	
 	objFile.write('\n')
 	objFile.close()
 
@@ -222,27 +219,27 @@ def writeSubdividedObj(ribPath, mesh):
 	objFile.write('\n')
 
 
-def writeHairs(tuft, fileObj):
+def writeHairs(ribRepository):
 
-    global rootColor,tipColor,hairDiameter,preview
-
-
-    hDiameter = hairDiameter.val*random.uniform(0.5,1)
-
-    objFile = file(fileObj,'w')
-    objFile.write('\t\tDeclare "rootcolor" "color"\n')
-    objFile.write('\t\tDeclare "tipcolor" "color"\n')
-    objFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]' % (rootColor.val[0],rootColor.val[1],rootColor.val[2],tipColor.val[0],tipColor.val[1],tipColor.val[2]))
-    objFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
-    objFile.write('Curves "cubic" [')
-    for hair in tuft:
-        objFile.write('%i ' % len(hair))
-    objFile.write('] "nonperiodic" "P" [')
-    for hair in tuft:
-        for vert in hair:
-            objFile.write("%s %s %s " % (vert[0],vert[1],vert[2]))
-    objFile.write(']  "constantwidth" [%s]' % (hDiameter))
-    objFile.close()
+    global rootColor,tipColor,hairDiameter,preview,hairsClass
+    hDiameter = hairsClass.hairDiameter*random.uniform(0.5,1)    
+    for tuft in hairsClass.hairs:        
+        hairName = "%s/%s.rib"%(ribRepository,tuft.name)
+        print "HAIRNAME",hairName
+        hairFile = open(hairName,'w')        
+        hairFile.write('\t\tDeclare "rootcolor" "color"\n')
+        hairFile.write('\t\tDeclare "tipcolor" "color"\n')
+        hairFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]' % (rootColor.val[0],rootColor.val[1],rootColor.val[2],tipColor.val[0],tipColor.val[1],tipColor.val[2]))
+        hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
+        hairFile.write('Curves "cubic" [')    
+        for hair in tuft.hairs:
+            hairFile.write('%i ' % len(hair))
+        hairFile.write('] "nonperiodic" "P" [')
+        for hair in tuft.hairs:
+            for vert in hair:
+                hairFile.write("%s %s %s " % (vert[0],vert[1],vert[2]))
+        hairFile.write(']  "constantwidth" [%s]' % (hDiameter))
+        hairFile.close()
 
 
 def writeLamps(ribfile):
@@ -289,13 +286,12 @@ def writeBody(ribfile, ribRepository):
                 ribfile.write("\t\tRotate %s 0 0 1\n" %(rotZ))
                 ribfile.write("\t\tRotate %s 0 1 0\n" %(rotY))
                 ribfile.write("\t\tRotate %s 1 0 0\n" %(rotX))
-                ribfile.write("\t\tScale %s %s %s\n" %(sizeX,sizeY,sizeZ))
-                tuft = hairsClass.generateTuft(curnurb)
-                writeHairs(tuft, ribObj)
-                hairCounter += 1
+                ribfile.write("\t\tScale %s %s %s\n" %(sizeX,sizeY,sizeZ))                
                 ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
                 ribfile.write('\tAttributeEnd\n')
-
+                hairsClass.addHairGuide(curnurb, name)
+                hairCounter += 1
+   
     print "Exported ",nHairs.val * hairCounter, " hairs"
 
 
@@ -320,13 +316,15 @@ def saveRib(fName):
     if not os.path.isdir(objectsDirectory):
         os.mkdir(objectsDirectory)
 
-    theFile = file(fName,'w')
+    theFile = open(fName,'w')
     
     writeHuman(objectsDirectory)
     writeHeader(theFile,imageName)    
     writeLamps(theFile)
     writeBody(theFile,objectsDirectory)
-    writeFooter(theFile)   
+    hairsClass.generateHairStyle()
+    writeFooter(theFile) 
+    writeHairs(objectsDirectory)  
     theFile.close()
     print fName
 
@@ -361,26 +359,20 @@ def draw():
 
     Button("Exit", 1, 210, buttonY, 50, 20)
     Button("Rendering", 2, 10, buttonY, 200, 20)
-    #samples= Slider("Samples: ", 3, 10, buttonY+40, 250, 18, samples.val, 2, 10, 1)
 
-    
-
-    clumptype = Slider("Clumpiness: ", 3, 10, buttonY+120, 250, 18, clumptype.val, 0.0, 1.0, 1)
-    hairDiameter = Slider("Hair diamter: ", 0, 10, buttonY+140, 250, 20, hairDiameter.val, 0, 0.05, 0)
-    percOfRebels= Slider("% of unkempt: ", 3, 10, buttonY+160, 250, 18, percOfRebels.val, 1, 100, 0)
-    randomFact= Slider("Unkempt val: ", 3, 10, buttonY+180, 250, 18, randomFact.val, 0, 1, 0)
-    nHairs= Slider("n Hairs: ", 3, 10, buttonY+200, 250, 18, nHairs.val, 1, 1000, 0)
-    tuftSize= Slider("Dupl. Size: ", 3, 10, buttonY+220, 250, 18, tuftSize.val, 0.0, 0.5, 0)    
-
-
-
-    rootColor = ColorPicker(3, 10, buttonY+240, 20, 20, rootColor.val)
-    tipColor = ColorPicker(3, 40, buttonY+240, 20, 20, tipColor.val)
+    clumptype = Slider("Clumpiness: ", 3, 10, buttonY+20, 250, 18, clumptype.val, 0.0, 1.0, 1)
+    hairDiameter = Slider("Hair diameter: ", 0, 10, buttonY+40, 250, 20, hairDiameter.val, 0, 0.05, 0)
+    percOfRebels= Slider("% of unkempt: ", 3, 10, buttonY+60, 250, 18, percOfRebels.val, 1, 100, 0)
+    randomFact= Slider("Unkempt dist: ", 3, 10, buttonY+80, 250, 18, randomFact.val, 0, 1, 0)
+    nHairs= Slider("Number of hairs: ", 3, 10, buttonY+100, 250, 18, nHairs.val, 1, 1000, 0)
+    tuftSize= Slider("Tuft area: ", 3, 10, buttonY+120, 250, 18, tuftSize.val, 0.0, 0.5, 0)
+    rootColor = ColorPicker(3, 10, buttonY+140, 125, 20, rootColor.val,"Color of root")
+    tipColor = ColorPicker(3, 135, buttonY+140, 125, 20, tipColor.val,"Color of tip")
 
 
     glColor3f(1, 1, 1)
-    glRasterPos2i(10, 420)
-    Text("MAKEHUMAN hair tool 1.0 beta" )
+    glRasterPos2i(10, buttonY+180)
+    Text("makeHair 1.0 beta" )
 
 def event(evt, val):
     if (evt== QKEY and not val): Exit()
