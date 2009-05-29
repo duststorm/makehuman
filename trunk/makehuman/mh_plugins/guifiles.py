@@ -87,7 +87,7 @@ class SaveTaskView(gui3d.TaskView):
 class LoadTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Load",  "data/images/button_load_file.png")
-    self.filechooser = gui3d.FileChooser(self, "mhm")
+    self.filechooser = gui3d.FileChooser(self, "models", "mhm")
     
     @self.filechooser.event
     def onFileSelected(filename):

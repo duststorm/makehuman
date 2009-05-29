@@ -65,7 +65,7 @@ else:
     pixiePath  = ""
 
 import gui3d, events3d
-import human
+import human, hair
 import guimodelling, guifiles, guirender
 
 class MHApplication(gui3d.Application):
@@ -153,7 +153,7 @@ class MHApplication(gui3d.Application):
     # Set up categories and tasks  
     
     # Exit button
-    category = gui3d.Category(self, "exit", "data/images/button_exit.png")
+    category = gui3d.Category(self, "Exit", "data/images/button_exit.png")
     @category.button.event
     def onClicked(event):
       self.stop()
@@ -163,6 +163,9 @@ class MHApplication(gui3d.Application):
     guifiles.FilesCategory(self)
     self.progressBar.setProgress(0.8)
     guirender.RenderingCategory(self)
+    
+    library = gui3d.Category(self, "Library", "data/images/button_library.png")
+    hair.HairTaskView(library)
     
     category = gui3d.Category(self, "Help", "data/images/button_about.png")
     # Help button
