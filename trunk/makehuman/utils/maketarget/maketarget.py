@@ -219,16 +219,17 @@ def loadTranslationTarget(targetPath):
     maxIndexOfVerts = len(obj.verts)        
     for vData in targetData:
         vectorData = vData.split()
-        if len(vectorData) < 4:
-            vectorData = vData.split(',') #compatible old format
-        mainPointIndex = int(vectorData[0])
-        if mainPointIndex < maxIndexOfVerts:
-            pointX = float(vectorData[1])
-            pointY = float(vectorData[2])
-            pointZ = float(vectorData[3])
-            targetBuffer.append([mainPointIndex, pointX,pointY,pointZ])
-        else:                
-            Draw.PupMenu("WARNING: target has more verts than Base mesh")
+        if '#' not in vectorData[0]:
+            if len(vectorData) < 4:
+                vectorData = vData.split(',') #compatible old format
+            mainPointIndex = int(vectorData[0])
+            if mainPointIndex < maxIndexOfVerts:
+                pointX = float(vectorData[1])
+                pointY = float(vectorData[2])
+                pointZ = float(vectorData[3])
+                targetBuffer.append([mainPointIndex, pointX,pointY,pointZ])
+            else:                
+                Draw.PupMenu("WARNING: target has more verts than Base mesh")
     return 1
 
 def saveTranslationTarget(targetPath):
