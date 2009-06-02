@@ -29,7 +29,9 @@ from Blender import Window
 import subprocess
 import hairgenerator
 
-hairsClass = hairgenerator.Hairgenerator()
+humanMesh = Blender.Object.Get("Base")
+
+hairsClass = hairgenerator.Hairgenerator(humanMesh.getData())
 hairDiameter = Create(hairsClass.hairDiameter)
 nHairs= Create(hairsClass.numberOfHairs)
 randomFact= Create(hairsClass.randomFact)
@@ -258,7 +260,7 @@ def writeLamps(ribfile):
 
 def writeHuman(ribRepository):    
 
-    humanMesh = Blender.Object.Get("Base")
+    global humanMesh
     meshData = humanMesh.getData()
     ribPath = "%s/base.obj.rib"%(ribRepository)
     writePolyObj(ribPath, meshData)

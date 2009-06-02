@@ -16,6 +16,8 @@ makehuman hairs.
 
 import random
 import math
+import simpleoctree
+
 
 class Hair:
     """
@@ -50,7 +52,7 @@ class Hairgenerator:
     The sum of all hair sets (think of it as tufts) is called hairstyle.
     """
 
-    def __init__(self):
+    def __init__(self, humanMesh):
 
         self.hairStyle = []
         self.numberOfHairs = 90
@@ -64,6 +66,7 @@ class Hairgenerator:
         self.guides = []
         self.version = "1.0 alpha 2"
         self.tags = []
+        self.octree = simpleoctree.SimpleOctree(humanMesh.verts)
 
     def addHairGuide(self,curve, curveName):
         g = HairGuide(curveName)
