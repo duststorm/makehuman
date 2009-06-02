@@ -1,17 +1,22 @@
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
 """ 
 Data Structures and Functions for *Half Edges* processing.
 
-===========================  ===============================================================  
-Project Name:                **MakeHuman**                                                  
-Module File Location:        mh_plugins/halfedges.py                                          
-Product Home Page:           http://www.makehuman.org/                                      
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
-Authors:                     Manuel Bastioni                                            
-Copyright(c):                MakeHuman Team 2001-2008                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
-===========================  ===============================================================  
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Manuel Bastioni
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 This module implements the data structures and functions to support vertex/face analysis 
 using *Half Edges* and is implemented as a plugin that can be used by developers to validate mesh 

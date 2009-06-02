@@ -1,17 +1,22 @@
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
 """ 
 POV-Ray Export functions.
 
-===========================  ===============================================================  
-Project Name:                **MakeHuman**                                                  
-Module File Location:        mh_plugins/mh2povray.py                                          
-Product Home Page:           http://www.makehuman.org/                                      
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
-Authors:                     Chris Bartlett                                            
-Copyright(c):                MakeHuman Team 2001-2009                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
-===========================  ===============================================================  
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Chris Bartlett
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 This module implements functions to export a human model in POV-Ray format. POV-Ray is a 
 Raytracing application (a renderer) that is free to download and use. The generated text 

@@ -1,35 +1,42 @@
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
 """
-Classes for widgets (GUI utilities). 
+Classes for widgets (GUI utilities).
 
-===========================  ===============================================================
-Project Name:                **MakeHuman**                                                  
-Module File Location:        mh_core/animation3d.py                                           
-Product Home Page:           http://www.makehuman.org/                                      
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
-Authors:                     Manuel Bastioni, Marc Flerackers                               
-Copyright(c):                MakeHuman Team 2001-2009                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
-===========================  ===============================================================
+**Project Name:**      MakeHuman
 
-This module contains classes defined to implement widgets that provide utility functions 
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Marc Flerackers
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
+
+This module contains classes defined to implement widgets that provide utility functions
 to the graphical user interface.
 
 """
+
+__docformat__ = 'restructuredtext'
 
 import time
 
 def lerp(v1, v2, alpha):
     return v1 + alpha * (v2 - v1)
-    
+
 def lerpVector(v1, v2, alpha):
     return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
 
 class Action:
     def __init__():
         pass
-        
+
     def set(self, alpha):
         pass
 
@@ -37,7 +44,7 @@ class PathAction(Action):
     def __init__(self, obj, positions):
         self.obj = obj
         self.positions = positions
-        
+
     def set(self, alpha):
         keys = float(len(self.positions) - 1)
         key = int(alpha * keys)
@@ -57,25 +64,25 @@ class RotateAction(Action):
         self.obj = obj
         self.startAngle = startAngles
         self.endAngle = endAngles
-        
+
     def set(self, alpha):
         value = (lerpVector(self.startAngle, self.endAngle, alpha))
         self.obj.setRot(value[0], value[1], value[2])
-        
+
 class ScaleAction(Action):
     def __init__(self, obj, startScale, endScale):
         self.obj = obj
         self.startScale = startScale
         self.endScale = endScale
-        
+
     def set(self, alpha):
         value = lerpVector(self.startScale, self.endScale, alpha)
         self.obj.setScale(value[0], value[1], value[2])
-        
+
 class UpdateAction(Action):
     def __init__(self, scene):
         self.scene = scene
-    
+
     def set(self, alpha):
         self.scene.redraw(0)
 
@@ -83,10 +90,10 @@ class Timeline:
     def __init__(self, seconds):
         self.length = seconds
         self.actions = []
-        
+
     def append(self, action):
         self.actions.append(action)
-        
+
     def start(self):
         reference = time.time()
         t = 0

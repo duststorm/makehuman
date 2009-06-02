@@ -2,16 +2,22 @@
 """
 Base 3D MakeHuman classes.
 
-===========================  ===============================================================
-Project Name:                **MakeHuman**
-Module File Location:        mh_core/module3d.py
-Product Home Page:           http://www.makehuman.org/
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/
-Authors:                     Manuel Bastioni,  Marc Flerackers, Paolo Colombo
-Copyright(c):                MakeHuman Team 2001-2009
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards
-===========================  ===============================================================
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Manuel Bastioni, Marc Flerackers
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 This module contains all of the base classes needed to manage the 3D MakeHuman
 data structures at runtime. This includes the data structures themselves as well
@@ -43,6 +49,15 @@ import os
 textureCache = {}
 
 class Texture:
+    """
+    A simple handler for textures loaded in the scene.
+    
+    Attributes
+    ----------
+    
+    - **self.id** : The texture identifier. (TODO:Editorial note: it's int?)
+    - **self.modified**: A flag to indicate if a texture is modified. (TODO:Editorial Note: it's for reload?)
+    """
         def __init__(self, id, modified):
             self.id = id
             self.modified = modified
@@ -107,24 +122,29 @@ class Vert:
         x,y,z = 1,1,1
         v = module3d.Vert([x,y,z])
         v.update()
+        
+    Attributes
+    ----------
+    
+    - **self.co**: *float list*. The coordinates of the vertex.
+      Default: [coX, coY, coZ]).
+    - **self.no**: *float list*. The normal of this vertex (or 0).
+      Default: [0, 0, 0].
+    - **self.objID**: *int*. The index of the object of which this vertex is a part.
+      Default: 0
+    - **self.sharedFacesIndices**: *faces list*. The list of faces that share this vertex.
+    - **self.sharedFaces**: *faces list*. The list of faces that share this vertex.
+    - **self.indicesInFullVertArray**: *Int list*. The list of corresponding vertices in the C OpenGL list.
+    - **self.idx**: *Int* The index of this vertex in the vertices list.
+    - **self.color**: *float list*. A list of 4 floats [r,g,b,a] used as the vertex color (including an alpha channel).
     """
 
     def __init__(self, co = [0, 0, 0], idx=0, obIdx=0, sfidx = []):
         """
         This is the constructor method for the Vert class. It initializes the
-        following attributes:
+        vert attributes.
 
-        - **self.co**: *float list*. The coordinates of the vertex.
-          Default: [coX, coY, coZ]).
-        - **self.no**: *float list*. The normal of this vertex (or 0).
-          Default: [0, 0, 0].
-        - **self.objID**: *int*. The index of the object of which this vertex is a part.
-          Default: 0
-        - **self.sharedFacesIndices**: *faces list*. The list of faces that share this vertex.
-        - **self.sharedFaces**: *faces list*. The list of faces that share this vertex.
-        - **self.indicesInFullVertArray**: *Int list*. The list of corresponding vertices in the C OpenGL list.
-        - **self.idx**: *Int* The index of this vertex in the vertices list.
-        - **self.color**: *float list*. A list of 4 floats [r,g,b,a] used as the vertex color (including an alpha channel).
+
 
         Parameters
         ----------
@@ -312,7 +332,7 @@ class Face:
     """
     A face object. In MakeHuman, all face objects are triangular.
 
-    Basic usage:
+    Basic usage
     ------------
 
     ::
@@ -324,23 +344,28 @@ class Face:
         v3 = module3d.Vert([0,0,1])
 
         f = module3d.Face(v1,v2,v3)
+        
+    Attributes
+    ----------
+    
+    - **self.no**: *float list* The physical surface normal of the face (x,y,z). Default: [0, 0, 0].
+    - **self.verts**: *verts list* A list of 3 vertices that represent the corners of this face.
+    - **self.idx**: *int* The index of this face in the list of faces.
+    - **self.group**: *FaceGroup* The face group that is the parent of this face.
+    - **self.color**: *list of list of ints*. A list of 3 lists of 4 integers (0-255)
+      [[r,g,b,a],[r,g,b,a],[r,g,b,a]] used as the 3 vertex colors (including an alpha channel).
+    - **self.colorID**: *list of list of ints*. A list of 3 integers (0-255) [index1,index2,index3]
+      used as a 'selection' color.
+    - **self.uv**: *list of list of floats*. A list of a 3 lists of 2 floats [[u,v],[u,v],[u,v]]
+      holding the UV coordinates for the uv-mapping of textures to this face.
     """
 
     def __init__(self,v0,v1,v2):
         """
         This is the constructor method for the Face class.
-        It initializes the following attributes:
+        It initializes all face attributes.
 
-        - **self.no**: *float list* The physical surface normal of the face (x,y,z). Default: [0, 0, 0].
-        - **self.verts**: *verts list* A list of 3 vertices that represent the corners of this face.
-        - **self.idx**: *int* The index of this face in the list of faces.
-        - **self.group**: *FaceGroup* The face group that is the parent of this face.
-        - **self.color**: *list of list of ints*. A list of 3 lists of 4 integers (0-255)
-          [[r,g,b,a],[r,g,b,a],[r,g,b,a]] used as the 3 vertex colors (including an alpha channel).
-        - **self.colorID**: *list of list of ints*. A list of 3 integers (0-255) [index1,index2,index3]
-          used as a 'selection' color.
-        - **self.uv**: *list of list of floats*. A list of a 3 lists of 2 floats [[u,v],[u,v],[u,v]]
-          holding the UV coordinates for the uv-mapping of textures to this face.
+
 
         Parameters
         ----------
@@ -416,17 +441,20 @@ class FaceGroup:
 
     The FaceGroup object contains a list of the faces in the group and must be
     kept in sync with the FaceGroup references stored by the individual faces.
+    
+    Attributes
+    ----------
+    
+    - **self.name**: *string*. The name of this FaceGroup.
+    - **self.faces**: *faces list*. A list of faces. Default: empty.
+    - **self.parent**: *Object3d*. The object3D object that contains this FaceGroup. Default: None.
 
     """
 
     def __init__(self,name):
         """
         This is the constructor method for the FaceGroup class.
-        It initializes the following attributes:
-
-        - **self.name**: *string*. The name of this FaceGroup.
-        - **self.faces**: *faces list*. A list of faces. Default: empty.
-        - **self.parent**: *Object3d*. The object3D object that contains this FaceGroup. Default: None.
+        It initializes all facegroups attributes.
 
         Parameters
         ----------
@@ -462,43 +490,47 @@ class Object3D:
 
     This object has a position and orientation of its own, and the positions and
     orientations of faces and vertices that make up this object are defined relative to
-    it.
+    it. 
+    
+    Attributes:
+    -----------
+    
+    - **self.name**: *string* The name of this Object3D object.
+    - **self.idx**: *int* The ID used to identify the object in the OpenGL engine array.
+    - **self.x**: *float* The x coordinate of the position of this object in the coordinate space of the scene.
+    - **self.y**: *float* The y coordinate of the position of this object in the coordinate space of the scene.
+    - **self.z**: *float* The z coordinate of the position of this object in the coordinate space of the scene.
+    - **self.rx**: *float* The x rotation component of the orientation of this object within the coordinate space of the scene.
+    - **self.ry**: *float* The y rotation component of the orientation of this object within the coordinate space of the scene.
+    - **self.rz**: *float* The z rotation component of the orientation of this object within the coordinate space of the scene.
+    - **self.sx**: *float* The x scale component of the size of this object within the coordinate space of the scene.
+    - **self.sy**: *float* The y scale component of the size of this object within the coordinate space of the scene.
+    - **self.sz**: *float* The z scale component of the size of this object within the coordinate space of the scene.
+    - **self.r**: *int* The Red channel component of the color ID of this object.
+    - **self.g**: *int* The Green channel component of the color ID of this object.
+    - **self.b**: *int* The Blue channel component of the color ID of this object.
+    - **self.verts**: *verts list* The list of vertices that go to make up this object.
+    - **self.faces**: *faces list* The list of faces that go to make up this object.
+    - **self.facesGroups**: *facesGroups list* The list of FaceGroups that go to make up this object.
+    - **self.cameraMode**: *int flag* A flag to indicate which of the two available perspective camera projections, fixed or movable, is to be used to draw this object.
+    - **self.visibility**: *int flag* A flag to indicate whether or not this object is visible.
+    - **self.texture**: *string* The path of a TGA file on disk containing the object texture.
+    - **self.isSelected**: *int flag* A flag to indicate whether this object is currently selected.
+    - **self.faceGroupSelected**: *string* The name of actually selected face group.
+    - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
+    - **self.isSubdivided**: *int flag* A flag to indicate whether this object is subdivided or not.
+    - **self.indexBuffer**: *faces list* The list of faces as indices to the vertexbuffer.
+    - **self.vertexBufferSize**: *int* size in vertices of the vertexbuffer.
+    - **self.uvValues**: *uv list* The list of uv values referenced to by the faces.
+    - **self.text**: string* A text to be printed near the obj
+    - **self.pickable**: *int flag* A flag to indicate whether this object is pickable by mouse or not.
 
     """
 
     def __init__(self, objName):
         """
         This is the constructor method for the Object3D class.
-        It initializes the following attributes:
-
-        - **self.name**: *string* The name of this Object3D object.
-        - **self.idx**: *int* The ID used to identify the object in the OpenGL engine array.
-        - **self.x**: *float* The x coordinate of the position of this object in the coordinate space of the scene.
-        - **self.y**: *float* The y coordinate of the position of this object in the coordinate space of the scene.
-        - **self.z**: *float* The z coordinate of the position of this object in the coordinate space of the scene.
-        - **self.rx**: *float* The x rotation component of the orientation of this object within the coordinate space of the scene.
-        - **self.ry**: *float* The y rotation component of the orientation of this object within the coordinate space of the scene.
-        - **self.rz**: *float* The z rotation component of the orientation of this object within the coordinate space of the scene.
-        - **self.sx**: *float* The x scale component of the size of this object within the coordinate space of the scene.
-        - **self.sy**: *float* The y scale component of the size of this object within the coordinate space of the scene.
-        - **self.sz**: *float* The z scale component of the size of this object within the coordinate space of the scene.
-        - **self.r**: *int* The Red channel component of the color ID of this object.
-        - **self.g**: *int* The Green channel component of the color ID of this object.
-        - **self.b**: *int* The Blue channel component of the color ID of this object.
-        - **self.verts**: *verts list* The list of vertices that go to make up this object.
-        - **self.faces**: *faces list* The list of faces that go to make up this object.
-        - **self.facesGroups**: *facesGroups list* The list of FaceGroups that go to make up this object.
-        - **self.cameraMode**: *int flag* A flag to indicate which of the two available perspective camera projections, fixed or movable, is to be used to draw this object.
-        - **self.visibility**: *int flag* A flag to indicate whether or not this object is visible.
-        - **self.texture**: *string* The path of a TGA file on disk containing the object texture.
-        - **self.isSelected**: *int flag* A flag to indicate whether this object is currently selected.
-        - **self.faceGroupSelected**: *string* The name of actually selected face group.
-        - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
-        - **self.isSubdivided**: *int flag* A flag to indicate whether this object is subdivided or not.
-        - **self.indexBuffer**: *faces list* The list of faces as indices to the vertexbuffer.
-        - **self.vertexBufferSize**: *int* size in vertices of the vertexbuffer.
-        - **self.uvValues**: *uv list* The list of uv values referenced to by the faces.
-        - **self.text**: string* A text to be printed near the obj
+        It initializes all object attributes.
 
         Parameters
         ----------
@@ -931,36 +963,37 @@ class Scene3D:
     this technique. However, this is not a major problem for MakeHuman, which
     doesn't use such low polygon groupings.
 
+    Attributes
+    ----------
+    
+    - **self.objects**: *3Dobject list* A list of the 3D objects in the scene.
+    - **self.faceGroupColorID**: *Dictionary of colors IDs* A dictionary of the color IDs used for
+      selection (see MakeHuman Selectors, above).
+    - **self.colorID**: *float list* A progressive color ID.
+    - **self.sceneTimerCallback**: *function* Event handling function. Initially None.
+    - **self.keyboardEventsDict**: *array* Dictionary of keyboard events. Initially empty.
+    - **self.keyPressed**: *function* Event handling function. Initially None.
+    - **self.characterPressed**: *function* Event handling function. Initially None.
+    - **self.mouseState**: *int* The current state of the mouse. Initially 0.
+    - **self.mouseX**: *int* Mouse position X value. Initially 0.
+    - **self.mouseY**: *int* Mouse position Y value. Initially 0.
+    - **self.mouseXRel**: *int* Mouse released position X value. Initially 0.
+    - **self.mouseYRel**: *int* Mouse released position Y value. Initially 0.
+    
+    The attributes *self.colorID* and *self.faceGroupColorID*
+    support a technique called *Selection Using Unique Color IDs* to make each
+    FaceGroup independently clickable.
 
+    The attribute *self.colorID* stores a progressive color that is incremented for each successive
+    FaceGroup added to the scene.
+    The *self.faceGroupColorID* attribute contains a list that serves as a directory to map
+    each color back to the corresponding FaceGroup by using its color ID.
     """
 
     def __init__(self):
         """
         This is the constructor method for the Scene3D class.
-        It initializes the following attributes:
-
-        - **self.objects**: *3Dobject list* A list of the 3D objects in the scene.
-        - **self.faceGroupColorID**: *Dictionary of colors IDs* A dictionary of the color IDs used for
-          selection (see MakeHuman Selectors, above).
-        - **self.colorID**: *float list* A progressive color ID.
-        - **self.sceneTimerCallback**: *function* Event handling function. Initially None.
-        - **self.keyboardEventsDict**: *array* Dictionary of keyboard events. Initially empty.
-        - **self.keyPressed**: *function* Event handling function. Initially None.
-        - **self.characterPressed**: *function* Event handling function. Initially None.
-        - **self.mouseState**: *int* The current state of the mouse. Initially 0.
-        - **self.mouseX**: *int* Mouse position X value. Initially 0.
-        - **self.mouseY**: *int* Mouse position Y value. Initially 0.
-        - **self.mouseXRel**: *int* Mouse released position X value. Initially 0.
-        - **self.mouseYRel**: *int* Mouse released position Y value. Initially 0.
-        
-        The attributes *self.colorID* and *self.faceGroupColorID*
-        support a technique called *Selection Using Unique Color IDs* to make each
-        FaceGroup independently clickable.
-
-        The attribute *self.colorID* stores a progressive color that is incremented for each successive
-        FaceGroup added to the scene.
-        The *self.faceGroupColorID* attribute contains a list that serves as a directory to map
-        each color back to the corresponding FaceGroup by using its color ID.
+        It initializes the following attributes:        
 
         **Parameters:** This method has no parameters.
 

@@ -3,7 +3,8 @@
 # The list of objects to document.  Objects can be named using
 # dotted names, module filenames, or package directory names.
 # Alases for this option include "objects" and "values".
-modules: ../genericutils.py,../module3d.py,../aljabr.py,../main.py
+modules: ../main.py,../mh_core/algos3d.py.py,../mh_core/aljabr.py,../mh_core/animation3d.py,../mh_core/events3d.py,../mh_core/files3d.py,../mh_core/gui3d.py,../mh_core/module3d.py,../mh_core/textures3d.py
+
 
 # The type of output that should be generated.  Should be one
 # of: html, text, latex, dvi, ps, pdf.
@@ -52,11 +53,11 @@ introspect: yes
 
 # The format for showing inheritance objects.
 # It should be one of: 'grouped', 'listed', 'included'.
-inheritance: listed
+inheritance: included
 
 # Whether or not to inclue private variables.  (Even if included,
 # private variables will be hidden by default.)
-private: yes
+private: no
 
 # Whether or not to list each module's imports.
 imports: yes
@@ -73,7 +74,7 @@ include-log: no
 ### Output options
 
 # The documented project's name.
-name: MakeHuman Phoenix
+name: MakeHuman
 
 # The CSS stylesheet for HTML output.  Can be the name of a builtin
 # stylesheet, or the name of a file.

@@ -2,16 +2,22 @@
 """ 
 Class for handling File mode in the GUI.
 
-===========================  ===============================================================  
-Project Name:                **MakeHuman**                                                  
-Module File Location:        mh_plugins/guifiles.py                                          
-Product Home Page:           http://www.makehuman.org/                                      
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
-Authors:                     Manuel Bastioni                                            
-Copyright(c):                MakeHuman Team 2001-2008                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
-===========================  ===============================================================  
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Marc Flerackers
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 This module implements the 'guifiles' class structures and methods to support GUI 
 File mode operations.

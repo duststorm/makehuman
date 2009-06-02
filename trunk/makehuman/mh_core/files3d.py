@@ -1,22 +1,25 @@
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
 """ 
 Modules to handle supported 3D file formats. 
 
-===========================  ===============================================================  
-Project Name:                **MakeHuman**                                                  
-Module File Location:        mh_core/files3d.py                                          
-Product Home Page:           http://www.makehuman.org/                                      
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
-Authors:                     Manuel Bastioni                                            
-Copyright(c):                MakeHuman Team 2001-2008                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
-===========================  ===============================================================  
+**Project Name:**      MakeHuman
 
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Manuel Bastioni, Marc Flerackers
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 .. image:: ../images/files_data.png
-   :align: right
-   
+   :align: right   
    
 This Module handles the 3D file formats supported by MakeHuman. It is planned that this module 
 will implement a range of functions to handle most common 3D file formats in the future. 

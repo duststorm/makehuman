@@ -1,17 +1,22 @@
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
 """ 
 MakeHuman 3D Transformation functions. 
 
-===========================  ===============================================================  
-Project Name:                **MakeHuman**                                                  
-Module File Location:        mh_core/algo3d.py                                          
-Product Home Page:           http://www.makehuman.org/                                      
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
-Authors:                     Manuel Bastioni                                            
-Copyright(c):                MakeHuman Team 2001-2008                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
-===========================  ===============================================================  
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Manuel Bastioni, Marc Flerackers
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 This module contains algorithms used to perform high-level 3D 
 transformations on the 3D mesh that is used to represent the human 

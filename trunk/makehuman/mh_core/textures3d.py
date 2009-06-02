@@ -1,23 +1,30 @@
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
 """
 Functions for processing bitmaps. 
 
-===========================  ===============================================================  
-Project Name:                **MakeHuman**                                                  
-Module File Location:        mh_core/textures3d.py                                          
-Product Home Page:           http://www.makehuman.org/                                      
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
-Authors:                     Manuel Bastioni                                            
-Copyright(c):                MakeHuman Team 2001-2008                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
-===========================  ===============================================================  
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Manuel Bastioni
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 This module contains a series of functions to perform standard processes on bitmaps. 
 These functions provide simple higher level functionality for use by other functions, 
 such as the 3D algorithms.
 
 """
+
+__docformat__ = 'restructuredtext'
 
 def byteToBit(val, numdigits=8, base=2):
     """
@@ -151,8 +158,6 @@ def readTGA(filename):
 
 def uvCooToBitmapIndex(TGAXres,TGAYres,U,V):
     """ 
-    .. image:: ../images/Coord2Pixel.gif
-       :align: right
     
     This function takes UV coordinates and a bitmap resolution as input and 
     returns an index to the position of a pixel in the bitmap.

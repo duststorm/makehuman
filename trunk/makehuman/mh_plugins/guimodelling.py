@@ -1,16 +1,22 @@
 """
 Module containing classes to handle modelling mode GUI operations.
 
-===========================  ===============================================================
-Project Name:                **MakeHuman**
-Module File Location:        mh_plugins/guimodelling.py
-Product Home Page:           http://www.makehuman.org/
-SourceForge Home Page:       http://sourceforge.net/projects/makehuman/
-Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2008
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards
-===========================  ===============================================================
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Marc Flerackers
+
+**Copyright(c):**      MakeHuman Team 2001-2009
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
 
 This module implements the 'guimodelling' class structures and methods to support GUI
 Modelling mode operations.
@@ -20,8 +26,6 @@ While in this mode, user actions (keyboard and mouse events) are passed into
 this class for processing. Having processed an event this class returns control to the
 main OpenGL/SDL/Application event handling loop.
 
-**IMPORTANT NOTE (13 mar 2009): Most parts of this plugin have been written quickly 
-to respect the planned roadmap. Later we will clean it or even refactorize it.**
 
 """
 
