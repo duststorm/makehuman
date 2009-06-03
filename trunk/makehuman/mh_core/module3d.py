@@ -58,9 +58,9 @@ class Texture:
     - **self.id** : The texture identifier. (TODO:Editorial note: it's int?)
     - **self.modified**: A flag to indicate if a texture is modified. (TODO:Editorial Note: it's for reload?)
     """
-        def __init__(self, id, modified):
-            self.id = id
-            self.modified = modified
+    def __init__(self, id, modified):
+        self.id = id
+        self.modified = modified
 
 class Vert:
     """
