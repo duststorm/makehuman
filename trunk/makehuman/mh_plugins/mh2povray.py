@@ -144,6 +144,13 @@ def povrayExportArray(obj, cameraSettings, path):
   underScores     = ''.ljust(len(baseName),"-")
   outputDirectory = os.path.dirname(path)
     
+  # Make sure the directory exists
+  if not os.path.isdir(outputDirectory):
+    try:
+      os.mkdir(outputDirectory)
+    except:
+      print "Error creating export directory ",outputDirectory,"."
+      return 0
   # Open the output file in Write mode
   try:
     outputFileDescriptor = open(path, "w")
@@ -341,6 +348,14 @@ def povrayExportMesh2(obj, cameraSettings, path):
   underScores     = ''.ljust(len(baseName),"-")
   outputDirectory = os.path.dirname(path)
     
+  # Make sure the directory exists
+  if not os.path.isdir(outputDirectory):
+    try:
+      os.mkdir(outputDirectory)
+    except:
+      print "Error creating export directory ",outputDirectory,"."
+      return 0
+
   # Open the output file in Write mode
   try:
     outputFileDescriptor = open(path, "w")
