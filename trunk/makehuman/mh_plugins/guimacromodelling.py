@@ -1,26 +1,3 @@
-"""
-**Project Name:**      MakeHuman
-
-**Product Home Page:** http://www.makehuman.org/
-
-**Code Home Page:**    http://code.google.com/p/makehuman/
-
-**Authors:**           Marc Flerackers
-
-**Copyright(c):**      MakeHuman Team 2001-2009
-
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
-
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
-
-Abstract
---------
-
-TO DO
-"""
-
-__docformat__ = 'restructuredtext'
-
 import gui3d, animation3d
 
 class MacroAction:
@@ -138,7 +115,7 @@ class MacroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Macro modelling", "data/images/macro.png")
     
-    self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [-0.54, 0.34, 6])
+    self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [-0.54, 0.328, 6])
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, "data/images/button_gender_macro.png",
