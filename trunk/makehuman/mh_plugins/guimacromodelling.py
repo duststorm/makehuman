@@ -138,6 +138,8 @@ class MacroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Macro modelling", "data/images/macro.png")
     
+    self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [-0.54, 0.34, 6])
+    
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, "data/images/button_gender_macro.png",
       "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, 0.25, 9], value = 0.5)
@@ -152,21 +154,25 @@ class MacroModelingTaskView(gui3d.TaskView):
     def onChange(value):
       human = self.app.scene3d.selectedHuman
       self.app.do(MacroAction(human, "Gender", value, self.syncSliders))
+      self.syncStatus()
       
     @self.ageSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
       self.app.do(MacroAction(human, "Age", value, self.syncSliders))
+      self.syncStatus()
       
     @self.muscleSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
       self.app.do(MacroAction(human, "Muscle", value, self.syncSliders))
+      self.syncStatus()
       
     @self.weightSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
       self.app.do(MacroAction(human, "Weight", value, self.syncSliders))
+      self.syncStatus()
     
     # Ethnic controls
     self.ethnicMapButtonGroup = []
@@ -220,8 +226,10 @@ class MacroModelingTaskView(gui3d.TaskView):
       human.applyAllTargets()
       self.syncSliders()
       self.syncEthnics()
+      self.syncStatus()
       
     self.syncSliders()
+    self.syncStatus()
       
   def syncSliders(self):
     human = self.app.scene3d.selectedHuman
@@ -235,6 +243,23 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.europeButton.syncEthnics()
     self.africaButton.syncEthnics()
     self.americaButton.syncEthnics()
+    
+  def syncStatus(self):
+    human = self.app.scene3d.selectedHuman
+    status = ""
+    if human.getGender() == 0.5:
+      gender = "Gender: neutral, "
+    else:
+      gender = "Gender: %.2f%% female, %.2f%% male, " %((1.0 - human.getGender()) * 100, human.getGender() * 100)
+    status += gender
+    if human.getAge() < 0.5:
+      age = 12 + (25 - 12) * 2 * human.getAge()
+    else:
+      age = 25 + (70 - 25) * 2 * (human.getAge() - 0.5)
+    status += "Age: %d, " %(age)
+    status += "Muscle: %.2f%%, " %(human.getMuscle())
+    status += "Weight: %.2f%%" %(50 + (150 - 50) * human.getWeight())
+    self.status.setText(status)
     
   def onShow(self, event):
     self.setFocus()

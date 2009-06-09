@@ -670,6 +670,15 @@ class ProgressBar(View):
     if redraw:
       self.app.scene3d.redraw(0)
 
+# TextView widget
+class TextView(View):
+  def __init__(self, parent, mesh = "data/3dobjs/empty.obj", texture = None, position = [0, 0, 9]):
+    View.__init__(self, parent)
+    self.object = Object(self, mesh, texture = texture, position = position)
+    
+  def setText(self, text):
+    self.object.setText(text)
+
 # FileEntryView widget
 class FileEntryView(View):
   def __init__(self, parent):
