@@ -113,19 +113,19 @@ class EthnicMapButton(gui3d.RadioButton):
 
 class MacroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Macro modelling", "data/images/macro.png")
+    gui3d.TaskView.__init__(self, category, "Macro modelling", category.app.getThemeResource("images", "macro.png"))
     
     self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [-0.54, 0.328, 6])
     
     # Macro sliders
-    self.genderSlider = gui3d.Slider(self, "data/images/button_gender_macro.png",
-      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, 0.25, 9], value = 0.5)
-    self.ageSlider = gui3d.Slider(self, "data/images/button_age_macro.png",
-      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, 0.1, 9], value = 0.5)
-    self.muscleSlider = gui3d.Slider(self, "data/images/button_muscle_macro.png",
-      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, -0.05, 9], value = 0.5)
-    self.weightSlider = gui3d.Slider(self, "data/images/button_weight_macro.png",
-      "data/images/slider.png", "data/images/slider_focused.png", position = [-0.45, -0.20, 9], value = 0.5)
+    self.genderSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_gender_macro.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, 0.25, 9], value = 0.5)
+    self.ageSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_age_macro.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, 0.1, 9], value = 0.5)
+    self.muscleSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_muscle_macro.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, -0.05, 9], value = 0.5)
+    self.weightSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_weight_macro.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, -0.20, 9], value = 0.5)
       
     @self.genderSlider.event
     def onChange(value):
@@ -154,39 +154,39 @@ class MacroModelingTaskView(gui3d.TaskView):
     # Ethnic controls
     self.ethnicMapButtonGroup = []
     self.asiaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_asia.obj",
-      texture = "data/images/button_asia.png", position = [0.45, 0.12, 9])
+      texture = self.app.getThemeResource("images", "button_asia.png"), position = [0.45, 0.12, 9])
     self.europeButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_europe.obj",
-      texture = "data/images/button_europe.png", position = [0.37, 0.12, 9])
+      texture = self.app.getThemeResource("images", "button_europe.png"), position = [0.37, 0.12, 9])
     self.africaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_africa.obj",
-      texture = "data/images/button_africa.png", position = [0.37, 0.04, 9])
+      texture = self.app.getThemeResource("images", "button_africa.png"), position = [0.37, 0.04, 9])
     self.americaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_america.obj",
-      texture = "data/images/button_america.png", position = [0.45, 0.04, 9])
+      texture = self.app.getThemeResource("images", "button_america.png"), position = [0.45, 0.04, 9])
     self.ethnicButtonGroup = []
     self.ethnicIncreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
       mesh = "data/3dobjs/button_ethnincr.obj",
-      texture = "data/images/button_ethnincr.png",
-      selectedTexture = "data/images/button_ethnincr_on.png", position = [0.52, 0.12, 9],
+      texture = self.app.getThemeResource("images", "button_ethnincr.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_ethnincr_on.png"), position = [0.52, 0.12, 9],
       selected = True)
     self.ethnicDecreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
       mesh = "data/3dobjs/button_ethndecr.obj",
-      texture = "data/images/button_ethndecr.png",
-      selectedTexture = "data/images/button_ethndecr_on.png", position = [0.52, 0.07, 9])
+      texture = self.app.getThemeResource("images", "button_ethndecr.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_ethndecr_on.png"), position = [0.52, 0.07, 9])
     self.ethnicResetButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
       mesh = "data/3dobjs/button_ethnreset.obj",
-      texture = "data/images/button_ethnreset.png",
-      selectedTexture = "data/images/button_ethnreset_on.png", position = [0.52, 0.02, 9])
+      texture = self.app.getThemeResource("images", "button_ethnreset.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [0.52, 0.02, 9])
       
     # Common controls
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [0, 0, -70])
     self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_redo.obj",
-      texture = "data/images/button_undo.png", 
-      selectedTexture = "data/images/button_undo_on.png", position = [0.37,0.20,9])
+      texture = self.app.getThemeResource("images", "button_undo.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [0.37,0.20,9])
     self.redoButton = gui3d.Button(category, mesh = "data/3dobjs/button_undo.obj",
-      texture = "data/images/button_redo.png", 
-      selectedTexture = "data/images/button_redo_on.png", position = [0.45,0.20,9])
+      texture = self.app.getThemeResource("images", "button_redo.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [0.45,0.20,9])
     self.resetButton = gui3d.Button(category, mesh = "data/3dobjs/button_new.obj",
-      texture = "data/images/button_new.png", 
-      selectedTexture = "data/images/button_new_on.png", position = [0.52,0.20,9])
+      texture = self.app.getThemeResource("images", "button_new.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [0.52,0.20,9])
     
     @self.undoButton.event
     def onClicked(event):

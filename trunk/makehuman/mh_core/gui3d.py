@@ -281,7 +281,7 @@ class Application(events3d.EventHandler):
 
   def start(self):
     self.cursor = Object(self, mesh = "data/3dobjs/cursor.obj",
-      texture = "data/images/cursor.png", position = [0, 0, 9.5])
+      texture = self.getThemeResource("images", "cursor.png"), position = [0, 0, 9.5])
     self.cursor.mesh.setPickable(0);
     self.scene3d.update()
     self.callEvent("onStart", None)
@@ -632,10 +632,10 @@ class ProgressBar(View):
   """
   
   def __init__(self, parent, backgroundMesh = "data/3dobjs/progressbar_background.obj",
-    backgroundTexture = "data/images/progressbar_background.png",
+    backgroundTexture = None,
     backgroundPosition = [0.0, -0.20, 9.1],
     barMesh = "data/3dobjs/progressbar.obj",
-    barTexture = "data/images/progressbar.png",
+    barTexture = None,
     barPosition = [-0.08, -0.178, 9.2], visible = True):
     """
     This is the constructor method for the ProgressBar class. It initializes the
@@ -688,7 +688,7 @@ class FileEntryView(View):
     Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [0.0, 1.3, 5.5])
     self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [-0.3, 0.29, 6])
     self.bConfirm = Object(self, mesh = "data/3dobjs/button_confirm.obj",
-      texture = "data/images/button_confirm.png", position = [0.35, 0.28, 9.1])
+      texture = self.app.getThemeResource("images", "button_confirm.png"), position = [0.35, 0.28, 9.1])
     self.text = ""
     
     @self.bConfirm.event

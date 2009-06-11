@@ -36,9 +36,9 @@ import mh2renderman
 
 class RenderingCategory(gui3d.Category):
   def __init__(self, parent):
-    gui3d.Category.__init__(self, parent, "Rendering", "data/images/button_render.png")
+    gui3d.Category.__init__(self, parent, "Rendering", parent.app.getThemeResource("images", "button_render.png"))
     
-    aqsis = gui3d.TaskView(self, "Aqsis",  "data/images/button_aqsis.png")
+    aqsis = gui3d.TaskView(self, "Aqsis",  self.app.getThemeResource("images", "button_aqsis.png"))
     @aqsis.event
     def onShow(event):
       pass
@@ -49,7 +49,7 @@ class RenderingCategory(gui3d.Category):
     def onClicked(event):
       mh2renderman.saveScene(self.app.scene3d, "scena.rib", "renderman_output", "aqsis")
       
-    pixie = gui3d.TaskView(self, "Pixie",  "data/images/button_pixie.png")
+    pixie = gui3d.TaskView(self, "Pixie",  self.app.getThemeResource("images", "button_pixie.png"))
     @pixie.event
     def onShow(event):
       pass
@@ -60,7 +60,7 @@ class RenderingCategory(gui3d.Category):
     def onClicked(event):
       mh2renderman.saveScene(self.app.scene3d, "scena.rib", "renderman_output", "pixie")
       
-    povray = gui3d.TaskView(self, "Povray",  "data/images/button_povray.png")
+    povray = gui3d.TaskView(self, "Povray",  self.app.getThemeResource("images", "button_povray.png"))
     @povray.event
     def onShow(event):
       pass

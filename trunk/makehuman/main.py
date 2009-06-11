@@ -76,10 +76,12 @@ import guimodelling, guifiles, guirender
 class MHApplication(gui3d.Application):
   def __init__(self):
     gui3d.Application.__init__(self)
+    self.theme = "default"
     
     # Dispkay the initial splash screen and the progress bar during startup 
-    self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", "data/images/splash.png", position = [0, 0, 0])
-    self.progressBar = gui3d.ProgressBar(self)
+    self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
+    self.progressBar = gui3d.ProgressBar(self, backgroundTexture = self.getThemeResource("images", "progressbar_background.png"),
+      barTexture = self.getThemeResource("images", "progressbar.png"))
     self.scene3d.update()
     self.scene3d.redraw(0)
     
@@ -95,9 +97,9 @@ class MHApplication(gui3d.Application):
     
     self.progressBar.setProgress(0.2)
     
-    gui3d.Object(self, "data/3dobjs/upperbar.obj", "data/images/upperbar.png", [0, 0.39, 9])
+    gui3d.Object(self, "data/3dobjs/upperbar.obj", self.getThemeResource("images", "upperbar.png"), [0, 0.39, 9])
     gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -72])
-    gui3d.Object(self, "data/3dobjs/lowerbar.obj", "data/images/lowerbar.png", [0, -0.39, 9])
+    gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, -0.39, 9])
     
     self.progressBar.setProgress(0.3)
     
@@ -158,7 +160,7 @@ class MHApplication(gui3d.Application):
     # Set up categories and tasks  
     
     # Exit button
-    category = gui3d.Category(self, "Exit", "data/images/button_exit.png")
+    category = gui3d.Category(self, "Exit", self.getThemeResource("images", "button_exit.png"))
     @category.button.event
     def onClicked(event):
       self.stop()
@@ -169,10 +171,10 @@ class MHApplication(gui3d.Application):
     self.progressBar.setProgress(0.8)
     guirender.RenderingCategory(self)
     
-    library = gui3d.Category(self, "Library", "data/images/button_library.png")
+    library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"))
     hair.HairTaskView(library)
     
-    category = gui3d.Category(self, "Help", "data/images/button_about.png")
+    category = gui3d.Category(self, "Help", self.getThemeResource("images", "button_about.png"))
     # Help button
     @category.button.event
     def onClicked(event):
@@ -239,6 +241,9 @@ class MHApplication(gui3d.Application):
       action.do()
       self.undoStack.append(action)
       self.scene3d.redraw()
+      
+  def getThemeResource(self, folder, id):
+    return "data/themes/" + self.theme + "/" + folder + "/"+ id
     
 application = MHApplication()
 mainScene = application.scene3d # HACK: Don't remove this, it is needed to receive events from C

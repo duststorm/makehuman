@@ -34,7 +34,7 @@ import files3d, animation3d, gui3d, events3d, os, mh2obj,  mh2bvh
 
 class SaveTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Save",  "data/images/button_save_file.png")
+    gui3d.TaskView.__init__(self, category, "Save",  category.app.getThemeResource("images", "button_save_file.png"))
     self.fileentry = gui3d.FileEntryView(self)
 
     @self.fileentry.event
@@ -92,7 +92,7 @@ class SaveTaskView(gui3d.TaskView):
 
 class LoadTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Load",  "data/images/button_load_file.png")
+    gui3d.TaskView.__init__(self, category, "Load",  category.app.getThemeResource("images", "button_load_file.png"))
     self.filechooser = gui3d.FileChooser(self, "models", "mhm")
     
     @self.filechooser.event
@@ -159,7 +159,7 @@ class LoadTaskView(gui3d.TaskView):
     
 class ExportTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Export",  "data/images/button_export_file.png")
+    gui3d.TaskView.__init__(self, category, "Export",  category.app.getThemeResource("images", "button_export_file.png"))
     self.fileentry = gui3d.FileEntryView(self)
 
     @self.fileentry.event
@@ -192,7 +192,7 @@ class ExportTaskView(gui3d.TaskView):
 
 class FilesCategory(gui3d.Category):
   def __init__(self, parent):
-    gui3d.Category.__init__(self, parent, "Files", "data/images/button_loadsave.png")
+    gui3d.Category.__init__(self, parent, "Files", parent.app.getThemeResource("images", "button_loadsave.png"))
     
     SaveTaskView(self)
     LoadTaskView(self)

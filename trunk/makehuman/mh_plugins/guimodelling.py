@@ -35,11 +35,11 @@ import events3d, gui3d, guimacromodelling, guidetailmodelling, mh2obj,  mh2bvh, 
 
 class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
-      gui3d.Category.__init__(self,  parent, "Modelling", "data/images/button_home.png")
+      gui3d.Category.__init__(self,  parent, "Modelling", parent.app.getThemeResource("images", "button_home.png"))
       guimacromodelling.MacroModelingTaskView(self)
       guidetailmodelling.DetailModelingTaskView(self)
       guidetailmodelling.MicroModelingTaskView(self)
-      gui3d.TaskView(self, "Anime modeling",  "data/images/button_expressions.png")
+      gui3d.TaskView(self, "Anime modeling",  self.app.getThemeResource("images", "button_expressions.png"))
       
     # Rotate and pan the camera
     def onMouseDragged(self, event):

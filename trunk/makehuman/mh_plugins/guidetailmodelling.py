@@ -359,23 +359,23 @@ class Detail3dTool(events3d.EventHandler):
 
 class DetailModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Detail modelling", "data/images/details.png")
+    gui3d.TaskView.__init__(self, category, "Detail modelling", category.app.getThemeResource("images", "details.png"))
     self.tool = None
     
     self.detailButtonGroup = []
     self.genderDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
-      texture = "data/images/button_gender.png", 
-      selectedTexture = "data/images/button_gender_on.png", position = [-0.45, 0.25, 9],
+      texture = self.app.getThemeResource("images", "button_gender.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_gender_on.png"), position = [-0.45, 0.25, 9],
       selected = True)
     self.ageDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
-      texture = "data/images/button_age.png", 
-      selectedTexture = "data/images/button_age_on.png", position = [-0.45, 0.1, 9])
+      texture = self.app.getThemeResource("images", "button_age.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_age_on.png"), position = [-0.45, 0.1, 9])
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
-      texture = "data/images/button_muscle.png", 
-      selectedTexture = "data/images/button_muscle_on.png", position = [-0.45,-0.05,9])
+      texture = self.app.getThemeResource("images", "button_muscle.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [-0.45,-0.05,9])
     self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
-      texture = "data/images/button_weight.png", 
-      selectedTexture = "data/images/button_weight_on.png", position = [-0.45,-0.20,9])
+      texture = self.app.getThemeResource("images", "button_weight.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [-0.45,-0.20,9])
       
     self.tool = DetailTool(self.app, False, "_female", "_male")
       
@@ -404,12 +404,12 @@ class DetailModelingTaskView(gui3d.TaskView):
       gui3d.RadioButton.onClicked(self.weightDetailButton, event)
       
     self.translationButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh = "data/3dobjs/button_transl.obj",
-      texture = "data/images/button_translation.png",
-      selectedTexture = "data/images/button_translation_on.png",
+      texture = self.app.getThemeResource("images", "button_translation.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_translation_on.png"),
       position = [0.37, 0.12, 9])
     self.scaleButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh = "data/3dobjs/button_scale.obj",
-      texture = "data/images/button_scale.png",
-      selectedTexture = "data/images/button_scale_on.png",
+      texture = self.app.getThemeResource("images", "button_scale.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_scale_on.png"),
       position = [0.45, 0.12, 9])
     
     @self.translationButton.event
@@ -425,9 +425,9 @@ class DetailModelingTaskView(gui3d.TaskView):
       gui3d.RadioButton.onClicked(self.scaleButton, event)
     
     self.rightSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmright.obj",
-      texture = "data/images/button_symmright.png", position = [0.37, 0.04, 9])
+      texture = self.app.getThemeResource("images", "button_symmright.png"), position = [0.37, 0.04, 9])
     self.leftSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmleft.obj",
-      texture = "data/images/button_symmleft.png", position = [0.45, 0.04, 9])
+      texture = self.app.getThemeResource("images", "button_symmleft.png"), position = [0.45, 0.04, 9])
       
     @self.rightSymmetryButton.event
     def onClicked(event):
@@ -449,18 +449,18 @@ class DetailModelingTaskView(gui3d.TaskView):
     
 class MicroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Micro modelling", "data/images/micro.png")
+    gui3d.TaskView.__init__(self, category, "Micro modelling", category.app.getThemeResource("images", "micro.png"))
     self.tool = None
     
     self.microButtonGroup = []
       
     self.translationButton = gui3d.RadioButton(self, self.microButtonGroup, mesh = "data/3dobjs/button_transl.obj",
-      texture = "data/images/button_translation.png",
-      selectedTexture = "data/images/button_translation_on.png",
+      texture = self.app.getThemeResource("images", "button_translation.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_translation_on.png"),
       position = [0.37, 0.12, 9], selected = True)
     self.scaleButton = gui3d.RadioButton(self, self.microButtonGroup, mesh = "data/3dobjs/button_scale.obj",
-      texture = "data/images/button_scale.png",
-      selectedTexture = "data/images/button_scale_on.png",
+      texture = self.app.getThemeResource("images", "button_scale.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_scale_on.png"),
       position = [0.45, 0.12, 9])
       
     self.tool = Detail3dTool(self.app, True, "translation")
@@ -478,9 +478,9 @@ class MicroModelingTaskView(gui3d.TaskView):
       gui3d.RadioButton.onClicked(self.scaleButton, event)
       
     self.rightSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmright.obj",
-      texture = "data/images/button_symmright.png", position = [0.37, 0.04, 9])
+      texture = self.app.getThemeResource("images", "button_symmright.png"), position = [0.37, 0.04, 9])
     self.leftSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmleft.obj",
-      texture = "data/images/button_symmleft.png", position = [0.45, 0.04, 9])
+      texture = self.app.getThemeResource("images", "button_symmleft.png"), position = [0.45, 0.04, 9])
       
     @self.rightSymmetryButton.event
     def onClicked(event):

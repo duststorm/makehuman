@@ -36,7 +36,9 @@ class Human(gui3d.Object):
         self.meshData = self.mesh
         #self.meshData = files3d.loadMesh(globalScene, objFilePath, loadColors = None)
         self.scene = globalScene
-        self.progressBar = gui3d.ProgressBar(globalScene.application, visible = False)
+        self.progressBar = gui3d.ProgressBar(globalScene.application,
+            backgroundTexture = globalScene.application.getThemeResource("images", "progressbar_background.png"),
+            barTexture = globalScene.application.getThemeResource("images", "progressbar.png"), visible = False)
         self.targetsDetailStack = {}#All details targets applied, with their values
         self.targetsEthnicStack = {"neutral":1.0}
         self.lastTargetApplied = None
