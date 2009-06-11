@@ -145,6 +145,7 @@ typedef struct
     int pendingTimer; /*1 if a timer is already pending*/
     int loop; /*1 if we haven't quit yet*/
     int fullscreen; /*1 for fullscreen, 0 for windowed*/
+    float clearColor[4]; /*color for background clear*/
 } Global;
 extern Global G;
 
@@ -161,6 +162,7 @@ void callReloadTextures();
 void initscene(int n);
 void addObject(int objIndex, float locX, float locY,float locZ,
                int numVerts, int numTrigs);
+void setClearColor(float r, float g, float b, float a);
 
 // Object methods
 int setVertCoo(int objIndex, int vIdx, float x, float y, float z);

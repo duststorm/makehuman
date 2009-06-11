@@ -246,6 +246,14 @@ void addObject(int objIndex, float locX, float locY,float locZ,
     }
 }
 
+void setClearColor(float r, float g, float b, float a)
+{
+  G.clearColor[0] = r;
+  G.clearColor[1] = g;
+  G.clearColor[2] = b;
+  G.clearColor[3] = a;
+}
+
 /** \brief Sets a single coordinate value (x, y or z) for a vertex in G.world.
  *  \param objIndex an int containing the index of the 3D object that contains this vertex.
  *  \param vIdx an int indexing the vertex coordinate component to update.

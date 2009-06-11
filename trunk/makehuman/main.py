@@ -76,7 +76,8 @@ import guimodelling, guifiles, guirender
 class MHApplication(gui3d.Application):
   def __init__(self):
     gui3d.Application.__init__(self)
-    self.theme = "default"
+    
+    self.setTheme("default")
     
     # Dispkay the initial splash screen and the progress bar during startup 
     self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
@@ -241,7 +242,22 @@ class MHApplication(gui3d.Application):
       action.do()
       self.undoStack.append(action)
       self.scene3d.redraw()
+  
+  def setTheme(self, theme):
+    f = open("data/themes/" + theme + ".mht", 'r')
       
+    for data in f.readlines():
+      lineData = data.split()
+      
+      if len(lineData) > 0:
+        if lineData[0] == "version":
+          print("Version " + lineData[1])
+        elif lineData[0] == "color":
+          if lineData[1] == "clear":
+            mh.setClearColor(float(lineData[2]), float(lineData[3]), float(lineData[4]), float(lineData[5]))
+    
+    self.theme = theme
+  
   def getThemeResource(self, folder, id):
     return "data/themes/" + self.theme + "/" + folder + "/"+ id
     

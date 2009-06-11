@@ -417,8 +417,12 @@ class Application(events3d.EventHandler):
     event = events3d.MouseEvent(self.scene3d.mouseState, mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1])
     
     # Get picked object
-    group = object = self.scene3d.getPickedObject()[0]
-    object = self.scene3d.getPickedObject()[1]
+    picked = self.scene3d.getPickedObject()
+    if not picked:
+      self.scene3d.redraw()
+      return
+    group = object = picked[0]
+    object = picked[1]
     
     event.object = object
     event.group = group

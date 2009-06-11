@@ -79,6 +79,10 @@ void initGlobals(void)
     G.pendingTimer = 0;
     G.loop = 1;
     G.fullscreen = 0;
+    G.clearColor[0] = 0.0;
+    G.clearColor[1] = 0.0;
+    G.clearColor[2] = 0.0;
+    G.clearColor[3] = 0.0;
 }
 
 /** \brief Get an integer representing the current modifier key settings.
@@ -418,6 +422,15 @@ static PyObject* mh_addObj(PyObject *self, PyObject *args)
         Py_DECREF(iterator);
     }
     return Py_BuildValue("");
+}
+
+static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
+{
+  float r, g, b, a;
+  if (!PyArg_ParseTuple(args, "ffff",  &r, &g, &b, &a))
+      return NULL;
+  setClearColor(r, g, b, a);
+  return Py_BuildValue("");
 }
 
 /** \brief Set coordinates, normal and color information for the 3 vertices of a face.
@@ -785,6 +798,7 @@ static PyMethodDef EmbMethods[] =
     {"redraw", mh_redraw, METH_VARARGS, ""},
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
     {"addObj", mh_addObj, METH_VARARGS, ""},
+    {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
     {"setVertCoord", mh_setVertCoord, METH_VARARGS, ""},
     {"setNormCoord", mh_setNormCoord, METH_VARARGS, ""},
     {"setUVCoord", mh_setUVCoord, METH_VARARGS, ""},

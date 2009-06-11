@@ -1,4 +1,4 @@
 # Default theme of alpha 2
 version 1.0.0
 creator Manuel Bastioni
-clear_color 0 0 0 0
+color clear 0 0 0 0

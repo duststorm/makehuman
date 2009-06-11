@@ -497,6 +497,7 @@ void mhGetPickedColor(int x, int y)
     glDisable (GL_BLEND);
     glDisable(GL_MULTISAMPLE);
 
+    glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glScissor(x - 1, viewport[3] - (y + 1), 3, 3);
     glEnable(GL_SCISSOR_TEST);
@@ -635,6 +636,7 @@ void mhReshape(int w, int h)
 void mhDrawBegin()
 {
     // clear the screen & depth buffer
+    glClearColor(G.clearColor[0], G.clearColor[1], G.clearColor[2], G.clearColor[3]);
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
 }
 
