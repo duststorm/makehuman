@@ -68,9 +68,9 @@
 		68D8631C0FA5D1810097F73F /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDLMain.m; path = src/SDLMain.m; sourceTree = "<group>"; };
 		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
 		68DFFDA40FC1F059009CA434 /* data */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
-		68EA2B640FC8348A0052A87E /* mh_plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; path = mh_plugins; sourceTree = "<group>"; };
-		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSFont_OpenGL.h; sourceTree = "<group>"; };
-		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSFont_OpenGL.m; sourceTree = "<group>"; };
+		68EA2B640FC8348A0052A87E /* mh_plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_plugins; path = ../mh_plugins; sourceTree = "<group>"; };
+		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
+		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
 		68F6D3CA0E63F88200D27961 /* MouseEventTrap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MouseEventTrap.h; path = include/MouseEventTrap.h; sourceTree = "<group>"; };
 		68F6D3F50E640E6A00D27961 /* AppIcon.psd */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppIcon.psd; path = resources/AppIcon.psd; sourceTree = "<group>"; };
 		68F6D3F60E640E6A00D27961 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = resources/AppIcon.icns; sourceTree = "<group>"; };
