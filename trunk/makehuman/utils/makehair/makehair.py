@@ -32,15 +32,24 @@ import hairgenerator
 humanMesh = Blender.Object.Get("Base")
 
 hairsClass = hairgenerator.Hairgenerator(humanMesh.getData())
-hairDiameter = Create(hairsClass.hairDiameter)
-nHairs= Create(hairsClass.numberOfHairs)
-randomFact= Create(hairsClass.randomFact)
-percOfRebels = Create(hairsClass.percOfRebels)
-clumptype = Create(hairsClass.clumptype)
-tuftSize= Create(hairsClass.tuftSize)
+
+hairDiameterClump = Create(hairsClass.hairDiameterClump)
+hairDiameterMultiStrand = Create(hairsClass.hairDiameterMultiStrand)
+
+numberOfHairsClump= Create(hairsClass.numberOfHairsClump)
+numberOfHairsMultiStrand= Create(hairsClass.numberOfHairsMultiStrand)
+
+randomFactClump= Create(hairsClass.randomFactClump)
+randomFactMultiStrand= Create(hairsClass.randomFactMultiStrand)
+
+sizeClump= Create(hairsClass.sizeClump)
+sizeMultiStrand= Create(hairsClass.sizeMultiStrand)
+
 rootColor= Create(hairsClass.rootColor[0],hairsClass.rootColor[1],hairsClass.rootColor[2])
 tipColor= Create(hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2])
 
+tipMagnet = Create(hairsClass.tipMagnet)
+clumptype = Create(hairsClass.clumptype)
 
 def convertCoords(obj):
 
@@ -127,116 +136,130 @@ def ambientLight(ribfile):
         ribfile.write('\tLightSource "ambientlight" 998 "intensity" [1] "color lightcolor" [%s %s %s]\n\n'%(aR, aG, aB))
 
 def writePolyObj(fileObj, mesh): 
-	
-	objFile = file(fileObj,'w')
-	index = 0
-	facenum = len(mesh.faces)
-	
-	if mesh.hasFaceUV() == 1:
-			objFile.write('Declare "st" "facevarying float[2]"\n')
-			
-	objFile.write("PointsPolygons [");
-	for face in mesh.faces:
-		objFile.write('%s '%(len(face.v)))
-		index = index + 1
-	
-	objFile.write("] ")
-	objFile.write("[ ")
-	for face in mesh.faces:
-		num = len(face.v)
-		if num == 3 or num == 4:
-			for vert in face.v:
-				objFile.write('%s ' % vert.index)
-	objFile.write("]")
-	objFile.write('\n"P" [')
-	for vert in mesh.verts:
-		objFile.write("%s %s %s " % (vert.co[0], vert.co[1], -vert.co[2]))
-	objFile.write('] ')
-	if mesh.faces[0].smooth:
-		objFile.write(' "N" [')
-		for vert in mesh.verts:
-			objFile.write("%s %s %s " % (-vert.no[0], +vert.no[1], -vert.no[2]))
-		objFile.write(']')
-	if mesh.hasVertexColours() == 1:
-		vertexcol = range(len(mesh.verts))
-		objFile.write('\n"Cs" [')
-		for face in mesh.faces:
-			num = len(face.v)
-			if num == 3 or num == 4:
-				for vi in range(len(face.v)):
-					vertexcol[face.v[vi].index] = face.col[vi]
-		for vc in vertexcol:
-			objFile.write('%s %s %s ' % (vc.r/256.0, vc.g/256.0, vc.b/256.0))
-		objFile.write(']')
-	
-	if mesh.hasFaceUV() == 1:
-		objFile.write('\n"st" [')
-		for face in mesh.faces:
-			num = len(face.v)
-			if num == 3 or num == 4:
-				for vi in range(len(face.v)):
-					objFile.write('%s %s ' % (face.uv[vi][0], 1.0 - face.uv[vi][1]))
-		objFile.write(']')	
-	objFile.write('\n')
-	objFile.close()
+    
+    objFile = file(fileObj,'w')
+    index = 0
+    facenum = len(mesh.faces)
+    
+    if mesh.hasFaceUV() == 1:
+            objFile.write('Declare "st" "facevarying float[2]"\n')
+            
+    objFile.write("PointsPolygons [");
+    for face in mesh.faces:
+        objFile.write('%s '%(len(face.v)))
+        index = index + 1
+    
+    objFile.write("] ")
+    objFile.write("[ ")
+    for face in mesh.faces:
+        num = len(face.v)
+        
+        verticesIdx = []
+        for vert in face.v:
+            verticesIdx.append(vert)
+        verticesIdx.reverse()
+           
+        if num == 3 or num == 4:
+            for vert in verticesIdx:
+                objFile.write('%s ' % vert.index)
+    objFile.write("]")
+    objFile.write('\n"P" [')
+    for vert in mesh.verts:
+        objFile.write("%s %s %s " % (vert.co[0], vert.co[1], -vert.co[2]))
+    objFile.write('] ')
+    #if mesh.faces[0].smooth:
+        #objFile.write(' "N" [')
+        #for vert in mesh.verts:
+            #objFile.write("%s %s %s " % (-vert.no[0], +vert.no[1], -vert.no[2]))
+        #objFile.write(']')
+    #if mesh.hasVertexColours() == 1:
+        #vertexcol = range(len(mesh.verts))
+        #objFile.write('\n"Cs" [')
+        #for face in mesh.faces:
+            #num = len(face.v)
+            #if num == 3 or num == 4:
+                #for vi in range(len(face.v)):
+                    #vertexcol[face.v[vi].index] = face.col[vi]
+        #for vc in vertexcol:
+            #objFile.write('%s %s %s ' % (vc.r/256.0, vc.g/256.0, vc.b/256.0))
+        #objFile.write(']')
+    
+    if mesh.hasFaceUV() == 1:
+        objFile.write('\n"st" [')
+        for face in mesh.faces:
+            num = len(face.v)
+            if num == 3 or num == 4:
+                for vi in range(len(face.v)):
+                    objFile.write('%s %s ' % (face.uv[vi][0], 1.0 - face.uv[vi][1]))
+        objFile.write(']')  
+    objFile.write('\n')
+    objFile.close()
 
     
 def writeSubdividedObj(ribPath, mesh):
 
-	objFile = open(ribPath,'w')
-	if mesh.hasFaceUV() == 1:
-		objFile.write('Declare "st" "facevarying float[2]"\n')
-	objFile.write('SubdivisionMesh "catmull-clark" [')
-	for face in mesh.faces:
-		num = len(face.v)
-		objFile.write('%s '%(num))
-	objFile.write(']\n[')
-	for face in mesh.faces:
-		for vert in face.v:
-			objFile.write('%s ' % vert.index)
-	objFile.write(']\n["interpolateboundary"] [0 0] [] []\n"P" [') 
-	for vert in mesh.verts:
-		objFile.write("%s %s %s " % (vert.co[0], vert.co[1], -vert.co[2]))
-	objFile.write(']')
+    objFile = open(ribPath,'w')
+    if mesh.hasFaceUV() == 1:
+        objFile.write('Declare "st" "facevarying float[2]"\n')
+    objFile.write('SubdivisionMesh "catmull-clark" [')
+    for face in mesh.faces:
+        num = len(face.v)
+        objFile.write('%s '%(num))
+    objFile.write(']\n[')
+    for face in mesh.faces:
+        for vert in face.v:
+            objFile.write('%s ' % vert.index)
+    objFile.write(']\n["interpolateboundary"] [0 0] [] []\n"P" [') 
+    for vert in mesh.verts:
+        objFile.write("%s %s %s " % (vert.co[0], vert.co[1], -vert.co[2]))
+    objFile.write(']')
 
-	if mesh.hasFaceUV() == 1:
-		objFile.write('\n"st" [')
-		for face in mesh.faces:
-			num = len(face.v)
-			if num == 3 or num == 4:
-				for vi in range(len(face.v)):
-					objFile.write('%s %s ' % (face.uv[vi][0], 1.0 - face.uv[vi][1]))
-		objFile.write(']')
-	if mesh.hasVertexColours() == 1:
-		vertexcol = range(len(mesh.verts))
-		objFile.write('\n"Cs" [')
-		for face in mesh.faces:
-			num = len(face.v)
-			if num == 3 or num == 4:
-				for vi in range(len(face.v)):
-					vertexcol[face.v[vi].index] = face.col[vi]
-		for vc in vertexcol:
-			objFile.write('%s %s %s ' % (vc.r/256.0, vc.g/256.0, vc.b/256.0))
-		objFile.write(']')
-	objFile.write('\n')
+    if mesh.hasFaceUV() == 1:
+        objFile.write('\n"st" [')
+        for face in mesh.faces:
+            num = len(face.v)
+            if num == 3 or num == 4:
+                for vi in range(len(face.v)):
+                    objFile.write('%s %s ' % (face.uv[vi][0], 1.0 - face.uv[vi][1]))
+        objFile.write(']')
+    if mesh.hasVertexColours() == 1:
+        vertexcol = range(len(mesh.verts))
+        objFile.write('\n"Cs" [')
+        for face in mesh.faces:
+            num = len(face.v)
+            if num == 3 or num == 4:
+                for vi in range(len(face.v)):
+                    vertexcol[face.v[vi].index] = face.col[vi]
+        for vc in vertexcol:
+            objFile.write('%s %s %s ' % (vc.r/256.0, vc.g/256.0, vc.b/256.0))
+        objFile.write(']')
+    objFile.write('\n')
 
 
 def writeHairs(ribRepository):
 
     global rootColor,tipColor,hairDiameter,preview,hairsClass
-    hDiameter = hairsClass.hairDiameter*random.uniform(0.5,1)    
-    for hSet in hairsClass.hairStyle:        
-        hairName = "%s/%s.rib"%(ribRepository,hSet.name)
-        
+    totalNumberOfHairs = 0
+    
+    for hSet in hairsClass.hairStyle:
+
+        if "clump" in hSet.name:
+            hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
+        else:
+            hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)
+            
+        hairName = "%s/%s.rib"%(ribRepository,hSet.name)        
         hairFile = open(hairName,'w')        
         hairFile.write('\t\tDeclare "rootcolor" "color"\n')
         hairFile.write('\t\tDeclare "tipcolor" "color"\n')
         hairFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]'%(rootColor.val[0],\
                     rootColor.val[1],rootColor.val[2],\
                     tipColor.val[0],tipColor.val[1],tipColor.val[2]))
+        #hairFile.write('\t\tSurface "matte" ')
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
         hairFile.write('Curves "cubic" [')    
-        for hair in hSet.hairs:
+        for hair in hSet.hairs:            
+            totalNumberOfHairs += 1
             hairFile.write('%i ' % len(hair.controlPoints))
         hairFile.write('] "nonperiodic" "P" [')
         for hair in hSet.hairs:
@@ -244,15 +267,18 @@ def writeHairs(ribRepository):
                 hairFile.write("%s %s %s " % (cP[0],cP[1],cP[2]))
         hairFile.write(']  "constantwidth" [%s]' % (hDiameter))
         hairFile.close()
+    print "TOTAL HAIRS WRITTEN: ",totalNumberOfHairs
+    print "NUMBER OF TUFTS",len(hairsClass.hairStyle)
+    print "NUMBER OF GUIDES: ",len(hairsClass.guides)
 
 
 def writeLamps(ribfile):
-    ribfile.write('\tLightSource "ambientlight" 998 "intensity" [1] "color lightcolor" [1 1 1]')
+    ribfile.write('\tLightSource "ambientlight" 998 "intensity" [.05] "color lightcolor" [1 1 1]')
     numLamp = 0
     for obj in Blender.Object.Get():
         if obj.getType() == "Lamp":
             lamp = obj.getData()
-            intensity = lamp.getEnergy()
+            intensity = lamp.getEnergy()*10
             numLamp += 1
             (locX,locY,locZ,rotX,rotY,rotZ,sizeX,sizeY,sizeZ) = convertCoords(obj)
             ribfile.write('\tLightSource "pointlight" %s "from" [%s %s %s] "intensity" %s  "lightcolor" [%s %s %s] \n' %(numLamp,locX, locY, locZ, intensity, lamp.col[0], lamp.col[1], lamp.col[2]))
@@ -267,7 +293,8 @@ def writeHuman(ribRepository):
     
 def writeFooter(ribfile):
     ribfile.write("\tAttributeBegin\n")
-    ribfile.write("\t\tRotate -90 1 0 0\n")
+    #ribfile.write("\t\tRotate -90 1 0 0\n")
+    ribfile.write("\t\tSurface \"matte\"\n")
     ribfile.write("\t\tReadArchive \"ribObjs/base.obj.rib\"\n")
     ribfile.write("\tAttributeEnd\n")
     ribfile.write("WorldEnd\n")
@@ -276,33 +303,34 @@ def writeFooter(ribfile):
 def writeBody(ribfile, ribRepository):
     global nHairs,subsurf,alpha
     print "Calling create objects"
+
+    for hSet in hairsClass.hairStyle:        
+        ribObj = "%s/%s.rib"%(ribRepository,hSet.name) 
+        print "RIBOBJ",ribObj        
+        ribfile.write('\tAttributeBegin\n')                             
+        ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
+        ribfile.write('\tAttributeEnd\n')        
+ 
+
+
+def generateHairs():
+    global nHairs,subsurf,alpha,hairsClass    
     hairCounter = 0
     for obj in Blender.Object.Get():
         data = obj.getData()
         name = obj.getName()
         if type(data) == Types.CurveType:
-            for curnurb in data:
-                ribObj = "%s/%s.rib"%(ribRepository,name)
-                print "RIBOBJ",ribObj
-                (locX,locY,locZ,rotX,rotY,rotZ,sizeX,sizeY,sizeZ) = convertCoords(obj)
-                ribfile.write('\tAttributeBegin\n')
-                ribfile.write("\t\tTranslate %s %s %s\n" %(locX, locY, locZ))
-                ribfile.write("\t\tRotate %s 0 0 1\n" %(rotZ))
-                ribfile.write("\t\tRotate %s 0 1 0\n" %(rotY))
-                ribfile.write("\t\tRotate %s 1 0 0\n" %(rotX))
-                ribfile.write("\t\tScale %s %s %s\n" %(sizeX,sizeY,sizeZ))                
-                ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
-                ribfile.write('\tAttributeEnd\n')
+            for curnurb in data:                
                 hairsClass.addHairGuide(curnurb, name)
-                hairCounter += 1
-   
-    print "Exported ",nHairs.val * hairCounter, " hairs"
-
+                hairCounter += 1    
+    hairsClass.generateHairStyle1()
+    #hairsClass.generateHairStyle2()
 
 
 
 def saveRib(fName):
-    engine = "aqsis"
+    global hairsClass
+    engine = "pixie"
 
     #d0 is [path,filename]
     #d1 is [name,extension]
@@ -316,7 +344,7 @@ def saveRib(fName):
     print "Saved rib in ",  fName
     print "Saved image in ", imageName
     objectsDirectory = 'ribObjs'
-
+    generateHairs()
     if not os.path.isdir(objectsDirectory):
         os.mkdir(objectsDirectory)
 
@@ -325,13 +353,16 @@ def saveRib(fName):
     writeHuman(objectsDirectory)
     writeHeader(theFile,imageName)    
     writeLamps(theFile)
-    writeBody(theFile,objectsDirectory)
-    hairsClass.generateHairStyle()
+    writeBody(theFile,objectsDirectory)    
     writeFooter(theFile) 
     writeHairs(objectsDirectory)  
     theFile.close()
     print fName
 
+    
+    hairsClass.hairStyle = []
+    hairsClass.guides = []
+    
     command = '%s %s'%('cd', mainPath) #To avoid spaces in path problem
     subprocess.Popen(command, shell=True) #We move into current dir
 
@@ -348,13 +379,16 @@ def saveHairsFile(path):
 
 def loadHairsFile(path):
     hairsClass.loadHairs(path)
+
+    
 ###############################INTERFACE#####################################
 #############################################################################
 
+
 def draw():
-    global hairDiameter,alpha
-    global nHairs,randomFact
-    global percOfRebels,tuftSize,subsurf
+    global hairDiameterClump,hairDiameterMultiStrand,alpha
+    global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump,randomFactMultiStrand
+    global tipMagnet,sizeMultiStrand,sizeClump,subsurf
     global samples,clumptype,preview
     global rootColor,tipColor
 
@@ -366,19 +400,26 @@ def draw():
     Button("Exit", 1, 210, buttonY, 50, 20)
     Button("Rendering", 2, 10, buttonY, 200, 20)
 
-    clumptype = Slider("Clumpiness: ", 3, 10, buttonY+20, 250, 18, clumptype.val, 0.0, 1.0, 1)
-    hairDiameter = Slider("Hair diameter: ", 0, 10, buttonY+40, 250, 20, hairDiameter.val, 0, 0.05, 0)
-    percOfRebels= Slider("% of unkempt: ", 3, 10, buttonY+60, 250, 18, percOfRebels.val, 1, 100, 0)
-    randomFact= Slider("Unkempt dist: ", 3, 10, buttonY+80, 250, 18, randomFact.val, 0, 1, 0)
-    nHairs= Slider("Number of hairs: ", 3, 10, buttonY+100, 250, 18, nHairs.val, 1, 1000, 0)
-    tuftSize= Slider("Tuft area: ", 3, 10, buttonY+120, 250, 18, tuftSize.val, 0.0, 0.5, 0)
-    rootColor = ColorPicker(3, 10, buttonY+140, 125, 20, rootColor.val,"Color of root")
-    tipColor = ColorPicker(3, 135, buttonY+140, 125, 20, tipColor.val,"Color of tip")
-    Button("Save", 4, 10, buttonY+200, 100, 20)
-    Button("Load", 5, 110, buttonY+200, 100, 20)
+    clumptype = Slider("Clumpiness: ", 3, 10, buttonY+20, 300, 18, clumptype.val, 1, 4, 1,"Determine when guide start to actract generated hairs")
+    hairDiameterClump = Slider("Clump hair diam.: ", 0, 10, buttonY+40, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
+    tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+60, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
+    randomFactClump= Slider("Clump Random Factor: ", 3, 10, buttonY+80, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
+    numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+100, 300, 18, numberOfHairsClump.val, 1, 1000, 0, "number of generated hair for each guide")
+    sizeClump= Slider("Clump size: ", 3, 10, buttonY+120, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
+
+    
+    
+    randomFactMultiStrand= Slider("Random Factor: ", 3, 10, buttonY+200, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
+    numberOfHairsMultiStrand= Slider("Number of hairs: ", 3, 10, buttonY+220, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
+    sizeMultiStrand= Slider("Tuft area: ", 3, 10, buttonY+240, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)    
+    
+    rootColor = ColorPicker(3, 10, buttonY+260, 125, 20, rootColor.val,"Color of root")
+    tipColor = ColorPicker(3, 135, buttonY+260, 125, 20, tipColor.val,"Color of tip")
+    Button("Save", 4, 10, buttonY+280, 100, 20)
+    Button("Load", 5, 110, buttonY+280, 100, 20)   
 
     glColor3f(1, 1, 1)
-    glRasterPos2i(10, buttonY+180)
+    glRasterPos2i(10, buttonY+300)
     Text("makeHair 1.0 beta" )
 
 def event(evt, val):
@@ -386,7 +427,7 @@ def event(evt, val):
 
 def bevent(evt):
     global tuftSize, clumptype
-    global nHairs, percOfRebels, randomFact
+    global nHairs, tipMagnet, randomFact
 
     if   (evt== 1): Exit()
 
@@ -394,12 +435,17 @@ def bevent(evt):
         saveRib("hair-test.rib")
 
     elif (evt== 3):
-        hairsClass.tuftSize = tuftSize.val
-        hairsClass.numberOfHairs = nHairs.val
-        hairsClass.percOfRebels = percOfRebels.val
+
+        hairsClass.tipMagnet = tipMagnet.val
         hairsClass.clumptype = clumptype.val
-        hairsClass.randomFact = randomFact.val
-        hairsClass.hairDiameter = hairDiameter.val
+        hairsClass.hairDiameterClump = hairDiameterClump.val
+        hairsClass.hairDiameterMultiStrand = hairDiameterMultiStrand.val
+        hairsClass.numberOfHairsClump= numberOfHairsClump.val
+        hairsClass.numberOfHairsMultiStrand= numberOfHairsMultiStrand.val
+        hairsClass.randomFactClump= randomFactClump.val
+        hairsClass.randomFactMultiStrand= randomFactMultiStrand.val
+        hairsClass.sizeClump= sizeClump.val
+        hairsClass.sizeMultiStrand= sizeMultiStrand.val
 
     elif (evt== 4):
         Window.FileSelector (saveHairsFile, "Save hair data")

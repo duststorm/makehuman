@@ -1,22 +1,24 @@
-/* matte.sl - Standard matte surface for RenderMan Interface.
- * (c) Copyright 1988, Pixar.
- *
- * The RenderMan (R) Interface Procedures and RIB Protocol are:
- *     Copyright 1988, 1989, Pixar.  All rights reserved.
- * RenderMan (R) is a registered trademark of Pixar.
- */
+surface hair(
 
-surface hair (float Ka = 1;
-	       float Kd = 1;
-           float Ks = 1;
-           color rootcolor = color (.109, .037, .007);
-           color tipcolor = color (.519, .325, .125);
-           color specularcolor = (color(1) + tipcolor) / 2;
-           float roughness = .1;
+    float Ka = 1;
+    float Kd = .6;
+    float Ks = .9;
+    float roughness = .15;
+    color rootcolor = color (.109, .037, .007);
+    color tipcolor = color (.519, .325, .125);
+    color specularcolor = (color(1) + tipcolor) / 2;
     )
 {    
-    normal Nf = faceforward (normalize(N),I);    
-    Oi = Os;    
-    Ci = Os * ( mix(rootcolor, tipcolor, v) * (Ka*ambient() + Kd*diffuse(Nf)) +
-		specularcolor * Ks*specular(Nf,-normalize(I),roughness));
+	normal FakeN;
+	
+	
+	
+	if (u>0.5)
+		FakeN = normalize(N+dPdu*du);
+	else
+		FakeN = normalize(N-dPdu*du);
+	
+    Ci = Os * (Ka*ambient() + mix(rootcolor, tipcolor, v) * diffuse(FakeN)+
+        specularcolor * Ks*specular(FakeN,-normalize(I),roughness));
 }
+
