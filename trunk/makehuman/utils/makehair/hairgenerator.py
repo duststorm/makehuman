@@ -57,8 +57,7 @@ class Hairgenerator:
 
         self.hairStyle = []
 
-        self.tipMagnet = 0.9
-        self.clumptype = 1
+        self.tipMagnet = 0.9        
 
         self.numberOfHairsClump = 10
         self.numberOfHairsMultiStrand = 90
@@ -81,6 +80,10 @@ class Hairgenerator:
         self.version = "1.0 alpha 2"
         self.tags = []
         self.octree = simpleoctree.SimpleOctree(humanMesh.verts)
+        
+    def resetHairs(self):
+        self.hairStyle = []
+        self.guides = []
 
     def addHairGuide(self,curve, curveName):
         g = HairGuide(curveName)
@@ -112,7 +115,6 @@ class Hairgenerator:
         hairName = "clump%s"%(guide.name)
         hSet = HairSet(hairName)
         nVerts = len(guide.controlPoints)
-        #headCentroid = [0.0,-0.570,7.318] #hardcoded...TODO
         interpFactor1 = 0
         incr = 1.0/(self.numberOfHairsClump)
         for n in range (self.numberOfHairsClump):
@@ -173,7 +175,7 @@ class Hairgenerator:
 
                     h.controlPoints.append([vert1[0]+offsetVector[0],\
                                             vert1[1]+offsetVector[1],\
-                                            -vert1[2]+offsetVector[2]])#I should to do in Blender coords
+                                            vert1[2]+offsetVector[2]])
 
                 hSet.hairs.append(h)
 
@@ -185,8 +187,7 @@ class Hairgenerator:
         hairName = "strand%s-%s"%(guide1.name,guide2.name)
         hSet = HairSet(hairName)
         print "INT.",hairName
-        nVerts = min([len(guide1.controlPoints),len(guide2.controlPoints)])
-        headCentroid = [0.0,-0.570,7.318] #hardcoded...TODO
+        nVerts = min([len(guide1.controlPoints),len(guide2.controlPoints)])        
         interpFactor = 0
         vertsListToModify1 = []
         vertsListToModify2 = []
@@ -197,10 +198,6 @@ class Hairgenerator:
 
         for n in range (self.numberOfHairsMultiStrand):
             h = Hair()
-
-            #randomHairs = random.uniform(0.0,self.randomFactMultiStrand)*random.uniform(0.0,self.sizeMultiStrand)
-            
-            
             
             interpFactor += 1.0/self.numberOfHairsMultiStrand
             for i in range(nVerts):
@@ -217,21 +214,9 @@ class Hairgenerator:
                 newVert = aljabr.vadd(aljabr.vmul(vert1,(1-interpFactor)),aljabr.vmul(vert2,interpFactor))
                 h.controlPoints.append([newVert[0]+randomVect[0],\
                                                 newVert[1]+randomVect[1],\
-                                                -newVert[2]+randomVect[2]]) #I should to do in Blender coords
-
+                                                newVert[2]+randomVect[2]])
             hSet.hairs.append(h)
-
         self.hairStyle.append(hSet)
-
-
-
-
-
-
-
-
-
-
 
     def saveHairs(self,path):
         """
@@ -249,13 +234,20 @@ class Hairgenerator:
         fileDescriptor.write("tags ")
         for tag in self.tags:
             fileDescriptor.write("%s "%(tag))
-        fileDescriptor.write("\n")
-        fileDescriptor.write("numberofhairs %i\n"%(self.numberOfHairs))
+        fileDescriptor.write("\n")        
+        
         fileDescriptor.write("tipMagnet %f\n"%(self.tipMagnet))
-        fileDescriptor.write("clumptype %f\n"%(self.clumptype))
-        fileDescriptor.write("tuftsize %f\n"%(self.tuftSize))
-        fileDescriptor.write("randomfact %f\n"%(self.randomFact))
-        fileDescriptor.write("hairdiameter %f\n"%(self.hairDiameter))
+        fileDescriptor.write("numberOfHairsClump %i\n"%(self.numberOfHairsClump))
+        fileDescriptor.write("numberOfHairsMultiStrand %i\n"%(self.numberOfHairsMultiStrand))
+        fileDescriptor.write("randomFactClump %f\n"%(self.randomFactClump))
+        fileDescriptor.write("randomFactMultiStrand %f\n"%(self.randomFactMultiStrand))
+        fileDescriptor.write("randomPercentage %f\n"%(self.randomPercentage))
+        fileDescriptor.write("hairDiameterClump %f\n"%(self.hairDiameterClump))
+        fileDescriptor.write("hairDiameterMultiStrand %f\n"%(self.hairDiameterMultiStrand))
+        fileDescriptor.write("sizeClump %f\n"%(self.sizeClump))
+        fileDescriptor.write("sizeMultiStrand %f\n"%(self.tuftSize))
+        fileDescriptor.write("blendDistance %f\n"%(self.blendDistance))        
+        
         fileDescriptor.write("tipcolor %f %f %f\n"%(self.tipColor[0],self.tipColor[1],self.tipColor[2]))
         fileDescriptor.write("rootcolor %f %f %f\n"%(self.rootColor[0],self.rootColor[1],self.rootColor[2]))
 
@@ -290,18 +282,29 @@ class Hairgenerator:
                 pass
             elif datalist[0] == "tags":
                 pass
-            elif datalist[0] == "numberofhairs":
-                self.numberOfHairs = int(datalist[1])
             elif datalist[0] == "tipMagnet":
-                self.tipMagnet = float(datalist[1])
-            elif datalist[0] == "clumptype":
-                self.clumpyype = float(datalist[1])
-            elif datalist[0] == "tuftsize":
-                self.tuftSize = float(datalist[1])
-            elif datalist[0] == "randomfact":
-                self.randomFact = float(datalist[1])
-            elif datalist[0] == "hairdiameter":
-                self.hairDiameter = float(datalist[1])
+                self.tipMagnet = int(datalist[1])
+            elif datalist[0] == "numberOfHairsClump":
+                self.numberOfHairsClump = float(datalist[1])
+            elif datalist[0] == "numberOfHairsMultiStrand":
+                self.numberOfHairsMultiStrand = float(datalist[1])
+            elif datalist[0] == "randomFactClump":
+                self.randomFactClump = float(datalist[1])
+            elif datalist[0] == "randomFactMultiStrand":
+                self.randomFactMultiStrand = float(datalist[1])
+            elif datalist[0] == "randomPercentage":
+                self.randomPercentage = float(datalist[1])
+            elif datalist[0] == "hairDiameterClump":
+                self.hairDiameterClump = float(datalist[1])
+            elif datalist[0] == "hairDiameterMultiStrand":
+                self.hairDiameterMultiStrand = float(datalist[1])
+            elif datalist[0] == "sizeClump":
+                self.sizeClump = float(datalist[1])
+            elif datalist[0] == "sizeMultiStrand":
+                self.sizeMultiStrand = float(datalist[1])
+            elif datalist[0] == "blendDistance":
+                self.blendDistance = float(datalist[1])                
+                
             elif datalist[0] == "tipcolor":
                 self.tipColor[0] = float(datalist[1])
                 self.tipColor[1] = float(datalist[2])
