@@ -57,20 +57,22 @@ class Hairgenerator:
 
         self.hairStyle = []
 
-        self.tipMagnet = 0.0
+        self.tipMagnet = 0.9
         self.clumptype = 1
 
-        self.numberOfHairsClump = 90
+        self.numberOfHairsClump = 10
         self.numberOfHairsMultiStrand = 90
 
-        self.randomFactClump = 0.0
-        self.randomFactMultiStrand = 0.0
+        self.randomFactClump = 0.5
+        self.randomFactMultiStrand = 0.5
+        self.randomPercentage = 0.5
 
         self.hairDiameterClump = 0.006
         self.hairDiameterMultiStrand = 0.006
 
-        self.sizeClump = 0.150
+        self.sizeClump = 0.200
         self.sizeMultiStrand = 0.150
+        self.blendDistance = 0.8
 
 
         self.tipColor = [0.518,0.325,0.125]
@@ -95,97 +97,87 @@ class Hairgenerator:
         for guide in self.guides:
             samplePointIndex = int(len(guide.controlPoints)/2)
             p1 = guide.controlPoints[samplePointIndex]
-            currentGuide = guide.name
-            distMin = .8
+            currentGuide = guide.name            
             guideToInterpolate = None
             for guide2 in self.guides:
                 if guide2.name != currentGuide:
                     p2 = guide2.controlPoints[samplePointIndex]
-                    dist = aljabr.vdist(p1,p2)
-                    #print p1
-                    #print p2
-                    #print "DIST BETWEEN %s ANS %s = %f"%(currentGuide,guide2.name,dist)
-                    if dist < distMin:
-                        #distMin = dist
+                    dist = aljabr.vdist(p1,p2)                    
+                    if dist < self.blendDistance:                        
                         guideToInterpolate = guide2
                         self.generateHairInterpolation2(guide,guideToInterpolate)
 
-   
+
     def generateHairInterpolation1(self,guide):
         hairName = "clump%s"%(guide.name)
         hSet = HairSet(hairName)
         nVerts = len(guide.controlPoints)
         #headCentroid = [0.0,-0.570,7.318] #hardcoded...TODO
-        interpFactor = 0
-        switch = 0
+        interpFactor1 = 0
+        incr = 1.0/(self.numberOfHairsClump)
         for n in range (self.numberOfHairsClump):
-            rFact = random.uniform(0.0,1.0)*self.randomFactClump
-            
-            print "rFact", rFact
-            interpFactor += 1.0/self.numberOfHairsMultiStrand
-            h = Hair()
+            interpFactor1 += incr
             vertsListToModify = []
-            if switch == 0:
-                switch = 1
-            else:
-                switch = 0
-                
             for c in guide.controlPoints:
                 vertsListToModify.append([c[0],c[1],c[2]])#maybe useless
+            interpFactor2 = 0
+            for n2 in range (self.numberOfHairsClump):
+                h = Hair()
+                interpFactor2 += incr
+                for i in range(nVerts):
+                    if nVerts > 3:
+                        clumpIndex = nVerts-2
+                    else:
+                        clumpIndex = nVerts-1
 
-            
-            for i in range(nVerts):                
-                if nVerts > 3:
-                    clumpIndex = nVerts-2
-                else:
-                    clumpIndex = nVerts-1
+                    magnet = 1.0-(i/float(clumpIndex))*self.tipMagnet
+                    if random.random() < self.randomPercentage:                        
+                        xRand = self.sizeClump*random.random()*self.randomFactClump*magnet
+                        yRand = self.sizeClump*random.random()*self.randomFactClump*magnet
+                        zRand = self.sizeClump*random.random()*self.randomFactClump*magnet
+                        randomVect = [xRand,yRand,zRand]
+                    else:                        
+                        randomVect = [0,0,0]
 
-                magnet = 1.0-(i/float(clumpIndex))                
-                rFact2 = random.uniform(0.0,0.5)*self.randomFactClump
-                if  i >= clumpIndex:
-                    
-                    offset =  self.sizeClump*magnet*interpFactor+rFact*magnet+rFact2
-                    vert0 = vertsListToModify[i-2]                 
-                    vert1 = vertsListToModify[i-1]
-                    vert2 = vertsListToModify[i]
+                    offset1 =  self.sizeClump*interpFactor1*magnet
+                    offset2 =  self.sizeClump*interpFactor2*magnet
+                    if  i >= clumpIndex:
+                        vert0 = vertsListToModify[i-1]
+                        vert1 = vertsListToModify[i]
+                        vert2 = vertsListToModify[nVerts-1]
+                    elif i < 1:
+                        vert0 = vertsListToModify[0]
+                        vert1 = vertsListToModify[1]
+                        vert2 = vertsListToModify[2]
+                    else:
+                        vert0 = vertsListToModify[i-1]
+                        vert1 = vertsListToModify[i]
+                        vert2 = vertsListToModify[i+1]
+
                     vector1 = aljabr.vsub(vert2,vert1)
                     vector2 = aljabr.vsub(vert1,vert0)
                     vector3 = aljabr.vnorm(aljabr.vcross(vector1,vector2))
                     vector4 = aljabr.vnorm(aljabr.vcross(vector1,vector3))
-                elif i < 1:
-                    offset =  self.sizeClump*magnet*interpFactor+rFact*magnet+rFact2
-                    vert0 = vertsListToModify[0]                 
-                    vert1 = vertsListToModify[1]
-                    vert2 = vertsListToModify[2]
-                    vector1 = aljabr.vsub(vert2,vert1)
-                    vector2 = aljabr.vsub(vert1,vert0)
-                    vector3 = aljabr.vnorm(aljabr.vcross(vector1,vector2))
-                    vector4 = aljabr.vnorm(aljabr.vcross(vector1,vector3))
-                else:
-                    offset =  self.sizeClump*magnet*interpFactor+rFact*magnet+rFact2
-                    vert0 = vertsListToModify[i-1]                 
-                    vert1 = vertsListToModify[i]
-                    vert2 = vertsListToModify[i+1]
-                    vector1 = aljabr.vsub(vert2,vert1)
-                    vector2 = aljabr.vsub(vert1,vert0)
-                    vector3 = aljabr.vnorm(aljabr.vcross(vector1,vector2))
-                    vector4 = aljabr.vnorm(aljabr.vcross(vector1,vector3))
-                    
-                    
 
-                #randomHairs = random.uniform(0,self.randomFactClump)*offset
-                if switch == 0:
-                    h.controlPoints.append([vert1[0]+vector3[0]*offset,\
-                                                    vert1[1]+vector3[1]*offset,\
-                                                    -vert1[2]+vector3[2]*offset])#I should to do in Blender coords
-                else:
-                    h.controlPoints.append([vert1[0]+vector4[0]*offset,\
-                                                        vert1[1]+vector4[1]*offset,\
-                                                        -vert1[2]+vector4[2]*offset])#I should to do in Blender coords
-                                                                                  
-            hSet.hairs.append(h)
+                    #Vector3 and vector4 are perpendicular between them,
+                    #and both are perpendicular to line vert1-vert2. This happen
+                    #because vector3 is the cross product of vector1 and vector2
+                    #so it's perpendicular to them, and vector4 is the cross product
+                    #of vector1 and vector3, so it's perpendicular to them.
+                    #So using these 2 vector we build a prims vector3*vector4*guideLenght.
 
-        
+                    offsetVector1 = aljabr.vmul(vector3,offset1)
+                    offsetVector2 = aljabr.vmul(vector4,offset2)
+                    offsetVector3 = aljabr.vadd(offsetVector1,offsetVector2)
+                    offsetVector = aljabr.vadd(offsetVector3,randomVect)
+
+                    h.controlPoints.append([vert1[0]+offsetVector[0],\
+                                            vert1[1]+offsetVector[1],\
+                                            -vert1[2]+offsetVector[2]])#I should to do in Blender coords
+
+                hSet.hairs.append(h)
+
+
         self.hairStyle.append(hSet)
 
 
@@ -194,8 +186,8 @@ class Hairgenerator:
         hSet = HairSet(hairName)
         print "INT.",hairName
         nVerts = min([len(guide1.controlPoints),len(guide2.controlPoints)])
-        headCentroid = [0.0,-0.570,7.318] #hardcoded...TODO        
-        interpFactor = 0        
+        headCentroid = [0.0,-0.570,7.318] #hardcoded...TODO
+        interpFactor = 0
         vertsListToModify1 = []
         vertsListToModify2 = []
         for c in guide1.controlPoints:
@@ -204,17 +196,28 @@ class Hairgenerator:
             vertsListToModify2.append([c[0],c[1],c[2]]) #TODOmaybe this is useless
 
         for n in range (self.numberOfHairsMultiStrand):
-            h = Hair()            
+            h = Hair()
+
+            #randomHairs = random.uniform(0.0,self.randomFactMultiStrand)*random.uniform(0.0,self.sizeMultiStrand)
             
-            randomHairs = random.uniform(0.0,self.randomFactMultiStrand)*random.uniform(0.0,self.sizeMultiStrand)
+            
+            
             interpFactor += 1.0/self.numberOfHairsMultiStrand
             for i in range(nVerts):
+                if random.random() < self.randomPercentage: 
+                    xRand = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand
+                    yRand = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand
+                    zRand = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand
+                    randomVect = [xRand,yRand,zRand]
+                else:
+                    randomVect = [0,0,0]
+                
                 vert1 = vertsListToModify1[i]
                 vert2 = vertsListToModify2[i]
                 newVert = aljabr.vadd(aljabr.vmul(vert1,(1-interpFactor)),aljabr.vmul(vert2,interpFactor))
-                h.controlPoints.append([newVert[0]+randomHairs,\
-                                                newVert[1]+randomHairs,\
-                                                -newVert[2]+randomHairs]) #I should to do in Blender coords
+                h.controlPoints.append([newVert[0]+randomVect[0],\
+                                                newVert[1]+randomVect[1],\
+                                                -newVert[2]+randomVect[2]]) #I should to do in Blender coords
 
             hSet.hairs.append(h)
 

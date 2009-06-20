@@ -48,6 +48,8 @@ sizeMultiStrand= Create(hairsClass.sizeMultiStrand)
 rootColor= Create(hairsClass.rootColor[0],hairsClass.rootColor[1],hairsClass.rootColor[2])
 tipColor= Create(hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2])
 
+blendDistance = Create(hairsClass.blendDistance)
+
 tipMagnet = Create(hairsClass.tipMagnet)
 clumptype = Create(hairsClass.clumptype)
 
@@ -301,7 +303,7 @@ def writeFooter(ribfile):
 
     
 def writeBody(ribfile, ribRepository):
-    global nHairs,subsurf,alpha
+    global nHairs,alpha
     print "Calling create objects"
 
     for hSet in hairsClass.hairStyle:        
@@ -324,13 +326,13 @@ def generateHairs():
                 hairsClass.addHairGuide(curnurb, name)
                 hairCounter += 1    
     hairsClass.generateHairStyle1()
-    #hairsClass.generateHairStyle2()
+    hairsClass.generateHairStyle2()
 
 
 
 def saveRib(fName):
     global hairsClass
-    engine = "pixie"
+    engine = "aqsis"
 
     #d0 is [path,filename]
     #d1 is [name,extension]
@@ -388,7 +390,7 @@ def loadHairsFile(path):
 def draw():
     global hairDiameterClump,hairDiameterMultiStrand,alpha
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump,randomFactMultiStrand
-    global tipMagnet,sizeMultiStrand,sizeClump,subsurf
+    global tipMagnet,sizeMultiStrand,sizeClump,blendDistance
     global samples,clumptype,preview
     global rootColor,tipColor
 
@@ -403,15 +405,15 @@ def draw():
     clumptype = Slider("Clumpiness: ", 3, 10, buttonY+20, 300, 18, clumptype.val, 1, 4, 1,"Determine when guide start to actract generated hairs")
     hairDiameterClump = Slider("Clump hair diam.: ", 0, 10, buttonY+40, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
     tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+60, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
-    randomFactClump= Slider("Clump Random Factor: ", 3, 10, buttonY+80, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
-    numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+100, 300, 18, numberOfHairsClump.val, 1, 1000, 0, "number of generated hair for each guide")
+    randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+80, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
+    numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+100, 300, 18, numberOfHairsClump.val, 1, 100, 0, "Number of generated hair for each guide. Note that value of x mean x*x hairs")
     sizeClump= Slider("Clump size: ", 3, 10, buttonY+120, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
 
     
-    
-    randomFactMultiStrand= Slider("Random Factor: ", 3, 10, buttonY+200, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
-    numberOfHairsMultiStrand= Slider("Number of hairs: ", 3, 10, buttonY+220, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
-    sizeMultiStrand= Slider("Tuft area: ", 3, 10, buttonY+240, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)    
+    blendDistance= Slider("Strand Random: ", 3, 10, buttonY+180, 300, 18, blendDistance.val, 0, 2, 0)
+    randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+200, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
+    numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+220, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
+    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+240, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)    
     
     rootColor = ColorPicker(3, 10, buttonY+260, 125, 20, rootColor.val,"Color of root")
     tipColor = ColorPicker(3, 135, buttonY+260, 125, 20, tipColor.val,"Color of tip")
@@ -419,14 +421,14 @@ def draw():
     Button("Load", 5, 110, buttonY+280, 100, 20)   
 
     glColor3f(1, 1, 1)
-    glRasterPos2i(10, buttonY+300)
+    glRasterPos2i(10, buttonY+320)
     Text("makeHair 1.0 beta" )
 
 def event(evt, val):
     if (evt== QKEY and not val): Exit()
 
 def bevent(evt):
-    global tuftSize, clumptype
+    global tuftSize, clumptype, blendDistance
     global nHairs, tipMagnet, randomFact
 
     if   (evt== 1): Exit()
@@ -446,6 +448,7 @@ def bevent(evt):
         hairsClass.randomFactMultiStrand= randomFactMultiStrand.val
         hairsClass.sizeClump= sizeClump.val
         hairsClass.sizeMultiStrand= sizeMultiStrand.val
+        hairsClass.blendDistance= blendDistance.val
 
     elif (evt== 4):
         Window.FileSelector (saveHairsFile, "Save hair data")
