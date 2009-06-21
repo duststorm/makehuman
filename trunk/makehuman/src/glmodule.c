@@ -764,14 +764,14 @@ void OnInit()
             // (see Encoding of the font desription in https://www.msu.edu/~huntharo/xwin/docs/xwindows/XLFD.pdf)
             XFontStruct *XFont = XLoadQueryFont(dpy, "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
 
-            // If this fails then start an 2nd attempt: Try to load any font which has a poit size of 120.
+            // If this fails then start an 2nd attempt: Try to load *any* font which has a point size of 120.
             if (NULL == XFont)
             {
                 XFont = XLoadQueryFont(dpy, "-*-*-*-*-*--*-120-*");            
             }
-       	    assert(XFont); // Failed anyway? :-(
+            assert(XFont); // Failed anyway? :-(
 
-	        if (NULL != XFont)
+            if (NULL != XFont)
             {
                 glXUseXFont(XFont->fid, 0, 256, G.fontOffset);
                 XFreeFont(dpy, XFont);
