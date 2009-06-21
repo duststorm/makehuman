@@ -179,7 +179,7 @@ class MHApplication(gui3d.Application):
     # Help button
     @category.button.event
     def onClicked(event):
-      webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
+      webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
     
     self.switchCategory("Modelling")
     
@@ -212,7 +212,7 @@ class MHApplication(gui3d.Application):
       elif event.key == events3d.SDLK_q:
           self.app.scene3d.shutdown()
       elif event.key == events3d.SDLK_h:
-          webbrowser.open(os.getcwd()+"/docs/MH_1.0.A1_Users_Guide.pdf");
+          webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
     
   def do(self, action):
     if action.do():
