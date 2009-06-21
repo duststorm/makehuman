@@ -38,14 +38,21 @@ class HairGuide(Hair):
        Hair.__init__(self)
        self.name = name
 
-class HairSet:
+class HairGroup:
     """
-    Hairset is basically a set of hair object. Usually they are randomly
-    generated upon a hair guide.
+    HairGroup is basically a set of hair objects. 
     """
     def __init__(self,name):
         self.name = name
         self.hairs = []
+        
+class GuideGroup:
+    """
+    GuideGroup is basically a set of guide objects. 
+    """
+    def __init__(self,name):
+        self.name = name
+        self.guides = []
 
 class Hairgenerator:
     """
@@ -60,7 +67,7 @@ class Hairgenerator:
         self.tipMagnet = 0.9        
 
         self.numberOfHairsClump = 10
-        self.numberOfHairsMultiStrand = 90
+        self.numberOfHairsMultiStrand = 20
 
         self.randomFactClump = 0.5
         self.randomFactMultiStrand = 0.5
@@ -70,59 +77,97 @@ class Hairgenerator:
         self.hairDiameterMultiStrand = 0.006
 
         self.sizeClump = 0.200
-        self.sizeMultiStrand = 0.150
+        self.sizeMultiStrand = 0.200
         self.blendDistance = 0.8
 
 
         self.tipColor = [0.518,0.325,0.125]
         self.rootColor = [0.109, 0.037, 0.007]
-        self.guides = []
+        self.guideGroups = []
         self.version = "1.0 alpha 2"
         self.tags = []
         self.octree = simpleoctree.SimpleOctree(humanMesh.verts)
         
     def resetHairs(self):
         self.hairStyle = []
-        self.guides = []
+        self.guideGroups = []
+        
+    def addGuideGroup(self,name):
+        
+        g = GuideGroup(name)
+        self.guideGroups.append(g)
+        return g
+        
+        
 
-    def addHairGuide(self,curve, curveName):
-        g = HairGuide(curveName)
-        g.name = curveName
-        for p in curve:
+    def addHairGuide(self,guidePoints, guideName, guideGroup):
+ 
+        g = HairGuide(guideName)        
+        for p in guidePoints:
             g.controlPoints.append([p[0],p[1],p[2]])
-        self.guides.append(g)
+        guideGroup.guides.append(g)
+        
 
     def generateHairStyle1(self):
-        for guide in self.guides:
-            self.generateHairInterpolation1(guide)
+        """
+        Calling this function, for each guide in each guideGroup, 
+        a new hairtuft will be added to the hairstyle.
+
+        Parameters
+        ----------
+
+        No parameters
+        """
+        for guideGroup in self.guideGroups:
+            for guide in guideGroup.guides:
+                self.generateHairInterpolation1(guide)
 
     def generateHairStyle2(self):
-        for guide in self.guides:
-            samplePointIndex = int(len(guide.controlPoints)/2)
-            p1 = guide.controlPoints[samplePointIndex]
-            currentGuide = guide.name            
-            guideToInterpolate = None
-            for guide2 in self.guides:
-                if guide2.name != currentGuide:
-                    p2 = guide2.controlPoints[samplePointIndex]
-                    dist = aljabr.vdist(p1,p2)                    
-                    if dist < self.blendDistance:                        
-                        guideToInterpolate = guide2
-                        self.generateHairInterpolation2(guide,guideToInterpolate)
+        """
+        Calling this function, each guide is interpolated with all other guides
+        (that are in a radius < blendDistance) to add a new strand of hairs to
+        the hairstyle.
+
+        Parameters
+        ----------
+
+        No parameters
+        """
+        near = 0.08
+        far = 1.6
+                 
+        
+        for guideGroup in self.guideGroups:            
+            for guide1 in guideGroup.guides: 
+                samplePointIndex1 = int(len(guide1.controlPoints)/2)
+                p1 = guide1.controlPoints[samplePointIndex1]
+                for guide2 in guideGroup.guides:
+                    if guide2.name != guide1.name:
+                        samplePointIndex2 = int(len(guide2.controlPoints)/2) 
+                        p2 = guide2.controlPoints[samplePointIndex2]
+                        dist = aljabr.vdist(p1,p2)   
+                        if dist < self.blendDistance:                     
+                            self.generateHairInterpolation2(guide1,guide2)
 
 
     def generateHairInterpolation1(self,guide):
         hairName = "clump%s"%(guide.name)
-        hSet = HairSet(hairName)
+        hSet = HairGroup(hairName)
         nVerts = len(guide.controlPoints)
         interpFactor1 = 0
         incr = 1.0/(self.numberOfHairsClump)
+        
+
+        
         for n in range (self.numberOfHairsClump):
             interpFactor1 += incr
-            vertsListToModify = []
-            for c in guide.controlPoints:
-                vertsListToModify.append([c[0],c[1],c[2]])#maybe useless
             interpFactor2 = 0
+            
+            xRand = self.sizeClump*random.random()
+            yRand = self.sizeClump*random.random()
+            zRand = self.sizeClump*random.random()
+            offsetVector = [xRand,yRand,zRand]
+            
             for n2 in range (self.numberOfHairsClump):
                 h = Hair()
                 interpFactor2 += incr
@@ -134,73 +179,49 @@ class Hairgenerator:
 
                     magnet = 1.0-(i/float(clumpIndex))*self.tipMagnet
                     if random.random() < self.randomPercentage:                        
-                        xRand = self.sizeClump*random.random()*self.randomFactClump*magnet
-                        yRand = self.sizeClump*random.random()*self.randomFactClump*magnet
-                        zRand = self.sizeClump*random.random()*self.randomFactClump*magnet
+                        xRand = self.sizeClump*random.random()*self.randomFactClump
+                        yRand = self.sizeClump*random.random()*self.randomFactClump
+                        zRand = self.sizeClump*random.random()*self.randomFactClump
                         randomVect = [xRand,yRand,zRand]
                     else:                        
                         randomVect = [0,0,0]
-
-                    offset1 =  self.sizeClump*interpFactor1*magnet
-                    offset2 =  self.sizeClump*interpFactor2*magnet
-                    if  i >= clumpIndex:
-                        vert0 = vertsListToModify[i-1]
-                        vert1 = vertsListToModify[i]
-                        vert2 = vertsListToModify[nVerts-1]
-                    elif i < 1:
-                        vert0 = vertsListToModify[0]
-                        vert1 = vertsListToModify[1]
-                        vert2 = vertsListToModify[2]
-                    else:
-                        vert0 = vertsListToModify[i-1]
-                        vert1 = vertsListToModify[i]
-                        vert2 = vertsListToModify[i+1]
-
-                    vector1 = aljabr.vsub(vert2,vert1)
-                    vector2 = aljabr.vsub(vert1,vert0)
-                    vector3 = aljabr.vnorm(aljabr.vcross(vector1,vector2))
-                    vector4 = aljabr.vnorm(aljabr.vcross(vector1,vector3))
-
-                    #Vector3 and vector4 are perpendicular between them,
-                    #and both are perpendicular to line vert1-vert2. This happen
-                    #because vector3 is the cross product of vector1 and vector2
-                    #so it's perpendicular to them, and vector4 is the cross product
-                    #of vector1 and vector3, so it's perpendicular to them.
-                    #So using these 2 vector we build a prims vector3*vector4*guideLenght.
-
-                    offsetVector1 = aljabr.vmul(vector3,offset1)
-                    offsetVector2 = aljabr.vmul(vector4,offset2)
-                    offsetVector3 = aljabr.vadd(offsetVector1,offsetVector2)
-                    offsetVector = aljabr.vadd(offsetVector3,randomVect)
-
-                    h.controlPoints.append([vert1[0]+offsetVector[0],\
-                                            vert1[1]+offsetVector[1],\
-                                            vert1[2]+offsetVector[2]])
-
+                    
+                    vert1 = guide.controlPoints[i]
+                    h.controlPoints.append([vert1[0]+offsetVector[0]*magnet+randomVect[0],\
+                                            vert1[1]+offsetVector[1]*magnet+randomVect[1],\
+                                            vert1[2]+offsetVector[2]*magnet+randomVect[2]])
                 hSet.hairs.append(h)
-
-
         self.hairStyle.append(hSet)
+
+
 
 
     def generateHairInterpolation2(self,guide1,guide2):
         hairName = "strand%s-%s"%(guide1.name,guide2.name)
-        hSet = HairSet(hairName)
-        print "INT.",hairName
+        hSet = HairGroup(hairName)
+       
+        if len(guide1.controlPoints)>= len(guide2.controlPoints):
+            longerGuide = guide1
+            shorterGuide = guide2            
+        else:
+            longerGuide = guide2
+            shorterGuide = guide1
+            
+       
+            
+        
+        
+        
         nVerts = min([len(guide1.controlPoints),len(guide2.controlPoints)])        
         interpFactor = 0
         vertsListToModify1 = []
-        vertsListToModify2 = []
-        for c in guide1.controlPoints:
-            vertsListToModify1.append([c[0],c[1],c[2]]) #TODOmaybe this is useless
-        for c in guide2.controlPoints:
-            vertsListToModify2.append([c[0],c[1],c[2]]) #TODOmaybe this is useless
+        vertsListToModify2 = []       
 
         for n in range (self.numberOfHairsMultiStrand):
             h = Hair()
             
             interpFactor += 1.0/self.numberOfHairsMultiStrand
-            for i in range(nVerts):
+            for i in range(len(longerGuide.controlPoints)):
                 if random.random() < self.randomPercentage: 
                     xRand = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand
                     yRand = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand
@@ -209,8 +230,15 @@ class Hairgenerator:
                 else:
                     randomVect = [0,0,0]
                 
-                vert1 = vertsListToModify1[i]
-                vert2 = vertsListToModify2[i]
+                if i == 0: 
+                    i2 = 0
+                if i == len(longerGuide.controlPoints)-1:
+                    i2 = len(shorterGuide.controlPoints)-1
+                else:
+                    i2 = int(round(i*len(shorterGuide.controlPoints)/len(longerGuide.controlPoints)))                   
+                    
+                vert1 = longerGuide.controlPoints[i]
+                vert2 = shorterGuide.controlPoints[i2]
                 newVert = aljabr.vadd(aljabr.vmul(vert1,(1-interpFactor)),aljabr.vmul(vert2,interpFactor))
                 h.controlPoints.append([newVert[0]+randomVect[0],\
                                                 newVert[1]+randomVect[1],\
@@ -245,7 +273,7 @@ class Hairgenerator:
         fileDescriptor.write("hairDiameterClump %f\n"%(self.hairDiameterClump))
         fileDescriptor.write("hairDiameterMultiStrand %f\n"%(self.hairDiameterMultiStrand))
         fileDescriptor.write("sizeClump %f\n"%(self.sizeClump))
-        fileDescriptor.write("sizeMultiStrand %f\n"%(self.tuftSize))
+        fileDescriptor.write("sizeMultiStrand %f\n"%(self.sizeMultiStrand))
         fileDescriptor.write("blendDistance %f\n"%(self.blendDistance))        
         
         fileDescriptor.write("tipcolor %f %f %f\n"%(self.tipColor[0],self.tipColor[1],self.tipColor[2]))
@@ -283,7 +311,7 @@ class Hairgenerator:
             elif datalist[0] == "tags":
                 pass
             elif datalist[0] == "tipMagnet":
-                self.tipMagnet = int(datalist[1])
+                self.tipMagnet = float(datalist[1])
             elif datalist[0] == "numberOfHairsClump":
                 self.numberOfHairsClump = float(datalist[1])
             elif datalist[0] == "numberOfHairsMultiStrand":

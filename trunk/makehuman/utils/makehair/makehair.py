@@ -26,6 +26,7 @@ from Blender import Scene
 from Blender import Types
 from Blender.Scene import Render
 from Blender import Window
+from Blender import Group
 import subprocess
 import hairgenerator
 
@@ -269,7 +270,7 @@ def writeHairs(ribRepository):
         hairFile.close()
     print "TOTAL HAIRS WRITTEN: ",totalNumberOfHairs
     print "NUMBER OF TUFTS",len(hairsClass.hairStyle)
-    print "NUMBER OF GUIDES: ",len(hairsClass.guides)
+    
 
 
 def writeLamps(ribfile):
@@ -322,21 +323,26 @@ def applyTransform(vec, matrix):
 def generateHairs():
     global nHairs,subsurf,alpha,hairsClass    
     hairCounter = 0
-    for obj in Blender.Object.Get():
-        data = obj.getData()
-        name = obj.getName()
+    
+    
+    groups = Group.Get()
+    for group in groups:
+        g = hairsClass.addGuideGroup(group.name)
         
-        if type(data) == Types.CurveType:
-            matr = obj.getMatrix()
-            controlPoints = [] 
-            for curnurb in data:                
-                for p in curnurb:
-                    p1 = [p[0],p[1],p[2]]
-                    worldP = applyTransform(p1,matr) #convert the point in absolute coords
-                    p2 = [worldP[0],worldP[1],-worldP[2]] #convert from Blender coord to Renderman coords
-                    controlPoints.append(p2)
-                hairsClass.addHairGuide(controlPoints, name)
-                hairCounter += 1    
+        for obj in list(group.objects):
+            data = obj.getData()
+            name = obj.getName()            
+            if type(data) == Types.CurveType:
+                matr = obj.getMatrix()
+                controlPoints = [] 
+                for curnurb in data:                
+                    for p in curnurb:
+                        p1 = [p[0],p[1],p[2]]
+                        worldP = applyTransform(p1,matr) #convert the point in absolute coords
+                        p2 = [worldP[0],worldP[1],-worldP[2]] #convert from Blender coord to Renderman coords
+                        controlPoints.append(p2)
+                    hairsClass.addHairGuide(controlPoints, name, g)
+                    hairCounter += 1    
     hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
 
