@@ -27,6 +27,7 @@ from Blender import Types
 from Blender.Scene import Render
 from Blender import Window
 from Blender import Group
+from Blender import Curve
 import subprocess
 import hairgenerator
 
@@ -320,11 +321,12 @@ def applyTransform(vec, matrix):
 			x*matrix[0][1] + y*matrix[1][1] + z*matrix[2][1] + yloc,\
 			x*matrix[0][2] + y*matrix[1][2] + z*matrix[2][2] + zloc
 
-def generateHairs():
-    global nHairs,subsurf,alpha,hairsClass    
-    hairCounter = 0
+
+def updateGuides():
+    global hairsClass
     
-    
+    hairsClass.resetHairs()  
+    hairCounter = 0    
     groups = Group.Get()
     for group in groups:
         g = hairsClass.addGuideGroup(group.name)
@@ -342,9 +344,15 @@ def generateHairs():
                         p2 = [worldP[0],worldP[1],-worldP[2]] #convert from Blender coord to Renderman coords
                         controlPoints.append(p2)
                     hairsClass.addHairGuide(controlPoints, name, g)
-                    hairCounter += 1    
+                    hairCounter += 1
+
+def generateHairs():
+    global hairsClass
+    updateGuides()   
     hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
+
+
 
 
 
@@ -390,10 +398,30 @@ def saveRib(fName):
     subprocess.Popen(command, shell=True)
 
 def saveHairsFile(path):
+    updateGuides()
     hairsClass.saveHairs(path)
 
 def loadHairsFile(path):
     hairsClass.loadHairs(path)
+    
+    scn = Scene.GetCurrent()
+    for group in hairsClass.guideGroups:
+        grp= Group.New(group.name)
+        for guide in group.guides:            
+            startP = guide.controlPoints[0]
+            cu = Curve.New()
+            #Note: hairs are stored using renderman coords system, so
+            #z is multiplied for -1 to conver renderman coords to Blender coord                 
+            cu.appendNurb([startP[0],startP[1],-startP[2],1])
+            cu_nurb= cu[0]  
+            for cP in guide.controlPoints[1:]:
+                cu_nurb.append([cP[0],cP[1],-cP[2],1])
+            ob = scn.objects.new(cu)
+            grp.objects.link(ob)
+    Window.RedrawAll()
+                
+
+    
     
 ###############################INTERFACE#####################################
 

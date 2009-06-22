@@ -194,8 +194,6 @@ class Hairgenerator:
         self.hairStyle.append(hSet)
 
 
-
-
     def generateHairInterpolation2(self,guide1,guide2):
         hairName = "strand%s-%s"%(guide1.name,guide2.name)
         hSet = HairGroup(hairName)
@@ -205,12 +203,7 @@ class Hairgenerator:
             shorterGuide = guide2            
         else:
             longerGuide = guide2
-            shorterGuide = guide1
-            
-       
-            
-        
-        
+            shorterGuide = guide1        
         
         nVerts = min([len(guide1.controlPoints),len(guide2.controlPoints)])        
         interpFactor = 0
@@ -218,8 +211,7 @@ class Hairgenerator:
         vertsListToModify2 = []       
 
         for n in range (self.numberOfHairsMultiStrand):
-            h = Hair()
-            
+            h = Hair()            
             interpFactor += 1.0/self.numberOfHairsMultiStrand
             for i in range(len(longerGuide.controlPoints)):
                 if random.random() < self.randomPercentage: 
@@ -279,11 +271,14 @@ class Hairgenerator:
         fileDescriptor.write("tipcolor %f %f %f\n"%(self.tipColor[0],self.tipColor[1],self.tipColor[2]))
         fileDescriptor.write("rootcolor %f %f %f\n"%(self.rootColor[0],self.rootColor[1],self.rootColor[2]))
 
-        for guide in self.guides:
-            fileDescriptor.write("%s "%(guide.name))
-            for cP in guide.controlPoints:
-                fileDescriptor.write("%f %f %f "%(cP[0],cP[1],cP[2]))
-            fileDescriptor.write("\n")
+        for guideGroup in self.guideGroups:
+            print "guidegroup",guideGroup.name
+            fileDescriptor.write("guideGroup %s\n"%(guideGroup.name))        
+            for guide in guideGroup.guides:
+                fileDescriptor.write("guide %s "%(guide.name))
+                for cP in guide.controlPoints:
+                    fileDescriptor.write("%f %f %f "%(cP[0],cP[1],cP[2]))
+                fileDescriptor.write("\n")
         fileDescriptor.close()
 
     def extractSubList(self,listToSplit,sublistLength):
@@ -301,7 +296,7 @@ class Hairgenerator:
             print "Impossible to load %s"%(path)
             return
 
-        self.guides = []
+        self.resetHairs()
         for data in fileDescriptor:
             datalist = data.split()
             if datalist[0] == "written":
@@ -341,12 +336,16 @@ class Hairgenerator:
                 self.rootColor[0] = float(datalist[1])
                 self.rootColor[1] = float(datalist[2])
                 self.rootColor[2] = float(datalist[3])
-            else:
-                controlPointsCoo = datalist[1:]
+            elif datalist[0] == "guideGroup":
+                currentGroup = self.addGuideGroup(datalist[1])
+            elif datalist[0] == "guide":
+                guideName = datalist[1]
+                controlPointsCoo = datalist[2:]
                 for i in range(len(controlPointsCoo)):
                     controlPointsCoo[i] = float(controlPointsCoo[i])
                 guidePoints = self.extractSubList(controlPointsCoo,3)
-                self.addHairGuide(guidePoints, datalist[0])
+                self.addHairGuide(guidePoints, guideName, currentGroup)
+                
         fileDescriptor.close()
 
 
