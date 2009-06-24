@@ -60,7 +60,7 @@ class Hairgenerator:
     The sum of all hair sets (think of it as tufts) is called hairstyle.
     """
 
-    def __init__(self, humanMesh):
+    def __init__(self):
 
         self.hairStyle = []
 
@@ -86,11 +86,13 @@ class Hairgenerator:
         self.guideGroups = []
         self.version = "1.0 alpha 2"
         self.tags = []
-        self.octree = simpleoctree.SimpleOctree(humanMesh.verts)
+        self.humanVerts = []
+        #self.octree = simpleoctree.SimpleOctree(humanMesh.verts)# not used yet
         
     def resetHairs(self):
         self.hairStyle = []
         self.guideGroups = []
+
         
     def addGuideGroup(self,name):
         
@@ -271,13 +273,31 @@ class Hairgenerator:
         fileDescriptor.write("tipcolor %f %f %f\n"%(self.tipColor[0],self.tipColor[1],self.tipColor[2]))
         fileDescriptor.write("rootcolor %f %f %f\n"%(self.rootColor[0],self.rootColor[1],self.rootColor[2]))
 
-        for guideGroup in self.guideGroups:
-            print "guidegroup",guideGroup.name
+        for guideGroup in self.guideGroups:            
             fileDescriptor.write("guideGroup %s\n"%(guideGroup.name))        
             for guide in guideGroup.guides:
                 fileDescriptor.write("guide %s "%(guide.name))
+                #Write points coord
                 for cP in guide.controlPoints:
                     fileDescriptor.write("%f %f %f "%(cP[0],cP[1],cP[2]))
+                fileDescriptor.write("\n")
+
+        for guideGroup in self.guideGroups:
+            print "guidegroup",guideGroup.name
+            for guide in guideGroup.guides:
+                fileDescriptor.write("delta %s "%(guide.name))
+                #Write points nearest body verts
+                for cP in guide.controlPoints:
+                    distMin = 1000
+                    for i in range(len(self.humanVerts)): #later we optimize this using octree
+                        v = self.humanVerts[i]
+                        dist = aljabr.vdist(cP,v)                        
+                        if dist < distMin:
+                            distMin = dist
+                            nearVert = v
+                            nearVertIndex = i
+                    delta = aljabr.vsub(cP,nearVert)
+                    fileDescriptor.write("%i %f %f %f "%(nearVertIndex, delta[0],delta[1],delta[2]))
                 fileDescriptor.write("\n")
         fileDescriptor.close()
 

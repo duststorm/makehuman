@@ -28,12 +28,13 @@ from Blender.Scene import Render
 from Blender import Window
 from Blender import Group
 from Blender import Curve
+
 import subprocess
 import hairgenerator
 
 humanMesh = Blender.Object.Get("Base")
 
-hairsClass = hairgenerator.Hairgenerator(humanMesh.getData())
+hairsClass = hairgenerator.Hairgenerator()
 
 hairDiameterClump = Create(hairsClass.hairDiameterClump)
 hairDiameterMultiStrand = Create(hairsClass.hairDiameterMultiStrand)
@@ -139,28 +140,28 @@ def ambientLight(ribfile):
         aB = world.amb[2]
         ribfile.write('\tLightSource "ambientlight" 998 "intensity" [1] "color lightcolor" [%s %s %s]\n\n'%(aR, aG, aB))
 
-def writePolyObj(fileObj, mesh): 
-    
+def writePolyObj(fileObj, mesh):
+
     objFile = file(fileObj,'w')
     index = 0
     facenum = len(mesh.faces)
-    
+
     if mesh.hasFaceUV() == 1:
             objFile.write('Declare "st" "facevarying float[2]"\n')
-            
+
     objFile.write("PointsPolygons [");
     for face in mesh.faces:
         objFile.write('%s '%(len(face.v)))
         index = index + 1
-    
+
     objFile.write("] ")
     objFile.write("[ ")
     for face in mesh.faces:
-        num = len(face.v)        
+        num = len(face.v)
         verticesIdx = []
         for vert in face.v:
             verticesIdx.append(vert)
-        verticesIdx.reverse()           
+        verticesIdx.reverse()
         if num == 3 or num == 4:
             for vert in verticesIdx:
                 objFile.write('%s ' % vert.index)
@@ -185,7 +186,7 @@ def writePolyObj(fileObj, mesh):
         #for vc in vertexcol:
             #objFile.write('%s %s %s ' % (vc.r/256.0, vc.g/256.0, vc.b/256.0))
         #objFile.write(']')
-    
+
     if mesh.hasFaceUV() == 1:
         objFile.write('\n"st" [')
         for face in mesh.faces:
@@ -193,11 +194,11 @@ def writePolyObj(fileObj, mesh):
             if num == 3 or num == 4:
                 for vi in range(len(face.v)):
                     objFile.write('%s %s ' % (face.uv[vi][0], 1.0 - face.uv[vi][1]))
-        objFile.write(']')  
+        objFile.write(']')
     objFile.write('\n')
     objFile.close()
 
-    
+
 def writeSubdividedObj(ribPath, mesh):
 
     objFile = open(ribPath,'w')
@@ -211,7 +212,7 @@ def writeSubdividedObj(ribPath, mesh):
     for face in mesh.faces:
         for vert in face.v:
             objFile.write('%s ' % vert.index)
-    objFile.write(']\n["interpolateboundary"] [0 0] [] []\n"P" [') 
+    objFile.write(']\n["interpolateboundary"] [0 0] [] []\n"P" [')
     for vert in mesh.verts:
         objFile.write("%s %s %s " % (vert.co[0], vert.co[1], -vert.co[2]))
     objFile.write(']')
@@ -242,16 +243,16 @@ def writeHairs(ribRepository):
 
     global rootColor,tipColor,hairDiameter,preview,hairsClass
     totalNumberOfHairs = 0
-    
+
     for hSet in hairsClass.hairStyle:
 
         if "clump" in hSet.name:
             hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
         else:
             hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)
-            
-        hairName = "%s/%s.rib"%(ribRepository,hSet.name)        
-        hairFile = open(hairName,'w')        
+
+        hairName = "%s/%s.rib"%(ribRepository,hSet.name)
+        hairFile = open(hairName,'w')
         hairFile.write('\t\tDeclare "rootcolor" "color"\n')
         hairFile.write('\t\tDeclare "tipcolor" "color"\n')
         hairFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]'%(rootColor.val[0],\
@@ -259,8 +260,8 @@ def writeHairs(ribRepository):
                     tipColor.val[0],tipColor.val[1],tipColor.val[2]))
         #hairFile.write('\t\tSurface "matte" ')
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
-        hairFile.write('Curves "cubic" [')    
-        for hair in hSet.hairs:            
+        hairFile.write('Curves "cubic" [')
+        for hair in hSet.hairs:
             totalNumberOfHairs += 1
             hairFile.write('%i ' % len(hair.controlPoints))
         hairFile.write('] "nonperiodic" "P" [')
@@ -271,7 +272,7 @@ def writeHairs(ribRepository):
         hairFile.close()
     print "TOTAL HAIRS WRITTEN: ",totalNumberOfHairs
     print "NUMBER OF TUFTS",len(hairsClass.hairStyle)
-    
+
 
 
 def writeLamps(ribfile):
@@ -286,13 +287,13 @@ def writeLamps(ribfile):
             ribfile.write('\tLightSource "pointlight" %s "from" [%s %s %s] "intensity" %s  "lightcolor" [%s %s %s] \n' %(numLamp,locX, locY, locZ, intensity, lamp.col[0], lamp.col[1], lamp.col[2]))
 
 
-def writeHuman(ribRepository):    
+def writeHuman(ribRepository):
 
     global humanMesh
     meshData = humanMesh.getData()
     ribPath = "%s/base.obj.rib"%(ribRepository)
     writePolyObj(ribPath, meshData)
-    
+
 def writeFooter(ribfile):
     ribfile.write("\tAttributeBegin\n")
     #ribfile.write("\t\tRotate -90 1 0 0\n")
@@ -301,18 +302,18 @@ def writeFooter(ribfile):
     ribfile.write("\tAttributeEnd\n")
     ribfile.write("WorldEnd\n")
 
-    
+
 def writeBody(ribfile, ribRepository):
     global nHairs,alpha
     print "Calling create objects"
 
-    for hSet in hairsClass.hairStyle:        
-        ribObj = "%s/%s.rib"%(ribRepository,hSet.name) 
-        print "RIBOBJ",ribObj        
-        ribfile.write('\tAttributeBegin\n')                             
+    for hSet in hairsClass.hairStyle:
+        ribObj = "%s/%s.rib"%(ribRepository,hSet.name)
+        print "RIBOBJ",ribObj
+        ribfile.write('\tAttributeBegin\n')
         ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
-        ribfile.write('\tAttributeEnd\n')        
- 
+        ribfile.write('\tAttributeEnd\n')
+
 
 def applyTransform(vec, matrix):
 	x, y, z = vec
@@ -321,23 +322,27 @@ def applyTransform(vec, matrix):
 			x*matrix[0][1] + y*matrix[1][1] + z*matrix[2][1] + yloc,\
 			x*matrix[0][2] + y*matrix[1][2] + z*matrix[2][2] + zloc
 
+def updateHumanVerts():
+    for v in humanMesh.getData().verts:
+        v1 = [v.co[0],v.co[1],-v.co[2]] #-1 +z to convert in renderman coord
+        hairsClass.humanVerts.append(v1)
 
-def updateGuides():
+
+def blenderCurves2MHData():
     global hairsClass
-    
-    hairsClass.resetHairs()  
-    hairCounter = 0    
+
+    hairsClass.resetHairs()
+    hairCounter = 0
     groups = Group.Get()
     for group in groups:
         g = hairsClass.addGuideGroup(group.name)
-        
         for obj in list(group.objects):
             data = obj.getData()
-            name = obj.getName()            
+            name = obj.getName()
             if type(data) == Types.CurveType:
                 matr = obj.getMatrix()
-                controlPoints = [] 
-                for curnurb in data:                
+                controlPoints = []
+                for curnurb in data:
                     for p in curnurb:
                         p1 = [p[0],p[1],p[2]]
                         worldP = applyTransform(p1,matr) #convert the point in absolute coords
@@ -346,9 +351,65 @@ def updateGuides():
                     hairsClass.addHairGuide(controlPoints, name, g)
                     hairCounter += 1
 
+def MHData2BlenderCurves():
+    global hairsClass
+    for group in hairsClass.guideGroups:
+        for guide in group.guides:
+            guide = Blender.Object.Get(guide.name)
+            data = guide.getData()
+            curnurb = data[0] #we assume each curve has only one nurbs
+            for p in curnurb:
+                print p
+
+
+
+
+
+def adjustGuides(path):
+    """
+
+    """
+    global hairsClass
+    humanMeshVerts = Blender.Object.Get("Base").getData().verts
+    try:
+        fileDescriptor = open(path)
+    except:
+        print "Impossible to load %s"%(path)
+        return
+
+    #Guides and Deltas have the same name, so it's
+    #easy to associate them. Anyway we must a dd a check to
+    #be sure the hairs to adjust are the same as saved in
+    #the file. 
+    deltaGuides = {}
+    for data in fileDescriptor:
+        datalist = data.split()
+        if datalist[0] == "delta":
+            name = datalist[1]
+            guidesDelta = datalist[2:]
+            deltaGuides[name] = hairsClass.extractSubList(guidesDelta,4)
+
+    for group in hairsClass.guideGroups:
+        for g in group.guides:
+            guide = Blender.Object.Get(g.name)
+            curvsDelta = deltaGuides[g.name]
+            data = guide.getData()
+            curnurb = data[0] #we assume each curve has only one nurbs
+            for i in range(len(curvsDelta)):
+                cpDelta = curvsDelta[i]
+                parentVertIndex = int(cpDelta[0])
+                v = humanMeshVerts[parentVertIndex]
+                cPoint = [0,0,0,1]
+                cPoint[0] = v.co[0] + float(cpDelta[1])
+                cPoint[1] = v.co[1] + float(cpDelta[2])
+                cPoint[2] = v.co[2] - float(cpDelta[3]) # mul -1 to convert from renderman to Blender
+                data.setControlPoint(0, i, cPoint)
+                data.update()
+
+
 def generateHairs():
     global hairsClass
-    updateGuides()   
+    blenderCurves2MHData()
     hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
 
@@ -375,17 +436,17 @@ def saveRib(fName):
     generateHairs()
     if not os.path.isdir(objectsDirectory):
         os.mkdir(objectsDirectory)
-    theFile = open(fName,'w')    
+    theFile = open(fName,'w')
     writeHuman(objectsDirectory)
-    writeHeader(theFile,imageName)    
+    writeHeader(theFile,imageName)
     writeLamps(theFile)
-    writeBody(theFile,objectsDirectory)    
-    writeFooter(theFile) 
-    writeHairs(objectsDirectory)  
+    writeBody(theFile,objectsDirectory)
+    writeFooter(theFile)
+    writeHairs(objectsDirectory)
     theFile.close()
-  
-    hairsClass.resetHairs()    
-    
+
+    hairsClass.resetHairs()
+
     command = '%s %s'%('cd', mainPath) #To avoid spaces in path problem
     subprocess.Popen(command, shell=True) #We move into current dir
 
@@ -398,31 +459,32 @@ def saveRib(fName):
     subprocess.Popen(command, shell=True)
 
 def saveHairsFile(path):
-    updateGuides()
+    updateHumanVerts()
+    blenderCurves2MHData()
     hairsClass.saveHairs(path)
 
 def loadHairsFile(path):
     hairsClass.loadHairs(path)
-    
+
     scn = Scene.GetCurrent()
     for group in hairsClass.guideGroups:
         grp= Group.New(group.name)
-        for guide in group.guides:            
+        for guide in group.guides:
             startP = guide.controlPoints[0]
             cu = Curve.New()
             #Note: hairs are stored using renderman coords system, so
-            #z is multiplied for -1 to conver renderman coords to Blender coord                 
+            #z is multiplied for -1 to conver renderman coords to Blender coord
             cu.appendNurb([startP[0],startP[1],-startP[2],1])
-            cu_nurb= cu[0]  
+            cu_nurb= cu[0]
             for cP in guide.controlPoints[1:]:
                 cu_nurb.append([cP[0],cP[1],-cP[2],1])
             ob = scn.objects.new(cu)
             grp.objects.link(ob)
     Window.RedrawAll()
-                
 
-    
-    
+
+
+
 ###############################INTERFACE#####################################
 
 def draw():
@@ -438,25 +500,25 @@ def draw():
 
     Button("Exit", 1, 210, buttonY, 100, 20)
     Button("Rendering", 2, 10, buttonY, 200, 20)
-   
+
     tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+40, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
     randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+60, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
     numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+80, 300, 18, numberOfHairsClump.val, 1, 100, 0, "Number of generated hair for each guide. Note that value of x mean x*x hairs")
     sizeClump= Slider("Clump size: ", 3, 10, buttonY+100, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
     hairDiameterMultiStrand = Slider("Clump hair diam.: ", 0, 10, buttonY+120, 300, 20, hairDiameterMultiStrand.val, 0, 0.05, 0,"Diameter of hairs used in strand interpolation")
-    
-    
+
+
     blendDistance= Slider("Strand blending dist.: ", 3, 10, buttonY+160, 300, 18, blendDistance.val, 0, 2, 0)
     randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+180, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
     numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+200, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
-    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+220, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)    
+    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+220, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)
     hairDiameterClump = Slider("Strand hair diam.: ", 0, 10, buttonY+240, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
-    
-    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+280, 300, 18, randomPercentage.val, 0.0, 1.0, 0)   
+
+    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+280, 300, 18, randomPercentage.val, 0.0, 1.0, 0)
     rootColor = ColorPicker(3, 10, buttonY+300, 150, 20, rootColor.val,"Color of root")
     tipColor = ColorPicker(3, 160, buttonY+300, 150, 20, tipColor.val,"Color of tip")
     Button("Save", 4, 10, buttonY+320, 150, 20)
-    Button("Load", 5, 160, buttonY+320, 150, 20)   
+    Button("Load", 5, 160, buttonY+320, 150, 20)
 
     glColor3f(1, 1, 1)
     glRasterPos2i(10, buttonY+360)
@@ -464,6 +526,12 @@ def draw():
 
 def event(evt, val):
     if (evt== QKEY and not val): Exit()
+
+    if (evt== TKEY and not val):
+        blenderCurves2MHData()
+        #MHData2BlenderCurves()
+
+        Window.FileSelector (adjustGuides, "Load curve file")
 
 def bevent(evt):
     global tuftSize,blendDistance
@@ -476,7 +544,7 @@ def bevent(evt):
 
     elif (evt== 3):
 
-        hairsClass.tipMagnet = tipMagnet.val        
+        hairsClass.tipMagnet = tipMagnet.val
         hairsClass.hairDiameterClump = hairDiameterClump.val
         hairsClass.hairDiameterMultiStrand = hairDiameterMultiStrand.val
         hairsClass.numberOfHairsClump= numberOfHairsClump.val
