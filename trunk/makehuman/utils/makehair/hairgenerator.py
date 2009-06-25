@@ -233,7 +233,15 @@ class Hairgenerator:
                     
                 vert1 = longerGuide.controlPoints[i]
                 vert2 = shorterGuide.controlPoints[i2]
-                newVert = aljabr.vadd(aljabr.vmul(vert1,(1-interpFactor)),aljabr.vmul(vert2,interpFactor))
+
+                #Slerp
+                angleBetweenGuides = math.acos(aljabr.vdot(aljabr.vnorm(vert1),aljabr.vnorm(vert2)))
+                f1 = math.sin((1-interpFactor)*angleBetweenGuides)/math.sin(angleBetweenGuides)
+                f2 = math.sin(interpFactor*angleBetweenGuides)/math.sin(angleBetweenGuides)
+                newVert = aljabr.vadd(aljabr.vmul(vert1,f1),aljabr.vmul(vert2,f2))
+
+                #Uncomment the following line we use lerp instead slerp
+                #newVert = aljabr.vadd(aljabr.vmul(vert1,(1-interpFactor)),aljabr.vmul(vert2,interpFactor))
                 h.controlPoints.append([newVert[0]+randomVect[0],\
                                                 newVert[1]+randomVect[1],\
                                                 newVert[2]+randomVect[2]])
