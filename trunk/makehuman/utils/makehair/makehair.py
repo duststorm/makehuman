@@ -330,6 +330,7 @@ def updateHumanVerts():
 
 def blenderCurves2MHData():
     global hairsClass
+    #Note the coords are saved in global coords.
 
     hairsClass.resetHairs()
     hairCounter = 0
@@ -464,14 +465,18 @@ def saveHairsFile(path):
     hairsClass.saveHairs(path)
 
 def loadHairsFile(path):
+    global tipMagnet,hairDiameterClump,hairDiameterMultiStrand
+    global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
+    global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
+    global blendDistance,sizeMultiStrand
+    
     hairsClass.loadHairs(path)
-
     scn = Scene.GetCurrent()
     for group in hairsClass.guideGroups:
         grp= Group.New(group.name)
         for guide in group.guides:
             startP = guide.controlPoints[0]
-            cu = Curve.New()
+            cu = Curve.New(guide.name)
             #Note: hairs are stored using renderman coords system, so
             #z is multiplied for -1 to conver renderman coords to Blender coord
             cu.appendNurb([startP[0],startP[1],-startP[2],1])
@@ -480,6 +485,19 @@ def loadHairsFile(path):
                 cu_nurb.append([cP[0],cP[1],-cP[2],1])
             ob = scn.objects.new(cu)
             grp.objects.link(ob)
+
+    tipMagnet.val = hairsClass.tipMagnet
+    hairDiameterClump.val = hairsClass.hairDiameterClump
+    hairDiameterMultiStrand.val = hairsClass.hairDiameterMultiStrand
+    numberOfHairsClump.val= hairsClass.numberOfHairsClump
+    numberOfHairsMultiStrand.val= hairsClass.numberOfHairsMultiStrand
+    randomFactClump.val= hairsClass.randomFactClump
+    randomFactMultiStrand.val= hairsClass.randomFactMultiStrand
+    randomPercentage.val= hairsClass.randomPercentage
+    sizeClump.val= hairsClass.sizeClump
+    sizeMultiStrand.val= hairsClass.sizeMultiStrand
+    blendDistance.val= hairsClass.blendDistance
+    
     Window.RedrawAll()
 
 
@@ -534,8 +552,10 @@ def event(evt, val):
         Window.FileSelector (adjustGuides, "Load curve file")
 
 def bevent(evt):
-    global tuftSize,blendDistance
-    global nHairs,tipMagnet,randomFact
+    global tipMagnet,hairDiameterClump,hairDiameterMultiStrand
+    global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
+    global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
+    global blendDistance,sizeMultiStrand
 
     if   (evt== 1): Exit()
 
