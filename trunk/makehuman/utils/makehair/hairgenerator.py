@@ -87,6 +87,7 @@ class Hairgenerator:
         self.version = "1.0 alpha 2"
         self.tags = []
         self.humanVerts = []
+        self.path = None
         #self.octree = simpleoctree.SimpleOctree(humanMesh.verts)# not used yet
         
     def resetHairs(self):
@@ -99,14 +100,14 @@ class Hairgenerator:
         self.guideGroups.append(g)
         return g
         
-    def adjustGuides(self,path):
+    def adjustGuides(self):
         """
 
         """ 
         try:
-            fileDescriptor = open(path)
+            fileDescriptor = open(self.path)
         except:
-            print "Impossible to load %s"%(path)
+            print "Impossible to load %s"%(self.path)
             return
 
         #Guides and Deltas have the same name, so it's
@@ -355,6 +356,7 @@ class Hairgenerator:
             return
 
         self.resetHairs()
+        self.path = path
         for data in fileDescriptor:
             datalist = data.split()
             if datalist[0] == "written":

@@ -364,13 +364,13 @@ def blenderCurves2MHData():
                     hairCounter += 1
 
 
-def adjustGuides(path):
+def adjustGuides():
     """
 
     """
     global hairsClass
     updateHumanVerts()
-    hairsClass.adjustGuides(path)
+    hairsClass.adjustGuides()
     MHData2BlenderCurves()
     Window.RedrawAll()
 
@@ -509,7 +509,8 @@ def event(evt, val):
         blenderCurves2MHData()
         #MHData2BlenderCurves()
 
-        Window.FileSelector (adjustGuides, "Load curve file")
+        adjustGuides()
+    Window.RedrawAll()
 
 def bevent(evt):
     global tipMagnet,hairDiameterClump,hairDiameterMultiStrand
