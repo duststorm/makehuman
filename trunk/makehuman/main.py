@@ -90,11 +90,13 @@ class MHApplication(gui3d.Application):
     subprocess.Popen(aqsisPath + "aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
     subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
     subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.slx", shell=True)
+    subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.slx", shell=True)
 
     # Create pixie shaders
     subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
     subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
     subprocess.Popen(pixiePath + "sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr", shell=True)
+    subprocess.Popen(pixiePath + "sdrc data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdr", shell=True)
     
     self.progressBar.setProgress(0.2)
     

@@ -1,6 +1,6 @@
 surface hair(
 
-    float Ka = 1;
+    float Ka = .01;
     float Kd = .6;
     float Ks = .9;
     float roughness = .15;

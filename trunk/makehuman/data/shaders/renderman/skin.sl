@@ -60,44 +60,38 @@ surface skin (
     V = -normalize(I);
 	float angle_ramp = (max(0,(1-( V.Nf))))/5;
 	float  noise3D = float noise(P*100);
-	float skin_matte = comp(diffuse(Nf), 0)*20;
+	float skin_matte = comp(diffuse(Nf), 0);
 	float dark_area = 0.5*pow((1-skin_matte),3);
+    //printf("dark area: %f\n",dark_area);
 
     color glancing_highlight = max(0,((1-(( V.Nf)/0.6))*pow(skin_matte,3)))*0.6;
     
     
     
 	Ci = (Cs * Ct) - angle_ramp*noise3D;	
-	//Ci = mix(Ci,Cd,0.5);
-    Ci = screen(Ci,Cd);
-    //Ci = (Ci*Ci)*(2/dark);
-    Ci = powC(Ci,dark)*(2/dark);
-    
 
+    Ci = screen(Ci,Cd);
+
+    Ci = powC(Ci,dark)*(2/dark);
+  
+    
+    
 	//DESATURATE THE HIGHTLIGHTS
-	
-	float CiR2 = comp(Ci, 0);
-	float CiG2 = comp(Ci, 1);
-	float CiB2 = comp(Ci, 2);
-	
-	float maxVal = max(CiR2,CiG2,CiB2);
-    float desaturate_factor = desaturation*pow(skin_matte, 3)*noise3D;
-	
-	CiR2 = (desaturate_factor*(maxVal - CiR2)) + CiR2;
-	CiG2 = (desaturate_factor*(maxVal - CiG2)) + CiG2;
-	CiB2 = (desaturate_factor*(maxVal - CiB2)) + CiB2;	
-	
-	setcomp (Ci, 0, CiR2);
-	setcomp (Ci, 1, CiG2);
-	setcomp (Ci, 2, CiB2);
-	
-	
-	Ci = Ci - (color(dark_area*.1,dark_area*.2,dark_area*.15));
-    Ci = (Ci * ambient())+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;
-       
+	float desaturate_factor = 0.25*desaturation*pow(skin_matte, 3)*noise3D;
+    float desaturate_tone = comp(Ci, 0);
+    Ci = mix(Ci,desaturate_tone,desaturate_factor); 	
+	//Ci = Ci - (color(dark_area*.1,dark_area*.2,dark_area*.15));
+    Ci = Ci - dark_area;
+    Ci = mix(desaturate_tone,Ci,0.7);   
+    Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;
+    
+    
+    
 	Ci = Ci*Oi;
     
-	
+    
+    
+
     
 	
 	
