@@ -244,6 +244,10 @@ def writeHairs(ribRepository):
     global rootColor,tipColor,hairDiameter,preview,hairsClass
     totalNumberOfHairs = 0
 
+    blenderCurves2MHData()
+    hairsClass.generateHairStyle1()
+    hairsClass.generateHairStyle2()
+
     for hSet in hairsClass.hairStyle:
 
         if "clump" in hSet.name:
@@ -308,8 +312,7 @@ def writeBody(ribfile, ribRepository):
     print "Calling create objects"
 
     for hSet in hairsClass.hairStyle:
-        ribObj = "%s/%s.rib"%(ribRepository,hSet.name)
-        print "RIBOBJ",ribObj
+        ribObj = "%s/%s.rib"%(ribRepository,hSet.name)       
         ribfile.write('\tAttributeBegin\n')
         ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
         ribfile.write('\tAttributeEnd\n')
@@ -327,11 +330,19 @@ def updateHumanVerts():
         v1 = [v.co[0],v.co[1],-v.co[2]] #-1 +z to convert in renderman coord
         hairsClass.humanVerts.append(v1)
 
+def MHData2BlenderCurves():
+    for group in hairsClass.guideGroups:
+        for mhGuide in group.guides:
+            blenderGuide = Blender.Object.Get(mhGuide.name).getData()
+            for i in range(len(mhGuide.controlPoints)):
+                mhCp = mhGuide.controlPoints[i]
+                cPoint = [mhCp[0],mhCp[1],-mhCp[2],1]# mul -1 to convert from renderman to Blender
+                blenderGuide.setControlPoint(0, i, cPoint)#we assume each curve has only one nurbs
+                blenderGuide.update()
 
 def blenderCurves2MHData():
     global hairsClass
-    #Note the coords are saved in global coords.
-
+    #Note the coords are saved in global (absolute) coords.
     hairsClass.resetHairs()
     hairCounter = 0
     groups = Group.Get()
@@ -352,74 +363,22 @@ def blenderCurves2MHData():
                     hairsClass.addHairGuide(controlPoints, name, g)
                     hairCounter += 1
 
-def MHData2BlenderCurves():
-    global hairsClass
-    for group in hairsClass.guideGroups:
-        for guide in group.guides:
-            guide = Blender.Object.Get(guide.name)
-            data = guide.getData()
-            curnurb = data[0] #we assume each curve has only one nurbs
-            for p in curnurb:
-                print p
-
-
-
-
 
 def adjustGuides(path):
     """
 
     """
     global hairsClass
-    humanMeshVerts = Blender.Object.Get("Base").getData().verts
-    try:
-        fileDescriptor = open(path)
-    except:
-        print "Impossible to load %s"%(path)
-        return
-
-    #Guides and Deltas have the same name, so it's
-    #easy to associate them. Anyway we must a dd a check to
-    #be sure the hairs to adjust are the same as saved in
-    #the file. 
-    deltaGuides = {}
-    for data in fileDescriptor:
-        datalist = data.split()
-        if datalist[0] == "delta":
-            name = datalist[1]
-            guidesDelta = datalist[2:]
-            deltaGuides[name] = hairsClass.extractSubList(guidesDelta,4)
-
-    for group in hairsClass.guideGroups:
-        for g in group.guides:
-            guide = Blender.Object.Get(g.name)
-            curvsDelta = deltaGuides[g.name]
-            data = guide.getData()
-            curnurb = data[0] #we assume each curve has only one nurbs
-            for i in range(len(curvsDelta)):
-                cpDelta = curvsDelta[i]
-                parentVertIndex = int(cpDelta[0])
-                v = humanMeshVerts[parentVertIndex]
-                cPoint = [0,0,0,1]
-                cPoint[0] = v.co[0] + float(cpDelta[1])
-                cPoint[1] = v.co[1] + float(cpDelta[2])
-                cPoint[2] = v.co[2] - float(cpDelta[3]) # mul -1 to convert from renderman to Blender
-                data.setControlPoint(0, i, cPoint)
-                data.update()
-
-
-def generateHairs():
-    global hairsClass
-    blenderCurves2MHData()
-    hairsClass.generateHairStyle1()
-    hairsClass.generateHairStyle2()
-
-
+    updateHumanVerts()
+    hairsClass.adjustGuides(path)
+    MHData2BlenderCurves()
+    Window.RedrawAll()
 
 
 
 def saveRib(fName):
     global hairsClass
+
     engine = "aqsis"
 
     #d0 is [path,filename]
@@ -434,16 +393,17 @@ def saveRib(fName):
     print "Saved rib in ",  fName
     print "Saved image in ", imageName
     objectsDirectory = 'ribObjs'
-    generateHairs()
+    #generateHairs()
     if not os.path.isdir(objectsDirectory):
         os.mkdir(objectsDirectory)
     theFile = open(fName,'w')
     writeHuman(objectsDirectory)
+    writeHairs(objectsDirectory)
     writeHeader(theFile,imageName)
     writeLamps(theFile)
     writeBody(theFile,objectsDirectory)
     writeFooter(theFile)
-    writeHairs(objectsDirectory)
+
     theFile.close()
 
     hairsClass.resetHairs()
@@ -469,7 +429,7 @@ def loadHairsFile(path):
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
     global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
     global blendDistance,sizeMultiStrand
-    
+
     hairsClass.loadHairs(path)
     scn = Scene.GetCurrent()
     for group in hairsClass.guideGroups:
@@ -497,8 +457,8 @@ def loadHairsFile(path):
     sizeClump.val= hairsClass.sizeClump
     sizeMultiStrand.val= hairsClass.sizeMultiStrand
     blendDistance.val= hairsClass.blendDistance
-    
-    Window.RedrawAll()
+
+
 
 
 

@@ -94,13 +94,43 @@ class Hairgenerator:
         self.guideGroups = []
 
         
-    def addGuideGroup(self,name):
-        
+    def addGuideGroup(self,name):        
         g = GuideGroup(name)
         self.guideGroups.append(g)
         return g
         
-        
+    def adjustGuides(self,path):
+        """
+
+        """ 
+        try:
+            fileDescriptor = open(path)
+        except:
+            print "Impossible to load %s"%(path)
+            return
+
+        #Guides and Deltas have the same name, so it's
+        #easy to associate them. Anyway we must a dd a check to
+        #be sure the hairs to adjust are the same as saved in
+        #the file. 
+        deltaGuides = {}
+        for data in fileDescriptor:
+            datalist = data.split()
+            if datalist[0] == "delta":
+                name = datalist[1]
+                guidesDelta = datalist[2:]
+                deltaGuides[name] = self.extractSubList(guidesDelta,4)
+
+        for group in self.guideGroups:
+            for guide in group.guides:                
+                deltaVector = deltaGuides[guide.name]                
+                for i in range(len(deltaVector)):
+                    cpDelta = deltaVector[i]
+                    cpGuide = guide.controlPoints[i]                   
+                    v = self.humanVerts[int(cpDelta[0])]                    
+                    cpGuide[0] = v[0] + float(cpDelta[1])
+                    cpGuide[1] = v[1] + float(cpDelta[2])
+                    cpGuide[2] = v[2] + float(cpDelta[3])                      
 
     def addHairGuide(self,guidePoints, guideName, guideGroup):
  
