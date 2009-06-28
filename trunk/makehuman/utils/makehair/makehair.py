@@ -53,7 +53,7 @@ tipColor= Create(hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipCol
 
 randomPercentage = Create(hairsClass.randomPercentage)
 blendDistance = Create(hairsClass.blendDistance)
-
+isPreview = Create(1)
 tipMagnet = Create(hairsClass.tipMagnet)
 
 def convertCoords(obj):
@@ -247,35 +247,50 @@ def writeHairs(ribRepository):
     blenderCurves2MHData()
     hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
-
-    for hSet in hairsClass.hairStyle:
-
-        if "clump" in hSet.name:
-            hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
-        else:
-            hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)
-
-        hairName = "%s/%s.rib"%(ribRepository,hSet.name)
+    
+    if isPreview == 1:
+        hDiameter = hairsClass.sizeClump
+        hairName = "%s/hairpreview.rib"%(ribRepository)
         hairFile = open(hairName,'w')
-        hairFile.write('\t\tDeclare "rootcolor" "color"\n')
-        hairFile.write('\t\tDeclare "tipcolor" "color"\n')
-        hairFile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]'%(rootColor.val[0],\
-                    rootColor.val[1],rootColor.val[2],\
-                    tipColor.val[0],tipColor.val[1],tipColor.val[2]))
-        #hairFile.write('\t\tSurface "matte" ')
-        hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
-        hairFile.write('Curves "cubic" [')
-        for hair in hSet.hairs:
-            totalNumberOfHairs += 1
-            hairFile.write('%i ' % len(hair.controlPoints))
-        hairFile.write('] "nonperiodic" "P" [')
-        for hair in hSet.hairs:
-            for cP in hair.controlPoints:
-                hairFile.write("%s %s %s " % (cP[0],cP[1],cP[2]))
-        hairFile.write(']  "constantwidth" [%s]' % (hDiameter))
+        for group in hairsClass.guideGroups:            
+            for guide in group.guides:                
+                hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
+                hairFile.write('Curves "cubic" [')
+                hairFile.write('%i ' % len(guide.controlPoints))
+                hairFile.write('] "nonperiodic" "P" [')
+                for cP in guide.controlPoints:
+                    hairFile.write("%s %s %s " % (cP[0],cP[1],cP[2]))
+                hairFile.write(']  "constantwidth" [%s]\n' % (hDiameter))
         hairFile.close()
-    print "TOTAL HAIRS WRITTEN: ",totalNumberOfHairs
-    print "NUMBER OF TUFTS",len(hairsClass.hairStyle)
+                
+    else:
+                
+        hairName = "%s/hairs.rib"%(ribRepository)
+        hairFile = open(hairName,'w')
+        for hSet in hairsClass.hairStyle:
+
+            if "clump" in hSet.name:
+                hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
+            else:
+                hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)  
+            
+
+
+
+            #hairFile.write('\t\tSurface "matte" ')
+            hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
+            hairFile.write('Curves "cubic" [')
+            for hair in hSet.hairs:
+                totalNumberOfHairs += 1
+                hairFile.write('%i ' % len(hair.controlPoints))
+            hairFile.write('] "nonperiodic" "P" [')
+            for hair in hSet.hairs:
+                for cP in hair.controlPoints:
+                    hairFile.write("%s %s %s " % (cP[0],cP[1],cP[2]))
+            hairFile.write(']  "constantwidth" [%s]\n' % (hDiameter))
+        hairFile.close()
+        print "TOTAL HAIRS WRITTEN: ",totalNumberOfHairs
+        print "NUMBER OF TUFTS",len(hairsClass.hairStyle)
 
 
 
@@ -310,12 +325,18 @@ def writeFooter(ribfile):
 def writeBody(ribfile, ribRepository):
     global nHairs,alpha
     print "Calling create objects"
-
-    for hSet in hairsClass.hairStyle:
-        ribObj = "%s/%s.rib"%(ribRepository,hSet.name)       
-        ribfile.write('\tAttributeBegin\n')
-        ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
-        ribfile.write('\tAttributeEnd\n')
+    ribfile.write('\t\tDeclare "rootcolor" "color"\n')
+    ribfile.write('\t\tDeclare "tipcolor" "color"\n')
+    ribfile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]'%(rootColor.val[0],\
+                    rootColor.val[1],rootColor.val[2],\
+                    tipColor.val[0],tipColor.val[1],tipColor.val[2]))
+    if isPreview == 1:        
+        ribObj = "%s/hairpreview.rib"%(ribRepository)
+    else:
+        ribObj = "%s/hairs.rib"%(ribRepository)       
+    ribfile.write('\tAttributeBegin\n')
+    ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
+    ribfile.write('\tAttributeEnd\n')
 
 
 def applyTransform(vec, matrix):
@@ -457,6 +478,7 @@ def loadHairsFile(path):
     sizeClump.val= hairsClass.sizeClump
     sizeMultiStrand.val= hairsClass.sizeMultiStrand
     blendDistance.val= hairsClass.blendDistance
+    Window.RedrawAll()
 
 
 
@@ -470,7 +492,7 @@ def draw():
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump,randomFactMultiStrand
     global tipMagnet,sizeMultiStrand,sizeClump,blendDistance
     global samples,preview,randomPercentage
-    global rootColor,tipColor
+    global rootColor,tipColor,isPreview
 
     glClearColor(0.5, 0.5, 0.5, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
@@ -478,29 +500,31 @@ def draw():
 
     Button("Exit", 1, 210, buttonY, 100, 20)
     Button("Rendering", 2, 10, buttonY, 200, 20)
+    Button("Save", 4, 10, buttonY+20, 150, 20)
+    Button("Load", 5, 160, buttonY+20, 150, 20)
+    isPreview = Toggle("preview", 6, 10, buttonY+40, 150, 20, isPreview.val, "Rendering in preview mode")
 
-    tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+40, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
-    randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+60, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
-    numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+80, 300, 18, numberOfHairsClump.val, 1, 100, 0, "Number of generated hair for each guide. Note that value of x mean x*x hairs")
-    sizeClump= Slider("Clump size: ", 3, 10, buttonY+100, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
-    hairDiameterMultiStrand = Slider("Clump hair diam.: ", 0, 10, buttonY+120, 300, 20, hairDiameterMultiStrand.val, 0, 0.05, 0,"Diameter of hairs used in strand interpolation")
+    tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+80, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
+    randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+100, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
+    numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+120, 300, 18, numberOfHairsClump.val, 1, 100, 0, "Number of generated hair for each guide. Note that value of x mean x*x hairs")
+    sizeClump= Slider("Clump size: ", 3, 10, buttonY+140, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
+    hairDiameterMultiStrand = Slider("Clump hair diam.: ", 0, 10, buttonY+160, 300, 20, hairDiameterMultiStrand.val, 0, 0.05, 0,"Diameter of hairs used in strand interpolation")
 
 
-    blendDistance= Slider("Strand blending dist.: ", 3, 10, buttonY+160, 300, 18, blendDistance.val, 0, 2, 0)
-    randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+180, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
-    numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+200, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
-    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+220, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)
-    hairDiameterClump = Slider("Strand hair diam.: ", 0, 10, buttonY+240, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
+    blendDistance= Slider("Strand blending dist.: ", 3, 10, buttonY+200, 300, 18, blendDistance.val, 0, 2, 0)
+    randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+220, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
+    numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+240, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
+    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+260, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)
+    hairDiameterClump = Slider("Strand hair diam.: ", 0, 10, buttonY+280, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
 
-    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+280, 300, 18, randomPercentage.val, 0.0, 1.0, 0)
-    rootColor = ColorPicker(3, 10, buttonY+300, 150, 20, rootColor.val,"Color of root")
-    tipColor = ColorPicker(3, 160, buttonY+300, 150, 20, tipColor.val,"Color of tip")
-    Button("Save", 4, 10, buttonY+320, 150, 20)
-    Button("Load", 5, 160, buttonY+320, 150, 20)
+    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+320, 300, 18, randomPercentage.val, 0.0, 1.0, 0)
+    rootColor = ColorPicker(3, 10, buttonY+340, 150, 20, rootColor.val,"Color of root")
+    tipColor = ColorPicker(3, 160, buttonY+340, 150, 20, tipColor.val,"Color of tip")
+    
 
     glColor3f(1, 1, 1)
-    glRasterPos2i(10, buttonY+360)
-    Text("makeHair 1.0 beta2" )
+    glRasterPos2i(10, buttonY+380)
+    Text("makeHair 1.0" )
 
 def event(evt, val):
     if (evt== QKEY and not val): Exit()
@@ -510,7 +534,7 @@ def event(evt, val):
         #MHData2BlenderCurves()
 
         adjustGuides()
-    Window.RedrawAll()
+    #Window.RedrawAll()
 
 def bevent(evt):
     global tipMagnet,hairDiameterClump,hairDiameterMultiStrand
@@ -542,6 +566,6 @@ def bevent(evt):
     elif (evt== 5):
         Window.FileSelector (loadHairsFile, "Load hair data")
 
-    Window.RedrawAll()
+    #Window.RedrawAll()
 
 Register(draw, event, bevent)
