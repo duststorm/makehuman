@@ -368,9 +368,9 @@ class Hairgenerator:
             elif datalist[0] == "tipMagnet":
                 self.tipMagnet = float(datalist[1])
             elif datalist[0] == "numberOfHairsClump":
-                self.numberOfHairsClump = float(datalist[1])
+                self.numberOfHairsClump = int(datalist[1])
             elif datalist[0] == "numberOfHairsMultiStrand":
-                self.numberOfHairsMultiStrand = float(datalist[1])
+                self.numberOfHairsMultiStrand = int(datalist[1])
             elif datalist[0] == "randomFactClump":
                 self.randomFactClump = float(datalist[1])
             elif datalist[0] == "randomFactMultiStrand":

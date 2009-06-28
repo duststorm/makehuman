@@ -53,17 +53,13 @@ def writeHairs(ribRepository, mesh):
     hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
     print "Writing hairs"
+    hairName = "%s/hairs.rib"%(ribRepository)
+    hairFile = open(hairName,'w')
     for hSet in hairsClass.hairStyle:
-
         if "clump" in hSet.name:
             hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
         else:
-            hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)
-
-        hairName = "%s/%s.rib"%(ribRepository,hSet.name)
-        hairFile = open(hairName,'w')
-
-        #hairFile.write('\t\tSurface "matte" ')
+            hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)        
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
         hairFile.write('Curves "cubic" [')
         for hair in hSet.hairs:
@@ -73,10 +69,10 @@ def writeHairs(ribRepository, mesh):
         for hair in hSet.hairs:
             for cP in hair.controlPoints:
                 hairFile.write("%s %s %s " % (cP[0],cP[1],-cP[2]))
-        hairFile.write(']  "constantwidth" [%s]' % (hDiameter))
-        hairFile.close()
-    print "TOTAL HAIRS WRITTEN: ",totalNumberOfHairs
-    print "NUMBER OF TUFTS",len(hairsClass.hairStyle)
+        hairFile.write(']  "constantwidth" [%s]\n' % (hDiameter))
+    hairFile.close()
+    print "Totals hairs written: ",totalNumberOfHairs
+    print "Number of tufts",len(hairsClass.hairStyle)
 
 
 
