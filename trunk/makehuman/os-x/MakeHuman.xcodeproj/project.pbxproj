@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		6806287A0FC136C9006C372E /* data in Resources */ = {isa = PBXBuildFile; fileRef = 68061C9B0FC136AB006C372E /* data */; };
+		684E6D680FEE34E600941536 /* docs in Resources */ = {isa = PBXBuildFile; fileRef = 684E6D340FEE34E600941536 /* docs */; };
 		686E5B9E0FA19EA3005B137C /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
 		686E5D820FA1AC91005B137C /* SDL_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
 		686FD6FD0FC06DA4006C12DA /* main.py in Resources */ = {isa = PBXBuildFile; fileRef = 686FD6FC0FC06DA4006C12DA /* main.py */; };
+		687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */; };
 		6894C4E20FA188D000A52097 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL.framework */; };
 		6894C50E0FA1893900A52097 /* SDL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL.framework */; };
 		689F331E0E6192CB00E37E9F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 689F33190E6192CB00E37E9F /* InfoPlist.strings */; };
@@ -18,10 +20,10 @@
 		689F332E0E6193B000E37E9F /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
 		689F332F0E6193B100E37E9F /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
 		689F33310E6193B100E37E9F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
-		689F33330E6193B600E37E9F /* MouseEventTrap.m in Sources */ = {isa = PBXBuildFile; fileRef = 689F33320E6193B600E37E9F /* MouseEventTrap.m */; };
 		689F33E60E61999C00E37E9F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
 		689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
 		689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
+		68C80B0B0FE3E41E0090D1E5 /* utils in Resources */ = {isa = PBXBuildFile; fileRef = 68C80AE10FE3E41D0090D1E5 /* utils */; };
 		68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.m */; };
 		68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
 		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
@@ -48,12 +50,15 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		68061C9B0FC136AB006C372E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
+		684E6D340FEE34E600941536 /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = docs; path = ../docs; sourceTree = SOURCE_ROOT; };
 		685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MakeHuman_Prefix.pch; path = include/MakeHuman_Prefix.pch; sourceTree = "<group>"; };
 		686944D10FCB25F1005B01DC /* mh_core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_core; path = ../mh_core; sourceTree = SOURCE_ROOT; };
 		686E5B9D0FA19EA3005B137C /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = frameworks/SDL_image.framework; sourceTree = "<group>"; };
 		686E5D340FA1AB4B005B137C /* pythonwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pythonwrapper; path = include/pythonwrapper; sourceTree = "<group>"; };
 		686E5D380FA1AB5F005B137C /* sdlwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sdlwrapper; path = include/sdlwrapper; sourceTree = "<group>"; };
 		686FD6FC0FC06DA4006C12DA /* main.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = main.py; path = ../main.py; sourceTree = SOURCE_ROOT; };
+		687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OSXTools.cpp; path = src/OSXTools.cpp; sourceTree = "<group>"; };
+		687236BC0FF7F8D30048ED40 /* OSXTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXTools.h; path = include/OSXTools.h; sourceTree = "<group>"; };
 		6894C4E10FA188D000A52097 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = frameworks/SDL.framework; sourceTree = "<group>"; };
 		689F331A0E6192CB00E37E9F /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
 		689F331C0E6192CB00E37E9F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = MainMenu.nib; sourceTree = "<group>"; };
@@ -61,17 +66,16 @@
 		689F332A0E6193B000E37E9F /* core.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = core.c; path = ../src/core.c; sourceTree = "<group>"; };
 		689F332B0E6193B000E37E9F /* glmodule.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = glmodule.c; path = ../src/glmodule.c; sourceTree = "<group>"; };
 		689F332D0E6193B000E37E9F /* main.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../src/main.c; sourceTree = "<group>"; };
-		689F33320E6193B600E37E9F /* MouseEventTrap.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MouseEventTrap.m; path = src/MouseEventTrap.m; sourceTree = "<group>"; };
 		689F33E50E61999C00E37E9F /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		689F33E70E6199B000E37E9F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		689F33E90E6199BD00E37E9F /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		68C80AE10FE3E41D0090D1E5 /* utils */ = {isa = PBXFileReference; lastKnownFileType = folder; name = utils; path = ../utils; sourceTree = SOURCE_ROOT; };
 		68D8631C0FA5D1810097F73F /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDLMain.m; path = src/SDLMain.m; sourceTree = "<group>"; };
 		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
 		68DFFDA40FC1F059009CA434 /* data */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
 		68EA2B640FC8348A0052A87E /* mh_plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_plugins; path = ../mh_plugins; sourceTree = "<group>"; };
 		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
 		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
-		68F6D3CA0E63F88200D27961 /* MouseEventTrap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MouseEventTrap.h; path = include/MouseEventTrap.h; sourceTree = "<group>"; };
 		68F6D3F50E640E6A00D27961 /* AppIcon.psd */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppIcon.psd; path = resources/AppIcon.psd; sourceTree = "<group>"; };
 		68F6D3F60E640E6A00D27961 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = resources/AppIcon.icns; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MakeHuman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeHuman.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,16 +98,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		080E96DDFE201D6D7F000001 /* Classes */ = {
+		080E96DDFE201D6D7F000001 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				68D8631E0FA5D1880097F73F /* SDLMain.h */,
-				68D8631C0FA5D1810097F73F /* SDLMain.m */,
+				689F332D0E6193B000E37E9F /* main.c */,
 				689F332A0E6193B000E37E9F /* core.c */,
 				689F332B0E6193B000E37E9F /* glmodule.c */,
-				689F332D0E6193B000E37E9F /* main.c */,
 			);
-			name = Classes;
+			name = Main;
 			sourceTree = "<group>";
 		};
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
@@ -140,10 +142,11 @@
 		29B97314FDCFA39411CA2CEA /* MHPhoenix */ = {
 			isa = PBXGroup;
 			children = (
-				68DFFDA40FC1F059009CA434 /* data */,
+				29B97315FDCFA39411CA2CEA /* C-Sources */,
 				686FD6FB0FC06D98006C12DA /* Python */,
-				080E96DDFE201D6D7F000001 /* Classes */,
-				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				68DFFDA40FC1F059009CA434 /* data */,
+				68C80AE10FE3E41D0090D1E5 /* utils */,
+				684E6D340FEE34E600941536 /* docs */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -151,18 +154,15 @@
 			name = MHPhoenix;
 			sourceTree = "<group>";
 		};
-		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+		29B97315FDCFA39411CA2CEA /* C-Sources */ = {
 			isa = PBXGroup;
 			children = (
-				685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */,
+				684E6D210FEE32BD00941536 /* OS-X */,
+				080E96DDFE201D6D7F000001 /* Main */,
 				686E5D380FA1AB5F005B137C /* sdlwrapper */,
 				686E5D340FA1AB4B005B137C /* pythonwrapper */,
-				689F33320E6193B600E37E9F /* MouseEventTrap.m */,
-				68F6D3CA0E63F88200D27961 /* MouseEventTrap.h */,
-				68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */,
-				68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */,
 			);
-			name = "Other Sources";
+			name = "C-Sources";
 			sourceTree = "<group>";
 		};
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
@@ -184,6 +184,20 @@
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		684E6D210FEE32BD00941536 /* OS-X */ = {
+			isa = PBXGroup;
+			children = (
+				685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */,
+				687236BC0FF7F8D30048ED40 /* OSXTools.h */,
+				687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */,
+				68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */,
+				68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */,
+				68D8631E0FA5D1880097F73F /* SDLMain.h */,
+				68D8631C0FA5D1810097F73F /* SDLMain.m */,
+			);
+			name = "OS-X";
 			sourceTree = "<group>";
 		};
 		686FD6FB0FC06D98006C12DA /* Python */ = {
@@ -256,6 +270,8 @@
 				68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */,
 				686FD6FD0FC06DA4006C12DA /* main.py in Resources */,
 				6806287A0FC136C9006C372E /* data in Resources */,
+				68C80B0B0FE3E41E0090D1E5 /* utils in Resources */,
+				684E6D680FEE34E600941536 /* docs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,9 +301,9 @@
 				689F332E0E6193B000E37E9F /* core.c in Sources */,
 				689F332F0E6193B100E37E9F /* glmodule.c in Sources */,
 				689F33310E6193B100E37E9F /* main.c in Sources */,
-				689F33330E6193B600E37E9F /* MouseEventTrap.m in Sources */,
 				68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */,
 				68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */,
+				687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
