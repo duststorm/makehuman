@@ -440,9 +440,10 @@ def writeLightMapFrameAqsis(scene, ribfile, ribRepository):
     ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
-    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.5] "color lightcolor" [%s %s %s]\n\n'%(1, 1, 1))
-    ribfile.write('\tLightSource "pointlight" 2 "from" [8 5 -15] "intensity" 350  "lightcolor" [1 1 1] \n')
-    ribfile.write('\tLightSource "pointlight" 3 "from" [-8 5 15] "intensity" 350  "lightcolor" [1 1 1] \n')
+    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
+    ribfile.write('\tLightSource "pointlight" 2 "from" [2.39623403549 10.6440887451 -5.00257110596] "intensity" 28.963727951  "lightcolor" [1.0 1.0 1.0]\n')
+    ribfile.write('\tLightSource "pointlight" 3 "from" [-4.14454030991 4.84535360336 -7.45121669769] "intensity" 36.8524575233  "lightcolor" [1.0 1.0 1.0]\n')
+    
 
     for obj in scene.objects:
         name = obj.name
@@ -537,9 +538,10 @@ def writeLightMapFramePixie(scene, ribfile, ribRepository):
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('DisplayChannel "varying color BakeCol" \n')
     ribfile.write('WorldBegin\n')
-    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.5] "color lightcolor" [%s %s %s]\n\n'%(1, 1, 1))
-    ribfile.write('\tLightSource "pointlight" 2 "from" [8 5 -15] "intensity" 350  "lightcolor" [1 1 1] \n')
-    ribfile.write('\tLightSource "pointlight" 3 "from" [-8 5 15] "intensity" 350  "lightcolor" [1 1 1] \n')
+    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
+    ribfile.write('\tLightSource "pointlight" 2 "from" [2.39623403549 10.6440887451 -5.00257110596] "intensity" 28.963727951  "lightcolor" [1.0 1.0 1.0]\n')
+    ribfile.write('\tLightSource "pointlight" 3 "from" [-4.14454030991 4.84535360336 -7.45121669769] "intensity" 36.8524575233  "lightcolor" [1.0 1.0 1.0]\n')
+    
 
     for obj in scene.objects:
         name = obj.name
@@ -641,9 +643,9 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
     ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
-    ribfile.write('\tLightSource "ambientlight" 998 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "pointlight" 1 "from" [2.39623403549 10.6440887451 -5.00257110596] "intensity" 28.963727951  "lightcolor" [1.0 1.0 1.0]\n')
-    ribfile.write('\tLightSource "pointlight" 2 "from" [-4.14454030991 4.84535360336 -7.45121669769] "intensity" 36.8524575233  "lightcolor" [1.0 1.0 1.0]\n')
+    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
+    ribfile.write('\tLightSource "pointlight" 2 "from" [2.39623403549 10.6440887451 -5.00257110596] "intensity" 28.963727951  "lightcolor" [1.0 1.0 1.0]\n')
+    ribfile.write('\tLightSource "pointlight" 3 "from" [-4.14454030991 4.84535360336 -7.45121669769] "intensity" 36.8524575233  "lightcolor" [1.0 1.0 1.0]\n')
     
    
      
@@ -668,6 +670,7 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
             ribfile.write('\t\tSurface "skin" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [0.2] "float dark" [2]\n'%("texture_opacity.tif","texture.tif","texture_ref.tif",lightMap))
+            #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
             writeHairs(ribRepository, obj)
@@ -680,9 +683,9 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
     ribfile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]\n'%(hairsClass.rootColor[0],\
                     hairsClass.rootColor[1],hairsClass.rootColor[2],\
                     hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
-    for hSet in hairsClass.hairStyle:
-        ribObj = "%s/%s.rib"%(ribRepository,hSet.name)
-        ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
+    
+
+    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
     ribfile.write('\tAttributeEnd\n')
 
     ribfile.write("WorldEnd\n")

@@ -254,7 +254,7 @@ def writeHairs(ribRepository):
         hairFile = open(hairName,'w')
         for group in hairsClass.guideGroups:            
             for guide in group.guides:                
-                hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
+                hairFile.write('\t\tBasis "hermite" 2 "hermite" 2  ')
                 hairFile.write('Curves "cubic" [')
                 hairFile.write('%i ' % len(guide.controlPoints))
                 hairFile.write('] "nonperiodic" "P" [')

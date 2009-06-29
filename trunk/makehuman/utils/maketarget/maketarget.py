@@ -26,7 +26,7 @@ development cycle to create these extreme morph target files from
 hand-crafted models.
 
 """
-import os.path
+
 
 __docformat__ = 'restructuredtext'
 
@@ -36,6 +36,7 @@ import math
 import time
 try:
     import os
+    from os import path
 except:
     print "os module not found: some advanced functions are not available"
 from Blender.BGL import *
