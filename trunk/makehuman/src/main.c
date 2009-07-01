@@ -200,6 +200,14 @@ static PyObject* mh_getCameraSettings(PyObject *self, PyObject *args)
                          G.windowHeight, G.windowWidth);
 }
 
+static PyObject* mh_setCameraSettings(PyObject *self, PyObject *args)
+{
+    if (!PyArg_ParseTuple(args, "f,f,f,f,f,f,i,i", &G.translX, &G.translY, &G.zoom,
+        &G.rotX, &G.rotY, &G.fovAngle, &G.windowHeight, &G.windowWidth))
+        return NULL;
+    return Py_BuildValue("");
+}
+
 /** \brief Get the current mouse x, y cursor position on the screen, in pixels.
  *  This function retrieves the x and y mouse position in screen
  *  coordinates returning two integer values to the Python code.
@@ -788,6 +796,7 @@ static PyMethodDef EmbMethods[] =
     {"getCameraZoom", mh_getCameraZoom, METH_VARARGS, ""},
     {"setCameraZoom", mh_setCameraZoom, METH_VARARGS, ""},
     {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
+    {"getCameraSettings", mh_setCameraSettings, METH_VARARGS, ""},
     {"setText", mh_setText, METH_VARARGS, ""},
     {"setVisibility", mh_setVisibility, METH_VARARGS, ""},
     {"setPickable", mh_setPickable, METH_VARARGS, ""},

@@ -449,3 +449,13 @@ def planeNorm(vect1,vect2,vect3):
     # Normalize
     length = math.sqrt(normal[0] * normal[0] + normal[1] * normal[1] +normal[2] * normal[2])
     return[normal[0] / length, normal[1] / length, normal[2] / length]
+
+def focalToFov(dimension, focal):
+  if focal == 0:
+    return 0
+  else:
+    return 2 * math.atan2(dimension * 0.5, focal);
+  
+def fovToFocal(dimension, fov):
+  return dimension / (2 * math.tan(fov/2));
+  
