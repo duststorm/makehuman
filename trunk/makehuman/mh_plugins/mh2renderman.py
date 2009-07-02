@@ -441,10 +441,12 @@ def writeLightMapFrameAqsis(scene, ribfile, ribRepository):
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "pointlight" 2 "from" [2.39623403549 10.6440887451 -5.00257110596] "intensity" 28.963727951  "lightcolor" [1.0 1.0 1.0]\n')
-    ribfile.write('\tLightSource "pointlight" 3 "from" [-4.14454030991 4.84535360336 -7.45121669769] "intensity" 36.8524575233  "lightcolor" [1.0 1.0 1.0]\n')
+    ribfile.write('\tLightSource "spotlight" 2 "from" [2.39 10.64 -5] "to" [0 0 0] "intensity" 30  "coneangle" [1.0] \n')
+    ribfile.write('\tLightSource "spotlight" 3 "from" [-4.14 4.84 -7.45] "to" [0 0 0] "intensity" 35  "coneangle" [1.0]\n')
     
 
+	
+	
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
@@ -539,9 +541,8 @@ def writeLightMapFramePixie(scene, ribfile, ribRepository):
     ribfile.write('DisplayChannel "varying color BakeCol" \n')
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "pointlight" 2 "from" [2.39623403549 10.6440887451 -5.00257110596] "intensity" 28.963727951  "lightcolor" [1.0 1.0 1.0]\n')
-    ribfile.write('\tLightSource "pointlight" 3 "from" [-4.14454030991 4.84535360336 -7.45121669769] "intensity" 36.8524575233  "lightcolor" [1.0 1.0 1.0]\n')
-    
+    ribfile.write('\tLightSource "spotlight" 2 "from" [2.39 10.64 -5] "to" [0 0 0] "intensity" 30  "coneangle" [1.0] \n')
+    ribfile.write('\tLightSource "spotlight" 3 "from" [-4.14 4.84 -7.45] "to" [0 0 0] "intensity" 35  "coneangle" [1.0]\n')
 
     for obj in scene.objects:
         name = obj.name
@@ -644,9 +645,8 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "pointlight" 2 "from" [2.39623403549 10.6440887451 -5.00257110596] "intensity" 28.963727951  "lightcolor" [1.0 1.0 1.0]\n')
-    ribfile.write('\tLightSource "pointlight" 3 "from" [-4.14454030991 4.84535360336 -7.45121669769] "intensity" 36.8524575233  "lightcolor" [1.0 1.0 1.0]\n')
-    
+    ribfile.write('\tLightSource "spotlight" 2 "from" [2.39 10.64 -5] "to" [0 0 0] "intensity" 30  "coneangle" [1.0] \n')
+    ribfile.write('\tLightSource "spotlight" 3 "from" [-4.14 4.84 -7.45] "to" [0 0 0] "intensity" 35  "coneangle" [1.0]\n')
    
      
 	 
