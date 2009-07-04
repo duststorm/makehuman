@@ -47,7 +47,6 @@
 #include "core.h"
 #include "glmodule.h"
 #ifdef __APPLE__
-#include "MouseEventTrap.h"
 #endif // __APPLE__
 
 /* Our global struct - all globals must be here */
@@ -868,8 +867,6 @@ int main(int argc, char *argv[])
     }
 #ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
     adjustWorkingDir(argv[0]);
-    // Initialize the Mouse trap code in order to gain access the mouse scroll wheel...
-    initMouseScrollWheelTrap();
 #endif
 
     Py_SetProgramName(argv[0]);
