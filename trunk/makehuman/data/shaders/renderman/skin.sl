@@ -1,12 +1,39 @@
 
 //(c) MakeHuman team 2007 - www.makehuman.org
 
-color screen(color F; color B)
-    {
-       color W = (1,1,1);
-	   color R = W - (W - F)*(W - B);
-	   return R;
-    }
+
+//color
+//wrappeddiffuse( normal N; float wrappedangle )
+//{
+	//color C = 0;
+	//normal Nn;
+    //vector Ln;
+    //extern point P;
+	//Nn = normalize(N);
+	//illuminance( P, Nn, PI/2 ) {
+		//Ln = normalize(L);
+		//C += Cl * (1 - acos(Ln.Nn) / wrappedangle); 	}
+	//return C;
+//}
+
+//color
+//test( normal N )
+//{
+	//color C = 0;
+    //extern point P;
+    //normal Nn = normalize(N);
+	//illuminance( P, Nn, PI) {		
+		//C += Cl; 	}
+	//return C;
+//}
+
+
+//color screen(color F; color B)
+    //{
+       //color W = (1,1,1);
+	   //color R = W - (W - F)*(W - B);
+	   //return R;
+    //}
 
 color powC(color ColToPow; float Factor)
     {
@@ -35,21 +62,21 @@ surface skin (
 {	
     normal Nf;
     vector V;
-    color Ct;
-	color Cd;
+    color Csss;
+	color Cflat;
     float spec;
 	
     if (texturename != "")
-        Cd = color texture (texturename);
-    else Cd = 1;
+        Cflat = color texture (texturename);
+    else Cflat = 1;
     
     if (speculartexture != "")
         spec = float texture (speculartexture);    
 	else spec = 1;
     
 	if (ssstexture != "")	
-        Ct = color texture (ssstexture);		
-    else Ct = 1;
+        Csss = color texture (ssstexture);		
+    else Csss = 1;
 	
     if (opacitytexture != "")	
         Oi = float texture (opacitytexture) * Os ;	
@@ -61,33 +88,40 @@ surface skin (
 	float angle_ramp = (max(0,(1-( V.Nf))))/5;
 	float  noise3D = float noise(P*100);
 	float skin_matte = comp(diffuse(Nf), 0);
-	float dark_area = 0.5*pow((1-skin_matte),3);
+	//float dark_area = 0.5*pow((1-skin_matte),3);
     //printf("dark area: %f\n",dark_area);
 
     color glancing_highlight = max(0,((1-(( V.Nf)/0.6))*pow(skin_matte,3)))*0.6;
     
+    Csss = Csss*Csss;
+    //Ci = Ct;
     
-    
-	Ci = (Cs * Ct) - angle_ramp*noise3D;	
+	//Ci = (Cs * Ct) - angle_ramp*noise3D;	
 
-    Ci = screen(Ci,Cd);
+    Ci = mix(Cflat,Csss,0.8);
 
-    Ci = powC(Ci,dark)*(2/dark);
+    //Ci = powC(Ci,dark)*(2/dark);
   
     
     
 	//DESATURATE THE HIGHTLIGHTS
 	float desaturate_factor = 0.25*desaturation*pow(skin_matte, 3)*noise3D;
     float desaturate_tone = comp(Ci, 0);
-    Ci = mix(Ci,desaturate_tone,desaturate_factor); 	
+    Ci = mix(Ci,desaturate_tone,desaturate_factor); 
+    	
 	//Ci = Ci - (color(dark_area*.1,dark_area*.2,dark_area*.15));
-    Ci = Ci - dark_area;
-    Ci = mix(desaturate_tone,Ci,0.7);   
+    //Ci = Ci - dark_area;
+    //Ci = mix(desaturate_tone,Ci,0.7)*diffuse(Nf);  
+     
     Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;
     
     
-    
+    //Ci = Ci*wrappeddiffuse(Nf,PI*0.8);
+    //Ci = Ci*test(Nf);
 	Ci = Ci*Oi;
+    
+    //Ci = test(Nf);
+    Ci = Ci*min((skin_matte*2),1);
     
     
     

@@ -1,6 +1,6 @@
 
 surface
-lightmap ( float Ka = 1, Kd = .5, roughness = .1;
+lightmap ( float Ka = 1, Kd = 1, roughness = .1;
 		 color specularcolor = 1;
          string texturename = "";
 		 string outputtexture = ""; 
