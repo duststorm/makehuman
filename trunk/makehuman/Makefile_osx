@@ -8,17 +8,25 @@
 build: debug
 
 release:
-	xcodebuild -project os-x/MakeHuman.xcodeproj -configuration Release build
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHumanLib -configuration Release build
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release build
 	hdiutil create -srcfolder os-x/build/Release/ -ov -volname MakeHuman MakeHuman.dmg
 
 debug:
-	xcodebuild -project os-x/MakeHuman.xcodeproj -configuration Debug build
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHumanLib -configuration Debug build
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug build
 
 # ---------------------------------------------------------------------
 # Cleanup unused stuff
 # ---------------------------------------------------------------------
+clean1:
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHumanLib -configuration Debug  clean
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug  clean
+
 clean:
 	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~
-	xcodebuild -project os-x/MakeHuman.xcodeproj -configuration Debug   clean
-	xcodebuild -project os-x/MakeHuman.xcodeproj -configuration Release clean
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHumanLib -configuration Debug  clean
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug  clean
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHumanLib -configuration Release  clean
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release  clean
 
