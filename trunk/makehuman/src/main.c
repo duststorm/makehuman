@@ -795,7 +795,7 @@ static PyMethodDef EmbMethods[] =
     {"getCameraZoom", mh_getCameraZoom, METH_VARARGS, ""},
     {"setCameraZoom", mh_setCameraZoom, METH_VARARGS, ""},
     {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
-    {"getCameraSettings", mh_setCameraSettings, METH_VARARGS, ""},
+    {"setCameraSettings", mh_setCameraSettings, METH_VARARGS, ""},
     {"setText", mh_setText, METH_VARARGS, ""},
     {"setVisibility", mh_setVisibility, METH_VARARGS, ""},
     {"setPickable", mh_setPickable, METH_VARARGS, ""},
