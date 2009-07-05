@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		6806287A0FC136C9006C372E /* data in Resources */ = {isa = PBXBuildFile; fileRef = 68061C9B0FC136AB006C372E /* data */; };
 		684E6D680FEE34E600941536 /* docs in Resources */ = {isa = PBXBuildFile; fileRef = 684E6D340FEE34E600941536 /* docs */; };
+		6857010F0FFF57FC00F9C649 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
+		685701100FFF57FC00F9C649 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
+		685701110FFF57FC00F9C649 /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
 		686E5B9E0FA19EA3005B137C /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
 		686E5D820FA1AC91005B137C /* SDL_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
 		686FD6FD0FC06DA4006C12DA /* main.py in Resources */ = {isa = PBXBuildFile; fileRef = 686FD6FC0FC06DA4006C12DA /* main.py */; };
@@ -51,6 +54,10 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		68061C9B0FC136AB006C372E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
 		684E6D340FEE34E600941536 /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = docs; path = ../docs; sourceTree = SOURCE_ROOT; };
+		685700FF0FFF563D00F9C649 /* Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info copy.plist"; path = "resources/Info copy.plist"; sourceTree = "<group>"; };
+		685701060FFF57CC00F9C649 /* libMakeHumanLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMakeHumanLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		6857012F1000EE8000F9C649 /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = core.h; path = ../include/core.h; sourceTree = SOURCE_ROOT; };
+		685701301000EE8000F9C649 /* glmodule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glmodule.h; path = ../include/glmodule.h; sourceTree = SOURCE_ROOT; };
 		685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MakeHuman_Prefix.pch; path = include/MakeHuman_Prefix.pch; sourceTree = "<group>"; };
 		686944D10FCB25F1005B01DC /* mh_core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_core; path = ../mh_core; sourceTree = SOURCE_ROOT; };
 		686E5B9D0FA19EA3005B137C /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = frameworks/SDL_image.framework; sourceTree = "<group>"; };
@@ -82,6 +89,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		685701040FFF57CC00F9C649 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D11072E0486CEB800E47090 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -104,6 +118,8 @@
 				689F332D0E6193B000E37E9F /* main.c */,
 				689F332A0E6193B000E37E9F /* core.c */,
 				689F332B0E6193B000E37E9F /* glmodule.c */,
+				6857012F1000EE8000F9C649 /* core.h */,
+				685701301000EE8000F9C649 /* glmodule.h */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -135,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				8D1107320486CEB800E47090 /* MakeHuman.app */,
+				685701060FFF57CC00F9C649 /* libMakeHumanLib.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -173,6 +190,7 @@
 				68F6D3F60E640E6A00D27961 /* AppIcon.icns */,
 				689F33180E6192CB00E37E9F /* English.lproj */,
 				689F331D0E6192CB00E37E9F /* Info.plist */,
+				685700FF0FFF563D00F9C649 /* Info copy.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -222,7 +240,34 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		685701020FFF57CC00F9C649 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		685701050FFF57CC00F9C649 /* MakeHumanLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 685701130FFF581A00F9C649 /* Build configuration list for PBXNativeTarget "MakeHumanLib" */;
+			buildPhases = (
+				685701020FFF57CC00F9C649 /* Headers */,
+				685701030FFF57CC00F9C649 /* Sources */,
+				685701040FFF57CC00F9C649 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MakeHumanLib;
+			productName = MakeHumanLib;
+			productReference = 685701060FFF57CC00F9C649 /* libMakeHumanLib.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		8D1107260486CEB800E47090 /* MakeHuman */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MakeHuman" */;
@@ -256,6 +301,7 @@
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* MakeHuman */,
+				685701050FFF57CC00F9C649 /* MakeHumanLib */,
 			);
 		};
 /* End PBXProject section */
@@ -294,6 +340,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		685701030FFF57CC00F9C649 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6857010F0FFF57FC00F9C649 /* main.c in Sources */,
+				685701100FFF57FC00F9C649 /* core.c in Sources */,
+				685701110FFF57FC00F9C649 /* glmodule.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D11072C0486CEB800E47090 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -329,6 +385,42 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		685701070FFF57CC00F9C649 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanLib;
+			};
+			name = Debug;
+		};
+		685701080FFF57CC00F9C649 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanLib;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -337,7 +429,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PFE_FILE_C_DIALECTS = "objective-c++ c";
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -355,7 +447,7 @@
 				);
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				GCC_PFE_FILE_C_DIALECTS = "objective-c++ c";
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -405,6 +497,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		685701130FFF581A00F9C649 /* Build configuration list for PBXNativeTarget "MakeHumanLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				685701070FFF57CC00F9C649 /* Debug */,
+				685701080FFF57CC00F9C649 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MakeHuman" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

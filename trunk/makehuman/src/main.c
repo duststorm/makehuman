@@ -47,6 +47,7 @@
 #include "core.h"
 #include "glmodule.h"
 #ifdef __APPLE__
+    #include "OSXTools.h"
 #endif // __APPLE__
 
 /* Our global struct - all globals must be here */

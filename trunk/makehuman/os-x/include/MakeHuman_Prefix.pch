@@ -12,3 +12,13 @@
 #include <stdint.h>
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
+
+#include "OSXTools.h"
+#include "SDLMain.h"
+#include "NSFont_OpenGL.h"
+#include "SDLMain.h"
+
+
+#include "core.h"
+#include "glmodule.h"
+
