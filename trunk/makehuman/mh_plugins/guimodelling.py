@@ -67,7 +67,7 @@ class ModellingCategory(gui3d.Category):
         self.app.scene3d.redraw()
         
     def onKeyDown(self, event):
-      if not event.modifiers:
+      if not event.modifiers or event.modifiers == KMOD_NUM:
         # Camera rotation
         if event.key == events3d.SDLK_2 or event.key == events3d.SDLK_KP2:
           rot = self.app.scene3d.getCameraRotations()
