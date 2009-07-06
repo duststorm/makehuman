@@ -620,7 +620,7 @@ def writeShadowScene(scene, ribfile, ribRepository):
         *string*. The file system path to the rib repository.
     """
 
-    fov = 90 #hardocode for now, because we use a spotligh with coneangle 1.57 rad
+    fov = 45 #hardocode for now, because we use a spotligh with coneangle 1.57 rad
     shadowPath1 = ribRepository + "/zbuffer.tif"
     shadowPath2 = ribRepository + "/zmap.shad"
             
@@ -722,7 +722,7 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [9.39 12.80 -25.80] "to" [0 0 0] "intensity" 600  "coneangle" [1.57] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad"))
+    ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [9.39 12.80 -25.80] "to" [0 0 0] "intensity" 600  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad"))
     #ribfile.write('\tLightSource "spotlight" 2 "from" [2.39 10.64 -5] "to" [0 0 0] "intensity" 30  "coneangle" [1.0] \n')
     #ribfile.write('\tLightSource "spotlight" 3 "from" [-4.14 4.84 -7.45] "to" [0 0 0] "intensity" 35  "coneangle" [1.0]\n')
    
