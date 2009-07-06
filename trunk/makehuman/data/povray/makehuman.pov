@@ -45,6 +45,7 @@
 #declare Example = 0;
 
 #include "xxLowercaseFileNamexx.inc"  
+#if (file_exists("makehuman_hair.inc")) #include "makehuman_hair.inc" #end  
 
 //
 // The simplest example uses the predefined camera, the mesh object 

@@ -40,15 +40,21 @@ __docformat__ = 'restructuredtext'
 
 import os
 import string
-import shutil #TODO check if it require full python installation
+import shutil
 import subprocess
 import mh2povray_ini
+import hairgenerator
+import random
+
+# Create an instance of the Hairgenerator class with a global context.
+hairsClass = hairgenerator.Hairgenerator()
+
 
 def povrayExport(obj, cameraSettings):
   """
   This function exports data in a format that can be used to reconstruct the humanoid 
   object in POV-Ray. It supports a range of options that can be specified in the Python 
-  script file mh2povray_ini.py, which is reloaded each time this function is run/ This 
+  script file mh2povray_ini.py, which is reloaded each time this function is run. This 
   enables these options to be changed while the MakeHuman application is still running.
   
   Parameters
@@ -81,6 +87,13 @@ def povrayExport(obj, cameraSettings):
   if mh2povray_ini.format=="mesh2": 
     povrayExportMesh2(obj, cameraSettings, path)
 
+  outputDirectory = os.path.dirname(path)
+  
+  # Export the hair model as a set of spline definitions.
+  # Load the test hair dataand write it out in POV-Ray format.
+  povrayLoadHairsFile("data/hairs/test.hair")
+  povrayWriteHairs(outputDirectory, obj)
+
   # The ini action option defines whether or not to attempt to render the file once  
   # it's been written.
   if mh2povray_ini.action=="render": 
@@ -89,7 +102,6 @@ def povrayExport(obj, cameraSettings):
       baseName      = os.path.basename(outputSceneFile)
     else:
       baseName      = mh2povray_ini.renderscenefile
-    outputDirectory = os.path.dirname(path)
     cmdLineOpt = "+I"
     if os.name == 'nt':
       cmdLineOpt = "/RENDER "
@@ -541,3 +553,47 @@ def povraySizeData(obj, outputFileDescriptor):
   outputFileDescriptor.write("#declare MakeHuman_Height    = %s;\n" % (maxY-minY))
   outputFileDescriptor.write("#declare MakeHuman_Depth     = %s;\n" % (maxZ-minZ))
   outputFileDescriptor.write("\n\n")
+
+
+
+
+def povrayLoadHairsFile(path):
+
+    hairsClass.loadHairs(path)
+    #TODO: add the loading of wavefront obj preview
+
+
+
+def povrayWriteHairs(outputDirectory, mesh):
+
+    totalNumberOfHairs = 0
+    hairsClass.humanVerts = mesh.verts
+    hairsClass.adjustGuides()
+    hairsClass.generateHairStyle1()
+    hairsClass.generateHairStyle2()
+    print "Writing hair"
+    hairFileName = "%s/makehuman_hair.inc"%(outputDirectory)
+    hairFile = open(hairFileName,'w')
+    for hSet in hairsClass.hairStyle:
+        if "clump" in hSet.name:
+            hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
+        else:
+            hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)        
+
+
+        for hair in hSet.hairs:
+            totalNumberOfHairs += 1
+            hairFile.write('sphere_sweep{')
+            hairFile.write('b_spline ')
+            hairFile.write('%i,' % len(hair.controlPoints))
+            hairCounter = 0
+            for cP in hair.controlPoints:
+                hairCounter += 1
+                hairFile.write("<%s,%s,%s>,%s" % (cP[0],cP[1],-cP[2],hDiameter/2))
+                if hairCounter != len(hair.controlPoints):
+                    hairFile.write(",")
+            hairFile.write(' pigment {rgb <%s,%s,%s>}}\n' % (hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
+    hairFile.close()
+    print "Totals hairs written: ",totalNumberOfHairs
+    print "Number of tufts",len(hairsClass.hairStyle)
+
