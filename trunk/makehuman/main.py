@@ -93,6 +93,13 @@ class MHApplication(gui3d.Application):
     subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.slx", shell=True)
     subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.slx", shell=True)
 
+    # Create 3delight shaders
+    subprocess.Popen(aqsisPath + "shaderdl data/shaders/3delight/lightmap_aqsis.sl -o data/shaders/3delight/lightmap.sdl", shell=True)
+    subprocess.Popen(aqsisPath + "shaderdl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdl", shell=True)
+    subprocess.Popen(aqsisPath + "shaderdl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.sdl", shell=True)
+    subprocess.Popen(aqsisPath + "shaderdl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdl", shell=True)
+    subprocess.Popen(aqsisPath + "shaderdl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.sdl", shell=True)
+
     # Create pixie shaders
     subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
     subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
