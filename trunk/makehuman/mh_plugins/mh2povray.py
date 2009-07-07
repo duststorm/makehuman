@@ -556,44 +556,97 @@ def povraySizeData(obj, outputFileDescriptor):
 
 
 
-
+# Temporary Function: The loading of hairs should be done by the main application.
 def povrayLoadHairsFile(path):
 
     hairsClass.loadHairs(path)
-    #TODO: add the loading of wavefront obj preview
-
 
 
 def povrayWriteHairs(outputDirectory, mesh):
+  """
+  This function generates hair for the POV-Ray format export. Each hair is 
+  written out as a sphere_sweep. 
 
-    totalNumberOfHairs = 0
-    hairsClass.humanVerts = mesh.verts
-    hairsClass.adjustGuides()
-    hairsClass.generateHairStyle1()
-    hairsClass.generateHairStyle2()
-    print "Writing hair"
-    hairFileName = "%s/makehuman_hair.inc"%(outputDirectory)
-    hairFile = open(hairFileName,'w')
-    for hSet in hairsClass.hairStyle:
-        if "clump" in hSet.name:
-            hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
-        else:
-            hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)        
-
-
-        for hair in hSet.hairs:
-            totalNumberOfHairs += 1
-            hairFile.write('sphere_sweep{')
-            hairFile.write('b_spline ')
-            hairFile.write('%i,' % len(hair.controlPoints))
-            hairCounter = 0
-            for cP in hair.controlPoints:
-                hairCounter += 1
-                hairFile.write("<%s,%s,%s>,%s" % (cP[0],cP[1],-cP[2],hDiameter/2))
-                if hairCounter != len(hair.controlPoints):
-                    hairFile.write(",")
-            hairFile.write(' pigment {rgb <%s,%s,%s>}}\n' % (hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
-    hairFile.close()
-    print "Totals hairs written: ",totalNumberOfHairs
-    print "Number of tufts",len(hairsClass.hairStyle)
+  Parameters
+  ----------
+  
+  outputDirectory:
+      *directory path*. A string containing the name of the directory into which the
+      output file is to be written. 
+  
+  mesh:
+      *mesh object*. The humanoid mesh object to which hair is added. 
+  """
+  print "Writing hair"
+  
+  hairsClass.humanVerts = mesh.verts
+  hairsClass.adjustGuides()
+  hairsClass.generateHairStyle1()
+  hairsClass.generateHairStyle2()
+  
+  # The output file name should really be picked up from screen field settings.
+  hairFileName = "%s/makehuman_hair.inc"%(outputDirectory)
+  hairFile = open(hairFileName,'w')
+  # Need to work out the total number of hairs upfront to know what size 
+  # array will be needed in POV-Ray. Writing to an array rather than adding 
+  # the hairs directly to the scene helps reduce the rendering times for 
+  # test renders, because you can easily render every 10th hair or every 
+  # 100th hair.
+  totalNumberOfHairs = 0
+  for hSet in hairsClass.hairStyle:
+    totalNumberOfHairs += len(hSet.hairs)
+  hairFile.write('#declare MakeHuman_HairArray = array[%i] {\n' % (totalNumberOfHairs))
+  # MakeHuman hair styles consist of lots of sets of hairs.
+  hairCounter = 0
+  for hSet in hairsClass.hairStyle:
+    if "clump" in hSet.name:
+      hDiameter = hairsClass.hairDiameterClump*random.uniform(0.5,1)
+    else:
+      hDiameter = hairsClass.hairDiameterMultiStrand*random.uniform(0.5,1)        
+    # Each hair is represented as a separate sphere_sweep in POV-Ray. 
+    for hair in hSet.hairs:
+      hairCounter += 1
+      hairFile.write('sphere_sweep{')
+      hairFile.write('b_spline ')
+      hairFile.write('%i,' % len(hair.controlPoints))
+      controlPointCounter = 0
+      # Each control point is written out, along with the radius of the 
+      # hair at that point.
+      for cP in hair.controlPoints:
+        controlPointCounter += 1
+        hairFile.write("<%s,%s,%s>,%s" % (round(cP[0],4),round(cP[1],4),round(cP[2],4),round(hDiameter/2,4)))
+      # All coordinates except the last need a following comma.
+        if controlPointCounter != len(hair.controlPoints):
+          hairFile.write(",")
+      # End the sphere_sweep declaration for this hair 
+      hairFile.write('}')
+      # All but the final sphere_sweep (each array element) needs a terminating comma. 
+      if hairCounter != totalNumberOfHairs:
+        hairFile.write(",\n")
+      else:
+        hairFile.write("\n")
+  # End the array declaration.
+  hairFile.write('}\n')
+  hairFile.write('\n')
+  # Pick up the hair color and create a default POV-Ray hair texture.
+  hairFile.write('#ifndef (MakeHuman_HairTexture)\n')
+  hairFile.write('  #declare MakeHuman_HairTexture = texture {\n')
+  hairFile.write('    pigment {rgb <%s,%s,%s>}\n' % (hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
+  hairFile.write('  }\n')
+  hairFile.write('#end\n')
+  hairFile.write('\n')
+  # Dynamically create a union of the hairs (or a subset of the hairs).
+  # By default use every 25th hair, which is usually ok for test renders. 
+  hairFile.write('#ifndef(MakeHuman_HairStep) #declare MakeHuman_HairStep = 25; #end\n')
+  hairFile.write('union{\n')
+  hairFile.write('  #local MakeHuman_I = 0;\n')
+  hairFile.write('  #while (MakeHuman_I < %i)\n' % (totalNumberOfHairs))
+  hairFile.write('    object {MakeHuman_HairArray[MakeHuman_I] texture{MakeHuman_HairTexture}}\n')
+  hairFile.write('    #local MakeHuman_I = MakeHuman_I + MakeHuman_HairStep;\n')
+  hairFile.write('  #end\n')
+  #hairFile.write('  translate -z*0.0\n')
+  hairFile.write('}')
+  hairFile.close()
+  print "Totals hairs written: ",totalNumberOfHairs
+  print "Number of tufts",len(hairsClass.hairStyle)
 
