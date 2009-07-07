@@ -1,3 +1,18 @@
+/*color
+diffuseNoCl( normal N )
+{
+	color C = 0;
+	vector Ln;
+    extern point P;
+
+	normal Nn = normalize(N);
+	illuminance( P, Nn, PI/2 ) {
+		Ln = normalize(L);
+		C += Ln.Nn; 	}
+	return C;
+}*/
+
+
 surface hair(
 
     float Ka = .01;
@@ -9,7 +24,7 @@ surface hair(
     color specularcolor = (color(1) + tipcolor) / 2;
     )
 {    
-	normal FakeN;
+	vector FakeN;
 	
 	
 	
