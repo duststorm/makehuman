@@ -68,7 +68,7 @@ def writeHairs(ribRepository, mesh):
         hairFile.write('] "nonperiodic" "P" [')
         for hair in hSet.hairs:
             for cP in hair.controlPoints:
-                hairFile.write("%s %s %s " % (cP[0],cP[1],-cP[2]))
+                hairFile.write("%s %s %s " % (cP[0],cP[1],-cP[2])) #z * -1 blender  to renderman coords
         hairFile.write(']  "constantwidth" [%s]\n' % (hDiameter))
     hairFile.close()
     print "Totals hairs written: ",totalNumberOfHairs

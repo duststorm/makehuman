@@ -16,7 +16,7 @@ makehuman hairs.
 
 import random
 import math
-import simpleoctree
+#import simpleoctree
 import aljabr
 
 
@@ -129,9 +129,9 @@ class Hairgenerator:
                     cpDelta = deltaVector[i]
                     cpGuide = guide.controlPoints[i]                   
                     v = self.humanVerts[int(cpDelta[0])]                    
-                    cpGuide[0] = v[0] + float(cpDelta[1])
-                    cpGuide[1] = v[1] + float(cpDelta[2])
-                    cpGuide[2] = v[2] + float(cpDelta[3])                      
+                    cpGuide[0] = v.co[0] + float(cpDelta[1])
+                    cpGuide[1] = v.co[1] + float(cpDelta[2])
+                    cpGuide[2] = v.co[2] + float(cpDelta[3])                      
 
     def addHairGuide(self,guidePoints, guideName, guideGroup):
  
@@ -368,9 +368,9 @@ class Hairgenerator:
             elif datalist[0] == "tipMagnet":
                 self.tipMagnet = float(datalist[1])
             elif datalist[0] == "numberOfHairsClump":
-                self.numberOfHairsClump = float(datalist[1])
+                self.numberOfHairsClump = int(datalist[1])
             elif datalist[0] == "numberOfHairsMultiStrand":
-                self.numberOfHairsMultiStrand = float(datalist[1])
+                self.numberOfHairsMultiStrand = int(datalist[1])
             elif datalist[0] == "randomFactClump":
                 self.randomFactClump = float(datalist[1])
             elif datalist[0] == "randomFactMultiStrand":

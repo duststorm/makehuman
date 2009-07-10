@@ -254,12 +254,12 @@ def writeHairs(ribRepository):
         hairFile = open(hairName,'w')
         for group in hairsClass.guideGroups:            
             for guide in group.guides:                
-                hairFile.write('\t\tBasis "hermite" 2 "hermite" 2  ')
+                hairFile.write('Basis "b-spline" 1 "b-spline" 1\n')
                 hairFile.write('Curves "cubic" [')
                 hairFile.write('%i ' % len(guide.controlPoints))
                 hairFile.write('] "nonperiodic" "P" [')
                 for cP in guide.controlPoints:
-                    hairFile.write("%s %s %s " % (cP[0],cP[1],cP[2]))
+                    hairFile.write("%s %s %s " % (cP[0],cP[1],-cP[2]))
                 hairFile.write(']  "constantwidth" [%s]\n' % (hDiameter))
         hairFile.close()
                 
@@ -278,7 +278,7 @@ def writeHairs(ribRepository):
 
 
             #hairFile.write('\t\tSurface "matte" ')
-            hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1  ')
+            hairFile.write('Basis "b-spline" 1 "b-spline" 1\n')
             hairFile.write('Curves "cubic" [')
             for hair in hSet.hairs:
                 totalNumberOfHairs += 1
@@ -286,7 +286,7 @@ def writeHairs(ribRepository):
             hairFile.write('] "nonperiodic" "P" [')
             for hair in hSet.hairs:
                 for cP in hair.controlPoints:
-                    hairFile.write("%s %s %s " % (cP[0],cP[1],cP[2]))
+                    hairFile.write("%s %s %s " % (cP[0],cP[1],-cP[2]))
             hairFile.write(']  "constantwidth" [%s]\n' % (hDiameter))
         hairFile.close()
         print "TOTAL HAIRS WRITTEN: ",totalNumberOfHairs
@@ -347,9 +347,10 @@ def applyTransform(vec, matrix):
 			x*matrix[0][2] + y*matrix[1][2] + z*matrix[2][2] + zloc
 
 def updateHumanVerts():
+    hairsClass.humanVerts = []
     for v in humanMesh.getData().verts:
-        v1 = [v.co[0],v.co[1],-v.co[2]] #-1 +z to convert in renderman coord
-        hairsClass.humanVerts.append(v1)
+        #v1 = [v.co[0],v.co[1],-v.co[2]] #-1 +z to convert in renderman coord
+        hairsClass.humanVerts.append(v)
 
 def MHData2BlenderCurves():
     for group in hairsClass.guideGroups:
@@ -357,7 +358,7 @@ def MHData2BlenderCurves():
             blenderGuide = Blender.Object.Get(mhGuide.name).getData()
             for i in range(len(mhGuide.controlPoints)):
                 mhCp = mhGuide.controlPoints[i]
-                cPoint = [mhCp[0],mhCp[1],-mhCp[2],1]# mul -1 to convert from renderman to Blender
+                cPoint = [mhCp[0],mhCp[1],mhCp[2],1]# mul -1 to convert from renderman to Blender
                 blenderGuide.setControlPoint(0, i, cPoint)#we assume each curve has only one nurbs
                 blenderGuide.update()
 
@@ -379,7 +380,7 @@ def blenderCurves2MHData():
                     for p in curnurb:
                         p1 = [p[0],p[1],p[2]]
                         worldP = applyTransform(p1,matr) #convert the point in absolute coords
-                        p2 = [worldP[0],worldP[1],-worldP[2]] #convert from Blender coord to Renderman coords
+                        p2 = [worldP[0],worldP[1],worldP[2]] #convert from Blender coord to Renderman coords
                         controlPoints.append(p2)
                     hairsClass.addHairGuide(controlPoints, name, g)
                     hairCounter += 1
@@ -460,10 +461,10 @@ def loadHairsFile(path):
             cu = Curve.New(guide.name)
             #Note: hairs are stored using renderman coords system, so
             #z is multiplied for -1 to conver renderman coords to Blender coord
-            cu.appendNurb([startP[0],startP[1],-startP[2],1])
+            cu.appendNurb([startP[0],startP[1],startP[2],1])
             cu_nurb= cu[0]
             for cP in guide.controlPoints[1:]:
-                cu_nurb.append([cP[0],cP[1],-cP[2],1])
+                cu_nurb.append([cP[0],cP[1],cP[2],1])
             ob = scn.objects.new(cu)
             grp.objects.link(ob)
 

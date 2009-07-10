@@ -131,7 +131,7 @@ class Hairgenerator:
                     v = self.humanVerts[int(cpDelta[0])]                    
                     cpGuide[0] = v.co[0] + float(cpDelta[1])
                     cpGuide[1] = v.co[1] + float(cpDelta[2])
-                    cpGuide[2] = v.co[2] - float(cpDelta[3])                      
+                    cpGuide[2] = v.co[2] + float(cpDelta[3])                      
 
     def addHairGuide(self,guidePoints, guideName, guideGroup):
  
