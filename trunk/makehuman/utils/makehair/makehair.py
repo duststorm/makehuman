@@ -19,6 +19,7 @@ import sys
 import math
 import random
 mainPath = Blender.sys.dirname(Blender.Get('filename'))
+print "MAINPATH = ",mainPath 
 sys.path.append(mainPath)
 from Blender.Draw import *
 from Blender.BGL import *
@@ -55,6 +56,9 @@ randomPercentage = Create(hairsClass.randomPercentage)
 blendDistance = Create(hairsClass.blendDistance)
 isPreview = Create(1)
 tipMagnet = Create(hairsClass.tipMagnet)
+
+compileComm = "aqsl shaders/hair.sl -o shaders/hair.slx"
+subprocess.Popen(compileComm, shell=True)
 
 def convertCoords(obj):
 
@@ -98,7 +102,7 @@ def convertCoords(obj):
 
 def writeHeader(ribfile,imgFile):
 
-    #ribfile.write('Option "searchpath" "texture" ["%s"]\n'%(texturesdir + ":" + shadowdir))
+    ribfile.write('Option "searchpath" "shader" "shaders:&"')
 
     display = Scene.GetCurrent()
     context = display.getRenderingContext()

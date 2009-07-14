@@ -1,39 +1,30 @@
-/*color
-diffuseNoCl( normal N )
+surface hair (float Ka = 1, Kd = .6, Ks = .35, roughness = .15;
+	      color rootcolor = color (.109, .037, .007);
+	      color tipcolor = color (.519, .325, .125);
+	      color specularcolor = (color(1) + tipcolor) / 2;
+	     )
 {
-	color C = 0;
-	vector Ln;
-    extern point P;
+    vector T = normalize (dPdv); /* tangent along length of hair */
+    vector V = -normalize(I);    /* V is the view vector */
+    color Cspec = 0, Cdiff = 0;  /* collect specular & diffuse light */
+    float cosang;
 
-	normal Nn = normalize(N);
-	illuminance( P, Nn, PI/2 ) {
-		Ln = normalize(L);
-		C += Ln.Nn; 	}
-	return C;
-}*/
+    /* Loop over lights, catch highlights as if this was a thin cylinder */
+    illuminance (P) {
+	cosang = cos (abs (acos (T.normalize(L)) - acos (-T.V)));
+    
+    if (cosang > 0)
+        Cspec += Cl * v * pow (cosang, 1/roughness);
+    
+	Cdiff += Cl+((1-Cl)/2) * v;
+	/* We multipled by v to make it darker at the roots.  This
+	 * assumes v=0 at the root, v=1 at the tip.
+	 */
+    }
 
-
-surface hair(
-
-    float Ka = .01;
-    float Kd = .6;
-    float Ks = .9;
-    float roughness = .15;
-    color rootcolor = color (.109, .037, .007);
-    color tipcolor = color (.519, .325, .125);
-    color specularcolor = (color(1) + tipcolor) / 2;
-    )
-{    
-	vector FakeN;
-	
-	
-	
-	if (u>0.5)
-		FakeN = normalize(N+dPdu*du);
-	else
-		FakeN = normalize(N-dPdu*du);
-	
-    Ci = Os * (Ka*ambient() + mix(rootcolor, tipcolor, v) * diffuse(FakeN)+
-        specularcolor * Ks*specular(FakeN,-normalize(I),roughness));
+    Oi = Os;
+    Ci = Oi * (mix(rootcolor, tipcolor, v) * (Ka*ambient() + Kd*Cdiff)
+                 + (Ks * Cspec * specularcolor));
 }
+
 

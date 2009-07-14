@@ -828,6 +828,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture.tif', 'data/textures/texture.texture'))
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_opacity.tif', 'data/textures/texture_opacity.texture'))
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_ref.tif', 'data/textures/texture_ref.texture'))
+    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_mix.tif', 'data/textures/texture_mix.texture'))
 
     # FRAME 1 ####################
     # MAKING SHADOW MAP
@@ -982,7 +983,7 @@ def mh2Aqsis(scene, fName, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'%("texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
             #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
@@ -1043,6 +1044,7 @@ def mh23delight(scene, fName, ribRepository):
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture.tif', 'data/textures/texture.texture'))
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_opacity.tif', 'data/textures/texture_opacity.texture'))
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_ref.tif', 'data/textures/texture_ref.texture'))
+    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_mix.tif', 'data/textures/texture_mix.texture'))
 
     # FRAME 1 ####################
     # MAKING SHADOW MAP
@@ -1197,7 +1199,7 @@ def mh23delight(scene, fName, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'%("texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
             #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')

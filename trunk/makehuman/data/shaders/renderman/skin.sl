@@ -53,6 +53,7 @@ surface skin (
 			string texturename = "";
 			string opacitytexture = "";
             string speculartexture = "";
+            string mixtexture = "";
 			float Ks = .5;
 			float roughness = .1;
 			color specularcolor = 1;
@@ -65,13 +66,18 @@ surface skin (
     color Csss;
 	color Cflat;
     float spec;
+    float mixVal;
 	
     if (texturename != "")
         Cflat = color texture (texturename);
     else Cflat = 1;
     
+    if (mixtexture != "")
+        mixVal = float texture (mixtexture);       
+	else mixVal = 1;
+    
     if (speculartexture != "")
-        spec = float texture (speculartexture);    
+        spec = float texture (speculartexture);       
 	else spec = 1;
     
 	if (ssstexture != "")	
@@ -87,41 +93,34 @@ surface skin (
     V = -normalize(I);
 	float angle_ramp = (max(0,(1-( V.Nf))))/5;
 	float  noise3D = float noise(P*100);
-	float skin_matte = comp(diffuse(Nf), 0);
-	//float dark_area = 0.5*pow((1-skin_matte),3);
-    //printf("dark area: %f\n",dark_area);
-
-    color glancing_highlight = max(0,((1-(( V.Nf)/0.6))*pow(skin_matte,3)))*0.6;
-    
+	float skin_matte = comp(diffuse(Nf), 0);	
+    color glancing_highlight = max(0,((1-(( V.Nf)/0.6))*pow(skin_matte,3)))*0.6;    
     Csss = Csss*Csss;
-    //Ci = Ct;
     
-	//Ci = (Cs * Ct) - angle_ramp*noise3D;	
 
     Ci = mix(Cflat,Csss,0.8);
 
-    //Ci = powC(Ci,dark)*(2/dark);
-  
-    
+        
     
 	//DESATURATE THE HIGHTLIGHTS
 	float desaturate_factor = 0.25*desaturation*pow(skin_matte, 3)*noise3D;
     float desaturate_tone = comp(Ci, 0);
     Ci = mix(Ci,desaturate_tone,desaturate_factor); 
     	
-	//Ci = Ci - (color(dark_area*.1,dark_area*.2,dark_area*.15));
-    //Ci = Ci - dark_area;
-    //Ci = mix(desaturate_tone,Ci,0.7)*diffuse(Nf);  
-     
+	     
     Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;
     
     
-    //Ci = Ci*wrappeddiffuse(Nf,PI*0.8);
-    //Ci = Ci*test(Nf);
-	Ci = Ci*Oi;
     
-    //Ci = test(Nf);
+	
+    
+    
     Ci = Ci*min((skin_matte*2),1);
+    
+    Ci = mix(Ci,Cflat,mixVal);
+    
+    Ci = Ci*Oi;
+    
     
     
     
