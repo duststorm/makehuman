@@ -114,7 +114,7 @@ def writeHeader(ribfile,imgFile):
         factor = xResolution / float(yResolution)
 
     scene = Blender.Scene.GetCurrent()
-    camobj = scene.getCurrentCamera()
+    camobj = scene.objects.camera
     (locX,locY,locZ,rotX,rotY,rotZ,sizeX,sizeY,sizeZ) = convertCoords(camobj)
     camera = Blender.Camera.Get(camobj.getData().name)
 
@@ -373,6 +373,7 @@ def blenderCurves2MHData():
     hairCounter = 0
     groups = Group.Get()
     for group in groups:
+        print "GROUP",group
         g = hairsClass.addGuideGroup(group.name)
         for obj in list(group.objects):
             data = obj.getData()
@@ -486,7 +487,21 @@ def loadHairsFile(path):
     Window.RedrawAll()
 
 
-
+def printVertsIndices():
+    data = Blender.Object.GetSelected()[0].getData()
+    wem = Window.EditMode()
+    Window.EditMode(0)
+    
+    if type(data) == Types.CurveType:                
+        for curnurb in data:
+            firstCP = curnurb[0]
+            print firstCP
+                        
+    #for v in data.verts:
+    #    if v.sel == 1:
+    #        print "Index ", v.index
+    Window.EditMode(wem)
+    Window.RedrawAll()
 
 
 
@@ -537,6 +552,9 @@ def event(evt, val):
     if (evt== TKEY and not val):
         blenderCurves2MHData()
         #MHData2BlenderCurves()
+        
+    elif evt == IKEY:
+        printVertsIndices()
 
         adjustGuides()
     #Window.RedrawAll()
