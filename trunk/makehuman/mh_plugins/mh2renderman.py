@@ -1254,7 +1254,7 @@ def saveScene(scene, fName, ribDir, engine):
     """
 
 
-    loadHairsFile("data/hairs/test.hair")
+    loadHairsFile(scene.selectedHuman.hairFile)
     if not os.path.isdir(ribDir):
         os.mkdir(ribDir)
     ribRepository = ribDir+"/"+"ribFiles"

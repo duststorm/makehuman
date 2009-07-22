@@ -27,12 +27,12 @@ import gui3d, events3d
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"))
-    self.filechooser = gui3d.FileChooser(self, "data/hair", "mhh")
+    self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair")
     
     @self.filechooser.event
     def onFileSelected(filename):
       print("Loading %s" %(filename))
-      
+      self.app.scene3d.selectedHuman.setHairFile("data/hairs/" + filename)
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
     
