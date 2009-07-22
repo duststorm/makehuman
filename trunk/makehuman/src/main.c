@@ -412,7 +412,9 @@ static PyObject* mh_addObj(PyObject *self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "ifffiO", &objIdx, &objX,
                           &objY, &objZ, &vertexbufferSize, &indexBuffer) || !PyList_Check(indexBuffer))
+    {
         return NULL;
+    }
     else
     {
         PyObject *iterator = PyObject_GetIter(indexBuffer);
@@ -849,10 +851,11 @@ PyMODINIT_FUNC initmh()
     m = Py_InitModule3("mh", EmbMethods,
                        "makehuman as a module.");
 }
-#else
+#else /* #if !defined(MAKEHUMAN_AS_MODULE) */
 int main(int argc, char *argv[])
 {
     // Need to declare variables before other statements
+    
     char str[80];
     int index, err;
 
@@ -890,7 +893,7 @@ int main(int argc, char *argv[])
     PyRun_SimpleString("fe.close()");
 #else
     err = PyRun_SimpleString("execfile(\"main.py\")");
-#endif
+#endif /* defined(__GNUC__) && defined(__WIN32__) */
 
     if (err != 0)
     {
@@ -919,7 +922,7 @@ int main(int argc, char *argv[])
     free(G.world);
     return 1;
 }
-#endif
+#endif /* #ifdef MAKEHUMAN_AS_MODULE */
 
 // The following comment block is used by Doxygen to populate the main page
 

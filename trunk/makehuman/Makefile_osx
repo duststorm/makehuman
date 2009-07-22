@@ -5,6 +5,10 @@
 # Which are available at http://developer.apple.com/technology/xcode.html
 #######################################################################
 
+DEPS=src/core.d src/main.d src/glmodule.d
+
+cleanbuild: clean build
+
 build: debug
 
 release:
@@ -17,14 +21,19 @@ debug:
 module: mh.so
 
 mh.so:
-	gcc -DMAKEHUMAN_AS_MODULE src/core.c src/main.c src/glmodule.c os-x/src/NSFont_OpenGL.m -I /usr/include/python2.5 -I ./include -I ./os-x/include -I ./os-x/frameworks/SDL.framework/Headers --shared -F./os-x/frameworks/ -framework SDL -framework SDL_image -framework Python -framework GLUT -framework OpenGL -framework Cocoa -dynamiclib -o mh.so
+	gcc -O2 -DMAKEHUMAN_AS_MODULE src/core.c src/main.c src/glmodule.c os-x/src/NSFont_OpenGL.m -I /usr/include/python2.5 -I ./include -I ./os-x/include -I ./os-x/frameworks/SDL.framework/Headers --shared -F./os-x/frameworks/ -framework SDL -framework SDL_image -framework Python -framework GLUT -framework OpenGL -framework Cocoa -dynamiclib -o mh.so
 
 # ---------------------------------------------------------------------
 # Cleanup unused stuff
 # ---------------------------------------------------------------------
 
 clean:
-	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~
+	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~ src/*.o src/*.d
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug  clean
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release  clean
 
+
+# ---------------------------------------------------------------------
+# Include dependencies if exists
+# ---------------------------------------------------------------------
+-include $(DEPS)

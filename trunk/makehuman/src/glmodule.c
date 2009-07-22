@@ -156,7 +156,7 @@ unsigned int mhLoadTexture(const char *fname, GLuint texture)
         return 0;
     }
 #endif // ifndef __APPLE__
-    surface = IMG_Load(fname);
+    surface = (SDL_Surface*)IMG_Load(fname);
 
     if (!surface)
     {

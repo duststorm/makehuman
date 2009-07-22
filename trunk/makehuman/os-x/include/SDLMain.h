@@ -8,4 +8,13 @@
 #import <Cocoa/Cocoa.h>
 
 @interface SDLMain : NSObject
+
+-(IBAction)helpVisitMHHome:(id)inSender;
+-(IBAction)helpVisitMHForum:(id)inSender;
+-(IBAction)helpUsersGuide:(id)inSender;
+-(IBAction)helpQuickStart:(id)inSender;
+
+-(IBAction)helpDocumentsSite:(id)inSender;
+-(IBAction)helpArtistsSite:(id)inSender;
+-(IBAction)helpSoftwareDownloadSite:(id)inSender;
 @end

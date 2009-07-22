@@ -1,0 +1,8 @@
+﻿"FileUsersGuide"    = "docs/MH_Users_Guide.pdf";
+"FileQuickStart"    = "docs/MH_Quick_Start.pdf";
+
+"URLMakeHumanHome"  = "http://www.makehuman.org";
+"URLMakeHumanForum" = "http://www.makehuman.org/forum/index.php";
+"URLDocumentsSite"  = "http://sites.google.com/site/makehumandocs/Home";
+"URLArtistsSite"    = "http://sites.google.com/site/makehumanartists/system/pages/matureConfirm?path=http%3A%2F%2Fsites.google.com%2Fsite%2Fmakehumanartists%2FHome";
+"URLUpdateSite"     = "http://code.google.com/p/makehuman/downloads/list";

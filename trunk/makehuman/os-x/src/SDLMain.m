@@ -18,7 +18,7 @@
 @end
 
 /* Use this flag to determine whether we use SDLMain.nib or not */
-#define		SDL_USE_NIB_FILE	0
+#define		SDL_USE_NIB_FILE	1
 
 /* Use this flag to determine whether we use CPS (docking) or not */
 #define		SDL_USE_CPS		1
@@ -76,10 +76,32 @@ static NSString *getApplicationName(void)
     event.type = SDL_QUIT;
     SDL_PushEvent(&event);
 }
+
 @end
 
 /* The main class of the application, the application's delegate */
 @implementation SDLMain
+
+
++(void)openFile:(NSString*)fileName
+{
+    NSString *s = NSLocalizedStringFromTable(fileName, @"HelpLinks", @"");
+    [[NSWorkspace sharedWorkspace] openFile:s];
+}
+
++(void)openURL:(NSString*)urlName
+{
+    NSString *s = NSLocalizedStringFromTable(urlName, @"HelpLinks", @"");
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:s]];
+}
+
+-(IBAction)helpUsersGuide:(id)inSender              {[SDLMain openFile:@"FileUsersGuide"];}
+-(IBAction)helpQuickStart:(id)inSender              {[SDLMain openFile:@"FileQuickStart"];}
+-(IBAction)helpVisitMHHome:(id)inSender             {[SDLMain openURL:@"URLMakeHumanHome"];}
+-(IBAction)helpVisitMHForum:(id)inSender            {[SDLMain openURL:@"URLMakeHumanForum"];}
+-(IBAction)helpDocumentsSite:(id)inSender           {[SDLMain openURL:@"URLDocumentsSite"];}
+-(IBAction)helpArtistsSite:(id)inSender             {[SDLMain openURL:@"URLArtistsSite"];}
+-(IBAction)helpSoftwareDownloadSite:(id)inSender    {[SDLMain openURL:@"URLUpdateSite"];}
 
 /* Set the working directory to the .app's parent directory */
 - (void) setupWorkingDirectory:(BOOL)shouldChdir
@@ -106,6 +128,7 @@ static NSString *getApplicationName(void)
     NSRange aRange;
     NSEnumerator *enumerator;
     NSMenuItem *menuItem;
+   
 
     aRange = [[aMenu title] rangeOfString:@"SDL App"];
     if (aRange.length != 0)
@@ -375,7 +398,8 @@ int main (int argc, char **argv)
 
 #if SDL_USE_NIB_FILE
     [SDLApplication poseAsClass:[NSApplication class]];
-    NSApplicationMain (argc, argv);
+
+    NSApplicationMain ((int)argc, (const char**)argv);
 #else
     CustomApplicationMain (argc, argv);
 #endif
