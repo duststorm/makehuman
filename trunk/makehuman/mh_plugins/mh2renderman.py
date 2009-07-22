@@ -47,6 +47,8 @@ def loadHairsFile(path):
 
 def writeHairs(ribRepository, mesh):
 
+
+    #Write the full hairstyle
     totalNumberOfHairs = 0
     hairsClass.humanVerts = mesh.verts
     hairsClass.adjustGuides()
@@ -965,6 +967,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
     ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
+    ribfile.write('\tLightSource "pointlight" 3  "from" [0 12.800000 25.800000] "intensity" 1000') 
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
@@ -1180,6 +1183,7 @@ def mh23delight(scene, fName, ribRepository):
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
     ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    ribfile.write('\tLightSource "pointlight" 3  "from" [0 12.800000 25.800000] "intensity" 1000') 
 
     for obj in scene.objects:
         name = obj.name
