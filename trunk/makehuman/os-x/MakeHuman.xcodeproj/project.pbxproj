@@ -621,6 +621,7 @@
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = MakeHuman;
+				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -637,6 +638,7 @@
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = MakeHuman;
+				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
