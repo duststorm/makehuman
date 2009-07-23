@@ -17,8 +17,11 @@ surface hair(
 		FakeN = normalize(N+dPdu*du);
 	else
 		FakeN = normalize(N-dPdu*du);
+
+    Oi = 1-pow(v,5);
 	
     Ci = Os * (Ka*ambient() + mix(rootcolor, tipcolor, v) * diffuse(FakeN)+
         specularcolor * Ks*specular(FakeN,-normalize(I),roughness));
+    Ci= Ci*Oi;
 }
 
