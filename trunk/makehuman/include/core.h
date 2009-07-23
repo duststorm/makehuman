@@ -24,12 +24,15 @@
 
  */
 
-
 #ifndef CORE_H
 #define CORE_H 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*! \brief 3D object basic structure. */
 /*!        3D object basic structure. */
@@ -153,10 +156,10 @@ extern Global G;
 void callMouseButtonDown(int b, int x, int y);
 void callMouseButtonUp(int b, int x, int y);
 void callMouseMotion(int s, int x, int y, int xrel, int yrel);
-void callTimerFunct();
+void callTimerFunct(void);
 void callKeyDown(int key, unsigned short character, int modifiers);
 void callKeyUp(int key, unsigned short character, int modifiers);
-void callReloadTextures();
+void callReloadTextures(void);
 
 // Scene methods
 void initscene(int n);
@@ -186,4 +189,8 @@ unsigned char *makeUCharArray(int n);
 int *makeIntArray(int n);
 OBJARRAY objVector(int n);
 
+#ifdef __cplusplus
+        }
+#endif
+        
 #endif // CORE_H

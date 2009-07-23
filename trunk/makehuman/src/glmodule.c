@@ -45,6 +45,7 @@
     #include <SDL_syswm.h>
 #elif __APPLE__
     void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
+    #include "SDL_image.h"
 #else
     #include <X11/Xlib.h>
     #include <X11/Xutil.h>
@@ -100,7 +101,7 @@ void mhDrawText(float x, float y, const char *message)
  *  swaps it with the bottom line, then the second line and swaps it with the second 
  *  line from the bottom etc. until the surface has been mirrored from top to bottom.
  */
-void mhFlipSurface(SDL_Surface *surface)
+static void mhFlipSurface(const SDL_Surface *surface)
 {
     unsigned char *line = malloc(surface->w * surface->format->BytesPerPixel);
     unsigned char *pixels = surface->pixels;
@@ -297,7 +298,9 @@ unsigned int mhTimerFunc(unsigned int interval, void* param)
     SDL_Event event;
 
     if (G.pendingTimer)
+    {
         return G.millisecTimer;
+    }
 
     G.pendingTimer = 1;
 
@@ -388,7 +391,9 @@ void mhMouseButtonUp(int b, int x, int y)
 
     // Check which object/group was hit
     if (b != 4 && b != 5)
-      mhGetPickedColor(x, y);
+    {
+        mhGetPickedColor(x, y);
+    }
 
     // Notify python
     callMouseButtonUp(b, x, y);
@@ -532,7 +537,7 @@ void mhGetPickedColor(int x, int y)
  *  the specified camera setting.
  *
  */
-void mhConvertToScreen(double world[3], double screen[3], int camera)
+void mhConvertToScreen(const double world[3], double screen[3], int camera)
 {
   GLint viewport[4];
   double modelview[16], projection[16];
@@ -559,7 +564,7 @@ void mhConvertToScreen(double world[3], double screen[3], int camera)
  *  the specified camera setting.
  *
  */
-void mhConvertToWorld2D(double screen[2], double world[3], int camera)
+void mhConvertToWorld2D(const double screen[2], double world[3], int camera)
 {
   GLint viewport[4];
   GLdouble modelview[16], projection[16];
@@ -587,7 +592,7 @@ void mhConvertToWorld2D(double screen[2], double world[3], int camera)
  *  the specified camera setting.
  *
  */
-void mhConvertToWorld3D(double screen[3], double world[3], int camera)
+void mhConvertToWorld3D(const double screen[3], double world[3], int camera)
 {
   GLint viewport[4];
   double modelview[16], projection[16];
@@ -656,14 +661,15 @@ void mhDrawEnd()
 void OnInit()
 {
     /*Lights and materials*/
-    float lightPos[] = { -10.99f, 20.0f, 20.0f, 1.0f}; /* Light Position */
-    float ambientLight[] = { 0.0f, 0.0f, 0.0f, 1.0f};  /* Ambient Light Values */
-    float diffuseLight[] = { .5f, .5f, .5f, 1.0f};     /* Diffuse Light Values */
-    float specular[] = {0.5f, .5f, .5f, .5f};          /* Specular Light Values */
-    float MatAmb[] = {0.11f, 0.06f, 0.11f, 1.0f};      /* Material - Ambient Values */
-    float MatDif[] = {0.2f, 0.6f, 0.9f, 1.0f};         /* Material - Diffuse Values */
-    float MatSpc[] = {0.33f, 0.33f, 0.52f, 1.0f};      /* Material - Specular Values */
-    float MatShn[] = {50.0f};                          /* Material - Shininess */
+    const float lightPos[] = { -10.99f, 20.0f, 20.0f, 1.0f}; /* Light Position */
+    const float ambientLight[] = { 0.0f, 0.0f, 0.0f, 1.0f};  /* Ambient Light Values */
+    const float diffuseLight[] = { .5f, .5f, .5f, 1.0f};     /* Diffuse Light Values */
+    const float specular[] = {0.5f, .5f, .5f, .5f};          /* Specular Light Values */
+    const float MatAmb[] = {0.11f, 0.06f, 0.11f, 1.0f};      /* Material - Ambient Values */
+    const float MatDif[] = {0.2f, 0.6f, 0.9f, 1.0f};         /* Material - Diffuse Values */
+    const float MatSpc[] = {0.33f, 0.33f, 0.52f, 1.0f};      /* Material - Specular Values */
+    const float MatShn[] = {50.0f};                          /* Material - Shininess */
+
     glEnable(GL_DEPTH_TEST);                           /* Hidden surface removal */
     glEnable(GL_CULL_FACE);                            /* Inside face removal */
     glEnable(GL_LIGHTING);                             /* Enable lighting */
@@ -861,7 +867,9 @@ void mhDrawMeshes(int pickMode, int cameraType)
     int i;
     
     if (!G.world)
-      return;
+    {
+        return;
+    }
 
     /*Draw all objects contained by G.world*/
     for (i = 0; i < G.nObjs; i++)
@@ -988,7 +996,9 @@ void mhQueueUpdate()
     SDL_Event ev;
 
     if (G.pendingUpdate)
+    {
         return;
+    }
 
     G.pendingUpdate = 1;
 
@@ -1007,23 +1017,29 @@ void mhQueueUpdate()
 void mhSetFullscreen(int fullscreen)
 {
     if (G.fullscreen == fullscreen)
+    {
         return;
-
+    }
+    
     G.fullscreen = fullscreen;
     
     if (fullscreen)
     {
-      G.windowWidth = g_desktopWidth;
-      G.windowHeight = g_desktopHeight;
+        G.windowWidth  = g_desktopWidth;
+        G.windowHeight = g_desktopHeight;
     }
     else
     {
-      G.windowWidth = g_windowWidth;
-      G.windowHeight = g_windowHeight;
+        G.windowWidth  = g_windowWidth;
+        G.windowHeight = g_windowHeight;
     }
 
     if (!g_screen)
+
+    if (!g_screen)
+    {
         return;
+    }
     
     g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
     OnInit();

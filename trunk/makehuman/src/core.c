@@ -27,7 +27,6 @@
 
  */
 
-
 #include "core.h"
 #include "SDL_thread.h"
 #ifdef _DEBUG
@@ -43,7 +42,7 @@
  *  This function invokes the Python idleFunc function when the SDL
  *  module detects idle time between mouse and keyboard events.
  */
-void callTimerFunct()
+void callTimerFunct(void)
 {
     PyObject *main_module = PyImport_AddModule("__main__");
     PyObject *global_dict = PyModule_GetDict(main_module);
@@ -158,7 +157,7 @@ void callKeyUp(int key, unsigned short character, int modifiers)
         Py_DECREF(v);
 }
 
-void callReloadTextures()
+void callReloadTextures(void)
 {
     PyObject *main_module = PyImport_AddModule("__main__");
     PyObject *global_dict = PyModule_GetDict(main_module);
@@ -669,13 +668,17 @@ float *makeFloatArray(int n)
     float *iptr;
     int i;
     iptr = (float *)malloc(n * sizeof(float));
-    if (iptr == NULL)
+    assert(iptr);
+    if (NULL != iptr)
+    {
+        for (i = 0; i < n; i++)
+        {
+            iptr[i] = 1.0;
+        }
+    }
+    else
     {
         printf ("Out of memory!\n");
-    }
-    for (i = 0; i < n; i++)
-    {
-        iptr[i] = 1.0;
     }
     return iptr;
 }
@@ -690,13 +693,18 @@ unsigned char *makeUCharArray(int n)
     unsigned char *iptr;
     int i;
     iptr = (unsigned char *)malloc(n * sizeof(unsigned char));
-    if (iptr == NULL)
+    assert(iptr);
+    if (NULL != iptr)
+    {
+        for (i = 0; i < n; i++)
+        {
+            iptr[i] = 255;
+        }
+    }
+    else
     {
         printf ("Out of memory!\n");
-    }
-    for (i = 0; i < n; i++)
-    {
-        iptr[i] = 255;
+        assert(0);
     }
     return iptr;
 }
@@ -711,13 +719,17 @@ int *makeIntArray(int n)
     int *iptr;
     int i;
     iptr = (int *)malloc(n * sizeof(int));
-    if (iptr == NULL)
+    assert(iptr);
+    if (NULL != iptr)
+    {
+        for (i = 0; i < n; i++)
+        {
+            iptr[i] = -1;
+        }
+    }
+    else
     {
         printf ("Out of memory!\n");
-    }
-    for (i = 0; i < n; i++)
-    {
-        iptr[i] = -1;
     }
     return iptr;
 }
@@ -731,13 +743,10 @@ OBJARRAY objVector(int n)
 {
     struct object3D * iptr;
     iptr = (struct object3D*)calloc(n, sizeof(struct object3D));
-    if (iptr == NULL)
+    assert(iptr);
+    if (NULL == iptr)
     {
         printf ("Out of memory!\n");
     }
     return iptr;
 }
-
-
-
-
