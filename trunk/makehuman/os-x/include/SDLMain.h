@@ -9,12 +9,23 @@
 
 @interface SDLMain : NSObject
 
--(IBAction)helpVisitMHHome:(id)inSender;
--(IBAction)helpVisitMHForum:(id)inSender;
--(IBAction)helpUsersGuide:(id)inSender;
--(IBAction)helpQuickStart:(id)inSender;
 
--(IBAction)helpDocumentsSite:(id)inSender;
--(IBAction)helpArtistsSite:(id)inSender;
--(IBAction)helpSoftwareDownloadSite:(id)inSender;
+-(IBAction)helpFileMHUsersGuide:(id)inSender;
+-(IBAction)helpFileMHQuickStart:(id)inSender;
+-(IBAction)helpURLMHVisitHome:(id)inSender;
+-(IBAction)helpURLMHVisitForum:(id)inSender;
+-(IBAction)helpURLMHDocuments:(id)inSender;
+-(IBAction)helpURLMHArtists:(id)inSender;
+-(IBAction)helpURLMHSoftwareDownload:(id)inSender;
+
+-(IBAction)helpURLAqsisHome:(id)inSender;
+-(IBAction)helpURLAqsisWiki:(id)inSender;
+
+-(IBAction)helpURLPixieHome:(id)inSender;
+-(IBAction)helpURLPixieWiki:(id)inSender;
+-(IBAction)helpURLPixieInstall:(id)inSender;
+
+-(IBAction)helpURL3DelightHome:(id)inSender;
+-(IBAction)helpURL3DelighWiki:(id)inSender;
+
 @end

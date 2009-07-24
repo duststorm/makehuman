@@ -95,13 +95,23 @@ static NSString *getApplicationName(void)
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:s]];
 }
 
--(IBAction)helpUsersGuide:(id)inSender              {[SDLMain openFile:@"FileUsersGuide"];}
--(IBAction)helpQuickStart:(id)inSender              {[SDLMain openFile:@"FileQuickStart"];}
--(IBAction)helpVisitMHHome:(id)inSender             {[SDLMain openURL:@"URLMakeHumanHome"];}
--(IBAction)helpVisitMHForum:(id)inSender            {[SDLMain openURL:@"URLMakeHumanForum"];}
--(IBAction)helpDocumentsSite:(id)inSender           {[SDLMain openURL:@"URLDocumentsSite"];}
--(IBAction)helpArtistsSite:(id)inSender             {[SDLMain openURL:@"URLArtistsSite"];}
--(IBAction)helpSoftwareDownloadSite:(id)inSender    {[SDLMain openURL:@"URLUpdateSite"];}
+-(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openFile:@"FileMHUsersGuide"];}
+-(IBAction)helpFileMHQuickStart:(id)inSender        {[SDLMain openFile:@"FileMHQuickStart"];}
+-(IBAction)helpURLMHVisitHome:(id)inSender          {[SDLMain openURL:@"URLMHHome"];}
+-(IBAction)helpURLMHVisitForum:(id)inSender         {[SDLMain openURL:@"URLMHForum"];}
+-(IBAction)helpURLMHDocuments:(id)inSender          {[SDLMain openURL:@"URMHLDocuments"];}
+-(IBAction)helpURLMHArtists:(id)inSender            {[SDLMain openURL:@"URLMHArtists"];}
+-(IBAction)helpURLMHSoftwareDownload:(id)inSender   {[SDLMain openURL:@"URLMHUpdate"];}
+
+-(IBAction)helpURLAqsisHome:(id)inSender            {[SDLMain openURL:@"URLAqsisHome"];}
+-(IBAction)helpURLAqsisWiki:(id)inSender            {[SDLMain openURL:@"URLAqsisWiki"];}
+
+-(IBAction)helpURLPixieHome:(id)inSender            {[SDLMain openURL:@"URLPixieHome"];}
+-(IBAction)helpURLPixieWiki:(id)inSender            {[SDLMain openURL:@"URLPixieWiki"];}
+-(IBAction)helpURLPixieInstall:(id)inSender         {[SDLMain openURL:@"URLPixieInstall"];}
+
+-(IBAction)helpURL3DelightHome:(id)inSender         {[SDLMain openURL:@"URL3DelightHome"];}
+-(IBAction)helpURL3DelighWiki:(id)inSender          {[SDLMain openURL:@"URL3DelightWiki"];}
 
 /* Set the working directory to the .app's parent directory */
 - (void) setupWorkingDirectory:(BOOL)shouldChdir
