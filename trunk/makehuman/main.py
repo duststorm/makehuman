@@ -63,13 +63,19 @@ sys.path.append("./mh_core")
 
 # Adjust the exe path for AQSIS and PIXIE acc. the various Operating Systems.
 if 'darwin' in sys.platform: # For MAC OS
-    aqsisPath   = "/Applications/Aqsis.app/Contents/MacOS/"
+    aqsisPath   = "/Applications/Aqsis.app/Contents/"
+    os.environ['PATH'] = os.environ['PATH'] + ":" + aqsisPath + "MacOS/"
+    os.environ['AQSIS_DISPLAY_PATH'] = aqsisPath + "Resources/lib/"
+
     pixiePath   = "/Library/Pixie/bin/"
-    delightPath = "/Applications/Graphics/3Delight-8.5.0/bin/"
-else:
-    aqsisPath   = ""
-    pixiePath   = ""
-    delightPath = ""
+    os.environ['PATH'] = os.environ['PATH'] + ":" + pixiePath
+
+    delightPath = "/Applications/Graphics/3Delight-8.5.0/"
+    os.environ['DELIGHT'] = delightPath
+    os.environ['PATH'] = os.environ['PATH'] + ":" + delightPath + "bin/"
+
+    # for param in os.environ.keys():
+    #   print "%20s %s" % (param,os.environ[param])
 
 import gui3d, events3d
 import human, hair
@@ -81,7 +87,7 @@ class MHApplication(gui3d.Application):
     
     self.setTheme("default")
     
-    # Dispkay the initial splash screen and the progress bar during startup 
+    # Display the initial splash screen and the progress bar during startup 
     self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
     self.progressBar = gui3d.ProgressBar(self, backgroundTexture = self.getThemeResource("images", "progressbar_background.png"),
       barTexture = self.getThemeResource("images", "progressbar.png"))
@@ -89,24 +95,24 @@ class MHApplication(gui3d.Application):
     self.scene3d.redraw(0)
     
     # Create aqsis shaders
-    subprocess.Popen(aqsisPath + "aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
-    subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
-    subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.slx", shell=True)
-    subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.slx", shell=True)
-    subprocess.Popen(aqsisPath + "aqsl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.slx", shell=True)
+    subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
+    subprocess.Popen("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
+    subprocess.Popen("aqsl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.slx", shell=True)
+    subprocess.Popen("aqsl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.slx", shell=True)
+    subprocess.Popen("aqsl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.slx", shell=True)
 
     # Create 3delight shaders
-    subprocess.Popen(delightPath + "shaderdl data/shaders/3delight/lightmap_3delight.sl -o data/shaders/3delight/lightmap.sdl", shell=True)
-    subprocess.Popen(delightPath + "shaderdl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdl", shell=True)
-    subprocess.Popen(delightPath + "shaderdl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.sdl", shell=True)
-    subprocess.Popen(delightPath + "shaderdl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdl", shell=True)
-    subprocess.Popen(delightPath + "shaderdl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.sdl", shell=True)
+    subprocess.Popen("shaderdl data/shaders/3delight/lightmap_3delight.sl -o data/shaders/3delight/lightmap.sdl", shell=True)
+    subprocess.Popen("shaderdl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdl", shell=True)
+    subprocess.Popen("shaderdl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.sdl", shell=True)
+    subprocess.Popen("shaderdl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdl", shell=True)
+    subprocess.Popen("shaderdl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.sdl", shell=True)
 
     # Create pixie shaders
-    subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
-    subprocess.Popen(pixiePath + "sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
-    subprocess.Popen(pixiePath + "sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr", shell=True)
-    subprocess.Popen(pixiePath + "sdrc data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdr", shell=True)
+    subprocess.Popen("sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
+    subprocess.Popen("sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
+    subprocess.Popen("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr", shell=True)
+    subprocess.Popen("sdrc data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdr", shell=True)
     
     self.progressBar.setProgress(0.2)
     
