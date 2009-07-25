@@ -414,57 +414,57 @@ def writeLightMapFrameLowRes(scene, ribfile, ribRepository):
 
 
 
-def writeShadowScene(scene, ribfile, ribRepository):
-    """
-    This function creates the frame definition for a Renderman scene
-    that render a shadowmap
+#def writeShadowScene(scene, ribfile, ribRepository):
+    #"""
+    #This function creates the frame definition for a Renderman scene
+    #that render a shadowmap
 
-    Parameters
-    ----------
+    #Parameters
+    #----------
 
-    scene:
-        *scene3D*. The scene object.
+    #scene:
+        #*scene3D*. The scene object.
 
-    ribfile:
-        *string*. The file system path to the output file that needs to be generated.
+    #ribfile:
+        #*string*. The file system path to the output file that needs to be generated.
 
-    ribRepository:
-        *string*. The file system path to the rib repository.
-    """
+    #ribRepository:
+        #*string*. The file system path to the rib repository.
+    #"""
 
-#FRAME 3 ####################
-
-
+##FRAME 3 ####################
 
 
-    #now we insert rot and trasl of spotlight in mainscene here
-    ribfile.write("\t\tRotate %s 1 0 0\n" %(-24.9999637248))
-    ribfile.write("\t\tRotate %s 0 1 0\n" %(19.9999716629))
-    ribfile.write("\t\tRotate %s 0 0 1\n" %(7.13799650132e-007))
-    ribfile.write("\t\tTranslate %s %s %s\n" %(-9.39302825928, -12.8063840866, 25.8071346283))
 
-    ribfile.write('WorldBegin\n')
 
-    for obj in scene.objects:
-        name = obj.name
-        if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
+    ##now we insert rot and trasl of spotlight in mainscene here
+    #ribfile.write("\t\tRotate %s 1 0 0\n" %(-24.9999637248))
+    #ribfile.write("\t\tRotate %s 0 1 0\n" %(19.9999716629))
+    #ribfile.write("\t\tRotate %s 0 0 1\n" %(7.13799650132e-007))
+    #ribfile.write("\t\tTranslate %s %s %s\n" %(-9.39302825928, -12.8063840866, 25.8071346283))
 
-            ribfile.write('\tAttributeBegin\n')
-            #ribfile.write("\t\tOrientation \"inside\"\n")
-            #ribfile.write("\t\tColor [%s %s %s]\n" %(0.8, 0.8, 0.8))
-            writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
-            ribfile.write('\tAttributeEnd\n')
-            writeHairs(ribRepository, obj)
-    ribfile.write('\tAttributeBegin\n')
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
-    ribfile.write('\tAttributeEnd\n')
+    #ribfile.write('WorldBegin\n')
 
-    ribfile.write("WorldEnd\n")
-    ribfile.write("FrameEnd\n")
-    ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
+    #for obj in scene.objects:
+        #name = obj.name
+        #if name == "base.obj":  #TODO: attribute isRendered
+            #ribPath = ribRepository + "/" + name + ".rib"
+            #objPath = "data/3dobjs/" + "base.obj"
+
+            #ribfile.write('\tAttributeBegin\n')
+            ##ribfile.write("\t\tOrientation \"inside\"\n")
+            ##ribfile.write("\t\tColor [%s %s %s]\n" %(0.8, 0.8, 0.8))
+            #writeSubdivisionMesh(ribPath, obj, objPath)
+            #ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
+            #ribfile.write('\tAttributeEnd\n')
+            #writeHairs(ribRepository, obj)
+    #ribfile.write('\tAttributeBegin\n')
+    #ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    #ribfile.write('\tAttributeEnd\n')
+
+    #ribfile.write("WorldEnd\n")
+    #ribfile.write("FrameEnd\n")
+    #ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
 
 
 
@@ -884,6 +884,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("FrameBegin 2\n")
     ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/aqsis:&\"\n")
     ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+    ribfile.write("Display \"bake pass\" \"framebuffer\" \"rgb\"\n")
     ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(fov))
     ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
     ribfile.write("Clipping 0.1 100\n")
@@ -930,6 +931,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
     ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
     ribfile.write("Display \"%s\" \"file\" \"rgb\"\n"%(lightMapTmp2))
+    ribfile.write("Display \"+SSS pass\" \"framebuffer\" \"rgb\"\n")
     ribfile.write("Format 1024 512 1\n")
     ribfile.write("PixelSamples 2 2\n")
     ribfile.write("PixelFilter \"gaussian\" 6 6\n")
@@ -966,7 +968,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write('Declare "shadowname" "string"\n')
     ribfile.write('Declare "blur" "float"\n')
     ribfile.write('Declare "falloff" "float"\n')
-    ribfile.write('Display "00001.tif" "framebuffer" "rgb"\n')
+    ribfile.write('Display "Final pass" "framebuffer" "rgb"\n')
     ribfile.write('Display "+rendering.tif" "file" "rgba"\n')
     ribfile.write("\t\tTranslate %s %s %s\n" %(locX, locY, zoom))
     ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
@@ -998,7 +1000,8 @@ def mh2Aqsis(scene, fName, ribRepository):
             #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
-            #writeHairs(ribRepository, obj)
+            writeHairs(ribRepository, obj)
+            
 
 
     ribfile.write('\tAttributeBegin\n')
@@ -1013,7 +1016,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("WorldEnd\n")
     ribfile.write("FrameEnd\n")
     ribfile.close()
-
+    
 
 
 def mh23delight(scene, fName, ribRepository):
