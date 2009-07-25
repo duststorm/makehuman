@@ -58,7 +58,7 @@ class RenderingCategory(gui3d.Category):
       pass
     @pixie.button.event
     def onClicked(event):
-      mh2renderman.saveScene(self.app.scene3d, "scena.rib", "renderman_output", "3delight")
+      mh2renderman.saveScene(self.app.scene3d, "scena.rib", "renderman_output", "pixie")
       
     povray = gui3d.TaskView(self, "Povray",  self.app.getThemeResource("images", "button_povray.png"))
     @povray.event

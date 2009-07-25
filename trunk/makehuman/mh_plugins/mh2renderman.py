@@ -605,42 +605,44 @@ def mh2Pixie(scene, fName, ribRepository):
     spot1InvTransf = [-24.9999637248, 19.9999716629, 7.13799650132e-007, -9.39302825928, -12.8063840866, 25.8071346283]
 
 
-    # FRAME 1 ####################
-    # MAKING SHADOW MAP
 
-    ribfile.write("FrameBegin 1\n")
-    ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
-    ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
-    ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
-    ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(45))
-    ribfile.write('Format %s %s 1\n' % (512, 512))
-    ribfile.write('PixelFilter "box" 1 1\n')
-    ribfile.write("Clipping 0.1 100\n")
-    ribfile.write('ShadingRate %s \n'%(10))
-    ribfile.write('Display "%s" "zfile" "z"\n'%(shadowPath1))
-    #now we insert rot and trasl of spotlight in mainscene here
-    ribfile.write("\t\tRotate %s 1 0 0\n" %(spot1InvTransf[0]))
-    ribfile.write("\t\tRotate %s 0 1 0\n" %(spot1InvTransf[1]))
-    ribfile.write("\t\tRotate %s 0 0 1\n" %(spot1InvTransf[2]))
-    ribfile.write("\t\tTranslate %s %s %s\n" %(spot1InvTransf[3], spot1InvTransf[4], spot1InvTransf[5]))
 
-    ribfile.write('WorldBegin\n')
-    for obj in scene.objects:
-        name = obj.name
-        if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
-            ribfile.write('\tAttributeBegin\n')            
-            writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
-            ribfile.write('\tAttributeEnd\n')
-            writeHairs(ribRepository, obj)
-    ribfile.write('\tAttributeBegin\n')
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
-    ribfile.write('\tAttributeEnd\n')
-    ribfile.write("WorldEnd\n")
-    ribfile.write("FrameEnd\n")
-    ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
+    ## FRAME 1 ####################
+    ## MAKING SHADOW MAP
+
+    #ribfile.write("FrameBegin 1\n")
+    #ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
+    #ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+    #ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
+    #ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(45))
+    #ribfile.write('Format %s %s 1\n' % (512, 512))
+    #ribfile.write('PixelFilter "box" 1 1\n')
+    #ribfile.write("Clipping 0.1 100\n")
+    #ribfile.write('ShadingRate %s \n'%(10))
+    #ribfile.write('Display "%s" "zfile" "z"\n'%(shadowPath1))
+    ##now we insert rot and trasl of spotlight in mainscene here
+    #ribfile.write("\t\tRotate %s 1 0 0\n" %(spot1InvTransf[0]))
+    #ribfile.write("\t\tRotate %s 0 1 0\n" %(spot1InvTransf[1]))
+    #ribfile.write("\t\tRotate %s 0 0 1\n" %(spot1InvTransf[2]))
+    #ribfile.write("\t\tTranslate %s %s %s\n" %(spot1InvTransf[3], spot1InvTransf[4], spot1InvTransf[5]))
+
+    #ribfile.write('WorldBegin\n')
+    #for obj in scene.objects:
+        #name = obj.name
+        #if name == "base.obj":  #TODO: attribute isRendered
+            #ribPath = ribRepository + "/" + name + ".rib"
+            #objPath = "data/3dobjs/" + "base.obj"
+            #ribfile.write('\tAttributeBegin\n')            
+            #writeSubdivisionMesh(ribPath, obj, objPath)
+            #ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
+            #ribfile.write('\tAttributeEnd\n')
+            #writeHairs(ribRepository, obj)
+    #ribfile.write('\tAttributeBegin\n')
+    #ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    #ribfile.write('\tAttributeEnd\n')
+    #ribfile.write("WorldEnd\n")
+    #ribfile.write("FrameEnd\n")
+    #ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
 
 
     # FRAME 2 ####################
@@ -664,7 +666,7 @@ def mh2Pixie(scene, fName, ribRepository):
     ribfile.write('DisplayChannel "varying color BakeCol" \n')
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.3] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "spotlight" 2 "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [1.0] \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f] "intensity" 1000  \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
     for obj in scene.objects:
         name = obj.name
@@ -700,7 +702,7 @@ def mh2Pixie(scene, fName, ribRepository):
     ribfile.write("Display \"%s\" \"file\" \"rgb\"\n"%(lightMapFinal))
     ribfile.write("Format 1024 512 1\n")
     ribfile.write("PixelSamples 2 2\n")
-    #ribfile.write("PixelFilter \"gaussian\" 6 6\n")
+    ribfile.write("PixelFilter \"gaussian\" 10 10\n") #Blur fake sss
     ribfile.write('ShadingRate %s \n'%(4))
     ribfile.write("ShadingInterpolation \"smooth\"\n")
     ribfile.write("Projection \"orthographic\"\n")
@@ -713,6 +715,12 @@ def mh2Pixie(scene, fName, ribRepository):
     ribfile.write("\tAttributeEnd\n")
     ribfile.write("WorldEnd\n")
     ribfile.write("FrameEnd\n")
+
+    #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture.tif', 'data/textures/texture.texture'))
+    #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_opacity.tif', 'data/textures/texture_opacity.texture'))
+    #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_ref.tif', 'data/textures/texture_ref.texture'))
+    #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_mix.tif', 'data/textures/texture_mix.texture'))
+    #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(lightMapFinal, lightMapFinal+'.texture'))
 
 
     # FRAME 4 ####################
@@ -734,14 +742,14 @@ def mh2Pixie(scene, fName, ribRepository):
     ribfile.write('Declare "blur" "float"\n')
     ribfile.write('Declare "falloff" "float"\n')
     ribfile.write('Display "00001.tif" "framebuffer" "rgb"\n')
-    ribfile.write('Display "+rendering.tif" "file" "rgba"\n')
+    ribfile.write('Display "+renderingPixie.tif" "file" "rgba"\n')
     ribfile.write("\t\tTranslate %s %s %s\n" %(locX, locY, zoom))
     ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
-
+    ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f]  "intensity" 1000\n'%( spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    ribfile.write('\tLightSource "pointlight" 3  "from" [0 12.800000 25.800000] "intensity" 1000') 
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
@@ -760,11 +768,11 @@ def mh2Pixie(scene, fName, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'%("texture_opacity.tif","texture.tif","texture_ref.tif",lightMapFinal))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'%("texture_mix.tif", "texture_opacity.tif","texture.tif","texture_ref.tif",lightMapFinal))
             #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
-            #writeHairs(ribRepository, obj)
+            writeHairs(ribRepository, obj)
 
 
     ribfile.write('\tAttributeBegin\n')
@@ -835,39 +843,39 @@ def mh2Aqsis(scene, fName, ribRepository):
     # FRAME 1 ####################
     # MAKING SHADOW MAP
 
-    ribfile.write("FrameBegin 1\n")
-    ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
-    ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
-    ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
-    ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(45))
-    ribfile.write('Format %s %s 1\n' % (512, 512))
-    ribfile.write('PixelFilter "box" 1 1\n')
-    ribfile.write("Clipping 0.1 100\n")
-    ribfile.write('ShadingRate %s \n'%(10))
-    ribfile.write('Display "%s" "zfile" "z"\n'%(shadowPath1))
-    #now we insert rot and trasl of spotlight in mainscene here
-    ribfile.write("\t\tRotate %s 1 0 0\n" %(spot1InvTransf[0]))
-    ribfile.write("\t\tRotate %s 0 1 0\n" %(spot1InvTransf[1]))
-    ribfile.write("\t\tRotate %s 0 0 1\n" %(spot1InvTransf[2]))
-    ribfile.write("\t\tTranslate %s %s %s\n" %(spot1InvTransf[3], spot1InvTransf[4], spot1InvTransf[5]))
+    #ribfile.write("FrameBegin 1\n")
+    #ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
+    #ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+    #ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
+    #ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(45))
+    #ribfile.write('Format %s %s 1\n' % (512, 512))
+    #ribfile.write('PixelFilter "box" 1 1\n')
+    #ribfile.write("Clipping 0.1 100\n")
+    #ribfile.write('ShadingRate %s \n'%(10))
+    #ribfile.write('Display "%s" "zfile" "z"\n'%(shadowPath1))
+    ##now we insert rot and trasl of spotlight in mainscene here
+    #ribfile.write("\t\tRotate %s 1 0 0\n" %(spot1InvTransf[0]))
+    #ribfile.write("\t\tRotate %s 0 1 0\n" %(spot1InvTransf[1]))
+    #ribfile.write("\t\tRotate %s 0 0 1\n" %(spot1InvTransf[2]))
+    #ribfile.write("\t\tTranslate %s %s %s\n" %(spot1InvTransf[3], spot1InvTransf[4], spot1InvTransf[5]))
 
-    ribfile.write('WorldBegin\n')
-    for obj in scene.objects:
-        name = obj.name
-        if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
-            ribfile.write('\tAttributeBegin\n')            
-            writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
-            ribfile.write('\tAttributeEnd\n')
-            writeHairs(ribRepository, obj)
-    ribfile.write('\tAttributeBegin\n')
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
-    ribfile.write('\tAttributeEnd\n')
-    ribfile.write("WorldEnd\n")
-    ribfile.write("FrameEnd\n")
-    ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
+    #ribfile.write('WorldBegin\n')
+    #for obj in scene.objects:
+        #name = obj.name
+        #if name == "base.obj":  #TODO: attribute isRendered
+            #ribPath = ribRepository + "/" + name + ".rib"
+            #objPath = "data/3dobjs/" + "base.obj"
+            #ribfile.write('\tAttributeBegin\n')            
+            #writeSubdivisionMesh(ribPath, obj, objPath)
+            #ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
+            #ribfile.write('\tAttributeEnd\n')
+            #writeHairs(ribRepository, obj)
+    #ribfile.write('\tAttributeBegin\n')
+    #ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    #ribfile.write('\tAttributeEnd\n')
+    #ribfile.write("WorldEnd\n")
+    #ribfile.write("FrameEnd\n")
+    #ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
 
 
     # FRAME 2 ####################
@@ -886,7 +894,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.3] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "spotlight" 2 "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [1.0] \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f]"intensity" 1000 \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
     for obj in scene.objects:
         name = obj.name
@@ -924,7 +932,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("Display \"%s\" \"file\" \"rgb\"\n"%(lightMapTmp2))
     ribfile.write("Format 1024 512 1\n")
     ribfile.write("PixelSamples 2 2\n")
-    #ribfile.write("PixelFilter \"gaussian\" 6 6\n")
+    ribfile.write("PixelFilter \"gaussian\" 6 6\n")
     ribfile.write('ShadingRate %s \n'%(4))
     ribfile.write("ShadingInterpolation \"smooth\"\n")
     ribfile.write("Projection \"orthographic\"\n")
@@ -965,7 +973,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f] "intensity" 1000\n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
     ribfile.write('\tLightSource "pointlight" 3  "from" [0 12.800000 25.800000] "intensity" 1000') 
     for obj in scene.objects:
@@ -1277,6 +1285,7 @@ def saveScene(scene, fName, ribDir, engine):
     if engine == "aqsis":
         mh2Aqsis(scene, fName, ribRepository)
     if engine == "pixie":
+        print "write pixie"
         mh2Pixie(scene, fName, ribRepository)
     if engine == "3delight":
         mh23delight(scene, fName, ribRepository)
