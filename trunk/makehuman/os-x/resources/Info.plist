@@ -8,6 +8,8 @@
 	<string>MakeHuman</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.0</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.makehuman</string>
 	<key>CFBundleInfoDictionaryVersion</key>
