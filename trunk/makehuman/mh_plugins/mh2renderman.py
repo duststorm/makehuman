@@ -817,7 +817,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     """
 
     ribfile = file(fName,'w')
-
+    print "RENDERING IN AQSIS"
     shadowPath1 = ribRepository + "/zbuffer.tif"
     shadowPath2 = ribRepository + "/zmap.shad"
     cameraData = scene.getCameraSettings()
@@ -996,7 +996,7 @@ def mh2Aqsis(scene, fName, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.25] "float dark" [2]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
             #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
