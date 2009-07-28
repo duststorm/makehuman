@@ -555,6 +555,12 @@ void mhGetPickedColor(int x, int y)
 
     y = viewport[3] - y;
 
+    if (y < 0 || y >= viewport[3] || x < 0 || x >= viewport[2])
+    {
+      memset(G.color_picked, 0, 3);
+      return;
+    }
+
     if (!pickingBuffer)
       UpdatePickingBuffer();
 
