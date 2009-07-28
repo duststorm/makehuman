@@ -66,6 +66,8 @@ void mhGUICameraPosition();
 void mhDrawMeshes(int pickMode, int cameraType);
 void mhDraw();
 
+void UpdatePickingBuffer();
+
 // Event loop
 void mhShutDown();
 void mhQueueUpdate();

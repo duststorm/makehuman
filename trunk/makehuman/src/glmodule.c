@@ -274,6 +274,8 @@ void mhKeyDown(int key, unsigned short character, int modifiers)
 void mhKeyUp(int key, unsigned short character, int modifiers)
 {
     callKeyUp(key, character, modifiers);
+
+    UpdatePickingBuffer();
 }
 
 /** \brief Pass a timer callback event up to Python.
@@ -356,6 +358,8 @@ void mhMouseButtonDown(int b, int x, int y)
 
     // Update screen
     mhQueueUpdate();
+
+    UpdatePickingBuffer();
 }
 
 /** \brief Pass a mouse button up event up to Python.
@@ -400,6 +404,8 @@ void mhMouseButtonUp(int b, int x, int y)
 
     // Update screen
     mhQueueUpdate();
+
+    UpdatePickingBuffer();
 }
 
 /** \brief Pass a mouse motion event up to Python and adjust current camera view.
@@ -465,6 +471,58 @@ void mhGetPickedCoords(int x, int y)
       projection, viewport, &G.mouseGUIX, &G.mouseGUIY, &G.mouseGUIZ);
 }
 
+static unsigned char *pickingBuffer = NULL;
+static int pickingBufferSize = 0;
+
+void UpdatePickingBuffer()
+{
+  // Get the viewport
+  GLint viewport[4];
+  GLint width;
+  GLint height;
+  glGetIntegerv(GL_VIEWPORT, viewport);
+
+  width = viewport[2];
+  height = viewport[3];
+
+  if (pickingBuffer)
+  {
+    // Resize the buffer in case the window size has changed
+    if  (pickingBufferSize != width * height * 3)
+      pickingBuffer = realloc(pickingBuffer, width * height * 3);
+  }
+  else
+    pickingBuffer = malloc(width * height * 3);
+
+  // Turn off lighting
+  glDisable(GL_LIGHTING);
+
+  // Turn off antialiasing
+  glDisable (GL_BLEND);
+  glDisable(GL_MULTISAMPLE);
+
+  // Clear screen
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // draw the objects in static camera
+  mhGUICameraPosition();
+  mhDrawMeshes(1, 0);
+
+  // draw the objects in dynamic camera
+  mhSceneCameraPosition();
+  mhDrawMeshes(1, 1);
+
+  glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer);
+
+  // Turn on antialiasing
+  glEnable (GL_BLEND);
+  glEnable(GL_MULTISAMPLE);
+
+  /* restore lighting */
+  glEnable(GL_LIGHTING);
+}
+
 /** \brief Retrieve the 'selected' color index for the specified coordinates.
  *  \param x an int specifying the horizontal position in the image plane (in pixels).
  *  \param y an int specifying the vertical position in the image plane (in pixels).
@@ -495,10 +553,17 @@ void mhGetPickedColor(int x, int y)
 
     glGetIntegerv(GL_VIEWPORT, viewport);
 
-    // Turn off lighting
+    y = viewport[3] - y;
+
+    if (!pickingBuffer)
+      UpdatePickingBuffer();
+
+    memcpy(G.color_picked, pickingBuffer + (y * viewport[2] + x) * 3, 3);
+
+    /*// Turn off lighting
     glDisable(GL_LIGHTING);
 
-	// Turn off antialiasing
+	  // Turn off antialiasing
     glDisable (GL_BLEND);
     glDisable(GL_MULTISAMPLE);
 
@@ -517,15 +582,15 @@ void mhGetPickedColor(int x, int y)
 
     glDisable(GL_SCISSOR_TEST);
 
-    /* Reading the unique object color ID */
+    // Reading the unique object color ID
     glReadPixels(x, viewport[3] - y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, G.color_picked);
 
 	  // Turn on antialiasing
     glEnable (GL_BLEND);
     glEnable(GL_MULTISAMPLE);
 
-    /* restore lighting */
-    glEnable(GL_LIGHTING);
+    // restore lighting
+    glEnable(GL_LIGHTING);*/
 }
 
 /** \brief Convert 3D OpenGL world coordinates to screen coordinates.
@@ -631,6 +696,8 @@ void mhReshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
     G.windowHeight = h;
     G.windowWidth = w;
+
+    UpdatePickingBuffer();
 }
 
 /** \brief Initialise the drawing space.
