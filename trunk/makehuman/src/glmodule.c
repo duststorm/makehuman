@@ -359,7 +359,8 @@ void mhMouseButtonDown(int b, int x, int y)
     // Update screen
     mhQueueUpdate();
 
-    UpdatePickingBuffer();
+    if (b != 4 && b != 5)
+      UpdatePickingBuffer();
 }
 
 /** \brief Pass a mouse button up event up to Python.
