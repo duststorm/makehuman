@@ -1464,10 +1464,10 @@ class Scene3D:
             *string* a string containing the full path of the file on disk.
 
         """
-        cursor = self.getObject("cursor.obj")
-        cursor.setVisibility(0)
+        #cursor = self.getObject("cursor.obj")
+        #cursor.setVisibility(0)
         mh.grabScreen(x, y, width, height, filename)
-        cursor.setVisibility(1)
+        #cursor.setVisibility(1)
 
     def newObj(self,name):
         """

@@ -44,14 +44,14 @@ class Object(events3d.EventHandler):
     self.mesh.setShadeless(shadeless)
     self.visible = visible
     self.mesh.object = self
-    print("Created object with mesh ", mesh, texture, position)
+    #print("Created object with mesh ", mesh, texture, position)
     
   def show(self):
     self.visible = True
     self.setVisibility(True)
     
   def hide(self):
-    print("hiding ", self.meshName)
+    #print("hiding ", self.meshName)
     self.visible = False
     self.setVisibility(False)
   
@@ -68,7 +68,7 @@ class Object(events3d.EventHandler):
     self.mesh.clearTexture()
   
   def setVisibility(self, visibility):
-    print("changing visibility of ", self.meshName, "to", self.view.isVisible() and self.visible and visibility)
+    #print("changing visibility of ", self.meshName, "to", self.view.isVisible() and self.visible and visibility)
     if self.view.isVisible() and self.visible and visibility:
       self.mesh.setVisibility(1)
     else:
@@ -211,7 +211,7 @@ class TaskView(View):
       self.app.switchTask(self.name)
 
   def onShow(self, event):
-    print("onShow", self.name, event)
+    #print("onShow", self.name, event)
     pos = self.button.getPosition()
     pos[1] += 0.01
     self.button.setPosition(pos)
@@ -219,7 +219,7 @@ class TaskView(View):
     self.show()
     
   def onHide(self, event):
-    print("onHide", self.name, event)
+    #print("onHide", self.name, event)
     pos = self.button.getPosition()
     pos[1] -= 0.01
     self.button.setPosition(pos)
@@ -280,9 +280,9 @@ class Application(events3d.EventHandler):
     self.scene3d.startWindow()
 
   def start(self):
-    self.cursor = Object(self, mesh = "data/3dobjs/cursor.obj",
-      texture = self.getThemeResource("images", "cursor.png"), position = [0, 0, 9.5])
-    self.cursor.mesh.setPickable(0);
+    #self.cursor = Object(self, mesh = "data/3dobjs/cursor.obj",
+    #  texture = self.getThemeResource("images", "cursor.png"), position = [0, 0, 9.5])
+    #self.cursor.mesh.setPickable(0);
     self.scene3d.update()
     self.callEvent("onStart", None)
     self.scene3d.startEventLoop()
@@ -294,7 +294,7 @@ class Application(events3d.EventHandler):
     return True
     
   def setFocus(self, view = None):
-    print("setFocus", view)
+    #print("setFocus", view)
     if self.focusView == view:
       return
       
@@ -324,7 +324,7 @@ class Application(events3d.EventHandler):
       self.currentTask.hide()
       
     self.currentTask = self.currentCategory.tasksByName[name]
-    print("Switched task to ", name)
+    #print("Switched task to ", name)
     
     if self.currentTask:
       self.currentTask.show()
@@ -348,7 +348,7 @@ class Application(events3d.EventHandler):
       self.currentCategory.hide()
     
     self.currentCategory = category
-    print("Switched category to ", name)
+    #print("Switched category to ", name)
     
     self.currentCategory.show()
     
@@ -408,8 +408,8 @@ class Application(events3d.EventHandler):
       
   def mouseMove(self, mouseState, x, y, xRel, yRel):
     # Move cursor
-    mousePos = self.scene3d.getMousePosGUI()
-    self.cursor.setPosition([mousePos[0], mousePos[1], self.cursor.mesh.z])
+    #mousePos = self.scene3d.getMousePosGUI()
+    #self.cursor.setPosition([mousePos[0], mousePos[1], self.cursor.mesh.z])
     
     # Build event
     mousePos = self.scene3d.getMousePos2D()
@@ -419,7 +419,7 @@ class Application(events3d.EventHandler):
     # Get picked object
     picked = self.scene3d.getPickedObject()
     if not picked:
-      self.scene3d.redraw()
+      #self.scene3d.redraw()
       return
     group = object = picked[0]
     object = picked[1]
@@ -438,7 +438,7 @@ class Application(events3d.EventHandler):
           self.enteredObject = object.object
           self.enteredObject.callEvent("onMouseEntered", event)
         object.object.callEvent("onMouseMoved", event)
-      self.scene3d.redraw()
+      #self.scene3d.redraw()
       
   def mouseWheel(self, wheelDelta):
     # Mouse wheel events, like key events are sent to the focus view
@@ -518,7 +518,7 @@ class Slider(View):
     sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
     self.slider.setPosition(sliderPos)
     self.value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
-    print(self.value)
+    #print(self.value)
     self.callEvent("onChange", self.value)
     
   def onKeyDown(self, event):
@@ -583,7 +583,7 @@ class Button(View):
       self.app.scene3d.redraw()
       
   def setSelected(self, selected):
-    print("(de)selecting", self.selected, selected)
+    #print("(de)selecting", self.selected, selected)
     if self.selected != selected:
       self.selected = selected
       self.onSelected(selected)
@@ -704,7 +704,7 @@ class FileEntryView(View):
     if event.modifiers & events3d.KMOD_CTRL:
       View.onKeyDown(self, event)
       return
-    print(event)
+    #print(event)
     if event.key == 8:
       self.text = self.text[:-1]
     elif event.key == 13:

@@ -1223,7 +1223,7 @@ void mhCreateWindow(int useTimer)
  */
 void mhEventLoop()
 {
-    SDL_ShowCursor(SDL_DISABLE);
+    //SDL_ShowCursor(SDL_DISABLE);
 
     while (G.loop)
     {
@@ -1237,11 +1237,11 @@ void mhEventLoop()
             {
               if (event.active.gain)
               {
-                SDL_ShowCursor(SDL_DISABLE);
+                //SDL_ShowCursor(SDL_DISABLE);
               }
               else
               {
-                SDL_ShowCursor(SDL_ENABLE);
+                //SDL_ShowCursor(SDL_ENABLE);
 #ifdef __WIN32__
                 SDL_WM_GrabInput(SDL_GRAB_OFF);
 #endif
