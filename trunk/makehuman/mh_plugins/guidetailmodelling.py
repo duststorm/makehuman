@@ -350,6 +350,7 @@ class Detail3dTool(events3d.EventHandler):
           f.updateColors()
         
     self.selectedGroups = groups
+    self.app.scene3d.redraw()
     
   def onMouseExited(self, event):    
     for g in self.selectedGroups:
@@ -358,6 +359,7 @@ class Detail3dTool(events3d.EventHandler):
         f.updateColors()
         
     self.selectedGroups = []
+    self.app.scene3d.redraw()
 
 class DetailModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
