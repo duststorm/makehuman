@@ -33,6 +33,7 @@ class HairTaskView(gui3d.TaskView):
     def onFileSelected(filename):
       print("Loading %s" %(filename))
       self.app.scene3d.selectedHuman.setHairFile("data/hairs/" + filename)
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.bmp'))
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
     
