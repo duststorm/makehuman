@@ -729,7 +729,7 @@ class FileEntryView(View):
 
 # FileChooser widget
 class FileChooser(View):
-  def __init__(self, parent, path, extension):
+  def __init__(self, parent, path, extension, previewExtension = "bmp"):
     View.__init__(self, parent)
     
     self.currentFile = Object(self, mesh = "data/3dobjs/file.obj", position = [0, 0, 0], visible = False)
@@ -738,6 +738,7 @@ class FileChooser(View):
     self.filename = Object(self, mesh = "data/3dobjs/empty.obj", position = [-0.5, -0.7, 0], visible = False)
     self.path = path
     self.extension = extension
+    self.previewExtension = previewExtension
     self.files = None
     self.selectedFile = 0
     
@@ -780,7 +781,7 @@ class FileChooser(View):
     self.previousFile.hide()
     
     if self.selectedFile < len(self.files):
-        self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, 'bmp'))
+        self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, self.previewExtension))
         self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
         self.currentFile.show()
         self.filename.show()
@@ -790,7 +791,7 @@ class FileChooser(View):
         self.filename.hide()
     
     if self.selectedFile + 1 < len(self.files):
-        self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, 'bmp'))
+        self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, self.previewExtension))
         self.nextFile.show()
     else:
         self.nextFile.clearTexture()
@@ -828,16 +829,16 @@ class FileChooser(View):
     self.selectedFile -= 1
     
     if self.selectedFile - 1 >= 0:
-        self.previousFile.setTexture(self.path + "/" + self.files[self.selectedFile - 1].replace(self.extension, 'bmp'))
+        self.previousFile.setTexture(self.path + "/" + self.files[self.selectedFile - 1].replace(self.extension, self.previewExtension))
         self.previousFile.show()
     else:
         self.previousFile.clearTexture()
         self.previousFile.hide()
     
-    self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, 'bmp'))
+    self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, self.previewExtension))
     self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
     self.currentFile.show()
-    self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, 'bmp'))
+    self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, self.previewExtension))
     self.nextFile.show()
     
     self.app.scene3d.redraw()
@@ -860,14 +861,14 @@ class FileChooser(View):
     
     self.selectedFile += 1
     
-    self.previousFile.setTexture(self.path + "/" + self.files[self.selectedFile - 1].replace(self.extension, 'bmp'))
+    self.previousFile.setTexture(self.path + "/" + self.files[self.selectedFile - 1].replace(self.extension, self.previewExtension))
     self.previousFile.show()
-    self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, 'bmp'))
+    self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, self.previewExtension))
     self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
     self.currentFile.show()
     
     if self.selectedFile + 1 < len(self.files):
-        self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, 'bmp'))
+        self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, self.previewExtension))
         self.nextFile.show()
     else:
         self.nextFile.clearTexture()
