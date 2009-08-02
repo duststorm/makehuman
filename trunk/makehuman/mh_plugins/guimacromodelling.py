@@ -189,7 +189,7 @@ class MacroModelingTaskView(gui3d.TaskView):
       selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [0.52,0.20,9])
       
     self.currentHair = gui3d.Button(category, mesh = "data/3dobjs/button_asia.obj",
-      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.bmp'),  position = [0.37, -0.20, 9])
+      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'),  position = [0.37, -0.20, 9])
     
     @self.undoButton.event
     def onClicked(event):
