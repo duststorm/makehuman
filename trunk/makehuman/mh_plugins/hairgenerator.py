@@ -151,6 +151,8 @@ class Hairgenerator:
 
         No parameters
         """
+        
+        #THIS FINTERPOLATION IS NOT SO USEFL SO PROB. WILL BE REMOVED
         for guideGroup in self.guideGroups:
             for guide in guideGroup.guides:
                 self.generateHairInterpolation1(guide)

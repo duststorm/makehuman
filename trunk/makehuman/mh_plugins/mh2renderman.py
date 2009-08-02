@@ -52,7 +52,7 @@ def writeHairs(ribRepository, mesh):
     totalNumberOfHairs = 0
     hairsClass.humanVerts = mesh.verts
     hairsClass.adjustGuides()
-    hairsClass.generateHairStyle1()
+    #hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
     print "Writing hairs"
     hairName = "%s/hairs.rib"%(ribRepository)
