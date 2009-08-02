@@ -188,7 +188,7 @@ class MacroModelingTaskView(gui3d.TaskView):
       texture = self.app.getThemeResource("images", "button_new.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [0.52,0.20,9])
       
-    self.currentHair = gui3d.Object(category, mesh = "data/3dobjs/button_asia.obj",
+    self.currentHair = gui3d.Button(category, mesh = "data/3dobjs/button_asia.obj",
       texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.bmp'),  position = [0.37, -0.20, 9])
     
     @self.undoButton.event
@@ -207,6 +207,11 @@ class MacroModelingTaskView(gui3d.TaskView):
       self.syncSliders()
       self.syncEthnics()
       self.syncStatus()
+      
+    @self.currentHair.event
+    def onClicked(event):
+      self.app.switchCategory("Library")
+      self.app.scene3d.redraw(1)
       
     self.syncSliders()
     self.syncStatus()

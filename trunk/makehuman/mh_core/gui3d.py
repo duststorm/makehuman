@@ -563,6 +563,10 @@ class Button(View):
     self.selectedTexture = selectedTexture
     self.selected = selected
     
+  def setTexture(self, texture):
+    self.texture = texture
+    self.button.setTexture(texture)
+    
   def onMouseDown(self, event):
     self.setSelected(True)
     
