@@ -8,7 +8,13 @@
 #import <Cocoa/Cocoa.h>
 
 @interface SDLMain : NSObject
+{
+    bool licenseWindowVisible;
 
+    IBOutlet NSPanel *mAboutPanel;
+}
+
+@property (assign) bool licenseWindowVisible;
 
 -(IBAction)helpFileMHUsersGuide:(id)inSender;
 -(IBAction)helpFileMHQuickStart:(id)inSender;
@@ -27,5 +33,8 @@
 
 -(IBAction)helpURL3DelightHome:(id)inSender;
 -(IBAction)helpURL3DelighWiki:(id)inSender;
+
+
+-(IBAction)showAbout:(id)inSender;
 
 @end

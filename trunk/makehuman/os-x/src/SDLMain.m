@@ -82,6 +82,19 @@ static NSString *getApplicationName(void)
 /* The main class of the application, the application's delegate */
 @implementation SDLMain
 
+-(void)endSelector:(id)inSender
+{
+}
+
+-(IBAction)showAbout:(id)inSender
+{
+    [mAboutPanel makeKeyAndOrderFront:self];
+
+/*
+    NSWindow *currentWindow = [NSApp keyWindow];
+    [NSApp beginSheet:mAboutPanel modalForWindow:currentWindow modalDelegate:self didEndSelector:@selector(endSelector:) contextInfo:self];
+*/
+}
 
 +(void)openFile:(NSString*)fileName
 {
@@ -328,6 +341,7 @@ static void CustomApplicationMain (int argc, char **argv)
 #if SDL_USE_NIB_FILE
     /* Set the main menu to contain the real app name instead of "SDL App" */
     [self fixMenu:[NSApp mainMenu] withAppName:getApplicationName()];
+    licenseWindowVisible = false; // The licensing panel should not be visible at launch time
 #endif
 
     /* Hand off to main application code */
