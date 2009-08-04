@@ -665,7 +665,7 @@ def mh2Pixie(scene, fName, ribRepository):
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('DisplayChannel "varying color BakeCol" \n')
     ribfile.write('WorldBegin\n')
-    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.3] "color lightcolor" [1 1 1]\n')
+    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
     ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f] "intensity" 1000  \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
     for obj in scene.objects:
@@ -894,7 +894,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
-    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.3] "color lightcolor" [1 1 1]\n')
+    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
     ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f]"intensity" 1000 \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
     for obj in scene.objects:
@@ -1113,7 +1113,7 @@ def mh23delight(scene, fName, ribRepository):
     ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
     ribfile.write('WorldBegin\n')
-    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.3] "color lightcolor" [1 1 1]\n')
+    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
     ribfile.write('\tLightSource "spotlight" 2 "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [1.0] \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
     for obj in scene.objects:

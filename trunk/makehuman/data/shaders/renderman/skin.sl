@@ -65,6 +65,7 @@ surface skin (
     vector V;
     color Csss;
 	color Cflat;
+    color Cdiff;
     float spec;
     float mixVal;
 	
@@ -95,18 +96,18 @@ surface skin (
 	float  noise3D = float noise(P*100);
 	float skin_matte = comp(diffuse(Nf), 0);	
     color glancing_highlight = max(0,((1-(( V.Nf)/0.6))*pow(skin_matte,3)))*0.6;    
-    //Csss = Csss*Csss;
     
+    Cdiff = Cflat*skin_matte;
 
-    Ci = mix(Cflat,Csss,0.8);
+    Ci = mix(Cdiff,Csss,0.6);
 
         
-    
+    /*
 	//DESATURATE THE HIGHTLIGHTS
 	float desaturate_factor = 0.25*desaturation*pow(skin_matte, 3)*noise3D;
     float desaturate_tone = comp(Ci, 0);
     Ci = mix(Ci,desaturate_tone,desaturate_factor); 
-    	
+    */	
 	     
     
     
@@ -119,19 +120,19 @@ surface skin (
     
     
    
-    Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;
-    //Ci = Ci* 2*skin_matte - pow(skin_matte,2);
-    //Ci = skin_matte;
-    Ci = glancing_highlight+(Ci*(1-pow((1-skin_matte),3)));
-    Ci = mix(Ci,Cflat,mixVal);
-    Ci = Ci*Oi;
+    Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;    
+    //Ci = glancing_highlight+(Ci*(1-pow((1-skin_matte),3)));
+    //Ci = mix(Ci,Cflat,mixVal);
     
-    //Ci = min(2*skin_matte - pow(skin_matte,2),1);
+    float desaturate_factor = 0.25*desaturation*pow(skin_matte, 3)*noise3D;
+    float desaturate_tone = comp(Ci, 0);
+    Ci = mix(Ci,desaturate_tone,desaturate_factor);
+     
     
     
-    //Ci = Cflat;
+    Ci = Ci*Oi*Cflat;
     
-
+    
     
 	
 	
