@@ -61,28 +61,39 @@ Global G;
  */
 void initGlobals(void)
 {
+    // Objects
     G.world = NULL;
-    G.nObjs = 0;
+
+    // Camera
     G.fovAngle = 25;
     G.zoom = 60;
     G.rotX = 0;
     G.rotY = 0;
     G.translX = 0;
     G.translY = 0;
+
+    // Screen
     G.windowHeight = 600;
     G.windowWidth = 800;
-    G.modifiersKeyState = 0;
-    G.millisecTimer = 10;
-
-    G.fontOffset = 0;
-    G.pendingUpdate = 0;
-    G.pendingTimer = 0;
-    G.loop = 1;
     G.fullscreen = 0;
     G.clearColor[0] = 0.0;
     G.clearColor[1] = 0.0;
     G.clearColor[2] = 0.0;
     G.clearColor[3] = 0.0;
+    G.pendingUpdate = 0;
+
+    // Keyboard
+    G.modifiersKeyState = 0;
+
+    // Timer
+    G.millisecTimer = 10;
+    G.pendingTimer = 0;
+
+    // Rendering
+    G.fontOffset = 0;
+    
+    // Events
+    G.loop = 1;
 }
 
 /** \brief Get an integer representing the current modifier key settings.
@@ -406,32 +417,31 @@ static PyObject* mh_init3DScene(PyObject *self, PyObject *args)
  */
 static PyObject* mh_addObj(PyObject *self, PyObject *args)
 {
-    int objIdx, vertexbufferSize;
+    int vertexbufferSize;
     float objX,objY,objZ;
     PyObject *indexBuffer;
 
-    if (!PyArg_ParseTuple(args, "ifffiO", &objIdx, &objX,
-                          &objY, &objZ, &vertexbufferSize, &indexBuffer) || !PyList_Check(indexBuffer))
+    if (!PyArg_ParseTuple(args, "fffiO", &objX, &objY, &objZ, &vertexbufferSize, &indexBuffer) || !PyList_Check(indexBuffer))
     {
         return NULL;
     }
     else
     {
-        PyObject *iterator = PyObject_GetIter(indexBuffer);
-        PyObject *item;
-        int index = 0;
+      PyObject *iterator = PyObject_GetIter(indexBuffer);
+      PyObject *item;
+      int index = 0;
+      Object3D *self = (Object3D*)addObject(objX, objY, objZ, vertexbufferSize, (int)PyList_Size(indexBuffer) / 3);
 
-        addObject(objIdx, objX, objY, objZ, vertexbufferSize, (int)PyList_Size(indexBuffer) / 3);
+      for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
+      {
+          self->trigs[index++] = PyInt_AsLong(item);
+          Py_DECREF(item);
+      }
 
-        for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
-        {
-            G.world[objIdx].trigs[index++] = PyInt_AsLong(item);
-            Py_DECREF(item);
-        }
+      Py_DECREF(iterator);
 
-        Py_DECREF(iterator);
+      return (PyObject*)self;
     }
-    return Py_BuildValue("");
 }
 
 static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
@@ -441,286 +451,6 @@ static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
       return NULL;
   setClearColor(r, g, b, a);
   return Py_BuildValue("");
-}
-
-/** \brief Set coordinates, normal and color information for the 3 vertices of a face.
- *
- *  This function passes the coordinates, normal and color information for the 3 vertices
- *  of a face into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setAllCoord(PyObject *self, PyObject *args)
-{
-    float vert[3];
-    float norm[3];
-    unsigned char color[3];
-    unsigned char color2[4];
-    int objIdx, index, colorIdx;
-
-    if (!PyArg_ParseTuple(args, "iii(fff)(fff)(BBB)(BBBB)",  &objIdx, &index, &colorIdx, &vert[0], &vert[1], &vert[2], &norm[0], &norm[1], &norm[2], &color[0], &color[1], &color[2], &color2[0], &color2[1], &color2[2],&color2[3]))
-        return NULL;
-    else if (!setVertCoo(objIdx, index, vert[0], vert[1], vert[2]) ||
-             !setNormCoo(objIdx, index, norm[0], norm[1], norm[2]) ||
-             !setColorIDComponent(objIdx, index, color[0], color[1], color[2]) ||
-             !setColorComponent(objIdx, colorIdx, color2[0], color2[1], color2[2], color2[3]))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the coordinates of a specified vertex.
- *
- *  This function passes the x, y and z coordinates for a specifed vertex
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setVertCoord(PyObject *self, PyObject *args)
-{
-    float vert[3];
-    int objIdx, index;
-
-    if (!PyArg_ParseTuple(args, "ii(fff)",  &objIdx, &index, &vert[0], &vert[1], &vert[2]))
-        return NULL;
-    else if (!setVertCoo(objIdx, index, vert[0], vert[1], vert[2]))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the normal of a specified vertex.
- *
- *  This function passes the x, y and z coordinates of a normal vector for a specifed vertex
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setNormCoord(PyObject *self, PyObject *args)
-{
-    float norm[3];
-    int objIdx, index;
-
-    if (!PyArg_ParseTuple(args, "ii(fff)",  &objIdx, &index, &norm[0], &norm[1], &norm[2]))
-        return NULL;
-    else if (!setNormCoo(objIdx, index, norm[0], norm[1], norm[2]))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the UV coordinates of a specified vertex.
- *
- *  This function passes the UV coordinates of a specifed vertex
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setUVCoord(PyObject *self, PyObject *args)
-{
-    int objIdx,index;
-    float uv[2];
-    if (!PyArg_ParseTuple(args, "ii(ff)", &objIdx, &index, &uv[0], &uv[1]))
-        return NULL;
-    else if (!setUVCoo(objIdx, index, uv[0], uv[1]))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the color of a specified vertex.
- *
- *  This function passes the 3 components (RGB) of a color of a specifed vertex
- *  into OpenGL.
- *  It returns a null value.
- *
- *  <b>EDITORIAL NOTE: mh_setColorCoord doesn't seem to be called from anywhere.</b>
- */
-static PyObject* mh_setColorCoord(PyObject *self, PyObject *args)
-{
-    unsigned char color[3];
-    int objIdx, index;
-
-    if (!PyArg_ParseTuple(args, "ii(BBB)",  &objIdx, &index, &color[0], &color[1], &color[2]))
-        return NULL;
-    else if (!setColorIDComponent(objIdx, index, color[0], color[1], color[2]))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the color and alpha channel of a specified vertex.
- *
- *  This function passes the 4 components (RGBA) of a color of a specifed vertex
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setColorCoord2(PyObject *self, PyObject *args)
-{
-    unsigned char color[4];
-    int objIdx, index;
-
-    if (!PyArg_ParseTuple(args, "ii(BBBB)",  &objIdx, &index, &color[0], &color[1], &color[2], &color[3]))
-        return NULL;
-    else if (!setColorComponent(objIdx, index, color[0], color[1], color[2], color[3]))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the camera mode.
- *
- *  This function passes the camera mode
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setCameraMode(PyObject *self, PyObject *args)
-{
-    int objIdx, cameraMode;
-    if (!PyArg_ParseTuple(args, "ii", &objIdx, &cameraMode))
-        return NULL;
-    else if (!setCamMode(objIdx, cameraMode))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the texture attribute.
- *
- *  This function passes the texture
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setObjTexture(PyObject *self, PyObject *args)
-{
-    int objIdx, texture;
-    if (!PyArg_ParseTuple(args, "ii", &objIdx, &texture))
-        return NULL;
-    else if (!setObjTexture(objIdx, texture))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the useLights attribute.
- *
- *  This function passes the useLights
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setShadeless(PyObject *self, PyObject *args)
-{
-    int objIdx, shadelessFlag;
-    if (!PyArg_ParseTuple(args, "ii", &objIdx, &shadelessFlag))
-        return NULL;
-    else if (!setShadeless(objIdx, shadelessFlag))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the object location.
- *
- *  This function passes the location of a specified object
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setObjLocation(PyObject *self, PyObject *args)
-{
-    int objIdx;
-    float locX,locY,locZ;
-    if (!PyArg_ParseTuple(args, "ifff", &objIdx, &locX, &locY, &locZ))
-        return NULL;
-    else if (!setObjLoc(objIdx, locX, locY, locZ))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the object orientation.
- *
- *  This function passes the orientation of a specified object
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setObjRotation(PyObject *self, PyObject *args)
-{
-    int objIdx;
-    float rotX,rotY,rotZ;
-    if (!PyArg_ParseTuple(args, "ifff", &objIdx, &rotX, &rotY, &rotZ))
-        return NULL;
-    else if (!setObjRot(objIdx, rotX, rotY, rotZ))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the object scale factors.
- *
- *  This function passes the x, y and z scale factors of a specified object
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setObjScale(PyObject *self, PyObject *args)
-{
-    int objIdx;
-    float sizeX,sizeY,sizeZ;
-    if (!PyArg_ParseTuple(args, "ifff", &objIdx, &sizeX, &sizeY, &sizeZ))
-        return NULL;
-    else if (!setObjScale(objIdx, sizeX, sizeY, sizeZ))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the visibility of an object.
- *
- *  This function sets the visibility of a specified object by passing it
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setVisibility(PyObject *self, PyObject *args)
-{
-    int objIdx;
-    int visible;
-    if (!PyArg_ParseTuple(args, "ii", &objIdx, &visible))
-        return NULL;
-    else if (!setVisibility(objIdx, visible))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set the pickable of an object.
- *
- *  This function sets the pickable of a specified object by passing it
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setPickable(PyObject *self, PyObject *args)
-{
-    int objIdx;
-    int pickable;
-    if (!PyArg_ParseTuple(args, "ii", &objIdx, &pickable))
-        return NULL;
-    else if (!setPickable(objIdx, pickable))
-        return NULL;
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Set text of an object.
- *
- *  This function passes the text describing the specified object
- *  into OpenGL.
- *  It returns a null value.
- */
-static PyObject* mh_setText(PyObject *self, PyObject *args)
-{
-    int objIdx;
-    char *objText;
-    if (!PyArg_ParseTuple(args, "is", &objIdx, &objText))
-        return NULL;
-    else if (!setText(objIdx, objText))
-        return NULL;
-    else
-        return Py_BuildValue("");
 }
 
 /** \brief Load texture of an object from file.
@@ -788,8 +518,6 @@ static PyMethodDef EmbMethods[] =
     {"convertToScreen", mh_convertToScreen, METH_VARARGS, ""},
     {"convertToWorld2D", mh_convertToWorld2D, METH_VARARGS, ""},
     {"convertToWorld3D", mh_convertToWorld3D, METH_VARARGS, ""},
-    {"setShadeless", mh_setShadeless, METH_VARARGS, ""},
-    {"setObjTexture", mh_setObjTexture, METH_VARARGS, ""},
     {"getKeyModifiers", mh_getKeyModifiers, METH_VARARGS, ""},
     {"getCameraRotations", mh_getCameraRotations, METH_VARARGS, ""},
     {"setCameraRotations", mh_setCameraRotations, METH_VARARGS, ""},
@@ -799,30 +527,17 @@ static PyMethodDef EmbMethods[] =
     {"setCameraZoom", mh_setCameraZoom, METH_VARARGS, ""},
     {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
     {"setCameraSettings", mh_setCameraSettings, METH_VARARGS, ""},
-    {"setText", mh_setText, METH_VARARGS, ""},
-    {"setVisibility", mh_setVisibility, METH_VARARGS, ""},
-    {"setPickable", mh_setPickable, METH_VARARGS, ""},
     {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
-    {"setColorCoord", mh_setColorCoord, METH_VARARGS, ""},
-    {"setColorCoord2", mh_setColorCoord2, METH_VARARGS, ""},
     {"init3DScene", mh_init3DScene, METH_VARARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
     {"addObj", mh_addObj, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
-    {"setVertCoord", mh_setVertCoord, METH_VARARGS, ""},
-    {"setNormCoord", mh_setNormCoord, METH_VARARGS, ""},
-    {"setUVCoord", mh_setUVCoord, METH_VARARGS, ""},
-    {"setCameraMode", mh_setCameraMode, METH_VARARGS, ""},
-    {"setObjLocation", mh_setObjLocation, METH_VARARGS, ""},
-    {"setObjRotation", mh_setObjRotation, METH_VARARGS, ""},
-    {"setObjScale", mh_setObjScale, METH_VARARGS, ""},
     {"LoadTexture", mh_LoadTexture, METH_VARARGS, ""},
     {"grabScreen", mh_GrabScreen, METH_VARARGS, ""},
     {"startWindow", mh_startWindow, METH_VARARGS, ""},
     {"startEventLoop", mh_startEventLoop, METH_VARARGS, ""},
     {"shutDown", mh_shutDown, METH_VARARGS, ""},
-    {"setAllCoord", mh_setAllCoord, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
@@ -857,17 +572,18 @@ int main(int argc, char *argv[])
     // Need to declare variables before other statements
     
     char str[80];
-    int index, err;
+    int err;
+    PyObject *module;
 
     initGlobals(); /* initialize all our globals */
 
     if (argc >= 2 && strlen(argv[1]) < 68)
     {
-        sprintf(str, "execfile(\"%s\")", argv[1]);
+        sprintf_s(str, 80, "execfile(\"%s\")", argv[1]);
     }
     else
     {
-        strcpy(str, "execfile(\"main.py\")");
+        strcpy_s(str, 80, "execfile(\"main.py\")");
     }
 #ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
     adjustWorkingDir(argv[0]);
@@ -883,7 +599,8 @@ int main(int argc, char *argv[])
     }
 
     PySys_SetArgv(argc, argv);
-    Py_InitModule("mh", EmbMethods);
+    module = Py_InitModule("mh", EmbMethods);
+    RegisterObject3D(module);
 
 #if defined(__GNUC__) && defined(__WIN32__)
     PyRun_SimpleString("import sys\nfo = open(\"python_out.txt\", \"w\")\nsys.stdout = fo");
@@ -903,23 +620,7 @@ int main(int argc, char *argv[])
     }
 
     Py_Finalize();
-    /*getc(stdin); just to stop the exit*/
 
-    printf("number of objects %i\n",G.nObjs);
-    for (index = 0; index < G.nObjs; index++)
-    {
-        printf("index %i\n", index);
-        printf("number of triangles %i\n", G.world[index].nTrigs);
-        printf("number of vertices %i\n", G.world[index].nVerts);
-        free(G.world[index].trigs);
-        free(G.world[index].verts);
-        free(G.world[index].norms);
-        free(G.world[index].colors);
-        free(G.world[index].colors2);
-        free(G.world[index].UVs);
-        free(G.world[index].textString);
-    }
-    free(G.world);
     return 1;
 }
 #endif /* #ifdef MAKEHUMAN_AS_MODULE */

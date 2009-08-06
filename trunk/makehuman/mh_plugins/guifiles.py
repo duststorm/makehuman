@@ -142,6 +142,9 @@ class LoadTaskView(gui3d.TaskView):
       del self.app.undoStack[:]
       del self.app.redoStack[:]
       
+      self.parent.tasksByName["Save"].fileentry.text = filename.replace(".mhm", "")
+      self.parent.tasksByName["Save"].fileentry.textObject.setText(filename.replace(".mhm", ""))
+      
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
     

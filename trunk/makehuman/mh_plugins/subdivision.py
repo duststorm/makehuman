@@ -42,7 +42,7 @@ __docformat__ = 'restructuredtext'
 import time
 import module3d
 
-def newSubVert1(v, objIdx):
+def newSubVert1(v, object):
     """
     This function adds a new subdivision vertex into the list of vertices.
     It calls the constructor on the Vert class to initialize a new vertex
@@ -63,7 +63,7 @@ def newSubVert1(v, objIdx):
       *integer*.  The index of the new Object3D object that will end up containing a copy of this vertex.
     """
     loopVertices = v.vertsShared()
-    vSubd = module3d.Vert(v.co,v.idx,objIdx)
+    vSubd = module3d.Vert(v.co, v.idx, object)
     vSubd.sub_type = 1
     n = len(loopVertices)
 
@@ -246,7 +246,7 @@ def subdivide(ob, scene):
         calcSubData(ob, scene)
     print "time for subdivision: %s"%(time.time()-t)
 
-def addEdgeVert(v0, v1, v2, face, edges, objIdx):
+def addEdgeVert(v0, v1, v2, face, edges, object):
     """
     This function adds a sub-division vertex in the middle of an edge. 
     It is called from the calcSubData function which loops through every edge of 
@@ -276,7 +276,7 @@ def addEdgeVert(v0, v1, v2, face, edges, objIdx):
       *Face*.  The face on which this edge sits.
     edges:     
       *list of edge names*.  The edges processed so far in this cycle (used to establish whether this edge has already been processed).
-    objIdx:     
+    object:     
       *Object3D*.  The object containing the face to be subdivided.
     """
 
@@ -289,7 +289,7 @@ def addEdgeVert(v0, v1, v2, face, edges, objIdx):
         edge = [v1,v0]
 
     if not edges.has_key(key):
-        vSubd = module3d.Vert([0,0,0],-1,objIdx)
+        vSubd = module3d.Vert([0,0,0], -1, object)
         vSubd.sub_data = edge + [v2]
         vSubd.sub_type = 3
         edges[key] = vSubd
@@ -335,7 +335,7 @@ def calcSubData(ob, scene):
     subdividedObj.uvValues = ob.uvValues[:]
     subdividedObj.indexBuffer = []
     for v in ob.verts:
-        vSubd = newSubVert1(v,subdividedObj.idx)
+        vSubd = newSubVert1(v, subdividedObj)
         subdividedObj.verts.append(vSubd)
         #subdividedObj.colors.append([v.color[0],v.color[1], v.color[2], v.color[3]])
 
@@ -348,9 +348,9 @@ def calcSubData(ob, scene):
         v0 = f.verts[0]
         v1 = f.verts[1]
         v2 = f.verts[2]
-        addEdgeVert(v0, v1, v2, f, edgeVerts, subdividedObj.idx)
-        addEdgeVert(v1, v2, v0, f, edgeVerts, subdividedObj.idx)
-        addEdgeVert(v2, v0, v1, f, edgeVerts, subdividedObj.idx)
+        addEdgeVert(v0, v1, v2, f, edgeVerts, subdividedObj)
+        addEdgeVert(v1, v2, v0, f, edgeVerts, subdividedObj)
+        addEdgeVert(v2, v0, v1, f, edgeVerts, subdividedObj)
 
     for ev in edgeVerts.values():
             if ev.sub_type == 3:

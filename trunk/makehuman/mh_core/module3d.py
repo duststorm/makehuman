@@ -130,7 +130,7 @@ class Vert:
       Default: [coX, coY, coZ]).
     - **self.no**: *float list*. The normal of this vertex (or 0).
       Default: [0, 0, 0].
-    - **self.objID**: *int*. The index of the object of which this vertex is a part.
+    - **self.object**: *Object3d*. The object of which this vertex is a part.
       Default: 0
     - **self.sharedFacesIndices**: *faces list*. The list of faces that share this vertex.
     - **self.sharedFaces**: *faces list*. The list of faces that share this vertex.
@@ -139,7 +139,7 @@ class Vert:
     - **self.color**: *float list*. A list of 4 floats [r,g,b,a] used as the vertex color (including an alpha channel).
     """
 
-    def __init__(self, co = [0, 0, 0], idx=0, obIdx=0, sfidx = []):
+    def __init__(self, co = [0, 0, 0], idx=0, object=None, sfidx = []):
         """
         This is the constructor method for the Vert class. It initializes the
         vert attributes.
@@ -161,8 +161,8 @@ class Vert:
         idx:
             *int*. The index of this vertex in the vertices list. Default is 0.
 
-        obIdx:
-            *int*. The index of the Object3D object that uses this vertex. Default is 0.
+        object:
+            *Object3d*. The Object3D object that uses this vertex. Default is 0.
 
         sfidx:
             *int list*. A list of indices of faces that share this vertex. Default is empty.
@@ -171,7 +171,7 @@ class Vert:
 
         self.co = co
         self.no = [0,0,0]
-        self.objID = obIdx
+        self.object = object
         self.sharedFacesIndices = sfidx
         self.sharedFaces = []
         self.indicesInFullVertArray = []
@@ -250,17 +250,17 @@ class Vert:
 
         if updateCoo:
             for i in self.indicesInFullVertArray:
-                mh.setVertCoord(self.objID, i, self.co)
+                self.object.object3d.setVertCoord(i, self.co)
         if updateNor:
             for i in self.indicesInFullVertArray:
-                mh.setNormCoord(self.objID, i, self.no)
+                self.object.object3d.setNormCoord(i, self.no)
 
         if updateCol:
             if colorIndexToUpdate == None:
                 for i in self.indicesInFullVertArray:
-                    mh.setColorCoord2(self.objID, i, self.color)
+                    self.object.object3d.setColorComponent(i, self.color)
             else:
-                mh.setColorCoord2(self.objID, colorIndexToUpdate, self.color)
+                self.object.object3d.setColorComponent(colorIndexToUpdate, self.color)
 
 
     def calcNorm(self):
@@ -496,7 +496,7 @@ class Object3D:
     -----------
     
     - **self.name**: *string* The name of this Object3D object.
-    - **self.idx**: *int* The ID used to identify the object in the OpenGL engine array.
+    - **self.object3d**: *mh.Object3d* The object in the OpenGL engine array.
     - **self.x**: *float* The x coordinate of the position of this object in the coordinate space of the scene.
     - **self.y**: *float* The y coordinate of the position of this object in the coordinate space of the scene.
     - **self.z**: *float* The z coordinate of the position of this object in the coordinate space of the scene.
@@ -541,7 +541,7 @@ class Object3D:
         """
 
         self.name = objName
-        self.idx = None
+        self.object3d = None
         self.x = 0
         self.y = 0
         self.z = 0
@@ -589,8 +589,8 @@ class Object3D:
         self.y = locy
         self.z = locz
         try:
-            mh.setObjLocation(self.idx, self.x, self.y, self.z)
-        except IndexError, text:
+            self.object3d.setTranslation(self.x, self.y, self.z)
+        except AttributeError, text:
             print(text)
         #TODO: try-except for all setXxx
         
@@ -613,8 +613,8 @@ class Object3D:
         self.ry = ry
         self.rz = rz
         try:
-            mh.setObjRotation(self.idx, self.rx, self.ry, self.rz)
-        except IndexError, text:
+            self.object3d.setRotation(self.rx, self.ry, self.rz)
+        except AttributeError, text:
             print(text)
 
     def setScale(self,sx,sy,sz):
@@ -636,11 +636,11 @@ class Object3D:
         self.sy = sy
         self.sz = sz
         try:
-            mh.setObjScale(self.idx, self.sx, self.sy, self.sz)
-        except IndexError, text:
+            self.object3d.setScale(self.sx, self.sy, self.sz)
+        except AttributeError, text:
             print(text)
 
-    def setVisibility(self,visible):
+    def setVisibility(self, visible):
         """
         This method sets the visibility of the object.
 
@@ -652,8 +652,8 @@ class Object3D:
         """
         self.visibility = visible
         try:
-            mh.setVisibility(self.idx, visible)
-        except IndexError, text:
+            self.object3d.visibility = visible
+        except AttributeError, text:
             print(text)
             
     def setPickable(self,pickable):
@@ -668,7 +668,7 @@ class Object3D:
         """
         self.pickable = pickable
         try:
-            mh.setPickable(self.idx, pickable)
+            self.object3d.pickable = pickable
         except IndexError, text:
             print(text)
 
@@ -695,8 +695,8 @@ class Object3D:
                     textureCache[path].modified = os.stat(path).st_mtime
             
             try:                
-                mh.setObjTexture(self.idx, textureCache[path].id)
-            except IndexError, text:
+                self.object3d.texture = textureCache[path].id
+            except AttributeError, text:
                 print(text)
         else:
             texture = None
@@ -707,8 +707,8 @@ class Object3D:
             else:
                 try:
                     textureCache[path] = Texture(texture, os.stat(path).st_mtime)
-                    mh.setObjTexture(self.idx, texture)
-                except IndexError, text:
+                    self.object3d.texture = texture
+                except AttributeError, text:
                     print(text)
     
             
@@ -720,9 +720,9 @@ class Object3D:
         
         """
         self.texture = None
-        mh.setObjTexture(self.idx, 0)
+        self.object3d.texture = 0;
 
-    def setShadeless(self,shadeVal):
+    def setShadeless(self, shadeless):
         """
         This method is used to specify whether or not the object is affected by lights.
         This is used for certain GUI controls to give them a more 2D type
@@ -735,10 +735,10 @@ class Object3D:
             *int* Whether or not the object is unaffected by lights. If 0, it is affected by lights; if 0, it is not.
 
         """
-        self.shadeless = shadeVal
+        self.shadeless = shadeless
         try:                
-            mh.setShadeless(self.idx, self.shadeless)
-        except IndexError, text:
+            self.object3d.shadeless = self.shadeless
+        except AttributeError, text:
             print(text)
         
 
@@ -755,8 +755,8 @@ class Object3D:
         """
         self.text = text
         try:
-            mh.setText(self.idx, self.text)
-        except IndexError, text:
+            self.object3d.text = self.text
+        except AttributeError, text:
             print(text)
         
 
@@ -790,7 +790,7 @@ class Object3D:
                 return fg
         return None
 
-    def setCameraProjection(self,mode):
+    def setCameraProjection(self, cameraMode):
         """
         This method sets the camera mode used to visualize this object (fixed or movable).
         The 3D engine has two camera modes (both perspective modes).
@@ -804,10 +804,10 @@ class Object3D:
         mode:
             *int*  The camera mode to be used for this object. 0 = fixed camera; 1 = movable camera
         """
-        self.cameraMode = mode        
+        self.cameraMode = cameraMode
         try:
-            mh.setCameraMode(self.idx,mode)
-        except IndexError, text:
+            self.object3d.cameraMode = self.cameraMode
+        except AttributeError, text:
             print(text)
 
 
@@ -1047,14 +1047,12 @@ class Scene3D:
         #Re-send all
         for obj in self.objects:
             self.assignSelectionID(obj)
-            #print "sending: ", obj.name, obj.idx, len(obj.verts)
+            #print "sending: ", obj.name, len(obj.verts)
             coIdx = 0
             fidx = 0
             uvIdx = 0
             colIdx = 0
-            mh.addObj(obj.idx, obj.x, obj.y, obj.z, obj.vertexBufferSize, obj.indexBuffer)  # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
-            mh.setCameraMode(obj.idx,obj.cameraMode)
-            mh.setShadeless(obj.idx, obj.shadeless)
+            obj.object3d = mh.addObj(obj.x, obj.y, obj.z, obj.vertexBufferSize, obj.indexBuffer)  # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
             
             for g in obj.facesGroups:
                 groupVerts = {};
@@ -1069,7 +1067,11 @@ class Scene3D:
                     i = 0
                     for v in f.verts:
                         if v.idx not in groupVerts:
-                            mh.setAllCoord(obj.idx, coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+                            #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+                            obj.object3d.setVertCoord(coIdx, v.co)
+                            obj.object3d.setNormCoord(coIdx, v.no)
+                            obj.object3d.setColorIDComponent(coIdx, f.colorID)
+                            obj.object3d.setColorComponent(colIdx, faceColor[i])
                             groupVerts[v.idx] = set()
                             groupVerts[v.idx].add(fUV[i])
                             
@@ -1077,32 +1079,37 @@ class Scene3D:
                             colIdx += 1
                             
                             if obj.uvValues:
-                                mh.setUVCoord(obj.idx, uvIdx, obj.uvValues[fUV[i]])
+                                obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
                                 uvIdx += 1
                             
                         elif fUV[i] not in groupVerts[v.idx]:
-                            mh.setAllCoord(obj.idx, coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+                            #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+                            obj.object3d.setVertCoord(coIdx, v.co)
+                            obj.object3d.setNormCoord(coIdx, v.no)
+                            obj.object3d.setColorIDComponent(coIdx, f.colorID)
+                            obj.object3d.setColorComponent(colIdx, faceColor[i])
                             groupVerts[v.idx].add(fUV[i])
                             
                             coIdx += 1
                             colIdx += 1
                             
                             if obj.uvValues:
-                                mh.setUVCoord(obj.idx, uvIdx, obj.uvValues[fUV[i]])
+                                obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
                                 uvIdx += 1
                             
                         i += 1
                         
             if obj.texture:
                 obj.setTexture(obj.texture)
-                
-            mh.setObjLocation(obj.idx, obj.x, obj.y, obj.z)
-            mh.setObjRotation(obj.idx, obj.rx, obj.ry, obj.rz)
-            mh.setObjScale(obj.idx, obj.sx, obj.sy, obj.sz)
-            mh.setVisibility(obj.idx, obj.visibility)
-            mh.setPickable(obj.idx, obj.pickable)
-            mh.setCameraMode(obj.idx,obj.cameraMode)
-            mh.setText(obj.idx, obj.text)
+
+            obj.object3d.setTranslation(obj.x, obj.y, obj.z)
+            obj.object3d.setRotation( obj.rx, obj.ry, obj.rz)
+            obj.object3d.setScale(obj.sx, obj.sy, obj.sz)
+            obj.object3d.visibility = obj.visibility
+            obj.object3d.shadeless = obj.shadeless
+            obj.object3d.pickable = obj.pickable
+            obj.object3d.cameraMode = obj.cameraMode
+            obj.object3d.text = obj.text
             #TODO add all obj attributes
             
 
@@ -1483,7 +1490,6 @@ class Scene3D:
         """
 
         newObj = Object3D(name)
-        newObj.idx = len(self.objects)
         self.objects.append(newObj)
         return newObj
 
@@ -1509,7 +1515,6 @@ class Scene3D:
 
         """
         newObj = Object3D(name)
-        newObj.idx = len(self.objects)
         newObj.x = obj.x
         newObj.y = obj.y
         newObj.z = obj.z
@@ -1550,6 +1555,8 @@ class Scene3D:
         name:
             *string*. The name of object to delete.
         """
+        
+        '''
         indexToDelete = None
         for obj in self.objects:
             if obj.name == name:
@@ -1561,6 +1568,7 @@ class Scene3D:
         #Update the index of objects
         for i,obj in enumerate(self.objects):
                 obj.idx = i
+        '''
 
 
     def assignSelectionID(self, obj):
@@ -1868,4 +1876,3 @@ class Scene3D:
         """
 
         mh.redraw(async)
-

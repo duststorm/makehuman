@@ -651,7 +651,7 @@ void mhConvertToWorld2D(const double screen[2], double world[3], int camera)
   glGetDoublev(GL_PROJECTION_MATRIX, projection);
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
-  glReadPixels(screen[0], viewport[3] - screen[1], 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, &z);
+  glReadPixels((GLint)screen[0], (GLint)(viewport[3] - screen[1]), 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, &z);
   gluUnProject(screen[0], viewport[3] - screen[1], z, modelview, projection, viewport, world, world + 1, world + 2);
 }
 
@@ -938,7 +938,8 @@ void mhGUICameraPosition()
  */
 void mhDrawMeshes(int pickMode, int cameraType)
 {
-    int i;
+    PyObject *iterator;
+    Object3D *obj;
     
     if (!G.world)
     {
@@ -946,30 +947,32 @@ void mhDrawMeshes(int pickMode, int cameraType)
     }
 
     /*Draw all objects contained by G.world*/
-    for (i = 0; i < G.nObjs; i++)
+    iterator = PyObject_GetIter(G.world);
+
+    for (obj = (Object3D*)PyIter_Next(iterator); obj; obj = (Object3D*)PyIter_Next(iterator))
     {
-        if (G.world[i].inMovableCamera == cameraType)
+        if (obj->inMovableCamera == cameraType)
         {
-            if (G.world[i].isVisible && (!pickMode || G.world[i].isPickable))
+            if (obj->isVisible && (!pickMode || obj->isPickable))
             {
                 //printf("draw obj n %i\n",G.world[i].nVerts/3);
                 /*Transform the current object*/
                 glPushMatrix();
-                glTranslatef(G.world[i].location[0], G.world[i].location[1], G.world[i].location[2]);
-                glRotatef(G.world[i].rotation[0], 1, 0, 0);
-                glRotatef(G.world[i].rotation[1], 0, 1, 0);
-                glRotatef(G.world[i].rotation[2], 0, 0, 1);
-                glScalef(G.world[i].scale[0], G.world[i].scale[1], G.world[i].scale[2]);
+                glTranslatef(obj->location[0], obj->location[1], obj->location[2]);
+                glRotatef(obj->rotation[0], 1, 0, 0);
+                glRotatef(obj->rotation[1], 0, 1, 0);
+                glRotatef(obj->rotation[2], 0, 0, 1);
+                glScalef(obj->scale[0], obj->scale[1], obj->scale[2]);
 
-                if (G.world[i].texture && !pickMode)
+                if (obj->texture && !pickMode)
                 {
                     glEnable(GL_TEXTURE_2D);
                     /*Bind the texture, that has the same index of object*/
 
                     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                    glBindTexture(GL_TEXTURE_2D, G.world[i].texture);
+                    glBindTexture(GL_TEXTURE_2D, obj->texture);
 
-                    glTexCoordPointer(2, GL_FLOAT, 0, G.world[i].UVs);
+                    glTexCoordPointer(2, GL_FLOAT, 0, obj->UVs);
                 }
 
                 /*
@@ -979,42 +982,42 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 */
 
                 /*Fill the array pointers with object mesh data*/
-                glVertexPointer(3, GL_FLOAT, 0, G.world[i].verts);
-                glNormalPointer(GL_FLOAT, 0, G.world[i].norms);
+                glVertexPointer(3, GL_FLOAT, 0, obj->verts);
+                glNormalPointer(GL_FLOAT, 0, obj->norms);
 
 
                 /*Because the selection is based on color, the color array can have 2 values*/
                 if (pickMode)
                 {
                     /*Use color to pick i */
-                    glColorPointer(3, GL_UNSIGNED_BYTE, 0, G.world[i].colors);
+                    glColorPointer(3, GL_UNSIGNED_BYTE, 0, obj->colors);
                 }
                 else
                 {
                     /*Use color to draw i */
-                    glColorPointer(4, GL_UNSIGNED_BYTE, 0, G.world[i].colors2);
+                    glColorPointer(4, GL_UNSIGNED_BYTE, 0, obj->colors2);
                     /*draw text attribute if there is one; because this function
                     restores lighting, it can be used only in non picking mode*/
-                    if (G.world[i].textString && G.world[i].textString[0] != '\0')
-                        mhDrawText(G.world[i].location[0], G.world[i].location[1], G.world[i].textString);
+                    if (obj->textString && obj->textString[0] != '\0')
+                        mhDrawText(obj->location[0], obj->location[1], obj->textString);
                 }
 
                 /*Disable lighting if the object is shadeless*/
-                if (G.world[i].shadeless || pickMode)
+                if (obj->shadeless || pickMode)
                 {
                     glDisable(GL_LIGHTING);
                 }
 
                 /*draw the mesh*/
-                glDrawElements(GL_TRIANGLES, G.world[i].nTrigs * 3, GL_UNSIGNED_INT, G.world[i].trigs);
+                glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
 
                 /*Enable lighting if the object was shadeless*/
-                if (G.world[i].shadeless || pickMode)
+                if (obj->shadeless || pickMode)
                 {
                     glEnable(GL_LIGHTING);
                 }
 
-                if (G.world[i].texture && !pickMode)
+                if (obj->texture && !pickMode)
                 {
                     glDisable(GL_TEXTURE_2D);
                     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1023,7 +1026,11 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 glPopMatrix();
             }
         }
+
+        Py_DECREF((PyObject*)obj);
     }
+
+    Py_DECREF(iterator);
 }
 
 /** \brief Draw all visible 3D objects.

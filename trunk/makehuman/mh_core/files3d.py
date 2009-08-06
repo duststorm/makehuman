@@ -109,7 +109,7 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
     #print "DEBUG FACEGROUP",faceGroupsNames
 
     for i, v in enumerate(verts):      
-        v = module3d.Vert(v, i, obj.idx, vertsSharedFaces[i])
+        v = module3d.Vert(v, i, obj, vertsSharedFaces[i])
         obj.verts.append(v)     
 
     gIndex = 0

@@ -30,86 +30,199 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _DEBUG
+  #undef _DEBUG
+  #include <Python.h>
+  #define _DEBUG
+#else
+  #include <Python.h>
+#endif
+#include "structmember.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+void RegisterObject3D(PyObject *module);
+
 /*! \brief 3D object basic structure. */
 /*!        3D object basic structure. */
-struct object3D
+typedef struct
 {
+    PyObject_HEAD
     int shadeless;              /**< \brief Whether this object is affected by scene lights or not.                                     */
     unsigned int texture;       /**< \brief a texture id or 0 if this object doesn't have a texture.                                    */
     int isVisible;              /**< \brief Whether this object is currently visible or not.                            */
-    /**<        An int defining whether this object is currently visible or not.            */
+                                /**<        An int defining whether this object is currently visible or not.            */
     int inMovableCamera;        /**< \brief Whether this object uses the Movable or Fixed camera mode.                  */
-    /**<        An int defining whether this object uses the Movable or Fixed camera mode.  */
+                                /**<        An int defining whether this object uses the Movable or Fixed camera mode.  */
     int isPickable;             /**< \brief Whether this object can be picked.                                          */
-    /**<        An int defining whether this object can be picked.                          */
+                                /**<        An int defining whether this object can be picked.                          */
     float location[3];          /**< \brief Tthe object location.                                                       */
-    /**<        Array of 3 floats defining the object location (x,y,z).                     */
+                                /**<        Array of 3 floats defining the object location (x,y,z).                     */
     float rotation[3];          /**< \brief The object orientation.                                                     */
-    /**<        Array of 3 floats defining the object orientation (x, y and z rotations).   */
+                                /**<        Array of 3 floats defining the object orientation (x, y and z rotations).   */
     float scale[3];             /**< \brief The object scale.                                                           */
-    /**<        Array of 3 floats defining the object size (x, y and z scale).              */
+                                /**<        Array of 3 floats defining the object size (x, y and z scale).              */
     int nVerts;                 /**< \brief The number of vertices in this object.                                      */
-    /**<        An int holding the number of vertices in this object.                       */
+                                /**<        An int holding the number of vertices in this object.                       */
     int nTrigs;                 /**< \brief The number of faces in this object.                                         */
-    /**<        An int holding the number of triangular faces in this object.
-                MakeHuman only supports triangular faces.                                   */
+                                /**<        An int holding the number of triangular faces in this object.
+                                            MakeHuman only supports triangular faces.                                   */
     int nNorms;                 /**< \brief The number of surface normals in this object.                               */
-    /**<        An int holding the number of surface normals defined for this object.       */
+                                /**<        An int holding the number of surface normals defined for this object.       */
     int nColors;                /**< \brief The number of colors used in this object.                                   */
-    /**<        An int holding the number of colors used in this object.                    */
+                                /**<        An int holding the number of colors used in this object.                    */
     int nColors2;               /**< \brief The number of colors used in this object.                                   */
-    /**<        An int holding the number of colors used in this object.
-                <b>EDITORIAL NOTE: One of these may be for 'false' colors. Find out which.</b>  */
+                                /**<        An int holding the number of colors used in this object.
+                                        <b>EDITORIAL NOTE: One of these may be for 'false' colors. Find out which.</b>  */
     int *trigs;                 /**< \brief The indices of faces in this object.                                        */
-    /**<        Three ints for each triangular face in this object.                         */
+                                /**<        Three ints for each triangular face in this object.                         */
     float *verts;               /**< \brief Pointer to the start of the list of vertex coordinates.                     */
-    /**<        A pointer to an array of floats containing the list of vertex coordinates
-                for each of the vertices defined for this object.
-                The x, y and z coordinates for a single vertex are stored sequentially in
-                this list.                                                                  */
+                                /**<        A pointer to an array of floats containing the list of vertex coordinates
+                                            for each of the vertices defined for this object.
+                                            The x, y and z coordinates for a single vertex are stored sequentially in
+                                            this list.                                                                  */
     float *norms;               /**< \brief Pointer to the start of the list of surface normals.                        */
-    /**<        A pointer to an array of floats containing the list of surface normals
-                defined for this object.
-                The x, y and z components for a single normal are stored sequentially in
-                this list.                                                                  */
+                                /**<        A pointer to an array of floats containing the list of surface normals
+                                            defined for this object.
+                                            The x, y and z components for a single normal are stored sequentially in
+                                            this list.                                                                  */
     float *UVs;                 /**< \brief Pointer to the start of the list of UV vectors.                             */
-    /**<        A pointer to an array of floats containing the list of UV vectors used for
-                texture mapping onto this object.
-                The U and V components for a single vector are stored sequentially in
-                this list.                                                                  */
+                                /**<        A pointer to an array of floats containing the list of UV vectors used for
+                                            texture mapping onto this object.
+                                            The U and V components for a single vector are stored sequentially in
+                                            this list.                                                                  */
     unsigned char *colors;      /**< \brief Pointer to the start of the list of color components.                       */
-    /**<        A pointer to an array of chars containing the list of color components
-                defined for this object. Each color component takes a single byte and can
-                have a value of 0-255.
-                The Red, Green and Blue components of a single color are
-                stored sequentially in this list.                                           */
+                                /**<        A pointer to an array of chars containing the list of color components
+                                            defined for this object. Each color component takes a single byte and can
+                                            have a value of 0-255.
+                                            The Red, Green and Blue components of a single color are
+                                            stored sequentially in this list.                                           */
     unsigned char *colors2;     /**< \brief Pointer to the start of the list of color components.                       */
-    /**<        A pointer to an array of chars containing the list of color components
-                defined for this object. Each color component takes a single byte and can
-                have a value of 0-255.
-                The Red, Green, Blue and Alpha Channel components of a single color are
-                stored sequentially in this list.                                           */
+                                /**<        A pointer to an array of chars containing the list of color components
+                                            defined for this object. Each color component takes a single byte and can
+                                            have a value of 0-255.
+                                            The Red, Green, Blue and Alpha Channel components of a single color are
+                                            stored sequentially in this list.                                           */
     char *textString;           /**< \brief Pointer to the start of a text string.                                      */
-    /**<        A pointer to a string of chars.                                             */
+                                /**<        A pointer to a string of chars.                                             */
+} Object3D;
+
+// Object3D attributes directly accessed by Python
+static PyMemberDef Object3D_members[] = {
+    {"shadeless", T_UINT, offsetof(Object3D, shadeless), 0, "Whether this object is affected by scene lights or not."},
+    {"texture", T_UINT, offsetof(Object3D, texture), 0, "A texture id or 0 if this object doesn't have a texture."},
+    {"visibility", T_INT, offsetof(Object3D, isVisible), 0, "Whether this object is currently visible or not."},
+    {"cameraMode", T_INT, offsetof(Object3D, inMovableCamera), 0, "Whether this object uses the Movable or Fixed camera mode."},
+    {"pickable", T_INT, offsetof(Object3D, isPickable), 0, "Whether this object can be picked."},
+    {NULL}  /* Sentinel */
 };
 
-typedef struct object3D OBJ3D;
-typedef struct object3D * OBJARRAY;
+// Object3D Methods
+PyObject *Object3D_setVertCoo(Object3D *self, PyObject *args);
+PyObject *Object3D_setNormCoo(Object3D *self, PyObject *args);
+PyObject *Object3D_setUVCoo(Object3D *self, PyObject *args);
+PyObject *Object3D_setColorIDComponent(Object3D *self, PyObject *args);
+PyObject *Object3D_setColorComponent(Object3D *self, PyObject *args);
+PyObject *Object3D_setTranslation(Object3D *self, PyObject *args);
+PyObject *Object3D_setRotation(Object3D *self, PyObject *args);
+PyObject *Object3D_setScale(Object3D *self, PyObject *args);
+
+static PyMethodDef Object3D_methods[] = {
+  {"setVertCoord", (PyCFunction)Object3D_setVertCoo, METH_VARARGS,
+   ""
+  },
+  {"setNormCoord", (PyCFunction)Object3D_setNormCoo, METH_VARARGS,
+   ""
+  },
+  {"setUVCoord", (PyCFunction)Object3D_setUVCoo, METH_VARARGS,
+   ""
+  },
+  {"setColorIDComponent", (PyCFunction)Object3D_setColorIDComponent, METH_VARARGS,
+   ""
+  },
+  {"setColorComponent", (PyCFunction)Object3D_setColorComponent, METH_VARARGS,
+   ""
+  },
+  {"setTranslation", (PyCFunction)Object3D_setTranslation, METH_VARARGS,
+   ""
+  },
+  {"setRotation", (PyCFunction)Object3D_setRotation, METH_VARARGS,
+   ""
+  },
+  {"setScale", (PyCFunction)Object3D_setScale, METH_VARARGS,
+   ""
+  },
+  {NULL}  /* Sentinel */
+};
+
+// Object3D attributes indirectly accessed by Python
+PyObject *Object3D_getText(Object3D *self, void *closure);
+int Object3D_setText(Object3D *self, PyObject *value, void *closure);
+
+static PyGetSetDef Object3D_getset[] = {
+  {"text", (getter)Object3D_getText, (setter)Object3D_setText, "The text of the object as a String or None if it doesn't have text.", NULL},
+  {NULL}
+};
+
+// Object3D object methods
+void Object3D_dealloc(Object3D *self);
+PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds);
+
+// Object3D type definition
+static PyTypeObject Object3DType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                                        // ob_size
+    "mh.object3D",                            // tp_name
+    sizeof(Object3D),                         // tp_basicsize
+    0,                                        // tp_itemsize
+    (destructor)Object3D_dealloc,             // tp_dealloc
+    0,                                        // tp_print
+    0,                                        // tp_getattr
+    0,                                        // tp_setattr
+    0,                                        // tp_compare
+    0,                                        // tp_repr
+    0,                                        // tp_as_number
+    0,                                        // tp_as_sequence
+    0,                                        // tp_as_mapping
+    0,                                        // tp_hash
+    0,                                        // tp_call
+    0,                                        // tp_str
+    0,                                        // tp_getattro
+    0,                                        // tp_setattro
+    0,                                        // tp_as_buffer
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
+    "Object3D object",                        // tp_doc
+    0,		                                    // tp_traverse
+    0,		                                    // tp_clear
+    0,		                                    // tp_richcompare
+    0,		                                    // tp_weaklistoffset
+    0,		                                    // tp_iter
+    0,		                                    // tp_iternext
+    Object3D_methods,                         // tp_methods
+    Object3D_members,                         // tp_members
+    Object3D_getset,                          // tp_getset
+    0,                                        // tp_base
+    0,                                        // tp_dict
+    0,                                        // tp_descr_get
+    0,                                        // tp_descr_set
+    0,                                        // tp_dictoffset
+    (initproc)Object3D_init,                  // tp_init
+    0,                                        // tp_alloc
+    Object3D_new,                             // tp_new
+};
 
 /** \brief A struct consolidating all global variables.
            A global struct - all globals must be here.
  */
 typedef struct
 {
-    OBJARRAY world;                /**< \brief A pointer to the list of objects.                                           */
+    PyObject *world;
+    //OBJARRAY world;                /**< \brief A pointer to the list of objects.                                           */
     /**<        A pointer to an array of object3D objects that contains the list of
                 currently defined objects.                                                  */
-    int nObjs;                     /**< \brief The total number of objects.                                                */
-    /**<        An int holding the number of objects currently defined.                     */
     float fovAngle;                /**< \brief The current Field Of View angle.                                            */
     /**<        A float holding the current Field of View of the camera.                    */
     float zoom;                    /**< \brief The current camera Zoom setting.                                            */
@@ -163,31 +276,13 @@ void callReloadTextures(void);
 
 // Scene methods
 void initscene(int n);
-void addObject(int objIndex, float locX, float locY,float locZ,
-               int numVerts, int numTrigs);
+PyObject *addObject(float locX, float locY,float locZ, int numVerts, int numTrigs);
 void setClearColor(float r, float g, float b, float a);
-
-// Object methods
-int setVertCoo(int objIndex, int vIdx, float x, float y, float z);
-int setNormCoo(int objIndex, int nIdx, float x, float y, float z);
-int setUVCoo(int objIndex, int nIdx, float u, float v);
-int setObjTexture(int objIndex, unsigned int texture);
-int setShadeless(int objIndex, int value);
-int setColorIDComponent(int objIndex, int nIdx, unsigned char r, unsigned char g, unsigned char b);
-int setColorComponent(int objIndex, int nIdx, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-int setVisibility(int objIndex, int visibility);
-int setPickable(int objIndex, int visibility);
-int setText(int objIndex, const char *objText);
-int setCamMode(int objIndex, int camMode);
-int setObjLoc(int objIndex, float locX, float locY, float locZ);
-int setObjRot(int objIndex, float rotX, float rotY, float rotZ);
-int setObjScale(int objIndex, float sizeX, float sizeY, float sizeZ);
 
 // Helper functions
 float *makeFloatArray(int n);
 unsigned char *makeUCharArray(int n);
 int *makeIntArray(int n);
-OBJARRAY objVector(int n);
 
 #ifdef __cplusplus
         }
