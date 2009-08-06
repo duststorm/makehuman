@@ -1333,7 +1333,7 @@ class Scene3D:
             *int* The modifier flags.
 
         """
-        print("keyDown %d %s %d" % (key, character, modifiers))
+        #print("keyDown %d %s %d" % (key, character, modifiers))
         self.keyPressed = key
         self.characterPressed = character
         self.application.keyDown(key, character, modifiers)
@@ -1355,7 +1355,7 @@ class Scene3D:
             *int* The modifier flags.
 
         """
-        print("keyUp %d %s %d" % (key, character, modifiers))
+        #print("keyUp %d %s %d" % (key, character, modifiers))
         self.application.keyUp(key, character, modifiers)
 
     def shutdown(self):

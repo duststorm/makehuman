@@ -249,7 +249,7 @@ def writeHairs(ribRepository):
     totalNumberOfHairs = 0
 
     blenderCurves2MHData()
-    hairsClass.generateHairStyle1()
+    #hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
     
     if isPreview == 1:
@@ -362,7 +362,7 @@ def MHData2BlenderCurves():
             blenderGuide = Blender.Object.Get(mhGuide.name).getData()
             for i in range(len(mhGuide.controlPoints)):
                 mhCp = mhGuide.controlPoints[i]
-                cPoint = [mhCp[0],mhCp[1],mhCp[2],1]# mul -1 to convert from renderman to Blender
+                cPoint = [mhCp[0],mhCp[1],mhCp[2],1]
                 blenderGuide.setControlPoint(0, i, cPoint)#we assume each curve has only one nurbs
                 blenderGuide.update()
 
@@ -455,7 +455,7 @@ def loadHairsFile(path):
     global tipMagnet,hairDiameterClump,hairDiameterMultiStrand
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
     global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
-    global blendDistance,sizeMultiStrand
+    global blendDistance,sizeMultiStrand,rootColor,tipColor
 
     hairsClass.loadHairs(path)
     scn = Scene.GetCurrent()
@@ -483,10 +483,35 @@ def loadHairsFile(path):
     randomPercentage.val= hairsClass.randomPercentage
     sizeClump.val= hairsClass.sizeClump
     sizeMultiStrand.val= hairsClass.sizeMultiStrand
+    rootColor.val = (hairsClass.rootColor[0],hairsClass.rootColor[1],hairsClass.rootColor[2])
+    tipColor.val = (hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2])
     blendDistance.val= hairsClass.blendDistance
     Window.RedrawAll()
 
+def randomizeCurves(xFactor=0.05,yFactor=0.05,zFactor=0.05):
 
+    groups = Group.Get()
+    for group in groups:       
+        
+        for obj in list(group.objects):
+            data = obj.getData()
+            name = obj.getName()
+            if type(data) == Types.CurveType:                
+                for curnurb in data:
+                    
+                    for i in range(len(curnurb)):
+                        p = curnurb[i]
+                        newX = p[0]+ xFactor*random.uniform(-1,1)  
+                        newY = p[1]+ yFactor*random.uniform(-1,1) 
+                        newZ = p[2]+ zFactor*random.uniform(-1,1)                  
+                        newP = [newX,newY,newZ,p[3]]
+                        
+                        data.setControlPoint(0, i, newP)#we assume each curve has only one nurbs
+                data.update()
+                        
+        
+    Window.RedrawAll()
+                        
 def printVertsIndices():
     data = Blender.Object.GetSelected()[0].getData()
     wem = Window.EditMode()
@@ -550,20 +575,22 @@ def event(evt, val):
     if (evt== QKEY and not val): Exit()
 
     if (evt== TKEY and not val):
-        blenderCurves2MHData()
+        randomizeCurves()
         #MHData2BlenderCurves()
         
     elif evt == IKEY:
-        printVertsIndices()
+        printVertsIndices()       
 
         adjustGuides()
+        
+    
     #Window.RedrawAll()
 
 def bevent(evt):
     global tipMagnet,hairDiameterClump,hairDiameterMultiStrand
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
     global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
-    global blendDistance,sizeMultiStrand
+    global blendDistance,sizeMultiStrand,rootCOlor,tipCOlor
 
     if   (evt== 1): Exit()
 
@@ -583,6 +610,8 @@ def bevent(evt):
         hairsClass.sizeClump= sizeClump.val
         hairsClass.sizeMultiStrand= sizeMultiStrand.val
         hairsClass.blendDistance= blendDistance.val
+        hairsClass.tipColor= tipColor.val
+        hairsClass.rootColor= rootColor.val
 
     elif (evt== 4):
         Window.FileSelector (saveHairsFile, "Save hair data")
