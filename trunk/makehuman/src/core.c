@@ -415,7 +415,7 @@ int Object3D_setText(Object3D *self, PyObject *value, void *closure)
     if (text)
     {
       free(self->textString);
-      self->textString = _strdup(text);
+      self->textString = strdup(text);
       return 0;
     }
     else
@@ -582,7 +582,7 @@ PyObject *addObject(float locX, float locY,float locZ, int numVerts, int numTrig
 {
     Object3D *obj;
 
-    Object3D *args = PyTuple_New(2);
+    PyObject *args = PyTuple_New(2);
     PyTuple_SetItem(args, 0, PyInt_FromLong(numVerts));
     PyTuple_SetItem(args, 1, PyInt_FromLong(numTrigs));
 

@@ -579,11 +579,11 @@ int main(int argc, char *argv[])
 
     if (argc >= 2 && strlen(argv[1]) < 68)
     {
-        sprintf_s(str, 80, "execfile(\"%s\")", argv[1]);
+        sprintf(str, "execfile(\"%s\")", argv[1]);
     }
     else
     {
-        strcpy_s(str, 80, "execfile(\"main.py\")");
+        strcpy(str, "execfile(\"main.py\")");
     }
 #ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
     adjustWorkingDir(argv[0]);
