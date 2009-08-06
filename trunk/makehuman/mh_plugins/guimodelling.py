@@ -140,7 +140,7 @@ class ModellingCategory(gui3d.Category):
           self.app.redo()
         elif event.key == events3d.SDLK_z:
           self.app.undo()
-      elif event.modifiers == KMOD_NUM:
+      elif event.modifiers == events3d.KMOD_NUM:
         # Camera rotation
         if event.key == events3d.SDLK_KP2:
           rot = self.app.scene3d.getCameraRotations()
