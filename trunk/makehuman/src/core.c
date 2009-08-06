@@ -36,6 +36,95 @@
 #else
   #include <Python.h>
 #endif
+#include "structmember.h"
+
+// Object3D attributes directly accessed by Python
+static PyMemberDef Object3D_members[] = {
+    {"shadeless", T_UINT, offsetof(Object3D, shadeless), 0, "Whether this object is affected by scene lights or not."},
+    {"texture", T_UINT, offsetof(Object3D, texture), 0, "A texture id or 0 if this object doesn't have a texture."},
+    {"visibility", T_INT, offsetof(Object3D, isVisible), 0, "Whether this object is currently visible or not."},
+    {"cameraMode", T_INT, offsetof(Object3D, inMovableCamera), 0, "Whether this object uses the Movable or Fixed camera mode."},
+    {"pickable", T_INT, offsetof(Object3D, isPickable), 0, "Whether this object can be picked."},
+    {NULL}  /* Sentinel */
+};
+
+// Object3D Methods
+static PyMethodDef Object3D_methods[] = {
+  {"setVertCoord", (PyCFunction)Object3D_setVertCoo, METH_VARARGS,
+   ""
+  },
+  {"setNormCoord", (PyCFunction)Object3D_setNormCoo, METH_VARARGS,
+   ""
+  },
+  {"setUVCoord", (PyCFunction)Object3D_setUVCoo, METH_VARARGS,
+   ""
+  },
+  {"setColorIDComponent", (PyCFunction)Object3D_setColorIDComponent, METH_VARARGS,
+   ""
+  },
+  {"setColorComponent", (PyCFunction)Object3D_setColorComponent, METH_VARARGS,
+   ""
+  },
+  {"setTranslation", (PyCFunction)Object3D_setTranslation, METH_VARARGS,
+   ""
+  },
+  {"setRotation", (PyCFunction)Object3D_setRotation, METH_VARARGS,
+   ""
+  },
+  {"setScale", (PyCFunction)Object3D_setScale, METH_VARARGS,
+   ""
+  },
+  {NULL}  /* Sentinel */
+};
+
+// Object3D attributes indirectly accessed by Python
+static PyGetSetDef Object3D_getset[] = {
+  {"text", (getter)Object3D_getText, (setter)Object3D_setText, "The text of the object as a String or None if it doesn't have text.", NULL},
+  {NULL}
+};
+
+// Object3D type definition
+static PyTypeObject Object3DType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                                        // ob_size
+    "mh.object3D",                            // tp_name
+    sizeof(Object3D),                         // tp_basicsize
+    0,                                        // tp_itemsize
+    (destructor)Object3D_dealloc,             // tp_dealloc
+    0,                                        // tp_print
+    0,                                        // tp_getattr
+    0,                                        // tp_setattr
+    0,                                        // tp_compare
+    0,                                        // tp_repr
+    0,                                        // tp_as_number
+    0,                                        // tp_as_sequence
+    0,                                        // tp_as_mapping
+    0,                                        // tp_hash
+    0,                                        // tp_call
+    0,                                        // tp_str
+    0,                                        // tp_getattro
+    0,                                        // tp_setattro
+    0,                                        // tp_as_buffer
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
+    "Object3D object",                        // tp_doc
+    0,		                                    // tp_traverse
+    0,		                                    // tp_clear
+    0,		                                    // tp_richcompare
+    0,		                                    // tp_weaklistoffset
+    0,		                                    // tp_iter
+    0,		                                    // tp_iternext
+    Object3D_methods,                         // tp_methods
+    Object3D_members,                         // tp_members
+    Object3D_getset,                          // tp_getset
+    0,                                        // tp_base
+    0,                                        // tp_dict
+    0,                                        // tp_descr_get
+    0,                                        // tp_descr_set
+    0,                                        // tp_dictoffset
+    (initproc)Object3D_init,                  // tp_init
+    0,                                        // tp_alloc
+    Object3D_new,                             // tp_new
+};
 
 /** \brief Registers the Object3D object in the Python environment.
  *  \param module The module to register the Object3D object in.
