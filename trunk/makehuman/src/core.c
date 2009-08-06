@@ -36,7 +36,11 @@
 #else
   #include <Python.h>
 #endif
-#include <structmember.h>
+#ifdef __APPLE__
+    #include <Python/structmember.h>
+#else
+    #include <structmember.h>
+#endif
 
 // Object3D attributes directly accessed by Python
 static PyMemberDef Object3D_members[] = {
