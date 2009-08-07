@@ -671,33 +671,6 @@ void callReloadTextures(void)
         Py_DECREF(v);
 }
 
-/** \brief Adds a 3D object into G.world.
- *  \param objIndex an int containing the index of the 3D object (used to index the G.world array).
- *  \param locX a float specifying the x coordinate of the object.
- *  \param locY a float specifying the y coordinate of the object.
- *  \param locZ a float specifying the z coordinate of the object.
- *  \param numVerts an int specifying the number of vertices in the object.
- *  \param numTrigs an int specifying the number of triangular faces in the object.
- *
- *  This function adds a 3D object into the G.world array.
- */
-/*PyObject *addObject(float locX, float locY,float locZ, int numVerts, int numTrigs)
-{
-    Object3D *obj;
-
-    PyObject *args = PyTuple_New(2);
-    PyTuple_SetItem(args, 0, PyInt_FromLong(numVerts));
-    PyTuple_SetItem(args, 1, PyInt_FromLong(numTrigs));
-
-    obj = (Object3D*)PyObject_CallObject((PyObject*)&Object3DType, args);
-
-    Py_DECREF(args);
-
-    PyList_Append(G.world, (PyObject*)obj);
-
-    return (PyObject*)obj;
-}*/
-
 void setClearColor(float r, float g, float b, float a)
 {
   G.clearColor[0] = r;
