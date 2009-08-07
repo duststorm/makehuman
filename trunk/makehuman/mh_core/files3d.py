@@ -568,7 +568,7 @@ def loadUV(path):
     return uvValues
 
 
-def loadMesh(scene,path,modeList=0,locX=0,locY=0,locZ=0,loadColors=1):
+def loadMesh(scene,path,locX=0,locY=0,locZ=0,loadColors=1):
     """
     This function loads the specified mesh objects into internal MakeHuman data structures,
     and return it.
@@ -578,9 +578,6 @@ def loadMesh(scene,path,modeList=0,locX=0,locY=0,locZ=0,loadColors=1):
    
     path:     
       *String*.  The file system path to the file containing the object to load.
-
-    modeList:
-      *list*.  The list used to store all objects associated to a specific mode.
 
     locX:
       *float* X location of loaded obj, default = 0
@@ -602,8 +599,6 @@ def loadMesh(scene,path,modeList=0,locX=0,locY=0,locZ=0,loadColors=1):
     objName = os.path.basename(path)    
     ob = scene.newObj(objName)
     
-    if modeList != 0: #this mean modelist is a list
-        modeList.append(ob)
     ob.path = path
     ob.x = locX
     ob.y = locY

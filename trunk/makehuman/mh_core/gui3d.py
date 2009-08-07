@@ -30,7 +30,7 @@ class Object(events3d.EventHandler):
   def __init__(self, view, mesh, texture = None, position = [0, 0, 9], camera = 0, shadeless = 1, visible = True):
     self.app = view.app
     self.view = view
-    self.mesh = files3d.loadMesh(self.app.scene3d, mesh, 0, position[0], position[1], position[2])
+    self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
     self.texture = texture
     self.meshName = mesh
     if texture:
