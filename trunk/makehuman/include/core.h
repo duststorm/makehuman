@@ -44,6 +44,8 @@ extern "C" {
 
 void RegisterObject3D(PyObject *module);
 
+extern PyTypeObject Object3DType;
+
 /*! \brief 3D object basic structure. */
 /*!        3D object basic structure. */
 typedef struct
@@ -188,8 +190,6 @@ void callKeyUp(int key, unsigned short character, int modifiers);
 void callReloadTextures(void);
 
 // Scene methods
-void initscene(int n);
-PyObject *addObject(float locX, float locY,float locZ, int numVerts, int numTrigs);
 void setClearColor(float r, float g, float b, float a);
 
 // Helper functions

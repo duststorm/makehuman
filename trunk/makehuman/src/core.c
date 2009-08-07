@@ -88,7 +88,7 @@ static PyGetSetDef Object3D_getset[] = {
 };
 
 // Object3D type definition
-static PyTypeObject Object3DType = {
+PyTypeObject Object3DType = {
     PyObject_HEAD_INIT(NULL)
     0,                                        // ob_size
     "mh.object3D",                            // tp_name
@@ -218,10 +218,15 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 {
   int numVerts, numTrigs;
+  PyObject *indexBuffer;
 
-  if (!PyArg_ParseTuple(args, "ii", &numVerts, &numTrigs))
+  if (!PyArg_ParseTuple(args, "iO", &numVerts, &indexBuffer) || !PyList_Check(indexBuffer))
     return -1;
 
+  // Faces are triangles
+  numTrigs = (int)PyList_Size(indexBuffer) / 3;
+
+  // Allocate arrays
   self->verts = makeFloatArray(numVerts * 3);
   self->norms = makeFloatArray(numVerts * 3);
   self->colors = makeUCharArray(numVerts * 3);
@@ -235,6 +240,21 @@ int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
   self->nTrigs = numTrigs;
   self->nColors = numVerts * 3;
   self->nColors2 = numVerts * 4;
+
+  // Copy face indices
+  {
+    PyObject *iterator = PyObject_GetIter(indexBuffer);
+    PyObject *item;
+    int index = 0;
+
+    for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
+    {
+        self->trigs[index++] = PyInt_AsLong(item);
+        Py_DECREF(item);
+    }
+
+    Py_DECREF(iterator);
+  }
 
   return 0;
 }
@@ -647,20 +667,6 @@ void callReloadTextures(void)
         Py_DECREF(v);
 }
 
-/** \brief Re-initialise the scene contained in G.world.
- *  \param n an int specifying the number of objects in the list of objects that will replace the objects currently in G.world.
- *
- *  This function frees up the memory currently being used to hold G.world.
- *  It then reinitializes G.world to make it ready to take the new list of objects.
- *
- */
-void initscene(int n)
-{
-    if (G.world)
-      Py_DECREF(G.world);
-    G.world = PyList_New(0);
-}
-
 /** \brief Adds a 3D object into G.world.
  *  \param objIndex an int containing the index of the 3D object (used to index the G.world array).
  *  \param locX a float specifying the x coordinate of the object.
@@ -671,7 +677,7 @@ void initscene(int n)
  *
  *  This function adds a 3D object into the G.world array.
  */
-PyObject *addObject(float locX, float locY,float locZ, int numVerts, int numTrigs)
+/*PyObject *addObject(float locX, float locY,float locZ, int numVerts, int numTrigs)
 {
     Object3D *obj;
 
@@ -686,7 +692,7 @@ PyObject *addObject(float locX, float locY,float locZ, int numVerts, int numTrig
     PyList_Append(G.world, (PyObject*)obj);
 
     return (PyObject*)obj;
-}
+}*/
 
 void setClearColor(float r, float g, float b, float a)
 {

@@ -62,7 +62,7 @@ Global G;
 void initGlobals(void)
 {
     // Objects
-    G.world = NULL;
+    G.world = PyList_New(0);
 
     // Camera
     G.fovAngle = 25;
@@ -410,40 +410,6 @@ static PyObject* mh_init3DScene(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
-/** \brief Add an object into the scene.
- *
- *  This function adds the object specified into the scene at the specified location.
- *  It returns a null value.
- */
-static PyObject* mh_addObj(PyObject *self, PyObject *args)
-{
-    int vertexbufferSize;
-    float objX,objY,objZ;
-    PyObject *indexBuffer;
-
-    if (!PyArg_ParseTuple(args, "fffiO", &objX, &objY, &objZ, &vertexbufferSize, &indexBuffer) || !PyList_Check(indexBuffer))
-    {
-        return NULL;
-    }
-    else
-    {
-      PyObject *iterator = PyObject_GetIter(indexBuffer);
-      PyObject *item;
-      int index = 0;
-      Object3D *self = (Object3D*)addObject(objX, objY, objZ, vertexbufferSize, (int)PyList_Size(indexBuffer) / 3);
-
-      for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
-      {
-          self->trigs[index++] = PyInt_AsLong(item);
-          Py_DECREF(item);
-      }
-
-      Py_DECREF(iterator);
-
-      return (PyObject*)self;
-    }
-}
-
 static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
 {
   float r, g, b, a;
@@ -528,10 +494,8 @@ static PyMethodDef EmbMethods[] =
     {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
     {"setCameraSettings", mh_setCameraSettings, METH_VARARGS, ""},
     {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
-    {"init3DScene", mh_init3DScene, METH_VARARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
-    {"addObj", mh_addObj, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
     {"LoadTexture", mh_LoadTexture, METH_VARARGS, ""},
     {"grabScreen", mh_GrabScreen, METH_VARARGS, ""},
@@ -575,8 +539,6 @@ int main(int argc, char *argv[])
     int err;
     PyObject *module;
 
-    initGlobals(); /* initialize all our globals */
-
     if (argc >= 2 && strlen(argv[1]) < 68)
     {
         sprintf(str, "execfile(\"%s\")", argv[1]);
@@ -599,8 +561,11 @@ int main(int argc, char *argv[])
     }
 
     PySys_SetArgv(argc, argv);
+
+    initGlobals(); /* initialize all our globals */
     module = Py_InitModule("mh", EmbMethods);
     RegisterObject3D(module);
+    PyModule_AddObject(module, "world", G.world);
 
 #if defined(__GNUC__) && defined(__WIN32__)
     PyRun_SimpleString("import sys\nfo = open(\"python_out.txt\", \"w\")\nsys.stdout = fo");

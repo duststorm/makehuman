@@ -951,6 +951,9 @@ void mhDrawMeshes(int pickMode, int cameraType)
 
     for (obj = (Object3D*)PyIter_Next(iterator); obj; obj = (Object3D*)PyIter_Next(iterator))
     {
+        if (!PyObject_TypeCheck(obj, &Object3DType))
+          continue;
+
         if (obj->inMovableCamera == cameraType)
         {
             if (obj->isVisible && (!pickMode || obj->isPickable))

@@ -1040,11 +1040,10 @@ class Scene3D:
 
         nObjs = len(self.objects)
         self.colorID = [0,0,0]#reset the colors selection ID
-
-        #Free all memory
-        mh.init3DScene(nObjs)
-
-        #Re-send all
+        
+        mh.world[:] = []
+        
+        #Send all
         for obj in self.objects:
             self.assignSelectionID(obj)
             #print "sending: ", obj.name, len(obj.verts)
@@ -1052,7 +1051,9 @@ class Scene3D:
             fidx = 0
             uvIdx = 0
             colIdx = 0
-            obj.object3d = mh.addObj(obj.x, obj.y, obj.z, obj.vertexBufferSize, obj.indexBuffer)  # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
+            # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
+            obj.object3d = mh.Object3D(obj.vertexBufferSize, obj.indexBuffer)
+            mh.world.append(obj.object3d)
             
             for g in obj.facesGroups:
                 groupVerts = {};
@@ -1556,20 +1557,11 @@ class Scene3D:
             *string*. The name of object to delete.
         """
         
-        '''
-        indexToDelete = None
         for obj in self.objects:
             if obj.name == name:
-                indexToDelete = obj.idx
-                break
-        if indexToDelete:
-            del self.objects[indexToDelete]
-
-        #Update the index of objects
-        for i,obj in enumerate(self.objects):
-                obj.idx = i
-        '''
-
+              self.objects.remove(obj)
+              mh.world.remove(obj)
+              break;
 
     def assignSelectionID(self, obj):
         """
