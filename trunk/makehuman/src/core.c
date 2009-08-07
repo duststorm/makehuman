@@ -158,6 +158,7 @@ void Object3D_dealloc(Object3D *self)
   free(self->UVs);
   free(self->colors);
   free(self->colors2);
+
   free(self->textString);
 
   // Free Python data
@@ -177,33 +178,36 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   // Init our data
   if (self)
   {
-    self->verts = NULL;
-    self->norms = NULL;
-    self->colors = NULL;
-    self->colors2 = NULL;
-    self->UVs = NULL;
+    self->shadeless = 0;
+    self->texture = 0;
+    self->isVisible = 1;
+    self->inMovableCamera = 1;
+    self->isPickable = 1;
 
-    self->nVerts = 0;
-    self->trigs = 0;
-    self->nNorms = 0;
-    self->nTrigs = 0;
-    self->nColors = 0;
-    self->nColors2 = 0;
     self->location[0] = 0.0;
     self->location[1] = 0.0;
     self->location[2] = 0.0;
-    self->isVisible = 1;
-    self->isPickable = 1;
     self->rotation[0] = 0.0;
     self->rotation[1] = 0.0;
     self->rotation[2] = 0.0;
     self->scale[0] = 1.0;
     self->scale[1] = 1.0;
     self->scale[2] = 1.0;
-    self->inMovableCamera = 1;
+
+    self->trigs = NULL;
+    self->verts = NULL;
+    self->norms = NULL;
+    self->UVs = NULL;
+    self->colors = NULL;
+    self->colors2 = NULL;
+
+    self->nTrigs = 0;
+    self->nVerts = 0;
+    self->nNorms = 0;
+    self->nColors = 0;
+    self->nColors2 = 0;
+    
     self->textString = NULL;
-    self->texture = 0;
-    self->shadeless = 0;
   }
 
   return (PyObject*)self;
