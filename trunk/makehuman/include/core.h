@@ -53,6 +53,7 @@ typedef struct
     PyObject_HEAD
     int shadeless;              /**< \brief Whether this object is affected by scene lights or not.                     */
     unsigned int texture;       /**< \brief a texture id or 0 if this object doesn't have a texture.                    */
+    unsigned int shader;        /**< \brief a shader id or 0 if this object doesn't have a shader.                      */
     int isVisible;              /**< \brief Whether this object is currently visible or not.                            */
                                 /**<        An int defining whether this object is currently visible or not.            */
     int inMovableCamera;        /**< \brief Whether this object uses the Movable or Fixed camera mode.                  */

@@ -515,6 +515,7 @@ class Object3D:
     - **self.cameraMode**: *int flag* A flag to indicate which of the two available perspective camera projections, fixed or movable, is to be used to draw this object.
     - **self.visibility**: *int flag* A flag to indicate whether or not this object is visible.
     - **self.texture**: *string* The path of a TGA file on disk containing the object texture.
+    - **self.shader**: *int* The shader.
     - **self.isSelected**: *int flag* A flag to indicate whether this object is currently selected.
     - **self.faceGroupSelected**: *string* The name of actually selected face group.
     - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
@@ -561,6 +562,7 @@ class Object3D:
         self.visibility = 1
         self.pickable = 1
         self.texture = None
+        self.shader = 0
         #self.colors = []
         self.isSelected = None
         self.faceGroupSelected = None
@@ -687,7 +689,7 @@ class Object3D:
         if path in textureCache:
             if os.stat(path).st_mtime != textureCache[path].modified:
                 try:
-                    mh.LoadTexture(path, textureCache[path].id)
+                    mh.loadTexture(path, textureCache[path].id)
                 except RuntimeError, text:
                     print(text)
                     return;
@@ -701,7 +703,7 @@ class Object3D:
         else:
             texture = None
             try:
-                texture = mh.LoadTexture(path, 0)
+                texture = mh.loadTexture(path, 0)
             except RuntimeError, text:
                 print(text)
             else:
@@ -721,6 +723,22 @@ class Object3D:
         """
         self.texture = None
         self.object3d.texture = 0;
+        
+    def setShader(self, shader):
+        """
+        This method is used to specify the shader.
+
+        Parameters
+        ----------
+        
+        path:
+            *int* The shader.
+        """
+        self.shader = shader
+        try:
+          self.object3d.shader = shader
+        except AttributeError, text:
+          print(text)
 
     def setShadeless(self, shadeless):
         """
@@ -1102,6 +1120,8 @@ class Scene3D:
                         
             if obj.texture:
                 obj.setTexture(obj.texture)
+                
+            obj.object3d.shader = obj.shader
 
             obj.object3d.setTranslation(obj.x, obj.y, obj.z)
             obj.object3d.setRotation( obj.rx, obj.ry, obj.rz)
@@ -1120,7 +1140,7 @@ class Scene3D:
         print("Reloading textures")
         for path in textureCache:
             try:
-                mh.LoadTexture(path, textureCache[path].id)
+                mh.loadTexture(path, textureCache[path].id)
             except RuntimeError, text:
                     print(text)
 
@@ -1536,6 +1556,7 @@ class Scene3D:
         newObj.cameraMode = obj.cameraMode
         newObj.visibility = obj.visibility
         newObj.texture = obj.texture
+        newObj.shader = obj.shader
         newObj.colors = obj.colors
         newObj.cameraMode = obj.cameraMode
         self.objects.append(newObj)

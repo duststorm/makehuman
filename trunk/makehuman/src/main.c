@@ -390,26 +390,6 @@ static PyObject* mh_setFullscreen(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
-/** \brief Initialize the scene in the GUI window.
- *
- *  This function passes through the instruction to the core.c module to reinitialize
- *  the set of objects stored in G.world by freeing memory from all objects previously
- *  recorded and creating an array of an appropriate size to take the new object list.
- *
- *  It returns a null value.
- */
-static PyObject* mh_init3DScene(PyObject *self, PyObject *args)
-{
-    int n;
-    if (!PyArg_ParseTuple(args, "i", &n))
-        return NULL;
-    else
-    {
-        initscene(n);
-    }
-    return Py_BuildValue("");
-}
-
 static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
 {
   float r, g, b, a;
@@ -436,6 +416,18 @@ static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
         return NULL;
     else
         return Py_BuildValue("i", texture);
+}
+
+PyObject* mh_CreateShader(PyObject *self, PyObject *args)
+{
+    int shader;
+    char *vertexShaderSource, *fragmentShaderSource;
+    if (!PyArg_ParseTuple(args, "ssi", &vertexShaderSource, &fragmentShaderSource, &shader))
+        return NULL;
+    else if (!(shader = mhCreateShader(vertexShaderSource, fragmentShaderSource, shader)))
+        return NULL;
+    else
+        return Py_BuildValue("i", shader);
 }
 
 static PyObject* mh_GrabScreen(PyObject *self, PyObject *args)
@@ -497,7 +489,8 @@ static PyMethodDef EmbMethods[] =
     {"redraw", mh_redraw, METH_VARARGS, ""},
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
-    {"LoadTexture", mh_LoadTexture, METH_VARARGS, ""},
+    {"loadTexture", mh_LoadTexture, METH_VARARGS, ""},
+    {"createShader", mh_CreateShader, METH_VARARGS, ""},
     {"grabScreen", mh_GrabScreen, METH_VARARGS, ""},
     {"startWindow", mh_startWindow, METH_VARARGS, ""},
     {"startEventLoop", mh_startEventLoop, METH_VARARGS, ""},

@@ -46,6 +46,7 @@
 static PyMemberDef Object3D_members[] = {
     {"shadeless", T_UINT, offsetof(Object3D, shadeless), 0, "Whether this object is affected by scene lights or not."},
     {"texture", T_UINT, offsetof(Object3D, texture), 0, "A texture id or 0 if this object doesn't have a texture."},
+    {"shader", T_UINT, offsetof(Object3D, shader), 0, "A shader id or 0 if this object doesn't have a shader."},
     {"visibility", T_INT, offsetof(Object3D, isVisible), 0, "Whether this object is currently visible or not."},
     {"cameraMode", T_INT, offsetof(Object3D, inMovableCamera), 0, "Whether this object uses the Movable or Fixed camera mode."},
     {"pickable", T_INT, offsetof(Object3D, isPickable), 0, "Whether this object can be picked."},
@@ -180,6 +181,7 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   {
     self->shadeless = 0;
     self->texture = 0;
+    self->shader = 0;
     self->isVisible = 1;
     self->inMovableCamera = 1;
     self->isPickable = 1;

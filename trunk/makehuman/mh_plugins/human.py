@@ -28,13 +28,17 @@ import time
 import subdivision
 import files3d
 import os
+import mh
 
 class Human(gui3d.Object):
     
     def __init__(self, globalScene, objFilePath):
         gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 1, shadeless = 0, visible = True)
         self.meshData = self.mesh
-        #self.meshData = files3d.loadMesh(globalScene, objFilePath, loadColors = None)
+        # Uncomment the following 3 lines to use a shader
+        #vertex_shader = open("data/shaders/glsl/toon_vertex_shader.txt").read()
+        #fragment_shader = open("data/shaders/glsl/toon_fragment_shader.txt").read()
+        #self.mesh.setShader(mh.createShader(vertex_shader, fragment_shader, 0))
         self.scene = globalScene
         self.progressBar = gui3d.ProgressBar(globalScene.application,
             backgroundTexture = globalScene.application.getThemeResource("images", "progressbar_background.png"),

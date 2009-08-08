@@ -31,9 +31,10 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-// Text and texture services
+// Text, shader and texture services
 void mhDrawText(float x, float y, const char *message);
-unsigned int mhLoadTexture(const char *fname, GLuint texture);
+GLuint mhLoadTexture(const char *fname, GLuint texture);
+GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShaderSource, GLuint shader);
 int mhGrabScreen(int x, int y, int width, int height, const char *filename);
 
 // Input events

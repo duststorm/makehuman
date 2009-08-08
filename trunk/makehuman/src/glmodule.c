@@ -66,6 +66,15 @@ static void *g_sdlImageHandle = NULL;
 static PFN_IMG_LOAD IMG_Load = NULL;
 #endif
 
+static int g_ShadersSupported = 0;
+static PFNGLCREATESHADERPROC glCreateShader = NULL;
+static PFNGLSHADERSOURCEPROC glShaderSource = NULL;
+static PFNGLCOMPILESHADERPROC glCompileShader = NULL;
+static PFNGLCREATEPROGRAMPROC glCreateProgram = NULL;
+static PFNGLATTACHSHADERPROC glAttachShader = NULL;
+static PFNGLLINKPROGRAMPROC glLinkProgram = NULL;
+static PFNGLUSEPROGRAMPROC glUseProgram = NULL;
+
 /** \brief Draw text at a specified location on the screen.
  *  \param x a float specifying the horizontal position in the GUI window.
  *  \param y a float specifying the vertical position in the GUI window.
@@ -125,7 +134,7 @@ static void mhFlipSurface(const SDL_Surface *surface)
  *
  *  This function loads a texture from a texture file and binds it into the OpenGL textures array.
  */
-unsigned int mhLoadTexture(const char *fname, GLuint texture)
+GLuint mhLoadTexture(const char *fname, GLuint texture)
 {
     int mode, components;
     SDL_Surface *surface;
@@ -204,6 +213,32 @@ unsigned int mhLoadTexture(const char *fname, GLuint texture)
     SDL_FreeSurface(surface);
 
     return texture;
+}
+
+GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShaderSource, GLuint shader)
+{
+  GLuint v, f, p;
+
+  if (!g_ShadersSupported)
+    return 0;
+
+  v = glCreateShader(GL_VERTEX_SHADER);
+	f = glCreateShader(GL_FRAGMENT_SHADER);
+
+  glShaderSource(v, 1, &vertexShaderSource, NULL);
+  glShaderSource(f, 1, &fragmentShaderSource, NULL);
+
+  glCompileShader(v);
+	glCompileShader(f);
+
+	p = glCreateProgram();
+	
+	glAttachShader(p, v);
+	glAttachShader(p, f);
+
+	glLinkProgram(p);
+	
+  return p;
 }
 
 /** \brief Capture a rectangular area from the screen into an image file.
@@ -768,51 +803,17 @@ void OnInit()
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
 
+    // Init shader functions
+    glCreateShader = (PFNGLCREATESHADERPROC)SDL_GL_GetProcAddress("glCreateShader");
+    glShaderSource = (PFNGLSHADERSOURCEPROC)SDL_GL_GetProcAddress("glShaderSource");
+    glCompileShader = (PFNGLCOMPILESHADERPROC)SDL_GL_GetProcAddress("glCompileShader");
+    glCreateProgram = (PFNGLCREATEPROGRAMPROC)SDL_GL_GetProcAddress("glCreateProgram");
+    glAttachShader = (PFNGLATTACHSHADERPROC)SDL_GL_GetProcAddress("glAttachShader");
+    glLinkProgram = (PFNGLLINKPROGRAMPROC)SDL_GL_GetProcAddress("glLinkProgram");
+    glUseProgram = (PFNGLUSEPROGRAMPROC)SDL_GL_GetProcAddress("glUseProgram");
 
-    /*LINES BELOW ARE JUST TO PRINT USEFUL INFO ABOUT USER MACHINE*/
-    /*
-    GLint redBits, greenBits, blueBits;
-    GLint packSwapBytes, packLSBfirst, unpackSwapBytes, unpackLSBfirst;
-    GLint packRowLength, packSkipRows, packSkipPixels, packAlignment;
-    GLint unpackRowLength, unpackSkipRows, unpackSkipPixels, unpackAlignment;
-    glGetIntegerv (GL_RED_BITS, &redBits);
-    glGetIntegerv (GL_GREEN_BITS, &greenBits);
-    glGetIntegerv (GL_BLUE_BITS, &blueBits);
-
-    glGetIntegerv (GL_PACK_SWAP_BYTES, &packSwapBytes);
-    glGetIntegerv (GL_PACK_LSB_FIRST, &packLSBfirst);
-    glGetIntegerv (GL_UNPACK_SWAP_BYTES, &unpackSwapBytes);
-    glGetIntegerv (GL_UNPACK_LSB_FIRST, &unpackLSBfirst);
-
-    glGetIntegerv (GL_PACK_ROW_LENGTH, &packRowLength);
-    glGetIntegerv (GL_PACK_SKIP_ROWS, &packSkipRows);
-    glGetIntegerv (GL_PACK_SKIP_PIXELS, &packSkipPixels);
-    glGetIntegerv (GL_PACK_ALIGNMENT, &packAlignment);
-    glGetIntegerv (GL_UNPACK_ROW_LENGTH, &unpackRowLength);
-    glGetIntegerv (GL_UNPACK_SKIP_ROWS, &unpackSkipRows);
-    glGetIntegerv (GL_UNPACK_SKIP_PIXELS, &unpackSkipPixels);
-    glGetIntegerv (GL_UNPACK_ALIGNMENT, &unpackAlignment);
-
-    printf("OPENGL INFO\n --------------\n");
-    printf("GL_VENDOR: %s\n",(char *)glGetString(GL_VENDOR));
-    printf("GL_RENDERER: %s\n" ,(char *)glGetString(GL_RENDERER));
-    printf("GL_VERSION: %s\n" ,(char *)glGetString(GL_VERSION));
-    //printf("GL_EXTENSIONS: %s\n" ,(char *)glGetString(GL_EXTENSIONS));
-
-    printf("Actual RGB bits used: %i, %i, %i\n",redBits, greenBits, blueBits);
-    printf("GL_PACK_SWAP_BYTES: %i\n",packSwapBytes);
-    printf("GL_PACK_LSB_FIRST: %i\n",packLSBfirst);
-    printf("GL_UNPACK_SWAP_BYTES: %i\n",unpackSwapBytes);
-    printf("GL_UNPACK_LSB_FIRST: %i\n",unpackLSBfirst);
-    printf("GL_PACK_ROW_LENGTH: %i\n",packRowLength);
-    printf("GL_PACK_SKIP_ROWS: %i\n",packSkipRows);
-    printf("GL_PACK_SKIP_PIXELS: %i\n",packSkipPixels);
-    printf("GL_PACK_ALIGNMENT: %i\n",packAlignment);
-    printf("GL_UNPACK_ROW_LENGTH: %i\n",unpackRowLength);
-    printf("GL_UNPACK_SKIP_ROWS: %i\n",unpackSkipRows);
-    printf("GL_UNPACK_SKIP_PIXELS: %i\n",unpackSkipPixels);
-    printf("GL_UNPACK_ALIGNMENT: %i\n",unpackAlignment);
-    */
+    g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader && glCreateProgram && glAttachShader &&
+      glLinkProgram && glUseProgram;
 
     // Init font
     G.fontOffset = glGenLists(256);
@@ -978,16 +979,9 @@ void mhDrawMeshes(int pickMode, int cameraType)
                     glTexCoordPointer(2, GL_FLOAT, 0, obj->UVs);
                 }
 
-                /*
-                int l;
-                for (l = 0; l < G.world[i].nVerts; l++)
-                    printf("oggetto %i, vert: %i\n",i,G.world[i].verts[l]);
-                */
-
                 /*Fill the array pointers with object mesh data*/
                 glVertexPointer(3, GL_FLOAT, 0, obj->verts);
                 glNormalPointer(GL_FLOAT, 0, obj->norms);
-
 
                 /*Because the selection is based on color, the color array can have 2 values*/
                 if (pickMode)
@@ -1011,8 +1005,16 @@ void mhDrawMeshes(int pickMode, int cameraType)
                     glDisable(GL_LIGHTING);
                 }
 
+                // Enable the shader if the driver supports it and there is a shader assigned
+                if (g_ShadersSupported && obj->shader)
+                  glUseProgram(obj->shader);
+
                 /*draw the mesh*/
                 glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
+
+                // Disable the shader if the driver supports it and there is a shader assigned
+                if (g_ShadersSupported && obj->shader)
+                  glUseProgram(0);
 
                 /*Enable lighting if the object was shadeless*/
                 if (obj->shadeless || pickMode)
