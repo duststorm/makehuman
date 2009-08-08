@@ -74,6 +74,10 @@ static PFNGLCREATEPROGRAMPROC glCreateProgram = NULL;
 static PFNGLATTACHSHADERPROC glAttachShader = NULL;
 static PFNGLLINKPROGRAMPROC glLinkProgram = NULL;
 static PFNGLUSEPROGRAMPROC glUseProgram = NULL;
+static PFNGLGETSHADERIVPROC glGetShaderiv = NULL;
+static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = NULL;
+static PFNGLGETPROGRAMIVPROC glGetProgramiv = NULL;
+static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = NULL;
 
 /** \brief Draw text at a specified location on the screen.
  *  \param x a float specifying the horizontal position in the GUI window.
@@ -218,6 +222,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture)
 GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShaderSource, GLuint shader)
 {
   GLuint v, f, p;
+  GLint status;
 
   if (!g_ShadersSupported)
     return 0;
@@ -229,7 +234,52 @@ GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShader
   glShaderSource(f, 1, &fragmentShaderSource, NULL);
 
   glCompileShader(v);
+  glGetShaderiv(v, GL_COMPILE_STATUS, &status);
+  if (status != GL_TRUE)
+  {
+    GLsizei logLength;
+    
+    glGetShaderiv(v, GL_INFO_LOG_LENGTH, &logLength);
+
+    if (logLength > 0)
+    {
+      char *log;
+      GLsizei charsWritten;
+
+      log = (char*)malloc(logLength);
+      glGetShaderInfoLog(v, logLength, &charsWritten, log);
+      PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
+      free(log);
+    }
+    else
+      PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
+
+    return 0;
+  }
+
 	glCompileShader(f);
+  glGetShaderiv(f, GL_COMPILE_STATUS, &status);
+  if (status != GL_TRUE)
+  {
+    GLsizei logLength;
+    
+    glGetShaderiv(f, GL_INFO_LOG_LENGTH, &logLength);
+
+    if (logLength > 0)
+    {
+      char *log;
+      GLsizei charsWritten;
+
+      log = (char*)malloc(logLength);
+      glGetShaderInfoLog(f, logLength, &charsWritten, log);
+      PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
+      free(log);
+    }
+    else
+      PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
+
+    return 0;
+  }
 
 	p = glCreateProgram();
 	
@@ -237,6 +287,28 @@ GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShader
 	glAttachShader(p, f);
 
 	glLinkProgram(p);
+  glGetProgramiv(f, GL_LINK_STATUS, &status);
+  if (status != GL_TRUE)
+  {
+    GLsizei logLength;
+    
+    glGetProgramiv(p, GL_INFO_LOG_LENGTH, &logLength);
+
+    if (logLength > 0)
+    {
+      char *log;
+      GLsizei charsWritten;
+
+      log = (char*)malloc(logLength);
+      glGetProgramInfoLog(p, logLength, &charsWritten, log);
+      PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
+      free(log);
+    }
+    else
+      PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
+
+    return 0;
+  }
 	
   return p;
 }
@@ -811,6 +883,10 @@ void OnInit()
     glAttachShader = (PFNGLATTACHSHADERPROC)SDL_GL_GetProcAddress("glAttachShader");
     glLinkProgram = (PFNGLLINKPROGRAMPROC)SDL_GL_GetProcAddress("glLinkProgram");
     glUseProgram = (PFNGLUSEPROGRAMPROC)SDL_GL_GetProcAddress("glUseProgram");
+    glGetShaderiv = (PFNGLGETSHADERIVPROC)SDL_GL_GetProcAddress("glGetShaderiv");
+    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)SDL_GL_GetProcAddress("glGetShaderInfoLog");
+    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)SDL_GL_GetProcAddress("glGetProgramiv");
+    glGetProgramInfoLog = ( PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
 
     g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader && glCreateProgram && glAttachShader &&
       glLinkProgram && glUseProgram;
