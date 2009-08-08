@@ -55,7 +55,7 @@ Section "Copy files"
   File /r /x .svn data\themes
   
   # Copy docs
-  SetOutPath $INSTDIR\doc
+  SetOutPath $INSTDIR\docs
   File /r /x .svn docs\*.pdf
 
   # Copy python files
@@ -82,9 +82,9 @@ Section "Create shortcuts"
   CreateDirectory "$SMPROGRAMS\Makehuman"
   SetOutPath $INSTDIR
   CreateShortCut "$SMPROGRAMS\Makehuman\Makehuman.lnk" "$INSTDIR\makehuman.exe" \
-    "" "$INSTDIR\makehuman.exe" 2 SW_SHOWNORMAL ""  "Makehuman"
+    "" "$INSTDIR\makehuman.exe" 0 SW_SHOWNORMAL ""  "Makehuman"
   CreateShortCut "$SMPROGRAMS\Makehuman\Uninstall.lnk" "$INSTDIR\Uninst.exe" \
-    "" "$INSTDIR\Uninst.exe" 2 SW_SHOWNORMAL ""  "Uninstall Makehuman"
+    "" "$INSTDIR\Uninst.exe" 0 SW_SHOWNORMAL ""  "Uninstall Makehuman"
     
 SectionEnd
 
