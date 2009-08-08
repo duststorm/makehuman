@@ -53,6 +53,10 @@ Section "Copy files"
   # Copy themes
   SetOutPath $INSTDIR\data
   File /r /x .svn data\themes
+  
+  # Copy docs
+  SetOutPath $INSTDIR\doc
+  File /r /x .svn docs\*.pdf
 
   # Copy python files
   SetOutPath $INSTDIR\mh_core
@@ -95,6 +99,7 @@ Section "Uninstall"
   
   # Remove Makehuman data folders
   RMDir /r $INSTDIR\data
+  RMDir /r $INSTDIR\docs
   RMDir /r $INSTDIR\mh_core
   RMDir /r $INSTDIR\mh_plugins
   RMDir /r $INSTDIR\pythonmodules
