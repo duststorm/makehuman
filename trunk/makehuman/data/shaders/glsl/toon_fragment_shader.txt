@@ -1,21 +1,49 @@
-varying vec3 normal;
-	
-void main()
+varying vec3 vNormal;
+varying vec3 vVertex;
+
+#define silhouetteThreshold 0.2
+#define shininess 20.0
+
+void main (void)
 {
-  float intensity;
-  vec4 color;
-  vec3 n = normalize(normal);
+
+  // Material Color:
+  vec4 materialColor = vec4(0.6, 0.6, 0.6, 1.0);//gl_FrontMaterial.diffuse;
+
+  // Silhouette Color:
+  vec4 silhouetteColor = vec4(0.0, 0.0, 0.0, 1.0);
+
+  // Specular Color:
+  vec4 specularColor = vec4(1.0, 1.0, 1.0, 1.0);//gl_FrontMaterial.specular;
+
+  // Lighting
+  vec3 eyePos = normalize(-vVertex); 
+  vec3 lightPos = gl_LightSource[0].position.xyz;
+
+  vec3 Normal = normalize(vNormal);
+  vec3 EyeVert = normalize(eyePos - vVertex);
+  vec3 LightVert = normalize(lightPos - vVertex);
+  vec3 EyeLight = normalize(LightVert + EyeVert);
+
+  // Simple Silhouette
+  float sil = max(dot(Normal, EyeVert), 0.0);
+  if (sil < silhouetteThreshold) 
+    gl_FragColor = silhouetteColor;
+  else 
+  {
+    gl_FragColor = materialColor;
   
-  intensity = dot(vec3(gl_LightSource[0].position),n);
+      // Specular part
+      float spec = pow(max(dot(Normal, EyeLight), 0.0), shininess);
   
-  if (intensity > 0.95)
-    color = vec4(1.0,0.5,0.5,1.0);
-  else if (intensity > 0.5)
-    color = vec4(0.6,0.3,0.3,1.0);
-  else if (intensity > 0.25)
-    color = vec4(0.4,0.2,0.2,1.0);
-  else
-    color = vec4(0.2,0.1,0.1,1.0);
+      if( spec < 0.2 )
+        gl_FragColor *= 0.98;
+      else
+        gl_FragColor = specularColor;
   
-  gl_FragColor = color;
+      // Diffuse part
+      float diffuse = max(dot(Normal, LightVert), 0.0);
+      if( diffuse < 0.5 )
+        gl_FragColor *= 0.9;
+  }
 }
