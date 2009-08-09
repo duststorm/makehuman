@@ -1082,14 +1082,14 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 }
 
                 // Enable the shader if the driver supports it and there is a shader assigned
-                if (g_ShadersSupported && obj->shader)
+                if (!pickMode && g_ShadersSupported && obj->shader)
                   glUseProgram(obj->shader);
 
                 /*draw the mesh*/
                 glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
-                if (g_ShadersSupported && obj->shader)
+                if (!pickMode && g_ShadersSupported && obj->shader)
                   glUseProgram(0);
 
                 /*Enable lighting if the object was shadeless*/
