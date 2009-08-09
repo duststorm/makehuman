@@ -287,7 +287,7 @@ GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShader
 	glAttachShader(p, f);
 
 	glLinkProgram(p);
-  glGetProgramiv(f, GL_LINK_STATUS, &status);
+  glGetProgramiv(p, GL_LINK_STATUS, &status);
   if (status != GL_TRUE)
   {
     GLsizei logLength;
