@@ -1,4 +1,5 @@
 varying vec3 normal, lightDir, halfVector;
+varying vec4 ambient_color, diffuse_color, specular_color;
 
 void main()
 {	
@@ -8,6 +9,13 @@ void main()
 
 	lightDir = vec3(gl_LightSource[0].position.xyz - vVertex);
 	halfVector = normalize(gl_LightSource[0].halfVector.xyz);
+	
+	ambient_color = (gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) + 
+    (gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
+		
+	diffuse_color = gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse;
+	
+	specular_color = gl_LightSource[0].specular * gl_FrontMaterial.specular;
 
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	gl_Position = ftransform();		

@@ -1,4 +1,5 @@
 varying vec3 normal, lightDir, halfVector;
+varying vec4 ambient_color, diffuse_color, specular_color;
 uniform sampler2D unit0;
 
 void main (void)
@@ -7,9 +8,7 @@ void main (void)
 	vec4 tex_color = texture2D(unit0, gl_TexCoord[0].st);
 	
 	// Ambient * texture color
-	vec4 final_color =
-    ((gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) + 
-    (gl_LightSource[0].ambient * gl_FrontMaterial.ambient)) * tex_color;
+	vec4 final_color = ambient_color * tex_color;
 							
 	vec3 N = normalize(normal);
 	vec3 L = normalize(lightDir);
@@ -19,13 +18,13 @@ void main (void)
 	if(NdotL > 0.0)
 	{
 		// Diffuse * texture color
-		final_color += gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse * NdotL * tex_color;	
+		final_color += diffuse_color * NdotL * tex_color;	
 		
 		// Specular
 		vec3 H = normalize(halfVector);
-		float NdotH = max(dot(N, H),0.0);
+		float NdotH = max(dot(N, H), 0.0);
 		float specular = pow(NdotH, gl_FrontMaterial.shininess);
-		final_color += gl_LightSource[0].specular * gl_FrontMaterial.specular * specular;	
+		final_color += specular_color * specular;	
 	}
 	
 	// Make sure we use the alpha from the texture
