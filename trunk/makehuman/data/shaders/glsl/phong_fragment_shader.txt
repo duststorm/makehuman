@@ -1,4 +1,4 @@
-varying vec3 normal, lightDir, eyeVec;
+varying vec3 normal, lightDir, halfVector;
 uniform sampler2D unit0;
 
 void main (void)
@@ -14,17 +14,17 @@ void main (void)
 	vec3 N = normalize(normal);
 	vec3 L = normalize(lightDir);
 	
-	float lambertTerm = dot(N,L);
+	float NdotL = max(dot(N, L), 0.0);
 	
-	if(lambertTerm > 0.0)
+	if(NdotL > 0.0)
 	{
 		// Diffuse * texture color
-		final_color += gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse * tex_color * lambertTerm;	
+		final_color += gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse * NdotL * tex_color;	
 		
 		// Specular
-		vec3 E = normalize(eyeVec);
-		vec3 R = reflect(-L, N);
-		float specular = pow(max(dot(R, E), 0.0), gl_FrontMaterial.shininess);
+		vec3 H = normalize(halfVector);
+		float NdotH = max(dot(N, H),0.0);
+		float specular = pow(NdotH, gl_FrontMaterial.shininess);
 		final_color += gl_LightSource[0].specular * gl_FrontMaterial.specular * specular;	
 	}
 	
