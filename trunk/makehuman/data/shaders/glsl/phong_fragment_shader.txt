@@ -3,7 +3,10 @@ uniform sampler2D unit0;
 
 void main (void)
 {
+	// Get the texture color
 	vec4 tex_color = texture2D(unit0, gl_TexCoord[0].st);
+	
+	// Ambient * texture color
 	vec4 final_color =
     ((gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) + 
     (gl_LightSource[0].ambient * gl_FrontMaterial.ambient)) * tex_color;
@@ -15,14 +18,18 @@ void main (void)
 	
 	if(lambertTerm > 0.0)
 	{
+		// Diffuse * texture color
 		final_color += gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse * tex_color * lambertTerm;	
 		
+		// Specular
 		vec3 E = normalize(eyeVec);
 		vec3 R = reflect(-L, N);
 		float specular = pow(max(dot(R, E), 0.0), gl_FrontMaterial.shininess);
 		final_color += gl_LightSource[0].specular * gl_FrontMaterial.specular * specular;	
 	}
 	
+	// Make sure we use the alpha from the texture
+	// otherwise the eyelashes and eyebrows are not tranparent
 	final_color.a = tex_color.a;
 	gl_FragColor = final_color;
 }
