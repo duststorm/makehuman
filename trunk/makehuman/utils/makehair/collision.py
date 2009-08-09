@@ -32,7 +32,6 @@ def drawLine(point1,point2,name):
     scn.objects.new(me,name)
     Blender.Redraw()
 
-
 def local2World(vec, matrix):
     x, y, z = vec
     xloc, yloc, zloc = matrix[3][0], matrix[3][1], matrix[3][2]
@@ -64,24 +63,34 @@ def drawNormal(i, obj, size,name):
     point1 = local2World(mesh.verts[i].co,obj.getMatrix())
     point2 = vecAdd(point1, scalarMult(size,normal))
     #drawLine(point1,point2,name)
-
-def getTangent(point,i,obj,size):
+ 
+def getTangent(point,i,obj,size,isNurb=False):
     mesh = obj.getData()
     L2 = local2World(mesh.verts[i].co,obj.getMatrix())
     vec1 = vecSub(point,L2)
     normal = mesh.verts[i].no
+    #if math.abs(diffang(vec1,normal))
     scalar = dotProd(normal,vec1)
-    tangent = vecSub(vec1,scalarMult(scalar,normal))
-    N= norm(tangent)
-    if not N==0: 
-        tangent = scalarMult(-size/N, tangent)
-        point2 = vecAdd(L2, tangent)
-        return[L2,point2]
-    else: 
-        tangent = [normal[0],-normal[2],normal[1]] #arbitrary rotation of 90deg.. choose x-axis rotation!
-        tangent = scalarMult(size,tangent)
-        point2 = vecAdd(L2,tangent)
-        return[L2,point2]
+    point2=[]
+    if isNurb and (not scalar == 0) and math.fabs(math.acos(scalar/norm(vec1))) > math.pi/2 : 
+    #For nurbs.. is angle of incidence obtuse? if so deflect through the same direction as incident from point
+        point2 = scalarMult(-size/norm(vec1),vec1)
+        point2= vecAdd(L2,point2)
+        print "point2 is: ", point2
+        print "Deflection is done through incidence"
+    else:
+        #YES! then try to deflect through the tangent space 
+        tangent = vecSub(vec1,scalarMult(scalar,normal))
+        N= norm(tangent)
+        if not N==0: 
+            tangent = scalarMult(-size/N, tangent)
+            point2 = vecAdd(L2, tangent)
+            #return[L2,point2]
+        else: #collision and normal lines are parallel
+            tangent = [normal[0],-normal[2],normal[1]] #arbitrary rotation of 90deg.. choose x-axis rotation!
+            tangent = scalarMult(size,tangent)
+            point2 = vecAdd(L2,tangent)
+    return[L2,point2]
 
  #check if an unordered interval (i.e. we can have [a,b] with a>=b) is in an ordered interval (i.e. [a,b] has always a<=b)
 def unordInOrd(unord,ord):
@@ -150,10 +159,12 @@ def lineInColoredLeaf(line, root): #root is of type SimpleOctreeVolume found in 
 def distance(point1,point2):
     return math.sqrt(math.pow(point1[0]-point2[0],2)+math.pow(point1[1]-point2[1],2)+math.pow(point1[2]-point2[2],2))
     
-#line consist of two vertices in world coordinates
+#line consist of two vertices in world coordinates, line is in general two subsequent control point of a curve
 #i is the ith vertex of object by which line must be deflected
+#isNurb asks whether line is subsequent controlPoint of a nurb, if yes then the algorithm is improved so deflection regards the actualy 
+#curve and not the line connecting controlpoints
 #TEST PASSED
-def deflectThruTangent(line,obj,gravity): #assume gravity is negative y-direction!
+def deflect(line,obj,gravity,isNurb=True): #assume gravity is negative y-direction!
     G=[0,-1,0] #vector direction of gravity
     mesh = obj.getData()
     #dist = distance(line[0],mesh.verts[0].co)
@@ -169,19 +180,19 @@ def deflectThruTangent(line,obj,gravity): #assume gravity is negative y-directio
                 dist = distTemp
                 near = j
     if near==[]:
-        print "near was []"
+        #print "near was []"
         return 0
     else:
         size = distance(mesh.verts[near].co,line[1])
     #get unit normal
-    #if size > 0:
-    if not gravity:
-        return getTangent(line[0],near,obj,size)
-    else: 
-        point = [mesh.verts[near].co[0],mesh.verts[near].co[1],mesh.verts[near].co[2]]
-        point = vecSub(point,G)
-        return getTangent(point,near,obj,size)
-    #else:
+    if size > 0.0001: #TODO add minimal unit
+        if not gravity:
+            return getTangent(line[0],near,obj,size,isNurb)
+        else: 
+            point = [mesh.verts[near].co[0],mesh.verts[near].co[1],mesh.verts[near].co[2]]
+            point = vecSub(point,G)
+            return getTangent(point,near,obj,size,isNurb)
+        #else:
     #    return 0 #0 means do not change the curve
 
 #assume the mesh vertices is in world coordinate
@@ -197,7 +208,7 @@ def collision(curve,obj,res,i=1,gravity=True):
         point1 = world2Local(curve[i-1],mat)
         point2 = world2Local(curve[i],mat)
         if lineInColoredLeaf([point1,point2],octree.root):
-            tangent = deflectThruTangent([curve[i-1],curve[i]],obj,gravity)
+            tangent = deflect([curve[i-1],curve[i]],obj,gravity)
             if not tangent ==0:
                 if not curve[i-1]==tangent[0]: #TODO in case after Tangent deflection we passthrough a second part of the body!
                     delta = vecSub(tangent[1],curve[i])
