@@ -1,10 +1,12 @@
 varying vec3 normal, lightDir, eyeVec;
+uniform sampler2D unit0;
 
 void main (void)
 {
-	vec4 final_color = 
-    (gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) + 
-    (gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
+	vec4 tex_color = texture2D(unit0, gl_TexCoord[0].st);
+	vec4 final_color =
+    ((gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) + 
+    (gl_LightSource[0].ambient * gl_FrontMaterial.ambient)) * tex_color;
 							
 	vec3 N = normalize(normal);
 	vec3 L = normalize(lightDir);
@@ -13,13 +15,14 @@ void main (void)
 	
 	if(lambertTerm > 0.0)
 	{
-		final_color += gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse * lambertTerm;	
+		final_color += gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse * tex_color * lambertTerm;	
 		
 		vec3 E = normalize(eyeVec);
 		vec3 R = reflect(-L, N);
-		float specular = pow( max(dot(R, E), 0.0), gl_FrontMaterial.shininess );
+		float specular = pow(max(dot(R, E), 0.0), gl_FrontMaterial.shininess);
 		final_color += gl_LightSource[0].specular * gl_FrontMaterial.specular * specular;	
 	}
-
-	gl_FragColor = final_color;			
+	
+	final_color.a = tex_color.a;
+	gl_FragColor = final_color;
 }

@@ -9,5 +9,6 @@ void main()
 	lightDir = vec3(gl_LightSource[0].position.xyz - vVertex);
 	eyeVec = -vVertex;
 
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 	gl_Position = ftransform();		
 }
