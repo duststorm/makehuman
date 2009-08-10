@@ -597,10 +597,16 @@ void UpdatePickingBuffer()
   {
     // Resize the buffer in case the window size has changed
     if  (pickingBufferSize != width * height * 3)
-      pickingBuffer = realloc(pickingBuffer, width * height * 3);
+    {
+      pickingBufferSize = width * height * 3;
+      pickingBuffer = realloc(pickingBuffer, pickingBufferSize);
+    }
   }
   else
-    pickingBuffer = malloc(width * height * 3);
+  {
+    pickingBufferSize = width * height * 3;
+    pickingBuffer = malloc(pickingBufferSize);
+  }
 
   // Turn off lighting
   glDisable(GL_LIGHTING);
@@ -621,6 +627,8 @@ void UpdatePickingBuffer()
   mhSceneCameraPosition();
   mhDrawMeshes(1, 1);
 
+  // Make sure the data is 1 byte aligned
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
   glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer);
 
   // Turn on antialiasing
@@ -673,38 +681,6 @@ void mhGetPickedColor(int x, int y)
       UpdatePickingBuffer();
 
     memcpy(G.color_picked, pickingBuffer + (y * viewport[2] + x) * 3, 3);
-
-    /*// Turn off lighting
-    glDisable(GL_LIGHTING);
-
-	  // Turn off antialiasing
-    glDisable (GL_BLEND);
-    glDisable(GL_MULTISAMPLE);
-
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glScissor(x - 1, viewport[3] - (y + 1), 3, 3);
-    glEnable(GL_SCISSOR_TEST);
-
-    // draw the objects in static camera
-    mhGUICameraPosition();
-    mhDrawMeshes(1, 0);
-
-    // draw the objects in dynamic camera
-    mhSceneCameraPosition();
-    mhDrawMeshes(1, 1);
-
-    glDisable(GL_SCISSOR_TEST);
-
-    // Reading the unique object color ID
-    glReadPixels(x, viewport[3] - y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, G.color_picked);
-
-	  // Turn on antialiasing
-    glEnable (GL_BLEND);
-    glEnable(GL_MULTISAMPLE);
-
-    // restore lighting
-    glEnable(GL_LIGHTING);*/
 }
 
 /** \brief Convert 3D OpenGL world coordinates to screen coordinates.
