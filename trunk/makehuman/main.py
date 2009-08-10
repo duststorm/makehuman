@@ -207,6 +207,7 @@ class MHApplication(gui3d.Application):
   def onStart(self, event):
       self.splash.hide()
       self.scene3d.selectedHuman.applyAllTargets()
+      mh.updatePickingBuffer();
       
   def onKeyDown(self, event):
     if event.modifiers & events3d.KMOD_CTRL:

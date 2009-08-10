@@ -106,6 +106,12 @@ static PyObject* mh_getKeyModifiers(PyObject *self, PyObject *args)
     return Py_BuildValue("i", G.modifiersKeyState);
 }
 
+static PyObject* mh_updatePickingBuffer(PyObject *self)
+{
+    UpdatePickingBuffer();
+    return Py_BuildValue("");
+}
+
 /** \brief Get the RGB value of the color that has been picked.
  *
  *  This function returns the color that has been picked as a Python list of 3 integers,
@@ -485,6 +491,7 @@ static PyMethodDef EmbMethods[] =
     {"setCameraZoom", mh_setCameraZoom, METH_VARARGS, ""},
     {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
     {"setCameraSettings", mh_setCameraSettings, METH_VARARGS, ""},
+    {"updatePickingBuffer", mh_updatePickingBuffer, METH_NOARGS, ""},
     {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
