@@ -29,6 +29,8 @@ from Blender.Scene import Render
 from Blender import Window
 from Blender import Group
 from Blender import Curve
+from collision import collision, world2Local, local2World
+import simpleoctree
 
 import subprocess
 import hairgenerator
@@ -55,6 +57,7 @@ tipColor= Create(hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipCol
 randomPercentage = Create(hairsClass.randomPercentage)
 blendDistance = Create(hairsClass.blendDistance)
 isPreview = Create(1)
+isCollision = Create(0)
 tipMagnet = Create(hairsClass.tipMagnet)
 
 compileComm = "aqsl shaders/hair.sl -o shaders/hair.slx"
@@ -96,9 +99,6 @@ def convertCoords(obj):
     sizeZ = SizeZ
 
     return (locX,locY,locZ,rotX,rotY,rotZ,sizeX,sizeY,sizeZ)
-
-
-
 
 def writeHeader(ribfile,imgFile):
 
@@ -245,12 +245,12 @@ def writeSubdividedObj(ribPath, mesh):
 
 def writeHairs(ribRepository):
 
-    global rootColor,tipColor,hairDiameter,preview,hairsClass
+    global rootColor,tipColor,hairDiameter,isPreview,isCollision,hairsClass,humanMesh
     totalNumberOfHairs = 0
 
     blenderCurves2MHData()
     #hairsClass.generateHairStyle1()
-    hairsClass.generateHairStyle2()
+    hairsClass.generateHairStyle2(humanMesh,isCollision==1)
     
     if isPreview == 1:
         hDiameter = hairsClass.sizeClump
@@ -342,14 +342,6 @@ def writeBody(ribfile, ribRepository):
     ribfile.write('\t\tReadArchive "%s"\n' %(ribObj))
     ribfile.write('\tAttributeEnd\n')
 
-
-def applyTransform(vec, matrix):
-	x, y, z = vec
-	xloc, yloc, zloc = matrix[3][0], matrix[3][1], matrix[3][2]
-	return	x*matrix[0][0] + y*matrix[1][0] + z*matrix[2][0] + xloc,\
-			x*matrix[0][1] + y*matrix[1][1] + z*matrix[2][1] + yloc,\
-			x*matrix[0][2] + y*matrix[1][2] + z*matrix[2][2] + zloc
-
 def updateHumanVerts():
     hairsClass.humanVerts = []
     for v in humanMesh.getData().verts:
@@ -384,7 +376,7 @@ def blenderCurves2MHData():
                 for curnurb in data:
                     for p in curnurb:
                         p1 = [p[0],p[1],p[2]]
-                        worldP = applyTransform(p1,matr) #convert the point in absolute coords
+                        worldP = local2World(p1,matr) #convert the point in absolute coords
                         p2 = [worldP[0],worldP[1],worldP[2]] #convert from Blender coord to Renderman coords
                         controlPoints.append(p2)
                     hairsClass.addHairGuide(controlPoints, name, g)
@@ -536,18 +528,19 @@ def draw():
     global hairDiameterClump,hairDiameterMultiStrand,alpha
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump,randomFactMultiStrand
     global tipMagnet,sizeMultiStrand,sizeClump,blendDistance
-    global samples,preview,randomPercentage
-    global rootColor,tipColor,isPreview
-
+    global randomPercentage, rootColor,tipColor,isPreview, isCollision
+    
     glClearColor(0.5, 0.5, 0.5, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
     buttonY = 10
 
     Button("Exit", 1, 210, buttonY, 100, 20)
-    Button("Rendering", 2, 10, buttonY, 200, 20)
+    Button("Render", 2, 10, buttonY, 100, 20)
+    Button("Collide guides", 8, 110, buttonY, 100, 20)
     Button("Save", 4, 10, buttonY+20, 150, 20)
     Button("Load", 5, 160, buttonY+20, 150, 20)
-    isPreview = Toggle("preview", 6, 10, buttonY+40, 150, 20, isPreview.val, "Rendering in preview mode")
+    isPreview = Toggle("Preview", 6, 10, buttonY+40, 150, 20, isPreview.val, "Rendering in preview mode")
+    isCollision = Toggle("Collision for all strands", 7, 160, buttonY+40, 150, 20, isCollision.val, "Implement collision detection")
 
     tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+80, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
     randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+100, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
@@ -590,7 +583,7 @@ def bevent(evt):
     global tipMagnet,hairDiameterClump,hairDiameterMultiStrand
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
     global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
-    global blendDistance,sizeMultiStrand,rootCOlor,tipCOlor
+    global blendDistance,sizeMultiStrand,rootCOlor,tipCOlor, humanMesh
 
     if   (evt== 1): Exit()
 
@@ -617,6 +610,37 @@ def bevent(evt):
         Window.FileSelector (saveHairsFile, "Save hair data")
     elif (evt== 5):
         Window.FileSelector (loadHairsFile, "Load hair data")
+    elif (evt==8):
+        scn = Scene.GetCurrent() #get current scene
+        mesh = humanMesh.getData()
+        mat = humanMesh.getMatrix()
+        verts=[]
+        for v in mesh.verts: #reduces vertices for simplifying octree, improves performance
+            if v.co[0]<=2 and v.co[0]>=-2 and v.co[1]<=8.6 and v.co[1]>=3.6: #2D bounding box between head and chest
+                verts.append(local2World(v.co,mat)) #localspace to worldspace
+        octree = simpleoctree.SimpleOctree(verts,0.08)
+        for obj in scn.objects:
+            if obj.type == "Curve":
+                data = obj.getData()
+                if data[0].isNurb():
+                    mat = obj.getMatrix()
+                    curve=[]
+                    for p in data[0]:
+                        curve.append(local2World([p[0],p[1],p[2]],mat))
+                    collision(curve,humanMesh,octree.minsize,9,True)
+                    N=data.getNumPoints(0)
+                    if N<len(curve):
+                        #Window.SetCursorPos(curve[len(curve)-1])
+                        for i in range(0,len(curve)):
+                            temp = world2Local(curve[i],mat)
+                            if i < N: 
+                                data.setControlPoint(0,i,[temp[0],temp[1],temp[2],1])
+                            else: 
+                                data.appendPoint(0,[temp[0],temp[1],temp[2],1])
+                        #data[0].recalc()
+                        data.update()
+        Blender.Redraw()
+
 
     #Window.RedrawAll()
 
