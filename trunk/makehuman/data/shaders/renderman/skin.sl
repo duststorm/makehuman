@@ -98,7 +98,7 @@ surface skin (
     
     Cdiff = (Cflat+ambient())*skin_matte;//-(1-ambient())/2;
 
-    Ci = mix(Cdiff,Csss,0.75);
+    Ci = mix(Cdiff,Csss,0.85);
     //Ci = Csss;
         
     /*
@@ -119,20 +119,23 @@ surface skin (
     
     
    
-    Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec;    
+       
     //Ci = glancing_highlight+(Ci*(1-pow((1-skin_matte),3)));
     //Ci = mix(Ci,Cflat,mixVal);
     
     
     //float desaturate_factor = 0.25*desaturation*pow(skin_matte, 3)*noise3D;
-    float desaturate_factor = 0.5* min((desaturation*pow(skin_matte, 3)+ comp(noise3D*specular(Nf,V,roughness)*spec,0)),1) ;
-    color desaturate_tone = color(comp(Ci, 0)*0.4,comp(Ci, 1),comp(Ci, 2));
+    float desaturate_factor = 0.5* min((desaturation*skin_matte+ comp(noise3D*specular(Nf,V,roughness)*spec,0)),1) ;
+    color desaturate_tone = color(comp(Ci, 0)*0.6,comp(Ci, 0),comp(Ci, 0));
+    color x2 = color((1-comp(Ci, 0))*0.5+1,1,1);
     color x = color(pow((1-angle_ramp),0.5)/10,0,0);
     Ci = mix(Ci,desaturate_tone,desaturate_factor)-x;
-     
-
     
-    Ci = Oi*Ci*Cflat*color(1,0.9,0.9);
+
+    Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec; 
+    Ci = Oi*(Ci*Cflat*x2)*Cflat;
+    
+    
     
 //Ci = glancing_highlight;
 //Ci = angle_ramp;
