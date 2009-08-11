@@ -106,7 +106,7 @@ static PyObject* mh_getKeyModifiers(PyObject *self, PyObject *args)
     return Py_BuildValue("i", G.modifiersKeyState);
 }
 
-static PyObject* mh_updatePickingBuffer(PyObject *self)
+static PyObject* mh_updatePickingBuffer(PyObject *self, PyObject *unused)
 {
     UpdatePickingBuffer();
     return Py_BuildValue("");
