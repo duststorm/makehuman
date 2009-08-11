@@ -351,6 +351,9 @@ static void CustomApplicationMain (int argc, char **argv)
     /* We're done, thank you for playing */
     exit(status);
 }
+
+@synthesize licenseWindowVisible;
+
 @end
 
 
