@@ -9,7 +9,7 @@
  <tr><td>SourceForge Home Page:                          </td>
      <td>http://sourceforge.net/projects/makehuman/      </td></tr>
  <tr><td>Authors:                                        </td>
-     <td>Manuel Bastioni, Paolo Colombo, Simone Re, Marc Flerackers </td></tr>
+     <td>Manuel Bastioni, Paolo Colombo, Simone Re, Marc Flerackers, Hans-Peter Dusel</td></tr>
  <tr><td>Copyright(c):                                   </td>
      <td>MakeHuman Team 2001-2009                        </td></tr>
  <tr><td>Licensing:                                      </td>
@@ -66,7 +66,7 @@ static void *g_sdlImageHandle = NULL;
 static PFN_IMG_LOAD IMG_Load = NULL;
 #endif
 
-static int g_ShadersSupported = 0;
+#ifndef __APPLE__ /* Mac OS X already supports this! */
 static PFNGLCREATESHADERPROC glCreateShader = NULL;
 static PFNGLSHADERSOURCEPROC glShaderSource = NULL;
 static PFNGLCOMPILESHADERPROC glCompileShader = NULL;
@@ -78,6 +78,11 @@ static PFNGLGETSHADERIVPROC glGetShaderiv = NULL;
 static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = NULL;
 static PFNGLGETPROGRAMIVPROC glGetProgramiv = NULL;
 static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = NULL;
+
+static int g_ShadersSupported = 0;
+#else
+static int g_ShadersSupported = 1;
+#endif /* ifndef __APPLE__*/
 
 /** \brief Draw text at a specified location on the screen.
  *  \param x a float specifying the horizontal position in the GUI window.
@@ -851,6 +856,7 @@ void OnInit()
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
 
+#ifndef __APPLE__ /* Omit initialization 'cos Mac OS X already supports this! */
     // Init shader functions
     glCreateShader = (PFNGLCREATESHADERPROC)SDL_GL_GetProcAddress("glCreateShader");
     glShaderSource = (PFNGLSHADERSOURCEPROC)SDL_GL_GetProcAddress("glShaderSource");
@@ -865,6 +871,8 @@ void OnInit()
     glGetProgramInfoLog = ( PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
 
     g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader && glCreateProgram && glAttachShader &&
+#endif // #ifndef __APPLE__
+
       glLinkProgram && glUseProgram;
 
     // Init font

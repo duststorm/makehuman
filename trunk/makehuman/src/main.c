@@ -9,7 +9,7 @@
  <tr><td>SourceForge Home Page:                          </td>
      <td>http://sourceforge.net/projects/makehuman/      </td></tr>
  <tr><td>Authors:                                        </td>
-     <td>Manuel Bastioni, Paolo Colombo, Simone Re       </td></tr>
+     <td>Manuel Bastioni, Paolo Colombo, Simone Re, Hans-Peter Dusel</td></tr>
  <tr><td>Copyright(c):                                   </td>
      <td>MakeHuman Team 2001-2008                        </td></tr>
  <tr><td>Licensing:                                      </td>
@@ -535,13 +535,13 @@ int main(int argc, char *argv[])
 {
     // Need to declare variables before other statements
     
-    char str[80];
+    char str[128];
     int err;
     PyObject *module;
 
-    if (argc >= 2 && strlen(argv[1]) < 68)
+    if (argc >= 2)
     {
-        sprintf(str, "execfile(\"%s\")", argv[1]);
+        snprintf(str, sizeof(str), "execfile(\"%s\")", argv[1]);
     }
     else
     {
