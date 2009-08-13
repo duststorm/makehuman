@@ -13,27 +13,23 @@ Coding Standards:            See http://sites.google.com/site/makehumandocs/deve
 
 
 import Blender
-import string
-import os
-import sys
-import math
+import string, os, sys, math
 import random
 mainPath = Blender.sys.dirname(Blender.Get('filename'))
 print "MAINPATH = ",mainPath 
 sys.path.append(mainPath)
 from Blender.Draw import *
 from Blender.BGL import *
-from Blender import Scene
-from Blender import Types
+from Blender import Scene, Types, Window, Group, Curve, Mesh, Object
 from Blender.Scene import Render
-from Blender import Window
-from Blender import Group
-from Blender import Curve
 from collision import collision, world2Local, local2World
-import simpleoctree
-
-import subprocess
-import hairgenerator
+import simpleoctree, subprocess, hairgenerator
+mhcore = os.path.split(mainPath)[0]
+mhcore = os.path.split(mhcore)[0]
+mhcore = os.path.join(mhcore,"mh_core")
+print "mh_core Path = ", mhcore
+sys.path.append(mhcore)
+from aljabr import *
 
 humanMesh = Blender.Object.Get("Base")
 
@@ -59,6 +55,9 @@ blendDistance = Create(hairsClass.blendDistance)
 isPreview = Create(1)
 isCollision = Create(0)
 tipMagnet = Create(hairsClass.tipMagnet)
+
+noGuides = Create(hairsClass.noGuides)
+gLength = Create(hairsClass.gLength)
 
 compileComm = "aqsl shaders/hair.sl -o shaders/hair.slx"
 subprocess.Popen(compileComm, shell=True)
@@ -100,6 +99,26 @@ def convertCoords(obj):
 
     return (locX,locY,locZ,rotX,rotY,rotZ,sizeX,sizeY,sizeZ)
 
+def drawCurve(scn,curve,name="Curve"):
+    cu = Curve.New()
+    cu.appendNurb([curve[0][0],curve[0][1],curve[0][2],1]) #last variable is the weight of the bezier
+    for i in range(1, len(curve)):
+        cu[0].append([curve[i][0],curve[i][1],curve[i][2],1])
+    ob = Object.New(name) #make curve object
+    ob.link(cu) #link curve data with this object
+    scn.link(ob) # link object into scene
+    #Blender.Redraw()  #its better to do this after all curves are drawn!
+
+def drawLine(point1,point2,name="Line"):
+    coords=[point1, point2]  
+    faces= [[0,1]]
+    me = Mesh.New()         # create a new mesh
+    me.verts.extend(coords)          # add vertices to mesh
+    me.faces.extend(faces)           # add faces to the mesh (also adds edges)
+    scn = Scene.GetCurrent() #get current scene
+    scn.objects.new(me,name)
+    #Blender.Redraw() #it´s better to do this after all lines are drawn!
+    
 def writeHeader(ribfile,imgFile):
 
     ribfile.write('Option "searchpath" "shader" "shaders:&"')
@@ -529,18 +548,19 @@ def draw():
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump,randomFactMultiStrand
     global tipMagnet,sizeMultiStrand,sizeClump,blendDistance
     global randomPercentage, rootColor,tipColor,isPreview, isCollision
+    global noGuides, gLength
     
     glClearColor(0.5, 0.5, 0.5, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
-    buttonY = 10
-
-    Button("Exit", 1, 210, buttonY, 100, 20)
-    Button("Render", 2, 10, buttonY, 100, 20)
-    Button("Collide guides", 8, 110, buttonY, 100, 20)
-    Button("Save", 4, 10, buttonY+20, 150, 20)
-    Button("Load", 5, 160, buttonY+20, 150, 20)
-    isPreview = Toggle("Preview", 6, 10, buttonY+40, 150, 20, isPreview.val, "Rendering in preview mode")
-    isCollision = Toggle("Collision for all strands", 7, 160, buttonY+40, 150, 20, isCollision.val, "Implement collision detection")
+    buttonY = 100
+    
+    Button("Exit", 1, 210, buttonY, 100, 20) #1
+    Button("Render", 2, 10, buttonY, 100, 20) #2
+    Button("Collide guides", 8, 110, buttonY, 100, 20) #8
+    Button("Save", 4, 10, buttonY+20, 150, 20) #4
+    Button("Load", 5, 160, buttonY+20, 150, 20) #5
+    isPreview = Toggle("Preview", 6, 10, buttonY+40, 150, 20, isPreview.val, "Rendering in preview mode") #6
+    isCollision = Toggle("Collision for all strands", 7, 160, buttonY+40, 150, 20, isCollision.val, "Implement collision detection") #7
 
     tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+80, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
     randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+100, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
@@ -559,6 +579,10 @@ def draw():
     rootColor = ColorPicker(3, 10, buttonY+340, 150, 20, rootColor.val,"Color of root")
     tipColor = ColorPicker(3, 160, buttonY+340, 150, 20, tipColor.val,"Color of tip")
     
+    buttonY = buttonY-80
+    Button("Guide along normal", 9, 10, buttonY, 150, 20) #9
+    noGuides= Slider("Number of guides: ", 10, 10, buttonY+20, 300, 18, noGuides.val, 1, 260, 0, "Number of guides to draw along normal of head")
+    gLength= Slider("Length of guides: ", 10, 10, buttonY+40, 300, 18, gLength.val, 0.0, 7.0, 0, "Length of each guides drawn along normal of head")
 
     glColor3f(1, 1, 1)
     glRasterPos2i(10, buttonY+380)
@@ -584,6 +608,7 @@ def bevent(evt):
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
     global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
     global blendDistance,sizeMultiStrand,rootCOlor,tipCOlor, humanMesh
+    global noGuides, gLength
 
     if   (evt== 1): Exit()
 
@@ -640,8 +665,36 @@ def bevent(evt):
                         #data[0].recalc()
                         data.update()
         Blender.Redraw()
-
-
-    #Window.RedrawAll()
-
+    elif (evt==9):
+        #noGuides=16
+        noCPoints=15
+        #gLength=5
+        mesh = humanMesh.getData()
+        #scalp = 269 vertices!
+        vertIndices = mesh.getVertsFromGroup("part_head-back-skull")
+        vertIndices.extend(mesh.getVertsFromGroup("part_head-upper-skull"))
+        vertIndices.extend(mesh.getVertsFromGroup("part_l-head-temple"))
+        vertIndices.extend(mesh.getVertsFromGroup("part_r-head-temple"))
+        scalpVerts = len(vertIndices)
+        interval = int(scalpVerts/noGuides.val)
+        cPInterval = gLength.val/float(noCPoints)
+        print "cPInterval is : ", cPInterval
+        scn = Scene.GetCurrent() #get current scene
+        for i in range(1,noGuides.val):
+            r = random.randint(interval*(i-1),interval*i)
+            v= mesh.verts[vertIndices[r]].co
+            normal = mesh.verts[vertIndices[r]].no
+            point1 = vadd(v,vmul(normal,-gLength.val/10))
+            point2 = vadd(point1,vmul(normal,gLength.val))
+            curve=[point1]
+            for j in range(1,noCPoints-1):
+                curve.append(vadd(point1,vmul(normal,cPInterval*j)))
+            curve.append(point2)
+            drawCurve(scn,curve[:])
+        r= random.randint(interval*(noGuides.val-1),scalpVerts-1)
+        Blender.Redraw()
+        #make last curve...
+        #draw curves....
+        
 Register(draw, event, bevent)
+

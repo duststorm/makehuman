@@ -88,7 +88,9 @@ class Hairgenerator:
         self.tags = []
         self.humanVerts = []
         self.path = None
-        #self.octree = simpleoctree.SimpleOctree(humanMesh.verts)# not used yet
+        
+        self.noGuides = 25
+        self.gLength = 5.0
 
     def resetHairs(self):
         self.hairStyle = []
@@ -332,14 +334,12 @@ class Hairgenerator:
                     angleBetweenGuides = math.acos(aljabr.vdot(aljabr.vnorm(vert1),aljabr.vnorm(vert2)))
                 denom = math.sin(angleBetweenGuides)
                 if denom == 0.0: #controlpoints of some guides coincide
-                    vert1[0] = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[0]
-                    vert1[1] = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[1]
-                    vert1[2] = self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[2]
+                    vert1[0] = self.randomPercentage*self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[0]
+                    vert1[1] = self.randomPercentage*self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[1]
+                    vert1[2] = self.randomPercentage*self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[2]
                     vert1= aljabr.vadd(vert1,randomVect)
                     angleBetweenGuides = math.acos(aljabr.vdot(aljabr.vnorm(vert1),aljabr.vnorm(vert2)))
                     denom = math.sin(angleBetweenGuides)
-                    print "vert1, vert2,randomVect: ", vert1,vert2,randomVect
-                    print "Denom: ", denom
                 f1 = math.sin((1-interpFactor)*angleBetweenGuides)/denom
                 f2 = math.sin(interpFactor*angleBetweenGuides)/denom
                 newVert = aljabr.vadd(aljabr.vmul(vert1,f1),aljabr.vmul(vert2,f2))
