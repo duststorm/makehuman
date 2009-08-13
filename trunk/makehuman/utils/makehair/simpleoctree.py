@@ -10,27 +10,27 @@ class SimpleOctree:
     root = ""
     
     def __init__(self, verts, minsize=0.4):
-        minX = verts[0].co[0]
+        minX = verts[0][0]
         maxX = minX
-        minY = verts[0].co[1]
+        minY = verts[0][1]
         maxY = minY
-        minZ = verts[0].co[2]
+        minZ = verts[0][2]
         maxZ = minZ
         self.minsize = minsize
         for v in verts:
-            if v.co[0] < minX:
-                minX = v.co[0]
-            if v.co[0] > maxX:
-                maxX = v.co[0]
-            if v.co[1] < minY:
-                minY = v.co[1]
-            if v.co[1] > maxY:
-                maxY = v.co[1]
+            if v[0] < minX:
+                minX = v[0]
+            if v[0] > maxX:
+                maxX = v[0]
+            if v[1] < minY:
+                minY = v[1]
+            if v[1] > maxY:
+                maxY = v[1]
 
-            if v.co[2] < minZ:
-                minZ = v.co[2]
-            if v.co[2] > maxZ:
-                maxZ = v.co[2]
+            if v[2] < minZ:
+                minZ = v[2]
+            if v[2] > maxZ:
+                maxZ = v[2]
         margin = 2*minsize
         minX -= margin
         maxX += margin
@@ -80,10 +80,10 @@ class SimpleOctreeVolume:
         #caso base: foglia. Verifica dei vertici e restituzione di quello piu' vicino al baricentro
         if len(self.children) == 0:
             i = self.verts[0]
-            distMinim = math.sqrt(math.pow(vert[0] - i.co[0], 2) + math.pow(vert[1] - i.co[1], 2) + math.pow(vert[2] - i.co[2], 2))
+            distMinim = math.sqrt(math.pow(vert[0] - i[0], 2) + math.pow(vert[1] - i[1], 2) + math.pow(vert[2] - i[2], 2))
             minim = self.verts[0]
             for i in self.verts:
-                dist = math.sqrt(math.pow(vert[0] - i.co[0], 2) + math.pow(vert[1] - i.co[1], 2) + math.pow(vert[2] - i.co[2], 2))
+                dist = math.sqrt(math.pow(vert[0] - i[0], 2) + math.pow(vert[1] - i[1], 2) + math.pow(vert[2] - i[2], 2))
                 if dist < distMinim:
                     distMinim = dist
                     minim = i
@@ -147,9 +147,9 @@ class SimpleOctreeVolume:
             subBounds.append(self.__getSubvolume(i))
 
         for v in verts:
-            ix = int(math.ceil((v.co[0] - self.bounds[0][0])/self.halfX) - 1)
-            iy = int(math.ceil((v.co[1] - self.bounds[0][1])/self.halfY) - 1)
-            iz = int(math.ceil((v.co[2] - self.bounds[0][2])/self.halfZ) - 1)
+            ix = int(math.ceil((v[0] - self.bounds[0][0])/self.halfX) - 1)
+            iy = int(math.ceil((v[1] - self.bounds[0][1])/self.halfY) - 1)
+            iz = int(math.ceil((v[2] - self.bounds[0][2])/self.halfZ) - 1)
 
             if ix == 0:
                 if iy == 0:
