@@ -459,3 +459,30 @@ def focalToFov(dimension, focal):
 def fovToFocal(dimension, fov):
   return dimension / (2 * math.tan(fov/2));
   
+
+def in2pts(point1,point2,t):
+    """
+    This function returns a vector that lies on the directed line between points, given
+    a parameter t. The paraemeter t is between 0 and 1 and it parametrizes our directed line
+    between point1 and point2
+    
+
+    Parameters
+    ----------
+
+    point1:
+        *float list*. A 3D vector - in the format[x,y,z] containing the
+        coordinates of the first point (i.e. starting point) of a directed line.
+
+    point2:
+        *float list*. A 3D vector - in the format[x,y,z] containing the
+        coordinates of the second point (i.e. endpoint) of a directed line.
+
+    t:
+        *float*. A real number between 0 and 1, that linearly parametrizes
+        the directed line between point1 and point2. In other words, when t is 0 the 
+        return value for this function is point1 and when t is 1 the return value
+        for this function is point2.
+    """
+
+    return vadd(vmul(point1,1-t),vmul(point2,t))
