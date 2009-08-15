@@ -56,6 +56,7 @@ isPreview = Create(1)
 isCollision = Create(0)
 tipMagnet = Create(hairsClass.tipMagnet)
 
+noCPoints = Create(hairsClass.noCPoints)
 noGuides = Create(hairsClass.noGuides)
 gLength = Create(hairsClass.gLength)
 
@@ -548,7 +549,7 @@ def draw():
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump,randomFactMultiStrand
     global tipMagnet,sizeMultiStrand,sizeClump,blendDistance
     global randomPercentage, rootColor,tipColor,isPreview, isCollision
-    global noGuides, gLength
+    global noGuides, noCPoints, gLength
     
     glClearColor(0.5, 0.5, 0.5, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
@@ -579,10 +580,11 @@ def draw():
     rootColor = ColorPicker(3, 10, buttonY+340, 150, 20, rootColor.val,"Color of root")
     tipColor = ColorPicker(3, 160, buttonY+340, 150, 20, tipColor.val,"Color of tip")
     
-    buttonY = buttonY-80
+    buttonY = buttonY-100
     Button("Guide along normal", 9, 10, buttonY, 150, 20) #9
     noGuides= Slider("Number of guides: ", 10, 10, buttonY+20, 300, 18, noGuides.val, 1, 260, 0, "Number of guides to draw along normal of head")
     gLength= Slider("Length of guides: ", 10, 10, buttonY+40, 300, 18, gLength.val, 0.0, 7.0, 0, "Length of each guides drawn along normal of head")
+    noCPoints= Slider("Controlpoints: ", 10, 10, buttonY+60, 300, 18, noCPoints.val, 2, 20, 0, "Number of control-points for each guide")
 
     glColor3f(1, 1, 1)
     glRasterPos2i(10, buttonY+380)
@@ -608,7 +610,7 @@ def bevent(evt):
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
     global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
     global blendDistance,sizeMultiStrand,rootCOlor,tipCOlor, humanMesh
-    global noGuides, gLength
+    global noGuides, noCPoints, gLength
 
     if   (evt== 1): Exit()
 
@@ -666,9 +668,7 @@ def bevent(evt):
                         data.update()
         Blender.Redraw()
     elif (evt==9):
-        #noGuides=16
-        noCPoints=15
-        #gLength=5
+        #noCPoints=15
         mesh = humanMesh.getData()
         #scalp = 269 vertices!
         vertIndices = mesh.getVertsFromGroup("part_head-back-skull")
@@ -677,21 +677,24 @@ def bevent(evt):
         vertIndices.extend(mesh.getVertsFromGroup("part_r-head-temple"))
         scalpVerts = len(vertIndices)
         interval = int(scalpVerts/noGuides.val)
-        cPInterval = gLength.val/float(noCPoints)
+        cPInterval = gLength.val/float(noCPoints.val)
         print "cPInterval is : ", cPInterval
         scn = Scene.GetCurrent() #get current scene
-        for i in range(1,noGuides.val):
-            r = random.randint(interval*(i-1),interval*i)
+        for i in range(0,noGuides.val):
+            if i==noGuides.val-1:
+                r= random.randint(interval*i,scalpVerts-1)
+            else:    
+                r = random.randint(interval*i,interval*(i+1))
             v= mesh.verts[vertIndices[r]].co
             normal = mesh.verts[vertIndices[r]].no
-            point1 = vadd(v,vmul(normal,-gLength.val/10))
-            point2 = vadd(point1,vmul(normal,gLength.val))
-            curve=[point1]
-            for j in range(1,noCPoints-1):
-                curve.append(vadd(point1,vmul(normal,cPInterval*j)))
+            point2 = vadd(v,vmul(normal,gLength.val))
+            curve=[vadd(v,vmul(normal,-0.5))]
+            curve.append(vadd(v,vmul(normal,-0.2)))
+            for j in range(1,noCPoints.val-1):
+                curve.append(vadd(v,vmul(normal,cPInterval*j)))
             curve.append(point2)
             drawCurve(scn,curve[:])
-        r= random.randint(interval*(noGuides.val-1),scalpVerts-1)
+        #r= random.randint(interval*(noGuides.val-1),scalpVerts-1)
         Blender.Redraw()
         #make last curve...
         #draw curves....

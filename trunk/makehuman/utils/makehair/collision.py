@@ -32,9 +32,9 @@ def local2World(vec, matrix):
 def world2Local(vec, matrix):
     x, y, z = vec
     xloc, yloc, zloc = matrix[3][0], matrix[3][1], matrix[3][2]
-    return  [x*matrix[0][0] + y*matrix[0][1] + z*matrix[0][2] - xloc,\
-            x*matrix[1][0] + y*matrix[1][1] + z*matrix[1][2] - yloc,\
-            x*matrix[2][0] + y*matrix[2][1] + z*matrix[2][2] - zloc]
+    return  [(x-xloc)*matrix[0][0] + (y-yloc)*matrix[0][1] + (z-zloc)*matrix[0][2],\
+            (x-xloc)*matrix[1][0] + (y-yloc)*matrix[1][1] + (z-zloc)*matrix[1][2],\
+            (x-xloc)*matrix[2][0] + (y-yloc)*matrix[2][1] + (z-zloc)*matrix[2][2]]
  
 def getTangent(point,i,obj,size,isNurb=False):
     mesh = obj.getData()
