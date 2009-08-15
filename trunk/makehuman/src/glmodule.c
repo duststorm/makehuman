@@ -79,7 +79,9 @@ static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = NULL;
 static PFNGLGETPROGRAMIVPROC glGetProgramiv = NULL;
 static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = NULL;
 static PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform = NULL;
+#ifdef __WIN32__
 static PFNGLACTIVETEXTUREPROC glActiveTexture = NULL;
+#endif
 static PFNGLUNIFORM1FPROC glUniform1f = NULL;
 static PFNGLUNIFORM2FPROC glUniform2f = NULL;
 static PFNGLUNIFORM3FPROC glUniform3f = NULL;
@@ -879,7 +881,9 @@ void OnInit()
     glGetProgramiv = (PFNGLGETPROGRAMIVPROC)SDL_GL_GetProcAddress("glGetProgramiv");
     glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
     glGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)SDL_GL_GetProcAddress("glGetActiveUniform");
+#ifdef __WIN32__
     glActiveTexture = (PFNGLACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glActiveTexture");
+#endif
     glUniform1f = (PFNGLUNIFORM1FPROC)SDL_GL_GetProcAddress("glUniform1f");
     glUniform2f = (PFNGLUNIFORM2FPROC)SDL_GL_GetProcAddress("glUniform2f");
     glUniform3f = (PFNGLUNIFORM3FPROC)SDL_GL_GetProcAddress("glUniform3f");
@@ -1142,7 +1146,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                           {
                             if (!PyList_Check(value) || PyList_Size(value) != 4)
                               break;
-                            glUniform3f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                            glUniform4f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
                               PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
                             break;
                           }
