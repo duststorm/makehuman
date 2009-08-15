@@ -563,22 +563,22 @@ def draw():
     isPreview = Toggle("Preview", 6, 10, buttonY+40, 150, 20, isPreview.val, "Rendering in preview mode") #6
     isCollision = Toggle("Collision for all strands", 7, 160, buttonY+40, 150, 20, isCollision.val, "Implement collision detection") #7
 
-    tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+80, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
-    randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+100, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
-    numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+120, 300, 18, numberOfHairsClump.val, 1, 100, 0, "Number of generated hair for each guide. Note that value of x mean x*x hairs")
-    sizeClump= Slider("Clump size: ", 3, 10, buttonY+140, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
-    hairDiameterMultiStrand = Slider("Clump hair diam.: ", 0, 10, buttonY+160, 300, 20, hairDiameterMultiStrand.val, 0, 0.05, 0,"Diameter of hairs used in strand interpolation")
+    #tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+80, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
+    #randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+100, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
+    #numberOfHairsClump= Slider("Clump hairs num.: ", 3, 10, buttonY+120, 300, 18, numberOfHairsClump.val, 1, 100, 0, "Number of generated hair for each guide. Note that value of x mean x*x hairs")
+    #sizeClump= Slider("Clump size: ", 3, 10, buttonY+140, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
+    #hairDiameterMultiStrand = Slider("Clump hair diam.: ", 0, 10, buttonY+160, 300, 20, hairDiameterMultiStrand.val, 0, 0.05, 0,"Diameter of hairs used in strand interpolation")
 
 
-    blendDistance= Slider("Strand blending dist.: ", 3, 10, buttonY+200, 300, 18, blendDistance.val, 0, 2, 0)
-    randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+220, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
-    numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+240, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
-    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+260, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)
-    hairDiameterClump = Slider("Strand hair diam.: ", 0, 10, buttonY+280, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
+    blendDistance= Slider("Strand blending dist.: ", 3, 10, buttonY+80, 300, 18, blendDistance.val, 0, 2, 0)
+    randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+100, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
+    numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+120, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
+    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+140, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)
+    hairDiameterClump = Slider("Strand hair diam.: ", 0, 10, buttonY+160, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
 
-    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+320, 300, 18, randomPercentage.val, 0.0, 1.0, 0)
-    rootColor = ColorPicker(3, 10, buttonY+340, 150, 20, rootColor.val,"Color of root")
-    tipColor = ColorPicker(3, 160, buttonY+340, 150, 20, tipColor.val,"Color of tip")
+    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+180, 300, 18, randomPercentage.val, 0.0, 1.0, 0)
+    rootColor = ColorPicker(3, 10, buttonY+200, 150, 20, rootColor.val,"Color of root")
+    tipColor = ColorPicker(3, 160, buttonY+200, 150, 20, tipColor.val,"Color of tip")
     
     buttonY = buttonY-100
     Button("Guide along normal", 9, 10, buttonY, 150, 20) #9
