@@ -52,8 +52,9 @@ typedef struct
 {
     PyObject_HEAD
     int shadeless;              /**< \brief Whether this object is affected by scene lights or not.                     */
-    unsigned int texture;       /**< \brief a texture id or 0 if this object doesn't have a texture.                    */
-    unsigned int shader;        /**< \brief a shader id or 0 if this object doesn't have a shader.                      */
+    unsigned int texture;       /**< \brief A texture id or 0 if this object doesn't have a texture.                    */
+    unsigned int shader;        /**< \brief A shader id or 0 if this object doesn't have a shader.                      */
+    PyObject *shaderParameters; /**< \brief A dictionary containing the shader parameters, read only.                   */
     int isVisible;              /**< \brief Whether this object is currently visible or not.                            */
                                 /**<        An int defining whether this object is currently visible or not.            */
     int inMovableCamera;        /**< \brief Whether this object uses the Movable or Fixed camera mode.                  */
@@ -122,6 +123,7 @@ PyObject *Object3D_setRotation(Object3D *self, PyObject *args);
 PyObject *Object3D_setScale(Object3D *self, PyObject *args);
 
 // Object3D attributes indirectly accessed by Python
+PyObject *Object3D_getShaderParameters(Object3D *self, void *closure);
 PyObject *Object3D_getText(Object3D *self, void *closure);
 int Object3D_setText(Object3D *self, PyObject *value, void *closure);
 

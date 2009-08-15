@@ -516,6 +516,7 @@ class Object3D:
     - **self.visibility**: *int flag* A flag to indicate whether or not this object is visible.
     - **self.texture**: *string* The path of a TGA file on disk containing the object texture.
     - **self.shader**: *int* The shader.
+    - **self.shaderParameters**: *dictionary* The shader parameters.
     - **self.isSelected**: *int flag* A flag to indicate whether this object is currently selected.
     - **self.faceGroupSelected**: *string* The name of actually selected face group.
     - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
@@ -563,6 +564,7 @@ class Object3D:
         self.pickable = 1
         self.texture = None
         self.shader = 0
+        self.shaderParameters = {}
         #self.colors = []
         self.isSelected = None
         self.faceGroupSelected = None
@@ -737,6 +739,13 @@ class Object3D:
         self.shader = shader
         try:
           self.object3d.shader = shader
+        except AttributeError, text:
+          print(text)
+          
+    def setShaderParameter(self, name, value):
+        self.shaderParameters[name] = value
+        try:
+          self.object3d.shaderParameters[name] = value
         except AttributeError, text:
           print(text)
 
@@ -1122,6 +1131,9 @@ class Scene3D:
                 obj.setTexture(obj.texture)
                 
             obj.object3d.shader = obj.shader
+            
+            for name, value in obj.shaderParameters.iteritems():
+              obj.object3d.shaderParameters[name] = value
 
             obj.object3d.setTranslation(obj.x, obj.y, obj.z)
             obj.object3d.setRotation( obj.rx, obj.ry, obj.rz)

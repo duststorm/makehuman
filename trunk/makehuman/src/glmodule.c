@@ -78,6 +78,13 @@ static PFNGLGETSHADERIVPROC glGetShaderiv = NULL;
 static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = NULL;
 static PFNGLGETPROGRAMIVPROC glGetProgramiv = NULL;
 static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = NULL;
+static PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform = NULL;
+static PFNGLACTIVETEXTUREPROC glActiveTexture = NULL;
+static PFNGLUNIFORM1FPROC glUniform1f = NULL;
+static PFNGLUNIFORM2FPROC glUniform2f = NULL;
+static PFNGLUNIFORM3FPROC glUniform3f = NULL;
+static PFNGLUNIFORM4FPROC glUniform4f = NULL;
+static PFNGLUNIFORM1IPROC glUniform1i = NULL;
 
 static int g_ShadersSupported = 0;
 #else
@@ -823,28 +830,30 @@ void mhDrawEnd()
 void OnInit()
 {
     /*Lights and materials*/
-    const float lightPos[] = { -10.99f, 20.0f, 20.0f, 1.0f}; /* Light Position */
-    const float ambientLight[] = { 0.0f, 0.0f, 0.0f, 1.0f};  /* Ambient Light Values */
-    const float diffuseLight[] = { .5f, .5f, .5f, 1.0f};     /* Diffuse Light Values */
-    const float specular[] = {0.5f, .5f, .5f, .5f};          /* Specular Light Values */
-    const float MatAmb[] = {0.11f, 0.06f, 0.11f, 1.0f};      /* Material - Ambient Values */
-    const float MatDif[] = {0.2f, 0.6f, 0.9f, 1.0f};         /* Material - Diffuse Values */
-    const float MatSpc[] = {0.33f, 0.33f, 0.52f, 1.0f};      /* Material - Specular Values */
-    const float MatShn[] = {50.0f};                          /* Material - Shininess */
+    const float lightPos[] = { -10.99f, 20.0f, 20.0f, 1.0f};  /* Light Position */
+    const float ambientLight[] = { 0.0f, 0.0f, 0.0f, 1.0f};   /* Ambient Light Values */
+    const float diffuseLight[] = { .5f, .5f, .5f, 1.0f};      /* Diffuse Light Values */
+    const float specular[] = {0.5f, .5f, .5f, .5f};           /* Specular Light Values */
+    const float MatAmb[] = {0.11f, 0.06f, 0.11f, 1.0f};       /* Material - Ambient Values */
+    const float MatDif[] = {0.2f, 0.6f, 0.9f, 1.0f};          /* Material - Diffuse Values */
+    const float MatSpc[] = {0.33f, 0.33f, 0.52f, 1.0f};       /* Material - Specular Values */
+    const float MatShn[] = {50.0f};                           /* Material - Shininess */
+    //const float MatEms[] = {0.1f, 0.05f, 0.0f, 1.0f};         /* Material - emission Values */
 
-    glEnable(GL_DEPTH_TEST);                           /* Hidden surface removal */
-    glEnable(GL_CULL_FACE);                            /* Inside face removal */
-    glEnable(GL_LIGHTING);                             /* Enable lighting */
+    glEnable(GL_DEPTH_TEST);                                  /* Hidden surface removal */
+    glEnable(GL_CULL_FACE);                                   /* Inside face removal */
+    glEnable(GL_LIGHTING);                                    /* Enable lighting */
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-    //glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR); // If we enable this, we have stronger specular highlights
-    glMaterialfv(GL_FRONT, GL_SHININESS, MatShn);      /* Set Material Shininess */
-    glMaterialfv(GL_FRONT, GL_AMBIENT, MatAmb);        /* Set Material Ambience */
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, MatDif);        /* Set Material Diffuse */
-    glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpc);       /* Set Material Specular */
-    glMaterialfv(GL_FRONT, GL_SHININESS, MatShn);      /* Set Material Shininess */
+    glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR); // If we enable this, we have stronger specular highlights
+    glMaterialfv(GL_FRONT, GL_SHININESS, MatShn);             /* Set Material Shininess */
+    glMaterialfv(GL_FRONT, GL_AMBIENT, MatAmb);               /* Set Material Ambience */
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, MatDif);               /* Set Material Diffuse */
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpc);              /* Set Material Specular */
+    glMaterialfv(GL_FRONT, GL_SHININESS, MatShn);             /* Set Material Shininess */
+    //glMaterialfv(GL_FRONT, GL_EMISSION, MatEms);              /* Set Material Emission */
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
@@ -868,12 +877,21 @@ void OnInit()
     glGetShaderiv = (PFNGLGETSHADERIVPROC)SDL_GL_GetProcAddress("glGetShaderiv");
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)SDL_GL_GetProcAddress("glGetShaderInfoLog");
     glGetProgramiv = (PFNGLGETPROGRAMIVPROC)SDL_GL_GetProcAddress("glGetProgramiv");
-    glGetProgramInfoLog = ( PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
+    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
+    glGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)SDL_GL_GetProcAddress("glGetActiveUniform");
+    glActiveTexture = (PFNGLACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glActiveTexture");
+    glUniform1f = (PFNGLUNIFORM1FPROC)SDL_GL_GetProcAddress("glUniform1f");
+    glUniform2f = (PFNGLUNIFORM2FPROC)SDL_GL_GetProcAddress("glUniform2f");
+    glUniform3f = (PFNGLUNIFORM3FPROC)SDL_GL_GetProcAddress("glUniform3f");
+    glUniform4f = (PFNGLUNIFORM4FPROC)SDL_GL_GetProcAddress("glUniform4f");
+    glUniform1i = (PFNGLUNIFORM1IPROC)SDL_GL_GetProcAddress("glUniform1i");
 
-    g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader && glCreateProgram && glAttachShader &&
+    g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader &&
+      glCreateProgram && glAttachShader && glLinkProgram && glUseProgram &&
+      glGetShaderiv && glGetShaderInfoLog && glGetProgramiv && glGetProgramInfoLog &&
+      glGetActiveUniform && glActiveTexture && glUniform1f && glUniform2f &&
+      glUniform3f && glUniform4f && glUniform1i;
 #endif // #ifndef __APPLE__
-
-      glLinkProgram && glUseProgram;
 
     // Init font
     G.fontOffset = glGenLists(256);
@@ -1067,14 +1085,91 @@ void mhDrawMeshes(int pickMode, int cameraType)
 
                 // Enable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && g_ShadersSupported && obj->shader)
+                {
+                  //int isValid;
+                  //glValidateProgram(ProgramObject);
+                  //glGetProgramiv(ProgramObject, GL_VALIDATE_STATUS, &isValid);
+                  //glGetProgramInfoLog
+
                   glUseProgram(obj->shader);
+
+                  // This should be optimized, since we only need to do it when it's changed
+                  // Validation should also only be done when it is set
+                  if (obj->shaderParameters)
+                  {
+                    GLint parameterCount = 0;
+                    int index;
+                    
+                    glGetProgramiv(obj->shader, GL_ACTIVE_UNIFORMS, &parameterCount);
+
+                    for (index = 0; index < parameterCount; index++)
+                    {
+                      GLsizei length;
+ 	                    GLint size;
+ 	                    GLenum type;
+ 	                    GLchar name[32];
+                      PyObject *value;
+
+                      glGetActiveUniform(obj->shader, index, 32, &length, &size, &type, name);
+
+                      value = PyDict_GetItemString(obj->shaderParameters, name);
+
+                      if (value)
+                      {
+                        switch (type)
+                        {
+                          case GL_FLOAT:
+                          {
+                            glUniform1f(index, PyFloat_AsDouble(value));
+                            break;
+                          }
+                          case GL_FLOAT_VEC2:
+                          {
+                            if (!PyList_Check(value) || PyList_Size(value) != 2)
+                              break;
+                            glUniform2f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)));
+                            break;
+                          }
+                          case GL_FLOAT_VEC3:
+                          {
+                            if (!PyList_Check(value) || PyList_Size(value) != 3)
+                              break;
+                            glUniform3f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                              PyFloat_AsDouble(PyList_GetItem(value, 2)));
+                            break;
+                          }
+                          case GL_FLOAT_VEC4:
+                          {
+                            if (!PyList_Check(value) || PyList_Size(value) != 4)
+                              break;
+                            glUniform3f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                              PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
+                            break;
+                          }
+                          case GL_SAMPLER_2D:
+                          {
+                            glActiveTexture(GL_TEXTURE1);
+                            glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
+                            glUniform1i(index, 1);
+                            break;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
 
                 /*draw the mesh*/
                 glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && g_ShadersSupported && obj->shader)
+                {
                   glUseProgram(0);
+                  glActiveTexture(GL_TEXTURE1);
+                  glBindTexture(GL_TEXTURE_2D, 0);
+                  glActiveTexture(GL_TEXTURE0);
+                }
 
                 /*Enable lighting if the object was shadeless*/
                 if (obj->shadeless || pickMode)

@@ -36,9 +36,10 @@ class Human(gui3d.Object):
         gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 1, shadeless = 0, visible = True)
         self.meshData = self.mesh
         # Uncomment the following 3 lines to use a shader
-        vertex_shader = open("data/shaders/glsl/phong_vertex_shader.txt").read()
-        fragment_shader = open("data/shaders/glsl/phong_fragment_shader.txt").read()
+        vertex_shader = open("data/shaders/glsl/skin_vertex_shader.txt").read()
+        fragment_shader = open("data/shaders/glsl/skin_fragment_shader.txt").read()
         self.mesh.setShader(mh.createShader(vertex_shader, fragment_shader, 0))
+        self.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
         self.scene = globalScene
         self.progressBar = gui3d.ProgressBar(globalScene.application,
             backgroundTexture = globalScene.application.getThemeResource("images", "progressbar_background.png"),

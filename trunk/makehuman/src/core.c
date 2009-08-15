@@ -84,6 +84,7 @@ static PyMethodDef Object3D_methods[] = {
 
 // Object3D attributes indirectly accessed by Python
 static PyGetSetDef Object3D_getset[] = {
+  {"shaderParameters", (getter)Object3D_getShaderParameters, (setter)NULL, "The dictionary containing the shader parameters, read only.", NULL},
   {"text", (getter)Object3D_getText, (setter)Object3D_setText, "The text of the object as a String or None if it doesn't have text.", NULL},
   {NULL}
 };
@@ -182,6 +183,7 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self->shadeless = 0;
     self->texture = 0;
     self->shader = 0;
+    self->shaderParameters = NULL;
     self->isVisible = 1;
     self->inMovableCamera = 1;
     self->isPickable = 1;
@@ -506,6 +508,20 @@ PyObject *Object3D_setScale(Object3D *self, PyObject *args)
     self->scale[2] = z;
 
     return Py_BuildValue("");
+}
+
+/** \brief Gets the shader parameter dictionary for this Object3D object.
+ *  \param self An 3D object.
+ *
+ *  This function gets  the shader parameter dictionary for this Object3D object.
+ */
+PyObject *Object3D_getShaderParameters(Object3D *self, void *closure)
+{
+  if (!self->shaderParameters)
+    self->shaderParameters = PyDict_New();
+
+  Py_INCREF(self->shaderParameters);
+  return self->shaderParameters;
 }
 
 /** \brief Gets a text string for this Object3D object.
