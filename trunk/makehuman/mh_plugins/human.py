@@ -35,7 +35,7 @@ class Human(gui3d.Object):
     def __init__(self, globalScene, objFilePath):
         gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 1, shadeless = 0, visible = True)
         self.meshData = self.mesh
-        # Uncomment the following 3 lines to use a shader
+        # Uncomment the following 4 lines to use a shader
         vertex_shader = open("data/shaders/glsl/skin_vertex_shader.txt").read()
         fragment_shader = open("data/shaders/glsl/skin_fragment_shader.txt").read()
         self.mesh.setShader(mh.createShader(vertex_shader, fragment_shader, 0))
