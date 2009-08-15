@@ -100,14 +100,23 @@ def convertCoords(obj):
 
     return (locX,locY,locZ,rotX,rotY,rotZ,sizeX,sizeY,sizeZ)
 
-def drawCurve(scn,curve,name="Curve"):
-    cu = Curve.New()
-    cu.appendNurb([curve[0][0],curve[0][1],curve[0][2],1]) #last variable is the weight of the bezier
-    for i in range(1, len(curve)):
-        cu[0].append([curve[i][0],curve[i][1],curve[i][2],1])
-    ob = Object.New(name) #make curve object
-    ob.link(cu) #link curve data with this object
-    scn.link(ob) # link object into scene
+def drawGuidePair(scn,curve1,curve2,name="guides"):
+    cu1 = Curve.New()
+    cu1.appendNurb([curve1[0][0],curve1[0][1],curve1[0][2],1]) #last variable is the weight of the bezier
+    cu2 = Curve.New()
+    cu2.appendNurb([curve2[0][0],curve2[0][1],curve2[0][2],1]) #last variable is the weight of the bezier
+    print "length of curve1, curve2): ", len(curve1), len(curve2)
+    for i in range(1, len(curve1)):
+        cu1[0].append([curve1[i][0],curve1[i][1],curve1[i][2],1])
+        cu2[0].append([curve2[i][0],curve2[i][1],curve2[i][2],1])
+    #ob = Object.New(name) #make curve object
+    #ob.link(cu) #link curve data with this object
+    #scn.link(ob) # link object into scene
+    obj1 = scn.objects.new(cu1)
+    obj2 = scn.objects.new(cu2)
+    grp= Group.New()
+    grp.objects.link(obj1)
+    grp.objects.link(obj2)
     #Blender.Redraw()  #its better to do this after all curves are drawn!
 
 def drawLine(point1,point2,name="Line"):
@@ -561,7 +570,7 @@ def draw():
     Button("Save", 4, 10, buttonY+20, 150, 20) #4
     Button("Load", 5, 160, buttonY+20, 150, 20) #5
     isPreview = Toggle("Preview", 6, 10, buttonY+40, 150, 20, isPreview.val, "Rendering in preview mode") #6
-    isCollision = Toggle("Collision for all strands", 7, 160, buttonY+40, 150, 20, isCollision.val, "Implement collision detection") #7
+    #isCollision = Toggle("Collision for all strands", 7, 160, buttonY+40, 150, 20, isCollision.val, "Implement collision detection") #7
 
     #tipMagnet= Slider("Clump tipMagnet: ", 3, 10, buttonY+80, 300, 18, tipMagnet.val, 0, 1, 0,"How much tip of guide attract generated hairs")
     #randomFactClump= Slider("Clump Random: ", 3, 10, buttonY+100, 300, 18, randomFactClump.val, 0, 1, 0,"Random factor in clump hairs generation")
@@ -569,16 +578,15 @@ def draw():
     #sizeClump= Slider("Clump size: ", 3, 10, buttonY+140, 300, 18, sizeClump.val, 0.0, 0.5, 0,"Size of clump volume")
     #hairDiameterMultiStrand = Slider("Clump hair diam.: ", 0, 10, buttonY+160, 300, 20, hairDiameterMultiStrand.val, 0, 0.05, 0,"Diameter of hairs used in strand interpolation")
 
+    blendDistance= Slider("Strand blending dist.: ", 3, 10, buttonY+60, 300, 18, blendDistance.val, 0, 2, 0)
+    randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+80, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
+    numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+100, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
+    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+120, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)
+    hairDiameterClump = Slider("Strand hair diam.: ", 0, 10, buttonY+140, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
 
-    blendDistance= Slider("Strand blending dist.: ", 3, 10, buttonY+80, 300, 18, blendDistance.val, 0, 2, 0)
-    randomFactMultiStrand= Slider("Strand Random: ", 3, 10, buttonY+100, 300, 18, randomFactMultiStrand.val, 0, 1, 0)
-    numberOfHairsMultiStrand= Slider("Strand hairs num. ", 3, 10, buttonY+120, 300, 18, numberOfHairsMultiStrand.val, 1, 1000, 0)
-    sizeMultiStrand= Slider("Strand volume: ", 3, 10, buttonY+140, 300, 18, sizeMultiStrand.val, 0.0, 0.5, 0)
-    hairDiameterClump = Slider("Strand hair diam.: ", 0, 10, buttonY+160, 300, 20, hairDiameterClump.val, 0, 0.05, 0,"Diameter of hairs used in clump interpolation")
-
-    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+180, 300, 18, randomPercentage.val, 0.0, 1.0, 0)
-    rootColor = ColorPicker(3, 10, buttonY+200, 150, 20, rootColor.val,"Color of root")
-    tipColor = ColorPicker(3, 160, buttonY+200, 150, 20, tipColor.val,"Color of tip")
+    randomPercentage= Slider("Random perc.: ", 3, 10, buttonY+160, 300, 18, randomPercentage.val, 0.0, 1.0, 0)
+    rootColor = ColorPicker(3, 10, buttonY+180, 150, 20, rootColor.val,"Color of root")
+    tipColor = ColorPicker(3, 160, buttonY+180, 150, 20, tipColor.val,"Color of tip")
     
     buttonY = buttonY-100
     Button("Guide along normal", 9, 10, buttonY, 150, 20) #9
@@ -689,11 +697,23 @@ def bevent(evt):
             normal = mesh.verts[vertIndices[r]].no
             point2 = vadd(v,vmul(normal,gLength.val))
             curve=[vadd(v,vmul(normal,-0.5))]
+            w,normal2,point22,curve2 =[],[],[],[]
+            for j in range(0,scalpVerts):
+                w=mesh.verts[vertIndices[j]].co
+                dist = vdist(v,w)
+                if dist>=0.05 and dist<=0.3:
+                    normal2=mesh.verts[vertIndices[j]].no
+                    point22 = vadd(w,vmul(normal2,gLength.val))
+                    curve2=[vadd(w,vmul(normal2,-0.5))]
+                    break
             curve.append(vadd(v,vmul(normal,-0.2)))
+            curve2.append(vadd(w,vmul(normal2,-0.2)))
             for j in range(1,noCPoints.val-1):
                 curve.append(vadd(v,vmul(normal,cPInterval*j)))
+                curve2.append(vadd(w,vmul(normal2,cPInterval*j)))
             curve.append(point2)
-            drawCurve(scn,curve[:])
+            curve2.append(point22)
+            drawGuidePair(scn,curve[:],curve2[:])
         #r= random.randint(interval*(noGuides.val-1),scalpVerts-1)
         Blender.Redraw()
         #make last curve...
