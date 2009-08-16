@@ -1133,6 +1133,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                   {
                     GLint parameterCount = 0;
                     int index;
+                    int currentTextureSampler = 1;
                     
                     glGetProgramiv(obj->shader, GL_ACTIVE_UNIFORMS, &parameterCount);
 
@@ -1182,16 +1183,16 @@ void mhDrawMeshes(int pickMode, int cameraType)
                           }
                           case GL_SAMPLER_1D:
                           {
-                            glActiveTexture(GL_TEXTURE1);
+                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
                             glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
-                            glUniform1i(index, 1);
+                            glUniform1i(index, currentTextureSampler++);
                             break;
                           }
                           case GL_SAMPLER_2D:
                           {
-                            glActiveTexture(GL_TEXTURE1);
+                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
                             glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
-                            glUniform1i(index, 1);
+                            glUniform1i(index, currentTextureSampler++);
                             break;
                           }
                         }
@@ -1207,8 +1208,6 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 if (!pickMode && g_ShadersSupported && obj->shader)
                 {
                   glUseProgram(0);
-                  glActiveTexture(GL_TEXTURE1);
-                  glBindTexture(GL_TEXTURE_2D, 0);
                   glActiveTexture(GL_TEXTURE0);
                 }
 
