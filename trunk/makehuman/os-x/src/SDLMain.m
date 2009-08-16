@@ -9,6 +9,7 @@
 #import "SDLMain.h"
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <unistd.h>
+#import "AppPreferences.h"
 
 /* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
  but the method still is there and works. To avoid warnings, we declare
@@ -99,7 +100,8 @@ static NSString *getApplicationName(void)
 
 -(IBAction)showPreferences:(id)inSender
 {
-    [mPreferencesPanel makeKeyAndOrderFront:self];
+	[NSPreferences setDefaultPreferencesClass: [AppPreferences class]];
+	[[NSPreferences sharedPreferences] showPreferencesPanel];
 }
 
 +(void)openFile:(NSString*)fileName

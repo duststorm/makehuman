@@ -56,8 +56,11 @@
 		68C80B0B0FE3E41E0090D1E5 /* utils in Resources */ = {isa = PBXBuildFile; fileRef = 68C80AE10FE3E41D0090D1E5 /* utils */; };
 		68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.m */; };
 		68E6B39F1036B40300BAA9F5 /* Acknowledgments.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */; };
-		68E6B3DC1036C9B100BAA9F5 /* PreferencesWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B3DB1036C9B100BAA9F5 /* PreferencesWindow.mm */; };
-		68E6B8B01038175A00BAA9F5 /* update.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8AF1038175A00BAA9F5 /* update.tiff */; };
+		68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */; };
+		68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */; };
+		68E6B8DF103820F500BAA9F5 /* UpdatePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */; };
+		68E6B8E4103821B500BAA9F5 /* UpdatePreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */; };
+		68E6BA1610384AF100BAA9F5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BA1410384AF100BAA9F5 /* Localizable.strings */; };
 		68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
 		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -129,9 +132,15 @@
 		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
 		68DFFDA40FC1F059009CA434 /* data */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
 		68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Acknowledgments.rtf; path = resources/Acknowledgments.rtf; sourceTree = "<group>"; };
-		68E6B3DA1036C9B100BAA9F5 /* PreferencesWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferencesWindow.h; path = include/PreferencesWindow.h; sourceTree = "<group>"; };
-		68E6B3DB1036C9B100BAA9F5 /* PreferencesWindow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PreferencesWindow.mm; path = src/PreferencesWindow.mm; sourceTree = "<group>"; };
-		68E6B8AF1038175A00BAA9F5 /* update.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = update.tiff; path = resources/icons/update.tiff; sourceTree = "<group>"; };
+		68E6B3DA1036C9B100BAA9F5 /* AppPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppPreferences.h; path = include/AppPreferences.h; sourceTree = "<group>"; };
+		68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppPreferences.mm; path = src/AppPreferences.mm; sourceTree = "<group>"; };
+		68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = UpdatePreferences.tiff; path = resources/icons/UpdatePreferences.tiff; sourceTree = "<group>"; };
+		68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = UpdatePreferences.xib; path = resources/UpdatePreferences.xib; sourceTree = "<group>"; };
+		68E6B8E2103821B500BAA9F5 /* UpdatePreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpdatePreferences.h; path = include/UpdatePreferences.h; sourceTree = "<group>"; };
+		68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = UpdatePreferences.mm; path = src/UpdatePreferences.mm; sourceTree = "<group>"; };
+		68E6B8EB10383F5400BAA9F5 /* NSPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSPreferences.h; path = include/NSPreferences.h; sourceTree = "<group>"; };
+		68E6B8EC10383F7B00BAA9F5 /* NSPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSPreferencesModule.h; path = include/NSPreferencesModule.h; sourceTree = "<group>"; };
+		68E6BA1510384AF100BAA9F5 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = resources/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		68EA2B640FC8348A0052A87E /* mh_plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_plugins; path = ../mh_plugins; sourceTree = "<group>"; };
 		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
 		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
@@ -260,18 +269,18 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				68E6BA5210384D4400BAA9F5 /* Non Exported */,
 				68E6B88A1038137F00BAA9F5 /* icons */,
-				68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */,
 				6869C0F510322C2800DF62C3 /* key */,
-				6869C127103305C500DF62C3 /* About.pages */,
 				6859C28010178958000E212C /* SDLMain.xib */,
+				68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */,
 				68061C9B0FC136AB006C372E /* data */,
-				68F6D3F50E640E6A00D27961 /* AppIcon.psd */,
 				68F6D3F60E640E6A00D27961 /* AppIcon.icns */,
 				6839A7AD10179EFF008AF603 /* HelpLinks.strings */,
 				689F33190E6192CB00E37E9F /* InfoPlist.strings */,
 				689F331D0E6192CB00E37E9F /* Info.plist */,
 				6857022810031DA200F9C649 /* MakeHumanFramework-Info.plist */,
+				68E6BA1410384AF100BAA9F5 /* Localizable.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -288,8 +297,7 @@
 		684E6D210FEE32BD00941536 /* OS-X */ = {
 			isa = PBXGroup;
 			children = (
-				68E6B3DA1036C9B100BAA9F5 /* PreferencesWindow.h */,
-				68E6B3DB1036C9B100BAA9F5 /* PreferencesWindow.mm */,
+				68E6B9721038439B00BAA9F5 /* Preferences */,
 				685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */,
 				687236BC0FF7F8D30048ED40 /* OSXTools.h */,
 				687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */,
@@ -322,9 +330,32 @@
 		68E6B88A1038137F00BAA9F5 /* icons */ = {
 			isa = PBXGroup;
 			children = (
-				68E6B8AF1038175A00BAA9F5 /* update.tiff */,
+				68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */,
 			);
 			name = icons;
+			sourceTree = "<group>";
+		};
+		68E6B9721038439B00BAA9F5 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				68E6B8E2103821B500BAA9F5 /* UpdatePreferences.h */,
+				68E6B8EB10383F5400BAA9F5 /* NSPreferences.h */,
+				68E6B8EC10383F7B00BAA9F5 /* NSPreferencesModule.h */,
+				68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */,
+				68E6B3DA1036C9B100BAA9F5 /* AppPreferences.h */,
+				68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */,
+			);
+			name = Preferences;
+			sourceTree = "<group>";
+		};
+		68E6BA5210384D4400BAA9F5 /* Non Exported */ = {
+			isa = PBXGroup;
+			children = (
+				6869C127103305C500DF62C3 /* About.pages */,
+				68F6D3F50E640E6A00D27961 /* AppIcon.psd */,
+				68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */,
+			);
+			name = "Non Exported";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -451,7 +482,9 @@
 				6859C28110178958000E212C /* SDLMain.xib in Resources */,
 				6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */,
 				68E6B39F1036B40300BAA9F5 /* Acknowledgments.rtf in Resources */,
-				68E6B8B01038175A00BAA9F5 /* update.tiff in Resources */,
+				68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */,
+				68E6B8DF103820F500BAA9F5 /* UpdatePreferences.xib in Resources */,
+				68E6BA1610384AF100BAA9F5 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -523,7 +556,8 @@
 				68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */,
 				68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */,
 				687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */,
-				68E6B3DC1036C9B100BAA9F5 /* PreferencesWindow.mm in Sources */,
+				68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */,
+				68E6B8E4103821B500BAA9F5 /* UpdatePreferences.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -545,6 +579,14 @@
 			);
 			name = InfoPlist.strings;
 			path = resources/English.lproj;
+			sourceTree = "<group>";
+		};
+		68E6BA1410384AF100BAA9F5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				68E6BA1510384AF100BAA9F5 /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
