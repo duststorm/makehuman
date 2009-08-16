@@ -9,8 +9,15 @@
 #import "UpdatePreferences.h"
 #import "Sparkle/SUUpdater.h"
 
-@implementation UpdatePreferences
+@interface UpdatePreferences (Delegate)
+-(void)updater:(SUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast;
+@end // @interface UpdatePreferences (Delegate)
 
+@interface UpdatePreferences (Private)
+-(void)updateLastUpdateCheckTime;
+@end // @interface UpdatePreferences (Private)
+
+@implementation UpdatePreferences
 
 -(void)awakeFromNib
 {
@@ -68,3 +75,6 @@
     [self updateLastUpdateCheckTime];
 }
 @end // @implementation UpdatePreferences (Delegate)
+
+
+
