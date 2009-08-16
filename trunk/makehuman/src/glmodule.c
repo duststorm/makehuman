@@ -218,15 +218,27 @@ GLuint mhLoadTexture(const char *fname, GLuint texture)
     // For some reason we need to flip the surface vertically
     mhFlipSurface(surface);
 
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    //glTexImage2D(GL_TEXTURE_2D, 0, components, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
-    gluBuild2DMipmaps(GL_TEXTURE_2D, components, surface->w, surface->h, mode, GL_UNSIGNED_BYTE, surface->pixels);
-    glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+    if (surface->h == 1)
+    {
+      glBindTexture(GL_TEXTURE_1D, texture);
+      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      gluBuild1DMipmaps(GL_TEXTURE_1D, components, surface->w, mode, GL_UNSIGNED_BYTE, surface->pixels);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    }
+    else
+    {
+      glBindTexture(GL_TEXTURE_2D, texture);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      //glTexImage2D(GL_TEXTURE_2D, 0, components, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
+      gluBuild2DMipmaps(GL_TEXTURE_2D, components, surface->w, surface->h, mode, GL_UNSIGNED_BYTE, surface->pixels);
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    }
 
     SDL_FreeSurface(surface);
 
@@ -837,7 +849,7 @@ void OnInit()
     const float diffuseLight[] = { .5f, .5f, .5f, 1.0f};      /* Diffuse Light Values */
     const float specular[] = {0.5f, .5f, .5f, .5f};           /* Specular Light Values */
     const float MatAmb[] = {0.11f, 0.06f, 0.11f, 1.0f};       /* Material - Ambient Values */
-    const float MatDif[] = {0.2f, 0.6f, 0.9f, 1.0f};          /* Material - Diffuse Values */
+    const float MatDif[] = {0.7f, 0.6f, 0.6f, 1.0f};          /* Material - Diffuse Values */
     const float MatSpc[] = {0.33f, 0.33f, 0.52f, 1.0f};       /* Material - Specular Values */
     const float MatShn[] = {50.0f};                           /* Material - Shininess */
     //const float MatEms[] = {0.1f, 0.05f, 0.0f, 1.0f};         /* Material - emission Values */
@@ -894,7 +906,7 @@ void OnInit()
       glCreateProgram && glAttachShader && glLinkProgram && glUseProgram &&
       glGetShaderiv && glGetShaderInfoLog && glGetProgramiv && glGetProgramInfoLog &&
       glGetActiveUniform && glActiveTexture && glUniform1f && glUniform2f &&
-      glUniform3f && glUniform4f && glUniform1i;
+      glUniform3f && glUniform4f && glUniform1i && glGetString(GL_SHADING_LANGUAGE_VERSION);
 #endif // #ifndef __APPLE__
 
     // Init font
@@ -1148,6 +1160,13 @@ void mhDrawMeshes(int pickMode, int cameraType)
                               break;
                             glUniform4f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
                               PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
+                            break;
+                          }
+                          case GL_SAMPLER_1D:
+                          {
+                            glActiveTexture(GL_TEXTURE1);
+                            glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
+                            glUniform1i(index, 1);
                             break;
                           }
                           case GL_SAMPLER_2D:

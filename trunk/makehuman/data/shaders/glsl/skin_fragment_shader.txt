@@ -1,7 +1,7 @@
 varying vec3 normal, lightDir, halfVector;
 varying vec4 ambient_color, diffuse_color, specular_color;
 uniform sampler2D unit0;
-uniform sampler2D gradientMap;
+uniform sampler1D gradientMap;
 
 void main (void)
 {
@@ -19,11 +19,11 @@ void main (void)
 	if(NdotL > 0.0)
 	{
 		// Color temperature
-		vec2 st = vec2(max(0.01, min(NdotL, 0.99)), 0); // Make sure we don't wrap around, strange since we clamp our texture
-		vec4 light_color = texture2D(gradientMap, st); // Take the color temperature from the gradient
-	
+		float s = max(0.01, min(NdotL, 0.99)); // Make sure we don't wrap around, strange since we clamp our texture
+		vec4 light_color = texture1D(gradientMap, s); // Take the color temperature from the gradient
+		
 		// Diffuse * texture color
-		final_color += NdotL * light_color * tex_color;	// diffuse_color makes it too dark
+		final_color += NdotL * diffuse_color * light_color * tex_color;	// diffuse_color makes it too dark
 		
 		// Specular
 		vec3 H = normalize(halfVector);
