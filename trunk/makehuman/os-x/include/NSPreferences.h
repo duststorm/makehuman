@@ -1,7 +1,11 @@
 #import <Cocoa/Cocoa.h>
 #import "NSPreferencesModule.h"
 
-extern void _nsBeginNSPSupport();				// magic call to get NSPreferences working properly....
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void _nsBeginNSPSupport();				// magic call to get NSPreferences working properly....
 
 @interface NSPreferences : NSObject
 {
@@ -53,3 +57,7 @@ extern void _nsBeginNSPSupport();				// magic call to get NSPreferences working 
 - (NSArray *) toolbarSelectableItemIdentifiers: (NSToolbar *) toolbar;
 
 @end
+
+#ifdef __cplusplus
+}
+#endif
