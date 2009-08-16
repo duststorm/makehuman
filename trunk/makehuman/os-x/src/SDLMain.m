@@ -67,6 +67,7 @@ static NSString *getApplicationName(void)
 @interface SDLApplication : NSApplication
 @end
 
+
 @implementation SDLApplication
 /* Invoked from the Quit menu item */
 - (void)terminate:(id)sender
@@ -89,11 +90,16 @@ static NSString *getApplicationName(void)
 -(IBAction)showAbout:(id)inSender
 {
     [mAboutPanel makeKeyAndOrderFront:self];
+}
 
-/*
-    NSWindow *currentWindow = [NSApp keyWindow];
-    [NSApp beginSheet:mAboutPanel modalForWindow:currentWindow modalDelegate:self didEndSelector:@selector(endSelector:) contextInfo:self];
-*/
+-(IBAction)showAcknowledgments:(id)inSender
+{
+    [mAcknowlegmentPanel makeKeyAndOrderFront:self];
+}
+
+-(IBAction)showPreferences:(id)inSender
+{
+    [mPreferencesPanel makeKeyAndOrderFront:self];
 }
 
 +(void)openFile:(NSString*)fileName
@@ -348,13 +354,17 @@ static void CustomApplicationMain (int argc, char **argv)
     gCalledAppMainline = TRUE;
     status = SDL_main (gArgc, gArgv);
 
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    /* Store the User defaults */
+    [userDefaults synchronize];
+
     /* We're done, thank you for playing */
     exit(status);
 }
 
 @synthesize licenseWindowVisible;
 
-@end
+@end /* @implementation SDLMain */
 
 
 @implementation NSString (ReplaceSubString)

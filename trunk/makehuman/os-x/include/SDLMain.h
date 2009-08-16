@@ -12,6 +12,9 @@
     bool licenseWindowVisible;
 
     IBOutlet NSPanel *mAboutPanel;
+    IBOutlet NSPanel *mAcknowlegmentPanel;
+    IBOutlet NSPanel *mPreferencesPanel;
+    IBOutlet NSUserDefaultsController *mUserDefaults;
 }
 
 @property (assign) bool licenseWindowVisible;
@@ -36,5 +39,7 @@
 
 
 -(IBAction)showAbout:(id)inSender;
+-(IBAction)showAcknowledgments:(id)inSender;
+-(IBAction)showPreferences:(id)inSender;
 
 @end

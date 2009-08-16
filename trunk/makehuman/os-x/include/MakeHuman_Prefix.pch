@@ -16,9 +16,9 @@
 #include "OSXTools.h"
 #include "SDLMain.h"
 #include "NSFont_OpenGL.h"
-#include "SDLMain.h"
+//#include "SDLMain.h"
 
 
-#include "core.h"
-#include "glmodule.h"
+//#include "core.h"
+//#include "glmodule.h"
 

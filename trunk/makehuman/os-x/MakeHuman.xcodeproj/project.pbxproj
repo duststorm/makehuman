@@ -35,6 +35,11 @@
 		68570292100322C400F9C649 /* glmodule.h in Headers */ = {isa = PBXBuildFile; fileRef = 685701301000EE8000F9C649 /* glmodule.h */; };
 		68570293100322CB00F9C649 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 6857012F1000EE8000F9C649 /* core.h */; };
 		6859C28110178958000E212C /* SDLMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6859C28010178958000E212C /* SDLMain.xib */; };
+		6869C0DE10322A0400DF62C3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
+		6869C0DF10322A0400DF62C3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
+		6869C0E710322A4200DF62C3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
+		6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
+		6869C0FA10322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
 		686E5B9E0FA19EA3005B137C /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
 		686E5D820FA1AC91005B137C /* SDL_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 686E5B9D0FA19EA3005B137C /* SDL_image.framework */; };
 		686FD6FD0FC06DA4006C12DA /* main.py in Resources */ = {isa = PBXBuildFile; fileRef = 686FD6FC0FC06DA4006C12DA /* main.py */; };
@@ -50,6 +55,9 @@
 		689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
 		68C80B0B0FE3E41E0090D1E5 /* utils in Resources */ = {isa = PBXBuildFile; fileRef = 68C80AE10FE3E41D0090D1E5 /* utils */; };
 		68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.m */; };
+		68E6B39F1036B40300BAA9F5 /* Acknowledgments.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */; };
+		68E6B3DC1036C9B100BAA9F5 /* PreferencesWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B3DB1036C9B100BAA9F5 /* PreferencesWindow.mm */; };
+		68E6B8B01038175A00BAA9F5 /* update.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8AF1038175A00BAA9F5 /* update.tiff */; };
 		68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
 		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -74,6 +82,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				6869C0E710322A4200DF62C3 /* Sparkle.framework in CopyFiles */,
 				686E5D820FA1AC91005B137C /* SDL_image.framework in CopyFiles */,
 				6894C50E0FA1893900A52097 /* SDL.framework in CopyFiles */,
 			);
@@ -97,6 +106,9 @@
 		6859C28010178958000E212C /* SDLMain.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SDLMain.xib; path = resources/English.lproj/SDLMain.xib; sourceTree = "<group>"; };
 		685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MakeHuman_Prefix.pch; path = include/MakeHuman_Prefix.pch; sourceTree = "<group>"; };
 		686944D10FCB25F1005B01DC /* mh_core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_core; path = ../mh_core; sourceTree = SOURCE_ROOT; };
+		6869C0DD10322A0400DF62C3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = frameworks/Sparkle.framework; sourceTree = "<group>"; };
+		6869C0F810322D1100DF62C3 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = resources/dsa_pub.pem; sourceTree = "<group>"; };
+		6869C127103305C500DF62C3 /* About.pages */ = {isa = PBXFileReference; lastKnownFileType = file; name = About.pages; path = resources/About.pages; sourceTree = "<group>"; };
 		686E5B9D0FA19EA3005B137C /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = frameworks/SDL_image.framework; sourceTree = "<group>"; };
 		686E5D340FA1AB4B005B137C /* pythonwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pythonwrapper; path = include/pythonwrapper; sourceTree = "<group>"; };
 		686E5D380FA1AB5F005B137C /* sdlwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sdlwrapper; path = include/sdlwrapper; sourceTree = "<group>"; };
@@ -116,6 +128,10 @@
 		68D8631C0FA5D1810097F73F /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDLMain.m; path = src/SDLMain.m; sourceTree = "<group>"; };
 		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
 		68DFFDA40FC1F059009CA434 /* data */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
+		68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Acknowledgments.rtf; path = resources/Acknowledgments.rtf; sourceTree = "<group>"; };
+		68E6B3DA1036C9B100BAA9F5 /* PreferencesWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferencesWindow.h; path = include/PreferencesWindow.h; sourceTree = "<group>"; };
+		68E6B3DB1036C9B100BAA9F5 /* PreferencesWindow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PreferencesWindow.mm; path = src/PreferencesWindow.mm; sourceTree = "<group>"; };
+		68E6B8AF1038175A00BAA9F5 /* update.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = update.tiff; path = resources/icons/update.tiff; sourceTree = "<group>"; };
 		68EA2B640FC8348A0052A87E /* mh_plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_plugins; path = ../mh_plugins; sourceTree = "<group>"; };
 		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
 		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
@@ -148,6 +164,7 @@
 				6857023110031E1C00F9C649 /* GLUT.framework in Frameworks */,
 				6857023210031E1C00F9C649 /* OpenGL.framework in Frameworks */,
 				6857023310031E1C00F9C649 /* Python.framework in Frameworks */,
+				6869C0DF10322A0400DF62C3 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +178,7 @@
 				689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */,
 				6894C4E20FA188D000A52097 /* SDL.framework in Frameworks */,
 				686E5B9E0FA19EA3005B137C /* SDL_image.framework in Frameworks */,
+				6869C0DE10322A0400DF62C3 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,6 +200,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6869C0DD10322A0400DF62C3 /* Sparkle.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -241,6 +260,10 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				68E6B88A1038137F00BAA9F5 /* icons */,
+				68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */,
+				6869C0F510322C2800DF62C3 /* key */,
+				6869C127103305C500DF62C3 /* About.pages */,
 				6859C28010178958000E212C /* SDLMain.xib */,
 				68061C9B0FC136AB006C372E /* data */,
 				68F6D3F50E640E6A00D27961 /* AppIcon.psd */,
@@ -265,6 +288,8 @@
 		684E6D210FEE32BD00941536 /* OS-X */ = {
 			isa = PBXGroup;
 			children = (
+				68E6B3DA1036C9B100BAA9F5 /* PreferencesWindow.h */,
+				68E6B3DB1036C9B100BAA9F5 /* PreferencesWindow.mm */,
 				685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */,
 				687236BC0FF7F8D30048ED40 /* OSXTools.h */,
 				687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */,
@@ -276,6 +301,14 @@
 			name = "OS-X";
 			sourceTree = "<group>";
 		};
+		6869C0F510322C2800DF62C3 /* key */ = {
+			isa = PBXGroup;
+			children = (
+				6869C0F810322D1100DF62C3 /* dsa_pub.pem */,
+			);
+			name = key;
+			sourceTree = "<group>";
+		};
 		686FD6FB0FC06D98006C12DA /* Python */ = {
 			isa = PBXGroup;
 			children = (
@@ -284,6 +317,14 @@
 				686FD6FC0FC06DA4006C12DA /* main.py */,
 			);
 			name = Python;
+			sourceTree = "<group>";
+		};
+		68E6B88A1038137F00BAA9F5 /* icons */ = {
+			isa = PBXGroup;
+			children = (
+				68E6B8AF1038175A00BAA9F5 /* update.tiff */,
+			);
+			name = icons;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -352,7 +393,8 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				68F6D3510E63F23400D27961 /* ShellScript */,
+				68F6D3510E63F23400D27961 /* Copy Resources Script */,
+				6869C1771034134B00DF62C3 /* Post Release build script */,
 			);
 			buildRules = (
 			);
@@ -391,6 +433,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6869C0FA10322D1100DF62C3 /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,24 +449,44 @@
 				68C80B0B0FE3E41E0090D1E5 /* utils in Resources */,
 				684E6D680FEE34E600941536 /* docs in Resources */,
 				6859C28110178958000E212C /* SDLMain.xib in Resources */,
+				6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */,
+				68E6B39F1036B40300BAA9F5 /* Acknowledgments.rtf in Resources */,
+				68E6B8B01038175A00BAA9F5 /* update.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		68F6D3510E63F23400D27961 /* ShellScript */ = {
+		6869C1771034134B00DF62C3 /* Post Release build script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Post Release build script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "set -o errexit\n\nif [ ${USER} == \"hdusel\" ] && [ ${BUILD_STYLE} == \"Release\" ]; then \n    echo \"Executing post release build actions...\"\n\n    VERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\n    SHORTVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleShortVersionString)\n    DOWNLOAD_BASE_URL=\"http://makehuman.googlecode.com/files/\"\n    RELEASENOTES_URL=\"http://tangerine-soft.de/rss/appcasts/makehuman/release-notes-version-${SHORTVERSION}.html\"\n    \n    ARCHIVE_FILENAME=\"${PROJECT_NAME}_${SHORTVERSION}.zip\"\n    DOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\n    KEYCHAIN_PRIVKEY_NAME=\"Sparkle Private Key 1\"\n    \n    WD=$PWD\n    cd \"$BUILT_PRODUCTS_DIR\"\n    rm -f \"$PROJECT_NAME\"*.zip\n    ditto -ck --keepParent \"$PROJECT_NAME.app\" \"$ARCHIVE_FILENAME\"\n    \n    SIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\n    PUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n    \ncat <<EOF\n        <item>\n            <title>Version $VERSION</title>\n            <!--<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>-->\n            <pubDate>$PUBDATE</pubDate>\n            <enclosure\n                url=\"$DOWNLOAD_URL\"\n                sparkle:version=\"$VERSION\"\n                sparkle:shortVersionString=\"$SHORTVERSION\"\n                type=\"application/octet-stream\"\n                length=\"$SIZE\"\n                sparkle:dsaSignature=\"$SIGNATURE\"\n            />\n        </item>\nEOF\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		68F6D3510E63F23400D27961 /* Copy Resources Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Resources Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# data 3dobjs mh_plugins mh_core\n\n# Copy the data directory into the Application Folder (Resources/data)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\"\n  cp -rf \"${PROJECT_DIR}/../data\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n# Copy the data directory into the Application Folder (Resources/mh_plugins)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\"\n  cp -rf \"${PROJECT_DIR}/../mh_plugins\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n# Copy the data directory into the Application Folder (Resources/mh_core)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\"\n  cp -rf \"${PROJECT_DIR}/../mh_core\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n\n# Copy the data directory into the Application Folder (Resources/docs)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\"\n  cp -rf \"${PROJECT_DIR}/../docs\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\ncp -f \"${PROJECT_DIR}/../main.py\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -460,6 +523,7 @@
 				68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */,
 				68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */,
 				687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */,
+				68E6B3DC1036C9B100BAA9F5 /* PreferencesWindow.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -545,9 +609,11 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -584,9 +650,11 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
@@ -612,6 +680,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -631,13 +704,21 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
 				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				DEAD_CODE_STRIPPING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				PREBINDING = YES;
 				PRODUCT_NAME = MakeHuman;
+				STRIP_INSTALLED_PRODUCT = YES;
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
 			};

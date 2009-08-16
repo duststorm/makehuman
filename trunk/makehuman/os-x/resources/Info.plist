@@ -23,10 +23,16 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0a3b</string>
+	<string>1.0.0.31</string>
 	<key>NSMainNibFile</key>
 	<string>SDLMain</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
+	<key>SUFeedURL</key>
+	<string>http://tangerine-soft.de/rss/appcasts/makehuman/makehuman.xml</string>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
 </dict>
 </plist>
