@@ -34,7 +34,9 @@
 // Text, shader and texture services
 void mhDrawText(float x, float y, const char *message);
 GLuint mhLoadTexture(const char *fname, GLuint texture);
-GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShaderSource, GLuint shader);
+GLuint mhCreateVertexShader(const char *source);
+GLuint mhCreateFragmentShader(const char *source);
+GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader);
 int mhGrabScreen(int x, int y, int width, int height, const char *filename);
 
 // Input events

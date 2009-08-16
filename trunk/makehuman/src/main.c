@@ -424,13 +424,37 @@ static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
         return Py_BuildValue("i", texture);
 }
 
+PyObject* mh_CreateVertexShader(PyObject *self, PyObject *args)
+{
+    int shader;
+    char *vertexShaderSource;
+    if (!PyArg_ParseTuple(args, "s", &vertexShaderSource))
+        return NULL;
+    else if (!(shader = mhCreateVertexShader(vertexShaderSource)))
+        return NULL;
+    else
+        return Py_BuildValue("i", shader);
+}
+
+PyObject* mh_CreateFragmentShader(PyObject *self, PyObject *args)
+{
+    int shader;
+    char *source;
+    if (!PyArg_ParseTuple(args, "s", &source))
+        return NULL;
+    else if (!(shader = mhCreateFragmentShader(source)))
+        return NULL;
+    else
+        return Py_BuildValue("i", shader);
+}
+
 PyObject* mh_CreateShader(PyObject *self, PyObject *args)
 {
     int shader;
-    char *vertexShaderSource, *fragmentShaderSource;
-    if (!PyArg_ParseTuple(args, "ssi", &vertexShaderSource, &fragmentShaderSource, &shader))
+    int vertexShader, fragmentShader;
+    if (!PyArg_ParseTuple(args, "ii", &vertexShader, &fragmentShader))
         return NULL;
-    else if (!(shader = mhCreateShader(vertexShaderSource, fragmentShaderSource, shader)))
+    else if (!(shader = mhCreateShader(vertexShader, fragmentShader)))
         return NULL;
     else
         return Py_BuildValue("i", shader);
@@ -497,6 +521,8 @@ static PyMethodDef EmbMethods[] =
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
     {"loadTexture", mh_LoadTexture, METH_VARARGS, ""},
+    {"createVertexShader", mh_CreateVertexShader, METH_VARARGS, ""},
+    {"createFragmentShader", mh_CreateFragmentShader, METH_VARARGS, ""},
     {"createShader", mh_CreateShader, METH_VARARGS, ""},
     {"grabScreen", mh_GrabScreen, METH_VARARGS, ""},
     {"startWindow", mh_startWindow, METH_VARARGS, ""},

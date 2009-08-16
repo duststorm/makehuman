@@ -245,19 +245,17 @@ GLuint mhLoadTexture(const char *fname, GLuint texture)
     return texture;
 }
 
-GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShaderSource, GLuint shader)
+GLuint mhCreateVertexShader(const char *source)
 {
-  GLuint v, f, p;
+  GLuint v;
   GLint status;
 
   if (!g_ShadersSupported)
     return 0;
 
   v = glCreateShader(GL_VERTEX_SHADER);
-	f = glCreateShader(GL_FRAGMENT_SHADER);
 
-  glShaderSource(v, 1, &vertexShaderSource, NULL);
-  glShaderSource(f, 1, &fragmentShaderSource, NULL);
+  glShaderSource(v, 1, &source, NULL);
 
   glCompileShader(v);
   glGetShaderiv(v, GL_COMPILE_STATUS, &status);
@@ -283,7 +281,19 @@ GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShader
     return 0;
   }
 
-	glCompileShader(f);
+  return v;
+}
+
+GLuint mhCreateFragmentShader(const char *source)
+{
+  GLuint f;
+  GLint status;
+
+  f = glCreateShader(GL_FRAGMENT_SHADER);
+
+  glShaderSource(f, 1, &source, NULL);
+
+  glCompileShader(f);
   glGetShaderiv(f, GL_COMPILE_STATUS, &status);
   if (status != GL_TRUE)
   {
@@ -307,10 +317,18 @@ GLuint mhCreateShader(const char *vertexShaderSource, const char *fragmentShader
     return 0;
   }
 
+  return f;
+}
+
+GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader)
+{
+  GLuint p;
+  GLint status;
+
 	p = glCreateProgram();
 	
-	glAttachShader(p, v);
-	glAttachShader(p, f);
+	glAttachShader(p, vertexShader);
+	glAttachShader(p, fragmentShader);
 
 	glLinkProgram(p);
   glGetProgramiv(p, GL_LINK_STATUS, &status);
