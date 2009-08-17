@@ -621,6 +621,24 @@ class RadioButton(Button):
       self.button.setTexture(self.selectedTexture)
     else:
       self.button.setTexture(self.texture)
+      
+# ToggleButton widget
+class ToggleButton(Button):
+  def __init__(self, parent, mesh = "data/3dobjs/button_gender.obj",
+      texture = None, selectedTexture = None, position = [0, 0, 9], selected = False):
+    Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected)
+    
+  def onClicked(self, event):
+    if self.selected:
+      self.setSelected(False)
+    else:
+      self.setSelected(True)
+  
+  def onMouseDown(self, event):
+    pass
+    
+  def onMouseUp(self, event):
+    pass
 
 # ToolbarButton widget (unused)
 class ToolbarButton(RadioButton):

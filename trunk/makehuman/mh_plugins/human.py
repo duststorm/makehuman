@@ -36,10 +36,11 @@ class Human(gui3d.Object):
         gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 1, shadeless = 0, visible = True)
         self.meshData = self.mesh
         # Uncomment the following 4 lines to use a shader
-        vertex_shader = mh.createVertexShader(open("data/shaders/glsl/skin_vertex_shader.txt").read())
-        fragment_shader = mh.createFragmentShader(open("data/shaders/glsl/skin_fragment_shader.txt").read())
-        self.mesh.setShader(mh.createShader(vertex_shader, fragment_shader))
-        self.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
+        #vertex_shader = mh.createVertexShader(open("data/shaders/glsl/skin_vertex_shader.txt").read())
+        #fragment_shader = mh.createFragmentShader(open("data/shaders/glsl/skin_fragment_shader.txt").read())
+        #self.mesh.setShader(mh.createShader(vertex_shader, fragment_shader))
+        #self.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
+        #self.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/ambient_occlusion.png", 0))
         self.scene = globalScene
         self.progressBar = gui3d.ProgressBar(globalScene.application,
             backgroundTexture = globalScene.application.getThemeResource("images", "progressbar_background.png"),
@@ -50,7 +51,8 @@ class Human(gui3d.Object):
         self.lastZoneModified = None
         self.grabMode = 0
         self.editMode = "macro"
-        self.modellingType = "translation"        
+        self.modellingType = "translation" 
+        self.symmetryModeEnabled = False    
         
         self.detailTargetX1a = None
         self.detailTargetX2a = None
@@ -347,6 +349,22 @@ class Human(gui3d.Object):
           
     def setHairFile(self, filename):
         self.hairFile = filename
+        
+    def getSymmetryGroup(self, group):
+        if group.name.find("l-", 0, 2) != -1:
+          return self.mesh.getFaceGroup(group.name.replace("l-", "r-", 1))
+        elif group.name.find("r-", 0, 2) != -1:
+          return self.mesh.getFaceGroup(group.name.replace("r-", "l-", 1))
+        else:
+          return None
+          
+    def getSymmetryPart(self, name):
+        if name.find("l-", 0, 2) != -1:
+          return name.replace("l-", "r-", 1)
+        elif name.find("r-", 0, 2) != -1:
+          return name.replace("r-", "l-", 1)
+        else:
+          return None
             
     def applyAllTargets(self):
 

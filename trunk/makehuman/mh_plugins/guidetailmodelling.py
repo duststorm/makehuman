@@ -24,24 +24,20 @@ __docformat__ = 'restructuredtext'
 import events3d, gui3d, algos3d
 
 class DetailAction:
-  def __init__(self, human, leftTarget, rightTarget, leftBefore, rightBefore, leftAfter, rightAfter):
+  def __init__(self, human, before, after):
     self.name = "Change detail"
     self.human = human
-    self.leftTarget = leftTarget
-    self.rightTarget = rightTarget
-    self.leftBefore = leftBefore
-    self.rightBefore = rightBefore
-    self.leftAfter = leftAfter
-    self.rightAfter = rightAfter
+    self.before = before
+    self.after = after
     
   def do(self):
-    self.human.setDetail(self.leftTarget, self.leftAfter)
-    self.human.setDetail(self.rightTarget, self.rightAfter)
+    for target, value in self.after.iteritems():
+      self.human.setDetail(target, value)
     self.human.applyAllTargets()
     
   def undo(self):
-    self.human.setDetail(self.leftTarget, self.leftBefore)
-    self.human.setDetail(self.rightTarget, self.rightBefore)
+    for target, value in self.before.iteritems():
+      self.human.setDetail(target, value)
     self.human.applyAllTargets()
 
 class DetailTool(events3d.EventHandler):
@@ -52,6 +48,8 @@ class DetailTool(events3d.EventHandler):
     self.right = right
     self.leftTarget = None
     self.rightTarget = None
+    self.symmetryTargets = None
+    self.before = None
     self.selectedGroups = []
     
   def onMouseDown(self, event):
@@ -69,14 +67,26 @@ class DetailTool(events3d.EventHandler):
     self.leftTarget = "%s%s%s.target"%(folder, part, self.left)
     self.rightTarget = "%s%s%s.target"%(folder, part, self.right)
     
-    if self.leftTarget in human.targetsDetailStack:
-      self.leftBefore = human.targetsDetailStack[self.leftTarget]
-    else:
-      self.leftBefore = 0
-    if self.rightTarget in human.targetsDetailStack:
-      self.rightBefore = human.targetsDetailStack[self.rightTarget]
-    else:
-      self.rightBefore = 0
+    # Add targets
+    self.before = {}
+    self.before[self.leftTarget] = 0;
+    self.before[self.rightTarget] = 0;
+    
+    # Add symmetry targets if needed
+    self.symmetryTargets = {}
+    if human.symmetryModeEnabled:
+      symmetryPart = human.getSymmetryPart(part)
+      print(part + str(symmetryPart))
+      if symmetryPart:
+        self.symmetryTargets[self.leftTarget] = "%s%s%s.target"%(folder, symmetryPart, self.left)
+        self.symmetryTargets[self.rightTarget] = "%s%s%s.target"%(folder, symmetryPart, self.right)
+        for target in self.symmetryTargets.itervalues():
+          self.before[target] = 0;
+    
+    # Save the state
+    for target in self.before.iterkeys():
+      if target in human.targetsDetailStack:
+        self.before[target] = human.targetsDetailStack[target]
     
   def onMouseDragged(self, event):
     human = self.app.scene3d.selectedHuman
@@ -107,11 +117,17 @@ class DetailTool(events3d.EventHandler):
         prev = human.targetsDetailStack[remove]
         next = max(0.0, human.targetsDetailStack[remove] - value)
         human.targetsDetailStack[remove] = next
+        if remove in self.symmetryTargets:
+          human.targetsDetailStack[self.symmetryTargets[remove]] = next
       else:
         prev = human.targetsDetailStack[remove]
         next = 0.0
         del human.targetsDetailStack[remove]
+        if remove in self.symmetryTargets and self.symmetryTargets[remove] in human.targetsDetailStack.keys():
+          del human.targetsDetailStack[self.symmetryTargets[remove]]
       algos3d.loadTranslationTarget(human.meshData, remove, next - prev, None, 1, 0)
+      if remove in self.symmetryTargets:
+        algos3d.loadTranslationTarget(human.meshData, self.symmetryTargets[remove], next - prev, None, 1, 0)
     else:
       if add in human.targetsDetailStack.keys():
         prev = human.targetsDetailStack[add]
@@ -121,6 +137,9 @@ class DetailTool(events3d.EventHandler):
         next = min(1.0, value)
       human.targetsDetailStack[add] = next
       algos3d.loadTranslationTarget(human.meshData, add, next - prev, None, 1, 0)
+      if add in self.symmetryTargets:
+        human.targetsDetailStack[self.symmetryTargets[add]] = next
+        algos3d.loadTranslationTarget(human.meshData, self.symmetryTargets[add], next - prev, None, 1, 0)
     
   def onMouseUp(self, event):
     human = self.app.scene3d.selectedHuman
@@ -128,18 +147,15 @@ class DetailTool(events3d.EventHandler):
     # Recalculate
     human.applyAllTargets()
     
-    # Add undo item
-    if self.leftTarget in human.targetsDetailStack:
-      leftAfter = human.targetsDetailStack[self.leftTarget]
-    else:
-      leftAfter = 0
-    if self.rightTarget in human.targetsDetailStack:
-      rightAfter = human.targetsDetailStack[self.rightTarget]
-    else:
-      rightAfter = 0
+    after = {}
+    
+    for target in self.before.keys():
+      if target in human.targetsDetailStack:
+        after[target] = human.targetsDetailStack[target]
+      else:
+        after[target] = 0
       
-    self.app.did(DetailAction(human, self.leftTarget, self.rightTarget,
-      self.leftBefore, self.rightBefore,  leftAfter, rightAfter))
+    self.app.did(DetailAction(human, self.before, after))
       
   def onMouseMoved(self, event):
     human = self.app.scene3d.selectedHuman
@@ -153,6 +169,10 @@ class DetailTool(events3d.EventHandler):
       for g in human.mesh.facesGroups:
         if part in g.name:
           groups.append(g)
+          if human.symmetryModeEnabled:
+            sg = human.getSymmetryGroup(g)
+            if sg:
+              groups.append(sg)
       
     for g in self.selectedGroups:
       if g not in groups:
@@ -331,11 +351,19 @@ class Detail3dTool(events3d.EventHandler):
     
     if self.micro:
       groups.append(event.group)
+      if human.symmetryModeEnabled:
+        sg = human.getSymmetryGroup(event.group)
+        if sg:
+          groups.append(sg)
     else:
       part = human.getPartNameForGroupName(event.group.name)
       for g in human.mesh.facesGroups:
         if part in g.name:
           groups.append(g)
+          if human.symmetryModeEnabled:
+            sg = human.getSymmetryGroup(g)
+            if sg:
+              groups.append(sg)
       
     for g in self.selectedGroups:
       if g not in groups:
@@ -432,7 +460,10 @@ class DetailModelingTaskView(gui3d.TaskView):
       texture = self.app.getThemeResource("images", "button_symmright.png"), position = [0.37, 0.04, 9])
     self.leftSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmleft.obj",
       texture = self.app.getThemeResource("images", "button_symmleft.png"), position = [0.45, 0.04, 9])
-      
+    self.symmetryButton = gui3d.ToggleButton(self, mesh = "data/3dobjs/button_symmright.obj",
+      texture = self.app.getThemeResource("images", "button_symmetry.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_symmetry_on.png"), position = [0.37, -0.04, 9])      
+    
     @self.rightSymmetryButton.event
     def onClicked(event):
       human = self.app.scene3d.selectedHuman
@@ -442,6 +473,12 @@ class DetailModelingTaskView(gui3d.TaskView):
     def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.applySymmetryLeft()
+      
+    @self.symmetryButton.event
+    def onClicked(event):
+      gui3d.ToggleButton.onClicked(self.symmetryButton, event)
+      human = self.app.scene3d.selectedHuman
+      human.symmetryModeEnabled = self.symmetryButton.selected
       
   def onShow(self, event):
     self.app.tool = self.tool
@@ -485,6 +522,8 @@ class MicroModelingTaskView(gui3d.TaskView):
       texture = self.app.getThemeResource("images", "button_symmright.png"), position = [0.37, 0.04, 9])
     self.leftSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmleft.obj",
       texture = self.app.getThemeResource("images", "button_symmleft.png"), position = [0.45, 0.04, 9])
+    self.symmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmright.obj",
+      texture = self.app.getThemeResource("images", "button_symmetry.png"), position = [0.37, -0.04, 9])
       
     @self.rightSymmetryButton.event
     def onClicked(event):
