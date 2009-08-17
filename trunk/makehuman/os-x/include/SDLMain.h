@@ -7,6 +7,16 @@
 
 #import <Cocoa/Cocoa.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    const char* getExportPath();
+    const char* getModelPath();
+    
+#ifdef __cplusplus
+}
+#endif
+
 @interface SDLMain : NSObject
 {
     bool licenseWindowVisible;

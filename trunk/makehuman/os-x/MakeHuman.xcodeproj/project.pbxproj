@@ -54,13 +54,17 @@
 		689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
 		689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
 		68C80B0B0FE3E41E0090D1E5 /* utils in Resources */ = {isa = PBXBuildFile; fileRef = 68C80AE10FE3E41D0090D1E5 /* utils */; };
-		68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.m */; };
+		68D8631D0FA5D1810097F73F /* SDLMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.mm */; };
 		68E6B39F1036B40300BAA9F5 /* Acknowledgments.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */; };
 		68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */; };
 		68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */; };
 		68E6B8DF103820F500BAA9F5 /* UpdatePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */; };
 		68E6B8E4103821B500BAA9F5 /* UpdatePreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */; };
 		68E6BA1610384AF100BAA9F5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BA1410384AF100BAA9F5 /* Localizable.strings */; };
+		68E6BB1810395A6600BAA9F5 /* GeneralPreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6BB1710395A6600BAA9F5 /* GeneralPreferences.mm */; };
+		68E6BB1C10395B2C00BAA9F5 /* GeneralPreferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BB1B10395B2C00BAA9F5 /* GeneralPreferences.tiff */; };
+		68E6BB471039619700BAA9F5 /* GeneralPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BB461039619700BAA9F5 /* GeneralPreferences.xib */; };
+		68E6BBBC1039732800BAA9F5 /* folder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BBBB1039732800BAA9F5 /* folder.tiff */; };
 		68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
 		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -128,7 +132,7 @@
 		689F33E70E6199B000E37E9F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		689F33E90E6199BD00E37E9F /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		68C80AE10FE3E41D0090D1E5 /* utils */ = {isa = PBXFileReference; lastKnownFileType = folder; name = utils; path = ../utils; sourceTree = SOURCE_ROOT; };
-		68D8631C0FA5D1810097F73F /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDLMain.m; path = src/SDLMain.m; sourceTree = "<group>"; };
+		68D8631C0FA5D1810097F73F /* SDLMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SDLMain.mm; path = src/SDLMain.mm; sourceTree = "<group>"; };
 		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
 		68DFFDA40FC1F059009CA434 /* data */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
 		68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Acknowledgments.rtf; path = resources/Acknowledgments.rtf; sourceTree = "<group>"; };
@@ -141,6 +145,11 @@
 		68E6B8EB10383F5400BAA9F5 /* NSPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSPreferences.h; path = include/NSPreferences.h; sourceTree = "<group>"; };
 		68E6B8EC10383F7B00BAA9F5 /* NSPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSPreferencesModule.h; path = include/NSPreferencesModule.h; sourceTree = "<group>"; };
 		68E6BA1510384AF100BAA9F5 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = resources/English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		68E6BB1610395A4D00BAA9F5 /* GeneralPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeneralPreferences.h; path = include/GeneralPreferences.h; sourceTree = "<group>"; };
+		68E6BB1710395A6600BAA9F5 /* GeneralPreferences.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GeneralPreferences.mm; path = src/GeneralPreferences.mm; sourceTree = "<group>"; };
+		68E6BB1B10395B2C00BAA9F5 /* GeneralPreferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GeneralPreferences.tiff; path = resources/icons/GeneralPreferences.tiff; sourceTree = "<group>"; };
+		68E6BB461039619700BAA9F5 /* GeneralPreferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = GeneralPreferences.xib; path = resources/GeneralPreferences.xib; sourceTree = "<group>"; };
+		68E6BBBB1039732800BAA9F5 /* folder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = folder.tiff; path = resources/icons/folder.tiff; sourceTree = "<group>"; };
 		68EA2B640FC8348A0052A87E /* mh_plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_plugins; path = ../mh_plugins; sourceTree = "<group>"; };
 		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
 		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
@@ -273,6 +282,7 @@
 				68E6B88A1038137F00BAA9F5 /* icons */,
 				6869C0F510322C2800DF62C3 /* key */,
 				6859C28010178958000E212C /* SDLMain.xib */,
+				68E6BB461039619700BAA9F5 /* GeneralPreferences.xib */,
 				68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */,
 				68061C9B0FC136AB006C372E /* data */,
 				68F6D3F60E640E6A00D27961 /* AppIcon.icns */,
@@ -304,7 +314,7 @@
 				68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */,
 				68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */,
 				68D8631E0FA5D1880097F73F /* SDLMain.h */,
-				68D8631C0FA5D1810097F73F /* SDLMain.m */,
+				68D8631C0FA5D1810097F73F /* SDLMain.mm */,
 			);
 			name = "OS-X";
 			sourceTree = "<group>";
@@ -330,6 +340,8 @@
 		68E6B88A1038137F00BAA9F5 /* icons */ = {
 			isa = PBXGroup;
 			children = (
+				68E6BBBB1039732800BAA9F5 /* folder.tiff */,
+				68E6BB1B10395B2C00BAA9F5 /* GeneralPreferences.tiff */,
 				68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */,
 			);
 			name = icons;
@@ -338,12 +350,14 @@
 		68E6B9721038439B00BAA9F5 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				68E6BB1610395A4D00BAA9F5 /* GeneralPreferences.h */,
+				68E6BB1710395A6600BAA9F5 /* GeneralPreferences.mm */,
 				68E6B8E2103821B500BAA9F5 /* UpdatePreferences.h */,
+				68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */,
 				68E6B8EB10383F5400BAA9F5 /* NSPreferences.h */,
 				68E6B8EC10383F7B00BAA9F5 /* NSPreferencesModule.h */,
 				68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */,
 				68E6B3DA1036C9B100BAA9F5 /* AppPreferences.h */,
-				68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -472,6 +486,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68E6BBBC1039732800BAA9F5 /* folder.tiff in Resources */,
 				6839A7AF10179EFF008AF603 /* HelpLinks.strings in Resources */,
 				689F331E0E6192CB00E37E9F /* InfoPlist.strings in Resources */,
 				68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */,
@@ -485,6 +500,8 @@
 				68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */,
 				68E6B8DF103820F500BAA9F5 /* UpdatePreferences.xib in Resources */,
 				68E6BA1610384AF100BAA9F5 /* Localizable.strings in Resources */,
+				68E6BB1C10395B2C00BAA9F5 /* GeneralPreferences.tiff in Resources */,
+				68E6BB471039619700BAA9F5 /* GeneralPreferences.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,11 +570,12 @@
 				689F332E0E6193B000E37E9F /* core.c in Sources */,
 				689F332F0E6193B100E37E9F /* glmodule.c in Sources */,
 				689F33310E6193B100E37E9F /* main.c in Sources */,
-				68D8631D0FA5D1810097F73F /* SDLMain.m in Sources */,
+				68D8631D0FA5D1810097F73F /* SDLMain.mm in Sources */,
 				68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */,
 				687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */,
 				68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */,
 				68E6B8E4103821B500BAA9F5 /* UpdatePreferences.mm in Sources */,
+				68E6BB1810395A6600BAA9F5 /* GeneralPreferences.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

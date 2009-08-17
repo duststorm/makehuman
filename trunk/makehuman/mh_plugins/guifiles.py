@@ -30,7 +30,7 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import files3d, animation3d, gui3d, events3d, os, mh2obj,  mh2bvh
+import mh, files3d, animation3d, gui3d, events3d, os, mh2obj,  mh2bvh
 
 class SaveTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -39,8 +39,9 @@ class SaveTaskView(gui3d.TaskView):
 
     @self.fileentry.event
     def onFileSelected(filename):
-      if not os.path.exists("models"):
-        os.mkdir("models")
+      modelPath = mh.getModelPath()
+      if not os.path.exists(modelPath):
+        os.mkdir(modelPath)
 
       tags = filename
       filename = filename.split()[0]
@@ -48,11 +49,11 @@ class SaveTaskView(gui3d.TaskView):
       # Save the thumbnail
       leftTop = self.app.scene3d.convertToScreen(-10, 10, 0, 1)
       rightBottom = self.app.scene3d.convertToScreen(10, -9, 0, 1)
-      self.app.scene3d.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), "models/" + filename + ".bmp")
+      self.app.scene3d.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), modelPath + "/" + filename + ".bmp")
       
       # Save the model
       human = self.app.scene3d.selectedHuman
-      f = open("models/" + filename + ".mhm", 'w')
+      f = open(modelPath + "/" + filename + ".mhm", 'w')
       f.write("# Written by makehuman 1.0.0 alpha 2\n")
       f.write("version 1.0.0\n")
       f.write("tags %s\n" %(tags))
@@ -92,8 +93,9 @@ class SaveTaskView(gui3d.TaskView):
 
 class LoadTaskView(gui3d.TaskView):
   def __init__(self, category):
+    modelPath = mh.getModelPath()
     gui3d.TaskView.__init__(self, category, "Load",  category.app.getThemeResource("images", "button_load_file.png"))
-    self.filechooser = gui3d.FileChooser(self, "models", "mhm")
+    self.filechooser = gui3d.FileChooser(self, modelPath, "mhm")
     
     @self.filechooser.event
     def onFileSelected(filename):
@@ -103,7 +105,7 @@ class LoadTaskView(gui3d.TaskView):
       human.resetMeshValues()
       
       # Load the model
-      f = open("models/" + filename, 'r')
+      f = open(modelPath+ "/" + filename, 'r')
       
       for data in f.readlines():
           lineData = data.split()
@@ -167,11 +169,13 @@ class ExportTaskView(gui3d.TaskView):
 
     @self.fileentry.event
     def onFileSelected(filename):
-      if not os.path.exists("exports"):
-        os.mkdir("exports")
+      exportPath = mh.getExportPath()
+
+      if not os.path.exists(exportPath):
+        os.mkdir(exportPath)
         
-      mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "exports/" + filename + ".obj")
-      mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, "exports/" + filename + ".bvh")
+      mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj")
+      mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
       
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)

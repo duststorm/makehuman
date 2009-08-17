@@ -39,6 +39,8 @@ extern "C"
       */
     int adjustWorkingDir(const char* inAppAbsPath);
 
+    const char* getExportPath();
+    const char* getModelPath();
 #ifdef __cplusplus
 }
 #endif // #ifdef __cplusplus

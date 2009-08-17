@@ -10,6 +10,23 @@
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <unistd.h>
 #import "AppPreferences.h"
+#import "GeneralPreferences.h"
+#import <string>
+
+static std::string sModelPath;
+static std::string sExportPath;
+
+const char* getExportPath()
+{
+    sExportPath = [[GeneralPreferences exportPath] UTF8String];
+    return sExportPath.c_str();
+}
+
+const char* getModelPath()
+{
+    sModelPath = [[GeneralPreferences modelPath] UTF8String];
+    return sModelPath.c_str();
+}
 
 /* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
  but the method still is there and works. To avoid warnings, we declare
@@ -381,7 +398,7 @@ static void CustomApplicationMain (int argc, char **argv)
     NSString *result;
 
     bufferSize = selfLen + aStringLen - aRange.length;
-    buffer = NSAllocateMemoryPages(bufferSize*sizeof(unichar));
+    buffer = (unichar*)NSAllocateMemoryPages(bufferSize*sizeof(unichar));
     
     /* Get first part into buffer */
     localRange.location = 0;

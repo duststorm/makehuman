@@ -7,6 +7,7 @@
 //
 
 #import "AppPreferences.h"
+#import "GeneralPreferences.h"
 #import "UpdatePreferences.h"
 
 @implementation AppPreferences
@@ -17,7 +18,8 @@
     self = [super init];
     if (self) 
     {
-        [self addPreferenceNamed:NSLocalizedString(@"UpdatePrefsHead", "update preference pane name" ) owner:[UpdatePreferences sharedInstance]];
+        [self addPreferenceNamed:NSLocalizedString(@"GeneralPrefsHead", "General preference pane name" ) owner:[GeneralPreferences sharedInstance]];
+        [self addPreferenceNamed:NSLocalizedString(@"UpdatePrefsHead", "Update preference pane name" ) owner:[UpdatePreferences sharedInstance]];
     }
     return self;
 }

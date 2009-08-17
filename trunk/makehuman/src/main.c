@@ -489,13 +489,62 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
+/** \brief Gets the path where objects are exported to.
+ *
+ *  For the OS X port this path is adjustable via the MH Preferences settings 
+ *  and defaults to "$(HOME)/Documents/makehuman/exports/".
+ *
+ *  \return The Path supposed to export objects.
+ *
+ *  \see mh_getModelPath(PyObject *, PyObject *)
+ */
+static PyObject* mh_getExportPath(PyObject *self, PyObject *args)
+{
+    if (!PyArg_ParseTuple(args, ""))
+    {
+        return NULL;
+    }
+#ifdef __APPLE__
+    /* For OS X: Get the path from the preferences ;) */
+    const char *exportsPath = getExportPath();
+#else
+    /* default as "exports/" at the current dir for Linux and Windows */
+    const char *exportsPath = "exports/";
+#endif
+    return Py_BuildValue("s", exportsPath); 
+}
+
+/** \brief Gets the path where models are located.
+ *
+ *  For the OS X port this path is adjustable via the MH Preferences settings 
+ *  and defaults to "$(HOME)/Documents/makehuman/models/".
+ *
+ *  \return The Path supposed to locate models.
+ *
+ *  \see mh_getExportPath(PyObject *, PyObject *)
+ */
+static PyObject* mh_getModelPath(PyObject *self, PyObject *args)
+{
+    if (!PyArg_ParseTuple(args, ""))
+    {
+        return NULL;
+    }
+#ifdef __APPLE__
+    /* For OS X: Get the path from the preferences ;) */
+    const char *modelsPath = getModelPath();
+#else
+    /* default as "models/" at the current dir for Linux and Windows */
+    const char *modelsPath = "models/"; 
+#endif
+    return Py_BuildValue("s", modelsPath);
+}
+
 /** \brief Defines a set of functions as an array that can be passed into the Py_InitModule function.
  *
  *  This array declaration is used to list a set of functions that can be called from Python.
  *  The array is passed into the Py_InitModule function when it is used to dynamically
  *  initialize the 'mh' moduleas.
  */
-
 static PyMethodDef EmbMethods[] =
 {
     {"setTimeTimer", mh_setTimeTimer, METH_VARARGS, ""},
@@ -528,6 +577,8 @@ static PyMethodDef EmbMethods[] =
     {"startWindow", mh_startWindow, METH_VARARGS, ""},
     {"startEventLoop", mh_startEventLoop, METH_VARARGS, ""},
     {"shutDown", mh_shutDown, METH_VARARGS, ""},
+    {"getExportPath", mh_getExportPath, METH_VARARGS, ""},
+    {"getModelPath", mh_getModelPath, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 

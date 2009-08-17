@@ -31,7 +31,7 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import events3d, gui3d, guimacromodelling, guidetailmodelling, mh2obj,  mh2bvh, os
+import mh, events3d, gui3d, guimacromodelling, guidetailmodelling, mh2obj,  mh2bvh, os
 
 class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
@@ -69,10 +69,11 @@ class ModellingCategory(gui3d.Category):
     def onKeyDown(self, event):
       # Other keybindings
       if event.key == events3d.SDLK_e:
-        if not os.path.exists("exports"):
-          os.mkdir("exports")
-        mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.obj")
-        mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, "exports/quick_export.bvh")
+        exportPath = mh.getExportPath()
+        if not os.path.exists(exportPath):
+          os.mkdir(exportPath)
+        mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/quick_export.obj")
+        mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/quick_export.bvh")
       elif event.key == events3d.SDLK_g:
         self.app.scene3d.grabScreen(180, 80, 440, 440, "grab.bmp")
       elif event.key == events3d.SDLK_q:
