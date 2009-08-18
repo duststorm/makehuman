@@ -347,6 +347,12 @@ class Human(gui3d.Object):
         elif name in self.targetsDetailStack:
           del self.targetsDetailStack[name]
           
+    def getDetail(self, name):
+        if name in self.targetsDetailStack:
+          return self.targetsDetailStack[name]
+        else:
+          return 0.0;
+          
     def setHairFile(self, filename):
         self.hairFile = filename
         

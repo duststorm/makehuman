@@ -23,6 +23,45 @@ __docformat__ = 'restructuredtext'
 
 import events3d, gui3d, algos3d
 
+class Modifier:
+  def __init__(self, human, left, right):
+    self.human = human
+    self.left = left
+    self.right = right
+    
+  def setValue(self, value):
+    value = max(-1.0, min(1.0, value))
+    #print(self.left + " " + str(value))
+    if not value:
+      if self.human.getDetail(self.left):
+        algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, 1, 0)
+      self.human.setDetail(self.left, None)
+      if self.human.getDetail(self.right):
+        algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, 1, 0)
+      self.human.setDetail(self.right, None)
+    elif value < 0.0:
+      algos3d.loadTranslationTarget(self.human.meshData, self.left, -value - self.human.getDetail(self.left), None, 1, 0)
+      self.human.setDetail(self.left, -value)
+      if self.human.getDetail(self.right):
+        algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, 1, 0)
+      self.human.setDetail(self.right, None)
+    else:
+      if self.human.getDetail(self.left):
+        algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, 1, 0)
+      self.human.setDetail(self.left, None)
+      algos3d.loadTranslationTarget(self.human.meshData, self.right, value - self.human.getDetail(self.right), None, 1, 0)
+      self.human.setDetail(self.right, value)
+  
+  def getValue(self):
+    value = self.human.getDetail(self.left)
+    if value:
+      return -value
+    value = self.human.getDetail(self.right)
+    if value:
+      return value
+    else:
+      return 0.0
+
 class DetailAction:
   def __init__(self, human, before, after):
     self.name = "Change detail"
@@ -45,11 +84,10 @@ class DetailTool(events3d.EventHandler):
     self.app = app
     self.micro = micro
     self.left = left
-    self.right = right
-    self.leftTarget = None
-    self.rightTarget = None
-    self.symmetryTargets = None
     self.before = None
+    self.right = right
+    self.modifier = None
+    self.symmetryModifier = None
     self.selectedGroups = []
     
   def onMouseDown(self, event):
@@ -64,35 +102,36 @@ class DetailTool(events3d.EventHandler):
       part = human.getPartNameForGroupName(self.app.selectedGroup.name)
       
     # Find the targets
-    self.leftTarget = "%s%s%s.target"%(folder, part, self.left)
-    self.rightTarget = "%s%s%s.target"%(folder, part, self.right)
+    leftTarget = "%s%s%s.target"%(folder, part, self.left)
+    rightTarget = "%s%s%s.target"%(folder, part, self.right)
     
-    # Add targets
-    self.before = {}
-    self.before[self.leftTarget] = 0;
-    self.before[self.rightTarget] = 0;
-    
-    # Add symmetry targets if needed
-    self.symmetryTargets = {}
-    if human.symmetryModeEnabled:
-      symmetryPart = human.getSymmetryPart(part)
-      print(part + str(symmetryPart))
-      if symmetryPart:
-        self.symmetryTargets[self.leftTarget] = "%s%s%s.target"%(folder, symmetryPart, self.left)
-        self.symmetryTargets[self.rightTarget] = "%s%s%s.target"%(folder, symmetryPart, self.right)
-        for target in self.symmetryTargets.itervalues():
-          self.before[target] = 0;
+    self.modifier = None
+    if not (leftTarget and rightTarget):
+      print("No targets available")
+      return
+      
+    self.modifier = Modifier(human, leftTarget, rightTarget)
     
     # Save the state
-    for target in self.before.iterkeys():
-      if target in human.targetsDetailStack:
-        self.before[target] = human.targetsDetailStack[target]
+    self.before = {}
+    self.before[leftTarget] = human.getDetail(leftTarget)
+    self.before[rightTarget] = human.getDetail(rightTarget)
+    
+    # Add symmetry targets if needed
+    self.symmetryModifier = None
+    if human.symmetryModeEnabled:
+      symmetryPart = human.getSymmetryPart(part)
+      if symmetryPart:
+        leftSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.left)
+        rightSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.right)
+        self.symmetryModifier = Modifier(human, leftSymmetryTarget, rightSymmetryTarget)
+        # Save the state
+        self.before[leftSymmetryTarget] = human.getDetail(leftSymmetryTarget)
+        self.before[rightSymmetryTarget] = human.getDetail(rightSymmetryTarget)
     
   def onMouseDragged(self, event):
-    human = self.app.scene3d.selectedHuman
-    
-    if not (self.leftTarget and self.rightTarget):
-      print("No targets available")
+    if not self.modifier:
+      print("No modifier available")
     
     # check which vector we need to check
     if abs(event.dx) > abs(event.dy):
@@ -100,46 +139,14 @@ class DetailTool(events3d.EventHandler):
     else:
       d = -event.dy
     
-    if d > 0:
-      add = self.rightTarget
-      remove = self.leftTarget
-    elif d < 0:
-      add = self.leftTarget
-      remove = self.rightTarget
-    else:
+    if d == 0.0:
       return
       
-    value = abs(d) / 20.0
+    value = d / 20.0
     
-    # Check whether we need to add or remove from the target
-    if remove in human.targetsDetailStack.keys():
-      if human.targetsDetailStack[remove] > 0.1:
-        prev = human.targetsDetailStack[remove]
-        next = max(0.0, human.targetsDetailStack[remove] - value)
-        human.targetsDetailStack[remove] = next
-        if remove in self.symmetryTargets:
-          human.targetsDetailStack[self.symmetryTargets[remove]] = next
-      else:
-        prev = human.targetsDetailStack[remove]
-        next = 0.0
-        del human.targetsDetailStack[remove]
-        if remove in self.symmetryTargets and self.symmetryTargets[remove] in human.targetsDetailStack.keys():
-          del human.targetsDetailStack[self.symmetryTargets[remove]]
-      algos3d.loadTranslationTarget(human.meshData, remove, next - prev, None, 1, 0)
-      if remove in self.symmetryTargets:
-        algos3d.loadTranslationTarget(human.meshData, self.symmetryTargets[remove], next - prev, None, 1, 0)
-    else:
-      if add in human.targetsDetailStack.keys():
-        prev = human.targetsDetailStack[add]
-        next = min(1.0, human.targetsDetailStack[add] + value)
-      else:
-        prev = 0.0
-        next = min(1.0, value)
-      human.targetsDetailStack[add] = next
-      algos3d.loadTranslationTarget(human.meshData, add, next - prev, None, 1, 0)
-      if add in self.symmetryTargets:
-        human.targetsDetailStack[self.symmetryTargets[add]] = next
-        algos3d.loadTranslationTarget(human.meshData, self.symmetryTargets[add], next - prev, None, 1, 0)
+    self.modifier.setValue(self.modifier.getValue() + value)
+    if self.symmetryModifier:
+      self.symmetryModifier.setValue(self.modifier.getValue())
     
   def onMouseUp(self, event):
     human = self.app.scene3d.selectedHuman
@@ -147,13 +154,11 @@ class DetailTool(events3d.EventHandler):
     # Recalculate
     human.applyAllTargets()
     
+    # Build undo item
     after = {}
     
-    for target in self.before.keys():
-      if target in human.targetsDetailStack:
-        after[target] = human.targetsDetailStack[target]
-      else:
-        after[target] = 0
+    for target in self.before.iterkeys():
+      after[target] = human.getDetail(target)
       
     self.app.did(DetailAction(human, self.before, after))
       
