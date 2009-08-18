@@ -35,10 +35,23 @@ class BackgroundTaskView(gui3d.TaskView):
       self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImage.setTexture("backgrounds/" + filename)
       bg = self.app.categories["Modelling"].tasksByName["Macro modelling"].background
       bg.setTexture("backgrounds/" + filename)
+      bg.setPosition([0.0, 0.0, 1])
+      bg.setScale(0.11)
       group = bg.mesh.getFaceGroup("default-dummy-group")
       for f in group.faces:
-        f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+        f.color = [[255, 255, 255, 100], [255, 255, 255, 100], [255, 255, 255, 100]]
         f.updateColors()
+      '''
+      for g in self.app.scene3d.selectedHuman.mesh.facesGroups:
+        if g.name.startswith("joint-"):
+          for f in g.faces:
+            f.color = [[255, 255, 255, 0], [255, 255, 255, 0], [255, 255, 255, 0]]
+            f.updateColors()
+        else:
+          for f in g.faces:
+            f.color = [[255, 255, 255, 128], [255, 255, 255, 128], [255, 255, 255, 128]]
+            f.updateColors()
+      '''
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
     
