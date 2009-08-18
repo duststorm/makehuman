@@ -924,8 +924,12 @@ void OnInit()
     g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader &&
       glCreateProgram && glAttachShader && glLinkProgram && glUseProgram &&
       glGetShaderiv && glGetShaderInfoLog && glGetProgramiv && glGetProgramInfoLog &&
-      glGetActiveUniform && glActiveTexture && glUniform1f && glUniform2f &&
-      glUniform3f && glUniform4f && glUniform1i && glGetString(GL_SHADING_LANGUAGE_VERSION);
+      glGetActiveUniform &&
+#ifdef __WIN32__
+      glActiveTexture &&
+#endif
+      glUniform1f && glUniform2f && glUniform3f && glUniform4f &&
+      glUniform1i && glGetString(GL_SHADING_LANGUAGE_VERSION);
 #endif // #ifndef __APPLE__
 
     // Init font
