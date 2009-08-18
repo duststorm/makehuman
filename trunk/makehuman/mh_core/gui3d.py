@@ -62,7 +62,10 @@ class Object(events3d.EventHandler):
     self.mesh.setLoc(position[0], position[1], position[2])
     
   def setTexture(self, texture):
-    self.mesh.setTexture(texture)
+    if texture:
+      self.mesh.setTexture(texture)
+    else:
+      self.mesh.clearTexture()
     
   def clearTexture(self):
     self.mesh.clearTexture()
@@ -789,7 +792,7 @@ class FileChooser(View):
   def onShow(self, event):
     self.files = []
     for f in os.listdir(self.path):
-        if os.path.splitext(f)[-1] == "." + self.extension:
+        if f.endswith("." + self.extension):
             self.files.append(f)
     self.selectedFile = 0
     

@@ -78,7 +78,7 @@ if 'darwin' in sys.platform: # For MAC OS
     #   print "%20s %s" % (param,os.environ[param])
 
 import gui3d, events3d
-import human, hair
+import human, hair, background
 import guimodelling, guifiles, guirender
 
 class MHApplication(gui3d.Application):
@@ -192,6 +192,7 @@ class MHApplication(gui3d.Application):
     
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"))
     hair.HairTaskView(library)
+    background.BackgroundTaskView(library)
     
     category = gui3d.Category(self, "Help", self.getThemeResource("images", "button_about.png"))
     # Help button
