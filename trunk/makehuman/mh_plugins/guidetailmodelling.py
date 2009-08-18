@@ -122,8 +122,12 @@ class DetailTool(events3d.EventHandler):
     if human.symmetryModeEnabled:
       symmetryPart = human.getSymmetryPart(part)
       if symmetryPart:
-        leftSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.left)
-        rightSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.right)
+        if self.left.find("trans-in") != -1 or self.left.find("trans-out") != -1:
+          leftSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.right)
+          rightSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.left)
+        else:
+          leftSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.left)
+          rightSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.right)
         self.symmetryModifier = Modifier(human, leftSymmetryTarget, rightSymmetryTarget)
         # Save the state
         self.before[leftSymmetryTarget] = human.getDetail(leftSymmetryTarget)
