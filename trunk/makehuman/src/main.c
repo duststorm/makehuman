@@ -500,16 +500,18 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
  */
 static PyObject* mh_getExportPath(PyObject *self, PyObject *args)
 {
+    const char *exportsPath;
+
     if (!PyArg_ParseTuple(args, ""))
     {
         return NULL;
     }
 #ifdef __APPLE__
     /* For OS X: Get the path from the preferences ;) */
-    const char *exportsPath = getExportPath();
+    exportsPath = getExportPath();
 #else
     /* default as "exports/" at the current dir for Linux and Windows */
-    const char *exportsPath = "exports/";
+    exportsPath = "exports/";
 #endif
     return Py_BuildValue("s", exportsPath); 
 }
@@ -525,16 +527,18 @@ static PyObject* mh_getExportPath(PyObject *self, PyObject *args)
  */
 static PyObject* mh_getModelPath(PyObject *self, PyObject *args)
 {
+    const char *modelsPath;
+
     if (!PyArg_ParseTuple(args, ""))
     {
         return NULL;
     }
 #ifdef __APPLE__
     /* For OS X: Get the path from the preferences ;) */
-    const char *modelsPath = getModelPath();
+    modelsPath = getModelPath();
 #else
     /* default as "models/" at the current dir for Linux and Windows */
-    const char *modelsPath = "models/"; 
+    modelsPath = "models/"; 
 #endif
     return Py_BuildValue("s", modelsPath);
 }
