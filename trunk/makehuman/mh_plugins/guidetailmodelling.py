@@ -203,50 +203,6 @@ class DetailTool(events3d.EventHandler):
     self.selectedGroups = []
     self.app.scene3d.redraw()
 
-class Detail3dAction:
-  def __init__(self, human,
-      leftTargetX, rightTargetX, leftBeforeX, rightBeforeX, leftAfterX, rightAfterX,
-      leftTargetY, rightTargetY, leftBeforeY, rightBeforeY, leftAfterY, rightAfterY,
-      leftTargetZ, rightTargetZ, leftBeforeZ, rightBeforeZ, leftAfterZ, rightAfterZ):
-    self.name = "Change detail"
-    self.human = human
-    self.leftTargetX = leftTargetX
-    self.rightTargetX = rightTargetX
-    self.leftBeforeX = leftBeforeX
-    self.rightBeforeX = rightBeforeX
-    self.leftAfterX = leftAfterX
-    self.rightAfterX = rightAfterX
-    self.leftTargetY = leftTargetY
-    self.rightTargetY = rightTargetY
-    self.leftBeforeY = leftBeforeY
-    self.rightBeforeY = rightBeforeY
-    self.leftAfterY = leftAfterY
-    self.rightAfterY = rightAfterY
-    self.leftTargetZ = leftTargetZ
-    self.rightTargetZ = rightTargetZ
-    self.leftBeforeZ = leftBeforeZ
-    self.rightBeforeZ = rightBeforeZ
-    self.leftAfterZ = leftAfterZ
-    self.rightAfterZ = rightAfterZ
-    
-  def do(self):
-    self.human.setDetail(self.leftTargetX, self.leftAfterX)
-    self.human.setDetail(self.rightTargetX, self.rightAfterX)
-    self.human.setDetail(self.leftTargetY, self.leftAfterY)
-    self.human.setDetail(self.rightTargetY, self.rightAfterY)
-    self.human.setDetail(self.leftTargetZ, self.leftAfterZ)
-    self.human.setDetail(self.rightTargetZ, self.rightAfterZ)
-    self.human.applyAllTargets()
-    
-  def undo(self):
-    self.human.setDetail(self.leftTargetX, self.leftBeforeX)
-    self.human.setDetail(self.rightTargetX, self.rightBeforeX)
-    self.human.setDetail(self.leftTargetY, self.leftBeforeY)
-    self.human.setDetail(self.rightTargetY, self.rightBeforeY)
-    self.human.setDetail(self.leftTargetZ, self.leftBeforeZ)
-    self.human.setDetail(self.rightTargetZ, self.rightBeforeZ)
-    self.human.applyAllTargets()
-
 class Detail3dTool(events3d.EventHandler):
   def __init__(self, app, micro, type):
     self.app = app
@@ -315,39 +271,21 @@ class Detail3dTool(events3d.EventHandler):
     human.applyAllTargets()
     
     # Add undo item
-    if self.x.leftTarget in human.targetsDetailStack:
-      leftAfterX = human.targetsDetailStack[self.x.leftTarget]
-    else:
-      leftAfterX = 0
-    if self.x.rightTarget in human.targetsDetailStack:
-      rightAfterX = human.targetsDetailStack[self.x.rightTarget]
-    else:
-      rightAfterX = 0
+    before = {}
+    
+    for target, value in self.x.before.iteritems():
+      before[target] = value
+    for target, value in self.y.before.iteritems():
+      before[target] = value
+    for target, value in self.z.before.iteritems():
+      before[target] = value
       
-    if self.y.leftTarget in human.targetsDetailStack:
-      leftAfterY = human.targetsDetailStack[self.y.leftTarget]
-    else:
-      leftAfterY = 0
-    if self.y.rightTarget in human.targetsDetailStack:
-      rightAfterY = human.targetsDetailStack[self.y.rightTarget]
-    else:
-      rightAfterY = 0
+    after = {}
+    
+    for target in before.iterkeys():
+      after[target] = human.getDetail(target)
       
-    if self.z.leftTarget in human.targetsDetailStack:
-      leftAfterZ = human.targetsDetailStack[self.z.leftTarget]
-    else:
-      leftAfterZ = 0
-    if self.z.rightTarget in human.targetsDetailStack:
-      rightAfterZ = human.targetsDetailStack[self.z.rightTarget]
-    else:
-      rightAfterZ = 0
-      
-    self.app.did(Detail3dAction(human, self.x.leftTarget, self.x.rightTarget,
-      self.x.leftBefore, self.x.rightBefore,  leftAfterX, rightAfterX,
-      self.y.leftTarget, self.y.rightTarget,
-      self.y.leftBefore, self.y.rightBefore,  leftAfterY, rightAfterY,
-      self.z.leftTarget, self.z.rightTarget,
-      self.z.leftBefore, self.z.rightBefore,  leftAfterZ, rightAfterZ))
+    self.app.did(DetailAction(human, before, after))
       
   def onMouseMoved(self, event):
     human = self.app.scene3d.selectedHuman
