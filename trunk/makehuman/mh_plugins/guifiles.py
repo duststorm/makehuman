@@ -30,7 +30,7 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import mh, files3d, animation3d, gui3d, events3d, os, mh2obj,  mh2bvh
+import mh, files3d, animation3d, gui3d, events3d, os, mh2obj,  mh2bvh, humanmodifier
 
 class SaveTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -61,6 +61,11 @@ class SaveTaskView(gui3d.TaskView):
       f.write("age %f\n" %(human.getAge()))
       f.write("muscle %f\n" %(human.getMuscle()))
       f.write("weight %f\n" %(human.getWeight()))
+      
+      modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
+        "data/targets/macrodetails/universal-stature-giant.target")
+      f.write("height %f\n" %(modifier.getValue()))
+      
       for (target, value) in human.targetsEthnicStack.iteritems():
           f.write("ethnic %s %f\n" %(target, value))
               
@@ -124,6 +129,10 @@ class LoadTaskView(gui3d.TaskView):
                   human.setMuscle(float(lineData[1]))
               elif lineData[0] == "weight":
                   human.setWeight(float(lineData[1]))
+              elif lineData[0] == "height":
+                  modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
+                    "data/targets/macrodetails/universal-stature-giant.target")
+                  modifier.setValue(float(lineData[1]))
               elif lineData[0] == "ethnic":
                   human.targetsEthnicStack[lineData[1]] = float(lineData[2])
               elif lineData[0] == "detail":

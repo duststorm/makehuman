@@ -1,4 +1,4 @@
-import gui3d, animation3d
+import gui3d, animation3d, humanmodifier
 
 class MacroAction:
     def __init__(self, human, method, value, postAction):
@@ -119,13 +119,15 @@ class MacroModelingTaskView(gui3d.TaskView):
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_gender_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, 0.25, 9], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, 0.27, 9], value = 0.5)
     self.ageSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_age_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, 0.1, 9], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, 0.15, 9], value = 0.5)
     self.muscleSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_muscle_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, -0.05, 9], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, 0.0, 9], value = 0.5)
     self.weightSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_weight_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, -0.20, 9], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, -0.15, 9], value = 0.5)
+    self.heightSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_height_macro.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [-0.45, -0.27, 9], value = 0.5)
       
     @self.genderSlider.event
     def onChange(value):
@@ -150,6 +152,21 @@ class MacroModelingTaskView(gui3d.TaskView):
       human = self.app.scene3d.selectedHuman
       self.app.do(MacroAction(human, "Weight", value, self.syncSliders))
       self.syncStatus()
+      
+    @self.heightSlider.event
+    def onChange(value):
+      human = self.app.scene3d.selectedHuman
+      before = {}
+      before["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
+      before["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
+      modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
+        "data/targets/macrodetails/universal-stature-giant.target")
+      modifier.setValue(value * 2 -1)
+      after = {}
+      after["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
+      after["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
+      self.app.did(humanmodifier.Action(human, before, after, self.syncSliders))
+      human.applyAllTargets()
     
     # Ethnic controls
     self.ethnicMapButtonGroup = []
@@ -222,6 +239,9 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.ageSlider.setValue(human.getAge())
     self.muscleSlider.setValue(human.getMuscle())
     self.weightSlider.setValue(human.getWeight())
+    modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
+      "data/targets/macrodetails/universal-stature-giant.target")
+    self.heightSlider.setValue(0.5 + modifier.getValue() / 2.0) 
     
   def syncEthnics(self):
     self.asiaButton.syncEthnics()

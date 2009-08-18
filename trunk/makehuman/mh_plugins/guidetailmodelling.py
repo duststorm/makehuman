@@ -21,63 +21,7 @@ TODO
 
 __docformat__ = 'restructuredtext'
 
-import events3d, gui3d, algos3d
-
-class Modifier:
-  def __init__(self, human, left, right):
-    self.human = human
-    self.left = left
-    self.right = right
-    
-  def setValue(self, value):
-    value = max(-1.0, min(1.0, value))
-    #print(self.left + " " + str(value))
-    if not value:
-      if self.human.getDetail(self.left):
-        algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, 1, 0)
-      self.human.setDetail(self.left, None)
-      if self.human.getDetail(self.right):
-        algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, 1, 0)
-      self.human.setDetail(self.right, None)
-    elif value < 0.0:
-      algos3d.loadTranslationTarget(self.human.meshData, self.left, -value - self.human.getDetail(self.left), None, 1, 0)
-      self.human.setDetail(self.left, -value)
-      if self.human.getDetail(self.right):
-        algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, 1, 0)
-      self.human.setDetail(self.right, None)
-    else:
-      if self.human.getDetail(self.left):
-        algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, 1, 0)
-      self.human.setDetail(self.left, None)
-      algos3d.loadTranslationTarget(self.human.meshData, self.right, value - self.human.getDetail(self.right), None, 1, 0)
-      self.human.setDetail(self.right, value)
-  
-  def getValue(self):
-    value = self.human.getDetail(self.left)
-    if value:
-      return -value
-    value = self.human.getDetail(self.right)
-    if value:
-      return value
-    else:
-      return 0.0
-
-class DetailAction:
-  def __init__(self, human, before, after):
-    self.name = "Change detail"
-    self.human = human
-    self.before = before
-    self.after = after
-    
-  def do(self):
-    for target, value in self.after.iteritems():
-      self.human.setDetail(target, value)
-    self.human.applyAllTargets()
-    
-  def undo(self):
-    for target, value in self.before.iteritems():
-      self.human.setDetail(target, value)
-    self.human.applyAllTargets()
+import events3d, gui3d, algos3d, humanmodifier
 
 class DetailTool(events3d.EventHandler):
   def __init__(self, app, micro, left, right):
@@ -110,7 +54,7 @@ class DetailTool(events3d.EventHandler):
       print("No targets available")
       return
       
-    self.modifier = Modifier(human, leftTarget, rightTarget)
+    self.modifier = humanmodifier.Modifier(human, leftTarget, rightTarget)
     
     # Save the state
     self.before = {}
@@ -128,7 +72,7 @@ class DetailTool(events3d.EventHandler):
         else:
           leftSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.left)
           rightSymmetryTarget = "%s%s%s.target"%(folder, symmetryPart, self.right)
-        self.symmetryModifier = Modifier(human, leftSymmetryTarget, rightSymmetryTarget)
+        self.symmetryModifier = humanmodifier.Modifier(human, leftSymmetryTarget, rightSymmetryTarget)
         # Save the state
         self.before[leftSymmetryTarget] = human.getDetail(leftSymmetryTarget)
         self.before[rightSymmetryTarget] = human.getDetail(rightSymmetryTarget)
@@ -164,7 +108,7 @@ class DetailTool(events3d.EventHandler):
     for target in self.before.iterkeys():
       after[target] = human.getDetail(target)
       
-    self.app.did(DetailAction(human, self.before, after))
+    self.app.did(humanmodifier.Action(human, self.before, after))
       
   def onMouseMoved(self, event):
     human = self.app.scene3d.selectedHuman
@@ -289,7 +233,7 @@ class Detail3dTool(events3d.EventHandler):
     for target in before.iterkeys():
       after[target] = human.getDetail(target)
       
-    self.app.did(DetailAction(human, before, after))
+    self.app.did(humanmodifier.Action(human, before, after))
       
   def onMouseMoved(self, event):
     human = self.app.scene3d.selectedHuman
