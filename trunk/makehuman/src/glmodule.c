@@ -391,6 +391,7 @@ int mhGrabScreen(int x, int y, int width, int height, const char *filename)
 
   // Draw before grabbing, to make sure we grab a rendering and not a picking buffer
   mhDraw();
+  glPixelStorei(GL_PACK_ALIGNMENT, 4);
   glReadPixels(x, viewport[3] - y - height, width, height, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
   mhFlipSurface(surface);
 
