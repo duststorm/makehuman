@@ -409,7 +409,7 @@ class DetailModelingTaskView(gui3d.TaskView):
       texture = self.app.getThemeResource("images", "button_symmleft.png"), position = [0.45, 0.04, 9])
     self.symmetryButton = gui3d.ToggleButton(self, mesh = "data/3dobjs/button_symmright.obj",
       texture = self.app.getThemeResource("images", "button_symmetry.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_symmetry_on.png"), position = [0.37, -0.04, 9])      
+      selectedTexture = self.app.getThemeResource("images", "button_symmetry_on.png"), position = [0.37, -0.04, 9])
     
     @self.rightSymmetryButton.event
     def onClicked(event):
@@ -426,6 +426,7 @@ class DetailModelingTaskView(gui3d.TaskView):
       gui3d.ToggleButton.onClicked(self.symmetryButton, event)
       human = self.app.scene3d.selectedHuman
       human.symmetryModeEnabled = self.symmetryButton.selected
+      self.parent.tasksByName["Micro modelling"].symmetryButton.setSelected(self.symmetryButton.selected)
       
   def onShow(self, event):
     self.app.tool = self.tool
@@ -469,8 +470,9 @@ class MicroModelingTaskView(gui3d.TaskView):
       texture = self.app.getThemeResource("images", "button_symmright.png"), position = [0.37, 0.04, 9])
     self.leftSymmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmleft.obj",
       texture = self.app.getThemeResource("images", "button_symmleft.png"), position = [0.45, 0.04, 9])
-    self.symmetryButton = gui3d.Button(self, mesh = "data/3dobjs/button_symmright.obj",
-      texture = self.app.getThemeResource("images", "button_symmetry.png"), position = [0.37, -0.04, 9])
+    self.symmetryButton = gui3d.ToggleButton(self, mesh = "data/3dobjs/button_symmright.obj",
+      texture = self.app.getThemeResource("images", "button_symmetry.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_symmetry_on.png"), position = [0.37, -0.04, 9])
       
     @self.rightSymmetryButton.event
     def onClicked(event):
@@ -481,6 +483,13 @@ class MicroModelingTaskView(gui3d.TaskView):
     def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.applySymmetryLeft()
+      
+    @self.symmetryButton.event
+    def onClicked(event):
+      gui3d.ToggleButton.onClicked(self.symmetryButton, event)
+      human = self.app.scene3d.selectedHuman
+      human.symmetryModeEnabled = self.symmetryButton.selected
+      self.parent.tasksByName["Detail modelling"].symmetryButton.setSelected(self.symmetryButton.selected)
       
   def onShow(self, event):
     self.app.tool = self.tool
