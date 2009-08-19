@@ -372,6 +372,7 @@ int mhGrabScreen(int x, int y, int width, int height, const char *filename)
 {
   GLint viewport[4];
   SDL_Surface *surface;
+  GLenum format;
 
   if (width <= 0 || height <= 0)
   {
@@ -397,9 +398,9 @@ int mhGrabScreen(int x, int y, int width, int height, const char *filename)
    on the endianness (byte order) of the machine (PowerPC is big endian 
    in contrast to i386 which is little endian!) */
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    GLenum format = GL_BGR; /* For big endian Machines as based on PowerPC */
+  format = GL_BGR; /* For big endian Machines as based on PowerPC */
 #else
-    GLenum format = GL_RGB; /* For little endian Machines as based on Intel x86 */
+  format = GL_RGB; /* For little endian Machines as based on Intel x86 */
 #endif
   glReadPixels(x, viewport[3] - y - height, width, height, format, GL_UNSIGNED_BYTE, surface->pixels);
   mhFlipSurface(surface);
