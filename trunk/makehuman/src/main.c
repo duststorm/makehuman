@@ -547,12 +547,13 @@ static PyObject* mh_getModelPath(PyObject *self, PyObject *noargs)
  */
 static PyObject* mh_getGrabPath(PyObject *self, PyObject *noargs)
 {
+    const char *grabPath;
 #ifdef __APPLE__
     /* For OS X: Get the path from the preferences ;) */
-    const char *grabPath = getGrabPath();
+    grabPath = getGrabPath();
 #else
     /* default as "" at the current dir for Linux and Windows */
-    const char *grabPath = "./"; 
+    grabPath = ""; 
 #endif
     return Py_BuildValue("s", grabPath);
 }
