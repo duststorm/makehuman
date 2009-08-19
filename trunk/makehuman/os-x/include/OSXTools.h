@@ -41,6 +41,7 @@ extern "C"
 
     const char* getExportPath();
     const char* getModelPath();
+    const char* getGrabPath();
 #ifdef __cplusplus
 }
 #endif // #ifdef __cplusplus

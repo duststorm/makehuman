@@ -497,15 +497,11 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
  *  \return The Path supposed to export objects.
  *
  *  \see mh_getModelPath(PyObject *, PyObject *)
+ *  \see mh_getGrabPath(PyObject *, PyObject *)
  */
-static PyObject* mh_getExportPath(PyObject *self, PyObject *args)
+static PyObject* mh_getExportPath(PyObject *self, PyObject *noargs)
 {
     const char *exportsPath;
-
-    if (!PyArg_ParseTuple(args, ""))
-    {
-        return NULL;
-    }
 #ifdef __APPLE__
     /* For OS X: Get the path from the preferences ;) */
     exportsPath = getExportPath();
@@ -524,15 +520,11 @@ static PyObject* mh_getExportPath(PyObject *self, PyObject *args)
  *  \return The Path supposed to locate models.
  *
  *  \see mh_getExportPath(PyObject *, PyObject *)
+ *  \see mh_getGrabPath(PyObject *, PyObject *)
  */
-static PyObject* mh_getModelPath(PyObject *self, PyObject *args)
+static PyObject* mh_getModelPath(PyObject *self, PyObject *noargs)
 {
     const char *modelsPath;
-
-    if (!PyArg_ParseTuple(args, ""))
-    {
-        return NULL;
-    }
 #ifdef __APPLE__
     /* For OS X: Get the path from the preferences ;) */
     modelsPath = getModelPath();
@@ -541,6 +533,28 @@ static PyObject* mh_getModelPath(PyObject *self, PyObject *args)
     modelsPath = "models/"; 
 #endif
     return Py_BuildValue("s", modelsPath);
+}
+
+/** \brief Gets the path where screen grabs are stored to.
+ *
+ *  For the OS X port this path is adjustable via the MH Preferences settings 
+ *  and defaults to "$(HOME)/Desktop".
+ *
+ *  \return The Path supposed to locate screen grabs.
+ *
+ *  \see mh_getExportPath(PyObject *, PyObject *)
+ *  \see mh_getModelPath(PyObject *, PyObject *)
+ */
+static PyObject* mh_getGrabPath(PyObject *self, PyObject *noargs)
+{
+#ifdef __APPLE__
+    /* For OS X: Get the path from the preferences ;) */
+    const char *grabPath = getGrabPath();
+#else
+    /* default as "" at the current dir for Linux and Windows */
+    const char *grabPath = "./"; 
+#endif
+    return Py_BuildValue("s", grabPath);
 }
 
 /** \brief Defines a set of functions as an array that can be passed into the Py_InitModule function.
@@ -581,8 +595,9 @@ static PyMethodDef EmbMethods[] =
     {"startWindow", mh_startWindow, METH_VARARGS, ""},
     {"startEventLoop", mh_startEventLoop, METH_VARARGS, ""},
     {"shutDown", mh_shutDown, METH_VARARGS, ""},
-    {"getExportPath", mh_getExportPath, METH_VARARGS, ""},
-    {"getModelPath", mh_getModelPath, METH_VARARGS, ""},
+    {"getExportPath", mh_getExportPath, METH_NOARGS, ""},
+    {"getModelPath", mh_getModelPath, METH_NOARGS, ""},
+    {"getGrabPath", mh_getGrabPath, METH_NOARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 

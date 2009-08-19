@@ -15,6 +15,7 @@
 
 static std::string sModelPath;
 static std::string sExportPath;
+static std::string sGrabPath;
 
 const char* getExportPath()
 {
@@ -26,6 +27,12 @@ const char* getModelPath()
 {
     sModelPath = [[GeneralPreferences modelPath] UTF8String];
     return sModelPath.c_str();
+}
+
+const char* getGrabPath()
+{
+    sGrabPath = [[GeneralPreferences grabPath] UTF8String];
+    return sGrabPath.c_str();
 }
 
 /* For some reaon, Apple removed setAppleMenu from the headers in 10.4,

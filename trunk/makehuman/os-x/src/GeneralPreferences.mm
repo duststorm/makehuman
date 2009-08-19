@@ -10,17 +10,22 @@
 
 const NSString *kUserDefaultsKeyExportPath = @"MHExportPath";
 const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
+const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
 
 @interface GeneralPreferences (Private)
 -(void)updateFileSelectPopUpButton:(NSPopUpButton*)inButton fromPath:(NSString*)inPath;
+
 -(void)updateModelPath:(NSString*)inPath;
 -(void)updateExportPath:(NSString*)inPath;
+-(void)updateGrabPath:(NSString*)inPath;
 
 -(void)setModelPath:(NSString*)inPath;
 -(void)setExportPath:(NSString*)inPath;
+-(void)setGrabPath:(NSString*)inPath;
 
 +(NSString*)defaultModelPath;
 +(NSString*)defaultExportPath;
++(NSString*)defaultGrabPath;
 @end // @interface GeneralPreferences (Private)
 
 @implementation GeneralPreferences
@@ -33,14 +38,16 @@ const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
 
 -(void)awakeFromNib
 {
-    [self setModelPath:[GeneralPreferences modelPath]];
+    [self setModelPath: [GeneralPreferences modelPath]];
     [self setExportPath:[GeneralPreferences exportPath]];
+    [self setGrabPath:  [GeneralPreferences grabPath]];
 }
 
 -(IBAction)actionResetPaths:(id)inSender
 {
-    [self setModelPath:[GeneralPreferences defaultModelPath]];
+    [self setModelPath: [GeneralPreferences defaultModelPath]];
     [self setExportPath:[GeneralPreferences defaultExportPath]];
+    [self setGrabPath:  [GeneralPreferences defaultGrabPath]];
 }
 
 -(IBAction)actionSelectModelPath:(NSPopUpButton*)inSender
@@ -85,6 +92,27 @@ const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
     }
 }
 
+-(IBAction)actionSelectGrabPath:(id)inSender
+{
+    if (1 == [inSender indexOfSelectedItem])
+    {
+        NSOpenPanel *directorySelectPanel = [NSOpenPanel openPanel];
+        [directorySelectPanel setCanChooseFiles:NO]; // Just directories may be selected
+        [directorySelectPanel setCanChooseDirectories:YES]; // Just directories may be selected
+        [directorySelectPanel setCanCreateDirectories:YES];
+        
+        NSInteger rc = [directorySelectPanel runModalForDirectory:[GeneralPreferences grabPath] file:nil types:nil];
+        
+        [inSender selectItemAtIndex:0];
+        
+        if (NSOKButton == rc)
+        {
+            NSString *selectedPath = [[directorySelectPanel filenames] objectAtIndex:0];
+            [self setGrabPath:selectedPath];
+        }
+    }
+}
+
 -(BOOL) isResizable
 {
 	return NO;
@@ -114,6 +142,18 @@ const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
     return s;
 }
 
++(NSString*)grabPath
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    
+    NSString *s = [ud stringForKey:kUserDefaultsKeyGrabPath];
+    if (s == nil)
+    {
+        s = [GeneralPreferences defaultGrabPath];
+    }
+    return s;
+}
+
 @end // @implementation GeneralPreferences
 
 
@@ -138,13 +178,28 @@ const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
     [ud synchronize];
 }
 
+-(void)setGrabPath:(NSString*)inPath
+{
+    [self updateFileSelectPopUpButton:mGrabPathPUB fromPath:inPath];
+    
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:inPath forKey:kUserDefaultsKeyGrabPath];
+    [ud synchronize];
+}
+
 -(void)updateModelPath:(NSString*)inPath
 {
+    [self updateFileSelectPopUpButton:mModelsPathsPUB fromPath:inPath];
 }
 
 -(void)updateExportPath:(NSString*)inPath
 {
     [self updateFileSelectPopUpButton:mExportsPathsPUB fromPath:inPath];
+}
+
+-(void)updateGrabPath:(NSString*)inPath
+{
+    [self updateFileSelectPopUpButton:mGrabPathPUB fromPath:inPath];
 }
 
 -(void)updateFileSelectPopUpButton:(NSPopUpButton*)inButton fromPath:(NSString*)inPath
@@ -176,6 +231,11 @@ const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
 +(NSString*)defaultExportPath
 {
     return [NSString stringWithFormat:@"%@/Documents/MakeHuman/exports",  NSHomeDirectory()];
+}
+
++(NSString*)defaultGrabPath
+{
+    return [NSString stringWithFormat:@"%@/Desktop",  NSHomeDirectory()];
 }
 
 @end // @implementation GeneralPreferences (Private)
