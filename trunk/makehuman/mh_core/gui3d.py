@@ -77,8 +77,11 @@ class Object(events3d.EventHandler):
     else:
       self.mesh.setVisibility(0)
     
-  def setScale(self, scale):
-    self.mesh.setScale(scale, scale, 1)
+  def setScale(self, scale, scaleY = None):
+    if scaleY:
+      self.mesh.setScale(scale, scaleY, 1)
+    else:
+      self.mesh.setScale(scale, scale, 1)
     
   def setText(self, text):
     self.mesh.setText(text)
@@ -788,6 +791,12 @@ class FileChooser(View):
     @self.nextFile.event
     def onClicked(event):
       self.goNext()
+      
+  def getPreview(self, filename):
+    preview = filename
+    if self.previewExtension:
+      preview = filename.replace(os.path.splitext(filename)[-1], "." + self.previewExtension)
+    return preview
     
   def onShow(self, event):
     self.files = []
@@ -802,7 +811,7 @@ class FileChooser(View):
     self.previousFile.hide()
     
     if self.selectedFile < len(self.files):
-        self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, self.previewExtension))
+        self.currentFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile]))
         self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
         self.currentFile.show()
         self.filename.show()
@@ -812,7 +821,7 @@ class FileChooser(View):
         self.filename.hide()
     
     if self.selectedFile + 1 < len(self.files):
-        self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, self.previewExtension))
+        self.nextFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile + 1]))
         self.nextFile.show()
     else:
         self.nextFile.clearTexture()
@@ -850,16 +859,16 @@ class FileChooser(View):
     self.selectedFile -= 1
     
     if self.selectedFile - 1 >= 0:
-        self.previousFile.setTexture(self.path + "/" + self.files[self.selectedFile - 1].replace(self.extension, self.previewExtension))
+        self.previousFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile - 1]))
         self.previousFile.show()
     else:
         self.previousFile.clearTexture()
         self.previousFile.hide()
     
-    self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, self.previewExtension))
+    self.currentFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile]))
     self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
     self.currentFile.show()
-    self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, self.previewExtension))
+    self.nextFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile + 1]))
     self.nextFile.show()
     
     self.app.scene3d.redraw()
@@ -882,14 +891,14 @@ class FileChooser(View):
     
     self.selectedFile += 1
     
-    self.previousFile.setTexture(self.path + "/" + self.files[self.selectedFile - 1].replace(self.extension, self.previewExtension))
+    self.previousFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile - 1]))
     self.previousFile.show()
     self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, self.previewExtension))
     self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
     self.currentFile.show()
     
     if self.selectedFile + 1 < len(self.files):
-        self.nextFile.setTexture(self.path + "/" + self.files[self.selectedFile + 1].replace(self.extension, self.previewExtension))
+        self.nextFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile + 1]))
         self.nextFile.show()
     else:
         self.nextFile.clearTexture()

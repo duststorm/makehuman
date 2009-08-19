@@ -27,7 +27,7 @@ import gui3d, events3d
 class BackgroundTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Background",  category.app.getThemeResource("images", "button_hair.png"))
-    self.filechooser = gui3d.FileChooser(self, "backgrounds", "bmp", "bmp")
+    self.filechooser = gui3d.FileChooser(self, "backgrounds", "bmp", None)
     
     @self.filechooser.event
     def onFileSelected(filename):
@@ -37,6 +37,7 @@ class BackgroundTaskView(gui3d.TaskView):
       bg.setTexture("backgrounds/" + filename)
       bg.setPosition([0.0, 0.0, 1])
       bg.setScale(0.11)
+      bg.mesh.setPickable(0)
       group = bg.mesh.getFaceGroup("default-dummy-group")
       for f in group.faces:
         f.color = [[255, 255, 255, 100], [255, 255, 255, 100], [255, 255, 255, 100]]
