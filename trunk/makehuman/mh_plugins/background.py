@@ -27,7 +27,7 @@ import gui3d, events3d
 class BackgroundTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Background",  category.app.getThemeResource("images", "button_hair.png"))
-    self.filechooser = gui3d.FileChooser(self, "backgrounds", "bmp", None)
+    self.filechooser = gui3d.FileChooser(self, "backgrounds", ["bmp", "png", "tif", "tiff", "jpg", "jpeg"], None)
     
     @self.filechooser.event
     def onFileSelected(filename):

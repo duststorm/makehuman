@@ -22,7 +22,7 @@ TODO
 
 __docformat__ = 'restructuredtext'
 
-import events3d, files3d, animation3d, module3d
+import events3d, files3d, animation3d, module3d, types
 import os
 
 # Wrapper around Object3D
@@ -798,11 +798,22 @@ class FileChooser(View):
       preview = filename.replace(os.path.splitext(filename)[-1], "." + self.previewExtension)
     return preview
     
+  def updateText(self):
+    text = self.files[self.selectedFile]
+    text = text.replace(os.path.splitext(text)[-1], "")
+    self.filename.setText(text)
+    
   def onShow(self, event):
     self.files = []
-    for f in os.listdir(self.path):
-        if f.endswith("." + self.extension):
-            self.files.append(f)
+    if type(self.extension) is types.StringType:
+      for f in os.listdir(self.path):
+          if f.endswith("." + self.extension):
+              self.files.append(f)
+    elif type(self.extension) is types.ListType:
+      for f in os.listdir(self.path):
+          for ext in self.extension:
+              if f.endswith("." + ext):
+                  self.files.append(f)
     self.selectedFile = 0
     
     self.currentFile.setScale(1.5);
@@ -812,7 +823,7 @@ class FileChooser(View):
     
     if self.selectedFile < len(self.files):
         self.currentFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile]))
-        self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
+        self.updateText()
         self.currentFile.show()
         self.filename.show()
     else:
@@ -866,7 +877,7 @@ class FileChooser(View):
         self.previousFile.hide()
     
     self.currentFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile]))
-    self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
+    self.updateText()
     self.currentFile.show()
     self.nextFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile + 1]))
     self.nextFile.show()
@@ -893,8 +904,8 @@ class FileChooser(View):
     
     self.previousFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile - 1]))
     self.previousFile.show()
-    self.currentFile.setTexture(self.path + "/" + self.files[self.selectedFile].replace(self.extension, self.previewExtension))
-    self.filename.setText(self.files[self.selectedFile].replace("." + self.extension, ""))
+    self.currentFile.setTexture(self.path + "/" + self.getPreview(self.files[self.selectedFile]))
+    self.updateText()
     self.currentFile.show()
     
     if self.selectedFile + 1 < len(self.files):
