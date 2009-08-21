@@ -26,6 +26,7 @@ To know more about the interpolation methods used, see the following references:
   http://en.wikipedia.org/wiki/Cubic_Hermite_spline
   http://en.wikipedia.org/wiki/Kochanek-Bartels_spline
   http://www.geometrictools.com/Documentation/KBSplines.pdf
+  http://www.tinaja.com/glib/cubemath.pdf
 """
 
 __docformat__ = 'restructuredtext'
@@ -79,7 +80,7 @@ def hermiteInterpolate(v0, v1, v2, v3, alpha, tension, bias):
 #   continuity: 1 for inverted corners, 0 for normal corners, -1 for box corners.
 #   bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
 # Using 0 continuity gives a hermite spline.
-def KochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias):
+def kochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias):
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
     m0  = (v1 - v0) * (1 - tension) * (1 + continuity) * (1 + bias) / 2.0
@@ -92,6 +93,19 @@ def KochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias
     a3 = -2 * alpha3 + 3 * alpha2
 
     return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2;
+
+# Quadratic Bezier interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
+def cubicBezierInterpolator(v0, v1, v2, alpha):
+    alpha2 = alpha * alpha
+    
+    return (v2 - 2 * v1 + v0) * alpha2 + (v1 - v0) * 2 * alpha + v0
+
+# Cubic Bezier interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+def cubicBezierInterpolator(v0, v1, v2, v3, alpha):
+    alpha2 = alpha * alpha
+    alpha3 = alpha2 * alpha
+    
+    return (v3 - 3 * v2 + 3 * v1 - x0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v1 - 3 * v0) * alpha + v0
 
 # Interpolates a whole vector at once.
 def lerpVector(v1, v2, alpha, interpolator = linearInterpolate):
