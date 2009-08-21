@@ -32,16 +32,16 @@ class BackgroundTaskView(gui3d.TaskView):
     @self.filechooser.event
     def onFileSelected(filename):
       print("Loading %s" %(filename))
-      self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImage.setTexture("backgrounds/" + filename)
-      bg = self.app.categories["Modelling"].tasksByName["Macro modelling"].background
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageChooser.setTexture("backgrounds/" + filename)
+      bg = self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImage
       bg.setTexture("backgrounds/" + filename)
-      bg.setPosition([0.0, 0.0, 1])
-      bg.setScale(0.11)
-      bg.mesh.setPickable(0)
       group = bg.mesh.getFaceGroup("default-dummy-group")
       for f in group.faces:
         f.color = [[255, 255, 255, 100], [255, 255, 255, 100], [255, 255, 255, 100]]
         f.updateColors()
+      bg.setScale(0.11)
+      bg.mesh.setPickable(0)
+      bg.show()
       '''
       for g in self.app.scene3d.selectedHuman.mesh.facesGroups:
         if g.name.startswith("joint-"):
