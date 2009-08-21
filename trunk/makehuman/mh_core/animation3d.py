@@ -58,6 +58,7 @@ def cubicInterpolate(v0, v1, v2, v3, alpha):
 # parameters to adjust them:
 #   tension: 1 for high tension, 0 for normal tension and -1 for low tension.
 #   bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
+# Using 0 bias gives a cardinal spline with just tension, using both 0 tension and 0 bias gives a Catmul-Rom spline.
 def hermiteInterpolate(v0, v1, v2, v3, alpha, tension, bias):
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
@@ -72,11 +73,12 @@ def hermiteInterpolate(v0, v1, v2, v3, alpha, tension, bias):
 
     return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2
     
-# Kochanek Bartels interpolator. Allows even better control of the bends in the spline by providing three
+# Kochanek-Bartels interpolator. Allows even better control of the bends in the spline by providing three
 # parameters to adjust them:
 #   tension: 1 for high tension, 0 for normal tension and -1 for low tension.
 #   continuity: 1 for inverted corners, 0 for normal corners, -1 for box corners.
 #   bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
+# Using 0 continuity gives a hermite spline.
 def KochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias):
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
