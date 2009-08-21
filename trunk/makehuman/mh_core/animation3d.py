@@ -61,10 +61,10 @@ def cubicInterpolate(v0, v1, v2, v3, alpha):
 def hermiteInterpolate(v0, v1, v2, v3, alpha, tension, bias):
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
-    m0  = (v1 - v0) * (1 + bias) * (1 - tension) / 2
-    m0 += (v2 - v1) * (1 - bias) * (1 - tension) / 2
-    m1  = (v2 - v1) * (1 + bias) * (1 - tension) / 2
-    m1 += (v3 - v2) * (1 - bias) * (1 - tension) / 2
+    m0  = (v1 - v0) * (1 - tension) * (1 + bias) / 2.0
+    m0 += (v2 - v1) * (1 - tension) * (1 - bias) / 2.0
+    m1  = (v2 - v1) * (1 - tension) * (1 + bias) / 2.0
+    m1 += (v3 - v2) * (1 - tension) * (1 - bias) / 2.0
     a0 =  2 * alpha3 - 3 * alpha2 + 1
     a1 =      alpha3 - 2 * alpha2 + alpha
     a2 =      alpha3 -     alpha2
@@ -78,8 +78,18 @@ def hermiteInterpolate(v0, v1, v2, v3, alpha, tension, bias):
 #   continuity: 1 for inverted corners, 0 for normal corners, -1 for box corners.
 #   bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
 def KochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias):
-    # TODO
-    pass
+    alpha2 = alpha * alpha
+    alpha3 = alpha2 * alpha
+    m0  = (v1 - v0) * (1 - tension) * (1 + continuity) * (1 + bias) / 2.0
+    m0 += (v2 - v1) * (1 - tension) * (1 - continuity) * (1 - bias) / 2.0
+    m1  = (v2 - v1) * (1 - tension) * (1 - continuity) * (1 + bias) / 2.0
+    m1 += (v3 - v2) * (1 - tension) * (1 + continuity) * (1 - bias) / 2.0
+    a0 =  2 * alpha3 - 3 * alpha2 + 1
+    a1 =      alpha3 - 2 * alpha2 + alpha
+    a2 =      alpha3 -     alpha2
+    a3 = -2 * alpha3 + 3 * alpha2
+
+    return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2;
 
 # Interpolates a whole vector at once.
 def lerpVector(v1, v2, alpha, interpolator = linearInterpolate):
