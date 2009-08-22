@@ -13,6 +13,7 @@ const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
 const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
 
 @interface GeneralPreferences (Private)
++(void)createPathIfNotExists:(NSString*)inPath;
 -(void)updateFileSelectPopUpButton:(NSPopUpButton*)inButton fromPath:(NSString*)inPath;
 
 -(void)updateModelPath:(NSString*)inPath;
@@ -127,6 +128,7 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     {
         s = [GeneralPreferences defaultExportPath];
     }
+    [GeneralPreferences createPathIfNotExists:s];
     return s;
 }
 
@@ -139,6 +141,7 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     {
         s = [GeneralPreferences defaultModelPath];
     }
+    [GeneralPreferences createPathIfNotExists:s];
     return s;
 }
 
@@ -151,6 +154,7 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     {
         s = [GeneralPreferences defaultGrabPath];
     }
+    [GeneralPreferences createPathIfNotExists:s];
     return s;
 }
 
@@ -159,11 +163,20 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
 
 
 @implementation GeneralPreferences (Private)
++(void)createPathIfNotExists:(NSString*)inPath
+{
+    NSFileManager *fm = [NSFileManager defaultManager];
+    BOOL rc = [fm createDirectoryAtPath:inPath 
+                  withIntermediateDirectories:YES 
+                  attributes:nil
+                  error:nil];
+    NSAssert1(rc == YES, @"could not create directory %@", inPath);
+}
 
 -(void)setModelPath:(NSString*)inPath
 {
     [self updateFileSelectPopUpButton:mModelsPathsPUB fromPath:inPath];
-    
+
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     [ud setObject:inPath forKey:kUserDefaultsKeyModelPath];
     [ud synchronize];
