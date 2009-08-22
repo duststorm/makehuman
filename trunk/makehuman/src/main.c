@@ -540,7 +540,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     
     if (!PyString_Check(type))
     {
-        PySys_WriteStderr("String expected");
+        PyErr_SetString(PyExc_TypeError, "String expected");
         return NULL;
     }
     
@@ -575,7 +575,8 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #endif
     if (NULL == path)
     {
-        PySys_WriteStderr("Unknown property for getPath()!");
+        PyErr_SetString(PyExc_TypeError, "Unknown property for getPath()!");
+        return NULL;
     }
     return Py_BuildValue("s", path); 
 }
