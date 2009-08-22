@@ -69,13 +69,13 @@ class ModellingCategory(gui3d.Category):
     def onKeyDown(self, event):
       # Other keybindings
       if event.key == events3d.SDLK_e:
-        exportPath = mh.getExportPath()
+        exportPath = mh.getPath("exports")
         if not os.path.exists(exportPath):
           os.mkdir(exportPath)
         mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/quick_export.obj")
         mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/quick_export.bvh")
       elif event.key == events3d.SDLK_g:
-        grabPath = mh.getGrabPath()
+        grabPath = mh.getPath("grab")
         self.app.scene3d.grabScreen(180, 80, 440, 440, grabPath + "/grab.bmp")
       elif event.key == events3d.SDLK_q:
         self.app.stop()

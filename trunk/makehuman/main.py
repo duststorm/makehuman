@@ -61,22 +61,6 @@ sys.path.append("./")
 sys.path.append("./mh_plugins")
 sys.path.append("./mh_core")
 
-# Adjust the exe path for AQSIS and PIXIE acc. the various Operating Systems.
-if 'darwin' in sys.platform: # For MAC OS
-    aqsisPath   = "/Applications/Aqsis.app/Contents/"
-    os.environ['PATH'] = os.environ['PATH'] + ":" + aqsisPath + "MacOS/"
-    os.environ['AQSIS_DISPLAY_PATH'] = aqsisPath + "Resources/lib/"
-
-    pixiePath   = "/Library/Pixie/bin/"
-    os.environ['PATH'] = os.environ['PATH'] + ":" + pixiePath
-
-    delightPath = "/Applications/Graphics/3Delight-8.5.0/"
-    os.environ['DELIGHT'] = delightPath
-    os.environ['PATH'] = os.environ['PATH'] + ":" + delightPath + "bin/"
-
-    # for param in os.environ.keys():
-    #   print "%20s %s" % (param,os.environ[param])
-
 import gui3d, events3d
 import human, hair, background
 import guimodelling, guifiles, guirender

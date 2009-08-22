@@ -33,15 +33,61 @@ extern "C"
 {
 #endif // #ifdef __cplusplus
 
-    /** Adjust the working dir in order to relocate to the application resources directory 
-      * @param inAppAbsPath the location to the Applications executeable (inclusive path). This is commonly argv[0] of main().
-      * @return 0 for success, -1 for failure.
+    /** Adjust the working dir in order to relocate to the application resources directory.
+      *
+      * \param inAppAbsPath the location to the Applications executeable (inclusive path). This is commonly argv[0] of main().
+      *
+      * \return 0 for success, -1 for failure.
+      *
+      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
       */
     int adjustWorkingDir(const char* inAppAbsPath);
 
+    /** Gets the path location for Exports. This is usually set by the User Preferences and points to
+      * ${USER}/Documents/MakeHuman/exports/ per default.
+      *
+      * \param inAppAbsPath the location to the Applications executeable (inclusive path). This is commonly argv[0] of main().
+      *
+      * \return The path to which all exports should be placed to.
+      *
+      * \see getModelPath()
+      * \see getGrabPath()
+      *
+      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
+      */
     const char* getExportPath();
+
+    /** Gets the path location for Models. This is usually set by the User Preferences and points to
+      * ${USER}/Documents/MakeHuman/models/ per default.
+      *
+      * \return The path to which all exports should be placed to.
+      *
+      * \see getExportPath()
+      * \see getGrabPath()
+      *
+      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
+      */
     const char* getModelPath();
+
+    /** Gets the path location for Screenshots (grabs). This is usually set by the User Preferences and points to
+      * ${USER}/Desktop/ per default.
+      *
+      * \return The path to which all exports should be placed to.
+      *
+      * \see getExportPath()
+      * \see getModelPath()
+      *
+      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
+      */
     const char* getGrabPath();
+
+    /** Adjusts the environment in order to work with all supported Ray Tracers.
+      *
+      * \return 0 for success, -1 for failure.
+      *
+      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
+      */
+    int adjustRenderEnvironment();
 #ifdef __cplusplus
 }
 #endif // #ifdef __cplusplus

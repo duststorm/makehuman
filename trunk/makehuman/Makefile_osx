@@ -23,10 +23,16 @@ module: mh.so
 mh.so:
 	gcc -O2 -DMAKEHUMAN_AS_MODULE src/core.c src/main.c src/glmodule.c os-x/src/NSFont_OpenGL.m -I /usr/include/python2.5 -I ./include -I ./os-x/include -I ./os-x/frameworks/SDL.framework/Headers --shared -F./os-x/frameworks/ -framework SDL -framework SDL_image -framework Python -framework GLUT -framework OpenGL -framework Cocoa -dynamiclib -o mh.so
 
+
+# ---------------------------------------------------------------------
+# Create the API documentation
+# ---------------------------------------------------------------------
+doc:
+	cd docs; doxygen configs/doxygen_html_config.txt
+    
 # ---------------------------------------------------------------------
 # Cleanup unused stuff
 # ---------------------------------------------------------------------
-
 clean:
 	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~ src/*.o src/*.d
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug  clean

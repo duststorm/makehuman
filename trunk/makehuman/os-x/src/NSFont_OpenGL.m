@@ -65,7 +65,7 @@ static BOOL openGLLoggingEnabled = YES;
    NSImage *theImage;
    BOOL retval;
 
-   // Make sure a list isn't already under construction
+   /* Make sure a list isn't already under construction */
    glGetIntegerv( GL_LIST_INDEX, &curListIndex );
    if( curListIndex != 0 )
    {
@@ -73,7 +73,7 @@ static BOOL openGLLoggingEnabled = YES;
       return FALSE;
    }
 
-   // Save pixel unpacking state
+   /* Save pixel unpacking state */
    glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
 
    glPixelStorei( GL_UNPACK_SWAP_BYTES, GL_FALSE );

@@ -59,7 +59,7 @@ Global G;
  *  the initial view of the Humanoid figure that the MakeHuman application
  *  manipulates (e.g. Field of View, Window Dimensions, Rotation Settings etc.).
  */
-void initGlobals(void)
+static void initGlobals(void)
 {
     // Objects
     G.world = PyList_New(0);
@@ -424,7 +424,7 @@ static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
         return Py_BuildValue("i", texture);
 }
 
-PyObject* mh_CreateVertexShader(PyObject *self, PyObject *args)
+static PyObject* mh_CreateVertexShader(PyObject *self, PyObject *args)
 {
     int shader;
     char *vertexShaderSource;
@@ -436,7 +436,7 @@ PyObject* mh_CreateVertexShader(PyObject *self, PyObject *args)
         return Py_BuildValue("i", shader);
 }
 
-PyObject* mh_CreateFragmentShader(PyObject *self, PyObject *args)
+static PyObject* mh_CreateFragmentShader(PyObject *self, PyObject *args)
 {
     int shader;
     char *source;
@@ -448,7 +448,7 @@ PyObject* mh_CreateFragmentShader(PyObject *self, PyObject *args)
         return Py_BuildValue("i", shader);
 }
 
-PyObject* mh_CreateShader(PyObject *self, PyObject *args)
+static PyObject* mh_CreateShader(PyObject *self, PyObject *args)
 {
     int shader;
     int vertexShader, fragmentShader;
@@ -489,73 +489,95 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
-/** \brief Gets the path where objects are exported to.
+/** \brief Gets program specific path locations. 
+ *  MakeHuman uses pathes to export objects and to (re)store exports and screen grabs. 
+ *  Since the various locations depend from the system (Linux, Windows, Mac OS) the program is running 
+ *  on theses pathes may be queried by this function.
  *
- *  For the OS X port this path is adjustable via the MH Preferences settings 
- *  and defaults to "$(HOME)/Documents/makehuman/exports/".
+ *  \param type Determines which path actually has to be queried. Type has to be either 
+ *   'exports', 'models' or 'grab'. NULL will be returnded if it does not fit these requirements. 
  *
- *  \return The Path supposed to export objects.
+ *   The symantics is as follow:
  *
- *  \see mh_getModelPath(PyObject *, PyObject *)
- *  \see mh_getGrabPath(PyObject *, PyObject *)
+ * <table cellspacing="0" cellpadding="5" border="1">
+ *     <tr bgcolor="#CCCCCC">
+ *       <th>type</th>
+ *       <th>synopsis</th>
+ *       <th>Windows</th>
+ *       <th>Linux</th>
+ *       <th>Mac OS X</th>
+ *     </tr>
+ *     <tr>
+ *       <th bgcolor="#CCCCCC"><tt>&quot;exports&quot;</tt></th>
+ *       <td>Declares the path to where exported to.</td>
+ *       <td><tt>&quot;./exports/&quot;</tt></td>
+ *       <td><tt>&quot;./exports/&quot;</tt></td>
+ *       <td>From preferences<br><i>(defaults to <tt>&quot;${USER}/Documents/MakeHuman/exports/&quot;</tt>)</i></td>
+ *     </tr>
+ *     <tr>
+ *       <th bgcolor="#CCCCCC"><tt>&quot;models&quot;</tt></th>
+ *       <td>Declares the path where the models are stored to.</td>
+ *       <td><tt>&quot;./models/&quot;</tt></td>
+ *       <td><tt>&quot;./models/&quot;</tt></td>
+ *       <td>From preferences<br><i>(defaults to <tt>&quot;${USER}/Documents/MakeHuman/models/&quot;</tt>)</i></td>
+ *     </tr>
+ *     <tr>
+ *       <th bgcolor="#CCCCCC"><tt>&quot;grab&quot;</tt></th>
+ *       <td>Declares the target for screenshots.</td>
+ *       <td><tt>&quot;./&quot;</tt></td>
+ *       <td><tt>&quot;./&quot;</tt></td>
+ *       <td>From preferences<br><i>(defaults to <tt>&quot;${USER}/Desktop/&quot;</tt>)</i></td>
+ *     </tr>
+ * </table>
+ *
+ *  \return The Path according the property 'type'.
+ *
  */
-static PyObject* mh_getExportPath(PyObject *self, PyObject *noargs)
+static PyObject* mh_getPath(PyObject *self, PyObject *type)
 {
-    const char *exportsPath;
-#ifdef __APPLE__
-    /* For OS X: Get the path from the preferences ;) */
-    exportsPath = getExportPath();
-#else
-    /* default as "exports/" at the current dir for Linux and Windows */
-    exportsPath = "exports/";
-#endif
-    return Py_BuildValue("s", exportsPath); 
-}
+    const char *path = NULL;
+    const char *typeStr;
+    
+    if (!PyString_Check(type))
+    {
+        PySys_WriteStderr("String expected");
+        return NULL;
+    }
+    
+    typeStr = PyString_AsString(type);
 
-/** \brief Gets the path where models are located.
- *
- *  For the OS X port this path is adjustable via the MH Preferences settings 
- *  and defaults to "$(HOME)/Documents/makehuman/models/".
- *
- *  \return The Path supposed to locate models.
- *
- *  \see mh_getExportPath(PyObject *, PyObject *)
- *  \see mh_getGrabPath(PyObject *, PyObject *)
- */
-static PyObject* mh_getModelPath(PyObject *self, PyObject *noargs)
-{
-    const char *modelsPath;
 #ifdef __APPLE__
-    /* For OS X: Get the path from the preferences ;) */
-    modelsPath = getModelPath();
-#else
-    /* default as "models/" at the current dir for Linux and Windows */
-    modelsPath = "models/"; 
+    if (0 == strcmp(typeStr, "exports"))
+    {
+        path = getExportPath();
+    }
+    else if (0 == strcmp(typeStr, "models"))
+    {
+        path = getModelPath();
+    }
+    else if (0 == strcmp(typeStr, "grab"))
+    {
+        path = getGrabPath();
+    }
+#else  /* default as "exports/" at the current dir for Linux and Windows */
+    if (0 == strcmp(typeStr, "exports"))
+    {
+        path = "exports/";
+    }
+    else if (0 == strcmp(typeStr, "models"))
+    {
+        path = "models/";
+    }
+    else if (0 == strcmp(typeStr, "grab"))
+    {
+        path = "./";
+    }
 #endif
-    return Py_BuildValue("s", modelsPath);
-}
-
-/** \brief Gets the path where screen grabs are stored to.
- *
- *  For the OS X port this path is adjustable via the MH Preferences settings 
- *  and defaults to "$(HOME)/Desktop".
- *
- *  \return The Path supposed to locate screen grabs.
- *
- *  \see mh_getExportPath(PyObject *, PyObject *)
- *  \see mh_getModelPath(PyObject *, PyObject *)
- */
-static PyObject* mh_getGrabPath(PyObject *self, PyObject *noargs)
-{
-    const char *grabPath;
-#ifdef __APPLE__
-    /* For OS X: Get the path from the preferences ;) */
-    grabPath = getGrabPath();
-#else
-    /* default as "" at the current dir for Linux and Windows */
-    grabPath = ""; 
-#endif
-    return Py_BuildValue("s", grabPath);
+    if (NULL == path)
+    {
+        PySys_WriteStderr("Unknown property for getPath()!");
+    }
+    return Py_BuildValue("s", path); 
 }
 
 /** \brief Defines a set of functions as an array that can be passed into the Py_InitModule function.
@@ -596,9 +618,7 @@ static PyMethodDef EmbMethods[] =
     {"startWindow", mh_startWindow, METH_VARARGS, ""},
     {"startEventLoop", mh_startEventLoop, METH_VARARGS, ""},
     {"shutDown", mh_shutDown, METH_VARARGS, ""},
-    {"getExportPath", mh_getExportPath, METH_NOARGS, ""},
-    {"getModelPath", mh_getModelPath, METH_NOARGS, ""},
-    {"getGrabPath", mh_getGrabPath, METH_NOARGS, ""},
+    {"getPath", mh_getPath, METH_O, ""},
     {NULL, NULL, 0, NULL}
 };
 
@@ -631,7 +651,7 @@ PyMODINIT_FUNC initmh()
 int main(int argc, char *argv[])
 {
     // Need to declare variables before other statements
-    
+    int rc;
     char str[128];
     int err;
     PyObject *module;
@@ -645,7 +665,12 @@ int main(int argc, char *argv[])
         strcpy(str, "execfile(\"main.py\")");
     }
 #ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
-    adjustWorkingDir(argv[0]);
+    rc = adjustWorkingDir(argv[0]);
+    assert(0 == rc);
+
+    /* Adjust the environment vars for the external renderer */
+    rc = adjustRenderEnvironment();
+    assert(0 == rc);
 #endif
 
     Py_SetProgramName(argv[0]);

@@ -39,7 +39,7 @@ class SaveTaskView(gui3d.TaskView):
 
     @self.fileentry.event
     def onFileSelected(filename):
-      modelPath = mh.getModelPath()
+      modelPath = mh.getPath("models")
       if not os.path.exists(modelPath):
         os.mkdir(modelPath)
 
@@ -98,7 +98,7 @@ class SaveTaskView(gui3d.TaskView):
 
 class LoadTaskView(gui3d.TaskView):
   def __init__(self, category):
-    modelPath = mh.getModelPath()
+    modelPath = mh.getPath("models")
     gui3d.TaskView.__init__(self, category, "Load",  category.app.getThemeResource("images", "button_load_file.png"))
     self.filechooser = gui3d.FileChooser(self, modelPath, "mhm")
     
@@ -178,7 +178,7 @@ class ExportTaskView(gui3d.TaskView):
 
     @self.fileentry.event
     def onFileSelected(filename):
-      exportPath = mh.getExportPath()
+      exportPath = mh.getPath("exports")
 
       if not os.path.exists(exportPath):
         os.mkdir(exportPath)
