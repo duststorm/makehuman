@@ -56,27 +56,27 @@ void mhConvertToWorld3D(const double screen[3], double world[3], int camera);
 
 // Window events
 void mhReshape(int w, int h);
-void mhDrawBegin();
-void mhDrawEnd();
+void mhDrawBegin(void);
+void mhDrawEnd(void);
 
 // Callbacks to init/cleanup gl state
-void OnInit();
-void OnExit();
+void OnInit(void);
+void OnExit(void);
 
 // Drawing
-void mhSceneCameraPosition();
-void mhGUICameraPosition();
+void mhSceneCameraPosition(void);
+void mhGUICameraPosition(void);
 void mhDrawMeshes(int pickMode, int cameraType);
-void mhDraw();
+void mhDraw(void);
 
-void UpdatePickingBuffer();
+void UpdatePickingBuffer(void);
 
 // Event loop
-void mhShutDown();
-void mhQueueUpdate();
+void mhShutDown(void);
+void mhQueueUpdate(void);
 void mhSetFullscreen(int fullscreen);
 void mhCreateWindow(int useTimer);
-void mhEventLoop();
+void mhEventLoop(void);
 unsigned int mhTimerFunc(unsigned int interval, void* param);
 
 #endif // GLMODULE_H

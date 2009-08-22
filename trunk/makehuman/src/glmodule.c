@@ -637,7 +637,7 @@ void mhGetPickedCoords(int x, int y)
 static unsigned char *pickingBuffer = NULL;
 static int pickingBufferSize = 0;
 
-void UpdatePickingBuffer()
+void UpdatePickingBuffer(void)
 {
   // Get the viewport
   GLint viewport[4];
@@ -850,7 +850,7 @@ void mhReshape(int w, int h)
  *  This function clears the screen and depth buffer and any previous transformations
  *  to initialize the drawing space.
  */
-void mhDrawBegin()
+void mhDrawBegin(void)
 {
     // clear the screen & depth buffer
     glClearColor(G.clearColor[0], G.clearColor[1], G.clearColor[2], G.clearColor[3]);
@@ -861,7 +861,7 @@ void mhDrawBegin()
  *
  *  This function swaps the drawing buffers following a redraw.
  */
-void mhDrawEnd()
+void mhDrawEnd(void)
 {
     SDL_GL_SwapBuffers();
 }
@@ -870,7 +870,7 @@ void mhDrawEnd()
  *
  *  This function initializes lights and materials/textures available to a scene.
  */
-void OnInit()
+void OnInit(void)
 {
     /*Lights and materials*/
     const float lightPos[] = { -10.99f, 20.0f, 20.0f, 1.0f};  /* Light Position */
@@ -994,7 +994,7 @@ void OnInit()
  *
  *  This function deletes materials/textures when the event loop is exited.
  */
-void OnExit()
+void OnExit(void)
 {
     /*Deactivate the pointers to vertex and normal array*/
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -1010,7 +1010,7 @@ void OnExit()
  *  current settings found in global variables.
  *  This function is called before drawing the dynamic camera.
  */
-void mhSceneCameraPosition()
+void mhSceneCameraPosition(void)
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -1029,7 +1029,7 @@ void mhSceneCameraPosition()
  *  This function defines a fixed camera zoom for the static camera,
  *  moving it by -10 in the Z dimension.
  */
-void mhGUICameraPosition()
+void mhGUICameraPosition(void)
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -1276,7 +1276,7 @@ void mhDraw(void)
  *
  *  This function sets loop to 0 which makes the event loop exit.
  */
-void mhShutDown()
+void mhShutDown(void)
 {
     G.loop = 0;
 }
@@ -1287,7 +1287,7 @@ void mhShutDown()
  *  isn't one pending already. This makes sure we don't create a "traffic
  *  jam" in the event queue when the system is slow in redrawing
  */
-void mhQueueUpdate()
+void mhQueueUpdate(void)
 {
     SDL_Event ev;
 
@@ -1443,7 +1443,7 @@ void mhCreateWindow(int useTimer)
  *  This function implements the event loop which manages all user interaction, 
  *  determining which functions to call to handle events etc.
  */
-void mhEventLoop()
+void mhEventLoop(void)
 {
     //SDL_ShowCursor(SDL_DISABLE);
 
