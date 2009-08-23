@@ -181,33 +181,42 @@ class Human(gui3d.Object):
             sob.setVisibility(1)
             self.meshData.setVisibility(0)
         self.scene.redraw()
-        
-        
-    def setGenderVals(self,amount):
+    
+    def setGender(self, gender):
         """
-        This method applies gender attributes to the human
-
+        Sets the gender of the model. 0 is female, 1 is male.
+        
         Parameters
         ----------
 
         amount:
             *float*. An amount, usually between 0 and 1, specifying how much
             of the attribute to apply.
-        """        
+        """  
+        self._setGenderVals(gender)
+    
+    def getGender(self):
+        return self.maleVal 
         
+    def _setGenderVals(self,amount):
         if self.maleVal == amount:
             return 
         self.maleVal =  amount
-        self.femaleVal = 1 - amount
-    
-    def setGender(self, gender):
-        self.setGenderVals(gender)
-    
-    def getGender(self):
-        return self.maleVal        
+        self.femaleVal = 1 - amount       
         
     def setAge(self, age):
-        self.setAgeVals(-1 + 2 * age)
+        """
+        Sets the age of the model. 0 if 12 years old, 1 is 70. To set a particular age in years, use the
+        formula age_value = (age_in_years - 12) / (70 - 12).
+        
+        Parameters
+        ----------
+
+        amount:
+            *float*. An amount, usually between 0 and 1, specifying how much
+            of the attribute to apply.
+        """  
+        self._setAgeVals(-1 + 2 * age)
         
     def getAge(self):
         if self.oldVal:
@@ -217,17 +226,7 @@ class Human(gui3d.Object):
         else:
             return 0.5
         
-    def setAgeVals(self,amount):
-        """
-        This method set age attributes to the human. 
-
-        Parameters
-        ----------
-
-        amount:
-            *float*. An amount, usually between 0 and 1, specifying how much
-            of the attribute to apply.
-        """     
+    def _setAgeVals(self,amount):  
         if amount >= 0:
             if self.oldVal == amount and self.childVal == 0:
                 return 
@@ -241,7 +240,17 @@ class Human(gui3d.Object):
         self.youngVal = 1-(self.oldVal + self.childVal)
     
     def setWeight(self, weight):
-        self.setWeightVals(-1 + 2 * weight)
+        """
+        Sets the amount of weight of the model. 0 for underweight, 1 for overweight.
+        
+        Parameters
+        ----------
+
+        amount:
+            *float*. An amount, usually between 0 and 1, specifying how much
+            of the attribute to apply.
+        """  
+        self._setWeightVals(-1 + 2 * weight)
         
     def getWeight(self):
         if self.overweightVal:
@@ -251,20 +260,7 @@ class Human(gui3d.Object):
         else:
             return 0.5
 
-    def setWeightVals(self,amount):
-        """
-        This method set the values for the weight targets variables:
-        self.overweightVal, self.underweightVal. Note that the slider return
-        a value between -1 and 1, but both self.overweightVal, self.underweightVal
-        have a value between 0 and 1.
-
-        Parameters
-        ----------
-
-        amount:
-            *float*. An amount, usually between 0 and 1, specifying how much
-            of the attribute to apply.
-        """ 
+    def _setWeightVals(self,amount):
         if amount >= 0:
             if self.overweightVal == amount and self.underweightVal == 0:
                 return 
@@ -278,7 +274,17 @@ class Human(gui3d.Object):
 
      
     def setMuscle(self, muscle):
-        self.setMuscleVals(-1 + 2 * muscle)
+        """
+        Sets the amount of muscle of the model. 0 for flacid, 1 for muscular.
+        
+        Parameters
+        ----------
+
+        amount:
+            *float*. An amount, usually between 0 and 1, specifying how much
+            of the attribute to apply.
+        """  
+        self._setMuscleVals(-1 + 2 * muscle)
         
     def getMuscle(self):
         if self.muscleVal:
@@ -288,19 +294,7 @@ class Human(gui3d.Object):
         else:
             return 0.5
 
-    def setMuscleVals(self, amount):
-        """
-        This method set the values for the tone targets variables:
-        self.flaccidVal, self.muscleVal. 
-        
-        Parameters
-        ----------
-
-        amount:
-            *float*. An amount, usually between 0 and 1, specifying how much
-            of the attribute to apply.
-        """  
-      
+    def _setMuscleVals(self, amount):
         if amount >= 0:
             if self.muscleVal == amount and self.flaccidVal == 0:
                 return 
@@ -509,10 +503,8 @@ class Human(gui3d.Object):
                 algos3d.loadTranslationTarget(self.meshData, k,tVal,None,0,0)
 
         #Update all verts
-        facesToRecalculate = range(len(self.meshData.faces))
-        indicesToUpdate = range(len(self.meshData.verts))
-        self.meshData.calcNormals(indicesToUpdate,facesToRecalculate,1)
-        self.meshData.update(indicesToUpdate)
+        self.meshData.calcNormals(1, 1)
+        self.meshData.update()
         self.progressBar.setProgress(1.0)
         self.progressBar.hide()
         

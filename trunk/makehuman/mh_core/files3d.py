@@ -214,10 +214,8 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
     
     
     print "time to build mesh: ", time.time() - time1
-    #Note: update argument in calcNormals must be None, because at this point (before obj.update) arrays don't exist in C
-    obj.calcNormals(recalcNorms=1)
 
-
+    obj.calcNormals()
 
 def wavefrontToData(path):
     """

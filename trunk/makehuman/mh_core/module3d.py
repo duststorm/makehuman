@@ -838,7 +838,7 @@ class Object3D:
             print(text)
 
 
-    def update(self,indexToUpdate = []):
+    def update(self, verticesToUpdate = None):
         """
         This method is used to call the update methods on each of a list of vertices that form part of this object.
 
@@ -849,8 +849,10 @@ class Object3D:
             *int list*  The list of vertex indices to update
 
         """
-        for i in indexToUpdate:
-            v = self.verts[i]
+        if verticesToUpdate == None:
+            verticesToUpdate = self.verts
+            
+        for v in verticesToUpdate:
             v.update()
 
     def applySelectionColor(self):
@@ -892,7 +894,7 @@ class Object3D:
             v.update(0,0,1)
 
 
-    def calcNormals(self,indexToUpdate = None, facesToRecalcNorm = None, recalcNorms = None):
+    def calcNormals(self, recalcVertexNormals = 1, recalcFaceNormals = 1, verticesToUpdate = None, facesToUpdate = None):
         """
         This method calls the calcNormal method for a subset of the faces
         in this Object3D object and the calcNorm method on a subset of the
@@ -925,15 +927,17 @@ class Object3D:
 
         """
 
-        if indexToUpdate == None:
-            indexToUpdate = range(len(self.verts))
-
-        if facesToRecalcNorm:
-            for i in facesToRecalcNorm:
-                self.faces[i].calcNormal()
-        if recalcNorms:
-            for i in indexToUpdate:
-                self.verts[i].calcNorm()
+        if recalcFaceNormals:
+            if facesToUpdate == None:
+                facesToUpdate = self.faces
+            for f in facesToUpdate:
+                f.calcNormal()
+                
+        if recalcVertexNormals:
+            if verticesToUpdate == None:
+                verticesToUpdate = self.verts
+            for v in verticesToUpdate:
+                v.calcNorm()
 
     def __str__(self):
         """

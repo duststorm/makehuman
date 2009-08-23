@@ -217,28 +217,27 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = 
         indicesToUpdate = set()
         facesToRecalculate = []
         for f in faceGroupToUpdate.faces:
-            facesToRecalculate.append(f.idx)
+            facesToRecalculate.append(f)
             for v in f.verts:
-                indicesToUpdate.add(v.idx)
+                verticesToUpdate.add(v)
     else:
         #if a vertgroup is not provided, all verts affected by
         #the targets will be modified
 
-        facesToRecalculate = target.faces
-        indicesToUpdate = target.verts
+        facesToRecalculate = [obj.faces[i] for i in target.faces]
+        verticesToUpdate = [obj.verts[i] for i in target.verts]
 
     #Adding the translation vector
-    for i in indicesToUpdate:
-        targetVect = target.data[i]
-        v = obj.verts[i]
+    for v in verticesToUpdate:
+        targetVect = target.data[v.idx]
         v.co[0] += targetVect[0]*morphFactor
         v.co[1] += targetVect[1]*morphFactor
         v.co[2] += targetVect[2]*morphFactor
 
     if calcNorm == 1:
-        obj.calcNormals(indicesToUpdate,facesToRecalculate,1)
+        obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
     if update:
-        obj.update(indicesToUpdate)
+        obj.update(verticesToUpdate)
 
     #print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
     return True
@@ -275,10 +274,10 @@ def calcTargetNormal(obj, targetPath):
     except:
         print "Probably %s does not exist"%(targetPath)
         return 
-    facesToRecalculate = target.faces
-    indicesToUpdate = target.verts    
-    obj.calcNormals(indicesToUpdate,facesToRecalculate,1)
-    obj.update(indicesToUpdate)
+    facesToRecalculate = [obj.faces[i] for i in target.faces]
+    verticesToUpdate = [obj.verts[i] for i in target.verts]
+    obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
+    obj.update(verticesToUpdate)
 
     #print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
     return True
