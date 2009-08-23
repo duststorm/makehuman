@@ -136,7 +136,6 @@ def lineInColoredLeaf(line, root): #root is of type SimpleOctreeVolume found in 
 #i is the ith vertex of object by which line must be deflected
 #isNurb asks whether line is subsequent controlPoint of a nurb, if yes then the algorithm is improved so deflection regards the actualy 
 #curve and not the line connecting controlpoints
-#TEST PASSED
 def deflect(line,obj,gravity,isNurb=True): #assume gravity is negative y-direction!
     G=[0,-1,0] #vector direction of gravity
     mesh = obj.getData()
@@ -153,7 +152,7 @@ def deflect(line,obj,gravity,isNurb=True): #assume gravity is negative y-directi
                 dist = distTemp
                 near = j
     if near==[]:
-        #print "near was []"
+        #print "near was []. this usually SHOULD NOT happen!"
         return 0
     else:
         size = vdist(mesh.verts[near].co,line[1])
@@ -178,7 +177,10 @@ def collision(curve,obj,res,i=1,gravity=True):
         point1 = world2Local(curve[i-1],mat)
         point2 = world2Local(curve[i],mat)
         if lineInColoredLeaf([point1,point2],octree.root):
-            tangent = deflect([curve[i-1],curve[i]],obj,gravity)
+            if i==N-2:
+                tangent = deflect([curve[i-1],curve[i]],obj,gravity)
+            else:
+                tangent = deflect([curve[i-1],curve[i],curve[i+1]],obj,gravity)
             if not tangent ==0:
                 if not curve[i-1]==tangent[0]: #TODO in case after Tangent deflection we passthrough a second part of the body!
                     delta = vsub(tangent[1],curve[i])
@@ -186,5 +188,5 @@ def collision(curve,obj,res,i=1,gravity=True):
                     for j in range(i+1,len(curve)):
                         curve[j] = vadd(curve[j],delta)
                     N=N+1
-                    i=i+1
+            i=i+1
         i=i+1

@@ -590,7 +590,7 @@ def draw():
     
     buttonY = buttonY-100
     Button("Guide along normal", 9, 10, buttonY, 150, 20) #9
-    noGuides= Slider("Number of guides: ", 10, 10, buttonY+20, 300, 18, noGuides.val, 1, 260, 0, "Number of guides to draw along normal of head")
+    noGuides= Slider("No. Guide-pairs: ", 10, 10, buttonY+20, 300, 18, noGuides.val, 1, 260, 0, "Number of guide-pairs to draw along normal of head")
     gLength= Slider("Length of guides: ", 10, 10, buttonY+40, 300, 18, gLength.val, 0.0, 7.0, 0, "Length of each guides drawn along normal of head")
     noCPoints= Slider("Controlpoints: ", 10, 10, buttonY+60, 300, 18, noCPoints.val, 2, 20, 0, "Number of control-points for each guide")
 
