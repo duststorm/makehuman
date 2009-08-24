@@ -1054,6 +1054,86 @@ class Scene3D:
 
         """
         return "scene_type"
+        
+    def attach(self, obj):
+        if obj.object3d:
+            return
+            
+        self.assignSelectionID(obj)
+        #print "sending: ", obj.name, len(obj.verts)
+        coIdx = 0
+        fidx = 0
+        uvIdx = 0
+        colIdx = 0
+        # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
+        obj.object3d = mh.Object3D(obj.vertexBufferSize, obj.indexBuffer)
+        mh.world.append(obj.object3d)
+        
+        for g in obj.facesGroups:
+            groupVerts = {};
+            for f in g.faces:
+                faceColor = f.color
+                if faceColor == None:
+                    faceColor = [[255,255,255,255],[255,255,255,255],[255,255,255,255]]
+                fUV = f.uv
+                if fUV == None:
+                    fUV = [-1,-1,-1]
+                            
+                i = 0
+                for v in f.verts:
+                    if v.idx not in groupVerts:
+                        #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+                        obj.object3d.setVertCoord(coIdx, v.co)
+                        obj.object3d.setNormCoord(coIdx, v.no)
+                        obj.object3d.setColorIDComponent(coIdx, f.colorID)
+                        obj.object3d.setColorComponent(colIdx, faceColor[i])
+                        groupVerts[v.idx] = set()
+                        groupVerts[v.idx].add(fUV[i])
+                        
+                        coIdx += 1
+                        colIdx += 1
+                        
+                        if obj.uvValues:
+                            obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
+                            uvIdx += 1
+                        
+                    elif fUV[i] not in groupVerts[v.idx]:
+                        #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+                        obj.object3d.setVertCoord(coIdx, v.co)
+                        obj.object3d.setNormCoord(coIdx, v.no)
+                        obj.object3d.setColorIDComponent(coIdx, f.colorID)
+                        obj.object3d.setColorComponent(colIdx, faceColor[i])
+                        groupVerts[v.idx].add(fUV[i])
+                        
+                        coIdx += 1
+                        colIdx += 1
+                        
+                        if obj.uvValues:
+                            obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
+                            uvIdx += 1
+                        
+                    i += 1
+                    
+        if obj.texture:
+            obj.setTexture(obj.texture)
+            
+        obj.object3d.shader = obj.shader
+        
+        for name, value in obj.shaderParameters.iteritems():
+          obj.object3d.shaderParameters[name] = value
+
+        obj.object3d.setTranslation(obj.x, obj.y, obj.z)
+        obj.object3d.setRotation( obj.rx, obj.ry, obj.rz)
+        obj.object3d.setScale(obj.sx, obj.sy, obj.sz)
+        obj.object3d.visibility = obj.visibility
+        obj.object3d.shadeless = obj.shadeless
+        obj.object3d.pickable = obj.pickable
+        obj.object3d.cameraMode = obj.cameraMode
+        obj.object3d.text = obj.text
+        #TODO add all obj attributes
+        
+    def detach(self, obj):
+        obj.object3d = None
 
     def update(self):
         """
@@ -1076,79 +1156,7 @@ class Scene3D:
         
         #Send all
         for obj in self.objects:
-            self.assignSelectionID(obj)
-            #print "sending: ", obj.name, len(obj.verts)
-            coIdx = 0
-            fidx = 0
-            uvIdx = 0
-            colIdx = 0
-            # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
-            obj.object3d = mh.Object3D(obj.vertexBufferSize, obj.indexBuffer)
-            mh.world.append(obj.object3d)
-            
-            for g in obj.facesGroups:
-                groupVerts = {};
-                for f in g.faces:
-                    faceColor = f.color
-                    if faceColor == None:
-                        faceColor = [[255,255,255,255],[255,255,255,255],[255,255,255,255]]
-                    fUV = f.uv
-                    if fUV == None:
-                        fUV = [-1,-1,-1]
-                                
-                    i = 0
-                    for v in f.verts:
-                        if v.idx not in groupVerts:
-                            #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
-                            obj.object3d.setVertCoord(coIdx, v.co)
-                            obj.object3d.setNormCoord(coIdx, v.no)
-                            obj.object3d.setColorIDComponent(coIdx, f.colorID)
-                            obj.object3d.setColorComponent(colIdx, faceColor[i])
-                            groupVerts[v.idx] = set()
-                            groupVerts[v.idx].add(fUV[i])
-                            
-                            coIdx += 1
-                            colIdx += 1
-                            
-                            if obj.uvValues:
-                                obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
-                                uvIdx += 1
-                            
-                        elif fUV[i] not in groupVerts[v.idx]:
-                            #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
-                            obj.object3d.setVertCoord(coIdx, v.co)
-                            obj.object3d.setNormCoord(coIdx, v.no)
-                            obj.object3d.setColorIDComponent(coIdx, f.colorID)
-                            obj.object3d.setColorComponent(colIdx, faceColor[i])
-                            groupVerts[v.idx].add(fUV[i])
-                            
-                            coIdx += 1
-                            colIdx += 1
-                            
-                            if obj.uvValues:
-                                obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
-                                uvIdx += 1
-                            
-                        i += 1
-                        
-            if obj.texture:
-                obj.setTexture(obj.texture)
-                
-            obj.object3d.shader = obj.shader
-            
-            for name, value in obj.shaderParameters.iteritems():
-              obj.object3d.shaderParameters[name] = value
-
-            obj.object3d.setTranslation(obj.x, obj.y, obj.z)
-            obj.object3d.setRotation( obj.rx, obj.ry, obj.rz)
-            obj.object3d.setScale(obj.sx, obj.sy, obj.sz)
-            obj.object3d.visibility = obj.visibility
-            obj.object3d.shadeless = obj.shadeless
-            obj.object3d.pickable = obj.pickable
-            obj.object3d.cameraMode = obj.cameraMode
-            obj.object3d.text = obj.text
-            #TODO add all obj attributes
-            
+            self.attach(obj)
 
         print "Regeneration done in" + str(time.time()-a)
         
