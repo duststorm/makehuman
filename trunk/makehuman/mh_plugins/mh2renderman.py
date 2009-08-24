@@ -226,7 +226,7 @@ def writeLightMapObj(fileName, mesh, referenceFile):
 
     facesUVcolor = []
 
-    for i in range(len(facesUVvalues)):
+    for i in xrange(len(facesUVvalues)):
         facesUVcolor.append(0)
 
     #These two list should be replaced by lights class in module3d.py

@@ -109,7 +109,7 @@ def cubicBezierInterpolator(v0, v1, v2, v3, alpha):
 
 # Interpolates a whole vector at once.
 def lerpVector(v1, v2, alpha, interpolator = linearInterpolate):
-    return [interpolator(v1[i], v2[i], alpha) for i in range(len(v1))]
+    return [interpolator(v1[i], v2[i], alpha) for i in xrange(len(v1))]
     #return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
 
 class Action:
