@@ -1152,7 +1152,7 @@ class Scene3D:
         nObjs = len(self.objects)
         self.colorID = [0,0,0]#reset the colors selection ID
         
-        mh.world[:] = []
+        #mh.world[:] = []
         
         #Send all
         for obj in self.objects:
