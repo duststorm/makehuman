@@ -74,7 +74,7 @@ def isFile(path):
     except:
         return None
 
-def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
+def dataTo3Dobject(obj, data, calcFaceNorm = 1, addSharedFaces = 1):
     """
     This function creates a 3D object based upon a standardised input data stream.
     The object created is held in memory in the standard internal MakeHuman data format.
@@ -109,7 +109,7 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
     #print "DEBUG FACEGROUP",faceGroupsNames
 
     for i, v in enumerate(verts):      
-        v = module3d.Vert(v, i, obj, vertsSharedFaces[i])
+        v = module3d.Vert(v, i, obj)
         obj.verts.append(v)     
 
     gIndex = 0
@@ -135,25 +135,21 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
             v1 = obj.verts[face[1]]
             v2 = obj.verts[face[2]]
             
-            t0 = -1
-            t1 = -1
-            t2 = -1
             if len(uvFaceData) > 0:               # look up uv, if existing, these are in the same order as in the file
                 uvIndices = uvFaceData[fIndex]
                 t0 = uvIndices[0]
                 t1 = uvIndices[1]
                 t2 = uvIndices[2]
+            else:
+                t0 = -1
+                t1 = -1
+                t2 = -1
             
-            f = module3d.Face(v0,v1,v2)           
+            f = module3d.Face(v0, v1, v2)           
             if calcFaceNorm:
                 f.calcNormal()                    # calculate normal
 
-            if len(uvFaceData) > 0:               # copy uv to the face????
-                #uvIndices = uvFaceData[fIndex]
-                uv0 = t0 #uvValues[t0]
-                uv1 = t1 #uvValues[t1]
-                uv2 = t2 #uvValues[t2]
-                f.uv = [uv0,uv1,uv2]
+            f.uv = [t0, t1, t2]
                 
             # Build the lists of vertex indices and UV-indices for this face group. 
             # In the Python data structures a single vertex can be shared between
@@ -163,13 +159,9 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
             # Where the UV-map needs a sharp transition (e.g. where the eyelids 
             # meet the eyeball) we therefore create duplicate vertices. 
             for i, v in enumerate(f.verts):
-            	# If UV data is present, retrieve the index to the UV 
-            	# data for this vertex on this face. This index will be 
-            	# used as the 'key' of an element in the groupVerts dictionary.
-                if f.uv:
-                  t = f.uv[i]
-                else:
-                  t = -1
+            	  # Retrieve the index to the UV data for this vertex on this face.
+            	  # This index will be used as the 'key' of an element in the groupVerts dictionary.
+                t = f.uv[i]
                 # If this is the first occurrence of this vertex add it 
                 # into the vertex array. A list element is added into the
                 # groupVerts dictionary for this vertex. This list element is used
@@ -182,7 +174,7 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
                     obj.indexBuffer.append(fullArrayIndex)
                     fullArrayIndex += 1
                 # If this vertex exists, but this UV index has not yet been 
-                # added as the 'name' of an element in the groupVerts list,
+                # added as the 'key' of an element in the groupVerts list,
                 # split it off to form a separate vertex.
                 elif t not in groupVerts[v.idx]:
                     v.indicesInFullVertArray.append(fullArrayIndex)
@@ -205,13 +197,9 @@ def dataTo3Dobject(obj,data,calcFaceNorm = 1, addSharedFaces = 1):
 
     if addSharedFaces:
         for v in obj.verts:
-            
-            for i in v.sharedFacesIndices:
-                #print i, len(obj.faces), obj.name, v.sharedFacesIndices
-                v.sharedFaces.append(obj.faces[i])            
- 
-                    
-    
+            for i in vertsSharedFaces[v.idx]:
+                #print i, len(obj.faces), obj.name, vertsSharedFaces[v.idx]
+                v.sharedFaces.append(obj.faces[i])
     
     print "time to build mesh: ", time.time() - time1
 
@@ -242,16 +230,12 @@ def wavefrontToData(path):
     currentFaceGroup = "default-dummy-group"
     faceGroups[currentFaceGroup] = []
     
-    
-    
     verts = []
     vertsSharedFaces = []    
     faceIndex = 0
     uvValues = []
     uvFaceData = []
-
     
-
     try:
         ObjFile = open(path)
     except:
@@ -587,21 +571,20 @@ def loadMesh(scene,path,locX=0,locY=0,locZ=0,loadColors=1):
       *float* Z location of loaded obj, default = 0
     """
 
- 
-    colorPath = path+".colors"
     data = wavefrontToData(path)
     
     if data is None:
       return
       
-    objName = os.path.basename(path)    
+    objName = os.path.basename(path)
     ob = scene.newObj(objName)
     
     ob.path = path
     ob.x = locX
     ob.y = locY
     ob.z = locZ    
-    dataTo3Dobject(ob,data)    
+    dataTo3Dobject(ob, data)    
     if loadColors:
+        colorPath = path + ".colors"
         algos3d.loadVertsColors(ob, colorPath, None)
     return ob

@@ -55,8 +55,8 @@ class Texture:
     Attributes
     ----------
     
-    - **self.id** : The texture identifier. (TODO:Editorial note: it's int?)
-    - **self.modified**: A flag to indicate if a texture is modified. (TODO:Editorial Note: it's for reload?)
+    - **self.id** : *int* The texture identifier.
+    - **self.modified**: *int* A flag to indicate if a texture is modified, used to reload the texture if needed.
     """
     def __init__(self, id, modified):
         self.id = id
@@ -132,7 +132,6 @@ class Vert:
       Default: [0, 0, 0].
     - **self.object**: *Object3d*. The object of which this vertex is a part.
       Default: 0
-    - **self.sharedFacesIndices**: *faces list*. The list of faces that share this vertex.
     - **self.sharedFaces**: *faces list*. The list of faces that share this vertex.
     - **self.indicesInFullVertArray**: *Int list*. The list of corresponding vertices in the C OpenGL list.
     - **self.idx**: *Int* The index of this vertex in the vertices list.
@@ -172,7 +171,6 @@ class Vert:
         self.co = co
         self.no = [0,0,0]
         self.object = object
-        self.sharedFacesIndices = sfidx
         self.sharedFaces = []
         self.indicesInFullVertArray = []
         self.idx = idx
@@ -310,11 +308,11 @@ class Vert:
 
         """
 
-        sharedVertices = {}
+        sharedVertices = set()
         for f in self.sharedFaces:
             for v in f.verts:
-                sharedVertices[v.idx] = v
-        return sharedVertices.values()
+                sharedVertices.add(v)
+        return list(sharedVertices)
 
     def __str__(self):
         """
@@ -596,8 +594,6 @@ class Object3D:
             self.object3d.setTranslation(self.x, self.y, self.z)
         except AttributeError, text:
             print(text)
-        #TODO: try-except for all setXxx
-        
 
     def setRot(self,rx,ry,rz):
         """
@@ -724,7 +720,10 @@ class Object3D:
         
         """
         self.texture = None
-        self.object3d.texture = 0;
+        try:
+          self.object3d.texture = 0;
+        except AttributeError, text:
+          print(text)
         
     def setShader(self, shader):
         """
@@ -1166,7 +1165,7 @@ class Scene3D:
             try:
                 mh.loadTexture(path, textureCache[path].id)
             except RuntimeError, text:
-                    print(text)
+                print(text)
 
     def setTimeTimer(self, millisecs):
         """
@@ -1860,7 +1859,7 @@ class Scene3D:
             objPicked = facegroupPicked.parent
             return (facegroupPicked,objPicked)
         else:
-            print "no clickable zone"
+            print "not a clickable zone"
             return None
 
 
