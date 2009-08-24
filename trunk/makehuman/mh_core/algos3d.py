@@ -115,14 +115,9 @@ def pushTargetInBuffer(obj,targetPath):
         print "Unable to open %s",(targetPath)
         return  0
 
-    #targetData = {} #The target buffer
     facesToRecalculate = set() #Indices of faces affected by the target, to put in buffer
     verticesToRecalculate = [] #Indices of vertices affected by the targets, to put in buffer
-    #Each targetData contain data for ALL verts, with default translation of 0
-    #Maybe it can be optimized.
-    #for i in range(len(obj.verts)):
-    #    targetData[i]=[0,0,0]
-    #targetData = dict([(i, [0,0,0]) for i in range(len(obj.verts))])
+
     target = Target(obj, targetPath)
 
     for lineData in fileDescriptor.readlines():
@@ -208,16 +203,14 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = 
     except:
         print "Probably %s does not exist"%(targetPath)
         return    
-    #if a facegroup is provided,
-    #it apply it ONLY to the verts used
-    #by the specified facegroup.
+    # if a facegroup is provided, apply it ONLY to the verts used
+    # by the specified facegroup.
     if faceGroupToUpdateName:
 
         faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
         indicesToUpdate = set()
-        facesToRecalculate = []
-        for f in faceGroupToUpdate.faces:
-            facesToRecalculate.append(f)
+        facesToRecalculate = list(faceGroupToUpdate.faces)
+        for f in facesToRecalculate:
             for v in f.verts:
                 verticesToUpdate.add(v)
     else:
