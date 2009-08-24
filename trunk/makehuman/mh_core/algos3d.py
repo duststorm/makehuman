@@ -866,19 +866,6 @@ def resetObj(obj, update = None, calcNorm = None):
         v.co[2] = originalVerts[i][2]
         if update:
             v.update()
-        if calcNorm:
-            v.calcNorm()
-
-
-
-
+    if calcNorm:
+        obj.calcNormals()
         
-
-
-
-   
-
-    
-
- 
-

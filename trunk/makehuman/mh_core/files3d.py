@@ -74,7 +74,7 @@ def isFile(path):
     except:
         return None
 
-def dataTo3Dobject(obj, data, calcFaceNorm = 1, addSharedFaces = 1):
+def dataTo3Dobject(obj, data, addSharedFaces = 1):
     """
     This function creates a 3D object based upon a standardised input data stream.
     The object created is held in memory in the standard internal MakeHuman data format.
@@ -87,9 +87,6 @@ def dataTo3Dobject(obj, data, calcFaceNorm = 1, addSharedFaces = 1):
 
     data:
         *list of various data*. The data to be used to fill the object.
-
-    calcFaceNorm:
-        *int flag*. Whether or not to calculated face normals (1=Calculate Normals, 0=Don't).
 
     addSharedFaces:
         *int flag*. Whether or not to perform the 'shared faces' analysis (1=Yes, 0=No).
@@ -117,10 +114,6 @@ def dataTo3Dobject(obj, data, calcFaceNorm = 1, addSharedFaces = 1):
     fullArrayIndex = 0
 
     obj.uvValues = uvValues
-
-    #gNames = faceGroups.keys()
-    
-    #print "GRUPPI:", len(gNames)
     
     for groupName in faceGroupsNames:
         group = faceGroups[groupName]
@@ -128,7 +121,6 @@ def dataTo3Dobject(obj, data, calcFaceNorm = 1, addSharedFaces = 1):
         
         fg = module3d.FaceGroup(groupName)        # create group with name groupName
         fg.elementIndex = fullArrayIndex          # first index in opengl array
-        #print "Adding facegroup: %s"%(groupName)
         obj.addFaceGroup(fg)                      # add group to object
         for face in group:                        # for each face in the group [co_index1, co_index2, co_index3]
             v0 = obj.verts[face[0]]               # look up vertices, these are in the same order as in the file
@@ -146,8 +138,6 @@ def dataTo3Dobject(obj, data, calcFaceNorm = 1, addSharedFaces = 1):
                 t2 = -1
             
             f = module3d.Face(v0, v1, v2)           
-            if calcFaceNorm:
-                f.calcNormal()                    # calculate normal
 
             f.uv = [t0, t1, t2]
                 
