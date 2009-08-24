@@ -114,7 +114,7 @@ static PyMemberDef Texture_members[] = {
     {NULL}  /* Sentinel */
 };
 
-PyObject *Texture_loadImage(Texture *texture, PyObject *path);
+static PyObject *Texture_loadImage(Texture *texture, PyObject *path);
 
 // Texture Methods
 static PyMethodDef Texture_methods[] = {
@@ -124,9 +124,9 @@ static PyMethodDef Texture_methods[] = {
   {NULL}  /* Sentinel */
 };
 
-void Texture_dealloc(Texture *self);
-PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
-int Texture_init(Texture *self, PyObject *args, PyObject *kwds);
+static void Texture_dealloc(Texture *self);
+static PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static int Texture_init(Texture *self, PyObject *args, PyObject *kwds);
 
 // Texture type definition
 PyTypeObject TextureType = {
@@ -193,7 +193,7 @@ void RegisterTexture(PyObject *module)
 static void Texture_dealloc(Texture *self)
 {
   // Free our data
-  glDeleteTextures(1, self->textureId);
+  glDeleteTextures(1, &self->textureId);
 
   // Free Python data
   self->ob_type->tp_free((PyObject*)self);
@@ -212,7 +212,7 @@ static PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   // Init our data
   if (self)
   {
-    glGenTextures(1, self->textureId);
+    glGenTextures(1, &self->textureId);
     self->width = 0;
     self->height = 0;
   }
