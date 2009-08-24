@@ -418,7 +418,7 @@ static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
     char *filename;
     if (!PyArg_ParseTuple(args, "si", &filename, &texture))
         return NULL;
-    else if (!(texture = mhLoadTexture(filename, texture)))
+    else if (!(texture = mhLoadTexture(filename, texture, NULL, NULL)))
         return NULL;
     else
         return Py_BuildValue("i", texture);
@@ -688,6 +688,7 @@ int main(int argc, char *argv[])
     initGlobals(); /* initialize all our globals */
     module = Py_InitModule("mh", EmbMethods);
     RegisterObject3D(module);
+    RegisterTexture(module);
     PyModule_AddObject(module, "world", G.world);
 
 #if defined(__GNUC__) && defined(__WIN32__)

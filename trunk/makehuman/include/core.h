@@ -43,6 +43,7 @@ extern "C" {
 #endif
 
 void RegisterObject3D(PyObject *module);
+void RegisterTexture(PyObject *module);
 
 extern PyTypeObject Object3DType;
 

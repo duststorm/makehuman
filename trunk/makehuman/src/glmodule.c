@@ -51,6 +51,11 @@
     #include <X11/Xutil.h>
     #include <GL/glx.h>
 #endif
+#ifdef __APPLE__
+    #include <Python/structmember.h>
+#else
+    #include <structmember.h>
+#endif
 
 static int g_savedx=0; /*saved x mouse position*/
 static int g_savedy=0; /*saved y mouse position*/
@@ -92,6 +97,161 @@ static int g_ShadersSupported = 0;
 #else
 static int g_ShadersSupported = 1;
 #endif /* ifndef __APPLE__*/
+
+typedef struct
+{
+    PyObject_HEAD
+    int textureId;
+    int width;
+    int height;
+} Texture;
+
+// Texture attributes directly accessed by Python
+static PyMemberDef Texture_members[] = {
+    {"textureId", T_UINT, offsetof(Texture, textureId), READONLY, "The id of the OpenGL texture."},
+    {"width",     T_UINT, offsetof(Texture, width),     READONLY, "The width of the texture in pixels."},
+    {"height",    T_UINT, offsetof(Texture, height),    READONLY, "The height of the texture in pixels."},
+    {NULL}  /* Sentinel */
+};
+
+PyObject *Texture_loadImage(Texture *texture, PyObject *path);
+
+// Texture Methods
+static PyMethodDef Texture_methods[] = {
+  {"loadImage", (PyCFunction)Texture_loadImage, METH_O,
+   "Loads the specified image from file"
+  },
+  {NULL}  /* Sentinel */
+};
+
+void Texture_dealloc(Texture *self);
+PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+int Texture_init(Texture *self, PyObject *args, PyObject *kwds);
+
+// Texture type definition
+PyTypeObject TextureType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                                        // ob_size
+    "mh.Texture",                             // tp_name
+    sizeof(Texture),                          // tp_basicsize
+    0,                                        // tp_itemsize
+    (destructor)Texture_dealloc,              // tp_dealloc
+    0,                                        // tp_print
+    0,                                        // tp_getattr
+    0,                                        // tp_setattr
+    0,                                        // tp_compare
+    0,                                        // tp_repr
+    0,                                        // tp_as_number
+    0,                                        // tp_as_sequence
+    0,                                        // tp_as_mapping
+    0,                                        // tp_hash
+    0,                                        // tp_call
+    0,                                        // tp_str
+    0,                                        // tp_getattro
+    0,                                        // tp_setattro
+    0,                                        // tp_as_buffer
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
+    "Texture object",                         // tp_doc
+    0,		                                    // tp_traverse
+    0,		                                    // tp_clear
+    0,		                                    // tp_richcompare
+    0,		                                    // tp_weaklistoffset
+    0,		                                    // tp_iter
+    0,		                                    // tp_iternext
+    Texture_methods,                          // tp_methods
+    Texture_members,                          // tp_members
+    0,                                        // tp_getset
+    0,                                        // tp_base
+    0,                                        // tp_dict
+    0,                                        // tp_descr_get
+    0,                                        // tp_descr_set
+    0,                                        // tp_dictoffset
+    (initproc)Texture_init,                   // tp_init
+    0,                                        // tp_alloc
+    Texture_new,                              // tp_new
+};
+
+/** \brief Registers the Object3D object in the Python environment.
+ *  \param module The module to register the Object3D object in.
+ *
+ *  This function registers the Object3D object in the Python environment.
+ */
+void RegisterTexture(PyObject *module)
+{
+  if (PyType_Ready(&TextureType) < 0)
+      return;
+
+  Py_INCREF(&TextureType);
+  PyModule_AddObject(module, "Texture", (PyObject*)&TextureType);
+}
+
+/** \brief Takes care of the deallocation of the OpenGL texture.
+ *  \param self The Texture object which is being deallocated.
+ *
+ *  This function takes care of the deallocation of the OpenGL texture.
+ */
+static void Texture_dealloc(Texture *self)
+{
+  // Free our data
+  glDeleteTextures(1, self->textureId);
+
+  // Free Python data
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+/** \brief Takes care of the initialization of the Texture object members.
+ *  \param self The Texture object which is being initialized.
+ *
+ *  This function takes care of the initialization of the Texture object members.
+ */
+static PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  // Alloc Python data
+  Texture *self = (Texture*)type->tp_alloc(type, 0);
+
+  // Init our data
+  if (self)
+  {
+    glGenTextures(1, self->textureId);
+    self->width = 0;
+    self->height = 0;
+  }
+
+  return (PyObject*)self;
+}
+
+/** \brief The constructor of the Texture object.
+ *  \param self The Texture object which is being constructed.
+ *  \param args The arguments.
+ *
+ *  The constructor of the Texture object.
+ */
+static int Texture_init(Texture *self, PyObject *args, PyObject *kwds)
+{
+  char *path = NULL;
+
+  if (!PyArg_ParseTuple(args, "|s", &path))
+    return -1;
+
+  if (path && !mhLoadTexture(path, self->textureId, &self->width, &self->height))
+    return -1;
+
+  return 0;
+}
+
+static PyObject *Texture_loadImage(Texture *texture, PyObject *path)
+{
+  if (!PyString_Check(path))
+  {
+      PyErr_SetString(PyExc_TypeError, "String expected");
+      return NULL;
+  }
+
+  if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
+    return NULL;
+
+  return Py_BuildValue(""); 
+}
 
 /** \brief Draw text at a specified location on the screen.
  *  \param x a float specifying the horizontal position in the GUI window.
@@ -152,7 +312,7 @@ static void mhFlipSurface(const SDL_Surface *surface)
  *
  *  This function loads a texture from a texture file and binds it into the OpenGL textures array.
  */
-GLuint mhLoadTexture(const char *fname, GLuint texture)
+GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 {
     int mode, components;
     SDL_Surface *surface;
@@ -239,6 +399,11 @@ GLuint mhLoadTexture(const char *fname, GLuint texture)
       gluBuild2DMipmaps(GL_TEXTURE_2D, components, surface->w, surface->h, mode, GL_UNSIGNED_BYTE, surface->pixels);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
+
+    if (width)
+      *width = surface->w;
+    if (height)
+      *height = surface->h;
 
     SDL_FreeSurface(surface);
 

@@ -22,37 +22,31 @@ TO DO
 
 __docformat__ = 'restructuredtext'
 
-import gui3d, events3d
+import gui3d, events3d, mh
 
 class BackgroundTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Background",  category.app.getThemeResource("images", "button_hair.png"))
     self.filechooser = gui3d.FileChooser(self, "backgrounds", ["bmp", "png", "tif", "tiff", "jpg", "jpeg"], None)
+    self.texture = mh.Texture();
     
     @self.filechooser.event
     def onFileSelected(filename):
       print("Loading %s" %(filename))
-      self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageChooser.setTexture("backgrounds/" + filename)
+      self.texture.loadImage("backgrounds/" + filename)
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageChooser.setTexture(self.texture.textureId)
       bg = self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImage
       bg.setTexture("backgrounds/" + filename)
       group = bg.mesh.getFaceGroup("default-dummy-group")
       for f in group.faces:
         f.color = [[255, 255, 255, 100], [255, 255, 255, 100], [255, 255, 255, 100]]
         f.updateColors()
-      bg.setScale(0.11)
+      if self.texture.width > self.texture.height:
+        bg.setScale(0.11, 0.11 * self.texture.height / self.texture.width)
+      else:
+        bg.setScale(0.11 * self.texture.width / self.texture.height, 0.11)
       bg.mesh.setPickable(0)
       bg.show()
-      '''
-      for g in self.app.scene3d.selectedHuman.mesh.facesGroups:
-        if g.name.startswith("joint-"):
-          for f in g.faces:
-            f.color = [[255, 255, 255, 0], [255, 255, 255, 0], [255, 255, 255, 0]]
-            f.updateColors()
-        else:
-          for f in g.faces:
-            f.color = [[255, 255, 255, 128], [255, 255, 255, 128], [255, 255, 255, 128]]
-            f.updateColors()
-      '''
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
     

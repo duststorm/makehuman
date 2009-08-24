@@ -287,7 +287,7 @@ def wavefrontToData(path):
                     vertsSharedFaces[vIndices[2]].append(faceIndex)
                     faceIndex += 1
                     
-                    triangle2 = [vIndices[2],vIndices[3],vIndices[0]]                  
+                    triangle2 = [vIndices[2],vIndices[3],vIndices[0]]
                     faceGroups[currentFaceGroup].append(triangle2)
                     vertsSharedFaces[vIndices[2]].append(faceIndex)
                     vertsSharedFaces[vIndices[3]].append(faceIndex)
