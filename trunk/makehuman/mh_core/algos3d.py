@@ -73,6 +73,34 @@ class Target:
         self.data = [0,0,0] * len(obj.verts)
         self.faces = None
         self.verts = None
+        
+        try:
+            fileDescriptor = open(name)        
+        except:
+            print "Unable to open %s",(name)
+            return
+            
+        facesToRecalculate = set() #Indices of faces affected by the target, to put in buffer
+        verticesToRecalculate = [] #Indices of vertices affected by the targets, to put in buffer
+        
+        for line in fileDescriptor:
+            translationData = line.split()
+            if len(translationData) == 4:
+                vertIndex = int(translationData[0])
+                verticesToRecalculate.append(vertIndex)
+                translationVector = (float(translationData[1]),\
+                                    float(translationData[2]),\
+                                    float(translationData[3]))
+                self.data[vertIndex] = translationVector
+
+                vertToModify = obj.verts[vertIndex]
+                for face in vertToModify.sharedFaces:
+                  facesToRecalculate.add(face.idx)
+                  
+        self.faces = tuple(facesToRecalculate)
+        self.verts = tuple(verticesToRecalculate)
+        
+        fileDescriptor.close()
 
 def pushTargetInBuffer(obj,targetPath):
     """
@@ -108,38 +136,12 @@ def pushTargetInBuffer(obj,targetPath):
 
     """
     t1 = time.time()
+    
     global targetBuffer
-    try:
-        fileDescriptor = open(targetPath)        
-    except:
-        print "Unable to open %s",(targetPath)
-        return  0
 
-    facesToRecalculate = set() #Indices of faces affected by the target, to put in buffer
-    verticesToRecalculate = [] #Indices of vertices affected by the targets, to put in buffer
-
-    target = Target(obj, targetPath)
-
-    for lineData in fileDescriptor.readlines():
-        translationData = lineData.split()
-        if len(translationData) == 4:
-            vertIndex = int(translationData[0])
-            verticesToRecalculate.append(vertIndex)
-            translationVector = (float(translationData[1]),\
-                                float(translationData[2]),\
-                                float(translationData[3]))
-            target.data[vertIndex] = translationVector
-
-            vertToModify = obj.verts[vertIndex]
-            for face in vertToModify.sharedFaces:
-                    facesToRecalculate.add(face.idx)
-    target.faces = tuple(facesToRecalculate)
-    target.verts = tuple(verticesToRecalculate)
-
-    targetBuffer[targetPath] = target
-    fileDescriptor.close()
+    targetBuffer[targetPath] = Target(obj, targetPath)
+    
     print "Buffer time", time.time() - t1
-
 
 def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = None, update = 1, calcNorm=1):
     """
