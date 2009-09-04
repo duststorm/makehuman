@@ -59,6 +59,7 @@ tipMagnet = Create(hairsClass.tipMagnet)
 noCPoints = Create(hairsClass.noCPoints)
 noGuides = Create(hairsClass.noGuides)
 gLength = Create(hairsClass.gLength)
+gFactor = Create(hairsClass.gFactor)
 
 compileComm = "aqsl shaders/hair.sl -o shaders/hair.slx"
 subprocess.Popen(compileComm, shell=True)
@@ -550,6 +551,17 @@ def printVertsIndices():
     Window.RedrawAll()
 
 
+def gravitize(curve,start,mat,gFactor):
+    length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
+    X = math.pow(math.pow(length,2)-math.pow(curve[start][1]-curve[len(curve)-1][1],2),0.5)
+    c = math.pow(2.0,-5+gFactor)
+    p0  = curve[start][:]
+    p1 = curve[len(curve)-1][:]
+    interval = length/(len(curve)-start-1)
+    for i in range(start+1, len(curve)):
+        t=math.pow(interval*(i-start)/(4*c),1.0/3.0)/X
+        curve[i] = in2pts(p0,p1,t)
+        curve[i][1] = curve[i][1] - c*math.pow(curve[i][0]-p0[0],4)
 
 ###############################INTERFACE#####################################
 
@@ -558,11 +570,11 @@ def draw():
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump,randomFactMultiStrand
     global tipMagnet,sizeMultiStrand,sizeClump,blendDistance
     global randomPercentage, rootColor,tipColor,isPreview, isCollision
-    global noGuides, noCPoints, gLength
+    global noGuides, noCPoints, gLength, gFactor
     
     glClearColor(0.5, 0.5, 0.5, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
-    buttonY = 100
+    buttonY = 200
     
     Button("Exit", 1, 210, buttonY, 100, 20) #1
     Button("Render", 2, 10, buttonY, 100, 20) #2
@@ -590,9 +602,13 @@ def draw():
     
     buttonY = buttonY-100
     Button("Guide along normal", 9, 10, buttonY, 150, 20) #9
-    noGuides= Slider("No. Guide-pairs: ", 10, 10, buttonY+20, 300, 18, noGuides.val, 1, 260, 0, "Number of guide-pairs to draw along normal of head")
-    gLength= Slider("Length of guides: ", 10, 10, buttonY+40, 300, 18, gLength.val, 0.0, 7.0, 0, "Length of each guides drawn along normal of head")
-    noCPoints= Slider("Controlpoints: ", 10, 10, buttonY+60, 300, 18, noCPoints.val, 2, 20, 0, "Number of control-points for each guide")
+    noGuides= Slider("No. Guide-pairs: ", 3, 10, buttonY+20, 300, 18, noGuides.val, 1, 260, 0, "Number of guide-pairs to draw along normal of head")
+    gLength= Slider("Length of guides: ", 3, 10, buttonY+40, 300, 18, gLength.val, 0.0, 7.0, 0, "Length of each guides drawn along normal of head")
+    noCPoints= Slider("Controlpoints: ", 3, 10, buttonY+60, 300, 18, noCPoints.val, 2, 20, 0, "Number of control-points for each guide")
+    
+    buttonY = buttonY - 60
+    Button("Gravitize Selected", 10, 10, buttonY, 150, 20) #10
+    gFactor= Slider("Gravity Factor: ", 3, 10, buttonY+20, 300, 18, gFactor.val, 0.0, 2.0, 0, "An exponential gravity factor")
 
     glColor3f(1, 1, 1)
     glRasterPos2i(10, buttonY+380)
@@ -618,7 +634,7 @@ def bevent(evt):
     global numberOfHairsClump,numberOfHairsMultiStrand,randomFactClump
     global randomFactMultiStrand,randomPercentage,sizeClump,sizeMultiStrand
     global blendDistance,sizeMultiStrand,rootCOlor,tipCOlor, humanMesh
-    global noGuides, noCPoints, gLength
+    global noGuides, noCPoints, gLength, gFactor
 
     if   (evt== 1): Exit()
 
@@ -640,6 +656,10 @@ def bevent(evt):
         hairsClass.blendDistance= blendDistance.val
         hairsClass.tipColor= tipColor.val
         hairsClass.rootColor= rootColor.val
+        hairsClass.noGuides = noGuides.val
+        hairsClass.noCPoints = noCPoints.val
+        hairsClass.gLength = gLength.val
+        hairsClass.gFactor = gFactor.val
 
     elif (evt== 4):
         Window.FileSelector (saveHairsFile, "Save hair data")
@@ -662,7 +682,7 @@ def bevent(evt):
                     curve=[]
                     for p in data[0]:
                         curve.append(local2World([p[0],p[1],p[2]],mat))
-                    collision(curve,humanMesh,octree.minsize,9,True)
+                    collision(curve,humanMesh,octree.minsize,9,True) #collision will after 9th controlPoint!!!
                     N=data.getNumPoints(0)
                     if N<len(curve):
                         #Window.SetCursorPos(curve[len(curve)-1])
@@ -683,10 +703,10 @@ def bevent(evt):
         vertIndices.extend(mesh.getVertsFromGroup("part_head-upper-skull"))
         vertIndices.extend(mesh.getVertsFromGroup("part_l-head-temple"))
         vertIndices.extend(mesh.getVertsFromGroup("part_r-head-temple"))
-        scalpVerts = len(vertIndices)
-        interval = int(scalpVerts/noGuides.val)
-        cPInterval = gLength.val/float(noCPoints.val)
-        print "cPInterval is : ", cPInterval
+        scalpVerts = len(vertIndices) #Collects all vertices that are part of the head where hair grows!
+        interval = int(scalpVerts/noGuides.val) #variable used to randomly distribute scalp-vertices
+        cPInterval = gLength.val/float(noCPoints.val) #Length between c.P. for hairs being generated
+        #print "cPInterval is : ", cPInterval
         scn = Scene.GetCurrent() #get current scene
         for i in range(0,noGuides.val):
             if i==noGuides.val-1:
@@ -716,8 +736,23 @@ def bevent(evt):
             drawGuidePair(scn,curve[:],curve2[:])
         #r= random.randint(interval*(noGuides.val-1),scalpVerts-1)
         Blender.Redraw()
-        #make last curve...
-        #draw curves....
+    elif (evt==10):
+        selected = Blender.Object.GetSelected()
+        start=3 #starting c.P. to use gravity!
+        for obj in selected:
+            if obj.type == "Curve": #we use virtual Young's modulus
+                start = 1
+                data= obj.getData()
+                if data[0].isNurb():
+                    mat = obj.getMatrix()
+                    curve=[]
+                    for p in data[0]:
+                        curve.append(local2World([p[0],p[1],p[2]],mat))
+                    gravitize(curve,start,mat,gFactor.val)
+                    for i in range(start,len(curve)):
+                        data.setControlPoint(0,i,[curve[i][0],curve[i][1],curve[i][2],1])
+                    data.update()
+        Blender.Redraw()
         
 Register(draw, event, bevent)
 
