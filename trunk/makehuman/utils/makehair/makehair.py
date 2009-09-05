@@ -553,15 +553,16 @@ def printVertsIndices():
 
 def gravitize(curve,start,mat,gFactor):
     length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
-    X = math.pow(math.pow(length,2)-math.pow(curve[start][1]-curve[len(curve)-1][1],2),0.5)
-    c = math.pow(2.0,-5+gFactor)
+    X = math.pow(math.pow(length,2.0)-math.pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
+    X= X*math.pow(2.0,gFactor)
+    c = math.pow(2.0,-8.0+gFactor)
     p0  = curve[start][:]
     p1 = curve[len(curve)-1][:]
     interval = length/(len(curve)-start-1)
     for i in range(start+1, len(curve)):
-        t=math.pow(interval*(i-start)/(4*c),1.0/3.0)/X
-        curve[i] = in2pts(p0,p1,t)
-        curve[i][1] = curve[i][1] - c*math.pow(curve[i][0]-p0[0],4)
+        x=math.pow(interval*(i-start)/(4*c),1.0/3.0)
+        curve[i] = in2pts(p0,p1,x/X) 
+        curve[i][1] = curve[i][1] - c*math.pow(x,4)
 
 ###############################INTERFACE#####################################
 
@@ -738,10 +739,9 @@ def bevent(evt):
         Blender.Redraw()
     elif (evt==10):
         selected = Blender.Object.GetSelected()
-        start=3 #starting c.P. to use gravity!
+        start=1 #starting c.P. to use gravity!
         for obj in selected:
             if obj.type == "Curve": #we use virtual Young's modulus
-                start = 1
                 data= obj.getData()
                 if data[0].isNurb():
                     mat = obj.getMatrix()
@@ -750,7 +750,8 @@ def bevent(evt):
                         curve.append(local2World([p[0],p[1],p[2]],mat))
                     gravitize(curve,start,mat,gFactor.val)
                     for i in range(start,len(curve)):
-                        data.setControlPoint(0,i,[curve[i][0],curve[i][1],curve[i][2],1])
+                        temp = world2Local(curve[i],mat)
+                        data.setControlPoint(0,i,[temp[0],temp[1],temp[2],1])
                     data.update()
         Blender.Redraw()
         
