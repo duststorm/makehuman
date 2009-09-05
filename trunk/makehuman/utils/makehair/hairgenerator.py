@@ -92,6 +92,7 @@ class Hairgenerator:
         self.noGuides = 25
         self.gLength = 5.0
         self.noCPoints = 15
+        self.gFactor = 1.5
 
     def resetHairs(self):
         self.hairStyle = []
