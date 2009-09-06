@@ -106,7 +106,7 @@ def drawGuidePair(scn,curve1,curve2,name="guides"):
     cu1.appendNurb([curve1[0][0],curve1[0][1],curve1[0][2],1]) #last variable is the weight of the bezier
     cu2 = Curve.New()
     cu2.appendNurb([curve2[0][0],curve2[0][1],curve2[0][2],1]) #last variable is the weight of the bezier
-    print "length of curve1, curve2): ", len(curve1), len(curve2)
+    #print "length of curve1, curve2): ", len(curve1), len(curve2)
     for i in range(1, len(curve1)):
         cu1[0].append([curve1[i][0],curve1[i][1],curve1[i][2],1])
         cu2[0].append([curve2[i][0],curve2[i][1],curve2[i][2],1])
@@ -551,7 +551,7 @@ def printVertsIndices():
     Window.RedrawAll()
 
 
-def gravitize(curve,start,mat,gFactor):
+def gravitize(curve,start,gFactor):
     length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
     X = math.pow(math.pow(length,2.0)-math.pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
     X= X*math.pow(2.0,gFactor)
@@ -564,6 +564,17 @@ def gravitize(curve,start,mat,gFactor):
         curve[i] = in2pts(p0,p1,x/X) 
         curve[i][1] = curve[i][1] - c*math.pow(x,4)
 
+def clamp(curve1,curve2):
+    l = min(len(curve1),len(curve2))
+    div = 0.5/(l-1)
+    for i in range(1,l-1):
+        p1 = curve1[i][:]
+        p2 = curve2[i][:]
+        curve1[i] = in2pts(p1,p2,div*i)
+        curve2[i] = in2pts(p2,p1,div*i)
+    curve1[l-1] = in2pts(p2,p1,0.5)
+    curve2[l-1] = curve1[l-1][:]
+    
 ###############################INTERFACE#####################################
 
 def draw():
@@ -602,7 +613,8 @@ def draw():
     tipColor = ColorPicker(3, 160, buttonY+180, 150, 20, tipColor.val,"Color of tip")
     
     buttonY = buttonY-100
-    Button("Guide along normal", 9, 10, buttonY, 150, 20) #9
+    Button("Guides along normal", 9, 10, buttonY, 150, 20) #9
+    Button("Clamp Guide Pairs", 11, 160, buttonY, 150, 20) #11
     noGuides= Slider("No. Guide-pairs: ", 3, 10, buttonY+20, 300, 18, noGuides.val, 1, 260, 0, "Number of guide-pairs to draw along normal of head")
     gLength= Slider("Length of guides: ", 3, 10, buttonY+40, 300, 18, gLength.val, 0.0, 7.0, 0, "Length of each guides drawn along normal of head")
     noCPoints= Slider("Controlpoints: ", 3, 10, buttonY+60, 300, 18, noCPoints.val, 2, 20, 0, "Number of control-points for each guide")
@@ -754,6 +766,28 @@ def bevent(evt):
                         data.setControlPoint(0,i,[temp[0],temp[1],temp[2],1])
                     data.update()
         Blender.Redraw()
-        
+    elif (evt==11):
+        groups = Group.Get()
+        for grp in groups:
+            obj1, obj2 = grp.objects[0], grp.objects[1]
+            if obj1.type == "Curve" and obj2.type == "Curve":
+                data1, data2 = obj1.getData(), obj2.getData()
+                if data1[0].isNurb() and data2[0].isNurb():
+                    mat1, mat2 = obj1.getMatrix(), obj2.getMatrix()
+                    curve1,curve2=[],[]
+                    l1,l2 = list(data1[0]), list(data2[0])
+                    for i in range(0,len(l1)):
+                        curve1.append(local2World([l1[i][0],l1[i][1],l1[i][2]],mat1))
+                        curve2.append(local2World([l2[i][0],l2[i][1],l2[i][2]],mat2))
+                    clamp(curve1,curve2)
+                    for i in range(0, len(curve1)):
+                        temp = world2Local(curve1[i],mat1)
+                        data1.setControlPoint(0,i,[temp[0],temp[1],temp[2],1])
+                        temp = world2Local(curve2[i],mat2)
+                        data2.setControlPoint(0,i,[temp[0],temp[1],temp[2],1])
+                    data1.update()
+                    data2.update()
+        Blender.Redraw()
+
 Register(draw, event, bevent)
 
