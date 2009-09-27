@@ -1,0 +1,28 @@
+## Process this file with automake to produce Makefile.in
+
+## Created by Anjuta
+
+AM_CPPFLAGS = \
+	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DPACKAGE_DATA_DIR=\""$(datadir)"\" 
+
+AM_CFLAGS =\
+	 -Wall\
+	 -g
+
+bin_PROGRAMS = fixmesh
+
+fixmesh_SOURCES = \
+	main.cc  \
+	obj.cc  \
+	mesh.cc  \
+	dump.cc  \
+	vector.cc  \
+	gauss.cc  \
+	group.cc
+
+fixmesh_LDFLAGS = 
+
+fixmesh_LDADD = 
+

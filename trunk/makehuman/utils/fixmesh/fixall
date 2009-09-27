@@ -1,0 +1,26 @@
+#!/bin/sh
+
+mydir=/home/thomas/fixmesh/
+
+./Debug/src/fixmesh -build -weight 0.2 -zone 2.0 -verbosity 1 -dir $mydir
+
+./Debug/src/fixmesh -group -verbosity 1 -dir $mydir
+
+for file in data/old/targets/details/*.target
+do
+	echo $file
+	./Debug/src/fixmesh -convert $file -detail 0.7 -verbosity 0 -dir $mydir
+done
+
+for file in data/old/targets/macrodetails/*.target
+do
+	echo $file
+	./Debug/src/fixmesh -convert $file -detail 0.7 -verbosity 0 -dir $mydir
+done
+
+for file in data/old/targets/microdetails/*.target
+do
+	echo $file
+	./Debug/src/fixmesh -convert $file -verbosity 0 -dir $mydir
+done
+

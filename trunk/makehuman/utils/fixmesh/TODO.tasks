@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<gtodo>
+  <category title="Personlig" place="0"/>
+  <category title="Arbete" place="1"/>
+  <category title="Ej arkiverad" place="2"/>
+</gtodo>
