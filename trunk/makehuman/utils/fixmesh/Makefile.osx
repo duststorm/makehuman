@@ -57,7 +57,13 @@ OBJPATH  =
 # The Targets
 EXE = fixmesh
 
-CCSRCS   = src/dump.cc src/gauss.cc src/group.cc src/main.cc src/mesh.cc src/obj.cc src/vector.cc 
+CCSRCS   = src/dump.cc \
+           src/gauss.cc \
+           src/group.cc \
+           src/main.cc \
+           src/mesh.cc \
+           src/obj.cc \
+           src/vector.cc 
 CSRCS    = 
 
 # Mention all include paths
@@ -111,6 +117,7 @@ INSTALL = cp
 #ANSI_STRICTNESS = -ansi -Wall
 ANSI_STRICTNESS =
 
+ARCHFLAGS = -arch ppc -arch i386
 
 # For Debugging purposes turn off all optimization
 #CFLAGS   = -g $(ANSI_STRICTNESS)
@@ -118,8 +125,8 @@ ANSI_STRICTNESS =
 #OPTFLAGS = -O0
 
 # For Final Release turn on full optimization
-CFLAGS   = $(ANSI_STRICTNESS)
-CCFLAGS  = $(ANSI_STRICTNESS)
+CFLAGS   = $(ARCHFLAGS) $(ANSI_STRICTNESS)
+CCFLAGS  = $(ARCHFLAGS) $(ANSI_STRICTNESS)
 OPTFLAGS = -O4
 
 CCFLAGS += $(foreach file, $(EXTRA_INC_PATHS),  -I $(file))
@@ -132,6 +139,8 @@ LINKFLAGS += $(foreach file, $(EXTRA_LIBS),       -l $(file))
 LINKFLAGS += $(foreach file, $(EXTRA_FMWK_PATHS), -F $(file))
 LINKFLAGS += $(foreach file, $(EXTRA_FWMKS), -framework $(file))
 
+LINKFLAGS += $(ARCHFLAGS)
+
 # The rule to build the targe(s)
 $(EXE) :
 
@@ -140,13 +149,9 @@ $(EXE) :
 # ---------------------------------------------------------------------
 .SUFFIXES: .c .cc .cp .cpp .c++ .cxx .h .hh .hp .hpp .h++ .hxx .i .o .gch
 
-%.o : %.cpp $(PREFIX).gch
-	@echo compiling $< to $@ ...
-	@$(CCC) -include $(PREFIX) -MMD -c $(CCFLAGS) $(OPTFLAGS) $(EXTRADEFINES) $< -o $@ 
-
 %.o : %.cc
 	@echo compiling $< to $@ ...
-	@$(CCC) -MMD -c $(CCFLAGS) $(OPTFLAGS) $(EXTRADEFINES) $< -o $@ 
+	@$(CCC) -c $(CCFLAGS) $(OPTFLAGS) $(EXTRADEFINES) $< -o $@ 
 
 %.o : %.c
 	@echo compiling $< to $@ ...
