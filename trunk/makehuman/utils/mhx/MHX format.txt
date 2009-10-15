@@ -1,0 +1,121 @@
+# -------------------------------------------------------------------------- 
+# MHX (MakeHuman eXchange format) specification.
+# Thomas Larsson
+# email: thomas_larsson_01@hotmail.com
+# -------------------------------------------------------------------------- 
+# ***** BEGIN GPL LICENSE BLOCK ***** 
+# 
+# This program is free software; you can redistribute it and/or 
+# modify it under the terms of the GNU General Public License 
+# as published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version. 
+# 
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the implied warranty of 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the 
+# GNU General Public License for more details. 
+# 
+# You should have received a copy of the GNU General Public License 
+# along with this program; if not, write to the Free Software Foundation, 
+# Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA. 
+# 
+# ***** END GPL LICENCE BLOCK ***** 
+# -------------------------------------------------------------------------- 
+
+
+The purpose of the MHX format is to allow transfer of information between MakeHuman and Blender.
+The format is modelled on the popular Wavefront OBJ format, but also contains constructs 
+describing bones, vertex weights and shape keys (NYI = not yet implemented). 
+
+A line in an MHX file should be of the following types:
+
+# Whatever
+A comment (ignored).
+
+MHX MajorVersion MinorVersion
+Identifies the MHX version. Current version is 0 1.
+
+object Name Layer1-10 Layer11-20 Mode
+Define a new object with the name Name.
+Layer1-10 and Layer11-20 are the layer masks, divided into two pieces because Python seems to
+have problems with 20-bit integers. 
+Mode is one of "add" (always add object) and "keep" (only add object if not already there).
+
+mesh Name
+Set the current mesh to a mesh with the name Name.
+
+v X Y Z
+A vertex with coordinates (X,Y,Z) (floats). Vertex numbers start from 0, since both MH and
+Blender (but not OBJ) do so.
+
+vt X Y
+A texture vertex with coordinates (X,Y) (floats). Texture vertex numbers start from 0.
+
+vn X Y Z
+A vertex normal with directions (X,Y,Z) (floats). Hm. Since Blender ignores the given vertex
+normals, so do I.
+
+e V1 V2
+An edge with endpoints (V1,V2). Ignored if the mesh has faces.
+
+f V1 V2 ...
+f V1/VT1 V2/VT2 ...
+A face whose corners are verts (V1, V2, ...) and texture verts (TV1, TV2, ...). Only tris and
+quads are supported by Blender, and thus by MHX.
+
+vertgroup VGroup
+Create a new vertex group with name VGroup and sets it to the current vertex group.
+
+wv V W
+The vertex V belongs to the current vertex group with weight W.
+
+material Mat
+Create a new material with name Mat and sets it to the current material.
+
+color R G B
+The current material has RGB values (R, G, B) (floats)
+
+alpha A
+The current material has alpha value A (float)
+
+texture Name ImagePath MapsTo
+Give the current material a new texture with name Name. The texture is an
+image located at ImagePath. The last argument specfies which channels the texture
+maps to.
+
+armature Amt
+Create a new armature with name Amt and sets it to the current armature.
+
+bone Name Parent Roll Flags Layers
+Create a new bone in the current armature. The bone has name Name and parent Parent; it has
+no parent if Parent = None. The roll value is Roll. Currently supported flags are Connected
+and NoDeform. The bone is visible on bone layers Layers.
+
+head X Y Z
+The head of the current bone is located at (X, Y, Z) (floats).
+
+tail X Y Z
+The tail of the current bone is located at (X, Y, Z) (floats).
+
+dispob Bone Object
+The display object of the bone Bone is Object.
+
+constraint Bone Type Target Driver Arg1 Arg2 ...
+Assign a constraint of type Type and target Target to the bone Bone. The influence of
+this constraint is driven by the bone Driver (currently not working). The final arguments
+depend on the constraint type, which may be one of:
+IK: Arg1 = level
+CopyRot: No arguments
+LimitDist: No arguments
+
+
+This specification is subject to changes without notice. Backward compatibility is presently 
+*NOT* a design goal.
+
+
+
+
+
+
+
+
