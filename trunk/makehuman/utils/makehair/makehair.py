@@ -551,7 +551,8 @@ def printVertsIndices():
     Window.RedrawAll()
 
 
-def gravitize(curve,start,gFactor):
+def gravitize(curve,start,mat,gFactor):
+    #TODO use mat to convert local to world!
     length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
     X = math.pow(math.pow(length,2.0)-math.pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
     X= X*math.pow(2.0,gFactor)
@@ -686,7 +687,7 @@ def bevent(evt):
         for v in mesh.verts: #reduces vertices for simplifying octree, improves performance
             if v.co[0]<=2 and v.co[0]>=-2 and v.co[1]<=8.6 and v.co[1]>=3.6: #2D bounding box between head and chest
                 verts.append(local2World(v.co,mat)) #localspace to worldspace
-        octree = simpleoctree.SimpleOctree(verts,0.08)
+        octree = simpleoctree.SimpleOctree(verts,0.09)
         for obj in scn.objects:
             if obj.type == "Curve":
                 data = obj.getData()

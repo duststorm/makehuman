@@ -36,7 +36,10 @@ def world2Local(vec, matrix):
             (x-xloc)*matrix[1][0] + (y-yloc)*matrix[1][1] + (z-zloc)*matrix[1][2],\
             (x-xloc)*matrix[2][0] + (y-yloc)*matrix[2][1] + (z-zloc)*matrix[2][2]]
  
-def getTangent(point,i,obj,size,isNurb=False):
+def getTangent(point,i,obj,size,isNurb=False, res=0.08): #default Octree Resolution is set to 0.08
+    l = 1.5*res*math.sqrt(3.0) #longest distance of an octree smallest cube
+    if (size<l) : l=size
+    size= size - l #josenow
     mesh = obj.getData()
     L2 = local2World(mesh.verts[i].co,obj.getMatrix())
     vec1 = vsub(point,L2)
@@ -46,7 +49,7 @@ def getTangent(point,i,obj,size,isNurb=False):
     point2=[]
     if isNurb and (not scalar == 0) and math.fabs(math.acos(scalar/vlen(vec1))) > math.pi/2 : 
     #For nurbs.. is angle of incidence obtuse? if so deflect through the same direction as incident from point
-        point2 = vmul(vec1,-size/vlen(vec1))
+        point2 = vmul(vec1,-res/vlen(vec1))
         point2= vadd(L2,point2)
         print "point2 is: ", point2
         print "Deflection is done through incidence"
@@ -55,14 +58,17 @@ def getTangent(point,i,obj,size,isNurb=False):
         tangent = vsub(vec1,vmul(normal,scalar))
         N= vlen(tangent)
         if not N==0: 
-            tangent = vmul(tangent,-size/N)
+            tangent = vmul(tangent,-l/N)
             point2 = vadd(L2, tangent)
+            point2 = vadd(point2,vmul(normal,res))
             #return[L2,point2]
         else: #collision and normal lines are parallel
+            print "Collision and normal lines are parallel"
             tangent = [normal[0],-normal[2],normal[1]] #arbitrary rotation of 90deg.. choose x-axis rotation!
-            tangent = vmul(tangent, size)
+            tangent = vmul(tangent, l)
             point2 = vadd(L2,tangent)
-    return[L2,point2]
+    if (size<=0): return [L2,point2]
+    else: return [L2, point2, vadd(point2,vmul(normal,size))]
  
 #check if an unordered interval (i.e. we can have [a,b] with a>=b) is in an ordered interval (i.e. [a,b] has always a<=b)
 def unordInOrd(unord,ord):
@@ -173,20 +179,24 @@ def collision(curve,obj,res,i=1,gravity=True):
     mat = obj.getMatrix()
     octree = simpleoctree.SimpleOctree(mesh.verts,res)
     N=len(curve)
-    while i<N : 
+    while i<N: 
         point1 = world2Local(curve[i-1],mat)
         point2 = world2Local(curve[i],mat)
+        print "i, N : ",i,N #todelete
         if lineInColoredLeaf([point1,point2],octree.root):
-            if i==N-2:
+            if i==N-1:
                 tangent = deflect([curve[i-1],curve[i]],obj,gravity)
             else:
                 tangent = deflect([curve[i-1],curve[i],curve[i+1]],obj,gravity)
+            n=1
             if not tangent ==0:
                 if not curve[i-1]==tangent[0]: #TODO in case after Tangent deflection we passthrough a second part of the body!
-                    delta = vsub(tangent[1],curve[i])
-                    curve.insert(i,tangent[0])
-                    for j in range(i+1,len(curve)):
+                    if len(tangent) ==3: n=2
+                    delta = vsub(tangent[n],curve[i])
+                    for k in range(0,n):
+                        curve.insert(i,tangent[n-1-k])
+                    for j in range(i+n,len(curve)):
                         curve[j] = vadd(curve[j],delta)
-                    N=N+1
-            i=i+1
+                    N=N+n
+            i=i+n
         i=i+1
