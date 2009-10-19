@@ -665,7 +665,7 @@ int main(int argc, char *argv[])
         strcpy(str, "execfile(\"main.py\")");
     }
 #ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
-    rc = adjustWorkingDir(argv[0]);
+    int rc = adjustWorkingDir(argv[0]);
     assert(0 == rc);
 
     /* Adjust the environment vars for the external renderer */
