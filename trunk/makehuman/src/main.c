@@ -652,7 +652,6 @@ PyMODINIT_FUNC initmh()
 int main(int argc, char *argv[])
 {
     // Need to declare variables before other statements
-    int rc;
     char str[128];
     int err;
     PyObject *module;
