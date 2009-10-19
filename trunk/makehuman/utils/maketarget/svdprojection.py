@@ -44,7 +44,8 @@ from Blender import Draw
 from Blender import Window
 from Blender.Mathutils import *
 
-from targets_projection import *
+from target_projection import *
+
 
 current_path = Blender.sys.dirname(Blender.Get('filename'))
 basePath = Blender.sys.join(current_path,'base.obj')
@@ -59,7 +60,10 @@ originalVerts = [] #Original base mesh coords
 targetBase = None
 targetVertexList = None
 targetVertexLookup = None
-baseString = Draw.Create("")
+targetBasePath = None
+baseString = None
+
+
 #Some math stuff
 def vsub(vect1,vect2):
     """
@@ -143,7 +147,7 @@ def get_target_vector(obj,vertex_list):
     # Filling target vector
 
     nverts = len(vertex_list)
-    lookup = build_lookup_dict(vertex_list)
+    
     targ = [0]*(3*nverts)
     for i in vertex_list :
         originalVertex = originalVerts[i]
@@ -151,24 +155,20 @@ def get_target_vector(obj,vertex_list):
         delta = vsub(targetVertex.co,originalVertex)
         dnorm = vlen(delta)
         if dnorm < 1.0e-3 : continue
-        ii = lookup[i]
+        ii = targetVertexLookup[i]
         targ[3*ii]   = delta[0]
         targ[3*ii+1] = delta[1]
         targ[3*ii+2] = delta[2]
     return targ
 
 
-
 def loadTargetBase(base_file):
-    global targetBase,baseString,targetVertexList,targetVertexLookup
-    list_file = base_file.replace("_base","_vertices")
-    if list_file == base_file :
-        Draw.PupMenu("Bad format for a base file name, it should end with '_base.dat'")
-    targetBase = read_target_base(base_file)
-    targetVertexList, targetVertexLookUp = read_vertex_list(list_file)
-	 
-    name = os.path.splitext(os.path.basename(base_file))    
+    global baseString,targetBasePath,targetBase,targetVertexList,targetVertexLookup
+    targetBasePath = base_file
+    targetBase,targetVertexList, targetVertexLookup = load_base(base_file)
+    name = os.path.splitext(os.path.basename(targetBasePath))
     baseString.val = name[0]
+
 
 def projectTarget(base,vertex_list,lookup):
     #from scipy.io import mmread
@@ -201,10 +201,9 @@ def projectTarget(base,vertex_list,lookup):
     t1 = time.time()
     wem = Blender.Window.EditMode()
     Blender.Window.EditMode(0)
-    lookup = build_lookup_dict(vertex_list)
     for i in vertex_list :
         originalVertex = originalVerts[i]
-        idx = lookup[i]
+        idx = targetVertexLookup[i]
         delta = proj[3*idx:3*(idx+1)]
         if vlen(delta) < epsilon : continue
         v = obj.verts[i]
@@ -723,7 +722,7 @@ def draw():
     Draw.Button("Regularise",11,10,40,200,20,"Regularise the mesh by projecting the current target on the target base")
     baseString = Draw.String("Base:", 0, 10, 20, 200, 20, "", 100, "Name of the loaded base")
     #Draw.Button("Save body settings",12,10,20,200,20,"Save the target as a body settings file")
-    Draw.Button("Load SVD base", 12, 10, 0, 200, 20, "Load base")  
+    Draw.Button("Load projection base", 12, 10, 0, 200, 20, "Load base")  
 
 def event(event, value):
     """
@@ -785,6 +784,5 @@ def b_event(event):
         else : projectTarget(targetBase,targetVertexList,targetVertexLookup)
     elif event == 12:
         Window.FileSelector (loadTargetBase, "Load Target base")
-        
     Draw.Draw()
 Draw.Register(draw, event, b_event)
