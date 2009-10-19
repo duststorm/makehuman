@@ -4,7 +4,7 @@ Utility function for creating a morph target (part of the development functional
 
 ===========================  ===============================================================
 Project Name:                **MakeHuman**
-Module File Location:        utils/maketarget/maketarget.py
+Module File Location:        utils/maketarget/svdp_maketarget.py
 Product Home Page:           http://www.makehuman.org/
 SourceForge Home Page:       http://sourceforge.net/projects/makehuman/
 Authors:                     Alexis Mignon, Manuel Bastioni
@@ -44,6 +44,7 @@ from Blender import Draw
 from Blender import Window
 from Blender.Mathutils import *
 
+from targets_projection import *
 
 current_path = Blender.sys.dirname(Blender.Get('filename'))
 basePath = Blender.sys.join(current_path,'base.obj')
@@ -57,6 +58,7 @@ targetBuffer = [] #Last target loaded
 originalVerts = [] #Original base mesh coords
 targetBase = None
 targetVertexList = None
+targetVertexLookup = None
 baseString = Draw.Create("")
 #Some math stuff
 def vsub(vect1,vect2):
@@ -155,103 +157,20 @@ def get_target_vector(obj,vertex_list):
         targ[3*ii+2] = delta[2]
     return targ
 
-def mat_mult_vector(m,v):
-    """ Multiplies matrix m by vector v
-		
-		args : 
-			- m : a list of list considered as a matrix
-			- v : a list considered as a column vector
-	
-		returns :
-			- a list corresponding to the elements of the column vecor
-			  given by: v' = m*v
-    """
-    dim1 = len(m)
-    dim2 = len(m[0])
-    if len(v) != dim2 : raise ValueError("Matrix and vector shapes mismatch : (%i x %i) and %i"%(dim1,dim2,len(v)))
-    
-    res = [0]*dim1
-    for i in xrange(dim1):
-        for j in xrange(dim2):
-                res[i] += m[i][j]*v[j]
-    return res
-    
-def mat_trans_mult_vector(m,v):
-    """ Multiplies the transpose of matrix m by vector v
-		
-		args : 
-			- m : a list of list considered as a matrix
-			- v : a list considered as a column vector
-	
-		returns :
-			- a list corresponding to the elements of the column vecor
-			  given by: v' = m^T*v
-	"""
-    dim1 = len(m)
-    dim2 = len(m[0])
-    if len(v) != dim1 : raise ValueError("Matrix and vector shapes mismatch : (%i x %i) and %i"%(dim2,dim1,len(v)))
-    
-    res = [0]*dim2
-    for i in xrange(dim2):
-        for j in xrange(dim1):
-                res[i] += m[j][i]*v[j]
-    return res
-
-def read_target_base(base_file):
-    """ 
-		read_target_base(base_file) -> base matrix
-		
-		Reads a base from a file and return the corresponding matrix as
-	    a list of lists
-	"""
-    f = open(base_file)
-    # skipping comments
-    while True  :
-        l = f.readline()
-        if not l.startswith("%") : 
-            output_dim,input_dim = [int(v) for v in l.split()]
-            base = [[0]*input_dim for i in xrange(output_dim)]
-            break
-    for j in xrange(input_dim):
-        for i in xrange(output_dim):
-            base[i][j] = float(f.readline())
-    f.close()
-    return base
-
-def read_vertex_list(list_file):
-    """ read_vertex_list(list_file) -> vertex list 
-		
-		Reads a list of vertices from a file.
-	"""
-    f = open(list_file)
-    vlist = [int(i) for i in f.readlines()]
-    f.close()
-    return vlist
-
-
-def build_lookup_dict(idx_list):
-    lookup_dict = {}
-    for i in xrange(len(idx_list)):
-        lookup_dict[idx_list[i]]=i
-    return lookup_dict
-
-def apply_projection(mbase,target):
-    proj = mat_mult_vector(mbase,target)
-    return mat_trans_mult_vector(mbase,proj)
-
 
 
 def loadTargetBase(base_file):
-    global targetBase,baseString,targetVertexList
+    global targetBase,baseString,targetVertexList,targetVertexLookup
     list_file = base_file.replace("_base","_vertices")
     if list_file == base_file :
         Draw.PupMenu("Bad format for a base file name, it should end with '_base.dat'")
     targetBase = read_target_base(base_file)
-    targetVertexList = read_vertex_list(list_file)
+    targetVertexList, targetVertexLookUp = read_vertex_list(list_file)
+	 
     name = os.path.splitext(os.path.basename(base_file))    
     baseString.val = name[0]
 
-def projectTarget(base,vertex_list):
+def projectTarget(base,vertex_list,lookup):
     #from scipy.io import mmread
     #from scipy import zeros,array,matrix
     global targetBuffer
@@ -863,7 +782,7 @@ def b_event(event):
         resetMesh()
     elif event == 11:
         if targetBase is None : Draw.PupMenu("No target base loaded")
-        else : projectTarget(targetBase,targetVertexList)
+        else : projectTarget(targetBase,targetVertexList,targetVertexLookup)
     elif event == 12:
         Window.FileSelector (loadTargetBase, "Load Target base")
         
