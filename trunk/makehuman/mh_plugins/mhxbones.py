@@ -29,9 +29,21 @@ from aljabr import *
 #
 #	Flags
 #
-
-F_CON = 	0x01
-F_NODEF	= 	0x02
+'''
+boneOptions = dict ({\
+	Armature.CONNECTED : 0x001, \
+	Armature.HINGE : 0x002, \
+	Armature.NO_DEFORM : 0x004, \
+	Armature.MULTIPLY : 0x008, \
+	Armature.HIDDEN_EDIT : 0x010, \
+	Armature.ROOT_SELECTED : 0x020, \
+	Armature.BONE_SELECTED : 0x040, \
+	Armature.TIP_SELECTED : 0x080, \
+	Armature.LOCKED_EDIT : 0x100 \
+})
+'''
+F_CON = 0x001
+F_NODEF = 0x004
 
 #
 #	Bone layers
@@ -357,42 +369,42 @@ armature = [
 #	constraint off.
 #
 constraints = [
-	("LoLeg_L", "IK", "Ankle_L", "LegIK-switch", "2",  ""),
-	("Foot_L", "IK", "FootIK_L", "LegIK-switch", "1", ""),
-	("Toe_L", "CopyRot", "ToeIK_L", "LegIK-switch", "", ""),
-	("UpLeg_L", "IK", "KneeIK_L", "LegIK-switch", "1", ""),
-	("LegCtrl_L", "LimitDist", "Hip_L", "LegIK-switch", "", ""),
+	("LoLeg_L" , "IKSOLVER", "Ankle_L", "LegIK-switch", "2",  ""),
+	("Foot_L" , "IKSOLVER", "FootIK_L", "LegIK-switch", "1", ""),
+	("Toe_L" , "COPYROT", "ToeIK_L", "LegIK-switch", "", ""),
+	("UpLeg_L" , "IKSOLVER", "KneeIK_L", "LegIK-switch", "1", ""),
+	("LegCtrl_L" , "LIMITDIST", "Hip_L", "LegIK-switch", "", ""),
 
-	("LoLeg_R", "IK", "Ankle_R", "LegIK-switch", "2", ""),
-	("Foot_R", "IK", "FootIK_R", "LegIK-switch", "1", ""),
-	("Toe_R", "CopyRot", "ToeIK_R", "LegIK-switch", "", ""),
-	("UpLeg_R", "IK", "KneeIK_R", "LegIK-switch", "1", ""),
-	("LegCtrl_R", "LimitDist", "Hip_R", "LegIK-switch", "", ""),
+	("LoLeg_R" , "IKSOLVER", "Ankle_R", "LegIK-switch", "2", ""),
+	("Foot_R" , "IKSOLVER", "FootIK_R", "LegIK-switch", "1", ""),
+	("Toe_R" , "COPYROT", "ToeIK_R", "LegIK-switch", "", ""),
+	("UpLeg_R" , "IKSOLVER", "KneeIK_R", "LegIK-switch", "1", ""),
+	("LegCtrl_R" , "LIMITDIST", "Hip_R", "LegIK-switch", "", ""),
 
-	("LoArm_L", "IK", "HandIK_L", "ArmIK-switch", "2", ""),
-	("UpArm_L", "IK", "ElbowIK_L", "ArmIK-switch", "1", ""),
-	("Hand_L", "CopyRot", "HandIK_L", "ArmIK-switch", "", ""),
-	("HandIK_L", "LimitDist", "Clavicle_L", "ArmIK-switch", "", ""),
+	("LoArm_L" , "IKSOLVER", "HandIK_L", "ArmIK-switch", "2", ""),
+	("UpArm_L" , "IKSOLVER", "ElbowIK_L", "ArmIK-switch", "1", ""),
+	("Hand_L" , "COPYROT", "HandIK_L", "ArmIK-switch", "", ""),
+	("HandIK_L" , "LIMITDIST", "Clavicle_L", "ArmIK-switch", "", ""),
 
-	("LoArm_R", "IK", "HandIK_R", "ArmIK-switch", "2", ""),
-	("UpArm_R", "IK", "ElbowIK_R", "ArmIK-switch", "1", ""),
-	("Hand_R", "CopyRot", "HandIK_R", "ArmIK-switch", "", ""),
-	("HandIK_R", "LimitDist", "Clavicle_R", "ArmIK-switch", "", ""),
+	("LoArm_R" , "IKSOLVER", "HandIK_R", "ArmIK-switch", "2", ""),
+	("UpArm_R" , "IKSOLVER", "ElbowIK_R", "ArmIK-switch", "1", ""),
+	("Hand_R" , "COPYROT", "HandIK_R", "ArmIK-switch", "", ""),
+	("HandIK_R" , "LIMITDIST", "Clavicle_R", "ArmIK-switch", "", ""),
 
-	("Finger-1-3_R", "IK", "Finger-1-IK_R", "FingerIK-switch", "3", ""),
-	("Finger-2-3_R", "IK", "Finger-2-IK_R", "FingerIK-switch", "3", ""),
-	("Finger-3-3_R", "IK", "Finger-3-IK_R", "FingerIK-switch", "3", ""),
-	("Finger-4-3_R", "IK", "Finger-4-IK_R", "FingerIK-switch", "3", ""),
-	("Finger-5-3_R", "IK", "Finger-5-IK_R", "FingerIK-switch", "3", ""),
+	("Finger-1-3_R" , "IKSOLVER", "Finger-1-IK_R", "FingerIK-switch", "3", ""),
+	("Finger-2-3_R" , "IKSOLVER", "Finger-2-IK_R", "FingerIK-switch", "3", ""),
+	("Finger-3-3_R" , "IKSOLVER", "Finger-3-IK_R", "FingerIK-switch", "3", ""),
+	("Finger-4-3_R" , "IKSOLVER", "Finger-4-IK_R", "FingerIK-switch", "3", ""),
+	("Finger-5-3_R" , "IKSOLVER", "Finger-5-IK_R", "FingerIK-switch", "3", ""),
 
-	("Finger-1-3_L", "IK", "Finger-1-IK_L", "FingerIK-switch", "3", ""),
-	("Finger-2-3_L", "IK", "Finger-2-IK_L", "FingerIK-switch", "3", ""),
-	("Finger-3-3_L", "IK", "Finger-3-IK_L", "FingerIK-switch", "3", ""),
-	("Finger-4-3_L", "IK", "Finger-4-IK_L", "FingerIK-switch", "3", ""),
-	("Finger-5-3_L", "IK", "Finger-5-IK_L", "FingerIK-switch", "3", ""),	
+	("Finger-1-3_L" , "IKSOLVER", "Finger-1-IK_L", "FingerIK-switch", "3", ""),
+	("Finger-2-3_L" , "IKSOLVER", "Finger-2-IK_L", "FingerIK-switch", "3", ""),
+	("Finger-3-3_L" , "IKSOLVER", "Finger-3-IK_L", "FingerIK-switch", "3", ""),
+	("Finger-4-3_L" , "IKSOLVER", "Finger-4-IK_L", "FingerIK-switch", "3", ""),
+	("Finger-5-3_L" , "IKSOLVER", "Finger-5-IK_L", "FingerIK-switch", "3", ""),	
 
-	("Eye_R", "IK", "Gaze_R", "Gaze-switch", "1", ""),
-	("Eye_L", "IK", "Gaze_L", "Gaze-switch", "1", ""),
+	("Eye_R" , "IKSOLVER", "Gaze_R", "Gaze-switch", "1", ""),
+	("Eye_L" , "IKSOLVER", "Gaze_L", "Gaze-switch", "1", "")
 ]
 
 #
@@ -431,41 +443,96 @@ def setupLocations (obj):
 		
 
 #
-#	getOffset(offs, par, bones):
+#	getOffs(offs):
 #
 
-def getOffset(offs, par, bones):
+def getOffs(offs):
 	if offs == 0:
 		return [0,0,0]
 	else:
 		return offs
 
 #
+#	writeJoints(fp, obj)
+#
+
+def writeJoints(fp, obj):
+	global locations
+	setupLocations(obj)
+	fp.write("\njoints\n")
+	for (key,val) in locations.items():
+		fp.write("  j %s %f %f %f ;\n" % (key, val[0], val[1], val[2]))
+	fp.write("end joints\n")
+
+#
 #	writeBones(fp, obj)
 #
 
 def writeBones(fp, obj):
-	global locations
-	setupLocations(obj)
-	bones = []
-	fp.write("object HumanRig %d %d add\n" % (0x001, 0x000))
-	fp.write("armature HumanRig\n")
 	for (bone, par, hjoint, hoffs, tjoint, toffs, flags, layers, dispOb) in armature:
-		dh = getOffset(hoffs, par, bones)
-		head = vadd(locations[hjoint], dh)
-		dt = getOffset(toffs, par, bones)
-		tail = vadd(locations[tjoint], dt)
-		roll = 0.0
-		if par == "None":
-			parName = "None"
+		fp.write("\n\tbone %s %s %x %x\n" % (bone, par, flags, layers))
+		if hoffs:
+			x = getOffs(hoffs)
+			fp.write("\t\thead joint %s + %f %f %f ;\n" % (hjoint, x[0], x[1], x[2]))
 		else:
-			parName = par
-		fp.write("bone %s %s %f %d %d\n" % (bone, parName, roll, flags, layers))
-		fp.write("head %f %f %f\n" % (head[0], head[1], head[2]))
-		fp.write("tail %f %f %f\n" % (tail[0], tail[1], tail[2]))
-		if dispOb != "None":
-			fp.write("dispob %s %s\n" % (bone, dispOb))
-		bones.append((bone, head, tail))
+			fp.write("\t\thead joint %s ;\n" % (hjoint))
+		if toffs:
+			x = getOffs(toffs)
+			fp.write("\t\ttail joint %s + %f %f %f ;\n" % (tjoint, x[0], x[1], x[2]))
+		else:
+			fp.write("\t\ttail joint %s ;\n" % (tjoint))
+		#headRadius 0.100000 ;
+		#tailRadius 0.050000 ;
+		#weight 1.000000 ;
+		fp.write("\tend bone\n")
 
-	for (bone, type, target, driver, arg1, arg2) in constraints:
-		fp.write("constraint %s %s %s %s %s %s\n" % (bone, type, target, driver, arg1, arg2))
+#
+#	writePose(fp, obj):
+#
+
+def writePose(fp, obj):
+	for (bone, par, hjoint, hoffs, tjoint, toffs, flags, layers, dispOb) in armature:
+		fp.write(\
+"\tposebone %s 0 \n\
+\t\tstiffX 0.000000 ;\n\
+\t\tstiffY 0.000000 ;\n\
+\t\tstiffZ 0.000000 ;\n\
+\t\tstretch 0.000000 ;\n" % (bone))
+		if dispOb != "None":
+			fp.write("\t\tdisplayObject _object['%s'] ;\n" % dispOb)
+
+		for (bone1, type, target, driver, arg1, arg2) in constraints:
+			if bone == bone1:
+				fp.write("\t\tconstraint %s Const 1.000000 \n" % type)
+				fp.write("\t\t\tdriver %s ;\n" % driver)
+	
+				if type == 'IKSOLVER':
+					fp.write(\
+"\t\t\tPOSWEIGHT	float 1.000000 ; \n\
+\t\t\tUSETIP	bool true ; \n\
+\t\t\tSTRETCH	bool true ; \n\
+\t\t\tCHAINLEN	int %s ; \n\
+\t\t\tTARGET	obj HumanRig ; \n\
+\t\t\tBONE	str %s ; \n\
+\t\t\tITERATIONS	int 500 ; \n\
+\t\t\tROTWEIGHT	float 1.000000 ;\n" % (arg1, target))
+
+				elif type == 'COPYROT':
+					fp.write(\
+"\t\t\tTARGETSPACE list 1 int 0 ;\n\
+\t\t\tTARGET	obj HumanRig ;\n\
+\t\t\tBONE	str %s ;\n\
+\t\t\tCOPY	int 7 ;\n" % (target))
+
+				elif type == 'LIMITDIST':
+					fp.write(\
+"\t\t\tTARGET	obj HumanRig ;\n\
+\t\t\tBONE	str %s ;\n" % (target))
+
+				else:
+					raise NameError("Unknown type "+type)
+
+				fp.write("\t\tend constraint\n")
+		fp.write("\tend posebone\n")
+
+
