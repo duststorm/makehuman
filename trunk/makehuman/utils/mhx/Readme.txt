@@ -1,73 +1,39 @@
 MHX - MakeHuman to Blender eXchange
 
-The purpose of these scripts is to transfer information from MakeHuman to Blender, and to some
-extent back. To achieve this goal we export to a custom format called MHX (MakeHuman eXchange),
-which can then be imported into Blender. The format is described in the document 
-"MHX format.txt".
+The purpose of these scripts is to transfer information from MakeHuman to Blender 
+and back. To achieve this goal we export to a custom format called MHX (MakeHuman 
+eXchange), which can then be imported into Blender.
 
-This is version 0.1. It is not compatible with the previous, unnumbered version.
+The MHX format is described in the document "MHX format.txt".
 
-New features:
+This is version 0.2. It is not compatible with the previous versions.
 
-1. There is a (minimal) user interface. Files are now selected by a file selector 
-instead of being hardcoded.
+The weighting and morphs can be modified in the file makehuman/utils/mhx/mhxbase.blend 
+and exported to a new mhxbase.mhx. 
 
-2. The script can be registered with Blender. Just copy mhx_import.py to your Blender
-scripts follow, and it should appear in the File > Import meny as "MakeHuman (.mhx)".
+Changes since version 0.1:
 
-3. There is an option for rotating the mesh and rig 90 degrees, to get the head up.
+1. The MHX syntax has been revised, and it is now separated from semantics.
 
-4. The rig has been completely remade. It has the following new features.
+2. The MHX semantics has been greately expanded to cover most python-accessible parts
+of Blender. One can export a Blender file with mhx_export.py and import it back with
+mhx_import.py, and most features are intact. Some of the limitations are apparently
+due to bugs in Blender's python interface.
 
-	a. Arm FK and IK.
+3. The option for rotating the mesh and rig 90 degrees has been removed. It became to
+difficult to maintain it with the new functionality.
 
-	b. Leg FK and IK, with an inverse foot setup.
+4. The imported file may either be merged with the existing scene, or completely replace it.
 
-	c. Finger FK and IK, a la Bassam Kurdali.
-
-	d. Gaze bone for eye tracking.
-
-	e. Bone layers.
-
-	f. Display objects for bones
-
-5. The mesh has a number of shape keys for morphing. Since the morphs were made on the base
-mesh, they will work more or less well depending on how much the character deviates from the 
-base mesh. 
-
-The shape keys can be turned off, to reduce load time and file size. This should be done if
-you plan on modifying the mesh, e.g. to add clothes, since that will ruin the shape keys
-anyway.
-
-The weighting and morphs can be modified in the file base03.blend and exported to a new 
-mhxbase.mhx. 
-
+5. The rigging and shape keys have not been changed. This will be done when the new mesh
+is available.
 
 
 Preparations:
 
-* Copy mhx_import.py to your Blender scripts folder. The variable TexDir at the end of
-this file should be modified to point to your texture directory.
-
-* Copy mhxbase.mhx to makehuman/data/3dobjs
-
-* Copy mh2mhx.py and mhxbones.py to makehuman/mh_plugins
-
-* Edit the files guifiles.py and guimodelling.py in the makehuman/mh_plugins directory.
-Everywhere where there is a reference to mh2obj (there are two places in each file), add an
-analogous statement for mh2mhx. Thus, in guifiles.py,
-
-change line 33 from:
-import files3d, animation3d, gui3d, events3d, os, mh2obj, mh2bvh
-to:
-import files3d, animation3d, gui3d, events3d, os, mh2obj, mh2bvh, mh2mhx
-
-and after line 170:
-      mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, "exports/" + filename + ".obj")
-add the line:
-      mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, "exports/" + filename + ".mhx")
-
-There are two analogous patches to be made in guimodelling.py.
+Copy mhx_import.py and mhx_export.py from the makehuman/utils/mhx folder to your Blender
+scripts folder. The variable TexDir at the beginning of mhx_import.py may be modified to 
+point to your texture directory. 
 
 
 Usage:
@@ -82,7 +48,9 @@ importer's user interface. First there are some choices to be made:
 1. Arm IK or FK.
 2. Leg IK or FK.
 3. Finger IK or FK.
-4. Rotate mesh and rig 90 degrees.
+4. Shape keys.
+5. Replace scene or merge with scene.
+6. Default texture directory.
 
 Pressing "Load MHX" will now allow you to select the MHX file in the MH export directory.
 Hopefully the rigged and weighted mesh is now loaded into Blender. As a final step, you need

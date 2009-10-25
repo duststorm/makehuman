@@ -24,93 +24,316 @@
 
 
 The purpose of the MHX format is to allow transfer of information between MakeHuman and Blender.
-The format is modelled on the popular Wavefront OBJ format, but also contains constructs 
-describing bones, vertex weights and shape keys (NYI = not yet implemented). 
-
-A line in an MHX file should be of the following types:
-
-# Whatever
-A comment (ignored).
-
-MHX MajorVersion MinorVersion
-Identifies the MHX version. Current version is 0 1.
-
-object Name Layer1-10 Layer11-20 Mode
-Define a new object with the name Name.
-Layer1-10 and Layer11-20 are the layer masks, divided into two pieces because Python seems to
-have problems with 20-bit integers. 
-Mode is one of "add" (always add object) and "keep" (only add object if not already there).
-
-mesh Name
-Set the current mesh to a mesh with the name Name.
-
-v X Y Z
-A vertex with coordinates (X,Y,Z) (floats). Vertex numbers start from 0, since both MH and
-Blender (but not OBJ) do so.
-
-vt X Y
-A texture vertex with coordinates (X,Y) (floats). Texture vertex numbers start from 0.
-
-vn X Y Z
-A vertex normal with directions (X,Y,Z) (floats). Hm. Since Blender ignores the given vertex
-normals, so do I.
-
-e V1 V2
-An edge with endpoints (V1,V2). Ignored if the mesh has faces.
-
-f V1 V2 ...
-f V1/VT1 V2/VT2 ...
-A face whose corners are verts (V1, V2, ...) and texture verts (TV1, TV2, ...). Only tris and
-quads are supported by Blender, and thus by MHX.
-
-vertgroup VGroup
-Create a new vertex group with name VGroup and sets it to the current vertex group.
-
-wv V W
-The vertex V belongs to the current vertex group with weight W.
-
-material Mat
-Create a new material with name Mat and sets it to the current material.
-
-color R G B
-The current material has RGB values (R, G, B) (floats)
-
-alpha A
-The current material has alpha value A (float)
-
-texture Name ImagePath MapsTo
-Give the current material a new texture with name Name. The texture is an
-image located at ImagePath. The last argument specfies which channels the texture
-maps to.
-
-armature Amt
-Create a new armature with name Amt and sets it to the current armature.
-
-bone Name Parent Roll Flags Layers
-Create a new bone in the current armature. The bone has name Name and parent Parent; it has
-no parent if Parent = None. The roll value is Roll. Currently supported flags are Connected
-and NoDeform. The bone is visible on bone layers Layers.
-
-head X Y Z
-The head of the current bone is located at (X, Y, Z) (floats).
-
-tail X Y Z
-The tail of the current bone is located at (X, Y, Z) (floats).
-
-dispob Bone Object
-The display object of the bone Bone is Object.
-
-constraint Bone Type Target Driver Arg1 Arg2 ...
-Assign a constraint of type Type and target Target to the bone Bone. The influence of
-this constraint is driven by the bone Driver (currently not working). The final arguments
-depend on the constraint type, which may be one of:
-IK: Arg1 = level
-CopyRot: No arguments
-LimitDist: No arguments
+More generally, it can be used to export and import Blender scenes for use with any external
+application. Ultimately the goal is to make MHX into a .blend file in Ascii format.
 
 
-This specification is subject to changes without notice. Backward compatibility is presently 
-*NOT* a design goal.
+Syntax:
+
+MHX allows for the following syntactic constructs:
+
+# A comment (ignored).
+
+A-one-line statement with-four-items separated-by-blanks ;
+
+A-multi-line statement
+   ...
+   ...
+end A-multi-line
+
+
+Semantics:
+
+An MHX file contains the following information from the Blender file:
+	groups
+	ipos
+	actions
+	textures
+	materials
+	objects
+It is important that the items appear in this order.
+An object is listed as two blocks: data, object.
+
+The information is encoded in the following language constructs, which hopefully are self-explanatory.
+"Other variables" have the same names and values as the corresponding Blender instance variables, 
+cf. the Blender documentation.
+
+
+MHX MajorVersion MinorVersion ;
+Identifies the MHX version. Current version is 0 2. It is not compatible with previous versions.
+
+#
+#	Group
+#
+
+group Name
+	object ObjectName ;
+	...
+	object ObjectName ;
+	Other variables
+end group
+
+#
+#	Ipo and action
+#
+
+ipo Type Name
+	Icu
+	...
+	Icu
+end ipo
+
+icu Name Extend Interpolation
+	bz2 Point (= H1x H1y Px Py H2x H2y)
+	...
+	bz2 Point
+	Other variables
+end icu
+
+action Name
+	ipo IpoName
+	...
+	ipo IpoName
+end action
+
+#
+#	Material and texture
+#
+
+material Name
+	MTex
+	...
+	MTex
+	Colorband Diffuse
+	Colorband Specular
+	Other variables
+end material
+
+mtex Index TextureName
+	Other variables
+end mtex
+
+texture Type Name
+	Image 
+	Colorband
+	Other variables
+end texture
+
+image Name
+	filename FileName ;
+	Other variables
+end image
+
+#
+#	Mesh
+#
+
+mesh Name ObjectName
+	material MaterialName ;
+	...
+	material MaterialName ;
+
+	v X Y Z ; (vertex coordinate)
+	...
+	v X Y Z ;
+
+	vt X Y ; (UV coordinate)
+	...
+	vt X Y ;
+
+	f V1 V2 V3 V4 ; (face vert numbers)
+or	f V1 V2 V3 ;
+or	f V1/VT1 V2/VT2 V3/VT3 V4/VT4 ; (face and UV vert numbers)
+or	f V1/VT1 V2/VT2 V3/VT3 ;
+	...
+	f V1... ;
+
+	ft FaceIndex Flag, Mode, Transp, Mat, Smooth ; (for textured faces)
+	...
+	ft FaceIndex Flag, Mode, Transp, Mat, Smooth ;
+or	ftall Flag, Mode, Transp, Mat, Smooth ; (assign to all faces)
+
+	fx FaceIndex Mat, Smooth ; (for untextured faces)
+	...
+	fx FaceIndex Mat, Smooth ;
+or	fxall Mat, Smooth ; (assign to all faces)
+	
+	e V1 V2 ; (edge.v1 and edge.v2)
+	...
+	e V1 V2 ;
+	
+	VertGroup
+	...
+	VertGroup
+
+	ShapeKey
+	...
+	ShapeKey
+
+	Other variables
+end mesh
+
+shapekey Name SliderMin SliderMax VertgroupName
+	sv VertIndex dX dY dZ ;
+	...
+	sv VertIndex dX dY dZ ;
+end shapekey
+	
+vertgroup Name
+	wv VertIndex Weight ;
+	...
+	wv VertIndex Weight ;
+end vertgroup
+
+#
+#	Armature and pose
+#
+
+armature ArmatureName ObjectName
+	Bone 
+	...
+	Bone
+	Other variables
+end armature
+
+bone Name ParentName Flags LayerMask
+	head X Y Z
+or	head joint JointName
+or	head joint JointName + DX DY DZ
+	tail X Y Z
+or	tail joint JointName
+or	tail joint JointName + DX DY DZ
+	Other variables
+end bone
+
+joints
+	j JointName X Y Z ;
+	...
+	j JointName X Y Z ;
+end joints
+
+pose Name
+	Posebone
+	...
+	Posebone
+end pose
+
+posebone Name Flags
+	Other variables
+	Constraint
+	...
+	Constraint
+end posebone
+
+#
+#	Other data types
+#
+
+lattice Name
+	partitions X Y Z ;
+	keytypes X Y Z ;
+	Other variables
+end lattice
+
+lamp Type Name
+	texture Index TextureName ;
+	...
+	texture Index TextureName ;
+	Other variables
+end lamp
+
+camera Type Name
+	Other variables
+end camera
+
+curve Name
+	Nurb
+	...
+	Nurb
+	Material MaterialName ;
+	...
+	Material MaterialName ;
+	Other variables
+end curve
+
+nurb poly/bezier/nurbs
+	pt X Y Z W Tilt (poly) ;
+or	pt H1x H1y H1z Px Py Pz H2x H2y H2z (bezier) ;
+or	pt X Y Z W Tilt (nurbs) ;
+	...
+	pt ...
+end nurb
+
+text Name
+	line String ;
+	...
+	line String ;
+	Other variables
+end text
+
+key Name
+	Block
+	...
+	Block
+	Other variables
+end key
+
+block Name
+end block
+
+#
+#	Object
+#
+
+object Name Type DataName
+	layers Layer1-10 Layer11-20 ;
+	parent ParentObject ParentType ParentBone/ParentVerts/None ;
+	ipo IpoName ;
+	Other variables
+	Constraints
+	Particles
+	Modifiers
+end object
+
+particle Name
+	Other variables
+	material MaterialName ;
+	vertgroup Affects Name ;
+	...
+	vertgroup Affects Name ;
+end particle
+
+constraint Type Name Influence
+	Setting ValueType Value ;
+	...
+	Setting ValueType Value ;
+end constraint
+
+modifier Type Name Influence
+	Setting ValueType Value ;
+	...
+	Setting ValueType Value ;
+end modifier
+
+Setting is one of Blender.Constraint.Settings and Value its value. 
+ValueType Value can be one of 
+	list Nelts ValueType1 Value1 ... ValueTypeN ValueN
+	int Int
+	hex Int
+	float Float
+	bool true/false
+	str String
+	vec X Y Z
+	obj ObjectName
+	ipo IpoName
+	act ActionName
+	tex TextureName
+	text TextName	
+	
+	
+
+This specification is subject to changes without notice. However, the MHX format is approaching 
+its final form and the main features are not expected to change so much in the future.
 
 
 
