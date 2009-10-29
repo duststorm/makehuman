@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mydir=/home/thomas/fixmesh/
+mydir=.
 
 for file in data/old/targets/macrodetails/*.target
 do

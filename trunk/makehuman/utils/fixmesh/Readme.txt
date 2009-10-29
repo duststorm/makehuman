@@ -1,8 +1,13 @@
+To build and run on Linux:
 
-The program is called fixmesh. The shell script "fixall" makes a batch conversion of the whole database. 
-You need to edit the mydir variable.
 
-It is an Anjuta project for Ubuntu Linux, but it runs under Windows as well.
+make -f Makefile.Linux
+
+./fixall
+
+
+Transforms all targets in makehuman/data/targets directories and put the new targets in 
+makehuman/utils/fixmesh/data/new/targets folder, from where it can be moved to the desired place.
 
 
 
@@ -25,9 +30,9 @@ Old base mesh with special materials applied for separation of disjoint parts.
 fixmesh/base/old/base-mat.obj
 New base mesh with special materials applied for separation of disjoint parts. 
 
-Copy the old target directory into fixmesh/data/old.
-
 Create the directory tree in fixmesh/data/new, if not already there.
+
+The
 
 
 Running

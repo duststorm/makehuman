@@ -350,7 +350,7 @@ int Mesh::insertMaterial(const char *name)
 
 void Mesh::remapMaterials(Mesh *mesh)
 {
-	int i, j, k, v, f;
+	int i, j, v, f;
 	char oldName[MaxMaterial][NAMESIZE];
 	int	map[MaxMaterial];
 
@@ -427,7 +427,6 @@ void Mesh::readTargetFile(const char *name, double &threshold)
 void Mesh::writeTargetFile(const char *name, bool detail, double threshold)
 {
 	int v;
-	double *x;
 	double *offs;
 	char fileName[BUFSIZE];
 
@@ -466,9 +465,9 @@ void Mesh::writeObjFile(const char *baseName,  int flagsBase, const char *tarNam
 	bool facesDone = false;
 	bool first = false;
 	const char *extBase = (flagsBase & F_MHX ? "mhx" : "obj");
-	int offsBase = (flagsBase & F_MHX ? 0 : 1);
+	// int offsBase = (flagsBase & F_MHX ? 0 : 1);
 	const char *extTar = (flagsTar & F_MHX ? "mhx" : "obj");
-	int offsTar = (flagsTar & F_MHX ? 0 : 1);
+	// int offsTar = (flagsTar & F_MHX ? 0 : 1);
 
 	sprintf(oldFile, "%s.%s", baseName, extBase);
 	sprintf(newFile, "%s.%s", tarName, extTar);

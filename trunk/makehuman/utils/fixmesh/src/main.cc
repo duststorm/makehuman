@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	char moName2[BUFSIZE];
 	memset(morph, 0, BUFSIZE*sizeof(char));
 
-	int group;
+	// int group;
 	double threshold;
 
 	// Default values for global variables
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 //	strcpy(morph, "data/old/targets/macrodetails/africa-aethiopid-female-child.target");
 //	strcpy(morph, "data/old/targets/microdetails/head-back-skull-scale-depth-decr.target");
 	strcpy(morph, "data/old/targets/details/ear-trans-in.target");
-	strcpy(theDir, "/home/thomas/fixmesh/");
+	strcpy(theDir, "/home/thomas/svn/makehuman/makehuman/fixmesh/");
 
 	
 	// parse command line
@@ -140,10 +140,12 @@ int main(int argc, char* argv[])
 	}
 
 	// Define the file names.
+	// ../../data/targets/ = 19
+	// data/old/targets/ = 17
 	
 	
-	sprintf(moName1, "data/old/targets/%s", morph+17);
-	sprintf(moName2, "data/new/targets/%s", morph+17);
+	sprintf(moName1, "../../data/targets/%s", morph+19);
+	sprintf(moName2, "data/new/targets/%s", morph+19);
 
 	if (verbosity > 0)
 		printf("%s\n ->  %s\n", moName1, moName2);

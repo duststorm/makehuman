@@ -63,7 +63,7 @@ void Mesh::findGroups(Mesh *oldMesh)
 	double *wts;
 	bool belongs;
 	Vert	*pVert;
-	Vector3 x[3], y;
+	Vector3 y;
 
 	if (verbosity > 0)
 		printf("Finding groups\n");
@@ -252,4 +252,5 @@ int Mesh::groupFromName(char *name)
 			return g;
 	}
 	RaiseError1("Did not find group %s\n", name);
+	return 0;
 }

@@ -334,7 +334,7 @@ Face *Mesh::findBestFaceWeights(Vert *pVert, double *weights,
 	Face *pFace;
 	int i, j, n;
 	bool test;
-	int ntries = 0;
+	//int ntries = 0;
 
 	int nInZone;
 
@@ -346,7 +346,7 @@ Face *Mesh::findBestFaceWeights(Vert *pVert, double *weights,
 		i = 1;
 #endif
 
-retry:
+//retry:
 	// Find all faces with v in the zone.
 	nInZone = 0;
 	for (i = 0; i < m_nFaces; i++) {
@@ -673,7 +673,7 @@ void Mesh::moveWeights(Mesh *oldMorph)
 
 void Mesh::findTextVerts(Mesh *oldMesh)
 {
-	int tv, v, i, j, oldTv;
+	int tv, v, j, oldTv;
 	int *tvs;
 	double *wts, *uv;
 	Vert *pVert;
