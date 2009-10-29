@@ -1,3 +1,3 @@
 #!/bin/sh
 
-make -f Makefile_osx
+make -f Makefile.osx
