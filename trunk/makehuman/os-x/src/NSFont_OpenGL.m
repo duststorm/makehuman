@@ -216,9 +216,11 @@ static BOOL openGLLoggingEnabled = YES;
    }
 }
 
-void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize)
+@end // @implementation NSFont (withay_OpenGL)
+
+void buildFont(GLint inBase, int inCount, char inStartCode, char const* inFontName, int inFontSize)
 {
-    NSFont *font = [ NSFont fontWithName:[NSString stringWithCString:inFontName] size:inFontSize ];
+    NSFont *font = [ NSFont fontWithName:[NSString stringWithCString:inFontName encoding:NSASCIIStringEncoding] size:inFontSize ];
     if( font == nil )
         NSLog( @"font is nil\n" );
     if( ![ font makeGLDisplayListFirst:inStartCode count:inCount base:inBase ] )
@@ -226,4 +228,3 @@ void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontNa
 }
 
 
-@end

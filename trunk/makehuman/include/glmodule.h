@@ -31,6 +31,11 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Text, shader and texture services
 void mhDrawText(float x, float y, const char *message);
 GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height);
@@ -78,5 +83,8 @@ void mhSetFullscreen(int fullscreen);
 void mhCreateWindow(int useTimer);
 void mhEventLoop(void);
 unsigned int mhTimerFunc(unsigned int interval, void* param);
+#ifdef __cplusplus
+}
+#endif
 
 #endif // GLMODULE_H

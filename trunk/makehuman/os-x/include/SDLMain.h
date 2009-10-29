@@ -12,7 +12,7 @@ extern "C" {
 #endif
     const char* getExportPath();
     const char* getModelPath();
-    
+    const char* getGrabPath();
 #ifdef __cplusplus
 }
 #endif

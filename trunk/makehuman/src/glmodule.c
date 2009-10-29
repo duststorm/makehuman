@@ -44,8 +44,14 @@
     #include <windows.h>
     #include <SDL_syswm.h>
 #elif __APPLE__
-    void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
-    #include "SDL_image.h"
+    #ifdef __cplusplus
+    extern "C" {
+    #endif
+        void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
+    #ifdef __cplusplus
+    }
+    #endif
+    #include "SDL_image/SDL_image.h"
 #else
     #include <X11/Xlib.h>
     #include <X11/Xutil.h>
@@ -101,7 +107,7 @@ static int g_ShadersSupported = 1;
 typedef struct
 {
     PyObject_HEAD
-    int textureId;
+    GLuint textureId;
     int width;
     int height;
 } Texture;
@@ -290,8 +296,8 @@ void mhDrawText(float x, float y, const char *message)
  */
 static void mhFlipSurface(const SDL_Surface *surface)
 {
-    unsigned char *line = malloc(surface->w * surface->format->BytesPerPixel);
-    unsigned char *pixels = surface->pixels;
+    unsigned char *line = (unsigned char*)malloc(surface->w * surface->format->BytesPerPixel);
+    unsigned char *pixels = (unsigned char*)surface->pixels;
     int lineIndex;
 
     for (lineIndex = 0; lineIndex < surface->h / 2; lineIndex++)
@@ -819,13 +825,13 @@ void UpdatePickingBuffer(void)
     if  (pickingBufferSize != width * height * 3)
     {
       pickingBufferSize = width * height * 3;
-      pickingBuffer = realloc(pickingBuffer, pickingBufferSize);
+      pickingBuffer = (unsigned char*)realloc(pickingBuffer, pickingBufferSize);
     }
   }
   else
   {
     pickingBufferSize = width * height * 3;
-    pickingBuffer = malloc(pickingBufferSize);
+    pickingBuffer = (unsigned char*)malloc(pickingBufferSize);
   }
 
   // Turn off lighting

@@ -50,7 +50,14 @@
 
 + (void) setOpenGLLogging:(BOOL)logEnabled;
 - (BOOL) makeGLDisplayListFirst:(unichar)first count:(int)count base:(GLint)base;
-
-void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
-
 @end
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void buildFont(GLint inBase, int inCount, char inStartCode, char const* inFontName, int inFontSize);
+#ifdef __cplusplus
+}
+#endif
+
