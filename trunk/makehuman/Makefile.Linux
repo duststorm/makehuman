@@ -5,10 +5,11 @@ OBJS = $(addsuffix .o,$(basename $(CSRCS) $(CCSRCS) ))
 
 CCOPTS = -Wall -O0 -g
 
+PYTHONVER     = 2.5
 EXTRAFMWKS    = -lX11 -lGL -lGLU -lSDL
-EXTRALIBS     = -lpython2.5
+EXTRALIBS     = -lpython$(PYTHONVER)
 EXTRADEFINES  =
-INCLUDEPATH   = -I/usr/include/SDL/ -I/usr/include/python2.5/ -I/usr/X11R6/include -I./include
+INCLUDEPATH   = -I/usr/include/SDL/ -I/usr/include/python$(PYTHONVER)/ -I/usr/X11R6/include -I./include
 
 EXE = makehuman
 
