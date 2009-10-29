@@ -28,7 +28,7 @@ CCSRCS   = src/dump.cc \
 CSRCS    = 
 
 # Mention all include paths
-EXTRA_INC_PATHS   = 
+EXTRA_INC_PATHS   = include
 
 # Mention all library paths
 EXTRA_LIB_PATHS   = 
