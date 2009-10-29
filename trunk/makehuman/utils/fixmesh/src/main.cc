@@ -9,11 +9,11 @@
 #include "stdafx.h"
 #ifndef __APPLE__
     /* comment by hdusel: 
- *      *
- *           * Do we really need this line? Why and where? OSX does not support an header error.h
- *                * I have tried to compile it on Fedora Linux by commenting out this line and everything
- *                     * went fine. So could we remove this?
- *                          */
+     *
+     * Do we really need this line? Why and where? OSX does not support an header error.h
+     * I have tried to compile it on Fedora Linux by commenting out this line and everything
+     * went fine. So could we remove this?
+     */
     #include <error.h> 
 #endif
 #include "hdr.h"
