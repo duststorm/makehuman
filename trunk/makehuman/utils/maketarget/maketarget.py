@@ -220,7 +220,7 @@ def loadTranslationTarget(targetPath):
     maxIndexOfVerts = len(obj.verts)        
     for vData in targetData:
         vectorData = vData.split()
-        if '#' not in vectorData[0]:
+        if vectorData[0].find('#')==-1:
             if len(vectorData) < 4:
                 vectorData = vData.split(',') #compatible old format
             mainPointIndex = int(vectorData[0])
