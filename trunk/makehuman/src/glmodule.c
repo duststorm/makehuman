@@ -271,16 +271,32 @@ void mhDrawText(float x, float y, const char *message)
     /* raster pos sets the current raster position
      * mapped via the modelview and projection matrices
      */
+    char *line;
+    int lineindex = 0;
 
     /*Turn off lighting*/
     glDisable(GL_LIGHTING);
 
     /*Set text color and position*/
     glColor3f(1.0, 1.0, 1.0);
-    glRasterPos3f(x, y, 2);
+    glRasterPos3f(x, y, 2.0f);
 
     /*Draw the text*/
     glListBase(G.fontOffset);
+
+    line = strchr(message, '\n');
+    if (line)
+    {
+      do
+      {
+        glCallLists(line - message, GL_UNSIGNED_BYTE, message);
+        glRasterPos3f(x, y - (22.0f / (float)g_windowHeight) * (float)(++lineindex), 2.0f);
+        message = line + 1;
+        line = strchr(message, '\n');
+      }
+      while (line);
+    }
+    
     glCallLists((GLsizei)strlen(message), GL_UNSIGNED_BYTE, message);
     
     /* restore lighting */
