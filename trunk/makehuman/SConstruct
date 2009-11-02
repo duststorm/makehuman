@@ -1,18 +1,22 @@
 import platform
 
 env = Environment(CPPPATH=['include','/usr/include/python2.5','/usr/include/GL','/usr/include/SDL'],
-LIBS =  ['python2.5','X11','GL','GLU','SDL'], CCFLAGS = '-O2')
+LIBS =  [], CCFLAGS = '-O2')
 conf = Configure(env)  
 if not env.GetOption('clean'):
+  env.Append(LIBS = ['python2.5'])
 	if not (conf.CheckLibWithHeader('python2.5', 'Python.h', 'c')):
 		print "The Python 2.5 development libraries must be installed"
 		exit(1)
+  env.Append(LIBS = ['X11'])
 	if not (conf.CheckLib('X11')):
 		print "The X11 development libraries must be installed"
 		exit(1)
+  env.Append(LIBS = ['SDL'])
 	if not (conf.CheckLibWithHeader('SDL', 'SDL.h', 'c')):
 		print "The SDL development libraries must be installed"
 		exit(1)
+  env.Append(LIBS = ['GL','GLU'])
 env=conf.Finish()
 
 # Build application
