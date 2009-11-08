@@ -42,9 +42,6 @@ class Human(gui3d.Object):
         #self.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
         #self.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/ambient_occlusion.png", 0))
         self.scene = globalScene
-        self.progressBar = gui3d.ProgressBar(globalScene.application,
-            backgroundTexture = globalScene.application.getThemeResource("images", "progressbar_background.png"),
-            barTexture = globalScene.application.getThemeResource("images", "progressbar.png"), visible = False)
         self.targetsDetailStack = {}#All details targets applied, with their values
         self.targetsEthnicStack = {"neutral":1.0}
         self.lastTargetApplied = None
@@ -366,7 +363,7 @@ class Human(gui3d.Object):
         else:
           return None
             
-    def applyAllTargets(self):
+    def applyAllTargets(self, progressCallback = None):
 
         """
         This method applies all targets, in function of age and sex
@@ -375,10 +372,10 @@ class Human(gui3d.Object):
 
         """
         targetName = None
-        self.progressBar.show()
         algos3d.resetObj(self.meshData)
 
-        self.progressBar.setProgress(0.0)
+        if progressCallback:
+            progressCallback(0.0)
         progressVal = 0.0
         progressIncr = 0.3/(len(self.targetsDetailStack)+1)
         
@@ -386,20 +383,18 @@ class Human(gui3d.Object):
         for t in self.targetsDetailStack.keys():
             algos3d.loadTranslationTarget(self.meshData, t, self.targetsDetailStack[t],None,0,0)
             progressVal += progressIncr
-            self.progressBar.setProgress(progressVal)
+            if progressCallback:
+                progressCallback(progressVal)
         a = time.time()
         #+.01 below to prevent zerodivision error
         progressIncr = (0.6/(len(self.targetsEthnicStack.keys())+.01))/6
                                                             
         #Now we apply all macro targets        
-        macroTargets = {}        
-
+        macroTargets = {}
         
         averageWeightVal = 1-(self.underweightVal+self.overweightVal)        
         averageToneVal = 1-(self.muscleVal + self.flaccidVal)
 
-        
-        
         macroTargets[self.targetFemaleFlaccidHeavyChild]= self.flaccidVal*self.overweightVal*self.childVal*self.femaleVal
         macroTargets[self.targetFemaleFlaccidHeavyYoung]= self.flaccidVal*self.overweightVal*self.youngVal*self.femaleVal
         macroTargets[self.targetFemaleFlaccidHeavyOld]= self.flaccidVal*self.overweightVal*self.oldVal*self.femaleVal
@@ -427,7 +422,6 @@ class Human(gui3d.Object):
         macroTargets[self.targetMaleMuscleLightChild]= self.muscleVal*self.underweightVal*self.childVal*self.maleVal
         macroTargets[self.targetMaleMuscleLightYoung]= self.muscleVal*self.underweightVal*self.youngVal*self.maleVal
         macroTargets[self.targetMaleMuscleLightOld]= self.muscleVal*self.underweightVal*self.oldVal*self.maleVal
-
 
         macroTargets[self.targetFemaleFlaccidChild]= self.flaccidVal*averageWeightVal*self.childVal*self.femaleVal
         macroTargets[self.targetFemaleFlaccidYoung]= self.flaccidVal*averageWeightVal*self.youngVal*self.femaleVal
@@ -457,25 +451,11 @@ class Human(gui3d.Object):
         macroTargets[self.targetMaleLightYoung]= averageToneVal*self.underweightVal*self.youngVal*self.maleVal
         macroTargets[self.targetMaleLightOld]= averageToneVal*self.underweightVal*self.oldVal*self.maleVal
 
-        
-                 
-
         for k in macroTargets.keys():
             tVal = macroTargets[k]
             if tVal != 0.0:         
                 print "APP: %s, VAL: %f"%(k,tVal)
             algos3d.loadTranslationTarget(self.meshData, k,tVal,None,0,0)
-
-
-
-
-
-
-
-
-
-
-            
 
         for ethnicGroup in self.targetsEthnicStack.keys():
             
@@ -496,18 +476,17 @@ class Human(gui3d.Object):
             ethnicTargets[targetMaleYoung]= self.maleVal*self.youngVal*ethnicVal
 
             for k in ethnicTargets.keys():
-                
                 tVal = ethnicTargets[k]                
                 progressVal = progressVal + progressIncr
-                self.progressBar.setProgress(progressVal)
+                if progressCallback:
+                    progressCallback(progressVal)
                 algos3d.loadTranslationTarget(self.meshData, k,tVal,None,0,0)
 
         #Update all verts
         self.meshData.calcNormals(1, 1)
         self.meshData.update()
-        self.progressBar.setProgress(1.0)
-        self.progressBar.hide()
-        
+        if progressCallback:
+            progressCallback(1.0)
         
     def applyDetailsTargets(self,targetPath,incrVal,totVal):
         """

@@ -149,7 +149,7 @@ class LoadTaskView(gui3d.TaskView):
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncEthnics()
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncStatus()
               
-      human.applyAllTargets()
+      human.applyAllTargets(self.app.progress)
       del self.app.undoStack[:]
       del self.app.redoStack[:]
       

@@ -100,7 +100,7 @@ class DetailTool(events3d.EventHandler):
     human = self.app.scene3d.selectedHuman
     
     # Recalculate
-    human.applyAllTargets()
+    human.applyAllTargets(self.app.progress)
     
     # Build undo item
     after = {}
@@ -216,7 +216,7 @@ class Detail3dTool(events3d.EventHandler):
     human = self.app.scene3d.selectedHuman
     
     # Recalculate
-    human.applyAllTargets()
+    human.applyAllTargets(self.app.progress)
     
     # Add undo item
     before = {}

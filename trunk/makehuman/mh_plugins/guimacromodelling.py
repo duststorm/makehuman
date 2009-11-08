@@ -11,13 +11,13 @@ class MacroAction:
       
     def do(self):
       getattr(self.human, "set" + self.method)(self.after)
-      self.human.applyAllTargets()
+      self.human.applyAllTargets(self.human.app.progress)
       self.postAction()
       return True
       
     def undo(self):
       getattr(self.human, "set" + self.method)(self.before)
-      self.human.applyAllTargets()
+      self.human.applyAllTargets(self.human.app.progress)
       self.postAction()
       return True
       
@@ -32,13 +32,13 @@ class EthnicAction:
       
     def do(self):
       self.human.setEthnic(self.ethnic, self.after)
-      self.human.applyAllTargets()
+      self.human.applyAllTargets(self.human.app.progress)
       self.postAction()
       return True
       
     def undo(self):
       self.human.setEthnic(self.ethnic, self.before)
-      self.human.applyAllTargets()
+      self.human.applyAllTargets(self.human.app.progress)
       self.postAction()
       return True
 
@@ -166,7 +166,7 @@ class MacroModelingTaskView(gui3d.TaskView):
       after["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
       after["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
       self.app.did(humanmodifier.Action(human, before, after, self.syncSliders))
-      human.applyAllTargets()
+      human.applyAllTargets(self.app.progress)
     
     # Ethnic controls
     self.ethnicMapButtonGroup = []
@@ -223,7 +223,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     def onClicked(event):
       human = self.app.scene3d.selectedHuman
       human.resetMeshValues()
-      human.applyAllTargets()
+      human.applyAllTargets(self.app.progress)
       self.syncSliders()
       self.syncEthnics()
       self.syncStatus()

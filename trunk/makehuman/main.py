@@ -191,7 +191,7 @@ class MHApplication(gui3d.Application):
     
   def onStart(self, event):
       self.splash.hide()
-      self.scene3d.selectedHuman.applyAllTargets()
+      self.scene3d.selectedHuman.applyAllTargets(self.app.progress)
       mh.updatePickingBuffer();
       
   def onKeyDown(self, event):
@@ -264,6 +264,13 @@ class MHApplication(gui3d.Application):
   
   def getThemeResource(self, folder, id):
     return "data/themes/" + self.theme + "/" + folder + "/"+ id
+    
+  def progress(self, value):
+    self.progressBar.setProgress(value)
+    if value <= 0:
+      self.progressBar.show()
+    elif value >= 1.0:
+      self.progressBar.hide()
     
 application = MHApplication()
 mainScene = application.scene3d # HACK: Don't remove this, it is needed to receive events from C
