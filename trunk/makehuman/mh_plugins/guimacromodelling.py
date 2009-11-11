@@ -271,7 +271,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     else:
       age = 25 + (70 - 25) * 2 * (human.getAge() - 0.5)
     status += "Age: %d, " %(age)
-    status += "Muscle: %.2f%%, " %(human.getMuscle())
+    status += "Muscle: %.2f%%, " %(human.getMuscle() * 100.0)
     status += "Weight: %.2f%%" %(50 + (150 - 50) * human.getWeight())
     self.status.setText(status)
     
