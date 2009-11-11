@@ -65,6 +65,7 @@ Face::Face()
 {
 	m_nCorners = 0;
 	m_mat = -1;
+	m_bestGroup = -1;
 	memset(m_v, -1, 4*sizeof(int));
 	memset(m_tv, -1, 4*sizeof(int));
 

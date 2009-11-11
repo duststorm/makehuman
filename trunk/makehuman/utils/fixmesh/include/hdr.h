@@ -37,6 +37,7 @@ extern bool stripPrefix;
 #define F_ONLYTRIS		0x02
 #define F_ALLOCGROUPS	0x04
 #define F_TEXTVERTS		0x08
+#define F_PRINTGROUPS	0x10
 
 /*
 	Typedefs
@@ -114,6 +115,7 @@ struct Face {
 	double m_dist[3];
 
 	int	 m_mat;
+	int	 m_bestGroup;
 	int	 m_groups[MaxGroup];
 
 	Vector3	m_normal;
@@ -175,13 +177,15 @@ struct Mesh {
 
 	void readObjFile(const char *name, int flags);
 	void readTargetFile(const char *name, double &threshold);
-	void writeObjFile(const char *baseName, int flagsBase, const char *tarName, int flagsTar);
+	void writeObjFile(const char *tarName, int flagsTar);
 	void writeTargetFile(const char *name, bool detail, double threshold);
+	void readVGroupFile(const char *name);
+	void writeVGroupFile(const char *name, double threshold);
 
 	void initGroups();
 	void allocGroups();
 	int setGroup(char *name);
-	void findGroups(Mesh *mesh);
+	void findGroups(Mesh *mesh, bool doFaces);
 	bool partGroup(int g);
 	void readGroups(const char *fileName);
 	void saveGroups(const char *fileName);

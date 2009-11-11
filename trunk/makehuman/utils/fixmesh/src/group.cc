@@ -52,10 +52,10 @@ bool Mesh::partGroup(int g)
 }
 
 /*
-	void Mesh::findGroups(Mesh *oldMesh)
+	void Mesh::findGroups(Mesh *oldMesh, bool doFaces)
 */
 
-void Mesh::findGroups(Mesh *oldMesh)
+void Mesh::findGroups(Mesh *oldMesh, bool doFaces)
 {
 	int i, v, g, f, n, best;
 	double w, maxWeight;
@@ -93,10 +93,13 @@ void Mesh::findGroups(Mesh *oldMesh)
 		}
 	}
 
+	if (!doFaces)
+		return;
+
 	// 
 	for (f = 0; f < m_nFaces; f++) {
 		memset(m_faces[f].m_groups, 0, MaxGroup*sizeof(int));
-		best = 0; maxWeight = -Infinity;
+		best = -1; maxWeight = -Infinity;
 		belongs = false;
 		for (g = 0; g < m_nGroups; g++) {
 			w = 0;
@@ -116,6 +119,7 @@ void Mesh::findGroups(Mesh *oldMesh)
 					belongs = true;
 			}
 		}
+		m_faces[f].m_bestGroup = best;
 		if (!belongs) {
 			m_faces[f].m_groups[best] = 1;
 		}

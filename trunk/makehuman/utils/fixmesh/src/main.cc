@@ -63,7 +63,8 @@ int main(int argc, char* argv[])
 	enum {
 		M_BUILD,
 		M_CONVERT,
-		M_GROUP,
+		M_VGROUP,
+		M_FGROUP,
 		M_VIEW
 	} mode;
 
@@ -91,13 +92,16 @@ int main(int argc, char* argv[])
 
 //	strcpy(morph, "data/old/targets/macrodetails/africa-aethiopid-female-child.target");
 //	strcpy(morph, "data/old/targets/microdetails/head-back-skull-scale-depth-decr.target");
-	strcpy(morph, "data/old/targets/details/ear-trans-in.target");
-	strcpy(theDir, "/home/thomas/svn/makehuman/makehuman/fixmesh/");
+//	strcpy(morph, "data/old/targets/details/ear-trans-in.target");
+//	strcpy(morph, "data/old/targets/shapes/smile.target");
+	strcpy(morph, "data/old/targets/shapes/head.vgroup");
+	strcpy(theDir, "/home/thomas/fixmesh/");
 
 	
 	// parse command line
 
-	mode = M_GROUP;
+	mode = M_FGROUP;
+	detail = true;
 
 	int i = 0;
 	while (++i < argc) {
@@ -112,8 +116,13 @@ int main(int argc, char* argv[])
 		}
 		else if (strcmp(argv[i], "-build") == 0) 
 			mode = M_BUILD;
-		else if (strcmp(argv[i], "-group") == 0) 
-			mode = M_GROUP;
+		else if (strcmp(argv[i], "-fgroup") == 0) 
+			mode = M_FGROUP;
+		else if (strcmp(argv[i], "-vgroup") == 0) {
+			mode = M_VGROUP;
+			i += 1;
+			if (sscanf(argv[i], "%s", morph) != 1) goto parseError;
+		}
 		else if (strcmp(argv[i], "-obj") == 0) 
 			objFile = true;
 		else if (strcmp(argv[i], "-detail") == 0) {
@@ -142,13 +151,14 @@ int main(int argc, char* argv[])
 	// ../../data/targets/ = 19
 	// data/old/targets/ = 17
 	
-	
+
+#if 1
 	sprintf(moName1, "../../data/targets/%s", morph+19);
 	sprintf(moName2, "data/new/targets/%s", morph+19);
-
-	if (verbosity > 0)
-		printf("%s\n ->  %s\n", moName1, moName2);
-//	return 0;
+#else
+	sprintf(moName1, "data/old/targets/%s", morph+17);
+	sprintf(moName2, "data/new/targets/%s", morph+17);
+#endif
 
 	// Run the program
 
@@ -176,22 +186,42 @@ int main(int argc, char* argv[])
 		printf("Table %s -> %s built\n", name1, name2);
 		break;
 
-	case M_GROUP:
+	case M_FGROUP:
 		// Build mode: create the table that maps the meshes.
 		sprintf(name1, "base/old/base");
 		sprintf(name2, "base/new/base-mat");
 		sprintf(grName2, "base/new/grbase");
+		printf("Converting face groups %s -> %s\n", name1, grName2);
 		stripPrefix = false;
 
 		mesh1.readObjFile (name1, F_ONLYTRIS | F_ALLOCGROUPS | F_TEXTVERTS);
 		mesh2.readObjFile (name2, 0);
 		mesh2.readWeights("wtable.txt");
-		mesh2.findGroups(&mesh1);
+		mesh2.findGroups(&mesh1, true);
 //		mesh2.findTextVerts(&mesh1);
 
-		mesh2.writeObjFile(name2, 0, grName2, F_MHX );
+		mesh2.writeObjFile(grName2, F_PRINTGROUPS );
 //		mesh1.saveGroups("g1table.txt");
 //		mesh2.saveGroups("g2table.txt");
+		if (verbosity > 0)
+			printf("%s grouped\n", grName2);
+		break;
+
+	case M_VGROUP:
+		// Build mode: create the table that maps the meshes.
+		sprintf(name1, "base/old/base");
+		sprintf(name2, "base/new/base-mat");
+		stripPrefix = false;
+		if (verbosity > 0)
+			printf("Converting %s -> %s\n", moName1, moName2);
+
+		mesh1.readObjFile (name1, F_ONLYTRIS | F_ALLOCGROUPS | F_TEXTVERTS);
+		mesh1.readVGroupFile (moName1);
+		mesh2.readObjFile (name2, 0);
+		mesh2.readWeights("wtable.txt");
+		mesh2.findGroups(&mesh1, false);
+		mesh2.writeVGroupFile(moName2, threshold);
+
 		if (verbosity > 0)
 			printf("%s grouped\n", grName2);
 		break;
@@ -213,7 +243,7 @@ int main(int argc, char* argv[])
 		mesh2.moveWeights(&mesh1);	
 
 		if (objFile)
-			mesh2.writeObjFile(name2, 0, moName2, F_MHX);
+			mesh2.writeObjFile(moName2, F_PRINTGROUPS);
 
 #if 0			
 		if (detail) {
@@ -236,7 +266,7 @@ int main(int argc, char* argv[])
 		printf("Making %s viewable obj file\n", moName1);
 		mesh1.readObjFile (name1, 0);
 		mesh1.readTargetFile (moName1, threshold);
-		mesh1.writeObjFile(name1, 0, moName1, 0);
+		mesh1.writeObjFile(moName1, F_PRINTGROUPS);
 		printf("Viewable obj file %s made\n", moName1);
 		break;
 	}
@@ -250,7 +280,8 @@ parseError:
 	printf("Error when parsing command line\n");
 	printf("Usage:\n");
 	printf("-build\n");
-	printf("-group\n");
+	printf("-fgroup\n");
+	printf("-vgroup\n");
 	printf("-convert morph\n");
 	printf("-view morph\n");
 	printf("-verbosity level\n");

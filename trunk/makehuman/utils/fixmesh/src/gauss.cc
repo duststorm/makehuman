@@ -12,6 +12,7 @@
 
 #define DUMPGAUSS	0
 
+#if DUMPGAUSS
 static void dumpGauss(FILE *fp, int nCols, double* mat, double* rhs)
 {
 	int i, j;
@@ -27,6 +28,7 @@ static void dumpGauss(FILE *fp, int nCols, double* mat, double* rhs)
 		}
 	fprintf(fp, "\n");
 }
+#endif
 
 #define Swap(x, y, tmp)	{ tmp = x; x = y; y = tmp; }
 

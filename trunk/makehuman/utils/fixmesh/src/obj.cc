@@ -448,109 +448,133 @@ void Mesh::writeTargetFile(const char *name, bool detail, double threshold)
 }
 
 /*
-	void Mesh::writeObjFile(const char *baseName,  int flagsBase, const char *tarName, int flagsTar)
+	void Mesh::writeObjFile(const char *tarName, int flagsTar)
 */
 
-void Mesh::writeObjFile(const char *baseName,  int flagsBase, const char *tarName, int flagsTar)
+void Mesh::writeObjFile(const char *tarName, int flagsTar)
 {
 	int v, f, g;
-	double w, *uv;
-	int lineNo;
-	char line[BUFSIZE+1];
+	double *uv;
 	Vector3 u;
 	int *vlist, *tlist;
-	char oldFile[BUFSIZE], newFile[BUFSIZE];
-	bool vertsDone = false;
-	bool textVertsDone = (flagsTar & F_TEXTVERTS ? false : true);
-	bool facesDone = false;
-	bool first = false;
-	const char *extBase = (flagsBase & F_MHX ? "mhx" : "obj");
-	// int offsBase = (flagsBase & F_MHX ? 0 : 1);
-	const char *extTar = (flagsTar & F_MHX ? "mhx" : "obj");
-	// int offsTar = (flagsTar & F_MHX ? 0 : 1);
+	char file[BUFSIZE];
+	bool empty = true;
 
-	sprintf(oldFile, "%s.%s", baseName, extBase);
-	sprintf(newFile, "%s.%s", tarName, extTar);
+	sprintf(file, "%s.obj", tarName);
 	if (verbosity > 0)
-		printf("Writing %s file %s\n", extTar, newFile);
-	FILE *in = fileOpen(oldFile, "r");
-	FILE *out = fileOpen(newFile, "w");
+		printf("Writing file %s\n", file);
+	FILE *out = fileOpen(file, "w");
 
-	fprintf(out, "mesh base\n");
-
-	lineNo = 0;
-	while (fgets(line, BUFSIZE, in)) {
-		lineNo += 1;
-
-		if (strncmp(line, "v ", 2) == 0) {
-			if (!vertsDone) {
-				for (v = 0; v < m_nVerts; v++) {
-					u.add( m_verts[v].m_co, m_verts[v].m_offset );
-					fprintf(out, "v %lf %lf %lf\n", u.vec[0], u.vec[1], u.vec[2]);
-				}
-				vertsDone = true;
-			}
-		}
-		else if (strncmp(line, "vt ", 3) == 0) {
-			if (!textVertsDone) {
-				for (v = 0; v < m_nTextVerts; v++) {
-					uv = m_textVerts[v].m_uv;
-					fprintf(out, "vt %lf %lf\n", uv[0], uv[1]);
-				}
-				textVertsDone = true;
-			}
-		}
-		else if (strncmp(line, "f ", 2) == 0) {
-			if (!facesDone) {
-				for (f = 0; f < m_nFaces; f++) {
-					vlist = m_faces[f].m_v;
-					if (flagsTar & F_TEXTVERTS) {
-						tlist = m_faces[f].m_tv;
-						fprintf(out, "f %d/%d %d/%d %d/%d", 
-						        vlist[0], tlist[0], vlist[1], tlist[1], vlist[2], tlist[2]);
-						if (vlist[3] < 0)
-							fprintf(out, "\n");
-						else
-							fprintf(out, " %d/%d\n", vlist[3], tlist[3]);
-					}
-					else {
-						fprintf(out, "f %d %d %d", vlist[0], vlist[1], vlist[2]);
-						if (vlist[3] < 0)
-							fprintf(out, "\n");
-						else
-							fprintf(out, " %d\n", vlist[3]);
-					}
-				}
-				facesDone = true;
-			}
-		}
-		else if (strncmp(line, "vertgroup ", 10) == 0);
-		else if (strncmp(line, "wv ", 3) == 0);
-		else
-			fprintf(out, "%s", line);
+	for (v = 0; v < m_nVerts; v++) {
+		u.add( m_verts[v].m_co, m_verts[v].m_offset );
+		fprintf(out, "v %lf %lf %lf\n", u.vec[0], u.vec[1], u.vec[2]);
 	}
 
-	if (flagsTar & F_MHX) {
-		const char *prefix = (stripPrefix ? "" : "part_");
-		for (g = 1; g < m_nGroups; g++) {
-			first = true;
-			for (v = 0; v < m_nVerts; v++) {
-				w = m_verts[v].m_weights[g];
-				if (w > Epsilon) {
-					if (first) {
-						fprintf(out, "vertgroup %s%s\n", prefix, m_groupNames[g]);
-						first = false;
-					}
-					fprintf(out, "wv %d %lf\n", v, w);
+	if (flagsTar & F_TEXTVERTS) {
+		for (v = 0; v < m_nTextVerts; v++) {
+			uv = m_textVerts[v].m_uv;
+			fprintf(out, "vt %lf %lf\n", uv[0], uv[1]);
+		}
+	}
+
+	for (g = 0; g < m_nGroups; g++) {
+		if (flagsTar & F_PRINTGROUPS) {
+			empty = true;
+			for (f = 0; f < m_nFaces; f++) {
+				if (m_faces[f].m_bestGroup == g) {
+					empty = false;
+					break;
+				}
+			}
+			if (!empty)
+				fprintf(out, "g part_%s\n", m_groupNames[g]);
+		}
+	
+		for (f = 0; f < m_nFaces; f++) {
+			if (m_faces[f].m_bestGroup == g) {
+				vlist = m_faces[f].m_v;
+				if (flagsTar & F_TEXTVERTS) {
+					tlist = m_faces[f].m_tv;
+					fprintf(out, "f %d/%d %d/%d %d/%d", 
+						vlist[0]+1, tlist[0]+1, vlist[1]+1, tlist[1]+1, vlist[2]+1, tlist[2]+1);
+					if (vlist[3] < 0)
+						fprintf(out, "\n");
+					else
+						fprintf(out, " %d/%d\n", vlist[3]+1, tlist[3]+1);
+				}
+				else {
+					fprintf(out, "f %d %d %d", vlist[0]+1, vlist[1]+1, vlist[2]+1);
+					if (vlist[3] < 0)
+						fprintf(out, "\n");
+					else
+						fprintf(out, " %d\n", vlist[3]+1);
 				}
 			}
 		}
 	}
-
-	fclose(in);
 	fclose(out);
 	if (verbosity > 0)
-		printf("%s file %s written\n", extTar, newFile);
+		printf("Obj file %s written\n", file);
 }
 
+/*
+	void Mesh::readVGroupFile(const char *name)
+*/
 
+void Mesh::readVGroupFile(const char *name)
+{
+	int v;
+	double w;
+	int lineNo;
+	char line[BUFSIZE+1];
+	char fileName[BUFSIZE];
+
+	sprintf(fileName, "%s", name);
+	if (verbosity > 0)
+		printf("Reading VGroup file %s\n", fileName);
+	FILE *fp = fileOpen(fileName, "r");
+
+	m_nGroups = 1;
+	memset(m_groupNames, 0, MaxGroup*NAMESIZE*sizeof(char));
+	for (v = 0; v < m_nVerts; v++)
+		memset(m_verts[v].m_weights, 0, MaxGroup*sizeof(double));
+
+	lineNo = 0;
+	while (fgets(line, BUFSIZE, fp)) {
+		lineNo += 1;
+		if (sscanf(line, "%d %lf", &v, &w) != 2)
+		    RaiseError2("readVGroupFile line %d file %s\n", lineNo, fileName);
+		m_verts[v].m_weights[0] = w;
+	}
+	fclose(fp);
+
+	if (verbosity > 0)
+		printf("VGroup file %s read\n", fileName);
+}
+
+/*
+	void Mesh::writeVGroupFile(const char *name, double threshold)
+*/
+
+void Mesh::writeVGroupFile(const char *name, double threshold)
+{
+	int v;
+	double w;
+	char fileName[BUFSIZE];
+
+	sprintf(fileName, "%s", name);
+	if (verbosity > 0)
+		printf("Writing VGroup file %s\n", fileName);
+	FILE *fp = fileOpen(fileName, "w");
+		
+	for (v = 0; v < m_nVerts; v++) {
+		w = m_verts[v].m_weights[0];
+		if (w > threshold) {
+			fprintf(fp, "%d %lf\n", v, w);
+		}
+	}
+		
+	fclose(fp);
+	if (verbosity > 0)
+		printf("VGroup file %s written\n", fileName);
+}

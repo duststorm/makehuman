@@ -4,7 +4,7 @@ mydir=./
 
 ./fixmesh -build -weight 0.2 -zone 2.0 -verbosity 1 -dir $mydir
 
-./fixmesh -group -verbosity 1 -dir $mydir
+./fixmesh -fgroup -verbosity 1 -dir $mydir
 
 for file in ../../data/targets/details/*.target
 do

@@ -5,10 +5,19 @@ make -f Makefile.Linux
 
 ./fixall
 
-
 Transforms all targets in makehuman/data/targets directories and put the new targets in 
 makehuman/utils/fixmesh/data/new/targets folder, from where it can be moved to the desired place.
 
+shapes.py
+
+In Blender, either exports all shapekeys (as .target files) and vertgroups (as .vgroup files) to a
+given directory; or, imports all target and vgroup files in the directory and apply them to your mesh.
+
+./fixshapes
+
+Transforms all target and vgroup files in the makehuman/data/target/shapes directory (which you put there
+with the shapes.py script) to the makehuman/utils/fixmesh/data/new/targets/shapes folder, from where it
+can be importet to the new mesh. For fixing a rigged character with shapekeys.
 
 
 Preparation.
@@ -32,7 +41,6 @@ New base mesh with special materials applied for separation of disjoint parts.
 
 Create the directory tree in fixmesh/data/new, if not already there.
 
-The
 
 
 Running
@@ -41,12 +49,9 @@ Run ./fixall in the fixmesh directory.
 
 All new targets should now appear in the fixmesh/data/new/targets directory. Move it to the makehuman dir.
 
-There also appears a file fixmesh/base/new/grbase.mhx, which contains information about the face groups. Open
-fixmesh/base/new/base-w-groups.blend. It has two internal scripts. 
+There also appears a file fixmesh/base/new/grbase.obj, which contains information about the face groups. 
 
-1. Run mxh_import.py.
-Imports grbase.mhx. File paths must be edited before the script works. Actually, it will halt with an error because
-it expects a rig. Ignore this, because the mesh has already been loaded.
+1. Load grbase.obj into Blender with the standard obj importer. Groups as vertgroups, and no rotate -90 deg.
 
 2. Apply texture coordinates.
 I failed to do so automatically, and I would have run into problems at seams anyway.
@@ -61,12 +66,14 @@ Program switches:
 -build
 Build the weight table and stores it in wtable.txt. The wtable must exist before conversion can take place.
 
--group
-Construct the face groups and save the grouped base mesh to fixmesh/data/new/grbase.mxh. This file needs further
-processing by fixmesh/base/new/base-w-groups.blend.
+-fgroup
+Construct the face groups and save the grouped base mesh to fixmesh/data/new/grbase.obj.
+
+-vgroup name
+Convert the file name.vgroup in data/shapes/ to a file with the same filename in fixmesh/data/new/shapes/.
 
 -convert morph
-Convert the morph. The old morph must exist in a subdirectory of fixmesh/data/old/, and the new morph appears
+Convert the morph. The old morph must exist in a subdirectory of data/, and the new morph appears
 in the same subdirectory of fixmesh/data/old/. The directory tree must exist.
 
 -view morph
