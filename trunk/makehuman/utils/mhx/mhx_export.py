@@ -8,10 +8,10 @@ Tooltip: 'Export from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.1'
+__version__= '0.3'
 __bpydoc__= '''\
 MHX exporter for Blender
-0.1 First version
+0.3 First version
 '''
 """ 
 **Project Name:**      MakeHuman
@@ -22,7 +22,7 @@ MHX exporter for Blender
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyamtht(c):**      MakeHuman Team 2001-2009
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -42,8 +42,9 @@ from Blender.Mathutils import *
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 2
+MINOR_VERSION = 3
 verbosity = 1
+minimality = 0
 Epsilon = 1e-6
 
 #
@@ -166,14 +167,15 @@ def writeMhxFile(fileName):
 	for grp in Group.Get():
 		exportGroup(grp, fp)
 
-	fp.write("\n# ------------------ IPOs -------------------------------- # \n \n")
-	for ipo in Ipo.Get():
-		exportIpo(ipo, fp)
+	if not minimality:
+		fp.write("\n# ------------------ IPOs -------------------------------- # \n \n")
+		for ipo in Ipo.Get():
+			exportIpo(ipo, fp, False)
 
-	fp.write("\n# ---------------- Actions -------------------------------- # \n \n")
-	for act in Armature.NLA.GetActions().values():
-		print act
-		exportAction(act, fp)
+		fp.write("\n# ---------------- Actions -------------------------------- # \n \n")
+		for act in Armature.NLA.GetActions().values():
+			print act
+			exportAction(act, fp)
 
 	fp.write("\n# --------------- Textures ----------------------------- # \n \n")
 	for tex in Texture.Get():
@@ -183,16 +185,8 @@ def writeMhxFile(fileName):
 	for mat in Material.Get():
 		exportMaterial(mat, fp)
 
-	#fp.write("\n# ---------------- Effects -------------------------------- # \n \n")
-	#for eff in Effect.Get():
-	#	exportEffect(eff, fp)
-
 	for ob in scn.objects:
-		exportObject1(ob, fp)
-
-	fp.write("\n# ---------------- Objects -------------------------------- # \n \n")
-	for ob in scn.objects:
-		exportObject2(ob, fp)
+		exportObject(ob, fp)
 
 	fp.close()
 	print "MHX file %s written \n" % (fileName)
@@ -210,21 +204,20 @@ def listColorBand(band, name, fp):
 
 def exportMaterial(mat, fp):
 	fp.write("material %s \n" % mat.name.replace(' ', '_'))
+	fp.write("  rgba %f %f %f %f ;\n" % (mat.R, mat.G, mat.B, mat.alpha))
 	for (n,mtex) in enumerate(mat.textures):
 		if mtex:
 			exportMTex(n, mtex, fp)
+	if mat.ipo:
+		exportIpo(mat.ipo, fp, True)
 	listColorBand(mat.colorbandDiffuse, "colorbandDiffuse", fp)
 	listColorBand(mat.colorbandSpecular, "colorbandSpecular", fp)
 	writeList("mat", materialList, fp, 2, globals(), locals())
 	fp.write("end material\n\n")
 
 materialList = [\
-	("float", "B"), \
-	("float", "G"), \
 	("float", "IOR"), \
-	("float", "R"), \
 	("float", "add"), \
-	("float", "alpha"), \
 	("float", "amb"), \
 	("float", "anisotropy"), \
 	("float", ("colorbandDiffuse", "colorbandDiffuseFactor")), \
@@ -253,7 +246,7 @@ materialList = [\
 	("int", "haloSeed"), \
 	("float", "haloSize"), \
 	("int", "hard"), \
-	("ipo", "ipo"), \
+	#("ipo", "ipo"), \
 	("string", "lib"), \
 	("group", "lightGroup"), \
 	("float", "mirB"), \
@@ -327,6 +320,7 @@ materialList = [\
 
 def exportTexture(tx, fp):
 	global todo
+	typename = "None"
 	for (str, index) in Texture.Types.items():
 		if tx.type == index:
 			typename = str
@@ -336,6 +330,8 @@ def exportTexture(tx, fp):
 	fp.write("texture %s %s\n" % (typename, tx.name.replace(' ', '_')))
 	if tx.image:
 		exportImage(tx.image, fp)
+	if tx.ipo:
+		exportIpo(tx.ipo, fp, True)
 	listColorBand(tx.colorband, "colorband", fp)
 	writeList("tx", textureList, fp, 2, globals(), locals())
 	fp.write("end texture\n\n")
@@ -347,7 +343,7 @@ textureList = [\
 	("int", "animStart"), \
 	("int", "anti"), \
 	("bool", "autoRefresh"), \
-	("float", "brightness"), \
+	("float", "bamthtness"), \
 	("int", "calcAlpha"), \
 	("float", "contrast"), \
 	("tuple4ints", "crop"), \
@@ -365,7 +361,7 @@ textureList = [\
 	("float", "iScale"), \
 	("xint", "imageFlags"), \
 	("int", "interpol"), \
-	("ipo", "ipo"), \
+	#("ipo", "ipo"), \
 	("float", "lacunarity"), \
 	("string", "lib"), \
 	("int", "mipmap"), \
@@ -403,8 +399,8 @@ def exportMTex(index, mtex, fp):
 	print mtex
 	name = mtex.tex.name.replace(' ','_')
 	fp.write("  mtex %d %s\n" % (index, name))
-	#if mtex.getIpo():
-	#	fp.write("    ipo %s\n" % mtex.getIpo().name.replace(' ','_'))
+	fp.write("    texco 0x%x ;\n" % mtex.texco)
+	fp.write("    mapto 0x%x ;\n" % mtex.mapto)    
 	writeList("mtex", mTexList, fp, 2, globals(), locals())
 	fp.write("  end mtex\n")
 	return
@@ -416,10 +412,11 @@ mTexList = [\
 	("bool", "correctNor"), \
 	("float", "dispfac"), \
 	("float", "dvar"), \
+	#("ipo", "ipo"), \
 	("bool", "fromDupli"), \
-	("bool", "fromOrig"), \
+	("bool", "fromOamt"), \
 	("xint", "mapping"), \
-	("xint", "mapto"), \
+	#("xint", "mapto"), \
 	("bool", "neg"), \
 	("bool", "noRGB"), \
 	("float", "norfac"), \
@@ -428,7 +425,7 @@ mTexList = [\
 	("tuple", "size"), \
 	("bool", "stencil"), \
 	# ("texture", "tex"), \
-	("xint", "texco"), \
+	#("xint", "texco"), \
 	("string", "uvlayer"), \
 	("float", "varfac"), \
 	("float", "warpfac"), \
@@ -436,27 +433,6 @@ mTexList = [\
 	("int", "yproj"), \
 	("int", "zproj") \
 ]
-
-'''
-	("int", "mtAlpha"), \
-	("int", "mtAmb"), \
-	("int", "mtBlend"), \
-	("int", "mtCmir"), \
-	("int", "mtCol"), \
-	("int", "mtCsp"), \
-	("int", "mtDisp"), \
-	("int", "mtEmit"), \
-	("int", "mtHard"), \
-	("int", "mtHoriz"), \
-	("int", "mtNor"), \
-	("int", "mtRayMir"), \
-	("int", "mtRef"), \
-	("int", "mtSpec"), \
-	("int", "mtTranslu"), \
-	("int", "mtWarp"), \
-	("int", "mtZenDown"), \
-	("int", "mtZenUp"), \
-'''
 
 #
 #
@@ -469,7 +445,8 @@ def exportFileName(file, fp):
 def exportImage(img, fp):
 	fp.write("  image %s\n" % img.name)
 	exportFileName(img.filename, fp)
-	writeList("img", imageList, fp, 2, globals(), locals())
+	if not minimality:
+		writeList("img", imageList, fp, 2, globals(), locals())
 	fp.write("  end image\n")
 	return
 	
@@ -621,53 +598,7 @@ particleList = [\
 ]
 
 #
-#	exportEffect(eff, fp):
-#
-
-def exportEffect(eff, fp):
-	fp.write("effect %s \n" % eff.name.replace(' ','_'))
-	writeList("eff", effectList, fp, 2, globals(), locals())
-	fp.write("    end effect\n")
-	return
-
-
-effectList = [\
-	("tuple4ints",	"child"), \
-	("tuple4ints",	"childMat"), \
-	("float",	"damping"), \
-	("tuple3floats",	"defvec"), \
-	("int",	"disp"), \
-	("int",	"dispMat"), \
-	("int",	"emissionTex"), \
-	("float",	"end"), \
-	("int",	"flag"), \
-	("tuple3floats",	"force"), \
-	("int",	"forceTex"), \
-	("int",	"jitter"), \
-	("tuple4floats",	"life"), \
-	("float",	"lifetime"), \
-	("tuple4floats",	"mult"), \
-	("float",	"nabla"), \
-	("float",	"normfac"), \
-	("float",	"obfac"), \
-	("float",	"randfac"), \
-	("float",	"randlife"), \
-	("int",	"seed"), \
-	("int",	"speedType"), \
-	("string", "speedVGroup"), \
-	("float",	"sta"), \
-	("int",	"staticStep"), \
-	("int",	"stype"), \
-	("float",	"texfac"), \
-	("int",	"totkey"), \
-	("int",	"totpart"), \
-	("int",	"type"), \
-	("string", "vGroup"), \
-	("float",	"vectsize") \
-]
-
-#
-#	exportIpo(ipo, fp):
+#	exportIpo(ipo, fp, local):
 #
 ipoBlockTypes = dict({\
 	0x424f : "Object", \
@@ -683,16 +614,22 @@ ipoBlockTypes = dict({\
 	0x454b : "Key" \
 })
 
-def exportIpo(ipo, fp):
-	if ipo == None:
+def exportIpo(ipo, fp, local):
+	if ipo == None or ipo.name == "None":
 		return
 	
 	name = ipo.name
 	typeint = ipo.getBlocktype()
 	type = ipoBlockTypes[typeint]
 
+	if local:
+		if type != 'Key' and type != 'Material' and type != 'Texture':
+			return
+	else:
+		if type == 'Key' or type == 'Material' or type == 'Texture':
+			return
+
 	fp.write("ipo %s %s \n" % (type, ipo.name.replace(' ','_')))
-	#icuNames = dict([(x[1],x[0]) for x in ipo.curveConsts.items()])
 	for icu in ipo:
 		exportIcu(icu, fp)
 	fp.write("end ipo\n")
@@ -710,15 +647,17 @@ def exportIcu(icu, fp):
 			(h1[0], h1[1], p[0], p[1], h2[0], h2[1]))
 
 	writeList("icu", icuList, fp, 3, globals(), locals())
+	if icu.driver:
+		print "icu ", icu.driverObject, icu.driverBone, icu.driverChannel
 	fp.write("    end icu\n")
 
 icuList = [\
-	#("int", "driver"), \
+	("int", "driver"), \
 	("object", ("driverObject", "driverObject")), \
 	("string", ("driverObject", "driverBone")), \
 	("string", ("driverObject", "driverBone2")), \
 	("int", ("driverObject", "driverChannel")), \
-	#("string", "driverExpression"), \
+	("string", "driverExpression"), \
 	("int", "extend"), \
 	("int", "interpolation"), \
 ]
@@ -763,7 +702,7 @@ actionStripList = [\
 ]
 
 #
-#	exportObject2(ob, fp):
+#	exportMatrix(A, fp):
 #
 
 def exportMatrix(A, fp):
@@ -772,7 +711,33 @@ def exportMatrix(A, fp):
 		fp.write("    row %f %f %f %f ;\n" % (A[i][0], A[i][1], A[i][2], A[i][3]))
 	fp.write("  end matrix\n")
 
-def exportObject2(ob, fp):
+#
+#	exportObject(ob, fp):
+#
+
+def exportObject(ob, fp):
+	fp.write("\n# ----------------------------- %s --------------------- # \n\n" % ob.type )
+	if ob.type == "Mesh":
+		exportMesh(ob, fp)
+	elif minimality:
+		return
+	elif ob.type == "Armature":
+		exportArmature(ob, fp)
+	elif ob.type == "Empty":
+		fp.write("empty ;\n")
+	elif ob.type == "Lattice":
+		exportLattice(ob,fp)
+	elif ob.type == "Lamp":
+		exportLamp(ob,fp)
+	elif ob.type == "Camera":
+		exportCamera(ob,fp)
+	elif ob.type == "Curve":
+		exportCurve(ob,fp)
+	elif ob.type == "Text":
+		exportText(ob,fp)
+	else:
+		raise NameError( "Unknown type "+ob.type )
+
 	obName = ob.name.replace(' ', '_')
 	data = ob.getData()
 	if data:
@@ -802,7 +767,8 @@ def exportObject2(ob, fp):
 	if ob.ipo:
 		fp.write("  ipo %s ;\n" % ob.ipo.name.replace(' ','_'))
 	
-	writeList("ob", objectList, fp, 2, globals(), locals())
+	if not minimality:
+		writeList("ob", objectList, fp, 2, globals(), locals())
 
 	for cns in ob.constraints:
 		exportConstraint(cns, fp)
@@ -880,7 +846,7 @@ objectList = [\
 	("bool", "enableDupVerts"), \
 	("bool", "enableNLAOverride"), \
 	("bool", "fakeUser"), \
-	("Ipo", "ipo"), \
+	#("ipo", "ipo"), \
 	#("bool", "isSoftBody"), \
 	("string", "lib"), \
 	("bool", "nameMode"), \
@@ -918,34 +884,6 @@ objectList = [\
 	("bool", "wireMode"), \
 	("bool", "xRay")
 ]
-
-#
-#	exportObject1(ob, fp):
-#
-
-def exportObject1(ob, fp):
-	fp.write("\n# ------------------------------------------------------- # \n \n")
-	if (ob.type == "Mesh"):
-		exportMesh(ob, fp)
-	elif (ob.type == "Armature"):
-		exportRig(ob, fp)
-	elif (ob.type == "Lattice"):
-		exportLattice(ob,fp)
-	elif (ob.type == "Lamp"):
-		exportLamp(ob,fp)
-	elif (ob.type == "Camera"):
-		exportCamera(ob,fp)
-	elif (ob.type == "Curve"):
-		exportCurve(ob,fp)
-	elif (ob.type == "Empty"):
-		fp.write("empty ;\n")
-	elif ob.type == "Text":
-		exportText(ob,fp)
-	else:
-		raise NameError( "Unknown type "+ob.type )
-
-	return # exportObject
-
 
 #
 #	exportMesh(ob, fp):
@@ -989,22 +927,23 @@ def exportMesh(ob, fp):
 				fp.write(" %d/%d" %( v.index, n ))
 				n += 1
 			fp.write(" ;\n")
-		if len(me.materials) > 1:
+		if minimality or len(me.materials) <= 1:
+			fp.write("  ftall %x %x %d %d %d ;\n" % (f.flag, f.mode, f.transp, f.mat, f.smooth))
+		else:
 			for f in me.faces:
 				fp.write("  ft %d %x %x %d %d %d ;\n" % (f.index, f.flag, f.mode, f.transp, f.mat, f.smooth))
-		else:
-			fp.write("  ftall %x %x %d %d %d ;\n" % (f.flag, f.mode, f.transp, f.mat, f.smooth))
+			
 	elif me.faces:
 		for f in me.faces:
 			fp.write("  f")
 			for v in f.verts:
 				fp.write(" %i" %( v.index ))
 			fp.write(" ;\n")
-		if len(me.materials) > 1:
+		if minimality or len(me.materials) <= 1:
+			fp.write("  fxall %d %d ;\n" %  ( f.mat, f.smooth))
+		else:
 			for f in me.faces:
 				fp.write("  fx %d %d %d ;\n" %  ( f.index, f.mat, f.smooth))
-		else:
-			fp.write("  fxall %d %d ;\n" %  ( f.mat, f.smooth))
 	elif me.edges:
 		for e in me.edges:
 			fp.write("  e %d %d ;\n" % ( e.v1.index, e.v2.index) )
@@ -1052,8 +991,10 @@ def exportMesh(ob, fp):
 				if dv.length > Epsilon:
 					fp.write("  sv %d %f %f %f ;\n" %(n, dv[0], dv[1], dv[2]))
 			fp.write("    end shapekey\n")
+		exportIpo(me.key.ipo, fp, True)
 
-	writeList("me", meshList, fp, 2, globals(), locals())
+	if not minimality:
+		writeList("me", meshList, fp, 2, globals(), locals())
 	fp.write("end mesh\n")
 	return # exportMesh
 
@@ -1082,16 +1023,16 @@ meshList = [\
 ]
 
 #
-#	exportRig(ob, fp):
+#	exportArmature(ob, fp):
 #
 
-def exportRig(ob, fp):
+def exportArmature(ob, fp):
 	amt = ob.getData()
 	amtName = amt.name.replace(' ','_')
 	obName = ob.name.replace(' ','_')
 	
 	if verbosity > 0:
-		print "Saving rig "+amtName
+		print "Saving amt "+amtName
 
 	bones = amt.bones.values()
 	fp.write("armature %s %s \n" % (amtName, obName))
@@ -1099,7 +1040,8 @@ def exportRig(ob, fp):
 		if b.parent == None:
 			exportBone(fp, 2, b)
 			fp.write("\n")
-	writeList("rig", armatureList, fp, 2, globals(), locals())
+	if not minimality:
+		writeList("amt", armatureList, fp, 2, globals(), locals())
 	fp.write("end armature\n")
 
 	fp.write("pose %s \n" % (obName))	
@@ -1109,7 +1051,7 @@ def exportRig(ob, fp):
 		exportPoseBone(fp, pb)
 	fp.write("end pose\n")
 		
-	return # exportRig
+	return # exportArmature
 			
 armatureList = [\
 	("bool", "autoIK"), \
@@ -1156,18 +1098,15 @@ def exportBone(fp, n, bone):
 	for key in bone.options:		
 		flags |= boneOptions[key]
 	parent = getObject(bone.parent)
-	indent(fp, n)
-	fp.write("bone %s %s %x %x \n" % (bone.name.replace(' ','_'), parent,\
+	fp.write("  bone %s %s %x %x \n" % (bone.name.replace(' ','_'), parent,\
 		flags, bone.layerMask))
 	head = bone.head['ARMATURESPACE']
-	indent(fp, n)
-	fp.write("  head %6.3f %6.3f %6.3f ;\n" % (head[0], head[1], head[2]))
+	fp.write("    head %6.3f %6.3f %6.3f ;\n" % (head[0], head[1], head[2]))
 	tail = bone.tail['ARMATURESPACE']
-	indent(fp, n)
-	fp.write("  tail %6.3f %6.3f %6.3f ;\n" % (tail[0], tail[1], tail[2]))
-	writeList("bone", editboneList, fp, n+2, globals(), locals())
-	indent(fp, n)
-	fp.write("end bone\n\n")
+	fp.write("    tail %6.3f %6.3f %6.3f ;\n" % (tail[0], tail[1], tail[2]))
+	if not minimality:
+		writeList("bone", editboneList, fp, n+2, globals(), locals())
+	fp.write("  end bone\n\n")
 	
 	if bone.children:
 		for child in bone.children:
@@ -1192,8 +1131,9 @@ editboneList = [\
 def exportPoseBone(fp, pb):
 	flags = pb.limitX | ( pb.limitY << 1) | (pb.limitZ << 2)
 	flags |= (pb.lockXRot <<3) | (pb.lockYRot <<4) | (pb.lockZRot <<5)
-	fp.write("  posebone %s %x \n" % (pb.name.replace(' ', '_'), flags))
-	writeList("pb", poseboneList, fp, 2, globals(), locals())	
+	fp.write("\n  posebone %s %x \n" % (pb.name.replace(' ', '_'), flags))
+	if not minimality:
+		writeList("pb", poseboneList, fp, 2, globals(), locals())	
 	for cns in pb.constraints:
 		exportConstraint(cns, fp)
 	fp.write("  end posebone\n")
@@ -1339,6 +1279,8 @@ def exportLamp(ob,fp):
 		for (n,tx) in enumerate(la.textures):
 			if tx:
 				fp.write("  texture %d %s\n" % tx)
+	#if la.ipo:
+	#	exportIpo(la.ipo, fp, True)
 
 	writeList("la", lampList, fp, 2, globals(), locals())
 	fp.write("end lamp\n")
@@ -1382,6 +1324,8 @@ lampList = [\
 def exportCamera(ob,fp):
 	ca = ob.getData()
 	fp.write("camera %s %s\n" % (ca.type, ca.name.replace(' ', '_')))
+	#if ca.ipo:
+	#	exportIpo(ca.ipo, fp, True)
 	writeList("ca", cameraList, fp, 2, globals(), locals())
 	fp.write("end camera\n")
  
@@ -1486,7 +1430,8 @@ def exportGroup(grp, fp):
 	fp.write("group %s\n" % grp.name)
 	for ob in grp.objects:
 		fp.write("  object %s ;\n" % ob.name.replace(' ','_'))
-	writeList("grp", groupList, fp, 2, globals(), locals())
+	if not minimality:
+		writeList("grp", groupList, fp, 2, globals(), locals())
 	fp.write("end group\n")
 	return
 
@@ -1504,12 +1449,13 @@ def exportKey(key, fp):
 	fp.write("key %s\n" % key.name)
 	for b in key.blocks:
 		exportKeyBlock(b, fp)
+	if key.ipo:
+		exportIpo(key.ipo, fp, True)
 	writeList("key", keyList, fp, 2, globals(), locals())
 	fp.write("end key\n")
 	return
 
 keyList = [\
-	("ipo", "ipo"), \
 	("bool", "relative"), \
 	("xint", "type"), \
 	("float", "value") \
@@ -1527,9 +1473,9 @@ def exportKeyBlock(block, fp):
 #	Change the filename to point to your MakeHuman directory
 #
 
-#file = "/home/thomas/mhx2/cube.mhx"
-file = "/home/thomas/makehuman/data/3dobjs/mhxbase.mhx"
-writeMhxFile(file)
-Draw.PupMenu("File "+file+" exported")
+#file = "/home/thomas/mhx3/mhxbase.mhx"
+#file = "/program/makehuman/data/3dobjs/mhxbase.mhx"
+#writeMhxFile(file)
+#Draw.PupMenu("File "+file+" exported")
 
-#Blender.Window.FileSelector (writeMhxFile, 'SAVE MHX FILE')
+Blender.Window.FileSelector (writeMhxFile, 'SAVE MHX FILE')

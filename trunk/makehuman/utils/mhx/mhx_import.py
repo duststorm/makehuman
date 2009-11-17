@@ -1,6 +1,6 @@
 #!BPY
 """ 
-Name 'Makehuman (.mhx)'
+Name: 'Makehuman (.mhx)'
 Blender: 249
 Group: 'Import'
 Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
@@ -8,10 +8,10 @@ Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.1'
+__version__= '0.3'
 __bpydoc__= '''\
-MHX importer
-0.1 First version
+MHX exporter for Blender
+0.3 First version
 '''
 """ 
 **Project Name:**      MakeHuman
@@ -22,14 +22,13 @@ MHX importer
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyamtht(c):**      MakeHuman Team 2001-2009
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
 Abstract
---------
 MHX (MakeHuman eXchange format) importer for Blender.
 
 TO DO
@@ -46,7 +45,7 @@ import string
 #	Default locations - change to fit your machine
 #
 
-TexDir = "~/makehuman/data/textures"
+TexDir = "/program/makehuman/data/textures"
 LibDir = "."
 
 #
@@ -54,7 +53,7 @@ LibDir = "."
 #
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 2
+MINOR_VERSION = 3
 
 #
 #	Button flags
@@ -64,8 +63,11 @@ toggleArmIK = 0
 toggleLegIK = 0
 toggleFingerIK = 0
 toggleDispObs = 1
-toggleReplace = 0
-toggleShape = 0
+toggleReplace = 1
+toggleShape = 1
+toggleRot90 = 0
+useMesh = 1
+doSmash = 1
 
 
 #
@@ -166,6 +168,16 @@ def readMhxFile(fileName):
 			print msg
 			nErrors += 1
 			#raise NameError(msg)
+
+	if toggleRot90:
+		rotMatrix = Mathutils.RotationMatrix(90, 4, 'x')
+		ob = _object['HumanRig']
+		pbones = ob.getPose().bones	
+		pbones['Root'].poseMatrix *= rotMatrix
+		pbones['Panel'].poseMatrix *= rotMatrix
+		ob.getPose().update()
+		
+
 	scn.update()
 	
 	for ob in scn.objects:
@@ -253,6 +265,13 @@ def parse(scn, tokens):
 			if (int(val[0]) != MAJOR_VERSION or int(val[1]) != MINOR_VERSION):
 				Draw.PupMenu("Warning: \nThis file was created with another version of MHX\n")
 			data = None
+		elif key == 'if':
+			try:
+				res = eval(val[0])
+			except:
+				res = False
+			if res:
+				parse(val, sub)
 		elif key == "action":
 			data = parseAction(val, sub)
 		elif key == "ipo":
@@ -387,27 +406,35 @@ def parseMatrix(args, tokens):
 #
 
 def parseParent(ob, args, tokens):
-	parent = getObject(args[0], "parent", globals, locals)
+	global todo
+	parent = args[0]
 	parentType = int(args[1])
 	extra = args[2]
+	expr = None
 
 	if parentType == Object.ParentTypes.OBJECT: 
-		parent.makeParent([ob])
+		expr = "_object[parent].makeParent([ob])"
 	elif parentType == Object.ParentTypes.CURVE:
-		parent.makeParentDeform([ob])
+		expr = "_object[parent].makeParentDeform([ob])"
 	elif parentType == Object.ParentTypes.LATTICE:
-		parent.makeParentDeform([ob])
+		expr = "_object[parent].makeParentDeform([ob])"
 	elif parentType == Object.ParentTypes.ARMATURE:
-		parent.makeParentDeform([ob])
+		expr = "_object[parent].makeParentDeform([ob])"
 	elif parentType == Object.ParentTypes.VERT1: 
-		parent.makeParentVertex([ob], (int(extra)))
+		expr = "_object[parent].makeParentVertex([ob], (int(extra)))"
 	elif parentType == Object.ParentTypes.VERT3: 
 		verts = extra.split("_")
 		if (ob.type != "Empty"):
-			parent.makeParentVertex([ob], (int(verts[0]), int(verts[1]), int(verts[2])) )
+			expr = "_object[parent].makeParentVertex([ob], (int(verts[0]), int(verts[1]), int(verts[2])) )"
 	elif parentType == Object.ParentTypes.BONE: 
 		if extra != "None":
-			parent.makeParentBone([ob], extra)
+			expr = "_object[parent].makeParentBone([ob], extra)"
+
+	if expr:
+		try:
+			exec(expr)
+		except:
+			todo.append((expr, globals(), locals()))
 
 #
 #	parseAction(args, tokens):
@@ -434,15 +461,27 @@ def parseIpo(args, tokens):
 	global todo
 	typeName = args[0]
 	name = args[1]
-	if typeName == 'Key':
-		return
 	ipo = Ipo.New(typeName,name)
 	_ipo[name] = ipo
-	icu = None
 	
 	for (key, val, sub) in tokens:
 		if key == 'icu':
-			icu = parseIcu(ipo, val, sub)
+			parseIcu(ipo, val, sub)
+		else:
+			defaultKey(key, val, "ipo", globals(), locals())
+	return ipo
+
+def parseLocalIpo(args, tokens, owner, ipoType):
+	global todo
+	typeName = args[0]
+	name = args[1]
+	owner.ipo = Ipo.New(ipoType, name)
+	ipo = owner.ipo
+	_ipo[name] = ipo
+	
+	for (key, val, sub) in tokens:
+		if key == 'icu':
+			parseIcu(ipo, val, sub)
 		else:
 			defaultKey(key, val, "ipo", globals(), locals())
 	return ipo
@@ -483,12 +522,19 @@ def parseMaterial(args, tokens):
 	mat = Material.New(name)
 	_material[name] = mat
 	for (key, val, sub) in tokens:
-		if key == 'mtex':
+		if key == 'rgba':
+			mat.R = float(val[0])
+			mat.G = float(val[1])
+			mat.B = float(val[2])
+			mat.alpha = float(val[3])
+		elif key == 'mtex':
 			index = int(val[0])
 			texname = val[1]
 			mat.setTexture(index, _texture[texname])
 			mtex = mat.textures[index]
 			parseMTex(mtex, val, sub)
+		elif key == 'ipo':
+			parseLocalIpo(val, sub, mat, 'Material')
 		elif key == 'colorbandDiffuse':
 			mat.colorbandDiffuse = parseColorBand(sub)
 		elif key == 'colorbandSpecular':
@@ -528,6 +574,8 @@ def parseTexture(args, tokens):
 			tex.colorband = parseColorBand(sub)
 		elif key == 'image':
 			tex.image = parseImage(val, sub)
+		elif key == 'ipo':
+			parseLocalIpo(val, sub, tex, 'Texture')
 		else:
 			defaultKey(key, val, "tex", globals(), locals())
 	return tex
@@ -696,6 +744,9 @@ def parseMesh (args, tokens):
 		elif key == 'shapekey':
 			if toggleShape:
 				parseShapeKey(ob, me, val, sub)
+		elif key == 'ipo':
+			if toggleShape:
+				parseLocalIpo(val, sub, me.key, 'Key')
 		elif key == 'material':
 			mat = _material[val[0]]
 			mats.append(mat)
@@ -727,6 +778,7 @@ def parseShapeKey(ob, me, args, tokens):
 		if key == 'sv':
 			index = int(val[0])
 			block.data[index] += Vector(float(val[1]), float(val[2]), float(val[3]))
+	
 
 #
 #	parseVertGroup(me, args, tokens):
@@ -858,15 +910,19 @@ def poseBone(pbones, args, tokens):
 
 	pb = pbones[name]
 	pb.limitX = flags & 1
-	pb.limitY = (flags >> 2) & 1
-	pb.limitZ = (flags >> 3) & 1
-	pb.lockXRot = (flags >> 4) & 1
-	pb.lockYRot = (flags >> 5) & 1
-	pb.lockZRot = (flags >> 6) & 1
+	pb.limitY = (flags >> 1) & 1
+	pb.limitZ = (flags >> 2) & 1
+	pb.lockXRot = (flags >> 3) & 1
+	pb.lockYRot = (flags >> 4) & 1
+	pb.lockZRot = (flags >> 5) & 1
 
 	for (key, val, sub) in tokens:
 		if key == 'constraint':
 			parseConstraint(pb.constraints, val, sub, name)
+		elif key == 'smash':
+			cns = pb.constraints[-1]
+			if doSmash:
+				todo.append(("cns.%s" % val[0], globals(), locals()))
 		else:
 			defaultKey(key, val, "pb", globals(), locals())
 
@@ -917,14 +973,14 @@ def readTypedValue(type, arg, tokens, name, globals, locals):
 		raise NameError(msg)
 
 #
-#	parseConstraint(constraints, args, tokens, name, globals, locals):
+#	parseConstraint(constraints, args, tokens, name)
 #
 
 def skipConstraint(type):
 	if type == 'PYTHON':
 		return True
 	elif type == 'CHILDOF':
-		return True
+		return False
 	return False
 
 def parseConstraint(constraints, args, tokens, name):
@@ -935,6 +991,7 @@ def parseConstraint(constraints, args, tokens, name):
 		nErrors += 1
 		return None
 	typeCns = Constraint.Type[typeName]
+	print "Constraint "+typeName
 	try:
 		cns = constraints.append(typeCns)
 	except:
@@ -962,7 +1019,11 @@ def parseConstraint(constraints, args, tokens, name):
 			idx = Constraint.Settings[key]
 			x = readTypedValue(val[0], val[1], val, "cns[idx]", globals(), locals())
 			try:
-				cns[idx] = x
+				if type(x) == list:
+					for n in range(len(x)):
+						cns[idx][n] = x[n]
+				else:
+					cns[idx] = x
 				failed = False
 			except:
 				failed = True
@@ -1290,5 +1351,5 @@ def gui():
 
 Draw.Register(gui, event, button_event) 
 
-#main("~/mhx2/cube.mhx")
-#main("~/makehuman/exports/foo.mhx")
+#main("/home/thomas/mhx3/test.mhx")
+#main("/program/makehuman/exports/foo.mhx")
