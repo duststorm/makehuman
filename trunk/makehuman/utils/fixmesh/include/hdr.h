@@ -10,6 +10,8 @@
 /*
 	Includes
 */
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,6 +183,8 @@ struct Mesh {
 	void writeTargetFile(const char *name, bool detail, double threshold);
 	void readVGroupFile(const char *name);
 	void writeVGroupFile(const char *name, double threshold);
+	
+	void printFace(FILE *out, int f, bool doText);
 
 	void initGroups();
 	void allocGroups();
@@ -199,6 +203,8 @@ struct Mesh {
 
 	void saveNeighbors(const char *name);
 	void readNeighbors(const char *name);
+
+
 
 	Face *findBestFaceWeights(Vert *pVert, double *weights,
 	                          int *facesInZone, int *reorder,

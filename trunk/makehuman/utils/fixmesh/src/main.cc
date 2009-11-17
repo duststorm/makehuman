@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
 	char morph[BUFSIZE];
 	char moName1[BUFSIZE];
 	char moName2[BUFSIZE];
+	char objName2[BUFSIZE];
 	memset(morph, 0, BUFSIZE*sizeof(char));
 
 	// int group;
@@ -85,22 +86,25 @@ int main(int argc, char* argv[])
 	bool detail = false;
 	verbosity = 2;
 	zoneSize = 2.0;
-	weightStep = 0.2;
+	weightStep = 0.6;
 	detailThreshold = 0.7;
 	
 	// default names, for debugging
 
-//	strcpy(morph, "data/old/targets/macrodetails/africa-aethiopid-female-child.target");
+	strcpy(morph, "data/old/targets/macrodetails/africa-aethiopid-female-child.target");
 //	strcpy(morph, "data/old/targets/microdetails/head-back-skull-scale-depth-decr.target");
 //	strcpy(morph, "data/old/targets/details/ear-trans-in.target");
-//	strcpy(morph, "data/old/targets/shapes/smile.target");
-	strcpy(morph, "data/old/targets/shapes/head.vgroup");
-	strcpy(theDir, "/home/thomas/fixmesh/");
+//	strcpy(morph, "data/old/targehts/shapes/smile.target");
+//	strcpy(morph, "data/old/targets/shapes/head.vgroup");
+//	strcpy(theDir, "/home/thomas/fixmesh/");
+//	strcpy(theDir, "C:/Users/Thomas/Documents/Visual Studio 2008/Projects/fixmesh/");
+	strcpy(theDir, "C:/Users/Thomas/svn/makehuman/utils/fixmesh/");
 
 	
 	// parse command line
 
-	mode = M_FGROUP;
+	mode = M_CONVERT;
+	objFile = true;
 	detail = true;
 
 	int i = 0;
@@ -155,9 +159,11 @@ int main(int argc, char* argv[])
 #if 1
 	sprintf(moName1, "../../data/targets/%s", morph+19);
 	sprintf(moName2, "data/new/targets/%s", morph+19);
+	sprintf(objName2, "data/new/objs/%s", morph+19);
 #else
 	sprintf(moName1, "data/old/targets/%s", morph+17);
 	sprintf(moName2, "data/new/targets/%s", morph+17);
+	sprintf(objName2, "data/new/objs/%s", morph+19);
 #endif
 
 	// Run the program
@@ -171,13 +177,9 @@ int main(int argc, char* argv[])
 		printf("Building table %s -> %s\n", name1, name2);
 
 		mesh1.readObjFile (name1, F_ONLYTRIS);
-		mesh1.findCenter();
-		mesh1.m_center.dump(stdout, "Center ", "\n");
 		dumpMesh(&mesh1, name1);
 
 		mesh2.readObjFile (name2, F_ONLYTRIS);
-		mesh2.findCenter();
-		mesh2.m_center.dump(stdout, "Center ", "\n");
 		dumpMesh(&mesh2, name2);
 
 		mesh1.remapMaterials (&mesh2);
@@ -243,7 +245,7 @@ int main(int argc, char* argv[])
 		mesh2.moveWeights(&mesh1);	
 
 		if (objFile)
-			mesh2.writeObjFile(moName2, F_PRINTGROUPS);
+			mesh2.writeObjFile(objName2, 0);
 
 #if 0			
 		if (detail) {

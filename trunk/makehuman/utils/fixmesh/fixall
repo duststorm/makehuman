@@ -2,7 +2,7 @@
 
 mydir=./
 
-./fixmesh -build -weight 0.2 -zone 2.0 -verbosity 1 -dir $mydir
+./fixmesh -build -weight 0.35 -zone 2.0 -verbosity 1 -dir $mydir
 
 ./fixmesh -fgroup -verbosity 1 -dir $mydir
 

@@ -335,6 +335,7 @@ Face *Mesh::findBestFaceWeights(Vert *pVert, double *weights,
 	Face *pFace;
 	int i, j, n;
 	bool test;
+	double dev, mindev, w;
 	//int ntries = 0;
 
 	int nInZone;
@@ -419,15 +420,28 @@ Face *Mesh::findBestFaceWeights(Vert *pVert, double *weights,
 
 	// We should have left before we arrive here.
 	printf("\nDid not find a best face for vert %d at ", pVert->m_idx);
-	pVert->m_co.dump(stdout, "(", "). \nTested:");
+	pVert->m_co.dump(stdout, "(", ").\n");
+	mindev = Infinity;
 	for (n = 0; n < nInZone; n++) {
 		i = reorder[n];
-		printf("\n%d %d %d:", n, i, facesInZone[i]);
+		if (verbosity > 1)
+			printf("\n%d %d %d:", n, i, facesInZone[i]);
+		dev = 0.0;
 		for (j = 0; j < 3; j++) {
-			printf(" %5.2lf: ", weightsInZone[3*i+j]);
-			m_verts[pFace[i].m_v[j]].m_co.dump(stdout, "(", ") ");
+			w = weightsInZone[3*i+j];
+			if (w > 1+dev) 
+				dev = w-1;
+			else if (w < -dev)
+				dev = -w;
+			if (verbosity > 1) {
+				printf(" %5.2lf: ", w); 
+				m_verts[pFace[i].m_v[j]].m_co.dump(stdout, "(", ") ");
+			}
 		}
+		if (dev < mindev)
+			mindev = dev;
 	}
+	printf("Tested %d faces. Rerun with -weight > %7.3lf\n", nInZone, mindev);
 	RaiseError0("\nfindBestFace");
 
 	return 0;

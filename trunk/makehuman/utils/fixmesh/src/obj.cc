@@ -10,6 +10,7 @@
 #include <math.h>
 #include "hdr.h"
 
+
 /*
 	TextVert
 */
@@ -366,6 +367,12 @@ void Mesh::remapMaterials(Mesh *mesh)
 			}
 		}
 	}
+
+	if (verbosity >= 2) {
+		for (i = 0; i < m_nMaterials; i++) {
+			printf("%2d %2d %15s %15s\n", i, map[i], mesh->m_matName[i], m_matName[i]);
+		}
+	}
 	
 	for (f = 0; f < m_nFaces; f++) {
 		m_faces[f].m_mat = map[m_faces[f].m_mat];
@@ -456,7 +463,6 @@ void Mesh::writeObjFile(const char *tarName, int flagsTar)
 	int v, f, g;
 	double *uv;
 	Vector3 u;
-	int *vlist, *tlist;
 	char file[BUFSIZE];
 	bool empty = true;
 
@@ -489,32 +495,44 @@ void Mesh::writeObjFile(const char *tarName, int flagsTar)
 			if (!empty)
 				fprintf(out, "g part_%s\n", m_groupNames[g]);
 		}
-	
-		for (f = 0; f < m_nFaces; f++) {
-			if (m_faces[f].m_bestGroup == g) {
-				vlist = m_faces[f].m_v;
-				if (flagsTar & F_TEXTVERTS) {
-					tlist = m_faces[f].m_tv;
-					fprintf(out, "f %d/%d %d/%d %d/%d", 
-						vlist[0]+1, tlist[0]+1, vlist[1]+1, tlist[1]+1, vlist[2]+1, tlist[2]+1);
-					if (vlist[3] < 0)
-						fprintf(out, "\n");
-					else
-						fprintf(out, " %d/%d\n", vlist[3]+1, tlist[3]+1);
-				}
-				else {
-					fprintf(out, "f %d %d %d", vlist[0]+1, vlist[1]+1, vlist[2]+1);
-					if (vlist[3] < 0)
-						fprintf(out, "\n");
-					else
-						fprintf(out, " %d\n", vlist[3]+1);
-				}
+
+		if (m_nGroups == 1) {
+			for (f = 0; f < m_nFaces; f++) 
+				printFace(out, f, flagsTar & F_TEXTVERTS);
+		}
+		else {
+			for (f = 0; f < m_nFaces; f++) {
+				if (m_faces[f].m_bestGroup == g) 
+					printFace(out, f, flagsTar & F_TEXTVERTS);
 			}
 		}
 	}
 	fclose(out);
 	if (verbosity > 0)
 		printf("Obj file %s written\n", file);
+}
+
+void Mesh::printFace(FILE *out, int f, bool doText)
+{
+	int *vlist = m_faces[f].m_v;
+	int *tlist;
+
+	if (doText) {
+		tlist = m_faces[f].m_tv;
+		fprintf(out, "f %d/%d %d/%d %d/%d", 
+			vlist[0]+1, tlist[0]+1, vlist[1]+1, tlist[1]+1, vlist[2]+1, tlist[2]+1);
+		if (vlist[3] < 0)
+			fprintf(out, "\n");
+		else
+			fprintf(out, " %d/%d\n", vlist[3]+1, tlist[3]+1);
+	}
+	else {
+		fprintf(out, "f %d %d %d", vlist[0]+1, vlist[1]+1, vlist[2]+1);
+		if (vlist[3] < 0)
+			fprintf(out, "\n");
+		else
+			fprintf(out, " %d\n", vlist[3]+1);
+	}
 }
 
 /*
