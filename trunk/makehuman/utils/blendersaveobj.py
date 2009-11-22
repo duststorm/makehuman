@@ -21,7 +21,7 @@ It's needed because default Blender exporter don't support face groups.
 __docformat__ = 'restructuredtext'
 
 import Blender
-def saveObj(path,prefix="part"):
+def saveObj(path,prefix="no"):
     """
     This function saves an object from Blender.  
     
@@ -66,8 +66,8 @@ def saveObj(path,prefix="part"):
     for g in vertsGroups:
         print "Exporting facegroup:", g
         groupNameData = g.split('_')
-        if groupNameData[0] == prefix:
-            fileDescriptor.write("g %s\n" % (groupNameData[1]))
+        if groupNameData[0] != prefix:
+            fileDescriptor.write("g %s\n" % (g))
             vIndxList = data.getVertsFromGroup(g)
 
             #Check if the face is contained into a facegroup
