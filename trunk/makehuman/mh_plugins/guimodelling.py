@@ -39,7 +39,6 @@ class ModellingCategory(gui3d.Category):
       guimacromodelling.MacroModelingTaskView(self)
       guidetailmodelling.DetailModelingTaskView(self)
       guidetailmodelling.MicroModelingTaskView(self)
-      gui3d.TaskView(self, "Anime modeling",  self.app.getThemeResource("images", "button_expressions.png"))
       
     # Rotate and pan the camera
     def onMouseDragged(self, event):
