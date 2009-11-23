@@ -44,8 +44,13 @@ import os
 MAJOR_VERSION = 0
 MINOR_VERSION = 3
 verbosity = 1
-minimality = 0
 Epsilon = 1e-6
+done = 0
+
+toggleMhxBase = 0
+toggleGeoOnly = 0
+MHDir = "C:/program/makehuman/"
+
 
 #
 #	getObject(ob):
@@ -150,7 +155,7 @@ def writeTyped(type, key, arg, fp, n):
 #
 
 def writeMhxFile(fileName):
-	# Check fileName
+	global done
 	n = len(fileName)
 	if fileName[n-3:] != "mhx":
 		Draw.PupMenu("Error: Not a mhx file: " + fileName)
@@ -167,7 +172,7 @@ def writeMhxFile(fileName):
 	for grp in Group.Get():
 		exportGroup(grp, fp)
 
-	if not minimality:
+	if not toggleGeoOnly:
 		fp.write("\n# ------------------ IPOs -------------------------------- # \n \n")
 		for ipo in Ipo.Get():
 			exportIpo(ipo, fp, False)
@@ -190,6 +195,7 @@ def writeMhxFile(fileName):
 
 	fp.close()
 	print "MHX file %s written \n" % (fileName)
+	done = 1
 
 #
 #	exportMaterial(mat, fp):
@@ -445,7 +451,7 @@ def exportFileName(file, fp):
 def exportImage(img, fp):
 	fp.write("  image %s\n" % img.name)
 	exportFileName(img.filename, fp)
-	if not minimality:
+	if not toggleGeoOnly:
 		writeList("img", imageList, fp, 2, globals(), locals())
 	fp.write("  end image\n")
 	return
@@ -719,12 +725,14 @@ def exportObject(ob, fp):
 	fp.write("\n# ----------------------------- %s --------------------- # \n\n" % ob.type )
 	if ob.type == "Mesh":
 		exportMesh(ob, fp)
-	elif minimality:
+	elif toggleMhxBase:
 		return
 	elif ob.type == "Armature":
 		exportArmature(ob, fp)
 	elif ob.type == "Empty":
 		fp.write("empty ;\n")
+	elif toggleGeoOnly:
+		return
 	elif ob.type == "Lattice":
 		exportLattice(ob,fp)
 	elif ob.type == "Lamp":
@@ -767,7 +775,7 @@ def exportObject(ob, fp):
 	if ob.ipo:
 		fp.write("  ipo %s ;\n" % ob.ipo.name.replace(' ','_'))
 	
-	if not minimality:
+	if not toggleGeoOnly:
 		writeList("ob", objectList, fp, 2, globals(), locals())
 
 	for cns in ob.constraints:
@@ -899,8 +907,12 @@ def exportMesh(ob, fp):
 	fp.write("mesh %s %s \n" % (meName, obName))
 	for mat in me.materials:
 		fp.write("  material %s ;\n" % mat.name.replace(" ", "_"))
-	for v in me.verts:
+	if toggleMhxBase and obName == 'Human':
+		v = me.verts[0]
 		fp.write("  v %f %f %f ;\n" %(v.co[0], v.co[1], v.co[2]))
+	else:
+		for v in me.verts:
+			fp.write("  v %f %f %f ;\n" %(v.co[0], v.co[1], v.co[2]))
 	if verbosity > 1:
 		print "Verts saved"
 
@@ -916,7 +928,22 @@ def exportMesh(ob, fp):
 	#
 	#	Faces and face UV
 	#
-	if me.faceUV:
+	if me.faceUV and toggleMhxBase and obName == 'Human':
+		print "single face with vt"
+		f = me.faces[0]
+		for uv in f.uv:
+			fp.write("  vt %f %f ;\n" %(uv.x, uv.y))
+		fp.write("  f")
+		v = f.verts[0]
+		n = 0
+		for v in f.verts:
+			fp.write(" %d/%d" %( v.index, n ))
+			n += 1
+		fp.write(" ;\n")
+		fp.write("  ftall %x %x %d %d %d ;\n" % (f.flag, f.mode, f.transp, f.mat, f.smooth))
+
+	elif me.faceUV:
+		print "multi faces with vt"
 		for f in me.faces:
 			for uv in f.uv:
 				fp.write("  vt %f %f ;\n" %(uv.x, uv.y))
@@ -927,19 +954,29 @@ def exportMesh(ob, fp):
 				fp.write(" %d/%d" %( v.index, n ))
 				n += 1
 			fp.write(" ;\n")
-		if minimality or len(me.materials) <= 1:
+		if len(me.materials) <= 1:
 			fp.write("  ftall %x %x %d %d %d ;\n" % (f.flag, f.mode, f.transp, f.mat, f.smooth))
 		else:
 			for f in me.faces:
 				fp.write("  ft %d %x %x %d %d %d ;\n" % (f.index, f.flag, f.mode, f.transp, f.mat, f.smooth))
 			
+	elif me.faces and toggleMhxBase and obName == 'Human':
+		print "single face w/o vt"
+		fp.write("  f")
+		f = me.faces[0]
+		for v in f.verts:
+			fp.write(" %i" %( v.index ))
+		fp.write(" ;\n")
+		fp.write("  fxall %d %d ;\n" %  ( f.mat, f.smooth))
+
 	elif me.faces:
+		print "multi faces w/o vt"
 		for f in me.faces:
 			fp.write("  f")
 			for v in f.verts:
 				fp.write(" %i" %( v.index ))
 			fp.write(" ;\n")
-		if minimality or len(me.materials) <= 1:
+		if len(me.materials) <= 1:
 			fp.write("  fxall %d %d ;\n" %  ( f.mat, f.smooth))
 		else:
 			for f in me.faces:
@@ -966,7 +1003,6 @@ def exportMesh(ob, fp):
 			g1 = g
 			
 		if save:	
-			# print "vg ", g, " to ", g1
 			try:
 				vgroup = me.getVertsFromGroup(g, True)
 				fp.write("vertgroup %s \n" % g1 )
@@ -993,7 +1029,7 @@ def exportMesh(ob, fp):
 			fp.write("    end shapekey\n")
 		exportIpo(me.key.ipo, fp, True)
 
-	if not minimality:
+	if not toggleGeoOnly:
 		writeList("me", meshList, fp, 2, globals(), locals())
 	fp.write("end mesh\n")
 	return # exportMesh
@@ -1040,7 +1076,7 @@ def exportArmature(ob, fp):
 		if b.parent == None:
 			exportBone(fp, 2, b)
 			fp.write("\n")
-	if not minimality:
+	if not toggleGeoOnly:
 		writeList("amt", armatureList, fp, 2, globals(), locals())
 	fp.write("end armature\n")
 
@@ -1061,7 +1097,7 @@ armatureList = [\
 	("xint", "drawType"), \
 	("bool", "envelopes"), \
 	("bool", "ghost"), \
-	("int", "ghostStep"), \
+	#("int", "ghostStep"), \
 	("xint", "layerMask"), \
 	("string", "lib"), \
 	("bool", "mirrorEdit"), \
@@ -1104,7 +1140,7 @@ def exportBone(fp, n, bone):
 	fp.write("    head %6.3f %6.3f %6.3f ;\n" % (head[0], head[1], head[2]))
 	tail = bone.tail['ARMATURESPACE']
 	fp.write("    tail %6.3f %6.3f %6.3f ;\n" % (tail[0], tail[1], tail[2]))
-	if not minimality:
+	if not toggleGeoOnly:
 		writeList("bone", editboneList, fp, n+2, globals(), locals())
 	fp.write("  end bone\n\n")
 	
@@ -1132,7 +1168,7 @@ def exportPoseBone(fp, pb):
 	flags = pb.limitX | ( pb.limitY << 1) | (pb.limitZ << 2)
 	flags |= (pb.lockXRot <<3) | (pb.lockYRot <<4) | (pb.lockZRot <<5)
 	fp.write("\n  posebone %s %x \n" % (pb.name.replace(' ', '_'), flags))
-	if not minimality:
+	if not toggleGeoOnly:
 		writeList("pb", poseboneList, fp, 2, globals(), locals())	
 	for cns in pb.constraints:
 		exportConstraint(cns, fp)
@@ -1141,15 +1177,8 @@ def exportPoseBone(fp, pb):
 
 poseboneList = [\
 	("object", "displayObject"), \
-	#("xint", "layerMask"), \
-	#("bool", "limitX"), \
-	#("bool", "limitY"), \
-	#("bool", "limitZ"), \
 	("tuple3floats", "limitmax"), \
 	("tuple3floats", "limitmin"), \
-	#("bool", "lockXRot"), \
-	#("bool", "lockYRot"), \
-	#("bool", "lockZRot"), \
 	("vector", "size"), \
 	("float", "stiffX"), \
 	("float", "stiffY"), \
@@ -1397,7 +1426,6 @@ curveList = [\
 	("tuple3floats", "rot"), \
 	("tuple3floats", "size"), \
 	("object", "taperob"), \
-	#("int", "totcol"), \
 	("float", "width") \
 ]
 
@@ -1430,7 +1458,7 @@ def exportGroup(grp, fp):
 	fp.write("group %s\n" % grp.name)
 	for ob in grp.objects:
 		fp.write("  object %s ;\n" % ob.name.replace(' ','_'))
-	if not minimality:
+	if not toggleGeoOnly:
 		writeList("grp", groupList, fp, 2, globals(), locals())
 	fp.write("end group\n")
 	return
@@ -1469,13 +1497,60 @@ def exportKeyBlock(block, fp):
 
 
 #
-#	Main entry point
-#	Change the filename to point to your MakeHuman directory
+#	User interface
 #
 
-#file = "/home/thomas/mhx3/mhxbase.mhx"
-#file = "/program/makehuman/data/3dobjs/mhxbase.mhx"
-#writeMhxFile(file)
-#Draw.PupMenu("File "+file+" exported")
+def event(evt, val):   
+	if done:
+		Draw.Exit()               
+		return		
+	if not val:  # val = 0: it's a key/mbutton release
+		if evt in [Draw.LEFTMOUSE, Draw.MIDDLEMOUSE, Draw.RIGHTMOUSE]:
+			Draw.Redraw(-1)
+		return
+	if evt == Draw.ESCKEY:
+		Draw.Exit()               
+		return
+	else: 
+		return
+	Draw.Redraw(-1)
 
-Blender.Window.FileSelector (writeMhxFile, 'SAVE MHX FILE')
+def button_event(evt): 
+	global toggleMhxBase, toggleGeoOnly, MHDir
+	if evt == 1:
+		toggleMhxBase = 1 - toggleMhxBase
+		if toggleMhxBase:
+			toggleGeoOnly = 1
+	elif evt == 2:
+		toggleGeoOnly = 1 - toggleGeoOnly
+		if not toggleGeoOnly:
+			toggleMhxBase = 0
+	elif evt == 7:
+		if toggleMhxBase:
+			writeMhxFile(MHDir+"data/3dobjs/mhxbase.mhx")
+		else:
+			Blender.Window.FileSelector (writeMhxFile, 'SAVE MHX FILE')
+	elif evt == 8:
+		Draw.Exit()
+		return
+	if evt == 9:
+		MHDir = Draw.PupStrInput("", MHDir, 100)
+	Draw.Redraw(-1)
+
+def gui():
+	BGL.glClearColor(1,1,0,1)
+	BGL.glClear(BGL.GL_COLOR_BUFFER_BIT)
+	BGL.glColor3f(0,0,0)
+
+	BGL.glRasterPos2i(10,170)
+	Draw.Text("MHX (MakeHuman eXchange format) exporter for Blender", "large")
+	BGL.glRasterPos2i(10,150)
+	Draw.Text("Version %d.%d" % (MAJOR_VERSION, MINOR_VERSION), "normal")
+	Draw.Toggle("Mhxbase", 1, 10, 110, 90, 20, toggleMhxBase)
+	Draw.Toggle("Only geo", 2, 110, 110, 90, 20, toggleGeoOnly)
+	Draw.PushButton("Export MHX file", 7, 10, 10, 150, 40)
+	Draw.PushButton("Cancel", 8, 210, 10, 90, 20)
+	Draw.PushButton("MH directory", 9, 210, 40, 90, 20) 
+	done = 0
+
+Draw.Register(gui, event, button_event) 

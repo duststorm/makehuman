@@ -50,17 +50,14 @@ def exportMhx(obj, filename):
 	return
 	
 
+def exportRawData(obj, fp):	
+	# Ugly klugdy fix of extra vert
+	x1 = aljabr.vadd(obj.verts[11137].co, obj.verts[11140].co)
+	x2 = aljabr.vadd(obj.verts[11162].co, obj.verts[11178].co)
+	x = aljabr.vadd(x1,x2)
+	obj.verts[14637].co = aljabr.vmul(x, 0.25)
+	# end ugly kludgy
 
-def exportRawMesh(obj, fp):
-	fp.write(\
-"# MakeHuman exported MHX\n" \
-"# www.makehuman.org\n" \
-"MHX 0 3 ;\n\n")
-
-	fp.write(\
-"if useMesh \n\
-mesh Human Human \n")
-	
 	for v in obj.verts:
 		fp.write("v %f %f %f ;\n" %(v.co[0], v.co[1], v.co[2]))
 		
@@ -73,7 +70,18 @@ mesh Human Human \n")
 		for v in f:
 			fp.write(" %i/%i " %(v[0], v[1]))
 		fp.write(";\n")
-	
+
+
+def exportRawMesh(obj, fp):
+	fp.write(\
+"# MakeHuman exported MHX\n" \
+"# www.makehuman.org\n" \
+"MHX 0 3 ;\n\n")
+
+	fp.write(\
+"if useMesh \n\
+mesh Human Human \n")
+	exportRawData(obj, fp)
 	fp.write(\
 "end mesh\n\
 \nobject Human Mesh Human \n\
@@ -89,7 +97,6 @@ end useMesh\n")
 def exportArmature(obj, fp):
 	mhxbones.writeJoints(obj, fp)
 	fp.write("\narmature HumanRig HumanRig\n")
-
 	mhxbones.writeBones(obj, fp)
 	fp.write(\
 "\tlayerMask 0x101 ;\n\
@@ -98,8 +105,6 @@ def exportArmature(obj, fp):
 \tdrawAxes false ;\n\
 \tdrawNames false ;\n\
 \tenvelopes false ;\n\
-\tghost false ;\n\
-\tghostStep 0 ;\n\
 \tmirrorEdit true ;\n\
 \trestPosition false ;\n\
 \tvertexGroups true ;\n\
@@ -115,7 +120,7 @@ object HumanRig Armature HumanRig \n\
 \txRay true ;\n\
 end object\n")
 
-	mhxbones.writeEmpties(fp)
+	#mhxbones.writeEmpties(fp)
 
 	return exportArmature
 
@@ -123,8 +128,10 @@ end object\n")
 #
 #	exportFromMhxTemplate(obj, tmpl, fp):
 #
-
+splitLeftRight = True
+	
 def exportFromMhxTemplate(obj, tmpl, fp):
+	global splitLeftRight
 
 	inZone = False
 	skip = False
@@ -152,6 +159,19 @@ def exportFromMhxTemplate(obj, tmpl, fp):
 				inZone = False
 				skip = False
 				skipOne = True
+			elif lineSplit[1] == 'shapekey':
+				if 0 and shapekey != 'Basis' and shapekey != "Smile" and shapekey != "Narrow" and shapekey != "MouthOpen":
+					pass
+				elif leftRightKey[shapekey] and splitLeftRight:
+					writeShapeKey(fp, shapekey+"_L", shapeVerts, "Left", sliderMin, sliderMax)
+					writeShapeKey(fp, shapekey+"_R", shapeVerts, "Right", sliderMin, sliderMax)
+				else:
+					writeShapeKey(fp, shapekey, shapeVerts, "None", sliderMin, sliderMax)
+				skip = False
+				skipOne = True
+			elif lineSplit[1] == 'ipo':
+				skip = False
+				skipOne = True
 		elif lineSplit[0] == 'mesh' and lineSplit[1] == 'Human':
 			inZone = True
 			mainMesh = True
@@ -166,14 +186,96 @@ def exportFromMhxTemplate(obj, tmpl, fp):
 			skip = True
 		elif lineSplit[0] == 'v' and inZone:
 			if not skip:
-				for v in obj.verts:
-					fp.write("v %f %f %f ;\n" %(v.co[0], v.co[1], v.co[2]))
+				exportRawData(obj, fp)
 				skip = True
-		elif lineSplit[0] == 'vt' and skip:
-			inZone = False
+		elif lineSplit[0] == 'f' and skip:
 			skip = False
+			skipOne = True
+		elif lineSplit[0] == 'shapekey' and mainMesh:
+			shapekey = lineSplit[1]
+			sliderMin = lineSplit[2]
+			sliderMax = lineSplit[3]
+			shapeVerts = []
+			skip = True
+		elif lineSplit[0] == 'sv' and skip:
+			shapeVerts.append(line)
+		elif lineSplit[0] == 'ipo' and mainMesh:
+			writeIpo(fp)
+			skip = True
 
 		if not (skip or skipOne):
 			fp.write(line)
 	
 	return
+
+#
+#	leftRightKey - True if shapekey comes in two parts
+#
+
+leftRightKey = dict({\
+	"Basis" : False, \
+	"BendElbowForward" : True, \
+	"BendHeadForward" : False, \
+	"BendKneeBack" : True, \
+	"BendLegBack" : True, \
+	"BendLegForward" : True, \
+	"BrowsDown" : True, \
+	"BrowsMidDown" : False, \
+	"BrowsMidUp" : False, \
+	"BrowsOutUp" : True, \
+	"BrowsSqueeze" : False, \
+	"CheekUp" : True, \
+	"Frown" : True, \
+	"UpLidDown" : True, \
+	"LoLidUp" : True, \
+	"Narrow" : True, \
+	"ShoulderDown" : True, \
+	"Smile" : True, \
+	"Sneer" : True, \
+	"Squint" : True, \
+	"TongueOut" : False, \
+	"ToungeUp" : False, \
+	"ToungeLeft" : False, \
+	"ToungeRight" : False, \
+	"UpLipUp" : True, \
+	"LoLipDown" : True, \
+	"MouthOpen" : False, \
+	"UpLipDown" : True, \
+	"LoLipUp" : True, \
+})
+
+#
+#	writeShapeKey(fp, shapekey, shapeVerts, vgroup, sliderMin, sliderMax):
+#
+
+def writeShapeKey(fp, shapekey, shapeVerts, vgroup, sliderMin, sliderMax):
+	fp.write("shapekey %s %s %s %s\n" % (shapekey, sliderMin, sliderMax, vgroup))
+	for line in shapeVerts:
+		fp.write(line)
+	fp.write("end shapekey\n")
+
+#
+#	writeIcu(fp, shape, expr):
+#
+
+def writeIcu(fp, shape, expr):
+	fp.write(\
+"\ticu %s 0 1\n \
+\t\tdriver 2 ;\n\
+\t\tdriverObject _object['Human'] ;\n\
+\t\tdriverChannel 1 ;\n\
+\t\tdriverExpression '%s' ;\n\
+\tend icu\n" % (shape, expr))
+
+def writeIpo(fp):
+	global splitLeftRight
+	fp.write("ipo Key KeyIpo\n")
+	for (shape, lr) in leftRightKey.items():
+		if shape == 'Basis':
+			pass
+		elif lr and splitLeftRight:
+			writeIcu(fp, shape+'_L', 'p.ctrl'+shape+'_L()')
+			writeIcu(fp, shape+'_R', 'p.ctrl'+shape+'_R()')
+		else:
+			writeIcu(fp, shape, 'p.ctrl'+shape+'()')
+	fp.write("end ipo\n")

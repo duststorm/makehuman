@@ -260,6 +260,9 @@ vertLocations = [
 #	Switching left and right compare to the MH joints
 #
 
+dx = 0.2
+dz = 0.3
+
 armature = [
 	("Root", "None", "mid-feet", [0,1,0], "mid-feet", [0,-1,0], F_NODEF, L_FK, "MHCircle15", 0),
 	("Torso", "Root", "pelvis", [0,0,-3], "pelvis", 0, F_NODEF, L_FK+L_TORSO, None, 0),
@@ -288,9 +291,9 @@ armature = [
 	("UpLid_L", "Head", "r-eye", 0, "r-upLid", 0, 0, L_DEFORM, None, 0),
 	("LoLid_L", "Head", "r-eye", 0, "r-loLid", 0, 0, L_DEFORM, None, 0),
 
-	("Gaze", "Root", "mid-eyes", [0,0,5.25], "mid-eyes", [0,0,4.25], F_NODEF, L_HEAD, None, 0),
-	("Gaze_R", "Gaze", "l-eye", [0,0,5], "l-eye", [0,0,4.5], F_NODEF, L_HEAD, None, 0),
-	("Gaze_L", "Gaze", "r-eye", [0,0,5], "r-eye", [0,0,4.5], F_NODEF, L_HEAD, None, 0),
+	("Gaze", "Root", "mid-eyes", [0,0,5.25], "mid-eyes", [0,0,4.25], F_NODEF, L_HEAD+L_PANEL, None, 0),
+	("Gaze_R", "Gaze", "l-eye", [0,0,5], "l-eye", [0,0,4.5], F_NODEF, L_HEAD+L_PANEL, None, 0),
+	("Gaze_L", "Gaze", "r-eye", [0,0,5], "r-eye", [0,0,4.5], F_NODEF, L_HEAD+L_PANEL, None, 0),
 
 	("Clavicle_L", "Spine1", "r-clavicle", 0, "r-shoulder", 0, F_CON, L_FK+L_DEFORM+L_ARMFK, "MHCircle05", 0),
 	("UpArm_L", "Clavicle_L", "r-shoulder", 0, "r-elbow", 0, F_CON, L_FK+L_DEFORM+L_ARMFK, "MHCircle03", 0),
@@ -434,22 +437,55 @@ armature = [
 	("Finger-5-IK_L", "Finger-5_L", "r-finger-5-end", 0, "r-finger-5-3", 0, F_NODEF, L_HELP, None, 0),
 	("Finger-5-Pole_L", "Finger-5_L", "r-finger-5-2", 0, "r-finger-5-2", [0,0.3,0], F_NODEF, L_HANDIK, "MHBall", 0),
 
-	# Osipa-like control panel
+	# Face representation
+	
+	("PFace", "None", "origin", 0, "origin", [0,0,1], F_NODEF, L_PANEL, "MHFace", 0),
 
-	("Panel", "None", "origin", [-0.25,-0.25,0], "origin", [-0.25,-0.25,1], F_NODEF, L_PANEL, "Panel", 0),
-	("PSync", "Panel", "origin", [1.5,1,0], "origin", [1.5,1,1], F_NODEF, L_PANEL, None, 0),
-	("PLips", "Panel", "origin", [3.0,0,0], "origin", [3,0,1], F_NODEF, L_PANEL, None, 0),
-	("PTounge", "Panel", "origin", [4.5,0,0], "origin", [4.5,0,1], F_NODEF, L_PANEL, None, 0),
-	("PMouthEmotion", "Panel", "origin", [4.0,1.5,0], "origin", [4,1.5,1], F_NODEF, L_PANEL, None, 0),
-	("PBrows", "Panel", "origin", [0,4,0], "origin", [0,4,1], F_NODEF, L_PANEL, None, 0),
-	("PBrowEmotion", "Panel", "origin", [1.5,4,0], "origin", [1.5,4,1], F_NODEF, L_PANEL, None, 0),
-	("PEyeLids", "Panel", "origin", [4,4,0], "origin", [4,4,1], F_NODEF, L_PANEL, None, 0),
-	("PEyes", "Panel", "origin", [6.5,4,0], "origin", [6.5,4,1], F_NODEF, L_PANEL, None, 0),
+	("PBrow_R", "PFace", "origin", [-2*dx,4.3*dx,0], "origin", [-2*dx,4*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PBrow_L", "PFace", "origin", [2*dx,4.3*dx,0], "origin", [2*dx,4*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PBrows", "PFace", "origin", [0,4*dx,0], "origin", [0,4*dx,dz], F_NODEF, L_PANEL, None, 0),
+
+	("PUpLid_R", "PFace", "origin", [-2*dx,2.8*dx,0], "origin", [-2*dx,2.8*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PUpLid_L", "PFace", "origin", [2*dx,2.8*dx,0], "origin", [2*dx,2.8*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PLoLid_R", "PFace", "origin", [-2*dx,1*dx,0], "origin", [-2*dx,1*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PLoLid_L", "PFace", "origin", [2*dx,1*dx,0], "origin", [2*dx,1*dx,dz], F_NODEF, L_PANEL, None, 0),
+
+	("PCheek_R", "PFace", "origin", [-2*dx,0,0], "origin", [-2*dx,0,dz], F_NODEF, L_PANEL, None, 0),
+	("PCheek_L", "PFace", "origin", [2*dx,0,0], "origin", [2*dx,0,dz], F_NODEF, L_PANEL, None, 0),
+
+	("PNose", "PFace", "origin", [0,0,0], "origin", [0,0,dz], F_NODEF, L_PANEL, None, 0),
+	("PUpLip", "PFace", "origin", [0,-1.2*dx,0], "origin", [0,-1.2*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PLoLip", "PFace", "origin", [0,-3.8*dx,0], "origin", [0,-3.8*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PMouth", "PFace", "origin", [0,-2.5*dx,0], "origin", [0,-2.5*dx,dz], F_NODEF, L_PANEL, None, 0),
+
+	("PUpLip_R", "PFace", "origin", [-1*dx,-1.8*dx,0], "origin", [-1*dx,-1.8*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PUpLip_L", "PFace", "origin", [1*dx,-1.8*dx,0], "origin", [1*dx,-1.8*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PLoLip_R", "PFace", "origin", [-1*dx,-3.2*dx,0], "origin", [-1*dx,-3.2*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PLoLip_L", "PFace", "origin", [1*dx,-3.2*dx,0], "origin", [1*dx,-3.2*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PMouth_R", "PFace", "origin", [-2.5*dx,-2.5*dx,0], "origin", [-2.5*dx,-2.5*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PMouth_L", "PFace", "origin", [2.5*dx,-2.5*dx,0], "origin", [2.5*dx,-2.5*dx,dz], F_NODEF, L_PANEL, None, 0),
+
+	("PTounge", "PFace", "origin", [0,-4.9*dx,0], "origin", [0,-4.9*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PJaw", "PFace", "origin", [0,-5.7*dx,0], "origin", [0,-5.7*dx,dz], F_NODEF, L_PANEL, None, 0),
+
 ]
 
-
+	# Osipa-like control panel
 '''
+	("Panel", "None", "origin", [-0.25,-0.25,0], "origin", [-0.25,-0.25,1], F_NODEF, L_PANEL, "Panel", 0),
+	("PSync", "Panel", "origin", [1.5,1,0], "origin", [1.5,1.5,0], F_NODEF, L_PANEL, None, 0),
+	("PLips", "Panel", "origin", [3.0,0,0], "origin", [3,0.5,0], F_NODEF, L_PANEL, None, 0),
+	("PTounge", "Panel", "origin", [4.5,0,0], "origin", [4.5,0.5,0], F_NODEF, L_PANEL, None, 0),
+	("PMouthEmotion", "Panel", "origin", [4.0,1.5,0], "origin", [4,2.0,0], F_NODEF, L_PANEL, None, 0),
+	("PBrows", "Panel", "origin", [0,4,0], "origin", [0,4.5,0], F_NODEF, L_PANEL, None, 0),
+	("PBrowEmotion", "Panel", "origin", [1.5,4,0], "origin", [1.5,4.5,0], F_NODEF, L_PANEL, None, 0),
+	("PEyeLids", "Panel", "origin", [4,4,0], "origin", [4,4.5,0], F_NODEF, L_PANEL, None, 0),
+	("PEyes", "Panel", "origin", [6.5,4,0], "origin", [6.5,4.5,0], F_NODEF, L_PANEL, None, 0),
+'''
+
+
 	# IK/FK switch bones. Do not work properly
+'''
 	("ArmIK-switch", "Root", "head-end", [0,1,0], "head-end", [0,1,-1], F_NODEF, L_ROOT),
 	("LegIK-switch", "Root", "head-end", [0,1.5,0], "head-end", [0,1.5,-1], F_NODEF, L_ROOT),
 	("FingerIK-switch", "Root", "head-end", [0,2,0], "head-end", [0,2,-1], F_NODEF, L_ROOT),
@@ -508,15 +544,8 @@ constraints = [
 	("UpArmTwist_R", "IKSOLVER", 1.0, "LoArm_R", None, 1, Bone),
 	("LoArmTwist_R", "IKSOLVER", 1.0, "Hand_R", None, 1, Bone),
 	
-	#("Eye_R" , "IKSOLVER", 1.0, "Gaze_R", "Gaze-switch", 1, Bone),
-	#("Eye_L" , "IKSOLVER", 1.0, "Gaze_L", "Gaze-switch", 1, Bone),
-
-	("Eye_L" , "IKSOLVER", 1.0, "EmptyEye_L", None, 1, Obj),
-	("UpLid_L" , "IKSOLVER", 1.0, "EmptyUpLid_L", None, 1, Obj),
-	("LoLid_L" , "IKSOLVER", 1.0, "EmptyLoLid_L", None, 1, Obj),
-	("Eye_R" , "IKSOLVER", 1.0, "EmptyEye_R", None, 1, Obj),
-	("UpLid_R" , "IKSOLVER", 1.0, "EmptyUpLid_R", None, 1, Obj),
-	("LoLid_R" , "IKSOLVER", 1.0, "EmptyLoLid_R", None, 1, Obj),
+	("Eye_R" , "IKSOLVER", 1.0, "Gaze_R", "Gaze-switch", 1, Bone),
+	("Eye_L" , "IKSOLVER", 1.0, "Gaze_L", "Gaze-switch", 1, Bone),
 
 	("Finger-1-3_R" , "IKSOLVER", 1.0, "Finger-1-IK_R", "FingerIK-switch", 3, Bone),
 	("Finger-2-3_R" , "IKSOLVER", 1.0, "Finger-2-IK_R", "FingerIK-switch", 3, Bone),
@@ -542,17 +571,20 @@ constraints = [
 	("Finger-4-1_L" , "IKSOLVER", 1.0, "Finger-4-Pole_L", "FingerIK-switch", 1, Bone),
 	("Finger-5-1_L" , "IKSOLVER", 1.0, "Finger-5-Pole_L", "FingerIK-switch", 1, Bone),
 
-	# Osipa-like panel
-	("PSync" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 0, -1, 1)),
-	("PLips" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 1, 0, 0, -1, 0)),
-	("PTounge" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 1, 0, 0, -1, 0)),
-	("PMouthEmotion" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 0, -1, 0)),
-	("PBrows" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 0, 0, 0, -1, 1)),
-	("PBrowEmotion" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 0, -1, 0)),
-	("PEyeLids" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 0, -1, 1)),
-	("PEyes" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 0, -1, 1)),
-
 ]	
+	
+	# Osipa-like panel
+'''
+	("PSync" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, -1, 1, 0, 0)),
+	("PLips" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 1, 0, 1, 0, 0)),
+	("PTounge" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 1, 0, 1, 0, 0)),
+	("PMouthEmotion" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 1, 0, 0)),
+	("PBrows" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 0, -1, 1, 0, 0)),
+	("PBrowEmotion" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 1, 0, 0)),
+	("PEyeLids" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, -1, 1, 0, 0)),
+	("PEyes" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, -1, 1, 0, 0)),
+'''
+
 
 
 #
@@ -725,6 +757,33 @@ def writePose(obj, fp):
 					fp.write("\t\tsmash %s ;\n" % smash)
 		fp.write("\tend posebone\n")
 
+
+
+"""
+#
+#	writePyDriver(fp, icu, empty, driverChannel, driverBone, factor1, channel1, factor2, channel2)
+#
+
+def writePyDriver(fp, icu, empty, driverChannel, driverBone, factor1, channel1, factor2, channel2):
+	bone = 'ob("HumanRig").getPose().bones["%s"]' % driverBone
+	expr1 = '%3.1f*%s.%s' % (factor1, bone, channel1)
+	if factor2 == 0:
+		expr2 = ''
+	elif factor2 < 0:
+		expr2 = '-%3.1f*%s.%s' % (-factor2, bone, channel2)
+	else:
+		expr2 = '+%3.1f*%s.%s' % (factor2, bone, channel2)
+
+	fp.write(\
+"  icu %s 0 2 \n\
+    driver 2 ; \n\
+    driverObject _object['%s'] ; \n\
+    driverChannel %d ; \n\
+    driverExpression 'ctrl%s()' ; \n\
+    extend 0 ; \n\
+    interpolation 2 ; \n\
+  end icu \n" % (icu, empty, driverChannel, expr1, expr2) )
+
 #
 #	writeEmpty(fp, empty, loc, offs, parentBone, extra)
 #
@@ -748,31 +807,6 @@ object %s Empty \n\
 		fp.write("  %s ;\n" % extra)
 	fp.write("end object\n")
 
-#
-#	writePyDriver(fp, icu, empty, driverChannel, driverBone, factor1, channel1, factor2, channel2)
-#
-
-def writePyDriver(fp, icu, empty, driverChannel, driverBone, factor1, channel1, factor2, channel2):
-	bone = 'ob("HumanRig").getPose().bones["%s"]' % driverBone
-	expr1 = '%3.1f*%s.%s' % (factor1, bone, channel1)
-	if factor2 == 0:
-		expr2 = ''
-	elif factor2 < 0:
-		expr2 = '-%3.1f*%s.%s' % (-factor2, bone, channel2)
-	else:
-		expr2 = '+%3.1f*%s.%s' % (factor2, bone, channel2)
-
-	fp.write(\
-"  icu %s 0 2 \n\
-    driver 2 ; \n\
-    driverObject _object['%s'] ; \n\
-    driverChannel %d ; \n\
-    driverExpression '%s%s' ; \n\
-    extend 0 ; \n\
-    interpolation 2 ; \n\
-  end icu \n" % (icu, empty, driverChannel, expr1, expr2) )
-
-	
 
 def writeEmpties(fp):
 	fp.write("\nipo Object IpoEye_L\n")
@@ -815,5 +849,5 @@ def writeEmpties(fp):
 	writeEmpty(fp, "EmptyLoLidBase_R", "l-eye", 0, "parent HumanRig 7 Head", "ipo IpoLoLid_R")
 	writeEmpty(fp, "EmptyLoLid_R", "l-loLid", 0, "parent EmptyLoLidBase_R 0 None", None)
 
-
+"""
 

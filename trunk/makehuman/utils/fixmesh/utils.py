@@ -83,6 +83,6 @@ def assignWeighted(w, g1, g2):
 #cleanGroup('Genitalia')
 #wipeVertGroups()
 #removeAllVertGroups()			
-#findSelected()
+findSelected()
 
-selectVertex(6668)
+#selectVertex(6668)

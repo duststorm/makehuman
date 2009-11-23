@@ -15,7 +15,8 @@ from Blender import *
 from Blender.Mathutils import *
 import os
 
-MHDir = "/home/thomas/svn/makehuman/makehuman/"
+#MHDir = "/home/thomas/svn/makehuman/makehuman/"
+MHDir = "/home/svn/"
 OldDir = MHDir+"data/targets/shapes/"
 NewDir = MHDir+"utils/fixmesh/data/new/targets/shapes/"
 Epsilon = 1e-6
@@ -78,7 +79,7 @@ def importAll():
 	ob = Object.Get("Human")
 	me = ob.getData(False, True)
 	importShape('Basis', me, ob)
-	for path in os.listdir(OldDir):
+	for path in os.listdir(NewDir):
 		(name, ext) = os.path.splitext(path)
 		if ext == '.target':
 			if name != 'Basis':

@@ -1335,10 +1335,15 @@ def gui():
 	BGL.glClear(BGL.GL_COLOR_BUFFER_BIT)
 	BGL.glColor3f(1,1,1)
 
-	BGL.glRasterPos2i(10,170)
+	BGL.glRasterPos2i(10,210)
 	Draw.Text("MHX (MakeHuman eXchange format) importer for Blender", "large")
-	BGL.glRasterPos2i(10,150)
+	BGL.glRasterPos2i(10,190)
 	Draw.Text("Version %d.%d" % (MAJOR_VERSION, MINOR_VERSION), "normal")
+	BGL.glRasterPos2i(10,170)
+	Draw.Text("Make sure that pydrivers.py is loaded", "large")
+	BGL.glRasterPos2i(10,150)
+	Draw.Text("Otherwise shape keys will not work", "normal")
+
 	Draw.Toggle("Arm IK", 1, 10, 110, 90, 20, toggleArmIK,"Arm IK")
 	Draw.Toggle("Leg IK", 2, 110, 110, 90, 20, toggleLegIK,"Leg IK")
 	Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Finger IK")

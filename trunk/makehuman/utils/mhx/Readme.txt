@@ -11,6 +11,7 @@ This is version 0.2. It is not compatible with the previous versions.
 The weighting and morphs can be modified in the file makehuman/utils/mhx/mhxbase.blend 
 and exported to a new mhxbase.mhx. 
 
+
 Changes since version 0.1:
 
 1. The MHX syntax has been revised, and it is now separated from semantics.
@@ -29,11 +30,15 @@ difficult to maintain it with the new functionality.
 is available.
 
 
+
 Preparations:
 
 Copy mhx_import.py and mhx_export.py from the makehuman/utils/mhx folder to your Blender
 scripts folder. The variable TexDir at the beginning of mhx_import.py may be modified to 
 point to your texture directory. 
+
+VERY IMPORTANT: Load pydrivers.py into your Blender file before importing the mhx file.
+Otherwise the shape keys will not work.
 
 
 Usage:
@@ -91,8 +96,12 @@ Known issues:
 
 IK does not work terribly well, especially for the fingers.
 
+
+
 One can choose between FK/IK at load time. It should be driven by bone instead,
+
 but I have not figured out how to implement driven constraint influence from a Python
+
 script. If somebody has done that, I would be interested to see a code example.
 
 Also shape keys should be driven by bones.
@@ -100,7 +109,12 @@ Also shape keys should be driven by bones.
 Display objects should be in wireframe, but I haven't figured out how to press the W button 
 from python. Also, only the outline should be shown.
 
+
+
 The Blender import script did not register on my Linux machine, but it works nicely under
+
 Windows (XP).
+
+
 
 
