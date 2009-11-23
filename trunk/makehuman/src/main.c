@@ -641,12 +641,15 @@ static PyMethodDef EmbMethods[] =
 #ifdef MAKEHUMAN_AS_MODULE
 PyMODINIT_FUNC initmh()
 {
-    PyObject* m;
+    PyObject* module;
 
     initGlobals(); /* initialize all our globals */
 
-    m = Py_InitModule3("mh", EmbMethods,
-                       "makehuman as a module.");
+    module = Py_InitModule3("mh", EmbMethods, "makehuman as a module.");
+
+    RegisterObject3D(module);
+    RegisterTexture(module);
+    PyModule_AddObject(module, "world", G.world);
 }
 #else /* #if !defined(MAKEHUMAN_AS_MODULE) */
 int main(int argc, char *argv[])
