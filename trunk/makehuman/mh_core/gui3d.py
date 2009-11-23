@@ -54,6 +54,9 @@ class Object(events3d.EventHandler):
     #print("hiding ", self.meshName)
     self.visible = False
     self.setVisibility(False)
+    
+  def isVisible(self):
+    return self.visible
   
   def getPosition(self):
     return [self.mesh.x, self.mesh.y, self.mesh.z]
@@ -69,6 +72,9 @@ class Object(events3d.EventHandler):
     
   def clearTexture(self):
     self.mesh.clearTexture()
+    
+  def hasTexture(self):
+    return self.mesh.hasTexture()
   
   def setVisibility(self, visibility):
     #print("changing visibility of ", self.meshName, "to", self.view.isVisible() and self.visible and visibility)

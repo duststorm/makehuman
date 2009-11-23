@@ -724,6 +724,9 @@ class Object3D:
           self.object3d.texture = 0;
         except AttributeError, text:
           print(text)
+          
+    def hasTexture(self):
+        return self.object3d.texture != 0;
         
     def setShader(self, shader):
         """
@@ -1818,6 +1821,32 @@ class Scene3D:
 
         """
         return mh.getCameraSettings()
+        
+    def getCameraStereoSettings(self):
+        """
+        This method passes the current camera stereo settings through from the
+        C core to the Python code. A list of numeric values is returned,
+        including the stereoMode and eyeSeparation:
+        [stereoMode, eyeSeparation]. 
+
+        **Parameters:** This method has no parameters.
+
+        """
+        return mh.getCameraStereoSettings()
+        
+    def setCameraStereoSettings(self, stereoMode, eyeSeparation):
+        """
+        This method sets the camera stereo settings. 
+
+        Parameters
+        ----------
+
+        zoom:
+            *stereoMode*. Stereo mode: 0 no stereo, 1 toe-in, 2 off-axis.
+            *eyeSeparation*. Distance between the eye positions.
+
+        """
+        return mh.setCameraStereoSettings(stereoMode, eyeSeparation)
 
     def getKeyModifiers(self):
         """

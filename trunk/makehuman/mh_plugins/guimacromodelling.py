@@ -210,7 +210,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     
     self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [0.0, 0.0, 1], visible = False)
     self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_asia.obj", position = [0.45, -0.20, 9])
-    self.backgroundImageClear = gui3d.Button(category, mesh = "data/3dobjs/button_asia.obj", position = [0.37, -0.30, 9])
+    self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_asia.obj", position = [0.37, -0.30, 9])
     
     @self.undoButton.event
     def onClicked(event):
@@ -240,9 +240,12 @@ class MacroModelingTaskView(gui3d.TaskView):
       self.app.switchTask("Background")
       self.app.scene3d.redraw(1)
       
-    @self.backgroundImageClear.event
+    @self.backgroundImageToggle.event
     def onClicked(event):
-      self.backgroundImage.hide()
+      if self.backgroundImage.isVisible():
+        self.backgroundImage.hide()
+      elif self.backgroundImage.hasTexture():
+        self.backgroundImage.show()
       self.app.scene3d.redraw(1)
       
     self.syncSliders()
