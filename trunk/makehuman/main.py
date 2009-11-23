@@ -56,6 +56,8 @@ import mh
 import os
 import subprocess
 import webbrowser
+import glob, imp
+from os.path import join, basename, splitext
 
 sys.path.append("./")
 sys.path.append("./mh_plugins")
@@ -160,7 +162,7 @@ class MHApplication(gui3d.Application):
       else:
         self.currentTask.callEvent("onMouseExited", event)
       
-    # Set up categories and tasks  
+    # Set up categories and tasks
     
     # Exit button
     category = gui3d.Category(self, "Exit", self.getThemeResource("images", "button_exit.png"))
@@ -177,6 +179,14 @@ class MHApplication(gui3d.Application):
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"))
     hair.HairTaskView(library)
     background.BackgroundTaskView(library)
+    
+    # Load plugins not starting with _
+    self.modules = {}
+    for path in glob.glob(join("plugins/",'[!_]*.py')):
+        name, ext = splitext(basename(path))
+        module = imp.load_source(name, path)
+        self.modules[name] = module
+        module.load(self)
     
     category = gui3d.Category(self, "Help", self.getThemeResource("images", "button_about.png"))
     # Help button
