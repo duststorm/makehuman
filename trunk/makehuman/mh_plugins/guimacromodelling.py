@@ -115,7 +115,7 @@ class MacroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Macro modelling", category.app.getThemeResource("images", "macro.png"))
     
-    self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [-0.54, 0.328, 6])
+    self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [-0.54, 0.328, 9])
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_gender_macro.png"),

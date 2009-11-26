@@ -19,7 +19,7 @@ class ExampleTaskView(gui3d.TaskView):
     self.pushed = 0
     self.aButtonLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.40, 0.25, 6])
+      position = [-0.40, 0.25, 9])
     self.aButtonLabel.setText("Pushed 0 times")
     
     @self.aButton.event
@@ -37,7 +37,7 @@ class ExampleTaskView(gui3d.TaskView):
       
     self.aToggleButtonLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.40, 0.20, 6])
+      position = [-0.40, 0.20, 9])
     self.aToggleButtonLabel.setText("Not selected")
       
     @self.aToggleButton.event
@@ -64,7 +64,7 @@ class ExampleTaskView(gui3d.TaskView):
       
     self.aRadioButtonLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.40, 0.15, 6])
+      position = [-0.40, 0.15, 9])
     self.aRadioButtonLabel.setText("Button 1 is selected")
     
     self.aRadioButton2 = gui3d.RadioButton(self,
@@ -97,7 +97,7 @@ class ExampleTaskView(gui3d.TaskView):
       
     self.aSliderLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.35, 0.05, 6])
+      position = [-0.35, 0.05, 9])
     self.aSliderLabel.setText("Value is 0.5")
     
     @self.aSlider.event
@@ -112,6 +112,11 @@ class ExampleTaskView(gui3d.TaskView):
       barTexture = self.app.getThemeResource("images", "progressbar.png"),
       barPosition = [-0.392, -0.021, 9.2])
     self.aProgressBar.setProgress(0.5, 0)
+    
+    self.aTextEdit = gui3d.TextEdit(self,
+      mesh = "data/3dobjs/empty.obj",
+      position = [-0.50, -0.07, 9])
+    self.aTextEdit.setText("Some text")
 
 category = None
 taskview = None

@@ -1,0 +1,9 @@
+# Blender3D v247 OBJ File: icons.blend
+# www.blender3d.org
+v 0.0 -0.01 -0.0001
+v 0.40 -0.01 -0.0001
+v 0.40 0.01 -0.0001
+v 0.0 0.01 -0.0001
+usemtl (null)
+s off
+f 1 2 3 4

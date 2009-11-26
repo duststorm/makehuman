@@ -279,7 +279,7 @@ void mhDrawText(float x, float y, const char *message)
 
     /*Set text color and position*/
     glColor3f(1.0, 1.0, 1.0);
-    glRasterPos3f(x, y, 2.0f);
+    glRasterPos3f(x, y, 0.0f);
 
     /*Draw the text*/
     glListBase(G.fontOffset);
@@ -290,7 +290,7 @@ void mhDrawText(float x, float y, const char *message)
       do
       {
         glCallLists(line - message, GL_UNSIGNED_BYTE, message);
-        glRasterPos3f(x, y - (22.0f / (float)g_windowHeight) * (float)(++lineindex), 2.0f);
+        glRasterPos3f(x, y - (22.0f / (float)g_windowHeight) * (float)(++lineindex), 0.0f);
         message = line + 1;
         line = strchr(message, '\n');
       }
@@ -1310,7 +1310,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                     /*draw text attribute if there is one; because this function
                     restores lighting, it can be used only in non picking mode*/
                     if (obj->textString && obj->textString[0] != '\0')
-                        mhDrawText(obj->location[0], obj->location[1], obj->textString);
+                        mhDrawText(0.0, 0.0, obj->textString);
                 }
 
                 /*Disable lighting if the object is shadeless*/

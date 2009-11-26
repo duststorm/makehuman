@@ -92,6 +92,9 @@ class Object(events3d.EventHandler):
   def setText(self, text):
     self.mesh.setText(text)
     
+  def getText(self, text):
+    self.mesh.text
+    
   def onMouseDown(self, event):
     self.view.callEvent("onMouseDown", event)
     
@@ -716,6 +719,47 @@ class TextView(View):
     
   def setText(self, text):
     self.object.setText(text)
+    
+# TextEdit widget
+class TextEdit(View):
+  def __init__(self, parent, mesh = "data/3dobjs/empty.obj", texture = None, position = [0, 0, 9]):
+    View.__init__(self, parent)
+    Object(self, mesh = "data/3dobjs/backgroundedit.obj", position = position)
+    self.textObject = Object(self, mesh, texture = texture, position = position)
+    self.text = ""
+    
+  def __updateTextObject(self):
+    lenText = len(self.text)
+    if lenText > 100:
+        text = self.text[(lenText-100):]
+    else:
+        text = self.text
+    self.textObject.setText(text)
+    
+  def setText(self, text):
+    self.text = text
+    self.__updateTextObject()
+    
+  def getText(self):
+    self.textObject.getText()
+    
+  def onKeyDown(self, event):
+    if event.modifiers & events3d.KMOD_CTRL:
+      View.onKeyDown(self, event)
+      return
+    print(event)
+    if event.key == events3d.SDLK_BACKSPACE:
+      self.text = self.text[:-1]
+    elif event.key == events3d.SDLK_RETURN:
+      if len(self.text):
+        pass
+        #self.onFileSelected(self.text)
+      return
+    elif event.key < 256:
+      self.text += event.character     
+        
+    self.__updateTextObject()
+    self.app.scene3d.redraw()
 
 # FileEntryView widget
 class FileEntryView(View):
@@ -724,7 +768,7 @@ class FileEntryView(View):
     
     Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 0.30, 9])
     Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [0.0, 1.3, 5.5])
-    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [-0.3, 0.29, 6])
+    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [-1.45, 1.31, 5.5])
     self.bConfirm = Object(self, mesh = "data/3dobjs/button_confirm.obj",
       texture = self.app.getThemeResource("images", "button_confirm.png"), position = [0.35, 0.28, 9.1])
     self.text = ""
@@ -765,7 +809,7 @@ class FileChooser(View):
     self.currentFile = Object(self, mesh = "data/3dobjs/file.obj", position = [0, 0, 0], visible = False)
     self.nextFile = Object(self, mesh = "data/3dobjs/nextfile.obj", position = [3.0, 0.5, 0], visible = False)
     self.previousFile = Object(self, mesh = "data/3dobjs/previousfile.obj", position = [-3.0, 0.5, 0], visible = False)
-    self.filename = Object(self, mesh = "data/3dobjs/empty.obj", position = [-0.5, -0.7, 0], visible = False)
+    self.filename = Object(self, mesh = "data/3dobjs/empty.obj", position = [-1.5, -1.8, 0], visible = False)
     self.path = path
     self.extension = extension
     self.previewExtension = previewExtension
