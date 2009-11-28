@@ -86,12 +86,6 @@ class MHApplication(gui3d.Application):
     subprocess.Popen("shaderdl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.sdl", shell=True)
     subprocess.Popen("shaderdl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdl", shell=True)
     subprocess.Popen("shaderdl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.sdl", shell=True)
-
-    # Create pixie shaders
-    subprocess.Popen("sdrc data/shaders/pixie/lightmap_pixie.sl -o data/shaders/pixie/lightmap.sdr", shell=True)
-    subprocess.Popen("sdrc data/shaders/pixie/read2dbm_pixie.sl -o data/shaders/pixie/read2dbm.sdr", shell=True)
-    subprocess.Popen("sdrc data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdr", shell=True)
-    subprocess.Popen("sdrc data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdr", shell=True)
     
     self.progressBar.setProgress(0.2)
     
