@@ -79,13 +79,6 @@ class MHApplication(gui3d.Application):
       barTexture = self.getThemeResource("images", "progressbar.png"))
     self.scene3d.update()
     self.scene3d.redraw(0)
-    
-    # Create aqsis shaders
-    subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
-    subprocess.Popen("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
-    subprocess.Popen("aqsl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.slx", shell=True)
-    subprocess.Popen("aqsl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.slx", shell=True)
-    subprocess.Popen("aqsl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.slx", shell=True)
 
     # Create 3delight shaders
     subprocess.Popen("shaderdl data/shaders/3delight/lightmap_3delight.sl -o data/shaders/3delight/lightmap.sdl", shell=True)
@@ -227,6 +220,25 @@ class MHApplication(gui3d.Application):
           self.app.scene3d.shutdown()
       elif event.key == events3d.SDLK_h:
           webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
+      elif event.key == events3d.SDLK_w:
+          settings = self.app.scene3d.getCameraStereoSettings()
+          settings[0] += 1
+          if settings[0] > 2:
+            settings[0] = 0
+          self.app.scene3d.setCameraStereoSettings(settings[0], settings[1])
+          
+          # We need a black background for stereo
+          background = self.app.categories["Modelling"].tasksByName["Macro modelling"].background
+          if settings[0]:
+            color = [  0,   0,   0, 255]
+          else:
+            color = [100, 100, 100, 255]
+          for g in background.mesh.facesGroups:
+            for f in g.faces:
+              f.color = [color, color, color]
+              f.updateColors()
+          
+          self.app.scene3d.redraw()
     
   def do(self, action):
     if action.do():

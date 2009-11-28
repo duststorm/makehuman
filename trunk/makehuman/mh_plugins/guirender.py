@@ -37,17 +37,6 @@ import mh2renderman
 class RenderingCategory(gui3d.Category):
   def __init__(self, parent):
     gui3d.Category.__init__(self, parent, "Rendering", parent.app.getThemeResource("images", "button_render.png"))
-    
-    aqsis = gui3d.TaskView(self, "Aqsis",  self.app.getThemeResource("images", "button_aqsis.png"))
-    @aqsis.event
-    def onShow(event):
-      pass
-    @aqsis.event
-    def onHide(event):
-      pass
-    @aqsis.button.event
-    def onClicked(event):
-      mh2renderman.saveScene(self.app.scene3d, "scena.rib", "renderman_output", "aqsis")
       
     pixie = gui3d.TaskView(self, "Pixie",  self.app.getThemeResource("images", "button_pixie.png"))
     @pixie.event
