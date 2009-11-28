@@ -30,30 +30,11 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import files3d, gui3d, events3d
-import mh2povray
-import mh2renderman
+import gui3d
 
 class RenderingCategory(gui3d.Category):
   def __init__(self, parent):
     gui3d.Category.__init__(self, parent, "Rendering", parent.app.getThemeResource("images", "button_render.png"))
-      
-    povray = gui3d.TaskView(self, "Povray",  self.app.getThemeResource("images", "button_povray.png"))
-    @povray.event
-    def onShow(event):
-      pass
-    @povray.event
-    def onHide(event):
-      pass
-    @povray.button.event
-    def onClicked(event):
-      reload(mh2povray)  # Avoid having to close and reopen MH for every coding change (can be removed once testing is complete)
-      for obj in self.app.scene3d.objects:
-          # print "POV-Ray Export test: ", obj.name
-          # Only process the humanoid figure
-          if obj.name == "base.obj":
-              cameraData = self.app.scene3d.getCameraSettings()
-              mh2povray.povrayExport(obj, cameraData)
           
   def onShow(self, event):
     self.setFocus()
