@@ -79,13 +79,6 @@ class MHApplication(gui3d.Application):
       barTexture = self.getThemeResource("images", "progressbar.png"))
     self.scene3d.update()
     self.scene3d.redraw(0)
-
-    # Create 3delight shaders
-    subprocess.Popen("shaderdl data/shaders/3delight/lightmap_3delight.sl -o data/shaders/3delight/lightmap.sdl", shell=True)
-    subprocess.Popen("shaderdl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.sdl", shell=True)
-    subprocess.Popen("shaderdl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.sdl", shell=True)
-    subprocess.Popen("shaderdl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdl", shell=True)
-    subprocess.Popen("shaderdl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.sdl", shell=True)
     
     self.progressBar.setProgress(0.2)
     
