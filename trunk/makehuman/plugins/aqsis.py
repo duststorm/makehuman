@@ -15,9 +15,9 @@ aqsis = None
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
   # Create aqsis shaders
-  subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
+  #subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o data/shaders/aqsis/lightmap.slx", shell=True)
   subprocess.Popen("aqsl data/shaders/renderman/skin.sl -o data/shaders/renderman/skin.slx", shell=True)
-  subprocess.Popen("aqsl data/shaders/renderman/scatteringtexture.sl -o data/shaders/renderman/scatteringtexture.slx", shell=True)
+  subprocess.Popen("aqsl data/shaders/renderman/lightmap.sl -o data/shaders/renderman/lightmap.slx", shell=True)
   subprocess.Popen("aqsl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.slx", shell=True)
   subprocess.Popen("aqsl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.slx", shell=True)
     

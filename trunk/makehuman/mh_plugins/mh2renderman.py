@@ -100,9 +100,9 @@ def writePolyObj(fileName, mesh, referenceFile = None):
     """
     if referenceFile:
         faces = files3d.loadFacesIndices(referenceFile)
-        facesUV = files3d.loadUV(referenceFile)
-        facesUVindices = facesUV[0]
-        facesUVvalues = facesUV[1]
+        facesUVindices = files3d.loadUV(referenceFile)
+        #facesUVindices = facesUV[0]
+        #facesUVvalues = facesUV[1]
     else:
         faces = []
         for face in mesh.faces:
@@ -218,21 +218,33 @@ def writeLightMapObj(fileName, mesh, referenceFile):
         *string*. The file system path to a reference file (the wavefront
         base object).
     """
+    
+    
+    
+    #fileName = "renderman_output/ribFiles/base.obj_map.rib"
+    #referenceFile = "data/3dobjs/testUV.obj"
+    
+    
+    
 
     objFile = file(fileName,'w')
 
     facesIndices = files3d.loadFacesIndices(referenceFile)
-    facesUVvalues = mesh.uvValues #files3d.loadUV(referenceFile)
+    #facesUVvalues = mesh.uvValues #files3d.loadUV(referenceFile)
+    facesUVvalues = files3d.loadUV(referenceFile)
+    
+    facesUVcolor = [] 
+    #because we set only the blue component, facesUVcolor is a list of float.
 
-    facesUVcolor = []
-
-    for i in xrange(len(facesUVvalues)):
-        facesUVcolor.append(0)
+    for i in xrange(len(facesUVvalues)): 
+        #faceUVvalues is a list of [u,v]: [[u0,v0],[u1,v1],[u2,v2]...[un,vn]]
+        facesUVcolor.append(0) #All indices of color initially equal to zero.
 
     #These two list should be replaced by lights class in module3d.py
-    pointLightCoords = [[-8, 5, -15],[8, 5, 15]]
-    pointLightIntensity = [1, 1]
+    pointLightCoords = [[-8, 5, 15]]#note 15 has the negative sign of renderman light because opengl->renderman
+    pointLightIntensity = [1, .25]
 
+    
     indicesProcessed = set()
     for faceIndices in facesIndices:
         for idx in faceIndices:
@@ -246,7 +258,10 @@ def writeLightMapObj(fileName, mesh, referenceFile):
                     lightRay = aljabr.vnorm(lightRay)
                     color += clamp(0, 1, aljabr.vdot(lightRay,v.no)*pointLightIntensity[i])
                 facesUVcolor[uvId] = color
-                indicesProcessed.add(uvId)
+            indicesProcessed.add(uvId)
+    
+    
+    
 
     objFile.write("PointsPolygons ");
 
@@ -256,7 +271,8 @@ def writeLightMapObj(fileName, mesh, referenceFile):
         objFile.write('%s '%(len(face)))
     objFile.write("] \n")
 
-    #Writing face indices. Note we use UV indices as vert indices
+    #Writing face indices. Note we use UV indices as vert indices 
+    #(idx[1] is the index of UV couples, idx[0] is the index of vert coord)
     objFile.write("[ ")
     for face in facesIndices:
         for idx in face:
@@ -269,14 +285,20 @@ def writeLightMapObj(fileName, mesh, referenceFile):
         objFile.write("%s %s %s \n" % (uv[0], uv[1], 0))
     objFile.write('] ')
 
-    #Writing verts color. We use a simple Goraud matte
+    #Writing verts color. We use a simple Goraud matte    
     objFile.write('\n"Cs" [')
-
     for color in facesUVcolor:
         objFile.write('%s %s %s \n' % (0, 0, color))
     objFile.write(']')
-
     objFile.write('\n')
+    
+    #Writing uv info
+    objFile.write('\n"st" [')
+    for uv in facesUVvalues:
+        objFile.write("%s %s\n" % (uv[0], 1-uv[1]))
+    objFile.write(']')
+    
+    
     objFile.close()
 
 
@@ -401,6 +423,7 @@ def writeLightMapFrameLowRes(scene, ribfile, ribRepository):
             ribfile.write('\tAttributeBegin\n')
             writeLightMapObj(ribPath, obj, objPath)
             ribfile.write('\tSurface "onlyci"\n')
+            #Note: quad.obj.rib has cs = (1,0,0) to have red background
             ribfile.write('\t\tReadArchive "%s"\n' %("data/3dobjs/quad.obj.rib"))
             ribfile.write('\tSurface "onlyci"\n')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
@@ -830,8 +853,9 @@ def mh2Aqsis(scene, fName, ribRepository):
     rotX = cameraData[3]
     rotY = cameraData[4]
 
-    spot1Pos = [9.39, 12.80, -25.80]
-    spot1InvTransf = [-24.9999637248, 19.9999716629, 7.13799650132e-007, -9.39302825928, -12.8063840866, 25.8071346283]
+    spot1Pos = [-8, 5, -15]
+    #spot1Pos = [9.39, 12.80, -25.80]
+    #spot1InvTransf = [-24.9999637248, 19.9999716629, 7.13799650132e-007, -9.39302825928, -12.8063840866, 25.8071346283]
 
 
 
@@ -845,130 +869,175 @@ def mh2Aqsis(scene, fName, ribRepository):
     #ribfile.write('ReadArchive "data/shaders/aqsis/occlmap.rib"\n')
     
 
-    # FRAME 1 ####################
-    # MAKING SHADOW MAP
+    ## FRAME 1 ####################
+    ## MAKING SHADOW MAP
 
-    shadowPath1 = ribRepository + "/zbuffer.tif"
-    shadowPath2 = ribRepository + "/zmap.shad"
-    spot1Pos = [9.39, 12.80, -25.80]
-    spot1InvTransf = [-24.9999637248, 19.9999716629, 7.13799650132e-007, -9.39302825928, -12.8063840866, 25.8071346283]
+    #shadowPath1 = ribRepository + "/zbuffer.tif"
+    #shadowPath2 = ribRepository + "/zmap.shad"
+    #spot1Pos = [9.39, 12.80, -25.80]
+    #spot1InvTransf = [-24.9999637248, 19.9999716629, 7.13799650132e-007, -9.39302825928, -12.8063840866, 25.8071346283]
     
-    ribfile.write("FrameBegin 1\n")
-    ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
-    ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
-    ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
-    ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(45))
-    ribfile.write('Format %s %s 1\n' % (512, 512))
-    ribfile.write('PixelFilter "box" 1 1\n')
-    ribfile.write("Clipping 0.1 100\n")
-    ribfile.write('ShadingRate %s \n'%(10))
-    ribfile.write('Display "%s" "zfile" "z"\n'%(shadowPath1))
-    #now we insert rot and trasl of spotlight in mainscene here
-    ribfile.write("\t\tRotate %s 1 0 0\n" %(spot1InvTransf[0]))
-    ribfile.write("\t\tRotate %s 0 1 0\n" %(spot1InvTransf[1]))
-    ribfile.write("\t\tRotate %s 0 0 1\n" %(spot1InvTransf[2]))
-    ribfile.write("\t\tTranslate %s %s %s\n" %(spot1InvTransf[3], spot1InvTransf[4], spot1InvTransf[5]))
+    #ribfile.write("FrameBegin 1\n")
+    #ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
+    #ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+    #ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
+    #ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(45))
+    #ribfile.write('Format %s %s 1\n' % (512, 512))
+    #ribfile.write('PixelFilter "box" 1 1\n')
+    #ribfile.write("Clipping 0.1 100\n")
+    #ribfile.write('ShadingRate %s \n'%(10))
+    #ribfile.write('Display "%s" "zfile" "z"\n'%(shadowPath1))
+    ##now we insert rot and trasl of spotlight in mainscene here
+    #ribfile.write("\t\tRotate %s 1 0 0\n" %(spot1InvTransf[0]))
+    #ribfile.write("\t\tRotate %s 0 1 0\n" %(spot1InvTransf[1]))
+    #ribfile.write("\t\tRotate %s 0 0 1\n" %(spot1InvTransf[2]))
+    #ribfile.write("\t\tTranslate %s %s %s\n" %(spot1InvTransf[3], spot1InvTransf[4], spot1InvTransf[5]))
 
-    ribfile.write('WorldBegin\n')
+    #ribfile.write('WorldBegin\n')
+    #for obj in scene.objects:
+        #name = obj.name
+        #if name == "base.obj":  #TODO: attribute isRendered
+            #ribPath = ribRepository + "/" + name + ".rib"
+            #objPath = "data/3dobjs/" + "base.obj"
+            #ribfile.write('\tAttributeBegin\n')            
+            #writeSubdivisionMesh(ribPath, obj, objPath)
+            #ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
+            #ribfile.write('\tAttributeEnd\n')
+            #writeHairs(ribRepository, obj)
+    #ribfile.write('\tAttributeBegin\n')
+    #ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    #ribfile.write('\tAttributeEnd\n')
+    #ribfile.write("WorldEnd\n")
+    #ribfile.write("FrameEnd\n")
+    #ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
+
+
+    ## FRAME 17 ####################
+    ## BAKING THE SKIN TEXTURE
+    
+    #ribfile.write("FrameBegin 17\n")
+    #ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
+    #ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/aqsis:&\"\n")
+    #ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+    #ribfile.write("Display \"bake pass\" \"framebuffer\" \"rgb\"\n")
+    #ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(fov))
+    #ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
+    #ribfile.write("Clipping 0.1 100\n")
+    #ribfile.write('PixelSamples %s %s\n'%(1,1))
+    #ribfile.write('ShadingRate %s \n'%(1))
+    #ribfile.write("\t\tTranslate %s %s %s\n" %(locX, locY, zoom))
+    #ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
+    #ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
+    #ribfile.write('WorldBegin\n')
+    ##ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
+    ##ribfile.write('\tLightSource "envlight" 1 "string filename" "data/textures/occlmap.sm" "float intensity" [ 0.9 ] "float samples" [ 32 ] "float blur" [ 0.025 ]\n')
+    ##ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f]"intensity" 1000 \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    #ribfile.write('\tLightSource "spotlight" 2 "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [1.0] \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    ##ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    #for obj in scene.objects:
+        #name = obj.name
+        #if name == "base.obj":  #TODO: attribute isRendered
+            #ribPath = ribRepository + "/" + name + ".rib"
+            #objPath = "data/3dobjs/" + "base.obj"
+            #bakePath = ribRepository + "/" + name +"_map"+ ".bake"
+            #lightMapTmp = ribRepository + "/" + name +"_map"+ ".tx"
+            #lightMapTmp2 = ribRepository + "/" + name +"_map"+ ".tif"
+            #lightMapFinal = ribRepository + "/" + name +"_map"+ ".texture"
+            #colorTexture = "texture.texture"
+            #ribfile.write('\tAttributeBegin\n')
+            #ribfile.write("\t\tColor [%s %s %s]\n" %(0.8, 0.8, 0.8))
+            #ribfile.write("\t\tOpacity [%s %s %s]\n" %(1,1,1))
+            #ribfile.write("\t\tTranslate %s %s %s\n" %(0,0,0))
+            #ribfile.write("\t\tRotate %s 0 0 1\n" %(0))
+            #ribfile.write("\t\tRotate %s 0 1 0\n" %(0))
+            #ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
+            #ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
+            #writeSubdivisionMesh(ribPath, obj, objPath)
+            #ribfile.write('\t\tSurface "lightmap" "string texturename" "%s" "string outputtexture" "%s"\n' % (colorTexture,bakePath))
+            #ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
+            #ribfile.write('\tAttributeEnd\n')
+    #ribfile.write("WorldEnd\n")
+    #ribfile.write("FrameEnd\n")
+    #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(bakePath, lightMapTmp))
+
+
+    ## FRAME 3 ####################
+    ## RENDERING OF BAKED AND SCATTERED TEXTURE
+
+    #ribfile.write("FrameBegin 18\n")
+    #ribfile.write('ScreenWindow -1 1 -1 1\n')
+    #ribfile.write('Clipping 0.001 30\n')
+    #ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
+    #ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+    #ribfile.write("Display \"%s\" \"file\" \"rgb\"\n"%(lightMapTmp2))
+    #ribfile.write("Display \"+SSS pass\" \"framebuffer\" \"rgb\"\n")
+    #ribfile.write("Format 512 512 1\n")
+    #ribfile.write("PixelSamples 2 2\n")
+    #ribfile.write("PixelFilter \"gaussian\" 1 1\n")
+    #ribfile.write('ShadingRate %s \n'%(4))
+    #ribfile.write("ShadingInterpolation \"smooth\"\n")
+    #ribfile.write("Projection \"orthographic\"\n")
+    #ribfile.write("\tWorldBegin\n")
+    #ribfile.write("\tAttributeBegin\n")
+    #ribfile.write("\tColor [ 1 1 1 ]")
+    #ribfile.write("\tSurface \"scatteringtexture\" \"string texturename\" \"%s\" \"float scattering\" [1] \n"%(lightMapTmp))
+    #ribfile.write("\tTranslate 0 0 0.02\n")
+    #ribfile.write("\tPolygon \"P\" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]\"st\" [ 0 1  1 1  1 0  0 0  ]\n")
+    #ribfile.write("\tAttributeEnd\n")
+    #ribfile.write("WorldEnd\n")
+    #ribfile.write("FrameEnd\n")    
+    #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 \n'%(lightMapTmp2, lightMapFinal))
+
+
+
+
+
+
+
+
     for obj in scene.objects:
         name = obj.name
-        if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
-            ribfile.write('\tAttributeBegin\n')            
-            writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
-            ribfile.write('\tAttributeEnd\n')
-            writeHairs(ribRepository, obj)
-    ribfile.write('\tAttributeBegin\n')
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
-    ribfile.write('\tAttributeEnd\n')
-    ribfile.write("WorldEnd\n")
-    ribfile.write("FrameEnd\n")
-    ribfile.write('MakeShadow "%s" "%s"\n'%(shadowPath1,shadowPath2))
+        if name == "base.obj": #TODO: attribute haveSSS
 
-
-    # FRAME 17 ####################
-    # BAKING THE SKIN TEXTURE
-    
-    ribfile.write("FrameBegin 17\n")
-    ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
-    ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/aqsis:&\"\n")
-    ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
-    ribfile.write("Display \"bake pass\" \"framebuffer\" \"rgb\"\n")
-    ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(fov))
-    ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
-    ribfile.write("Clipping 0.1 100\n")
-    ribfile.write('PixelSamples %s %s\n'%(1,1))
-    ribfile.write('ShadingRate %s \n'%(1))
-    ribfile.write("\t\tTranslate %s %s %s\n" %(locX, locY, zoom))
-    ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
-    ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
-    ribfile.write('WorldBegin\n')
-    #ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    #ribfile.write('\tLightSource "envlight" 1 "string filename" "data/textures/occlmap.sm" "float intensity" [ 0.9 ] "float samples" [ 32 ] "float blur" [ 0.025 ]\n')
-    #ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f]"intensity" 1000 \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
-    ribfile.write('\tLightSource "spotlight" 2 "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [1.0] \n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
-    #ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
-    for obj in scene.objects:
-        name = obj.name
-        if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
+            ribPath = ribRepository + "/" + name +"_map"+ ".rib"
             objPath = "data/3dobjs/" + "base.obj"
-            bakePath = ribRepository + "/" + name +"_map"+ ".bake"
-            lightMapTmp = ribRepository + "/" + name +"_map"+ ".tx"
-            lightMapTmp2 = ribRepository + "/" + name +"_map"+ ".tif"
+            mapPath = ribRepository + "/" + name +"_map"+ ".tif"
             lightMapFinal = ribRepository + "/" + name +"_map"+ ".texture"
-            colorTexture = "texture.texture"
-            ribfile.write('\tAttributeBegin\n')
-            ribfile.write("\t\tColor [%s %s %s]\n" %(0.8, 0.8, 0.8))
-            ribfile.write("\t\tOpacity [%s %s %s]\n" %(1,1,1))
-            ribfile.write("\t\tTranslate %s %s %s\n" %(0,0,0))
-            ribfile.write("\t\tRotate %s 0 0 1\n" %(0))
-            ribfile.write("\t\tRotate %s 0 1 0\n" %(0))
-            ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
-            ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
-            writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "lightmap" "string texturename" "%s" "string outputtexture" "%s"\n' % (colorTexture,bakePath))
+
+            ribfile.write("FrameBegin 1\n")
+            ribfile.write("Projection \"orthographic\"")
+            ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
+            ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+            ribfile.write("Format %s %s 1\n" % (512, 512))
+            ribfile.write("PixelFilter \"gaussian\" %s %s \n" % (8, 8))#This cause sss
+            ribfile.write("PixelSamples %s %s\n"%(1,1))
+            #ribfile.write("Sides 2\n")
+            ribfile.write("Display \"%s\" \"file\" \"rgba\"\n" % (mapPath))
+            ribfile.write("Display \"+light_map\" \"framebuffer\" \"rgb\"\n")
+            ribfile.write("\t\tScale %s %s %s\n" %(2,2,2))
+            ribfile.write("\t\tTranslate %s %s %s\n" %(-0.5, -0.5, 1))
+            ribfile.write('WorldBegin\n')
+            ribfile.write('\tAttributeBegin\n')            
+            writeLightMapObj(ribPath, obj, objPath)
+            ribfile.write('\tSurface "onlyci"\n')
+            ribfile.write('\t\tReadArchive "%s"\n' %("data/3dobjs/quad.obj.rib"))
+            #ribfile.write('\tSurface "onlyci"\n')
+            ribfile.write('\tSurface "lightmap" "string texturename" "texture.texture"\n')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
-    ribfile.write("WorldEnd\n")
-    ribfile.write("FrameEnd\n")
-    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(bakePath, lightMapTmp))
+            ribfile.write("WorldEnd\n")
+            ribfile.write("FrameEnd\n")
+            ribfile.write("MakeTexture \"%s\" \"%s\" \"periodic\" \"periodic\" \"gaussian\" 1 1\n" % (mapPath,lightMapFinal))
 
 
-    # FRAME 3 ####################
-    # RENDERING OF BAKED AND SCATTERED TEXTURE
 
-    ribfile.write("FrameBegin 18\n")
-    ribfile.write('ScreenWindow -1 1 -1 1\n')
-    ribfile.write('Clipping 0.001 30\n')
-    ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
-    ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
-    ribfile.write("Display \"%s\" \"file\" \"rgb\"\n"%(lightMapTmp2))
-    ribfile.write("Display \"+SSS pass\" \"framebuffer\" \"rgb\"\n")
-    ribfile.write("Format 512 512 1\n")
-    ribfile.write("PixelSamples 2 2\n")
-    ribfile.write("PixelFilter \"gaussian\" 1 1\n")
-    ribfile.write('ShadingRate %s \n'%(4))
-    ribfile.write("ShadingInterpolation \"smooth\"\n")
-    ribfile.write("Projection \"orthographic\"\n")
-    ribfile.write("\tWorldBegin\n")
-    ribfile.write("\tAttributeBegin\n")
-    ribfile.write("\tColor [ 1 1 1 ]")
-    ribfile.write("\tSurface \"scatteringtexture\" \"string texturename\" \"%s\" \"float scattering\" [1] \n"%(lightMapTmp))
-    ribfile.write("\tTranslate 0 0 0.02\n")
-    ribfile.write("\tPolygon \"P\" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]\"st\" [ 0 1  1 1  1 0  0 0  ]\n")
-    ribfile.write("\tAttributeEnd\n")
-    ribfile.write("WorldEnd\n")
-    ribfile.write("FrameEnd\n")    
-    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 \n'%(lightMapTmp2, lightMapFinal))
+
 
 
     # FRAME 4 ####################
     # FINAL RENDERING
 
-    ribfile.write("FrameBegin 19\n")
+    ribfile.write("FrameBegin 2\n")
     ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
     ribfile.write("Option \"statistics\" \"endofframe\" [1]\n")
     ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
@@ -993,8 +1062,8 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.8] "color lightcolor" [1 1 1]\n')
     #ribfile.write('\tLightSource "envlight" 1 "string filename" "data/textures/occlmap.sm" "float intensity" [ 0.9 ] "float samples" [ 32 ] "float blur" [ 0.025 ]\n')
     #ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f] "intensity" 1000\n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
-    ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
-    ribfile.write('\tLightSource "pointlight" 3  "from" [0 12.800000 25.800000] "intensity" 1000\n') 
+    #ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
+    ribfile.write('\tLightSource "pointlight" 3  "from" [%f %f %f] "intensity" 250\n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2])) 
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
@@ -1013,7 +1082,7 @@ def mh2Aqsis(scene, fName, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.15]\n'%("texture.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.15]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
             #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
@@ -1302,7 +1371,7 @@ def saveScene(scene, fName, ribDir, engine):
       
 
     
-    if engine == "aqsis":
+    if engine == "aqsis":        
         mh2Aqsis(scene, fName, ribRepository)
     if engine == "pixie":
         print "write pixie"

@@ -8,7 +8,7 @@ hair    (float Ka = 1;
 	     color specularcolor = 1;)
 {
     normal Nf = faceforward (normalize(N),I);
-    Oi = 1-pow(v,5);
+    Oi = 0.5*(1-pow(v,5));
     Ci = Oi * Os * ( mix(rootcolor, tipcolor, v) * (Ka*ambient() + Kd*diffuse(Nf)) +
 		specularcolor * Ks*specular(Nf,-normalize(I),roughness));
 }
