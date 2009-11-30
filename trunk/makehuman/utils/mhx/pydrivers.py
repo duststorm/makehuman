@@ -11,42 +11,67 @@ def clamp(x, xmin, xmax):
 		return x
 
 #
-#	Bones
-#
+#	Rotations, including constraints
+#	1 = 90 deg, -1 = -90 deg
 
+def rotX(name):
+	return 0
+	return 1.414*pbones[name].quat.x
+
+def rotZ(name):
+	return 1.414*pbones[name].quat.z
+
+#
+#	Bones - used driven bones instead
+#	Problems with py-drivers: 
+#	quat not updated by constraints
+#	posematrix in armature space, not bone space
+#
+'''
 def ctrlBendElbowForward_L():
-	return clamp(pbones['LoArm_L'].quat.x, 0, 1)
+	r = rotX('LoArm_L')
+	return clamp(r, 0, 1)
 
 def ctrlBendElbowForward_R():
-	return clamp(pbones['LoArm_R'].quat.x, 0, 1)
+	r = rotX('LoArm_R')
+	return clamp(r, 0, 1)
 
 def ctrlBendHeadForward():
-	return clamp(pbones['Head'].quat.x, 0, 1)
+	r = rotX('Head')
+	return clamp(3*r, 0, 1)
 
 def ctrlBendKneeBack_L():
-	return clamp(pbones['LoLeg_L'].quat.x, 0, 1)
+	r = rotX('LoLeg_L')
+	return -clamp(r, -1, 0)
 
 def ctrlBendKneeBack_R():
-	return clamp(pbones['LoLeg_R'].quat.x, 0, 1)
+	r = rotX('LoLeg_R')
+	return -clamp(r, -1, 0)
 
 def ctrlBendLegBack_L():
-	return -clamp(pbones['UpLeg_L'].quat.x, -1, 0)
+	r = rotX('UpLeg_L')
+	return -clamp(2*r, -1, 0)
 
 def ctrlBendLegBack_R():
-	return -clamp(pbones['UpLeg_R'].quat.x, -1, 0)
+	r = rotX('UpLeg_R')
+	return -clamp(2*r, -1, 0)
 
 def ctrlBendLegForward_L():
-	return clamp(pbones['UpLeg_L'].quat.x, 0, 1)
+	r = rotX('UpLeg_L')
+	return clamp(r, 0, 1)
 
 def ctrlBendLegForward_R():
-	return clamp(pbones['UpLeg_R'].quat.x, 0, 1)
+	r = rotX('UpLeg_R')
+	return clamp(r, 0, 1)
 
 def ctrlShoulderDown_L():
-	return- clamp(pbones['UpArm_L'].quat.z, -1, 0)
+	r = rotZ('UpArm_L')
+	return -clamp(r, -1, 0)
 
 def ctrlShoulderDown_R():
-	return clamp(pbones['UpArm_R'].quat.x, 0, 1)
-
+	r = rotZ('UpArm_R')
+	return clamp(r, 0, 1)
+'''
 #
 #	Face representation
 #
@@ -82,27 +107,29 @@ def ctrlBrowsOutUp_R():
 #
 #	Lids
 #
-#	Left = matrix[1][0]
-#	Up = matrix[1][1]
 
 def ctrlUpLidDown_L():
 	z = clamp(pbones['PUpLid_L'].loc.z, -0.5*fullScale, fullScale)
-	r = clamp(0.5*pbones['Eye_L'].poseMatrix[1][1], -0.5*fullScale, 0.5*fullScale)
+	r = rotX('Eye_L')
+	r = clamp(0.5*r, -0.5*fullScale, 0.5*fullScale)
 	return factor*clamp(z-r, -0.5*fullScale, fullScale)
 
 def ctrlUpLidDown_R():
 	z = clamp(pbones['PUpLid_R'].loc.z, -0.5*fullScale, fullScale)
-	r = clamp(0.5*pbones['Eye_R'].poseMatrix[1][1], -0.5*fullScale, 0.5*fullScale)
+	r = rotX('Eye_R')
+	r = clamp(0.5*r, -0.5*fullScale, 0.5*fullScale)
 	return factor*clamp(z-r, -0.5*fullScale, fullScale)
 
 def ctrlLoLidUp_L():
 	z = clamp(pbones['PLoLid_L'].loc.z, -0.5*fullScale, fullScale)
-	r = clamp(0.5*pbones['Eye_L'].poseMatrix[1][1], -0.5*fullScale, 0.5*fullScale)
+	r = rotX('Eye_L')
+	r = clamp(0.5*r, -0.5*fullScale, 0.5*fullScale)
 	return factor*clamp(-z+r, -0.5*fullScale, fullScale)
 
 def ctrlLoLidUp_R():
 	z = clamp(pbones['PLoLid_R'].loc.z, -0.5*fullScale, fullScale)
-	r = clamp(0.5*pbones['Eye_R'].poseMatrix[1][1], -0.5*fullScale, 0.5*fullScale)
+	r = rotX('Eye_R')
+	r = clamp(0.5*r, -0.5*fullScale, 0.5*fullScale)
 	return factor*clamp(-z+r, -0.5*fullScale, fullScale)
 
 
@@ -213,9 +240,3 @@ def ctrlLoLipDown_L():
 def ctrlLoLipDown_R():
 	z = clamp(pbones['PLoLip'].loc.z, 0, fullScale) + clamp(pbones['PLoLip_R'].loc.z, 0, fullScale)
 	return factor*clamp(z, 0, fullScale)
-
-
-
-
-
-

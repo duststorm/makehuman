@@ -22,7 +22,7 @@ TO DO
 
 """
 
-import module3d, aljabr, files3d, mh2bvh, mhxbones
+import module3d, aljabr, mh, files3d, mh2bvh, mhxbones
 import os
 
 #
@@ -202,6 +202,12 @@ def exportFromMhxTemplate(obj, tmpl, fp):
 		elif lineSplit[0] == 'ipo' and mainMesh:
 			writeIpo(fp)
 			skip = True
+		elif lineSplit[0] == 'filename':
+			(path, filename) = os.path.split(lineSplit[1])
+			#texPath = mh.getPath("textures")
+			MHpath = os.path.realpath('.')
+			fp.write("  filename %s ;\n" % (MHpath+'/data/textures/'+filename))
+			skipOne = True
 
 		if not (skip or skipOne):
 			fp.write(line)
@@ -269,13 +275,31 @@ def writeIcu(fp, shape, expr):
 
 def writeIpo(fp):
 	global splitLeftRight
-	fp.write("ipo Key KeyIpo\n")
-	for (shape, lr) in leftRightKey.items():
-		if shape == 'Basis':
-			pass
-		elif lr and splitLeftRight:
-			writeIcu(fp, shape+'_L', 'p.ctrl'+shape+'_L()')
-			writeIcu(fp, shape+'_R', 'p.ctrl'+shape+'_R()')
-		else:
-			writeIcu(fp, shape, 'p.ctrl'+shape+'()')
-	fp.write("end ipo\n")
+
+	mhxFile = "data/3dobjs/mhxipos.mhx"
+	try:
+		print("Trying to open "+mhxFile)
+		tmpl = open(mhxFile, "r")
+	except:
+		print("Failed to open "+mhxFile)
+		tmpl = None
+
+	if tmpl and splitLeftRight:
+		for line in tmpl:
+			fp.write(line)
+	else:
+		fp.write("ipo Key KeyIpo\n")
+		for (shape, lr) in leftRightKey.items():
+			if shape == 'Basis':
+				pass
+			elif lr and splitLeftRight:
+				writeIcu(fp, shape+'_L', 'p.ctrl'+shape+'_L()')
+				writeIcu(fp, shape+'_R', 'p.ctrl'+shape+'_R()')
+			else:
+				writeIcu(fp, shape, 'p.ctrl'+shape+'()')
+		fp.write("end ipo\n")
+	
+	if tmpl:
+		print(mhxFile+" closed")
+		tmpl.close()
+

@@ -45,7 +45,7 @@ import string
 #	Default locations - change to fit your machine
 #
 
-TexDir = "/program/makehuman/data/textures"
+TexDir = "."
 LibDir = "."
 
 #
@@ -65,7 +65,7 @@ toggleFingerIK = 0
 toggleDispObs = 1
 toggleReplace = 1
 toggleShape = 1
-toggleRot90 = 0
+toggleRot90 = 1
 useMesh = 1
 doSmash = 1
 
@@ -169,13 +169,13 @@ def readMhxFile(fileName):
 			nErrors += 1
 			#raise NameError(msg)
 
-	if toggleRot90:
-		rotMatrix = Mathutils.RotationMatrix(90, 4, 'x')
-		ob = _object['HumanRig']
-		pbones = ob.getPose().bones	
-		pbones['Root'].poseMatrix *= rotMatrix
-		pbones['Panel'].poseMatrix *= rotMatrix
-		ob.getPose().update()
+	#if toggleRot90:
+	#	rotMatrix = Mathutils.RotationMatrix(90, 4, 'x')
+	#	ob = _object['HumanRig']
+	#	pbones = ob.getPose().bones	
+	#	pbones['Root'].poseMatrix *= rotMatrix
+	#	pbones['Panel'].poseMatrix *= rotMatrix
+	#	ob.getPose().update()
 		
 
 	scn.update()
@@ -592,18 +592,19 @@ def parseColorBand(args):
 
 def parseFileName(filepath, dir):
 	global TexDir, LibDir
-	print filepath
-	file1 = os.path.expanduser(filepath)
+	file1 = os.path.realpath(filepath)
+	print "Loading ", filepath, " = ", file1
 	if os.path.isfile(file1):
 		print "Found file "+file1
 		return file1
 	
 	(path, filename) = os.path.split(file1)
-	ntries = 4
+	ntries = 2
 	while ntries > 0:
 		path = eval(dir)
 		filepath = os.path.join(path, filename)
-		file2 = os.path.expanduser(filepath)
+		file2 = os.path.realpath(filepath)
+		print "Loading ", filepath, " = ", file2
 		if os.path.isfile(file2):
 			print "Found file "+file2
 			return file2
@@ -640,6 +641,18 @@ def parseImage(args, tokens):
 	return img
 
 #
+#	rot90(x, y, z, doRot)
+#
+
+def rot90(x, y, z, doRot):
+	global toggleRot90
+	if toggleRot90 and doRot:
+		return (float(x), -float(z), float(y))
+	else:
+		return (float(x), float(y), float(z))
+
+
+#
 #	parseMesh (args, tokens):
 #
 
@@ -651,6 +664,10 @@ def parseMesh (args, tokens):
 
 	name = args[0]
 	me = bpy.data.meshes.new(name)
+	if name == 'Human':
+		mainMesh = True
+	else:
+		mainMesh = False
 	_mesh[name] = me
 	verts = []
 	edges = []
@@ -660,7 +677,8 @@ def parseMesh (args, tokens):
 
 	for (key, val, sub) in tokens:
 		if key == 'v':
-			verts.append( (float(val[0]), float(val[1]), float(val[2])) )
+			coords = rot90(val[0], val[1], val[2], mainMesh)
+			verts.append( coords )
 		elif key == 'e':
 			edges.append((int(val[0]), int(val[1])))
 		elif key == 'f':
@@ -777,7 +795,8 @@ def parseShapeKey(ob, me, args, tokens):
 	for (key, val, sub) in tokens:
 		if key == 'sv':
 			index = int(val[0])
-			block.data[index] += Vector(float(val[1]), float(val[2]), float(val[3]))
+			coord = rot90(float(val[1]), float(val[2]), float(val[3]), True)
+			block.data[index] += Vector(coord)
 	
 
 #
@@ -822,7 +841,8 @@ def parseArmature (args, tokens):
 def parseJoints(args, tokens):
 	for (key,val,sub) in tokens:
 		if key == 'j':
-			_joint[val[0]] = Vector(float(val[1]), float(val[2]), float(val[3]))
+			coord = rot90(val[1], val[2], val[3], True)
+			_joint[val[0]] = Vector(coord)
 
 def jointLoc(args):
 	global _joint
@@ -833,12 +853,14 @@ def jointLoc(args):
 		else:
 			if args[2] != '+':
 				raise NameError("joint "+args)
-			offs = Vector(float(args[3]), float(args[4]), float(args[5]))
+			coord = rot90(args[3], args[4], args[5], True)
+			offs = Vector(coord)
 			if offs.length < Epsilon:
 				print args, vec, offs
 			return vec+offs			
 	else:
-		return Vector(float(args[0]), float(args[1]), float(args[2]))
+		coord = rot90(args[0], args[1], args[2], True)
+		return Vector(coord)
 
 #
 #	parsePose (args, tokens):
@@ -889,6 +911,11 @@ def parseBone(bones, args, tokens):
 			bone.head = jointLoc(val)
 		elif key == "tail":
 			bone.tail = jointLoc(val)
+		elif key == "roll":
+			if toggleRot90:
+				bone.roll = float(val[1])
+			else:
+				bone.roll = float(val[0])
 		else:
 			defaultKey(key, val, "bone", globals(), locals())
 
@@ -1307,7 +1334,7 @@ def event(evt, val):
 
 def button_event(evt): 
 	global toggleArmIK, toggleLegIK, toggleFingerIK, toggleDispObs
-	global toggleReplace, toggleShape
+	global toggleReplace, toggleShape, toggleRot90
 	global TexDir
 	if evt == 1:
 		toggleArmIK = 1 - toggleArmIK
@@ -1326,8 +1353,10 @@ def button_event(evt):
 	elif evt == 8:
 		Draw.Exit()
 		return
-	if evt == 9:
+	elif evt == 9:
 		TexDir = Draw.PupStrInput("TexDir? ", TexDir, 100)
+	elif evt == 10:
+		toggleRot90 = 1 - toggleRot90
 	Draw.Redraw(-1)
 
 def gui():
@@ -1336,23 +1365,24 @@ def gui():
 	BGL.glColor3f(1,1,1)
 
 	BGL.glRasterPos2i(10,210)
-	Draw.Text("MHX (MakeHuman eXchange format) importer for Blender", "large")
+	t = Draw.Text("MHX (MakeHuman eXchange format) importer for Blender", "large")
 	BGL.glRasterPos2i(10,190)
-	Draw.Text("Version %d.%d" % (MAJOR_VERSION, MINOR_VERSION), "normal")
+	t = Draw.Text("Version %d.%d" % (MAJOR_VERSION, MINOR_VERSION), "normal")
 	BGL.glRasterPos2i(10,170)
-	Draw.Text("Make sure that pydrivers.py is loaded", "large")
+	t = Draw.Text("Make sure that pydrivers.py is loaded", "large")
 	BGL.glRasterPos2i(10,150)
-	Draw.Text("Otherwise shape keys will not work", "normal")
+	t = Draw.Text("Otherwise shape keys will not work", "normal")
 
-	Draw.Toggle("Arm IK", 1, 10, 110, 90, 20, toggleArmIK,"Arm IK")
-	Draw.Toggle("Leg IK", 2, 110, 110, 90, 20, toggleLegIK,"Leg IK")
-	Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Finger IK")
-	Draw.Toggle("Display objs", 4, 210, 80, 90, 20, toggleDispObs,"Display objects")
-	Draw.Toggle("Replace scene", 5, 110, 80, 90, 20, toggleReplace,"Delete old scene")
-	Draw.Toggle("Shapekeys", 6, 10, 80, 90, 20, toggleShape,"Load shape keys")
-	Draw.PushButton("Load MHX file", 7, 10, 10, 150, 40)
-	Draw.PushButton("Cancel", 8, 210, 10, 90, 20)
-	Draw.PushButton("Texture directory", 9, 210, 40, 90, 20) 
+	b = Draw.Toggle("Rot90", 10, 310, 110, 90, 20, toggleRot90,"Rotate mesh 90 degrees (Z up)")
+	b = Draw.Toggle("Arm IK", 1, 10, 110, 90, 20, toggleArmIK,"Arm IK")
+	b = Draw.Toggle("Leg IK", 2, 110, 110, 90, 20, toggleLegIK,"Leg IK")
+	b = Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Finger IK")
+	b = Draw.Toggle("Display objs", 4, 210, 80, 90, 20, toggleDispObs,"Display objects")
+	b = Draw.Toggle("Replace scene", 5, 110, 80, 90, 20, toggleReplace,"Delete old scene")
+	b = Draw.Toggle("Shapekeys", 6, 10, 80, 90, 20, toggleShape,"Load shape keys")
+	b = Draw.PushButton("Load MHX file", 7, 10, 10, 150, 40)
+	b = Draw.PushButton("Cancel", 8, 210, 10, 90, 20)
+	b = Draw.PushButton("Texture directory", 9, 210, 40, 90, 20) 
 
 Draw.Register(gui, event, button_event) 
 

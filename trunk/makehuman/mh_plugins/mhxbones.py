@@ -441,8 +441,8 @@ armature = [
 	
 	("PFace", "None", "origin", 0, "origin", [0,0,1], F_NODEF, L_PANEL, "MHFace", 0),
 
-	("PBrow_R", "PFace", "origin", [-2*dx,4.3*dx,0], "origin", [-2*dx,4*dx,dz], F_NODEF, L_PANEL, None, 0),
-	("PBrow_L", "PFace", "origin", [2*dx,4.3*dx,0], "origin", [2*dx,4*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PBrow_R", "PFace", "origin", [-2*dx,4*dx,0], "origin", [-2*dx,4*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PBrow_L", "PFace", "origin", [2*dx,4*dx,0], "origin", [2*dx,4*dx,dz], F_NODEF, L_PANEL, None, 0),
 	("PBrows", "PFace", "origin", [0,4*dx,0], "origin", [0,4*dx,dz], F_NODEF, L_PANEL, None, 0),
 
 	("PUpLid_R", "PFace", "origin", [-2*dx,2.8*dx,0], "origin", [-2*dx,2.8*dx,dz], F_NODEF, L_PANEL, None, 0),
@@ -491,9 +491,187 @@ armature = [
 	("FingerIK-switch", "Root", "head-end", [0,2,0], "head-end", [0,2,-1], F_NODEF, L_ROOT),
 	("Gaze-switch", "Root", "head-end", [0,2.5,0], "head-end", [0,2.5,-1], F_NODEF, L_ROOT),
 '''
-
+#
+#	boneRoll - computer generated list
+#
 
-
+boneRoll = dict({\
+	'Ankle_L'	 : (180, 180), \
+	'Ankle_R'	 : (180, 180), \
+	'Breathe'	 : (  0,   0), \
+	'Clavicle_L'	 : (  0, 110), \
+	'Clavicle_R'	 : (  0, -110), \
+	'ElbowIK_L'	 : (-135, -138), \
+	'ElbowIK_R'	 : (135, 138), \
+	'Eye_L'	 : (  0,   0), \
+	'Eye_R'	 : (  0,   0), \
+	'Finger-1-1_L'	 : (-40,  98), \
+	'Finger-1-1_R'	 : ( 40, -98), \
+	'Finger-1-2_L'	 : (-22,  95), \
+	'Finger-1-2_R'	 : ( 22, -95), \
+	'Finger-1-3_L'	 : (-22,  95), \
+	'Finger-1-3_R'	 : ( 22, -95), \
+	'Finger-1-IK_L'	 : (-25, -92), \
+	'Finger-1-IK_R'	 : ( 25,  92), \
+	'Finger-1-Pole_L'	 : ( -3,  -4), \
+	'Finger-1-Pole_R'	 : (  3,   4), \
+	'Finger-1_L'	 : (-31,  96), \
+	'Finger-1_R'	 : ( 31, -96), \
+	'Finger-2-1_L'	 : (  0,  95), \
+	'Finger-2-1_R'	 : (  0, -95), \
+	'Finger-2-2_L'	 : ( -3,  93), \
+	'Finger-2-2_R'	 : (  3, -93), \
+	'Finger-2-3_L'	 : ( -3,  93), \
+	'Finger-2-3_R'	 : (  3, -93), \
+	'Finger-2-IK_L'	 : ( -7, -93), \
+	'Finger-2-IK_R'	 : (  7,  93), \
+	'Finger-2-Pole_L'	 : ( -3,  -4), \
+	'Finger-2-Pole_R'	 : (  3,   4), \
+	'Finger-2_L'	 : (  0,  94), \
+	'Finger-2_R'	 : (  0, -94), \
+	'Finger-3-1_L'	 : (  3,  94), \
+	'Finger-3-1_R'	 : ( -3, -94), \
+	'Finger-3-2_L'	 : (  0,  93), \
+	'Finger-3-2_R'	 : (  0, -93), \
+	'Finger-3-3_L'	 : (  0,  93), \
+	'Finger-3-3_R'	 : (  0, -93), \
+	'Finger-3-IK_L'	 : ( -3, -93), \
+	'Finger-3-IK_R'	 : (  3,  93), \
+	'Finger-3-Pole_L'	 : ( -3,  -4), \
+	'Finger-3-Pole_R'	 : (  3,   4), \
+	'Finger-3_L'	 : (  2,  94), \
+	'Finger-3_R'	 : ( -2, -94), \
+	'Finger-4-1_L'	 : (  5,  94), \
+	'Finger-4-1_R'	 : ( -5, -94), \
+	'Finger-4-2_L'	 : (  0,  93), \
+	'Finger-4-2_R'	 : (  0, -93), \
+	'Finger-4-3_L'	 : (  0,  93), \
+	'Finger-4-3_R'	 : (  0, -93), \
+	'Finger-4-IK_L'	 : ( -4, -93), \
+	'Finger-4-IK_R'	 : (  4,  93), \
+	'Finger-4-Pole_L'	 : ( -3,  -4), \
+	'Finger-4-Pole_R'	 : (  3,   4), \
+	'Finger-4_L'	 : (  2,  94), \
+	'Finger-4_R'	 : ( -2, -94), \
+	'Finger-5-1_L'	 : (  7,  94), \
+	'Finger-5-1_R'	 : ( -7, -94), \
+	'Finger-5-2_L'	 : (  3,  93), \
+	'Finger-5-2_R'	 : ( -3, -93), \
+	'Finger-5-3_L'	 : (  3,  93), \
+	'Finger-5-3_R'	 : ( -3, -93), \
+	'Finger-5-IK_L'	 : (  0, -93), \
+	'Finger-5-IK_R'	 : (  0,  93), \
+	'Finger-5-Pole_L'	 : ( -3,  -4), \
+	'Finger-5-Pole_R'	 : (  3,   4), \
+	'Finger-5_L'	 : (  5,  94), \
+	'Finger-5_R'	 : ( -5, -94), \
+	'Fingers_L'	 : (  2,  94), \
+	'Fingers_R'	 : ( -2, -94), \
+	'FootIK_L'	 : (-173, -177), \
+	'FootIK_R'	 : (173, 177), \
+	'Foot_L'	 : (  6, -28), \
+	'Foot_R'	 : ( -6,  28), \
+	'Gaze'	 : (180, 180), \
+	'Gaze_L'	 : (180, 180), \
+	'Gaze_R'	 : (180, 180), \
+	'HandIK_L'	 : ( -4,  70), \
+	'HandIK_R'	 : (  4, -70), \
+	'Hand_L'	 : ( -4,  70), \
+	'Hand_R'	 : (  4, -70), \
+	'Head'	 : (  0,   0), \
+	'Head-inv'	 : (180, 180), \
+	'Hip_L'	 : (-11,  93), \
+	'Hip_R'	 : ( 11, -93), \
+	'Hips'	 : (  0, 180), \
+	'Hips-inv'	 : (  0,   0), \
+	'Jaw'	 : (  0,   0), \
+	'KneeIK_L'	 : (  0,   0), \
+	'KneeIK_R'	 : (  0,   0), \
+	'LegCtrl_L'	 : (180, 180), \
+	'LegCtrl_R'	 : (180, 180), \
+	'LoArmTwist_L'	 : (  0,  91), \
+	'LoArmTwist_R'	 : (  0, -91), \
+	'LoArm_L'	 : (  0,  91), \
+	'LoArm_R'	 : (  0, -91), \
+	'LoLeg_L'	 : (-172, 180), \
+	'LoLeg_R'	 : (172, 180), \
+	'LoLid_L'	 : (  2, -17), \
+	'LoLid_R'	 : ( -2,  17), \
+	'Neck'	 : (  0,   0), \
+	'PBrow_L'	 : (  0, 180), \
+	'PBrow_R'	 : (  0, 180), \
+	'PBrows'	 : (  0, 180), \
+	'PCheek_L'	 : (  0, 180), \
+	'PCheek_R'	 : (  0, 180), \
+	'PFace'	 : (  0, 180), \
+	'PJaw'	 : (  0, 180), \
+	'PLoLid_L'	 : (  0, 180), \
+	'PLoLid_R'	 : (  0, 180), \
+	'PLoLip'	 : (  0, 180), \
+	'PLoLip_L'	 : (  0, 180), \
+	'PLoLip_R'	 : (  0, 180), \
+	'PMouth'	 : (  0, 180), \
+	'PMouth_L'	 : (  0, 180), \
+	'PMouth_R'	 : (  0, 180), \
+	'PNose'	 : (  0, 180), \
+	'PTounge'	 : (  0, 180), \
+	'PUpLid_L'	 : (  0, 180), \
+	'PUpLid_R'	 : (  0, 180), \
+	'PUpLip'	 : (  0, 180), \
+	'PUpLip_L'	 : (  0, 180), \
+	'PUpLip_R'	 : (  0, 180), \
+	'Pelvis'	 : (  0,   0), \
+	'Root'	 : (  0,   0), \
+	'Spine1'	 : (  0,   0), \
+	'Spine2'	 : (  0,   0), \
+	'Spine3'	 : (  0,   0), \
+	'Stomach'	 : (180, 180), \
+	'Toe-1-1_L'	 : (  5, 139), \
+	'Toe-1-1_R'	 : ( -5, -139), \
+	'Toe-1-2_L'	 : (  5, 139), \
+	'Toe-1-2_R'	 : ( -5, -139), \
+	'Toe-2-1_L'	 : (  8, 103), \
+	'Toe-2-1_R'	 : ( -8, -103), \
+	'Toe-2-2_L'	 : (  4, -29), \
+	'Toe-2-2_R'	 : ( -4,  29), \
+	'Toe-2-3_L'	 : (  4, -29), \
+	'Toe-2-3_R'	 : ( -4,  29), \
+	'Toe-3-1_L'	 : (-19, 159), \
+	'Toe-3-1_R'	 : ( 19, -159), \
+	'Toe-3-2_L'	 : ( 25, 175), \
+	'Toe-3-2_R'	 : (-25, -175), \
+	'Toe-3-3_L'	 : ( 25, 175), \
+	'Toe-3-3_R'	 : (-25, -175), \
+	'Toe-4-1_L'	 : (-29, -162), \
+	'Toe-4-1_R'	 : ( 29, 162), \
+	'Toe-4-2_L'	 : ( 30, 172), \
+	'Toe-4-2_R'	 : (-30, -172), \
+	'Toe-4-3_L'	 : ( 30, 172), \
+	'Toe-4-3_R'	 : (-30, -172), \
+	'Toe-5-1_L'	 : (-32, 160), \
+	'Toe-5-1_R'	 : ( 32, -160), \
+	'Toe-5-2_L'	 : ( 36, -171), \
+	'Toe-5-2_R'	 : (-36, 171), \
+	'Toe-5-3_L'	 : ( 36, -171), \
+	'Toe-5-3_R'	 : (-36, 171), \
+	'ToeIK_L'	 : (  5, -164), \
+	'ToeIK_R'	 : ( -5, 164), \
+	'Toe_L'	 : (  5, -164), \
+	'Toe_R'	 : ( -5, 164), \
+	'Torso'	 : (  0, 180), \
+	'ToungeBase'	 : (  0,   0), \
+	'ToungeTip'	 : (  0,   0), \
+	'UpArmTwist_L'	 : (  0,  97), \
+	'UpArmTwist_R'	 : (  0, -97), \
+	'UpArm_L'	 : (  0,  97), \
+	'UpArm_R'	 : (  0, -97), \
+	'UpLegTwist_L'	 : ( 19, -177), \
+	'UpLegTwist_R'	 : (-19, 177), \
+	'UpLeg_L'	 : ( 19, -177), \
+	'UpLeg_R'	 : (-19, 177), \
+	'UpLid_L'	 : ( -2, -16), \
+	'UpLid_R'	 : (  2,  16), \
+})
 
 #
 #	Definition of constraints
@@ -661,6 +839,7 @@ def writeBones(obj, fp):
 			fp.write("\t\ttail joint %s + %f %f %f ;\n" % (tjoint, x[0], x[1], x[2]))
 		else:
 			fp.write("\t\ttail joint %s ;\n" % (tjoint))
+		fp.write("\t\troll %f %f ;\n" % boneRoll[bone])
 		fp.write("\tend bone\n")
 
 #
