@@ -49,7 +49,7 @@ done = 0
 
 toggleMhxBase = 0
 toggleGeoOnly = 0
-MHDir = "C:/program/makehuman/"
+MHDir = "/home/svn/"
 
 
 #
@@ -928,59 +928,59 @@ def exportMesh(ob, fp):
 	#
 	#	Faces and face UV
 	#
-	if me.faceUV and toggleMhxBase and obName == 'Human':
-		print "single face with vt"
-		f = me.faces[0]
-		for uv in f.uv:
-			fp.write("  vt %f %f ;\n" %(uv.x, uv.y))
-		fp.write("  f")
-		v = f.verts[0]
-		n = 0
-		for v in f.verts:
-			fp.write(" %d/%d" %( v.index, n ))
-			n += 1
-		fp.write(" ;\n")
-		fp.write("  ftall %x %x %d %d %d ;\n" % (f.flag, f.mode, f.transp, f.mat, f.smooth))
-
-	elif me.faceUV:
-		print "multi faces with vt"
-		for f in me.faces:
+	if me.faceUV:
+		if toggleMhxBase and obName == 'Human':
+			print "single face with vt"
+			f = me.faces[0]
 			for uv in f.uv:
 				fp.write("  vt %f %f ;\n" %(uv.x, uv.y))
-		n = 0
-		for f in me.faces:
 			fp.write("  f")
+			v = f.verts[0]
+			n = 0
 			for v in f.verts:
 				fp.write(" %d/%d" %( v.index, n ))
 				n += 1
 			fp.write(" ;\n")
+		else:
+			print "multi faces with vt"
+			for f in me.faces:
+				for uv in f.uv:
+					fp.write("  vt %f %f ;\n" %(uv.x, uv.y))
+			n = 0
+			for f in me.faces:
+				fp.write("  f")
+				for v in f.verts:
+					fp.write(" %d/%d" %( v.index, n ))
+					n += 1
+				fp.write(" ;\n")
 		if len(me.materials) <= 1:
 			fp.write("  ftall %x %x %d %d %d ;\n" % (f.flag, f.mode, f.transp, f.mat, f.smooth))
 		else:
 			for f in me.faces:
 				fp.write("  ft %d %x %x %d %d %d ;\n" % (f.index, f.flag, f.mode, f.transp, f.mat, f.smooth))
 			
-	elif me.faces and toggleMhxBase and obName == 'Human':
-		print "single face w/o vt"
-		fp.write("  f")
-		f = me.faces[0]
-		for v in f.verts:
-			fp.write(" %i" %( v.index ))
-		fp.write(" ;\n")
-		fp.write("  fxall %d %d ;\n" %  ( f.mat, f.smooth))
-
 	elif me.faces:
-		print "multi faces w/o vt"
-		for f in me.faces:
+		if toggleMhxBase and obName == 'Human':
+			print "single face w/o vt"
 			fp.write("  f")
+			f = me.faces[0]
 			for v in f.verts:
 				fp.write(" %i" %( v.index ))
 			fp.write(" ;\n")
+
+		else:
+			print "multi faces w/o vt"
+			for f in me.faces:
+				fp.write("  f")
+				for v in f.verts:
+					fp.write(" %i" %( v.index ))
+				fp.write(" ;\n")
 		if len(me.materials) <= 1:
 			fp.write("  fxall %d %d ;\n" %  ( f.mat, f.smooth))
 		else:
 			for f in me.faces:
 				fp.write("  fx %d %d %d ;\n" %  ( f.index, f.mat, f.smooth))
+	
 	elif me.edges:
 		for e in me.edges:
 			fp.write("  e %d %d ;\n" % ( e.v1.index, e.v2.index) )
