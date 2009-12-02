@@ -136,9 +136,9 @@ static PyMemberDef Camera_members[] = {
     {NULL}  /* Sentinel */
 };
 
-void Camera_convertToScreen(Camera *camera, const double world[3], double screen[3]);
-void Camera_convertToWorld2D(Camera *camera, const double screen[2], double world[3]);
-void Camera_convertToWorld3D(Camera *camera, const double screen[3], double world[3]);
+PyObject *Camera_convertToScreen(Camera *camera, PyObject *args);
+PyObject *Camera_convertToWorld2D(Camera *camera, PyObject *args);
+PyObject *Camera_convertToWorld3D(Camera *camera, PyObject *args);
 
 // Camera Methods
 static PyMethodDef Camera_methods[] = {
@@ -966,7 +966,7 @@ void mhGetPickedCoords(int x, int y)
     the z coord = 9.5 is normalized to 0.800801. So we use this fixed
     precalculated value.
     */
-    mhCameraPosition(PyList_GetItem(G.cameras, 1), 0);/*Applying GUI matrix*/
+    mhCameraPosition((Camera*)PyList_GetItem(G.cameras, 1), 0);/*Applying GUI matrix*/
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
     glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
     gluUnProject(x, viewport[3]-y, 0.800801f, modelview,
@@ -1016,7 +1016,7 @@ void UpdatePickingBuffer(void)
 
   for (i = 0; i < PyList_Size(G.cameras); i++)
   {
-    mhCameraPosition(PyList_GetItem(G.cameras, i), 0);
+    mhCameraPosition((Camera*)PyList_GetItem(G.cameras, i), 0);
     mhDrawMeshes(1, i);
   }
 
@@ -1085,7 +1085,7 @@ void mhGetPickedColor(int x, int y)
  *  the specified camera setting.
  *
  */
-void Camera_convertToScreen(Camera *camera, PyObject *args)
+PyObject *Camera_convertToScreen(Camera *camera, PyObject *args)
 {
   GLint viewport[4];
   GLdouble modelview[16], projection[16];
@@ -1115,7 +1115,7 @@ void Camera_convertToScreen(Camera *camera, PyObject *args)
  *  the specified camera setting.
  *
  */
-void Camera_convertToWorld2D(Camera *camera, PyObject *args)
+PyObject *Camera_convertToWorld2D(Camera *camera, PyObject *args)
 {
   GLint viewport[4];
   GLdouble modelview[16], projection[16];
@@ -1146,7 +1146,7 @@ void Camera_convertToWorld2D(Camera *camera, PyObject *args)
  *  the specified camera setting.
  *
  */
-void Camera_convertToWorld3D(Camera *camera, PyObject *args)
+PyObject *Camera_convertToWorld3D(Camera *camera, PyObject *args)
 {
   GLint viewport[4];
   GLdouble modelview[16], projection[16];
