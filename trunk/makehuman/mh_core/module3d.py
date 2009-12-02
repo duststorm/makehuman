@@ -1227,7 +1227,7 @@ class Scene3D:
 
         **Parameters:** This method has no parameters.
         """
-        return mh.getMousePos3D()
+        return mh.cameras[0].convertToWorld2D(mh.getMousePos2D())
 
     def getMousePosGUI(self):
         """
@@ -1242,74 +1242,7 @@ class Scene3D:
 
         **Parameters:** This method has no parameters.
         """
-        return mh.getMousePosGUI()
-        
-    def convertToScreen(self, x, y, z, camera = 0):
-        """
-        This method returns the screen coordinates corresponding to the specified 
-        OpenGL 3D world coordinates for the camera type given.  
-        
-        It calls the convertToScreen function on the 'mh' module 
-        (a module created dynamically at run time by main.c) to calculate these  
-        coordinates.
-
-        Parameters
-        ----------
-
-        x:
-            *int* The x-coordinate of the 3D world point.
-        y:
-            *int* The y-coordinate of the 3D world point.
-        z:
-            *int* The z-coordinate of the 3D world point.
-        camera:
-            *int* The camera type.
-        """
-        return mh.convertToScreen(x, y, z, camera)
-        
-    def convertToWorld2D(self, x, y, camera = 0):
-        """
-        This method returns the OpenGL 2D world coordinates corresponding to the 
-        specified screen coordinates for the camera type given.  
-        
-        It calls the convertToWorld2D function on the 'mh' module 
-        (a module created dynamically at run time by main.c) to calculate these  
-        coordinates.
-
-        Parameters
-        ----------
-
-        x:
-            *int* The x-coordinate of the screen position.
-        y:
-            *int* The y-coordinate of the screen position.
-        camera:
-            *int* The camera type.
-        """
-        return mh.convertToWorld2D(x, y, camera)
-       
-    def convertToWorld3D(self, x, y, z, camera = 0):
-        """
-        This method returns the OpenGL 3D world coordinates corresponding to the 
-        specified screen coordinates for the camera type given.  
-        
-        It calls the convertToWorld3D function on the 'mh' module 
-        (a module created dynamically at run time by main.c) to calculate these  
-        coordinates.
-
-        Parameters
-        ----------
-
-        x:
-            *int* The x-coordinate of the screen position.
-        y:
-            *int* The y-coordinate of the screen position.
-        z:
-            *int* The z-coordinate of the 3D world point.
-        camera:
-            *int* The camera type.
-        """
-        return mh.convertToWorld3D(x, y, z, camera)    
+        return mh.getMousePosGUI()  
 
     def getWindowSize(self):
         """
@@ -1690,124 +1623,6 @@ class Scene3D:
 
         """
         return [self.mouseXRel, self.mouseYRel]
-    
-    def getCameraFraming(self):
-        """
-        This method return a label to identify the main
-        camera framing (front, back. side, top) depending
-        the camera rotations.
-        
-        **Parameters:** This method has no parameters.
-        """
-        #TODO: top and botton view
-        xRot = mh.getCameraRotations()[0] % 360
-        yRot = mh.getCameraRotations()[1] % 360
-        
-        
-        if (315 < yRot <= 360) or (0 <= yRot < 45):
-            return "FRONTAL_VIEW"
-        if (145 < yRot < 235):
-            return "BACK_VIEW"
-        if (45 < yRot < 145):
-            return "LEFT_VIEW"
-        if (235 < yRot < 315):
-            return "RIGHT_VIEW"
-        
-        
-        
-
-    def getCameraRotations(self):
-        """
-        This method retrieves the amount by which a cursor movement has
-        rotated the camera, returning the x and y rotations in degrees
-        as a list of two floats.
-        **Note.** The camera can only rotate around the X and Y axes.
-
-        **Parameters:** This method has no parameters.
-
-        """
-        return mh.getCameraRotations()
-        
-    def setCameraRotations(self, rotX, rotY):
-        """
-        This method sets the amount by which a cursor movement has
-        rotated the camera, passing the x and y rotations in degrees
-        as two floats.
-        **Note.** The camera can only rotate around the X and Y axes.
-
-        Parameters
-        ----------
-
-        rotX:
-            *int*. Rotation around the x axis in degrees.
-        rotY:
-            *int*. Rotation around the y axis in degrees.
-
-        """
-        return mh.setCameraRotations(rotX, rotY)
-
-    def getCameraTranslations(self):
-        """
-        This method retrieves the amount by which a cursor movement has
-        translated the camera, returning the x and y displacements as a
-        list of two floats. The values returned are 0.05 times the number
-        of pixels moved by the cursor.
-        **Note.** The camera is only translated in the XY-plane. Movements in
-        the Z direction are treated as 'zoom' and can be retrieved using the
-        getCameraZoom method.
-
-        **Parameters:** This method has no parameters.
-
-        """
-        return mh.getCameraTranslations()
-        
-    def setCameraTranslations(self, x, y):
-        """
-        This method sets the amount by which a cursor movement has
-        translated the camera, passing the x and y displacements as
-        two floats.
-        **Note.** The camera is only translated in the XY-plane. Movements in
-        the Z direction are treated as 'zoom' and can be set using the
-        setCameraZoom method.
-
-        Parameters
-        ----------
-
-        x:
-            *float*. Translation on the x axis.
-        y:
-            *float*. Translation on the y axis.
-
-        """
-        return mh.setCameraTranslations(x, y)
-
-    def getCameraZoom(self):
-        """
-        This method retrieves the amount by which a cursor movement has
-        zoomed the camera, returning the z displacement as a
-        single float value. The value returned is 0.05 times the number
-        of pixels moved by the cursor.
-
-        **Parameters:** This method has no parameters.
-
-        """
-        return mh.getCameraZoom()
-        
-    def setCameraZoom(self, zoom):
-        """
-        This method sets the amount by which a cursor movement has
-        zoomed the camera, passing the z displacement as a
-        single float value. The value returned is 0.05 times the number
-        of pixels moved by the cursor.
-
-        Parameters
-        ----------
-
-        zoom:
-            *float*. Zoom factor.
-
-        """
-        return mh.setCameraZoom(zoom)
 
     def getCameraSettings(self):
         """
@@ -1820,33 +1635,14 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
-        return mh.getCameraSettings()
-        
-    def getCameraStereoSettings(self):
-        """
-        This method passes the current camera stereo settings through from the
-        C core to the Python code. A list of numeric values is returned,
-        including the stereoMode and eyeSeparation:
-        [stereoMode, eyeSeparation]. 
-
-        **Parameters:** This method has no parameters.
-
-        """
-        return mh.getCameraStereoSettings()
-        
-    def setCameraStereoSettings(self, stereoMode, eyeSeparation):
-        """
-        This method sets the camera stereo settings. 
-
-        Parameters
-        ----------
-
-        zoom:
-            *stereoMode*. Stereo mode: 0 no stereo, 1 toe-in, 2 off-axis.
-            *eyeSeparation*. Distance between the eye positions.
-
-        """
-        return mh.setCameraStereoSettings(stereoMode, eyeSeparation)
+        settings = mh.getCameraSettings()
+        pos = self.selectedHuman.getPosition()
+        rot = self.selectedHuman.getRotation()
+        settings[0] = pos[0]
+        settings[1] = pos[1]
+        settings[3] = rot[0]
+        settings[4] = rot[1]
+        return settings
 
     def getKeyModifiers(self):
         """

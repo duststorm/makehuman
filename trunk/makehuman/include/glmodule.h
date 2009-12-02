@@ -55,9 +55,6 @@ void mhPassiveMotion(int x,int y, int xrel, int yrel);
 // Calculations for 3d coordinates and selection
 void mhGetPickedCoords(int x, int y);
 void mhGetPickedColor(int x, int y);
-void mhConvertToScreen(const double world[3], double screen[3], int camera);
-void mhConvertToWorld2D(const double screen[2], double world[3], int camera);
-void mhConvertToWorld3D(const double screen[3], double world[3], int camera);
 
 // Window events
 void mhReshape(int w, int h);
@@ -69,8 +66,6 @@ void OnInit(void);
 void OnExit(void);
 
 // Drawing
-void mhSceneCameraPosition(void);
-void mhGUICameraPosition(void);
 void mhDrawMeshes(int pickMode, int cameraType);
 void mhDraw(void);
 

@@ -47,8 +47,8 @@ class SaveTaskView(gui3d.TaskView):
       filename = filename.split()[0]
       
       # Save the thumbnail
-      leftTop = self.app.scene3d.convertToScreen(-10, 10, 0, 1)
-      rightBottom = self.app.scene3d.convertToScreen(10, -9, 0, 1)
+      leftTop = mh.cameras[0].convertToScreen(-10, 9, 0)
+      rightBottom = mh.cameras[0].convertToScreen(10, -10, 0)
       self.app.scene3d.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), modelPath + "/" + filename + ".bmp")
       
       # Save the model
@@ -83,18 +83,18 @@ class SaveTaskView(gui3d.TaskView):
     # When the task gets shown, set the focus to the file entry
     gui3d.TaskView.onShow(self, event)
     self.fileentry.setFocus()
-    self.pan = self.app.scene3d.getCameraTranslations()
-    self.zoom = self.app.scene3d.getCameraZoom()
-    self.rotation = self.app.scene3d.getCameraRotations()
-    self.app.scene3d.setCameraTranslations(0, -1)
-    self.app.scene3d.setCameraZoom(70.0)
-    self.app.scene3d.setCameraRotations(0.0, 0.0)
+    self.pan = self.app.scene3d.selectedHuman.getPosition()
+    self.zoom = mh.cameras[0].zoom
+    self.rotation = self.app.scene3d.selectedHuman.getRotation()
+    self.app.scene3d.selectedHuman.setPosition([0, -1, 0])
+    mh.cameras[0].zoom = 70.0
+    self.app.scene3d.selectedHuman.setRotation([0.0, 0.0, 0.0])
     
   def onHide(self, event):
     gui3d.TaskView.onHide(self, event)
-    self.app.scene3d.setCameraTranslations(self.pan[0], self.pan[1])
-    self.app.scene3d.setCameraZoom(self.zoom)
-    self.app.scene3d.setCameraRotations(self.rotation[0], self.rotation[1])
+    self.app.scene3d.selectedHuman.setPosition(self.pan)
+    mh.cameras[0].zoom = self.zoom
+    self.app.scene3d.selectedHuman.setRotation(self.rotation)
 
 class LoadTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -194,18 +194,18 @@ class ExportTaskView(gui3d.TaskView):
     # When the task gets shown, set the focus to the file entry
     gui3d.TaskView.onShow(self, event)
     self.fileentry.setFocus()
-    self.pan = self.app.scene3d.getCameraTranslations()
-    self.zoom = self.app.scene3d.getCameraZoom()
-    self.rotation = self.app.scene3d.getCameraRotations()
-    self.app.scene3d.setCameraTranslations(0, -1)
-    self.app.scene3d.setCameraZoom(70.0)
-    self.app.scene3d.setCameraRotations(0.0, 0.0)
+    self.pan = self.app.scene3d.selectedHuman.getPosition()
+    self.zoom = mh.cameras[0].zoom
+    self.rotation = self.app.scene3d.selectedHuman.getRotation()
+    self.app.scene3d.selectedHuman.setPosition([0, -1, 0])
+    mh.cameras[0].zoom = 70.0
+    self.app.scene3d.selectedHuman.setRotation([0.0, 0.0, 0.0])
     
   def onHide(self, event):
     gui3d.TaskView.onHide(self, event)
-    self.app.scene3d.setCameraTranslations(self.pan[0], self.pan[1])
-    self.app.scene3d.setCameraZoom(self.zoom)
-    self.app.scene3d.setCameraRotations(self.rotation[0], self.rotation[1])
+    self.app.scene3d.selectedHuman.setPosition(self.pan)
+    mh.cameras[0].zoom = self.zoom
+    self.app.scene3d.selectedHuman.setRotation(self.rotation)
 
 class FilesCategory(gui3d.Category):
   def __init__(self, parent):

@@ -63,14 +63,7 @@ static void initGlobals(void)
 {
     // Objects
     G.world = PyList_New(0);
-
-    // Camera
-    G.fovAngle = 25;
-    G.zoom = 60;
-    G.rotX = 0;
-    G.rotY = 0;
-    G.translX = 0;
-    G.translY = 0;
+    G.cameras = PyList_New(0);
 
     // Screen
     G.windowHeight = 600;
@@ -122,76 +115,6 @@ static PyObject* mh_getColorPicked(PyObject *self, PyObject *args)
     return Py_BuildValue("[i,i,i]", G.color_picked[0], G.color_picked[1], G.color_picked[2]);
 }
 
-/** \brief Get the current camera rotation settings.
- *
- *  This function returns the current camera rotation settings as a Python
- *  list of 2 float values. This is an X and a Y rotation in degrees.
- */
-static PyObject* mh_getCameraRotations(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("[f,f]", G.rotX,G.rotY);
-}
-
-/** \brief Set the current camera rotation settings.
- *
- *  This function sets the current camera rotation settings as 
- *  2 float values. This is an X and a Y rotation in degrees.
- */
-static PyObject* mh_setCameraRotations(PyObject *self, PyObject *args)
-{
-  if (!PyArg_ParseTuple(args, "ff", &G.rotX, &G.rotY))
-      return NULL;
-  return Py_BuildValue("");
-}
-
-/** \brief Get the current camera translation (pan) settings.
- *
- *  This function returns the current camera translation settings as a Python
- *  list of 2 float values. This is an X and a Y translation in ???.
- *  <b>EDITORIAL NOTE. Need to indicate the units used.</b>
- */
-static PyObject* mh_getCameraTranslations(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("[f,f]", G.translX,G.translY);
-}
-
-/** \brief Set the current camera translation (pan) settings.
- *
- *  This function returns the current camera translation settings as
- *  2 float values. This is an X and a Y translation in ???.
- *  <b>EDITORIAL NOTE. Need to indicate the units used.</b>
- */
-static PyObject* mh_setCameraTranslations(PyObject *self, PyObject *args)
-{
-    if (!PyArg_ParseTuple(args, "ff", &G.translX, &G.translY))
-        return NULL;
-    return Py_BuildValue("");
-}
-
-/** \brief Get the current camera zoom setting.
- *
- *  This function returns the current camera zoom setting as a Python
- *  float value.
- *  <b>EDITORIAL NOTE. Need to indicate the units used.</b>
- */
-static PyObject* mh_getCameraZoom(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("f", G.zoom);
-}
-
-/** \brief Set the current camera zoom setting.
- *
- *  This function sets the current camera zoom setting as a Python
- *  float value.
- *  <b>EDITORIAL NOTE. Need to indicate the units used.</b>
- */
-static PyObject* mh_setCameraZoom(PyObject *self, PyObject *args)
-{
-    if (!PyArg_ParseTuple(args, "f", &G.zoom))
-        return NULL;
-    return Py_BuildValue("");
-}
-
 /** \brief Get the current camera settings.
  *
  *  This function returns the current camera settings as a list of 8 Python
@@ -210,19 +133,15 @@ static PyObject* mh_setCameraZoom(PyObject *self, PyObject *args)
  */
 static PyObject* mh_getCameraSettings(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("[f,f,f,f,f,f,i,i]",
-                         G.translX, G.translY, G.zoom,
-                         G.rotX, G.rotY,
-                         G.fovAngle,
-                         G.windowHeight, G.windowWidth);
-}
+    PyObject *camera = PyList_GetItem(G.cameras, 0);
+    float fovAngle = PyFloat_AsDouble(PyObject_GetAttrString(camera, "fovAngle"));
+    float zoom = PyFloat_AsDouble(PyObject_GetAttrString(camera, "zoom"));
 
-static PyObject* mh_setCameraSettings(PyObject *self, PyObject *args)
-{
-    if (!PyArg_ParseTuple(args, "f,f,f,f,f,f,i,i", &G.translX, &G.translY, &G.zoom,
-        &G.rotX, &G.rotY, &G.fovAngle, &G.windowHeight, &G.windowWidth))
-        return NULL;
-    return Py_BuildValue("");
+    return Py_BuildValue("[f,f,f,f,f,f,i,i]",
+                         0.0, 0.0, zoom,
+                         0.0, 0.0,
+                         fovAngle,
+                         G.windowHeight, G.windowWidth);
 }
 
 /** \brief Get the current mouse x, y cursor position on the screen, in pixels.
@@ -236,22 +155,6 @@ static PyObject* mh_getMousePos2D(PyObject *self, PyObject *args)
     return Py_BuildValue("[i,i]", x, y);
 }
 
-/** \brief Get the current mouse x, y, z cursor position in the 3D scene.
- *  This function retrieves the x, y and z mouse position in screen
- *  coordinates returning three float values to the Python code.
- */
-static PyObject* mh_getMousePos3D(PyObject *self, PyObject *args)
-{
-    int x, y;
-    double screen[2];
-    double world[3];
-    SDL_GetMouseState(&x, &y);
-    screen[0] = x;
-    screen[1] = y;
-    mhConvertToWorld2D(screen, world, 1);
-    return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
-}
-
 /** \brief Get the current mouse x, y, z cursor position in the 3D GUI.
  *  This function retrieves the x, y and z mouse position in GUI
  *  coordinates returning three float values to the Python code.
@@ -259,48 +162,6 @@ static PyObject* mh_getMousePos3D(PyObject *self, PyObject *args)
 static PyObject* mh_getMousePosGUI(PyObject *self, PyObject *args)
 {
     return Py_BuildValue("[d,d,d]", G.mouseGUIX, G.mouseGUIY, G.mouseGUIZ);
-}
-
-static PyObject* mh_convertToScreen(PyObject *self, PyObject *args)
-{
-    double world[3];
-    double screen[3];
-    int camera;
-    if (!PyArg_ParseTuple(args, "dddi", screen, screen + 1, screen + 2, &camera))
-        return NULL;
-    else
-    {
-        mhConvertToScreen(screen, world, camera);
-        return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
-    }
-}
-
-static PyObject* mh_convertToWorld2D(PyObject *self, PyObject *args)
-{
-    double screen[2];
-    double world[3];
-    int camera;
-    if (!PyArg_ParseTuple(args, "ddi", screen, screen + 1, &camera))
-        return NULL;
-    else
-    {
-        mhConvertToWorld2D(screen, world, camera);
-        return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
-    }
-}
-
-static PyObject* mh_convertToWorld3D(PyObject *self, PyObject *args)
-{
-    double screen[3];
-    double world[3];
-    int camera;
-    if (!PyArg_ParseTuple(args, "dddi", screen, screen + 1, screen + 2, &camera))
-        return NULL;
-    else
-    {
-        mhConvertToWorld3D(screen, world, camera);
-        return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
-    }
 }
 
 /** \brief Get the current window (viewport) width and height in pixels.
@@ -591,21 +452,10 @@ static PyMethodDef EmbMethods[] =
 {
     {"setTimeTimer", mh_setTimeTimer, METH_VARARGS, ""},
     {"getMousePosGUI", mh_getMousePosGUI, METH_VARARGS, ""},
-    {"getMousePos3D", mh_getMousePos3D, METH_VARARGS, ""},
     {"getWindowSize", mh_getWindowSize, METH_VARARGS, ""},
     {"getMousePos2D", mh_getMousePos2D, METH_VARARGS, ""},
-    {"convertToScreen", mh_convertToScreen, METH_VARARGS, ""},
-    {"convertToWorld2D", mh_convertToWorld2D, METH_VARARGS, ""},
-    {"convertToWorld3D", mh_convertToWorld3D, METH_VARARGS, ""},
     {"getKeyModifiers", mh_getKeyModifiers, METH_VARARGS, ""},
-    {"getCameraRotations", mh_getCameraRotations, METH_VARARGS, ""},
-    {"setCameraRotations", mh_setCameraRotations, METH_VARARGS, ""},
-    {"getCameraTranslations", mh_getCameraTranslations, METH_VARARGS, ""},
-    {"setCameraTranslations", mh_setCameraTranslations, METH_VARARGS, ""},
-    {"getCameraZoom", mh_getCameraZoom, METH_VARARGS, ""},
-    {"setCameraZoom", mh_setCameraZoom, METH_VARARGS, ""},
     {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
-    {"setCameraSettings", mh_setCameraSettings, METH_VARARGS, ""},
     {"updatePickingBuffer", mh_updatePickingBuffer, METH_NOARGS, ""},
     {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},
@@ -648,6 +498,7 @@ PyMODINIT_FUNC initmh()
     module = Py_InitModule3("mh", EmbMethods, "makehuman as a module.");
 
     RegisterObject3D(module);
+    RegisterCamera(module);
     RegisterTexture(module);
     PyModule_AddObject(module, "world", G.world);
 }
@@ -690,8 +541,10 @@ int main(int argc, char *argv[])
     initGlobals(); /* initialize all our globals */
     module = Py_InitModule("mh", EmbMethods);
     RegisterObject3D(module);
+    RegisterCamera(module);
     RegisterTexture(module);
     PyModule_AddObject(module, "world", G.world);
+    PyModule_AddObject(module, "cameras", G.cameras);
 
 #if defined(__GNUC__) && defined(__WIN32__)
     PyRun_SimpleString("import sys\nfo = open(\"python_out.txt\", \"w\")\nsys.stdout = fo");

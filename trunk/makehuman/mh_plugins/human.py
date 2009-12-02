@@ -33,7 +33,7 @@ import mh
 class Human(gui3d.Object):
     
     def __init__(self, globalScene, objFilePath):
-        gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 1, shadeless = 0, visible = True)
+        gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 0, shadeless = 0, visible = True)
         self.meshData = self.mesh
         # Uncomment the following 4 lines to use a shader
         #vertex_shader = mh.createVertexShader(open("data/shaders/glsl/skin_vertex_shader.txt").read())

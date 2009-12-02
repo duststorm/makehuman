@@ -22,12 +22,12 @@ TODO
 
 __docformat__ = 'restructuredtext'
 
-import events3d, files3d, animation3d, module3d, types
+import events3d, files3d, animation3d, module3d, types, mh
 import os
 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
-  def __init__(self, view, mesh, texture = None, position = [0, 0, 9], camera = 0, shadeless = 1, visible = True):
+  def __init__(self, view, mesh, texture = None, position = [0, 0, 9], camera = 1, shadeless = 1, visible = True):
     self.app = view.app
     self.view = view
     self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
@@ -63,6 +63,12 @@ class Object(events3d.EventHandler):
   
   def setPosition(self, position):
     self.mesh.setLoc(position[0], position[1], position[2])
+    
+  def getRotation(self):
+    return [self.mesh.rx, self.mesh.ry, self.mesh.rz]
+  
+  def setRotation(self, rotation):
+    self.mesh.setRot(rotation[0], rotation[1], rotation[2])
     
   def setTexture(self, texture):
     if texture:
@@ -521,15 +527,15 @@ class Slider(View):
   
   def onMouseDragged(self, event):
     sliderPos = self.slider.getPosition()
-    screenPos = self.app.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
-    worldPos = self.app.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
+    screenPos = mh.cameras[1].convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
+    worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
     sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
     self.slider.setPosition(sliderPos)
     
   def onMouseUp(self, event):
     sliderPos = self.slider.getPosition()
-    screenPos = self.app.scene3d.convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
-    worldPos = self.app.scene3d.convertToWorld3D(event.x, event.y, screenPos[2])
+    screenPos = mh.cameras[1].convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
+    worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
     sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
     self.slider.setPosition(sliderPos)
     self.value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)

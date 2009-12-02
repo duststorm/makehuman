@@ -43,6 +43,7 @@ extern "C" {
 #endif
 
 void RegisterObject3D(PyObject *module);
+void RegisterCamera(PyObject *module);
 void RegisterTexture(PyObject *module);
 
 extern PyTypeObject Object3DType;
@@ -139,21 +140,8 @@ int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds);
 typedef struct
 {
     PyObject *world;
-    //OBJARRAY world;                /**< \brief A pointer to the list of objects.                                           */
-    /**<        A pointer to an array of object3D objects that contains the list of
-                currently defined objects.                                                  */
-    float fovAngle;                /**< \brief The current Field Of View angle.                                            */
-    /**<        A float holding the current Field of View of the camera.                    */
-    float zoom;                    /**< \brief The current camera Zoom setting.                                            */
-    /**<        A float holding the current camera Zoom setting.                            */
-    float rotX;                    /**< \brief The current camera rotation around the x-axis (the tilt).                   */
-    /**<        A float holding the current camera x-rotation setting.                      */
-    float rotY;                    /**< \brief The current camera rotation around the y-axis (left/right).                 */
-    /**<        A float holding the current camera y-rotation setting.                      */
-    float translX;                 /**< \brief The current camera x-translation (pan left/right).                          */
-    /**<        A float holding the current camera x-translation setting.                   */
-    float translY;                 /**< \brief The current camera y-translation (pan up/down).                             */
-    /**<        A float holding the current camera y-translation setting.                   */
+    PyObject *cameras;
+
     int windowHeight;              /**< \brief The current window height in pixels.                                        */
     /**<        An int holding the current window height in pixels.                         */
     int windowWidth;               /**< \brief The current window width in pixels.                                         */

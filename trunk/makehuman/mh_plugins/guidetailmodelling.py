@@ -170,8 +170,31 @@ class Detail3dTool(events3d.EventHandler):
     self.y.onMouseDown(event)
     self.z.onMouseDown(event)
     
+  def getCameraFraming(self):
+    """
+    This method return a label to identify the main
+    camera framing (front, back. side, top) depending
+    the camera rotations.
+    
+    **Parameters:** This method has no parameters.
+    """
+    #TODO: top and botton view
+    rot = self.app.scene3d.selectedHuman.getRotation()
+    
+    xRot = rot[0] % 360
+    yRot = rot[1] % 360
+    
+    if (315 < yRot <= 360) or (0 <= yRot < 45):
+        return "FRONTAL_VIEW"
+    if (145 < yRot < 235):
+        return "BACK_VIEW"
+    if (45 < yRot < 145):
+        return "LEFT_VIEW"
+    if (235 < yRot < 315):
+        return "RIGHT_VIEW"
+    
   def onMouseDragged(self, event):
-    viewType =  self.app.scene3d.getCameraFraming() 
+    viewType =  self.getCameraFraming() 
     
     if viewType == "FRONTAL_VIEW":
       d = event.dy

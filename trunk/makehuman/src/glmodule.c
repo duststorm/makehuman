@@ -71,6 +71,8 @@ static int g_windowWidth = 800;
 static int g_windowHeight = 600;
 static SDL_Surface *g_screen = NULL;
 
+#define GL_CLAMP_TO_EDGE_EXT 0x812F
+
 #ifndef __APPLE__
 typedef SDL_Surface *(*PFN_IMG_LOAD)(const char *);
 static void *g_sdlImageHandle = NULL;
@@ -103,6 +105,156 @@ static int g_ShadersSupported = 0;
 #else
 static int g_ShadersSupported = 1;
 #endif /* ifndef __APPLE__*/
+
+typedef struct
+{
+    PyObject_HEAD
+
+    float fovAngle;
+    float nearPlane;
+    float farPlane;
+
+    int stereoMode;
+    float eyeSeparation;
+
+    float zoom;
+
+    //float position[3];
+    //float up[3];
+} Camera;
+
+void mhCameraPosition(Camera *camera, int eye);
+
+// Camera attributes directly accessed by Python
+static PyMemberDef Camera_members[] = {
+    {"fovAngle", T_FLOAT, offsetof(Camera, fovAngle), 0, "The Field Of View angle."},
+    {"nearPlane", T_FLOAT, offsetof(Camera, nearPlane), 0, "The Near Clipping Plane."},
+    {"farPlane", T_FLOAT, offsetof(Camera, farPlane), 0, "The Far Clipping Plane."},
+    {"stereoMode", T_UINT, offsetof(Camera, stereoMode), 0, "The Stereo Mode."},
+    {"eyeSeparation", T_FLOAT, offsetof(Camera, eyeSeparation), 0, "The Eye Separation."},
+    {"zoom", T_FLOAT, offsetof(Camera, zoom), 0, "The Zoom."},
+    {NULL}  /* Sentinel */
+};
+
+void Camera_convertToScreen(Camera *camera, const double world[3], double screen[3]);
+void Camera_convertToWorld2D(Camera *camera, const double screen[2], double world[3]);
+void Camera_convertToWorld3D(Camera *camera, const double screen[3], double world[3]);
+
+// Camera Methods
+static PyMethodDef Camera_methods[] = {
+  {"convertToScreen", (PyCFunction)Camera_convertToScreen, METH_VARARGS,
+   "Converts world coordinates to screen coordinates."
+  },
+  {"convertToWorld2D", (PyCFunction)Camera_convertToWorld2D, METH_VARARGS,
+   "Converts 2D screen coordinates to world coordinates."
+  },
+  {"convertToWorld3D", (PyCFunction)Camera_convertToWorld3D, METH_VARARGS,
+   "Converts 3D screen coordinates to world coordinates."
+  },
+  {NULL}  /* Sentinel */
+};
+
+static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static int Camera_init(Camera *self, PyObject *args, PyObject *kwds);
+
+// Camera type definition
+PyTypeObject CameraType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                                        // ob_size
+    "mh.Camera",                              // tp_name
+    sizeof(Camera),                           // tp_basicsize
+    0,                                        // tp_itemsize
+    0,                                        // tp_dealloc
+    0,                                        // tp_print
+    0,                                        // tp_getattr
+    0,                                        // tp_setattr
+    0,                                        // tp_compare
+    0,                                        // tp_repr
+    0,                                        // tp_as_number
+    0,                                        // tp_as_sequence
+    0,                                        // tp_as_mapping
+    0,                                        // tp_hash
+    0,                                        // tp_call
+    0,                                        // tp_str
+    0,                                        // tp_getattro
+    0,                                        // tp_setattro
+    0,                                        // tp_as_buffer
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
+    "Camera object",                          // tp_doc
+    0,		                                    // tp_traverse
+    0,		                                    // tp_clear
+    0,		                                    // tp_richcompare
+    0,		                                    // tp_weaklistoffset
+    0,		                                    // tp_iter
+    0,		                                    // tp_iternext
+    Camera_methods,                           // tp_methods
+    Camera_members,                           // tp_members
+    0,                                        // tp_getset
+    0,                                        // tp_base
+    0,                                        // tp_dict
+    0,                                        // tp_descr_get
+    0,                                        // tp_descr_set
+    0,                                        // tp_dictoffset
+    (initproc)Camera_init,                    // tp_init
+    0,                                        // tp_alloc
+    Camera_new,                               // tp_new
+};
+
+/** \brief Registers the Camera object in the Python environment.
+ *  \param module The module to register the Camera object in.
+ *
+ *  This function registers the Camera object in the Python environment.
+ */
+void RegisterCamera(PyObject *module)
+{
+  if (PyType_Ready(&CameraType) < 0)
+      return;
+
+  Py_INCREF(&CameraType);
+  PyModule_AddObject(module, "Camera", (PyObject*)&CameraType);
+}
+
+/** \brief Takes care of the initialization of the Camera object members.
+ *  \param self The Camera object which is being initialized.
+ *
+ *  This function takes care of the initialization of the Camera object members.
+ */
+static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  // Alloc Python data
+  Camera *self = (Camera*)type->tp_alloc(type, 0);
+
+  // Init our data
+  if (self)
+  {
+    self->fovAngle = 25.0f;
+    self->nearPlane = 0.1f;
+    self->farPlane = 100.0f;
+
+    self->stereoMode = 0;
+    self->eyeSeparation = 1.0f;
+
+    self->zoom = 60;
+  }
+
+  return (PyObject*)self;
+}
+
+/** \brief The constructor of the Texture object.
+ *  \param self The Texture object which is being constructed.
+ *  \param args The arguments.
+ *
+ *  The constructor of the Texture object.
+ */
+static int Camera_init(Camera *self, PyObject *args, PyObject *kwds)
+{
+  char *path = NULL;
+
+  if (!PyArg_ParseTuple(args, "|s", &path))
+    return -1;
+
+  return 0;
+}
 
 typedef struct
 {
@@ -177,10 +329,10 @@ PyTypeObject TextureType = {
     Texture_new,                              // tp_new
 };
 
-/** \brief Registers the Object3D object in the Python environment.
- *  \param module The module to register the Object3D object in.
+/** \brief Registers the Texture object in the Python environment.
+ *  \param module The module to register the Texture object in.
  *
- *  This function registers the Object3D object in the Python environment.
+ *  This function registers the Texture object in the Python environment.
  */
 void RegisterTexture(PyObject *module)
 {
@@ -403,8 +555,8 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
     if (surface->h == 1)
     {
       glBindTexture(GL_TEXTURE_1D, texture);
-      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
+      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
       glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       gluBuild1DMipmaps(GL_TEXTURE_1D, components, surface->w, mode, GL_UNSIGNED_BYTE, surface->pixels);
@@ -413,8 +565,8 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
     else
     {
       glBindTexture(GL_TEXTURE_2D, texture);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       //glTexImage2D(GL_TEXTURE_2D, 0, components, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
@@ -814,7 +966,7 @@ void mhGetPickedCoords(int x, int y)
     the z coord = 9.5 is normalized to 0.800801. So we use this fixed
     precalculated value.
     */
-    mhGUICameraPosition();/*Applying GUI matrix*/
+    mhCameraPosition(PyList_GetItem(G.cameras, 1), 0);/*Applying GUI matrix*/
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
     glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
     gluUnProject(x, viewport[3]-y, 0.800801f, modelview,
@@ -826,6 +978,7 @@ static int pickingBufferSize = 0;
 
 void UpdatePickingBuffer(void)
 {
+  int i;
   // Get the viewport
   GLint viewport[4];
   GLint width;
@@ -861,13 +1014,11 @@ void UpdatePickingBuffer(void)
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // draw the objects in static camera
-  mhGUICameraPosition();
-  mhDrawMeshes(1, 0);
-
-  // draw the objects in dynamic camera
-  mhSceneCameraPosition();
-  mhDrawMeshes(1, 1);
+  for (i = 0; i < PyList_Size(G.cameras); i++)
+  {
+    mhCameraPosition(PyList_GetItem(G.cameras, i), 0);
+    mhDrawMeshes(1, i);
+  }
 
   // Make sure the data is 1 byte aligned
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -934,15 +1085,16 @@ void mhGetPickedColor(int x, int y)
  *  the specified camera setting.
  *
  */
-void mhConvertToScreen(const double world[3], double screen[3], int camera)
+void Camera_convertToScreen(Camera *camera, PyObject *args)
 {
   GLint viewport[4];
-  double modelview[16], projection[16];
+  GLdouble modelview[16], projection[16];
+  double world[3], screen[3];
 
-  if (camera)
-      mhSceneCameraPosition();
-  else
-      mhGUICameraPosition();
+  if (!PyArg_ParseTuple(args, "ddd", world, world + 1, world + 2))
+    return NULL;
+
+  mhCameraPosition(camera, 0);
 
   glGetIntegerv(GL_VIEWPORT, viewport);
   glGetDoublev(GL_PROJECTION_MATRIX, projection);
@@ -950,6 +1102,8 @@ void mhConvertToScreen(const double world[3], double screen[3], int camera)
 
   gluProject(world[0], world[1], world[2], modelview, projection, viewport, screen, screen + 1, screen + 2);
   screen[1] = viewport[3] - screen[1];
+
+  return Py_BuildValue("[d,d,d]", screen[0], screen[1], screen[2]);
 }
 
 /** \brief Convert 2D (x, y) screen coordinates to OpenGL world coordinates.
@@ -961,16 +1115,17 @@ void mhConvertToScreen(const double world[3], double screen[3], int camera)
  *  the specified camera setting.
  *
  */
-void mhConvertToWorld2D(const double screen[2], double world[3], int camera)
+void Camera_convertToWorld2D(Camera *camera, PyObject *args)
 {
   GLint viewport[4];
   GLdouble modelview[16], projection[16];
   GLdouble z;
+  double screen[2], world[3];
 
-  if (camera)
-      mhSceneCameraPosition();
-  else
-      mhGUICameraPosition();
+  if (!PyArg_ParseTuple(args, "dd", screen, screen + 1))
+    return NULL;
+
+  mhCameraPosition(camera, 0);
 
   glGetIntegerv(GL_VIEWPORT, viewport);
   glGetDoublev(GL_PROJECTION_MATRIX, projection);
@@ -978,6 +1133,8 @@ void mhConvertToWorld2D(const double screen[2], double world[3], int camera)
 
   glReadPixels((GLint)screen[0], (GLint)(viewport[3] - screen[1]), 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, &z);
   gluUnProject(screen[0], viewport[3] - screen[1], z, modelview, projection, viewport, world, world + 1, world + 2);
+
+  return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
 }
 
 /** \brief Convert 3D (x, y, depth) screen coordinates to 3D OpenGL world coordinates.
@@ -989,21 +1146,24 @@ void mhConvertToWorld2D(const double screen[2], double world[3], int camera)
  *  the specified camera setting.
  *
  */
-void mhConvertToWorld3D(const double screen[3], double world[3], int camera)
+void Camera_convertToWorld3D(Camera *camera, PyObject *args)
 {
   GLint viewport[4];
-  double modelview[16], projection[16];
+  GLdouble modelview[16], projection[16];
+  double screen[3], world[3];
 
-  if (camera)
-      mhSceneCameraPosition();
-  else
-      mhGUICameraPosition();
+  if (!PyArg_ParseTuple(args, "ddd", screen, screen + 1, screen + 2))
+    return NULL;
+
+  mhCameraPosition(camera, 0);
 
   glGetIntegerv(GL_VIEWPORT, viewport);
   glGetDoublev(GL_PROJECTION_MATRIX, projection);
   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
   gluUnProject(screen[0], viewport[3] - screen[1], screen[2], modelview, projection, viewport, world, world + 1, world + 2);
+
+  return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
 }
 
 /** \brief Redraw the contents of the window when the user resizes the window.
@@ -1022,8 +1182,7 @@ void mhReshape(int w, int h)
     // set up the projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // just use a perspective projection
-    gluPerspective(G.fovAngle, (float)w/h, 0.1, 100);
+
     // go back to modelview matrix so we can move the objects about
     glMatrixMode(GL_MODELVIEW);
     G.windowHeight = h;
@@ -1196,19 +1355,28 @@ void OnExit(void)
  *  This function sets the camera zoom, position and orientation based upon the
  *  current settings found in global variables.
  *  This function is called before drawing the dynamic camera.
+ *  If stereoMode is one of the two stereo modes, eye will determine which eye is drawn.
  */
-void mhSceneCameraPosition(void)
+void mhCameraPosition(Camera *camera, int eye)
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(G.fovAngle, (float)G.windowWidth/G.windowHeight, 0.1, 100);
+    int stereoMode = 0;
+    if (eye)
+      stereoMode = camera->stereoMode;
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(0, 0, -G.zoom);
-    glTranslatef(G.translX, G.translY, 0);
-    glRotatef(G.rotX, 1 ,0 , 0);
-    glRotatef(G.rotY, 0 ,1 , 0);
+    switch (stereoMode)
+    {
+    case 0: // No stereo
+      {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glTranslatef(0, 0, -camera->zoom);
+        break;
+      }
+    }
 }
 
 /** \brief Zoom the camera by -10 units.
@@ -1216,16 +1384,24 @@ void mhSceneCameraPosition(void)
  *  This function defines a fixed camera zoom for the static camera,
  *  moving it by -10 in the Z dimension.
  */
-void mhGUICameraPosition(void)
+/*void mhGUICameraPosition(void)
 {
+    Camera *guiCamera = NULL;
+
+    if (!PyList_Size(G.cameras))
+      return;
+
+    guiCamera = (Camera*)PyList_GetItem(G.cameras, 1);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, (float)G.windowWidth/G.windowHeight, 0.1, 100);
+    
+    gluPerspective(guiCamera->fovAngle, (float)G.windowWidth/G.windowHeight, guiCamera->nearPlane, guiCamera->farPlane);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0, 0, -10);
-}
+    glTranslatef(0, 0, -guiCamera->zoom);
+}*/
 
 /** \brief Draw all of the 3D objects held in the G.world array matching the 'pickMode' setting.
  *  \param pickMode an int indicating whether to use selection colors or draw colors.
@@ -1273,7 +1449,6 @@ void mhDrawMeshes(int pickMode, int cameraType)
         {
             if (obj->isVisible && (!pickMode || obj->isPickable))
             {
-                //printf("draw obj n %i\n",G.world[i].nVerts/3);
                 /*Transform the current object*/
                 glPushMatrix();
                 glTranslatef(obj->location[0], obj->location[1], obj->location[2]);
@@ -1285,11 +1460,8 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 if (obj->texture && !pickMode)
                 {
                     glEnable(GL_TEXTURE_2D);
-                    /*Bind the texture, that has the same index of object*/
-
                     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
                     glBindTexture(GL_TEXTURE_2D, obj->texture);
-
                     glTexCoordPointer(2, GL_FLOAT, 0, obj->UVs);
                 }
 
@@ -1443,15 +1615,35 @@ void mhDrawMeshes(int pickMode, int cameraType)
  */
 void mhDraw(void)
 {
+    int i;
     mhDrawBegin();
 
-    // draw the objects in dynamic camera
-    mhSceneCameraPosition();
-    mhDrawMeshes(0, 1);
+    for (i = 0; i < PyList_Size(G.cameras); i++)
+    {
+      Camera *camera = (Camera*)PyList_GetItem(G.cameras, i);
 
-    // draw the objects in static camera
-    mhGUICameraPosition();
-    mhDrawMeshes(0, 0);
+      // draw the objects in dynamic camera
+      if (camera->stereoMode)
+      {
+        glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE); // Red
+        mhCameraPosition(camera, 1);
+        mhDrawMeshes(0, i);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE); // Green
+        mhCameraPosition(camera, 2);
+        mhDrawMeshes(0, i);
+        // To prevent the GUI from overwritting the red model, we need to render it again in the z-buffer
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // None, only z-buffer
+        mhCameraPosition(camera, 1);
+        mhDrawMeshes(0, i);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); // All
+      }
+      else
+      {
+        mhCameraPosition(camera, 0);
+        mhDrawMeshes(0, i);
+      }
+    }
 
     mhDrawEnd();
 }

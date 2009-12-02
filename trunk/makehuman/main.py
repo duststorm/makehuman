@@ -71,6 +71,15 @@ class MHApplication(gui3d.Application):
   def __init__(self):
     gui3d.Application.__init__(self)
     
+    modelCamera = mh.Camera()
+    
+    mh.cameras.append(modelCamera)
+    
+    guiCamera = mh.Camera()
+    guiCamera.fovAngle = 45
+    guiCamera.zoom = 10
+    mh.cameras.append(guiCamera)
+    
     self.setTheme("default")
     
     # Display the initial splash screen and the progress bar during startup 
@@ -208,15 +217,15 @@ class MHApplication(gui3d.Application):
       elif event.key == events3d.SDLK_h:
           webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
       elif event.key == events3d.SDLK_w:
-          settings = self.app.scene3d.getCameraStereoSettings()
-          settings[0] += 1
-          if settings[0] > 2:
-            settings[0] = 0
-          self.app.scene3d.setCameraStereoSettings(settings[0], settings[1])
+          stereoMode = mh.cameras[0].stereoMode
+          stereoMode += 1
+          if stereoMode > 2:
+            stereoMode = 0
+          mh.cameras[0].stereoMode = stereoMode
           
           # We need a black background for stereo
           background = self.app.categories["Modelling"].tasksByName["Macro modelling"].background
-          if settings[0]:
+          if stereoMode:
             color = [  0,   0,   0, 255]
           else:
             color = [100, 100, 100, 255]
