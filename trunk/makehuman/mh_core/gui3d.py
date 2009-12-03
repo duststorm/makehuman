@@ -221,8 +221,8 @@ class TaskView(View):
     self.focusWidget = None
     
     # The button is attached to the parent, as it stays visible when the category is hidden
-    self.button = Object(self.parent, "data/3dobjs/button_home.obj",
-      texture = texture, position = [-0.5 + len(self.parent.tasks) * 0.1, -0.39, 9])
+    self.button = Object(self.parent, "data/3dobjs/button_about.obj",
+      texture = texture, position = [30 + len(self.parent.tasks) * 60, 600.0 - 25.0, 9.1])
     
     category.tasks.append(self)
     category.tasksByName[self.name] = self
@@ -234,7 +234,7 @@ class TaskView(View):
   def onShow(self, event):
     #print("onShow", self.name, event)
     pos = self.button.getPosition()
-    pos[1] += 0.01
+    pos[1] -= 10.0
     self.button.setPosition(pos)
     self.button.setScale(1.5)
     self.show()
@@ -242,7 +242,7 @@ class TaskView(View):
   def onHide(self, event):
     #print("onHide", self.name, event)
     pos = self.button.getPosition()
-    pos[1] -= 0.01
+    pos[1] += 10.0
     self.button.setPosition(pos)
     self.button.setScale(1.0)
     self.hide()
@@ -258,7 +258,7 @@ class Category(View):
     
     # The button is attached to the parent, as it stays visible when the category is hidden
     self.button = Object(self.parent, "data/3dobjs/button_about.obj",
-      position = [-0.5 + len(self.app.categories) * 0.1, 0.39, 9], texture = texture)
+      position = [30 + len(self.app.categories) * 60, 25.0, 9.1], texture = texture)
       
     parent.categories[name] = self
     
@@ -268,14 +268,14 @@ class Category(View):
       
   def onShow(self, event):
     pos = self.button.getPosition()
-    pos[1] -= 0.01
+    pos[1] += 10
     self.button.setPosition(pos)
     self.button.setScale(1.5)
     self.show()
     
   def onHide(self, event):
     pos = self.button.getPosition()
-    pos[1] += 0.01
+    pos[1] -= 10
     self.button.setPosition(pos)
     self.button.setScale(1.0)
     self.hide()
@@ -506,14 +506,14 @@ class Application(events3d.EventHandler):
 class Slider(View):
   def __init__(self, parent, backgroundTexture, sliderTexture, focusedSliderTexture = None, position = [0, 0, 9], value = 0.0):
     View.__init__(self, parent)
-    self.background = Object(self, "data/3dobjs/button_gender.obj",
+    self.background = Object(self, "data/3dobjs/slider_background.obj",
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/button_about.obj",
-      texture = sliderTexture, position = [position[0], position[1], position[2] + 0.01])
+      texture = sliderTexture, position = [position[0], position[1] + 75, position[2] + 0.01])
     self.sliderTexture = sliderTexture
     self.focusedSliderTexture = focusedSliderTexture
-    self.sliderMinX = -0.5;
-    self.sliderMaxX = -0.39;
+    self.sliderMinX = position[0] + 25;
+    self.sliderMaxX = position[0] + 125;
     self.setValue(value)
     
   def setValue(self, value):
@@ -680,10 +680,10 @@ class ProgressBar(View):
   
   def __init__(self, parent, backgroundMesh = "data/3dobjs/progressbar_background.obj",
     backgroundTexture = None,
-    backgroundPosition = [0.0, -0.20, 9.1],
+    backgroundPosition = [300, 520, 9.1],
     barMesh = "data/3dobjs/progressbar.obj",
     barTexture = None,
-    barPosition = [-0.08, -0.178, 9.2], visible = True):
+    barPosition = [300, 520, 9.2], visible = True):
     """
     This is the constructor method for the ProgressBar class. It initializes the
     following attributes:
@@ -731,7 +731,7 @@ class TextEdit(View):
   def __init__(self, parent, mesh = "data/3dobjs/empty.obj", texture = None, position = [0, 0, 9]):
     View.__init__(self, parent)
     Object(self, mesh = "data/3dobjs/backgroundedit.obj", position = position)
-    self.textObject = Object(self, mesh, texture = texture, position = position)
+    self.textObject = Object(self, mesh, texture = texture, position = [position[0] + 10.0, position[1] + 12.0, position[2] + 0.1])
     self.text = ""
     
   def __updateTextObject(self):
@@ -773,10 +773,10 @@ class FileEntryView(View):
     View.__init__(self, parent)
     
     Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 0.30, 9])
-    Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [0.0, 1.3, 5.5])
-    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [-1.45, 1.31, 5.5])
+    Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [200, 80, 5.5])
+    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [210, 95, 5.5])
     self.bConfirm = Object(self, mesh = "data/3dobjs/button_confirm.obj",
-      texture = self.app.getThemeResource("images", "button_confirm.png"), position = [0.35, 0.28, 9.1])
+      texture = self.app.getThemeResource("images", "button_confirm.png"), position = [610, 70, 9.1])
     self.text = ""
     
     @self.bConfirm.event
@@ -812,10 +812,13 @@ class FileChooser(View):
   def __init__(self, parent, path, extension, previewExtension = "bmp"):
     View.__init__(self, parent)
     
-    self.currentFile = Object(self, mesh = "data/3dobjs/file.obj", position = [0, 0, 0], visible = False)
-    self.nextFile = Object(self, mesh = "data/3dobjs/nextfile.obj", position = [3.0, 0.5, 0], visible = False)
-    self.previousFile = Object(self, mesh = "data/3dobjs/previousfile.obj", position = [-3.0, 0.5, 0], visible = False)
-    self.filename = Object(self, mesh = "data/3dobjs/empty.obj", position = [-1.5, -1.8, 0], visible = False)
+    self.currentPos = [400, 300, 0]
+    self.nextPos = [550, 250, 0]
+    self.previousPos = [250, 250, 0]
+    self.currentFile = Object(self, mesh = "data/3dobjs/file.obj", position = self.currentPos, visible = False)
+    self.nextFile = Object(self, mesh = "data/3dobjs/nextfile.obj", position = self.nextPos, visible = False)
+    self.previousFile = Object(self, mesh = "data/3dobjs/previousfile.obj", position = self.previousPos, visible = False)
+    self.filename = Object(self, mesh = "data/3dobjs/empty.obj", position = [330, 390, 0], visible = False)
     self.path = path
     self.extension = extension
     self.previewExtension = previewExtension
@@ -823,16 +826,16 @@ class FileChooser(View):
     self.selectedFile = 0
     
     self.nextFileAnimation = animation3d.Timeline(0.25)
-    self.nextFileAnimation.append(animation3d.PathAction(self.currentFile.mesh, [[0, 0, 0], [-3.0, 0.5, 0]]))
+    self.nextFileAnimation.append(animation3d.PathAction(self.currentFile.mesh, [self.currentPos, self.previousPos]))
     self.nextFileAnimation.append(animation3d.ScaleAction(self.currentFile.mesh, [1.5, 1.5, 1.5], [1.0, 1.0, 1.0]))
-    self.nextFileAnimation.append(animation3d.PathAction(self.nextFile.mesh, [[3.0, 0.5, 0], [0, 0, 0]]))
+    self.nextFileAnimation.append(animation3d.PathAction(self.nextFile.mesh, [self.nextPos, self.currentPos]))
     self.nextFileAnimation.append(animation3d.ScaleAction(self.nextFile.mesh, [1.0, 1.0, 1.0], [1.5, 1.5, 1.5]))
     self.nextFileAnimation.append(animation3d.UpdateAction(self.app.scene3d))
     
     self.previousFileAnimation = animation3d.Timeline(0.25)
-    self.previousFileAnimation.append(animation3d.PathAction(self.previousFile.mesh, [[-3.0, 0.5, 0], [0, 0, 0]]))
+    self.previousFileAnimation.append(animation3d.PathAction(self.previousFile.mesh, [self.previousPos, self.currentPos]))
     self.previousFileAnimation.append(animation3d.ScaleAction(self.previousFile.mesh, [1.0, 1.0, 1.0], [1.5, 1.5, 1.5]))
-    self.previousFileAnimation.append(animation3d.PathAction(self.currentFile.mesh, [[0, 0, 0], [3.0, 0.5, 0],]))
+    self.previousFileAnimation.append(animation3d.PathAction(self.currentFile.mesh, [self.currentPos, self.nextPos]))
     self.previousFileAnimation.append(animation3d.ScaleAction(self.currentFile.mesh, [1.5, 1.5, 1.5], [1.0, 1.0, 1.0]))
     self.previousFileAnimation.append(animation3d.UpdateAction(self.app.scene3d))
     
@@ -918,9 +921,9 @@ class FileChooser(View):
     self.previousFileAnimation.start()
     
     # End animation by resetting positions and showing new configuration
-    self.previousFile.setPosition([-3.0, 0.5, 0])
+    self.previousFile.setPosition(self.previousPos)
     self.previousFile.setScale(1.0)
-    self.currentFile.setPosition([0, 0, 0])
+    self.currentFile.setPosition(self.currentPos)
     self.currentFile.setScale(1.5)
         
     self.selectedFile -= 1
@@ -951,9 +954,9 @@ class FileChooser(View):
     self.nextFileAnimation.start()
     
     # End animation by resetting positions and showing new configuration
-    self.currentFile.setPosition([0, 0, 0])
+    self.currentFile.setPosition(self.currentPos)
     self.currentFile.setScale(1.5)
-    self.nextFile.setPosition([3.0, 0.5, 0])
+    self.nextFile.setPosition(self.nextPos)
     self.nextFile.setScale(1.0)
     
     self.selectedFile += 1

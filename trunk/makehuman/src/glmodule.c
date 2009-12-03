@@ -114,6 +114,8 @@ typedef struct
     float nearPlane;
     float farPlane;
 
+    int projection;
+
     int stereoMode;
     float eyeSeparation;
 
@@ -130,7 +132,8 @@ static PyMemberDef Camera_members[] = {
     {"fovAngle", T_FLOAT, offsetof(Camera, fovAngle), 0, "The Field Of View angle."},
     {"nearPlane", T_FLOAT, offsetof(Camera, nearPlane), 0, "The Near Clipping Plane."},
     {"farPlane", T_FLOAT, offsetof(Camera, farPlane), 0, "The Far Clipping Plane."},
-    {"stereoMode", T_UINT, offsetof(Camera, stereoMode), 0, "The Stereo Mode."},
+    {"projection", T_UINT, offsetof(Camera, projection), 0, "The projection type, 0 for orthogonal, 1 for perspective."},
+    {"stereoMode", T_UINT, offsetof(Camera, stereoMode), 0, "The Stereo Mode, 0 for no stereo, 1 for toe-in, 2 for off-axis."},
     {"eyeSeparation", T_FLOAT, offsetof(Camera, eyeSeparation), 0, "The Eye Separation."},
     {"zoom", T_FLOAT, offsetof(Camera, zoom), 0, "The Zoom."},
     {NULL}  /* Sentinel */
@@ -230,6 +233,8 @@ static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self->fovAngle = 25.0f;
     self->nearPlane = 0.1f;
     self->farPlane = 100.0f;
+
+    self->projection = 1;
 
     self->stereoMode = 0;
     self->eyeSeparation = 1.0f;
@@ -1369,39 +1374,21 @@ void mhCameraPosition(Camera *camera, int eye)
       {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
+
+        if (camera->projection)
+          gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
+        else
+          glOrtho(0.0, G.windowWidth * 600.0 / G.windowHeight, 600, 0.0, camera->nearPlane, camera->farPlane);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glTranslatef(0, 0, -camera->zoom);
+        gluLookAt(0.0, 0.0, camera->zoom, // Eye
+                  0.0, 0.0, 0.0,          // Focus
+                  0.0 , 1.0, 0.0);        // Up
         break;
       }
     }
 }
-
-/** \brief Zoom the camera by -10 units.
- *
- *  This function defines a fixed camera zoom for the static camera,
- *  moving it by -10 in the Z dimension.
- */
-/*void mhGUICameraPosition(void)
-{
-    Camera *guiCamera = NULL;
-
-    if (!PyList_Size(G.cameras))
-      return;
-
-    guiCamera = (Camera*)PyList_GetItem(G.cameras, 1);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    
-    gluPerspective(guiCamera->fovAngle, (float)G.windowWidth/G.windowHeight, guiCamera->nearPlane, guiCamera->farPlane);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(0, 0, -guiCamera->zoom);
-}*/
 
 /** \brief Draw all of the 3D objects held in the G.world array matching the 'pickMode' setting.
  *  \param pickMode an int indicating whether to use selection colors or draw colors.
@@ -1629,7 +1616,7 @@ void mhDraw(void)
         mhCameraPosition(camera, 1);
         mhDrawMeshes(0, i);
         glClear(GL_DEPTH_BUFFER_BIT);
-        glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE); // Green
+        glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE); // Green
         mhCameraPosition(camera, 2);
         mhDrawMeshes(0, i);
         // To prevent the GUI from overwritting the red model, we need to render it again in the z-buffer

@@ -14,12 +14,12 @@ class ExampleTaskView(gui3d.TaskView):
       texture = self.app.getThemeResource("images", "button_ethnreset.png"),
       # getThemeResource returns a texture for a gui element according to the chosen theme
       selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"),
-      position = [-0.45, 0.25, 9])
+      position = [20, 60, 9])
     
     self.pushed = 0
     self.aButtonLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.40, 0.25, 9])
+      position = [120, 80, 9])
     self.aButtonLabel.setText("Pushed 0 times")
     
     @self.aButton.event
@@ -33,11 +33,11 @@ class ExampleTaskView(gui3d.TaskView):
       mesh = "data/3dobjs/button_ethnreset.obj",
       texture = self.app.getThemeResource("images", "button_ethnreset.png"),
       selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"),
-      position = [-0.45, 0.20, 9])
+      position = [20, 120, 9])
       
     self.aToggleButtonLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.40, 0.20, 9])
+      position = [120, 140, 9])
     self.aToggleButtonLabel.setText("Not selected")
       
     @self.aToggleButton.event
@@ -58,13 +58,13 @@ class ExampleTaskView(gui3d.TaskView):
       mesh = "data/3dobjs/button_ethnreset.obj",
       texture = self.app.getThemeResource("images", "button_ethnreset.png"),
       selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"),
-      position = [-0.45, 0.15, 9],
+      position = [20, 180, 9],
       # We make the first one selected
       selected = True)
       
     self.aRadioButtonLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.40, 0.15, 9])
+      position = [120, 200, 9])
     self.aRadioButtonLabel.setText("Button 1 is selected")
     
     self.aRadioButton2 = gui3d.RadioButton(self,
@@ -72,7 +72,7 @@ class ExampleTaskView(gui3d.TaskView):
       mesh = "data/3dobjs/button_ethnreset.obj",
       texture = self.app.getThemeResource("images", "button_ethnreset.png"),
       selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"),
-      position = [-0.45, 0.10, 9])
+      position = [20, 220, 9])
       
     @self.aRadioButton1.event
     def onClicked(event):
@@ -91,13 +91,13 @@ class ExampleTaskView(gui3d.TaskView):
       self.app.getThemeResource("images", "button_gender_macro.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
-      position = [-0.45, 0.05, 9],
+      position = [20, 250, 9],
       # We want the slider to start from the middle
       value = 0.5)
       
     self.aSliderLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.35, 0.05, 9])
+      position = [120, 240, 9])
     self.aSliderLabel.setText("Value is 0.5")
     
     @self.aSlider.event
@@ -108,14 +108,14 @@ class ExampleTaskView(gui3d.TaskView):
     # we also create a progressbar, which is updated as the slider moves
     self.aProgressBar = gui3d.ProgressBar(self,
       backgroundTexture = self.app.getThemeResource("images", "progressbar_background.png"),
-      backgroundPosition = [-0.35, -0.025, 9.1],
+      backgroundPosition = [20, 380, 9.1],
       barTexture = self.app.getThemeResource("images", "progressbar.png"),
-      barPosition = [-0.392, -0.021, 9.2])
+      barPosition = [20, 380, 9.2])
     self.aProgressBar.setProgress(0.5, 0)
     
     self.aTextEdit = gui3d.TextEdit(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [-0.50, -0.07, 9])
+      position = [20, 420, 9])
     self.aTextEdit.setText("Some text")
 
 category = None

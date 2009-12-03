@@ -78,6 +78,7 @@ class MHApplication(gui3d.Application):
     guiCamera = mh.Camera()
     guiCamera.fovAngle = 45
     guiCamera.zoom = 10
+    guiCamera.projection = 0
     mh.cameras.append(guiCamera)
     
     self.setTheme("default")
@@ -91,9 +92,9 @@ class MHApplication(gui3d.Application):
     
     self.progressBar.setProgress(0.2)
     
-    gui3d.Object(self, "data/3dobjs/upperbar.obj", self.getThemeResource("images", "upperbar.png"), [0, 0.39, 9])
-    gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -72])
-    gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, -0.39, 9])
+    gui3d.Object(self, "data/3dobjs/upperbar.obj", self.getThemeResource("images", "upperbar.png"), [0, 0, 9])
+    gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -90])
+    gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, 550, 9])
     
     self.progressBar.setProgress(0.3)
     
