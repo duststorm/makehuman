@@ -196,7 +196,7 @@ class MacroModelingTaskView(gui3d.TaskView):
       selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [750, 210, 9])
       
     # Common controls
-    self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [0, 0, -70])
+    self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, -89.9999])
     self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_undo.obj",
       texture = self.app.getThemeResource("images", "button_undo.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [620, 70, 9])
@@ -210,7 +210,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.currentHair = gui3d.Button(category, mesh = "data/3dobjs/button_about.obj",
       texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'), position = [700, 450, 9])
     
-    self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [0.0, 0.0, 1], visible = False)
+    self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, 1], visible = False)
     self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_about.obj", position = [700, 500, 9])
     self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_about.obj", position = [750, 500, 9])
     
