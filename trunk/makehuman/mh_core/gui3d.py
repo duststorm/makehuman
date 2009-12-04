@@ -509,7 +509,7 @@ class Slider(View):
     self.background = Object(self, "data/3dobjs/slider_background.obj",
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/button_about.obj",
-      texture = sliderTexture, position = [position[0], position[1] + 75, position[2] + 0.01])
+      texture = sliderTexture, position = [position[0], position[1] + 25, position[2] + 0.01])
     self.sliderTexture = sliderTexture
     self.focusedSliderTexture = focusedSliderTexture
     self.sliderMinX = position[0] + 25;

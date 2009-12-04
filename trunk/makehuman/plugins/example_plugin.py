@@ -91,13 +91,13 @@ class ExampleTaskView(gui3d.TaskView):
       self.app.getThemeResource("images", "button_gender_macro.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
-      position = [20, 250, 9],
+      position = [20, 300, 9],
       # We want the slider to start from the middle
       value = 0.5)
       
     self.aSliderLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
-      position = [120, 240, 9])
+      position = [120, 290, 9])
     self.aSliderLabel.setText("Value is 0.5")
     
     @self.aSlider.event

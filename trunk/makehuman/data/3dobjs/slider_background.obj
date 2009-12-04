@@ -2,8 +2,8 @@
 # www.blender3d.org
 v 0 0 0
 v 150 0 0
-v 150 150 0
-v 0 150 0
+v 150 75 0
+v 0 75 0
 vt 0 1
 vt 1 1
 vt 1 0
