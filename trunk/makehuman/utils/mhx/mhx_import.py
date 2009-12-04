@@ -64,7 +64,8 @@ toggleLegIK = 0
 toggleFingerIK = 0
 toggleDispObs = 1
 toggleReplace = 1
-toggleShape = 1
+toggleFace = 1
+toggleShape = 0
 toggleRot90 = 1
 useMesh = 1
 doSmash = 1
@@ -481,7 +482,8 @@ def parseLocalIpo(args, tokens, owner, ipoType):
 	
 	for (key, val, sub) in tokens:
 		if key == 'icu':
-			parseIcu(ipo, val, sub)
+			if (typeName != 'Key' or doShape(val[0])):
+				parseIcu(ipo, val, sub)
 		else:
 			defaultKey(key, val, "ipo", globals(), locals())
 	return ipo
@@ -760,10 +762,10 @@ def parseMesh (args, tokens):
 		elif key == 'vertgroup':
 			parseVertGroup(me, val, sub)
 		elif key == 'shapekey':
-			if toggleShape:
+			if doShape(val[0]):
 				parseShapeKey(ob, me, val, sub)
 		elif key == 'ipo':
-			if toggleShape:
+			if toggleShape or toggleFace:
 				parseLocalIpo(val, sub, me.key, 'Key')
 		elif key == 'material':
 			mat = _material[val[0]]
@@ -774,6 +776,14 @@ def parseMesh (args, tokens):
 	me.materials = mats
 
 	return me
+
+def doShape(name):
+	if (toggleShape or toggleFace) and (name == 'Basis'):
+		return True
+	elif name[0:4] in ["Bend", "Shou"]:
+		return toggleShape
+	else:
+		return toggleFace
 
 #
 #	parseShapeKey(ob, me, args, tokens):
@@ -1010,6 +1020,32 @@ def skipConstraint(type):
 		return False
 	return False
 
+def insertInfluenceIpo(cns, bone, xmax):
+	global todo
+	if bone != 'PArmIK_L' and bone != 'PArmIK_R' and bone != 'PLegIK_L' and bone != 'PLegIK_R':
+		#print "Skipped ", bone
+		return False
+
+	cns.influence = 0.0
+	cns.insertKey(0)
+	cns.influence = 1.0
+	cns.insertKey(1)
+	ipo = Ipo.Get()[-1]
+	icu = ipo[Ipo.CO_INF]
+	#print bone, ipo, icu
+	icu.driver = 1
+	icu.driverObject = getObject('HumanRig', 'icu.driverObject', globals(), locals())
+	try:
+		icu.driverBone = bone
+	except:
+		Draw.PupMenu("MHX only works with Blender 2.49b")
+	icu.driverChannel = IpoCurve.LOC_X
+	icu.extend = 0
+	icu.interpolation = 1
+	return True
+
+	
+
 def parseConstraint(constraints, args, tokens, name):
 	global todo, nErrors
 	typeName = args[0]	
@@ -1018,7 +1054,7 @@ def parseConstraint(constraints, args, tokens, name):
 		nErrors += 1
 		return None
 	typeCns = Constraint.Type[typeName]
-	print "Constraint "+typeName
+	# print "Constraint "+typeName
 	try:
 		cns = constraints.append(typeCns)
 	except:
@@ -1032,12 +1068,8 @@ def parseConstraint(constraints, args, tokens, name):
 
 	for (key,val,sub) in tokens:
 		if key == 'driver':
-			if toggleArmIK == 0 and val[0] == "ArmIK-switch":
-				print "Constraint "+name+" ignored."
-				cns.influence = 0.0
-			elif toggleLegIK == 0 and val[0] == "LegIK-switch":
-				print "Constraint "+name+" ignored."
-				cns.influence = 0.0
+			if insertInfluenceIpo(cns, val[0], val[1]):
+				pass
 			elif toggleFingerIK == 0 and val[0] == "FingerIK-switch":
 				print "Constraint "+name+" ignored."
 				cns.influence = 0.0
@@ -1334,20 +1366,22 @@ def event(evt, val):
 
 def button_event(evt): 
 	global toggleArmIK, toggleLegIK, toggleFingerIK, toggleDispObs
-	global toggleReplace, toggleShape, toggleRot90
+	global toggleReplace, toggleShape, toggleFace, toggleRot90
 	global TexDir
 	if evt == 1:
-		toggleArmIK = 1 - toggleArmIK
+		toggleShape = 1 - toggleShape
 	elif evt == 2:
-		toggleLegIK = 1 - toggleLegIK
+		toggleFace = 1 - toggleFace
+	#if evt == 1:
+	#	toggleArmIK = 1 - toggleArmIK
+	#elif evt == 2:
+	#	toggleLegIK = 1 - toggleLegIK
 	elif evt == 3:
 		toggleFingerIK = 1 - toggleFingerIK
 	elif evt == 4:
 		toggleDispObs = 1 - toggleDispObs
 	elif evt == 5:
 		toggleReplace = 1 - toggleReplace
-	elif evt == 6:
-		toggleShape = 1 - toggleShape
 	elif evt == 7:
 		Blender.Window.FileSelector (main, 'OPEN MHX FILE')
 	elif evt == 8:
@@ -1360,29 +1394,33 @@ def button_event(evt):
 	Draw.Redraw(-1)
 
 def gui():
+	global b1, b2, b3, b4, b5, b6, b7, b8, b9
+	global t1, t2, t3, t4
+
 	BGL.glClearColor(0,0,1,1)
 	BGL.glClear(BGL.GL_COLOR_BUFFER_BIT)
 	BGL.glColor3f(1,1,1)
 
 	BGL.glRasterPos2i(10,210)
-	t = Draw.Text("MHX (MakeHuman eXchange format) importer for Blender", "large")
+	t1 = Draw.Text("MHX (MakeHuman eXchange format) importer for Blender", "large")
 	BGL.glRasterPos2i(10,190)
-	t = Draw.Text("Version %d.%d" % (MAJOR_VERSION, MINOR_VERSION), "normal")
+	t2 = Draw.Text("Version %d.%d" % (MAJOR_VERSION, MINOR_VERSION), "normal")
 	BGL.glRasterPos2i(10,170)
-	t = Draw.Text("Make sure that pydrivers.py is loaded", "large")
+	t3 = Draw.Text("Make sure that pydrivers.py is loaded", "large")
 	BGL.glRasterPos2i(10,150)
-	t = Draw.Text("Otherwise shape keys will not work", "normal")
+	t4 = Draw.Text("Otherwise shape keys will not work", "normal")
 
-	b = Draw.Toggle("Rot90", 10, 310, 110, 90, 20, toggleRot90,"Rotate mesh 90 degrees (Z up)")
-	b = Draw.Toggle("Arm IK", 1, 10, 110, 90, 20, toggleArmIK,"Arm IK")
-	b = Draw.Toggle("Leg IK", 2, 110, 110, 90, 20, toggleLegIK,"Leg IK")
-	b = Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Finger IK")
-	b = Draw.Toggle("Display objs", 4, 210, 80, 90, 20, toggleDispObs,"Display objects")
-	b = Draw.Toggle("Replace scene", 5, 110, 80, 90, 20, toggleReplace,"Delete old scene")
-	b = Draw.Toggle("Shapekeys", 6, 10, 80, 90, 20, toggleShape,"Load shape keys")
-	b = Draw.PushButton("Load MHX file", 7, 10, 10, 150, 40)
-	b = Draw.PushButton("Cancel", 8, 210, 10, 90, 20)
-	b = Draw.PushButton("Texture directory", 9, 210, 40, 90, 20) 
+	b2 = Draw.Toggle("Body shapes", 1, 10, 110, 90, 20, toggleShape,"Load body shape keys")
+	b3 = Draw.Toggle("Facial shapes", 2, 110, 110, 90, 20, toggleFace,"Load facial shape keys")
+	#b = Draw.Toggle("Arm IK", 1, 10, 110, 90, 20, toggleArmIK,"Arm IK")
+	#b = Draw.Toggle("Leg IK", 2, 110, 110, 90, 20, toggleLegIK,"Leg IK")
+	b4 = Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Finger IK")
+	b1 = Draw.Toggle("Rot90", 10, 10, 80, 90, 20, toggleRot90,"Rotate mesh 90 degrees (Z up)")
+	b6 = Draw.Toggle("Replace scene", 5, 110, 80, 90, 20, toggleReplace,"Delete old scene")
+	b5 = Draw.Toggle("Display objs", 4, 210, 80, 90, 20, toggleDispObs,"Display objects")
+	b7 = Draw.PushButton("Load MHX file", 7, 10, 10, 150, 40)
+	b8 = Draw.PushButton("Cancel", 8, 210, 10, 90, 20)
+	b9 = Draw.PushButton("Texture directory", 9, 210, 40, 90, 20) 
 
 Draw.Register(gui, event, button_event) 
 

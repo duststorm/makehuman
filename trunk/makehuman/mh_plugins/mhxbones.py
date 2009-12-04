@@ -262,7 +262,6 @@ vertLocations = [
 
 dx = 0.2
 dz = 0.3
-
 armature = [
 	("Root", "None", "mid-feet", [0,1,0], "mid-feet", [0,-1,0], F_NODEF, L_FK, "MHCircle15", 0),
 	("Torso", "Root", "pelvis", [0,0,-3], "pelvis", 0, F_NODEF, L_FK+L_TORSO, None, 0),
@@ -275,7 +274,6 @@ armature = [
 	("Spine1", "Spine2", "spine1", 0, "neck", 0, F_CON, L_FK+L_DEFORM+L_TORSO, "MHCircle10", 0),
 	("Neck", "Spine1", "neck", 0, "head", 0, F_CON, L_FK+L_DEFORM+L_TORSO+L_HEAD, "MHCircle05", 0),
 	("Breathe", "Spine2", "spine1", 0, "chest-front", 0, F_CON, L_DEFORM, None, 0),
-	#("Chest", "Spine1", "neck", 0, "chest-front", 0, F_CON, L_DEFORM, None, 0),
 	("Stomach", "Breathe", "chest-front", 0, "pelvis", 0, F_CON+F_NOSCALE, L_DEFORM, None, 0),
 
 	("Head", "Neck", "head", 0, "head-end", 0, F_CON, L_FK+L_DEFORM+L_TORSO+L_HEAD, "MHCircle10", 0),
@@ -299,9 +297,13 @@ armature = [
 	("UpArm_L", "Clavicle_L", "r-shoulder", 0, "r-elbow", 0, F_CON, L_FK+L_DEFORM+L_ARMFK, "MHCircle03", 0),
 	("LoArm_L", "UpArm_L", "r-elbow", 0, "r-hand", 0, F_CON, L_FK+L_DEFORM+L_ARMFK, "MHCircle03", 0),
 	("Hand_L", "LoArm_L", "r-hand", 0, "r-finger-3-1", 0, F_CON, L_FK+L_DEFORM+L_ARMFK+L_HANDFK, "MHCircle05", 0),
-
 	("UpArmTwist_L", "Clavicle_L", "r-shoulder", 0, "r-elbow", 0, F_CON, L_DEFORM, None, 0),
 	("LoArmTwist_L", "UpArm_L", "r-elbow", 0, "r-hand", 0, F_CON, L_DEFORM, None, 0),
+
+	("UpArmIK_L", "Clavicle_L", "r-shoulder", 0, "r-elbow", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("LoArmIK_L", "UpArmIK_L", "r-elbow", 0, "r-hand", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("HandIK_L", "Root", "r-hand", 0, "r-finger-3-1", 0, F_NODEF, L_ARMIK, None, 0),
+	("ElbowIK_L", "Clavicle_L", "r-elbow-target", 0, "r-elbow-target", [0,0,-0.5], F_NODEF, L_ARMIK, "MHBall", 0),
 
 	("Finger-1-1_L", "Hand_L", "r-finger-1-1", 0, "r-finger-1-2", 0, 0, L_HANDFK, "MHCircle05", LockY),
 	("Finger-1-2_L", "Finger-1-1_L", "r-finger-1-2", 0, "r-finger-1-3", 0, F_CON, L_HANDFK, "MHCircle05", LockX+LockY),
@@ -326,6 +328,11 @@ armature = [
 	("UpArmTwist_R", "Clavicle_R", "l-shoulder", 0, "l-elbow", 0, F_CON, L_DEFORM, None, 0),
 	("LoArmTwist_R", "UpArm_R", "l-elbow", 0, "l-hand", 0, F_CON, L_DEFORM, None, 0),
 
+	("UpArmIK_R", "Clavicle_R", "l-shoulder", 0, "l-elbow", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("LoArmIK_R", "UpArmIK_R", "l-elbow", 0, "l-hand", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("HandIK_R", "Root", "l-hand", 0, "l-finger-3-1", 0, F_NODEF, L_ARMIK+L_HANDIK, None, 0),
+	("ElbowIK_R", "Clavicle_R", "l-elbow-target", 0, "l-elbow-target", [0,0,-0.5], F_NODEF, L_ARMIK, "MHBall", 0),
+
 	("Finger-1-1_R", "Hand_R", "l-finger-1-1", 0, "l-finger-1-2", 0, 0, L_HANDFK, "MHCircle05", LockY),
 	("Finger-1-2_R", "Finger-1-1_R", "l-finger-1-2", 0, "l-finger-1-3", 0, F_CON, L_HANDFK, "MHCircle05", LockX+LockY),
 	("Finger-1-3_R", "Finger-1-2_R", "l-finger-1-3", 0, "l-finger-1-end", 0, F_CON, L_HANDFK, "MHCircle05", LockX+LockY),
@@ -345,7 +352,7 @@ armature = [
 	("Hip_L", "Hips-inv", "pelvis", 0, "r-upper-leg", 0, F_CON, L_HELP, None, 0),
 	("UpLeg_L", "Hip_L", "r-upper-leg", 0, "r-knee", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
 	("LoLeg_L", "UpLeg_L", "r-knee", 0, "r-ankle", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
-	("Foot_L", "LoLeg_L", "r-ankle", 0, "r-toe-3-1", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
+	("Foot_L", "LoLeg_L", "r-ankle", 0, "r-toe-3-1", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
  	("UpLegTwist_L", "Hip_L", "r-upper-leg", 0, "r-knee", 0, F_CON, L_DEFORM, None, 0),
 
 	("Toe_L", "Foot_L", "r-toe-3-1", 0, "r-toe-end", 0, F_CON+F_NODEF, L_FK+L_DEFORM+L_LEGFK, "MHCircle05", 0),
@@ -387,21 +394,20 @@ armature = [
 	("Toe-5-3_R", "Toe-5-2_R", "l-toe-5-3", 0, "l-toe-5-end", 0, F_CON, L_TOE, None, 0),
 
 	("LegCtrl_L", "Root", "r-ankle", [0,-1,0], "r-ankle", [0,-1,-2], F_NODEF, L_LEGIK, None, 0),
-	("FootIK_L", "LegCtrl_L", "r-toe-3-1", 0, "r-ankle", 0, F_NODEF, L_LEGIK, "MHCircle03", 0),
-	("ToeIK_L", "LegCtrl_L",  "r-toe-3-1", 0,  "r-toe-end", 0, F_NODEF, L_LEGIK, "MHCircle05", 0),
+	("UpLegIK_L", "Hip_L", "r-upper-leg", 0, "r-knee", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("LoLegIK_L", "UpLegIK_L", "r-knee", 0, "r-ankle", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("FootIK_L", "LegCtrl_L", "r-toe-3-1", 0, "r-ankle", 0, F_NODEF, L_LEGIK, None, 0),
+	("ToeIK_L", "LegCtrl_L",  "r-toe-3-1", 0,  "r-toe-end", 0, F_NODEF, L_LEGIK, None, 0),
 	("Ankle_L", "FootIK_L", "r-ankle", 0, "r-ankle", [0,0,-1], F_NODEF, L_HELP, None, 0),
 	("KneeIK_L", "Hip_L", "r-knee-target", 0, "r-knee-target", [0,0.5,0.5], F_NODEF, L_LEGIK, "MHBall", 0),
 
 	("LegCtrl_R", "Root", "l-ankle", [0,-1,0], "l-ankle", [0,-1,-2], F_NODEF, L_LEGIK, None, 0),
-	("FootIK_R", "LegCtrl_R", "l-toe-3-1", 0, "l-ankle", 0, F_NODEF, L_LEGIK, "MHCircle03", 0),
-	("ToeIK_R", "LegCtrl_R",  "l-toe-3-1", 0,  "l-toe-end", 0, F_NODEF, L_LEGIK, "MHCircle05", 0),
+	("UpLegIK_R", "Hip_R", "l-upper-leg", 0, "l-knee", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("LoLegIK_R", "UpLegIK_R", "l-knee", 0, "l-ankle", 0, F_CON+F_NODEF, L_HELP, None, 0),
+	("FootIK_R", "LegCtrl_R", "l-toe-3-1", 0, "l-ankle", 0, F_NODEF, L_LEGIK, None, 0),
+	("ToeIK_R", "LegCtrl_R",  "l-toe-3-1", 0,  "l-toe-end", 0, F_NODEF, L_LEGIK, None, 0),
 	("Ankle_R", "FootIK_R", "l-ankle", 0, "l-ankle", [0,0,-1], F_NODEF, L_HELP, None, 0),
 	("KneeIK_R", "Hip_R", "l-knee-target", 0, "l-knee-target", [0,0.5,0.5], F_NODEF, L_LEGIK, "MHBall", 0),
-	("HandIK_L", "Root", "r-hand", 0, "r-finger-3-1", 0, F_NODEF, L_ARMIK+L_HANDIK, "MHCircle05", 0),
-	("ElbowIK_L", "Clavicle_L", "r-elbow-target", 0, "r-elbow-target", [0,0,-0.5], F_NODEF, L_ARMIK, "MHBall", 0),
-
-	("HandIK_R", "Root", "l-hand", 0, "l-finger-3-1", 0, F_NODEF, L_ARMIK+L_HANDIK, "MHCircle05", 0),
-	("ElbowIK_R", "Clavicle_R", "l-elbow-target", 0, "l-elbow-target", [0,0,-0.5], F_NODEF, L_ARMIK, "MHBall", 0),
 
 	("Fingers_R", "Hand_R", "l-finger-3-1", [0,1,0], "l-finger-3-end", [0,1,0], F_NODEF, L_HANDIK, None, 0),
 	("Finger-1_R", "Hand_R", "l-finger-1-1", 0, "l-finger-1-end", 0, F_NODEF, L_HANDIK, None, 0),
@@ -453,7 +459,7 @@ armature = [
 	("PCheek_R", "PFace", "origin", [-2*dx,0,0], "origin", [-2*dx,0,dz], F_NODEF, L_PANEL, None, 0),
 	("PCheek_L", "PFace", "origin", [2*dx,0,0], "origin", [2*dx,0,dz], F_NODEF, L_PANEL, None, 0),
 
-	("PNose", "PFace", "origin", [0,0,0], "origin", [0,0,dz], F_NODEF, L_PANEL, None, 0),
+	("PNose", "PFace", "origin", 0, "origin", [0,0,dz], F_NODEF, L_PANEL, None, 0),
 	("PUpLip", "PFace", "origin", [0,-1.2*dx,0], "origin", [0,-1.2*dx,dz], F_NODEF, L_PANEL, None, 0),
 	("PLoLip", "PFace", "origin", [0,-3.8*dx,0], "origin", [0,-3.8*dx,dz], F_NODEF, L_PANEL, None, 0),
 	("PMouth", "PFace", "origin", [0,-2.5*dx,0], "origin", [0,-2.5*dx,dz], F_NODEF, L_PANEL, None, 0),
@@ -468,6 +474,10 @@ armature = [
 	("PTounge", "PFace", "origin", [0,-4.9*dx,0], "origin", [0,-4.9*dx,dz], F_NODEF, L_PANEL, None, 0),
 	("PJaw", "PFace", "origin", [0,-5.7*dx,0], "origin", [0,-5.7*dx,dz], F_NODEF, L_PANEL, None, 0),
 
+	("PArmIK_R", "PFace", "origin", [-1.1,2,0], "origin", [-1.1,2,dz], F_NODEF, L_PANEL, None, 0),
+	("PArmIK_L", "PFace", "origin", [0.1,2,0], "origin", [0.1,2,dz], F_NODEF, L_PANEL, None, 0),
+	("PLegIK_R", "PFace", "origin", [-1.1,1.5,0], "origin", [-1.1,1.5,dz], F_NODEF, L_PANEL, None, 0),
+	("PLegIK_L", "PFace", "origin", [0.1,1.5,0], "origin", [0.1,1.5,dz], F_NODEF, L_PANEL, None, 0),
 ]
 
 	# Osipa-like control panel
@@ -486,12 +496,11 @@ armature = [
 
 	# IK/FK switch bones. Do not work properly
 '''
-	("ArmIK-switch", "Root", "head-end", [0,1,0], "head-end", [0,1,-1], F_NODEF, L_ROOT),
-	("LegIK-switch", "Root", "head-end", [0,1.5,0], "head-end", [0,1.5,-1], F_NODEF, L_ROOT),
-	("FingerIK-switch", "Root", "head-end", [0,2,0], "head-end", [0,2,-1], F_NODEF, L_ROOT),
+	("FingerIK_L", "Root", "head-end", [0,2,0], "head-end", [0,2,-1], F_NODEF, L_ROOT),
 	("Gaze-switch", "Root", "head-end", [0,2.5,0], "head-end", [0,2.5,-1], F_NODEF, L_ROOT),
 '''
-#
+
+#
 #	boneRoll - computer generated list
 #
 
@@ -571,20 +580,20 @@ boneRoll = dict({\
 	'FootIK_R'	 : (173, 177), \
 	'Foot_L'	 : (  6, -28), \
 	'Foot_R'	 : ( -6,  28), \
-	'Gaze'	 : (180, 180), \
+	'Gaze'		 : (180, 180), \
 	'Gaze_L'	 : (180, 180), \
 	'Gaze_R'	 : (180, 180), \
 	'HandIK_L'	 : ( -4,  70), \
 	'HandIK_R'	 : (  4, -70), \
 	'Hand_L'	 : ( -4,  70), \
 	'Hand_R'	 : (  4, -70), \
-	'Head'	 : (  0,   0), \
+	'Head'		 : (  0,   0), \
 	'Head-inv'	 : (180, 180), \
-	'Hip_L'	 : (-11,  93), \
-	'Hip_R'	 : ( 11, -93), \
-	'Hips'	 : (  0, 180), \
+	'Hip_L'		 : (-11,  93), \
+	'Hip_R'		 : ( 11, -93), \
+	'Hips'		 : (  0, 180), \
 	'Hips-inv'	 : (  0,   0), \
-	'Jaw'	 : (  0,   0), \
+	'Jaw'		 : (  0,   0), \
 	'KneeIK_L'	 : (  0,   0), \
 	'KneeIK_R'	 : (  0,   0), \
 	'LegCtrl_L'	 : (180, 180), \
@@ -592,12 +601,18 @@ boneRoll = dict({\
 	'LoArmTwist_L'	 : (  0,  91), \
 	'LoArmTwist_R'	 : (  0, -91), \
 	'LoArm_L'	 : (  0,  91), \
+	'LoArmIK_L'	 : (  0,  91), \
 	'LoArm_R'	 : (  0, -91), \
+	'LoArmIK_R'	 : (  0, -91), \
 	'LoLeg_L'	 : (-172, 180), \
+	'LoLegIK_L'	 : (-172, 180), \
 	'LoLeg_R'	 : (172, 180), \
+	'LoLegIK_R'	 : (172, 180), \
 	'LoLid_L'	 : (  2, -17), \
 	'LoLid_R'	 : ( -2,  17), \
-	'Neck'	 : (  0,   0), \
+	'Neck'		 : (  0,   0), \
+	'PArmIK_L'	 : (  0, 180), \
+	'PArmIK_R'	 : (  0, 180), \
 	'PBrow_L'	 : (  0, 180), \
 	'PBrow_R'	 : (  0, 180), \
 	'PBrows'	 : (  0, 180), \
@@ -605,6 +620,8 @@ boneRoll = dict({\
 	'PCheek_R'	 : (  0, 180), \
 	'PFace'	 : (  0, 180), \
 	'PJaw'	 : (  0, 180), \
+	'PLegIK_L'	 : (  0, 180), \
+	'PLegIK_R'	 : (  0, 180), \
 	'PLoLid_L'	 : (  0, 180), \
 	'PLoLid_R'	 : (  0, 180), \
 	'PLoLip'	 : (  0, 180), \
@@ -664,11 +681,15 @@ boneRoll = dict({\
 	'UpArmTwist_L'	 : (  0,  97), \
 	'UpArmTwist_R'	 : (  0, -97), \
 	'UpArm_L'	 : (  0,  97), \
+	'UpArmIK_L'	 : (  0,  97), \
 	'UpArm_R'	 : (  0, -97), \
+	'UpArmIK_R'	 : (  0, -97), \
 	'UpLegTwist_L'	 : ( 19, -177), \
 	'UpLegTwist_R'	 : (-19, 177), \
 	'UpLeg_L'	 : ( 19, -177), \
+	'UpLegIK_L'	 : ( 19, -177), \
 	'UpLeg_R'	 : (-19, 177), \
+	'UpLegIK_R'	 : (-19, 177), \
 	'UpLid_L'	 : ( -2, -16), \
 	'UpLid_R'	 : (  2,  16), \
 })
@@ -687,35 +708,46 @@ Obj = 1
 constraints = [
 	("Stomach", "LIMITROT", 1.0, "None", None, 5, (0, 0, 0, 0, 0, 0)),
 	("Stomach", "STRETCHTO", 1.0, "Hips", None, "", 0),
-	("LoLeg_L" , "IKSOLVER", 1.0, "Ankle_L", "LegIK-switch", 2,  0),
-	("Foot_L" , "IKSOLVER", 1.0, "FootIK_L", "LegIK-switch", 1, Bone),
-	("Toe_L" , "COPYROT", 1.0, "ToeIK_L", "LegIK-switch", "", 0),
-	("UpLeg_L" , "IKSOLVER", 1.0, "KneeIK_L", "LegIK-switch", 1, Bone),
-	("LegCtrl_L" , "LIMITDIST", 1.0, "Hip_L", "LegIK-switch", "", 0),
-	("KneeIK_L" , "LIMITDIST", 1.0, "Hip_L", "LegIK-switch", "", 0),
+
+	("LoLegIK_L" , "IKSOLVER", 1.0, "Ankle_L", None, 2,  Bone),
+	("LoLeg_L" , "COPYROT", 1.0, "LoLegIK_L", "PLegIK_L", 7, 0),
+	("Foot_L" , "IKSOLVER", 1.0, "FootIK_L", "PLegIK_L", 1, Bone),
+	#("Foot_L" , "COPYROT", 1.0, "FootIK_L", "PLegIK_L", 0x12, 0),
+	("Toe_L" , "COPYROT", 1.0, "ToeIK_L", "PLegIK_L", 7, 0),
+	("UpLegIK_L" , "IKSOLVER", 1.0, "KneeIK_L", None, 1, Bone),
+	("UpLeg_L" , "COPYROT", 1.0, "UpLegIK_L", "PLegIK_L", 7, 0),
+	("LegCtrl_L" , "LIMITDIST", 1.0, "Hip_L", "PLegIK_L", "", 0),
+	("KneeIK_L" , "LIMITDIST", 1.0, "Hip_L", "PLegIK_L", "", 0),
 	("UpLegTwist_L", "IKSOLVER", 1.0, "LoLeg_L", None, 1, Bone),
 
-	("LoLeg_R" , "IKSOLVER", 1.0, "Ankle_R", "LegIK-switch", 2, Bone),
-	("Foot_R" , "IKSOLVER", 1.0, "FootIK_R", "LegIK-switch", 1, Bone),
-	("Toe_R" , "COPYROT", 1.0, "ToeIK_R", "LegIK-switch", "", 0),
-	("UpLeg_R" , "IKSOLVER", 1.0, "KneeIK_R", "LegIK-switch", 1, Bone),
-	("LegCtrl_R" , "LIMITDIST", 1.0, "Hip_R", "LegIK-switch", "", 0),
-	("KneeIK_R" , "LIMITDIST", 1.0, "Hip_R", "LegIK-switch", "", 0),
+	("LoLegIK_R" , "IKSOLVER", 1.0, "Ankle_R", None, 2, Bone),
+	("LoLeg_R" , "COPYROT", 1.0, "LoLegIK_R", "PLegIK_R", 7, 0),
+	("Foot_R" , "IKSOLVER", 1.0, "FootIK_R", "PLegIK_R", 1, Bone),
+	#("Foot_R" , "COPYROT", 1.0, "FootIK_R", "PLegIK_R", 0x12, 0),
+	("Toe_R" , "COPYROT", 1.0, "ToeIK_R", "PLegIK_R", 7, 0),
+	("UpLegIK_R" , "IKSOLVER", 1.0, "KneeIK_R", None, 1, Bone),
+	("UpLeg_R" , "COPYROT", 1.0, "UpLegIK_R", "PLegIK_R", 7, 0),
+	("LegCtrl_R" , "LIMITDIST", 1.0, "Hip_R", "PLegIK_R", "", 0),
+	("KneeIK_R" , "LIMITDIST", 1.0, "Hip_R", "PLegIK_R", "", 0),
 	("UpLegTwist_R", "IKSOLVER", 1.0, "LoLeg_R", None, 1, Bone),
 
-	("LoArm_L" , "IKSOLVER", 1.0, "HandIK_L", "ArmIK-switch", 2, Bone),
-	("LoArm_L", "LIMITROT", 1.0, "None", None, 7, (-30, 180, -90, 90, -30, 30)), 
-	("UpArm_L" , "IKSOLVER", 1.0, "ElbowIK_L", "ArmIK-switch", 1, Bone),
-	("Hand_L" , "COPYROT", 1.0, "HandIK_L", "ArmIK-switch", "", 0),
-	("HandIK_L" , "LIMITDIST", 1.0, "Clavicle_L", "ArmIK-switch", "", 0),
-	("ElbowIK_L" , "LIMITDIST", 1.0, "Clavicle_L", "ArmIK-switch", "", 0),
+	("LoArmIK_L" , "IKSOLVER", 1.0, "HandIK_L", None, 2, Bone),
+	("LoArm_L" , "COPYROT", 1.0, "LoArmIK_L", "PArmIK_L", 7, 0),
+	#("LoArm_L", "LIMITROT", 1.0, "None", None, 7, (-30, 180, -90, 90, -30, 30)), 
+	("UpArmIK_L" , "IKSOLVER", 1.0, "ElbowIK_L", None, 1, Bone),
+	("UpArm_L" , "COPYROT", 1.0, "UpArmIK_L", "PArmIK_L", 7, 0),
+	("Hand_L" , "COPYROT", 1.0, "HandIK_L", "PArmIK_L", 7, 0),
+	("HandIK_L" , "LIMITDIST", 1.0, "Clavicle_L", "PArmIK_L", "", 0),
+	("ElbowIK_L" , "LIMITDIST", 1.0, "Clavicle_L", "PArmIK_L", "", 0),
 
-	("LoArm_R" , "IKSOLVER", 1.0, "HandIK_R", "ArmIK-switch", 2, Bone),
-	("LoArm_R", "LIMITROT", 1.0, "None", None, 7, (-30, 180, -90, 90, -30, 30)), 
-	("UpArm_R" , "IKSOLVER", 1.0, "ElbowIK_R", "ArmIK-switch", 1, Bone),
-	("Hand_R" , "COPYROT", 1.0, "HandIK_R", "ArmIK-switch", "", 0),
-	("HandIK_R" , "LIMITDIST", 1.0, "Clavicle_R", "ArmIK-switch", "", 0),
-	("ElbowIK_R" , "LIMITDIST", 1.0, "Clavicle_R", "ArmIK-switch", "", 0),
+	("LoArmIK_R" , "IKSOLVER", 1.0, "HandIK_R", None, 2, Bone),
+	("LoArm_R" , "COPYROT", 1.0, "LoArmIK_R", "PArmIK_R", 7, 0),
+	#("LoArm_R", "LIMITROT", 1.0, "None", None, 7, (-30, 180, -90, 90, -30, 30)), 
+	("UpArmIK_R" , "IKSOLVER", 1.0, "ElbowIK_R", None, 1, Bone),
+	("UpArm_R" , "COPYROT", 1.0, "UpArmIK_R", "PArmIK_R", 7, 0),
+	("Hand_R" , "COPYROT", 1.0, "HandIK_R", "PArmIK_R", 7, 0),
+	("HandIK_R" , "LIMITDIST", 1.0, "Clavicle_R", "PArmIK_R", "", 0),
+	("ElbowIK_R" , "LIMITDIST", 1.0, "Clavicle_R", "PArmIK_R", "", 0),
 
 	("UpArmTwist_L", "IKSOLVER", 1.0, "LoArm_L", None, 1, Bone),
 	("LoArmTwist_L", "IKSOLVER", 1.0, "Hand_L", None, 1, Bone),
@@ -725,45 +757,36 @@ constraints = [
 	("Eye_R" , "IKSOLVER", 1.0, "Gaze_R", "Gaze-switch", 1, Bone),
 	("Eye_L" , "IKSOLVER", 1.0, "Gaze_L", "Gaze-switch", 1, Bone),
 
-	("Finger-1-3_R" , "IKSOLVER", 1.0, "Finger-1-IK_R", "FingerIK-switch", 3, Bone),
-	("Finger-2-3_R" , "IKSOLVER", 1.0, "Finger-2-IK_R", "FingerIK-switch", 3, Bone),
-	("Finger-3-3_R" , "IKSOLVER", 1.0, "Finger-3-IK_R", "FingerIK-switch", 3, Bone),
-	("Finger-4-3_R" , "IKSOLVER", 1.0, "Finger-4-IK_R", "FingerIK-switch", 3, Bone),
-	("Finger-5-3_R" , "IKSOLVER", 1.0, "Finger-5-IK_R", "FingerIK-switch", 3, Bone),
+	("Finger-1-3_R" , "IKSOLVER", 1.0, "Finger-1-IK_R", "FingerIK_L", 3, Bone),
+	("Finger-2-3_R" , "IKSOLVER", 1.0, "Finger-2-IK_R", "FingerIK_L", 3, Bone),
+	("Finger-3-3_R" , "IKSOLVER", 1.0, "Finger-3-IK_R", "FingerIK_L", 3, Bone),
+	("Finger-4-3_R" , "IKSOLVER", 1.0, "Finger-4-IK_R", "FingerIK_L", 3, Bone),
+	("Finger-5-3_R" , "IKSOLVER", 1.0, "Finger-5-IK_R", "FingerIK_L", 3, Bone),
 
-	("Finger-1-3_L" , "IKSOLVER", 1.0, "Finger-1-IK_L", "FingerIK-switch", 3, Bone),
-	("Finger-2-3_L" , "IKSOLVER", 1.0, "Finger-2-IK_L", "FingerIK-switch", 3, Bone),
-	("Finger-3-3_L" , "IKSOLVER", 1.0, "Finger-3-IK_L", "FingerIK-switch", 3, Bone),
-	("Finger-4-3_L" , "IKSOLVER", 1.0, "Finger-4-IK_L", "FingerIK-switch", 3, Bone),
-	("Finger-5-3_L" , "IKSOLVER", 1.0, "Finger-5-IK_L", "FingerIK-switch", 3, Bone),	
+	("Finger-1-3_L" , "IKSOLVER", 1.0, "Finger-1-IK_L", "FingerIK_L", 3, Bone),
+	("Finger-2-3_L" , "IKSOLVER", 1.0, "Finger-2-IK_L", "FingerIK_L", 3, Bone),
+	("Finger-3-3_L" , "IKSOLVER", 1.0, "Finger-3-IK_L", "FingerIK_L", 3, Bone),
+	("Finger-4-3_L" , "IKSOLVER", 1.0, "Finger-4-IK_L", "FingerIK_L", 3, Bone),
+	("Finger-5-3_L" , "IKSOLVER", 1.0, "Finger-5-IK_L", "FingerIK_L", 3, Bone),	
 
-	("Finger-1-1_R" , "IKSOLVER", 1.0, "Finger-1-Pole_R", "FingerIK-switch", 1, Bone),
-	("Finger-2-1_R" , "IKSOLVER", 1.0, "Finger-2-Pole_R", "FingerIK-switch", 1, Bone),
-	("Finger-3-1_R" , "IKSOLVER", 1.0, "Finger-3-Pole_R", "FingerIK-switch", 1, Bone),
-	("Finger-4-1_R" , "IKSOLVER", 1.0, "Finger-4-Pole_R", "FingerIK-switch", 1, Bone),
-	("Finger-5-1_R" , "IKSOLVER", 1.0, "Finger-5-Pole_R", "FingerIK-switch", 1, Bone),
+	("Finger-1-1_R" , "IKSOLVER", 1.0, "Finger-1-Pole_R", "FingerIK_L", 1, Bone),
+	("Finger-2-1_R" , "IKSOLVER", 1.0, "Finger-2-Pole_R", "FingerIK_L", 1, Bone),
+	("Finger-3-1_R" , "IKSOLVER", 1.0, "Finger-3-Pole_R", "FingerIK_L", 1, Bone),
+	("Finger-4-1_R" , "IKSOLVER", 1.0, "Finger-4-Pole_R", "FingerIK_L", 1, Bone),
+	("Finger-5-1_R" , "IKSOLVER", 1.0, "Finger-5-Pole_R", "FingerIK_L", 1, Bone),
 
-	("Finger-1-1_L" , "IKSOLVER", 1.0, "Finger-1-Pole_L", "FingerIK-switch", 1, Bone),
-	("Finger-2-1_L" , "IKSOLVER", 1.0, "Finger-2-Pole_L", "FingerIK-switch", 1, Bone),
-	("Finger-3-1_L" , "IKSOLVER", 1.0, "Finger-3-Pole_L", "FingerIK-switch", 1, Bone),
-	("Finger-4-1_L" , "IKSOLVER", 1.0, "Finger-4-Pole_L", "FingerIK-switch", 1, Bone),
-	("Finger-5-1_L" , "IKSOLVER", 1.0, "Finger-5-Pole_L", "FingerIK-switch", 1, Bone),
+	("Finger-1-1_L" , "IKSOLVER", 1.0, "Finger-1-Pole_L", "FingerIK_L", 1, Bone),
+	("Finger-2-1_L" , "IKSOLVER", 1.0, "Finger-2-Pole_L", "FingerIK_L", 1, Bone),
+	("Finger-3-1_L" , "IKSOLVER", 1.0, "Finger-3-Pole_L", "FingerIK_L", 1, Bone),
+	("Finger-4-1_L" , "IKSOLVER", 1.0, "Finger-4-Pole_L", "FingerIK_L", 1, Bone),
+	("Finger-5-1_L" , "IKSOLVER", 1.0, "Finger-5-Pole_L", "FingerIK_L", 1, Bone),
 
+
+	("PArmIK_L", "LIMITLOC", 1.0, "None", None, 0x3f, (0,1,0,0,0,0)), 
+	("PArmIK_R", "LIMITLOC", 1.0, "None", None, 0x3f, (0,1,0,0,0,0)), 
+	("PLegIK_L", "LIMITLOC", 1.0, "None", None, 0x3f, (0,1,0,0,0,0)), 
+	("PLegIK_R", "LIMITLOC", 1.0, "None", None, 0x3f, (0,1,0,0,0,0)), 
 ]	
-	
-	# Osipa-like panel
-'''
-	("PSync" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, -1, 1, 0, 0)),
-	("PLips" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 1, 0, 1, 0, 0)),
-	("PTounge" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 1, 0, 1, 0, 0)),
-	("PMouthEmotion" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 1, 0, 0)),
-	("PBrows" , "LIMITLOC", 1.0, "None", None, 0x3f, (0, 0, -1, 1, 0, 0)),
-	("PBrowEmotion" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, 0, 1, 0, 0)),
-	("PEyeLids" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, -1, 1, 0, 0)),
-	("PEyes" , "LIMITLOC", 1.0, "None", None, 0x3f, (-1, 1, -1, 1, 0, 0)),
-'''
-
-
 
 #
 #	calcJointPos(obj, joint):
@@ -857,7 +880,7 @@ def writePose(obj, fp):
 			if bone == bone1:
 				fp.write("\t\tconstraint %s Const %f \n" % (type, infl))
 				if driver:
-					fp.write("\t\t\tdriver %s ;\n" % driver)
+					fp.write("\t\t\tdriver %s 0.5 ;\n" % driver)
 	
 				if type == 'IKSOLVER':
 					if arg2 == Bone:
@@ -874,7 +897,8 @@ def writePose(obj, fp):
 				elif type == 'COPYROT':
 					fp.write(\
 "\t\t\tTARGET	obj HumanRig ;\n\
-\t\t\tBONE	str %s ;\n" % (target))
+\t\t\tBONE	str %s ; \n\
+\t\t\tCOPY	hex %x ;\n" % (target, arg1))
 
 				elif type == 'COPYLOC':
 					fp.write(\
@@ -935,7 +959,6 @@ def writePose(obj, fp):
 				if smash:
 					fp.write("\t\tsmash %s ;\n" % smash)
 		fp.write("\tend posebone\n")
-
 
 
 """
