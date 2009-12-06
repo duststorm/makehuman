@@ -774,7 +774,7 @@ class FileEntryView(View):
     
     Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 0.30, 9])
     Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [200, 80, 5.5])
-    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [210, 95, 5.5])
+    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [210, 95, 5.6])
     self.bConfirm = Object(self, mesh = "data/3dobjs/button_confirm.obj",
       texture = self.app.getThemeResource("images", "button_confirm.png"), position = [610, 70, 9.1])
     self.text = ""
