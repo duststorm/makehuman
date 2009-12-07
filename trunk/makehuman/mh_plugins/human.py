@@ -148,7 +148,7 @@ class Human(gui3d.Object):
         self.targetMaleLightYoung = "%s/universal-male-young-light.target"%(targetFolder)
         self.targetMaleLightOld = "%s/universal-male-old-light.target"%(targetFolder)
 
-        self.hairFile = "data/hairs/test.hair"
+        self.hairFile = "data/hairs/default.hair"
                         
     def setTexture(self, texturePath):
         self.meshData.setTexture(texturePath)
