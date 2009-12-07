@@ -591,7 +591,7 @@ class Object3D:
         self.y = locy
         self.z = locz
         try:
-            self.object3d.setTranslation(self.x, self.y, self.z)
+            self.object3d.translation = (self.x, self.y, self.z)
         except AttributeError, text:
             print(text)
 
@@ -613,7 +613,7 @@ class Object3D:
         self.ry = ry
         self.rz = rz
         try:
-            self.object3d.setRotation(self.rx, self.ry, self.rz)
+            self.object3d.rotation = (self.rx, self.ry, self.rz)
         except AttributeError, text:
             print(text)
 
@@ -636,7 +636,7 @@ class Object3D:
         self.sy = sy
         self.sz = sz
         try:
-            self.object3d.setScale(self.sx, self.sy, self.sz)
+            self.object3d.scale = (self.sx, self.sy, self.sz)
         except AttributeError, text:
             print(text)
 
@@ -1124,9 +1124,9 @@ class Scene3D:
         for name, value in obj.shaderParameters.iteritems():
           obj.object3d.shaderParameters[name] = value
 
-        obj.object3d.setTranslation(obj.x, obj.y, obj.z)
-        obj.object3d.setRotation( obj.rx, obj.ry, obj.rz)
-        obj.object3d.setScale(obj.sx, obj.sy, obj.sz)
+        obj.object3d.translation = (obj.x, obj.y, obj.z)
+        obj.object3d.rotation = ( obj.rx, obj.ry, obj.rz)
+        obj.object3d.scale = (obj.sx, obj.sy, obj.sz)
         obj.object3d.visibility = obj.visibility
         obj.object3d.shadeless = obj.shadeless
         obj.object3d.pickable = obj.pickable

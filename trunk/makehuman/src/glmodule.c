@@ -1438,11 +1438,11 @@ void mhDrawMeshes(int pickMode, int cameraType)
             {
                 /*Transform the current object*/
                 glPushMatrix();
-                glTranslatef(obj->location[0], obj->location[1], obj->location[2]);
-                glRotatef(obj->rotation[0], 1, 0, 0);
-                glRotatef(obj->rotation[1], 0, 1, 0);
-                glRotatef(obj->rotation[2], 0, 0, 1);
-                glScalef(obj->scale[0], obj->scale[1], obj->scale[2]);
+                glTranslatef(obj->x, obj->y, obj->z);
+                glRotatef(obj->rx, 1, 0, 0);
+                glRotatef(obj->rx, 0, 1, 0);
+                glRotatef(obj->rz, 0, 0, 1);
+                glScalef(obj->sx, obj->sy, obj->sz);
 
                 if (obj->texture && !pickMode)
                 {

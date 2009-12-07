@@ -44,6 +44,15 @@
 
 // Object3D attributes directly accessed by Python
 static PyMemberDef Object3D_members[] = {
+    {"x", T_FLOAT, offsetof(Object3D, x), 0, "X translation"},
+    {"y", T_FLOAT, offsetof(Object3D, y), 0, "Y translation"},
+    {"z", T_FLOAT, offsetof(Object3D, z), 0, "Z translation"},
+    {"rx", T_FLOAT, offsetof(Object3D, rx), 0, "X rotation"},
+    {"ry", T_FLOAT, offsetof(Object3D, ry), 0, "Y rotation"},
+    {"rz", T_FLOAT, offsetof(Object3D, rz), 0, "Z rotation"},
+    {"sx", T_FLOAT, offsetof(Object3D, sx), 0, "X scale"},
+    {"sy", T_FLOAT, offsetof(Object3D, sy), 0, "Y scale"},
+    {"sz", T_FLOAT, offsetof(Object3D, sz), 0, "Z scale"},
     {"shadeless", T_UINT, offsetof(Object3D, shadeless), 0, "Whether this object is affected by scene lights or not."},
     {"texture", T_UINT, offsetof(Object3D, texture), 0, "A texture id or 0 if this object doesn't have a texture."},
     {"shader", T_UINT, offsetof(Object3D, shader), 0, "A shader id or 0 if this object doesn't have a shader."},
@@ -70,15 +79,6 @@ static PyMethodDef Object3D_methods[] = {
   {"setColorComponent", (PyCFunction)Object3D_setColorComponent, METH_VARARGS,
    ""
   },
-  {"setTranslation", (PyCFunction)Object3D_setTranslation, METH_VARARGS,
-   ""
-  },
-  {"setRotation", (PyCFunction)Object3D_setRotation, METH_VARARGS,
-   ""
-  },
-  {"setScale", (PyCFunction)Object3D_setScale, METH_VARARGS,
-   ""
-  },
   {NULL}  /* Sentinel */
 };
 
@@ -86,6 +86,9 @@ static PyMethodDef Object3D_methods[] = {
 static PyGetSetDef Object3D_getset[] = {
   {"shaderParameters", (getter)Object3D_getShaderParameters, (setter)NULL, "The dictionary containing the shader parameters, read only.", NULL},
   {"text", (getter)Object3D_getText, (setter)Object3D_setText, "The text of the object as a String or None if it doesn't have text.", NULL},
+  {"translation", (getter)Object3D_getTranslation, (setter)Object3D_setTranslation, "The translation of the object as a 3 component vector.", NULL},
+  {"rotation", (getter)Object3D_getRotation, (setter)Object3D_setRotation, "The rotation of the object as a 3 component vector.", NULL},
+  {"scale", (getter)Object3D_getScale, (setter)Object3D_setScale, "The scale of the object as a 3 component vector.", NULL},
   {NULL}
 };
 
@@ -188,15 +191,15 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self->inMovableCamera = 1;
     self->isPickable = 1;
 
-    self->location[0] = 0.0;
-    self->location[1] = 0.0;
-    self->location[2] = 0.0;
-    self->rotation[0] = 0.0;
-    self->rotation[1] = 0.0;
-    self->rotation[2] = 0.0;
-    self->scale[0] = 1.0;
-    self->scale[1] = 1.0;
-    self->scale[2] = 1.0;
+    self->x = 0.0;
+    self->y = 0.0;
+    self->z = 0.0;
+    self->rx = 0.0;
+    self->ry = 0.0;
+    self->rz = 0.0;
+    self->sx = 1.0;
+    self->sy = 1.0;
+    self->sz = 1.0;
 
     self->trigs = NULL;
     self->verts = NULL;
@@ -292,7 +295,7 @@ PyObject *Object3D_setVertCoo(Object3D *self, PyObject *args)
 
     if (index < 0 || index >= self->nVerts)
     {
-        PyErr_Format(PyExc_IndexError, "index out of range, %i is not between 0 and %i", index, self->nVerts);
+        PyErr_BadArgument(PyExc_IndexError, "index out of range, %i is not between 0 and %i", index, self->nVerts);
         return NULL;
     }
 
@@ -444,72 +447,6 @@ PyObject *Object3D_setColorComponent(Object3D *self, PyObject *args)
     return Py_BuildValue("");
 }
 
-/** \brief Sets the location of an Object3D object.
- *  \param self An Object3D.
- *  \param locX a float specifying the x coordinate of the object.
- *  \param locY a float specifying the y coordinate of the object.
- *  \param locZ a float specifying the z coordinate of the object.
- *
- *  This function sets the location of an Object3D object.
- */
-PyObject *Object3D_setTranslation(Object3D *self, PyObject *args)
-{
-    float x, y, z;
-
-    if (!PyArg_ParseTuple(args, "fff", &x, &y, &z))
-        return NULL;
-
-    self->location[0] = x;
-    self->location[1] = y;
-    self->location[2] = z;
-
-    return Py_BuildValue("");
-}
-
-/** \brief Sets the orientation of an Object3D object.
- *  \param self An Object3D.
- *  \param rotX a float specifying the rotation around the x-axis required to achieve the required orientation.
- *  \param rotY a float specifying the rotation around the y-axis required to achieve the required orientatio.
- *  \param rotZ a float specifying the rotation around the z-axis required to achieve the required orientatio.
- *
- *  This function sets the orientation of an Object3D object.
- */
-PyObject *Object3D_setRotation(Object3D *self, PyObject *args)
-{
-    float x, y, z;
-
-    if (!PyArg_ParseTuple(args, "fff", &x, &y, &z))
-        return NULL;
-
-    self->rotation[0] = x;
-    self->rotation[1] = y;
-    self->rotation[2] = z;
-
-    return Py_BuildValue("");
-}
-
-/** \brief Sets the scale factor used to define the size of an Object3D object.
- *  \param self An Object3D.
- *  \param sizeX a float specifying the scale along the x-axis required to achieve the required size.
- *  \param sizeY a float specifying the scale along the Y-axis required to achieve the required size.
- *  \param sizeZ a float specifying the scale along the Z-axis required to achieve the required size.
- *
- *  This function sets the scale factor used to define the size of an Object3D object.
- */
-PyObject *Object3D_setScale(Object3D *self, PyObject *args)
-{
-    float x, y, z;
-
-    if (!PyArg_ParseTuple(args, "fff", &x, &y, &z))
-        return NULL;
-
-    self->scale[0] = x;
-    self->scale[1] = y;
-    self->scale[2] = z;
-
-    return Py_BuildValue("");
-}
-
 /** \brief Gets the shader parameter dictionary for this Object3D object.
  *  \param self An 3D object.
  *
@@ -555,6 +492,108 @@ int Object3D_setText(Object3D *self, PyObject *value, void *closure)
     }
     else
       return -1;
+}
+
+/** \brief Gets the translation for this Object3D object as a list.
+ *  \param self The 3D object.
+ *
+ *  This function gets the translation for this Object3D object as a list.
+ */
+PyObject *Object3D_getTranslation(Object3D *self, void *closure)
+{
+    return Py_BuildValue("[f,f,f]", self->x, self->y, self->z);
+}
+
+/** \brief Sets the translation for this Object3D object as a list.
+ *  \param self The 3D object.
+ *  \param self The new translation as a python list.
+ *
+ *  This function sets the translation for this Object3D object as a list.
+ */
+int Object3D_setTranslation(Object3D *self, PyObject *value)
+{
+    if (!PySequence_Check(value))
+      return -1;
+
+    if (PySequence_Size(value) != 3)
+    {
+      PyErr_BadArgument();
+      return -1;
+    }
+
+    self->x = PyFloat_AsDouble(PySequence_GetItem(value, 0));
+    self->y = PyFloat_AsDouble(PySequence_GetItem(value, 1));
+    self->z = PyFloat_AsDouble(PySequence_GetItem(value, 2));
+
+    return 0;
+}
+
+/** \brief Gets the rotation for this Object3D object as a list.
+ *  \param self The 3D object.
+ *
+ *  This function gets the rotation for this Object3D object as a list.
+ */
+PyObject *Object3D_getRotation(Object3D *self, void *closure)
+{
+    return Py_BuildValue("[f,f,f]", self->rx, self->ry, self->rz);
+}
+
+/** \brief Sets the rotation for this Object3D object as a list.
+ *  \param self The 3D object.
+ *  \param self The new rotation as a python list.
+ *
+ *  This function sets the rotation for this Object3D object as a list.
+ */
+int Object3D_setRotation(Object3D *self, PyObject *value)
+{
+    if (!PySequence_Check(value))
+      return -1;
+
+    if (PySequence_Size(value) != 3)
+    {
+      PyErr_BadArgument();
+      return -1;
+    }
+
+    self->rx = PyFloat_AsDouble(PySequence_GetItem(value, 0));
+    self->ry = PyFloat_AsDouble(PySequence_GetItem(value, 1));
+    self->rz = PyFloat_AsDouble(PySequence_GetItem(value, 2));
+
+    return 0;
+}
+
+/** \brief Gets the scale for this Object3D object as a list.
+ *  \param self The 3D object.
+ *
+ *  This function gets the scale for this Object3D object as a list.
+ */
+PyObject *Object3D_getScale(Object3D *self, void *closure)
+{
+    return Py_BuildValue("[f,f,f]", self->sx, self->sy, self->sz);
+}
+
+/** \brief Sets the scale for this Object3D object as a list.
+ *  \param self The 3D object.
+ *  \param self The new scale as a python list.
+ *
+ *  This function sets the scale for this Object3D object as a list.
+ */
+int Object3D_setScale(Object3D *self, PyObject *value)
+{
+    if (!PySequence_Check(value))
+      return -1;
+
+    if (PySequence_Size(value) != 3)
+    {
+      PyErr_BadArgument();
+      return -1;
+    }
+
+    self->sx = PyFloat_AsDouble(PySequence_GetItem(value, 0));
+    self->sy = PyFloat_AsDouble(PySequence_GetItem(value, 1));
+    self->sz = PyFloat_AsDouble(PySequence_GetItem(value, 2));
+
+    return 0;
 }
 
 /** \brief Invokes the Python timer function.

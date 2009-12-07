@@ -63,11 +63,11 @@ typedef struct
                                 /**<        An int defining whether this object uses the Movable or Fixed camera mode.  */
     int isPickable;             /**< \brief Whether this object can be picked.                                          */
                                 /**<        An int defining whether this object can be picked.                          */
-    float location[3];          /**< \brief Tthe object location.                                                       */
+    float x, y, z;              /**< \brief Tthe object location.                                                       */
                                 /**<        Array of 3 floats defining the object location (x,y,z).                     */
-    float rotation[3];          /**< \brief The object orientation.                                                     */
+    float rx, ry, rz;           /**< \brief The object orientation.                                                     */
                                 /**<        Array of 3 floats defining the object orientation (x, y and z rotations).   */
-    float scale[3];             /**< \brief The object scale.                                                           */
+    float sx, sy, sz;           /**< \brief The object scale.                                                           */
                                 /**<        Array of 3 floats defining the object size (x, y and z scale).              */
     int nVerts;                 /**< \brief The number of vertices in this object.                                      */
                                 /**<        An int holding the number of vertices in this object.                       */
@@ -120,9 +120,12 @@ PyObject *Object3D_setNormCoo(Object3D *self, PyObject *args);
 PyObject *Object3D_setUVCoo(Object3D *self, PyObject *args);
 PyObject *Object3D_setColorIDComponent(Object3D *self, PyObject *args);
 PyObject *Object3D_setColorComponent(Object3D *self, PyObject *args);
-PyObject *Object3D_setTranslation(Object3D *self, PyObject *args);
-PyObject *Object3D_setRotation(Object3D *self, PyObject *args);
-PyObject *Object3D_setScale(Object3D *self, PyObject *args);
+PyObject *Object3D_getTranslation(Object3D *self, void *closure);
+int Object3D_setTranslation(Object3D *self, PyObject *value);
+PyObject *Object3D_getRotation(Object3D *self, void *closure);
+int Object3D_setRotation(Object3D *self, PyObject *value);
+PyObject *Object3D_getScale(Object3D *self, void *closure);
+int Object3D_setScale(Object3D *self, PyObject *value);
 
 // Object3D attributes indirectly accessed by Python
 PyObject *Object3D_getShaderParameters(Object3D *self, void *closure);
