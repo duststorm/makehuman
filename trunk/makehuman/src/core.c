@@ -295,7 +295,7 @@ PyObject *Object3D_setVertCoo(Object3D *self, PyObject *args)
 
     if (index < 0 || index >= self->nVerts)
     {
-        PyErr_BadArgument(PyExc_IndexError, "index out of range, %i is not between 0 and %i", index, self->nVerts);
+        PyErr_Format(PyExc_IndexError, "index out of range, %i is not between 0 and %i", index, self->nVerts);
         return NULL;
     }
 
