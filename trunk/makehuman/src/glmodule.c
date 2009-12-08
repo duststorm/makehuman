@@ -1440,7 +1440,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 glPushMatrix();
                 glTranslatef(obj->x, obj->y, obj->z);
                 glRotatef(obj->rx, 1, 0, 0);
-                glRotatef(obj->rx, 0, 1, 0);
+                glRotatef(obj->ry, 0, 1, 0);
                 glRotatef(obj->rz, 0, 0, 1);
                 glScalef(obj->sx, obj->sy, obj->sz);
 
