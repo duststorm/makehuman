@@ -501,6 +501,7 @@ PyMODINIT_FUNC initmh()
     RegisterCamera(module);
     RegisterTexture(module);
     PyModule_AddObject(module, "world", G.world);
+    PyModule_AddObject(module, "cameras", G.cameras);
 }
 #else /* #if !defined(MAKEHUMAN_AS_MODULE) */
 int main(int argc, char *argv[])
