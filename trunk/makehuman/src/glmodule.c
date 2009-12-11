@@ -447,7 +447,7 @@ void mhDrawText(float x, float y, const char *message)
       do
       {
         glCallLists(line - message, GL_UNSIGNED_BYTE, message);
-        glRasterPos3f(x, y - (22.0f / (float)g_windowHeight) * (float)(++lineindex), 0.0f);
+        glRasterPos3f(x, y + 14.0f * (float)(++lineindex), 0.0f); // fontsize = 12, linespacing = 14
         message = line + 1;
         line = strchr(message, '\n');
       }
