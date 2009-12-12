@@ -17,7 +17,7 @@ class MeasurementTaskView(gui3d.TaskView):
             self.app.getThemeResource("images", "slider.png"),
             self.app.getThemeResource("images", "slider_focused.png"),
             position=[10, 460, 9.04],
-            # We want the slider to start from the middle
+            #  We want the slider to start from the middle
             value=0.5)
         @self.hipGirthSlider.event
         def onChange(value):
