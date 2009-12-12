@@ -117,7 +117,7 @@ class MeasurementTaskView(gui3d.TaskView):
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
-  category = gui3d.Category(app, "Example", app.getThemeResource("images", "button_measure.png"))
+  category = gui3d.Category(app, "Measurement", app.getThemeResource("images", "button_measure.png"))
   taskview = MeasurementTaskView(category)
   # Zoom the camera
   @taskview.event
