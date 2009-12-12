@@ -1,6 +1,8 @@
 # We need this for gui controls
 import gui3d
 import aljabr
+import humanmodifier
+import mh
 
 
 
@@ -8,7 +10,7 @@ class MeasurementTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, "Example", category.app.getThemeResource("images", "button_measure.png"))
         gui3d.Object(self, "data/3dobjs/background.obj", position = [400, 300, -89.98])
-        self.measureList = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 100, 8.04])
+        self.measureList = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 80, 8.04])
         self.measureList.setText("");
         self.hipGirthSlider = gui3d.Slider(self,
             self.app.getThemeResource("images", "button_hip_girth.png"),
@@ -56,7 +58,19 @@ class MeasurementTaskView(gui3d.TaskView):
 
         @self.chestGirthSlider.event
         def onChange(value):
+            human = self.app.scene3d.selectedHuman
             self.chestGirthLabel.setText("Value is %f" % (value))
+            modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-horiz-decr.target",
+                 "data/targets/details/torso-scale-horiz-incr.target")
+            modifier.setValue(value * 2)
+            modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-depth-decr.target",
+                 "data/targets/details/torso-scale-depth-incr.target")
+            modifier.setValue(value * 2)
+            human.applyAllTargets(self.app.progress)
+            self.measureList.setText(self.ruler.getMeasurementsString());
+            
+            
+            
 
         self.statureSlider = gui3d.Slider(self,
             self.app.getThemeResource("images", "button_stature.png"),
@@ -66,22 +80,39 @@ class MeasurementTaskView(gui3d.TaskView):
             # We want the slider to start from the middle
             value=0.5)
 
-        self.statureLabel = gui3d.TextView(self,
-            mesh="data/3dobjs/empty.obj",
-            position=[10, 160, 8.04])
-        self.statureLabel.setText("Value is 0.5")
+       
 
         @self.statureSlider.event
         def onChange(value):
-            self.statureLabel.setText("Value is %f" % (value))
-            self.measureList.setText(ruler.getMeasurementsString());
+          human = self.app.scene3d.selectedHuman
+          before = {}
+          before["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
+          before["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
+          modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
+                 "data/targets/macrodetails/universal-stature-giant.target")
+          modifier.setValue(value * 2 -1)
+          after = {}
+          after["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
+          after["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
+          self.app.did(humanmodifier.Action(human, before, after, self.syncSliders))#
+          human.applyAllTargets(self.app.progress)
+          self.measureList.setText(self.ruler.getMeasurementsString());
 
-        ruler = Ruler(category.app.scene3d.selectedHuman)
-        self.measureList.setText(ruler.getMeasurementsString());
+        self.ruler = Ruler(category.app.scene3d.selectedHuman)
+        self.measureList.setText(self.ruler.getMeasurementsString());
 
-category = None
-taskview = None
-ruler = None
+
+    def onShow(self, event):
+    # When the task gets shown, set the focus to the file entry
+      gui3d.TaskView.onShow(self, event)
+      self.measureList.setText(self.ruler.getMeasurementsString());
+      self.syncSliders()
+
+    def syncSliders(self):
+      human = self.app.scene3d.selectedHuman
+      modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
+      "data/targets/macrodetails/universal-stature-giant.target")
+      self.statureSlider.setValue(0.5 + modifier.getValue() / 2.0)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
@@ -148,7 +179,8 @@ class Ruler:
                                  7267, 7242, 7290, 7246, 7314],
                        'Hips' : [7298, 2936, 3816, 3817, 3821, 4487, 3822, 3823, 3913, 3915, 4506,
                                  5688, 4505, 6860, 6785, 6859, 7094, 7096, 7188, 7189, 6878, 7190,
-                                 7194, 7247, 7300]
+                                 7194, 7247, 7300],
+                       'Stature' : [8224,13675]
                    }
 
     self.humanoid = human
@@ -176,3 +208,6 @@ class Ruler:
       measuretext += ": %.1f cm \n" % self.getMeasure(key)
       measuretext += " \n"
     return measuretext
+
+
+#for example setDetail("data/targets/details/torso-scale-horiz-incr.target", 1.0)?
