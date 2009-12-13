@@ -223,6 +223,9 @@ class TaskView(View):
     # The button is attached to the parent, as it stays visible when the category is hidden
     self.button = Object(self.parent, "data/3dobjs/button_about.obj",
       texture = texture, position = [30 + len(self.parent.tasks) * 60, 600.0 - 25.0, 9.1])
+      
+    if name in category.tasksByName:
+      raise KeyError("The task with this name already exists", name)
     
     category.tasks.append(self)
     category.tasksByName[self.name] = self
@@ -259,6 +262,9 @@ class Category(View):
     # The button is attached to the parent, as it stays visible when the category is hidden
     self.button = Object(self.parent, "data/3dobjs/button_about.obj",
       position = [30 + len(self.app.categories) * 60, 25.0, 9.1], texture = texture)
+      
+    if name in parent.categories:
+      raise KeyError("The category with this name already exists", name)
       
     parent.categories[name] = self
     
