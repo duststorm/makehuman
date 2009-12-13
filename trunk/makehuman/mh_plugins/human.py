@@ -29,6 +29,7 @@ import subdivision
 import files3d
 import os
 import mh
+import humanmodifier
 
 class Human(gui3d.Object):
     
@@ -737,5 +738,42 @@ class Human(gui3d.Object):
         self.targetsEthnicStack = {"neutral":1.0}  
         self.targetsDetailStack = {}    
 
+    def load(self, filename, progressCallback = None):
+        self.resetMeshValues()
         
+        f = open(filename, 'r')
         
+        for data in f.readlines():
+            lineData = data.split()
+            
+            if len(lineData) > 0:
+                if lineData[0] == "version":
+                    print("Version " + lineData[1])
+                elif lineData[0] == "tags":
+                    for tag in lineData:
+                      print("Tag " + tag)
+                elif lineData[0] == "gender":
+                    self.setGender(float(lineData[1]))
+                elif lineData[0] == "age":
+                    self.setAge(float(lineData[1]))
+                elif lineData[0] == "muscle":
+                    self.setMuscle(float(lineData[1]))
+                elif lineData[0] == "weight":
+                    self.setWeight(float(lineData[1]))
+                elif lineData[0] == "height":
+                    modifier = humanmodifier.Modifier(self, "data/targets/macrodetails/universal-stature-dwarf.target",
+                      "data/targets/macrodetails/universal-stature-giant.target")
+                    modifier.setValue(float(lineData[1]))
+                elif lineData[0] == "ethnic":
+                    self.targetsEthnicStack[lineData[1]] = float(lineData[2])
+                elif lineData[0] == "detail":
+                    self.targetsDetailStack["data/targets/details/" + lineData[1] + ".target"] = float(lineData[2])
+                elif lineData[0] == "microdetail":
+                    self.targetsDetailStack["data/targets/microdetails/" + lineData[1] + ".target"] = float(lineData[2])
+                
+        f.close()
+        
+        del self.targetsEthnicStack["neutral"]
+        self.targetsEthnicStack["neutral"] = 1.0 - sum(self.targetsEthnicStack.values())
+                
+        self.applyAllTargets(progressCallback)

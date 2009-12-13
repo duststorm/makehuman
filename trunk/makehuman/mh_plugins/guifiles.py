@@ -107,49 +107,13 @@ class LoadTaskView(gui3d.TaskView):
       print("Loading %s" %(filename))
         
       human = self.app.scene3d.selectedHuman
-      human.resetMeshValues()
       
-      # Load the model
-      f = open(modelPath+ "/" + filename, 'r')
-      
-      for data in f.readlines():
-          lineData = data.split()
-          
-          if len(lineData) > 0:
-              if lineData[0] == "version":
-                  print("Version " + lineData[1])
-              elif lineData[0] == "tags":
-                  for tag in lineData:
-                    print("Tag " + tag)
-              elif lineData[0] == "gender":
-                  human.setGender(float(lineData[1]))
-              elif lineData[0] == "age":
-                  human.setAge(float(lineData[1]))
-              elif lineData[0] == "muscle":
-                  human.setMuscle(float(lineData[1]))
-              elif lineData[0] == "weight":
-                  human.setWeight(float(lineData[1]))
-              elif lineData[0] == "height":
-                  modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
-                    "data/targets/macrodetails/universal-stature-giant.target")
-                  modifier.setValue(float(lineData[1]))
-              elif lineData[0] == "ethnic":
-                  human.targetsEthnicStack[lineData[1]] = float(lineData[2])
-              elif lineData[0] == "detail":
-                  human.targetsDetailStack["data/targets/details/" + lineData[1] + ".target"] = float(lineData[2])
-              elif lineData[0] == "microdetail":
-                  human.targetsDetailStack["data/targets/microdetails/" + lineData[1] + ".target"] = float(lineData[2])
-              
-      f.close()
-      
-      del human.targetsEthnicStack["neutral"]
-      human.targetsEthnicStack["neutral"] = 1.0 - sum(human.targetsEthnicStack.values())
+      human.load(modelPath + "/" + filename, self.app.progress)
       
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncSliders()
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncEthnics()
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncStatus()
               
-      human.applyAllTargets(self.app.progress)
       del self.app.undoStack[:]
       del self.app.redoStack[:]
       
