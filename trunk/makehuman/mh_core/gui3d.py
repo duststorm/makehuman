@@ -510,7 +510,7 @@ class Application(events3d.EventHandler):
 
 # Slider widget
 class Slider(View):
-  def __init__(self, parent, backgroundTexture, sliderTexture, focusedSliderTexture = None, position = [0, 0, 9], value = 0.0):
+  def __init__(self, parent, backgroundTexture, sliderTexture, focusedSliderTexture = None, position = [0, 0, 9], value = 0.0, min = 0.0, max = 1.0):
     View.__init__(self, parent)
     self.background = Object(self, "data/3dobjs/slider_background.obj",
       texture = backgroundTexture, position = position)
@@ -520,12 +520,15 @@ class Slider(View):
     self.focusedSliderTexture = focusedSliderTexture
     self.sliderMinX = position[0] + 25;
     self.sliderMaxX = position[0] + 125;
+    self.min = min
+    self.max = max
     self.setValue(value)
     
   def setValue(self, value):
-    self.__value = min(1, max(0, value))
+    self.__value = min(self.max, max(self.min, value))
     sliderPos = self.slider.getPosition()
-    sliderPos[0] = self.__value * (self.sliderMaxX - self.sliderMinX) + self.sliderMinX
+    value = (self.__value - self.min) / (self.max - self.min) 
+    sliderPos[0] = value * (self.sliderMaxX - self.sliderMinX) + self.sliderMinX
     self.slider.setPosition(sliderPos)
     
   def getValue(self):
@@ -544,7 +547,8 @@ class Slider(View):
     worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
     sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
     self.slider.setPosition(sliderPos)
-    self.value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
+    value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
+    self.value = value * (self.max - self.min) + self.min
     #print(self.value)
     self.callEvent("onChange", self.value)
     
