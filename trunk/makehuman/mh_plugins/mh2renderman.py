@@ -809,7 +809,16 @@ def mh2Pixie(scene, fName, ribRepository):
 
 
 
-
+def calculateHeadCentroid(obj):
+    #4 Reference vertices to calculate head centroid
+    v1 = obj.verts[4311]
+    v2 = obj.verts[8194]
+    v3 = obj.verts[8218]
+    v4 = obj.verts[8688]    
+    vertsList = [v1.co,v2.co,v3.co,v4.co]    
+    centr =  aljabr.centroid(vertsList)
+    
+    return [centr[0],centr[1],-centr[2]]
 
 
 
@@ -850,9 +859,10 @@ def mh2Aqsis(scene, fName, ribRepository):
 
    
     #These two list should be replaced by lights class in module3d.py
-    pointLightCoords = [[-8, 5, 15],[1, 1, 15],[1, 5, -15],[-8, 0, 0]]
+    pointLightCoords = [[-8, 10, 15],[1, 10, 15],[1, 15, -8],[-8, 0, 0]]
     pointLightIntensity = [.6, .6, .9, .6]
-    
+   
+  
 
 
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture.tif', 'data/textures/texture.texture'))
@@ -946,7 +956,7 @@ def mh2Aqsis(scene, fName, ribRepository):
                                                                                         pointLightIntensity[i]*75))
         #note z has the negative sign of renderman light because opengl->renderman
         #factor 75 is just an empirical. TODO: modify it in propotion of distance
-
+    headCentr = [0,0,0]
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
@@ -965,20 +975,19 @@ def mh2Aqsis(scene, fName, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.15]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [1]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
             #ribfile.write('Surface "matte"')
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
             writeHairs(ribRepository, obj)
+            headCentr = calculateHeadCentroid(obj)
             
 
 
     ribfile.write('\tAttributeBegin\n')
-    ribfile.write('\t\tDeclare "rootcolor" "color"\n')
-    ribfile.write('\t\tDeclare "tipcolor" "color"\n')
-    ribfile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]\n'%(hairsClass.rootColor[0],\
-                    hairsClass.rootColor[1],hairsClass.rootColor[2],\
-                    hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
+
+    ribfile.write('\t\tColor [0.41 0.23 0.04]\n')
+    ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [.8] "float headX" [%s] "float headY" [%s] "float headZ" [%s] \n'%(headCentr[0],headCentr[1],headCentr[2]))
     ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
     ribfile.write('\tAttributeEnd\n')
 
