@@ -99,7 +99,7 @@ class MHApplication(gui3d.Application):
     self.progressBar.setProgress(0.3)
 
     self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj")
-    self.scene3d.selectedHuman.setGender(1.0)
+    #self.scene3d.selectedHuman.setGender(1.0)
     self.scene3d.selectedHuman.setTexture("data/textures/texture.tif")
 
     self.progressBar.setProgress(0.6)
