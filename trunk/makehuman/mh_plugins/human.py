@@ -777,3 +777,27 @@ class Human(gui3d.Object):
         self.targetsEthnicStack["neutral"] = 1.0 - sum(self.targetsEthnicStack.values())
                 
         self.applyAllTargets(progressCallback)
+
+    def save(self, filename, tags):
+        f = open(filename, 'w')
+        f.write("# Written by makehuman 1.0.0 alpha 4\n")
+        f.write("version 1.0.0\n")
+        f.write("tags %s\n" %(tags))
+        f.write("gender %f\n" %(self.getGender()))
+        f.write("age %f\n" %(self.getAge()))
+        f.write("muscle %f\n" %(self.getMuscle()))
+        f.write("weight %f\n" %(self.getWeight()))
+        
+        modifier = humanmodifier.Modifier(self, "data/targets/macrodetails/universal-stature-dwarf.target",
+          "data/targets/macrodetails/universal-stature-giant.target")
+        f.write("height %f\n" %(modifier.getValue()))
+        
+        for (target, value) in self.targetsEthnicStack.iteritems():
+            f.write("ethnic %s %f\n" %(target, value))
+                
+        for t in self.targetsDetailStack.keys():
+            if "/details/" in t:
+                f.write("detail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
+            elif  "/microdetails/" in t:
+                f.write("microdetail %s %f\n" %(os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
+        f.close()

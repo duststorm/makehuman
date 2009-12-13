@@ -53,28 +53,7 @@ class SaveTaskView(gui3d.TaskView):
       
       # Save the model
       human = self.app.scene3d.selectedHuman
-      f = open(modelPath + "/" + filename + ".mhm", 'w')
-      f.write("# Written by makehuman 1.0.0 alpha 2\n")
-      f.write("version 1.0.0\n")
-      f.write("tags %s\n" %(tags))
-      f.write("gender %f\n" %(human.getGender()))
-      f.write("age %f\n" %(human.getAge()))
-      f.write("muscle %f\n" %(human.getMuscle()))
-      f.write("weight %f\n" %(human.getWeight()))
-      
-      modifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
-        "data/targets/macrodetails/universal-stature-giant.target")
-      f.write("height %f\n" %(modifier.getValue()))
-      
-      for (target, value) in human.targetsEthnicStack.iteritems():
-          f.write("ethnic %s %f\n" %(target, value))
-              
-      for t in human.targetsDetailStack.keys():
-          if "/details/" in t:
-              f.write("detail %s %f\n" %(os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
-          elif  "/microdetails/" in t:
-              f.write("microdetail %s %f\n" %(os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
-      f.close()
+      human.save(modelPath + "/" + filename + ".mhm", tags)
       
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
