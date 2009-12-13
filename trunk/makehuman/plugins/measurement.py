@@ -26,13 +26,15 @@ class MeasurementTaskView(gui3d.TaskView):
             mesh="data/3dobjs/empty.obj",
             position=[10, 460, 8.04])
         self.hipGirthLabel.setText("Value is 0.5")
+
+        
         self.waistGirthSlider = gui3d.Slider(self,
             self.app.getThemeResource("images", "button_waist_girth.png"),
             self.app.getThemeResource("images", "slider.png"),
             self.app.getThemeResource("images", "slider_focused.png"),
             position=[10, 360, 9.04],
             # We want the slider to start from the middle
-            value=0.5)
+            value=0.0, min = -1.0, max = 1.0)
 
         self.waistGirthLabel = gui3d.TextView(self,
             mesh="data/3dobjs/empty.obj",
@@ -43,18 +45,17 @@ class MeasurementTaskView(gui3d.TaskView):
         def onChange(value):
             self.waistGirthLabel.setText("Value is %f" % (value))
 
-        self.chestGirthSlider = gui3d.Slider(self,
+        self.chestGirthSlider = self.chestGirthSlider = gui3d.Slider(self,
             self.app.getThemeResource("images", "button_chest_girth.png"),
             self.app.getThemeResource("images", "slider.png"),
             self.app.getThemeResource("images", "slider_focused.png"),
             position=[10, 260, 8.04],
             # We want the slider to start from the middle
-            value=0.5)
+            value=0.0, min = -1.0, max = 1.0)
 
         self.chestGirthLabel = gui3d.TextView(self,
             mesh="data/3dobjs/empty.obj",
             position=[10, 260, 8.04])
-        self.chestGirthLabel.setText("Value is 0.5")
 
         @self.chestGirthSlider.event
         def onChange(value):
@@ -62,10 +63,10 @@ class MeasurementTaskView(gui3d.TaskView):
             self.chestGirthLabel.setText("Value is %f" % (value))
             modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-horiz-decr.target",
                  "data/targets/details/torso-scale-horiz-incr.target")
-            modifier.setValue(value * 2)
+            modifier.setValue(value )
             modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-depth-decr.target",
                  "data/targets/details/torso-scale-depth-incr.target")
-            modifier.setValue(value * 2)
+            modifier.setValue(value)
             human.applyAllTargets(self.app.progress)
             self.measureList.setText(self.ruler.getMeasurementsString());
             
