@@ -548,9 +548,9 @@ class Slider(View):
     sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
     self.slider.setPosition(sliderPos)
     value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
-    self.value = value * (self.max - self.min) + self.min
-    #print(self.value)
-    self.callEvent("onChange", self.value)
+    self.__value = value * (self.max - self.min) + self.min
+    #print(value, self.__value)
+    self.callEvent("onChange", self.__value)
     
   def onKeyDown(self, event):
     oldValue = self.__value
