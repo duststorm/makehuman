@@ -18,10 +18,24 @@ class MeasurementTaskView(gui3d.TaskView):
             self.app.getThemeResource("images", "slider_focused.png"),
             position=[10, 460, 9.04],
             #  We want the slider to start from the middle
-            value=0.5)
+            value=0.5, min = 0.0, max = 1.0)
         @self.hipGirthSlider.event
         def onChange(value):
             self.hipGirthLabel.setText("Value is %f" % (value))
+            human = self.app.scene3d.selectedHuman
+            self.chestGirthLabel.setText("Value is %f" % (value))
+            modifier = humanmodifier.Modifier(human, "data/targets/details/pelvis_underweight.target",
+                 "data/targets/details/pelvis_overweight.target")
+            modifier.setValue(value)
+            modifier = humanmodifier.Modifier(human, "data/targets/details/r-upperleg_underweight.target",
+                 "data/targets/details/r-upperleg_overweight.target")
+            modifier.setValue(value)
+            modifier = humanmodifier.Modifier(human, "data/targets/details/l-upperleg_underweight.target",
+                 "data/targets/details/l-upperleg_overweight.target")
+            modifier.setValue(value)
+            human.applyAllTargets(self.app.progress)
+            self.measureList.setText(self.ruler.getMeasurementsString());
+    
         self.hipGirthLabel = gui3d.TextView(self,
             mesh="data/3dobjs/empty.obj",
             position=[10, 460, 8.04])
@@ -43,7 +57,13 @@ class MeasurementTaskView(gui3d.TaskView):
 
         @self.waistGirthSlider.event
         def onChange(value):
-            self.waistGirthLabel.setText("Value is %f" % (value))
+            human = self.app.scene3d.selectedHuman
+            self.chestGirthLabel.setText("Value is %f" % (value))
+            modifier = humanmodifier.Modifier(human, "data/targets/details/hip_underweight.target",
+                 "data/targets/details/hip_overweight.target")
+            modifier.setValue(value)
+            human.applyAllTargets(self.app.progress)
+            self.measureList.setText(self.ruler.getMeasurementsString());
 
         self.chestGirthSlider = self.chestGirthSlider = gui3d.Slider(self,
             self.app.getThemeResource("images", "button_chest_girth.png"),
@@ -51,7 +71,7 @@ class MeasurementTaskView(gui3d.TaskView):
             self.app.getThemeResource("images", "slider_focused.png"),
             position=[10, 260, 8.04],
             # We want the slider to start from the middle
-            value=0.0, min = -1.0, max = 1.0)
+            value=0.5, min = 0.0, max = 1.0)
 
         self.chestGirthLabel = gui3d.TextView(self,
             mesh="data/3dobjs/empty.obj",
@@ -79,7 +99,7 @@ class MeasurementTaskView(gui3d.TaskView):
             self.app.getThemeResource("images", "slider_focused.png"),
             position=[10, 160, 8.04],
             # We want the slider to start from the middle
-            value=0.5)
+            value=0.5, min = 0.0, max = 1.0)
 
        
 
