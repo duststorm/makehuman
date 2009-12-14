@@ -150,6 +150,7 @@ class Human(gui3d.Object):
         self.targetMaleLightOld = "%s/universal-male-old-light.target"%(targetFolder)
 
         self.hairFile = "data/hairs/default.hair"
+        self.hairColor = [0.41, 0.23, 0.04]
                         
     def setTexture(self, texturePath):
         self.meshData.setTexture(texturePath)

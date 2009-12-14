@@ -986,7 +986,7 @@ def mh2Aqsis(scene, fName, ribRepository):
 
     ribfile.write('\tAttributeBegin\n')
 
-    ribfile.write('\t\tColor [0.41 0.23 0.04]\n')
+    ribfile.write('\t\tColor [%f %f %f]\n' % (scene.selectedHuman.hairColor[0], scene.selectedHuman.hairColor[1], scene.selectedHuman.hairColor[2]))
     ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [.8] "float headX" [%s] "float headY" [%s] "float headZ" [%s] \n'%(headCentr[0],headCentr[1],headCentr[2]))
     ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
     ribfile.write('\tAttributeEnd\n')
