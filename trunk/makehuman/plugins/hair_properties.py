@@ -75,6 +75,14 @@ class HairPropertiesTaskView(gui3d.TaskView):
         f.color = [c, c, c]
         f.updateColors()
     self.app.scene3d.selectedHuman.hairColor = [color[0], color[1], color[2]]
+    
+  def onShow(self, event):
+    gui3d.TaskView.onShow(self, event)
+    hairColor = self.app.scene3d.selectedHuman.hairColor;
+    self.redSlider.setValue(hairColor[0])
+    self.greenSlider.setValue(hairColor[1])
+    self.blueSlider.setValue(hairColor[2])
+    self.setColor(hairColor)
 
 category = None
 taskview = None
