@@ -27,7 +27,7 @@ Requires:
 
 __docformat__ = 'restructuredtext'
 
-import files3d
+import files3d, types
 
 def exportObj(obj, filename):
     """
@@ -60,12 +60,15 @@ def exportObj(obj, filename):
     f.write("usemtl basic\n")
     f.write("s off\n")
     
-    faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
+    faces = files3d.loadFacesIndices("data/3dobjs/base.obj", True)
     for fc in faces:
-        f.write("f")
-        for v in fc:
-          f.write(" %i/%i/%i " %(v[0] + 1, v[1] + 1, v[0] + 1))
-        f.write("\n")
+        if type(fc) is types.StringType:
+            f.write("g %s\n" % fc)
+        else:
+            f.write("f")
+            for v in fc:
+              f.write(" %i/%i/%i " %(v[0] + 1, v[1] + 1, v[0] + 1))
+            f.write("\n")
     f.close()
     
     # Write material file

@@ -451,7 +451,7 @@ def loadVertsCoo(path):
     return originalVertexCoordinates
 
 
-def loadFacesIndices(path):
+def loadFacesIndices(path, groups = False):
     """
     This function reads an obj file and loads just the vertex indices used in each face. 
    
@@ -495,7 +495,9 @@ def loadFacesIndices(path):
         return    
     vertsIdxs = []
     for data in fileDescriptor:
-        dataList = data.split()        
+        dataList = data.split()
+        if groups and (dataList[0] == "g"):
+            vertsIdxs.append(dataList[1])
         if dataList[0] == "f":
             vIndices = []
             for faceData in dataList[1:]:
