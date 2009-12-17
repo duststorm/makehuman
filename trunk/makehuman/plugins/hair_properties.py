@@ -11,9 +11,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
       self.app.getThemeResource("images", "button_gender_macro.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
-      position = [20, 60, 9],
-      # We want the slider to start from the middle
-      value = 0.0)
+      position = [20, 60, 9])
       
     self.redSliderLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
@@ -24,9 +22,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
       self.app.getThemeResource("images", "button_gender_macro.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
-      position = [20, 160, 9],
-      # We want the slider to start from the middle
-      value = 0.0)
+      position = [20, 160, 9])
       
     self.greenSliderLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
@@ -37,9 +33,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
       self.app.getThemeResource("images", "button_gender_macro.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
-      position = [20, 260, 9],
-      # We want the slider to start from the middle
-      value = 0.0)
+      position = [20, 260, 9])
       
     self.blueSliderLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
