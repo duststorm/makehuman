@@ -27,8 +27,6 @@
 
  */
 
-#include "core.h"
-#include "SDL_thread.h"
 #ifdef _DEBUG
   #undef _DEBUG
   #include <Python.h>
@@ -41,6 +39,9 @@
 #else
     #include <structmember.h>
 #endif
+
+#include "core.h"
+#include "SDL_thread.h"
 
 // Object3D attributes directly accessed by Python
 static PyMemberDef Object3D_members[] = {

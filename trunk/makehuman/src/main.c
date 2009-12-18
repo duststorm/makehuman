@@ -31,11 +31,6 @@
 
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <SDL.h>
-
 #ifdef _DEBUG
   #undef _DEBUG
   #include <Python.h>
@@ -43,6 +38,8 @@
 #else
   #include <Python.h>
 #endif
+
+#include <SDL.h>
 
 #include "core.h"
 #include "glmodule.h"

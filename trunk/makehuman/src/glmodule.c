@@ -29,9 +29,6 @@
 
  */
 
-#include "glmodule.h"
-#include "core.h"
-
 #ifdef _DEBUG
   #undef _DEBUG
   #include <Python.h>
@@ -39,6 +36,9 @@
 #else
   #include <Python.h>
 #endif
+
+#include "glmodule.h"
+#include "core.h"
 
 #ifdef __WIN32__
     #include <windows.h>

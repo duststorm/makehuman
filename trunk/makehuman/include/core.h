@@ -26,9 +26,6 @@
 
 #ifndef CORE_H
 #define CORE_H 1
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #ifdef _DEBUG
   #undef _DEBUG
