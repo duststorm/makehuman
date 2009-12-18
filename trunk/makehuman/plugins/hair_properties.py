@@ -3,6 +3,26 @@ import gui3d
 
 print("hair properties imported")
 
+class Action:
+  def __init__(self, human, before, after, postAction = None):
+    self.name = "Change hair color"
+    self.human = human
+    self.before = before
+    self.after = after
+    self.postAction = postAction
+    
+  def do(self):
+    self.human.hairColor = self.after
+    if self.postAction:
+      self.postAction()
+    return True
+    
+  def undo(self):
+    self.human.hairColor = self.before
+    if self.postAction:
+      self.postAction()
+    return True
+
 class HairPropertiesTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Hair", category.app.getThemeResource("images", "button_hair.png"))
@@ -50,17 +70,21 @@ class HairPropertiesTaskView(gui3d.TaskView):
     @self.redSlider.event
     def onChange(value):
       self.redSliderLabel.setText("Red: %.2f"%(value))
-      self.setColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
+      self.changeColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
       
     @self.greenSlider.event
     def onChange(value):
       self.greenSliderLabel.setText("Green: %.2f"%(value))
-      self.setColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
+      self.changeColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
       
     @self.blueSlider.event
     def onChange(value):
       self.blueSliderLabel.setText("Blue: %.2f"%(value))
-      self.setColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
+      self.changeColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
+      
+  def changeColor(self, color):
+    action = Action(self.app.scene3d.selectedHuman, self.app.scene3d.selectedHuman.hairColor, color, self.syncSliders)
+    self.app.do(action)
       
   def setColor(self, color):
     c = [color[0] * 255, color[1] * 255, color[2] * 255, 255]
@@ -68,10 +92,13 @@ class HairPropertiesTaskView(gui3d.TaskView):
       for f in g.faces:
         f.color = [c, c, c]
         f.updateColors()
-    self.app.scene3d.selectedHuman.hairColor = [color[0], color[1], color[2]]
     
   def onShow(self, event):
     gui3d.TaskView.onShow(self, event)
+    hairColor = self.app.scene3d.selectedHuman.hairColor;
+    self.syncSliders()
+    
+  def syncSliders(self):
     hairColor = self.app.scene3d.selectedHuman.hairColor;
     self.redSlider.setValue(hairColor[0])
     self.greenSlider.setValue(hairColor[1])
@@ -81,15 +108,9 @@ class HairPropertiesTaskView(gui3d.TaskView):
 category = None
 taskview = None
 
-# This method is called when the plugin is loaded into makehuman
-# The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
   taskview = HairPropertiesTaskView(app.categories["Modelling"])
-  
   print("hair properties loaded")
-  print("Hello world")
 
-# This method is called when the plugin is unloaded from makehuman
-# At the moment this is not used, but in the future it will remove the added GUI elements
 def unload(app):
   print("hair properties unloaded")
