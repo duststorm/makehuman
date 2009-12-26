@@ -8,7 +8,7 @@ MHX 0 3 ;
  
 texture IMAGE alpha
   image texture_opacity.t
-    filename /Users/roberto/makehuman-read-only/makehuman/data/textures/texture_opacity.tif ;
+    filename texture_opacity.tif ;
   end image
     animFrames 100 ;
     animOffset 0 ;
@@ -56,7 +56,7 @@ end texture
 
 texture IMAGE diffuse.002
   image texture2.png
-    filename /Users/roberto/Documents/pelle/texture2.png ;
+    filename texture2.png ;
   end image
     animFrames 100 ;
     animOffset 0 ;
@@ -104,7 +104,7 @@ end texture
 
 texture IMAGE HumanAlpha
   image texture_opacity.tif
-    filename C:\home\svn\data\textures\texture_opacity.tif ;
+    filename texture_opacity.tif ;
   end image
     animFrames 100 ;
     animOffset 0 ;
@@ -152,7 +152,7 @@ end texture
 
 texture IMAGE HumanColor
   image texture.tif
-    filename C:\home\svn\data\textures\texture.tif ;
+    filename texture.tif ;
   end image
     animFrames 100 ;
     animOffset 0 ;
@@ -200,7 +200,7 @@ end texture
 
 texture IMAGE normals.001
   image bump5.png
-    filename /Users/roberto/Documents/pelle/bump5.png ;
+    filename bump5.png ;
   end image
     animFrames 100 ;
     animOffset 0 ;
@@ -248,7 +248,7 @@ end texture
 
 texture IMAGE specularity.001
   image texture2.png
-    filename /Users/roberto/Documents/pelle/texture2.png ;
+    filename texture2.png ;
   end image
     animFrames 100 ;
     animOffset 0 ;

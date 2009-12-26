@@ -46,7 +46,6 @@ import string
 #
 
 TexDir = "."
-LibDir = "."
 
 #
 #
@@ -592,31 +591,32 @@ def parseColorBand(args):
 #	parseFileName(filepath, dir):
 #
 
-def parseFileName(filepath, dir):
-	global TexDir, LibDir
-	file1 = os.path.realpath(filepath)
-	print "Loading ", filepath, " = ", file1
+def doLoadFile(filepath):		
+	path1 = os.path.expanduser(filepath)
+	file1 = os.path.realpath(path1)
 	if os.path.isfile(file1):
 		print "Found file "+file1
 		return file1
-	
+	else:
+		print "No file "+file1
+		return None
+
+
+def parseFileName(filepath, dir):
+	global TexDir
+	path1 = os.path.expanduser(filepath)
+	file1 = os.path.realpath(path1)
 	(path, filename) = os.path.split(file1)
-	ntries = 2
-	while ntries > 0:
-		path = eval(dir)
-		filepath = os.path.join(path, filename)
-		file2 = os.path.realpath(filepath)
-		print "Loading ", filepath, " = ", file2
-		if os.path.isfile(file2):
-			print "Found file "+file2
-			return file2
-		path = Draw.PupStrInput(dir+"? ", path, 100)
-		if dir == "TexDir":
-			TexDir = path
-		elif dir == "LibDir":
-			LibDir = path
-		ntries -= 1
-	return None
+	print "Loading ", filepath, " = ", filename
+
+	f = doLoadFile(TexDir+"/"+filename)
+	if f:
+		return f
+	f = doLoadFile(file1)
+	if f:
+		return f
+	TexDir = Draw.PupStrInput("TexDir? ", path, 100)
+	return doLoadFile(TexDir+"/"+filename)
 	
 #
 #	parseImage(args, tokens):
