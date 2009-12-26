@@ -1,5 +1,6 @@
 import sys
 import os
+import math
 
 dir_input = ""
 dir_output = ""
@@ -127,6 +128,8 @@ def createTarget(file):
             index = int(words[0])
             target.append(vert([float(words[1]), float(words[2]), float(words[3])], index))
             indexT.append(index)
+            
+
     fileDescriptor.close()
     
            
@@ -241,6 +244,18 @@ def eyes():
                 pass
                  
         #ripristino la forma
+        """
+        if cnt_g == 2:
+            target.append(vert([float(0.0), float(0.0), float(0.0)], 14637))
+            indexT.append(14637)
+        """
+        for v in g:
+            try:
+                indexT.index(v)
+            except:
+                target.append(vert([float(0.0), float(0.0), float(0.0)], v))
+                indexT.append(v)
+            
         for v in g:
             try:
                 offset = indexT.index(v)
@@ -316,11 +331,11 @@ def eyes():
                 pass
         
         try:
-        	center  = [(minx + (maxx - minx)/2), (miny + (maxy - miny)/2), (minz + (maxz - minz)/2)] 
-       		centern = [(minxn + (maxxn - minxn)/2), (minyn + (maxyn - minyn)/2), (minzn + (maxzn - minzn)/2)] 
-       	except:
-			pass
-			
+            center  = [(minx + (maxx - minx)/2), (miny + (maxy - miny)/2), (minz + (maxz - minz)/2)] 
+            centern = [(minxn + (maxxn - minxn)/2), (minyn + (maxyn - minyn)/2), (minzn + (maxzn - minzn)/2)] 
+        except:
+            pass
+            
         for v in g:
             try:
                 offset = indexT.index(v)
@@ -363,7 +378,10 @@ def saveTarget(file):
         return  None    
     #riscrivo target secondo struttura
     for i in target:
-        fileDescriptor.write("%d %f %f %f\n" % (i.index, i.co[0], i.co[1], i.co[2]))
+        if math.fabs(i.co[0]) == 0.0 and math.fabs(i.co[1]) == 0.0 and math.fabs(i.co[2]) == 0.0:
+            pass
+        else:
+            fileDescriptor.write("%d %f %f %f\n" % (i.index, i.co[0], i.co[1], i.co[2]))
     fileDescriptor.close()         
                 
 
