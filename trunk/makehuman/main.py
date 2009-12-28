@@ -154,13 +154,7 @@ class MHApplication(gui3d.Application):
         self.currentTask.callEvent("onMouseExited", event)
 
     # Set up categories and tasks
-
-    # Exit button
-    category = gui3d.Category(self, "Exit", self.getThemeResource("images", "button_exit.png"))
-    @category.button.event
-    def onClicked(event):
-      self.stop()
-
+    
     guimodelling.ModellingCategory(self)
     self.progressBar.setProgress(0.7)
     guifiles.FilesCategory(self)
@@ -184,6 +178,12 @@ class MHApplication(gui3d.Application):
     @category.button.event
     def onClicked(event):
       webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
+      
+    # Exit button
+    category = gui3d.Category(self, "Exit", self.getThemeResource("images", "button_exit.png"))
+    @category.button.event
+    def onClicked(event):
+      self.stop()
 
     self.switchCategory("Modelling")
 

@@ -221,8 +221,8 @@ class TaskView(View):
     self.focusWidget = None
     
     # The button is attached to the parent, as it stays visible when the category is hidden
-    self.button = Object(self.parent, "data/3dobjs/button_about.obj",
-      texture = texture, position = [30 + len(self.parent.tasks) * 60, 600.0 - 25.0, 9.1])
+    self.button = Object(self.parent, "data/3dobjs/button_standard.obj",
+      texture = texture, position = [50 + len(self.parent.tasks) * 80, 600.0 - 25.0, 9.1])
       
     if name in category.tasksByName:
       raise KeyError("The task with this name already exists", name)
@@ -260,8 +260,8 @@ class Category(View):
     self.tasksByName = {}
     
     # The button is attached to the parent, as it stays visible when the category is hidden
-    self.button = Object(self.parent, "data/3dobjs/button_about.obj",
-      position = [30 + len(self.app.categories) * 60, 25.0, 9.1], texture = texture)
+    self.button = Object(self.parent, "data/3dobjs/button_standard_big.obj",
+      position = [50 + len(self.app.categories) * 80, 20.0, 9.1], texture = texture)
       
     if name in parent.categories:
       raise KeyError("The category with this name already exists", name)
@@ -510,12 +510,12 @@ class Application(events3d.EventHandler):
 
 # Slider widget
 class Slider(View):
-  def __init__(self, parent, backgroundTexture, sliderTexture, focusedSliderTexture = None, position = [0, 0, 9], value = 0.0, min = 0.0, max = 1.0):
+  def __init__(self, parent, backgroundTexture, sliderTexture, focusedSliderTexture = None, position = [0, 0, 15], value = 0.0, min = 0.0, max = 1.0):
     View.__init__(self, parent)
     self.background = Object(self, "data/3dobjs/slider_background.obj",
       texture = backgroundTexture, position = position)
-    self.slider = Object(self, "data/3dobjs/button_about.obj",
-      texture = sliderTexture, position = [position[0], position[1] + 32, position[2] + 0.01])
+    self.slider = Object(self, "data/3dobjs/slider_cursor.obj",
+      texture = sliderTexture, position = [position[0], position[1] + 35, position[2] + 0.01])
     self.sliderTexture = sliderTexture
     self.focusedSliderTexture = focusedSliderTexture
     self.sliderMinX = position[0] + 25;
