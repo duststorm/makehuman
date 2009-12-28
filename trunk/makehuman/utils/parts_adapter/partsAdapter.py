@@ -349,14 +349,17 @@ def eyes():
         if cnt_g == 2:
             offset = 0
             for j in range(0, len(refMouth[0])):
-                indexSkin  = indexT.index(refMouth[0][j])
-                indexMouth = indexT.index(refMouth[1][j])
-                #prendo la differenza tra la distanza tipica (in base) e quella che c'e' ora
-                diffBase = originalVerts[refMouth[0][j]][2] - originalVerts[refMouth[1][j]][2]
-                diffTarget = (originalVerts[refMouth[0][j]][2] - target[indexMouth].co[2]) - (originalVerts[refMouth[1][j]][2] - target[indexSkin].co[2])
-                diff = diffBase - diffTarget
-                if diff > offset:
-                    offset = diff
+                try:
+                    indexSkin  = indexT.index(refMouth[0][j])
+                    indexMouth = indexT.index(refMouth[1][j])
+                    #prendo la differenza tra la distanza tipica (in base) e quella che c'e' ora
+                    diffBase = originalVerts[refMouth[0][j]][2] - originalVerts[refMouth[1][j]][2]
+                    diffTarget = (originalVerts[refMouth[0][j]][2] - target[indexMouth].co[2]) - (originalVerts[refMouth[1][j]][2] - target[indexSkin].co[2])
+                    diff = diffBase - diffTarget
+                    if diff > offset:
+                        offset = diff
+                except:
+                    pass
             
             for v in g:
                 try:
