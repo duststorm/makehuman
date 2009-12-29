@@ -28,7 +28,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
     gui3d.TaskView.__init__(self, category, "Hair", category.app.getThemeResource("images", "button_hair.png"))
       
     self.redSlider = gui3d.Slider(self,
-      self.app.getThemeResource("images", "button_gender_macro.png"),
+      self.app.getThemeResource("images", "slider_red.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
       position = [20, 60, 9])
@@ -39,7 +39,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
     self.redSliderLabel.setText("Red: 0")
     
     self.greenSlider = gui3d.Slider(self,
-      self.app.getThemeResource("images", "button_gender_macro.png"),
+      self.app.getThemeResource("images", "slider_green.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
       position = [20, 160, 9])
@@ -50,7 +50,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
     self.greenSliderLabel.setText("Green: 0")
     
     self.blueSlider = gui3d.Slider(self,
-      self.app.getThemeResource("images", "button_gender_macro.png"),
+      self.app.getThemeResource("images", "slider_blue.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
       position = [20, 260, 9])
