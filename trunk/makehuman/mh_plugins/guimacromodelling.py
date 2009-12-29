@@ -197,22 +197,22 @@ class MacroModelingTaskView(gui3d.TaskView):
       
     # Common controls
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, -89.98])
-    self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_undo.obj",
+    self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_undo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [620, 70, 9])
-    self.redoButton = gui3d.Button(category, mesh = "data/3dobjs/button_undo.obj",
+      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [650, 520, 9])
+    self.redoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_redo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [680, 70, 9])
-    self.resetButton = gui3d.Button(category, mesh = "data/3dobjs/button_undo.obj",
+      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [710, 520, 9])
+    self.resetButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_new.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [730, 70,9])
+      selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [770, 520,9])
       
-    self.currentHair = gui3d.Button(category, mesh = "data/3dobjs/button_about.obj",
-      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'), position = [700, 450, 9])
+    self.currentHair = gui3d.Button(category, mesh = "data/3dobjs/button_standard_little.obj",
+      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'), position = [770, 460, 9])
     
     self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, 1], visible = False)
-    self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_about.obj", position = [700, 500, 9])
-    self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_about.obj", position = [750, 500, 9])
+    self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [650, 460, 9],texture = self.app.getThemeResource("images", "button_background_load.png"))
+    self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [710, 460, 9],texture = self.app.getThemeResource("images", "button_background_toggle.png"))
     
     @self.undoButton.event
     def onClicked(event):
