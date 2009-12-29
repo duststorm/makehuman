@@ -694,7 +694,7 @@ def loadVertsColors(obj, colorsPath, update = 1, mode = "new"):
     try:
         fileDescriptor = open(colorsPath)
     except:
-        print "WARNING: Unable to open color file %s"%(colorsPath)
+        #print "WARNING: Unable to open color file %s"%(colorsPath)
         return  0
     colorData = fileDescriptor.readlines()
     fileDescriptor.close()    

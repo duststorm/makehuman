@@ -593,7 +593,7 @@ class Object3D:
         try:
             self.object3d.translation = (self.x, self.y, self.z)
         except AttributeError, text:
-            print(text)
+            pass
 
     def setRot(self,rx,ry,rz):
         """
@@ -615,7 +615,7 @@ class Object3D:
         try:
             self.object3d.rotation = (self.rx, self.ry, self.rz)
         except AttributeError, text:
-            print(text)
+            pass
 
     def setScale(self,sx,sy,sz):
         """
@@ -638,7 +638,7 @@ class Object3D:
         try:
             self.object3d.scale = (self.sx, self.sy, self.sz)
         except AttributeError, text:
-            print(text)
+            pass
 
     def setVisibility(self, visible):
         """
@@ -654,7 +654,7 @@ class Object3D:
         try:
             self.object3d.visibility = visible
         except AttributeError, text:
-            print(text)
+            pass
             
     def setPickable(self,pickable):
         """
@@ -670,7 +670,7 @@ class Object3D:
         try:
             self.object3d.pickable = pickable
         except IndexError, text:
-            print(text)
+            pass
 
     def setTexture(self, path):
         """
@@ -697,7 +697,7 @@ class Object3D:
             try:                
                 self.object3d.texture = textureCache[path].id
             except AttributeError, text:
-                print(text)
+                pass
         else:
             texture = None
             try:
@@ -709,7 +709,7 @@ class Object3D:
                     textureCache[path] = Texture(texture, os.stat(path).st_mtime)
                     self.object3d.texture = texture
                 except AttributeError, text:
-                    print(text)
+                    pass
     
             
     def clearTexture(self):
@@ -723,7 +723,7 @@ class Object3D:
         try:
           self.object3d.texture = 0;
         except AttributeError, text:
-          print(text)
+          pass
           
     def hasTexture(self):
         return self.object3d.texture != 0;
@@ -742,14 +742,14 @@ class Object3D:
         try:
           self.object3d.shader = shader
         except AttributeError, text:
-          print(text)
+          pass
           
     def setShaderParameter(self, name, value):
         self.shaderParameters[name] = value
         try:
           self.object3d.shaderParameters[name] = value
         except AttributeError, text:
-          print(text)
+          pass
 
     def setShadeless(self, shadeless):
         """
@@ -768,7 +768,7 @@ class Object3D:
         try:                
             self.object3d.shadeless = self.shadeless
         except AttributeError, text:
-            print(text)
+            pass
         
 
     def setText(self,text):
@@ -786,7 +786,7 @@ class Object3D:
         try:
             self.object3d.text = self.text
         except AttributeError, text:
-            print(text)
+            pass
         
 
     def addFaceGroup(self, fg):
@@ -837,7 +837,7 @@ class Object3D:
         try:
             self.object3d.cameraMode = self.cameraMode
         except AttributeError, text:
-            print(text)
+            pass
 
 
     def update(self, verticesToUpdate = None):
