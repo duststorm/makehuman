@@ -25,7 +25,7 @@ class Action:
 
 class HairPropertiesTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Hair", category.app.getThemeResource("images", "button_hair.png"))
+    gui3d.TaskView.__init__(self, category, "Hair", category.app.getThemeResource("images", "button_hair_det.png"))
       
     self.redSlider = gui3d.Slider(self,
       self.app.getThemeResource("images", "slider_red.png"),

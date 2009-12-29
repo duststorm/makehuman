@@ -121,7 +121,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_gender_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 60, 9], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 60, 9.2], value = 0.5)
     self.ageSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_age_macro.png"),
       self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 160, 9.01], value = 0.5)
     self.muscleSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_muscle_macro.png"),
