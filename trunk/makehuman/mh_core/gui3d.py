@@ -518,7 +518,7 @@ class Slider(View):
       texture = sliderTexture, position = [position[0], position[1] + 35, position[2] + 0.01])
     self.sliderTexture = sliderTexture
     self.focusedSliderTexture = focusedSliderTexture
-    self.sliderMinX = position[0] + 25;
+    self.sliderMinX = position[0] + 19;
     self.sliderMaxX = position[0] + 125;
     self.min = min
     self.max = max
