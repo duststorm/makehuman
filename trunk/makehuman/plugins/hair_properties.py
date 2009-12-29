@@ -31,7 +31,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
       self.app.getThemeResource("images", "slider_red.png"),
       self.app.getThemeResource("images", "slider.png"),
       self.app.getThemeResource("images", "slider_focused.png"),
-      position = [20, 60, 9])
+      position = [20, 60, 9.2])
       
     self.redSliderLabel = gui3d.TextView(self,
       mesh = "data/3dobjs/empty.obj",
