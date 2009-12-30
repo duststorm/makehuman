@@ -173,46 +173,46 @@ class MacroModelingTaskView(gui3d.TaskView):
     # Ethnic controls
     self.ethnicMapButtonGroup = []
     self.asiaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_asia.obj",
-      texture = self.app.getThemeResource("images", "button_asia.png"), position = [650, 150, 9])
+      texture = self.app.getThemeResource("images", "button_asia.png"), position = [630, 150, 9])
     self.europeButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_europe.obj",
-      texture = self.app.getThemeResource("images", "button_europe.png"), position = [710, 150, 9])
+      texture = self.app.getThemeResource("images", "button_europe.png"), position = [690, 150, 9])
     self.africaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_africa.obj",
-      texture = self.app.getThemeResource("images", "button_africa.png"), position = [650, 210, 9])
+      texture = self.app.getThemeResource("images", "button_africa.png"), position = [630, 210, 9])
     self.americaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh = "data/3dobjs/button_america.obj",
-      texture = self.app.getThemeResource("images", "button_america.png"), position = [710, 210, 9])
+      texture = self.app.getThemeResource("images", "button_america.png"), position = [690, 210, 9])
     self.ethnicButtonGroup = []
     self.ethnicIncreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
       mesh = "data/3dobjs/button_ethnincr.obj",
       texture = self.app.getThemeResource("images", "button_ethnincr.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_ethnincr_on.png"), position = [750, 130, 9],
+      selectedTexture = self.app.getThemeResource("images", "button_ethnincr_on.png"), position = [730, 130, 9],
       selected = True)
     self.ethnicDecreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
       mesh = "data/3dobjs/button_ethndecr.obj",
       texture = self.app.getThemeResource("images", "button_ethndecr.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_ethndecr_on.png"), position = [750, 170, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_ethndecr_on.png"), position = [730, 170, 9])
     self.ethnicResetButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
       mesh = "data/3dobjs/button_ethnreset.obj",
       texture = self.app.getThemeResource("images", "button_ethnreset.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [750, 210, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [730, 210, 9])
       
     # Common controls
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, -89.98])
     self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_undo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [650, 520, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [630, 520, 9])
     self.redoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_redo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [710, 520, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [690, 520, 9])
     self.resetButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_new.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [770, 520,9])
+      selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [750, 520,9])
       
     self.currentHair = gui3d.Button(category, mesh = "data/3dobjs/button_standard_little.obj",
-      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'), position = [770, 460, 9])
+      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'), position = [750, 460, 9])
     
     self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, 1], visible = False)
-    self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [650, 460, 9],texture = self.app.getThemeResource("images", "button_background_load.png"))
-    self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [710, 460, 9],texture = self.app.getThemeResource("images", "button_background_toggle.png"))
+    self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [630, 460, 9],texture = self.app.getThemeResource("images", "button_background_load.png"))
+    self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [690, 460, 9],texture = self.app.getThemeResource("images", "button_background_toggle.png"))
     
     @self.undoButton.event
     def onClicked(event):
