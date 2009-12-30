@@ -2,17 +2,18 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10A432</string>
-		<string key="IBDocument.InterfaceBuilderVersion">732</string>
-		<string key="IBDocument.AppKitVersion">1038</string>
-		<string key="IBDocument.HIToolboxVersion">437.00</string>
+		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.InterfaceBuilderVersion">740</string>
+		<string key="IBDocument.AppKitVersion">1038.25</string>
+		<string key="IBDocument.HIToolboxVersion">458.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">732</string>
+			<string key="NS.object.0">740</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="413"/>
+			<integer value="385"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -455,10 +456,10 @@
 				<string key="NSWindowTitle">Licensing information</string>
 				<string key="NSWindowClass">NSPanel</string>
 				<nil key="NSViewClass"/>
-				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSWindowContentMinSize">{474, 539}</string>
 				<object class="NSView" key="NSWindowView" id="46576997">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">4352</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -477,7 +478,6 @@
 											<int key="NSvFlags">2322</int>
 											<string key="NSFrameSize">{459, 1833}</string>
 											<reference key="NSSuperview" ref="327691521"/>
-											<reference key="NSWindow"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="921151772">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
@@ -772,7 +772,7 @@ IFRIRSBNRVNILg</bytes>
 															<string key="NSColorName">selectedTextBackgroundColor</string>
 															<object class="NSColor" key="NSColor">
 																<int key="NSColorSpace">3</int>
-																<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+																<bytes key="NSWhite">MC42NjY2NjY2ODY1AA</bytes>
 															</object>
 														</object>
 														<object class="NSColor" id="118878916">
@@ -1098,7 +1098,6 @@ IFRIRSBNRVNILg</bytes>
 									</object>
 									<string key="NSFrame">{{1, 1}, {459, 539}}</string>
 									<reference key="NSSuperview" ref="456952172"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="125099801"/>
 									<reference key="NSDocView" ref="125099801"/>
 									<reference key="NSBGColor" ref="4365593"/>
@@ -1111,33 +1110,30 @@ IFRIRSBNRVNILg</bytes>
 								<object class="NSScroller" id="1068647521">
 									<reference key="NSNextResponder" ref="456952172"/>
 									<int key="NSvFlags">256</int>
-									<string key="NSFrame">{{460, 1}, {15, 524}}</string>
+									<string key="NSFrame">{{460, 1}, {15, 539}}</string>
 									<reference key="NSSuperview" ref="456952172"/>
-									<reference key="NSWindow"/>
 									<bool key="NSEnabled">YES</bool>
 									<int key="NSsFlags">512</int>
 									<reference key="NSTarget" ref="456952172"/>
 									<string key="NSAction">_doScroller:</string>
-									<double key="NSPercent">0.29405346426623025</double>
+									<double key="NSPercent">0.29405346512794495</double>
 								</object>
 								<object class="NSScroller" id="24905855">
 									<reference key="NSNextResponder" ref="456952172"/>
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{-100, -100}, {87, 18}}</string>
 									<reference key="NSSuperview" ref="456952172"/>
-									<reference key="NSWindow"/>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="456952172"/>
 									<string key="NSAction">_doScroller:</string>
-									<double key="NSCurValue">0.99567079999999997</double>
-									<double key="NSPercent">0.94565220000000005</double>
+									<double key="NSCurValue">0.99567079544067383</double>
+									<double key="NSPercent">0.94565218687057495</double>
 								</object>
 							</object>
 							<string key="NSFrame">{{-1, -1}, {476, 541}}</string>
 							<reference key="NSSuperview" ref="46576997"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="327691521"/>
-							<double key="NSViewAlphaValue">0.57042250000000005</double>
+							<double key="NSViewAlphaValue">0.5704224705696106</double>
 							<object class="NSDictionary" key="NSViewAnimations">
 								<string key="NS.key.0">subviews</string>
 								<object class="CATransition" key="NS.object.0">
@@ -1191,8 +1187,6 @@ IFRIRSBNRVNILg</bytes>
 						</object>
 					</object>
 					<string key="NSFrameSize">{474, 539}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<object class="NSDictionary" key="NSViewAnimations">
 						<string key="NS.key.0">subviews</string>
 						<object class="CATransition" key="NS.object.0">
@@ -1252,7 +1246,7 @@ IFRIRSBNRVNILg</bytes>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{474, 555}</string>
-				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
 			</object>
 			<object class="NSWindowTemplate" id="16871849">
 				<int key="NSWindowStyleMask">27</int>
@@ -1262,7 +1256,7 @@ IFRIRSBNRVNILg</bytes>
 				<string key="NSWindowTitle">About MakeHuman</string>
 				<string key="NSWindowClass">NSPanel</string>
 				<nil key="NSViewClass"/>
-				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSWindowContentMinSize">{712, 328}</string>
 				<object class="NSView" key="NSWindowView" id="273299187">
 					<reference key="NSNextResponder"/>
@@ -1284,9 +1278,8 @@ IFRIRSBNRVNILg</bytes>
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{-8, 65}, {308, 253}}</string>
+							<string key="NSFrame">{{-13, 32}, {318, 296}}</string>
 							<reference key="NSSuperview" ref="273299187"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="213087814">
 								<int key="NSCellFlags">130560</int>
@@ -1317,7 +1310,6 @@ IFRIRSBNRVNILg</bytes>
 											<int key="NSvFlags">6418</int>
 											<string key="NSFrameSize">{502, 1280}</string>
 											<reference key="NSSuperview" ref="411001940"/>
-											<reference key="NSWindow"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="446993259">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
@@ -1392,7 +1384,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<bool key="EncodedWithXMLCoder">YES</bool>
 																	<object class="NSColor" id="589686322">
 																		<int key="NSColorSpace">1</int>
-																		<bytes key="NSRGB">MC4yMTk2MDc4NCAwLjQzNTI5NDEyIDAuNzUyOTQxMTkAA</bytes>
+																		<bytes key="NSRGB">MC4yMTk2MDc4NDQ5IDAuNDM1Mjk0MTIxNSAwLjc1Mjk0MTE5MTIAA</bytes>
 																	</object>
 																	<object class="NSFont">
 																		<string key="NSName">Helvetica-Bold</string>
@@ -1403,7 +1395,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">7</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<object class="NSTextTab" id="745627482">
@@ -1461,7 +1453,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<bool key="EncodedWithXMLCoder">YES</bool>
 																	<object class="NSColor" id="169820017">
 																		<int key="NSColorSpace">1</int>
-																		<bytes key="NSRGB">MC4zMTc2NDcwNyAwLjMxNzY0NzA3IDAuMzE3NjQ3MDcAA</bytes>
+																		<bytes key="NSRGB">MC4zMTc2NDcwNjk3IDAuMzE3NjQ3MDY5NyAwLjMxNzY0NzA2OTcAA</bytes>
 																	</object>
 																	<object class="NSFont" id="121306300">
 																		<string key="NSName">Helvetica</string>
@@ -1472,7 +1464,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle" id="302112671">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">8</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="745627482"/>
@@ -1534,7 +1526,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<bool key="EncodedWithXMLCoder">YES</bool>
 																	<object class="NSColor" id="497510539">
 																		<int key="NSColorSpace">1</int>
-																		<bytes key="NSRGB">MCAwIDAuNjAwMDAwMDIAA</bytes>
+																		<bytes key="NSRGB">MCAwIDAuNjAwMDAwMDIzOAA</bytes>
 																	</object>
 																	<reference ref="121306300"/>
 																	<real value="0.0"/>
@@ -1566,7 +1558,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle" id="975542669">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">22</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="745627482"/>
@@ -1632,7 +1624,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<object class="NSTextTab" id="114306460">
@@ -1688,7 +1680,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle" id="347910016">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -1771,7 +1763,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">22</double>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -1815,7 +1807,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -1866,7 +1858,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -1908,7 +1900,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">22</double>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -1952,7 +1944,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -2005,7 +1997,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle" id="504608993">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -2029,7 +2021,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<integer value="1"/>
 																	<object class="NSColor">
 																		<int key="NSColorSpace">1</int>
-																		<bytes key="NSRGB">MC44ODYyNzQ1MiAwLjExMzcyNTQ5IDAuMTEzNzI1NDkAA</bytes>
+																		<bytes key="NSRGB">MC44ODYyNzQ1MTY2IDAuMTEzNzI1NDkwOSAwLjExMzcyNTQ5MDkAA</bytes>
 																	</object>
 																</object>
 															</object>
@@ -2080,7 +2072,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">22</double>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -2124,7 +2116,7 @@ R3JlZ29yeTogQXFzaXMgdGVhbS4KCeKAoglMZW9uIEF0a2luc29uOiBBcXNpcyB0ZWFtLgo</bytes>
 																	<object class="NSParagraphStyle">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">9</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="114306460"/>
@@ -2212,7 +2204,6 @@ Aw4TEQoArQESA</bytes>
 									</object>
 									<string key="NSFrame">{{1, 1}, {502, 328}}</string>
 									<reference key="NSSuperview" ref="310158547"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="514359729"/>
 									<reference key="NSDocView" ref="514359729"/>
 									<reference key="NSBGColor" ref="4365593"/>
@@ -2224,29 +2215,26 @@ Aw4TEQoArQESA</bytes>
 									<int key="NSvFlags">4352</int>
 									<string key="NSFrame">{{503, 1}, {15, 313}}</string>
 									<reference key="NSSuperview" ref="310158547"/>
-									<reference key="NSWindow"/>
 									<bool key="NSEnabled">YES</bool>
 									<int key="NSsFlags">512</int>
 									<reference key="NSTarget" ref="310158547"/>
 									<string key="NSAction">_doScroller:</string>
-									<double key="NSPercent">0.25624999999999998</double>
+									<double key="NSPercent">0.25624999403953552</double>
 								</object>
 								<object class="NSScroller" id="893984301">
 									<reference key="NSNextResponder" ref="310158547"/>
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{-100, -100}, {87, 18}}</string>
 									<reference key="NSSuperview" ref="310158547"/>
-									<reference key="NSWindow"/>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="310158547"/>
 									<string key="NSAction">_doScroller:</string>
-									<double key="NSCurValue">0.66879980000000006</double>
-									<double key="NSPercent">0.94565220000000005</double>
+									<double key="NSCurValue">1</double>
+									<double key="NSPercent">0.94565218687057495</double>
 								</object>
 							</object>
 							<string key="NSFrame">{{292, -1}, {519, 330}}</string>
 							<reference key="NSSuperview" ref="273299187"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="411001940"/>
 							<int key="NSsFlags">594</int>
 							<reference key="NSVScroller" ref="346122388"/>
@@ -2256,11 +2244,10 @@ Aw4TEQoArQESA</bytes>
 					</object>
 					<string key="NSFrameSize">{810, 328}</string>
 					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{712, 344}</string>
-				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
 			</object>
 			<object class="NSWindowTemplate" id="74768827">
 				<int key="NSWindowStyleMask">83</int>
@@ -2270,9 +2257,9 @@ Aw4TEQoArQESA</bytes>
 				<string key="NSWindowTitle">Acknowledgments</string>
 				<string key="NSWindowClass">NSPanel</string>
 				<nil key="NSViewClass"/>
-				<string key="NSWindowContentMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<object class="NSView" key="NSWindowView" id="658604990">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">4352</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2291,7 +2278,6 @@ Aw4TEQoArQESA</bytes>
 											<int key="NSvFlags">2322</int>
 											<string key="NSFrameSize">{758, 426}</string>
 											<reference key="NSSuperview" ref="120888671"/>
-											<reference key="NSWindow"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="801433359">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
@@ -2341,7 +2327,7 @@ IHRoZSBMR1BMLg</bytes>
 																	<bool key="EncodedWithXMLCoder">YES</bool>
 																	<object class="NSColor" id="215845965">
 																		<int key="NSColorSpace">1</int>
-																		<bytes key="NSRGB">MC4xNjA3ODQzMTM3IDAuMzQxMTc2NDcwNiAwLjU3MjU0OTAxOTYAA</bytes>
+																		<bytes key="NSRGB">MC4xNjA3ODQzMTkgMC4zNDExNzY0ODAxIDAuNTcyNTQ5MDQ1MQA</bytes>
 																	</object>
 																	<object class="NSFont">
 																		<string key="NSName">Helvetica-Bold</string>
@@ -2350,7 +2336,6 @@ IHRoZSBMR1BMLg</bytes>
 																	</object>
 																	<object class="NSParagraphStyle" id="72036698">
 																		<int key="NSAlignment">4</int>
-																		<double key="NSTighteningFactorForTruncation">0.05000000074505806</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<object class="NSTextTab" id="224709497">
@@ -2430,8 +2415,7 @@ IHRoZSBMR1BMLg</bytes>
 																	<object class="NSParagraphStyle" id="254690608">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">8</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
-																		<double key="NSTighteningFactorForTruncation">0.05000000074505806</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="224709497"/>
@@ -2499,7 +2483,7 @@ IHRoZSBMR1BMLg</bytes>
 																	<integer value="1"/>
 																	<object class="NSColor" id="271627043">
 																		<int key="NSColorSpace">1</int>
-																		<bytes key="NSRGB">MCAwIDAuNgA</bytes>
+																		<bytes key="NSRGB">MCAwIDAuNjAwMDAwMDIzOAA</bytes>
 																	</object>
 																</object>
 															</object>
@@ -2533,7 +2517,6 @@ IHRoZSBMR1BMLg</bytes>
 																	<reference ref="21503808"/>
 																	<object class="NSParagraphStyle" id="626099645">
 																		<int key="NSAlignment">4</int>
-																		<double key="NSTighteningFactorForTruncation">0.05000000074505806</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="224709497"/>
@@ -2590,8 +2573,7 @@ IHRoZSBMR1BMLg</bytes>
 																	<object class="NSParagraphStyle" id="68527539">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSParagraphSpacing">8</double>
-																		<double key="NSDefaultTabInterval">35.399999999999999</double>
-																		<double key="NSTighteningFactorForTruncation">0.05000000074505806</double>
+																		<double key="NSDefaultTabInterval">35.400001525878906</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="224709497"/>
@@ -2656,7 +2638,6 @@ IHRoZSBMR1BMLg</bytes>
 																	<object class="NSParagraphStyle" id="854122477">
 																		<int key="NSAlignment">4</int>
 																		<double key="NSHeadIndent">91</double>
-																		<double key="NSTighteningFactorForTruncation">0.05000000074505806</double>
 																		<object class="NSArray" key="NSTabStops">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="224709497"/>
@@ -2737,14 +2718,13 @@ IHRoZSBMR1BMLg</bytes>
 												<nil key="NSDefaultParagraphStyle"/>
 											</object>
 											<int key="NSTVFlags">6</int>
-											<string key="NSMaxSize">{758, 1e+07}</string>
-											<string key="NSMinize">{223, 2}</string>
+											<string key="NSMaxSize">{1518, 1e+07}</string>
+											<string key="NSMinize">{223, 0}</string>
 											<nil key="NSDelegate"/>
 										</object>
 									</object>
 									<string key="NSFrame">{{1, 1}, {758, 459}}</string>
 									<reference key="NSSuperview" ref="724533390"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="395873193"/>
 									<reference key="NSDocView" ref="395873193"/>
 									<reference key="NSBGColor" ref="4365593"/>
@@ -2756,18 +2736,16 @@ IHRoZSBMR1BMLg</bytes>
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{744, 1}, {15, 444}}</string>
 									<reference key="NSSuperview" ref="724533390"/>
-									<reference key="NSWindow"/>
 									<reference key="NSTarget" ref="724533390"/>
 									<string key="NSAction">_doScroller:</string>
 									<double key="NSCurValue">1</double>
-									<double key="NSPercent">0.35915492957746481</double>
+									<double key="NSPercent">0.35915493965148926</double>
 								</object>
 								<object class="NSScroller" id="344214223">
 									<reference key="NSNextResponder" ref="724533390"/>
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{-100, -100}, {87, 18}}</string>
 									<reference key="NSSuperview" ref="724533390"/>
-									<reference key="NSWindow"/>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="724533390"/>
 									<string key="NSAction">_doScroller:</string>
@@ -2777,7 +2755,6 @@ IHRoZSBMR1BMLg</bytes>
 							</object>
 							<string key="NSFrame">{{-1, -1}, {760, 461}}</string>
 							<reference key="NSSuperview" ref="658604990"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="120888671"/>
 							<int key="NSsFlags">530</int>
 							<reference key="NSVScroller" ref="795491809"/>
@@ -2786,8 +2763,6 @@ IHRoZSBMR1BMLg</bytes>
 						</object>
 					</object>
 					<string key="NSFrameSize">{758, 459}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<object class="NSDictionary" key="NSViewAnimations">
 						<string key="NS.key.0">subviews</string>
 						<object class="CATransition" key="NS.object.0">
@@ -2846,7 +2821,7 @@ IHRoZSBMR1BMLg</bytes>
 					</object>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
-				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -3455,8 +3430,8 @@ IHRoZSBMR1BMLg</bytes>
 						<reference key="object" ref="273299187"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="754968801"/>
 							<reference ref="310158547"/>
+							<reference ref="754968801"/>
 						</object>
 						<reference key="parent" ref="16871849"/>
 					</object>
