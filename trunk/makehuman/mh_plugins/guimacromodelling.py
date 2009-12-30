@@ -182,18 +182,18 @@ class MacroModelingTaskView(gui3d.TaskView):
       texture = self.app.getThemeResource("images", "button_america.png"), position = [690, 210, 9])
     self.ethnicButtonGroup = []
     self.ethnicIncreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
-      mesh = "data/3dobjs/button_ethnincr.obj",
+      mesh = "data/3dobjs/button_standard_little.obj",
       texture = self.app.getThemeResource("images", "button_ethnincr.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_ethnincr_on.png"), position = [730, 130, 9],
+      selectedTexture = self.app.getThemeResource("images", "button_ethnincr_on.png"), position = [750, 140, 9],
       selected = True)
     self.ethnicDecreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
-      mesh = "data/3dobjs/button_ethndecr.obj",
+      mesh = "data/3dobjs/button_standard_little.obj",
       texture = self.app.getThemeResource("images", "button_ethndecr.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_ethndecr_on.png"), position = [730, 170, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_ethndecr_on.png"), position = [750, 180, 9])
     self.ethnicResetButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
-      mesh = "data/3dobjs/button_ethnreset.obj",
+      mesh = "data/3dobjs/button_standard_little.obj",
       texture = self.app.getThemeResource("images", "button_ethnreset.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [730, 210, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [750, 220, 9])
       
     # Common controls
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, -89.98])

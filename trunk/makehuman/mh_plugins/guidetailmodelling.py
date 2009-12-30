@@ -310,7 +310,7 @@ class DetailModelingTaskView(gui3d.TaskView):
     
     self.detailButtonGroup = []
     self.genderDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
-      texture = self.app.getThemeResource("images", "button_gender.png"), 
+      texture = self.app.getThemeResource("images", "button_genderxxx.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_gender_on.png"), position = [10, 50, 9.2],
       selected = True)
     self.ageDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
