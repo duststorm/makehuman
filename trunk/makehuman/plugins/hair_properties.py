@@ -69,17 +69,14 @@ class HairPropertiesTaskView(gui3d.TaskView):
     
     @self.redSlider.event
     def onChange(value):
-      self.redSliderLabel.setText("Red: %.2f"%(value))
       self.changeColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
       
     @self.greenSlider.event
     def onChange(value):
-      self.greenSliderLabel.setText("Green: %.2f"%(value))
       self.changeColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
       
     @self.blueSlider.event
     def onChange(value):
-      self.blueSliderLabel.setText("Blue: %.2f"%(value))
       self.changeColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
       
   def changeColor(self, color):
@@ -101,8 +98,11 @@ class HairPropertiesTaskView(gui3d.TaskView):
   def syncSliders(self):
     hairColor = self.app.scene3d.selectedHuman.hairColor;
     self.redSlider.setValue(hairColor[0])
+    self.redSliderLabel.setText("Red: %.2f"%(hairColor[0]))
     self.greenSlider.setValue(hairColor[1])
+    self.greenSliderLabel.setText("Green: %.2f"%(hairColor[1]))
     self.blueSlider.setValue(hairColor[2])
+    self.blueSliderLabel.setText("Blue: %.2f"%(hairColor[2]))
     self.setColor(hairColor)
 
 category = None
