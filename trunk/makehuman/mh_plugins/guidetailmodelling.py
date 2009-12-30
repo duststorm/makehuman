@@ -309,33 +309,15 @@ class DetailModelingTaskView(gui3d.TaskView):
     self.tool = None
     
     self.detailButtonGroup = []
-    self.genderDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
-      texture = self.app.getThemeResource("images", "button_genderxxx.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_gender_on.png"), position = [10, 50, 9.2],
-      selected = True)
-    self.ageDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
-      texture = self.app.getThemeResource("images", "button_age.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_age_on.png"), position = [10, 170, 9])
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_muscle.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 290, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 290, 9],
+      selected = True)
     self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_weight.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 410, 9])
       
-    self.tool = DetailTool(self.app, False, "_female", "_male")
-      
-    @self.genderDetailButton.event
-    def onClicked(event):
-      self.tool = DetailTool(self.app, False, "_female", "_male")
-      self.app.tool = self.tool
-      gui3d.RadioButton.onClicked(self.genderDetailButton, event)
-      
-    @self.ageDetailButton.event
-    def onClicked(event):
-      self.tool = DetailTool(self.app, False, "_child", "_old")
-      self.app.tool = self.tool
-      gui3d.RadioButton.onClicked(self.ageDetailButton, event)
+    self.tool = DetailTool(self.app, False, "_flaccid", "_muscle")
       
     @self.muscleDetailButton.event
     def onClicked(event):
