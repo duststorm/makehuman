@@ -145,7 +145,7 @@ static NSString *getApplicationName(void)
 -(IBAction)helpFileMHQuickStart:(id)inSender        {[SDLMain openFile:@"FileMHQuickStart"];}
 -(IBAction)helpURLMHVisitHome:(id)inSender          {[SDLMain openURL:@"URLMHHome"];}
 -(IBAction)helpURLMHVisitForum:(id)inSender         {[SDLMain openURL:@"URLMHForum"];}
--(IBAction)helpURLMHDocuments:(id)inSender          {[SDLMain openURL:@"URMHLDocuments"];}
+-(IBAction)helpURLMHDocuments:(id)inSender          {[SDLMain openURL:@"URLMHDocuments"];}
 -(IBAction)helpURLMHArtists:(id)inSender            {[SDLMain openURL:@"URLMHArtists"];}
 -(IBAction)helpURLMHSoftwareDownload:(id)inSender   {[SDLMain openURL:@"URLMHUpdate"];}
 
