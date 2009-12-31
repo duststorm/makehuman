@@ -346,10 +346,7 @@ class Human(gui3d.Object):
         ethnics["neutral"] = 1.0 - sum(ethnics.values())
             
     def getEthnic(self, ethnic):
-        if ethnic in self.targetsEthnicStack:
-            return self.targetsEthnicStack[ethnic]
-        else:
-            return 0.0
+        return self.targetsEthnicStack.get(ethnic, 0.0)
             
     def setDetail(self, name, value):
         if value:
@@ -358,10 +355,7 @@ class Human(gui3d.Object):
           del self.targetsDetailStack[name]
           
     def getDetail(self, name):
-        if name in self.targetsDetailStack:
-          return self.targetsDetailStack[name]
-        else:
-          return 0.0;
+        return self.targetsDetailStack.get(name, 0.0)
           
     def setHairFile(self, filename):
         self.hairFile = filename
@@ -399,8 +393,8 @@ class Human(gui3d.Object):
         progressIncr = 0.3/(len(self.targetsDetailStack)+1)
         
         #As first thing, we apply all micro details
-        for t in self.targetsDetailStack.keys():
-            algos3d.loadTranslationTarget(self.meshData, t, self.targetsDetailStack[t],None,0,0)
+        for k, v in self.targetsDetailStack.iteritems():
+            algos3d.loadTranslationTarget(self.meshData, k, v,None,0,0)
             progressVal += progressIncr
             if progressCallback:
                 progressCallback(progressVal)
@@ -489,9 +483,8 @@ class Human(gui3d.Object):
                 print "APP: %s, VAL: %f"%(k, v)
             algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
-        for ethnicGroup in self.targetsEthnicStack.keys():
+        for ethnicGroup, ethnicVal in self.targetsEthnicStack.iteritems():
             
-            ethnicVal = self.targetsEthnicStack[ethnicGroup]
             ethnicTargets = {}
             targetFemaleChild = "data/targets/macrodetails/%s-female-child.target"%(ethnicGroup)
             targetMaleChild = "data/targets/macrodetails/%s-male-child.target"%(ethnicGroup)
@@ -507,12 +500,11 @@ class Human(gui3d.Object):
             ethnicTargets[targetFemaleYoung]= self.femaleVal*self.youngVal*ethnicVal
             ethnicTargets[targetMaleYoung]= self.maleVal*self.youngVal*ethnicVal
 
-            for k in ethnicTargets.keys():
-                tVal = ethnicTargets[k]                
+            for k, v in ethnicTargets.iteritems():              
                 progressVal = progressVal + progressIncr
                 if progressCallback:
                     progressCallback(progressVal)
-                algos3d.loadTranslationTarget(self.meshData, k,tVal,None,0,0)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
         #Update all verts
         self.meshData.calcNormals(1, 1)
