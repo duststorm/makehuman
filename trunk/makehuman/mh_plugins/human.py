@@ -788,6 +788,8 @@ class Human(gui3d.Object):
                     modifier = humanmodifier.Modifier(self, "data/targets/macrodetails/universal-stature-dwarf.target",
                       "data/targets/macrodetails/universal-stature-giant.target")
                     modifier.setValue(float(lineData[1]))
+                elif lineData[0] == "genitals":
+                    self.setGenitals(float(lineData[1]))
                 elif lineData[0] == "ethnic":
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == "detail":
@@ -811,6 +813,7 @@ class Human(gui3d.Object):
         f.write("age %f\n" %(self.getAge()))
         f.write("muscle %f\n" %(self.getMuscle()))
         f.write("weight %f\n" %(self.getWeight()))
+        f.write("genitals %f\n" %(self.getGenitals()))
         
         modifier = humanmodifier.Modifier(self, "data/targets/macrodetails/universal-stature-dwarf.target",
           "data/targets/macrodetails/universal-stature-giant.target")
