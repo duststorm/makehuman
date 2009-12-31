@@ -37,6 +37,7 @@
   #include <Python.h>
 #endif
 
+#include <assert.h>
 #include "glmodule.h"
 #include "core.h"
 
@@ -868,7 +869,7 @@ void mhMouseButtonDown(int b, int x, int y)
 
     if (b != 4 && b != 5)
       UpdatePickingBuffer();
-}
+ }
 
 /** \brief Pass a mouse button up event up to Python.
  *  \param b an int indicating which button this event relates to.
@@ -994,19 +995,12 @@ void UpdatePickingBuffer(void)
   width = viewport[2];
   height = viewport[3];
 
-  if (pickingBuffer)
-  {
-    // Resize the buffer in case the window size has changed
-    if  (pickingBufferSize != width * height * 3)
-    {
-      pickingBufferSize = width * height * 3;
-      pickingBuffer = (unsigned char*)realloc(pickingBuffer, pickingBufferSize);
-    }
-  }
-  else
+  // Resize the buffer in case the window size has changed
+  if (pickingBufferSize != width * height * 3)
   {
     pickingBufferSize = width * height * 3;
-    pickingBuffer = (unsigned char*)malloc(pickingBufferSize);
+    pickingBuffer = (unsigned char*)realloc(pickingBuffer, pickingBufferSize);
+    assert(pickingBuffer != NULL);
   }
 
   // Turn off lighting
@@ -1036,6 +1030,17 @@ void UpdatePickingBuffer(void)
 
   /* restore lighting */
   glEnable(GL_LIGHTING);
+
+/* hdusel: Bugfix for http://code.google.com/p/makehuman/issues/detail?id=16
+ * "Red and black window - 'selection rendering'"
+ *
+ * This error happened for the OS X port only
+ *
+ * So I enforce a redraw whenever the picking buffer will be updated.
+ * But I'm not certain weather we need this for OS X only? */
+#ifdef __APPLE__
+  mhDraw();
+#endif
 }
 
 /** \brief Retrieve the 'selected' color index for the specified coordinates.
