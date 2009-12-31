@@ -121,7 +121,8 @@ typedef struct
 
     float zoom;
 
-    //float position[3];
+    //float eye[3];
+    //float focus[3];
     //float up[3];
 } Camera;
 
@@ -1387,6 +1388,58 @@ void mhCameraPosition(Camera *camera, int eye)
                   0.0 , 1.0, 0.0);        // Up
         break;
       }
+    case 1: // Toe-in method, uses different eye positions, same focus point and projection
+      {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        if (eye == 1)
+          gluLookAt(0.0 - 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
+                    0.0, 0.0, 0.0,                                        // Focus
+                    0.0 , 1.0, 0.0);                                      // Up
+        else if (eye == 2)
+          gluLookAt(0.0 + 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
+                    0.0, 0.0, 0.0,                                        // Focus
+                    0.0 , 1.0, 0.0);                                      // Up
+
+        break;
+      }
+    case 2: // Off-axis method, uses different eye positions, focus points and projections
+      {
+        double aspectratio = G.windowWidth / (double)G.windowHeight;
+        double widthdiv2 = tan(camera->fovAngle * 3.14159/360.0) * camera->nearPlane;
+        double left  = - aspectratio * widthdiv2;
+        double right = aspectratio * widthdiv2;
+        double top = widthdiv2;
+        double bottom = -widthdiv2;
+        double eyePosition;
+
+        if (eye == 1) // Left
+          eyePosition = -0.5 * camera->eyeSeparation;
+        else if (eye == 2) // Right
+          eyePosition = 0.5 * camera->eyeSeparation;
+
+        left -= eyePosition * camera->nearPlane / camera->zoom;
+        right -= eyePosition * camera->nearPlane / camera->zoom;
+
+         // Left frustum is moved right, right frustum moved left
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glFrustum(left, right, bottom, top, camera->nearPlane, camera->farPlane);
+
+         // Left camera is moved left, right camera moved right
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        gluLookAt(0.0 + eyePosition, 0.0, camera->zoom, // Eye
+               0.0 + eyePosition, 0.0, 0.0,             // Focus
+               0.0 , 1.0, 0.0);                         // Up
+
+        break;
+      }
     }
 }
 
@@ -1616,7 +1669,7 @@ void mhDraw(void)
         mhCameraPosition(camera, 1);
         mhDrawMeshes(0, i);
         glClear(GL_DEPTH_BUFFER_BIT);
-        glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE); // Green
+        glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE); // Cyan
         mhCameraPosition(camera, 2);
         mhDrawMeshes(0, i);
         // To prevent the GUI from overwritting the red model, we need to render it again in the z-buffer
