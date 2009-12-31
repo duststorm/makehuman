@@ -92,6 +92,7 @@ class LoadTaskView(gui3d.TaskView):
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncSliders()
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncEthnics()
       self.app.categories["Modelling"].tasksByName["Macro modelling"].syncStatus()
+      self.app.categories["Modelling"].tasksByName["Detail modelling"].syncSliders()
               
       del self.app.undoStack[:]
       del self.app.redoStack[:]
