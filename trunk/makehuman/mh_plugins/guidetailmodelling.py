@@ -23,6 +23,26 @@ __docformat__ = 'restructuredtext'
 
 import events3d, gui3d, algos3d, humanmodifier
 
+class GenitalsAction:
+    def __init__(self, human, value, postAction):
+      self.name = "Genitals"
+      self.human = human
+      self.before = self.human.getGenitals()
+      self.after = value
+      self.postAction = postAction
+      
+    def do(self):
+      self.human.setGenitals(self.after)
+      self.human.applyAllTargets(self.human.app.progress)
+      self.postAction()
+      return True
+      
+    def undo(self):
+      self.human.setGenitals(self.before)
+      self.human.applyAllTargets(self.human.app.progress)
+      self.postAction()
+      return True
+
 class DetailTool(events3d.EventHandler):
   def __init__(self, app, micro, left, right):
     self.app = app
@@ -308,14 +328,22 @@ class DetailModelingTaskView(gui3d.TaskView):
     gui3d.TaskView.__init__(self, category, "Detail modelling", category.app.getThemeResource("images", "details.png"))
     self.tool = None
     
+    self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_genitals.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 60, 9.2], value = 0.0)
+    
+    @self.genitalsSlider.event
+    def onChange(value):
+      human = self.app.scene3d.selectedHuman
+      self.app.do(GenitalsAction(human, value, self.syncSliders))
+      
     self.detailButtonGroup = []
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_muscle.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 290, 9],
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 160, 9],
       selected = True)
     self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_weight.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 410, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 260, 9])
       
     self.tool = DetailTool(self.app, False, "_flaccid", "_muscle")
       
@@ -384,6 +412,10 @@ class DetailModelingTaskView(gui3d.TaskView):
   def onHide(self, event):
     self.app.tool = None
     gui3d.TaskView.onHide(self, event)
+    
+  def syncSliders(self):
+    human = self.app.scene3d.selectedHuman
+    self.genitalsSlider.setValue(human.getGenitals())
     
 class MicroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):

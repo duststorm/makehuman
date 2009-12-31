@@ -74,14 +74,7 @@ class Human(gui3d.Object):
         self.muscleVal = 0.0
         self.overweightVal = 0.0
         self.underweightVal = 0.0
-        self.childValDetails = 0.0 #child
-        self.oldValDetails = 0.0  #old
-        self.flaccidValDetails = 0.0
-        self.muscleValDetails = 0.0
-        self.overweightValDetails = 0.0
-        self.underweightValDetails = 0.0
-        self.femaleValDetails = 0
-        self.maleValDetails = 0        
+        self.genitals = 0.0
         self.bodyZones =  ["eye","jaw","nose","mouth","head","neck","torso",\
                         "hip","pelvis","r-upperarm","l-upperarm","r-lowerarm",\
                         "l-lowerarm","l-hand", "r-hand", "r-upperleg","l-upperleg",\
@@ -148,6 +141,15 @@ class Human(gui3d.Object):
         self.targetMaleLightChild = "%s/universal-male-child-light.target"%(targetFolder)
         self.targetMaleLightYoung = "%s/universal-male-young-light.target"%(targetFolder)
         self.targetMaleLightOld = "%s/universal-male-old-light.target"%(targetFolder)
+        
+        targetFolder = "data/targets/details"  
+        
+        self.targetFemaleGenitalsChild = "%s/genitals_female_child.target"%(targetFolder)
+        self.targetFemaleGenitalsYoung = "%s/genitals_female_young.target"%(targetFolder)
+        self.targetFemaleGenitalsOld = "%s/genitals_female_old.target"%(targetFolder)
+        self.targetMaleGenitalsChild = "%s/genitals_male_child.target"%(targetFolder)
+        self.targetMaleGenitalsYoung = "%s/genitals_male_young.target"%(targetFolder)
+        self.targetMaleGenitalsOld = "%s/genitals_male_old.target"%(targetFolder)
 
         self.hairFile = "data/hairs/default.hair"
         self.hairColor = [0.41, 0.23, 0.04]
@@ -305,6 +307,21 @@ class Human(gui3d.Object):
             self.flaccidVal = -amount
             self.muscleVal = 0      
       
+    def setGenitals(self, value):
+        """
+        Sets the amount of genitals of the model. 0 for none, 1 for pronounced.
+        
+        Parameters
+        ----------
+
+        amount:
+            *float*. An amount, usually between 0 and 1, specifying how much
+            of the attribute to apply.
+        """  
+        self.genitals = min(max(value, 0.0), 1.0)
+        
+    def getGenitals(self):
+        return self.genitals
             
     def setEthnic(self, ethnic, value):
         modified = None
@@ -453,11 +470,24 @@ class Human(gui3d.Object):
         macroTargets[self.targetMaleLightYoung]= averageToneVal*self.underweightVal*self.youngVal*self.maleVal
         macroTargets[self.targetMaleLightOld]= averageToneVal*self.underweightVal*self.oldVal*self.maleVal
 
-        for k in macroTargets.keys():
-            tVal = macroTargets[k]
-            if tVal != 0.0:         
-                print "APP: %s, VAL: %f"%(k,tVal)
-            algos3d.loadTranslationTarget(self.meshData, k,tVal,None,0,0)
+        for k, v in macroTargets.iteritems():
+            if v != 0.0:         
+                print "APP: %s, VAL: %f"%(k, v)
+            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+            
+        detailTargets = {}
+        
+        detailTargets[self.targetFemaleGenitalsChild]= self.genitals*self.childVal*self.femaleVal
+        detailTargets[self.targetFemaleGenitalsYoung]= self.genitals*self.youngVal*self.femaleVal
+        detailTargets[self.targetFemaleGenitalsOld]= self.genitals*self.oldVal*self.femaleVal
+        detailTargets[self.targetMaleGenitalsChild]= self.genitals*self.childVal*self.maleVal
+        detailTargets[self.targetMaleGenitalsYoung]= self.genitals*self.youngVal*self.maleVal
+        detailTargets[self.targetMaleGenitalsOld]= self.genitals*self.oldVal*self.maleVal
+        
+        for k, v in detailTargets.iteritems():
+            if v != 0.0:         
+                print "APP: %s, VAL: %f"%(k, v)
+            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
         for ethnicGroup in self.targetsEthnicStack.keys():
             
