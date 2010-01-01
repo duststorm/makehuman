@@ -332,6 +332,20 @@ def calcSubData(ob, scene):
 
     t3 = time.time()
     subdividedObj = scene.newObj(subObjName)
+    subdividedObj.x = ob.x
+    subdividedObj.y = ob.y
+    subdividedObj.z = ob.z
+    subdividedObj.rx = ob.rx
+    subdividedObj.ry = ob.ry
+    subdividedObj.rz = ob.rz
+    subdividedObj.sx = ob.sx
+    subdividedObj.sy = ob.sy
+    subdividedObj.sz = ob.sz
+    subdividedObj.visibility = ob.visibility
+    subdividedObj.shadeless = ob.shadeless
+    subdividedObj.pickable = ob.pickable
+    subdividedObj.cameraMode = ob.cameraMode
+    subdividedObj.text = ob.text
     subdividedObj.uvValues = ob.uvValues[:]
     subdividedObj.indexBuffer = []
     for v in ob.verts:
