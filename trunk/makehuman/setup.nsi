@@ -68,6 +68,7 @@ Section "Copy files"
   
   CreateDirectory $INSTDIR\models
   CreateDirectory $INSTDIR\exports
+  CreateDirectory $INSTDIR\backgrounds
   
 SectionEnd
 
