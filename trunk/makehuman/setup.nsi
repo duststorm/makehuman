@@ -65,6 +65,8 @@ Section "Copy files"
   File /r /x .svn mh_plugins\*.py
   SetOutPath $INSTDIR\pythonmodules
   File /r /x .svn pythonmodules\*.py
+  SetOutPath $INSTDIR\plugins
+  File /r /x .svn plugins\*.py
   
   CreateDirectory $INSTDIR\models
   CreateDirectory $INSTDIR\exports
@@ -103,6 +105,7 @@ Section "Uninstall"
   RMDir /r $INSTDIR\docs
   RMDir /r $INSTDIR\mh_core
   RMDir /r $INSTDIR\mh_plugins
+  RMDir /r $INSTDIR\plugins
   RMDir /r $INSTDIR\pythonmodules
   
   # Remove uninstaller
@@ -111,6 +114,7 @@ Section "Uninstall"
   # Remove remaining Makehuman folders if empty
   RMDir $INSTDIR\models
   RMDir $INSTDIR\exports
+  RMDir $INSTDIR\backgrounds
   RMDir $INSTDIR
   
   # Remove shortcuts
