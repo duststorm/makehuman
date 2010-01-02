@@ -1,0 +1,868 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6806287A0FC136C9006C372E /* data in Resources */ = {isa = PBXBuildFile; fileRef = 68061C9B0FC136AB006C372E /* data */; };
+		6839A7AF10179EFF008AF603 /* HelpLinks.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6839A7AD10179EFF008AF603 /* HelpLinks.strings */; };
+		684E6D680FEE34E600941536 /* docs in Resources */ = {isa = PBXBuildFile; fileRef = 684E6D340FEE34E600941536 /* docs */; };
+		685701AF1001D79200F9C649 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
+		685701B01001D79200F9C649 /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
+		685701B11001D79200F9C649 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
+		685702011001D7EF00F9C649 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		685702021001D7EF00F9C649 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
+		685702031001D7EF00F9C649 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
+		685702041001D7EF00F9C649 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
+		685702051001D7EF00F9C649 /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
+		685702111001D8C300F9C649 /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
+		6857022C10031DE300F9C649 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
+		6857022D10031DE300F9C649 /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
+		6857022E10031DE300F9C649 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
+		6857022F10031DE300F9C649 /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
+		6857023010031E0400F9C649 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		6857023110031E1C00F9C649 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
+		6857023210031E1C00F9C649 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
+		6857023310031E1C00F9C649 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
+		6857023410031E1C00F9C649 /* SDL_image.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
+		68570267100320B500F9C649 /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
+		68570292100322C400F9C649 /* glmodule.h in Headers */ = {isa = PBXBuildFile; fileRef = 685701301000EE8000F9C649 /* glmodule.h */; };
+		68570293100322CB00F9C649 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 6857012F1000EE8000F9C649 /* core.h */; };
+		6859C28110178958000E212C /* SDLMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6859C28010178958000E212C /* SDLMain.xib */; };
+		6869C0DE10322A0400DF62C3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
+		6869C0DF10322A0400DF62C3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
+		6869C0E710322A4200DF62C3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
+		6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
+		6869C0FA10322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
+		686FD6FD0FC06DA4006C12DA /* main.py in Resources */ = {isa = PBXBuildFile; fileRef = 686FD6FC0FC06DA4006C12DA /* main.py */; };
+		687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */; };
+		6894C4E20FA188D000A52097 /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
+		6894C50E0FA1893900A52097 /* SDL_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
+		689F331E0E6192CB00E37E9F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 689F33190E6192CB00E37E9F /* InfoPlist.strings */; };
+		689F332E0E6193B000E37E9F /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
+		689F332F0E6193B100E37E9F /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
+		689F33310E6193B100E37E9F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
+		689F33E60E61999C00E37E9F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
+		689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
+		689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
+		68C80B0B0FE3E41E0090D1E5 /* utils in Resources */ = {isa = PBXBuildFile; fileRef = 68C80AE10FE3E41D0090D1E5 /* utils */; };
+		68D8631D0FA5D1810097F73F /* SDLMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.mm */; };
+		68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */; };
+		68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */; };
+		68E6B8DF103820F500BAA9F5 /* UpdatePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */; };
+		68E6B8E4103821B500BAA9F5 /* UpdatePreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */; };
+		68E6BA1610384AF100BAA9F5 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BA1410384AF100BAA9F5 /* Localizable.strings */; };
+		68E6BB1810395A6600BAA9F5 /* GeneralPreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6BB1710395A6600BAA9F5 /* GeneralPreferences.mm */; };
+		68E6BB1C10395B2C00BAA9F5 /* GeneralPreferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BB1B10395B2C00BAA9F5 /* GeneralPreferences.tiff */; };
+		68E6BB471039619700BAA9F5 /* GeneralPreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BB461039619700BAA9F5 /* GeneralPreferences.xib */; };
+		68E6BBBC1039732800BAA9F5 /* folder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6BBBB1039732800BAA9F5 /* folder.tiff */; };
+		68E6C077103B1E2500BAA9F5 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68E6C076103B1E2500BAA9F5 /* SDL.framework */; };
+		68E6C07A103B1E3500BAA9F5 /* SDL.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 68E6C076103B1E2500BAA9F5 /* SDL.framework */; };
+		68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
+		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6857024B10031F4400F9C649 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				6857023410031E1C00F9C649 /* SDL_image.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6894C51A0FA1895B00A52097 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				68E6C07A103B1E3500BAA9F5 /* SDL.framework in CopyFiles */,
+				6869C0E710322A4200DF62C3 /* Sparkle.framework in CopyFiles */,
+				6894C50E0FA1893900A52097 /* SDL_image.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		68061C9B0FC136AB006C372E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
+		6839A7AE10179EFF008AF603 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = resources/English.lproj/HelpLinks.strings; sourceTree = "<group>"; };
+		684E6D340FEE34E600941536 /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = docs; path = ../docs; sourceTree = SOURCE_ROOT; };
+		6857012F1000EE8000F9C649 /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = core.h; path = ../include/core.h; sourceTree = SOURCE_ROOT; };
+		685701301000EE8000F9C649 /* glmodule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glmodule.h; path = ../include/glmodule.h; sourceTree = SOURCE_ROOT; };
+		685701AC1001D77F00F9C649 /* libMakeHumanDLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libMakeHumanDLib.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		6857022710031DA200F9C649 /* MakeHuman.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MakeHuman.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6857022810031DA200F9C649 /* MakeHumanFramework-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MakeHumanFramework-Info.plist"; sourceTree = "<group>"; };
+		6859C28010178958000E212C /* SDLMain.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SDLMain.xib; path = resources/English.lproj/SDLMain.xib; sourceTree = "<group>"; };
+		685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MakeHuman_Prefix.pch; path = include/MakeHuman_Prefix.pch; sourceTree = "<group>"; };
+		686944D10FCB25F1005B01DC /* mh_core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_core; path = ../mh_core; sourceTree = SOURCE_ROOT; };
+		6869C0DD10322A0400DF62C3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = frameworks/Sparkle.framework; sourceTree = "<group>"; };
+		6869C0F810322D1100DF62C3 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = resources/dsa_pub.pem; sourceTree = "<group>"; };
+		6869C127103305C500DF62C3 /* About.pages */ = {isa = PBXFileReference; lastKnownFileType = file; name = About.pages; path = resources/About.pages; sourceTree = "<group>"; };
+		686E5D340FA1AB4B005B137C /* pythonwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pythonwrapper; path = include/pythonwrapper; sourceTree = "<group>"; };
+		686E5D380FA1AB5F005B137C /* sdlwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sdlwrapper; path = include/sdlwrapper; sourceTree = "<group>"; };
+		686FD6FC0FC06DA4006C12DA /* main.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = main.py; path = ../main.py; sourceTree = SOURCE_ROOT; };
+		687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OSXTools.cpp; path = src/OSXTools.cpp; sourceTree = "<group>"; };
+		687236BC0FF7F8D30048ED40 /* OSXTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXTools.h; path = include/OSXTools.h; sourceTree = "<group>"; };
+		6894C4E10FA188D000A52097 /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = frameworks/SDL_image.framework; sourceTree = "<group>"; };
+		689F331A0E6192CB00E37E9F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
+		689F331D0E6192CB00E37E9F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = Info.plist; path = resources/Info.plist; sourceTree = "<group>"; };
+		689F332A0E6193B000E37E9F /* core.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = core.c; path = ../src/core.c; sourceTree = "<group>"; };
+		689F332B0E6193B000E37E9F /* glmodule.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = glmodule.c; path = ../src/glmodule.c; sourceTree = "<group>"; };
+		689F332D0E6193B000E37E9F /* main.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../src/main.c; sourceTree = "<group>"; };
+		689F33E50E61999C00E37E9F /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
+		689F33E70E6199B000E37E9F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		689F33E90E6199BD00E37E9F /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		68C80AE10FE3E41D0090D1E5 /* utils */ = {isa = PBXFileReference; lastKnownFileType = folder; name = utils; path = ../utils; sourceTree = SOURCE_ROOT; };
+		68D8631C0FA5D1810097F73F /* SDLMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SDLMain.mm; path = src/SDLMain.mm; sourceTree = "<group>"; };
+		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
+		68DFFDA40FC1F059009CA434 /* data */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
+		68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Acknowledgments.rtf; path = resources/Acknowledgments.rtf; sourceTree = "<group>"; };
+		68E6B3DA1036C9B100BAA9F5 /* AppPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppPreferences.h; path = include/AppPreferences.h; sourceTree = "<group>"; };
+		68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppPreferences.mm; path = src/AppPreferences.mm; sourceTree = "<group>"; };
+		68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = UpdatePreferences.tiff; path = resources/icons/UpdatePreferences.tiff; sourceTree = "<group>"; };
+		68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = UpdatePreferences.xib; path = resources/UpdatePreferences.xib; sourceTree = "<group>"; };
+		68E6B8E2103821B500BAA9F5 /* UpdatePreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpdatePreferences.h; path = include/UpdatePreferences.h; sourceTree = "<group>"; };
+		68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = UpdatePreferences.mm; path = src/UpdatePreferences.mm; sourceTree = "<group>"; };
+		68E6B8EB10383F5400BAA9F5 /* NSPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSPreferences.h; path = include/NSPreferences.h; sourceTree = "<group>"; };
+		68E6B8EC10383F7B00BAA9F5 /* NSPreferencesModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSPreferencesModule.h; path = include/NSPreferencesModule.h; sourceTree = "<group>"; };
+		68E6BA1510384AF100BAA9F5 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = resources/English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		68E6BB1610395A4D00BAA9F5 /* GeneralPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeneralPreferences.h; path = include/GeneralPreferences.h; sourceTree = "<group>"; };
+		68E6BB1710395A6600BAA9F5 /* GeneralPreferences.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GeneralPreferences.mm; path = src/GeneralPreferences.mm; sourceTree = "<group>"; };
+		68E6BB1B10395B2C00BAA9F5 /* GeneralPreferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GeneralPreferences.tiff; path = resources/icons/GeneralPreferences.tiff; sourceTree = "<group>"; };
+		68E6BB461039619700BAA9F5 /* GeneralPreferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = GeneralPreferences.xib; path = resources/GeneralPreferences.xib; sourceTree = "<group>"; };
+		68E6BBBB1039732800BAA9F5 /* folder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = folder.tiff; path = resources/icons/folder.tiff; sourceTree = "<group>"; };
+		68E6C076103B1E2500BAA9F5 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = frameworks/SDL.framework; sourceTree = "<group>"; };
+		68EA2B640FC8348A0052A87E /* mh_plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mh_plugins; path = ../mh_plugins; sourceTree = "<group>"; };
+		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
+		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
+		68F6D3F50E640E6A00D27961 /* AppIcon.psd */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppIcon.psd; path = resources/AppIcon.psd; sourceTree = "<group>"; };
+		68F6D3F60E640E6A00D27961 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = resources/AppIcon.icns; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* MakeHuman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeHuman.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		685701AA1001D77F00F9C649 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				685702011001D7EF00F9C649 /* Cocoa.framework in Frameworks */,
+				685702021001D7EF00F9C649 /* Python.framework in Frameworks */,
+				685702031001D7EF00F9C649 /* OpenGL.framework in Frameworks */,
+				685702041001D7EF00F9C649 /* GLUT.framework in Frameworks */,
+				685702051001D7EF00F9C649 /* SDL_image.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6857022510031DA200F9C649 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				68570267100320B500F9C649 /* SDL_image.framework in Frameworks */,
+				6857023010031E0400F9C649 /* Cocoa.framework in Frameworks */,
+				6857023110031E1C00F9C649 /* GLUT.framework in Frameworks */,
+				6857023210031E1C00F9C649 /* OpenGL.framework in Frameworks */,
+				6857023310031E1C00F9C649 /* Python.framework in Frameworks */,
+				6869C0DF10322A0400DF62C3 /* Sparkle.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				689F33E60E61999C00E37E9F /* Python.framework in Frameworks */,
+				689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */,
+				689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */,
+				6894C4E20FA188D000A52097 /* SDL_image.framework in Frameworks */,
+				6869C0DE10322A0400DF62C3 /* Sparkle.framework in Frameworks */,
+				68E6C077103B1E2500BAA9F5 /* SDL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				689F332D0E6193B000E37E9F /* main.c */,
+				689F332A0E6193B000E37E9F /* core.c */,
+				689F332B0E6193B000E37E9F /* glmodule.c */,
+				6857012F1000EE8000F9C649 /* core.h */,
+				685701301000EE8000F9C649 /* glmodule.h */,
+			);
+			name = Main;
+			sourceTree = "<group>";
+		};
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6869C0DD10322A0400DF62C3 /* Sparkle.framework */,
+				68E6C076103B1E2500BAA9F5 /* SDL.framework */,
+				6894C4E10FA188D000A52097 /* SDL_image.framework */,
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				689F33E90E6199BD00E37E9F /* GLUT.framework */,
+				689F33E70E6199B000E37E9F /* OpenGL.framework */,
+				689F33E50E61999C00E37E9F /* Python.framework */,
+				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* MakeHuman.app */,
+				685701AC1001D77F00F9C649 /* libMakeHumanDLib.dylib */,
+				6857022710031DA200F9C649 /* MakeHuman.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* MHPhoenix */ = {
+			isa = PBXGroup;
+			children = (
+				29B97315FDCFA39411CA2CEA /* C-Sources */,
+				686FD6FB0FC06D98006C12DA /* Python */,
+				68DFFDA40FC1F059009CA434 /* data */,
+				68C80AE10FE3E41D0090D1E5 /* utils */,
+				684E6D340FEE34E600941536 /* docs */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = MHPhoenix;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* C-Sources */ = {
+			isa = PBXGroup;
+			children = (
+				684E6D210FEE32BD00941536 /* OS-X */,
+				080E96DDFE201D6D7F000001 /* Main */,
+				686E5D380FA1AB5F005B137C /* sdlwrapper */,
+				686E5D340FA1AB4B005B137C /* pythonwrapper */,
+			);
+			name = "C-Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				68E6BA5210384D4400BAA9F5 /* Non Exported */,
+				68E6B88A1038137F00BAA9F5 /* icons */,
+				6869C0F510322C2800DF62C3 /* key */,
+				6859C28010178958000E212C /* SDLMain.xib */,
+				68E6BB461039619700BAA9F5 /* GeneralPreferences.xib */,
+				68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */,
+				68061C9B0FC136AB006C372E /* data */,
+				68F6D3F60E640E6A00D27961 /* AppIcon.icns */,
+				6839A7AD10179EFF008AF603 /* HelpLinks.strings */,
+				689F33190E6192CB00E37E9F /* InfoPlist.strings */,
+				689F331D0E6192CB00E37E9F /* Info.plist */,
+				6857022810031DA200F9C649 /* MakeHumanFramework-Info.plist */,
+				68E6BA1410384AF100BAA9F5 /* Localizable.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		684E6D210FEE32BD00941536 /* OS-X */ = {
+			isa = PBXGroup;
+			children = (
+				68E6B9721038439B00BAA9F5 /* Preferences */,
+				685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */,
+				687236BC0FF7F8D30048ED40 /* OSXTools.h */,
+				687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */,
+				68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */,
+				68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */,
+				68D8631E0FA5D1880097F73F /* SDLMain.h */,
+				68D8631C0FA5D1810097F73F /* SDLMain.mm */,
+			);
+			name = "OS-X";
+			sourceTree = "<group>";
+		};
+		6869C0F510322C2800DF62C3 /* key */ = {
+			isa = PBXGroup;
+			children = (
+				6869C0F810322D1100DF62C3 /* dsa_pub.pem */,
+			);
+			name = key;
+			sourceTree = "<group>";
+		};
+		686FD6FB0FC06D98006C12DA /* Python */ = {
+			isa = PBXGroup;
+			children = (
+				686944D10FCB25F1005B01DC /* mh_core */,
+				68EA2B640FC8348A0052A87E /* mh_plugins */,
+				686FD6FC0FC06DA4006C12DA /* main.py */,
+			);
+			name = Python;
+			sourceTree = "<group>";
+		};
+		68E6B88A1038137F00BAA9F5 /* icons */ = {
+			isa = PBXGroup;
+			children = (
+				68E6BBBB1039732800BAA9F5 /* folder.tiff */,
+				68E6BB1B10395B2C00BAA9F5 /* GeneralPreferences.tiff */,
+				68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */,
+			);
+			name = icons;
+			sourceTree = "<group>";
+		};
+		68E6B9721038439B00BAA9F5 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				68E6BB1610395A4D00BAA9F5 /* GeneralPreferences.h */,
+				68E6BB1710395A6600BAA9F5 /* GeneralPreferences.mm */,
+				68E6B8E2103821B500BAA9F5 /* UpdatePreferences.h */,
+				68E6B8E3103821B500BAA9F5 /* UpdatePreferences.mm */,
+				68E6B8EB10383F5400BAA9F5 /* NSPreferences.h */,
+				68E6B8EC10383F7B00BAA9F5 /* NSPreferencesModule.h */,
+				68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */,
+				68E6B3DA1036C9B100BAA9F5 /* AppPreferences.h */,
+			);
+			name = Preferences;
+			sourceTree = "<group>";
+		};
+		68E6BA5210384D4400BAA9F5 /* Non Exported */ = {
+			isa = PBXGroup;
+			children = (
+				6869C127103305C500DF62C3 /* About.pages */,
+				68F6D3F50E640E6A00D27961 /* AppIcon.psd */,
+				68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */,
+			);
+			name = "Non Exported";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		685701A81001D77F00F9C649 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6857022210031DA200F9C649 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				68570292100322C400F9C649 /* glmodule.h in Headers */,
+				68570293100322CB00F9C649 /* core.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		685701AB1001D77F00F9C649 /* MakeHumanDLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 685702001001D7EA00F9C649 /* Build configuration list for PBXNativeTarget "MakeHumanDLib" */;
+			buildPhases = (
+				685701A81001D77F00F9C649 /* Headers */,
+				685701A91001D77F00F9C649 /* Sources */,
+				685701AA1001D77F00F9C649 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MakeHumanDLib;
+			productName = MakeHumanDLib;
+			productReference = 685701AC1001D77F00F9C649 /* libMakeHumanDLib.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		6857022610031DA200F9C649 /* MakeHumanFramework */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6857022B10031DA200F9C649 /* Build configuration list for PBXNativeTarget "MakeHumanFramework" */;
+			buildPhases = (
+				6857022210031DA200F9C649 /* Headers */,
+				6857024B10031F4400F9C649 /* Copy Frameworks */,
+				6857022310031DA200F9C649 /* Resources */,
+				6857022410031DA200F9C649 /* Sources */,
+				6857022510031DA200F9C649 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MakeHumanFramework;
+			productName = MakeHumanFramework;
+			productReference = 6857022710031DA200F9C649 /* MakeHuman.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		8D1107260486CEB800E47090 /* MakeHuman */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MakeHuman" */;
+			buildPhases = (
+				6894C51A0FA1895B00A52097 /* CopyFiles */,
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+				68F6D3510E63F23400D27961 /* Copy Resources Script */,
+				6869C1771034134B00DF62C3 /* Post Release build script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MakeHuman;
+			productInstallPath = "$(HOME)/Applications";
+			productName = MHPhoenix;
+			productReference = 8D1107320486CEB800E47090 /* MakeHuman.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = MakeHuman;
+			};
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 1;
+			mainGroup = 29B97314FDCFA39411CA2CEA /* MHPhoenix */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D1107260486CEB800E47090 /* MakeHuman */,
+				685701AB1001D77F00F9C649 /* MakeHumanDLib */,
+				6857022610031DA200F9C649 /* MakeHumanFramework */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6857022310031DA200F9C649 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6869C0FA10322D1100DF62C3 /* dsa_pub.pem in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				68E6BBBC1039732800BAA9F5 /* folder.tiff in Resources */,
+				6839A7AF10179EFF008AF603 /* HelpLinks.strings in Resources */,
+				689F331E0E6192CB00E37E9F /* InfoPlist.strings in Resources */,
+				68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */,
+				686FD6FD0FC06DA4006C12DA /* main.py in Resources */,
+				6806287A0FC136C9006C372E /* data in Resources */,
+				68C80B0B0FE3E41E0090D1E5 /* utils in Resources */,
+				684E6D680FEE34E600941536 /* docs in Resources */,
+				6859C28110178958000E212C /* SDLMain.xib in Resources */,
+				6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */,
+				68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */,
+				68E6B8DF103820F500BAA9F5 /* UpdatePreferences.xib in Resources */,
+				68E6BA1610384AF100BAA9F5 /* Localizable.strings in Resources */,
+				68E6BB1C10395B2C00BAA9F5 /* GeneralPreferences.tiff in Resources */,
+				68E6BB471039619700BAA9F5 /* GeneralPreferences.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6869C1771034134B00DF62C3 /* Post Release build script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Post Release build script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "set -o errexit\n\nif [ ${USER} == \"hdusel\" ] && [ ${BUILD_STYLE} == \"Release\" ]; then \n    echo \"Executing post release build actions...\"\n\n    VERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\n    SHORTVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleShortVersionString)\n    DOWNLOAD_BASE_URL=\"http://makehuman.googlecode.com/files/\"\n    RELEASENOTES_URL=\"http://tangerine-soft.de/rss/appcasts/makehuman/release-notes-version-${SHORTVERSION}.html\"\n    \n    ARCHIVE_FILENAME=\"${PROJECT_NAME}_${SHORTVERSION}.zip\"\n    DOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\n    KEYCHAIN_PRIVKEY_NAME=\"Sparkle Private Key 1\"\n    \n    WD=$PWD\n    cd \"$BUILT_PRODUCTS_DIR\"\n    rm -f \"$PROJECT_NAME\"*.zip\n    ditto -ck --keepParent \"$PROJECT_NAME.app\" \"$ARCHIVE_FILENAME\"\n    \n    SIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\n    PUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n    \ncat <<EOF\n        <item>\n            <title>Version $VERSION</title>\n            <!--<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>-->\n            <pubDate>$PUBDATE</pubDate>\n            <enclosure\n                url=\"$DOWNLOAD_URL\"\n                sparkle:version=\"$VERSION\"\n                sparkle:shortVersionString=\"$SHORTVERSION\"\n                type=\"application/octet-stream\"\n                length=\"$SIZE\"\n                sparkle:dsaSignature=\"$SIGNATURE\"\n            />\n        </item>\nEOF\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		68F6D3510E63F23400D27961 /* Copy Resources Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Resources Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# data 3dobjs mh_plugins mh_core\n\n# Copy the data directory into the Application Folder (Resources/data)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\"\n  cp -rf \"${PROJECT_DIR}/../data\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n# Copy the data directory into the Application Folder (Resources/mh_plugins)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\"\n  cp -rf \"${PROJECT_DIR}/../mh_plugins\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_plugins\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n# Copy the data directory into the Application Folder (Resources/mh_core)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\"\n  cp -rf \"${PROJECT_DIR}/../mh_core\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/mh_core\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\n\n# Copy the data directory into the Application Folder (Resources/docs)\nif [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\" ]; then\n  mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\"\n  cp -rf \"${PROJECT_DIR}/../docs\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n  cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/docs\"\n  find . -name \"Makefile*\" -delete\n  find . -name \"*.zip\" -delete\n  find . -name \"empty.txt\" -delete\n  find . -name \".svn\" -type d | xargs rm -rf\n  find . -name \"CVS\" -type d | xargs rm -rf\n  find . -name \"*.pyc\" -delete\nfi\n\ncp -f \"${PROJECT_DIR}/../main.py\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		685701A91001D77F00F9C649 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				685701AF1001D79200F9C649 /* core.c in Sources */,
+				685701B01001D79200F9C649 /* glmodule.c in Sources */,
+				685701B11001D79200F9C649 /* main.c in Sources */,
+				685702111001D8C300F9C649 /* NSFont_OpenGL.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6857022410031DA200F9C649 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6857022C10031DE300F9C649 /* core.c in Sources */,
+				6857022D10031DE300F9C649 /* glmodule.c in Sources */,
+				6857022E10031DE300F9C649 /* main.c in Sources */,
+				6857022F10031DE300F9C649 /* NSFont_OpenGL.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				689F332E0E6193B000E37E9F /* core.c in Sources */,
+				689F332F0E6193B100E37E9F /* glmodule.c in Sources */,
+				689F33310E6193B100E37E9F /* main.c in Sources */,
+				68D8631D0FA5D1810097F73F /* SDLMain.mm in Sources */,
+				68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */,
+				687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */,
+				68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */,
+				68E6B8E4103821B500BAA9F5 /* UpdatePreferences.mm in Sources */,
+				68E6BB1810395A6600BAA9F5 /* GeneralPreferences.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		6839A7AD10179EFF008AF603 /* HelpLinks.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6839A7AE10179EFF008AF603 /* English */,
+			);
+			name = HelpLinks.strings;
+			sourceTree = "<group>";
+		};
+		689F33190E6192CB00E37E9F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				689F331A0E6192CB00E37E9F /* English */,
+			);
+			name = InfoPlist.strings;
+			path = resources/English.lproj;
+			sourceTree = "<group>";
+		};
+		68E6BA1410384AF100BAA9F5 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				68E6BA1510384AF100BAA9F5 /* English */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		685701AD1001D78000F9C649 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanDLib;
+			};
+			name = Debug;
+		};
+		685701AE1001D78000F9C649 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanDLib;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		6857022910031DA200F9C649 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INFOPLIST_FILE = "MakeHumanFramework-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHuman;
+			};
+			name = Debug;
+		};
+		6857022A10031DA200F9C649 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INFOPLIST_FILE = "MakeHumanFramework-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHuman;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = MakeHuman;
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEAD_CODE_STRIPPING = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PREBINDING = YES;
+				PRODUCT_NAME = MakeHuman;
+				STRIP_INSTALLED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = "$(EXTRA_FRAMEWORK_SEARCH_PATHS)";
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = "$(EXTRA_FRAMEWORK_SEARCH_PATHS)";
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_VERSION = 4.0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		685702001001D7EA00F9C649 /* Build configuration list for PBXNativeTarget "MakeHumanDLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				685701AD1001D78000F9C649 /* Debug */,
+				685701AE1001D78000F9C649 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6857022B10031DA200F9C649 /* Build configuration list for PBXNativeTarget "MakeHumanFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6857022910031DA200F9C649 /* Debug */,
+				6857022A10031DA200F9C649 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "MakeHuman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
