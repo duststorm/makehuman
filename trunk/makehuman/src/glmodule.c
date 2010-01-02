@@ -553,7 +553,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         SDL_FreeSurface(surface);
         PyErr_Format(PyExc_RuntimeError, "Could not load %s, unsupported pixel format", fname);
         return 0;
-
+        
     }
 
     // For some reason we need to flip the surface vertically
@@ -1476,7 +1476,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
 {
     PyObject *iterator;
     Object3D *obj;
-    
+
     if (!G.world)
     {
         return;
@@ -1564,7 +1564,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
  	                    GLchar name[32];
                       PyObject *value;
 
-                      glGetActiveUniform(obj->shader, index, 32, &length, &size, &type, name);
+                      glGetActiveUniform(obj->shader, index, sizeof(name), &length, &size, &type, name);
 
                       value = PyDict_GetItemString(obj->shaderParameters, name);
 
@@ -1876,6 +1876,18 @@ void mhEventLoop(void)
         SDL_Event event;
         SDL_WaitEvent(&event);
 
+        /* On OS-X SDL continuously posts events even when a native dialog or
+         * Window is opened. So if the ActiveWindow (focused Window) is not
+         * the main window then cancel the SDL Event.
+         */
+#ifdef __APPLE__
+        extern int isMainWindowActive(); // Defined in SDLMain.mm
+
+        // Consider this event only if the main window is active.
+        if (!isMainWindowActive())
+            continue;
+#endif /* __APPLE__ */
+        
         switch (event.type)
         {
         case SDL_ACTIVEEVENT:

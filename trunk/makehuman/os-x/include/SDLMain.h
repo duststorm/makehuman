@@ -22,6 +22,7 @@ extern "C" {
     bool licenseWindowVisible;
 
     IBOutlet NSPanel *mAboutPanel;
+    IBOutlet NSPanel *mLicensePanel;
     IBOutlet NSPanel *mAcknowlegmentPanel;
     IBOutlet NSPanel *mPreferencesPanel;
     IBOutlet NSUserDefaultsController *mUserDefaults;
@@ -51,5 +52,6 @@ extern "C" {
 -(IBAction)showAbout:(id)inSender;
 -(IBAction)showAcknowledgments:(id)inSender;
 -(IBAction)showPreferences:(id)inSender;
+-(IBAction)showLicensing:(id)inSender;
 
 @end

@@ -123,6 +123,11 @@ static NSString *getApplicationName(void)
     [mAcknowlegmentPanel makeKeyAndOrderFront:self];
 }
 
+-(IBAction)showLicensing:(id)inSender;
+{
+    [mLicensePanel makeKeyAndOrderFront:self];
+}
+
 -(IBAction)showPreferences:(id)inSender
 {
 	[NSPreferences setDefaultPreferencesClass: [AppPreferences class]];
@@ -167,8 +172,10 @@ static NSString *getApplicationName(void)
         char parentdir[MAXPATHLEN];
 		CFURLRef url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 		CFURLRef url2 = CFURLCreateCopyDeletingLastPathComponent(0, url);
-		if (CFURLGetFileSystemRepresentation(url2, true, (UInt8 *)parentdir, MAXPATHLEN)) {
-	        assert ( chdir (parentdir) == 0 );   /* chdir to the binary app's parent */
+		if (CFURLGetFileSystemRepresentation(url2, true, (UInt8 *)parentdir, MAXPATHLEN)) 
+        {
+            int rc = chdir (parentdir);
+	        assert (rc == 0 );   /* chdir to the binary app's parent */
 		}
 		CFRelease(url);
 		CFRelease(url2);
@@ -362,6 +369,23 @@ static void CustomApplicationMain (int argc, char **argv)
     return TRUE;
 }
 
+extern "C" int isMainWindowActive();
+// Check weather the current focus window is the main window
+int isMainWindowActive()
+{
+    const NSWindow *keyWin  = [NSApp keyWindow];
+
+    // is the key window valid?
+    if (keyWin == NULL)
+        return false; // No? then The Mian Window is not the active one.
+    
+    // Get the Key Windows title
+    const NSString *title = [keyWin title];
+
+    // The MainWindow is active only if the key window is the MainWindow 
+    // (whose title is "MakeHuman").
+    return ([title compare:@"MakeHuman"] == NSOrderedSame);
+}
 
 /* Called when the internal event loop has just started running */
 - (void) applicationDidFinishLaunching: (NSNotification *) note

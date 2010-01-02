@@ -59,7 +59,8 @@ int adjustWorkingDir(const char* inAppAbsPath)
         strcpy(currwd, tmp_currwd);
         strcpy(&currwd[len1], appStr);
 
-        chdir(currwd); // And change the current working dir to this path
+        int rc = chdir(currwd); // And change the current working dir to this path
+        assert(0 == rc);
         free(currwd);  // Release the memory again
         return 0; // indicate success
     }
