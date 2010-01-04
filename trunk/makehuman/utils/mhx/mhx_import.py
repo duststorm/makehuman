@@ -1025,7 +1025,7 @@ def insertInfluenceIpo(cns, bone, xmax):
 	if bone != 'PArmIK_L' and bone != 'PArmIK_R' and bone != 'PLegIK_L' and bone != 'PLegIK_R':
 		#print "Skipped ", bone
 		return False
-
+	'''
 	cns.influence = 0.0
 	cns.insertKey(0)
 	cns.influence = 1.0
@@ -1042,6 +1042,18 @@ def insertInfluenceIpo(cns, bone, xmax):
 	icu.driverChannel = IpoCurve.LOC_X
 	icu.extend = 0
 	icu.interpolation = 1
+	'''
+	if bone == 'PArmIK_L' or bone == 'PArmIK_R':
+		if toggleArmIK:
+			cns.influence = 1.0
+		else:
+			cns.influence = 0.0
+	elif bone == 'PLegIK_L' or bone == 'PLegIK_R':
+		if toggleLegIK:
+			cns.influence = 1.0
+		else:
+			cns.influence = 0.0
+
 	return True
 
 	
@@ -1372,10 +1384,10 @@ def button_event(evt):
 		toggleShape = 1 - toggleShape
 	elif evt == 2:
 		toggleFace = 1 - toggleFace
-	#if evt == 1:
-	#	toggleArmIK = 1 - toggleArmIK
-	#elif evt == 2:
-	#	toggleLegIK = 1 - toggleLegIK
+	elif evt == 11:
+		toggleArmIK = 1 - toggleArmIK
+	elif evt == 12:
+		toggleLegIK = 1 - toggleLegIK
 	elif evt == 3:
 		toggleFingerIK = 1 - toggleFingerIK
 	elif evt == 4:
@@ -1394,7 +1406,7 @@ def button_event(evt):
 	Draw.Redraw(-1)
 
 def gui():
-	global b1, b2, b3, b4, b5, b6, b7, b8, b9
+	global b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11
 	global t1, t2, t3, t4
 
 	BGL.glClearColor(0,0,1,1)
@@ -1412,8 +1424,8 @@ def gui():
 
 	b2 = Draw.Toggle("Body shapes", 1, 10, 110, 90, 20, toggleShape,"Load body shape keys")
 	b3 = Draw.Toggle("Facial shapes", 2, 110, 110, 90, 20, toggleFace,"Load facial shape keys")
-	#b = Draw.Toggle("Arm IK", 1, 10, 110, 90, 20, toggleArmIK,"Arm IK")
-	#b = Draw.Toggle("Leg IK", 2, 110, 110, 90, 20, toggleLegIK,"Leg IK")
+	b10 = Draw.Toggle("Arm IK", 11, 310, 110, 90, 20, toggleArmIK,"Arm IK")
+	b11 = Draw.Toggle("Leg IK", 12, 310, 80, 90, 20, toggleLegIK,"Leg IK")
 	b4 = Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Finger IK")
 	b1 = Draw.Toggle("Rot90", 10, 10, 80, 90, 20, toggleRot90,"Rotate mesh 90 degrees (Z up)")
 	b6 = Draw.Toggle("Replace scene", 5, 110, 80, 90, 20, toggleReplace,"Delete old scene")

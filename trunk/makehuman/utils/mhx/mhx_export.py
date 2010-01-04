@@ -444,13 +444,10 @@ mTexList = [\
 #
 #
 
-def exportFileName(file, fp):
-	(filepath, filename) = os.path.split(file)
-	fp.write("    filename %s ;\n" % (file))
-	
 def exportImage(img, fp):
 	fp.write("  image %s\n" % img.name)
-	exportFileName(img.filename, fp)
+	(filepath, filename) = os.path.split(img.filename)
+	fp.write("    filename %s ;\n" % (filename))
 	if not toggleGeoOnly:
 		writeList("img", imageList, fp, 2, globals(), locals())
 	fp.write("  end image\n")
