@@ -1023,6 +1023,7 @@ void UpdatePickingBuffer(void)
   // Make sure the data is 1 byte aligned
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
   glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
   // Turn on antialiasing
   glEnable (GL_BLEND);
