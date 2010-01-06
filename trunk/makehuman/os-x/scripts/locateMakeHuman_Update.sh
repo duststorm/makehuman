@@ -44,7 +44,7 @@ if [ -e ${MH_MODELS} ]; then
 fi
 
 # ...and set the permissions to grant users access.
-chown -R ${USER}:${USER} ${MH_DOCS_BASE}
+chown -R ${USER} ${MH_DOCS_BASE}
 
 #finally erase the old app
 rm -rf ${MAKEHUMAN_BASE}
