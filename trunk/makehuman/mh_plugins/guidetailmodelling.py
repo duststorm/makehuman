@@ -337,7 +337,7 @@ class DetailModelingTaskView(gui3d.TaskView):
       self.app.do(GenitalsAction(human, value, self.syncSliders))
       
     self.breastCupSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_cup.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 160, 9.2], value = 0.0,
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 160, 9.2], value = 5.0,
       min = 1, max = 8)
     
     @self.breastCupSlider.event
