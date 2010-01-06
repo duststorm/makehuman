@@ -336,14 +336,34 @@ class DetailModelingTaskView(gui3d.TaskView):
       human = self.app.scene3d.selectedHuman
       self.app.do(GenitalsAction(human, value, self.syncSliders))
       
+    self.breastCupSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_cup.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 160, 9.2], value = 0.0,
+      min = 1, max = 8)
+    
+    @self.breastCupSlider.event
+    def onChange(value):
+      human = self.app.scene3d.selectedHuman
+      human.SetBreastCup(value)
+      human.applyAllTargets(self.app.progress)
+      
+    self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_firmness.png"),
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 260, 9.2], value = 0.5,
+      min = 0, max = 1)
+      
+    @self.breastFirmnessSlider.event
+    def onChange(value):
+      human = self.app.scene3d.selectedHuman
+      human.SetBreastFirmness(value)
+      human.applyAllTargets(self.app.progress)
+      
     self.detailButtonGroup = []
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_muscle.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 160, 9],
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 360, 9],
       selected = True)
     self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_weight.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 260, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 460, 9])
       
     self.tool = DetailTool(self.app, False, "_flaccid", "_muscle")
       

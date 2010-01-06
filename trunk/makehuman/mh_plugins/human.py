@@ -30,6 +30,7 @@ import files3d
 import os
 import mh
 import humanmodifier
+import math
 
 class Human(gui3d.Object):
     
@@ -75,6 +76,8 @@ class Human(gui3d.Object):
         self.overweightVal = 0.0
         self.underweightVal = 0.0
         self.genitals = 0.0
+        self.breastCup = 5
+        self.breastFirmness = 0.5
         self.bodyZones =  ["eye","jaw","nose","mouth","head","neck","torso",\
                         "hip","pelvis","r-upperarm","l-upperarm","r-lowerarm",\
                         "l-lowerarm","l-hand", "r-hand", "r-upperleg","l-upperleg",\
@@ -322,6 +325,12 @@ class Human(gui3d.Object):
         
     def getGenitals(self):
         return self.genitals
+        
+    def SetBreastCup(self, value):
+        self.breastCup = math.floor(value)
+        
+    def SetBreastFirmness(self, value):
+        self.breastFirmness = min(1.0, max(0.0, value))
             
     def setEthnic(self, ethnic, value):
         modified = None
@@ -477,6 +486,28 @@ class Human(gui3d.Object):
         detailTargets[self.targetMaleGenitalsChild]= self.genitals*self.childVal*self.maleVal
         detailTargets[self.targetMaleGenitalsYoung]= self.genitals*self.youngVal*self.maleVal
         detailTargets[self.targetMaleGenitalsOld]= self.genitals*self.oldVal*self.maleVal
+        
+        breastCup = [0 for i in xrange(8)]
+        for i in xrange(8):
+          if self.breastCup == i + 1:
+            breastCup[i] = 1
+        
+        detailTargets["data/targets/details/neutral_female-young-cup1-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[0]
+        detailTargets["data/targets/details/neutral_female-young-cup1-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[0]
+        detailTargets["data/targets/details/neutral_female-young-cup2-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[1]
+        detailTargets["data/targets/details/neutral_female-young-cup2-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[1]
+        detailTargets["data/targets/details/neutral_female-young-cup3-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[2]
+        detailTargets["data/targets/details/neutral_female-young-cup3-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[2]
+        detailTargets["data/targets/details/neutral_female-young-cup4-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[3]
+        detailTargets["data/targets/details/neutral_female-young-cup4-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[3]
+        detailTargets["data/targets/details/neutral_female-young-cup5-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[4]
+        detailTargets["data/targets/details/neutral_female-young-cup5-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[4]
+        detailTargets["data/targets/details/neutral_female-young-cup6-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[5]
+        detailTargets["data/targets/details/neutral_female-young-cup6-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[5]
+        detailTargets["data/targets/details/neutral_female-young-cup7-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[6]
+        detailTargets["data/targets/details/neutral_female-young-cup7-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[6]
+        detailTargets["data/targets/details/neutral_female-young-cup8-firmness0.target"] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[7]
+        detailTargets["data/targets/details/neutral_female-young-cup8-firmness1.target"] = self.youngVal*self.femaleVal*self.breastFirmness*breastCup[7]
         
         for k, v in detailTargets.iteritems():
             if v != 0.0:         
@@ -725,12 +756,12 @@ class Human(gui3d.Object):
             prefix1 = "r-"
             prefix2 = "l-"
 
-        for target in self.targetsDetailStack.keys():
+        for k, v in self.targetsDetailStack.iteritems():
             targetName = os.path.basename(target)
             #Reset previous targets on symm side
             if targetName[:2] == prefix2:
-                algos3d.loadTranslationTarget(self.meshData, target, -self.targetsDetailStack[target],None,1,0)
-                self.targetsDetailStack[target] = 0
+                algos3d.loadTranslationTarget(self.meshData, target, -v,None,1,0)
+                self.targetsDetailStack[k] = 0
 
         #Apply symm target. For horiz movement the value must ve inverted
         for target in self.targetsDetailStack.keys():
