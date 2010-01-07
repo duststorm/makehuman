@@ -488,12 +488,11 @@ class Human(gui3d.Object):
         detailTargets[self.targetMaleGenitalsOld]= self.genitals*self.oldVal*self.maleVal
         
         breastCup = [0 for i in xrange(0, 9)]
-        for i in xrange(1, 9):
-          if math.floor(self.breastCup) == i:
-            value = self.breastCup - i
-            breastCup[i] = 1 - value;
-            if i < 8:
-              breastCup[i+1] = value;
+        i = int(math.floor(self.breastCup))
+        value = self.breastCup - i
+        breastCup[i] = 1 - value;
+        if i < 8:
+          breastCup[i+1] = value;
         
         for i in xrange(1, 9):
           detailTargets["data/targets/details/neutral_female-young-cup%i-firmness0.target"%(i)] = self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
