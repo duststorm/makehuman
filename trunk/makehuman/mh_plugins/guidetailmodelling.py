@@ -329,7 +329,8 @@ class DetailModelingTaskView(gui3d.TaskView):
     self.tool = None
     
     self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_genitals.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 60, 9.2], value = 0.0)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 60, 9.2], value = 0.0,
+      min = -1.0, max = 1.0)
     
     @self.genitalsSlider.event
     def onChange(value):
@@ -359,11 +360,11 @@ class DetailModelingTaskView(gui3d.TaskView):
     self.detailButtonGroup = []
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_muscle.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 360, 9],
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 300, 9],
       selected = True)
     self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_weight.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 460, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 380, 9])
       
     self.tool = DetailTool(self.app, False, "_flaccid", "_muscle")
       

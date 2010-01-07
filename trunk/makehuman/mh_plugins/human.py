@@ -312,7 +312,7 @@ class Human(gui3d.Object):
       
     def setGenitals(self, value):
         """
-        Sets the amount of genitals of the model. 0 for none, 1 for pronounced.
+        Sets the amount of genitals of the model. -1 for female, 0 for none, 1 for male.
         
         Parameters
         ----------
@@ -321,7 +321,7 @@ class Human(gui3d.Object):
             *float*. An amount, usually between 0 and 1, specifying how much
             of the attribute to apply.
         """  
-        self.genitals = min(max(value, 0.0), 1.0)
+        self.genitals = min(max(value, -1.0), 1.0)
         
     def getGenitals(self):
         return self.genitals
@@ -480,12 +480,14 @@ class Human(gui3d.Object):
             
         detailTargets = {}
         
-        detailTargets[self.targetFemaleGenitalsChild]= self.genitals*self.childVal*self.femaleVal
-        detailTargets[self.targetFemaleGenitalsYoung]= self.genitals*self.youngVal*self.femaleVal
-        detailTargets[self.targetFemaleGenitalsOld]= self.genitals*self.oldVal*self.femaleVal
-        detailTargets[self.targetMaleGenitalsChild]= self.genitals*self.childVal*self.maleVal
-        detailTargets[self.targetMaleGenitalsYoung]= self.genitals*self.youngVal*self.maleVal
-        detailTargets[self.targetMaleGenitalsOld]= self.genitals*self.oldVal*self.maleVal
+        maleGenitals = max(0.0, self.genitals)
+        femaleGenitals = -min(0.0, self.genitals)
+        detailTargets[self.targetFemaleGenitalsChild] = femaleGenitals*self.childVal
+        detailTargets[self.targetFemaleGenitalsYoung] = femaleGenitals*self.youngVal
+        detailTargets[self.targetFemaleGenitalsOld] = femaleGenitals*self.oldVal
+        detailTargets[self.targetMaleGenitalsChild] = maleGenitals*self.childVal
+        detailTargets[self.targetMaleGenitalsYoung] = maleGenitals*self.youngVal
+        detailTargets[self.targetMaleGenitalsOld] = maleGenitals*self.oldVal
         
         breastCup = [0 for i in xrange(0, 9)]
         i = int(math.floor(self.breastCup))
