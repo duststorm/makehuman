@@ -1428,6 +1428,8 @@ void mhCameraPosition(Camera *camera, int eye)
           eyePosition = -0.5 * camera->eyeSeparation;
         else if (eye == 2) // Right
           eyePosition = 0.5 * camera->eyeSeparation;
+        else
+          eyePosition = 0.0;
 
         left -= eyePosition * camera->nearPlane / camera->zoom;
         right -= eyePosition * camera->nearPlane / camera->zoom;
