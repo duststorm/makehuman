@@ -509,8 +509,14 @@ class Human(gui3d.Object):
           detailTargets["data/targets/details/female-young-flaccid-cup%i-firmness0.target"%(i)] = self.flaccidVal*averageWeightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
           detailTargets["data/targets/details/female-young-flaccid-cup%i-firmness1.target"%(i)] = self.flaccidVal*averageWeightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
         
+          detailTargets["data/targets/details/female-young-light-cup%i-firmness0.target"%(i)] = averageToneVal*self.underweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
+          detailTargets["data/targets/details/female-young-light-cup%i-firmness1.target"%(i)] = averageToneVal*self.underweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+        
           detailTargets["data/targets/details/female-young-heavy-cup%i-firmness0.target"%(i)] = averageToneVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
           detailTargets["data/targets/details/female-young-heavy-cup%i-firmness1.target"%(i)] = averageToneVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+        
+          detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness0.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
+          detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness1.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
         
         for k, v in detailTargets.iteritems():
             if v != 0.0:         
