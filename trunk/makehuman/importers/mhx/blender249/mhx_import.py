@@ -60,6 +60,7 @@ MINOR_VERSION = 3
 
 toggleArmIK = 0
 toggleLegIK = 0
+toggleFKIK = 0
 toggleFingerIK = 0
 toggleDispObs = 1
 toggleReplace = 1
@@ -1025,25 +1026,24 @@ def insertInfluenceIpo(cns, bone, xmax):
 	if bone != 'PArmIK_L' and bone != 'PArmIK_R' and bone != 'PLegIK_L' and bone != 'PLegIK_R':
 		#print "Skipped ", bone
 		return False
-	'''
-	cns.influence = 0.0
-	cns.insertKey(0)
-	cns.influence = 1.0
-	cns.insertKey(1)
-	ipo = Ipo.Get()[-1]
-	icu = ipo[Ipo.CO_INF]
-	#print bone, ipo, icu
-	icu.driver = 1
-	icu.driverObject = getObject('HumanRig', 'icu.driverObject', globals(), locals())
-	try:
-		icu.driverBone = bone
-	except:
-		Draw.PupMenu("MHX only works with Blender 2.49b")
-	icu.driverChannel = IpoCurve.LOC_X
-	icu.extend = 0
-	icu.interpolation = 1
-	'''
-	if bone == 'PArmIK_L' or bone == 'PArmIK_R':
+
+	if toggleFKIK:
+		cns.influence = 0.0
+		cns.insertKey(0)
+		cns.influence = 1.0
+		cns.insertKey(1)
+		ipo = Ipo.Get()[-1]
+		icu = ipo[Ipo.CO_INF]
+		icu.driver = 1
+		icu.driverObject = getObject('HumanRig', 'icu.driverObject', globals(), locals())
+		try:
+			icu.driverBone = bone
+		except:
+			Draw.PupMenu("MHX only works with Blender 2.49b")
+		icu.driverChannel = IpoCurve.LOC_X
+		icu.extend = 0
+		icu.interpolation = 1
+	elif bone == 'PArmIK_L' or bone == 'PArmIK_R':
 		if toggleArmIK:
 			cns.influence = 1.0
 		else:
@@ -1377,7 +1377,7 @@ def event(evt, val):
 	Draw.Redraw(-1)
 
 def button_event(evt): 
-	global toggleArmIK, toggleLegIK, toggleFingerIK, toggleDispObs
+	global toggleArmIK, toggleLegIK, toggleFKIK, toggleFingerIK, toggleDispObs
 	global toggleReplace, toggleShape, toggleFace, toggleRot90
 	global TexDir
 	if evt == 1:
@@ -1388,6 +1388,8 @@ def button_event(evt):
 		toggleArmIK = 1 - toggleArmIK
 	elif evt == 12:
 		toggleLegIK = 1 - toggleLegIK
+	elif evt == 13:
+		toggleFKIK = 1 - toggleFKIK
 	elif evt == 3:
 		toggleFingerIK = 1 - toggleFingerIK
 	elif evt == 4:
@@ -1406,7 +1408,7 @@ def button_event(evt):
 	Draw.Redraw(-1)
 
 def gui():
-	global b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11
+	global b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12
 	global t1, t2, t3, t4
 
 	BGL.glClearColor(0,0,1,1)
@@ -1424,9 +1426,10 @@ def gui():
 
 	b2 = Draw.Toggle("Body shapes", 1, 10, 110, 90, 20, toggleShape,"Load body shape keys")
 	b3 = Draw.Toggle("Facial shapes", 2, 110, 110, 90, 20, toggleFace,"Load facial shape keys")
-	b10 = Draw.Toggle("Arm IK", 11, 310, 110, 90, 20, toggleArmIK,"Arm IK")
-	b11 = Draw.Toggle("Leg IK", 12, 310, 80, 90, 20, toggleLegIK,"Leg IK")
-	b4 = Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Finger IK")
+	b10 = Draw.Toggle("Arm IK", 11, 310, 110, 90, 20, toggleArmIK,"Toggle arm IK")
+	b11 = Draw.Toggle("Leg IK", 12, 310, 80, 90, 20, toggleLegIK,"Toggle leg IK")
+	b12 = Draw.Toggle("FK/IK switch", 13, 310, 50, 90, 20, toggleFKIK,"Toggle FK/IK switch")
+	b4 = Draw.Toggle("Finger IK", 3, 210, 110, 90, 20, toggleFingerIK,"Toggle finger IK")
 	b1 = Draw.Toggle("Rot90", 10, 10, 80, 90, 20, toggleRot90,"Rotate mesh 90 degrees (Z up)")
 	b6 = Draw.Toggle("Replace scene", 5, 110, 80, 90, 20, toggleReplace,"Delete old scene")
 	b5 = Draw.Toggle("Display objs", 4, 210, 80, 90, 20, toggleDispObs,"Display objects")
