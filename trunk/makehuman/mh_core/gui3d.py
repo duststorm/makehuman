@@ -221,8 +221,8 @@ class TaskView(View):
     self.focusWidget = None
     
     # The button is attached to the parent, as it stays visible when the category is hidden
-    self.button = Object(self.parent, "data/3dobjs/button_standard.obj",
-      texture = texture, position = [50 + len(self.parent.tasks) * 80, 60.0, 9.2])
+    self.button = Object(self.parent, "data/3dobjs/button_standard_big.obj",
+      texture = texture, position = [50 + len(self.parent.tasks) * 70, 45.0, 9.2])
       
     if name in category.tasksByName:
       raise KeyError("The task with this name already exists", name)
@@ -261,7 +261,7 @@ class Category(View):
     
     # The button is attached to the parent, as it stays visible when the category is hidden
     self.button = Object(self.parent, "data/3dobjs/button_standard_big.obj",
-      position = [50 + len(self.app.categories) * 80, 20.0, 9.1], texture = texture)
+      position = [50 + len(self.app.categories) * 70, 15.0, 9.1], texture = texture)
       
     if name in parent.categories:
       raise KeyError("The category with this name already exists", name)
@@ -515,11 +515,11 @@ class Slider(View):
     self.background = Object(self, "data/3dobjs/slider_background.obj",
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/slider_cursor.obj",
-      texture = sliderTexture, position = [position[0], position[1] + 35, position[2] + 0.01])
+      texture = sliderTexture, position = [position[0], position[1] + 32, position[2] + 0.01])
     self.sliderTexture = sliderTexture
     self.focusedSliderTexture = focusedSliderTexture
     self.sliderMinX = position[0] + 18;
-    self.sliderMaxX = position[0] + 122;
+    self.sliderMaxX = position[0] + 110;
     self.min = min
     self.max = max
     self.setValue(value)

@@ -43,7 +43,7 @@ class EthnicAction:
       return True
 
 class EthnicMapButton(gui3d.RadioButton):
-  def __init__(self, group, parent, mesh = "data/3dobjs/button_gender.obj", texture = None,
+  def __init__(self, group, parent, mesh = "data/3dobjs/button_standard.obj", texture = None,
     selectedTexture = None, position = [0, 0, 9], selected = False):
     gui3d.RadioButton.__init__(self, group, parent, mesh, texture, selectedTexture, position, selected)
     self.button.setRotation([180, 0, 0])
