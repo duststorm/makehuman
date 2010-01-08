@@ -94,7 +94,7 @@ class MHApplication(gui3d.Application):
 
     gui3d.Object(self, "data/3dobjs/upperbar.obj", self.getThemeResource("images", "upperbar.png"), [0, 0, 9])
     gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -89.99])
-    gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, 550, 9])
+    gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, 30, 9])
 
     self.progressBar.setProgress(0.3)
 

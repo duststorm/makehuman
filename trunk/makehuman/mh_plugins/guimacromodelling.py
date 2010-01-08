@@ -117,19 +117,19 @@ class MacroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Macro modelling", category.app.getThemeResource("images", "macro.png"))
     
-    self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [180, 60, 9])
+    self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [180, 90, 9])
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_gender_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 60, 9.2], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 90, 9.3], value = 0.5)
     self.ageSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_age_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 160, 9.01], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 190, 9.01], value = 0.5)
     self.muscleSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_muscle_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 260, 9.02], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 290, 9.02], value = 0.5)
     self.weightSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_weight_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 360, 9.03], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 390, 9.03], value = 0.5)
     self.heightSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_height_macro.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 460, 9.04], value = 0.5)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 490, 9.04], value = 0.5)
       
     @self.genderSlider.event
     def onChange(value):

@@ -222,7 +222,7 @@ class TaskView(View):
     
     # The button is attached to the parent, as it stays visible when the category is hidden
     self.button = Object(self.parent, "data/3dobjs/button_standard.obj",
-      texture = texture, position = [50 + len(self.parent.tasks) * 80, 600.0 - 17.0, 9.1])
+      texture = texture, position = [50 + len(self.parent.tasks) * 80, 60.0, 9.2])
       
     if name in category.tasksByName:
       raise KeyError("The task with this name already exists", name)
@@ -237,7 +237,7 @@ class TaskView(View):
   def onShow(self, event):
     #print("onShow", self.name, event)
     pos = self.button.getPosition()
-    pos[1] -= 10.0
+    pos[1] += 10.0
     self.button.setPosition(pos)
     self.button.setScale(1.5)
     self.show()
@@ -245,7 +245,7 @@ class TaskView(View):
   def onHide(self, event):
     #print("onHide", self.name, event)
     pos = self.button.getPosition()
-    pos[1] += 10.0
+    pos[1] -= 10.0
     self.button.setPosition(pos)
     self.button.setScale(1.0)
     self.hide()
@@ -782,11 +782,11 @@ class FileEntryView(View):
   def __init__(self, parent):
     View.__init__(self, parent)
     
-    Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 0.30, 9])
-    Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [200, 80, 5.5])
-    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [210, 95, 5.6])
+    Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 30.30, 9.4])
+    Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [200, 110, 9.5])
+    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [210, 125, 9.6])
     self.bConfirm = Object(self, mesh = "data/3dobjs/button_confirm.obj",
-      texture = self.app.getThemeResource("images", "button_confirm.png"), position = [610, 70, 9.1])
+      texture = self.app.getThemeResource("images", "button_confirm.png"), position = [610, 100, 9.1])
     self.text = ""
     
     @self.bConfirm.event

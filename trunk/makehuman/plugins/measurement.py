@@ -8,7 +8,7 @@ class MeasurementTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, "Example", category.app.getThemeResource("images", "button_measure.png"))
         gui3d.Object(self, "data/3dobjs/background.obj", position = [400, 300, -89.98])
-        self.measureList = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 70, 8.04])
+        self.measureList = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 100, 9.4])
         self.measureList.setText("");
         
         human = self.app.scene3d.selectedHuman
@@ -17,12 +17,86 @@ class MeasurementTaskView(gui3d.TaskView):
         self.heightModifier = humanmodifier.Modifier(human, "data/targets/macrodetails/universal-stature-dwarf.target",
           "data/targets/macrodetails/universal-stature-giant.target")
         
+        # Height    
+        self.statureSlider = gui3d.Slider(self,
+            self.app.getThemeResource("images", "button_stature.png"),
+            self.app.getThemeResource("images", "slider.png"),
+            self.app.getThemeResource("images", "slider_focused.png"),
+            position=[10, 190, 8.04],
+            # We want the slider to start from the middle
+            value=0.0, min = -1.0, max = 1.0)
+
+        @self.statureSlider.event
+        def onChange(value):
+          human = self.app.scene3d.selectedHuman
+          before = {}
+          before["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
+          before["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
+          self.heightModifier.setValue(value)
+          after = {}
+          after["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
+          after["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
+          self.app.did(humanmodifier.Action(human, before, after, self.syncSliders))
+          human.applyAllTargets(self.app.progress)
+          self.measureList.setText(self.ruler.getMeasurementsString());
+
+        self.ruler = Ruler(category.app.scene3d.selectedHuman)
+        self.measureList.setText(self.ruler.getMeasurementsString());
+        
+        # Chest
+        self.chestGirthSlider = self.chestGirthSlider = gui3d.Slider(self,
+            self.app.getThemeResource("images", "button_chest_girth.png"),
+            self.app.getThemeResource("images", "slider.png"),
+            self.app.getThemeResource("images", "slider_focused.png"),
+            position=[10, 290, 8.04],
+            # We want the slider to start from the middle
+            value=0.5, min = 0.0, max = 1.0)
+
+        #self.chestGirthLabel = gui3d.TextView(self,
+        #    mesh="data/3dobjs/empty.obj",
+        #    position=[10, 290, 8.04])
+
+        @self.chestGirthSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            #self.chestGirthLabel.setText("Value is %f" % (value))
+            modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-horiz-decr.target",
+                 "data/targets/details/torso-scale-horiz-incr.target")
+            modifier.setValue(value )
+            modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-depth-decr.target",
+                 "data/targets/details/torso-scale-depth-incr.target")
+            modifier.setValue(value)
+            human.applyAllTargets(self.app.progress)
+            self.measureList.setText(self.ruler.getMeasurementsString());
+            
+        # Waist
+        self.waistGirthSlider = gui3d.Slider(self,
+            self.app.getThemeResource("images", "button_waist_girth.png"),
+            self.app.getThemeResource("images", "slider.png"),
+            self.app.getThemeResource("images", "slider_focused.png"),
+            position=[10, 390, 9.04],
+            # We want the slider to start from the middle
+            value=0.0, min = -1.0, max = 1.0)
+
+        #self.waistGirthLabel = gui3d.TextView(self,
+        #    mesh="data/3dobjs/empty.obj",
+        #    position=[10, 390, 8.04])
+        #self.waistGirthLabel.setText("Value is 0.5")
+
+        @self.waistGirthSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            #self.chestGirthLabel.setText("Value is %f" % (value))
+            self.waistModifier.setValue(value)
+            human.applyAllTargets(self.app.progress)
+            self.measureList.setText(self.ruler.getMeasurementsString());
+            
         # Hips
         self.hipGirthSlider = gui3d.Slider(self,
             self.app.getThemeResource("images", "button_hip_girth.png"),
             self.app.getThemeResource("images", "slider.png"),
             self.app.getThemeResource("images", "slider_focused.png"),
-            position=[10, 460, 9.04],
+            position=[10, 490, 9.04],
             #  We want the slider to start from the middle
             value=0.5, min = 0.0, max = 1.0)
         @self.hipGirthSlider.event
@@ -44,82 +118,8 @@ class MeasurementTaskView(gui3d.TaskView):
     
         #self.hipGirthLabel = gui3d.TextView(self,
         #    mesh="data/3dobjs/empty.obj",
-        #    position=[10, 460, 8.04])
+        #    position=[10, 490, 8.04])
         #self.hipGirthLabel.setText("Value is 0.5")
-
-        # Waist
-        self.waistGirthSlider = gui3d.Slider(self,
-            self.app.getThemeResource("images", "button_waist_girth.png"),
-            self.app.getThemeResource("images", "slider.png"),
-            self.app.getThemeResource("images", "slider_focused.png"),
-            position=[10, 360, 9.04],
-            # We want the slider to start from the middle
-            value=0.0, min = -1.0, max = 1.0)
-
-        #self.waistGirthLabel = gui3d.TextView(self,
-        #    mesh="data/3dobjs/empty.obj",
-        #    position=[10, 360, 8.04])
-        #self.waistGirthLabel.setText("Value is 0.5")
-
-        @self.waistGirthSlider.event
-        def onChange(value):
-            human = self.app.scene3d.selectedHuman
-            #self.chestGirthLabel.setText("Value is %f" % (value))
-            self.waistModifier.setValue(value)
-            human.applyAllTargets(self.app.progress)
-            self.measureList.setText(self.ruler.getMeasurementsString());
-
-        # Chest
-        self.chestGirthSlider = self.chestGirthSlider = gui3d.Slider(self,
-            self.app.getThemeResource("images", "button_chest_girth.png"),
-            self.app.getThemeResource("images", "slider.png"),
-            self.app.getThemeResource("images", "slider_focused.png"),
-            position=[10, 260, 8.04],
-            # We want the slider to start from the middle
-            value=0.5, min = 0.0, max = 1.0)
-
-        #self.chestGirthLabel = gui3d.TextView(self,
-        #    mesh="data/3dobjs/empty.obj",
-        #    position=[10, 260, 8.04])
-
-        @self.chestGirthSlider.event
-        def onChange(value):
-            human = self.app.scene3d.selectedHuman
-            #self.chestGirthLabel.setText("Value is %f" % (value))
-            modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-horiz-decr.target",
-                 "data/targets/details/torso-scale-horiz-incr.target")
-            modifier.setValue(value )
-            modifier = humanmodifier.Modifier(human, "data/targets/details/torso-scale-depth-decr.target",
-                 "data/targets/details/torso-scale-depth-incr.target")
-            modifier.setValue(value)
-            human.applyAllTargets(self.app.progress)
-            self.measureList.setText(self.ruler.getMeasurementsString());
-            
-        # Height    
-        self.statureSlider = gui3d.Slider(self,
-            self.app.getThemeResource("images", "button_stature.png"),
-            self.app.getThemeResource("images", "slider.png"),
-            self.app.getThemeResource("images", "slider_focused.png"),
-            position=[10, 160, 8.04],
-            # We want the slider to start from the middle
-            value=0.0, min = -1.0, max = 1.0)
-
-        @self.statureSlider.event
-        def onChange(value):
-          human = self.app.scene3d.selectedHuman
-          before = {}
-          before["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
-          before["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
-          self.heightModifier.setValue(value)
-          after = {}
-          after["data/targets/macrodetails/universal-stature-dwarf.target"] = human.getDetail("data/targets/macrodetails/universal-stature-dwarf.target")
-          after["data/targets/macrodetails/universal-stature-giant.target"] = human.getDetail("data/targets/macrodetails/universal-stature-giant.target")
-          self.app.did(humanmodifier.Action(human, before, after, self.syncSliders))
-          human.applyAllTargets(self.app.progress)
-          self.measureList.setText(self.ruler.getMeasurementsString());
-
-        self.ruler = Ruler(category.app.scene3d.selectedHuman)
-        self.measureList.setText(self.ruler.getMeasurementsString());
 
     def onShow(self, event):
     # When the task gets shown, set the focus to the file entry

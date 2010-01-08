@@ -329,7 +329,7 @@ class DetailModelingTaskView(gui3d.TaskView):
     self.tool = None
     
     self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_genitals.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 60, 9.2], value = 0.0,
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 90, 9.3], value = 0.0,
       min = -1.0, max = 1.0)
     
     @self.genitalsSlider.event
@@ -338,7 +338,7 @@ class DetailModelingTaskView(gui3d.TaskView):
       self.app.do(GenitalsAction(human, value, self.syncSliders))
       
     self.breastCupSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_cup.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 160, 9.2], value = 5.0,
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 190, 9.2], value = 5.0,
       min = 1, max = 8)
     
     @self.breastCupSlider.event
@@ -348,7 +348,7 @@ class DetailModelingTaskView(gui3d.TaskView):
       human.applyAllTargets(self.app.progress)
       
     self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_firmness.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 260, 9.2], value = 0.5,
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 290, 9.2], value = 0.5,
       min = 0, max = 1)
       
     @self.breastFirmnessSlider.event
@@ -360,11 +360,11 @@ class DetailModelingTaskView(gui3d.TaskView):
     self.detailButtonGroup = []
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_muscle.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 300, 9],
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 340, 9],
       selected = True)
     self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
       texture = self.app.getThemeResource("images", "button_weight.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 380, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 420, 9])
       
     self.tool = DetailTool(self.app, False, "_flaccid", "_muscle")
       
