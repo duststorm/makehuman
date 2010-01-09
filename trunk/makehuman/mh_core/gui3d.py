@@ -214,15 +214,15 @@ class View(events3d.EventHandler):
 
 # A View representing a specific task
 class TaskView(View):
-  def __init__(self, category, name, texture):
+  def __init__(self, category, name, texture, selectedTexture = None):
     View.__init__(self, parent = category, visible = False)
     self.canHaveFocus = False
     self.name = name
     self.focusWidget = None
     
     # The button is attached to the parent, as it stays visible when the category is hidden
-    self.button = Object(self.parent, "data/3dobjs/button_standard_big.obj",
-      texture = texture, position = [50 + len(self.parent.tasks) * 70, 45.0, 9.2])
+    self.button = ToggleButton(self.parent, "data/3dobjs/button_standard_big.obj",
+      texture = texture, selectedTexture = selectedTexture, position = [50 + len(self.parent.tasks) * 70, 45.0, 9.2])
       
     if name in category.tasksByName:
       raise KeyError("The task with this name already exists", name)
@@ -236,23 +236,17 @@ class TaskView(View):
 
   def onShow(self, event):
     #print("onShow", self.name, event)
-    pos = self.button.getPosition()
-    pos[1] += 10.0
-    self.button.setPosition(pos)
-    self.button.setScale(1.5)
+    self.button.setSelected(True)
     self.show()
     
   def onHide(self, event):
     #print("onHide", self.name, event)
-    pos = self.button.getPosition()
-    pos[1] -= 10.0
-    self.button.setPosition(pos)
-    self.button.setScale(1.0)
+    self.button.setSelected(False)
     self.hide()
 
 # A category grouping similar tasks
 class Category(View):
-  def __init__(self, parent, name, texture):
+  def __init__(self, parent, name, texture, selectedTexture = None):
     View.__init__(self, parent, visible = False)
     self.canHaveFocus = False
     self.name = name
@@ -260,8 +254,9 @@ class Category(View):
     self.tasksByName = {}
     
     # The button is attached to the parent, as it stays visible when the category is hidden
-    self.button = Object(self.parent, "data/3dobjs/button_standard_big.obj",
-      position = [50 + len(self.app.categories) * 70, 15.0, 9.1], texture = texture)
+    self.button = ToggleButton(self.parent, "data/3dobjs/button_standard_big.obj",
+      position = [50 + len(self.app.categories) * 70, 15.0, 9.1], texture = texture,
+      selectedTexture = selectedTexture)
       
     if name in parent.categories:
       raise KeyError("The category with this name already exists", name)
@@ -273,17 +268,11 @@ class Category(View):
       self.app.switchCategory(self.name)
       
   def onShow(self, event):
-    pos = self.button.getPosition()
-    pos[1] += 10
-    self.button.setPosition(pos)
-    self.button.setScale(1.5)
+    self.button.setSelected(True)
     self.show()
     
   def onHide(self, event):
-    pos = self.button.getPosition()
-    pos[1] -= 10
-    self.button.setPosition(pos)
-    self.button.setScale(1.0)
+    self.button.setSelected(False)
     self.hide()
 
 # The application, a wrapper around Scene3D

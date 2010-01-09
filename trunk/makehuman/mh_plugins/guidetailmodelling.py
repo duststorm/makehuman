@@ -325,7 +325,8 @@ class Detail3dTool(events3d.EventHandler):
 
 class DetailModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Detail modelling", category.app.getThemeResource("images", "details.png"))
+    gui3d.TaskView.__init__(self, category, "Detail modelling", category.app.getThemeResource("images", "details.png"),
+      category.app.getThemeResource("images", "details_on.png"))
     self.tool = None
     
     self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_genitals.png"),
@@ -440,7 +441,8 @@ class DetailModelingTaskView(gui3d.TaskView):
     
 class MicroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Micro modelling", category.app.getThemeResource("images", "micro.png"))
+    gui3d.TaskView.__init__(self, category, "Micro modelling", category.app.getThemeResource("images", "micro.png"),
+      category.app.getThemeResource("images", "micro_on.png"))
     self.tool = None
     
     self.microButtonGroup = []

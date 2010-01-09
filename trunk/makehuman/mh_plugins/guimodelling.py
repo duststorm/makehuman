@@ -35,7 +35,8 @@ import mh, events3d, gui3d, guimacromodelling, guidetailmodelling, mh2obj, mh2bv
 
 class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
-      gui3d.Category.__init__(self,  parent, "Modelling", parent.app.getThemeResource("images", "button_home.png"))
+      gui3d.Category.__init__(self,  parent, "Modelling", parent.app.getThemeResource("images", "button_home.png"),
+        parent.app.getThemeResource("images", "button_home_on.png"))
       guimacromodelling.MacroModelingTaskView(self)
       guidetailmodelling.DetailModelingTaskView(self)
       guidetailmodelling.MicroModelingTaskView(self)

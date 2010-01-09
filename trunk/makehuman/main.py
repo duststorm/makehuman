@@ -161,7 +161,8 @@ class MHApplication(gui3d.Application):
     self.progressBar.setProgress(0.8)
     guirender.RenderingCategory(self)
 
-    library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"))
+    library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),
+      self.getThemeResource("images", "button_library_on.png"))
     hair.HairTaskView(library)
     background.BackgroundTaskView(library)
 
@@ -173,14 +174,16 @@ class MHApplication(gui3d.Application):
         self.modules[name] = module
         module.load(self)
 
-    category = gui3d.Category(self, "Help", self.getThemeResource("images", "button_about.png"))
+    category = gui3d.Category(self, "Help", self.getThemeResource("images", "button_about.png"),
+      self.getThemeResource("images", "button_about_on.png"))
     # Help button
     @category.button.event
     def onClicked(event):
       webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
       
     # Exit button
-    category = gui3d.Category(self, "Exit", self.getThemeResource("images", "button_exit.png"))
+    category = gui3d.Category(self, "Exit", self.getThemeResource("images", "button_exit.png"),
+      self.getThemeResource("images", "button_exit_on.png"))
     @category.button.event
     def onClicked(event):
       self.stop()

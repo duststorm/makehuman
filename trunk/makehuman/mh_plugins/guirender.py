@@ -34,7 +34,8 @@ import gui3d
 
 class RenderingCategory(gui3d.Category):
   def __init__(self, parent):
-    gui3d.Category.__init__(self, parent, "Rendering", parent.app.getThemeResource("images", "button_render.png"))
+    gui3d.Category.__init__(self, parent, "Rendering", parent.app.getThemeResource("images", "button_render.png"),
+      parent.app.getThemeResource("images", "button_render_on.png"))
           
   def onShow(self, event):
     self.setFocus()
