@@ -6,7 +6,8 @@ import mh
 
 class MeasurementTaskView(gui3d.TaskView):
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, "Example", category.app.getThemeResource("images", "button_measure.png"))
+        gui3d.TaskView.__init__(self, category, "Example", category.app.getThemeResource("images", "button_measure.png"),
+          category.app.getThemeResource("images", "button_measure_on.png"))
         gui3d.Object(self, "data/3dobjs/background.obj", position = [400, 300, -89.98])
         self.measureList = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 100, 9.4])
         self.measureList.setText("");
@@ -135,7 +136,8 @@ class MeasurementTaskView(gui3d.TaskView):
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
-  category = gui3d.Category(app, "Measurement", app.getThemeResource("images", "button_measure.png"))
+  category = gui3d.Category(app, "Measurement", app.getThemeResource("images", "button_measure.png"),
+    app.getThemeResource("images", "button_measure_on.png"))
   taskview = MeasurementTaskView(category)
   # Zoom the camera
   @taskview.event
