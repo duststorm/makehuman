@@ -76,7 +76,7 @@ class Human(gui3d.Object):
         self.overweightVal = 0.0
         self.underweightVal = 0.0
         self.genitals = 0.0
-        self.breastCup = 4.5
+        self.breastSize = 0.5
         self.breastFirmness = 0.5
         self.bodyZones =  ["eye","jaw","nose","mouth","head","neck","torso",\
                         "hip","pelvis","r-upperarm","l-upperarm","r-lowerarm",\
@@ -326,11 +326,17 @@ class Human(gui3d.Object):
     def getGenitals(self):
         return self.genitals
         
-    def SetBreastCup(self, value):
-        self.breastCup = min(8.0, max(1.0, value))
+    def setBreastSize(self, value):
+        self.breastSize = min(1.0, max(0.0, value))
         
-    def SetBreastFirmness(self, value):
+    def getBreastSize(self):
+        return self.breastSize
+        
+    def setBreastFirmness(self, value):
         self.breastFirmness = min(1.0, max(0.0, value))
+        
+    def getBreastFirmness(self, value):
+        return self.breastFirmness
             
     def setEthnic(self, ethnic, value):
         modified = None
@@ -489,40 +495,42 @@ class Human(gui3d.Object):
         detailTargets[self.targetMaleGenitalsYoung] = maleGenitals*self.youngVal
         detailTargets[self.targetMaleGenitalsOld] = maleGenitals*self.oldVal
         
-        breastCup = [0 for i in xrange(0, 9)]
-        i = int(math.floor(self.breastCup))
-        value = self.breastCup - i
-        breastCup[i] = 1 - value;
+        # breastCup goes from 1 to 8
+        breastCup = 1 + self.breastSize * 7
+        breastCupValues = [0 for i in xrange(0, 9)]
+        i = int(math.floor(breastCup))
+        value = breastCup - i
+        breastCupValues[i] = 1 - value;
         if i < 8:
-          breastCup[i+1] = value;
+          breastCupValues[i+1] = value;
         
         for i in xrange(1, 9):
-          detailTargets["data/targets/details/neutral_female-young-cup%i-firmness0.target"%(i)] = averageToneVal*averageWeightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/neutral_female-young-cup%i-firmness1.target"%(i)] = averageToneVal*averageWeightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/neutral_female-young-cup%i-firmness0.target"%(i)] = averageToneVal*averageWeightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/neutral_female-young-cup%i-firmness1.target"%(i)] = averageToneVal*averageWeightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
  
-          detailTargets["data/targets/details/female-young-light-cup%i-firmness0.target"%(i)] = averageToneVal*self.underweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-light-cup%i-firmness1.target"%(i)] = averageToneVal*self.underweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-light-cup%i-firmness0.target"%(i)] = averageToneVal*self.underweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-light-cup%i-firmness1.target"%(i)] = averageToneVal*self.underweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
-          detailTargets["data/targets/details/female-young-heavy-cup%i-firmness0.target"%(i)] = averageToneVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-heavy-cup%i-firmness1.target"%(i)] = averageToneVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-heavy-cup%i-firmness0.target"%(i)] = averageToneVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-heavy-cup%i-firmness1.target"%(i)] = averageToneVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
          
-          detailTargets["data/targets/details/female-young-flaccid-cup%i-firmness0.target"%(i)] = self.flaccidVal*averageWeightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-flaccid-cup%i-firmness1.target"%(i)] = self.flaccidVal*averageWeightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-flaccid-cup%i-firmness0.target"%(i)] = self.flaccidVal*averageWeightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-flaccid-cup%i-firmness1.target"%(i)] = self.flaccidVal*averageWeightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
-          detailTargets["data/targets/details/female-young-flaccid-light-cup%i-firmness0.target"%(i)] = self.flaccidVal*self.underweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-flaccid-light-cup%i-firmness1.target"%(i)] = self.flaccidVal*self.underweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-flaccid-light-cup%i-firmness0.target"%(i)] = self.flaccidVal*self.underweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-flaccid-light-cup%i-firmness1.target"%(i)] = self.flaccidVal*self.underweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
-          detailTargets["data/targets/details/female-young-flaccid-heavy-cup%i-firmness0.target"%(i)] = self.flaccidVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-flaccid-heavy-cup%i-firmness1.target"%(i)] = self.flaccidVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-flaccid-heavy-cup%i-firmness0.target"%(i)] = self.flaccidVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-flaccid-heavy-cup%i-firmness1.target"%(i)] = self.flaccidVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
-          detailTargets["data/targets/details/female-young-muscle-cup%i-firmness0.target"%(i)] = self.muscleVal*averageWeightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-muscle-cup%i-firmness1.target"%(i)] = self.muscleVal*averageWeightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-muscle-cup%i-firmness0.target"%(i)] = self.muscleVal*averageWeightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-muscle-cup%i-firmness1.target"%(i)] = self.muscleVal*averageWeightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
-          detailTargets["data/targets/details/female-young-muscle-light-cup%i-firmness0.target"%(i)] = self.muscleVal*self.underweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-muscle-light-cup%i-firmness1.target"%(i)] = self.muscleVal*self.underweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-muscle-light-cup%i-firmness0.target"%(i)] = self.muscleVal*self.underweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-muscle-light-cup%i-firmness1.target"%(i)] = self.muscleVal*self.underweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
-          detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness0.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCup[i]
-          detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness1.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCup[i]
+          detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness0.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness1.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
         for k, v in detailTargets.iteritems():
             if v != 0.0:         
