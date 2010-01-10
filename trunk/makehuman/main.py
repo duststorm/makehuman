@@ -66,6 +66,7 @@ sys.path.append("./mh_core")
 import gui3d, events3d
 import human, hair, background
 import guimodelling, guifiles, guirender
+import font3d
 
 class MHApplication(gui3d.Application):
   def __init__(self):
@@ -193,6 +194,9 @@ class MHApplication(gui3d.Application):
 
     self.progressBar.setProgress(1.0)
     self.progressBar.hide()
+    
+    font = font3d.Font("data/fonts/arial.fnt")
+    font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 500, 9.6]);
 
   def onStart(self, event):
       self.splash.hide()
