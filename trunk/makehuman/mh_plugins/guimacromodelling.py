@@ -120,7 +120,9 @@ class MacroModelingTaskView(gui3d.TaskView):
     
     self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 590, 9.1])
     
-    gui3d.Object(self, "data/3dobjs/button_group_background1.obj", self.app.getThemeResource("images", "button_group_background1.png"), [10, 80, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_main.obj", self.app.getThemeResource("images", "group_main.png"), [10, 80, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_actions.obj", self.app.getThemeResource("images", "group_actions.png"), [10, 340, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_ethnics.obj", self.app.getThemeResource("images", "group_ethnics.png"), [10, 408, 9.0])
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_gender_macro.png"),
@@ -203,20 +205,20 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, -89.98])
     self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_undo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [630, 520, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [33, 371, 9.1])
     self.redoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_redo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [690, 520, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [68, 371, 9.1])
     self.resetButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
-      texture = self.app.getThemeResource("images", "button_new.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_new_on.png"), position = [750, 520,9])
+      texture = self.app.getThemeResource("images", "button_reset.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_reset_on.png"), position = [103, 371,9.1])
       
     self.currentHair = gui3d.Button(category, mesh = "data/3dobjs/button_standard_little.obj",
-      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'), position = [750, 460, 9])
+      texture = self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'), position = [750, 459, 9])
     
     self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, 1], visible = False)
-    self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [630, 460, 9],texture = self.app.getThemeResource("images", "button_background_load.png"))
-    self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [690, 460, 9],texture = self.app.getThemeResource("images", "button_background_toggle.png"))
+    #self.backgroundImageChooser = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj", position = [630, 460, 9],texture = self.app.getThemeResource("images", "button_background_load.png"))
+    self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj", position = [33, 390, 9.1],texture = self.app.getThemeResource("images", "button_background_toggle.png"),selectedTexture = self.app.getThemeResource("images", "button_background_toggle_on.png"))
     
     @self.undoButton.event
     def onClicked(event):
@@ -240,11 +242,11 @@ class MacroModelingTaskView(gui3d.TaskView):
       self.app.switchCategory("Library")
       self.app.scene3d.redraw(1)
       
-    @self.backgroundImageChooser.event
-    def onClicked(event):
-      self.app.switchCategory("Library")
-      self.app.switchTask("Background")
-      self.app.scene3d.redraw(1)
+    #@self.backgroundImageChooser.event
+    #def onClicked(event):
+      #self.app.switchCategory("Library")
+      #self.app.switchTask("Background")
+      #self.app.scene3d.redraw(1)
       
     @self.backgroundImageToggle.event
     def onClicked(event):

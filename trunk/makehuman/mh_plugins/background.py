@@ -34,7 +34,7 @@ class BackgroundTaskView(gui3d.TaskView):
     def onFileSelected(filename):
       print("Loading %s" %(filename))
       self.texture.loadImage("backgrounds/" + filename)
-      self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageChooser.setTexture("backgrounds/" + filename)
+      #self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageChooser.setTexture("backgrounds/" + filename)
       bg = self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImage
       bg.mesh.setTexture("backgrounds/" + filename)
       group = bg.mesh.getFaceGroup("default-dummy-group")

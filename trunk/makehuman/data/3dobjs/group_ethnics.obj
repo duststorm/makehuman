@@ -1,8 +1,8 @@
-# Background panel 192x256, cenered at 0,0
+# Background panel 128x256, centered at 0,0
 v 0 0 0
 v 128 0 0
-v 128 256 0
-v 0 256 0
+v 128 128 0
+v 0 128 0
 vt 0 1
 vt 1 1
 vt 1 0
