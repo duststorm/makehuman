@@ -121,7 +121,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 590, 9.1])
     
     gui3d.Object(self, "data/3dobjs/group_main.obj", self.app.getThemeResource("images", "group_main.png"), [10, 80, 9.0])
-    gui3d.Object(self, "data/3dobjs/group_actions.obj", self.app.getThemeResource("images", "group_actions.png"), [10, 340, 9.0])
+    gui3d.Object(category, "data/3dobjs/group_actions.obj", self.app.getThemeResource("images", "group_actions.png"), [10, 340, 9.0])
     gui3d.Object(self, "data/3dobjs/group_ethnics.obj", self.app.getThemeResource("images", "group_ethnics.png"), [10, 408, 9.0])
     
     # Macro sliders
@@ -218,19 +218,19 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.backgroundImageToggle = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj", position = [33, 390, 9.1],texture = self.app.getThemeResource("images", "button_background_toggle.png"),selectedTexture = self.app.getThemeResource("images", "button_background_toggle_on.png"))
     
     # Ethnics buttons
-    self.asianButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj",
+    self.asianButton = gui3d.Button(self, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_african.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_african_on.png"), position = [49, 440, 9.1])
-    self.africanButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj",
+    self.africanButton = gui3d.Button(self, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_asian.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_asian_on.png"), position = [49, 460, 9.1])
-    self.caucas1Button = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj",
+    self.caucas1Button = gui3d.Button(self, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_caucas1.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_caucas1_on.png"), position = [49, 480, 9.1])
-    self.caucas2Button = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj",
+    self.caucas2Button = gui3d.Button(self, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_caucas2.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_caucas2_on.png"), position = [49, 500, 9.1])
-    self.pacificButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard_big.obj",
+    self.pacificButton = gui3d.Button(self, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_pacific.png"), 
       selectedTexture = self.app.getThemeResource("images", "button_pacific_on.png"), position = [49, 520, 9.1])
     self.ethnicResetButton = gui3d.RadioButton(self, self.ethnicButtonGroup,
