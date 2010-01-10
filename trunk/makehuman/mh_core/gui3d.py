@@ -504,7 +504,7 @@ class Slider(View):
     self.background = Object(self, "data/3dobjs/slider_background.obj",
       texture = backgroundTexture, position = position)
     self.slider = Object(self, "data/3dobjs/slider_cursor.obj",
-      texture = sliderTexture, position = [position[0], position[1] + 32, position[2] + 0.01])
+      texture = sliderTexture, position = [position[0], position[1] + 16, position[2] + 0.01])
     self.sliderTexture = sliderTexture
     self.focusedSliderTexture = focusedSliderTexture
     self.sliderMinX = position[0] + 17;
@@ -679,10 +679,10 @@ class ProgressBar(View):
   
   def __init__(self, parent, backgroundMesh = "data/3dobjs/progressbar_background.obj",
     backgroundTexture = None,
-    backgroundPosition = [300, 520, 9.1],
+    backgroundPosition = [650, 580, 9.1],
     barMesh = "data/3dobjs/progressbar.obj",
     barTexture = None,
-    barPosition = [300, 520, 9.2], visible = True):
+    barPosition = [650, 580, 9.2], visible = True):
     """
     This is the constructor method for the ProgressBar class. It initializes the
     following attributes:
