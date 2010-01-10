@@ -716,8 +716,8 @@ constraints = [
 	("Toe_L" , "COPYROT", 1.0, "ToeIK_L", "PLegIK_L", 7, 0),
 	("UpLegIK_L" , "IKSOLVER", 1.0, "KneeIK_L", None, 1, Bone),
 	("UpLeg_L" , "COPYROT", 1.0, "UpLegIK_L", "PLegIK_L", 7, 0),
-	("LegCtrl_L" , "LIMITDIST", 1.0, "Hip_L", "PLegIK_L", "", 0),
-	("KneeIK_L" , "LIMITDIST", 1.0, "Hip_L", "PLegIK_L", "", 0),
+	("LegCtrl_L" , "LIMITDIST", 1.0, "Hip_L", None, "", 0),
+	("KneeIK_L" , "LIMITDIST", 1.0, "Hip_L", None, "", 0),
 	("UpLegTwist_L", "IKSOLVER", 1.0, "LoLeg_L", None, 1, Bone),
 
 	("LoLegIK_R" , "IKSOLVER", 1.0, "Ankle_R", None, 2, Bone),
@@ -727,8 +727,8 @@ constraints = [
 	("Toe_R" , "COPYROT", 1.0, "ToeIK_R", "PLegIK_R", 7, 0),
 	("UpLegIK_R" , "IKSOLVER", 1.0, "KneeIK_R", None, 1, Bone),
 	("UpLeg_R" , "COPYROT", 1.0, "UpLegIK_R", "PLegIK_R", 7, 0),
-	("LegCtrl_R" , "LIMITDIST", 1.0, "Hip_R", "PLegIK_R", "", 0),
-	("KneeIK_R" , "LIMITDIST", 1.0, "Hip_R", "PLegIK_R", "", 0),
+	("LegCtrl_R" , "LIMITDIST", 1.0, "Hip_R", None, "", 0),
+	("KneeIK_R" , "LIMITDIST", 1.0, "Hip_R", None, "", 0),
 	("UpLegTwist_R", "IKSOLVER", 1.0, "LoLeg_R", None, 1, Bone),
 
 	("LoArmIK_L" , "IKSOLVER", 1.0, "HandIK_L", None, 2, Bone),
@@ -737,8 +737,8 @@ constraints = [
 	("UpArmIK_L" , "IKSOLVER", 1.0, "ElbowIK_L", None, 1, Bone),
 	("UpArm_L" , "COPYROT", 1.0, "UpArmIK_L", "PArmIK_L", 7, 0),
 	("Hand_L" , "COPYROT", 1.0, "HandIK_L", "PArmIK_L", 7, 0),
-	("HandIK_L" , "LIMITDIST", 1.0, "Clavicle_L", "PArmIK_L", "", 0),
-	("ElbowIK_L" , "LIMITDIST", 1.0, "Clavicle_L", "PArmIK_L", "", 0),
+	("HandIK_L" , "LIMITDIST", 1.0, "Clavicle_L", None, "", 0),
+	("ElbowIK_L" , "LIMITDIST", 1.0, "Clavicle_L", None, "", 0),
 
 	("LoArmIK_R" , "IKSOLVER", 1.0, "HandIK_R", None, 2, Bone),
 	("LoArm_R" , "COPYROT", 1.0, "LoArmIK_R", "PArmIK_R", 7, 0),
@@ -746,8 +746,8 @@ constraints = [
 	("UpArmIK_R" , "IKSOLVER", 1.0, "ElbowIK_R", None, 1, Bone),
 	("UpArm_R" , "COPYROT", 1.0, "UpArmIK_R", "PArmIK_R", 7, 0),
 	("Hand_R" , "COPYROT", 1.0, "HandIK_R", "PArmIK_R", 7, 0),
-	("HandIK_R" , "LIMITDIST", 1.0, "Clavicle_R", "PArmIK_R", "", 0),
-	("ElbowIK_R" , "LIMITDIST", 1.0, "Clavicle_R", "PArmIK_R", "", 0),
+	("HandIK_R" , "LIMITDIST", 1.0, "Clavicle_R", None, "", 0),
+	("ElbowIK_R" , "LIMITDIST", 1.0, "Clavicle_R", None, "", 0),
 
 	("UpArmTwist_L", "IKSOLVER", 1.0, "LoArm_L", None, 1, Bone),
 	("LoArmTwist_L", "IKSOLVER", 1.0, "Hand_L", None, 1, Bone),

@@ -22,7 +22,7 @@ MHX exporter for Blender
 
 **Authors:**           Thomas Larsson
 
-**Copyamtht(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2009
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -1021,7 +1021,7 @@ def skipConstraint(type):
 		return False
 	return False
 
-def insertInfluenceIpo(cns, bone, xmax):
+def insertInfluenceIpo(cns, bone):
 	global todo
 	if bone != 'PArmIK_L' and bone != 'PArmIK_R' and bone != 'PLegIK_L' and bone != 'PLegIK_R':
 		#print "Skipped ", bone
@@ -1032,8 +1032,15 @@ def insertInfluenceIpo(cns, bone, xmax):
 		cns.insertKey(0)
 		cns.influence = 1.0
 		cns.insertKey(1)
-		ipo = Ipo.Get()[-1]
-		icu = ipo[Ipo.CO_INF]
+		n = -1
+		notyetfound = True
+		while notyetfound:
+			ipo = Ipo.Get()[n]
+			try:
+				icu = ipo[Ipo.CO_INF]
+				notyetfound = False
+			except:
+				n -= 1
 		icu.driver = 1
 		icu.driverObject = getObject('HumanRig', 'icu.driverObject', globals(), locals())
 		try:
@@ -1080,7 +1087,7 @@ def parseConstraint(constraints, args, tokens, name):
 
 	for (key,val,sub) in tokens:
 		if key == 'driver':
-			if insertInfluenceIpo(cns, val[0], val[1]):
+			if insertInfluenceIpo(cns, val[0]):
 				pass
 			elif toggleFingerIK == 0 and val[0] == "FingerIK-switch":
 				print "Constraint "+name+" ignored."
@@ -1350,6 +1357,7 @@ def clearScene(scn):
 	for ob in scn.objects:
 		scn.objects.unlink(ob)
 		del ob
+
 	oldScn = scn
 	scn = Scene.New()
 	scn.makeCurrent()
