@@ -6,39 +6,22 @@ eXchange), which can then be imported into Blender.
 
 The MHX format is described in the document "MHX format.txt".
 
-This is version 0.2. It is not compatible with the previous versions.
-
-The weighting and morphs can be modified in the file makehuman/utils/mhx/mhxbase.blend 
-and exported to a new mhxbase.mhx. 
-
-
-Changes since version 0.1:
-
-1. The MHX syntax has been revised, and it is now separated from semantics.
-
-2. The MHX semantics has been greately expanded to cover most python-accessible parts
-of Blender. One can export a Blender file with mhx_export.py and import it back with
-mhx_import.py, and most features are intact. Some of the limitations are apparently
-due to bugs in Blender's python interface.
-
-3. The option for rotating the mesh and rig 90 degrees has been removed. It became to
-difficult to maintain it with the new functionality.
-
-4. The imported file may either be merged with the existing scene, or completely replace it.
-
-5. The rigging and shape keys have not been changed. This will be done when the new mesh
-is available.
+This is version 0.3. It is not compatible with the previous versions.
 
 
 
 Preparations:
 
-Copy mhx_import.py and mhx_export.py from the makehuman/utils/mhx folder to your Blender
-scripts folder. The variable TexDir at the beginning of mhx_import.py may be modified to 
-point to your texture directory. 
+Copy mhx_import.py and mhx_export.py from the makehuman/importers/mhx/blender249 folder 
+to your Blender scripts folder. 
 
-VERY IMPORTANT: Load pydrivers.py into your Blender file before importing the mhx file.
-Otherwise the shape keys will not work.
+The import script only works with Blender 2.49b. In earlier versions there is a bug in 
+Blender's python API which makes the script crash (one can not access a bone display object 
+from python). A version for Blender 2.5x will come later.
+
+Load the pydrivers.py into a text editor window in Blender before importing the mhx file. 
+Otherwise the shape keys will not work. The file should only be loaded into Blender, not 
+executed.
 
 
 Usage:
@@ -50,12 +33,16 @@ should now have the option "MakeHuman eXchange (.mhx)". If the choice is not the
 load mhx_import.py in your text window instead. You will now be prompted with the MHX
 importer's user interface. First there are some choices to be made:
 
-1. Arm IK or FK.
-2. Leg IK or FK.
-3. Finger IK or FK.
-4. Shape keys.
-5. Replace scene or merge with scene.
-6. Default texture directory.
+1. Enable FK/IK switch
+2. Arm IK or FK (if FK/IK switch not enabled).
+3. Leg IK or FK (if FK/IK switch not enabled).
+4. Finger IK or FK.
+5. Facial shape keys.
+6. Body shape keys, to preserve volume.
+7. Replace scene or merge with scene.
+8. Default texture directory. 
+9. Rotate the character 90 degrees to make the head point up (Z up convention).
+10. Use display objects for bones.
 
 Pressing "Load MHX" will now allow you to select the MHX file in the MH export directory.
 Hopefully the rigged and weighted mesh is now loaded into Blender. As a final step, you need
@@ -66,7 +53,7 @@ in python).
 Bone layers:
 The bones are separated into different bone layers to unclutter the view for the animator:
 
-1. All deform bones.
+1. All control bones for FK.
 2. Torso
 3. Arm IK
 4. Arm FK
@@ -75,11 +62,13 @@ The bones are separated into different bone layers to unclutter the view for the
 7. Hand IK
 8. Hand FK
 
-9. Root bone
+9. Panel
 10. Indiviual toes.
 11. Head
 
-16. Hidden helper bones.
+18. Root bone.
+19. All deform bones.
+20. Hidden helper bones.
 
 
 Vertex weighting:
@@ -92,28 +81,34 @@ on your machine). I didn't put a lot of effort into this export-from-Blender scr
 gets the vertex weighting right, which is what matters at this time.
 
 
+Some links where aspects of MHX import are discussed:
+
+Generalities: 			http://makehuman.blogspot.com/2009/11/blender-export-with-mhx-format.html
+Shape keys: 			http://makehuman.blogspot.com/2009/11/bones-that-bend.html
+Z up: 				http://makehuman.blogspot.com/2009/11/z-up-last-week-i-have-struggled-with.html
+FK/IK switch: 			http://makehuman.blogspot.com/2009/12/fkik-switch.html
+Problems with FK/IK switch:	http://makehuman.blogspot.com/2010/01/problems-with-fkik-switch.html
+
+
+
 Known issues:
 
-IK does not work terribly well, especially for the fingers.
+1. IK does not work terribly well, especially for the fingers.
 
+2. FK/IK switching does not update in real time. Therefore it is also possible to 
+choose between FK/IK at load time.
 
+3. The Blender import script does not always register. It does not show up in Blender's 
+import menu on my Linux machine, but it works nicely under Windows (XP).
 
-One can choose between FK/IK at load time. It should be driven by bone instead,
+4. On Linux (or at least Ubuntu), Blender does not recognize the texture images in tif
+format. Workaround: convert the textures to png and make the corresponding changes in the
+file makehuman/data/3dobjs/mxhbase.mhx. There are three lines starting with the word
+"filename". This problem does not appear under Windows.
 
-but I have not figured out how to implement driven constraint influence from a Python
+5. The artistic quality of the shape keys is poor. They will be replaced once the proper pose
+engine is in place.
 
-script. If somebody has done that, I would be interested to see a code example.
-
-Also shape keys should be driven by bones.
-
-Display objects should be in wireframe, but I haven't figured out how to press the W button 
-from python. Also, only the outline should be shown.
-
-
-
-The Blender import script did not register on my Linux machine, but it works nicely under
-
-Windows (XP).
 
 
 
