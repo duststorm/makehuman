@@ -22,26 +22,6 @@ TODO
 __docformat__ = 'restructuredtext'
 
 import events3d, gui3d, algos3d, humanmodifier
-
-class GenitalsAction:
-    def __init__(self, human, value, postAction):
-      self.name = "Genitals"
-      self.human = human
-      self.before = self.human.getGenitals()
-      self.after = value
-      self.postAction = postAction
-      
-    def do(self):
-      self.human.setGenitals(self.after)
-      self.human.applyAllTargets(self.human.app.progress)
-      self.postAction()
-      return True
-      
-    def undo(self):
-      self.human.setGenitals(self.before)
-      self.human.applyAllTargets(self.human.app.progress)
-      self.postAction()
-      return True
       
 class DetailAction:
     def __init__(self, human, method, value, postAction):
@@ -357,7 +337,7 @@ class DetailModelingTaskView(gui3d.TaskView):
     @self.genitalsSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
-      self.app.do(GenitalsAction(human, value, self.syncSliders))
+      self.app.do(DetailAction(human, "Genitals", value, self.syncSliders))
       
     self.breastCupSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_cup.png"),
       self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 190, 9.2], value = 0.5,
