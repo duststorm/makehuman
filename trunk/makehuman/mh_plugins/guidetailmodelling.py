@@ -42,6 +42,27 @@ class GenitalsAction:
       self.human.applyAllTargets(self.human.app.progress)
       self.postAction()
       return True
+      
+class DetailAction:
+    def __init__(self, human, method, value, postAction):
+      self.name = method
+      self.human = human
+      self.method = method
+      self.before = getattr(self.human, "get" + self.method)()
+      self.after = value
+      self.postAction = postAction
+      
+    def do(self):
+      getattr(self.human, "set" + self.method)(self.after)
+      self.human.applyAllTargets(self.human.app.progress)
+      self.postAction()
+      return True
+      
+    def undo(self):
+      getattr(self.human, "set" + self.method)(self.before)
+      self.human.applyAllTargets(self.human.app.progress)
+      self.postAction()
+      return True
 
 class DetailTool(events3d.EventHandler):
   def __init__(self, app, micro, left, right):
@@ -345,8 +366,7 @@ class DetailModelingTaskView(gui3d.TaskView):
     @self.breastCupSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
-      human.setBreastSize(value)
-      human.applyAllTargets(self.app.progress)
+      self.app.do(DetailAction(human, "BreastSize", value, self.syncSliders))
       
     self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_firmness.png"),
       self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 290, 9.2], value = 0.5,
@@ -355,8 +375,7 @@ class DetailModelingTaskView(gui3d.TaskView):
     @self.breastFirmnessSlider.event
     def onChange(value):
       human = self.app.scene3d.selectedHuman
-      human.setBreastFirmness(value)
-      human.applyAllTargets(self.app.progress)
+      self.app.do(DetailAction(human, "BreastFirmness", value, self.syncSliders))
       
     self.detailButtonGroup = []
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
