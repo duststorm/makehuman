@@ -495,7 +495,7 @@ static void mhFlipSurface(const SDL_Surface *surface)
  */
 GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 {
-    int mode, components;
+    int internalFormat, format;
     SDL_Surface *surface;
 
     if (!texture)
@@ -535,19 +535,23 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 
     switch (surface->format->BytesPerPixel)
     {
+    case 1:
+        internalFormat = GL_ALPHA8;
+        format = GL_ALPHA;
+        break;
     case 3:
-        components = 3;
+        internalFormat = 3;
         if (surface->format->Rshift) // If there is a shift on the red value, we need to tell that red and blue are switched
-            mode = GL_BGR;
+            format = GL_BGR;
         else
-            mode = GL_RGB;
+            format = GL_RGB;
         break;
     case 4:
-        components = 4;
+        internalFormat = 4;
         if (surface->format->Rshift) // If there is a shift on the red value, we need to tell that red and blue are switched
-            mode = GL_BGRA;
+            format = GL_BGRA;
         else
-            mode = GL_RGBA;
+            format = GL_RGBA;
         break;
     default:
         SDL_FreeSurface(surface);
@@ -566,7 +570,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
       glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
       glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      gluBuild1DMipmaps(GL_TEXTURE_1D, components, surface->w, mode, GL_UNSIGNED_BYTE, surface->pixels);
+      gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, surface->w, format, GL_UNSIGNED_BYTE, surface->pixels);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
     else
@@ -577,7 +581,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       //glTexImage2D(GL_TEXTURE_2D, 0, components, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
-      gluBuild2DMipmaps(GL_TEXTURE_2D, components, surface->w, surface->h, mode, GL_UNSIGNED_BYTE, surface->pixels);
+      gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
       glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
@@ -1243,6 +1247,8 @@ void OnInit(void)
 
     glEnable(GL_DEPTH_TEST);                                  /* Hidden surface removal */
     glEnable(GL_CULL_FACE);                                   /* Inside face removal */
+    //glEnable(GL_ALPHA_TEST);
+    //glAlphaFunc(GL_GREATER, 0.0f);
     glEnable(GL_LIGHTING);                                    /* Enable lighting */
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
