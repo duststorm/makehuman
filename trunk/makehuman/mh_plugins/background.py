@@ -42,9 +42,9 @@ class BackgroundTaskView(gui3d.TaskView):
         f.color = [[255, 255, 255, 100], [255, 255, 255, 100], [255, 255, 255, 100]]
         f.updateColors()
       if self.texture.width > self.texture.height:
-        bg.setScale(1.0, self.texture.height / self.texture.width)
+        bg.setScale(1.0, float(self.texture.height) / float(self.texture.width))
       else:
-        bg.setScale(self.texture.width / self.texture.height, 1.0)
+        bg.setScale(float(self.texture.width) / float(self.texture.height), 1.0)
       bg.mesh.setPickable(0)
       bg.show()
       self.app.switchCategory("Modelling")
