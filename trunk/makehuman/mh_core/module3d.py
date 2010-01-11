@@ -477,8 +477,19 @@ class FaceGroup:
         """
         return "facegroup %s"%(self.name)
 
-
-
+    def createFace(self, v0, v1, v2, uv = None):
+            f = Face(v0,v1,v2)
+            f.group = self
+            self.faces.append(f)
+            self.parent.faces.append(f)
+            
+            if uv:
+              index = len(self.parent.uvValues)
+              for uvpair in uv:
+                self.parent.uvValues.append(uvpair)
+              f.uv = [index, index + 1, index + 2]
+            
+            return f
 
 class Object3D:
     """
@@ -573,6 +584,17 @@ class Object3D:
         self.uvValues = None
         self.text = ""
 
+    def createFaceGroup(self, name):
+        fg = FaceGroup(name)
+        fg.parent = self
+        self.facesGroups.append(fg)
+        return fg
+        
+    def createVertex(self, co):
+        v = Vert(co, len(self.verts), self)
+        self.verts.append(v)
+        return v
+  
     def setLoc(self,locx,locy,locz):
         """
         This method is used to set the location of the object in the 3D coordinate space of the scene.

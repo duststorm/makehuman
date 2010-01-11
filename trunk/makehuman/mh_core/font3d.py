@@ -101,9 +101,7 @@ def createMesh(scene, font, text, position):
   obj.indexBuffer = []
   
   # create group
-  fg = module3d.FaceGroup("text")
-  fg.parent = obj
-  obj.facesGroups.append(fg)
+  fg = obj.createFaceGroup("text")
   
   index = 0
   xoffset = 0.0
@@ -113,44 +111,21 @@ def createMesh(scene, font, text, position):
     uv = font.getTextureCoordinatesForChar(char)
     
     # create vertices
-    v1 = module3d.Vert([xoffset + co[0], co[1], 0.0], index, obj)
-    index += 1
-    v2 = module3d.Vert([xoffset + co[2], co[1], 0.0], index, obj)
-    index += 1
-    v3 = module3d.Vert([xoffset + co[2], co[3], 0.0], index, obj)
-    index += 1
-    v4 = module3d.Vert([xoffset + co[0], co[3], 0.0], index, obj)
-    index += 1
+    v1 = obj.createVertex([xoffset + co[0], co[1], 0.0])
+    v2 = obj.createVertex([xoffset + co[2], co[1], 0.0])
+    v3 = obj.createVertex([xoffset + co[2], co[3], 0.0])
+    v4 = obj.createVertex([xoffset + co[0], co[3], 0.0])
     
     xoffset += co[4]
     
-    # create faces
-    f1 = module3d.Face(v1, v4, v2)
-    f2 = module3d.Face(v2, v4, v3)
-    
     uv1 = [uv[0], uv[1]]
-    uv1i = len(obj.uvValues)
-    obj.uvValues.append(uv1)
     uv2 = [uv[2], uv[1]]
-    uv2i = len(obj.uvValues)
-    obj.uvValues.append(uv2)
     uv3 = [uv[2], uv[3]]
-    uv3i = len(obj.uvValues)
-    obj.uvValues.append(uv3)
     uv4 = [uv[0], uv[3]]
-    uv4i = len(obj.uvValues)
-    obj.uvValues.append(uv4)
     
-    f1.uv = [uv1i,uv4i,uv2i]
-    f2.uv = [uv2i,uv4i,uv3i]
-    
-    # add faces to group
-    fg.faces.append(f1)
-    fg.faces.append(f2)
-    
-    # add faces to object
-    obj.faces.append(f1)
-    obj.faces.append(f2)
+    # create faces
+    f1 = fg.createFace(v1, v4, v2, uv = (uv1, uv4, uv2))
+    f2 = fg.createFace(v2, v4, v3, uv = (uv2, uv4, uv3))
   
   fullArrayIndex = 0
   groupVerts = {}
