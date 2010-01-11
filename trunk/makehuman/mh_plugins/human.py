@@ -335,7 +335,7 @@ class Human(gui3d.Object):
     def setBreastFirmness(self, value):
         self.breastFirmness = min(1.0, max(0.0, value))
         
-    def getBreastFirmness(self, value):
+    def getBreastFirmness(self):
         return self.breastFirmness
             
     def setEthnic(self, ethnic, value):
@@ -844,6 +844,10 @@ class Human(gui3d.Object):
                     modifier.setValue(float(lineData[1]))
                 elif lineData[0] == "genitals":
                     self.setGenitals(float(lineData[1]))
+                elif lineData[0] == "breastSize":
+                    self.setBreastSize(float(lineData[1]))
+                elif lineData[0] == "breastFirmness":
+                    self.setBreastFirmness(float(lineData[1]))
                 elif lineData[0] == "ethnic":
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == "detail":
@@ -868,6 +872,8 @@ class Human(gui3d.Object):
         f.write("muscle %f\n" %(self.getMuscle()))
         f.write("weight %f\n" %(self.getWeight()))
         f.write("genitals %f\n" %(self.getGenitals()))
+        f.write("breastSize %f\n" %(self.getBreastSize()))
+        f.write("breastFirmness %f\n" %(self.getBreastFirmness()))
         
         modifier = humanmodifier.Modifier(self, "data/targets/macrodetails/universal-stature-dwarf.target",
           "data/targets/macrodetails/universal-stature-giant.target")
