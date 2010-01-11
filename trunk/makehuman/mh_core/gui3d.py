@@ -771,11 +771,11 @@ class FileEntryView(View):
   def __init__(self, parent):
     View.__init__(self, parent)
     
-    Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 30.30, 9.4])
-    Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [200, 110, 9.5])
-    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [210, 125, 9.6])
+    #Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 30.30, 9.4])
+    Object(self, mesh = "data/3dobjs/backgroundtext.obj", position = [200, 90, 9.5])
+    self.textObject = Object(self, mesh = "data/3dobjs/empty.obj", position = [210, 105, 9.6])
     self.bConfirm = Object(self, mesh = "data/3dobjs/button_confirm.obj",
-      texture = self.app.getThemeResource("images", "button_confirm.png"), position = [610, 100, 9.1])
+      texture = self.app.getThemeResource("images", "button_confirm.png"), position = [610, 80, 9.1])
     self.text = ""
     
     @self.bConfirm.event
