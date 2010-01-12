@@ -532,6 +532,9 @@ class Human(gui3d.Object):
           detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness0.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
           detailTargets["data/targets/details/female-young-muscle-heavy-cup%i-firmness1.target"%(i)] = self.muscleVal*self.overweightVal*self.youngVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
         
+          detailTargets["data/targets/details/neutral_female-child-cup%i-firmness0.target"%(i)] = averageToneVal*averageWeightVal*self.childVal*self.femaleVal*(1.0-self.breastFirmness)*breastCupValues[i]
+          detailTargets["data/targets/details/neutral_female-child-cup%i-firmness1.target"%(i)] = averageToneVal*averageWeightVal*self.childVal*self.femaleVal*self.breastFirmness*breastCupValues[i]
+ 
         for k, v in detailTargets.iteritems():
             if v != 0.0:         
                 print "APP: %s, VAL: %f"%(k, v)
