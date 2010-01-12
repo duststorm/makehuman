@@ -300,7 +300,7 @@ materialList = [\
 	("float", "sssRadiusBlue"), \
 	("float", "sssRadiusGreen"), \
 	("float", "sssRadiusRed"), \
-	("bool", "sssScale"), \
+	("float", "sssScale"), \
 	("float", "sssTextureScatter"), \
 	("int", "strandBlendUnit"), \
 	("float", "strandDist"), \

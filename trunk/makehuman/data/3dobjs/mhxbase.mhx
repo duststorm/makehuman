@@ -265,7 +265,7 @@ material Invisio
     sssRadiusBlue 1.000000 ;
     sssRadiusGreen 1.000000 ;
     sssRadiusRed 1.000000 ;
-    sssScale true ;
+    sssScale 1.000000 ;
     sssTextureScatter 0.000000 ;
     strandBlendUnit 0 ;
     strandDist 0.000000 ;
@@ -448,7 +448,7 @@ material SSS_skinshader
     sssRadiusBlue 1.089971 ;
     sssRadiusGreen 1.693699 ;
     sssRadiusRed 4.821475 ;
-    sssScale true ;
+    sssScale 0.008000 ;
     sssTextureScatter 0.000000 ;
     strandBlendUnit 0 ;
     strandDist 0.000000 ;
