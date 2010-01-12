@@ -201,13 +201,16 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, -89.98])
     self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_undo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [33, 371, 9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [33, 371, 9.1],
+      focusedTexture = self.app.getThemeResource("images", "button_undo_focused.png"))
     self.redoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_redo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [68, 371, 9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [68, 371, 9.1],
+      focusedTexture = self.app.getThemeResource("images", "button_redo_focused.png"))
     self.resetButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_reset.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_reset_on.png"), position = [103, 371,9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_reset_on.png"), position = [103, 371,9.1],
+      focusedTexture = self.app.getThemeResource("images", "button_reset_focused.png"))
       
     @self.undoButton.event
     def onClicked(event):
@@ -235,7 +238,10 @@ class MacroModelingTaskView(gui3d.TaskView):
       self.app.scene3d.redraw(1)
       
     self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, 1], visible = False)
-    self.backgroundImageToggle = gui3d.ToggleButton(category, mesh = "data/3dobjs/button_standard.obj", position = [33, 390, 9.1],texture = self.app.getThemeResource("images", "button_background_toggle.png"),selectedTexture = self.app.getThemeResource("images", "button_background_toggle_on.png"))
+    self.backgroundImageToggle = gui3d.ToggleButton(category, mesh = "data/3dobjs/button_standard.obj", position = [33, 390, 9.1],
+      texture = self.app.getThemeResource("images", "button_background_toggle.png"),
+      selectedTexture = self.app.getThemeResource("images", "button_background_toggle_on.png"),
+      focusedTexture = self.app.getThemeResource("images", "button_background_toggle_focused.png"))
       
     @self.backgroundImageToggle.event
     def onClicked(event):

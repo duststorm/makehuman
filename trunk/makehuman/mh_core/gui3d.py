@@ -572,7 +572,7 @@ class Slider(View):
 # Button widget
 class Button(View):
   def __init__(self, parent, mesh = "data/3dobjs/button_gender.obj", texture = None,
-    selectedTexture = None, position = [0, 0, 9], selected = False):
+    selectedTexture = None, position = [0, 0, 9], selected = False, focusedTexture = None):
     View.__init__(self, parent)
     if selectedTexture and selected:
       t = selectedTexture
@@ -581,6 +581,7 @@ class Button(View):
     self.button = Object(self, mesh, texture = t, position = position)
     self.texture = texture
     self.selectedTexture = selectedTexture
+    self.focusedTexture = focusedTexture
     self.selected = selected
     
   def setTexture(self, texture):
@@ -615,7 +616,17 @@ class Button(View):
   def onSelected(self, selected):
     if selected and self.selectedTexture:
       self.button.setTexture(self.selectedTexture)
+    elif self.hasFocus() and self.focusedTexture:
+      self.button.setTexture(self.focusedTexture)
     else:
+      self.button.setTexture(self.texture)
+      
+  def onFocus(self, event):
+    if self.focusedTexture:
+      self.button.setTexture(self.focusedTexture)
+  
+  def onBlur(self, event):
+    if self.focusedTexture:
       self.button.setTexture(self.texture)
 
 # RadioButton widget
@@ -645,8 +656,9 @@ class RadioButton(Button):
 # ToggleButton widget
 class ToggleButton(Button):
   def __init__(self, parent, mesh = "data/3dobjs/button_gender.obj",
-      texture = None, selectedTexture = None, position = [0, 0, 9], selected = False):
-    Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected)
+      texture = None, selectedTexture = None, position = [0, 0, 9], selected = False,
+      focusedTexture = None):
+    Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture)
     
   def onClicked(self, event):
     if self.selected:
