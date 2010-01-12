@@ -1308,6 +1308,55 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3351"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3388"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3419-3"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3985"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4016"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4050"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4084"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1316,9 +1365,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.76305148"
-     inkscape:cx="486.60822"
-     inkscape:cy="739.45569"
+     inkscape:zoom="2.1582355"
+     inkscape:cx="258.64422"
+     inkscape:cy="836.08478"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -1454,16 +1503,6 @@
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_measure.png"
        inkscape:export-xdpi="45"
        inkscape:export-ydpi="45" />
-    <rect
-       style="fill:#808080;fill-opacity:0;stroke:none"
-       id="rect3735-4-7-0-6-8"
-       width="125.41099"
-       height="127.99986"
-       x="438.72308"
-       y="254.79082"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_expressions.png"
-       inkscape:export-xdpi="90.000084"
-       inkscape:export-ydpi="90.000084" />
     <rect
        style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3"
@@ -4082,8 +4121,8 @@
        id="rect3737-2-0-8-5-3-8-4-8"
        width="63.073643"
        height="15.073632"
-       x="-47.918415"
-       y="342.3826"
+       x="-34.813141"
+       y="341.07208"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_asian.png"
        inkscape:export-xdpi="90"
@@ -4091,8 +4130,8 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="-45.598694"
-       y="352.27142"
+       x="-32.423485"
+       y="350.96786"
        id="text3802-47-9"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4101,15 +4140,15 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-41"
-         x="-45.598694"
-         y="352.27142">Asian</tspan></text>
+         x="-32.423485"
+         y="350.96786">Asian</tspan></text>
     <rect
        style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-4"
        width="63.073643"
        height="15.073632"
-       x="-47.918415"
-       y="364.00629"
+       x="-34.813141"
+       y="362.69577"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_african.png"
        inkscape:export-xdpi="90"
@@ -4117,8 +4156,8 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="-45.598694"
-       y="373.78036"
+       x="-32.423485"
+       y="372.47681"
        id="text3802-47-3"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4127,15 +4166,15 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-5"
-         x="-45.598694"
-         y="373.78036">African</tspan></text>
+         x="-32.423485"
+         y="372.47681">African</tspan></text>
     <rect
        style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-87"
        width="63.073643"
        height="15.073632"
-       x="-47.918415"
-       y="383.66422"
+       x="-34.813141"
+       y="382.3537"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_pacific.png"
        inkscape:export-xdpi="90"
@@ -4143,8 +4182,8 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="-45.598698"
-       y="393.33395"
+       x="-32.423489"
+       y="392.0304"
        id="text3802-47-33"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4153,15 +4192,15 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-50"
-         x="-45.598698"
-         y="393.33395">Pacific</tspan></text>
+         x="-32.423489"
+         y="392.0304">Pacific</tspan></text>
     <rect
        style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-45"
        width="63.073643"
        height="15.073632"
-       x="-48.573681"
-       y="403.32211"
+       x="-35.468407"
+       y="402.0116"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_caucas1.png"
        inkscape:export-xdpi="90"
@@ -4169,8 +4208,8 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="-46.257458"
-       y="412.88748"
+       x="-33.082249"
+       y="411.58392"
        id="text3802-47-7"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4179,24 +4218,24 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-0"
-         x="-46.257458"
-         y="412.88748">Caucas1</tspan></text>
+         x="-33.082249"
+         y="411.58392">Caucas1</tspan></text>
     <rect
-       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636876999999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-8-9"
        width="63.073643"
        height="15.073632"
-       x="26.708494"
-       y="342.04715"
+       x="39.81377"
+       y="340.73663"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_asian_on.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
-       style="font-size:11.81255817000000086px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="29.426449"
-       y="351.93774"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="42.601658"
+       y="350.63419"
        id="text3802-47-9-3"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4205,50 +4244,50 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-41-0"
-         x="29.426449"
-         y="351.93774">Asian</tspan></text>
+         x="42.601658"
+         y="350.63419">Asian</tspan></text>
     <rect
-       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636876999999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-4-4"
        width="63.073643"
        height="15.073632"
-       x="26.708494"
-       y="363.67084"
+       x="39.81377"
+       y="362.36032"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_african_on.png"
-       inkscape:export-xdpi="45"
-       inkscape:export-ydpi="45" />
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
-       style="font-size:11.81255817000000086px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="29.426449"
-       y="373.44669"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="42.601658"
+       y="372.14313"
        id="text3802-47-3-6"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_african_on.png"
-       inkscape:export-xdpi="45"
-       inkscape:export-ydpi="45"><tspan
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-5-7"
-         x="29.426449"
-         y="373.44669">African</tspan></text>
+         x="42.601658"
+         y="372.14313">African</tspan></text>
     <rect
-       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636876999999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-87-9"
        width="63.073643"
        height="15.073632"
-       x="26.708494"
-       y="383.32877"
+       x="39.81377"
+       y="382.01825"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_pacific_on.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
-       style="font-size:11.81255817000000086px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="29.426445"
-       y="393.00027"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="42.601654"
+       y="391.69672"
        id="text3802-47-33-8"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4257,15 +4296,15 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-50-1"
-         x="29.426445"
-         y="393.00027">Pacific</tspan></text>
+         x="42.601654"
+         y="391.69672">Pacific</tspan></text>
     <rect
-       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636876999999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-45-6"
        width="63.073643"
        height="15.073632"
-       x="26.053228"
-       y="402.98666"
+       x="39.158504"
+       y="401.67615"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_caucas1_on.png"
        inkscape:export-xdpi="90"
@@ -4273,8 +4312,8 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="28.767685"
-       y="412.5538"
+       x="41.942894"
+       y="411.25024"
        id="text3802-47-7-8"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4283,15 +4322,15 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-0-2"
-         x="28.767685"
-         y="412.5538">Caucas1</tspan></text>
+         x="41.942894"
+         y="411.25024">Caucas1</tspan></text>
     <rect
        style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-45-9"
        width="63.073643"
        height="15.073632"
-       x="-48.463253"
-       y="430.13898"
+       x="-35.357979"
+       y="428.82846"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_caucas2.png"
        inkscape:export-xdpi="90"
@@ -4299,8 +4338,8 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="-46.146439"
-       y="439.56198"
+       x="-32.97123"
+       y="438.25842"
        id="text3802-47-7-6"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4309,15 +4348,15 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-0-5"
-         x="-46.146439"
-         y="439.56198">Caucas2</tspan></text>
+         x="-32.97123"
+         y="438.25842">Caucas2</tspan></text>
     <rect
        style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-45-6-7"
        width="63.073643"
        height="15.073632"
-       x="26.163658"
-       y="429.80353"
+       x="39.268932"
+       y="428.49301"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_caucas2_on.png"
        inkscape:export-xdpi="90"
@@ -4325,8 +4364,8 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="28.8787"
-       y="439.2283"
+       x="42.053909"
+       y="437.92474"
        id="text3802-47-7-8-2"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
@@ -4335,7 +4374,330 @@
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-56-0-2-1"
-         x="28.8787"
-         y="439.2283">Caucas2</tspan></text>
+         x="42.053909"
+         y="437.92474">Caucas2</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnreset_on.png"
+       ry="2.3011835"
+       y="362.46326"
+       x="116.7573"
+       height="15.341223"
+       width="31.341223"
+       id="rect3737-2-0-8-5-3-8-4-09-8-0-8"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnreset_on.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-3-7-9"
+       y="371.68976"
+       x="120.09029"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       xml:space="preserve"><tspan
+         y="371.68976"
+         x="120.09029"
+         id="tspan3804-56-401-8-4-0"
+         sodipodi:role="line">Reset</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-2-0-8-5-3-8-4-09-8-6"
+       width="31.341223"
+       height="15.341223"
+       x="117.19625"
+       y="340.7612"
+       ry="2.3011835"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnreset.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="120.53156"
+       y="350.10287"
+       id="text3802-47-0-3-8"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnreset.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-8-7"
+         x="120.53156"
+         y="350.10287">Reset</tspan></text>
+    <path
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_gender.png"
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 427.14224,54.61129 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 128,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46875,0 z"
+       id="rect4238-9-90" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.60939598px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="428.41388"
+       y="69.413353"
+       id="text3802-14-9-8-5-7"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_gender.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2"
+         x="428.41388"
+         y="69.413353">Gender tool</tspan></text>
+    <path
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 427.14224,182.61129 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.51472 128,-10e-6 0,102.51473 c 0,2.37693 -1.88189,4.29721 -4.25,4.29721 l -119.46875,0 z"
+       id="rect4238-9-6-7"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_gender.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29"
+       width="120.00141"
+       height="101.55521"
+       x="426.97095"
+       y="76.159431"
+       ry="3.5770829"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_gender.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       id="rect4238-5"
+       width="128"
+       height="255.99969"
+       x="422.50854"
+       y="186.72273"
+       ry="4.2745557"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-6"
+       width="120.00141"
+       height="230.36415"
+       x="426.50781"
+       y="207.95883"
+       ry="3.5770829"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.60922432px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="428.04581"
+       y="200.82323"
+       id="text3802-14-9-8-58"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-8"
+         x="428.04581"
+         y="200.82323">Head tool</tspan></text>
+    <path
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_pelvis.png"
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 426.78979,448.10603 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 128,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46875,0 z"
+       id="rect4238-9-90-0" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.60939598px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="428.05954"
+       y="460.81512"
+       id="text3802-14-9-8-5-7-8"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_pelvis.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2-3"
+         x="428.05954"
+         y="460.81512">Pelvis tool</tspan></text>
+    <path
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 426.78979,576.10603 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.51472 128,-1e-5 0,102.51473 c 0,2.37693 -1.88189,4.29721 -4.25,4.29721 l -119.46875,0 z"
+       id="rect4238-9-6-7-0"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_pelvis.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29-0"
+       width="120.00141"
+       height="101.55521"
+       x="426.6185"
+       y="469.65417"
+       ry="3.5770829"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_pelvis.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <path
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_modifiers.png"
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 559.50553,53.956026 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 128,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46875,0 z"
+       id="rect4238-9-90-0-9" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.60939598px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="561.48499"
+       y="68.761589"
+       id="text3802-14-9-8-5-7-8-7"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_modifiers.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2-3-9"
+         x="561.48499"
+         y="68.761589">Modifiers</tspan></text>
+    <path
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 559.50553,181.95603 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.514724 128,-1e-5 0,102.514734 c 0,2.37693 -1.88189,4.29721 -4.25,4.29721 l -119.46875,0 z"
+       id="rect4238-9-6-7-0-6"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_modifiers.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29-0-3"
+       width="120.00141"
+       height="101.55521"
+       x="559.33429"
+       y="75.504173"
+       ry="3.5770829"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_modifiers.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_muscle_on.png"
+       ry="2.3011835"
+       y="185.85068"
+       x="125.08732"
+       height="15.341223"
+       width="31.341223"
+       id="rect3737-2-0-8-5-3-8-4-09-8-0-6"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_muscle_on.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-3-7-0"
+       y="196.01462"
+       x="128.46475"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       xml:space="preserve"><tspan
+         y="196.01462"
+         x="128.46475"
+         id="tspan3804-56-401-8-4-8"
+         sodipodi:role="line">Tone</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_weight_on.png"
+       ry="2.3011835"
+       y="185.85068"
+       x="162.83815"
+       height="15.341223"
+       width="31.341223"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-0-0"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_weight_on.png"
+       transform="scale(0.99469202,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-2-5-0-2-7"
+       y="196.70352"
+       x="166.41708"
+       style="font-size:10.00000095px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       xml:space="preserve"><tspan
+         y="196.70352"
+         x="166.41708"
+         id="tspan3804-56-401-7-4-0-4-3"
+         sodipodi:role="line">Wght</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-2-0-8-5-3-8-4-09-8-65"
+       width="31.341223"
+       height="15.341223"
+       x="125.52625"
+       y="164.14862"
+       ry="2.3011835"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_muscle.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="128.90602"
+       y="174.42772"
+       id="text3802-47-0-3-5"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_muscle.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-8-6"
+         x="128.90602"
+         y="174.42772">Tone</tspan></text>
+    <g
+       id="g3448-7-9"
+       transform="translate(-340.56658,-192.01752)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_weight.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         inkscape:export-ydpi="45"
+         inkscape:export-xdpi="45"
+         inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_exit.png"
+         ry="2.3011835"
+         y="356.16614"
+         x="503.84366"
+         height="15.341223"
+         width="31.341223"
+         id="rect3737-2-0-8-5-3-8-4-09-1-4-9-3"
+         style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         inkscape:export-ydpi="45"
+         inkscape:export-xdpi="45"
+         inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_exit.png"
+         transform="scale(0.99469202,1.0053363)"
+         sodipodi:linespacing="125%"
+         id="text3802-47-0-2-5-0-5"
+         y="366.11493"
+         x="509.24231"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+         xml:space="preserve"><tspan
+           y="366.11493"
+           x="509.24231"
+           id="tspan3804-56-401-7-4-0-0"
+           sodipodi:role="line">Wght</tspan></text>
+    </g>
   </g>
 </svg>

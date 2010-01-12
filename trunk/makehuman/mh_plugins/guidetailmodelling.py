@@ -330,9 +330,15 @@ class DetailModelingTaskView(gui3d.TaskView):
       category.app.getThemeResource("images", "details_on.png"))
     self.tool = None
     
+    #details tool panel background
+    gui3d.Object(self, "data/3dobjs/group_128x128.obj", self.app.getThemeResource("images", "group_details_gender.png"), [10, 80, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_128x256.obj", self.app.getThemeResource("images", "group_details_head.png"), [10, 211, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_128x128.obj", self.app.getThemeResource("images", "group_details_pelvis.png"), [650, 80, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_128x128.obj", self.app.getThemeResource("images", "group_details_modifiers.png"), [650, 211, 9.0])
+    
     self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_genitals.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 90, 9.3], value = 0.0,
-      min = -1.0, max = 1.0)
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 105, 9.3], value = 0.0,
+      min = -1.0, max = 1.0)    
     
     @self.genitalsSlider.event
     def onChange(value):
@@ -340,7 +346,7 @@ class DetailModelingTaskView(gui3d.TaskView):
       self.app.do(DetailAction(human, "Genitals", value, self.syncSliders))
       
     self.breastCupSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_cup.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 190, 9.2], value = 0.5,
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 139, 9.2], value = 0.5,
       min = 0, max = 1)
     
     @self.breastCupSlider.event
@@ -349,7 +355,7 @@ class DetailModelingTaskView(gui3d.TaskView):
       self.app.do(DetailAction(human, "BreastSize", value, self.syncSliders))
       
     self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource("images", "slider_breast_firmness.png"),
-      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 290, 9.2], value = 0.5,
+      self.app.getThemeResource("images", "slider.png"), self.app.getThemeResource("images", "slider_focused.png"), position = [10, 173, 9.2], value = 0.5,
       min = 0, max = 1)
       
     @self.breastFirmnessSlider.event
@@ -359,12 +365,14 @@ class DetailModelingTaskView(gui3d.TaskView):
       
     self.detailButtonGroup = []
     self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
+      mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_muscle.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [10, 340, 9],
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [673, 242, 9.2],
       selected = True)
     self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup,
+      mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_weight.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [10, 420, 9])
+      selectedTexture = self.app.getThemeResource("images", "button_weight_on.png"), position = [708, 242, 9.2])
       
     self.tool = DetailTool(self.app, False, "_flaccid", "_muscle")
       

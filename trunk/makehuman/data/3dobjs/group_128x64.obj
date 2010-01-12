@@ -1,4 +1,4 @@
-# Background panel 128x256, centered at 0,0
+# Background panel 128x64, centered at 0,0
 v 0 0 0
 v 128 0 0
 v 128 64 0

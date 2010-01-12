@@ -120,9 +120,9 @@ class MacroModelingTaskView(gui3d.TaskView):
     
     self.status = gui3d.TextView(self, mesh = "data/3dobjs/empty.obj", position = [10, 590, 9.1])
     
-    gui3d.Object(self, "data/3dobjs/group_main.obj", self.app.getThemeResource("images", "group_main.png"), [10, 80, 9.0])
-    gui3d.Object(category, "data/3dobjs/group_actions.obj", self.app.getThemeResource("images", "group_actions.png"), [10, 340, 9.0])
-    gui3d.Object(self, "data/3dobjs/group_ethnics.obj", self.app.getThemeResource("images", "group_ethnics.png"), [10, 408, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_128x256.obj", self.app.getThemeResource("images", "group_main.png"), [10, 80, 9.0])
+    gui3d.Object(category, "data/3dobjs/group_128x64.obj", self.app.getThemeResource("images", "group_actions.png"), [10, 472, 9.0])
+    gui3d.Object(self, "data/3dobjs/group_128x128.obj", self.app.getThemeResource("images", "group_ethnics.png"), [10, 340, 9.0])
     
     # Macro sliders
     self.genderSlider = gui3d.Slider(self, self.app.getThemeResource("images", "button_gender_macro.png"),
@@ -201,15 +201,15 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.background = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, -89.98])
     self.undoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_undo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [33, 371, 9.1],
+      selectedTexture = self.app.getThemeResource("images", "button_undo_on.png"), position = [33, 503, 9.1],
       focusedTexture = self.app.getThemeResource("images", "button_undo_focused.png"))
     self.redoButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_redo.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [68, 371, 9.1],
+      selectedTexture = self.app.getThemeResource("images", "button_redo_on.png"), position = [68, 503, 9.1],
       focusedTexture = self.app.getThemeResource("images", "button_redo_focused.png"))
     self.resetButton = gui3d.Button(category, mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_reset.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_reset_on.png"), position = [103, 371,9.1],
+      selectedTexture = self.app.getThemeResource("images", "button_reset_on.png"), position = [103, 503,9.1],
       focusedTexture = self.app.getThemeResource("images", "button_reset_focused.png"))
       
     @self.undoButton.event
@@ -238,7 +238,7 @@ class MacroModelingTaskView(gui3d.TaskView):
       self.app.scene3d.redraw(1)
       
     self.backgroundImage = gui3d.Object(category, "data/3dobjs/background.obj", position = [400, 300, 1], visible = False)
-    self.backgroundImageToggle = gui3d.ToggleButton(category, mesh = "data/3dobjs/button_standard.obj", position = [33, 390, 9.1],
+    self.backgroundImageToggle = gui3d.ToggleButton(category, mesh = "data/3dobjs/button_standard.obj", position = [33, 522, 9.1],
       texture = self.app.getThemeResource("images", "button_background_toggle.png"),
       selectedTexture = self.app.getThemeResource("images", "button_background_toggle_on.png"),
       focusedTexture = self.app.getThemeResource("images", "button_background_toggle_focused.png"))
@@ -260,23 +260,23 @@ class MacroModelingTaskView(gui3d.TaskView):
     self.ethnicsGroup = []
     self.asianButton = gui3d.RadioButton(self, self.ethnicsGroup, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_african.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_african_on.png"), position = [49, 440, 9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_african_on.png"), position = [49, 372, 9.1])
     self.africanButton = gui3d.RadioButton(self, self.ethnicsGroup, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_asian.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_asian_on.png"), position = [49, 460, 9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_asian_on.png"), position = [49, 392, 9.1])
     self.caucas1Button = gui3d.RadioButton(self, self.ethnicsGroup, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_caucas1.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_caucas1_on.png"), position = [49, 480, 9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_caucas1_on.png"), position = [49, 412, 9.1])
     self.caucas2Button = gui3d.RadioButton(self, self.ethnicsGroup, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_caucas2.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_caucas2_on.png"), position = [49, 500, 9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_caucas2_on.png"), position = [49, 432, 9.1])
     self.pacificButton = gui3d.RadioButton(self, self.ethnicsGroup, mesh = "data/3dobjs/button_standard_big.obj",
       texture = self.app.getThemeResource("images", "button_pacific.png"), 
-      selectedTexture = self.app.getThemeResource("images", "button_pacific_on.png"), position = [49, 520, 9.1])
+      selectedTexture = self.app.getThemeResource("images", "button_pacific_on.png"), position = [49, 452, 9.1])
     self.ethnicResetButton = gui3d.Button(self,
       mesh = "data/3dobjs/button_standard.obj",
       texture = self.app.getThemeResource("images", "button_ethnreset.png"),
-      selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [100, 520, 9.1])     
+      selectedTexture = self.app.getThemeResource("images", "button_ethnreset_on.png"), position = [100, 452, 9.1])     
       
     self.syncSliders()
     self.syncStatus()
