@@ -509,6 +509,12 @@ def parseIcu(ipo, args, tokens):
 			#bz = BezTriple.New(h1x,h1y,0, px,py,0, h2x,h2y,0)
 			#icu.bezierPoints.append((px,py))
 			icu.addBezier((px,py))
+		elif key == 'driverBone':
+			try:
+				defaultKey(key, val, "icu", globals(), locals())
+			except:
+				blenderWarning()
+
 		else:
 			defaultKey(key, val, "icu", globals(), locals())
 
@@ -1046,7 +1052,7 @@ def insertInfluenceIpo(cns, bone):
 		try:
 			icu.driverBone = bone
 		except:
-			Draw.PupMenu("MHX only works with Blender 2.49b")
+			blenderWarning()
 		icu.driverChannel = IpoCurve.LOC_X
 		icu.extend = 0
 		icu.interpolation = 1
@@ -1063,6 +1069,14 @@ def insertInfluenceIpo(cns, bone):
 
 	return True
 
+warnedBlenderVersion = False
+
+def blenderWarning():
+	global warnedBlenderVersion
+	if not warnedBlenderVersion:
+		Draw.PupMenu("MHX only works properly with Blender 2.49b")
+		warnedBlenderVersion = True
+	return
 	
 
 def parseConstraint(constraints, args, tokens, name):
