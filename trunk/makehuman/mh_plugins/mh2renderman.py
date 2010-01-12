@@ -55,7 +55,7 @@ def writeHairs(ribRepository, mesh):
     #hairsClass.generateHairStyle1()
     hairsClass.generateHairStyle2()
     print "Writing hairs"
-    hairName = "%s/hairs.rib"%(ribRepository)
+    hairName = os.path.join(ribRepository, "hairs.rib")
     hairFile = open(hairName,'w')
     for hSet in hairsClass.hairStyle:
         if "clump" in hSet.name:
@@ -398,10 +398,10 @@ def writeLightMapFrameLowRes(scene, ribfile, ribRepository):
         name = obj.name
         if name == "base.obj": #TODO: attribute haveSSS
 
-            ribPath = ribRepository + "/" + name +"_map"+ ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
-            mapPath = ribRepository + "/" + name +"_map"+ ".tif"
-            texturePath = ribRepository + "/" + name +"_map"+ ".tx"
+            ribPath = os.path.join(ribRepository, name + "_map" + ".rib")
+            objPath = os.path.join("data/3dobjs/", "base.obj")
+            mapPath = os.path.join(ribRepository, "textures", name +"_map"+ ".tif")
+            texturePath = os.path.join(ribRepository, "textures", name +"_map"+ ".tx")
 
             ribfile.write("FrameBegin 1\n")
             ribfile.write("Projection \"orthographic\"")
@@ -466,8 +466,8 @@ def writeLightMapFrameLowRes(scene, ribfile, ribRepository):
     #for obj in scene.objects:
         #name = obj.name
         #if name == "base.obj":  #TODO: attribute isRendered
-            #ribPath = ribRepository + "/" + name + ".rib"
-            #objPath = "data/3dobjs/" + "base.obj"
+            #ribPath = os.path.join(ribRepository, name + ".rib")
+            #objPath = os.path.join("data/3dobjs", "base.obj")
 
             #ribfile.write('\tAttributeBegin\n')
             ##ribfile.write("\t\tOrientation \"inside\"\n")
@@ -477,7 +477,7 @@ def writeLightMapFrameLowRes(scene, ribfile, ribRepository):
             #ribfile.write('\tAttributeEnd\n')
             #writeHairs(ribRepository, obj)
     #ribfile.write('\tAttributeBegin\n')
-    #ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    #ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(ribRepository, "hairs.rib")))
     #ribfile.write('\tAttributeEnd\n')
 
     #ribfile.write("WorldEnd\n")
@@ -547,10 +547,10 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
+            ribPath = os.path.join(ribRepository, name + ".rib")
+            objPath = os.path.join("data/3dobjs", base.obj)
 
-            lightMap = ribRepository + "/" + name +"_map"+ ".tif"
+            lightMap = os.path.join(ribRepository, "textures", name +"_map"+ ".tif")
 
             ribfile.write('\tAttributeBegin\n')
             #ribfile.write("\t\tOrientation \"inside\"\n")
@@ -578,7 +578,7 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
                     hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
 
 
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(ribRepository, "hairs.rib")))
     ribfile.write('\tAttributeEnd\n')
 
     ribfile.write("WorldEnd\n")
@@ -607,8 +607,8 @@ def mh2Pixie(scene, fName, ribRepository):
 
     ribfile = file(fName,'w')
 
-    shadowPath1 = ribRepository + "/zbuffer.tif"
-    shadowPath2 = ribRepository + "/zmap.shad"
+    shadowPath1 = os.path.join(ribRepository, "/zbuffer.tif")
+    shadowPath2 = os.path.join(ribRepository, "/zmap.shad")
     cameraData = scene.getCameraSettings()
     yResolution = cameraData[6]
     xResolution = cameraData[7]
@@ -656,7 +656,7 @@ def mh2Pixie(scene, fName, ribRepository):
             #ribfile.write('\tAttributeEnd\n')
             #writeHairs(ribRepository, obj)
     #ribfile.write('\tAttributeBegin\n')
-    #ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    #ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(ribRepository, "hairs.rib"))
     #ribfile.write('\tAttributeEnd\n')
     #ribfile.write("WorldEnd\n")
     #ribfile.write("FrameEnd\n")
@@ -689,11 +689,11 @@ def mh2Pixie(scene, fName, ribRepository):
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
-            bakePath = ribRepository + "/" + name +"_map"+ ".ptc"
-            lightMapTmp = ribRepository + "/" + name +"_map"+ ".tx"
-            lightMapFinal = ribRepository + "/" + name +"_map"+ ".tif"
+            ribPath = os.path.join(ribRepository, name + ".rib")
+            objPath = os.path.join("data/3dobjs", "base.obj")
+            bakePath = os.path.join(ribRepository, "textures", name +"_map"+ ".ptc")
+            lightMapTmp = os.path.join(ribRepository, "textures", name +"_map"+ ".tx")
+            lightMapFinal = os.path.join(ribRepository, "textures", name +"_map"+ ".tif")
             colorTexture = "texture.tif"
             ribfile.write('\tAttributeBegin\n')
             ribfile.write("\t\tColor [%s %s %s]\n" %(0.8, 0.8, 0.8))
@@ -771,10 +771,10 @@ def mh2Pixie(scene, fName, ribRepository):
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
+            ribPath = os.path.join(ribRepository, "/" + name + ".rib")
+            objPath = os.path.join("data/3dobjs", "base.obj")
 
-            #lightMap = ribRepository + "/" + name +"_map"+ ".tif"
+            #lightMap = os.path.join(ribRepository, "textures", name +"_map"+ ".tif")
 
             ribfile.write('\tAttributeBegin\n')
             #ribfile.write("\t\tOrientation \"inside\"\n")
@@ -799,7 +799,7 @@ def mh2Pixie(scene, fName, ribRepository):
     ribfile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]\n'%(hairsClass.rootColor[0],\
                     hairsClass.rootColor[1],hairsClass.rootColor[2],\
                     hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(ribRepository, "hairs.rib")))
     ribfile.write('\tAttributeEnd\n')
 
     ribfile.write("WorldEnd\n")
@@ -845,8 +845,13 @@ def mh2Aqsis(scene, fName, ribRepository):
 
     ribfile = file(fName,'w')
     print "RENDERING IN AQSIS"
-    shadowPath1 = ribRepository + "/zbuffer.tif"
-    shadowPath2 = ribRepository + "/zmap.shad"
+    applicationPath = os.getcwd() # TODO: this may not always return the app folder
+    appTexturePath = os.path.join(applicationPath, "data", "textures")
+    appShaderPath = os.path.join(applicationPath, "data", "shaders", "renderman")
+    appObjectPath = os.path.join(applicationPath, "data", "3dobjs")
+    usrTexturePath = os.path.join(ribRepository, "textures")
+    shadowPath1 = os.path.join(ribRepository, "zbuffer.tif")
+    shadowPath2 = os.path.join(ribRepository, "zmap.shad")
     cameraData = scene.getCameraSettings()
     yResolution = cameraData[6]
     xResolution = cameraData[7]
@@ -856,47 +861,34 @@ def mh2Aqsis(scene, fName, ribRepository):
     zoom = cameraData[2]
     rotX = cameraData[3]
     rotY = cameraData[4]
-
    
     #These two list should be replaced by lights class in module3d.py
     pointLightCoords = [[-8, 10, 15],[1, 10, 15],[1, 15, -8],[-8, 0, 0]]
     pointLightIntensity = [.6, .6, .9, .6]
-   
-  
 
-
-    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture.tif', 'data/textures/texture.texture'))
-    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_opacity.tif', 'data/textures/texture_opacity.texture'))
-    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_ref.tif', 'data/textures/texture_ref.texture'))
-    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%('data/textures/texture_mix.tif', 'data/textures/texture_mix.texture'))
-    
-    
-
-
-
-
-
-
-
+    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(os.path.join(appTexturePath, 'texture.tif').replace('\\', '/'), os.path.join(usrTexturePath, 'texture.texture').replace('\\', '/')))
+    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(os.path.join(appTexturePath, 'texture_opacity.tif').replace('\\', '/'), os.path.join(usrTexturePath, 'texture_opacity.texture').replace('\\', '/')))
+    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(os.path.join(appTexturePath, 'texture_ref.tif').replace('\\', '/'), os.path.join(usrTexturePath, 'texture_ref.texture').replace('\\', '/')))
+    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(os.path.join(appTexturePath, 'texture_mix.tif').replace('\\', '/'), os.path.join(usrTexturePath, 'texture_mix.texture').replace('\\', '/')))
 
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj": #TODO: attribute haveSSS
 
-            ribPath = ribRepository + "/" + name +"_map"+ ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
-            mapPath = ribRepository + "/" + name +"_map"+ ".tif"
-            lightMapFinal = ribRepository + "/" + name +"_map"+ ".texture"
+            ribPath = os.path.join(ribRepository, name +"_map"+ ".rib")
+            objPath = os.path.join("data/3dobjs", "base.obj")
+            mapPath = os.path.join(usrTexturePath, name +"_map"+ ".tif")
+            lightMapFinal = os.path.join(usrTexturePath, name +"_map"+ ".texture")
 
             ribfile.write("FrameBegin 1\n")
-            ribfile.write("Projection \"orthographic\"")
-            ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
-            ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+            ribfile.write("Projection \"orthographic\"\n")
+            ribfile.write("Option \"searchpath\" \"shader\" \"%s:&\"\n" % (appShaderPath.replace('\\', '/')))
+            ribfile.write("Option \"searchpath\" \"texture\" \"%s:&\"\n" % (usrTexturePath.replace('\\', '/')))
             ribfile.write("Format %s %s 1\n" % (512, 512))
             ribfile.write("PixelFilter \"gaussian\" %s %s \n" % (8, 8))#This cause sss
             ribfile.write("PixelSamples %s %s\n"%(1,1))
             #ribfile.write("Sides 2\n")
-            ribfile.write("Display \"%s\" \"file\" \"rgba\"\n" % (mapPath))
+            ribfile.write("Display \"%s\" \"file\" \"rgba\"\n" % (mapPath.replace('\\', '/')))
             ribfile.write("Display \"+light_map\" \"framebuffer\" \"rgb\"\n")
             ribfile.write("\t\tScale %s %s %s\n" %(2,2,2))
             ribfile.write("\t\tTranslate %s %s %s\n" %(-0.5, -0.5, 1))
@@ -904,19 +896,14 @@ def mh2Aqsis(scene, fName, ribRepository):
             ribfile.write('\tAttributeBegin\n')            
             writeLightMapObj(ribPath, obj, objPath,pointLightCoords,pointLightIntensity)
             ribfile.write('\tSurface "onlyci"\n')
-            ribfile.write('\t\tReadArchive "%s"\n' %("data/3dobjs/quad.obj.rib"))
+            ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(appObjectPath, "quad.obj.rib").replace('\\', '/')))
             #ribfile.write('\tSurface "onlyci"\n')
             ribfile.write('\tSurface "lightmap" "string texturename" "texture.texture"\n')
-            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
+            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath.replace('\\', '/')))
             ribfile.write('\tAttributeEnd\n')
             ribfile.write("WorldEnd\n")
             ribfile.write("FrameEnd\n")
-            ribfile.write("MakeTexture \"%s\" \"%s\" \"periodic\" \"periodic\" \"gaussian\" 1 1\n" % (mapPath,lightMapFinal))
-
-
-
-
-
+            ribfile.write("MakeTexture \"%s\" \"%s\" \"periodic\" \"periodic\" \"gaussian\" 1 1\n" % (mapPath.replace('\\', '/'), lightMapFinal.replace('\\', '/')))
 
     # FRAME 4 ####################
     # FINAL RENDERING
@@ -924,8 +911,8 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("FrameBegin 2\n")
     ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
     ribfile.write("Option \"statistics\" \"endofframe\" [1]\n")
-    ribfile.write("Option \"searchpath\" \"shader\" \"data/shaders/renderman:&\"\n")
-    ribfile.write("Option \"searchpath\" \"texture\" \"data/textures:&\"\n")
+    ribfile.write("Option \"searchpath\" \"shader\" \"%s:&\"\n" % (appShaderPath.replace('\\', '/')))
+    ribfile.write("Option \"searchpath\" \"texture\" \"%s:&\"\n" % (usrTexturePath.replace('\\', '/')))
     ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(fov))
     ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
     ribfile.write("Clipping 0.1 100\n")
@@ -960,10 +947,10 @@ def mh2Aqsis(scene, fName, ribRepository):
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
+            ribPath = os.path.join(ribRepository, name + ".rib")
+            objPath = os.path.join("data/3dobjs", "base.obj")
 
-            #lightMap = ribRepository + "/" + name +"_map"+ ".tif"
+            #lightMap = os.path.join(ribRepository, "textures", name +"_map"+ ".tif")
 
             ribfile.write('\tAttributeBegin\n')
             #ribfile.write("\t\tOrientation \"inside\"\n")
@@ -975,20 +962,18 @@ def mh2Aqsis(scene, fName, ribRepository):
             ribfile.write("\t\tRotate %s 1 0 0\n" %(0))
             ribfile.write("\t\tScale %s %s %s\n" %(1,1,1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [1]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [1]\n'%("texture_mix.texture", "texture_opacity.texture","texture.texture","texture_ref.texture",lightMapFinal.replace('\\', '/')))
             #ribfile.write('Surface "matte"')
-            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
+            ribfile.write('\t\tReadArchive "%s"\n' %(ribPath.replace('\\', '/')))
             ribfile.write('\tAttributeEnd\n')
             writeHairs(ribRepository, obj)
             headCentr = calculateHeadCentroid(obj)
-            
-
 
     ribfile.write('\tAttributeBegin\n')
 
     ribfile.write('\t\tColor [%f %f %f]\n' % (scene.selectedHuman.hairColor[0], scene.selectedHuman.hairColor[1], scene.selectedHuman.hairColor[2]))
     ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [.8] "float headX" [%s] "float headY" [%s] "float headZ" [%s] \n'%(headCentr[0],headCentr[1],headCentr[2]))
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(ribRepository, "hairs.rib").replace('\\', '/')))
     ribfile.write('\tAttributeEnd\n')
 
     ribfile.write("WorldEnd\n")
@@ -1016,8 +1001,8 @@ def mh23delight(scene, fName, ribRepository):
 
     ribfile = file(fName,'w')
 
-    shadowPath1 = ribRepository + "/zbuffer.tif"
-    shadowPath2 = ribRepository + "/zmap.shad"
+    shadowPath1 = os.path.join(ribRepository, "zbuffer.tif")
+    shadowPath2 = os.path.join(ribRepository, "zmap.shad")
     cameraData = scene.getCameraSettings()
     yResolution = cameraData[6]
     xResolution = cameraData[7]
@@ -1061,15 +1046,15 @@ def mh23delight(scene, fName, ribRepository):
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
+            ribPath = os.path.join(ribRepository, name + ".rib")
+            objPath = os.path.join("data/3dobjs", "base.obj")
             ribfile.write('\tAttributeBegin\n')            
             writeSubdivisionMesh(ribPath, obj, objPath)
             ribfile.write('\t\tReadArchive "%s"\n' %(ribPath))
             ribfile.write('\tAttributeEnd\n')
             writeHairs(ribRepository, obj)
     ribfile.write('\tAttributeBegin\n')
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(ribRepository, "hairs.rib")))
     ribfile.write('\tAttributeEnd\n')
     ribfile.write("WorldEnd\n")
     ribfile.write("FrameEnd\n")
@@ -1097,12 +1082,12 @@ def mh23delight(scene, fName, ribRepository):
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
-            bakePath = ribRepository + "/" + name +"_map"+ ".bake"
-            lightMapTmp = ribRepository + "/" + name +"_map"+ ".tx"
-            lightMapTmp2 = ribRepository + "/" + name +"_map"+ ".tif"
-            lightMapFinal = ribRepository + "/" + name +"_map"+ ".texture"
+            ribPath = os.path.join(ribRepository, name + ".rib")
+            objPath = os.path.join("data/3dobjs", "base.obj")
+            bakePath = os.path.join(ribRepository, "textures", name +"_map"+ ".bake")
+            lightMapTmp = os.path.join(ribRepository, "textures", name +"_map"+ ".tx")
+            lightMapTmp2 = os.path.join(ribRepository, "textures", name +"_map"+ ".tif")
+            lightMapFinal = os.path.join(ribRepository, "textures", name +"_map"+ ".texture")
             colorTexture = "texture.texture"
             ribfile.write('\tAttributeBegin\n')
             ribfile.write("\t\tColor [%s %s %s]\n" %(0.8, 0.8, 0.8))
@@ -1177,10 +1162,10 @@ def mh23delight(scene, fName, ribRepository):
     for obj in scene.objects:
         name = obj.name
         if name == "base.obj":  #TODO: attribute isRendered
-            ribPath = ribRepository + "/" + name + ".rib"
-            objPath = "data/3dobjs/" + "base.obj"
+            ribPath = os.path.join(ribRepository, name + ".rib")
+            objPath = os.path.join("data/3dobjs", "base.obj")
 
-            #lightMap = ribRepository + "/" + name +"_map"+ ".tif"
+            #lightMap = os.path.join(ribRepository, "textures", name +"_map"+ ".tif")
 
             ribfile.write('\tAttributeBegin\n')
             #ribfile.write("\t\tOrientation \"inside\"\n")
@@ -1205,7 +1190,7 @@ def mh23delight(scene, fName, ribRepository):
     ribfile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]\n'%(hairsClass.rootColor[0],\
                     hairsClass.rootColor[1],hairsClass.rootColor[2],\
                     hairsClass.tipColor[0],hairsClass.tipColor[1],hairsClass.tipColor[2]))
-    ribfile.write('\t\tReadArchive "%s/hairs.rib"\n' %(ribRepository))
+    ribfile.write('\t\tReadArchive "%s"\n' %(os.path.join(ribRepository, "hairs.rib")))
     ribfile.write('\tAttributeEnd\n')
 
     ribfile.write("WorldEnd\n")
@@ -1249,12 +1234,15 @@ def saveScene(scene, fName, ribDir, engine):
 
     loadHairsFile(scene.selectedHuman.hairFile)
     if not os.path.isdir(ribDir):
-        os.mkdir(ribDir)
-    ribRepository = ribDir+"/"+"ribFiles"
+        os.makedirs(ribDir)
+    ribRepository = os.path.join(ribDir, "ribFiles")
+    usrTexturePath = os.path.join(ribRepository, "textures")
 
 
     if not os.path.isdir(ribRepository):
-        os.mkdir(ribRepository)
+        os.makedirs(ribRepository)
+    if not os.path.isdir(usrTexturePath):
+        os.makedirs(usrTexturePath)
     fName = os.path.join(ribDir,fName)
 
     #ribfile = file(fName,'w')
@@ -1275,7 +1263,7 @@ def saveScene(scene, fName, ribDir, engine):
 
     if engine == "aqsis":
         #os.system('%s %s &'%('aqsis', fName))
-        command = '%s %s'%('aqsis -Progress', fName)
+        command = '%s "%s"'%('aqsis -Progress', fName)
     if engine == "pixie":
         command = '%s %s'%('rndr', fName)
     if engine == "3delight":

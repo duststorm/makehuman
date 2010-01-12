@@ -159,7 +159,7 @@ def povrayExportArray(obj, cameraSettings, path):
   # Make sure the directory exists
   if not os.path.isdir(outputDirectory):
     try:
-      os.mkdir(outputDirectory)
+      os.makedirs(outputDirectory)
     except:
       print "Error creating export directory ",outputDirectory,"."
       return 0
@@ -363,7 +363,7 @@ def povrayExportMesh2(obj, cameraSettings, path):
   # Make sure the directory exists
   if not os.path.isdir(outputDirectory):
     try:
-      os.mkdir(outputDirectory)
+      os.makedirs(outputDirectory)
     except:
       print "Error creating export directory ",outputDirectory,"."
       return 0

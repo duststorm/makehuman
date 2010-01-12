@@ -46,6 +46,9 @@
 #ifdef __APPLE__
     #include "OSXTools.h"
 #endif // __APPLE__
+#ifdef __WIN32__
+    #include <shlobj.h>
+#endif // __WIN32__
 
 /* Our global struct - all globals must be here */
 Global G;
@@ -393,7 +396,14 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
  */
 static PyObject* mh_getPath(PyObject *self, PyObject *type)
 {
+#ifdef __APPLE__
     const char *path = NULL;
+#else
+#ifndef MAX_PATH
+#define MAX_PATH 1024
+#endif // __WIN32__ and linux
+    char path[MAX_PATH];
+#endif // __APPLE__
     const char *typeStr;
     
     if (!PyString_Check(type))
@@ -417,18 +427,55 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     {
         path = getGrabPath();
     }
-#else  /* default as "exports/" at the current dir for Linux and Windows */
-    if (0 == strcmp(typeStr, "exports"))
+#elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
-        path = "exports/";
+      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+      if (FAILED(hr))
+      {
+        path[0] = "\0";
+      }
+
+      if (0 == strcmp(typeStr, "exports"))
+      {
+          strcat(path, "\\makehuman\\exports\\");
+      }
+      else if (0 == strcmp(typeStr, "models"))
+      {
+          strcat(path, "\\makehuman\\models\\");
+      }
+      else if (0 == strcmp(typeStr, "grab"))
+      {
+          strcat(path, "\\makehuman\\grab\\");
+      }
+      else if (0 == strcmp(typeStr, "render"))
+      {
+          strcat(path, "\\makehuman\\renderman_output\\");
+      }
     }
-    else if (0 == strcmp(typeStr, "models"))
+#else
     {
-        path = "models/";
-    }
-    else if (0 == strcmp(typeStr, "grab"))
-    {
-        path = "./";
+      struct passwd *pw = getpwent();
+      if (pw)
+        strcpy(path, pw->pw_dir);
+      else
+        path[0] = "\0";
+
+      if (0 == strcmp(typeStr, "exports"))
+      {
+          strcat(path, "/makehuman/exports/");
+      }
+      else if (0 == strcmp(typeStr, "models"))
+      {
+          strcat(path, "/makehuman/models/");
+      }
+      else if (0 == strcmp(typeStr, "grab"))
+      {
+          strcat(path, "/makehuman/grab/");
+      }
+      else if (0 == strcmp(typeStr, "render"))
+      {
+          strcat(path, "/makehuman/renderman_output/");
+      }
     }
 #endif
     if (NULL == path)

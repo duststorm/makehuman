@@ -6,6 +6,8 @@ import subprocess
 import mh2renderman
 # We need this for gui controls
 import gui3d
+import mh
+import os
 
 print("aqsis imported")
 
@@ -32,7 +34,10 @@ def load(app):
     pass
   @aqsis.button.event
   def onClicked(event):
-    mh2renderman.saveScene(app.scene3d, "scena.rib", "renderman_output", "aqsis")
+    renderPath = mh.getPath("render")
+    if not os.path.exists(renderPath):
+      os.makedirs(renderPath)
+    mh2renderman.saveScene(app.scene3d, "scena.rib", renderPath, "aqsis")
   
   print("aqsis loaded")
 

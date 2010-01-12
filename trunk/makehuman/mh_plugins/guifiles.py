@@ -41,7 +41,7 @@ class SaveTaskView(gui3d.TaskView):
     def onFileSelected(filename):
       modelPath = mh.getPath("models")
       if not os.path.exists(modelPath):
-        os.mkdir(modelPath)
+        os.makedirs(modelPath)
 
       tags = filename
       filename = filename.split()[0]
@@ -123,9 +123,8 @@ class ExportTaskView(gui3d.TaskView):
     @self.fileentry.event
     def onFileSelected(filename):
       exportPath = mh.getPath("exports")
-
       if not os.path.exists(exportPath):
-        os.mkdir(exportPath)
+        os.makedirs(exportPath)
         
       mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj")
       mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
