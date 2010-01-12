@@ -196,7 +196,7 @@ class MHApplication(gui3d.Application):
     self.progressBar.hide()
     
     font = font3d.Font("data/fonts/arial.fnt")
-    font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 500, 9.6]);
+    font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 540, 9.6]);
 
   def onStart(self, event):
       self.splash.hide()

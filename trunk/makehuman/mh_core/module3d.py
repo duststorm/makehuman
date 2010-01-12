@@ -478,18 +478,18 @@ class FaceGroup:
         return "facegroup %s"%(self.name)
 
     def createFace(self, v0, v1, v2, uv = None):
-            f = Face(v0,v1,v2)
-            f.group = self
-            self.faces.append(f)
-            self.parent.faces.append(f)
-            
-            if uv:
-              index = len(self.parent.uvValues)
-              for uvpair in uv:
-                self.parent.uvValues.append(uvpair)
-              f.uv = [index, index + 1, index + 2]
-            
-            return f
+        f = Face(v0,v1,v2)
+        f.group = self
+        self.faces.append(f)
+        self.parent.faces.append(f)
+        
+        if uv:
+          index = len(self.parent.uvValues)
+          for uvpair in uv:
+            self.parent.uvValues.append(uvpair)
+          f.uv = [index, index + 1, index + 2]
+        
+        return f
 
 class Object3D:
     """
