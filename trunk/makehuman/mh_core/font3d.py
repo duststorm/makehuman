@@ -94,7 +94,7 @@ def createMesh(scene, font, text, position):
   obj.sz = 1.0
   obj.visibility = 1
   obj.shadeless = 1
-  obj.pickable = 1
+  obj.pickable = 0
   obj.cameraMode = 1
   obj.text = ""
   obj.uvValues = []
