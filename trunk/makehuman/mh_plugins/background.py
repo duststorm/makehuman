@@ -47,6 +47,7 @@ class BackgroundTaskView(gui3d.TaskView):
         bg.setScale(float(self.texture.width) / float(self.texture.height), 1.0)
       bg.mesh.setPickable(0)
       bg.show()
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageToggle.setSelected(True)
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
     
