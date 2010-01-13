@@ -847,8 +847,8 @@ def mh2Aqsis(scene, fName, ribRepository):
     print "RENDERING IN AQSIS"
     applicationPath = os.getcwd() # TODO: this may not always return the app folder
     appTexturePath = os.path.join(applicationPath, "data", "textures")
-    appShaderPath = os.path.join(applicationPath, "data", "shaders", "renderman")
     appObjectPath = os.path.join(applicationPath, "data", "3dobjs")
+    usrShaderPath = os.path.join(ribRepository, "shaders")
     usrTexturePath = os.path.join(ribRepository, "textures")
     shadowPath1 = os.path.join(ribRepository, "zbuffer.tif")
     shadowPath2 = os.path.join(ribRepository, "zmap.shad")
@@ -882,7 +882,7 @@ def mh2Aqsis(scene, fName, ribRepository):
 
             ribfile.write("FrameBegin 1\n")
             ribfile.write("Projection \"orthographic\"\n")
-            ribfile.write("Option \"searchpath\" \"shader\" \"%s:&\"\n" % (appShaderPath.replace('\\', '/')))
+            ribfile.write("Option \"searchpath\" \"shader\" \"%s:&\"\n" % (usrShaderPath.replace('\\', '/')))
             ribfile.write("Option \"searchpath\" \"texture\" \"%s:&\"\n" % (usrTexturePath.replace('\\', '/')))
             ribfile.write("Format %s %s 1\n" % (512, 512))
             ribfile.write("PixelFilter \"gaussian\" %s %s \n" % (8, 8))#This cause sss
@@ -911,7 +911,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write("FrameBegin 2\n")
     ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
     ribfile.write("Option \"statistics\" \"endofframe\" [1]\n")
-    ribfile.write("Option \"searchpath\" \"shader\" \"%s:&\"\n" % (appShaderPath.replace('\\', '/')))
+    ribfile.write("Option \"searchpath\" \"shader\" \"%s:&\"\n" % (usrShaderPath.replace('\\', '/')))
     ribfile.write("Option \"searchpath\" \"texture\" \"%s:&\"\n" % (usrTexturePath.replace('\\', '/')))
     ribfile.write("Projection \"perspective\" \"fov\" %f\n"%(fov))
     ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
