@@ -432,7 +432,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
       HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
       if (FAILED(hr))
       {
-        path[0] = "\0";
+        path[0] = '\0';
       }
 
       if (0 == strcmp(typeStr, "exports"))
@@ -454,11 +454,11 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     }
 #else
     {
-      struct passwd *pw = getpwent();
-      if (pw)
-        strcpy(path, pw->pw_dir);
+      char *home = getenv("HOME");
+      if (home)
+        strcpy(path, home);
       else
-        path[0] = "\0";
+        path[0] = '\0';
 
       if (0 == strcmp(typeStr, "exports"))
       {
