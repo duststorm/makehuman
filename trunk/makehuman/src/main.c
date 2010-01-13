@@ -429,14 +429,25 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     }
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
-#ifdef CSIDL_MYDOCUMENTS
-      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
-#else
-      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, path);
-#endif
-      if (FAILED(hr))
+      typedef HMODULE  (__stdcall *SHGETFOLDERPATH)(HWND, int, HANDLE, DWORD, LPTSTR);        
+      HMODULE hModule = LoadLibrary("SHFOLDER.DLL");
+      if (hModule != NULL)
       {
-        path[0] = '\0';
+        SHGETFOLDERPATH fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetFolderPathA");
+        if (fnShGetFolderPath != NULL)
+        {
+    #ifdef CSIDL_MYDOCUMENTS
+          HRESULT hr = fnShGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+    #else
+          HRESULT hr = fnShGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path);
+    #endif
+
+          if (FAILED(hr))
+          {
+            path[0] = '\0';
+          }
+        }
+        FreeLibrary(hModule);
       }
 
       if (0 == strcmp(typeStr, "exports"))
