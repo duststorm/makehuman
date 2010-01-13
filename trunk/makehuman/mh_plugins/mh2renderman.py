@@ -925,7 +925,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write('Declare "blur" "float"\n')
     ribfile.write('Declare "falloff" "float"\n')
     ribfile.write('Display "Final pass" "framebuffer" "rgb"\n')
-    ribfile.write('Display "+rendering.tif" "file" "rgba"\n')
+    ribfile.write('Display "+%s" "file" "rgba"\n' %  (os.path.join(ribRepository, "rendering.tif").replace('\\', '/')))
     ribfile.write("\t\tTranslate %s %s %s\n" %(locX, locY, zoom))
     ribfile.write("\t\tRotate %s 1 0 0\n" %(-rotX))
     ribfile.write("\t\tRotate %s 0 1 0\n" %(-rotY))
