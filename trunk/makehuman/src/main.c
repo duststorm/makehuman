@@ -429,7 +429,11 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     }
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
+#ifdef CSIDL_MYDOCUMENTS
       HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+#else
+      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, path);
+#endif
       if (FAILED(hr))
       {
         path[0] = '\0';
