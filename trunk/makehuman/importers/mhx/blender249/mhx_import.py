@@ -8,10 +8,9 @@ Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.3'
+__version__= '0.4'
 __bpydoc__= '''\
 MHX exporter for Blender
-0.3 First version
 '''
 """ 
 **Project Name:**      MakeHuman
@@ -52,7 +51,7 @@ TexDir = "."
 #
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 3
+MINOR_VERSION = 4
 
 #
 #	Button flags
@@ -69,6 +68,7 @@ toggleShape = 0
 toggleRot90 = 1
 useMesh = 1
 doSmash = 1
+warnedTextureDir = False
 
 
 #
@@ -610,7 +610,7 @@ def doLoadFile(filepath):
 
 
 def parseFileName(filepath, dir):
-	global TexDir
+	global TexDir, warnedTextureDir
 	path1 = os.path.expanduser(filepath)
 	file1 = os.path.realpath(path1)
 	(path, filename) = os.path.split(file1)
@@ -622,6 +622,9 @@ def parseFileName(filepath, dir):
 	f = doLoadFile(file1)
 	if f:
 		return f
+	if warnedTextureDir:
+		return None
+	warnedTextureDir = True
 	TexDir = Draw.PupStrInput("TexDir? ", path, 100)
 	return doLoadFile(TexDir+"/"+filename)
 	
@@ -1103,9 +1106,10 @@ def parseConstraint(constraints, args, tokens, name):
 		if key == 'driver':
 			if insertInfluenceIpo(cns, val[0]):
 				pass
-			elif toggleFingerIK == 0 and val[0] == "FingerIK-switch":
-				print "Constraint "+name+" ignored."
-				cns.influence = 0.0
+			elif val[0] == "FingerIK_L" or val[0] == "FingerIK_R":
+				if toggleFingerIK == 0:
+					print "Constraint "+name+" ignored."
+					cns.influence = 0.0
 						
 		else:
 			idx = Constraint.Settings[key]

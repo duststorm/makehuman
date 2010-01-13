@@ -8,10 +8,9 @@ Tooltip: 'Export from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.3'
+__version__= '0.4'
 __bpydoc__= '''\
 MHX exporter for Blender
-0.3 First version
 '''
 """ 
 **Project Name:**      MakeHuman
@@ -42,7 +41,7 @@ from Blender.Mathutils import *
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 3
+MINOR_VERSION = 4
 verbosity = 1
 Epsilon = 1e-6
 done = 0
