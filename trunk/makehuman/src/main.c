@@ -432,7 +432,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #ifdef CSIDL_MYDOCUMENTS
       HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
 #else
-      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, path);
+      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, path);
 #endif
       if (FAILED(hr))
       {
