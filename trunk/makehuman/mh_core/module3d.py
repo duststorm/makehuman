@@ -386,6 +386,9 @@ class Face:
         self.idx = None
         self.group = None
 
+    def setColor(self, color):
+        f.color = [color, color, color]
+        f.updateColors()
 
     def calcNormal(self):
         """
@@ -490,6 +493,11 @@ class FaceGroup:
           f.uv = [index, index + 1, index + 2]
         
         return f
+        
+    def setColor(self, color):
+      for f in self.faces:
+        f.color = [color, color, color]
+        f.updateColors()
 
 class Object3D:
     """

@@ -87,9 +87,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
   def setColor(self, color):
     c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
     for g in self.colorPreview.mesh.facesGroups:
-      for f in g.faces:
-        f.color = [c, c, c]
-        f.updateColors()
+      g.setColor(c)
     
   def onShow(self, event):
     gui3d.TaskView.onShow(self, event)

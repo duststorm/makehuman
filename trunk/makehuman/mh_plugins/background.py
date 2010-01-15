@@ -38,9 +38,7 @@ class BackgroundTaskView(gui3d.TaskView):
       bg = self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImage
       bg.mesh.setTexture("backgrounds/" + filename)
       group = bg.mesh.getFaceGroup("default-dummy-group")
-      for f in group.faces:
-        f.color = [[255, 255, 255, 100], [255, 255, 255, 100], [255, 255, 255, 100]]
-        f.updateColors()
+      group.setColor([255, 255, 255, 100])
       if self.texture.width > self.texture.height:
         bg.setScale(1.0, float(self.texture.height) / float(self.texture.width))
       else:

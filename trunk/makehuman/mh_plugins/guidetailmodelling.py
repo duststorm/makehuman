@@ -150,24 +150,18 @@ class DetailTool(events3d.EventHandler):
       
     for g in self.selectedGroups:
       if g not in groups:
-        for f in g.faces:
-          f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
-          f.updateColors()
+        g.setColor([255, 255, 255, 255])
             
     for g in groups:
       if g not in self.selectedGroups:
-        for f in g.faces:
-          f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
-          f.updateColors()
+        g.setColor([0,255,0, 255])
         
     self.selectedGroups = groups
     self.app.scene3d.redraw()
     
   def onMouseExited(self, event):
     for g in self.selectedGroups:
-      for f in g.faces:
-        f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
-        f.updateColors()
+      g.setColor([255, 255, 255, 255])
         
     self.selectedGroups = []
     self.app.scene3d.redraw()
@@ -302,24 +296,18 @@ class Detail3dTool(events3d.EventHandler):
       
     for g in self.selectedGroups:
       if g not in groups:
-        for f in g.faces:
-          f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
-          f.updateColors()
+        g.setColor([255, 255, 255, 255])
             
     for g in groups:
       if g not in self.selectedGroups:
-        for f in g.faces:
-          f.color = [[0,255,0, 255], [0,255,0, 255], [0,255,0, 255]]
-          f.updateColors()
+        g.setColor([0,255,0, 255])
         
     self.selectedGroups = groups
     self.app.scene3d.redraw()
     
   def onMouseExited(self, event):    
     for g in self.selectedGroups:
-      for f in g.faces:
-        f.color = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
-        f.updateColors()
+      g.setColor([255, 255, 255, 255])
         
     self.selectedGroups = []
     self.app.scene3d.redraw()

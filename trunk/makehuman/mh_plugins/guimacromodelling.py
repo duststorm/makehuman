@@ -101,17 +101,12 @@ class EthnicMapButton(gui3d.RadioButton):
     # We first clear the non applied ethnics
     for g in obj.facesGroups:
       if g.name not in ethnics:
-        color =[255,255,255,255]
-        for f in g.faces:
-          f.color = [color,color,color]
-          f.updateColors()
+        g.setColor([255, 255, 255, 255])
     # Then we color the applied ethnics, doing it in two steps makes sure we don't erase our coloring
     for g in obj.facesGroups:
       if g.name in ethnics:
         color = [int(255*ethnics[g.name]), 1-int(255*ethnics[g.name]), 255, 255]
-        for f in g.faces:
-          f.color = [color,color,color]
-          f.updateColors()
+        g.setColor(color)
 
 class MacroModelingTaskView(gui3d.TaskView):
   def __init__(self, category):

@@ -240,9 +240,7 @@ class MHApplication(gui3d.Application):
           else:
             color = [100, 100, 100, 255]
           for g in background.mesh.facesGroups:
-            for f in g.faces:
-              f.color = [color, color, color]
-              f.updateColors()
+            g.setColor(color)
 
           self.app.scene3d.redraw()
 
