@@ -598,7 +598,10 @@ class Object3D:
         groupVerts = {}
         for f in self.faces:
           for i, v in enumerate(f.verts):
-            t = f.uv[i]
+            if f.uv:
+              t = f.uv[i]
+            else:
+              t = -1
             if v.idx not in groupVerts:
               v.indicesInFullVertArray.append(fullArrayIndex)
               groupVerts[v.idx] = {}
