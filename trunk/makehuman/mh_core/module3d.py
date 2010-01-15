@@ -591,6 +591,29 @@ class Object3D:
         self.vertexBufferSize = None
         self.uvValues = None
         self.text = ""
+        
+    def updateIndexBuffer(self):
+        del self.indexBuffer[:]
+        fullArrayIndex = 0
+        groupVerts = {}
+        for f in self.faces:
+          for i, v in enumerate(f.verts):
+            t = f.uv[i]
+            if v.idx not in groupVerts:
+              v.indicesInFullVertArray.append(fullArrayIndex)
+              groupVerts[v.idx] = {}
+              groupVerts[v.idx][t] = fullArrayIndex
+              self.indexBuffer.append(fullArrayIndex)
+              fullArrayIndex += 1
+            elif t not in groupVerts[v.idx]:
+              v.indicesInFullVertArray.append(fullArrayIndex)
+              groupVerts[v.idx][t] = fullArrayIndex
+              self.indexBuffer.append(fullArrayIndex)
+              fullArrayIndex += 1
+            else:
+              self.indexBuffer.append(groupVerts[v.idx][t])
+        
+        self.vertexBufferSize = fullArrayIndex;
 
     def createFaceGroup(self, name):
         fg = FaceGroup(name)

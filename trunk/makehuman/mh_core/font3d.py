@@ -127,29 +127,9 @@ def createMesh(scene, font, text, position):
     f1 = fg.createFace(v1, v4, v2, uv = (uv1, uv4, uv2))
     f2 = fg.createFace(v2, v4, v3, uv = (uv2, uv4, uv3))
   
-  fullArrayIndex = 0
-  groupVerts = {}
-  for f in obj.faces:
-    for i, v in enumerate(f.verts):
-      t = f.uv[i]
-      if v.idx not in groupVerts:
-        v.indicesInFullVertArray.append(fullArrayIndex)
-        groupVerts[v.idx] = {}
-        groupVerts[v.idx][t] = fullArrayIndex
-        obj.indexBuffer.append(fullArrayIndex)
-        fullArrayIndex += 1
-      elif t not in groupVerts[v.idx]:
-        v.indicesInFullVertArray.append(fullArrayIndex)
-        groupVerts[v.idx][t] = fullArrayIndex
-        obj.indexBuffer.append(fullArrayIndex)
-        fullArrayIndex += 1
-      else:
-        obj.indexBuffer.append(groupVerts[v.idx][t])
-        
-  obj.vertexBufferSize = fullArrayIndex;
-  obj.texture = font.file
+  obj.updateIndexBuffer()
   
-  print(obj.texture)
+  obj.texture = font.file
   
   scene.update()
           
