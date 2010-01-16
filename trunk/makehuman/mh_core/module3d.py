@@ -1113,7 +1113,7 @@ class Scene3D:
         """
         return "scene_type"
     
-    def clear():
+    def clear(self, obj):
         mh.world.remove(obj.object3d)
         obj.object3d = None
         if obj.indexBuffer:
