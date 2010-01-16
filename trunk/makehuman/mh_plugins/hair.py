@@ -36,7 +36,10 @@ class HairTaskView(gui3d.TaskView):
     @self.filechooser.event
     def onFileSelected(filename):
       print("Loading %s" %(filename))
-      self.app.scene3d.selectedHuman.setHairFile("data/hairs/" + filename)
+      human = self.app.scene3d.selectedHuman
+      human.setHairFile("data/hairs/" + filename)    
+      human.scene.clear(human.hairObj)
+      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename)
       #Josenow: TODO load .obj hair into model!
       #Josenow: TODO collision detection button?
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
@@ -69,7 +72,7 @@ def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
   obj.sy = 1.0
   obj.sz = 1.0
   obj.visibility = 1
-  obj.shadeless = 1
+  obj.shadeless = 0
   obj.pickable = 0
   obj.cameraMode = 0
   obj.text = ""
@@ -117,9 +120,6 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0]):
           for i in range(2,len(guide.controlPoints)-1):
               cp1=guide.controlPoints[i-1]
               cp2=guide.controlPoints[i]
-              #blender coords?
-              #cp1[2] = -cp1[2]
-              #cp2[2] = -cp2[2]
               verts=[cp1[:],cp1[:],cp2[:],cp2[:]]
               verts[0][0]=cp1[0]-res/2
               verts[1][0]=cp1[0]+res/2
