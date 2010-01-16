@@ -55,55 +55,52 @@ class HairTaskView(gui3d.TaskView):
     self.app.scene3d.selectedHuman.show()
     gui3d.TaskView.onHide(self, event)
   
-  #Draws a Quad
-  #TODO: account for world2local and viceversa
-  def drawQuad(self, scn, verts, position=[0.0,0.0,0.0], name="quad"):
-    obj = scn.newObj(name)
-    obj.x = position[0]
-    obj.y = position[1]
-    obj.z = position[2]
-    obj.rx = 0.0
-    obj.ry = 0.0
-    obj.rz = 0.0
-    obj.sx = 1.0
-    obj.sy = 1.0
-    obj.sz = 1.0
-    obj.visibility = 1
-    obj.shadeless = 1
-    obj.pickable = 0
-    obj.cameraMode = 0
-    obj.text = ""
-    #obj.uvValues = []
-    obj.indexBuffer = []
-    fg = obj.createFaceGroup("faces")
-    
-    # create vertices
-    v1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-    v2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
-    v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
-    v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
-
-    # create faces
-    f1 = fg.createFace(v1, v4, v2)
-    f2 = fg.createFace(v2, v4, v3)
+#Draws a Quad
+#TODO: account for world2local and viceversa
+def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
+  obj = scn.newObj(name)
+  obj.x = position[0]
+  obj.y = position[1]
+  obj.z = position[2]
+  obj.rx = 0.0
+  obj.ry = 0.0
+  obj.rz = 0.0
+  obj.sx = 1.0
+  obj.sy = 1.0
+  obj.sz = 1.0
+  obj.visibility = 1
+  obj.shadeless = 1
+  obj.pickable = 0
+  obj.cameraMode = 0
+  obj.text = ""
+  #obj.uvValues = []
+  obj.indexBuffer = []
+  fg = obj.createFaceGroup("faces")
   
-    obj.updateIndexBuffer()
-    scn.update()
-    
-  def loadHairsFile(self, scn, path,res=0.08):
-    hairsClass = hairgenerator.Hairgenerator()
-    hairsClass.loadHairs(path)
-    for group in hairsClass.guideGroups:
-        for guide in group.guides:
-            for i in range(2,len(guide.controlPoints)-1):
-                cp1=guide.controlPoints[i-1]
-                cp2=guide.controlPoints[i]
-                verts=[cp1[:],cp1[:],cp2[:],cp2[:]]
-                verts[0][0]=cp1[0]-res/2
-                verts[1][0]=cp1[0]+res/2
-                verts[2][0]=cp2[0]+res/2
-                verts[3][0]=cp2[0]-res/2
-                self.drawQuad(scn,verts)
+  # create vertices
+  v1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
+  v2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+  v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
+  v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
 
+  # create faces
+  f1 = fg.createFace(v1, v4, v2)
+  f2 = fg.createFace(v2, v4, v3)
 
-
+  obj.updateIndexBuffer()
+  scn.update()
+  
+def loadHairsFile(scn, path,res=0.08):
+  hairsClass = hairgenerator.Hairgenerator()
+  hairsClass.loadHairs(path)
+  for group in hairsClass.guideGroups:
+      for guide in group.guides:
+          for i in range(2,len(guide.controlPoints)-1):
+              cp1=guide.controlPoints[i-1]
+              cp2=guide.controlPoints[i]
+              verts=[cp1[:],cp1[:],cp2[:],cp2[:]]
+              verts[0][0]=cp1[0]-res/2
+              verts[1][0]=cp1[0]+res/2
+              verts[2][0]=cp2[0]+res/2
+              verts[3][0]=cp2[0]-res/2
+              drawQuad(scn,verts, "currentHair")

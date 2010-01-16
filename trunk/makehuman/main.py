@@ -166,9 +166,9 @@ class MHApplication(gui3d.Application):
 
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),
       self.getThemeResource("images", "button_library_on.png"))
-    h=hair.HairTaskView(library)
-    #h.drawQuad(self.scene3d, [[0.0,0.0,0.0],[0.0,10.0,0.0],[0.0,0.0,10.0],[10.0,0.0,0.0]], [0.0,0.0,0.0])
-    h.loadHairsFile(self.scene3d, "./utils/makehair/test.hair")
+    hair.HairTaskView(library)
+    hair.loadHairsFile(self.scene3d, "./data/hairs/test.hair")
+    #self.scene3d.deleteObj("currentHair") Does not work :P .. TODO marc
     background.BackgroundTaskView(library)
 
     # Load plugins not starting with _
