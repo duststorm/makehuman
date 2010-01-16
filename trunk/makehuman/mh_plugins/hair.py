@@ -117,6 +117,9 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0]):
           for i in range(2,len(guide.controlPoints)-1):
               cp1=guide.controlPoints[i-1]
               cp2=guide.controlPoints[i]
+              #blender coords?
+              #cp1[2] = -cp1[2]
+              #cp2[2] = -cp2[2]
               verts=[cp1[:],cp1[:],cp2[:],cp2[:]]
               verts[0][0]=cp1[0]-res/2
               verts[1][0]=cp1[0]+res/2
@@ -127,10 +130,13 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0]):
               v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
               v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
               fg.createFace(v1, v4, v2)
-              fg.createFace(v1, v4, v2)
+              fg.createFace(v2, v4, v3)
 
               #drawQuad(scn,verts, "currentHair")
 
+  #HACK: set hair color to default black 
+  fg.setColor([0,0,0,255]) #rgba
+  
   obj.updateIndexBuffer()
   scn.update()
   return obj
