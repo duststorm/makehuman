@@ -1112,6 +1112,15 @@ class Scene3D:
 
         """
         return "scene_type"
+    
+    def clear():
+        mh.world.remove(obj.object3d)
+        obj.object3d = None
+        if obj.indexBuffer:
+          del obj.indexBuffer[:]
+        del obj.faces[:]
+        del obj.verts[:]
+        del obj.facesGroups[:]
         
     def attach(self, obj):
         if obj.object3d:
