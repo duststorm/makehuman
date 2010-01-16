@@ -50,8 +50,9 @@ specific Python modules.
 __docformat__ = 'restructuredtext'
 
 import sys
-if 'nt' in sys.builtin_module_names:
-    sys.path.append("./pythonmodules")
+#print sys.builtin_module_names
+#if 'nt' in sys.builtin_module_names:
+sys.path.append("./pythonmodules")
 import mh
 import os
 import subprocess
@@ -165,7 +166,9 @@ class MHApplication(gui3d.Application):
 
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),
       self.getThemeResource("images", "button_library_on.png"))
-    hair.HairTaskView(library)
+    h=hair.HairTaskView(library)
+    #h.drawQuad(self.scene3d, [[0.0,0.0,0.0],[0.0,10.0,0.0],[0.0,0.0,10.0],[10.0,0.0,0.0]], [0.0,0.0,0.0])
+    h.loadHairsFile(self.scene3d, "./utils/makehair/test.hair")
     background.BackgroundTaskView(library)
 
     # Load plugins not starting with _

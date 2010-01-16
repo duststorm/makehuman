@@ -16,9 +16,9 @@ makehuman hairs.
 
 import random
 import math
-#import simpleoctree
+import simpleoctree
 import aljabr
-
+from collision import collision
 
 class Hair:
     """
@@ -88,7 +88,11 @@ class Hairgenerator:
         self.tags = []
         self.humanVerts = []
         self.path = None
-        #self.octree = simpleoctree.SimpleOctree(humanMesh.verts)# not used yet
+        
+        self.noGuides = 25
+        self.gLength = 5.0
+        self.noCPoints = 15
+        self.gFactor = 1.5
 
     def resetHairs(self):
         self.hairStyle = []
@@ -151,8 +155,6 @@ class Hairgenerator:
 
         No parameters
         """
-        
-        #THIS FINTERPOLATION IS NOT SO USEFL SO PROB. WILL BE REMOVED
         for guideGroup in self.guideGroups:
             for guide in guideGroup.guides:
                 self.generateHairInterpolation1(guide)
@@ -166,7 +168,7 @@ class Hairgenerator:
                 return i
         return None
 
-    def generateHairStyle2(self):
+    def generateHairStyle2(self,humanMesh=None,isCollision=False):
         """
         Calling this function, each guide is interpolated with all other guides
         to add a new strand of hairs to the hairstyle.
@@ -179,7 +181,7 @@ class Hairgenerator:
         #near = 0.08
         #far = 1.6
 
-
+        if humanMesh == None: isCollision=False
         for guideGroup in self.guideGroups:
             if len(guideGroup.guides) > 0:
 
@@ -238,7 +240,7 @@ class Hairgenerator:
                     guide1 = guideOrder[k1]
                     guide2 = guideOrder[k2]
                     print "INTERP. GUIDE",guide1.name,guide2.name
-                    self.generateHairInterpolation2(guide1,guide2)
+                    self.generateHairInterpolation2(guide1,guide2,humanMesh,isCollision)
 
     def generateHairInterpolation1(self,guide):
         hairName = "clump%s"%(guide.name)
@@ -283,8 +285,10 @@ class Hairgenerator:
                 hSet.hairs.append(h)
         self.hairStyle.append(hSet)
 
-
-    def generateHairInterpolation2(self,guide1,guide2):
+    #humanMesh is a blender object.. the format can be changed later on if the necessity arises!
+    #for the time being we have a blender object and gravity direction is [0,-1,0]
+    def generateHairInterpolation2(self,guide1,guide2,humanMesh,isCollision,startIndex=9,gravity=True):
+        if isCollision: octree = simpleoctree.SimpleOctree(humanMesh.getData().verts,0.08)
         hairName = "strand%s-%s"%(guide1.name,guide2.name)
         hSet = HairGroup(hairName)
 
@@ -323,9 +327,23 @@ class Hairgenerator:
                 vert2 = shorterGuide.controlPoints[i2]
 
                 #Slerp
-                angleBetweenGuides = math.acos(aljabr.vdot(aljabr.vnorm(vert1),aljabr.vnorm(vert2)))
-                f1 = math.sin((1-interpFactor)*angleBetweenGuides)/math.sin(angleBetweenGuides)
-                f2 = math.sin(interpFactor*angleBetweenGuides)/math.sin(angleBetweenGuides)
+                dotProd = aljabr.vdot(aljabr.vnorm(vert1),aljabr.vnorm(vert2))
+                #Python has a very very bad numerical accuracy.. we need to do this for very small angle between guides 
+                #this occurs when we do collision detection
+                if dotProd>1: 
+                    angleBetweenGuides = 0.0
+                else:
+                    angleBetweenGuides = math.acos(aljabr.vdot(aljabr.vnorm(vert1),aljabr.vnorm(vert2)))
+                denom = math.sin(angleBetweenGuides)
+                if denom == 0.0: #controlpoints of some guides coincide
+                    vert1[0] = self.randomPercentage*self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[0]
+                    vert1[1] = self.randomPercentage*self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[1]
+                    vert1[2] = self.randomPercentage*self.sizeMultiStrand*random.random()*self.randomFactMultiStrand+vert1[2]
+                    vert1= aljabr.vadd(vert1,randomVect)
+                    angleBetweenGuides = math.acos(aljabr.vdot(aljabr.vnorm(vert1),aljabr.vnorm(vert2)))
+                    denom = math.sin(angleBetweenGuides)
+                f1 = math.sin((1-interpFactor)*angleBetweenGuides)/denom
+                f2 = math.sin(interpFactor*angleBetweenGuides)/denom
                 newVert = aljabr.vadd(aljabr.vmul(vert1,f1),aljabr.vmul(vert2,f2))
 
                 #Uncomment the following line we use lerp instead slerp
@@ -333,6 +351,15 @@ class Hairgenerator:
                 h.controlPoints.append([newVert[0]+randomVect[0],\
                                                 newVert[1]+randomVect[1],\
                                                 newVert[2]+randomVect[2]])
+            if isCollision:
+                print "h is: ", h.controlPoints
+                for j in (0,len(h.controlPoints)):
+                    #print "h.controlPts is : ", h.controlPoints[i]
+                    #print "h.controlPts[i] length is: ", len(h.controlPoints[i])
+                    h.controlPoints[i][2] = -h.controlPoints[i][2] #Renderman to Blender coordinates!
+                collision(h.controlPoints,humanMesh,octree.minsize,startIndex,gravity)
+                for j in (0,len(h.controlPoints)):
+                    h.controlPoints[i][2] = -h.controlPoints[i][2] #Blender to Renderman coordinates!
             hSet.hairs.append(h)
         self.hairStyle.append(hSet)
 
@@ -403,8 +430,6 @@ class Hairgenerator:
             listOfLists.append(listToSplit[i: i+sublistLength])
         return listOfLists
 
-
-
     def loadHairs(self, path):
         try:
             fileDescriptor = open(path)
@@ -464,12 +489,3 @@ class Hairgenerator:
                 self.addHairGuide(guidePoints, guideName, currentGroup)
 
         fileDescriptor.close()
-
-
-
-
-
-
-
-
-
