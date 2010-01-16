@@ -100,8 +100,9 @@ class MHApplication(gui3d.Application):
     gui3d.Object(self, "data/3dobjs/lowerbar2.obj", self.getThemeResource("images", "lowerbar2.png"), [0, 568, 9])
 
     self.progressBar.setProgress(0.3)
-
-    self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj")
+    hairObj = hair.loadHairsFile(self.scene3d, "./data/hairs/test.hair")
+    #self.scene3d.clear(hairObj)
+    self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj", hairObj)
     #self.scene3d.selectedHuman.setGender(1.0)
     self.scene3d.selectedHuman.setTexture("data/textures/texture.tif")
 
@@ -167,8 +168,6 @@ class MHApplication(gui3d.Application):
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),
       self.getThemeResource("images", "button_library_on.png"))
     hair.HairTaskView(library)
-    hair.loadHairsFile(self.scene3d, "./data/hairs/test.hair")
-    #self.scene3d.deleteObj("currentHair") Does not work :P .. TODO marc
     background.BackgroundTaskView(library)
 
     # Load plugins not starting with _

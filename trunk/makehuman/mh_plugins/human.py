@@ -34,7 +34,7 @@ import math
 
 class Human(gui3d.Object):
     
-    def __init__(self, globalScene, objFilePath):
+    def __init__(self, globalScene, objFilePath, hairObj):
         gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 0, shadeless = 0, visible = True)
         self.meshData = self.mesh
         # Uncomment the following 4 lines to use a shader
@@ -44,6 +44,7 @@ class Human(gui3d.Object):
         #self.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
         #self.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/ambient_occlusion.png", 0))
         self.scene = globalScene
+        self.hairObj = hairObj
         self.targetsDetailStack = {}#All details targets applied, with their values
         self.targetsEthnicStack = {"neutral":1.0}
         self.lastTargetApplied = None
@@ -157,6 +158,25 @@ class Human(gui3d.Object):
         self.hairFile = "data/hairs/default.hair"
         self.hairColor = [0.41, 0.23, 0.04]
                         
+    #Overriding hide and show to account for both human base and the hairs!
+    def show(self):
+      self.visible = True
+      self.hairObj.setVisibility(1)
+      self.setVisibility(True)
+    def hide(self):
+      #print("hiding ", self.meshName)
+      self.visible = False
+      self.hairObj.setVisibility(0)
+      self.setVisibility(False)
+    
+    #Overriding setPosition and setRotation to account for both hair and base object
+    def setPosition(self, position):
+      self.mesh.setLoc(position[0], position[1], position[2])
+      self.hairObj.setLoc(position[0], position[1], position[2])
+    def setRotation(self, rotation):
+      self.mesh.setRot(rotation[0], rotation[1], rotation[2])
+      self.hairObj.setRot(rotation[0], rotation[1], rotation[2])
+      
     def setTexture(self, texturePath):
         self.meshData.setTexture(texturePath)
         
