@@ -44,7 +44,7 @@ import string
 #	Default locations - change to fit your machine
 #
 
-TexDir = "."
+TexDir = os.path.expanduser("~/makehuman/exports")
 
 #
 #
@@ -1373,8 +1373,10 @@ def clearScene(scn):
 		return scn
 
 	for ob in scn.objects:
-		scn.objects.unlink(ob)
-		del ob
+		if ob.type == 'Mesh' or ob.type == 'Armature':
+			scn.objects.unlink(ob)
+			del ob
+	return scn
 
 	oldScn = scn
 	scn = Scene.New()
