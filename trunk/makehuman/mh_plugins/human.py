@@ -171,10 +171,10 @@ class Human(gui3d.Object):
     
     #Overriding setPosition and setRotation to account for both hair and base object
     def setPosition(self, position):
-      self.mesh.setLoc(position[0], position[1], position[2])
+      gui3d.Object.setPosition(self, position)
       self.hairObj.setLoc(position[0], position[1], position[2])
     def setRotation(self, rotation):
-      self.mesh.setRot(rotation[0], rotation[1], rotation[2])
+      gui3d.Object.setRotation(self, rotation)
       self.hairObj.setRot(rotation[0], rotation[1], rotation[2])
       
     def setTexture(self, texturePath):
