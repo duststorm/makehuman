@@ -37,11 +37,13 @@ class HairTaskView(gui3d.TaskView):
     @self.filechooser.event
     def onFileSelected(filename):
       print("Loading %s" %(filename))
-      human = self.app.scene3d.selectedHuman
+      #human = self.app.scene3d.selectedHuman
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
-      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition(), rotation = self.app.scene3d.selectedHuman.getRotation())
+      hairsClass = hairgenerator.Hairgenerator()
+      hairsClass.humanVerts = human.mesh.verts
+      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition(), rotation = self.app.scene3d.selectedHuman.getRotation(), hairsClass = hairsClass)
       #Jose: TODO collision detection
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
       self.app.switchCategory("Modelling")
@@ -94,7 +96,9 @@ def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
   obj.updateIndexBuffer()
   scn.update()
   
-def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0]):
+def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None):
+  if hairsClass == None :
+    hairsClass = hairgenerator.Hairgenerator()
   obj = scn.newObj(path)
   obj.x = position[0]
   obj.y = position[1]
@@ -120,39 +124,42 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   #temporary vectors
   headNormal = [0.0,1.0,0.0]
   headCentroid = [0.0,7.8,0.4]
-  
-  hairsClass = hairgenerator.Hairgenerator()
+    
   hairsClass.loadHairs(path)
-  for group in hairsClass.guideGroups:
-      for guide in group.guides:
-          for i in range(2,len(guide.controlPoints)-1):
-              cp1=guide.controlPoints[i-1]
-              cp2=guide.controlPoints[i]
-              verts=[[],[],[],[]]
-              #compute ribbon plane
-              vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
-              if i==2:
-                verts[0] = vsub(cp1,vec)
-                verts[1] = vadd(cp1,vec)
-              else:
-                verts[0]=v1[:]
-                verts[1]=v2[:]
-              verts[2]=vadd(cp2,vec)
-              verts[3]=vsub(cp2,vec)
-              v1=verts[3][:]
-              v2=verts[2][:]
-              w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-              w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
-              w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
-              w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
-              fg.createFace(w1, w4, w2)
-              fg.createFace(w2, w4, w3)
+  try: hairsClass.humanVerts
+  except NameError: 
+    print "No human vertices in hairsClass"
+  else: 
+    hairsClass.adjustGuides()
+    print "Hair adjusted"
 
-              #drawQuad(scn,verts, "currentHair")
+  for group in hairsClass.guideGroups:
+    for guide in group.guides:
+        for i in range(2,len(guide.controlPoints)-1):
+            cp1=guide.controlPoints[i-1]
+            cp2=guide.controlPoints[i]
+            verts=[[],[],[],[]]
+            #compute ribbon plane
+            vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
+            if i==2:
+              verts[0] = vsub(cp1,vec)
+              verts[1] = vadd(cp1,vec)
+            else:
+              verts[0]=v1[:]
+              verts[1]=v2[:]
+            verts[2]=vadd(cp2,vec)
+            verts[3]=vsub(cp2,vec)
+            v1=verts[3][:]
+            v2=verts[2][:]
+            w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
+            w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+            w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
+            w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
+            fg.createFace(w1, w4, w2)
+            fg.createFace(w2, w4, w3)
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
-  
   obj.updateIndexBuffer()
   scn.update()
   return obj
