@@ -23,6 +23,7 @@ TO DO
 __docformat__ = 'restructuredtext'
 
 import gui3d, events3d, hairgenerator
+from aljabr import *
 
 class Hair(gui3d.Object):
   def __init__(self, globalScene, objFilePath):
@@ -36,6 +37,7 @@ class HairTaskView(gui3d.TaskView):
     @self.filechooser.event
     def onFileSelected(filename):
       print("Loading %s" %(filename))
+      human = self.app.scene3d.selectedHuman
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
@@ -113,6 +115,10 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0]):
   obj.indexBuffer = []
   fg = obj.createFaceGroup("ribbons")
   
+  #temporary vectors
+  headNormal = [0.0,1.0,0.0]
+  headCentroid = [0.0,7.8,0.4]
+  
   hairsClass = hairgenerator.Hairgenerator()
   hairsClass.loadHairs(path)
   for group in hairsClass.guideGroups:
@@ -120,17 +126,25 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0]):
           for i in range(2,len(guide.controlPoints)-1):
               cp1=guide.controlPoints[i-1]
               cp2=guide.controlPoints[i]
-              verts=[cp1[:],cp1[:],cp2[:],cp2[:]]
-              verts[0][0]=cp1[0]-res/2
-              verts[1][0]=cp1[0]+res/2
-              verts[2][0]=cp2[0]+res/2
-              verts[3][0]=cp2[0]-res/2
-              v1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-              v2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
-              v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
-              v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
-              fg.createFace(v1, v4, v2)
-              fg.createFace(v2, v4, v3)
+              verts=[[],[],[],[]]
+              #compute ribbon plane
+              vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
+              if i==2:
+                verts[0] = vsub(cp1,vec)
+                verts[1] = vadd(cp1,vec)
+              else:
+                verts[0]=v1[:]
+                verts[1]=v2[:]
+              verts[2]=vadd(cp2,vec)
+              verts[3]=vsub(cp2,vec)
+              v1=verts[3][:]
+              v2=verts[2][:]
+              w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
+              w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+              w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
+              w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
+              fg.createFace(w1, w4, w2)
+              fg.createFace(w2, w4, w3)
 
               #drawQuad(scn,verts, "currentHair")
 
