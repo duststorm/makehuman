@@ -598,35 +598,57 @@ def parseColorBand(args):
 #	parseFileName(filepath, dir):
 #
 
-def doLoadFile(filepath):		
+def doLoadImage(filepath):		
 	path1 = os.path.expanduser(filepath)
 	file1 = os.path.realpath(path1)
 	if os.path.isfile(file1):
 		print "Found file "+file1
-		return file1
+		try:
+			img = Image.Load(file1)
+			return img
+		except:
+			print "Cannot read image"
+			return None
 	else:
 		print "No file "+file1
 		return None
 
 
-def parseFileName(filepath, dir):
+def loadImage(filepath):
 	global TexDir, warnedTextureDir
 	path1 = os.path.expanduser(filepath)
 	file1 = os.path.realpath(path1)
 	(path, filename) = os.path.split(file1)
+	(name, ext) = os.path.splitext(filename)
 	print "Loading ", filepath, " = ", filename
 
-	f = doLoadFile(TexDir+"/"+filename)
-	if f:
-		return f
-	f = doLoadFile(file1)
-	if f:
-		return f
+	img = doLoadImage(TexDir+"/"+name+".png")
+	if img:
+		return img
+
+	img = doLoadImage(TexDir+"/"+filename)
+	if img:
+		return img
+
+	img = doLoadImage(path+"/"+name+".png")
+	if img:
+		return img
+
+	img = doLoadImage(path+"/"+filename)
+	if img:
+		return img
+
 	if warnedTextureDir:
 		return None
 	warnedTextureDir = True
 	TexDir = Draw.PupStrInput("TexDir? ", path, 100)
-	return doLoadFile(TexDir+"/"+filename)
+
+	img =  doLoadFile(TexDir+"/"+name+".png")
+	if img:
+		return img
+
+	img = doLoadImage(TexDir+"/"+filename)
+	return img
 	
 #
 #	parseImage(args, tokens):
@@ -637,16 +659,7 @@ def parseImage(args, tokens):
 	img = None
 	for (key, val, sub) in tokens:
 		if key == 'filename':
-			file = parseFileName(val[0], "TexDir")
-			print "Loading ", file
-			if file:
-				try:
-					img = Image.Load(file)
-				except:
-					pass
-			else:
-				print "Could not load image ", file
-				return None
+			img = loadImage(val[0])
 		else:
 			defaultKey(key, val, "img", globals(), locals())
 	print "Image ", img
