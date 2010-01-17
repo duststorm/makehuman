@@ -41,9 +41,8 @@ class HairTaskView(gui3d.TaskView):
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
-      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition())
-      #Josenow: TODO load .obj hair into model!
-      #Josenow: TODO collision detection button?
+      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition(), rotation = self.app.scene3d.selectedHuman.getRotation())
+      #Jose: TODO collision detection
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
@@ -95,14 +94,17 @@ def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
   obj.updateIndexBuffer()
   scn.update()
   
-def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0]):
+def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0]):
   obj = scn.newObj(path)
   obj.x = position[0]
   obj.y = position[1]
   obj.z = position[2]
-  obj.rx = 0.0
-  obj.ry = 0.0
-  obj.rz = 0.0
+  obj.rx = rotation[0]
+  obj.ry = rotation[1]
+  obj.rz = rotation[2]
+  #obj.rx = 0.0
+  #obj.ry = 0.0
+  #obj.rz = 0.0
   obj.sx = 1.0
   obj.sy = 1.0
   obj.sz = 1.0
