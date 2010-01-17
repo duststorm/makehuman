@@ -39,7 +39,7 @@ class HairTaskView(gui3d.TaskView):
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
-      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename)
+      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition())
       #Josenow: TODO load .obj hair into model!
       #Josenow: TODO collision detection button?
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
