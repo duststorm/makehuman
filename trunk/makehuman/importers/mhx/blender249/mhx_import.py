@@ -1443,10 +1443,18 @@ def button_event(evt):
 		Draw.Exit()
 		return
 	elif evt == 9:
-		TexDir = Draw.PupStrInput("TexDir? ", TexDir, 100)
+		#TexDir = Draw.PupStrInput("TexDir? ", TexDir, 100)
+		Blender.Window.ImageSelector (setTexDir, 'CHOOSE TEXTURE')
 	elif evt == 10:
 		toggleRot90 = 1 - toggleRot90
 	Draw.Redraw(-1)
+
+def setTexDir(filepath):
+	global TexDir
+	path1 = os.path.expanduser(filepath)
+	file1 = os.path.realpath(path1)
+	(TexDir,f) = os.path.split(file1)
+	return
 
 def gui():
 	global b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12
