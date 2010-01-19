@@ -1026,6 +1026,8 @@ void UpdatePickingBuffer(void)
 
   // Make sure the data is 1 byte aligned
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  //glFlush();
+  //glFinish();
   glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
@@ -1246,7 +1248,7 @@ void OnInit(void)
     //const float MatEms[] = {0.1f, 0.05f, 0.0f, 1.0f};         /* Material - emission Values */
 
     glEnable(GL_DEPTH_TEST);                                  /* Hidden surface removal */
-    glEnable(GL_CULL_FACE);                                   /* Inside face removal */
+    //glEnable(GL_CULL_FACE);                                   /* Inside face removal */
     //glEnable(GL_ALPHA_TEST);
     //glAlphaFunc(GL_GREATER, 0.0f);
     glEnable(GL_LIGHTING);                                    /* Enable lighting */
