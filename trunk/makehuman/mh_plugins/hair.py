@@ -24,6 +24,8 @@ __docformat__ = 'restructuredtext'
 
 import gui3d, events3d, hairgenerator
 from aljabr import *
+from random import random
+from math import radians
 
 class Hair(gui3d.Object):
   def __init__(self, globalScene, objFilePath):
@@ -113,7 +115,7 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.sy = 1.0
   obj.sz = 1.0
   obj.visibility = 1
-  obj.shadeless = 1
+  obj.shadeless = 0
   obj.pickable = 0
   obj.cameraMode = 0
   obj.text = ""
@@ -135,32 +137,39 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
 
   for group in hairsClass.guideGroups:
     for guide in group.guides:
-        for i in range(2,len(guide.controlPoints)-1):
-            cp1=guide.controlPoints[i-1]
-            cp2=guide.controlPoints[i]
-            verts=[[],[],[],[]]
-            #compute ribbon plane
-            vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
-            if i==2:
-              verts[0] = vsub(cp1,vec)
-              verts[1] = vadd(cp1,vec)
-            else:
-              verts[0]=v1[:]
-              verts[1]=v2[:]
-            verts[2]=vadd(cp2,vec)
-            verts[3]=vsub(cp2,vec)
-            v1=verts[3][:]
-            v2=verts[2][:]
-            w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-            w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
-            w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
-            w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
-            fg.createFace(w1, w4, w2)
-            fg.createFace(w2, w4, w3)
+      M = makeRotEulerMtx2D(random()*radians(45),"Z") #random angle element that eliminate ribbon "dissapearance" upon rotation
+      for i in range(2,len(guide.controlPoints)-1):
+          cp1=guide.controlPoints[i-1]
+          cp2=guide.controlPoints[i]
+          verts=[[],[],[],[]]
+          #compute ribbon plane
+          vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
+          if i==2:
+            verts[0] = vsub(cp1,vec)
+            verts[1] = vadd(cp1,vec)
+            verts[0] = rotatePoint(cp1,verts[0],M)
+            verts[1] = rotatePoint(cp1,verts[1],M)
+          else:
+            verts[0]=v1[:]
+            verts[1]=v2[:]
+          
+          verts[2]=vadd(cp2,vec)
+          verts[3]=vsub(cp2,vec)
+          verts[2] = rotatePoint(cp2,verts[2],M)
+          verts[3] = rotatePoint(cp1,verts[3],M)
+          v1=verts[3][:]
+          v2=verts[2][:]
+          w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
+          w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+          w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
+          w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
+          fg.createFace(w1, w4, w2)
+          fg.createFace(w2, w4, w3)
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
   obj.updateIndexBuffer()
+  obj.calcNormals()
   scn.update()
   return obj
               
