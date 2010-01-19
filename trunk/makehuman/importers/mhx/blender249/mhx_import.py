@@ -643,7 +643,7 @@ def loadImage(filepath):
 	warnedTextureDir = True
 	TexDir = Draw.PupStrInput("TexDir? ", path, 100)
 
-	img =  doLoadFile(TexDir+"/"+name+".png")
+	img =  doLoadImage(TexDir+"/"+name+".png")
 	if img:
 		return img
 
