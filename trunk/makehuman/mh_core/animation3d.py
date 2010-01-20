@@ -95,17 +95,44 @@ def kochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias
     return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2;
 
 # Quadratic Bezier interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
+# | 1   -2    1|
+# |-2    2    0|
+# | 1    0    0|
 def quadraticBezierInterpolator(v0, v1, v2, alpha):
     alpha2 = alpha * alpha
     
     return (v2 - 2 * v1 + v0) * alpha2 + (v1 - v0) * 2 * alpha + v0
 
 # Cubic Bezier interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+# |-1    3   -3    1|
+# | 3   -6    3    0|
+# |-3    3    0    0|
+# | 1    0    0    0|
 def cubicBezierInterpolator(v0, v1, v2, v3, alpha):
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
     
     return (v3 - 3 * v2 + 3 * v1 - x0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v1 - 3 * v0) * alpha + v0
+
+# Quadratic b-spline interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
+# 1   | 1   -2    1|
+# - * |-2    2    0|
+# 2   | 1    1    0|
+def quadraticBSplineInterpolator(v0, v1, v2, alpha):
+   alpha2 = alpha * alpha
+
+   return ((v2 - 2 * v1 + v0)* alpha2 + (v1 - v0) * 2 * alpha + v0 + v1) / 2.0
+
+# Cubic b-spline interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+#     |-1    3   -3    1|
+# 1   | 3   -6    3    0|
+# - * |-3    0    3    0|
+# 6   | 1    4    1    0|
+def cubicBSplineInterpolator(v0, v1, v2, v3, alpha):
+   alpha2 = alpha * alpha
+   alpha3 = alpha2 * alpha
+
+   return ((v3 - 3 * v2 + 3 * v1 - x0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v2 - 3 * v0) * alpha + v0 + 4 * v1 + v2) / 6.0
 
 # Interpolates a whole vector at once.
 def lerpVector(v1, v2, alpha, interpolator = linearInterpolate):
