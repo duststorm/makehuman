@@ -95,7 +95,7 @@ def kochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias
     return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2;
 
 # Quadratic Bezier interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
-def cubicBezierInterpolator(v0, v1, v2, alpha):
+def quadraticBezierInterpolator(v0, v1, v2, alpha):
     alpha2 = alpha * alpha
     
     return (v2 - 2 * v1 + v0) * alpha2 + (v1 - v0) * 2 * alpha + v0
