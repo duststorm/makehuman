@@ -1052,4 +1052,25 @@ def writeEmpties(fp):
 	writeEmpty(fp, "EmptyLoLid_R", "l-loLid", 0, "parent EmptyLoLidBase_R 0 None", None)
 
 """
+#
+#	setupBones(obj):
+#	Used by Collada and other exporters
+#
 
+def setupBones(obj):
+	global boneHead, boneTail, locations
+	setupLocations(obj)
+	locations['origin'] = (-2.0, 10.0, 0.0)
+	boneHead = {}
+	boneTail = {}
+	for (bone, par, hjoint, hoffs, tjoint, toffs, flags, layers, dispOb, ikFlags) in armature:
+		if hoffs:
+			x = getOffs(hoffs)
+			boneHead[bone] = aljabr.vadd(locations[hjoint], x)
+		else:
+			boneHead[bone] = locations[hjoint]
+		if toffs:
+			x = getOffs(toffs)
+			boneTail[bone] = aljabr.vadd(locations[tjoint], x)
+		else:
+			boneTail[bone] = locations[tjoint]

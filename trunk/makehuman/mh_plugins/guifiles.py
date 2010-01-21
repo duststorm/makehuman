@@ -30,7 +30,7 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import mh, files3d, animation3d, gui3d, events3d, os, mh2obj, mh2bvh, mh2mhx, humanmodifier
+import mh, files3d, animation3d, gui3d, events3d, os, mh2obj, mh2bvh, mh2mhx, mh2collada, humanmodifier
 
 class SaveTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -129,6 +129,7 @@ class ExportTaskView(gui3d.TaskView):
       mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj")
       mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
       mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".mhx")
+      mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
       
       self.app.switchCategory("Modelling")
       self.app.scene3d.redraw(1)
