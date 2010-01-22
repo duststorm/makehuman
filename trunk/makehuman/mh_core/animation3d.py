@@ -132,7 +132,29 @@ def cubicBSplineInterpolator(v0, v1, v2, v3, alpha):
    alpha2 = alpha * alpha
    alpha3 = alpha2 * alpha
 
-   return ((v3 - 3 * v2 + 3 * v1 - x0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v2 - 3 * v0) * alpha + v0 + 4 * v1 + v2) / 6.0
+   return ((v3 - 3 * v2 + 3 * v1 - v0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v2 - 3 * v0) * alpha + v0 + 4 * v1 + v2) / 6.0
+
+# Cubic Catmull Rom interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+#     |-1    3   -3    1|
+# 1   | 2   -5    4   -1|
+# - * |-1    0    1    0|
+# 2   | 1    2    0    0|
+def cubicCatmullRomInterpolator(v0, v1, v2, v3, alpha):
+   alpha2 = alpha * alpha
+   alpha3 = alpha2 * alpha
+
+   return ((v3 - 3 * v2 + 3 * v1 - v0) * alpha3 + (- v3 + 4 * v2 - 5 * v1 + 2 * v0) * alpha2 + (v2 - v0) * alpha + 2 * v1 + v0) / 2.0
+
+# Cubic hermite interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+#     | 2    1   -2    1|
+# 1   |-3   -2    3   -1|
+# - * | 0    1    0    0|
+# 6   | 1    0    0    0|
+def cubicHermiteInterpolator(v0, v1, v2, v3, alpha):
+   alpha2 = alpha * alpha
+   alpha3 = alpha2 * alpha
+
+   return (v3 - 2 * v2 + v1 + 2 * v0) * alpha3 + (- v3 + 3 * v2 - 2 * v1 - 3 * v0) * alpha2 + v1 * alpha + v0
 
 # Interpolates a whole vector at once.
 def lerpVector(v1, v2, alpha, interpolator = linearInterpolate):
