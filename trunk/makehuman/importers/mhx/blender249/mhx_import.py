@@ -659,7 +659,10 @@ def parseImage(args, tokens):
 	img = None
 	for (key, val, sub) in tokens:
 		if key == 'filename':
-			img = loadImage(val[0])
+			filename = val[0]
+			for n in range(len(val)-1):
+				filename += " " + val[n+1]
+			img = loadImage(filename)
 		else:
 			defaultKey(key, val, "img", globals(), locals())
 	print "Image ", img
