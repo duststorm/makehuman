@@ -119,13 +119,42 @@ class ExportTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Export",  category.app.getThemeResource("images", "button_export_file.png"))
     self.fileentry = gui3d.FileEntryView(self)
+    
+    self.exportTypeGroup = []
+    self.wavefrontObj = gui3d.RadioButton(self, self.exportTypeGroup,
+      mesh = "data/3dobjs/button_standard.obj",
+      texture = self.app.getThemeResource("images", "button_muscle.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [673, 242, 9.2],
+      selected = True)
+    self.mhx = gui3d.RadioButton(self, self.exportTypeGroup,
+      mesh = "data/3dobjs/button_standard.obj",
+      texture = self.app.getThemeResource("images", "button_muscle.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [708, 242, 9.2])
+    self.collada = gui3d.RadioButton(self, self.exportTypeGroup,
+      mesh = "data/3dobjs/button_standard.obj",
+      texture = self.app.getThemeResource("images", "button_muscle.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [743, 242, 9.2])
+      
+    self.exportSkeleton = gui3d.ToggleButton(self, mesh = "data/3dobjs/button_standard.obj",
+      texture = self.app.getThemeResource("images", "button_muscle.png"), 
+      selectedTexture = self.app.getThemeResource("images", "button_muscle_on.png"), position = [673, 292, 9.2],
+      selected = True)
 
     @self.fileentry.event
     def onFileSelected(filename):
       exportPath = mh.getPath("exports")
       if not os.path.exists(exportPath):
         os.makedirs(exportPath)
-        
+      
+      #if self.wavefrontObj.selected:
+      #  mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj")
+      #  if self.exportSkeleton.selected:
+      #    mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
+      #elif self.mhx.selected:
+      #  mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".mhx")
+      #elif self.collada.selected:
+      #  mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
+      
       mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj")
       mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
       mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".mhx")
