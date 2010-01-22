@@ -173,3 +173,29 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   scn.update()
   return obj
               
+def exportHairs(file, guideGroups):
+  DEG_ORDER_U = 3
+
+  # use negative indices
+  for group in guideGroups:
+    for guide in group.guides:
+      N = len(guide.controlPoints) -1
+      for i in range(0,N):
+        file.write('v %.6f %.6f %.6f\n' % (guide.controlPoints[i][0], guide.controlPoints[i][1],\
+                                           guide.controlPoints[i][2]))
+      
+      file.write('g %s\n' % guideGroups.name+"_"+group.name+"_"+guide.name)
+      file.write('cstype bspline\n') # not ideal, hard coded
+      file.write('deg %d\n' % DEG_ORDER_U) # not used for curves but most files have it still
+
+      curve_ls = [-(i+1) for i in range(N)]
+      file.write('curv 0.0 1.0 %s\n' % (' '.join( [str(i) for i in curve_ls] ))) # hair  has no U and V values for the curve
+
+      # 'parm' keyword
+      tot_parm = (DEG_ORDER_U + 1) + N
+      tot_parm_div = float(tot_parm-1)
+      parm_ls = [(i/tot_parm_div) for i in range(tot_parm)]
+      #our hairs dont do endpoints.. *sigh*
+      file.write('parm u %s\n' % ' '.join( [str(i) for i in parm_ls] ))
+
+      file.write('end\n')
