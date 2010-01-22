@@ -805,23 +805,25 @@ class Human(gui3d.Object):
             prefix1 = "r-"
             prefix2 = "l-"
 
-        for k, v in self.targetsDetailStack.iteritems():
+        # Remove current values
+        for target in self.targetsDetailStack.keys():
             targetName = os.path.basename(target)
             #Reset previous targets on symm side
             if targetName[:2] == prefix2:
-                algos3d.loadTranslationTarget(self.meshData, target, -v,None,1,0)
-                self.targetsDetailStack[k] = 0
+                targetVal = self.targetsDetailStack[target]
+                algos3d.loadTranslationTarget(self.meshData, target, -targetVal, None, 1, 0)
+                del self.targetsDetailStack[target]
 
-        #Apply symm target. For horiz movement the value must ve inverted
+        #Apply symm target. For horiz movement the value must be inverted
         for target in self.targetsDetailStack.keys():
             targetName = os.path.basename(target)
             if targetName[:2] == prefix1:
-                targetSym = os.path.join(os.path.dirname(target),prefix2+targetName[2:])
+                targetSym = os.path.join(os.path.dirname(target), prefix2 + targetName[2:])
                 targetSymVal = self.targetsDetailStack[target]
                 if "trans-in" in targetSym or "trans-out" in targetName:
                     targetSymVal *= -1
 
-                algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal,None, 1, 1)
+                algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
 
         self.scene.redraw()
