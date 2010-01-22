@@ -32,11 +32,11 @@
  */
 
 #ifdef _DEBUG
-  #undef _DEBUG
-  #include <Python.h>
-  #define _DEBUG
+#undef _DEBUG
+#include <Python.h>
+#define _DEBUG
 #else
-  #include <Python.h>
+#include <Python.h>
 #endif
 
 #include <SDL.h>
@@ -44,10 +44,10 @@
 #include "core.h"
 #include "glmodule.h"
 #ifdef __APPLE__
-    #include "OSXTools.h"
+#include "OSXTools.h"
 #endif // __APPLE__
 #ifdef __WIN32__
-    #include <shlobj.h>
+#include <shlobj.h>
 #endif // __WIN32__
 
 /* Our global struct - all globals must be here */
@@ -84,7 +84,7 @@ static void initGlobals(void)
 
     // Rendering
     G.fontOffset = 0;
-    
+
     // Events
     G.loop = 1;
 }
@@ -259,11 +259,11 @@ static PyObject* mh_setFullscreen(PyObject *self, PyObject *args)
 
 static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
 {
-  float r, g, b, a;
-  if (!PyArg_ParseTuple(args, "ffff",  &r, &g, &b, &a))
-      return NULL;
-  setClearColor(r, g, b, a);
-  return Py_BuildValue("");
+    float r, g, b, a;
+    if (!PyArg_ParseTuple(args, "ffff",  &r, &g, &b, &a))
+        return NULL;
+    setClearColor(r, g, b, a);
+    return Py_BuildValue("");
 }
 
 /** \brief Load texture of an object from file.
@@ -328,7 +328,7 @@ static PyObject* mh_GrabScreen(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "iiiis", &x, &y, &width, &height, &filename))
         return NULL;
     else if (!mhGrabScreen(x, y, width, height, filename))
-      return NULL;
+        return NULL;
     else
         return Py_BuildValue("");
 }
@@ -350,13 +350,13 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
-/** \brief Gets program specific path locations. 
- *  MakeHuman uses pathes to export objects and to (re)store exports and screen grabs. 
- *  Since the various locations depend from the system (Linux, Windows, Mac OS) the program is running 
+/** \brief Gets program specific path locations.
+ *  MakeHuman uses pathes to export objects and to (re)store exports and screen grabs.
+ *  Since the various locations depend from the system (Linux, Windows, Mac OS) the program is running
  *  on theses pathes may be queried by this function.
  *
- *  \param type Determines which path actually has to be queried. Type has to be either 
- *   'exports', 'models' or 'grab'. NULL will be returnded if it does not fit these requirements. 
+ *  \param type Determines which path actually has to be queried. Type has to be either
+ *   'exports', 'models' or 'grab'. NULL will be returnded if it does not fit these requirements.
  *
  *   The symantics is as follow:
  *
@@ -405,13 +405,13 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     char path[MAX_PATH];
 #endif // __APPLE__
     const char *typeStr;
-    
+
     if (!PyString_Check(type))
     {
         PyErr_SetString(PyExc_TypeError, "String expected");
         return NULL;
     }
-    
+
     typeStr = PyString_AsString(type);
 
 #ifdef __APPLE__
@@ -430,56 +430,56 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
 #ifdef CSIDL_MYDOCUMENTS
-      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+        HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
 #else
-      HRESULT hr = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, path);
+        HRESULT hr = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, path);
 #endif
-      if (FAILED(hr))
-      {
-        path[0] = '\0';
-      }
+        if (FAILED(hr))
+        {
+            path[0] = '\0';
+        }
 
-      if (0 == strcmp(typeStr, "exports"))
-      {
-          strcat(path, "\\makehuman\\exports\\");
-      }
-      else if (0 == strcmp(typeStr, "models"))
-      {
-          strcat(path, "\\makehuman\\models\\");
-      }
-      else if (0 == strcmp(typeStr, "grab"))
-      {
-          strcat(path, "\\makehuman\\grab\\");
-      }
-      else if (0 == strcmp(typeStr, "render"))
-      {
-          strcat(path, "\\makehuman\\renderman_output\\");
-      }
+        if (0 == strcmp(typeStr, "exports"))
+        {
+            strcat(path, "\\makehuman\\exports\\");
+        }
+        else if (0 == strcmp(typeStr, "models"))
+        {
+            strcat(path, "\\makehuman\\models\\");
+        }
+        else if (0 == strcmp(typeStr, "grab"))
+        {
+            strcat(path, "\\makehuman\\grab\\");
+        }
+        else if (0 == strcmp(typeStr, "render"))
+        {
+            strcat(path, "\\makehuman\\renderman_output\\");
+        }
     }
 #else
     {
-      char *home = getenv("HOME");
-      if (home)
-        strcpy(path, home);
-      else
-        path[0] = '\0';
+        char *home = getenv("HOME");
+        if (home)
+            strcpy(path, home);
+        else
+            path[0] = '\0';
 
-      if (0 == strcmp(typeStr, "exports"))
-      {
-          strcat(path, "/makehuman/exports/");
-      }
-      else if (0 == strcmp(typeStr, "models"))
-      {
-          strcat(path, "/makehuman/models/");
-      }
-      else if (0 == strcmp(typeStr, "grab"))
-      {
-          strcat(path, "/makehuman/grab/");
-      }
-      else if (0 == strcmp(typeStr, "render"))
-      {
-          strcat(path, "/makehuman/renderman_output/");
-      }
+        if (0 == strcmp(typeStr, "exports"))
+        {
+            strcat(path, "/makehuman/exports/");
+        }
+        else if (0 == strcmp(typeStr, "models"))
+        {
+            strcat(path, "/makehuman/models/");
+        }
+        else if (0 == strcmp(typeStr, "grab"))
+        {
+            strcat(path, "/makehuman/grab/");
+        }
+        else if (0 == strcmp(typeStr, "render"))
+        {
+            strcat(path, "/makehuman/renderman_output/");
+        }
     }
 #endif
     if (NULL == path)
@@ -487,7 +487,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         PyErr_Format(PyExc_ValueError, "Unknown property %s for getPath()!", typeStr);
         return NULL;
     }
-    return Py_BuildValue("s", path); 
+    return Py_BuildValue("s", path);
 }
 
 /** \brief Defines a set of functions as an array that can be passed into the Py_InitModule function.
@@ -652,10 +652,10 @@ This module contains a series of embedded integration functions that map through
 
 For example, the "getCameraRotations" function is created as an embedded Python function on the 'mh' module that calls the C function "mh_getCameraRotations" (defined in the file main.c). This returns camera rotation angles as Python values based upon settings stored in C global variables.
 
-Having created the 'mh' module in memory the 'main' C function loads the 'main.py' module. This displays a splash screen and a progress bar as it loads the initial 3D humanoid model (the neutral base object) and adds the various GUI sections into the scene. It creates the main toolbar that enables the user to switch between different GUI modes and defines functions to 
+Having created the 'mh' module in memory the 'main' C function loads the 'main.py' module. This displays a splash screen and a progress bar as it loads the initial 3D humanoid model (the neutral base object) and adds the various GUI sections into the scene. It creates the main toolbar that enables the user to switch between different GUI modes and defines functions to
 perform that switch for all active buttons. Active buttons are connected to these functions by being registered to receive events.
- 
-At the end of the initiation process the splash screen is hidden and Modelling mode is activated. The 'startEventLoop' method on the main Scene3D object is invoked to call the OpenGL/SDL C functions that manage the low-level event loop. 
+
+At the end of the initiation process the splash screen is hidden and Modelling mode is activated. The 'startEventLoop' method on the main Scene3D object is invoked to call the OpenGL/SDL C functions that manage the low-level event loop.
 
 This Python module responds to high-level GUI toolbar events to switch between different GUI modes, but otherwise events are handled by GUI mode specific Python modules.
 

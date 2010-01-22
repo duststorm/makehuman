@@ -28,23 +28,24 @@
  */
 
 #ifdef _DEBUG
-  #undef _DEBUG
-  #include <Python.h>
-  #define _DEBUG
+#undef _DEBUG
+#include <Python.h>
+#define _DEBUG
 #else
-  #include <Python.h>
+#include <Python.h>
 #endif
 #ifdef __APPLE__
-    #include <Python/structmember.h>
+#include <Python/structmember.h>
 #else
-    #include <structmember.h>
+#include <structmember.h>
 #endif
 
 #include "core.h"
 #include "SDL_thread.h"
 
 // Object3D attributes directly accessed by Python
-static PyMemberDef Object3D_members[] = {
+static PyMemberDef Object3D_members[] =
+{
     {"x", T_FLOAT, offsetof(Object3D, x), 0, "X translation"},
     {"y", T_FLOAT, offsetof(Object3D, y), 0, "Y translation"},
     {"z", T_FLOAT, offsetof(Object3D, z), 0, "Z translation"},
@@ -64,37 +65,40 @@ static PyMemberDef Object3D_members[] = {
 };
 
 // Object3D Methods
-static PyMethodDef Object3D_methods[] = {
-  {"setVertCoord", (PyCFunction)Object3D_setVertCoo, METH_VARARGS,
-   ""
-  },
-  {"setNormCoord", (PyCFunction)Object3D_setNormCoo, METH_VARARGS,
-   ""
-  },
-  {"setUVCoord", (PyCFunction)Object3D_setUVCoo, METH_VARARGS,
-   ""
-  },
-  {"setColorIDComponent", (PyCFunction)Object3D_setColorIDComponent, METH_VARARGS,
-   ""
-  },
-  {"setColorComponent", (PyCFunction)Object3D_setColorComponent, METH_VARARGS,
-   ""
-  },
-  {NULL}  /* Sentinel */
+static PyMethodDef Object3D_methods[] =
+{
+    {"setVertCoord", (PyCFunction)Object3D_setVertCoo, METH_VARARGS,
+        ""
+    },
+    {"setNormCoord", (PyCFunction)Object3D_setNormCoo, METH_VARARGS,
+     ""
+    },
+    {"setUVCoord", (PyCFunction)Object3D_setUVCoo, METH_VARARGS,
+     ""
+    },
+    {"setColorIDComponent", (PyCFunction)Object3D_setColorIDComponent, METH_VARARGS,
+     ""
+    },
+    {"setColorComponent", (PyCFunction)Object3D_setColorComponent, METH_VARARGS,
+     ""
+    },
+    {NULL}  /* Sentinel */
 };
 
 // Object3D attributes indirectly accessed by Python
-static PyGetSetDef Object3D_getset[] = {
-  {"shaderParameters", (getter)Object3D_getShaderParameters, (setter)NULL, "The dictionary containing the shader parameters, read only.", NULL},
-  {"text", (getter)Object3D_getText, (setter)Object3D_setText, "The text of the object as a String or None if it doesn't have text.", NULL},
-  {"translation", (getter)Object3D_getTranslation, (setter)Object3D_setTranslation, "The translation of the object as a 3 component vector.", NULL},
-  {"rotation", (getter)Object3D_getRotation, (setter)Object3D_setRotation, "The rotation of the object as a 3 component vector.", NULL},
-  {"scale", (getter)Object3D_getScale, (setter)Object3D_setScale, "The scale of the object as a 3 component vector.", NULL},
-  {NULL}
+static PyGetSetDef Object3D_getset[] =
+{
+    {"shaderParameters", (getter)Object3D_getShaderParameters, (setter)NULL, "The dictionary containing the shader parameters, read only.", NULL},
+    {"text", (getter)Object3D_getText, (setter)Object3D_setText, "The text of the object as a String or None if it doesn't have text.", NULL},
+    {"translation", (getter)Object3D_getTranslation, (setter)Object3D_setTranslation, "The translation of the object as a 3 component vector.", NULL},
+    {"rotation", (getter)Object3D_getRotation, (setter)Object3D_setRotation, "The rotation of the object as a 3 component vector.", NULL},
+    {"scale", (getter)Object3D_getScale, (setter)Object3D_setScale, "The scale of the object as a 3 component vector.", NULL},
+    {NULL}
 };
 
 // Object3D type definition
-PyTypeObject Object3DType = {
+PyTypeObject Object3DType =
+{
     PyObject_HEAD_INIT(NULL)
     0,                                        // ob_size
     "mh.object3D",                            // tp_name
@@ -143,11 +147,11 @@ PyTypeObject Object3DType = {
  */
 void RegisterObject3D(PyObject *module)
 {
-  if (PyType_Ready(&Object3DType) < 0)
-      return;
+    if (PyType_Ready(&Object3DType) < 0)
+        return;
 
-  Py_INCREF(&Object3DType);
-  PyModule_AddObject(module, "Object3D", (PyObject*)&Object3DType);
+    Py_INCREF(&Object3DType);
+    PyModule_AddObject(module, "Object3D", (PyObject*)&Object3DType);
 }
 
 /** \brief Takes care of the deallocation of the vertices, faces and text the Object3D object.
@@ -157,18 +161,18 @@ void RegisterObject3D(PyObject *module)
  */
 void Object3D_dealloc(Object3D *self)
 {
-  // Free our data
-  free(self->trigs);
-  free(self->verts);
-  free(self->norms);
-  free(self->UVs);
-  free(self->colors);
-  free(self->colors2);
+    // Free our data
+    free(self->trigs);
+    free(self->verts);
+    free(self->norms);
+    free(self->UVs);
+    free(self->colors);
+    free(self->colors2);
 
-  free(self->textString);
+    free(self->textString);
 
-  // Free Python data
-  self->ob_type->tp_free((PyObject*)self);
+    // Free Python data
+    self->ob_type->tp_free((PyObject*)self);
 }
 
 /** \brief Takes care of the initialization of the Object3D object members.
@@ -178,47 +182,47 @@ void Object3D_dealloc(Object3D *self)
  */
 PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-  // Alloc Python data
-  Object3D *self = (Object3D*)type->tp_alloc(type, 0);
+    // Alloc Python data
+    Object3D *self = (Object3D*)type->tp_alloc(type, 0);
 
-  // Init our data
-  if (self)
-  {
-    self->shadeless = 0;
-    self->texture = 0;
-    self->shader = 0;
-    self->shaderParameters = NULL;
-    self->isVisible = 1;
-    self->inMovableCamera = 1;
-    self->isPickable = 1;
+    // Init our data
+    if (self)
+    {
+        self->shadeless = 0;
+        self->texture = 0;
+        self->shader = 0;
+        self->shaderParameters = NULL;
+        self->isVisible = 1;
+        self->inMovableCamera = 1;
+        self->isPickable = 1;
 
-    self->x = 0.0;
-    self->y = 0.0;
-    self->z = 0.0;
-    self->rx = 0.0;
-    self->ry = 0.0;
-    self->rz = 0.0;
-    self->sx = 1.0;
-    self->sy = 1.0;
-    self->sz = 1.0;
+        self->x = 0.0;
+        self->y = 0.0;
+        self->z = 0.0;
+        self->rx = 0.0;
+        self->ry = 0.0;
+        self->rz = 0.0;
+        self->sx = 1.0;
+        self->sy = 1.0;
+        self->sz = 1.0;
 
-    self->trigs = NULL;
-    self->verts = NULL;
-    self->norms = NULL;
-    self->UVs = NULL;
-    self->colors = NULL;
-    self->colors2 = NULL;
+        self->trigs = NULL;
+        self->verts = NULL;
+        self->norms = NULL;
+        self->UVs = NULL;
+        self->colors = NULL;
+        self->colors2 = NULL;
 
-    self->nTrigs = 0;
-    self->nVerts = 0;
-    self->nNorms = 0;
-    self->nColors = 0;
-    self->nColors2 = 0;
-    
-    self->textString = NULL;
-  }
+        self->nTrigs = 0;
+        self->nVerts = 0;
+        self->nNorms = 0;
+        self->nColors = 0;
+        self->nColors2 = 0;
 
-  return (PyObject*)self;
+        self->textString = NULL;
+    }
+
+    return (PyObject*)self;
 }
 
 /** \brief The constructor of the Object3D object.
@@ -229,46 +233,46 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 {
-  int numVerts, numTrigs;
-  PyObject *indexBuffer;
+    int numVerts, numTrigs;
+    PyObject *indexBuffer;
 
-  if (!PyArg_ParseTuple(args, "iO", &numVerts, &indexBuffer) || !PyList_Check(indexBuffer))
-    return -1;
+    if (!PyArg_ParseTuple(args, "iO", &numVerts, &indexBuffer) || !PyList_Check(indexBuffer))
+        return -1;
 
-  // Faces are triangles
-  numTrigs = (int)PyList_Size(indexBuffer) / 3;
+    // Faces are triangles
+    numTrigs = (int)PyList_Size(indexBuffer) / 3;
 
-  // Allocate arrays
-  self->verts = makeFloatArray(numVerts * 3);
-  self->norms = makeFloatArray(numVerts * 3);
-  self->colors = makeUCharArray(numVerts * 3);
-  self->colors2 = makeUCharArray(numVerts * 4);
-  self->UVs = makeFloatArray(numVerts * 2);
+    // Allocate arrays
+    self->verts = makeFloatArray(numVerts * 3);
+    self->norms = makeFloatArray(numVerts * 3);
+    self->colors = makeUCharArray(numVerts * 3);
+    self->colors2 = makeUCharArray(numVerts * 4);
+    self->UVs = makeFloatArray(numVerts * 2);
 
-  self->nVerts = numVerts;
+    self->nVerts = numVerts;
 
-  self->trigs = makeIntArray(numTrigs * 3);
-  self->nNorms = numVerts * 3;
-  self->nTrigs = numTrigs;
-  self->nColors = numVerts * 3;
-  self->nColors2 = numVerts * 4;
+    self->trigs = makeIntArray(numTrigs * 3);
+    self->nNorms = numVerts * 3;
+    self->nTrigs = numTrigs;
+    self->nColors = numVerts * 3;
+    self->nColors2 = numVerts * 4;
 
-  // Copy face indices
-  {
-    PyObject *iterator = PyObject_GetIter(indexBuffer);
-    PyObject *item;
-    int index = 0;
-
-    for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
+    // Copy face indices
     {
-        self->trigs[index++] = PyInt_AsLong(item);
-        Py_DECREF(item);
+        PyObject *iterator = PyObject_GetIter(indexBuffer);
+        PyObject *item;
+        int index = 0;
+
+        for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
+        {
+            self->trigs[index++] = PyInt_AsLong(item);
+            Py_DECREF(item);
+        }
+
+        Py_DECREF(iterator);
     }
 
-    Py_DECREF(iterator);
-  }
-
-  return 0;
+    return 0;
 }
 
 /** \brief Sets a single coordinate value (x, y or z) for a vertex in G.world.
@@ -379,7 +383,7 @@ PyObject *Object3D_setUVCoo(Object3D *self, PyObject *args)
 /** \brief Sets a single color component value (R, G or B) for a vertex in G.world.
  *  \param objIndex an int containing the index of the 3D object that contains this vertex.
  *  \param nIdx an int indexing the vertex color component to update.
- *  \param r an unsigned char (an integer value from 0-255) specifying the Red channel 
+ *  \param r an unsigned char (an integer value from 0-255) specifying the Red channel
  *         component to be assigned to this color component.
  *  \param g an unsigned char (an integer value from 0-255) specifying the Green channel
  *         component to be assigned to this color component.
@@ -415,7 +419,7 @@ PyObject *Object3D_setColorIDComponent(Object3D *self, PyObject *args)
 /** \brief Sets a single color component value (R, G, B or A) for a vertex in G.world.
  *  \param objIndex an int containing the index of the 3D object that contains this vertex.
  *  \param nIdx an int indexing the vertex color component to update.
- *  \param r an unsigned char (an integer value from 0-255) specifying the Red channel 
+ *  \param r an unsigned char (an integer value from 0-255) specifying the Red channel
  *         component to be assigned to this color component in the G.world array.
  *  \param g an unsigned char (an integer value from 0-255) specifying the Green channel
  *         component to be assigned to this color component in the G.world array.
@@ -455,11 +459,11 @@ PyObject *Object3D_setColorComponent(Object3D *self, PyObject *args)
  */
 PyObject *Object3D_getShaderParameters(Object3D *self, void *closure)
 {
-  if (!self->shaderParameters)
-    self->shaderParameters = PyDict_New();
+    if (!self->shaderParameters)
+        self->shaderParameters = PyDict_New();
 
-  Py_INCREF(self->shaderParameters);
-  return self->shaderParameters;
+    Py_INCREF(self->shaderParameters);
+    return self->shaderParameters;
 }
 
 /** \brief Gets a text string for this Object3D object.
@@ -470,9 +474,9 @@ PyObject *Object3D_getShaderParameters(Object3D *self, void *closure)
 PyObject *Object3D_getText(Object3D *self, void *closure)
 {
     if (self->textString)
-      return PyString_FromString(self->textString);
+        return PyString_FromString(self->textString);
     else
-      return Py_BuildValue("");
+        return Py_BuildValue("");
 }
 
 /** \brief Sets a text string for this Object3D object.
@@ -487,12 +491,12 @@ int Object3D_setText(Object3D *self, PyObject *value, void *closure)
 
     if (text)
     {
-      free(self->textString);
-      self->textString = strdup(text);
-      return 0;
+        free(self->textString);
+        self->textString = strdup(text);
+        return 0;
     }
     else
-      return -1;
+        return -1;
 }
 
 /** \brief Gets the translation for this Object3D object as a list.
@@ -514,12 +518,12 @@ PyObject *Object3D_getTranslation(Object3D *self, void *closure)
 int Object3D_setTranslation(Object3D *self, PyObject *value)
 {
     if (!PySequence_Check(value))
-      return -1;
+        return -1;
 
     if (PySequence_Size(value) != 3)
     {
-      PyErr_BadArgument();
-      return -1;
+        PyErr_BadArgument();
+        return -1;
     }
 
     self->x = PyFloat_AsDouble(PySequence_GetItem(value, 0));
@@ -548,12 +552,12 @@ PyObject *Object3D_getRotation(Object3D *self, void *closure)
 int Object3D_setRotation(Object3D *self, PyObject *value)
 {
     if (!PySequence_Check(value))
-      return -1;
+        return -1;
 
     if (PySequence_Size(value) != 3)
     {
-      PyErr_BadArgument();
-      return -1;
+        PyErr_BadArgument();
+        return -1;
     }
 
     self->rx = PyFloat_AsDouble(PySequence_GetItem(value, 0));
@@ -582,12 +586,12 @@ PyObject *Object3D_getScale(Object3D *self, void *closure)
 int Object3D_setScale(Object3D *self, PyObject *value)
 {
     if (!PySequence_Check(value))
-      return -1;
+        return -1;
 
     if (PySequence_Size(value) != 3)
     {
-      PyErr_BadArgument();
-      return -1;
+        PyErr_BadArgument();
+        return -1;
     }
 
     self->sx = PyFloat_AsDouble(PySequence_GetItem(value, 0));
@@ -658,9 +662,9 @@ void callMouseButtonUp(int b, int x, int y)
  *  \param s an int indicating the mouse.motion.state of the event (1=Mouse moved, 0=Mouse click)..
  *  \param x an int specifying the horizontal mouse pointer position in the GUI window (in pixels).
  *  \param y an int specifying the vertical mouse pointer position in the GUI window (in pixels).
- *  \param xrel an int specifying the difference between the previously recorded horizontal mouse 
+ *  \param xrel an int specifying the difference between the previously recorded horizontal mouse
  *         pointer position in the GUI window and the current position (in pixels).
- *  \param yrel an int specifying the difference between the previously recorded vertical mouse 
+ *  \param yrel an int specifying the difference between the previously recorded vertical mouse
  *         pointer position in the GUI window and the current position (in pixels).
  *
  *  This function invokes the Python mouseMotion function when the SDL
@@ -731,10 +735,10 @@ void callReloadTextures(void)
 
 void setClearColor(float r, float g, float b, float a)
 {
-  G.clearColor[0] = r;
-  G.clearColor[1] = g;
-  G.clearColor[2] = b;
-  G.clearColor[3] = a;
+    G.clearColor[0] = r;
+    G.clearColor[1] = g;
+    G.clearColor[2] = b;
+    G.clearColor[3] = a;
 }
 
 /** \brief Creates an array of n floats and returns a pointer to that array.

@@ -30,11 +30,11 @@
  */
 
 #ifdef _DEBUG
-  #undef _DEBUG
-  #include <Python.h>
-  #define _DEBUG
+#undef _DEBUG
+#include <Python.h>
+#define _DEBUG
 #else
-  #include <Python.h>
+#include <Python.h>
 #endif
 
 #include <assert.h>
@@ -42,26 +42,27 @@
 #include "core.h"
 
 #ifdef __WIN32__
-    #include <windows.h>
-    #include <SDL_syswm.h>
+#include <windows.h>
+#include <SDL_syswm.h>
 #elif __APPLE__
-    #ifdef __cplusplus
-    extern "C" {
-    #endif
-        void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
-    #ifdef __cplusplus
-    }
-    #endif
-    #include "SDL_image/SDL_image.h"
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
+#ifdef __cplusplus
+}
+#endif
+#include "SDL_image/SDL_image.h"
 #else
-    #include <X11/Xlib.h>
-    #include <X11/Xutil.h>
-    #include <GL/glx.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <GL/glx.h>
 #endif
 #ifdef __APPLE__
-    #include <Python/structmember.h>
+#include <Python/structmember.h>
 #else
-    #include <structmember.h>
+#include <structmember.h>
 #endif
 
 static int g_savedx=0; /*saved x mouse position*/
@@ -130,7 +131,8 @@ typedef struct
 void mhCameraPosition(Camera *camera, int eye);
 
 // Camera attributes directly accessed by Python
-static PyMemberDef Camera_members[] = {
+static PyMemberDef Camera_members[] =
+{
     {"fovAngle", T_FLOAT, offsetof(Camera, fovAngle), 0, "The Field Of View angle."},
     {"nearPlane", T_FLOAT, offsetof(Camera, nearPlane), 0, "The Near Clipping Plane."},
     {"farPlane", T_FLOAT, offsetof(Camera, farPlane), 0, "The Far Clipping Plane."},
@@ -146,24 +148,26 @@ PyObject *Camera_convertToWorld2D(Camera *camera, PyObject *args);
 PyObject *Camera_convertToWorld3D(Camera *camera, PyObject *args);
 
 // Camera Methods
-static PyMethodDef Camera_methods[] = {
-  {"convertToScreen", (PyCFunction)Camera_convertToScreen, METH_VARARGS,
-   "Converts world coordinates to screen coordinates."
-  },
-  {"convertToWorld2D", (PyCFunction)Camera_convertToWorld2D, METH_VARARGS,
-   "Converts 2D screen coordinates to world coordinates."
-  },
-  {"convertToWorld3D", (PyCFunction)Camera_convertToWorld3D, METH_VARARGS,
-   "Converts 3D screen coordinates to world coordinates."
-  },
-  {NULL}  /* Sentinel */
+static PyMethodDef Camera_methods[] =
+{
+    {"convertToScreen", (PyCFunction)Camera_convertToScreen, METH_VARARGS,
+        "Converts world coordinates to screen coordinates."
+    },
+    {"convertToWorld2D", (PyCFunction)Camera_convertToWorld2D, METH_VARARGS,
+     "Converts 2D screen coordinates to world coordinates."
+    },
+    {"convertToWorld3D", (PyCFunction)Camera_convertToWorld3D, METH_VARARGS,
+     "Converts 3D screen coordinates to world coordinates."
+    },
+    {NULL}  /* Sentinel */
 };
 
 static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int Camera_init(Camera *self, PyObject *args, PyObject *kwds);
 
 // Camera type definition
-PyTypeObject CameraType = {
+PyTypeObject CameraType =
+{
     PyObject_HEAD_INIT(NULL)
     0,                                        // ob_size
     "mh.Camera",                              // tp_name
@@ -212,11 +216,11 @@ PyTypeObject CameraType = {
  */
 void RegisterCamera(PyObject *module)
 {
-  if (PyType_Ready(&CameraType) < 0)
-      return;
+    if (PyType_Ready(&CameraType) < 0)
+        return;
 
-  Py_INCREF(&CameraType);
-  PyModule_AddObject(module, "Camera", (PyObject*)&CameraType);
+    Py_INCREF(&CameraType);
+    PyModule_AddObject(module, "Camera", (PyObject*)&CameraType);
 }
 
 /** \brief Takes care of the initialization of the Camera object members.
@@ -226,25 +230,25 @@ void RegisterCamera(PyObject *module)
  */
 static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-  // Alloc Python data
-  Camera *self = (Camera*)type->tp_alloc(type, 0);
+    // Alloc Python data
+    Camera *self = (Camera*)type->tp_alloc(type, 0);
 
-  // Init our data
-  if (self)
-  {
-    self->fovAngle = 25.0f;
-    self->nearPlane = 0.1f;
-    self->farPlane = 100.0f;
+    // Init our data
+    if (self)
+    {
+        self->fovAngle = 25.0f;
+        self->nearPlane = 0.1f;
+        self->farPlane = 100.0f;
 
-    self->projection = 1;
+        self->projection = 1;
 
-    self->stereoMode = 0;
-    self->eyeSeparation = 1.0f;
+        self->stereoMode = 0;
+        self->eyeSeparation = 1.0f;
 
-    self->zoom = 60;
-  }
+        self->zoom = 60;
+    }
 
-  return (PyObject*)self;
+    return (PyObject*)self;
 }
 
 /** \brief The constructor of the Texture object.
@@ -255,12 +259,12 @@ static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 static int Camera_init(Camera *self, PyObject *args, PyObject *kwds)
 {
-  char *path = NULL;
+    char *path = NULL;
 
-  if (!PyArg_ParseTuple(args, "|s", &path))
-    return -1;
+    if (!PyArg_ParseTuple(args, "|s", &path))
+        return -1;
 
-  return 0;
+    return 0;
 }
 
 typedef struct
@@ -272,7 +276,8 @@ typedef struct
 } Texture;
 
 // Texture attributes directly accessed by Python
-static PyMemberDef Texture_members[] = {
+static PyMemberDef Texture_members[] =
+{
     {"textureId", T_UINT, offsetof(Texture, textureId), READONLY, "The id of the OpenGL texture."},
     {"width",     T_UINT, offsetof(Texture, width),     READONLY, "The width of the texture in pixels."},
     {"height",    T_UINT, offsetof(Texture, height),    READONLY, "The height of the texture in pixels."},
@@ -282,11 +287,12 @@ static PyMemberDef Texture_members[] = {
 static PyObject *Texture_loadImage(Texture *texture, PyObject *path);
 
 // Texture Methods
-static PyMethodDef Texture_methods[] = {
-  {"loadImage", (PyCFunction)Texture_loadImage, METH_O,
-   "Loads the specified image from file"
-  },
-  {NULL}  /* Sentinel */
+static PyMethodDef Texture_methods[] =
+{
+    {"loadImage", (PyCFunction)Texture_loadImage, METH_O,
+        "Loads the specified image from file"
+    },
+    {NULL}  /* Sentinel */
 };
 
 static void Texture_dealloc(Texture *self);
@@ -294,7 +300,8 @@ static PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 static int Texture_init(Texture *self, PyObject *args, PyObject *kwds);
 
 // Texture type definition
-PyTypeObject TextureType = {
+PyTypeObject TextureType =
+{
     PyObject_HEAD_INIT(NULL)
     0,                                        // ob_size
     "mh.Texture",                             // tp_name
@@ -343,11 +350,11 @@ PyTypeObject TextureType = {
  */
 void RegisterTexture(PyObject *module)
 {
-  if (PyType_Ready(&TextureType) < 0)
-      return;
+    if (PyType_Ready(&TextureType) < 0)
+        return;
 
-  Py_INCREF(&TextureType);
-  PyModule_AddObject(module, "Texture", (PyObject*)&TextureType);
+    Py_INCREF(&TextureType);
+    PyModule_AddObject(module, "Texture", (PyObject*)&TextureType);
 }
 
 /** \brief Takes care of the deallocation of the OpenGL texture.
@@ -357,11 +364,11 @@ void RegisterTexture(PyObject *module)
  */
 static void Texture_dealloc(Texture *self)
 {
-  // Free our data
-  glDeleteTextures(1, &self->textureId);
+    // Free our data
+    glDeleteTextures(1, &self->textureId);
 
-  // Free Python data
-  self->ob_type->tp_free((PyObject*)self);
+    // Free Python data
+    self->ob_type->tp_free((PyObject*)self);
 }
 
 /** \brief Takes care of the initialization of the Texture object members.
@@ -371,18 +378,18 @@ static void Texture_dealloc(Texture *self)
  */
 static PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-  // Alloc Python data
-  Texture *self = (Texture*)type->tp_alloc(type, 0);
+    // Alloc Python data
+    Texture *self = (Texture*)type->tp_alloc(type, 0);
 
-  // Init our data
-  if (self)
-  {
-    glGenTextures(1, &self->textureId);
-    self->width = 0;
-    self->height = 0;
-  }
+    // Init our data
+    if (self)
+    {
+        glGenTextures(1, &self->textureId);
+        self->width = 0;
+        self->height = 0;
+    }
 
-  return (PyObject*)self;
+    return (PyObject*)self;
 }
 
 /** \brief The constructor of the Texture object.
@@ -393,29 +400,29 @@ static PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 static int Texture_init(Texture *self, PyObject *args, PyObject *kwds)
 {
-  char *path = NULL;
+    char *path = NULL;
 
-  if (!PyArg_ParseTuple(args, "|s", &path))
-    return -1;
+    if (!PyArg_ParseTuple(args, "|s", &path))
+        return -1;
 
-  if (path && !mhLoadTexture(path, self->textureId, &self->width, &self->height))
-    return -1;
+    if (path && !mhLoadTexture(path, self->textureId, &self->width, &self->height))
+        return -1;
 
-  return 0;
+    return 0;
 }
 
 static PyObject *Texture_loadImage(Texture *texture, PyObject *path)
 {
-  if (!PyString_Check(path))
-  {
-      PyErr_SetString(PyExc_TypeError, "String expected");
-      return NULL;
-  }
+    if (!PyString_Check(path))
+    {
+        PyErr_SetString(PyExc_TypeError, "String expected");
+        return NULL;
+    }
 
-  if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
-    return NULL;
+    if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
+        return NULL;
 
-  return Py_BuildValue(""); 
+    return Py_BuildValue("");
 }
 
 /** \brief Draw text at a specified location on the screen.
@@ -446,18 +453,18 @@ void mhDrawText(float x, float y, const char *message)
     line = strchr(message, '\n');
     if (line)
     {
-      do
-      {
-        glCallLists(line - message, GL_UNSIGNED_BYTE, message);
-        glRasterPos3f(x, y + 14.0f * (float)(++lineindex), 0.0f); // fontsize = 12, linespacing = 14
-        message = line + 1;
-        line = strchr(message, '\n');
-      }
-      while (line);
+        do
+        {
+            glCallLists(line - message, GL_UNSIGNED_BYTE, message);
+            glRasterPos3f(x, y + 14.0f * (float)(++lineindex), 0.0f); // fontsize = 12, linespacing = 14
+            message = line + 1;
+            line = strchr(message, '\n');
+        }
+        while (line);
     }
-    
+
     glCallLists((GLsizei)strlen(message), GL_UNSIGNED_BYTE, message);
-    
+
     /* restore lighting */
     glEnable(GL_LIGHTING);
 }
@@ -465,8 +472,8 @@ void mhDrawText(float x, float y, const char *message)
 /** \brief Flip an SDL surface from top to bottom.
  *  \param surface a pointer to an SDL_Surface.
  *
- *  This function takes an SDL surface, working line by line it takes the top line and 
- *  swaps it with the bottom line, then the second line and swaps it with the second 
+ *  This function takes an SDL surface, working line by line it takes the top line and
+ *  swaps it with the bottom line, then the second line and swaps it with the second
  *  line from the bottom etc. until the surface has been mirrored from top to bottom.
  */
 static void mhFlipSurface(const SDL_Surface *surface)
@@ -557,7 +564,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         SDL_FreeSurface(surface);
         PyErr_Format(PyExc_RuntimeError, "Could not load %s, unsupported pixel format", fname);
         return 0;
-        
+
     }
 
     // For some reason we need to flip the surface vertically
@@ -565,30 +572,30 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 
     if (surface->h == 1)
     {
-      glBindTexture(GL_TEXTURE_1D, texture);
-      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
-      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
-      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-      glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, surface->w, format, GL_UNSIGNED_BYTE, surface->pixels);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glBindTexture(GL_TEXTURE_1D, texture);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, surface->w, format, GL_UNSIGNED_BYTE, surface->pixels);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
     else
     {
-      glBindTexture(GL_TEXTURE_2D, texture);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      //glTexImage2D(GL_TEXTURE_2D, 0, components, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
-      gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
-      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //glTexImage2D(GL_TEXTURE_2D, 0, components, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
+        gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
     if (width)
-      *width = surface->w;
+        *width = surface->w;
     if (height)
-      *height = surface->h;
+        *height = surface->h;
 
     SDL_FreeSurface(surface);
 
@@ -597,114 +604,114 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 
 GLuint mhCreateVertexShader(const char *source)
 {
-  GLuint v;
-  GLint status;
+    GLuint v;
+    GLint status;
 
-  if (!g_ShadersSupported)
-    return 0;
+    if (!g_ShadersSupported)
+        return 0;
 
-  v = glCreateShader(GL_VERTEX_SHADER);
+    v = glCreateShader(GL_VERTEX_SHADER);
 
-  glShaderSource(v, 1, &source, NULL);
+    glShaderSource(v, 1, &source, NULL);
 
-  glCompileShader(v);
-  glGetShaderiv(v, GL_COMPILE_STATUS, &status);
-  if (status != GL_TRUE)
-  {
-    GLsizei logLength;
-    
-    glGetShaderiv(v, GL_INFO_LOG_LENGTH, &logLength);
-
-    if (logLength > 0)
+    glCompileShader(v);
+    glGetShaderiv(v, GL_COMPILE_STATUS, &status);
+    if (status != GL_TRUE)
     {
-      char *log;
-      GLsizei charsWritten;
+        GLsizei logLength;
 
-      log = (char*)malloc(logLength);
-      glGetShaderInfoLog(v, logLength, &charsWritten, log);
-      PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
-      free(log);
+        glGetShaderiv(v, GL_INFO_LOG_LENGTH, &logLength);
+
+        if (logLength > 0)
+        {
+            char *log;
+            GLsizei charsWritten;
+
+            log = (char*)malloc(logLength);
+            glGetShaderInfoLog(v, logLength, &charsWritten, log);
+            PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
+            free(log);
+        }
+        else
+            PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
+
+        return 0;
     }
-    else
-      PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
 
-    return 0;
-  }
-
-  return v;
+    return v;
 }
 
 GLuint mhCreateFragmentShader(const char *source)
 {
-  GLuint f;
-  GLint status;
+    GLuint f;
+    GLint status;
 
-  f = glCreateShader(GL_FRAGMENT_SHADER);
+    f = glCreateShader(GL_FRAGMENT_SHADER);
 
-  glShaderSource(f, 1, &source, NULL);
+    glShaderSource(f, 1, &source, NULL);
 
-  glCompileShader(f);
-  glGetShaderiv(f, GL_COMPILE_STATUS, &status);
-  if (status != GL_TRUE)
-  {
-    GLsizei logLength;
-    
-    glGetShaderiv(f, GL_INFO_LOG_LENGTH, &logLength);
-
-    if (logLength > 0)
+    glCompileShader(f);
+    glGetShaderiv(f, GL_COMPILE_STATUS, &status);
+    if (status != GL_TRUE)
     {
-      char *log;
-      GLsizei charsWritten;
+        GLsizei logLength;
 
-      log = (char*)malloc(logLength);
-      glGetShaderInfoLog(f, logLength, &charsWritten, log);
-      PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
-      free(log);
+        glGetShaderiv(f, GL_INFO_LOG_LENGTH, &logLength);
+
+        if (logLength > 0)
+        {
+            char *log;
+            GLsizei charsWritten;
+
+            log = (char*)malloc(logLength);
+            glGetShaderInfoLog(f, logLength, &charsWritten, log);
+            PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
+            free(log);
+        }
+        else
+            PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
+
+        return 0;
     }
-    else
-      PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
 
-    return 0;
-  }
-
-  return f;
+    return f;
 }
 
 GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader)
 {
-  GLuint p;
-  GLint status;
+    GLuint p;
+    GLint status;
 
-	p = glCreateProgram();
-	
-	glAttachShader(p, vertexShader);
-	glAttachShader(p, fragmentShader);
+    p = glCreateProgram();
 
-	glLinkProgram(p);
-  glGetProgramiv(p, GL_LINK_STATUS, &status);
-  if (status != GL_TRUE)
-  {
-    GLsizei logLength;
-    
-    glGetProgramiv(p, GL_INFO_LOG_LENGTH, &logLength);
+    glAttachShader(p, vertexShader);
+    glAttachShader(p, fragmentShader);
 
-    if (logLength > 0)
+    glLinkProgram(p);
+    glGetProgramiv(p, GL_LINK_STATUS, &status);
+    if (status != GL_TRUE)
     {
-      char *log;
-      GLsizei charsWritten;
+        GLsizei logLength;
 
-      log = (char*)malloc(logLength);
-      glGetProgramInfoLog(p, logLength, &charsWritten, log);
-      PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
-      free(log);
+        glGetProgramiv(p, GL_INFO_LOG_LENGTH, &logLength);
+
+        if (logLength > 0)
+        {
+            char *log;
+            GLsizei charsWritten;
+
+            log = (char*)malloc(logLength);
+            glGetProgramInfoLog(p, logLength, &charsWritten, log);
+            PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
+            free(log);
+        }
+        else
+            PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
+
+        return 0;
     }
-    else
-      PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
 
-    return 0;
-  }
-	
-  return p;
+    return p;
 }
 
 /** \brief Capture a rectangular area from the screen into an image file.
@@ -712,68 +719,68 @@ GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader)
  *  \param y an int containing the y coordinate of the corner of the area (in pixels)
  *  \param width an int containing the width of the area in pixels
  *  \param height an int containing the height of the area in pixels
- *  \param filename a pointer to a char string containing the full path of the file on disk 
+ *  \param filename a pointer to a char string containing the full path of the file on disk
  *
- *  This function takes a rectangular section from the screen and writes an image to 
- *  a bitmap image file on disk containing the pixels currently displayed in that 
+ *  This function takes a rectangular section from the screen and writes an image to
+ *  a bitmap image file on disk containing the pixels currently displayed in that
  *  section of screen.
  */
 int mhGrabScreen(int x, int y, int width, int height, const char *filename)
 {
-  GLint viewport[4];
-  SDL_Surface *surface;
-  GLenum format;
+    GLint viewport[4];
+    SDL_Surface *surface;
+    GLenum format;
 
-  if (width <= 0 || height <= 0)
-  {
-    PyErr_Format(PyExc_RuntimeError, "width or height is 0");
-    return 0;
-  }
+    if (width <= 0 || height <= 0)
+    {
+        PyErr_Format(PyExc_RuntimeError, "width or height is 0");
+        return 0;
+    }
 
-  surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 24, 0xFF, 0xFF00, 0xFF0000, 0);
-  glGetIntegerv(GL_VIEWPORT, viewport);
+    surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 24, 0xFF, 0xFF00, 0xFF0000, 0);
+    glGetIntegerv(GL_VIEWPORT, viewport);
 
-  if (SDL_LockSurface(surface))
-  {
-    SDL_FreeSurface(surface);
-    PyErr_Format(PyExc_RuntimeError, "Could not lock surface to grab region to file %s, %s", filename, SDL_GetError());
-    return 0;
-  }
+    if (SDL_LockSurface(surface))
+    {
+        SDL_FreeSurface(surface);
+        PyErr_Format(PyExc_RuntimeError, "Could not lock surface to grab region to file %s, %s", filename, SDL_GetError());
+        return 0;
+    }
 
-  // Draw before grabbing, to make sure we grab a rendering and not a picking buffer
-  mhDraw();
-  glPixelStorei(GL_PACK_ALIGNMENT, 4);
+    // Draw before grabbing, to make sure we grab a rendering and not a picking buffer
+    mhDraw();
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
 
-/* SDL interprets each pixel as a 32-bit number, so our masks must depend
-   on the endianness (byte order) of the machine (PowerPC is big endian 
-   in contrast to i386 which is little endian!) */
+    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+       on the endianness (byte order) of the machine (PowerPC is big endian
+       in contrast to i386 which is little endian!) */
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-  format = GL_BGR; /* For big endian Machines as based on PowerPC */
+    format = GL_BGR; /* For big endian Machines as based on PowerPC */
 #else
-  format = GL_RGB; /* For little endian Machines as based on Intel x86 */
+    format = GL_RGB; /* For little endian Machines as based on Intel x86 */
 #endif
-  glReadPixels(x, viewport[3] - y - height, width, height, format, GL_UNSIGNED_BYTE, surface->pixels);
-  mhFlipSurface(surface);
+    glReadPixels(x, viewport[3] - y - height, width, height, format, GL_UNSIGNED_BYTE, surface->pixels);
+    mhFlipSurface(surface);
 
-  SDL_UnlockSurface(surface);
+    SDL_UnlockSurface(surface);
 
-  if (SDL_SaveBMP(surface, filename))
-  {
+    if (SDL_SaveBMP(surface, filename))
+    {
+        SDL_FreeSurface(surface);
+        PyErr_Format(PyExc_RuntimeError, "Could not access file to grab region to file %s, %s", filename, SDL_GetError());
+        return 0;
+    }
+
     SDL_FreeSurface(surface);
-    PyErr_Format(PyExc_RuntimeError, "Could not access file to grab region to file %s, %s", filename, SDL_GetError());
-    return 0;
-  }
-
-  SDL_FreeSurface(surface);
-  return 1;
+    return 1;
 }
 
 /** \brief Pass a keydown event up to Python.
  *  \param key an int containing the key code of the key pressed.
  *  \param character an unsigned short character containing the Unicode character corresponding to the key pressed.
  *
- *  This function calls a keydown keyboard event handling function that will be bubbled up 
- *  to the keyDown Python function and on to an appropriate handler function if registered 
+ *  This function calls a keydown keyboard event handling function that will be bubbled up
+ *  to the keyDown Python function and on to an appropriate handler function if registered
  *  against the Scene3D object. That function processes the event and control is returned
  *  to the event loop to await the next event.
  *
@@ -797,15 +804,15 @@ void mhKeyUp(int key, unsigned short character, int modifiers)
  *  If the useTimer parameter is set when mhCreateWindow is called during the MakeHuman
  *  initiation sequence then this function is registered as the SDL timer event handler.
  *
- *  This function processes timer events. It creates a new event that it pushes into the 
- *  event queue, it resets the timer and returns. This timer function is called in a 
- *  separate thread, but the newly registered event is handled by the standard thread 
- *  in mhEventLoop, where it calls callTimerFunct, which calls mainScene.timerFunc in 
- *  the Python module. 
- * 
- *  Any Python functions registered to use this event perform their tasks before 
+ *  This function processes timer events. It creates a new event that it pushes into the
+ *  event queue, it resets the timer and returns. This timer function is called in a
+ *  separate thread, but the newly registered event is handled by the standard thread
+ *  in mhEventLoop, where it calls callTimerFunct, which calls mainScene.timerFunc in
+ *  the Python module.
+ *
+ *  Any Python functions registered to use this event perform their tasks before
  *  returning control to the event loop.
- *  
+ *
  */
 unsigned int mhTimerFunc(unsigned int interval, void* param)
 {
@@ -863,7 +870,7 @@ void mhMouseButtonDown(int b, int x, int y)
 
     // Check which object/group was hit
     if (b != 4 && b != 5)
-      mhGetPickedColor(x, y);
+        mhGetPickedColor(x, y);
 
     // Notify python
     callMouseButtonDown(b, x, y);
@@ -872,8 +879,8 @@ void mhMouseButtonDown(int b, int x, int y)
     mhQueueUpdate();
 
     if (b != 4 && b != 5)
-      UpdatePickingBuffer();
- }
+        UpdatePickingBuffer();
+}
 
 /** \brief Pass a mouse button up event up to Python.
  *  \param b an int indicating which button this event relates to.
@@ -925,9 +932,9 @@ void mhMouseButtonUp(int b, int x, int y)
  *  \param s an int indicating the mouse.motion.state of the event (1=Mouse moved, 0=Mouse click).
  *  \param x an int specifying the horizontal mouse pointer position in the GUI window (in pixels).
  *  \param y an int specifying the vertical mouse pointer position in the GUI window (in pixels).
- *  \param xrel an int specifying the difference between the previously recorded horizontal mouse 
+ *  \param xrel an int specifying the difference between the previously recorded horizontal mouse
  *         pointer position in the GUI window and the current position (in pixels).
- *  \param yrel an int specifying the difference between the previously recorded vertical mouse 
+ *  \param yrel an int specifying the difference between the previously recorded vertical mouse
  *         pointer position in the GUI window and the current position (in pixels).
  *
  *  This function processes mouse movement events, calling a corresponding Python event handler.
@@ -947,7 +954,7 @@ void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
 
     // Check which object/group was hit
     if (!s)
-      mhGetPickedColor(x, y);
+        mhGetPickedColor(x, y);
 
     // Notify python
     callMouseMotion(s, x, y, xrel, yrel);
@@ -981,7 +988,7 @@ void mhGetPickedCoords(int x, int y)
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
     glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
     gluUnProject(x, viewport[3]-y, 0.800801f, modelview,
-      projection, viewport, &G.mouseGUIX, &G.mouseGUIY, &G.mouseGUIZ);
+                 projection, viewport, &G.mouseGUIX, &G.mouseGUIY, &G.mouseGUIZ);
 }
 
 static unsigned char *pickingBuffer = NULL;
@@ -989,64 +996,64 @@ static int pickingBufferSize = 0;
 
 void UpdatePickingBuffer(void)
 {
-  int i;
-  // Get the viewport
-  GLint viewport[4];
-  GLint width;
-  GLint height;
-  glGetIntegerv(GL_VIEWPORT, viewport);
+    int i;
+    // Get the viewport
+    GLint viewport[4];
+    GLint width;
+    GLint height;
+    glGetIntegerv(GL_VIEWPORT, viewport);
 
-  width = viewport[2];
-  height = viewport[3];
+    width = viewport[2];
+    height = viewport[3];
 
-  // Resize the buffer in case the window size has changed
-  if (pickingBufferSize != width * height * 3)
-  {
-    pickingBufferSize = width * height * 3;
-    pickingBuffer = (unsigned char*)realloc(pickingBuffer, pickingBufferSize);
-    assert(pickingBuffer != NULL);
-  }
+    // Resize the buffer in case the window size has changed
+    if (pickingBufferSize != width * height * 3)
+    {
+        pickingBufferSize = width * height * 3;
+        pickingBuffer = (unsigned char*)realloc(pickingBuffer, pickingBufferSize);
+        assert(pickingBuffer != NULL);
+    }
 
-  // Turn off lighting
-  glDisable(GL_LIGHTING);
+    // Turn off lighting
+    glDisable(GL_LIGHTING);
 
-  // Turn off antialiasing
-  glDisable (GL_BLEND);
-  glDisable(GL_MULTISAMPLE);
+    // Turn off antialiasing
+    glDisable (GL_BLEND);
+    glDisable(GL_MULTISAMPLE);
 
-  // Clear screen
-  glClearColor(0.0, 0.0, 0.0, 0.0);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Clear screen
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  for (i = 0; i < PyList_Size(G.cameras); i++)
-  {
-    mhCameraPosition((Camera*)PyList_GetItem(G.cameras, i), 0);
-    mhDrawMeshes(1, i);
-  }
+    for (i = 0; i < PyList_Size(G.cameras); i++)
+    {
+        mhCameraPosition((Camera*)PyList_GetItem(G.cameras, i), 0);
+        mhDrawMeshes(1, i);
+    }
 
-  // Make sure the data is 1 byte aligned
-  glPixelStorei(GL_PACK_ALIGNMENT, 1);
-  //glFlush();
-  //glFinish();
-  glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+    // Make sure the data is 1 byte aligned
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    //glFlush();
+    //glFinish();
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Turn on antialiasing
-  glEnable (GL_BLEND);
-  glEnable(GL_MULTISAMPLE);
+    // Turn on antialiasing
+    glEnable (GL_BLEND);
+    glEnable(GL_MULTISAMPLE);
 
-  /* restore lighting */
-  glEnable(GL_LIGHTING);
+    /* restore lighting */
+    glEnable(GL_LIGHTING);
 
-/* hdusel: Bugfix for http://code.google.com/p/makehuman/issues/detail?id=16
- * "Red and black window - 'selection rendering'"
- *
- * This error happened for the OS X port only
- *
- * So I enforce a redraw whenever the picking buffer will be updated.
- * But I'm not certain weather we need this for OS X only? */
+    /* hdusel: Bugfix for http://code.google.com/p/makehuman/issues/detail?id=16
+     * "Red and black window - 'selection rendering'"
+     *
+     * This error happened for the OS X port only
+     *
+     * So I enforce a redraw whenever the picking buffer will be updated.
+     * But I'm not certain weather we need this for OS X only? */
 #ifdef __APPLE__
-  mhDraw();
+    mhDraw();
 #endif
 }
 
@@ -1084,12 +1091,12 @@ void mhGetPickedColor(int x, int y)
 
     if (y < 0 || y >= viewport[3] || x < 0 || x >= viewport[2])
     {
-      memset(G.color_picked, 0, 3);
-      return;
+        memset(G.color_picked, 0, 3);
+        return;
     }
 
     if (!pickingBuffer)
-      UpdatePickingBuffer();
+        UpdatePickingBuffer();
 
     memcpy(G.color_picked, pickingBuffer + (y * viewport[2] + x) * 3, 3);
 }
@@ -1099,29 +1106,29 @@ void mhGetPickedColor(int x, int y)
  *  \param screen a list of doubles that will contain the screen coordinates.
  *  \param camera an int indicating the camera mode (1=Scene or 0=GUI).
  *
- *  This function converts 3D OpenGL world coordinates to screen coordinates based upon 
+ *  This function converts 3D OpenGL world coordinates to screen coordinates based upon
  *  the specified camera setting.
  *
  */
 PyObject *Camera_convertToScreen(Camera *camera, PyObject *args)
 {
-  GLint viewport[4];
-  GLdouble modelview[16], projection[16];
-  double world[3], screen[3];
+    GLint viewport[4];
+    GLdouble modelview[16], projection[16];
+    double world[3], screen[3];
 
-  if (!PyArg_ParseTuple(args, "ddd", world, world + 1, world + 2))
-    return NULL;
+    if (!PyArg_ParseTuple(args, "ddd", world, world + 1, world + 2))
+        return NULL;
 
-  mhCameraPosition(camera, 0);
+    mhCameraPosition(camera, 0);
 
-  glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_PROJECTION_MATRIX, projection);
-  glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
-  gluProject(world[0], world[1], world[2], modelview, projection, viewport, screen, screen + 1, screen + 2);
-  screen[1] = viewport[3] - screen[1];
+    gluProject(world[0], world[1], world[2], modelview, projection, viewport, screen, screen + 1, screen + 2);
+    screen[1] = viewport[3] - screen[1];
 
-  return Py_BuildValue("[d,d,d]", screen[0], screen[1], screen[2]);
+    return Py_BuildValue("[d,d,d]", screen[0], screen[1], screen[2]);
 }
 
 /** \brief Convert 2D (x, y) screen coordinates to OpenGL world coordinates.
@@ -1129,30 +1136,30 @@ PyObject *Camera_convertToScreen(Camera *camera, PyObject *args)
  *  \param world a list of doubles containing the 3D OpenGL world coordinates.
  *  \param camera an int indicating the camera mode (1=Scene or 0=GUI).
  *
- *  This function converts screen coordinates to 2D OpenGL world coordinates based upon 
+ *  This function converts screen coordinates to 2D OpenGL world coordinates based upon
  *  the specified camera setting.
  *
  */
 PyObject *Camera_convertToWorld2D(Camera *camera, PyObject *args)
 {
-  GLint viewport[4];
-  GLdouble modelview[16], projection[16];
-  GLdouble z;
-  double screen[2], world[3];
+    GLint viewport[4];
+    GLdouble modelview[16], projection[16];
+    GLdouble z;
+    double screen[2], world[3];
 
-  if (!PyArg_ParseTuple(args, "dd", screen, screen + 1))
-    return NULL;
+    if (!PyArg_ParseTuple(args, "dd", screen, screen + 1))
+        return NULL;
 
-  mhCameraPosition(camera, 0);
+    mhCameraPosition(camera, 0);
 
-  glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_PROJECTION_MATRIX, projection);
-  glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
-  glReadPixels((GLint)screen[0], (GLint)(viewport[3] - screen[1]), 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, &z);
-  gluUnProject(screen[0], viewport[3] - screen[1], z, modelview, projection, viewport, world, world + 1, world + 2);
+    glReadPixels((GLint)screen[0], (GLint)(viewport[3] - screen[1]), 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, &z);
+    gluUnProject(screen[0], viewport[3] - screen[1], z, modelview, projection, viewport, world, world + 1, world + 2);
 
-  return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
+    return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
 }
 
 /** \brief Convert 3D (x, y, depth) screen coordinates to 3D OpenGL world coordinates.
@@ -1160,28 +1167,28 @@ PyObject *Camera_convertToWorld2D(Camera *camera, PyObject *args)
  *  \param world a list of doubles containing the 3D OpenGL world coordinates.
  *  \param camera an int indicating the camera mode (1=Scene or 0=GUI).
  *
- *  This function converts screen coordinates to 3D OpenGL world coordinates based upon 
+ *  This function converts screen coordinates to 3D OpenGL world coordinates based upon
  *  the specified camera setting.
  *
  */
 PyObject *Camera_convertToWorld3D(Camera *camera, PyObject *args)
 {
-  GLint viewport[4];
-  GLdouble modelview[16], projection[16];
-  double screen[3], world[3];
+    GLint viewport[4];
+    GLdouble modelview[16], projection[16];
+    double screen[3], world[3];
 
-  if (!PyArg_ParseTuple(args, "ddd", screen, screen + 1, screen + 2))
-    return NULL;
+    if (!PyArg_ParseTuple(args, "ddd", screen, screen + 1, screen + 2))
+        return NULL;
 
-  mhCameraPosition(camera, 0);
+    mhCameraPosition(camera, 0);
 
-  glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_PROJECTION_MATRIX, projection);
-  glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 
-  gluUnProject(screen[0], viewport[3] - screen[1], screen[2], modelview, projection, viewport, world, world + 1, world + 2);
+    gluUnProject(screen[0], viewport[3] - screen[1], screen[2], modelview, projection, viewport, world, world + 1, world + 2);
 
-  return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
+    return Py_BuildValue("[d,d,d]", world[0], world[1], world[2]);
 }
 
 /** \brief Redraw the contents of the window when the user resizes the window.
@@ -1298,14 +1305,14 @@ void OnInit(void)
     glUniform1i = (PFNGLUNIFORM1IPROC)SDL_GL_GetProcAddress("glUniform1i");
 
     g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader &&
-      glCreateProgram && glAttachShader && glLinkProgram && glUseProgram &&
-      glGetShaderiv && glGetShaderInfoLog && glGetProgramiv && glGetProgramInfoLog &&
-      glGetActiveUniform &&
+                         glCreateProgram && glAttachShader && glLinkProgram && glUseProgram &&
+                         glGetShaderiv && glGetShaderInfoLog && glGetProgramiv && glGetProgramInfoLog &&
+                         glGetActiveUniform &&
 #ifdef __WIN32__
-      glActiveTexture &&
+                         glActiveTexture &&
 #endif
-      glUniform1f && glUniform2f && glUniform3f && glUniform4f &&
-      glUniform1i && glGetString(GL_SHADING_LANGUAGE_VERSION);
+                         glUniform1f && glUniform2f && glUniform3f && glUniform4f &&
+                         glUniform1i && glGetString(GL_SHADING_LANGUAGE_VERSION);
 #endif // #ifndef __APPLE__
 
     // Init font
@@ -1341,7 +1348,7 @@ void OnInit(void)
             // If this fails then start an 2nd attempt: Try to load *any* font which has a point size of 120.
             if (NULL == XFont)
             {
-                XFont = XLoadQueryFont(dpy, "-*-*-*-*-*--*-120-*");            
+                XFont = XLoadQueryFont(dpy, "-*-*-*-*-*--*-120-*");
             }
             assert(XFont); // Failed anyway? :-(
 
@@ -1381,19 +1388,19 @@ void mhCameraPosition(Camera *camera, int eye)
 {
     int stereoMode = 0;
     if (eye)
-      stereoMode = camera->stereoMode;
+        stereoMode = camera->stereoMode;
 
     switch (stereoMode)
     {
     case 0: // No stereo
-      {
+    {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
         if (camera->projection)
-          gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
+            gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
         else
-          glOrtho(0.0, G.windowWidth * 600.0 / G.windowHeight, 600, 0.0, camera->nearPlane, camera->farPlane);
+            glOrtho(0.0, G.windowWidth * 600.0 / G.windowHeight, 600, 0.0, camera->nearPlane, camera->farPlane);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -1401,9 +1408,9 @@ void mhCameraPosition(Camera *camera, int eye)
                   0.0, 0.0, 0.0,          // Focus
                   0.0 , 1.0, 0.0);        // Up
         break;
-      }
+    }
     case 1: // Toe-in method, uses different eye positions, same focus point and projection
-      {
+    {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
@@ -1412,18 +1419,18 @@ void mhCameraPosition(Camera *camera, int eye)
         glLoadIdentity();
 
         if (eye == 1)
-          gluLookAt(0.0 - 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
-                    0.0, 0.0, 0.0,                                        // Focus
-                    0.0 , 1.0, 0.0);                                      // Up
+            gluLookAt(0.0 - 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
+                      0.0, 0.0, 0.0,                                        // Focus
+                      0.0 , 1.0, 0.0);                                      // Up
         else if (eye == 2)
-          gluLookAt(0.0 + 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
-                    0.0, 0.0, 0.0,                                        // Focus
-                    0.0 , 1.0, 0.0);                                      // Up
+            gluLookAt(0.0 + 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
+                      0.0, 0.0, 0.0,                                        // Focus
+                      0.0 , 1.0, 0.0);                                      // Up
 
         break;
-      }
+    }
     case 2: // Off-axis method, uses different eye positions, focus points and projections
-      {
+    {
         double aspectratio = G.windowWidth / (double)G.windowHeight;
         double widthdiv2 = tan(camera->fovAngle * 3.14159/360.0) * camera->nearPlane;
         double left  = - aspectratio * widthdiv2;
@@ -1433,29 +1440,29 @@ void mhCameraPosition(Camera *camera, int eye)
         double eyePosition;
 
         if (eye == 1) // Left
-          eyePosition = -0.5 * camera->eyeSeparation;
+            eyePosition = -0.5 * camera->eyeSeparation;
         else if (eye == 2) // Right
-          eyePosition = 0.5 * camera->eyeSeparation;
+            eyePosition = 0.5 * camera->eyeSeparation;
         else
-          eyePosition = 0.0;
+            eyePosition = 0.0;
 
         left -= eyePosition * camera->nearPlane / camera->zoom;
         right -= eyePosition * camera->nearPlane / camera->zoom;
 
-         // Left frustum is moved right, right frustum moved left
+        // Left frustum is moved right, right frustum moved left
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glFrustum(left, right, bottom, top, camera->nearPlane, camera->farPlane);
 
-         // Left camera is moved left, right camera moved right
+        // Left camera is moved left, right camera moved right
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         gluLookAt(0.0 + eyePosition, 0.0, camera->zoom, // Eye
-               0.0 + eyePosition, 0.0, 0.0,             // Focus
-               0.0 , 1.0, 0.0);                         // Up
+                  0.0 + eyePosition, 0.0, 0.0,             // Focus
+                  0.0 , 1.0, 0.0);                         // Up
 
         break;
-      }
+    }
     }
 }
 
@@ -1499,7 +1506,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
     for (obj = (Object3D*)PyIter_Next(iterator); obj; obj = (Object3D*)PyIter_Next(iterator))
     {
         if (!PyObject_TypeCheck(obj, &Object3DType))
-          continue;
+            continue;
 
         if (obj->inMovableCamera == cameraType)
         {
@@ -1550,85 +1557,85 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 // Enable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && g_ShadersSupported && obj->shader)
                 {
-                  //int isValid;
-                  //glValidateProgram(ProgramObject);
-                  //glGetProgramiv(ProgramObject, GL_VALIDATE_STATUS, &isValid);
-                  //glGetProgramInfoLog
+                    //int isValid;
+                    //glValidateProgram(ProgramObject);
+                    //glGetProgramiv(ProgramObject, GL_VALIDATE_STATUS, &isValid);
+                    //glGetProgramInfoLog
 
-                  glUseProgram(obj->shader);
+                    glUseProgram(obj->shader);
 
-                  // This should be optimized, since we only need to do it when it's changed
-                  // Validation should also only be done when it is set
-                  if (obj->shaderParameters)
-                  {
-                    GLint parameterCount = 0;
-                    int index;
-                    int currentTextureSampler = 1;
-                    
-                    glGetProgramiv(obj->shader, GL_ACTIVE_UNIFORMS, &parameterCount);
-
-                    for (index = 0; index < parameterCount; index++)
+                    // This should be optimized, since we only need to do it when it's changed
+                    // Validation should also only be done when it is set
+                    if (obj->shaderParameters)
                     {
-                      GLsizei length;
- 	                    GLint size;
- 	                    GLenum type;
- 	                    GLchar name[32];
-                      PyObject *value;
+                        GLint parameterCount = 0;
+                        int index;
+                        int currentTextureSampler = 1;
 
-                      glGetActiveUniform(obj->shader, index, sizeof(name), &length, &size, &type, name);
+                        glGetProgramiv(obj->shader, GL_ACTIVE_UNIFORMS, &parameterCount);
 
-                      value = PyDict_GetItemString(obj->shaderParameters, name);
-
-                      if (value)
-                      {
-                        switch (type)
+                        for (index = 0; index < parameterCount; index++)
                         {
-                          case GL_FLOAT:
-                          {
-                            glUniform1f(index, PyFloat_AsDouble(value));
-                            break;
-                          }
-                          case GL_FLOAT_VEC2:
-                          {
-                            if (!PyList_Check(value) || PyList_Size(value) != 2)
-                              break;
-                            glUniform2f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)));
-                            break;
-                          }
-                          case GL_FLOAT_VEC3:
-                          {
-                            if (!PyList_Check(value) || PyList_Size(value) != 3)
-                              break;
-                            glUniform3f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
-                              PyFloat_AsDouble(PyList_GetItem(value, 2)));
-                            break;
-                          }
-                          case GL_FLOAT_VEC4:
-                          {
-                            if (!PyList_Check(value) || PyList_Size(value) != 4)
-                              break;
-                            glUniform4f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
-                              PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
-                            break;
-                          }
-                          case GL_SAMPLER_1D:
-                          {
-                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
-                            glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
-                            glUniform1i(index, currentTextureSampler++);
-                            break;
-                          }
-                          case GL_SAMPLER_2D:
-                          {
-                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
-                            glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
-                            glUniform1i(index, currentTextureSampler++);
-                            break;
-                          }
+                            GLsizei length;
+                            GLint size;
+                            GLenum type;
+                            GLchar name[32];
+                            PyObject *value;
+
+                            glGetActiveUniform(obj->shader, index, sizeof(name), &length, &size, &type, name);
+
+                            value = PyDict_GetItemString(obj->shaderParameters, name);
+
+                            if (value)
+                            {
+                                switch (type)
+                                {
+                                case GL_FLOAT:
+                                {
+                                    glUniform1f(index, PyFloat_AsDouble(value));
+                                    break;
+                                }
+                                case GL_FLOAT_VEC2:
+                                {
+                                    if (!PyList_Check(value) || PyList_Size(value) != 2)
+                                        break;
+                                    glUniform2f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)));
+                                    break;
+                                }
+                                case GL_FLOAT_VEC3:
+                                {
+                                    if (!PyList_Check(value) || PyList_Size(value) != 3)
+                                        break;
+                                    glUniform3f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                                PyFloat_AsDouble(PyList_GetItem(value, 2)));
+                                    break;
+                                }
+                                case GL_FLOAT_VEC4:
+                                {
+                                    if (!PyList_Check(value) || PyList_Size(value) != 4)
+                                        break;
+                                    glUniform4f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                                PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
+                                    break;
+                                }
+                                case GL_SAMPLER_1D:
+                                {
+                                    glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                                    glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
+                                    glUniform1i(index, currentTextureSampler++);
+                                    break;
+                                }
+                                case GL_SAMPLER_2D:
+                                {
+                                    glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                                    glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
+                                    glUniform1i(index, currentTextureSampler++);
+                                    break;
+                                }
+                                }
+                            }
                         }
-                      }
                     }
-                  }
                 }
 
                 /*draw the mesh*/
@@ -1637,8 +1644,8 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 // Disable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && g_ShadersSupported && obj->shader)
                 {
-                  glUseProgram(0);
-                  glActiveTexture(GL_TEXTURE0);
+                    glUseProgram(0);
+                    glActiveTexture(GL_TEXTURE0);
                 }
 
                 /*Enable lighting if the object was shadeless*/
@@ -1676,29 +1683,29 @@ void mhDraw(void)
 
     for (i = 0; i < PyList_Size(G.cameras); i++)
     {
-      Camera *camera = (Camera*)PyList_GetItem(G.cameras, i);
+        Camera *camera = (Camera*)PyList_GetItem(G.cameras, i);
 
-      // draw the objects in dynamic camera
-      if (camera->stereoMode)
-      {
-        glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE); // Red
-        mhCameraPosition(camera, 1);
-        mhDrawMeshes(0, i);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE); // Cyan
-        mhCameraPosition(camera, 2);
-        mhDrawMeshes(0, i);
-        // To prevent the GUI from overwritting the red model, we need to render it again in the z-buffer
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // None, only z-buffer
-        mhCameraPosition(camera, 1);
-        mhDrawMeshes(0, i);
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); // All
-      }
-      else
-      {
-        mhCameraPosition(camera, 0);
-        mhDrawMeshes(0, i);
-      }
+        // draw the objects in dynamic camera
+        if (camera->stereoMode)
+        {
+            glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE); // Red
+            mhCameraPosition(camera, 1);
+            mhDrawMeshes(0, i);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE); // Cyan
+            mhCameraPosition(camera, 2);
+            mhDrawMeshes(0, i);
+            // To prevent the GUI from overwritting the red model, we need to render it again in the z-buffer
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // None, only z-buffer
+            mhCameraPosition(camera, 1);
+            mhDrawMeshes(0, i);
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); // All
+        }
+        else
+        {
+            mhCameraPosition(camera, 0);
+            mhDrawMeshes(0, i);
+        }
     }
 
     mhDrawEnd();
@@ -1751,9 +1758,9 @@ void mhSetFullscreen(int fullscreen)
     {
         return;
     }
-    
+
     G.fullscreen = fullscreen;
-    
+
     if (fullscreen)
     {
         G.windowWidth  = g_desktopWidth;
@@ -1767,11 +1774,11 @@ void mhSetFullscreen(int fullscreen)
 
     if (!g_screen)
 
-    if (!g_screen)
-    {
-        return;
-    }
-    
+        if (!g_screen)
+        {
+            return;
+        }
+
     g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
     OnInit();
     mhReshape(G.windowWidth, G.windowHeight);
@@ -1875,7 +1882,7 @@ void mhCreateWindow(int useTimer)
 
 /** \brief Start the event loop to manage the MakeHuman GUI.
  *
- *  This function implements the event loop which manages all user interaction, 
+ *  This function implements the event loop which manages all user interaction,
  *  determining which functions to call to handle events etc.
  */
 void mhEventLoop(void)
@@ -1898,23 +1905,23 @@ void mhEventLoop(void)
         if (!isMainWindowActive())
             continue;
 #endif /* __APPLE__ */
-        
+
         switch (event.type)
         {
         case SDL_ACTIVEEVENT:
             if (event.active.state & SDL_APPINPUTFOCUS)
             {
-              if (event.active.gain)
-              {
-                //SDL_ShowCursor(SDL_DISABLE);
-              }
-              else
-              {
-                //SDL_ShowCursor(SDL_ENABLE);
+                if (event.active.gain)
+                {
+                    //SDL_ShowCursor(SDL_DISABLE);
+                }
+                else
+                {
+                    //SDL_ShowCursor(SDL_ENABLE);
 #ifdef __WIN32__
-                SDL_WM_GrabInput(SDL_GRAB_OFF);
+                    SDL_WM_GrabInput(SDL_GRAB_OFF);
 #endif
-              }
+                }
             }
             break;
         case SDL_KEYDOWN:

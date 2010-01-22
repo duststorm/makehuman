@@ -33,51 +33,52 @@
 
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 // Text, shader and texture services
-void mhDrawText(float x, float y, const char *message);
-GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height);
-GLuint mhCreateVertexShader(const char *source);
-GLuint mhCreateFragmentShader(const char *source);
-GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader);
-int mhGrabScreen(int x, int y, int width, int height, const char *filename);
+    void mhDrawText(float x, float y, const char *message);
+    GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height);
+    GLuint mhCreateVertexShader(const char *source);
+    GLuint mhCreateFragmentShader(const char *source);
+    GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader);
+    int mhGrabScreen(int x, int y, int width, int height, const char *filename);
 
 // Input events
-void mhKeyDown(int key, unsigned short character, int modifiers);
-void mhKeyUp(int key, unsigned short character, int modifiers);
-void mhMouseButtonDown(int b, int x,int y);
-void mhMouseButtonUp(int b, int x,int y);
-void mhMouseMotion(int s, int x, int y, int xrel, int yrel);
-void mhPassiveMotion(int x,int y, int xrel, int yrel);
+    void mhKeyDown(int key, unsigned short character, int modifiers);
+    void mhKeyUp(int key, unsigned short character, int modifiers);
+    void mhMouseButtonDown(int b, int x,int y);
+    void mhMouseButtonUp(int b, int x,int y);
+    void mhMouseMotion(int s, int x, int y, int xrel, int yrel);
+    void mhPassiveMotion(int x,int y, int xrel, int yrel);
 
 // Calculations for 3d coordinates and selection
-void mhGetPickedCoords(int x, int y);
-void mhGetPickedColor(int x, int y);
+    void mhGetPickedCoords(int x, int y);
+    void mhGetPickedColor(int x, int y);
 
 // Window events
-void mhReshape(int w, int h);
-void mhDrawBegin(void);
-void mhDrawEnd(void);
+    void mhReshape(int w, int h);
+    void mhDrawBegin(void);
+    void mhDrawEnd(void);
 
 // Callbacks to init/cleanup gl state
-void OnInit(void);
-void OnExit(void);
+    void OnInit(void);
+    void OnExit(void);
 
 // Drawing
-void mhDrawMeshes(int pickMode, int cameraType);
-void mhDraw(void);
+    void mhDrawMeshes(int pickMode, int cameraType);
+    void mhDraw(void);
 
-void UpdatePickingBuffer(void);
+    void UpdatePickingBuffer(void);
 
 // Event loop
-void mhShutDown(void);
-void mhQueueUpdate(void);
-void mhSetFullscreen(int fullscreen);
-void mhCreateWindow(int useTimer);
-void mhEventLoop(void);
-unsigned int mhTimerFunc(unsigned int interval, void* param);
+    void mhShutDown(void);
+    void mhQueueUpdate(void);
+    void mhSetFullscreen(int fullscreen);
+    void mhCreateWindow(int useTimer);
+    void mhEventLoop(void);
+    unsigned int mhTimerFunc(unsigned int interval, void* param);
 #ifdef __cplusplus
 }
 #endif
