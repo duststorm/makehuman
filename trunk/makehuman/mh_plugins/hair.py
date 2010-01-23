@@ -23,6 +23,7 @@ TO DO
 __docformat__ = 'restructuredtext'
 
 import gui3d, events3d, hairgenerator
+from animation3d import ThreeDQBspline
 from aljabr import *
 from random import random
 from math import radians
@@ -98,7 +99,7 @@ def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
   obj.updateIndexBuffer()
   scn.update()
   
-def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True):
+def loadHairsFile(scn, path,res=0.001, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None):
   if hairsClass == None :
     hairsClass = hairgenerator.Hairgenerator()
   obj = scn.newObj(path)
@@ -138,9 +139,18 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   for group in hairsClass.guideGroups:
     for guide in group.guides:
       M = makeRotEulerMtx2D(random()*radians(45),"Z") #random angle element that eliminate ribbon "dissapearance" upon rotation
-      for i in range(2,len(guide.controlPoints)-1):
-          cp1=guide.controlPoints[i-1]
-          cp2=guide.controlPoints[i]
+      cPs = []
+      for i in xrange(2,len(guide.controlPoints)-1,2): #piecewise continuous polynomial
+        d=vdist(guide.controlPoints[i],guide.controlPoints[i-1]) + vdist(guide.controlPoints[i-1],\
+                guide.controlPoints[i-2])
+        N=d//(res*100) #floor division
+        for j in xrange(1,N+1): #doesnt account the first endpoint
+          if j==N: cPs.append(guide.controlPoints[i])
+          else: cPs.append(ThreeDQBspline(guide.controlPoints[i-2],guide.controlPoints[i-1],\
+                           guide.controlPoints[i],float(j)/N))
+      for i in xrange(2,len(cPs)-1):
+          cp1=cPs[i-1]
+          cp2=cPs[i]
           verts=[[],[],[],[]]
           #compute ribbon plane
           vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
@@ -170,8 +180,7 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   fg.setColor([0,0,0,255]) #rgba
   obj.updateIndexBuffer()
   obj.calcNormals()
-  if update:
-      scn.update()
+  scn.update()
   return obj
               
 def exportHairs(file, guideGroups):
@@ -181,7 +190,7 @@ def exportHairs(file, guideGroups):
   for group in guideGroups:
     for guide in group.guides:
       N = len(guide.controlPoints) -1
-      for i in range(0,N):
+      for i in xrange(0,N+1):
         file.write('v %.6f %.6f %.6f\n' % (guide.controlPoints[i][0], guide.controlPoints[i][1],\
                                            guide.controlPoints[i][2]))
       
@@ -189,13 +198,13 @@ def exportHairs(file, guideGroups):
       file.write('cstype bspline\n') # not ideal, hard coded
       file.write('deg %d\n' % DEG_ORDER_U) # not used for curves but most files have it still
 
-      curve_ls = [-(i+1) for i in range(N)]
+      curve_ls = [-(i+1) for i in xrange(N)]
       file.write('curv 0.0 1.0 %s\n' % (' '.join( [str(i) for i in curve_ls] ))) # hair  has no U and V values for the curve
 
       # 'parm' keyword
       tot_parm = (DEG_ORDER_U + 1) + N
       tot_parm_div = float(tot_parm-1)
-      parm_ls = [(i/tot_parm_div) for i in range(tot_parm)]
+      parm_ls = [(i/tot_parm_div) for i in xrange(tot_parm)]
       #our hairs dont do endpoints.. *sigh*
       file.write('parm u %s\n' % ' '.join( [str(i) for i in parm_ls] ))
 

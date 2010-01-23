@@ -156,9 +156,13 @@ def cubicHermiteInterpolator(v0, v1, v2, v3, alpha):
 
    return (v3 - 2 * v2 + v1 + 2 * v0) * alpha3 + (- v3 + 3 * v2 - 2 * v1 - 3 * v0) * alpha2 + v1 * alpha + v0
 
+def ThreeDQBspline(v0, v1, v2, alpha):
+    return [quadraticBSplineInterpolator(v0[i], v1[i], v2[i], alpha) for i in xrange(len(v1))]
+    #return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
+
 # Interpolates a whole vector at once.
-def lerpVector(v1, v2, alpha, interpolator = linearInterpolate):
-    return [interpolator(v1[i], v2[i], alpha) for i in xrange(len(v1))]
+def lerpVector(v0, v1, alpha, interpolator = linearInterpolate):
+    return [interpolator(v0[i], v1[i], alpha) for i in xrange(len(v1))]
     #return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
 
 class Action:
