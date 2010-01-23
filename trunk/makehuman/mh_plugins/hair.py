@@ -99,7 +99,7 @@ def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
   obj.updateIndexBuffer()
   scn.update()
   
-def loadHairsFile(scn, path,res=0.001, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True):
+def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True):
   if hairsClass == None :
     hairsClass = hairgenerator.Hairgenerator()
   obj = scn.newObj(path)
@@ -140,14 +140,14 @@ def loadHairsFile(scn, path,res=0.001, position=[0.0,0.0,0.0], rotation=[0.0,0.0
     for guide in group.guides:
       M = makeRotEulerMtx2D(random()*radians(45),"Z") #random angle element that eliminate ribbon "dissapearance" upon rotation
       cPs = []
-      for i in xrange(2,len(guide.controlPoints)-1,2): #piecewise continuous polynomial
-        d=vdist(guide.controlPoints[i],guide.controlPoints[i-1]) + vdist(guide.controlPoints[i-1],\
-                guide.controlPoints[i-2])
-        N=d//(res*100) #floor division
-        for j in xrange(1,N+1): #doesnt account the first endpoint
-          if j==N: cPs.append(guide.controlPoints[i])
+      for i in xrange(2,len(guide.controlPoints)-1): #piecewise continuous polynomial
+        d=vdist(guide.controlPoints[i-1],guide.controlPoints[i-2])
+        N=int(d/(res*4))
+        d=d+vdist(guide.controlPoints[i-1],guide.controlPoints[i])
+        for j in xrange(1,N+1): #doesnt account the endpoints
+          if j==N: cPs.append(guide.controlPoints[i-1])
           else: cPs.append(ThreeDQBspline(guide.controlPoints[i-2],guide.controlPoints[i-1],\
-                           guide.controlPoints[i],float(j)/N))
+                           guide.controlPoints[i],j*res*4/d))
       for i in xrange(2,len(cPs)-1):
           cp1=cPs[i-1]
           cp2=cPs[i]
