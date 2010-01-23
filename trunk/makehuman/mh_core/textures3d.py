@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """
 Functions for processing bitmaps. 
 
@@ -26,6 +29,7 @@ such as the 3D algorithms.
 
 __docformat__ = 'restructuredtext'
 
+
 def byteToBit(val, numdigits=8, base=2):
     """
     This function returns a list of binary digits representing the number specified.
@@ -41,14 +45,14 @@ def byteToBit(val, numdigits=8, base=2):
         *integer*. The factor to repeatedly divide by.
     
     """
+
     digits = [0 for i in range(numdigits)]
     for i in range(numdigits):
-        val, digits[i] = divmod(val, base)
+        (val, digits[i]) = divmod(val, base)
     return digits
 
 
 def readTGA(filename):
-
     """
     This function reads a TGA file and constructs a list of lists 
     with RGB values plus an alpha channel.
@@ -71,92 +75,103 @@ def readTGA(filename):
     filename:
         *string*. The full file system path to the TGA file to be processed.
     """
-    origin = ""
+
+    origin = ''
     lengthOfID = 0
     byteList = []
 
     try:
-        f = open(filename,'rb')
-    except IOError,(errno,strerror):
-        print "I/O error(%s): %s" % (errno, strerror)
+        f = open(filename, 'rb')
+    except IOError, (errno, strerror):
+        print 'I/O error(%s): %s' % (errno, strerror)
         return None
-    fileReaded = f.read();
+    fileReaded = f.read()
     for i in xrange(len(fileReaded)):
         byteList.append(ord(fileReaded[i]))
     f.close()
 
-    #byteList[0] is the Identification Field.
+    # byteList[0] is the Identification Field.
+
     lengthOfID = byteList[0]
-    print "Identification Field lentgh = %i" %(lengthOfID);
+    print 'Identification Field lentgh = %i' % lengthOfID
 
-    #byteList[1] is the Color Map Type.
+    # byteList[1] is the Color Map Type.
+
     if byteList[1] != 0:
-        print "this module work only with true color image, no mapped type";
+        print 'this module work only with true color image, no mapped type'
         return None
 
-    #byteList[2] is the image type field.
+    # byteList[2] is the image type field.
+
     if byteList[2] != 2:
-        print "Image type =",byteList[2]
-        print "This module work only with uncompressed true color image";
+        print 'Image type =', byteList[2]
+        print 'This module work only with uncompressed true color image'
         return None
 
+    # byteList[12] and istByte[13] are 2 byte of image X resolution.
+    # TGA files are stored using the Intel byte ordering convention
+    # (least significant byte first, most significant
+    # byte last). For this reason, applications running on
+    # Motorola-based systems will need to invert the ordering
+    # of bytes for short and long values after a file has been read.
 
-    #byteList[12] and istByte[13] are 2 byte of image X resolution.
-    #TGA files are stored using the Intel byte ordering convention
-    #(least significant byte first, most significant
-    #byte last). For this reason, applications running on
-    #Motorola-based systems will need to invert the ordering
-    #of bytes for short and long values after a file has been read.
-    TGAXres = byteList[12]+(byteList[13]*256)
-    print "X resolution: %i"%(TGAXres)
+    TGAXres = byteList[12] + byteList[13] * 256
+    print 'X resolution: %i' % TGAXres
 
-    #byteList[14] and istByte[15] are 2 byte of image Y resolution.
-    TGAYres = byteList[14]+(byteList[15]*256)
-    print "Y resolution: %i"%(TGAYres)
+    # byteList[14] and istByte[15] are 2 byte of image Y resolution.
 
-    #byteList[16] is the pixel depth: 8,16,24,32, etc.
-    pixelDepth =  byteList[16]
+    TGAYres = byteList[14] + byteList[15] * 256
+    print 'Y resolution: %i' % TGAYres
+
+    # byteList[16] is the pixel depth: 8,16,24,32, etc.
+
+    pixelDepth = byteList[16]
     if pixelDepth == 24:
         byteUsedForPixel = 3
     elif pixelDepth == 32:
         byteUsedForPixel = 4
     else:
-        print "This module work only with 24 or 32 bits images"
+        print 'This module work only with 24 or 32 bits images'
         return None
 
-    print "Pixel Depth: %i"%(pixelDepth)
+    print 'Pixel Depth: %i' % pixelDepth
 
-    #byteList[17] is Image Descriptor
+    # byteList[17] is Image Descriptor
+
     imageDescriptor = byteList[17]
-    #In this case we need to examine the single bits
+
+    # In this case we need to examine the single bits
+
     imageDescrBit = byteToBit(imageDescriptor)
-    #We need just bit 4 and 5 for TGA coordinate system origin
-    a=imageDescrBit[5]
-    b=imageDescrBit[4]
+
+    # We need just bit 4 and 5 for TGA coordinate system origin
+
+    a = imageDescrBit[5]
+    b = imageDescrBit[4]
     if a == 0 and b == 0:
-        print "The image origin is Bottom Left"
-        origin = "BL"
+        print 'The image origin is Bottom Left'
+        origin = 'BL'
     if a == 0 and b == 1:
-        print "The image origin is Bottom Right"
-        origin = "BR"
+        print 'The image origin is Bottom Right'
+        origin = 'BR'
     if a == 1 and b == 0:
-        print "The image origin is Top Left"
-        origin = "TL"
+        print 'The image origin is Top Left'
+        origin = 'TL'
     if a == 1 and b == 1:
-        print "The image origin is Top Right"
-        origin = "TR"
+        print 'The image origin is Top Right'
+        origin = 'TR'
 
-    #Calculation of TGA header length
+    # Calculation of TGA header length
+
     standardLength = 18
-    headerLength = standardLength+lengthOfID
-    numOfPixel =  TGAXres * TGAYres
-    numeOfBytesUsedForPixels =  numOfPixel * byteUsedForPixel
-    byteList = byteList[headerLength:headerLength+numeOfBytesUsedForPixels]
-    return [byteList,TGAXres,TGAYres,numOfPixel,byteUsedForPixel]
+    headerLength = standardLength + lengthOfID
+    numOfPixel = TGAXres * TGAYres
+    numeOfBytesUsedForPixels = numOfPixel * byteUsedForPixel
+    byteList = byteList[headerLength:headerLength + numeOfBytesUsedForPixels]
+    return [byteList, TGAXres, TGAYres, numOfPixel, byteUsedForPixel]
 
 
-
-def uvCooToBitmapIndex(TGAXres,TGAYres,U,V):
+def uvCooToBitmapIndex(TGAXres, TGAYres, U, V):
     """ 
     
     This function takes UV coordinates and a bitmap resolution as input and 
@@ -187,12 +202,15 @@ def uvCooToBitmapIndex(TGAXres,TGAYres,U,V):
         *float*. The horizontal component of the UV coordinates. A value between 0 and 1.
     V:
         *float*. The vertical component of the UV coordinate. A value between 0 and 1
-    """ 
-    
+    """
+
     # We use 'resolution - 1' in both dimensions as multiplication
     # factors to work out which pixel the UV coordinate sits in.
-    # The calculated coordinates are integer values counting from '0'.  
-    UVimageCoordX = int(abs((TGAXres-1)*U))
-    UVimageCoordY = int(abs((TGAYres-1)*V))
-    pixelIndex = UVimageCoordX + (UVimageCoordY * TGAXres)
+    # The calculated coordinates are integer values counting from '0'.
+
+    UVimageCoordX = int(abs((TGAXres - 1) * U))
+    UVimageCoordY = int(abs((TGAYres - 1) * V))
+    pixelIndex = UVimageCoordX + UVimageCoordY * TGAXres
     return pixelIndex
+
+

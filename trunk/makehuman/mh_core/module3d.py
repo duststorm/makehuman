@@ -1,4 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # You may use, modify and redistribute this module under the terms of the GNU GPL.
+# .. include:: docs/includes/example1.txt
+
 """
 Base 3D MakeHuman classes.
 
@@ -35,10 +39,8 @@ controls. The Scene3D object contains all of the Object3D objects that go
 to make up the entire scene.
 
 """
-#.. include:: docs/includes/example1.txt
 
 __docformat__ = 'restructuredtext'
-
 
 import mh
 import aljabr
@@ -48,7 +50,9 @@ import os
 
 textureCache = {}
 
+
 class Texture:
+
     """
     A simple handler for textures loaded in the scene.
     
@@ -58,11 +62,14 @@ class Texture:
     - **self.id** : *int* The texture identifier.
     - **self.modified**: *int* A flag to indicate if a texture is modified, used to reload the texture if needed.
     """
+
     def __init__(self, id, modified):
         self.id = id
         self.modified = modified
 
+
 class Vert:
+
     """
     A 3D vertex object. This object records the 3D location and surface normal
     of the vertex and an RGBA color value. It also records references to
@@ -138,7 +145,7 @@ class Vert:
     - **self.color**: *float list*. A list of 4 floats [r,g,b,a] used as the vertex color (including an alpha channel).
     """
 
-    def __init__(self, co = [0, 0, 0], idx=0, object=None, sfidx = []):
+    def __init__(self, co=[0, 0, 0], idx=0, object=None, sfidx=[]):
         """
         This is the constructor method for the Vert class. It initializes the
         vert attributes.
@@ -169,15 +176,14 @@ class Vert:
         """
 
         self.co = co
-        self.no = [0,0,0]
+        self.no = [0, 0, 0]
         self.object = object
         self.sharedFaces = []
         self.indicesInFullVertArray = []
         self.idx = idx
-        self.color = [255,255,255,255]
+        self.color = [255, 255, 255, 255]
 
-
-    def update(self,updateNor=1,updateCoo=1,updateCol=None,colorIndexToUpdate=None):
+    def update(self, updateNor=1, updateCoo=1, updateCol=None, colorIndexToUpdate=None):
         """
         This method updates the coordinates, normal and/or color of a vertex in the C
         OpenGL world, based upon the values currently held in the Python Vert class.
@@ -260,7 +266,6 @@ class Vert:
             else:
                 self.object.object3d.setColorComponent(colorIndexToUpdate, self.color)
 
-
     def calcNorm(self):
         """
         This method calculates the vertex surface normal based upon a mathematical average
@@ -280,7 +285,7 @@ class Vert:
 
         Because the actual 3D engine uses optimized glDrawElements,
         where each vertex can have only one normal, it is impossible
-        in MakeHuman to draw the geometry in a "flat" mode.
+        in MakeHuman to draw the geometry in a \"flat\" mode.
 
         MakeHuman is organically oriented, so the benefits of using this optimized technique
         outweigh potential performance costs.
@@ -288,7 +293,7 @@ class Vert:
         **Parameters:** This method has no parameters.
 
         """
-        
+
         no = [0.0, 0.0, 0.0]
         for f in self.sharedFaces:
             no[0] += f.no[0]
@@ -323,10 +328,12 @@ class Vert:
         **Parameters:** This method has no parameters.
 
         """
-        return "vert num %s, coord(%s,%s,%s)"%(self.idx,self.co[0],self.co[1],self.co[2])
+
+        return 'vert num %s, coord(%s,%s,%s)' % (self.idx, self.co[0], self.co[1], self.co[2])
 
 
 class Face:
+
     """
     A face object. In MakeHuman, all face objects are triangular.
 
@@ -358,7 +365,7 @@ class Face:
       holding the UV coordinates for the uv-mapping of textures to this face.
     """
 
-    def __init__(self,v0,v1,v2):
+    def __init__(self, v0, v1, v2):
         """
         This is the constructor method for the Face class.
         It initializes all face attributes.
@@ -378,11 +385,12 @@ class Face:
             *vert*. Third vertex of face
 
         """
-        self.no = [0.0,0.0,0.0]
-        self.verts = [v0,v1,v2]
+
+        self.no = [0.0, 0.0, 0.0]
+        self.verts = [v0, v1, v2]
         self.uv = None
         self.color = None
-        self.colorID = [255,255,255]
+        self.colorID = [255, 255, 255]
         self.idx = None
         self.group = None
 
@@ -399,26 +407,26 @@ class Face:
         **Parameters:** This method has no parameters.
 
         """
+
         vt1 = self.verts[0].co
         vt2 = self.verts[1].co
         vt3 = self.verts[2].co
-        self.no = aljabr.planeNorm(vt1,vt2,vt3)
-
+        self.no = aljabr.planeNorm(vt1, vt2, vt3)
 
     def updateColors(self):
         """
         This method updates the color attributes for each vertex on this face.
         """
-        #The position of color index to update in C color array
-        #is given by the index of face * 3 * 4
-        #because for each face we have 3 verts, and for each vert we have
-        #4 floats R,G,B,A.
 
-        for i,v in enumerate(self.verts):
+        # The position of color index to update in C color array
+        # is given by the index of face * 3 * 4
+        # because for each face we have 3 verts, and for each vert we have
+        # 4 floats R,G,B,A.
+
+        for (i, v) in enumerate(self.verts):
             v.color = self.color[i]
             for index in v.indicesInFullVertArray:
-                v.update(0,0,1)
-        
+                v.update(0, 0, 1)
 
     def __str__(self):
         """
@@ -429,11 +437,12 @@ class Face:
         **Parameters:** This method has no parameters.
 
         """
-        return "face %i: verts: %i, %i, %i" % (self.idx, self.verts[0].idx,
-            self.verts[1].idx,self.verts[2].idx)
+
+        return 'face %i: verts: %i, %i, %i' % (self.idx, self.verts[0].idx, self.verts[1].idx, self.verts[2].idx)
 
 
 class FaceGroup:
+
     """
     A FaceGroup (a group of faces with a unique name).
 
@@ -452,7 +461,7 @@ class FaceGroup:
 
     """
 
-    def __init__(self,name):
+    def __init__(self, name):
         """
         This is the constructor method for the FaceGroup class.
         It initializes all facegroups attributes.
@@ -478,28 +487,31 @@ class FaceGroup:
         **Parameters:** This method has no parameters.
 
         """
-        return "facegroup %s"%(self.name)
 
-    def createFace(self, v0, v1, v2, uv = None):
-        f = Face(v0,v1,v2)
+        return 'facegroup %s' % self.name
+
+    def createFace(self, v0, v1, v2, uv=None):
+        f = Face(v0, v1, v2)
         f.group = self
         self.faces.append(f)
         self.parent.faces.append(f)
-        
+
         if uv:
-          index = len(self.parent.uvValues)
-          for uvpair in uv:
-            self.parent.uvValues.append(uvpair)
-          f.uv = [index, index + 1, index + 2]
-        
+            index = len(self.parent.uvValues)
+            for uvpair in uv:
+                self.parent.uvValues.append(uvpair)
+            f.uv = [index, index + 1, index + 2]
+
         return f
-        
+
     def setColor(self, color):
-      for f in self.faces:
-        f.color = [color, color, color]
-        f.updateColors()
+        for f in self.faces:
+            f.color = [color, color, color]
+            f.updateColors()
+
 
 class Object3D:
+
     """
     A 3D object, made up of faces and vertices (i.e. containing Face objects and Vert objects).
     The humanoid object manipulated by the MakeHuman application is an instance of this
@@ -582,7 +594,9 @@ class Object3D:
         self.texture = None
         self.shader = 0
         self.shaderParameters = {}
-        #self.colors = []
+
+        # self.colors = []
+
         self.isSelected = None
         self.faceGroupSelected = None
         self.shadeless = 0
@@ -590,46 +604,46 @@ class Object3D:
         self.indexBuffer = []
         self.vertexBufferSize = None
         self.uvValues = None
-        self.text = ""
-        
+        self.text = ''
+
     def updateIndexBuffer(self):
         del self.indexBuffer[:]
         fullArrayIndex = 0
         groupVerts = {}
         for f in self.faces:
-          for i, v in enumerate(f.verts):
-            if f.uv:
-              t = f.uv[i]
-            else:
-              t = -1
-            if v.idx not in groupVerts:
-              v.indicesInFullVertArray.append(fullArrayIndex)
-              groupVerts[v.idx] = {}
-              groupVerts[v.idx][t] = fullArrayIndex
-              self.indexBuffer.append(fullArrayIndex)
-              fullArrayIndex += 1
-            elif t not in groupVerts[v.idx]:
-              v.indicesInFullVertArray.append(fullArrayIndex)
-              groupVerts[v.idx][t] = fullArrayIndex
-              self.indexBuffer.append(fullArrayIndex)
-              fullArrayIndex += 1
-            else:
-              self.indexBuffer.append(groupVerts[v.idx][t])
-        
-        self.vertexBufferSize = fullArrayIndex;
+            for (i, v) in enumerate(f.verts):
+                if f.uv:
+                    t = f.uv[i]
+                else:
+                    t = -1
+                if v.idx not in groupVerts:
+                    v.indicesInFullVertArray.append(fullArrayIndex)
+                    groupVerts[v.idx] = {}
+                    groupVerts[v.idx][t] = fullArrayIndex
+                    self.indexBuffer.append(fullArrayIndex)
+                    fullArrayIndex += 1
+                elif t not in groupVerts[v.idx]:
+                    v.indicesInFullVertArray.append(fullArrayIndex)
+                    groupVerts[v.idx][t] = fullArrayIndex
+                    self.indexBuffer.append(fullArrayIndex)
+                    fullArrayIndex += 1
+                else:
+                    self.indexBuffer.append(groupVerts[v.idx][t])
+
+        self.vertexBufferSize = fullArrayIndex
 
     def createFaceGroup(self, name):
         fg = FaceGroup(name)
         fg.parent = self
         self.facesGroups.append(fg)
         return fg
-        
+
     def createVertex(self, co):
         v = Vert(co, len(self.verts), self)
         self.verts.append(v)
         return v
-  
-    def setLoc(self,locx,locy,locz):
+
+    def setLoc(self, locx, locy, locz):
         """
         This method is used to set the location of the object in the 3D coordinate space of the scene.
 
@@ -643,6 +657,7 @@ class Object3D:
         locz:
             *float*. The z coordinate of the object.
         """
+
         self.x = locx
         self.y = locy
         self.z = locz
@@ -651,7 +666,7 @@ class Object3D:
         except AttributeError, text:
             pass
 
-    def setRot(self,rx,ry,rz):
+    def setRot(self, rx, ry, rz):
         """
         This method sets the orientation of the object in the 3D coordinate space of the scene.
 
@@ -665,6 +680,7 @@ class Object3D:
         rz:
             *float*. Rotation around the z-axis.
         """
+
         self.rx = rx
         self.ry = ry
         self.rz = rz
@@ -673,7 +689,7 @@ class Object3D:
         except AttributeError, text:
             pass
 
-    def setScale(self,sx,sy,sz):
+    def setScale(self, sx, sy, sz):
         """
         This method sets the scale of the object in the 3D coordinate space of
         the scene, relative to the initially defined size of the object.
@@ -688,6 +704,7 @@ class Object3D:
         sz:
             *float*. Scale along the z-axis.
         """
+
         self.sx = sx
         self.sy = sy
         self.sz = sz
@@ -706,13 +723,14 @@ class Object3D:
         visib:
             *int flag*. Whether or not the object is visible. 1=Visible, 0=Invisible.
         """
+
         self.visibility = visible
         try:
             self.object3d.visibility = visible
         except AttributeError, text:
             pass
-            
-    def setPickable(self,pickable):
+
+    def setPickable(self, pickable):
         """
         This method sets the pickable flag of the object.
 
@@ -722,6 +740,7 @@ class Object3D:
         visib:
             *int flag*. Whether or not the object is pickable. 0=not pickable, 1=pickable.
         """
+
         self.pickable = pickable
         try:
             self.object3d.pickable = pickable
@@ -738,19 +757,20 @@ class Object3D:
         path:
             *string* The path of a texture TGA file.
         """
+
         self.texture = path
-        print("loading " + path);
+        print 'loading ' + path
         if path in textureCache:
             if os.stat(path).st_mtime != textureCache[path].modified:
                 try:
                     mh.loadTexture(path, textureCache[path].id)
                 except RuntimeError, text:
-                    print(text)
-                    return;
+                    print text
+                    return
                 else:
                     textureCache[path].modified = os.stat(path).st_mtime
-            
-            try:                
+
+            try:
                 self.object3d.texture = textureCache[path].id
             except AttributeError, text:
                 pass
@@ -759,15 +779,14 @@ class Object3D:
             try:
                 texture = mh.loadTexture(path, 0)
             except RuntimeError, text:
-                print(text)
+                print text
             else:
                 try:
                     textureCache[path] = Texture(texture, os.stat(path).st_mtime)
                     self.object3d.texture = texture
                 except AttributeError, text:
                     pass
-    
-            
+
     def clearTexture(self):
         """
         This method is used to clear an object's texture.
@@ -775,15 +794,16 @@ class Object3D:
         **Parameters:** This method has no parameters.
         
         """
+
         self.texture = None
         try:
-          self.object3d.texture = 0;
+            self.object3d.texture = 0
         except AttributeError, text:
-          pass
-          
+            pass
+
     def hasTexture(self):
-        return self.object3d.texture != 0;
-        
+        return self.object3d.texture != 0
+
     def setShader(self, shader):
         """
         This method is used to specify the shader.
@@ -794,18 +814,19 @@ class Object3D:
         path:
             *int* The shader.
         """
+
         self.shader = shader
         try:
-          self.object3d.shader = shader
+            self.object3d.shader = shader
         except AttributeError, text:
-          pass
-          
+            pass
+
     def setShaderParameter(self, name, value):
         self.shaderParameters[name] = value
         try:
-          self.object3d.shaderParameters[name] = value
+            self.object3d.shaderParameters[name] = value
         except AttributeError, text:
-          pass
+            pass
 
     def setShadeless(self, shadeless):
         """
@@ -820,14 +841,14 @@ class Object3D:
             *int* Whether or not the object is unaffected by lights. If 0, it is affected by lights; if 0, it is not.
 
         """
+
         self.shadeless = shadeless
-        try:                
+        try:
             self.object3d.shadeless = self.shadeless
         except AttributeError, text:
             pass
-        
 
-    def setText(self,text):
+    def setText(self, text):
         """
         Ths method sets the text to print on the object.
 
@@ -838,12 +859,12 @@ class Object3D:
             *string* The text to print on the object.
 
         """
+
         self.text = text
         try:
             self.object3d.text = self.text
         except AttributeError, text:
             pass
-        
 
     def addFaceGroup(self, fg):
         """
@@ -855,7 +876,8 @@ class Object3D:
         fg:
             *faceGroups list* The FaceGroup to add.
         """
-        fg.parent= self
+
+        fg.parent = self
         self.facesGroups.append(fg)
 
     def getFaceGroup(self, name):
@@ -870,6 +892,7 @@ class Object3D:
         name:
             *string*  The name of the FaceGroup to retrieve.
         """
+
         for fg in self.facesGroups:
             if fg.name == name:
                 return fg
@@ -889,14 +912,14 @@ class Object3D:
         mode:
             *int*  The camera mode to be used for this object. 0 = fixed camera; 1 = movable camera
         """
+
         self.cameraMode = cameraMode
         try:
             self.object3d.cameraMode = self.cameraMode
         except AttributeError, text:
             pass
 
-
-    def update(self, verticesToUpdate = None):
+    def update(self, verticesToUpdate=None):
         """
         This method is used to call the update methods on each of a list of vertices that form part of this object.
 
@@ -907,9 +930,10 @@ class Object3D:
             *int list*  The list of vertex indices to update
 
         """
+
         if verticesToUpdate == None:
             verticesToUpdate = self.verts
-            
+
         for v in verticesToUpdate:
             v.update()
 
@@ -936,8 +960,7 @@ class Object3D:
                 v.color[1] = 0
             if v.color[2] < 0:
                 v.color[2] = 0
-            v.update(0,0,1)
-
+            v.update(0, 0, 1)
 
     def applyDefaultColor(self):
         """
@@ -948,11 +971,10 @@ class Object3D:
         """
 
         for v in self.verts:
-            v.color = [255,255,255,255]
-            v.update(0,0,1)
+            v.color = [255, 255, 255, 255]
+            v.update(0, 0, 1)
 
-
-    def calcNormals(self, recalcVertexNormals = 1, recalcFaceNormals = 1, verticesToUpdate = None, facesToUpdate = None):
+    def calcNormals(self, recalcVertexNormals=1, recalcFaceNormals=1, verticesToUpdate=None, facesToUpdate=None):
         """
         This method calls the calcNormal method for a subset of the faces
         in this Object3D object and the calcNorm method on a subset of the
@@ -990,7 +1012,7 @@ class Object3D:
                 facesToUpdate = self.faces
             for f in facesToUpdate:
                 f.calcNormal()
-                
+
         if recalcVertexNormals:
             if verticesToUpdate == None:
                 verticesToUpdate = self.verts
@@ -1007,10 +1029,11 @@ class Object3D:
 
         """
 
-        return "object3D named: %s, nverts: %s, nfaces: %s, at |%s,%s,%s|" % \
-                (self.name,len(self.verts),len(self.faces),self.x,self.y,self.z)
+        return 'object3D named: %s, nverts: %s, nfaces: %s, at |%s,%s,%s|' % (self.name, len(self.verts), len(self.faces), self.x, self.y, self.z)
+
 
 class Scene3D:
+
     """
     A 3D object that stores the contents of a scene (made up primarily of
     one or more Object3D objects).
@@ -1087,9 +1110,10 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         self.objects = []
         self.faceGroupColorID = {}
-        self.colorID = [0,0,0]
+        self.colorID = [0, 0, 0]
         self.sceneTimerCallback = None
         self.keyboardEventsDict = {}
         self.keyPressed = None
@@ -1099,106 +1123,114 @@ class Scene3D:
         self.mouseY = 0
         self.mouseXRel = 0
         self.mouseYRel = 0
-        
+
         self.selectedHuman = None
-        
 
     def __str__(self):
         """
         This method is the Print method for a Scene3D object, which returns a string containing the words
-        "scene_type".
+        \"scene_type\".
 
         **Parameters:** This method has no parameters.
 
         """
-        return "scene_type"
-    
+
+        return 'scene_type'
+
     def clear(self, obj):
         mh.world.remove(obj.object3d)
         obj.object3d = None
         if obj.indexBuffer:
-          del obj.indexBuffer[:]
+            del obj.indexBuffer[:]
         del obj.faces[:]
         del obj.verts[:]
         del obj.facesGroups[:]
-        
+
     def attach(self, obj):
         if obj.object3d:
             return
-            
+
         self.assignSelectionID(obj)
-        #print "sending: ", obj.name, len(obj.verts)
+
+        # print "sending: ", obj.name, len(obj.verts)
+
         coIdx = 0
         fidx = 0
         uvIdx = 0
         colIdx = 0
+
         # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
+
         obj.object3d = mh.Object3D(obj.vertexBufferSize, obj.indexBuffer)
         mh.world.append(obj.object3d)
-        
+
         for g in obj.facesGroups:
-            groupVerts = {};
+            groupVerts = {}
             for f in g.faces:
                 faceColor = f.color
                 if faceColor == None:
-                    faceColor = [[255,255,255,255],[255,255,255,255],[255,255,255,255]]
+                    faceColor = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
                 fUV = f.uv
                 if fUV == None:
-                    fUV = [-1,-1,-1]
-                            
+                    fUV = [-1, -1, -1]
+
                 i = 0
                 for v in f.verts:
                     if v.idx not in groupVerts:
-                        #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+
+                        # obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+
                         obj.object3d.setVertCoord(coIdx, v.co)
                         obj.object3d.setNormCoord(coIdx, v.no)
                         obj.object3d.setColorIDComponent(coIdx, f.colorID)
                         obj.object3d.setColorComponent(colIdx, faceColor[i])
                         groupVerts[v.idx] = set()
                         groupVerts[v.idx].add(fUV[i])
-                        
+
                         coIdx += 1
                         colIdx += 1
-                        
+
                         if obj.uvValues:
                             obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
                             uvIdx += 1
-                        
                     elif fUV[i] not in groupVerts[v.idx]:
-                        #obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+
+                        # obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+
                         obj.object3d.setVertCoord(coIdx, v.co)
                         obj.object3d.setNormCoord(coIdx, v.no)
                         obj.object3d.setColorIDComponent(coIdx, f.colorID)
                         obj.object3d.setColorComponent(colIdx, faceColor[i])
                         groupVerts[v.idx].add(fUV[i])
-                        
+
                         coIdx += 1
                         colIdx += 1
-                        
+
                         if obj.uvValues:
                             obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
                             uvIdx += 1
-                        
+
                     i += 1
-                    
+
         if obj.texture:
             obj.setTexture(obj.texture)
-            
+
         obj.object3d.shader = obj.shader
-        
-        for name, value in obj.shaderParameters.iteritems():
-          obj.object3d.shaderParameters[name] = value
+
+        for (name, value) in obj.shaderParameters.iteritems():
+            obj.object3d.shaderParameters[name] = value
 
         obj.object3d.translation = (obj.x, obj.y, obj.z)
-        obj.object3d.rotation = ( obj.rx, obj.ry, obj.rz)
+        obj.object3d.rotation = (obj.rx, obj.ry, obj.rz)
         obj.object3d.scale = (obj.sx, obj.sy, obj.sz)
         obj.object3d.visibility = obj.visibility
         obj.object3d.shadeless = obj.shadeless
         obj.object3d.pickable = obj.pickable
         obj.object3d.cameraMode = obj.cameraMode
         obj.object3d.text = obj.text
-        #TODO add all obj attributes
-        
+
+        # TODO add all obj attributes
+
     def detach(self, obj):
         obj.object3d = None
 
@@ -1214,26 +1246,28 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         a = time.time()
 
         nObjs = len(self.objects)
-        self.colorID = [0,0,0]#reset the colors selection ID
-        
-        #mh.world[:] = []
-        
-        #Send all
+        self.colorID = [0, 0, 0]  # reset the colors selection ID
+
+        # mh.world[:] = []
+
+        # Send all
+
         for obj in self.objects:
             self.attach(obj)
 
-        print "Regeneration done in" + str(time.time()-a)
-        
+        print 'Regeneration done in' + str(time.time() - a)
+
     def reloadTextures(self):
-        print("Reloading textures")
+        print 'Reloading textures'
         for path in textureCache:
             try:
                 mh.loadTexture(path, textureCache[path].id)
             except RuntimeError, text:
-                print(text)
+                print text
 
     def setTimeTimer(self, millisecs):
         """
@@ -1246,11 +1280,10 @@ class Scene3D:
         millisecs:
             *int* The number of milliseconds until the next timer event is triggered.
 
-        """       
+        """
+
         mh.setTimeTimer(millisecs)
 
-
-        
     def timerFunc(self):
         """
         This method calls the 'idle' callback function registered against
@@ -1258,7 +1291,8 @@ class Scene3D:
 
         **Parameters:** This method has no parameters.
 
-        """       
+        """
+
         if self.sceneTimerCallback:
             self.sceneTimerCallback()
 
@@ -1276,8 +1310,10 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         return [self.mouseX, self.mouseY]
-        #return mh.getMousePos2D()
+
+        # return mh.getMousePos2D()
 
     def getMousePos3D(self):
         """
@@ -1292,6 +1328,7 @@ class Scene3D:
 
         **Parameters:** This method has no parameters.
         """
+
         return mh.cameras[0].convertToWorld2D(mh.getMousePos2D())
 
     def getMousePosGUI(self):
@@ -1307,7 +1344,8 @@ class Scene3D:
 
         **Parameters:** This method has no parameters.
         """
-        return mh.getMousePosGUI()  
+
+        return mh.getMousePosGUI()
 
     def getWindowSize(self):
         """
@@ -1320,6 +1358,7 @@ class Scene3D:
 
         **Parameters:** This method has no parameters.
         """
+
         return mh.getWindowSize()
 
     def mouseButtonDown(self, button, x, y):
@@ -1331,9 +1370,10 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         self.mouseX = x
         self.mouseY = y
-        
+
         self.application.mouseDown(button, x, y)
 
     def mouseButtonUp(self, button, x, y):
@@ -1345,9 +1385,10 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         self.mouseX = x
         self.mouseY = y
-        
+
         self.application.mouseUp(button, x, y)
 
     def mouseMotion(self, mouseState, x, y, xRel, yRel):
@@ -1359,13 +1400,13 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
-        
+
         self.mouseState = mouseState
         self.mouseX = x
         self.mouseY = y
         self.mouseXRel = xRel
         self.mouseYRel = yRel
-        
+
         self.application.mouseMove(mouseState, x, y, xRel, yRel)
 
     def keyDown(self, key, character, modifiers):
@@ -1385,11 +1426,13 @@ class Scene3D:
             *int* The modifier flags.
 
         """
-        #print("keyDown %d %s %d" % (key, character, modifiers))
+
+        # print("keyDown %d %s %d" % (key, character, modifiers))
+
         self.keyPressed = key
         self.characterPressed = character
         self.application.keyDown(key, character, modifiers)
-        
+
     def keyUp(self, key, character, modifiers):
         """
         This method processes a 'keyUp' event for this Scene3D
@@ -1407,7 +1450,9 @@ class Scene3D:
             *int* The modifier flags.
 
         """
-        #print("keyUp %d %s %d" % (key, character, modifiers))
+
+        # print("keyUp %d %s %d" % (key, character, modifiers))
+
         self.application.keyUp(key, character, modifiers)
 
     def shutdown(self):
@@ -1418,6 +1463,7 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         mh.shutDown()
 
     def getObject(self, name):
@@ -1431,13 +1477,15 @@ class Scene3D:
         name:
             *string*. The name of the object to retrieve.
         """
+
         objToGet = None
         for obj in self.objects:
             if obj.name == name:
                 objToGet = obj
                 break
         return objToGet
-        #print "Obj %s not found"%(name)
+
+        # print "Obj %s not found"%(name)
 
     def getSelectedObject(self):
         """
@@ -1448,12 +1496,13 @@ class Scene3D:
 
         **Parameters:** This method has no parameters.
 
-        """        
+        """
+
         objToGet = None
         for obj in self.objects:
             if obj.isSelected:
                 objToGet = obj
-                break        
+                break
         return objToGet
 
     def deselectAll(self):
@@ -1464,12 +1513,13 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         for obj in self.objects:
             if obj.isSelected:
                 obj.isSelected = None
                 break
 
-    def startWindow(self, useIdle = 0):
+    def startWindow(self, useIdle=0):
         """
         This method opens a Window with a graphical context and is part of the
         application launch sequence.
@@ -1482,8 +1532,9 @@ class Scene3D:
             (whether to use timer based events).
 
         """
+
         mh.startWindow(useIdle)
-        
+
     def startEventLoop(self):
         """
         This method starts the event loop is part of the
@@ -1492,6 +1543,7 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         mh.startEventLoop()
 
     def grabScreen(self, x, y, width, height, filename):
@@ -1516,12 +1568,15 @@ class Scene3D:
             *string* a string containing the full path of the file on disk.
 
         """
-        #cursor = self.getObject("cursor.obj")
-        #cursor.setVisibility(0)
-        mh.grabScreen(x, y, width, height, filename)
-        #cursor.setVisibility(1)
 
-    def newObj(self,name):
+        # cursor = self.getObject("cursor.obj")
+        # cursor.setVisibility(0)
+
+        mh.grabScreen(x, y, width, height, filename)
+
+        # cursor.setVisibility(1)
+
+    def newObj(self, name):
         """
         This method creates a newly initialized Object3D instance within this Scene3D object
         and returns it to the calling code ready to be populated.
@@ -1538,8 +1593,7 @@ class Scene3D:
         self.objects.append(newObj)
         return newObj
 
-    def instanceObj(self,obj,name):
-
+    def instanceObj(self, obj, name):
         """
         This macro creates a reference copy of the Object3D object that is passed in as a parameter.
         It instantiates new FaceGroups which contain the same faces as the original.
@@ -1559,6 +1613,7 @@ class Scene3D:
             *string*. The name of the new instance.
 
         """
+
         newObj = Object3D(name)
         newObj.x = obj.x
         newObj.y = obj.y
@@ -1573,7 +1628,7 @@ class Scene3D:
         newObj.faces = obj.faces
 
         for fg in obj.facesGroups:
-            newFg = FaceGroup(name+fg.name)
+            newFg = FaceGroup(name + fg.name)
             newFg.faces = fg.faces
             newObj.addFaceGroup(newFg)
 
@@ -1585,7 +1640,6 @@ class Scene3D:
         newObj.cameraMode = obj.cameraMode
         self.objects.append(newObj)
         return newObj
-
 
     def deleteObj(self, name):
         """
@@ -1601,12 +1655,12 @@ class Scene3D:
         name:
             *string*. The name of object to delete.
         """
-        
+
         for obj in self.objects:
             if obj.name == name:
-              self.objects.remove(obj)
-              mh.world.remove(obj)
-              break;
+                self.objects.remove(obj)
+                mh.world.remove(obj)
+                break
 
     def assignSelectionID(self, obj):
         """
@@ -1632,26 +1686,31 @@ class Scene3D:
             *object 3D*. The object3D object for which a color dictionary is to be generated.
 
         """
-        #print "DEBUG COLOR AND GROUPS, obj", obj.name
-        #print "---------------------------"
+
+        # print "DEBUG COLOR AND GROUPS, obj", obj.name
+        # print "---------------------------"
+
         for g in obj.facesGroups:
-            #if len(g.faces) > 0:
+
+            # if len(g.faces) > 0:
             #    print g.name
             # Assign a unique sequential colorID used for selection
+
             self.colorID[0] += 1
             if self.colorID[0] >= 255:
-                self.colorID[0] = 0;
+                self.colorID[0] = 0
                 self.colorID[1] += 1
                 if self.colorID[1] >= 255:
-                    self.colorID[1] = 0;
+                    self.colorID[1] = 0
                     self.colorID[2] += 1
-            idR = self.colorID[0];
-            idG = self.colorID[1];
-            idB = self.colorID[2];
+            idR = self.colorID[0]
+            idG = self.colorID[1]
+            idB = self.colorID[2]
             for f in g.faces:
-                f.colorID = [idR,idG,idB]
-            self.faceGroupColorID[str(idR)+str(idG)+str(idB)] = g
-            #print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s"%(g.name,obj.name,idR,idG,idB)
+                f.colorID = [idR, idG, idB]
+            self.faceGroupColorID[str(idR) + str(idG) + str(idB)] = g
+
+            # print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s"%(g.name,obj.name,idR,idG,idB)
 
     def getSelectedFacesGroup(self):
         """
@@ -1664,17 +1723,19 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         picked = mh.getColorPicked()
-        #print "DEBUG COLOR PICKED: %s,%s,%s"%(picked[0],picked[1],picked[2])
-        IDkey = str(picked[0])+str(picked[1])+str(picked[2])#TODO convert to string side C
+
+        # print "DEBUG COLOR PICKED: %s,%s,%s"%(picked[0],picked[1],picked[2])
+
+        IDkey = str(picked[0]) + str(picked[1]) + str(picked[2])  # TODO convert to string side C
 
         try:
             groupSelected = self.faceGroupColorID[IDkey]
         except:
-            print("Color %s not found" %(IDkey))
-            groupSelected = None        
+            print 'Color %s not found' % IDkey
+            groupSelected = None
         return groupSelected
-
 
     def getMouseDiff(self):
         """
@@ -1687,6 +1748,7 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         return [self.mouseXRel, self.mouseYRel]
 
     def getCameraSettings(self):
@@ -1700,6 +1762,7 @@ class Scene3D:
         **Parameters:** This method has no parameters.
 
         """
+
         settings = mh.getCameraSettings()
         pos = self.selectedHuman.getPosition()
         rot = self.selectedHuman.getRotation()
@@ -1733,25 +1796,24 @@ class Scene3D:
 
         return mh.getKeyModifiers()
 
-
     def getPickedObject(self):
         """
         This method determines whether a FaceGroup or a non-selectable zone has been
         clicked with the mouse. It returns a tuple, showing the FaceGroup and the parent
         Object3D object, or None.
-        If no object is picked, this method will simply print "no clickable zone."
+        If no object is picked, this method will simply print \"no clickable zone.\"
 
         **Parameters:** This method has no parameters.
 
         """
+
         facegroupPicked = self.getSelectedFacesGroup()
         if facegroupPicked:
             objPicked = facegroupPicked.parent
-            return (facegroupPicked,objPicked)
+            return (facegroupPicked, objPicked)
         else:
-            print "not a clickable zone"
+            print 'not a clickable zone'
             return None
-
 
     def selectObject(self):
         """
@@ -1768,27 +1830,32 @@ class Scene3D:
 
         global scene
 
-        #get actual selected obj
+        # get actual selected obj
+
         objPicked = self.getSelectedObject()
 
-        #restore his original color (no selected)
-        #and then deselect all obj in the scene
+        # restore his original color (no selected)
+        # and then deselect all obj in the scene
+
         if objPicked:
-            #objPicked.applyDefaultColor()
+
+            # objPicked.applyDefaultColor()
+
             self.deselectAll()
 
-        #Now get the picked obj to select it
+        # Now get the picked obj to select it
+
         pickedInfo = self.getPickedObject()
         if pickedInfo:
             pickedObj = pickedInfo[1]
-            #pickedObj.applySelectionColor()
+
+            # pickedObj.applySelectionColor()
+
             pickedObj.isSelected = 1
             pickedObj.faceGroupSelected = pickedInfo[0]
         self.redraw()
 
-
-
-    def redraw(self, async = 1):
+    def redraw(self, async=1):
         """
         This method redraws the scene. This should be used wherever possible to avoid
         unnecessary calls to the update method, as this method's performance is far better.
@@ -1802,3 +1869,5 @@ class Scene3D:
         """
 
         mh.redraw(async)
+
+

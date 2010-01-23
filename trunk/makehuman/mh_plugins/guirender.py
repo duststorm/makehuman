@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """ 
 Class for handling Render mode in the GUI.
 
@@ -32,11 +35,15 @@ __docformat__ = 'restructuredtext'
 
 import gui3d
 
+
 class RenderingCategory(gui3d.Category):
-  def __init__(self, parent):
-    gui3d.Category.__init__(self, parent, "Rendering", parent.app.getThemeResource("images", "button_render.png"),
-      parent.app.getThemeResource("images", "button_render_on.png"))
-          
-  def onShow(self, event):
-    self.setFocus()
-    gui3d.Category.onShow(self, event)
+
+    def __init__(self, parent):
+        gui3d.Category.__init__(self, parent, 'Rendering', parent.app.getThemeResource('images', 'button_render.png'), parent.app.getThemeResource('images',
+                                'button_render_on.png'))
+
+    def onShow(self, event):
+        self.setFocus()
+        gui3d.Category.onShow(self, event)
+
+

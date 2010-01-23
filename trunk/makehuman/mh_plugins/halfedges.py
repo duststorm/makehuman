@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """ 
 Data Structures and Functions for *Half Edges* processing.
 
@@ -54,7 +57,7 @@ perform. These new attributes are all named using a common prefix of: *he_*
 
 New properties added to base classes:
 
-- **Object3D.he_hedges**. A list of HEdges, indexed using the key-identifier (a string of the form 'vn"-"(vn-1)') of the *Half Edge*.
+- **Object3D.he_hedges**. A list of HEdges, indexed using the key-identifier (a string of the form 'vn\"-\"(vn-1)') of the *Half Edge*.
 - **Object3D.he_hedgeCalculated**. A flag indicating whether *Half Edges* have been calculated for this object.
 - **Vert.he_hedge**. A HEdge reference from the vertex. This is the vertex that forms the starting point of this *Half Edge*.
 - **Face.he_hedge**. A list of 3 HEdges (indexed using 0, 1 and 2), referenced from the triangular Face formed by those *Half Edges*.
@@ -87,6 +90,7 @@ __docformat__ = 'restructuredtext'
 
 
 class HEdge:
+
     """
     This class implements the data structures and the constructor method required 
     to support vertex/face analysis using *Half Edges*.
@@ -121,7 +125,8 @@ class HEdge:
     All of the other Half Edges contain the same attributes, enabling the data structure to be 'viewed' in a number of ways that support the integrity and coherence of the 3D mesh. 
 
     """
-    def __init__(self,heId,heNextId,heTwinId,heVertId,heFaceId):
+
+    def __init__(self, heId, heNextId, heTwinId, heVertId, heFaceId):
         """
         This is the constructor method for the HEdge class which is used to set 
         up the data structures on the first of two passes. 
@@ -181,6 +186,7 @@ class HEdge:
         - *self.sub_vert*: *Vert*. The subdivided vertex if the object is subdivided
         
         """
+
         self.twinID = heTwinId
         self.nextID = heNextId
         self.ID = heId
@@ -190,19 +196,17 @@ class HEdge:
         self.next = None
         self.face = None
         self.vert = None
-        
-    
 
     def __str__(self):
         """
         This method is the Print method and returns a string listing the index of this half edge.
  
         """
+
         return self.ID
 
 
-
-def addHedge(ob,heId1,heNextId1,heTwinId1,vIndex,fIndex ):
+def addHedge(ob, heId1, heNextId1, heTwinId1, vIndex, fIndex):
     """
     This function calls the constructor method of the HEdge class to instantiate 
     a single new *Half Edge* instance and populate it with the data that is available 
@@ -232,19 +236,21 @@ def addHedge(ob,heId1,heNextId1,heTwinId1,vIndex,fIndex ):
 
     """
 
-    he = HEdge(heId1,heNextId1,heTwinId1,vIndex,fIndex)
-    #print vIndex   
+    he = HEdge(heId1, heNextId1, heTwinId1, vIndex, fIndex)
+
+    # print vIndex
+
     v = ob.verts[vIndex]
-    f = ob.faces[fIndex]        
-    f.he_hedge = he #New property for base face class
-    v.he_hedge = he #New property for base vert class
+    f = ob.faces[fIndex]
+    f.he_hedge = he  # New property for base face class
+    v.he_hedge = he  # New property for base vert class
     he.vert = v
     he.face = f
     ob.he_hedges[heId1] = he
 
 
 def linkHEdges(ob):
-        """
+    """
         This function constructs a *linked list* by performing a second 
         pass through the HEdge dictionary to insert cross-references 
         that were not available during the first pass. 
@@ -270,23 +276,23 @@ def linkHEdges(ob):
           *Object3D*.  The Object3D object of which this *Half Edge* is a part.
 
         """
-        print "linking hedges", len(ob.he_hedges)
-        for he in ob.he_hedges.values():            
-            try:                
-                he.next = ob.he_hedges[he.nextID]           
-            except:
-                continue
 
-        for he in ob.he_hedges.values():
-            try:                
-                he.twin = ob.he_hedges[he.twinID]                
-            except:
-                continue
+    print 'linking hedges', len(ob.he_hedges)
+    for he in ob.he_hedges.values():
+        try:
+            he.next = ob.he_hedges[he.nextID]
+        except:
+            continue
 
+    for he in ob.he_hedges.values():
+        try:
+            he.twin = ob.he_hedges[he.twinID]
+        except:
+            continue
 
 
 def calcHedgeData(ob):
-        """
+    """
         This function loops through each Face object for a given Object3D object and 
         calculates the *Half Edges* data for each edge of that face, 
         calling the *addHedge* function for each new *Half Edge* to add 
@@ -300,8 +306,8 @@ def calcHedgeData(ob):
 
         For example, in the image above:
 
-        HEdge["vo-v1"] has as 'next' HEdge["v1-v2"] and as 'twin'
-        HEdge["v1-v0"], where 'v0', 'v1' and 'v2' would evaluate to the indices (in the
+        HEdge[\"vo-v1\"] has as 'next' HEdge[\"v1-v2\"] and as 'twin'
+        HEdge[\"v1-v0\"], where 'v0', 'v1' and 'v2' would evaluate to the indices (in the
         set of all vertices) that point to the 3 vertices defining the face being processed. 
         
         **Second Pass** - 
@@ -322,42 +328,44 @@ def calcHedgeData(ob):
           *Object3D*.  The Object3D object of which this *Half Edge* is a part.
 
         """
-        ob.he_hedges = {} #New property added to base obj
-        fIndex = 0        
-        
-        for f in ob.faces:
-            
-            vIndex0 = str(f.verts[0].idx)
-            vIndex1 = str(f.verts[1].idx)
-            vIndex2 = str(f.verts[2].idx) 
 
-            heId1 = vIndex0+"-"+vIndex1
-            heNextId1 = vIndex1+"-"+vIndex2
-            heTwinId1 = vIndex1+"-"+vIndex0
+    ob.he_hedges = {}  # New property added to base obj
+    fIndex = 0
 
-            heId2 = vIndex1+"-"+vIndex2
-            heNextId2 = vIndex2+"-"+vIndex0
-            heTwinId2 = vIndex2+"-"+vIndex1
+    for f in ob.faces:
 
-            heId3 = vIndex2+"-"+vIndex0
-            heNextId3 = vIndex0+"-"+vIndex1
-            heTwinId3 = vIndex0+"-"+vIndex2
+        vIndex0 = str(f.verts[0].idx)
+        vIndex1 = str(f.verts[1].idx)
+        vIndex2 = str(f.verts[2].idx)
 
-            vIndex0 = f.verts[0].idx
-            vIndex1 = f.verts[1].idx
-            vIndex2 = f.verts[2].idx
-            
-            addHedge(ob,heId1,heNextId1,heTwinId1,vIndex0,fIndex)
-            addHedge(ob,heId2,heNextId2,heTwinId2,vIndex1,fIndex)
-            addHedge(ob,heId3,heNextId3,heTwinId3,vIndex2,fIndex)
-            
-            fIndex += 1
-            
-        linkHEdges(ob)
-        ob.he_hedgeCalculated = 1
+        heId1 = vIndex0 + '-' + vIndex1
+        heNextId1 = vIndex1 + '-' + vIndex2
+        heTwinId1 = vIndex1 + '-' + vIndex0
+
+        heId2 = vIndex1 + '-' + vIndex2
+        heNextId2 = vIndex2 + '-' + vIndex0
+        heTwinId2 = vIndex2 + '-' + vIndex1
+
+        heId3 = vIndex2 + '-' + vIndex0
+        heNextId3 = vIndex0 + '-' + vIndex1
+        heTwinId3 = vIndex0 + '-' + vIndex2
+
+        vIndex0 = f.verts[0].idx
+        vIndex1 = f.verts[1].idx
+        vIndex2 = f.verts[2].idx
+
+        addHedge(ob, heId1, heNextId1, heTwinId1, vIndex0, fIndex)
+        addHedge(ob, heId2, heNextId2, heTwinId2, vIndex1, fIndex)
+        addHedge(ob, heId3, heNextId3, heTwinId3, vIndex2, fIndex)
+
+        fIndex += 1
+
+    linkHEdges(ob)
+    ob.he_hedgeCalculated = 1
+
 
 def edgesSharedByVert(v):
-        """
+    """
         This function lists the *Half Edges* that share a specified vertex as 
         their starting points.
         When the *Half Edge* data is created, one of the *HEdge* objects that 
@@ -381,40 +389,40 @@ def edgesSharedByVert(v):
 
         """
 
-        i = 0
-        try:    
-            startHEdge = v.he_hedge
-        except:
-            print v.idx
-        edgesShared = [startHEdge]       
-        
-        try:
-            loopHedge = startHEdge.twin.next
-            while loopHedge != startHEdge:                
+    i = 0
+    try:
+        startHEdge = v.he_hedge
+    except:
+        print v.idx
+    edgesShared = [startHEdge]
+
+    try:
+        loopHedge = startHEdge.twin.next
+        while loopHedge != startHEdge:
+            edgesShared.append(loopHedge)
+            if i == 10:
+                break
+            i += 1
+            try:
+                loopHedge = loopHedge.twin.next
+            except:
+                break
+    except:
+
+        if startHEdge.next.next.twin:
+            loopHedge = startHEdge.next.next.twin
+            while loopHedge != startHEdge:
                 edgesShared.append(loopHedge)
-                if  i == 10:                
+                if i == 2:
                     break
                 i += 1
-                try:
-                    loopHedge = loopHedge.twin.next
-                except:
+                if loopHedge.next.next.twin:
+                    loopHedge = loopHedge.next.next.twin
+                else:
                     break
-                       
-        except:            
-            if startHEdge.next.next.twin:
-                loopHedge = startHEdge.next.next.twin
-                while loopHedge != startHEdge:                    
-                    edgesShared.append(loopHedge)
-                    if  i == 2:                
-                        break
-                    i += 1
-                    if loopHedge.next.next.twin:
-                        loopHedge = loopHedge.next.next.twin
-                    else:
-                        break
-            else:                
-                edgesShared.append(startHEdge.next)                
-        return edgesShared
+        else:
+            edgesShared.append(startHEdge.next)
+    return edgesShared
 
 
 def hedgesSharedByFace(f):
@@ -435,7 +443,7 @@ def hedgesSharedByFace(f):
     f:     
       *Face*.  The face to be scanned.
     """
-    
+
     hEdgesShared = []
     startHEdge = f.he_hedge
     hEdgesShared.append(startHEdge)
@@ -449,6 +457,7 @@ def hedgesSharedByFace(f):
     else:
         return []
     return hEdgesShared
+
 
 def facesSharedByVert(v):
     """
@@ -466,7 +475,7 @@ def facesSharedByVert(v):
     v:     
       *Vertex*.  The vertex to be scanned.
     """
-    
+
     hEdges = edgesSharedByVert(v)
     facesShared = []
     for he in hEdges:
@@ -474,16 +483,17 @@ def facesSharedByVert(v):
 
     return facesShared
 
-#def subvertIdxSharedByVert(v):
-    
-    #hEdges = edgesSharedByVert(v)
-    #subvertsIdxs = []
-    #for he in hEdges:
-        #subvertsIdxs.append(he.subVertID) #TODO: getter
 
-    #return subvertsIdxs
+# def subvertIdxSharedByVert(v):
 
-    
+    # hEdges = edgesSharedByVert(v)
+    # subvertsIdxs = []
+    # for he in hEdges:
+        # subvertsIdxs.append(he.subVertID) #TODO: getter
+
+    # return subvertsIdxs
+
+
 def vertsSharedbyVert(v):
     """
     This function lists the set of vertices from all of the faces that 
@@ -509,3 +519,5 @@ def vertsSharedbyVert(v):
             if ve != v and ve not in vertsShared:
                 vertsShared.append(ve)
     return vertsShared
+
+

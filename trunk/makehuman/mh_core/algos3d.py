@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """ 
 MakeHuman 3D Transformation functions. 
 
@@ -39,19 +42,20 @@ algorithms will be coded. For example:
 
 __docformat__ = 'restructuredtext'
 
-
 import time
 import aljabr
 import textures3d
 import files3d
 
-
 targetBuffer = {}
 
+
 class Target:
+
     """
     This class is used to store morph targets.
     """
+
     def __init__(self, obj, name):
         """
         This method initializes an instance of the Target class.
@@ -69,40 +73,40 @@ class Target:
         
         
         """
+
         self.name = name
-        self.data = [0,0,0] * len(obj.verts)
+        self.data = [0, 0, 0] * len(obj.verts)
         self.faces = None
         self.verts = None
-        
+
         try:
-            fileDescriptor = open(name)        
+            fileDescriptor = open(name)
         except:
-            print "Unable to open %s",(name)
+            print 'Unable to open %s', name
             return
-            
-        facesToRecalculate = set() #Indices of faces affected by the target, to put in buffer
-        verticesToRecalculate = [] #Indices of vertices affected by the targets, to put in buffer
-        
+
+        facesToRecalculate = set()  # Indices of faces affected by the target, to put in buffer
+        verticesToRecalculate = []  # Indices of vertices affected by the targets, to put in buffer
+
         for line in fileDescriptor:
             translationData = line.split()
             if len(translationData) == 4:
                 vertIndex = int(translationData[0])
                 verticesToRecalculate.append(vertIndex)
-                translationVector = (float(translationData[1]),\
-                                    float(translationData[2]),\
-                                    float(translationData[3]))
+                translationVector = (float(translationData[1]), float(translationData[2]), float(translationData[3]))
                 self.data[vertIndex] = translationVector
 
                 vertToModify = obj.verts[vertIndex]
                 for face in vertToModify.sharedFaces:
-                  facesToRecalculate.add(face.idx)
-                  
+                    facesToRecalculate.add(face.idx)
+
         self.faces = tuple(facesToRecalculate)
         self.verts = tuple(verticesToRecalculate)
-        
+
         fileDescriptor.close()
 
-def pushTargetInBuffer(obj,targetPath):
+
+def pushTargetInBuffer(obj, targetPath):
     """
     This function retrieves a set of translation vectors from a morphing 
     target file and stores them in a buffer. It is usually only called if 
@@ -112,14 +116,14 @@ def pushTargetInBuffer(obj,targetPath):
     The translation target files contain lists of vertex indices and corresponding 
     3D translation vectors. The buffer is structured as a list of lists 
     (a dictionary of dictionaries) indexed using the morph target file name, so:
-    "targetBuffer[targetPath] = targetData" and targetData is a list of vectors 
+    \"targetBuffer[targetPath] = targetData\" and targetData is a list of vectors 
     keyed on their vertex indices. 
     
     For example, a translation direction vector
     of [0,5.67,2.34] for vertex 345 would be stored using 
-    "targetData[345] = [0,5.67,2.34]".
-    If this is taken from target file "foo.target", then this targetData could be
-    assigned to the buffer with 'targetBuffer["c:/MH/foo.target"] = targetData'. 
+    \"targetData[345] = [0,5.67,2.34]\".
+    If this is taken from target file \"foo.target\", then this targetData could be
+    assigned to the buffer with 'targetBuffer[\"c:/MH/foo.target\"] = targetData'. 
     
     Parameters
     ----------
@@ -135,15 +139,17 @@ def pushTargetInBuffer(obj,targetPath):
 
 
     """
+
     t1 = time.time()
-    
+
     global targetBuffer
 
     targetBuffer[targetPath] = Target(obj, targetPath)
-    
-    print "Buffer time", time.time() - t1
 
-def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = None, update = 1, calcNorm=1):
+    print 'Buffer time', time.time() - t1
+
+
+def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1):
     """
     This function retrieves a set of translation vectors and applies those 
     translations to the specified vertices of the mesh object. This set of 
@@ -191,22 +197,27 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = 
         or not (0/false).   
 
     """
+
     if morphFactor == 0:
-      return     
-    
+        return
+
     t1 = time.time()
-    global targetBuffer    
+    global targetBuffer
     if not targetBuffer.has_key(targetPath):
-        pushTargetInBuffer(obj,targetPath)
-    #if the target is already buffered, just get it using
-    #the path as key
+        pushTargetInBuffer(obj, targetPath)
+
+    # if the target is already buffered, just get it using
+    # the path as key
+
     try:
         target = targetBuffer[targetPath]
     except:
-        print "Probably %s does not exist"%(targetPath)
-        return    
+        print 'Probably %s does not exist' % targetPath
+        return
+
     # if a facegroup is provided, apply it ONLY to the verts used
     # by the specified facegroup.
+
     if faceGroupToUpdateName:
 
         faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
@@ -216,28 +227,29 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName = 
             for v in f.verts:
                 verticesToUpdate.add(v)
     else:
-        #if a vertgroup is not provided, all verts affected by
-        #the targets will be modified
+
+        # if a vertgroup is not provided, all verts affected by
+        # the targets will be modified
 
         facesToRecalculate = [obj.faces[i] for i in target.faces]
         verticesToUpdate = [obj.verts[i] for i in target.verts]
 
-    #Adding the translation vector
+    # Adding the translation vector
+
     for v in verticesToUpdate:
         targetVect = target.data[v.idx]
-        v.co[0] += targetVect[0]*morphFactor
-        v.co[1] += targetVect[1]*morphFactor
-        v.co[2] += targetVect[2]*morphFactor
+        v.co[0] += targetVect[0] * morphFactor
+        v.co[1] += targetVect[1] * morphFactor
+        v.co[2] += targetVect[2] * morphFactor
 
     if calcNorm == 1:
         obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
     if update:
         obj.update(verticesToUpdate)
 
-    #print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+    # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+
     return True
-    
-    
 
 
 def calcTargetNormal(obj, targetPath):
@@ -259,29 +271,30 @@ def calcTargetNormal(obj, targetPath):
         The precise format of this string will be operating system dependant.    
 
     """
+
     global targetBuffer
     if not targetBuffer.has_key(targetPath):
-        pushTargetInBuffer(obj,targetPath)
-    #if the target is already buffered, just get it using
-    #the path as key
+        pushTargetInBuffer(obj, targetPath)
+
+    # if the target is already buffered, just get it using
+    # the path as key
+
     try:
         target = targetBuffer[targetPath]
     except:
-        print "Probably %s does not exist"%(targetPath)
-        return 
+        print 'Probably %s does not exist' % targetPath
+        return
     facesToRecalculate = [obj.faces[i] for i in target.faces]
     verticesToUpdate = [obj.verts[i] for i in target.verts]
     obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
     obj.update(verticesToUpdate)
 
-    #print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+    # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+
     return True
 
 
-
-
-
-def mhloadRotationTarget2(obj,targetPath,morphFactor,calcNorm=1):
+def mhloadRotationTarget2(obj, targetPath, morphFactor, calcNorm=1):
     """
     This function loads a rotation target file and applies the rotations to 
     specific vertices on the mesh object by rotating them around a common axis 
@@ -325,56 +338,56 @@ def mhloadRotationTarget2(obj,targetPath,morphFactor,calcNorm=1):
         *int flag*. A flag to indicate whether the normals are to be recalculated (1/true) 
         or not (0/false).    
 
-    """  
+    """
+
     a = time.time()
-        
+
     try:
-        infoFile = open(targetPath+".info")
+        infoFile = open(targetPath + '.info')
         infoData = infoFile.readlines()
-        rotAxeVerts = infoData[0].split(",")        
+        rotAxeVerts = infoData[0].split(',')
         infoFile.close()
-    except:         
-        print "Error%t|Error opening info file: "+targetPath+".info"
+    except:
+        print 'Error%t|Error opening info file: ' + targetPath + '.info'
         return 0
-    
-    axisP1  = obj.verts[int(rotAxeVerts[0])]   
-    axisP2  = obj.verts[int(rotAxeVerts[1])]
-    rotAxis = [axisP2.co[0]-axisP1.co[0],axisP2.co[1]-axisP1.co[1],axisP2.co[2]-axisP1.co[2]]
+
+    axisP1 = obj.verts[int(rotAxeVerts[0])]
+    axisP2 = obj.verts[int(rotAxeVerts[1])]
+    rotAxis = [axisP2.co[0] - axisP1.co[0], axisP2.co[1] - axisP1.co[1], axisP2.co[2] - axisP1.co[2]]
     rotAxis = aljabr.vunit(rotAxis)
     indicesToUpdate = []
-    print rotAxis   
-    v1= [axisP1.co[0],axisP1.co[1],axisP1.co[2]]
-    v2= [axisP2.co[0],axisP2.co[1],axisP2.co[2]]
-    actualRotCenter = aljabr.centroid([v1,v2])          
+    print rotAxis
+    v1 = [axisP1.co[0], axisP1.co[1], axisP1.co[2]]
+    v2 = [axisP2.co[0], axisP2.co[1], axisP2.co[2]]
+    actualRotCenter = aljabr.centroid([v1, v2])
     try:
         fileDescriptor = open(targetPath)
-    except:         
-        print "Error opening target file" + targetPath
-        return 0        
-    
-    for stringData in fileDescriptor:               
-        listData = stringData.split()            
+    except:
+        print 'Error opening target file' + targetPath
+        return 0
+
+    for stringData in fileDescriptor:
+        listData = stringData.split()
         pointIndex = int(listData[0])
         indicesToUpdate.append(pointIndex)
-        theta = float(listData[1])         
-        theta = theta*morphFactor    
-        Rmtx = aljabr.makeRotMatrix(-theta, rotAxis)        
-        pointToRotate = [obj.verts[pointIndex].co[0],obj.verts[pointIndex].co[1],obj.verts[pointIndex].co[2]]        
-        pointRotated = aljabr.rotatePoint(actualRotCenter,pointToRotate,Rmtx)
-        
+        theta = float(listData[1])
+        theta = theta * morphFactor
+        Rmtx = aljabr.makeRotMatrix(-theta, rotAxis)
+        pointToRotate = [obj.verts[pointIndex].co[0], obj.verts[pointIndex].co[1], obj.verts[pointIndex].co[2]]
+        pointRotated = aljabr.rotatePoint(actualRotCenter, pointToRotate, Rmtx)
+
         obj.verts[pointIndex].co[0] = pointRotated[0]
         obj.verts[pointIndex].co[1] = pointRotated[1]
         obj.verts[pointIndex].co[2] = pointRotated[2]
-             
+
     fileDescriptor.close()
-   
+
     obj.update(indicesToUpdate)
-    print "time: ", time.time()-a
+    print 'time: ', time.time() - a
     return 1
 
-    
 
-def saveTranslationTarget(obj, targetPath, groupToSave = None, epsilon = 0.001):
+def saveTranslationTarget(obj, targetPath, groupToSave=None, epsilon=0.001):
     """
     This function analyses an object to determine the differences between the current 
     set of vertices and the vertices contained in the *originalVerts* list, writing the
@@ -408,54 +421,54 @@ def saveTranslationTarget(obj, targetPath, groupToSave = None, epsilon = 0.001):
 
     """
 
-
     modifiedFacesIndices = {}
     modifiedVertsIndices = []
-    originalVerts = files3d.loadVertsCoo(obj.path)      
+    originalVerts = files3d.loadVertsCoo(obj.path)
 
     if not groupToSave:
         vertsToSave = range(len(obj.verts))
     else:
-        pass #TODO verts from group
-        
+        pass  # TODO verts from group
+
     objVerts = obj.verts
 
     nVertsExported = 0
     if objVerts:
-        for index in vertsToSave:      
+        for index in vertsToSave:
             originalVertex = originalVerts[index]
             targetVertex = objVerts[index]
             sharedFaces = obj.verts[index].sharedFaces
-             
-            delta = aljabr.vsub(targetVertex.co,originalVertex)
-            dist =  aljabr.vdist(originalVertex,targetVertex.co)                
-                 
-            if dist > epsilon:    
-                nVertsExported += 1
-                dataToExport =  [index,delta[0],delta[1],delta[2]]
-                modifiedVertsIndices.append(dataToExport)
-                #for f in sharedFaces:
-                #    modifiedFacesIndices[f.idx] = f.idx
-    try:
-        fileDescriptor = open(targetPath, "w")
-    except:
-        print "Unable to open %s",(targetPath)
-        return  None
 
-    #for fidx in modifiedFacesIndices.values():        
-        #fileDescriptor.write("%i " % (fidx))
-    #fileDescriptor.write("\n")
+            delta = aljabr.vsub(targetVertex.co, originalVertex)
+            dist = aljabr.vdist(originalVertex, targetVertex.co)
+
+            if dist > epsilon:
+                nVertsExported += 1
+                dataToExport = [index, delta[0], delta[1], delta[2]]
+                modifiedVertsIndices.append(dataToExport)
+
+                # for f in sharedFaces:
+                #    modifiedFacesIndices[f.idx] = f.idx
+
+    try:
+        fileDescriptor = open(targetPath, 'w')
+    except:
+        print 'Unable to open %s', targetPath
+        return None
+
+    # for fidx in modifiedFacesIndices.values():
+        # fileDescriptor.write("%i " % (fidx))
+    # fileDescriptor.write("\n")
 
     for data in modifiedVertsIndices:
-        fileDescriptor.write("%d %f %f %f\n" % (data[0],data[1],data[2],data[3]))
-         
-    fileDescriptor.close()  
+        fileDescriptor.write('%d %f %f %f\n' % (data[0], data[1], data[2], data[3]))
+
+    fileDescriptor.close()
     if nVertsExported == 0:
-        print "Warning%t|Zero verts exported in file "+targetPath  
+        print 'Warning%t|Zero verts exported in file ' + targetPath
 
 
-def checkMeshTopology(obj, verbose = None):
-
+def checkMeshTopology(obj, verbose=None):
     """
     
     This function is used (during the development cycle rather than in the 
@@ -468,11 +481,11 @@ def checkMeshTopology(obj, verbose = None):
 
     Three main checks are performed:
 
-      - The "isolated verts" check identifies vertices that are not 
+      - The \"isolated verts\" check identifies vertices that are not 
         used by any edges.
-      - The "boundary edge" check identifies edges that are connected
+      - The \"boundary edge\" check identifies edges that are connected
         to only one face.
-      - The "wrong normal" check identifies adjoining half-edges (which
+      - The \"wrong normal\" check identifies adjoining half-edges (which
         should point in opposite directions) that are pointing in the
         same direction. 
         
@@ -480,7 +493,7 @@ def checkMeshTopology(obj, verbose = None):
     the vertices and edges
     found to be defective are coloured on the image on the screen. 
     
-    The 'wrong normal' check is written to accommodate an h-edge "bug":
+    The 'wrong normal' check is written to accommodate an h-edge \"bug\":
     if a face has a wrong normal (i.e. wrong verts
     order) the edge loop is infinite, because the
     condition:
@@ -511,18 +524,18 @@ def checkMeshTopology(obj, verbose = None):
 
     import halfedges
 
-    if not hasattr(obj,"he_hedgeCalculated"):
+    if not hasattr(obj, 'he_hedgeCalculated'):
         halfedges.calcHedgeData(obj)
 
     for v in obj.verts:
-        he = v.he_hedge           
+        he = v.he_hedge
         twin = he.twin
-        if  not he:
-            isolate_verts.append(obj.verts.index(v))                
+        if not he:
+            isolate_verts.append(obj.verts.index(v))
             continue
         if not twin:
-            edges_boundary.append(he)                
-            v.color = [0,0,255,255] #Blue = boundary
+            edges_boundary.append(he)
+            v.color = [0, 0, 255, 255]  # Blue = boundary
             continue
 
         startHEdge = he
@@ -532,31 +545,32 @@ def checkMeshTopology(obj, verbose = None):
             i += 1
             if not loopHedge.twin:
                 edges_boundary.append(loopHedge)
-                v.color = [0,0,255,255] #Blue = boundary
+                v.color = [0, 0, 255, 255]  # Blue = boundary
                 break
             try:
                 loopHedge = loopHedge.twin.next
             except:
                 break
-            if  i > 25:
+            if i > 25:
                 wrong_normals_edges.append(loopHedge.next)
-                v.color = [255,0,0,255] #Red =Wrong normals
+                v.color = [255, 0, 0, 255]  # Red =Wrong normals
                 break
     for v in obj.verts:
-        v.update(0,0,1)
-    print "Check Mesh result:"
-    print "Mesh %s has %s isolated verts " %(obj.name, len(isolate_verts))
+        v.update(0, 0, 1)
+    print 'Check Mesh result:'
+    print 'Mesh %s has %s isolated verts ' % (obj.name, len(isolate_verts))
     if verbose:
         for iv in isolate_verts:
             print iv
-    print "Mesh %s has %s boundary edges " %(obj.name, len(edges_boundary))
+    print 'Mesh %s has %s boundary edges ' % (obj.name, len(edges_boundary))
     if verbose:
         for eb in edges_boundary:
             print eb
-    print "Mesh %s has %s edges shared between faces with opposite normals " %(obj.name, len(wrong_normals_edges))
+    print 'Mesh %s has %s edges shared between faces with opposite normals ' % (obj.name, len(wrong_normals_edges))
     if verbose:
         for wne in wrong_normals_edges:
             print wne
+
 
 def analyzeTarget(obj, targetPath):
     """
@@ -578,65 +592,63 @@ def analyzeTarget(obj, targetPath):
 
     targetPath:
         *string*. The file system path to the file containing the target vertex positions.
-    """    
+    """
+
     try:
         fileDescriptor = open(targetPath)
     except:
-        print "Unable to open %s",(targetPath)
-        return  0
+        print 'Unable to open %s', targetPath
+        return 0
 
-    targetData = fileDescriptor.readlines()    
+    targetData = fileDescriptor.readlines()
     distMax = 0.00001
 
-    #Step 1: calculate max length
+    # Step 1: calculate max length
+
     for vData in targetData:
         vectorData = vData.split()
-        targetsVector = [float(vectorData[1]),
-            float(vectorData[2]),
-            float(vectorData[3])]
+        targetsVector = [float(vectorData[1]), float(vectorData[2]), float(vectorData[3])]
         dist = aljabr.vlen(targetsVector)
         if dist > distMax:
             distMax = dist
 
-    #Step 2: calculate color
+    # Step 2: calculate color
+
     for vData in targetData:
         vectorData = vData.split()
         mainPointIndex = int(vectorData[0])
-        targetsVector = [float(vectorData[1]),
-            float(vectorData[2]),
-            float(vectorData[3])]
+        targetsVector = [float(vectorData[1]), float(vectorData[2]), float(vectorData[3])]
         dist = aljabr.vlen(targetsVector)
         v = obj.verts[mainPointIndex]
         if dist == 0:
-            v.color = [255,255,255,255]
+            v.color = [255, 255, 255, 255]
         else:
-            R = int((dist/distMax)*255)
-            G = 255-int(R/10)
-            B = 255-int(R/10)
-            v.color = [R,G,B,255]
-            v.update(0,0,1)
+            R = int((dist / distMax) * 255)
+            G = 255 - int(R / 10)
+            B = 255 - int(R / 10)
+            v.color = [R, G, B, 255]
+            v.update(0, 0, 1)
 
     fileDescriptor.close()
 
 
-
-
-def colorizeVerts(obj, color, targetPath = None, faceGroupName = None ):
+def colorizeVerts(obj, color, targetPath=None, faceGroupName=None):
     """       
-    """    
-    if targetPath:  
+    """
+
+    if targetPath:
         try:
             fileDescriptor = open(targetPath)
         except:
-            print "Unable to open %s",(targetPath)
-            return  0         
+            print 'Unable to open %s', targetPath
+            return 0
 
-        for vData in fileDescriptor:        
+        for vData in fileDescriptor:
             vectorData = vData.split()
-            mainPointIndex = int(vectorData[0])        
+            mainPointIndex = int(vectorData[0])
             v = obj.verts[mainPointIndex]
             v.color = color
-            v.update(0,0,1)
+            v.update(0, 0, 1)
 
         fileDescriptor.close()
     elif faceGroupName:
@@ -645,25 +657,19 @@ def colorizeVerts(obj, color, targetPath = None, faceGroupName = None ):
             if faceGroup.name == faceGroupName:
                 found = True
                 for f in faceGroup.faces:
-                    f.color = [color,color,color]
+                    f.color = [color, color, color]
                     f.updateColors()
         if not found:
-            print("Warning, face group %s not found in %s possible values are")%(faceGroupName,obj.name)
+            print 'Warning, face group %s not found in %s possible values are' % (faceGroupName, obj.name)
             for faceGroup in obj.facesGroups:
-                print(faceGroup.name)
+                print faceGroup.name
     else:
         for v in obj.verts:
             v.color = color
-            v.update(0,0,1)
-            
-
-    
+            v.update(0, 0, 1)
 
 
-
-
-         
-def loadVertsColors(obj, colorsPath, update = 1, mode = "new"):
+def loadVertsColors(obj, colorsPath, update=1, mode='new'):
     """
     This function is used to load a set of vertex colors from a file and 
     apply them to an object. This is used for both the humanoid object and 
@@ -685,79 +691,56 @@ def loadVertsColors(obj, colorsPath, update = 1, mode = "new"):
         on the values read from the file.
         
     mode:
-        *string*. A mode setting of "new" to completely replace the current color 
-        or "linearmix" to produce a linear mix of the existing color and the color 
+        *string*. A mode setting of \"new\" to completely replace the current color 
+        or \"linearmix\" to produce a linear mix of the existing color and the color 
         from the file.  
        
     """
-    t1 = time.time()    
+
+    t1 = time.time()
     try:
         fileDescriptor = open(colorsPath)
     except:
-        #print "WARNING: Unable to open color file %s"%(colorsPath)
-        return  0
+
+        # print "WARNING: Unable to open color file %s"%(colorsPath)
+
+        return 0
     colorData = fileDescriptor.readlines()
-    fileDescriptor.close()    
+    fileDescriptor.close()
 
     # if mode == new, the existing colors will be totally
     # replaced by the colors loaded. So we re-init it using
     # range function that make a list of n integers, where n is
     # the number of vertices
 
-    #TODO THE CODE  COMMENTED BELOW IS WRONG: must be updated with new color structure
-    #if mode == "new":
+    # TODO THE CODE  COMMENTED BELOW IS WRONG: must be updated with new color structure
+    # if mode == "new":
     #    obj.colors = range(len(obj.verts))
 
-
     if len(colorData) != len(obj.faces):
-        print "Warning: Color data does not match number of vertices ( %i vs %i)"%(len(colorData),len(obj.faces))
+        print 'Warning: Color data does not match number of vertices ( %i vs %i)' % (len(colorData), len(obj.faces))
         return 0
 
-    for i,f in enumerate(obj.faces):
+    for (i, f) in enumerate(obj.faces):
         faceColor = colorData[i]
-        vColors =  [int(x) for x in faceColor.split()]
-        f.color = [[vColors[0],vColors[1],vColors[2],vColors[3]],\
-                [vColors[4],vColors[5],vColors[6],vColors[7]],\
-                [vColors[8],vColors[9],vColors[10],vColors[11]]]
+        vColors = [int(x) for x in faceColor.split()]
+        f.color = [[vColors[0], vColors[1], vColors[2], vColors[3]], [vColors[4], vColors[5], vColors[6], vColors[7]], [vColors[8], vColors[9], vColors[10], vColors[11]]]
 
-        #I assign single verts color too, but without really use them in realtime rendering
-        #infact, in realtime rendering we use face.color and not vert.color, but
-        #vert.color maybe useful in some algos, in example when exporting to renderman.
-        f.verts[0].color = [vColors[0],vColors[1],vColors[2],vColors[3]]
-        f.verts[1].color = [vColors[4],vColors[5],vColors[6],vColors[7]]
-        f.verts[2].color = [vColors[8],vColors[9],vColors[10],vColors[11]]
+        # I assign single verts color too, but without really use them in realtime rendering
+        # infact, in realtime rendering we use face.color and not vert.color, but
+        # vert.color maybe useful in some algos, in example when exporting to renderman.
 
-        #print f.verts[0].idx, f.verts[0].color
+        f.verts[0].color = [vColors[0], vColors[1], vColors[2], vColors[3]]
+        f.verts[1].color = [vColors[4], vColors[5], vColors[6], vColors[7]]
+        f.verts[2].color = [vColors[8], vColors[9], vColors[10], vColors[11]]
+
+        # print f.verts[0].idx, f.verts[0].color
 
         if update:
             f.updateColors()
-                
-                
-        
-        
-        
-    
-    """         
-    for i,color in enumerate(colorData):
-        rgba = color.split()
-        
-        colorVert = [int(x) for x in  rgba]        
-        obj.verts[i].color = colorVert
 
-        #TODO: to add different modes
-        if mode == "new":
-            obj.colors[i] = colorVert2
+    print 'Time to apply colors ', time.time() - t1
 
-        if mode == "linearmix":
-            obj.colors[i] = (obj.colors[i]+ colorVert2)/2 #int division return int
-            
-        if update:
-            obj.verts[i].update(0,0,1)
-
-    """
-
-
-    print "Time to apply colors ", time.time() - t1
 
 def saveVertsColorsFromBitmap(obj, imagePath):
     """
@@ -776,75 +759,67 @@ def saveVertsColorsFromBitmap(obj, imagePath):
 
            
     """
+
     t1 = time.time()
-    tgaData = textures3d.readTGA(imagePath)    
+    tgaData = textures3d.readTGA(imagePath)
     if tgaData:
         BGRlist = tgaData[0]
         xres = tgaData[1]
-        yres = tgaData[2]    
+        yres = tgaData[2]
         numOfPixel = tgaData[3]
         byteUsedForPixel = tgaData[4]
-        
+
         objectColor = []
         for f in obj.faces:
             faceColors = []
             for uv in f.uv:
                 u = uv[0]
                 v = uv[1]
-                
-                pixelIdx = textures3d.UVCooToBitmapIndex(xres,yres,u,v)
+
+                pixelIdx = textures3d.UVCooToBitmapIndex(xres, yres, u, v)
                 if byteUsedForPixel == 3:
                     pixelIdx *= 3
                     B = BGRlist[pixelIdx]
-                    G = BGRlist[pixelIdx+1]
-                    R = BGRlist[pixelIdx+2]
-                    A = 255            
-                    
+                    G = BGRlist[pixelIdx + 1]
+                    R = BGRlist[pixelIdx + 2]
+                    A = 255
+
                 if byteUsedForPixel == 4:
                     pixelIdx *= 4
                     B = BGRlist[pixelIdx]
-                    G = BGRlist[pixelIdx+1]
-                    R = BGRlist[pixelIdx+2]
-                    A = BGRlist[pixelIdx+3]
-                    
-                color = (R,G,B,A)
+                    G = BGRlist[pixelIdx + 1]
+                    R = BGRlist[pixelIdx + 2]
+                    A = BGRlist[pixelIdx + 3]
+
+                color = (R, G, B, A)
                 faceColors.append(color)
             objectColor.append(faceColors)
-                
     else:
-        print "WARNING: %s not converted in verts color"%(imagePath)
+
+        print 'WARNING: %s not converted in verts color' % imagePath
         return
 
     try:
-        fileDescriptor = open(imagePath+".colors", "w")
+        fileDescriptor = open(imagePath + '.colors', 'w')
     except:
-        print "error to save obj file"
-        return 0    
-        
-    #Write, for each line, a sequence of 3 verts color of the triangle:
-    #r1,g1,b1,a1,r2,g2,b2,a2,r3,g3,b3,a3,
+        print 'error to save obj file'
+        return 0
+
+    # Write, for each line, a sequence of 3 verts color of the triangle:
+    # r1,g1,b1,a1,r2,g2,b2,a2,r3,g3,b3,a3,
+
     for fc in objectColor:
         colorVert0 = fc[0]
         colorVert1 = fc[1]
-        colorVert2 = fc[2]  
-        fileDescriptor.write("%i %i %i %i %i %i %i %i %i %i %i %i\n" % (colorVert0[0],\
-                                                                        colorVert0[1],\
-                                                                        colorVert0[2],\
-                                                                        colorVert0[3],\
-                                                                        colorVert1[0],\
-                                                                        colorVert1[1],\
-                                                                        colorVert1[2],\
-                                                                        colorVert1[3],\
-                                                                        colorVert2[0],\
-                                                                        colorVert2[1],\
-                                                                        colorVert2[2],\
-                                                                        colorVert2[3]))
-    fileDescriptor.close()    
+        colorVert2 = fc[2]
+        fileDescriptor.write('%i %i %i %i %i %i %i %i %i %i %i %i\n' % (colorVert0[0], colorVert0[1], colorVert0[2], colorVert0[3], colorVert1[0], colorVert1[1],
+                             colorVert1[2], colorVert1[3], colorVert2[0], colorVert2[1], colorVert2[2], colorVert2[3]))
+    fileDescriptor.close()
 
-    print "Time to save colors ", time.time() - t1 
+    print 'Time to save colors ', time.time() - t1
 
 
-def resetObj(obj, update = None, calcNorm = None):
+def resetObj(obj, update=None, calcNorm=None):
     """
     This function resets the positions of the vertices of an object to their original base positions.
     
@@ -861,8 +836,9 @@ def resetObj(obj, update = None, calcNorm = None):
         *int*. An indicator to control whether or not the normals should be recalculated
 
     """
-    originalVerts = files3d.loadVertsCoo(obj.path)    
-    for i,v in enumerate(obj.verts):       
+
+    originalVerts = files3d.loadVertsCoo(obj.path)
+    for (i, v) in enumerate(obj.verts):
         v.co[0] = originalVerts[i][0]
         v.co[1] = originalVerts[i][1]
         v.co[2] = originalVerts[i][2]
@@ -870,4 +846,5 @@ def resetObj(obj, update = None, calcNorm = None):
             v.update()
     if calcNorm:
         obj.calcNormals()
-        
+
+

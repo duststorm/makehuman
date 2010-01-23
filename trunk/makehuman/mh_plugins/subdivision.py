@@ -1,4 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # You may use, modify and redistribute this module under the terms of the GNU GPL.
+
 """ 
 Mesh Subdivision Plugin.
 
@@ -42,6 +45,7 @@ __docformat__ = 'restructuredtext'
 import time
 import module3d
 
+
 def newSubVert1(v, object):
     """
     This function adds a new subdivision vertex into the list of vertices.
@@ -62,6 +66,7 @@ def newSubVert1(v, object):
     objIdx:     
       *integer*.  The index of the new Object3D object that will end up containing a copy of this vertex.
     """
+
     loopVertices = v.vertsShared()
     vSubd = module3d.Vert(v.co, v.idx, object)
     vSubd.sub_type = 1
@@ -69,17 +74,18 @@ def newSubVert1(v, object):
 
     if n == 3:
         b = 0.1875
-        a = 1-(n*b)
+        a = 1 - n * b
     elif n > 3:
-        b = 3.0/(8*n)
-        a = 1.0-(n*b)
+        b = 3.0 / (8 * n)
+        a = 1.0 - n * b
     else:
-        a = 0.75 #3/4
-        b = 0.125 #1/8
-    vSubd.sub_data = [v,a,b,loopVertices]
+        a = 0.75  # 3/4
+        b = 0.125  # 1/8
+    vSubd.sub_data = [v, a, b, loopVertices]
 
     calcSubCoord1(vSubd)
     return vSubd
+
 
 def calcSubCoord1(vSubd):
     """
@@ -102,29 +108,34 @@ def calcSubCoord1(vSubd):
     a = vSubd.sub_data[1]
     b = vSubd.sub_data[2]
     loopVertices = vSubd.sub_data[3]
-    subdX = a*v.co[0]
-    subdY = a*v.co[1]
-    subdZ = a*v.co[2]
-    noX = a*v.no[0]
-    noY = a*v.no[1]
-    noZ = a*v.no[2]
-    #texU = a*v.uv[0]
-    #texV = a*v.uv[1]
-    for lv in loopVertices:
-        subdX += b*lv.co[0]
-        subdY += b*lv.co[1]
-        subdZ += b*lv.co[2]
-        noX += b*lv.no[0]
-        noY += b*lv.no[1]
-        noZ += b*lv.no[2]
-        #texU += b*lv.uv[0]
-        #texV += b*lv.uv[1]
+    subdX = a * v.co[0]
+    subdY = a * v.co[1]
+    subdZ = a * v.co[2]
+    noX = a * v.no[0]
+    noY = a * v.no[1]
+    noZ = a * v.no[2]
 
-    vSubd.co = [subdX,subdY,subdZ]
-    vSubd.no = [noX,noY,noZ]
-    
-    #vSubd.uv = [texU,texV]
-    #vSubd.color = v.color
+    # texU = a*v.uv[0]
+    # texV = a*v.uv[1]
+
+    for lv in loopVertices:
+        subdX += b * lv.co[0]
+        subdY += b * lv.co[1]
+        subdZ += b * lv.co[2]
+        noX += b * lv.no[0]
+        noY += b * lv.no[1]
+        noZ += b * lv.no[2]
+
+        # texU += b*lv.uv[0]
+        # texV += b*lv.uv[1]
+
+    vSubd.co = [subdX, subdY, subdZ]
+    vSubd.no = [noX, noY, noZ]
+
+
+    # vSubd.uv = [texU,texV]
+    # vSubd.color = v.color
+
 
 def calcSubCoord2(vSubd):
     """
@@ -150,22 +161,27 @@ def calcSubCoord2(vSubd):
     v2 = vSubd.sub_data[1]
     v3 = vSubd.sub_data[2]
     v4 = vSubd.sub_data[3]
-    subdX = 0.375*(v1.co[0] + v2.co[0]) + 0.125*(v3.co[0] + v4.co[0])
-    subdY = 0.375*(v1.co[1] + v2.co[1]) + 0.125*(v3.co[1] + v4.co[1])
-    subdZ = 0.375*(v1.co[2] + v2.co[2]) + 0.125*(v3.co[2] + v4.co[2])
-    noX = 0.375*(v1.no[0] + v2.no[0]) + 0.125*(v3.no[0] + v4.no[0])
-    noY = 0.375*(v1.no[1] + v2.no[1]) + 0.125*(v3.no[1] + v4.no[1])
-    noZ = 0.375*(v1.no[2] + v2.no[2]) + 0.125*(v3.no[2] + v4.no[2])
-    #texU = 0.375*(v1.uv[0] + v2.uv[0]) + 0.125*(v3.uv[0] + v4.uv[0])
-    #texV = 0.375*(v1.uv[1] + v2.uv[1]) + 0.125*(v3.uv[1] + v4.uv[1])
-    #r = (v1.color[0] + v2.color[0])/2
-    #g = (v1.color[1] + v2.color[1])/2
-    #b = (v1.color[2] + v2.color[2])/2
-    #a = (v1.color[3] + v2.color[3])/2
-    vSubd.co = [subdX,subdY,subdZ]
-    vSubd.no = [noX,noY,noZ]
-    #vSubd.uv = [texU,texV]
-    #vSubd.color = [r,g,b,a]
+    subdX = 0.375 * (v1.co[0] + v2.co[0]) + 0.125 * (v3.co[0] + v4.co[0])
+    subdY = 0.375 * (v1.co[1] + v2.co[1]) + 0.125 * (v3.co[1] + v4.co[1])
+    subdZ = 0.375 * (v1.co[2] + v2.co[2]) + 0.125 * (v3.co[2] + v4.co[2])
+    noX = 0.375 * (v1.no[0] + v2.no[0]) + 0.125 * (v3.no[0] + v4.no[0])
+    noY = 0.375 * (v1.no[1] + v2.no[1]) + 0.125 * (v3.no[1] + v4.no[1])
+    noZ = 0.375 * (v1.no[2] + v2.no[2]) + 0.125 * (v3.no[2] + v4.no[2])
+
+    # texU = 0.375*(v1.uv[0] + v2.uv[0]) + 0.125*(v3.uv[0] + v4.uv[0])
+    # texV = 0.375*(v1.uv[1] + v2.uv[1]) + 0.125*(v3.uv[1] + v4.uv[1])
+    # r = (v1.color[0] + v2.color[0])/2
+    # g = (v1.color[1] + v2.color[1])/2
+    # b = (v1.color[2] + v2.color[2])/2
+    # a = (v1.color[3] + v2.color[3])/2
+
+    vSubd.co = [subdX, subdY, subdZ]
+    vSubd.no = [noX, noY, noZ]
+
+
+    # vSubd.uv = [texU,texV]
+    # vSubd.color = [r,g,b,a]
+
 
 def calcSubCoord3(vSubd):
     """
@@ -190,23 +206,26 @@ def calcSubCoord3(vSubd):
     v1 = vSubd.sub_data[0]
     v2 = vSubd.sub_data[1]
 
-    subdX = 0.5*(v1.co[0] + v2.co[0])
-    subdY = 0.5*(v1.co[1] + v2.co[1])
-    subdZ = 0.5*(v1.co[2] + v2.co[2])
-    noX = 0.5*(v1.no[0] + v2.no[0])
-    noY = 0.5*(v1.no[1] + v2.no[1])
-    noZ = 0.5*(v1.no[2] + v2.no[2])
-    
-    #texU = 0.5*(v1.uv[0] + v2.uv[0])
-    #texV = 0.5*(v1.uv[1] + v2.uv[1])
-    #r = (v1.color[0] + v2.color[0])/2
-    #g = (v1.color[1] + v2.color[1])/2
-    #b = (v1.color[2] + v2.color[2])/2
-    #a = (v1.color[3] + v2.color[3])/2
-    vSubd.co = [subdX,subdY,subdZ]
-    vSubd.no = [noX,noY,noZ]
-    #vSubd.uv = [texU,texV]
-    #vSubd.color = [r,g,b,a]
+    subdX = 0.5 * (v1.co[0] + v2.co[0])
+    subdY = 0.5 * (v1.co[1] + v2.co[1])
+    subdZ = 0.5 * (v1.co[2] + v2.co[2])
+    noX = 0.5 * (v1.no[0] + v2.no[0])
+    noY = 0.5 * (v1.no[1] + v2.no[1])
+    noZ = 0.5 * (v1.no[2] + v2.no[2])
+
+    # texU = 0.5*(v1.uv[0] + v2.uv[0])
+    # texV = 0.5*(v1.uv[1] + v2.uv[1])
+    # r = (v1.color[0] + v2.color[0])/2
+    # g = (v1.color[1] + v2.color[1])/2
+    # b = (v1.color[2] + v2.color[2])/2
+    # a = (v1.color[3] + v2.color[3])/2
+
+    vSubd.co = [subdX, subdY, subdZ]
+    vSubd.no = [noX, noY, noZ]
+
+
+    # vSubd.uv = [texU,texV]
+    # vSubd.color = [r,g,b,a]
 
 
 def subdivide(ob, scene):
@@ -216,7 +235,7 @@ def subdivide(ob, scene):
     if found, updates the sub-division vertex information (otherwise it 
     creates a new subdivided version of the Object3D object).
      
-    The subdivided object is identified by appending the string ".sub" to 
+    The subdivided object is identified by appending the string \".sub\" to 
     the end of the name of the original object. 
     
     Parameters
@@ -229,22 +248,23 @@ def subdivide(ob, scene):
     """
 
     t = time.time()
-    subdividedObj = scene.getObject(ob.name+".sub")
+    subdividedObj = scene.getObject(ob.name + '.sub')
     if subdividedObj:
-        print "Sub data present"
-        for v in subdividedObj.verts:            
+        print 'Sub data present'
+        for v in subdividedObj.verts:
             if v.sub_type == 1:
                 calcSubCoord1(v)
             if v.sub_type == 2:
                 calcSubCoord2(v)
             if v.sub_type == 3:
-                calcSubCoord3(v)       
+                calcSubCoord3(v)
             v.update()
-
     else:
-        print "Calculating sub data"
+
+        print 'Calculating sub data'
         calcSubData(ob, scene)
-    print "time for subdivision: %s"%(time.time()-t)
+    print 'time for subdivision: %s' % (time.time() - t)
+
 
 def addEdgeVert(v0, v1, v2, face, edges, object):
     """
@@ -280,16 +300,17 @@ def addEdgeVert(v0, v1, v2, face, edges, object):
       *Object3D*.  The object containing the face to be subdivided.
     """
 
-    #Just make an unique key
+    # Just make an unique key
+
     if v0.idx > v1.idx:
-        key = str(v0.idx)+"-"+str(v1.idx)
-        edge = [v0,v1]
+        key = str(v0.idx) + '-' + str(v1.idx)
+        edge = [v0, v1]
     else:
-        key = str(v1.idx)+"-"+str(v0.idx)
-        edge = [v1,v0]
+        key = str(v1.idx) + '-' + str(v0.idx)
+        edge = [v1, v0]
 
     if not edges.has_key(key):
-        vSubd = module3d.Vert([0,0,0], -1, object)
+        vSubd = module3d.Vert([0, 0, 0], -1, object)
         vSubd.sub_data = edge + [v2]
         vSubd.sub_type = 3
         edges[key] = vSubd
@@ -299,7 +320,6 @@ def addEdgeVert(v0, v1, v2, face, edges, object):
         vSubd.sub_data.append(v2)
 
     face.sub_verts.append(vSubd)
-
 
 
 def calcSubData(ob, scene):
@@ -328,7 +348,7 @@ def calcSubData(ob, scene):
     """
 
     t1 = time.time()
-    subObjName = ob.name+".sub"
+    subObjName = ob.name + '.sub'
 
     t3 = time.time()
     subdividedObj = scene.newObj(subObjName)
@@ -351,9 +371,10 @@ def calcSubData(ob, scene):
     for v in ob.verts:
         vSubd = newSubVert1(v, subdividedObj)
         subdividedObj.verts.append(vSubd)
-        #subdividedObj.colors.append([v.color[0],v.color[1], v.color[2], v.color[3]])
 
-    print "time to create new obj and map verts: ",  time.time()-t3
+        # subdividedObj.colors.append([v.color[0],v.color[1], v.color[2], v.color[3]])
+
+    print 'time to create new obj and map verts: ', time.time() - t3
 
     t4 = time.time()
     edgeVerts = {}
@@ -367,16 +388,18 @@ def calcSubData(ob, scene):
         addEdgeVert(v2, v0, v1, f, edgeVerts, subdividedObj)
 
     for ev in edgeVerts.values():
-            if ev.sub_type == 3:
-                calcSubCoord3(ev)
-            if ev.sub_type == 2:
-                calcSubCoord2(ev)
-            ev.idx = len(subdividedObj.verts)
-            subdividedObj.verts.append(ev)
-            #subdividedObj.colors.append([ev.color[0],ev.color[1], ev.color[2], ev.color[3]])
-    print "time to add edge verts: ", time.time()-t4
+        if ev.sub_type == 3:
+            calcSubCoord3(ev)
+        if ev.sub_type == 2:
+            calcSubCoord2(ev)
+        ev.idx = len(subdividedObj.verts)
+        subdividedObj.verts.append(ev)
 
-    fg = module3d.FaceGroup("subobj")
+            # subdividedObj.colors.append([ev.color[0],ev.color[1], ev.color[2], ev.color[3]])
+
+    print 'time to add edge verts: ', time.time() - t4
+
+    fg = module3d.FaceGroup('subobj')
     fg.parent = subdividedObj
     subdividedObj.facesGroups.append(fg)
     fullArrayIndex = 0
@@ -389,35 +412,36 @@ def calcSubData(ob, scene):
         v3 = f.sub_verts[1]
         v5 = f.sub_verts[2]
 
-        f1 = module3d.Face(v0,v1,v5)
-        f2 = module3d.Face(v1,v2,v3)
-        f3 = module3d.Face(v1,v3,v5)
-        f4 = module3d.Face(v5,v3,v4)
-        
-        #Simple UV linear interpolation: uv are not subdivided
+        f1 = module3d.Face(v0, v1, v5)
+        f2 = module3d.Face(v1, v2, v3)
+        f3 = module3d.Face(v1, v3, v5)
+        f4 = module3d.Face(v5, v3, v4)
+
+        # Simple UV linear interpolation: uv are not subdivided
+
         if f.uv:
             uv0 = subdividedObj.uvValues[f.uv[0]]
             uv2 = subdividedObj.uvValues[f.uv[1]]
             uv4 = subdividedObj.uvValues[f.uv[2]]
             uv1 = len(subdividedObj.uvValues)
-            subdividedObj.uvValues.append([uv0[0]+(uv2[0]-uv0[0])*0.5, uv0[1]+(uv2[1]-uv0[1])*0.5])
+            subdividedObj.uvValues.append([uv0[0] + (uv2[0] - uv0[0]) * 0.5, uv0[1] + (uv2[1] - uv0[1]) * 0.5])
             uv3 = len(subdividedObj.uvValues)
-            subdividedObj.uvValues.append([uv2[0]+(uv4[0]-uv2[0])*0.5, uv2[1]+(uv4[1]-uv2[1])*0.5])
+            subdividedObj.uvValues.append([uv2[0] + (uv4[0] - uv2[0]) * 0.5, uv2[1] + (uv4[1] - uv2[1]) * 0.5])
             uv5 = len(subdividedObj.uvValues)
-            subdividedObj.uvValues.append([uv4[0]+(uv0[0]-uv4[0])*0.5, uv4[1]+(uv0[1]-uv4[1])*0.5])
+            subdividedObj.uvValues.append([uv4[0] + (uv0[0] - uv4[0]) * 0.5, uv4[1] + (uv0[1] - uv4[1]) * 0.5])
             uv0 = f.uv[0]
             uv2 = f.uv[1]
             uv4 = f.uv[2]
 
-            f1.uv = [uv0,uv1,uv5]
-            f2.uv = [uv1,uv2,uv3]
-            f3.uv = [uv1,uv3,uv5]
-            f4.uv = [uv5,uv3,uv4]
-            
+            f1.uv = [uv0, uv1, uv5]
+            f2.uv = [uv1, uv2, uv3]
+            f3.uv = [uv1, uv3, uv5]
+            f4.uv = [uv5, uv3, uv4]
+
         faces = [f1, f2, f3, f4]
-        
+
         for f in faces:
-            for i, v in enumerate(f.verts):
+            for (i, v) in enumerate(f.verts):
                 t = f.uv[i]
                 if v.idx not in groupVerts:
                     v.indicesInFullVertArray.append(fullArrayIndex)
@@ -432,13 +456,15 @@ def calcSubData(ob, scene):
                     fullArrayIndex += 1
                 else:
                     subdividedObj.indexBuffer.append(groupVerts[v.idx][t])
-              
+
             f.group = fg
             fg.faces.append(f)
             subdividedObj.faces.append(f)
-        
-    subdividedObj.vertexBufferSize = fullArrayIndex;
+
+    subdividedObj.vertexBufferSize = fullArrayIndex
     subdividedObj.texture = ob.texture
 
     scene.update()
-    print "Time to calc and send subdata: ", time.time()-t1
+    print 'Time to calc and send subdata: ', time.time() - t1
+
+

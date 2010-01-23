@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """ 
 Export mesh data as a Wavefront obj format file.
 
@@ -27,7 +30,9 @@ Requires:
 
 __docformat__ = 'restructuredtext'
 
-import files3d, types
+import files3d
+import types
+
 
 def exportObj(obj, filename):
     """
@@ -41,45 +46,49 @@ def exportObj(obj, filename):
     filename:     
       *string*.  The filename of the file to export the object to.
     """
-    
+
     # Write obj file
+
     f = open(filename, 'w')
-    f.write("# MakeHuman exported OBJ\n")
-    f.write("# www.makehuman.org\n")
-    f.write("mtllib " + filename + ".mtl\n")
-    
+    f.write('# MakeHuman exported OBJ\n')
+    f.write('# www.makehuman.org\n')
+    f.write('mtllib ' + filename + '.mtl\n')
+
     for v in obj.verts:
-        f.write("v %f %f %f\n" %(v.co[0], v.co[1], v.co[2]))
-      
+        f.write('v %f %f %f\n' % (v.co[0], v.co[1], v.co[2]))
+
     for uv in obj.uvValues:
-        f.write("vt %f %f\n" %(uv[0], uv[1]))
-      
+        f.write('vt %f %f\n' % (uv[0], uv[1]))
+
     for v in obj.verts:
-        f.write("vn %f %f %f\n" %(v.no[0], v.no[1], v.no[2]))
-      
-    f.write("usemtl basic\n")
-    f.write("s off\n")
-    
-    faces = files3d.loadFacesIndices("data/3dobjs/base.obj", True)
+        f.write('vn %f %f %f\n' % (v.no[0], v.no[1], v.no[2]))
+
+    f.write('usemtl basic\n')
+    f.write('s off\n')
+
+    faces = files3d.loadFacesIndices('data/3dobjs/base.obj', True)
     for fc in faces:
         if type(fc) is types.StringType:
-            f.write("g %s\n" % fc)
+            f.write('g %s\n' % fc)
         else:
-            f.write("f")
+            f.write('f')
             for v in fc:
-              f.write(" %i/%i/%i " %(v[0] + 1, v[1] + 1, v[0] + 1))
-            f.write("\n")
+                f.write(' %i/%i/%i ' % (v[0] + 1, v[1] + 1, v[0] + 1))
+            f.write('\n')
     f.close()
-    
+
     # Write material file
-    f = open(filename + ".mtl", 'w')
-    f.write("# MakeHuman exported MTL\n")
-    f.write("# www.makehuman.org\n")
-    f.write("newmtl basic\n")
-    f.write("Ka 1.0 1.0 1.0\n")
-    f.write("Kd 1.0 1.0 1.0\n")
-    f.write("Ks 0.33 0.33 0.52\n")
-    f.write("illum 5\n")
-    f.write("Ns 50.0\n")
-    f.write("map_Kd -clamp on " + obj.texture + "\n")
+
+    f = open(filename + '.mtl', 'w')
+    f.write('# MakeHuman exported MTL\n')
+    f.write('# www.makehuman.org\n')
+    f.write('newmtl basic\n')
+    f.write('Ka 1.0 1.0 1.0\n')
+    f.write('Kd 1.0 1.0 1.0\n')
+    f.write('Ks 0.33 0.33 0.52\n')
+    f.write('illum 5\n')
+    f.write('Ns 50.0\n')
+    f.write('map_Kd -clamp on ' + obj.texture + '\n')
     f.close()
+
+

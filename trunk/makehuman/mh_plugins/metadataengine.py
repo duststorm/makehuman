@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """ 
 Metadata Search Functionality for Tagged Settings Libraries.
 
@@ -37,7 +40,7 @@ Because of these performance figures and because of MakeHuman file management re
 to add new dependencies instead of using an ultra powerful external database that would be
 of limited value in the context required for MakeHuman.
 
-If the following content is contained in a plain text file called "tags.txt"...
+If the following content is contained in a plain text file called \"tags.txt\"...
 
 ::
 
@@ -55,10 +58,10 @@ the following examples illustrate the use of the load search and save functions:
 ::
 
     r1 = loadRecord('tags.txt', 'c:\MakeHuman\objectlibrary\obj2.obj')
-    // Sets r1 to be the list ["c:\MakeHuman\objectlibrary\obj2.obj","leg","calf","muscular"]
+    // Sets r1 to be the list [\"c:\MakeHuman\objectlibrary\obj2.obj\",\"leg\",\"calf\",\"muscular\"]
 
     r2 = searchRecord('tags.txt', 'eye')
-    // Sets r2 to be the list ["c:\MakeHuman\objectlibrary\obj4.obj","c:\MakeHuman\objectlibrary\obj5.obj","c:\MakeHuman\objectlibrary\obj7.obj"]
+    // Sets r2 to be the list [\"c:\MakeHuman\objectlibrary\obj4.obj\",\"c:\MakeHuman\objectlibrary\obj5.obj\",\"c:\MakeHuman\objectlibrary\obj7.obj\"]
 
     recordToSave = 'c:\MakeHuman\objectlibrary\obj5.obj eyelash thick long black'
     saveRecord('tags.txt', recordToSave)
@@ -69,6 +72,7 @@ the following examples illustrate the use of the load search and save functions:
 __docformat__ = 'restructuredtext'
 
 import time
+
 
 def joinRecords(record1, record2):
     """
@@ -85,13 +89,14 @@ def joinRecords(record1, record2):
     record2:     
       *list of strings*.  The records to append to the first record.
     """
+
     recordID = record1[0]
     fields1 = set(record1[1:])
     fields2 = set(record2[1:])
     joinedRecord = fields1.union(fields2)
     joinedRecord = list(joinedRecord)
-    joinedRecord.insert(0,recordID)
-    print "joining", joinedRecord
+    joinedRecord.insert(0, recordID)
+    print 'joining', joinedRecord
     return ' '.join(joinedRecord)
 
 
@@ -111,16 +116,18 @@ def loadRecord(archivePath, recordID):
     recordID:     
       *string*.  The ID of the record to load.
     """
+
     time1 = time.time()
-    f=open(archivePath)
+    f = open(archivePath)
     record = None
     for line in f:
         if line.find(recordID) != -1:
             record = line.split()
-            print "Found %s fields in %s sec"%(len(record),time.time()-time1)
+            print 'Found %s fields in %s sec' % (len(record), time.time() - time1)
             break
     f.close()
     return record
+
 
 def searchRecord(archivePath, field):
     """
@@ -137,14 +144,15 @@ def searchRecord(archivePath, field):
     field:     
       *string*.  The field to search for.
     """
+
     time1 = time.time()
-    f=open(archivePath)
+    f = open(archivePath)
     recordIDs = []
     for line in f:
         if line.find(field) != -1:
             recordIDs.append(line.split()[0])
     f.close()
-    print "Found %s records in %s sec"%(len(recordIDs),time.time()-time1)
+    print 'Found %s records in %s sec' % (len(recordIDs), time.time() - time1)
     return recordIDs
 
 
@@ -163,12 +171,13 @@ def saveRecord(archivePath, recordToSave):
     recordToSave:     
       *string*.  The record to save.
     """
+
     time1 = time.time()
     recordID = recordToSave.split()[0]
     records = []
     isExistent = None
     try:
-        f=open(archivePath)
+        f = open(archivePath)
         i = 0
         for line in f:
             if line.find(recordID) != -1:
@@ -181,14 +190,15 @@ def saveRecord(archivePath, recordToSave):
             records.append(line.strip())
         f.close()
     except:
-        print "A new %s archive will be created"%(archivePath)
+        print 'A new %s archive will be created' % archivePath
 
     if not isExistent:
         records.append(recordToSave)
 
-    f=open(archivePath,'w')
+    f = open(archivePath, 'w')
     for record in records:
-            f.write("%s\n" % (record))
+        f.write('%s\n' % record)
     f.close()
-    print "Record %s saved in %s sec"%(recordID,time.time()-time1)
+    print 'Record %s saved in %s sec' % (recordID, time.time() - time1)
+
 
