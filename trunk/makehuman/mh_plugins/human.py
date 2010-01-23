@@ -625,10 +625,10 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-child-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.childVal)
                      * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
 
-            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
+            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
                      * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
 
-            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
+            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
                      * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
 
             detailTargets['data/targets/details/female-child-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
@@ -659,6 +659,60 @@ class Human(gui3d.Object):
                      * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
 
             detailTargets['data/targets/details/female-child-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+                     
+            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-light-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-heavy-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-muscle-light-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
+
+            detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
                      * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
 
         for (k, v) in detailTargets.iteritems():
