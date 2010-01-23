@@ -234,6 +234,7 @@ class MacroModelingTaskView(gui3d.TaskView):
             self.syncSliders()
             self.syncEthnics()
             self.syncStatus()
+            self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
 
         self.currentHair = gui3d.Button(category, mesh='data/3dobjs/button_standard_little.obj', texture=self.app.scene3d.selectedHuman.hairFile.replace('.hair', '.png'
                                         ), position=[600, 580, 9.2])
