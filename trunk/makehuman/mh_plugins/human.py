@@ -1056,6 +1056,8 @@ class Human(gui3d.Object):
         self.overweightVal = 0.0
         self.underweightVal = 0.0
         self.genitals = 0.0
+        self.breastSize = 0.5
+        self.breastFirmness = 0.5
 
         self.activeEthnicSets = {}
         self.targetsEthnicStack = {'neutral': 1.0}

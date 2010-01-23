@@ -451,6 +451,8 @@ class DetailModelingTaskView(gui3d.TaskView):
     def syncSliders(self):
         human = self.app.scene3d.selectedHuman
         self.genitalsSlider.setValue(human.getGenitals())
+        self.breastCupSlider.setValue(human.getBreastSize())
+        self.breastFirmnessSlider.setValue(human.getBreastFirmness())
 
 
 class MicroModelingTaskView(gui3d.TaskView):
