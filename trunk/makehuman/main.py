@@ -100,7 +100,7 @@ class MHApplication(gui3d.Application):
     gui3d.Object(self, "data/3dobjs/lowerbar2.obj", self.getThemeResource("images", "lowerbar2.png"), [0, 568, 9])
 
     self.progressBar.setProgress(0.3)
-    hairObj = hair.loadHairsFile(self.scene3d, "./data/hairs/default.hair")
+    hairObj = hair.loadHairsFile(self.scene3d, "./data/hairs/default.hair", update = False)
     #self.scene3d.clear(hairObj)
     self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj", hairObj)
     #self.scene3d.selectedHuman.setGender(1.0)
@@ -197,8 +197,8 @@ class MHApplication(gui3d.Application):
     self.progressBar.setProgress(1.0)
     self.progressBar.hide()
     
-    font = font3d.Font("data/fonts/arial.fnt")
-    font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 540, 9.6]);
+    #font = font3d.Font("data/fonts/arial.fnt")
+    #font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 540, 9.6]);
 
   def onStart(self, event):
       self.splash.hide()

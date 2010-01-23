@@ -98,7 +98,7 @@ def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
   obj.updateIndexBuffer()
   scn.update()
   
-def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None):
+def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True):
   if hairsClass == None :
     hairsClass = hairgenerator.Hairgenerator()
   obj = scn.newObj(path)
@@ -170,7 +170,8 @@ def loadHairsFile(scn, path,res=0.08, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   fg.setColor([0,0,0,255]) #rgba
   obj.updateIndexBuffer()
   obj.calcNormals()
-  scn.update()
+  if update:
+      scn.update()
   return obj
               
 def exportHairs(file, guideGroups):
