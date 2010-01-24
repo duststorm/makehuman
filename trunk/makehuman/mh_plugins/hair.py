@@ -138,14 +138,15 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
 
   for group in hairsClass.guideGroups:
     for guide in group.guides:
-      M = makeRotEulerMtx2D(random()*radians(45),"Z") #random angle element that eliminate ribbon "dissapearance" upon rotation
-      cPs = []
+      #M = makeRotEulerMtx2D(random()*radians(45),"Z") #random angle element that eliminate ribbon "dissapearance" upon rotation
+      cPs = [guide.controlPoints[0]]
       for i in xrange(2,len(guide.controlPoints)-1): #piecewise continuous polynomial
-        d=vdist(guide.controlPoints[i-1],guide.controlPoints[i-2])
-        N=int(d/(res*4))
-        d=d+vdist(guide.controlPoints[i-1],guide.controlPoints[i])
-        for j in xrange(1,N+1): #doesnt account the endpoints
-          if j==N: cPs.append(guide.controlPoints[i-1])
+        d1=vdist(guide.controlPoints[i-1],guide.controlPoints[i-2])
+        d=d1+vdist(guide.controlPoints[i-1],guide.controlPoints[i])
+        if i==len(guide.controlPoints)-1: N=int(d1/(res*4))
+        else: N=int(d/(res*4))
+        for j in xrange(1,N+1): #doesnt account one endpoint
+          if j==N and i==len(guide.controlPoints)-1 : cPs.append(guide.controlPoints[i-1])
           else: cPs.append(ThreeDQBspline(guide.controlPoints[i-2],guide.controlPoints[i-1],\
                            guide.controlPoints[i],j*res*4/d))
       for i in xrange(2,len(cPs)-1):
@@ -157,24 +158,28 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           if i==2:
             verts[0] = vsub(cp1,vec)
             verts[1] = vadd(cp1,vec)
-            verts[0] = rotatePoint(cp1,verts[0],M)
-            verts[1] = rotatePoint(cp1,verts[1],M)
+            #verts[0] = rotatePoint(cp1,verts[0],M)
+            #verts[1] = rotatePoint(cp1,verts[1],M)
           else:
             verts[0]=v1[:]
             verts[1]=v2[:]
           
           verts[2]=vadd(cp2,vec)
           verts[3]=vsub(cp2,vec)
-          verts[2] = rotatePoint(cp2,verts[2],M)
-          verts[3] = rotatePoint(cp1,verts[3],M)
+          #verts[2] = rotatePoint(cp2,verts[2],M)
+          #verts[3] = rotatePoint(cp1,verts[3],M)
           v1=verts[3][:]
           v2=verts[2][:]
+          #plain orientation:
+          # 1 2  
+          # 4 3
           w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
           w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
           w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
           w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
           fg.createFace(w1, w4, w2)
           fg.createFace(w2, w4, w3)
+    #break
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
