@@ -44,10 +44,10 @@ def exportMhx(obj, filename):
 #
 
 def exportMhx_249(obj, fp):
-	fp.write(\
-"# MakeHuman exported MHX\n" \
-"# www.makehuman.org\n" \
-"MHX 0 5 ;\n\n")
+	fp.write(
+"# MakeHuman exported MHX\n" +
+"# www.makehuman.org\n" +
+"MHX 0 5 ;\n")
 
 	fp.write("if Blender24\n")
 	copyMaterialFile("data/3dobjs/materials24.mhx", fp)	
@@ -71,16 +71,16 @@ def exportMhx_249(obj, fp):
 
 def exportRawMhx(obj, fp):
 	exportArmature(obj, fp)
-	fp.write(\
-"if useMesh \n\
-mesh Human Human \n")
+	fp.write(
+"if useMesh \n" +
+"mesh Human Human \n")
 	exportRawData(obj, fp)
-	fp.write(\
-"end mesh\n\
-\nobject Human Mesh Human \n\
-\tlayers 1 0 ;\n\
-end object\n\
-end useMesh\n")
+	fp.write(
+"end mesh\n" +
+"\nobject Human Mesh Human \n" +
+"\tlayers 1 0 ;\n" +
+"end object\n" +
+"end useMesh\n")
 	return
 
 #
@@ -88,17 +88,17 @@ end useMesh\n")
 #
 
 def exportMhx_250(obj,fp):
-	fp.write(\
-"# MakeHuman exported MHX\n" \
-"# www.makehuman.org\n" \
-"MHX 0 5 ;\n\n")
+	fp.write(
+"# MakeHuman exported MHX\n" +
+"# www.makehuman.org\n" +
+"MHX 0 5 ;\n")
 
 	copyMaterialFile("data/3dobjs/materials25.mhx", fp)	
 	mhxbones_rigify.writeBones(obj, fp)
 
-	fp.write(\
-"if useMesh \n\
-mesh Human Human \n")
+	fp.write(
+"if useMesh \n" +
+"mesh Human Human \n")
 	exportRawData(obj, fp)
 
 	tmpl = open("data/3dobjs/meshes25.mhx")
@@ -213,27 +213,27 @@ def exportArmature(obj, fp):
 
 
 	mhxbones.writeBones(obj, fp)
-	fp.write(\
-"\tlayerMask 0x101 ;\n\
-\tautoIK false ;\n\
-\tdelayDeform false ;\n\
-\tdrawAxes false ;\n\
-\tdrawNames false ;\n\
-\tenvelopes false ;\n\
-\tmirrorEdit true ;\n\
-\trestPosition false ;\n\
-\tvertexGroups true ;\n\
-end armature\n")
+	fp.write(
+"\tlayerMask 0x101 ;\n" +
+"\tautoIK false ;\n" +
+"\tdelayDeform false ;\n" +
+"\tdrawAxes false ;\n" +
+"\tdrawNames false ;\n" +
+"\tenvelopes false ;\n" +
+"\tmirrorEdit true ;\n" +
+"\trestPosition false ;\n" +
+"\tvertexGroups true ;\n" +
+"end armature\n")
 
 	fp.write("\npose HumanRig\n")
 	mhxbones.writePose(obj, fp)
 	fp.write("end pose\n")
 		
-	fp.write("\n\
-object HumanRig Armature HumanRig \n\
-\tlayers 1 0 ;\n\
-\txRay true ;\n\
-end object\n")
+	fp.write(
+"\nobject HumanRig Armature HumanRig \n" +
+"\tlayers 1 0 ;\n" +
+"\txRay true ;\n" +
+"end object\n")
 
 	return exportArmature
 	
@@ -322,13 +322,13 @@ def writeShapeKey(fp, shapekey, shapeVerts, vgroup, sliderMin, sliderMax):
 #
 
 def writeIcu(fp, shape, expr):
-	fp.write(\
-"\ticu %s 0 1\n \
-\t\tdriver 2 ;\n\
-\t\tdriverObject _object['Human'] ;\n\
-\t\tdriverChannel 1 ;\n\
-\t\tdriverExpression '%s' ;\n\
-\tend icu\n" % (shape, expr))
+	fp.write(
+"\ticu %s 0 1\n" +
+"\t\tdriver 2 ;\n" +
+"\t\tdriverObject _object['Human'] ;\n" +
+"\t\tdriverChannel 1 ;\n" +
+"\t\tdriverExpression '%s' ;\n" +
+"\tend icu\n" % (shape, expr))
 
 def writeIpo(fp):
 	global splitLeftRight

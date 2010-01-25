@@ -332,17 +332,17 @@ def getLoc(j):
 def writeBone((bone, par, hjoint, tjoint, flags, btype), fp):
 	head = getLoc(hjoint)
 	tail = getLoc(tjoint)
-	fp.write("\n\
-\tbone %s %s %d\n\
-\t\thead %f %f %f ;\n\
-\t\ttail %f %f %f ;\n\
-\tend bone\n" % (bone, par, flags, head[0], head[1], head[2], tail[0], tail[1], tail[2]))
+	fp.write(
+"\n\tbone %s %s %d\n" +
+"\t\thead %f %f %f ;\n" +
+"\t\ttail %f %f %f ;\n" +
+"\tend bone\n" % (bone, par, flags, head[0], head[1], head[2], tail[0], tail[1], tail[2]))
 
 def writePoseBone((bone, par, hjoint, tjoint, flags, btype), fp):
 	if btype != '':
-		fp.write("\
-\n\tposebone %s\n\
-\t\ttype %s ;\n\
-\tend posebone\n" % (bone, btype))
+		fp.write(
+"\n\tposebone %s\n" +
+"\t\ttype %s ;\n" +
+"\tend posebone\n" % (bone, btype))
 
 

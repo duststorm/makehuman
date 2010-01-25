@@ -484,7 +484,7 @@ armature = [
 #	boneRoll - computer generated list
 #
 
-boneRoll = dict({\
+boneRoll = {
 	'Ankle_L'	 : (180, 180),
 	'Ankle_R'	 : (180, 180),
 	'Breathe'	 : (  0,   0),
@@ -672,7 +672,7 @@ boneRoll = dict({\
 	'UpLegIK_R'	 : (-19, 177),
 	'UpLid_L'	 : ( -2, -16),
 	'UpLid_R'	 : (  2,  16),
-})
+}
 
 #
 #	Definition of constraints
@@ -864,73 +864,74 @@ def writePose(obj, fp):
 	
 				if type == 'IKSOLVER':
 					if arg2 == Bone:
-						fp.write(\
-"\t\t\tCHAINLEN	int %d ; \n\
-\t\t\tTARGET	obj HumanRig ; \n\
-\t\t\tBONE	str %s ; \n" % (arg1, target))
+						fp.write(
+"\t\t\tCHAINLEN	int %d ; \n" % arg1 +
+"\t\t\tTARGET	obj HumanRig ; \n" +
+"\t\t\tBONE	str %s ; \n" % target)
 					else:
-						fp.write(\
-"\t\t\tCHAINLEN	int %d ; \n\
-\t\t\tTARGET	obj %s ; \n" % (arg1, target))
+						fp.write(
+"\t\t\tCHAINLEN	int %d ; \n" % arg1 +
+"\t\t\tTARGET	obj %s ; \n" % target)
 						smash = "influence=%4.2f" % (infl)
 
 				elif type == 'COPYROT':
-					fp.write(\
-"\t\t\tTARGET	obj HumanRig ;\n\
-\t\t\tBONE	str %s ; \n\
-\t\t\tCOPY	hex %x ;\n" % (target, arg1))
+					fp.write(
+"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tBONE	str %s ; \n" % target +
+"\t\t\tCOPY	hex %x ;\n" %  arg1)
 
 				elif type == 'COPYLOC':
-					fp.write(\
-"\t\t\tTARGET	obj HumanRig ;\n\
-\t\t\tBONE	str %s ;\n" % (target))
+					fp.write(
+"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tBONE	str %s ;\n" % target)
 
 				elif type == 'STRETCHTO':
-					fp.write(\
-"\t\t\tTARGET	obj HumanRig ;\n\
-\t\t\tBONE	str %s ;\n\
-\t\t\tPLANE	hex 2 ;\n" % (target))
+					fp.write(
+"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tBONE	str %s ;\n" % target +
+"\t\t\tPLANE	hex 2 ;\n")
 
 				elif type == 'LIMITDIST':
-					fp.write(\
-"\t\t\tTARGET	obj HumanRig ;\n\
-\t\t\tBONE	str %s ;\n" % (target))
+					fp.write(
+"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tBONE	str %s ;\n" % target)
 
 				elif type == 'LIMITROT':
 					(xmin, xmax, ymin, ymax, zmin, zmax) = arg2
-					fp.write(\
-"\t\t\tLIMIT	hex %x ;\n\
-\t\t\tOWNERSPACE       hex 1 ;\n\
-\t\t\tXMIN       float %f ; \n\
-\t\t\tXMAX       float %f ; \n\
-\t\t\tYMIN       float %f ; \n\
-\t\t\tYMAX       float %f ; \n\
-\t\t\tZMIN       float %f ; \n\
-\t\t\tZMAX       float %f ; \n" % (arg1, xmin, xmax, ymin, ymax, zmin, zmax))
+					fp.write(
+"\t\t\tLIMIT	hex %x ;\n" % arg1 +
+"\t\t\tOWNERSPACE       hex 1 ;\n" +
+"\t\t\tXMIN       float %f ; \n" % xmin +
+"\t\t\tXMAX       float %f ; \n" % xmax +
+"\t\t\tYMIN       float %f ; \n" % ymin +
+"\t\t\tYMAX       float %f ; \n" % ymax +
+"\t\t\tZMIN       float %f ; \n" % zmin +
+"\t\t\tZMAX       float %f ; \n" % zmax)
+
 				elif type == 'LIMITLOC':
 					(xmin, xmax, ymin, ymax, zmin, zmax) = arg2
-					fp.write(\
-"\t\t\tLIMIT	hex %x ;\n\
-\t\t\tOWNERSPACE       hex 1 ;\n\
-\t\t\tXMIN       float %f ; \n\
-\t\t\tXMAX       float %f ; \n\
-\t\t\tYMIN       float %f ; \n\
-\t\t\tYMAX       float %f ; \n\
-\t\t\tZMIN       float %f ; \n\
-\t\t\tZMAX       float %f ; \n" % (arg1, xmin, xmax, ymin, ymax, zmin, zmax))
+					fp.write(
+"\t\t\tLIMIT	hex %x ;\n" % arg1 +
+"\t\t\tOWNERSPACE       hex 1 ;\n" +
+"\t\t\tXMIN       float %f ; \n" % xmin +
+"\t\t\tXMAX       float %f ; \n" % xmax +
+"\t\t\tYMIN       float %f ; \n" % ymin +
+"\t\t\tYMAX       float %f ; \n" % ymax +
+"\t\t\tZMIN       float %f ; \n" % zmin +
+"\t\t\tZMAX       float %f ; \n" % zmax)
 
 				elif type == 'ACTION':
 					(key, bmin, bmax) = arg2
-					fp.write(\
-"\t\t\tTARGETSPACE	list 1 hex 0 ; \n\
-\t\t\tACTION	act %s ; \n\
-\t\t\tTARGET	obj HumanRig ; \n\
-\t\t\tBONE	str %s ; \n\
-\t\t\tKEYON	hex %d ; \n\
-\t\t\tMIN	float %f ; \n\
-\t\t\tMAX	float %f ; \n\
-\t\t\tSTART	int 1 ; \n\
-\t\t\tEND	int 21 ; \n" % (arg1, target, key, bmin, bmax))
+					fp.write(
+"\t\t\tTARGETSPACE	list 1 hex 0 ; \n" +
+"\t\t\tACTION	act %s ; \n" % arg1 +
+"\t\t\tTARGET	obj HumanRig ; \n" +
+"\t\t\tBONE	str %s ; \n" % target +
+"\t\t\tKEYON	hex %d ; \n" % key +
+"\t\t\tMIN	float %f ; \n" % bmin +
+"\t\t\tMAX	float %f ; \n" % bmax +
+"\t\t\tSTART	int 1 ; \n" +
+"\t\t\tEND	int 21 ; \n")
 
 				else:
 					raise NameError("Unknown type "+type)
@@ -956,14 +957,14 @@ def writePyDriver(fp, icu, empty, driverChannel, driverBone, factor1, channel1, 
 	else:
 		expr2 = '+%3.1f*%s.%s' % (factor2, bone, channel2)
 
-	fp.write(\
-"  icu %s 0 2 \n\
-    driver 2 ; \n\
-    driverObject _object['%s'] ; \n\
-    driverChannel %d ; \n\
-    driverExpression 'ctrl%s()' ; \n\
-    extend 0 ; \n\
-    interpolation 2 ; \n\
+	fp.write(
+"  icu %s 0 2 \n" +
+    driver 2 ; \n" +
+    driverObject _object['%s'] ; \n" +
+    driverChannel %d ; \n" +
+    driverExpression 'ctrl%s()' ; \n" +
+    extend 0 ; \n" +
+    interpolation 2 ; \n" +
   end icu \n" % (icu, empty, driverChannel, expr1, expr2) )
 
 #
@@ -975,15 +976,15 @@ def writeEmpty(fp, empty, loc, offs, parent, extra):
 	if offs:
 		vec = vadd(vec, offs)
 	fp.write(\
-"\nempty ; \n\
-object %s Empty \n\
-  layers 0 1 ;\n\
-  matrix \n\
-    row 1.000000 0.000000 0.000000 0.000000 ;\n\
-    row 0.000000 1.000000 0.000000 0.000000 ;\n\
-    row 0.000000 0.000000 1.000000 0.000000 ;\n\
-    row %f %f %f 1.000000 ;\n\
-  end matrix\n\
+"\nempty ; \n" +
+object %s Empty \n" +
+  layers 0 1 ;\n" +
+  matrix \n" +
+    row 1.000000 0.000000 0.000000 0.000000 ;\n" +
+    row 0.000000 1.000000 0.000000 0.000000 ;\n" +
+    row 0.000000 0.000000 1.000000 0.000000 ;\n" +
+    row %f %f %f 1.000000 ;\n" +
+  end matrix\n" +
   %s ;\n"  % (empty, vec[0], vec[1], vec[2], parent) )
 	if extra:
 		fp.write("  %s ;\n" % extra)
