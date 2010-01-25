@@ -8,7 +8,7 @@ Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.4'
+__version__= '0.5'
 __bpydoc__= '''\
 MHX exporter for Blender
 '''
@@ -51,7 +51,7 @@ TexDir = os.path.expanduser("~/makehuman/exports")
 #
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 4
+MINOR_VERSION = 5
 
 #
 #	Button flags
@@ -69,6 +69,8 @@ toggleRot90 = 1
 useMesh = 1
 doSmash = 1
 warnedTextureDir = False
+Blender24 = True
+Blender25 = False
 
 
 #

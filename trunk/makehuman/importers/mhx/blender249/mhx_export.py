@@ -41,7 +41,7 @@ from Blender.Mathutils import *
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 4
+MINOR_VERSION = 5
 verbosity = 1
 Epsilon = 1e-6
 done = 0
@@ -150,6 +150,85 @@ def writeTyped(type, key, arg, fp, n):
 
 
 #
+#	writeMhxBases()	
+#
+
+def writeMhxBases():
+	global done, toggleMhxBase
+
+	toggleMhxBase = True
+	
+	#
+	# Materials
+	#
+	fileName = MHDir + "data/3dobjs/materials24.mhx"
+	print "Writing MHX material file " + fileName
+	fp = open(fileName, 'w')
+	fp.write("# MHX materials for Blender 2.49 \n")
+	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
+	fp.write("\n# --------------- Textures ----------------------------- # \n \n")
+	for tex in Texture.Get():
+		exportTexture(tex, fp)
+
+	fp.write("\n# --------------- Materials ----------------------------- # \n \n")
+	for mat in Material.Get():
+		exportMaterial(mat, fp)
+
+	fp.close()
+	print "Material file %s written" % fileName
+
+	scn = Scene.GetCurrent()
+	
+	#
+	# Meshes
+	# 
+	fileName = MHDir + "data/3dobjs/meshes24.mhx"
+	print "Writing MHX meshes file " + fileName
+	fp = open(fileName, 'w')
+	fp.write("# MHX meshes for Blender 2.49 \n")
+	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
+
+	for ob in scn.objects:
+		if ob.type == "Mesh":
+			exportObject(ob, fp)
+
+	fp.close()
+	print "Mesh file %s written" % fileName
+
+	#
+	# Shapekeys
+	# 
+	fileName = MHDir + "data/3dobjs/shapekeys24.mhx"
+	print "Writing MHX shapekey file " + fileName
+	fp = open(fileName, 'w')
+	fp.write("# MHX shapekeys for Blender 2.49 \n")
+	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
+
+	ob = Object.Get('Human')
+	me = ob.getData(False, True)
+	exportShapeKeys(fp, me)
+
+	fp.close()
+	print "Shapekey file %s written" % fileName
+
+	#
+	# Armature
+	# 
+	fileName = MHDir + "data/3dobjs/armature24.mhx"
+	print "Writing MHX armature file " + fileName
+	fp = open(fileName, 'w')
+	fp.write("# MHX armatures for Blender 2.49 \n")
+	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
+
+	ob = Object.Get('HumanRig')
+	exportObject(ob, fp)
+
+	fp.close()
+	print "Armature file %s written" % fileName
+	
+	return
+
+#
 #	writeMhxFile(fileName):
 #
 
@@ -184,7 +263,6 @@ def writeMhxFile(fileName):
 	fp.write("\n# --------------- Textures ----------------------------- # \n \n")
 	for tex in Texture.Get():
 		exportTexture(tex, fp)
-
 	fp.write("\n# --------------- Materials ----------------------------- # \n \n")
 	for mat in Material.Get():
 		exportMaterial(mat, fp)
@@ -220,102 +298,102 @@ def exportMaterial(mat, fp):
 	writeList("mat", materialList, fp, 2, globals(), locals())
 	fp.write("end material\n\n")
 
-materialList = [\
-	("float", "IOR"), \
-	("float", "add"), \
-	("float", "amb"), \
-	("float", "anisotropy"), \
-	("float", ("colorbandDiffuse", "colorbandDiffuseFactor")), \
-	("int", ("colorbandDiffuse", "colorbandDiffuseInput")), \
-	("int", ("colorbandDiffuse", "colorbandDiffuseMethod")), \
-	("float", ("colorbandSpecular", "colorbandSpecularFactor")), \
-	("int", ("colorbandSpecular", "colorbandSpecularInput")), \
-	("int", ("colorbandSpecular", "colorbandSpecularMethod")), \
-	("float", "diffuseDarkness"), \
-	("int", "diffuseShader"), \
-	("float", "diffuseSize"), \
-	("float", "diffuseSmooth"), \
-	("float", "emit"), \
-	("bool", "enableSSS"), \
-	("listInts", "enabledTextures"), \
-	("float", "filter"), \
-	("float", "flareBoost"), \
-	("int", "flareSeed"), \
-	("float", "flareSize"), \
-	("float", "fresnelDepth"), \
-	("float", "fresnelDepthFac"), \
-	("float", "fresnelTrans"), \
-	("float", "fresnelTransFac"), \
-	("float", "glossMir"), \
-	("float", "glossTra"), \
-	("int", "haloSeed"), \
-	("float", "haloSize"), \
-	("int", "hard"), \
-	#("ipo", "ipo"), \
-	("string", "lib"), \
-	("group", "lightGroup"), \
-	("float", "mirB"), \
-	("tuple3floats", "mirCol"), \
-	("float", "mirG"), \
-	("float", "mirR"), \
-	("xint", "mode"), \
-	("int", "nFlares"), \
-	("int", "nLines"), \
-	("int", "nRings"), \
-	("int", "nStars"), \
-	("tuple2floats", "oopsLoc"), \
-	("int", "oopsSel"), \
-	("float", "rayMirr"), \
-	("int", "rayMirrDepth"), \
-	("float", "rbFriction"), \
-	("float", "rbRestitution"), \
-	("float", "ref"), \
-	("float", "refracIndex"), \
-	("tuple3floats", "rgbCol"), \
-	("float", "rms"), \
-	("float", "roughness"), \
-	("int", "sampGlossTra"), \
-	("int", "sampGloss_mir"), \
-	("float", "shadAlpha"), \
-	("int", "shadeMode"), \
-	("float", "spec"), \
-	("float", "specB"), \
-	("tuple3floats", "specCol"), \
-	("float", "specG"), \
-	("float", "specR"), \
-	("int", "specShader"), \
-	("float", "specSize"), \
-	("float", "specSmooth"), \
-	("float", "specTransp"), \
-	("float", "sssB"), \
-	("float", "sssBack"), \
-	("tuple3floats", "sssCol"), \
-	("float", "sssColorBlend"), \
-	("float", "sssError"), \
-	("float", "sssFront"), \
-	("float", "sssG"), \
-	("float", "sssIOR"), \
-	("float", "sssR"), \
-	("float", "sssRadiusBlue"), \
-	("float", "sssRadiusGreen"), \
-	("float", "sssRadiusRed"), \
-	("float", "sssScale"), \
-	("float", "sssTextureScatter"), \
-	("int", "strandBlendUnit"), \
-	("float", "strandDist"), \
-	("float", "strandEnd"), \
-	("float", "strandFade"), \
-	# ("float", "strandMin"), \
-	("float", "strandShape"), \
-	("float", "strandStart"), \
-	("int", "strandSurfDiff"), \
-	("int", "strandTanShad"), \
-	("float", "subSize"), \
-	("float", "threshMir"), \
-	("float", "threshTra"), \
-	("int", "transDepth"), \
-	("float", "translucency"), \
-	("string", "uvlayer"), \
+materialList = [
+	("float", "IOR"),
+	("float", "add"),
+	("float", "amb"),
+	("float", "anisotropy"),
+	("float", ("colorbandDiffuse", "colorbandDiffuseFactor")),
+	("int", ("colorbandDiffuse", "colorbandDiffuseInput")),
+	("int", ("colorbandDiffuse", "colorbandDiffuseMethod")),
+	("float", ("colorbandSpecular", "colorbandSpecularFactor")),
+	("int", ("colorbandSpecular", "colorbandSpecularInput")),
+	("int", ("colorbandSpecular", "colorbandSpecularMethod")),
+	("float", "diffuseDarkness"),
+	("int", "diffuseShader"),
+	("float", "diffuseSize"),
+	("float", "diffuseSmooth"),
+	("float", "emit"),
+	("bool", "enableSSS"),
+	("listInts", "enabledTextures"),
+	("float", "filter"),
+	("float", "flareBoost"),
+	("int", "flareSeed"),
+	("float", "flareSize"),
+	("float", "fresnelDepth"),
+	("float", "fresnelDepthFac"),
+	("float", "fresnelTrans"),
+	("float", "fresnelTransFac"),
+	("float", "glossMir"),
+	("float", "glossTra"),
+	("int", "haloSeed"),
+	("float", "haloSize"),
+	("int", "hard"),
+	#("ipo", "ipo"),
+	("string", "lib"),
+	("group", "lightGroup"),
+	("float", "mirB"),
+	("tuple3floats", "mirCol"),
+	("float", "mirG"),
+	("float", "mirR"),
+	("xint", "mode"),
+	("int", "nFlares"),
+	("int", "nLines"),
+	("int", "nRings"),
+	("int", "nStars"),
+	("tuple2floats", "oopsLoc"),
+	("int", "oopsSel"),
+	("float", "rayMirr"),
+	("int", "rayMirrDepth"),
+	("float", "rbFriction"),
+	("float", "rbRestitution"),
+	("float", "ref"),
+	("float", "refracIndex"),
+	("tuple3floats", "rgbCol"),
+	("float", "rms"),
+	("float", "roughness"),
+	("int", "sampGlossTra"),
+	("int", "sampGloss_mir"),
+	("float", "shadAlpha"),
+	("int", "shadeMode"),
+	("float", "spec"),
+	("float", "specB"),
+	("tuple3floats", "specCol"),
+	("float", "specG"),
+	("float", "specR"),
+	("int", "specShader"),
+	("float", "specSize"),
+	("float", "specSmooth"),
+	("float", "specTransp"),
+	("float", "sssB"),
+	("float", "sssBack"),
+	("tuple3floats", "sssCol"),
+	("float", "sssColorBlend"),
+	("float", "sssError"),
+	("float", "sssFront"),
+	("float", "sssG"),
+	("float", "sssIOR"),
+	("float", "sssR"),
+	("float", "sssRadiusBlue"),
+	("float", "sssRadiusGreen"),
+	("float", "sssRadiusRed"),
+	("float", "sssScale"),
+	("float", "sssTextureScatter"),
+	("int", "strandBlendUnit"),
+	("float", "strandDist"),
+	("float", "strandEnd"),
+	("float", "strandFade"),
+	# ("float", "strandMin"),
+	("float", "strandShape"),
+	("float", "strandStart"),
+	("int", "strandSurfDiff"),
+	("int", "strandTanShad"),
+	("float", "subSize"),
+	("float", "threshMir"),
+	("float", "threshTra"),
+	("int", "transDepth"),
+	("float", "translucency"),
+	("string", "uvlayer"),
 	("float", "zOffset")\
 ]
 
@@ -342,58 +420,58 @@ def exportTexture(tx, fp):
 	fp.write("end texture\n\n")
 	return
 
-textureList = [\
-	("int", "animFrames"), \
-	("int", "animOffset"), \
-	("int", "animStart"), \
-	("int", "anti"), \
-	("bool", "autoRefresh"), \
-	("float", "bamthtness"), \
-	("int", "calcAlpha"), \
-	("float", "contrast"), \
-	("tuple4ints", "crop"), \
-	("bool", "cyclic"), \
-	("float", "distAmnt"), \
-	("int", "distMetric"), \
-	("float", "exp"), \
-	("int", "extend"), \
-	("int", "fields"), \
-	("int", "fieldsPerImage"), \
-	("float", "filterSize"), \
-	("xint", "flags"), \
-	("float", "gain"), \
-	("float", "hFracDim"), \
-	("float", "iScale"), \
-	("xint", "imageFlags"), \
-	("int", "interpol"), \
-	#("ipo", "ipo"), \
-	("float", "lacunarity"), \
-	("string", "lib"), \
-	("int", "mipmap"), \
-	("int", "movie"), \
-	("int", "noiseBasis"), \
-	("int", "noiseBasis2"), \
-	("int", "noiseDepth"), \
-	("float", "noiseSize"), \
-	("string", "noiseType"), \
-	("int", "normalMap"), \
-	("float", "octs"), \
-	("float", "offset"), \
-	("tuple2ints", "repeat"), \
-	("tuple3floats", "rgbCol"), \
-	("int", "rot90"), \
-	# ("int", "saw"), \
-	("int", "sine"), \
-	("int", "stField"), \
-	("int", "stype"), \
-	# ("int", "tri"), \
-	("float", "turbulence"), \
-	("int", "useAlpha"), \
-	("int", "useColorband"), \
-	("float", "weight1"), \
-	("float", "weight2"), \
-	("float", "weight3"), \
-	("float", "weight4") \
+textureList = [
+	("int", "animFrames"),
+	("int", "animOffset"),
+	("int", "animStart"),
+	("int", "anti"),
+	("bool", "autoRefresh"),
+	("float", "bamthtness"),
+	("int", "calcAlpha"),
+	("float", "contrast"),
+	("tuple4ints", "crop"),
+	("bool", "cyclic"),
+	("float", "distAmnt"),
+	("int", "distMetric"),
+	("float", "exp"),
+	("int", "extend"),
+	("int", "fields"),
+	("int", "fieldsPerImage"),
+	("float", "filterSize"),
+	("xint", "flags"),
+	("float", "gain"),
+	("float", "hFracDim"),
+	("float", "iScale"),
+	("xint", "imageFlags"),
+	("int", "interpol"),
+	#("ipo", "ipo"),
+	("float", "lacunarity"),
+	("string", "lib"),
+	("int", "mipmap"),
+	("int", "movie"),
+	("int", "noiseBasis"),
+	("int", "noiseBasis2"),
+	("int", "noiseDepth"),
+	("float", "noiseSize"),
+	("string", "noiseType"),
+	("int", "normalMap"),
+	("float", "octs"),
+	("float", "offset"),
+	("tuple2ints", "repeat"),
+	("tuple3floats", "rgbCol"),
+	("int", "rot90"),
+	# ("int", "saw"),
+	("int", "sine"),
+	("int", "stField"),
+	("int", "stype"),
+	# ("int", "tri"),
+	("float", "turbulence"),
+	("int", "useAlpha"),
+	("int", "useColorband"),
+	("float", "weight1"),
+	("float", "weight2"),
+	("float", "weight3"),
+	("float", "weight4")
 ]
 
 #
@@ -410,33 +488,33 @@ def exportMTex(index, mtex, fp):
 	fp.write("  end mtex\n")
 	return
 
-mTexList = [\
-	("int", "blendmode"), \
-	("tuple3floats", "col"), \
-	("float", "colfac"), \
-	("bool", "correctNor"), \
-	("float", "dispfac"), \
-	("float", "dvar"), \
-	#("ipo", "ipo"), \
-	("bool", "fromDupli"), \
-	("bool", "fromOamt"), \
-	("xint", "mapping"), \
-	#("xint", "mapto"), \
-	("bool", "neg"), \
-	("bool", "noRGB"), \
-	("float", "norfac"), \
-	("object", "object"), \
-	("tuple", "ofs"), \
-	("tuple", "size"), \
-	("bool", "stencil"), \
-	# ("texture", "tex"), \
-	#("xint", "texco"), \
-	("string", "uvlayer"), \
-	("float", "varfac"), \
-	("float", "warpfac"), \
-	("int", "xproj"), \
-	("int", "yproj"), \
-	("int", "zproj") \
+mTexList = [
+	("int", "blendmode"),
+	("tuple3floats", "col"),
+	("float", "colfac"),
+	("bool", "correctNor"),
+	("float", "dispfac"),
+	("float", "dvar"),
+	#("ipo", "ipo"),
+	("bool", "fromDupli"),
+	("bool", "fromOamt"),
+	("xint", "mapping"),
+	#("xint", "mapto"),
+	("bool", "neg"),
+	("bool", "noRGB"),
+	("float", "norfac"),
+	("object", "object"),
+	("tuple", "ofs"),
+	("tuple", "size"),
+	("bool", "stencil"),
+	# ("texture", "tex"),
+	#("xint", "texco"),
+	("string", "uvlayer"),
+	("float", "varfac"),
+	("float", "warpfac"),
+	("int", "xproj"),
+	("int", "yproj"),
+	("int", "zproj")
 ]
 
 #
@@ -452,20 +530,20 @@ def exportImage(img, fp):
 	fp.write("  end image\n")
 	return
 	
-imageList = [\
-	("bool", "antialias"), \
-	("bool", "clampX"), \
-	("bool", "clampY"), \
-	#("int", "end"), \
-	("bool", "fields"), \
-	("bool", "fields_odd"), \
-	("string", "lib"), \
-	("bool", "premul"), \
-	("int", "source"), \
-	("int", "speed"), \
-	("int", "start"), \
-	("int", "xrep"), \
-	("int", "yrep") \
+imageList = [
+	("bool", "antialias"),
+	("bool", "clampX"),
+	("bool", "clampY"),
+	#("int", "end"),
+	("bool", "fields"),
+	("bool", "fields_odd"),
+	("string", "lib"),
+	("bool", "premul"),
+	("int", "source"),
+	("int", "speed"),
+	("int", "start"),
+	("int", "xrep"),
+	("int", "yrep")
 ]
 
 #
@@ -508,111 +586,111 @@ def exportParticle(par, fp):
 	fp.write("  end particle\n")
 	return
 
-particleList = [\
-	("float",	"2d"), \
-	("int",	"amount"), \
-	("float",	"avvel"), \
-	("int",	"childAmount"), \
-	("int",	"childBranch"), \
-	("int",	"childBranchAnim"), \
-	("int",	"childBranchSymm"), \
-	("float",	"childBranchThre"), \
-	("float",	"childClump"), \
-	("int",	"childKink"), \
-	("float",	"childKinkAmp"), \
-	("int",	"childKinkAxis"), \
-	("float",	"childKinkFreq"), \
-	("float",	"childKinkShape"), \
-	("float",	"childRadius"), \
-	("float",	"childRand"), \
-	("int",	"childRenderAmount"), \
-	("float",	"childRough1"), \
-	("float",	"childRough1Size"), \
-	("float",	"childRough2"), \
-	("float",	"childRough2Size"), \
-	("float",	"childRough2Thresh"), \
-	("float",	"childRoughE"), \
-	("float",	"childRoughEShape"), \
-	("float",	"childRound"), \
-	("float",	"childShape"), \
-	("float",	"childSize"), \
-	("int",	"childType"), \
-	("int",	"displayPercentage"), \
-	("int",	"distribution"), \
-	("int",	"drawAs"), \
-	("object", "duplicateObject"), \
-	("int",	"editable"), \
-	("float",	"endFrame"), \
-	("int",	"evenDistribution"), \
-	("float",	"glAccX"), \
-	("float",	"glAccY"), \
-	("float",	"glAccZ"), \
-	("float",	"glBrown"), \
-	("float",	"glDamp"), \
-	("float",	"glDrag"), \
-	("float",	"groundz"), \
-	("int",	"hairDisplayStep"), \
-	("int",	"hairRenderStep"), \
-	("int",	"hairSegments"), \
-	("float",	"inVelNor"), \
-	("float",	"inVelObj"), \
-	("float",	"inVelPart"), \
-	("float",	"inVelRan"), \
-	("float",	"inVelReact"), \
-	("float",	"inVelRot"), \
-	("float",	"inVelTan"), \
-	("int",	"integration"), \
-	("int",	"invert"), \
-	("float",	"jitterAmount"), \
-	("float",	"latacc"), \
-	("float",	"lifetime"), \
-	("float",	"maxvel"), \
-	("int",	"multireact"), \
-	("object", 	"object"), \
-	("int",	"particleDistribution"), \
-	("int",	"pf"), \
-	("int",	"physics"), \
-	("int",	"randemission"), \
-	("float",	"randlife"), \
-	("float",	"reactshape"), \
-	("int",	"renderDied"), \
-	("int",	"renderEmitter"), \
-	("int",	"renderMatCol"), \
-	("int",	"renderMaterial"), \
-	("int",	"renderParents"), \
-	("int",	"renderUnborn"), \
-	("int",	"resolutionGrid"), \
-	("int",	"rotAnV"), \
-	("float",	"rotAnVAm"), \
-	("int",	"rotDyn"), \
-	("float",	"rotPhase"), \
-	("float",	"rotPhaseR"), \
-	("float",	"rotRand"), \
-	("int",	"rotation"), \
-	("int",	"seed"), \
-	("float",	"startFrame"), \
-	("int",	"strandRender"), \
-	("int",	"strandRenderAngle"), \
-	("float", "tanacc"), \
-	("object", "targetObject"), \
-	("int",	"targetpsys"), \
-	("xint",	"type") \
+particleList = [
+	("float",	"2d"),
+	("int",	"amount"),
+	("float",	"avvel"),
+	("int",	"childAmount"),
+	("int",	"childBranch"),
+	("int",	"childBranchAnim"),
+	("int",	"childBranchSymm"),
+	("float",	"childBranchThre"),
+	("float",	"childClump"),
+	("int",	"childKink"),
+	("float",	"childKinkAmp"),
+	("int",	"childKinkAxis"),
+	("float",	"childKinkFreq"),
+	("float",	"childKinkShape"),
+	("float",	"childRadius"),
+	("float",	"childRand"),
+	("int",	"childRenderAmount"),
+	("float",	"childRough1"),
+	("float",	"childRough1Size"),
+	("float",	"childRough2"),
+	("float",	"childRough2Size"),
+	("float",	"childRough2Thresh"),
+	("float",	"childRoughE"),
+	("float",	"childRoughEShape"),
+	("float",	"childRound"),
+	("float",	"childShape"),
+	("float",	"childSize"),
+	("int",	"childType"),
+	("int",	"displayPercentage"),
+	("int",	"distribution"),
+	("int",	"drawAs"),
+	("object", "duplicateObject"),
+	("int",	"editable"),
+	("float",	"endFrame"),
+	("int",	"evenDistribution"),
+	("float",	"glAccX"),
+	("float",	"glAccY"),
+	("float",	"glAccZ"),
+	("float",	"glBrown"),
+	("float",	"glDamp"),
+	("float",	"glDrag"),
+	("float",	"groundz"),
+	("int",	"hairDisplayStep"),
+	("int",	"hairRenderStep"),
+	("int",	"hairSegments"),
+	("float",	"inVelNor"),
+	("float",	"inVelObj"),
+	("float",	"inVelPart"),
+	("float",	"inVelRan"),
+	("float",	"inVelReact"),
+	("float",	"inVelRot"),
+	("float",	"inVelTan"),
+	("int",	"integration"),
+	("int",	"invert"),
+	("float",	"jitterAmount"),
+	("float",	"latacc"),
+	("float",	"lifetime"),
+	("float",	"maxvel"),
+	("int",	"multireact"),
+	("object", 	"object"),
+	("int",	"particleDistribution"),
+	("int",	"pf"),
+	("int",	"physics"),
+	("int",	"randemission"),
+	("float",	"randlife"),
+	("float",	"reactshape"),
+	("int",	"renderDied"),
+	("int",	"renderEmitter"),
+	("int",	"renderMatCol"),
+	("int",	"renderMaterial"),
+	("int",	"renderParents"),
+	("int",	"renderUnborn"),
+	("int",	"resolutionGrid"),
+	("int",	"rotAnV"),
+	("float",	"rotAnVAm"),
+	("int",	"rotDyn"),
+	("float",	"rotPhase"),
+	("float",	"rotPhaseR"),
+	("float",	"rotRand"),
+	("int",	"rotation"),
+	("int",	"seed"),
+	("float",	"startFrame"),
+	("int",	"strandRender"),
+	("int",	"strandRenderAngle"),
+	("float", "tanacc"),
+	("object", "targetObject"),
+	("int",	"targetpsys"),
+	("xint",	"type")
 ]
 
 #
 #	exportIpo(ipo, fp, local):
 #
 ipoBlockTypes = dict({\
-	0x424f : "Object", \
-	0x4143 : "Camera", \
-	0x4f57 : "World", \
-	0x414d : "Material", \
-	0x4554 : "Texture", \
-	0x414c : "Lamp", \
-	0x4341 : "Action", \
-	0x4f43 : "Constraint", \
-	0x5153 : "Sequence", \
-	0x5543 : "Curve", \
+	0x424f : "Object",
+	0x4143 : "Camera",
+	0x4f57 : "World",
+	0x414d : "Material",
+	0x4554 : "Texture",
+	0x414c : "Lamp",
+	0x4341 : "Action",
+	0x4f43 : "Constraint",
+	0x5153 : "Sequence",
+	0x5543 : "Curve",
 	0x454b : "Key" \
 })
 
@@ -653,15 +731,15 @@ def exportIcu(icu, fp):
 		print "icu ", icu.driverObject, icu.driverBone, icu.driverChannel
 	fp.write("    end icu\n")
 
-icuList = [\
-	("int", "driver"), \
-	("object", ("driverObject", "driverObject")), \
-	("string", ("driverObject", "driverBone")), \
-	("string", ("driverObject", "driverBone2")), \
-	("int", ("driverObject", "driverChannel")), \
-	("string", "driverExpression"), \
-	("int", "extend"), \
-	("int", "interpolation"), \
+icuList = [
+	("int", "driver"),
+	("object", ("driverObject", "driverObject")),
+	("string", ("driverObject", "driverBone")),
+	("string", ("driverObject", "driverBone2")),
+	("int", ("driverObject", "driverChannel")),
+	("string", "driverExpression"),
+	("int", "extend"),
+	("int", "interpolation"),
 ]
 
 #
@@ -686,21 +764,21 @@ def exportActionStrip(strip, fp):
 	fp.write("    end actionstrip\n")
 	return
 
-actionStripList = [\
-	("action", "action"), \
-	("float", "actionEnd"), \
-	("float", "actionStart"), \
-	("float", "blendIn"), \
-	("float", "blendOut"), \
-	("xint", "flag"), \
-	("object", "groupTarget"), \
-	("xint", "mode"), \
-	("float", "repeat"), \
-	("int", "strideAxis"), \
-	("string", "strideBone"), \
-	("float", "strideLength"), \
-	("float", "stripEnd"), \
-	("float", "stripStart") \
+actionStripList = [
+	("action", "action"),
+	("float", "actionEnd"),
+	("float", "actionStart"),
+	("float", "blendIn"),
+	("float", "blendOut"),
+	("xint", "flag"),
+	("object", "groupTarget"),
+	("xint", "mode"),
+	("float", "repeat"),
+	("int", "strideAxis"),
+	("string", "strideBone"),
+	("float", "strideLength"),
+	("float", "stripEnd"),
+	("float", "stripStart")
 ]
 
 #
@@ -787,105 +865,105 @@ def exportObject(ob, fp):
 	fp.write("end object\n\n")
 	return #exportObject2
 
-objectList = [\
-	("int", "DupEnd"), \
-	("group", "DupGroup"), \
-	("int", "DupOff"), \
-	("int", "DupOn"), \
-	("int", "DupSta"), \
-	#("float", "LocX"), \
-	#("float", "LocY"), \
-	#("float", "LocZ"), \
-	#("float", "RotX"), \
-	#("float", "RotY"), \
-	#("float", "RotZ"), \
-	#("float", "SizeX"), \
-	#("float", "SizeY"), \
-	#("float", "SizeZ"), \
-	#("tuple3floats", "loc"), \
-	#("tuple3floats", "rot"), \
-	#("tuple3floats", "size"), \
-	("float", "SBDefaultGoal"), \
-	("float", "SBErrorLimit"), \
-	("float", "SBFriction"), \
-	("float", "SBGoalFriction"), \
-	("float", "SBGoalSpring"), \
-	("float", "SBGrav"), \
-	("float", "SBInnerSpring"), \
-	("float", "SBInnerSpringFrict"), \
-	("float", "SBMass"), \
-	("float", "SBMaxGoal"), \
-	("float", "SBMinGoal"), \
-	("float", "SBSpeed"), \
-	("bool", "SBStiffQuads"), \
-	("bool", "SBUseEdges"), \
-	("bool", "SBUseGoal"), \
-	("int", "activeMaterial"), \
-	("int", "activeShape"), \
-	("bool", "axis"), \
-	("xint", "colbits"), \
-	("tuple4floats", "color"), \
-	#("float", "dLocX"), \
-	#("float", "dLocY"), \
-	#("float", "dLocZ"), \
-	#("float", "dRotX"), \
-	#("float", "dRotY"), \
-	#("float", "dRotZ"), \
-	#("float", "dSizeX"), \
-	#("float", "dSizeY"), \
-	#("float", "dSizeZ"), \
-	("tuple3floats", "dloc"), \
-	("tuple3floats", "drot"), \
-	("tuple3floats", "dsize"), \
-	("int", "drawMode"), \
-	("float", "drawSize"), \
-	("int", "drawType"), \
-	#("float", "dupFacesScaleFac"), \
-	("bool", "enableDupFaces"), \
-	("bool", "enableDupFacesScale"), \
-	("bool", "enableDupFrames"), \
-	("bool", "enableDupGroup"), \
-	("bool", "enableDupNoSpeed"), \
-	("bool", "enableDupRot"), \
-	("bool", "enableDupVerts"), \
-	("bool", "enableNLAOverride"), \
-	("bool", "fakeUser"), \
-	#("ipo", "ipo"), \
-	#("bool", "isSoftBody"), \
-	("string", "lib"), \
-	("bool", "nameMode"), \
-	("tuple2floats", "oopsLoc"), \
-	("bool", "oopsSel"), \
-	#("object", "parent"), \
-	#("int", "parentType"), \
-	#("listInts", "parentVertexIndex"), \
-	#("string", "parentbonename"), \
-	("int", "passIndex"), \
-	("float", ("piType", "piFalloff")), \
-	("float", ("piType", "piMaxDist")), \
-	("float", ("piType", "piPermeability")), \
-	("float", ("piType", "piRandomDamp")), \
-	("float", ("piType", "piSoftbodyDamp")), \
-	("float", ("piType", "piSoftbodyIThick")), \
-	("float", ("piType", "piSoftbodyOThick")), \
-	("float", ("piType", "piStrength")), \
-	("float", ("piType", "piSurfaceDamp")), \
-	("int", ("piType", "piType")), \
-	("bool", ("piType", "piUseMaxDist")), \
-	("bool", ("piType", "pinShape")), \
-	("xint", "protectFlags"), \
-	("xint", "rbFlags"), \
-	("float", "rbMass"), \
-	("float", "rbRadius"), \
-	("int", "rbShapeBoundType"), \
-	("bool", "restrictDisplay"), \
-	("bool", "restrictRender"), \
-	("bool", "restrictSelect"), \
-	("bool", "texSpace"), \
-	("float", "timeOffset"), \
-	("object", "track"), \
-	("bool", "transp"), \
-	("bool", "wireMode"), \
+objectList = [
+	("int", "DupEnd"),
+	("group", "DupGroup"),
+	("int", "DupOff"),
+	("int", "DupOn"),
+	("int", "DupSta"),
+	#("float", "LocX"),
+	#("float", "LocY"),
+	#("float", "LocZ"),
+	#("float", "RotX"),
+	#("float", "RotY"),
+	#("float", "RotZ"),
+	#("float", "SizeX"),
+	#("float", "SizeY"),
+	#("float", "SizeZ"),
+	#("tuple3floats", "loc"),
+	#("tuple3floats", "rot"),
+	#("tuple3floats", "size"),
+	("float", "SBDefaultGoal"),
+	("float", "SBErrorLimit"),
+	("float", "SBFriction"),
+	("float", "SBGoalFriction"),
+	("float", "SBGoalSpring"),
+	("float", "SBGrav"),
+	("float", "SBInnerSpring"),
+	("float", "SBInnerSpringFrict"),
+	("float", "SBMass"),
+	("float", "SBMaxGoal"),
+	("float", "SBMinGoal"),
+	("float", "SBSpeed"),
+	("bool", "SBStiffQuads"),
+	("bool", "SBUseEdges"),
+	("bool", "SBUseGoal"),
+	("int", "activeMaterial"),
+	("int", "activeShape"),
+	("bool", "axis"),
+	("xint", "colbits"),
+	("tuple4floats", "color"),
+	#("float", "dLocX"),
+	#("float", "dLocY"),
+	#("float", "dLocZ"),
+	#("float", "dRotX"),
+	#("float", "dRotY"),
+	#("float", "dRotZ"),
+	#("float", "dSizeX"),
+	#("float", "dSizeY"),
+	#("float", "dSizeZ"),
+	("tuple3floats", "dloc"),
+	("tuple3floats", "drot"),
+	("tuple3floats", "dsize"),
+	("int", "drawMode"),
+	("float", "drawSize"),
+	("int", "drawType"),
+	#("float", "dupFacesScaleFac"),
+	("bool", "enableDupFaces"),
+	("bool", "enableDupFacesScale"),
+	("bool", "enableDupFrames"),
+	("bool", "enableDupGroup"),
+	("bool", "enableDupNoSpeed"),
+	("bool", "enableDupRot"),
+	("bool", "enableDupVerts"),
+	("bool", "enableNLAOverride"),
+	("bool", "fakeUser"),
+	#("ipo", "ipo"),
+	#("bool", "isSoftBody"),
+	("string", "lib"),
+	("bool", "nameMode"),
+	("tuple2floats", "oopsLoc"),
+	("bool", "oopsSel"),
+	#("object", "parent"),
+	#("int", "parentType"),
+	#("listInts", "parentVertexIndex"),
+	#("string", "parentbonename"),
+	("int", "passIndex"),
+	("float", ("piType", "piFalloff")),
+	("float", ("piType", "piMaxDist")),
+	("float", ("piType", "piPermeability")),
+	("float", ("piType", "piRandomDamp")),
+	("float", ("piType", "piSoftbodyDamp")),
+	("float", ("piType", "piSoftbodyIThick")),
+	("float", ("piType", "piSoftbodyOThick")),
+	("float", ("piType", "piStrength")),
+	("float", ("piType", "piSurfaceDamp")),
+	("int", ("piType", "piType")),
+	("bool", ("piType", "piUseMaxDist")),
+	("bool", ("piType", "pinShape")),
+	("xint", "protectFlags"),
+	("xint", "rbFlags"),
+	("float", "rbMass"),
+	("float", "rbRadius"),
+	("int", "rbShapeBoundType"),
+	("bool", "restrictDisplay"),
+	("bool", "restrictRender"),
+	("bool", "restrictSelect"),
+	("bool", "texSpace"),
+	("float", "timeOffset"),
+	("object", "track"),
+	("bool", "transp"),
+	("bool", "wireMode"),
 	("bool", "xRay")
 ]
 
@@ -1011,6 +1089,43 @@ def exportMesh(ob, fp):
 		print "Vertgroups saved"
 
 	# Shape keys
+	if not toggleMhxBase:
+		exportShapeKeys(fp, me)
+
+	if not toggleGeoOnly:
+		writeList("me", meshList, fp, 2, globals(), locals())
+	fp.write("end mesh\n")
+	return # exportMesh
+
+meshList = [
+	("string", "activeColorLayer"),
+	("int", "activeFace"),
+	("string", "activeGroup"),
+	("string", "activeUVLayer"),
+	("int", "degr"),
+	("bool", "faceUV"),
+	("bool", "hide"),
+	("key", "key"),
+	("string", "lib"),
+	("xint", "mode"),
+	("bool", "multires"),
+	("int", ("multires", "multiresDrawLevel")),
+	("int", ("multires", "multiresEdgeLevel")),
+	("int", ("multires", "multiresPinLevel")),
+	# ("int", ("multires", "multiresRenderLevel")),
+	# ("string", "renderColorLayer"),
+	("string", "renderUVLayer"),
+	("tuple2ints", "subDivLevels"),
+	("mesh", "texMesh"),
+	("bool", "vertexColors"),
+	("bool", "vertexUV")
+]
+
+#
+#	exportShapeKeys(fp, me)
+#
+
+def exportShapeKeys(fp, me):	
 	if me.key:
 		if me.key.relative == False:
 			Draw.Pupmenu("Keys should be relative")
@@ -1023,36 +1138,8 @@ def exportMesh(ob, fp):
 				if dv.length > Epsilon:
 					fp.write("  sv %d %f %f %f ;\n" %(n, dv[0], dv[1], dv[2]))
 			fp.write("    end shapekey\n")
-		exportIpo(me.key.ipo, fp, True)
-
-	if not toggleGeoOnly:
-		writeList("me", meshList, fp, 2, globals(), locals())
-	fp.write("end mesh\n")
-	return # exportMesh
-
-meshList = [\
-	("string", "activeColorLayer"), \
-	("int", "activeFace"), \
-	("string", "activeGroup"), \
-	("string", "activeUVLayer"), \
-	("int", "degr"), \
-	("bool", "faceUV"), \
-	("bool", "hide"), \
-	("key", "key"), \
-	("string", "lib"), \
-	("xint", "mode"), \
-	("bool", "multires"), \
-	("int", ("multires", "multiresDrawLevel")), \
-	("int", ("multires", "multiresEdgeLevel")), \
-	("int", ("multires", "multiresPinLevel")), \
-	# ("int", ("multires", "multiresRenderLevel")), \
-	# ("string", "renderColorLayer"), \
-	("string", "renderUVLayer"), \
-	("tuple2ints", "subDivLevels"), \
-	("mesh", "texMesh"), \
-	("bool", "vertexColors"), \
-	("bool", "vertexUV") \
-]
+		if not toggleMhxBase:
+			exportIpo(me.key.ipo, fp, True)
 
 #
 #	exportArmature(ob, fp):
@@ -1085,20 +1172,20 @@ def exportArmature(ob, fp):
 		
 	return # exportArmature
 			
-armatureList = [\
-	("bool", "autoIK"), \
-	("bool", "delayDeform"), \
-	("bool", "drawAxes"), \
-	("bool", "drawNames"), \
-	("xint", "drawType"), \
-	("bool", "envelopes"), \
-	("bool", "ghost"), \
-	#("int", "ghostStep"), \
-	("xint", "layerMask"), \
-	("string", "lib"), \
-	("bool", "mirrorEdit"), \
-	("bool", "restPosition"), \
-	("bool", "vertexGroups") \
+armatureList = [
+	("bool", "autoIK"),
+	("bool", "delayDeform"),
+	("bool", "drawAxes"),
+	("bool", "drawNames"),
+	("xint", "drawType"),
+	("bool", "envelopes"),
+	("bool", "ghost"),
+	#("int", "ghostStep"),
+	("xint", "layerMask"),
+	("string", "lib"),
+	("bool", "mirrorEdit"),
+	("bool", "restPosition"),
+	("bool", "vertexGroups")
 ]
 
 #
@@ -1114,14 +1201,14 @@ def indent(fp, n):
 #
 
 boneOptions = dict ({\
-	Armature.CONNECTED : 0x001, \
-	Armature.HINGE : 0x002, \
-	Armature.NO_DEFORM : 0x004, \
-	Armature.MULTIPLY : 0x008, \
-	Armature.HIDDEN_EDIT : 0x010, \
-	Armature.ROOT_SELECTED : 0x020, \
-	Armature.BONE_SELECTED : 0x040, \
-	Armature.TIP_SELECTED : 0x080, \
+	Armature.CONNECTED : 0x001,
+	Armature.HINGE : 0x002,
+	Armature.NO_DEFORM : 0x004,
+	Armature.MULTIPLY : 0x008,
+	Armature.HIDDEN_EDIT : 0x010,
+	Armature.ROOT_SELECTED : 0x020,
+	Armature.BONE_SELECTED : 0x040,
+	Armature.TIP_SELECTED : 0x080,
 	Armature.LOCKED_EDIT : 0x100 \
 })
 
@@ -1145,14 +1232,14 @@ def exportBone(fp, n, bone):
 			exportBone(fp, n+1, child)
 	return
 
-editboneList = [\
-	("float", "deformDist"), \
-	("float", "headRadius"), \
-	#("float", "length"), \
-	("float", "roll"), \
-	("int", "subdivision"), \
-	("float", "tailRadius"), \
-	("float", "weight") \
+editboneList = [
+	("float", "deformDist"),
+	("float", "headRadius"),
+	#("float", "length"),
+	("float", "roll"),
+	("int", "subdivision"),
+	("float", "tailRadius"),
+	("float", "weight")
 ]
 
 
@@ -1171,15 +1258,15 @@ def exportPoseBone(fp, pb):
 	fp.write("  end posebone\n")
 	return
 
-poseboneList = [\
-	("object", "displayObject"), \
-	("tuple3floats", "limitmax"), \
-	("tuple3floats", "limitmin"), \
-	("vector", "size"), \
-	("float", "stiffX"), \
-	("float", "stiffY"), \
-	("float", "stiffZ"), \
-	("float", "stretch") \
+poseboneList = [
+	("object", "displayObject"),
+	("tuple3floats", "limitmax"),
+	("tuple3floats", "limitmin"),
+	("vector", "size"),
+	("float", "stiffX"),
+	("float", "stiffY"),
+	("float", "stiffZ"),
+	("float", "stretch")
 ]
 
 #
@@ -1284,8 +1371,8 @@ def exportLattice(ob,fp):
 	writeList("lat", latticeList, fp, 2, globals(), locals())
 	fp.write("end lattice\n")
 
-latticeList = [\
-	("string", "lib"), \
+latticeList = [
+	("string", "lib"),
 	("xint", "mode")
 ]
 
@@ -1311,35 +1398,35 @@ def exportLamp(ob,fp):
 	fp.write("end lamp\n")
 
 
-lampList = [\
-	("float", "B"), \
-	("float", "G"), \
-	("float", "R"), \
-	("float", "areaSizeX"), \
-	("float", "areaSizeY"), \
-	("float", "bias"), \
-	("int", "bufferSize"), \
-	("int", "bufferType"), \
-	("float", "clipEnd"), \
-	("float", "clipStart"), \
-	("tuple3floats", "col"), \
-	("float", "dist"), \
-	("float", "energy"), \
-	("int", "falloffType"), \
-	("float", "haloint"), \
-	("int", "haloStep"), \
-	("ipo", "ipo"), \
-	("string", "lib"), \
-	("int", "mode"), \
-	("float", "quad1"), \
-	("float", "quad2"), \
-	("int", "raySamplesX"), \
-	("int", "raySamplesY"), \
-	("int", "sampleBuffers"), \
-	("int", "samples"), \
-	("float", "softness"), \
-	("float", "spotBlend"), \
-	("float", "spotSize") \
+lampList = [
+	("float", "B"),
+	("float", "G"),
+	("float", "R"),
+	("float", "areaSizeX"),
+	("float", "areaSizeY"),
+	("float", "bias"),
+	("int", "bufferSize"),
+	("int", "bufferType"),
+	("float", "clipEnd"),
+	("float", "clipStart"),
+	("tuple3floats", "col"),
+	("float", "dist"),
+	("float", "energy"),
+	("int", "falloffType"),
+	("float", "haloint"),
+	("int", "haloStep"),
+	("ipo", "ipo"),
+	("string", "lib"),
+	("int", "mode"),
+	("float", "quad1"),
+	("float", "quad2"),
+	("int", "raySamplesX"),
+	("int", "raySamplesY"),
+	("int", "sampleBuffers"),
+	("int", "samples"),
+	("float", "softness"),
+	("float", "spotBlend"),
+	("float", "spotSize")
 ]
 
 #
@@ -1354,25 +1441,25 @@ def exportCamera(ob,fp):
 	writeList("ca", cameraList, fp, 2, globals(), locals())
 	fp.write("end camera\n")
  
-cameraList = [\
-	("float", "alpha"), \
-	("float", "angle"), \
-	("float", "clipEnd"), \
-	("float", "clipStart"), \
-	("float", "dofDist"), \
-	("bool", "drawLimits"), \
-	("bool", "drawMist"), \
-	("bool", "drawName"), \
-	("bool", "drawPassepartout"), \
-	("float", "drawSize"), \
-	("bool", "drawTileSafe"), \
-	("ipo", "ipo"), \
-	("float", "lens"), \
-	("string", "lib"), \
-	("xint", "mode"), \
-	("float", "scale"), \
-	("float", "shiftX"), \
-	("float", "shiftY") \
+cameraList = [
+	("float", "alpha"),
+	("float", "angle"),
+	("float", "clipEnd"),
+	("float", "clipStart"),
+	("float", "dofDist"),
+	("bool", "drawLimits"),
+	("bool", "drawMist"),
+	("bool", "drawName"),
+	("bool", "drawPassepartout"),
+	("float", "drawSize"),
+	("bool", "drawTileSafe"),
+	("ipo", "ipo"),
+	("float", "lens"),
+	("string", "lib"),
+	("xint", "mode"),
+	("float", "scale"),
+	("float", "shiftX"),
+	("float", "shiftY")
 ]
 
 #
@@ -1408,21 +1495,21 @@ def exportCurve(ob,fp):
 	writeList("cu", curveList, fp, 2, globals(), locals())
 	fp.write("end curve\n")
 
-curveList = [\
-	("object", "bevob"), \
-	("int", "bevresol"), \
-	("float", "ext1"), \
-	("float", "ext2"), \
-	("xint", "flag"), \
-	("key", "key"), \
-	("tuple3floats", "loc"), \
-	("int", "pathlen"), \
-	("int", "resolu"), \
-	("int", "resolv"), \
-	("tuple3floats", "rot"), \
-	("tuple3floats", "size"), \
-	("object", "taperob"), \
-	("float", "width") \
+curveList = [
+	("object", "bevob"),
+	("int", "bevresol"),
+	("float", "ext1"),
+	("float", "ext2"),
+	("xint", "flag"),
+	("key", "key"),
+	("tuple3floats", "loc"),
+	("int", "pathlen"),
+	("int", "resolu"),
+	("int", "resolv"),
+	("tuple3floats", "rot"),
+	("tuple3floats", "size"),
+	("object", "taperob"),
+	("float", "width")
 ]
 
 #
@@ -1437,13 +1524,13 @@ def exportText(ob,fp):
 	writeList("te", textList, fp, 2, globals(), locals())
 	fp.write("end text\n")
 
-textList = [\
-	("int", "activeFrame"), \
-	("float", "frameHeight"), \
-	("float", "frameWidth"), \
-	("float", "frameX"), \
-	("float", "frameY"), \
-	("string", "lib") \
+textList = [
+	("int", "activeFrame"),
+	("float", "frameHeight"),
+	("float", "frameWidth"),
+	("float", "frameX"),
+	("float", "frameY"),
+	("string", "lib")
 ]
 
 #
@@ -1459,10 +1546,10 @@ def exportGroup(grp, fp):
 	fp.write("end group\n")
 	return
 
-groupList = [\
-	("vector", "dupliOffset"), \
-	("xint", "layers"), \
-	("string", "lib") \
+groupList = [
+	("vector", "dupliOffset"),
+	("xint", "layers"),
+	("string", "lib") 
 ]
 
 #
@@ -1479,10 +1566,10 @@ def exportKey(key, fp):
 	fp.write("end key\n")
 	return
 
-keyList = [\
-	("bool", "relative"), \
-	("xint", "type"), \
-	("float", "value") \
+keyList = [
+	("bool", "relative"),
+	("xint", "type"),
+	("float", "value")
 ]
 
 def exportKeyBlock(block, fp):
@@ -1523,7 +1610,9 @@ def button_event(evt):
 			toggleMhxBase = 0
 	elif evt == 7:
 		if toggleMhxBase:
-			writeMhxFile(MHDir+"data/3dobjs/mhxbase.mhx")
+			writeMhxBases()
+			Draw.Exit()
+			return
 		else:
 			Blender.Window.FileSelector (writeMhxFile, 'SAVE MHX FILE')
 	elif evt == 8:
