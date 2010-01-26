@@ -1258,6 +1258,7 @@ void OnInit(void)
     //glEnable(GL_CULL_FACE);                                   /* Inside face removal */
     //glEnable(GL_ALPHA_TEST);
     //glAlphaFunc(GL_GREATER, 0.0f);
+    glDisable(GL_DITHER);
     glEnable(GL_LIGHTING);                                    /* Enable lighting */
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);

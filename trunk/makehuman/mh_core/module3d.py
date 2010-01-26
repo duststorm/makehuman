@@ -390,7 +390,7 @@ class Face:
         self.verts = [v0, v1, v2]
         self.uv = None
         self.color = None
-        self.colorID = [255, 255, 255]
+        self.colorID = [0, 0, 0]
         self.idx = None
         self.group = None
 
@@ -951,15 +951,6 @@ class Object3D:
         """
 
         for v in self.verts:
-            v.color[0] += 50
-            v.color[1] -= 50
-            v.color[2] -= 50
-            if v.color[0] > 255:
-                v.color[0] = 255
-            if v.color[1] < 0:
-                v.color[1] = 0
-            if v.color[2] < 0:
-                v.color[2] = 0
             v.update(0, 0, 1)
 
     def applyDefaultColor(self):
@@ -1113,7 +1104,7 @@ class Scene3D:
 
         self.objects = []
         self.faceGroupColorID = {}
-        self.colorID = [0, 0, 0]
+        self.colorID = 0
         self.sceneTimerCallback = None
         self.keyboardEventsDict = {}
         self.keyPressed = None
@@ -1250,7 +1241,7 @@ class Scene3D:
         a = time.time()
 
         nObjs = len(self.objects)
-        self.colorID = [0, 0, 0]  # reset the colors selection ID
+        self.colorID = 0  # reset the colors selection ID
 
         # mh.world[:] = []
 
@@ -1691,26 +1682,16 @@ class Scene3D:
         # print "---------------------------"
 
         for g in obj.facesGroups:
-
-            # if len(g.faces) > 0:
-            #    print g.name
-            # Assign a unique sequential colorID used for selection
-
-            self.colorID[0] += 1
-            if self.colorID[0] >= 255:
-                self.colorID[0] = 0
-                self.colorID[1] += 1
-                if self.colorID[1] >= 255:
-                    self.colorID[1] = 0
-                    self.colorID[2] += 1
-            idR = self.colorID[0]
-            idG = self.colorID[1]
-            idB = self.colorID[2]
+            self.colorID += 1
+            #555 to 24-bit rgb
+            idR = (self.colorID % 32) * 8
+            idG = ((self.colorID>>5)%32) * 8
+            idB = ((self.colorID>>10)%32) * 8
             for f in g.faces:
                 f.colorID = [idR, idG, idB]
-            self.faceGroupColorID[str(idR) + str(idG) + str(idB)] = g
+            self.faceGroupColorID[self.colorID] = g
 
-            # print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s"%(g.name,obj.name,idR,idG,idB)
+            #print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s or %s"%(g.name,obj.name,idR,idG,idB, self.colorID)
 
     def getSelectedFacesGroup(self):
         """
@@ -1726,12 +1707,13 @@ class Scene3D:
 
         picked = mh.getColorPicked()
 
-        # print "DEBUG COLOR PICKED: %s,%s,%s"%(picked[0],picked[1],picked[2])
-
-        IDkey = str(picked[0]) + str(picked[1]) + str(picked[2])  # TODO convert to string side C
+        IDkey = (picked[0]/8) | ((picked[1]/8) << 5) | ((picked[2]/8)<<10) #555
+        
+        #print "DEBUG COLOR PICKED: %s,%s,%s %s"%(picked[0], picked[1], picked[2], IDkey)
 
         try:
             groupSelected = self.faceGroupColorID[IDkey]
+            print groupSelected.name
         except:
             print 'Color %s not found' % IDkey
             groupSelected = None
