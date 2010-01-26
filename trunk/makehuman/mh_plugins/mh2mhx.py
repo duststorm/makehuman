@@ -191,10 +191,10 @@ def exportRawData(obj, fp):
 	# end ugly kludgy
 
 	for v in obj.verts:
-		fp.write("v %f %f %f ;\n" %(v.co[0], v.co[1], v.co[2]))
+		fp.write("v %g %g %g ;\n" %(v.co[0], v.co[1], v.co[2]))
 		
 	for uv in obj.uvValues:
-		fp.write("vt %f %f ;\n" %(uv[0], uv[1]))
+		fp.write("vt %g %g ;\n" %(uv[0], uv[1]))
 
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
 	for f in faces:
@@ -225,9 +225,21 @@ def exportArmature(obj, fp):
 "\tvertexGroups true ;\n" +
 "end armature\n")
 
-	fp.write("\npose HumanRig\n")
-	mhxbones.writePose(obj, fp)
-	fp.write("end pose\n")
+	fp.write(
+"\nif Blender24\n" +
+"pose HumanRig\n")
+	mhxbones.writePose24(obj, fp)
+	fp.write(
+"end pose\n" +
+"end if\n")
+
+	fp.write(
+"\nif Blender25\n" +
+"pose HumanRig\n")
+	mhxbones.writePose25(obj, fp)
+	fp.write(
+"end pose\n" +
+"end if\n")
 		
 	fp.write(
 "\nobject HumanRig Armature HumanRig \n" +

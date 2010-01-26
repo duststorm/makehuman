@@ -29,19 +29,7 @@ from aljabr import *
 #
 #	Flags
 #
-'''
-boneOptions = dict ({\
-	Armature.CONNECTED : 0x001,
-	Armature.HINGE : 0x002,
-	Armature.NO_DEFORM : 0x004,
-	Armature.MULTIPLY : 0x008,
-	Armature.HIDDEN_EDIT : 0x010,
-	Armature.ROOT_SELECTED : 0x020,
-	Armature.BONE_SELECTED : 0x040,
-	Armature.TIP_SELECTED : 0x080,
-	Armature.LOCKED_EDIT : 0x100 
-})
-'''
+
 F_CON = 0x001
 F_NODEF = 0x004
 
@@ -823,7 +811,7 @@ def writeJoints(obj, fp):
 	setupLocations(obj)
 	fp.write("\njoints\n  j origin -2.0 10.0 0.0 ;\n")
 	for (key,val) in locations.items():
-		fp.write("  j %s %f %f %f ;\n" % (key, val[0], val[1], val[2]))
+		fp.write("  j %s %g %g %g ;\n" % (key, val[0], val[1], val[2]))
 	fp.write("end joints\n")
 #
 #	writeBones(obj, fp)
@@ -834,22 +822,22 @@ def writeBones(obj, fp):
 		fp.write("\n\tbone %s %s %x %x\n" % (bone, par, flags, layers))
 		if hoffs:
 			x = getOffs(hoffs)
-			fp.write("\t\thead joint %s + %f %f %f ;\n" % (hjoint, x[0], x[1], x[2]))
+			fp.write("\t\thead joint %s + %g %g %g ;\n" % (hjoint, x[0], x[1], x[2]))
 		else:
 			fp.write("\t\thead joint %s ;\n" % (hjoint))
 		if toffs:
 			x = getOffs(toffs)
-			fp.write("\t\ttail joint %s + %f %f %f ;\n" % (tjoint, x[0], x[1], x[2]))
+			fp.write("\t\ttail joint %s + %g %g %g ;\n" % (tjoint, x[0], x[1], x[2]))
 		else:
 			fp.write("\t\ttail joint %s ;\n" % (tjoint))
-		fp.write("\t\troll %f %f ;\n" % boneRoll[bone])
+		fp.write("\t\troll %g %g ;\n" % boneRoll[bone])
 		fp.write("\tend bone\n")
 
 #
-#	writePose(obj, fp):
+#	writePose24(obj, fp):
 #
 
-def writePose(obj, fp):
+def writePose24(obj, fp):
 	for (bone, par, hjoint, hoffs, tjoint, toffs, flags, layers, dispOb, ikFlags) in armature:
 		fp.write("\tposebone %s %x \n" % (bone, ikFlags))
 		smash = None
@@ -858,7 +846,7 @@ def writePose(obj, fp):
 
 		for (bone1, type, infl, target, driver, arg1, arg2) in constraints:
 			if bone == bone1:
-				fp.write("\t\tconstraint %s Const %f \n" % (type, infl))
+				fp.write("\t\tconstraint %s Const %g \n" % (type, infl))
 				if driver:
 					fp.write("\t\t\tdriver %s 0.5 ;\n" % driver)
 	
@@ -901,37 +889,129 @@ def writePose(obj, fp):
 					fp.write(
 "\t\t\tLIMIT	hex %x ;\n" % arg1 +
 "\t\t\tOWNERSPACE       hex 1 ;\n" +
-"\t\t\tXMIN       float %f ; \n" % xmin +
-"\t\t\tXMAX       float %f ; \n" % xmax +
-"\t\t\tYMIN       float %f ; \n" % ymin +
-"\t\t\tYMAX       float %f ; \n" % ymax +
-"\t\t\tZMIN       float %f ; \n" % zmin +
-"\t\t\tZMAX       float %f ; \n" % zmax)
+"\t\t\tXMIN       float %g ; \n" % xmin +
+"\t\t\tXMAX       float %g ; \n" % xmax +
+"\t\t\tYMIN       float %g ; \n" % ymin +
+"\t\t\tYMAX       float %g ; \n" % ymax +
+"\t\t\tZMIN       float %g ; \n" % zmin +
+"\t\t\tZMAX       float %g ; \n" % zmax)
 
 				elif type == 'LIMITLOC':
 					(xmin, xmax, ymin, ymax, zmin, zmax) = arg2
 					fp.write(
 "\t\t\tLIMIT	hex %x ;\n" % arg1 +
 "\t\t\tOWNERSPACE       hex 1 ;\n" +
-"\t\t\tXMIN       float %f ; \n" % xmin +
-"\t\t\tXMAX       float %f ; \n" % xmax +
-"\t\t\tYMIN       float %f ; \n" % ymin +
-"\t\t\tYMAX       float %f ; \n" % ymax +
-"\t\t\tZMIN       float %f ; \n" % zmin +
-"\t\t\tZMAX       float %f ; \n" % zmax)
+"\t\t\tXMIN       float %g ; \n" % xmin +
+"\t\t\tXMAX       float %g ; \n" % xmax +
+"\t\t\tYMIN       float %g ; \n" % ymin +
+"\t\t\tYMAX       float %g ; \n" % ymax +
+"\t\t\tZMIN       float %g ; \n" % zmin +
+"\t\t\tZMAX       float %g ; \n" % zmax)
 
-				elif type == 'ACTION':
-					(key, bmin, bmax) = arg2
+				else:
+					raise NameError("Unknown type "+type)
+
+				fp.write("\t\tend constraint\n")
+				if smash:
+					fp.write("\t\tsmash %s ;\n" % smash)
+		fp.write("\tend posebone\n")
+
+#
+#	writePose25(obj, fp):
+#
+
+ConstraintTypeTable = {
+	'COPYLOC' : 'COPY_LOCATION',
+	'COPYROT' : 'COPY_ROTATION',
+	'COPYSCALE' : 'COPY_SCALE',
+	'LIMITDIST' : 'LIMIT_DISTANCE',
+	'LIMITLOC' : 'LIMIT_LOCATION',
+	'LIMITROT' : 'LIMIT_ROTATION',
+	'LIMITSCALE' : 'LIMIT_SCALE',
+	'TRANSFORM' : 'TRANSFORM',
+	'CLAMPTO' : 'CLAMP_TO',
+	'DAMPED_TRACK' : 'DAMPED_TRACK',
+	'IKSOLVER' : 'IK',
+	'LOCKED_TRACK' : 'LOCKED_TRACK',
+	'SPLINE_IK' : 'SPLINE_IK',
+	'STRETCHTO' : 'STRETCH_TO',
+	'TRACKTO' : 'TRACK_TO',
+	'ACTION' : 'ACTION',
+	'CHILDOF' : 'CHILD_OF',
+	'FLOOR' : 'FLOOR',
+	'FOLLOWPATH' : 'FOLLOW_PATH',
+	'SHRINKWRAP' : 'SHRINKWRAP',
+}
+
+def writePose25(obj, fp):
+	for (bone, par, hjoint, hoffs, tjoint, toffs, flags, layers, dispOb, ikFlags) in armature:
+		fp.write("\tposebone %s %x \n" % (bone, ikFlags))
+		smash = None
+		if dispOb:
+			fp.write("\t\tcustom_shape _object['%s'] ;\n" % dispOb)
+
+		for (bone1, type, infl, target, driver, arg1, arg2) in constraints:
+			if bone == bone1:
+				fp.write("\t\tconstraint %s Const %g \n" % (ConstraintTypeTable[type], infl))
+				if driver:
+					fp.write("\t\t\tdriver %s 0.5 ;\n" % driver)
+	
+				if type == 'IKSOLVER':
+					if arg2 == Bone:
+						fp.write(
+"\t\t\tchain_length	int %d ; \n" % arg1 +
+"\t\t\ttarget		obj HumanRig ; \n" +
+"\t\t\tsubtarget	str %s ; \n" % target)
+					else:
+						fp.write(
+"\t\t\tchain_length	int %d ; \n" % arg1 +
+"\t\t\ttarget		obj %s ; \n" % target)
+						smash = "influence=%4.2f" % (infl)
+
+				elif type == 'COPYROT':
 					fp.write(
-"\t\t\tTARGETSPACE	list 1 hex 0 ; \n" +
-"\t\t\tACTION	act %s ; \n" % arg1 +
-"\t\t\tTARGET	obj HumanRig ; \n" +
-"\t\t\tBONE	str %s ; \n" % target +
-"\t\t\tKEYON	hex %d ; \n" % key +
-"\t\t\tMIN	float %f ; \n" % bmin +
-"\t\t\tMAX	float %f ; \n" % bmax +
-"\t\t\tSTART	int 1 ; \n" +
-"\t\t\tEND	int 21 ; \n")
+"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\tsubtarget	str %s ; \n" % target +
+"\t\t\tCOPY		hex %x ;\n" %  arg1)
+
+				elif type == 'COPYLOC':
+					fp.write(
+"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\tsubtarget	str %s ;\n" % target)
+
+				elif type == 'STRETCHTO':
+					fp.write(
+"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\tsubtarget	str %s ;\n" % target +
+"\t\t\tplane		hex 2 ;\n")
+
+				elif type == 'LIMITDIST':
+					fp.write(
+"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\tsubtarget	str %s ;\n" % target)
+
+				elif type == 'LIMITROT':
+					(xmin, xmax, ymin, ymax, zmin, zmax) = arg2
+					fp.write(
+"\t\t\tLIMIT	hex %x ;\n" % arg1 +
+"\t\t\towner_space	str LOCAL ;\n" +
+"\t\t\tminimum_x       float %g ; \n" % xmin +
+"\t\t\tmaximum_x       float %g ; \n" % xmax +
+"\t\t\tminimum_y       float %g ; \n" % ymin +
+"\t\t\tmaximum_y       float %g ; \n" % ymax +
+"\t\t\tminimum_z       float %g ; \n" % zmin +
+"\t\t\tmaximum_z       float %g ; \n" % zmax)
+				elif type == 'LIMITLOC':
+					(xmin, xmax, ymin, ymax, zmin, zmax) = arg2
+					fp.write(
+"\t\t\tLIMIT	hex %x ;\n" % arg1 +
+"\t\t\towner_space     str LOCAL ;\n" +
+"\t\t\tminimum_x       float %g ; \n" % xmin +
+"\t\t\tmaximum_x       float %g ; \n" % xmax +
+"\t\t\tminimum_y       float %g ; \n" % ymin +
+"\t\t\tmaximum_y       float %g ; \n" % ymax +
+"\t\t\tminimum_z       float %g ; \n" % zmin +
+"\t\t\tmaximum_z       float %g ; \n" % zmax)
 
 				else:
 					raise NameError("Unknown type "+type)
@@ -942,97 +1022,7 @@ def writePose(obj, fp):
 		fp.write("\tend posebone\n")
 
 
-"""
-#
-#	writePyDriver(fp, icu, empty, driverChannel, driverBone, factor1, channel1, factor2, channel2)
-#
 
-def writePyDriver(fp, icu, empty, driverChannel, driverBone, factor1, channel1, factor2, channel2):
-	bone = 'ob("HumanRig").getPose().bones["%s"]' % driverBone
-	expr1 = '%3.1f*%s.%s' % (factor1, bone, channel1)
-	if factor2 == 0:
-		expr2 = ''
-	elif factor2 < 0:
-		expr2 = '-%3.1f*%s.%s' % (-factor2, bone, channel2)
-	else:
-		expr2 = '+%3.1f*%s.%s' % (factor2, bone, channel2)
-
-	fp.write(
-"  icu %s 0 2 \n" +
-    driver 2 ; \n" +
-    driverObject _object['%s'] ; \n" +
-    driverChannel %d ; \n" +
-    driverExpression 'ctrl%s()' ; \n" +
-    extend 0 ; \n" +
-    interpolation 2 ; \n" +
-  end icu \n" % (icu, empty, driverChannel, expr1, expr2) )
-
-#
-#	writeEmpty(fp, empty, loc, offs, parentBone, extra)
-#
-
-def writeEmpty(fp, empty, loc, offs, parent, extra):
-	vec = locations[loc]
-	if offs:
-		vec = vadd(vec, offs)
-	fp.write(\
-"\nempty ; \n" +
-object %s Empty \n" +
-  layers 0 1 ;\n" +
-  matrix \n" +
-    row 1.000000 0.000000 0.000000 0.000000 ;\n" +
-    row 0.000000 1.000000 0.000000 0.000000 ;\n" +
-    row 0.000000 0.000000 1.000000 0.000000 ;\n" +
-    row %f %f %f 1.000000 ;\n" +
-  end matrix\n" +
-  %s ;\n"  % (empty, vec[0], vec[1], vec[2], parent) )
-	if extra:
-		fp.write("  %s ;\n" % extra)
-	fp.write("end object\n")
-
-
-def writeEmpties(fp):
-	fp.write("\nipo Object IpoEye_L\n")
-	writePyDriver(fp, "RotY", "EmptyEye_L", 1, "PEyes", 3.0, "loc.x", 0, "loc.z")
-	writePyDriver(fp, "RotX", "EmptyEye_L", 1, "PEyes", 2.0, "loc.z", 0, "loc.x")
-	fp.write("end ipo\n")
-
-	fp.write("\nipo Object IpoUpLid_L\n")
-	writePyDriver(fp, "RotX", "EmptyUpLid_L", 1, "PEyes", 2.0, "loc.z", 0, "loc.x")
-	fp.write("end ipo\n")
-
-	fp.write("\nipo Object IpoLoLid_L\n")
-	writePyDriver(fp, "RotX", "EmptyLoLid_L", 1, "PEyes", 2.0, "loc.z", 0, "loc.x")
-	fp.write("end ipo\n")
-
-	fp.write("\nipo Object IpoEye_R\n")
-	writePyDriver(fp, "RotY", "EmptyEye_R", 1, "PEyes", 3.0, "loc.x", 0, "loc.z")
-	writePyDriver(fp, "RotX", "EmptyEye_R", 1, "PEyes", 2.0, "loc.z", 0, "loc.x")
-	fp.write("end ipo\n")
-
-	fp.write("\nipo Object IpoUpLid_R\n")
-	writePyDriver(fp, "RotX", "EmptyUpLid_R", 1, "PEyes", 2.0, "loc.z", 0, "loc.x")
-	fp.write("end ipo\n")
-
-	fp.write("\nipo Object IpoLoLid_R\n")
-	writePyDriver(fp, "RotX", "EmptyLoLid_R", 1, "PEyes", 2.0, "loc.z", 0, "loc.z")
-	fp.write("end ipo\n")
-
-	writeEmpty(fp, "EmptyEyeBase_L", "r-eye", 0, "parent HumanRig 7 Head", "ipo IpoEye_L")
-	writeEmpty(fp, "EmptyEye_L", "r-eye", [0,0,1], "parent EmptyEyeBase_L 0 None", None)
-	writeEmpty(fp, "EmptyUpLidBase_L", "r-eye", 0, "parent HumanRig 7 Head", "ipo IpoUpLid_L")
-	writeEmpty(fp, "EmptyUpLid_L", "r-upLid", 0, "parent EmptyUpLidBase_L 0 None", None)
-	writeEmpty(fp, "EmptyLoLidBase_L", "r-eye", 0, "parent HumanRig 7 Head", "ipo IpoLoLid_L")
-	writeEmpty(fp, "EmptyLoLid_L", "r-loLid", 0, "parent EmptyLoLidBase_L 0 None", None)
-
-	writeEmpty(fp, "EmptyEyeBase_R", "l-eye", 0, "parent HumanRig 7 Head", "ipo IpoEye_R")
-	writeEmpty(fp, "EmptyEye_R", "l-eye", [0,0,1], "parent EmptyEyeBase_R 0 None", None)
-	writeEmpty(fp, "EmptyUpLidBase_R", "l-eye", 0, "parent HumanRig 7 Head", "ipo IpoUpLid_R")
-	writeEmpty(fp, "EmptyUpLid_R", "l-upLid", 0, "parent EmptyUpLidBase_R 0 None", None)
-	writeEmpty(fp, "EmptyLoLidBase_R", "l-eye", 0, "parent HumanRig 7 Head", "ipo IpoLoLid_R")
-	writeEmpty(fp, "EmptyLoLid_R", "l-loLid", 0, "parent EmptyLoLidBase_R 0 None", None)
-
-"""
 #
 #	setupBones(obj):
 #	Used by Collada and other exporters
