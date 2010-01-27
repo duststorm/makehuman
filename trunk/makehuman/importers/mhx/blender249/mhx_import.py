@@ -172,16 +172,9 @@ def readMhxFile(fileName):
 			nErrors += 1
 			#raise NameError(msg)
 
-	#if toggleRot90:
-	#	rotMatrix = Mathutils.RotationMatrix(90, 4, 'x')
-	#	ob = _object['HumanRig']
-	#	pbones = ob.getPose().bones	
-	#	pbones['Root'].poseMatrix *= rotMatrix
-	#	pbones['Panel'].poseMatrix *= rotMatrix
-	#	ob.getPose().update()
-		
-
 	scn.update()
+	context = scn.getRenderingContext()
+	context.rayTracing = False
 	
 	for ob in scn.objects:
 		ob.sel = 1
@@ -275,6 +268,16 @@ def parse(scn, tokens):
 				res = False
 			if res:
 				parse(val, sub)
+		elif key == 'print':
+			msg = concatList(val)
+			print(msg)
+		elif key == 'warn':
+			msg = concatList(val)
+			Draw.PupMenu("Warning: %s" % msg)
+			print(msg)
+		elif key == 'error':
+			msg = concatList(val)
+			raise NameError(msg)			
 		elif key == "action":
 			data = parseAction(val, sub)
 		elif key == "ipo":
@@ -314,6 +317,16 @@ def parse(scn, tokens):
 		
 		if data:
 			print data
+
+#
+#	concatList(elts)
+#
+
+def concatList(elts):
+	string = ""
+	for elt in elts:
+		string += " %s" % elt
+	return string
 
 #
 #	parseObject(scn, args, tokens):
