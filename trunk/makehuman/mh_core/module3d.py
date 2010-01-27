@@ -1713,7 +1713,7 @@ class Scene3D:
 
         try:
             groupSelected = self.faceGroupColorID[IDkey]
-            print groupSelected.name
+            #print groupSelected.name
         except:
             print 'Color %s not found' % IDkey
             groupSelected = None

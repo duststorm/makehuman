@@ -22,7 +22,7 @@ TO DO
 
 __docformat__ = 'restructuredtext'
 
-import gui3d, events3d, hairgenerator
+import gui3d, events3d, hairgenerator, guifiles
 from animation3d import ThreeDQBspline
 from aljabr import *
 from random import random
@@ -36,6 +36,13 @@ class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
+
+    self.aTextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/empty.obj', position=[20, 480, 9])
+    self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
+                    texture=category.app.getThemeResource("images", "button_save_file.png"),
+                    selectedTexture=None, position=[470, 490, 9])
+    self.Button.button.setScale(1.0,5.0)
+    self.aTextEdit.setText('saved_hair.obj')
     
     @self.filechooser.event
     def onFileSelected(filename):
@@ -138,14 +145,13 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
 
   for group in hairsClass.guideGroups:
     for guide in group.guides:
-      #M = makeRotEulerMtx2D(random()*radians(45),"Z") #random angle element that eliminate ribbon "dissapearance" upon rotation
       cPs = [guide.controlPoints[0]]
       for i in xrange(2,len(guide.controlPoints)-1): #piecewise continuous polynomial
         d1=vdist(guide.controlPoints[i-1],guide.controlPoints[i-2])
         d=d1+vdist(guide.controlPoints[i-1],guide.controlPoints[i])
         if i==len(guide.controlPoints)-1: N=int(d1/(res*4))
         else: N=int(d/(res*4))
-        for j in xrange(1,N+1): #doesnt account one endpoint
+        for j in xrange(1,N+1):
           if j==N and i==len(guide.controlPoints)-1 : cPs.append(guide.controlPoints[i-1])
           else: cPs.append(ThreeDQBspline(guide.controlPoints[i-2],guide.controlPoints[i-1],\
                            guide.controlPoints[i],j*res*4/d))
@@ -153,23 +159,22 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           cp1=cPs[i-1]
           cp2=cPs[i]
           verts=[[],[],[],[]]
+          
           #compute ribbon plane
           vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
           if i==2:
             verts[0] = vsub(cp1,vec)
             verts[1] = vadd(cp1,vec)
-            #verts[0] = rotatePoint(cp1,verts[0],M)
-            #verts[1] = rotatePoint(cp1,verts[1],M)
           else:
             verts[0]=v1[:]
             verts[1]=v2[:]
           
           verts[2]=vadd(cp2,vec)
           verts[3]=vsub(cp2,vec)
-          #verts[2] = rotatePoint(cp2,verts[2],M)
-          #verts[3] = rotatePoint(cp1,verts[3],M)
+
           v1=verts[3][:]
           v2=verts[2][:]
+          
           #plain orientation:
           # 1 2  
           # 4 3
@@ -179,7 +184,6 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
           fg.createFace(w1, w4, w2)
           fg.createFace(w2, w4, w3)
-    #break
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
