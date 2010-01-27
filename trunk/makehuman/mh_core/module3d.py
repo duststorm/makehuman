@@ -1241,7 +1241,7 @@ class Scene3D:
         a = time.time()
 
         nObjs = len(self.objects)
-        self.colorID = 0  # reset the colors selection ID
+        #self.colorID = 0  # reset the colors selection ID
 
         # mh.world[:] = []
 
@@ -1709,7 +1709,7 @@ class Scene3D:
 
         IDkey = (picked[0]/8) | ((picked[1]/8) << 5) | ((picked[2]/8)<<10) #555
         
-        #print "DEBUG COLOR PICKED: %s,%s,%s %s"%(picked[0], picked[1], picked[2], IDkey)
+        print "DEBUG COLOR PICKED: %s,%s,%s %s"%(picked[0], picked[1], picked[2], IDkey)
 
         try:
             groupSelected = self.faceGroupColorID[IDkey]
