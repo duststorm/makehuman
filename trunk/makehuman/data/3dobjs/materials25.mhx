@@ -38,7 +38,6 @@ texture IMAGE alpha
   repeat_y 1 ;
   use_alpha False ;
   use_color_ramp False ;
-  use_nodes False ;
 end texture
 
 texture IMAGE diffuse
@@ -77,7 +76,6 @@ texture IMAGE diffuse
   repeat_y 1 ;
   use_alpha False ;
   use_color_ramp False ;
-  use_nodes False ;
 end texture
 
 texture CLOUDS normals
@@ -93,7 +91,6 @@ texture CLOUDS normals
   noise_type 'SOFT_NOISE' ;
   stype 'GREYSCALE' ;
   use_color_ramp False ;
-  use_nodes False ;
 end texture
 
 texture IMAGE specularity
@@ -132,7 +129,6 @@ texture IMAGE specularity
   repeat_y 1 ;
   use_alpha True ;
   use_color_ramp False ;
-  use_nodes False ;
 end texture
 material Invisio 
   diffuse_color (1,1,1) ;
@@ -201,7 +197,6 @@ material Invisio
   transparency True ;
   transparency_method 'Z_TRANSPARENCY' ;
   use_diffuse_ramp False ;
-  use_nodes False ;
   use_specular_ramp False ;
   vertex_color_light False ;
   vertex_color_paint False ;
@@ -532,7 +527,6 @@ material SSS_skinshader
   transparency True ;
   transparency_method 'Z_TRANSPARENCY' ;
   use_diffuse_ramp True ;
-  use_nodes False ;
   use_specular_ramp False ;
   vertex_color_light False ;
   vertex_color_paint False ;

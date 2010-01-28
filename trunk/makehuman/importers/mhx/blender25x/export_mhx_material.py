@@ -140,7 +140,7 @@ def writeMhxBases():
 #
 
 MatExclude = ['active_texture', 'diffuse_color', 'diffuse_ramp', 'specular_color', 'specular_ramp', 'mirror_color', 'halo', 'physics',
-	'raytrace_mirror', 'raytrace_transparency', 'strand', 'subsurface_scattering', 'textures', 'use_textures', 'volume']
+	'raytrace_mirror', 'raytrace_transparency', 'strand', 'subsurface_scattering', 'textures', 'use_nodes', 'use_textures', 'volume']
 
 def exportMaterial(mat, fp):
 	fp.write("material %s \n" % mat.name.replace(' ', '_'))
@@ -232,7 +232,7 @@ def exportTexture(tx, fp):
 		exportImage(tx.image, fp)
 	except:
 		pass
-	writeDir(tx, "tx", ['image', 'image_user'], "  ", fp, globals(), locals())
+	writeDir(tx, "tx", ['image', 'image_user', 'use_nodes'], "  ", fp, globals(), locals())
 	fp.write("end texture\n")
 	return
 
