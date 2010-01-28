@@ -1335,7 +1335,7 @@ def clearScene():
 		if ob.type == 'MESH' or ob.type == 'ARMATURE':
 			scn.objects.unlink(ob)
 			del ob
-	#scn.render_data.render_raytracing = False
+	scn.render_data.render_raytracing = False
 	return scn
 
 #
