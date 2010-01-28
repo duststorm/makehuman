@@ -37,12 +37,31 @@ class HairTaskView(gui3d.TaskView):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
 
-    self.aTextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/empty.obj', position=[20, 480, 9])
+    #filename textbox
+    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/empty.obj', position=[20, 480, 9])
+    self.TextEdit.setText('saved_hair.obj')
+    
+    #Save Button
     self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
-                    texture=category.app.getThemeResource("images", "button_save_file.png"),
+                    texture=category.app.getThemeResource("images", "button_save_file.png"),\
                     selectedTexture=None, position=[470, 490, 9])
     self.Button.button.setScale(1.0,5.0)
-    self.aTextEdit.setText('saved_hair.obj')
+    
+    self.RadioButtonGroup = []
+    self.RadioButton1 = gui3d.RadioButton(self, self.RadioButtonGroup, mesh='data/3dobjs/slider_cursor.obj',\
+                          texture=category.app.getThemeResource('images','slider.png'),\
+                          selectedTexture=category.app.getThemeResource('images', 'slider_focused.png'),\
+                          position=[200,510, 9], selected=True)  # We make the first one selected
+    self.RadioButtonLabel1 = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[220, 520, 9])
+    self.RadioButtonLabel1.setText('Save hairs to Wavefront .obj as Curves')
+    self.RadioButton2 = gui3d.RadioButton(self, self.RadioButtonGroup, mesh='data/3dobjs/slider_cursor.obj',\
+                          texture=category.app.getThemeResource('images','slider.png'),\
+                          selectedTexture=category.app.getThemeResource('images', 'slider_focused.png'),\
+                          position=[200,530, 9])
+    self.RadioButtonLabel2 = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[220, 540, 9])
+    self.RadioButtonLabel2.setText('Save hairs to Wavefront .obj as Mesh')
+
+    
     
     @self.filechooser.event
     def onFileSelected(filename):
@@ -193,7 +212,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
       scn.update()
   return obj
               
-def exportHairs(file, guideGroups):
+def exportAsCurves(file, guideGroups):
   DEG_ORDER_U = 3
 
   # use negative indices

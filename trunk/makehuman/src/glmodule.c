@@ -456,7 +456,7 @@ void mhDrawText(float x, float y, const char *message)
         do
         {
             glCallLists(line - message, GL_UNSIGNED_BYTE, message);
-            glRasterPos3f(x, y + 14.0f * (float)(++lineindex), 0.0f); // fontsize = 12, linespacing = 14
+            glRasterPos3f(x, y + 14.0f * (float)(++lineindex), 0.0f); // fontsize = 12, linespacing = 14 .. no kidding?
             message = line + 1;
             line = strchr(message, '\n');
         }
@@ -1328,7 +1328,7 @@ void OnInit(void)
         SDL_GetWMInfo(&wmi);
 
         hDC = GetDC(wmi.window);
-        font = CreateFont(12, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 0	, FF_DONTCARE | DEFAULT_PITCH, TEXT("Helvetica"));
+        font = CreateFont(-20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 0	, FF_DONTCARE | DEFAULT_PITCH, TEXT("Comic Sans MS")); //Helvetica
         SelectObject(hDC, font);
         wglUseFontBitmaps(hDC, 0, 256, G.fontOffset);
         ReleaseDC(wmi.window, hDC);
