@@ -22,7 +22,7 @@ TO DO
 
 __docformat__ = 'restructuredtext'
 
-import gui3d, events3d, hairgenerator, guifiles
+import gui3d, events3d, hairgenerator, guifiles, mh, os
 from animation3d import ThreeDQBspline
 from aljabr import *
 from random import random
@@ -36,7 +36,9 @@ class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
-
+    self.hairsClass = hairgenerator.Hairgenerator()
+    self.saveAsCurves = True
+    
     #filename textbox
     self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/empty.obj', position=[20, 480, 9])
     self.TextEdit.setText('saved_hair.obj')
@@ -46,6 +48,16 @@ class HairTaskView(gui3d.TaskView):
                     texture=category.app.getThemeResource("images", "button_save_file.png"),\
                     selectedTexture=None, position=[470, 490, 9])
     self.Button.button.setScale(1.0,5.0)
+    
+    @self.Button.event
+    def onClicked(event):
+      if len(self.TextEdit.text) >= 1 and len(self.hairsClass.guideGroups)> 0:
+        #Do something!
+        modelPath = mh.getPath('models')
+        if not os.path.exists(modelPath): os.makedirs(modelPath)
+        file = open(modelPath+"/"+self.TextEdit.text, 'w')
+        exportAsCurves(file, self.hairsClass.guideGroups)
+        file.close()
     
     self.RadioButtonGroup = []
     self.RadioButton1 = gui3d.RadioButton(self, self.RadioButtonGroup, mesh='data/3dobjs/slider_cursor.obj',\
@@ -70,9 +82,9 @@ class HairTaskView(gui3d.TaskView):
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
-      hairsClass = hairgenerator.Hairgenerator()
-      hairsClass.humanVerts = human.mesh.verts
-      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition(), rotation = self.app.scene3d.selectedHuman.getRotation(), hairsClass = hairsClass)
+      self.hairsClass = hairgenerator.Hairgenerator()
+      self.hairsClass.humanVerts = human.mesh.verts
+      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition(), rotation = self.app.scene3d.selectedHuman.getRotation(), hairsClass = self.hairsClass)
       #Jose: TODO collision detection
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
       self.app.switchCategory("Modelling")
@@ -218,12 +230,12 @@ def exportAsCurves(file, guideGroups):
   # use negative indices
   for group in guideGroups:
     for guide in group.guides:
-      N = len(guide.controlPoints) -1
-      for i in xrange(0,N+1):
+      N = len(guide.controlPoints)
+      for i in xrange(0,N):
         file.write('v %.6f %.6f %.6f\n' % (guide.controlPoints[i][0], guide.controlPoints[i][1],\
                                            guide.controlPoints[i][2]))
-      
-      file.write('g %s\n' % guideGroups.name+"_"+group.name+"_"+guide.name)
+      name = group.name+"_"+guide.name 
+      file.write('g %s\n' % name)
       file.write('cstype bspline\n') # not ideal, hard coded
       file.write('deg %d\n' % DEG_ORDER_U) # not used for curves but most files have it still
 
