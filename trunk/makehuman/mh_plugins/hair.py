@@ -9,6 +9,7 @@
 
 **Copyright(c):**      MakeHuman Team 2001-2009
 
+
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
@@ -23,6 +24,7 @@ TO DO
 __docformat__ = 'restructuredtext'
 
 import gui3d, events3d, hairgenerator, guifiles, mh, os
+from mh2obj import *
 from animation3d import ThreeDQBspline
 from aljabr import *
 from random import random
@@ -49,16 +51,7 @@ class HairTaskView(gui3d.TaskView):
                     selectedTexture=None, position=[470, 490, 9])
     self.Button.button.setScale(1.0,5.0)
     
-    @self.Button.event
-    def onClicked(event):
-      if len(self.TextEdit.text) >= 1 and len(self.hairsClass.guideGroups)> 0:
-        #Do something!
-        modelPath = mh.getPath('models')
-        if not os.path.exists(modelPath): os.makedirs(modelPath)
-        file = open(modelPath+"/"+self.TextEdit.text, 'w')
-        exportAsCurves(file, self.hairsClass.guideGroups)
-        file.close()
-    
+    #.obj save type Radiobuttons
     self.RadioButtonGroup = []
     self.RadioButton1 = gui3d.RadioButton(self, self.RadioButtonGroup, mesh='data/3dobjs/slider_cursor.obj',\
                           texture=category.app.getThemeResource('images','slider.png'),\
@@ -73,7 +66,18 @@ class HairTaskView(gui3d.TaskView):
     self.RadioButtonLabel2 = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[220, 540, 9])
     self.RadioButtonLabel2.setText('Save hairs to Wavefront .obj as Mesh')
 
-    
+    @self.Button.event
+    def onClicked(event):
+      if len(self.TextEdit.text) >= 1 and len(self.hairsClass.guideGroups)> 0:
+        #Do something!
+        modelPath = mh.getPath('models')
+        if not os.path.exists(modelPath): os.makedirs(modelPath)
+        if self.RadioButton1.selected:
+          file = open(modelPath+"/"+self.TextEdit.text, 'w')
+          exportAsCurves(file, self.hairsClass.guideGroups)
+          file.close()
+        else:
+          exportObj(self.app.scene3d.selectedHuman.hairObj,modelPath+"/"+self.TextEdit.text)
     
     @self.filechooser.event
     def onFileSelected(filename):

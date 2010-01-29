@@ -36,7 +36,8 @@ import types
 
 def exportObj(obj, filename):
     """
-    This function exports a mesh object in Wavefront obj format. 
+    This function exports a mesh object in Wavefront obj format. It is assumed that obj will have at least vertices and
+    faces (exception handling for vertices/faces must be done outside this method).
     
     Parameters
     ----------
@@ -57,8 +58,9 @@ def exportObj(obj, filename):
     for v in obj.verts:
         f.write('v %f %f %f\n' % (v.co[0], v.co[1], v.co[2]))
 
-    for uv in obj.uvValues:
-        f.write('vt %f %f\n' % (uv[0], uv[1]))
+    if not (obj.uvValues==None):
+      for uv in obj.uvValues:
+          f.write('vt %f %f\n' % (uv[0], uv[1]))
 
     for v in obj.verts:
         f.write('vn %f %f %f\n' % (v.no[0], v.no[1], v.no[2]))
@@ -88,7 +90,7 @@ def exportObj(obj, filename):
     f.write('Ks 0.33 0.33 0.52\n')
     f.write('illum 5\n')
     f.write('Ns 50.0\n')
-    f.write('map_Kd -clamp on ' + obj.texture + '\n')
+    if not (obj.texture==None): f.write('map_Kd -clamp on ' + obj.texture + '\n')
     f.close()
 
 

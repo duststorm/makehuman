@@ -1328,7 +1328,7 @@ void OnInit(void)
         SDL_GetWMInfo(&wmi);
 
         hDC = GetDC(wmi.window);
-        font = CreateFont(-20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 0	, FF_DONTCARE | DEFAULT_PITCH, TEXT("Comic Sans MS")); //Helvetica
+        font = CreateFont(-16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 0	, FF_DONTCARE | DEFAULT_PITCH, TEXT("Arial")); //Comic Sans MS
         SelectObject(hDC, font);
         wglUseFontBitmaps(hDC, 0, 256, G.fontOffset);
         ReleaseDC(wmi.window, hDC);
