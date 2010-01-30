@@ -350,7 +350,7 @@ class Application(events3d.EventHandler):
 
     def setFocus(self, view=None):
 
-    # print("setFocus", view)
+        print("setFocus", view)
 
         if self.focusView == view:
             return

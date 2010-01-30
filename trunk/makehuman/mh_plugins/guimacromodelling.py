@@ -318,7 +318,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.status.setText(status)
 
     def onShow(self, event):
-        self.setFocus()
+        self.genderSlider.setFocus()
         gui3d.TaskView.onShow(self, event)
 
 
