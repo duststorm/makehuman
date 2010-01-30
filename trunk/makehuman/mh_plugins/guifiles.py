@@ -49,7 +49,7 @@ import humanmodifier
 class SaveTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Save', category.app.getThemeResource('images', 'button_save_file.png'))
+        gui3d.TaskView.__init__(self, category, 'Save', category.app.getThemeResource('images', 'button_save_file.png'), category.app.getThemeResource('images', 'button_save_file_on.png'))
         self.fileentry = gui3d.FileEntryView(self)
 
         @self.fileentry.event
@@ -100,7 +100,7 @@ class LoadTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         modelPath = mh.getPath('models')
-        gui3d.TaskView.__init__(self, category, 'Load', category.app.getThemeResource('images', 'button_load_file.png'))
+        gui3d.TaskView.__init__(self, category, 'Load', category.app.getThemeResource('images', 'button_load_file.png'), category.app.getThemeResource('images', 'button_load_file_on.png'))
         self.filechooser = gui3d.FileChooser(self, modelPath, 'mhm')
 
         @self.filechooser.event
@@ -145,20 +145,21 @@ class LoadTaskView(gui3d.TaskView):
 class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'))
+        gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'), category.app.getThemeResource('images', 'button_export_file_on.png'))
+        gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0])
         self.fileentry = gui3d.FileEntryView(self)
 
         self.exportTypeGroup = []
         self.wavefrontObj = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                              'button_muscle.png'), selectedTexture=self.app.getThemeResource('images', 'button_muscle_on.png'), position=[673, 242,
+                                              'button_export_obj.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_obj_on.png'), position=[33, 120,
                                               9.2], selected=True)
-        self.mhx = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_muscle.png'
-                                     ), selectedTexture=self.app.getThemeResource('images', 'button_muscle_on.png'), position=[708, 242, 9.2])
+        self.mhx = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_mhx.png'
+                                     ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 120, 9.2])
         self.collada = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                         'button_muscle.png'), selectedTexture=self.app.getThemeResource('images', 'button_muscle_on.png'), position=[743, 242, 9.2])
+                                         'button_export_collada_on.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada.png'), position=[103, 120, 9.2])
 
-        self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_muscle.png'),
-                                                 selectedTexture=self.app.getThemeResource('images', 'button_muscle_on.png'), position=[673, 292, 9.2], selected=True)
+        self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
+                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 140, 9.2], selected=True)
 
         @self.fileentry.event
         def onFileSelected(filename):

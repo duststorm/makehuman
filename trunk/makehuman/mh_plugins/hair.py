@@ -36,7 +36,7 @@ class Hair(gui3d.Object):
 
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"))
+    gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"),  category.app.getThemeResource("images", "button_hair_on.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
     self.hairsClass = hairgenerator.Hairgenerator()
     self.saveAsCurves = True
