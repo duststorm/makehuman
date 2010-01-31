@@ -158,9 +158,6 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.rx = rotation[0]
   obj.ry = rotation[1]
   obj.rz = rotation[2]
-  #obj.rx = 0.0
-  #obj.ry = 0.0
-  #obj.rz = 0.0
   obj.sx = 1.0
   obj.sy = 1.0
   obj.sz = 1.0
@@ -198,6 +195,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           else: cPs.append(ThreeDQBspline(guide.controlPoints[i-2],guide.controlPoints[i-1],\
                            guide.controlPoints[i],j*res*4/d))
       uvFactor = 1.0/(len(cPs) -2) #here obviously guides must have ctrlPts  > 2!
+      vtemp1, vtemp2 = None, None
       for i in xrange(2,len(cPs)-1):
           cp1=cPs[i-1]
           cp2=cPs[i]
@@ -221,10 +219,19 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           #plain orientation:
           # xy :  1 2      uv:   (0,v[j-1])  (1,v[j-1])
           #         4 3             (0,0)          (1,v[j])
-          w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-          w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+          if vtemp1 == None:
+             w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
+             w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+          else:
+             w1=vtemp1
+             w2=vtemp2
           w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
           w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
+          
+          #hoping shallow copy works for this type
+          vtemp1=w4
+          vtemp2=w3 
+          
           fg.createFace(w1, w4, w2, [[0.0,(i-2)*uvFactor],[0.0,(i-1)*uvFactor],[1.0,(i-2)*uvFactor]])
           fg.createFace(w2, w4, w3, [[1.0,(i-2)*uvFactor],[0.0,(i-1)*uvFactor],[1.0,(i-1)*uvFactor]])
 
