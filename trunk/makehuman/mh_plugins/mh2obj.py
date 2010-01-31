@@ -86,7 +86,8 @@ def exportObj(obj, filename, originalQuadsFile=None):
             f.write('f')
             #print "face.verts : " , face.verts
             for v in face.verts:
-               f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+               if (obj.uvValues == None): f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+               else: f.write(' %i/%i/%i ' % (v.idx + 1, v.idx + 1, v.idx + 1))
             f.write('\n')
     f.close()
 

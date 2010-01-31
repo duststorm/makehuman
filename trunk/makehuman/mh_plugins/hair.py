@@ -169,7 +169,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.pickable = 0
   obj.cameraMode = 0
   obj.text = ""
-  #obj.uvValues = []
+  obj.uvValues = []
   obj.indexBuffer = []
   fg = obj.createFaceGroup("ribbons")
   
@@ -197,6 +197,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           if j==N and i==len(guide.controlPoints)-1 : cPs.append(guide.controlPoints[i-1])
           else: cPs.append(ThreeDQBspline(guide.controlPoints[i-2],guide.controlPoints[i-1],\
                            guide.controlPoints[i],j*res*4/d))
+      uvFactor = 1.0/(len(cPs) -2) #here obviously guides must have ctrlPts  > 2!
       for i in xrange(2,len(cPs)-1):
           cp1=cPs[i-1]
           cp2=cPs[i]
@@ -218,14 +219,14 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           v2=verts[2][:]
           
           #plain orientation:
-          # 1 2  
-          # 4 3
+          # xy :  1 2      uv:   (0,v[j-1])  (1,v[j-1])
+          #         4 3             (0,0)          (1,v[j])
           w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
           w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
           w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
           w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
-          fg.createFace(w1, w4, w2)
-          fg.createFace(w2, w4, w3)
+          fg.createFace(w1, w4, w2, [[0.0,(i-2)*uvFactor],[0.0,(i-1)*uvFactor],[1.0,(i-2)*uvFactor]])
+          fg.createFace(w2, w4, w3, [[1.0,(i-2)*uvFactor],[0.0,(i-1)*uvFactor],[1.0,(i-1)*uvFactor]])
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
