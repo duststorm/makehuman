@@ -824,8 +824,10 @@ class TextEdit(View):
 
     def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9]):
         View.__init__(self, parent)
-        Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
-        self.textObject = Object(self, mesh, texture=texture, position=[position[0] + 10.0, position[1] + 12.0, position[2] + 0.1])
+        #Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
+        Object(self, mesh=mesh, position=position)
+        self.textObject = Object(self, mesh='data/3dobjs/empty.obj', texture=texture, position=[position[0] + 10.0, position[1] + 12.0, position[2] + 0.1])
+        #self.textObject = Object(self, mesh, texture, position)
         self.text = ''
 
     def __updateTextObject(self):

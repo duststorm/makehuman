@@ -40,16 +40,21 @@ class HairTaskView(gui3d.TaskView):
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
     self.hairsClass = hairgenerator.Hairgenerator()
     self.saveAsCurves = True
+    self.widthFactor = 1.0
     
     #filename textbox
-    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/empty.obj', position=[20, 480, 9])
+    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj', position=[20, 480, 9])
     self.TextEdit.setText('saved_hair.obj')
+    
+    #widthFactor
+    self.TextEdit2 = gui3d.TextEdit(self, mesh='data/3dobjs/small_input.obj', position=[20, 450, 9])
+    self.TextEdit2.setText('1.00')
     
     #Save Button
     self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
                     texture=category.app.getThemeResource("images", "button_save_file.png"),\
                     selectedTexture=None, position=[470, 490, 9])
-    self.Button.button.setScale(1.0,5.0)
+    #self.Button.button.setScale(1.0,5.0)
     
     #.obj save type Radiobuttons
     self.RadioButtonGroup = []
@@ -83,12 +88,14 @@ class HairTaskView(gui3d.TaskView):
     def onFileSelected(filename):
       print("Loading %s" %(filename))
       #human = self.app.scene3d.selectedHuman
+      wFactor = float(self.TextEdit2.text)
+      if (wFactor <= 100.00) and (wFactor >= 1.00): self.widthFactor = wFactor
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
       self.hairsClass = hairgenerator.Hairgenerator()
       self.hairsClass.humanVerts = human.mesh.verts
-      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position = self.app.scene3d.selectedHuman.getPosition(), rotation = self.app.scene3d.selectedHuman.getRotation(), hairsClass = self.hairsClass)
+      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=self.hairsClass, widthFactor=self.widthFactor)
       #Jose: TODO collision detection
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
       self.app.switchCategory("Modelling")
@@ -141,7 +148,7 @@ def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
   obj.updateIndexBuffer()
   scn.update()
   
-def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True):
+def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1):
   if hairsClass == None :
     hairsClass = hairgenerator.Hairgenerator()
   obj = scn.newObj(path)
@@ -196,7 +203,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           verts=[[],[],[],[]]
           
           #compute ribbon plane
-          vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), res/2)
+          vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), widthFactor*res/2)
           if i==2:
             verts[0] = vsub(cp1,vec)
             verts[1] = vadd(cp1,vec)
