@@ -34,7 +34,7 @@ import files3d
 import types
 
 
-def exportObj(obj, filename):
+def exportObj(obj, filename, base=True):
     """
     This function exports a mesh object in Wavefront obj format. It is assumed that obj will have at least vertices and
     faces (exception handling for vertices/faces must be done outside this method).
@@ -68,7 +68,10 @@ def exportObj(obj, filename):
     f.write('usemtl basic\n')
     f.write('s off\n')
 
-    faces = files3d.loadFacesIndices('data/3dobjs/base.obj', True)
+    if base:
+      faces = files3d.loadFacesIndices('data/3dobjs/base.obj', True)
+    else:
+      faces = obj.faces
     for fc in faces:
         if type(fc) is types.StringType:
             f.write('g %s\n' % fc)
