@@ -176,7 +176,8 @@ class ExportTaskView(gui3d.TaskView):
       # elif self.collada.selected:
       #  mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
 
-            mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.obj')
+            mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.obj',\
+            'data/3dobjs/base.obj')
             mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.bvh')
             mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.mhx')
             mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.dae')
