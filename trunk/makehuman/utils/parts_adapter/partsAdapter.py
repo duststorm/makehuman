@@ -92,7 +92,6 @@ j79 = [14187,14188,14189,14190,14191,14192] #joint-r-toe-5-3
 
 g_transf = [eye_left,eye_right,mouth,j1,j2,j3,j4,j5,j6,j7,j8,j9,j10,j11,j12,j13,j14,j15,j16,j17,j18,j19,j20,j21,j22,j23,j24,j25,j26,j27,j28,j29,j30,j31,j32,j33,j34,j35,j36,j37,j38,j39,j40,j41,j42,j43,j44,j45,j46,j47,j48,j49,j50,j51,j52,j53,j54,j55,j56,j57,j58,j59,j60,j61,j62,j63,j64,j65,j66,j67,j68,j69,j70,j71,j72,j73,j74,j75,j76,j77,j78,j79]
 
-
 originalVerts = [] #Original base mesh coords
 
 target = [] #struttura del target
@@ -165,14 +164,20 @@ def calcVerts():
             target[offsetV].co[1] = y
             target[offsetV].co[2] = z
         except:
-            #print "errore"
             pass
             
 
 def eyes():
     #prendo ingombro e baricentro
     cnt_g = 0
+   
     for g in g_transf:
+        maxx = 0
+    	minx = 0
+    	maxy = 0
+    	miny = 0
+    	maxx = 0
+    	minz = 0
         try:
             offset = indexT.index(g[0])
             maxx = target[offset].co[0]
@@ -199,11 +204,11 @@ def eyes():
             try:
                 offset = indexT.index(v)
                 x = target[offset].co[0] + originalVerts[v][0]
-                y = target[offset].co[0] + originalVerts[v][0]
-                z = target[offset].co[0] + originalVerts[v][0]
+                y = target[offset].co[1] + originalVerts[v][1]
+                z = target[offset].co[2] + originalVerts[v][2]
                 xt = originalVerts[v][0]
-                yt = originalVerts[v][0]
-                zt = originalVerts[v][0]
+                yt = originalVerts[v][1]
+                zt = originalVerts[v][2]
                 if target[offset].co[0] > maxx:
                     maxx = target[offset].co[0]
                 if target[offset].co[0] < minx:
@@ -290,7 +295,6 @@ def eyes():
                 pass
 
         
-        
         #sposto le coordinate           
         for v in g:
             try:
@@ -300,7 +304,7 @@ def eyes():
                 target[offset].co[2] = target[offset].co[2] - originalVerts[v][2]
             except:
                 pass
-                
+              
         #verificare lo spostamento con il target attuale e quello salvato
         try:
             offset = indexT.index(g[0])
@@ -312,6 +316,9 @@ def eyes():
             minzn = target[offset].co[2]
         except:
             pass
+        
+        center = []
+        centern = []
         for v in g:
             try:
                 offset = indexT.index(v)
@@ -329,21 +336,25 @@ def eyes():
                     minzn = target[offset].co[2]
             except:
                 pass
+                
         
         try:
             center  = [(minx + (maxx - minx)/2), (miny + (maxy - miny)/2), (minz + (maxz - minz)/2)] 
-            centern = [(minxn + (maxxn - minxn)/2), (minyn + (maxyn - minyn)/2), (minzn + (maxzn - minzn)/2)] 
         except:
-            pass
-            
+            center  = [0,0,0]
+        centern = [(minxn + (maxxn - minxn)/2), (minyn + (maxyn - minyn)/2), (minzn + (maxzn - minzn)/2)] 
+        
+        
         for v in g:
             try:
                 offset = indexT.index(v)
+                
                 target[offset].co[0] = target[offset].co[0] + (center[0] - centern[0])
                 target[offset].co[1] = target[offset].co[1] + (center[1] - centern[1])
                 target[offset].co[2] = target[offset].co[2] + (center[2] - centern[2])
             except:
                 pass
+        
         
         #check y-coor for the mouth
         if cnt_g == 2:
@@ -368,7 +379,7 @@ def eyes():
                 except:
                     pass
             
-           
+        
         cnt_g += 1
     
     
@@ -445,12 +456,12 @@ if __name__ == '__main__' :
     #modifica i vertici e salva i file nella nuova directory
     cnt = 1
     for f in file_list:
+        print 
+        print "Processing file %s [%d/%d]" % (f, cnt, len(file_list))
         target = []
         indexT = []
         createTarget(f)
         calcVerts()
-        print 
-        print "Processing file %s [%d/%d]" % (f, cnt, len(file_list))
         eyes()     
         saveTarget(f)
         cnt += 1
