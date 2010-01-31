@@ -156,7 +156,7 @@ class ExportTaskView(gui3d.TaskView):
         self.mhx = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_mhx.png'
                                      ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 120, 9.2])
         self.collada = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                         'button_export_collada_on.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada.png'), position=[103, 120, 9.2])
+                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 120, 9.2])
 
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 140, 9.2], selected=True)
