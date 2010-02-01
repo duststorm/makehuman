@@ -384,7 +384,10 @@ class DetailModelingTaskView(gui3d.TaskView):
             gui3d.Slider.onMouseDragged(self.noseSlider, event)
             sliderPos = self.noseSlider.slider.getPosition()
             value = (sliderPos[0] - self.noseSlider.sliderMinX) / (self.noseSlider.sliderMaxX - self.noseSlider.sliderMinX)
-            value = value * (self.noseSlider.max - self.noseSlider.min) + self.noseSlider.min                                         
+            value = value * (self.noseSlider.max - self.noseSlider.min) + self.noseSlider.min
+            human = self.app.scene3d.selectedHuman
+            human.setNose(value)
+            human.applyAllTargets(self.app.progress)                                        
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',

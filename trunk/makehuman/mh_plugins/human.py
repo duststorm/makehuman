@@ -86,6 +86,7 @@ class Human(gui3d.Object):
         self.genitals = 0.0
         self.breastSize = 0.5
         self.breastFirmness = 0.5
+        self.nose = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
@@ -371,6 +372,12 @@ class Human(gui3d.Object):
 
     def getBreastFirmness(self):
         return self.breastFirmness
+
+    def setNose(self, value):
+        self.nose = min(1.0, max(0.0, value))
+
+    def getNose(self):
+       return self.nose
 
     def setEthnic(self, ethnic, value):
         modified = None
@@ -715,6 +722,19 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
                      * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
 
+        nose = 1 + self.nose * 11
+        noseValues = [0 for i in xrange(0, 13)]
+        i = int(math.floor(nose))
+        value = nose - i
+        noseValues[i] = 1 - value
+        if i < 12:
+            noseValues[i + 1] = value
+
+        for i in xrange(1, 13):
+            detailTargets['data/targets/details/neutral_male-young-nose%i.target'% i] = self.youngVal * self.maleVal * noseValues[i]
+            detailTargets['data/targets/details/neutral_male-child-nose%i.target'% i] = self.childVal * self.maleVal * noseValues[i]
+            detailTargets['data/targets/details/neutral_male-old-nose%i.target'% i] = self.oldVal * self.maleVal * noseValues[i]
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 print 'APP: %s, VAL: %f' % (k, v)
@@ -1058,6 +1078,7 @@ class Human(gui3d.Object):
         self.genitals = 0.0
         self.breastSize = 0.5
         self.breastFirmness = 0.5
+        self.nose = 0.0
 
         self.activeEthnicSets = {}
         self.targetsEthnicStack = {'neutral': 1.0}
@@ -1095,6 +1116,8 @@ class Human(gui3d.Object):
                     self.setBreastSize(float(lineData[1]))
                 elif lineData[0] == 'breastFirmness':
                     self.setBreastFirmness(float(lineData[1]))
+                elif lineData[0] == 'nose':
+                    self.setNose(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
@@ -1123,6 +1146,7 @@ class Human(gui3d.Object):
         f.write('genitals %f\n' % self.getGenitals())
         f.write('breastSize %f\n' % self.getBreastSize())
         f.write('breastFirmness %f\n' % self.getBreastFirmness())
+        f.write('nose %f\n' % self.getNose())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         f.write('height %f\n' % modifier.getValue())
