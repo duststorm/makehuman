@@ -722,7 +722,7 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
                      * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
 
-        nose = 1 + self.nose * 11
+        nose = self.nose * 12
         noseValues = [0 for i in xrange(0, 13)]
         i = int(math.floor(nose))
         value = nose - i
