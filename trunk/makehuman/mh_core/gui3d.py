@@ -589,6 +589,10 @@ class Slider(View):
         worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
         sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
         self.slider.setPosition(sliderPos)
+        value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
+        self.__value = value * (self.max - self.min) + self.min
+        
+        self.callEvent('onChanging', self.__value)
 
     def onMouseUp(self, event):
         sliderPos = self.slider.getPosition()
@@ -598,8 +602,6 @@ class Slider(View):
         self.slider.setPosition(sliderPos)
         value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
         self.__value = value * (self.max - self.min) + self.min
-
-    # print(value, self.__value)
 
         self.callEvent('onChange', self.__value)
 

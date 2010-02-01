@@ -439,6 +439,30 @@ class Human(gui3d.Object):
             return name.replace('r-', 'l-', 1)
         else:
             return None
+            
+    def updateNose(self, previous, next):
+        noseValues = [0 for i in xrange(0, 13)]
+        
+        # remove previous
+        previousNose = previous * 12
+        i = int(math.floor(previousNose))
+        value = previousNose - i
+        noseValues[i] -= 1 - value
+        if i < 12:
+            noseValues[i + 1] -= value
+            
+        # add next
+        nextNose = next * 12
+        i = int(math.floor(nextNose))
+        value = nextNose - i
+        noseValues[i] += 1 - value
+        if i < 12:
+            noseValues[i + 1] += value
+
+        for i in xrange(1, 13):
+            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-young-nose%i.target'% i, self.youngVal * self.maleVal * noseValues[i], None, 0, 0)
+            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-child-nose%i.target'% i, self.childVal * self.maleVal * noseValues[i], None, 0, 0)
+            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-old-nose%i.target'% i, self.oldVal * self.maleVal * noseValues[i], None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None):
         """

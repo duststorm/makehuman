@@ -379,17 +379,12 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.noseSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
                                                  ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0)
 
-        '''
         @self.noseSlider.event
-        def onMouseDragged(event):
-            gui3d.Slider.onMouseDragged(self.noseSlider, event)
-            sliderPos = self.noseSlider.slider.getPosition()
-            value = (sliderPos[0] - self.noseSlider.sliderMinX) / (self.noseSlider.sliderMaxX - self.noseSlider.sliderMinX)
-            value = value * (self.noseSlider.max - self.noseSlider.min) + self.noseSlider.min
+        def onChanging(value):
             human = self.app.scene3d.selectedHuman
+            human.updateNose(human.getNose(), value)
             human.setNose(value)
-            human.applyAllTargets(self.app.progress)
-        '''
+            human.meshData.update()
         
         @self.noseSlider.event
         def onChange(value):
