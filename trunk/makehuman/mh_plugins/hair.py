@@ -194,8 +194,10 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           if j==N and i==len(guide.controlPoints)-1 : cPs.append(guide.controlPoints[i-1])
           else: cPs.append(ThreeDQBspline(guide.controlPoints[i-2],guide.controlPoints[i-1],\
                            guide.controlPoints[i],j*res*4/d))
-      uvFactor = 1.0/(len(cPs) -2) #here obviously guides must have ctrlPts  > 2!
+      uvFactor = 1.0/(len(cPs) -3) #here obviously guides must have ctrlPts  > 4!
+      uvLength=len(cPs)-3
       vtemp1, vtemp2 = None, None
+      uvtemp1, uvtemp2 = None, None
       for i in xrange(2,len(cPs)-1):
           cp1=cPs[i-1]
           cp2=cPs[i]
@@ -219,21 +221,30 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           #plain orientation:
           # xy :  1 2      uv:   (0,v[j-1])  (1,v[j-1])
           #         4 3             (0,0)          (1,v[j])
+          
+          #please do not change the sequence of the lines here
           if vtemp1 == None:
              w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
              w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+             obj.uvValues.append([0.0,(uvLength - i+2)*uvFactor])
+             obj.uvValues.append([1.0,(uvLength - i+2)*uvFactor])
           else:
              w1=vtemp1
              w2=vtemp2
           w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
           w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
+          obj.uvValues.append([1.0,(uvLength - i+1)*uvFactor])
+          obj.uvValues.append([0.0,(uvLength - i+1)*uvFactor])
+          #end of please...
           
-          #hoping shallow copy works for this type
+          #hoping shallow copy works for this type          
+          fg.createFace(w1, w4, w2)
+          fg.faces[len(fg.faces) -1].uv= [w1.idx,w4.idx,w2.idx]
+          fg.createFace(w2, w4, w3)
+          fg.faces[len(fg.faces) -1].uv=[w2.idx,w4.idx,w3.idx]
           vtemp1=w4
           vtemp2=w3 
-          
-          fg.createFace(w1, w4, w2, [[0.0,(i-2)*uvFactor],[0.0,(i-1)*uvFactor],[1.0,(i-2)*uvFactor]])
-          fg.createFace(w2, w4, w3, [[1.0,(i-2)*uvFactor],[0.0,(i-1)*uvFactor],[1.0,(i-1)*uvFactor]])
+
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
