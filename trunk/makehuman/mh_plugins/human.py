@@ -498,7 +498,7 @@ class Human(gui3d.Object):
           faces.extend(group.faces)
           for f in group.faces:
               vertices.extend(f.verts)
-        self.meshData.calcNormals(1, 1, set(vertices), set(faces))
+        self.meshData.calcNormals(1, 1, set(vertices), faces)
         
     def updateBreastFirmness(self, previous, next):
         breastCupValues = [0 for i in xrange(0, 9)]
@@ -524,7 +524,7 @@ class Human(gui3d.Object):
           faces.extend(group.faces)
           for f in group.faces:
               vertices.extend(f.verts)
-        self.meshData.calcNormals(1, 1, set(vertices), set(faces))
+        self.meshData.calcNormals(1, 1, set(vertices), faces)
           
     def applyBreastTargets(self, values, firmness):  
         averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
@@ -731,7 +731,7 @@ class Human(gui3d.Object):
           faces.extend(group.faces)
           for f in group.faces:
               vertices.extend(f.verts)
-        self.meshData.calcNormals(1, 1, set(vertices), set(faces))
+        self.meshData.calcNormals(1, 1, set(vertices), faces)
 
     def applyNoseTargets(self, values):
         for i in xrange(1, 13):
