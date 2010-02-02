@@ -442,6 +442,13 @@ class Human(gui3d.Object):
             
     def updateGenitals(self, previous, next):
         self.applyGenitalTargets(max(0.0, next) - max(0.0, previous), min(0.0, previous) - min(0.0, next))
+        
+        # Update normals
+        group = self.meshData.getFaceGroup("pelvis-genital-area")
+        vertices = []
+        for f in group.faces:
+            vertices.extend(f.verts)
+        self.meshData.calcNormals(1, 1, set(vertices), group.faces)
             
     def applyGenitalTargets(self, maleGenitals, femaleGenitals):
         detailTargets = {}
@@ -479,6 +486,20 @@ class Human(gui3d.Object):
             
         self.applyBreastTargets(breastCupValues, [1 - self.breastFirmness, self.breastFirmness])
         
+        # Update normals
+        groupnames = ["l-torso-inner-pectoralis", "l-torso-middle-pectoralis", "l-torso-outer-pectoralis", "l-torso-upper-pectoralis",
+            "l-torso-lower-pectoralis", "l-torso-nipple",
+            "r-torso-inner-pectoralis", "r-torso-middle-pectoralis", "r-torso-outer-pectoralis", "r-torso-upper-pectoralis",
+            "r-torso-lower-pectoralis", "r-torso-nipple"]
+        vertices = []
+        faces = []
+        for name in groupnames:
+          group = self.meshData.getFaceGroup(name)
+          faces.extend(group.faces)
+          for f in group.faces:
+              vertices.extend(f.verts)
+        self.meshData.calcNormals(1, 1, set(vertices), set(faces))
+        
     def updateBreastFirmness(self, previous, next):
         breastCupValues = [0 for i in xrange(0, 9)]
         
@@ -490,6 +511,20 @@ class Human(gui3d.Object):
             breastCupValues[i + 1] = value
             
         self.applyBreastTargets(breastCupValues, [previous - next, next - previous])
+        
+        # Update normals
+        groupnames = ["l-torso-inner-pectoralis", "l-torso-middle-pectoralis", "l-torso-outer-pectoralis", "l-torso-upper-pectoralis",
+            "l-torso-lower-pectoralis", "l-torso-nipple",
+            "r-torso-inner-pectoralis", "r-torso-middle-pectoralis", "r-torso-outer-pectoralis", "r-torso-upper-pectoralis",
+            "r-torso-lower-pectoralis", "r-torso-nipple"]
+        vertices = []
+        faces = []
+        for name in groupnames:
+          group = self.meshData.getFaceGroup(name)
+          faces.extend(group.faces)
+          for f in group.faces:
+              vertices.extend(f.verts)
+        self.meshData.calcNormals(1, 1, set(vertices), set(faces))
           
     def applyBreastTargets(self, values, firmness):  
         averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
@@ -686,6 +721,17 @@ class Human(gui3d.Object):
             noseValues[i + 1] += value
             
         self.applyNoseTargets(noseValues)
+        
+        # Update normals
+        groupnames = ["l-nose-nostril", "nose-bridge", "nose-glabella", "nose-philtrum", "nose-sellion", "nose-tip", "r-nose-nostril"]
+        vertices = []
+        faces = []
+        for name in groupnames:
+          group = self.meshData.getFaceGroup(name)
+          faces.extend(group.faces)
+          for f in group.faces:
+              vertices.extend(f.verts)
+        self.meshData.calcNormals(1, 1, set(vertices), set(faces))
 
     def applyNoseTargets(self, values):
         for i in xrange(1, 13):
