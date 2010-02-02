@@ -440,6 +440,214 @@ class Human(gui3d.Object):
         else:
             return None
             
+    def updateBreastSize(self, previous, next):
+        breastCupValues = [0 for i in xrange(0, 9)]
+        
+        # Remove previous
+        previousBreastSize = 1 + previous * 7
+        i = int(math.floor(previousBreastSize))
+        value = previousBreastSize - i
+        breastCupValues[i] -= 1 - value
+        if i < 8:
+            breastCupValues[i + 1] -= value
+            
+        # Add next
+        nextBreastSize = 1 + next * 7
+        i = int(math.floor(nextBreastSize))
+        value = nextBreastSize - i
+        breastCupValues[i] += 1 - value
+        if i < 8:
+            breastCupValues[i + 1] += value
+            
+        self.applyBreastTargets(breastCupValues, [1 - self.breastFirmness, self.breastFirmness])
+        
+    def updateBreastFirmness(self, previous, next):
+        breastCupValues = [0 for i in xrange(0, 9)]
+        
+        breastSize = 1 + self.breastSize * 7
+        i = int(math.floor(breastSize))
+        value = breastSize - i
+        breastCupValues[i] = 1 - value
+        if i < 8:
+            breastCupValues[i + 1] = value
+            
+        self.applyBreastTargets(breastCupValues, [previous - next, next - previous])
+          
+    def applyBreastTargets(self, values, firmness):  
+        averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
+        averageToneVal = 1 - (self.muscleVal + self.flaccidVal)
+        
+        detailTargets = {}
+            
+        for i in xrange(1, 9):
+
+            detailTargets['data/targets/details/neutral_female-young-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/neutral_female-young-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-flaccid-light-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-flaccid-heavy-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-muscle-light-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-young-muscle-heavy-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-young-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/neutral_female-child-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/neutral_female-child-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-flaccid-light-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-flaccid-heavy-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-muscle-light-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-child-muscle-heavy-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-child-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+                     
+            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-light-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-heavy-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-muscle-light-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+
+            detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
+
+            detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
+                     
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                print 'APP: %s, VAL: %f' % (k, v)
+            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+            
     def updateNose(self, previous, next):
         noseValues = [0 for i in xrange(0, 13)]
         
@@ -458,11 +666,14 @@ class Human(gui3d.Object):
         noseValues[i] += 1 - value
         if i < 12:
             noseValues[i + 1] += value
+            
+        self.applyNoseTargets(noseValues)
 
+    def applyNoseTargets(self, values):
         for i in xrange(1, 13):
-            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-young-nose%i.target'% i, self.youngVal * self.maleVal * noseValues[i], None, 0, 0)
-            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-child-nose%i.target'% i, self.childVal * self.maleVal * noseValues[i], None, 0, 0)
-            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-old-nose%i.target'% i, self.oldVal * self.maleVal * noseValues[i], None, 0, 0)
+            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-young-nose%i.target'% i, self.youngVal * self.maleVal * values[i], None, 0, 0)
+            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-child-nose%i.target'% i, self.childVal * self.maleVal * values[i], None, 0, 0)
+            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-old-nose%i.target'% i, self.oldVal * self.maleVal * values[i], None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None):
         """
@@ -571,9 +782,13 @@ class Human(gui3d.Object):
         detailTargets[self.targetMaleGenitalsChild] = maleGenitals * self.childVal
         detailTargets[self.targetMaleGenitalsYoung] = maleGenitals * self.youngVal
         detailTargets[self.targetMaleGenitalsOld] = maleGenitals * self.oldVal
+        
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                print 'APP: %s, VAL: %f' % (k, v)
+            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
         # breastCup goes from 1 to 8
-
         breastCup = 1 + self.breastSize * 7
         breastCupValues = [0 for i in xrange(0, 9)]
         i = int(math.floor(breastCup))
@@ -581,171 +796,10 @@ class Human(gui3d.Object):
         breastCupValues[i] = 1 - value
         if i < 8:
             breastCupValues[i + 1] = value
+            
+        self.applyBreastTargets(breastCupValues, [1.0 - self.breastFirmness, self.breastFirmness])
 
-        for i in xrange(1, 9):
-
-            detailTargets['data/targets/details/neutral_female-young-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/neutral_female-young-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-flaccid-light-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-flaccid-heavy-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-muscle-light-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.underweightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-muscle-heavy-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.overweightVal) * self.youngVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-young-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.youngVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/neutral_female-child-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/neutral_female-child-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-flaccid-light-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-flaccid-heavy-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-muscle-light-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.underweightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-muscle-heavy-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-child-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-                     
-            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-flaccid-light-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-flaccid-heavy-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-muscle-light-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
-                     * self.femaleVal) * (1.0 - self.breastFirmness)) * breastCupValues[i]
-
-            detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
-                     * self.femaleVal) * self.breastFirmness) * breastCupValues[i]
-
+        # nose goes from 0 to 12, 0 is no target
         nose = self.nose * 12
         noseValues = [0 for i in xrange(0, 13)]
         i = int(math.floor(nose))
@@ -754,15 +808,7 @@ class Human(gui3d.Object):
         if i < 12:
             noseValues[i + 1] = value
 
-        for i in xrange(1, 13):
-            detailTargets['data/targets/details/neutral_male-young-nose%i.target'% i] = self.youngVal * self.maleVal * noseValues[i]
-            detailTargets['data/targets/details/neutral_male-child-nose%i.target'% i] = self.childVal * self.maleVal * noseValues[i]
-            detailTargets['data/targets/details/neutral_male-old-nose%i.target'% i] = self.oldVal * self.maleVal * noseValues[i]
-
-        for (k, v) in detailTargets.iteritems():
-            if v != 0.0:
-                print 'APP: %s, VAL: %f' % (k, v)
-            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+        self.applyNoseTargets(noseValues)
 
         for (ethnicGroup, ethnicVal) in self.targetsEthnicStack.iteritems():
 

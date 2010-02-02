@@ -360,10 +360,17 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Genitals', value, self.syncSliders))
 
-        self.breastCupSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_cup.png'), self.app.getThemeResource('images', 'slider.png'),
+        self.breastSizeSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_cup.png'), self.app.getThemeResource('images', 'slider.png'),
                                             self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 139, 9.2], value=0.5, min=0, max=1)
 
-        @self.breastCupSlider.event
+        @self.breastSizeSlider.event
+        def onChanging(value):
+            human = self.app.scene3d.selectedHuman
+            human.updateBreastSize(human.getBreastSize(), value)
+            human.setBreastSize(value)
+            human.meshData.update()
+            
+        @self.breastSizeSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'BreastSize', value, self.syncSliders))
@@ -371,6 +378,13 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_firmness.png'), self.app.getThemeResource('images', 'slider.png'
                                                  ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 173, 9.2], value=0.5, min=0, max=1)
 
+        @self.breastFirmnessSlider.event
+        def onChanging(value):
+            human = self.app.scene3d.selectedHuman
+            human.updateBreastFirmness(human.getBreastFirmness(), value)
+            human.setBreastFirmness(value)
+            human.meshData.update()
+        
         @self.breastFirmnessSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
@@ -467,9 +481,8 @@ class DetailModelingTaskView(gui3d.TaskView):
     def syncSliders(self):
         human = self.app.scene3d.selectedHuman
         self.genitalsSlider.setValue(human.getGenitals())
-        self.breastCupSlider.setValue(human.getBreastSize())
+        self.breastSizeSlider.setValue(human.getBreastSize())
         self.breastFirmnessSlider.setValue(human.getBreastFirmness())
-
 
 class MicroModelingTaskView(gui3d.TaskView):
 
