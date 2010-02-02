@@ -356,6 +356,13 @@ class DetailModelingTaskView(gui3d.TaskView):
                                            self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0)
 
         @self.genitalsSlider.event
+        def onChanging(value):
+            human = self.app.scene3d.selectedHuman
+            human.updateGenitals(human.getGenitals(), value)
+            human.setGenitals(value)
+            human.meshData.update()
+            
+        @self.genitalsSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Genitals', value, self.syncSliders))

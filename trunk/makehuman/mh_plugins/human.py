@@ -440,6 +440,24 @@ class Human(gui3d.Object):
         else:
             return None
             
+    def updateGenitals(self, previous, next):
+        self.applyGenitalTargets(max(0.0, next) - max(0.0, previous), min(0.0, previous) - min(0.0, next))
+            
+    def applyGenitalTargets(self, maleGenitals, femaleGenitals):
+        detailTargets = {}
+        
+        detailTargets[self.targetFemaleGenitalsChild] = femaleGenitals * self.childVal
+        detailTargets[self.targetFemaleGenitalsYoung] = femaleGenitals * self.youngVal
+        detailTargets[self.targetFemaleGenitalsOld] = femaleGenitals * self.oldVal
+        detailTargets[self.targetMaleGenitalsChild] = maleGenitals * self.childVal
+        detailTargets[self.targetMaleGenitalsYoung] = maleGenitals * self.youngVal
+        detailTargets[self.targetMaleGenitalsOld] = maleGenitals * self.oldVal
+        
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+            
     def updateBreastSize(self, previous, next):
         breastCupValues = [0 for i in xrange(0, 9)]
         
@@ -646,7 +664,7 @@ class Human(gui3d.Object):
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 print 'APP: %s, VAL: %f' % (k, v)
-            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
             
     def updateNose(self, previous, next):
         noseValues = [0 for i in xrange(0, 13)]
@@ -776,17 +794,8 @@ class Human(gui3d.Object):
 
         maleGenitals = max(0.0, self.genitals)
         femaleGenitals = -min(0.0, self.genitals)
-        detailTargets[self.targetFemaleGenitalsChild] = femaleGenitals * self.childVal
-        detailTargets[self.targetFemaleGenitalsYoung] = femaleGenitals * self.youngVal
-        detailTargets[self.targetFemaleGenitalsOld] = femaleGenitals * self.oldVal
-        detailTargets[self.targetMaleGenitalsChild] = maleGenitals * self.childVal
-        detailTargets[self.targetMaleGenitalsYoung] = maleGenitals * self.youngVal
-        detailTargets[self.targetMaleGenitalsOld] = maleGenitals * self.oldVal
         
-        for (k, v) in detailTargets.iteritems():
-            if v != 0.0:
-                print 'APP: %s, VAL: %f' % (k, v)
-            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+        self.applyGenitalTargets(maleGenitals, femaleGenitals)
 
         # breastCup goes from 1 to 8
         breastCup = 1 + self.breastSize * 7
