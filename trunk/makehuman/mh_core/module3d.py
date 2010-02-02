@@ -98,8 +98,13 @@ class Vert:
       [v1,v2,v3,v4]
 
     However, the C vertex list will repeat vertices that are shared by more
-    than one face. So, the C vertex list will be based on the list:
+    than one face in the faces do not belong to the same group. So, the C
+    vertex list will be based on the list:
 
+      [v1,v2,v3,v4]
+      
+      or
+      
       [v1,v2,v3,v3,v2,v4]
 
     In addition, the C vertex list is actually an expanded coordinate list,
@@ -138,7 +143,7 @@ class Vert:
     - **self.no**: *float list*. The normal of this vertex (or 0).
       Default: [0, 0, 0].
     - **self.object**: *Object3d*. The object of which this vertex is a part.
-      Default: 0
+      Default: None
     - **self.sharedFaces**: *faces list*. The list of faces that share this vertex.
     - **self.indicesInFullVertArray**: *Int list*. The list of corresponding vertices in the C OpenGL list.
     - **self.idx**: *Int* The index of this vertex in the vertices list.
@@ -168,7 +173,7 @@ class Vert:
             *int*. The index of this vertex in the vertices list. Default is 0.
 
         object:
-            *Object3d*. The Object3D object that uses this vertex. Default is 0.
+            *Object3d*. The Object3D object that uses this vertex. Default is None.
 
         sfidx:
             *int list*. A list of indices of faces that share this vertex. Default is empty.
@@ -361,16 +366,14 @@ class Face:
       [[r,g,b,a],[r,g,b,a],[r,g,b,a]] used as the 3 vertex colors (including an alpha channel).
     - **self.colorID**: *list of list of ints*. A list of 3 integers (0-255) [index1,index2,index3]
       used as a 'selection' color.
-    - **self.uv**: *list of list of floats*. A list of a 3 lists of 2 floats [[u,v],[u,v],[u,v]]
-      holding the UV coordinates for the uv-mapping of textures to this face.
+    - **self.uv**: *list of ints*. A list of 3 ints [i,i,i]
+      holding the index to the UV coordinates in the objects' uvValues list for the uv-mapping of textures to this face.
     """
 
     def __init__(self, v0, v1, v2):
         """
         This is the constructor method for the Face class.
         It initializes all face attributes.
-
-
 
         Parameters
         ----------
