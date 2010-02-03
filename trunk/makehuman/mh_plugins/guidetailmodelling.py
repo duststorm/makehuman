@@ -364,7 +364,6 @@ class DetailModelingTaskView(gui3d.TaskView):
                 self.genitals = human.getGenitals()
             human.updateGenitals(self.genitals, value)
             self.genitals = min(max(value, -1.0), 1.0)
-            human.meshData.update()
             
         @self.genitalsSlider.event
         def onChange(value):
@@ -384,7 +383,6 @@ class DetailModelingTaskView(gui3d.TaskView):
                 self.breastSize = human.getBreastSize()
             human.updateBreastSize(self.breastSize, value)
             self.breastSize = min(1.0, max(0.0, value))
-            human.meshData.update()
             
         @self.breastSizeSlider.event
         def onChange(value):
@@ -404,7 +402,6 @@ class DetailModelingTaskView(gui3d.TaskView):
                 self.breastFirmness = human.getBreastFirmness()
             human.updateBreastFirmness(self.breastFirmness, value)
             self.breastFirmness = min(1.0, max(0.0, value))
-            human.meshData.update()
         
         @self.breastFirmnessSlider.event
         def onChange(value):
@@ -424,7 +421,6 @@ class DetailModelingTaskView(gui3d.TaskView):
                 self.nose = human.getNose()
             human.updateNose(self.nose, value)
             self.nose = min(1.0, max(0.0, value))
-            human.meshData.update()
         
         @self.noseSlider.event
         def onChange(value):
