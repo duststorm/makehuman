@@ -900,6 +900,26 @@ class Object3D:
             if fg.name == name:
                 return fg
         return None
+        
+    def getVerticesAndFacesForGroups(self, groupNames):
+        vertices = []
+        faces = []
+        
+        for name in groupNames:
+          group = self.getFaceGroup(name)
+          faces.extend(group.faces)
+          for f in group.faces:
+              vertices.extend(f.verts)
+        vertices = set(vertices)
+        return vertices, faces
+        
+    def updateGroups(self, groupnames, recalcNormals = True, update = True):
+        if recalcNormals or update:
+          vertices, faces = self.getVerticesAndFacesForGroups(groupnames)
+          if recalcNormals:
+            self.calcNormals(1, 1, vertices, faces)
+          if update:
+            self.update(vertices)
 
     def setCameraProjection(self, cameraMode):
         """
