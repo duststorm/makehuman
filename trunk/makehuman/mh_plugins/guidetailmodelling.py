@@ -355,63 +355,82 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_genitals.png'), self.app.getThemeResource('images', 'slider.png'),
                                            self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0)
 
+        self.genitals = None
+        
         @self.genitalsSlider.event
         def onChanging(value):
             human = self.app.scene3d.selectedHuman
-            human.updateGenitals(human.getGenitals(), value)
-            human.setGenitals(value)
+            if self.genitals == None:
+                self.genitals = human.getGenitals()
+            human.updateGenitals(self.genitals, value)
+            self.genitals = min(max(value, -1.0), 1.0)
             human.meshData.update()
             
         @self.genitalsSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Genitals', value, self.syncSliders))
+            self.genitals = None
 
         self.breastSizeSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_cup.png'), self.app.getThemeResource('images', 'slider.png'),
                                             self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 139, 9.2], value=0.5, min=0, max=1)
 
+        self.breastSize = None
+        
         @self.breastSizeSlider.event
         def onChanging(value):
             human = self.app.scene3d.selectedHuman
-            human.updateBreastSize(human.getBreastSize(), value)
-            human.setBreastSize(value)
+            if self.breastSize == None:
+                self.breastSize = human.getBreastSize()
+            human.updateBreastSize(self.breastSize, value)
+            self.breastSize = min(1.0, max(0.0, value))
             human.meshData.update()
             
         @self.breastSizeSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'BreastSize', value, self.syncSliders))
+            self.breastSize = None
 
         self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_firmness.png'), self.app.getThemeResource('images', 'slider.png'
                                                  ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 173, 9.2], value=0.5, min=0, max=1)
-
+        
+        self.breastFirmness = None
+        
         @self.breastFirmnessSlider.event
         def onChanging(value):
             human = self.app.scene3d.selectedHuman
-            human.updateBreastFirmness(human.getBreastFirmness(), value)
-            human.setBreastFirmness(value)
+            if self.breastFirmness == None:
+                self.breastFirmness = human.getBreastFirmness()
+            human.updateBreastFirmness(self.breastFirmness, value)
+            self.breastFirmness = min(1.0, max(0.0, value))
             human.meshData.update()
         
         @self.breastFirmnessSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
+            self.breastFirmness = None
 
         self.noseSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
                                                  ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0)
 
+        self.nose = None
+        
         @self.noseSlider.event
         def onChanging(value):
             human = self.app.scene3d.selectedHuman
-            human.updateNose(human.getNose(), value)
-            human.setNose(value)
+            if self.nose == None:
+                self.nose = human.getNose()
+            human.updateNose(self.nose, value)
+            self.nose = min(1.0, max(0.0, value))
             human.meshData.update()
         
         @self.noseSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
-            human.setNose(value)
-            human.applyAllTargets(self.app.progress)
+            self.app.do(DetailAction(human, 'Nose', value, self.syncSliders))
+            self.nose = None
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
@@ -490,6 +509,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.genitalsSlider.setValue(human.getGenitals())
         self.breastSizeSlider.setValue(human.getBreastSize())
         self.breastFirmnessSlider.setValue(human.getBreastFirmness())
+        self.noseSlider.setValue(human.getNose())
 
 class MicroModelingTaskView(gui3d.TaskView):
 
