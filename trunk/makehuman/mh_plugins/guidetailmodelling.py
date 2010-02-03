@@ -359,11 +359,12 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.genitalsSlider.event
         def onChanging(value):
-            human = self.app.scene3d.selectedHuman
-            if self.genitals == None:
-                self.genitals = human.getGenitals()
-            human.updateGenitals(self.genitals, value)
-            self.genitals = min(max(value, -1.0), 1.0)
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.genitals == None:
+                    self.genitals = human.getGenitals()
+                human.updateGenitals(self.genitals, value, self.app.settings.realtimeNormalUpdates)
+                self.genitals = min(max(value, -1.0), 1.0)
             
         @self.genitalsSlider.event
         def onChange(value):
@@ -378,11 +379,12 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.breastSizeSlider.event
         def onChanging(value):
-            human = self.app.scene3d.selectedHuman
-            if self.breastSize == None:
-                self.breastSize = human.getBreastSize()
-            human.updateBreastSize(self.breastSize, value)
-            self.breastSize = min(1.0, max(0.0, value))
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.breastSize == None:
+                    self.breastSize = human.getBreastSize()
+                human.updateBreastSize(self.breastSize, value, self.app.settings.realtimeNormalUpdates)
+                self.breastSize = min(1.0, max(0.0, value))
             
         @self.breastSizeSlider.event
         def onChange(value):
@@ -397,11 +399,12 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.breastFirmnessSlider.event
         def onChanging(value):
-            human = self.app.scene3d.selectedHuman
-            if self.breastFirmness == None:
-                self.breastFirmness = human.getBreastFirmness()
-            human.updateBreastFirmness(self.breastFirmness, value)
-            self.breastFirmness = min(1.0, max(0.0, value))
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.breastFirmness == None:
+                    self.breastFirmness = human.getBreastFirmness()
+                human.updateBreastFirmness(self.breastFirmness, value, self.app.settings.realtimeNormalUpdates)
+                self.breastFirmness = min(1.0, max(0.0, value))
         
         @self.breastFirmnessSlider.event
         def onChange(value):
@@ -416,11 +419,12 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.noseSlider.event
         def onChanging(value):
-            human = self.app.scene3d.selectedHuman
-            if self.nose == None:
-                self.nose = human.getNose()
-            human.updateNose(self.nose, value)
-            self.nose = min(1.0, max(0.0, value))
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.nose == None:
+                    self.nose = human.getNose()
+                human.updateNose(self.nose, value, self.app.settings.realtimeNormalUpdates)
+                self.nose = min(1.0, max(0.0, value))
         
         @self.noseSlider.event
         def onChange(value):
