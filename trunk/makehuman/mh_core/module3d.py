@@ -910,7 +910,7 @@ class Object3D:
           faces.extend(group.faces)
           for f in group.faces:
               vertices.extend(f.verts)
-        vertices = set(vertices)
+        #vertices = set(vertices)
         return vertices, faces
         
     def updateGroups(self, groupnames, recalcNormals = True, update = True):
