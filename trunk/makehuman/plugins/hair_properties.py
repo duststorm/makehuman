@@ -63,12 +63,24 @@ class HairPropertiesTaskView(gui3d.TaskView):
         #self.colorPreviewLabel.setText('Hair color')
 
         @self.redSlider.event
+        def onChanging(value):
+            self.setColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
+            
+        @self.redSlider.event
         def onChange(value):
             self.changeColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
 
         @self.greenSlider.event
+        def onChanging(value):
+            self.setColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
+            
+        @self.greenSlider.event
         def onChange(value):
             self.changeColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
+            
+        @self.blueSlider.event
+        def onChanging(value):
+            self.setColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
 
         @self.blueSlider.event
         def onChange(value):
