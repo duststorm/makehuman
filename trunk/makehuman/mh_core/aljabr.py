@@ -31,8 +31,7 @@ The paper was so important that Al-jabr is the root of modern word I{algebra} an
 
 __docformat__ = 'restructuredtext'
 
-import math
-
+from math import sqrt, cos, sin, tan, atan2
 
 def vsub(vect1, vect2):
     """
@@ -94,7 +93,7 @@ def vlen(vect):
 
     """
 
-    return math.sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
+    return sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
 
 
 def vnorm(vect):
@@ -112,7 +111,7 @@ def vnorm(vect):
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
-    length = math.sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
+    length = sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
 
     # Keep the program from blowing up by providing an acceptable
     # value for vectors whose length may be calculated too close to zero.
@@ -145,7 +144,7 @@ def vdist(vect1, vect2):
     """
 
     joiningVect = [vect1[0] - vect2[0], vect1[1] - vect2[1], vect1[2] - vect2[2]]
-    return math.sqrt(joiningVect[0] * joiningVect[0] + joiningVect[1] * joiningVect[1] + joiningVect[2] * joiningVect[2])
+    return sqrt(joiningVect[0] * joiningVect[0] + joiningVect[1] * joiningVect[1] + joiningVect[2] * joiningVect[2])
 
 
 def vcross(vect1, vect2):
@@ -252,7 +251,7 @@ def vunit(vect):
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
-    length = math.sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
+    length = sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
     return [vect[0] / length, vect[1] / length, vect[2] / length]
 
 
@@ -297,12 +296,12 @@ def makeRotEulerMtx3D(rx, ry, rz):
         *float*. The angle of rotation (in radians) around the z-axis
     """
 
-    SRX = math.sin(rx)
-    SRY = math.sin(ry)
-    SRZ = math.sin(rz)
-    CRX = math.cos(rx)
-    CRY = math.cos(ry)
-    CRZ = math.cos(rz)
+    SRX = sin(rx)
+    SRY = sin(ry)
+    SRZ = sin(rz)
+    CRX = cos(rx)
+    CRY = cos(ry)
+    CRZ = cos(rz)
 
     return [[CRY * CRZ, CRY * SRZ, -SRY], [(CRZ * SRX) * SRY - CRX * SRZ, CRX * CRZ + (SRX * SRY) * SRZ, CRY * SRX], [SRX * SRZ + (CRX * CRZ) * SRY, (CRX * SRY) * SRZ
              - CRZ * SRX, CRX * CRY]]
@@ -354,9 +353,9 @@ def makeRotMatrix(angle, axis):
     x = axis[0]
     y = axis[1]
     z = axis[2]
-    t = 1 - math.cos(a)
-    c = math.cos(a)
-    s = math.sin(a)
+    t = 1 - cos(a)
+    c = cos(a)
+    s = sin(a)
     M11 = (t * x) * x + c
     M12 = (t * x) * y + s * z
     M13 = (t * x) * z - s * y
@@ -490,7 +489,7 @@ def planeNorm(vect1, vect2, vect3):
 
     # Normalize
 
-    length = math.sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2])
+    length = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2])
     return [normal[0] / length, normal[1] / length, normal[2] / length]
 
 
@@ -498,11 +497,11 @@ def focalToFov(dimension, focal):
     if focal == 0:
         return 0
     else:
-        return 2 * math.atan2(dimension * 0.5, focal)
+        return 2 * atan2(dimension * 0.5, focal)
 
 
 def fovToFocal(dimension, fov):
-    return dimension / (2 * math.tan(fov / 2))
+    return dimension / (2 * tan(fov / 2))
 
 
 def in2pts(point1, point2, t):
