@@ -162,6 +162,17 @@ class Human(gui3d.Object):
 
         self.hairFile = 'data/hairs/default.hair'
         self.hairColor = [0.41, 0.23, 0.04]
+        
+        self.genitalVertices, self.genitalFaces = self.meshData.getVerticesAndFacesForGroups(["pelvis-genital-area"])
+        
+        breastNames = ["l-torso-inner-pectoralis", "l-torso-middle-pectoralis", "l-torso-outer-pectoralis", "l-torso-upper-pectoralis",
+                "l-torso-lower-pectoralis", "l-torso-nipple",
+                "r-torso-inner-pectoralis", "r-torso-middle-pectoralis", "r-torso-outer-pectoralis", "r-torso-upper-pectoralis",
+                "r-torso-lower-pectoralis", "r-torso-nipple"]
+        self.breastVertices, self.breastFaces = self.meshData.getVerticesAndFacesForGroups(breastNames)
+        
+        noseNames = ["l-nose-nostril", "nose-bridge", "nose-glabella", "nose-philtrum", "nose-sellion", "nose-tip", "r-nose-nostril"]
+        self.noseVertices, self.noseFaces = self.meshData.getVerticesAndFacesForGroups(noseNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -443,8 +454,10 @@ class Human(gui3d.Object):
     def updateGenitals(self, previous, next, recalcNormals = True, update = True):
         self.applyGenitalTargets(max(0.0, next) - max(0.0, previous), min(0.0, previous) - min(0.0, next))
             
-        groupnames = ["pelvis-genital-area"]
-        self.meshData.updateGroups(groupnames, recalcNormals, update)
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.genitalVertices, self.genitalFaces)
+        if update:
+          self.meshData.update(self.genitalVertices)
             
     def applyGenitalTargets(self, maleGenitals, femaleGenitals):
         detailTargets = {}
@@ -482,11 +495,10 @@ class Human(gui3d.Object):
             
         self.applyBreastTargets(breastCupValues, [1 - self.breastFirmness, self.breastFirmness])
         
-        groupnames = ["l-torso-inner-pectoralis", "l-torso-middle-pectoralis", "l-torso-outer-pectoralis", "l-torso-upper-pectoralis",
-                "l-torso-lower-pectoralis", "l-torso-nipple",
-                "r-torso-inner-pectoralis", "r-torso-middle-pectoralis", "r-torso-outer-pectoralis", "r-torso-upper-pectoralis",
-                "r-torso-lower-pectoralis", "r-torso-nipple"]
-        self.meshData.updateGroups(groupnames, recalcNormals, update)
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
+        if update:
+          self.meshData.update(self.breastVertices)
         
     def updateBreastFirmness(self, previous, next, recalcNormals = True, update = True):
         breastCupValues = [0 for i in xrange(0, 9)]
@@ -500,11 +512,10 @@ class Human(gui3d.Object):
             
         self.applyBreastTargets(breastCupValues, [previous - next, next - previous])
             
-        groupnames = ["l-torso-inner-pectoralis", "l-torso-middle-pectoralis", "l-torso-outer-pectoralis", "l-torso-upper-pectoralis",
-                "l-torso-lower-pectoralis", "l-torso-nipple",
-                "r-torso-inner-pectoralis", "r-torso-middle-pectoralis", "r-torso-outer-pectoralis", "r-torso-upper-pectoralis",
-                "r-torso-lower-pectoralis", "r-torso-nipple"]
-        self.meshData.updateGroups(groupnames, recalcNormals, update)
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
+        if update:
+          self.meshData.update(self.breastVertices)
           
     def applyBreastTargets(self, values, firmness):  
         averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
@@ -702,8 +713,10 @@ class Human(gui3d.Object):
             
         self.applyNoseTargets(noseValues)
         
-        groupnames = ["l-nose-nostril", "nose-bridge", "nose-glabella", "nose-philtrum", "nose-sellion", "nose-tip", "r-nose-nostril"]
-        self.meshData.updateGroups(groupnames, recalcNormals, update)
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.noseVertices, self.noseFaces)
+        if update:
+          self.meshData.update(self.noseVertices)
 
     def applyNoseTargets(self, values):
         for i in xrange(1, 13):

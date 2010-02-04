@@ -299,6 +299,7 @@ class Vert:
 
         """
 
+        
         no = [0.0, 0.0, 0.0]
         for f in self.sharedFaces:
             no[0] += f.no[0]
@@ -910,7 +911,7 @@ class Object3D:
           faces.extend(group.faces)
           for f in group.faces:
               vertices.extend(f.verts)
-        #vertices = set(vertices)
+        vertices = list(set(vertices))
         return vertices, faces
         
     def updateGroups(self, groupnames, recalcNormals = True, update = True):
