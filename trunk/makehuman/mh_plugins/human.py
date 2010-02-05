@@ -719,10 +719,20 @@ class Human(gui3d.Object):
           self.meshData.update(self.noseVertices)
 
     def applyNoseTargets(self, values):
+        detailTargets = {}
+        
         for i in xrange(1, 13):
-            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-young-nose%i.target'% i, self.youngVal * self.maleVal * values[i], None, 0, 0)
-            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-child-nose%i.target'% i, self.childVal * self.maleVal * values[i], None, 0, 0)
-            algos3d.loadTranslationTarget(self.meshData, 'data/targets/details/neutral_male-old-nose%i.target'% i, self.oldVal * self.maleVal * values[i], None, 0, 0)
+            detailTargets['data/targets/details/neutral_male-young-nose%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_male-child-nose%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_male-old-nose%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-young-nose%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-child-nose%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            #detailTargets['data/targets/details/neutral_female-old-nose%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None):
         """
