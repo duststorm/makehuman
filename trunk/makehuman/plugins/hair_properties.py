@@ -94,6 +94,9 @@ class HairPropertiesTaskView(gui3d.TaskView):
         c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
         for g in self.colorPreview.mesh.facesGroups:
             g.setColor(c)
+        self.redSliderLabel.setText('Red:%i' % c[0])
+        self.greenSliderLabel.setText('Green:%i' % c[1])
+        self.blueSliderLabel.setText('Blue:%i' % c[2])
 
     def onShow(self, event):
         gui3d.TaskView.onShow(self, event)
@@ -103,11 +106,8 @@ class HairPropertiesTaskView(gui3d.TaskView):
     def syncSliders(self):
         hairColor = self.app.scene3d.selectedHuman.hairColor
         self.redSlider.setValue(hairColor[0])
-        self.redSliderLabel.setText('Red: %.2f' % hairColor[0])
         self.greenSlider.setValue(hairColor[1])
-        self.greenSliderLabel.setText('Green: %.2f' % hairColor[1])
         self.blueSlider.setValue(hairColor[2])
-        self.blueSliderLabel.setText('Blue: %.2f' % hairColor[2])
         self.setColor(hairColor)
 
 
