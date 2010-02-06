@@ -7,7 +7,7 @@
 
 **Authors:**		   Thomas Larsson
 
-**Copyamtht(c):**      MakeHuman Team 2001-2010
+**Copyright(c):**      MakeHuman Team 2001-2010
 
 **Licensing:**		 GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -15,6 +15,7 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
+Version 0.5
 
 """
 
@@ -45,7 +46,7 @@ import string
 
 MAJOR_VERSION = 0
 MINOR_VERSION = 5
-MHX249 = True
+MHX249 = False
 Blender24 = False
 Blender25 = True
 
@@ -63,52 +64,105 @@ T_Face = 0x40
 T_Shape = 0x80
 T_Rot90 = 0x100
 
-toggle = T_Replace + T_ArmIK + T_LegIK
+T_Rigify = 0x1000
+
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
 
 useMesh = 1
 doSmash = 1
-verbosity = 2
+verbosity = 4
 warnedTextureDir = False
 warnedVersion = False
 
-
-#
-#	Dictionaries
-#
 
 true = True
 false = False
 Epsilon = 1e-6
 nErrors = 0
-
-_object = dict()
-_mesh = dict()
-_block = dict()
-_armature = dict()
-_lamp = dict()
-_camera = dict()
-_lattice = dict()
-_particle = dict()
-_material = dict()
-_texture = dict()
-_image = dict()
-_curve = dict()
-_lattice = dict()
-_text3d = dict()
-_action = dict()
-_ipo = dict()
-_icu = dict()
-_group = dict()
-_joint = dict()
+theTempDatum = None
 
 todo = []
+
+#
+#	Dictionaries
+#
+
+loadedData = {
+	'NONE' : {},
+
+	'Object' : {},
+	'Mesh' : {},
+	'Armature' : {},
+	'Lamp' : {},
+	'Camera' : {},
+	'Lattice' : {},
+	'Curve' : {},
+
+	'Material' : {},
+	'Image' : {},
+	'MaterialTextureSlot' : {},
+	'Texture' : {},
+	
+	'Bone' : {},
+	'Rigify' : {},
+
+	'Action' : {},
+	'Group' : {},
+
+	'MeshTextureFaceLayer' : {},
+	'MeshColorLayer' : {},
+	'VertexGroup' : {},
+	'ShapeKey' : {},
+	'ParticleSystem' : {},
+
+	'ObjectConstraints' : {},
+	'ObjectModifiers' : {},
+	'MaterialSlot' : {},
+}
+
+Plural = {
+	'Object' : 'objects',
+	'Mesh' : 'meshes',
+	'Curve' : 'curves',
+	'Empty' : 'empties',
+	'Armature' : 'armatures',
+	'Bone' : 'bones',
+	'Pose' : 'poses',
+	'PoseBone' : 'pose_bones',
+	'Material' : 'materials',
+	'Texture' : 'textures',
+	'Image' : 'images',
+	'Camera' : 'cameras',
+	'Lamp' : 'lamps',
+	'World' : 'worlds',
+}
+
+#
+#	Creators
+#
+
+def uvtexCreator(me, name):
+	print("uvtexCreator", me, name)
+	me.add_uv_texture()
+	uvtex = me.uv_textures[-1]
+	uvtex.name = name
+	return uvtex
+
+
+def vertcolCreator(me, name):
+	print("vertcolCreator", me, name)
+	me.add_vertex_color()
+	vcol = me.vertex_colors[-1]
+	vcol.name = name
+	return vcol
+		
 
 #
 #	loadMhx(filePath, context, flags):
 #
 
 def loadMhx(filePath, context, flags):
-	global toggle 
+	global toggle
 	toggle = flags
 	readMhxFile(filePath)
 	return
@@ -139,6 +193,7 @@ def readMhxFile(filePath):
 	print( "Tokenizing" )
 	lineNo = 0
 	for line in file: 
+		# print(line)
 		lineSplit= line.split()
 		lineNo += 1
 		if len(lineSplit) == 0:
@@ -157,8 +212,12 @@ def readMhxFile(filePath):
 				print( line )
 				dummy = stack.pop()
 		elif lineSplit[-1] == ';':
-			key = lineSplit[0]
-			tokens.append([key,lineSplit[1:-1],[]])
+			if lineSplit[0] == '\\':
+				key = lineSplit[1]
+				tokens.append([key,lineSplit[2:-1],[]])
+			else:
+				key = lineSplit[0]
+				tokens.append([key,lineSplit[1:-1],[]])
 		else:
 			key = lineSplit[0]
 			tokens.append([key,lineSplit[1:],[]])
@@ -173,75 +232,36 @@ def readMhxFile(filePath):
 	print( "Parsing" )
 	parse(tokens)
 	
-	for (expr, globals, locals) in todo:
+	for (expr, glbals, lcals) in todo:
 		try:
-			exec(expr, globals, locals)
+			print("Doing %s" % expr)
+			exec(expr, glbals, lcals)
 		except:
 			msg = "Failed: "+expr
-			# print( msg )
+			print( msg )
 			nErrors += 1
 			#raise NameError(msg)
 
+	processRigify()
 	time2 = time.clock()
 	msg = "File %s loaded in %g s" % (fileName, time2-time1)
 	if nErrors:
 		msg += " but there where %d errors. " % (nErrors)
 	print(msg)
-	print("Toggle was 0x%x\n" % toggle)
 	return	# loadMhx
 
 #
-#	defaultKey(ext, val, var, globals, locals):
+#	getObject(name, var, glbals, lcals):
 #
 
-def defaultKey(ext, val, var, globals, locals):
-	nargs = len(val)-1
-	if nargs == 0:
-		expr = var+"."+ext+" = "+val[0]
-		try:
-			exec(expr, globals, locals)
-		except:
-			todo.append((expr, globals, locals))
-	else:
-		for n in range(nargs):
-			expr  = var+"."+ext+"["+str(n)+"] = "+val[n]
-			try:
-				exec(expr, globals, locals)
-			except:
-				todo.append((expr, globals, locals))
-	return
-
-#
-#	parseDefault(data, tokens):
-#
-
-def parseDefault(data, tokens):
-	for (key, val, sub) in tokens:	
-		defaultKey(key, val, "data", globals(), locals())
-
-#
-#
-#
-
-def Bool(string):
-	if string == 'True':
-		return True
-	elif string == 'False':
-		return False
-	else:
-		raise NameError("Bool %s?" % string)
-		
-#
-#	getObject(name, var, globals, locals):
-#
-
-def getObject(name, var, globals, locals):
+def getObject(name, var, glbals, lcals):
 	try:
-		ob = _object[name]
+		ob = loadedData['Object'][name]
 	except:
 		if name != "None":
-			expr = var+" = _object['"+name+"']"
-			todo.append((expr, globals, locals))
+			expr = "%s = loadedData['Object'][name]" % var
+			print("Todo ", expr)
+			todo.append((expr, glbals, lcals))
 		ob = None
 	return ob
 
@@ -250,9 +270,10 @@ def getObject(name, var, globals, locals):
 #
 
 def parse(tokens):
-	global warnedVersion
+	global warnedVersion, MHX249
 	
 	for (key, val, sub) in tokens:	
+		print("Parse %s" % key)
 		data = None
 		if key == 'MHX':
 			if int(val[0]) != MAJOR_VERSION and int(val[1]) != MINOR_VERSION and not warnedVersion:
@@ -270,6 +291,10 @@ def parse(tokens):
 				res = False
 			if res:
 				parse(sub)
+
+		elif MHX249:
+			pass
+
 		elif key == 'print':
 			msg = concatList(val)
 			print(msg)
@@ -279,25 +304,56 @@ def parse(tokens):
 		elif key == 'error':
 			msg = concatList(val)
 			raise NameError(msg)			
-		elif key == "object":
+		elif key == "Object":
 			parseObject(val, sub)
-		elif key == "joints":
-			parseJoints(val, sub)
-		elif key == "mesh":
+		elif key == "Mesh":
 			data = parseMesh(val, sub)
-		elif key == "armature":
+		elif key == "Curve":
+			data = parseCurve(val, sub)
+		elif key == "Armature":
 			data = parseArmature(val, sub)
-		elif key == "pose":
+		elif key == "Pose":
 			data = parsePose(val, sub)
-		elif key == "material":
+		elif key == "Action":
+			data = parseAction(val, sub)
+		elif key == "Material":
 			data = parseMaterial(val, sub)
-		elif key == "texture":
+		elif key == "Texture":
 			data = parseTexture(val, sub)
-		elif key == "image":
+		elif key == "Image":
 			data = parseImage(val, sub)
+		else:
+			data = parseDefaultType(key, val, sub)				
+
 		if data:
 			print( data )
 	return
+
+#
+#	parseDefaultType(typ, args, tokens):
+#
+
+def parseDefaultType(typ, args, tokens):
+	global todo
+
+	name = args[0]
+	data = None
+	expr = "bpy.data.%s.new('%s')" % (Plural[typ], name)
+	print(expr)
+	data = eval(expr)
+	print("  ok", data)
+
+	bpyType = typ.capitalize()
+	print(bpyType, name, data)
+	loadedData[bpyType][name] = data
+	if data == None:
+		return None
+
+	for (key, val, sub) in tokens:
+		#print("%s %s" % (key, val))
+		defaultKey(key, val, sub, 'data', [], globals(), locals())
+	print("Done ", data)
+	return data
 	
 #
 #	concatList(elts)
@@ -310,146 +366,87 @@ def concatList(elts):
 	return string
 
 #
-#	buildLayerMask(mask, n, list):
+#	parseAnimationData(anim, args, tokens):
+#	parseAction(args, tokens):
+#	parseFCurve(fcu, args, tokens):
+#	parseKeyFramePoint(pt, args, tokens):
+#
+#	parseDriver(drv, args, tokens):
+#	parseDriverVariable(var, args, tokens):
 #
 
-def buildLayerMask(mask, n, list):
-	for i in range(n):
-		if mask & 1:
-			list.append(True)
+def parseAnimationData(anim, args, tokens):
+	for (key, val, sub) in tokens:
+		if key == 'FCurve':
+			fcu = parseFCurve(anim.fcurves, val, sub)
 		else:
-			list.append(False)
-		mask = mask >> 1
-	#print("Layer %x -> %s" % (mask, list))
-	return list
+			defaultKey(key, val, sub, 'anim', [], globals(), locals())
+	return act
 
-#
-#	parseObject(args, tokens):
-#
+def parseAction(args, tokens):
+	name = args[0].replace(' ', '_')
+	act = bpy.data.actions.new(name)
+	loadedData['Action'][name] = act
+	#act.animation_data_create()
+	#bpy.context.scene.actions.active = act
+	bpy.ops.action.keyframe_insert(type='ALL')
+	for (key, val, sub) in tokens:
+		if key == 'FCurve':
+			fcu = parseFCurve(act.fcurves, val, sub)
+		else:
+			defaultKey(key, val, sub, 'act', [], globals(), locals())
+	return act
 
-ObjectTranslation = {
-	'xRay' : 'x_ray'
-}
+'''
+bpy.ops.anim.keyframe_insert_menu(type=-2, confirm_success=False, always_prompt=False)
+bpy.ops.action.select_border(gesture_mode=3, xmin=33, xmax=73, ymin=319, ymax=370, axis_range=False)
+bpy.ops.action.duplicate(mode=17)
+bpy.ops.transform.transform(mode='TIME_TRANSLATE', value=(20, 0, 0, 0), axis=(0, 0, 0), proportional='DISABLED', proportional_editing_falloff='SMOOTH', proportional_size=1, mirror=False, constraint_axis=(False, False, False), constraint_orientation='GLOBAL')
+'''
 
-def parseObject(args, tokens):
-	if verbosity > 2:
-		print( "Parsing object %s" % args )
-	name = args[0]
-	type = args[1]
+def parseFCurve(fcurves, args, tokens):
+	print(fcurves)
+	return
+	fcu.data_path = args[0]
+	fcu.array_index = int(args[1])
+
+	for (key, val, sub) in tokens:
+		if key == 'kp':
+			bpy.ops.anim.keyframe_insert_menu(type=-2, confirm_success=False, always_prompt=False)
+			pt = fcu.keyframe_points.new()
+			pt = parseKeyFramePoint(pt, val, sub)
+		else:
+			defaultKey(key, val, sub, 'fcu', [], globals(), locals())
+	return fcu
+
+def parseDriver(drv, args, tokens):
+	for (key, val, sub) in tokens:
+		if key == 'DriverVariable':
+			var = drv.variables.new()
+			var = parseDriverVariable(var, val, sub)
+		else:
+			defaultKey(key, val, sub, 'drv', [], globals(), locals())
+	return drv
+
+def parseDriverVariable(var, args, tokens):
+	for (key, val, sub) in tokens:
+		if key == 'Targets':
+			pass
+		else:
+			defaultKey(key, val, sub, 'var', [], globals(), locals())
+	return var
+
+
+def parseKeyFramePoint(pt, args, tokens):
+	pt.co = eval(args[0])
+	pt.handle1 = eval(args[1])
+	pt.handle2 = eval(args[2])
+	return pt
 	
-	try:
-		datName = args[2]
-	except:
-		datName = None
-
-	#print("Objects %s" % _object)
-	#print("Meshes %s" % _mesh)
-	#print("Amts %s" % _armature)
-
-	if type == "Mesh":
-		data = _mesh[datName]
-	elif type == "Armature":
-		data = _armature[datName]
-	else:
-		return
-
-	ob = _object[name]
-
-	for (key, val, sub) in tokens:
-		if key == "layers":
-			layers = buildLayerMask(int(val[0], 16) & 0x3ff, 10, [])
-			layers = buildLayerMask(int(val[1], 16) & 0x3ff, 10, layers)
-			ob.layers = layers
-		elif key == "matrix":
-			ob.matrix = parseMatrix(val, sub)
-		elif key == "modifier":
-			parseModifier(ob, val,sub)
-		elif key == "parent":
-			parseParent(ob, val,sub)
-		elif key == "constraint":
-			parseConstraint(ob.constraints, val, sub, name)
-		elif MHX249:
-			try:
-				key1 = ObjectTranslation[key]
-				defaultKey(key1, val, "ob", globals(), locals())
-			except:
-				pass
-		else:
-			defaultKey(key, val, "ob", globals(), locals())
-	return
-#
-#	createObject(type, name, data):
-#
-
-def createObject(type, name, data):
-	if verbosity > 2:
-		print( "Creating object %s %s %s" % (type, name, data) )
-	ob = bpy.data.objects.new(type.upper(), name)
-	if data:
-		ob.data = data
-	ob.name = name
-	_object[name] = ob
-	scn = bpy.context.scene
-	print("Scene %s %s" % (scn, ob))
-	print("Objs %s %s " % (scn.objects, scn.objects.values()))
-	scn.objects.link(ob)
-	return ob
-
-#
-#	parseMatrix(args, tokens)
-#
-
-def parseMatrix(args, tokens):
-	matrix = Matrix( [1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1] )
-	i = 0
-	for (key, val, sub) in tokens:
-		if key == 'row':	
-			matrix[i][0] = float(val[0])
-			matrix[i][1] = float(val[1])
-			matrix[i][2] = float(val[2])
-			matrix[i][3] = float(val[3])
-			i += 1
-	return matrix
-
-#
-#	parseParent(ob, args, tokens):
-#
-
-def parseParent(ob, args, tokens):
-	global todo
-	parent = args[0]
-	#parentType = int(args[1])
-	parentType = 'BONE'
-	extra = args[2]
-	expr = None
-
-	if parentType == 'OBJECT': 
-		expr = "ob.parent = _object[parent]"
-	elif parentType == 'CURVE':
-		expr = "ob.parent = _object[parent]"
-	elif parentType == 'LATTICE':
-		expr = "ob.parent = _object[parent]"
-	elif parentType == 'ARMATURE':
-		expr = "ob.parent = _object[parent]"
-	elif parentType == 'VERTEX': 
-		expr = "ob.parent_vertices = extra"
-	elif parentType == 'VERTEX_3': 
-		verts = extra.split("_")
-		if (ob.type != "Empty"):
-			expr = "ob.parent_vertices = verts"
-	elif parentType == 'BONE': 
-		if extra != "None":
-			expr = "ob.parent_bone = parent"
-
-	if expr:
-		try:
-			exec(expr)
-		except:
-			todo.append((expr, globals(), locals()))
-	return
-
 #
 #	parseMaterial(args, ext, tokens):
+#	parseMTex(mat, args, tokens):
+#	parseTexture(args, tokens):
 #
 
 def parseMaterial(args, tokens):
@@ -458,90 +455,55 @@ def parseMaterial(args, tokens):
 	mat = bpy.data.materials.new(name)
 	if mat == None:
 		return None
-	_material[name] = mat
-	print("Mat1 %s" % mat)
+	loadedData['Material'][name] = mat
+	print("Material %s %s %s" % (mat, name, loadedData['Material'][name]))
 	for (key, val, sub) in tokens:
-		if key == 'mtex':
+		if key == 'MTex':
 			parseMTex(mat, val, sub)
-		#elif key == 'active_texture':
-		#	mat.active_texture = _texture[val[0]]
-		elif key == 'diffuse_ramp':
-			mat.diffuse_ramp = parseRamp(sub)
-		elif key == 'halo': 
-			parseDefault(mat.halo, sub)
-		elif key == 'specular_ramp':
-			mat.specular_ramp = parseRamp(sub)
-		elif key == 'raytrace_mirror':
-			parseDefault(mat.raytrace_mirror, sub)
-		elif key == 'raytrace_transparency':
-			parseDefault(mat.raytrace_transparency, sub)
-		elif key == 'subsurface_scattering':
-			parseDefault(mat.subsurface_scattering, sub)
-		elif key == 'volume':
-			parseDefault(mat.volume, sub)
-		else:			
-			defaultKey(key, val, 'mat', globals(), locals())
-	return mat
-
-#
-#	parseRamp(ramp, tokens):
-#
-
-def parseRamp(ramp, tokens):
-	global todo
-	for (key,val,sub) in tokens:
-		if key == 'elements':
-			pass
 		else:
-			defaultKey(key, val, "ramp", globals(), locals())
-
-#
-#	parseMTex(mtex, args, tokens):
-#
+			defaultKey(key, val, sub, 'mat', ['specular_intensity', 'tangent_shading'], globals(), locals())
+	print("Done ", mat)
+	
+	return mat
 
 def parseMTex(mat, args, tokens):
 	global todo
-	if verbosity > 2:
-		print( "Parsing MTex %s" % args )
-
 	index = int(args[0])
 	texname = args[1]
-	#use = Bool(args[2])
-		
-	mat.add_texture()
+	texco = args[2]
+	use = args[3]
+
+	mat.add_texture(texture = loadedData['Texture'][texname], texture_coordinates = texco)
 	mtex = mat.textures[index]
-	mtex.texture = _texture[texname]
-	#mat.use_textures[index] = use
+	mat.use_textures[index] = Bool(use)
+	print("mtex", mtex)
 
 	for (key, val, sub) in tokens:
-		defaultKey(key, val, "mtex", globals(), locals())
+		defaultKey(key, val, sub, "mtex", [], globals(), locals())
 
 	return mtex
-
-			
-			
-#
-#	parseTexture(args, tokens):
-#
 
 def parseTexture(args, tokens):
 	global todo
 	if verbosity > 2:
 		print( "Parsing texture %s" % args )
-	typename = args[0].upper()
-	name = args[1]
+	name = args[0]
 	tex = bpy.data.textures.new(name)
-	tex.type = typename
+	typ = args[1]
+	print("TEX", tex)
+	tex.type = typ
 	tex = tex.recast_type()
-	_texture[name] = tex
+	print("RECAST", tex)
+	loadedData['Texture'][name] = tex
 	
 	for (key, val, sub) in tokens:
 		if key == 'image':
-			img = parseImage(val, sub)
-			tex.image = img
+			try:
+				tex.image = loadedData['Image'][val[0]]
+			except:
+				pass
 		else:
-			pass
-			#defaultKey(key, val, "tex", globals(), locals())
+			defaultKey(key, val,  sub, "tex", ['use_nodes', 'use_textures', 'contrast'], globals(), locals())
 
 	return tex
 	
@@ -570,7 +532,8 @@ def doLoadImage(filepath):
 
 
 def loadImage(filepath):
-	global TexDir, warnedTextureDir
+	global TexDir, warnedTextureDir, loadedData
+
 	texDir = os.path.expanduser(TexDir)
 	path1 = os.path.expanduser(filepath)
 	file1 = os.path.realpath(path1)
@@ -612,26 +575,112 @@ def parseImage(args, tokens):
 	global todo
 	img = None
 	for (key, val, sub) in tokens:
-		if key == 'filename':
+		if key == 'Filename':
 			filename = val[0]
-			for n in range(len(val)-1):
-				filename += " " + val[n+1]
+			for n in range(1,len(val)):
+				filename += " " + val[n]
 			img = loadImage(filename)
 		else:
-			defaultKey(key, val, "img", globals(), locals())
+			defaultKey(key, val,  sub, "img", ['depth', 'dirty', 'has_data', 'size', 'type'], globals(), locals())
 	print ("Image %s" % img )
+	loadedData['Image'][img.name] = img
 	return img
 
 #
-#	rot90(x, y, z, doRot)
+#	parseObject(args, tokens):
+#	createObject(type, name, data):
+#
+	
+def parseObject(args, tokens):
+	if verbosity > 2:
+		print( "Parsing object %s" % args )
+	name = args[0]
+	type = args[1]
+	datName = args[2]
+	try:
+		data = loadedData[type.capitalize()][datName]	
+	except:
+		data = None
+
+	if data == None and type != 'EMPTY':
+		print("Failed to find data: %s %s %s" % (name, type, datName))
+		return
+
+	try:
+		ob = loadedData['Object'][name]
+		print("Found data")
+	except:
+		ob = createObject(type, name, data)
+	bpy.context.scene.objects.active = ob
+
+	for (key, val, sub) in tokens:
+		if key == 'ParticleSystem':
+			parseParticleSystem(ob.particle_systems, val, sub)
+		else:
+			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
+	return
+
+def createObject(type, name, data):
+	if verbosity > 2:
+		print( "Creating object %s %s %s" % (type, name, data) )
+	ob = bpy.data.objects.new(name, type.upper())
+	if data:
+		ob.data = data
+	ob.name = name
+	loadedData['Object'][name] = ob
+	bpy.context.scene.objects.link(ob)
+	return ob
+
+#
+#	parseParticleSystem(particle_systems, args, tokens):
+#	parseParticles(particles, args, tokens):
+#	parseParticle(par, args, tokens):
 #
 
-def rot90(x, y, z, doRot):
-	global toggle
-	if (toggle & T_Rot90) and doRot:
-		return (float(x), -float(z), float(y))
-	else:
-		return (float(x), float(y), float(z))
+def parseParticleSystem(particle_systems, args, tokens):
+	print(particle_systems)
+	name = args[0]
+	typ = args[1]
+	#psys = particle_systems.new(name, typ)
+	bpy.ops.object.particle_system_add()
+	psys = particle_systems[-1]
+	psys.settings.type = typ
+	loadedData['ParticleSystem'][name] = psys
+	print("Psys", psys)
+
+	for (key, val, sub) in tokens:
+		if key == 'Particles':
+			parseParticles(psys, val, sub)
+		else:
+			defaultKey(key, val, sub, 'psys', [], globals(), locals())
+	return psys
+
+def parseParticles(psys, args, tokens):
+	particles = psys.particles
+	bpy.ops.particle.particle_edit_toggle()
+	n = 0
+	for (key, val, sub) in tokens:
+		if key == 'Particle':
+			parseParticle(particles[n], val, sub)
+			n += 1
+		else:
+			for par in particles:
+				defaultKey(key, val, sub, 'par', [], globals(), locals())
+	bpy.ops.particle.particle_edit_toggle()
+	return particles
+
+def parseParticle(par, args, tokens):
+	n = 0
+	for (key, val, sub) in tokens:
+		if key == 'h':
+			h = par.hair[n]
+			h.location = eval(val[0])
+			h.time = int(val[1])
+			h.weight = float(val[2])
+			n += 1
+		elif key == 'location':
+			par.location = eval(val[0])
+	return
 
 #
 #	unpackList(list_of_tuples):
@@ -654,20 +703,10 @@ def parseMesh (args, tokens):
 
 	mename = args[0]
 	obname = args[1]
-
-	# Create object here
-	bpy.ops.object.add(type='MESH')
-	ob = bpy.context.scene.objects.active
-	ob.name = obname
-	_object[obname] = ob
-	me = ob.data
-	me.name = mename
-	_mesh[mename] = me
-
-	if mename == 'Human':
-		mainMesh = True
-	else:
-		mainMesh = False
+	me = bpy.data.meshes.new(mename)
+	loadedData['Mesh'][mename] = me
+	ob = createObject('Mesh', obname, me)
+	print("Mesh", me, ob)
 
 	verts = []
 	edges = []
@@ -676,31 +715,12 @@ def parseMesh (args, tokens):
 	texFaces = []
 
 	for (key, val, sub) in tokens:
-		if key == 'v':
-			coords = rot90(val[0], val[1], val[2], mainMesh)
-			verts.append( coords )
-		elif key == 'e':
-			edges.append((int(val[0]), int(val[1])))
-		elif key == 'f':
-			faceLocVerts = []
-			faceTexVerts = []
-			for vv in val:
-				v = vv.split('/')
-				faceLocVerts.append(int(v[0]))
-				if len(v) > 1 and v[1]:
-					faceTexVerts.append(int(v[1]))
-			if len(faceLocVerts) < 4:
-				faceLocVerts.append(0)
-			if len(faceTexVerts) < 4:
-				faceTexVerts.append(0)
-			if len(v) == 1:
-				faces.append( faceLocVerts )
-			else:
-				faces.append( faceLocVerts )
-				texFaces.append( faceTexVerts )
-
-		elif key == 'vt':
-			vertsTex.append( (float(val[0]), float(val[1])) ) 
+		if key == 'Verts':
+			verts = parseVerts(sub)
+		elif key == 'Edges':
+			edges = parseEdges(sub)
+		elif key == 'Faces':
+			faces = parseFaces(sub)
 
 	if faces:
 		me.add_geometry(len(verts), 0, len(faces))
@@ -710,70 +730,157 @@ def parseMesh (args, tokens):
 		me.add_geometry(len(verts), len(edges), 0)
 		me.verts.foreach_set("co", unpackList(verts))
 		me.edges.foreach_set("verts", unpackList(edges))
-
-	# UVs
-	
-	if texFaces != [] and me.faces:
-		#me.faceUV= 1
-		me.add_uv_texture()
-		tfaces = me.uv_textures[-1].data
-		for n,ft in enumerate(texFaces):
-			tfaces[n].uv1= vertsTex[ft[0]]
-			tfaces[n].uv2= vertsTex[ft[1]]
-			tfaces[n].uv3= vertsTex[ft[2]]
-			if len(ft)==4:
-				tfaces[n].uv4= vertsTex[ft[3]]
 	me.update()
 		
 	mats = []
 	for (key, val, sub) in tokens:
-		if key == 'v' or \
-			 key == 'e' or \
-			 key == 'f' or \
-			 key == 'vt':
+		if key == 'Verts' or \
+		   key == 'Edges':
 				pass
+		elif key == 'Faces':
+			parseFaces2(sub, me)
+		elif key == 'MeshTextureFaceLayer':
+			parseUvTexture(val, sub, me)
+		elif key == 'MeshColorLayer':
+			parseVertColorLayer(val, sub, me)
+		elif key == 'VertexGroup':
+			parseVertexGroup(ob, me, val, sub)
+		elif key == 'ShapeKey':
+			if doShape(val[0]):
+				parseShapeKey(ob, me, val, sub)
+		elif key == 'Material':
+			me.add_material(loadedData['Material'][val[0]])
+		else:
+			defaultKey(key, val,  sub, "me", [], globals(), locals())
 
-		elif key == 'fx':
-			f = me.faces[int(val[0])]
-			f.material_index = int(val[1])
-			f.smooth = int(val[2])
+	return me
 
-		elif key == 'fxall':
+#
+#	parseVerts(tokens):
+#	parseEdges(tokens):
+#	parseFaces(tokens):
+#	parseFaces2(tokens, me):		
+#
+
+def parseVerts(tokens):
+	verts = []
+	for (key, val, sub) in tokens:
+		if key == 'v':
+			coords = rot90(val[0], val[1], val[2], True)
+			verts.append( coords )
+	return verts
+
+def parseEdges(tokens):
+	edges = []
+	for (key, val, sub) in tokens:
+		if key == 'e':
+			edges.append((int(val[0]), int(val[1])))
+	return edges
+	
+def parseFaces(tokens):	
+	faces = []
+	for (key, val, sub) in tokens:
+		if key == 'f':
+			if len(val) == 3:
+				face = [int(val[0]), int(val[1]), int(val[2]), 0]
+			elif len(val) == 4:
+				face = [int(val[0]), int(val[1]), int(val[2]), int(val[3])]
+			faces.append(face)
+	return faces
+
+def parseFaces2(tokens, me):	
+	n = 0
+	for (key, val, sub) in tokens:
+		if key == 'ft':
+			f = me.faces[n]
+			f.material_index = int(val[0])
+			f.smooth = int(val[1])
+			n += 1
+		elif key == 'ftall':
 			mat = int(val[0])
 			smooth = int(val[1])
 			for f in me.faces:
 				f.material_index = mat
 				f.smooth = smooth
+	return
 
-		elif key == 'vertgroup':
-			parseVertGroup(ob, me, val, sub)
-		elif key == 'shapekey':
-			if doShape(val[0]):
-				parseShapeKey(ob, me, val, sub)
-		elif key == 'ipo':
-			if (toggle & T_Shape) or (toggle & T_Face):
-				parseShapeIpo(val, sub, ob)
-		elif key == 'material':
-			try:
-				mat = _material[val[0]]
-				me.add_material(mat)
-			except:
-				pass
+
+#
+#	parseUvTexture(args, tokens, me):
+#	parseUvTexData(args, tokens, uvdata):
+#
+
+def parseUvTexture(args, tokens, me):
+	me.add_uv_texture()
+	uvtex = me.uv_textures[-1]
+	name = args[0]
+	uvtex.name = name
+	loadedData['MeshTextureFaceLayer'][name] = uvtex
+	for (key, val, sub) in tokens:
+		if key == 'Data':
+			parseUvTexData(val, sub, uvtex.data)
 		else:
-			defaultKey(key, val, "me", globals(), locals())
+			defaultKey(key, val,  sub, "uvtex", [], globals(), locals())
+	return
 
-	return me
+def parseUvTexData(args, tokens, data):
+	n = 0
+	for (key, val, sub) in tokens:
+		if key == 'vt':
+			data[n].uv1 = (float(val[0]), float(val[1]))
+			data[n].uv2 = (float(val[2]), float(val[3]))
+			data[n].uv3 = (float(val[4]), float(val[5]))
+			if len(val) > 6:
+				data[n].uv4 = (float(val[6]), float(val[7]))
+			n += 1	
+		else:
+			pass
+			#for i in range(n):
+			#	defaultKey(key, val,  sub, "data[i]", [], globals(), locals())
+	return
 
 #
-#	parseVertGroup(ob, me, args, tokens):
+#	parseVertColorLayer(args, tokens, me):
+#	parseVertColorData(args, tokens, data):
 #
 
-def parseVertGroup(ob, me, args, tokens):
+def parseVertColorLayer(args, tokens, me):
+	name = args[0]
+	print("VertColorLayer", name)
+	me.add_vertex_color()
+	vcol = me.vertex_colors[-1]
+	vcol.name = name
+	loadedData['MeshColorLayer'][name] = vcol
+	for (key, val, sub) in tokens:
+		if key == 'Data':
+			parseVertColorData(val, sub, vcol.data)
+		else:
+			defaultKey(key, val,  sub, "vcol", [], globals(), locals())
+	return
+
+def parseVertColorData(args, tokens, data):
+	n = 0
+	for (key, val, sub) in tokens:
+		if key == 'cv':
+			data[n].color1 = eval(val[0])
+			data[n].color2 = eval(val[1])
+			data[n].color3 = eval(val[2])
+			data[n].color4 = eval(val[3])
+			n += 1	
+	return
+
+
+#
+#	parseVertexGroup(ob, me, args, tokens):
+#
+
+def parseVertexGroup(ob, me, args, tokens):
 	if verbosity > 2:
 		print( "Parsing vertgroup %s" % args )
-	grp = args[0]
-	group = ob.add_vertex_group(grp)
-	group.name = grp
+	grpName = args[0]
+	group = ob.add_vertex_group(grpName)
+	group.name = grpName
+	loadedData['VertexGroup'][grpName] = group
 	for (key, val, sub) in tokens:
 		if key == 'wv':
 			ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
@@ -784,24 +891,24 @@ def parseVertGroup(ob, me, args, tokens):
 #
 
 def doShape(name):
-	if ((toggle & T_Shape) or (toggle & T_Face)) and (name == 'Basis'):
+	if (toggle & T_Shape+T_Face) and (name == 'Basis'):
 		return True
-	elif name[0:4] in ["Bend", "Shou"]:
-		return (toggle & T_Shape)
 	else:
 		return (toggle & T_Face)
 
 def parseShapeKey(ob, me, args, tokens):
-	name = args[0]
 	if verbosity > 0:
-		print( "Parsing shape %s" % name )
-	#block = ob.add_shape_key(name, False)
+		print( "Parsing shape %s" % args[0] )
+	name = args[0]
+	bpy.context.scene.objects.active = ob
 	bpy.ops.object.shape_key_add(False)
 	block = ob.active_shape_key
 	if name != 'Basis':
-		block.relative_key = _block['Basis']
+		block.relative_key = loadedData['ShapeKey']['Basis']
+	print("L1", loadedData['ShapeKey'])
 	block.name = name
-	_block[name] = block
+	loadedData['ShapeKey'][name] = block
+	print("L2", loadedData['ShapeKey'])
 	block.slider_min = float(args[1])
 	block.slider_max = float(args[2])
 	if args[3] != "None":
@@ -817,72 +924,6 @@ def parseShapeKey(ob, me, args, tokens):
 			pt[2] += z
 	return	
 
-#  icu BrowsOutUp_L 0 2 
-#      driver 2 ;
-#      driverObject _object['Human'] ;
-#      driverChannel 1 ;
-#      driverExpression 'p.ctrlBrowsOutUp_L()' ;
-#    end icu
-#
-#  icu BendElbowForward_L 0 1 
-#      bz2 -3.508294 0.000000 0.000000 0.000000 3.508294 0.000000  ;
-#      bz2 5.491706 1.000000 9.000000 1.000000 12.508294 1.000000  ;
-#      driver 1 ;
-#      driverObject _object['HumanRig'] ;
-#      driverBone 'LoArmTwist_L' ;
-#      driverChannel 7 ;
-#      extend 0 ;
-#      interpolation 1 ;
-#    end icu
-
-#
-#	parseShapeIpo(args, tokens, ob)
-#	parseShapeIcu(args, tokens, ob)
-#
-
-DriverChannels = [0, 'LOC_X', 'LOC_Y', 'LOC_Z', 'SCALE_X', 'SCALE_Y', 'SCALE_Z', 'ROT_X', 'ROT_Y', 'ROT_Z']
-
-def parseShapeIpo(args, tokens, ob):
-	for (key, val, sub) in tokens:
-		if key == 'icu':
-			parseShapeIcu(val, sub, ob)
-	return
-
-def parseShapeIcu(args, tokens, ob):
-	name = args[0]
-	if not doShape(name):
-		return
-	fcurve = ob.data.shape_keys.keys[name].driver_add("value", 0)
-	print("%s %s" % (name, fcurve))
-
-	var = fcurve.driver.variables.new()
-	var.name = name
-	var.targets[0].id_type = 'OBJECT'
-	var.targets[0].data_path ='keys["' + name + '"].value'
-
-	mod = fcurve.modifiers[0]
-	mod.poly_order = 2
-	mod.coefficients[0] = 0.0
-	mod.coefficients[1] = 1.0
-	for (key, val, sub) in tokens:
-		arg = eval(val[0])
-		if key == 'driver':
-			if arg == 1:
-				fcurve.driver.type = 'AVERAGE'
-			elif arg == 2:
-				fcurve.driver.type = 'SCRIPTED'
-			else:
-				raise NameError("Unknown driver %s" % val)
-		elif key == 'driverObject':
-			
-			var.targets[0].id = arg
-		elif key == 'driverChannel':
-			var.targets[0].transform_type = DriverChannels[arg]
-		elif key == 'driverExpression':
-			fcurve.driver.expression = arg[2:]	# skip p.
-		#elif key == 'driverBone':
-		#	var.targets[0].name = arg
-	return
 	
 #
 #	parseArmature (obName, args, tokens)
@@ -891,57 +932,56 @@ def parseShapeIcu(args, tokens, ob):
 rigify = False
 
 def parseArmature (args, tokens):
-	global rigify
+	global toggle
 	if verbosity > 2:
 		print( "Parsing armature %s" % args )
 	
-	(key,val,sub) = tokens[0]
-	if key == 'rigify':
-		bpy.ops.object.armature_human_advanced_add()
-		rigify = True
+	amtname = args[0]
+	obname = args[1]
+	mode = args[2]
+
+	if mode == 'Rigify':
+		toggle |= T_Rigify
+		(key,val,sub) = tokens[0]
+		if key != 'MetaRig':
+			raise NameError("Expected MetaRig")
+		typ = val[0]
+		print("Metarig ", typ)
+		if typ == "human":
+			bpy.ops.object.armature_human_advanced_add()
+		else:
+			bpy.ops.pose.metarig_sample_add(type = typ)
+		ob = bpy.context.object
+		amt = ob.data
+		loadedData['Rigify'][obname] = ob
 	else:
-		bpy.ops.object.armature_add()
-		rigify = False
+		toggle &= ~T_Rigify
+		amt = bpy.data.armatures.new(amtname)
+		ob = createObject('Armature', obname, amt)	
+		bpy.context.scene.objects.active = ob
 
-	name = args[1]
-	ob = bpy.context.scene.objects.active
-	ob.name = name
-	_object[name] = ob
+	loadedData['Armature'][amtname] = amt
+	loadedData['Object'][obname] = ob
+	print("Armature", amt, ob)
 
-	amt = ob.data
-	name = args[0]
-	amt.name = name
-	_armature[name] = amt
-	bones = dict()
+	bones = {}
 
-	bpy.ops.object.mode_set(mode='OBJECT')
+	# bpy.ops.object.mode_set(mode='OBJECT')
 	bpy.ops.object.mode_set(mode='EDIT')
 
-	if not rigify:
-		layer1 = [False for n in range(16)]
-		layer2 = buildLayerMask(0x0101, 16, [])
-		amt.layer = layer2+layer1
-		print(amt.layer)
-	#	amt.bones[0].name = '__Unused__'
-
 	for (key, val, sub) in tokens:
-		if key == 'bone':
+		if key == 'Bone':
 			parseBone(amt, bones, val, sub)
-		elif key == 'rigify':
-			pass
 		else:
-			defaultKey(key, val, "amt", globals(), locals())
+			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
 
 	bpy.ops.object.mode_set(mode='OBJECT')
-	
+
 	return amt
 
 #
 #	parseBone(amt, bones, args, tokens):
 #
-
-OPT_CONNECTED = 0x001
-OPT_NODEFORM = 0x004
 
 def parseBone(amt, bones, args, tokens):
 	global todo, rigify
@@ -952,64 +992,42 @@ def parseBone(amt, bones, args, tokens):
 		bone = amt.edit_bones[name]
 		print("Found %s" %bone)
 	else:
-		bpy.ops.armature.bone_primitive_add(name="Bone")
-		bone = amt.edit_bones[-1]
-		bone.name = name
-		bones[bone.name] = bone
-		parName = args[1]
-		if (parName != "None"):
-			parent = bones[parName]
-			bone.parent = parent
-		flags = int(args[2],16)
-		bone.connected = flags & OPT_CONNECTED
-		bone.deform = not (flags & OPT_NODEFORM)
-		bone.draw_wire = True
-		layer1 = [False for n in range(16)]
-		layer2 = buildLayerMask(int(args[3], 16) & 0xffff, 16, [])
-		bone.layer = layer2+layer1
+		bone = amt.edit_bones.new(name)
+	
+	loadedData['Bone'][name] = bone
 
 	for (key, val, sub) in tokens:
+		defaultKey(key, val,  sub, "bone", [], globals(), locals())
+		'''
 		if key == "head":
-			bone.head = jointLoc(val)
+			bone.head = rot90(val[0], val[1], val[2], True) 
 		elif key == "tail":
-			bone.tail = jointLoc(val)
+			bone.tail = rot90(val[0], val[1], val[2], True) 
 		elif key == "roll":
 			if (toggle & T_Rot90):
 				bone.roll = float(val[1])
 			else:
 				bone.roll = float(val[0])
 		else:
-			defaultKey(key, val, "bone", globals(), locals())
+			defaultKey(key, val,  sub, "bone", [], globals(), locals())
+		'''
 
 	return bone
 
+
 #
-#	parseJoints(args, tokens):
+#	processRigify()
 #
 
-def parseJoints(args, tokens):
-	for (key,val,sub) in tokens:
-		if key == 'j':
-			coord = rot90(val[1], val[2], val[3], True)
-			_joint[val[0]] = Vector(coord)
+def processRigify():
+	for ob in loadedData['Rigify'].values():
+		bpy.context.scene.objects.active = ob
+		bpy.ops.pose.metarig_generate()
+		bpy.context.scene.objects.unlink(ob)
+		ob = bpy.context.object
+		print("Rigged", ob)
+	
 
-def jointLoc(args):
-	global _joint
-	if args[0] == 'joint':
-		vec = _joint[args[1]]
-		if len(args) <= 2:
-			return vec
-		else:
-			if args[2] != '+':
-				raise NameError("joint "+args)
-			coord = rot90(args[3], args[4], args[5], True)
-			offs = Vector(coord)
-			if offs.length < Epsilon:
-				print( "%s %s %s" % (args, vec, offs) )
-			return vec+offs			
-	else:
-		coord = rot90(args[0], args[1], args[2], True)
-		return Vector(coord)
 
 #
 #	parsePose (args, tokens):
@@ -1020,19 +1038,22 @@ def parsePose (args, tokens):
 	if rigify:
 		return
 	name = args[0]
-	ob = _object[name]
+	ob = loadedData['Object'][name]
+	bpy.context.scene.objects.active = ob
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = ob.pose.bones	
 	for (key, val, sub) in tokens:
-		if key == 'posebone':
+		if key == 'Posebone':
 			poseBone(pbones, val, sub)
-	#ob.pose.update()
+		else:
+			defaultKey(key, val,  sub, "pbones", [], globals(), locals())
 	bpy.ops.object.mode_set(mode='OBJECT')
 	return ob
 
 
 #
 #	poseBone(pbones, args, tokens):
+#	parseArray(list, args):
 #
 
 def poseBone(pbones, args, tokens):
@@ -1041,83 +1062,46 @@ def poseBone(pbones, args, tokens):
 		print( "Parsing posebone %s" % args )
 	name = args[0]
 	pb = pbones[name]
-
-	flags = int(args[1],16)
-	pb.ik_limit_x = flags & 1
-	pb.ik_limit_y = (flags >> 1) & 1
-	pb.ik_limit_z = (flags >> 2) & 1
-	pb.ik_dof_x = not ((flags >> 3) & 1)
-	pb.ik_dof_y = not ((flags >> 4) & 1)
-	pb.ik_dof_z = not ((flags >> 5) & 1)
-
 	for (key, val, sub) in tokens:
-		if key == 'constraint':
-			parseConstraint(pb.constraints, val, sub, name)
-		elif key == 'type':
-			pb.set("type", val[0])
-		elif key == 'smash':
-			cns = pb.constraints[-1]
-			if doSmash:
-				todo.append(("cns.%s" % val[0], globals(), locals()))
+		if key == 'Constraint':
+			parseConstraint(pb.constraints, val, sub)
+		elif key == 'ik_dof':
+			parseArray([pb.ik_dof_x, pb.ik_dof_y, pb.ik_dof_z], val)
+		elif key == 'ik_limit':
+			parseArray([pb.ik_limit_x, pb.ik_limit_y, pb.ik_limit_z], val)
+		elif key == 'ik_max':
+			parseArray([pb.ik_max_x, pb.ik_max_y, pb.ik_max_z], val)
+		elif key == 'ik_min':
+			parseArray([pb.ik_min_x, pb.ik_min_y, pb.ik_min_z], val)
+		elif key == 'ik_stiffness':
+			parseArray([pb.ik_stiffness_x, pb.ik_stiffness_y, pb.ik_stiffness_z], val)
 		else:
-			defaultKey(key, val, "pb", globals(), locals())
+			defaultKey(key, val,  sub, "pb", [], globals(), locals())
+	return
+
+def parseArray(list, args):
+	n = 1
+	for elt in enumerate(list):
+		elt = eval(args[n])
+		
 #
-#	readTypedValue(type, arg, tokens, name, globals, locals):
+#	parseConstraint(constraints, args, tokens)
 #
 
-def readTypedValue(type, arg, tokens, name, globals, locals):
-	if type == 'list':
-		n = int(arg)
-		list = []
-		for i in range(n):
-			elt = readTypedValue(tokens[2*i+2], tokens[2*i+3], [], name, globals, locals)
-			list.append(elt)
-		return list
-	elif type == 'int':
-		return int(arg)
-	elif type == 'hex':
-		return int(arg,16)
-	elif type == 'bool':
-		if arg == 'True':
-			return True
+def parseConstraint(constraints, args, tokens):
+	cns = constraints.new(args[1])
+	cns.name = args[0]
+	print("Cnostr", cns)
+	#cns.influence = float(args[2])
+	for (key,val,sub) in tokens:
+		if key == 'invert':
+			parseArray([cns.invert_x, cns.invert_y, cns.invert_z], val)
+		elif key == 'use':
+			parseArray([cns.use_x, cns.use_y, cns.use_z], val)
 		else:
-			return False
-	elif type == 'float':
-		return float(arg)
-	elif type == 'vec':
-		return Vector(float(arg[0]), float(arg[1]), float(arg[2]))
-	elif type == 'str':
-		return arg
-	elif type == 'obj':
-		return getObject(arg, name, globals, locals)
-	elif type == 'ipo':
-		return getIpo(arg, name, globals, locals)
-	elif type == 'act':
-		return getAction(arg, name, globals, locals)
-	elif type == 'tex':
-		return _texture[arg[0]]
-	elif type == 'text':
-		try:
-			txt = _text3d[arg]
-		except:
-			txt = None
-		return txt
-	else:
-		msg = "Unknown type "+type+" "+arg
-		print( msg )
-		raise NameError(msg)
-
-#
-#	parseConstraint(constraints, args, tokens, name)
-#
-
-def skipConstraint(type):
-	if type == 'PYTHON':
-		return True
-	elif type == 'CHILDOF':
-		return False
-	return False
-
+			defaultKey(key, val,  sub, "cns", [], globals(), locals())
+	return 
+	
 def insertInfluenceIpo(cns, bone):
 	global todo
 	if bone != 'PArmIK_L' and bone != 'PArmIK_R' and bone != 'PLegIK_L' and bone != 'PLegIK_R':
@@ -1141,12 +1125,12 @@ def insertInfluenceIpo(cns, bone):
 		mod.coefficients[0] = 0.0
 		mod.coefficients[1] = 1.0
 	elif bone == 'PArmIK_L' or bone == 'PArmIK_R':
-		if (toggle & T_ArmIK):
+		if toggle & T_ArmIK:
 			cns.influence = 1.0
 		else:
 			cns.influence = 0.0
 	elif bone == 'PLegIK_L' or bone == 'PLegIK_R':
-		if (toggle & T_LegIK):
+		if toggle & T_LegIK:
 			cns.influence = 1.0
 		else:
 			cns.influence = 0.0
@@ -1154,194 +1138,280 @@ def insertInfluenceIpo(cns, bone):
 	return True
 
 #
-#	parseConstraint(constraints, args, tokens, name):
+#	parseCurve (args, tokens):
+#	parseNurb(cu, nNurbs, args, tokens):
+#	parseBezier(nurb, n, args, tokens):
 #
 
-
-def parseConstraint(constraints, args, tokens, name):
-	global todo, nErrors
-	if verbosity > 2:
-		print( "Parsing constraint %s" % args )
-	typeName = args[0]	
-
-	try:
-		cns = constraints.new(typeName)
-	except:
-		msg = "Unable to add constraint %s (%s) %s" % (typeName, typeName, args[1])
-		print( msg )
-		nErrors += 1
-		#raise NameError(msg)
-		return
-	cns.name = args[1]
-	cns.influence = float(args[2])
-
-	for (key,val,sub) in tokens:
-		if key == 'driver':
-			if insertInfluenceIpo(cns, val[0]):
-				pass
-			elif val[0] == "FingerIK_L" or val[0] == "FingerIK_R":
-				if (toggle & T_FingerIK) == 0:
-					if verbosity > 2:
-						print("Constraint "+name+" ignored.")
-					cns.influence = 0.0
-		elif key == '-':
-			pass
-
-		elif key == 'LIMIT':
-			n = int(val[1],16)
-			if typeName == 'LIMIT_LOCATION':
-				cns.use_minimum_x = n & 1
-				n = n >> 1
-				cns.use_minimum_y = n & 1
-				n = n >> 1
-				cns.use_minimum_z = n & 1
-				n = n >> 1
-				cns.use_maximum_x = n & 1
-				n = n >> 1
-				cns.use_maximum_y = n & 1
-				n = n >> 1
-				cns.use_maximum_z = n & 1
-			elif typeName == 'LIMIT_ROTATION':
-				cns.use_limit_x = n & 1
-				n = n >> 1
-				cns.use_limit_y = n & 1
-				n = n >> 1
-				cns.use_limit_z = n & 1
-			else:
-				raise NameError("LIMIT %s" % typeName)
-
-		elif key == 'COPY':
-			n = int(val[1],16)
-			cns.use_x = n & 1
-			n = n >> 1
-			cns.use_y = n & 1
-			n = n >> 1
-			cns.use_z = n & 1
-			n = n >> 1
-			cns.invert_x = n & 1
-			n = n >> 1
-			cns.invert_y = n & 1
-			n = n >> 1
-			cns.invert_z = n & 1
-
-		else:
-			x = readTypedValue(val[0], val[1], val, "cns.%s" % (key), globals(), locals())
-			try:
-				exec("cns.%s = x" % (key))
-			except:
-				pass
-
-
-
-#
-#
-#
-
-ModifierTypeName = dict({\
-
-})
-
-#
-#	parseModifiers(ob, args, tokens):		
-#
-
-ModifierSettingsName = dict({\
-	'RENDER' : 'render',
-	'OBJECT' : 'object',
-	'REALTIME' : 'realtime',
-	'VGROUPS' : 'use_vertex_groups',
-	'ENVELOPES' : 'use_bone_envelopes',
-	'EDITMODE' : 'editmode',
-	'ONCAGE' : 'on_cage',
-
-})
-
-def skipModifier(type):
-	if type == 'LATTICE':
-		return False
-	else:
-		return False
-
-def parseModifier(ob, args, tokens):
-	global todo, nErrors
-	if verbosity > 2:
-		print( "Parsing modifier %s" % args )
-	typeName = args[0]
-	if skipModifier(typeName):
-		print( "Skipping modifier " + typeName )
-		nErrors += 1
-		return None
-	mod = ob.modifiers.new("mod", typeName)
-	for (key,val,sub) in tokens:
-		try:
-			if MHX249:
-				ext = ModifierSettingsName[key]
-			else:
-				ext = key
-			x = readTypedValue(val[0], val[1], val, "mod.%s" % ext, globals(), locals())
-			expr = "mod.%s = x" % (ext)
-			exec(expr)
-		except:
-			print("modifer setting %s = %s failed" % (key, val))
-
-	return mod
-
-#
-#	parseParticle(ob, args, tokens):
-#
-
-def parseParticle(ob, args, tokens):
+def parseCurve (args, tokens):
 	global todo
 	if verbosity > 2:
-		print( "Parsing particle %s" % args )
-	par = Particle.New(ob)
-	name = args[0]
-	par.setName(name)
-	_particle[name] = par
+		print( "Parsing curve %s" % args )
+
+	cuname = args[0]
+	obname = args[1]
+	bpy.ops.object.curve_add(type='BEZIER_CURVE')
+	ob = bpy.context.object
+	cu = ob.data
+	loadedData['Curve'][cuname] = cu
+	loadedData['Object'][obname] = ob
+	print("Curve", cu, ob)
+	nNurbs = 0
 	for (key, val, sub) in tokens:
-		if key == 'loc':
-			pass
-			#for (key1, val1, sub1) in sub:
-			#	if key1 == 'v':
-			#		par.setLoc(float(val1[0]), float(val1[1]), float(val1[2]))
-		elif key == 'rot':
-			for (key1, val1, sub1) in sub:
-				if key1 == 'v':
-					par.setRot(float(val1[0]), float(val1[1]), float(val1[2]))
-		elif key == 'material':
-			mat = Material.Get(val[0])
-			par.setMat(mat)
-		elif key == 'size':
-			par.setSize(int(val[0]))
-		elif key == 'vertGroup':
-			n = Particle.VERTEXGROUPS[val[0]]
-			par.setVertGroup(val[1], n, int(val[2]))
+		if key == 'Nurb':
+			parseNurb(cu, nNurbs, val, sub)
+			nNurbs += 1
 		else:
-			defaultKey(key, val, "par", globals(), locals())
+			defaultKey(key, val, sub, "cu", [], globals(), locals())
+	return
+
+def parseNurb(cu, nNurbs, args, tokens):
+	if nNurbs > 0:
+		bpy.ops.object.curve_add(type='BEZIER_CURVE')
+	print(cu.splines, nNurbs)
+	nurb = cu.splines[nNurbs]
+	nPoints = int(args[0])
+	print(nurb, nPoints)
+	for n in range(2, nPoints):
+		bpy.ops.curve.extrude(mode=1)		
+
+	n = 0
+	for (key, val, sub) in tokens:
+		if key == 'Bezier':
+			parseBezier(nurb, n, val, sub)
+			n += 1
+		else:
+			defaultKey(key, val, sub, "nurb", [], globals(), locals())
+	return
+	
+def parseBezier(nurb, n, args, tokens):
+	bez = nurb[n]
+	bez.co = eval(args[0])	
+	bez.handle1 = eval(args[1])	
+	bez.handle1_type = args[2]
+	bez.handle2 = eval(args[3])	
+	bez.handle2_type = args[4]
+	return
+
+#
+#	defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
+#
+
+def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
+	global todo
+
+	if ext == 'Property':
+		expr = "%s['%s'] = %s" % (var, args[0], args[1])
+		print("Property", expr, eval(var, glbals, lcals))
+		exec(expr, glbals, lcals)
+		return
+		
+	nvar = "%s.%s" % (var, ext)
+	# print(ext)
+	if ext in exclude:
+		return
+	#print("D", nvar)
+
+	if len(args) == 0:
+		raise NameError("Key length 0: %s" % ext)
+		
+	rnaType = args[0]
+	if rnaType == 'Add':
+		print("*** Cannot Add yet ***")
+		return
+
+	elif rnaType == 'Refer':
+		typ = args[1]
+		name = args[2]
+		data = "loadedData['%s']['%s']" % (typ, name)
+
+	elif rnaType == 'Struct' or rnaType == 'Define':
+		typ = args[1]
+		name = args[2]
+		try:
+			data = eval(nvar, glbals, lcals)
+		except:
+			data = None			
+		print("Old structrna", nvar, data)
+
+		if data == None:
+			try:
+				creator = args[3]
+			except:
+				creator = None
+			print("Creator", creator, eval(var,glbals,lcals))
+
+			try:
+				rna = eval(var,glbals,lcals)
+				data = eval(creator)
+			except:
+				data = None	
+			print("New struct", nvar, typ, data)
+
+		if rnaType == 'Define':
+			loadedData[typ][name] = data
+
+		if data:
+			for (key, val, sub) in tokens:
+				defaultKey(key, val, sub, "data", [], globals(), locals())
+
+		print("Struct done", nvar)
+		return
+
+	elif rnaType == 'PropertyRNA':
+		raise NameError("PropertyRNA!")
+		#print("PropertyRNA ", ext, var)
+		for (key, val, sub) in tokens:
+			defaultKey(ext, val, sub, nvar, [], glbals, lcals)
+		return
+
+	elif rnaType == 'Array':
+		for n in range(1, len(args)):
+			expr = "%s[%d] = %s" % (nvar, n-1, args[n])
+			exec(expr, glbals, lcals)
+		return
+		
+	elif rnaType == 'List':
+		data = []
+		for (key, val, sub) in tokens:
+			elt = eval(val[1], glbals, lcals)
+			data.append(elt)
+
+	elif rnaType == 'Matrix':
+		i = 0
+		n = len(tokens)
+		for (key, val, sub) in tokens:
+			if key == 'row':	
+				for j in range(n):
+					expr = "%s[%d][%d] = %g" % (nvar, i, j, float(val[j]))
+					exec(expr, glbals, lcals)
+				i += 1
+		return
+
+	else:
+		try:
+			data = loadedData[rnaType][args[1]]
+			#print("From loaded", rnaType, args[1], data)
+			return data
+		except:
+			data = rnaType
+
+	#print(var, ext, data)
+	expr = "%s = %s" % (nvar, data)
+	try:
+		exec(expr, glbals, lcals)
+	except:
+		print("Failed ",expr)
+		todo.append((expr, glbals, lcals))
+	return
 			
-	return par
+#
+#	parseBoolArray(mask):
+#
+
+def parseBoolArray(mask):
+	list = []
+	for c in mask:
+		if c == '0':			
+			list.append(False)
+		else:
+			list.append(True)
+	return list
+
+#	parseMatrix(args, tokens)
+#
+
+def parseMatrix(args, tokens):
+	matrix = Matrix( [1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1] )
+	i = 0
+	for (key, val, sub) in tokens:
+		if key == 'row':	
+			matrix[i][0] = float(val[0])
+			matrix[i][1] = float(val[1])
+			matrix[i][2] = float(val[2])
+			matrix[i][3] = float(val[3])
+			i += 1
+	return matrix
+
+#
+#	parseDefault(data, tokens, exclude):
+#
+
+def parseDefault(data, tokens):
+	for (key, val, sub) in tokens:	
+		defaultKey(key, val, sub, "data", exclude, globals(), locals())
+
+
+#
+#	Utilities	
+#
+
+#
+#	extractBpyType(data):
+#
+
+def extractBpyType(data):
+	typeSplit = str(type(data)).split("'")
+	if typeSplit[0] != '<class ':
+		return None
+	classSplit = typeSplit[1].split(".")
+	if classSplit[0] == 'bpy' and classSplit[1] == 'types':
+		return classSplit[2]
+	elif classSplit[0] == 'bpy_types':
+		return classSplit[1]
+	else:
+		return None
+
+#
+#	rot90(x, y, z, doRot)
+#
+
+def rot90(x, y, z, doRot):
+	global toggle
+	if (toggle & T_Rot90) and doRot:
+		return (float(x), -float(z), float(y))
+	else:
+		return (float(x), float(y), float(z))
+
+#
+#	Bool(string):
+#
+
+def Bool(string):
+	if string == 'True':
+		return True
+	elif string == 'False':
+		return False
+	else:
+		raise NameError("Bool %s?" % string)
+		
 	
 #
-#	clearScene():
+#	clearScene(context):
 #
 	
 def clearScene():
 	global toggle
 	scn = bpy.context.scene
-	print("clearScene %s %s" % ((toggle & T_Replace), scn))
-	if not (toggle & T_Replace):
+	print("clearScene %s %s" % (toggle & T_Replace, scn))
+	if not toggle & T_Replace:
 		return scn
 	for ob in scn.objects:
-		if ob.type == 'MESH' or ob.type == 'ARMATURE':
-			scn.objects.unlink(ob)
-			del ob
-	scn.render_data.render_raytracing = False
+		scn.objects.unlink(ob)
+		del ob
+	#print(scn.objects)
+	return scn
+	oldScn = scn
+	scn = Scene.New()
+	scn.makeCurrent()
+	Scene.Unlink(oldScn)
+	del oldScn
 	return scn
 
 #
 #	User interface
 #
-
+"""
 DEBUG= False
 from bpy.props import *
 
@@ -1387,16 +1457,13 @@ bpy.types.register(IMPORT_OT_makehuman_mhx)
 menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 bpy.types.INFO_MT_file_import.append(menu_func)
 """
-
 #
 #	Testing
 #
-#readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo.mhx")
-#readMhxFile("/home/svn/data/3dobjs/materials25.mhx")
-readMhxFile("/home/thomas/makehuman/exports/foo.mhx")
-#readMhxFile("/home/thomas/svn/makehuman/data/3dobjs/materials25.mhx")
+readMhxFile("/home/thomas/makehuman/exports/foo-classic25.mhx")
+#readMhxFile("/home/thomas/mhx4/test1.mhx")
+#readMhxFile("/home/thomas/myblends/mhx4/test1.mhx")
 #bump
-"""
 
 
 
