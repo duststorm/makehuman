@@ -31,37 +31,41 @@ splitLeftRight = True
 #	exportMhx(obj, filename):
 #
 def exportMhx(obj, filename):	
-	print("Writing MHX file " + filename )
+	(name, ext) = os.path.splitext(filename)
+	print("Writing MHX 2.4x file " + filename )
 	fp = open(filename, 'w')
-	exportMhx_249(obj, fp)
-	#exportMhx_250(obj, fp)
+	exportMhx_24(obj, fp)
 	fp.close()
-	print("MHX file %s written" % filename)
+	print("MHX 2.4x file %s written" % filename)
+
+	filename = name+"-classic25"+ext
+	print("Writing MHX 2.5x file " + filename )
+	fp = open(filename, 'w')
+	exportMhx_25(obj, "classic", fp)
+	fp.close()
+	print("MHX 2.5x file %s written" % filename)
 	return
 
 #
-#	exportMhx_249(obj,fp):
+#	exportMhx_24(obj,fp):
 #
 
-def exportMhx_249(obj, fp):
+def exportMhx_24(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
 "MHX 0 5 ;\n")
 
-	fp.write("if Blender24\n")
-	copyMaterialFile("data/3dobjs/materials24.mhx", fp)	
-	fp.write("end if\n")
-	
-	fp.write("if Blender25\n")
-	copyMaterialFile("data/3dobjs/materials25.mhx", fp)	
-	fp.write("end if\n")
-	
-	exportArmature(obj, fp)
+	fp.write(
+"if Blender25\n"+
+"  error('This file can not be opened in Blender 2.5x. Try the -classic25 file instead.') ;\n "+
+"end if\n")
 
-	tmpl = open("data/3dobjs/meshes24.mhx")
+	copyMaterialFile("data/templates/materials24.mhx", fp)	
+	exportArmature(obj, fp)
+	tmpl = open("data/templates/meshes24.mhx")
 	if tmpl:
-		copyMeshFile(obj, tmpl, fp)	
+		copyMeshFile249(obj, tmpl, fp)	
 		tmpl.close()
 	return
 
@@ -84,27 +88,65 @@ def exportRawMhx(obj, fp):
 	return
 
 #
-#	exportMhx_250(obj,fp):
+#	exportMhx_25(obj, rig, fp):
 #
 
-def exportMhx_250(obj,fp):
-	fp.write(
-"# MakeHuman exported MHX\n" +
-"# www.makehuman.org\n" +
-"MHX 0 5 ;\n")
+def exportMhx_25(obj, rig, fp):
+	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
+	copyFile25(obj, "data/templates/armatures-%s25.mhx" % rig, rig, fp)	
+	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+	return
 
-	copyMaterialFile("data/3dobjs/materials25.mhx", fp)	
-	mhxbones_rigify.writeBones(obj, fp)
+def copyFile25(obj, tmplName, rig, fp):
+	print("Trying to open "+tmplName)
+	tmpl = open(tmplName)
+	if tmpl == None:
+		print("Cannot open "+tmplName)
+		return
 
-	fp.write(
-"if useMesh \n" +
-"mesh Human Human \n")
-	exportRawData(obj, fp)
+	for line in tmpl:
+		lineSplit= line.split()
+		if len(lineSplit) == 0:
+			fp.write(line)
+		elif lineSplit[0] == '***':
+			if lineSplit[1] == 'amount':
+				pass
+			elif lineSplit[1] == 'Particles':
+				pass
+			elif lineSplit[1] == 'Verts':
+				for v in obj.verts:
+					fp.write("v %g %g %g ;\n" %(v.co[0], v.co[1], v.co[2]))
+			elif lineSplit[1] == 'VertexGroup':
+				copyFile("data/templates/vertexgroups-%s25.mhx" % rig, fp)	
+			elif lineSplit[1] == 'ShapeKey':
+				copyFile("data/templates/shapekeys-facial25.mhx", fp)	
+			elif lineSplit[1] == 'Armature':
+				fp.write("Armature HumanRig HumanRig %s\n" % rig)
+				fp.write("end Armature\n")
+			elif lineSplit[1] == 'Filename':
+				path1 = os.path.expanduser("./data/textures/")
+				(path, filename) = os.path.split(lineSplit[2])
+				file1 = os.path.realpath(path1+filename)
+				fp.write("  Filename %s ;\n" % file1)
+			else:
+				raise NameError("Unknown *** %s" % lineSplit[1])
+		else:
+			fp.write(line)
 
-	tmpl = open("data/3dobjs/meshes25.mhx")
-	if tmpl:
-		copyMeshFile(obj, tmpl, fp)	
-		tmpl.close()
+	print("Closing "+tmplName)
+	tmpl.close()
+	return
+
+def copyFile(tmplName, fp):
+	print("Trying to open "+tmplName)
+	tmpl = open(tmplName)
+	if tmpl == None:
+		print("Cannot open "+tmplName)
+		return
+	for line in tmpl:
+		fp.write(line)
+	print("Closing "+tmplName)
+	tmpl.close()
 	return
 
 #
@@ -127,10 +169,10 @@ def copyMaterialFile(infile, fp):
 	tmpl.close()
 
 #
-#	copyMeshFile(obj, tmpl, fp):
+#	copyMeshFile249(obj, tmpl, fp):
 #
 
-def copyMeshFile(obj, tmpl, fp):
+def copyMeshFile249(obj, tmpl, fp):
 	inZone = False
 	skip = False
 	mainMesh = False
@@ -148,7 +190,7 @@ def copyMeshFile(obj, tmpl, fp):
 				fp.write("end if\n")
 				mainMesh = False
 			elif lineSplit[1] == 'mesh' and mainMesh:
-				shpfp = open("data/3dobjs/shapekeys24.mhx", "rU")
+				shpfp = open("data/templates/shapekeys24.mhx", "rU")
 				exportShapeKeys(obj, shpfp, fp)
 				shpfp.close()
 				writeIpo(fp)
@@ -345,7 +387,7 @@ def writeIcu(fp, shape, expr):
 def writeIpo(fp):
 	global splitLeftRight
 
-	mhxFile = "data/3dobjs/mhxipos.mhx"
+	mhxFile = "data/templates/mhxipos.mhx"
 	try:
 		print("Trying to open "+mhxFile)
 		tmpl = open(mhxFile, "r")

@@ -1,11 +1,28 @@
-# MHX materials for Blender 2.5x 
+# Blender 2.5 exported MHX 
 MHX 0 5 ;
-MHX249 False ; 
+if Blender24
+  error 'This file can only be read with Blender 2.5' ;
+end if
 
-texture IMAGE alpha
-  image texture_opacity.tif
-    filename /home/thomas/makehuman/exports/texture_opacity.tif ;
-  end image
+# --------------- Images ----------------------------- # 
+ 
+Image texture.tif
+  *** Filename /home/thomas/makehuman/exports/texture.png ;
+end Image
+
+Image texture_opacity.tif
+  *** Filename /home/thomas/makehuman/exports/texture_opacity.png ;
+end Image
+
+Image texture_ref.tif
+  *** Filename /home/thomas/makehuman/exports/texture_ref.png ;
+end Image
+
+
+# --------------- Textures ----------------------------- # 
+ 
+Texture alpha IMAGE
+  image Refer Image texture_opacity.tif ;
   brightness 1 ;
   calculate_alpha False ;
   checker_distance 0 ;
@@ -26,6 +43,7 @@ texture IMAGE alpha
   filter_size 1 ;
   filter_size_minimum False ;
   flip_axis False ;
+  image Refer Image texture_opacity.tif ;
   interpolation True ;
   invert_alpha False ;
   mipmap False ;
@@ -38,12 +56,10 @@ texture IMAGE alpha
   repeat_y 1 ;
   use_alpha False ;
   use_color_ramp False ;
-end texture
+end Texture
 
-texture IMAGE diffuse
-  image texture.tif
-    filename /home/thomas/makehuman/exports/texture.tif ;
-  end image
+Texture diffuse IMAGE
+  image Refer Image texture.tif ;
   brightness 1 ;
   calculate_alpha False ;
   checker_distance 0 ;
@@ -64,6 +80,7 @@ texture IMAGE diffuse
   filter_size 1 ;
   filter_size_minimum False ;
   flip_axis False ;
+  image Refer Image texture.tif ;
   interpolation False ;
   invert_alpha False ;
   mipmap False ;
@@ -76,9 +93,9 @@ texture IMAGE diffuse
   repeat_y 1 ;
   use_alpha False ;
   use_color_ramp False ;
-end texture
+end Texture
 
-texture CLOUDS normals
+Texture normals CLOUDS
   brightness 1 ;
   contrast 1 ;
   factor_blue 1 ;
@@ -91,12 +108,10 @@ texture CLOUDS normals
   noise_type 'SOFT_NOISE' ;
   stype 'GREYSCALE' ;
   use_color_ramp False ;
-end texture
+end Texture
 
-texture IMAGE specularity
-  image texture_ref.tif
-    filename /home/thomas/makehuman/exports/texture_ref.tif ;
-  end image
+Texture specularity IMAGE
+  image Refer Image texture_ref.tif ;
   brightness 1 ;
   calculate_alpha False ;
   checker_distance 0 ;
@@ -117,6 +132,7 @@ texture IMAGE specularity
   filter_size 1 ;
   filter_size_minimum False ;
   flip_axis False ;
+  image Refer Image texture_ref.tif ;
   interpolation False ;
   invert_alpha False ;
   mipmap False ;
@@ -129,30 +145,20 @@ texture IMAGE specularity
   repeat_y 1 ;
   use_alpha True ;
   use_color_ramp False ;
-end texture
-material Invisio 
-  diffuse_color (1,1,1) ;
-  specular_color (1,1,1) ;
-  mirror_color (1,1,1) ;
-  raytrace_transparency
-    depth 2 ;
-    falloff 1 ;
-    filter 0 ;
-    fresnel 0 ;
-    fresnel_factor 1.25 ;
-    gloss_factor 1 ;
-    gloss_samples 18 ;
-    gloss_threshold 0.005 ;
-    ior 1 ;
-    limit 0 ;
-  end raytrace_transparency
+end Texture
+
+
+# --------------- Materials ----------------------------- # 
+ 
+Material Invisio 
   active_texture_index 1 ;
   alpha 0 ;
-  ambient 0.5 ;
+  ambient 1 ;
   cast_buffer_shadows False ;
   cast_shadows_only False ;
   cubic False ;
   darkness 1 ;
+  diffuse_color Array 1.0 1.0 1.0  ;
   diffuse_fresnel 0.1 ;
   diffuse_fresnel_factor 0.5 ;
   diffuse_intensity 0.8 ;
@@ -169,6 +175,7 @@ material Invisio
   full_oversampling False ;
   invert_z False ;
   light_group_exclusive False ;
+  mirror_color Array 1.0 1.0 1.0  ;
   object_color False ;
   only_shadow False ;
   ray_shadow_bias True ;
@@ -181,6 +188,7 @@ material Invisio
   shadows True ;
   sky False ;
   specular_alpha 0 ;
+  specular_color Array 1.0 1.0 1.0  ;
   specular_hardness 168 ;
   specular_intensity 0.615208 ;
   specular_ior 4 ;
@@ -191,24 +199,37 @@ material Invisio
   specular_slope 0.1 ;
   specular_toon_size 0.5 ;
   specular_toon_smooth 0.1 ;
+  strand Struct MaterialStrand None 
+    blend_distance 0 ;
+    blender_units False ;
+    min_size 0 ;
+    root_size 1 ;
+    shape 0 ;
+    surface_diffuse False ;
+    tangent_shading True ;
+    tip_size 1 ;
+    width_fade 0 ;
+  end Struct
   tangent_shading False ;
   traceable False ;
   translucency 0 ;
   transparency True ;
   transparency_method 'Z_TRANSPARENCY' ;
   use_diffuse_ramp False ;
+  use_nodes False ;
   use_specular_ramp False ;
+  use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
   vertex_color_light False ;
   vertex_color_paint False ;
   z_offset 0 ;
-end material
+end Material
 
-material SSS_skinshader 
-  mtex 0 diffuse True
-    color (1,0,1) ;
+Material SSS_skinshader 
+  MTex 0 diffuse UV True
     alpha_factor 1 ;
     ambient_factor 1 ;
     blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
     colordiff_factor 0.945272 ;
     coloremission_factor 0.945272 ;
     colorreflection_factor 0.945272 ;
@@ -255,21 +276,21 @@ material SSS_skinshader
     reflection_factor 1 ;
     rgb_to_intensity False ;
     scattering_factor 1 ;
+    size (1,1,1) ;
     specular_factor 1 ;
     stencil False ;
-    texture_coordinates 'UV' ;
     translucency_factor 1 ;
     warp_factor 0 ;
     x_mapping 'X' ;
     y_mapping 'Y' ;
     z_mapping 'Z' ;
-  end mtex
+  end MTex
 
-  mtex 1 specularity True
-    color (1,0,1) ;
+  MTex 1 specularity UV True
     alpha_factor 1 ;
     ambient_factor 1 ;
     blend_type 'ADD' ;
+    color Array 1.0 0.0 1.0  ;
     colordiff_factor 1 ;
     coloremission_factor 1 ;
     colorreflection_factor 1 ;
@@ -316,21 +337,21 @@ material SSS_skinshader
     reflection_factor 1 ;
     rgb_to_intensity False ;
     scattering_factor 1 ;
+    size (1,1,1) ;
     specular_factor 1 ;
     stencil False ;
-    texture_coordinates 'UV' ;
     translucency_factor 1 ;
     warp_factor 0 ;
     x_mapping 'X' ;
     y_mapping 'Y' ;
     z_mapping 'Z' ;
-  end mtex
+  end MTex
 
-  mtex 2 alpha True
-    color (1,1,1) ;
+  MTex 2 alpha UV True
     alpha_factor 1 ;
     ambient_factor 1 ;
     blend_type 'MIX' ;
+    color Array 1.0 1.0 1.0  ;
     colordiff_factor 0.165813 ;
     coloremission_factor 0.165813 ;
     colorreflection_factor 0.165813 ;
@@ -377,21 +398,21 @@ material SSS_skinshader
     reflection_factor 1 ;
     rgb_to_intensity False ;
     scattering_factor 1 ;
+    size (1,1,1) ;
     specular_factor 1 ;
     stencil False ;
-    texture_coordinates 'UV' ;
     translucency_factor 1 ;
     warp_factor 0.444186 ;
     x_mapping 'X' ;
     y_mapping 'Y' ;
     z_mapping 'Z' ;
-  end mtex
+  end MTex
 
-  mtex 3 normals True
-    color (1,0,1) ;
+  MTex 3 normals UV True
     alpha_factor 1 ;
     ambient_factor 1 ;
     blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
     colordiff_factor 1 ;
     coloremission_factor 1 ;
     colorreflection_factor 1 ;
@@ -438,51 +459,25 @@ material SSS_skinshader
     reflection_factor 1 ;
     rgb_to_intensity False ;
     scattering_factor 1 ;
+    size (1,1,1) ;
     specular_factor 1 ;
     stencil False ;
-    texture_coordinates 'UV' ;
     translucency_factor 1 ;
     warp_factor 0 ;
     x_mapping 'X' ;
     y_mapping 'Y' ;
     z_mapping 'Z' ;
-  end mtex
+  end MTex
 
-  active_texture _texture('diffuse') ;
-  diffuse_color (1,1,1) ;
-  specular_color (1,1,1) ;
-  mirror_color (1,1,1) ;
-  raytrace_transparency
-    depth 2 ;
-    falloff 1 ;
-    filter 0 ;
-    fresnel 0 ;
-    fresnel_factor 1.25 ;
-    gloss_factor 0 ;
-    gloss_samples 18 ;
-    gloss_threshold 0.005 ;
-    ior 1 ;
-    limit 0 ;
-  end raytrace_transparency
-  subsurface_scattering
-    color (0.782027,0.717113,0.717113) ;
-    radius (4.82148,1.6937,1.08997) ;
-    back 2 ;
-    color_factor 0.750324 ;
-    enabled True ;
-    error_tolerance 0.15 ;
-    front 1 ;
-    ior 1.3 ;
-    scale 0.008 ;
-    texture_factor 0 ;
-  end subsurface_scattering
+  active_texture Refer Texture diffuse ;
   active_texture_index 0 ;
   alpha 0 ;
-  ambient 0.5 ;
+  ambient 1 ;
   cast_buffer_shadows True ;
   cast_shadows_only False ;
   cubic False ;
   darkness 1 ;
+  diffuse_color Array 1.0 1.0 1.0  ;
   diffuse_fresnel 0.1 ;
   diffuse_fresnel_factor 1 ;
   diffuse_intensity 0.93 ;
@@ -499,6 +494,7 @@ material SSS_skinshader
   full_oversampling False ;
   invert_z False ;
   light_group_exclusive False ;
+  mirror_color Array 1.0 1.0 1.0  ;
   object_color False ;
   only_shadow False ;
   ray_shadow_bias True ;
@@ -511,6 +507,7 @@ material SSS_skinshader
   shadows True ;
   sky False ;
   specular_alpha 1 ;
+  specular_color Array 1.0 1.0 1.0  ;
   specular_hardness 10 ;
   specular_intensity 0 ;
   specular_ior 4 ;
@@ -521,17 +518,40 @@ material SSS_skinshader
   specular_slope 0.1 ;
   specular_toon_size 0.5 ;
   specular_toon_smooth 0.1 ;
+  strand Struct MaterialStrand None 
+    blend_distance 0 ;
+    blender_units False ;
+    min_size 0 ;
+    root_size 1 ;
+    shape 0 ;
+    surface_diffuse False ;
+    tangent_shading True ;
+    tip_size 1 ;
+    width_fade 0 ;
+  end Struct
+  subsurface_scattering Struct MaterialSubsurfaceScattering None 
+    back 2 ;
+    color Array 0.782026708126 0.717113316059 0.717113316059  ;
+    color_factor 0.750324 ;
+    enabled True ;
+    error_tolerance 0.15 ;
+    front 1 ;
+    ior 1.3 ;
+    radius Array 4.82147502899 1.69369900227 1.08997094631  ;
+    scale 0.008 ;
+    texture_factor 0 ;
+  end Struct
   tangent_shading False ;
   traceable True ;
   translucency 0 ;
   transparency True ;
   transparency_method 'Z_TRANSPARENCY' ;
   use_diffuse_ramp True ;
+  use_nodes False ;
   use_specular_ramp False ;
+  use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
   vertex_color_light False ;
   vertex_color_paint False ;
   z_offset 0 ;
-end material
-
-MHX249 True ;
+end Material
 
