@@ -23,10 +23,10 @@ TO DO
 """
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.5'
+__version__= '0.6'
 __bpydoc__= '''\
 MHX importer for Blender 2.5
-0.5 Fifth version
+0.6 Sixth version
 '''
 
 import bpy
@@ -37,7 +37,7 @@ import array
 import struct
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 5
+MINOR_VERSION = 6
 verbosity = 1
 Epsilon = 1e-5
 done = 0
@@ -51,18 +51,20 @@ Optimize = 3
 
 M_Mat	= 0x01
 M_Geo	= 0x02
-M_Scn	= 0x04
-M_Anim	= 0x08
+M_Amt	= 0x04
+M_Obj	= 0x08
 M_Game	= 0x10
-M_Obj	= 0x20
-M_Tool	= 0x80
+M_Scn	= 0x20
+M_Tool	= 0x40
+M_Anim	= 0x80
 M_All = 0xff
 
-M_Rigify = 0x1000
-M_MHX	= 0x2000
-M_Shape	= 0x4000
+M_Rigify = 0x100
+M_MHX	= 0x200
+M_Shape	= 0x400
+M_VGroup = 0x800
 
-expMsk = M_Geo+M_Anim+M_Obj+M_Mat
+expMsk = 0
 theRig = ""
 
 #
@@ -730,24 +732,61 @@ def exportMaterial(mat, fp):
 	for (n,mtex) in enumerate(mat.textures):
 		if mtex:
 			exportMTex(n, mtex, mat.use_textures[n], fp)
-	writeDir(mat, ['textures', 'volume', 'diffuse_ramp', 'specular_ramp'], "  ", fp)
+	prio = ['diffuse_color', 'diffuse_shader', 'specular_color', 'specular_shader']
+	writePrio(mat, prio, "  ", fp)
+	writeDir(mat, prio+['textures', 'volume', 'diffuse_ramp', 'specular_ramp'], "  ", fp)
 	fp.write("end Material\n\n")
+
+MapToTypes = {
+	'map_alpha' : 'ALPHA',
+	'map_ambient' : 'AMBIENT',
+	'map_colordiff' : 'COLOR',
+	'map_coloremission' : 'COLOR_EMISSION',
+	'map_colorreflection' : 'COLOR_REFLECTION',
+	'map_colorspec' : 'COLOR_SPEC',
+	'map_colortransmission' : 'COLOR_TRANSMISSION',
+	'map_density' : 'DENSITY',
+	'map_diffuse' : 'DIFFUSE',
+	'map_displacement' : 'DISPLACEMENT',
+	'map_emission' : 'EMISSION',
+	'map_emit' : 'EMIT', 
+	'map_hardness' : 'HARDNESS',
+	'map_mirror' : 'MIRROR',
+	'map_normal' : 'NORMAL',
+	'map_raymir' : 'RAYMIR',
+	'map_reflection' : 'REFLECTION',
+	'map_scattering' : 'SCATTERING',
+	'map_specular' : 'SPECULAR_COLOR', 
+	'map_translucency' : 'TRANSLUCENCY',
+	'map_warp' : 'WARP',
+}
 
 def exportMTex(index, mtex, use, fp):
 	tex = mtex.texture
 	texname = tex.name.replace(' ','_')
-	fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coordinates, use))
-	# writePrio(mtex, ['texture'], "    ", fp)
-	print("MTEX", texname)
-	writeDir(mtex, ['texture', 'type', 'texture_coordinates', 'offset'], "    ", fp)
+	mapto = None
+	prio = []
+	for ext in MapToTypes.keys():
+		if eval("mtex.%s" % ext):
+			if mapto == None:
+				mapto = MapToTypes[ext]
+			prio.append(ext)	
+			print("Mapto", ext, mapto)
+			
+	fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coordinates, mapto))
+	writePrio(mtex, ['texture']+prio, "    ", fp)
+	print("MTEX", texname,  list(MapToTypes.keys()) )
+	writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coordinates', 'offset'], "    ", fp)
 	print("DONE MTEX", texname)
 	fp.write("  end MTex\n\n")
 	return
 
 def exportTexture(tex, fp):
 	fp.write("Texture %s %s\n" % (tex.name.replace(' ', '_'), tex.type))
-	writePrio(tex, ['image'], "  ", fp)
-	writeDir(tex, ['image_user', 'use_nodes', 'use_textures', 'type'], "  ", fp)
+	if tex.type == 'IMAGE':
+		fp.write("  Image %s ;\n" % tex.image.name.replace(' ', '_'))
+	else:
+		writeDir(tex, ['image_user', 'use_nodes', 'use_textures', 'type'], "  ", fp)
 	fp.write("end Texture\n\n")
 
 def exportImage(img, fp):
@@ -1007,25 +1046,26 @@ FacialKey = {
 
 #
 def exportShapeKeys(me, fp):
-	skey = me.shape_keys
-	shapeName = skey.name.replace(' ','_')
-	fp.write("  ShapeKey %s %s %s %g\n" %
-		(shapeName, skey.reference_key.name.replace(' ','_'), skey.relative, skey.slurph))
-	for key in skey.keys:
-		keyName = key.name.replace(' ','_')
+	skeys = me.shape_keys
+	for skey in skeys.keys:
+		skeyName = skey.name.replace(' ','_')
 		try:
-			lr = FacialKey[keyName]
-			fp.write("    Key %s %s\n" % (keyName, lr))
-			for (n,pt) in enumerate(key.data):
+			lr = FacialKey[skeyName]
+		except:
+			if expMsk & M_MHX:
+				lr = None
+			else:
+				lr = "Sym"
+		if lr:
+			fp.write("  ShapeKey %s %s\n" % (skeyName, lr))
+			writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
+			for (n,pt) in enumerate(skey.data):
 				dv = pt.co - me.verts[n].co
 				if dv.length > Epsilon:
-					fp.write("      sv %d %g %g %g ;\n" %(n, dv[0], dv[1], dv[2]))
-			fp.write("    end Key\n")
-			print(key)
-		except:
-			pass
-		createdLocal['ShapeKey'].append(keyName)
-	fp.write("  end ShapeKey\n")
+					fp.write("    sv %d %g %g %g ;\n" %(n, dv[0], dv[1], dv[2]))
+			fp.write("  end ShapeKey\n")
+			print(skey)
+		createdLocal['ShapeKey'].append(skeyName)
 
 #
 #	exportArmature(ob, fp):
@@ -1034,10 +1074,6 @@ def exportShapeKeys(me, fp):
 #
 
 def exportArmature(ob, fp):
-	if expMsk & M_MHX:
-		fp.write("*** Armature\n")
-		return
-
 	amt = ob.data
 	amtName = amt.name.replace(' ','_')
 	obName = ob.name.replace(' ','_')
@@ -1097,14 +1133,23 @@ def exportArmature(ob, fp):
 
 def exportBone(fp, bone):
 	flags = 0
-	fp.write("  Bone %s \n" % (bone.name.replace(' ','_')))
-	prio = ['head', 'tail', 'roll', 'connected', 'deform', 'layer']
+	if expMsk & M_MHX:
+		fp.write("  *** Bone %s \n" % (bone.name.replace(' ','_')))
+		fp.write("    *** head ;\n")
+		fp.write("    *** tail ;\n")
+		fp.write("    *** roll ;\n")
+	else:
+		fp.write("  Bone %s \n" % (bone.name.replace(' ','_')))
+		writePrio(bone,  ['head', 'tail', 'roll'], "    ", fp)
+
+	prio = ['connected', 'deform', 'layer']
 	writePrio(bone, prio, "    ", fp)
 	if bone.parent:
 		fp.write("    parent Refer Bone %s ;\n" % (bone.parent.name.replace(' ','_')))
 
-	writeDir(bone, 
-		prio + ['parent', 'head_local', 'tail_local', 'matrix_local', 'children'], 
+	if expMsk & M_MHX == 0:
+		writeDir(bone, prio + 
+		['head', 'tail', 'roll', 'parent', 'head_local', 'tail_local', 'matrix_local', 'children'], 
 		"    ", fp)
 
 	fp.write("  end Bone\n\n")
@@ -1198,39 +1243,38 @@ def exportBezierPoint(bz, pad, fp):
 	fp.write("%s ;\n" % bz.handle2_type)
 
 #
+#	writeHeader(fp):
 #	writeMaterials(fp):
 #	writeAnimations(fp):
-#
-#
+#	writeArmatures(fp):
+#	writeMeshes(fp):
+#	writeTools(fp):
+#	writeScenes(fp):
 #
 
-def writeMaterials(fp):
+def writeHeader(fp):
 	fp.write(
 "# Blender 2.5 exported MHX \n" +
 "MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION) +
 "if Blender24\n" +
 "  error 'This file can only be read with Blender 2.5' ;\n" +
 "end if\n")
+	return
 
-	if bpy.data.groups and expMsk & M_Geo:
-		fp.write("\n# ---------------- Groups -------------------------------- # \n \n")
-		for grp in bpy.data.groups:
-			initLocalData()
-			exportDefault("Group", grp, [], [], [], fp)
-
-	if bpy.data.images and expMsk & M_Mat:
+def writeMaterials(fp):
+	if bpy.data.images:
 		fp.write("\n# --------------- Images ----------------------------- # \n \n")
 		for img in bpy.data.images:
 			initLocalData()
 			exportImage(img, fp)
 
-	if bpy.data.textures and expMsk & M_Mat:
+	if bpy.data.textures:
 		fp.write("\n# --------------- Textures ----------------------------- # \n \n")			
 		for tex in bpy.data.textures:
 			initLocalData()
 			exportTexture(tex, fp)
 			
-	if bpy.data.materials and expMsk & M_Mat:
+	if bpy.data.materials:
 		fp.write("\n# --------------- Materials ----------------------------- # \n \n")
 		for mat in bpy.data.materials:
 			print(mat)
@@ -1239,7 +1283,7 @@ def writeMaterials(fp):
 	return
 
 def writeAnimations(fp):
-	if bpy.data.actions and expMsk & M_Anim:
+	if bpy.data.actions:
 		fp.write("\n# --------------- Actions ----------------------------- # \n \n")
 		for act in bpy.data.actions:
 			initLocalData()
@@ -1247,8 +1291,8 @@ def writeAnimations(fp):
 	return
 
 def writeArmatures(fp):
-	if bpy.data.objects and expMsk & M_Geo:		
-		fp.write("\n# --------------- Objects ----------------------------- # \n \n")
+	if bpy.data.objects:		
+		fp.write("\n# --------------- Armatures ----------------------------- # \n \n")
 		for ob in bpy.data.objects:
 			if ob.type == 'ARMATURE':
 				initLocalData()
@@ -1256,39 +1300,47 @@ def writeArmatures(fp):
 	return
 
 def writeMeshes(fp):
-	if bpy.data.objects and expMsk & M_Geo:		
+	if bpy.data.objects:		
 		for ob in bpy.data.objects:
 			if ob.type != 'ARMATURE':
 				initLocalData()
 				exportObject(ob, fp)
+	if bpy.data.groups:
+		fp.write("\n# ---------------- Groups -------------------------------- # \n \n")
+		for grp in bpy.data.groups:
+			initLocalData()
+			exportDefault("Group", grp, [], [], [], fp)
+
 	return
 
-def writeStuff(fp):
-	if bpy.data.brushes  and expMsk & M_Tool:
+def writeTools(fp):
+	if bpy.data.brushes:
 		print(bpy.data.brushes)
 		for brush in bpy.data.brushes:
 			initLocalData()
 			exportDefault('Brush', brush, [], [], [], fp)
 
-	if bpy.data.libraries and expMsk & M_Tool:		
+	if bpy.data.libraries:		
 		fp.write("\n# --------------- Libraries ----------------------------- # \n \n")
 		for lib in bpy.data.libraries:
 			initLocalData()
 			exportDefault("Library", lib, [], [], [], fp)
+	return
 		
-	if bpy.data.node_groups and expMsk & M_Scn:		
+def writeScenes(fp):
+	if bpy.data.node_groups:		
 		fp.write("\n# --------------- Node groups ----------------------------- # \n \n")
 		for grp in bpy.data.node_groups:
 			initLocalData()
 			exportDefault("Node_group", grp, [], [], [], fp)
 
-	if bpy.data.worlds and expMsk & M_Scn:
+	if bpy.data.worlds:
 		fp.write("\n# --------------- Worlds ----------------------------- # \n \n")
 		for world in bpy.data.worlds:
 			initLocalData()
 			exportDefault("World", world, [], [], [], fp)
 
-	if bpy.data.scenes and expMsk & M_Scn:
+	if bpy.data.scenes:
 		fp.write("\n# --------------- Scenes ----------------------------- # \n \n")
 		for scn in bpy.data.scenes:
 			initLocalData()
@@ -1300,35 +1352,57 @@ def writeStuff(fp):
 #	writeMhxTemplates():
 #
 
-def writeMhxFile(fileName):
+def writeMhxFile(fileName, msk):
+	global expMsk
+	expMsk = msk
+	print("expMsk %x %x %x" %( expMsk, M_Mat, expMsk&M_Mat))
 	n = len(fileName)
 	if fileName[n-3:] != "mhx":
 		raise NameError("Not a mhx file: " + fileName)
 	fp = open(fileName, "w")
-	writeMaterials(fp)
-	writeAnimations(fp)
-	writeArmatures(fp)
-	writeMeshes(fp)
-	writeStuff(fp)
+	writeHeader(fp)
+	if expMsk & M_Mat:
+		writeMaterials(fp)
+	if expMsk & M_Anim:
+		writeAnimations(fp)
+	if expMsk & M_Amt:
+		writeArmatures(fp)
+	if expMsk & M_Geo:
+		writeMeshes(fp)
+	if expMsk & M_Tool:
+		writeTools(fp)
+	if expMsk & M_Scn:
+		writeScenes(fp)
 	mhxClose(fp)
 	return
 
-def writeMhxTemplates():
-	fp = mhxOpen("materials25.mhx")
-	writeMaterials(fp)
-	mhxClose(fp)
-	fp = mhxOpen("meshes25.mhx")
-	writeMeshes(fp)
-	mhxClose(fp)
-	fp = mhxOpen("armatures%s25.mhx" % theRig)
-	writeArmatures(fp)
-	mhxClose(fp)
+def writeMhxTemplates(msk):
+	global expMsk
+	expMsk = msk
+	if expMsk & M_Mat:
+		fp = mhxOpen("materials25.mhx")
+		writeHeader(fp)
+		writeMaterials(fp)
+		mhxClose(fp)
+	if expMsk & M_Geo:
+		fp = mhxOpen("meshes25.mhx")
+		writeMeshes(fp)
+		mhxClose(fp)
+	if expMsk & M_Amt:
+		fp = mhxOpen("armatures%s25.mhx" % theRig)
+		writeArmatures(fp)
+		mhxClose(fp)
 	return
 
-MHDir = '/home/thomas/svn/makehuman'
+#
+#	MakeHuman directory
+#
+
+#MHDir = '/home/thomas/svn/makehuman/data/templates/'
+MHDir = 'C:\\home\\svn\\data\\templates\\'
 
 def mhxOpen(name):
-	fileName = "%s/data/templates/%s" % (MHDir, name)
+	fileName = "%s%s" % (MHDir, name)
 	print( "Writing MHX file " + fileName )
 	return open(fileName, 'w')
 
@@ -1340,12 +1414,12 @@ def mhxClose(fp):
 #
 #	Testing
 #
-expMsk = M_Mat+M_Geo+M_MHX
 theRig = "-classic"
-#expMsk = M_Geo+M_Mat+M_MHX+M_Rigify
-#theRig = "-rigify"
-writeMhxTemplates()
+#writeMhxFile('/home/thomas/mhx5/test1.mhx', M_Mat+M_Geo+M_Amt+M_Shape)
+writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_Shape)
 
-#writeMhxFile('/home/thomas/mhx4/test1.mhx')
-#writeMhxFile('/home/thomas/myblends/mhx4/test1.mhx')
-#writeMhxBases()
+#theRig = "-rigify"
+#writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_Rigify)
+
+
+

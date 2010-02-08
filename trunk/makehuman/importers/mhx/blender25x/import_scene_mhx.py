@@ -1,13 +1,13 @@
 """ 
-**Project Name:**      MakeHuman
+**Project Name:**	  MakeHuman
 
 **Product Home Page:** http://www.makehuman.org/
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+**Code Home Page:**	http://code.google.com/p/makehuman/
 
 **Authors:**		   Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+**Copyright(c):**	  MakeHuman Team 2001-2010
 
 **Licensing:**		 GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -70,7 +70,7 @@ toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
 
 useMesh = 1
 doSmash = 1
-verbosity = 4
+verbosity = 2
 warnedTextureDir = False
 warnedVersion = False
 
@@ -452,17 +452,20 @@ def parseKeyFramePoint(pt, args, tokens):
 def parseMaterial(args, tokens):
 	global todo
 	name = args[0]
+	#print("Parse material "+name)
 	mat = bpy.data.materials.new(name)
 	if mat == None:
 		return None
 	loadedData['Material'][name] = mat
-	print("Material %s %s %s" % (mat, name, loadedData['Material'][name]))
+	#print("Material %s %s %s" % (mat, name, loadedData['Material'][name]))
 	for (key, val, sub) in tokens:
 		if key == 'MTex':
+			#print("MTEX", val)
 			parseMTex(mat, val, sub)
+			#print("MTEX done")
 		else:
 			defaultKey(key, val, sub, 'mat', ['specular_intensity', 'tangent_shading'], globals(), locals())
-	print("Done ", mat)
+	#print("Done ", mat)
 	
 	return mat
 
@@ -471,12 +474,11 @@ def parseMTex(mat, args, tokens):
 	index = int(args[0])
 	texname = args[1]
 	texco = args[2]
-	use = args[3]
+	mapto = args[3]
 
-	mat.add_texture(texture = loadedData['Texture'][texname], texture_coordinates = texco)
+	mat.add_texture(texture = loadedData['Texture'][texname], texture_coordinates = texco, map_to = mapto)
 	mtex = mat.textures[index]
-	mat.use_textures[index] = Bool(use)
-	print("mtex", mtex)
+	#mat.use_textures[index] = Bool(use)
 
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, "mtex", [], globals(), locals())
@@ -490,18 +492,21 @@ def parseTexture(args, tokens):
 	name = args[0]
 	tex = bpy.data.textures.new(name)
 	typ = args[1]
-	print("TEX", tex)
 	tex.type = typ
+	print("RECASTING", tex, typ)
 	tex = tex.recast_type()
-	print("RECAST", tex)
+	print("RECAST OK", tex, typ)
 	loadedData['Texture'][name] = tex
 	
 	for (key, val, sub) in tokens:
-		if key == 'image':
+		print("TEX", key, val)
+		if key == 'Image':
 			try:
-				tex.image = loadedData['Image'][val[0]]
+				imgName = val[0]
+				img = loadedData['Image'][imgName]
+				tex.image = img
 			except:
-				pass
+				msg = "Unable to load image '%s'" % val[0]
 		else:
 			defaultKey(key, val,  sub, "tex", ['use_nodes', 'use_textures', 'contrast'], globals(), locals())
 
@@ -573,6 +578,7 @@ def loadImage(filepath):
 	
 def parseImage(args, tokens):
 	global todo
+	imgName = args[0]
 	img = None
 	for (key, val, sub) in tokens:
 		if key == 'Filename':
@@ -580,10 +586,11 @@ def parseImage(args, tokens):
 			for n in range(1,len(val)):
 				filename += " " + val[n]
 			img = loadImage(filename)
+			img.name = imgName
 		else:
 			defaultKey(key, val,  sub, "img", ['depth', 'dirty', 'has_data', 'size', 'type'], globals(), locals())
 	print ("Image %s" % img )
-	loadedData['Image'][img.name] = img
+	loadedData['Image'][imgName] = img
 	return img
 
 #
@@ -888,6 +895,8 @@ def parseVertexGroup(ob, me, args, tokens):
 
 #
 #	parseShapeKey(ob, me, args, tokens):
+#	addShapeKey(ob, name, vgroup, tokens):
+#	doShape(name):
 #
 
 def doShape(name):
@@ -900,28 +909,38 @@ def parseShapeKey(ob, me, args, tokens):
 	if verbosity > 0:
 		print( "Parsing shape %s" % args[0] )
 	name = args[0]
+	lr = args[1]
 	bpy.context.scene.objects.active = ob
+	if lr == 'Sym':
+		addShapeKey(ob, name, None, tokens)
+	elif lr == 'LR':
+		addShapeKey(ob, name+'_L', 'Left', tokens)
+		addShapeKey(ob, name+'_R', 'Right', tokens)
+	else:
+		raise NameError("ShapeKey L/R %s" % lr)
+	return
+
+def addShapeKey(ob, name, vgroup, tokens):
 	bpy.ops.object.shape_key_add(False)
-	block = ob.active_shape_key
+	skey = ob.active_shape_key
 	if name != 'Basis':
-		block.relative_key = loadedData['ShapeKey']['Basis']
-	print("L1", loadedData['ShapeKey'])
-	block.name = name
-	loadedData['ShapeKey'][name] = block
-	print("L2", loadedData['ShapeKey'])
-	block.slider_min = float(args[1])
-	block.slider_max = float(args[2])
-	if args[3] != "None":
-		block.vertex_group = args[3]
+		skey.relative_key = loadedData['ShapeKey']['Basis']
+	skey.name = name
+	if vgroup:
+		skey.vertex_group = vgroup
+	loadedData['ShapeKey'][name] = skey
 
 	for (key, val, sub) in tokens:
 		if key == 'sv':
 			index = int(val[0])
-			pt = block.data[index].co
+			pt = skey.data[index].co
 			(x,y,z) = rot90(float(val[1]), float(val[2]), float(val[3]), True)
 			pt[0] += x
 			pt[1] += y
 			pt[2] += z
+		else:
+			defaultKey(key, val,  sub, "skey", [], globals(), locals())
+
 	return	
 
 	
@@ -1091,8 +1110,6 @@ def parseArray(list, args):
 def parseConstraint(constraints, args, tokens):
 	cns = constraints.new(args[1])
 	cns.name = args[0]
-	print("Cnostr", cns)
-	#cns.influence = float(args[2])
 	for (key,val,sub) in tokens:
 		if key == 'invert':
 			parseArray([cns.invert_x, cns.invert_y, cns.invert_z], val)
@@ -1411,14 +1428,188 @@ def clearScene():
 #
 #	User interface
 #
-"""
+
 DEBUG= False
 from bpy.props import *
 
+def check(flag):
+	global toggle
+	if toggle & flag:
+		return "CHECKBOX_HLT"
+	else:
+		return "CHECKBOX_DEHLT"
+
+class IMPORT_PT_makehuman_mhx(bpy.types.Panel):
+	bl_label = "Import MHX"
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
+	bl_context = "scene"
+
+	def draw(self, context):
+		row = self.layout.row()
+		col = []
+		split = row.split(percentage = 1.0/3)
+		col.append(split.column())
+		col[0].operator("mhxArmIK", icon=check(T_ArmIK))
+		col.append(split.column())
+		col[1].operator("mhxLegIK", icon=check(T_LegIK))
+		col.append(split.column())
+		col[2].operator("mhxFingerIK", icon=check(T_FingerIK))
+
+		row = self.layout.row()
+		col = []
+		split = row.split(percentage = 1.0/3)
+		col.append(split.column())
+		col[0].operator("mhxFKIK", icon=check(T_FKIK))
+		col.append(split.column())
+		col[1].operator("mhxDispObs", icon=check(T_DispObs))
+		col.append(split.column())
+		col[2].operator("mhxReplace", icon=check(T_Replace))
+
+		row = self.layout.row()
+		col = []
+		split = row.split(percentage = 1.0/3)
+		col.append(split.column())
+		col[0].operator("mhxShapes", icon=check(T_Face))
+		col.append(split.column())
+		col[1].operator("mhxRot90", icon=check(T_Rot90))
+		col.append(split.column())
+		col[2].operator("mhxTexDir")
+
+		row = self.layout.row()
+		row.operator("mhxImport")
+
+		return
+
+class OBJECT_OT_mhx_arm_ik(bpy.types.Operator):
+	bl_label = "Arm IK"
+	bl_idname = "mhxArmIK"
+	bl_description = "Arm IK"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_ArmIK
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_leg_ik(bpy.types.Operator):
+	bl_label = "Leg IK"
+	bl_idname = "mhxLegIK"
+	bl_description = "Leg IK"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_LegIK
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_finger_ik(bpy.types.Operator):
+	bl_label = "Finger IK"
+	bl_idname = "mhxFingerIK"
+	bl_description = "Finger IK"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_FingerIK
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_fkik(bpy.types.Operator):
+	bl_label = "FK/IK"
+	bl_idname = "mhxFKIK"
+	bl_description = "FK/IK switch"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_FKIK
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_dispobs(bpy.types.Operator):
+	bl_label = "Dispobs"
+	bl_idname = "mhxDispObs"
+	bl_description = "Display objects"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_DispObs
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_replace(bpy.types.Operator):
+	bl_label = "Replace scene"
+	bl_idname = "mhxReplace"
+	bl_description = "Replace scene"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_Replace
+		return{'FINISHED'}
+
+
+class OBJECT_OT_mhx_shapes(bpy.types.Operator):
+	bl_label = "Shapes"
+	bl_idname = "mhxShapes"
+	bl_description = "Shape keys"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_Face
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_rot90(bpy.types.Operator):
+	bl_label = "Rot 90"
+	bl_idname = "mhxRot90"
+	bl_description = "Rotate 90 degrees (Y up)"
+
+	def invoke(self, context, event):
+		global toggle
+		toggle ^= T_Rot90
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_texdir(bpy.types.Operator):
+	bl_label = "Tex dir"
+	bl_idname = "mhxTexDir"
+	bl_description = "Choose texture directory"
+
+	def invoke(self, context, event):
+		return{'FINISHED'}
+
+class OBJECT_OT_mhx_import(bpy.types.Operator):
+	bl_label = "Import MHX file"
+	bl_idname = "mhxImport"
+	bl_description = "Import MHX file"
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
+
+	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
+
+	def execute(self, context):
+		readMhxFile(self.properties.path)
+		return {'FINISHED'}
+
+	def invoke(self, context, event):
+		wm = context.manager
+		wm.add_fileselect(self)
+		return {'RUNNING_MODAL'}
+
+
+bpy.types.register(OBJECT_OT_mhx_arm_ik)
+bpy.types.register(OBJECT_OT_mhx_leg_ik)
+bpy.types.register(OBJECT_OT_mhx_finger_ik)
+bpy.types.register(OBJECT_OT_mhx_fkik)
+bpy.types.register(OBJECT_OT_mhx_dispobs)
+bpy.types.register(OBJECT_OT_mhx_replace)
+bpy.types.register(OBJECT_OT_mhx_shapes)
+bpy.types.register(OBJECT_OT_mhx_rot90)
+bpy.types.register(OBJECT_OT_mhx_texdir)
+bpy.types.register(OBJECT_OT_mhx_import)
+bpy.types.register(IMPORT_PT_makehuman_mhx)
+
+
+"""
 class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	'''Import from MHX file format (.mhx)'''
 	bl_idname = "import_scene.makehuman_mhx"
-	bl_label = 'Import MHX'
+	bl_description = 'Import from MHX file format (.mhx)'
+	bl_label = "Import MHX"
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
@@ -1431,20 +1622,9 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default= True)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default= False)
 	rot90 = BoolProperty(name="Rot 90", description="Rotate X 90.", default= False)
-
+	
 	def execute(self, context):
-		loadMhx(self.properties.path, 
-			context, 
-			self.properties.armik +
-			(self.properties.legik << 1) +
-			(self.properties.fkik << 2) +
-			(self.properties.fingerik << 3) +
-			(self.properties.dispobs << 4) +
-			(self.properties.replace << 5) +
-			(self.properties.face << 6) +
-			(self.properties.shape << 7) +
-			(self.properties.rot90 << 8)
-			)
+		readMhxFile(self.properties.path)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
@@ -1453,17 +1633,19 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		return {'RUNNING_MODAL'}
 
 bpy.types.register(IMPORT_OT_makehuman_mhx)
-
 menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 bpy.types.INFO_MT_file_import.append(menu_func)
+"""
+
 """
 #
 #	Testing
 #
-readMhxFile("/home/thomas/makehuman/exports/foo-classic25.mhx")
-#readMhxFile("/home/thomas/mhx4/test1.mhx")
+#readMhxFile("/home/thomas/makehuman/exports/foo-classic-25.mhx")
+readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-classic-25.mhx")
+#readMhxFile("/home/thomas/mhx5/test1.mhx")
 #readMhxFile("/home/thomas/myblends/mhx4/test1.mhx")
-#bump
+"""
 
 
 

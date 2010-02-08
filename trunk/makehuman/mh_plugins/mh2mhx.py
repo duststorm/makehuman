@@ -25,20 +25,24 @@ TO DO
 import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify
 import os
 
+
 splitLeftRight = True
+
 
 #
 #	exportMhx(obj, filename):
 #
 def exportMhx(obj, filename):	
 	(name, ext) = os.path.splitext(filename)
+
+	filename = name+"-24"+ext
 	print("Writing MHX 2.4x file " + filename )
 	fp = open(filename, 'w')
 	exportMhx_24(obj, fp)
 	fp.close()
 	print("MHX 2.4x file %s written" % filename)
 
-	filename = name+"-classic25"+ext
+	filename = name+"-classic-25"+ext
 	print("Writing MHX 2.5x file " + filename )
 	fp = open(filename, 'w')
 	exportMhx_25(obj, "classic", fp)
@@ -52,29 +56,49 @@ def exportMhx(obj, filename):
 
 def exportMhx_24(obj, fp):
 	fp.write(
+
 "# MakeHuman exported MHX\n" +
+
 "# www.makehuman.org\n" +
+
 "MHX 0 5 ;\n")
+
+
 
 	fp.write(
 "if Blender25\n"+
 "  error('This file can not be opened in Blender 2.5x. Try the -classic25 file instead.') ;\n "+
 "end if\n")
 
+
 	copyMaterialFile("data/templates/materials24.mhx", fp)	
+
 	exportArmature(obj, fp)
+
 	tmpl = open("data/templates/meshes24.mhx")
+
 	if tmpl:
+
 		copyMeshFile249(obj, tmpl, fp)	
+
 		tmpl.close()
+
 	return
 
-#
-#	exportRawMhx(obj, fp)
+
+
 #
 
+#	exportRawMhx(obj, fp)
+
+#
+
+
+
 def exportRawMhx(obj, fp):
+
 	exportArmature(obj, fp)
+
 	fp.write(
 "if useMesh \n" +
 "mesh Human Human \n")
@@ -92,9 +116,11 @@ def exportRawMhx(obj, fp):
 #
 
 def exportMhx_25(obj, rig, fp):
+	mhxbones.setupBones(obj)
 	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
 	copyFile25(obj, "data/templates/armatures-%s25.mhx" % rig, rig, fp)	
 	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+
 	return
 
 def copyFile25(obj, tmplName, rig, fp):
@@ -104,6 +130,7 @@ def copyFile25(obj, tmplName, rig, fp):
 		print("Cannot open "+tmplName)
 		return
 
+	bone = None
 	for line in tmpl:
 		lineSplit= line.split()
 		if len(lineSplit) == 0:
@@ -113,9 +140,21 @@ def copyFile25(obj, tmplName, rig, fp):
 				pass
 			elif lineSplit[1] == 'Particles':
 				pass
+			elif lineSplit[1] == 'Bone':
+				bone = lineSplit[2]
+				fp.write("    Bone %s\n" % bone)
+			elif lineSplit[1] == 'head':
+				(x, y, z) = mhxbones.boneHead[bone]
+				fp.write("    head (%g,%g,%g) ;\n" % (x,y,z))
+			elif lineSplit[1] == 'tail':
+				(x, y, z) = mhxbones.boneTail[bone]
+				fp.write("    tail (%g,%g,%g) ;\n" % (x,y,z))
+			elif lineSplit[1] == 'roll':
+				(x, y) = mhxbones.boneRoll[bone]
+				fp.write("    roll %g %g ;\n" % (x,y))
 			elif lineSplit[1] == 'Verts':
 				for v in obj.verts:
-					fp.write("v %g %g %g ;\n" %(v.co[0], v.co[1], v.co[2]))
+					fp.write("    v %g %g %g ;\n" %(v.co[0], v.co[1], v.co[2]))
 			elif lineSplit[1] == 'VertexGroup':
 				copyFile("data/templates/vertexgroups-%s25.mhx" % rig, fp)	
 			elif lineSplit[1] == 'ShapeKey':
@@ -124,10 +163,15 @@ def copyFile25(obj, tmplName, rig, fp):
 				fp.write("Armature HumanRig HumanRig %s\n" % rig)
 				fp.write("end Armature\n")
 			elif lineSplit[1] == 'Filename':
+
 				path1 = os.path.expanduser("./data/textures/")
+
 				(path, filename) = os.path.split(lineSplit[2])
+
 				file1 = os.path.realpath(path1+filename)
+
 				fp.write("  Filename %s ;\n" % file1)
+
 			else:
 				raise NameError("Unknown *** %s" % lineSplit[1])
 		else:
@@ -135,15 +179,20 @@ def copyFile25(obj, tmplName, rig, fp):
 
 	print("Closing "+tmplName)
 	tmpl.close()
+
 	return
+
+
 
 def copyFile(tmplName, fp):
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
+
 	if tmpl == None:
 		print("Cannot open "+tmplName)
 		return
 	for line in tmpl:
+
 		fp.write(line)
 	print("Closing "+tmplName)
 	tmpl.close()
@@ -157,68 +206,129 @@ def copyMaterialFile(infile, fp):
 	tmpl = open(infile, "rU")
 	for line in tmpl:
 		lineSplit= line.split()
+
 		if len(lineSplit) == 0:
+
 			fp.write(line)
+
 		elif lineSplit[0] == 'filename':
+
 			path1 = os.path.expanduser("./data/textures/")
+
 			(path, filename) = os.path.split(lineSplit[1])
+
 			file1 = os.path.realpath(path1+filename)
+
 			fp.write("  filename %s ;\n" % file1)
+
 		else:
+
 			fp.write(line)
 	tmpl.close()
 
+
 #
 #	copyMeshFile249(obj, tmpl, fp):
+
 #
 
+
+
 def copyMeshFile249(obj, tmpl, fp):
+
 	inZone = False
+
 	skip = False
+
 	mainMesh = False
+
 	
+
 	for line in tmpl:
+
 		lineSplit= line.split()
+
 		skipOne = False
 
+
+
 		if len(lineSplit) == 0:
+
 			pass
+
 		elif lineSplit[0] == 'end':
+
 			if lineSplit[1] == 'object' and mainMesh:
+
 				fp.write(line)
+
 				skipOne = True
+
 				fp.write("end if\n")
+
 				mainMesh = False
+
 			elif lineSplit[1] == 'mesh' and mainMesh:
+
 				shpfp = open("data/templates/shapekeys24.mhx", "rU")
+
 				exportShapeKeys(obj, shpfp, fp)
+
 				shpfp.close()
+
 				writeIpo(fp)
+
 				fp.write(line)
+
 				skipOne = True
+
 				fp.write("end if\n")
+
 				mainMesh = False
+
 				inZone = False
+
 				skip = False
+
 		elif lineSplit[0] == 'mesh' and lineSplit[1] == 'Human':
+
 			inZone = True
+
 			mainMesh = True
+
 			fp.write("if useMesh\n")
+
 		elif lineSplit[0] == 'object' and lineSplit[1] == 'Human':
+
 			mainMesh = True
+
 			fp.write("if useMesh\n")
+
 		elif lineSplit[0] == 'v' and inZone:
+
 			if not skip:
+
 				exportRawData(obj, fp)
+
 				skip = True
+
 		elif lineSplit[0] == 'f' and skip:
+
 			skip = False
+
 			skipOne = True
 
+
+
 		if not (skip or skipOne):
+
 			fp.write(line)
+
 	
+
 	return
+
+
 
 #
 #	exportRawData(obj, fp):	
@@ -252,6 +362,7 @@ def exportRawData(obj, fp):
 def exportArmature(obj, fp):
 	mhxbones.writeJoints(obj, fp)
 	fp.write("\narmature HumanRig HumanRig\n")
+
 
 
 	mhxbones.writeBones(obj, fp)
@@ -413,4 +524,5 @@ def writeIpo(fp):
 	if tmpl:
 		print(mhxFile+" closed")
 		tmpl.close()
+
 	return

@@ -43002,8 +43002,8 @@ Mesh Human Human
 end Mesh
 
 Object Human MESH Human
-  active_material Refer Material SSS_skinshader ;
-  active_material_index 0 ;
+  active_material Refer Material Invisio ;
+  active_material_index 1 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
   active_vertex_group_index 39 ;
@@ -43067,7 +43067,7 @@ Object Human MESH Human
   rotation_mode 'XYZ' ;
   rotation_quaternion (1,0,0,0) ;
   scale (1,1,1) ;
-  selected True ;
+  selected False ;
   shape_key_edit_mode False ;
   shape_key_lock False ;
   slow_parent False ;
