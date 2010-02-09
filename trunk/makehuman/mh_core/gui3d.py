@@ -982,12 +982,21 @@ class FileChooser(View):
                 for ext in self.extension:
                     if f.endswith('.' + ext):
                         self.files.append(f)
-        self.selectedFile = 0
+
+        if (self.selectedFile > len(self.files)) or (self.selectedFile < 0):
+            self.selectedFile =0 #Im not sure if this happens but Ill check
 
         self.currentFile.setScale(1.5)
 
-        self.previousFile.clearTexture()
-        self.previousFile.hide()
+        #self.previousFile.clearTexture()
+        #self.previousFile.hide()
+        
+        if self.selectedFile > 0:
+            self.previousFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile-1]))
+            self.previousFile.show()
+        else:
+            self.previousFile.clearTexture()
+            self.previousFile.hide()
 
         if self.selectedFile < len(self.files):
             self.currentFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile]))
