@@ -66,7 +66,7 @@ T_Rot90 = 0x100
 
 T_Rigify = 0x1000
 
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
+toggle = T_Replace + T_ArmIK + T_LegIK 
 
 useMesh = 1
 doSmash = 1
@@ -234,7 +234,7 @@ def readMhxFile(filePath):
 	
 	for (expr, glbals, lcals) in todo:
 		try:
-			print("Doing %s" % expr)
+			#print("Doing %s" % expr)
 			exec(expr, glbals, lcals)
 		except:
 			msg = "Failed: "+expr
@@ -242,7 +242,7 @@ def readMhxFile(filePath):
 			nErrors += 1
 			#raise NameError(msg)
 
-	processRigify()
+	postProcess()
 	time2 = time.clock()
 	msg = "File %s loaded in %g s" % (fileName, time2-time1)
 	if nErrors:
@@ -477,7 +477,7 @@ def parseMTex(mat, args, tokens):
 	mapto = args[3]
 
 	mat.add_texture(texture = loadedData['Texture'][texname], texture_coordinates = texco, map_to = mapto)
-	mtex = mat.textures[index]
+	mtex = mat.texture_slots[index]
 	#mat.use_textures[index] = Bool(use)
 
 	for (key, val, sub) in tokens:
@@ -615,14 +615,19 @@ def parseObject(args, tokens):
 
 	try:
 		ob = loadedData['Object'][name]
+		bpy.context.scene.objects.active = ob
 		print("Found data")
 	except:
 		ob = createObject(type, name, data)
-	bpy.context.scene.objects.active = ob
+	if bpy.context.object != ob:
+		print("Context", ob, bpy.context.object, bpy.context.scene.objects.active)
+		ob = foo 
 
 	for (key, val, sub) in tokens:
-		if key == 'ParticleSystem':
-			parseParticleSystem(ob.particle_systems, val, sub)
+		if key == 'Modifier':
+			parseModifier(ob, val, sub)
+		elif key == 'ParticleSystem':
+			parseParticleSystem(ob, val, sub)
 		else:
 			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
 	return
@@ -636,21 +641,41 @@ def createObject(type, name, data):
 	ob.name = name
 	loadedData['Object'][name] = ob
 	bpy.context.scene.objects.link(ob)
+	bpy.context.scene.objects.active = ob
 	return ob
 
 #
-#	parseParticleSystem(particle_systems, args, tokens):
+#	parseModifier(ob, args, tokens):
+#
+
+def parseModifier(ob, args, tokens):
+	name = args[0]
+	typ = args[1]
+	if typ == 'PARTICLE_SYSTEM':
+		return None
+	print("MOD", name, typ)
+	mod = ob.modifiers.new(name, typ)
+	for (key, val, sub) in tokens:
+		defaultKey(key, val, sub, 'mod', [], globals(), locals())
+	print("MOD2", mod)
+	return mod
+
+#
+#	parseParticleSystem(ob, args, tokens):
 #	parseParticles(particles, args, tokens):
 #	parseParticle(par, args, tokens):
 #
 
-def parseParticleSystem(particle_systems, args, tokens):
-	print(particle_systems)
+def parseParticleSystem(ob, args, tokens):
+	print(ob, bpy.context.object)
+	pss = ob.particle_systems
+	print(pss, pss.values())
 	name = args[0]
 	typ = args[1]
-	#psys = particle_systems.new(name, typ)
+	#psys = pss.new(name, typ)
 	bpy.ops.object.particle_system_add()
-	psys = particle_systems[-1]
+	print(pss, pss.values())
+	psys = pss[-1]
 	psys.settings.type = typ
 	loadedData['ParticleSystem'][name] = psys
 	print("Psys", psys)
@@ -756,7 +781,10 @@ def parseMesh (args, tokens):
 			if doShape(val[0]):
 				parseShapeKey(ob, me, val, sub)
 		elif key == 'Material':
-			me.add_material(loadedData['Material'][val[0]])
+			try:
+				me.add_material(loadedData['Material'][val[0]])
+			except:
+				print("Could not add material", val[0])
 		else:
 			defaultKey(key, val,  sub, "me", [], globals(), locals())
 
@@ -910,7 +938,7 @@ def parseShapeKey(ob, me, args, tokens):
 		print( "Parsing shape %s" % args[0] )
 	name = args[0]
 	lr = args[1]
-	bpy.context.scene.objects.active = ob
+	# bpy.context.scene.objects.active = ob
 	if lr == 'Sym':
 		addShapeKey(ob, name, None, tokens)
 	elif lr == 'LR':
@@ -977,7 +1005,7 @@ def parseArmature (args, tokens):
 		toggle &= ~T_Rigify
 		amt = bpy.data.armatures.new(amtname)
 		ob = createObject('Armature', obname, amt)	
-		bpy.context.scene.objects.active = ob
+		# bpy.context.scene.objects.active = ob
 
 	loadedData['Armature'][amtname] = amt
 	loadedData['Object'][obname] = ob
@@ -1035,16 +1063,43 @@ def parseBone(amt, bones, args, tokens):
 
 
 #
-#	processRigify()
+#	postProcess()
 #
 
-def processRigify():
-	for ob in loadedData['Rigify'].values():
-		bpy.context.scene.objects.active = ob
-		bpy.ops.pose.metarig_generate()
-		bpy.context.scene.objects.unlink(ob)
-		ob = bpy.context.object
-		print("Rigged", ob)
+def postProcess():
+	if toggle & T_Rigify:
+		for ob in loadedData['Rigify'].values():
+			bpy.context.scene.objects.active = ob
+			bpy.ops.pose.metarig_generate()
+			bpy.context.scene.objects.unlink(ob)
+			ob = bpy.context.object
+			print("Rigged", ob)
+
+	else:
+		if toggle & T_ArmIK:
+			setInfluence(['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R'], 1.0)
+		if toggle & T_LegIK:
+			setInfluence(['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R'], 1.0)
+		if toggle & T_FingerIK:
+			for i in range(5):
+				for j in range(3):
+					setInfluence(['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)], 1.0)
+	return
+
+def setInfluence(bones, w):
+	ob = loadedData['Object']['HumanRig']
+	bpy.context.scene.objects.active = ob
+	bpy.ops.object.mode_set(mode='POSE')
+	pbones = ob.pose.bones	
+	for pb in pbones:
+		if pb.name in bones:
+			print("setinfl", pb.name)
+			for cns in pb.constraints:
+				cns.influence = w
+	bpy.ops.object.mode_set(mode='OBJECT')
+	return
+
+		
 	
 
 
@@ -1318,7 +1373,7 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 	try:
 		exec(expr, glbals, lcals)
 	except:
-		print("Failed ",expr)
+		#print("Failed ",expr)
 		todo.append((expr, glbals, lcals))
 	return
 			
@@ -1428,7 +1483,7 @@ def clearScene():
 #
 #	User interface
 #
-
+"""
 DEBUG= False
 from bpy.props import *
 
@@ -1600,7 +1655,7 @@ bpy.types.register(OBJECT_OT_mhx_rot90)
 bpy.types.register(OBJECT_OT_mhx_texdir)
 bpy.types.register(OBJECT_OT_mhx_import)
 bpy.types.register(IMPORT_PT_makehuman_mhx)
-
+"""
 
 """
 class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
@@ -1636,16 +1691,14 @@ bpy.types.register(IMPORT_OT_makehuman_mhx)
 menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 bpy.types.INFO_MT_file_import.append(menu_func)
 """
-
-"""
 #
 #	Testing
 #
-#readMhxFile("/home/thomas/makehuman/exports/foo-classic-25.mhx")
-readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-classic-25.mhx")
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
+readMhxFile("/home/thomas/makehuman/exports/foo-classic-25.mhx")
+#readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-classic-25.mhx")
 #readMhxFile("/home/thomas/mhx5/test1.mhx")
 #readMhxFile("/home/thomas/myblends/mhx4/test1.mhx")
-"""
 
 
 

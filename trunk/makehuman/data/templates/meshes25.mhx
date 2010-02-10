@@ -42974,6 +42974,7 @@ Mesh Human Human
   end MeshTextureFaceLayer
   Material SSS_skinshader ;
   Material Invisio ;
+  Material Hair ;
     *** VertexGroup
     *** ShapeKey
   active_uv_texture_index 0 ;
@@ -43002,17 +43003,40 @@ Mesh Human Human
 end Mesh
 
 Object Human MESH Human
-  active_material Refer Material Invisio ;
-  active_material_index 1 ;
+    layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    Modifier Armature ARMATURE
+      b_bone_rest False ;
+      editmode True ;
+      expanded True ;
+      invert False ;
+      multi_modifier False ;
+      object Refer Object HumanRig ;
+      on_cage True ;
+      quaternion False ;
+      realtime True ;
+      render True ;
+      use_bone_envelopes True ;
+      use_vertex_groups True ;
+    end Modifier
+    Modifier ParticleSystem_1 PARTICLE_SYSTEM
+      editmode False ;
+      expanded True ;
+      on_cage False ;
+      realtime True ;
+      render True ;
+    end Modifier
+*** ParticleSystem
+  active_material Refer Material Hair ;
+  active_material_index 2 ;
   active_particle_system_index 0 ;
-  active_shape_key_index 0 ;
-  active_vertex_group_index 39 ;
+  active_shape_key_index 22 ;
+  active_vertex_group_index 103 ;
   color Array 1.0 1.0 1.0 1.0  ;
   delta_location (0,0,0) ;
   delta_rotation_euler (0,0,0) ;
   delta_rotation_quaternion (0,0,0,0) ;
   delta_scale (0,0,0) ;
-  dimensions (16.2823,16.9561,2.85939) ;
+  dimensions (16.3674,3.02534,16.7043) ;
   draw_axis False ;
   draw_bounds False ;
   draw_bounds_type 'BOX' ;
@@ -43042,20 +43066,6 @@ Object Human MESH Human
     row 0.0 0.0 0.0 1.0 ;
   end Matrix
   max_draw_type 'TEXTURED' ;
-  modifiers[0] Struct Modifier Armature rna.modifiers.new("Armature","ARMATURE")
-    b_bone_rest False ;
-    editmode True ;
-    expanded True ;
-    invert False ;
-    multi_modifier False ;
-    object Refer Object HumanRig ;
-    on_cage True ;
-    quaternion False ;
-    realtime True ;
-    render True ;
-    use_bone_envelopes True ;
-    use_vertex_groups True ;
-  end Struct
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
   pass_index 0 ;
@@ -43063,11 +43073,11 @@ Object Human MESH Human
   restrict_select False ;
   restrict_view False ;
   rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
-  rotation_euler (0,0,0) ;
+  rotation_euler (0,-0,0) ;
   rotation_mode 'XYZ' ;
   rotation_quaternion (1,0,0,0) ;
   scale (1,1,1) ;
-  selected False ;
+  selected True ;
   shape_key_edit_mode False ;
   shape_key_lock False ;
   slow_parent False ;
@@ -43142,6 +43152,7 @@ Mesh MHBall MHBall
 end Mesh
 
 Object MHBall MESH MHBall
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43280,6 +43291,7 @@ Mesh MHCircle03 MHCircle03
 end Mesh
 
 Object MHCircle03 MESH MHCircle03
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43418,6 +43430,7 @@ Mesh MHCircle05 MHCircle05
 end Mesh
 
 Object MHCircle05 MESH MHCircle05
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43556,6 +43569,7 @@ Mesh MHCircle10 MHCircle10
 end Mesh
 
 Object MHCircle10 MESH MHCircle10
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43694,6 +43708,7 @@ Mesh MHCircle15 MHCircle15
 end Mesh
 
 Object MHCircle15 MESH MHCircle15
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43766,118 +43781,118 @@ end Object
 
 Mesh MHFace MHFace 
   Verts
-    v 0.738147 2.79736e-08 -0.854837 ;
-    v -0.738148 -1.60234e-08 -0.854836 ;
-    v 0.935171 3.10402e-08 -0.45351 ;
-    v -0.935171 -2.47003e-08 -0.453509 ;
-    v 0.908892 2.69481e-08 0.0198878 ;
-    v -0.908892 -2.72261e-08 0.0198885 ;
-    v 0.839707 2.15772e-08 0.493286 ;
-    v -0.839707 -2.84732e-08 0.493286 ;
-    v 0.642684 1.29003e-08 0.894614 ;
-    v -0.642683 -2.54066e-08 0.894614 ;
-    v 0.347819 2.23825e-09 1.16277 ;
-    v -0.347818 -1.84933e-08 1.16277 ;
-    v 4.2563e-07 -8.50771e-09 1.21716 ;
-    v -4.2563e-07 8.50771e-09 -1.21716 ;
-    v 0.483059 2.22458e-08 -1.123 ;
-    v -0.48306 -6.54678e-09 -1.12299 ;
-    v 0.534954 1.94171e-08 -0.497044 ;
-    v -0.534955 -1.24686e-08 -0.497044 ;
-    v 0.604961 2.05593e-08 -0.361969 ;
-    v -0.604961 -1.54991e-08 -0.361969 ;
-    v 0.534955 1.75288e-08 -0.226893 ;
-    v -0.534955 -1.43569e-08 -0.226893 ;
-    v 0.365946 1.21009e-08 -0.170942 ;
-    v -0.365946 -9.71117e-09 -0.170942 ;
-    v 0.196936 7.4551e-09 -0.226893 ;
-    v -0.196937 -4.28323e-09 -0.226893 ;
-    v 0.12693 6.31291e-09 -0.361969 ;
-    v -0.12693 -1.25272e-09 -0.361969 ;
-    v 0.196936 9.3434e-09 -0.497044 ;
-    v -0.196937 -2.39493e-09 -0.497044 ;
-    v 0.365945 1.47713e-08 -0.552994 ;
-    v -0.365946 -7.0407e-09 -0.552994 ;
-    v 1.01156e-07 -2.02196e-09 0.289273 ;
-    v 2.54929e-07 -5.09564e-09 0.729011 ;
-    v 0.349007 5.97673e-09 0.632991 ;
-    v -0.349007 -1.48257e-08 0.632991 ;
-    v 0.56263 1.32923e-08 0.497209 ;
-    v -0.56263 -2.02431e-08 0.497209 ;
-    v 0.349007 7.87491e-09 0.361426 ;
-    v -0.349007 -1.29275e-08 0.361426 ;
-    v 0.365945 1.656e-08 -0.808888 ;
-    v -0.365946 -5.25206e-09 -0.808887 ;
-    v 0.196936 1.13899e-08 -0.789831 ;
-    v -0.196937 -3.48403e-10 -0.789831 ;
-    v 0.12693 8.982e-09 -0.743825 ;
-    v -0.126931 1.41637e-09 -0.743825 ;
-    v 0.196936 1.07468e-08 -0.697819 ;
-    v -0.196937 -9.91551e-10 -0.697819 ;
-    v 0.365945 1.60397e-08 -0.73445 ;
-    v -0.365946 -5.77237e-09 -0.734449 ;
-    v 0.534954 2.08205e-08 -0.697819 ;
-    v -0.534955 -1.10653e-08 -0.697819 ;
-    v 0.604961 2.32284e-08 -0.743825 ;
-    v -0.604961 -1.283e-08 -0.743824 ;
-    v 0.534954 2.14636e-08 -0.789831 ;
-    v -0.534955 -1.04221e-08 -0.78983 ;
-    v 0.668323 2.5316e-08 -0.772329 ;
-    v 0.84671 2.80925e-08 -0.408964 ;
-    v -0.668324 -1.45192e-08 -0.772328 ;
-    v -0.84671 -2.23753e-08 -0.408964 ;
-    v 0.822917 2.43874e-08 0.0196529 ;
-    v -0.822916 -2.46622e-08 0.0196535 ;
-    v 0.760276 1.95246e-08 0.44827 ;
-    v -0.760275 -2.57913e-08 0.448271 ;
-    v 0.58189 1.16685e-08 0.811634 ;
-    v -0.581889 -2.30148e-08 0.811634 ;
-    v 0.314917 2.01501e-09 1.05443 ;
-    v -0.314916 -1.67555e-08 1.05443 ;
-    v 3.85944e-07 -7.71444e-09 1.10367 ;
-    v -3.84793e-07 7.69143e-09 -1.10038 ;
-    v 0.437364 2.013e-08 -1.01512 ;
-    v -0.437365 -5.93897e-09 -1.01512 ;
-    v 1.17554e-07 -2.34974e-09 0.336167 ;
-    v 0.271411 5.34674e-09 0.392278 ;
-    v -0.271411 -1.08306e-08 0.392278 ;
-    v 2.37138e-07 -4.74004e-09 0.678137 ;
-    v 0.271412 3.87058e-09 0.603466 ;
-    v -0.271411 -1.23068e-08 0.603466 ;
-    v 0.43754 9.55966e-09 0.497872 ;
-    v -0.437539 -1.65197e-08 0.497872 ;
-    v 0.492865 1.79276e-08 -0.463406 ;
-    v 0.545437 1.87854e-08 -0.361969 ;
-    v 0.492865 1.65096e-08 -0.260531 ;
-    v 0.365945 1.24334e-08 -0.218515 ;
-    v 0.239026 8.94459e-09 -0.260531 ;
-    v 0.186454 8.08686e-09 -0.361969 ;
-    v 0.239026 1.03626e-08 -0.463406 ;
-    v 0.365945 1.44388e-08 -0.505422 ;
-    v -0.489833 -1.1376e-08 -0.460981 ;
-    v -0.541149 -1.35974e-08 -0.361969 ;
-    v -0.489833 -1.27601e-08 -0.262955 ;
-    v -0.365946 -9.35469e-09 -0.221942 ;
-    v -0.242059 -5.3759e-09 -0.262955 ;
-    v -0.190743 -3.15449e-09 -0.361969 ;
-    v -0.242059 -3.99173e-09 -0.460981 ;
-    v -0.365946 -7.39718e-09 -0.501994 ;
-    v 0.124296 -6.36123e-08 -1.4318 ;
-    v 0.124296 -1.14643e-07 -1.59757 ;
-    v 1.09752 -9.66864e-08 -1.59757 ;
-    v 1.09752 -4.56552e-08 -1.4318 ;
-    v 1.09752 -6.72788e-08 -1.90038 ;
-    v 1.09752 -1.1831e-07 -2.06615 ;
-    v 0.124296 -1.36267e-07 -2.06615 ;
-    v 0.124296 -8.52358e-08 -1.90038 ;
-    v -1.09218 -1.07588e-07 -1.90038 ;
-    v -1.09218 -1.58619e-07 -2.06615 ;
-    v -0.0931959 -1.40662e-07 -2.06615 ;
-    v -0.0931961 -8.96305e-08 -1.90038 ;
-    v -0.0931959 -6.8007e-08 -1.4318 ;
-    v -0.0931958 -1.19038e-07 -1.59757 ;
-    v -1.09218 -1.36995e-07 -1.59757 ;
-    v -1.09218 -8.5964e-08 -1.4318 ;
+    v 0.738147 0 -0.854837 ;
+    v -0.738148 -0 -0.854836 ;
+    v 0.935171 0 -0.45351 ;
+    v -0.935171 -0 -0.453509 ;
+    v 0.908892 0 0.019888 ;
+    v -0.908892 -0 0.019888 ;
+    v 0.839707 0 0.493286 ;
+    v -0.839707 -0 0.493286 ;
+    v 0.642684 0 0.894614 ;
+    v -0.642683 -0 0.894614 ;
+    v 0.347819 0 1.16277 ;
+    v -0.347818 -0 1.16277 ;
+    v 0 -0 1.21716 ;
+    v -0 0 -1.21716 ;
+    v 0.483059 0 -1.123 ;
+    v -0.48306 -0 -1.123 ;
+    v 0.534954 0 -0.497044 ;
+    v -0.534955 -0 -0.497044 ;
+    v 0.604961 0 -0.361969 ;
+    v -0.604961 -0 -0.361969 ;
+    v 0.534955 0 -0.226893 ;
+    v -0.534955 -0 -0.226893 ;
+    v 0.365946 0 -0.170942 ;
+    v -0.365946 -0 -0.170942 ;
+    v 0.196936 0 -0.226893 ;
+    v -0.196937 -0 -0.226893 ;
+    v 0.12693 0 -0.361969 ;
+    v -0.12693 -0 -0.361969 ;
+    v 0.196936 0 -0.497044 ;
+    v -0.196937 -0 -0.497044 ;
+    v 0.365945 0 -0.552994 ;
+    v -0.365946 -0 -0.552994 ;
+    v 0 -0 0.289273 ;
+    v 0 -0 0.729011 ;
+    v 0.349007 0 0.632991 ;
+    v -0.349007 -0 0.632991 ;
+    v 0.56263 0 0.497209 ;
+    v -0.56263 -0 0.497209 ;
+    v 0.349007 0 0.361426 ;
+    v -0.349007 -0 0.361426 ;
+    v 0.365945 0 -0.808888 ;
+    v -0.365946 -0 -0.808887 ;
+    v 0.196936 0 -0.789831 ;
+    v -0.196937 -0 -0.789831 ;
+    v 0.12693 0 -0.743825 ;
+    v -0.126931 0 -0.743825 ;
+    v 0.196936 0 -0.697819 ;
+    v -0.196937 -0 -0.697819 ;
+    v 0.365945 0 -0.73445 ;
+    v -0.365946 -0 -0.734449 ;
+    v 0.534954 0 -0.697819 ;
+    v -0.534955 -0 -0.697819 ;
+    v 0.604961 0 -0.743825 ;
+    v -0.604961 -0 -0.743824 ;
+    v 0.534954 0 -0.789831 ;
+    v -0.534955 -0 -0.78983 ;
+    v 0.668323 0 -0.772329 ;
+    v 0.84671 0 -0.408964 ;
+    v -0.668324 -0 -0.772328 ;
+    v -0.84671 -0 -0.408964 ;
+    v 0.822917 0 0.019653 ;
+    v -0.822916 -0 0.019654 ;
+    v 0.760276 0 0.44827 ;
+    v -0.760275 -0 0.448271 ;
+    v 0.58189 0 0.811634 ;
+    v -0.581889 -0 0.811634 ;
+    v 0.314917 0 1.05443 ;
+    v -0.314916 -0 1.05443 ;
+    v 0 -0 1.10367 ;
+    v -0 0 -1.10038 ;
+    v 0.437364 0 -1.01512 ;
+    v -0.437365 -0 -1.01512 ;
+    v 0 -0 0.336167 ;
+    v 0.271411 0 0.392278 ;
+    v -0.271411 -0 0.392278 ;
+    v 0 -0 0.678137 ;
+    v 0.271412 0 0.603466 ;
+    v -0.271411 -0 0.603466 ;
+    v 0.43754 0 0.497872 ;
+    v -0.437539 -0 0.497872 ;
+    v 0.492865 0 -0.463406 ;
+    v 0.545437 0 -0.361969 ;
+    v 0.492865 0 -0.260531 ;
+    v 0.365945 0 -0.218515 ;
+    v 0.239026 0 -0.260531 ;
+    v 0.186454 0 -0.361969 ;
+    v 0.239026 0 -0.463406 ;
+    v 0.365945 0 -0.505422 ;
+    v -0.489833 -0 -0.460981 ;
+    v -0.541149 -0 -0.361969 ;
+    v -0.489833 -0 -0.262955 ;
+    v -0.365946 -0 -0.221942 ;
+    v -0.242059 -0 -0.262955 ;
+    v -0.190743 -0 -0.361969 ;
+    v -0.242059 -0 -0.460981 ;
+    v -0.365946 -0 -0.501994 ;
+    v 0.124296 -0 -1.4318 ;
+    v 0.124296 -0 -1.59757 ;
+    v 1.09752 -0 -1.59757 ;
+    v 1.09752 -0 -1.4318 ;
+    v 1.09752 -0 -1.90038 ;
+    v 1.09752 -0 -2.06615 ;
+    v 0.124296 -0 -2.06615 ;
+    v 0.124296 -0 -1.90038 ;
+    v -1.09218 -0 -1.90038 ;
+    v -1.09218 -0 -2.06615 ;
+    v -0.093196 -0 -2.06615 ;
+    v -0.093196 -0 -1.90038 ;
+    v -0.093196 -0 -1.4318 ;
+    v -0.093196 -0 -1.59757 ;
+    v -1.09218 -0 -1.59757 ;
+    v -1.09218 -0 -1.4318 ;
   end Verts
   Faces
     f 2 0 56 57 ;
@@ -43960,6 +43975,7 @@ Mesh MHFace MHFace
 end Mesh
 
 Object MHFace MESH MHFace
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43969,7 +43985,7 @@ Object MHFace MESH MHFace
   delta_rotation_euler (0,0,0) ;
   delta_rotation_quaternion (0,0,0,0) ;
   delta_scale (0,0,0) ;
-  dimensions (2.18971,1.89659e-07,3.28331) ;
+  dimensions (2.18971,0,3.28331) ;
   draw_axis False ;
   draw_bounds False ;
   draw_bounds_type 'BOX' ;
@@ -44005,7 +44021,7 @@ Object MHFace MESH MHFace
   restrict_select False ;
   restrict_view False ;
   rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
-  rotation_euler (0,0,0) ;
+  rotation_euler (0,-0,0) ;
   rotation_mode 'XYZ' ;
   rotation_quaternion (1,0,0,0) ;
   scale (1,1,1) ;

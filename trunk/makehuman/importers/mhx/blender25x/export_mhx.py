@@ -63,6 +63,7 @@ M_Rigify = 0x100
 M_MHX	= 0x200
 M_Shape	= 0x400
 M_VGroup = 0x800
+M_Part = 0x1000
 
 expMsk = 0
 theRig = ""
@@ -380,6 +381,9 @@ excludeList = [\
 	'bl_rna', 'fake_user', 'id_data', 'rna_type', 'name', 'tag', 'users', 'type'
 ]
 
+Danger = ['ParticleEdit', 'color_ramp']
+
+
 def writeValue(ext, arg, exclude, pad, depth, fp):
 	global todo
 
@@ -388,7 +392,8 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
 	   arg == [] or\
 	   ext[0] == '_' or\
 	   ext in excludeList or\
-	   ext in exclude:
+	   ext in exclude or\
+	   ext in Danger:
 		return
 		
 	if ext == 'targets':
@@ -559,8 +564,6 @@ def writeArray(ext, arg, pad, depth, fp):
 #	writeBpyType(typ, ext, data, pad, depth, fp):
 #
 
-Danger = ['ParticleEdit']
-
 def writeBpyType(typ, ext, data, pad, depth, fp):
 	if typ in Danger:
 		fp.write(" DANGER %s ;\n" % typ)
@@ -729,7 +732,7 @@ def writeTuple(list, fp):
 
 def exportMaterial(mat, fp):
 	fp.write("Material %s \n" % mat.name.replace(' ', '_'))
-	for (n,mtex) in enumerate(mat.textures):
+	for (n,mtex) in enumerate(mat.texture_slots):
 		if mtex:
 			exportMTex(n, mtex, mat.use_textures[n], fp)
 	prio = ['diffuse_color', 'diffuse_shader', 'specular_color', 'specular_shader']
@@ -792,10 +795,10 @@ def exportTexture(tex, fp):
 def exportImage(img, fp):
 	fp.write("Image %s\n" % (img.name.replace(' ', '_')))
 	if expMsk & M_MHX:
-		prefix = "*** "
+		(path, name) = os.path.split(img.filename)
+		fp.write("  *** Filename %s ;\n" % (name))
 	else:
-		prefix = ""
-	fp.write("  %sFilename %s ;\n" % (prefix, img.filename))
+		fp.write("  %sFilename %s ;\n" % (img.filename))
 	# writeDir(img, [], "  ", fp)
 	fp.write("end Image\n\n")
 
@@ -825,13 +828,25 @@ def exportObject(ob, fp):
 		datName = 'None'
 	fp.write("\nObject %s %s %s\n" % (ob.name.replace(' ', '_'), ob.type, datName))
 
+	writeArray('layers', ob.layers, "    ", 1, fp)
+
+	for mod in ob.modifiers:
+		exportModifier(mod, fp)
+
 	for psys in ob.particle_systems:
-		exportParticleSystem(psys, "  ", fp)
+		if expMsk & M_MHX:
+			fp.write("*** ParticleSystem\n")
+			fp1 = mhxOpen(M_Part, "particles25.mhx")
+			exportParticleSystem(psys, "  ", fp1)
+			mhxClose(fp1)
+		else:
+			exportParticleSystem(psys, "  ", fp)
 
 	print("AD", ob.animation_data)
 	# exportAnimationData(ob.animation_data, fp)
 	writeDir(ob, 
 		['data','parent_vertices', 'mode', 'scene_users', 'children', 'pose', 
+		'material_slots', 'modifiers', 'layers',
 		'animation_visualisation', 'animation_data', 'particle_systems', 'active_particle_system',
 		'active_shape_key', 'vertex_groups', 'active_vertex_group', 'materials'], "  ", fp)
 	fp.write("end Object\n\n")
@@ -862,7 +877,8 @@ def exportParticleSettings(settings, psys, pad, fp):
 	else:
 		prefix = ""
 	fp.write("%s%samount %d ;\n" % (pad, prefix, settings.amount))
-	writeDir(settings, ['amount'], pad+"  ", fp)
+	fp.write("%s%shair_step %d ;\n" % (pad, prefix, settings.hair_step))
+	writeDir(settings, ['amount', 'hair_step'], pad+"  ", fp)
 	fp.write("%send Struct\n" % pad)
 
 def exportParticles(particles, nmax, pad, fp):
@@ -870,18 +886,19 @@ def exportParticles(particles, nmax, pad, fp):
 	prio = ['location']
 	if expMsk & M_MHX:
 		fp.write("%s  *** Particles\n" % pad)
-	else:
-		n = 0
-		for par in particles:
-			if n < nmax:
-				fp.write("%s  Particle \n" % pad)
-				for h in par.hair:
-					fp.write("%s    h " % pad)
-					writeTuple(h.location, fp)
-					fp.write(" %d %g ;\n" % (h.time, h.weight))
-				writePrio(par, prio, pad+"    ", fp)
-				fp.write("%s  end Particle\n" % pad)
-				n += 1
+	n = 0
+	for par in particles:
+		if n < nmax:
+			fp.write("%s  Particle \n" % pad)
+			for h in par.hair:
+				fp.write("%s    h " % pad)
+				writeTuple(h.location, fp)
+				fp.write(" %d %g ;\n" % (h.time, h.weight))
+			writePrio(par, prio, pad+"    ", fp)
+			fp.write("%s  end Particle\n" % pad)
+			n += 1
+	if expMsk & M_MHX:
+		fp.write("%s  *** EndParticles\n" % pad)
 	writeDir(particles[0], prio+['hair'], pad+"  ", fp)
 	fp.write("%send Particles\n" % pad)
 
@@ -973,7 +990,7 @@ def exportMesh(ob, fp):
 	
 	if expMsk & M_MHX and obName == "Human":
 		fp.write("    *** VertexGroup\n")
-		fp1 = mhxOpen("vertexgroups%s25.mhx" % theRig)
+		fp1 = mhxOpen(M_VGroup, "vertexgroups%s25.mhx" % theRig)
 		exportVertexGroups(ob, me, fp1)
 		mhxClose(fp1)
 	else:
@@ -982,10 +999,9 @@ def exportMesh(ob, fp):
 	if me.shape_keys:
 		if expMsk & M_MHX and obName == "Human":
 			fp.write("    *** ShapeKey\n")
-			if expMsk & M_Shape:
-				fp1 = mhxOpen("shapekeys-facial25.mhx")
-				exportShapeKeys(me, fp1)
-				mhxClose(fp1)
+			fp1 = mhxOpen(M_Shape, "shapekeys-facial25.mhx")
+			exportShapeKeys(me, fp1)
+			mhxClose(fp1)
 		else:
 			if expMsk & M_Shape:
 				exportShapeKeys(me, fp)
@@ -1198,6 +1214,18 @@ def exportConstraint(cns, index, fp):
 		'disabled', 'lin_error', 'rot_error', 'target', 'type'], "      ", fp)	
 	fp.write("    end Constraint\n")
 	return
+
+#
+#	exportModifier(mod, fp):
+#
+
+def exportModifier(mod, fp):
+	name = mod.name.replace(' ', '_')
+	fp.write("    Modifier %s %s\n" % (name, mod.type))
+	writeDir(mod, [], "      ", fp)	
+	fp.write("    end Modifier\n")
+	return
+
 #
 #	exportRestObject(ob,fp):
 #
@@ -1379,30 +1407,37 @@ def writeMhxFile(fileName, msk):
 def writeMhxTemplates(msk):
 	global expMsk
 	expMsk = msk
-	if expMsk & M_Mat:
-		fp = mhxOpen("materials25.mhx")
-		writeHeader(fp)
-		writeMaterials(fp)
-		mhxClose(fp)
-	if expMsk & M_Geo:
-		fp = mhxOpen("meshes25.mhx")
-		writeMeshes(fp)
-		mhxClose(fp)
-	if expMsk & M_Amt:
-		fp = mhxOpen("armatures%s25.mhx" % theRig)
-		writeArmatures(fp)
-		mhxClose(fp)
+
+	fp = mhxOpen(M_Mat, "materials25.mhx")
+	writeHeader(fp)
+	writeMaterials(fp)
+	mhxClose(fp)
+	
+	fp = mhxOpen(M_Geo, "meshes25.mhx")
+	writeMeshes(fp)
+	mhxClose(fp)
+
+	fp = mhxOpen(M_Amt, "armatures%s25.mhx" % theRig)
+	writeArmatures(fp)
+	mhxClose(fp)
 	return
 
 #
 #	MakeHuman directory
 #
 
-#MHDir = '/home/thomas/svn/makehuman/data/templates/'
-MHDir = 'C:\\home\\svn\\data\\templates\\'
+MHXDir = '/home/thomas/svn/makehuman/data/templates/'
+TrashDir = '/home/thomas/mhx5/trash/'
 
-def mhxOpen(name):
-	fileName = "%s%s" % (MHDir, name)
+# MHXDir = 'C:/home/svn/data/templates/'
+# TrashDir = 'C:/home/thomas/mhx5/trash/'
+
+def mhxOpen(msk, name):
+	if expMsk & msk:
+		fdir = MHXDir
+	else:
+		fdir = TrashDir
+	fileName = "%s%s" % (fdir, name)
 	print( "Writing MHX file " + fileName )
 	return open(fileName, 'w')
 
@@ -1416,8 +1451,7 @@ def mhxClose(fp):
 #
 theRig = "-classic"
 #writeMhxFile('/home/thomas/mhx5/test1.mhx', M_Mat+M_Geo+M_Amt+M_Shape)
-writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_Shape)
-
+writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Part)
 #theRig = "-rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_Rigify)
 

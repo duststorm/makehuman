@@ -6,27 +6,42 @@ end if
 
 # --------------- Images ----------------------------- # 
  
-Image texture.tif
-  *** Filename C:\home\svn\data\textures\texture.tif ;
+Image Render_Result
+  *** Filename  ;
 end Image
 
-Image texture_opacity.tif
-  *** Filename C:\home\svn\data\textures\texture_opacity.tif ;
+Image texture.png
+  *** Filename texture.png ;
 end Image
 
-Image texture_ref.tif
-  *** Filename C:\home\svn\data\textures\texture_ref.tif ;
+Image texture_opacity.png
+  *** Filename texture_opacity.png ;
+end Image
+
+Image texture_ref.png
+  *** Filename texture_ref.png ;
 end Image
 
 
 # --------------- Textures ----------------------------- # 
  
 Texture alpha IMAGE
-  Image texture_opacity.tif ;
+  Image texture_opacity.png ;
 end Texture
 
 Texture diffuse IMAGE
-  Image texture.tif ;
+  Image texture.png ;
+end Texture
+
+Texture Hair BLEND
+  brightness 1 ;
+  contrast 1 ;
+  factor_blue 1 ;
+  factor_green 1 ;
+  factor_red 1 ;
+  flip_axis 'HORIZONTAL' ;
+  progression 'LINEAR' ;
+  use_color_ramp True ;
 end Texture
 
 Texture normals CLOUDS
@@ -45,18 +60,201 @@ Texture normals CLOUDS
 end Texture
 
 Texture specularity IMAGE
-  Image texture_ref.tif ;
+  Image texture_ref.png ;
 end Texture
 
 
 # --------------- Materials ----------------------------- # 
  
+Material Hair 
+  MTex 0 Hair STRAND COLOR
+    texture Refer Texture Hair ;
+    map_colordiff True ;
+    map_alpha True ;
+    map_coloremission True ;
+    map_density True ;
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
+    colordiff_factor 1 ;
+    coloremission_factor 1 ;
+    colorreflection_factor 1 ;
+    colorspec_factor 1 ;
+    colortransmission_factor 1 ;
+    default_value 1 ;
+    density_factor 1 ;
+    diffuse_factor 1 ;
+    displacement_factor 0.2 ;
+    emission_factor 1 ;
+    emit_factor 1 ;
+    enabled True ;
+    from_dupli False ;
+    from_original False ;
+    hardness_factor 1 ;
+    mapping 'FLAT' ;
+    mirror_factor 1 ;
+    negate False ;
+    new_bump True ;
+    normal_factor 1 ;
+    normal_map_space 'TANGENT' ;
+    raymir_factor 1 ;
+    reflection_factor 1 ;
+    rgb_to_intensity False ;
+    scattering_factor 1 ;
+    size (1,1,1) ;
+    specular_factor 1 ;
+    stencil False ;
+    translucency_factor 1 ;
+    warp_factor 0 ;
+    x_mapping 'X' ;
+    y_mapping 'Y' ;
+    z_mapping 'Z' ;
+  end MTex
+
+  diffuse_color Array 0.800000011921 0.800000011921 0.800000011921  ;
+  diffuse_shader 'LAMBERT' ;
+  specular_color Array 1.0 1.0 1.0  ;
+  specular_shader 'COOKTORR' ;
+  active_texture Refer Texture Hair ;
+  active_texture_index 0 ;
+  alpha 0 ;
+  ambient 1 ;
+  cast_buffer_shadows True ;
+  cast_shadows_only False ;
+  cubic False ;
+  darkness 1 ;
+  diffuse_fresnel 0.1 ;
+  diffuse_fresnel_factor 0.5 ;
+  diffuse_intensity 0.8 ;
+  diffuse_ramp_blend 'MIX' ;
+  diffuse_ramp_factor 1 ;
+  diffuse_ramp_input 'SHADER' ;
+  diffuse_toon_size 0.5 ;
+  diffuse_toon_smooth 0.1 ;
+  emit 0 ;
+  exclude_mist False ;
+  face_texture False ;
+  face_texture_alpha False ;
+  full_oversampling False ;
+  invert_z False ;
+  light_group_exclusive False ;
+  mirror_color Array 1.0 1.0 1.0  ;
+  object_color False ;
+  only_shadow False ;
+  ray_shadow_bias True ;
+  receive_transparent_shadows False ;
+  roughness 0.5 ;
+  shadeless False ;
+  shadow_buffer_bias 0 ;
+  shadow_casting_alpha 1 ;
+  shadow_ray_bias 0 ;
+  shadows True ;
+  specular_alpha 1 ;
+  specular_hardness 50 ;
+  specular_intensity 0.5 ;
+  specular_ior 4 ;
+  specular_ramp_blend 'MIX' ;
+  specular_ramp_factor 1 ;
+  specular_ramp_input 'SHADER' ;
+  specular_slope 0.1 ;
+  specular_toon_size 0.5 ;
+  specular_toon_smooth 0.1 ;
+  strand Struct MaterialStrand None 
+    blend_distance 0 ;
+    blender_units True ;
+    min_size 0.001 ;
+    root_size 0.02 ;
+    shape 0 ;
+    surface_diffuse False ;
+    tangent_shading True ;
+    tip_size 0.01 ;
+    width_fade 0 ;
+  end Struct
+  tangent_shading True ;
+  texture_slots[0] Struct MaterialTextureSlot Hair 
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
+    colordiff_factor 1 ;
+    coloremission_factor 1 ;
+    colorreflection_factor 1 ;
+    colorspec_factor 1 ;
+    colortransmission_factor 1 ;
+    default_value 1 ;
+    density_factor 1 ;
+    diffuse_factor 1 ;
+    displacement_factor 0.2 ;
+    emission_factor 1 ;
+    emit_factor 1 ;
+    enabled True ;
+    from_dupli False ;
+    from_original False ;
+    hardness_factor 1 ;
+    map_alpha True ;
+    map_ambient False ;
+    map_colordiff True ;
+    map_coloremission True ;
+    map_colorreflection False ;
+    map_colorspec False ;
+    map_colortransmission False ;
+    map_density True ;
+    map_diffuse False ;
+    map_displacement False ;
+    map_emission False ;
+    map_emit False ;
+    map_hardness False ;
+    map_mirror False ;
+    map_normal False ;
+    map_raymir False ;
+    map_reflection False ;
+    map_scattering False ;
+    map_specular False ;
+    map_translucency False ;
+    map_warp False ;
+    mapping 'FLAT' ;
+    mirror_factor 1 ;
+    negate False ;
+    new_bump True ;
+    normal_factor 1 ;
+    normal_map_space 'TANGENT' ;
+    offset (0,0,0) ;
+    raymir_factor 1 ;
+    reflection_factor 1 ;
+    rgb_to_intensity False ;
+    scattering_factor 1 ;
+    size (1,1,1) ;
+    specular_factor 1 ;
+    stencil False ;
+    texture Refer Texture Hair ;
+    texture_coordinates 'STRAND' ;
+    translucency_factor 1 ;
+    warp_factor 0 ;
+    x_mapping 'X' ;
+    y_mapping 'Y' ;
+    z_mapping 'Z' ;
+  end Struct
+  traceable True ;
+  translucency 0 ;
+  transparency False ;
+  transparency_method 'Z_TRANSPARENCY' ;
+  use_diffuse_ramp False ;
+  use_nodes False ;
+  use_sky False ;
+  use_specular_ramp False ;
+  use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
+  vertex_color_light False ;
+  vertex_color_paint False ;
+  z_offset 0 ;
+end Material
+
 Material Invisio 
   diffuse_color Array 1.0 1.0 1.0  ;
   diffuse_shader 'LAMBERT' ;
   specular_color Array 1.0 1.0 1.0  ;
   specular_shader 'COOKTORR' ;
-  active_texture_index 1 ;
+  active_texture_index 0 ;
   alpha 0 ;
   ambient 1 ;
   cast_buffer_shadows False ;
@@ -89,7 +287,6 @@ Material Invisio
   shadow_casting_alpha 1 ;
   shadow_ray_bias 0 ;
   shadows True ;
-  sky False ;
   specular_alpha 0 ;
   specular_hardness 168 ;
   specular_intensity 0.615208 ;
@@ -118,6 +315,7 @@ Material Invisio
   transparency_method 'Z_TRANSPARENCY' ;
   use_diffuse_ramp False ;
   use_nodes False ;
+  use_sky False ;
   use_specular_ramp False ;
   use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
   vertex_color_light False ;
@@ -238,7 +436,7 @@ Material SSS_skinshader
     mapping 'FLAT' ;
     mirror_factor 0.165813 ;
     negate False ;
-    new_bump True ;
+    new_bump False ;
     normal_factor 0.5 ;
     normal_map_space 'TANGENT' ;
     raymir_factor 1 ;
@@ -335,7 +533,6 @@ Material SSS_skinshader
   shadow_casting_alpha 1 ;
   shadow_ray_bias 0 ;
   shadows True ;
-  sky False ;
   specular_alpha 1 ;
   specular_hardness 10 ;
   specular_intensity 0 ;
@@ -359,7 +556,7 @@ Material SSS_skinshader
   end Struct
   subsurface_scattering Struct MaterialSubsurfaceScattering None 
     back 2 ;
-    color Array 0.782026708126 0.717113316059 0.717113316059  ;
+    color Array 0.782027006149 0.717113018036 0.717113018036  ;
     color_factor 0.750324 ;
     enabled True ;
     error_tolerance 0.15 ;
@@ -370,12 +567,265 @@ Material SSS_skinshader
     texture_factor 0 ;
   end Struct
   tangent_shading False ;
+  texture_slots[0] Struct MaterialTextureSlot diffuse 
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
+    colordiff_factor 0.945272 ;
+    coloremission_factor 0.945272 ;
+    colorreflection_factor 0.945272 ;
+    colorspec_factor 0.945272 ;
+    colortransmission_factor 0.945272 ;
+    default_value 1 ;
+    density_factor 1 ;
+    diffuse_factor 1 ;
+    displacement_factor 0.2 ;
+    emission_factor 1 ;
+    emit_factor 1 ;
+    enabled True ;
+    from_dupli False ;
+    from_original False ;
+    hardness_factor 1 ;
+    map_alpha False ;
+    map_ambient False ;
+    map_colordiff True ;
+    map_coloremission True ;
+    map_colorreflection False ;
+    map_colorspec False ;
+    map_colortransmission False ;
+    map_density False ;
+    map_diffuse False ;
+    map_displacement False ;
+    map_emission False ;
+    map_emit False ;
+    map_hardness False ;
+    map_mirror False ;
+    map_normal False ;
+    map_raymir False ;
+    map_reflection False ;
+    map_scattering False ;
+    map_specular False ;
+    map_translucency False ;
+    map_warp False ;
+    mapping 'FLAT' ;
+    mirror_factor 0.945272 ;
+    negate False ;
+    new_bump False ;
+    normal_factor 0.5 ;
+    normal_map_space 'TANGENT' ;
+    offset (0,0,0) ;
+    raymir_factor 1 ;
+    reflection_factor 1 ;
+    rgb_to_intensity False ;
+    scattering_factor 1 ;
+    size (1,1,1) ;
+    specular_factor 1 ;
+    stencil False ;
+    texture Refer Texture diffuse ;
+    texture_coordinates 'UV' ;
+    translucency_factor 1 ;
+    warp_factor 0 ;
+    x_mapping 'X' ;
+    y_mapping 'Y' ;
+    z_mapping 'Z' ;
+  end Struct
+  texture_slots[1] Struct MaterialTextureSlot specularity 
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'ADD' ;
+    color Array 1.0 0.0 1.0  ;
+    colordiff_factor 1 ;
+    coloremission_factor 1 ;
+    colorreflection_factor 1 ;
+    colorspec_factor 1 ;
+    colortransmission_factor 1 ;
+    default_value 0.15 ;
+    density_factor 1 ;
+    diffuse_factor 1 ;
+    displacement_factor 0.2 ;
+    emission_factor 1 ;
+    emit_factor 1 ;
+    enabled True ;
+    from_dupli False ;
+    from_original False ;
+    hardness_factor 1 ;
+    map_alpha False ;
+    map_ambient False ;
+    map_colordiff False ;
+    map_coloremission False ;
+    map_colorreflection False ;
+    map_colorspec False ;
+    map_colortransmission False ;
+    map_density False ;
+    map_diffuse False ;
+    map_displacement False ;
+    map_emission False ;
+    map_emit False ;
+    map_hardness False ;
+    map_mirror False ;
+    map_normal False ;
+    map_raymir False ;
+    map_reflection True ;
+    map_scattering False ;
+    map_specular True ;
+    map_translucency False ;
+    map_warp False ;
+    mapping 'FLAT' ;
+    mirror_factor 1 ;
+    negate False ;
+    new_bump False ;
+    normal_factor 0.5 ;
+    normal_map_space 'TANGENT' ;
+    offset (0,0,0) ;
+    raymir_factor 1 ;
+    reflection_factor 1 ;
+    rgb_to_intensity False ;
+    scattering_factor 1 ;
+    size (1,1,1) ;
+    specular_factor 1 ;
+    stencil False ;
+    texture Refer Texture specularity ;
+    texture_coordinates 'UV' ;
+    translucency_factor 1 ;
+    warp_factor 0 ;
+    x_mapping 'X' ;
+    y_mapping 'Y' ;
+    z_mapping 'Z' ;
+  end Struct
+  texture_slots[2] Struct MaterialTextureSlot alpha 
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'MIX' ;
+    color Array 1.0 1.0 1.0  ;
+    colordiff_factor 0.165813 ;
+    coloremission_factor 0.165813 ;
+    colorreflection_factor 0.165813 ;
+    colorspec_factor 0.165813 ;
+    colortransmission_factor 0.165813 ;
+    default_value 1 ;
+    density_factor 1 ;
+    diffuse_factor 1 ;
+    displacement_factor 0.2 ;
+    emission_factor 1 ;
+    emit_factor 1 ;
+    enabled True ;
+    from_dupli False ;
+    from_original False ;
+    hardness_factor 1 ;
+    map_alpha True ;
+    map_ambient False ;
+    map_colordiff False ;
+    map_coloremission False ;
+    map_colorreflection False ;
+    map_colorspec False ;
+    map_colortransmission False ;
+    map_density True ;
+    map_diffuse False ;
+    map_displacement False ;
+    map_emission False ;
+    map_emit False ;
+    map_hardness False ;
+    map_mirror False ;
+    map_normal False ;
+    map_raymir False ;
+    map_reflection False ;
+    map_scattering False ;
+    map_specular False ;
+    map_translucency False ;
+    map_warp False ;
+    mapping 'FLAT' ;
+    mirror_factor 0.165813 ;
+    negate False ;
+    new_bump False ;
+    normal_factor 0.5 ;
+    normal_map_space 'TANGENT' ;
+    offset (0,0,0) ;
+    raymir_factor 1 ;
+    reflection_factor 1 ;
+    rgb_to_intensity False ;
+    scattering_factor 1 ;
+    size (1,1,1) ;
+    specular_factor 1 ;
+    stencil False ;
+    texture Refer Texture alpha ;
+    texture_coordinates 'UV' ;
+    translucency_factor 1 ;
+    warp_factor 0.444186 ;
+    x_mapping 'X' ;
+    y_mapping 'Y' ;
+    z_mapping 'Z' ;
+  end Struct
+  texture_slots[3] Struct MaterialTextureSlot normals 
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
+    colordiff_factor 1 ;
+    coloremission_factor 1 ;
+    colorreflection_factor 1 ;
+    colorspec_factor 1 ;
+    colortransmission_factor 1 ;
+    default_value 1 ;
+    density_factor 1 ;
+    diffuse_factor 1 ;
+    displacement_factor 0.2 ;
+    emission_factor 1 ;
+    emit_factor 1 ;
+    enabled True ;
+    from_dupli False ;
+    from_original False ;
+    hardness_factor 1 ;
+    map_alpha False ;
+    map_ambient False ;
+    map_colordiff False ;
+    map_coloremission False ;
+    map_colorreflection False ;
+    map_colorspec False ;
+    map_colortransmission False ;
+    map_density False ;
+    map_diffuse False ;
+    map_displacement False ;
+    map_emission False ;
+    map_emit False ;
+    map_hardness False ;
+    map_mirror False ;
+    map_normal True ;
+    map_raymir False ;
+    map_reflection False ;
+    map_scattering False ;
+    map_specular False ;
+    map_translucency False ;
+    map_warp False ;
+    mapping 'FLAT' ;
+    mirror_factor 1 ;
+    negate False ;
+    new_bump False ;
+    normal_factor 0.2 ;
+    normal_map_space 'TANGENT' ;
+    offset (0,0,0) ;
+    raymir_factor 1 ;
+    reflection_factor 1 ;
+    rgb_to_intensity False ;
+    scattering_factor 1 ;
+    size (1,1,1) ;
+    specular_factor 1 ;
+    stencil False ;
+    texture Refer Texture normals ;
+    texture_coordinates 'UV' ;
+    translucency_factor 1 ;
+    warp_factor 0 ;
+    x_mapping 'X' ;
+    y_mapping 'Y' ;
+    z_mapping 'Z' ;
+  end Struct
   traceable True ;
   translucency 0 ;
   transparency True ;
   transparency_method 'Z_TRANSPARENCY' ;
-  use_diffuse_ramp True ;
+  use_diffuse_ramp False ;
   use_nodes False ;
+  use_sky False ;
   use_specular_ramp False ;
   use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
   vertex_color_light False ;
