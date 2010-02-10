@@ -47,8 +47,9 @@ class HairTaskView(gui3d.TaskView):
     self.TextEdit.setText('saved_hair.obj')
     
     #widthFactor
-    self.TextEdit2 = gui3d.TextEdit(self, mesh='data/3dobjs/small_input.obj', position=[20, 450, 9])
-    self.TextEdit2.setText('1.00')
+    #self.TextEdit2 = gui3d.TextEdit(self, mesh='data/3dobjs/small_input.obj', position=[20, 450, 9])
+    #self.TextEdit2.setText('1.00')
+    self.Slider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'), self.app.getThemeResource('images', 'slider.png'),self.app.getThemeResource('images', 'slider_focused.png'), [20, 150, 9], 1.0, 1.0,30.0) 
     
     #Save Button
     self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
@@ -88,7 +89,7 @@ class HairTaskView(gui3d.TaskView):
     def onFileSelected(filename):
       print("Loading %s" %(filename))
       #human = self.app.scene3d.selectedHuman
-      wFactor = float(self.TextEdit2.text)
+      wFactor = self.Slider.getValue() #float(self.TextEdit2.text)
       if (wFactor <= 100.00) and (wFactor >= 1.00): self.widthFactor = wFactor
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    

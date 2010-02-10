@@ -851,7 +851,7 @@ class TextEdit(View):
         if event.modifiers & events3d.KMOD_CTRL:
             View.onKeyDown(self, event)
             return
-        print event
+        #print event #only for DEBUG
         if event.key == events3d.SDLK_BACKSPACE:
             self.text = self.text[:-1]
         elif event.key == events3d.SDLK_RETURN:
