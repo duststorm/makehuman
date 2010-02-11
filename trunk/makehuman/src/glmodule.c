@@ -1336,7 +1336,7 @@ void OnInit(void)
 #elif defined(__APPLE__)
     buildFont(G.fontOffset, 256, 0, "Lucida Grande", 10);
 #else
-    {
+    {   //it must then be linux? :P .. TODO: add a condition here!
         Display *dpy = XOpenDisplay(NULL);
 
         assert(dpy);  // Display valid?
@@ -1349,6 +1349,7 @@ void OnInit(void)
             // If this fails then start an 2nd attempt: Try to load *any* font which has a point size of 120.
             if (NULL == XFont)
             {
+                printf("Cannot load Helvetica fonts, attempting to load another font\n");
                 XFont = XLoadQueryFont(dpy, "-*-*-*-*-*--*-120-*");
             }
             assert(XFont); // Failed anyway? :-(
@@ -1358,8 +1359,10 @@ void OnInit(void)
                 glXUseXFont(XFont->fid, 0, 256, G.fontOffset);
                 XFreeFont(dpy, XFont);
             }
+            else printf("Sorry, cannot load fonts.. attempting to run Makehuman anyway\n");
             XCloseDisplay(dpy);
         }
+        else printf("Invalid Display, is this Linux?\n");
     }
 #endif
 }
