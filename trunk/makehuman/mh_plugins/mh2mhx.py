@@ -26,7 +26,7 @@ import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, hairgen
 import os
 
 
-splitLeftRight = False
+splitLeftRight = True
 
 #
 #	exportMhx(obj, filename):
