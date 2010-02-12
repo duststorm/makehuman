@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d
+import gui3d, hair
 
 print 'hair properties imported'
 
@@ -56,6 +56,11 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
         self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
+        
+       #widthFactor
+        self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'),\
+        self.app.getThemeResource('images', 'slider.png'),\
+        self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0,30.0) 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
 
@@ -85,6 +90,13 @@ class HairPropertiesTaskView(gui3d.TaskView):
         @self.blueSlider.event
         def onChange(value):
             self.changeColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
+            
+        @self.widthSlider.event
+        def onChanging(value):
+            human = self.app.scene3d.selectedHuman
+            if len(human.hairObj.verts)>0 : 
+               hair.dynamicUpdate(human.scene, human.hairObj, widthFactor=self.widthSlider.getValue())
+            #pass #Do something!
 
     def changeColor(self, color):
         action = Action(self.app.scene3d.selectedHuman, self.app.scene3d.selectedHuman.hairColor, color, self.syncSliders)

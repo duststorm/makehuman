@@ -25,6 +25,7 @@ __docformat__ = 'restructuredtext'
 
 import gui3d, events3d, hairgenerator, guifiles, mh, os
 from mh2obj import *
+from module3d import drawQuad
 from animation3d import ThreeDQBspline
 from aljabr import *
 from random import random
@@ -45,11 +46,6 @@ class HairTaskView(gui3d.TaskView):
     #filename textbox
     self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj', position=[20, 480, 9])
     self.TextEdit.setText('saved_hair.obj')
-    
-    #widthFactor
-    #self.TextEdit2 = gui3d.TextEdit(self, mesh='data/3dobjs/small_input.obj', position=[20, 450, 9])
-    #self.TextEdit2.setText('1.00')
-    self.Slider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'), self.app.getThemeResource('images', 'slider.png'),self.app.getThemeResource('images', 'slider_focused.png'), [20, 150, 9], 1.0, 1.0,30.0) 
     
     #Save Button
     self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
@@ -89,14 +85,14 @@ class HairTaskView(gui3d.TaskView):
     def onFileSelected(filename):
       print("Loading %s" %(filename))
       #human = self.app.scene3d.selectedHuman
-      wFactor = self.Slider.getValue() #float(self.TextEdit2.text)
+      wFactor = self.app.categories["Modelling"].tasksByName["Hair"].widthSlider.getValue() 
       if (wFactor <= 100.00) and (wFactor >= 1.00): self.widthFactor = wFactor
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
       self.hairsClass = hairgenerator.Hairgenerator()
       self.hairsClass.humanVerts = human.mesh.verts
-      human.hairObj = loadHairsFile(human.scene, "./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=self.hairsClass, widthFactor=self.widthFactor)
+      human.hairObj = loadHairsFile(human.scene, path="./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=self.hairsClass, widthFactor=self.widthFactor)
       #Jose: TODO collision detection
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
       self.app.switchCategory("Modelling")
@@ -113,43 +109,8 @@ class HairTaskView(gui3d.TaskView):
   def onHide(self, event):
     self.app.scene3d.selectedHuman.show()
     gui3d.TaskView.onHide(self, event)
-  
-#Draws a Quad
-#TODO: account for world2local and viceversa
-def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
-  obj = scn.newObj(name)
-  obj.x = position[0]
-  obj.y = position[1]
-  obj.z = position[2]
-  obj.rx = 0.0
-  obj.ry = 0.0
-  obj.rz = 0.0
-  obj.sx = 1.0
-  obj.sy = 1.0
-  obj.sz = 1.0
-  obj.visibility = 1
-  obj.shadeless = 0
-  obj.pickable = 0
-  obj.cameraMode = 0
-  obj.text = ""
-  #obj.uvValues = []
-  obj.indexBuffer = []
-  fg = obj.createFaceGroup("faces")
-  
-  # create vertices
-  v1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-  v2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
-  v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
-  v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
-
-  # create faces
-  f1 = fg.createFace(v1, v4, v2)
-  f2 = fg.createFace(v2, v4, v3)
-
-  obj.updateIndexBuffer()
-  scn.update()
-  
-def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1):
+    
+def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
   if hairsClass == None :
     hairsClass = hairgenerator.Hairgenerator()
   obj = scn.newObj(path)
@@ -199,13 +160,14 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
       uvLength=len(cPs)-3
       vtemp1, vtemp2 = None, None
       uvtemp1, uvtemp2 = None, None
+      dist =  widthFactor*res/2
       for i in xrange(2,len(cPs)-1):
           cp1=cPs[i-1]
           cp2=cPs[i]
           verts=[[],[],[],[]]
           
           #compute ribbon plane
-          vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), widthFactor*res/2)
+          vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), dist)
           if i==2:
             verts[0] = vsub(cp1,vec)
             verts[1] = vadd(cp1,vec)
@@ -238,14 +200,13 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           obj.uvValues.append([0.0,(uvLength - i+1)*uvFactor])
           #end of please...
           
-          #hoping shallow copy works for this type          
+          #shallow copies used
           fg.createFace(w1, w4, w2)
           fg.faces[len(fg.faces) -1].uv= [w1.idx,w4.idx,w2.idx]
           fg.createFace(w2, w4, w3)
           fg.faces[len(fg.faces) -1].uv=[w2.idx,w4.idx,w3.idx]
           vtemp1=w4
           vtemp2=w3 
-
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
@@ -254,10 +215,20 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   if update:
       scn.update()
   return obj
+  
+def dynamicUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal and vertex index of object remains the same!
+  N=len(obj.verts)
+  origWidth = vdist(obj.verts[1].co,obj.verts[0].co)/res
+  diff= (widthFactor-origWidth)*res/2
+  for i in xrange(0,N/2):
+      vec=vmul(vnorm(vsub(obj.verts[i*2+1].co,obj.verts[i*2].co)), diff)    
+      obj.verts[i*2].co=vsub(obj.verts[i*2].co,vec)
+      obj.verts[i*2+1].co=vadd(obj.verts[i*2+1].co,vec)
+      obj.verts[i*2].update(updateNor=0)
+      obj.verts[i*2+1].update(updateNor=0)
               
 def exportAsCurves(file, guideGroups):
   DEG_ORDER_U = 3
-
   # use negative indices
   for group in guideGroups:
     for guide in group.guides:
