@@ -1,10 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 # We need this for gui controls
 
-import gui3d
-import hair
+import gui3d, hair
 
 print 'hair properties imported'
 
@@ -33,11 +31,12 @@ class Action:
 
 class HairPropertiesTaskView(gui3d.TaskView):
 
-    def __init__(self, category):
-
+    def __init__(self, category):        
+        
+        
         gui3d.TaskView.__init__(self, category, 'Hair', category.app.getThemeResource('images', 'button_hair_det.png'), category.app.getThemeResource('images',
                                 'button_hair_det_on.png'))
-
+                                
         gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_hair_tool.png'), [10, 211, 9.0])
 
         self.redSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_red.png'), self.app.getThemeResource('images', 'slider.png'),
@@ -57,21 +56,21 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
         self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
-
-       # widthFactor
-
-        self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'), self.app.getThemeResource('images', 'slider.png'),
-                                        self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0, 30.0)
+        
+       #widthFactor
+        self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'),\
+        self.app.getThemeResource('images', 'slider.png'),\
+        self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0,30.0) 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
 
-        # self.colorPreviewLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[20, 210, 9.4])
-        # self.colorPreviewLabel.setText('Hair color')
+        #self.colorPreviewLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[20, 210, 9.4])
+        #self.colorPreviewLabel.setText('Hair color')
 
         @self.redSlider.event
         def onChanging(value):
             self.setColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
-
+            
         @self.redSlider.event
         def onChange(value):
             self.changeColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
@@ -79,11 +78,11 @@ class HairPropertiesTaskView(gui3d.TaskView):
         @self.greenSlider.event
         def onChanging(value):
             self.setColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
-
+            
         @self.greenSlider.event
         def onChange(value):
             self.changeColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
-
+            
         @self.blueSlider.event
         def onChanging(value):
             self.setColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
@@ -91,14 +90,13 @@ class HairPropertiesTaskView(gui3d.TaskView):
         @self.blueSlider.event
         def onChange(value):
             self.changeColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
-
+            
         @self.widthSlider.event
         def onChanging(value):
             human = self.app.scene3d.selectedHuman
-            if len(human.hairObj.verts) > 0:
-                hair.dynamicUpdate(human.scene, human.hairObj, widthFactor=self.widthSlider.getValue())
-
-            # pass #Do something!
+            if len(human.hairObj.verts)>0 : 
+               hair.dynamicUpdate(human.scene, human.hairObj, widthFactor=self.widthSlider.getValue())
+            #pass #Do something!
 
     def changeColor(self, color):
         action = Action(self.app.scene3d.selectedHuman, self.app.scene3d.selectedHuman.hairColor, color, self.syncSliders)
