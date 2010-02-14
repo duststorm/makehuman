@@ -824,13 +824,15 @@ class TextView(View):
 
 class TextEdit(View):
 
-    def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9]):
+    def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9], focusedTexture=None):
         View.__init__(self, parent)
         #Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
-        Object(self, mesh=mesh, position=position)
-        self.textObject = Object(self, mesh='data/3dobjs/empty.obj', texture=texture, position=[position[0] + 10.0, position[1] + 12.0, position[2] + 0.1])
+        self.background = Object(self, mesh=mesh, texture=texture, position=position)
+        self.textObject = Object(self, mesh='data/3dobjs/empty.obj', texture=None, position=[position[0] + 10.0, position[1] + 12.0, position[2] + 0.1])
         #self.textObject = Object(self, mesh, texture, position)
         self.text = ''
+        self.texture = texture;
+        self.focusedTexture = focusedTexture;
 
     def __updateTextObject(self):
         lenText = len(self.text)
@@ -866,7 +868,14 @@ class TextEdit(View):
 
         self.__updateTextObject()
         self.app.scene3d.redraw()
+        
+    def onFocus(self, event):
+        if self.focusedTexture:
+            self.background.setTexture(self.focusedTexture)
 
+    def onBlur(self, event):
+        if self.focusedTexture:
+            self.background.setTexture(self.texture)
 
 # FileEntryView widget
 
