@@ -1462,6 +1462,20 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4124"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4918"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1470,9 +1484,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.1790494"
-     inkscape:cx="-149.20846"
-     inkscape:cy="917.66323"
+     inkscape:zoom="1.5408206"
+     inkscape:cx="-265.70483"
+     inkscape:cy="709.98169"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -5224,5 +5238,27 @@
          id="tspan3804-6-99-3-4"
          x="-188.16556"
          y="199.23593">Backgr.</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.9677037;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-2-0-8-5-3-8-4-38"
+       width="399.03229"
+       height="19.032297"
+       x="-447.38757"
+       y="215.17123"
+       ry="2.8548443"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/texedit_off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#f58220;stroke-width:1.35341251;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-2-0-8-5-3-8-4-38-8"
+       width="398.64658"
+       height="18.646587"
+       x="-446.79428"
+       y="241.06908"
+       ry="2.7969878"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/texedit_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>

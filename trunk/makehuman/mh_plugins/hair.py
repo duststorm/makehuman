@@ -44,13 +44,13 @@ class HairTaskView(gui3d.TaskView):
     self.widthFactor = 1.0
     
     #filename textbox
-    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj', position=[20, 480, 9])
+    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj', texture = category.app.getThemeResource('images', 'texedit_off.png'), position=[20, 480, 9], focusedTexture = category.app.getThemeResource('images', 'texedit_on.png'))
     self.TextEdit.setText('saved_hair.obj')
     
     #Save Button
     self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
                     texture=category.app.getThemeResource("images", "button_save_file.png"),\
-                    selectedTexture=None, position=[470, 490, 9])
+                    selectedTexture=None, position=[470, 490, 9.4])
     #self.Button.button.setScale(1.0,5.0)
     
     #.obj save type Radiobuttons
