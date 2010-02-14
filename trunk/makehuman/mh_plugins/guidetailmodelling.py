@@ -304,6 +304,7 @@ class Detail3dTool(events3d.EventHandler):
         groups = []
 
         if self.micro:
+            #print(event.group)
             groups.append(event.group)
             if human.symmetryModeEnabled:
                 sg = human.getSymmetryGroup(event.group)
@@ -431,6 +432,26 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Nose', value, self.syncSliders))
             self.nose = None
+            
+        self.mouthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
+                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 269, 9.2], value=0.0, min=0.0, max=1.0)
+
+        self.mouth = None
+        
+        @self.mouthSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.mouth == None:
+                    self.mouth = human.getMouth()
+                human.updateMouth(self.mouth, value, self.app.settings.realtimeNormalUpdates)
+                self.mouth = min(1.0, max(0.0, value))
+        
+        @self.mouthSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Mouth', value, self.syncSliders))
+            self.mouth = None
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
