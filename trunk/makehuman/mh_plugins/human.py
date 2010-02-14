@@ -163,19 +163,20 @@ class Human(gui3d.Object):
 
         self.hairFile = 'data/hairs/default.hair'
         self.hairColor = [0.41, 0.23, 0.04]
-
-        (self.genitalVertices, self.genitalFaces) = self.meshData.getVerticesAndFacesForGroups(['pelvis-genital-area'])
-
-        breastNames = ['l-torso-inner-pectoralis', 'l-torso-middle-pectoralis', 'l-torso-outer-pectoralis', 'l-torso-upper-pectoralis', 'l-torso-lower-pectoralis',
-                       'l-torso-nipple', 'r-torso-inner-pectoralis', 'r-torso-middle-pectoralis', 'r-torso-outer-pectoralis', 'r-torso-upper-pectoralis',
-                       'r-torso-lower-pectoralis', 'r-torso-nipple']
-        (self.breastVertices, self.breastFaces) = self.meshData.getVerticesAndFacesForGroups(breastNames)
-
-        noseNames = ['l-nose-nostril', 'nose-bridge', 'nose-glabella', 'nose-philtrum', 'nose-sellion', 'nose-tip', 'r-nose-nostril']
-        (self.noseVertices, self.noseFaces) = self.meshData.getVerticesAndFacesForGroups(noseNames)
-
-        mouthNames = ['l-mouth-upper-lip', 'mouth-upper-middle-lip', 'r-mouth-upper-lip', 'l-mouth-lower-lip', 'mouth-lower-middle-lip', 'r-mouth-lower-lip']
-        (self.mouthVertices, self.mouthFaces) = self.meshData.getVerticesAndFacesForGroups(mouthNames)
+        
+        self.genitalVertices, self.genitalFaces = self.meshData.getVerticesAndFacesForGroups(["pelvis-genital-area"])
+        
+        breastNames = ["l-torso-inner-pectoralis", "l-torso-middle-pectoralis", "l-torso-outer-pectoralis", "l-torso-upper-pectoralis",
+                "l-torso-lower-pectoralis", "l-torso-nipple",
+                "r-torso-inner-pectoralis", "r-torso-middle-pectoralis", "r-torso-outer-pectoralis", "r-torso-upper-pectoralis",
+                "r-torso-lower-pectoralis", "r-torso-nipple"]
+        self.breastVertices, self.breastFaces = self.meshData.getVerticesAndFacesForGroups(breastNames)
+        
+        noseNames = ["l-nose-nostril", "nose-bridge", "nose-glabella", "nose-philtrum", "nose-sellion", "nose-tip", "r-nose-nostril"]
+        self.noseVertices, self.noseFaces = self.meshData.getVerticesAndFacesForGroups(noseNames)
+        
+        mouthNames = ["l-mouth-upper-lip", "mouth-upper-middle-lip", "r-mouth-upper-lip", "l-mouth-lower-lip", "mouth-lower-middle-lip", "r-mouth-lower-lip"]
+        self.mouthVertices, self.mouthFaces = self.meshData.getVerticesAndFacesForGroups(mouthNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -391,13 +392,13 @@ class Human(gui3d.Object):
         self.nose = min(1.0, max(0.0, value))
 
     def getNose(self):
-        return self.nose
-
+       return self.nose
+       
     def setMouth(self, value):
         self.mouth = min(1.0, max(0.0, value))
 
     def getMouth(self):
-        return self.mouth
+       return self.mouth
 
     def setEthnic(self, ethnic, value):
         modified = None
@@ -459,83 +460,79 @@ class Human(gui3d.Object):
             return name.replace('r-', 'l-', 1)
         else:
             return None
-
-    def updateGenitals(self, previous, next, recalcNormals=True, update=True):
+            
+    def updateGenitals(self, previous, next, recalcNormals = True, update = True):
         self.applyGenitalTargets(max(0.0, next) - max(0.0, previous), min(0.0, previous) - min(0.0, next))
-
+            
         if recalcNormals:
-            self.meshData.calcNormals(1, 1, self.genitalVertices, self.genitalFaces)
+          self.meshData.calcNormals(1, 1, self.genitalVertices, self.genitalFaces)
         if update:
-            self.meshData.update(self.genitalVertices)
-
+          self.meshData.update(self.genitalVertices)
+            
     def applyGenitalTargets(self, maleGenitals, femaleGenitals):
         detailTargets = {}
-
+        
         detailTargets[self.targetFemaleGenitalsChild] = femaleGenitals * self.childVal
         detailTargets[self.targetFemaleGenitalsYoung] = femaleGenitals * self.youngVal
         detailTargets[self.targetFemaleGenitalsOld] = femaleGenitals * self.oldVal
         detailTargets[self.targetMaleGenitalsChild] = maleGenitals * self.childVal
         detailTargets[self.targetMaleGenitalsYoung] = maleGenitals * self.youngVal
         detailTargets[self.targetMaleGenitalsOld] = maleGenitals * self.oldVal
-
+        
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
-
-                # print 'APP: %s, VAL: %f' % (k, v)
-
+                #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-
-    def updateBreastSize(self, previous, next, recalcNormals=True, update=True):
+            
+    def updateBreastSize(self, previous, next, recalcNormals = True, update = True):
         breastCupValues = [0 for i in xrange(0, 9)]
-
+        
         # Remove previous
-
         previousBreastSize = 1 + previous * 7
         i = int(math.floor(previousBreastSize))
         value = previousBreastSize - i
         breastCupValues[i] -= 1 - value
         if i < 8:
             breastCupValues[i + 1] -= value
-
+            
         # Add next
-
         nextBreastSize = 1 + next * 7
         i = int(math.floor(nextBreastSize))
         value = nextBreastSize - i
         breastCupValues[i] += 1 - value
         if i < 8:
             breastCupValues[i + 1] += value
-
+            
         self.applyBreastTargets(breastCupValues, [1 - self.breastFirmness, self.breastFirmness])
-
+        
         if recalcNormals:
-            self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
+          self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
         if update:
-            self.meshData.update(self.breastVertices)
-
-    def updateBreastFirmness(self, previous, next, recalcNormals=True, update=True):
+          self.meshData.update(self.breastVertices)
+        
+    def updateBreastFirmness(self, previous, next, recalcNormals = True, update = True):
         breastCupValues = [0 for i in xrange(0, 9)]
-
+        
         breastSize = 1 + self.breastSize * 7
         i = int(math.floor(breastSize))
         value = breastSize - i
         breastCupValues[i] = 1 - value
         if i < 8:
             breastCupValues[i + 1] = value
-
+            
         self.applyBreastTargets(breastCupValues, [previous - next, next - previous])
-
+            
         if recalcNormals:
-            self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
+          self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
         if update:
-            self.meshData.update(self.breastVertices)
-
-    def applyBreastTargets(self, values, firmness):
+          self.meshData.update(self.breastVertices)
+          
+    def applyBreastTargets(self, values, firmness):  
         averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
         averageToneVal = 1 - (self.muscleVal + self.flaccidVal)
-
+        
         detailTargets = {}
-
+            
         for i in xrange(1, 9):
 
             detailTargets['data/targets/details/neutral_female-young-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
@@ -645,30 +642,30 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/female-child-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
                      * self.femaleVal) * firmness[1]) * values[i]
+                     
+            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
 
-            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[0]) * values[i]
+            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
 
-            detailTargets['data/targets/details/neutral_female-old-cup%i-firmness1.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[1]) * values[i]
+            detailTargets['data/targets/details/female-old-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
 
-            detailTargets['data/targets/details/female-old-light-cup%i-firmness0.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[0]) * values[i]
+            detailTargets['data/targets/details/female-old-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
 
-            detailTargets['data/targets/details/female-old-light-cup%i-firmness1.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[1]) * values[i]
+            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
 
-            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness0.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[0]) * values[i]
+            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
 
-            detailTargets['data/targets/details/female-old-heavy-cup%i-firmness1.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[1]) * values[i]
+            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
 
-            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness0.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[0]) * values[i]
-
-            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[1]) * values[i]
+            detailTargets['data/targets/details/female-old-flaccid-cup%i-firmness1.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
 
             detailTargets['data/targets/details/female-old-flaccid-light-cup%i-firmness0.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
                      * self.femaleVal) * firmness[0]) * values[i]
@@ -682,11 +679,11 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-old-flaccid-heavy-cup%i-firmness1.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
                      * self.femaleVal) * firmness[1]) * values[i]
 
-            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[0]) * values[i]
+            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness0.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[0]) * values[i]
 
-            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal) * self.femaleVal)
-                     * firmness[1]) * values[i]
+            detailTargets['data/targets/details/female-old-muscle-cup%i-firmness1.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * firmness[1]) * values[i]
 
             detailTargets['data/targets/details/female-old-muscle-light-cup%i-firmness0.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
                      * self.femaleVal) * firmness[0]) * values[i]
@@ -699,107 +696,94 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
                      * self.femaleVal) * firmness[1]) * values[i]
-
+                     
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
-
-                # print 'APP: %s, VAL: %f' % (k, v)
-
+                #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-
-    def updateNose(self, previous, next, recalcNormals=True, update=True):
+            
+    def updateNose(self, previous, next, recalcNormals = True, update = True):
         noseValues = [0 for i in xrange(0, 13)]
-
+        
         # remove previous
-
         previousNose = previous * 12
         i = int(math.floor(previousNose))
         value = previousNose - i
         noseValues[i] -= 1 - value
         if i < 12:
             noseValues[i + 1] -= value
-
+            
         # add next
-
         nextNose = next * 12
         i = int(math.floor(nextNose))
         value = nextNose - i
         noseValues[i] += 1 - value
         if i < 12:
             noseValues[i + 1] += value
-
+            
         self.applyNoseTargets(noseValues)
-
+        
         if recalcNormals:
-            self.meshData.calcNormals(1, 1, self.noseVertices, self.noseFaces)
+          self.meshData.calcNormals(1, 1, self.noseVertices, self.noseFaces)
         if update:
-            self.meshData.update(self.noseVertices)
+          self.meshData.update(self.noseVertices)
 
     def applyNoseTargets(self, values):
         detailTargets = {}
-
+        
         for i in xrange(1, 13):
-            detailTargets['data/targets/details/neutral_male-young-nose%i.target' % i] = (self.youngVal * self.maleVal) * values[i]
-            detailTargets['data/targets/details/neutral_male-child-nose%i.target' % i] = (self.childVal * self.maleVal) * values[i]
-            detailTargets['data/targets/details/neutral_male-old-nose%i.target' % i] = (self.oldVal * self.maleVal) * values[i]
-            detailTargets['data/targets/details/neutral_female-young-nose%i.target' % i] = (self.youngVal * self.femaleVal) * values[i]
-            detailTargets['data/targets/details/neutral_female-child-nose%i.target' % i] = (self.childVal * self.femaleVal) * values[i]
-            detailTargets['data/targets/details/neutral_female-old-nose%i.target' % i] = (self.oldVal * self.femaleVal) * values[i]
-
+            detailTargets['data/targets/details/neutral_male-young-nose%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_male-child-nose%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_male-old-nose%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-young-nose%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-child-nose%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-old-nose%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
-
-                # print 'APP: %s, VAL: %f' % (k, v)
-
+                #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-
-    def updateMouth(self, previous, next, recalcNormals=True, update=True):
+                
+    def updateMouth(self, previous, next, recalcNormals = True, update = True):
         mouthValues = [0 for i in xrange(0, 14)]
-
+        
         # remove previous
-
         previousMouth = previous * 13
         i = int(math.floor(previousMouth))
         value = previousMouth - i
         mouthValues[i] -= 1 - value
         if i < 13:
             mouthValues[i + 1] -= value
-
+            
         # add next
-
         nextMouth = next * 13
         i = int(math.floor(nextMouth))
         value = nextMouth - i
         mouthValues[i] += 1 - value
         if i < 13:
             mouthValues[i + 1] += value
-
+            
         self.applyMouthTargets(mouthValues)
-
+        
         if recalcNormals:
-            self.meshData.calcNormals(1, 1, self.mouthVertices, self.mouthFaces)
+          self.meshData.calcNormals(1, 1, self.mouthVertices, self.mouthFaces)
         if update:
-            self.meshData.update(self.mouthVertices)
+          self.meshData.update(self.mouthVertices)
 
     def applyMouthTargets(self, values):
         detailTargets = {}
-
+        
         for i in xrange(1, 13):
-            detailTargets['data/targets/details/neutral_male-young-mouth%i.target' % i] = (self.youngVal * self.maleVal) * values[i]
-            detailTargets['data/targets/details/neutral_male-child-mouth%i.target' % i] = (self.childVal * self.maleVal) * values[i]
-
-            # detailTargets['data/targets/details/neutral_male-old-mouth%i.target'% i] = self.oldVal * self.maleVal * values[i]
-            # detailTargets['data/targets/details/neutral_female-young-mouth%i.target'% i] = self.youngVal * self.femaleVal * values[i]
-
-            detailTargets['data/targets/details/neutral_female-child-mouth%i.target' % i] = (self.childVal * self.femaleVal) * values[i]
-
-            # detailTargets['data/targets/details/neutral_female-old-mouth%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-
+            detailTargets['data/targets/details/neutral_male-young-mouth%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_male-child-mouth%i.target'% i] = self.childVal * self.maleVal * values[i]
+            #detailTargets['data/targets/details/neutral_male-old-mouth%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            #detailTargets['data/targets/details/neutral_female-young-mouth%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-child-mouth%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            #detailTargets['data/targets/details/neutral_female-old-mouth%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
-
-                # print 'APP: %s, VAL: %f' % (k, v)
-
+                #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None):
@@ -903,11 +887,10 @@ class Human(gui3d.Object):
 
         maleGenitals = max(0.0, self.genitals)
         femaleGenitals = -min(0.0, self.genitals)
-
+        
         self.applyGenitalTargets(maleGenitals, femaleGenitals)
 
         # breastCup goes from 1 to 8
-
         breastCup = 1 + self.breastSize * 7
         breastCupValues = [0 for i in xrange(0, 9)]
         i = int(math.floor(breastCup))
@@ -915,11 +898,10 @@ class Human(gui3d.Object):
         breastCupValues[i] = 1 - value
         if i < 8:
             breastCupValues[i + 1] = value
-
+            
         self.applyBreastTargets(breastCupValues, [1.0 - self.breastFirmness, self.breastFirmness])
 
         # nose goes from 0 to 12, 0 is no target
-
         nose = self.nose * 12
         noseValues = [0 for i in xrange(0, 13)]
         i = int(math.floor(nose))
@@ -929,9 +911,8 @@ class Human(gui3d.Object):
             noseValues[i + 1] = value
 
         self.applyNoseTargets(noseValues)
-
+        
         # mouth goes from 0 to 13, 0 is no target
-
         mouth = self.mouth * 13
         mouthValues = [0 for i in xrange(0, 14)]
         i = int(math.floor(mouth))
