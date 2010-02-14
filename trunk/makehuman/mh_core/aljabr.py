@@ -33,6 +33,7 @@ __docformat__ = 'restructuredtext'
 
 from math import sqrt, cos, sin, tan, atan2
 
+
 def vsub(vect1, vect2):
     """
 

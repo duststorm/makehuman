@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # Note 1: I am using the latest simnpleoctree.py in the makehuman svn
 
 import math

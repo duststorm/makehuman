@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # You may use, modify and redistribute this module under the terms of the GNU GPL.
 
 """ 

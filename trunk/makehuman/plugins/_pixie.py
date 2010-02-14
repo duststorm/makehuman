@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import sys
 if 'nt' in sys.builtin_module_names:
     sys.path.append('./pythonmodules')

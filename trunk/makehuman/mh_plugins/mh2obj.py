@@ -58,37 +58,43 @@ def exportObj(obj, filename, originalQuadsFile=None):
     for v in obj.verts:
         f.write('v %f %f %f\n' % (v.co[0], v.co[1], v.co[2]))
 
-    if not (obj.uvValues==None):
-      for uv in obj.uvValues:
-          f.write('vt %f %f\n' % (uv[0], uv[1]))
+    if not obj.uvValues == None:
+        for uv in obj.uvValues:
+            f.write('vt %f %f\n' % (uv[0], uv[1]))
 
     for v in obj.verts:
         f.write('vn %f %f %f\n' % (v.no[0], v.no[1], v.no[2]))
 
     f.write('usemtl basic\n')
     f.write('s off\n')
-      
+
     if originalQuadsFile:
-      faces = files3d.loadFacesIndices(originalQuadsFile, True)
-      for fc in faces:
-         if type(fc) is types.StringType:
-            f.write('g %s\n' % fc)
-         else :
-            f.write('f')
-            for v in fc:
-               if (obj.uvValues == None): f.write(' %i//%i ' % (v[0] + 1, v[1] + 1))
-               else: f.write(' %i/%i/%i ' % (v[0] + 1, v[1] + 1, v[0] + 1))
-            f.write('\n')
+        faces = files3d.loadFacesIndices(originalQuadsFile, True)
+        for fc in faces:
+            if type(fc) is types.StringType:
+                f.write('g %s\n' % fc)
+            else:
+                f.write('f')
+                for v in fc:
+                    if obj.uvValues == None:
+                        f.write(' %i//%i ' % (v[0] + 1, v[1] + 1))
+                    else:
+                        f.write(' %i/%i/%i ' % (v[0] + 1, v[1] + 1, v[0] + 1))
+                f.write('\n')
     else:
-      for fg in obj.facesGroups:
-         f.write('g %s\n' % fg.name)
-         for face in fg.faces:
-            f.write('f')
-            #print "face.verts : " , face.verts
-            for v in face.verts:
-               if (obj.uvValues == None): f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-               else: f.write(' %i/%i/%i ' % (v.idx + 1, v.idx + 1, v.idx + 1))
-            f.write('\n')
+        for fg in obj.facesGroups:
+            f.write('g %s\n' % fg.name)
+            for face in fg.faces:
+                f.write('f')
+
+            # print "face.verts : " , face.verts
+
+                for v in face.verts:
+                    if obj.uvValues == None:
+                        f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+                    else:
+                        f.write(' %i/%i/%i ' % (v.idx + 1, v.idx + 1, v.idx + 1))
+                f.write('\n')
     f.close()
 
     # Write material file
@@ -102,5 +108,8 @@ def exportObj(obj, filename, originalQuadsFile=None):
     f.write('Ks 0.33 0.33 0.52\n')
     f.write('illum 5\n')
     f.write('Ns 50.0\n')
-    if not (obj.texture==None): f.write('map_Kd -clamp on ' + obj.texture + '\n')
+    if not obj.texture == None:
+        f.write('map_Kd -clamp on ' + obj.texture + '\n')
     f.close()
+
+

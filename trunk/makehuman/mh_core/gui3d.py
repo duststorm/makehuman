@@ -350,7 +350,7 @@ class Application(events3d.EventHandler):
 
     def setFocus(self, view=None):
 
-        print("setFocus", view)
+        print ('setFocus', view)
 
         if self.focusView == view:
             return
@@ -591,7 +591,7 @@ class Slider(View):
         self.slider.setPosition(sliderPos)
         value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
         self.__value = value * (self.max - self.min) + self.min
-        
+
         self.callEvent('onChanging', self.__value)
 
     def onMouseUp(self, event):
@@ -824,15 +824,19 @@ class TextView(View):
 
 class TextEdit(View):
 
-    def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9], focusedTexture=None):
+    def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', texture=None, position=[0, 0, 9], focusedTexture=None):
         View.__init__(self, parent)
-        #Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
+
+        # Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
+
         self.background = Object(self, mesh=mesh, texture=texture, position=position)
-        self.textObject = Object(self, mesh='data/3dobjs/empty.obj', texture=None, position=[position[0] + 10.0, position[1] + 12.0, position[2] + 0.1])
-        #self.textObject = Object(self, mesh, texture, position)
+        self.textObject = Object(self, mesh='data/3dobjs/empty.obj', texture=None, position=[position[0] + 10.0, position[1] + 14.0, position[2] + 0.1])
+
+        # self.textObject = Object(self, mesh, texture, position)
+
         self.text = ''
-        self.texture = texture;
-        self.focusedTexture = focusedTexture;
+        self.texture = texture
+        self.focusedTexture = focusedTexture
 
     def __updateTextObject(self):
         lenText = len(self.text)
@@ -853,7 +857,9 @@ class TextEdit(View):
         if event.modifiers & events3d.KMOD_CTRL:
             View.onKeyDown(self, event)
             return
-        #print event #only for DEBUG
+
+        # print event #only for DEBUG
+
         if event.key == events3d.SDLK_BACKSPACE:
             self.text = self.text[:-1]
         elif event.key == events3d.SDLK_RETURN:
@@ -868,7 +874,7 @@ class TextEdit(View):
 
         self.__updateTextObject()
         self.app.scene3d.redraw()
-        
+
     def onFocus(self, event):
         if self.focusedTexture:
             self.background.setTexture(self.focusedTexture)
@@ -876,6 +882,7 @@ class TextEdit(View):
     def onBlur(self, event):
         if self.focusedTexture:
             self.background.setTexture(self.texture)
+
 
 # FileEntryView widget
 
@@ -885,41 +892,14 @@ class FileEntryView(View):
     def __init__(self, parent):
         View.__init__(self, parent)
 
-    # Object(self, mesh = "data/3dobjs/fileselectorbar.obj", position = [0.0, 30.30, 9.4])
-
-        Object(self, mesh='data/3dobjs/backgroundtext.obj', position=[200, 90, 9.5])
-        self.textObject = Object(self, mesh='data/3dobjs/empty.obj', position=[210, 105, 9.6])
+        self.edit = TextEdit(self, texture=self.app.getThemeResource('images', 'texedit_off.png'), position=[200, 90, 9.5],
+                             focusedTexture=self.app.getThemeResource('images', 'texedit_on.png'))
         self.bConfirm = Object(self, mesh='data/3dobjs/button_confirm.obj', texture=self.app.getThemeResource('images', 'button_confirm.png'), position=[610, 80, 9.1])
-        self.text = ''
 
         @self.bConfirm.event
         def onClicked(event):
-            if len(self.text):
-                self.onFileSelected(self.text)
-
-    def onKeyDown(self, event):
-        if event.modifiers & events3d.KMOD_CTRL:
-            View.onKeyDown(self, event)
-            return
-
-    # print(event)
-
-        if event.key == 8:
-            self.text = self.text[:-1]
-        elif event.key == 13:
-            if len(self.text):
-                self.onFileSelected(self.text)
-            return
-        elif event.key < 256 and event.key != 13:
-            self.text += event.character
-
-        lenText = len(self.text)
-        if lenText > 100:
-            textToVisualize = self.text[lenText - 100:]
-        else:
-            textToVisualize = self.text
-        self.textObject.setText(textToVisualize)
-        self.app.scene3d.redraw()
+            if len(self.edit.getText()):
+                self.onFileSelected(self.edit.getText())
 
 
 # FileChooser widget
@@ -992,16 +972,16 @@ class FileChooser(View):
                     if f.endswith('.' + ext):
                         self.files.append(f)
 
-        if (self.selectedFile > len(self.files)) or (self.selectedFile < 0):
-            self.selectedFile =0 #Im not sure if this happens but Ill check
+        if self.selectedFile > len(self.files) or self.selectedFile < 0:
+            self.selectedFile = 0  # Im not sure if this happens but Ill check
 
         self.currentFile.setScale(1.5)
 
-        #self.previousFile.clearTexture()
-        #self.previousFile.hide()
-        
+        # self.previousFile.clearTexture()
+        # self.previousFile.hide()
+
         if self.selectedFile > 0:
-            self.previousFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile-1]))
+            self.previousFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile - 1]))
             self.previousFile.show()
         else:
             self.previousFile.clearTexture()

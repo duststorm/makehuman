@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # You may use, modify and redistribute this module under the terms of the GNU GPL.
 # .. include:: docs/includes/example1.txt
 
@@ -299,7 +300,6 @@ class Vert:
 
         """
 
-        
         no = [0.0, 0.0, 0.0]
         for f in self.sharedFaces:
             no[0] += f.no[0]
@@ -901,26 +901,26 @@ class Object3D:
             if fg.name == name:
                 return fg
         return None
-        
+
     def getVerticesAndFacesForGroups(self, groupNames):
         vertices = []
         faces = []
-        
+
         for name in groupNames:
-          group = self.getFaceGroup(name)
-          faces.extend(group.faces)
-          for f in group.faces:
-              vertices.extend(f.verts)
+            group = self.getFaceGroup(name)
+            faces.extend(group.faces)
+            for f in group.faces:
+                vertices.extend(f.verts)
         vertices = list(set(vertices))
-        return vertices, faces
-        
-    def updateGroups(self, groupnames, recalcNormals = True, update = True):
+        return (vertices, faces)
+
+    def updateGroups(self, groupnames, recalcNormals=True, update=True):
         if recalcNormals or update:
-          vertices, faces = self.getVerticesAndFacesForGroups(groupnames)
-          if recalcNormals:
-            self.calcNormals(1, 1, vertices, faces)
-          if update:
-            self.update(vertices)
+            (vertices, faces) = self.getVerticesAndFacesForGroups(groupnames)
+            if recalcNormals:
+                self.calcNormals(1, 1, vertices, faces)
+            if update:
+                self.update(vertices)
 
     def setCameraProjection(self, cameraMode):
         """
@@ -1265,7 +1265,8 @@ class Scene3D:
         a = time.time()
 
         nObjs = len(self.objects)
-        #self.colorID = 0  # reset the colors selection ID
+
+        # self.colorID = 0  # reset the colors selection ID
 
         # mh.world[:] = []
 
@@ -1707,15 +1708,17 @@ class Scene3D:
 
         for g in obj.facesGroups:
             self.colorID += 1
-            #555 to 24-bit rgb
+
+            # 555 to 24-bit rgb
+
             idR = (self.colorID % 32) * 8
-            idG = ((self.colorID>>5)%32) * 8
-            idB = ((self.colorID>>10)%32) * 8
+            idG = ((self.colorID >> 5) % 32) * 8
+            idB = ((self.colorID >> 10) % 32) * 8
             for f in g.faces:
                 f.colorID = [idR, idG, idB]
             self.faceGroupColorID[self.colorID] = g
 
-            #print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s or %s"%(g.name,obj.name,idR,idG,idB, self.colorID)
+            # print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s or %s"%(g.name,obj.name,idR,idG,idB, self.colorID)
 
     def getSelectedFacesGroup(self):
         """
@@ -1731,14 +1734,16 @@ class Scene3D:
 
         picked = mh.getColorPicked()
 
-        IDkey = (picked[0]/8) | ((picked[1]/8) << 5) | ((picked[2]/8)<<10) #555
-        
-        #print "DEBUG COLOR PICKED: %s,%s,%s %s"%(picked[0], picked[1], picked[2], IDkey)
+        IDkey = picked[0] / 8 | picked[1] / 8 << 5 | picked[2] / 8 << 10  # 555
+
+        # print "DEBUG COLOR PICKED: %s,%s,%s %s"%(picked[0], picked[1], picked[2], IDkey)
 
         try:
             groupSelected = self.faceGroupColorID[IDkey]
-            #print groupSelected.name
         except:
+
+            # print groupSelected.name
+
             print 'Color %s not found' % IDkey
             groupSelected = None
         return groupSelected
@@ -1876,38 +1881,46 @@ class Scene3D:
 
         mh.redraw(async)
 
-#Draws a Quad
-#TODO: account for world2local and viceversa
-def drawQuad(scn, verts, name="quad", position=[0.0,0.0,0.0]):
-  obj = scn.newObj(name)
-  obj.x = position[0]
-  obj.y = position[1]
-  obj.z = position[2]
-  obj.rx = 0.0
-  obj.ry = 0.0
-  obj.rz = 0.0
-  obj.sx = 1.0
-  obj.sy = 1.0
-  obj.sz = 1.0
-  obj.visibility = 1
-  obj.shadeless = 0
-  obj.pickable = 0
-  obj.cameraMode = 0
-  obj.text = ""
-  #obj.uvValues = []
-  obj.indexBuffer = []
-  fg = obj.createFaceGroup("faces")
-  
+
+# Draws a Quad
+# TODO: account for world2local and viceversa
+
+
+def drawQuad(scn, verts, name='quad', position=[0.0, 0.0, 0.0]):
+    obj = scn.newObj(name)
+    obj.x = position[0]
+    obj.y = position[1]
+    obj.z = position[2]
+    obj.rx = 0.0
+    obj.ry = 0.0
+    obj.rz = 0.0
+    obj.sx = 1.0
+    obj.sy = 1.0
+    obj.sz = 1.0
+    obj.visibility = 1
+    obj.shadeless = 0
+    obj.pickable = 0
+    obj.cameraMode = 0
+    obj.text = ''
+
+  # obj.uvValues = []
+
+    obj.indexBuffer = []
+    fg = obj.createFaceGroup('faces')
+
   # create vertices
-  v1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-  v2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
-  v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
-  v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
+
+    v1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
+    v2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+    v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
+    v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
 
   # create faces
-  f1 = fg.createFace(v1, v4, v2)
-  f2 = fg.createFace(v2, v4, v3)
 
-  obj.updateIndexBuffer()
-  scn.update()
- 
+    f1 = fg.createFace(v1, v4, v2)
+    f2 = fg.createFace(v2, v4, v3)
+
+    obj.updateIndexBuffer()
+    scn.update()
+
+

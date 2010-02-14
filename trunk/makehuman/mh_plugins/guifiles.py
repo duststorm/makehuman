@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # You may use, modify and redistribute this module under the terms of the GNU GPL.
 
 """ 
@@ -49,7 +50,8 @@ import humanmodifier
 class SaveTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Save', category.app.getThemeResource('images', 'button_save_file.png'), category.app.getThemeResource('images', 'button_save_file_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Save', category.app.getThemeResource('images', 'button_save_file.png'), category.app.getThemeResource('images',
+                                'button_save_file_on.png'))
         self.fileentry = gui3d.FileEntryView(self)
 
         @self.fileentry.event
@@ -100,7 +102,8 @@ class LoadTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         modelPath = mh.getPath('models')
-        gui3d.TaskView.__init__(self, category, 'Load', category.app.getThemeResource('images', 'button_load_file.png'), category.app.getThemeResource('images', 'button_load_file_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Load', category.app.getThemeResource('images', 'button_load_file.png'), category.app.getThemeResource('images',
+                                'button_load_file_on.png'))
         self.filechooser = gui3d.FileChooser(self, modelPath, 'mhm')
 
         @self.filechooser.event
@@ -145,18 +148,20 @@ class LoadTaskView(gui3d.TaskView):
 class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'), category.app.getThemeResource('images', 'button_export_file_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'), category.app.getThemeResource('images',
+                                'button_export_file_on.png'))
         gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0])
         self.fileentry = gui3d.FileEntryView(self)
 
         self.exportTypeGroup = []
         self.wavefrontObj = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                              'button_export_obj.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_obj_on.png'), position=[33, 120,
-                                              9.2], selected=True)
-        self.mhx = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_mhx.png'
-                                     ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 120, 9.2])
+                                              'button_export_obj.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_obj_on.png'), position=[33,
+                                              120, 9.2], selected=True)
+        self.mhx = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
+                                     'button_export_mhx.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 120, 9.2])
         self.collada = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 120, 9.2])
+                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'),
+                                         position=[103, 120, 9.2])
 
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 140, 9.2], selected=True)
@@ -176,8 +181,7 @@ class ExportTaskView(gui3d.TaskView):
       # elif self.collada.selected:
       #  mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
 
-            mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.obj',\
-            'data/3dobjs/base.obj')
+            mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.obj', 'data/3dobjs/base.obj')
             mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.bvh')
             mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.mhx')
             mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.dae')

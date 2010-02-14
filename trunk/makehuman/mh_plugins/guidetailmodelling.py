@@ -304,7 +304,9 @@ class Detail3dTool(events3d.EventHandler):
         groups = []
 
         if self.micro:
-            #print(event.group)
+
+            # print(event.group)
+
             groups.append(event.group)
             if human.symmetryModeEnabled:
                 sg = human.getSymmetryGroup(event.group)
@@ -357,7 +359,7 @@ class DetailModelingTaskView(gui3d.TaskView):
                                            self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0)
 
         self.genitals = None
-        
+
         @self.genitalsSlider.event
         def onChanging(value):
             if self.app.settings.realtimeUpdates:
@@ -366,7 +368,7 @@ class DetailModelingTaskView(gui3d.TaskView):
                     self.genitals = human.getGenitals()
                 human.updateGenitals(self.genitals, value, self.app.settings.realtimeNormalUpdates)
                 self.genitals = min(max(value, -1.0), 1.0)
-            
+
         @self.genitalsSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
@@ -374,10 +376,10 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.genitals = None
 
         self.breastSizeSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_cup.png'), self.app.getThemeResource('images', 'slider.png'),
-                                            self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 139, 9.2], value=0.5, min=0, max=1)
+                                             self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 139, 9.2], value=0.5, min=0, max=1)
 
         self.breastSize = None
-        
+
         @self.breastSizeSlider.event
         def onChanging(value):
             if self.app.settings.realtimeUpdates:
@@ -386,7 +388,7 @@ class DetailModelingTaskView(gui3d.TaskView):
                     self.breastSize = human.getBreastSize()
                 human.updateBreastSize(self.breastSize, value, self.app.settings.realtimeNormalUpdates)
                 self.breastSize = min(1.0, max(0.0, value))
-            
+
         @self.breastSizeSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
@@ -395,9 +397,9 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_firmness.png'), self.app.getThemeResource('images', 'slider.png'
                                                  ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 173, 9.2], value=0.5, min=0, max=1)
-        
+
         self.breastFirmness = None
-        
+
         @self.breastFirmnessSlider.event
         def onChanging(value):
             if self.app.settings.realtimeUpdates:
@@ -406,18 +408,18 @@ class DetailModelingTaskView(gui3d.TaskView):
                     self.breastFirmness = human.getBreastFirmness()
                 human.updateBreastFirmness(self.breastFirmness, value, self.app.settings.realtimeNormalUpdates)
                 self.breastFirmness = min(1.0, max(0.0, value))
-        
+
         @self.breastFirmnessSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
             self.breastFirmness = None
 
-        self.noseSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
-                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0)
+        self.noseSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'),
+                                       self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0)
 
         self.nose = None
-        
+
         @self.noseSlider.event
         def onChanging(value):
             if self.app.settings.realtimeUpdates:
@@ -426,18 +428,18 @@ class DetailModelingTaskView(gui3d.TaskView):
                     self.nose = human.getNose()
                 human.updateNose(self.nose, value, self.app.settings.realtimeNormalUpdates)
                 self.nose = min(1.0, max(0.0, value))
-        
+
         @self.noseSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Nose', value, self.syncSliders))
             self.nose = None
-            
-        self.mouthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
-                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 269, 9.2], value=0.0, min=0.0, max=1.0)
+
+        self.mouthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'),
+                                        self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 269, 9.2], value=0.0, min=0.0, max=1.0)
 
         self.mouth = None
-        
+
         @self.mouthSlider.event
         def onChanging(value):
             if self.app.settings.realtimeUpdates:
@@ -446,7 +448,7 @@ class DetailModelingTaskView(gui3d.TaskView):
                     self.mouth = human.getMouth()
                 human.updateMouth(self.mouth, value, self.app.settings.realtimeNormalUpdates)
                 self.mouth = min(1.0, max(0.0, value))
-        
+
         @self.mouthSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
@@ -494,9 +496,9 @@ class DetailModelingTaskView(gui3d.TaskView):
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
         self.rightSymmetryButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmright.png'),
-                                                selectedTexture=self.app.getThemeResource('images', 'button_symmright_on.png'),position=[673, 282, 9.2])
+                                                selectedTexture=self.app.getThemeResource('images', 'button_symmright_on.png'), position=[673, 282, 9.2])
         self.leftSymmetryButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmleft.png'),
-                                               selectedTexture=self.app.getThemeResource('images', 'button_symmleft_on.png'),position=[708, 282, 9.2])
+                                               selectedTexture=self.app.getThemeResource('images', 'button_symmleft_on.png'), position=[708, 282, 9.2])
         self.symmetryButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmetry.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_symmetry_on.png'), position=[743, 282, 9.2])
 
@@ -532,13 +534,13 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.breastFirmnessSlider.setValue(human.getBreastFirmness())
         self.noseSlider.setValue(human.getNose())
 
+
 class MicroModelingTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Micro modelling', category.app.getThemeResource('images', 'micro.png'), category.app.getThemeResource('images',
                                 'micro_on.png'))
         self.tool = None
-        
 
         gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_modifiers.png'), [10, 339, 9.0])
 
@@ -567,7 +569,7 @@ class MicroModelingTaskView(gui3d.TaskView):
         self.rightSymmetryButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmright.png'),
                                                 selectedTexture=self.app.getThemeResource('images', 'button_symmright_on.png'), position=[33, 390, 9.2])
         self.leftSymmetryButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmleft.png'),
-                                                selectedTexture=self.app.getThemeResource('images', 'button_symmleft_on.png'), position=[68, 390, 9.2])
+                                               selectedTexture=self.app.getThemeResource('images', 'button_symmleft_on.png'), position=[68, 390, 9.2])
         self.symmetryButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmetry.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_symmetry_on.png'), position=[103, 390, 9.2])
 
