@@ -114,7 +114,7 @@ class Object(events3d.EventHandler):
     def setText(self, text):
         self.mesh.setText(text)
 
-    def getText(self, text):
+    def getText(self):
         self.mesh.text
 
     def onMouseDown(self, event):
