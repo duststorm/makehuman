@@ -190,12 +190,12 @@ PyTypeObject CameraType =
     0,                                        // tp_as_buffer
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
     "Camera object",                          // tp_doc
-    0,		                                    // tp_traverse
-    0,		                                    // tp_clear
-    0,		                                    // tp_richcompare
-    0,		                                    // tp_weaklistoffset
-    0,		                                    // tp_iter
-    0,		                                    // tp_iternext
+    0,                                        // tp_traverse
+    0,                                        // tp_clear
+    0,                                        // tp_richcompare
+    0,                                        // tp_weaklistoffset
+    0,                                        // tp_iter
+    0,                                        // tp_iternext
     Camera_methods,                           // tp_methods
     Camera_members,                           // tp_members
     0,                                        // tp_getset
@@ -324,12 +324,12 @@ PyTypeObject TextureType =
     0,                                        // tp_as_buffer
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
     "Texture object",                         // tp_doc
-    0,		                                    // tp_traverse
-    0,		                                    // tp_clear
-    0,		                                    // tp_richcompare
-    0,		                                    // tp_weaklistoffset
-    0,		                                    // tp_iter
-    0,		                                    // tp_iternext
+    0,                                        // tp_traverse
+    0,                                        // tp_clear
+    0,                                        // tp_richcompare
+    0,                                        // tp_weaklistoffset
+    0,                                        // tp_iter
+    0,                                        // tp_iternext
     Texture_methods,                          // tp_methods
     Texture_members,                          // tp_members
     0,                                        // tp_getset
@@ -469,6 +469,47 @@ void mhDrawText(float x, float y, const char *message)
     glEnable(GL_LIGHTING);
 }
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+/** \brief Perform a byte swapping of a long value by reversing all bytes 
+ *         (e.g. 0x012345678 becomes 0x78563412).
+ *  \param inValue The long to swap to.
+ *  \return The long value swapped.
+ */
+static uint32_t swapLong(uint32_t inValue)
+{
+    return (((inValue      ) & 0xff) << 24) |
+           (((inValue >>  8) & 0xff) << 16) |
+           (((inValue >> 16) & 0xff) <<  8) |
+           (((inValue >> 24) & 0xff));
+}
+#endif
+
+/** \brief Copy one Array of long values (32 bits) to another location in 
+ *         memory by considering the endian correctness.
+ *         The rule here is that if the machine this method is a big endian 
+ *         architecture (e.g. PowerPC) then every long is swapped accordingly.
+ *         On big endian archtiectures (as x86) no byte swapping will be done.
+ *
+ *  \param destPtr the destination pointer (the target of the copy process).
+ *  \param srcPtr the source pointer which points to the data to copy from.
+ *  \param inLongs The count of long values to copy to. Note that this is not 
+ *         in bytes but in long values (1 long consumes 4 bytes)
+ *  \return The numer of longs copied.
+ */
+static int longCopyEndianSafe(uint32_t *destPtr, const uint32_t *srcPtr, size_t inLongs)
+{
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    memcpy(destPtr, srcPtr, inLongs << 2);
+#else /* For Big Endian we'll need to swap all bytes within the long */
+    int i;
+    for (i=0; i<inLongs; ++i)
+    {
+        *(destPtr++) = swapLong(*(srcPtr++));
+    }
+#endif
+    return inLongs;
+}
+
 /** \brief Flip an SDL surface from top to bottom.
  *  \param surface a pointer to an SDL_Surface.
  *
@@ -476,21 +517,32 @@ void mhDrawText(float x, float y, const char *message)
  *  swaps it with the bottom line, then the second line and swaps it with the second
  *  line from the bottom etc. until the surface has been mirrored from top to bottom.
  */
-static void mhFlipSurface(const SDL_Surface *surface)
+static void mhFlipSurface(SDL_Surface *surface)
 {
     unsigned char *line = (unsigned char*)malloc(surface->w * surface->format->BytesPerPixel);
-    unsigned char *pixels = (unsigned char*)surface->pixels;
-    int lineIndex;
-
-    for (lineIndex = 0; lineIndex < surface->h / 2; lineIndex++)
+    if (line)
     {
-        memcpy(line, pixels + lineIndex * surface->pitch, surface->w * surface->format->BytesPerPixel);
-        memcpy(pixels + lineIndex * surface->pitch,
-               pixels + (surface->h - lineIndex - 1) * surface->pitch,
-               surface->w * surface->format->BytesPerPixel);
-        memcpy(pixels + (surface->h - lineIndex - 1) * surface->pitch, line, surface->w * surface->format->BytesPerPixel);
-    }
+        if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
 
+        const size_t lineBytes = surface->pitch;
+        const size_t lineLongs = lineBytes >> 2;
+        
+        unsigned char *pixelsA = (unsigned char*)surface->pixels;
+        unsigned char *pixelsB = (unsigned char*)surface->pixels + (surface->h - 1) * lineBytes;
+        
+        int lineIndex;
+        
+        for (lineIndex = 0; lineIndex < surface->h >> 1; lineIndex++)
+        {
+            memcpy((uint32_t*)line,    (const uint32_t*)pixelsA, lineBytes);
+            longCopyEndianSafe((uint32_t*)pixelsA, (const uint32_t*)pixelsB, lineLongs);
+            longCopyEndianSafe((uint32_t*)pixelsB, (const uint32_t*)line,    lineLongs);
+            
+            pixelsA += lineBytes;
+            pixelsB -= lineBytes;
+        }
+        if (SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
+    }
     free(line);
 }
 
@@ -1777,11 +1829,9 @@ void mhSetFullscreen(int fullscreen)
     }
 
     if (!g_screen)
-
-        if (!g_screen)
-        {
-            return;
-        }
+    {
+        return;
+    }
 
     g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
     OnInit();
