@@ -115,7 +115,7 @@ class Object(events3d.EventHandler):
         self.mesh.setText(text)
 
     def getText(self):
-        self.mesh.text
+        return self.mesh.text
 
     def onMouseDown(self, event):
         self.view.callEvent('onMouseDown', event)
@@ -851,7 +851,7 @@ class TextEdit(View):
         self.__updateTextObject()
 
     def getText(self):
-        self.textObject.getText()
+        return self.textObject.getText()
 
     def onKeyDown(self, event):
         if event.modifiers & events3d.KMOD_CTRL:
