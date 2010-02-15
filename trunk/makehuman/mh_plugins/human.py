@@ -777,7 +777,7 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/neutral_male-young-mouth%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-mouth%i.target'% i] = self.childVal * self.maleVal * values[i]
             #detailTargets['data/targets/details/neutral_male-old-mouth%i.target'% i] = self.oldVal * self.maleVal * values[i]
-            #detailTargets['data/targets/details/neutral_female-young-mouth%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-young-mouth%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-child-mouth%i.target'% i] = self.childVal * self.femaleVal * values[i]
             #detailTargets['data/targets/details/neutral_female-old-mouth%i.target'% i] = self.oldVal * self.femaleVal * values[i]
             
