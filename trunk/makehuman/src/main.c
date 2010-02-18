@@ -427,6 +427,10 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     {
         path = getGrabPath();
     }
+    else if (0 == strcmp(typeStr, "render"))
+    {
+        path = getRenderPath();
+    }
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
 #ifdef CSIDL_MYDOCUMENTS

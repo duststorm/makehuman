@@ -11,6 +11,7 @@
 const NSString *kUserDefaultsKeyExportPath = @"MHExportPath";
 const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
 const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
+const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
 
 @interface GeneralPreferences (Private)
 +(void)createPathIfNotExists:(NSString*)inPath;
@@ -19,14 +20,17 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
 -(void)updateModelPath:(NSString*)inPath;
 -(void)updateExportPath:(NSString*)inPath;
 -(void)updateGrabPath:(NSString*)inPath;
+-(void)updateRenderPath:(NSString*)inPath;
 
 -(void)setModelPath:(NSString*)inPath;
 -(void)setExportPath:(NSString*)inPath;
 -(void)setGrabPath:(NSString*)inPath;
+-(void)setRenderPath:(NSString*)inPath;
 
 +(NSString*)defaultModelPath;
 +(NSString*)defaultExportPath;
 +(NSString*)defaultGrabPath;
++(NSString*)defaultRenderPath;
 @end // @interface GeneralPreferences (Private)
 
 @implementation GeneralPreferences
@@ -42,6 +46,7 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     [self setModelPath: [GeneralPreferences modelPath]];
     [self setExportPath:[GeneralPreferences exportPath]];
     [self setGrabPath:  [GeneralPreferences grabPath]];
+    [self setRenderPath:[GeneralPreferences renderPath]];
 }
 
 -(IBAction)actionResetPaths:(id)inSender
@@ -49,6 +54,7 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     [self setModelPath: [GeneralPreferences defaultModelPath]];
     [self setExportPath:[GeneralPreferences defaultExportPath]];
     [self setGrabPath:  [GeneralPreferences defaultGrabPath]];
+    [self setRenderPath:[GeneralPreferences defaultRenderPath]];
 }
 
 -(IBAction)actionSelectModelPath:(NSPopUpButton*)inSender
@@ -114,6 +120,27 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     }
 }
 
+-(IBAction)actionSelectRenderPath:(id)inSender
+{
+    if (1 == [inSender indexOfSelectedItem])
+    {
+        NSOpenPanel *directorySelectPanel = [NSOpenPanel openPanel];
+        [directorySelectPanel setCanChooseFiles:NO]; // Just directories may be selected
+        [directorySelectPanel setCanChooseDirectories:YES]; // Just directories may be selected
+        [directorySelectPanel setCanCreateDirectories:YES];
+        
+        NSInteger rc = [directorySelectPanel runModalForDirectory:[GeneralPreferences renderPath] file:nil types:nil];
+        
+        [inSender selectItemAtIndex:0];
+        
+        if (NSOKButton == rc)
+        {
+            NSString *selectedPath = [[directorySelectPanel filenames] objectAtIndex:0];
+            [self setGrabPath:selectedPath];
+        }
+    }
+}
+
 -(BOOL) isResizable
 {
 	return NO;
@@ -153,6 +180,19 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     if (s == nil)
     {
         s = [GeneralPreferences defaultGrabPath];
+    }
+    [GeneralPreferences createPathIfNotExists:s];
+    return s;
+}
+
++(NSString*)renderPath
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    
+    NSString *s = [ud stringForKey:kUserDefaultsKeyRenderPath];
+    if (s == nil)
+    {
+        s = [GeneralPreferences defaultRenderPath];
     }
     [GeneralPreferences createPathIfNotExists:s];
     return s;
@@ -200,6 +240,15 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
     [ud synchronize];
 }
 
+-(void)setRenderPath:(NSString*)inPath
+{
+    [self updateFileSelectPopUpButton:mRenderPathPUB fromPath:inPath];
+    
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:inPath forKey:kUserDefaultsKeyRenderPath];
+    [ud synchronize];
+}
+
 -(void)updateModelPath:(NSString*)inPath
 {
     [self updateFileSelectPopUpButton:mModelsPathsPUB fromPath:inPath];
@@ -213,6 +262,11 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
 -(void)updateGrabPath:(NSString*)inPath
 {
     [self updateFileSelectPopUpButton:mGrabPathPUB fromPath:inPath];
+}
+
+-(void)updateRenderPath:(NSString*)inPath
+{
+    [self updateFileSelectPopUpButton:mRenderPathPUB fromPath:inPath];
 }
 
 -(void)updateFileSelectPopUpButton:(NSPopUpButton*)inButton fromPath:(NSString*)inPath
@@ -249,6 +303,11 @@ const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
 +(NSString*)defaultGrabPath
 {
     return [NSString stringWithFormat:@"%@/Desktop",  NSHomeDirectory()];
+}
+
++(NSString*)defaultRenderPath
+{
+    return [NSString stringWithFormat:@"%@/Documents/MakeHuman/renderman",  NSHomeDirectory()];
 }
 
 @end // @implementation GeneralPreferences (Private)

@@ -13,6 +13,7 @@ extern "C" {
     const char* getExportPath();
     const char* getModelPath();
     const char* getGrabPath();
+    const char* getRenderPath();
 #ifdef __cplusplus
 }
 #endif

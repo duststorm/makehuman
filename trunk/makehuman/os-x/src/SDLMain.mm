@@ -16,6 +16,7 @@
 static std::string sModelPath;
 static std::string sExportPath;
 static std::string sGrabPath;
+static std::string sRenderPath;
 
 const char* getExportPath()
 {
@@ -33,6 +34,12 @@ const char* getGrabPath()
 {
     sGrabPath = [[GeneralPreferences grabPath] UTF8String];
     return sGrabPath.c_str();
+}
+
+const char* getRenderPath()
+{
+    sGrabPath = [[GeneralPreferences renderPath] UTF8String];
+    return sRenderPath.c_str();
 }
 
 #ifndef MAKEHUMAN_AS_MODULE
@@ -369,24 +376,6 @@ static void CustomApplicationMain (int argc, char **argv)
     return TRUE;
 }
 
-extern "C" int isMainWindowActive();
-// Check weather the current focus window is the main window
-int isMainWindowActive()
-{
-    const NSWindow *keyWin  = [NSApp keyWindow];
-
-    // is the key window valid?
-    if (keyWin == NULL)
-        return false; // No? then The Mian Window is not the active one.
-    
-    // Get the Key Windows title
-    const NSString *title = [keyWin title];
-
-    // The MainWindow is active only if the key window is the MainWindow 
-    // (whose title is "MakeHuman").
-    return ([title compare:@"MakeHuman"] == NSOrderedSame);
-}
-
 /* Called when the internal event loop has just started running */
 - (void) applicationDidFinishLaunching: (NSNotification *) note
 {
@@ -495,4 +484,22 @@ int main (int argc, char **argv)
 }
 
 #endif // #ifndef MAKEHUMAN_AS_MODULE
+
+extern "C" int isMainWindowActive();
+// Check weather the current focus window is the main window
+int isMainWindowActive()
+{
+    const NSWindow *keyWin  = [NSApp keyWindow];
+    
+    // is the key window valid?
+    if (keyWin == NULL)
+        return false; // No? then The main Window is not the active one.
+    
+    // Get the Key Windows title
+    const NSString *title = [keyWin title];
+    
+    // The MainWindow is active only if the key window is the MainWindow 
+    // (whose title is "MakeHuman").
+    return ([title compare:@"MakeHuman"] == NSOrderedSame);
+}
 
