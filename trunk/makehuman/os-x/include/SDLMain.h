@@ -33,6 +33,9 @@ extern "C" {
 
 -(IBAction)helpFileMHUsersGuide:(id)inSender;
 -(IBAction)helpFileMHQuickStart:(id)inSender;
+
+-(IBAction)helpFileMHDevelMHProto:(id)inSender;
+
 -(IBAction)helpURLMHVisitHome:(id)inSender;
 -(IBAction)helpURLMHVisitForum:(id)inSender;
 -(IBAction)helpURLMHDocuments:(id)inSender;

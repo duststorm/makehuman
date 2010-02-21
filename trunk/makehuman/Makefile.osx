@@ -6,19 +6,24 @@
 #######################################################################
 
 DEPS=src/core.d src/main.d src/glmodule.d
+RM=rm -rf
 
 cleanbuild: clean build
 
 build: debug
 
-release:
+release: 
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release build
 	hdiutil create -srcfolder os-x/build/Release/ -ov -volname MakeHuman MakeHuman.dmg
 
-debug:
+debug: 
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug build
 
-module: mh.so
+module: mh.so mhproto_doc
+
+mhproto_doc:
+	cd docs; doxygen ./configs/doxygen_html_config_osx.txt
+    
 
 mh.so:
 	@echo "building mh.so ..."
@@ -55,7 +60,7 @@ doc:
 # Cleanup unused stuff
 # ---------------------------------------------------------------------
 clean:
-	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~ src/*.o src/*.d mh.so
+	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug  clean
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release  clean
 	make -C utils/fixmesh/ -f Makefile.osx clean

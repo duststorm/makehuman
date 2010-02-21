@@ -3,6 +3,7 @@
 // ===========================================================================================================
 "FileMHUsersGuide"  = "docs/MH_Users_Guide.pdf";
 "FileMHQuickStart"  = "docs/MH_Quick_Start.pdf";
+"FileDevelMHProto"  = "docs/mhproto_cdoc/index.html";
 
 "URLMHHome"         = "http://www.makehuman.org";
 "URLMHForum"        = "http://www.makehuman.org/forum/index.php";
