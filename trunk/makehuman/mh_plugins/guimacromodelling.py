@@ -1,23 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import gui3d
+import gui3d, time
 import animation3d
 import humanmodifier
 
 
 class MacroAction:
 
-    def __init__(self, human, method, value, postAction):
+    def __init__(self, human, method, value, postAction,update=True):
         self.name = method
         self.human = human
         self.method = method
         self.before = getattr(self.human, 'get' + self.method)()
         self.after = value
         self.postAction = postAction
+        self.update = update
 
     def do(self):
         getattr(self.human, 'set' + self.method)(self.after)
-        self.human.applyAllTargets(self.human.app.progress)
+        self.human.applyAllTargets(self.human.app.progress, update=self.update)
         self.postAction()
         return True
 
@@ -49,7 +50,6 @@ class EthnicAction:
         self.human.applyAllTargets(self.human.app.progress)
         self.postAction()
         return True
-
 
 class EthnicMapButton(gui3d.RadioButton):
 
@@ -146,17 +146,28 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.heightSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_height_macro.png'), self.app.getThemeResource('images', 'slider.png'),
                                          self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 280, 9.04], value=0.5)
 
+        #hair update only necessary for : gender, age , height
+        
         @self.genderSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
-            self.app.do(MacroAction(human, 'Gender', value, self.syncSliders))
+            self.app.do(MacroAction(human, 'Gender', value, self.syncSliders,False))
             self.syncStatus()
+            fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
+            fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
+            human.meshData.update()
+            human.hairObj.update()
+
 
         @self.ageSlider.event
         def onChange(value):
             human = self.app.scene3d.selectedHuman
-            self.app.do(MacroAction(human, 'Age', value, self.syncSliders))
+            self.app.do(MacroAction(human, 'Age', value, self.syncSliders,False))
             self.syncStatus()
+            fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
+            fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
+            human.meshData.update()
+            human.hairObj.update()
 
         @self.muscleSlider.event
         def onChange(value):
@@ -178,12 +189,21 @@ class MacroModelingTaskView(gui3d.TaskView):
             before['data/targets/macrodetails/universal-stature-giant.target'] = human.getDetail('data/targets/macrodetails/universal-stature-giant.target')
             modifier = humanmodifier.Modifier(human, 'data/targets/macrodetails/universal-stature-dwarf.target',
                                               'data/targets/macrodetails/universal-stature-giant.target')
-            modifier.setValue(value * 2 - 1)
+            modifier.setValue(value * 2 - 1,update=0)
             after = {}
             after['data/targets/macrodetails/universal-stature-dwarf.target'] = human.getDetail('data/targets/macrodetails/universal-stature-dwarf.target')
             after['data/targets/macrodetails/universal-stature-giant.target'] = human.getDetail('data/targets/macrodetails/universal-stature-giant.target')
-            self.app.did(humanmodifier.Action(human, before, after, self.syncSliders))
-            human.applyAllTargets(self.app.progress)
+            self.app.did(humanmodifier.Action(human, before, after, self.syncSliders,update=False))
+            human.applyAllTargets(self.app.progress,update=False)
+            #Best method is to reload hair and readjust.. other methods arent very convincing
+            #May be expensive? since our changes are not realtime we can live with it for the time being
+            fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
+            fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
+            #self.app.categories["Library"].tasksByName["Hair"].adjustHairObj(human.hairObj, human.meshData)
+            human.meshData.update()
+            human.hairObj.update()
+            #self.app.scene3d.redraw(True)
+
 
     # Ethnic controls
 

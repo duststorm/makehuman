@@ -87,7 +87,6 @@ class Human(gui3d.Object):
         self.breastSize = 0.5
         self.breastFirmness = 0.5
         self.nose = 0.0
-        self.mouth = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
@@ -174,9 +173,6 @@ class Human(gui3d.Object):
         
         noseNames = ["l-nose-nostril", "nose-bridge", "nose-glabella", "nose-philtrum", "nose-sellion", "nose-tip", "r-nose-nostril"]
         self.noseVertices, self.noseFaces = self.meshData.getVerticesAndFacesForGroups(noseNames)
-        
-        mouthNames = ["l-mouth-upper-lip", "mouth-upper-middle-lip", "r-mouth-upper-lip", "l-mouth-lower-lip", "mouth-lower-middle-lip", "r-mouth-lower-lip"]
-        self.mouthVertices, self.mouthFaces = self.meshData.getVerticesAndFacesForGroups(mouthNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -393,12 +389,6 @@ class Human(gui3d.Object):
 
     def getNose(self):
        return self.nose
-       
-    def setMouth(self, value):
-        self.mouth = min(1.0, max(0.0, value))
-
-    def getMouth(self):
-       return self.mouth
 
     def setEthnic(self, ethnic, value):
         modified = None
@@ -743,7 +733,7 @@ class Human(gui3d.Object):
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateMouth(self, previous, next, recalcNormals = True, update = True):
         mouthValues = [0 for i in xrange(0, 14)]
         
@@ -786,7 +776,7 @@ class Human(gui3d.Object):
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
-    def applyAllTargets(self, progressCallback=None):
+    def applyAllTargets(self, progressCallback=None, update=True):
         """
         This method applies all targets, in function of age and sex
         
@@ -911,17 +901,6 @@ class Human(gui3d.Object):
             noseValues[i + 1] = value
 
         self.applyNoseTargets(noseValues)
-        
-        # mouth goes from 0 to 13, 0 is no target
-        mouth = self.mouth * 13
-        mouthValues = [0 for i in xrange(0, 14)]
-        i = int(math.floor(mouth))
-        value = mouth - i
-        mouthValues[i] = 1 - value
-        if i < 13:
-            mouthValues[i + 1] = value
-
-        self.applyMouthTargets(mouthValues)
 
         for (ethnicGroup, ethnicVal) in self.targetsEthnicStack.iteritems():
 
@@ -949,7 +928,7 @@ class Human(gui3d.Object):
         # Update all verts
 
         self.meshData.calcNormals(1, 1)
-        self.meshData.update()
+        if update: self.meshData.update()
         if progressCallback:
             progressCallback(1.0)
 
@@ -1262,7 +1241,6 @@ class Human(gui3d.Object):
         self.breastSize = 0.5
         self.breastFirmness = 0.5
         self.nose = 0.0
-        self.mouth = 0.0
 
         self.activeEthnicSets = {}
         self.targetsEthnicStack = {'neutral': 1.0}
@@ -1302,8 +1280,6 @@ class Human(gui3d.Object):
                     self.setBreastFirmness(float(lineData[1]))
                 elif lineData[0] == 'nose':
                     self.setNose(float(lineData[1]))
-                elif lineData[0] == 'mouth':
-                    self.setMouth(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
@@ -1333,7 +1309,6 @@ class Human(gui3d.Object):
         f.write('breastSize %f\n' % self.getBreastSize())
         f.write('breastFirmness %f\n' % self.getBreastFirmness())
         f.write('nose %f\n' % self.getNose())
-        f.write('mouth %f\n' % self.getMouth())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         f.write('height %f\n' % modifier.getValue())

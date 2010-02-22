@@ -30,17 +30,18 @@ import algos3d
 
 class Action:
 
-    def __init__(self, human, before, after, postAction=None):
+    def __init__(self, human, before, after, postAction=None,update=True):
         self.name = 'Change detail'
         self.human = human
         self.before = before
         self.after = after
         self.postAction = postAction
+        self.update=update
 
     def do(self):
         for (target, value) in self.after.iteritems():
             self.human.setDetail(target, value)
-        self.human.applyAllTargets()
+        self.human.applyAllTargets(update=self.update)
         if self.postAction:
             self.postAction()
 
@@ -59,29 +60,29 @@ class Modifier:
         self.left = left
         self.right = right
 
-    def setValue(self, value):
+    def setValue(self, value,update=1):
         value = max(-1.0, min(1.0, value))
 
     # print(self.left + " " + str(value))
 
         if not value:
             if self.human.getDetail(self.left):
-                algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, 1, 0)
+                algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, update, 0)
             self.human.setDetail(self.left, None)
             if self.human.getDetail(self.right):
-                algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, 1, 0)
+                algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, update, 0)
             self.human.setDetail(self.right, None)
         elif value < 0.0:
-            algos3d.loadTranslationTarget(self.human.meshData, self.left, -value - self.human.getDetail(self.left), None, 1, 0)
+            algos3d.loadTranslationTarget(self.human.meshData, self.left, -value - self.human.getDetail(self.left), None, update, 0)
             self.human.setDetail(self.left, -value)
             if self.human.getDetail(self.right):
-                algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, 1, 0)
+                algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, update, 0)
             self.human.setDetail(self.right, None)
         else:
             if self.human.getDetail(self.left):
-                algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, 1, 0)
+                algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, update, 0)
             self.human.setDetail(self.left, None)
-            algos3d.loadTranslationTarget(self.human.meshData, self.right, value - self.human.getDetail(self.right), None, 1, 0)
+            algos3d.loadTranslationTarget(self.human.meshData, self.right, value - self.human.getDetail(self.right), None, update, 0)
             self.human.setDetail(self.right, value)
 
     def getValue(self):

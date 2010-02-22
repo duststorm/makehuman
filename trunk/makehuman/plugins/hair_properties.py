@@ -3,6 +3,7 @@
 # We need this for gui controls
 
 import gui3d, hair
+from aljabr import vdist,vnorm,vmul,vsub,vadd
 
 print 'hair properties imported'
 
@@ -33,6 +34,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
     def __init__(self, category):        
         
+        self.deltaGuides={}
         
         gui3d.TaskView.__init__(self, category, 'Hair', category.app.getThemeResource('images', 'button_hair_det.png'), category.app.getThemeResource('images',
                                 'button_hair_det_on.png'))
@@ -95,12 +97,17 @@ class HairPropertiesTaskView(gui3d.TaskView):
         def onChanging(value):
             human = self.app.scene3d.selectedHuman
             if len(human.hairObj.verts)>0 : 
-               hair.dynamicUpdate(human.scene, human.hairObj, widthFactor=self.widthSlider.getValue())
+               hairWidthUpdate(human.scene, human.hairObj, widthFactor=self.widthSlider.getValue())
             #pass #Do something!
 
     def changeColor(self, color):
         action = Action(self.app.scene3d.selectedHuman, self.app.scene3d.selectedHuman.hairColor, color, self.syncSliders)
         self.app.do(action)
+        human = self.app.scene3d.selectedHuman
+        rgba = color[:] 
+        rgba.append(255) #temporary fix?? do we need to adjust alpha? YES! :P TODO: Jose
+        human.hairObj.facesGroups[0].setColor(rgba)
+        human.hairObj.update() #for efficiency .. is there a way to update with only colors? TODO: Marc
 
     def setColor(self, color):
         c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
@@ -126,13 +133,22 @@ class HairPropertiesTaskView(gui3d.TaskView):
 category = None
 taskview = None
 
-
 def load(app):
     taskview = HairPropertiesTaskView(app.categories['Modelling'])
     print 'hair properties loaded'
-
 
 def unload(app):
     print 'hair properties unloaded'
 
 
+#obj = hair object
+def hairWidthUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal and vertex index of object remains the same!
+  N=len(obj.verts)
+  origWidth = vdist(obj.verts[1].co,obj.verts[0].co)/res
+  diff= (widthFactor-origWidth)*res/2
+  for i in xrange(0,N/2):
+      vec=vmul(vnorm(vsub(obj.verts[i*2+1].co,obj.verts[i*2].co)), diff)    
+      obj.verts[i*2].co=vsub(obj.verts[i*2].co,vec)
+      obj.verts[i*2+1].co=vadd(obj.verts[i*2+1].co,vec)
+      obj.verts[i*2].update(updateNor=0)
+      obj.verts[i*2+1].update(updateNor=0)

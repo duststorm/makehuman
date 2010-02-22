@@ -82,7 +82,7 @@ class Hairgenerator:
         self.hairStyle = []
 
         self.tipMagnet = 0.9
-
+         
         self.numberOfHairsClump = 10
         self.numberOfHairsMultiStrand = 20
 
@@ -93,7 +93,7 @@ class Hairgenerator:
         self.hairDiameterClump = 0.006
         self.hairDiameterMultiStrand = 0.006
 
-        self.sizeClump = 0.200
+        self.sizeClump = 0.20
         self.sizeMultiStrand = 0.200
         self.blendDistance = 0.8
 
@@ -109,6 +109,7 @@ class Hairgenerator:
         self.gLength = 5.0
         self.noCPoints = 15
         self.gFactor = 1.5
+        self.Delta=None #Delta of the very first controlpoint of the very first guide in our guide list! This will be used as a reference
 
     def resetHairs(self):
         self.hairStyle = []
@@ -123,7 +124,6 @@ class Hairgenerator:
         """
 
         """
-
         try:
             fileDescriptor = open(self.path)
         except:
@@ -148,6 +148,8 @@ class Hairgenerator:
                 deltaVector = deltaGuides[guide.name]
                 for i in range(len(deltaVector)):
                     cpDelta = deltaVector[i]
+                    if self.Delta == None:
+                       self.Delta=cpDelta[:]
                     cpGuide = guide.controlPoints[i]
                     v = self.humanVerts[int(cpDelta[0])]
                     cpGuide[0] = v.co[0] + float(cpDelta[1])

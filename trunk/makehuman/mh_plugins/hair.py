@@ -31,26 +31,24 @@ from aljabr import *
 from random import random
 from math import radians
 
-class Hair(gui3d.Object):
-  def __init__(self, globalScene, objFilePath):
-    gui3d.Object.__init__(self, globalScene.application, objFilePath, position = [0, 0, 0], camera = 0, shadeless = 0, visible = True)
-
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"),  category.app.getThemeResource("images", "button_hair_on.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
-    self.hairsClass = hairgenerator.Hairgenerator()
+    self.filechooser.selectedFile = 1 #This is where default.hair is located :P .. bad HACK need to improve on this, maybe a hashtable?.. TODO for marc :P
+    #self.hairsClass = hairgenerator.Hairgenerator() #this will have more points than the .hair file, as we will use curve interpolations on the controlpoints
     self.saveAsCurves = True
     self.widthFactor = 1.0
-    
+    self.Delta=None
+ 
     #filename textbox
-    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj', texture = category.app.getThemeResource('images', 'texedit_off.png'), position=[20, 480, 9], focusedTexture = category.app.getThemeResource('images', 'texedit_on.png'))
+    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj', position=[20, 480, 9])
     self.TextEdit.setText('saved_hair.obj')
-    
+    self.refVector=None #reference vector used for fast updating of hair (e.g. when base model only changes height or age)
     #Save Button
     self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
                     texture=category.app.getThemeResource("images", "button_save_file.png"),\
-                    selectedTexture=None, position=[470, 490, 9.4])
+                    selectedTexture=None, position=[470, 490, 9])
     #self.Button.button.setScale(1.0,5.0)
     
     #.obj save type Radiobuttons
@@ -70,19 +68,22 @@ class HairTaskView(gui3d.TaskView):
 
     @self.Button.event
     def onClicked(event):
-      if len(self.TextEdit.text) >= 1 and len(self.hairsClass.guideGroups)> 0:
-        #Do something!
+      if len(self.TextEdit.text) >= 1 and len(hairsClass.guideGroups)> 0:
         modelPath = mh.getPath('models')
         if not os.path.exists(modelPath): os.makedirs(modelPath)
         if self.RadioButton1.selected:
+          hairsClass = hairgenerator.Hairgenerator()
+          hairsClass.humanVerts = self.app.scene3d.selectedHuman.mesh.verts
+          hairsClass.loadHairs(self.app.scene3d.selectedHuman.hairFile)
+          hairsClass.adjustGuides()
           file = open(modelPath+"/"+self.TextEdit.text, 'w')
-          exportAsCurves(file, self.hairsClass.guideGroups)
+          exportAsCurves(file, hairsClass.guideGroups)
           file.close()
         else:
           exportObj(self.app.scene3d.selectedHuman.hairObj,modelPath+"/"+self.TextEdit.text)
     
     @self.filechooser.event
-    def onFileSelected(filename):
+    def onFileSelected(filename,update=1):
       print("Loading %s" %(filename))
       #human = self.app.scene3d.selectedHuman
       wFactor = self.app.categories["Modelling"].tasksByName["Hair"].widthSlider.getValue() 
@@ -90,13 +91,16 @@ class HairTaskView(gui3d.TaskView):
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
       human.scene.clear(human.hairObj)
-      self.hairsClass = hairgenerator.Hairgenerator()
-      self.hairsClass.humanVerts = human.mesh.verts
-      human.hairObj = loadHairsFile(human.scene, path="./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=self.hairsClass, widthFactor=self.widthFactor)
+      hairsClass = hairgenerator.Hairgenerator()
+      hairsClass.humanVerts = human.mesh.verts
+      L = loadHairsFile(human.scene, path="./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=hairsClass, update=update, widthFactor=self.widthFactor)
+      if self.refVector==None: self.refVector=L[1]
+      self.Delta = L[2]
+      human.hairObj=L[0]
       #Jose: TODO collision detection
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
       self.app.switchCategory("Modelling")
-      self.app.scene3d.redraw(1)
+      #self.app.scene3d.redraw(update)
     
   def onShow(self, event):
     # When the task gets shown, set the focus to the file chooser
@@ -109,6 +113,21 @@ class HairTaskView(gui3d.TaskView):
   def onHide(self, event):
     self.app.scene3d.selectedHuman.show()
     gui3d.TaskView.onHide(self, event)
+  
+"""  
+  #Note: Does not update!
+  #Suggestion: Updates of objects should be done manually!
+  #No rotation (e.g. different pose) change assumed on base head! only translation and scales
+  def adjustHairObj(self, hairObj, humanObj): #luckily both normal and vertex index of object remains the same!
+    v=humanObj.verts[int(self.Delta[0])].co[:]
+    v[0]=v[0] + float(self.Delta[1])
+    v[1]=v[1] + float(self.Delta[2])
+    v[2]=v[2] + float(self.Delta[2])
+    delta = vsub(v,self.refVector)
+    for i in range(len(hairObj.verts)):
+       hairObj.verts[i].co = vadd(hairObj.verts[i].co,delta)
+    self.refVector=vadd(self.refVector,delta)
+"""
     
 def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
   if hairsClass == None :
@@ -131,6 +150,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.uvValues = []
   obj.indexBuffer = []
   fg = obj.createFaceGroup("ribbons")
+  refVector=None
   
   #temporary vectors
   headNormal = [0.0,1.0,0.0]
@@ -143,10 +163,12 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   else: 
     hairsClass.adjustGuides()
     print "Hair adjusted"
-
+  
+  Delta = hairsClass.Delta
   for group in hairsClass.guideGroups:
     for guide in group.guides:
       cPs = [guide.controlPoints[0]]
+      if refVector == None : refVector = guide.controlPoints[0][:]
       for i in xrange(2,len(guide.controlPoints)-1): #piecewise continuous polynomial
         d1=vdist(guide.controlPoints[i-1],guide.controlPoints[i-2])
         d=d1+vdist(guide.controlPoints[i-1],guide.controlPoints[i])
@@ -214,18 +236,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.calcNormals()
   if update:
       scn.update()
-  return obj
-  
-def dynamicUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal and vertex index of object remains the same!
-  N=len(obj.verts)
-  origWidth = vdist(obj.verts[1].co,obj.verts[0].co)/res
-  diff= (widthFactor-origWidth)*res/2
-  for i in xrange(0,N/2):
-      vec=vmul(vnorm(vsub(obj.verts[i*2+1].co,obj.verts[i*2].co)), diff)    
-      obj.verts[i*2].co=vsub(obj.verts[i*2].co,vec)
-      obj.verts[i*2+1].co=vadd(obj.verts[i*2+1].co,vec)
-      obj.verts[i*2].update(updateNor=0)
-      obj.verts[i*2+1].update(updateNor=0)
+  return obj,refVector,Delta
               
 def exportAsCurves(file, guideGroups):
   DEG_ORDER_U = 3
