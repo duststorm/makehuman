@@ -520,17 +520,20 @@ static int longCopyEndianSafe(uint32_t *destPtr, const uint32_t *srcPtr, size_t 
 static void mhFlipSurface(SDL_Surface *surface)
 {
     unsigned char *line = (unsigned char*)malloc(surface->w * surface->format->BytesPerPixel);
+    const size_t lineBytes = surface->pitch;
+    const size_t lineLongs = lineBytes >> 2;
+        
+    unsigned char *pixelsA;
+    unsigned char *pixelsB;
+        
+    int lineIndex;
+
     if (line)
     {
         if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
-
-        const size_t lineBytes = surface->pitch;
-        const size_t lineLongs = lineBytes >> 2;
         
-        unsigned char *pixelsA = (unsigned char*)surface->pixels;
-        unsigned char *pixelsB = (unsigned char*)surface->pixels + (surface->h - 1) * lineBytes;
-        
-        int lineIndex;
+        pixelsA = (unsigned char*)surface->pixels;
+        pixelsB = (unsigned char*)surface->pixels + (surface->h - 1) * lineBytes;
         
         for (lineIndex = 0; lineIndex < surface->h >> 1; lineIndex++)
         {
