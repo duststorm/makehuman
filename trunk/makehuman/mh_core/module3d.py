@@ -1247,6 +1247,7 @@ class Scene3D:
         # TODO add all obj attributes
 
     def detach(self, obj):
+        mh.world.remove(obj.object3d)
         obj.object3d = None
 
     def update(self):
