@@ -34,7 +34,7 @@ import files3d
 import types
 
 
-def exportObj(obj, filename, originalQuadsFile=None):
+def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True):
     """
     This function exports a mesh object in Wavefront obj format. It is assumed that obj will have at least vertices and
     faces (exception handling for vertices/faces must be done outside this method).
@@ -72,23 +72,27 @@ def exportObj(obj, filename, originalQuadsFile=None):
       faces = files3d.loadFacesIndices(originalQuadsFile, True)
       for fc in faces:
          if type(fc) is types.StringType:
-            f.write('g %s\n' % fc)
+            if exportGroups:
+                f.write('g %s\n' % fc)
          else :
             f.write('f')
             for v in fc:
-               if (obj.uvValues == None): f.write(' %i//%i ' % (v[0] + 1, v[1] + 1))
-               else: f.write(' %i/%i/%i ' % (v[0] + 1, v[1] + 1, v[0] + 1))
+                if (obj.uvValues == None): f.write(' %i//%i ' % (v[0] + 1, v[1] + 1))
+                else: f.write(' %i/%i/%i ' % (v[0] + 1, v[1] + 1, v[0] + 1))
             f.write('\n')
     else:
-      for fg in obj.facesGroups:
-         f.write('g %s\n' % fg.name)
-         for face in fg.faces:
-            f.write('f')
-            #print "face.verts : " , face.verts
-            for v in face.verts:
-               if (obj.uvValues == None): f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-               else: f.write(' %i/%i/%i ' % (v.idx + 1, v.idx + 1, v.idx + 1))
-            f.write('\n')
+        for fg in obj.facesGroups:
+            if exportGroups:
+                f.write('g %s\n' % fg.name)
+            for face in fg.faces:
+                f.write('f')
+                #print "face.verts : " , face.verts
+                for v in face.verts:
+                    if (obj.uvValues == None):
+                        f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+                    else:
+                        f.write(' %i/%i/%i ' % (v.idx + 1, v.idx + 1, v.idx + 1))
+                f.write('\n')
     f.close()
 
     # Write material file

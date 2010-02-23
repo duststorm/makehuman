@@ -160,6 +160,9 @@ class ExportTaskView(gui3d.TaskView):
 
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 140, 9.2], selected=True)
+                                                 
+        self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
+                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[68, 140, 9.2], selected=True)
 
         @self.fileentry.event
         def onFileSelected(filename):
@@ -167,20 +170,14 @@ class ExportTaskView(gui3d.TaskView):
             if not os.path.exists(exportPath):
                 os.makedirs(exportPath)
 
-      # if self.wavefrontObj.selected:
-      #  mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj")
-      #  if self.exportSkeleton.selected:
-      #    mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
-      # elif self.mhx.selected:
-      #  mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".mhx")
-      # elif self.collada.selected:
-      #  mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
-
-            mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.obj',\
-            'data/3dobjs/base.obj')
-            mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.bvh')
-            mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.mhx')
-            mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + '/' + filename + '.dae')
+            if self.wavefrontObj.selected:
+                mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj", 'data/3dobjs/base.obj', self.exportGroups.selected)
+                if self.exportSkeleton.selected:
+                    mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
+            elif self.mhx.selected:
+                mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".mhx")
+            elif self.collada.selected:
+                mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
 
             self.app.switchCategory('Modelling')
             self.app.scene3d.redraw(1)
