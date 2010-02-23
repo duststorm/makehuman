@@ -106,7 +106,6 @@ class HairPropertiesTaskView(gui3d.TaskView):
         human = self.app.scene3d.selectedHuman
         c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
         human.hairObj.facesGroups[0].setColor(c)
-        human.hairObj.update() #for efficiency .. is there a way to update with only colors? TODO: Marc
 
     def setColor(self, color):
         c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
