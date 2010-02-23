@@ -87,6 +87,8 @@ class Human(gui3d.Object):
         self.breastSize = 0.5
         self.breastFirmness = 0.5
         self.nose = 0.0
+        self.mouth = 0.0
+        self.eyes = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
@@ -171,8 +173,14 @@ class Human(gui3d.Object):
                 "r-torso-lower-pectoralis", "r-torso-nipple"]
         self.breastVertices, self.breastFaces = self.meshData.getVerticesAndFacesForGroups(breastNames)
         
-        noseNames = ["l-nose-nostril", "nose-bridge", "nose-glabella", "nose-philtrum", "nose-sellion", "nose-tip", "r-nose-nostril"]
+        noseNames = [group.name for group in self.meshData.facesGroups if group.name.find("nose") > -1]
         self.noseVertices, self.noseFaces = self.meshData.getVerticesAndFacesForGroups(noseNames)
+        
+        mouthNames = [group.name for group in self.meshData.facesGroups if group.name.find("mouth") > -1]
+        self.mouthVertices, self.mouthFaces = self.meshData.getVerticesAndFacesForGroups(mouthNames)
+
+        eyesNames = [group.name for group in self.meshData.facesGroups if group.name.find("eye") > -1]
+        self.eyesVertices, self.eyesFaces = self.meshData.getVerticesAndFacesForGroups(eyesNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -389,6 +397,18 @@ class Human(gui3d.Object):
 
     def getNose(self):
        return self.nose
+       
+    def setMouth(self, value):
+        self.mouth = min(1.0, max(0.0, value))
+
+    def getMouth(self):
+       return self.mouth
+   
+    def setEyes(self, value):
+        self.eyes = min(1.0, max(0.0, value))
+
+    def getEyes(self):
+       return self.eyes
 
     def setEthnic(self, ethnic, value):
         modified = None
@@ -775,6 +795,48 @@ class Human(gui3d.Object):
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
+    def updateEyes(self, previous, next, recalcNormals = True, update = True):
+        eyesValues = [0 for i in xrange(0, 31)]
+        
+        # remove previous
+        previousEyes = previous * 30
+        i = int(math.floor(previousEyes))
+        value = previousEyes - i
+        eyesValues[i] -= 1 - value
+        if i < 30:
+            eyesValues[i + 1] -= value
+            
+        # add next
+        nextEyes = next * 30
+        i = int(math.floor(nextEyes))
+        value = nextEyes - i
+        eyesValues[i] += 1 - value
+        if i < 30:
+            eyesValues[i + 1] += value
+            
+        self.applyEyesTargets(eyesValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.eyesVertices, self.eyesFaces)
+        if update:
+          self.meshData.update(self.eyesVertices)
+
+    def applyEyesTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 30):
+            #detailTargets['data/targets/details/neutral_male-young-mouth%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            #detailTargets['data/targets/details/neutral_male-child-mouth%i.target'% i] = self.childVal * self.maleVal * values[i]
+            #detailTargets['data/targets/details/neutral_male-old-mouth%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-young-eye%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            #detailTargets['data/targets/details/neutral_female-child-mouth%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            #detailTargets['data/targets/details/neutral_female-old-mouth%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None, update=True):
         """
@@ -901,6 +963,28 @@ class Human(gui3d.Object):
             noseValues[i + 1] = value
 
         self.applyNoseTargets(noseValues)
+        
+        # mouth goes from 0 to 13, 0 is no target
+        mouth = self.mouth * 13
+        mouthValues = [0 for i in xrange(0, 14)]
+        i = int(math.floor(mouth))
+        value = mouth - i
+        mouthValues[i] = 1 - value
+        if i < 13:
+            mouthValues[i + 1] = value
+
+        self.applyMouthTargets(mouthValues)
+        
+        # eyes goes from 0 to 30, 0 is no target
+        eyes = self.eyes * 30
+        eyesValues = [0 for i in xrange(0, 31)]
+        i = int(math.floor(eyes))
+        value = eyes - i
+        eyesValues[i] = 1 - value
+        if i < 30:
+            eyesValues[i + 1] = value
+
+        self.applyEyesTargets(eyesValues)
 
         for (ethnicGroup, ethnicVal) in self.targetsEthnicStack.iteritems():
 
@@ -1241,6 +1325,8 @@ class Human(gui3d.Object):
         self.breastSize = 0.5
         self.breastFirmness = 0.5
         self.nose = 0.0
+        self.mouth = 0.0
+        self.eyes = 0.0
 
         self.activeEthnicSets = {}
         self.targetsEthnicStack = {'neutral': 1.0}
@@ -1280,6 +1366,10 @@ class Human(gui3d.Object):
                     self.setBreastFirmness(float(lineData[1]))
                 elif lineData[0] == 'nose':
                     self.setNose(float(lineData[1]))
+                elif lineData[0] == 'mouth':
+                    self.setMouth(float(lineData[1]))
+                elif lineData[0] == 'eyes':
+                    self.setEyes(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
@@ -1309,6 +1399,8 @@ class Human(gui3d.Object):
         f.write('breastSize %f\n' % self.getBreastSize())
         f.write('breastFirmness %f\n' % self.getBreastFirmness())
         f.write('nose %f\n' % self.getNose())
+        f.write('mouth %f\n' % self.getMouth())
+        f.write('eyes %f\n' % self.getEyes())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         f.write('height %f\n' % modifier.getValue())

@@ -304,7 +304,7 @@ class Detail3dTool(events3d.EventHandler):
         groups = []
 
         if self.micro:
-            #print(event.group)
+            print(event.group)
             groups.append(event.group)
             if human.symmetryModeEnabled:
                 sg = human.getSymmetryGroup(event.group)
@@ -452,6 +452,26 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Mouth', value, self.syncSliders))
             self.mouth = None
+            
+        self.eyesSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
+                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 303, 9.2], value=0.0, min=0.0, max=1.0)
+
+        self.eyes = None
+        
+        @self.eyesSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.eyes == None:
+                    self.eyes = human.getEyes()
+                human.updateEyes(self.eyes, value, self.app.settings.realtimeNormalUpdates)
+                self.eyes = min(1.0, max(0.0, value))
+        
+        @self.eyesSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Eyes', value, self.syncSliders))
+            self.eyes = None
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
@@ -531,6 +551,8 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.breastSizeSlider.setValue(human.getBreastSize())
         self.breastFirmnessSlider.setValue(human.getBreastFirmness())
         self.noseSlider.setValue(human.getNose())
+        self.mouthSlider.setValue(human.getMouth())
+        self.eyesSlider.setValue(human.getEyes())
 
 class MicroModelingTaskView(gui3d.TaskView):
 
