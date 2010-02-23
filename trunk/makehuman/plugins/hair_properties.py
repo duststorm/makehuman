@@ -104,9 +104,8 @@ class HairPropertiesTaskView(gui3d.TaskView):
         action = Action(self.app.scene3d.selectedHuman, self.app.scene3d.selectedHuman.hairColor, color, self.syncSliders)
         self.app.do(action)
         human = self.app.scene3d.selectedHuman
-        rgba = color[:] 
-        rgba.append(255) #temporary fix?? do we need to adjust alpha? YES! :P TODO: Jose
-        human.hairObj.facesGroups[0].setColor(rgba)
+        c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
+        human.hairObj.facesGroups[0].setColor(c)
         human.hairObj.update() #for efficiency .. is there a way to update with only colors? TODO: Marc
 
     def setColor(self, color):
