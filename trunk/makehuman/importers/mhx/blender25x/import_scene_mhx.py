@@ -665,20 +665,30 @@ def parseObject(args, tokens):
 		elif key == 'ParticleSystem':
 			parseParticleSystem(ob, val, sub)
 		else:
-			print(key,val)
 			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
 	return
 
 def createObject(type, name, data):
-	if verbosity > 2:
-		print( "Creating object %s %s %s" % (type, name, data) )
-	ob = bpy.data.objects.new(name, type.upper())
+	typ = type.upper()
+	print( "Creating object %s %s" % (name, typ) )	
+	ob = bpy.data.objects.new(name, typ)
+	ob.name = name
 	if data:
 		ob.data = data
-	ob.name = name
 	loadedData['Object'][name] = ob
-	bpy.context.scene.objects.link(ob)
-	bpy.context.scene.objects.active = ob
+	return ob
+	
+def linkObject(ob, data):
+	print("Data", data, ob.data)
+	if data and ob.data == None:
+		ob.data = data
+	scn = bpy.context.scene
+	scn.objects.link(ob)
+	scn.objects.active = ob
+	print("Linked object", ob)
+	print("Scene", scn)
+	print("Active", scn.objects.active)
+	print("Context", bpy.context.object)
 	return ob
 
 def createObjectAndData(args, typ):
@@ -817,6 +827,7 @@ def parseMesh (args, tokens):
 	#print(x)
 	me.update()
 	print(me)
+	linkObject(ob, me)
 		
 	mats = []
 	for (key, val, sub) in tokens:
@@ -989,10 +1000,9 @@ def doShape(name):
 
 def parseShapeKey(ob, me, args, tokens):
 	if verbosity > 0:
-		print( "Parsing shape %s" % args[0] )
+		print( "Parsing ob %s shape %s" % (bpy.context.object.active, args[0] ))
 	name = args[0]
 	lr = args[1]
-	# bpy.context.scene.objects.active = ob
 	if lr == 'Sym':
 		addShapeKey(ob, name, None, tokens)
 	elif lr == 'LR':
@@ -1038,86 +1048,102 @@ def parseArmature (args, tokens):
 	amtname = args[0]
 	obname = args[1]
 	mode = args[2]
-
+	
 	if mode == 'Rigify':
 		toggle |= T_Rigify
-		(key,val,sub) = tokens[0]
-		if key != 'MetaRig':
-			raise NameError("Expected MetaRig")
-		typ = val[0]
-		print("Metarig ", typ)
-		if typ == "human":
-			bpy.ops.object.armature_human_advanced_add()
-		else:
-			bpy.ops.pose.metarig_sample_add(type = typ)
-		ob = bpy.context.object
-		amt = ob.data
-		loadedData['Rigify'][obname] = ob
-	else:
-		toggle &= ~T_Rigify
-		amt = bpy.data.armatures.new(amtname)
-		ob = createObject('Armature', obname, amt)	
-		# bpy.context.scene.objects.active = ob
+		return parseRigify(amtname, obname, tokens)
 
+	toggle &= ~T_Rigify
+	amt = bpy.data.armatures.new(amtname)
+	ob = createObject('Armature', obname, amt)	
 	loadedData['Armature'][amtname] = amt
 	loadedData['Object'][obname] = ob
 	print("Armature", amt, ob)
+	linkObject(ob, amt)
+	print("Linked")
+
+	bpy.ops.object.mode_set(mode='OBJECT')
+	bpy.ops.object.mode_set(mode='EDIT')
 
 	bones = {}
-
-	#bpy.ops.object.mode_set(mode='OBJECT')
-	bpy.ops.object.mode_set(mode='EDIT')
-	'''
-	fp = open("/home/thomas/test.txt", "w")
-	fp.write("Editbones\n")
-	for b in amt.edit_bones.keys():
-		fp.write("%s\t%s\n" % (b, amt.edit_bones[b]))
-	fp.write("\nBones\n")
-	for b in amt.bones.keys():
-		fp.write("%s\t%s\n" % (b, amt.bones[b]))
-	fp.close()
-	'''
-
 	heads = {}
 	tails = {}
 	for (key, val, sub) in tokens:
 		if key == 'Bone':
-			parseBone(amt, bones, val, sub, heads, tails)
+			bname = val[0]
+			bone = amt.edit_bones.new(bname)
+			parseBone(bone, sub, heads, tails)
+			loadedData['Bone'][bname] = bone
 		else:
 			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
 
 	bpy.ops.object.mode_set(mode='OBJECT')
-
+	
 	return amt
 
 #
-#	parseBone(amt, bones, args, tokens):
+#	parseRigify(amtname, obname, tokens):		
 #
 
-def parseBone(amt, bones, args, tokens, heads, tails):
-	global todo
-
-	name = args[0]
-	if toggle & T_Rigify:
-		try:
-			bone = amt.edit_bones[name]
-		except:
-			print("Did not find bone %s" %name)
-			return None
+def parseRigify(amtname, obname, tokens):		
+	(key,val,sub) = tokens[0]
+	if key != 'MetaRig':
+		raise NameError("Expected MetaRig")
+	typ = val[0]
+	print("Metarig ", typ)
+	if typ == "human":
+		bpy.ops.object.armature_human_advanced_add()
 	else:
-		bone = amt.edit_bones.new(name)
-	
-	loadedData['Bone'][name] = bone
+		bpy.ops.pose.metarig_sample_add(type = typ)
+	ob = bpy.context.scene.objects.active
+	amt = ob.data
+	loadedData['Rigify'][obname] = ob
+	loadedData['Armature'][amtname] = amt
+	loadedData['Object'][obname] = ob
+	print("Rigify object", ob, amt)
+	print("Context", bpy.context.object)
+	print("Bones", amt.bones.keys())
+
+	bones = {}
+	heads = {}
+	tails = {}
+
+	bpy.ops.object.mode_set(mode='OBJECT')
+	bpy.ops.object.mode_set(mode='EDIT')
+	print("EditBones", amt.edit_bones.keys())
+
+	for (key, val, sub) in tokens:
+		if key == 'Bone':
+			bname = val[0]
+			try:
+				bone = amt.edit_bones[bname]
+			except:
+				print("Did not find bone %s" % bname)
+				bone = None
+			if bone:
+				parseBone(bone, sub, heads, tails)
+		else:
+			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
+
+	bpy.ops.object.mode_set(mode='OBJECT')
+	return amt
+		
+#
+#	parseBone(bone, tokens, heads, tails):
+#
+
+def parseBone(bone, tokens, heads, tails):
+	global todo
 
 	for (key, val, sub) in tokens:
 		if key == "head":
 			old = rot90rig(bone.head, True)
 			bone.head = rot90(val[0], val[1], val[2], True) 
-			heads[name] = bone.head - old
+			heads[bone.name] = bone.head - old
 		elif key == "tail":
 			old = rot90rig(bone.tail, True)
 			bone.tail = rot90(val[0], val[1], val[2], True) 
-			tails[name] = bone.tail - old
+			tails[bone.name] = bone.tail - old
 		elif key == "head-as":
 			print("head", val[0], heads[val[0]], bone.head)
 			if val[1] == 'head':
@@ -1158,7 +1184,7 @@ def postProcess():
 			bpy.context.scene.objects.active = ob
 			bpy.ops.pose.metarig_generate()
 			bpy.context.scene.objects.unlink(ob)
-			ob = bpy.context.object
+			ob = bpy.context.scene.objects.active
 			print("Rigged", ob)
 
 	else:
@@ -1500,8 +1526,6 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 	elif rnaType == 'List':
 		data = []
 		for (key, val, sub) in tokens:
-			print(key, val, sub, nvar)
-			#defaultKey(key, val, sub, nvar, [], glbals, lcals)
 			elt = eval(val[1], glbals, lcals)
 			data.append(elt)
 
@@ -1636,6 +1660,8 @@ def clearScene():
 		return scn
 	for ob in scn.objects:
 		if ob.type == "MESH" or ob.type == "ARMATURE":
+			scn.objects.active = ob
+			bpy.ops.object.mode_set(mode='OBJECT')
 			scn.objects.unlink(ob)
 			del ob
 	#print(scn.objects)
