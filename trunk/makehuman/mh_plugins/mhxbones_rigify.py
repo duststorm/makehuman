@@ -49,10 +49,10 @@ joints = dict({
   'spine.03_tail' : 'spine2' ,
   'spine.04_tail' : 'spine1' ,
   'neck_base_tail' : 'neck' ,
-  'head_tail' : 'head' ,
+  'head_tail' : [(0.7,'head') , (0.3,'neck')] ,
   'neck.01_head' : 'neck' ,
-  'neck.01_tail' : 'head' ,
-  'neck.02_tail' : [(1.5,'head') , (-0.5,'neck')] ,
+  'neck.01_tail' : [(0.5,'head') , (0.5,'neck')] ,
+  'neck.02_tail' : 'head' ,
   'neck.03_tail' : [(2,'head') , (-1,'neck')] ,
 
   'DLT-shoulder.L_head' :'r-clavicle'  ,
@@ -144,7 +144,7 @@ joints = dict({
 
 
 armature = [
-	('root', 'None', 'root_head', 'root_tail', 0, 'root'), 
+	# ('root', 'None', 'root_head', 'root_tail', 0, 'root'), 
 	('pelvis', 'root', 'pelvis_head', 'pelvis_tail', 0, ''), 
 	('torso', 'pelvis', 'torso_head', 'torso_tail', 0, 'spine_pivot_flex'), 
 	('spine.01', 'torso', 'spine.01_head', 'spine.01_tail', 0, ''), 
@@ -181,9 +181,9 @@ armature = [
 	('thumb.01.L', 'hand.L', 'thumb.01.L_head', 'thumb.01.L_tail', 0, 'finger_curl'), 
 	('thumb.02.L', 'thumb.01.L', 'thumb.01.L_tail', 'thumb.02.L_tail', F_CON, ''), 
 	('thumb.03.L', 'thumb.02.L', 'thumb.02.L_tail', 'thumb.03.L_tail', F_CON, ''), 
-	('DLT-shoulder.R', 'neck_base', 'DLT-shoulder.R_head', 'DLT-shoulder.R_tail', 0, 'delta'), 
+	('DLT-shoulder.R', 'neck_base', ('shoulder.R', 'head'), ('shoulder.R', 'tail'), 0, 'delta'), 
 	('shoulder.R', 'DLT-shoulder.R', 'shoulder.R_head', 'shoulder.R_tail', 0, 'copy'), 
-	('DLT-upper_arm.R', 'shoulder.R', 'DLT-upper_arm.R_head', 'DLT-upper_arm.R_tail', 0, 'delta'), 
+	('DLT-upper_arm.R', 'shoulder.R', ('upper_arm.R', 'head'), ('upper_arm.R', 'tail'), 0, 'delta'), 
 	('upper_arm.R', 'DLT-upper_arm.R', 'upper_arm.R_head', 'upper_arm.R_tail', 0, 'arm_biped_generic'), 
 	('forearm.R', 'upper_arm.R', 'upper_arm.R_tail', 'forearm.R_tail', F_CON, ''), 
 	('hand.R', 'forearm.R', 'forearm.R_tail', 'hand.R_tail', F_CON, ''), 
@@ -210,7 +210,7 @@ armature = [
 	('shin.L', 'thigh.L', 'thigh.L_tail', 'shin.L_tail', F_CON, ''), 
 	('foot.L', 'shin.L', 'shin.L_tail', 'foot.L_tail', F_CON, ''), 
 	('toe.L', 'foot.L', 'foot.L_tail', 'toe.L_tail', F_CON, ''), 
-	('heel.L', 'foot.L', 'heel.L_head', 'heel.L_tail', 0, ''), 
+	('heel.L', 'foot.L', ('foot.L', 'head'), ('foot.L', 'tail'), 0, ''), 
 	('thigh.R', 'spine.01', 'thigh.R_head', 'thigh.R_tail', 0, 'leg_biped_generic'), 
 	('shin.R', 'thigh.R', 'thigh.R_tail', 'shin.R_tail', F_CON, ''), 
 	('foot.R', 'shin.R', 'shin.R_tail', 'foot.R_tail', F_CON, ''), 
@@ -304,9 +304,11 @@ def jointAdd((f0,j0), (f1,j1)):
 def writeBones(obj, fp):
 	global oldLocs, newLocs
 	setupLocations(obj)
-	fp.write("\narmature RigifyRig RigifyRig\n\trigify ;")
+	fp.write("  MetaRig human ;\n")
 	for bone in armature:
-		writeBone(bone, fp)
+		writeBone1(bone, fp)
+	for bone in armature:
+		writeBone2(bone, fp)
 	'''
 	for (bone, par, hjoint, tjoint, conn) in toeArmature:
 		if type(hjoint) == str:
@@ -316,11 +318,6 @@ def writeBones(obj, fp):
 	for bone in toeArmature:
 		writeBone(bone, fp)
 	'''
-	fp.write("end armature\n")
-	fp.write("pose RigifyRig\n")
-	for bone in armature:
-		writePoseBone(bone, fp)
-	fp.write("end pose\n")
 
 def getLoc(j):
 	global newLocs
@@ -329,20 +326,32 @@ def getLoc(j):
 	elif type(j) == list:
 		return jointAdd(j[0], j[1])
 
-def writeBone((bone, par, hjoint, tjoint, flags, btype), fp):
+def writeBone1((bone, par, hjoint, tjoint, flags, btype), fp):
+	try:
+		(b,h) = hjoint
+		return
+	except:
+		pass
 	head = getLoc(hjoint)
 	tail = getLoc(tjoint)
 	fp.write(
-"\n\tbone %s %s %d\n" +
-"\t\thead %f %f %f ;\n" +
-"\t\ttail %f %f %f ;\n" +
-"\tend bone\n" % (bone, par, flags, head[0], head[1], head[2], tail[0], tail[1], tail[2]))
+"\n  Bone %s\n" % (bone) +
+"    head %.6g %.6g %.6g ;\n" % (head[0], head[1], head[2]) +
+"    tail %.6g %.6g %.6g ;\n" % (tail[0], tail[1], tail[2]) +
+"  end Bone\n")
 
-def writePoseBone((bone, par, hjoint, tjoint, flags, btype), fp):
-	if btype != '':
-		fp.write(
-"\n\tposebone %s\n" +
-"\t\ttype %s ;\n" +
-"\tend posebone\n" % (bone, btype))
+def writeBone2((bone, par, hjoint, tjoint, flags, btype), fp):
+	try:
+		(b,h) = hjoint
+	except:
+		return
+	(hbone, hend) = hjoint
+	(tbone, tend) = tjoint
+	fp.write(
+"\n  Bone %s\n" % (bone) +
+"    head-as %s %s ;\n" % (hbone, hend) +
+"    tail-as %s %s ;\n" % (tbone, tend) +
+"  end Bone\n")
+
 
 

@@ -64,6 +64,7 @@ M_MHX	= 0x200
 M_Shape	= 0x400
 M_VGroup = 0x800
 M_Part = 0x1000
+M_MHPart = 0x2000
 
 expMsk = 0
 theRig = ""
@@ -76,6 +77,7 @@ RegisteredBlocks = {
 	'Scene' : (False, True, "''"),
 	'World' : (False, True, "''"),
 	'Object' : (False, True, "''"),
+	'Group' : (False, True, "''"),
 	'Action' : (False, True, "''"),
 
 	'Mesh' : (False, True, "''"),
@@ -98,6 +100,7 @@ RegisteredBlocks = {
 	'ParticleSystem' : (True, True, "'partSysCreator(rna,\"%s\")' % (name)"),
 
 	'Bone' : (True, True, "'edit_bones.new(\"%s\")' % (name)"),
+	'BoneGroup' : (True, True, "'boneGroupCreator(rna,\"%s\")' % (name)"),
 	
 	'FCurve' : (True, False, "'drivers.new(\"%s\")' % (name)"),
 	'DriverVariable' : (True, False, "'variables.new(\"%s\")' % (name)"),
@@ -111,6 +114,7 @@ createdLocal = {
 	'Modifier' : {},
 	'Constraint' : {},
 	'Bone' : {}, 
+	'BoneGroup' : {}, 
 	'Nurb' : {},
 	'BezierSplinePoint' : {},
 
@@ -381,7 +385,7 @@ excludeList = [\
 	'bl_rna', 'fake_user', 'id_data', 'rna_type', 'name', 'tag', 'users', 'type'
 ]
 
-Danger = ['ParticleEdit', 'color_ramp']
+Danger = []	# ['ParticleEdit', 'color_ramp']
 
 
 def writeValue(ext, arg, exclude, pad, depth, fp):
@@ -411,27 +415,29 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
 	if typ == int:
 		fp.write("%s%s %d ;\n" % (pad, ext, arg))
 	elif typ == float:
-		fp.write("%s%s %g ;\n" % (pad, ext, arg))
+		fp.write("%s%s %.6g ;\n" % (pad, ext, arg))
 	elif typ == bool:
 		fp.write("%s%s %s ;\n" % (pad, ext, arg))
 	elif typ == str:
 		fp.write("%s%s '%s' ;\n" % (pad, ext, stringQuote(arg.replace(' ','_'))))
 	elif typ == list:
 		fp.write("%s%s List\n" % (pad, ext))
+		n = 0
 		for elt in arg:
-			writeValue(" ", "", elt, [], [], pad+"  ", depth+1, fp)
+			writeValue("[%d]" % n, elt, [], pad+"  ", depth+1, fp)
+			n += 1
 		fp.write("%send List\n" % pad)
 	elif typ == Mathutils.Vector:
 		c = '('
 		fp.write("%s%s " % (pad, ext))
 		for elt in arg:
-			fp.write("%s%g" % (c,elt))
+			fp.write("%s%.6g" % (c,elt))
 			c = ','
 		fp.write(") ;\n")
 	elif typ == Mathutils.Euler:
-		fp.write("%s%s (%g,%g,%g) ;\n" % (pad, ext, arg[0], arg[1], arg[2]))
+		fp.write("%s%s (%.6g,%.6g,%.6g) ;\n" % (pad, ext, arg[0], arg[1], arg[2]))
 	elif typ == Mathutils.Quaternion:
-		fp.write("%s%s (%g,%g,%g,%g) ;\n" % (pad, ext, arg[0], arg[1], arg[2], arg[3]))
+		fp.write("%s%s (%.6g,%.6g,%.6g,%.6g) ;\n" % (pad, ext, arg[0], arg[1], arg[2], arg[3]))
 	elif typ == Mathutils.Matrix:
 		fp.write("%s%s Matrix\n" % (pad, ext))
 		n = len(arg)
@@ -500,7 +506,7 @@ def writeClass(list, ext, arg, pad, depth, fp):
 		return
 		propName = str(arg).split()[2]
 		writeProperty(propName, ext, arg, pad, depth, fp)
-	elif classSplit[0] == "PropertyRNA":
+	elif classSplit[0] == "PropertyRNA" or classSplit[0] == "PropertyCollectionRNA":
 		#<class 'PropertyRNA'>
 		#print("PROP", arg, dir(arg))
 		if 0 and dir(arg) != []:
@@ -514,7 +520,7 @@ def writeClass(list, ext, arg, pad, depth, fp):
 		return
 		print("METHOD", arg)
 	else:
-		fp.write("# **CLASS** %s %s %s %s \n" % (ext, classSplit, arg))
+		fp.write("# **CLASS** %s %s %s \n" % (ext, classSplit, arg))
 	return
 	
 #
@@ -690,8 +696,8 @@ def exportDriverVariable(var, pad, fp):
 	fp.write("%sDriverVariable %s \n" % (pad,name))
 	targets = var.targets
 	fp.write("%s  Targets %s ;\n" % (pad, targets))
-	#for targ in targets:
-	#	fp.write("%s  Target  ;\n" % (pad))
+	for targ in targets:
+		fp.write("%s  Target  ;\n" % (pad))
 	writeDir(var, [], pad+"  ", fp)
 	fp.write("%send exportDriverVariable\n\n" % pad)
 
@@ -737,7 +743,9 @@ def exportMaterial(mat, fp):
 			exportMTex(n, mtex, mat.use_textures[n], fp)
 	prio = ['diffuse_color', 'diffuse_shader', 'specular_color', 'specular_shader']
 	writePrio(mat, prio, "  ", fp)
-	writeDir(mat, prio+['textures', 'volume', 'diffuse_ramp', 'specular_ramp'], "  ", fp)
+	exportRamp(mat.diffuse_ramp, "diffuse_ramp", fp)
+	exportRamp(mat.specular_ramp, "specular_ramp", fp)
+	writeDir(mat, prio+['texture_slots', 'volume', 'diffuse_ramp', 'specular_ramp'], "  ", fp)
 	fp.write("end Material\n\n")
 
 MapToTypes = {
@@ -789,18 +797,33 @@ def exportTexture(tex, fp):
 	if tex.type == 'IMAGE':
 		fp.write("  Image %s ;\n" % tex.image.name.replace(' ', '_'))
 	else:
-		writeDir(tex, ['image_user', 'use_nodes', 'use_textures', 'type'], "  ", fp)
+		exportRamp(tex.color_ramp, "color_ramp", fp)
+		writeDir(tex, ['color_ramp', 'image_user', 'use_nodes', 'use_textures', 'type'], "  ", fp)
 	fp.write("end Texture\n\n")
 
 def exportImage(img, fp):
-	fp.write("Image %s\n" % (img.name.replace(' ', '_')))
+	imgName = img.name.replace(' ', '_')
+	if imgName == 'Render_Result':
+		return
+	fp.write("Image %s\n" % imgName)
 	if expMsk & M_MHX:
 		(path, name) = os.path.split(img.filename)
 		fp.write("  *** Filename %s ;\n" % (name))
 	else:
-		fp.write("  %sFilename %s ;\n" % (img.filename))
+		fp.write("  Filename %s ;\n" % (img.filename))
 	# writeDir(img, [], "  ", fp)
 	fp.write("end Image\n\n")
+
+def exportRamp(ramp, name, fp):
+	if ramp == None:
+		return
+	print(ramp)
+	fp.write("  Ramp %s\n" % name)
+	for elt in ramp.elements:
+		col = elt.color
+		fp.write("    Element (%.6g,%.6g,%.6g,%.6g) %.6g ;\n" % (col[0], col[1], col[2], col[3], elt.position))
+	writeDir(ramp, ['elements'], "    ", fp)
+	fp.write("  end Ramp\n")
 
 
 #
@@ -808,6 +831,8 @@ def exportImage(img, fp):
 # 
 
 def exportObject(ob, fp):
+	global hairFile
+
 	fp.write("\n# ----------------------------- %s --------------------- # \n\n" % ob.type )
 	if ob.type == "MESH":
 		exportMesh(ob, fp)
@@ -816,7 +841,9 @@ def exportObject(ob, fp):
 	elif ob.type == "EMPTY":
 		pass
 	elif ob.type == "CURVE":
-		exportCurve(ob,fp)
+		exportCurve(ob, fp)
+	elif ob.type == 'LATTICE':
+		exportLattice(ob, fp)
 	elif not expMsk & M_Obj:
 		return
 	else:
@@ -833,10 +860,13 @@ def exportObject(ob, fp):
 	for mod in ob.modifiers:
 		exportModifier(mod, fp)
 
+	for cns in ob.constraints:
+		exportConstraint(cns, fp)
+
 	for psys in ob.particle_systems:
 		if expMsk & M_MHX:
 			fp.write("*** ParticleSystem\n")
-			fp1 = mhxOpen(M_Part, "particles25.mhx")
+			fp1 = mhxOpen(M_Part, hairFile)
 			exportParticleSystem(psys, "  ", fp1)
 			mhxClose(fp1)
 		else:
@@ -846,7 +876,7 @@ def exportObject(ob, fp):
 	# exportAnimationData(ob.animation_data, fp)
 	writeDir(ob, 
 		['data','parent_vertices', 'mode', 'scene_users', 'children', 'pose', 
-		'material_slots', 'modifiers', 'layers',
+		'material_slots', 'modifiers', 'constraints', 'layers', 'bound_box', 'group_users',
 		'animation_visualisation', 'animation_data', 'particle_systems', 'active_particle_system',
 		'active_shape_key', 'vertex_groups', 'active_vertex_group', 'materials'], "  ", fp)
 	fp.write("end Object\n\n")
@@ -872,33 +902,34 @@ def exportParticleSystem(psys, pad, fp):
 
 def exportParticleSettings(settings, psys, pad, fp):
 	fp.write("%ssettings Struct ParticleSettings %s \n" % (pad, settings.name.replace(' ','_')))
+	if expMsk & (M_MHX+M_MHPart) == M_MHX+M_MHPart:
+		fp.write("%s  *** ParticleSettings\n" % pad)
+	prio = ['amount', 'hair_step', 'rendered_child_nbr', 'child_radius', 'child_random_size']
+	writePrio(settings, prio, pad+"  ", fp)
 	if expMsk & M_MHX:
-		prefix = "*** "
-	else:
-		prefix = ""
-	fp.write("%s%samount %d ;\n" % (pad, prefix, settings.amount))
-	fp.write("%s%shair_step %d ;\n" % (pad, prefix, settings.hair_step))
-	writeDir(settings, ['amount', 'hair_step'], pad+"  ", fp)
+		fp.write("%s  *** EndIgnore\n" % pad)
+	writeDir(settings, prio, pad+"  ", fp)
 	fp.write("%send Struct\n" % pad)
 
 def exportParticles(particles, nmax, pad, fp):
-	fp.write("%sParticles\n" % pad)
-	prio = ['location']
-	if expMsk & M_MHX:
+	if expMsk & (M_MHX+M_MHPart) == M_MHX+M_MHPart:
 		fp.write("%s  *** Particles\n" % pad)
+	else:
+		fp.write("%sParticles\n" % pad)
 	n = 0
+	prio = ['location']
 	for par in particles:
 		if n < nmax:
 			fp.write("%s  Particle \n" % pad)
 			for h in par.hair:
 				fp.write("%s    h " % pad)
 				writeTuple(h.location, fp)
-				fp.write(" %d %g ;\n" % (h.time, h.weight))
+				fp.write(" %d %.6g ;\n" % (h.time, h.weight))
 			writePrio(par, prio, pad+"    ", fp)
 			fp.write("%s  end Particle\n" % pad)
 			n += 1
 	if expMsk & M_MHX:
-		fp.write("%s  *** EndParticles\n" % pad)
+		fp.write("%s  *** EndIgnore\n" % pad)
 	writeDir(particles[0], prio+['hair'], pad+"  ", fp)
 	fp.write("%send Particles\n" % pad)
 
@@ -922,7 +953,7 @@ def exportMesh(ob, fp):
 			fp.write("  *** Verts\n")
 		else:
 			for v in me.verts:
-				fp.write("    v %g %g %g ;\n" %(v.co[0], v.co[1], v.co[2]))
+				fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
 		v = me.verts[0]
 		#writeDir(v, ['co', 'index', 'normal'], "      ", fp)
 		fp.write("  end Verts\n")
@@ -944,8 +975,7 @@ def exportMesh(ob, fp):
 	elif me.edges:
 		fp.write("  Edges\n")
 		for e in me.edges:
-			fp.write("  e %d %d\n" % (e.verts[0], e.verts[1]))
-			fp.write(";\n")
+			fp.write("  e %d %d ;\n" % (e.verts[0], e.verts[1]))
 		e = me.edges[0]
 		writeDir(e, ['verts'], "      ", fp)
 		fp.write("  end Edges\n")
@@ -956,7 +986,7 @@ def exportMesh(ob, fp):
 		fp.write("    Data \n")
 		for data in uvtex.data.values():
 			v = data.uv_raw
-			fp.write("      vt %g %g %g %g %g %g %g %g ;\n" % (v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
+			fp.write("      vt %.6g %.6g %.6g %.6g %.6g %.6g %.6g %.6g ;\n" % (v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
 		writeDir(uvtex.data[0], ['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "      ", fp)
 		fp.write("    end Data\n")
 		writeDir(uvtex, ['data'], "    ", fp)
@@ -982,7 +1012,7 @@ def exportMesh(ob, fp):
 
 	"""
 	for v in me.sticky:
-		fp.write("  sticky %g %g\n" % (v.co[0], v.co[1]))
+		fp.write("  sticky %.6g %.6g\n" % (v.co[0], v.co[1]))
 	"""	
 
 	for mat in me.materials:
@@ -990,11 +1020,15 @@ def exportMesh(ob, fp):
 	
 	if expMsk & M_MHX and obName == "Human":
 		fp.write("    *** VertexGroup\n")
-		fp1 = mhxOpen(M_VGroup, "vertexgroups%s25.mhx" % theRig)
-		exportVertexGroups(ob, me, fp1)
+		fp1 = mhxOpen(M_VGroup, "vertexgroups-common25.mhx")
+		exportVertexGroups(ob, me, True, fp1)
+		mhxClose(fp1)
+		fp1 = mhxOpen(M_VGroup, "vertexgroups-%s25.mhx" % theRig)
+		exportVertexGroups(ob, me, False, fp1)
 		mhxClose(fp1)
 	else:
-		exportVertexGroups(ob, me, fp)
+		exportVertexGroups(ob, me, True, fp)
+		exportVertexGroups(ob, me, False, fp)
 
 	if me.shape_keys:
 		if expMsk & M_MHX and obName == "Human":
@@ -1013,22 +1047,34 @@ def exportMesh(ob, fp):
 
 	exclude = ['edge_face_count', 'edge_face_count_dict', 'edge_keys', 'edges', 'faces', 'verts', 'texspace_loc', 
 		'texspace_size', 'active_uv_texture', 'active_vertex_color', 'uv_texture_clone', 'uv_texture_stencil',
-		'float_layers', 'int_layers', 'string_layers', 'shape_keys', 'uv_textures', 'vertex_colors', 'materials']
+		'float_layers', 'int_layers', 'string_layers', 'shape_keys', 'uv_textures', 'vertex_colors', 'materials', 
+		'total_face_sel', 'total_edge_sel', 'total_vert_sel']
 	writeDir(me, exclude, "  ", fp)
 	fp.write("end Mesh\n")
 	return # exportMesh
 
-def exportVertexGroups(ob, me, fp):
+CommonVertGroups = [
+	'Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'LoLid_L', 'LoLid_R', 'Middle', 'Right',
+	'Toe-1-1_L', 'Toe-1-1_R', 'Toe-1-2_L', 'Toe-1-2_R', 
+	'Toe-2-1_L', 'Toe-2-1_R', 'Toe-2-2_L', 'Toe-2-2_R', 'Toe-2-3_L', 'Toe-2-3_R', 
+	'Toe-3-1_L', 'Toe-3-1_R', 'Toe-3-2_L', 'Toe-3-2_R', 'Toe-3-3_L', 'Toe-3-3_R', 
+	'Toe-4-1_L', 'Toe-4-1_R', 'Toe-4-2_L', 'Toe-4-2_R', 'Toe-4-3_L', 'Toe-4-3_R', 
+	'Toe-5-1_L', 'Toe-5-1_R', 'Toe-5-2_L', 'Toe-5-2_R', 'Toe-5-3_L', 'Toe-5-3_R',
+	'ToungeBase', 'ToungeTip', 'UpLid_L', 'UpLid_R', 'Scalp']
+
+def exportVertexGroups(ob, me, common, fp):
 	for vg in ob.vertex_groups:
 		index = vg.index
 		vgName = vg.name.replace(' ','_')
-		fp.write("  VertexGroup %s\n" % (vgName))
-		for v in me.verts:
-			for grp in v.groups:
-				if grp.group == index:
-					fp.write("    wv %d %g ;\n" % (v.index, grp.weight))
-		fp.write("  end VertexGroup\n")
-		createdLocal['VertexGroup'].append(vgName)
+		if (common and vgName in CommonVertGroups) or\
+		   (not common and vgName not in CommonVertGroups):
+			fp.write("  VertexGroup %s\n" % (vgName))
+			for v in me.verts:
+				for grp in v.groups:
+					if grp.group == index:
+						fp.write("    wv %d %.6g ;\n" % (v.index, grp.weight))
+			fp.write("  end VertexGroup\n")
+			createdLocal['VertexGroup'].append(vgName)
 
 #
 #	exportShapeKeys(me, fp
@@ -1078,7 +1124,7 @@ def exportShapeKeys(me, fp):
 			for (n,pt) in enumerate(skey.data):
 				dv = pt.co - me.verts[n].co
 				if dv.length > Epsilon:
-					fp.write("    sv %d %g %g %g ;\n" %(n, dv[0], dv[1], dv[2]))
+					fp.write("    sv %d %.6g %.6g %.6g ;\n" %(n, dv[0], dv[1], dv[2]))
 			fp.write("  end ShapeKey\n")
 			print(skey)
 		createdLocal['ShapeKey'].append(skeyName)
@@ -1119,8 +1165,7 @@ def exportArmature(ob, fp):
 		fp.write("  Rigify \n")
 		fp.write("  MetaRig %s ;\n" %typ)
 		for bone in bones:
-			fp.write("  Bone %s \n" % (bone.name.replace(' ','_')))
-			writePrio(bone, ['head', 'tail', 'roll'], "    ", fp)
+			writeBone(bone, fp)
 			fp.write("  end Bone\n\n")
 		fp.write("end Armature\n")
 		bpy.ops.object.mode_set(mode='OBJECT')
@@ -1147,6 +1192,16 @@ def exportArmature(ob, fp):
 	fp.write("end Pose\n")
 	return # exportArmature
 
+def writeBone(bone, fp):
+	fp.write("  Bone %s \n" % (bone.name.replace(' ','_')))
+	x = bone.head
+	fp.write("    head %.6g %.6g %.6g ; \n" % (x[0], x[1], x[2]))
+	x = bone.tail
+	fp.write("    tail %.6g %.6g %.6g ; \n" % (x[0], x[1], x[2]))
+	writePrio(bone, ['roll'], "    ", fp)
+	return
+
+
 def exportBone(fp, bone):
 	flags = 0
 	if expMsk & M_MHX:
@@ -1155,8 +1210,7 @@ def exportBone(fp, bone):
 		fp.write("    *** tail ;\n")
 		fp.write("    *** roll ;\n")
 	else:
-		fp.write("  Bone %s \n" % (bone.name.replace(' ','_')))
-		writePrio(bone,  ['head', 'tail', 'roll'], "    ", fp)
+		writeBone(bone, fp)
 
 	prio = ['connected', 'deform', 'layer']
 	writePrio(bone, prio, "    ", fp)
@@ -1176,8 +1230,8 @@ def exportBone(fp, bone):
 
 def exportPoseBone(fp, pb):
 	fp.write("\n  Posebone %s \n" % (pb.name.replace(' ', '_')))
-	for (n,cns) in enumerate(pb.constraints):
-		exportConstraint(cns, n, fp)
+	for cns in pb.constraints:
+		exportConstraint(cns, fp)
 	writeArray('ik_dof', [pb.ik_dof_x, pb.ik_dof_y, pb.ik_dof_z], "    ", 1, fp)
 	writeArray('ik_limit', [pb.ik_limit_x, pb.ik_limit_y, pb.ik_limit_z], "    ", 1, fp)
 	writeArray('ik_max', [pb.ik_max_x, pb.ik_max_y, pb.ik_max_z], "    ", 1, fp)
@@ -1188,17 +1242,20 @@ def exportPoseBone(fp, pb):
 		'ik_max_x', 'ik_max_y', 'ik_max_z', 
 		'ik_min_x', 'ik_min_y', 'ik_min_z', 
 		'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',
-		'parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
+		'bone_group_index','parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
 	writeDir(pb, exclude, "    ", fp)	
 	fp.write("  end Posebone\n")
 	return
 
 #
-#	exportConstraint(cns, index, fp):
+#	exportConstraint(cns, fp):
 #
 
-def exportConstraint(cns, index, fp):
-	name = cns.name.replace(' ', '_')
+def exportConstraint(cns, fp):
+	try:
+		name = cns.name.replace(' ', '_')
+	except:
+		return
 	fp.write("    Constraint %s %s\n" % (name, cns.type))
 	writePrio(cns, ['target'], "      ", fp)
 	try:
@@ -1248,27 +1305,59 @@ def exportCurve(ob, fp):
 	cuname = cu.name.replace(' ', '_') 
 	obname = ob.name.replace(' ', '_') 
 	fp.write("Curve %s %s\n" % (cuname, obname))
+	writeDir(cu, ['splines', 'points'], "  ", fp)
 	for nurb in cu.splines:
 		exportNurb(nurb, "  ", fp)
-	writeDir(cu, ['splines'], "  ", fp)
 	fp.write("end Curve\n")
 
 def exportNurb(nurb, pad, fp):
 	fp.write("%sNurb\n" % pad)
-	fp.write("%s  Bezier %d\n" % (pad, len(nurb.bezier_points)))
+	writeDir(nurb, ['bezier_points', 'points'], "    ", fp)
 	for bz in nurb.bezier_points:
-		exportBezierPoint(bz, pad+"    ", fp)
-	fp.write("%s  end Bezier\n" % pad)
-	writeDir(nurb, ['bezier_points'], "    ", fp)
+		fp.write("%s  bz " % pad)
+		writeTuple(bz.co, fp)
+		writeTuple(bz.handle1, fp)
+		fp.write("%s " % bz.handle1_type)
+		writeTuple(bz.handle2, fp)
+		fp.write("%s ;\n" % bz.handle2_type)
+	for pt in nurb.points:
+		fp.write("%s  pt " % pad)
+		writeTuple(pt.co, fp)
+		fp.write(" ;\n")
 	fp.write("%send Nurb\n" % pad)
 
-def exportBezierPoint(bz, pad, fp):
-	fp.write("%sbz " % pad)
-	writeTuple(bz.co, fp)
-	writeTuple(bz.handle1, fp)
-	fp.write("%s " % bz.handle1_type)
-	writeTuple(bz.handle2, fp)
-	fp.write("%s ;\n" % bz.handle2_type)
+#
+#	exportLattice(ob, fp):
+#
+
+def exportLattice(ob, fp):
+	lat = ob.data
+	latName = lat.name.replace(' ', '_') 
+	obName = ob.name.replace(' ', '_') 
+	fp.write("Lattice %s %s\n" % (latName, obName))
+	writeDir(lat, ['points'], "  ", fp)
+	fp.write("  Points\n")
+	for pt in lat.points:
+		x = pt.co
+		y = pt.deformed_co
+		fp.write("    pt (%.6g,%.6g,%.6g) (%.6g,%.6g,%.6g) ;\n" % (x[0], x[1], x[2], y[0], y[1], y[2]))
+	fp.write("  end Points\n")
+	fp.write("end Lattice\n")
+
+#
+#	exportGroup(grp, fp):
+#
+
+def exportGroup(grp, fp):
+	name = grp.name.replace(' ', '_') 
+	fp.write("Group %s\n" % (name))
+	fp.write("  Objects\n")
+	for ob in grp.objects:
+		fp.write("    ob %s ;\n" % ob.name.replace(' ','_'))
+	fp.write("  end Objects\n")
+	writeDir(grp, ['objects'], "  ", fp)
+	fp.write("end Group\n")
+
 
 #
 #	writeHeader(fp):
@@ -1337,7 +1426,7 @@ def writeMeshes(fp):
 		fp.write("\n# ---------------- Groups -------------------------------- # \n \n")
 		for grp in bpy.data.groups:
 			initLocalData()
-			exportDefault("Group", grp, [], [], [], fp)
+			exportGroup(grp, fp)
 
 	return
 
@@ -1413,13 +1502,15 @@ def writeMhxTemplates(msk):
 	writeMaterials(fp)
 	mhxClose(fp)
 	
-	fp = mhxOpen(M_Geo, "meshes25.mhx")
-	writeMeshes(fp)
-	mhxClose(fp)
+	if expMsk & M_Geo:
+		fp = mhxOpen(M_Geo, "meshes25.mhx")
+		writeMeshes(fp)
+		mhxClose(fp)
 
-	fp = mhxOpen(M_Amt, "armatures%s25.mhx" % theRig)
-	writeArmatures(fp)
-	mhxClose(fp)
+	if expMsk & M_Amt:
+		fp = mhxOpen(M_Amt, "armatures-%s25.mhx" % theRig)
+		writeArmatures(fp)
+		mhxClose(fp)
 	return
 
 #
@@ -1449,11 +1540,13 @@ def mhxClose(fp):
 #
 #	Testing
 #
-theRig = "-classic"
-#writeMhxFile('/home/thomas/mhx5/test1.mhx', M_Mat+M_Geo+M_Amt+M_Shape)
-writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Part)
-#theRig = "-rigify"
-#writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_Rigify)
+hairFile = "particles25.mhx"
+theRig = "classic"
+#writeMhxFile('/home/thomas/mhx5/test1.mhx', M_Mat+M_Geo+M_Amt+M_Obj+M_Anim)
+writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup)
+#writeMhxTemplates(M_MHX+M_Part)
+#theRig = "rigify"
+#writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
 
 
 
