@@ -1266,8 +1266,11 @@ def exportConstraint(cns, fp):
 		writeArray('use', [cns.use_x, cns.use_y, cns.use_z], "      ", 2, fp)
 	except:
 		pass
-	writeDir(cns, [
-		'invert_x', 'invert_y', 'invert_z', 'use_x', 'use_y', 'use_z',
+	if expMsk & M_MHX:
+		exclude = ['distance']
+	else:
+		exclude = []
+	writeDir(cns, exclude + ['invert_x', 'invert_y', 'invert_z', 'use_x', 'use_y', 'use_z',
 		'disabled', 'lin_error', 'rot_error', 'target', 'type'], "      ", fp)	
 	fp.write("    end Constraint\n")
 	return
@@ -1543,8 +1546,8 @@ def mhxClose(fp):
 hairFile = "particles25.mhx"
 theRig = "classic"
 #writeMhxFile('/home/thomas/mhx5/test1.mhx', M_Mat+M_Geo+M_Amt+M_Obj+M_Anim)
-writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup)
-#writeMhxTemplates(M_MHX+M_Part)
+#writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup)
+writeMhxTemplates(M_MHX+M_Amt)
 #theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
 

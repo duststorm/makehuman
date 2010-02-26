@@ -1000,7 +1000,7 @@ def doShape(name):
 
 def parseShapeKey(ob, me, args, tokens):
 	if verbosity > 0:
-		print( "Parsing ob %s shape %s" % (bpy.context.object.active, args[0] ))
+		print( "Parsing ob %s shape %s" % (bpy.context.object, args[0] ))
 	name = args[0]
 	lr = args[1]
 	if lr == 'Sym':
@@ -1674,177 +1674,6 @@ def clearScene():
 DEBUG= False
 from bpy.props import *
 
-def check(flag):
-	global toggle
-	if toggle & flag:
-		return "CHECKBOX_HLT"
-	else:
-		return "CHECKBOX_DEHLT"
-
-class IMPORT_PT_makehuman_mhx(bpy.types.Panel):
-	bl_label = "Import MHX"
-	bl_space_type = "PROPERTIES"
-	bl_region_type = "WINDOW"
-	bl_context = "scene"
-
-	def draw(self, context):
-		row = self.layout.row()
-		col = []
-		split = row.split(percentage = 1.0/3)
-		col.append(split.column())
-		col[0].operator("mhxArmIK", icon=check(T_ArmIK))
-		col.append(split.column())
-		col[1].operator("mhxLegIK", icon=check(T_LegIK))
-		col.append(split.column())
-		col[2].operator("mhxFingerIK", icon=check(T_FingerIK))
-
-		row = self.layout.row()
-		col = []
-		split = row.split(percentage = 1.0/3)
-		col.append(split.column())
-		col[0].operator("mhxFKIK", icon=check(T_FKIK))
-		col.append(split.column())
-		col[1].operator("mhxDispObs", icon=check(T_DispObs))
-		col.append(split.column())
-		col[2].operator("mhxReplace", icon=check(T_Replace))
-
-		row = self.layout.row()
-		col = []
-		split = row.split(percentage = 1.0/3)
-		col.append(split.column())
-		col[0].operator("mhxShapes", icon=check(T_Face))
-		col.append(split.column())
-		col[1].operator("mhxRot90", icon=check(T_Rot90))
-		col.append(split.column())
-		col[2].operator("mhxTexDir")
-
-		row = self.layout.row()
-		row.operator("mhxImport")
-
-		return
-
-class OBJECT_OT_mhx_arm_ik(bpy.types.Operator):
-	bl_label = "Arm IK"
-	bl_idname = "mhxArmIK"
-	bl_description = "Arm IK"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_ArmIK
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_leg_ik(bpy.types.Operator):
-	bl_label = "Leg IK"
-	bl_idname = "mhxLegIK"
-	bl_description = "Leg IK"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_LegIK
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_finger_ik(bpy.types.Operator):
-	bl_label = "Finger IK"
-	bl_idname = "mhxFingerIK"
-	bl_description = "Finger IK"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_FingerIK
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_fkik(bpy.types.Operator):
-	bl_label = "FK/IK"
-	bl_idname = "mhxFKIK"
-	bl_description = "FK/IK switch"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_FKIK
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_dispobs(bpy.types.Operator):
-	bl_label = "Dispobs"
-	bl_idname = "mhxDispObs"
-	bl_description = "Display objects"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_DispObs
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_replace(bpy.types.Operator):
-	bl_label = "Replace scene"
-	bl_idname = "mhxReplace"
-	bl_description = "Replace scene"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_Replace
-		return{'FINISHED'}
-
-
-class OBJECT_OT_mhx_shapes(bpy.types.Operator):
-	bl_label = "Shapes"
-	bl_idname = "mhxShapes"
-	bl_description = "Shape keys"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_Face
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_rot90(bpy.types.Operator):
-	bl_label = "Rot 90"
-	bl_idname = "mhxRot90"
-	bl_description = "Rotate 90 degrees (Y up)"
-
-	def invoke(self, context, event):
-		global toggle
-		toggle ^= T_Rot90
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_texdir(bpy.types.Operator):
-	bl_label = "Tex dir"
-	bl_idname = "mhxTexDir"
-	bl_description = "Choose texture directory"
-
-	def invoke(self, context, event):
-		return{'FINISHED'}
-
-class OBJECT_OT_mhx_import(bpy.types.Operator):
-	bl_label = "Import MHX file"
-	bl_idname = "mhxImport"
-	bl_description = "Import MHX file"
-	bl_space_type = "PROPERTIES"
-	bl_region_type = "WINDOW"
-
-	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
-
-	def execute(self, context):
-		readMhxFile(self.properties.path)
-		return {'FINISHED'}
-
-	def invoke(self, context, event):
-		wm = context.manager
-		wm.add_fileselect(self)
-		return {'RUNNING_MODAL'}
-
-
-bpy.types.register(OBJECT_OT_mhx_arm_ik)
-bpy.types.register(OBJECT_OT_mhx_leg_ik)
-bpy.types.register(OBJECT_OT_mhx_finger_ik)
-bpy.types.register(OBJECT_OT_mhx_fkik)
-bpy.types.register(OBJECT_OT_mhx_dispobs)
-bpy.types.register(OBJECT_OT_mhx_replace)
-bpy.types.register(OBJECT_OT_mhx_shapes)
-bpy.types.register(OBJECT_OT_mhx_rot90)
-bpy.types.register(OBJECT_OT_mhx_texdir)
-bpy.types.register(OBJECT_OT_mhx_import)
-bpy.types.register(IMPORT_PT_makehuman_mhx)
-
-
-"""
 class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	'''Import from MHX file format (.mhx)'''
 	bl_idname = "import_scene.makehuman_mhx"
@@ -1866,6 +1695,17 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	rot90 = BoolProperty(name="Rot 90", description="Rotate X 90.", default= False)
 	
 	def execute(self, context):
+		global toggle
+		O_ArmIK = T_ArmIK if self.properties.armik else 0
+		O_LegIK = T_LegIK if self.properties.legik else 0
+		O_FKIK = T_FKIK if self.properties.armik else 0
+		O_FingerIK = T_FingerIK if self.properties.fkik else 0
+		O_DispObs = T_DispObs if self.properties.dispobs else 0
+		O_Replace = T_Replace if self.properties.replace else 0
+		O_Face = T_Face if self.properties.face else 0
+		O_Shape = T_Shape if self.properties.shape else 0
+		O_Rot90 = T_Rot90 if self.properties.rot90 else 0
+		toggle =  O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs | O_Replace | O_Face | O_Shape | O_Rot90
 		readMhxFile(self.properties.path)
 		return {'FINISHED'}
 
@@ -1881,6 +1721,7 @@ bpy.types.INFO_MT_file_import.append(menu_func)
 #
 #	Testing
 #
+"""
 theScale = 1.0
 toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
 toggle = T_Replace + T_Face
