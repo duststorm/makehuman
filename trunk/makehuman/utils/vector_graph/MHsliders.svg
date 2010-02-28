@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,7 +13,7 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
+   inkscape:version="0.47pre4 r22446"
    sodipodi:docname="MHsliders.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -396,6 +397,20 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3057"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3057-8"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -404,16 +419,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4851425"
-     inkscape:cx="378.4895"
-     inkscape:cy="715.15017"
+     inkscape:zoom="5.94057"
+     inkscape:cx="386.96202"
+     inkscape:cy="890.8627"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1152"
-     inkscape:window-height="826"
+     inkscape:window-width="1920"
+     inkscape:window-height="1006"
      inkscape:window-x="0"
-     inkscape:window-y="11"
+     inkscape:window-y="25"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -423,7 +438,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1867,5 +1882,99 @@
          id="tspan2619"
          x="36.325867"
          y="457.86987">Hair mesh width</tspan></text>
+    <rect
+       style="fill:#6b6b6b;fill-opacity:0;stroke:none"
+       id="rect3633-7-3-3-5"
+       width="127.99837"
+       height="31.99999"
+       x="327.20905"
+       y="124.66515"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#999999;fill-opacity:1;stroke:#999999;stroke-width:0.28413174;stroke-opacity:1"
+       id="rect2816-04-09-8-9"
+       width="110.99105"
+       height="17.278593"
+       x="335.71265"
+       y="136.66309"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.73553455;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect2816-3-6-6-5-7"
+       width="107.53072"
+       height="14.802762"
+       x="337.44284"
+       y="137.90103"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.74086475px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial Black;-inkscape-font-specification:'Arial Black,'"
+       x="337.39615"
+       y="134.11136"
+       id="text3635-2-11-2-5"
+       sodipodi:linespacing="125%"
+       inkscape:transform-center-x="2.1241625"
+       inkscape:transform-center-y="-2.3328038"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="scale(0.99666575,1.0033454)"><tspan
+         sodipodi:role="line"
+         id="tspan3637-7-63-2-3"
+         x="337.39615"
+         y="134.11136">Mouth shape</tspan></text>
+    <rect
+       style="fill:#6b6b6b;fill-opacity:0;stroke:none"
+       id="rect3633-7-3-3-8"
+       width="127.99837"
+       height="31.99999"
+       x="329.2291"
+       y="167.75867"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_eyes.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#999999;fill-opacity:1;stroke:#999999;stroke-width:0.28413174;stroke-opacity:1"
+       id="rect2816-04-09-8-3"
+       width="110.99105"
+       height="17.278593"
+       x="337.7327"
+       y="179.75659"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_eyes.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.73553455;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect2816-3-6-6-5-1"
+       width="107.53072"
+       height="14.802762"
+       x="339.46289"
+       y="180.99454"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_eyes.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.74086475px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial Black;-inkscape-font-specification:'Arial Black,'"
+       x="339.42291"
+       y="177.06119"
+       id="text3635-2-11-2-8"
+       sodipodi:linespacing="125%"
+       inkscape:transform-center-x="2.1241625"
+       inkscape:transform-center-y="-2.3328038"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_eyes.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="scale(0.99666575,1.0033454)"><tspan
+         sodipodi:role="line"
+         id="tspan3637-7-63-2-9"
+         x="339.42291"
+         y="177.06119">Eyes shape</tspan></text>
   </g>
 </svg>

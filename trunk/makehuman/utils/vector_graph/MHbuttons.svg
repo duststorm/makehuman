@@ -1476,6 +1476,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3447"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1485,13 +1492,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5408206"
-     inkscape:cx="-265.70483"
-     inkscape:cy="709.98169"
+     inkscape:cx="581.89547"
+     inkscape:cy="543.18745"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="826"
+     inkscape:window-width="1920"
+     inkscape:window-height="1006"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="1" />
@@ -4068,7 +4075,7 @@
        x="422.50854"
        y="186.72273"
        ry="4.2745557"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_face.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
@@ -4079,7 +4086,7 @@
        x="426.50781"
        y="207.95883"
        ry="3.5770829"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_face.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <text
@@ -4090,13 +4097,13 @@
        id="text3802-14-9-8-58"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_face.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107"><tspan
          sodipodi:role="line"
          id="tspan3804-35-9-9-8"
          x="428.04581"
-         y="200.82323">Head tool</tspan></text>
+         y="200.82323">Face tool</tspan></text>
     <path
        inkscape:export-ydpi="90.000107"
        inkscape:export-xdpi="90.000107"
@@ -5260,5 +5267,46 @@
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/texedit_on.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <path
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 427.68387,580.78716 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 128,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46875,0 z"
+       id="rect4238-9-90-0-4" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.60939598px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="428.9584"
+       y="592.79053"
+       id="text3802-14-9-8-5-7-8-2"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2-3-2"
+         x="428.9584"
+         y="592.79053">Head tool</tspan></text>
+    <path
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       d="m 427.68387,708.78716 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.51472 128,-10e-6 0,102.51473 c 0,2.37693 -1.88189,4.29721 -4.25,4.29721 l -119.46875,0 z"
+       id="rect4238-9-6-7-0-64"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29-0-1"
+       width="120.00141"
+       height="101.55521"
+       x="427.5126"
+       y="602.33533"
+       ry="3.5770829"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
   </g>
 </svg>

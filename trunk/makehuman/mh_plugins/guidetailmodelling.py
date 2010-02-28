@@ -349,9 +349,10 @@ class DetailModelingTaskView(gui3d.TaskView):
         # details tool panel background
 
         gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_gender.png'), [10, 80, 9.0])
-        gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_details_head.png'), [10, 211, 9.0])
-        gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_pelvis.png'), [650, 80, 9.0])
-        gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_modifiers.png'), [650, 211, 9.0])
+        gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_details_face.png'), [10, 211, 9.0])
+        gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_pelvis.png'), [650, 211, 9.0])
+        gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_head.png'), [650, 80, 9.0])
+        gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_modifiers.png'), [650, 342, 9.0])
 
         self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_genitals.png'), self.app.getThemeResource('images', 'slider.png'),
                                            self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0)
@@ -433,7 +434,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Nose', value, self.syncSliders))
             self.nose = None
             
-        self.mouthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
+        self.mouthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_mouth.png'), self.app.getThemeResource('images', 'slider.png'
                                                  ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 269, 9.2], value=0.0, min=0.0, max=1.0)
 
         self.mouth = None
@@ -453,7 +454,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Mouth', value, self.syncSliders))
             self.mouth = None
             
-        self.eyesSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
+        self.eyesSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_eyes.png'), self.app.getThemeResource('images', 'slider.png'
                                                  ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 303, 9.2], value=0.0, min=0.0, max=1.0)
 
         self.eyes = None
@@ -476,10 +477,10 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                                     'button_muscle.png'), selectedTexture=self.app.getThemeResource('images', 'button_muscle_on.png'), position=[673,
-                                                    242, 9.2], selected=True)
+                                                    373, 9.2], selected=True)
         self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                                     'button_weight.png'), selectedTexture=self.app.getThemeResource('images', 'button_weight_on.png'), position=[708,
-                                                    242, 9.2])
+                                                    373, 9.2])
 
         self.tool = DetailTool(self.app, False, '_flaccid', '_muscle')
 
@@ -497,9 +498,9 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         self.translationButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                                    'button_translation.png'), selectedTexture=self.app.getThemeResource('images', 'button_translation_on.png'),
-                                                   position=[673, 262, 9.2])
+                                                   position=[673, 393, 9.2])
         self.scaleButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                             'button_scale.png'), selectedTexture=self.app.getThemeResource('images', 'button_scale_on.png'), position=[708, 262, 9.2])
+                                             'button_scale.png'), selectedTexture=self.app.getThemeResource('images', 'button_scale_on.png'), position=[708, 393, 9.2])
 
         @self.translationButton.event
         def onClicked(event):
@@ -514,11 +515,11 @@ class DetailModelingTaskView(gui3d.TaskView):
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
         self.rightSymmetryButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmright.png'),
-                                                selectedTexture=self.app.getThemeResource('images', 'button_symmright_on.png'),position=[673, 282, 9.2])
+                                                selectedTexture=self.app.getThemeResource('images', 'button_symmright_on.png'),position=[673, 410, 9.2])
         self.leftSymmetryButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmleft.png'),
-                                               selectedTexture=self.app.getThemeResource('images', 'button_symmleft_on.png'),position=[708, 282, 9.2])
+                                               selectedTexture=self.app.getThemeResource('images', 'button_symmleft_on.png'),position=[708, 410, 9.2])
         self.symmetryButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_symmetry.png'),
-                                                 selectedTexture=self.app.getThemeResource('images', 'button_symmetry_on.png'), position=[743, 282, 9.2])
+                                                 selectedTexture=self.app.getThemeResource('images', 'button_symmetry_on.png'), position=[743, 410, 9.2])
 
         @self.rightSymmetryButton.event
         def onClicked(event):
