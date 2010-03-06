@@ -433,24 +433,24 @@ class Application(events3d.EventHandler):
 
       # Get picked object
 
+            pickedObject = self.scene3d.getPickedObject()
+            if not pickedObject: return
             object = self.scene3d.getPickedObject()[1]
-
+               
       # If we have an object
 
-            if object:
-
-        # Try to give its view focus
-
-                self.focusObject = object.object
-                self.focusObject.view.setFocus()
-
-        # It is the object which will receive the following mouse messages
-
-                self.mouseDownObject = object.object
-
-        # Send event to the object
-
-                object.object.callEvent('onMouseDown', event)
+     # Try to give its view focus
+   
+            self.focusObject = object.object
+            self.focusObject.view.setFocus()
+   
+     # It is the object which will receive the following mouse messages
+   
+            self.mouseDownObject = object.object
+   
+     # Send event to the object
+   
+            object.object.callEvent('onMouseDown', event)
 
     def mouseUp(self, button, x, y):
         if button == 4 or button == 5:
@@ -462,9 +462,9 @@ class Application(events3d.EventHandler):
         event = events3d.MouseEvent(button, mousePos[0], mousePos[1])
 
     # Get picked object
-
-        object = self.scene3d.getPickedObject()[1]
-
+        pickedObject = self.scene3d.getPickedObject()
+        if not pickedObject: return
+        object = pickedObject[1]
         if self.mouseDownObject:
             self.mouseDownObject.callEvent('onMouseUp', event)
             if self.mouseDownObject is object.object:
