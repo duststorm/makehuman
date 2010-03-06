@@ -35,7 +35,8 @@ class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"),  category.app.getThemeResource("images", "button_hair_on.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
-    self.filechooser.selectedFile = 1 #This is where default.hair is located :P .. bad HACK need to improve on this, maybe a hashtable?.. TODO for marc :P
+    self.default = True
+    #self.filechooser.selectedFile = 1 #This is where default.hair is located :P .. bad HACK need to improve on this, maybe a hashtable?.. TODO for marc :P
     #self.hairsClass = hairgenerator.Hairgenerator() #this will have more points than the .hair file, as we will use curve interpolations on the controlpoints
     self.saveAsCurves = True
     self.widthFactor = 1.0
@@ -106,6 +107,11 @@ class HairTaskView(gui3d.TaskView):
     # When the task gets shown, set the focus to the file chooser
     self.app.scene3d.selectedHuman.hide()
     gui3d.TaskView.onShow(self, event)
+    if self.default:
+      self.default = False
+      self.filechooser.selectedFile = self.filechooser.files.index("default.hair")
+      print "Debug: ", self.filechooser.selectedFile
+      print "Debug: ", self.filechooser.files
     self.filechooser.setFocus()
     # HACK: otherwise the toolbar background disappears for some weird reason
     self.app.scene3d.redraw(0)
@@ -234,6 +240,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   fg.setColor([0,0,0,255]) #rgba
   obj.updateIndexBuffer()
   obj.calcNormals()
+  obj.shadeless = 1 
   if update:
       scn.update()
   return obj,refVector,Delta
