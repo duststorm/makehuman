@@ -78,31 +78,42 @@ def exportFromDaeTemplate(obj, tmpl, fp):
 		elif lineSplit[0] == '***':
 			if lineSplit[1] == 'Position':
 				for v in obj.verts:
-					fp.write('%.6g %.6g %.6g ' % (v.co[0], v.co[1], v.co[2]))
+					fp.write('%.6g %.6g %.6g ' % (v.co[0], -v.co[2], v.co[1]))
 				fp.write('\n')
 			elif lineSplit[1] == 'Normals':
 				for v in obj.verts:
-					fp.write('%.6g %.6g %.6g ' % (v.no[0], v.no[1], v.no[2]))
+					fp.write('%.6g %.6g %.6g ' % (v.no[0], -v.no[2], v.no[1]))
 				fp.write('\n')
 			elif lineSplit[1] == 'BeginJoints':
 				doBones = True
+				rootBone = True
 			elif lineSplit[1] == 'EndJoints':
 				doBones = False
 			else:
 				raise NameError("Error in base.dae: "+line)
-		elif doBones and lineSplit[0] == '<node':
-			words = lineSplit[1].split('"')
-			if words[0] == 'layer=':
-				words = lineSplit[2].split('"')
-			if words[0] != 'sid=':
-				raise NameError("Node error in base.dae: "+line)
-			word = words[1]
-			bone = word
-			print("Node "+bone)
-			fp.write(line)
-		elif doBones and lineSplit[0] == '<translate':
-			(x, y, z) = mhxbones.boneHead[bone]
-			fp.write('\t\t\t<translate sid="translate">%.6g %.6g %.6g</translate>\n' % (x, y, z))
+		elif doBones:
+			if lineSplit[0] == '<node':
+				words = lineSplit[1].split('"')
+				if words[0] == 'layer=':
+					words = lineSplit[2].split('"')
+				if words[0] != 'sid=':
+					raise NameError("Node error in base.dae: "+line)
+				word = words[1]
+				bone = word
+				print("Node "+bone)
+				fp.write(line)
+			elif lineSplit[0] == '<translate':
+				(x, y, z) = mhxbones.boneHead[bone]
+				if rootBone:
+					(x0, y0, z0) = (x, y, z)
+					rootBone = False
+				fp.write('\t\t\t<translate sid="translate">%.6g %.6g %.6g</translate>\n' % (x-x0, y-y0, z-z0))
+			elif lineSplit[0] == '<rotate':
+				pass
+			elif lineSplit[0] == '<scale':
+				pass
+			else:
+				fp.write(line)
 		else:
 			fp.write(line)
 

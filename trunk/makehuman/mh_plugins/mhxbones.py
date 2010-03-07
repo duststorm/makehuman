@@ -1021,8 +1021,22 @@ def writePose25(obj, fp):
 					fp.write("\t\tsmash %s ;\n" % smash)
 		fp.write("\tend posebone\n")
 
+#
+#	colladaBones
+#	Extra bones used by collada export
+#
 
-
+colladaBones = [
+	("Chin", "Jaw", "jaw-tip", 0, "jaw-tip", [0,0,0.3], 0, 0, None, 0),
+	("ToungeParent", "Head-inv", "mouth", 0, "tounge-root", 0, 0, 0, None, 0),
+	("Head_L", "Head", "head-end", 0, "r-eye", 0, 0, 0, None, 0),
+	("Head_R", "Head", "head-end", 0, "l-eye", 0, 0, 0, None, 0),
+	("EyeEnd_L", "Eye_L", "r-eye", [0,0,0.5], "r-eye", [0,0,0.75], 0, 0, None, 0),
+	("EyeEnd_R", "Eye_R", "l-eye", [0,0,0.5], "l-eye", [0,0,0.75], 0, 0, None, 0),
+	("Spine1_L", "Spine1", "neck", 0, "r-clavicle", 0, 0, 0, None, 0),
+	("Spine1_R", "Spine1", "neck", 0, "l-clavicle", 0, 0, 0, None, 0),
+]
+	
 #
 #	setupBones(obj):
 #	Used by Collada and other exporters
@@ -1034,7 +1048,7 @@ def setupBones(obj):
 	locations['origin'] = (-2.0, 10.0, 0.0)
 	boneHead = {}
 	boneTail = {}
-	for (bone, par, hjoint, hoffs, tjoint, toffs, flags, layers, dispOb, ikFlags) in armature:
+	for (bone, par, hjoint, hoffs, tjoint, toffs, flags, layers, dispOb, ikFlags) in armature+colladaBones:
 		if hoffs:
 			x = getOffs(hoffs)
 			boneHead[bone] = aljabr.vadd(locations[hjoint], x)
