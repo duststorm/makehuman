@@ -45,7 +45,7 @@ joints = dict({
   'torso_tail' : 'spine2' ,
   'spine.01_head' : 'pelvis' ,
   'spine.01_tail' : 'spine3' ,
-  'spine.02_tail' : 'spine3' ,
+  'spine.02_tail' : [(0.5,'spine3') , (0.5,'spine2')],
   'spine.03_tail' : 'spine2' ,
   'spine.04_tail' : 'spine1' ,
   'neck_base_tail' : 'neck' ,
@@ -156,9 +156,9 @@ armature = [
 	('neck.01', 'head', 'neck.01_head', 'neck.01_tail', 0, ''), 
 	('neck.02', 'neck.01', 'neck.01_tail', 'neck.02_tail', F_CON, ''), 
 	('neck.03', 'neck.02', 'neck.02_tail', 'neck.03_tail', F_CON, ''), 
-	('DLT-shoulder.L', 'neck_base', 'DLT-shoulder.L_head', 'DLT-shoulder.L_tail', 0, 'delta'), 
+	('DLT-shoulder.L', 'neck_base', ('shoulder.L', 'head'), ('shoulder.L', 'tail'), 0, 'delta'), 
 	('shoulder.L', 'DLT-shoulder.L', 'shoulder.L_head', 'shoulder.L_tail', 0, 'copy'), 
-	('DLT-upper_arm.L', 'shoulder.L', 'DLT-upper_arm.L_head', 'DLT-upper_arm.L_tail', 0, 'delta'), 
+	('DLT-upper_arm.L', 'shoulder.L', ('upper_arm.L', 'head'), ('upper_arm.L', 'tail'), 0, 'delta'), 
 	('upper_arm.L', 'DLT-upper_arm.L', 'upper_arm.L_head', 'upper_arm.L_tail', 0, 'arm_biped_generic'), 
 	('forearm.L', 'upper_arm.L', 'upper_arm.L_tail', 'forearm.L_tail', F_CON, ''), 
 	('hand.L', 'forearm.L', 'forearm.L_tail', 'hand.L_tail', F_CON, ''), 
@@ -210,12 +210,12 @@ armature = [
 	('shin.L', 'thigh.L', 'thigh.L_tail', 'shin.L_tail', F_CON, ''), 
 	('foot.L', 'shin.L', 'shin.L_tail', 'foot.L_tail', F_CON, ''), 
 	('toe.L', 'foot.L', 'foot.L_tail', 'toe.L_tail', F_CON, ''), 
-	('heel.L', 'foot.L', ('foot.L', 'head'), ('foot.L', 'tail'), 0, ''), 
+	('heel.L', 'foot.L', ('foot.L', 'head'), ('foot.L', 'head'), 0, ''), 
 	('thigh.R', 'spine.01', 'thigh.R_head', 'thigh.R_tail', 0, 'leg_biped_generic'), 
 	('shin.R', 'thigh.R', 'thigh.R_tail', 'shin.R_tail', F_CON, ''), 
 	('foot.R', 'shin.R', 'shin.R_tail', 'foot.R_tail', F_CON, ''), 
 	('toe.R', 'foot.R', 'foot.R_tail', 'toe.R_tail', F_CON, ''), 
-	('heel.R', 'foot.R', 'heel.R_head', 'heel.R_tail', 0, ''), 
+	('heel.R', 'foot.R', ('foot.R', 'head'), ('foot.R', 'head'), 0, ''), 
 ]
 
 Bone = 0 
@@ -336,8 +336,8 @@ def writeBone1((bone, par, hjoint, tjoint, flags, btype), fp):
 	tail = getLoc(tjoint)
 	fp.write(
 "\n  Bone %s\n" % (bone) +
-"    head %.6g %.6g %.6g ;\n" % (head[0], head[1], head[2]) +
-"    tail %.6g %.6g %.6g ;\n" % (tail[0], tail[1], tail[2]) +
+"    head %.6g %.6g %.6g ;\n" % (head[0], -head[2], head[1]) +
+"    tail %.6g %.6g %.6g ;\n" % (tail[0], -tail[2], tail[1]) +
 "  end Bone\n")
 
 def writeBone2((bone, par, hjoint, tjoint, flags, btype), fp):

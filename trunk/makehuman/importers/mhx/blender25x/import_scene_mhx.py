@@ -62,7 +62,6 @@ T_DispObs = 0x10
 T_Replace = 0x20
 T_Face = 0x40
 T_Shape = 0x80
-T_Rot90 = 0x100
 
 T_Rigify = 0x1000
 
@@ -278,7 +277,7 @@ def parse(tokens):
 	global warnedVersion, MHX249
 	
 	for (key, val, sub) in tokens:	
-		print("Parse %s" % key)
+		# print("Parse %s" % key)
 		data = None
 		if key == 'MHX':
 			if int(val[0]) != MAJOR_VERSION and int(val[1]) != MINOR_VERSION and not warnedVersion:
@@ -628,7 +627,7 @@ def parseImage(args, tokens):
 
 #
 #	parseObject(args, tokens):
-#	createObject(type, name, data):
+#	createObject(type, name, data, datName):
 #	createObjectAndData(args, typ):
 #
 	
@@ -636,23 +635,23 @@ def parseObject(args, tokens):
 	if verbosity > 2:
 		print( "Parsing object %s" % args )
 	name = args[0]
-	type = args[1]
+	typ = args[1]
 	datName = args[2]
 	try:
-		data = loadedData[type.capitalize()][datName]	
+		data = loadedData[typ.capitalize()][datName]	
 	except:
 		data = None
 
-	if data == None and type != 'EMPTY':
-		print("Failed to find data: %s %s %s" % (name, type, datName))
+	if data == None and typ != 'EMPTY':
+		print("Failed to find data: %s %s %s" % (name, typ, datName))
 		return
 
 	try:
 		ob = loadedData['Object'][name]
 		bpy.context.scene.objects.active = ob
-		print("Found data")
+		#print("Found data")
 	except:
-		ob = createObject(type, name, data)
+		ob = createObject(typ, name, data, datName)
 	if bpy.context.object != ob:
 		print("Context", ob, bpy.context.object, bpy.context.scene.objects.active)
 		# ob = foo 
@@ -668,27 +667,24 @@ def parseObject(args, tokens):
 			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
 	return
 
-def createObject(type, name, data):
-	typ = type.upper()
-	print( "Creating object %s %s" % (name, typ) )	
-	ob = bpy.data.objects.new(name, typ)
-	ob.name = name
-	if data:
-		ob.data = data
+def createObject(typ, name, data, datName):
+	#print( "Creating object %s %s %s" % (typ, name, data) )	
+	ob = bpy.data.objects.new(name, data)
+	loadedData[typ][datName] = data
 	loadedData['Object'][name] = ob
 	return ob
 	
 def linkObject(ob, data):
-	print("Data", data, ob.data)
+	#print("Data", data, ob.data)
 	if data and ob.data == None:
 		ob.data = data
 	scn = bpy.context.scene
 	scn.objects.link(ob)
 	scn.objects.active = ob
-	print("Linked object", ob)
-	print("Scene", scn)
-	print("Active", scn.objects.active)
-	print("Context", bpy.context.object)
+	#print("Linked object", ob)
+	#print("Scene", scn)
+	#print("Active", scn.objects.active)
+	#print("Context", bpy.context.object)
 	return ob
 
 def createObjectAndData(args, typ):
@@ -712,11 +708,11 @@ def parseModifier(ob, args, tokens):
 	typ = args[1]
 	if typ == 'PARTICLE_SYSTEM':
 		return None
-	print("MOD", name, typ)
+	#print("MOD", name, typ)
 	mod = ob.modifiers.new(name, typ)
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, 'mod', [], globals(), locals())
-	print("MOD2", mod)
+	#print("MOD2", mod)
 	return mod
 
 #
@@ -796,9 +792,7 @@ def parseMesh (args, tokens):
 	mename = args[0]
 	obname = args[1]
 	me = bpy.data.meshes.new(mename)
-	loadedData['Mesh'][mename] = me
-	ob = createObject('Mesh', obname, me)
-	print("Mesh", me, ob)
+	ob = createObject('Mesh', obname, me, mename)
 
 	verts = []
 	edges = []
@@ -826,7 +820,7 @@ def parseMesh (args, tokens):
 		me.edges.foreach_set("verts", unpackList(edges))
 	#print(x)
 	me.update()
-	print(me)
+	#print(me)
 	linkObject(ob, me)
 		
 	mats = []
@@ -866,8 +860,7 @@ def parseVerts(tokens):
 	verts = []
 	for (key, val, sub) in tokens:
 		if key == 'v':
-			coords = rot90(val[0], val[1], val[2], True)
-			verts.append( coords )
+			verts.append( (float(val[0]), float(val[1]), float(val[2])) )
 	return verts
 
 def parseEdges(tokens):
@@ -1026,10 +1019,9 @@ def addShapeKey(ob, name, vgroup, tokens):
 		if key == 'sv':
 			index = int(val[0])
 			pt = skey.data[index].co
-			(x,y,z) = rot90(float(val[1]), float(val[2]), float(val[3]), True)
-			pt[0] += x
-			pt[1] += y
-			pt[2] += z
+			pt[0] += float(val[1])
+			pt[1] += float(val[2])
+			pt[2] += float(val[3])
 		else:
 			defaultKey(key, val,  sub, "skey", [], globals(), locals())
 
@@ -1041,7 +1033,7 @@ def addShapeKey(ob, name, vgroup, tokens):
 #
 
 def parseArmature (args, tokens):
-	global toggle
+	global toggle,  theScale
 	if verbosity > 2:
 		print( "Parsing armature %s" % args )
 	
@@ -1051,34 +1043,30 @@ def parseArmature (args, tokens):
 	
 	if mode == 'Rigify':
 		toggle |= T_Rigify
+		theScale = 0.1
 		return parseRigify(amtname, obname, tokens)
 
 	toggle &= ~T_Rigify
+	theScale = 1.0
 	amt = bpy.data.armatures.new(amtname)
-	ob = createObject('Armature', obname, amt)	
-	loadedData['Armature'][amtname] = amt
-	loadedData['Object'][obname] = ob
-	print("Armature", amt, ob)
+	ob = createObject('Armature', obname, amt, amtname)	
 	linkObject(ob, amt)
 	print("Linked")
 
 	bpy.ops.object.mode_set(mode='OBJECT')
 	bpy.ops.object.mode_set(mode='EDIT')
 
-	bones = {}
 	heads = {}
 	tails = {}
 	for (key, val, sub) in tokens:
 		if key == 'Bone':
 			bname = val[0]
 			bone = amt.edit_bones.new(bname)
-			parseBone(bone, sub, heads, tails)
+			parseBone(bone, amt.edit_bones, sub, heads, tails)
 			loadedData['Bone'][bname] = bone
 		else:
 			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
-
 	bpy.ops.object.mode_set(mode='OBJECT')
-	
 	return amt
 
 #
@@ -1090,7 +1078,6 @@ def parseRigify(amtname, obname, tokens):
 	if key != 'MetaRig':
 		raise NameError("Expected MetaRig")
 	typ = val[0]
-	print("Metarig ", typ)
 	if typ == "human":
 		bpy.ops.object.armature_human_advanced_add()
 	else:
@@ -1101,16 +1088,15 @@ def parseRigify(amtname, obname, tokens):
 	loadedData['Armature'][amtname] = amt
 	loadedData['Object'][obname] = ob
 	print("Rigify object", ob, amt)
-	print("Context", bpy.context.object)
-	print("Bones", amt.bones.keys())
-
-	bones = {}
-	heads = {}
-	tails = {}
 
 	bpy.ops.object.mode_set(mode='OBJECT')
 	bpy.ops.object.mode_set(mode='EDIT')
-	print("EditBones", amt.edit_bones.keys())
+
+	heads = {}
+	tails = {}
+	for (bname, bone) in amt.edit_bones.items():
+		heads[bname] = 10*theScale*bone.head
+		tails[bname] = 10*theScale*bone.tail
 
 	for (key, val, sub) in tokens:
 		if key == 'Bone':
@@ -1121,57 +1107,44 @@ def parseRigify(amtname, obname, tokens):
 				print("Did not find bone %s" % bname)
 				bone = None
 			if bone:
-				parseBone(bone, sub, heads, tails)
+				parseBone(bone, amt.edit_bones, sub, heads, tails)
 		else:
 			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
-
 	bpy.ops.object.mode_set(mode='OBJECT')
 	return amt
 		
 #
-#	parseBone(bone, tokens, heads, tails):
+#	parseBone(bone, bones, tokens, heads, tails):
 #
 
-def parseBone(bone, tokens, heads, tails):
+def parseBone(bone, bones, tokens, heads, tails):
 	global todo
 
 	for (key, val, sub) in tokens:
 		if key == "head":
-			old = rot90rig(bone.head, True)
-			bone.head = rot90(val[0], val[1], val[2], True) 
-			heads[bone.name] = bone.head - old
+			bone.head = (float(val[0]), float(val[1]), float(val[2]))
 		elif key == "tail":
-			old = rot90rig(bone.tail, True)
-			bone.tail = rot90(val[0], val[1], val[2], True) 
-			tails[bone.name] = bone.tail - old
+			bone.tail = (float(val[0]), float(val[1]), float(val[2]))
 		elif key == "head-as":
-			print("head", val[0], heads[val[0]], bone.head)
+			target = val[0]
 			if val[1] == 'head':
-				bone.head = rot90rig(bone.head, True) + heads[val[0]]
+				bone.head = heads[bone.name] + bones[target].head - heads[target]
 			elif val[1] == 'tail':
-				bone.head = rot90rig(bone.head, True) + tails[val[0]]
+				bone.head = heads[bone.name] + bones[target].tail - tails[target]
 			else:
 				raise NameError("head-as %s" % val)
-			print("  ", bone.head)
 		elif key == "tail-as":
-			print("tail", val[0], tails[val[0]], bone.tail)
+			target = val[0]
 			if val[1] == 'head':
-				bone.tail = rot90rig(bone.tail, True) + heads[val[0]]
+				bone.tail = tails[bone.name] + bones[target].head - heads[target]
 			elif val[1] == 'tail':
-				bone.tail = rot90rig(bone.tail, True) + tails[val[0]]
+				bone.tail = tails[bone.name] + bones[target].tail - tails[target]
 			else:
 				raise NameError("tail-as %s" % val)
-			print("  ", bone.tail)
-		elif key == "roll":
-			if (toggle & T_Rot90):
-				bone.roll = float(val[1])
-			else:
-				bone.roll = float(val[0])
 		else:
 			defaultKey(key, val,  sub, "bone", [], globals(), locals())
 
 	return bone
-
 
 #
 #	postProcess()
@@ -1180,12 +1153,20 @@ def parseBone(bone, tokens, heads, tails):
 def postProcess():
 	if toggle & T_Rigify:
 		return
-		for ob in loadedData['Rigify'].values():
-			bpy.context.scene.objects.active = ob
+		for rig in loadedData['Rigify'].values():
+			bpy.context.scene.objects.active = rig
+			print("Rigify", rig)
 			bpy.ops.pose.metarig_generate()
-			bpy.context.scene.objects.unlink(ob)
-			ob = bpy.context.scene.objects.active
-			print("Rigged", ob)
+			print("Metarig generated")
+			#bpy.context.scene.objects.unlink(rig)
+			rig = bpy.context.scene.objects.active
+			print("Rigged", rig, bpy.context.object)
+			ob = loadedData['Object']['Human']
+			mod = ob.modifiers[0]
+			print(ob, mod, mod.object)
+			mod.object = rig
+			print("Rig changed", mod.object)
+			
 
 	else:
 		if toggle & T_ArmIK:
@@ -1205,7 +1186,6 @@ def setInfluence(bones, w):
 	pbones = ob.pose.bones	
 	for pb in pbones:
 		if pb.name in bones:
-			print("setinfl", pb.name)
 			for cns in pb.constraints:
 				cns.influence = w
 	bpy.ops.object.mode_set(mode='OBJECT')
@@ -1615,27 +1595,6 @@ def extractBpyType(data):
 		return None
 
 #
-#	rot90(x, y, z, doRot)
-#	rot90rig(vec, doRot):
-#
-
-def rot90(x, y, z, doRot):
-	global toggle, theScale
-	if (toggle & T_Rot90) and doRot:
-		return Vector(float(x)*theScale, -float(z)*theScale, float(y)*theScale)
-	else:
-		return Vector(float(x)*theScale, float(y)*theScale, float(z)*theScale)
-
-
-def rot90rig(vec, doRot):
-	global toggle, theScale
-	scale = 10*theScale
-	if (toggle & T_Rot90) and doRot:
-		return Vector(vec.x*scale, -vec.z*scale, vec.y*scale)
-	else:
-		return Vector(vec.x*scale, vec.y*scale, vec.z*scale)
-
-#
 #	Bool(string):
 #
 
@@ -1692,7 +1651,6 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default= True)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default= True)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default= False)
-	rot90 = BoolProperty(name="Rot 90", description="Rotate X 90.", default= False)
 	
 	def execute(self, context):
 		global toggle
@@ -1704,8 +1662,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
-		O_Rot90 = T_Rot90 if self.properties.rot90 else 0
-		toggle =  O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs | O_Replace | O_Face | O_Shape | O_Rot90
+		toggle =  O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs | O_Replace | O_Face | O_Shape 
 		readMhxFile(self.properties.path)
 		return {'FINISHED'}
 
@@ -1724,12 +1681,12 @@ bpy.types.INFO_MT_file_import.append(menu_func)
 """
 theScale = 1.0
 toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
-toggle = T_Replace + T_Face
-readMhxFile("/home/thomas/makehuman/exports/foo-classic-25.mhx")
+toggle = T_Replace 
+#readMhxFile("/home/thomas/makehuman/exports/foo-classic-25.mhx")
 #readMhxFile("/home/thomas/makehuman/exports/foo-rigify-25.mhx")
 #readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-classic-25.mhx")
 #readMhxFile("/home/thomas/mhx5/test1.mhx")
-#readMhxFile("/home/thomas/myblends/mhx4/test1.mhx")
+readMhxFile("/home/thomas/myblends/gobo/gobo.mhx")
 """
 
 

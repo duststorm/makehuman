@@ -499,7 +499,9 @@ def writeClass(list, ext, arg, pad, depth, fp):
 		writeBpyType(classSplit[2], ext, arg, pad, depth, fp)		
 	elif classSplit[0] == "bpy_types":
 		#<class 'bpy.types.GameObjectSettings'>
-		writeBpyType(classSplit[1], ext, arg, pad, depth, fp)		
+		writeBpyType(classSplit[1], ext, arg, pad, depth, fp)
+	elif classSplit[0] == 'bpy_prop_collection':
+		writeBpyPropCollection(ext, arg, pad, depth, fp)		
 	elif classSplit[0] == "'netrender":
 		return
 	elif classSplit[0] == "builtin_function_or_method":
@@ -646,6 +648,19 @@ def writeBpyType(typ, ext, data, pad, depth, fp):
 	fp.write("%send %s\n" % (pad, rnaType))
 	return
 
+def writeBpyPropCollection(ext, data, pad, depth, fp):
+	if len(data) == 0:
+		return
+	fp.write("%s%s Collection\n" % (pad, ext))
+	print("coll", ext, data, len(data))
+	print("values", data.values())
+	print("dir", dir(data))
+	n = 0
+	for elt in data.items():
+		writeValue("%s{%d]" %(ext,n), elt, [], pad+"  ", depth+1, fp)
+		n += 1
+	fp.write("%send Collection\n" % pad)
+	return
 
 #
 #	exportAnimationData(anim, fp):
@@ -796,9 +811,12 @@ def exportTexture(tex, fp):
 	fp.write("Texture %s %s\n" % (tex.name.replace(' ', '_'), tex.type))
 	if tex.type == 'IMAGE':
 		fp.write("  Image %s ;\n" % tex.image.name.replace(' ', '_'))
-	else:
-		exportRamp(tex.color_ramp, "color_ramp", fp)
-		writeDir(tex, ['color_ramp', 'image_user', 'use_nodes', 'use_textures', 'type'], "  ", fp)
+		fp.write("end Texture\n\n")
+		return
+
+	exportRamp(tex.color_ramp, "color_ramp", fp)
+	#exportNodeTree(tex.node_tree, "node_tree", fp)
+	writeDir(tex, ['color_ramp', 'node_tree', 'image_user', 'use_nodes', 'use_textures', 'type'], "  ", fp)
 	fp.write("end Texture\n\n")
 
 def exportImage(img, fp):
@@ -824,6 +842,15 @@ def exportRamp(ramp, name, fp):
 		fp.write("    Element (%.6g,%.6g,%.6g,%.6g) %.6g ;\n" % (col[0], col[1], col[2], col[3], elt.position))
 	writeDir(ramp, ['elements'], "    ", fp)
 	fp.write("  end Ramp\n")
+
+def exportNodeTree(tree, name, fp):
+	if tree == None:
+		return
+	print(tree)
+	fp.write("  NodeTree %s\n" % name)
+	return
+	#for node in tree.nodes:
+		
 
 
 #
@@ -855,7 +882,7 @@ def exportObject(ob, fp):
 		datName = 'None'
 	fp.write("\nObject %s %s %s\n" % (ob.name.replace(' ', '_'), ob.type, datName))
 
-	writeArray('layers', ob.layers, "    ", 1, fp)
+	writeArray('layers', ob.layers, "  ", 1, fp)
 
 	for mod in ob.modifiers:
 		exportModifier(mod, fp)
@@ -1544,10 +1571,10 @@ def mhxClose(fp):
 #	Testing
 #
 hairFile = "particles25.mhx"
-theRig = "classic"
-#writeMhxFile('/home/thomas/mhx5/test1.mhx', M_Mat+M_Geo+M_Amt+M_Obj+M_Anim)
-#writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup)
-writeMhxTemplates(M_MHX+M_Amt)
+theRig = "rigify"
+writeMhxFile('/home/thomas/myblends/gobo/gobo.mhx', M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim)
+#writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
+#writeMhxTemplates(M_MHX+M_Amt)
 #theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
 

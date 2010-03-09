@@ -139,17 +139,18 @@ def copyFile25(obj, tmplName, rig, fp):
 				mhxbones_rigify.writeBones(obj, fp)
 			elif lineSplit[1] == 'head':
 				(x, y, z) = mhxbones.boneHead[bone]
-				fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,y,z))
+				fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
 			elif lineSplit[1] == 'tail':
 				(x, y, z) = mhxbones.boneTail[bone]
-				fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,y,z))
+				fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
 			elif lineSplit[1] == 'roll':
 				(x, y) = mhxbones.boneRoll[bone]
-				fp.write("    roll %.6g %.6g ;\n" % (x,y))
+				fp.write("    roll %.6g ;\n" % (y))
 			elif lineSplit[1] == 'Verts':
 				for v in obj.verts:
-					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
+					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 			elif lineSplit[1] == 'VertexGroup':
+				pass
 				copyFile("data/templates/vertexgroups-common25.mhx", fp)	
 				copyFile("data/templates/vertexgroups-%s25.mhx" % rig, fp)	
 			elif lineSplit[1] == 'ShapeKey':

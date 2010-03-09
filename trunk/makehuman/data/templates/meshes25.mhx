@@ -42995,6 +42995,7 @@ Mesh Human Human
   draw_seams False ;
   draw_sharp False ;
   draw_vertex_normals False ;
+# **CLASS** sticky ['bpy_prop_collection'] <bpy_collection[0], Mesh.sticky> 
   use_mirror_topology False ;
   use_mirror_x False ;
   use_paint_mask False ;
@@ -43030,7 +43031,7 @@ Object Human MESH Human
   active_material Refer Material SSS_skinshader ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
-  active_shape_key_index 22 ;
+  active_shape_key_index 0 ;
   active_vertex_group_index 8 ;
   color Array 1.0 1.0 1.0 1.0  ;
   delta_location (0,0,0) ;
@@ -43050,6 +43051,7 @@ Object Human MESH Human
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;
@@ -43077,7 +43079,7 @@ Object Human MESH Human
   rotation_mode 'XYZ' ;
   rotation_quaternion (1,0,0,0) ;
   scale (1,1,1) ;
-  selected False ;
+  selected True ;
   shape_key_edit_mode False ;
   shape_key_lock False ;
   slow_parent False ;
@@ -43144,6 +43146,7 @@ Mesh MHBall MHBall
   draw_seams False ;
   draw_sharp False ;
   draw_vertex_normals False ;
+# **CLASS** sticky ['bpy_prop_collection'] <bpy_collection[0], Mesh.sticky> 
   use_mirror_topology False ;
   use_mirror_x False ;
   use_paint_mask False ;
@@ -43153,7 +43156,7 @@ Mesh MHBall MHBall
 end Mesh
 
 Object MHBall MESH MHBall
-    layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43176,6 +43179,7 @@ Object MHBall MESH MHBall
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;
@@ -43283,6 +43287,7 @@ Mesh MHCircle03 MHCircle03
   draw_seams False ;
   draw_sharp False ;
   draw_vertex_normals False ;
+# **CLASS** sticky ['bpy_prop_collection'] <bpy_collection[0], Mesh.sticky> 
   use_mirror_topology False ;
   use_mirror_x False ;
   use_paint_mask False ;
@@ -43292,7 +43297,7 @@ Mesh MHCircle03 MHCircle03
 end Mesh
 
 Object MHCircle03 MESH MHCircle03
-    layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43315,6 +43320,7 @@ Object MHCircle03 MESH MHCircle03
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;
@@ -43422,6 +43428,7 @@ Mesh MHCircle05 MHCircle05
   draw_seams False ;
   draw_sharp False ;
   draw_vertex_normals False ;
+# **CLASS** sticky ['bpy_prop_collection'] <bpy_collection[0], Mesh.sticky> 
   use_mirror_topology False ;
   use_mirror_x False ;
   use_paint_mask False ;
@@ -43431,7 +43438,7 @@ Mesh MHCircle05 MHCircle05
 end Mesh
 
 Object MHCircle05 MESH MHCircle05
-    layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43454,6 +43461,7 @@ Object MHCircle05 MESH MHCircle05
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;
@@ -43561,6 +43569,7 @@ Mesh MHCircle10 MHCircle10
   draw_seams False ;
   draw_sharp False ;
   draw_vertex_normals False ;
+# **CLASS** sticky ['bpy_prop_collection'] <bpy_collection[0], Mesh.sticky> 
   use_mirror_topology False ;
   use_mirror_x False ;
   use_paint_mask False ;
@@ -43570,7 +43579,7 @@ Mesh MHCircle10 MHCircle10
 end Mesh
 
 Object MHCircle10 MESH MHCircle10
-    layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43593,6 +43602,7 @@ Object MHCircle10 MESH MHCircle10
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;
@@ -43700,6 +43710,7 @@ Mesh MHCircle15 MHCircle15
   draw_seams False ;
   draw_sharp False ;
   draw_vertex_normals False ;
+# **CLASS** sticky ['bpy_prop_collection'] <bpy_collection[0], Mesh.sticky> 
   use_mirror_topology False ;
   use_mirror_x False ;
   use_paint_mask False ;
@@ -43709,7 +43720,7 @@ Mesh MHCircle15 MHCircle15
 end Mesh
 
 Object MHCircle15 MESH MHCircle15
-    layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43732,6 +43743,7 @@ Object MHCircle15 MESH MHCircle15
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;
@@ -43967,6 +43979,7 @@ Mesh MHFace MHFace
   draw_seams False ;
   draw_sharp False ;
   draw_vertex_normals False ;
+# **CLASS** sticky ['bpy_prop_collection'] <bpy_collection[0], Mesh.sticky> 
   use_mirror_topology False ;
   use_mirror_x False ;
   use_paint_mask False ;
@@ -43976,7 +43989,7 @@ Mesh MHFace MHFace
 end Mesh
 
 Object MHFace MESH MHFace
-    layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
   active_material_index 0 ;
   active_particle_system_index 0 ;
   active_shape_key_index 0 ;
@@ -43999,6 +44012,7 @@ Object MHFace MESH MHFace
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;

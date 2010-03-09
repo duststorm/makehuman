@@ -1911,6 +1911,7 @@ Pose HumanRig
       row 0.0 -9.92102400232e-10 1.00000011921 0.0 ;
       row 0.0 0.0 9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle15 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -1970,7 +1971,7 @@ Pose HumanRig
     rotation_mode 'QUATERNION' ;
     rotation_quaternion (1,0,0,0) ;
     scale (1,1,1) ;
-    selected False ;
+    selected True ;
   end Posebone
 
   Posebone Hips 
@@ -1985,6 +1986,7 @@ Pose HumanRig
       row 1.22735609301e-21 0.0 1.0 0.0 ;
       row -2.54109884176e-21 0.0 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle15 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2039,7 +2041,7 @@ Pose HumanRig
       row 5.08219768353e-21 -1.0 -3.14415842695e-07 0.0 ;
       row -1.22505656877e-13 0.0188488904387 -0.715552091599 1.0 ;
     end Matrix
-    rotation_a0.0 0.0 1.0 0.0  ;
+    rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
     rotation_euler (0,0,0) ;
     rotation_mode 'QUATERNION' ;
     rotation_quaternion (1,0,0,0) ;
@@ -2054,10 +2056,10 @@ Pose HumanRig
     ik_min Array -3.14159274101 -3.14159274101 -3.14159274101  ;
     ik_stiffness Array 0.0 0.0 0.0  ;
     channel_matrix Matrix
-      row 1.0 -2.98023223877e-08 -6.053596735e-09 0.0 ;
-      row -1.49011611938e-08 0.999999940395 1.86264514923e-09 0.0 ;
-      row -9.77888703346e-09 5.58793544769e-09 1.0 0.0 ;
-      row 5.0640736049e-09 -5.58793544769e-09 0.0 1.0 ;
+      row 1.0 -2.98023223877e-08 9.31322574615e-10 0.0 ;
+      row 0.0 0.999999940395 -3.72529029846e-09 0.0 ;
+      row -1.11758708954e-08 1.86264514923e-09 1.0 0.0 ;
+      row 3.72529562753e-09 0.0 0.0 1.0 ;
     end Matrix
     ik_lin_control False ;
     ik_lin_weight 0 ;
@@ -2071,10 +2073,10 @@ Pose HumanRig
     lock_rotations_4d False ;
     lock_scale Array 0 0 0  ;
     matrix Matrix
-      row -0.0658295601606 -0.0105772009119 -0.997774839401 0.0 ;
-      row 0.968668282032 -0.240659698844 -0.0613580346107 0.0 ;
-      row -0.239475190639 -0.970551967621 0.0260883197188 0.0 ;
-      row 7.192461687e-15 0.0188484191895 0.784447908401 1.0 ;
+      row -0.0658295601606 -0.0105771860108 -0.997774839401 0.0 ;
+      row 0.968668282032 -0.240659713745 -0.0613580308855 0.0 ;
+      row -0.239475190639 -0.970551967621 0.0260883048177 0.0 ;
+      row 5.39203555937e-15 0.0188484191895 0.784447908401 1.0 ;
     end Matrix
     rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
     rotation_euler (0,0,0) ;
@@ -2086,7 +2088,8 @@ Pose HumanRig
 
   Posebone KneeIK_L 
     Constraint Const LIMIT_DISTANCE
-ive False ;
+      target Refer Object HumanRig ;
+      active False ;
       expanded True ;
       influence 1 ;
       limit_mode 'LIMITDIST_INSIDE' ;
@@ -2106,6 +2109,7 @@ ive False ;
       row -1.93199696241e-08 -5.96046447754e-08 1.0 0.0 ;
       row -9.53674316406e-07 3.42726707458e-07 6.19888305664e-06 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2170,6 +2174,7 @@ ive False ;
 
   Posebone KneeIK_R 
     Constraint Const LIMIT_DISTANCE
+      target Refer Object HumanRig ;
       active False ;
       expanded True ;
       influence 1 ;
@@ -2190,6 +2195,7 @@ ive False ;
       row 1.93199696241e-08 -5.96046447754e-08 1.0 0.0 ;
       row 9.53674316406e-07 3.42726707458e-07 6.19888305664e-06 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2264,6 +2270,7 @@ ive False ;
       row 1.26399336829e-21 -1.49011611938e-08 1.00000011921 0.0 ;
       row 5.08219768353e-21 -5.96046447754e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle10 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2301,6 +2308,7 @@ ive False ;
       row 1.33773684302e-21 0.0 0.999999940395 0.0 ;
       row 0.0 5.96046447754e-08 2.38418579102e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle15 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2323,7 +2331,7 @@ ive False ;
     rotation_mode 'QUATERNION' ;
     rotation_quaternion (1,0,0,0) ;
     scale (1,1,1) ;
-    selected True ;
+    selected False ;
   end Posebone
 
   Posebone Spine1 
@@ -2338,6 +2346,7 @@ ive False ;
       row 2.96022011059e-21 -2.98023223877e-08 1.0 0.0 ;
       row -2.71050543121e-20 5.96046447754e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle10 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2375,6 +2384,7 @@ ive False ;
       row 6.86628005417e-21 7.45058059692e-09 1.0 0.0 ;
       row 0.0 0.0 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2412,6 +2422,7 @@ ive False ;
       row 6.41980043281e-21 0.0 1.00000011921 0.0 ;
       row 0.0 -8.94069671631e-08 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle10 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2745,6 +2756,7 @@ ive False ;
       row 0.0 2.98023223877e-08 1.0 0.0 ;
       row 2.98023223877e-08 -2.38418579102e-07 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2772,6 +2784,7 @@ ive False ;
 
   Posebone ElbowIK_L 
     Constraint Const LIMIT_DISTANCE
+      target Refer Object HumanRig ;
       active False ;
       expanded True ;
       influence 1 ;
@@ -2792,6 +2805,7 @@ ive False ;
       row -5.96046447754e-08 -2.38330954971e-09 1.0 0.0 ;
       row 0.0 2.98023223877e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2829,6 +2843,7 @@ ive False ;
       row 0.0 2.98023223877e-08 1.0 0.0 ;
       row -2.98023223877e-08 -2.38418579102e-07 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2856,6 +2871,7 @@ ive False ;
 
   Posebone ElbowIK_R 
     Constraint Const LIMIT_DISTANCE
+      target Refer Object HumanRig ;
       active False ;
       expanded True ;
       influence 1 ;
@@ -2876,6 +2892,7 @@ ive False ;
       row 5.96046447754e-08 -2.38330954971e-09 1.0 0.0 ;
       row 0.0 2.98023223877e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -2958,6 +2975,7 @@ ive False ;
       use_limit_z True ;
     end Constraint
     Constraint Const STRETCH_TO
+      target Refer Object HumanRig ;
       active False ;
       bulge 1 ;
       expanded True ;
@@ -3083,6 +3101,7 @@ ive False ;
 
   Posebone Eye_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -3185,6 +3204,7 @@ ive False ;
 
   Posebone Eye_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -3250,6 +3270,7 @@ ive False ;
 
   Posebone HandIK_L 
     Constraint Const LIMIT_DISTANCE
+      target Refer Object HumanRig ;
       active False ;
       expanded True ;
       influence 1 ;
@@ -3297,6 +3318,7 @@ ive False ;
 
   Posebone UpArmIK_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -3362,6 +3384,7 @@ ive False ;
 
   Posebone UpArm_L 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -3384,6 +3407,7 @@ ive False ;
       row -2.00234353542e-08 7.45058059692e-09 0.999999940395 0.0 ;
       row 0.0 -1.78813934326e-07 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -3411,6 +3435,7 @@ ive False ;
 
   Posebone LoArmIK_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 2 ;
@@ -3476,6 +3501,7 @@ ive False ;
 
   Posebone LoArm_L 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -3498,6 +3524,7 @@ ive False ;
       row 3.0966475606e-08 1.49011611938e-08 1.00000011921 0.0 ;
       row 4.76837158203e-07 0.0 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -3525,6 +3552,7 @@ ive False ;
 
   Posebone UpArmTwist_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -3590,6 +3618,7 @@ ive False ;
 
   Posebone Hand_L 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -3612,6 +3641,7 @@ ive False ;
       row 0.0 0.0 1.0 0.0 ;
       row -4.76837158203e-07 2.38418579102e-07 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -3760,6 +3790,7 @@ ive False ;
       row 2.48689957516e-14 -5.68434188608e-14 0.999999940395 0.0 ;
       row 4.76837158203e-07 -1.49011611938e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -3787,6 +3818,7 @@ ive False ;
 
   Posebone Finger-1-1_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -3825,6 +3857,7 @@ ive False ;
       row 2.98023223877e-08 -5.96046447754e-08 1.0 0.0 ;
       row 4.76837158203e-07 1.49011611938e-07 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -3862,6 +3895,7 @@ ive False ;
       row 0.0 0.0 1.0 0.0 ;
       row -4.76837158203e-07 4.47034835815e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -3889,6 +3923,7 @@ ive False ;
 
   Posebone Finger-1-3_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -3927,6 +3962,7 @@ ive False ;
       row 0.0 1.49011611938e-08 1.0 0.0 ;
       row -4.76837158203e-07 -2.98023223877e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4038,6 +4074,7 @@ ive False ;
       row 1.82076576039e-14 -7.1054273576e-15 1.0 0.0 ;
       row -4.76837158203e-07 1.11758708954e-07 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4065,6 +4102,7 @@ ive False ;
 
   Posebone Finger-2-1_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -4103,6 +4141,7 @@ ive False ;
       row 0.0 0.0 1.00000011921 0.0 ;
       row 0.0 5.96046447754e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4140,6 +4179,7 @@ ive False ;
       row 6.51925802231e-09 0.0 1.0 0.0 ;
       row -4.76837158203e-07 -3.35276126862e-08 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4167,6 +4207,7 @@ ive False ;
 
   Posebone Finger-2-3_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -4205,6 +4246,7 @@ ive False ;
       row 1.39698386192e-08 7.45058059692e-09 1.0 0.0 ;
       row 4.76837158203e-07 -4.47034835815e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4316,6 +4358,7 @@ ive False ;
       row 3.5527136788e-14 -2.84217094304e-14 1.0 0.0 ;
       row 0.0 -5.96046447754e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4343,6 +4386,7 @@ ive False ;
 
   Posebone Finger-3-1_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -4381,6 +4425,7 @@ ive False ;
       row 1.39698386192e-09 7.45058059692e-09 1.0 0.0 ;
       row 0.0 -8.94069671631e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4418,6 +4463,7 @@ ive False ;
       row 6.98491930962e-10 3.72529029846e-09 1.0 0.0 ;
       row 9.53674316406e-07 -2.98023223877e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4445,6 +4491,7 @@ ive False ;
 
   Posebone Finger-3-3_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -4483,6 +4530,7 @@ ive False ;
       row 9.02218744159e-10 3.72529029846e-09 1.0 0.0 ;
       row 9.53674316406e-07 4.47034835815e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4594,6 +4642,7 @@ ive False ;
       row 2.68229882749e-13 -1.42108547152e-14 1.0 0.0 ;
       row 0.0 8.94069671631e-08 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4621,6 +4670,7 @@ ive False ;
 
   Posebone Finger-4-1_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -4659,6 +4709,7 @@ ive False ;
       row 6.30834051663e-10 -3.72529029846e-09 1.0 0.0 ;
       row 0.0 2.98023223877e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4696,6 +4747,7 @@ ive False ;
       row -1.16415321827e-09 3.72529029846e-09 1.0 0.0 ;
       row 0.0 1.19209289551e-07 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4723,6 +4775,7 @@ ive False ;
 
   Posebone Finger-4-3_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -4761,6 +4814,7 @@ ive False ;
       row 1.16415321827e-10 3.72529029846e-09 1.0 0.0 ;
       row 4.76837158203e-07 -5.96046447754e-08 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4872,6 +4926,7 @@ ive False ;
       row -1.59872115546e-14 0.0 1.0 0.0 ;
       row 9.53674316406e-07 0.0 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4899,6 +4954,7 @@ ive False ;
 
   Posebone Finger-5-1_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -4937,6 +4993,7 @@ ive False ;
       row 1.33877620101e-09 6.98491930962e-10 1.0 0.0 ;
       row 0.0 0.0 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -4974,6 +5031,7 @@ ive False ;
       row -2.32830643654e-10 0.0 1.0 0.0 ;
       row -9.53674316406e-07 -5.96046447754e-08 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5001,6 +5059,7 @@ ive False ;
 
   Posebone Finger-5-3_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -5039,6 +5098,7 @@ ive False ;
       row 0.0 -3.72529029846e-09 1.0 0.0 ;
       row 4.76837158203e-07 5.96046447754e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5066,6 +5126,7 @@ ive False ;
 
   Posebone LoArmTwist_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -5131,6 +5192,7 @@ ive False ;
 
   Posebone HandIK_R 
     Constraint Const LIMIT_DISTANCE
+      target Refer Object HumanRig ;
       active False ;
       expanded True ;
       influence 1 ;
@@ -5178,6 +5240,7 @@ ive False ;
 
   Posebone UpArmIK_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -5243,6 +5306,7 @@ ive False ;
 
   Posebone UpArm_R 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -5265,6 +5329,7 @@ ive False ;
       row 2.00234353542e-08 7.45058059692e-09 0.999999940395 0.0 ;
       row 0.0 -1.78813934326e-07 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5292,6 +5357,7 @@ ive False ;
 
   Posebone LoArmIK_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 2 ;
@@ -5357,6 +5423,7 @@ ive False ;
 
   Posebone LoArm_R 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -5379,6 +5446,7 @@ ive False ;
       row -3.0966475606e-08 1.49011611938e-08 1.00000011921 0.0 ;
       row -4.76837158203e-07 0.0 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5406,6 +5474,7 @@ ive False ;
 
   Posebone UpArmTwist_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -5471,6 +5540,7 @@ ive False ;
 
   Posebone Hand_R 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -5493,6 +5563,7 @@ ive False ;
       row 0.0 0.0 1.0 0.0 ;
       row 4.76837158203e-07 2.38418579102e-07 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5641,6 +5712,7 @@ ive False ;
       row -2.48689957516e-14 -5.68434188608e-14 0.999999940395 0.0 ;
       row -4.76837158203e-07 -1.49011611938e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5668,6 +5740,7 @@ ive False ;
 
   Posebone Finger-1-1_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -5706,6 +5779,7 @@ ive False ;
       row -2.98023223877e-08 -5.96046447754e-08 1.0 0.0 ;
       row -4.76837158203e-07 1.49011611938e-07 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5743,6 +5817,7 @@ ive False ;
       row 0.0 0.0 1.0 0.0 ;
       row 4.76837158203e-07 4.47034835815e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5770,6 +5845,7 @@ ive False ;
 
   Posebone Finger-1-3_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -5808,6 +5884,7 @@ ive False ;
       row 0.0 1.49011611938e-08 1.0 0.0 ;
       row 4.76837158203e-07 -2.98023223877e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5919,6 +5996,7 @@ ive False ;
       row -1.82076576039e-14 -7.1054273576e-15 1.0 0.0 ;
       row 4.76837158203e-07 1.11758708954e-07 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -5946,6 +6024,7 @@ ive False ;
 
   Posebone Finger-2-1_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -5984,6 +6063,7 @@ ive False ;
       row 0.0 0.0 1.00000011921 0.0 ;
       row 0.0 5.96046447754e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6021,6 +6101,7 @@ ive False ;
       row -6.51925802231e-09 0.0 1.0 0.0 ;
       row 4.76837158203e-07 -3.35276126862e-08 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6048,6 +6129,7 @@ ive False ;
 
   Posebone Finger-2-3_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -6086,6 +6168,7 @@ ive False ;
       row -1.39698386192e-08 7.45058059692e-09 1.0 0.0 ;
       row -4.76837158203e-07 -4.47034835815e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6197,6 +6280,7 @@ ive False ;
       row -3.5527136788e-14 -2.84217094304e-14 1.0 0.0 ;
       row 0.0 -5.96046447754e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6224,6 +6308,7 @@ ive False ;
 
   Posebone Finger-3-1_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -6262,6 +6347,7 @@ ive False ;
       row -1.39698386192e-09 7.45058059692e-09 1.0 0.0 ;
       row 0.0 -8.94069671631e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6299,6 +6385,7 @@ ive False ;
       row -6.98491930962e-10 3.72529029846e-09 1.0 0.0 ;
       row -9.53674316406e-07 -2.98023223877e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6326,6 +6413,7 @@ ive False ;
 
   Posebone Finger-3-3_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -6364,6 +6452,7 @@ ive False ;
       row -9.02218744159e-10 3.72529029846e-09 1.0 0.0 ;
       row -9.53674316406e-07 4.47034835815e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6475,6 +6564,7 @@ ive False ;
       row -2.68229882749e-13 -1.42108547152e-14 1.0 0.0 ;
       row 0.0 8.94069671631e-08 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6502,6 +6592,7 @@ ive False ;
 
   Posebone Finger-4-1_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -6540,6 +6631,7 @@ ive False ;
       row -6.30834051663e-10 -3.72529029846e-09 1.0 0.0 ;
       row 0.0 2.98023223877e-08 4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6577,6 +6669,7 @@ ive False ;
       row 1.16415321827e-09 3.72529029846e-09 1.0 0.0 ;
       row 0.0 1.19209289551e-07 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6604,6 +6697,7 @@ ive False ;
 
   Posebone Finger-4-3_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -6642,6 +6736,7 @@ ive False ;
       row -1.16415321827e-10 3.72529029846e-09 1.0 0.0 ;
       row -4.76837158203e-07 -5.96046447754e-08 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6753,6 +6848,7 @@ ive False ;
       row 1.59872115546e-14 0.0 1.0 0.0 ;
       row -9.53674316406e-07 0.0 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHBall ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6780,6 +6876,7 @@ ive False ;
 
   Posebone Finger-5-1_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -6818,6 +6915,7 @@ ive False ;
       row -1.33877620101e-09 6.98491930962e-10 1.0 0.0 ;
       row 0.0 0.0 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6855,6 +6953,7 @@ ive False ;
       row 2.32830643654e-10 0.0 1.0 0.0 ;
       row 9.53674316406e-07 -5.96046447754e-08 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6882,6 +6981,7 @@ ive False ;
 
   Posebone Finger-5-3_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 3 ;
@@ -6920,6 +7020,7 @@ ive False ;
       row 0.0 -3.72529029846e-09 1.0 0.0 ;
       row -4.76837158203e-07 5.96046447754e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -6947,6 +7048,7 @@ ive False ;
 
   Posebone LoArmTwist_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -7012,6 +7114,7 @@ ive False ;
 
   Posebone LegCtrl_L 
     Constraint Const LIMIT_DISTANCE
+      target Refer Object HumanRig ;
       active False ;
       expanded True ;
       influence 1 ;
@@ -7133,6 +7236,7 @@ ive False ;
 
   Posebone UpLegIK_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -7198,6 +7302,7 @@ ive False ;
 
   Posebone UpLeg_L 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -7220,6 +7325,7 @@ ive False ;
       row 1.62981450558e-09 9.31322574615e-10 1.00000011921 0.0 ;
       row 0.0 1.49011611938e-08 -5.96046447754e-08 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -7247,6 +7353,7 @@ ive False ;
 
   Posebone LoLegIK_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 2 ;
@@ -7312,6 +7419,7 @@ ive False ;
 
   Posebone LoLeg_L 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -7334,6 +7442,7 @@ ive False ;
       row -2.44472175837e-09 7.45058059692e-09 1.0 0.0 ;
       row -5.96046447754e-08 2.98023223877e-08 2.38418579102e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -7361,6 +7470,7 @@ ive False ;
 
   Posebone UpLegTwist_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -7426,6 +7536,7 @@ ive False ;
 
   Posebone Foot_L 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -7464,6 +7575,7 @@ ive False ;
       row -5.96046447754e-08 0.0 1.0 0.0 ;
       row -4.17232513428e-07 8.94069671631e-08 -4.76837158203e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -7528,6 +7640,7 @@ ive False ;
 
   Posebone Toe_L 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -7550,6 +7663,7 @@ ive False ;
       row 0.0 0.0 0.999999821186 0.0 ;
       row 5.96046447754e-08 0.0 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -8095,6 +8209,7 @@ ive False ;
 
   Posebone LegCtrl_R 
     Constraint Const LIMIT_DISTANCE
+      target Refer Object HumanRig ;
       active False ;
       expanded True ;
       influence 1 ;
@@ -8216,6 +8331,7 @@ ive False ;
 
   Posebone UpLegIK_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -8281,6 +8397,7 @@ ive False ;
 
   Posebone UpLeg_R 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -8303,6 +8420,7 @@ ive False ;
       row -1.62981450558e-09 9.31322574615e-10 1.00000011921 0.0 ;
       row 0.0 1.49011611938e-08 -5.96046447754e-08 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -8330,6 +8448,7 @@ ive False ;
 
   Posebone LoLegIK_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 2 ;
@@ -8395,6 +8514,7 @@ ive False ;
 
   Posebone LoLeg_R 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -8417,6 +8537,7 @@ ive False ;
       row 1.12922862172e-08 -7.45058059692e-09 1.0 0.0 ;
       row 0.0 5.96046447754e-08 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -8444,6 +8565,7 @@ ive False ;
 
   Posebone UpLegTwist_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -8509,6 +8631,7 @@ ive False ;
 
   Posebone Foot_R 
     Constraint Const IK
+      target Refer Object HumanRig ;
       active False ;
       axis_reference 'BONE' ;
       chain_length 1 ;
@@ -8547,6 +8670,7 @@ ive False ;
       row 0.0 0.0 0.999999940395 0.0 ;
       row 5.96046447754e-08 2.98023223877e-07 -9.53674316406e-07 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle03 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -8611,6 +8735,7 @@ ive False ;
 
   Posebone Toe_R 
     Constraint Const COPY_ROTATION
+      target Refer Object HumanRig ;
       invert Array 0 0 0  ;
       use Array 1 1 1  ;
       active False ;
@@ -8633,6 +8758,7 @@ ive False ;
       row 1.49011611938e-08 1.49011611938e-08 1.00000023842 0.0 ;
       row 5.96046447754e-08 1.19209289551e-07 1.90734863281e-06 1.0 ;
     end Matrix
+    custom_shape Refer Object MHCircle05 ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -9188,6 +9314,7 @@ ive False ;
       row -1.98419058961e-09 0.0 1.0 0.0 ;
       row 0.0 0.0 0.0 1.0 ;
     end Matrix
+    custom_shape Refer Object MHFace ;
     ik_lin_control False ;
     ik_lin_weight 0 ;
     ik_rot_control False ;
@@ -10247,6 +10374,7 @@ Object HumanRig ARMATURE HumanRig
   dupli_frames_off 0 ;
   dupli_frames_on 1 ;
   dupli_frames_start 1 ;
+# **CLASS** dupli_list ['bpy_prop_collection'] <bpy_collection[0], Object.dupli_list> 
   dupli_type 'NONE' ;
   empty_draw_size 1 ;
   empty_draw_type 'ARROWS' ;
@@ -10273,7 +10401,7 @@ Object HumanRig ARMATURE HumanRig
   rotation_mode 'XYZ' ;
   rotation_quaternion (1,0,0,0) ;
   scale (1,1,1) ;
-  selected True ;
+  selected False ;
   shape_key_edit_mode False ;
   shape_key_lock False ;
   slow_parent False ;
