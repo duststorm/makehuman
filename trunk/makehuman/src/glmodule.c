@@ -475,20 +475,32 @@ void mhDrawText(float x, float y, const char *message)
  *  \param inValue The long to swap to.
  *  \return The long value swapped.
  */
+
 static uint32_t swapLong(uint32_t inValue)
 {
+#ifdef __GNUC__
+#   if defined(__ppc__)
+        register uint32_t word;
+        __asm__("lwbrx %0,%2,%1" : "=r" (word) : "r" (&inValue), "b" (0));
+        return word;
+#   elif defined(__x86__) || defined(__i386__) || defined (__x86_64__)
+        register uint32_t word;
+        __asm__("bswap %0" : "=r" (word) : "0" (inValue));
+        return word;
+#   endif
+#endif    
     return (((inValue      ) & 0xff) << 24) |
            (((inValue >>  8) & 0xff) << 16) |
            (((inValue >> 16) & 0xff) <<  8) |
            (((inValue >> 24) & 0xff));
 }
-#endif
+#endif // #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
 /** \brief Copy one Array of long values (32 bits) to another location in 
  *         memory by considering the endian correctness.
  *         The rule here is that if the machine this method is a big endian 
  *         architecture (e.g. PowerPC) then every long is swapped accordingly.
- *         On big endian archtiectures (as x86) no byte swapping will be done.
+ *         On big endian architectures (as x86) no byte swapping will be done.
  *
  *  \param destPtr the destination pointer (the target of the copy process).
  *  \param srcPtr the source pointer which points to the data to copy from.
@@ -545,8 +557,8 @@ static void mhFlipSurface(SDL_Surface *surface)
             pixelsB -= lineBytes;
         }
         if (SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
+        free(line);
     }
-    free(line);
 }
 
 /** \brief Load a texture from a file and bind it into the textures array.
