@@ -95,7 +95,21 @@ class SimpleOctreeVolume:
 
             pos = self.chooseChildren(vert)
             return self.children[pos].deepSearch(vert)
+            
+    def getSmallestChild(self, vert):
 
+        # caso base: foglia. Verifica dei vertici e restituzione di quello piu' vicino al baricentro
+
+        if len(self.children) == 0:
+            return self
+        else:
+
+        # passo induttivo: tra tutti i figli del nodo considerato seleziono quello piu' vicino
+            # cerco il figlio giusto
+
+            pos = self.chooseChildren(vert)
+            return self.children[pos].getSmallestChild(vert)
+            
     def chooseChildren(self, vert):
         node = self.children[0]
         dist = math.sqrt(math.pow(vert[0] - (node.bounds[0][0] + (node.bounds[2][0] - node.bounds[0][0]) / 2), 2) + math.pow(vert[1] - (node.bounds[0][1]
@@ -146,7 +160,7 @@ class SimpleOctreeVolume:
 
         # I need empty leaves as well so we dont assume that verts should be less than 8
 
-        if self.halfX <= minsize or self.halfY <= minsize or self.halfZ <= minsize or len(verts) < 1:  # or len(verts) <= 8:
+        if self.halfX <= minsize or self.halfY <= minsize or self.halfZ <= minsize or len(verts) < 1:  
             self.verts = verts
         else:
             self.children = self.__spawnVolumes(verts)
