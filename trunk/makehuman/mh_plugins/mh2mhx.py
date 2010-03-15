@@ -22,7 +22,7 @@ TO DO
 
 """
 
-import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, hairgenerator
+import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, hairgenerator, gobo_bones
 import os
 
 
@@ -47,14 +47,21 @@ def exportMhx(obj, filename):
 	exportMhx_25(obj, "classic", fp)
 	fp.close()
 	print("MHX 2.5x file %s written" % filename)
-
+	'''
 	filename = name+"-rigify-25"+ext
 	print("Writing MHX 2.5x file " + filename )
 	fp = open(filename, 'w')
 	exportMhx_25(obj, "rigify", fp)
 	fp.close()
 	print("MHX 2.5x file %s written" % filename)
-
+	'''
+	filename = name+"-gobo-25"+ext
+	print("Writing MHX 2.5x file " + filename )
+	fp = open(filename, 'w')
+	exportMhx_25(obj, "gobo", fp)
+	fp.close()
+	print("MHX 2.5x file %s written" % filename)
+	
 	return
 
 #
@@ -103,11 +110,22 @@ def exportRawMhx(obj, fp):
 #
 
 def exportMhx_25(obj, rig, fp):
-	mhxbones.setupBones(obj)
-	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
-	copyFile25(obj, "data/templates/armatures-%s25.mhx" % rig, rig, fp)	
-	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+	if rig == 'gobo':
+		mhxbones.newSetupJoints(obj, gobo_bones.joints, gobo_bones.headsTails)
+		copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
+		copyFile25(obj, "data/templates/gobo-armature25.mhx", rig, fp)	
+		copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+	else:
+		mhxbones.setupBones(obj)
+		copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
+		copyFile25(obj, "data/templates/armatures-%s25.mhx" % rig, rig, fp)	
+		copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
 	return
+
+		
+#
+#	copyFile25(obj, tmplName, rig, fp):
+#
 
 def copyFile25(obj, tmplName, rig, fp):
 	print("Trying to open "+tmplName)
@@ -146,13 +164,30 @@ def copyFile25(obj, tmplName, rig, fp):
 			elif lineSplit[1] == 'roll':
 				(x, y) = mhxbones.boneRoll[bone]
 				fp.write("    roll %.6g ;\n" % (y))
+			elif lineSplit[1] == 'gobo-bones':
+				gobo_bones.writeArmature(fp)
+			elif lineSplit[1] == 'gobo-extra-poses':
+				gobo_bones.writeExtraPoses(fp)
+			elif lineSplit[1] == 'gobo-actions':
+				gobo_bones.writeActions(fp)
+			elif lineSplit[1] == 'gobo-constraint-drivers':
+				gobo_bones.writeConstraintDrivers(fp)
 			elif lineSplit[1] == 'Verts':
 				for v in obj.verts:
 					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 			elif lineSplit[1] == 'VertexGroup':
-				pass
-				copyFile("data/templates/vertexgroups-common25.mhx", fp)	
-				copyFile("data/templates/vertexgroups-%s25.mhx" % rig, fp)	
+				if rig == 'classic':
+					copyFile("data/templates/vertexgroups-common25.mhx", fp)	
+					copyFile("data/templates/vertexgroups-classic25.mhx", fp)	
+					copyFile("data/templates/vertexgroups-toes25.mhx", fp)	
+				elif rig == 'gobo':
+					copyFile("data/templates/vertexgroups-common25.mhx", fp)	
+					copyFile("data/templates/vertexgroups-classic25.mhx", fp)	
+					copyFile("data/templates/vertexgroups-foot25.mhx", fp)	
+				elif rig == 'rigify':
+					copyFile("data/templates/vertexgroups-common25.mhx", fp)	
+					copyFile("data/templates/vertexgroups-rigify25.mhx", fp)	
+					copyFile("data/templates/vertexgroups-foot25.mhx", fp)	
 			elif lineSplit[1] == 'ShapeKey':
 				copyFile("data/templates/shapekeys-facial25.mhx", fp)	
 			elif lineSplit[1] == 'Armature':
@@ -450,3 +485,6 @@ def writeIpo(fp):
 		tmpl.close()
 
 	return
+
+
+

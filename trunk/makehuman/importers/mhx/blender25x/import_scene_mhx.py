@@ -374,60 +374,131 @@ def concatList(elts):
 	return string
 
 #
-#	parseAnimationData(anim, args, tokens):
 #	parseAction(args, tokens):
 #	parseFCurve(fcu, args, tokens):
 #	parseKeyFramePoint(pt, args, tokens):
 #
-#	parseDriver(drv, args, tokens):
-#	parseDriverVariable(var, args, tokens):
-#
-
-def parseAnimationData(anim, args, tokens):
-	for (key, val, sub) in tokens:
-		if key == 'FCurve':
-			fcu = parseFCurve(anim.fcurves, val, sub)
-		else:
-			defaultKey(key, val, sub, 'anim', [], globals(), locals())
-	return act
 
 def parseAction(args, tokens):
-	name = args[0].replace(' ', '_')
-	act = bpy.data.actions.new(name)
-	loadedData['Action'][name] = act
-	#act.animation_data_create()
-	#bpy.context.scene.actions.active = act
-	bpy.ops.action.keyframe_insert(type='ALL')
+	ob = bpy.context.object
+	print("Object", ob)
+	bpy.ops.object.mode_set(mode='POSE')
+	pbones = ob.pose.bones
+	if ob.animation_data:
+		ob.animation_data.action = None
+	created = {}
 	for (key, val, sub) in tokens:
 		if key == 'FCurve':
-			fcu = parseFCurve(act.fcurves, val, sub)
+			prepareActionFCurve(pbones, created, val, sub)
+		
+	name = args[0]
+	act = ob.animation_data.action
+	act.name = name
+	loadedData['Action'][name] = act
+	print("Action", act, list(act.fcurves))
+	
+	for (key, val, sub) in tokens:
+		if key == 'FCurve':
+			fcu = parseActionFCurve(act, val, sub)
 		else:
 			defaultKey(key, val, sub, 'act', [], globals(), locals())
+	ob.animation_data.action = None
+	bpy.ops.object.mode_set(mode='OBJECT')
 	return act
 
-'''
-bpy.ops.anim.keyframe_insert_menu(type=-2, confirm_success=False, always_prompt=False)
-bpy.ops.action.select_border(gesture_mode=3, xmin=33, xmax=73, ymin=319, ymax=370, axis_range=False)
-bpy.ops.action.duplicate(mode=17)
-bpy.ops.transform.transform(mode='TIME_TRANSLATE', value=(20, 0, 0, 0), axis=(0, 0, 0), proportional='DISABLED', proportional_editing_falloff='SMOOTH', proportional_size=1, mirror=False, constraint_axis=(False, False, False), constraint_orientation='GLOBAL')
-'''
+def prepareActionFCurve(pbones, created, args, tokens):			
+	dataPath = args[0]
+	try:
+		x = created[dataPath]
+		return
+	except:
+		created[dataPath] = True
 
-def parseFCurve(fcurves, args, tokens):
-	print(fcurves)
-	return
-	fcu.data_path = args[0]
-	fcu.array_index = int(args[1])
-
+	times = []
 	for (key, val, sub) in tokens:
 		if key == 'kp':
-			bpy.ops.anim.keyframe_insert_menu(type=-2, confirm_success=False, always_prompt=False)
-			pt = fcu.keyframe_points.new()
+			times.append(int(val[0]))
+
+	(bname, channel) = channelFromDataPath(dataPath)
+	for t in times:
+		bpy.context.scene.current_frame = t
+		pbones[bname].keyframe_insert(channel)
+	return
+
+def channelFromDataPath(dataPath):
+	words = dataPath.split('"')
+	bname = words[1]
+	channel = words[2].split('.')[1]
+	return (bname, channel)
+
+def parseActionFCurve(act, args, tokens):
+	dataPath = args[0]
+	(bname, channel) = channelFromDataPath(dataPath)
+	index = int(args[1])
+
+	for fcu in act.fcurves:
+		(bname1, channel1) = channelFromDataPath(fcu.data_path)
+		if bname1 == bname and fcu.array_index == index:
+			if channel1 == channel:
+				print("Hit", dataPath, index)
+				break
+	print("parse", fcu.data_path, fcu.array_index)
+
+	n = 0
+	for (key, val, sub) in tokens:
+		if key == 'kp':
+			pt = fcu.keyframe_points[n]
 			pt = parseKeyFramePoint(pt, val, sub)
+			n += 1
 		else:
 			defaultKey(key, val, sub, 'fcu', [], globals(), locals())
 	return fcu
 
-def parseDriver(drv, args, tokens):
+def parseKeyFramePoint(pt, args, tokens):
+	pt.co = (float(args[0]), float(args[1]))
+	if len(args) > 2:
+		pt.handle1 = (float(args[2]), float(args[3]))
+		pt.handle2 = (float(args[3]), float(args[5]))
+	return pt
+
+#
+#	parseAnimationData(ob, args, tokens):
+#	parseDriver(drv, args, tokens):
+#	parseDriverVariable(var, args, tokens):
+#
+
+def parseAnimationData(ob, args, tokens):
+	if ob.animation_data == None:	
+		ob.animation_data_create()
+	adata = ob.animation_data
+	for (key, val, sub) in tokens:
+		if key == 'FCurve':
+			parseADataFCurve(ob, adata, val, sub)
+		else:
+			defaultKey(key, val, sub, 'adata', [], globals(), locals())
+	return adata
+
+def parseADataFCurve(ob, adata, args, tokens):
+	dataPath = args[0]
+	words = dataPath.split('"')
+	bname = words[1]
+	index = int(args[1])
+	print("Fcurve ignored:", dataPath)
+	return
+
+	for (key, val, sub) in tokens:
+		if key == 'Driver':
+			expr = "ob.%s" % dataPath
+			print(expr)
+			x = eval(expr)
+			print(x)
+			bpy.ops.anim.driver_button_add(all=False)
+			drv = parseDriver(adata, val, sub)
+		else:
+			defaultKey(key, val, sub, 'fcu', [], globals(), locals())
+	return fcu
+
+def parseDriver(adata, args, tokens):
 	for (key, val, sub) in tokens:
 		if key == 'DriverVariable':
 			var = drv.variables.new()
@@ -445,11 +516,6 @@ def parseDriverVariable(var, args, tokens):
 	return var
 
 
-def parseKeyFramePoint(pt, args, tokens):
-	pt.co = eval(args[0])
-	pt.handle1 = eval(args[1])
-	pt.handle2 = eval(args[2])
-	return pt
 	
 #
 #	parseMaterial(args, ext, tokens):
@@ -661,6 +727,8 @@ def parseObject(args, tokens):
 			parseModifier(ob, val, sub)
 		elif key == 'Constraint':
 			parseConstraint(ob.constraints, val, sub)
+		elif key == 'AnimationData':
+			parseAnimationData(ob, val, sub)
 		elif key == 'ParticleSystem':
 			parseParticleSystem(ob, val, sub)
 		else:
@@ -1101,11 +1169,13 @@ def parseRigify(amtname, obname, tokens):
 	for (key, val, sub) in tokens:
 		if key == 'Bone':
 			bname = val[0]
+			print("Bone", bname)
 			try:
 				bone = amt.edit_bones[bname]
 			except:
 				print("Did not find bone %s" % bname)
 				bone = None
+			print(" -> ", bone)
 			if bone:
 				parseBone(bone, amt.edit_bones, sub, heads, tails)
 		else:
@@ -1141,6 +1211,8 @@ def parseBone(bone, bones, tokens, heads, tails):
 				bone.tail = tails[bone.name] + bones[target].tail - tails[target]
 			else:
 				raise NameError("tail-as %s" % val)
+		elif key == 'restrict_select':
+			pass
 		else:
 			defaultKey(key, val,  sub, "bone", [], globals(), locals())
 
@@ -1262,6 +1334,10 @@ def parseConstraint(constraints, args, tokens):
 			parseArray([cns.invert_x, cns.invert_y, cns.invert_z], val)
 		elif key == 'use':
 			parseArray([cns.use_x, cns.use_y, cns.use_z], val)
+		elif key == 'pos_lock':
+			parseArray([cns.pos_lock_x, cns.pos_lock_y, cns.pos_lock_z], val)
+		elif key == 'rot_lock':
+			parseArray([cns.rot_lock_x, cns.rot_lock_y, cns.rot_lock_z], val)
 		else:
 			defaultKey(key, val,  sub, "cns", [], globals(), locals())
 	return 
@@ -1501,6 +1577,9 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 		for n in range(1, len(args)):
 			expr = "%s[%d] = %s" % (nvar, n-1, args[n])
 			exec(expr, glbals, lcals)
+		if len(args) > 0:
+			expr = "%s[0] = %s" % (nvar, args[1])
+			exec(expr, glbals, lcals)			
 		return
 		
 	elif rnaType == 'List':
@@ -1683,11 +1762,12 @@ theScale = 1.0
 toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
 toggle = T_Replace 
 #readMhxFile("/home/thomas/makehuman/exports/foo-classic-25.mhx")
-#readMhxFile("/home/thomas/makehuman/exports/foo-rigify-25.mhx")
+readMhxFile("/home/thomas/makehuman/exports/foo-gobo-25.mhx")
 #readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-classic-25.mhx")
 #readMhxFile("/home/thomas/mhx5/test1.mhx")
-readMhxFile("/home/thomas/myblends/gobo/gobo.mhx")
+#readMhxFile("/home/thomas/myblends/gobo/gobo.mhx")
 """
+
 
 
 

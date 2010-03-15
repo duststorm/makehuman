@@ -1059,3 +1059,48 @@ def setupBones(obj):
 			boneTail[bone] = aljabr.vadd(locations[tjoint], x)
 		else:
 			boneTail[bone] = locations[tjoint]
+
+#
+#	newSetupJoints (obj, joints, armature):
+#	Used by gobo
+#
+def newSetupJoints (obj, joints, armature):
+	global boneHead, boneTail, locations
+	locations = {}
+	for (key, typ, data) in joints:
+		print(key, typ, data)
+		if typ == 'j':
+			loc = calcJointPos(obj, data)
+			locations[key] = loc
+			locations[data] = loc
+		elif typ == 'v':
+			v = int(data)
+			locations[key] = obj.verts[v].co
+
+	for (key, typ, data) in joints:
+		#print(key, locations.keys())
+		if typ == 'j':
+			pass
+		elif typ == 'b':
+			locations[key] = locations[data]
+		elif typ == 'v':
+			pass
+		elif typ == 'l':
+			((k1, joint1), (k2, joint2)) = data
+			locations[key] = vadd(vmul(locations[joint1], k1), vmul(locations[joint2], k2))
+		elif typ == 'o':
+			(joint, offs) = data
+			locations[key] = vadd(locations[joint], offs)
+		else:
+			raise NameError("Unknown %s" % typ)
+
+	for (key, val) in locations.items():
+		print("J", key, val)
+
+	boneHead = {}
+	boneTail = {}
+	for (bone, head, tail) in armature:
+		boneHead[bone] = locations[head]
+		boneTail[bone] = locations[tail]
+	return 
+
