@@ -91,6 +91,7 @@ class HairTaskView(gui3d.TaskView):
       if (wFactor <= 100.00) and (wFactor >= 1.00): self.widthFactor = wFactor
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
+      print "Debug: Filename.. ", filename
       human.scene.clear(human.hairObj)
       hairsClass = hairgenerator.Hairgenerator()
       hairsClass.humanVerts = human.mesh.verts
@@ -106,12 +107,13 @@ class HairTaskView(gui3d.TaskView):
   def onShow(self, event):
     # When the task gets shown, set the focus to the file chooser
     self.app.scene3d.selectedHuman.hide()
-    gui3d.TaskView.onShow(self, event)
     if self.default:
       self.default = False
       self.filechooser.selectedFile = self.filechooser.files.index("default.hair")
-      print "Debug: ", self.filechooser.selectedFile
-      print "Debug: ", self.filechooser.files
+      self.filechooser.onShow(event) #If I dont do this, first time libraries are chosen the wrong selectedFile is shown.. TODO: marc, make eleganter :P
+      #print "Debug: ", self.filechooser.selectedFile
+      #print "Debug: ", self.filechooser.files
+    gui3d.TaskView.onShow(self, event)
     self.filechooser.setFocus()
     # HACK: otherwise the toolbar background disappears for some weird reason
     self.app.scene3d.redraw(0)
