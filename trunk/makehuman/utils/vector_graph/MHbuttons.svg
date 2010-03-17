@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,11 +12,13 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.46"
    sodipodi:docname="MHbuttons.svg"
    inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_load.png"
    inkscape:export-xdpi="90.000084"
-   inkscape:export-ydpi="90.000084">
+   inkscape:export-ydpi="90.000084"
+   sodipodi:version="0.32"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -1491,16 +1492,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.5408206"
-     inkscape:cx="581.89547"
-     inkscape:cy="543.18745"
+     inkscape:zoom="8.9531247"
+     inkscape:cx="40.18382"
+     inkscape:cy="504.9347"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1006"
+     inkscape:window-width="1280"
+     inkscape:window-height="778"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -1510,7 +1511,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1518,6 +1519,17 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.99728656;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3040"
+       width="73.445999"
+       height="15.002714"
+       x="10.972494"
+       y="555.51349"
+       ry="2.2504072"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_export_obj.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <rect
        style="fill:none;stroke:none"
        id="rect3737-2-0-8-5-3-8-4-1-4-5-0-8-1-0-0-3-65-3-5-7-9-55-8-6"
@@ -4866,14 +4878,14 @@
        y="459.41537"
        id="text3802-14-9-8-58-5-9"
        sodipodi:linespacing="125%"
-       transform="scale(0.99469202,1.0053363)"
+       transform="scale(0.994692,1.0053363)"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107"><tspan
          sodipodi:role="line"
          id="tspan3804-35-9-9-8-9-2"
          x="562.70062"
-         y="459.41537">Export option</tspan></text>
+         y="459.41537">Export options</tspan></text>
     <rect
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
@@ -5308,5 +5320,88 @@
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_details_head.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="605.88013"
+       y="553.82709"
+       id="text3012"><tspan
+         sodipodi:role="line"
+         id="tspan3014"
+         x="605.88013"
+         y="553.82709" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.60922431999999900px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="581.19836"
+       y="566.83752"
+       id="text3790"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3792"
+         x="581.19836"
+         y="566.83752"
+         style="font-size:13;fill:#ffff00">Hair</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.60922431999999900px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="581.19836"
+       y="487.17328"
+       id="text3786"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3788"
+         x="581.19836"
+         y="487.17328"
+         style="font-size:13;fill:#ffff00">Body</tspan></text>
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_expor_obj_on.png"
+       transform="scale(0.994692,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3030"
+       y="563.72717"
+       x="13.129547"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       xml:space="preserve"><tspan
+         y="563.72717"
+         x="13.129547"
+         id="tspan3032"
+         sodipodi:role="line">.obj as Mesh</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.99728656;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3034"
+       width="73.445999"
+       height="15.002714"
+       x="10.972494"
+       y="533.99518"
+       ry="2.2504072"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_export_obj.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="13.570824"
+       y="542.14026"
+       id="text3036"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_export_obj.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3038"
+         x="13.570824"
+         y="542.14026">.obj as Curves</tspan></text>
   </g>
 </svg>

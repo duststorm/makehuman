@@ -37,13 +37,15 @@ class HairTaskView(gui3d.TaskView):
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
     self.default = True
     #self.filechooser.selectedFile = 1 #This is where default.hair is located :P .. bad HACK need to improve on this, maybe a hashtable?.. TODO for marc :P
-    #self.hairsClass = hairgenerator.Hairgenerator() #this will have more points than the .hair file, as we will use curve interpolations on the controlpoints
+    self.hairsClass = hairgenerator.Hairgenerator() #this will have more points than the .hair file, as we will use curve interpolations on the controlpoints
     self.saveAsCurves = True
     self.widthFactor = 1.0
     self.Delta=None
  
     #filename textbox
-    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj', position=[20, 480, 9])
+    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj',\
+                       texture = category.app.getThemeResource("images", "texedit_off.png"),\
+                       focusedTexture=category.app.getThemeResource("images", "texedit_on.png"), position=[20, 480, 9])
     self.TextEdit.setText('saved_hair.obj')
     self.refVector=None #reference vector used for fast updating of hair (e.g. when base model only changes height or age)
     #Save Button
@@ -69,7 +71,7 @@ class HairTaskView(gui3d.TaskView):
 
     @self.Button.event
     def onClicked(event):
-      if len(self.TextEdit.text) >= 1 and len(hairsClass.guideGroups)> 0:
+      if len(self.TextEdit.text) >= 1 and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0: # and len(hairsClass.guideGroups)> 0:
         modelPath = mh.getPath('models')
         if not os.path.exists(modelPath): os.makedirs(modelPath)
         if self.RadioButton1.selected:
@@ -121,21 +123,6 @@ class HairTaskView(gui3d.TaskView):
   def onHide(self, event):
     self.app.scene3d.selectedHuman.show()
     gui3d.TaskView.onHide(self, event)
-  
-"""  
-  #Note: Does not update!
-  #Suggestion: Updates of objects should be done manually!
-  #No rotation (e.g. different pose) change assumed on base head! only translation and scales
-  def adjustHairObj(self, hairObj, humanObj): #luckily both normal and vertex index of object remains the same!
-    v=humanObj.verts[int(self.Delta[0])].co[:]
-    v[0]=v[0] + float(self.Delta[1])
-    v[1]=v[1] + float(self.Delta[2])
-    v[2]=v[2] + float(self.Delta[2])
-    delta = vsub(v,self.refVector)
-    for i in range(len(hairObj.verts)):
-       hairObj.verts[i].co = vadd(hairObj.verts[i].co,delta)
-    self.refVector=vadd(self.refVector,delta)
-"""
     
 def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
   if hairsClass == None :

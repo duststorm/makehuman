@@ -149,20 +149,21 @@ class ExportTaskView(gui3d.TaskView):
         gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0])
         self.fileentry = gui3d.FileEntryView(self)
 
-        self.exportTypeGroup = []
-        self.wavefrontObj = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                              'button_export_obj.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_obj_on.png'), position=[33, 120,
+        self.exportBodyGroup = []
+        self.exportHairGroup = []
+        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
+                                              'button_export_obj.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_obj_on.png'), position=[33, 140,
                                               9.2], selected=True)
-        self.mhx = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_mhx.png'
-                                     ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 120, 9.2])
-        self.collada = gui3d.RadioButton(self, self.exportTypeGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 120, 9.2])
+        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_mhx.png'
+                                     ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 140, 9.2])
+        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
+                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 140, 9.2])
 
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
-                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 140, 9.2], selected=True)
+                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 160, 9.2], selected=True)
                                                  
         self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
-                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[68, 140, 9.2], selected=True)
+                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[68, 160, 9.2], selected=True)
 
         @self.fileentry.event
         def onFileSelected(filename):
