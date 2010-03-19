@@ -976,42 +976,44 @@ class FileChooser(View):
             self.selectedFile = 0  # Im not sure if this happens but Ill check
             print "Debug: Something weird just happened with the selected files!"
         """
+        
+        if len(self.files):
 
-        self.currentFile.setScale(1.5)
+          self.currentFile.setScale(1.5)
 
-        # self.previousFile.clearTexture()
-        # self.previousFile.hide()
+          # self.previousFile.clearTexture()
+          # self.previousFile.hide()
 
-        if self.selectedFile > 0:
-            self.previousFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile - 1]))
-            self.previousFile.show()
-        else:
-            self.previousFile.clearTexture()
-            self.previousFile.hide()
-            
-        self.currentFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile]))
-        self.updateText()
-        self.currentFile.show()
-        self.filename.show()
+          if self.selectedFile > 0:
+              self.previousFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile - 1]))
+              self.previousFile.show()
+          else:
+              self.previousFile.clearTexture()
+              self.previousFile.hide()
+              
+          self.currentFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile]))
+          self.updateText()
+          self.currentFile.show()
+          self.filename.show()
 
-        """
-        if self.selectedFile < len(self.files):
-            self.currentFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile]))
-            self.updateText()
-            self.currentFile.show()
-            self.filename.show()
-        else:
-            self.currentFile.clearTexture()
-            self.currentFile.hide()
-            self.filename.hide()
-        """
+          """
+          if self.selectedFile < len(self.files):
+              self.currentFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile]))
+              self.updateText()
+              self.currentFile.show()
+              self.filename.show()
+          else:
+              self.currentFile.clearTexture()
+              self.currentFile.hide()
+              self.filename.hide()
+          """
 
-        if self.selectedFile + 1 < len(self.files):
-            self.nextFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile + 1]))
-            self.nextFile.show()
-        else:
-            self.nextFile.clearTexture()
-            self.nextFile.hide()
+          if self.selectedFile + 1 < len(self.files):
+              self.nextFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile + 1]))
+              self.nextFile.show()
+          else:
+              self.nextFile.clearTexture()
+              self.nextFile.hide()
 
         self.app.scene3d.redraw()
 
