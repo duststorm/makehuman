@@ -1,6 +1,7 @@
 # You may use, modify and redistribute this module under the terms of the GNU GPL3.0.
 """
 Translate a  morph target from a mesh with topology 1 to a mesh with topology 2
+The shape of old and new objs must be similar. We assume the new mesh is done using a retopology tool.
 
 ===========================  ==================================================================
 Project Name:                **MakeHuman**
@@ -19,6 +20,8 @@ from math import sqrt
 from aljabr import *
 import simpleoctree
 import sys
+import getopt
+import os
 
 
 
@@ -58,7 +61,7 @@ def loadVertsCoo(path):
 
 
 
-def tesselate(path, vertices):
+def tessellate(path, vertices):
     """
     This function make a very simple tesselation, based on verts only.
 
@@ -183,12 +186,33 @@ def loadTranslationTarget(vertsList, targetPath):
 
 
 
-def saveData(newMeshPath, oldMeshPath, dataPath):
+def saveData(objNewPath, objOldPath, dataPath):
+    """
+    This function link the old mesh to the new one.
+    It find, for each vert of the old mesh, one or more verts (max 7) on the new mesh,
+    that are the nearest to the input one. Then, each vert is saved on the data ascii file,
+    with its weight calculated in function of the distance from the input vert, as well.
+
+
+    Parameters
+    ----------
+
+    objNewPath:
+        *string*. The path of the new wavefront obj
+
+    objOldPath:
+        *string*. The path of the old wavefront obj
+
+    dataPath:
+        *string*. The path of data file to save
+
+    """
+    print "building data..."
 
     #We load the old mesh coords, and then tesselate it, in order
     #to have a better result in linking new mesh.
-    vertsList1 = loadVertsCoo(newMeshPath)
-    vertsList2 = tesselate(oldMeshPath, loadVertsCoo(oldMeshPath))
+    vertsList1 = loadVertsCoo(objNewPath)
+    vertsList2 = tessellate(objOldPath, loadVertsCoo(objOldPath))
 
     overwrite = 0 #Just for more elegant one-line print output progress
 
@@ -199,7 +223,7 @@ def saveData(newMeshPath, oldMeshPath, dataPath):
     try:
         fileDescriptor = open(dataPath, 'w')
     except:
-        print 'Unable to open %s', dataPath
+        print 'Unable to open %s'%(dataPath)
         return None
 
     #For each vert of new mesh we found the nearest verts of old one
@@ -262,26 +286,48 @@ def saveData(newMeshPath, oldMeshPath, dataPath):
 
 
     fileDescriptor.close()
+    print "Data saved in %s"%(dataPath)
 
 
 
 
-def translateMorph(objOldPath, targetOldPath, objNewPath, oldMeshPath, dataPath):
+def convertTargets(targetPath, objNewPath, objOldPath, dataPath):
+
+    """
+    This function load the old mesh verts, morph it and transfer the
+    deformations on the new mesh verts.
 
 
-    vertsOld1 = loadVertsCoo(objOldPath)
-    vertsNew = loadVertsCoo(objNewPath)
-    loadTranslationTarget(vertsOld1, targetOldPath)
-    vertsOld = tesselate(oldMeshPath, vertsOld1)
+    Parameters
+    ----------
+    targetPath:
+        *string*. The path of morph target to convert
 
+    objNewPath:
+        *string*. The path of the new wavefront obj
+
+    objOldPath:
+        *string*. The path of the old wavefront obj
+
+    dataPath:
+        *string*. The path of data file to save
+
+    """
+
+    #Load the old mesh, morph it and then tessellate
+    vertsOld = loadVertsCoo(objOldPath)    
+    loadTranslationTarget(vertsOld, targetPath)
+    vertsOldTessellated = tessellate(objOldPath, vertsOld)
+    vertsNew = loadVertsCoo(objNewPath)   
+    
     try:
         fileDescriptor = open(dataPath)
     except:
-        print 'Unable to open %s', dataPath
+        print 'Unable to open %s'%(dataPath)
         return
 
-    idx = 0
-    for line in fileDescriptor:
+    
+    for idx,line in enumerate(fileDescriptor):
         translationData = line.split()
 
         halfList = len(translationData)/2
@@ -295,32 +341,65 @@ def translateMorph(objOldPath, targetOldPath, objNewPath, oldMeshPath, dataPath)
         for i in range(len(xIdx)):
             index = int(xIdx[i])
             weight = float(xWeight[i])
-
-            vertOld = vmul(vertsOld[index],weight)
+            vertOld = vmul(vertsOldTessellated[index],weight)
             xSum = vadd(xSum,vertOld)
 
-            if idx == 9030:
-                print "weight", weight
-                print "vert old", vertsOld[index]
-
         vertsNew[idx] = vmul(xSum,1.0/sumWeight)
-        idx += 1
+        
     fileDescriptor.close()
     return vertsNew
 
 
 
 
-def saveTranslationTarget(objPath, targetPath, targetVerts, epsilon=0.001):
+def saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon=0.001):
+
+    """
+    This function call the main functions in order to convert the morphing.
+    Then save the target in our standard format.
 
 
-    originalVerts = loadVertsCoo(objPath)
+    Parameters
+    ----------
+    oldTargetPath:
+        *string*. The path of old morph target to convert    
+
+    objNewPath:
+        *string*. The path of the new wavefront obj
+
+    objOldPath:
+        *string*. The path of the old wavefront obj
+
+    dataPath:
+        *string*. The path of data file to save
+
+    epsilon:
+        *float*. The threshold to decide when consider or not a modification as
+        morph to be saved.
+
+    """
+    
+
+    #modified verts are the verts of new mesh, modified by the morphing
+    modifiedVerts = convertTargets(oldTargetPath, objNewPath, objOldPath, dataPath)
+
+    #original verts are the verts of new mesh, unmodified.
+    originalVerts = loadVertsCoo(objNewPath)
+
+    convertDirectory = os.path.join(os.path.dirname(oldTargetPath), "converted")
+    if not os.path.isdir(convertDirectory):
+        os.mkdir(convertDirectory)
+    newTargetPath = os.path.join(convertDirectory, os.path.basename(oldTargetPath))
+
+    print "Conversion of %s, from %s to %s"%(oldTargetPath,objOldPath,objNewPath)
+    print "Using datafile %s"%(dataPath)
+    print "Saved target as %s"%(newTargetPath)
+    
     modifiedVertsIndices = []
     nVertsExported = 0
-    for i in range(len(targetVerts)):
-
+    for i in range(len(modifiedVerts)):
         originalVertex = originalVerts[i]
-        targetVertex = targetVerts[i]
+        targetVertex = modifiedVerts[i]
 
         delta = vsub(targetVertex, originalVertex)
         dist = vdist(originalVertex, targetVertex)
@@ -330,9 +409,9 @@ def saveTranslationTarget(objPath, targetPath, targetVerts, epsilon=0.001):
             dataToExport = [i, delta[0], delta[1], delta[2]]
             modifiedVertsIndices.append(dataToExport)
     try:
-        fileDescriptor = open(targetPath, 'w')
+        fileDescriptor = open(newTargetPath, 'w')
     except:
-        print 'Unable to open %s', targetPath
+        print 'Unable to open %s'%(targetPath)
         return None
 
     for data in modifiedVertsIndices:
@@ -342,23 +421,50 @@ def saveTranslationTarget(objPath, targetPath, targetVerts, epsilon=0.001):
     print 'Exported %d verts '%(nVertsExported)
 
 
+#saveData("baseNew.obj", "baseOld.obj", "diff.data")
+#saveConvertedTarget("test.target", "baseNew.obj", "baseOld.obj", "diff.data")
+#saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon=0.001)
+
+def usage():
+    print "Usage: " + sys.argv[0] + " [options] target outputfile"
 
 
+def main(argv):
+
+    target = "test.target"
+    oldbase = "baseOld.obj"
+    newbase = "baseNew.obj"    
+    datafile = "diff.data"
+    buildit = None
+
+    #handle options
+    try:
+        opts, args = getopt.getopt(argv, "hbt:o:n:d:", ["help","build","target=","oldbase=","newbase=","datafile="])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            usage()
+            sys.exit()        
+        elif opt in ("-t", "--target"):
+            target = arg
+        elif opt in ("-o", "--oldbase"):
+            oldbase = arg
+        elif opt in ("-n", "--newbase"):
+            newbase = arg
+        elif opt in ("-d", "--datafile"):
+            datafile = arg
+        elif opt in ("-b", "--build"):
+            buildit = 1           
+            
+
+    if buildit:
+        saveData(newbase, oldbase, datafile)
+    else:
+        saveConvertedTarget(target, newbase, oldbase, datafile)
 
 
-
-
-
-
-
-
-
-saveData("baseNew.obj", "baseOld.obj", "diff.data")
-
-
-vertsToSave = translateMorph("baseOld.obj", "test.target", "baseNew.obj","baseOld.obj", "diff.data")
-saveTranslationTarget("baseNew.obj", "result.target", vertsToSave, epsilon=0.001)
-
-
-
+if __name__ == "__main__":
+    main(sys.argv[1:])
 
