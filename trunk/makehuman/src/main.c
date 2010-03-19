@@ -602,11 +602,11 @@ int main(int argc, char *argv[])
 #if defined(__GNUC__) && defined(__WIN32__)
     PyRun_SimpleString("import sys\nfo = open(\"python_out.txt\", \"w\")\nsys.stdout = fo");
     PyRun_SimpleString("import sys\nfe = open(\"python_err.txt\", \"w\")\nsys.stderr = fe");
-    err = PyRun_SimpleString("execfile(\"main.py\")");
+    err = PyRun_SimpleString(str);
     PyRun_SimpleString("fo.close()");
     PyRun_SimpleString("fe.close()");
 #else
-    err = PyRun_SimpleString("execfile(\"main.py\")");
+    err = PyRun_SimpleString(str);
 #endif /* defined(__GNUC__) && defined(__WIN32__) */
 
     if (err != 0)
