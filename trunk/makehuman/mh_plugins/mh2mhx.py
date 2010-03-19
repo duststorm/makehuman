@@ -166,8 +166,8 @@ def copyFile25(obj, tmplName, rig, fp):
 				fp.write("    roll %.6g ;\n" % (y))
 			elif lineSplit[1] == 'gobo-bones':
 				gobo_bones.writeArmature(fp)
-			elif lineSplit[1] == 'gobo-extra-poses':
-				gobo_bones.writeExtraPoses(fp)
+			elif lineSplit[1] == 'gobo-poses':
+				gobo_bones.writePoses(fp)
 			elif lineSplit[1] == 'gobo-actions':
 				gobo_bones.writeActions(fp)
 			elif lineSplit[1] == 'gobo-constraint-drivers':
