@@ -58,10 +58,41 @@ def loadVertsCoo(path):
     fileDescriptor.close()
 
     return verts
+    
+    
+def loadFacesIndices(path):
+    """
+    This function serves as a small utility function to load just the  face indices
+    data from a WaveFront object file.
 
+    Parameters
+    ----------
 
+    path:
+        *string*. The file system path to the file to be read.
 
-def tessellate(path, vertices):
+    """
+    try:
+        fileDescriptor = open(path)
+    except:
+        print 'Error opening %s file' % path
+        return
+
+    faces = []
+    for data in fileDescriptor:
+        lineData = data.split()
+        if lineData[0] == 'f':
+            face = []
+            for faceData in lineData[1:]:
+                vInfo = faceData.split('/')
+                vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
+                face.append(vIdx)
+            faces.append(face)
+    fileDescriptor.close()
+    return faces
+    
+
+def tessellate(faces, vertices):
     """
     This function make a very simple tesselation, based on verts only.
 
@@ -80,26 +111,8 @@ def tessellate(path, vertices):
 
     """
 
-    try:
-        fileDescriptor = open(path)
-    except:
-        print 'Error opening %s file' % path
-        return
-
-    faces = []
-    for data in fileDescriptor:
-        lineData = data.split()
-
-        if lineData[0] == 'f':
-            face = []
-            for faceData in lineData[1:]:
-                vInfo = faceData.split('/')
-                vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
-                face.append(vIdx)
-            faces.append(face)
-    fileDescriptor.close()
-
     subdividedVerts = []
+    subdividedFaces = []
     for face in faces:
         centroidVerts = []
         if len(face) == 4:
@@ -113,7 +126,7 @@ def tessellate(path, vertices):
             newVert4 = centroid([vertices[i3],vertices[i0]])
             newVert5 = centroid([newVert1,newVert2,newVert3,newVert4])
             newVert6 = centroid([vertices[i0],newVert1,newVert5,newVert4])
-            newVert7 = centroid([newVert1,vertices[i1],newVert5,newVert1])
+            newVert7 = centroid([newVert1,vertices[i1],newVert2,newVert5])
             newVert8 = centroid([newVert5,newVert2,vertices[i2],newVert3])
             newVert9 = centroid([newVert4,newVert5,newVert3,vertices[i3]])
             newVert10 = centroid([vertices[i0],vertices[i1],newVert5])
@@ -211,8 +224,8 @@ def saveData(objNewPath, objOldPath, dataPath):
 
     #We load the old mesh coords, and then tesselate it, in order
     #to have a better result in linking new mesh.
-    vertsList1 = loadVertsCoo(objNewPath)
-    vertsList2 = tessellate(objOldPath, loadVertsCoo(objOldPath))
+    vertsList1 = loadVertsCoo(objNewPath)   
+    vertsList2 = tessellate(loadFacesIndices(objOldPath), loadVertsCoo(objOldPath))
 
     overwrite = 0 #Just for more elegant one-line print output progress
 
@@ -317,7 +330,7 @@ def convertTargets(targetPath, objNewPath, objOldPath, dataPath):
     #Load the old mesh, morph it and then tessellate
     vertsOld = loadVertsCoo(objOldPath)    
     loadTranslationTarget(vertsOld, targetPath)
-    vertsOldTessellated = tessellate(objOldPath, vertsOld)
+    vertsOldTessellated = tessellate(loadFacesIndices(objOldPath), vertsOld)
     vertsNew = loadVertsCoo(objNewPath)   
     
     try:
@@ -384,7 +397,7 @@ def saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon
     modifiedVerts = convertTargets(oldTargetPath, objNewPath, objOldPath, dataPath)
 
     #original verts are the verts of new mesh, unmodified.
-    originalVerts = loadVertsCoo(objNewPath)
+    originalVerts = loadVertsCoo(objNewPath)  
 
     convertDirectory = os.path.join(os.path.dirname(oldTargetPath), "converted")
     if not os.path.isdir(convertDirectory):
@@ -399,11 +412,9 @@ def saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon
     nVertsExported = 0
     for i in range(len(modifiedVerts)):
         originalVertex = originalVerts[i]
-        targetVertex = modifiedVerts[i]
-
-        delta = vsub(targetVertex, originalVertex)
+        targetVertex = modifiedVerts[i]       
+        delta = vsub(targetVertex, originalVertex)       
         dist = vdist(originalVertex, targetVertex)
-
         if dist > epsilon:
             nVertsExported += 1
             dataToExport = [i, delta[0], delta[1], delta[2]]
@@ -425,8 +436,32 @@ def saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon
 #saveConvertedTarget("test.target", "baseNew.obj", "baseOld.obj", "diff.data")
 #saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon=0.001)
 
-def usage():
-    print "Usage: " + sys.argv[0] + " [options] target outputfile"
+def usage():    
+    print""
+    print"NAME"
+    print"    %s: a program to translate a  morph target from"%(sys.argv[0])
+    print"    a mesh with topology 1 to a mesh with topology 2"
+    print"    The shape of old and new objs must be similar."
+    print"    We assume the new mesh is done using a retopology tool."
+    print""
+    print"SYNOPSIS"
+    print"    %s [options]"%(sys.argv[0])
+    print""
+    print"OPTIONS:"
+    print"    --build; -b; build the database to be used in conversion"
+    print"    --target; -t; to specify the target file to convert"
+    print"    --oldbase; -o; to specify the old base wavefront obj"
+    print"    --newbase; -n; to specify the new base wavefront obj"
+    print"    --help: -h; what you're looking at right now."
+    print""
+    print"AUTHOR:"
+    print"    Manuel Bastioni(info@makehuman.org)"
+    print""
+    print"SEE ALSO:"
+    print"    MakeHuman web page:"
+    print"    http://www.makehuman.org"
+    print""        
+    exit()
 
 
 def main(argv):
