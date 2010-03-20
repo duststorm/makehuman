@@ -193,7 +193,6 @@ class ExportTaskView(gui3d.TaskView):
             elif self.collada.selected:
                 mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
 
-            #TODO: manuel or marc, maybe add exortasCurves into mh2obj instead of hair.py? 
             if len(filename)> 0 and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
                if self.hairMesh.selected:
                   mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj,exportPath+"/hair_"+filename+".obj")
