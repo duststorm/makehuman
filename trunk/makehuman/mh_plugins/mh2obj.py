@@ -108,3 +108,29 @@ def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True):
     f.write('Ns 50.0\n')
     if not (obj.texture==None): f.write('map_Kd -clamp on ' + obj.texture + '\n')
     f.close()
+    
+def exportAsCurves(file, guideGroups):
+  DEG_ORDER_U = 3
+  # use negative indices
+  for group in guideGroups:
+    for guide in group.guides:
+      N = len(guide.controlPoints)
+      for i in xrange(0,N):
+        file.write('v %.6f %.6f %.6f\n' % (guide.controlPoints[i][0], guide.controlPoints[i][1],\
+                                           guide.controlPoints[i][2]))
+      name = group.name+"_"+guide.name 
+      file.write('g %s\n' % name)
+      file.write('cstype bspline\n') # not ideal, hard coded
+      file.write('deg %d\n' % DEG_ORDER_U) # not used for curves but most files have it still
+
+      curve_ls = [-(i+1) for i in xrange(N)]
+      file.write('curv 0.0 1.0 %s\n' % (' '.join( [str(i) for i in curve_ls] ))) # hair  has no U and V values for the curve
+
+      # 'parm' keyword
+      tot_parm = (DEG_ORDER_U + 1) + N
+      tot_parm_div = float(tot_parm-1)
+      parm_ls = [(i/tot_parm_div) for i in xrange(tot_parm)]
+      #our hairs dont do endpoints.. *sigh*
+      file.write('parm u %s\n' % ' '.join( [str(i) for i in parm_ls] ))
+
+      file.write('end\n')

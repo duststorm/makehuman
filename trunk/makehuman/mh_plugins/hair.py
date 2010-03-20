@@ -41,49 +41,8 @@ class HairTaskView(gui3d.TaskView):
     self.saveAsCurves = True
     self.widthFactor = 1.0
     self.Delta=None
- 
-    #filename textbox
-    self.TextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/backgroundedit.obj',\
-                       texture = category.app.getThemeResource("images", "texedit_off.png"),\
-                       focusedTexture=category.app.getThemeResource("images", "texedit_on.png"), position=[20, 480, 9])
-    self.TextEdit.setText('saved_hair.obj')
-    self.refVector=None #reference vector used for fast updating of hair (e.g. when base model only changes height or age)
-    #Save Button
-    self.Button = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj',\
-                    texture=category.app.getThemeResource("images", "button_save_file.png"),\
-                    selectedTexture=None, position=[470, 490, 9])
-    #self.Button.button.setScale(1.0,5.0)
     
-    #.obj save type Radiobuttons
-    self.RadioButtonGroup = []
-    self.RadioButton1 = gui3d.RadioButton(self, self.RadioButtonGroup, mesh='data/3dobjs/slider_cursor.obj',\
-                          texture=category.app.getThemeResource('images','slider.png'),\
-                          selectedTexture=category.app.getThemeResource('images', 'slider_focused.png'),\
-                          position=[200,510, 9], selected=True)  # We make the first one selected
-    self.RadioButtonLabel1 = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[220, 520, 9])
-    self.RadioButtonLabel1.setText('Save hairs to Wavefront .obj as Curves')
-    self.RadioButton2 = gui3d.RadioButton(self, self.RadioButtonGroup, mesh='data/3dobjs/slider_cursor.obj',\
-                          texture=category.app.getThemeResource('images','slider.png'),\
-                          selectedTexture=category.app.getThemeResource('images', 'slider_focused.png'),\
-                          position=[200,530, 9])
-    self.RadioButtonLabel2 = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[220, 540, 9])
-    self.RadioButtonLabel2.setText('Save hairs to Wavefront .obj as Mesh')
-
-    @self.Button.event
-    def onClicked(event):
-      if len(self.TextEdit.text) >= 1 and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0: # and len(hairsClass.guideGroups)> 0:
-        modelPath = mh.getPath('models')
-        if not os.path.exists(modelPath): os.makedirs(modelPath)
-        if self.RadioButton1.selected:
-          hairsClass = hairgenerator.Hairgenerator()
-          hairsClass.humanVerts = self.app.scene3d.selectedHuman.mesh.verts
-          hairsClass.loadHairs(self.app.scene3d.selectedHuman.hairFile)
-          hairsClass.adjustGuides()
-          file = open(modelPath+"/"+self.TextEdit.text, 'w')
-          exportAsCurves(file, hairsClass.guideGroups)
-          file.close()
-        else:
-          exportObj(self.app.scene3d.selectedHuman.hairObj,modelPath+"/"+self.TextEdit.text)
+    self.refVector=None #reference vector used for fast updating of hair (e.g. when base model only changes height or age)
     
     @self.filechooser.event
     def onFileSelected(filename,update=1):
@@ -234,28 +193,3 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
       scn.update()
   return obj,refVector,Delta
               
-def exportAsCurves(file, guideGroups):
-  DEG_ORDER_U = 3
-  # use negative indices
-  for group in guideGroups:
-    for guide in group.guides:
-      N = len(guide.controlPoints)
-      for i in xrange(0,N):
-        file.write('v %.6f %.6f %.6f\n' % (guide.controlPoints[i][0], guide.controlPoints[i][1],\
-                                           guide.controlPoints[i][2]))
-      name = group.name+"_"+guide.name 
-      file.write('g %s\n' % name)
-      file.write('cstype bspline\n') # not ideal, hard coded
-      file.write('deg %d\n' % DEG_ORDER_U) # not used for curves but most files have it still
-
-      curve_ls = [-(i+1) for i in xrange(N)]
-      file.write('curv 0.0 1.0 %s\n' % (' '.join( [str(i) for i in curve_ls] ))) # hair  has no U and V values for the curve
-
-      # 'parm' keyword
-      tot_parm = (DEG_ORDER_U + 1) + N
-      tot_parm_div = float(tot_parm-1)
-      parm_ls = [(i/tot_parm_div) for i in xrange(tot_parm)]
-      #our hairs dont do endpoints.. *sigh*
-      file.write('parm u %s\n' % ' '.join( [str(i) for i in parm_ls] ))
-
-      file.write('end\n')

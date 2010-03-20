@@ -33,6 +33,8 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
+#from hair import exportAsCurves
+#import hair
 import mh
 import files3d
 import animation3d
@@ -44,7 +46,7 @@ import mh2bvh
 import mh2mhx
 import mh2collada
 import humanmodifier
-
+import hairgenerator
 
 class SaveTaskView(gui3d.TaskView):
 
@@ -151,6 +153,8 @@ class ExportTaskView(gui3d.TaskView):
 
         self.exportBodyGroup = []
         self.exportHairGroup = []
+        
+        #### BODY EXPORT #######
         self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                               'button_export_obj.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_obj_on.png'), position=[33, 140,
                                               9.2], selected=True)
@@ -158,13 +162,22 @@ class ExportTaskView(gui3d.TaskView):
                                      ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 140, 9.2])
         self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                          'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 140, 9.2])
-
+                                         
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 160, 9.2], selected=True)
                                                  
         self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[68, 160, 9.2], selected=True)
 
+        ####### HAIR EXPORT ###################
+        self.hairMesh = gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images',\
+                         'hair_export_mesh_off.png'), selectedTexture=self.app.getThemeResource('images', 'hair_export_mesh_on.png'),\
+                         position=[68, 220, 9.2], selected=True)
+
+        gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images',\
+                         'hair_export_curves_off.png'), selectedTexture=self.app.getThemeResource('images', 'hair_export_curves_on.png'),\
+                         position=[68, 240, 9.2])
+        
         @self.fileentry.event
         def onFileSelected(filename):
             exportPath = mh.getPath('exports')
@@ -179,6 +192,19 @@ class ExportTaskView(gui3d.TaskView):
                 mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".mhx")
             elif self.collada.selected:
                 mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
+
+            #TODO: manuel or marc, maybe add exortasCurves into mh2obj instead of hair.py? 
+            if len(filename)> 0 and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
+               if self.hairMesh.selected:
+                  mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj,exportPath+"/hair_"+filename+".obj")
+               else:
+                  hairsClass = hairgenerator.Hairgenerator()
+                  hairsClass.humanVerts = self.app.scene3d.selectedHuman.mesh.verts
+                  hairsClass.loadHairs(self.app.scene3d.selectedHuman.hairFile)
+                  hairsClass.adjustGuides()
+                  file = open(exportPath+"/hair_"+filename + ".obj", 'w')
+                  mh2obj.exportAsCurves(file, hairsClass.guideGroups)
+                  file.close()
 
             self.app.switchCategory('Modelling')
             self.app.scene3d.redraw(1)
