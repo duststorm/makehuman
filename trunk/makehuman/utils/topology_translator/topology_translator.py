@@ -90,6 +90,12 @@ def loadFacesIndices(path):
             faces.append(face)
     fileDescriptor.close()
     return faces
+
+def subdivideObj(faces, vertices, loops):  
+    for n in range(loops):        
+        faces,vertices = tessellate(faces, vertices)
+    return (faces,vertices)
+    
     
 
 def tessellate(faces, vertices):
@@ -113,8 +119,12 @@ def tessellate(faces, vertices):
 
     subdividedVerts = []
     subdividedFaces = []
+    
+    idx = len(vertices)-1
+    vertsUsed = {}
     for face in faces:
         centroidVerts = []
+        
         if len(face) == 4:
             i0 = face[0]
             i1 = face[1]
@@ -125,37 +135,149 @@ def tessellate(faces, vertices):
             newVert3 = centroid([vertices[i2],vertices[i3]])
             newVert4 = centroid([vertices[i3],vertices[i0]])
             newVert5 = centroid([newVert1,newVert2,newVert3,newVert4])
-            newVert6 = centroid([vertices[i0],newVert1,newVert5,newVert4])
-            newVert7 = centroid([newVert1,vertices[i1],newVert2,newVert5])
-            newVert8 = centroid([newVert5,newVert2,vertices[i2],newVert3])
-            newVert9 = centroid([newVert4,newVert5,newVert3,vertices[i3]])
-            newVert10 = centroid([vertices[i0],vertices[i1],newVert5])
-            newVert11 = centroid([vertices[i1],vertices[i2],newVert5])
-            newVert12 = centroid([vertices[i2],vertices[i3],newVert5])
-            newVert13 = centroid([vertices[i3],vertices[i0],newVert5])
-            subdividedVerts.extend([newVert5,newVert6,newVert7,newVert8,newVert9,newVert10,newVert11,newVert12,newVert13])
+      
+
+            k1 = [i0,i1]
+            k2 = [i1,i2]
+            k3 = [i2,i3]
+            k4 = [i3,i0]
+            k5 = [i0,i1,i2,i3]
+
+            k1.sort()
+            k2.sort()
+            k3.sort()
+            k4.sort()
+            k5.sort()
+            
+            key1 = str(k1)
+            key2 = str(k2)
+            key3 = str(k3)
+            key4 = str(k4)
+            key5 = str(k5)                          
+      
+            
+            if not vertsUsed.has_key(key1):
+                idx += 1
+                vertsUsed[key1] = idx
+                subdividedVerts.append(newVert1)
+                n1 = idx                
+            else:
+                n1 = vertsUsed[key1]
+                
+            if not vertsUsed.has_key(key2):
+                idx += 1
+                vertsUsed[key2] = idx
+                subdividedVerts.append(newVert2)
+                n2 = idx                
+            else:
+                n2 = vertsUsed[key2]
+                
+            if not vertsUsed.has_key(key3):
+                idx += 1
+                vertsUsed[key3] = idx
+                subdividedVerts.append(newVert3)
+                n3 = idx                
+            else:
+                n3 = vertsUsed[key3]
+                
+            if not vertsUsed.has_key(key4):
+                idx += 1
+                vertsUsed[key4] = idx
+                subdividedVerts.append(newVert4)
+                n4 = idx                
+            else:
+                n4 = vertsUsed[key4]
+                
+            if not vertsUsed.has_key(key5):
+                idx += 1
+                vertsUsed[key5] = idx
+                subdividedVerts.append(newVert5)
+                n5 = idx                
+            else:
+                n5 = vertsUsed[key5]     
+                
+            newFace1 = [i0,n1,n5,n4]
+            newFace2 = [n1,i1,n2,n5]
+            newFace3 = [n5,n2,i2,n3]
+            newFace4 = [n5,n3,i3,n4]
+
+            
+            
+            subdividedFaces.extend([newFace1,newFace2,newFace3,newFace4])            
+         
         elif len(face) == 3:
             i0 = face[0]
             i1 = face[1]
             i2 = face[2]
+            
             newVert1 = centroid([vertices[i0],vertices[i1]])
             newVert2 = centroid([vertices[i1],vertices[i2]])
             newVert3 = centroid([vertices[i2],vertices[i0]])
             newVert4 = centroid([newVert1,newVert2,newVert3])
-            newVert5 = centroid([vertices[i0],newVert1,newVert4,newVert3])
-            newVert6 = centroid([newVert1,vertices[i1],newVert2,newVert4])
-            newVert7 = centroid([newVert2,vertices[i2],newVert3,newVert4])
-            newVert8 = centroid([vertices[i0],vertices[i1],newVert4])
-            newVert9 = centroid([vertices[i1],vertices[i2],newVert4])
-            newVert10 = centroid([vertices[i2],vertices[i0],newVert4])
-            subdividedVerts.extend([newVert4,newVert5,newVert6,newVert7,newVert8,newVert9,newVert10])
 
+            #Create an unique ID of each new vert, using a sorted list of
+            #vert indices used to calculate it.
+            k1 = [i0,i1]
+            k2 = [i1,i2]
+            k3 = [i2,i0]
+            k4 = [i0,i1,i2]
+            k1.sort()
+            k2.sort()
+            k3.sort()
+            k4.sort()            
+            key1 = str(k1)
+            key2 = str(k2)
+            key3 = str(k3)
+            key4 = str(k4)   
+            
 
+            
+            if not vertsUsed.has_key(key1):
+                idx += 1
+                vertsUsed[key1] = idx
+                subdividedVerts.append(newVert1)
+                n1 = idx                
+            else:
+                n1 = vertsUsed[key1]
+                
+            if not vertsUsed.has_key(key2):
+                idx += 1
+                vertsUsed[key2] = idx
+                subdividedVerts.append(newVert2)
+                n2 = idx                
+            else:
+                n2 = vertsUsed[key2]
+                
+            if not vertsUsed.has_key(key3):
+                idx += 1
+                vertsUsed[key3] = idx
+                subdividedVerts.append(newVert3)
+                n3 = idx                
+            else:
+                n3 = vertsUsed[key3]
+                
+            if not vertsUsed.has_key(key4):
+                idx += 1
+                vertsUsed[key4] = idx
+                subdividedVerts.append(newVert4)
+                n4 = idx                
+            else:
+                n4 = vertsUsed[key4]
+                
+            newFace1 = [i0,n1,n4]
+            newFace2 = [n1,i1,n4]
+            newFace3 = [i1,n2,n4]
+            newFace4 = [n2,i2,n4]
+            newFace5 = [i2,n3,n4]
+            newFace6 = [n3,i0,n4]
+            subdividedFaces.extend([newFace1,newFace2,newFace3,newFace4,newFace5,newFace6])     
+    
     finalVertList = vertices + subdividedVerts
+    finalFacesList = subdividedFaces
     print "ORIGINAL VERTS: %i"%(len(vertices))
     print "VERTS ADDED BY SUBDIVISION: %i"%(len(subdividedVerts))
-    return finalVertList
-
+    print "TOTAL VERTICES ADDED %i"%len(finalVertList)
+    return (finalFacesList, finalVertList)
 
 
 def loadTranslationTarget(vertsList, targetPath):
@@ -224,9 +346,14 @@ def saveData(objNewPath, objOldPath, dataPath):
 
     #We load the old mesh coords, and then tesselate it, in order
     #to have a better result in linking new mesh.
-    vertsList1 = loadVertsCoo(objNewPath)   
-    vertsList2 = tessellate(loadFacesIndices(objOldPath), loadVertsCoo(objOldPath))
+    vertsList1 = loadVertsCoo(objNewPath)
+    vertices = loadVertsCoo(objOldPath)
+    faces = loadFacesIndices(objOldPath)  
+    tess = subdivideObj(faces, vertices, 2)
+    vertsList2 = tess[1]
 
+    #saveTestObj(tess[0], tess[1], "foo1.obj")
+    
     overwrite = 0 #Just for more elegant one-line print output progress
 
     for i,v in enumerate(vertsList2):
@@ -328,9 +455,14 @@ def convertTargets(targetPath, objNewPath, objOldPath, dataPath):
     """
 
     #Load the old mesh, morph it and then tessellate
-    vertsOld = loadVertsCoo(objOldPath)    
+    vertsOld = loadVertsCoo(objOldPath)
+    facesOld = loadFacesIndices(objOldPath)
+    #morph 
     loadTranslationTarget(vertsOld, targetPath)
-    vertsOldTessellated = tessellate(loadFacesIndices(objOldPath), vertsOld)
+    #tesselate    
+    tess = subdivideObj(facesOld, vertsOld, 2)  
+    vertsOldTessellated = tess[1]
+    
     vertsNew = loadVertsCoo(objNewPath)   
     
     try:
@@ -361,6 +493,40 @@ def convertTargets(targetPath, objNewPath, objOldPath, dataPath):
         
     fileDescriptor.close()
     return vertsNew
+
+
+
+def saveTestObj(faces, verts, objTestPath):
+
+    """
+    This function load the old mesh verts, morph it and transfer the
+    deformations on the new mesh verts.
+
+
+    Parameters
+    ----------
+
+
+    """
+
+    try:
+        fileDescriptor = open(objTestPath, 'w')
+    except:
+        print 'Unable to open %s'%(objTestPath)
+        return
+    
+    for v in verts:
+        fileDescriptor.write('v %f %f %f\n' % (v[0], v[1], v[2]))
+    for f in faces:
+        if len(f) == 4:
+            fileDescriptor.write('f %i %i %i %i\n' % (f[0]+1, f[1]+1, f[2]+1, f[3]+1))
+        if len(f) == 3:
+            fileDescriptor.write('f %i %i %i\n' % (f[0]+1, f[1]+1, f[2]+1))
+    print "Saved a test obj in %s"%(objTestPath)
+        
+    fileDescriptor.close()
+
+
 
 
 
@@ -455,7 +621,7 @@ def usage():
     print"    --help: -h; what you're looking at right now."
     print""
     print"AUTHOR:"
-    print"    Manuel Bastioni(info@makehuman.org)"
+    print"    Manuel Bastioni (info@makehuman.org)"
     print""
     print"SEE ALSO:"
     print"    MakeHuman web page:"
@@ -471,10 +637,11 @@ def main(argv):
     newbase = "baseNew.obj"    
     datafile = "diff.data"
     buildit = None
+    testobj = None
 
     #handle options
     try:
-        opts, args = getopt.getopt(argv, "hbt:o:n:d:", ["help","build","target=","oldbase=","newbase=","datafile="])
+        opts, args = getopt.getopt(argv, "hbt:o:n:d:w:", ["help","build","target=","oldbase=","newbase=","datafile=","testobj="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -491,13 +658,21 @@ def main(argv):
         elif opt in ("-d", "--datafile"):
             datafile = arg
         elif opt in ("-b", "--build"):
-            buildit = 1           
+            buildit = 1
+        elif opt in ("-w", "--testobj"):
+            testobj = arg 
             
 
     if buildit:
         saveData(newbase, oldbase, datafile)
+    elif testobj:
+        vertices = loadVertsCoo(testobj)
+        faces = loadFacesIndices(testobj)  
+        tess = subdivideObj(faces, vertices, 2)               
+        saveTestObj(tess[0], tess[1], testobj+".subdivided.obj")        
     else:
         saveConvertedTarget(target, newbase, oldbase, datafile)
+        
 
 
 if __name__ == "__main__":
