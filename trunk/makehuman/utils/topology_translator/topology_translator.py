@@ -22,6 +22,7 @@ import simpleoctree
 import sys
 import getopt
 import os
+import copy
 
 
 
@@ -280,7 +281,7 @@ def tessellate(faces, vertices):
     return (finalFacesList, finalVertList)
 
 
-def loadTranslationTarget(vertsList, targetPath):
+def applyMorph(vertsList, targetPath):
     """
     This function load and apply, with value 1, a morph target.
 
@@ -301,6 +302,7 @@ def loadTranslationTarget(vertsList, targetPath):
         changed by previously applied morphs.
 
     """
+    newVertsList = copy.deepcopy(vertsList)
     try:
         fileDescriptor = open(targetPath)
     except:
@@ -312,11 +314,11 @@ def loadTranslationTarget(vertsList, targetPath):
         if len(translationData) == 4:
             vertIndex = int(translationData[0])
             # Adding the translation vector
-            vertsList[vertIndex][0] += float(translationData[1])
-            vertsList[vertIndex][1] += float(translationData[2])
-            vertsList[vertIndex][2] += float(translationData[3])
+            newVertsList[vertIndex][0] = vertsList[vertIndex][0] + float(translationData[1])
+            newVertsList[vertIndex][1] = vertsList[vertIndex][1] + float(translationData[2])
+            newVertsList[vertIndex][2] = vertsList[vertIndex][2] + float(translationData[3])
     fileDescriptor.close()
-    return True
+    return newVertsList
 
 
 
@@ -455,13 +457,22 @@ def convertTargets(targetPath, objNewPath, objOldPath, dataPath):
     """
 
     #Load the old mesh, morph it and then tessellate
-    vertsOld = loadVertsCoo(objOldPath)
     facesOld = loadFacesIndices(objOldPath)
+    vertsOldBeforeMorph = loadVertsCoo(objOldPath)
+    
     #morph 
-    loadTranslationTarget(vertsOld, targetPath)
+    vertsOldAfterMorph = applyMorph(vertsOldBeforeMorph, targetPath)
     #tesselate    
-    tess = subdivideObj(facesOld, vertsOld, 2)  
-    vertsOldTessellated = tess[1]
+    tessBefore = subdivideObj(facesOld, vertsOldBeforeMorph, 2)
+    tessAfter = subdivideObj(facesOld, vertsOldAfterMorph, 2) 
+    vertsOldTessellatedBefore = tessBefore[1]
+    vertsOldTessellatedAfter = tessAfter[1]
+
+    #We need to consider only verts that get deformed by the morph
+    morphedVerts = set()
+    for i in range(len(vertsOldTessellatedBefore)):        
+        if vertsOldTessellatedBefore[i] != vertsOldTessellatedAfter[i]:
+            morphedVerts.add(i)     
     
     vertsNew = loadVertsCoo(objNewPath)   
     
@@ -476,20 +487,28 @@ def convertTargets(targetPath, objNewPath, objOldPath, dataPath):
         translationData = line.split()
 
         halfList = len(translationData)/2
+
+        #The first half of line are verts Indices
         xIdx = translationData[:halfList]
+        #The second half of line are verts weight
         xWeight = translationData[halfList:]
+        
         xSum = [0,0,0]
         sumWeight = 0
         for w in xWeight:
             sumWeight += float(w)
 
+        isMorphed = False
         for i in range(len(xIdx)):
             index = int(xIdx[i])
+            if index in morphedVerts:
+                isMorphed = True            
             weight = float(xWeight[i])
-            vertOld = vmul(vertsOldTessellated[index],weight)
+            vertOld = vmul(vertsOldTessellatedAfter[index],weight)
             xSum = vadd(xSum,vertOld)
 
-        vertsNew[idx] = vmul(xSum,1.0/sumWeight)
+        if isMorphed:
+            vertsNew[idx] = vmul(xSum,1.0/sumWeight)
         
     fileDescriptor.close()
     return vertsNew
@@ -525,10 +544,6 @@ def saveTestObj(faces, verts, objTestPath):
     print "Saved a test obj in %s"%(objTestPath)
         
     fileDescriptor.close()
-
-
-
-
 
 
 def saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon=0.001):
@@ -598,10 +613,6 @@ def saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon
     print 'Exported %d verts '%(nVertsExported)
 
 
-#saveData("baseNew.obj", "baseOld.obj", "diff.data")
-#saveConvertedTarget("test.target", "baseNew.obj", "baseOld.obj", "diff.data")
-#saveConvertedTarget(oldTargetPath, objNewPath, objOldPath, dataPath, epsilon=0.001)
-
 def usage():    
     print""
     print"NAME"
@@ -614,11 +625,12 @@ def usage():
     print"    %s [options]"%(sys.argv[0])
     print""
     print"OPTIONS:"
-    print"    --build; -b; build the database to be used in conversion"
-    print"    --target; -t; to specify the target file to convert"
-    print"    --oldbase; -o; to specify the old base wavefront obj"
-    print"    --newbase; -n; to specify the new base wavefront obj"
-    print"    --help: -h; what you're looking at right now."
+    print"    --build; build the database to be used in conversion (-b also available)"
+    print"    --target path; to specify the target file to convert (-t also available)"
+    print"    --oldbase path; to specify the old base wavefront obj (-o also available)"
+    print"    --newbase path; to specify the new base wavefront obj (-n also available)"
+    print"    --help; what you're looking at right now. (-h also available)"
+    print"    --testObj: path; Save a subdivided version of the obj passes as argument (-w also available)" 
     print""
     print"AUTHOR:"
     print"    Manuel Bastioni (info@makehuman.org)"
@@ -660,8 +672,7 @@ def main(argv):
         elif opt in ("-b", "--build"):
             buildit = 1
         elif opt in ("-w", "--testobj"):
-            testobj = arg 
-            
+            testobj = arg             
 
     if buildit:
         saveData(newbase, oldbase, datafile)
@@ -671,8 +682,7 @@ def main(argv):
         tess = subdivideObj(faces, vertices, 2)               
         saveTestObj(tess[0], tess[1], testobj+".subdivided.obj")        
     else:
-        saveConvertedTarget(target, newbase, oldbase, datafile)
-        
+        saveConvertedTarget(target, newbase, oldbase, datafile)        
 
 
 if __name__ == "__main__":
