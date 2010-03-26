@@ -72,7 +72,7 @@ def exportMhx_24(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
-"MHX 0 5 ;\n")
+"MHX 0 6 ;\n")
 
 	fp.write(
 "if Blender25\n"+
@@ -120,7 +120,7 @@ def exportMhx_25(obj, rig, fp):
 		copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
 		fp.write("end if\n")
 		fp.write("if toggle&T_Mesh\n")
-		#copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+		copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
 		fp.write("end if\n")
 	else:
 		mhxbones.setupBones(obj)
@@ -132,7 +132,7 @@ def exportMhx_25(obj, rig, fp):
 		copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
 		fp.write("end if\n")
 		fp.write("if toggle&T_Mesh\n")
-		#copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+		copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
 		fp.write("end if\n")
 	return
 
@@ -395,7 +395,9 @@ def copyMeshFile249(obj, tmpl, fp):
 			mainMesh = True
 			fp.write("if useMesh\n")
 		elif lineSplit[0] == 'vertgroup':
-			copyProxy("data/templates/vertexgroups24.mhx", fp, None)	
+			copyProxy("data/templates/vertexgroups-common25.mhx", fp, None)	
+			copyProxy("data/templates/vertexgroups-classic25.mhx", fp, None)	
+			copyProxy("data/templates/vertexgroups-toes25.mhx", fp, None)	
 			skipOne = True
 			skip = False
 		elif lineSplit[0] == 'v' and inZone:
@@ -445,7 +447,10 @@ def exportProxy24(obj, fp):
 					fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 				fp.write(" ;\n")
 		elif lineSplit[0] == 'vertgroup':
-			copyProxy("data/templates/vertexgroups24.mhx", fp, proxyVerts)	
+			copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
+			copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
+			copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	
+			# copyProxy("data/templates/vertexgroups24.mhx", fp, proxyVerts)	
 		elif lineSplit[0] == 'shapekey':
 			shpfp = open("data/templates/shapekeys24.mhx", "rU")
 			exportShapeKeys(obj, shpfp, fp, proxyVerts)

@@ -1245,25 +1245,55 @@ def postProcess():
 			
 
 	elif toggle & T_Armature:
+		armBones = ['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R']
 		if toggle & T_ArmIK:
-			setInfluence(['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R'], 1.0)
+			setInfluence(armBones, 'CopyRotIK', 1.0)
+			setInfluence(armBones, 'CopyRotFK', 0.0)
+		else:
+			setInfluence(armBones, 'CopyRotIK', 0.0)
+			setInfluence(armBones, 'CopyRotFK', 1.0)
+
+		legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
 		if toggle & T_LegIK:
-			setInfluence(['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R'], 1.0)
-		if toggle & T_FingerIK:
-			for i in range(5):
-				for j in range(3):
-					setInfluence(['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)], 1.0)
+			setInfluence(legBones, 'CopyRotIK', 1.0)
+			setInfluence(legBones, 'CopyRotFK', 0.0)
+		else:
+			setInfluence(legBones, 'CopyRotIK', 0.0)
+			setInfluence(legBones, 'CopyRotFK', 1.0)
+
+		for i in range(5):
+			for j in range(3):
+				bones = ['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)]
+				if toggle & T_FingerIK:
+					setInfluence(bones, 'CopyRotIK', 1.0)
+					setInfluence(bones, 'CopyRotFK', 0.0)
+				else:
+					setInfluence(bones, 'CopyRotIK', 0.0)
+					setInfluence(bones, 'CopyRotFK', 1.0)
+
+	try:
+		ob = loadedData['Object']['HumanProxy']
+		bpy.context.scene.objects.active = ob
+		bpy.ops.object.mode_set(mode='EDIT')
+		bpy.ops.mesh.normals_make_consistent(inside=False)
+		bpy.ops.object.mode_set(mode='OBJECT')
+	except:
+		pass
+
 	return
 
-def setInfluence(bones, w):
+def setInfluence(bones, cnsName, w):
 	ob = loadedData['Object']['HumanRig']
 	bpy.context.scene.objects.active = ob
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = ob.pose.bones	
 	for pb in pbones:
 		if pb.name in bones:
-			for cns in pb.constraints:
+			try:
+				cns = pb.constraints[cnsName]
 				cns.influence = w
+			except:
+				pass
 	bpy.ops.object.mode_set(mode='OBJECT')
 	return
 

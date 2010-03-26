@@ -1,5 +1,4 @@
 # MHX shapekeys for Blender 2.49 
-MHX 0 5 ;
 shapekey Basis 0.000000 0.000000 None 
     end shapekey
 shapekey BendElbowForward 0.000000 1.000000 None 

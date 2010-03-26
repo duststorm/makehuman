@@ -8,7 +8,7 @@ Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.5'
+__version__= '0.6'
 __bpydoc__= '''\
 MHX exporter for Blender
 '''
@@ -51,7 +51,7 @@ TexDir = os.path.expanduser("~/makehuman/exports")
 #
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 5
+MINOR_VERSION = 6
 
 #
 #	Button flags
@@ -802,7 +802,7 @@ def parseMesh (args, tokens):
 				f.mat = mat
 				f.smooth = smooth
 
-		elif key == 'vertgroup':
+		elif key == 'VertexGroup':
 			parseVertGroup(me, val, sub)
 		elif key == 'shapekey':
 			if doShape(val[0]):

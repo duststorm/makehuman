@@ -8,7 +8,7 @@ Tooltip: 'Export from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.4'
+__version__= '0.6'
 __bpydoc__= '''\
 MHX exporter for Blender
 '''
@@ -41,7 +41,7 @@ from Blender.Mathutils import *
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 5
+MINOR_VERSION = 6
 verbosity = 1
 Epsilon = 1e-6
 done = 0
@@ -165,7 +165,6 @@ def writeMhxBases():
 	print "Writing MHX material file " + fileName
 	fp = open(fileName, 'w')
 	fp.write("# MHX materials for Blender 2.49 \n")
-	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
 	fp.write("\n# --------------- Textures ----------------------------- # \n \n")
 	for tex in Texture.Get():
 		exportTexture(tex, fp)
@@ -186,7 +185,6 @@ def writeMhxBases():
 	print "Writing MHX meshes file " + fileName
 	fp = open(fileName, 'w')
 	fp.write("# MHX meshes for Blender 2.49 \n")
-	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
 
 	for ob in scn.objects:
 		if ob.type == "Mesh":
@@ -202,7 +200,6 @@ def writeMhxBases():
 	print "Writing MHX shapekey file " + fileName
 	fp = open(fileName, 'w')
 	fp.write("# MHX shapekeys for Blender 2.49 \n")
-	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
 
 	ob = Object.Get('Human')
 	me = ob.getData(False, True)
@@ -218,7 +215,6 @@ def writeMhxBases():
 	print "Writing MHX armature file " + fileName
 	fp = open(fileName, 'w')
 	fp.write("# MHX armatures for Blender 2.49 \n")
-	fp.write("MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION))
 
 	ob = Object.Get('HumanRig')
 	exportObject(ob, fp)
@@ -1079,14 +1075,14 @@ def exportMesh(ob, fp):
 		if save:	
 			try:
 				vgroup = me.getVertsFromGroup(g, True)
-				fp.write("vertgroup %s \n" % g1 )
+				fp.write("VertexGroup %s \n" % g1 )
 				for (v, w) in vgroup:
 					fp.write("  wv %i %f ;\n" % (v, w) )
-				fp.write("end vertgroup\n")
+				fp.write("end VertexGroup\n")
 			except:
 				pass
 	if verbosity > 1:		
-		print "Vertgroups saved"
+		print "VertexGroups saved"
 
 	# Shape keys
 	if not toggleMhxBase:
