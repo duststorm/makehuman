@@ -1,6 +1,3 @@
-					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	
 """ 
 **Project Name:**      MakeHuman
 
