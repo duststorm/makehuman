@@ -399,7 +399,6 @@ def parseAction(args, tokens):
 	act = ob.animation_data.action
 	act.name = name
 	loadedData['Action'][name] = act
-	print("Action", act, list(act.fcurves))
 	
 	for (key, val, sub) in tokens:
 		if key == 'FCurve':
@@ -444,9 +443,7 @@ def parseActionFCurve(act, args, tokens):
 		(bname1, channel1) = channelFromDataPath(fcu.data_path)
 		if bname1 == bname and fcu.array_index == index:
 			if channel1 == channel:
-				print("Hit", dataPath, index)
 				break
-	print("parse", fcu.data_path, fcu.array_index)
 
 	n = 0
 	for (key, val, sub) in tokens:
@@ -487,7 +484,7 @@ def parseADataFCurve(ob, adata, args, tokens):
 	words = dataPath.split('"')
 	bname = words[1]
 	index = int(args[1])
-	print("Fcurve ignored:", dataPath)
+	#print("Fcurve ignored:", dataPath)
 	return
 
 	for (key, val, sub) in tokens:
@@ -573,13 +570,10 @@ def parseTexture(args, tokens):
 	tex = bpy.data.textures.new(name)
 	typ = args[1]
 	tex.type = typ
-	print("RECASTING", tex, typ)
 	tex = tex.recast_type()
-	print("RECAST OK", tex, typ)
 	loadedData['Texture'][name] = tex
 	
 	for (key, val, sub) in tokens:
-		print("TEX", key, val)
 		if key == 'Image':
 			try:
 				imgName = val[0]
@@ -1040,15 +1034,17 @@ def parseVertColorData(args, tokens, data):
 #
 
 def parseVertexGroup(ob, me, args, tokens):
+	global toggle
 	if verbosity > 2:
 		print( "Parsing vertgroup %s" % args )
 	grpName = args[0]
-	group = ob.add_vertex_group(grpName)
-	group.name = grpName
-	loadedData['VertexGroup'][grpName] = group
-	for (key, val, sub) in tokens:
-		if key == 'wv':
-			ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
+	if (toggle & T_Armature) or (grpName in ['Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'Middle', 'Right', 'Scalp']):
+		group = ob.add_vertex_group(grpName)
+		group.name = grpName
+		loadedData['VertexGroup'][grpName] = group
+		for (key, val, sub) in tokens:
+			if key == 'wv':
+				ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
 
 
 #
@@ -1249,17 +1245,21 @@ def postProcess():
 		if toggle & T_ArmIK:
 			setInfluence(armBones, 'CopyRotIK', 1.0)
 			setInfluence(armBones, 'CopyRotFK', 0.0)
+			setInfluence(armBones, 'Const', 1.0)
 		else:
 			setInfluence(armBones, 'CopyRotIK', 0.0)
 			setInfluence(armBones, 'CopyRotFK', 1.0)
+			setInfluence(armBones, 'Const', 0.0)
 
 		legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
 		if toggle & T_LegIK:
 			setInfluence(legBones, 'CopyRotIK', 1.0)
 			setInfluence(legBones, 'CopyRotFK', 0.0)
+			setInfluence(legBones, 'Const', 1.0)
 		else:
 			setInfluence(legBones, 'CopyRotIK', 0.0)
 			setInfluence(legBones, 'CopyRotFK', 1.0)
+			setInfluence(legBones, 'Const', 0.0)
 
 		for i in range(5):
 			for j in range(3):
@@ -1267,9 +1267,11 @@ def postProcess():
 				if toggle & T_FingerIK:
 					setInfluence(bones, 'CopyRotIK', 1.0)
 					setInfluence(bones, 'CopyRotFK', 0.0)
+					setInfluence(bones, 'Const', 1.0)
 				else:
 					setInfluence(bones, 'CopyRotIK', 0.0)
 					setInfluence(bones, 'CopyRotFK', 1.0)
+					setInfluence(bones, 'Const', 0.0)
 
 	try:
 		ob = loadedData['Object']['HumanProxy']

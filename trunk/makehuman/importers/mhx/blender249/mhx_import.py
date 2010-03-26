@@ -858,10 +858,11 @@ def parseShapeKey(ob, me, args, tokens):
 
 def parseVertGroup(me, args, tokens):
 	grp = args[0]
-	me.addVertGroup(grp)
-	for (key, val, sub) in tokens:
-		if key == 'wv':
-			me.assignVertsToGroup(grp, [int(val[0])], float(val[1]), Mesh.AssignModes.REPLACE)
+	if (useArmature) or (grp in ['Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'Middle', 'Right', 'Scalp']):
+		me.addVertGroup(grp)
+		for (key, val, sub) in tokens:
+			if key == 'wv':
+				me.assignVertsToGroup(grp, [int(val[0])], float(val[1]), Mesh.AssignModes.REPLACE)
 
 #
 #	parseArmature (obName, args, tokens)
