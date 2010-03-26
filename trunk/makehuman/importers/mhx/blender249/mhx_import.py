@@ -67,6 +67,8 @@ toggleFace = 1
 toggleShape = 0
 toggleRot90 = 1
 useMesh = 1
+useArmature = 1
+useProxy = 1
 doSmash = 1
 warnedTextureDir = False
 Blender24 = True
@@ -1438,6 +1440,7 @@ def event(evt, val):
 def button_event(evt): 
 	global toggleArmIK, toggleLegIK, toggleFKIK, toggleFingerIK, toggleDispObs
 	global toggleReplace, toggleShape, toggleFace, toggleRot90
+	global useMesh, useArmature, useProxy
 	global TexDir
 	if evt == 1:
 		toggleShape = 1 - toggleShape
@@ -1449,6 +1452,12 @@ def button_event(evt):
 		toggleLegIK = 1 - toggleLegIK
 	elif evt == 13:
 		toggleFKIK = 1 - toggleFKIK
+	elif evt == 14:
+		useMesh = 1 - useMesh
+	elif evt == 15:
+		useArmature = 1 - useArmature
+	elif evt == 16:
+		useProxy = 1 - useProxy
 	elif evt == 3:
 		toggleFingerIK = 1 - toggleFingerIK
 	elif evt == 4:
@@ -1475,21 +1484,25 @@ def setTexDir(filepath):
 	return
 
 def gui():
-	global b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12
+	global b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15
 	global t1, t2, t3, t4
 
 	BGL.glClearColor(0,0,1,1)
 	BGL.glClear(BGL.GL_COLOR_BUFFER_BIT)
 	BGL.glColor3f(1,1,1)
 
-	BGL.glRasterPos2i(10,210)
+	BGL.glRasterPos2i(10,240)
 	t1 = Draw.Text("MHX (MakeHuman eXchange format) importer for Blender", "large")
-	BGL.glRasterPos2i(10,190)
+	BGL.glRasterPos2i(10,220)
 	t2 = Draw.Text("Version %d.%d" % (MAJOR_VERSION, MINOR_VERSION), "normal")
-	BGL.glRasterPos2i(10,170)
+	BGL.glRasterPos2i(10,200)
 	t3 = Draw.Text("Make sure that pydrivers.py is loaded", "large")
-	BGL.glRasterPos2i(10,150)
+	BGL.glRasterPos2i(10,180)
 	t4 = Draw.Text("Otherwise shape keys will not work", "normal")
+
+	b13 = Draw.Toggle("Mesh", 14, 10, 140, 90, 20, useMesh,"Use mesh")
+	b14 = Draw.Toggle("Armature", 15, 110, 140, 90, 20, useArmature,"Use armature")
+	b15 = Draw.Toggle("Proxy", 16, 210, 140, 90, 20, useProxy,"Use proxy")
 
 	b2 = Draw.Toggle("Body shapes", 1, 10, 110, 90, 20, toggleShape,"Load body shape keys")
 	b3 = Draw.Toggle("Facial shapes", 2, 110, 110, 90, 20, toggleFace,"Load facial shape keys")

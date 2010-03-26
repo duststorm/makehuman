@@ -1068,7 +1068,6 @@ def newSetupJoints (obj, joints, armature):
 	global boneHead, boneTail, locations
 	locations = {}
 	for (key, typ, data) in joints:
-		print(key, typ, data)
 		if typ == 'j':
 			loc = calcJointPos(obj, data)
 			locations[key] = loc
@@ -1078,7 +1077,6 @@ def newSetupJoints (obj, joints, armature):
 			locations[key] = obj.verts[v].co
 
 	for (key, typ, data) in joints:
-		#print(key, locations.keys())
 		if typ == 'j':
 			pass
 		elif typ == 'b':
@@ -1093,9 +1091,6 @@ def newSetupJoints (obj, joints, armature):
 			locations[key] = vadd(locations[joint], offs)
 		else:
 			raise NameError("Unknown %s" % typ)
-
-	for (key, val) in locations.items():
-		print("J", key, val)
 
 	boneHead = {}
 	boneTail = {}

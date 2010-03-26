@@ -62,10 +62,13 @@ T_DispObs = 0x10
 T_Replace = 0x20
 T_Face = 0x40
 T_Shape = 0x80
+T_Mesh = 0x100
+T_Armature = 0x200
+T_Proxy = 0x400
 
 T_Rigify = 0x1000
 
-toggle = T_Replace + T_ArmIK + T_LegIK 
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature
 
 theScale = 1.0
 useMesh = 1
@@ -248,6 +251,7 @@ def readMhxFile(filePath):
 
 	postProcess()
 	time2 = time.clock()
+	print("toggle = %x" % toggle)
 	msg = "File %s loaded in %g s" % (fileName, time2-time1)
 	if nErrors:
 		msg += " but there where %d errors. " % (nErrors)
@@ -1240,7 +1244,7 @@ def postProcess():
 			print("Rig changed", mod.object)
 			
 
-	else:
+	elif toggle & T_Armature:
 		if toggle & T_ArmIK:
 			setInfluence(['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R'], 1.0)
 		if toggle & T_LegIK:
@@ -1722,17 +1726,23 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	armik = BoolProperty(name="Arm IK", description="Use arm IK", default= False)
-	legik = BoolProperty(name="Leg IK", description="Use leg IK", default= False)
-	fkik = BoolProperty(name="FK/IK switch", description="Use FK/IK switching", default= False)
-	fingerik = BoolProperty(name="Finger IK", description="Use finger IK", default= False)
-	dispobs = BoolProperty(name="DispObs", description="Display objects", default= True)
-	replace = BoolProperty(name="Replace scene", description="Replace scene", default= True)
-	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default= True)
-	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default= False)
+	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
+	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
+	proxy = BoolProperty(name="Proxy", description="Use proxy object", default=toggle&T_Proxy)
+	armik = BoolProperty(name="Arm IK", description="Use arm IK", default=toggle&T_ArmIK)
+	legik = BoolProperty(name="Leg IK", description="Use leg IK", default=toggle&T_LegIK)
+	fkik = BoolProperty(name="FK/IK switch", description="Use FK/IK switching", default=toggle&T_FKIK)
+	fingerik = BoolProperty(name="Finger IK", description="Use finger IK", default=toggle&T_FingerIK)
+	dispobs = BoolProperty(name="DispObs", description="Display objects", default=toggle&T_DispObs)
+	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
+	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
+	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
 	
 	def execute(self, context):
 		global toggle
+		O_Mesh = T_Mesh if self.properties.mesh else 0
+		O_Armature = T_Armature if self.properties.armature else 0
+		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_ArmIK = T_ArmIK if self.properties.armik else 0
 		O_LegIK = T_LegIK if self.properties.legik else 0
 		O_FKIK = T_FKIK if self.properties.armik else 0
@@ -1741,7 +1751,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
-		toggle =  O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs | O_Replace | O_Face | O_Shape 
+		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs | O_Replace | O_Face | O_Shape 
 		readMhxFile(self.properties.path)
 		return {'FINISHED'}
 
@@ -1759,13 +1769,14 @@ bpy.types.INFO_MT_file_import.append(menu_func)
 #
 """
 theScale = 1.0
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Face
-toggle = T_Replace 
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Proxy + T_Face + T_Mesh + T_Armature
+toggle = T_Replace + T_Proxy + T_Armature 
 #readMhxFile("/home/thomas/makehuman/exports/foo-classic-25.mhx")
 readMhxFile("/home/thomas/makehuman/exports/foo-gobo-25.mhx")
 #readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-classic-25.mhx")
 #readMhxFile("/home/thomas/mhx5/test1.mhx")
 #readMhxFile("/home/thomas/myblends/gobo/gobo.mhx")
+
 """
 
 
