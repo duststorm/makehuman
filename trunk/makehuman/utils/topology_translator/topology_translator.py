@@ -349,9 +349,10 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
     #We load the old mesh coords, and then tesselate it, in order
     #to have a better result in linking new mesh.
     vertsList1 = loadVertsCoo(mesh1)
-    vertices = loadVertsCoo(mesh2)
+    vertices2 = loadVertsCoo(mesh2)
+    
     faces = loadFacesIndices(mesh2)  
-    tess = subdivideObj(faces, vertices, 2)
+    tess = subdivideObj(faces, vertices2, 2)
     vertsList2 = tess[1]
     notLinked = 0
 
@@ -664,15 +665,18 @@ def saveConvertedTarget(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=
     if not os.path.isdir(convertDirectory):
         os.mkdir(convertDirectory)
     
-    
-    if targetToConvert:      
-        #verts are modified by target
-        newTargetPath = os.path.join(convertDirectory, os.path.basename(targetToConvert))
-        modifiedVerts = convertTargets(mesh1, mesh2, targetToConvert, dataPath)
-    else: 
-        #verts are modified by direct fitting
-        newTargetPath = os.path.join(convertDirectory, os.path.basename(mesh1)+".target")
-        modifiedVerts = convertDirect(mesh1, mesh2, dataPath)
+    if os.path.isfile(mesh1) and os.path.isfile(mesh2):
+        if targetToConvert:      
+            #verts are modified by target
+            newTargetPath = os.path.join(convertDirectory, os.path.basename(targetToConvert))
+            modifiedVerts = convertTargets(mesh1, mesh2, targetToConvert, dataPath)
+        else: 
+            #verts are modified by direct fitting
+            newTargetPath = os.path.join(convertDirectory, os.path.basename(mesh1)+".target")
+            modifiedVerts = convertDirect(mesh1, mesh2, dataPath)
+    else:
+        print "Error opening %s or %s"%(mesh1,mesh2)
+        return
 
     #original verts are the verts of new mesh, unmodified.
     originalVerts = loadVertsCoo(mesh1)  
@@ -740,15 +744,15 @@ def usage():
 def main(argv):
 
     target = None
-    oldbase = "mesh2.obj"
-    newbase = "mesh1.obj"    
+    mesh2 = "mesh2.obj"
+    mesh1 = "mesh1.obj"    
     datafile = "diff.data"
     buildit = None
     testobj = None
 
     #handle options
     try:
-        opts, args = getopt.getopt(argv, "hbt:o:n:d:w:", ["help","build","target=","oldbase=","newbase=","datafile=","testobj="])
+        opts, args = getopt.getopt(argv, "hbt:m:M:d:w:", ["help","build","target=","mesh1=","mesh2=","datafile=","testobj="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -758,10 +762,10 @@ def main(argv):
             sys.exit()        
         elif opt in ("-t", "--target"):
             target = arg
-        elif opt in ("-o", "--oldbase"):
-            oldbase = arg
-        elif opt in ("-n", "--newbase"):
-            newbase = arg
+        elif opt in ("-m", "--mesh1"):
+            mesh1 = arg
+        elif opt in ("-M", "--mesh2"):
+            mesh2 = arg
         elif opt in ("-d", "--datafile"):
             datafile = arg
         elif opt in ("-b", "--build"):
@@ -770,14 +774,14 @@ def main(argv):
             testobj = arg             
 
     if buildit:
-        saveData(newbase, oldbase, datafile)
+        saveData(mesh1, mesh2, datafile)
     elif testobj:
         vertices = loadVertsCoo(testobj)
         faces = loadFacesIndices(testobj)  
         tess = subdivideObj(faces, vertices, 2)               
         saveTestObj(tess[0], tess[1], testobj+".subdivided.obj")        
     else:
-        saveConvertedTarget(newbase, oldbase, datafile, target)        
+        saveConvertedTarget(mesh1, mesh2, datafile, target)        
 
 
 if __name__ == "__main__":
