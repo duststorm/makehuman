@@ -220,6 +220,7 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->nColors2 = 0;
 
         self->textString = NULL;
+        //self->textSize = 12;
     }
 
     return (PyObject*)self;

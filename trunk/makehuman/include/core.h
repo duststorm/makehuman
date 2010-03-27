@@ -110,6 +110,9 @@ extern "C"
                     stored sequentially in this list.                                           */
         char *textString;           /**< \brief Pointer to the start of a text string.                                      */
         /**<        A pointer to a string of chars.                                             */
+        //int textSize;               /**< \brief The textsize of the text string in this object                                   */
+        /**<        An int holding the pixel size of text string in this object. */
+
     } Object3D;
 
 // Object3D Methods
