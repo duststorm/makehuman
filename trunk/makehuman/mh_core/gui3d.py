@@ -46,6 +46,7 @@ class Object(events3d.EventHandler):
          self.meshName = mesh
         else: #its of type module3d.Object3D
          self.mesh=mesh
+         self.app.scene3d.objects.append(mesh)
          self.meshName = mesh.name
         self.texture = texture
         if texture:

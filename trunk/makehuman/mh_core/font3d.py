@@ -87,7 +87,7 @@ class Font:
         return [u1, v1, u2, v2]
 
 #returns font as object3d with 0 visibility
-def createMesh(font, text, position):
+def createMesh(font, text, position=[0.0,0.0,0.0]):
 
   # create object
 
@@ -102,7 +102,7 @@ def createMesh(font, text, position):
     obj.sx = 1.0
     obj.sy = 1.0
     obj.sz = 1.0
-    obj.visibility = 0
+    obj.visibility = 1
     obj.shadeless = 1
     obj.pickable = 0
     obj.cameraMode = 1

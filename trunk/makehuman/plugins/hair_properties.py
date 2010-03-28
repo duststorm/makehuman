@@ -73,8 +73,9 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
         
         font = font3d.Font("data/fonts/arial.fnt")
-        obj=font3d.createMesh(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [0,0,9]);
-        gui3d.Object(self,obj,texture=obj.texture)
+        obj=font3d.createMesh(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",position=[20,340,9.4]);
+        obj.setScale(0.5,0.5,0.5)
+        gui3d.Object(self,obj)
         #self.objects.append(gui3d.Object(self,obj,texture=obj.texture))
 
         #self.colorPreviewLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[20, 210, 9.4])
