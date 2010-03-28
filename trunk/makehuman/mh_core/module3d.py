@@ -558,6 +558,7 @@ class Object3D:
     - **self.vertexBufferSize**: *int* size in vertices of the vertexbuffer.
     - **self.uvValues**: *uv list* The list of uv values referenced to by the faces.
     - **self.text**: string* A text to be printed near the obj
+    - **self.textSize**: int* text-size in pixels for self.text, its 12pt by default
     - **self.pickable**: *int flag* A flag to indicate whether this object is pickable by mouse or not.
 
     """
@@ -609,6 +610,7 @@ class Object3D:
         self.vertexBufferSize = None
         self.uvValues = None
         self.text = ''
+        #self.textSize = 12
 
     def updateIndexBuffer(self):
         del self.indexBuffer[:]
