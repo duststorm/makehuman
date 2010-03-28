@@ -732,7 +732,7 @@ class Object3D:
 
         self.visibility = visible
         try:
-            self.object3d.visibility = visible
+            self.object3d.visibility = int(visible)
         except AttributeError, text:
             pass
 

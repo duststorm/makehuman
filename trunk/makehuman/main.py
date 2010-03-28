@@ -67,7 +67,7 @@ sys.path.append("./mh_core")
 import gui3d, events3d
 import human, hair, background
 import guimodelling, guifiles, guirender
-import font3d
+#import font3d
 
 class Settings:
     def __init__():

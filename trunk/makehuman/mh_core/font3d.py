@@ -86,12 +86,13 @@ class Font:
         v2 = 1.0 - float(charRecord['y'] + charRecord['height']) / float(self.height)
         return [u1, v1, u2, v2]
 
-
-def createMesh(scene, font, text, position):
+#returns font as object3d with 0 visibility
+def createMesh(font, text, position):
 
   # create object
 
-    obj = scene.newObj(text)
+    #obj = scene.newObj(text)
+    obj = module3d.Object3D(text)
     obj.x = position[0]
     obj.y = position[1]
     obj.z = position[2]
@@ -101,7 +102,7 @@ def createMesh(scene, font, text, position):
     obj.sx = 1.0
     obj.sy = 1.0
     obj.sz = 1.0
-    obj.visibility = 1
+    obj.visibility = 0
     obj.shadeless = 1
     obj.pickable = 0
     obj.cameraMode = 1
@@ -143,7 +144,8 @@ def createMesh(scene, font, text, position):
 
     obj.texture = font.file
 
-    scene.update()
+    return obj
+    #scene.update()
 
 
 # font = Font("../data/fonts/arial.fnt")

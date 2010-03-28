@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d, hair
+import gui3d, hair, font3d
 from aljabr import vdist,vnorm,vmul,vsub,vadd
 
 print 'hair properties imported'
@@ -59,12 +59,23 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
         
+        self.cPSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'progressbar_background.png'),\
+        self.app.getThemeResource('images', 'slider.png'),\
+        self.app.getThemeResource('images', 'slider_focused.png'), [700, 295, 9.2], 4,30,14)        
+        self.controlPointsLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[700, 390, 9.4])
+        self.controlPointsLabel.setText('Controlpoints: 15')
+        
        #widthFactor
         self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'),\
         self.app.getThemeResource('images', 'slider.png'),\
         self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0,30.0) 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
+        
+        font = font3d.Font("data/fonts/arial.fnt")
+        obj=font3d.createMesh(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [0,0,9]);
+        gui3d.Object(self,obj,texture=obj.texture)
+        #self.objects.append(gui3d.Object(self,obj,texture=obj.texture))
 
         #self.colorPreviewLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[20, 210, 9.4])
         #self.colorPreviewLabel.setText('Hair color')
@@ -116,6 +127,8 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSliderLabel.setText('Blue:%i' % c[2])
 
     def onShow(self, event):
+        for o in self.objects:
+         print "Debug Objects: ", o.mesh.name
         gui3d.TaskView.onShow(self, event)
         hairColor = self.app.scene3d.selectedHuman.hairColor
         self.syncSliders()

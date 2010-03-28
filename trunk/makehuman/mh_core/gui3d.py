@@ -41,9 +41,13 @@ class Object(events3d.EventHandler):
     def __init__(self, view, mesh, texture=None, position=[0, 0, 9], camera=1, shadeless=1, visible=True):
         self.app = view.app
         self.view = view
-        self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
+        if type(mesh) is str:
+         self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
+         self.meshName = mesh
+        else: #its of type module3d.Object3D
+         self.mesh=mesh
+         self.meshName = mesh.name
         self.texture = texture
-        self.meshName = mesh
         if texture:
             self.mesh.setTexture(texture)
         view.objects.append(self)
