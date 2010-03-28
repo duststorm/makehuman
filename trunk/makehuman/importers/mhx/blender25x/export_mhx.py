@@ -697,12 +697,15 @@ def exportAction(act, fp):
 def exportFCurve(fcu, exported, pad, fp):
 	dataPath = fcu.data_path.replace(' ', '_')
 	words = dataPath.split('"')
+	print("Fcurve", dataPath, words)
+	'''
 	typ = words[0].split('.')[0]
 	bname = words[1]
 	channel = words[2].split('.')[1]
 	if alreadyExported(exported, bname, (channel,fcu.array_index)):
 		return
 	#print("fcu", bname, channel)
+	'''
 
 	fp.write("%sFCurve %s %d\n"  % (pad, dataPath, fcu.array_index))
 	if fcu.driver:
@@ -1072,7 +1075,8 @@ def exportMesh(ob, fp):
 	"""	
 
 	for mat in me.materials:
-		fp.write("  Material %s ;\n" % mat.name.replace(" ", "_"))
+		if mat:
+			fp.write("  Material %s ;\n" % mat.name.replace(" ", "_"))
 	
 	if expMsk & M_MHX and obName == "Human":
 		fp.write("    *** VertexGroup\n")
@@ -1349,6 +1353,7 @@ def exportPoseBone(fp, pb):
 		'ik_max_x', 'ik_max_y', 'ik_max_z', 
 		'ik_min_x', 'ik_min_y', 'ik_min_z', 
 		'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',
+		'custom_shape_transform',
 		'bone_group_index','parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
 	if expMsk & M_MHX:
 		exclude += ['channel_matrix', 'matrix', 'rotation_axis_angle', 'rotation_euler', 'rotation_mode',
@@ -1554,7 +1559,10 @@ def writeMeshes(fp):
 	return
 
 def writeHumanMesh(fp):
-	ob = bpy.data.objects['Human']
+	try:
+		ob = bpy.data.objects['Human']
+	except:
+		return
 	initLocalData()
 	exportObject(ob, fp)
 	return
@@ -1675,9 +1683,9 @@ def mhxClose(fp):
 hairFile = "particles25.mhx"
 theRig = "classic"
 #theRig = "gobo"
-#writeMhxFile('/home/thomas/myblends/gobo/gobo.mhx', M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim)
+writeMhxFile('/home/thomas/myblends/sintel/simple.mhx', M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
 #writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
-writeMhxTemplates(M_MHX+M_Geo+M_VGroup)
+#writeMhxTemplates(M_MHX+M_Geo+M_VGroup)
 #writeMhxTemplates(M_MHX+M_Amt)
 #theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)

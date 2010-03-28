@@ -191,13 +191,14 @@ def copyFile25(obj, tmplName, rig, fp):
 			elif lineSplit[1] == 'gobo-constraint-drivers':
 				gobo_bones.writeConstraintDrivers(fp)
 			elif lineSplit[1] == 'ProxyVerts':
-				(proxyVerts, realVerts, proxyFaces) = readProxyFile(obj.verts, faces)
+				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts, faces)
 				for v in realVerts:
 					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 			elif lineSplit[1] == 'Verts':
 				proxyVerts = None
 				realVerts = None
 				proxyFaces = None
+				proxyMaterials = None
 				for v in obj.verts:
 					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 			elif lineSplit[1] == 'ProxyFaces':
@@ -206,6 +207,8 @@ def copyFile25(obj, tmplName, rig, fp):
 					for v in f:
 						fp.write(" %d" % v)
 					fp.write(" ;\n")
+				for mat in proxyMaterials:
+					fp.write("    ft %d 1 ;\n" % mat)
 			elif lineSplit[1] == 'Faces':
 				for f in faces:
 					fp.write("    f")
@@ -271,9 +274,11 @@ def readProxyFile(verts, faces):
 	realVerts = []
 	proxyFaces = []
 	proxyVerts = {}
+	proxyMaterials = []
 	vn = 0
 	doVerts = False
 	doFaces = False
+	doMaterials = False
 	for line in tmpl:
 		lineSplit= line.split()
 		if len(lineSplit) == 0:
@@ -283,6 +288,10 @@ def readProxyFile(verts, faces):
 		elif lineSplit[0] == 'Faces':
 			doVerts = False
 			doFaces = True
+		elif lineSplit[0] == 'Materials':
+			doVerts = False
+			doFaces = False
+			doMaterials = True
 		elif doVerts:
 			v = int(lineSplit[0])
 			realVerts.append(verts[v])
@@ -294,7 +303,10 @@ def readProxyFile(verts, faces):
 				f = int(lineSplit[n])
 				face.append(f)
 			proxyFaces.append(face)
-	return (proxyVerts, realVerts, proxyFaces)
+		elif doMaterials:
+			proxyMaterials.append(int(lineSplit[0]))
+
+	return (proxyVerts, realVerts, proxyFaces, proxyMaterials)
 
 #
 #	copyProxy(tmplName, fp, proxyVerts):
@@ -422,6 +434,7 @@ def exportProxy24(obj, fp):
 	proxyVerts = None
 	realVerts = None
 	proxyFaces = None
+	proxyMaterials = None
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
 	fp.write("if useProxy\n")
 	for line in tmpl:
@@ -429,7 +442,7 @@ def exportProxy24(obj, fp):
 		if len(lineSplit) == 0:
 			fp.write(line)
 		elif lineSplit[0] == 'v':
-			(proxyVerts, realVerts, proxyFaces) = readProxyFile(obj.verts, faces)
+			(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts, faces)
 			for v in realVerts:
 				fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 		elif lineSplit[0] == 'f':
@@ -438,6 +451,10 @@ def exportProxy24(obj, fp):
 				for v in f:
 					fp.write(" %d" % v)
 				fp.write(" ;\n")
+			fn = 0
+			for mat in proxyMaterials:
+				fp.write("    fx %d %d 1 ;\n" % (fn,mat))
+				fn += 1
 		elif lineSplit[0] == 'vt':
 			for f in proxyFaces:
 				fp.write("    vt")

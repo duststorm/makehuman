@@ -954,6 +954,8 @@ def parseFaces2(tokens, me):
 			f = me.faces[n]
 			f.material_index = int(val[0])
 			f.smooth = int(val[1])
+			if int(val[0]) != 0:
+				print("MI", val[0], f.material_index, f.smooth)
 			n += 1
 		elif key == 'ftall':
 			mat = int(val[0])

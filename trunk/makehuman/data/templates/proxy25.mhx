@@ -1,3 +1,28 @@
+Material ProxySkin 
+  diffuse_color Array  0.92 0.73 0.58  ;
+end Material
+
+Material ProxyWhite 
+  diffuse_color Array 1.0 1.0 1.0  ;
+end Material
+
+Material ProxyRed 
+  diffuse_color Array 1.0 0.0 0.0 ;
+end Material
+
+Material ProxyGum 
+  diffuse_color Array 0.6 0.2 0.3  ;
+end Material
+
+Material ProxyBlue 
+  diffuse_color Array 0.0 0.0 1.0  ;
+end Material
+
+Material ProxyBlack
+  diffuse_color Array 0.0 0.0 0.0  ;
+end Material
+
+
 Mesh HumanProxy HumanProxy 
   Verts
   *** ProxyVerts
@@ -5,54 +30,15 @@ Mesh HumanProxy HumanProxy
   Faces
   *** ProxyFaces
   end Faces
-  MeshTextureFaceLayer UVTex
-    Data 
-      *** ProxyTexVerts
-      alpha_sort False ;
-      billboard False ;
-      collision True ;
-      halo False ;
-      invisible False ;
-      light False ;
-      object_color False ;
-      shadow False ;
-      shared False ;
-      tex False ;
-      text False ;
-      transp 'OPAQUE' ;
-      twoside False ;
-    end Data
-    active True ;
-    active_clone True ;
-    active_render True ;
-  end MeshTextureFaceLayer
-  Material SSS_skinshader ;
-  Material Invisio ;
+  Material ProxySkin ;
+  Material ProxyWhite ;
+  Material ProxyRed ;
+  Material ProxyGum ;
+  Material ProxyBlue ;
+  Material ProxyBlack ;
     *** VertexGroup
     *** ShapeKey
-  active_uv_texture_index 0 ;
-  active_vertex_color_index -1 ;
-  all_edges False ;
-  auto_texspace True ;
-  autosmooth False ;
-  autosmooth_angle 30 ;
-  double_sided True ;
-  draw_bevel_weights False ;
-  draw_creases True ;
-  draw_edge_angle False ;
-  draw_edge_lenght False ;
-  draw_edges True ;
-  draw_face_area False ;
-  draw_faces True ;
-  draw_normals False ;
-  draw_seams False ;
-  draw_sharp False ;
-  draw_vertex_normals False ;
-  use_mirror_topology False ;
-  use_mirror_x False ;
-  use_paint_mask False ;
-  uv_texture_clone_index 0 ;
-  uv_texture_stencil_index 0 ;
+
   vertex_normal_flip True ;
 end Mesh
 
