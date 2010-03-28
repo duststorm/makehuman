@@ -52,10 +52,10 @@ def loadVertsCoo(path):
     faces = []
     for data in fileDescriptor:
         lineData = data.split()
-
-        if lineData[0] == 'v':
-            co = [float(lineData[1]), float(lineData[2]), float(lineData[3])]
-            verts.append(co)
+        if len(lineData) > 2:
+            if lineData[0] == 'v':
+                co = [float(lineData[1]), float(lineData[2]), float(lineData[3])]
+                verts.append(co)
     fileDescriptor.close()
 
     return verts
@@ -82,13 +82,14 @@ def loadFacesIndices(path):
     faces = []
     for data in fileDescriptor:
         lineData = data.split()
-        if lineData[0] == 'f':
-            face = []
-            for faceData in lineData[1:]:
-                vInfo = faceData.split('/')
-                vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
-                face.append(vIdx)
-            faces.append(face)
+        if len(lineData) > 2:
+            if lineData[0] == 'f':
+                face = []
+                for faceData in lineData[1:]:
+                    vInfo = faceData.split('/')
+                    vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
+                    face.append(vIdx)
+                faces.append(face)
     fileDescriptor.close()
     return faces
 
@@ -407,7 +408,7 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
                     vDistances = dKeys[:7]
                 else:
                     vDistances = dKeys[:(len(dKeys)-1)]
-                vIndices = [distData[n] for n in vDistances]
+                vIndices = [distData[n] for n in vDistances]            
 
             #Now we have verts indices and distances from the input vert, so
             #we can calculate their weights
@@ -672,7 +673,7 @@ def saveConvertedTarget(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=
             modifiedVerts = convertTargets(mesh1, mesh2, targetToConvert, dataPath)
         else: 
             #verts are modified by direct fitting
-            newTargetPath = os.path.join(convertDirectory, os.path.basename(mesh1)+".target")
+            newTargetPath = os.path.join(convertDirectory, os.path.basename(mesh2)+".target")
             modifiedVerts = convertDirect(mesh1, mesh2, dataPath)
     else:
         print "Error opening %s or %s"%(mesh1,mesh2)
