@@ -24,18 +24,18 @@ end Material
 
 
 Mesh HumanProxy HumanProxy 
-  Verts
-  *** ProxyVerts
-  end Verts
-  Faces
-  *** ProxyFaces
-  end Faces
   Material ProxySkin ;
   Material ProxyWhite ;
   Material ProxyRed ;
   Material ProxyGum ;
   Material ProxyBlue ;
   Material ProxyBlack ;
+  Verts
+  *** ProxyVerts
+  end Verts
+  Faces
+  *** ProxyFaces
+  end Faces
     *** VertexGroup
     *** ShapeKey
 
