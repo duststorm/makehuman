@@ -618,9 +618,7 @@ def doLoadImage(filepath):
 	if os.path.isfile(file1):
 		print( "Found file "+file1 )
 		try:
-			img = bpy.data.add_image(file1)
-			#bpy.ops.images.open(file1)
-			#img = bpy.data.images[-1]
+			img = bpy.data.images.load(file1)
 			return img
 		except:
 			print( "Cannot read image" )
@@ -954,8 +952,6 @@ def parseFaces2(tokens, me):
 			f = me.faces[n]
 			f.material_index = int(val[0])
 			f.smooth = int(val[1])
-			if int(val[0]) != 0:
-				print("MI", val[0], f.material_index, f.smooth)
 			n += 1
 		elif key == 'ftall':
 			mat = int(val[0])
@@ -1578,21 +1574,21 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 			data = eval(nvar, glbals, lcals)
 		except:
 			data = None			
-		print("Old structrna", nvar, data)
+		# print("Old structrna", nvar, data)
 
 		if data == None:
 			try:
 				creator = args[3]
 			except:
 				creator = None
-			print("Creator", creator, eval(var,glbals,lcals))
+			# print("Creator", creator, eval(var,glbals,lcals))
 
 			try:
 				rna = eval(var,glbals,lcals)
 				data = eval(creator)
 			except:
 				data = None	
-			print("New struct", nvar, typ, data)
+			# print("New struct", nvar, typ, data)
 
 		if rnaType == 'Define':
 			loadedData[typ][name] = data

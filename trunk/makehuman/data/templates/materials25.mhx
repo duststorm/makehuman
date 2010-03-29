@@ -5,28 +5,28 @@ if Blender24
 end if
 
 # --------------- Images ----------------------------- # 
- 
-Image texture.png
-  *** Filename texture.png ;
+
+Image texture.tif
+  *** Filename texture.tif ;
 end Image
 
-Image texture_opacity.png
-  *** Filename texture_opacity.png ;
+Image texture_opacity.tif
+  *** Filename texture_opacity.tif ;
 end Image
 
-Image texture_ref.png
-  *** Filename texture_ref.png ;
+Image texture_ref.tif
+  *** Filename texture_ref.tif ;
 end Image
 
 
 # --------------- Textures ----------------------------- # 
  
 Texture alpha IMAGE
-  Image texture_opacity.png ;
+  Image texture_opacity.tif ;
 end Texture
 
 Texture diffuse IMAGE
-  Image texture.png ;
+  Image texture.tif ;
 end Texture
 
 Texture Hair BLEND
@@ -63,7 +63,7 @@ Texture normals CLOUDS
 end Texture
 
 Texture specularity IMAGE
-  Image texture_ref.png ;
+  Image texture_ref.tif ;
 end Texture
 
 

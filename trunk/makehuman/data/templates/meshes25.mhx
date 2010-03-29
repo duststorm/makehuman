@@ -28771,7 +28771,6 @@ Object Human MESH Human
   time_offset_parent True ;
   time_offset_particle False ;
   track_axis 'POS_Y' ;
-  track_override_parent False ;
   up_axis 'Z' ;
   use_dupli_faces_scale False ;
   use_dupli_frames_speed True ;
