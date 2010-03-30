@@ -1,12 +1,317 @@
 
-# ----------------------------- CAMERA --------------------- # 
+# ----------------------------- MESH --------------------- # 
+
+Mesh widgetCircle025 widgetCircle025 
+  Verts
+    v 0.212132 0.5 -0.212132 ;
+    v 0.166671 0.5 -0.249441 ;
+    v 0.114805 0.5 -0.277164 ;
+    v 0.0585271 0.5 -0.294236 ;
+    v 1.23808e-08 0.5 -0.3 ;
+    v -0.0585271 0.5 -0.294236 ;
+    v -0.114805 0.5 -0.277164 ;
+    v -0.166671 0.5 -0.249441 ;
+    v -0.212132 0.5 -0.212132 ;
+    v -0.249441 0.5 -0.166671 ;
+    v -0.277164 0.5 -0.114805 ;
+    v -0.294236 0.5 -0.058527 ;
+    v -0.3 0.5 1.08021e-07 ;
+    v -0.294236 0.5 0.0585272 ;
+    v -0.277164 0.5 0.114805 ;
+    v -0.249441 0.5 0.166671 ;
+    v -0.212132 0.5 0.212132 ;
+    v -0.166671 0.5 0.249441 ;
+    v -0.114805 0.5 0.277164 ;
+    v -0.0585268 0.5 0.294236 ;
+    v 2.99948e-07 0.5 0.3 ;
+    v 0.0585274 0.5 0.294236 ;
+    v 0.114805 0.5 0.277164 ;
+    v 0.166671 0.5 0.249441 ;
+    v 0.212132 0.5 0.212132 ;
+    v 0.249441 0.5 0.166671 ;
+    v 0.277164 0.5 0.114805 ;
+    v 0.294236 0.5 0.0585266 ;
+    v 0.3 0.5 -4.91876e-07 ;
+    v 0.294235 0.5 -0.0585276 ;
+    v 0.277164 0.5 -0.114806 ;
+    v 0.249441 0.5 -0.166672 ;
+  end Verts
+  Edges
+    e 0 1 ;
+    e 1 2 ;
+    e 2 3 ;
+    e 3 4 ;
+    e 4 5 ;
+    e 5 6 ;
+    e 6 7 ;
+    e 7 8 ;
+    e 8 9 ;
+    e 9 10 ;
+    e 10 11 ;
+    e 11 12 ;
+    e 12 13 ;
+    e 13 14 ;
+    e 14 15 ;
+    e 15 16 ;
+    e 16 17 ;
+    e 17 18 ;
+    e 18 19 ;
+    e 19 20 ;
+    e 20 21 ;
+    e 21 22 ;
+    e 22 23 ;
+    e 23 24 ;
+    e 24 25 ;
+    e 25 26 ;
+    e 26 27 ;
+    e 27 28 ;
+    e 28 29 ;
+    e 29 30 ;
+    e 30 31 ;
+    e 0 31 ;
+  end Edges
+end Mesh
+
+Object widgetCircle025 MESH widgetCircle025
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
+Mesh widgetCircle05 widgetCircle05 
+  Verts
+    v 0.424264 0.5 -0.424264 ;
+    v 0.333342 0.5 -0.498882 ;
+    v 0.22961 0.5 -0.554328 ;
+    v 0.117054 0.5 -0.588471 ;
+    v 2.47616e-08 0.5 -0.6 ;
+    v -0.117054 0.5 -0.588471 ;
+    v -0.22961 0.5 -0.554328 ;
+    v -0.333342 0.5 -0.498882 ;
+    v -0.424264 0.5 -0.424264 ;
+    v -0.498882 0.5 -0.333342 ;
+    v -0.554328 0.5 -0.22961 ;
+    v -0.588471 0.5 -0.117054 ;
+    v -0.6 0.5 2.16042e-07 ;
+    v -0.588471 0.5 0.117054 ;
+    v -0.554328 0.5 0.22961 ;
+    v -0.498882 0.5 0.333342 ;
+    v -0.424264 0.5 0.424264 ;
+    v -0.333342 0.5 0.498882 ;
+    v -0.22961 0.5 0.554328 ;
+    v -0.117054 0.5 0.588471 ;
+    v 5.99897e-07 0.5 0.6 ;
+    v 0.117055 0.5 0.588471 ;
+    v 0.229611 0.5 0.554327 ;
+    v 0.333343 0.5 0.498881 ;
+    v 0.424265 0.5 0.424264 ;
+    v 0.498882 0.5 0.333341 ;
+    v 0.554328 0.5 0.229609 ;
+    v 0.588471 0.5 0.117053 ;
+    v 0.6 0.5 -9.83751e-07 ;
+    v 0.588471 0.5 -0.117055 ;
+    v 0.554327 0.5 -0.229611 ;
+    v 0.498881 0.5 -0.333343 ;
+  end Verts
+  Edges
+    e 0 1 ;
+    e 1 2 ;
+    e 2 3 ;
+    e 3 4 ;
+    e 4 5 ;
+    e 5 6 ;
+    e 6 7 ;
+    e 7 8 ;
+    e 8 9 ;
+    e 9 10 ;
+    e 10 11 ;
+    e 11 12 ;
+    e 12 13 ;
+    e 13 14 ;
+    e 14 15 ;
+    e 15 16 ;
+    e 16 17 ;
+    e 17 18 ;
+    e 18 19 ;
+    e 19 20 ;
+    e 20 21 ;
+    e 21 22 ;
+    e 22 23 ;
+    e 23 24 ;
+    e 24 25 ;
+    e 25 26 ;
+    e 26 27 ;
+    e 27 28 ;
+    e 28 29 ;
+    e 29 30 ;
+    e 30 31 ;
+    e 0 31 ;
+  end Edges
+end Mesh
+
+Object widgetCircle05 MESH widgetCircle05
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+end Object
+
+
 # ----------------------------- MESH --------------------- # 
 
-Mesh doubleArrow goboWidgetArrows 
+Mesh widgetCircle10 widgetCircle10 
+  Verts
+    v 0.707107 0.5 -0.707107 ;
+    v 0.55557 0.5 -0.83147 ;
+    v 0.382683 0.5 -0.92388 ;
+    v 0.19509 0.5 -0.980785 ;
+    v 4.12694e-08 0.5 -1 ;
+    v -0.19509 0.5 -0.980785 ;
+    v -0.382683 0.5 -0.92388 ;
+    v -0.55557 0.5 -0.83147 ;
+    v -0.707107 0.5 -0.707107 ;
+    v -0.83147 0.5 -0.55557 ;
+    v -0.92388 0.5 -0.382683 ;
+    v -0.980785 0.5 -0.19509 ;
+    v -1 0.5 3.6007e-07 ;
+    v -0.980785 0.5 0.195091 ;
+    v -0.923879 0.5 0.382684 ;
+    v -0.831469 0.5 0.555571 ;
+    v -0.707106 0.5 0.707107 ;
+    v -0.55557 0.5 0.83147 ;
+    v -0.382683 0.5 0.92388 ;
+    v -0.195089 0.5 0.980785 ;
+    v 9.99828e-07 0.5 1 ;
+    v 0.195091 0.5 0.980785 ;
+    v 0.382684 0.5 0.923879 ;
+    v 0.555571 0.5 0.831469 ;
+    v 0.707108 0.5 0.707106 ;
+    v 0.83147 0.5 0.555569 ;
+    v 0.92388 0.5 0.382682 ;
+    v 0.980786 0.5 0.195089 ;
+    v 1 0.5 -1.63959e-06 ;
+    v 0.980785 0.5 -0.195092 ;
+    v 0.923879 0.5 -0.382685 ;
+    v 0.831469 0.5 -0.555572 ;
+  end Verts
+  Edges
+    e 0 1 ;
+    e 1 2 ;
+    e 2 3 ;
+    e 3 4 ;
+    e 4 5 ;
+    e 5 6 ;
+    e 6 7 ;
+    e 7 8 ;
+    e 8 9 ;
+    e 9 10 ;
+    e 10 11 ;
+    e 11 12 ;
+    e 12 13 ;
+    e 13 14 ;
+    e 14 15 ;
+    e 15 16 ;
+    e 16 17 ;
+    e 17 18 ;
+    e 18 19 ;
+    e 19 20 ;
+    e 20 21 ;
+    e 21 22 ;
+    e 22 23 ;
+    e 23 24 ;
+    e 24 25 ;
+    e 25 26 ;
+    e 26 27 ;
+    e 27 28 ;
+    e 28 29 ;
+    e 29 30 ;
+    e 30 31 ;
+    e 0 31 ;
+  end Edges
+end Mesh
+
+Object widgetCircle10 MESH widgetCircle10
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+end Object
+
+# ----------------------------- MESH --------------------- # 
+
+Mesh widgetCircle15 widgetCircle15 
+  Verts
+    v 1.06066 0.5 -1.06066 ;
+    v 0.833355 0.5 -1.2472 ;
+    v 0.574025 0.5 -1.38582 ;
+    v 0.292636 0.5 -1.47118 ;
+    v 6.1904e-08 0.5 -1.5 ;
+    v -0.292635 0.5 -1.47118 ;
+    v -0.574025 0.5 -1.38582 ;
+    v -0.833355 0.5 -1.2472 ;
+    v -1.06066 0.5 -1.06066 ;
+    v -1.2472 0.5 -0.833355 ;
+    v -1.38582 0.5 -0.574025 ;
+    v -1.47118 0.5 -0.292635 ;
+    v -1.5 0.5 5.40105e-07 ;
+    v -1.47118 0.5 0.292636 ;
+    v -1.38582 0.5 0.574026 ;
+    v -1.2472 0.5 0.833356 ;
+    v -1.06066 0.5 1.06066 ;
+    v -0.833354 0.5 1.24721 ;
+    v -0.574024 0.5 1.38582 ;
+    v -0.292634 0.5 1.47118 ;
+    v 1.49974e-06 0.5 1.5 ;
+    v 0.292637 0.5 1.47118 ;
+    v 0.574027 0.5 1.38582 ;
+    v 0.833357 0.5 1.2472 ;
+    v 1.06066 0.5 1.06066 ;
+    v 1.24721 0.5 0.833354 ;
+    v 1.38582 0.5 0.574023 ;
+    v 1.47118 0.5 0.292633 ;
+    v 1.5 0.5 -2.45938e-06 ;
+    v 1.47118 0.5 -0.292638 ;
+    v 1.38582 0.5 -0.574028 ;
+    v 1.2472 0.5 -0.833358 ;
+  end Verts
+  Edges
+    e 0 1 ;
+    e 1 2 ;
+    e 2 3 ;
+    e 3 4 ;
+    e 4 5 ;
+    e 5 6 ;
+    e 6 7 ;
+    e 7 8 ;
+    e 8 9 ;
+    e 9 10 ;
+    e 10 11 ;
+    e 11 12 ;
+    e 12 13 ;
+    e 13 14 ;
+    e 14 15 ;
+    e 15 16 ;
+    e 16 17 ;
+    e 17 18 ;
+    e 18 19 ;
+    e 19 20 ;
+    e 20 21 ;
+    e 21 22 ;
+    e 22 23 ;
+    e 23 24 ;
+    e 24 25 ;
+    e 25 26 ;
+    e 26 27 ;
+    e 27 28 ;
+    e 28 29 ;
+    e 29 30 ;
+    e 30 31 ;
+    e 0 31 ;
+  end Edges
+end Mesh
+
+Object widgetCircle15 MESH widgetCircle15
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+end Object
+
+# ----------------------------- MESH --------------------- # 
+
+Mesh doubleArrow widgetArrows 
   Verts
     v 1 7.45058e-09 4.1624e-08 ;
     v -1 -1.49012e-07 4.1624e-08 ;
@@ -36,14 +341,14 @@ Mesh doubleArrow goboWidgetArrows
   end Edges
 end Mesh
 
-Object goboWidgetArrows MESH doubleArrow
+Object widgetArrows MESH doubleArrow
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetCircle goboWidgetCircle 
+Mesh widgetCircle widgetCircle 
   Verts
     v 1.61011e-07 0.763983 -0.764047 ;
     v 1.61011e-07 -4.74199e-09 -1.08053 ;
@@ -76,7 +381,7 @@ Mesh widgetCircle goboWidgetCircle
   end Edges
 end Mesh
 
-Object goboWidgetCircle MESH widgetCircle
+Object widgetCircle MESH widgetCircle
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -95,7 +400,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetGaze goboWidgetGaze 
+Mesh widgetGaze widgetGaze 
   Verts
     v 0.25 -4.96706e-09 0.433013 ;
     v 0.433013 -4.96706e-09 0.25 ;
@@ -193,14 +498,14 @@ Mesh widgetGaze goboWidgetGaze
   end Faces
 end Mesh
 
-Object goboWidgetGaze MESH widgetGaze
+Object widgetGaze MESH widgetGaze
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetFinger_L goboWidgetFinger_L 
+Mesh widgetFinger_L widgetFinger_L 
   Verts
     v 0.363705 1.00139 -0.498935 ;
     v 0.363705 0.00189617 -0.630239 ;
@@ -222,14 +527,14 @@ Mesh widgetFinger_L goboWidgetFinger_L
   end Faces
 end Mesh
 
-Object goboWidgetFinger_L MESH widgetFinger_L
+Object widgetFinger_L MESH widgetFinger_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetFinger_R goboWidgetFinger_R 
+Mesh widgetFinger_R widgetFinger_R 
   Verts
     v -0.363705 1.00139 -0.498935 ;
     v -0.363705 0.00189622 -0.63024 ;
@@ -251,7 +556,7 @@ Mesh widgetFinger_R goboWidgetFinger_R
   end Faces
 end Mesh
 
-Object goboWidgetFinger_R MESH widgetFinger_R
+Object widgetFinger_R MESH widgetFinger_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
@@ -259,7 +564,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetFootCtrl_L goboWidgetFootCtrl_L 
+Mesh widgetFootCtrl_L widgetFootCtrl_L 
   Verts
     v -0.2204 -1.82539e-07 2.57123 ;
     v -0.2204 -1.37836e-07 1.85642 ;
@@ -298,7 +603,7 @@ Mesh widgetFootCtrl_L goboWidgetFootCtrl_L
   end Edges
 end Mesh
 
-Object goboWidgetFootCtrl_L MESH widgetFootCtrl_L
+Object widgetFootCtrl_L MESH widgetFootCtrl_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -314,7 +619,7 @@ Object goboWidgetFootCtrl_L MESH widgetFootCtrl_L
     end Modifier
 end Object
 
-Mesh widgetHandCtrl_L goboWidgetHandCtrl_L 
+Mesh widgetHandCtrl_L widgetHandCtrl_L 
   Verts
     v 1.77138e-07 0.897492 -0.341868 ;
     v 2.07718e-07 0.386663 -0.461143 ;
@@ -347,7 +652,7 @@ Mesh widgetHandCtrl_L goboWidgetHandCtrl_L
   end Edges
 end Mesh
 
-Object goboWidgetHandCtrl_L MESH widgetHandCtrl_L
+Object widgetHandCtrl_L MESH widgetHandCtrl_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -366,7 +671,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetHandCtrl_R goboWidgetHandCtrl_R 
+Mesh widgetHandCtrl_R widgetHandCtrl_R 
   Verts
     v 2.56517e-07 0.897492 -0.341868 ;
     v -2.08882e-08 0.386663 -0.461143 ;
@@ -399,7 +704,7 @@ Mesh widgetHandCtrl_R goboWidgetHandCtrl_R
   end Edges
 end Mesh
 
-Object goboWidgetHandCtrl_R MESH widgetHandCtrl_R
+Object widgetHandCtrl_R MESH widgetHandCtrl_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -419,7 +724,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetFootCtrl_R goboWidgetFootCtrl_R 
+Mesh widgetFootCtrl_R widgetFootCtrl_R 
   Verts
     v 0.2204 -1.82539e-07 2.57123 ;
     v 0.2204 -1.37836e-07 1.85642 ;
@@ -458,7 +763,7 @@ Mesh widgetFootCtrl_R goboWidgetFootCtrl_R
   end Edges
 end Mesh
 
-Object goboWidgetFootCtrl_R MESH widgetFootCtrl_R
+Object widgetFootCtrl_R MESH widgetFootCtrl_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -476,7 +781,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetHand_L goboWidgetHand_L 
+Mesh widgetHand_L widgetHand_L 
   Verts
     v 0.267232 1.00216 -0.463049 ;
     v 0.267232 0.0025128 -0.541759 ;
@@ -498,14 +803,14 @@ Mesh widgetHand_L goboWidgetHand_L
   end Faces
 end Mesh
 
-Object goboWidgetHand_L MESH widgetHand_L
+Object widgetHand_L MESH widgetHand_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetHand_R goboWidgetHand_R 
+Mesh widgetHand_R widgetHand_R 
   Verts
     v -0.267232 1.00216 -0.463049 ;
     v -0.267232 0.00251284 -0.541759 ;
@@ -527,14 +832,14 @@ Mesh widgetHand_R goboWidgetHand_R
   end Faces
 end Mesh
 
-Object goboWidgetHand_R MESH widgetHand_R
+Object widgetHand_R MESH widgetHand_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetHead goboWidgetHead 
+Mesh widgetHead widgetHead 
   Verts
     v -0.514002 0.0739176 -0.384196 ;
     v 0 0.208315 -0.735577 ;
@@ -567,7 +872,7 @@ Mesh widgetHead goboWidgetHead
   end Edges
 end Mesh
 
-Object goboWidgetHead MESH widgetHead
+Object widgetHead MESH widgetHead
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -586,20 +891,20 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetHip goboWidgetHip 
+Mesh widgetHips widgetHips 
   Verts
-    v 0.498129 0.99998 -0.471056 ;
-    v 0.602091 -7.20908e-09 -0.607249 ;
-    v -0.602091 -7.20908e-09 -0.607249 ;
-    v -0.498129 0.99998 -0.471056 ;
-    v 0.498129 0.99998 6.59372e-06 ;
-    v 0.647858 4.14483e-09 0.339912 ;
-    v -0.647858 4.14483e-09 0.339912 ;
-    v -0.498129 0.99998 6.59372e-06 ;
-    v 0 -1.01007e-08 -0.849733 ;
-    v 1.49012e-07 0.99998 -0.647026 ;
-    v 0 4.14483e-09 0.339912 ;
-    v 8.9407e-08 0.99998 6.59372e-06 ;
+    v 1.19551 1.69997 -0.77366 ;
+    v 1.44502 -0.699986 -1.10052 ;
+    v -1.44502 -0.699986 -1.10052 ;
+    v -1.19551 1.69997 -0.77366 ;
+    v 1.19551 1.69997 0.356891 ;
+    v 1.55486 -0.699986 1.17266 ;
+    v -1.55486 -0.699986 1.17266 ;
+    v -1.19551 1.69997 0.356891 ;
+    v 0 -0.699986 -1.68248 ;
+    v 3.57629e-07 1.69997 -1.19599 ;
+    v 0 -0.699986 1.17266 ;
+    v 2.14577e-07 1.69997 0.356891 ;
   end Verts
   Faces
     f 0 4 5 1 ;
@@ -616,14 +921,14 @@ Mesh widgetHip goboWidgetHip
   end Faces
 end Mesh
 
-Object goboWidgetHip MESH widgetHip
+Object widgetHips MESH widgetHips
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetDoubleArrow goboWidgetIkfk 
+Mesh widgetDoubleArrow widgetIkfk 
   Verts
     v 0.27163 -1.40199e-07 0.580108 ;
     v 0.27163 -1.24404e-07 0.712608 ;
@@ -895,14 +1200,14 @@ Mesh widgetDoubleArrow goboWidgetIkfk
   end Faces
 end Mesh
 
-Object goboWidgetIkfk MESH widgetDoubleArrow
+Object widgetIkfk MESH widgetDoubleArrow
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetJaw goboWidgetJaw 
+Mesh widgetJaw widgetJaw 
   Verts
     v 0.569231 0.763927 -0.324759 ;
     v 0.723682 0.258677 -0.0667114 ;
@@ -935,7 +1240,7 @@ Mesh widgetJaw goboWidgetJaw
   end Edges
 end Mesh
 
-Object goboWidgetJaw MESH widgetJaw
+Object widgetJaw MESH widgetJaw
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -954,7 +1259,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetNeck goboWidgetNeck 
+Mesh widgetNeck widgetNeck 
   Verts
     v -1.03299 0.493375 -0.932564 ;
     v 0 0.0211842 -1.37783 ;
@@ -987,7 +1292,7 @@ Mesh widgetNeck goboWidgetNeck
   end Edges
 end Mesh
 
-Object goboWidgetNeck MESH widgetNeck
+Object widgetNeck MESH widgetNeck
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1006,7 +1311,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetRotate_L goboWidgetRotate_L 
+Mesh widgetRotate_L widgetRotate_L 
   Verts
     v 0.401586 0.763983 -0.764047 ;
     v 0.401586 -4.74199e-09 -1.08053 ;
@@ -1039,7 +1344,7 @@ Mesh widgetRotate_L goboWidgetRotate_L
   end Edges
 end Mesh
 
-Object goboWidgetRotate_L MESH widgetRotate_L
+Object widgetRotate_L MESH widgetRotate_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1058,7 +1363,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetRotate_R goboWidgetRotate_R 
+Mesh widgetRotate_R widgetRotate_R 
   Verts
     v -0.401586 0.763983 -0.764047 ;
     v -0.401586 -4.74199e-09 -1.08052 ;
@@ -1091,7 +1396,7 @@ Mesh widgetRotate_R goboWidgetRotate_R
   end Edges
 end Mesh
 
-Object goboWidgetRotate_R MESH widgetRotate_R
+Object widgetRotate_R MESH widgetRotate_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1110,7 +1415,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh doubleArrow.001 goboWidgetShldr_L 
+Mesh doubleArrow.001 widgetShldr_L 
   Verts
     v -0.480084 1.34936 0.00398867 ;
     v -0.986242 1.34935 0.00398867 ;
@@ -1148,7 +1453,7 @@ Mesh doubleArrow.001 goboWidgetShldr_L
   end Edges
 end Mesh
 
-Object goboWidgetShldr_L MESH doubleArrow.001
+Object widgetShldr_L MESH doubleArrow.001
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1167,7 +1472,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh doubleArrow.002 goboWidgetShldr_R 
+Mesh doubleArrow.002 widgetShldr_R 
   Verts
     v 0.482122 1.34936 0.00398867 ;
     v 0.986256 1.34935 0.00398867 ;
@@ -1205,7 +1510,7 @@ Mesh doubleArrow.002 goboWidgetShldr_R
   end Edges
 end Mesh
 
-Object goboWidgetShldr_R MESH doubleArrow.002
+Object widgetShldr_R MESH doubleArrow.002
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1224,7 +1529,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetSpine3 goboWidgetSpine3 
+Mesh widgetSpine3 widgetSpine3 
   Verts
     v 0.544094 0.865011 -0.483764 ;
     v 0.544094 3.83378e-06 -0.321913 ;
@@ -1270,14 +1575,14 @@ Mesh widgetSpine3 goboWidgetSpine3
   end Faces
 end Mesh
 
-Object goboWidgetSpine3 MESH widgetSpine3
+Object widgetSpine3 MESH widgetSpine3
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetRoot goboWidgetRoot 
+Mesh widgetRoot widgetRoot 
   Verts
     v 5.65685 5.65685 0 ;
     v 8 -4.01845e-07 0 ;
@@ -1328,7 +1633,7 @@ Mesh widgetRoot goboWidgetRoot
   end Edges
 end Mesh
 
-Object goboWidgetRoot MESH widgetRoot
+Object widgetRoot MESH widgetRoot
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1347,7 +1652,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetFoot_L goboWidgetFoot_L 
+Mesh widgetFoot_L widgetFoot_L 
   Verts
     v 0.462314 0.961753 -0.0660449 ;
     v 0.355194 0.0124916 0.021601 ;
@@ -1376,14 +1681,14 @@ Mesh widgetFoot_L goboWidgetFoot_L
   end Faces
 end Mesh
 
-Object goboWidgetFoot_L MESH widgetFoot_L
+Object widgetFoot_L MESH widgetFoot_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetFoot_R goboWidgetFoot_R 
+Mesh widgetFoot_R widgetFoot_R 
   Verts
     v -0.462317 0.961751 -0.0660451 ;
     v -0.355194 0.0124903 0.0216009 ;
@@ -1412,13 +1717,13 @@ Mesh widgetFoot_R goboWidgetFoot_R
   end Faces
 end Mesh
 
-Object goboWidgetFoot_R MESH widgetFoot_R
+Object widgetFoot_R MESH widgetFoot_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetTipToe_L goboWidgetTipToe_L 
+Mesh widgetTipToe_L widgetTipToe_L 
   Verts
     v 1.4516 0.132168 -4.91621 ;
     v 1.4516 0.1081 -4.01653 ;
@@ -1457,7 +1762,7 @@ Mesh widgetTipToe_L goboWidgetTipToe_L
   end Edges
 end Mesh
 
-Object goboWidgetTipToe_L MESH widgetTipToe_L
+Object widgetTipToe_L MESH widgetTipToe_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1476,7 +1781,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetTipToe_R goboWidgetTipToe_R 
+Mesh widgetTipToe_R widgetTipToe_R 
   Verts
     v -1.4516 0.132168 -4.91621 ;
     v -1.4516 0.1081 -4.01653 ;
@@ -1515,7 +1820,7 @@ Mesh widgetTipToe_R goboWidgetTipToe_R
   end Edges
 end Mesh
 
-Object goboWidgetTipToe_R MESH widgetTipToe_R
+Object widgetTipToe_R MESH widgetTipToe_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
       editmode True ;
@@ -1534,7 +1839,7 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetToe_L goboWidgetToe_L 
+Mesh widgetToe_L widgetToe_L 
   Verts
     v 0.662823 0.853339 -0.416486 ;
     v 0.662818 -0.0363643 -0.103208 ;
@@ -1556,14 +1861,14 @@ Mesh widgetToe_L goboWidgetToe_L
   end Faces
 end Mesh
 
-Object goboWidgetToe_L MESH widgetToe_L
+Object widgetToe_L MESH widgetToe_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh widgetToe_R goboWidgetToe_R 
+Mesh widgetToe_R widgetToe_R 
   Verts
     v -0.662823 0.85334 -0.416484 ;
     v -0.662819 -0.0363634 -0.103206 ;
@@ -1585,7 +1890,7 @@ Mesh widgetToe_R goboWidgetToe_R
   end Faces
 end Mesh
 
-Object goboWidgetToe_R MESH widgetToe_R
+Object widgetToe_R MESH widgetToe_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
 end Object
 
@@ -1636,69 +1941,7 @@ Object HumanRig ARMATURE HumanRig
     nla_enabled True ;
   end AnimationData
 
-  active_material_index 0 ;
-  active_particle_system_index 0 ;
-  active_shape_key_index 0 ;
-  active_vertex_group_index 0 ;
-  color Array 1.0 1.0 1.0 1.0  ;
-  delta_location (0,0,0) ;
-  delta_rotation_euler (0,0,0) ;
-  delta_rotation_quaternion (0,0,0,0) ;
-  delta_scale (0,0,0) ;
-  dimensions (0,0,0) ;
-  draw_axis False ;
-  draw_bounds False ;
-  draw_bounds_type 'BOX' ;
-  draw_name False ;
-  draw_texture_space False ;
-  draw_transparent False ;
-  draw_wire False ;
-  dupli_faces_scale 1 ;
-  dupli_frames_end 100 ;
-  dupli_frames_off 0 ;
-  dupli_frames_on 1 ;
-  dupli_frames_start 1 ;
-  dupli_type 'NONE' ;
-  empty_draw_size 1 ;
-  empty_draw_type 'ARROWS' ;
-  location (0,0,0) ;
-  lock_location Array 0 0 0  ;
-  lock_rotation Array 0 0 0  ;
-  lock_rotation_w False ;
-  lock_rotations_4d False ;
-  lock_scale Array 0 0 0  ;
-  matrix Matrix
-    row 1.0 0.0 0.0 0.0 ;
-    row 0.0 1.0 0.0 0.0 ;
-    row 0.0 0.0 1.0 0.0 ;
-    row 0.0 0.0 0.0 1.0 ;
-  end Matrix
-  max_draw_type 'TEXTURED' ;
-  parent_type 'OBJECT' ;
-  pass_index 0 ;
-  restrict_render False ;
-  restrict_select False ;
-  restrict_view False ;
-  rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
-  rotation_euler (0,0,0) ;
-  rotation_mode 'XYZ' ;
-  rotation_quaternion (0,0,0,0) ;
-  scale (1,1,1) ;
-  selected False ;
-  shape_key_edit_mode False ;
-  shape_key_lock False ;
-  slow_parent False ;
-  time_offset 0 ;
-  time_offset_add_parent False ;
-  time_offset_edit False ;
-  time_offset_parent False ;
-  time_offset_particle False ;
-  track_axis 'POS_Y' ;
-  track_override_parent False ;
   up_axis 'Z' ;
-  use_dupli_faces_scale False ;
-  use_dupli_frames_speed True ;
-  use_dupli_verts_rotation False ;
   x_ray True ;
 end Object
 

@@ -1239,14 +1239,23 @@ def postProcess():
 			
 
 	elif toggle & T_Armature:
+		fingerBones = []
+		fingerBonesIK = []
+		fingerBonesFK = []
+		for i in range(1,6):
+			for j in range(1,4):
+				fingerBones.extend(['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)])
+				fingerBonesIK.extend(['Finger-%d-%d_ik_L' % (i,j), 'Finger-%d-%d_ik_R' % (i,j)])
+				fingerBonesFK.extend(['Finger-%d-%d_fk_L' % (i,j), 'Finger-%d-%d_fk_R' % (i,j)])
+
 		armBones = ['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R']
 		if toggle & T_ArmIK:
-			setInfluence(armBones, 'CopyRotIK', 1.0)
-			setInfluence(armBones, 'CopyRotFK', 0.0)
+			setInfluence(armBones+fingerBones, 'CopyRotIK', 1.0)
+			setInfluence(armBones+fingerBones, 'CopyRotFK', 0.0)
 			setInfluence(armBones, 'Const', 1.0)
 		else:
-			setInfluence(armBones, 'CopyRotIK', 0.0)
-			setInfluence(armBones, 'CopyRotFK', 1.0)
+			setInfluence(armBones+fingerBones, 'CopyRotIK', 0.0)
+			setInfluence(armBones+fingerBones, 'CopyRotFK', 1.0)
 			setInfluence(armBones, 'Const', 0.0)
 
 		legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
@@ -1259,17 +1268,14 @@ def postProcess():
 			setInfluence(legBones, 'CopyRotFK', 1.0)
 			setInfluence(legBones, 'Const', 0.0)
 
-		for i in range(5):
-			for j in range(3):
-				bones = ['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)]
-				if toggle & T_FingerIK:
-					setInfluence(bones, 'CopyRotIK', 1.0)
-					setInfluence(bones, 'CopyRotFK', 0.0)
-					setInfluence(bones, 'Const', 1.0)
-				else:
-					setInfluence(bones, 'CopyRotIK', 0.0)
-					setInfluence(bones, 'CopyRotFK', 1.0)
-					setInfluence(bones, 'Const', 0.0)
+		if toggle & T_FingerIK:
+			setInfluence(fingerBones, 'Const', 1.0)
+			setInfluence(fingerBonesIK, 'Action', 1.0)
+			setInfluence(fingerBonesFK, 'Action', 1.0)
+		else:
+			setInfluence(fingerBones, 'Const', 0.0)
+			setInfluence(fingerBonesIK, 'Action', 0.0)
+			setInfluence(fingerBonesFK, 'Action', 0.0)
 
 	try:
 		ob = loadedData['Object']['HumanProxy']
@@ -1775,8 +1781,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_ArmIK = T_ArmIK if self.properties.armik else 0
 		O_LegIK = T_LegIK if self.properties.legik else 0
-		O_FKIK = T_FKIK if self.properties.armik else 0
-		O_FingerIK = T_FingerIK if self.properties.fkik else 0
+		O_FKIK = T_FKIK if self.properties.fkik else 0
+		O_FingerIK = T_FingerIK if self.properties.fingerik else 0
 		O_DispObs = T_DispObs if self.properties.dispobs else 0
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
