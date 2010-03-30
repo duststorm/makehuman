@@ -186,6 +186,7 @@ class ExportTaskView(gui3d.TaskView):
 
             if self.wavefrontObj.selected:
                 mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj", 'data/3dobjs/base.obj', self.exportGroups.selected)
+                mh2mhx.exportProxyObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + "-proxy.obj")
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
             elif self.mhx.selected:

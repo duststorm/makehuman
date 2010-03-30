@@ -191,7 +191,7 @@ def copyFile25(obj, tmplName, rig, fp):
 			elif lineSplit[1] == 'gobo-constraint-drivers':
 				gobo_bones.writeConstraintDrivers(fp)
 			elif lineSplit[1] == 'ProxyVerts':
-				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts, faces)
+				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
 				for v in realVerts:
 					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 			elif lineSplit[1] == 'Verts':
@@ -261,12 +261,12 @@ def copyFile25(obj, tmplName, rig, fp):
 	return
 
 #
-#	readProxyFile(verts, faces):
+#	readProxyFile(verts):
 #
 
-def readProxyFile(verts, faces):
+def readProxyFile(verts):
 	tmplName = "./data/templates/proxy_mesh.txt"
-	tmpl = open(tmplName, "r")
+	tmpl = open(tmplName, "rU")
 	if tmpl == None:
 		print("Cannot open proxy template "+tmplName)
 		return (None, None, None)
@@ -307,6 +307,24 @@ def readProxyFile(verts, faces):
 			proxyMaterials.append(int(lineSplit[0]))
 
 	return (proxyVerts, realVerts, proxyFaces, proxyMaterials)
+	
+#
+#	exportProxyObj(obj, filename):	
+#
+
+def exportProxyObj(obj, filename):
+	(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
+	fp = open(filename, 'w')
+	for v in realVerts:
+		fp.write("v %.6g %.6g %.6g\n" %(v.co[0], v.co[1], v.co[2]))
+	for f in proxyFaces:
+		fp.write("f")
+		for v in f:
+			fp.write(" %d" % (v+1))
+		fp.write("\n")
+	fp.close()
+	return
+	
 
 #
 #	copyProxy(tmplName, fp, proxyVerts):
@@ -442,7 +460,7 @@ def exportProxy24(obj, fp):
 		if len(lineSplit) == 0:
 			fp.write(line)
 		elif lineSplit[0] == 'v':
-			(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts, faces)
+			(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
 			for v in realVerts:
 				fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 		elif lineSplit[0] == 'f':
@@ -655,7 +673,7 @@ def writeIpo(fp):
 	mhxFile = "data/templates/mhxipos.mhx"
 	try:
 		print("Trying to open "+mhxFile)
-		tmpl = open(mhxFile, "r")
+		tmpl = open(mhxFile, "rU")
 	except:
 		print("Failed to open "+mhxFile)
 		tmpl = None
