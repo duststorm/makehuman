@@ -313,15 +313,53 @@ def readProxyFile(verts):
 #
 
 def exportProxyObj(obj, filename):
+	(name, ext) = os.path.splitext(filename)
 	(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
+	matNames = ['ProxySkin', 'ProxyWhite', 'ProxyRed', 'ProxyGum', 'ProxyBlue', 'ProxyBlack']
+
 	fp = open(filename, 'w')
+	fp.write(
+"# MakeHuman exported OBJ for proxy mesh\n" +
+"# www.makehuman.org\n" +
+"mtllib %s.mtl\n" % name)
+
 	for v in realVerts:
 		fp.write("v %.6g %.6g %.6g\n" %(v.co[0], v.co[1], v.co[2]))
+
+	mat = -1
+	n = 0
 	for f in proxyFaces:
+		if proxyMaterials[n] != mat:
+			mat = proxyMaterials[n]
+			fp.write("usemtl %s\n" % matNames[mat])
+		n += 1
 		fp.write("f")
 		for v in f:
 			fp.write(" %d" % (v+1))
 		fp.write("\n")
+	fp.close()
+
+	fp = open(name + ".mtl", 'w')
+	fp.write(
+"# MakeHuman exported MTL for proxy\n"+
+"# www.makehuman.org\n"+
+"newmtl ProxySkin \n"+
+"Kd 0.92 0.73 0.58\n"+ 
+"\n"+
+"newmtl ProxyWhite\n"+ 
+"Kd 1.0 1.0 1.0 \n"+
+"\n"+
+"newmtl ProxyRed \n"+
+"Kd 1.0 0.0 0.0\n"+
+"\n"+
+"newmtl ProxyGum \n"+
+"Kd 0.6 0.2 0.3 \n"+
+"\n"+
+"newmtl ProxyBlue \n"+
+"Kd 0.0 0.0 1.0\n"+
+"\n"+
+"newmtl ProxyBlack\n"+
+"Kd 0.0 0.0 0.0 \n")
 	fp.close()
 	return
 	
