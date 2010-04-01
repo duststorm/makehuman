@@ -38,7 +38,7 @@ const char* getGrabPath()
 
 const char* getRenderPath()
 {
-    sGrabPath = [[GeneralPreferences renderPath] UTF8String];
+    sRenderPath = [[GeneralPreferences renderPath] UTF8String];
     return sRenderPath.c_str();
 }
 
