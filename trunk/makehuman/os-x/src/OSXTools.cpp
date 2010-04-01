@@ -125,7 +125,7 @@ int adjustRenderEnvironment()
     // -----------------------------------------------------------------
     // Adjust Aqsis
     const std::string kPathAqsis    = "/Applications/Aqsis.app/Contents/";
-    path.append(":" + kPathAqsis + "MacOS/");
+    path.append(":" + kPathAqsis + "Resources/bin/");
     rc = setEnvVar("AQSIS_DISPLAY_PATH", kPathAqsis + "Resources/lib/");
     if (0 != rc)
     {
