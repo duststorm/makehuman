@@ -32,7 +32,7 @@ import module3d
 import types
 import mh
 import os
-
+import font3d
 # Wrapper around Object3D
 
 
@@ -168,7 +168,7 @@ class View(events3d.EventHandler):
         self.__totalVisibility = parent.isVisible() and visible
 
         parent.children.append(self)
-
+        
     def show(self):
         self.__visible = True
         self.__updateVisibility()
@@ -1105,4 +1105,8 @@ class FileChooser(View):
 
         self.app.scene3d.redraw()
 
-
+def createText(view, text,position=[0.0,0.0,9.0],scale=[0.5,0.5,0.5],fontFileName="data/fonts/arial.fnt"):
+        font = font3d.Font(fontFileName)
+        obj=font3d.createMesh(font, text,position);
+        obj.setScale(scale[0],scale[1],scale[2])
+        Object(view,obj)

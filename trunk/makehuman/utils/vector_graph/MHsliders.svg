@@ -1,24 +1,79 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="744.09448819"
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.46"
    sodipodi:docname="MHsliders.svg"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3638">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3640" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3642" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3410">
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0"
+         id="stop3618" />
+      <stop
+         id="stop3620"
+         offset="0.9921875"
+         style="stop-color:#000000;stop-opacity:0;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0.99609375"
+         id="stop3622" />
+      <stop
+         id="stop3624"
+         offset="0.99804688"
+         style="stop-color:#000000;stop-opacity:0;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0.99902344"
+         id="stop3626" />
+      <stop
+         id="stop3628"
+         offset="0.99951172"
+         style="stop-color:#000000;stop-opacity:0;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0.99975586"
+         id="stop3630" />
+      <stop
+         id="stop3632"
+         offset="0.99987793"
+         style="stop-color:#000000;stop-opacity:0;" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0.99993896"
+         id="stop3634" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3414" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
@@ -411,6 +466,16 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3638"
+       id="linearGradient3644"
+       x1="338.77496"
+       y1="234.18278"
+       x2="447.04122"
+       y2="234.18278"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-785.81618,22)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -419,16 +484,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.94057"
-     inkscape:cx="386.96202"
-     inkscape:cy="890.8627"
+     inkscape:zoom="1.4851425"
+     inkscape:cx="287.98162"
+     inkscape:cy="781.26018"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1006"
+     inkscape:window-width="1280"
+     inkscape:window-height="778"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -438,7 +503,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1976,5 +2041,26 @@
          id="tspan3637-7-63-2-9"
          x="339.42291"
          y="177.06119">Eyes shape</tspan></text>
+    <rect
+       style="fill:#6b6b6b;fill-opacity:0;stroke:none"
+       id="rect2630"
+       width="127.99837"
+       height="31.99999"
+       x="328.90894"
+       y="213.54552"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:url(#linearGradient3644);fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.73553455;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2634"
+       width="107.53072"
+       height="14.802762"
+       x="-446.67346"
+       y="248.7814"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="scale(-1,1)" />
   </g>
 </svg>

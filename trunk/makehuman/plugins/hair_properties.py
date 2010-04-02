@@ -59,27 +59,16 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
         
-        self.cPSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'progressbar_background.png'),\
+        self.cPSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_generic.png'),\
         self.app.getThemeResource('images', 'slider.png'),\
-        self.app.getThemeResource('images', 'slider_focused.png'), [700, 295, 9.2], 4,30,14)        
-        self.controlPointsLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[700, 390, 9.4])
-        self.controlPointsLabel.setText('Controlpoints: 15')
-        
+        self.app.getThemeResource('images', 'slider_focused.png'), [700, 295, 9.2], 4,30,14)             
        #widthFactor
         self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'),\
         self.app.getThemeResource('images', 'slider.png'),\
         self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0,30.0) 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
-        
-        font = font3d.Font("data/fonts/arial.fnt")
-        obj=font3d.createMesh(font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",position=[20,340,9.4]);
-        obj.setScale(0.5,0.5,0.5)
-        gui3d.Object(self,obj)
-        #self.objects.append(gui3d.Object(self,obj,texture=obj.texture))
-
-        #self.colorPreviewLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[20, 210, 9.4])
-        #self.colorPreviewLabel.setText('Hair color')
+        gui3d.createText(self,"Test text!",[20,340,9.4])
 
         @self.redSlider.event
         def onChanging(value):
