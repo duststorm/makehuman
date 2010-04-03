@@ -34,7 +34,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
     def __init__(self, category):        
         
-        self.deltaGuides={}
+        #self.deltaGuides={}
         
         gui3d.TaskView.__init__(self, category, 'Hair', category.app.getThemeResource('images', 'button_hair_det.png'), category.app.getThemeResource('images',
                                 'button_hair_det_on.png'))

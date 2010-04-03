@@ -36,13 +36,9 @@ class HairTaskView(gui3d.TaskView):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"),  category.app.getThemeResource("images", "button_hair_on.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
     self.default = True
-    #self.filechooser.selectedFile = 1 #This is where default.hair is located :P .. bad HACK need to improve on this, maybe a hashtable?.. TODO for marc :P
     self.hairsClass = hairgenerator.Hairgenerator() #this will have more points than the .hair file, as we will use curve interpolations on the controlpoints
     self.saveAsCurves = True
     self.widthFactor = 1.0
-    self.Delta=None
-    
-    self.refVector=None #reference vector used for fast updating of hair (e.g. when base model only changes height or age)
     
     @self.filechooser.event
     def onFileSelected(filename,update=1):
@@ -56,14 +52,10 @@ class HairTaskView(gui3d.TaskView):
       human.scene.clear(human.hairObj)
       hairsClass = hairgenerator.Hairgenerator()
       hairsClass.humanVerts = human.mesh.verts
-      L = loadHairsFile(human.scene, path="./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=hairsClass, update=update, widthFactor=self.widthFactor)
-      if self.refVector==None: self.refVector=L[1]
-      self.Delta = L[2]
-      human.hairObj=L[0]
+      human.hairObj = loadHairsFile(human.scene, path="./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=hairsClass, update=update, widthFactor=self.widthFactor)
       #Jose: TODO collision detection
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
       self.app.switchCategory("Modelling")
-      #self.app.scene3d.redraw(update)
     
   def onShow(self, event):
     # When the task gets shown, set the focus to the file chooser
@@ -71,9 +63,7 @@ class HairTaskView(gui3d.TaskView):
     if self.default:
       self.default = False
       self.filechooser.selectedFile = self.filechooser.files.index("default.hair")
-      self.filechooser.onShow(event) #If I dont do this, first time libraries are chosen the wrong selectedFile is shown.. TODO: marc, make eleganter :P
-      #print "Debug: ", self.filechooser.selectedFile
-      #print "Debug: ", self.filechooser.files
+      self.filechooser.onShow(event) 
     gui3d.TaskView.onShow(self, event)
     self.filechooser.setFocus()
     # HACK: otherwise the toolbar background disappears for some weird reason
@@ -104,7 +94,6 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.uvValues = []
   obj.indexBuffer = []
   fg = obj.createFaceGroup("ribbons")
-  refVector=None
   
   #temporary vectors
   headNormal = [0.0,1.0,0.0]
@@ -118,11 +107,9 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
     hairsClass.adjustGuides()
     print "Hair adjusted"
   
-  Delta = hairsClass.Delta
   for group in hairsClass.guideGroups:
     for guide in group.guides:
       cPs = [guide.controlPoints[0]]
-      if refVector == None : refVector = guide.controlPoints[0][:]
       for i in xrange(2,len(guide.controlPoints)-1): #piecewise continuous polynomial
         d1=vdist(guide.controlPoints[i-1],guide.controlPoints[i-2])
         d=d1+vdist(guide.controlPoints[i-1],guide.controlPoints[i])
@@ -191,5 +178,5 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.shadeless = 1 
   if update:
       scn.update()
-  return obj,refVector,Delta
+  return obj
               
