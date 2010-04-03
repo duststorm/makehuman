@@ -566,7 +566,14 @@ class Application(events3d.EventHandler):
 
 class Slider(View):
 
-    def __init__(self, parent, backgroundTexture, sliderTexture, focusedSliderTexture=None, position=[0, 0, 15], value=0.0, min=0.0, max=1.0):
+    def __init__(self, parent, backgroundTexture="data/themes/default/images/slider_generic.png",\
+    sliderTexture="data/themes/default/images/slider.png",\
+    focusedSliderTexture="data/themes/default/images/slider_focused.png",\
+    position=[0, 0, 15], value=0.0, min=0.0, max=1.0,\
+    label=None):
+        #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
+        if type(label) is str:
+            createText(parent,label, [position[0]+10,position[1]-5,position[2]])
         View.__init__(self, parent)
         self.background = Object(self, 'data/3dobjs/slider_background.obj', texture=backgroundTexture, position=position)
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj', texture=sliderTexture, position=[position[0], position[1] + 16, position[2] + 0.01])
@@ -581,7 +588,8 @@ class Slider(View):
     def setValue(self, value):
         self.__value = min(self.max, max(self.min, value))
         sliderPos = self.slider.getPosition()
-        value = (self.__value - self.min) / (self.max - self.min)
+        #for values that are integer we need a float denominator
+        value = (self.__value - self.min) / float(self.max - self.min)
         sliderPos[0] = value * (self.sliderMaxX - self.sliderMinX) + self.sliderMinX
         self.slider.setPosition(sliderPos)
 

@@ -61,14 +61,13 @@ class HairPropertiesTaskView(gui3d.TaskView):
         
         self.cPSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_generic.png'),\
         self.app.getThemeResource('images', 'slider.png'),\
-        self.app.getThemeResource('images', 'slider_focused.png'), [700, 295, 9.2], 4,30,14)             
+        self.app.getThemeResource('images', 'slider_focused.png'), [600, 100, 9.2], 14,4,30,"Number of Control Points")             
        #widthFactor
         self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'),\
         self.app.getThemeResource('images', 'slider.png'),\
         self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0,30.0) 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
-        gui3d.createText(self,"Test text!",[20,340,9.4])
 
         @self.redSlider.event
         def onChanging(value):
