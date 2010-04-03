@@ -656,7 +656,11 @@ class Slider(View):
 
 class Button(View):
 
-    def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None):
+    def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture="data/themes/default/images/button_unselected.png",\
+    selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None,\
+    label=None):
+        if type(label) is str:
+            createText(parent,label, [position[0]-20,position[1]-10,position[2]])
         View.__init__(self, parent)
         if selectedTexture and selected:
             t = selectedTexture

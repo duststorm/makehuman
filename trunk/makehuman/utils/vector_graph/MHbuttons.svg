@@ -1492,9 +1492,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8.9531247"
+     inkscape:zoom="1.1191406"
      inkscape:cx="40.18382"
-     inkscape:cy="504.9347"
+     inkscape:cy="612.87926"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -5403,5 +5403,27 @@
          id="tspan3038"
          x="13.570824"
          y="542.14026">.obj as Curves</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3024"
+       width="63.073643"
+       height="15.073632"
+       x="11.568574"
+       y="590.66846"
+       ry="2.2610447"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_unselected.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3026"
+       width="63.073643"
+       height="15.073632"
+       x="86.195488"
+       y="590.33301"
+       ry="2.2610447"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_selected.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>

@@ -51,6 +51,7 @@ class Human(gui3d.Object):
         # self.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/ambient_occlusion.png", 0))
 
         self.scene = globalScene
+        self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
         self.targetsDetailStack = {}  # All details targets applied, with their values
         self.targetsEthnicStack = {'neutral': 1.0}
