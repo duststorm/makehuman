@@ -21,15 +21,15 @@
      id="defs4">
     <linearGradient
        inkscape:collect="always"
-       id="linearGradient3435">
+       id="linearGradient3545">
       <stop
-         style="stop-color:#252525;stop-opacity:1;"
+         style="stop-color:#0a0a0a;stop-opacity:1;"
          offset="0"
-         id="stop3437" />
+         id="stop3547" />
       <stop
-         style="stop-color:#252525;stop-opacity:0;"
+         style="stop-color:#0a0a0a;stop-opacity:0;"
          offset="1"
-         id="stop3439" />
+         id="stop3549" />
     </linearGradient>
     <linearGradient
        inkscape:collect="always"
@@ -490,12 +490,12 @@
        gradientTransform="translate(-785.81618,22)" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3435"
-       id="linearGradient3441"
-       x1="447.76849"
-       y1="253.78561"
-       x2="303.00122"
-       y2="254.55754"
+       xlink:href="#linearGradient3545"
+       id="linearGradient3551"
+       x1="437.66843"
+       y1="252.43895"
+       x2="317.1413"
+       y2="253.03615"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
@@ -506,7 +506,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4851425"
-     inkscape:cx="287.98162"
+     inkscape:cx="189.00122"
      inkscape:cy="781.26018"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -2073,23 +2073,33 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:url(#linearGradient3441);fill-opacity:1;stroke:#ff9999;stroke-width:0.28400001000000002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3415"
-       width="110.99105"
-       height="17.278593"
-       x="337.50568"
-       y="245.91824"
-       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\slider_generic.png"
+       style="fill:#6b6b6b;fill-opacity:0.07058824;stroke:none"
+       id="rect2759"
+       width="127.99837"
+       height="31.99999"
+       x="330.31564"
+       y="232.39893"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\slider_generic.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:none;stroke:#000000;stroke-width:0.736;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3417"
-       width="107.53072"
+       style="fill:url(#linearGradient3551);fill-opacity:1;stroke:#999999;stroke-width:0.28413174000000002;stroke-opacity:1"
+       id="rect2761"
+       width="110.99106"
+       height="17.278591"
+       x="338.81924"
+       y="244.39685"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\slider_generic.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.73553455;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2763"
+       width="107.53073"
        height="14.802762"
-       x="339.2359"
-       y="247.15619"
-       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\slider_generic.png"
+       x="340.54944"
+       y="245.6348"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\slider_generic.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>
