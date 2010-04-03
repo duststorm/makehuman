@@ -21,6 +21,18 @@
      id="defs4">
     <linearGradient
        inkscape:collect="always"
+       id="linearGradient3435">
+      <stop
+         style="stop-color:#252525;stop-opacity:1;"
+         offset="0"
+         id="stop3437" />
+      <stop
+         style="stop-color:#252525;stop-opacity:0;"
+         offset="1"
+         id="stop3439" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
        id="linearGradient3638">
       <stop
          style="stop-color:#000000;stop-opacity:1;"
@@ -476,6 +488,15 @@
        y2="234.18278"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(-785.81618,22)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3435"
+       id="linearGradient3441"
+       x1="447.76849"
+       y1="253.78561"
+       x2="303.00122"
+       y2="254.55754"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1285,7 +1306,7 @@
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
-         style="fill:#32b75b;fill-opacity:1;stroke:#999999;stroke-width:0.56826723;stroke-opacity:1"
+         style="fill:#32b75b;fill-opacity:1;stroke:#999999;stroke-width:0.56800375;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
          id="rect2816-04-7-8-0"
          width="221.98495"
          height="34.557198"
@@ -1295,7 +1316,7 @@
          inkscape:export-xdpi="90"
          inkscape:export-ydpi="90" />
       <rect
-         style="fill:none;stroke:#000000;stroke-width:1.47107875;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         style="fill:none;stroke:#000000;stroke-width:1.47200972;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          id="rect2816-3-6-56-8-2"
          width="215.06421"
          height="29.605536"
@@ -2005,7 +2026,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:#999999;fill-opacity:1;stroke:#999999;stroke-width:0.28413174;stroke-opacity:1"
+       style="fill:#999999;fill-opacity:1;stroke:#999999;stroke-width:0.284;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
        id="rect2816-04-09-8-3"
        width="110.99105"
        height="17.278593"
@@ -2015,7 +2036,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:none;stroke:#000000;stroke-width:0.73553455;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:none;stroke:#000000;stroke-width:0.736;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect2816-3-6-6-5-1"
        width="107.53072"
        height="14.802762"
@@ -2052,15 +2073,24 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:url(#linearGradient3644);fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.73553455;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect2634"
+       style="fill:url(#linearGradient3441);fill-opacity:1;stroke:#ff9999;stroke-width:0.28400001000000002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3415"
+       width="110.99105"
+       height="17.278593"
+       x="337.50568"
+       y="245.91824"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\slider_generic.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.736;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3417"
        width="107.53072"
        height="14.802762"
-       x="-446.67346"
-       y="248.7814"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       x="339.2359"
+       y="247.15619"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\slider_generic.png"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"
-       transform="scale(-1,1)" />
+       inkscape:export-ydpi="90" />
   </g>
 </svg>
