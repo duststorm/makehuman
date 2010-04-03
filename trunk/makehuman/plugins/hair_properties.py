@@ -59,16 +59,17 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
         
-        self.cPSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_generic.png'),\
-        self.app.getThemeResource('images', 'slider.png'),\
-        self.app.getThemeResource('images', 'slider_focused.png'), [600, 100, 9.2], 14,4,30,"Number of Control Points")             
-       #widthFactor
+        self.cPSlider = gui3d.Slider(self, position=[600, 100, 9.2], value=14,min=4,max=30,label="Control Points")
+        self.length = gui3d.Slider(self, position=[600, 140, 9.2], value=5.0,min=0.0,max=7.0,label="Strand Length")
+        self.number = gui3d.Slider(self, position=[600, 180, 9.2], value=25,min=1,max=260,label="Strands Number")
+        self.gravity = gui3d.Slider(self, position=[600, 220, 9.2], value=1.5,min=0.0,max=2.0,label="Gravity Factor")
+        
         self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'),\
         self.app.getThemeResource('images', 'slider.png'),\
         self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0,30.0) 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
-
+        
         @self.redSlider.event
         def onChanging(value):
             self.setColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])

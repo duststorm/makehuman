@@ -602,8 +602,10 @@ class Slider(View):
         worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
         sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
         self.slider.setPosition(sliderPos)
-        value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
+        value = (sliderPos[0] - self.sliderMinX) / float(self.sliderMaxX - self.sliderMinX)
         self.__value = value * (self.max - self.min) + self.min
+        if type(self.min) is int:
+            self.__value = int(self.__value)
 
         self.callEvent('onChanging', self.__value)
 
@@ -613,8 +615,10 @@ class Slider(View):
         worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
         sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
         self.slider.setPosition(sliderPos)
-        value = (sliderPos[0] - self.sliderMinX) / (self.sliderMaxX - self.sliderMinX)
+        value = (sliderPos[0] - self.sliderMinX) / float(self.sliderMaxX - self.sliderMinX)
         self.__value = value * (self.max - self.min) + self.min
+        if type(self.min) is int:
+            self.__value = int(self.__value)
 
         self.callEvent('onChange', self.__value)
 
@@ -1118,3 +1122,4 @@ def createText(view, text,position=[0.0,0.0,9.0],scale=[0.5,0.5,0.5],fontFileNam
         obj=font3d.createMesh(font, text,position);
         obj.setScale(scale[0],scale[1],scale[2])
         Object(view,obj)
+        return obj
