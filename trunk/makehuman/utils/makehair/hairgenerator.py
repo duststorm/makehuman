@@ -4,7 +4,7 @@ Project Name:                **MakeHuman**
 Product Home Page:           http://www.makehuman.org/
 Google Home Page:            http://code.google.com/p/makehuman/
 Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2009
+Copyright(c):                MakeHuman Team 2001-2010
 Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
 Coding Standards:            See http://sites.google.com/site/makehumandocs/developers-guide
 ===========================  ===============================================================

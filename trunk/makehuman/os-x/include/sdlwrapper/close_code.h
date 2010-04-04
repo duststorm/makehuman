@@ -13,7 +13,7 @@
  <tr><td>Author of this file:                             </td>
  <td>Hans-Peter Dusel &lt;<a href='mailto:hdusel@tangerine-soft.de'>hdusel@tangerine-soft.de</a>&gt;</td></tr>
  <tr><td>Copyright(c):                                   </td>
- <td>MakeHuman Team 2001-2009                        </td></tr>
+ <td>MakeHuman Team 2001-2010                        </td></tr>
  <tr><td>Licensing:                                      </td>
  <td>GPL3 (see also
  http://makehuman.wiki.sourceforge.net/Licensing)</td></tr>

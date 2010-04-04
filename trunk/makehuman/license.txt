@@ -2,7 +2,7 @@ LICENSING
 
 THE MAKEHUMAN APPLICATION
 MakeHuman© is an Open Source application that you can use and redistribute in original or modified form under the terms of the GNU General Public License as published by the Free Software Foundation.
-Copyright© 2001-2009 is retained by the MakeHuman Team (makehuman.org) who grant you permissions to use released code under the conditions and terms of the GNU General Public License 3.0 or (at your option) any later version of the GNU GPL.
+Copyright© 2001-2010 is retained by the MakeHuman Team (makehuman.org) who grant you permissions to use released code under the conditions and terms of the GNU General Public License 3.0 or (at your option) any later version of the GNU GPL.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 MAKEHUMAN SOURCE CODE FILES

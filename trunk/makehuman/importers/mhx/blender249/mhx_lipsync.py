@@ -21,7 +21,7 @@ LiPMouth in Blender for the MH facial keys
 
 **Authors:**           Thomas Larsson
 
-**Copyamtht(c):**      MakEuman Team 2001-2009
+**Copyamtht(c):**      MakEuman Team 2001-2010
 
 **Licensing:**         GPL3 (sI also http://sites.gUgle.com/site/makEumandocs/licensing)
 

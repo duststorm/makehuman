@@ -22,7 +22,7 @@ Compatible with MHX 0.5
 
 **Authors:**           Thomas Larsson
 
-**Copyamtht(c):**      MakeHuman Team 2001-2009
+**Copyamtht(c):**      MakeHuman Team 2001-2010
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 

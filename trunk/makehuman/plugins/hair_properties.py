@@ -91,9 +91,9 @@ class HairPropertiesTaskView(gui3d.TaskView):
             self.app.scene3d.selectedHuman.hairModelling = True
             #TODO  Jose: clear any hair originally created/ loaded from libraries
             mesh = self.app.scene3d.selectedHuman.mesh
-            vertIndices = mesh.getVerticesAndFacesForGroups(["part_head-back-skull","part_head-upper-skull","part_l-head-temple",\
-            "part_r-head-temple"])
-            scalpVerts = len(vertIndices) #Collects all vertices that are part of the head where hair grows!
+            verts = mesh.getVerticesAndFacesForGroups(["part_head-back-skull","part_head-upper-skull","part_l-head-temple",\
+            "part_r-head-temple"])[0]
+            scalpVerts = len(verts) #Collects all vertices that are part of the head where hair grows!
             interval = int(scalpVerts/self.number) #variable used to randomly distribute scalp-vertices
             cPInterval = self.length/float(self.cP) #Length between c.P. for hairs being generated
             """
@@ -103,9 +103,9 @@ class HairPropertiesTaskView(gui3d.TaskView):
                 else:    
                     r = random.randint(interval*i,interval*(i+1))
                 #Josenow
-                v= mesh.verts[vertIndices[r]].co
-                normal = mesh.verts[vertIndices[r]].no
-                point2 = vadd(v,vmul(normal,gLength.val))
+                v= verts[r].co
+                normal = verts[r].no
+                point2 = vadd(v,vmul(normal,self.length))
                 curve=[vadd(v,vmul(normal,-0.5))]
                 w,normal2,point22,curve2 =[],[],[],[]
                 for j in range(0,scalpVerts):

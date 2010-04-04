@@ -12,7 +12,7 @@ Data Structures and Functions for *Half Edges* processing.
 
 **Authors:**           Manuel Bastioni
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2010
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 

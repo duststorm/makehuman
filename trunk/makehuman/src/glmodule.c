@@ -11,7 +11,7 @@
  <tr><td>Authors:                                        </td>
      <td>Manuel Bastioni, Paolo Colombo, Simone Re, Marc Flerackers, Hans-Peter Dusel</td></tr>
  <tr><td>Copyright(c):                                   </td>
-     <td>MakeHuman Team 2001-2009                        </td></tr>
+     <td>MakeHuman Team 2001-2010                        </td></tr>
  <tr><td>Licensing:                                      </td>
      <td>GPL3 (see also
          http://makehuman.wiki.sourceforge.net/Licensing)</td></tr>
