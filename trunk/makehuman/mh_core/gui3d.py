@@ -659,14 +659,16 @@ class Button(View):
     def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture="data/themes/default/images/button_unselected.png",\
     selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None,\
     label=None):
-        if type(label) is str:
-            createText(parent,label, [position[0]-20,position[1]-10,position[2]])
         View.__init__(self, parent)
         if selectedTexture and selected:
             t = selectedTexture
         else:
             t = texture
         self.button = Object(self, mesh, texture=t, position=position)
+        if type(label) is str:
+            createText(parent,label, [position[0]+5,position[1]-8,position[2]+0.001])
+            #assumes button obj origin is upper left corner
+            #TODO text should be in the middle of button, calculate this from text length
         self.texture = texture
         self.selectedTexture = selectedTexture
         self.focusedTexture = focusedTexture

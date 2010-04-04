@@ -78,7 +78,8 @@ class HairPropertiesTaskView(gui3d.TaskView):
         #############
         #BUTTONS
         #############        
-        self.doButton = gui3d.Button(self, position=[600,260,9.2],label="Test!")
+        self.doButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[600,270,9.2],label="Create Hair")
+        #self.doButton = gui3d.Button(self,position=[600,270,9.2],label="Create Hair")
 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
