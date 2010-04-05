@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+**Copyright(c):**      MakeHuman Team 2001-2009
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -1061,10 +1061,10 @@ def setupBones(obj):
 			boneTail[bone] = locations[tjoint]
 
 #
-#	newSetupJoints (obj, joints, armature):
+#	newSetupJoints (obj, joints, headTails):
 #	Used by gobo
 #
-def newSetupJoints (obj, joints, armature):
+def newSetupJoints (obj, joints, headTails):
 	global boneHead, boneTail, locations
 	locations = {}
 	for (key, typ, data) in joints:
@@ -1075,6 +1075,8 @@ def newSetupJoints (obj, joints, armature):
 		elif typ == 'v':
 			v = int(data)
 			locations[key] = obj.verts[v].co
+		elif typ == 'x':
+			locations[key] = [float(data[0]), float(data[2]), -float(data[1])]
 
 	for (key, typ, data) in joints:
 		if typ == 'j':
@@ -1082,6 +1084,8 @@ def newSetupJoints (obj, joints, armature):
 		elif typ == 'b':
 			locations[key] = locations[data]
 		elif typ == 'v':
+			pass
+		elif typ == 'x':
 			pass
 		elif typ == 'l':
 			((k1, joint1), (k2, joint2)) = data
@@ -1094,7 +1098,7 @@ def newSetupJoints (obj, joints, armature):
 
 	boneHead = {}
 	boneTail = {}
-	for (bone, head, tail) in armature:
+	for (bone, head, tail) in headTails:
 		boneHead[bone] = locations[head]
 		boneTail[bone] = locations[tail]
 	return 

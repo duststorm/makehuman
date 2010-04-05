@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+**Copyright(c):**      MakeHuman Team 2001-2009
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -400,10 +400,6 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
 	   ext in Danger:
 		return
 		
-	if ext == 'targets':
-		print("TARG", ext, arg)
-		return
-
 	if ext == 'end':
 		print("RENAME end", arg)
 		ext = '\\ end'
@@ -510,7 +506,7 @@ def writeClass(list, ext, arg, pad, depth, fp):
 	elif classSplit[0] == "PropertyRNA" or classSplit[0] == "PropertyCollectionRNA":
 		#<class 'PropertyRNA'>
 		#print("PROP", arg, dir(arg))
-		if 0 and dir(arg) != []:
+		if 1 and dir(arg) != []:
 			typeSplit = str(type(arg.rna_type)).split("'")
 			fp.write("%s%s PropertyRNA\n" % (pad, ext))
 			writeSubDir(arg, [], pad+"  ", depth+1, fp)
@@ -697,7 +693,7 @@ def exportAction(act, fp):
 def exportFCurve(fcu, exported, pad, fp):
 	dataPath = fcu.data_path.replace(' ', '_')
 	words = dataPath.split('"')
-	print("Fcurve", dataPath, words)
+	#print("Fcurve", dataPath, words)
 	'''
 	typ = words[0].split('.')[0]
 	bname = words[1]
@@ -719,8 +715,9 @@ def exportFCurve(fcu, exported, pad, fp):
 	# exportActionGroup(fcu.group, pad+"  ", fp)
 	prio = ['extrapolation']
 	writePrio(fcu, prio, pad+"  ", fp)
-	if expMsk & M_MHX == 0:
-		writeDir(fcu, prio+['modifiers', 'keyframe_points', 'sampled_points', 'group', 'data_path', 'array_index', 'driver'], pad+"  ", fp)
+	exclude = ['modifiers', 'keyframe_points', 'sampled_points', 'group', 'data_path', 'array_index', 'driver',
+		'auto_clamped_handles', 'color', 'color_mode', 'muted', 'visible']
+	writeDir(fcu, prio+exclude, pad+"  ", fp)
 	fp.write("%send FCurve\n\n" % pad)
 	return exported
 
@@ -743,13 +740,16 @@ def exportDriver(drv, pad, fp):
 
 def exportDriverVariable(var, pad, fp):
 	name = var.name.replace(' ', '_')
-	fp.write("%sDriverVariable %s \n" % (pad,name))
-	targets = var.targets
-	fp.write("%s  Targets %s ;\n" % (pad, targets))
-	for targ in targets:
-		fp.write("%s  Target  ;\n" % (pad))
-	writeDir(var, [], pad+"  ", fp)
-	fp.write("%send exportDriverVariable\n\n" % pad)
+	fp.write("%sDriverVariable %s %s \n" % (pad,name, var.type))
+	for targ in var.targets:
+		exportDriverTarget(targ, pad+'  ', fp)
+	writeDir(var, ['targets'], pad+"  ", fp)
+	fp.write("%send DriverVariable\n\n" % pad)
+
+def exportDriverTarget(targ, pad, fp):
+	fp.write("%sTarget %s %s\n" % (pad, targ.data_path, targ.id_type))
+	writeDir(targ, ['data_path', 'id_type'], pad+'  ', fp)
+	fp.write("%send Target\n" % pad)
 
 def exportActionGroup(grp, fp):
 	fp.write("%sGroup %s \n" % (pad,grp.name.replace(' ', '_')))
@@ -766,7 +766,7 @@ def exportChannel(chnl, pad, fp):
 	fp.write("%send Channels\n\n" % pad)
 
 def exportKeyFramePoint(kpt, pad, fp):
-	#fp.write("%skp %.6g %.6g %.6g %.6g %.6g %.6g ;\n" % 
+	#fp.write("%skp %.6g %.6f %.6f %.6f %.6f %.6f ;\n" % 
 	#	(pad, kpt.co[0], kpt.co[1], kpt.handle1[0], kpt.handle1[1], kpt.handle2[0], kpt.handle2[1]))
 	fp.write("%skp %.6g %.6f ;\n" % (pad, kpt.co[0], kpt.co[1]))
 
@@ -1244,14 +1244,13 @@ def exportShapeKeys(me, fp):
 #
 #	exportArmature(ob, fp):
 #	exportBone(fp, n, bone):
-#	exportPoseBone(fp, pb):
 #
 
 def exportArmature(ob, fp):
+	global createdLocal
 	amt = ob.data
 	amtName = amt.name.replace(' ','_')
 	obName = ob.name.replace(' ','_')
-	pbones = ob.pose.bones.values()
 	
 	if verbosity > 0:
 		print( "Saving amt "+amtName )
@@ -1259,8 +1258,10 @@ def exportArmature(ob, fp):
 	bpy.context.scene.objects.active = ob
 	fp.write("Armature %s %s " % (amtName, obName))
 
+	'''
 	typ = None
 	ntypes = 0
+	pbones = ob.pose.bones.values()
 	for pb in pbones:
 		try:
 			typ = pb['type']
@@ -1270,10 +1271,10 @@ def exportArmature(ob, fp):
 	if ntypes > 1: 
 		typ = "human"
 
-	bpy.ops.object.mode_set(mode='EDIT')
-	bones = amt.edit_bones.values()
 
 	if typ and expMsk & M_Rigify:
+		bpy.ops.object.mode_set(mode='EDIT')
+		bones = amt.edit_bones.values()
 		fp.write("  Rigify \n")
 		fp.write("  MetaRig %s ;\n" %typ)
 		for bone in bones:
@@ -1282,8 +1283,11 @@ def exportArmature(ob, fp):
 		fp.write("end Armature\n")
 		bpy.ops.object.mode_set(mode='OBJECT')
 		return
-	else:
-		fp.write("  Normal \n")
+	'''
+
+	bpy.ops.object.mode_set(mode='EDIT')
+	bones = amt.edit_bones.values()
+	fp.write("  Normal \n")
 	
 	for b in bones:
 		if b.parent == None:
@@ -1296,12 +1300,17 @@ def exportArmature(ob, fp):
 	writePrio(amt, prio, "  ", fp)
 	writeDir(amt, prio+['animation_data', 'edit_bones', 'bones'], "  ", fp)
 	fp.write("end Armature\n")
-	bpy.ops.object.mode_set(mode='OBJECT')
 
-	fp.write("Pose %s \n" % (obName))	
-	for pb in pbones:
+	bpy.ops.object.mode_set(mode='POSE')
+	fp.write("\nPose %s \n" % (obName))	
+	createdLocal['BoneGroup'] = []
+	for bg in ob.pose.bone_groups.values():
+		exportBoneGroup(fp, bg)
+	for pb in ob.pose.bones.values():
 		exportPoseBone(fp, pb)
+	writeDir(ob.pose, ['bones', 'bone_groups'], "  ", fp)
 	fp.write("end Pose\n")
+	bpy.ops.object.mode_set(mode='OBJECT')
 	return # exportArmature
 
 def writeBone(bone, fp):
@@ -1312,7 +1321,6 @@ def writeBone(bone, fp):
 	fp.write("    tail %.6g %.6g %.6g ; \n" % (x[0], x[1], x[2]))
 	writePrio(bone, ['roll'], "    ", fp)
 	return
-
 
 def exportBone(fp, bone):
 	flags = 0
@@ -1328,7 +1336,7 @@ def exportBone(fp, bone):
 		fp.write("    parent Refer Bone %s ;\n" % (bone.parent.name.replace(' ','_')))
 
 	exclude = ['head', 'tail', 'parent', 'head_local', 'tail_local', 'matrix_local', 'children']
-	if expMsk & M_MHX:
+	if True or expMsk & M_MHX:
 		exclude += ['matrix',  'envelope_distance', 'envelope_weight', 'head_radius', 'tail_radius',
 			'selected', 'selected_head', 'selected_tail']
 	writeDir(bone, exclude, "    ", fp)
@@ -1338,6 +1346,12 @@ def exportBone(fp, bone):
 		for child in bone.children:
 			exportBone(fp, child)
 	return
+
+#
+#
+#	exportBoneGroup(bg, fp):
+#	exportPoseBone(fp, pb):
+#
 
 def exportPoseBone(fp, pb):
 	fp.write("\n  Posebone %s \n" % (pb.name.replace(' ', '_')))
@@ -1353,13 +1367,22 @@ def exportPoseBone(fp, pb):
 		'ik_max_x', 'ik_max_y', 'ik_max_z', 
 		'ik_min_x', 'ik_min_y', 'ik_min_z', 
 		'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',
-		'custom_shape_transform',
-		'bone_group_index','parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
-	if expMsk & M_MHX:
+		'custom_shape_transform', 'original_length', 'bone_group_index', 
+		'parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
+	if True or expMsk & M_MHX:
 		exclude += ['channel_matrix', 'matrix', 'rotation_axis_angle', 'rotation_euler', 'rotation_mode',
 			'rotation_quaternion', 'scale', 'selected']
 	writeDir(pb, exclude, "    ", fp)	
 	fp.write("  end Posebone\n")
+	return
+
+def exportBoneGroup(fp, bg):
+	global createdLocal
+	name = bg.name.replace(' ', '_')
+	fp.write("    BoneGroup %s\n" % (name))
+	writeDir(bg, [], "      ", fp)	
+	fp.write("    end BoneGroup\n")
+	createdLocal['BoneGroup'].append(name)
 	return
 
 #
@@ -1392,6 +1415,7 @@ def exportConstraint(cns, fp):
 		pass
 
 	exclude = ['invert_x', 'invert_y', 'invert_z', 'use_x', 'use_y', 'use_z',
+		'head_tail',
 		'pos_lock_x', 'pos_lock_y', 'pos_lock_z', 'rot_lock_x', 'rot_lock_y', 'rot_lock_z', 
 		'disabled', 'lin_error', 'rot_error', 'target', 'type']
 	if expMsk & M_MHX:
@@ -1683,7 +1707,8 @@ def mhxClose(fp):
 hairFile = "particles25.mhx"
 theRig = "classic"
 #theRig = "gobo"
-writeMhxFile('/home/thomas/myblends/sintel/simple.mhx', M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
+writeMhxFile('/home/thomas/myblends/gobo/gobo.mhx', M_Amt+M_Anim)
+#writeMhxFile('/home/thomas/myblends/sintel/simple2.mhx', M_Amt+M_Anim)
 #writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
 #writeMhxTemplates(M_MHX+M_Geo+M_VGroup)
 #writeMhxTemplates(M_MHX+M_Amt)

@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+**Copyright(c):**      MakeHuman Team 2001-2009
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -22,7 +22,7 @@ TO DO
 
 """
 
-import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, hairgenerator, gobo_bones
+import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, hairgenerator, gobo_bones #, sintel_bones
 import os
 
 
@@ -47,7 +47,22 @@ def exportMhx(obj, filename):
 	exportMhx_25(obj, "classic", fp)
 	fp.close()
 	print("MHX 2.5x file %s written" % filename)
+
+	filename = name+"-gobo-25"+ext
+	print("Writing MHX 2.5x file " + filename )
+	fp = open(filename, 'w')
+	exportMhx_25(obj, "gobo", fp)
+	fp.close()
+	print("MHX 2.5x file %s written" % filename)
+
 	'''
+	filename = name+"-sintel-25"+ext
+	print("Writing MHX 2.5x file " + filename )
+	fp = open(filename, 'w')
+	exportMhx_25(obj, "sintel", fp)
+	fp.close()
+	print("MHX 2.5x file %s written" % filename)
+	
 	filename = name+"-rigify-25"+ext
 	print("Writing MHX 2.5x file " + filename )
 	fp = open(filename, 'w')
@@ -55,13 +70,7 @@ def exportMhx(obj, filename):
 	fp.close()
 	print("MHX 2.5x file %s written" % filename)
 	'''
-	filename = name+"-gobo-25"+ext
-	print("Writing MHX 2.5x file " + filename )
-	fp = open(filename, 'w')
-	exportMhx_25(obj, "gobo", fp)
-	fp.close()
-	print("MHX 2.5x file %s written" % filename)
-	
+
 	return
 
 #
@@ -111,7 +120,7 @@ def exportRawMhx(obj, fp):
 
 def exportMhx_25(obj, rig, fp):
 	if rig == 'gobo':
-		mhxbones.newSetupJoints(obj, gobo_bones.joints, gobo_bones.headsTails)
+		mhxbones.newSetupJoints(obj, gobo_bones.GoboJoints, gobo_bones.GoboHeadsTails)
 		copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
 		fp.write("if toggle&T_Armature\n")
 		copyFile25(obj, "data/templates/gobo-armature25.mhx", rig, fp)	
@@ -122,6 +131,9 @@ def exportMhx_25(obj, rig, fp):
 		fp.write("if toggle&T_Mesh\n")
 		copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
 		fp.write("end if\n")
+	elif rig == 'sintel':
+		mhxbones.newSetupJoints(obj, sintel_bones.SintelJoints, sintel_bones.SintelHeadsTails)
+		copyFile25(obj, "data/templates/sintel-armature25.mhx", rig, fp)	
 	else:
 		mhxbones.setupBones(obj)
 		copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
@@ -183,13 +195,19 @@ def copyFile25(obj, tmplName, rig, fp):
 				(x, y) = mhxbones.boneRoll[bone]
 				fp.write("    roll %.6g ;\n" % (y))
 			elif lineSplit[1] == 'gobo-bones':
-				gobo_bones.writeArmature(fp)
+				gobo_bones.writeArmature(fp, gobo_bones.GoboArmature)
 			elif lineSplit[1] == 'gobo-poses':
-				gobo_bones.writePoses(fp)
+				gobo_bones.GoboWritePoses(fp)
 			elif lineSplit[1] == 'gobo-actions':
-				gobo_bones.writeActions(fp)
+				gobo_bones.GoboWriteActions(fp)
 			elif lineSplit[1] == 'gobo-constraint-drivers':
-				gobo_bones.writeConstraintDrivers(fp)
+				gobo_bones.GoboWriteDrivers(fp)
+			elif lineSplit[1] == 'sintel-bones':
+				gobo_bones.writeArmature(fp, sintel_bones.SintelArmature)
+			elif lineSplit[1] == 'sintel-poses':
+				sintel_bones.SintelWritePoses(fp)
+			elif lineSplit[1] == 'sintel-drivers':
+				gobo_bones.writeDrivers(fp, sintel_bones.SintelDrivers)
 			elif lineSplit[1] == 'ProxyVerts':
 				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
 				for v in realVerts:

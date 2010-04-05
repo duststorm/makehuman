@@ -1913,10 +1913,10 @@ Armature HumanRig HumanRig   Normal
   draw_group_colors True ;
   draw_names False ;
   drawtype 'OCTAHEDRAL' ;
-  ghost_end_frame 0 ;
+  ghost_frame_end 0 ;
   ghost_only_selected False ;
   ghost_size 1 ;
-  ghost_start_frame 0 ;
+  ghost_frame_start 0 ;
   ghost_step 0 ;
   ghost_type 'CURRENT_FRAME' ;
   layer Array 1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;

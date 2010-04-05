@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+**Copyright(c):**      MakeHuman Team 2001-2009
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -21,7 +21,7 @@ Bones for the Gobo rig
 
 import mhxbones
 
-joints = [
+GoboJoints = [
 	('mid-feet'			,'l', ((0.5, 'l-ankle'), (0.5, 'r-ankle'))),
 	('root_head'			, 'o', ('mid-feet', [0,-0.3,0])),
 	('root_tail'			, 'o', ('root_head', [0,0,-1])),
@@ -214,7 +214,7 @@ joints = [
 	('foot_tumble_L_tail'		, 'o', ('foot_tumble_L_head', [0,0.6,0])),
 	('foot_roll_L_head'		, 'o', ('toe_L_tail', [0.3,0,0.6])),
 	('foot_roll_L_tail'		, 'o', ('foot_roll_L_head', [-0.6,0,0])),
-	('knee_L_tail'			, 'o', ('thigh_L_tail', [0,0,3.0])),
+	('knee_L_tail'			, 'o', ('thigh_L_tail', [0,0,6.0])),
 	('knee_L_head'			, 'o', ('knee_L_tail', [0,-0.6,0])),
 	('ikfk_foot_L_head'		, 'o', ('foot_roll_L_head', [0.0,0,0.6])),
 	('ikfk_foot_L_tail'		, 'o', ('ikfk_foot_L_head', [-0.6,0,0])),
@@ -241,13 +241,13 @@ joints = [
 	('foot_tumble_R_tail'		, 'o', ('foot_tumble_R_head', [0,0.6,0])),
 	('foot_roll_R_head'		, 'o', ('toe_R_tail', [0.3,0,0.6])),
 	('foot_roll_R_tail'		, 'o', ('foot_roll_R_head', [-0.6,0,0])),
-	('knee_R_tail'			, 'o', ('thigh_R_tail', [0,0,3.0])),
+	('knee_R_tail'			, 'o', ('thigh_R_tail', [0,0,6.0])),
 	('knee_R_head'			, 'o', ('knee_R_tail', [0,-0.6,0])),
 	('ikfk_foot_R_head'		, 'o', ('foot_roll_R_head', [0,0,0.6])),
 	('ikfk_foot_R_tail'		, 'o', ('ikfk_foot_R_head', [-0.6,0,0])),
 ]
 
-headsTails = [
+GoboHeadsTails = [
 	('Root'			, 'root_head', 'root_tail'),
 	('HandCtrl_L'		, 'hand_L_head', 'hand_L_tail'),
 	('HandCtrl_R'		, 'hand_R_head', 'hand_R_tail'),
@@ -260,7 +260,7 @@ headsTails = [
 	('Jaw'			, 'jaw_head', 'jaw_tail'),
 
 	('Clavicle_L'		, 'shoulder_L_head', 'shoulder_L_tail'),
-	('ikfkHand_L'		, 'ikfk_hand_L_head', 'ikfk_hand_L_tail'),
+	('PArmIK_L'		, 'ikfk_hand_L_head', 'ikfk_hand_L_tail'),
 	('ArmRoot_L'		, 'arm_root_L_head', 'arm_root_L_tail'),
 	('UpArm_L'		, 'arm_root_L_tail', 'armupper_L_tail'),
 	('LoArm_L'		, 'armupper_L_tail', 'armlower_L_tail'),
@@ -325,7 +325,7 @@ headsTails = [
 	('Finger-5-3_fk_L'	, 'finger-5-2_L_tail', 'finger-5-3_L_tail'),
 
 	('Clavicle_R'		, 'shoulder_R_head', 'shoulder_R_tail'),
-	('ikfkHand_R'		, 'ikfk_hand_R_head', 'ikfk_hand_R_tail'),
+	('PArmIK_R'		, 'ikfk_hand_R_head', 'ikfk_hand_R_tail'),
 	('ArmRoot_R'		, 'arm_root_R_head', 'arm_root_R_tail'),
 	('UpArm_R'		, 'arm_root_R_tail', 'armupper_R_tail'),
 	('LoArm_R'		, 'armupper_R_tail', 'armlower_R_tail'),
@@ -431,7 +431,7 @@ headsTails = [
 	('FootTumble_L'		, 'foot_tumble_L_head', 'foot_tumble_L_tail'),
 	('FootRoll_L'		, 'foot_roll_L_head', 'foot_roll_L_tail'),
 	('Knee_L'		, 'knee_L_head', 'knee_L_tail'),
-	('ikfkFootCtrl_L'	, 'ikfk_foot_L_head', 'ikfk_foot_L_tail'),
+	('PLegIK_L'		, 'ikfk_foot_L_head', 'ikfk_foot_L_tail'),
 
 	('FootCtrl_R'		, 'footCtrl_R_head', 'footCtrl_R_tail'),
 	('TipToe_R'		, 'tiptoe_R_head', 'tiptoe_R_tail'),
@@ -445,7 +445,7 @@ headsTails = [
 	('FootTumble_R'		, 'foot_tumble_R_head', 'foot_tumble_R_tail'),
 	('FootRoll_R'		, 'foot_roll_R_head', 'foot_roll_R_tail'),
 	('Knee_R'		, 'knee_R_head', 'knee_R_tail'),
-	('ikfkFootCtrl_R'	, 'ikfk_foot_R_head', 'ikfk_foot_R_tail'),
+	('PLegIK_R'		, 'ikfk_foot_R_head', 'ikfk_foot_R_tail'),
 
 	('Breathe'		, 'spine1', 'chest-front'),
 	('Stomach'		, 'chest-front', 'pelvis'),
@@ -473,11 +473,29 @@ headsTails = [
 #	Flags
 #
 
-F_CON = 0x001
-F_DEF = 0x002
-F_RES = 0x004
-F_WIR = 0x008
-F_NOSCALE = 0x010
+
+F_CON = 0x0001
+F_DEF = 0x0002
+F_RES = 0x0004
+F_WIR = 0x0008
+F_NOSCALE = 0x0010
+F_GLOC = 0x0020
+F_LOCK = 0x0040
+F_HID = 0x0080
+F_NOCYC = 0x0100
+
+
+P_LKROT4 = 0x0001
+P_LKROTW = 0x0002
+P_IKLIN = 0x0004
+P_IKROT = 0x0008
+
+C_OWNER = 0x0001
+C_TARGET = 0x0002
+C_ACT = 0x0004
+C_EXP = 0x0008
+C_LTRA = 0x0010
+C_LOCAL = 0x0020
 
 #
 #	Bone layers
@@ -501,11 +519,11 @@ L_HLPFK	=	0x2000
 L_HELP	=	0x4000
 L_DEF =		0x8000
 
-armature = [
+GoboArmature = [
 	('Root',		0.0, None, F_WIR, L_MAIN, (1,1,1)),
 
-	('HandCtrl_L',	1.5708, 'Root', F_WIR, L_ARMIK, (1,1,1)),
-	('HandCtrl_R',	-1.5708, 'Root', F_WIR, L_ARMIK, (1,1,1)),
+	('HandCtrl_L',		1.5708, 'Root', F_WIR, L_ARMIK, (1,1,1)),
+	('HandCtrl_R',		-1.5708, 'Root', F_WIR, L_ARMIK, (1,1,1)),
 
 	('Hips',		0.0, 'Root', F_DEF+F_WIR, L_MAIN+L_DEF, (1,1,1)),
 	('Spine3',		0.0, 'Hips', F_DEF+F_WIR, L_MAIN+L_DEF, (1,1,1)),
@@ -516,7 +534,7 @@ armature = [
 	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_MAIN+L_DEF, (1,1,1)),
 
 	('Clavicle_L',		1.5708, 'Spine1', F_DEF+F_WIR, L_SKEL+L_DEF, (1,1,1)),
-	('ikfkHand_L',		-1.5708, 'Clavicle_L', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
+	('PArmIK_L',		-1.5708, 'Clavicle_L', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
 	('ArmRoot_L',		1.5708, 'Clavicle_L', F_RES, L_SKEL, (0,0,2)),
 	('Elbow_L',		0, 'ArmRoot_L', F_WIR,  L_ARMIK, (1,1,1)),
 	('UpArm_L',		1.5708, 'ArmRoot_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
@@ -532,7 +550,7 @@ armature = [
 	('FingerCurl_fk_L',	0, 'LoArm_fk_L', F_WIR, L_ARMFK, (1,1,1)),
 
 	('Clavicle_R',		-1.5708, 'Spine1', F_DEF+F_WIR, L_SKEL+L_DEF, (1,1,1)),
-	('ikfkHand_R',		-1.5708, 'Clavicle_R', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
+	('PArmIK_R',		-1.5708, 'Clavicle_R', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
 	('ArmRoot_R',		-1.5708, 'Clavicle_R', F_RES, L_SKEL, (0,0,2)),
 	('Elbow_R',		0, 'ArmRoot_R', F_WIR, L_ARMIK, (1,1,1)),
 	('UpArm_R',		-1.5708, 'ArmRoot_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
@@ -685,7 +703,7 @@ armature = [
 	('FootTumble_L',	0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
 	('FootRoll_L',		-1.5708, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
 	('Knee_L',		0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
-	('ikfkFootCtrl_L',	-1.5708, 'FootCtrl_L', F_WIR, L_MAIN+L_LEGIK+L_LEGFK, (1,1,1)),
+	('PLegIK_L',		-1.5708, 'FootCtrl_L', F_WIR, L_MAIN+L_LEGIK+L_LEGFK, (1,1,1)),
 
 	('FootCtrl_R',		0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
 	('TipToe_R',		0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
@@ -699,7 +717,7 @@ armature = [
 	('FootTumble_R',	0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
 	('FootRoll_R',		-1.5708, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
 	('Knee_R',		0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
-	('ikfkFootCtrl_R',	-1.5708, 'FootCtrl_R', F_WIR, L_MAIN+L_LEGIK, (1,1,1)),
+	('PLegIK_R',		-1.5708, 'FootCtrl_R', F_WIR, L_MAIN+L_LEGIK, (1,1,1)),
 
 	('Breathe', 		0.0, 'Spine2', F_CON+F_DEF, L_DEF, (1,1,1)),
 	('Stomach', 		0.0, 'Breathe', F_CON+F_DEF+F_NOSCALE+F_RES, L_DEF, (1,1,1)),
@@ -726,12 +744,12 @@ armature = [
 ]	
 
 #
-#	writeArmature(fp):
+#	writeArmature(fp, armature):
 #	boolString(val):
 #	addBone(bone, roll, parent, flags, layers, bbone, fp):
 #
 
-def writeArmature(fp):
+def writeArmature(fp, armature):
 	for (bone, roll, parent, flags, layers, bbone) in armature:
 		addBone(bone, roll, parent, flags, layers, bbone, fp)
 	return
@@ -748,6 +766,10 @@ def addBone(bone, roll, parent, flags, layers, bbone, fp):
 	restr = boolString(flags & F_RES)
 	wire = boolString(flags & F_WIR)
 	scale = boolString(flags & F_NOSCALE == 0)
+	lloc = boolString(flags & F_GLOC == 0)
+	locked = boolString(flags & F_LOCK)
+	hidden = boolString(flags & F_HID)
+	cyc = boolString(flags & F_NOCYC == 0)
 	(bin, bout, bseg) = bbone
 
 	fp.write("\n  Bone %s \n" % (bone))
@@ -763,9 +785,9 @@ def addBone(bone, roll, parent, flags, layers, bbone, fp):
 "    bbone_out %d ; \n" % (bout) +
 "    bbone_segments %d ; \n" % (bseg) +
 "    connected %s ; \n" % (conn) +
-"    cyclic_offset True ; \n"+
+"    cyclic_offset %s ; \n" % cyc +
 "    deform %s ; \n" % (deform)+
-"    hidden False ; \n"+
+"    hidden %s ; \n" % hidden +
 "    draw_wire %s ; \n" % (wire) +
 "    hinge True ; \n"+
 "    inherit_scale %s ; \n" % (scale) +
@@ -780,245 +802,269 @@ def addBone(bone, roll, parent, flags, layers, bbone, fp):
 		bit = bit << 1
 
 	fp.write(" ; \n" +
-"    local_location True ; \n"+
-"    locked False ; \n"+
+"    local_location %s ; \n" % lloc +
+"    locked %s ; \n" % locked +
 "    multiply_vertexgroup_with_envelope False ; \n"+
 "    restrict_select %s ; \n" % (restr) +
 "  end Bone \n")
 
 #
-#	writePoses(fp):
+#	GoboBoneGroups
+#	writeBoneGroups(fp, groups):
 #
 
-def writePoses(fp):
+GoboBoneGroups = [
+	('fk', 'THEME11'),
+	('ik', 'THEME09'),
+	('spinal_column', 'THEME11'),
+	('grabable', 'DEFAULT'),
+]
+	
+def writeBoneGroups(fp, groups):
+	for (name, theme) in groups:
+		fp.write(
+"    BoneGroup %s\n" % name +
+"      color_set '%s' ;\n" % theme +
+"    end BoneGroup\n")
+	return
+
+#
+#	GoboWritePoses(fp):
+#
+
+def GoboWritePoses(fp):
 	global boneGroups
 	boneGroups = {}
 
-	addPoseBone(fp, 'Root', 'widgetRoot', None, (0,0,0), (0,0,0),
-		[('LimitRot', [(0,2.96706, 0,0, 0,0), (True, False, False)])])
+	writeBoneGroups(fp, GoboBoneGroups) 
+
+	addPoseBone(fp, 'Root', 'widgetRoot', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (0,2.96706, 0,0, 0,0), (True, False, False)])])
 
 	# Left foot
-	addPoseBone(fp, 'FootCtrl_L', 'widgetFootCtrl_L', 'ik', (0,0,0), (0,0,0), [])
+	addPoseBone(fp, 'FootCtrl_L', 'widgetFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'TipToe_L', 'widgetTipToe_L', None, (1,1,1), (0,0,1),
-		[('LimitRot', [(0,2.96706, 0,0, 0,0), (True, False, False)])])
+	addPoseBone(fp, 'TipToe_L', 'widgetTipToe_L', None, (1,1,1), (0,0,1), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (0,2.96706, 0,0, 0,0), (True, False, False)])])
 
-	addPoseBone(fp, 'FootRoll_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FootRoll_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'FootTumble_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FootTumble_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'TumbleOut_L', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootTumble', 'FootTumble_L'])])
+	addPoseBone(fp, 'TumbleOut_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootTumble', 'FootTumble_L', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'TumbleIn_L', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootTumble', 'FootTumble_L'])])
+	addPoseBone(fp, 'TumbleIn_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootTumble', 'FootTumble_L', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'Heel_L', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootRoll', 'FootRoll_L'])])
+	addPoseBone(fp, 'Heel_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootRoll', 'FootRoll_L', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'RotateToe_L', 'widgetRotate_L', None, (1,1,1), (0,1,1), [])
+	addPoseBone(fp, 'RotateToe_L', 'widgetRotate_L', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'FootTarget_L', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootRoll', 'FootRoll_L'])])
+	addPoseBone(fp, 'FootTarget_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootRoll', 'FootRoll_L', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'Knee_L', 'widgetCircle', 'ik', (0,0,0), (1,1,1), [])
+	addPoseBone(fp, 'Knee_L', 'widgetCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'ikfkFootCtrl_L', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'PLegIK_L', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	# Right foot
-	addPoseBone(fp, 'FootCtrl_R', 'widgetFootCtrl_R', 'ik', (0,0,0), (0,0,0), [])
+	addPoseBone(fp, 'FootCtrl_R', 'widgetFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'TipToe_R', 'widgetTipToe_R', None, (1,1,1), (0,0,1),
-		[('LimitRot', [(0,2.96706, 0,0, 0,0), (True, False, False)])])
+	addPoseBone(fp, 'TipToe_R', 'widgetTipToe_R', None, (1,1,1), (0,0,1), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (0,2.96706, 0,0, 0,0), (True, False, False)])])
 
-	addPoseBone(fp, 'FootRoll_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FootRoll_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'FootTumble_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FootTumble_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'TumbleOut_R', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootTumble', 'FootTumble_R'])])
+	addPoseBone(fp, 'TumbleOut_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootTumble', 'FootTumble_R', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'TumbleIn_R', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootTumble', 'FootTumble_R'])])
+	addPoseBone(fp, 'TumbleIn_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootTumble', 'FootTumble_R', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'Heel_R', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootRoll', 'FootRoll_R'])])
+	addPoseBone(fp, 'Heel_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootRoll', 'FootRoll_R', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'RotateToe_R', 'widgetRotate_R', None, (1,1,1), (0,1,1), [])
+	addPoseBone(fp, 'RotateToe_R', 'widgetRotate_R', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'FootTarget_R', None, None, (0,0,0), (0,0,0),
-		 [('Action', ['goboFootRoll', 'FootRoll_R'])])
+	addPoseBone(fp, 'FootTarget_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TARGET, ['goboFootRoll', 'FootRoll_R', 'LOCATION_X', (1,21), (-0.5,0.5)])])
 
-	addPoseBone(fp, 'Knee_R', 'widgetCircle', 'ik', (0,0,0), (1,1,1), [])
+	addPoseBone(fp, 'Knee_R', 'widgetCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'ikfkFootCtrl_R', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'PLegIK_R', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	# Spinal column
-	addPoseBone(fp, 'Hips', 'widgetHips', 'spinal_column', (0,0,0), (0,0,0), [])
-	addPoseBone(fp, 'Spine3', 'widgetCircle15', 'spinal_column', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Spine2', 'widgetCircle15', 'spinal_column', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Spine1', 'widgetCircle10', 'spinal_column', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Neck', 'widgetNeck', 'spinal_column', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Head', 'widgetHead', 'spinal_column', (1,1,1), (0,0,0), [])
+	addPoseBone(fp, 'Hips', 'widgetHips', 'spinal_column', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Spine3', 'widgetCircle15', 'spinal_column', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Spine2', 'widgetCircle15', 'spinal_column', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Spine1', 'widgetCircle10', 'spinal_column', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Neck', 'widgetNeck', 'spinal_column', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Head', 'widgetHead', 'spinal_column', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Jaw', 'widgetJaw', 'fk', (1,1,1), (0,0,0),
-		[('LimitRot', [(-0.174533,0.785398, 0,0, -0.349066,0.349066), (True, True, True)])])
+	addPoseBone(fp, 'Jaw', 'widgetJaw', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (-0.174533,0.785398, 0,0, -0.349066,0.349066), (True, True, True)])])
 
 	# Left arm
-	addPoseBone(fp, 'Clavicle_L', 'widgetShldr_L', 'grabable', (1,1,1), (0,1,0),
-		[('LimitRot', [(-0.785398,0.349066, 0,0, -0.349066,0.785398), (True, True, True)])])
+	addPoseBone(fp, 'Clavicle_L', 'widgetShldr_L', 'grabable', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.349066,0.785398), (True, True, True)])])
 
-	addPoseBone(fp, 'ikfkHand_L', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'PArmIK_L', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'Elbow_L', 'widgetCircle', 'ik', (0,0,0), (1,1,1), [])
+	addPoseBone(fp, 'Elbow_L', 'widgetCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'UpArm_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), [])
-	addPoseBone(fp, 'LoArm_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Hand_fk_L', 'widgetCircle10', 'fk', (0,0,0), (0,0,0), [])
+	addPoseBone(fp, 'UpArm_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoArm_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Hand_fk_L', 'widgetCircle10', 'fk', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoArm_ik_L', None, 'ik', (0,0,0), (0,0,0),
-		 [('IK', ['HandCtrl_L', 2, (-1.5708, 'Elbow_L'), (True, False)])])
+	addPoseBone(fp, 'LoArm_ik_L', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['HandCtrl_L', 2, (-1.5708, 'Elbow_L'), (True, False)])])
 
-	addPoseBone(fp, 'Hand_ik_L', None, None, (0,0,0), (0,0,0), 
-		[('CopyRot', ['CopyRotIK', 'HandCtrl_L', 1])])
+	addPoseBone(fp, 'Hand_ik_L', None, None, (0,0,0), (0,0,0),  (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'HandCtrl_L', 1, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'UpArm_L', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'UpArm_ik_L', 1]),
-		('CopyRot', ['CopyRotFK', 'UpArm_fk_L', 0])])
-	addPoseBone(fp, 'LoArm_L', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'LoArm_ik_L', 1]),
-		('CopyRot', ['CopyRotFK', 'LoArm_fk_L', 0])])
-	addPoseBone(fp, 'Hand_L', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'Hand_ik_L', 1]),
-		('CopyRot', ['CopyRotFK', 'Hand_fk_L', 0])])
+	addPoseBone(fp, 'UpArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'UpArm_ik_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpArm_fk_L', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'LoArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'LoArm_ik_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoArm_fk_L', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'Hand_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'Hand_ik_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'Hand_fk_L', 0, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'FingerCurl_fk_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
-	addPoseBone(fp, 'FingerCurl_ik_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FingerCurl_fk_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FingerCurl_ik_L', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'HandCtrl_L', 'widgetHandCtrl_L', 'ik', (0,0,0), (0,0,0), [])
+	addPoseBone(fp, 'HandCtrl_L', 'widgetHandCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Right arm
-	addPoseBone(fp, 'Clavicle_R', 'widgetShldr_R', 'grabable', (1,1,1), (0,1,0),
-		[('LimitRot', [(-0.785398,0.349066, 0,0, -0.785398,0.349066), (True, True, True)])])
+	addPoseBone(fp, 'Clavicle_R', 'widgetShldr_R', 'grabable', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.785398,0.349066), (True, True, True)])])
 
-	addPoseBone(fp, 'ikfkHand_R', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'PArmIK_R', 'widgetIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'Elbow_R', 'widgetCircle', 'ik', (0,0,0), (1,1,1), [])
-	addPoseBone(fp, 'UpArm_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), [])
-	addPoseBone(fp, 'LoArm_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Hand_fk_R', 'widgetCircle10', 'fk', (0,0,0), (0,0,0), [])
+	addPoseBone(fp, 'Elbow_R', 'widgetCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'UpArm_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoArm_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Hand_fk_R', 'widgetCircle10', 'fk', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoArm_ik_R', None, 'ik', (0,0,0), (0,0,0),
-		 [('IK', ['HandCtrl_R', 2, (-1.5708, 'Elbow_R'), (True, False)])])
+	addPoseBone(fp, 'LoArm_ik_R', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['HandCtrl_R', 2, (-1.5708, 'Elbow_R'), (True, False)])])
 
-	addPoseBone(fp, 'Hand_ik_R', None, None, (0,0,0), (0,0,0), 
-		[('CopyRot', ['CopyRotIK', 'HandCtrl_R', 1])])
+	addPoseBone(fp, 'Hand_ik_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('CopyRot', 0, ['CopyRotIK', 'HandCtrl_R', 1, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'UpArm_R', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'UpArm_ik_R', 1]),
-		('CopyRot', ['CopyRotFK', 'UpArm_fk_R', 0])])
-	addPoseBone(fp, 'LoArm_R', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'LoArm_ik_R', 1]),
-		('CopyRot', ['CopyRotFK', 'LoArm_fk_R', 0])])
-	addPoseBone(fp, 'Hand_R', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'Hand_ik_R', 1]),
-		('CopyRot', ['CopyRotFK', 'Hand_fk_R', 0])])
+	addPoseBone(fp, 'UpArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'UpArm_ik_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpArm_fk_R', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'LoArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'LoArm_ik_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoArm_fk_R', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'Hand_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'Hand_ik_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'Hand_fk_R', 0, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'FingerCurl_fk_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.2, 0,0, 0,0), (True,True, False,False, False,False)])])
-	addPoseBone(fp, 'FingerCurl_ik_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1),
-		[('LimitLoc', [(-0.5,0.2, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FingerCurl_fk_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.2, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FingerCurl_ik_R', 'widgetArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.2, 0,0, 0,0), (True,True, False,False, False,False)])])
 
-	addPoseBone(fp, 'HandCtrl_R', 'widgetHandCtrl_R', 'ik', (0,0,0), (0,0,0), [])
+	addPoseBone(fp, 'HandCtrl_R', 'widgetHandCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Left leg
-	addPoseBone(fp, 'UpLeg_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), [])
-	addPoseBone(fp, 'LoLeg_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Foot_fk_L', 'widgetCircle05', 'fk', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Toe_fk_L', 'widgetCircle05', 'fk', (1,1,1), (0,1,1), [])
+	addPoseBone(fp, 'UpLeg_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoLeg_fk_L', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Foot_fk_L', 'widgetCircle05', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Toe_fk_L', 'widgetCircle05', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoLeg_ik_L', None, 'ik', (0,0,0), (0,0,0),
-		 [('IK', ['LegTarget_L', 2, (-1.5708, 'Knee_L'), (True, False)])])
+	addPoseBone(fp, 'LoLeg_ik_L', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['LegTarget_L', 2, (-1.87, 'Knee_L'), (True, False)])])
 
-	addPoseBone(fp, 'Foot_ik_L', None, None, (0,0,0), (0,0,0), 
-		[('IK', ['FootTarget_L', 1, None, (True, True)])])
-	addPoseBone(fp, 'Toe_ik_L', None, None, (0,0,0), (0,0,0), 
-		[('IK', ['ToeTarget_L', 1, None, (True, True)])])
+	addPoseBone(fp, 'Foot_ik_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['FootTarget_L', 1, None, (True, True)])])
+	addPoseBone(fp, 'Toe_ik_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['ToeTarget_L', 1, None, (True, True)])])
 
-	addPoseBone(fp, 'UpLeg_L', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'UpLeg_ik_L', 1]),
-		('CopyRot', ['CopyRotFK', 'UpLeg_fk_L', 0])])
-	addPoseBone(fp, 'LoLeg_L', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'LoLeg_ik_L', 1]),
-		('CopyRot', ['CopyRotFK', 'LoLeg_fk_L', 0])])
-	addPoseBone(fp, 'Foot_L', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'Foot_ik_L', 1]),
-		('CopyRot', ['CopyRotFK', 'Foot_fk_L', 0])])
-	addPoseBone(fp, 'Toe_L', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'Toe_ik_L', 1]),
-		('CopyRot', ['CopyRotFK', 'Toe_fk_L', 0])])
+	addPoseBone(fp, 'UpLeg_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'UpLeg_ik_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpLeg_fk_L', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'LoLeg_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'LoLeg_ik_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoLeg_fk_L', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'Foot_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'Foot_ik_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'Foot_fk_L', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'Toe_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'Toe_ik_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'Toe_fk_L', 0, (1,1,1), (0,0,0)])])
 
 	# Right leg
-	addPoseBone(fp, 'UpLeg_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), [])
-	addPoseBone(fp, 'LoLeg_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Foot_fk_R', 'widgetCircle10', 'fk', (1,1,1), (0,0,0), [])
-	addPoseBone(fp, 'Toe_fk_R', 'widgetCircle10', 'fk', (1,1,1), (0,1,1), [])
+	addPoseBone(fp, 'UpLeg_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoLeg_fk_R', 'widgetCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Foot_fk_R', 'widgetCircle10', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Toe_fk_R', 'widgetCircle10', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoLeg_ik_R', None, 'ik', (0,0,0), (0,0,0),
-		 [('IK', ['LegTarget_R', 2, (-1.5708, 'Knee_R'), (True, False)])])
+	addPoseBone(fp, 'LoLeg_ik_R', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['LegTarget_R', 2, (-1.27, 'Knee_R'), (True, False)])])
 
-	addPoseBone(fp, 'Foot_ik_R', None, None, (0,0,0), (0,0,0), 
-		[('IK', ['FootTarget_R', 1, None, (True, True)])])
-	addPoseBone(fp, 'Toe_ik_R', None, None, (0,0,0), (0,0,0), 
-		[('IK', ['ToeTarget_R', 1, None, (True, True)])])
+	addPoseBone(fp, 'Foot_ik_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['FootTarget_R', 1, None, (True, True)])])
+	addPoseBone(fp, 'Toe_ik_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['ToeTarget_R', 1, None, (True, True)])])
 
-	addPoseBone(fp, 'UpLeg_R', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'UpLeg_ik_R', 1]),
-		('CopyRot', ['CopyRotFK', 'UpLeg_fk_R', 0])])
-	addPoseBone(fp, 'LoLeg_R', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'LoLeg_ik_R', 1]),
-		('CopyRot', ['CopyRotFK', 'LoLeg_fk_R', 0])])
-	addPoseBone(fp, 'Foot_R', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'Foot_ik_R', 1]),
-		('CopyRot', ['CopyRotFK', 'Foot_fk_R', 0])])
-	addPoseBone(fp, 'Toe_R', None, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'Toe_ik_R', 1]),
-		('CopyRot', ['CopyRotFK', 'Toe_fk_R', 0])])
+	addPoseBone(fp, 'UpLeg_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'UpLeg_ik_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpLeg_fk_R', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'LoLeg_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'LoLeg_ik_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoLeg_fk_R', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'Foot_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'Foot_ik_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'Foot_fk_R', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'Toe_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'Toe_ik_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'Toe_fk_R', 0, (1,1,1), (0,0,0)])])
 
 	for m in range(1,6):
-		poseFinger(fp, m, 1, 'L', None)
-		poseFinger(fp, m, 1, 'R', None)
-		poseFinger_fkik(fp, m, 1, 'L', 'widgetCircle025', 'fk', False)
-		poseFinger_fkik(fp, m, 1, 'R', 'widgetCircle025', 'fk', False)
-		poseFinger_fkik(fp, m, 1, 'L', 'widgetCircle025', 'ik', False)
-		poseFinger_fkik(fp, m, 1, 'R', 'widgetCircle025', 'ik', False)
-		for n in range(2,4):
+		for n in range(1,4):
 			poseFinger(fp, m, n, 'L', None)
 			poseFinger(fp, m, n, 'R', None)
-			poseFinger_fkik(fp, m, n, 'L', 'widgetCircle025', 'fk', True)
-			poseFinger_fkik(fp, m, n, 'R', 'widgetCircle025', 'fk', True)
-			poseFinger_fkik(fp, m, n, 'L', 'widgetCircle025', 'ik', True)
-			poseFinger_fkik(fp, m, n, 'R', 'widgetCircle025', 'ik', True)
+			poseFinger_fkik(fp, m, n, 'L', 'widgetCircle025', 'fk')
+			poseFinger_fkik(fp, m, n, 'R', 'widgetCircle025', 'fk')
+			poseFinger_fkik(fp, m, n, 'L', 'widgetCircle025', 'ik')
+			poseFinger_fkik(fp, m, n, 'R', 'widgetCircle025', 'ik')
 
-	addPoseBone(fp, 'UpArmTwist_L', None, None, (0,0,0), (0,0,0), [('IK', ['LoArm_L', 1, None, (True, False)])]) 
-	addPoseBone(fp, 'LoArmTwist_L', None, None, (0,0,0), (0,0,0), [('IK', ['Hand_L', 1, None, (True, False)])])
-	addPoseBone(fp, 'UpLegTwist_L', None, None, (0,0,0), (0,0,0), [('IK', ['LoLeg_L', 1, None, (True, False)])])
-	addPoseBone(fp, 'UpArmTwist_R', None, None, (0,0,0), (0,0,0), [('IK', ['LoArm_R', 1, None, (True, False)])])
-	addPoseBone(fp, 'LoArmTwist_R', None, None, (0,0,0), (0,0,0), [('IK', ['Hand_R', 1, None, (True, False)])])
-	addPoseBone(fp, 'UpLegTwist_R', None, None, (0,0,0), (0,0,0), [('IK', ['LoLeg_R', 1, None, (True, False)])])
+	addPoseBone(fp, 'UpArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['LoArm_L', 1, None, (True, False)])]) 
+	addPoseBone(fp, 'LoArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['Hand_L', 1, None, (True, False)])])
+	addPoseBone(fp, 'UpLegTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['LoLeg_L', 1, None, (True, False)])])
+	addPoseBone(fp, 'UpArmTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['LoArm_R', 1, None, (True, False)])])
+	addPoseBone(fp, 'LoArmTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['Hand_R', 1, None, (True, False)])])
+	addPoseBone(fp, 'UpLegTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['LoLeg_R', 1, None, (True, False)])])
 
-	addPoseBone(fp, 'Eye_L', None, None, (0,0,0), (0,0,0), [('IK', ['Gaze_L', 1, None, (True, False)])])
-	addPoseBone(fp, 'Eye_R', None, None, (0,0,0), (0,0,0), [('IK', ['Gaze_R', 1, None, (True, False)])])
+	addPoseBone(fp, 'Eye_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['Gaze_L', 1, None, (True, False)])])
+	addPoseBone(fp, 'Eye_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('IK', 0, ['Gaze_R', 1, None, (True, False)])])
 
 	return
 
@@ -1029,114 +1075,138 @@ def writePoses(fp):
 
 def poseFinger(fp, m, n, suffix, shape):
 	customShape = 'widgetFinger_%s' % (suffix)
-	addPoseBone(fp, "Finger-%d-%d_%s \n" % (m, n, suffix), shape, None, (0,0,0), (0,0,0),
-		[('CopyRot', ['CopyRotIK', 'Finger-%d-%d_ik_%s' % (m, n, suffix), 1]),
-		('CopyRot', ['CopyRotFK', 'Finger-%d-%d_fk_%s' % (m, n, suffix), 0])])
+	addPoseBone(fp, "Finger-%d-%d_%s \n" % (m, n, suffix), shape, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'Finger-%d-%d_ik_%s' % (m, n, suffix), 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'Finger-%d-%d_fk_%s' % (m, n, suffix), 0, (1,1,1), (0,0,0)])])
 	return
 
-def poseFinger_fkik(fp, m, n, suffix, shape, ik, curl):
-	if curl:
-		constraints = [('Action', ['goboFingerCurl', 'FingerCurl_%s_%s' % (ik, suffix)])]
+def poseFinger_fkik(fp, m, n, suffix, shape, ik):
+	if n == 1:
+		addPoseBone(fp, "Finger-%d-%d_%s_%s \n" % (m, n, ik, suffix), shape, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
 	else:
-		constraints = []
-	addPoseBone(fp, "Finger-%d-%d_%s_%s \n" % (m, n, ik, suffix), shape, None, (0,0,0), (0,0,0), constraints)
-	return
+		constraints = [('Action', C_TARGET, ['goboFingerCurl', 'FingerCurl_%s_%s' % (ik, suffix), 'LOCATION_X', (1,21), (-0.5,0.5)])]
+		if m == 1:
+			lockRot = (0,1,0)
+		else:
+			lockRot = (1,1,0)
+		addPoseBone(fp, "Finger-%d-%d_%s_%s \n" % (m, n, ik, suffix), shape, None, (0,0,0), lockRot, (1,1,1), (1,1,1), 0, constraints)
 
 #
-#	addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, constraints):
+#	addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 #
 
-def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, constraints):
+def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 	global boneGroups
 
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
 	(lockRotX, lockRotY, lockRotZ) = lockRot
+	(lockScaleX, lockScaleY, lockScaleZ) = lockScale
+	(ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof
+
+	ikLin = boolString(flags & P_IKLIN)
+	ikRot = boolString(flags & P_IKROT)
+	lkRot4 = boolString(flags & P_LKROT4)
+	lkRotW = boolString(flags & P_LKROTW)
 
 	fp.write("\n  Posebone %s\n" % bone)
-	for (typ, data) in constraints:
+	for (typ, flags, data) in constraints:
 		if typ == 'IK':
-			addIkConstraint(fp, data)
+			addIkConstraint(fp, flags, data)
 		elif typ == 'Action':
-			addActionConstraint(fp, data)
+			addActionConstraint(fp, flags, data)
+		elif typ == 'CopyLoc':
+			addCopyLocConstraint(fp, flags, data)
 		elif typ == 'CopyRot':
-			addCopyRotConstraint(fp, data)
+			addCopyRotConstraint(fp, flags, data)
+		elif typ == 'CopyScale':
+			addCopyScaleConstraint(fp, flags, data)
+		elif typ == 'CopyTrans':
+			addCopyTransConstraint(fp, flags, data)
 		elif typ == 'LimitRot':
-			addLimitRotConstraint(fp, data)
+			addLimitRotConstraint(fp, flags, data)
 		elif typ == 'LimitLoc':
-			addLimitLocConstraint(fp, data)
+			addLimitLocConstraint(fp, flags, data)
+		elif typ == 'DampedTrack':
+			addDampedTrackConstraint(fp, flags, data)
+		elif typ == 'StretchTo':
+			addStretchToConstraint(fp, flags, data)
 		else:
 			raise NameError("Unknown constraint type %s" % typ)
 
 	fp.write(
-"    ik_dof Array 1 1 1  ; \n"+
+"    ik_dof Array %d %d %d  ; \n" % (ik_dof_x, ik_dof_y, ik_dof_z) +
 "    ik_limit Array 0 0 0  ; \n"+
-"    ik_max Array 3.14159274101 3.14159274101 3.14159274101  ; \n"+
-"    ik_min Array -3.14159274101 -3.14159274101 -3.14159274101  ; \n"+
 "    ik_stiffness Array 0.0 0.0 0.0  ; \n")
+	'''
+	fp.write(
+"    ik_max Array 3.14159274101 3.14159274101 3.14159274101  ; \n"+
+"    ik_min Array -3.14159274101 -3.14159274101 -3.14159274101  ; \n")
+	fp.write(
+"    ik_max Array 180 180 180 ;\n"+
+"    ik_min Array -180 -180 -180 ;\n")
+	'''
 	if boneGroup:
-		try:
-			x = boneGroups[boneGroup]
-			fp.write("    bone_group Refer BoneGroup %s ; \n" % (boneGroup))
-		except:
-			boneGroups[boneGroup] = True
-			fp.write(
-"    bone_group Define BoneGroup %s boneGroupCreator(rna,\"%s\")\n" % (boneGroup, boneGroup) +
-"      color_set 'DEFAULT' ;\n" +
-"      colors Struct ThemeBoneColorSet None \n" +
-"        active Array 0.968627512455 0.0392156876624 0.0392156876624  ;\n" +
-"        colored_constraints False ;\n" +
-"        normal Array 0.603921592236 0.0 0.0  ;\n" +
-"        selected Array 0.741176486015 0.0666666701436 0.0666666701436  ;\n" +
-"      end Struct\n" +
-"    end Define\n")
+		fp.write("    bone_group Refer BoneGroup %s ; \n" % (boneGroup))
 
 	if customShape:
 		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
 
 	fp.write(
-"    ik_lin_control False ; \n"+
+"    ik_lin_control %s ; \n" % ikLin +
 "    ik_lin_weight 0 ; \n"+
-"    ik_rot_control False ; \n"+
+"    ik_rot_control %s ; \n" % ikRot +
 "    ik_rot_weight 0 ; \n"+
 "    ik_stretch 0 ; \n"+
 "    location (0,0,0) ; \n"+
 "    lock_location Array %d %d %d ;\n"  % (lockLocX, lockLocY, lockLocZ)+
 "    lock_rotation Array %d %d %d ;\n"  % (lockRotX, lockRotY, lockRotZ)+
-"    lock_rotation_w False ; \n"+
-"    lock_rotations_4d False ; \n"+
-"    lock_scale Array 1 1 1  ; \n"+
+"    lock_rotation_w %s ; \n" % lkRotW +
+"    lock_rotations_4d %s ; \n" % lkRot4 +
+"    lock_scale Array %d %d %d  ; \n" % (lockScaleX, lockScaleY, lockScaleZ)+
 "  end Posebone \n")
 	return
 
 #
-#	addIkConstraint(fp, data)
-#	addActionConstraint(fp, data):
-#	addCopyRotConstraint(fp, data):
-#	addLimitRotConstraint(fp, data):
-#	addLimitLocConstraint(fp, data):
+#	addIkConstraint(fp, flags, data)
+#	addActionConstraint(fp, flags, data):
+#	addCopyLocConstraint(fp, flags, data):
+#	addCopyRotConstraint(fp, flags, data):
+#	addCopyScaleConstraint(fp, flags, data):
+#	addCopyTransConstraint(fp, flags, data):
+#	addLimitRotConstraint(fp, flags, data):
+#	addLimitLocConstraint(fp, flags, data):
+#	addDampedTrackConstraint(fp, flags, data):
+#	addStretchToConstraint(fp, flags, data):
 #
 
+def getSpace(flags, mask):
+	if flags & mask:
+		return 'LOCAL'
+	else:
+		return 'WORLD'
 
-def addIkConstraint(fp, data):
+def addIkConstraint(fp, flags, data):
 	subtar = data[0]
 	chainlen = data[1]
 	pole = data[2]
 	(useLoc, useRot) = data[3]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
 	fp.write(
 "    Constraint IK IK\n" +
 "      target Refer Object HumanRig ;\n" +
 "      pos_lock Array 1 1 1  ;\n" +
 "      rot_lock Array 1 1 1  ;\n" +
-"      active True ;\n" +
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
 "      axis_reference 'BONE' ;\n" +
 "      chain_length %d ;\n" % chainlen +
-"      expanded True ;\n" +
 "      ik_type 'COPY_POSE' ;\n" +
 "      influence 1 ;\n" +
 "      iterations 500 ;\n" +
 "      limit_mode 'LIMITDIST_INSIDE' ;\n" +
 "      orient_weight 1 ;\n" +
-"      owner_space 'WORLD' ;\n")
+"      owner_space '%s' ;\n" % ownsp)
 
 	if pole:
 		(angle, ptar) = pole
@@ -1148,7 +1218,7 @@ def addIkConstraint(fp, data):
 	fp.write(
 "      proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
-"      target_space 'WORLD' ;\n" +
+"      target_space '%s' ;\n" % targsp +
 "      use_position %s ;\n" % useLoc +
 "      use_rotation %s ;\n" % useRot +
 "      use_stretch True ;\n" +
@@ -1158,81 +1228,161 @@ def addIkConstraint(fp, data):
 "    end Constraint\n")
 	return
 
-def addActionConstraint(fp, data):
+def addActionConstraint(fp, flags, data):
 	action = data[0]
 	subtar = data[1]
+	channel = data[2]
+	(sframe, eframe) = data[3]
+	(amin, amax) = data[4]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
 	fp.write(
 "    Constraint Action ACTION \n"+
 "      target Refer Object HumanRig ; \n"+
 "      action Refer Action %s ; \n" % action+
-"      active True ; \n"+
-"      end_frame 21 ; \n"+
-"      expanded True ; \n"+
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      frame_start %s ; \n" % sframe +
+"      frame_end %d ; \n" % eframe+
 "      influence 1 ; \n"+
-"      maximum 0.5 ; \n"+
-"      minimum -0.5 ; \n"+
-"      owner_space 'WORLD' ; \n"+
+"      maximum %f ; \n" % amax +
+"      minimum %f ; \n" % amin +
+"      owner_space '%s' ; \n" % ownsp +
 "      proxy_local False ; \n"+
-"      start_frame 1 ; \n"+
 "      subtarget '%s' ; \n" % subtar +
-"      target_space 'LOCAL' ; \n"+
-"      transform_channel 'LOCATION_X' ; \n"+
+"      target_space '%s' ; \n" % targsp +
+"      transform_channel '%s' ;\n" % channel +
 "    end Constraint \n")
 	return
 
-def addCopyRotConstraint(fp, data):
+def addCopyRotConstraint(fp, flags, data):
 	name = data[0]
 	subtar = data[1]
 	inf = data[2]
+	(useX, useY, useZ) = data[3]
+	(invertX, invertY, invertZ) = data[4]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
 	fp.write(
 "    Constraint %s COPY_ROTATION \n" % name +
 "      target Refer Object HumanRig ; \n"+
-"      invert Array 0 0 0  ; \n"+
-"      use Array 1 1 1  ; \n"+
-"      active False ; \n"+
-"      expanded True ; \n"+
-"      influence %d ; \n" % inf +
-"      owner_space 'WORLD' ; \n"+
+"      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
+"      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      influence %f ; \n" % inf +
+"      owner_space '%s' ; \n" % ownsp+
 "      proxy_local False ; \n"+
 "      subtarget '%s' ;\n" % subtar +
-"      target_space 'WORLD' ; \n"+
+"      target_space '%s' ; \n" % targsp+
 "      use_offset False ; \n"+
 "    end Constraint \n")
 	return
 
-def addLimitRotConstraint(fp, data):
-	(xmin, xmax, ymin, ymax, zmin, zmax) = data[0]
-	(usex, usey, usez) = data[1]
+def addCopyLocConstraint(fp, flags, data):
+	name = data[0]
+	subtar = data[1]
+	inf = data[2]
+	(useX, useY, useZ) = data[3]
+	(invertX, invertY, invertZ) = data[4]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	fp.write(
-"    Constraint Limit_rotation LIMIT_ROTATION \n"+
-"     active True ; \n"+
-"      expanded True ; \n"+
+"    Constraint %s COPY_LOCATION \n" % name +
+"      target Refer Object HumanRig ; \n"+
+"      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
+"      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      influence %f ; \n" % inf +
+"      owner_space '%s' ; \n" % ownsp +
+"      proxy_local False ; \n"+
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ; \n" % targsp+
+"      use_offset False ; \n"+
+"    end Constraint \n")
+	return
+
+def addCopyScaleConstraint(fp, flags, data):
+	name = data[0]
+	subtar = data[1]
+	inf = data[2]
+	(useX, useY, useZ) = data[3]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+	fp.write(
+"    Constraint %s COPY_SCALE\n" % name +
+"      target Refer Object HumanRig ;\n" +
+"      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      influence %f ;\n" % inf +
+"      owner_space '%s' ;\n" % ownsp +
+"      proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp +
+"      use_offset False ;\n" +
+"    end Constraint\n")
+	return
+
+def addCopyTransConstraint(fp, flags, data):
+	name = data[0]
+	subtar = data[1]
+	inf = data[2]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+	
+	fp.write(
+"    Constraint %s COPY_TRANSFORMS\n" % name +
+"      target Refer Object HumanRig ;\n" +
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      influence %f ;\n" % inf +
+"      owner_space '%s' ;\n" % ownsp +
+"      proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp +
+"    end Constraint\n")
+	return
+
+
+def addLimitRotConstraint(fp, flags, data):
+	name = data[0]
+	(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
+	(usex, usey, usez) = data[2]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+	ltra = boolString(flags & C_LTRA == 0)
+
+	fp.write(
+"    Constraint %s LIMIT_ROTATION \n" % name+
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
 "      influence 1 ; \n"+
-"      limit_transform True ; \n"+
+"      limit_transform %s ; \n" % ltra+
 "      maximum_x %.6g ;\n" % xmax +
 "      maximum_y %.6g ;\n" % ymax +
 "      maximum_z %.6g ;\n" % zmax +
 "      minimum_x %.6g ;\n" % xmin +
 "      minimum_y %.6g ;\n" % ymin +
 "      minimum_z %.6g ;\n" % zmin +
-"      owner_space 'LOCAL' ; \n"+
+"      owner_space '%s' ; \n" % ownsp+
 "      proxy_local False ; \n"+
-"      target_space 'WORLD' ; \n"+
+"      target_space '%s' ; \n" % targsp+
 "      use_limit_x %s ; \n" % usex +
 "      use_limit_y %s ; \n" % usey +
 "      use_limit_z %s ; \n" % usez +
 "   end Constraint \n")
 	return
 
-def addLimitLocConstraint(fp, data):
-	(xmin, xmax, ymin, ymax, zmin, zmax) = data[0]
-	(useminx, usemaxx, useminy, usemaxy, useminz, usemaxz) = data[1]
+def addLimitLocConstraint(fp, flags, data):
+	name = data[0]
+	(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
+	(useminx, usemaxx, useminy, usemaxy, useminz, usemaxz) = data[2]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 	
 	fp.write(
-"    Constraint Limit_location LIMIT_LOCATION \n" +
-"      active True ;\n" +
-"      expanded True ;\n" +
+"    Constraint %s LIMIT_LOCATION \n" % name +
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
 "      limit_transform True ;\n" +
 "      maximum_x %.6g ;\n" % xmax +
@@ -1241,9 +1391,9 @@ def addLimitLocConstraint(fp, data):
 "      minimum_x %.6g ;\n" % xmin +
 "      minimum_y %.6g ;\n" % ymin +
 "      minimum_z %.6g ;\n" % zmin +
-"      owner_space 'LOCAL' ;\n" +
+"      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
-"      target_space 'WORLD' ;\n" +
+"      target_space '%s' ;\n" % targsp +
 "      use_maximum_x %s ;\n" % usemaxx +
 "      use_maximum_y %s ;\n" % usemaxy +
 "      use_maximum_z %s ;\n" % usemaxz +
@@ -1252,6 +1402,57 @@ def addLimitLocConstraint(fp, data):
 "      use_minimum_z %s ;\n" % useminz +
 "    end Constraint\n")
 	return
+
+def addDampedTrackConstraint(fp, flags, data):
+	name = data[0]
+	subtar = data[1]
+	track = data[2]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+	fp.write(
+"    Constraint %s DAMPED_TRACK\n" % name +
+"      target Refer Object HumanRig ;\n" +
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      influence 1 ;\n" +
+"      owner_space '%s' ;\n" % ownsp+
+"      proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp+
+"      track '%s' ;\n" % track + 
+"    end Constraint\n")
+	return
+
+def addStretchToConstraint(fp, flags, data):
+	name = data[0]
+	subtar = data[1]
+	axis = data[2]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+	fp.write(
+"    Constraint %s STRETCH_TO\n" % name +
+"      target Refer Object HumanRig ;\n" +
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      bulge 1 ;\n" +
+"      influence 1 ;\n" +
+"      keep_axis '%s' ;\n" % axis +
+#"      original_length 0.0477343 ;\n" +
+"      owner_space '%s' ;\n" % ownsp+
+"      proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp+
+"      volume 'NO_VOLUME' ;\n" +
+"    end Constraint\n")
+	return
+
+def constraintFlags(flags):
+	ownsp = getSpace(flags, C_OWNER)
+	targsp = getSpace(flags, C_TARGET)
+	active = boolString(flags & C_ACT == 0)
+	expanded = boolString(flags & C_EXP == 0)
+	return (ownsp, targsp, active, expanded)
+
 
 #
 #	actionFingerCurl
@@ -1293,7 +1494,7 @@ actionFootRoll = [
 ]
 
 
-def writeActions(fp):
+def GoboWriteActions(fp):
 	writeAction("goboFingerCurl", actionFingerCurl, True, fp)
 	writeAction("goboFootRoll", actionFootRoll, False, fp)
 	writeAction("goboFootTumble", actionFootTumble, False, fp)
@@ -1322,7 +1523,7 @@ def writeFCurves(name, (x01, y01, z01, w01), (x21, y21, z21, w21), fp):
 
 def writeFCurve(name, index, x01, x11, x21, fp):
 	fp.write("\n" +
-"  FCurve pose.pose_channels[\"%s\"].rotation_quaternion %d\n" % (name, index) +
+"  FCurve pose.bones[\"%s\"].rotation_quaternion %d\n" % (name, index) +
 "    kp 1 %.6g ;\n" % (x01) +
 "    kp 11 %.6g ;\n" % (x11) +
 "    kp 21 %.6g ;\n" % (x21) +
@@ -1331,77 +1532,106 @@ def writeFCurve(name, index, x01, x11, x21, fp):
 	return
 
 #
-#	constraintInfluences
-#	writeConstraintDrivers(fp):
+#	GoboDrivers
+#	writeConstraintDrivers(fp, constraintInfluences):
 #
 
-constraintInfluences = [
-	("UpLeg_L", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
-	("LoLeg_L", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
-	("Foot_L", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
-	("Toe_L", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
-	("UpLeg_R", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
-	("LoLeg_R", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
-	("Foot_R", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
-	("Toe_R", "CopyRotFK", "CopyRotIK", "ToggleLegIK"),
+GoboDrivers = [
+	("UpLeg_L", "CopyRotFK", "CopyRotIK", "PLegIK_L"),
+	("LoLeg_L", "CopyRotFK", "CopyRotIK", "PLegIK_L"),
+	("Foot_L", "CopyRotFK", "CopyRotIK", "PLegIK_L"),
+	("Toe_L", "CopyRotFK", "CopyRotIK", "PLegIK_L"),
+	("UpLeg_R", "CopyRotFK", "CopyRotIK", "PLegIK_R"),
+	("LoLeg_R", "CopyRotFK", "CopyRotIK", "PLegIK_R"),
+	("Foot_R", "CopyRotFK", "CopyRotIK", "PLegIK_R"),
+	("Toe_R", "CopyRotFK", "CopyRotIK", "PLegIK_R"),
 
-	("UpArm_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("LoArm_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Hand_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("UpArm_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("LoArm_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Hand_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
+	("UpArm_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("LoArm_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Hand_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("UpArm_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("LoArm_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Hand_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
 
-	("Finger-1-1_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-1-2_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-1-3_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-2-1_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-2-2_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-2-3_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-3-1_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-3-2_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-3-3_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-4-1_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-4-2_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-4-3_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-5-1_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-5-2_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-5-3_L", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
+	("Finger-1-1_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-1-2_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-1-3_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-2-1_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-2-2_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-2-3_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-3-1_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-3-2_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-3-3_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-4-1_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-4-2_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-4-3_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-5-1_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-5-2_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
+	("Finger-5-3_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
 
-	("Finger-1-1_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-1-2_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-1-3_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-2-1_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-2-2_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-2-3_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-3-1_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-3-2_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-3-3_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-4-1_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-4-2_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-4-3_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-5-1_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-5-2_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
-	("Finger-5-3_R", "CopyRotFK", "CopyRotIK", "ToggleArmIK"),
+	("Finger-1-1_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-1-2_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-1-3_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-2-1_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-2-2_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-2-3_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-3-1_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-3-2_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-3-3_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-4-1_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-4-2_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-4-3_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-5-1_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-5-2_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("Finger-5-3_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
 ]
 
-def writeConstraintDrivers(fp):
-	for (bone, cnsFk, cnsIk, toggle) in constraintInfluences:
-		fp.write("\n"+
-"    FCurve pose.bones[\"%s\"].constraints[\"%s\"].influence 0\n" % (bone, cnsIk) +
-"      Driver %s\n" % (toggle)+
-"        expression '1.0' ;\n" +
+#
+#	SINGLE_PROP, 
+#
+
+def GoboWriteDrivers(fp):
+	for (bone, cnsIK, cnsFK, targ) in GoboDrivers:
+		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), 0, "2*ik", 
+			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
+		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), 0, "1.0-2*ik",
+			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
+
+def writeDrivers(fp, drivers):
+	for (bone, typ, name, index, expr, variables) in drivers:
+		if typ == 'INFL':
+			writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, expr, variables)
+		elif typ == 'ROTE':
+			writeDriver(fp, "pose.bones[\"%s\"].rotation_euler" % bone, index, expr, variables)
+		elif typ == 'ROTQ':
+			writeDriver(fp, "pose.bones[\"%s\"].rotation_quaternion" % bone, index, expr, variables)
+		elif typ == 'LOC':
+			writeDriver(fp, "pose.bones[\"%s\"].location" % bone, index, expr, variables)
+
+def writeDriver(fp, channel, index, expr, variables):
+	fp.write("\n"+
+"    FCurve %s %d\n" % (channel, index) +
+"      Driver\n")
+	for (var, typ, targets) in variables:
+		fp.write("        DriverVariable %s %s\n" % (var,typ))
+		for (targ, boneTarg, ttype, flags) in targets:
+			local = boolString(flags & C_LOCAL)
+			fp.write(
+"          Target %s OBJECT\n" % targ +
+"            transform_type '%s' ;\n" % ttype)
+			if boneTarg:
+				fp.write("            bone_target '%s' ;\n" % boneTarg)
+			fp.write(
+"            use_local_space_transforms %s ;\n" % local +
+"          end Target\n")
+		fp.write("        end DriverVariable\n")
+	fp.write(
+"        expression '%s' ;\n" % expr +
 "        show_debug_info False ;\n" +
 "      end Driver\n" +
-"    extrapolation 'CONSTANT' ;\n" +
-"    end FCurve\n" +
-"    FCurve pose.bones[\"%s\"].constraints[\"%s\"].influence 0\n" % (bone, cnsFk) +
-"      Driver %s\n" % (toggle)+
-"        expression '0.0' ;\n" +
-"        show_debug_info False ;\n" +
-"      end Driver\n" +
-"    extrapolation 'CONSTANT' ;\n" +
+"      extrapolation 'CONSTANT' ;\n" +
+"      locked False ;\n" +
+"      selected True ;\n" +
 "    end FCurve\n")
 	return
-
 
