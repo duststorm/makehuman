@@ -95,10 +95,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   obj.indexBuffer = []
   fg = obj.createFaceGroup("ribbons")
   
-  #temporary vectors
-  headNormal = [0.0,1.0,0.0]
-  headCentroid = [0.0,7.8,0.4]
-    
+  #temporary vectors    
   hairsClass.loadHairs(path)
   try: hairsClass.humanVerts
   except NameError: 
@@ -109,6 +106,8 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
   
   for group in hairsClass.guideGroups:
     for guide in group.guides:
+        loadStrands(obj,guide.controlPoints, widthFactor, res)
+    """
       cPs = [guide.controlPoints[0]]
       for i in xrange(2,len(guide.controlPoints)-1): #piecewise continuous polynomial
         d1=vdist(guide.controlPoints[i-1],guide.controlPoints[i-2])
@@ -170,6 +169,7 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           fg.faces[len(fg.faces) -1].uv=[w2.idx,w4.idx,w3.idx]
           vtemp1=w4
           vtemp2=w3 
+    """
 
   #HACK: set hair color to default black 
   fg.setColor([0,0,0,255]) #rgba
@@ -180,3 +180,68 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
       scn.update()
   return obj
               
+def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
+      headNormal = [0.0,1.0,0.0]
+      headCentroid = [0.0,7.8,0.4]
+      fg = obj.facesGroups[0]
+      cPs = [curve[0]]
+      for i in xrange(2,len(curve)-1): #piecewise continuous polynomial
+        d1=vdist(curve[i-1],curve[i-2])
+        d=d1+vdist(curve[i-1],curve[i])
+        if i==len(curve)-1: N=int(d1/(res*4))
+        else: N=int(d/(res*4))
+        for j in xrange(1,N+1):
+          if j==N and i==len(curve)-1 : cPs.append(curve[i-1])
+          else: cPs.append(ThreeDQBspline(curve[i-2],curve[i-1],\
+                           curve[i],j*res*4/d))
+      uvFactor = 1.0/(len(cPs) -3) #here obviously guides must have ctrlPts  > 4!
+      uvLength=len(cPs)-3
+      vtemp1, vtemp2 = None, None
+      uvtemp1, uvtemp2 = None, None
+      dist =  widthFactor*res/2
+      for i in xrange(2,len(cPs)-1):
+          cp1=cPs[i-1]
+          cp2=cPs[i]
+          verts=[[],[],[],[]]
+          
+          #compute ribbon plane
+          vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), dist)
+          if i==2:
+            verts[0] = vsub(cp1,vec)
+            verts[1] = vadd(cp1,vec)
+          else:
+            verts[0]=v1[:]
+            verts[1]=v2[:]
+          
+          verts[2]=vadd(cp2,vec)
+          verts[3]=vsub(cp2,vec)
+
+          v1=verts[3][:]
+          v2=verts[2][:]
+          
+          #plain orientation:
+          # xy :  1 2      uv:   (0,v[j-1])  (1,v[j-1])
+          #         4 3             (0,0)          (1,v[j])
+          
+          #please do not change the sequence of the lines here
+          if vtemp1 == None:
+             w1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
+             w2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
+             obj.uvValues.append([0.0,(uvLength - i+2)*uvFactor])
+             obj.uvValues.append([1.0,(uvLength - i+2)*uvFactor])
+          else:
+             w1=vtemp1
+             w2=vtemp2
+          w3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
+          w4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
+          obj.uvValues.append([1.0,(uvLength - i+1)*uvFactor])
+          obj.uvValues.append([0.0,(uvLength - i+1)*uvFactor])
+          #end of please...
+          
+          #shallow copies used
+          fg.createFace(w1, w4, w2)
+          fg.faces[len(fg.faces) -1].uv= [w1.idx,w4.idx,w2.idx]
+          fg.createFace(w2, w4, w3)
+          fg.faces[len(fg.faces) -1].uv=[w2.idx,w4.idx,w3.idx]
+          vtemp1=w4
+          vtemp2=w3

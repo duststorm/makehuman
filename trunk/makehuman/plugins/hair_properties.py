@@ -86,17 +86,40 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
         
+        #CREATE HAIR
         @self.createButton.event
         def onClicked(event):
-            self.app.scene3d.selectedHuman.hairModelling = True
+            scn = self.app.scene3d
+            obj = scn.newObj("hair")
+            position = scn.selectedHuman.getPosition()
+            rotation = scn.selectedHuman.getRotation()
+            obj.x = position[0]
+            obj.y = position[1]
+            obj.z = position[2]
+            obj.rx = rotation[0]
+            obj.ry = rotation[1]
+            obj.rz = rotation[2]
+            obj.sx = 1.0
+            obj.sy = 1.0
+            obj.sz = 1.0
+            obj.visibility = 1
+            obj.shadeless = 0
+            obj.pickable = 0
+            obj.cameraMode = 0
+            obj.text = ""
+            obj.uvValues = []
+            obj.indexBuffer = []
+            fg = obj.createFaceGroup("ribbons")
+
+            scn.selectedHuman.hairModelling = True
             #TODO  Jose: clear any hair originally created/ loaded from libraries
-            mesh = self.app.scene3d.selectedHuman.mesh
-            verts = mesh.getVerticesAndFacesForGroups(["part_head-back-skull","part_head-upper-skull","part_l-head-temple",\
-            "part_r-head-temple"])[0]
+            mesh = scn.selectedHuman.mesh
+            verts = mesh.getVerticesAndFacesForGroups(["head-back-skull","head-upper-skull","l-head-temple",\
+            "r-head-temple"])[0]
             scalpVerts = len(verts) #Collects all vertices that are part of the head where hair grows!
             interval = int(scalpVerts/self.number) #variable used to randomly distribute scalp-vertices
             cPInterval = self.length/float(self.cP) #Length between c.P. for hairs being generated
-            """
+        
             for i in range(0,self.number):
                 if i==self.number-1:
                     r= random.randint(interval*i,scalpVerts-1)
@@ -108,25 +131,18 @@ class HairPropertiesTaskView(gui3d.TaskView):
                 point2 = vadd(v,vmul(normal,self.length))
                 curve=[vadd(v,vmul(normal,-0.5))]
                 w,normal2,point22,curve2 =[],[],[],[]
-                for j in range(0,scalpVerts):
-                    w=mesh.verts[vertIndices[j]].co
-                    dist = vdist(v,w)
-                    if dist>=0.05 and dist<=0.3:
-                        normal2=mesh.verts[vertIndices[j]].no
-                        point22 = vadd(w,vmul(normal2,gLength.val))
-                        curve2=[vadd(w,vmul(normal2,-0.5))]
-                        break
                 curve.append(vadd(v,vmul(normal,-0.2)))
-                curve2.append(vadd(w,vmul(normal2,-0.2)))
-                for j in range(1,noCPoints.val-1):
+                for j in range(1,self.cP-1):
                     curve.append(vadd(v,vmul(normal,cPInterval*j)))
-                    curve2.append(vadd(w,vmul(normal2,cPInterval*j)))
                 curve.append(point2)
-                curve2.append(point22)
-                drawGuidePair(scn,curve[:],curve2[:])
-            #r= random.randint(interval*(noGuides.val-1),scalpVerts-1)
-            Blender.Redraw()
-            """
+                hair.loadStrands(obj,curve)
+
+            fg.setColor([0,0,0,255]) #rgba
+            obj.updateIndexBuffer()
+            obj.calcNormals()
+            obj.shadeless = 1
+            scn.selectedHuman.hairObj = obj
+            scn.update()
             
         @self.cPSlider.event
         def onChange(value):
@@ -191,8 +207,6 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSliderLabel.setText('Blue:%i' % c[2])
 
     def onShow(self, event):
-        for o in self.objects:
-         print "Debug Objects: ", o.mesh.name
         gui3d.TaskView.onShow(self, event)
         hairColor = self.app.scene3d.selectedHuman.hairColor
         self.syncSliders()
