@@ -205,7 +205,8 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
           verts=[[],[],[],[]]
           
           #compute ribbon plane
-          vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), dist)
+          #vec = vmul(vnorm(vcross(headNormal, vsub(cp2,headCentroid))), dist)
+          vec = vmul(vnorm(vcross(vsub(cp2,cp1), vsub(cp2,headCentroid))), dist)
           if i==2:
             verts[0] = vsub(cp1,vec)
             verts[1] = vadd(cp1,vec)
