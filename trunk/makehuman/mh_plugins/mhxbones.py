@@ -271,11 +271,11 @@ armature = [
 	("ToungeTip", "ToungeBase", "tounge-mid", 0, "tounge-tip", 0, F_CON, L_DEFORM+L_HEAD, None, 0),
 
 	("Eye_R", "Head", "l-eye", 0, "l-eye", [0,0,0.5], 0, L_DEFORM, None, 0),
-	("UpLid_R", "Head", "l-eye", 0, "l-upLid", 0, 0, L_DEFORM, None, 0),
-	("LoLid_R", "Head", "l-eye", 0, "l-loLid", 0, 0, L_DEFORM, None, 0),
+	("UpLid_R", "Head", "l-eye", 0, "l-upLid", 0, 0, L_DEFORM+L_HEAD, None, 0),
+	("LoLid_R", "Head", "l-eye", 0, "l-loLid", 0, 0, L_DEFORM+L_HEAD, None, 0),
 	("Eye_L", "Head", "r-eye", 0, "r-eye", [0,0,0.5], 0, L_DEFORM, None, 0),
-	("UpLid_L", "Head", "r-eye", 0, "r-upLid", 0, 0, L_DEFORM, None, 0),
-	("LoLid_L", "Head", "r-eye", 0, "r-loLid", 0, 0, L_DEFORM, None, 0),
+	("UpLid_L", "Head", "r-eye", 0, "r-upLid", 0, 0, L_DEFORM+L_HEAD, None, 0),
+	("LoLid_L", "Head", "r-eye", 0, "r-loLid", 0, 0, L_DEFORM+L_HEAD, None, 0),
 
 	("Gaze", "Root", "mid-eyes", [0,0,5.25], "mid-eyes", [0,0,4.25], F_NODEF, L_HEAD+L_PANEL, None, 0),
 	("Gaze_R", "Gaze", "l-eye", [0,0,5], "l-eye", [0,0,4.5], F_NODEF, L_HEAD+L_PANEL, None, 0),

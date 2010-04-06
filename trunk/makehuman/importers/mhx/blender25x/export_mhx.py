@@ -16,14 +16,14 @@
 Abstract
 --------
 MHX (MakeHuman eXchange format) exporter for Blender 2.5.
-Version 0.5
+Version 0.7
 
 TO DO
 
 """
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.6'
+__version__= '0.7'
 __bpydoc__= '''\
 MHX importer for Blender 2.5
 0.6 Sixth version
@@ -37,7 +37,7 @@ import array
 import struct
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 6
+MINOR_VERSION = 7
 verbosity = 1
 Epsilon = 1e-5
 done = 0
@@ -1097,14 +1097,18 @@ def exportMesh(ob, fp):
 		exportVertexGroups(ob, me, 'All', fp)
 
 	if me.shape_keys:
+		global FacialKey, BodyKey
 		if expMsk & M_MHX and obName == "Human":
 			fp.write("    *** ShapeKey\n")
 			fp1 = mhxOpen(M_Shape, "shapekeys-facial25.mhx")
-			exportShapeKeys(me, fp1)
+			exportShapeKeys(me, FacialKey, fp1)
 			mhxClose(fp1)
+			#fp1 = mhxOpen(M_Shape, "shapekeys-body25.mhx")
+			#exportShapeKeys(me, BodyKey, fp1)
+			#mhxClose(fp1)
 		else:
 			if expMsk & M_Shape:
-				exportShapeKeys(me, fp)
+				exportShapeKeys(me, None, fp)
 		 
 	if verbosity > 1:
 		print( "Faces saved" )
@@ -1193,7 +1197,6 @@ def dumpVertexGroup(toeDict, vgName, fp):
 #
 
 FacialKey = {
-	"Basis" : "Sym",
 	"BrowsDown" : "LR",
 	"BrowsMidDown" : "Sym",
 	"BrowsMidUp" : "Sym",
@@ -1218,13 +1221,23 @@ FacialKey = {
 	"LoLipUp" : "LR",
 }
 
+BodyKey = {
+	"BendElbowForward" : "LR",
+	"BendHeadForward" : "Sym",
+	"BendLegForward" : "LR",
+	"BendLegBack" : "LR",
+	"BendKneeBack" : "LR",
+	"ShoulderDown" : "LR",
+}
+
+
 #
-def exportShapeKeys(me, fp):
+def exportShapeKeys(me, keyList, fp):
 	skeys = me.shape_keys
 	for skey in skeys.keys:
 		skeyName = skey.name.replace(' ','_')
 		try:
-			lr = FacialKey[skeyName]
+			lr = keyList[skeyName]
 		except:
 			if expMsk & M_MHX:
 				lr = None
@@ -1707,10 +1720,10 @@ def mhxClose(fp):
 hairFile = "particles25.mhx"
 theRig = "classic"
 #theRig = "gobo"
-writeMhxFile('/home/thomas/myblends/gobo/gobo.mhx', M_Amt+M_Anim)
+#writeMhxFile('/home/thomas/myblends/gobo/gobo.mhx', M_Amt+M_Anim)
 #writeMhxFile('/home/thomas/myblends/sintel/simple2.mhx', M_Amt+M_Anim)
 #writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
-#writeMhxTemplates(M_MHX+M_Geo+M_VGroup)
+writeMhxTemplates(M_MHX+M_Geo+M_Shape)
 #writeMhxTemplates(M_MHX+M_Amt)
 #theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)

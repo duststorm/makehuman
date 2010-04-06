@@ -1,5 +1,5 @@
 # Blender 2.5 exported MHX 
-MHX 0 6 ;
+MHX 0 7 ;
 if Blender24
   error 'This file can only be read with Blender 2.5' ;
 end if

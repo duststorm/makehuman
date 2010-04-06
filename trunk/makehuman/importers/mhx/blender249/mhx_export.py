@@ -8,7 +8,7 @@ Tooltip: 'Export from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.6'
+__version__= '0.7'
 __bpydoc__= '''\
 MHX exporter for Blender
 '''
@@ -41,7 +41,7 @@ from Blender.Mathutils import *
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 6
+MINOR_VERSION = 7
 verbosity = 1
 Epsilon = 1e-6
 done = 0
@@ -1127,8 +1127,7 @@ def exportShapeKeys(fp, me):
 			Draw.Pupmenu("Keys should be relative")
 		blocks = me.key.blocks
 		for b in blocks:
-			vgname = getString(b.vgroup)
-			fp.write("shapekey %s %f %f %s \n" % (b.name, b.slidermin, b.slidermax, vgname))
+			fp.write("ShapeKey %s Sym \n" % b.name)
 			for (n,v) in enumerate(b.data):
 				dv = v - me.verts[n].co
 				if dv.length > Epsilon:

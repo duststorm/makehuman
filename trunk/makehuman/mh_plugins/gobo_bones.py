@@ -511,8 +511,8 @@ L_HANDIK =	0x0040
 L_HANDFK =	0x0080
 
 L_PANEL	=	0x0100
-L_HEAD =	0x0200
-L_TOE =		0x0400
+L_TOE =		0x0200
+L_HEAD =	0x0400
 
 L_HLPIK	=	0x1000
 L_HLPFK	=	0x2000
@@ -725,11 +725,11 @@ GoboArmature = [
 	('ToungeTip', 		0.0, 'ToungeBase', F_DEF+F_CON+F_NOSCALE, L_DEF+L_HEAD, (1,1,1)),
 
 	('Eye_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('UpLid_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('LoLid_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
+	('UpLid_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
+	('LoLid_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
 	('Eye_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('UpLid_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('LoLid_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
+	('UpLid_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
+	('LoLid_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
 
 	('Gaze', 		0.0, 'Root', 0, L_HEAD, (1,1,1)),
 	('Gaze_L', 		0.0, 'Gaze', 0, L_HEAD, (1,1,1)),

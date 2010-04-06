@@ -8,7 +8,7 @@ Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.6'
+__version__= '0.7'
 __bpydoc__= '''\
 MHX exporter for Blender
 '''
@@ -51,7 +51,7 @@ TexDir = os.path.expanduser("~/makehuman/exports")
 #
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 6
+MINOR_VERSION = 7
 
 #
 #	Button flags
@@ -804,7 +804,7 @@ def parseMesh (args, tokens):
 
 		elif key == 'VertexGroup':
 			parseVertGroup(me, val, sub)
-		elif key == 'shapekey':
+		elif key == 'ShapeKey':
 			if doShape(val[0]):
 				parseShapeKey(ob, me, val, sub)
 		elif key == 'ipo':
@@ -833,23 +833,37 @@ def doShape(name):
 #
 
 def parseShapeKey(ob, me, args, tokens):
-	print "parsing shape ", args[0]
+	name = args[0]
+	lr = args[1]
+	if lr == 'Sym':
+		addShapeKey(ob, me, name, None, tokens)
+	elif lr == 'LR':
+		addShapeKey(ob, me, name+'_L', 'Left', tokens)
+		addShapeKey(ob, me, name+'_R', 'Right', tokens)
+	else:
+		raise NameError("ShapeKey L/R %s" % lr)
+	return
+
+def addShapeKey(ob, me, name, vgroup, tokens):
+	print "parsing shape ", name
 	ob.insertShapeKey()
 	me.key.relative = True
 	block = me.key.blocks[-1]
-	name = args[0]
 	block.name = name
 	_block[name] = block
-	block.slidermin = float(args[1])
-	block.slidermax = float(args[2])
-	if args[3] != "None":
-		block.vgroup = args[3]
+	if vgroup:
+		block.vgroup = vgroup
 
 	for (key, val, sub) in tokens:
 		if key == 'sv':
 			index = int(val[0])
-			coord = rot90(float(val[1]), float(val[2]), float(val[3]), True)
+			#coord = rot90(float(val[1]), float(val[2]), float(val[3]), True)
+			coord = (float(val[1]), float(val[2]), float(val[3]))
 			block.data[index] += Vector(coord)
+		elif key == 'slider_min':
+			block.slidermin = float(val[0])
+		elif key == 'slider_max':
+			block.slidermax = float(val[0])
 	
 
 #
@@ -1474,7 +1488,8 @@ def button_event(evt):
 		#TexDir = Draw.PupStrInput("TexDir? ", TexDir, 100)
 		Blender.Window.ImageSelector (setTexDir, 'CHOOSE TEXTURE')
 	elif evt == 10:
-		toggleRot90 = 1 - toggleRot90
+		#toggleRot90 = 1 - toggleRot90
+		pass
 	Draw.Redraw(-1)
 
 def setTexDir(filepath):

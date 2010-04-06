@@ -81,7 +81,7 @@ def exportMhx_24(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
-"MHX 0 6 ;\n")
+"MHX 0 7 ;\n")
 
 	fp.write(
 "if Blender25\n"+
@@ -262,7 +262,9 @@ def copyFile25(obj, tmplName, rig, fp):
 					copyProxy("data/templates/vertexgroups-rigify25.mhx", fp, proxyVerts)	
 					copyProxy("data/templates/vertexgroups-foot25.mhx", fp, proxyVerts)	
 			elif lineSplit[1] == 'ShapeKey':
+				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
 				copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxyVerts)	
+				copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)	
 			elif lineSplit[1] == 'Filename':
 				path1 = os.path.expanduser("./data/textures/")
 				(path, filename) = os.path.split(lineSplit[2])
@@ -463,9 +465,12 @@ def copyMeshFile249(obj, tmpl, fp):
 				mainMesh = False
 				exportProxy24(obj, fp)
 			elif lineSplit[1] == 'mesh' and mainMesh:
-				shpfp = open("data/templates/shapekeys24.mhx", "rU")
-				exportShapeKeys(obj, shpfp, fp, None)
-				shpfp.close()
+				#shpfp = open("data/templates/shapekeys24.mhx", "rU")
+				#exportShapeKeys(obj, shpfp, fp, None)
+				#shpfp.close()
+				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
+				copyProxy("data/templates/shapekeys-facial25.mhx", fp, None)	
+				copyProxy("data/templates/shapekeys-body25.mhx", fp, None)	
 				writeIpo(fp)
 				fp.write(line)
 				skipOne = True
@@ -543,9 +548,12 @@ def exportProxy24(obj, fp):
 			copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	
 			# copyProxy("data/templates/vertexgroups24.mhx", fp, proxyVerts)	
 		elif lineSplit[0] == 'shapekey':
-			shpfp = open("data/templates/shapekeys24.mhx", "rU")
-			exportShapeKeys(obj, shpfp, fp, proxyVerts)
-			shpfp.close()
+			# shpfp = open("data/templates/shapekeys24.mhx", "rU")
+			# exportShapeKeys(obj, shpfp, fp, proxyVerts)
+			# shpfp.close()
+			fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
+			copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxyVerts)	
+			copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)	
 			writeIpo(fp)
 		else:
 			fp.write(line)
@@ -585,7 +593,7 @@ def exportArmature(obj, fp):
 
 	mhxbones.writeBones(obj, fp)
 	fp.write(
-"\tlayerMask 0x101 ;\n" +
+"\tlayerMask 0x515 ;\n" +
 "\tautoIK false ;\n" +
 "\tdelayDeform false ;\n" +
 "\tdrawAxes false ;\n" +

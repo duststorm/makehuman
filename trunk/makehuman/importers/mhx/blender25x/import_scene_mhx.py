@@ -21,7 +21,7 @@ Version 0.5
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.5'
+__version__= '0.7'
 
 #
 #	Default locations - change to fit your machine
@@ -42,7 +42,7 @@ import Geometry
 import string
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 6
+MINOR_VERSION = 7
 MHX249 = False
 Blender24 = False
 Blender25 = True
@@ -64,6 +64,7 @@ T_Armature = 0x200
 T_Proxy = 0x400
 
 T_Rigify = 0x1000
+T_Symm = 0x4000
 T_MHX = 0x8000
 
 toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_FingerIK
@@ -1151,7 +1152,7 @@ def parseShapeKey(ob, me, args, tokens):
 		print( "Parsing ob %s shape %s" % (bpy.context.object, args[0] ))
 	name = args[0]
 	lr = args[1]
-	if lr == 'Sym':
+	if lr == 'Sym' or toggle & T_Symm:
 		addShapeKey(ob, name, None, tokens)
 	elif lr == 'LR':
 		addShapeKey(ob, name+'_L', 'Left', tokens)
@@ -1887,6 +1888,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
+	symm = BoolProperty(name="Symmetric shapes", description="Keep shapekeys symmetric", default=toggle&T_Symm)
 	
 	def execute(self, context):
 		global toggle
@@ -1901,7 +1903,9 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
-		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs | O_Replace | O_Face | O_Shape | T_MHX
+		O_Symm = T_Shape if self.properties.symm else 0
+		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs 
+		toggle |= O_Replace | O_Face | O_Shape | O_Symm | T_MHX
 		readMhxFile(self.properties.path)
 		return {'FINISHED'}
 

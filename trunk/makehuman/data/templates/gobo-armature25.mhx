@@ -1919,7 +1919,7 @@ Armature HumanRig HumanRig   Normal
   ghost_frame_start 0 ;
   ghost_step 0 ;
   ghost_type 'CURRENT_FRAME' ;
-  layer Array 1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layer Array 1 0 1 0 1 0 0 0  0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   layer_protection Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
   x_axis_mirror False ;
