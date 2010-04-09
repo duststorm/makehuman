@@ -474,11 +474,24 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Eyes', value, self.syncSliders))
             self.eyes = None
 
-
         self.headShapeSlider = gui3d.Slider(self, position=[650, 106, 9.2], value=0.0,min=0.0,max=1.0,label="Head shape")
 
-
-            
+        self.head = None
+        
+        @self.headShapeSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.head == None:
+                    self.head = human.getHead()
+                human.updateHead(self.head, value, self.app.settings.realtimeNormalUpdates)
+                self.head = min(1.0, max(0.0, value))
+        
+        @self.headShapeSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Head', value, self.syncSliders))
+            self.head = None
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',

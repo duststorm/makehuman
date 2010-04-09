@@ -90,6 +90,7 @@ class Human(gui3d.Object):
         self.nose = 0.0
         self.mouth = 0.0
         self.eyes = 0.0
+        self.head = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
@@ -182,6 +183,9 @@ class Human(gui3d.Object):
 
         eyesNames = [group.name for group in self.meshData.facesGroups if group.name.find("eye") > -1]
         self.eyesVertices, self.eyesFaces = self.meshData.getVerticesAndFacesForGroups(eyesNames)
+        
+        headNames = [group.name for group in self.meshData.facesGroups if group.name.find("head") > -1]
+        self.headVertices, self.headFaces = self.meshData.getVerticesAndFacesForGroups(headNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -410,6 +414,12 @@ class Human(gui3d.Object):
 
     def getEyes(self):
        return self.eyes
+       
+    def setHead(self, value):
+        self.head = min(1.0, max(0.0, value))
+
+    def getHead(self):
+       return self.head
 
     def setEthnic(self, ethnic, value):
         modified = None
@@ -838,6 +848,48 @@ class Human(gui3d.Object):
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
+    def updateHead(self, previous, next, recalcNormals = True, update = True):
+        headValues = [0 for i in xrange(0, 9)]
+        
+        # remove previous
+        previousHead = previous * 8
+        i = int(math.floor(previousHead))
+        value = previousHead - i
+        headValues[i] -= 1 - value
+        if i < 8:
+            headValues[i + 1] -= value
+            
+        # add next
+        nextHead = next * 8
+        i = int(math.floor(nextHead))
+        value = nextHead - i
+        headValues[i] += 1 - value
+        if i < 8:
+            headValues[i + 1] += value
+            
+        self.applyHeadTargets(headValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.headVertices, self.headFaces)
+        if update:
+          self.meshData.update(self.headVertices)
+
+    def applyHeadTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 8):
+            detailTargets['data/targets/details/neutral_male-young-head%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_male-child-head%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_male-old-head%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-young-head%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-child-head%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/neutral_female-old-head%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None, update=True):
         """
@@ -986,6 +1038,17 @@ class Human(gui3d.Object):
             eyesValues[i + 1] = value
 
         self.applyEyesTargets(eyesValues)
+        
+        # head goes from 0 to 8, 0 is no target
+        head = self.head * 8
+        headValues = [0 for i in xrange(0, 9)]
+        i = int(math.floor(head))
+        value = head - i
+        headValues[i] = 1 - value
+        if i < 8:
+            headValues[i + 1] = value
+
+        self.applyHeadTargets(headValues)
 
         for (ethnicGroup, ethnicVal) in self.targetsEthnicStack.iteritems():
 
