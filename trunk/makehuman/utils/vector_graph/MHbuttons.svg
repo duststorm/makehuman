@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,7 +13,7 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
+   inkscape:version="0.47pre4 r22446"
    sodipodi:docname="MHbuttons.svg"
    inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_load.png"
    inkscape:export-xdpi="90.000084"
@@ -1492,16 +1493,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1191406"
-     inkscape:cx="40.18382"
-     inkscape:cy="612.87926"
+     inkscape:zoom="2.2382812"
+     inkscape:cx="459.70215"
+     inkscape:cy="889.73458"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="778"
+     inkscape:window-width="1920"
+     inkscape:window-height="1006"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="25"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -1511,7 +1512,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -3396,18 +3397,18 @@
        x="288.97687"
        y="54.426811"
        ry="4.2745557"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_group_background1.png"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_group_main.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750"
        width="120.00141"
        height="230.36415"
        x="292.97614"
        y="75.662918"
        ry="3.5770829"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_group_background1.png"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_group_main.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <text
@@ -3418,7 +3419,7 @@
        id="text3802-14-9-8"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_group_background1.png"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_group_main.png"
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107"><tspan
          sodipodi:role="line"
@@ -3560,7 +3561,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-1"
        width="120.00141"
        height="101.55521"
@@ -3572,7 +3573,10 @@
        inkscape:export-ydpi="90.000107" />
     <g
        id="g3299-1"
-       transform="matrix(1,0,0,0.99192831,1.1134911,142.42077)">
+       transform="matrix(1,0,0,0.99192831,1.1134911,142.42077)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_actions.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107">
       <path
          id="rect4238-9-9"
          d="m 293.84375,322.21875 c -2.3681,0 -4.28125,1.91315 -4.28125,4.28125 l 0,17.28125 128,0 0,-17.28125 c 0,-2.3681 -1.8819,-4.28125 -4.25,-4.28125 l -119.46875,0 z"
@@ -3605,7 +3609,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-1-2"
        width="120.00141"
        height="38.649883"
@@ -4069,7 +4073,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-1-29"
        width="120.00141"
        height="101.55521"
@@ -4091,7 +4095,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-6"
        width="120.00141"
        height="230.36415"
@@ -4147,7 +4151,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-1-29-0"
        width="120.00141"
        height="101.55521"
@@ -4188,7 +4192,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-1-29-0-3"
        width="120.00141"
        height="101.55521"
@@ -4668,7 +4672,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-6-8"
        width="120.00141"
        height="230.36415"
@@ -4861,7 +4865,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-6-8-4"
        width="120.00141"
        height="230.36415"
@@ -5310,7 +5314,7 @@
        inkscape:export-xdpi="90.000107"
        inkscape:export-ydpi="90.000107" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.81714761;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#646464;fill-opacity:1;stroke:#000000;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4750-1-29-0-1"
        width="120.00141"
        height="101.55521"
