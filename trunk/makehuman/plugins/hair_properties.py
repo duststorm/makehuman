@@ -72,9 +72,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.numberSlider = gui3d.Slider(self, position=[600, 180, 9.2], value=25,min=1,max=260,label="Strands Number")
         self.gravitySlider = gui3d.Slider(self, position=[600, 220, 9.2], value=1.5,min=0.0,max=2.0,label="Gravity Factor")
         
-        self.widthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_hairs.png'),\
-        self.app.getThemeResource('images', 'slider.png'),\
-        self.app.getThemeResource('images', 'slider_focused.png'), [10, 150, 9], 1.0, 1.0,30.0) 
+        self.widthSlider = gui3d.Slider(self, position=[10, 150, 9], value=1.0, min=1.0,max=30.0, label = "Hair width") 
 
         #############
         #BUTTONS
