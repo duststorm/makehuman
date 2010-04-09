@@ -135,16 +135,11 @@ class MacroModelingTaskView(gui3d.TaskView):
 
     # Macro sliders
 
-        self.genderSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_gender_macro.png'), self.app.getThemeResource('images', 'slider.png'),
-                                         self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 105, 9.3], value=0.5)
-        self.ageSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_age_macro.png'), self.app.getThemeResource('images', 'slider.png'),
-                                      self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 145, 9.01], value=0.5)
-        self.muscleSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_muscle_macro.png'), self.app.getThemeResource('images', 'slider.png'),
-                                         self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 190, 9.02], value=0.5)
-        self.weightSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_weight_macro.png'), self.app.getThemeResource('images', 'slider.png'),
-                                         self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.03], value=0.5)
-        self.heightSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_height_macro.png'), self.app.getThemeResource('images', 'slider.png'),
-                                         self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 280, 9.04], value=0.5)
+        self.genderSlider = gui3d.Slider(self, position=[10, 105, 9.3], value=0.5, label = "Gender")
+        self.ageSlider = gui3d.Slider(self, position=[10, 145, 9.01], value=0.5, label = "Age")
+        self.muscleSlider = gui3d.Slider(self, position=[10, 190, 9.02], value=0.5, label = "Tone")
+        self.weightSlider = gui3d.Slider(self, position=[10, 235, 9.03], value=0.5, label = "Weight")
+        self.heightSlider = gui3d.Slider(self, position=[10, 280, 9.04], value=0.5, label = "Height")
 
         #hair update only necessary for : gender, age , height
         

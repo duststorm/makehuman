@@ -354,8 +354,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_head.png'), [650, 80, 9.0])
         gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_details_modifiers.png'), [650, 342, 9.0])
 
-        self.genitalsSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_genitals.png'), self.app.getThemeResource('images', 'slider.png'),
-                                           self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0)
+        self.genitalsSlider = gui3d.Slider(self, position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0, label="Genitalia")
 
         self.genitals = None
         
@@ -374,8 +373,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Genitals', value, self.syncSliders))
             self.genitals = None
 
-        self.breastSizeSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_cup.png'), self.app.getThemeResource('images', 'slider.png'),
-                                            self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 139, 9.2], value=0.5, min=0, max=1)
+        self.breastSizeSlider = gui3d.Slider(self, position=[10, 139, 9.2], value=0.5, min=0.0, max=1.0,label = "Breast")
 
         self.breastSize = None
         
@@ -394,8 +392,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'BreastSize', value, self.syncSliders))
             self.breastSize = None
 
-        self.breastFirmnessSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_breast_firmness.png'), self.app.getThemeResource('images', 'slider.png'
-                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 173, 9.2], value=0.5, min=0, max=1)
+        self.breastFirmnessSlider = gui3d.Slider(self, position=[10, 173, 9.2], value=0.5, min=0.0, max=1.0, label ="Breast firmness")
         
         self.breastFirmness = None
         
@@ -414,8 +411,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
             self.breastFirmness = None
 
-        self.noseSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_nose.png'), self.app.getThemeResource('images', 'slider.png'
-                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0)
+        self.noseSlider = gui3d.Slider(self, position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0, label = "Nose shape")
 
         self.nose = None
         
@@ -434,8 +430,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Nose', value, self.syncSliders))
             self.nose = None
             
-        self.mouthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_mouth.png'), self.app.getThemeResource('images', 'slider.png'
-                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 269, 9.2], value=0.0, min=0.0, max=1.0)
+        self.mouthSlider = gui3d.Slider(self, position=[10, 269, 9.2], value=0.0, min=0.0, max=1.0, label = "Mouth shape")
 
         self.mouth = None
         
@@ -454,8 +449,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Mouth', value, self.syncSliders))
             self.mouth = None
             
-        self.eyesSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_eyes.png'), self.app.getThemeResource('images', 'slider.png'
-                                                 ), self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 303, 9.2], value=0.0, min=0.0, max=1.0)
+        self.eyesSlider = gui3d.Slider(self, position=[10, 303, 9.2], value=0.0, min=0.0, max=1.0, label = "Eyes shape")
 
         self.eyes = None
         
@@ -474,24 +468,11 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Eyes', value, self.syncSliders))
             self.eyes = None
 
+
         self.headShapeSlider = gui3d.Slider(self, position=[650, 106, 9.2], value=0.0,min=0.0,max=1.0,label="Head shape")
 
-        self.head = None
-        
-        @self.headShapeSlider.event
-        def onChanging(value):
-            if self.app.settings.realtimeUpdates:
-                human = self.app.scene3d.selectedHuman
-                if self.head == None:
-                    self.head = human.getHead()
-                human.updateHead(self.head, value, self.app.settings.realtimeNormalUpdates)
-                self.head = min(1.0, max(0.0, value))
-        
-        @self.headShapeSlider.event
-        def onChange(value):
-            human = self.app.scene3d.selectedHuman
-            self.app.do(DetailAction(human, 'Head', value, self.syncSliders))
-            self.head = None
+
+            
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
