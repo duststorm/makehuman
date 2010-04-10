@@ -1905,7 +1905,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
-		O_Symm = T_Shape if self.properties.symm else 0
+		O_Symm = T_Symm if self.properties.symm else 0
 		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs 
 		toggle |= O_Replace | O_Face | O_Shape | O_Symm | T_MHX
 		readMhxFile(self.properties.path)
