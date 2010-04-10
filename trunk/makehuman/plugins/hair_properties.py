@@ -3,8 +3,9 @@
 # We need this for gui controls
 
 import gui3d, hair, font3d
-from aljabr import vdist,vnorm,vmul,vsub,vadd
+from aljabr import *
 import random
+import math
 
 print 'hair properties imported'
 
@@ -70,7 +71,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.cPSlider = gui3d.Slider(self, position=[600, 100, 9.2], value=14,min=4,max=30,label="Control Points")
         self.lengthSlider = gui3d.Slider(self, position=[600, 140, 9.2], value=5.0,min=0.0,max=7.0,label="Strand Length")
         self.numberSlider = gui3d.Slider(self, position=[600, 180, 9.2], value=25,min=1,max=260,label="Strands Number")
-        self.gravitySlider = gui3d.Slider(self, position=[600, 220, 9.2], value=1.5,min=0.0,max=2.0,label="Gravity Factor")
+        self.gravitySlider = gui3d.Slider(self, position=[600, 220, 9.2], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
         
         self.widthSlider = gui3d.Slider(self, position=[10, 150, 9], value=1.0, min=1.0,max=30.0, label = "Hair width") 
 
@@ -134,6 +135,10 @@ class HairPropertiesTaskView(gui3d.TaskView):
                 for j in range(1,self.cP-1):
                     curve.append(vadd(v,vmul(normal,cPInterval*j)))
                 curve.append(point2)
+                
+                #adjusting gravity of curve
+                gravitize(curve,self.gravity)
+ 
                 hair.loadStrands(obj,curve)
 
             fg.setColor([0,0,0,255]) #rgba
@@ -232,7 +237,7 @@ def unload(app):
 #obj = hair object
 def hairWidthUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal and vertex index of object remains the same!
   N=len(obj.verts)
-  origWidth = vdist(obj.verts[1].co,obj.verts[0].co)/res
+  origWidth = vdist(obj.verts[1].co,obj.verts[0].co)/cr
   diff= (widthFactor-origWidth)*res/2
   for i in xrange(0,N/2):
       vec=vmul(vnorm(vsub(obj.verts[i*2+1].co,obj.verts[i*2].co)), diff)    
@@ -240,3 +245,21 @@ def hairWidthUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal an
       obj.verts[i*2+1].co=vadd(obj.verts[i*2+1].co,vec)
       obj.verts[i*2].update(updateNor=0)
       obj.verts[i*2+1].update(updateNor=0)
+
+def gravitize(curve,gFactor,start=1):
+    length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
+    delta = math.pow(math.pow(length,2.0)-math.pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
+    X= delta*math.pow(2.0,gFactor)
+    c = math.pow(2.0,-8.0+gFactor)
+    p0  = curve[start][:]
+    p1 = curve[len(curve)-1][:]
+    print "Debug: length =",length," len(curve)=", len(curve), "delta= ", delta
+    interval = length/(len(curve)-start-1)
+    for i in xrange(start+1, len(curve)):
+        x=math.pow(interval*(i-start)/(4*c),1.0/3.0)
+        curve[i] = in2pts(p0,p1,x/X)
+        if delta < 3.0:
+            print "Debug: detected normal strand on the middle of the head"
+            curve[i][1] = curve[i][1] - 0.005*math.pow(x,4)#curve[0][1] - (curve[i][1] - curve[0][1])
+        else:
+            curve[i][1] = curve[i][1] - c*math.pow(x,4)
