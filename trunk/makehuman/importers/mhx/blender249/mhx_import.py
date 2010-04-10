@@ -174,6 +174,7 @@ def readMhxFile(fileName):
 			nErrors += 1
 			#raise NameError(msg)
 
+	#postProcess()
 	scn.update()
 	context = scn.getRenderingContext()
 	context.rayTracing = False
@@ -1137,8 +1138,11 @@ def parseConstraint(constraints, args, tokens, name):
 		print "Skipping constraint " + typeName
 		nErrors += 1
 		return None
-	typeCns = Constraint.Type[typeName]
-	# print "Constraint "+typeName
+	try:
+		typeCns = Constraint.Type[typeName]
+	except:
+		raise NameError("Unknown constraint type " + typeName)
+
 	try:
 		cns = constraints.append(typeCns)
 	except:
@@ -1391,7 +1395,64 @@ def add2Group(grp, name):
 
 def parseEmpty(args, tokens):	
 	return
+
+#
+#	postProcess():
+#
+
+'''
+def postProcess():
+	global toggleArmIK, toggleLegIK, toggleFKIK, toggleFingerIK
+	fingerBones = []
+	fingerBonesIK = []
+	fingerBonesFK = []
+	for i in range(1,6):
+		for j in range(1,4):
+			fingerBones.extend(['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)])
+			fingerBonesIK.extend(['Finger-%d-%d_ik_L' % (i,j), 'Finger-%d-%d_ik_R' % (i,j)])
+			fingerBonesFK.extend(['Finger-%d-%d_fk_L' % (i,j), 'Finger-%d-%d_fk_R' % (i,j)])
+
+	armBones = ['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R']
+	if toggleArmIK:
+		setInfluence(armBones, 'CopyRotIK', 1.0)
+		setInfluence(armBones, 'CopyRotFK', 0.0)
+		setInfluence(armBones, 'Const', 1.0)
+	else:
+		setInfluence(armBones, 'CopyRotIK', 0.0)
+		setInfluence(armBones, 'CopyRotFK', 1.0)
+		setInfluence(armBones, 'Const', 0.0)
+
+	legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
+	if toggleLegIK:
+		setInfluence(legBones, 'CopyRotIK', 1.0)
+		setInfluence(legBones, 'IK', 1.0)
+		setInfluence(legBones, 'CopyRotFK', 0.0)
+		setInfluence(legBones, 'Const', 1.0)
+	else:
+		setInfluence(legBones, 'CopyRotIK', 0.0)
+		setInfluence(legBones, 'IK', 0.0)
+		setInfluence(legBones, 'CopyRotFK', 1.0)
+		setInfluence(legBones, 'Const', 0.0)
+
+	if toggleFingerIK:
+		setInfluence(fingerBones, 'Const', 1.0)
+		setInfluence(fingerBonesIK, 'Action', 1.0)
+		setInfluence(fingerBonesFK, 'Action', 1.0)
+	else:
+		setInfluence(fingerBones, 'Const', 0.0)
+		setInfluence(fingerBonesIK, 'Action', 0.0)
+		setInfluence(fingerBonesFK, 'Action', 0.0)
 	
+def setInfluence(bones, cnsName, w):
+	ob = _object['HumanRig']
+	pbones = ob.getPose().bones	
+	for pb in pbones.values():
+		if pb.name in bones:
+			for cns in pb.constraints:
+				if cns.name == cnsName:
+					cns.influence = w
+	return
+'''
 #
 #	main(fileName):
 #

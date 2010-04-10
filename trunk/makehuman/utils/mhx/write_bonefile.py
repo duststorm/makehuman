@@ -4,6 +4,13 @@
 
 import bpy
 
+BoneLayers = [
+	'L_FK', 'L_TORSO', 'L_ARMIK', 'L_ARMFK',
+	'L_LEGIK', 'L_LEGFK', 'L_HANDIK', 'L_HANDFK', 
+	'L_PANEL', 'L_TOE', 'L_HEAD', 'L_NONE',
+	'L_NONE', 'L_ROOT', 'L_DEFORM', 'L_HELP'
+]
+
 #
 #	writeBones(character, fp):
 #
@@ -90,14 +97,13 @@ def writeBones(character, fp):
 			flags += "+F_NOCYC"
 
 		if len(flags) > 0:
-			fp.write(flags[1:])
+			fp.write("%s, " % flags[1:])
 		else:
-			fp.write("0")
+			fp.write("0, ")
 
 		# Layers
 		'''
 		(bType, bName) = extractName(b)
-		fp.write(", ")
 		if bType == 'MCP':
 			fp.write("L_HELP, ")
 		elif bType == 'DEF':
@@ -109,6 +115,17 @@ def writeBones(character, fp):
 		else:
 			fp.write("L_PANEL, ")
 		'''
+		c = ""
+		for n,name in enumerate(BoneLayers):
+			if b.layer[n]:
+				fp.write("%s%s" % (c, name))
+				c = "+"
+		if c == "":
+			fp.write("0, ")
+		else:
+			fp.write(", ")		
+
+		'''
 		x = 0
 		bit = 1
 		for lay in b.layer:
@@ -116,6 +133,7 @@ def writeBones(character, fp):
 				x += bit
 			bit <<= 1
 		fp.write(", 0x%x, " % x)
+		'''
 
 		# BBones
 		fp.write("(%d,%g,%d) ),\n" % (b.bbone_in, b.bbone_out, b.bbone_segments))
@@ -180,6 +198,8 @@ def writeBones(character, fp):
 	#
 	
 	bpy.ops.object.mode_set(mode='OBJECT')
+	if ob.animation_data == None:
+		return
 	fp.write("\n%sDrivers = [\n" % character)
 	for fcu in ob.animation_data.drivers:
 		try:
@@ -325,6 +345,8 @@ def writeConstraint(fp, cns):
 	elif typ == 'STRETCH_TO':
 		fp.write("('StretchTo', %s, ['%s', '%s', '%s'])" % (space, cns.name.replace(' ','_'), cns.subtarget, cns.keep_axis))
 
+	elif typ == 'LIMIT_DISTANCE':
+		fp.write("('Limit', %s, ['%s', '%s'])" % (space, cns.name.replace(' ','_'), cns.subtarget))
 	else:
 		fp.write(typ)
 		raise NameError("Unknown constraint type %s" % typ)
@@ -370,7 +392,7 @@ def writeBoneFile(character, fname):
 	print("Bone file %s written" % fname)
 	return
 
-writeBoneFile('Sintel', '/home/thomas/svn/makehuman/mh_plugins/sintel_bones.py')
+writeBoneFile('Classic', '/home/thomas/svn/makehuman/mh_plugins/classic_bones.py')
 #writeBoneFile("Sintel", "/home/thomas/myblends/sintel/sintel_bones-raw.py")
 #writeBoneFile("Gobo", "/home/thomas/myblends/gobo/gobo_bones-raw.py")
 

@@ -22,7 +22,8 @@ TO DO
 
 """
 
-import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, hairgenerator, gobo_bones #, sintel_bones
+import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig
+import classic_bones, gobo_bones #, sintel_bones
 import os
 
 
@@ -120,32 +121,25 @@ def exportRawMhx(obj, fp):
 
 def exportMhx_25(obj, rig, fp):
 	if rig == 'gobo':
-		mhxbones.newSetupJoints(obj, gobo_bones.GoboJoints, gobo_bones.GoboHeadsTails)
-		copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
-		fp.write("if toggle&T_Armature\n")
-		copyFile25(obj, "data/templates/gobo-armature25.mhx", rig, fp)	
-		fp.write("end if\n")
-		fp.write("if toggle&T_Proxy\n")
-		copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
-		fp.write("end if\n")
-		fp.write("if toggle&T_Mesh\n")
-		copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
-		fp.write("end if\n")
+		mhx_rig.newSetupJoints(obj, gobo_bones.GoboJoints, gobo_bones.GoboHeadsTails)
 	elif rig == 'sintel':
-		mhxbones.newSetupJoints(obj, sintel_bones.SintelJoints, sintel_bones.SintelHeadsTails)
-		copyFile25(obj, "data/templates/sintel-armature25.mhx", rig, fp)	
-	else:
-		mhxbones.setupBones(obj)
-		copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
-		fp.write("if toggle&T_Armature\n")
-		copyFile25(obj, "data/templates/armatures-%s25.mhx" % rig, rig, fp)	
-		fp.write("end if\n")
-		fp.write("if toggle&T_Proxy\n")
-		copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
-		fp.write("end if\n")
-		fp.write("if toggle&T_Mesh\n")
-		copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
-		fp.write("end if\n")
+		mhx_rig.newSetupJoints(obj, sintel_bones.SintelJoints, sintel_bones.SintelHeadsTails)
+		copyFile25(obj, "data/templates/sintel-armature25.mhx", rig, fp)
+		return
+	elif rig == 'classic':
+		mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, classic_bones.ClassicHeadsTails)
+		#mhxbones.setupBones(obj)
+
+	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
+	fp.write("if toggle&T_Armature\n")
+	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp)	
+	fp.write("end if\n")
+	fp.write("if toggle&T_Proxy\n")
+	copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
+	fp.write("end if\n")
+	fp.write("if toggle&T_Mesh\n")
+	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+	fp.write("end if\n")
 	return
 
 		
@@ -194,8 +188,14 @@ def copyFile25(obj, tmplName, rig, fp):
 			elif lineSplit[1] == 'roll':
 				(x, y) = mhxbones.boneRoll[bone]
 				fp.write("    roll %.6g ;\n" % (y))
+			elif lineSplit[1] == 'classic-bones':
+				mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.PanelArmature, True)
+			elif lineSplit[1] == 'classic-poses':
+				classic_bones.ClassicWritePoses(fp)
+			elif lineSplit[1] == 'classic-drivers':
+				pass
 			elif lineSplit[1] == 'gobo-bones':
-				gobo_bones.writeArmature(fp, gobo_bones.GoboArmature)
+				mhx_rig.writeArmature(fp, gobo_bones.GoboArmature, True)
 			elif lineSplit[1] == 'gobo-poses':
 				gobo_bones.GoboWritePoses(fp)
 			elif lineSplit[1] == 'gobo-actions':
@@ -203,11 +203,11 @@ def copyFile25(obj, tmplName, rig, fp):
 			elif lineSplit[1] == 'gobo-constraint-drivers':
 				gobo_bones.GoboWriteDrivers(fp)
 			elif lineSplit[1] == 'sintel-bones':
-				gobo_bones.writeArmature(fp, sintel_bones.SintelArmature)
+				mhx_rig.writeArmature(fp, sintel_bones.SintelArmature, True)
 			elif lineSplit[1] == 'sintel-poses':
 				sintel_bones.SintelWritePoses(fp)
 			elif lineSplit[1] == 'sintel-drivers':
-				gobo_bones.writeDrivers(fp, sintel_bones.SintelDrivers)
+				mhx_rig.writeDrivers(fp, sintel_bones.SintelDrivers)
 			elif lineSplit[1] == 'ProxyVerts':
 				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
 				for v in realVerts:
@@ -585,12 +585,18 @@ def exportRawData(obj, fp):
 #
 #	exportArmature(obj, fp):
 #
+
 def exportArmature(obj, fp):
+	oldExportArmature24(obj, fp)
+	#newExportArmature24(obj, fp)
+	return
+
+def oldExportArmature24(obj, fp):
 	mhxbones.writeJoints(obj, fp)
+
 	fp.write(
 "\nif useArmature\n" +
 "armature HumanRig HumanRig\n")
-
 	mhxbones.writeBones(obj, fp)
 	fp.write(
 "\tlayerMask 0x515 ;\n" +
@@ -603,21 +609,45 @@ def exportArmature(obj, fp):
 "\trestPosition false ;\n" +
 "\tvertexGroups true ;\n" +
 "end armature\n")
-	fp.write(
-"\nif Blender24\n" +
-"pose HumanRig\n")
+
+	fp.write("\npose HumanRig\n")
 	mhxbones.writePose24(obj, fp)
-	fp.write(
-"end pose\n" +
-"end if\n")
+	fp.write("end pose\n")
 
 	fp.write(
-"\nif Blender25\n" +
-"pose HumanRig\n")
-	mhxbones.writePose25(obj, fp)
+"\nobject HumanRig Armature HumanRig \n" +
+"\tlayers 1 0 ;\n" +
+"\txRay true ;\n" +
+"end object\n" +
+"end useArmature\n")
+
+	return 
+
+#
+#	newExportArmature4(obj, fp):
+#
+def newExportArmature24(obj, fp):
+	mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, classic_bones.ClassicHeadsTails)
+
 	fp.write(
-"end pose\n" +
-"end if\n")
+"\nif useArmature\n" +
+"armature HumanRig HumanRig\n")
+	mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.PanelArmature, False)
+	fp.write(
+"\tlayerMask 0x515 ;\n" +
+"\tautoIK false ;\n" +
+"\tdelayDeform false ;\n" +
+"\tdrawAxes false ;\n" +
+"\tdrawNames false ;\n" +
+"\tenvelopes false ;\n" +
+"\tmirrorEdit true ;\n" +
+"\trestPosition false ;\n" +
+"\tvertexGroups true ;\n" +
+"end armature\n")
+
+	fp.write("\npose HumanRig\n")
+	classic_bones.ClassicWritePoses(fp)
+	fp.write("end pose\n")
 		
 	fp.write(
 "\nobject HumanRig Armature HumanRig \n" +
@@ -626,7 +656,8 @@ def exportArmature(obj, fp):
 "end object\n" +
 "end useArmature\n")
 
-	return exportArmature
+	return 
+
 	
 #
 #	exportShapeKeys(obj, tmpl, fp, proxyVerts):

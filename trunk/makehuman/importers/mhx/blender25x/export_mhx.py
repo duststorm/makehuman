@@ -1720,11 +1720,11 @@ def mhxClose(fp):
 hairFile = "particles25.mhx"
 theRig = "classic"
 #theRig = "gobo"
-#writeMhxFile('/home/thomas/myblends/gobo/gobo.mhx', M_Amt+M_Anim)
+writeMhxFile('/home/thomas/myblends/test.mhx', M_MHX+M_Mat)
 #writeMhxFile('/home/thomas/myblends/sintel/simple2.mhx', M_Amt+M_Anim)
 #writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
-writeMhxTemplates(M_MHX+M_Geo+M_Shape)
-#writeMhxTemplates(M_MHX+M_Amt)
+#writeMhxTemplates(M_MHX+M_Geo+M_Shape)
+#writeMhxTemplates(M_MHX+M_Mat)
 #theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
 

@@ -288,6 +288,10 @@ armature = [
 	("UpArmTwist_L", "Clavicle_L", "r-shoulder", 0, "r-elbow", 0, F_CON, L_DEFORM, None, 0),
 	("LoArmTwist_L", "UpArm_L", "r-elbow", 0, "r-hand", 0, F_CON, L_DEFORM, None, 0),
 
+	("UpArmFK_L", "Clavicle_L", "r-shoulder", 0, "r-elbow", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("LoArmFK_L", "UpArmFK_L", "r-elbow", 0, "r-hand", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("HandFK_L", "LoArmFK_L", "r-hand", 0, "r-finger-3-1", 0, F_CON+F_NODEF, L_HELP, "MHCircle05", 0),
+
 	("UpArmIK_L", "Clavicle_L", "r-shoulder", 0, "r-elbow", 0, F_CON+F_NODEF, L_HELP, None, 0),
 	("LoArmIK_L", "UpArmIK_L", "r-elbow", 0, "r-hand", 0, F_CON+F_NODEF, L_HELP, None, 0),
 	("HandIK_L", "Root", "r-hand", 0, "r-finger-3-1", 0, F_NODEF, L_ARMIK, None, 0),
@@ -316,6 +320,10 @@ armature = [
 	("UpArmTwist_R", "Clavicle_R", "l-shoulder", 0, "l-elbow", 0, F_CON, L_DEFORM, None, 0),
 	("LoArmTwist_R", "UpArm_R", "l-elbow", 0, "l-hand", 0, F_CON, L_DEFORM, None, 0),
 
+	("UpArmFK_R", "Clavicle_R", "l-shoulder", 0, "l-elbow", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("LoArmFK_R", "UpArmFK_R", "l-elbow", 0, "l-hand", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("HandFK_R", "LoArmFK_R", "l-hand", 0, "l-finger-3-1", 0, F_CON+F_NODEF, L_HELP, "MHCircle05", 0),
+
 	("UpArmIK_R", "Clavicle_R", "l-shoulder", 0, "l-elbow", 0, F_CON+F_NODEF, L_HELP, None, 0),
 	("LoArmIK_R", "UpArmIK_R", "l-elbow", 0, "l-hand", 0, F_CON+F_NODEF, L_HELP, None, 0),
 	("HandIK_R", "Root", "l-hand", 0, "l-finger-3-1", 0, F_NODEF, L_ARMIK+L_HANDIK, None, 0),
@@ -338,12 +346,18 @@ armature = [
 	("Finger-5-3_R", "Finger-5-2_R", "l-finger-5-3", 0, "l-finger-5-end", 0, F_CON, L_HANDFK, "MHCircle05", LockX+LockY),
 
 	("Hip_L", "Hips-inv", "pelvis", 0, "r-upper-leg", 0, F_CON, L_HELP, None, 0),
+ 	("UpLegTwist_L", "Hip_L", "r-upper-leg", 0, "r-knee", 0, F_CON, L_DEFORM, None, 0),
+
 	("UpLeg_L", "Hip_L", "r-upper-leg", 0, "r-knee", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
 	("LoLeg_L", "UpLeg_L", "r-knee", 0, "r-ankle", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
 	("Foot_L", "LoLeg_L", "r-ankle", 0, "r-toe-3-1", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
- 	("UpLegTwist_L", "Hip_L", "r-upper-leg", 0, "r-knee", 0, F_CON, L_DEFORM, None, 0),
-
 	("Toe_L", "Foot_L", "r-toe-3-1", 0, "r-toe-end", 0, F_CON+F_NODEF, L_FK+L_DEFORM+L_LEGFK, "MHCircle05", 0),
+
+	("UpLegFK_L", "Hip_L", "r-upper-leg", 0, "r-knee", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("LoLegFK_L", "UpLegFK_L", "r-knee", 0, "r-ankle", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("FootFK_L", "LoLegFK_L", "r-ankle", 0, "r-toe-3-1", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("ToeFK_L", "FootFK_L", "r-toe-3-1", 0, "r-toe-end", 0, F_CON+F_NODEF, L_HELP, "MHCircle05", 0),
+
 	("Toe-1-1_L", "Toe_L", "r-toe-1-1", 0, "r-toe-1-2", 0, 0, L_TOE, None, 0),
 	("Toe-1-2_L", "Toe-1-1_L", "r-toe-1-2", 0, "r-toe-1-end", 0, F_CON, L_TOE, None, 0),
 	("Toe-2-1_L", "Toe_L", "r-toe-2-1", 0, "r-toe-2-2", 0, 0, L_TOE, None, 0),
@@ -360,11 +374,17 @@ armature = [
 	("Toe-5-3_L", "Toe-5-2_L", "r-toe-5-3", 0, "r-toe-5-end", 0, F_CON, L_TOE, None, 0),
 
 	("Hip_R", "Hips-inv", "pelvis", 0, "l-upper-leg", 0, F_CON, L_HELP, None, 0),
+	("UpLegTwist_R", "Hip_R", "l-upper-leg", 0, "l-knee", 0, F_CON, L_DEFORM, None, 0),
+
 	("UpLeg_R", "Hip_R", "l-upper-leg", 0, "l-knee", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
 	("LoLeg_R", "UpLeg_R", "l-knee", 0, "l-ankle", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
 	("Foot_R", "LoLeg_R", "l-ankle", 0, "l-toe-3-1", 0, F_CON, L_FK+L_DEFORM+L_LEGFK, "MHCircle03", 0),
 	("Toe_R", "Foot_R", "l-toe-3-1", 0, "l-toe-end", 0, F_CON+F_NODEF, L_FK+L_DEFORM+L_LEGFK, "MHCircle05", 0),
-	("UpLegTwist_R", "Hip_R", "l-upper-leg", 0, "l-knee", 0, F_CON, L_DEFORM, None, 0),
+
+	("UpLegFK_R", "Hip_R", "l-upper-leg", 0, "l-knee", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("LoLegFK_R", "UpLegFK_R", "l-knee", 0, "l-ankle", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("FootFK_R", "LoLegFK_R", "l-ankle", 0, "l-toe-3-1", 0, F_CON+F_NODEF, L_HELP, "MHCircle03", 0),
+	("ToeFK_R", "FootFK_R", "l-toe-3-1", 0, "l-toe-end", 0, F_CON+F_NODEF, L_HELP, "MHCircle05", 0),
 
 	("Toe-1-1_R", "Toe_R", "l-toe-1-1", 0, "l-toe-1-2", 0, 0, L_TOE, None, 0),
 	("Toe-1-2_R", "Toe-1-1_R", "l-toe-1-2", 0, "l-toe-1-end", 0, F_CON, L_TOE, None, 0),
@@ -548,11 +568,15 @@ boneRoll = {
 	'FootIK_R'	 : (173, 177),
 	'Foot_L'	 : (  6, -28),
 	'Foot_R'	 : ( -6,  28),
+	'FootFK_L'	 : (  6, -28),
+	'FootFK_R'	 : ( -6,  28),
 	'Gaze'		 : (180, 180),
 	'Gaze_L'	 : (180, 180),
 	'Gaze_R'	 : (180, 180),
 	'HandIK_L'	 : ( -4,  70),
 	'HandIK_R'	 : (  4, -70),
+	'HandFK_L'	 : ( -4,  70),
+	'HandFK_R'	 : (  4, -70),
 	'Hand_L'	 : ( -4,  70),
 	'Hand_R'	 : (  4, -70),
 	'Head'		 : (  0,   0),
@@ -570,12 +594,16 @@ boneRoll = {
 	'LoArmTwist_R'	 : (  0, -91),
 	'LoArm_L'	 : (  0,  91),
 	'LoArmIK_L'	 : (  0,  91),
+	'LoArmFK_L'	 : (  0,  91),
 	'LoArm_R'	 : (  0, -91),
 	'LoArmIK_R'	 : (  0, -91),
+	'LoArmFK_R'	 : (  0, -91),
 	'LoLeg_L'	 : (-172, 180),
 	'LoLegIK_L'	 : (-172, 180),
+	'LoLegFK_L'	 : (-172, 180),
 	'LoLeg_R'	 : (172, 180),
 	'LoLegIK_R'	 : (172, 180),
+	'LoLegFK_R'	 : (172, 180),
 	'LoLid_L'	 : (  2, -17),
 	'LoLid_R'	 : ( -2,  17),
 	'Neck'		 : (  0,   0),
@@ -641,6 +669,8 @@ boneRoll = {
 	'Toe-5-3_R'	 : (-36, 171),
 	'ToeIK_L'	 : (  5, -164),
 	'ToeIK_R'	 : ( -5, 164),
+	'ToeFK_L'	 : (  5, -164),
+	'ToeFK_R'	 : ( -5, 164),
 	'Toe_L'	 : (  5, -164),
 	'Toe_R'	 : ( -5, 164),
 	'Torso'	 : (  0, 180),
@@ -650,14 +680,18 @@ boneRoll = {
 	'UpArmTwist_R'	 : (  0, -97),
 	'UpArm_L'	 : (  0,  97),
 	'UpArmIK_L'	 : (  0,  97),
+	'UpArmFK_L'	 : (  0,  97),
 	'UpArm_R'	 : (  0, -97),
 	'UpArmIK_R'	 : (  0, -97),
+	'UpArmFK_R'	 : (  0, -97),
 	'UpLegTwist_L'	 : ( 19, -177),
 	'UpLegTwist_R'	 : (-19, 177),
 	'UpLeg_L'	 : ( 19, -177),
 	'UpLegIK_L'	 : ( 19, -177),
+	'UpLegFK_L'	 : ( 19, -177),
 	'UpLeg_R'	 : (-19, 177),
 	'UpLegIK_R'	 : (-19, 177),
+	'UpLegFK_R'	 : (-19, 177),
 	'UpLid_L'	 : ( -2, -16),
 	'UpLid_R'	 : (  2,  16),
 }
@@ -1060,46 +1094,4 @@ def setupBones(obj):
 		else:
 			boneTail[bone] = locations[tjoint]
 
-#
-#	newSetupJoints (obj, joints, headTails):
-#	Used by gobo
-#
-def newSetupJoints (obj, joints, headTails):
-	global boneHead, boneTail, locations
-	locations = {}
-	for (key, typ, data) in joints:
-		if typ == 'j':
-			loc = calcJointPos(obj, data)
-			locations[key] = loc
-			locations[data] = loc
-		elif typ == 'v':
-			v = int(data)
-			locations[key] = obj.verts[v].co
-		elif typ == 'x':
-			locations[key] = [float(data[0]), float(data[2]), -float(data[1])]
-
-	for (key, typ, data) in joints:
-		if typ == 'j':
-			pass
-		elif typ == 'b':
-			locations[key] = locations[data]
-		elif typ == 'v':
-			pass
-		elif typ == 'x':
-			pass
-		elif typ == 'l':
-			((k1, joint1), (k2, joint2)) = data
-			locations[key] = vadd(vmul(locations[joint1], k1), vmul(locations[joint2], k2))
-		elif typ == 'o':
-			(joint, offs) = data
-			locations[key] = vadd(locations[joint], offs)
-		else:
-			raise NameError("Unknown %s" % typ)
-
-	boneHead = {}
-	boneTail = {}
-	for (bone, head, tail) in headTails:
-		boneHead[bone] = locations[head]
-		boneTail[bone] = locations[tail]
-	return 
 

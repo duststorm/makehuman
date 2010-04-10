@@ -1353,19 +1353,21 @@ def postProcess():
 		legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
 		if toggle & T_LegIK:
 			setInfluence(legBones, 'CopyRotIK', 1.0)
+			setInfluence(legBones, 'IK', 1.0)
 			setInfluence(legBones, 'CopyRotFK', 0.0)
 			setInfluence(legBones, 'Const', 1.0)
 		else:
 			setInfluence(legBones, 'CopyRotIK', 0.0)
+			setInfluence(legBones, 'IK', 0.0)
 			setInfluence(legBones, 'CopyRotFK', 1.0)
 			setInfluence(legBones, 'Const', 0.0)
 
 		if toggle & T_FingerIK:
-			setInfluence(fingerBones, 'Const', 1.0)
+			setInfluence(fingerBones, 'IK', 1.0)
 			setInfluence(fingerBonesIK, 'Action', 1.0)
 			setInfluence(fingerBonesFK, 'Action', 1.0)
 		else:
-			setInfluence(fingerBones, 'Const', 0.0)
+			setInfluence(fingerBones, 'IK', 0.0)
 			setInfluence(fingerBonesIK, 'Action', 0.0)
 			setInfluence(fingerBonesFK, 'Action', 0.0)
 
