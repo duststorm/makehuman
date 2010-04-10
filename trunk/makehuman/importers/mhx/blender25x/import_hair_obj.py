@@ -295,6 +295,10 @@ def makeHair(hstep, guides):
 			h.location = point
 			h.time = n*dt
 			h.weight = 1.0 - n*dw
+
+	bpy.ops.particle.select_all(action='SELECT')
+	bpy.ops.particle.connect_hair(all=True)
+	bpy.ops.particle.particle_edit_toggle()
 	return
 
 	fp = open("/home/thomas/myblends/hair/test2.txt", "w")
@@ -303,8 +307,6 @@ def makeHair(hstep, guides):
 		printGuideAndHair(fp, nguide, psys.particles[m], nmax)
 	fp.close()	
 
-	#bpy.ops.particle.particle_edit_toggle()
-	#bpy.ops.particle.connect_hair(all=True)
 	return
 
 #
