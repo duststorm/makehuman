@@ -243,15 +243,14 @@ GoboHeadsTails = [
 	('LoArm_L'		, 'armupper_L_tail', 'armlower_L_tail'),
 	('Hand_L'		, 'armlower_L_tail', 'hand_L_tail'),
 
-	('UpArm_ik_L'		, 'arm_root_L_tail', 'armupper_L_tail'),
-	('LoArm_ik_L'		, 'armupper_L_tail', 'armlower_L_tail'),
-	('Hand_ik_L'		, 'armlower_L_tail', 'hand_L_tail'),
-	('FingerCurl_ik_L'	, 'finger_curl_L_head', 'finger_curl_L_tail'),
-	('UpArm_fk_L'		, 'arm_root_L_tail', 'armupper_L_tail'),
-	('LoArm_fk_L'		, 'armupper_L_tail', 'armlower_L_tail'),
-	('FingerCurl_fk_L'	, 'finger_curl_L_head', 'finger_curl_L_tail'),
-	('Hand_fk_L'		, 'hand_L_head', 'hand_L_tail'),
+	('UpArmIK_L'		, 'arm_root_L_tail', 'armupper_L_tail'),
+	('LoArmIK_L'		, 'armupper_L_tail', 'armlower_L_tail'),
+	('HandIK_L'		, 'armlower_L_tail', 'hand_L_tail'),
+	('UpArmFK_L'		, 'arm_root_L_tail', 'armupper_L_tail'),
+	('LoArmFK_L'		, 'armupper_L_tail', 'armlower_L_tail'),
+	('HandFK_L'		, 'hand_L_head', 'hand_L_tail'),
 	('Elbow_L'		, 'elbow_L_head', 'elbow_L_tail'),
+	('FingerCurl_L'		, 'finger_curl_L_head', 'finger_curl_L_tail'),
 
 	('Finger-1-1_L'		, 'finger-1-1_L_head', 'finger-1-1_L_tail'),
 	('Finger-1-2_L'		, 'finger-1-1_L_tail', 'finger-1-2_L_tail'),
@@ -269,37 +268,37 @@ GoboHeadsTails = [
 	('Finger-5-2_L'		, 'finger-5-1_L_tail', 'finger-5-2_L_tail'),
 	('Finger-5-3_L'		, 'finger-5-2_L_tail', 'finger-5-3_L_tail'),
 
-	('Finger-1-1_ik_L'	, 'finger-1-1_L_head', 'finger-1-1_L_tail'),
-	('Finger-1-2_ik_L'	, 'finger-1-1_L_tail', 'finger-1-2_L_tail'),
-	('Finger-1-3_ik_L'	, 'finger-1-2_L_tail', 'finger-1-3_L_tail'),
-	('Finger-2-1_ik_L'	, 'finger-2-1_L_head', 'finger-2-1_L_tail'),
-	('Finger-2-2_ik_L'	, 'finger-2-1_L_tail', 'finger-2-2_L_tail'),
-	('Finger-2-3_ik_L'	, 'finger-2-2_L_tail', 'finger-2-3_L_tail'),
-	('Finger-3-1_ik_L'	, 'finger-3-1_L_head', 'finger-3-1_L_tail'),
-	('Finger-3-2_ik_L'	, 'finger-3-1_L_tail', 'finger-3-2_L_tail'),
-	('Finger-3-3_ik_L'	, 'finger-3-2_L_tail', 'finger-3-3_L_tail'),
-	('Finger-4-1_ik_L'	, 'finger-4-1_L_head', 'finger-4-1_L_tail'),
-	('Finger-4-2_ik_L'	, 'finger-4-1_L_tail', 'finger-4-2_L_tail'),
-	('Finger-4-3_ik_L'	, 'finger-4-2_L_tail', 'finger-4-3_L_tail'),
-	('Finger-5-1_ik_L'	, 'finger-5-1_L_head', 'finger-5-1_L_tail'),
-	('Finger-5-2_ik_L'	, 'finger-5-1_L_tail', 'finger-5-2_L_tail'),
-	('Finger-5-3_ik_L'	, 'finger-5-2_L_tail', 'finger-5-3_L_tail'),
+	('Finger-1-1IK_L'	, 'finger-1-1_L_head', 'finger-1-1_L_tail'),
+	('Finger-1-2IK_L'	, 'finger-1-1_L_tail', 'finger-1-2_L_tail'),
+	('Finger-1-3IK_L'	, 'finger-1-2_L_tail', 'finger-1-3_L_tail'),
+	('Finger-2-1IK_L'	, 'finger-2-1_L_head', 'finger-2-1_L_tail'),
+	('Finger-2-2IK_L'	, 'finger-2-1_L_tail', 'finger-2-2_L_tail'),
+	('Finger-2-3IK_L'	, 'finger-2-2_L_tail', 'finger-2-3_L_tail'),
+	('Finger-3-1IK_L'	, 'finger-3-1_L_head', 'finger-3-1_L_tail'),
+	('Finger-3-2IK_L'	, 'finger-3-1_L_tail', 'finger-3-2_L_tail'),
+	('Finger-3-3IK_L'	, 'finger-3-2_L_tail', 'finger-3-3_L_tail'),
+	('Finger-4-1IK_L'	, 'finger-4-1_L_head', 'finger-4-1_L_tail'),
+	('Finger-4-2IK_L'	, 'finger-4-1_L_tail', 'finger-4-2_L_tail'),
+	('Finger-4-3IK_L'	, 'finger-4-2_L_tail', 'finger-4-3_L_tail'),
+	('Finger-5-1IK_L'	, 'finger-5-1_L_head', 'finger-5-1_L_tail'),
+	('Finger-5-2IK_L'	, 'finger-5-1_L_tail', 'finger-5-2_L_tail'),
+	('Finger-5-3IK_L'	, 'finger-5-2_L_tail', 'finger-5-3_L_tail'),
 
-	('Finger-1-1_fk_L'	, 'finger-1-1_L_head', 'finger-1-1_L_tail'),
-	('Finger-1-2_fk_L'	, 'finger-1-1_L_tail', 'finger-1-2_L_tail'),
-	('Finger-1-3_fk_L'	, 'finger-1-2_L_tail', 'finger-1-3_L_tail'),
-	('Finger-2-1_fk_L'	, 'finger-2-1_L_head', 'finger-2-1_L_tail'),
-	('Finger-2-2_fk_L'	, 'finger-2-1_L_tail', 'finger-2-2_L_tail'),
-	('Finger-2-3_fk_L'	, 'finger-2-2_L_tail', 'finger-2-3_L_tail'),
-	('Finger-3-1_fk_L'	, 'finger-3-1_L_head', 'finger-3-1_L_tail'),
-	('Finger-3-2_fk_L'	, 'finger-3-1_L_tail', 'finger-3-2_L_tail'),
-	('Finger-3-3_fk_L'	, 'finger-3-2_L_tail', 'finger-3-3_L_tail'),
-	('Finger-4-1_fk_L'	, 'finger-4-1_L_head', 'finger-4-1_L_tail'),
-	('Finger-4-2_fk_L'	, 'finger-4-1_L_tail', 'finger-4-2_L_tail'),
-	('Finger-4-3_fk_L'	, 'finger-4-2_L_tail', 'finger-4-3_L_tail'),
-	('Finger-5-1_fk_L'	, 'finger-5-1_L_head', 'finger-5-1_L_tail'),
-	('Finger-5-2_fk_L'	, 'finger-5-1_L_tail', 'finger-5-2_L_tail'),
-	('Finger-5-3_fk_L'	, 'finger-5-2_L_tail', 'finger-5-3_L_tail'),
+	('Finger-1-1FK_L'	, 'finger-1-1_L_head', 'finger-1-1_L_tail'),
+	('Finger-1-2FK_L'	, 'finger-1-1_L_tail', 'finger-1-2_L_tail'),
+	('Finger-1-3FK_L'	, 'finger-1-2_L_tail', 'finger-1-3_L_tail'),
+	('Finger-2-1FK_L'	, 'finger-2-1_L_head', 'finger-2-1_L_tail'),
+	('Finger-2-2FK_L'	, 'finger-2-1_L_tail', 'finger-2-2_L_tail'),
+	('Finger-2-3FK_L'	, 'finger-2-2_L_tail', 'finger-2-3_L_tail'),
+	('Finger-3-1FK_L'	, 'finger-3-1_L_head', 'finger-3-1_L_tail'),
+	('Finger-3-2FK_L'	, 'finger-3-1_L_tail', 'finger-3-2_L_tail'),
+	('Finger-3-3FK_L'	, 'finger-3-2_L_tail', 'finger-3-3_L_tail'),
+	('Finger-4-1FK_L'	, 'finger-4-1_L_head', 'finger-4-1_L_tail'),
+	('Finger-4-2FK_L'	, 'finger-4-1_L_tail', 'finger-4-2_L_tail'),
+	('Finger-4-3FK_L'	, 'finger-4-2_L_tail', 'finger-4-3_L_tail'),
+	('Finger-5-1FK_L'	, 'finger-5-1_L_head', 'finger-5-1_L_tail'),
+	('Finger-5-2FK_L'	, 'finger-5-1_L_tail', 'finger-5-2_L_tail'),
+	('Finger-5-3FK_L'	, 'finger-5-2_L_tail', 'finger-5-3_L_tail'),
 
 	('Clavicle_R'		, 'shoulder_R_head', 'shoulder_R_tail'),
 	('ArmFkIk_R'		, 'ikfk_hand_R_head', 'ikfk_hand_R_tail'),
@@ -308,15 +307,14 @@ GoboHeadsTails = [
 	('LoArm_R'		, 'armupper_R_tail', 'armlower_R_tail'),
 	('Hand_R'		, 'armlower_R_tail', 'hand_R_tail'),
 
-	('UpArm_ik_R'		, 'arm_root_R_tail', 'armupper_R_tail'),
-	('LoArm_ik_R'		, 'armupper_R_tail', 'armlower_R_tail'),
-	('Hand_ik_R'		, 'armlower_R_tail', 'hand_R_tail'),
-	('FingerCurl_ik_R'	, 'finger_curl_R_head', 'finger_curl_R_tail'),
-	('UpArm_fk_R'		, 'arm_root_R_tail', 'armupper_R_tail'),
-	('LoArm_fk_R'		, 'armupper_R_tail', 'armlower_R_tail'),
-	('FingerCurl_fk_R'	, 'finger_curl_R_head', 'finger_curl_R_tail'),
-	('Hand_fk_R'		, 'hand_R_head', 'hand_R_tail'),
+	('UpArmIK_R'		, 'arm_root_R_tail', 'armupper_R_tail'),
+	('LoArmIK_R'		, 'armupper_R_tail', 'armlower_R_tail'),
+	('HandIK_R'		, 'armlower_R_tail', 'hand_R_tail'),
+	('UpArmFK_R'		, 'arm_root_R_tail', 'armupper_R_tail'),
+	('LoArmFK_R'		, 'armupper_R_tail', 'armlower_R_tail'),
+	('HandFK_R'		, 'hand_R_head', 'hand_R_tail'),
 	('Elbow_R'		, 'elbow_R_head', 'elbow_R_tail'),
+	('FingerCurl_R'		, 'finger_curl_R_head', 'finger_curl_R_tail'),
 
 	('Finger-1-1_R'		, 'finger-1-1_R_head', 'finger-1-1_R_tail'),
 	('Finger-1-2_R'		, 'finger-1-1_R_tail', 'finger-1-2_R_tail'),
@@ -334,48 +332,48 @@ GoboHeadsTails = [
 	('Finger-5-2_R'		, 'finger-5-1_R_tail', 'finger-5-2_R_tail'),
 	('Finger-5-3_R'		, 'finger-5-2_R_tail', 'finger-5-3_R_tail'),
 
-	('Finger-1-1_ik_R'	, 'finger-1-1_R_head', 'finger-1-1_R_tail'),
-	('Finger-1-2_ik_R'	, 'finger-1-1_R_tail', 'finger-1-2_R_tail'),
-	('Finger-1-3_ik_R'	, 'finger-1-2_R_tail', 'finger-1-3_R_tail'),
-	('Finger-2-1_ik_R'	, 'finger-2-1_R_head', 'finger-2-1_R_tail'),
-	('Finger-2-2_ik_R'	, 'finger-2-1_R_tail', 'finger-2-2_R_tail'),
-	('Finger-2-3_ik_R'	, 'finger-2-2_R_tail', 'finger-2-3_R_tail'),
-	('Finger-3-1_ik_R'	, 'finger-3-1_R_head', 'finger-3-1_R_tail'),
-	('Finger-3-2_ik_R'	, 'finger-3-1_R_tail', 'finger-3-2_R_tail'),
-	('Finger-3-3_ik_R'	, 'finger-3-2_R_tail', 'finger-3-3_R_tail'),
-	('Finger-4-1_ik_R'	, 'finger-4-1_R_head', 'finger-4-1_R_tail'),
-	('Finger-4-2_ik_R'	, 'finger-4-1_R_tail', 'finger-4-2_R_tail'),
-	('Finger-4-3_ik_R'	, 'finger-4-2_R_tail', 'finger-4-3_R_tail'),
-	('Finger-5-1_ik_R'	, 'finger-5-1_R_head', 'finger-5-1_R_tail'),
-	('Finger-5-2_ik_R'	, 'finger-5-1_R_tail', 'finger-5-2_R_tail'),
-	('Finger-5-3_ik_R'	, 'finger-5-2_R_tail', 'finger-5-3_R_tail'),
+	('Finger-1-1IK_R'	, 'finger-1-1_R_head', 'finger-1-1_R_tail'),
+	('Finger-1-2IK_R'	, 'finger-1-1_R_tail', 'finger-1-2_R_tail'),
+	('Finger-1-3IK_R'	, 'finger-1-2_R_tail', 'finger-1-3_R_tail'),
+	('Finger-2-1IK_R'	, 'finger-2-1_R_head', 'finger-2-1_R_tail'),
+	('Finger-2-2IK_R'	, 'finger-2-1_R_tail', 'finger-2-2_R_tail'),
+	('Finger-2-3IK_R'	, 'finger-2-2_R_tail', 'finger-2-3_R_tail'),
+	('Finger-3-1IK_R'	, 'finger-3-1_R_head', 'finger-3-1_R_tail'),
+	('Finger-3-2IK_R'	, 'finger-3-1_R_tail', 'finger-3-2_R_tail'),
+	('Finger-3-3IK_R'	, 'finger-3-2_R_tail', 'finger-3-3_R_tail'),
+	('Finger-4-1IK_R'	, 'finger-4-1_R_head', 'finger-4-1_R_tail'),
+	('Finger-4-2IK_R'	, 'finger-4-1_R_tail', 'finger-4-2_R_tail'),
+	('Finger-4-3IK_R'	, 'finger-4-2_R_tail', 'finger-4-3_R_tail'),
+	('Finger-5-1IK_R'	, 'finger-5-1_R_head', 'finger-5-1_R_tail'),
+	('Finger-5-2IK_R'	, 'finger-5-1_R_tail', 'finger-5-2_R_tail'),
+	('Finger-5-3IK_R'	, 'finger-5-2_R_tail', 'finger-5-3_R_tail'),
 
-	('Finger-1-1_fk_R'	, 'finger-1-1_R_head', 'finger-1-1_R_tail'),
-	('Finger-1-2_fk_R'	, 'finger-1-1_R_tail', 'finger-1-2_R_tail'),
-	('Finger-1-3_fk_R'	, 'finger-1-2_R_tail', 'finger-1-3_R_tail'),
-	('Finger-2-1_fk_R'	, 'finger-2-1_R_head', 'finger-2-1_R_tail'),
-	('Finger-2-2_fk_R'	, 'finger-2-1_R_tail', 'finger-2-2_R_tail'),
-	('Finger-2-3_fk_R'	, 'finger-2-2_R_tail', 'finger-2-3_R_tail'),
-	('Finger-3-1_fk_R'	, 'finger-3-1_R_head', 'finger-3-1_R_tail'),
-	('Finger-3-2_fk_R'	, 'finger-3-1_R_tail', 'finger-3-2_R_tail'),
-	('Finger-3-3_fk_R'	, 'finger-3-2_R_tail', 'finger-3-3_R_tail'),
-	('Finger-4-1_fk_R'	, 'finger-4-1_R_head', 'finger-4-1_R_tail'),
-	('Finger-4-2_fk_R'	, 'finger-4-1_R_tail', 'finger-4-2_R_tail'),
-	('Finger-4-3_fk_R'	, 'finger-4-2_R_tail', 'finger-4-3_R_tail'),
-	('Finger-5-1_fk_R'	, 'finger-5-1_R_head', 'finger-5-1_R_tail'),
-	('Finger-5-2_fk_R'	, 'finger-5-1_R_tail', 'finger-5-2_R_tail'),
-	('Finger-5-3_fk_R'	, 'finger-5-2_R_tail', 'finger-5-3_R_tail'),
+	('Finger-1-1FK_R'	, 'finger-1-1_R_head', 'finger-1-1_R_tail'),
+	('Finger-1-2FK_R'	, 'finger-1-1_R_tail', 'finger-1-2_R_tail'),
+	('Finger-1-3FK_R'	, 'finger-1-2_R_tail', 'finger-1-3_R_tail'),
+	('Finger-2-1FK_R'	, 'finger-2-1_R_head', 'finger-2-1_R_tail'),
+	('Finger-2-2FK_R'	, 'finger-2-1_R_tail', 'finger-2-2_R_tail'),
+	('Finger-2-3FK_R'	, 'finger-2-2_R_tail', 'finger-2-3_R_tail'),
+	('Finger-3-1FK_R'	, 'finger-3-1_R_head', 'finger-3-1_R_tail'),
+	('Finger-3-2FK_R'	, 'finger-3-1_R_tail', 'finger-3-2_R_tail'),
+	('Finger-3-3FK_R'	, 'finger-3-2_R_tail', 'finger-3-3_R_tail'),
+	('Finger-4-1FK_R'	, 'finger-4-1_R_head', 'finger-4-1_R_tail'),
+	('Finger-4-2FK_R'	, 'finger-4-1_R_tail', 'finger-4-2_R_tail'),
+	('Finger-4-3FK_R'	, 'finger-4-2_R_tail', 'finger-4-3_R_tail'),
+	('Finger-5-1FK_R'	, 'finger-5-1_R_head', 'finger-5-1_R_tail'),
+	('Finger-5-2FK_R'	, 'finger-5-1_R_tail', 'finger-5-2_R_tail'),
+	('Finger-5-3FK_R'	, 'finger-5-2_R_tail', 'finger-5-3_R_tail'),
 
 	('Hip_L'		, 'hip_tail', 'thigh_root_L_head'),
 	('LegRoot_L'		, 'thigh_root_L_head', 'thigh_root_L_tail'),
-	('UpLeg_fk_L'		, 'thigh_root_L_tail', 'thigh_L_tail'),
-	('LoLeg_fk_L'		, 'thigh_L_tail', 'shin_L_tail'),
-	('Foot_fk_L'		, 'shin_L_tail', 'foot_L_tail'),
-	('Toe_fk_L'		, 'foot_L_tail', 'toe_L_tail'),
-	('UpLeg_ik_L'		, 'thigh_root_L_tail', 'thigh_L_tail'),
-	('LoLeg_ik_L'		, 'thigh_L_tail', 'shin_L_tail'),
-	('Foot_ik_L'		, 'shin_L_tail', 'foot_L_tail'),
-	('Toe_ik_L'		, 'foot_L_tail', 'toe_L_tail'),
+	('UpLegFK_L'		, 'thigh_root_L_tail', 'thigh_L_tail'),
+	('LoLegFK_L'		, 'thigh_L_tail', 'shin_L_tail'),
+	('FootFK_L'		, 'shin_L_tail', 'foot_L_tail'),
+	('ToeFK_L'		, 'foot_L_tail', 'toe_L_tail'),
+	('UpLegIK_L'		, 'thigh_root_L_tail', 'thigh_L_tail'),
+	('LoLegIK_L'		, 'thigh_L_tail', 'shin_L_tail'),
+	('FootIK_L'		, 'shin_L_tail', 'foot_L_tail'),
+	('ToeIK_L'		, 'foot_L_tail', 'toe_L_tail'),
 	('UpLeg_L'		, 'thigh_root_L_tail', 'thigh_L_tail'),
 	('LoLeg_L'		, 'thigh_L_tail', 'shin_L_tail'),
 	('Foot_L'		, 'shin_L_tail', 'foot_L_tail'),
@@ -383,14 +381,14 @@ GoboHeadsTails = [
 
 	('Hip_R'		, 'hip_tail', 'thigh_root_R_head'),
 	('LegRoot_R'		, 'thigh_root_R_head', 'thigh_root_R_tail'),
-	('UpLeg_fk_R'		, 'thigh_root_R_tail', 'thigh_R_tail'),
-	('LoLeg_fk_R'		, 'thigh_R_tail', 'shin_R_tail'),
-	('Foot_fk_R'		, 'shin_R_tail', 'foot_R_tail'),
-	('Toe_fk_R'		, 'foot_R_tail', 'toe_R_tail'),
-	('UpLeg_ik_R'		, 'thigh_root_R_tail', 'thigh_R_tail'),
-	('LoLeg_ik_R'		, 'thigh_R_tail', 'shin_R_tail'),
-	('Foot_ik_R'		, 'shin_R_tail', 'foot_R_tail'),
-	('Toe_ik_R'		, 'foot_R_tail', 'toe_R_tail'),
+	('UpLegFK_R'		, 'thigh_root_R_tail', 'thigh_R_tail'),
+	('LoLegFK_R'		, 'thigh_R_tail', 'shin_R_tail'),
+	('FootFK_R'		, 'shin_R_tail', 'foot_R_tail'),
+	('ToeFK_R'		, 'foot_R_tail', 'toe_R_tail'),
+	('UpLegIK_R'		, 'thigh_root_R_tail', 'thigh_R_tail'),
+	('LoLegIK_R'		, 'thigh_R_tail', 'shin_R_tail'),
+	('FootIK_R'		, 'shin_R_tail', 'foot_R_tail'),
+	('ToeIK_R'		, 'foot_R_tail', 'toe_R_tail'),
 	('UpLeg_R'		, 'thigh_root_R_tail', 'thigh_R_tail'),
 	('LoLeg_R'		, 'thigh_R_tail', 'shin_R_tail'),
 	('Foot_R'		, 'shin_R_tail', 'foot_R_tail'),
@@ -455,14 +453,13 @@ GoboArmature = [
 	('UpArm_L',		1.5708, 'ArmRoot_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
 	('LoArm_L',		1.5708, 'UpArm_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
 	('Hand_L',		1.5708, 'LoArm_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
-	('UpArm_ik_L',		1.5708, 'ArmRoot_L', F_CON+F_RES, L_HLPIK, (0,0,10)),
-	('LoArm_ik_L',		1.5708, 'UpArm_ik_L', F_CON+F_RES, L_HLPIK, (0,0,10)),
-	('Hand_ik_L',		1.5708, 'LoArm_ik_L', F_CON+F_RES, L_HLPIK, (1,1,1)),
-	('FingerCurl_ik_L',	0, 'LoArm_ik_L', F_WIR, L_ARMIK, (1,1,1)),
-	('UpArm_fk_L',		1.5708, 'ArmRoot_L', F_CON+F_WIR, L_ARMFK, (0,0,10)),
-	('LoArm_fk_L',		1.5708, 'UpArm_fk_L', F_CON+F_WIR, L_ARMFK, (0,0,10)),
-	('Hand_fk_L',		1.5708, 'LoArm_fk_L', F_CON+F_WIR, L_ARMFK, (1,1,1)),
-	('FingerCurl_fk_L',	0, 'LoArm_fk_L', F_WIR, L_ARMFK, (1,1,1)),
+	('UpArmIK_L',		1.5708, 'ArmRoot_L', F_CON+F_RES, L_HLPIK, (0,0,10)),
+	('LoArmIK_L',		1.5708, 'UpArmIK_L', F_CON+F_RES, L_HLPIK, (0,0,10)),
+	('HandIK_L',		1.5708, 'LoArmIK_L', F_CON+F_RES, L_HLPIK, (1,1,1)),
+	('UpArmFK_L',		1.5708, 'ArmRoot_L', F_CON+F_WIR, L_ARMFK, (0,0,10)),
+	('LoArmFK_L',		1.5708, 'UpArmFK_L', F_CON+F_WIR, L_ARMFK, (0,0,10)),
+	('HandFK_L',		1.5708, 'LoArmFK_L', F_CON+F_WIR, L_ARMFK, (1,1,1)),
+	('FingerCurl_L',	0, 'LoArm_L',	 F_WIR, L_ARMIK+L_ARMFK, (1,1,1)),
 
 	('Clavicle_R',		-1.5708, 'Spine1', F_DEF+F_WIR, L_SKEL+L_DEF, (1,1,1)),
 	('ArmFkIk_R',		-1.5708, 'Clavicle_R', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
@@ -471,110 +468,45 @@ GoboArmature = [
 	('UpArm_R',		-1.5708, 'ArmRoot_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
 	('LoArm_R',		-1.5708, 'UpArm_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
 	('Hand_R',		-1.5708, 'LoArm_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
-	('UpArm_ik_R',		-1.5708, 'ArmRoot_R', F_CON+F_RES, L_HLPIK, (0,0,10)),
-	('LoArm_ik_R',		-1.5708, 'UpArm_ik_R', F_CON+F_RES, L_HLPIK, (0,0,10)),
-	('Hand_ik_R',		-1.5708, 'LoArm_ik_R', F_CON+F_RES, L_HLPIK, (1,1,1)),
-	('FingerCurl_ik_R',	3.14158, 'LoArm_ik_R', F_WIR, L_MAIN+L_ARMIK, (1,1,1)),
-	('UpArm_fk_R',		-1.5708, 'ArmRoot_R', F_CON+F_WIR, L_ARMFK, (0,0,10)),
-	('LoArm_fk_R',		-1.5708, 'UpArm_fk_R', F_CON+F_WIR, L_ARMFK, (0,0,10)),
-	('Hand_fk_R',		-1.5708, 'LoArm_fk_R', F_CON+F_WIR, L_ARMFK, (1,1,1)),
-	('FingerCurl_fk_R',	-3.14158, 'LoArm_fk_R', F_WIR, L_ARMFK, (1,1,1)),
+	('UpArmIK_R',		-1.5708, 'ArmRoot_R', F_CON+F_RES, L_HLPIK, (0,0,10)),
+	('LoArmIK_R',		-1.5708, 'UpArmIK_R', F_CON+F_RES, L_HLPIK, (0,0,10)),
+	('HandIK_R',		-1.5708, 'LoArmIK_R', F_CON+F_RES, L_HLPIK, (1,1,1)),
+	('UpArmFK_R',		-1.5708, 'ArmRoot_R', F_CON+F_WIR, L_ARMFK, (0,0,10)),
+	('LoArmFK_R',		-1.5708, 'UpArmFK_R', F_CON+F_WIR, L_ARMFK, (0,0,10)),
+	('HandFK_R',		-1.5708, 'LoArmFK_R', F_CON+F_WIR, L_ARMFK, (1,1,1)),
+	('FingerCurl_R',	-3.14158, 'LoArm_R', F_WIR, L_ARMFK+L_ARMIK, (1,1,1)),
 
-	('Finger-1-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-1-2_L',	1.5708, 'Finger-1-1_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-1-3_L',	1.5708, 'Finger-1-2_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-2-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-2-2_L',	1.5708, 'Finger-2-1_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-2-3_L',	1.5708, 'Finger-2-2_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-3-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-3-2_L',	1.5708, 'Finger-3-1_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-3-3_L',	1.5708, 'Finger-3-2_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-4-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-4-2_L',	1.5708, 'Finger-4-1_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-4-3_L',	1.5708, 'Finger-4-2_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-5-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-5-2_L',	1.5708, 'Finger-5-1_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-5-3_L',	1.5708, 'Finger-5-2_L', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
+	('Finger-1-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-1-2_L',	1.5708, 'Finger-1-1_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-1-3_L',	1.5708, 'Finger-1-2_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-2-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-2-2_L',	1.5708, 'Finger-2-1_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-2-3_L',	1.5708, 'Finger-2-2_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-3-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-3-2_L',	1.5708, 'Finger-3-1_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-3-3_L',	1.5708, 'Finger-3-2_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-4-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-4-2_L',	1.5708, 'Finger-4-1_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-4-3_L',	1.5708, 'Finger-4-2_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-5-1_L',	1.5708, 'Hand_L', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-5-2_L',	1.5708, 'Finger-5-1_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-5-3_L',	1.5708, 'Finger-5-2_L', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
 
-	('Finger-1-1_fk_L',	1.5708, 'Hand_fk_L', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-1-2_fk_L',	1.5708, 'Finger-1-1_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-1-3_fk_L',	1.5708, 'Finger-1-2_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-2-1_fk_L',	1.5708, 'Hand_fk_L', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-2-2_fk_L',	1.5708, 'Finger-2-1_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-2-3_fk_L',	1.5708, 'Finger-2-2_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-3-1_fk_L',	1.5708, 'Hand_fk_L', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-3-2_fk_L',	1.5708, 'Finger-3-1_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-3-3_fk_L',	1.5708, 'Finger-3-2_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-4-1_fk_L',	1.5708, 'Hand_fk_L', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-4-2_fk_L',	1.5708, 'Finger-4-1_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-4-3_fk_L',	1.5708, 'Finger-4-2_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-5-1_fk_L',	1.5708, 'Hand_fk_L', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-5-2_fk_L',	1.5708, 'Finger-5-1_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-5-3_fk_L',	1.5708, 'Finger-5-2_fk_L', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-
-	('Finger-1-1_ik_L',	1.5708, 'Hand_ik_L', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-1-2_ik_L',	1.5708, 'Finger-1-1_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-1-3_ik_L',	1.5708, 'Finger-1-2_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-2-1_ik_L',	1.5708, 'Hand_ik_L', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-2-2_ik_L',	1.5708, 'Finger-2-1_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-2-3_ik_L',	1.5708, 'Finger-2-2_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-3-1_ik_L',	1.5708, 'Hand_ik_L', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-3-2_ik_L',	1.5708, 'Finger-3-1_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-3-3_ik_L',	1.5708, 'Finger-3-2_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-4-1_ik_L',	1.5708, 'Hand_ik_L', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-4-2_ik_L',	1.5708, 'Finger-4-1_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-4-3_ik_L',	1.5708, 'Finger-4-2_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-5-1_ik_L',	1.5708, 'Hand_ik_L', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-5-2_ik_L',	1.5708, 'Finger-5-1_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-5-3_ik_L',	1.5708, 'Finger-5-2_ik_L', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-
-	('Finger-1-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-1-2_R',	1.5708, 'Finger-1-1_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-1-3_R',	1.5708, 'Finger-1-2_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-2-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-2-2_R',	1.5708, 'Finger-2-1_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-2-3_R',	1.5708, 'Finger-2-2_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-3-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-3-2_R',	1.5708, 'Finger-3-1_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-3-3_R',	1.5708, 'Finger-3-2_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-4-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-4-2_R',	1.5708, 'Finger-4-1_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-4-3_R',	1.5708, 'Finger-4-2_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-5-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('Finger-5-2_R',	1.5708, 'Finger-5-1_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-	('Finger-5-3_R',	1.5708, 'Finger-5-2_R', F_DEF+F_RES+F_CON, L_DEF, (1,1,1)),
-
-	('Finger-1-1_fk_R',	1.5708, 'Hand_fk_R', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-1-2_fk_R',	1.5708, 'Finger-1-1_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-1-3_fk_R',	1.5708, 'Finger-1-2_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-2-1_fk_R',	1.5708, 'Hand_fk_R', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-2-2_fk_R',	1.5708, 'Finger-2-1_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-2-3_fk_R',	1.5708, 'Finger-2-2_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-3-1_fk_R',	1.5708, 'Hand_fk_R', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-3-2_fk_R',	1.5708, 'Finger-3-1_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-3-3_fk_R',	1.5708, 'Finger-3-2_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-4-1_fk_R',	1.5708, 'Hand_fk_R', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-4-2_fk_R',	1.5708, 'Finger-4-1_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-4-3_fk_R',	1.5708, 'Finger-4-2_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-5-1_fk_R',	1.5708, 'Hand_fk_R', F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-5-2_fk_R',	1.5708, 'Finger-5-1_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-	('Finger-5-3_fk_R',	1.5708, 'Finger-5-2_fk_R', F_CON+F_WIR, L_HANDFK, (1,1,1)),
-
-	('Finger-1-1_ik_R',	1.5708, 'Hand_ik_R', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-1-2_ik_R',	1.5708, 'Finger-1-1_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-1-3_ik_R',	1.5708, 'Finger-1-2_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-2-1_ik_R',	1.5708, 'Hand_ik_R', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-2-2_ik_R',	1.5708, 'Finger-2-1_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-2-3_ik_R',	1.5708, 'Finger-2-2_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-3-1_ik_R',	1.5708, 'Hand_ik_R', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-3-2_ik_R',	1.5708, 'Finger-3-1_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-3-3_ik_R',	1.5708, 'Finger-3-2_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-4-1_ik_R',	1.5708, 'Hand_ik_R', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-4-2_ik_R',	1.5708, 'Finger-4-1_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-4-3_ik_R',	1.5708, 'Finger-4-2_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-5-1_ik_R',	1.5708, 'Hand_ik_R', F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-5-2_ik_R',	1.5708, 'Finger-5-1_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
-	('Finger-5-3_ik_R',	1.5708, 'Finger-5-2_ik_R', F_CON+F_WIR, L_HANDIK, (1,1,1)),
+	('Finger-1-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-1-2_R',	1.5708, 'Finger-1-1_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-1-3_R',	1.5708, 'Finger-1-2_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-2-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-2-2_R',	1.5708, 'Finger-2-1_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-2-3_R',	1.5708, 'Finger-2-2_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-3-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-3-2_R',	1.5708, 'Finger-3-1_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-3-3_R',	1.5708, 'Finger-3-2_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-4-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-4-2_R',	1.5708, 'Finger-4-1_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-4-3_R',	1.5708, 'Finger-4-2_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-5-1_R',	1.5708, 'Hand_R', F_DEF+F_RES, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-5-2_R',	1.5708, 'Finger-5-1_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
+	('Finger-5-3_R',	1.5708, 'Finger-5-2_R', F_DEF+F_RES+F_CON, L_DEF+L_HANDIK+L_HANDFK, (1,1,1)),
 
 	('Hip_L',		0.0, 'Hips', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
 	('LegRoot_L',		0.0, 'Hip_L', F_CON+F_RES, L_SKEL, (0,0,2)),
@@ -582,14 +514,14 @@ GoboArmature = [
 	('LoLeg_L',		0.0, 'UpLeg_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,5)),
 	('Foot_L',		0.0, 'LoLeg_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
 	('Toe_L',		0.0, 'Foot_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
-	('UpLeg_ik_L',		0.0, 'LegRoot_L', F_CON+F_RES, L_HLPIK, (0,0,8)),
-	('LoLeg_ik_L',		0.0, 'UpLeg_ik_L', F_CON+F_RES, L_HLPIK, (0,0,5)),
-	('Foot_ik_L',		0.0, 'LoLeg_ik_L', F_CON+F_RES, L_HLPIK, (1,1,1)),
-	('Toe_ik_L',		0.0, 'Foot_ik_L', F_CON+F_RES, L_HLPIK, (1,1,1)),
-	('UpLeg_fk_L',		0.0, 'LegRoot_L', F_CON, L_LEGFK, (0,0,8)),
-	('LoLeg_fk_L',		0.0, 'UpLeg_fk_L', F_CON, L_LEGFK, (0,0,5)),
-	('Foot_fk_L',		0.0, 'LoLeg_fk_L', F_CON, L_LEGFK, (1,1,1)),
-	('Toe_fk_L',		0.0, 'Foot_fk_L', F_CON, L_LEGFK, (1,1,1)),
+	('UpLegIK_L',		0.0, 'LegRoot_L', F_CON+F_RES, L_HLPIK, (0,0,8)),
+	('LoLegIK_L',		0.0, 'UpLegIK_L', F_CON+F_RES, L_HLPIK, (0,0,5)),
+	('FootIK_L',		0.0, 'LoLegIK_L', F_CON+F_RES, L_HLPIK, (1,1,1)),
+	('ToeIK_L',		0.0, 'FootIK_L', F_CON+F_RES, L_HLPIK, (1,1,1)),
+	('UpLegFK_L',		0.0, 'LegRoot_L', F_CON, L_LEGFK, (0,0,8)),
+	('LoLegFK_L',		0.0, 'UpLegFK_L', F_CON, L_LEGFK, (0,0,5)),
+	('FootFK_L',		0.0, 'LoLegFK_L', F_CON, L_LEGFK, (1,1,1)),
+	('ToeFK_L',		0.0, 'FootFK_L', F_CON, L_LEGFK, (1,1,1)),
 
 	('Hip_R',		0.0, 'Hips', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
 	('LegRoot_R',		0.0, 'Hip_R', F_CON+F_RES, L_SKEL, (0,0,2)),
@@ -597,14 +529,14 @@ GoboArmature = [
 	('LoLeg_R',		0.0, 'UpLeg_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,5)),
 	('Foot_R',		0.0, 'LoLeg_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
 	('Toe_R',		0.0, 'Foot_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (1,1,1)),
-	('UpLeg_ik_R',		0.0, 'LegRoot_R', F_CON+F_RES, L_HLPIK, (0,0,8)),
-	('LoLeg_ik_R',		0.0, 'UpLeg_ik_R', F_CON+F_RES, L_HLPIK, (0,0,5)),
-	('Foot_ik_R',		0.0, 'LoLeg_ik_R', F_CON+F_RES, L_HLPIK, (1,1,1)),
-	('Toe_ik_R',		0.0, 'Foot_ik_R', F_CON+F_RES, L_HLPIK, (1,1,1)),
-	('UpLeg_fk_R',		0.0, 'LegRoot_R', F_CON, L_LEGFK, (0,0,8)),
-	('LoLeg_fk_R',		0.0, 'UpLeg_fk_R', F_CON, L_LEGFK, (0,0,5)),
-	('Foot_fk_R',		0.0, 'LoLeg_fk_R', F_CON, L_LEGFK, (1,1,1)),
-	('Toe_fk_R',		0.0, 'Foot_fk_R', F_CON, L_LEGFK, (1,1,1)),
+	('UpLegIK_R',		0.0, 'LegRoot_R', F_CON+F_RES, L_HLPIK, (0,0,8)),
+	('LoLegIK_R',		0.0, 'UpLegIK_R', F_CON+F_RES, L_HLPIK, (0,0,5)),
+	('FootIK_R',		0.0, 'LoLegIK_R', F_CON+F_RES, L_HLPIK, (1,1,1)),
+	('ToeIK_R',		0.0, 'FootIK_R', F_CON+F_RES, L_HLPIK, (1,1,1)),
+	('UpLegFK_R',		0.0, 'LegRoot_R', F_CON, L_LEGFK, (0,0,8)),
+	('LoLegFK_R',		0.0, 'UpLegFK_R', F_CON, L_LEGFK, (0,0,5)),
+	('FootFK_R',		0.0, 'LoLegFK_R', F_CON, L_LEGFK, (1,1,1)),
+	('ToeFK_R',		0.0, 'FootFK_R', F_CON, L_LEGFK, (1,1,1)),
 
 	('FootCtrl_L',		0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
 	('TipToe_L',		0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
@@ -748,29 +680,27 @@ def GoboWritePoses(fp):
 
 	addPoseBone(fp, 'Elbow_L', 'MHCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'UpArm_fk_L', 'MHCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'LoArm_fk_L', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'Hand_fk_L', 'MHCircle10', 'fk', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'UpArmFK_L', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoArmFK_L', 'MHCircle025', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'HandFK_L', 'MHCircle10', 'fk', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoArm_ik_L', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LoArmIK_L', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		 [('IK', 0, ['HandCtrl_L', 2, (-1.5708, 'Elbow_L'), (True, False)])])
 
-	addPoseBone(fp, 'Hand_ik_L', None, None, (0,0,0), (0,0,0),  (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'HandIK_L', None, None, (0,0,0), (0,0,0),  (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['CopyRotIK', 'HandCtrl_L', 1, (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'UpArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpArm_ik_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpArm_fk_L', 0, (1,1,1), (0,0,0)])])
-	addPoseBone(fp, 'LoArm_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoArm_ik_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoArm_fk_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_L', 0, (1,1,1), (0,0,0)])])
+	addPoseBone(fp, 'LoArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_L', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'Hand_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'Hand_ik_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'Hand_fk_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'HandIK_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'HandFK_L', 0, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'FingerCurl_fk_L', 'MHArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
-	addPoseBone(fp, 'FingerCurl_ik_L', 'MHArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'FingerCurl_L', 'MHArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'HandCtrl_L', 'MHHandCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
@@ -783,95 +713,89 @@ def GoboWritePoses(fp):
 		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'Elbow_R', 'MHCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'UpArm_fk_R', 'MHCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'LoArm_fk_R', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'Hand_fk_R', 'MHCircle10', 'fk', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'UpArmFK_R', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoArmFK_R', 'MHCircle025', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'HandFK_R', 'MHCircle10', 'fk', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoArm_ik_R', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LoArmIK_R', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		 [('IK', 0, ['HandCtrl_R', 2, (-1.5708, 'Elbow_R'), (True, False)])])
 
-	addPoseBone(fp, 'Hand_ik_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'HandIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('CopyRot', 0, ['CopyRotIK', 'HandCtrl_R', 1, (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'UpArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpArm_ik_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpArm_fk_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_R', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'LoArm_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoArm_ik_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoArm_fk_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_R', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'Hand_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'Hand_ik_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'Hand_fk_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'HandIK_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'HandFK_R', 0, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'FingerCurl_fk_R', 'MHArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.2, 0,0, 0,0), (True,True, False,False, False,False)])])
-	addPoseBone(fp, 'FingerCurl_ik_R', 'MHArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.2, 0,0, 0,0), (True,True, False,False, False,False)])])
+	addPoseBone(fp, 'FingerCurl_R', 'MHArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'HandCtrl_R', 'MHHandCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Left leg
-	addPoseBone(fp, 'UpLeg_fk_L', 'MHCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'LoLeg_fk_L', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'Foot_fk_L', 'MHCircle05', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'Toe_fk_L', 'MHCircle05', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'UpLegFK_L', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoLegFK_L', 'MHCircle025', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'FootFK_L', 'MHCircle05', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'ToeFK_L', 'MHCircle05', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoLeg_ik_L', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LoLegIK_L', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		 [('IK', 0, ['LegTarget_L', 2, (-1.87, 'Knee_L'), (True, False)])])
 
-	addPoseBone(fp, 'Foot_ik_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'FootIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, ['FootTarget_L', 1, None, (True, True)])])
-	addPoseBone(fp, 'Toe_ik_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'ToeIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, ['ToeTarget_L', 1, None, (True, True)])])
 
 	addPoseBone(fp, 'UpLeg_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpLeg_ik_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpLeg_fk_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'UpLegIK_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpLegFK_L', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'LoLeg_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoLeg_ik_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoLeg_fk_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'LoLegIK_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoLegFK_L', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'Foot_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'Foot_ik_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'Foot_fk_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'FootIK_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'FootFK_L', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'Toe_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'Toe_ik_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'Toe_fk_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'ToeIK_L', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'ToeFK_L', 0, (1,1,1), (0,0,0)])])
 
 	# Right leg
-	addPoseBone(fp, 'UpLeg_fk_R', 'MHCircle025', 'fk', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'LoLeg_fk_R', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'Foot_fk_R', 'MHCircle10', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'Toe_fk_R', 'MHCircle10', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'UpLegFK_R', 'MHCircle025', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoLegFK_R', 'MHCircle025', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'FootFK_R', 'MHCircle10', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'ToeFK_R', 'MHCircle10', 'fk', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoLeg_ik_R', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LoLegIK_R', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		 [('IK', 0, ['LegTarget_R', 2, (-1.27, 'Knee_R'), (True, False)])])
 
-	addPoseBone(fp, 'Foot_ik_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'FootIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, ['FootTarget_R', 1, None, (True, True)])])
-	addPoseBone(fp, 'Toe_ik_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'ToeIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, ['ToeTarget_R', 1, None, (True, True)])])
 
 	addPoseBone(fp, 'UpLeg_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpLeg_ik_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpLeg_fk_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'UpLegIK_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpLegFK_R', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'LoLeg_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoLeg_ik_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoLeg_fk_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'LoLegIK_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoLegFK_R', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'Foot_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'Foot_ik_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'Foot_fk_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'FootIK_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'FootFK_R', 0, (1,1,1), (0,0,0)])])
 	addPoseBone(fp, 'Toe_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'Toe_ik_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'Toe_fk_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'ToeIK_R', 1, (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'ToeFK_R', 0, (1,1,1), (0,0,0)])])
 
 	for m in range(1,6):
 		for n in range(1,4):
-			poseFinger(fp, m, n, 'L', None)
-			poseFinger(fp, m, n, 'R', None)
-			poseFinger_fkik(fp, m, n, 'L', 'MHCircle025', 'fk')
-			poseFinger_fkik(fp, m, n, 'R', 'MHCircle025', 'fk')
-			poseFinger_fkik(fp, m, n, 'L', 'MHCircle025', 'ik')
-			poseFinger_fkik(fp, m, n, 'R', 'MHCircle025', 'ik')
+			poseFinger(fp, m, n, 'L', 'MHCircle025')
+			poseFinger(fp, m, n, 'R', 'MHCircle025')
 
 	addPoseBone(fp, 'UpArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		 [('IK', 0, ['LoArm_L', 1, None, (True, False)])]) 
@@ -890,27 +814,19 @@ def GoboWritePoses(fp):
 
 #
 #	poseFinger(fp, m, n, suffix, shape):
-#	poseFinger_fkik(fp, m, n, suffix, shape, ik, curl):
 #
 
 def poseFinger(fp, m, n, suffix, shape):
-	customShape = 'MHFinger_%s' % (suffix)
-	addPoseBone(fp, "Finger-%d-%d_%s \n" % (m, n, suffix), shape, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'Finger-%d-%d_ik_%s' % (m, n, suffix), 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'Finger-%d-%d_fk_%s' % (m, n, suffix), 0, (1,1,1), (0,0,0)])])
-	return
-
-def poseFinger_fkik(fp, m, n, suffix, shape, ik):
 	if n == 1:
-		addPoseBone(fp, "Finger-%d-%d_%s_%s \n" % (m, n, ik, suffix), shape, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+		addPoseBone(fp, "Finger-%d-%d_%s \n" % (m, n, suffix), shape, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
 	else:
-		constraints = [('Action', C_TARGET, ['goboFingerCurl', 'FingerCurl_%s_%s' % (ik, suffix), 'LOCATION_X', (1,21), (-0.5,0.5)])]
+		constraints = [('Action', C_TARGET, ['goboFingerCurl', 'FingerCurl_%s' % (suffix), 'LOCATION_X', (1,21), (-0.5,0.5)])]
 		if m == 1:
 			lockRot = (0,1,0)
 		else:
 			lockRot = (1,1,0)
-		addPoseBone(fp, "Finger-%d-%d_%s_%s \n" % (m, n, ik, suffix), shape, None, (0,0,0), lockRot, (1,1,1), (1,1,1), 0, constraints)
-
+		addPoseBone(fp, "Finger-%d-%d_%s \n" % (m, n, suffix), shape, None, (0,0,0), lockRot, (1,1,1), (1,1,1), 0, constraints)
+	return
 
 #
 #	actionFingerCurl
@@ -950,9 +866,9 @@ actionFootRoll = [
 
 
 def GoboWriteActions(fp):
-	writeAction("goboFingerCurl", actionFingerCurl, True, fp)
-	writeAction("goboFootRoll", actionFootRoll, False, fp)
-	writeAction("goboFootTumble", actionFootTumble, False, fp)
+	writeAction("goboFingerCurl", actionFingerCurl, True, False, fp)
+	writeAction("goboFootRoll", actionFootRoll, False,  False, fp)
+	writeAction("goboFootTumble", actionFootTumble, False,  False, fp)
 	return
 
 #
@@ -975,7 +891,8 @@ GoboDrivers = [
 	("UpArm_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
 	("LoArm_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
 	("Hand_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
-
+]
+'''
 	("Finger-1-1_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
 	("Finger-1-2_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
 	("Finger-1-3_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
@@ -1007,7 +924,7 @@ GoboDrivers = [
 	("Finger-5-1_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
 	("Finger-5-2_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
 	("Finger-5-3_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
-]
+'''
 
 #
 #	GoboWriteDrivers(fp):

@@ -679,7 +679,7 @@ ClassicArmature = [
 FaceArmature = [
 	#('Head-inv',			-3.14159, 'Head', F_CON, L_HELP, (1,1,1) ),
 	('Jaw',				0.0, 'Head', F_DEF+F_WIR, L_MAIN+L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeBase',			0.0, 'Jaw', F_DEF, L_HEAD+L_DEF+F_WIR, (1,1,1) ),
+	('ToungeBase',			0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
 	('ToungeTip',			0.0, 'ToungeBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
 	('Eye_R',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('Eye_L',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
@@ -793,7 +793,7 @@ def ClassicWritePoses(fp):
 		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_L', 1, (1,1,1), (0,0,0)]),
 		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_L', 0, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'LoArm_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LoArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_L', 1, (1,1,1), (0,0,0)]),
 		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_L', 0, (1,1,1), (0,0,0)])])
 
@@ -832,7 +832,7 @@ def ClassicWritePoses(fp):
 		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_R', 1, (1,1,1), (0,0,0)]),
 		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_R', 0, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'LoArm_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LoArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_R', 1, (1,1,1), (0,0,0)]),
 		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_R', 0, (1,1,1), (0,0,0)])])
 
@@ -1010,7 +1010,7 @@ def ClassicWritePoses(fp):
 
 	addPoseBone(fp, 'UpLegFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoLegFK_L', 'MHCircle025', None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoLegFK_L', 'MHCircle025', None, (0,0,0), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'FootFK_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
@@ -1021,7 +1021,7 @@ def ClassicWritePoses(fp):
 		[('CopyRot', 0, ['CopyRotIK', 'UpLegIK_L', 1, (1,1,1), (0,0,0)]),
 		('CopyRot', 0, ['CopyRotFK', 'UpLegFK_L', 0, (1,1,1), (0,0,0)])])
 
-	addPoseBone(fp, 'LoLeg_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LoLeg_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['CopyRotIK', 'LoLegIK_L', 1, (1,1,1), (0,0,0)]),
 		('CopyRot', 0, ['CopyRotFK', 'LoLegFK_L', 0, (1,1,1), (0,0,0)])])
 
@@ -1057,7 +1057,7 @@ def ClassicWritePoses(fp):
 
 	addPoseBone(fp, 'UpLegFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoLegFK_R', 'MHCircle025', None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'LoLegFK_R', 'MHCircle025', None, (0,0,0), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'FootFK_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 

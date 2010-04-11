@@ -708,22 +708,26 @@ def constraintFlags(flags):
 	return (ownsp, targsp, active, expanded)
 
 #
-#	writeAction(name, action, ikfk, fp):
+#	writeAction(name, action, lr, ikfk, fp):
 #	writeFCurves(name, (x01, y01, z01, w01), (x21, y21, z21, w21), fp):
 #	writeFCurve(name, index, x01, x11, x21, fp):
 #
 
-def writeAction(name, action, ikfk, fp):
+def writeAction(name, action, lr, ikfk, fp):
 	fp.write("Action %s\n" % name)
 	if ikfk:
+		iklist = ["IK", "FK"]
+	else:
+		iklist = [""]
+	if lr:
 		for (bone, (x01, y01, z01, w01), (x21, y21, z21, w21)) in action:
-			writeFCurves("%s_ik_L" % bone, (x01, y01, z01, w01), (x21, y21, z21, w21), fp)
-			writeFCurves("%s_ik_R" % bone, (x01, y01, z01, -w01), (x21, y21, z21, -w21), fp)
-			writeFCurves("%s_fk_L" % bone, (x01, y01, z01, w01), (x21, y21, z21, w21), fp)
-			writeFCurves("%s_fk_R" % bone, (x01, y01, z01, -w01), (x21, y21, z21, -w21), fp)
+			for ik in iklist:
+				writeFCurves("%s%s_L" % (bone, ik), (x01, y01, z01, w01), (x21, y21, z21, w21), fp)
+				writeFCurves("%s%s_R" % (bone, ik), (x21, y21, z21, -w21), (x01, y01, z01, -w01), fp)
 	else:
 		for (bone, quat01, quat21) in action:
-			writeFCurves(bone, quat01, quat21, fp)
+			for ik in iklist:
+				writeFCurves("%s%s" % (bone, ik), quat01, quat21, fp)
 	fp.write("end Action\n\n")
 	return
 

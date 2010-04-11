@@ -239,7 +239,11 @@ def makeHair(hstep, guides):
 	# [‘VERT’, ‘FACE’, ‘VOLUME’, ‘PARTICLE’]
 	settings.emit_from = 'FACE'
 	settings.emitter = True
-	settings.hair_bspline = True
+
+	settings.hair_bspline = False
+	settings.hair_geometry = True
+	#settings.grid_resolution = 
+	#settings.draw_step = 1
 
 	settings.material = 3
 	settings.material_color = True
