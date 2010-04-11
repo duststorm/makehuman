@@ -12,9 +12,6 @@ ClassicJoints = [
 	('chest-front',			'v', 7292),
 	('neck',			'j', 'neck'),
 	('head',			'j', 'head'),
-	('mouth',			'j', 'mouth'),
-	('l-eye',			'j', 'l-eye'),
-	('r-eye',			'j', 'r-eye'),
 
 	('r-clavicle',			'j', 'r-clavicle'),
 	('r-shoulder',			'j', 'r-shoulder'),
@@ -96,17 +93,6 @@ ClassicJoints = [
 	('l-toe-5-2',			'j', 'l-toe-5-2'),
 	('l-toe-5-3',			'j', 'l-toe-5-3'),
 
-	('jaw-tip',			'v', 8162),
-	('tounge-tip',			'v', 8049),
-	('tounge-mid',			'v', 8103),
-	('tounge-root',			'v', 8099),
-	('l-upLid',			'v', 12630),
-	('l-loLid',			'v', 12594),
-	('r-upLid',			'v', 2442),
-	('r-loLid',			'v', 2520),
-	('head-end',			'l', ((2.0, 'head'), (-1.0, 'neck'))),
-	('mouth-end',			'l', ((3.0, 'mouth'), (-2.0, 'head'))),
-
 	('l-finger-1-end',		'l', ((2.0, 'l-finger-1-3'), (-1.0, 'l-finger-1-2'))),
 	('l-finger-2-end',		'l', ((2.0, 'l-finger-2-3'), (-1.0, 'l-finger-2-2'))),
 	('l-finger-3-end',		'l', ((2.0, 'l-finger-3-3'), (-1.0, 'l-finger-3-2'))),
@@ -161,17 +147,8 @@ ClassicJoints = [
 	('Root_tail',			'o', ('mid-feet', [0.0, -1.0, 0.0])),
 	('Torso_head',			'o', ('pelvis', [0.0, 0.0, -3.0])),
 	('Hips_tail',			'o', ('pelvis', [0.0, -1.5, 0.0])),
-	('Hips-inv_head',		'o', ('pelvis', [0.0, -1.5, 0.0])),
+	#('Hips-inv_head',		'o', ('pelvis', [0.0, -1.5, 0.0])),
 
-	('Eye_R_tail',			'o', ('l-eye', [0.0, 0.0, 0.5])),
-	('Eye_L_tail',			'o', ('r-eye', [0.0, 0.0, 0.5])),
-	('mid-eyes',			'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
-	('Gaze_head',			'o', ('mid-eyes', [0.0, 0.0, 5.2])),
-	('Gaze_tail',			'o', ('mid-eyes', [0.0, 0.0, 4.2])),
-	('Gaze_R_head',			'o', ('l-eye', [0.0, 0.0, 5.0])),
-	('Gaze_R_tail',			'o', ('l-eye', [0.0, 0.0, 4.5])),
-	('Gaze_L_head',			'o', ('r-eye', [0.0, 0.0, 5.0])),
-	('Gaze_L_tail',			'o', ('r-eye', [0.0, 0.0, 4.5])),
 	('ElbowIK_L_tail',		'o', ('r-elbow-target', [0.0, 0.0, -0.5])),
 	('ElbowIK_R_tail',		'o', ('l-elbow-target', [0.0, 0.0, -0.5])),
 
@@ -199,8 +176,39 @@ ClassicJoints = [
 	('Finger-3-Pole_L_tail',	'o', ('r-finger-3-2', [0.0, 0.3, 0.0])),
 	('Finger-4-Pole_L_tail',	'o', ('r-finger-4-2', [0.0, 0.3, 0.0])),
 	('Finger-5-Pole_L_tail',	'o', ('r-finger-5-2', [0.0, 0.3, 0.0])),
+]
 
-	
+FaceJoints = [
+	('mouth',			'j', 'mouth'),
+	('l-eye',			'j', 'l-eye'),
+	('r-eye',			'j', 'r-eye'),
+	('jaw-tip',			'v', 8162),
+	('tounge-tip',			'v', 8049),
+	('tounge-mid',			'v', 8103),
+	('tounge-root',			'v', 8099),
+	('l-upLid-v',			'v', 12630),
+	('l-loLid-v',			'v', 12594),
+	('r-upLid-v',			'v', 2442),
+	('r-loLid-v',			'v', 2520),
+	('l-upLid',			'l', ((2.5, 'l-upLid-v'), (-1.5, 'l-eye'))),
+	('l-loLid',			'l', ((2.5, 'l-loLid-v'), (-1.5, 'l-eye'))),
+	('r-upLid',			'l', ((2.5, 'r-upLid-v'), (-1.5, 'r-eye'))),
+	('r-loLid',			'l', ((2.5, 'r-loLid-v'), (-1.5, 'r-eye'))),
+	('head-end',			'l', ((2.0, 'head'), (-1.0, 'neck'))),
+
+	('mouth-end',			'l', ((3.0, 'mouth'), (-2.0, 'head'))),
+	('Eye_R_tail',			'o', ('l-eye', [0.0, 0.0, 0.5])),
+	('Eye_L_tail',			'o', ('r-eye', [0.0, 0.0, 0.5])),
+	('mid-eyes',			'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
+	('Gaze_head',			'o', ('mid-eyes', [0.0, 0.0, 5.2])),
+	('Gaze_tail',			'o', ('mid-eyes', [0.0, 0.0, 4.2])),
+	('Gaze_R_head',			'o', ('l-eye', [0.0, 0.0, 5.0])),
+	('Gaze_R_tail',			'o', ('l-eye', [0.0, 0.0, 4.5])),
+	('Gaze_L_head',			'o', ('r-eye', [0.0, 0.0, 5.0])),
+	('Gaze_L_tail',			'o', ('r-eye', [0.0, 0.0, 4.5])),
+]
+
+PanelJoints = [
 	('origin',			'o', ('head', [-2.5, 0.5, 0.0])),
 	('PFace_tail',			'o', ('origin', [0.0, 0.0, 1.0])),
 	('PBrow_R_head',		'o', ('origin', [-0.4, 0.8, 0.0])),
@@ -258,29 +266,15 @@ ClassicHeadsTails = [
 	('Root',			'Root_head', 'Root_tail'),
 	('Torso',			'Torso_head', 'pelvis'),
 	('Hips',			'pelvis', 'Hips_tail'),
-	('Hips-inv',			'Hips-inv_head', 'pelvis'),
+	#('Hips-inv',			'Hips-inv_head', 'pelvis'),
 	('Pelvis',			'pelvis', 'spine3'),
 	('Spine3',			'spine3', 'spine2'),
 	('Spine2',			'spine2', 'spine1'),
 	('Spine1',			'spine1', 'neck'),
 	('Neck',			'neck', 'head'),
+	('Head',			'head', 'head-end'),
 	('Breathe',			'spine1', 'chest-front'),
 	('Stomach',			'chest-front', 'pelvis'),
-
-	('Head',			'head', 'head-end'),
-	('Head-inv',			'head-end', 'mouth'),
-	('Jaw',				'mouth', 'jaw-tip'),
-	('ToungeBase',			'tounge-root', 'tounge-mid'),
-	('ToungeTip',			'tounge-mid', 'tounge-tip'),
-	('Eye_R',			'l-eye', 'Eye_R_tail'),
-	('UpLid_R',			'l-eye', 'l-upLid'),
-	('LoLid_R',			'l-eye', 'l-loLid'),
-	('Eye_L',			'r-eye', 'Eye_L_tail'),
-	('UpLid_L',			'r-eye', 'r-upLid'),
-	('LoLid_L',			'r-eye', 'r-loLid'),
-	('Gaze',			'Gaze_head', 'Gaze_tail'),
-	('Gaze_R',			'Gaze_R_head', 'Gaze_R_tail'),
-	('Gaze_L',			'Gaze_L_head', 'Gaze_L_tail'),
 
 	('Clavicle_L',			'r-clavicle', 'r-shoulder'),
 	('UpArm_L',			'r-shoulder', 'r-elbow'),
@@ -442,7 +436,25 @@ ClassicHeadsTails = [
 	('Finger-5_L',			'r-finger-5-1', 'r-finger-5-end'),
 	('Finger-5-IK_L',		'r-finger-5-end', 'r-finger-5-3'),
 	('Finger-5-Pole_L',		'r-finger-5-2', 'Finger-5-Pole_L_tail'),
+]
 
+FaceHeadsTails = [
+	#('Head-inv',			'head-end', 'mouth'),
+	('Jaw',				'mouth', 'jaw-tip'),
+	('ToungeBase',			'tounge-root', 'tounge-mid'),
+	('ToungeTip',			'tounge-mid', 'tounge-tip'),
+	('Eye_R',			'l-eye', 'Eye_R_tail'),
+	('UpLid_R',			'l-eye', 'l-upLid'),
+	('LoLid_R',			'l-eye', 'l-loLid'),
+	('Eye_L',			'r-eye', 'Eye_L_tail'),
+	('UpLid_L',			'r-eye', 'r-upLid'),
+	('LoLid_L',			'r-eye', 'r-loLid'),
+	('Gaze',			'Gaze_head', 'Gaze_tail'),
+	('Gaze_R',			'Gaze_R_head', 'Gaze_R_tail'),
+	('Gaze_L',			'Gaze_L_head', 'Gaze_L_tail'),
+]
+
+PanelHeadsTails = [
 	('PFace',			'origin', 'PFace_tail'),
 	('PBrow_R',			'PBrow_R_head', 'PBrow_R_tail'),
 	('PBrow_L',			'PBrow_L_head', 'PBrow_L_tail'),
@@ -475,10 +487,10 @@ ClassicArmature = [
 	('Root',			0.0, None, F_WIR, L_MAIN, (1,1,1) ),
 	('Torso',			0.0, 'Root', 0, L_MAIN+L_SKEL, (1,1,1) ),
 	('Hips',			-3.14159, 'Torso', F_DEF+F_CON+F_WIR, L_MAIN+L_SKEL+L_DEF, (1,1,1) ),
-	('Hips-inv',			0.0, 'Hips', F_CON, L_HELP, (1,1,1) ),
+	#('Hips-inv',			0.0, 'Hips', F_CON, L_HELP, (1,1,1) ),
 
 	# Left leg
-	('Hip_L',			1.62316, 'Hips-inv', F_DEF+F_CON, L_HELP, (1,1,1) ),
+	('Hip_L',			1.62316, 'Hips', F_DEF, L_HELP, (1,1,1) ),
 	('UpLeg_L',			-3.08923, 'Hip_L', F_DEF+F_CON, L_DEF, (1,1,1) ),
 	('LoLeg_L',			-3.14159, 'UpLeg_L', F_DEF+F_CON, L_DEF, (1,1,1) ),
 	('Foot_L',			-0.488688, 'LoLeg_L', F_DEF+F_CON, L_DEF, (1,1,1) ),
@@ -499,7 +511,7 @@ ClassicArmature = [
 	('ToeIK_L',			-2.86234, 'LegCtrl_L', 0, L_LEGIK, (1,1,1) ),
 
 	# Right leg
-	('Hip_R',			-1.62316, 'Hips-inv', F_DEF+F_CON, L_HELP, (1,1,1) ),
+	('Hip_R',			-1.62316, 'Hips', F_DEF, L_HELP, (1,1,1) ),
 	('UpLeg_R',			3.08923, 'Hip_R', F_DEF+F_CON, L_DEF, (1,1,1) ),
 	('LoLeg_R',			-3.14159, 'UpLeg_R', F_DEF+F_CON, L_DEF, (1,1,1) ),
 	('Foot_R',			0.488689, 'LoLeg_R', F_DEF+F_CON, L_DEF, (1,1,1) ),
@@ -558,23 +570,8 @@ ClassicArmature = [
 	('Spine1',			0.0, 'Spine2', F_DEF+F_CON+F_WIR, L_MAIN+L_SKEL+L_DEF, (1,1,1) ),
 	('Breathe',			0.0, 'Spine2', F_DEF+F_CON, L_DEF, (1,1,1) ),
 	('Stomach',			-3.14159, 'Breathe', F_DEF+F_CON, L_DEF, (1,1,1) ),
-
-	# Face
 	('Neck',			0.0, 'Spine1', F_DEF+F_CON+F_WIR, L_MAIN+L_SKEL+L_HEAD+L_DEF, (1,1,1) ),
 	('Head',			0.0, 'Neck', F_DEF+F_CON+F_WIR, L_MAIN+L_SKEL+L_HEAD+L_DEF, (1,1,1) ),
-	('Head-inv',			-3.14159, 'Head', F_CON, L_HELP, (1,1,1) ),
-	('Jaw',				0.0, 'Head-inv', F_DEF+F_CON+F_WIR, L_MAIN+L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeBase',			0.0, 'Jaw', F_DEF, L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeTip',			0.0, 'ToungeBase', F_DEF+F_CON, L_HEAD+L_DEF, (1,1,1) ),
-	('Eye_R',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('UpLid_R',			0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('LoLid_R',			0.296705, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('Eye_L',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('UpLid_L',			-0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('LoLid_L',			-0.296705, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('Gaze',			-3.14159, 'Root', 0, L_PANEL+L_HEAD, (1,1,1) ),
-	('Gaze_R',			-3.14159, 'Gaze', 0, L_PANEL+L_HEAD, (1,1,1) ),
-	('Gaze_L',			-3.14159, 'Gaze', 0, L_PANEL+L_HEAD, (1,1,1) ),
 
 	# Left arm
 	('Clavicle_L',			1.91986, 'Spine1', F_DEF+F_WIR, L_ARMFK+L_DEF, (1,1,1) ),
@@ -679,6 +676,22 @@ ClassicArmature = [
 	('Finger-5-Pole_R',		0.0698135, 'Finger-5_R', F_WIR, L_HANDIK, (1,1,1) ),
 ]
 
+FaceArmature = [
+	#('Head-inv',			-3.14159, 'Head', F_CON, L_HELP, (1,1,1) ),
+	('Jaw',				0.0, 'Head', F_DEF+F_WIR, L_MAIN+L_HEAD+L_DEF, (1,1,1) ),
+	('ToungeBase',			0.0, 'Jaw', F_DEF, L_HEAD+L_DEF+F_WIR, (1,1,1) ),
+	('ToungeTip',			0.0, 'ToungeBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('Eye_R',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
+	('Eye_L',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
+	('UpLid_R',			0.279253, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
+	('LoLid_R',			0.296705, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
+	('UpLid_L',			-0.279253, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
+	('LoLid_L',			-0.296705, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
+	('Gaze',			-3.14159, 'Root', 0, L_PANEL+L_HEAD, (1,1,1) ),
+	('Gaze_R',			-3.14159, 'Gaze', 0, L_PANEL+L_HEAD, (1,1,1) ),
+	('Gaze_L',			-3.14159, 'Gaze', 0, L_PANEL+L_HEAD, (1,1,1) ),
+]
+
 PanelArmature = [
 	('PFace',			-3.14159, None, F_WIR, L_PANEL, (1,1,1) ),
 	('PBrow_R',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
@@ -718,14 +731,14 @@ def ClassicWritePoses(fp):
 
 	addPoseBone(fp, 'Hips', 'MHCircle15', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Hips-inv', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	#addPoseBone(fp, 'Hips-inv', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Hip_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'KneeIK_L', 'MHBall', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitDist', 0, ['Const', 'Hip_L'])])
 
-	addPoseBone(fp, 'Hip_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Hip_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'KneeIK_R', 'MHBall', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitDist', 0, ['Const', 'Hip_R'])])
@@ -745,38 +758,9 @@ def ClassicWritePoses(fp):
 		[('LimitRot', C_OWNER+0+C_LTRA, ['Const', (0,0, 0,0, 0,0), (1,0,1)]),
 		 ('StretchTo', 0, ['Const.001', 'Hips', 'PLANE_Z'])])
 
-	# Face
 	addPoseBone(fp, 'Neck', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'Head', 'MHCircle10', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'Head-inv', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'Jaw', 'MHJaw', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'ToungeBase', None, None, (0,0,0), (0,0,0), (1,0,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'ToungeTip', None, None, (0,0,0), (0,0,0), (1,0,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'UpLid_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'LoLid_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'UpLid_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'LoLid_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'Gaze', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'Gaze_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['Gaze_R', 1, None, (True, False)])])
-
-	addPoseBone(fp, 'Gaze_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'Eye_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['Gaze_L', 1, None, (True, False)])])
 
 	# Left arm
 	addPoseBone(fp, 'Clavicle_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
@@ -1154,15 +1138,48 @@ def ClassicWritePoses(fp):
 	addPoseBone(fp, 'Toe-5-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'Toe-5-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
-
-	addPanelPoseBones(fp)
 	return
 
 #
-#	addPanelPoseBones(fp):
+#	FaceWritePoses(fp):
 #
 
-def addPanelPoseBones(fp):
+def FaceWritePoses(fp):
+	#addPoseBone(fp, 'Head-inv', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'Jaw', 'MHJaw', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'ToungeBase', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'ToungeTip', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'UpLid_R', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'LoLid_R', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'UpLid_L', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'LoLid_L', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'Gaze', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'Gaze_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['Gaze_R', 1, None, (True, False)])])
+
+	addPoseBone(fp, 'Gaze_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'Eye_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['Gaze_L', 1, None, (True, False)])])
+
+	return
+
+#
+#	PanelWritePoses(fp):
+#
+
+def PanelWritePoses(fp):
 	addPoseBone(fp, 'PFace', 'MHFace', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'PBrow_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])

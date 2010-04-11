@@ -38,32 +38,8 @@ GoboJoints = [
 	('spine_1_tail'			, 'j', 'neck'),
 	('neck_tail'			, 'j', 'head'),
 	('head_tail'			, 'l', ((2.0, 'head'), (-1.0, 'neck'))),
-	('jaw_head'			, 'j', 'mouth'),
-	('jaw_tail'			, 'v', 8162),
-
-	('eye_L'			, 'j', 'r-eye'),
-	('eye_R'			, 'j', 'l-eye'),
-	('mid-eyes'			, 'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))), 
-	('r-eye-front'			, 'o', ('r-eye', [0,0,0.3])),
-	('l-eye-front'			, 'o', ('l-eye', [0,0,0.3])),
-
-	('gaze_head'			, 'o', ('mid-eyes', [0,0,5.25])),
-	('gaze_tail'			, 'o', ('gaze_head', [0,0,-1])),
-	('gaze_L_head'			, 'o', ('r-eye', [0,0,5.25])),
-	('gaze_L_tail'			, 'o', ('gaze_L_head', [0,0,-1])),
-	('gaze_R_head'			, 'o', ('l-eye', [0,0,5.25])),
-	('gaze_R_tail'			, 'o', ('gaze_R_head', [0,0,-1])),
-
 	('chest-front'			,'v', 7292 ),
-	('jaw-tip'			,'v', 8162 ),
-	('tounge-tip'			,'v', 8049 ),
-	('tounge-mid'			,'v', 8103 ),
-	('tounge-root'			,'v', 8099 ),
-	('l-uplid'			,'v', 12630 ),
-	('l-lolid'			,'v', 12594 ),
-	('r-uplid'			,'v', 2442 ),
-	('r-lolid'			,'v', 2520 ),
-
+	
 	('shoulder_L_head'		, 'j', 'r-clavicle'),
 	('shoulder_L_tail'		, 'j', 'r-shoulder'),
 	('ikfk_hand_L_head'		, 'o', ('r-finger-3-3', [2,0,0])),
@@ -248,6 +224,7 @@ GoboJoints = [
 	('ikfk_foot_R_tail'		, 'o', ('ikfk_foot_R_head', [-0.6,0,0])),
 ]
 
+
 GoboHeadsTails = [
 	('Root'			, 'root_head', 'root_tail'),
 	('HandCtrl_L'		, 'hand_L_head', 'hand_L_tail'),
@@ -258,10 +235,9 @@ GoboHeadsTails = [
 	('Spine1'		, 'spine_2_tail', 'spine_1_tail'),
 	('Neck'			, 'spine_1_tail', 'neck_tail'),
 	('Head'			, 'neck_tail', 'head_tail'),
-	('Jaw'			, 'jaw_head', 'jaw_tail'),
 
 	('Clavicle_L'		, 'shoulder_L_head', 'shoulder_L_tail'),
-	('PArmIK_L'		, 'ikfk_hand_L_head', 'ikfk_hand_L_tail'),
+	('ArmFkIk_L'		, 'ikfk_hand_L_head', 'ikfk_hand_L_tail'),
 	('ArmRoot_L'		, 'arm_root_L_head', 'arm_root_L_tail'),
 	('UpArm_L'		, 'arm_root_L_tail', 'armupper_L_tail'),
 	('LoArm_L'		, 'armupper_L_tail', 'armlower_L_tail'),
@@ -326,7 +302,7 @@ GoboHeadsTails = [
 	('Finger-5-3_fk_L'	, 'finger-5-2_L_tail', 'finger-5-3_L_tail'),
 
 	('Clavicle_R'		, 'shoulder_R_head', 'shoulder_R_tail'),
-	('PArmIK_R'		, 'ikfk_hand_R_head', 'ikfk_hand_R_tail'),
+	('ArmFkIk_R'		, 'ikfk_hand_R_head', 'ikfk_hand_R_tail'),
 	('ArmRoot_R'		, 'arm_root_R_head', 'arm_root_R_tail'),
 	('UpArm_R'		, 'arm_root_R_tail', 'armupper_R_tail'),
 	('LoArm_R'		, 'armupper_R_tail', 'armlower_R_tail'),
@@ -432,7 +408,7 @@ GoboHeadsTails = [
 	('FootTumble_L'		, 'foot_tumble_L_head', 'foot_tumble_L_tail'),
 	('FootRoll_L'		, 'foot_roll_L_head', 'foot_roll_L_tail'),
 	('Knee_L'		, 'knee_L_head', 'knee_L_tail'),
-	('PLegIK_L'		, 'ikfk_foot_L_head', 'ikfk_foot_L_tail'),
+	('LegFkIk_L'		, 'ikfk_foot_L_head', 'ikfk_foot_L_tail'),
 
 	('FootCtrl_R'		, 'footCtrl_R_head', 'footCtrl_R_tail'),
 	('TipToe_R'		, 'tiptoe_R_head', 'tiptoe_R_tail'),
@@ -446,22 +422,10 @@ GoboHeadsTails = [
 	('FootTumble_R'		, 'foot_tumble_R_head', 'foot_tumble_R_tail'),
 	('FootRoll_R'		, 'foot_roll_R_head', 'foot_roll_R_tail'),
 	('Knee_R'		, 'knee_R_head', 'knee_R_tail'),
-	('PLegIK_R'		, 'ikfk_foot_R_head', 'ikfk_foot_R_tail'),
+	('LegFkIk_R'		, 'ikfk_foot_R_head', 'ikfk_foot_R_tail'),
 
 	('Breathe'		, 'spine1', 'chest-front'),
 	('Stomach'		, 'chest-front', 'pelvis'),
-	('ToungeBase'		, 'tounge-root', 'tounge-mid'),
-	('ToungeTip'		, 'tounge-mid', 'tounge-tip'),
-
-	('Eye_L'		, 'r-eye', 'r-eye-front'),
-	('UpLid_L'		, 'r-eye', 'r-uplid'),
-	('LoLid_L'		, 'r-eye', 'r-lolid'),
-	('Gaze_L'		, 'gaze_L_head', 'gaze_L_tail'),
-	('Eye_R'		, 'l-eye', 'l-eye-front'),
-	('UpLid_R'		, 'l-eye', 'l-uplid'),
-	('LoLid_R'		, 'l-eye', 'l-lolid'),
-	('Gaze_R'		, 'gaze_R_head', 'gaze_R_tail'),
-	('Gaze'			, 'gaze_head', 'gaze_tail'),
 
 	('UpArmTwist_L'		, 'r-shoulder', 'r-elbow'),
 	('LoArmTwist_L'		, 'r-elbow', 'r-hand'),
@@ -470,7 +434,6 @@ GoboHeadsTails = [
 	('LoArmTwist_R'		, 'l-elbow', 'l-hand'),
 	('UpLegTwist_R'		, 'l-upper-leg', 'l-knee'),
 ]
-
 
 GoboArmature = [
 	('Root',		0.0, None, F_WIR, L_MAIN, (1,1,1)),
@@ -484,10 +447,9 @@ GoboArmature = [
 	('Spine1',		0.0, 'Spine2', F_DEF+F_CON+F_WIR, L_MAIN+L_DEF, (1,1,1)),
 	('Neck',		0.0, 'Spine1', F_DEF+F_CON+F_WIR, L_MAIN+L_DEF, (1,1,1)),
 	('Head',		0.0, 'Neck', F_DEF+F_CON+F_WIR, L_MAIN+L_DEF, (1,1,1)),
-	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_MAIN+L_DEF, (1,1,1)),
 
 	('Clavicle_L',		1.5708, 'Spine1', F_DEF+F_WIR, L_SKEL+L_DEF, (1,1,1)),
-	('PArmIK_L',		-1.5708, 'Clavicle_L', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
+	('ArmFkIk_L',		-1.5708, 'Clavicle_L', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
 	('ArmRoot_L',		1.5708, 'Clavicle_L', F_RES, L_SKEL, (0,0,2)),
 	('Elbow_L',		0, 'ArmRoot_L', F_WIR,  L_ARMIK, (1,1,1)),
 	('UpArm_L',		1.5708, 'ArmRoot_L', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
@@ -503,7 +465,7 @@ GoboArmature = [
 	('FingerCurl_fk_L',	0, 'LoArm_fk_L', F_WIR, L_ARMFK, (1,1,1)),
 
 	('Clavicle_R',		-1.5708, 'Spine1', F_DEF+F_WIR, L_SKEL+L_DEF, (1,1,1)),
-	('PArmIK_R',		-1.5708, 'Clavicle_R', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
+	('ArmFkIk_R',		-1.5708, 'Clavicle_R', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
 	('ArmRoot_R',		-1.5708, 'Clavicle_R', F_RES, L_SKEL, (0,0,2)),
 	('Elbow_R',		0, 'ArmRoot_R', F_WIR, L_ARMIK, (1,1,1)),
 	('UpArm_R',		-1.5708, 'ArmRoot_R', F_DEF+F_CON+F_RES, L_SKEL+L_DEF, (0,0,10)),
@@ -656,7 +618,7 @@ GoboArmature = [
 	('FootTumble_L',	0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
 	('FootRoll_L',		-1.5708, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
 	('Knee_L',		0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
-	('PLegIK_L',		-1.5708, 'FootCtrl_L', F_WIR, L_MAIN+L_LEGIK+L_LEGFK, (1,1,1)),
+	('LegFkIk_L',		-1.5708, 'FootCtrl_L', F_WIR, L_MAIN+L_LEGIK+L_LEGFK, (1,1,1)),
 
 	('FootCtrl_R',		0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
 	('TipToe_R',		0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
@@ -670,23 +632,10 @@ GoboArmature = [
 	('FootTumble_R',	0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
 	('FootRoll_R',		-1.5708, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
 	('Knee_R',		0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
-	('PLegIK_R',		-1.5708, 'FootCtrl_R', F_WIR, L_MAIN+L_LEGIK, (1,1,1)),
+	('LegFkIk_R',		-1.5708, 'FootCtrl_R', F_WIR, L_MAIN+L_LEGIK, (1,1,1)),
 
 	('Breathe', 		0.0, 'Spine2', F_CON+F_DEF, L_DEF, (1,1,1)),
 	('Stomach', 		0.0, 'Breathe', F_CON+F_DEF+F_NOSCALE+F_RES, L_DEF, (1,1,1)),
-	('ToungeBase', 		0.0, 'Jaw', F_DEF+F_NOSCALE, L_DEF+L_HEAD, (1,1,1)),
-	('ToungeTip', 		0.0, 'ToungeBase', F_DEF+F_CON+F_NOSCALE, L_DEF+L_HEAD, (1,1,1)),
-
-	('Eye_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('UpLid_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
-	('LoLid_L', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
-	('Eye_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF, (1,1,1)),
-	('UpLid_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
-	('LoLid_R', 		0.0, 'Head', F_DEF+F_RES, L_DEF+L_HEAD, (1,1,1)),
-
-	('Gaze', 		0.0, 'Root', 0, L_HEAD, (1,1,1)),
-	('Gaze_L', 		0.0, 'Gaze', 0, L_HEAD, (1,1,1)),
-	('Gaze_R', 		0.0, 'Gaze', 0, L_HEAD, (1,1,1)),
 
 	('UpArmTwist_L', 	0.0, 'ArmRoot_L', F_CON+F_DEF+F_RES, L_DEF, (1,1,1)),
 	('LoArmTwist_L', 	0.0, 'UpArm_L', F_CON+F_DEF+F_RES, L_DEF, (1,1,1)),
@@ -748,7 +697,7 @@ def GoboWritePoses(fp):
 
 	addPoseBone(fp, 'Knee_L', 'MHCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'PLegIK_L', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LegFkIk_L', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	# Right foot
@@ -779,7 +728,7 @@ def GoboWritePoses(fp):
 
 	addPoseBone(fp, 'Knee_R', 'MHCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'PLegIK_R', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'LegFkIk_R', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	# Spinal column
@@ -790,14 +739,11 @@ def GoboWritePoses(fp):
 	addPoseBone(fp, 'Neck', 'MHNeck', 'spinal_column', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	addPoseBone(fp, 'Head', 'MHHead', 'spinal_column', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Jaw', 'MHJaw', 'fk', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OWNER, ['LimitRot', (-0.174533,0.785398, 0,0, -0.349066,0.349066), (True, True, True)])])
-
 	# Left arm
 	addPoseBone(fp, 'Clavicle_L', 'MHShldr_L', 'grabable', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.349066,0.785398), (True, True, True)])])
 
-	addPoseBone(fp, 'PArmIK_L', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'ArmFkIk_L', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'Elbow_L', 'MHCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
@@ -833,7 +779,7 @@ def GoboWritePoses(fp):
 	addPoseBone(fp, 'Clavicle_R', 'MHShldr_R', 'grabable', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.785398,0.349066), (True, True, True)])])
 
-	addPoseBone(fp, 'PArmIK_R', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'ArmFkIk_R', 'MHIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'Elbow_R', 'MHCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
@@ -939,11 +885,6 @@ def GoboWritePoses(fp):
 		 [('IK', 0, ['Hand_R', 1, None, (True, False)])])
 	addPoseBone(fp, 'UpLegTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		 [('IK', 0, ['LoLeg_R', 1, None, (True, False)])])
-
-	addPoseBone(fp, 'Eye_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('IK', 0, ['Gaze_L', 1, None, (True, False)])])
-	addPoseBone(fp, 'Eye_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('IK', 0, ['Gaze_R', 1, None, (True, False)])])
 
 	return
 

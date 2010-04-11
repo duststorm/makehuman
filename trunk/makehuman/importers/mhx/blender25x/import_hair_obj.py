@@ -122,18 +122,12 @@ def readHairFile(fileName):
 			guide.append(Vector(float(lineSplit[1]), -float(lineSplit[3]), float(lineSplit[2])))
 		elif lineSplit[0] == 'g':
 			guides.append(guide)
-		elif lineSplit[0] == 'cstype':
-			pass
-		elif lineSplit[0] == 'deg':
-			pass
-		elif lineSplit[0] == 'curv':
-			pass
-		elif lineSplit[0] == 'parm':
-			pass
 		elif lineSplit[0] == 'end':
 			guide = []
+		elif lineSplit[0] == 'f':
+			raise NameError("Hair file '%s' must only contain curves, not meshes" % filePath)
 		else:
-			raise NameError("Unexpected line %d in %s: '%s'" % (lineNo, fileName, line))
+			pass
 	fp.close()
 	print("File %s read" % fileName)
 	return guides
@@ -153,15 +147,12 @@ def equalizeHairLengths(guides):
 		#for k in range(1,n):
 		#	guide[k] -= guide[0]
 	
-	fp = open("/home/thomas/myblends/hair/test.txt", "w")
 	for guide in guides:
 		if len(guide) < nmax:
 			nguide = recalcHair(guide, nmax)
 		else:
 			nguide = guide
-		printGuides(fp, guide, nguide, nmax)
 		nguides.append(nguide)
-	fp.close()	
 	return (nmax, nguides)
 
 #
@@ -217,7 +208,12 @@ def printGuideAndHair(fp, guide, par, nmax):
 			nv = par.location
 		else:
 			nv = par.hair[n-1].location
-		fp.write("(%.6f %.6f %.6f)\t=> (%.6f %.6f %.6f)\n" % (v[0], v[1], v[2], nv[0], nv[1], nv[2]))
+		fp.write("(%.6f %.6f %.6f)\t=> (%.6f %.6f %.6f)" % (v[0], v[1], v[2], nv[0], nv[1], nv[2]))
+		if n > 0:
+			h = par.hair[n-1]
+			fp.write(" %f %f\n" % (h.time, h.weight))
+		else:
+			fp.write("\n")
 	return
 	
 #	
@@ -299,14 +295,14 @@ def makeHair(hstep, guides):
 	bpy.ops.particle.select_all(action='SELECT')
 	bpy.ops.particle.connect_hair(all=True)
 	bpy.ops.particle.particle_edit_toggle()
-	return
 
+	'''
 	fp = open("/home/thomas/myblends/hair/test2.txt", "w")
-	nmax = len(nguides[0])
-	for m,nguide in enumerate(nguides):
-		printGuideAndHair(fp, nguide, psys.particles[m], nmax)
+	nmax = len(guides[0])
+	for m,guide in enumerate(guides):
+		printGuideAndHair(fp, guide, psys.particles[m], nmax)
 	fp.close()	
-
+	'''
 	return
 
 #

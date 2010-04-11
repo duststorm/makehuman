@@ -1019,11 +1019,14 @@ def exportMesh(ob, fp):
 
 	if me.faces:
 		fp.write("  Faces\n")
-		for f in me.faces:
-			fp.write("    f ")
-			for v in f.verts:
-				fp.write("%d " % v)
-			fp.write(";\n")
+		if expMsk & M_MHX and obName == "Human":
+			fp.write("  *** Faces\n")
+		else:
+			for f in me.faces:
+				fp.write("    f ")
+				for v in f.verts:
+					fp.write("%d " % v)
+				fp.write(";\n")
 		if len(me.materials) <= 1:
 			f = me.faces[0]
 			fp.write("    ftall %d %d ;\n" % (f.material_index, f.smooth))
@@ -1043,10 +1046,13 @@ def exportMesh(ob, fp):
 		uvtexName = uvtex.name.replace(' ','_')
 		fp.write("  MeshTextureFaceLayer %s\n" % uvtexName)
 		fp.write("    Data \n")
-		for data in uvtex.data.values():
-			v = data.uv_raw
-			fp.write("      vt %.6g %.6g %.6g %.6g %.6g %.6g %.6g %.6g ;\n" % (v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
-		writeDir(uvtex.data[0], ['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "      ", fp)
+		if expMsk & M_MHX and obName == "Human":
+			fp.write("  *** TexVerts\n")
+		else:
+			for data in uvtex.data.values():
+				v = data.uv_raw
+				fp.write("      vt %.6g %.6g %.6g %.6g %.6g %.6g %.6g %.6g ;\n" % (v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
+			writeDir(uvtex.data[0], ['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "      ", fp)
 		fp.write("    end Data\n")
 		writeDir(uvtex, ['data'], "    ", fp)
 		createdLocal['MeshTextureFaceLayer'].append(uvtexName)
@@ -1082,6 +1088,9 @@ def exportMesh(ob, fp):
 		fp.write("    *** VertexGroup\n")
 		fp1 = mhxOpen(M_VGroup, "vertexgroups-common25.mhx")
 		exportVertexGroups(ob, me, 'Common', fp1)
+		mhxClose(fp1)
+		fp1 = mhxOpen(M_VGroup, "vertexgroups-face25.mhx")
+		exportVertexGroups(ob, me, 'Face', fp1)
 		mhxClose(fp1)
 		fp1 = mhxOpen(M_VGroup, "vertexgroups-toes25.mhx")
 		(toeLeft, toeRight) = exportVertexGroups(ob, me, 'Toe', fp1)
@@ -1127,6 +1136,10 @@ CommonVertGroups = [
 	'Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'LoLid_L', 'LoLid_R', 'Middle', 'Right',
 	'ToungeBase', 'ToungeTip', 'UpLid_L', 'UpLid_R', 'Scalp']
 
+FaceVertGroups = [
+	'UpLipMid', 'UpLipMid_L', 'UpLipMid_R', 'MouthCorner_L', 'MouthCorner_R', 'LoLipMid_L', 'LoLipMid_R', 'LoLipMid', 
+	'NoseTip', 'BrowMid', 'BrowMid_L', 'BrowMid_R']
+
 ToeVertGroups = [
 	'Toe-1-1_L', 'Toe-1-1_R', 'Toe-1-2_L', 'Toe-1-2_R', 
 	'Toe-2-1_L', 'Toe-2-1_R', 'Toe-2-2_L', 'Toe-2-2_R', 'Toe-2-3_L', 'Toe-2-3_R', 
@@ -1145,6 +1158,9 @@ def exportVertexGroups(ob, me, typ, fp):
 		doToe = False
 		if typ == 'Common':
 			if vgName in CommonVertGroups:
+				doExport = True
+		elif typ == 'Face':
+			if vgName in FaceVertGroups:
 				doExport = True
 		elif typ == 'Toe':
 			if vgName in ToeVertGroups:
@@ -1720,10 +1736,10 @@ def mhxClose(fp):
 hairFile = "particles25.mhx"
 theRig = "classic"
 #theRig = "gobo"
-writeMhxFile('/home/thomas/myblends/test.mhx', M_MHX+M_Mat)
+writeMhxFile('/home/thomas/myblends/test.mhx', M_MHX+M_Geo+M_VGroup)
 #writeMhxFile('/home/thomas/myblends/sintel/simple2.mhx', M_Amt+M_Anim)
 #writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
-#writeMhxTemplates(M_MHX+M_Geo+M_Shape)
+#writeMhxTemplates(M_MHX+M_Geo+M_VGroup)
 #writeMhxTemplates(M_MHX+M_Mat)
 #theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
