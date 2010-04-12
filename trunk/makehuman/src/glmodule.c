@@ -2005,8 +2005,17 @@ void mhEventLoop(void)
                 mhKeyUp(event.key.keysym.sym, event.key.keysym.unicode, event.key.keysym.mod);
             break;
         case SDL_MOUSEMOTION:
+	{
+#if defined WIN32 || defined APPLE
             mhMouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+#else
+            int x, y;
+            SDL_GetMouseState(&x, &y);
+            if (x == event.motion.x && y == event.motion.y)
+                mhMouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+#endif
             break;
+	}
         case SDL_MOUSEBUTTONDOWN:
             mhMouseButtonDown(event.button.button, event.button.x, event.button.y);
             break;
