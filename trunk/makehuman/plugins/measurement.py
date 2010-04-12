@@ -24,8 +24,7 @@ class MeasurementTaskView(gui3d.TaskView):
 
         # Height
 
-        self.statureSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_stature.png'), self.app.getThemeResource('images', 'slider.png'),
-                                          self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 190, 8.04], value=0.0, min=-1.0, max=1.0)  # We want the slider to start from the middle
+        self.statureSlider = gui3d.Slider(self, position=[10, 220, 8.04], value=0.0, min=-1.0, max=1.0, label='Stature')  # We want the slider to start from the middle
 
         @self.statureSlider.event
         def onChange(value):
@@ -46,9 +45,7 @@ class MeasurementTaskView(gui3d.TaskView):
 
         # Chest
 
-        self.chestGirthSlider = self.chestGirthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_chest_girth.png'),
-                                                                     self.app.getThemeResource('images', 'slider.png'), self.app.getThemeResource('images',
-                                                                     'slider_focused.png'), position=[10, 290, 8.04], value=0.5, min=0.0, max=1.0)  # We want the slider to start from the middle
+        self.chestGirthSlider = self.chestGirthSlider = gui3d.Slider(self, position=[10, 270, 8.04], value=0.0, min=-1.0, max=1.0, label='Chest')  # We want the slider to start from the middle
 
         # self.chestGirthLabel = gui3d.TextView(self,
         #    mesh="data/3dobjs/empty.obj",
@@ -69,8 +66,7 @@ class MeasurementTaskView(gui3d.TaskView):
 
         # Waist
 
-        self.waistGirthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_waist_girth.png'), self.app.getThemeResource('images', 'slider.png'),
-                                             self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 390, 9.04], value=0.0, min=-1.0, max=1.0)  # We want the slider to start from the middle
+        self.waistGirthSlider = gui3d.Slider(self, position=[10, 320, 9.04], value=0.0, min=-1.0, max=1.0, label='Waist')  # We want the slider to start from the middle
 
         # self.waistGirthLabel = gui3d.TextView(self,
         #    mesh="data/3dobjs/empty.obj",
@@ -89,8 +85,7 @@ class MeasurementTaskView(gui3d.TaskView):
 
         # Hips
 
-        self.hipGirthSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_hip_girth.png'), self.app.getThemeResource('images', 'slider.png'),
-                                           self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 490, 9.04], value=0.5, min=0.0, max=1.0)  #  We want the slider to start from the middle
+        self.hipGirthSlider = gui3d.Slider(self, position=[10, 370, 9.04], value=0.0, min=-1.0, max=1.0, label='Hip')  #  We want the slider to start from the middle
 
         @self.hipGirthSlider.event
         def onChange(value):
