@@ -13,16 +13,16 @@ Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.ne
 Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards
 ===========================  ===============================================================
 
-The MakeHuman application uses predefined morph target files to distort 
+The MakeHuman application uses predefined morph target files to distort
 the humanoid model when physiological changes or changes to the pose are
-applied by the user. The morph target files contain extreme mesh 
-deformations for individual joints and features which can used 
-proportionately to apply less extreme deformations and which can be 
+applied by the user. The morph target files contain extreme mesh
+deformations for individual joints and features which can used
+proportionately to apply less extreme deformations and which can be
 combined to provide a very wide range of options to the user of the
 application.
 
-This module contains a set of functions used by 3d artists during the 
-development cycle to create these extreme morph target files from 
+This module contains a set of functions used by 3d artists during the
+development cycle to create these extreme morph target files from
 hand-crafted models.
 
 """
@@ -59,38 +59,38 @@ originalVerts = [] #Original base mesh coords
 #Some math stuff
 def vsub(vect1,vect2):
     """
-    This utility function returns a list of 3 float values containing the 
+    This utility function returns a list of 3 float values containing the
     difference between two 3D vectors (vect1-vect2).
 
     Parameters
     ----------
 
     vect1:
-        *list of floats*. A list of 3 floats containing the x, y and z 
+        *list of floats*. A list of 3 floats containing the x, y and z
         coordinates of a vector.
 
     vect2:
-        *list of floats*. A list of 3 floats containing the x, y and z 
+        *list of floats*. A list of 3 floats containing the x, y and z
         coordinates of a vector.
-        
+
     """
     return [vect1[0]-vect2[0], vect1[1]-vect2[1], vect1[2]-vect2[2]]
 
 def vdist(vect1,vect2):
     """
-    This utility function returns a single float value containing the 
-    euclidean distance between two coordinate vectors (the length of 
+    This utility function returns a single float value containing the
+    euclidean distance between two coordinate vectors (the length of
     the line between them).
 
     Parameters
     ----------
 
     vect1:
-        *list of floats*. A list of 3 floats containing the x, y and z 
+        *list of floats*. A list of 3 floats containing the x, y and z
         coordinates of a vector.
 
     vect2:
-        *list of floats*. A list of 3 floats containing the x, y and z 
+        *list of floats*. A list of 3 floats containing the x, y and z
         coordinates of a vector.
 
     """
@@ -99,14 +99,14 @@ def vdist(vect1,vect2):
 
 def vlen(vect):
     """
-    This utility function returns a single float value containing the length 
+    This utility function returns a single float value containing the length
     of a vector [x,y,z].
 
     Parameters
     ----------
 
     vect:
-        *list of floats*. A list of 3 floats containing the x, y and z 
+        *list of floats*. A list of 3 floats containing the x, y and z
         coordinates of a vector.
 
     """
@@ -115,20 +115,20 @@ def vlen(vect):
 def vdot(vect1,vect2):
 
     """
-    This utility function returns a single float value containing the dot 
+    This utility function returns a single float value containing the dot
     (scalar) product of two vectors.
 
     Parameters
     ----------
 
     vect1:
-        *list of floats*. A list of 3 floats containing the x, y and z 
+        *list of floats*. A list of 3 floats containing the x, y and z
         coordinates of a vector.
 
     vect2:
-        *list of floats*. A list of 3 floats containing the x, y and z 
+        *list of floats*. A list of 3 floats containing the x, y and z
         coordinates of a vector.
-    
+
     """
     return vect1[0]*vect2[0] + vect1[1]*vect2[1] + vect1[2]*vect2[2]
 
@@ -138,13 +138,13 @@ def vdot(vect1,vect2):
 def doMorph(mFactor):
     """
     This function applies the currently loaded morph target to the base mesh.
-    
+
     Parameters
     ----------
 
     mFactor:
         *float*. Morphing factor.
-    
+
     """
     t1 = time.time()
     global targetBuffer
@@ -178,7 +178,7 @@ def loadTranslationTarget(targetPath):
     ----------
 
     targetPath:
-        *string*. A string containing the operating system path to the 
+        *string*. A string containing the operating system path to the
         file to be read.
 
     """
@@ -186,22 +186,22 @@ def loadTranslationTarget(targetPath):
     try:
         fileDescriptor = open(targetPath)
     except:
-        Draw.PupMenu("Unable to open %s",(targetPath))        
+        Draw.PupMenu("Unable to open %s",(targetPath))
         return  None
     activeObjs = Blender.Object.GetSelected()
     if len(activeObjs) > 0:
         activeObj = activeObjs[0]
     else:
         Draw.PupMenu("No object selected")
-        return None    
-    
-    obj = activeObj.getData(mesh=True)    
+        return None
+
+    obj = activeObj.getData(mesh=True)
     try:
         obj.verts
     except:
         Draw.PupMenu("The selected obj is not a mesh")
         return None
-        
+
     #check mesh version
     if len(obj.verts) == 11787:
         print "Working on Mesh MH1.0.0prealpha"
@@ -211,13 +211,13 @@ def loadTranslationTarget(targetPath):
                 print "Working on Mesh MH0.9.2NR"
             elif len(obj.verts) < 11751:
                 print "Working on Mesh 0.9.1 or earlier"
-        
-   
+
+
     current_target = targetPath
     targetData = fileDescriptor.readlines()
     fileDescriptor.close()
     targetBuffer = []
-    maxIndexOfVerts = len(obj.verts)        
+    maxIndexOfVerts = len(obj.verts)
     for vData in targetData:
         vectorData = vData.split()
         if vectorData[0].find('#')==-1:
@@ -229,28 +229,28 @@ def loadTranslationTarget(targetPath):
                 pointY = float(vectorData[2])
                 pointZ = float(vectorData[3])
                 targetBuffer.append([mainPointIndex, pointX,pointY,pointZ])
-            else:                
-                Draw.PupMenu("WARNING: target has more verts than Base mesh")
+            #else:
+            #    Draw.PupMenu("WARNING: target has more verts than Base mesh")
     return 1
 
 def saveTranslationTarget(targetPath):
     """
-    This function saves a morph target file containing the difference between 
+    This function saves a morph target file containing the difference between
     the *originalVerts* positions and the actual vertex coordinates.
 
     Parameters
     ----------
 
     targetPath:
-        *string*. A string containing the operating system path to the 
+        *string*. A string containing the operating system path to the
         file to be written.
 
     epsilon:
         *float*. The max value of difference between original vert and
         actual vert. If the distance is over epsilon, the vert is
         considered as modificated, so to save as target morph.
-        ** EDITORIAL NOTE** This parameter is not implemented. 
-        
+        ** EDITORIAL NOTE** This parameter is not implemented.
+
     """
 
     global originalVerts
@@ -290,7 +290,7 @@ def saveTranslationTarget(targetPath):
     except:
         print "Unable to open %s",(targetPath)
         return  None
-  
+
     for data in modifiedVertsIndices:
         fileDescriptor.write("%d %f %f %f\n" % (data[0],data[1],data[2],data[3]))
     fileDescriptor.close()
@@ -311,9 +311,9 @@ def saveTranslationTargetAndHisSymm(targetPath):
     ----------
 
     targetPath:
-        *string*. A string containing the operating system path to the 
-        file to be written. Must start with "l-" prefix.    
-        
+        *string*. A string containing the operating system path to the
+        file to be written. Must start with "l-" prefix.
+
     """
 
     saveTranslationTarget(targetPath)
@@ -339,18 +339,108 @@ def loadAllTargetInFolder(filepath):
         doMorph(0.5)
 
 
-    
+def utility1(filepath,basetype= "mc"):
+    """
+    This function is used to adjust little changes on base
+    meshes, correcting all targets
+    """
+
+
+    folderToScan = os.path.dirname(filepath)
+    oldBasesPath = os.path.join(folderToScan,"oldbases")
+    newBasesPath = os.path.join(folderToScan,"newbases")
+    targetList = os.listdir(folderToScan)
+
+    if basetype == "fc":
+        oldBase = os.path.join(oldBasesPath,"neutral-female-child.target")
+        newBase = os.path.join(newBasesPath,"neutral-female-child.target")
+    elif basetype == "fy":
+        oldBase = os.path.join(oldBasesPath,"neutral-female-young.target")
+        newBase = os.path.join(newBasesPath,"neutral-female-young.target")
+    elif basetype == "fo":
+        oldBase = os.path.join(oldBasesPath,"neutral-female-old.target")
+        newBase = os.path.join(newBasesPath,"neutral-female-old.target")
+    elif basetype == "mc":
+        oldBase = os.path.join(oldBasesPath,"neutral-male-child.target")
+        newBase = os.path.join(newBasesPath,"neutral-male-child.target")
+    elif basetype == "my":
+        oldBase = os.path.join(oldBasesPath,"neutral-male-young.target")
+        newBase = os.path.join(newBasesPath,"neutral-male-young.target")
+    elif basetype == "mo":
+        oldBase = os.path.join(oldBasesPath,"neutral-male-old.target")
+        newBase = os.path.join(newBasesPath,"neutral-male-old.target")
+
+
+    for targetName in targetList:
+        targetPath = os.path.join(folderToScan,targetName)
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetPath)
+            loadTranslationTarget(oldBase)
+            doMorph(1.0)
+            loadTranslationTarget(targetPath)
+            doMorph(1.0)
+            loadTranslationTarget(newBase)
+            doMorph(-1.0)
+            saveTranslationTarget(targetPath)
+            resetMesh()
+
+def utility2(targetPath):
+
+    print targetPath
+    isModified = False
+    if os.path.isfile(targetPath):
+        try:
+            fileDescriptor = open(targetPath)
+        except:
+            Draw.PupMenu("Unable to open %s",(targetPath))
+            return  None
+        targetData = fileDescriptor.readlines()
+        fileDescriptor.close()
+        targetData2 = []        
+        for vData in targetData:
+            vectorData = vData.split()
+            if vectorData[0].find('#')==-1:
+                vectorData[0] = int(vectorData[0])
+                if vectorData[0] > 15081:
+                    isModified = True
+                    vectorData[0] = vectorData[0]-428
+                targetData2.append(vectorData)
+
+    if isModified == True:
+        try:
+            fileDescriptor = open(targetPath, "w")
+        except:
+            print "Unable to open %s",(targetPath)
+            return  None
+
+        for vData in targetData2:
+            fileDescriptor.write("%d %s %s %s\n" % (vData[0],vData[1],vData[2],vData[3]))
+        fileDescriptor.close()
+
+    return 1
+
+
+def utility3(filepath):
+    #Because Blender filechooser return a file
+    #it's needed to extract the dirname
+    folderToScan = os.path.dirname(filepath)
+    targetList = os.listdir(folderToScan)
+    for targetName in targetList:
+        targetPath = os.path.join(folderToScan,targetName)
+        utility2(targetPath)
+
+
 
 def loadInitialBaseCoords(path):
     """
-    This function is a little utility function to load only the vertex data 
+    This function is a little utility function to load only the vertex data
     from a wavefront obj file.
 
     Parameters
     ----------
 
     path:
-        *string*. A string containing the operating system path to the 
+        *string*. A string containing the operating system path to the
         file that contains the wavefront obj.
 
     """
@@ -383,7 +473,7 @@ def saveSymVertsIndices(filePath):
     ----------
 
     filePath:
-        *string*. A string containing the operating system path to the 
+        *string*. A string containing the operating system path to the
         file that will contain the new or updated morph target.
 
     """
@@ -446,14 +536,14 @@ def saveSymVertsIndices(filePath):
 
 def loadSymVertsIndex(right=1):
     """
-    Make the mesh symmetrical by reflecting the existing vertices across 
+    Make the mesh symmetrical by reflecting the existing vertices across
     to the left or right. By default this function reflects left to right.
 
     Parameters
     ----------
 
     right:
-        *int*. A flag to indicate whether the new vertices will be reflected 
+        *int*. A flag to indicate whether the new vertices will be reflected
         across to the left or right. (1=right, 0=left)
 
     """
@@ -498,20 +588,20 @@ def loadSymVertsIndex(right=1):
 
 def selectSymmetricVerts():
     """
-    Select symmetrical verts  by reflecting the existing selection across 
+    Select symmetrical verts  by reflecting the existing selection across
     to the left or right. This function reflects left to right.
 
     Parameters
     ----------
 
     right:
-        *int*. A flag to indicate whether the new vertices will be reflected 
+        *int*. A flag to indicate whether the new vertices will be reflected
         across to the left or right. (1=right, 0=left)
 
     """
 
     global pairsPath
-    print "selecting symm"   
+    print "selecting symm"
     activeObjs = Blender.Object.GetSelected()
     activeObj = activeObjs[0]
     data = activeObj.getData(mesh=True)
@@ -525,8 +615,8 @@ def selectSymmetricVerts():
     for symmCouple in symmFile:
         leftVert = data.verts[int(symmCouple.split(',')[0])]
         rightVert = data.verts[int(symmCouple.split(',')[1])]
-        
-        if leftVert.sel == 1:            
+
+        if leftVert.sel == 1:
             leftVert.sel = 0
             rightVert.sel = 1
     symmFile.close()
@@ -535,13 +625,13 @@ def selectSymmetricVerts():
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
 
-    
+
 def resetMesh():
     """
     This function restores the initial base mesh coordinates.
-    
+
     **Parameters:** This method has no parameters.
-    
+
     """
     activeObjs = Blender.Object.GetSelected()
     activeObj = activeObjs[0]
@@ -567,24 +657,24 @@ def absoluteToRelative(path):
     the target female_young_nilotid is saved not from base mesh, but from
     female_young. In other words, it's needed to apply female_young before apply
     female_young_nilotid.
-    
+
     Parameters
     ----------
-   
-    path:     
-      *path*.  Path of folder to examine.   
+
+    path:
+      *path*.  Path of folder to examine.
     """
     activeObjs = Blender.Object.GetSelected()
     activeObj = activeObjs[0]
-    data = activeObj.getData(mesh=True)  
-    path = os.path.split(path)[0] 
-    
+    data = activeObj.getData(mesh=True)
+    path = os.path.split(path)[0]
+
     targetsFiles = os.listdir(path)
     targetsNames = []
     for targetFile in targetsFiles:
         if targetFile != "base_female.target" and \
             targetFile != "base_male.target":
-                
+
             #targetFile != "base_female_child.target" and \
             #targetFile != "base_male_child.target" and \
             #targetFile != "base_female_old.target" and \
@@ -593,13 +683,13 @@ def absoluteToRelative(path):
             targetName = fileName[0]
             targetPath = os.path.join(path, targetFile)
             if "female" in targetName:
-                absoluteTarget = os.path.join(path,"base_female.target")                    
+                absoluteTarget = os.path.join(path,"base_female.target")
             else:
                 absoluteTarget = os.path.join(path,"base_male.target")
             loadTranslationTarget(targetPath)
             doMorph(1.0)
             loadTranslationTarget(absoluteTarget)
-            doMorph(-1.0)            
+            doMorph(-1.0)
             saveTranslationTarget(targetPath)#Note it overwrite
             resetMesh()
 
@@ -613,11 +703,11 @@ originalVerts = loadInitialBaseCoords(basePath)
 
 def draw():
     """
-    This function draws the morph target on the screen and adds buttons to 
+    This function draws the morph target on the screen and adds buttons to
     enable utility functions to be called to process the target.
 
     **Parameters:** This method has no parameters.
-    
+
     """
     global targetPath,morphFactor,rotVal,rotSum,current_target,selAxis
     global saveOnlySelectedVerts
@@ -644,7 +734,7 @@ def draw():
 
 def event(event, value):
     """
-    This function handles keyboard events when the escape key or the 's' key 
+    This function handles keyboard events when the escape key or the 's' key
     is pressed to exit or save the morph target file.
 
     Parameters
@@ -667,6 +757,10 @@ def event(event, value):
         Window.FileSelector (loadAllTargetInFolder, "Load from folder")
     elif event == Draw.CKEY:
         Window.FileSelector (absoluteToRelative, "Select base_female")
+    elif event == Draw.HKEY:
+        Window.FileSelector (utility1, "Select files")
+    elif event == Draw.UKEY:
+        Window.FileSelector (utility3, "Select files")
 
 
 def b_event(event):
