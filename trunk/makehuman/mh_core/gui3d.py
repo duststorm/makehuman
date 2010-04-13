@@ -923,6 +923,9 @@ class FileEntryView(View):
         def onClicked(event):
             if len(self.edit.getText()):
                 self.onFileSelected(self.edit.getText())
+                
+    def onFocus(self, event):
+        self.edit.setFocus()
 
 
 # FileChooser widget
