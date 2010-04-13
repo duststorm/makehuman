@@ -78,15 +78,15 @@ class MHApplication(gui3d.Application):
   def __init__(self):
     gui3d.Application.__init__(self)
 
-    modelCamera = mh.Camera()
+    self.modelCamera = mh.Camera()
 
-    mh.cameras.append(modelCamera)
+    mh.cameras.append(self.modelCamera)
 
-    guiCamera = mh.Camera()
-    guiCamera.fovAngle = 45
-    guiCamera.eyeZ = 10
-    guiCamera.projection = 0
-    mh.cameras.append(guiCamera)
+    self.guiCamera = mh.Camera()
+    self.guiCamera.fovAngle = 45
+    self.guiCamera.eyeZ = 10
+    self.guiCamera.projection = 0
+    mh.cameras.append(self.guiCamera)
 
     self.setTheme("default")
     
@@ -308,24 +308,24 @@ class MHApplication(gui3d.Application):
       self.progressBar.hide()
       
   def setGlobalCamera(self):
-    mh.cameras[0].eyeX = 0
-    mh.cameras[0].eyeY = 0
-    mh.cameras[0].eyeZ = 60
-    mh.cameras[0].focusX = 0
-    mh.cameras[0].focusY = 0
-    mh.cameras[0].focusZ = 0
+    self.modelCamera.eyeX = 0
+    self.modelCamera.eyeY = 0
+    self.modelCamera.eyeZ = 60
+    self.modelCamera.focusX = 0
+    self.modelCamera.focusY = 0
+    self.modelCamera.focusZ = 0
   
   def setFaceCamera(self):
     human = self.scene3d.selectedHuman
     headNames = [group.name for group in human.meshData.facesGroups if (group.name.find("head") > -1 or group.name.find("jaw") > -1)]
     self.headVertices, self.headFaces = human.meshData.getVerticesAndFacesForGroups(headNames)
     center = centroid([v.co for v in self.headVertices])
-    mh.cameras[0].eyeX = center[0]
-    mh.cameras[0].eyeY = center[1]
-    mh.cameras[0].eyeZ = 10
-    mh.cameras[0].focusX = center[0]
-    mh.cameras[0].focusY = center[1]
-    mh.cameras[0].focusZ = 0
+    self.modelCamera.eyeX = center[0]
+    self.modelCamera.eyeY = center[1]
+    self.modelCamera.eyeZ = 10
+    self.modelCamera.focusX = center[0]
+    self.modelCamera.focusY = center[1]
+    self.modelCamera.focusZ = 0
     human.setPosition([0.0, 0.0, 0.0])
     human.setRotation([0.0, 0.0, 0.0])
     
