@@ -137,10 +137,10 @@ def load(app):
     @taskview.event
     def onMouseWheel(event):
         if event.wheelDelta > 0:
-            mh.cameras[0].zoom -= 0.65
+            mh.cameras[0].eyeZ -= 0.65
             app.scene3d.redraw()
         else:
-            mh.cameras[0].zoom += 0.65
+            mh.cameras[0].eyeZ += 0.65
             app.scene3d.redraw()
 
     @taskview.event
@@ -151,7 +151,7 @@ def load(app):
         rightButtonDown = event.button & 4
 
         if leftButtonDown and rightButtonDown or middleButtonDown:
-            mh.cameras[0].zoom += 0.05 * diff[1]
+            mh.cameras[0].eyeZ += 0.05 * diff[1]
         elif leftButtonDown:
             human = app.scene3d.selectedHuman
             rot = human.getRotation()

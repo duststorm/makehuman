@@ -121,11 +121,15 @@ typedef struct
     int stereoMode;
     float eyeSeparation;
 
-    float zoom;
-
-    //float eye[3];
-    //float focus[3];
-    //float up[3];
+    float eyeX;
+    float eyeY;
+    float eyeZ;
+    float focusX;
+    float focusY;
+    float focusZ;
+    float upX;
+    float upY;
+    float upZ;
 } Camera;
 
 void mhCameraPosition(Camera *camera, int eye);
@@ -139,7 +143,15 @@ static PyMemberDef Camera_members[] =
     {"projection", T_UINT, offsetof(Camera, projection), 0, "The projection type, 0 for orthogonal, 1 for perspective."},
     {"stereoMode", T_UINT, offsetof(Camera, stereoMode), 0, "The Stereo Mode, 0 for no stereo, 1 for toe-in, 2 for off-axis."},
     {"eyeSeparation", T_FLOAT, offsetof(Camera, eyeSeparation), 0, "The Eye Separation."},
-    {"zoom", T_FLOAT, offsetof(Camera, zoom), 0, "The Zoom."},
+    {"eyeX", T_FLOAT, offsetof(Camera, eyeX), 0, "The x position of the eye."},
+    {"eyeY", T_FLOAT, offsetof(Camera, eyeY), 0, "The y position of the eye."},
+    {"eyeZ", T_FLOAT, offsetof(Camera, eyeZ), 0, "The z position of the eye."},
+    {"focusX", T_FLOAT, offsetof(Camera, focusX), 0, "The x position of the focus."},
+    {"focusY", T_FLOAT, offsetof(Camera, focusY), 0, "The y position of the focus."},
+    {"focusZ", T_FLOAT, offsetof(Camera, focusZ), 0, "The z position of the focus."},
+    {"upX", T_FLOAT, offsetof(Camera, upX), 0, "The x of the up vector."},
+    {"upY", T_FLOAT, offsetof(Camera, upY), 0, "The y of the up vector."},
+    {"upZ", T_FLOAT, offsetof(Camera, upZ), 0, "The z of the up vector."},
     {NULL}  /* Sentinel */
 };
 
@@ -245,7 +257,15 @@ static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->stereoMode = 0;
         self->eyeSeparation = 1.0f;
 
-        self->zoom = 60;
+        self->eyeX = 0.0f;
+        self->eyeY = 0.0f;
+        self->eyeZ = 60.0f;
+        self->focusX = 0.0f;
+        self->focusY = 0.0f;
+        self->focusZ = 0.0f;
+        self->upX = 0.0f;
+        self->upY = 1.0f;
+        self->upZ = 0.0f;
     }
 
     return (PyObject*)self;
@@ -1475,9 +1495,9 @@ void mhCameraPosition(Camera *camera, int eye)
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        gluLookAt(0.0, 0.0, camera->zoom, // Eye
-                  0.0, 0.0, 0.0,          // Focus
-                  0.0 , 1.0, 0.0);        // Up
+        gluLookAt(camera->eyeX, camera->eyeY, camera->eyeZ,       // Eye
+                  camera->focusX, camera->focusY, camera->focusZ, // Focus
+                  camera->upX, camera->upY, camera->upZ);         // Up
         break;
     }
     case 1: // Toe-in method, uses different eye positions, same focus point and projection
@@ -1490,13 +1510,13 @@ void mhCameraPosition(Camera *camera, int eye)
         glLoadIdentity();
 
         if (eye == 1)
-            gluLookAt(0.0 - 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
-                      0.0, 0.0, 0.0,                                        // Focus
-                      0.0 , 1.0, 0.0);                                      // Up
+            gluLookAt(camera->eyeX - 0.5 * camera->eyeSeparation, camera->eyeY, camera->eyeZ, // Eye
+                  camera->focusX, camera->focusY, camera->focusZ,                             // Focus
+                  camera->upX, camera->upY, camera->upZ);                                     // Up
         else if (eye == 2)
-            gluLookAt(0.0 + 0.5 * camera->eyeSeparation, 0.0, camera->zoom, // Eye
-                      0.0, 0.0, 0.0,                                        // Focus
-                      0.0 , 1.0, 0.0);                                      // Up
+            gluLookAt(camera->eyeX + 0.5 * camera->eyeSeparation, camera->eyeY, camera->eyeZ, // Eye
+                  camera->focusX, camera->focusY, camera->focusZ,                             // Focus
+                  camera->upX, camera->upY, camera->upZ);                                     // Up
 
         break;
     }
@@ -1517,8 +1537,8 @@ void mhCameraPosition(Camera *camera, int eye)
         else
             eyePosition = 0.0;
 
-        left -= eyePosition * camera->nearPlane / camera->zoom;
-        right -= eyePosition * camera->nearPlane / camera->zoom;
+        left -= eyePosition * camera->nearPlane / camera->eyeZ;
+        right -= eyePosition * camera->nearPlane / camera->eyeZ;
 
         // Left frustum is moved right, right frustum moved left
         glMatrixMode(GL_PROJECTION);
@@ -1528,9 +1548,9 @@ void mhCameraPosition(Camera *camera, int eye)
         // Left camera is moved left, right camera moved right
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        gluLookAt(0.0 + eyePosition, 0.0, camera->zoom, // Eye
-                  0.0 + eyePosition, 0.0, 0.0,             // Focus
-                  0.0 , 1.0, 0.0);                         // Up
+        gluLookAt(camera->eyeX + eyePosition, camera->eyeY, camera->eyeZ,       // Eye
+                  camera->focusX + eyePosition, camera->focusY, camera->focusZ, // Focus
+                  camera->upX, camera->upY, camera->upZ);                       // Up
 
         break;
     }

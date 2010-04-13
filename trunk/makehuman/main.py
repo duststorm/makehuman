@@ -67,6 +67,7 @@ sys.path.append("./mh_core")
 import gui3d, events3d
 import human, hair, background
 import guimodelling, guifiles, guirender
+from aljabr import centroid
 #import font3d
 
 class Settings:
@@ -83,7 +84,7 @@ class MHApplication(gui3d.Application):
 
     guiCamera = mh.Camera()
     guiCamera.fovAngle = 45
-    guiCamera.zoom = 10
+    guiCamera.eyeZ = 10
     guiCamera.projection = 0
     mh.cameras.append(guiCamera)
 
@@ -305,7 +306,29 @@ class MHApplication(gui3d.Application):
       self.progressBar.show()
     elif value >= 1.0:
       self.progressBar.hide()
-
+      
+  def setGlobalCamera(self):
+    mh.cameras[0].eyeX = 0
+    mh.cameras[0].eyeY = 0
+    mh.cameras[0].eyeZ = 60
+    mh.cameras[0].focusX = 0
+    mh.cameras[0].focusY = 0
+    mh.cameras[0].focusZ = 0
+  
+  def setFaceCamera(self):
+    human = self.scene3d.selectedHuman
+    headNames = [group.name for group in human.meshData.facesGroups if (group.name.find("head") > -1 or group.name.find("jaw") > -1)]
+    self.headVertices, self.headFaces = human.meshData.getVerticesAndFacesForGroups(headNames)
+    center = centroid([v.co for v in self.headVertices])
+    mh.cameras[0].eyeX = center[0]
+    mh.cameras[0].eyeY = center[1]
+    mh.cameras[0].eyeZ = 10
+    mh.cameras[0].focusX = center[0]
+    mh.cameras[0].focusY = center[1]
+    mh.cameras[0].focusZ = 0
+    human.setPosition([0.0, 0.0, 0.0])
+    human.setRotation([0.0, 0.0, 0.0])
+    
 application = MHApplication()
 mainScene = application.scene3d # HACK: Don't remove this, it is needed to receive events from C
 application.start()

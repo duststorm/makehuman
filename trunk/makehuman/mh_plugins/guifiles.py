@@ -85,16 +85,16 @@ class SaveTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.fileentry.setFocus()
         self.pan = self.app.scene3d.selectedHuman.getPosition()
-        self.zoom = mh.cameras[0].zoom
+        self.eyeZ = mh.cameras[0].eyeZ
         self.rotation = self.app.scene3d.selectedHuman.getRotation()
         self.app.scene3d.selectedHuman.setPosition([0, -1, 0])
-        mh.cameras[0].zoom = 70.0
+        mh.cameras[0].eyeZ = 70.0
         self.app.scene3d.selectedHuman.setRotation([0.0, 0.0, 0.0])
 
     def onHide(self, event):
         gui3d.TaskView.onHide(self, event)
         self.app.scene3d.selectedHuman.setPosition(self.pan)
-        mh.cameras[0].zoom = self.zoom
+        mh.cameras[0].eyeZ = self.eyeZ
         self.app.scene3d.selectedHuman.setRotation(self.rotation)
 
 
@@ -216,16 +216,16 @@ class ExportTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.fileentry.setFocus()
         self.pan = self.app.scene3d.selectedHuman.getPosition()
-        self.zoom = mh.cameras[0].zoom
+        self.eyeZ = mh.cameras[0].eyeZ
         self.rotation = self.app.scene3d.selectedHuman.getRotation()
         self.app.scene3d.selectedHuman.setPosition([0, -1, 0])
-        mh.cameras[0].zoom = 70.0
+        mh.cameras[0].eyeZ = 70.0
         self.app.scene3d.selectedHuman.setRotation([0.0, 0.0, 0.0])
 
     def onHide(self, event):
         gui3d.TaskView.onHide(self, event)
         self.app.scene3d.selectedHuman.setPosition(self.pan)
-        mh.cameras[0].zoom = self.zoom
+        mh.cameras[0].eyeZ = self.eyeZ
         self.app.scene3d.selectedHuman.setRotation(self.rotation)
 
 

@@ -63,7 +63,7 @@ class ModellingCategory(gui3d.Category):
         rightButtonDown = event.button & 4
 
         if leftButtonDown and rightButtonDown or middleButtonDown:
-            mh.cameras[0].zoom += 0.05 * diff[1]
+            mh.cameras[0].eyeZ += 0.05 * diff[1]
         elif leftButtonDown:
             human = self.app.scene3d.selectedHuman
             rot = human.getRotation()
@@ -81,10 +81,10 @@ class ModellingCategory(gui3d.Category):
 
     def onMouseWheel(self, event):
         if event.wheelDelta > 0:
-            mh.cameras[0].zoom -= 0.65
+            mh.cameras[0].eyeZ -= 0.65
             self.app.scene3d.redraw()
         else:
-            mh.cameras[0].zoom += 0.65
+            mh.cameras[0].eyeZ += 0.65
             self.app.scene3d.redraw()
 
     def onKeyDown(self, event):
@@ -170,10 +170,10 @@ class ModellingCategory(gui3d.Category):
 
           # Camera zoom
 
-                    mh.cameras[0].zoom += 0.65
+                    mh.cameras[0].eyeZ += 0.65
                     self.app.scene3d.redraw()
                 elif event.key == events3d.SDLK_MINUS or event.key == events3d.SDLK_KP_MINUS:
-                    mh.cameras[0].zoom -= 0.65
+                    mh.cameras[0].eyeZ -= 0.65
                     self.app.scene3d.redraw()
                 elif event.key == events3d.SDLK_7 or event.key == events3d.SDLK_KP7:
 
@@ -189,7 +189,7 @@ class ModellingCategory(gui3d.Category):
                     self.app.scene3d.redraw()
                 elif event.key == events3d.SDLK_PERIOD or event.key == events3d.SDLK_KP_PERIOD:
                     self.app.scene3d.selectedHuman.setPosition([0.0, 0.0, 0.0])
-                    mh.cameras[0].zoom = 60.0
+                    mh.cameras[0].eyeZ = 60.0
                     self.app.scene3d.redraw()
             elif event.modifiers == events3d.KMOD_NUM:
 
@@ -219,10 +219,10 @@ class ModellingCategory(gui3d.Category):
                     rot[0] -= 5.0
                     human.setRotation(rot)
                     self.app.scene3d.redraw()
+                    
+           # Camera views
+                    
                 elif event.key == events3d.SDLK_KP7:
-
-          # Camera views
-
                     self.app.scene3d.selectedHuman.setRotation([90.0, 0.0, 0.0])
                     self.app.scene3d.redraw()
                 elif event.key == events3d.SDLK_KP1:
