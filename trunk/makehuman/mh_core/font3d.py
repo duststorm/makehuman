@@ -86,6 +86,16 @@ class Font:
         v2 = 1.0 - float(charRecord['y'] + charRecord['height']) / float(self.height)
         return [u1, v1, u2, v2]
 
+    # Returns the width of the string
+    def stringWidth(self, text):
+        width = 0.0
+
+        for char in text:
+            co = self.getAbsoluteCoordsForChar(char)
+            width += co[4]
+            
+        return width
+
 #returns font as object3d with 0 visibility
 def createMesh(font, text, position=[0.0,0.0,0.0]):
 
