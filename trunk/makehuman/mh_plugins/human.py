@@ -175,16 +175,16 @@ class Human(gui3d.Object):
                 "r-torso-lower-pectoralis", "r-torso-nipple"]
         self.breastVertices, self.breastFaces = self.meshData.getVerticesAndFacesForGroups(breastNames)
         
-        noseNames = [group.name for group in self.meshData.facesGroups if group.name.find("nose") > -1]
+        noseNames = [group.name for group in self.meshData.facesGroups if "nose" in group.name]
         self.noseVertices, self.noseFaces = self.meshData.getVerticesAndFacesForGroups(noseNames)
         
-        mouthNames = [group.name for group in self.meshData.facesGroups if group.name.find("mouth") > -1]
+        mouthNames = [group.name for group in self.meshData.facesGroups if "mouth" in group.name]
         self.mouthVertices, self.mouthFaces = self.meshData.getVerticesAndFacesForGroups(mouthNames)
 
-        eyesNames = [group.name for group in self.meshData.facesGroups if group.name.find("eye") > -1]
+        eyesNames = [group.name for group in self.meshData.facesGroups if "eye" in group.name]
         self.eyesVertices, self.eyesFaces = self.meshData.getVerticesAndFacesForGroups(eyesNames)
         
-        headNames = [group.name for group in self.meshData.facesGroups if (group.name.find("head") > -1 or group.name.find("jaw") > -1)]
+        headNames = [group.name for group in self.meshData.facesGroups if ("head" in group.name or "jaw" in group.name)]
         self.headVertices, self.headFaces = self.meshData.getVerticesAndFacesForGroups(headNames)
 
     # Overriding hide and show to account for both human base and the hairs!

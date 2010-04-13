@@ -317,7 +317,7 @@ class MHApplication(gui3d.Application):
   
   def setFaceCamera(self):
     human = self.scene3d.selectedHuman
-    headNames = [group.name for group in human.meshData.facesGroups if (group.name.find("head") > -1 or group.name.find("jaw") > -1)]
+    headNames = [group.name for group in human.meshData.facesGroups if ("head" in group.name or "jaw" in group.name)]
     self.headVertices, self.headFaces = human.meshData.getVerticesAndFacesForGroups(headNames)
     center = centroid([v.co for v in self.headVertices])
     self.modelCamera.eyeX = center[0]
