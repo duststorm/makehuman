@@ -91,6 +91,7 @@ class Human(gui3d.Object):
         self.mouth = 0.0
         self.eyes = 0.0
         self.head = 0.0
+        self.pelvisTone = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
@@ -186,6 +187,9 @@ class Human(gui3d.Object):
         
         headNames = [group.name for group in self.meshData.facesGroups if ("head" in group.name or "jaw" in group.name)]
         self.headVertices, self.headFaces = self.meshData.getVerticesAndFacesForGroups(headNames)
+        
+        pelvisNames = [group.name for group in self.meshData.facesGroups if "pelvis" in group.name]
+        self.pelvisVertices, self.pelvisFaces = self.meshData.getVerticesAndFacesForGroups(pelvisNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -420,6 +424,12 @@ class Human(gui3d.Object):
 
     def getHead(self):
        return self.head
+       
+    def setPelvisTone(self, value):
+       self.pelvisTone = min(1.0, max(-1.0, value))
+
+    def getPelvisTone(self):
+       return self.pelvisTone
 
     def setEthnic(self, ethnic, value):
         modified = None
@@ -890,6 +900,44 @@ class Human(gui3d.Object):
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
+    def updatePelvisTone(self, previous, next, recalcNormals = True, update = True):
+        pelvisToneValues = [0 for i in xrange(0, 3)]
+        
+        # remove previous
+        if previous < 0.0:
+          pelvisToneValues[1] += previous
+        elif previous > 0.0:
+          pelvisToneValues[2] -= previous
+            
+        # add next
+        if next < 0.0:
+          pelvisToneValues[1] -= next
+        elif next > 0.0:
+          pelvisToneValues[2] += next
+          
+        self.applyPelvisToneTargets(pelvisToneValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.pelvisVertices, self.pelvisFaces)
+        if update:
+          self.meshData.update(self.pelvisVertices)
+
+    def applyPelvisToneTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 3):
+            detailTargets['data/targets/details/male-young-pelvis-tone%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-child-pelvis-tone%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-old-pelvis-tone%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/female-young-pelvis-tone%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-child-pelvis-tone%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-old-pelvis-tone%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None, update=True):
         """
@@ -1049,6 +1097,15 @@ class Human(gui3d.Object):
             headValues[i + 1] = value
 
         self.applyHeadTargets(headValues)
+        
+        # There are two pelvis targets, 1 and 2
+        pelvisToneValues = [0 for i in xrange(0, 3)]
+        if self.pelvisTone < 0.0:
+          pelvisToneValues[1] = -self.pelvisTone
+        elif self.pelvisTone > 0.0:
+          pelvisToneValues[2] = self.pelvisTone
+          
+        self.applyPelvisToneTargets(pelvisToneValues)
 
         for (ethnicGroup, ethnicVal) in self.targetsEthnicStack.iteritems():
 

@@ -487,6 +487,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Head', value, self.syncSliders))
             self.head = None
+            
+        self.pelvisToneSlider = gui3d.Slider(self, position=[650, 235, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone")
+
+        self.pelvisTone = None
+        
+        @self.pelvisToneSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.pelvisTone == None:
+                    self.pelvisTone = human.getPelvisTone()
+                human.updatePelvisTone(self.pelvisTone, value, self.app.settings.realtimeNormalUpdates)
+                self.pelvisTone = min(1.0, max(-1.0, value))
+                
+        @self.pelvisToneSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'PelvisTone', value, self.syncSliders))
+            self.pelvisTone = None
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
