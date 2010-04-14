@@ -1448,6 +1448,8 @@ class Human(gui3d.Object):
         self.nose = 0.0
         self.mouth = 0.0
         self.eyes = 0.0
+        self.head = 0.0
+        self.pelvisTone = 0.0
 
         self.activeEthnicSets = {}
         self.targetsEthnicStack = {'neutral': 1.0}
@@ -1491,6 +1493,10 @@ class Human(gui3d.Object):
                     self.setMouth(float(lineData[1]))
                 elif lineData[0] == 'eyes':
                     self.setEyes(float(lineData[1]))
+                elif lineData[0] == 'head':
+                    self.setHead(float(lineData[1]))
+                elif lineData[0] == 'pelvisTone':
+                    self.setPelvisTone(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
@@ -1522,6 +1528,8 @@ class Human(gui3d.Object):
         f.write('nose %f\n' % self.getNose())
         f.write('mouth %f\n' % self.getMouth())
         f.write('eyes %f\n' % self.getEyes())
+        f.write('head %f\n' % self.getHead())
+        f.write('pelvisTone %f\n' % self.getPelvisTone())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         f.write('height %f\n' % modifier.getValue())
