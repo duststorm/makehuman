@@ -469,7 +469,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.eyes = None
 
 
-        self.headShapeSlider = gui3d.Slider(self, position=[650, 106, 9.2], value=0.0,min=0.0,max=1.0,label="Head shape")
+        self.headShapeSlider = gui3d.Slider(self, position=[650, 106, 9.2], value=0.0,min=0.0,max=1.0,label="Shape")
 
         self.head = None
 
@@ -487,6 +487,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Head', value, self.syncSliders))
             self.head = None
+            
+        self.headAgeSlider = gui3d.Slider(self, position=[650, 140, 9.2], value=0.0,min=-1.0,max=1.0,label="Age")
+            
+        self.headAge = None
+
+        @self.headAgeSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.headAge == None:
+                    self.headAge = human.getHeadAge()
+                human.updateHeadAge(self.headAge, value, self.app.settings.realtimeNormalUpdates)
+                self.headAge = min(1.0, max(-1.0, value))
+
+        @self.headAgeSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'HeadAge', value, self.syncSliders))
+            self.headAge = None
             
         self.pelvisToneSlider = gui3d.Slider(self, position=[650, 235, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone")
 
@@ -599,6 +618,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.mouthSlider.setValue(human.getMouth())
         self.eyesSlider.setValue(human.getEyes())
         self.headShapeSlider.setValue(human.getHead())
+        self.headAgeSlider.setValue(human.getHeadAge())
         self.pelvisToneSlider.setValue(human.getPelvisTone())
 
 class MicroModelingTaskView(gui3d.TaskView):

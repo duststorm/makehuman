@@ -91,6 +91,7 @@ class Human(gui3d.Object):
         self.mouth = 0.0
         self.eyes = 0.0
         self.head = 0.0
+        self.headAge = 0.0
         self.pelvisTone = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
@@ -424,6 +425,12 @@ class Human(gui3d.Object):
 
     def getHead(self):
        return self.head
+       
+    def setHeadAge(self, value):
+        self.headAge = min(1.0, max(-1.0, value))
+
+    def getHeadAge(self):
+       return self.headAge
        
     def setPelvisTone(self, value):
        self.pelvisTone = min(1.0, max(-1.0, value))
@@ -901,6 +908,44 @@ class Human(gui3d.Object):
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
                 
+    def updateHeadAge(self, previous, next, recalcNormals = True, update = True):
+        headAgeValues = [0 for i in xrange(0, 3)]
+        
+        # remove previous
+        if previous < 0.0:
+          headAgeValues[1] += previous
+        elif previous > 0.0:
+          headAgeValues[2] -= previous
+            
+        # add next
+        if next < 0.0:
+          headAgeValues[1] -= next
+        elif next > 0.0:
+          headAgeValues[2] += next
+          
+        self.applyHeadAgeTargets(headAgeValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.headVertices, self.headFaces)
+        if update:
+          self.meshData.update(self.headVertices)
+
+    def applyHeadAgeTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 3):
+            detailTargets['data/targets/details/male-young-head-age%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-child-head-age%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-old-head-age%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/female-young-head-age%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-child-head-age%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-old-head-age%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
     def updatePelvisTone(self, previous, next, recalcNormals = True, update = True):
         pelvisToneValues = [0 for i in xrange(0, 3)]
         
@@ -1097,6 +1142,15 @@ class Human(gui3d.Object):
             headValues[i + 1] = value
 
         self.applyHeadTargets(headValues)
+        
+        # There are two head age targets, 1 and 2
+        headAgeValues = [0 for i in xrange(0, 3)]
+        if self.headAge < 0.0:
+          headAgeValues[1] = -self.headAge
+        elif self.headAge > 0.0:
+          headAgeValues[2] = self.headAge
+          
+        self.applyHeadAgeTargets(headAgeValues)
         
         # There are two pelvis targets, 1 and 2
         pelvisToneValues = [0 for i in xrange(0, 3)]
@@ -1449,6 +1503,7 @@ class Human(gui3d.Object):
         self.mouth = 0.0
         self.eyes = 0.0
         self.head = 0.0
+        self.headAge = 0.0
         self.pelvisTone = 0.0
 
         self.activeEthnicSets = {}
@@ -1495,6 +1550,8 @@ class Human(gui3d.Object):
                     self.setEyes(float(lineData[1]))
                 elif lineData[0] == 'head':
                     self.setHead(float(lineData[1]))
+                elif lineData[0] == 'headAge':
+                    self.setHeadAge(float(lineData[1]))
                 elif lineData[0] == 'pelvisTone':
                     self.setPelvisTone(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
@@ -1529,6 +1586,7 @@ class Human(gui3d.Object):
         f.write('mouth %f\n' % self.getMouth())
         f.write('eyes %f\n' % self.getEyes())
         f.write('head %f\n' % self.getHead())
+        f.write('headAge %f\n' % self.getHeadAge())
         f.write('pelvisTone %f\n' % self.getPelvisTone())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
