@@ -34,14 +34,22 @@ splitLeftRight = True
 #
 def exportMhx(obj, filename):	
 	(name, ext) = os.path.splitext(filename)
-
+	'''
 	filename = name+"-24"+ext
 	print("Writing MHX 2.4x file " + filename )
 	fp = open(filename, 'w')
 	exportMhx_24(obj, fp)
 	fp.close()
 	print("MHX 2.4x file %s written" % filename)
+	'''
+	filename = name+"-25"+ext
+	print("Writing MHX 2.5x file " + filename )
+	fp = open(filename, 'w')
+	exportMhx_25(obj, "rig", fp)
+	fp.close()
+	print("MHX 2.5x file %s written" % filename)
 
+	'''
 	filename = name+"-classic-25"+ext
 	print("Writing MHX 2.5x file " + filename )
 	fp = open(filename, 'w')
@@ -56,7 +64,6 @@ def exportMhx(obj, filename):
 	fp.close()
 	print("MHX 2.5x file %s written" % filename)
 
-	'''
 	filename = name+"-sintel-25"+ext
 	print("Writing MHX 2.5x file " + filename )
 	fp = open(filename, 'w')
@@ -120,6 +127,8 @@ def exportRawMhx(obj, fp):
 #
 
 def exportMhx_25(obj, rig, fp):
+	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
+
 	if rig == 'gobo':
 		mhx_rig.newSetupJoints(obj, gobo_bones.GoboJoints +  classic_bones.FaceJoints +  classic_bones.PanelJoints, 
 			gobo_bones.GoboHeadsTails + classic_bones.FaceHeadsTails + classic_bones.PanelHeadsTails)
@@ -131,8 +140,9 @@ def exportMhx_25(obj, rig, fp):
 		mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints +  classic_bones.FaceJoints +  classic_bones.PanelJoints,
 			classic_bones.ClassicHeadsTails + classic_bones.FaceHeadsTails + classic_bones.PanelHeadsTails)
 		#mhxbones.setupBones(obj)
+	elif rig == 'rig':
+		mhx_rig.setupRig(obj)
 
-	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
 	fp.write("if toggle&T_Armature\n")
 	copyFile25(obj, "data/templates/common-armature25.mhx", rig, fp)	
 	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp)	
@@ -191,6 +201,14 @@ def copyFile25(obj, tmplName, rig, fp):
 			elif lineSplit[1] == 'roll':
 				(x, y) = mhxbones.boneRoll[bone]
 				fp.write("    roll %.6g ;\n" % (y))
+			elif lineSplit[1] == 'rig-bones':
+				mhx_rig.writeAllArmatures(fp)
+			elif lineSplit[1] == 'rig-poses':
+				mhx_rig.writeAllPoses(fp)
+			elif lineSplit[1] == 'rig-actions':
+				mhx_rig.writeAllActions(fp)
+			elif lineSplit[1] == 'rig-drivers':
+				mhx_rig.writeAllDrivers(fp)
 			elif lineSplit[1] == 'classic-bones':
 				mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.FaceArmature + classic_bones.PanelArmature, True)
 			elif lineSplit[1] == 'classic-poses':
@@ -256,7 +274,12 @@ def copyFile25(obj, tmplName, rig, fp):
 						fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 					fp.write(" ;\n")
 			elif lineSplit[1] == 'VertexGroup':
-				if rig == 'classic':
+				if rig == 'rig':
+					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
+					copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
+					copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	
+					copyProxy("data/templates/vertexgroups-foot25.mhx", fp, proxyVerts)
+				elif rig == 'classic':
 					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
 					copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
 					copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	

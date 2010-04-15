@@ -36,9 +36,9 @@ TexDir = "~/makehuman/exports"
 import bpy
 import os
 import time
-import Mathutils
-from Mathutils import *
-import Geometry
+import mathutils
+from mathutils import *
+import geometry
 import string
 
 MAJOR_VERSION = 0
@@ -48,7 +48,7 @@ Blender24 = False
 Blender25 = True
 
 #
-#	Button flags
+#	toggle flags
 #
 
 T_ArmIK = 0x01
@@ -62,12 +62,48 @@ T_Shape = 0x80
 T_Mesh = 0x100
 T_Armature = 0x200
 T_Proxy = 0x400
+T_Panel = 0x800
 
 T_Rigify = 0x1000
 T_Symm = 0x4000
 T_MHX = 0x8000
+
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_FingerIK 
 
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_FingerIK
+#
+#	Global floats
+#
+
+fElbowIK = 0.0
+fKneeIK = 0.0
+fFingerCurl = 0.0
+
+#
+#	rigLeg flags
+#
+
+T_Toes = 0x0001
+T_GoboFoot = 0x0002
+T_InvFoot = 0x0004
+T_KneeIK = 0x0008
+T_KneePT = 0x0010
+
+rigLeg = 0
+
+#
+#	rigArm flags
+#
+
+T_LocalFKIK = 0x0001
+T_FingerCurl = 0x0002
+T_ElbowIK = 0x0008
+T_ElbowPT = 0x0010
+
+rigArm = 0
+
+#
+#
+#
 
 theScale = 1.0
 useMesh = 1
@@ -174,11 +210,11 @@ def loadMhx(filePath, context, flags):
 	return
 
 #
-#	readMhxFile(filePath):
+#	readMhxFile(filePath, rigtype):
 #
 
-def readMhxFile(filePath):
-	global todo, nErrors
+def readMhxFile(filePath, rigtype):
+	global todo, nErrors, toggle, rigLeg, rigArm
 	
 	fileName = os.path.expanduser(filePath)
 	(shortName, ext) = os.path.splitext(fileName)
@@ -194,6 +230,24 @@ def readMhxFile(filePath):
 	key = "toplevel"
 	level = 0
 	nErrors = 0
+
+	# Rigtypes. Finer control will be available later
+	if rigtype == 'Gobo':
+		rigLeg = T_KneePT + T_GoboFoot
+		rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
+		toggle &= ~T_Panel
+	elif rigtype == 'Classic':
+		rigLeg = T_Toes + T_KneeIK + T_InvFoot
+		rigArm = T_ElbowIK + T_FingerIK
+		toggle |= T_Panel
+	else:
+		raise NameError("Unknown rigtype " + rigtype)
+		
+	# Global float variables, used as influences
+	global fElbowIK, fKneeIK, fFingerCurl
+	if rigArm&T_ElbowIK: fElbowIK = 1.0
+	if rigLeg&T_KneeIK: fKneeIK = 1.0
+	if rigArm&T_FingerCurl: fFingerCurl = 1.0
 
 	file= open(fileName, "rU")
 	print( "Tokenizing" )
@@ -276,8 +330,10 @@ def getObject(name, var, glbals, lcals):
 #	parse(tokens):
 #
 
+ifResult = False
+
 def parse(tokens):
-	global warnedVersion, MHX249
+	global warnedVersion, MHX249, ifResult
 	
 	for (key, val, sub) in tokens:	
 		# print("Parse %s" % key)
@@ -293,11 +349,25 @@ def parse(tokens):
 
 		elif key == 'if':
 			try:
-				res = eval(val[0])
+				ifResult = eval(val[0])
 			except:
-				res = False
-			if res:
+				ifResult = False
+			if ifResult:
 				parse(sub)
+				
+		elif key == 'elif':
+			if not ifResult:
+				try:
+					ifResult = eval(val[0])
+				except:
+					ifResult = False
+				if ifResult:
+					parse(sub)
+		
+		elif key == 'else':
+			if not ifResult:
+				parse(sub)
+		
 
 		elif MHX249:
 			pass
@@ -383,6 +453,10 @@ def concatList(elts):
 #
 
 def parseAction(args, tokens):
+	name = args[0]
+	if invalid(args[1]):
+		return
+
 	ob = bpy.context.object
 	bpy.ops.object.mode_set(mode='POSE')
 	if ob.animation_data:
@@ -392,7 +466,6 @@ def parseAction(args, tokens):
 		if key == 'FCurve':
 			prepareActionFCurve(ob, created, val, sub)
 		
-	name = args[0]
 	act = ob.animation_data.action
 	loadedData['Action'][name] = act
 	if act == None:
@@ -1126,6 +1199,13 @@ def parseVertexGroup(ob, me, args, tokens):
 	if verbosity > 2:
 		print( "Parsing vertgroup %s" % args )
 	grpName = args[0]
+	try:
+		res = eval(args[1])
+	except:
+		res = True
+	if not res:
+		return
+
 	if (toggle & T_Armature) or (grpName in ['Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'Middle', 'Right', 'Scalp']):
 		group = ob.add_vertex_group(grpName)
 		group.name = grpName
@@ -1133,6 +1213,7 @@ def parseVertexGroup(ob, me, args, tokens):
 		for (key, val, sub) in tokens:
 			if key == 'wv':
 				ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
+	return
 
 
 #
@@ -1152,6 +1233,9 @@ def parseShapeKey(ob, me, args, tokens):
 		print( "Parsing ob %s shape %s" % (bpy.context.object, args[0] ))
 	name = args[0]
 	lr = args[1]
+	if invalid(args[2]):
+		return
+
 	if lr == 'Sym' or toggle & T_Symm:
 		addShapeKey(ob, name, None, tokens)
 	elif lr == 'LR':
@@ -1217,9 +1301,10 @@ def parseArmature (args, tokens):
 	for (key, val, sub) in tokens:
 		if key == 'Bone':
 			bname = val[0]
-			bone = amt.edit_bones.new(bname)
-			parseBone(bone, amt.edit_bones, sub, heads, tails)
-			loadedData['Bone'][bname] = bone
+			if not invalid(val[1]):
+				bone = amt.edit_bones.new(bname)
+				parseBone(bone, amt.edit_bones, sub, heads, tails)
+				loadedData['Bone'][bname] = bone
 		else:
 			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
 	bpy.ops.object.mode_set(mode='OBJECT')
@@ -1307,101 +1392,6 @@ def parseBone(bone, bones, tokens, heads, tails):
 	return bone
 
 #
-#	postProcess()
-#
-
-def postProcess():
-	if not toggle & T_MHX:
-		return
-	if toggle & T_Rigify:
-		return
-		for rig in loadedData['Rigify'].values():
-			bpy.context.scene.objects.active = rig
-			print("Rigify", rig)
-			bpy.ops.pose.metarig_generate()
-			print("Metarig generated")
-			#bpy.context.scene.objects.unlink(rig)
-			rig = bpy.context.scene.objects.active
-			print("Rigged", rig, bpy.context.object)
-			ob = loadedData['Object']['Human']
-			mod = ob.modifiers[0]
-			print(ob, mod, mod.object)
-			mod.object = rig
-			print("Rig changed", mod.object)
-			
-
-	elif toggle & T_Armature:
-		fingerBones = []
-		fingerBonesIK = []
-		fingerBonesFK = []
-		for i in range(1,6):
-			for j in range(1,4):
-				fingerBones.extend(['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)])
-				fingerBonesIK.extend(['Finger-%d-%d_ik_L' % (i,j), 'Finger-%d-%d_ik_R' % (i,j)])
-				fingerBonesFK.extend(['Finger-%d-%d_fk_L' % (i,j), 'Finger-%d-%d_fk_R' % (i,j)])
-
-		armBones = ['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R']
-		if toggle & T_ArmIK:
-			setInfluence(armBones+fingerBones, 'CopyRotIK', 1.0)
-			setInfluence(armBones+fingerBones, 'CopyRotFK', 0.0)
-			setInfluence(armBones, 'Const', 1.0)
-		else:
-			setInfluence(armBones+fingerBones, 'CopyRotIK', 0.0)
-			setInfluence(armBones+fingerBones, 'CopyRotFK', 1.0)
-			setInfluence(armBones, 'Const', 0.0)
-
-		legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
-		if toggle & T_LegIK:
-			setInfluence(legBones, 'CopyRotIK', 1.0)
-			setInfluence(legBones, 'IK', 1.0)
-			setInfluence(legBones, 'CopyRotFK', 0.0)
-			setInfluence(legBones, 'Const', 1.0)
-		else:
-			setInfluence(legBones, 'CopyRotIK', 0.0)
-			setInfluence(legBones, 'IK', 0.0)
-			setInfluence(legBones, 'CopyRotFK', 1.0)
-			setInfluence(legBones, 'Const', 0.0)
-
-		if toggle & T_FingerIK:
-			setInfluence(fingerBones, 'IK', 1.0)
-			setInfluence(fingerBonesIK, 'Action', 1.0)
-			setInfluence(fingerBonesFK, 'Action', 1.0)
-		else:
-			setInfluence(fingerBones, 'IK', 0.0)
-			setInfluence(fingerBonesIK, 'Action', 0.0)
-			setInfluence(fingerBonesFK, 'Action', 0.0)
-
-	try:
-		ob = loadedData['Object']['HumanProxy']
-		bpy.context.scene.objects.active = ob
-		bpy.ops.object.mode_set(mode='EDIT')
-		bpy.ops.mesh.normals_make_consistent(inside=False)
-		bpy.ops.object.mode_set(mode='OBJECT')
-	except:
-		pass
-
-	return
-
-def setInfluence(bones, cnsName, w):
-	ob = loadedData['Object']['HumanRig']
-	bpy.context.scene.objects.active = ob
-	bpy.ops.object.mode_set(mode='POSE')
-	pbones = ob.pose.bones	
-	for pb in pbones:
-		if pb.name in bones:
-			try:
-				cns = pb.constraints[cnsName]
-				cns.influence = w
-			except:
-				pass
-	bpy.ops.object.mode_set(mode='OBJECT')
-	return
-
-		
-	
-
-
-#
 #	parsePose (args, tokens):
 #
 
@@ -1448,6 +1438,8 @@ def parseBoneGroup(pose, nGrps, args, tokens):
 def parsePoseBone(pbones, args, tokens):
 	global todo
 	#print( "Parsing posebone %s" % args )
+	if invalid(args[1]):
+		return
 	name = args[0]
 	pb = pbones[name]
 	for (key, val, sub) in tokens:
@@ -1658,6 +1650,101 @@ def parseGroupObjects(args, tokens, grp):
 	return
 
 #
+#	postProcess()
+#	setInfluence(bones, cnsName, w):
+#
+
+def postProcess():
+	if not toggle & T_MHX:
+		return
+	if toggle & T_Rigify:
+		return
+		for rig in loadedData['Rigify'].values():
+			bpy.context.scene.objects.active = rig
+			print("Rigify", rig)
+			bpy.ops.pose.metarig_generate()
+			print("Metarig generated")
+			#bpy.context.scene.objects.unlink(rig)
+			rig = bpy.context.scene.objects.active
+			print("Rigged", rig, bpy.context.object)
+			ob = loadedData['Object']['Human']
+			mod = ob.modifiers[0]
+			print(ob, mod, mod.object)
+			mod.object = rig
+			print("Rig changed", mod.object)
+			
+
+	elif toggle & T_Armature:
+		fingerBones = []
+		fingerBonesIK = []
+		fingerBonesFK = []
+		for i in range(1,6):
+			for j in range(1,4):
+				fingerBones.extend(['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)])
+				fingerBonesIK.extend(['Finger-%d-%d_ik_L' % (i,j), 'Finger-%d-%d_ik_R' % (i,j)])
+				fingerBonesFK.extend(['Finger-%d-%d_fk_L' % (i,j), 'Finger-%d-%d_fk_R' % (i,j)])
+
+		armBones = ['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R']
+		if toggle & T_ArmIK:
+			setInfluence(armBones+fingerBones, 'CopyRotIK', 1.0)
+			setInfluence(armBones+fingerBones, 'CopyRotFK', 0.0)
+			setInfluence(armBones, 'Const', 1.0)
+		else:
+			setInfluence(armBones+fingerBones, 'CopyRotIK', 0.0)
+			setInfluence(armBones+fingerBones, 'CopyRotFK', 1.0)
+			setInfluence(armBones, 'Const', 0.0)
+
+		legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
+		if toggle & T_LegIK:
+			setInfluence(legBones, 'CopyRotIK', 1.0)
+			setInfluence(legBones, 'IK', 1.0)
+			setInfluence(legBones, 'CopyRotFK', 0.0)
+			setInfluence(legBones, 'Const', 1.0)
+		else:
+			setInfluence(legBones, 'CopyRotIK', 0.0)
+			setInfluence(legBones, 'IK', 0.0)
+			setInfluence(legBones, 'CopyRotFK', 1.0)
+			setInfluence(legBones, 'Const', 0.0)
+
+		if toggle & T_FingerIK:
+			setInfluence(fingerBones, 'IK', 1.0)
+			setInfluence(fingerBonesIK, 'Action', 1.0)
+			setInfluence(fingerBonesFK, 'Action', 1.0)
+		else:
+			setInfluence(fingerBones, 'IK', 0.0)
+			setInfluence(fingerBonesIK, 'Action', 0.0)
+			setInfluence(fingerBonesFK, 'Action', 0.0)
+
+	try:
+		ob = loadedData['Object']['HumanProxy']
+		bpy.context.scene.objects.active = ob
+		bpy.ops.object.mode_set(mode='EDIT')
+		bpy.ops.mesh.normals_make_consistent(inside=False)
+		bpy.ops.object.mode_set(mode='OBJECT')
+	except:
+		pass
+
+	return
+
+def setInfluence(bones, cnsName, w):
+	ob = loadedData['Object']['HumanRig']
+	bpy.context.scene.objects.active = ob
+	bpy.ops.object.mode_set(mode='POSE')
+	pbones = ob.pose.bones	
+	for pb in pbones:
+		#print("inf", pb.name, cnsName, w)
+		if pb.name in bones:
+			try:
+				cns = pb.constraints[cnsName]
+				cns.influence = w
+			except:
+				pass
+	bpy.ops.object.mode_set(mode='OBJECT')
+	return
+
+		
+	
+#
 #	defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 #
 
@@ -1842,6 +1929,21 @@ def Bool(string):
 	else:
 		raise NameError("Bool %s?" % string)
 		
+#
+#	invalid(condition):
+#
+
+def invalid(condition):
+	global rigLeg, rigArm, toggle
+	print("Invalid %s?" % condition)
+	res = eval(condition, globals())
+	try:
+		res = eval(condition, globals())
+		print("Res %s" % res)
+		return not res
+	except:
+		print("Invalid!")
+		return True
 	
 #
 #	clearScene(context):
@@ -1879,6 +1981,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
+	gobo = BoolProperty(name="Gobo rig", description="Gobo or classic rig?", default=True)
+
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	proxy = BoolProperty(name="Proxy", description="Use proxy object", default=toggle&T_Proxy)
@@ -1891,7 +1995,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
 	symm = BoolProperty(name="Symmetric shapes", description="Keep shapekeys symmetric", default=toggle&T_Symm)
-	
+		
 	def execute(self, context):
 		global toggle
 		O_Mesh = T_Mesh if self.properties.mesh else 0
@@ -1907,8 +2011,11 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs 
-		toggle |= O_Replace | O_Face | O_Shape | O_Symm | T_MHX
-		readMhxFile(self.properties.path)
+		toggle |= O_Replace | O_Face | O_Shape | O_Symm | T_MHX 
+		
+		S_Rigtype = "Gobo" if self.properties.gobo else "Classic"
+
+		readMhxFile(self.properties.path, S_Rigtype)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
@@ -1926,13 +2033,16 @@ bpy.types.INFO_MT_file_import.append(menu_func)
 """
 theScale = 1.0
 
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Proxy + T_Face + T_FingerIK + T_Armature + T_MHX
-readMhxFile("/home/thomas/makehuman/exports/foo-gobo-25.mhx")
+toggle = T_Replace + T_Mesh + T_Armature + T_MHX + T_ArmIK + T_LegIK
+#rigLeg = T_Toes + T_KneePT + T_GoboFoot
+#rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
+
+#readMhxFile("/home/thomas/makehuman/exports/foo-25.mhx")
 
 #toggle = T_Replace + T_Armature 
 #readMhxFile("/home/thomas/makehuman/exports/foo-sintel-25.mhx")
 
-#readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-classic-25.mhx")
+readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-25.mhx", 'Classic')
 #readMhxFile("/home/thomas/mhx5/test1.mhx")
 #readMhxFile("/home/thomas/myblends/gobo/gobo.mhx")
 #readMhxFile("/home/thomas/myblends/sintel/simple.mhx")

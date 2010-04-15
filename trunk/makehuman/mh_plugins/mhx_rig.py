@@ -76,7 +76,7 @@ C_LOCAL = 0x0020
 #	newSetupJoints (obj, joints, headTails):
 #
 def newSetupJoints (obj, joints, headTails):
-	global rigHead, rigTail
+	global rigHead, rigTail, locations
 	locations = {}
 	for (key, typ, data) in joints:
 		if typ == 'j':
@@ -125,11 +125,11 @@ def writeArmature(fp, armature, mhx25):
 	global Mhx25
 	Mhx25 = mhx25
 	if Mhx25:
-		for (bone, roll, parent, flags, layers, bbone) in armature:
-			addBone25(bone, roll, parent, flags, layers, bbone, fp)
+		for (bone, cond, roll, parent, flags, layers, bbone) in armature:
+			addBone25(bone, cond, roll, parent, flags, layers, bbone, fp)
 	else:
-		for (bone, roll, parent, flags, layers, bbone) in armature:
-			addBone24(bone, roll, parent, flags, layers, bbone, fp)
+		for (bone, cond, roll, parent, flags, layers, bbone) in armature:
+			addBone24(bone, cond, roll, parent, flags, layers, bbone, fp)
 	return
 
 def boolString(val):
@@ -138,7 +138,7 @@ def boolString(val):
 	else:
 		return "False"
 
-def addBone25(bone, roll, parent, flags, layers, bbone, fp):
+def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	global rigHead, rigTail
 
 	conn = boolString(flags & F_CON)
@@ -152,7 +152,7 @@ def addBone25(bone, roll, parent, flags, layers, bbone, fp):
 	cyc = boolString(flags & F_NOCYC == 0)
 	(bin, bout, bseg) = bbone
 
-	fp.write("\n  Bone %s \n" % (bone))
+	fp.write("\n  Bone %s %s\n" % (bone, cond))
 	(x, y, z) = rigHead[bone]
 	fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
 	(x, y, z) = rigTail[bone]
@@ -188,7 +188,7 @@ def addBone25(bone, roll, parent, flags, layers, bbone, fp):
 "    restrict_select %s ; \n" % (restr) +
 "  end Bone \n")
 
-def addBone24(bone, roll, parent, flags, layers, bbone, fp):
+def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 	global rigHead, rigTail
 
 	flags24 = 0
@@ -222,10 +222,10 @@ def writeBoneGroups(fp, groups):
 
 
 #
-#	addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
+#	addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 #
 
-def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
+def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 	global boneGroups, Mhx25
 
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
@@ -239,7 +239,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 	lkRotW = boolString(flags & P_LKROTW)
 
 	if Mhx25:
-		fp.write("\n  Posebone %s\n" % bone)
+		fp.write("\n  Posebone %s %s \n" % (bone, cond))
 	else:
 		# limitX = flags & 1
 		# limitY = (flags >> 1) & 1
@@ -341,6 +341,7 @@ def addIkConstraint(fp, flags, data):
 	chainlen = data[1]
 	pole = data[2]
 	(useLoc, useRot) = data[3]
+	inf = data[4]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -354,7 +355,7 @@ def addIkConstraint(fp, flags, data):
 "      axis_reference 'BONE' ;\n" +
 "      chain_length %d ;\n" % chainlen +
 "      ik_type 'COPY_POSE' ;\n" +
-"      influence 1 ;\n" +
+"      influence %s ;\n" % inf +
 "      iterations 500 ;\n" +
 "      limit_mode 'LIMITDIST_INSIDE' ;\n" +
 "      orient_weight 1 ;\n" +
@@ -396,8 +397,9 @@ def addActionConstraint(fp, flags, data):
 	channel = data[2]
 	(sframe, eframe) = data[3]
 	(amin, amax) = data[4]
+	inf = data[5]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
-
+	
 	fp.write(
 "    Constraint Action ACTION \n"+
 "      target Refer Object HumanRig ; \n"+
@@ -406,7 +408,7 @@ def addActionConstraint(fp, flags, data):
 "      expanded %s ;\n" % expanded +
 "      frame_start %s ; \n" % sframe +
 "      frame_end %d ; \n" % eframe+
-"      influence 1 ; \n"+
+"      influence %s ; \n" % inf +
 "      maximum %f ; \n" % amax +
 "      minimum %f ; \n" % amin +
 "      owner_space '%s' ; \n" % ownsp +
@@ -434,7 +436,7 @@ def addCopyRotConstraint(fp, flags, data):
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
 "      expanded %s ;\n" % expanded +
-"      influence %f ; \n" % inf +
+"      influence %s ; \n" % inf +
 "      owner_space '%s' ; \n" % ownsp+
 "      proxy_local False ; \n"+
 "      subtarget '%s' ;\n" % subtar +
@@ -469,7 +471,7 @@ def addCopyLocConstraint(fp, flags, data):
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
 "      expanded %s ;\n" % expanded +
-"      influence %f ; \n" % inf +
+"      influence %s ; \n" % inf +
 "      owner_space '%s' ; \n" % ownsp +
 "      proxy_local False ; \n"+
 "      subtarget '%s' ;\n" % subtar +
@@ -498,7 +500,7 @@ def addCopyScaleConstraint(fp, flags, data):
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
 "      expanded %s ;\n" % expanded +
-"      influence %f ;\n" % inf +
+"      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
@@ -519,7 +521,7 @@ def addCopyTransConstraint(fp, flags, data):
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
 "      expanded %s ;\n" % expanded +
-"      influence %f ;\n" % inf +
+"      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
@@ -708,13 +710,13 @@ def constraintFlags(flags):
 	return (ownsp, targsp, active, expanded)
 
 #
-#	writeAction(name, action, lr, ikfk, fp):
-#	writeFCurves(name, (x01, y01, z01, w01), (x21, y21, z21, w21), fp):
-#	writeFCurve(name, index, x01, x11, x21, fp):
+#	writeAction(fp, cond, name, action, lr, ikfk):
+#	writeFCurves(fp, name, (x01, y01, z01, w01), (x21, y21, z21, w21)):
+#	writeFCurve(fp, name, index, x01, x11, x21):
 #
 
-def writeAction(name, action, lr, ikfk, fp):
-	fp.write("Action %s\n" % name)
+def writeAction(fp, cond, name, action, lr, ikfk):
+	fp.write("Action %s %s\n" % (name,cond))
 	if ikfk:
 		iklist = ["IK", "FK"]
 	else:
@@ -722,23 +724,23 @@ def writeAction(name, action, lr, ikfk, fp):
 	if lr:
 		for (bone, (x01, y01, z01, w01), (x21, y21, z21, w21)) in action:
 			for ik in iklist:
-				writeFCurves("%s%s_L" % (bone, ik), (x01, y01, z01, w01), (x21, y21, z21, w21), fp)
-				writeFCurves("%s%s_R" % (bone, ik), (x21, y21, z21, -w21), (x01, y01, z01, -w01), fp)
+				writeFCurves(fp, "%s%s_L" % (bone, ik), (x01, y01, z01, w01), (x21, y21, z21, w21))
+				writeFCurves(fp, "%s%s_R" % (bone, ik), (x21, y21, z21, w21), (x01, y01, z01, w01))
 	else:
 		for (bone, quat01, quat21) in action:
 			for ik in iklist:
-				writeFCurves("%s%s" % (bone, ik), quat01, quat21, fp)
+				writeFCurves(fp, "%s%s" % (bone, ik), quat01, quat21)
 	fp.write("end Action\n\n")
 	return
 
-def writeFCurves(name, (x01, y01, z01, w01), (x21, y21, z21, w21), fp):
-	writeFCurve(name, 0, x01, 1.0, x21, fp)
-	writeFCurve(name, 1, y01, 0.0, y21, fp)
-	writeFCurve(name, 2, z01, 0.0, z21, fp)
-	writeFCurve(name, 3, w01, 0.0, w21, fp)
+def writeFCurves(fp, name, (x01, y01, z01, w01), (x21, y21, z21, w21)):
+	writeFCurve(fp, name, 0, x01, 1.0, x21)
+	writeFCurve(fp, name, 1, y01, 0.0, y21)
+	writeFCurve(fp, name, 2, z01, 0.0, z21)
+	writeFCurve(fp, name, 3, w01, 0.0, w21)
 	return
 
-def writeFCurve(name, index, x01, x11, x21, fp):
+def writeFCurve(fp, name, index, x01, x11, x21):
 	fp.write("\n" +
 "  FCurve pose.bones[\"%s\"].rotation_quaternion %d\n" % (name, index) +
 "    kp 1 %.6g ;\n" % (x01) +
@@ -749,11 +751,11 @@ def writeFCurve(name, index, x01, x11, x21, fp):
 	return
 
 #
-#	writeDrivers(fp, drivers):
+#	writeDrivers(fp, cond, drivers):
 #	writeDriver(fp, channel, index, expr, variables):
 #
 
-def writeDrivers(fp, drivers):
+def writeDrivers(fp, cond, drivers):
 	for (bone, typ, name, index, expr, variables) in drivers:
 		if typ == 'INFL':
 			writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, expr, variables)
@@ -789,5 +791,65 @@ def writeDriver(fp, channel, index, expr, variables):
 "      locked False ;\n" +
 "      selected True ;\n" +
 "    end FCurve\n")
+	return
+
+#
+#	setupRig(obj):
+#	writeAllArmatures(fp)	
+#	writeAllPoses(fp)	
+#	writeAllActions(fp)	
+#	writeAllDrivers(fp)	
+#
+import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
+
+def setupRig(obj):
+	newSetupJoints(obj, 
+		rig_body_25.BodyJoints +
+		rig_arm_25.ArmJoints +
+		rig_finger_25.FingerJoints +
+		rig_leg_25.LegJoints +
+		rig_toe_25.ToeJoints +
+		rig_face_25.FaceJoints +
+		rig_panel_25.PanelJoints,
+		
+		rig_body_25.BodyHeadsTails +
+		rig_arm_25.ArmHeadsTails +
+		rig_finger_25.FingerHeadsTails +
+		rig_leg_25.LegHeadsTails +
+		rig_toe_25.ToeHeadsTails +
+		rig_face_25.FaceHeadsTails +
+		rig_panel_25.PanelHeadsTails)
+	return
+	
+def writeAllArmatures(fp):
+	writeArmature(fp, 
+		rig_body_25.BodyArmature +
+		rig_arm_25.ArmArmature +
+		rig_finger_25.FingerArmature +
+		rig_leg_25.LegArmature +
+		rig_toe_25.ToeArmature +
+		rig_face_25.FaceArmature +
+		rig_panel_25.PanelArmature, True)
+	return
+
+def writeAllPoses(fp):
+	rig_body_25.BodyWritePoses(fp)
+	rig_arm_25.ArmWritePoses(fp)
+	rig_finger_25.FingerWritePoses(fp)
+	rig_leg_25.LegWritePoses(fp)
+	rig_toe_25.ToeWritePoses(fp)
+	rig_face_25.FaceWritePoses(fp)
+	rig_panel_25.PanelWritePoses(fp)
+	return
+	
+def writeAllActions(fp):
+	rig_arm_25.ArmWriteActions(fp)
+	rig_leg_25.LegWriteActions(fp)
+	rig_finger_25.FingerWriteActions(fp)
+	return
+
+def writeAllDrivers(fp):
+	rig_arm_25.ArmWriteDrivers(fp)
+	rig_leg_25.LegWriteDrivers(fp)
 	return
 

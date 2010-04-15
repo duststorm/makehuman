@@ -1,4 +1,4 @@
-  VertexGroup Toe-1-1_L
+  VertexGroup Toe-1-1_L rigLeg&T_Toes
   wv 4003 0.005979 ;
   wv 4689 0.014287 ;
   wv 4690 0.019723 ;
@@ -197,7 +197,7 @@
   wv 14244 0.505231 ;
   wv 14246 0.991906 ;
   end VertexGroup
-  VertexGroup Toe-1-1_R
+  VertexGroup Toe-1-1_R  rigLeg&T_Toes
   wv 13121 0.012506 ;
   wv 13126 0.002623 ;
   wv 13127 0.01578 ;
@@ -396,7 +396,7 @@
   wv 14306 1 ;
   wv 14307 1 ;
   end VertexGroup
-  VertexGroup Toe-1-2_L
+  VertexGroup Toe-1-2_L  rigLeg&T_Toes
   wv 4702 0.004525 ;
   wv 4716 0.055133 ;
   wv 4717 0.159316 ;
@@ -545,7 +545,7 @@
   wv 14245 0.991962 ;
   wv 14246 7e-06 ;
   end VertexGroup
-  VertexGroup Toe-1-2_R
+  VertexGroup Toe-1-2_R  rigLeg&T_Toes
   wv 13138 0.005804 ;
   wv 13139 0.007888 ;
   wv 13164 0.003268 ;
@@ -688,7 +688,7 @@
   wv 14300 0.835544 ;
   wv 14301 0.832589 ;
   end VertexGroup
-  VertexGroup Toe-2-1_L
+  VertexGroup Toe-2-1_L  rigLeg&T_Toes
   wv 4699 0.019915 ;
   wv 4700 0.521478 ;
   wv 4701 0.548983 ;
@@ -895,7 +895,7 @@
   wv 14257 0.164114 ;
   wv 14258 0.292057 ;
   end VertexGroup
-  VertexGroup Toe-2-1_R
+  VertexGroup Toe-2-1_R  rigLeg&T_Toes
   wv 13121 0.111213 ;
   wv 13122 0.026242 ;
   wv 13123 0.00392 ;
@@ -1120,7 +1120,7 @@
   wv 14324 1 ;
   wv 14325 0.999999 ;
   end VertexGroup
-  VertexGroup Toe-2-2_L
+  VertexGroup Toe-2-2_L  rigLeg&T_Toes
   wv 4778 0.064325 ;
   wv 4841 0.000225 ;
   wv 4872 0.008452 ;
@@ -1265,7 +1265,7 @@
   wv 14233 0.123605 ;
   wv 14234 0.86954 ;
   end VertexGroup
-  VertexGroup Toe-2-2_R
+  VertexGroup Toe-2-2_R  rigLeg&T_Toes
   wv 13126 0.004349 ;
   wv 13127 0.008079 ;
   wv 13133 0.037008 ;
@@ -1423,7 +1423,7 @@
   wv 14318 0.863575 ;
   wv 14319 0.501652 ;
   end VertexGroup
-  VertexGroup Toe-2-3_L
+  VertexGroup Toe-2-3_L  rigLeg&T_Toes
   wv 4884 0.9467 ;
   wv 4885 0.496995 ;
   wv 5102 0.605782 ;
@@ -1537,7 +1537,7 @@
   wv 14233 0.869485 ;
   wv 14234 0.123547 ;
   end VertexGroup
-  VertexGroup Toe-2-3_R
+  VertexGroup Toe-2-3_R  rigLeg&T_Toes
   wv 13232 0.035042 ;
   wv 13233 0.088815 ;
   wv 13234 0.173827 ;
@@ -1658,7 +1658,7 @@
   wv 14312 0.836116 ;
   wv 14313 0.161111 ;
   end VertexGroup
-  VertexGroup Toe-3-1_L
+  VertexGroup Toe-3-1_L  rigLeg&T_Toes
   wv 4700 0.006907 ;
   wv 4701 0.171039 ;
   wv 4703 0.384368 ;
@@ -1821,7 +1821,7 @@
   wv 14263 0.255486 ;
   wv 14264 0.251899 ;
   end VertexGroup
-  VertexGroup Toe-3-1_R
+  VertexGroup Toe-3-1_R  rigLeg&T_Toes
   wv 13109 0.001308 ;
   wv 13115 0.002541 ;
   wv 13121 0.16178 ;
@@ -1940,7 +1940,7 @@
   wv 14336 0.506535 ;
   wv 14337 0.184684 ;
   end VertexGroup
-  VertexGroup Toe-3-2_L
+  VertexGroup Toe-3-2_L  rigLeg&T_Toes
   wv 4700 0.000194 ;
   wv 4701 0.084204 ;
   wv 4703 0.212476 ;
@@ -2146,7 +2146,7 @@
   wv 14257 0.262284 ;
   wv 14258 0.262894 ;
   end VertexGroup
-  VertexGroup Toe-3-2_R
+  VertexGroup Toe-3-2_R  rigLeg&T_Toes
   wv 13109 0.028644 ;
   wv 13112 0.504346 ;
   wv 13114 0.025224 ;
@@ -2367,7 +2367,7 @@
   wv 14330 0.153399 ;
   wv 14331 0.500456 ;
   end VertexGroup
-  VertexGroup Toe-3-3_L
+  VertexGroup Toe-3-3_L  rigLeg&T_Toes
   wv 4726 0.002312 ;
   wv 4727 0.081797 ;
   wv 4728 0.069972 ;
@@ -2501,7 +2501,7 @@
   wv 14215 0.746805 ;
   wv 14216 0.25335 ;
   end VertexGroup
-  VertexGroup Toe-3-3_R
+  VertexGroup Toe-3-3_R  rigLeg&T_Toes
   wv 13112 0.062515 ;
   wv 13122 0.085553 ;
   wv 13123 0.039255 ;
@@ -2648,7 +2648,7 @@
   wv 14330 0.846602 ;
   wv 14331 0.499543 ;
   end VertexGroup
-  VertexGroup Toe-4-1_L
+  VertexGroup Toe-4-1_L  rigLeg&T_Toes
   wv 4703 0.001416 ;
   wv 4704 0.115842 ;
   wv 4705 0.299366 ;
@@ -2806,7 +2806,7 @@
   wv 14269 0.087179 ;
   wv 14270 0.101796 ;
   end VertexGroup
-  VertexGroup Toe-4-1_R
+  VertexGroup Toe-4-1_R  rigLeg&T_Toes
   wv 13109 0.18143 ;
   wv 13110 0.063181 ;
   wv 13113 0.095115 ;
@@ -2964,7 +2964,7 @@
   wv 14348 0.999999 ;
   wv 14349 0.999999 ;
   end VertexGroup
-  VertexGroup Toe-4-2_L
+  VertexGroup Toe-4-2_L  rigLeg&T_Toes
   wv 4703 0.002664 ;
   wv 4704 0.122535 ;
   wv 4705 0.30375 ;
@@ -3161,7 +3161,7 @@
   wv 14263 0.49534 ;
   wv 14264 0.148367 ;
   end VertexGroup
-  VertexGroup Toe-4-2_R
+  VertexGroup Toe-4-2_R  rigLeg&T_Toes
   wv 13109 0.516356 ;
   wv 13110 0.556055 ;
   wv 13112 0.454987 ;
@@ -3405,7 +3405,7 @@
   wv 14342 0.149246 ;
   wv 14343 0.167242 ;
   end VertexGroup
-  VertexGroup Toe-4-3_L
+  VertexGroup Toe-4-3_L  rigLeg&T_Toes
   wv 4737 0.019278 ;
   wv 4738 0.016555 ;
   wv 4751 0.015955 ;
@@ -3548,7 +3548,7 @@
   wv 14203 0.672351 ;
   wv 14204 0.327842 ;
   end VertexGroup
-  VertexGroup Toe-4-3_R
+  VertexGroup Toe-4-3_R  rigLeg&T_Toes
   wv 13109 0.082903 ;
   wv 13110 0.298502 ;
   wv 13113 0.169196 ;
@@ -3709,7 +3709,7 @@
   wv 14342 0.850753 ;
   wv 14343 0.832758 ;
   end VertexGroup
-  VertexGroup Toe-5-1_L
+  VertexGroup Toe-5-1_L  rigLeg&T_Toes
   wv 4000 0.087102 ;
   wv 4001 0.094745 ;
   wv 4004 0.103624 ;
@@ -3900,7 +3900,7 @@
   wv 14269 0.414445 ;
   wv 14270 0.44476 ;
   end VertexGroup
-  VertexGroup Toe-5-1_R
+  VertexGroup Toe-5-1_R  rigLeg&T_Toes
   wv 13109 0.043992 ;
   wv 13110 0.002617 ;
   wv 13111 0.029056 ;
@@ -4084,7 +4084,7 @@
   wv 14360 1 ;
   wv 14361 0.999999 ;
   end VertexGroup
-  VertexGroup Toe-5-2_L
+  VertexGroup Toe-5-2_L  rigLeg&T_Toes
   wv 4705 0.013233 ;
   wv 4706 0.257816 ;
   wv 4737 0.023746 ;
@@ -4269,7 +4269,7 @@
   wv 14269 0.305979 ;
   wv 14270 0.326519 ;
   end VertexGroup
-  VertexGroup Toe-5-2_R
+  VertexGroup Toe-5-2_R  rigLeg&T_Toes
   wv 13109 0.051424 ;
   wv 13110 0.002036 ;
   wv 13111 0.598658 ;
@@ -4480,7 +4480,7 @@
   wv 14354 0.141001 ;
   wv 14355 0.834889 ;
   end VertexGroup
-  VertexGroup Toe-5-3_L
+  VertexGroup Toe-5-3_L  rigLeg&T_Toes
   wv 4740 0.013587 ;
   wv 4741 0.06371 ;
   wv 4742 0.051407 ;
@@ -4620,7 +4620,7 @@
   wv 14269 0.192396 ;
   wv 14270 0.126925 ;
   end VertexGroup
-  VertexGroup Toe-5-3_R
+  VertexGroup Toe-5-3_R  rigLeg&T_Toes  
   wv 13111 0.324485 ;
   wv 13177 0.860561 ;
   wv 13178 0.874999 ;

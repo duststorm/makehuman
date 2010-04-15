@@ -1,4 +1,4 @@
-  VertexGroup Toe_L
+  VertexGroup Toe_L rigLeg&T_Toes==0
   wv 12288 0.649369 ;
   wv 12289 0.741036 ;
   wv 12290 0.807552 ;
@@ -899,7 +899,7 @@
   wv 12286 0.499212 ;
   wv 12287 0.733314 ;
   end VertexGroup
-  VertexGroup Toe_R
+  VertexGroup Toe_R rigLeg&T_Toes==0
   wv 14336 0.506535 ;
   wv 14337 0.184684 ;
   wv 14338 0.912609 ;
