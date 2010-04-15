@@ -253,13 +253,13 @@ def gravitize(curve,gFactor,start=1):
     c = math.pow(2.0,-8.0+gFactor)
     p0  = curve[start][:]
     p1 = curve[len(curve)-1][:]
-    print "Debug: length =",length," len(curve)=", len(curve), "delta= ", delta
+    #print "Debug: length =",length," len(curve)=", len(curve), "delta= ", delta
     interval = length/(len(curve)-start-1)
     for i in xrange(start+1, len(curve)):
         x=math.pow(interval*(i-start)/(4*c),1.0/3.0)
         curve[i] = in2pts(p0,p1,x/X)
         if delta < 3.0:
-            print "Debug: detected normal strand on the middle of the head"
+            #print "Debug: detected normal strand on the middle of the head"
             curve[i][1] = curve[i][1] - 0.005*math.pow(x,4)#curve[0][1] - (curve[i][1] - curve[0][1])
         else:
             curve[i][1] = curve[i][1] - c*math.pow(x,4)
