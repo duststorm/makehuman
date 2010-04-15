@@ -186,7 +186,7 @@ class Human(gui3d.Object):
         eyesNames = [group.name for group in self.meshData.facesGroups if "eye" in group.name]
         self.eyesVertices, self.eyesFaces = self.meshData.getVerticesAndFacesForGroups(eyesNames)
         
-        headNames = [group.name for group in self.meshData.facesGroups if ("head" in group.name or "jaw" in group.name)]
+        headNames = [group.name for group in self.meshData.facesGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
         self.headVertices, self.headFaces = self.meshData.getVerticesAndFacesForGroups(headNames)
         
         pelvisNames = [group.name for group in self.meshData.facesGroups if "pelvis" in group.name]
