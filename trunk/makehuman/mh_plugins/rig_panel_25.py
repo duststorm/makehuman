@@ -204,18 +204,18 @@ def PanelWritePoses(fp):
 
 	# Leg FK ik
 	addPoseBone(fp, 'rigLeg&T_LocalFKIK', 'LegFkIk_L', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'rigLeg&T_LocalFKIK', 'LegFkIk_R', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 
 	# Arm FK/IK
 	addPoseBone(fp, 'rigArm&T_LocalFKIK', 'ArmFkIk_L', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'rigArm&T_LocalFKIK', 'ArmFkIk_R', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 	return
 
 

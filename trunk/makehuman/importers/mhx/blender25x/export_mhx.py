@@ -30,7 +30,7 @@ MHX importer for Blender 2.5
 '''
 
 import bpy
-import Mathutils
+import mathutils
 import os
 import types
 import array
@@ -422,18 +422,18 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
 			writeValue("[%d]" % n, elt, [], pad+"  ", depth+1, fp)
 			n += 1
 		fp.write("%send List\n" % pad)
-	elif typ == Mathutils.Vector:
+	elif typ == mathutils.Vector:
 		c = '('
 		fp.write("%s%s " % (pad, ext))
 		for elt in arg:
 			fp.write("%s%.6g" % (c,elt))
 			c = ','
 		fp.write(") ;\n")
-	elif typ == Mathutils.Euler:
+	elif typ == mathutils.Euler:
 		fp.write("%s%s (%.6g,%.6g,%.6g) ;\n" % (pad, ext, arg[0], arg[1], arg[2]))
-	elif typ == Mathutils.Quaternion:
+	elif typ == mathutils.Quaternion:
 		fp.write("%s%s (%.6g,%.6g,%.6g,%.6g) ;\n" % (pad, ext, arg[0], arg[1], arg[2], arg[3]))
-	elif typ == Mathutils.Matrix:
+	elif typ == mathutils.Matrix:
 		fp.write("%s%s Matrix\n" % (pad, ext))
 		n = len(arg)
 		for i in range(n):

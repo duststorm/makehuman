@@ -151,22 +151,22 @@ def ArmWritePoses(fp):
 		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.349066,0.785398), (True, True, True)])])
 
 	addPoseBone(fp, 'True', 'UpArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['ConstIK', 'UpArmIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['ConstFK', 'UpArmFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'LoArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['ConstIK', 'LoArmIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['ConstFK', 'LoArmFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'Hand_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'HandIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'HandFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['ConstIK', 'HandIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['ConstFK', 'HandFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'UpArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['LoArm_L', 1, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'LoArm_L', 1, None, (True, False), 1.0])])
 
 	addPoseBone(fp, 'True', 'LoArmTwist_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['Hand_L', 1, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'Hand_L', 1, None, (True, False), 1.0])])
 
 
 	#addPoseBone(fp, 'True', 'Clavicle_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
@@ -175,22 +175,22 @@ def ArmWritePoses(fp):
 		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.785398,0.349066), (True, True, True)])])
 
 	addPoseBone(fp, 'True', 'UpArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['ConstIK', 'UpArmIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['ConstFK', 'UpArmFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'LoArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['ConstIK', 'LoArmIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['ConstFK', 'LoArmFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'Hand_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'HandIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'HandFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['ConstIK', 'HandIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['ConstFK', 'HandFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'UpArmTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['LoArm_R', 1, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'LoArm_R', 1, None, (True, False), 1.0])])
 
 	addPoseBone(fp, 'True', 'LoArmTwist_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['Hand_R', 1, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'Hand_R', 1, None, (True, False), 1.0])])
 
 
 	# FK
@@ -217,10 +217,10 @@ def ArmWritePoses(fp):
 		[('LimitDist', 0, ['Const', 'Clavicle_R'])])
 
 	addPoseBone(fp, 'True', 'UpArmIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['ElbowIK_L', 1, None, (True, False), 'fElbowIK'])])
+		[('IK', 0, ['IK', 'ElbowIK_L', 1, None, (True, False), 'fElbowIK'])])
 
 	addPoseBone(fp, 'True', 'UpArmIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['ElbowIK_R', 1, None, (True, False), 'fElbowIK'])])
+		[('IK', 0, ['IK', 'ElbowIK_R', 1, None, (True, False), 'fElbowIK'])])
 
 
 	# IK Elbow uparm ik
@@ -232,19 +232,19 @@ def ArmWritePoses(fp):
 		[('LimitDist', 0, ['Const', 'Clavicle_R'])])
 
 	addPoseBone(fp, 'rigArm&T_ElbowPT==0', 'LoArmIK_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['HandIK_L', 2, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'HandIK_L', 2, None, (True, False), 1.0])])
 
 	addPoseBone(fp, 'rigArm&T_ElbowPT==0', 'LoArmIK_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['HandIK_R', 2, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'HandIK_R', 2, None, (True, False), 1.0])])
 
 
 	# IK Elbow pole target
 
 	addPoseBone(fp, 'rigArm&T_ElbowPT', 'LoArmIK_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['HandIK_L', 2, (-1.5708, 'ElbowPT_L'), (True, False), 1.0])])
+		[('IK', 0, ['IK', 'HandIK_L', 2, (-1.5708, 'ElbowPT_L'), (True, False), 1.0])])
 
 	addPoseBone(fp, 'rigArm&T_ElbowPT', 'LoArmIK_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['HandIK_R', 2, (-1.5708, 'ElbowPT_R'), (True, False), 1.0])])
+		[('IK', 0, ['IK', 'HandIK_R', 2, (-1.5708, 'ElbowPT_R'), (True, False), 1.0])])
 
 	addPoseBone(fp, 'rigArm&T_ElbowPT', 'ElbowPT_L', 'GoboCircle', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
@@ -270,19 +270,17 @@ def ArmWriteActions(fp):
 	return
 
 #
-#	ArmWriteDrivers(fp):
+#	ArmDrivers
+#	(Bone, FK constraint, IK constraint, driver)
 #
 
 ArmDrivers = [
-	("UpArm_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
-	("LoArm_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
-	("Hand_L", "CopyRotFK", "CopyRotIK", "PArmIK_L"),
-	("UpArm_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
-	("LoArm_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
-	("Hand_R", "CopyRotFK", "CopyRotIK", "PArmIK_R"),
+	("UpArm_L", "ConstFK", "ConstIK", "PArmIK_L"),
+	("LoArm_L", "ConstFK", "ConstIK", "PArmIK_L"),
+	("Hand_L", "ConstFK", "ConstIK", "PArmIK_L"),
+	("UpArm_R", "ConstFK", "ConstIK", "PArmIK_R"),
+	("LoArm_R", "ConstFK", "ConstIK", "PArmIK_R"),
+	("Hand_R", "ConstFK", "ConstIK", "PArmIK_R"),
 ]
-
-def ArmWriteDrivers(fp):
-	return
-	
+	
 

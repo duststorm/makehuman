@@ -337,16 +337,17 @@ def getSpace(flags, mask):
 
 def addIkConstraint(fp, flags, data):
 	global Mhx25
-	subtar = data[0]
-	chainlen = data[1]
-	pole = data[2]
-	(useLoc, useRot) = data[3]
-	inf = data[4]
+	name = data[0]
+	subtar = data[1]
+	chainlen = data[2]
+	pole = data[3]
+	(useLoc, useRot) = data[4]
+	inf = data[5]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
 		fp.write(
-"    Constraint IK IK\n" +
+"    Constraint %s IK\n" % name +
 "      target Refer Object HumanRig ;\n" +
 "      pos_lock Array 1 1 1  ;\n" +
 "      rot_lock Array 1 1 1  ;\n" +
@@ -381,7 +382,7 @@ def addIkConstraint(fp, flags, data):
 "    end Constraint\n")
 
 	else:
-		fp.write("\t\tconstraint IKSOLVER Const 1.0 \n")
+		fp.write("\t\tconstraint IKSOLVER %s 1.0 \n" % name)
 		fp.write(
 "\t\t\tCHAINLEN	int %d ; \n" % chainlen +
 "\t\t\tTARGET	obj HumanRig ; \n" +
@@ -392,16 +393,17 @@ def addIkConstraint(fp, flags, data):
 
 def addActionConstraint(fp, flags, data):
 	global Mhx25
-	action = data[0]
-	subtar = data[1]
-	channel = data[2]
-	(sframe, eframe) = data[3]
-	(amin, amax) = data[4]
-	inf = data[5]
+	name = data[0]
+	action = data[1]
+	subtar = data[2]
+	channel = data[3]
+	(sframe, eframe) = data[4]
+	(amin, amax) = data[5]
+	inf = data[6]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 	
 	fp.write(
-"    Constraint Action ACTION \n"+
+"    Constraint %s ACTION \n" % name +
 "      target Refer Object HumanRig ; \n"+
 "      action Refer Action %s ; \n" % action+
 "      active %s ;\n" % active +
@@ -751,9 +753,17 @@ def writeFCurve(fp, name, index, x01, x11, x21):
 	return
 
 #
+#	writeFkIkSwitch(fp, drivers)
 #	writeDrivers(fp, cond, drivers):
 #	writeDriver(fp, channel, index, expr, variables):
 #
+
+def writeFkIkSwitch(fp, drivers):
+	for (bone, cnsFK, cnsIK, targ) in drivers:
+		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, "1-ik",
+			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
+		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, "ik", 
+			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
 
 def writeDrivers(fp, cond, drivers):
 	for (bone, typ, name, index, expr, variables) in drivers:
@@ -849,7 +859,7 @@ def writeAllActions(fp):
 	return
 
 def writeAllDrivers(fp):
-	rig_arm_25.ArmWriteDrivers(fp)
-	rig_leg_25.LegWriteDrivers(fp)
+	writeFkIkSwitch(fp, rig_arm_25.ArmDrivers)
+	writeFkIkSwitch(fp, rig_leg_25.LegDrivers)
 	return
 

@@ -81,12 +81,13 @@ T_Proxy = 0x400
 T_Panel = 0x800
 
 T_Rigify = 0x1000
+T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature
 
 #
-#	setFlagsAndFloats(rigtype):
+#	setFlagsAndFloats(rigFlags):
 #
 #	Global floats
 fElbowIK = 0.0
@@ -96,37 +97,50 @@ fArmIK = 0.0
 fFingerIK = 0.0
 fFingerCurl = 0.0
 
-#	rigLeg flags
+#	rigLeg and rigArm flags
 T_Toes = 0x0001
 T_GoboFoot = 0x0002
 T_InvFoot = 0x0004
 T_KneeIK = 0x0008
 T_KneePT = 0x0010
 
+T_FingerCurl = 0x0100
+T_FingerIK = 0x0200
+T_ElbowIK = 0x0400
+T_ElbowPT = 0x0800
+
+T_LocalFKIK = 0x8000
+
 rigLeg = 0
-
-#	rigArm flags
-T_LocalFKIK = 0x0001
-T_FingerCurl = 0x0002
-T_FingerIK = 0x0004
-T_ElbowIK = 0x0008
-T_ElbowPT = 0x0010
-
 rigArm = 0
 
-def setFlagsAndFloats(rigtype):
+def setFlagsAndFloats(rigFlags):
 	global toggle, rigLeg, rigArm
-	# Rigtypes. Finer control will be available later
-	if rigtype == 'Gobo':
-		rigLeg = T_KneePT + T_GoboFoot + T_LocalFKIK
-		rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
-		toggle &= ~T_Panel
-	elif rigtype == 'Classic':
-		rigLeg = T_Toes + T_KneeIK + T_InvFoot
-		rigArm = T_ElbowIK + T_FingerIK
-		toggle |= T_Panel
+
+	(presetRig, footRig, kneeRig, elbowRig, fingerRig) = rigFlags
+	rigLeg = 0
+	rigArm = 0
+	if toggle & T_Preset:
+		if presetRig == 'Gobo':
+			rigLeg = T_KneePT + T_GoboFoot + T_LocalFKIK
+			rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
+			toggle &= ~T_Panel
+		elif presetRig == 'Classic':
+			rigLeg = T_Toes + T_KneeIK + T_InvFoot
+			rigArm = T_ElbowIK + T_FingerIK
+			toggle |= T_Panel
 	else:
-		raise NameError("Unknown rigtype " + rigtype)
+		if footRig == 'Inverse foot': rigLeg |= T_InvFoot
+		elif footRig == 'Gobo': rigLeg |= T_GoboFoot
+
+		if kneeRig == 'Pole target': rigLeg |= T_KneePT
+		elif kneeRig == 'Thigh IK': rigLeg |= T_KneeIK
+
+		if elbowRig == 'Pole target': rigArm |= T_ElbowPT
+		elif elbowRig == 'Uparm IK': rigArm |= T_ElbowIK
+
+		if fingerRig == 'IK': rigArm |= T_FingerIK
+		elif fingerRig == 'Curl': rigArm |= T_FingerCurl
 		
 	# Global floats, used as influences
 	global fElbowIK, fKneeIK, fFingerCurl, fLegIK, fArmIK, fFingerIK, fFingerCurl
@@ -230,10 +244,10 @@ def loadMhx(filePath, context, flags):
 	return
 
 #
-#	readMhxFile(filePath, rigtype):
+#	readMhxFile(filePath, rigFlags):
 #
 
-def readMhxFile(filePath, rigtype):
+def readMhxFile(filePath, rigFlags):
 	global todo, nErrors
 	
 	fileName = os.path.expanduser(filePath)
@@ -251,7 +265,7 @@ def readMhxFile(filePath, rigtype):
 	level = 0
 	nErrors = 0
 
-	setFlagsAndFloats(rigtype)
+	setFlagsAndFloats(rigFlags)
 
 	file= open(fileName, "rU")
 	print( "Tokenizing" )
@@ -632,11 +646,11 @@ def parseDriver(adata, dataPath, index, ob, args, tokens):
 		for n in range(len(words)-1):
 			expr += "." + words[n]
 		expr += ".driver_add('%s', index)" % channel
-		#print("expr", expr)
-
+	
+	#print("expr", expr)
 	fcu = eval(expr)
 	drv = fcu.driver
-	print("parseDriver", fcu, drv)
+	print("driver", fcu, drv)
 	for (key, val, sub) in tokens:
 		if key == 'DriverVariable':
 			var = parseDriverVariable(drv, ob, val, sub)
@@ -1874,10 +1888,10 @@ def invalid(condition):
 	res = eval(condition, globals())
 	try:
 		res = eval(condition, globals())
-		print("%s = %s" % (condition, res))
+		#print("%s = %s" % (condition, res))
 		return not res
 	except:
-		print("%s invalid!" % condition)
+		#print("%s invalid!" % condition)
 		return True
 	
 #
@@ -1916,7 +1930,17 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	gobo = BoolProperty(name="Gobo rig", description="Gobo or classic rig?", default=True)
+	preset = BoolProperty(name="Use rig preset", description="Use rig preset (Classic/Gobo)?", default=True)
+	presetRig = EnumProperty(name="Rig", description="Choose preset rig", 
+		items = [('Classic','Classic','Classic'), ('Gobo','Gobo','Gobo')], default = '1')
+	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
+		items = [('Inverse foot','Inverse foot','Inverse foot'), ('Gobo','Gobo','Gobo')], default = '1')
+	kneeRig = EnumProperty(name="Knee rig", description="Knee rig", 
+		items = [('Pole target','Pole target','Pole target'), ('Thigh IK','Thigh IK','Thigh IK'), ('None','None','None')], default = '1')
+	elbowRig = EnumProperty(name="Elbow rig", description="Elbow rig", 
+		items = [('Pole target','Pole target','Pole target'), ('Uparm IK','Uparm IK','Uparm IK'), ('None','None','None')], default = '1')
+	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
+		items = [('IK','IK','IK'), ('Curl','Curl','Curl')], default = '1')
 
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
@@ -1939,11 +1963,15 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
-		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_Replace | O_Face | O_Shape | O_Symm | T_MHX 
+		O_Preset = T_Preset if self.properties.symm else 0
+		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_Replace | O_Face | O_Shape | O_Symm | O_Preset | T_MHX 
 		
-		S_Rigtype = "Gobo" if self.properties.gobo else "Classic"
-
-		readMhxFile(self.properties.path, S_Rigtype)
+		readMhxFile(self.properties.path, 	
+			(self.properties.presetRig, 
+			self.properties.footRig, 
+			self.properties.kneeRig, 
+			self.properties.elbowRig, 
+			self.properties.fingerRig))
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
@@ -1951,9 +1979,11 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		wm.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
+
 bpy.types.register(IMPORT_OT_makehuman_mhx)
 menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 bpy.types.INFO_MT_file_import.append(menu_func)
+
 
 #
 #	Testing
