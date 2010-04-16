@@ -638,6 +638,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.eyesSlider.setValue(human.getEyes())
         self.headShapeSlider.setValue(human.getHead())
         self.headAgeSlider.setValue(human.getHeadAge())
+        self.faceAngleSlider.setValue(human.getFaceAngle())
         self.pelvisToneSlider.setValue(human.getPelvisTone())
 
 class MicroModelingTaskView(gui3d.TaskView):
