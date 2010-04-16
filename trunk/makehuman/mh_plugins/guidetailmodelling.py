@@ -507,6 +507,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'HeadAge', value, self.syncSliders))
             self.headAge = None
             
+        self.faceAngleSlider = gui3d.Slider(self, position=[650, 174, 9.2], value=0.0,min=-1.0,max=1.0,label="Face angle")
+            
+        self.faceAngle = None
+
+        @self.faceAngleSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.faceAngle == None:
+                    self.faceAngle = human.getFaceAngle()
+                human.updateFaceAngle(self.faceAngle, value, self.app.settings.realtimeNormalUpdates)
+                self.faceAngle = min(1.0, max(-1.0, value))
+
+        @self.faceAngleSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'FaceAngle', value, self.syncSliders))
+            self.faceAngle = None
+            
         self.pelvisToneSlider = gui3d.Slider(self, position=[650, 235, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone")
 
         self.pelvisTone = None

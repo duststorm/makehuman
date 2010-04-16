@@ -92,6 +92,7 @@ class Human(gui3d.Object):
         self.eyes = 0.0
         self.head = 0.0
         self.headAge = 0.0
+        self.faceAngle = 0.0
         self.pelvisTone = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
@@ -431,6 +432,12 @@ class Human(gui3d.Object):
 
     def getHeadAge(self):
        return self.headAge
+       
+    def setFaceAngle(self, value):
+        self.faceAngle = min(1.0, max(-1.0, value))
+
+    def getFaceAngle(self):
+       return self.faceAngle
        
     def setPelvisTone(self, value):
        self.pelvisTone = min(1.0, max(-1.0, value))
@@ -946,6 +953,39 @@ class Human(gui3d.Object):
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
                 
+    def updateFaceAngle(self, previous, next, recalcNormals = True, update = True):
+        faceAngleValues = [0 for i in xrange(0, 3)]
+        
+        # remove previous
+        if previous < 0.0:
+          faceAngleValues[1] += previous
+        elif previous > 0.0:
+          faceAngleValues[2] -= previous
+            
+        # add next
+        if next < 0.0:
+          faceAngleValues[1] -= next
+        elif next > 0.0:
+          faceAngleValues[2] += next
+          
+        self.applyFaceAngleTargets(faceAngleValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.headVertices, self.headFaces)
+        if update:
+          self.meshData.update(self.headVertices)
+
+    def applyFaceAngleTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 3):
+            detailTargets['data/targets/details/facial-angle%i.target'% i] = values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
     def updatePelvisTone(self, previous, next, recalcNormals = True, update = True):
         pelvisToneValues = [0 for i in xrange(0, 3)]
         
@@ -1151,6 +1191,15 @@ class Human(gui3d.Object):
           headAgeValues[2] = self.headAge
           
         self.applyHeadAgeTargets(headAgeValues)
+        
+        # There are face angle targets, 1 and 2
+        faceAngleValues = [0 for i in xrange(0, 3)]
+        if self.faceAngle < 0.0:
+          faceAngleValues[1] -= self.faceAngle
+        elif self.faceAngle > 0.0:
+          faceAngleValues[2] += self.faceAngle
+          
+        self.applyFaceAngleTargets(faceAngleValues)
         
         # There are two pelvis targets, 1 and 2
         pelvisToneValues = [0 for i in xrange(0, 3)]
@@ -1504,6 +1553,7 @@ class Human(gui3d.Object):
         self.eyes = 0.0
         self.head = 0.0
         self.headAge = 0.0
+        self.faceAngle = 0.0
         self.pelvisTone = 0.0
 
         self.activeEthnicSets = {}
@@ -1552,6 +1602,8 @@ class Human(gui3d.Object):
                     self.setHead(float(lineData[1]))
                 elif lineData[0] == 'headAge':
                     self.setHeadAge(float(lineData[1]))
+                elif lineData[0] == 'faceAngle':
+                    self.setFaceAngle(float(lineData[1]))
                 elif lineData[0] == 'pelvisTone':
                     self.setPelvisTone(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
@@ -1587,6 +1639,7 @@ class Human(gui3d.Object):
         f.write('eyes %f\n' % self.getEyes())
         f.write('head %f\n' % self.getHead())
         f.write('headAge %f\n' % self.getHeadAge())
+        f.write('faceAngle %f\n' % self.getFaceAngle())
         f.write('pelvisTone %f\n' % self.getPelvisTone())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
