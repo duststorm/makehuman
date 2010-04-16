@@ -17,11 +17,12 @@ BodyJoints = [
 	('r-toe-1-1',			'j', 'r-toe-1-1'),
 	('l-toe-1-1',			'j', 'l-toe-1-1'),
 	('mid-feet',			'l', ((0.5, 'l-toe-1-1'), (0.5, 'r-toe-1-1'))),
-	('Root_head',			'o', ('mid-feet', [0.0, 1.0, 0.0])),
-	('Root_tail',			'o', ('mid-feet', [0.0, -1.0, 0.0])),
+	('Root_head',			'o', ('mid-feet', [0,-0.3,0])),
+	('Root_tail',			'o', ('Root_head', [0,0,-1])),
+	#('Root_head',			'o', ('mid-feet', [0.0, 1.0, 0.0])),
+	#('Root_tail',			'o', ('mid-feet', [0.0, -1.0, 0.0])),
 	('Torso_head',			'o', ('pelvis', [0.0, 0.0, -3.0])),
 	('Hips_tail',			'o', ('pelvis', [0.0, -1.5, 0.0])),
-
 ]
 
 BodyHeadsTails = [
@@ -60,7 +61,7 @@ def BodyWritePoses(fp):
 	global boneGroups
 	boneGroups = {}
 
-	addPoseBone(fp, 'True', 'Root', 'MHCircle15', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'Root', 'GoboRoot', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'True', 'Torso', 'GoboHips', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 

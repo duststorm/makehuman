@@ -294,8 +294,8 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 "    ik_max Array 180 180 180 ;\n"+
 "    ik_min Array -180 -180 -180 ;\n")
 	'''
-	if boneGroup:
-		fp.write("    bone_group Refer BoneGroup %s ; \n" % (boneGroup))
+	#if boneGroup:
+	#	fp.write("    bone_group Refer BoneGroup %s ; \n" % (boneGroup))
 
 	if customShape:
 		fp.write("    custom_shape Refer Object %s ; \n" % customShape)

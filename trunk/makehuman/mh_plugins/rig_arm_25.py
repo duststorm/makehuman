@@ -151,16 +151,16 @@ def ArmWritePoses(fp):
 		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.349066,0.785398), (True, True, True)])])
 
 	addPoseBone(fp, 'True', 'UpArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'LoArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'Hand_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'HandIK_L', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'HandFK_L', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'HandIK_L', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'HandFK_L', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'UpArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('IK', 0, ['LoArm_L', 1, None, (True, False), 1.0])])
@@ -175,16 +175,16 @@ def ArmWritePoses(fp):
 		[('LimitRot', C_OWNER, ['LimitRot', (-0.785398,0.349066, 0,0, -0.785398,0.349066), (True, True, True)])])
 
 	addPoseBone(fp, 'True', 'UpArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'UpArmIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'UpArmFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'LoArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'LoArmIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'LoArmFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'Hand_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', 0, ['CopyRotIK', 'HandIK_R', 1, (1,1,1), (0,0,0)]),
-		('CopyRot', 0, ['CopyRotFK', 'HandFK_R', 0, (1,1,1), (0,0,0)])])
+		[('CopyRot', 0, ['CopyRotIK', 'HandIK_R', 'fArmIK', (1,1,1), (0,0,0)]),
+		('CopyRot', 0, ['CopyRotFK', 'HandFK_R', '1-fArmIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'UpArmTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('IK', 0, ['LoArm_R', 1, None, (True, False), 1.0])])

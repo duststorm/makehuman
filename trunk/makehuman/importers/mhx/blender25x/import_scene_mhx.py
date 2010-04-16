@@ -48,14 +48,30 @@ Blender24 = False
 Blender25 = True
 
 #
+#
+#
+
+theScale = 1.0
+useMesh = 1
+doSmash = 1
+verbosity = 2
+warnedTextureDir = False
+warnedVersion = False
+
+true = True
+false = False
+Epsilon = 1e-6
+nErrors = 0
+theTempDatum = None
+
+todo = []
+
+#
 #	toggle flags
 #
 
 T_ArmIK = 0x01
 T_LegIK = 0x02
-T_FKIK = 0x04
-T_FingerIK = 0x08
-T_DispObs = 0x10
 T_Replace = 0x20
 T_Face = 0x40
 T_Shape = 0x80
@@ -67,21 +83,20 @@ T_Panel = 0x800
 T_Rigify = 0x1000
 T_Symm = 0x4000
 T_MHX = 0x8000
-
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_FingerIK 
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature
 
+#
+#	setFlagsAndFloats(rigtype):
 #
 #	Global floats
-#
-
 fElbowIK = 0.0
 fKneeIK = 0.0
+fLegIK = 0.0
+fArmIK = 0.0
+fFingerIK = 0.0
 fFingerCurl = 0.0
 
-#
 #	rigLeg flags
-#
-
 T_Toes = 0x0001
 T_GoboFoot = 0x0002
 T_InvFoot = 0x0004
@@ -90,36 +105,41 @@ T_KneePT = 0x0010
 
 rigLeg = 0
 
-#
 #	rigArm flags
-#
-
 T_LocalFKIK = 0x0001
 T_FingerCurl = 0x0002
+T_FingerIK = 0x0004
 T_ElbowIK = 0x0008
 T_ElbowPT = 0x0010
 
 rigArm = 0
 
-#
-#
-#
+def setFlagsAndFloats(rigtype):
+	global toggle, rigLeg, rigArm
+	# Rigtypes. Finer control will be available later
+	if rigtype == 'Gobo':
+		rigLeg = T_KneePT + T_GoboFoot + T_LocalFKIK
+		rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
+		toggle &= ~T_Panel
+	elif rigtype == 'Classic':
+		rigLeg = T_Toes + T_KneeIK + T_InvFoot
+		rigArm = T_ElbowIK + T_FingerIK
+		toggle |= T_Panel
+	else:
+		raise NameError("Unknown rigtype " + rigtype)
+		
+	# Global floats, used as influences
+	global fElbowIK, fKneeIK, fFingerCurl, fLegIK, fArmIK, fFingerIK, fFingerCurl
 
-theScale = 1.0
-useMesh = 1
-doSmash = 1
-verbosity = 2
-warnedTextureDir = False
-warnedVersion = False
+	fElbowIK = 1.0 if rigArm&T_ElbowIK else 0.0
+	fKneeIK = 1.0 if rigLeg&T_KneeIK else 0.0
+	fFingerCurl = 1.0 if rigArm&T_FingerCurl else 0.0
+	fLegIK = 1.0 if toggle&T_LegIK else 0.0
+	fArmIK = 1.0 if toggle&T_ArmIK else 0.0
+	fFingerIK = 1.0 if rigArm&T_FingerIK else 0.0
+	fFingerCurl = 1.0 if rigArm&T_FingerCurl else 0.0
+	return
 
-
-true = True
-false = False
-Epsilon = 1e-6
-nErrors = 0
-theTempDatum = None
-
-todo = []
 
 #
 #	Dictionaries
@@ -214,7 +234,7 @@ def loadMhx(filePath, context, flags):
 #
 
 def readMhxFile(filePath, rigtype):
-	global todo, nErrors, toggle, rigLeg, rigArm
+	global todo, nErrors
 	
 	fileName = os.path.expanduser(filePath)
 	(shortName, ext) = os.path.splitext(fileName)
@@ -231,23 +251,7 @@ def readMhxFile(filePath, rigtype):
 	level = 0
 	nErrors = 0
 
-	# Rigtypes. Finer control will be available later
-	if rigtype == 'Gobo':
-		rigLeg = T_KneePT + T_GoboFoot
-		rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
-		toggle &= ~T_Panel
-	elif rigtype == 'Classic':
-		rigLeg = T_Toes + T_KneeIK + T_InvFoot
-		rigArm = T_ElbowIK + T_FingerIK
-		toggle |= T_Panel
-	else:
-		raise NameError("Unknown rigtype " + rigtype)
-		
-	# Global float variables, used as influences
-	global fElbowIK, fKneeIK, fFingerCurl
-	if rigArm&T_ElbowIK: fElbowIK = 1.0
-	if rigLeg&T_KneeIK: fKneeIK = 1.0
-	if rigArm&T_FingerCurl: fFingerCurl = 1.0
+	setFlagsAndFloats(rigtype)
 
 	file= open(fileName, "rU")
 	print( "Tokenizing" )
@@ -888,7 +892,8 @@ def parseObject(args, tokens):
 					layers[n] = True
 			bpy.ops.object.move_to_layer(layer=layers)
 			if layers != ob.layers:
-				print("not moved", list(ob.layers))
+				pass
+				# print("not moved", list(ob.layers))
 			
 		else:
 			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
@@ -1672,76 +1677,7 @@ def postProcess():
 			print(ob, mod, mod.object)
 			mod.object = rig
 			print("Rig changed", mod.object)
-			
-
-	elif toggle & T_Armature:
-		fingerBones = []
-		fingerBonesIK = []
-		fingerBonesFK = []
-		for i in range(1,6):
-			for j in range(1,4):
-				fingerBones.extend(['Finger-%d-%d_L' % (i,j), 'Finger-%d-%d_R' % (i,j)])
-				fingerBonesIK.extend(['Finger-%d-%d_ik_L' % (i,j), 'Finger-%d-%d_ik_R' % (i,j)])
-				fingerBonesFK.extend(['Finger-%d-%d_fk_L' % (i,j), 'Finger-%d-%d_fk_R' % (i,j)])
-
-		armBones = ['UpArm_L', 'LoArm_L', 'Hand_L', 'UpArm_R', 'LoArm_R', 'Hand_R']
-		if toggle & T_ArmIK:
-			setInfluence(armBones+fingerBones, 'CopyRotIK', 1.0)
-			setInfluence(armBones+fingerBones, 'CopyRotFK', 0.0)
-			setInfluence(armBones, 'Const', 1.0)
-		else:
-			setInfluence(armBones+fingerBones, 'CopyRotIK', 0.0)
-			setInfluence(armBones+fingerBones, 'CopyRotFK', 1.0)
-			setInfluence(armBones, 'Const', 0.0)
-
-		legBones = ['UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R']
-		if toggle & T_LegIK:
-			setInfluence(legBones, 'CopyRotIK', 1.0)
-			setInfluence(legBones, 'IK', 1.0)
-			setInfluence(legBones, 'CopyRotFK', 0.0)
-			setInfluence(legBones, 'Const', 1.0)
-		else:
-			setInfluence(legBones, 'CopyRotIK', 0.0)
-			setInfluence(legBones, 'IK', 0.0)
-			setInfluence(legBones, 'CopyRotFK', 1.0)
-			setInfluence(legBones, 'Const', 0.0)
-
-		if toggle & T_FingerIK:
-			setInfluence(fingerBones, 'IK', 1.0)
-			setInfluence(fingerBonesIK, 'Action', 1.0)
-			setInfluence(fingerBonesFK, 'Action', 1.0)
-		else:
-			setInfluence(fingerBones, 'IK', 0.0)
-			setInfluence(fingerBonesIK, 'Action', 0.0)
-			setInfluence(fingerBonesFK, 'Action', 0.0)
-
-	try:
-		ob = loadedData['Object']['HumanProxy']
-		bpy.context.scene.objects.active = ob
-		bpy.ops.object.mode_set(mode='EDIT')
-		bpy.ops.mesh.normals_make_consistent(inside=False)
-		bpy.ops.object.mode_set(mode='OBJECT')
-	except:
-		pass
-
-	return
-
-def setInfluence(bones, cnsName, w):
-	ob = loadedData['Object']['HumanRig']
-	bpy.context.scene.objects.active = ob
-	bpy.ops.object.mode_set(mode='POSE')
-	pbones = ob.pose.bones	
-	for pb in pbones:
-		#print("inf", pb.name, cnsName, w)
-		if pb.name in bones:
-			try:
-				cns = pb.constraints[cnsName]
-				cns.influence = w
-			except:
-				pass
-	bpy.ops.object.mode_set(mode='OBJECT')
-	return
-
+	return			
 		
 	
 #
@@ -1935,14 +1871,13 @@ def Bool(string):
 
 def invalid(condition):
 	global rigLeg, rigArm, toggle
-	print("Invalid %s?" % condition)
 	res = eval(condition, globals())
 	try:
 		res = eval(condition, globals())
-		print("Res %s" % res)
+		print("%s = %s" % (condition, res))
 		return not res
 	except:
-		print("Invalid!")
+		print("%s invalid!" % condition)
 		return True
 	
 #
@@ -1988,9 +1923,6 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	proxy = BoolProperty(name="Proxy", description="Use proxy object", default=toggle&T_Proxy)
 	armik = BoolProperty(name="Arm IK", description="Use arm IK", default=toggle&T_ArmIK)
 	legik = BoolProperty(name="Leg IK", description="Use leg IK", default=toggle&T_LegIK)
-	fkik = BoolProperty(name="FK/IK switch", description="Use FK/IK switching", default=toggle&T_FKIK)
-	fingerik = BoolProperty(name="Finger IK", description="Use finger IK", default=toggle&T_FingerIK)
-	dispobs = BoolProperty(name="DispObs", description="Display objects", default=toggle&T_DispObs)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
@@ -2003,15 +1935,11 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_ArmIK = T_ArmIK if self.properties.armik else 0
 		O_LegIK = T_LegIK if self.properties.legik else 0
-		O_FKIK = T_FKIK if self.properties.fkik else 0
-		O_FingerIK = T_FingerIK if self.properties.fingerik else 0
-		O_DispObs = T_DispObs if self.properties.dispobs else 0
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
-		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_FKIK | O_FingerIK | O_DispObs 
-		toggle |= O_Replace | O_Face | O_Shape | O_Symm | T_MHX 
+		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_Replace | O_Face | O_Shape | O_Symm | T_MHX 
 		
 		S_Rigtype = "Gobo" if self.properties.gobo else "Classic"
 
