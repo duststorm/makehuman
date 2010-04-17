@@ -468,6 +468,24 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Eyes', value, self.syncSliders))
             self.eyes = None
 
+        self.earsSlider = gui3d.Slider(self, position=[10, 337, 9.2], value=0.0, min=0.0, max=1.0, label = "Ears shape")
+
+        self.ears = None
+        
+        @self.earsSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.ears == None:
+                    self.ears = human.getEars()
+                human.updateEars(self.ears, value, self.app.settings.realtimeNormalUpdates)
+                self.ears = min(1.0, max(0.0, value))
+        
+        @self.earsSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Ears', value, self.syncSliders))
+            self.ears = None
 
         self.headShapeSlider = gui3d.Slider(self, position=[650, 106, 9.2], value=0.0,min=0.0,max=1.0,label="Shape")
 
@@ -636,6 +654,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.noseSlider.setValue(human.getNose())
         self.mouthSlider.setValue(human.getMouth())
         self.eyesSlider.setValue(human.getEyes())
+        self.earsSlider.setValue(human.getEars())
         self.headShapeSlider.setValue(human.getHead())
         self.headAgeSlider.setValue(human.getHeadAge())
         self.faceAngleSlider.setValue(human.getFaceAngle())

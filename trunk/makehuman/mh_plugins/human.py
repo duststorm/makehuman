@@ -90,6 +90,7 @@ class Human(gui3d.Object):
         self.nose = 0.0
         self.mouth = 0.0
         self.eyes = 0.0
+        self.ears = 0.0
         self.head = 0.0
         self.headAge = 0.0
         self.faceAngle = 0.0
@@ -186,6 +187,9 @@ class Human(gui3d.Object):
 
         eyesNames = [group.name for group in self.meshData.facesGroups if "eye" in group.name]
         self.eyesVertices, self.eyesFaces = self.meshData.getVerticesAndFacesForGroups(eyesNames)
+        
+        earsNames = [group.name for group in self.meshData.facesGroups if "ear" in group.name]
+        self.earsVertices, self.earsFaces = self.meshData.getVerticesAndFacesForGroups(earsNames)
         
         headNames = [group.name for group in self.meshData.facesGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
         self.headVertices, self.headFaces = self.meshData.getVerticesAndFacesForGroups(headNames)
@@ -420,6 +424,12 @@ class Human(gui3d.Object):
 
     def getEyes(self):
        return self.eyes
+       
+    def setEars(self, value):
+        self.ears = min(1.0, max(0.0, value))
+
+    def getEars(self):
+       return self.ears
        
     def setHead(self, value):
         self.head = min(1.0, max(0.0, value))
@@ -873,6 +883,48 @@ class Human(gui3d.Object):
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
                 
+    def updateEars(self, previous, next, recalcNormals = True, update = True):
+        earsValues = [0 for i in xrange(0, 9)]
+        
+        # remove previous
+        previousEars = previous * 8
+        i = int(math.floor(previousEars))
+        value = previousEars - i
+        earsValues[i] -= 1 - value
+        if i < 8:
+            earsValues[i + 1] -= value
+            
+        # add next
+        nextEars = next * 8
+        i = int(math.floor(nextEars))
+        value = nextEars - i
+        earsValues[i] += 1 - value
+        if i < 8:
+            earsValues[i + 1] += value
+            
+        self.applyEarsTargets(earsValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.earsVertices, self.earsFaces)
+        if update:
+          self.meshData.update(self.earsVertices)
+
+    def applyEarsTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 9):
+            detailTargets['data/targets/details/male-young-ears%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-child-ears%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-old-ears%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/female-young-ears%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-child-ears%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-old-ears%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
     def updateHead(self, previous, next, recalcNormals = True, update = True):
         headValues = [0 for i in xrange(0, 9)]
         
@@ -1171,6 +1223,17 @@ class Human(gui3d.Object):
             eyesValues[i + 1] = value
 
         self.applyEyesTargets(eyesValues)
+        
+        # ears goes from 0 to 8, 0 is no target
+        ears = self.ears * 8
+        earsValues = [0 for i in xrange(0, 9)]
+        i = int(math.floor(ears))
+        value = ears - i
+        earsValues[i] = 1 - value
+        if i < 8:
+            earsValues[i + 1] = value
+
+        self.applyEarsTargets(earsValues)
         
         # head goes from 0 to 8, 0 is no target
         head = self.head * 8
@@ -1551,6 +1614,7 @@ class Human(gui3d.Object):
         self.nose = 0.0
         self.mouth = 0.0
         self.eyes = 0.0
+        self.ears = 0.0
         self.head = 0.0
         self.headAge = 0.0
         self.faceAngle = 0.0
@@ -1598,6 +1662,8 @@ class Human(gui3d.Object):
                     self.setMouth(float(lineData[1]))
                 elif lineData[0] == 'eyes':
                     self.setEyes(float(lineData[1]))
+                elif lineData[0] == 'ears':
+                    self.setEars(float(lineData[1]))
                 elif lineData[0] == 'head':
                     self.setHead(float(lineData[1]))
                 elif lineData[0] == 'headAge':
@@ -1637,6 +1703,7 @@ class Human(gui3d.Object):
         f.write('nose %f\n' % self.getNose())
         f.write('mouth %f\n' % self.getMouth())
         f.write('eyes %f\n' % self.getEyes())
+        f.write('ears %f\n' % self.getEars())
         f.write('head %f\n' % self.getHead())
         f.write('headAge %f\n' % self.getHeadAge())
         f.write('faceAngle %f\n' % self.getFaceAngle())
