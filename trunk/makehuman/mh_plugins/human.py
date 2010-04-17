@@ -828,7 +828,7 @@ class Human(gui3d.Object):
     def applyMouthTargets(self, values):
         detailTargets = {}
         
-        for i in xrange(1, 13):
+        for i in xrange(1, 14):
             detailTargets['data/targets/details/neutral_male-young-mouth%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-mouth%i.target'% i] = self.childVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-old-mouth%i.target'% i] = self.oldVal * self.maleVal * values[i]
@@ -870,7 +870,7 @@ class Human(gui3d.Object):
     def applyEyesTargets(self, values):
         detailTargets = {}
         
-        for i in xrange(1, 30):
+        for i in xrange(1, 31):
             detailTargets['data/targets/details/neutral_male-young-eye%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-eye%i.target'% i] = self.childVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-old-eye%i.target'% i] = self.oldVal * self.maleVal * values[i]
@@ -954,7 +954,7 @@ class Human(gui3d.Object):
     def applyHeadTargets(self, values):
         detailTargets = {}
         
-        for i in xrange(1, 8):
+        for i in xrange(1, 9):
             detailTargets['data/targets/details/neutral_male-young-head%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-head%i.target'% i] = self.childVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-old-head%i.target'% i] = self.oldVal * self.maleVal * values[i]
