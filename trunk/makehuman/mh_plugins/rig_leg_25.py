@@ -483,5 +483,30 @@ LegDrivers = [
 	#("Foot_R", "IK", "ConstIK", "PLegIK_R"),
 	("Toe_R", "ConstFK", "ConstIK", "PLegIK_R"),
 ]
-	
+
+#
+#	LegProcess
+#	(bone, axis, angle)
+#
+
+LegProcess = [
+	("UpLeg_L", "X", 0.3),
+	("UpLegTwist_L", "X", 0.3),
+	("UpLegFK_L", "X", 0.3),
+	("UpLegIK_L", "X", 0.3),
+	("LoLeg_L", "X", -0.5),
+	("LoLegFK_L", "X", -0.5),
+	("LoLegIK_L", "X", -0.5),
+
+	("UpLeg_R", "X", 0.3),
+	("UpLegTwist_R", "X", 0.3),
+	("UpLegFK_R", "X", 0.3),
+	("UpLegIK_R", "X", 0.3),
+	("LoLeg_R", "X", -0.5),
+	("LoLegFK_R", "X", -0.5),
+	("LoLegIK_R", "X", -0.5),
+]	
+
+LegParents = [
+	("FootCtrl_L", "LoLegIK_L"),	("FootCtrl_R", "LoLegIK_R"),]	
 

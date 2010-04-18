@@ -153,6 +153,9 @@ def exportMhx_25(obj, rig, fp):
 	fp.write("if toggle&T_Mesh\n")
 	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
 	fp.write("end if\n")
+	fp.write("if toggle&T_Armature\n")
+	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp)	
+	fp.write("end if\n")
 	return
 
 		
@@ -209,6 +212,8 @@ def copyFile25(obj, tmplName, rig, fp):
 				mhx_rig.writeAllActions(fp)
 			elif lineSplit[1] == 'rig-drivers':
 				mhx_rig.writeAllDrivers(fp)
+			elif lineSplit[1] == 'rig-process':
+				mhx_rig.writeAllProcesses(fp)
 			elif lineSplit[1] == 'classic-bones':
 				mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.FaceArmature + classic_bones.PanelArmature, True)
 			elif lineSplit[1] == 'classic-poses':

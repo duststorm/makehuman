@@ -1592,29 +1592,11 @@ Armature HumanRig HumanRig   Normal
   x_axis_mirror False ;
 end Armature
 
-Pose HumanRig 
-
-  *** rig-poses
-
-end Pose
-
 Object HumanRig ARMATURE HumanRig
-  layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
-  AnimationData
-     *** rig-drivers
-    action_blending 'REPLACE' ;
-    action_extrapolation 'HOLD' ;
-    action_influence 1 ;
-    nla_enabled True ;
-  end AnimationData
-
+  layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
   x_ray True ;
 end Object
 
-
-# --------------- Actions ----------------------------- # 
-
-*** rig-actions
 
 

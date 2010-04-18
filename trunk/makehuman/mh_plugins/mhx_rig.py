@@ -809,6 +809,7 @@ def writeDriver(fp, channel, index, expr, variables):
 #	writeAllPoses(fp)	
 #	writeAllActions(fp)	
 #	writeAllDrivers(fp)	
+#	writeAllProcesses(fp):
 #
 import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 
@@ -862,4 +863,21 @@ def writeAllDrivers(fp):
 	writeFkIkSwitch(fp, rig_arm_25.ArmDrivers)
 	writeFkIkSwitch(fp, rig_leg_25.LegDrivers)
 	return
+
+def writeAllProcesses(fp):
+	#return
+	
+	fp.write("  Edit ;\n")
+	parents = rig_arm_25.ArmParents + rig_finger_25.FingerParents + rig_leg_25.LegParents
+	for (bone, parent) in parents:
+		fp.write("  Reparent %s %s ;\n" % (bone, parent))
+
+	fp.write("  Pose ;\n")
+	processes = rig_arm_25.ArmProcess + rig_finger_25.FingerProcess + rig_leg_25.LegProcess
+	for (bone, axis, angle) in processes:
+		fp.write("  Bend %s %s %.6g ;\n" % (bone, axis, angle))
+
+	fp.write("  Edit ;\n")
+	return
+
 

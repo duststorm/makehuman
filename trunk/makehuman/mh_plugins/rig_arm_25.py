@@ -282,5 +282,23 @@ ArmDrivers = [
 	("LoArm_R", "ConstFK", "ConstIK", "PArmIK_R"),
 	("Hand_R", "ConstFK", "ConstIK", "PArmIK_R"),
 ]
-	
+#
+#	ArmProcess
+#	(bone, axis, angle)
+#
 
+ArmProcess = [
+	("LoArm_L", "X", 0.3),
+	("LoArmTwist_L", "X", 0.3),
+	("LoArmFK_L", "X", 0.3),
+	("LoArmIK_L", "X", 0.3),
+
+	("LoArm_R", "X", 0.3),
+	("LoArmTwist_R", "X", 0.3),
+	("LoArmFK_R", "X", 0.3),
+	("LoArmIK_R", "X", 0.3),
+]	
+ArmParents = [
+	("HandIK_L", "LoArmIK_L"),
+	("HandIK_R", "LoArmIK_R"),
+]

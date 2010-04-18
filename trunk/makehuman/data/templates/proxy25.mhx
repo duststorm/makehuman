@@ -43,7 +43,7 @@ Mesh HumanProxy HumanProxy
 end Mesh
 
 Object HumanProxy MESH HumanProxy
-  layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layers Array 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
     Modifier Armature ARMATURE
       b_bone_rest False ;
       editmode True ;

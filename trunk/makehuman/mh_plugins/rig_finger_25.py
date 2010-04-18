@@ -114,18 +114,6 @@ FingerHeadsTails = [
 	('Finger-3-IK_L',		'r-finger-3-end', 'r-finger-3-3'),
 	('Finger-4-IK_L',		'r-finger-4-end', 'r-finger-4-3'),
 	('Finger-5-IK_L',		'r-finger-5-end', 'r-finger-5-3'),
-
-	('Finger-1-Pole_L',		'r-finger-1-2', 'r-finger-1-3'),
-	('Finger-2-Pole_L',		'r-finger-2-2', 'r-finger-2-3'),
-	('Finger-3-Pole_L',		'r-finger-3-2', 'r-finger-3-3'),
-	('Finger-4-Pole_L',		'r-finger-4-2', 'r-finger-4-3'),
-	('Finger-5-Pole_L',		'r-finger-5-2', 'r-finger-5-3'),
-
-	('Finger-1-Pole_R',		'l-finger-1-2', 'l-finger-1-3'),
-	('Finger-2-Pole_R',		'l-finger-2-2', 'l-finger-2-3'),
-	('Finger-3-Pole_R',		'l-finger-3-2', 'l-finger-3-3'),
-	('Finger-4-Pole_R',		'l-finger-4-2', 'l-finger-4-3'),
-	('Finger-5-Pole_R',		'l-finger-5-2', 'l-finger-5-3'),
 ]
 
 FingerArmature = [
@@ -180,30 +168,17 @@ FingerArmature = [
 	('Finger-5_R', 'rigArm&T_FingerIK',	-1.64061, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
 
 	# IK targets
-	('Finger-1-IK_L', 'rigArm&T_FingerIK',	-1.6057, 'Finger-1_L', 0, L_HELP, (1,1,1) ),
-	('Finger-2-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-2_L', 0, L_HELP, (1,1,1) ),
-	('Finger-3-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-3_L', 0, L_HELP, (1,1,1) ),
-	('Finger-4-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-4_L', 0, L_HELP, (1,1,1) ),
-	('Finger-5-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-5_L', 0, L_HELP, (1,1,1) ),
+	('Finger-1-IK_L', 'rigArm&T_FingerIK',	-1.6057, 'Finger-1_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-2-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-2_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-3-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-3_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-4-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-4_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-5-IK_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-5_L', F_CON, L_HELP, (1,1,1) ),
 
-	('Finger-1-IK_R', 'rigArm&T_FingerIK',	1.6057, 'Finger-1_R', 0, L_HELP, (1,1,1) ),
-	('Finger-2-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-2_R', 0, L_HELP, (1,1,1) ),
-	('Finger-3-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-3_R', 0, L_HELP, (1,1,1) ),
-	('Finger-4-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-4_R', 0, L_HELP, (1,1,1) ),
-	('Finger-5-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-5_R', 0, L_HELP, (1,1,1) ),
-
-	# Pole targets
-	('Finger-1-Pole_L', 'rigArm&T_FingerIK',	-1.6057, 'Finger-1_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-2-Pole_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-2_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-3-Pole_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-3_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-4-Pole_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-4_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-5-Pole_L', 'rigArm&T_FingerIK',	-1.62316, 'Finger-5_L', 0, L_HANDIK, (1,1,1) ),
-
-	('Finger-1-Pole_R', 'rigArm&T_FingerIK',	1.6057, 'Finger-1_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-2-Pole_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-2_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-3-Pole_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-3_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-4-Pole_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-4_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-5-Pole_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-5_R', 0, L_HANDIK, (1,1,1) ),
+	('Finger-1-IK_R', 'rigArm&T_FingerIK',	1.6057, 'Finger-1_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-2-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-2_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-3-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-3_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-4-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-4_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-5-IK_R', 'rigArm&T_FingerIK',	1.62316, 'Finger-5_R', F_CON, L_HELP, (1,1,1) ),
 ]
 
 def FingerWritePoses(fp):
@@ -217,19 +192,19 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-1-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, [])
 	addPoseBone(fp, 'True', 'Finger-1-2_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, [])
 	addPoseBone(fp, 'True', 'Finger-1-3_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-1-IK_L', 3, (1.5708, 'Finger-1-Pole_L'), (True, False), 'fFingerIK'])])
+		[('IK', 0, ['IK', 'Finger-1-IK_L', 3, None, (True, False), 'fFingerIK'])])
 
 	addPoseBone(fp, 'True', 'Finger-1-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, [])
 	addPoseBone(fp, 'True', 'Finger-1-2_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, [])
 	addPoseBone(fp, 'True', 'Finger-1-3_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-1-IK_R', 3,  (1.5708, 'Finger-1-Pole_R'), (True, False), 'fFingerIK'])])
+		[('IK', 0, ['IK', 'Finger-1-IK_R', 3,  None, (True, False), 'fFingerIK'])])
 
 	addPoseBone(fp, 'True', 'Finger-2-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-2-2_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-2-3_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-2-IK_L', 3,  (-0.6, 'Finger-2-Pole_L'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-2-IK_L', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	addPoseBone(fp, 'True', 'Finger-2-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
@@ -237,7 +212,7 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-2-2_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-2-3_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-2-IK_R', 3,  (-2.2, 'Finger-2-Pole_R'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-2-IK_R', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	addPoseBone(fp, 'True', 'Finger-3-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
@@ -245,7 +220,7 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-3-2_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-3-3_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-3-IK_L', 3,  (1.5708, 'Finger-3-Pole_L'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-3-IK_L', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	addPoseBone(fp, 'True', 'Finger-3-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
@@ -253,7 +228,7 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-3-2_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-3-3_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-3-IK_R', 3,  (1.5708, 'Finger-3-Pole_R'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-3-IK_R', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	addPoseBone(fp, 'True', 'Finger-4-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
@@ -261,7 +236,7 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-4-2_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-4-3_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-4-IK_L', 3,  (-1.9, 'Finger-4-Pole_L'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-4-IK_L', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	addPoseBone(fp, 'True', 'Finger-4-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
@@ -269,7 +244,7 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-4-2_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-4-3_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-4-IK_R', 3,  (-1.9, 'Finger-4-Pole_R'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-4-IK_R', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	addPoseBone(fp, 'True', 'Finger-5-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
@@ -277,7 +252,7 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-5-2_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-5-3_L', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-5-IK_L', 3,  (-1.6, 'Finger-5-Pole_L'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-5-IK_L', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	addPoseBone(fp, 'True', 'Finger-5-1_R', customShape, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0,
@@ -285,20 +260,20 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'True', 'Finger-5-2_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0, 
 		[('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 	addPoseBone(fp, 'True', 'Finger-5-3_R', customShape, None, (0,0,0), (1,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-5-IK_R', 3,  (-1.6, 'Finger-5-Pole_R'), (True, False), 'fFingerIK']),
+		[('IK', 0, ['IK', 'Finger-5-IK_R', 3,  None, (True, False), 'fFingerIK']),
 		('Action', C_TARGET, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
 
 	# Finger IK
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1_L', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1_R', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2_L', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2_R', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3_L', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3_R', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4_L', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4_R', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5_L', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5_R', None, None, (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, [])
 
 	# Ik targets
 	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1-IK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
@@ -311,21 +286,9 @@ def FingerWritePoses(fp):
 	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4-IK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5-IK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5-IK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	# Pole targets
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1-Pole_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1-Pole_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2-Pole_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2-Pole_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3-Pole_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3-Pole_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4-Pole_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4-Pole_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5-Pole_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5-Pole_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	return
 	
+	return 
+
 #
 #	actionFingerCurl
 #	FingerWriteActions(fp):
@@ -347,5 +310,58 @@ actionFingerCurl = [
 ]
 def FingerWriteActions(fp):
 	writeAction(fp, 'rigArm&T_FingerCurl', "goboFingerCurl", actionFingerCurl, True, False)
+
+#
+#	FingerProcess
+#	(bone, axis, angle)
+#
+
+FingerProcess = [
+	("Finger-1-1_L", "Z", -0.3),
+	("Finger-1-2_L", "Z", -0.3),
+	("Finger-1-3_L", "Z", -0.3),
+	("Finger-2-1_L", "Z", -0.3),
+	("Finger-2-2_L", "Z", -0.3),
+	("Finger-2-3_L", "Z", -0.3),
+	("Finger-3-1_L", "Z", -0.3),
+	("Finger-3-2_L", "Z", -0.3),
+	("Finger-3-3_L", "Z", -0.3),
+	("Finger-4-1_L", "Z", -0.3),
+	("Finger-4-2_L", "Z", -0.3),
+	("Finger-4-3_L", "Z", -0.3),
+	("Finger-5-1_L", "Z", -0.3),
+	("Finger-5-2_L", "Z", -0.3),
+	("Finger-5-3_L", "Z", -0.3),
+
+	("Finger-1-1_R", "Z", 0.3),
+	("Finger-1-2_R", "Z", 0.3),
+	("Finger-1-3_R", "Z", 0.3),
+	("Finger-2-1_R", "Z", 0.3),
+	("Finger-2-2_R", "Z", 0.3),
+	("Finger-2-3_R", "Z", 0.3),
+	("Finger-3-1_R", "Z", 0.3),
+	("Finger-3-2_R", "Z", 0.3),
+	("Finger-3-3_R", "Z", 0.3),
+	("Finger-4-1_R", "Z", 0.3),
+	("Finger-4-2_R", "Z", 0.3),
+	("Finger-4-3_R", "Z", 0.3),
+	("Finger-5-1_R", "Z", 0.3),
+	("Finger-5-2_R", "Z", 0.3),
+	("Finger-5-3_R", "Z", 0.3),
+]
+
+FingerParents = [
+	("Finger-1-IK_L", "Finger-1-3_L"),
+	("Finger-2-IK_L", "Finger-2-3_L"),
+	("Finger-3-IK_L", "Finger-3-3_L"),
+	("Finger-4-IK_L", "Finger-4-3_L"),
+	("Finger-5-IK_L", "Finger-5-3_L"),
+
+	("Finger-1-IK_R", "Finger-1-3_R"),
+	("Finger-2-IK_R", "Finger-2-3_R"),
+	("Finger-3-IK_R", "Finger-3-3_R"),
+	("Finger-4-IK_R", "Finger-4-3_R"),
+	("Finger-5-IK_R", "Finger-5-3_R"),
+]
 
 

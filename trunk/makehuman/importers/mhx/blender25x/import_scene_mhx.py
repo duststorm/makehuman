@@ -15,19 +15,25 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.5
+Version 0.7
 
 """
 
-__author__= ['Thomas Larsson']
-__url__ = ("www.makehuman.org")
-__version__= '0.7'
+bl_addon_info = {
+	'name': 'Import MakeHuman (.mhx)',
+	'author': 'Thomas Larsson',
+	'version': '0.7',
+	'blender': (2, 5, 3),
+	'location': 'File > Import',
+	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
+	'url': 'http://www.makehuman.org',
+	'category': 'Import/Export'}
 
-#
-#	Default locations - change to fit your machine
-#
-
-TexDir = "~/makehuman/exports"
+"""
+Place this file in the .blender/scripts/addons dir
+You have to activated the script in the "Add-Ons" tab (user preferences).
+Access from the File > Import menu.
+"""
 
 #
 #
@@ -46,6 +52,7 @@ MINOR_VERSION = 7
 MHX249 = False
 Blender24 = False
 Blender25 = True
+TexDir = "~/makehuman/exports"
 
 #
 #
@@ -143,7 +150,7 @@ def setFlagsAndFloats(rigFlags):
 		elif fingerRig == 'Curl': rigArm |= T_FingerCurl
 		
 	# Global floats, used as influences
-	global fElbowIK, fKneeIK, fFingerCurl, fLegIK, fArmIK, fFingerIK, fFingerCurl
+	global fElbowIK, fKneeIK, fFingerCurl, fLegIK, fArmIK, fFingerIK
 
 	fElbowIK = 1.0 if rigArm&T_ElbowIK else 0.0
 	fKneeIK = 1.0 if rigLeg&T_KneeIK else 0.0
@@ -151,7 +158,13 @@ def setFlagsAndFloats(rigFlags):
 	fLegIK = 1.0 if toggle&T_LegIK else 0.0
 	fArmIK = 1.0 if toggle&T_ArmIK else 0.0
 	fFingerIK = 1.0 if rigArm&T_FingerIK else 0.0
-	fFingerCurl = 1.0 if rigArm&T_FingerCurl else 0.0
+
+	'''
+	print(rigFlags)
+	print("%x l %x a %x" % (toggle, rigLeg, rigArm))
+	print(fElbowIK, fKneeIK, fFingerCurl)
+	print(fLegIK, fArmIK, fFingerIK)
+	'''
 	return
 
 
@@ -321,6 +334,7 @@ def readMhxFile(filePath, rigFlags):
 			#raise NameError(msg)
 
 	postProcess()
+	hideLayers()
 	time2 = time.clock()
 	print("toggle = %x" % toggle)
 	msg = "File %s loaded in %g s" % (fileName, time2-time1)
@@ -421,6 +435,11 @@ def parse(tokens):
 			data = parseTexture(val, sub)
 		elif key == "Image":
 			data = parseImage(val, sub)
+		elif key == "Process":
+			parseProcess(val, sub)
+		elif key == 'AnimationData':
+			ob = loadedData['Object'][val[0]]
+			parseAnimationData(ob, val, sub)
 		else:
 			data = parseDefaultType(key, val, sub)				
 
@@ -899,18 +918,12 @@ def parseObject(args, tokens):
 			parseAnimationData(ob, val, sub)
 		elif key == 'ParticleSystem':
 			parseParticleSystem(ob, val, sub)
-		elif key == 'layers':
-			layers = [False]*20
-			for n in range(len(val)-1):
-				if val[n+1] == '1':
-					layers[n] = True
-			bpy.ops.object.move_to_layer(layer=layers)
-			if layers != ob.layers:
-				pass
-				# print("not moved", list(ob.layers))
-			
 		else:
 			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
+
+	# Needed for updating layers
+	bpy.ops.object.mode_set(mode='EDIT')
+	bpy.ops.object.mode_set(mode='OBJECT')
 	return
 
 def createObject(typ, name, data, datName):
@@ -954,11 +967,9 @@ def parseModifier(ob, args, tokens):
 	typ = args[1]
 	if typ == 'PARTICLE_SYSTEM':
 		return None
-	#print("MOD", name, typ)
 	mod = ob.modifiers.new(name, typ)
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, 'mod', [], globals(), locals())
-	#print("MOD2", mod)
 	return mod
 
 #
@@ -1693,7 +1704,90 @@ def postProcess():
 			print("Rig changed", mod.object)
 	return			
 		
-	
+#
+#	parseProcess(args, tokens):
+#
+
+def parseProcess(args, tokens):
+	return
+	rig = loadedData['Object'][args[0]]
+	parents = {}
+	objects = []
+
+	for (key, val, sub) in tokens:
+		if key == 'Reparent':
+			bname = val[0]
+			try:
+				eb = ebones[bname]
+				parents[bname] = eb.parent.name
+				eb.parent = ebones[val[1]]
+			except:
+				pass
+		elif key == 'Bend':
+			print(val)
+			axis = val[1]
+			angle = float(val[2])
+			mat = mathutils.RotationMatrix(angle, 4, axis)
+			try:
+				pb = pbones[val[0]]
+				prod = pb.matrix_local * mat
+				for i in range(4):
+					for j in range(4):
+						pb.matrix_local[i][j] = prod[i][j]
+				print("Done", pb.matrix_local)
+			except:
+				pass
+		elif key == 'Pose':
+			bpy.context.scene.objects.active = rig
+			bpy.ops.object.mode_set(mode='POSE')
+			pbones = rig.pose.bones	
+		elif key == 'Edit':
+			bpy.context.scene.objects.active = rig
+			bpy.ops.object.mode_set(mode='EDIT')
+			ebones = rig.data.edit_bones	
+		elif key == 'Object':
+			bpy.ops.object.mode_set(mode='OBJECT')
+			try:
+				ob = loadedData['Object'][val[0]]
+				objects.append((ob,sub))
+			except:
+				ob = None
+			if ob:
+				bpy.context.scene.objects.active = ob
+				mod = ob.modifiers[0]
+				ob.modifiers.remove(mod)
+				for (key1, val1, sub1) in sub:
+					if key1 == 'Modifier':
+						parseModifier(ob, val1, sub1)
+
+	for (ob,tokens) in objects:
+		bpy.context.scene.objects.active = ob
+		bpy.ops.object.visual_transform_apply()
+		print("vis", list(ob.modifiers))
+		bpy.ops.object.modifier_apply(apply_as='DATA')
+		print("app")
+
+	bpy.context.scene.objects.active = rig
+	bpy.ops.object.mode_set(mode='POSE')
+	bpy.ops.pose.armature_apply()
+	bpy.ops.object.mode_set(mode='EDIT')
+	ebones = rig.data.edit_bones
+	for (bname, pname) in parents.items():
+		eb = ebones[bname]
+		par = ebones[pname]
+		if eb.connected:
+			par.tail = eb.head
+		eb.parent = par
+	bpy.ops.object.mode_set(mode='OBJECT')
+
+	for (ob,tokens) in objects:
+		bpy.context.scene.objects.active = ob
+		for (key, val, sub) in tokens:
+			if key == 'Modifier':
+				parseModifier(ob, val, sub)
+
+	return			
+
 #
 #	defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 #
@@ -1896,14 +1990,18 @@ def invalid(condition):
 	
 #
 #	clearScene(context):
+#	hideLayers():
 #
 	
 def clearScene():
 	global toggle
 	scn = bpy.context.scene
+	for n in range(len(scn.visible_layers)):
+		scn.visible_layers[n] = True
 	print("clearScene %s %s" % (toggle & T_Replace, scn))
 	if not toggle & T_Replace:
 		return scn
+
 	for ob in scn.objects:
 		if ob.type == "MESH" or ob.type == "ARMATURE":
 			scn.objects.active = ob
@@ -1912,6 +2010,15 @@ def clearScene():
 			del ob
 	#print(scn.objects)
 	return scn
+
+def hideLayers():
+	scn = bpy.context.scene
+	for n in range(len(scn.visible_layers)):
+		if n < 3:
+			scn.visible_layers[n] = True
+		else:
+			scn.visible_layers[n] = False
+	return
 
 #
 #	User interface
@@ -1963,7 +2070,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
-		O_Preset = T_Preset if self.properties.symm else 0
+		O_Preset = T_Preset if self.properties.preset else 0
 		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_Replace | O_Face | O_Shape | O_Symm | O_Preset | T_MHX 
 		
 		readMhxFile(self.properties.path, 	
@@ -1979,11 +2086,18 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		wm.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
+def register():
+	bpy.types.register(IMPORT_OT_makehuman_mhx)
+	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+	bpy.types.INFO_MT_file_import.append(menu_func)
+ 
+def unregister():
+	bpy.types.unregister(IMPORT_OT_makehuman_mhx)
+	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+	bpy.types.INFO_MT_file_import.remove(menu_func)
 
-bpy.types.register(IMPORT_OT_makehuman_mhx)
-menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
-bpy.types.INFO_MT_file_import.append(menu_func)
-
+if __name__ == "__main__":
+	register()
 
 #
 #	Testing
