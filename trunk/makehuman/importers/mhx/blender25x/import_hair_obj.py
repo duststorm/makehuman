@@ -30,13 +30,28 @@ OBJ hair importer for Blender 2.5
 Abstract
 Hair importer for Blender.2.5
 
-TO DO
+"""
+
+bl_addon_info = {
+	'name': 'Import MakeHuman hair (.obj)',
+	'author': 'Thomas Larsson',
+	'version': '0.7',
+	'blender': (2, 5, 3),
+	'location': 'File > Import',
+	'description': 'Import MakeHuman hair file (.obj)',
+	'url': 'http://www.makehuman.org',
+	'category': 'Import/Export'}
+
+"""
+Place this file in the .blender/scripts/addons dir
+You have to activated the script in the "Add-Ons" tab (user preferences).
+Access from the File > Import menu.
 """
 
 import bpy
-import Mathutils
-from Mathutils import *
-import Geometry
+import mathutils
+from mathutils import *
+import geometry
 import os
 
 #
@@ -320,11 +335,11 @@ class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 	'''Import MakeHuman hair from OBJ curves file (.obj)'''
 	bl_idname = "import_hair.makehuman_obj"
 	bl_description = 'Import MakeHuman hair from OBJ curves file (.obj)'
-	bl_label = "Import MH hair"
+	bl_label = "Import MakeHuman hair"
 	bl_space_type = "PROPERTIES"
 	bl_region_type = "WINDOW"
 
-	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
+	path = StringProperty(name="File Path", description="File path used for importing the .obj file", maxlen= 1024, default= "")
 	
 	def execute(self, context):
 		importHair(self.properties.path)
@@ -335,10 +350,18 @@ class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 		wm.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
-bpy.types.register(IMPORT_OT_makehuman_hair_obj)
-menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_hair_obj.bl_idname, text="MakeHuman hair (.obj)...")
-bpy.types.INFO_MT_file_import.append(menu_func)
+def register():
+	bpy.types.register(IMPORT_OT_makehuman_hair_obj)
+	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_hair_obj.bl_idname, text="MakeHuman hair (.obj)...")
+	bpy.types.INFO_MT_file_import.append(menu_func)
+ 
+def unregister():
+	bpy.types.unregister(IMPORT_OT_makehuman_hair_obj)
+	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_hair_obj.bl_idname, text="MakeHuman hair (.obj)...")
+	bpy.types.INFO_MT_file_import.remove(menu_func)
 
+if __name__ == "__main__":
+	register()
 #
 #	Testing
 #

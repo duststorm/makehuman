@@ -18,16 +18,24 @@ Abstract
 MHX (MakeHuman eXchange format) exporter for Blender 2.5.
 Version 0.7
 
-TO DO
+"""
+
+bl_addon_info = {
+	'name': 'Export MakeHuman (.mhx)',
+	'author': 'Thomas Larsson',
+	'version': '0.7',
+	'blender': (2, 5, 3),
+	'location': 'File > Export',
+	'description': 'Export files in the MakeHuman eXchange format (.mhx)',
+	'url': 'http://www.makehuman.org',
+	'category': 'Import/Export'}
 
 """
-__author__= ['Thomas Larsson']
-__url__ = ("www.makehuman.org")
-__version__= '0.7'
-__bpydoc__= '''\
-MHX importer for Blender 2.5
-0.6 Sixth version
-'''
+Place this file in the .blender/scripts/addons dir
+You have to activated the script in the "Add-Ons" tab (user preferences).
+Access from the File > Export menu.
+"""
+
 
 import bpy
 import mathutils
@@ -57,7 +65,6 @@ M_Game	= 0x10
 M_Scn	= 0x20
 M_Tool	= 0x40
 M_Anim	= 0x80
-M_All = 0xff
 
 M_Rigify = 0x100
 M_MHX	= 0x200
@@ -65,6 +72,8 @@ M_Shape	= 0x400
 M_VGroup = 0x800
 M_Part = 0x1000
 M_MHPart = 0x2000
+
+M_All = ~(M_MHX)
 
 expMsk = 0
 theRig = ""
@@ -1731,8 +1740,73 @@ def mhxClose(fp):
 	return
 
 #
+#	User interface
+#
+
+DEBUG= False
+from bpy.props import *
+
+class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
+	'''Export to MHX file format (.mhx)'''
+	bl_idname = "export.makehuman_mhx"
+	bl_description = 'Export to MHX file format (.mhx)'
+	bl_label = "Export MHX"
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
+
+	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
+
+	mask = M_MHX+M_Mat+M_Geo+M_Amt+M_Shape+M_VGroup
+
+	mhx = BoolProperty(name="MHX", description="Include materials", default=mask&M_MHX)
+	xall = BoolProperty(name="Everything", description="Include everything", default=mask&M_All)
+	mat = BoolProperty(name="Materials", description="Include materials", default=mask&M_Mat)
+	geo = BoolProperty(name="Geometry", description="Include geometry", default=mask&M_Geo)
+	amt = BoolProperty(name="Armatures", description="Include armature", default=mask&M_Amt)
+	anim = BoolProperty(name="Animations", description="Include animations and drivers", default=mask&M_Anim)
+	shape = BoolProperty(name="Shapes", description="Include shapes", default=mask&M_Shape)
+	vgroup = BoolProperty(name="Vertex groups", description="Include vertex groups", default=mask&M_VGroup)
+	obj = BoolProperty(name="Objects", description="Include other objects", default=mask&M_Obj)
+
+	def execute(self, context):
+		global toggle
+		O_MHX = M_MHX if self.properties.mhx else 0
+		O_All = M_All if self.properties.xall else 0
+		O_Mat = M_Mat if self.properties.mat else 0
+		O_Geo = M_Geo if self.properties.geo else 0
+		O_Amt = M_Amt if self.properties.amt else 0
+		O_Anim = M_Anim if self.properties.anim else 0
+		O_Shape = M_Shape if self.properties.shape else 0
+		O_VGroup = M_VGroup if self.properties.vgroup else 0
+		O_Obj = M_Obj if self.properties.obj else 0
+
+		mask = O_MHX | O_All | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_VGroup | O_Obj
+		
+		writeMhxFile(self.properties.path, mask)
+		return {'FINISHED'}
+
+	def invoke(self, context, event):
+		wm = context.manager
+		wm.add_fileselect(self)
+		return {'RUNNING_MODAL'}
+
+def register():
+	bpy.types.register(EXPORT_OT_makehuman_mhx)
+	menu_func = lambda self, context: self.layout.operator(EXPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+	bpy.types.INFO_MT_file_export.append(menu_func)
+ 
+def unregister():
+	bpy.types.unregister(EXPORT_OT_makehuman_mhx)
+	menu_func = lambda self, context: self.layout.operator(EXPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+	bpy.types.INFO_MT_file_export.remove(menu_func)
+
+if __name__ == "__main__":
+	register()
+
+#
 #	Testing
 #
+"""
 hairFile = "particles25.mhx"
 theRig = "classic"
 #theRig = "gobo"
@@ -1743,6 +1817,6 @@ writeMhxFile('/home/thomas/myblends/test.mhx', M_MHX+M_Geo+M_VGroup)
 #writeMhxTemplates(M_MHX+M_Mat)
 #theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
-
+"""
 
 
