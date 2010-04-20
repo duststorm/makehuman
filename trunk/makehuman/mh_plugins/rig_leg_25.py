@@ -260,7 +260,8 @@ def LegWritePoses(fp):
 		('CopyRot', 0, ['ConstFK', 'UpLegFK_L', '1-fLegIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'UpLegTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'LoLeg_L', 1, None, (True, False), 1.0])])
+		#[('IK', 0, ['IK', 'LoLeg_L', 1, None, (True, False), 1.0])])
+		[('CopyRot', 0, ['UnTwist', 'UpLeg_L', 'True', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'LoLeg_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['ConstIK', 'LoLegIK_L', 'fLegIK', (1,1,1), (0,0,0)]),
@@ -284,7 +285,8 @@ def LegWritePoses(fp):
 		('CopyRot', 0, ['ConstFK', 'UpLegFK_R', '1-fLegIK', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'UpLegTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'LoLeg_R', 1, None, (True, False), 1.0])])
+		#[('IK', 0, ['IK', 'LoLeg_R', 1, None, (True, False), 1.0])])
+		[('CopyRot', 0, ['UnTwist', 'UpLeg_R', 'True', (1,1,1), (0,0,0)])])
 
 	addPoseBone(fp, 'True', 'LoLeg_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['ConstIK', 'LoLegIK_R', 'fLegIK', (1,1,1), (0,0,0)]),
@@ -304,17 +306,21 @@ def LegWritePoses(fp):
 
 
 	# FK
-	addPoseBone(fp, 'True', 'UpLegFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'UpLegFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+ 		[('LimitRot', C_OWNER, ['LimitRot', (-1.05,2.6, -1.05,1.05, -0.7805,1.5708), (True, True, True)])])
 
-	addPoseBone(fp, 'True', 'LoLegFK_L', 'MHCircle025', None, (0,0,0), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'LoLegFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
 
 	addPoseBone(fp, 'True', 'FootFK_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'True', 'ToeFK_L', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'True', 'UpLegFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'UpLegFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+ 		[('LimitRot', C_OWNER, ['LimitRot', (-1.05,2.6, -1.05,1.05, -1.5708,0.7805), (True, True, True)])])
 
-	addPoseBone(fp, 'True', 'LoLegFK_R', 'MHCircle025', None, (0,0,0), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'LoLegFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OWNER, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
 
 	addPoseBone(fp, 'True', 'FootFK_R', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
@@ -339,16 +345,20 @@ def LegWritePoses(fp):
 		[('LimitDist', 0, ['Const', 'Hip_R'])])
 
 	addPoseBone(fp, 'rigLeg&T_KneeIK', 'UpLegIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'KneeIK_L', 1, None, (True, False), 'fKneeIK'])])
+		[('IK', 0, ['IK', 'KneeIK_L', 1, None, (True, False), 'fKneeIK']),
+ 		('LimitRot', C_OWNER, ['LimitRot', (-1.05,2.6, -1.05,1.05, -0.7805,1.5708), (True, True, True)])])
 
 	addPoseBone(fp, 'rigLeg&T_KneeIK', 'UpLegIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'KneeIK_R', 1, None, (True, False), 'fKneeIK'])])
+		[('IK', 0, ['IK', 'KneeIK_R', 1, None, (True, False), 'fKneeIK']),
+ 		('LimitRot', C_OWNER, ['LimitRot', (-1.05,2.6, -1.05,1.05, -1.5708,0.7805), (True, True, True)])])
 
-	addPoseBone(fp, 'rigLeg&T_KneePT==0', 'LoLegIK_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-			[('IK', 0, ['IK', 'LegTarget_L', 2, None, (True, False), 1.0])])
+	addPoseBone(fp, 'rigLeg&T_KneePT==0', 'LoLegIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['IK', 'LegTarget_L', 2, None, (True, False), 1.0]),
+		('LimitRot', C_OWNER, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
 	
-	addPoseBone(fp, 'rigLeg&T_KneePT==0', 'LoLegIK_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-			[('IK', 0, ['IK', 'LegTarget_R', 2, None, (True, False), 1.0])])
+	addPoseBone(fp, 'rigLeg&T_KneePT==0', 'LoLegIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['IK', 'LegTarget_R', 2, None, (True, False), 1.0]),
+		('LimitRot', C_OWNER, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
 
 
 	# Knee pole target
@@ -358,10 +368,12 @@ def LegWritePoses(fp):
 	addPoseBone(fp, 'rigLeg&T_KneePT', 'KneePT_R', 'MHCircle10', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'rigLeg&T_KneePT', 'LoLegIK_L', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('IK', 0, ['IK', 'LegTarget_L', 2, (1.2708, 'KneePT_L'), (True, False), 1.0])])
+		[('IK', 0, ['IK', 'LegTarget_L', 2, (1.2708, 'KneePT_L'), (True, False), 1.0]),
+		 ('LimitRot', C_OWNER, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
 
 	addPoseBone(fp, 'rigLeg&T_KneePT', 'LoLegIK_R', None, 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('IK', 0, ['IK', 'LegTarget_R', 2, (1.8708, 'KneePT_R'), (True, False), 1.0])])
+		[('IK', 0, ['IK', 'LegTarget_R', 2, (1.8708, 'KneePT_R'), (True, False), 1.0]),
+		('LimitRot', C_OWNER, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
 
 
 	# IK inverse foot
