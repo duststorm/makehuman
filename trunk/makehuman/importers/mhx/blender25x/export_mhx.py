@@ -16,14 +16,14 @@
 Abstract
 --------
 MHX (MakeHuman eXchange format) exporter for Blender 2.5.
-Version 0.7
+Version 0.8
 
 """
 
 bl_addon_info = {
 	'name': 'Export MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.7',
+	'version': '0.8',
 	'blender': (2, 5, 3),
 	'location': 'File > Export',
 	'description': 'Export files in the MakeHuman eXchange format (.mhx)',
@@ -45,7 +45,7 @@ import array
 import struct
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 7
+MINOR_VERSION = 8
 verbosity = 1
 Epsilon = 1e-5
 done = 0
@@ -719,8 +719,8 @@ def exportFCurve(fcu, exported, pad, fp):
 		exportKeyFramePoint(kpt, pad+"  ", fp)
 	for pt in fcu.sampled_points:
 		exportSampledPoint(pt, pad+"  ", fp)
-	#for fmod in fcu.modifiers:
-	#	exportFModifier(fmod, pad+"  ", fp)
+	for fmod in fcu.modifiers:
+		exportFModifier(fmod, pad+"  ", fp)
 	# exportActionGroup(fcu.group, pad+"  ", fp)
 	prio = ['extrapolation']
 	writePrio(fcu, prio, pad+"  ", fp)
@@ -741,11 +741,16 @@ def alreadyExported(exported, key, val):
 	return False
 
 def exportDriver(drv, pad, fp):
-	fp.write("%sDriver \n" % pad)
+	fp.write("%sDriver %s \n" % (pad, drv.type))
 	for var in drv.variables:
 		exportDriverVariable(var, pad+"  ", fp)
 	writeDir(drv, ['variables'], pad+"  ", fp)
 	fp.write("%send Driver\n\n" % pad)
+
+def exportFModifier(fmod, pad, fp):
+	fp.write("%sFModifier %s \n" % (pad, fmod.type))
+	writeDir(fmod, [], pad+"  ", fp)
+	fp.write("%send FModifier\n\n" % pad)
 
 def exportDriverVariable(var, pad, fp):
 	name = var.name.replace(' ', '_')
@@ -1119,17 +1124,17 @@ def exportMesh(ob, fp):
 		if expMsk & M_MHX and obName == "Human":
 			fp.write("    *** ShapeKey\n")
 			fp1 = mhxOpen(M_Shape, "shapekeys-facial25.mhx")
-			exportShapeKeys(me, FacialKey, fp1)
+			exportShapeKeys(me, FacialKey, "toggle&T_Face", fp1)
 			mhxClose(fp1)
 			#fp1 = mhxOpen(M_Shape, "shapekeys-body25.mhx")
-			#exportShapeKeys(me, BodyKey, fp1)
+			#exportShapeKeys(me, BodyKey, "toggle&T_Shape", fp1)
 			#mhxClose(fp1)
 		else:
 			if expMsk & M_Shape:
-				exportShapeKeys(me, None, fp)
-		 
-	if verbosity > 1:
-		print( "Faces saved" )
+				exportShapeKeys(me, None, "True", fp)
+
+	if me.animation_data:		 
+		exportAnimationData(me.animation_data, fp)
 
 	#writePrio(me, ['vertex_colors'], "  ", fp)
 
@@ -1218,7 +1223,7 @@ def dumpVertexGroup(toeDict, vgName, fp):
 	
 
 #
-#	exportShapeKeys(me, fp
+#	exportShapeKeys(me, keyList, toggle, fp):
 #
 
 FacialKey = {
@@ -1255,10 +1260,9 @@ BodyKey = {
 	"ShoulderDown" : "LR",
 }
 
-
-#
-def exportShapeKeys(me, keyList, fp):
+def exportShapeKeys(me, keyList, toggle, fp):
 	skeys = me.shape_keys
+	fp.write("ShapeKeys\n")
 	for skey in skeys.keys:
 		skeyName = skey.name.replace(' ','_')
 		try:
@@ -1269,7 +1273,7 @@ def exportShapeKeys(me, keyList, fp):
 			else:
 				lr = "Sym"
 		if lr:
-			fp.write("  ShapeKey %s %s\n" % (skeyName, lr))
+			fp.write("  ShapeKey %s %s %s\n" % (skeyName, lr, toggle))
 			writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
 			for (n,pt) in enumerate(skey.data):
 				dv = pt.co - me.verts[n].co
@@ -1278,6 +1282,11 @@ def exportShapeKeys(me, keyList, fp):
 			fp.write("  end ShapeKey\n")
 			print(skey)
 		createdLocal['ShapeKey'].append(skeyName)
+
+	if skeys.animation_data:		 
+		exportAnimationData(skeys.animation_data, fp)
+	fp.write("end ShapeKeys\n")
+	return
 
 #
 #	exportArmature(ob, fp):
@@ -1340,7 +1349,7 @@ def exportArmature(ob, fp):
 	fp.write("end Armature\n")
 
 	bpy.ops.object.mode_set(mode='POSE')
-	fp.write("\nPose %s \n" % (obName))	
+	fp.write("\nPose %s True \n" % (obName))	
 	createdLocal['BoneGroup'] = []
 	for bg in ob.pose.bone_groups.values():
 		exportBoneGroup(fp, bg)

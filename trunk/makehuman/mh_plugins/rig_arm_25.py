@@ -116,12 +116,12 @@ ArmArmature = [
 	('HandFK_R', 'True',		-1.22173, 'LoArmFK_R', F_CON+F_WIR, L_ARMFK, (1,1,1) ),
 
 	# IK common
-	('UpArmIK_L', 'True',		1.69297, 'ArmRoot_L', F_CON, L_HELP, (1,1,1) ),
-	('LoArmIK_L', 'True',		1.58825, 'UpArmIK_L', F_CON, L_HELP, (1,1,1) ),
+	('UpArmIK_L', 'True',		1.69297, 'ArmRoot_L', F_CON, L_ARMIK, (1,1,1) ),
+	('LoArmIK_L', 'True',		1.58825, 'UpArmIK_L', F_CON, L_ARMIK, (1,1,1) ),
 	('HandIK_L', 'True',		1.5708, 'Root', F_WIR, L_ARMIK, (1,1,1)),
 
-	('UpArmIK_R', 'True',		-1.69297, 'ArmRoot_R', F_CON, L_HELP, (1,1,1) ),
-	('LoArmIK_R', 'True',		-1.58825, 'UpArmIK_R', F_CON, L_HELP, (1,1,1) ),
+	('UpArmIK_R', 'True',		-1.69297, 'ArmRoot_R', F_CON, L_ARMIK, (1,1,1) ),
+	('LoArmIK_R', 'True',		-1.58825, 'UpArmIK_R', F_CON, L_ARMIK, (1,1,1) ),
 	('HandIK_R', 'True',		-1.5708, 'Root', F_WIR, L_ARMIK, (1,1,1)),
 
 	# IK elbow uparm ik

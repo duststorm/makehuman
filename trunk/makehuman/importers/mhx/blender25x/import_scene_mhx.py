@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.7
+Version 0.8
 
 """
 
 bl_addon_info = {
 	'name': 'Import MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.7',
+	'version': '0.8',
 	'blender': (2, 5, 3),
 	'location': 'File > Import',
 	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
@@ -48,7 +48,7 @@ import geometry
 import string
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 7
+MINOR_VERSION = 8
 MHX249 = False
 Blender24 = False
 Blender25 = True
@@ -91,7 +91,7 @@ T_Rigify = 0x1000
 T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -129,12 +129,12 @@ def setFlagsAndFloats(rigFlags):
 	rigArm = 0
 	if toggle & T_Preset:
 		if presetRig == 'Gobo':
-			rigLeg = T_KneePT + T_GoboFoot + T_LocalFKIK
-			rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
+			rigLeg = T_KneePT + T_GoboFoot
+			rigArm = T_ElbowPT + T_FingerCurl
 			toggle &= ~T_Panel
 		elif presetRig == 'Classic':
-			rigLeg = T_Toes + T_KneeIK + T_InvFoot
-			rigArm = T_ElbowIK + T_FingerIK
+			rigLeg = T_Toes + T_InvFoot
+			rigArm = T_ElbowIK + T_FingerCurl
 			toggle |= T_Panel
 	else:
 		if footRig == 'Inverse foot': rigLeg |= T_InvFoot
@@ -148,7 +148,9 @@ def setFlagsAndFloats(rigFlags):
 
 		if fingerRig == 'IK': rigArm |= T_FingerIK
 		elif fingerRig == 'Curl': rigArm |= T_FingerCurl
-		
+
+	toggle |= T_Panel
+
 	# Global floats, used as influences
 	global fElbowIK, fKneeIK, fFingerCurl, fLegIK, fArmIK, fFingerIK
 
@@ -439,7 +441,7 @@ def parse(tokens):
 			parseProcess(val, sub)
 		elif key == 'AnimationData':
 			ob = loadedData['Object'][val[0]]
-			parseAnimationData(ob, val, sub)
+			parseAnimationData(ob, sub)
 		else:
 			data = parseDefaultType(key, val, sub)				
 
@@ -614,31 +616,33 @@ def parseKeyFramePoint(pt, args, tokens):
 	return pt
 
 #
-#	parseAnimationData(ob, args, tokens):
+#	parseAnimationData(rna, tokens):
 #	parseDriver(drv, args, tokens):
 #	parseDriverVariable(var, args, tokens):
 #
 
-def parseAnimationData(ob, args, tokens):
-	if toggle & T_MHX:
+def parseAnimationData(rna, tokens):
+	if 0 and toggle & T_MHX:
 		return
-	if ob.animation_data == None:	
-		ob.animation_data_create()
-	adata = ob.animation_data
+	if rna.animation_data == None:	
+		rna.animation_data_create()
+	adata = rna.animation_data
 	for (key, val, sub) in tokens:
 		if key == 'FCurve':
-			parseAnimDataFCurve(adata, ob, val, sub)
+			fcu = parseAnimDataFCurve(adata, rna, val, sub)
 		else:
 			defaultKey(key, val, sub, 'adata', [], globals(), locals())
 	return adata
 
-def parseAnimDataFCurve(adata, ob, args, tokens):
+def parseAnimDataFCurve(adata, rna, args, tokens):
 	dataPath = args[0]
 	index = int(args[1])
-	print("parseAnimDataFCurve", adata, dataPath, index)
+	# print("parseAnimDataFCurve", adata, dataPath, index)
 	for (key, val, sub) in tokens:
 		if key == 'Driver':
-			fcu = parseDriver(adata, dataPath, index, ob, val, sub)
+			fcu = parseDriver(adata, dataPath, index, rna, val, sub)
+		elif key == 'FModifier':
+			parseFModifier(fcu, val, sub)
 		else:
 			defaultKey(key, val, sub, 'fcu', [], globals(), locals())
 	return fcu
@@ -648,64 +652,72 @@ def parseAnimDataFCurve(adata, ob, args, tokens):
         driver = fcurve.driver
         driver.type = 'AVERAGE'
 """
-def parseDriver(adata, dataPath, index, ob, args, tokens):
-	#print("xx", dataPath, dataPath[-1])
+def parseDriver(adata, dataPath, index, rna, args, tokens):
 	if dataPath[-1] == ']':
 		words = dataPath.split(']')
-		expr = "ob." + words[0] + ']'
+		expr = "rna." + words[0] + ']'
 		pwords = words[1].split('"')
 		prop = pwords[1]
-		#print("prop", expr, prop)
+		# print("prop", expr, prop)
 		bone = eval(expr)
 		return None
 	else:
 		words = dataPath.split('.')
 		channel = words[-1]
-		expr = "ob"
+		expr = "rna"
 		for n in range(len(words)-1):
 			expr += "." + words[n]
 		expr += ".driver_add('%s', index)" % channel
 	
-	#print("expr", expr)
+	# print("expr", rna, expr)
 	fcu = eval(expr)
 	drv = fcu.driver
-	print("driver", fcu, drv)
+	drv.type = args[0]
 	for (key, val, sub) in tokens:
 		if key == 'DriverVariable':
-			var = parseDriverVariable(drv, ob, val, sub)
+			var = parseDriverVariable(drv, rna, val, sub)
 		else:
 			defaultKey(key, val, sub, 'drv', [], globals(), locals())
 	return fcu
 
-def parseDriverVariable(drv, ob, args, tokens):
+def parseDriverVariable(drv, rna, args, tokens):
 	var = drv.variables.new()
 	var.name = args[0]
 	var.type = args[1]
 	nTarget = 0
-	print("var", var, var.name, var.type)
+	# print("var", var, var.name, var.type)
 	for (key, val, sub) in tokens:
 		if key == 'Target':
-			parseDriverTarget(var, nTarget, ob, val, sub)
+			parseDriverTarget(var, nTarget, rna, val, sub)
 			nTarget += 1
 		else:
 			defaultKey(key, val, sub, 'var', [], globals(), locals())
 	return var
+
+def parseFModifier(fcu, args, tokens):
+	#fmod = fcu.modifiers.new()
+	fmod = fcu.modifiers[0]
+	#fmod.type = args[0]
+	#print("fmod", fmod, fmod.type)
+	for (key, val, sub) in tokens:
+		defaultKey(key, val, sub, 'fmod', [], globals(), locals())
+	return fmod
 
 """
         var = driver.variables.new()
         var.name = target_bone
         var.targets[0].id_type = 'OBJECT'
         var.targets[0].id = obj
-        var.targets[0].data_path = driver_path
+        var.targets[0].rna_path = driver_path
 """
-def parseDriverTarget(var, nTarget, ob, args, tokens):
+def parseDriverTarget(var, nTarget, rna, args, tokens):
 	targ = var.targets[nTarget]
-	# targ.data_path = args[0]
+	# targ.rna_path = args[0]
 	# targ.id_type = args[1]
-	targ.id = ob
+	targ.id = loadedData['Object'][args[0]]
 	for (key, val, sub) in tokens:
-		defaultKey(key, val, sub, targ, [], globals(), locals())
-	print("Targ", targ, targ.id, targ.data_path, targ.id_type, targ.bone_target, targ.use_local_space_transforms)
+		defaultKey(key, val, sub, 'targ', [], globals(), locals())
+	#print("Targ", targ, targ.id, targ.data_path, targ.id_type, targ.bone_target, targ.use_local_space_transforms)
 	return targ
 
 	
@@ -726,9 +738,7 @@ def parseMaterial(args, tokens):
 	#print("Material %s %s %s" % (mat, name, loadedData['Material'][name]))
 	for (key, val, sub) in tokens:
 		if key == 'MTex':
-			#print("MTEX", val)
 			parseMTex(mat, val, sub)
-			#print("MTEX done")
 		elif key == 'Ramp':
 			parseRamp(mat, val, sub)
 		else:
@@ -915,7 +925,8 @@ def parseObject(args, tokens):
 		elif key == 'Constraint':
 			parseConstraint(ob.constraints, val, sub)
 		elif key == 'AnimationData':
-			parseAnimationData(ob, val, sub)
+			if eval(val[0]):
+				parseAnimationData(ob, sub)
 		elif key == 'ParticleSystem':
 			parseParticleSystem(ob, val, sub)
 		else:
@@ -1093,9 +1104,8 @@ def parseMesh (args, tokens):
 			parseVertColorLayer(val, sub, me)
 		elif key == 'VertexGroup':
 			parseVertexGroup(ob, me, val, sub)
-		elif key == 'ShapeKey':
-			if doShape(val[0]):
-				parseShapeKey(ob, me, val, sub)
+		elif key == 'ShapeKeys':
+			parseShapeKeys(ob, me, val, sub)
 		elif key == 'Material':
 			try:
 				me.add_material(loadedData['Material'][val[0]])
@@ -1247,6 +1257,7 @@ def parseVertexGroup(ob, me, args, tokens):
 
 
 #
+#	parseShapeKeys(ob, me, args, tokens):
 #	parseShapeKey(ob, me, args, tokens):
 #	addShapeKey(ob, name, vgroup, tokens):
 #	doShape(name):
@@ -1257,6 +1268,16 @@ def doShape(name):
 		return True
 	else:
 		return (toggle & T_Face)
+
+def parseShapeKeys(ob, me, args, tokens):
+	for (key, val, sub) in tokens:
+		if key == 'ShapeKey':
+			parseShapeKey(ob, me, val, sub)
+		elif key == 'AnimationData':
+			if me.shape_keys:
+				parseAnimationData(me.shape_keys, sub)
+	return
+
 
 def parseShapeKey(ob, me, args, tokens):
 	if verbosity > 0:
@@ -2041,9 +2062,9 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	presetRig = EnumProperty(name="Rig", description="Choose preset rig", 
 		items = [('Classic','Classic','Classic'), ('Gobo','Gobo','Gobo')], default = '1')
 	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
-		items = [('Inverse foot','Inverse foot','Inverse foot'), ('Gobo','Gobo','Gobo')], default = '1')
+		items = [('Inverse foot','Inverse foot','Inverse foot'), ('Gobo','Gobo','Gobo')], default = '2')
 	kneeRig = EnumProperty(name="Knee rig", description="Knee rig", 
-		items = [('Pole target','Pole target','Pole target'), ('Thigh IK','Thigh IK','Thigh IK'), ('None','None','None')], default = '1')
+		items = [('Pole target','Pole target','Pole target'), ('Thigh IK','Thigh IK','Thigh IK'), ('None','None','None')], default = '3')
 	elbowRig = EnumProperty(name="Elbow rig", description="Elbow rig", 
 		items = [('Pole target','Pole target','Pole target'), ('Uparm IK','Uparm IK','Uparm IK'), ('None','None','None')], default = '1')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
@@ -2052,8 +2073,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	proxy = BoolProperty(name="Proxy", description="Use proxy object", default=toggle&T_Proxy)
-	armik = BoolProperty(name="Arm IK", description="Use arm IK", default=toggle&T_ArmIK)
-	legik = BoolProperty(name="Leg IK", description="Use leg IK", default=toggle&T_LegIK)
+	#armik = BoolProperty(name="Arm IK", description="Use arm IK", default=toggle&T_ArmIK)
+	#legik = BoolProperty(name="Leg IK", description="Use leg IK", default=toggle&T_LegIK)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
@@ -2064,14 +2085,14 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Mesh = T_Mesh if self.properties.mesh else 0
 		O_Armature = T_Armature if self.properties.armature else 0
 		O_Proxy = T_Proxy if self.properties.proxy else 0
-		O_ArmIK = T_ArmIK if self.properties.armik else 0
-		O_LegIK = T_LegIK if self.properties.legik else 0
+		# O_ArmIK = T_ArmIK if self.properties.armik else 0
+		# O_LegIK = T_LegIK if self.properties.legik else 0
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		O_Preset = T_Preset if self.properties.preset else 0
-		toggle =  O_Mesh | O_Armature | O_Proxy | O_ArmIK | O_LegIK | O_Replace | O_Face | O_Shape | O_Symm | O_Preset | T_MHX 
+		toggle =  O_Mesh | O_Armature | O_Proxy | T_ArmIK | T_LegIK | O_Replace | O_Face | O_Shape | O_Symm | O_Preset | T_MHX 
 		
 		readMhxFile(self.properties.path, 	
 			(self.properties.presetRig, 

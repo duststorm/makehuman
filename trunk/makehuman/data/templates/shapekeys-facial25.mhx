@@ -1,4 +1,4 @@
-  ShapeKey BrowsDown LR
+  ShapeKey BrowsDown LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -330,7 +330,7 @@
   sv 14521 0 0 -0.00703478 ;
   sv 14523 0 0 -0.00825787 ;
   end ShapeKey
-  ShapeKey BrowsMidDown Sym
+  ShapeKey BrowsMidDown Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -756,7 +756,7 @@
   sv 14517 0 0 -0.00219917 ;
   sv 14518 0 0 -0.00298023 ;
   end ShapeKey
-  ShapeKey BrowsMidUp Sym
+  ShapeKey BrowsMidUp Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -1047,7 +1047,7 @@
   sv 14518 0 0.00139397 0.0151019 ;
   sv 14520 0 -0.000312984 -0.00217104 ;
   end ShapeKey
-  ShapeKey BrowsOutUp LR
+  ShapeKey BrowsOutUp LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -1600,7 +1600,7 @@
   sv 14522 0 0 0.0780191 ;
   sv 14523 0 0 0.0736332 ;
   end ShapeKey
-  ShapeKey BrowsSqueeze Sym
+  ShapeKey BrowsSqueeze Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -2017,7 +2017,7 @@
   sv 14518 0.008019 0 0 ;
   sv 14520 -0.000747025 0 0 ;
   end ShapeKey
-  ShapeKey Frown LR
+  ShapeKey Frown LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -2480,7 +2480,7 @@
   sv 14633 0 0 -0.0001688 ;
   sv 14634 0 0 -0.000236988 ;
   end ShapeKey
-  ShapeKey Narrow LR
+  ShapeKey Narrow LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -2990,7 +2990,7 @@
   sv 14633 0.002281 -0.005952 0 ;
   sv 14634 0.001323 -0.00641698 0 ;
   end ShapeKey
-  ShapeKey Smile LR
+  ShapeKey Smile LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -4112,7 +4112,7 @@
   sv 14633 -0.001681 -0.00292403 -0.00396204 ;
   sv 14634 -0.001016 -0.00229299 -0.00391197 ;
   end ShapeKey
-  ShapeKey Sneer LR
+  ShapeKey Sneer LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -4932,7 +4932,7 @@
   sv 14635 0.011555 0.00371403 0.0691929 ;
   sv 14636 0.010789 0.00405103 0.077764 ;
   end ShapeKey
-  ShapeKey Squint LR
+  ShapeKey Squint LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -5327,7 +5327,7 @@
   sv 14522 -0.013225 -1.60038e-05 -0.0577359 ;
   sv 14523 -0.00890303 -0.015423 -0.0643001 ;
   end ShapeKey
-  ShapeKey TongueOut Sym
+  ShapeKey TongueOut Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -5509,7 +5509,7 @@
   sv 8146 0 -0.085558 0.00187778 ;
   sv 8846 7.00355e-06 2.50041e-05 2.86102e-06 ;
   end ShapeKey
-  ShapeKey ToungeUp Sym
+  ShapeKey ToungeUp Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -5678,7 +5678,7 @@
   sv 8140 0 -0.000168994 0.0018611 ;
   sv 8846 7.00355e-06 2.50041e-05 2.86102e-06 ;
   end ShapeKey
-  ShapeKey UpLipUp LR
+  ShapeKey UpLipUp LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -5878,7 +5878,7 @@
   sv 14633 2.00048e-06 0 0.00730181 ;
   sv 14634 -7.30008e-05 -0.00029403 0.00967216 ;
   end ShapeKey
-  ShapeKey LoLipDown LR
+  ShapeKey LoLipDown LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -6035,7 +6035,7 @@
   sv 9066 -0.005182 -0.00335997 -0.040699 ;
   sv 9067 -0.004385 -0.00168997 -0.0210929 ;
   end ShapeKey
-  ShapeKey MouthOpen Sym
+  ShapeKey MouthOpen Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -8476,7 +8476,7 @@
   sv 12608 0 -0.000746012 -0.0105171 ;
   sv 12726 0 0.000241995 -0.0130892 ;
   end ShapeKey
-  ShapeKey UpLipDown LR
+  ShapeKey UpLipDown LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -8883,7 +8883,7 @@
   sv 14633 2.00048e-06 0.00384903 -0.00590181 ;
   sv 14634 0 0.00426698 -0.00842619 ;
   end ShapeKey
-  ShapeKey LoLipUp LR
+  ShapeKey LoLipUp LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -9356,7 +9356,7 @@
   sv 14633 2.00048e-06 -0.00465602 -0.0114822 ;
   sv 14634 0 -0.00508898 -0.0125518 ;
   end ShapeKey
-  ShapeKey CheekUp LR
+  ShapeKey CheekUp LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -9628,7 +9628,7 @@
   sv 12725 3.09944e-05 -0.000424981 0.000955105 ;
   sv 12726 0.000138998 -0.022506 0.029521 ;
   end ShapeKey
-  ShapeKey ToungeLeft Sym
+  ShapeKey ToungeLeft Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -9807,7 +9807,7 @@
   sv 8144 6.10054e-05 -1.09999e-05 0 ;
   sv 8146 0.000247002 -3.09981e-05 0 ;
   end ShapeKey
-  ShapeKey ToungeRight Sym
+  ShapeKey ToungeRight Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -9987,7 +9987,7 @@
   sv 8145 -1.09971e-05 0 0 ;
   sv 8146 -0.000351995 0 0 ;
   end ShapeKey
-  ShapeKey UpLidDown LR
+  ShapeKey UpLidDown LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -10797,7 +10797,7 @@
   sv 15080 -2.98023e-08 0.0144987 -0.02495 ;
   sv 15081 -2.98023e-08 0.012806 -0.0289593 ;
   end ShapeKey
-  ShapeKey LoLidUp LR
+  ShapeKey LoLidUp LR toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;

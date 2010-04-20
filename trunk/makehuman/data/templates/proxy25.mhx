@@ -37,7 +37,10 @@ Mesh HumanProxy HumanProxy
   *** ProxyFaces
   end Faces
     *** VertexGroup
+  ShapeKeys
     *** ShapeKey
+    *** AnimationData
+  end ShapeKeys
 
   vertex_normal_flip True ;
 end Mesh

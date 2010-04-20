@@ -198,10 +198,10 @@ LegArmature = [
 	('ToeFK_R', 'True',		2.86233, 'FootFK_R', F_CON+F_WIR, L_LEGFK, (1,1,1) ),
 
 	# IK Common
-	('UpLegIK_L', 'True',			-3.08923, 'Hip_L', F_CON, L_HELP, (1,1,1) ),
-	('LoLegIK_L', 'True',			-3.14159, 'UpLegIK_L', F_CON, L_HELP, (1,1,1) ),
-	('UpLegIK_R', 'True',			3.08923, 'Hip_R', F_CON, L_HELP, (1,1,1) ),
-	('LoLegIK_R', 'True',			-3.14159, 'UpLegIK_R', F_CON, L_HELP, (1,1,1) ),
+	('UpLegIK_L', 'True',			-3.08923, 'Hip_L', F_CON, L_LEGIK, (1,1,1) ),
+	('LoLegIK_L', 'True',			-3.14159, 'UpLegIK_L', F_CON, L_LEGIK, (1,1,1) ),
+	('UpLegIK_R', 'True',			3.08923, 'Hip_R', F_CON, L_LEGIK, (1,1,1) ),
+	('LoLegIK_R', 'True',			-3.14159, 'UpLegIK_R', F_CON, L_LEGIK, (1,1,1) ),
 	('FootCtrl_L', 'True',			0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
 	('FootCtrl_R', 'True',			0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
 	('LegTarget_L', 'True',			0.0, 'FootCtrl_L', F_RES, L_HELP, (1,1,1)),

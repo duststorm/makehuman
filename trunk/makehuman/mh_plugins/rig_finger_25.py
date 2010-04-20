@@ -186,7 +186,7 @@ def FingerWritePoses(fp):
 	boneGroups = {}
 
 	customShape = 'MHCircle05'
-	#customShape = None
+	customShape = None
 	# Deform with finger IK
 
 	addPoseBone(fp, 'True', 'Finger-1-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, [])

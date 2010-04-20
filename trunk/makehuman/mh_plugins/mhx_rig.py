@@ -755,31 +755,41 @@ def writeFCurve(fp, name, index, x01, x11, x21):
 #
 #	writeFkIkSwitch(fp, drivers)
 #	writeDrivers(fp, cond, drivers):
-#	writeDriver(fp, channel, index, expr, variables):
+#	writeDriver(fp, channel, index, coeffs, variables):
 #
 
 def writeFkIkSwitch(fp, drivers):
 	for (bone, cnsFK, cnsIK, targ) in drivers:
-		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, "1-ik",
+		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, (1,-1),
 			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
-		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, "ik", 
+		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
 			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
+
+# 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
+
+def writeShapeDrivers(fp, drivers):
+	for (shape, vlist) in drivers.items():
+		drvVars = []
+		(targ, channel, coeff) = vlist
+		drvVars.append( (targ, 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)]) )
+		writeDriver(fp, "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+	return
 
 def writeDrivers(fp, cond, drivers):
-	for (bone, typ, name, index, expr, variables) in drivers:
+	for (bone, typ, name, index, coeffs, variables) in drivers:
 		if typ == 'INFL':
-			writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, expr, variables)
+			writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
 		elif typ == 'ROTE':
-			writeDriver(fp, "pose.bones[\"%s\"].rotation_euler" % bone, index, expr, variables)
+			writeDriver(fp, "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
 		elif typ == 'ROTQ':
-			writeDriver(fp, "pose.bones[\"%s\"].rotation_quaternion" % bone, index, expr, variables)
+			writeDriver(fp, "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
 		elif typ == 'LOC':
-			writeDriver(fp, "pose.bones[\"%s\"].location" % bone, index, expr, variables)
+			writeDriver(fp, "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
 
-def writeDriver(fp, channel, index, expr, variables):
+def writeDriver(fp, channel, index, coeffs, variables):
 	fp.write("\n"+
 "    FCurve %s %d\n" % (channel, index) +
-"      Driver\n")
+"      Driver AVERAGE\n")
 	for (var, typ, targets) in variables:
 		fp.write("        DriverVariable %s %s\n" % (var,typ))
 		for (targ, boneTarg, ttype, flags) in targets:
@@ -794,9 +804,20 @@ def writeDriver(fp, channel, index, expr, variables):
 "          end Target\n")
 		fp.write("        end DriverVariable\n")
 	fp.write(
-"        expression '%s' ;\n" % expr +
 "        show_debug_info False ;\n" +
-"      end Driver\n" +
+"      end Driver\n")
+
+	(a0,a1) = coeffs
+	fp.write(
+"      FModifier GENERATOR \n" +
+"        active False ;\n" +
+"        additive False ;\n" +
+"        coefficients Array %f %f ;\n" % (a0,a1) +
+"        expanded True ;\n" +
+"        mode 'POLYNOMIAL' ;\n" +
+"        muted False ;\n" +
+"        poly_order 1 ;\n" +
+"      end FModifier\n" +
 "      extrapolation 'CONSTANT' ;\n" +
 "      locked False ;\n" +
 "      selected True ;\n" +
@@ -811,7 +832,7 @@ def writeDriver(fp, channel, index, expr, variables):
 #	writeAllDrivers(fp)	
 #	writeAllProcesses(fp):
 #
-import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
+import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25, rig_shape_25
 
 def setupRig(obj):
 	newSetupJoints(obj, 

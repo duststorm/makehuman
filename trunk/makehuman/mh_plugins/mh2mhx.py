@@ -22,7 +22,7 @@ TO DO
 
 """
 
-import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig
+import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig, rig_panel_25
 import classic_bones, gobo_bones #, sintel_bones
 import os
 
@@ -297,9 +297,13 @@ def copyFile25(obj, tmplName, rig, fp):
 					copyProxy("data/templates/vertexgroups-rigify25.mhx", fp, proxyVerts)	
 					copyProxy("data/templates/vertexgroups-foot25.mhx", fp, proxyVerts)	
 			elif lineSplit[1] == 'ShapeKey':
-				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
+				fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
 				copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxyVerts)	
-				copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)	
+				copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)
+			elif lineSplit[1] == 'AnimationData':
+				fp.write("  AnimationData toggle&(T_Face)\n")	
+				mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceDrivers)
+				fp.write("  end AnimationData\n")
 			elif lineSplit[1] == 'Filename':
 				path1 = os.path.expanduser("./data/textures/")
 				(path, filename) = os.path.split(lineSplit[2])

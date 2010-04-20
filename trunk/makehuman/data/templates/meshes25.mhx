@@ -14488,7 +14488,10 @@ Mesh Human Human
   Material Invisio ;
   Material Hair ;
     *** VertexGroup
+  ShapeKeys
     *** ShapeKey
+    *** AnimationData
+  end ShapeKeys
   active_uv_texture_index 0 ;
   active_vertex_color_index -1 ;
   all_edges False ;

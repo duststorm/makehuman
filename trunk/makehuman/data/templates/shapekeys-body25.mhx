@@ -1,4 +1,4 @@
-  ShapeKey BendElbowForward LR
+  ShapeKey BendElbowForward LR toggle&T_Shape
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -234,7 +234,7 @@
   sv 10746 0.064415 -0.00524807 0.013114 ;
   sv 10747 0.00140905 0 1.09999e-05 ;
   end ShapeKey
-  ShapeKey BendHeadForward Sym
+  ShapeKey BendHeadForward Sym toggle&T_Shape
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -567,7 +567,7 @@
   sv 10809 0 -1.28746e-05 9.0003e-06 ;
   sv 10817 0 5.72205e-05 -3.60012e-05 ;
   end ShapeKey
-  ShapeKey BendKneeBack LR
+  ShapeKey BendKneeBack LR toggle&T_Shape
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -799,7 +799,7 @@
   sv 7227 0 -0.0457079 0.013252 ;
   sv 8846 7.00355e-06 2.86102e-06 -2.49743e-05 ;
   end ShapeKey
-  ShapeKey BendLegBack LR
+  ShapeKey BendLegBack LR toggle&T_Shape
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -889,7 +889,7 @@
   sv 7186 0.001652 0.041145 0.00114 ;
   sv 8846 7.00355e-06 2.86102e-06 -2.49743e-05 ;
   end ShapeKey
-  ShapeKey BendLegForward LR
+  ShapeKey BendLegForward LR toggle&T_Shape
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -1177,7 +1177,7 @@
   sv 8846 7.00355e-06 2.86102e-06 -2.49743e-05 ;
   sv 14017 0.008459 0.02404 0.033931 ;
   end ShapeKey
-  ShapeKey ShoulderDown LR
+  ShapeKey ShoulderDown LR toggle&T_Shape
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
