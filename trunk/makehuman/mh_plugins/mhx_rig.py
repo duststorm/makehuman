@@ -832,7 +832,7 @@ def writeDriver(fp, channel, index, coeffs, variables):
 #	writeAllDrivers(fp)	
 #	writeAllProcesses(fp):
 #
-import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25, rig_shape_25
+import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 
 def setupRig(obj):
 	newSetupJoints(obj, 
