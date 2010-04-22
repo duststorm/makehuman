@@ -134,12 +134,18 @@ static PyObject* mh_getColorPicked(PyObject *self, PyObject *args)
 static PyObject* mh_getCameraSettings(PyObject *self, PyObject *args)
 {
     PyObject *camera = PyList_GetItem(G.cameras, 0);
-    float fovAngle = PyFloat_AsDouble(PyObject_GetAttrString(camera, "fovAngle"));
-    float zoom = PyFloat_AsDouble(PyObject_GetAttrString(camera, "zoom"));
+    PyObject *fovAngle;
+    PyObject *zoom;
 
-    return Py_BuildValue("[f,f,f,f,f,f,i,i]",
-                         0.0, 0.0, zoom,
-                         0.0, 0.0,
+    if (!camera)
+      return NULL;
+
+    fovAngle = PyObject_GetAttrString(camera, "fovAngle");
+    zoom = PyObject_GetAttrString(camera, "eyeZ");
+
+    return Py_BuildValue("[f,f,O,f,f,O,i,i]",
+                         0.0f, 0.0f, zoom,
+                         0.0f, 0.0f,
                          fovAngle,
                          G.windowHeight, G.windowWidth);
 }
