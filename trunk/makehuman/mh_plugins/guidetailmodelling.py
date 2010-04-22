@@ -410,6 +410,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
             self.breastFirmness = None
+            
+        self.stomachSlider = gui3d.Slider(self, position=[650, 269, 9.2], value=0.0, min=-1.0, max=1.0, label ="Stomach")
+        
+        self.stomach = None
+        
+        @self.stomachSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.stomach == None:
+                    self.stomach = human.getStomach()
+                human.updateStomach(self.stomach, value, self.app.settings.realtimeNormalUpdates)
+                self.stomach = min(1.0, max(-1.0, value))
+        
+        @self.stomachSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Stomach', value, self.syncSliders))
+            self.stomach = None
 
         self.noseSlider = gui3d.Slider(self, position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0, label = "Nose shape")
 
@@ -651,6 +670,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.genitalsSlider.setValue(human.getGenitals())
         self.breastSizeSlider.setValue(human.getBreastSize())
         self.breastFirmnessSlider.setValue(human.getBreastFirmness())
+        self.stomachSlider.setValue(human.getStomach())
         self.noseSlider.setValue(human.getNose())
         self.mouthSlider.setValue(human.getMouth())
         self.eyesSlider.setValue(human.getEyes())

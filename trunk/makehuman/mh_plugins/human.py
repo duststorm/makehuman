@@ -87,6 +87,7 @@ class Human(gui3d.Object):
         self.genitals = 0.0
         self.breastSize = 0.5
         self.breastFirmness = 0.5
+        self.stomach = 0.0
         self.nose = 0.0
         self.mouth = 0.0
         self.eyes = 0.0
@@ -196,6 +197,9 @@ class Human(gui3d.Object):
         
         pelvisNames = [group.name for group in self.meshData.facesGroups if "pelvis" in group.name]
         self.pelvisVertices, self.pelvisFaces = self.meshData.getVerticesAndFacesForGroups(pelvisNames)
+        
+        stomachNames = [group.name for group in self.meshData.facesGroups if "hip" in group.name]
+        self.stomachVertices, self.stomachFaces = self.meshData.getVerticesAndFacesForGroups(stomachNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -406,6 +410,12 @@ class Human(gui3d.Object):
 
     def getBreastFirmness(self):
         return self.breastFirmness
+        
+    def setStomach(self, value):
+        self.stomach = min(1.0, max(-1.0, value))
+
+    def getStomach(self):
+        return self.stomach
 
     def setNose(self, value):
         self.nose = min(1.0, max(0.0, value))
@@ -755,6 +765,203 @@ class Human(gui3d.Object):
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
+    def updateStomach(self, previous, next, recalcNormals = True, update = True):
+        stomachValues = [0 for i in xrange(0, 3)]
+        
+        # remove previous
+        if previous < 0.0:
+          stomachValues[1] += previous
+        elif previous > 0.0:
+          stomachValues[2] -= previous
+            
+        # add next
+        if next < 0.0:
+          stomachValues[1] -= next
+        elif next > 0.0:
+          stomachValues[2] += next
+          
+        self.applyStomachTargets(stomachValues)
+            
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.stomachVertices, self.stomachFaces)
+        if update:
+          self.meshData.update(self.stomachVertices)
+                
+    def applyStomachTargets(self, values):  
+        averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
+        averageToneVal = 1 - (self.muscleVal + self.flaccidVal)
+        
+        detailTargets = {}
+        
+        for i in xrange(1, 3):
+            
+            detailTargets['data/targets/details/female-young-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-light-stomach%i.target' % i] = ((((averageToneVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-heavy-stomach%i.target' % i] = ((((averageToneVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-flaccid-stomach%i.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-flaccid-light-stomach%i.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-flaccid-heavy-stomach%i.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-muscle-stomach%i.target' % i] = ((((self.muscleVal * averageWeightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-muscle-stomach%i.target' % i] = ((((self.muscleVal * self.underweightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-young-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.youngVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-light-stomach%i.target' % i] = ((((averageToneVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-heavy-stomach%i.target' % i] = ((((averageToneVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-flaccid-stomach%i.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-flaccid-light-stomach%i.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-flaccid-heavy-stomach%i.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-muscle-stomach%i.target' % i] = ((((self.muscleVal * averageWeightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-muscle-light-stomach%i.target' % i] = ((((self.muscleVal * self.underweightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-child-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
+                     * self.femaleVal) * values[i])
+                     
+            detailTargets['data/targets/details/female-old-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-light-stomach%i.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-heavy-stomach%i.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-flaccid-stomach%i.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-flaccid-light-stomach%i.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-flaccid-heavy-stomach%i.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-muscle-stomach%i.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-muscle-light-stomach%i.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+
+            detailTargets['data/targets/details/female-old-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
+                     * self.femaleVal) * values[i])
+                     
+            detailTargets['data/targets/details/male-young-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-light-stomach%i.target' % i] = ((((averageToneVal * self.underweightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-heavy-stomach%i.target' % i] = ((((averageToneVal * self.overweightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-flaccid-stomach%i.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-flaccid-light-stomach%i.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-flaccid-heavy-stomach%i.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-muscle-stomach%i.target' % i] = ((((self.muscleVal * averageWeightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-muscle-stomach%i.target' % i] = ((((self.muscleVal * self.underweightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-young-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.youngVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-light-stomach%i.target' % i] = ((((averageToneVal * self.underweightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-heavy-stomach%i.target' % i] = ((((averageToneVal * self.overweightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-flaccid-stomach%i.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-flaccid-light-stomach%i.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-flaccid-heavy-stomach%i.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-muscle-stomach%i.target' % i] = ((((self.muscleVal * averageWeightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-muscle-light-stomach%i.target' % i] = ((((self.muscleVal * self.underweightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-child-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
+                     * self.maleVal) * values[i])
+                     
+            detailTargets['data/targets/details/male-old-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-light-stomach%i.target' % i] = ((((averageToneVal * self.underweightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-heavy-stomach%i.target' % i] = ((((averageToneVal * self.overweightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-flaccid-stomach%i.target' % i] = ((((self.flaccidVal * averageWeightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-flaccid-light-stomach%i.target' % i] = ((((self.flaccidVal * self.underweightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-flaccid-heavy-stomach%i.target' % i] = ((((self.flaccidVal * self.overweightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-muscle-stomach%i.target' % i] = ((((self.muscleVal * averageWeightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-muscle-light-stomach%i.target' % i] = ((((self.muscleVal * self.underweightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+
+            detailTargets['data/targets/details/male-old-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
+                     * self.maleVal) * values[i])
+                     
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
             
     def updateNose(self, previous, next, recalcNormals = True, update = True):
@@ -1188,8 +1395,15 @@ class Human(gui3d.Object):
         breastCupValues[i] = 1 - value
         if i < 8:
             breastCupValues[i + 1] = value
-            
         self.applyBreastTargets(breastCupValues, [1.0 - self.breastFirmness, self.breastFirmness])
+        
+        # There are two stomach targets, 1 and 2, 0 is no target
+        stomachValues = [0 for i in xrange(0, 3)]
+        if self.stomach < 0.0:
+          stomachValues[1] = -self.stomach
+        elif self.stomach > 0.0:
+          stomachValues[2] = self.stomach
+        self.applyStomachTargets(stomachValues)
 
         # nose goes from 0 to 12, 0 is no target
         nose = self.nose * 12
@@ -1246,7 +1460,7 @@ class Human(gui3d.Object):
 
         self.applyHeadTargets(headValues)
         
-        # There are two head age targets, 1 and 2
+        # There are two head age targets, 1 and 2, 0 is no target
         headAgeValues = [0 for i in xrange(0, 3)]
         if self.headAge < 0.0:
           headAgeValues[1] = -self.headAge
@@ -1255,7 +1469,7 @@ class Human(gui3d.Object):
           
         self.applyHeadAgeTargets(headAgeValues)
         
-        # There are face angle targets, 1 and 2
+        # There are face angle targets, 1 and 2, 0 is no target
         faceAngleValues = [0 for i in xrange(0, 3)]
         if self.faceAngle < 0.0:
           faceAngleValues[1] -= self.faceAngle
@@ -1264,7 +1478,7 @@ class Human(gui3d.Object):
           
         self.applyFaceAngleTargets(faceAngleValues)
         
-        # There are two pelvis targets, 1 and 2
+        # There are two pelvis targets, 1 and 2, 0 is no target
         pelvisToneValues = [0 for i in xrange(0, 3)]
         if self.pelvisTone < 0.0:
           pelvisToneValues[1] = -self.pelvisTone
@@ -1611,6 +1825,7 @@ class Human(gui3d.Object):
         self.genitals = 0.0
         self.breastSize = 0.5
         self.breastFirmness = 0.5
+        self.stomach = 0.0
         self.nose = 0.0
         self.mouth = 0.0
         self.eyes = 0.0
@@ -1656,6 +1871,8 @@ class Human(gui3d.Object):
                     self.setBreastSize(float(lineData[1]))
                 elif lineData[0] == 'breastFirmness':
                     self.setBreastFirmness(float(lineData[1]))
+                elif lineData[0] == 'stomach':
+                    self.setStomach(float(lineData[1]))
                 elif lineData[0] == 'nose':
                     self.setNose(float(lineData[1]))
                 elif lineData[0] == 'mouth':
@@ -1700,6 +1917,7 @@ class Human(gui3d.Object):
         f.write('genitals %f\n' % self.getGenitals())
         f.write('breastSize %f\n' % self.getBreastSize())
         f.write('breastFirmness %f\n' % self.getBreastFirmness())
+        f.write('stomach %f\n' % self.getStomach())
         f.write('nose %f\n' % self.getNose())
         f.write('mouth %f\n' % self.getMouth())
         f.write('eyes %f\n' % self.getEyes())
