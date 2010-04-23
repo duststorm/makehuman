@@ -83,7 +83,7 @@ def BodyWritePoses(fp):
 	addPoseBone(fp, 'True', 'Breathe', None, None, (0,0,0), (0,0,0), (1,0,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'True', 'Stomach', None, None, (0,0,0), (0,0,0), (1,0,1), (1,1,1), 0,
-		[('LimitRot', C_OWNER+0+C_LTRA, ['Const', (0,0, 0,0, 0,0), (1,0,1)]),
+		[('LimitRot', C_OW_LOCAL+C_LTRA, ['Const', (0,0, 0,0, 0,0), (1,0,1)]),
 		 ('StretchTo', 0, ['Const.001', 'Hips', 'PLANE_Z'])])
 
 	addPoseBone(fp, 'True', 'Neck', 'GoboNeck', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])

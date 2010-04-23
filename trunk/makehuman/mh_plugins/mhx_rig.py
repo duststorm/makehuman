@@ -65,12 +65,20 @@ P_LKROTW = 0x0002
 P_IKLIN = 0x0004
 P_IKROT = 0x0008
 
-C_OWNER = 0x0001
-C_TARGET = 0x0002
 C_ACT = 0x0004
 C_EXP = 0x0008
 C_LTRA = 0x0010
 C_LOCAL = 0x0020
+
+C_OW_MASK = 0x0f00
+C_OW_LOCAL = 0x0100
+C_OW_LOCPAR = 0x0200
+C_OW_POSE = 0x0300
+
+C_TG_MASK = 0xf000
+C_TG_LOCAL = 0x1000
+C_TG_LOCPAR = 0x2000
+C_TG_POSE = 0x3000
 
 #
 #	newSetupJoints (obj, joints, headTails):
@@ -102,7 +110,11 @@ def newSetupJoints (obj, joints, headTails):
 			((k1, joint1), (k2, joint2)) = data
 			locations[key] = vadd(vmul(locations[joint1], k1), vmul(locations[joint2], k2))
 		elif typ == 'o':
-			(joint, offs) = data
+			(joint, offsSym) = data
+			if type(offsSym) == str:
+				offs = locations[offsSym]
+			else:
+				offs = offsSym
 			locations[key] = vadd(locations[joint], offs)
 		else:
 			raise NameError("Unknown %s" % typ)
@@ -231,7 +243,6 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
 	(lockRotX, lockRotY, lockRotZ) = lockRot
 	(lockScaleX, lockScaleY, lockScaleZ) = lockScale
-	(ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof
 
 	ikLin = boolString(flags & P_IKLIN)
 	ikRot = boolString(flags & P_IKROT)
@@ -252,9 +263,14 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 		if customShape:
 			fp.write("\t\tdisplayObject _object['%s'] ;\n" % customShape)
 
+	(ik_dof_x, ik_dof_y, ik_dof_z) = (1-lockRotX, 1-lockRotY, 1-lockRotZ)
+	(usex,usey,usez) = (0,0,0)
+	(xmin, ymin, zmin) = (-3.14159274101, -3.14159274101, -3.14159274101)
+	(xmax, ymax, zmax) = (3.14159274101, 3.14159274101, 3.14159274101)
+
 	for (typ, flags, data) in constraints:
 		if typ == 'IK':
-			addIkConstraint(fp, flags, data)
+			addIkConstraint(fp, flags, data, lockLoc, lockRot)
 		elif typ == 'Action':
 			addActionConstraint(fp, flags, data)
 		elif typ == 'CopyLoc':
@@ -267,6 +283,8 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 			addCopyTransConstraint(fp, flags, data)
 		elif typ == 'LimitRot':
 			addLimitRotConstraint(fp, flags, data)
+			(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
+			(usex,usey,usez) = data[2]			
 		elif typ == 'LimitLoc':
 			addLimitLocConstraint(fp, flags, data)
 		elif typ == 'DampedTrack':
@@ -284,12 +302,12 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 
 	fp.write(
 "    ik_dof Array %d %d %d  ; \n" % (ik_dof_x, ik_dof_y, ik_dof_z) +
-"    ik_limit Array 0 0 0  ; \n"+
+"    ik_limit Array %d %d %d  ; \n" % (usex,usey,usez)+
 "    ik_stiffness Array 0.0 0.0 0.0  ; \n")
-	'''
 	fp.write(
-"    ik_max Array 3.14159274101 3.14159274101 3.14159274101  ; \n"+
-"    ik_min Array -3.14159274101 -3.14159274101 -3.14159274101  ; \n")
+"    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
+"    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
+	'''
 	fp.write(
 "    ik_max Array 180 180 180 ;\n"+
 "    ik_min Array -180 -180 -180 ;\n")
@@ -316,7 +334,7 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 	return
 
 #
-#	addIkConstraint(fp, flags, data)
+#	addIkConstraint(fp, flags, data, lockLoc, lockRot)
 #	addActionConstraint(fp, flags, data):
 #	addCopyLocConstraint(fp, flags, data):
 #	addCopyRotConstraint(fp, flags, data):
@@ -329,13 +347,7 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 #	addLimitDistConstraint(fp, flags, data):
 #
 
-def getSpace(flags, mask):
-	if flags & mask:
-		return 'LOCAL'
-	else:
-		return 'WORLD'
-
-def addIkConstraint(fp, flags, data):
+def addIkConstraint(fp, flags, data, lockLoc, lockRot):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
@@ -344,6 +356,8 @@ def addIkConstraint(fp, flags, data):
 	(useLoc, useRot) = data[4]
 	inf = data[5]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+	(lockLocX, lockLocY, lockLocZ) = lockLoc
+	(lockRotX, lockRotY, lockRotZ) = lockRot
 
 	if Mhx25:
 		fp.write(
@@ -428,6 +442,7 @@ def addCopyRotConstraint(fp, flags, data):
 	inf = data[2]
 	(useX, useY, useZ) = data[3]
 	(invertX, invertY, invertZ) = data[4]
+	useOffs = data[5]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -443,7 +458,7 @@ def addCopyRotConstraint(fp, flags, data):
 "      proxy_local False ; \n"+
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ; \n" % targsp+
-"      use_offset False ; \n"+
+"      use_offset %s ; \n" % useOffs +
 "    end Constraint \n")
 
 	else:
@@ -463,6 +478,7 @@ def addCopyLocConstraint(fp, flags, data):
 	inf = data[2]
 	(useX, useY, useZ) = data[3]
 	(invertX, invertY, invertZ) = data[4]
+	useOffs = data[5]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -478,7 +494,7 @@ def addCopyLocConstraint(fp, flags, data):
 "      proxy_local False ; \n"+
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ; \n" % targsp+
-"      use_offset False ; \n"+
+"      use_offset %s ; \n" % useOffs +
 "    end Constraint \n")
 
 	else:
@@ -494,6 +510,7 @@ def addCopyScaleConstraint(fp, flags, data):
 	subtar = data[1]
 	inf = data[2]
 	(useX, useY, useZ) = data[3]
+	useOffs = data[4]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	fp.write(
@@ -507,7 +524,7 @@ def addCopyScaleConstraint(fp, flags, data):
 "      proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
-"      use_offset False ;\n" +
+"      use_offset %s ;\n" % useOffs +
 "    end Constraint\n")
 	return
 
@@ -705,8 +722,26 @@ def addLimitDistConstraint(fp, flags, data):
 	return
 
 def constraintFlags(flags):
-	ownsp = getSpace(flags, C_OWNER)
-	targsp = getSpace(flags, C_TARGET)
+	ow = flags & C_OW_MASK
+	if ow == 0:
+		ownsp = 'WORLD'
+	elif ow == C_OW_LOCAL:
+		ownsp = 'LOCAL'
+	elif ow == C_OW_LOCPAR:
+		ownsp = 'LOCAL_WITH_PARENT'
+	elif ow == C_OW_POSE:
+		ownsp = 'POSE'
+
+	tg = flags & C_TG_MASK
+	if tg == 0:
+		targsp = 'WORLD'
+	elif tg == C_TG_LOCAL:
+		targsp = 'LOCAL'
+	elif tg == C_TG_LOCPAR:
+		targsp = 'LOCAL_WITH_PARENT'
+	elif tg == C_TG_POSE:
+		targsp = 'POSE'
+
 	active = boolString(flags & C_ACT == 0)
 	expanded = boolString(flags & C_EXP == 0)
 	return (ownsp, targsp, active, expanded)

@@ -1785,7 +1785,11 @@ def parseProcess(args, tokens):
 		bpy.context.scene.objects.active = ob
 		bpy.ops.object.visual_transform_apply()
 		print("vis", list(ob.modifiers))
-		bpy.ops.object.modifier_apply(apply_as='DATA')
+		C_py = bpy.context.copy()
+		print("C_py", C_py)
+		C_py["modifier"] = mod
+		bpy.ops.object.modifier_apply(C_py)
+#		bpy.ops.object.modifier_apply(apply_as='DATA')
 		print("app")
 
 	bpy.context.scene.objects.active = rig

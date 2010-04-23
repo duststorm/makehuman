@@ -149,100 +149,99 @@ MX = 0.25
 
 
 def PanelWritePoses(fp):
-	addPoseBone(fp, 'toggle&T_Panel', 'PFace', 'MHFace', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+	addPoseBone(fp, 'toggle&T_Panel', 'PFace', 'MHFace', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PBrow_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PBrow_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PBrows', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PUpLid_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PUpLid_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLoLid_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLoLid_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PCheek_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PCheek_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PNose', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 	"""
 	addPoseBone(fp, 'toggle&T_Panel', 'PUpLip', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLoLip', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PMouth', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 	"""
 	addPoseBone(fp, 'toggle&T_Panel', 'PUpLip_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PUpLip_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLoLip_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLoLip_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PMouth_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PMouth_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PTounge', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PJaw', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PArmIK_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PArmIK_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLegIK_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLegIK_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
 
 	return
 '''
 	# Leg FK ik
 	addPoseBone(fp, 'rigLeg&T_LocalFKIK', 'LegFkIk_L', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'rigLeg&T_LocalFKIK', 'LegFkIk_R', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 
 	# Arm FK/IK
 	addPoseBone(fp, 'rigArm&T_LocalFKIK', 'ArmFkIk_L', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'rigArm&T_LocalFKIK', 'ArmFkIk_R', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OWNER, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
 	return
 '''
 
