@@ -621,15 +621,19 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.buttocks = None
 
         self.detailButtonGroup = []
+        
+        '''
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                                     'button_muscle.png'), selectedTexture=self.app.getThemeResource('images', 'button_muscle_on.png'), position=[673,
                                                     373, 9.2], selected=True)
         self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                                     'button_weight.png'), selectedTexture=self.app.getThemeResource('images', 'button_weight_on.png'), position=[708,
                                                     373, 9.2])
+        '''
 
-        self.tool = DetailTool(self.app, False, '_flaccid', '_muscle')
-
+        self.tool = Detail3dTool(self.app, False, 'translation')
+        
+        '''
         @self.muscleDetailButton.event
         def onClicked(event):
             self.tool = DetailTool(self.app, False, '_flaccid', '_muscle')
@@ -641,10 +645,11 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.tool = DetailTool(self.app, False, '_underweight', '_overweight')
             self.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.weightDetailButton, event)
+        '''
 
         self.translationButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                                    'button_translation.png'), selectedTexture=self.app.getThemeResource('images', 'button_translation_on.png'),
-                                                   position=[673, 393, 9.2])
+                                                   position=[673, 393, 9.2], selected=True)
         self.scaleButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                              'button_scale.png'), selectedTexture=self.app.getThemeResource('images', 'button_scale_on.png'), position=[708, 393, 9.2])
 
