@@ -131,11 +131,9 @@ def setFlagsAndFloats(rigFlags):
 		if presetRig == 'Gobo':
 			rigLeg = T_KneePT + T_GoboFoot
 			rigArm = T_ElbowPT + T_FingerCurl
-			toggle &= ~T_Panel
 		elif presetRig == 'Classic':
 			rigLeg = T_Toes + T_InvFoot
-			rigArm = T_ElbowIK + T_FingerCurl
-			toggle |= T_Panel
+			rigArm = T_ElbowIK + T_FingerIK
 	else:
 		if footRig == 'Inverse foot': rigLeg |= T_InvFoot
 		elif footRig == 'Gobo': rigLeg |= T_GoboFoot
@@ -440,8 +438,21 @@ def parse(tokens):
 		elif key == "Process":
 			parseProcess(val, sub)
 		elif key == 'AnimationData':
-			ob = loadedData['Object'][val[0]]
-			parseAnimationData(ob, sub)
+			try:
+				ob = loadedData['Object'][val[0]]
+			except:
+				ob = None
+			if ob:
+				bpy.context.scene.objects.active = ob
+				parseAnimationData(ob, sub)
+		elif key == 'ShapeKeys':
+			try:
+				ob = loadedData['Object'][val[0]]
+			except:
+				ob = None
+			if ob:
+				bpy.context.scene.objects.active = ob
+				parseShapeKeys(ob, ob.data, val, sub)
 		else:
 			data = parseDefaultType(key, val, sub)				
 
@@ -741,8 +752,13 @@ def parseMaterial(args, tokens):
 			parseMTex(mat, val, sub)
 		elif key == 'Ramp':
 			parseRamp(mat, val, sub)
+		elif key == 'SSS':
+			parseSSS(mat, val, sub)
+		elif key == 'Strand':
+			parseStrand(mat, val, sub)
 		else:
-			defaultKey(key, val, sub, 'mat', ['specular_intensity', 'tangent_shading'], globals(), locals())
+			exclude = ['specular_intensity', 'tangent_shading']
+			defaultKey(key, val, sub, 'mat', [], globals(), locals())
 	#print("Done ", mat)
 	
 	return mat
@@ -790,22 +806,30 @@ def parseTexture(args, tokens):
 	return tex
 
 def parseRamp(data, args, tokens):
-	return
 	nvar = "data.%s" % args[0]
-	print(data, dir(data))
-	print(nvar, eval(nvar))
+	use = "data.use_%s = True" % args[0]
+	exec(use)
+	ramp = eval(nvar)
+	elts = ramp.elements
+	n = 0
 	for (key, val, sub) in tokens:
 		print("Ramp", key, val)
 		if key == 'Element':
-			expr = "%s.color = %s" % (nvar, val[0])
-			print(expr)
-			exec(expr)
-			expr = "%s.position = %s" % (nvar, val[1])
-			print(expr)
-			exec(expr)
+			elts[n].color = eval(val[0])
+			elts[n].position = eval(val[1])
+			n += 1
 		else:
 			defaultKey(key, val,  sub, "tex", ['use_nodes', 'use_textures', 'contrast'], globals(), locals())
 	
+def parseSSS(mat, args, tokens):
+	sss = mat.subsurface_scattering
+	for (key, val, sub) in tokens:
+		defaultKey(key, val, sub, "sss", [], globals(), locals())
+
+def parseStrand(mat, args, tokens):
+	strand = mat.strand
+	for (key, val, sub) in tokens:
+		defaultKey(key, val, sub, "strand", [], globals(), locals())
 
 #
 #	doLoadImage(filepath):
@@ -1730,7 +1754,7 @@ def postProcess():
 #
 
 def parseProcess(args, tokens):
-	return
+	# return
 	rig = loadedData['Object'][args[0]]
 	parents = {}
 	objects = []
@@ -1784,13 +1808,9 @@ def parseProcess(args, tokens):
 	for (ob,tokens) in objects:
 		bpy.context.scene.objects.active = ob
 		bpy.ops.object.visual_transform_apply()
-		print("vis", list(ob.modifiers))
-		C_py = bpy.context.copy()
-		print("C_py", C_py)
-		C_py["modifier"] = mod
-		bpy.ops.object.modifier_apply(C_py)
-#		bpy.ops.object.modifier_apply(apply_as='DATA')
-		print("app")
+		#print("vis", list(ob.modifiers))
+		bpy.ops.object.modifier_apply(apply_as='DATA', modifier='Armature')
+		#print("app", list(ob.modifiers))
 
 	bpy.context.scene.objects.active = rig
 	bpy.ops.object.mode_set(mode='POSE')
@@ -2021,8 +2041,8 @@ def invalid(condition):
 def clearScene():
 	global toggle
 	scn = bpy.context.scene
-	for n in range(len(scn.visible_layers)):
-		scn.visible_layers[n] = True
+	for n in range(len(scn.layers)):
+		scn.layers[n] = True
 	print("clearScene %s %s" % (toggle & T_Replace, scn))
 	if not toggle & T_Replace:
 		return scn
@@ -2038,11 +2058,11 @@ def clearScene():
 
 def hideLayers():
 	scn = bpy.context.scene
-	for n in range(len(scn.visible_layers)):
+	for n in range(len(scn.layers)):
 		if n < 3:
-			scn.visible_layers[n] = True
+			scn.layers[n] = True
 		else:
-			scn.visible_layers[n] = False
+			scn.layers[n] = False
 	return
 
 #

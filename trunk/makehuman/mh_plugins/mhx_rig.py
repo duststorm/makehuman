@@ -749,7 +749,6 @@ def constraintFlags(flags):
 #
 #	writeAction(fp, cond, name, action, lr, ikfk):
 #	writeFCurves(fp, name, (x01, y01, z01, w01), (x21, y21, z21, w21)):
-#	writeFCurve(fp, name, index, x01, x11, x21):
 #
 
 def writeAction(fp, cond, name, action, lr, ikfk):
@@ -759,30 +758,31 @@ def writeAction(fp, cond, name, action, lr, ikfk):
 	else:
 		iklist = [""]
 	if lr:
-		for (bone, (x01, y01, z01, w01), (x21, y21, z21, w21)) in action:
+		for (bone, quats) in action:
+			rquats = []
+			for (x,y,z,w) in quats:
+				rquats.append((x,y,-z,-w))
 			for ik in iklist:
-				writeFCurves(fp, "%s%s_L" % (bone, ik), (x01, y01, z01, w01), (x21, y21, z21, w21))
-				writeFCurves(fp, "%s%s_R" % (bone, ik), (x21, y21, z21, w21), (x01, y01, z01, w01))
+				writeFCurves(fp, "%s%s_L" % (bone, ik), quats)
+				writeFCurves(fp, "%s%s_R" % (bone, ik), rquats)
 	else:
-		for (bone, quat01, quat21) in action:
+		for (bone, quats) in action:
 			for ik in iklist:
-				writeFCurves(fp, "%s%s" % (bone, ik), quat01, quat21)
+				writeFCurves(fp, "%s%s" % (bone, ik), quats)
 	fp.write("end Action\n\n")
 	return
 
-def writeFCurves(fp, name, (x01, y01, z01, w01), (x21, y21, z21, w21)):
-	writeFCurve(fp, name, 0, x01, 1.0, x21)
-	writeFCurve(fp, name, 1, y01, 0.0, y21)
-	writeFCurve(fp, name, 2, z01, 0.0, z21)
-	writeFCurve(fp, name, 3, w01, 0.0, w21)
-	return
-
-def writeFCurve(fp, name, index, x01, x11, x21):
-	fp.write("\n" +
-"  FCurve pose.bones[\"%s\"].rotation_quaternion %d\n" % (name, index) +
-"    kp 1 %.6g ;\n" % (x01) +
-"    kp 11 %.6g ;\n" % (x11) +
-"    kp 21 %.6g ;\n" % (x21) +
+def writeFCurves(fp, name, quats):
+	n = len(quats)
+	for index in range(4):
+		t = 1
+		fp.write("\n" +
+"  FCurve pose.bones[\"%s\"].rotation_quaternion %d\n" % (name, index))
+		for m in range(n):
+			x = quats[m][index]
+			fp.write("    kp %d %.4g ;\n" % (t,x))
+			t += 10
+		fp.write(
 "    extrapolation 'CONSTANT' ;\n" +
 "  end FCurve \n")
 	return
@@ -924,12 +924,12 @@ def writeAllProcesses(fp):
 	#return
 	
 	fp.write("  Edit ;\n")
-	parents = rig_arm_25.ArmParents + rig_finger_25.FingerParents + rig_leg_25.LegParents
+	parents = rig_finger_25.FingerParents + rig_arm_25.ArmParents + rig_leg_25.LegParents
 	for (bone, parent) in parents:
 		fp.write("  Reparent %s %s ;\n" % (bone, parent))
 
 	fp.write("  Pose ;\n")
-	processes = rig_arm_25.ArmProcess + rig_finger_25.FingerProcess + rig_leg_25.LegProcess
+	processes = rig_finger_25.FingerProcess + rig_arm_25.ArmProcess + rig_leg_25.LegProcess
 	for (bone, axis, angle) in processes:
 		fp.write("  Bend %s %s %.6g ;\n" % (bone, axis, angle))
 

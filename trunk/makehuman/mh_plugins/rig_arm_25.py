@@ -280,10 +280,10 @@ def ArmWritePoses(fp):
 	# Finger curl
 
 	addPoseBone(fp, 'rigArm&T_FingerCurl', 'FingerCurl_L', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 	addPoseBone(fp, 'rigArm&T_FingerCurl', 'FingerCurl_R', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.2,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (True,True, False,False, False,False)])])
 
 
 	return

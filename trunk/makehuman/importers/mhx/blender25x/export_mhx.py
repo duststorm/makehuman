@@ -696,21 +696,50 @@ def exportAction(act, fp):
 	exported = {}
 	for fcu in act.fcurves:
 		exportFCurve(fcu, exported, "  ", fp)
+	if expMsk & M_MHX:
+		explist = []
+		for (bone, blist) in exported.items():
+			explist.append((bone,blist))
+		explist.sort()
+		for (bone, blist) in explist:
+			print(bone,blist)
+			c0 = ' ['
+			fp.write("\t('%s', " % bone)
+			k = blist[0]
+			for m in range(len(k)):
+				fp.write(c0)
+				c1 = ' ('
+				for n in range(4):
+					x = blist[n][m]
+					if abs(x) < 1e-4:
+						x = 0
+					fp.write("%s%.4g" % (c1,x))
+					c1 = ', '
+				fp.write(")")
+				c0 = ', '
+			fp.write(" ]),\n")
+		return
 	writeDir(act, ['fcurves', 'groups'], "  ", fp)
 	fp.write("end Action\n\n")
+	return
 
 def exportFCurve(fcu, exported, pad, fp):
 	dataPath = fcu.data_path.replace(' ', '_')
 	words = dataPath.split('"')
 	#print("Fcurve", dataPath, words)
-	'''
-	typ = words[0].split('.')[0]
-	bname = words[1]
-	channel = words[2].split('.')[1]
-	if alreadyExported(exported, bname, (channel,fcu.array_index)):
-		return
-	#print("fcu", bname, channel)
-	'''
+
+	if expMsk & M_MHX:
+		bone = words[1]
+		try:
+			blist = exported[bone]
+		except:
+			exported[bone] = []
+
+		pts = []
+		exported[bone].append(pts)
+		for kpt in fcu.keyframe_points:
+			pts.append(kpt.co[1])
+		return 
 
 	fp.write("%sFCurve %s %d\n"  % (pad, dataPath, fcu.array_index))
 	if fcu.driver:
@@ -728,7 +757,7 @@ def exportFCurve(fcu, exported, pad, fp):
 		'auto_clamped_handles', 'color', 'color_mode', 'muted', 'visible']
 	writeDir(fcu, prio+exclude, pad+"  ", fp)
 	fp.write("%send FCurve\n\n" % pad)
-	return exported
+	return 
 
 def alreadyExported(exported, key, val):
 	try:
@@ -803,11 +832,16 @@ def exportMaterial(mat, fp):
 	for (n,mtex) in enumerate(mat.texture_slots):
 		if mtex:
 			exportMTex(n, mtex, mat.use_textures[n], fp)
-	prio = ['diffuse_color', 'diffuse_shader', 'specular_color', 'specular_shader']
+	prio = ['diffuse_color', 'diffuse_shader', 'diffuse_intensity', 
+		'specular_color', 'specular_shader', 'specular_intensity']
 	writePrio(mat, prio, "  ", fp)
-	exportRamp(mat.diffuse_ramp, "diffuse_ramp", fp)
-	exportRamp(mat.specular_ramp, "specular_ramp", fp)
-	writeDir(mat, prio+['texture_slots', 'volume', 'diffuse_ramp', 'specular_ramp'], "  ", fp)
+	exportRamp(mat.diffuse_ramp, 'diffuse_ramp', fp)
+	exportRamp(mat.specular_ramp, 'specular_ramp', fp)
+	exportSSS(mat.subsurface_scattering, fp)
+	exportStrand(mat.strand, fp)
+	writeDir(mat, prio+['texture_slots', 'volume', 
+		'diffuse_ramp', 'specular_ramp', 'use_diffuse_ramp', 'use_specular_ramp', 
+		'subsurface_scattering', 'strand'], "  ", fp)
 	fp.write("end Material\n\n")
 
 MapToTypes = {
@@ -897,6 +931,20 @@ def exportNodeTree(tree, name, fp):
 	fp.write("  NodeTree %s\n" % name)
 	return
 	#for node in tree.nodes:
+
+def exportSSS(sss, fp):
+	if sss == None:
+		return
+	fp.write("  SSS\n")
+	writeDir(sss, [], "    ", fp)
+	fp.write("  end SSS\n")
+		
+def exportStrand(strand, fp):
+	if strand == None:
+		return
+	fp.write("  Strand\n")
+	writeDir(strand, [], "    ", fp)
+	fp.write("  end Strand\n")
 		
 
 

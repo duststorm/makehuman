@@ -296,14 +296,15 @@ def copyFile25(obj, tmplName, rig, fp):
 					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
 					copyProxy("data/templates/vertexgroups-rigify25.mhx", fp, proxyVerts)	
 					copyProxy("data/templates/vertexgroups-foot25.mhx", fp, proxyVerts)	
-			elif lineSplit[1] == 'ShapeKey':
-				fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
-				copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxyVerts)	
-				copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)
-			elif lineSplit[1] == 'AnimationData':
-				fp.write("  AnimationData toggle&(T_Face)\n")	
-				mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceDrivers)
-				fp.write("  end AnimationData\n")
+			elif lineSplit[1] == 'mesh-shapeKey':
+				writeShapeKeys(fp, "Human", None)
+			elif lineSplit[1] == 'proxy-shapeKey':
+				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
+				writeShapeKeys(fp, "HumanProxy", proxyVerts)
+			elif lineSplit[1] == 'mesh-animationData':
+				writeAnimationData(fp, "Human", None)
+			elif lineSplit[1] == 'proxy-animationData':
+				writeAnimationData(fp, "HumanProxy", proxyVerts)
 			elif lineSplit[1] == 'Filename':
 				path1 = os.path.expanduser("./data/textures/")
 				(path, filename) = os.path.split(lineSplit[2])
@@ -317,6 +318,17 @@ def copyFile25(obj, tmplName, rig, fp):
 	print("Closing "+tmplName)
 	tmpl.close()
 
+	return
+
+def writeShapeKeys(fp, name, proxyVerts):
+	fp.write("ShapeKeys %s\n" % name)
+	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
+	copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxyVerts)	
+	copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)
+	fp.write("  AnimationData toggle&(T_Face)\n")	
+	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceDrivers)
+	fp.write("  end AnimationData\n")
+	fp.write("end ShapeKeys\n")
 	return
 
 #

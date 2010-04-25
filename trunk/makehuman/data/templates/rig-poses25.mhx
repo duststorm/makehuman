@@ -52,4 +52,11 @@ end AnimationData
 
 *** rig-actions
 
+# --------------- Shapekeys ----------------------------- # 
+
+*** proxy-shapeKey
+
+*** mesh-shapeKey
+
+
 
