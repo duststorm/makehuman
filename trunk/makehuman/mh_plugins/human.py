@@ -95,6 +95,7 @@ class Human(gui3d.Object):
         self.head = 0.0
         self.headAge = 0.0
         self.faceAngle = 0.0
+        self.jaw = 0.0
         self.pelvisTone = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
@@ -200,6 +201,9 @@ class Human(gui3d.Object):
         
         stomachNames = [group.name for group in self.meshData.facesGroups if "hip" in group.name]
         self.stomachVertices, self.stomachFaces = self.meshData.getVerticesAndFacesForGroups(stomachNames)
+        
+        jawNames = [group.name for group in self.meshData.facesGroups if "jaw" in group.name]
+        self.jawVertices, self.jawFaces = self.meshData.getVerticesAndFacesForGroups(jawNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -458,6 +462,12 @@ class Human(gui3d.Object):
 
     def getFaceAngle(self):
        return self.faceAngle
+       
+    def setJaw(self, value):
+        self.jaw = min(1.0, max(0.0, value))
+
+    def getJaw(self):
+       return self.jaw
        
     def setPelvisTone(self, value):
        self.pelvisTone = min(1.0, max(-1.0, value))
@@ -1245,6 +1255,48 @@ class Human(gui3d.Object):
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
                 
+    def updateJaw(self, previous, next, recalcNormals = True, update = True):
+        jawValues = [0 for i in xrange(0, 8)]
+        
+        # remove previous
+        previousJaw = previous * 7
+        i = int(math.floor(previousJaw))
+        value = previousJaw - i
+        jawValues[i] -= 1 - value
+        if i < 7:
+            jawValues[i + 1] -= value
+            
+        # add next
+        nextJaw = next * 7
+        i = int(math.floor(nextJaw))
+        value = nextJaw - i
+        jawValues[i] += 1 - value
+        if i < 7:
+            jawValues[i + 1] += value
+            
+        self.applyJawTargets(jawValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.jawVertices, self.jawFaces)
+        if update:
+          self.meshData.update(self.jawVertices)
+
+    def applyJawTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 8):
+            detailTargets['data/targets/details/male-young-jaw%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-child-jaw%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-old-jaw%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/female-young-jaw%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-child-jaw%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-old-jaw%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
     def updatePelvisTone(self, previous, next, recalcNormals = True, update = True):
         pelvisToneValues = [0 for i in xrange(0, 3)]
         
@@ -1477,6 +1529,17 @@ class Human(gui3d.Object):
           faceAngleValues[2] += self.faceAngle
           
         self.applyFaceAngleTargets(faceAngleValues)
+        
+        # jaw goes from 0 to 7, 0 is no target
+        jaw = self.jaw * 7
+        jawValues = [0 for i in xrange(0, 8)]
+        i = int(math.floor(jaw))
+        value = jaw - i
+        jawValues[i] = 1 - value
+        if i < 7:
+            jawValues[i + 1] = value
+            
+        self.applyJawTargets(jawValues)
         
         # There are two pelvis targets, 1 and 2, 0 is no target
         pelvisToneValues = [0 for i in xrange(0, 3)]
@@ -1833,6 +1896,7 @@ class Human(gui3d.Object):
         self.head = 0.0
         self.headAge = 0.0
         self.faceAngle = 0.0
+        self.jaw = 0.0
         self.pelvisTone = 0.0
 
         self.activeEthnicSets = {}
@@ -1887,6 +1951,8 @@ class Human(gui3d.Object):
                     self.setHeadAge(float(lineData[1]))
                 elif lineData[0] == 'faceAngle':
                     self.setFaceAngle(float(lineData[1]))
+                elif lineData[0] == 'jaw':
+                    self.setJaw(float(lineData[1]))
                 elif lineData[0] == 'pelvisTone':
                     self.setPelvisTone(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
@@ -1925,6 +1991,7 @@ class Human(gui3d.Object):
         f.write('head %f\n' % self.getHead())
         f.write('headAge %f\n' % self.getHeadAge())
         f.write('faceAngle %f\n' % self.getFaceAngle())
+        f.write('jaw %f\n' % self.getJaw())
         f.write('pelvisTone %f\n' % self.getPelvisTone())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')

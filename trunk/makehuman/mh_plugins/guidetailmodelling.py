@@ -563,6 +563,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'FaceAngle', value, self.syncSliders))
             self.faceAngle = None
             
+        self.jawSlider = gui3d.Slider(self, position=[10, 374, 9.2], value=0.0, min=0.0, max=1.0, label = "Jaw shape")
+
+        self.jaw = None
+        
+        @self.jawSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.jaw == None:
+                    self.jaw = human.getJaw()
+                human.updateJaw(self.jaw, value, self.app.settings.realtimeNormalUpdates)
+                self.jaw = min(1.0, max(0.0, value))
+        
+        @self.jawSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Jaw', value, self.syncSliders))
+            self.jaw = None
+            
         self.pelvisToneSlider = gui3d.Slider(self, position=[650, 235, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone")
 
         self.pelvisTone = None
@@ -678,6 +697,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.headShapeSlider.setValue(human.getHead())
         self.headAgeSlider.setValue(human.getHeadAge())
         self.faceAngleSlider.setValue(human.getFaceAngle())
+        self.jawSlider.setValue(human.getJaw())
         self.pelvisToneSlider.setValue(human.getPelvisTone())
 
 class MicroModelingTaskView(gui3d.TaskView):
