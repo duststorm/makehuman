@@ -600,6 +600,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'PelvisTone', value, self.syncSliders))
             self.pelvisTone = None
+            
+        self.buttocksSlider = gui3d.Slider(self, position=[650, 303, 9.2], value=0.0, min=-1.0, max=1.0, label = "Buttocks")
+
+        self.buttocks = None
+        
+        @self.buttocksSlider.event
+        def onChanging(value):
+            if self.app.settings.realtimeUpdates:
+                human = self.app.scene3d.selectedHuman
+                if self.buttocks == None:
+                    self.buttocks = human.getButtocks()
+                human.updateButtocks(self.buttocks, value, self.app.settings.realtimeNormalUpdates)
+                self.buttocks = min(1.0, max(-1.0, value))
+                
+        @self.buttocksSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Buttocks', value, self.syncSliders))
+            self.buttocks = None
 
         self.detailButtonGroup = []
         self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
@@ -699,6 +718,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.faceAngleSlider.setValue(human.getFaceAngle())
         self.jawSlider.setValue(human.getJaw())
         self.pelvisToneSlider.setValue(human.getPelvisTone())
+        self.buttocksSlider.setValue(human.getButtocks())
 
 class MicroModelingTaskView(gui3d.TaskView):
 

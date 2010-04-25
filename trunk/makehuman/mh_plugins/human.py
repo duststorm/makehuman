@@ -97,6 +97,7 @@ class Human(gui3d.Object):
         self.faceAngle = 0.0
         self.jaw = 0.0
         self.pelvisTone = 0.0
+        self.buttocks = 0.0
         self.bodyZones = ['eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
@@ -204,6 +205,9 @@ class Human(gui3d.Object):
         
         jawNames = [group.name for group in self.meshData.facesGroups if "jaw" in group.name]
         self.jawVertices, self.jawFaces = self.meshData.getVerticesAndFacesForGroups(jawNames)
+        
+        #buttocksNames = [group.name for group in self.meshData.facesGroups if "jaw" in group.name]
+        #self.buttocksVertices, self.buttocksFaces = self.meshData.getVerticesAndFacesForGroups(buttocksNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -474,6 +478,12 @@ class Human(gui3d.Object):
 
     def getPelvisTone(self):
        return self.pelvisTone
+       
+    def setButtocks(self, value):
+       self.buttocks = min(1.0, max(-1.0, value))
+
+    def getButtocks(self):
+       return self.buttocks
 
     def setEthnic(self, ethnic, value):
         modified = None
@@ -1334,6 +1344,44 @@ class Human(gui3d.Object):
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+                
+    def updateButtocks(self, previous, next, recalcNormals = True, update = True):
+        buttocksValues = [0 for i in xrange(0, 3)]
+        
+        # remove previous
+        if previous < 0.0:
+          buttocksValues[1] += previous
+        elif previous > 0.0:
+          buttocksValues[2] -= previous
+            
+        # add next
+        if next < 0.0:
+          buttocksValues[1] -= next
+        elif next > 0.0:
+          buttocksValues[2] += next
+          
+        self.applyButtocksTargets(buttocksValues)
+        
+        if recalcNormals:
+          self.meshData.calcNormals(1, 1, self.pelvisVertices, self.pelvisFaces)
+        if update:
+          self.meshData.update(self.pelvisVertices)
+
+    def applyButtocksTargets(self, values):
+        detailTargets = {}
+        
+        for i in xrange(1, 3):
+            detailTargets['data/targets/details/male-young-nates%i.target'% i] = self.youngVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-child-nates%i.target'% i] = self.childVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/male-old-nates%i.target'% i] = self.oldVal * self.maleVal * values[i]
+            detailTargets['data/targets/details/female-young-nates%i.target'% i] = self.youngVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-child-nates%i.target'% i] = self.childVal * self.femaleVal * values[i]
+            detailTargets['data/targets/details/female-old-nates%i.target'% i] = self.oldVal * self.femaleVal * values[i]
+            
+        for (k, v) in detailTargets.iteritems():
+            if v != 0.0:
+                #print 'APP: %s, VAL: %f' % (k, v)
+                algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
     def applyAllTargets(self, progressCallback=None, update=True):
         """
@@ -1549,6 +1597,15 @@ class Human(gui3d.Object):
           pelvisToneValues[2] = self.pelvisTone
           
         self.applyPelvisToneTargets(pelvisToneValues)
+        
+        # There are two buttocks targets, 1 and 2, 0 is no target
+        buttocksValues = [0 for i in xrange(0, 3)]
+        if self.buttocks < 0.0:
+          buttocksValues[1] = -self.buttocks
+        elif self.buttocks > 0.0:
+          buttocksValues[2] = self.buttocks
+          
+        self.applyButtocksTargets(buttocksValues)
 
         for (ethnicGroup, ethnicVal) in self.targetsEthnicStack.iteritems():
 
@@ -1898,6 +1955,7 @@ class Human(gui3d.Object):
         self.faceAngle = 0.0
         self.jaw = 0.0
         self.pelvisTone = 0.0
+        self.buttocks = 0.0
 
         self.activeEthnicSets = {}
         self.targetsEthnicStack = {'neutral': 1.0}
@@ -1955,6 +2013,8 @@ class Human(gui3d.Object):
                     self.setJaw(float(lineData[1]))
                 elif lineData[0] == 'pelvisTone':
                     self.setPelvisTone(float(lineData[1]))
+                elif lineData[0] == 'buttocks':
+                    self.setButtocks(float(lineData[1]))
                 elif lineData[0] == 'ethnic':
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
@@ -1993,6 +2053,7 @@ class Human(gui3d.Object):
         f.write('faceAngle %f\n' % self.getFaceAngle())
         f.write('jaw %f\n' % self.getJaw())
         f.write('pelvisTone %f\n' % self.getPelvisTone())
+        f.write('buttocks %f\n' % self.getButtocks())
 
         modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         f.write('height %f\n' % modifier.getValue())
