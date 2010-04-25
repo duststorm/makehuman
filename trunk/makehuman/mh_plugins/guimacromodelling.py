@@ -131,7 +131,7 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_main.png'), [10, 80, 9.0])
         gui3d.Object(category, 'data/3dobjs/group_128x64.obj', self.app.getThemeResource('images', 'group_actions.png'), [10, 472, 9.0])
-        gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_ethnics.png'), [10, 340, 9.0])
+        #gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_ethnics.png'), [10, 340, 9.0])
 
     # Macro sliders
 
@@ -204,7 +204,7 @@ class MacroModelingTaskView(gui3d.TaskView):
 
 
     # Ethnic controls
-
+        '''
         self.ethnicMapButtonGroup = []
         self.asiaButton = EthnicMapButton(self, self.ethnicMapButtonGroup, mesh='data/3dobjs/button_asia.obj', texture=self.app.getThemeResource('images',
                                           'button_asia.png'), position=[630, 150, 9])
@@ -222,7 +222,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.ethnicDecreaseButton = gui3d.RadioButton(self, self.ethnicButtonGroup, mesh='data/3dobjs/button_standard_little.obj',
                                                       texture=self.app.getThemeResource('images', 'button_ethndecr.png'),
                                                       selectedTexture=self.app.getThemeResource('images', 'button_ethndecr_on.png'), position=[750, 180, 9])
-
+        '''
     # Common controls
 
         self.background = gui3d.Object(category, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
@@ -282,7 +282,7 @@ class MacroModelingTaskView(gui3d.TaskView):
             self.app.scene3d.redraw(1)
 
     # Ethnics buttons
-
+        '''
         self.ethnicsGroup = []
         self.asianButton = gui3d.RadioButton(self, self.ethnicsGroup, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images',
                                              'button_african.png'), selectedTexture=self.app.getThemeResource('images', 'button_african_on.png'), position=[49, 372, 9.1])
@@ -299,7 +299,7 @@ class MacroModelingTaskView(gui3d.TaskView):
                                                9.1])
         self.ethnicResetButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_ethnreset.png'),
                                               selectedTexture=self.app.getThemeResource('images', 'button_ethnreset_on.png'), position=[100, 452, 9.1])
-
+        '''
         self.syncSliders()
         self.syncStatus()
 
@@ -313,10 +313,11 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.heightSlider.setValue(0.5 + modifier.getValue() / 2.0)
 
     def syncEthnics(self):
-        self.asiaButton.syncEthnics()
-        self.europeButton.syncEthnics()
-        self.africaButton.syncEthnics()
-        self.americaButton.syncEthnics()
+        #self.asiaButton.syncEthnics()
+        #self.europeButton.syncEthnics()
+        #self.africaButton.syncEthnics()
+        #self.americaButton.syncEthnics()
+        pass
 
     def syncStatus(self):
         human = self.app.scene3d.selectedHuman
