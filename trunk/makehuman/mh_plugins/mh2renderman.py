@@ -798,7 +798,7 @@ def calculateHeadCentroid(obj):
     return [centr[0], centr[1], -centr[2]]
 
 
-def mh2Aqsis(scene, fName, ribRepository):
+def mh2Aqsis(camera, scene, fName, ribRepository):
     """
     This function creates the frame definition for a Renderman scene.
 
@@ -824,15 +824,12 @@ def mh2Aqsis(scene, fName, ribRepository):
     usrTexturePath = os.path.join(ribRepository, 'textures')
     shadowPath1 = os.path.join(ribRepository, 'zbuffer.tif')
     shadowPath2 = os.path.join(ribRepository, 'zmap.shad')
-    cameraData = scene.getCameraSettings()
-    yResolution = cameraData[6]
-    xResolution = cameraData[7]
-    fov = cameraData[5]
-    locX = cameraData[0]
-    locY = cameraData[1]
-    zoom = cameraData[2]
-    rotX = cameraData[3]
-    rotY = cameraData[4]
+    xResolution, yResolution = scene.getWindowSize()
+    human = scene.selectedHuman
+    locX = human.getPosition()[0]
+    locY = human.getPosition()[1]
+    rotX = human.getRotation()[0]
+    rotY = human.getRotation()[1]
 
     # These two list should be replaced by lights class in module3d.py
 
@@ -894,7 +891,7 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write('Option "statistics" "endofframe" [1]\n')
     ribfile.write('Option "searchpath" "shader" "%s:&"\n' % usrShaderPath.replace('\\', '/'))
     ribfile.write('Option "searchpath" "texture" "%s:&"\n' % usrTexturePath.replace('\\', '/'))
-    ribfile.write('Projection "perspective" "fov" %f\n' % fov)
+    ribfile.write('Projection "perspective" "fov" %f\n' % camera.fovAngle)
     ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
     ribfile.write('Clipping 0.1 100\n')
     ribfile.write('PixelSamples %s %s\n' % (2, 2))
@@ -907,9 +904,11 @@ def mh2Aqsis(scene, fName, ribRepository):
     ribfile.write('Declare "falloff" "float"\n')
     ribfile.write('Display "Final pass" "framebuffer" "rgb"\n')
     ribfile.write('Display "+%s" "file" "rgba"\n' % os.path.join(ribRepository, 'rendering.tif').replace('\\', '/'))
-    ribfile.write('\t\tTranslate %s %s %s\n' % (locX, locY, zoom))
+    ribfile.write('\t\tTranslate %s %s %s\n' % (camera.eyeX, -camera.eyeY, camera.eyeZ)) # Camera
+    ribfile.write('\t\tTranslate %s %s %s\n' % (locX, locY, 0.0)) # Model
     ribfile.write('\t\tRotate %s 1 0 0\n' % -rotX)
     ribfile.write('\t\tRotate %s 0 1 0\n' % -rotY)
+    
     ribfile.write('WorldBegin\n')
     ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.8] "color lightcolor" [1 1 1]\n')
 
@@ -1189,7 +1188,7 @@ def mh23delight(scene, fName, ribRepository):
     ribfile.close()
 
 
-def saveScene(scene, fName, ribDir, engine):
+def saveScene(camera, scene, fName, ribDir, engine):
     """
     This function exports a Renderman format scene and then invokes either
     Aqsis or Renderman to render it.
@@ -1228,7 +1227,7 @@ def saveScene(scene, fName, ribDir, engine):
     # writeShadowScene(scene, ribfile, ribRepository)
 
     if engine == 'aqsis':
-        mh2Aqsis(scene, fName, ribRepository)
+        mh2Aqsis(camera, scene, fName, ribRepository)
     if engine == 'pixie':
         print 'write pixie'
         mh2Pixie(scene, fName, ribRepository)

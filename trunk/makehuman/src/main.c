@@ -115,41 +115,6 @@ static PyObject* mh_getColorPicked(PyObject *self, PyObject *args)
     return Py_BuildValue("[i,i,i]", G.color_picked[0], G.color_picked[1], G.color_picked[2]);
 }
 
-/** \brief Get the current camera settings.
- *
- *  This function returns the current camera settings as a list of 8 Python
- *  float values:
- *  1: Camera Pan X - The camera displacement in the +X direction.
- *  2: Camera Pan Y - The camera displacement in the +Y direction.
- *  3: Camera Zoom (Z) - The camera displacement in the -Z direction.
- *  4: Camera X Rotation - The camera rotation around the X axis in degrees.
- *  5: Camera Y Rotation - The camera rotation around the Y axis in degrees.
- *  6: Camera FOV - The vertical field of view angle in degrees (Y).
- *  7: Window Width - The viewport width in pixels (X).
- *  8: Window Height - The viewport height in pixels (Y).
- *
- *  Note. The camera start position is at the origin pointing straight
- *  ahead along the +Z axis.
- */
-static PyObject* mh_getCameraSettings(PyObject *self, PyObject *args)
-{
-    PyObject *camera = PyList_GetItem(G.cameras, 0);
-    PyObject *fovAngle;
-    PyObject *zoom;
-
-    if (!camera)
-      return NULL;
-
-    fovAngle = PyObject_GetAttrString(camera, "fovAngle");
-    zoom = PyObject_GetAttrString(camera, "eyeZ");
-
-    return Py_BuildValue("[f,f,O,f,f,O,i,i]",
-                         0.0f, 0.0f, zoom,
-                         0.0f, 0.0f,
-                         fovAngle,
-                         G.windowHeight, G.windowWidth);
-}
-
 /** \brief Get the current mouse x, y cursor position on the screen, in pixels.
  *  This function retrieves the x and y mouse position in screen
  *  coordinates returning two integer values to the Python code.
@@ -176,7 +141,7 @@ static PyObject* mh_getMousePosGUI(PyObject *self, PyObject *args)
  */
 static PyObject* mh_getWindowSize(PyObject *self, PyObject *args)
 {
-    return Py_BuildValue("[i,i]", G.windowWidth, G.windowHeight);
+    return Py_BuildValue("i,i", G.windowWidth, G.windowHeight);
 }
 
 /** \brief Start the GUI window at application launch.
@@ -513,7 +478,6 @@ static PyMethodDef EmbMethods[] =
     {"getWindowSize", mh_getWindowSize, METH_VARARGS, ""},
     {"getMousePos2D", mh_getMousePos2D, METH_VARARGS, ""},
     {"getKeyModifiers", mh_getKeyModifiers, METH_VARARGS, ""},
-    {"getCameraSettings", mh_getCameraSettings, METH_VARARGS, ""},
     {"updatePickingBuffer", mh_updatePickingBuffer, METH_NOARGS, ""},
     {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},

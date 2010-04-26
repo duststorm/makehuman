@@ -52,7 +52,7 @@ def load(app):
         renderPath = mh.getPath('render')
         if not os.path.exists(renderPath):
             os.makedirs(renderPath)
-        mh2renderman.saveScene(app.scene3d, 'scena.rib', renderPath, 'aqsis')
+        mh2renderman.saveScene(app.modelCamera, app.scene3d, 'scena.rib', renderPath, 'aqsis')
 
     print 'aqsis loaded'
 

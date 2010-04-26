@@ -1765,27 +1765,6 @@ class Scene3D:
 
         return [self.mouseXRel, self.mouseYRel]
 
-    def getCameraSettings(self):
-        """
-        This method passes the current camera settings through from the
-        C core to the Python code. A list of numeric values is returned,
-        including the pan, zoom, rotation, field of view angle and the
-        viewport dimensions:
-        [locX,locY,zoom,rotX,rotY,fovAngle,windowHeight,windowWidth]. 
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        settings = mh.getCameraSettings()
-        pos = self.selectedHuman.getPosition()
-        rot = self.selectedHuman.getRotation()
-        settings[0] = pos[0]
-        settings[1] = pos[1]
-        settings[3] = rot[0]
-        settings[4] = rot[1]
-        return settings
-
     def getKeyModifiers(self):
         """
         This method returns the state of modifiers keys (CTRL, ALT, SHIFT).
