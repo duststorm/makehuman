@@ -709,7 +709,7 @@ def exportAction(act, fp):
 			for m in range(len(k)):
 				fp.write(c0)
 				c1 = ' ('
-				for n in range(4):
+				for n in range(len(blist)):
 					x = blist[n][m]
 					if abs(x) < 1e-4:
 						x = 0

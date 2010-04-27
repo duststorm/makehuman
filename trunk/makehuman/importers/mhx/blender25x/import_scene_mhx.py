@@ -1754,7 +1754,7 @@ def postProcess():
 #
 
 def parseProcess(args, tokens):
-	# return
+	return
 	rig = loadedData['Object'][args[0]]
 	parents = {}
 	objects = []
@@ -1922,6 +1922,7 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 			data.append(elt)
 
 	elif rnaType == 'Matrix':
+		return
 		i = 0
 		n = len(tokens)
 		for (key, val, sub) in tokens:
