@@ -830,7 +830,7 @@ def writeFCurves(fp, name, quats):
 #	writeDrivers(fp, cond, drivers):
 #	writeDriver(fp, channel, index, coeffs, variables):
 #
-
+'''
 def writeFkIkSwitch(fp, drivers):
 	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
 		if cnsFK:
@@ -838,6 +838,15 @@ def writeFkIkSwitch(fp, drivers):
 				[("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])])
 		writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
 			[("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])])
+'''
+
+def writeFkIkSwitch(fp, drivers):
+	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
+		if cnsFK:
+			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, (1,-1),
+				[("ik", 'SINGLE_PROP', [('HumanRig', targ)])])
+		writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
+			[("ik", 'SINGLE_PROP', [('HumanRig', targ)])])
 
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 
@@ -866,16 +875,27 @@ def writeDriver(fp, cond, channel, index, coeffs, variables):
 "      Driver AVERAGE\n")
 	for (var, typ, targets) in variables:
 		fp.write("        DriverVariable %s %s\n" % (var,typ))
-		for (targ, boneTarg, ttype, flags) in targets:
-			local = boolString(flags & C_LOCAL)
-			fp.write(
+
+		if typ == 'TRANSFORMS':
+			for (targ, boneTarg, ttype, flags) in targets:
+				local = boolString(flags & C_LOCAL)
+				fp.write(
 "          Target %s OBJECT\n" % targ +
-"            transform_type '%s' ;\n" % ttype)
-			if boneTarg:
-				fp.write("            bone_target '%s' ;\n" % boneTarg)
-			fp.write(
+"            transform_type '%s' ;\n" % ttype +
+"            bone_target '%s' ;\n" % boneTarg +
 "            use_local_space_transforms %s ;\n" % local +
 "          end Target\n")
+
+		elif typ == 'SINGLE_PROP':
+			for (targ, boneTarg) in targets:
+				fp.write(
+"          Target %s OBJECT\n" % targ +
+"            data_path '%s' ;\n" % boneTarg +
+"          end Target\n")
+
+		else:
+			raise NameError("Unknown driver type %s" % typ)
+
 		fp.write("        end DriverVariable\n")
 	fp.write(
 "        show_debug_info False ;\n" +

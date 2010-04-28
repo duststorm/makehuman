@@ -641,9 +641,9 @@ def parseAnimDataFCurve(adata, rna, args, tokens):
 	return fcu
 
 """
-        fcurve = con.driver_add("influence", 0)
-        driver = fcurve.driver
-        driver.type = 'AVERAGE'
+		fcurve = con.driver_add("influence", 0)
+		driver = fcurve.driver
+		driver.type = 'AVERAGE'
 """
 def parseDriver(adata, dataPath, index, rna, args, tokens):
 	if dataPath[-1] == ']':
@@ -697,11 +697,11 @@ def parseFModifier(fcu, args, tokens):
 	return fmod
 
 """
-        var = driver.variables.new()
-        var.name = target_bone
-        var.targets[0].id_type = 'OBJECT'
-        var.targets[0].id = obj
-        var.targets[0].rna_path = driver_path
+		var = driver.variables.new()
+		var.name = target_bone
+		var.targets[0].id_type = 'OBJECT'
+		var.targets[0].id = obj
+		var.targets[0].rna_path = driver_path
 """
 def parseDriverTarget(var, nTarget, rna, args, tokens):
 	targ = var.targets[nTarget]
@@ -2108,12 +2108,46 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		wm.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
+class MakeHumanPanel(bpy.types.Panel):
+	bl_label = "MakeHuman"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	def draw(self, context):
+		layout = self.layout
+		ob = bpy.context.active_object
+		if ob.type == 'ARMATURE':
+			layout.row().prop(ob, "PArmIK_L")
+			layout.row().prop(ob, "PArmIK_R")
+			layout.row().prop(ob, "PLegIK_L")
+			layout.row().prop(ob, "PLegIK_R")
+
+			layout.row().prop(ob, "PHandLocal_L")
+			layout.row().prop(ob, "PHandLocal_R")
+			layout.row().prop(ob, "PFootLocal_L")
+			layout.row().prop(ob, "PFootLocal_R")
+		return
+		  
+
 def register():
+	bpy.types.Object.FloatProperty(attr="PArmIK_L", name="L arm - IK", default = 0, min = 0.0, max = 1.0)
+	bpy.types.Object.FloatProperty(attr="PArmIK_R", name="R arm - IK", default = 0, min = 0.0, max = 1.0)
+	bpy.types.Object.FloatProperty(attr="PLegIK_L", name="L leg - IK", default = 0, min = 0.0, max = 1.0)
+	bpy.types.Object.FloatProperty(attr="PLegIK_R", name="R leg - IK", default = 0, min = 0.0, max = 1.0)
+
+	bpy.types.Object.FloatProperty(attr="PHandLocal_L", name="L hand - Loc", default = 0, min = 0.0, max = 1.0)
+	bpy.types.Object.FloatProperty(attr="PHandLocal_R", name="R hand - Loc", default = 0, min = 0.0, max = 1.0)
+	bpy.types.Object.FloatProperty(attr="PFootLocal_L", name="L foot - Loc", default = 0, min = 0.0, max = 1.0)
+	bpy.types.Object.FloatProperty(attr="PFootLocal_R", name="R foot - Loc", default = 0, min = 0.0, max = 1.0)
+
+	bpy.types.register(MakeHumanPanel)
 	bpy.types.register(IMPORT_OT_makehuman_mhx)
 	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 	bpy.types.INFO_MT_file_import.append(menu_func)
+	return
  
 def unregister():
+	bpy.types.unregister(MakeHumanPanel)
 	bpy.types.unregister(IMPORT_OT_makehuman_mhx)
 	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 	bpy.types.INFO_MT_file_import.remove(menu_func)
