@@ -97,8 +97,6 @@ T_MHX = 0x8000
 #	setFlagsAndFloats(rigFlags):
 #
 #	Global floats
-fElbowIK = 0.0
-fKneeIK = 0.0
 fLegIK = 0.0
 fArmIK = 0.0
 fFingerIK = 0.0
@@ -108,13 +106,9 @@ fFingerCurl = 0.0
 T_Toes = 0x0001
 T_GoboFoot = 0x0002
 T_InvFoot = 0x0004
-T_KneeIK = 0x0008
-T_KneePT = 0x0010
 
 T_FingerCurl = 0x0100
 T_FingerIK = 0x0200
-T_ElbowIK = 0x0400
-T_ElbowPT = 0x0800
 
 T_LocalFKIK = 0x8000
 
@@ -124,25 +118,19 @@ rigArm = 0
 def setFlagsAndFloats(rigFlags):
 	global toggle, rigLeg, rigArm
 
-	(presetRig, footRig, kneeRig, elbowRig, fingerRig) = rigFlags
+	(presetRig, footRig, fingerRig) = rigFlags
 	rigLeg = 0
 	rigArm = 0
 	if toggle & T_Preset:
 		if presetRig == 'Gobo':
-			rigLeg = T_KneePT + T_GoboFoot
-			rigArm = T_ElbowPT + T_FingerCurl
+			rigLeg = T_GoboFoot
+			rigArm = T_FingerCurl
 		elif presetRig == 'Classic':
 			rigLeg = T_Toes + T_InvFoot
-			rigArm = T_ElbowIK + T_FingerIK
+			rigArm = T_FingerIK
 	else:
 		if footRig == 'Inverse foot': rigLeg |= T_InvFoot
 		elif footRig == 'Gobo': rigLeg |= T_GoboFoot
-
-		if kneeRig == 'Pole target': rigLeg |= T_KneePT
-		elif kneeRig == 'Thigh IK': rigLeg |= T_KneeIK
-
-		if elbowRig == 'Pole target': rigArm |= T_ElbowPT
-		elif elbowRig == 'Uparm IK': rigArm |= T_ElbowIK
 
 		if fingerRig == 'IK': rigArm |= T_FingerIK
 		elif fingerRig == 'Curl': rigArm |= T_FingerCurl
@@ -150,21 +138,13 @@ def setFlagsAndFloats(rigFlags):
 	toggle |= T_Panel
 
 	# Global floats, used as influences
-	global fElbowIK, fKneeIK, fFingerCurl, fLegIK, fArmIK, fFingerIK
+	global fFingerCurl, fLegIK, fArmIK, fFingerIK
 
-	fElbowIK = 1.0 if rigArm&T_ElbowIK else 0.0
-	fKneeIK = 1.0 if rigLeg&T_KneeIK else 0.0
 	fFingerCurl = 1.0 if rigArm&T_FingerCurl else 0.0
 	fLegIK = 1.0 if toggle&T_LegIK else 0.0
 	fArmIK = 1.0 if toggle&T_ArmIK else 0.0
 	fFingerIK = 1.0 if rigArm&T_FingerIK else 0.0
 
-	'''
-	print(rigFlags)
-	print("%x l %x a %x" % (toggle, rigLeg, rigArm))
-	print(fElbowIK, fKneeIK, fFingerCurl)
-	print(fLegIK, fArmIK, fFingerIK)
-	'''
 	return
 
 
@@ -646,6 +626,8 @@ def parseAnimationData(rna, tokens):
 	return adata
 
 def parseAnimDataFCurve(adata, rna, args, tokens):
+	if invalid(args[2]):
+		return
 	dataPath = args[0]
 	index = int(args[1])
 	# print("parseAnimDataFCurve", adata, dataPath, index)
@@ -2087,11 +2069,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	presetRig = EnumProperty(name="Rig", description="Choose preset rig", 
 		items = [('Classic','Classic','Classic'), ('Gobo','Gobo','Gobo')], default = '1')
 	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
-		items = [('Inverse foot','Inverse foot','Inverse foot'), ('Gobo','Gobo','Gobo')], default = '2')
-	kneeRig = EnumProperty(name="Knee rig", description="Knee rig", 
-		items = [('Pole target','Pole target','Pole target'), ('Thigh IK','Thigh IK','Thigh IK'), ('None','None','None')], default = '3')
-	elbowRig = EnumProperty(name="Elbow rig", description="Elbow rig", 
-		items = [('Pole target','Pole target','Pole target'), ('Uparm IK','Uparm IK','Uparm IK'), ('None','None','None')], default = '1')
+		items = [('Reverse foot','Reverse foot','Reverse foot'), ('Gobo','Gobo','Gobo')], default = '2')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
 		items = [('IK','IK','IK'), ('Curl','Curl','Curl')], default = '1')
 
@@ -2122,8 +2100,6 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		readMhxFile(self.properties.path, 	
 			(self.properties.presetRig, 
 			self.properties.footRig, 
-			self.properties.kneeRig, 
-			self.properties.elbowRig, 
 			self.properties.fingerRig))
 		return {'FINISHED'}
 
@@ -2152,8 +2128,8 @@ if __name__ == "__main__":
 theScale = 1.0
 
 toggle = T_Replace + T_Mesh + T_Armature + T_MHX + T_ArmIK + T_LegIK
-#rigLeg = T_Toes + T_KneePT + T_GoboFoot
-#rigArm = T_ElbowPT + T_LocalFKIK + T_FingerCurl
+#rigLeg = T_Toes + T_GoboFoot
+#rigArm = T_ElbowPT + T_FingerCurl
 
 #readMhxFile("/home/thomas/makehuman/exports/foo-25.mhx")
 

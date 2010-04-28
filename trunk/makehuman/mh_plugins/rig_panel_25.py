@@ -49,14 +49,14 @@ PanelJoints = [
 	('PTounge_tail',		'o', ('origin', [0.0, -1.0, 0.3])),
 	('PJaw_head',			'o', ('origin', [0.0, -1.1, 0.0])),
 	('PJaw_tail',			'o', ('origin', [0.0, -1.1, 0.3])),
-	('PArmIK_R_head',		'o', ('origin', [-1.1, 2.0, 0.0])),
-	('PArmIK_R_tail',		'o', ('origin', [-1.1, 2.0, 0.3])),
-	('PArmIK_L_head',		'o', ('origin', [0.1, 2.0, 0.0])),
-	('PArmIK_L_tail',		'o', ('origin', [0.1, 2.0, 0.3])),
-	('PLegIK_R_head',		'o', ('origin', [-1.1, 1.5, 0.0])),
-	('PLegIK_R_tail',		'o', ('origin', [-1.1, 1.5, 0.3])),
-	('PLegIK_L_head',		'o', ('origin', [0.1, 1.5, 0.0])),
-	('PLegIK_L_tail',		'o', ('origin', [0.1, 1.5, 0.3])),
+	('PArmIK_R_head',		'o', ('origin', [-1.1, 3.7, 0.0])),
+	('PArmIK_R_tail',		'o', ('origin', [-1.1, 3.7, 0.3])),
+	('PArmIK_L_head',		'o', ('origin', [0.1, 3.7, 0.0])),
+	('PArmIK_L_tail',		'o', ('origin', [0.1, 3.7, 0.3])),
+	('PLegIK_R_head',		'o', ('origin', [-1.1, 2.5, 0.0])),
+	('PLegIK_R_tail',		'o', ('origin', [-1.1, 2.5, 0.3])),
+	('PLegIK_L_head',		'o', ('origin', [0.1, 2.5, 0.0])),
+	('PLegIK_L_tail',		'o', ('origin', [0.1, 2.5, 0.3])),
 
 	('ikfk_foot_L_head',		'o', ('foot_roll_L_head', [0.0,0,0.6])),
 	('ikfk_foot_L_tail',		'o', ('ikfk_foot_L_head', [-0.6,0,0])),
@@ -97,13 +97,7 @@ PanelHeadsTails = [
 	('PLegIK_R',			'PLegIK_R_head', 'PLegIK_R_tail'),
 	('PLegIK_L',			'PLegIK_L_head', 'PLegIK_L_tail'),
 	]
-'''
-	('LegFkIk_L',			'ikfk_foot_L_head', 'ikfk_foot_L_tail'),
-	('LegFkIk_R',			'ikfk_foot_R_head', 'ikfk_foot_R_tail'),
 
-	('ArmFkIk_L',			'ikfk_hand_L_head', 'ikfk_hand_L_tail'),
-	('ArmFkIk_R',			'ikfk_hand_R_head', 'ikfk_hand_R_tail'),
-'''	
 PanelArmature = [
 	('PFace', 'toggle&T_Panel',	-3.14159, None, F_WIR, L_PANEL, (1,1,1) ),
 	('PBrow_R', 'toggle&T_Panel',	-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
@@ -133,13 +127,6 @@ PanelArmature = [
 	('PLegIK_L', 'toggle&T_Panel',	-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
 
 ]
-'''
-	('LegFkIk_L', 'rigLeg&T_LocalFKIK',	-1.5708, 'FootCtrl_L', F_WIR, L_MAIN+L_LEGIK+L_LEGFK, (1,1,1)),
-	('LegFkIk_R', 'rigLeg&T_LocalFKIK',	-1.5708, 'FootCtrl_R', F_WIR, L_MAIN+L_LEGIK, (1,1,1)),
-
-	('ArmFkIk_L', 'rigArm&T_LocalFKIK',	-1.5708, 'Clavicle_L', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
-	('ArmFkIk_R', 'rigArm&T_LocalFKIK',	-1.5708, 'Clavicle_R', F_WIR, L_MAIN+L_ARMIK+L_ARMFK, (1,1,1)),
-'''
 
 #
 #	PanelWritePoses(fp):
@@ -215,36 +202,18 @@ def PanelWritePoses(fp):
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PArmIK_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,1), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PArmIK_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,1), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLegIK_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,1), (1,1,1,1,1,1)])])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PLegIK_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,1), (1,1,1,1,1,1)])])
 
 	return
-'''
-	# Leg FK ik
-	addPoseBone(fp, 'rigLeg&T_LocalFKIK', 'LegFkIk_L', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
-
-	addPoseBone(fp, 'rigLeg&T_LocalFKIK', 'LegFkIk_R', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
-
-
-	# Arm FK/IK
-	addPoseBone(fp, 'rigArm&T_LocalFKIK', 'ArmFkIk_L', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
-
-	addPoseBone(fp, 'rigArm&T_LocalFKIK', 'ArmFkIk_R', 'GoboIkfk', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (0,1, 0,0, 0,0), (True,True, False,False, False,False)])])
-	return
-'''
-
 '''
 	'BendElbowForward_L' : ('LoArm_L', 'ROT_X', 1, 0, 1)],
 	'BendElbowForward_R' : ('LoArm_R', 'ROT_X', 1, 0, 1)],

@@ -71,11 +71,13 @@ C_LTRA = 0x0010
 C_LOCAL = 0x0020
 
 C_OW_MASK = 0x0f00
+C_OW_WORLD = 0x0000
 C_OW_LOCAL = 0x0100
 C_OW_LOCPAR = 0x0200
 C_OW_POSE = 0x0300
 
 C_TG_MASK = 0xf000
+C_TG_WORLD = 0x0000
 C_TG_LOCAL = 0x1000
 C_TG_LOCPAR = 0x2000
 C_TG_POSE = 0x3000
@@ -293,6 +295,8 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 			addStretchToConstraint(fp, flags, data)
 		elif typ == 'LimitDist':
 			addLimitDistConstraint(fp, flags, data)
+		elif typ == 'ChildOf':
+			addChildOfConstraint(fp, flags, data)
 		else:
 			raise NameError("Unknown constraint type %s" % typ)
 
@@ -721,6 +725,40 @@ def addLimitDistConstraint(fp, flags, data):
 "\t\tend constraint\n")
 	return
 
+def addChildOfConstraint(fp, flags, data):
+	global Mhx25
+	name = data[0]
+	subtar = data[1]
+	inf = data[2]
+	(locx, locy, locz) = data[3]
+	(rotx, roty, rotz) = data[4]
+	(scalex, scaley, scalez) = data[5]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+	if Mhx25:
+		fp.write(
+"    Constraint ChildOf CHILD_OF\n" +
+"      target Refer Object HumanRig ;\n" +
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      influence %s ;\n" % inf +
+"      owner_space 'POSE' ;\n" +
+"      proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp +
+"      use_location_x %s ;\n" % locx +
+"      use_location_y %s ;\n" % locy +
+"      use_location_z %s ;\n" % locz +
+"      use_rotation_x %s ;\n" % rotx +
+"      use_rotation_y %s ;\n" % roty +
+"      use_rotation_z %s ;\n" % rotz +
+"      use_scale_x %s ;\n" % scalex +
+"      use_scale_y %s ;\n" % scaley +
+"      use_scale_z %s ;\n" % scalez +
+"    end Constraint\n")
+	return
+
+
 def constraintFlags(flags):
 	ow = flags & C_OW_MASK
 	if ow == 0:
@@ -794,11 +832,12 @@ def writeFCurves(fp, name, quats):
 #
 
 def writeFkIkSwitch(fp, drivers):
-	for (bone, cnsFK, cnsIK, targ) in drivers:
-		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, (1,-1),
-			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
-		writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
-			[("ik", 'TRANSFORMS', [('HumanRig', targ, 'LOC_X', C_LOCAL)])])
+	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
+		if cnsFK:
+			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, (1,-1),
+				[("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])])
+		writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
+			[("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])])
 
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 
@@ -807,23 +846,23 @@ def writeShapeDrivers(fp, drivers):
 		drvVars = []
 		(targ, channel, coeff) = vlist
 		drvVars.append( (targ, 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)]) )
-		writeDriver(fp, "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+		writeDriver(fp, True, "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
 def writeDrivers(fp, cond, drivers):
 	for (bone, typ, name, index, coeffs, variables) in drivers:
 		if typ == 'INFL':
-			writeDriver(fp, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
+			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
 		elif typ == 'ROTE':
-			writeDriver(fp, "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
 		elif typ == 'ROTQ':
-			writeDriver(fp, "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
 		elif typ == 'LOC':
-			writeDriver(fp, "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
 
-def writeDriver(fp, channel, index, coeffs, variables):
+def writeDriver(fp, cond, channel, index, coeffs, variables):
 	fp.write("\n"+
-"    FCurve %s %d\n" % (channel, index) +
+"    FCurve %s %d %s\n" % (channel, index, cond) +
 "      Driver AVERAGE\n")
 	for (var, typ, targets) in variables:
 		fp.write("        DriverVariable %s %s\n" % (var,typ))
