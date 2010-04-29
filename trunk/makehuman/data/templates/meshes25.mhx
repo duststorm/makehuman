@@ -14597,3 +14597,7 @@ Object Human MESH Human
   x_ray False ;
 end Object
 
+# --------------- Shapekeys ----------------------------- # 
+
+*** mesh-shapeKey
+

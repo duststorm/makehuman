@@ -90,9 +90,13 @@ ArmHeadsTails = [
 
 ]
 
-upArmRoll = 1.69297
-loArmRoll = pihalf
-handRoll = 1.22173
+#upArmRoll = 1.69297
+#loArmRoll = deg90
+#handRoll = 1.22173
+
+upArmRoll = 0.0
+loArmRoll = 0.0
+handRoll = 0.0
 
 ArmArmature = [
 	# Root
@@ -131,20 +135,31 @@ ArmArmature = [
 	('LoArmIK_L', True,		loArmRoll, 'UpArmIK_L', F_CON, L_HLPIK, (1,1,1) ),
 	('WristCtrl_L', True,		loArmRoll, 'Root', F_WIR, L_ARMIK, (1,1,1)),
 	('HandIK_L', True,		handRoll, 'LoArmIK_L', F_WIR, L_ARMIK, (1,1,1)),
-	('ElbowPT_L', True,		loArmRoll, 'WristCtrl_L', F_WIR,  L_ARMIK, (1,1,1)),
+	('ElbowPT_L', True,		loArmRoll, 'ArmRoot_L', F_WIR,  L_ARMIK, (1,1,1)),
 
 	('UpArmIK_R', True,		-upArmRoll, 'ArmRoot_R', F_CON, L_HLPIK, (1,1,1) ),
 	('LoArmIK_R', True,		-loArmRoll, 'UpArmIK_R', F_CON, L_HLPIK, (1,1,1) ),
 	('WristCtrl_R', True,		-loArmRoll, 'Root', F_WIR, L_ARMIK, (1,1,1)),
 	('HandIK_R', True,		-handRoll, 'LoArmIK_R', F_WIR, L_ARMIK, (1,1,1)),
-	('ElbowPT_R', True,		-loArmRoll, 'WristCtrl_R', F_WIR, L_ARMIK, (1,1,1)),
+	('ElbowPT_R', True,		-loArmRoll, 'ArmRoot_R', F_WIR, L_ARMIK, (1,1,1)),
 
 	# Finger curl
-	('FingerCurl_L', 'rigArm&T_FingerCurl',		0, 'LoArm_L', F_WIR, L_ARMIK+L_ARMFK, (1,1,1)),
-	('FingerCurl_R', 'rigArm&T_FingerCurl',		-3.14158, 'LoArm_R', F_WIR, L_ARMFK+L_ARMIK, (1,1,1)),
-
-
+	#('FingerCurl_L', 'rigArm&T_FingerCurl',		0, 'LoArm_L', F_WIR, L_ARMIK+L_ARMFK, (1,1,1)),
+	#('FingerCurl_R', 'rigArm&T_FingerCurl',		deg180, 'LoArm_R', F_WIR, L_ARMFK+L_ARMIK, (1,1,1)),
 ]
+
+limClavicle_L = (-deg45,deg45, 0,0, -deg20,deg20)
+limClavicle_R = (-deg45,deg45, 0,0, -deg20,deg20)
+
+limUpArm_L = (-deg90,deg90, -deg45,deg45, -deg90,deg45)
+limUpArm_R = (-deg90,deg90, -deg45,deg45, -deg45,deg90)
+
+limLoArm_L = (0,0, -deg90,deg90, -deg90,deg10)
+limLoArm_R = (0,0, -deg90,deg90, -deg10,deg90)
+
+limHand_L = (-deg90,70*deg1, 0,0, -deg20,deg20)
+limHand_R = (-deg90,70*deg1, 0,0, -deg20,deg20)
+
 
 def ArmWritePoses(fp):
 	global boneGroups
@@ -167,7 +182,7 @@ def ArmWritePoses(fp):
 	# Deform
 
 	addPoseBone(fp, True, 'Clavicle_L', 'GoboShldr_L', 'grabable', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.785398,0.785398, 0,0, -0.349066,0.785398), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limClavicle_L, (True, True, True)])])
 
 	addPoseBone(fp, True, 'UpArm_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['ConstIK', 'UpArmIK_L', 'fArmIK', (1,1,1), (0,0,0), False]),
@@ -185,13 +200,13 @@ def ArmWritePoses(fp):
 		#[('IK', 0, ['IK', 'LoArm_L', 1, None, (True, False), 1.0])])
 		[('CopyRot', 0, ['UnTwist', 'UpArm_L', True, (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, True, 'LoArmTwist_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, True, 'LoArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('IK', 0, ['IK', 'Hand_L', 1, None, (True, False), 1.0])])
 		#[('CopyRot', 0, ['UnTwist', 'LoArm_L', True, (1,1,1), (0,0,0), False])])
 
 
 	addPoseBone(fp, True, 'Clavicle_R', 'GoboShldr_R', 'grabable', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.785398,0.785398, 0,0, -0.785398,0.349066), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limClavicle_R, (True, True, True)])])
 
 	addPoseBone(fp, True, 'UpArm_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['ConstIK', 'UpArmIK_R', 'fArmIK', (1,1,1), (0,0,0), False]),
@@ -209,7 +224,7 @@ def ArmWritePoses(fp):
 		#[('IK', 0, ['IK', 'LoArm_R', 1, None, (True, False), 1.0])])
 		[('CopyRot', 0, ['UnTwist', 'UpArm_R', True, (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, True, 'LoArmTwist_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, True, 'LoArmTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('IK', 0, ['IK', 'Hand_R', 1, None, (True, False), 1.0])])
 		#[('CopyRot', 0, ['UnTwist', 'LoArm_R', True, (1,1,1), (0,0,0), False])])
 
@@ -217,61 +232,65 @@ def ArmWritePoses(fp):
 	# FK
 
 	addPoseBone(fp, True, 'UpArmFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.523,pihalf, -0.5,0.5, -1.7,0.78), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_L, (True, True, True)])])
 
-	addPoseBone(fp, True, 'LoArmFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.2,1.8, -pihalf,pihalf, -0.1,0.1), (True, True, True)])])
+	addPoseBone(fp, True, 'LoArmFK_L', 'MHCircle025', None, (0,0,0), (1,0,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_L, (True, True, True)])])
 
-	addPoseBone(fp, True, 'HandFK_L', 'MHHand', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.3,0.3, -0.1,0.1, -pihalf,pihalf), (True, True, True)])])
+	addPoseBone(fp, True, 'HandFK_L', 'MHHand', None, (0,0,0), (0,1,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_L, (True, True, True)])])
 		
 
 	addPoseBone(fp, True, 'UpArmFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.523,pihalf, -0.5,0.5, -0.78,1.7), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_R, (True, True, True)])])
 
-	addPoseBone(fp, True, 'LoArmFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.2,1.8, -pihalf,pihalf, -0.1,0.1), (True, True, True)])])
+	addPoseBone(fp, True, 'LoArmFK_R', 'MHCircle025', None, (0,0,0), (1,0,0), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_R, (True, True, True)])])
 
-	addPoseBone(fp, True, 'HandFK_R', 'MHHand', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.3,0.3, -0.1,0.1, -pihalf,pihalf), (True, True, True)])])
+	addPoseBone(fp, True, 'HandFK_R', 'MHHand', None, (0,0,0), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_R, (True, True, True)])])
 
 
 	# IK
 
 	addPoseBone(fp, True, 'UpArmIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.523,pihalf, -0.5,0.5, -1.7,0.78), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_L, (True, True, True)])])
 
-	addPoseBone(fp, True, 'LoArmIK_L', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'WristCtrl_L', 2, (-pihalf, 'ElbowPT_L'), (True, False), 1.0]),
-		 ('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.2,1.8, -pihalf,pihalf, -0.1,0.1), (True, True, True)])])
+	addPoseBone(fp, True, 'LoArmIK_L', None, None, (0,0,0), (1,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['IK', 'WristCtrl_L', 2, (deg180, 'ElbowPT_L'), (True, False), 1.0]),
+		 ('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_L, (True, True, True)])])
 
 	addPoseBone(fp, True, 'WristCtrl_L', 'MHWristCtrl_L', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['ChildOf', 'ArmRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Local', 'ArmRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'Clavicle_L'])])
 
 	addPoseBone(fp, True, 'HandIK_L', 'MHHand', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.3,0.3, -0.1,0.1, -pihalf,pihalf), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_L, (True, True, True)])])
 
 	addPoseBone(fp, True, 'ElbowPT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['ChildOf', 'WristCtrl_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		[('ChildOf', C_CHILDOF, ['Arm', 'ArmRoot_L', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Wrist', 'WristCtrl_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 
 	addPoseBone(fp, True, 'UpArmIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.523,pihalf, -0.5,0.5, -0.78,1.7), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_R, (True, True, True)])])
 
-	addPoseBone(fp, True, 'LoArmIK_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'WristCtrl_R', 2, (-pihalf, 'ElbowPT_R'), (True, False), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.2,1.8, -pihalf,pihalf, -0.1,0.1), (True, True, True)])])
+	addPoseBone(fp, True, 'LoArmIK_R', None, None, (0,0,0), (1,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['IK', 'WristCtrl_R', 2, (0, 'ElbowPT_R'), (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_R, (True, True, True)])])
 
 	addPoseBone(fp, True, 'WristCtrl_R', 'MHWristCtrl_R', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['ChildOf', 'ArmRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Local', 'ArmRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'Clavicle_R'])])
 
 	addPoseBone(fp, True, 'HandIK_R', 'MHHand', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-0.3,0.3, -0.1,0.1, -pihalf,pihalf), (True, True, True)])])
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_R, (True, True, True)])])
 
 	addPoseBone(fp, True, 'ElbowPT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['ChildOf', 'WristCtrl_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		[('ChildOf', C_CHILDOF, ['Arm', 'ArmRoot_R', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Wrist', 'WristCtrl_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 
 	# Finger curl
@@ -304,11 +323,11 @@ ArmDrivers = [
 	("UpArm_R", True, "ConstFK", "ConstIK", "PArmIK_R", "LOC_X"),
 	("LoArm_R", True, "ConstFK", "ConstIK", "PArmIK_R", "LOC_X"),
 	("Hand_R", True, "ConstFK", "ConstIK", "PArmIK_R", "LOC_X"),
-
-	("WristCtrl_L", True, None, "ChildOf", "PHandLocal_L", "LOC_X"),
-	("WristCtrl_R", True, None, "ChildOf", "PHandLocal_R", "LOC_X"),
-]
-
+]
+'''
+	("WristCtrl_L", True, "World", "Local", "PHandLocal_L", "LOC_X"),
+	("WristCtrl_R", True, "World", "Local", "PHandLocal_R", "LOC_X"),
+'''
 #
 #	ArmProcess
 #	(bone, axis, angle)

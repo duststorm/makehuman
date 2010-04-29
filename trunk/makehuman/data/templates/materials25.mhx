@@ -1,8 +1,8 @@
 # Blender 2.5 exported MHX 
-MHX 0 8 ;
 if Blender24
   error 'This file can only be read with Blender 2.5' ;
 end if
+MHX 0 9 ;
 
 # --------------- Images ----------------------------- # 
  
@@ -458,30 +458,6 @@ Material Invisio
   vertex_color_light False ;
   vertex_color_paint False ;
   z_offset 0 ;
-end Material
-
-Material ProxySkin 
-  diffuse_color Array 0.92 0.73 0.5 ;
-end Material
-
-Material ProxyWhite 
-  diffuse_color Array 1.0 1.0 1.0 ;
-end Material
-
-Material ProxyRed 
-  diffuse_color Array 1.0 0.0 0.0 ;
-end Material
-
-Material ProxyGum 
-  diffuse_color Array  0.6 0.2 0.3 ;
-end Material
-
-Material ProxyBlue 
-  diffuse_color Array 0.0 0.0 1.0 ;
-end Material
-
-Material ProxyBlack 
-  diffuse_color Array 0.0 0.0 0.0 ;
 end Material
 
 

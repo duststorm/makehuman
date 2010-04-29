@@ -23,7 +23,12 @@ import aljabr, mhxbones
 from aljabr import *
 
 pi = 3.14159
-pihalf = pi/2
+deg180 = pi
+deg90 = pi/2
+deg45 = pi/4
+deg20 = pi/9
+deg10 = pi/18
+deg1 = pi/180
 
 #
 #	Bone layers
@@ -85,7 +90,7 @@ C_TG_LOCAL = 0x1000
 C_TG_LOCPAR = 0x2000
 C_TG_POSE = 0x3000
 
-C_CHILDOF = C_OW_LOCPAR+C_TG_LOCPAR
+C_CHILDOF = C_OW_POSE+C_TG_WORLD
 
 #
 #	newSetupJoints (obj, joints, headTails):
@@ -732,6 +737,7 @@ def addLimitDistConstraint(fp, flags, data):
 
 def addChildOfConstraint(fp, flags, data):
 	global Mhx25
+	return
 	name = data[0]
 	subtar = data[1]
 	inf = data[2]
@@ -742,7 +748,7 @@ def addChildOfConstraint(fp, flags, data):
 
 	if Mhx25:
 		fp.write(
-"    Constraint ChildOf CHILD_OF\n" +
+"    Constraint %s CHILD_OF\n" % name +
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
 "      expanded %s ;\n" % expanded +
@@ -760,7 +766,8 @@ def addChildOfConstraint(fp, flags, data):
 "      use_scale_x %s ;\n" % scalex +
 "      use_scale_y %s ;\n" % scaley +
 "      use_scale_z %s ;\n" % scalez +
-"    end Constraint\n")
+"    end Constraint\n" +
+"    bpyops constraint.childof_set_inverse(constraint='%s',owner='BONE') ;\n" % name)
 	return
 
 

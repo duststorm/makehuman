@@ -1409,7 +1409,7 @@ def exportArmature(ob, fp):
 	return # exportArmature
 
 def writeBone(bone, fp):
-	fp.write("  Bone %s \n" % (bone.name.replace(' ','_')))
+	fp.write("  Bone %s True\n" % (bone.name.replace(' ','_')))
 	x = bone.head
 	fp.write("    head %.6g %.6g %.6g ; \n" % (x[0], x[1], x[2]))
 	x = bone.tail
@@ -1449,7 +1449,7 @@ def exportBone(fp, bone):
 #
 
 def exportPoseBone(fp, pb):
-	fp.write("\n  Posebone %s \n" % (pb.name.replace(' ', '_')))
+	fp.write("\n  Posebone %s True\n" % (pb.name.replace(' ', '_')))
 	for cns in pb.constraints:
 		exportConstraint(cns, fp)
 	writeArray('ik_dof', [pb.ik_dof_x, pb.ik_dof_y, pb.ik_dof_z], "    ", 1, fp)

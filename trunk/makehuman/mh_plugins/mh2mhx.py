@@ -147,14 +147,14 @@ def exportMhx_25(obj, rig, fp):
 	copyFile25(obj, "data/templates/common-armature25.mhx", rig, fp)	
 	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp)	
 	fp.write("end if\n")
+	fp.write("if toggle&T_Armature\n")
+	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp)	
+	fp.write("end if\n")
 	fp.write("if toggle&T_Proxy\n")
 	copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
 	fp.write("end if\n")
 	fp.write("if toggle&T_Mesh\n")
 	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
-	fp.write("end if\n")
-	fp.write("if toggle&T_Armature\n")
-	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp)	
 	fp.write("end if\n")
 	return
 

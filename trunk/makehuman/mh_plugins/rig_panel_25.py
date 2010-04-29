@@ -83,6 +83,7 @@ PanelJoints = [
 
 PanelHeadsTails = [
 	('PFace',			'origin', 'PFace_tail'),
+	('PFaceDisp',			'origin', 'PFace_tail'),
 	('PBrow_R',			'PBrow_R_head', 'PBrow_R_tail'),
 	('PBrow_L',			'PBrow_L_head', 'PBrow_L_tail'),
 	('PBrows',			'PBrows_head', 'PBrows_tail'),
@@ -117,6 +118,7 @@ PanelHeadsTails = [
 
 PanelArmature = [
 	('PFace', 'toggle&T_Panel',		pi, None, F_WIR, L_PANEL, (1,1,1) ),
+	('PFaceDisp', 'toggle&T_Panel',		pi, 'PFace', F_WIR+F_RES, L_PANEL, (1,1,1) ),
 	('PBrow_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PBrow_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PBrows', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
@@ -158,7 +160,9 @@ MX = 0.25
 
 
 def PanelWritePoses(fp):
-	addPoseBone(fp, 'toggle&T_Panel', 'PFace', 'MHFace', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+	addPoseBone(fp, 'toggle&T_Panel', 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'toggle&T_Panel', 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PBrow_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])

@@ -392,8 +392,9 @@ def writeBoneFile(character, fname):
 	print("Bone file %s written" % fname)
 	return
 
-writeBoneFile('Classic', '/home/thomas/svn/makehuman/mh_plugins/classic_bones.py')
+#writeBoneFile('Classic', '/home/thomas/svn/makehuman/mh_plugins/classic_bones.py')
 #writeBoneFile("Sintel", "/home/thomas/myblends/sintel/sintel_bones-raw.py")
 #writeBoneFile("Gobo", "/home/thomas/myblends/gobo/gobo_bones-raw.py")
+writeBoneFile('Test', '/home/thomas/myblends/test.py')
 
 

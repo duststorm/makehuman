@@ -38,6 +38,8 @@ end Process
 
 Pose HumanRig 
   *** rig-poses
+  active_bone_group_index 0 ;
+  ik_solver 'LEGACY' ;
 end Pose
 
 AnimationData HumanRig
@@ -51,12 +53,6 @@ end AnimationData
 # --------------- Actions ----------------------------- # 
 
 *** rig-actions
-
-# --------------- Shapekeys ----------------------------- # 
-
-*** proxy-shapeKey
-
-*** mesh-shapeKey
 
 
 

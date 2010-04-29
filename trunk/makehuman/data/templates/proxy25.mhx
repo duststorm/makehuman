@@ -123,3 +123,7 @@ Object HumanProxy MESH HumanProxy
   x_ray False ;
 end Object
 
+# --------------- Shapekeys ----------------------------- # 
+
+*** proxy-shapeKey
+

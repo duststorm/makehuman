@@ -134,7 +134,7 @@ def readHairFile(fileName):
 		if len(lineSplit) == 0:
 			pass
 		elif lineSplit[0] == 'v':
-			guide.append(Vector(float(lineSplit[1]), -float(lineSplit[3]), float(lineSplit[2])))
+			guide.append(Vector([float(lineSplit[1]), -float(lineSplit[3]), float(lineSplit[2])]))
 		elif lineSplit[0] == 'g':
 			guides.append(guide)
 		elif lineSplit[0] == 'end':
@@ -181,7 +181,7 @@ def recalcHair(guide, nmax):
 		return guide
 	dx = float(nmax)/n
 	x = 0.0
-	y0 = Vector(0.0, 0.0, 0.0)
+	y0 = Vector([0.0, 0.0, 0.0])
 	y0 = guide[0]
 	nguide = [guide[0].copy()]
 	for k in range(1,n):

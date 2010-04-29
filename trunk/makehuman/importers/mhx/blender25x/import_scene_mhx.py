@@ -22,7 +22,7 @@ Version 0.8
 bl_addon_info = {
 	'name': 'Import MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.8',
+	'version': '0.9',
 	'blender': (2, 5, 3),
 	'location': 'File > Import',
 	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
@@ -48,7 +48,7 @@ import geometry
 import string
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 8
+MINOR_VERSION = 9
 MHX249 = False
 Blender24 = False
 Blender25 = True
@@ -1466,7 +1466,7 @@ def parsePose (args, tokens):
 	nGrps = 0
 	for (key, val, sub) in tokens:
 		if key == 'Posebone':
-			parsePoseBone(pbones, val, sub)
+			parsePoseBone(pbones, ob, val, sub)
 		elif key == 'BoneGroup':
 			parseBoneGroup(ob.pose, nGrps, val, sub)
 			nGrps += 1
@@ -1494,16 +1494,26 @@ def parseBoneGroup(pose, nGrps, args, tokens):
 		defaultKey(key, val,  sub, "bg", [], globals(), locals())
 	return
 
-def parsePoseBone(pbones, args, tokens):
+def parsePoseBone(pbones, ob, args, tokens):
 	global todo
 	#print( "Parsing posebone %s" % args )
 	if invalid(args[1]):
 		return
 	name = args[0]
 	pb = pbones[name]
+	#ob.active_pose_bone = pb
 	for (key, val, sub) in tokens:
 		if key == 'Constraint':
-			parseConstraint(pb.constraints, val, sub)
+			cns = parseConstraint(pb.constraints, val, sub)
+		elif key == 'bpyops':
+			expr = "bpy.ops.%s" % val[0]
+			print(expr)
+			print("ob", bpy.context.active_object)
+			print("b", bpy.context.active_bone)
+			print("pb", bpy.context.active_pose_bone)
+			print("md", bpy.context.mode)
+			exec(expr)
+			print("alive")
 		elif key == 'ik_dof':
 			parseArray(pb, ["ik_dof_x", "ik_dof_y", "ik_dof_z"], val)
 		elif key == 'ik_limit':
@@ -1548,7 +1558,7 @@ def parseConstraint(constraints, args, tokens):
 		else:
 			defaultKey(key, val,  sub, "cns", [], globals(), locals())
 	#print("cns %s done" % cns.name)
-	return 
+	return cns
 	
 def insertInfluenceIpo(cns, bone):
 	global todo
