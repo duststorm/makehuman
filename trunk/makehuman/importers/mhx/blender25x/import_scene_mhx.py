@@ -1276,6 +1276,8 @@ def doShape(name):
 		return (toggle & T_Face)
 
 def parseShapeKeys(ob, me, args, tokens):
+	if bpy.context.object == None:
+		return
 	for (key, val, sub) in tokens:
 		if key == 'ShapeKey':
 			parseShapeKey(ob, me, val, sub)

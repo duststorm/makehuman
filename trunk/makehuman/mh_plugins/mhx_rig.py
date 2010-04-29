@@ -22,6 +22,9 @@ Functions shared by all rigs
 import aljabr, mhxbones
 from aljabr import *
 
+pi = 3.14159
+pihalf = pi/2
+
 #
 #	Bone layers
 #
@@ -81,6 +84,8 @@ C_TG_WORLD = 0x0000
 C_TG_LOCAL = 0x1000
 C_TG_LOCPAR = 0x2000
 C_TG_POSE = 0x3000
+
+C_CHILDOF = C_OW_LOCPAR+C_TG_LOCPAR
 
 #
 #	newSetupJoints (obj, joints, headTails):
@@ -742,7 +747,7 @@ def addChildOfConstraint(fp, flags, data):
 "      active %s ;\n" % active +
 "      expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
-"      owner_space 'POSE' ;\n" +
+"      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
@@ -830,7 +835,7 @@ def writeFCurves(fp, name, quats):
 #	writeDrivers(fp, cond, drivers):
 #	writeDriver(fp, channel, index, coeffs, variables):
 #
-'''
+
 def writeFkIkSwitch(fp, drivers):
 	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
 		if cnsFK:
@@ -839,7 +844,6 @@ def writeFkIkSwitch(fp, drivers):
 		writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
 			[("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])])
 '''
-
 def writeFkIkSwitch(fp, drivers):
 	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
 		if cnsFK:
@@ -847,7 +851,7 @@ def writeFkIkSwitch(fp, drivers):
 				[("ik", 'SINGLE_PROP', [('HumanRig', targ)])])
 		writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
 			[("ik", 'SINGLE_PROP', [('HumanRig', targ)])])
-
+'''
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 
 def writeShapeDrivers(fp, drivers):
