@@ -89,6 +89,7 @@ class MHApplication(gui3d.Application):
     mh.cameras.append(self.guiCamera)
 
     self.setTheme("default")
+    #self.setTheme("3d")
     
     self.settings = Settings
     self.settings.realtimeUpdates = True
@@ -299,7 +300,10 @@ class MHApplication(gui3d.Application):
     self.theme = theme
 
   def getThemeResource(self, folder, id):
-    return "data/themes/" + self.theme + "/" + folder + "/"+ id
+    if os.path.exists("data/themes/" + self.theme + "/" + folder + "/"+ id):
+      return "data/themes/" + self.theme + "/" + folder + "/"+ id
+    else:
+      return "data/themes/default/" + folder + "/"+ id
 
   def progress(self, value):
     self.progressBar.setProgress(value)
