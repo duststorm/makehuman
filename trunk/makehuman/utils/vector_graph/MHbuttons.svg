@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="744.09448819"
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.46"
    sodipodi:docname="MHbuttons.svg"
    inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_load.png"
    inkscape:export-xdpi="90.000084"
@@ -22,6 +22,78 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3847">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3849" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3851" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3829">
+      <stop
+         style="stop-color:#e6e6e6;stop-opacity:1;"
+         offset="0"
+         id="stop3831" />
+      <stop
+         style="stop-color:#e6e6e6;stop-opacity:0;"
+         offset="1"
+         id="stop3833" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3821">
+      <stop
+         style="stop-color:#00ff00;stop-opacity:1;"
+         offset="0"
+         id="stop3823" />
+      <stop
+         style="stop-color:#00ff00;stop-opacity:0;"
+         offset="1"
+         id="stop3825" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3041">
+      <stop
+         style="stop-color:#323232;stop-opacity:1;"
+         offset="0"
+         id="stop3043" />
+      <stop
+         style="stop-color:#323232;stop-opacity:0;"
+         offset="1"
+         id="stop3045" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3945">
+      <stop
+         style="stop-color:#ffff00;stop-opacity:1;"
+         offset="0"
+         id="stop3947" />
+      <stop
+         style="stop-color:#ffff00;stop-opacity:0;"
+         offset="1"
+         id="stop3949" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3931">
+      <stop
+         style="stop-color:#008b00;stop-opacity:1;"
+         offset="0"
+         id="stop3933" />
+      <stop
+         style="stop-color:#008b00;stop-opacity:0;"
+         offset="1"
+         id="stop3935" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
@@ -1485,6 +1557,84 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3945"
+       id="radialGradient3951"
+       cx="118.73647"
+       cy="598.25049"
+       fx="118.73647"
+       fy="598.25049"
+       r="31.536821"
+       gradientTransform="matrix(1,-0.2389845,5.5549321e-2,0.2324391,-34.57272,486.3971)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3931"
+       id="radialGradient3038"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.7796185,-0.1001737,3.0456582e-2,0.2370334,-8.5777697,459.45723)"
+       cx="43.867367"
+       cy="599.06024"
+       fx="43.867367"
+       fy="599.06024"
+       r="31.536821" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3041"
+       id="linearGradient3047"
+       x1="56.232883"
+       y1="595.54895"
+       x2="60.023865"
+       y2="609.44922"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3821"
+       id="linearGradient3827"
+       x1="105.51564"
+       y1="596.81262"
+       x2="109.30662"
+       y2="611.34473"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3829"
+       id="linearGradient3835"
+       x1="133.36127"
+       y1="644.4599"
+       x2="133.80803"
+       y2="662.10736"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3847"
+       id="linearGradient3853"
+       x1="129.78709"
+       y1="668.80896"
+       x2="129.78709"
+       y2="661.21381"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3829"
+       id="linearGradient3867"
+       gradientUnits="userSpaceOnUse"
+       x1="133.36127"
+       y1="644.4599"
+       x2="133.80803"
+       y2="662.10736"
+       gradientTransform="translate(-58.642235,21.902264)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3847"
+       id="linearGradient3869"
+       gradientUnits="userSpaceOnUse"
+       x1="129.78709"
+       y1="668.80896"
+       x2="129.78709"
+       y2="661.21381"
+       gradientTransform="translate(-58.642235,21.902264)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1494,15 +1644,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.2382812"
-     inkscape:cx="459.70215"
-     inkscape:cy="889.73458"
+     inkscape:cx="137.86899"
+     inkscape:cy="336.05439"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1006"
+     inkscape:window-width="1280"
+     inkscape:window-height="778"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -1512,7 +1662,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1650,7 +1800,7 @@
        x="-36.151028"
        y="191.52385"
        ry="2.2610447"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_expressions.png"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -1695,6 +1845,28 @@
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_exit.png"
        inkscape:export-xdpi="45"
        inkscape:export-ydpi="45" />
+    <rect
+       style="fill:#ffff00;fill-opacity:1;stroke:#808080;stroke-width:0.92636870999999998;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3855"
+       width="63.073643"
+       height="15.073632"
+       x="42.065277"
+       y="674.4519"
+       ry="2.2610445"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       ry="2.2610445"
+       y="674.4519"
+       x="42.065277"
+       height="15.073632"
+       width="63.073643"
+       id="rect3865"
+       style="fill:url(#linearGradient3869);fill-opacity:1;stroke:none;stroke-width:0.92636871;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
        style="fill:#808080;fill-opacity:0;stroke:none"
        id="rect3735-4-7-0-6-8-0-9-4"
@@ -2840,14 +3012,14 @@
        y="202.01938"
        id="text3802-14"
        sodipodi:linespacing="125%"
-       transform="scale(0.99469202,1.0053363)"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_expressions.png"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan3804-35"
          x="-34.114582"
-         y="202.01938">Express.</tspan></text>
+         y="202.01938">Advance</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
@@ -2970,7 +3142,7 @@
        inkscape:randomized="0"
        d="m -122.22846,159.43317 -4.83134,-8.36813 -4.83134,-8.36812 9.66268,0 9.66268,-1e-5 -4.83134,8.36813 -4.83134,8.36813 z"
        transform="matrix(0.37063632,0,0,0.37063632,68.208531,143.07048)"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_expressions.png"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -3051,9 +3223,9 @@
        x="49.673954"
        y="190.25529"
        ry="2.2610447"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_expressions_on.png"
-       inkscape:export-xdpi="45"
-       inkscape:export-ydpi="45" />
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance_on.png"
+       inkscape:export-xdpi="89.999977"
+       inkscape:export-ydpi="89.999977" />
     <rect
        style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-1"
@@ -3143,14 +3315,14 @@
        y="200.75757"
        id="text3802-14-4"
        sodipodi:linespacing="125%"
-       transform="scale(0.99469202,1.0053363)"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_expressions_on.png"
-       inkscape:export-xdpi="45"
-       inkscape:export-ydpi="45"><tspan
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance_on.png"
+       inkscape:export-xdpi="89.999977"
+       inkscape:export-ydpi="89.999977"><tspan
          sodipodi:role="line"
          id="tspan3804-35-3"
          x="52.168377"
-         y="200.75757">Express.</tspan></text>
+         y="200.75757">Advance</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
@@ -5408,25 +5580,132 @@
          x="13.570824"
          y="542.14026">.obj as Curves</tspan></text>
     <rect
-       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect3024"
-       width="63.073643"
-       height="15.073632"
-       x="11.568574"
-       y="590.66846"
-       ry="2.2610447"
-       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_unselected.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <rect
-       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:url(#linearGradient3827);fill-opacity:1;stroke:#808080;stroke-width:0.92636876999999995;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect3026"
        width="63.073643"
        height="15.073632"
        x="86.195488"
        y="590.33301"
        ry="2.2610447"
-       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_selected.png"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:url(#linearGradient3047);fill-opacity:1;stroke:#808080;stroke-width:0.926;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3024"
+       width="63.073643"
+       height="15.073632"
+       x="11.568574"
+       y="590.66846"
+       ry="2.2610447"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:url(#radialGradient3038);fill-opacity:1;stroke:none;stroke-width:0.92636877;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3027"
+       width="63.073643"
+       height="15.073632"
+       x="12.330545"
+       y="589.52344"
+       ry="2.2610447"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:url(#radialGradient3951);fill-opacity:1;stroke:none;stroke-width:0.926;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3943"
+       width="63.073643"
+       height="15.073632"
+       x="85.859337"
+       y="589.54089"
+       ry="2.2610447"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3044"
+       width="63.073643"
+       height="15.073632"
+       x="100.70751"
+       y="652.54962"
+       ry="2.2610445"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="103.58157"
+       y="659.15442"
+       id="text3046"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3048"
+         x="103.58157"
+         y="659.15442">Modeling</tspan></text>
+    <path
+       style="fill:url(#linearGradient3835);fill-opacity:1;stroke:none;stroke-width:0.92636870999999998;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 102.96875 652.5625 C 102.02929 652.5625 101.21734 653.12543 100.875 653.9375 C 100.88128 653.94461 100.86856 653.96165 100.875 653.96875 C 103.21103 656.54128 116.41956 658.53124 132.34375 658.53125 C 147.96288 658.53125 160.95944 656.62521 163.65625 654.125 C 163.36479 653.2137 162.54174 652.5625 161.53125 652.5625 L 102.96875 652.5625 z "
+       id="rect3824"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:type="star"
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       id="path3050"
+       sodipodi:sides="3"
+       sodipodi:cx="-122.22846"
+       sodipodi:cy="148.27567"
+       sodipodi:r1="11.1575"
+       sodipodi:r2="5.5787497"
+       sodipodi:arg1="1.5707963"
+       sodipodi:arg2="2.6179939"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M -122.22846,159.43317 L -127.0598,151.06504 L -131.89114,142.69692 L -122.22846,142.69692 L -112.56578,142.69691 L -117.39712,151.06504 L -122.22846,159.43317 z"
+       transform="matrix(0.3706363,0,0,0.3706363,205.15084,603.68088)"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       ry="2.2610445"
+       y="652.54962"
+       x="100.70751"
+       height="15.073632"
+       width="63.073643"
+       id="rect3837"
+       style="fill:url(#linearGradient3853);fill-opacity:1;stroke:none;stroke-width:0.92636870999999998;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="44.045708"
+       y="680.92664"
+       id="text3871"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3873"
+         x="44.045708"
+         y="680.92664">Modeling</tspan></text>
+    <path
+       style="fill:url(#linearGradient3867);fill-opacity:1;stroke:none;stroke-width:0.92636871;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 44.32651,674.46476 C 43.38705,674.46476 42.5751,675.02769 42.23276,675.83976 C 42.23904,675.84687 42.22632,675.86391 42.23276,675.87101 C 44.56879,678.44354 57.77732,680.4335 73.70151,680.43351 C 89.32064,680.43351 102.3172,678.52747 105.01401,676.02726 C 104.72255,675.11596 103.8995,674.46476 102.88901,674.46476 L 44.32651,674.46476 z"
+       id="path3861"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

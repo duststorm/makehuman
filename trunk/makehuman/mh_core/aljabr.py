@@ -33,6 +33,7 @@ __docformat__ = 'restructuredtext'
 
 from math import sqrt, cos, sin, tan, atan2
 
+machine_epsilon = 1.0e-16
 
 def vsub(vect1, vect2):
     """
@@ -532,4 +533,75 @@ def in2pts(point1, point2, t):
 
     return vadd(vmul(point1, 1 - t), vmul(point2, t))
 
+# u and m must be float 0<=m<=1
+# returns : sn,cn,dn,phi
+#TODO : Add reference: Louis V. King; Hofsommer; Salzer (after reading it yourself :P)
+#pg. 9 eq'n 35 of Louis V. King for m within 1.0e-9 range
+def jacobianEllipticFunction(u,m):
+    """
+    This function returns a triple consisting of the Jacobian elliptic functions, namely the
+    Jacobian sine (sn), Jacobian cosine (cn), Jacobian *TODO.. dn*, angle (in radians)      
 
+    Parameters
+    ----------
+
+    u:
+        *float*. A 3D vector - in the format[x,y,z] containing the
+        coordinates of the first point (i.e. starting point) of a directed line.
+
+    k:
+        *float* a value between 0 and 1 which represent the modulus of the Jacobian elliptic function
+
+    """
+    if (m< 0) or (m >1):
+        print "Coefficient for Elliptic Integral should be between 1 and 0"
+        return  #error-code!
+    a=[0]*9
+    c=[0]*9
+    if m < 1.0e-9:
+        t = sin(u)
+        b = cos(u)
+        ai = 0.25*m*(u-t*b)
+        sn = t-ai*b
+        cn = b+ai*t
+        ph = u-ai
+        dn = 1.0 - 0.5*m*t*t
+        return sn,cn,dn,ph
+    if m>=1.0 - 1.0e-9:
+        ai = 0.25*(1.0-m)
+        b = math.cosh(u)
+        t= math.tanh(u)
+        phi = 1.0/b
+        twon = b*math.sinh(u)
+        sn = t+a*(twon-u)/(b*b)
+        ph = 2.0*math.atan(math.exp(u))-math.pi/2+ai*(twon-u)/b
+        ai=ai*t*phi
+        cn = phi - ai*(twon-u)
+        dn=phi+ai*(twon+u)
+        return sn,cn,dn,ph
+        
+    a[0] = 1.0;
+    b=math.sqrt(1.0-m)
+    c[0]=math.sqrt(m)
+    twon=1.0
+    i=0
+    
+    while math.fabs(c[i]/a[i])>machine_epsilon:
+        if i>7:
+            print "Overflow in the calculation of Jacobian elliptic functions"
+            break
+        ai = a[i]
+        i=i+1
+        c[i]=0.5*(ai-b)
+        t=sqrt(ai*b)
+        a[i]=0.5*(ai+b)
+        b=t
+        twon=twon*2.0
+
+    phi=twon*a[i]*u
+    while i!=0:
+        t=c[i]*sin(phi)/a[i]
+        b=phi
+        phi=(math.asin(t)+phi)/2.0
+        i=i-1            
+    return sin(phi),cn,cn/cos(phi-b),phi

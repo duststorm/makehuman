@@ -254,8 +254,8 @@ class ExportTaskView(gui3d.TaskView):
 class FilesCategory(gui3d.Category):
 
     def __init__(self, parent):
-        gui3d.Category.__init__(self, parent, 'Files', parent.app.getThemeResource('images', 'button_loadsave.png'), parent.app.getThemeResource('images',
-                                'button_loadsave_on.png'))
+        gui3d.Category.__init__(self, parent, 'Files', parent.app.getThemeResource('images', 'button_files.png'), parent.app.getThemeResource('images',
+                                'button_files_on.png'))
 
         SaveTaskView(self)
         LoadTaskView(self)
