@@ -172,6 +172,7 @@ class MHApplication(gui3d.Application):
     guifiles.FilesCategory(self)
     self.progressBar.setProgress(0.8)
     guirender.RenderingCategory(self)
+    guiadvance.AdvanceCategory(self)
     #guiadvance.AdvanceCategory(self)
 
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),

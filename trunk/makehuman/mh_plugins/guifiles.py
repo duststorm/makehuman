@@ -33,8 +33,6 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-#from hair import exportAsCurves
-#import hair
 import mh
 import files3d
 import animation3d

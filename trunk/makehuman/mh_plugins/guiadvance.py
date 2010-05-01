@@ -34,7 +34,17 @@ main OpenGL/SDL/Application event handling loop.
 
 __docformat__ = 'restructuredtext'
 
-import mh
-import events3d
 import gui3d
-import os
+import events3d
+
+class MakeHairTaskView(gui3d.TaskView):
+    def __init__(self, category):
+        gui3d.TaskView.__init__(self, category, 'MakeHair', category.app.getThemeResource('images', 'makehair.png'), category.app.getThemeResource('images', 'makehair_on.png'))
+
+
+class AdvanceCategory(gui3d.Category):
+
+    def __init__(self, category):
+        gui3d.Category.__init__(self, category, 'Advance', category.app.getThemeResource('images', 'button_advance.png'), category.app.getThemeResource('images', 'button_advance_on.png'))
+        
+        MakeHairTaskView(self);

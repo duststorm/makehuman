@@ -1645,7 +1645,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="2.2382812"
      inkscape:cx="137.86899"
-     inkscape:cy="336.05439"
+     inkscape:cy="1001.0724"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -5708,5 +5708,57 @@
        inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\work\temp.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3065"
+       width="63.073643"
+       height="15.073632"
+       x="124.68428"
+       y="29.289566"
+       ry="2.2610447"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\makehair.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="127.57867"
+       y="40.646233"
+       id="text3067"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\makehair.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3069"
+         x="127.57867"
+         y="40.646233">MakeHair</tspan></text>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3071"
+       width="63.073643"
+       height="15.073632"
+       x="195.90002"
+       y="29.289566"
+       ry="2.2610447"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\makehair_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="199.17444"
+       y="40.646233"
+       id="text3073"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\makehair_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3075"
+         x="199.17444"
+         y="40.646233">MakeHair</tspan></text>
   </g>
 </svg>
