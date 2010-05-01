@@ -511,6 +511,9 @@ def loadFacesIndices(path, groups=False):
     
     path:
         *string*. The file system path to the file to be read.
+        
+    groups:
+        *Boolean*. It True, the facegroup names are included in the list.
        
     """
 

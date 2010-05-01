@@ -50,8 +50,7 @@ color powC(color ColToPow; float Factor)
 
 surface skin (
             string ssstexture = "";
-			string texturename = "";
-			string opacitytexture = "";
+			string texturename = "";			
             string speculartexture = "";
             string mixtexture = "";
 			float Ks = .5;
@@ -68,8 +67,10 @@ surface skin (
     float spec;
     float mixVal;
 	
-    if (texturename != "")
+    if (texturename != ""){
         Cflat = color texture (texturename);
+        Oi = float texture (texturename[3], "fill", 1);
+        }
     else Cflat = 1;
     
     if (mixtexture != "")
@@ -83,10 +84,6 @@ surface skin (
 	if (ssstexture != "")	
         Csss = color texture (ssstexture);		
     else Csss = 1;
-	
-    if (opacitytexture != "")	
-        Oi = float texture (opacitytexture) * Os ;	
-	
 	
 	
 	Nf = faceforward (normalize(N),I);

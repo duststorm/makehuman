@@ -838,8 +838,6 @@ def mh2Aqsis(camera, scene, fName, ribRepository):
 
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n' % (os.path.join(appTexturePath, 'texture.tif').replace('\\', '/'),
                   os.path.join(usrTexturePath, 'texture.texture').replace('\\', '/')))
-    ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n' % (os.path.join(appTexturePath, 'texture_opacity.tif').replace('\\', '/'),
-                  os.path.join(usrTexturePath, 'texture_opacity.texture').replace('\\', '/')))
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n' % (os.path.join(appTexturePath, 'texture_ref.tif').replace('\\', '/'),
                   os.path.join(usrTexturePath, 'texture_ref.texture').replace('\\', '/')))
     ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n' % (os.path.join(appTexturePath, 'texture_mix.tif').replace('\\', '/'),
@@ -944,8 +942,8 @@ def mh2Aqsis(camera, scene, fName, ribRepository):
             ribfile.write('\t\tRotate %s 1 0 0\n' % 0)
             ribfile.write('\t\tScale %s %s %s\n' % (1, 1, 1))
             writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [1]\n'
-                           % ('texture_mix.texture', 'texture_opacity.texture', 'texture.texture', 'texture_ref.texture', lightMapFinal.replace('\\', '/')))
+            ribfile.write('\t\tSurface "skin" "string mixtexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [1]\n'
+                           % ('texture_mix.texture', 'texture.texture', 'texture_ref.texture', lightMapFinal.replace('\\', '/')))
 
             # ribfile.write('Surface "matte"')
 
