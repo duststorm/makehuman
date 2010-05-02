@@ -302,7 +302,7 @@ def readMhxFile(filePath, rigFlags):
 	
 	for (expr, glbals, lcals) in todo:
 		try:
-			print("Doing %s" % expr)
+			# print("Doing %s" % expr)
 			exec(expr, glbals, lcals)
 		except:
 			msg = "Failed: "+expr
@@ -798,7 +798,7 @@ def parseRamp(data, args, tokens):
 	elts = ramp.elements
 	n = 0
 	for (key, val, sub) in tokens:
-		print("Ramp", key, val)
+		# print("Ramp", key, val)
 		if key == 'Element':
 			elts[n].color = eval(val[0])
 			elts[n].position = eval(val[1])
