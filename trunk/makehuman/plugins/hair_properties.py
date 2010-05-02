@@ -3,9 +3,7 @@
 # We need this for gui controls
 
 import gui3d, hair, font3d
-from aljabr import *
-import random
-import math
+from aljabr import vdist,vsub,vmul,vadd, vnorm
 
 print 'hair properties imported'
 
@@ -36,12 +34,6 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
     def __init__(self, category):        
         
-        #member variables:
-        self.number = 25
-        self.gravity = 1.5
-        self.cP = 14
-        self.length=5.0
-        
         gui3d.TaskView.__init__(self, category, 'Hair', category.app.getThemeResource('images', 'button_hair_det.png'), category.app.getThemeResource('images',
                                 'button_hair_det_on.png'))
                                 
@@ -67,106 +59,11 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
         self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
-        
-        self.cPSlider = gui3d.Slider(self, position=[600, 100, 9.2], value=14,min=4,max=30,label="Control Points")
-        self.lengthSlider = gui3d.Slider(self, position=[600, 140, 9.2], value=5.0,min=0.0,max=7.0,label="Strand Length")
-        self.numberSlider = gui3d.Slider(self, position=[600, 180, 9.2], value=25,min=1,max=260,label="Strands Number")
-        self.gravitySlider = gui3d.Slider(self, position=[600, 220, 9.2], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
-        
+    
         self.widthSlider = gui3d.Slider(self, position=[10, 150, 9], value=1.0, min=1.0,max=30.0, label = "Hair width") 
 
-        #############
-        #BUTTONS
-        #############        
-        self.createButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[600,270,9.2],label="Create Hair")
-        self.deleteButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[600,290,9.2],label="Delete Hair")
-        #self.doButton = gui3d.Button(self,position=[600,270,9.2],label="Create Hair")
-
-
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
-        
-        #CREATE HAIR
-        @self.createButton.event
-        def onClicked(event):
-            scn = self.app.scene3d
-            scn.clear(scn.selectedHuman.hairObj)
-            obj = scn.newObj("hair")
-            position = scn.selectedHuman.getPosition()
-            rotation = scn.selectedHuman.getRotation()
-            obj.x = position[0]
-            obj.y = position[1]
-            obj.z = position[2]
-            obj.rx = rotation[0]
-            obj.ry = rotation[1]
-            obj.rz = rotation[2]
-            obj.sx = 1.0
-            obj.sy = 1.0
-            obj.sz = 1.0
-            obj.visibility = 1
-            obj.shadeless = 0
-            obj.pickable = 0
-            obj.cameraMode = 0
-            obj.text = ""
-            obj.uvValues = []
-            obj.indexBuffer = []
-            fg = obj.createFaceGroup("ribbons")
-
-            scn.selectedHuman.hairModelling = True
-            #TODO  Jose: clear any hair originally created/ loaded from libraries
-            mesh = scn.selectedHuman.mesh
-            verts = mesh.getVerticesAndFacesForGroups(["head-back-skull","head-upper-skull","l-head-temple",\
-            "r-head-temple"])[0]
-            scalpVerts = len(verts) #Collects all vertices that are part of the head where hair grows!
-            interval = int(scalpVerts/self.number) #variable used to randomly distribute scalp-vertices
-            cPInterval = self.length/float(self.cP) #Length between c.P. for hairs being generated
-            self.number = 1 #for debug
-            for i in range(0,self.number):
-                """
-                if i==self.number-1:
-                    r= random.randint(interval*i,scalpVerts-1)
-                else:    
-                    r = random.randint(interval*i,interval*(i+1))
-                #Josenow
-                """
-                r=1 #for debug
-                v= verts[r].co
-                normal = verts[r].no
-                point2 = vadd(v,vmul(normal,self.length))
-                curve=[vadd(v,vmul(normal,-0.5))]
-                w,normal2,point22,curve2 =[],[],[],[]
-                curve.append(vadd(v,vmul(normal,-0.2)))
-                for j in range(1,self.cP-1):
-                    curve.append(vadd(v,vmul(normal,cPInterval*j)))
-                curve.append(point2)
-                
-                #adjusting gravity of curve
-                gravitize(curve,self.gravity)
- 
-                hair.loadStrands(obj,curve)
-
-            fg.setColor([0,0,0,255]) #rgba
-            obj.updateIndexBuffer()
-            obj.calcNormals()
-            obj.shadeless = 1
-            scn.selectedHuman.hairObj = obj
-            scn.update()
-            
-        @self.cPSlider.event
-        def onChange(value):
-            self.cP = value;
-
-        @self.lengthSlider.event
-        def onChange(value):
-            self.length = value;
- 
-        @self.numberSlider.event
-        def onChange(value):
-            self.number = value;
-
-        @self.gravitySlider.event
-        def onChange(value):
-            self.gravity = value;
-            
+                    
         @self.redSlider.event
         def onChanging(value):
             self.setColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
@@ -240,60 +137,11 @@ def unload(app):
 #obj = hair object
 def hairWidthUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal and vertex index of object remains the same!
   N=len(obj.verts)
-  origWidth = vdist(obj.verts[1].co,obj.verts[0].co)/cr
+  origWidth = vdist(obj.verts[1].co,obj.verts[0].co)/res
   diff= (widthFactor-origWidth)*res/2
   for i in xrange(0,N/2):
-      vec=vmul(vnorm(vsub(obj.verts[i*2+1].co,obj.verts[i*2].co)), diff)    
+      vec=vmul(vnorm(vsub(obj.verts[i*2+1].co,obj.verts[i*2].co)), diff) 
       obj.verts[i*2].co=vsub(obj.verts[i*2].co,vec)
       obj.verts[i*2+1].co=vadd(obj.verts[i*2+1].co,vec)
       obj.verts[i*2].update(updateNor=0)
       obj.verts[i*2+1].update(updateNor=0)
-
-def gravitize(curve,gFactor,start=1,res=0.04):
-    length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
-    temp = vdist(vnorm(vsub(curve[len(curve)-1],curve[start])),[0,1,0])
-    interval = length/(len(curve) - 1)
-    c=0.001;
-    for i in xrange(start+1, len(curve)):
-        #x=math.pow(interval*(i-start)/(4*c),1.0/3.0)
-        #curve[i] = in2pts(p0,p1,x/X)
-        curve[i][1] = curve[i][1] - c*math.pow(interval*(i-start),4)
-      
-"""
-def gravitize(curve,gFactor,start=1,res=0.04):
-    length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
-    temp = vdist(vnorm(vsub(curve[len(curve)-1],curve[start])),[0,1,0])
-    delta = math.pow(math.pow(length,2.0)-math.pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
-    X= delta*math.pow(2.0,gFactor)
-    c = math.pow(2.0,-8.0+gFactor)
-    p0  = curve[start][:]
-    p1 = curve[len(curve)-1][:]
-    #print "Debug: length =",length," len(curve)=", len(curve), "delta= ", delta
-    interval = length/(len(curve)-start-1)
-    for i in xrange(start+1, len(curve)):
-        x=math.pow(interval*(i-start)/(4*c),1.0/3.0)
-        curve[i] = in2pts(p0,p1,x/X)
-        if temp < 3.0:
-            #print "Debug: detected normal strand on the middle of the head"
-            curve[i][1] = curve[i][1] - 0.005*math.pow(x,4)#curve[0][1] - (curve[i][1] - curve[0][1])
-        else:
-            curve[i][1] = curve[i][1] - c*math.pow(x,4)
-def gravitize(curve,gFactor,start=1,res=0.04):
-    length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
-    temp = vdist(vnorm(vsub(curve[len(curve)-1],curve[start])),[0,1,0])
-    delta = math.pow(math.pow(length,2.0)-math.pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
-    X= delta*math.pow(2.0,gFactor)
-    c = math.pow(2.0,-8.0+gFactor)
-    p0  = curve[start][:]
-    p1 = curve[len(curve)-1][:]
-    #print "Debug: length =",length," len(curve)=", len(curve), "delta= ", delta
-    interval = length/(len(curve)-start-1)
-    for i in xrange(start+1, len(curve)):
-        x=math.pow(interval*(i-start)/(4*c),1.0/3.0)
-        curve[i] = in2pts(p0,p1,x/X)
-        if temp < 3.0:
-            #print "Debug: detected normal strand on the middle of the head"
-            curve[i][1] = curve[i][1] - 0.005*math.pow(x,4)#curve[0][1] - (curve[i][1] - curve[0][1])
-        else:
-            curve[i][1] = curve[i][1] - c*math.pow(x,4)
-"""
