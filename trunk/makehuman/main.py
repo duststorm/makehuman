@@ -66,7 +66,7 @@ sys.path.append("./mh_core")
 
 import gui3d, events3d
 import human, hair, background
-import guimodelling, guifiles, guirender, guiadvance
+import guimodelling, guifiles, guirender, guiadvanced
 from aljabr import centroid
 #import font3d
 
@@ -172,7 +172,7 @@ class MHApplication(gui3d.Application):
     guifiles.FilesCategory(self)
     self.progressBar.setProgress(0.8)
     guirender.RenderingCategory(self)
-    guiadvance.AdvanceCategory(self)
+    guiadvanced.AdvancedCategory(self)
     #guiadvance.AdvanceCategory(self)
 
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),
