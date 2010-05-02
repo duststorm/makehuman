@@ -5,6 +5,13 @@
 import mhx_rig
 from mhx_rig import *
 
+T_FIK = 'rigArm&T_FingerIK'
+T_FPanel = 'rigArm&T_FingerPanel'
+
+dx = 0.2
+dy = 0.3
+dz = 0.1
+
 FingerJoints = [
 	('r-finger-1-1',		'j', 'r-finger-1-1'),
 	('r-finger-1-2',		'j', 'r-finger-1-2'),
@@ -49,10 +56,44 @@ FingerJoints = [
 	('r-finger-4-end',		'l', ((2.0, 'r-finger-4-3'), (-1.0, 'r-finger-4-2'))),
 	('r-finger-5-end',		'l', ((2.0, 'r-finger-5-3'), (-1.0, 'r-finger-5-2'))),
 
+	('l-palm-1',			'l', ((0.6, 'l-hand'), (0.4, 'l-finger-2-1'))),
+	('l-palm-2',			'l', ((0.6, 'l-hand'), (0.4, 'l-finger-5-1'))),
+	('r-palm-1',			'l', ((0.6, 'r-hand'), (0.4, 'r-finger-2-1'))),
+	('r-palm-2',			'l', ((0.6, 'r-hand'), (0.4, 'r-finger-5-1'))),
+
 	('Fingers_R_head',		'o', ('l-finger-3-1', [0.0, 1.0, 0.0])),
 	('Fingers_R_tail',		'o', ('l-finger-3-end', [0.0, 1.0, 0.0])),
 	('Fingers_L_head',		'o', ('r-finger-3-1', [0.0, 1.0, 0.0])),
 	('Fingers_L_tail',		'o', ('r-finger-3-end', [0.0, 1.0, 0.0])),
+
+	('PHand_L_head',		'o', ('r-hand', [0,1,0])),
+	('PFinger-1_L_head',		'o', ('PHand_L_head', [dx,0,2*dz])),
+	('PFinger-2_L_head',		'o', ('PHand_L_head', [dx,0,dz])),
+	('PFinger-3_L_head',		'o', ('PHand_L_head', [dx,0,0])),
+	('PFinger-4_L_head',		'o', ('PHand_L_head', [dx,0,-dz])),
+	('PFinger-5_L_head',		'o', ('PHand_L_head', [dx,0,-2*dz])),
+
+	('PHand_L_tail',		'o', ('PHand_L_head', [0,dy,0])),
+	('PFinger-1_L_tail',		'o', ('PFinger-1_L_head', [0,dy,0])),
+	('PFinger-2_L_tail',		'o', ('PFinger-2_L_head', [0,dy,0])),
+	('PFinger-3_L_tail',		'o', ('PFinger-3_L_head', [0,dy,0])),
+	('PFinger-4_L_tail',		'o', ('PFinger-4_L_head', [0,dy,0])),
+	('PFinger-5_L_tail',		'o', ('PFinger-5_L_head', [0,dy,0])),
+
+	('PHand_R_head',		'o', ('l-hand', [0,1,0])),
+	('PFinger-1_R_head',		'o', ('PHand_R_head', [-dx,0,2*dz])),
+	('PFinger-2_R_head',		'o', ('PHand_R_head', [-dx,0,dz])),
+	('PFinger-3_R_head',		'o', ('PHand_R_head', [-dx,0,0])),
+	('PFinger-4_R_head',		'o', ('PHand_R_head', [-dx,0,-dz])),
+	('PFinger-5_R_head',		'o', ('PHand_R_head', [-dx,0,-2*dz])),
+
+	('PHand_R_tail',		'o', ('PHand_R_head', [0,dy,0])),
+	('PFinger-1_R_tail',		'o', ('PFinger-1_R_head', [0,dy,0])),
+	('PFinger-2_R_tail',		'o', ('PFinger-2_R_head', [0,dy,0])),
+	('PFinger-3_R_tail',		'o', ('PFinger-3_R_head', [0,dy,0])),
+	('PFinger-4_R_tail',		'o', ('PFinger-4_R_head', [0,dy,0])),
+	('PFinger-5_R_tail',		'o', ('PFinger-5_R_head', [0,dy,0])),
+
 ]
 
 FingerHeadsTails = [
@@ -88,6 +129,22 @@ FingerHeadsTails = [
 	('Finger-5-2_R',		'l-finger-5-2', 'l-finger-5-3'),
 	('Finger-5-3_R',		'l-finger-5-3', 'l-finger-5-end'),
 
+	('Wrist-1_L',			'r-hand', 'r-palm-1'),
+	('Wrist-2_L',			'r-hand', 'r-palm-2'),
+	('Palm-1_L',			'r-hand', 'r-finger-1-1'),
+	('Palm-2_L',			'r-palm-1', 'r-finger-2-1'),
+	('Palm-3_L',			'r-palm-1', 'r-finger-3-1'),
+	('Palm-4_L',			'r-palm-2', 'r-finger-4-1'),
+	('Palm-5_L',			'r-palm-2', 'r-finger-5-1'),
+
+	('Wrist-1_R',			'l-hand', 'l-palm-1'),
+	('Wrist-2_R',			'l-hand', 'l-palm-2'),
+	('Palm-1_R',			'l-hand', 'l-finger-1-1'),
+	('Palm-2_R',			'l-palm-1', 'l-finger-2-1'),
+	('Palm-3_R',			'l-palm-1', 'l-finger-3-1'),
+	('Palm-4_R',			'l-palm-2', 'l-finger-4-1'),
+	('Palm-5_R',			'l-palm-2', 'l-finger-5-1'),
+
 	('Fingers_L',			'Fingers_L_head', 'Fingers_L_tail'),
 	('Fingers_R',			'Fingers_R_head', 'Fingers_R_tail'),
 
@@ -114,72 +171,217 @@ FingerHeadsTails = [
 	('Finger-3-IK_L',		'r-finger-3-end', 'r-finger-3-3'),
 	('Finger-4-IK_L',		'r-finger-4-end', 'r-finger-4-3'),
 	('Finger-5-IK_L',		'r-finger-5-end', 'r-finger-5-3'),
+
+	('PHand_L',			'PHand_L_head', 'PHand_L_tail'),
+	('PFinger-1_L',			'PFinger-1_L_head', 'PFinger-1_L_tail'),
+	('PFinger-2_L',			'PFinger-2_L_head', 'PFinger-2_L_tail'),
+	('PFinger-3_L',			'PFinger-3_L_head', 'PFinger-3_L_tail'),
+	('PFinger-4_L',			'PFinger-4_L_head', 'PFinger-4_L_tail'),
+	('PFinger-5_L',			'PFinger-5_L_head', 'PFinger-5_L_tail'),
+
+	('DrvHand_L',			'PHand_L_head', 'PHand_L_tail'),
+	('DrvFinger-1_L',		'PFinger-1_L_head', 'PFinger-1_L_tail'),
+	('DrvFinger-2_L',		'PFinger-2_L_head', 'PFinger-2_L_tail'),
+	('DrvFinger-3_L',		'PFinger-3_L_head', 'PFinger-3_L_tail'),
+	('DrvFinger-4_L',		'PFinger-4_L_head', 'PFinger-4_L_tail'),
+	('DrvFinger-5_L',		'PFinger-5_L_head', 'PFinger-5_L_tail'),
+
+	('PHand_R',			'PHand_R_head', 'PHand_R_tail'),
+	('PFinger-1_R',			'PFinger-1_R_head', 'PFinger-1_R_tail'),
+	('PFinger-2_R',			'PFinger-2_R_head', 'PFinger-2_R_tail'),
+	('PFinger-3_R',			'PFinger-3_R_head', 'PFinger-3_R_tail'),
+	('PFinger-4_R',			'PFinger-4_R_head', 'PFinger-4_R_tail'),
+	('PFinger-5_R',			'PFinger-5_R_head', 'PFinger-5_R_tail'),
+
+	('DrvHand_R',			'PHand_R_head', 'PHand_R_tail'),
+	('DrvFinger-1_R',		'PFinger-1_R_head', 'PFinger-1_R_tail'),
+	('DrvFinger-2_R',		'PFinger-2_R_head', 'PFinger-2_R_tail'),
+	('DrvFinger-3_R',		'PFinger-3_R_head', 'PFinger-3_R_tail'),
+	('DrvFinger-4_R',		'PFinger-4_R_head', 'PFinger-4_R_tail'),
+	('DrvFinger-5_R',		'PFinger-5_R_head', 'PFinger-5_R_tail'),
 ]
 
 FingerArmature = [
 	# Deform
-	('Finger-1-1_L', 'True',	0.0, 'Hand_L', F_DEF, L_HANDFK, (1,1,1) ),
-	('Finger-1-2_L', 'True',	1.5708, 'Finger-1-1_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-1-3_L', 'True',	1.5708, 'Finger-1-2_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-2-1_L', 'True',	0.0, 'Hand_L', F_DEF, L_HANDFK, (1,1,1) ),
+	('Wrist-1_L', 'True',		0.0, 'Hand_L', F_DEF, L_PALM, (1,1,1) ),
+	('Wrist-2_L', 'True',		0.0, 'Hand_L', F_DEF, L_PALM, (1,1,1) ),
+	('Palm-1_L', 'True',		0.0, 'Hand_L', F_DEF, L_PALM, (1,1,1) ),
+	('Palm-2_L', 'True',		0.0, 'Wrist-1_L', F_DEF+F_CON, L_PALM, (1,1,1) ),
+	('Palm-3_L', 'True',		0.0, 'Wrist-1_L', F_DEF+F_CON, L_PALM, (1,1,1) ),
+	('Palm-4_L', 'True',		0.0, 'Wrist-2_L', F_DEF+F_CON, L_PALM, (1,1,1) ),
+	('Palm-5_L', 'True',		0.0, 'Wrist-2_L', F_DEF+F_CON, L_PALM, (1,1,1) ),
+
+	('Wrist-1_R', 'True',		0.0, 'Hand_R', F_DEF, L_PALM, (1,1,1) ),
+	('Wrist-2_R', 'True',		0.0, 'Hand_R', F_DEF, L_PALM, (1,1,1) ),
+	('Palm-1_R', 'True',		0.0, 'Hand_R', F_DEF, L_PALM, (1,1,1) ),
+	('Palm-2_R', 'True',		0.0, 'Wrist-1_R', F_DEF+F_CON, L_PALM, (1,1,1) ),
+	('Palm-3_R', 'True',		0.0, 'Wrist-1_R', F_DEF+F_CON, L_PALM, (1,1,1) ),
+	('Palm-4_R', 'True',		0.0, 'Wrist-2_R', F_DEF+F_CON, L_PALM, (1,1,1) ),
+	('Palm-5_R', 'True',		0.0, 'Wrist-2_R', F_DEF+F_CON, L_PALM, (1,1,1) ),
+
+	('Finger-1-1_L', 'True',	0.0, 'Palm-1_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
+	('Finger-1-2_L', 'True',	deg90, 'Finger-1-1_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
+	('Finger-1-3_L', 'True',	deg90, 'Finger-1-2_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
+	('Finger-2-1_L', 'True',	0.0, 'Palm-2_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-2-2_L', 'True',	0.0, 'Finger-2-1_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-2-3_L', 'True',	0.0, 'Finger-2-2_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-3-1_L', 'True',	0.0, 'Hand_L', F_DEF, L_HANDFK, (1,1,1) ),
+	('Finger-3-1_L', 'True',	0.0, 'Palm-3_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-3-2_L', 'True',	0.0, 'Finger-3-1_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-3-3_L', 'True',	0.0, 'Finger-3-2_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-4-1_L', 'True',	0.0, 'Hand_L', F_DEF, L_HANDFK, (1,1,1) ),
+	('Finger-4-1_L', 'True',	0.0, 'Palm-4_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-4-2_L', 'True',	0.0, 'Finger-4-1_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-4-3_L', 'True',	0.0, 'Finger-4-2_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-5-1_L', 'True',	0.0, 'Hand_L', F_DEF, L_HANDFK, (1,1,1) ),
+	('Finger-5-1_L', 'True',	0.0, 'Palm-5_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-5-2_L', 'True',	0.0, 'Finger-5-1_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-5-3_L', 'True',	0.0, 'Finger-5-2_L', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 
-	('Finger-1-1_R', 'True',	0.0, 'Hand_R', F_DEF, L_HANDFK, (1,1,1) ),
-	('Finger-1-2_R', 'True',	1.5708, 'Finger-1-1_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-1-3_R', 'True',	1.5708, 'Finger-1-2_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-2-1_R', 'True',	0.0, 'Hand_R', F_DEF, L_HANDFK, (1,1,1) ),
+	('Finger-1-1_R', 'True',	0.0, 'Palm-1_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
+	('Finger-1-2_R', 'True',	-deg90, 'Finger-1-1_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
+	('Finger-1-3_R', 'True',	-deg90, 'Finger-1-2_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
+	('Finger-2-1_R', 'True',	0.0, 'Palm-2_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-2-2_R', 'True',	0.0, 'Finger-2-1_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-2-3_R', 'True',	0.0, 'Finger-2-2_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-3-1_R', 'True',	0.0, 'Hand_R', F_DEF, L_HANDFK, (1,1,1) ),
+	('Finger-3-1_R', 'True',	0.0, 'Palm-3_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-3-2_R', 'True',	0.0, 'Finger-3-1_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-3-3_R', 'True',	0.0, 'Finger-3-2_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-4-1_R', 'True',	0.0, 'Hand_R', F_DEF, L_HANDFK, (1,1,1) ),
+	('Finger-4-1_R', 'True',	0.0, 'Palm-4_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-4-2_R', 'True',	0.0, 'Finger-4-1_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-4-3_R', 'True',	0.0, 'Finger-4-2_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
-	('Finger-5-1_R', 'True',	0.0, 'Hand_R', F_DEF, L_HANDFK, (1,1,1) ),
+	('Finger-5-1_R', 'True',	0.0, 'Palm-5_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-5-2_R', 'True',	0.0, 'Finger-5-1_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 	('Finger-5-3_R', 'True',	0.0, 'Finger-5-2_R', F_DEF+F_CON, L_HANDFK, (1,1,1) ),
 
-	#
-	#('Fingers_L', 'rigArm&T_FingerIK',	0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
-	#('Fingers_R', 'rigArm&T_FingerIK',	0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
-
 	# Finger controls
-	('Finger-1_L', 'rigArm&T_FingerIK',	0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-2_L', 'rigArm&T_FingerIK',	0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-3_L', 'rigArm&T_FingerIK',	0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-4_L', 'rigArm&T_FingerIK',	0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
-	('Finger-5_L', 'rigArm&T_FingerIK',	0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
-
-	('Finger-1_R', 'rigArm&T_FingerIK',	0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-2_R', 'rigArm&T_FingerIK',	0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-3_R', 'rigArm&T_FingerIK',	0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-4_R', 'rigArm&T_FingerIK',	0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
-	('Finger-5_R', 'rigArm&T_FingerIK',	0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
+	('Finger-1_L', T_FIK,		0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
+	('Finger-2_L', T_FIK,		0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
+	('Finger-3_L', T_FIK,		0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
+	('Finger-4_L', T_FIK,		0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
+	('Finger-5_L', T_FIK,		0.0, 'Hand_L', 0, L_HANDIK, (1,1,1) ),
+	
+	('Finger-1_R', T_FIK,		0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
+	('Finger-2_R', T_FIK,		0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
+	('Finger-3_R', T_FIK,		0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
+	('Finger-4_R', T_FIK,		0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
+	('Finger-5_R', T_FIK,		0.0, 'Hand_R', 0, L_HANDIK, (1,1,1) ),
 
 	# IK targets
-	('Finger-1-IK_L', 'rigArm&T_FingerIK',	0.0, 'Finger-1_L', F_CON, L_HELP, (1,1,1) ),
-	('Finger-2-IK_L', 'rigArm&T_FingerIK',	0.0, 'Finger-2_L', F_CON, L_HELP, (1,1,1) ),
-	('Finger-3-IK_L', 'rigArm&T_FingerIK',	0.0, 'Finger-3_L', F_CON, L_HELP, (1,1,1) ),
-	('Finger-4-IK_L', 'rigArm&T_FingerIK',	0.0, 'Finger-4_L', F_CON, L_HELP, (1,1,1) ),
-	('Finger-5-IK_L', 'rigArm&T_FingerIK',	0.0, 'Finger-5_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-1-IK_L', T_FIK,	0.0, 'Finger-1_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-2-IK_L', T_FIK,	0.0, 'Finger-2_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-3-IK_L', T_FIK,	0.0, 'Finger-3_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-4-IK_L', T_FIK,	0.0, 'Finger-4_L', F_CON, L_HELP, (1,1,1) ),
+	('Finger-5-IK_L', T_FIK,	0.0, 'Finger-5_L', F_CON, L_HELP, (1,1,1) ),
 
-	('Finger-1-IK_R', 'rigArm&T_FingerIK',	0.0, 'Finger-1_R', F_CON, L_HELP, (1,1,1) ),
-	('Finger-2-IK_R', 'rigArm&T_FingerIK',	0.0, 'Finger-2_R', F_CON, L_HELP, (1,1,1) ),
-	('Finger-3-IK_R', 'rigArm&T_FingerIK',	0.0, 'Finger-3_R', F_CON, L_HELP, (1,1,1) ),
-	('Finger-4-IK_R', 'rigArm&T_FingerIK',	0.0, 'Finger-4_R', F_CON, L_HELP, (1,1,1) ),
-	('Finger-5-IK_R', 'rigArm&T_FingerIK',	0.0, 'Finger-5_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-1-IK_R', T_FIK,	0.0, 'Finger-1_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-2-IK_R', T_FIK,	0.0, 'Finger-2_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-3-IK_R', T_FIK,	0.0, 'Finger-3_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-4-IK_R', T_FIK,	0.0, 'Finger-4_R', F_CON, L_HELP, (1,1,1) ),
+	('Finger-5-IK_R', T_FIK,	0.0, 'Finger-5_R', F_CON, L_HELP, (1,1,1) ),
+
+	# Drivers
+	('PHand_L', T_FPanel,		0.0, 'Hand_L', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-1_L', T_FPanel,	0.0, 'PHand_L', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-2_L', T_FPanel,	0.0, 'PHand_L', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-3_L', T_FPanel,	0.0, 'PHand_L', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-4_L', T_FPanel,	0.0, 'PHand_L', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-5_L', T_FPanel,	0.0, 'PHand_L', F_WIR, L_HANDIK, (1,1,1) ),
+
+	('DrvHand_L', T_FPanel,		0.0, 'PHand_L', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-1_L', T_FPanel,	0.0, 'PHand_L', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-2_L', T_FPanel,	0.0, 'PHand_L', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-3_L', T_FPanel,	0.0, 'PHand_L', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-4_L', T_FPanel,	0.0, 'PHand_L', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-5_L', T_FPanel,	0.0, 'PHand_L', 0, L_HELP, (1,1,1) ),
+
+	('PHand_R', T_FPanel,		0.0, 'Hand_R', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-1_R', T_FPanel,	0.0, 'PHand_R', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-2_R', T_FPanel,	0.0, 'PHand_R', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-3_R', T_FPanel,	0.0, 'PHand_R', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-4_R', T_FPanel,	0.0, 'PHand_R', F_WIR, L_HANDIK, (1,1,1) ),
+	('PFinger-5_R', T_FPanel,	0.0, 'PHand_R', F_WIR, L_HANDIK, (1,1,1) ),
+
+	('DrvHand_R', T_FPanel,		0.0, 'PHand_R', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-1_R', T_FPanel,	0.0, 'PHand_R', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-2_R', T_FPanel,	0.0, 'PHand_R', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-3_R', T_FPanel,	0.0, 'PHand_R', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-4_R', T_FPanel,	0.0, 'PHand_R', 0, L_HELP, (1,1,1) ),
+	('DrvFinger-5_R', T_FPanel,	0.0, 'PHand_R', 0, L_HELP, (1,1,1) ),
 ]
+
+#
+#	fingerConstraints(hand, finger):	
+#	fingerDrivers(fnum, suffix):
+#	FingerWriteDrivers(fp):
+#	FingerWritePoses(fp):
+#
+
+def fingerSetProps(fp):
+	if not PanelWorks: return
+	props = ['MHRelax', 'MHCurl', 'MHCone', 'MHSpread', 'MHScrunch', 'MHLean']
+	values = [0, 0, 0, 0, 0, 0]
+	for suffix in ["_L", "_R"]:
+		for fnum in range(1,6):
+			setProps(fp, 'PFinger-%s%s' % (fnum, suffix), props, values)
+		setProps(fp, 'PHand%s' % suffix, props, values)
+	return
+
+def setProps(fp, bone, props, values):
+	for (n,prop) in enumerate(props):
+		fp.write("  SetProp %s %s %s ;\n" % (bone, prop, values[n]))
+	return
+
+
+def fingerConstraints(fnum, suffix):
+	hand = "DrvHand%s" % suffix
+	finger = "DrvFinger-%s%s" % (fnum, suffix)
+	enable = 1.0
+	constraints = [
+		(('Action', T_FPanel), C_TG_LOCAL, ['Relax', 'ActionHand', hand, 'LOCATION_X', (1,7), (-0.2,0.4), enable]),
+		(('Action', T_FPanel), C_TG_LOCAL, ['Curl', 'ActionHand', hand, 'LOCATION_Y', (11,17), (-0.2,0.4), enable]),
+		(('Action', T_FPanel), C_TG_LOCAL, ['Cone', 'ActionHand', hand, 'LOCATION_Z', (21,27), (-0.2,0.4), enable]),
+		(('Action', T_FPanel), C_TG_LOCAL, ['Spread', 'ActionHand', hand, 'ROTATION_X', (31,37), (-20,40), enable]),
+		(('Action', T_FPanel), C_TG_LOCAL, ['Scrunch', 'ActionHand', hand, 'ROTATION_Y', (41,47), (-20,40), enable]),
+		(('Action', T_FPanel), C_TG_LOCAL, ['Lean', 'ActionHand', hand, 'ROTATION_Z', (52,58), (-40,40), enable]),
+		]
+	return constraints
+
+def fingerDrivers(driver, suffix):
+	if PanelWorks:
+		path = 'pose.bones["PHand%s"]' % suffix
+		return [
+			(driver, 'LOC', None, 0, (0,0.4), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHRelax"]')])]), 
+			(driver, 'LOC', None, 1, (0,0.4), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHCurl"]')])]), 
+			(driver, 'LOC', None, 2, (0,0.4), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHCone"]')])]), 
+			(driver, 'ROTE', None, 0, (0,deg40), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHSpread"]')])]), 
+			(driver, 'ROTE', None, 1, (0,deg40), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHScrunch"]')])]), 
+			(driver, 'ROTE', None, 2, (0,deg40), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHLean"]')])]), 
+			]
+	else:
+		if suffix == '_R': sign = -1 
+		else: sign = 1
+		return [
+			(driver, 'LOC', None, 0, (0,sign*0.4), [("var", 'TRANSFORMS', [('HumanRig', 'MHRelax%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'LOC', None, 1, (0,sign*0.4), [("var", 'TRANSFORMS', [('HumanRig', 'MHCurl%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'LOC', None, 2, (0,sign*0.4), [("var", 'TRANSFORMS', [('HumanRig', 'MHCone%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'ROTE', None, 0, (0,sign*deg40), [("var", 'TRANSFORMS', [('HumanRig', 'MHSpread%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'ROTE', None, 1, (0,sign*deg40), [("var", 'TRANSFORMS', [('HumanRig', 'MHScrunch%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'ROTE', None, 2, (0,sign*deg40), [("var", 'TRANSFORMS', [('HumanRig', 'MHLean%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			]
+
+
+def FingerWriteDrivers(fp):
+	drivers = []
+	for suffix in ["_L", "_R"]:
+		'''
+		for fnum in range(1,6):
+			driver = 'DrvFinger-%s%s' % (fnum, suffix)
+			path = 'pose.bones["PFinger-%s%s"]' % (fnum, suffix)
+			drivers += fingerDrivers(driver, path)
+		'''
+		driver = 'DrvHand%s' % suffix
+		drivers += fingerDrivers(driver, suffix)
+	# (bone, typ, name, index, coeffs, variables)
+	writeDrivers(fp, T_FPanel, drivers)
+	return
 
 def FingerWritePoses(fp):
 	global boneGroups
@@ -189,134 +391,148 @@ def FingerWritePoses(fp):
 	customShape = None
 	# Deform with finger IK
 
-	addPoseBone(fp, 'True', 'Finger-1-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, 
-		[('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-1-2_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, 
-		[('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-1-3_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-1-IK_L', 3, None, (True, False), 'fFingerIK']),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	fingerSetProps(fp)
 
-	addPoseBone(fp, 'True', 'Finger-1-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-1-2_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0,
-		[('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-1-3_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-1-IK_R', 3,  None, (True, False), 'fFingerIK']),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("1-1", "_L") 
+	addPoseBone(fp, 'True', 'Finger-1-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
 
-	addPoseBone(fp, 'True', 'Finger-2-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-2-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-2-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-2-IK_L', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("1-2", "_L") 
+	addPoseBone(fp, 'True', 'Finger-1-2_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
 
-	addPoseBone(fp, 'True', 'Finger-2-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-2-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-2-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-2-IK_R', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("1-3", "_L") 
+	constraints += [ (('IK', T_FIK), 0, ['IK', 'Finger-1-IK_L', 3, None, (True, False), 1.0]) ]
+	addPoseBone(fp, 'True', 'Finger-1-3_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
 
-	addPoseBone(fp, 'True', 'Finger-3-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-3-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-3-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-3-IK_L', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("1-1", "_R") 
+	addPoseBone(fp, 'True', 'Finger-1-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
 
-	addPoseBone(fp, 'True', 'Finger-3-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-3-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-3-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-3-IK_R', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("1-2", "_R") 
+	addPoseBone(fp, 'True', 'Finger-1-2_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
 
-	addPoseBone(fp, 'True', 'Finger-4-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-4-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-4-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-4-IK_L', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("1-3", "_R") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-1-IK_R', 3,  None, (True, False), 1.0])]
+	addPoseBone(fp, 'True', 'Finger-1-3_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
 
-	addPoseBone(fp, 'True', 'Finger-4-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-4-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-4-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-4-IK_R', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("2-1", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-2-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
 
-	addPoseBone(fp, 'True', 'Finger-5-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-5-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-5-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-5-IK_L', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_L', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("2-2", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-2-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
 
-	addPoseBone(fp, 'True', 'Finger-5-1_R', customShape, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-5-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
-	addPoseBone(fp, 'True', 'Finger-5-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,
-		[('IK', 0, ['IK', 'Finger-5-IK_R', 3,  None, (True, False), 'fFingerIK']),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]),
-		('Action', C_TG_LOCAL, ['Action', 'goboFingerCurl', 'FingerCurl_R', 'LOCATION_X', (1,21), (-0.5,0.5), 'fFingerCurl'])])
+	constraints = fingerConstraints("2-3", "_L") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-2-IK_L', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-2-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
 
-	# Finger IK
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5_L', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5_R', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+	constraints = fingerConstraints("2-1", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-2-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
 
-	# Ik targets
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1-IK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-1-IK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2-IK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-2-IK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3-IK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-3-IK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4-IK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-4-IK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5-IK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, 'rigArm&T_FingerIK', 'Finger-5-IK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	
+	constraints = fingerConstraints("2-2", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-2-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
+
+	constraints = fingerConstraints("2-3", "_R") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-2-IK_R', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-2-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
+
+	constraints = fingerConstraints("3-1", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-3-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
+
+	constraints = fingerConstraints("3-2", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-3-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
+
+	constraints = fingerConstraints("3-3", "_L") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-3-IK_L', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-3-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
+
+	constraints = fingerConstraints("3-1", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-3-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
+
+	constraints = fingerConstraints("3-2", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-3-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
+
+	constraints = fingerConstraints("3-3", "_R") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-3-IK_R', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-3-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
+
+	constraints = fingerConstraints("4-1", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-4-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
+
+	constraints = fingerConstraints("4-2", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-4-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
+
+	constraints = fingerConstraints("4-3", "_L") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-4-IK_L', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-4-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
+
+	constraints = fingerConstraints("4-1", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-4-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
+
+	constraints = fingerConstraints("4-2", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-4-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
+
+	constraints = fingerConstraints("4-3", "_R") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-4-IK_R', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-4-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
+
+	constraints = fingerConstraints("5-1", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-5-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
+
+	constraints = fingerConstraints("5-2", "_L") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-5-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
+
+	constraints = fingerConstraints("5-3", "_L") 
+	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-5-IK_L', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-5-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
+
+	constraints = fingerConstraints("5-1", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-5-1_R', customShape, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, constraints)
+
+	constraints = fingerConstraints("5-2", "_R") 
+	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-5-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
+
+	constraints = fingerConstraints("5-3", "_R") 
+	constraints +=	[(('IK', T_FIK), 0, ['IK', 'Finger-5-IK_R', 3,  None, (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
+	addPoseBone(fp, 'True', 'Finger-5-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
+
+	# Control
+	addPoseBone(fp, T_FPanel, 'PHand_L', 'MHCircle05', None, (1,1,1), (1,1,1), (1,1,1), (0,0,0), 0, [])
+	addPoseBone(fp, T_FPanel, 'PHand_R', 'MHCircle05', None, (1,1,1), (1,1,1), (1,1,1), (0,0,0), 0, [])
+	addPoseBone(fp, T_FPanel, 'DrvHand_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), P_XYZ, [])
+	addPoseBone(fp, T_FPanel, 'DrvHand_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), P_XYZ, [])
+	for fnum in range(1,6):
+		addControlFinger(fp, fnum, "_L")
+		addControlFinger(fp, fnum, "_R")
+	return
+
+
+def addControlFinger(fp, fnum, suffix):
+	addPoseBone(fp, T_FIK, 'Finger-%s%s' % (fnum, suffix), None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, T_FIK, 'Finger-%s-IK%s' % (fnum, suffix), None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, T_FPanel, 'PFinger-%s%s' % (fnum, suffix), 'MHCircle025', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, T_FPanel, 'DrvFinger-%s%s' % (fnum, suffix), None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, [])
 	return 
 
 #
@@ -324,41 +540,10 @@ def FingerWritePoses(fp):
 #	FingerWriteActions(fp):
 #
 
-actionFingerCurl = [
-	('Finger-1-1_L',  [ (0.975, -0.0577, 0.01267, -0.2141),  (1, 0, 0, 0),  (0.9994, 0.0269, 0.0006276, 0.02332) ]),
-	('Finger-1-2_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8246, -0.5485, -0.07666, 0.1153) ]),
-	('Finger-1-3_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.746, -0.6509, -0.09243, 0.1059) ]),
-	('Finger-2-1_L',  [ (0.98, -0.04539, 0.008959, -0.1934),  (1, 0, 0, 0),  (0.8703, -0.4792, -0.05481, 0.09955) ]),
-	('Finger-2-2_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.712, -0.7022, 0, 0) ]),
-	('Finger-2-3_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.85, -0.5268, 0, 0) ]),
-	('Finger-3-1_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8713, -0.4899, -0.01351, 0.02403) ]),
-	('Finger-3-2_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.7076, -0.7066, 0, 0) ]),
-	('Finger-3-3_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8405, -0.5418, 0, 0) ]),
-	('Finger-4-1_L',  [ (0.9972, 0.0031, 0.0002317, 0.07453),  (1, 0, 0, 0),  (0.8707, -0.489, 0.02597, -0.04625) ]),
-	('Finger-4-2_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.71, -0.7042, 0, 0) ]),
-	('Finger-4-3_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.84, -0.5426, 0, 0) ]),
-	('Finger-5-1_L',  [ (0.9537, 0.02048, 0.006446, 0.3001),  (1, 0, 0, 0),  (0.8735, -0.485, 0.02113, -0.03806) ]),
-	('Finger-5-2_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.7168, -0.6973, 0, 0) ]),
-	('Finger-5-3_L',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8445, -0.5356, 0, 0) ]),
+import actions_finger_25
 
-	('Finger-1-1_R',  [ (0.9386, -0.08983, -0.03174, 0.3316),  (1, 0, 0, 0),  (0.9958, 0.02071, -0.001852, -0.08907) ]),
-	('Finger-1-2_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.9594, 0.2739, 0.0185, 0.0648) ]),
-	('Finger-1-3_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.7585, 0.6297, 0.1072, 0.1291) ]),
-	('Finger-2-1_R',  [ (0.9599, -0.06575, -0.01863, 0.272),  (1, 0, 0, 0),  (0.9256, -0.369, 0.031, -0.07775) ]),
-	('Finger-2-2_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8702, -0.4927, 0, 0) ]),
-	('Finger-2-3_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8933, -0.4494, 0, 0) ]),
-	('Finger-3-1_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.9262, -0.3769, 0.004653, -0.01144) ]),
-	('Finger-3-2_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8698, -0.4935, 0, 0) ]),
-	('Finger-3-3_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8928, -0.4504, 0, 0) ]),
-	('Finger-4-1_R',  [ (0.9959, 0.003674, -0.0003333, -0.09034),  (1, 0, 0, 0),  (0.9274, -0.3741, 0.0001118, -0.000277) ]),
-	('Finger-4-2_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8707, -0.4918, 0, 0) ]),
-	('Finger-4-3_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8936, -0.4489, 0, 0) ]),
-	('Finger-5-1_R',  [ (0.9811, 0.01696, -0.003332, -0.1927),  (1, 0, 0, 0),  (0.9291, -0.3689, 0.01023, -0.02576) ]),
-	('Finger-5-2_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8738, -0.4862, 0, 0) ]),
-	('Finger-5-3_R',  [ (1, 0, 0, 0),  (1, 0, 0, 0),  (0.8961, -0.4438, 0, 0) ]),
-]
-def FingerWriteActions(fp):
-	writeAction(fp, 'rigArm&T_FingerCurl', "goboFingerCurl", actionFingerCurl, False, False)
+def FingerWriteActions(fp):
+	writeAction(fp, T_FPanel, "ActionHand", actions_finger_25.ActionHand, False, False)
 
 #
 #	FingerProcess

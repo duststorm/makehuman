@@ -5,85 +5,106 @@
 import mhx_rig
 from mhx_rig import *
 
+offs = [0, 0, 0.3]
+
 PanelJoints = [
 	('origin',			'o', ('head', [-2.5, 0.5, 0.0])),
-	('PFace_tail',			'o', ('origin', [0.0, 0.0, 1.0])),
+	('PFaceDisp_tail',		'o', ('origin', [0.0, 0.0, 1.0])),
+	('PFace_head',			'o', ('origin', [0.0, -1.5, 0.0])),
+	('PFace_tail',			'o', ('PFace_head', [0.0, 0.0, 1.0])),
 	('PBrow_R_head',		'o', ('origin', [-0.4, 0.8, 0.0])),
-	('PBrow_R_tail',		'o', ('origin', [-0.4, 0.8, 0.3])),
+	('PBrow_R_tail',		'o', ('PBrow_R_head', offs)),
 	('PBrow_L_head',		'o', ('origin', [0.4, 0.8, 0.0])),
-	('PBrow_L_tail',		'o', ('origin', [0.4, 0.8, 0.3])),
+	('PBrow_L_tail',		'o', ('PBrow_L_head', offs)),
 	('PBrows_head',			'o', ('origin', [0.0, 0.8, 0.0])),
-	('PBrows_tail',			'o', ('origin', [0.0, 0.8, 0.3])),
+	('PBrows_tail',			'o', ('PBrows_head', offs)),
 	('PUpLid_R_head',		'o', ('origin', [-0.4, 0.6, 0.0])),
-	('PUpLid_R_tail',		'o', ('origin', [-0.4, 0.6, 0.3])),
+	('PUpLid_R_tail',		'o', ('PUpLid_R_head', offs)),
 	('PUpLid_L_head',		'o', ('origin', [0.4, 0.6, 0.0])),
-	('PUpLid_L_tail',		'o', ('origin', [0.4, 0.6, 0.3])),
+	('PUpLid_L_tail',		'o', ('PUpLid_L_head', offs)),
 	('PLoLid_R_head',		'o', ('origin', [-0.4, 0.2, 0.0])),
-	('PLoLid_R_tail',		'o', ('origin', [-0.4, 0.2, 0.3])),
+	('PLoLid_R_tail',		'o', ('PLoLid_R_head', offs)),
 	('PLoLid_L_head',		'o', ('origin', [0.4, 0.2, 0.0])),
-	('PLoLid_L_tail',		'o', ('origin', [0.4, 0.2, 0.3])),
+	('PLoLid_L_tail',		'o', ('PLoLid_L_head', offs)),
 	('PCheek_R_head',		'o', ('origin', [-0.4, 0.0, 0.0])),
-	('PCheek_R_tail',		'o', ('origin', [-0.4, 0.0, 0.3])),
+	('PCheek_R_tail',		'o', ('PCheek_R_head', offs)),
 	('PCheek_L_head',		'o', ('origin', [0.4, 0.0, 0.0])),
-	('PCheek_L_tail',		'o', ('origin', [0.4, 0.0, 0.3])),
-	('PNose_tail',			'o', ('origin', [0.0, 0.0, 0.3])),
+	('PCheek_L_tail',		'o', ('PCheek_L_head', offs)),
+	('PNose_tail',			'o', ('origin', offs)),
 	('PUpLip_head',			'o', ('origin', [0.0, -0.2, 0.0])),
-	('PUpLip_tail',			'o', ('origin', [0.0, -0.2, 0.3])),
+	('PUpLip_tail',			'o', ('PUpLip_head', offs)),
 	('PLoLip_head',			'o', ('origin', [0.0, -0.8, 0.0])),
-	('PLoLip_tail',			'o', ('origin', [0.0, -0.8, 0.3])),
+	('PLoLip_tail',			'o', ('PLoLip_head', offs)),
 	('PMouth_head',			'o', ('origin', [0.0, -0.5, 0.0])),
-	('PMouth_tail',			'o', ('origin', [0.0, -0.5, 0.3])),
+	('PMouth_tail',			'o', ('PMouth_head', offs)),
 	('PUpLip_R_head',		'o', ('origin', [-0.2, -0.4, 0.0])),
-	('PUpLip_R_tail',		'o', ('origin', [-0.2, -0.4, 0.3])),
+	('PUpLip_R_tail',		'o', ('PUpLip_R_head', offs)),
 	('PUpLip_L_head',		'o', ('origin', [0.2, -0.4, 0.0])),
-	('PUpLip_L_tail',		'o', ('origin', [0.2, -0.4, 0.3])),
+	('PUpLip_L_tail',		'o', ('PUpLip_L_head', offs)),
 	('PLoLip_R_head',		'o', ('origin', [-0.2, -0.6, 0.0])),
-	('PLoLip_R_tail',		'o', ('origin', [-0.2, -0.6, 0.3])),
+	('PLoLip_R_tail',		'o', ('PLoLip_R_head', offs)),
 	('PLoLip_L_head',		'o', ('origin', [0.2, -0.6, 0.0])),
-	('PLoLip_L_tail',		'o', ('origin', [0.2, -0.6, 0.3])),
+	('PLoLip_L_tail',		'o', ('PLoLip_L_head', offs)),
 	('PMouth_R_head',		'o', ('origin', [-0.5, -0.5, 0.0])),
-	('PMouth_R_tail',		'o', ('origin', [-0.5, -0.5, 0.3])),
+	('PMouth_R_tail',		'o', ('PMouth_R_head', offs)),
 	('PMouth_L_head',		'o', ('origin', [0.5, -0.5, 0.0])),
-	('PMouth_L_tail',		'o', ('origin', [0.5, -0.5, 0.3])),
+	('PMouth_L_tail',		'o', ('PMouth_L_head', offs)),
 	('PTounge_head',		'o', ('origin', [0.0, -1.0, 0.0])),
-	('PTounge_tail',		'o', ('origin', [0.0, -1.0, 0.3])),
+	('PTounge_tail',		'o', ('PTounge_head', offs)),
 	('PJaw_head',			'o', ('origin', [0.0, -1.1, 0.0])),
-	('PJaw_tail',			'o', ('origin', [0.0, -1.1, 0.3])),
+	('PJaw_tail',			'o', ('PJaw_head', offs)),
 
-	('PArmIK_R_head',		'o', ('origin', [-1.1, 3.0, 0.0])),
-	('PArmIK_R_tail',		'o', ('origin', [-1.1, 3.0, 0.3])),
-	('PArmIK_L_head',		'o', ('origin', [0.1, 3.0, 0.0])),
-	('PArmIK_L_tail',		'o', ('origin', [0.1, 3.0, 0.3])),
+	('PArmIK_R_head',		'o', ('origin', [-1.1, 2.0, 0.0])),
+	('PArmIK_R_tail',		'o', ('PArmIK_R_head', offs)),
+	('PArmIK_L_head',		'o', ('origin', [0.1, 2.0, 0.0])),
+	('PArmIK_L_tail',		'o', ('PArmIK_L_head', offs)),
 
-	('PLegIK_R_head',		'o', ('origin', [-1.1, 2.5, 0.0])),
-	('PLegIK_R_tail',		'o', ('origin', [-1.1, 2.5, 0.3])),
-	('PLegIK_L_head',		'o', ('origin', [0.1, 2.5, 0.0])),
-	('PLegIK_L_tail',		'o', ('origin', [0.1, 2.5, 0.3])),
+	('PLegIK_R_head',		'o', ('origin', [-1.1, 1.5, 0.0])),
+	('PLegIK_R_tail',		'o', ('PLegIK_R_head', offs)),
+	('PLegIK_L_head',		'o', ('origin', [0.1, 1.5, 0.0])),
+	('PLegIK_L_tail',		'o', ('PLegIK_L_head', offs)),
 
 	('PHandLocal_R_head',		'o', ('origin', [-1.1, 2.0, 0.0])),
-	('PHandLocal_R_tail',		'o', ('origin', [-1.1, 2.0, 0.3])),
+	('PHandLocal_R_tail',		'o', ('PHandLocal_R_head', offs)),
 	('PHandLocal_L_head',		'o', ('origin', [0.1, 2.0, 0.0])),
-	('PHandLocal_L_tail',		'o', ('origin', [0.1, 2.0, 0.3])),
+	('PHandLocal_L_tail',		'o', ('PHandLocal_L_head', offs)),
 
 	('PFootLocal_R_head',		'o', ('origin', [-1.1, 1.5, 0.0])),
-	('PFootLocal_R_tail',		'o', ('origin', [-1.1, 1.5, 0.3])),
+	('PFootLocal_R_tail',		'o', ('PFootLocal_R_head', offs)),
 	('PFootLocal_L_head',		'o', ('origin', [0.1, 1.5, 0.0])),
-	('PFootLocal_L_tail',		'o', ('origin', [0.1, 1.5, 0.3])),
+	('PFootLocal_L_tail',		'o', ('PFootLocal_L_head', offs)),
 
-	('ikfk_foot_L_head',		'o', ('foot_roll_L_head', [0.0,0,0.6])),
-	('ikfk_foot_L_tail',		'o', ('ikfk_foot_L_head', [-0.6,0,0])),
-	('ikfk_foot_R_head',		'o', ('foot_roll_R_head', [0,0,0.6])),
-	('ikfk_foot_R_tail',		'o', ('ikfk_foot_R_head', [-0.6,0,0])),
+	('MHRelax_L_head',		'o', ('origin', [1.8, 1.0, 0.0])),
+	('MHRelax_L_tail',		'o', ('MHRelax_L_head', offs)),
+	('MHCurl_L_head',		'o', ('MHRelax_L_head', [0.0, -0.5, 0.0])),
+	('MHCurl_L_tail',		'o', ('MHCurl_L_head', offs)),
+	('MHCone_L_head',		'o', ('MHRelax_L_head', [0.0, -1.0, 0.0])),
+	('MHCone_L_tail',		'o', ('MHCone_L_head', offs)),
+	('MHSpread_L_head',		'o', ('MHRelax_L_head', [0.0, -1.5, 0.0])),
+	('MHSpread_L_tail',		'o', ('MHSpread_L_head', offs)),
+	('MHScrunch_L_head',		'o', ('MHRelax_L_head', [0.0, -2.0, 0.0])),
+	('MHScrunch_L_tail',		'o', ('MHScrunch_L_head', offs)),
+	('MHLean_L_head',		'o', ('MHRelax_L_head', [0.0, -2.5, 0.0])),
+	('MHLean_L_tail',		'o', ('MHLean_L_head', offs)),
 
-	('ikfk_hand_L_head',		'o', ('r-finger-3-3', [2,0,0])),
-	('ikfk_hand_L_tail',		'o', ('ikfk_hand_L_head', [-1,0,0])),
-	('ikfk_hand_R_head',		'o', ('l-finger-3-3', [-2,0,0])),
-	('ikfk_hand_R_tail',		'o', ('ikfk_hand_R_head', [1,0,0])),
+	('MHRelax_R_head',		'o', ('origin', [-2.0, 1.0, 0.0])),
+	('MHRelax_R_tail',		'o', ('MHRelax_R_head', offs)),
+	('MHCurl_R_head',		'o', ('MHRelax_R_head', [0.0, -0.5, 0.0])),
+	('MHCurl_R_tail',		'o', ('MHCurl_R_head', offs)),
+	('MHCone_R_head',		'o', ('MHRelax_R_head', [0.0, -1.0, 0.0])),
+	('MHCone_R_tail',		'o', ('MHCone_R_head', offs)),
+	('MHSpread_R_head',		'o', ('MHRelax_R_head', [0.0, -1.5, 0.0])),
+	('MHSpread_R_tail',		'o', ('MHSpread_R_head', offs)),
+	('MHScrunch_R_head',		'o', ('MHRelax_R_head', [0.0, -2.0, 0.0])),
+	('MHScrunch_R_tail',		'o', ('MHScrunch_R_head', offs)),
+	('MHLean_R_head',		'o', ('MHRelax_R_head', [0.0, -2.5, 0.0])),
+	('MHLean_R_tail',		'o', ('MHLean_R_head', offs)),
+
 ]
 
 PanelHeadsTails = [
-	('PFace',			'origin', 'PFace_tail'),
-	('PFaceDisp',			'origin', 'PFace_tail'),
+	('PFace',			'PFace_head', 'PFace_tail'),
+	('PFaceDisp',			'origin', 'PFaceDisp_tail'),
 	('PBrow_R',			'PBrow_R_head', 'PBrow_R_tail'),
 	('PBrow_L',			'PBrow_L_head', 'PBrow_L_tail'),
 	('PBrows',			'PBrows_head', 'PBrows_tail'),
@@ -110,11 +131,26 @@ PanelHeadsTails = [
 	('PArmIK_L',			'PArmIK_L_head', 'PArmIK_L_tail'),
 	('PLegIK_R',			'PLegIK_R_head', 'PLegIK_R_tail'),
 	('PLegIK_L',			'PLegIK_L_head', 'PLegIK_L_tail'),
-	('PHandLocal_R',		'PHandLocal_R_head', 'PHandLocal_R_tail'),
-	('PHandLocal_L',		'PHandLocal_L_head', 'PHandLocal_L_tail'),
-	('PFootLocal_R',		'PFootLocal_R_head', 'PFootLocal_R_tail'),
-	('PFootLocal_L',		'PFootLocal_L_head', 'PFootLocal_L_tail'),
+	#('PHandLocal_R',		'PHandLocal_R_head', 'PHandLocal_R_tail'),
+	#('PHandLocal_L',		'PHandLocal_L_head', 'PHandLocal_L_tail'),
+	#('PFootLocal_R',		'PFootLocal_R_head', 'PFootLocal_R_tail'),
+	#('PFootLocal_L',		'PFootLocal_L_head', 'PFootLocal_L_tail'),
+
+	('MHRelax_L',			'MHRelax_L_head', 'MHRelax_L_tail'),
+	('MHCurl_L',			'MHCurl_L_head', 'MHCurl_L_tail'),
+	('MHCone_L',			'MHCone_L_head', 'MHCone_L_tail'),
+	('MHSpread_L',			'MHSpread_L_head', 'MHSpread_L_tail'),
+	('MHScrunch_L',			'MHScrunch_L_head', 'MHScrunch_L_tail'),
+	('MHLean_L',			'MHLean_L_head', 'MHLean_L_tail'),
+
+	('MHRelax_R',			'MHRelax_R_head', 'MHRelax_R_tail'),
+	('MHCurl_R',			'MHCurl_R_head', 'MHCurl_R_tail'),
+	('MHCone_R',			'MHCone_R_head', 'MHCone_R_tail'),
+	('MHSpread_R',			'MHSpread_R_head', 'MHSpread_R_tail'),
+	('MHScrunch_R',			'MHScrunch_R_head', 'MHScrunch_R_tail'),
+	('MHLean_R',			'MHLean_R_head', 'MHLean_R_tail'),
 	]
+
 
 PanelArmature = [
 	('PFace', 'toggle&T_Panel',		pi, None, F_WIR, L_PANEL, (1,1,1) ),
@@ -145,10 +181,24 @@ PanelArmature = [
 	('PArmIK_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PLegIK_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PLegIK_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PHandLocal_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PHandLocal_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PFootLocal_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PFootLocal_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PHandLocal_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PHandLocal_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PFootLocal_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PFootLocal_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+
+	('MHRelax_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCurl_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCone_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHSpread_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHScrunch_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHLean_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+
+	('MHRelax_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCurl_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCone_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHSpread_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHScrunch_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHLean_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
 ]
 
@@ -164,95 +214,58 @@ def PanelWritePoses(fp):
 
 	addPoseBone(fp, 'toggle&T_Panel', 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'toggle&T_Panel', 'PBrow_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+	cSlider(fp,  'PBrow_L', MX)
+	cSlider(fp,  'PBrow_R', MX)
+	cSlider(fp,  'PBrows', MX)
+	cSlider(fp,  'PUpLid_L', MX)
+	cSlider(fp,  'PUpLid_R', MX)
+	cSlider(fp,  'PLoLid_L', MX)
+	cSlider(fp,  'PLoLid_R', MX)
+	cSlider(fp,  'PCheek_L', MX)
+	cSlider(fp,  'PCheek_R', MX)
+	cSlider(fp,  'PNose', MX)
+	cSlider(fp,  'PUpLip_L', MX)
+	cSlider(fp,  'PUpLip_R', MX)
+	cSlider(fp,  'PLoLip_L', MX)
+	cSlider(fp,  'PLoLip_R', MX)
+	cSlider(fp,  'PMouth_L', MX)
+	cSlider(fp,  'PMouth_R', MX)
+	cSlider(fp,  'PTounge', MX)
+	cSlider(fp,  'PJaw', MX)
 
-	addPoseBone(fp, 'toggle&T_Panel', 'PBrow_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+	xSlider(fp, 'PArmIK_L', 0.0, 1.0)
+	xSlider(fp, 'PArmIK_R', 0.0, 1.0)
+	xSlider(fp, 'PLegIK_L', 0.0, 1.0)
+	xSlider(fp, 'PLegIK_R', 0.0, 1.0)
+	#xSlider(fp, 'PHandLocal_L', 0.0, 1.0)
+	#xSlider(fp, 'PHandLocal_R', 0.0, 1.0)
+	#xSlider(fp, 'PFootLocal_L', 0.0, 1.0)
+	#xSlider(fp, 'PFootLocal_R', 0.0, 1.0)
 
-	addPoseBone(fp, 'toggle&T_Panel', 'PBrows', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
+	xSlider(fp, 'MHRelax_L', -0.5, 1.0)
+	xSlider(fp, 'MHCurl_L', -0.5, 1.0)
+	xSlider(fp, 'MHCone_L', -0.5, 1.0)
+	xSlider(fp, 'MHSpread_L', -0.5, 1.0)
+	xSlider(fp, 'MHScrunch_L', -0.5, 1.0)
+	xSlider(fp, 'MHLean_L', -1.0, 1.0)
 
-	addPoseBone(fp, 'toggle&T_Panel', 'PUpLid_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PUpLid_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PLoLid_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PLoLid_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PCheek_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PCheek_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PNose', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-	"""
-	addPoseBone(fp, 'toggle&T_Panel', 'PUpLip', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PLoLip', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PMouth', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-	"""
-	addPoseBone(fp, 'toggle&T_Panel', 'PUpLip_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PUpLip_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PLoLip_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PLoLip_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PMouth_R', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PMouth_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PTounge', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PJaw', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-MX,MX, 0,0, -MX,MX), (1,1,1,1,1,1)])])
-
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PArmIK_R', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PArmIK_L', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PLegIK_R', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PLegIK_L', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PHandLocal_R', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PHandLocal_L', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PFootLocal_R', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
-
-	addPoseBone(fp, 'toggle&T_Panel', 'PFootLocal_L', None, None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (0,1, 0,0, 0,0), (1,1,1,1,1,1)])])
+	xSlider(fp, 'MHRelax_R', -1.0, 0.5)
+	xSlider(fp, 'MHCurl_R', -1.0, 0.5)
+	xSlider(fp, 'MHCone_R', -1.0, 0.5)
+	xSlider(fp, 'MHSpread_R', -1.0, 0.5)
+	xSlider(fp, 'MHScrunch_R', -1.0, 0.5)
+	xSlider(fp, 'MHLean_R', -1.0, 1.0)
 
 	return
+
+def cSlider(fp, bone, mx):
+	addPoseBone(fp, 'toggle&T_Panel', bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-mx,mx, 0,0, -mx,mx), (1,1,1,1,1,1)])])
+
+def xSlider(fp, bone, mn, mx):
+	addPoseBone(fp, 'toggle&T_Panel', bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, 0,0, 0,0), (1,1,1,1,1,1)])])
+
 '''
 	'BendElbowForward_L' : ('LoArm_L', 'ROT_X', 1, 0, 1)],
 	'BendElbowForward_R' : ('LoArm_R', 'ROT_X', 1, 0, 1)],

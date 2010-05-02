@@ -102,7 +102,8 @@ RegisteredBlocks = {
 
 	'Modifier' : (True, False, "'rna.modifiers.new(\"%s\",\"%s\")' % (name, subtype)"),
 	'Constraint' : (True, False, "'rna.constraints.new(\"%s\")' % (subtype)"),
-	'MeshTextureFaceLayer' : (True, True, "'uvTexCreator(rna,\"%s\")' % (name)"),
+
+	'MeshTextureFaceLayer' : (True, True, "'uvTexCreator(rna,\"%s\")' % (name)"),
 	'MeshColorLayer' : (True, True, "'vertColCreator(rna,\"%s\")' % (name)"),
 	'VertexGroup' : (True, True, "'vertGroupCreator(rna,\"%s\")' % (name)"),
 	'ShapeKey' : (True, True, "'shapeKeyCreator(rna,\"%s\")' % (name)"),
@@ -133,7 +134,8 @@ createdLocal = {
 	'ShapeKey' : {},
 	'ParticleSystem' : {},
 }
-
+
+
 ModifierTypes = {
 	'ArrayModifier' : 'ARRAY', 
 	'BevelModifier' : 'BEVEL', 
@@ -676,7 +678,8 @@ def writeBpyPropCollection(ext, data, pad, depth, fp):
 #	exportDriver(drv, fp):
 #	exportDriverVariable(drv, fp):
 #
-
+
+
 def exportAnimationData(adata, fp):
 	print("ob-adata", adata)
 	if adata == None:
@@ -698,17 +701,18 @@ def exportAction(act, fp):
 		exportFCurve(fcu, exported, "  ", fp)
 	if expMsk & M_MHX:
 		explist = []
-		for (bone, blist) in exported.items():
-			explist.append((bone,blist))
+		for (bone, lists) in exported.items():
+			explist.append((bone,lists))
 		explist.sort()
-		for (bone, blist) in explist:
+		for (bone, lists) in explist:
+			(tlist,blist) = lists
 			print(bone,blist)
-			c0 = ' ['
+			c0 = '\n\t\t['
 			fp.write("\t('%s', " % bone)
 			k = blist[0]
 			for m in range(len(k)):
 				fp.write(c0)
-				c1 = ' ('
+				c1 = '(%2d, ' % tlist[m]
 				for n in range(len(blist)):
 					x = blist[n][m]
 					if abs(x) < 1e-4:
@@ -716,7 +720,7 @@ def exportAction(act, fp):
 					fp.write("%s%.4g" % (c1,x))
 					c1 = ', '
 				fp.write(")")
-				c0 = ', '
+				c0 = ',\n\t\t '
 			fp.write(" ]),\n")
 		return
 	writeDir(act, ['fcurves', 'groups'], "  ", fp)
@@ -729,14 +733,24 @@ def exportFCurve(fcu, exported, pad, fp):
 	#print("Fcurve", dataPath, words)
 
 	if expMsk & M_MHX:
+		if words[2] != '].rotation_quaternion':
+			return
 		bone = words[1]
 		try:
-			blist = exported[bone]
+			(tlist,blist) = exported[bone]
+			first = False
 		except:
-			exported[bone] = []
+			tlist = []
+			blist = []
+			exported[bone] = (tlist,blist)
+			first = True
+
+		if first:
+			for kpt in fcu.keyframe_points:
+				tlist.append(kpt.co[0])
 
 		pts = []
-		exported[bone].append(pts)
+		blist.append(pts)
 		for kpt in fcu.keyframe_points:
 			pts.append(kpt.co[1])
 		return 
@@ -918,6 +932,7 @@ def exportRamp(ramp, name, fp):
 		return
 	print(ramp)
 	fp.write("  Ramp %s\n" % name)
+
 	for elt in ramp.elements:
 		col = elt.color
 		fp.write("    Element (%.6g,%.6g,%.6g,%.6g) %.6g ;\n" % (col[0], col[1], col[2], col[3], elt.position))
@@ -1470,6 +1485,7 @@ def exportPoseBone(fp, pb):
 	writeDir(pb, exclude, "    ", fp)	
 	fp.write("  end Posebone\n")
 	return
+
 
 def exportBoneGroup(fp, bg):
 	global createdLocal

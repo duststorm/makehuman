@@ -15,7 +15,7 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.8
+Version 0.9
 
 """
 
@@ -91,7 +91,8 @@ T_Rigify = 0x1000
 T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face
+
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -99,6 +100,7 @@ T_MHX = 0x8000
 #	Global floats
 fLegIK = 0.0
 fArmIK = 0.0
+fFingerPanel = 0.0
 fFingerIK = 0.0
 fFingerCurl = 0.0
 
@@ -107,9 +109,11 @@ T_Toes = 0x0001
 T_GoboFoot = 0x0002
 T_InvFoot = 0x0004
 
-T_FingerCurl = 0x0100
-T_FingerIK = 0x0200
-
+T_FingerPanel = 0x100
+T_FingerCurl = 0x0200
+T_FingerIK = 0x0400
+
+
 T_LocalFKIK = 0x8000
 
 rigLeg = 0
@@ -118,22 +122,15 @@ rigArm = 0
 def setFlagsAndFloats(rigFlags):
 	global toggle, rigLeg, rigArm
 
-	(presetRig, footRig, fingerRig) = rigFlags
+	(footRig, fingerRig) = rigFlags
 	rigLeg = 0
 	rigArm = 0
-	if toggle & T_Preset:
-		if presetRig == 'Gobo':
-			rigLeg = T_GoboFoot
-			rigArm = T_FingerCurl
-		elif presetRig == 'Classic':
-			rigLeg = T_Toes + T_InvFoot
-			rigArm = T_FingerIK
-	else:
-		if footRig == 'Inverse foot': rigLeg |= T_InvFoot
-		elif footRig == 'Gobo': rigLeg |= T_GoboFoot
+	if footRig == 'Reverse foot': rigLeg |= T_InvFoot
+	elif footRig == 'Gobo': rigLeg |= T_GoboFoot
 
-		if fingerRig == 'IK': rigArm |= T_FingerIK
-		elif fingerRig == 'Curl': rigArm |= T_FingerCurl
+	if fingerRig == 'Panel': rigArm |= T_FingerPanel
+	elif fingerRig == 'IK': rigArm |= T_FingerIK
+	elif fingerRig == 'Curl': rigArm |= T_FingerCurl
 
 	toggle |= T_Panel
 
@@ -305,7 +302,7 @@ def readMhxFile(filePath, rigFlags):
 	
 	for (expr, glbals, lcals) in todo:
 		try:
-			#print("Doing %s" % expr)
+			print("Doing %s" % expr)
 			exec(expr, glbals, lcals)
 		except:
 			msg = "Failed: "+expr
@@ -313,7 +310,9 @@ def readMhxFile(filePath, rigFlags):
 			nErrors += 1
 			#raise NameError(msg)
 
+	print("Postprocess")
 	postProcess()
+	print("HideLayers")
 	hideLayers()
 	time2 = time.clock()
 	print("toggle = %x" % toggle)
@@ -595,6 +594,10 @@ def parseActionFCurve(act, ob, args, tokens):
 				pass
 				#print(tokens)
 				#raise NameError("kp", fcu, n, len(fcu.keyframe_points), val)
+		elif key == 'interpolation':
+			pass
+			#bpy.ops.graph.select_all_toggle(invert=False)
+			#bpy.ops.graph.interpolation_type(type=val[0])
 		else:
 			defaultKey(key, val, sub, 'fcu', [], globals(), locals())
 	return fcu
@@ -1349,7 +1352,8 @@ def parseArmature (args, tokens):
 	theScale = 1.0
 	amt = bpy.data.armatures.new(amtname)
 	ob = createObject('Armature', obname, amt, amtname)	
-	linkObject(ob, amt)
+
+	linkObject(ob, amt)
 	print("Linked")
 
 	bpy.ops.object.mode_set(mode='OBJECT')
@@ -1470,6 +1474,14 @@ def parsePose (args, tokens):
 		elif key == 'BoneGroup':
 			parseBoneGroup(ob.pose, nGrps, val, sub)
 			nGrps += 1
+		elif key == 'SetProp':
+			bone = val[0]
+			prop = val[1]
+			value = eval(val[2])
+			pb = pbones[bone]
+			print("Setting", pb, prop, val)
+			pb[prop] = value
+			print("Prop set", pb[prop])
 		else:
 			defaultKey(key, val,  sub, "ob.pose", [], globals(), locals())
 	bpy.ops.object.mode_set(mode='OBJECT')
@@ -1501,7 +1513,12 @@ def parsePoseBone(pbones, ob, args, tokens):
 		return
 	name = args[0]
 	pb = pbones[name]
-	#ob.active_pose_bone = pb
+
+	# Make posebone active - don't know how to do this in pose mode
+	bpy.ops.object.mode_set(mode='OBJECT')
+	ob.data.bones.active = pb.bone
+	bpy.ops.object.mode_set(mode='POSE')
+
 	for (key, val, sub) in tokens:
 		if key == 'Constraint':
 			cns = parseConstraint(pb.constraints, val, sub)
@@ -1543,7 +1560,12 @@ def parseArray(data, exts, args):
 #
 
 def parseConstraint(constraints, args, tokens):
+	if invalid(args[2]):
+		return None
 	cns = constraints.new(args[1])
+	#bpy.ops.pose.constraint_add(type=args[1])
+	#cns = pb.constraints[-1]
+
 	cns.name = args[0]
 	#print("cns", cns.name)
 	for (key,val,sub) in tokens:
@@ -2077,19 +2099,17 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	preset = BoolProperty(name="Use rig preset", description="Use rig preset (Classic/Gobo)?", default=True)
-	presetRig = EnumProperty(name="Rig", description="Choose preset rig", 
-		items = [('Classic','Classic','Classic'), ('Gobo','Gobo','Gobo')], default = '1')
+	#preset = BoolProperty(name="Use rig preset", description="Use rig preset (Classic/Gobo)?", default=True)
+	#presetRig = EnumProperty(name="Rig", description="Choose preset rig", 
+	#	items = [('Classic','Classic','Classic'), ('Gobo','Gobo','Gobo')], default = '1')
 	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
-		items = [('Reverse foot','Reverse foot','Reverse foot'), ('Gobo','Gobo','Gobo')], default = '2')
+		items = [('Reverse foot','Reverse foot','Reverse foot'), ('Gobo','Gobo','Gobo')], default = '1')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
-		items = [('IK','IK','IK'), ('Curl','Curl','Curl')], default = '1')
+		items = [('Panel','Panel','Panel'), ('Curl','Curl','Curl'), ('IK','IK','IK')], default = '1')
 
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	proxy = BoolProperty(name="Proxy", description="Use proxy object", default=toggle&T_Proxy)
-	#armik = BoolProperty(name="Arm IK", description="Use arm IK", default=toggle&T_ArmIK)
-	#legik = BoolProperty(name="Leg IK", description="Use leg IK", default=toggle&T_LegIK)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
@@ -2100,18 +2120,16 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Mesh = T_Mesh if self.properties.mesh else 0
 		O_Armature = T_Armature if self.properties.armature else 0
 		O_Proxy = T_Proxy if self.properties.proxy else 0
-		# O_ArmIK = T_ArmIK if self.properties.armik else 0
-		# O_LegIK = T_LegIK if self.properties.legik else 0
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
-		O_Preset = T_Preset if self.properties.preset else 0
-		toggle =  O_Mesh | O_Armature | O_Proxy | T_ArmIK | T_LegIK | O_Replace | O_Face | O_Shape | O_Symm | O_Preset | T_MHX 
-		
+		#O_Preset = T_Preset if self.properties.preset else 0
+		toggle =  O_Mesh | O_Armature | O_Proxy | T_ArmIK | T_LegIK | O_Replace | O_Face | O_Shape | O_Symm | T_MHX 
+
+		
 		readMhxFile(self.properties.path, 	
-			(self.properties.presetRig, 
-			self.properties.footRig, 
+			(self.properties.footRig, 
 			self.properties.fingerRig))
 		return {'FINISHED'}
 
@@ -2120,8 +2138,9 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		wm.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
-class MakeHumanPanel(bpy.types.Panel):
-	bl_label = "MakeHuman"
+'''
+class MakeHumanFKIKPanel(bpy.types.Panel):
+	bl_label = "MakeHuman FK/IK"
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
 	
@@ -2140,8 +2159,24 @@ class MakeHumanPanel(bpy.types.Panel):
 			layout.row().prop(ob, "PFootLocal_R")
 		return
 		  
+class MakeHumanFingerPanel(bpy.types.Panel):
+	bl_label = "MakeHuman Fingers"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	def draw(self, context):
+		layout = self.layout
+		pb = bpy.context.active_pose_bone
+		layout.row().prop(pb, "MHRelax")
+		layout.row().prop(pb, "MHCurl")
+		layout.row().prop(pb, "MHCone")
+		layout.row().prop(pb, "MHSpread")
+		layout.row().prop(pb, "MHScrunch")
+		layout.row().prop(pb, "MHLean")
+		return
+		  
 
-def register():
+def registerPanels():
 	bpy.types.Object.FloatProperty(attr="PArmIK_L", name="L arm - IK", default = 0, min = 0.0, max = 1.0)
 	bpy.types.Object.FloatProperty(attr="PArmIK_R", name="R arm - IK", default = 0, min = 0.0, max = 1.0)
 	bpy.types.Object.FloatProperty(attr="PLegIK_L", name="L leg - IK", default = 0, min = 0.0, max = 1.0)
@@ -2152,14 +2187,30 @@ def register():
 	bpy.types.Object.FloatProperty(attr="PFootLocal_L", name="L foot - Loc", default = 0, min = 0.0, max = 1.0)
 	bpy.types.Object.FloatProperty(attr="PFootLocal_R", name="R foot - Loc", default = 0, min = 0.0, max = 1.0)
 
-	bpy.types.register(MakeHumanPanel)
+	bpy.types.PoseBone.FloatProperty(attr="MHCone", name="Cone", default = 0, min = -0.5, max = 1.0)
+	bpy.types.PoseBone.FloatProperty(attr="MHRelax", name="Relax", default = 0, min = -0.5, max = 1.0)
+	bpy.types.PoseBone.FloatProperty(attr="MHCurl", name="Curl", default = 0, min = -0.5, max = 1.0)
+	bpy.types.PoseBone.FloatProperty(attr="MHLean", name="Lean", default = 0, min = -1.0, max = 1.0)
+	bpy.types.PoseBone.FloatProperty(attr="MHScrunch", name="Scrunch", default = 0, min = -0.5, max = 1.0)
+	bpy.types.PoseBone.FloatProperty(attr="MHSpread", name="Spread", default = 0, min = -0.5, max = 1.0)
+
+	bpy.types.register(MakeHumanFKIKPanel)
+	bpy.types.register(MakeHumanFingerPanel)
+
+def unregisterPanels():
+	bpy.types.unregister(MakeHumanFKIKPanel)
+	bpy.types.unregister(MakeHumanFingerPanel)
+	'''
+
+def register():
+	# registerPanels()
 	bpy.types.register(IMPORT_OT_makehuman_mhx)
 	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 	bpy.types.INFO_MT_file_import.append(menu_func)
 	return
  
 def unregister():
-	bpy.types.unregister(MakeHumanPanel)
+	# unregisterPanels()
 	bpy.types.unregister(IMPORT_OT_makehuman_mhx)
 	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 	bpy.types.INFO_MT_file_import.remove(menu_func)

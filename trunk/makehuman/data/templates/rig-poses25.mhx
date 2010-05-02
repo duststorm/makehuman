@@ -42,6 +42,10 @@ Pose HumanRig
   ik_solver 'LEGACY' ;
 end Pose
 
+# --------------- Actions ----------------------------- # 
+
+*** rig-actions
+
 AnimationData HumanRig
    *** rig-drivers
   action_blending 'REPLACE' ;
@@ -49,10 +53,6 @@ AnimationData HumanRig
   action_influence 1 ;
   nla_enabled True ;
 end AnimationData
-
-# --------------- Actions ----------------------------- # 
-
-*** rig-actions
 
 
 
