@@ -348,23 +348,23 @@ def fingerDrivers(driver, suffix):
 	if PanelWorks:
 		path = 'pose.bones["PHand%s"]' % suffix
 		return [
-			(driver, 'LOC', None, 0, (0,0.4), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHRelax"]')])]), 
-			(driver, 'LOC', None, 1, (0,0.4), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHCurl"]')])]), 
-			(driver, 'LOC', None, 2, (0,0.4), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHCone"]')])]), 
-			(driver, 'ROTE', None, 0, (0,deg40), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHSpread"]')])]), 
-			(driver, 'ROTE', None, 1, (0,deg40), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHScrunch"]')])]), 
-			(driver, 'ROTE', None, 2, (0,deg40), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHLean"]')])]), 
+			(driver, 'LOC', None, 0, (0,0.8), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHRelax"]')])]), 
+			(driver, 'LOC', None, 1, (0,0.8), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHCurl"]')])]), 
+			(driver, 'LOC', None, 2, (0,0.8), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHCone"]')])]), 
+			(driver, 'ROTE', None, 0, (0,deg80), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHSpread"]')])]), 
+			(driver, 'ROTE', None, 1, (0,deg80), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHScrunch"]')])]), 
+			(driver, 'ROTE', None, 2, (0,deg80), [("var", 'SINGLE_PROP', [('HumanRig', path+'["MHLean"]')])]), 
 			]
 	else:
 		if suffix == '_R': sign = -1 
 		else: sign = 1
 		return [
-			(driver, 'LOC', None, 0, (0,sign*0.4), [("var", 'TRANSFORMS', [('HumanRig', 'MHRelax%s' % suffix, 'LOC_X', C_LOCAL)])]), 
-			(driver, 'LOC', None, 1, (0,sign*0.4), [("var", 'TRANSFORMS', [('HumanRig', 'MHCurl%s' % suffix, 'LOC_X', C_LOCAL)])]), 
-			(driver, 'LOC', None, 2, (0,sign*0.4), [("var", 'TRANSFORMS', [('HumanRig', 'MHCone%s' % suffix, 'LOC_X', C_LOCAL)])]), 
-			(driver, 'ROTE', None, 0, (0,sign*deg40), [("var", 'TRANSFORMS', [('HumanRig', 'MHSpread%s' % suffix, 'LOC_X', C_LOCAL)])]), 
-			(driver, 'ROTE', None, 1, (0,sign*deg40), [("var", 'TRANSFORMS', [('HumanRig', 'MHScrunch%s' % suffix, 'LOC_X', C_LOCAL)])]), 
-			(driver, 'ROTE', None, 2, (0,sign*deg40), [("var", 'TRANSFORMS', [('HumanRig', 'MHLean%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'LOC', None, 0, (0,sign*0.8), [("var", 'TRANSFORMS', [('HumanRig', 'MHRelax%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'LOC', None, 1, (0,sign*0.8), [("var", 'TRANSFORMS', [('HumanRig', 'MHCurl%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'LOC', None, 2, (0,sign*0.8), [("var", 'TRANSFORMS', [('HumanRig', 'MHCone%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'ROTE', None, 0, (0,sign*deg80), [("var", 'TRANSFORMS', [('HumanRig', 'MHSpread%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'ROTE', None, 1, (0,sign*deg80), [("var", 'TRANSFORMS', [('HumanRig', 'MHScrunch%s' % suffix, 'LOC_X', C_LOCAL)])]), 
+			(driver, 'ROTE', None, 2, (0,sign*deg80), [("var", 'TRANSFORMS', [('HumanRig', 'MHLean%s' % suffix, 'LOC_X', C_LOCAL)])]), 
 			]
 
 

@@ -8,7 +8,7 @@ from mhx_rig import *
 offs = [0, 0, 0.3]
 
 PanelJoints = [
-	('origin',			'o', ('head', [-2.5, 0.5, 0.0])),
+	('origin',			'o', ('head', [-3.3, 0.5, 0.0])),
 	('PFaceDisp_tail',		'o', ('origin', [0.0, 0.0, 1.0])),
 	('PFace_head',			'o', ('origin', [0.0, -1.5, 0.0])),
 	('PFace_tail',			'o', ('PFace_head', [0.0, 0.0, 1.0])),
@@ -74,7 +74,7 @@ PanelJoints = [
 	('PFootLocal_L_head',		'o', ('origin', [0.1, 1.5, 0.0])),
 	('PFootLocal_L_tail',		'o', ('PFootLocal_L_head', offs)),
 
-	('MHRelax_L_head',		'o', ('origin', [1.8, 1.0, 0.0])),
+	('MHRelax_L_head',		'o', ('origin', [1.5, 1.0, 0.0])),
 	('MHRelax_L_tail',		'o', ('MHRelax_L_head', offs)),
 	('MHCurl_L_head',		'o', ('MHRelax_L_head', [0.0, -0.5, 0.0])),
 	('MHCurl_L_tail',		'o', ('MHCurl_L_head', offs)),
@@ -87,7 +87,7 @@ PanelJoints = [
 	('MHLean_L_head',		'o', ('MHRelax_L_head', [0.0, -2.5, 0.0])),
 	('MHLean_L_tail',		'o', ('MHLean_L_head', offs)),
 
-	('MHRelax_R_head',		'o', ('origin', [-2.0, 1.0, 0.0])),
+	('MHRelax_R_head',		'o', ('origin', [-1.5, 1.0, 0.0])),
 	('MHRelax_R_tail',		'o', ('MHRelax_R_head', offs)),
 	('MHCurl_R_head',		'o', ('MHRelax_R_head', [0.0, -0.5, 0.0])),
 	('MHCurl_R_tail',		'o', ('MHCurl_R_head', offs)),
@@ -242,19 +242,19 @@ def PanelWritePoses(fp):
 	#xSlider(fp, 'PFootLocal_L', 0.0, 1.0)
 	#xSlider(fp, 'PFootLocal_R', 0.0, 1.0)
 
-	xSlider(fp, 'MHRelax_L', -0.5, 1.0)
-	xSlider(fp, 'MHCurl_L', -0.5, 1.0)
-	xSlider(fp, 'MHCone_L', -0.5, 1.0)
-	xSlider(fp, 'MHSpread_L', -0.5, 1.0)
-	xSlider(fp, 'MHScrunch_L', -0.5, 1.0)
-	xSlider(fp, 'MHLean_L', -1.0, 1.0)
+	xSlider(fp, 'MHRelax_L', -0.25, 0.5)
+	xSlider(fp, 'MHCurl_L', -0.25, 0.5)
+	xSlider(fp, 'MHCone_L', -0.25, 0.5)
+	xSlider(fp, 'MHSpread_L', -0.25, 0.5)
+	xSlider(fp, 'MHScrunch_L', -0.25, 0.5)
+	xSlider(fp, 'MHLean_L', -0.5, 0.5)
 
-	xSlider(fp, 'MHRelax_R', -1.0, 0.5)
-	xSlider(fp, 'MHCurl_R', -1.0, 0.5)
-	xSlider(fp, 'MHCone_R', -1.0, 0.5)
-	xSlider(fp, 'MHSpread_R', -1.0, 0.5)
-	xSlider(fp, 'MHScrunch_R', -1.0, 0.5)
-	xSlider(fp, 'MHLean_R', -1.0, 1.0)
+	xSlider(fp, 'MHRelax_R', -0.5, 0.25)
+	xSlider(fp, 'MHCurl_R', -0.5, 0.25)
+	xSlider(fp, 'MHCone_R', -0.5, 0.25)
+	xSlider(fp, 'MHSpread_R', -0.5, 0.25)
+	xSlider(fp, 'MHScrunch_R', -0.5, 0.25)
+	xSlider(fp, 'MHLean_R', -0.5, 0.5)
 
 	return
 

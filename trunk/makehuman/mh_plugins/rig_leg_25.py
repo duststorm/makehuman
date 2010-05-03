@@ -225,15 +225,15 @@ LegArmature = [
 
 	# IK Inverse foot
 	('FootCtrl_L', 'rigLeg&T_InvFoot',	footCtrlRoll, 'Root', F_WIR, L_LEGIK, (1,1,1) ),
-	('ToeRevIK_L', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_L', F_CON+F_WIR, L_LEGIK, (1,1,1)),
+	('ToeRevIK_L', 'rigLeg&T_InvFoot',	0, 'FootCtrl_L', F_CON+F_WIR, L_LEGIK, (1,1,1)),
 	('FootRevIK_L', 'rigLeg&T_InvFoot',	deg180, 'ToeRevIK_L', F_CON+F_WIR, L_LEGIK, (1,1,1)),
 	('Ankle_L', 'rigLeg&T_InvFoot',		deg180, 'FootRevIK_L', F_CON+F_CON, L_HELP, (1,1,1) ),
 	('KneePT_L', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
 
-	('FootCtrl_R', 'rigLeg&T_InvFoot',	footCtrlRoll, 'Root', F_WIR, L_LEGIK, (1,1,1) ),
-	('ToeRevIK_R', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_R', F_CON+F_WIR, L_LEGIK, (1,1,1)),
-	('FootRevIK_R', 'rigLeg&T_InvFoot',	deg90, 'ToeRevIK_R', F_CON+F_WIR, L_LEGIK, (1,1,1)),
-	('Ankle_R', 'rigLeg&T_InvFoot',		deg90, 'FootRevIK_R', F_CON, L_HELP, (1,1,1) ),
+	('FootCtrl_R', 'rigLeg&T_InvFoot',	-footCtrlRoll, 'Root', F_WIR, L_LEGIK, (1,1,1) ),
+	('ToeRevIK_R', 'rigLeg&T_InvFoot',	0, 'FootCtrl_R', F_CON+F_WIR, L_LEGIK, (1,1,1)),
+	('FootRevIK_R', 'rigLeg&T_InvFoot',	deg180, 'ToeRevIK_R', F_CON+F_WIR, L_LEGIK, (1,1,1)),
+	('Ankle_R', 'rigLeg&T_InvFoot',		deg180, 'FootRevIK_R', F_CON, L_HELP, (1,1,1) ),
 	('KneePT_R', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
 
 	# IK Gobo
