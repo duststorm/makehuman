@@ -173,8 +173,9 @@ LegHeadsTails = [
 
 ]
 
-hipRoll = 1.62316
-upLegRoll = -3.08923
+# hipRoll = 1.62316
+# upLegRoll = -3.08923
+upLegRoll = deg180
 loLegRoll = deg180
 footRoll = deg180
 toeRoll = -2.813
@@ -329,7 +330,7 @@ def LegWritePoses(fp):
 		#[('IK', 0, ['IK', 'LoLeg_R', 1, None, (True, False), 1.0])])
 		[('CopyRot', 0, ['UnTwist', 'UpLeg_R', 'True', (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, 'True', 'LoLeg_R', None, None, (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'True', 'LoLeg_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('CopyRot', 0, ['ConstIK', 'LoLegIK_R', 'fLegIK', (1,1,1), (0,0,0), False]),
 		('CopyRot', 0, ['ConstFK', 'LoLegFK_R', '1-fLegIK', (1,1,1), (0,0,0), False])])
 
@@ -381,13 +382,15 @@ def LegWritePoses(fp):
 		('ChildOf', C_CHILDOF, ['Local', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'LegRoot_R'])])
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Ankle_L', 2, (deg90, 'KneePT_L'), (True, False), 1.0]),
-		 ('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_L, (True, True, True)])])
+	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['IK', 'Ankle_L', 2, (70*deg1, 'KneePT_L'), (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)])
+		])
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Ankle_R', 2, (deg90, 'KneePT_R'), (True, False), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_R, (True, True, True)])])
+	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, ['IK', 'Ankle_R', 2, (110*deg1, 'KneePT_R'), (True, False), 1.0]),
+		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)])
+		])
 
 	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootRevIK_L', 'MHRevFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevFoot_L, (True, True, True)])])
@@ -425,13 +428,15 @@ def LegWritePoses(fp):
 
 	# IK Gobo
 		
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
 		[('IK', 0, ['IK', 'LegTarget_L', 2, (1.2708, 'KneePT_L'), (True, False), 1.0]),
-		 ('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])
+		])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
 		[('IK', 0, ['IK', 'LegTarget_R', 2, (1.8708, 'KneePT_R'), (True, False), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])])
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])
+		])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootGobo_L', 'GoboFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['ChildOf', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
