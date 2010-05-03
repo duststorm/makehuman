@@ -588,6 +588,7 @@ def parseActionFCurve(act, ob, args, tokens):
 		if key == 'kp':
 			try:
 				pt = fcu.keyframe_points[n]
+				pt.interpolation = 'LINEAR'
 				pt = parseKeyFramePoint(pt, val, sub)
 				n += 1
 			except:

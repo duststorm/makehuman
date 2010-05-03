@@ -851,7 +851,6 @@ def writeFCurves(fp, name, quats):
 			x = quats[m][index+1]
 			fp.write("    kp %d %.4g ;\n" % (t,x))
 		fp.write(
-"    interpolation 'LINEAR' ;\n" +
 "    extrapolation 'CONSTANT' ;\n" +
 "  end FCurve \n")
 	return
