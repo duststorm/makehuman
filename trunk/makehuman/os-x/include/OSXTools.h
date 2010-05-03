@@ -52,8 +52,7 @@ extern "C"
       *
       * \see getModelPath()
       * \see getGrabPath()
-      *
-      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
+      * \see getRenderPath()
       */
     const char* getExportPath();
 
@@ -64,8 +63,7 @@ extern "C"
       *
       * \see getExportPath()
       * \see getGrabPath()
-      *
-      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
+      * \see getRenderPath()
       */
     const char* getModelPath();
 
@@ -76,11 +74,21 @@ extern "C"
       *
       * \see getExportPath()
       * \see getModelPath()
-      *
-      * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
+      * \see getRenderPath()
       */
     const char* getGrabPath();
 
+    /** Gets the path location for Renderman ouput. This is usually set by the User Preferences and points to
+     * ${USER}/Documents/MakeHuman/renderman per default.
+     *
+     * \return The path to which all exports should be placed to.
+     *
+     * \see getExportPath()
+     * \see getModelPath()
+     * \see getGrabPath()
+     */
+    const char* getRenderPath();
+    
     /** Adjusts the environment in order to work with all supported Ray Tracers.
       *
       * \return 0 for success, -1 for failure.

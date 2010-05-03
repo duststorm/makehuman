@@ -491,7 +491,7 @@ void mhDrawText(float x, float y, const char *message)
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 /** \brief Perform a byte swapping of a long value by reversing all bytes 
- *         (e.g. 0x012345678 becomes 0x78563412).
+ *         (e.g. 0x12345678 becomes 0x78563412).
  *  \param inValue The long to swap to.
  *  \return The long value swapped.
  */
@@ -2026,7 +2026,7 @@ void mhEventLoop(void)
             break;
         case SDL_MOUSEMOTION:
 	{
-#if defined WIN32 || defined APPLE
+#if defined(WIN32)
             mhMouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
 #else
             int x, y;
