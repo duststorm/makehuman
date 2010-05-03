@@ -2,54 +2,6 @@
 
 # --------------- Textures ----------------------------- # 
  
-texture IMAGE alpha
-  image texture_opacity.tif
-    filename texture_opacity.tif ;
-  end image
-    animFrames 100 ;
-    animOffset 0 ;
-    animStart 0 ;
-    autoRefresh false ;
-    calcAlpha 0 ;
-    contrast 1.000000 ;
-    crop (0,0,1,1) ;
-    cyclic false ;
-    distAmnt 1.000000 ;
-    distMetric 0 ;
-    exp 2.500000 ;
-    extend 3 ;
-    fieldsPerImage 2 ;
-    filterSize 1.000000 ;
-    flags 0x8 ;
-    gain 1.000000 ;
-    hFracDim 1.000000 ;
-    iScale 1.000000 ;
-    imageFlags 0x1 ;
-    interpol 1 ;
-    lacunarity 2.000000 ;
-        mipmap 0 ;
-    noiseBasis 0 ;
-    noiseBasis2 0 ;
-    noiseDepth 2 ;
-    noiseSize 0.250000 ;
-    noiseType 'soft' ;
-    normalMap 0 ;
-    octs 2.000000 ;
-    offset 1.000000 ;
-    repeat (1,1) ;
-    rgbCol (1.000000,1.000000,1.000000) ;
-    rot90 0 ;
-    sine 1 ;
-    stype 0 ;
-    turbulence 5.000000 ;
-    useAlpha 0 ;
-    useColorband 0 ;
-    weight1 1.000000 ;
-    weight2 0.000000 ;
-    weight3 0.000000 ;
-    weight4 0.000000 ;
-end texture
-
 texture IMAGE diffuse
   image texture.tif
     filename texture.tif ;
@@ -90,7 +42,7 @@ texture IMAGE diffuse
     sine 1 ;
     stype 0 ;
     turbulence 5.000000 ;
-    useAlpha 0 ;
+    useAlpha 1 ;
     useColorband 0 ;
     weight1 1.000000 ;
     weight2 0.000000 ;
@@ -283,7 +235,7 @@ material SSS_skinshader
   rgba 1.000000 1.000000 1.000000 0.000000 ;
   mtex 0 diffuse
     texco 0x10 ;
-    mapto 0x1 ;
+    mapto 0x81 ;
     blendmode 0 ;
     col (1.000000,0.000000,1.000000) ;
     colfac 0.945272 ;
@@ -323,28 +275,7 @@ material SSS_skinshader
     yproj 2 ;
     zproj 3 ;
   end mtex
-  mtex 2 alpha
-    texco 0x10 ;
-    mapto 0x80 ;
-    blendmode 0 ;
-    col (1.000000,1.000000,1.000000) ;
-    colfac 0.165813 ;
-    correctNor false ;
-    dispfac 0.200000 ;
-    dvar 1.000000 ;
-    fromDupli false ;
-    mapping 0x0 ;
-    neg false ;
-    noRGB false ;
-    norfac 0.500000 ;
-                stencil false ;
-        varfac 1.000000 ;
-    warpfac 0.444186 ;
-    xproj 1 ;
-    yproj 2 ;
-    zproj 3 ;
-  end mtex
-  mtex 3 normals
+  mtex 2 normals
     texco 0x10 ;
     mapto 0x2 ;
     blendmode 0 ;
