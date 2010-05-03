@@ -594,10 +594,6 @@ def parseActionFCurve(act, ob, args, tokens):
 				pass
 				#print(tokens)
 				#raise NameError("kp", fcu, n, len(fcu.keyframe_points), val)
-		elif key == 'interpolation':
-			pass
-			#bpy.ops.graph.select_all_toggle(invert=False)
-			#bpy.ops.graph.interpolation_type(type=val[0])
 		else:
 			defaultKey(key, val, sub, 'fcu', [], globals(), locals())
 	return fcu
