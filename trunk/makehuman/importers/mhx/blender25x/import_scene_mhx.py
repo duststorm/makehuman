@@ -848,17 +848,17 @@ def loadImage(filepath):
 	(name, ext) = os.path.splitext(filename)
 	print( "Loading ", filepath, " = ", filename )
 
-	img = doLoadImage(texDir+"/"+name+".png")
-	if img:
-		return img
+	# img = doLoadImage(texDir+"/"+name+".png")
+	# if img:
+	#	return img
 
 	img = doLoadImage(texDir+"/"+filename)
 	if img:
 		return img
 
-	img = doLoadImage(path+"/"+name+".png")
-	if img:
-		return img
+	# img = doLoadImage(path+"/"+name+".png")
+	# if img:
+	#	return img
 
 	img = doLoadImage(path+"/"+filename)
 	if img:

@@ -14,10 +14,6 @@ Image texture_ref.tif
   *** Filename texture_ref.tif ;
 end Image
 
-Image texture_opacity.tif
-  *** Filename texture_opacity.tif ;
-end Image
-
 
 # --------------- Textures ----------------------------- # 
  
@@ -27,10 +23,6 @@ end Texture
 
 Texture specularity IMAGE
   Image texture_ref.tif ;
-end Texture
-
-Texture alpha IMAGE
-  Image texture_opacity.tif ;
 end Texture
 
 Texture normals CLOUDS
@@ -51,11 +43,14 @@ end Texture
 
 
 # --------------- Materials ----------------------------- # 
+
 Material SSS_skinshader 
   MTex 0 diffuse UV COLOR
     texture Refer Texture diffuse ;
     map_colordiff True ;
+    map_alpha True ;
     map_coloremission True ;
+    map_density True ;
     alpha_factor 1 ;
     ambient_factor 1 ;
     blend_type 'MIX' ;
@@ -138,50 +133,7 @@ Material SSS_skinshader
     z_mapping 'Z' ;
   end MTex
 
-  MTex 2 alpha UV ALPHA
-    texture Refer Texture alpha ;
-    map_alpha True ;
-    map_density True ;
-    alpha_factor 1 ;
-    ambient_factor 1 ;
-    blend_type 'MIX' ;
-    color Array 1.0 1.0 1.0  ;
-    colordiff_factor 0.165813 ;
-    coloremission_factor 0.165813 ;
-    colorreflection_factor 0.165813 ;
-    colorspec_factor 0.165813 ;
-    colortransmission_factor 0.165813 ;
-    default_value 1 ;
-    density_factor 1 ;
-    diffuse_factor 1 ;
-    displacement_factor 0.2 ;
-    emission_factor 1 ;
-    emit_factor 1 ;
-    enabled True ;
-    from_dupli False ;
-    from_original False ;
-    hardness_factor 1 ;
-    mapping 'FLAT' ;
-    mirror_factor 0.165813 ;
-    negate False ;
-    new_bump True ;
-    normal_factor 0.5 ;
-    normal_map_space 'TANGENT' ;
-    raymir_factor 1 ;
-    reflection_factor 1 ;
-    rgb_to_intensity True ;
-    scattering_factor 1 ;
-    size (1,1,1) ;
-    specular_factor 1 ;
-    stencil False ;
-    translucency_factor 1 ;
-    warp_factor 0.444186 ;
-    x_mapping 'X' ;
-    y_mapping 'Y' ;
-    z_mapping 'Z' ;
-  end MTex
-
-  MTex 3 normals UV NORMAL
+  MTex 2 normals UV NORMAL
     texture Refer Texture normals ;
     map_normal True ;
     alpha_factor 1 ;
@@ -228,7 +180,7 @@ Material SSS_skinshader
   diffuse_intensity 0.93 ;
   specular_color Array 1.0 1.0 1.0  ;
   specular_shader 'PHONG' ;
-  specular_intensity 0.01 ;
+  specular_intensity 0 ;
   Ramp diffuse_ramp
     Element (0.569697,0.0276216,0.0473347,0.449231) 0.0666667 ;
     Element (1,0.990444,0.961778,1) 0.525252 ;
@@ -313,7 +265,7 @@ Material SSS_skinshader
   transparency_method 'Z_TRANSPARENCY' ;
   use_nodes False ;
   use_sky False ;
-  use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
+  use_textures Array 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
   vertex_color_light False ;
   vertex_color_paint False ;
   z_offset 0 ;
