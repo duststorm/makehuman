@@ -49,10 +49,22 @@ Section "Copy files"
   # Copy textures
   SetOutPath $INSTDIR\data\textures
   File /r /x .svn data\textures\*.tif
+
+  # Copy fonts
+  SetOutPath $INSTDIR\data\fonts
+  File /r /x .svn data\fonts\*.fnt
+  File /r /x .svn data\fonts\*.png
   
   # Copy themes
   SetOutPath $INSTDIR\data
   File /r /x .svn data\themes
+
+  # Copy importers
+  SetOutPath $INSTDIR\importers\mhx\blender25x
+  File /r /x .svn importers\mhx\blender25x\*.py 
+  SetOutPath $INSTDIR\importers\mhx\blender249
+  File /r /x .svn importers\mhx\blender249\*.py
+  File /r /x .svn importers\mhx\blender249\*.txt
   
   # Copy docs
   SetOutPath $INSTDIR\docs
@@ -107,6 +119,7 @@ Section "Uninstall"
   RMDir /r $INSTDIR\mh_plugins
   RMDir /r $INSTDIR\plugins
   RMDir /r $INSTDIR\pythonmodules
+  RMDir /r $INSTDIR\importers
   
   # Remove uninstaller
   Delete $INSTDIR\Uninst.exe
@@ -114,7 +127,7 @@ Section "Uninstall"
   # Remove remaining Makehuman folders if empty
   RMDir $INSTDIR\models
   RMDir $INSTDIR\exports
-  RMDir $INSTDIR\backgrounds
+  RMDir $INSTDIR\backgrounds  
   RMDir $INSTDIR
   
   # Remove shortcuts
