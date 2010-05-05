@@ -2030,7 +2030,7 @@ class Human(gui3d.Object):
 
     def save(self, filename, tags):
         f = open(filename, 'w')
-        f.write('# Written by makehuman 1.0.0 alpha 4\n')
+        f.write('# Written by makehuman 1.0.0 alpha 5\n')
         f.write('version 1.0.0\n')
         f.write('tags %s\n' % tags)
         f.write('gender %f\n' % self.getGender())
