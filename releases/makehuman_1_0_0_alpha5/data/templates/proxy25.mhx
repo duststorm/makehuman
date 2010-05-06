@@ -1,0 +1,129 @@
+Material ProxySkin 
+  diffuse_color Array  0.92 0.73 0.58  ;
+end Material
+
+Material ProxyWhite 
+  diffuse_color Array 1.0 1.0 1.0  ;
+end Material
+
+Material ProxyRed 
+  diffuse_color Array 1.0 0.0 0.0 ;
+end Material
+
+Material ProxyGum 
+  diffuse_color Array 0.6 0.2 0.3  ;
+end Material
+
+Material ProxyBlue 
+  diffuse_color Array 0.0 0.0 1.0  ;
+end Material
+
+Material ProxyBlack
+  diffuse_color Array 0.0 0.0 0.0  ;
+end Material
+
+
+Mesh HumanProxy HumanProxy 
+  Material ProxySkin ;
+  Material ProxyWhite ;
+  Material ProxyRed ;
+  Material ProxyGum ;
+  Material ProxyBlue ;
+  Material ProxyBlack ;
+  Verts
+  *** ProxyVerts
+  end Verts
+  Faces
+  *** ProxyFaces
+  end Faces
+    *** VertexGroup
+  vertex_normal_flip True ;
+end Mesh
+
+Object HumanProxy MESH HumanProxy
+  layers Array 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+    Modifier Armature ARMATURE
+      b_bone_rest False ;
+      editmode True ;
+      expanded True ;
+      invert False ;
+      multi_modifier False ;
+      object Refer Object HumanRig ;
+      on_cage True ;
+      quaternion False ;
+      realtime True ;
+      render True ;
+      use_bone_envelopes False ;
+      use_vertex_groups True ;
+    end Modifier
+  active_material Refer Material SSS_skinshader ;
+  active_material_index 0 ;
+  active_particle_system_index 0 ;
+  active_shape_key_index 0 ;
+  active_vertex_group_index 8 ;
+  color Array 1.0 1.0 1.0 1.0  ;
+  delta_location (0,0,0) ;
+  delta_rotation_euler (0,0,0) ;
+  delta_rotation_quaternion (0,0,0,0) ;
+  delta_scale (0,0,0) ;
+  dimensions (16.3674,3.02534,16.7043) ;
+  draw_axis False ;
+  draw_bounds False ;
+  draw_bounds_type 'BOX' ;
+  draw_name False ;
+  draw_texture_space False ;
+  draw_transparent False ;
+  draw_wire False ;
+  dupli_faces_scale 1 ;
+  dupli_frames_end 100 ;
+  dupli_frames_off 0 ;
+  dupli_frames_on 1 ;
+  dupli_frames_start 1 ;
+  dupli_type 'NONE' ;
+  empty_draw_size 1 ;
+  empty_draw_type 'ARROWS' ;
+  location (0,0,0) ;
+  lock_location Array 0 0 0  ;
+  lock_rotation Array 0 0 0  ;
+  lock_rotation_w False ;
+  lock_rotations_4d False ;
+  lock_scale Array 0 0 0  ;
+  matrix Matrix
+    row 1.0 0.0 0.0 0.0 ;
+    row 0.0 1.0 0.0 0.0 ;
+    row 0.0 0.0 1.0 0.0 ;
+    row 0.0 0.0 0.0 1.0 ;
+  end Matrix
+  max_draw_type 'TEXTURED' ;
+  parent Refer Object HumanRig ;
+  parent_type 'OBJECT' ;
+  pass_index 0 ;
+  restrict_render False ;
+  restrict_select False ;
+  restrict_view False ;
+  rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
+  rotation_euler (0,-0,0) ;
+  rotation_mode 'XYZ' ;
+  rotation_quaternion (1,0,0,0) ;
+  scale (1,1,1) ;
+  selected True ;
+  shape_key_edit_mode False ;
+  shape_key_lock False ;
+  slow_parent False ;
+  time_offset 0 ;
+  time_offset_add_parent False ;
+  time_offset_edit True ;
+  time_offset_parent True ;
+  time_offset_particle False ;
+  track_axis 'POS_Y' ;
+  up_axis 'Z' ;
+  use_dupli_faces_scale False ;
+  use_dupli_frames_speed True ;
+  use_dupli_verts_rotation False ;
+  x_ray False ;
+end Object
+
+# --------------- Shapekeys ----------------------------- # 
+
+*** proxy-shapeKey
+

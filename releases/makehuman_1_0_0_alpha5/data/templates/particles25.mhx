@@ -1,0 +1,279 @@
+  ParticleSystem Hair HAIR 
+  settings Struct ParticleSettings Hair 
+    amount 10 ;
+    hair_step 6 ;
+    rendered_child_nbr 2000 ;
+    child_radius 0.2 ;
+    child_random_size 0 ;
+    *** EndIgnore
+    abs_path_time False ;
+    active_dupliweight_index 0 ;
+    adaptive_angle 5 ;
+    adaptive_pix 3 ;
+    angular_velocity_factor 0 ;
+    angular_velocity_mode 'SPIN' ;
+    animate_branching False ;
+    billboard_align 'VIEW' ;
+    billboard_animation 'NONE' ;
+    billboard_lock False ;
+    billboard_offset (0,0) ;
+    billboard_random_tilt 0 ;
+    billboard_split_offset 'LINEAR' ;
+    billboard_tilt 0 ;
+    billboard_uv_split 1 ;
+    boids_2d False ;
+    branch_threshold 0 ;
+    branching False ;
+    brownian_factor 0 ;
+    child_effector False ;
+    child_guide False ;
+    child_length 1 ;
+    child_length_thres 0 ;
+    child_nbr 10 ;
+    child_render False ;
+    child_roundness 0 ;
+    child_size 1 ;
+    child_type 'FACES' ;
+    clump_factor 0 ;
+    clumppow 0 ;
+    damp_factor 0 ;
+    die_on_collision False ;
+    died False ;
+    display 100 ;
+    distribution 'JIT' ;
+    drag_factor 0 ;
+    draw_as 'RENDER' ;
+    draw_health False ;
+    draw_size 0 ;
+    draw_step 2 ;
+    effect_hair 0 ;
+    effector_weights Struct EffectorWeights None 
+      all 1 ;
+      boid 1 ;
+      charge 1 ;
+      curveguide 1 ;
+      do_growing_hair False ;
+      drag 1 ;
+      force 1 ;
+      gravity 1 ;
+      harmonic 1 ;
+      lennardjones 1 ;
+      magnetic 1 ;
+      texture 1 ;
+      turbulence 1 ;
+      vortex 1 ;
+      wind 1 ;
+    end Struct
+    emit_from 'FACE' ;
+    emitter True ;
+    enable_simplify True ;
+    \ end 200 ;
+    even_distribution True ;
+    grid_invert False ;
+    grid_resolution 10 ;
+    hair_bspline True ;
+    hair_geometry True ;
+    integrator 'MIDPOINT' ;
+    jitter_factor 1 ;
+    keyed_loops 1 ;
+    keys_step 5 ;
+    kink 'NO' ;
+    kink_amplitude 0.2 ;
+    kink_axis 'Z' ;
+    kink_frequency 2 ;
+    kink_shape 0 ;
+    lifetime 50 ;
+    line_length_head 0 ;
+    line_length_tail 0.5 ;
+    mass 1 ;
+    material 3 ;
+    material_color True ;
+    normal_factor 0.4 ;
+    num False ;
+    object_aligned_factor (0,0,0) ;
+    object_factor 0 ;
+    parent False ;
+    particle_factor 0 ;
+    particle_size 0.05 ;
+    path_end 1 ;
+    path_start 0 ;
+    phase_factor 0 ;
+    physics_type 'NEWTON' ;
+    rand_group False ;
+    random_factor 0 ;
+    random_length 0 ;
+    random_lifetime 0 ;
+    random_phase_factor 0 ;
+    random_rotation_factor 0 ;
+    random_size 0 ;
+    react_event 'DEATH' ;
+    react_multiple True ;
+    react_start_end False ;
+    reaction_shape 1 ;
+    reactor_factor 0 ;
+    ren_as 'PATH' ;
+    render_adaptive False ;
+    render_step 3 ;
+    render_strand True ;
+    rotate_from 'KEYS' ;
+    rotation_dynamic False ;
+    rotation_mode 'VEL' ;
+    rough1 0 ;
+    rough1_size 1 ;
+    rough2 0 ;
+    rough2_size 1 ;
+    rough2_thres 0 ;
+    rough_end_shape 1 ;
+    rough_endpoint 0 ;
+    self_effect False ;
+    show_size False ;
+    simplify_rate 1 ;
+    simplify_refsize 1920 ;
+    simplify_transition 0.1 ;
+    simplify_viewport 0.8 ;
+    size_deflect False ;
+    sizemass False ;
+    start 1 ;
+    symmetric_branching False ;
+    tangent_factor 0 ;
+    tangent_phase 0 ;
+    time_tweak 1 ;
+    trail_count 1 ;
+    trand True ;
+    unborn False ;
+    use_global_dupli False ;
+    use_group_count False ;
+    userjit 0 ;
+    velocity False ;
+    velocity_length False ;
+    viewport False ;
+    virtual_parents 0 ;
+    whole_group False ;
+  end Struct
+    active_particle_target_index 0 ;
+    hair_dynamics False ;
+    keyed_timing False ;
+    reactor_target_particle_system 0 ;
+    seed 0 ;
+    vertex_group_clump_negate False ;
+    vertex_group_density 'Scalp' ;
+    vertex_group_density_negate False ;
+    vertex_group_field_negate False ;
+    vertex_group_kink_negate False ;
+    vertex_group_length_negate False ;
+    vertex_group_rotation_negate False ;
+    vertex_group_roughness1_negate False ;
+    vertex_group_roughness2_negate False ;
+    vertex_group_roughness_end_negate False ;
+    vertex_group_size_negate False ;
+    vertex_group_tangent_negate False ;
+    vertex_group_velocity_negate False ;
+    Particles
+      Particle 
+        h (-0.0285363197327,0.28026676178,-0.448021650314)  0 1 ;
+        h (-0.206309109926,0.505383491516,-0.306179285049)  20 0.8 ;
+        h (-0.359043836594,0.549143791199,-0.0284075737)  40 0.6 ;
+        h (-0.405840754509,0.308182150126,0.176890850067)  60 0.4 ;
+        h (-0.401863336563,0.000849574804306,0.26594594121)  80 0.2 ;
+        h (-0.359659433365,-0.290899336338,0.390450030565)  100 0 ;
+        location (-2.00194,1.08317,8.49665) ;
+      end Particle
+      Particle 
+        h (0.383321285248,0.546221733093,-0.306174278259)  0 1 ;
+        h (0.554764091969,0.547096967697,-0.0359771549702)  20 0.8 ;
+        h (0.501175880432,0.467814654112,0.269379228354)  40 0.6 ;
+        h (0.273772060871,0.347232252359,0.459503769875)  60 0.4 ;
+        h (0.00969085097313,0.243426591158,0.607440888882)  80 0.2 ;
+        h (-0.274698108435,0.106319025159,0.659637033939)  100 0 ;
+        location (-0.750362,2.33165,8.43557) ;
+      end Particle
+      Particle 
+        h (-0.483201503754,-0.0837769508362,-0.210825681686)  0 1 ;
+        h (-0.750083565712,0.00863938033581,-0.0603822916746)  20 0.8 ;
+        h (-0.60494852066,-0.214862972498,0.116768851876)  40 0.6 ;
+        h (-0.434539377689,0.00308325886726,0.277580201626)  60 0.4 ;
+        h (-0.161595493555,0.144603297114,0.188845917583)  80 0.2 ;
+        h (0.153856694698,0.101759016514,0.221316620708)  100 0 ;
+        location (2.13902,0.343823,8.57775) ;
+      end Particle
+      Particle 
+        h (-4.17232513428e-07,-9.53674316406e-07,2.14576721191e-06)  0 1 ;
+        h (0.0116692204028,-0.144749179482,0.285154134035)  20 0.8 ;
+        h (0.02716560103,0.0749365240335,0.517313480377)  40 0.6 ;
+        h (0.03832860291,0.337763190269,0.699515104294)  60 0.4 ;
+        h (0.0158757641912,0.5062302351,0.97065103054)  80 0.2 ;
+        h (-0.0445079021156,0.49049898982,1.28450798988)  100 0 ;
+        location (0.73087,2.16439,6.34495) ;
+      end Particle
+      Particle 
+        h (0.313080787659,-0.0708191394806,-0.0677523612976)  0 1 ;
+        h (0.428277134895,-0.121491715312,0.226462155581)  20 0.8 ;
+        h (0.119918256998,-0.0574627667665,0.283164918423)  40 0.6 ;
+        h (-0.110238820314,0.0172490403056,0.492559254169)  60 0.4 ;
+        h (-0.248346924782,-0.0144398473203,0.205641031265)  80 0.2 ;
+        h (-0.444478332996,0.11243198812,-0.0130734741688)  100 0 ;
+        location (-1.18549,-1.19662,9.37718) ;
+      end Particle
+      Particle 
+        h (-0.312987804413,-0.274386048317,-0.129881203175)  0 1 ;
+        h (-0.505383968353,-0.205801770091,0.116451665759)  20 0.8 ;
+        h (-0.357196837664,-0.0546423047781,0.356433689594)  40 0.6 ;
+        h (-0.0490870773792,0.0027679130435,0.421027898788)  60 0.4 ;
+        h (0.269245266914,0.0284829232842,0.441109538078)  80 0.2 ;
+        h (0.588249027729,0.0468834191561,0.45837238431)  100 0 ;
+        location (0.282409,2.54508,7.20103) ;
+      end Particle
+      Particle 
+        h (-0.45731690526,0.400200843811,-0.364177465439)  0 1 ;
+        h (-0.377217233181,0.638217687607,-0.165854617953)  20 0.8 ;
+        h (-0.267099142075,0.646906852722,0.134476020932)  40 0.6 ;
+        h (-0.16101808846,0.448414117098,0.361956775188)  60 0.4 ;
+        h (-0.155362561345,0.230568736792,0.596288561821)  80 0.2 ;
+        h (-0.0830160081387,-0.0760372281075,0.652491092682)  100 0 ;
+        location (-0.487932,2.42808,8.34799) ;
+      end Particle
+      Particle 
+        h (0.0410684943199,-0.261274337769,-0.117914676666)  0 1 ;
+        h (0.178905114532,-0.395033866167,0.13803344965)  20 0.8 ;
+        h (0.0572777763009,-0.350126236677,0.430591285229)  40 0.6 ;
+        h (-0.0175151154399,-0.0945923924446,0.253085017204)  60 0.4 ;
+        h (-0.110219284892,0.209452182055,0.216167509556)  80 0.2 ;
+        h (-0.265931993723,0.472250103951,0.120821602643)  100 0 ;
+        location (0.559675,-1.95007,8.97249) ;
+      end Particle
+      Particle 
+        h (0.00392150878906,-0.00265967845917,-0.00994980335236)  0 1 ;
+        h (-0.0674652978778,0.172654360533,0.248059689999)  20 0.8 ;
+        h (-0.335819244385,0.132537961006,0.41769695282)  40 0.6 ;
+        h (-0.409664154053,0.129644334316,0.729046463966)  60 0.4 ;
+        h (-0.606586158276,0.209682300687,0.968244314194)  80 0.2 ;
+        h (-0.498594194651,0.120809838176,1.25606238842)  100 0 ;
+        location (-1.72262,1.45871,6.5806) ;
+      end Particle
+      Particle 
+        h (-0.125568389893,0.317762851715,-0.337256908417)  0 1 ;
+        h (-0.308769077063,0.469038665295,-0.122890427709)  20 0.8 ;
+        h (-0.380223244429,0.343385279179,0.162601068616)  40 0.6 ;
+        h (-0.334324926138,0.0600461959839,0.304065465927)  60 0.4 ;
+        h (-0.456906080246,-0.192777603865,0.457211911678)  80 0.2 ;
+        h (-0.208762153983,-0.387861847878,0.509810328484)  100 0 ;
+        location (-1.77739,1.2269,8.83284) ;
+      end Particle
+      *** EndIgnore
+      alive_state 'DEAD' ;
+      angular_velocity (0,0,0) ;
+      birthtime 0 ;
+      die_time 100 ;
+      lifetime 100 ;
+      no_disp False ;
+      prev_angular_velocity (0,0,0) ;
+      prev_location (-1.71921,0.971761,8.39639) ;
+      prev_rotation (0.184212,0.155882,-0.0296035,0.969995) ;
+      prev_velocity (-0.353413,0.139256,0.125326) ;
+      rekey False ;
+      rotation (0.184212,0.155882,-0.0296035,0.969995) ;
+      size 0.05 ;
+      unexist False ;
+      velocity (-0.353413,0.139256,0.125326) ;
+    end Particles
+  end ParticleSystem
