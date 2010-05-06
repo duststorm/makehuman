@@ -45,6 +45,12 @@ Section "Copy files"
   File /r /x .svn data\targets\macrodetails\*.target
   SetOutPath $INSTDIR\data\targets\microdetails
   File /r /x .svn data\targets\microdetails\*.target
+
+  # Copy templates
+  SetOutPath $INSTDIR\data\templates
+  File /r /x .svn data\templates\*.mhx
+  File /r /x .svn data\templates\*.dae
+  File /r /x .svn data\templates\*.txt
   
   # Copy textures
   SetOutPath $INSTDIR\data\textures
