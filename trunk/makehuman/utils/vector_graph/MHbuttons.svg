@@ -1645,14 +1645,14 @@
      inkscape:pageshadow="2"
      inkscape:zoom="2.2382812"
      inkscape:cx="137.86899"
-     inkscape:cy="1001.0724"
+     inkscape:cy="500.68844"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="778"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="116"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -5766,5 +5766,64 @@
          id="tspan3075"
          x="199.17444"
          y="40.646233">MakeHair</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\button_export_group_on.png"
+       ry="2.3011835"
+       y="481.44135"
+       x="115.01395"
+       height="15.341223"
+       width="31.341223"
+       id="rect3072"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\button_export_group_on.png"
+       transform="scale(0.994692,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3074"
+       y="490.72522"
+       x="117.43936"
+       style="font-size:10.00000095px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       xml:space="preserve"><tspan
+         y="490.72522"
+         x="117.43936"
+         id="tspan3076"
+         sodipodi:role="line">group</tspan></text>
+    <g
+       id="g3078"
+       transform="translate(-388.39079,103.57318)"
+       inkscape:export-filename="C:\button_export_group.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         inkscape:export-ydpi="45"
+         inkscape:export-xdpi="45"
+         inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_exit.png"
+         ry="2.3011835"
+         y="356.16614"
+         x="503.84366"
+         height="15.341223"
+         width="31.341223"
+         id="rect3080"
+         style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         inkscape:export-ydpi="45"
+         inkscape:export-xdpi="45"
+         inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_exit.png"
+         transform="scale(0.994692,1.0053363)"
+         sodipodi:linespacing="125%"
+         id="text3082"
+         y="366.11493"
+         x="508.34399"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+         xml:space="preserve"><tspan
+           y="366.11493"
+           x="508.34399"
+           id="tspan3084"
+           sodipodi:role="line">group</tspan></text>
+    </g>
   </g>
 </svg>
