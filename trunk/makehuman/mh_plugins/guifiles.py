@@ -174,8 +174,8 @@ class ExportTaskView(gui3d.TaskView):
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 160, 9.2], selected=True)
                                                  
-        self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
-                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[68, 160, 9.2], selected=True)
+        self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_group.png'),
+                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_group_on.png'), position=[68, 160, 9.2], selected=True)
 
         ####### HAIR EXPORT ###################
         self.hairMesh = gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images',\
