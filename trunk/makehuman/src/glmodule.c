@@ -620,7 +620,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
     }
 #endif // ifndef __APPLE__
     surface = (SDL_Surface*)IMG_Load(fname);
-
+        
     if (!surface)
     {
         PyErr_Format(PyExc_RuntimeError, "Could not load %s, %s", fname, SDL_GetError());
@@ -2026,7 +2026,7 @@ void mhEventLoop(void)
             break;
         case SDL_MOUSEMOTION:
 	{
-#if defined(WIN32)
+#if defined(WIN32) || defined(__APPLE__)
             mhMouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
 #else
             int x, y;
