@@ -65,13 +65,12 @@ class SaveTaskView(gui3d.TaskView):
 
             leftTop = mh.cameras[0].convertToScreen(-10, 9, 0)
             rightBottom = mh.cameras[0].convertToScreen(10, -10, 0)
-            self.app.scene3d.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), modelPath + '/' + filename
-                                         + '.bmp')
+            self.app.scene3d.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), os.path.join(modelPath, filename + '.bmp'))
 
       # Save the model
 
             human = self.app.scene3d.selectedHuman
-            human.save(modelPath + '/' + filename + '.mhm', tags)
+            human.save(os.path.join(modelPath, filename + '.mhm'), tags)
 
             self.app.switchCategory('Modelling')
             self.app.scene3d.redraw(1)
@@ -120,7 +119,7 @@ class LoadTaskView(gui3d.TaskView):
 
             human = self.app.scene3d.selectedHuman
 
-            human.load(modelPath + '/' + filename, self.app.progress)
+            human.load(os.path.join(modelPath, filename), self.app.progress)
 
             self.app.categories['Modelling'].tasksByName['Macro modelling'].syncSliders()
             self.app.categories['Modelling'].tasksByName['Macro modelling'].syncEthnics()
@@ -194,24 +193,24 @@ class ExportTaskView(gui3d.TaskView):
                 os.makedirs(exportPath)
 
             if self.wavefrontObj.selected:
-                mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".obj", 'data/3dobjs/base.obj', self.exportGroups.selected)
-                mh2mhx.exportProxyObj(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + "-proxy.obj")
+                mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".obj"), 'data/3dobjs/base.obj', self.exportGroups.selected)
+                mh2mhx.exportProxyObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + "-proxy.obj"))
                 if self.exportSkeleton.selected:
-                    mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".bvh")
+                    mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".bvh"))
             elif self.mhx.selected:
-                mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".mhx")
+                mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
             elif self.collada.selected:
-                mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, exportPath + "/" + filename + ".dae")
+                mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".dae"))
 
             if len(filename)> 0 and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
                if self.hairMesh.selected:
-                  mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj,exportPath+"/hair_"+filename+".obj")
+                  mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
                else:
                   hairsClass = hairgenerator.Hairgenerator()
                   hairsClass.humanVerts = self.app.scene3d.selectedHuman.mesh.verts
                   hairsClass.loadHairs(self.app.scene3d.selectedHuman.hairFile)
                   hairsClass.adjustGuides()
-                  file = open(exportPath+"/hair_"+filename + ".obj", 'w')
+                  file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
                   mh2obj.exportAsCurves(file, hairsClass.guideGroups)
                   file.close()
 
