@@ -34,6 +34,7 @@ __docformat__ = 'restructuredtext'
 import Blender
 import math
 import time
+from blendersaveobj import *
 try:
     import os
     from os import path
@@ -431,6 +432,58 @@ def utility3(filepath):
 
 
 
+
+
+def utility5(filepath):
+    """
+    This function is used to adjust little changes on base
+    meshes, correcting all targets
+    """
+
+    folderToScan = os.path.dirname(filepath)
+    fileName = os.path.basename(filepath)    
+    
+    targetList = os.listdir(folderToScan)
+
+    for targetName in targetList:
+        targetPath = os.path.join(folderToScan,targetName)
+        objFileName = os.path.splitext(targetName)[0]+".obj"
+        objPath = os.path.join(folderToScan,objFileName)
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetPath)
+            loadTranslationTarget(targetPath)            
+            doMorph(1.0)         
+            saveObj(objPath) 
+            doMorph(-1.0)
+
+
+def utility4(filepath):
+    """
+    This function is used to adjust little changes on base
+    meshes, correcting all targets
+    """
+
+
+    folderToScan = os.path.dirname(filepath)   
+    targetList = os.listdir(folderToScan)
+
+    for targetName in targetList:
+        targetPath = os.path.join(folderToScan,targetName)
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetPath)
+            loadTranslationTarget(targetPath)
+            
+            doMorph(1.0)
+            
+            saveTranslationTarget(targetPath)            
+
+
+            doMorph(-1.0)
+
+
+
+
+
 def loadInitialBaseCoords(path):
     """
     This function is a little utility function to load only the vertex data
@@ -760,7 +813,7 @@ def event(event, value):
     elif event == Draw.HKEY:
         Window.FileSelector (utility1, "Select files")
     elif event == Draw.UKEY:
-        Window.FileSelector (utility3, "Select files")
+        Window.FileSelector (utility5, "Select files")
 
 
 def b_event(event):
@@ -775,9 +828,10 @@ def b_event(event):
 
     """
     global symmPath,selAxis,morphFactor
+    global current_target
     if event == 0: pass
     elif event == 1:
-        Window.FileSelector (saveTranslationTarget, "Save Target")
+        Window.FileSelector (saveTranslationTarget, "Save Target",current_target)
     elif event == 2:
         Window.FileSelector (loadTranslationTarget, "Load Target")
     elif event == 3:
