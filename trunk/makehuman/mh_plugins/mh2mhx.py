@@ -99,32 +99,20 @@ def exportRawMhx(obj, fp):
 def exportMhx_25(obj, rig, fp):
 	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
 
-	if rig == 'gobo':
-		mhx_rig.newSetupJoints(obj, gobo_bones.GoboJoints +  classic_bones.FaceJoints +  classic_bones.PanelJoints, 
-			gobo_bones.GoboHeadsTails + classic_bones.FaceHeadsTails + classic_bones.PanelHeadsTails)
-	elif rig == 'sintel':
-		mhx_rig.newSetupJoints(obj, sintel_bones.SintelJoints, sintel_bones.SintelHeadsTails)
-		copyFile25(obj, "data/templates/sintel-armature25.mhx", rig, fp)
-		return
-	elif rig == 'classic':
-		mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints +  classic_bones.FaceJoints +  classic_bones.PanelJoints,
-			classic_bones.ClassicHeadsTails + classic_bones.FaceHeadsTails + classic_bones.PanelHeadsTails)
-		#mhxbones.setupBones(obj)
-	elif rig == 'rig':
-		mhx_rig.setupRig(obj)
+	mhx_rig.setupRig(obj)
 
 	fp.write("if toggle&T_Armature\n")
 	copyFile25(obj, "data/templates/common-armature25.mhx", rig, fp)	
 	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp)	
-	fp.write("end if\n")
-	fp.write("if toggle&T_Armature\n")
-	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp)	
 	fp.write("end if\n")
 	fp.write("if toggle&T_Proxy\n")
 	copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
 	fp.write("end if\n")
 	fp.write("if toggle&T_Mesh\n")
 	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+	fp.write("end if\n")
+	fp.write("if toggle&T_Armature\n")
+	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp)	
 	fp.write("end if\n")
 	return
 
@@ -184,30 +172,6 @@ def copyFile25(obj, tmplName, rig, fp):
 				mhx_rig.writeAllDrivers(fp)
 			elif lineSplit[1] == 'rig-process':
 				mhx_rig.writeAllProcesses(fp)
-			elif lineSplit[1] == 'classic-bones':
-				mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.FaceArmature + classic_bones.PanelArmature, True)
-			elif lineSplit[1] == 'classic-poses':
-				classic_bones.ClassicWritePoses(fp)
-				classic_bones.FaceWritePoses(fp)
-				classic_bones.PanelWritePoses(fp)
-			elif lineSplit[1] == 'classic-drivers':
-				pass
-			elif lineSplit[1] == 'gobo-bones':
-				mhx_rig.writeArmature(fp, gobo_bones.GoboArmature + classic_bones.FaceArmature + classic_bones.PanelArmature, True)
-			elif lineSplit[1] == 'gobo-poses':
-				gobo_bones.GoboWritePoses(fp)
-				classic_bones.FaceWritePoses(fp)
-				classic_bones.PanelWritePoses(fp)
-			elif lineSplit[1] == 'gobo-actions':
-				gobo_bones.GoboWriteActions(fp)
-			elif lineSplit[1] == 'gobo-constraint-drivers':
-				gobo_bones.GoboWriteDrivers(fp)
-			elif lineSplit[1] == 'sintel-bones':
-				mhx_rig.writeArmature(fp, sintel_bones.SintelArmature, True)
-			elif lineSplit[1] == 'sintel-poses':
-				sintel_bones.SintelWritePoses(fp)
-			elif lineSplit[1] == 'sintel-drivers':
-				mhx_rig.writeDrivers(fp, sintel_bones.SintelDrivers)
 			elif lineSplit[1] == 'ProxyVerts':
 				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
 				for v in realVerts:

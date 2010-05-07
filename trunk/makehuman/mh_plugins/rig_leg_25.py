@@ -228,7 +228,7 @@ LegArmature = [
 	('FootCtrl_L', 'rigLeg&T_InvFoot',	footCtrlRoll, 'Root', F_WIR, L_LEGIK, (1,1,1) ),
 	('ToeRevIK_L', 'rigLeg&T_InvFoot',	0, 'FootCtrl_L', F_CON+F_WIR, L_LEGIK, (1,1,1)),
 	('FootRevIK_L', 'rigLeg&T_InvFoot',	deg180, 'ToeRevIK_L', F_CON+F_WIR, L_LEGIK, (1,1,1)),
-	('Ankle_L', 'rigLeg&T_InvFoot',		deg180, 'FootRevIK_L', F_CON+F_CON, L_HELP, (1,1,1) ),
+	('Ankle_L', 'rigLeg&T_InvFoot',		deg180, 'FootRevIK_L', F_CON, L_HELP, (1,1,1) ),
 	('KneePT_L', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
 
 	('FootCtrl_R', 'rigLeg&T_InvFoot',	-footCtrlRoll, 'Root', F_WIR, L_LEGIK, (1,1,1) ),
@@ -580,24 +580,49 @@ LegDrivers = [
 #
 
 LegProcess = [
-	("UpLeg_L", "X", 0.3),
-	("UpLegTwist_L", "X", 0.3),
-	("UpLegFK_L", "X", 0.3),
-	("UpLegIK_L", "X", 0.3),
-	("LoLeg_L", "X", -0.5),
-	("LoLegFK_L", "X", -0.5),
-	("LoLegIK_L", "X", -0.5),
+	("UpLeg_L", "X", 0.2),
+	("LoLeg_L", "X", -0.4),
+	("Foot_L", "X", 0.2),
 
-	("UpLeg_R", "X", 0.3),
-	("UpLegTwist_R", "X", 0.3),
-	("UpLegFK_R", "X", 0.3),
-	("UpLegIK_R", "X", 0.3),
-	("LoLeg_R", "X", -0.5),
-	("LoLegFK_R", "X", -0.5),
-	("LoLegIK_R", "X", -0.5),
+	("UpLeg_R", "X", 0.2),
+	("LoLeg_R", "X", -0.4),
+	("Foot_R", "X", 0.2),
 ]	
 
+LegSnaps = [
+	("UpLegTwist_L", "UpLeg_L", 0),
+	("UpLegFK_L", "UpLeg_L", 0),
+	("UpLegIK_L", "UpLeg_L", 0),
+	("LoLegFK_L", "LoLeg_L", 0),
+	("LoLegIK_L", "LoLeg_L", 0),
+	("FootFK_L", "Foot_L", 0),
+	("FootIK_L", "Foot_L", 0),
+	("FootRevIK_L", "Foot_L", 1),
+	("ToeIK_L", "Toe_L", 0),
+	("ToeRevIK_L", "Toe_L", 1),
+
+	("UpLegTwist_R", "UpLeg_R", 0),
+	("UpLegFK_R", "UpLeg_R", 0),
+	("UpLegIK_R", "UpLeg_R", 0),
+	("LoLegFK_R", "LoLeg_R", 0),
+	("LoLegIK_R", "LoLeg_R", 0),
+	("FootFK_R", "Foot_R", 0),
+	("FootIK_R", "Foot_R", 0),
+	("FootRevIK_R", "Foot_R", 1),
+	("ToeIK_R", "Toe_R", 0),
+	("ToeRevIK_R", "Toe_R", 1),
+]
+
+
 LegParents = [
+	('KneePT_L', 'UpLeg_L'),
+	('Ankle_L', 'LoLeg_L'),
+	('FootCtrl_L', 'ToeRevIK_L'),
+
+	('KneePT_R', 'UpLeg_R'),
+	('Ankle_R', 'LoLeg_R'),
+	('FootCtrl_R', 'ToeRevIK_R'),
+
 	("FootGobo_L", "LoLegIK_L"),
 	("FootGobo_R", "LoLegIK_R"),
 ]

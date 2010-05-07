@@ -143,9 +143,19 @@ def newSetupJoints (obj, joints, headTails):
 	rigHead = {}
 	rigTail = {}
 	for (bone, head, tail) in headTails:
-		rigHead[bone] = locations[head]
-		rigTail[bone] = locations[tail]
+		rigHead[bone] = findLocation(head)
+		rigTail[bone] = findLocation(tail)
 	return 
+
+def findLocation(joint):
+	try:
+		(bone, offs) = joint
+	except:
+		offs = 0
+	if offs:
+		return vadd(locations[bone], offs)
+	else:
+		return locations[joint]
 
 #
 #	writeArmature(fp, armature, mhx25):
@@ -331,7 +341,7 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 	if not Mhx25:
 		fp.write("\tend posebone\n")
 		return
-
+	'''
 	fp.write(
 "    ik_dof Array %d %d %d  ; \n" % (ik_dof_x, ik_dof_y, ik_dof_z) +
 "    ik_limit Array %d %d %d  ; \n" % (usex,usey,usez)+
@@ -339,6 +349,7 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 	fp.write(
 "    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
 "    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
+	'''
 	#if boneGroup:
 	#	fp.write("    bone_group Refer BoneGroup %s ; \n" % (boneGroup))
 
@@ -1021,17 +1032,25 @@ def writeAllDrivers(fp):
 def writeAllProcesses(fp):
 	#return
 	
-	fp.write("  Edit ;\n")
-	parents = rig_finger_25.FingerParents + rig_arm_25.ArmParents + rig_leg_25.LegParents
+	fp.write("  EditMode ;\n")
+	parents = rig_arm_25.ArmParents + rig_leg_25.LegParents
 	for (bone, parent) in parents:
 		fp.write("  Reparent %s %s ;\n" % (bone, parent))
 
-	fp.write("  Pose ;\n")
-	processes = rig_finger_25.FingerProcess + rig_arm_25.ArmProcess + rig_leg_25.LegProcess
+	fp.write("  PoseMode ;\n")
+	processes = rig_arm_25.ArmProcess + rig_leg_25.LegProcess
 	for (bone, axis, angle) in processes:
 		fp.write("  Bend %s %s %.6g ;\n" % (bone, axis, angle))
+	fp.write("  ObjectMode ;\n")
 
-	fp.write("  Edit ;\n")
+	fp.write("  Apply ;\n")
+
+	fp.write("  EditMode ;\n")
+	snaps = rig_arm_25.ArmSnaps + rig_leg_25.LegSnaps
+	for (bone, target, rev) in snaps:
+		fp.write("  Snap %s %s %s ;\n" % (bone, target, rev))
+	fp.write("  ObjectMode ;\n")
+
 	return
 
 

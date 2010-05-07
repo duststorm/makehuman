@@ -337,18 +337,23 @@ ArmDrivers = [
 #
 
 ArmProcess = [
-	("LoArm_L", "X", 0.3),
-	("LoArmTwist_L", "X", 0.3),
-	("LoArmFK_L", "X", 0.3),
-	("LoArmIK_L", "X", 0.3),
-
-	("LoArm_R", "X", 0.3),
-	("LoArmTwist_R", "X", 0.3),
-	("LoArmFK_R", "X", 0.3),
-	("LoArmIK_R", "X", 0.3),
+	("LoArm_L", "Z", -deg20),
+	("LoArm_R", "Z", deg20),
 ]	
 
+ArmSnaps = [
+	("LoArmTwist_L", "LoArm_L", 0),
+	("LoArmFK_L", "LoArm_L", 0),
+	("LoArmIK_L", "LoArm_L", 0),
+	("HandIK_L", "Hand_L", 0),
+
+	("LoArmTwist_R", "LoArm_R", 0),
+	("LoArmFK_R", "LoArm_R", 0),
+	("LoArmIK_R", "LoArm_R", 0),
+	("HandIK_R", "Hand_R", 0),
+]
+
 ArmParents = [
-	("HandIK_L", "LoArmIK_L"),
-	("HandIK_R", "LoArmIK_R"),
+	("WristCtrl_L", "LoArmIK_L"),
+	("WristCtrl_R", "LoArmIK_R"),
 ]

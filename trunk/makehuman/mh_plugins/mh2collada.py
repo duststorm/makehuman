@@ -30,7 +30,7 @@ import aljabr
 import mh
 import files3d
 import mh2bvh
-import os
+import os, time
 import mhx_rig, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 from mhx_rig import *
 
@@ -180,9 +180,15 @@ def writeBone(fp, bone, orig, extra, pad):
 	
 	
 def printNode(fp, name, vec, extra, pad):
-	print(name, vec)
+	# print(name, vec)
+	if name:
+		nameStr = 'sid="%s"' % name
+		idStr = 'id="%s" name="%s"' % (name, name)
+	else:
+		nameStr = ''
+		idStr = ''
 	fp.write('\n'+
-'%s      <node %s sid="%s" type="JOINT" id="%s" name="%s">\n' % (pad, extra, name, name, name) +
+'%s      <node %s %s type="JOINT" %s>\n' % (pad, extra, nameStr, idStr) +
 '%s        <translate sid="translate"> %.4f %.4f %.4f </translate>\n' % (pad, vec[0], -vec[2], vec[1]) +
 '%s        <rotate sid="rotateZ">0 0 1 0.0</rotate>\n' % pad +
 '%s        <rotate sid="rotateY">0 1 0 0.0</rotate>\n' % pad +
@@ -228,7 +234,7 @@ def exportDae(obj, fp):
 				#print("find", bone, par, rigHier)
 				(p, children) = findInHierarchy(par, rigHier)
 				children.append((bone, []))
-	print("hier", rigHier)
+	#print("hier", rigHier)
 	
 	bones = []
 	flatten(rigHier, bones)	
@@ -266,16 +272,17 @@ def exportDae(obj, fp):
 	nFaces = len(faces)
 	
 	texture = os.path.expanduser("~/makehuman/texture.tif")
-	texture_ref = os.path.expanduser("~/makehuman/texture_ref.tif")
-	
+	texture_ref = os.path.expanduser("~/makehuman/texture_ref.tif")	
+	date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
+
 	fp.write('<?xml version="1.0" encoding="utf-8"?>\n' +
 '<COLLADA version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">\n' +
 '  <asset>\n' +
 '    <contributor>\n' +
 '      <author>www.makehuman.org</author>\n' +
 '    </contributor>\n' +
-'    <created>2010-03-07T12:28:17.237396</created>\n' +
-'    <modified>2010-03-07T12:28:17.237412</modified>\n' +
+'    <created>%s</created>\n' % date +
+'    <modified>%s</modified>\n' % date +
 '    <unit meter="0.1" name="decimeter"/>\n' +
 '    <up_axis>Z_UP</up_axis>\n' +
 '  </asset>\n' +
@@ -312,6 +319,7 @@ def exportDae(obj, fp):
 '        </newparam>\n' +
 '        <technique sid="common">\n' +
 '          <phong>\n' +
+
 '            <emission>\n' +
 '              <color>0 0 0 1</color>\n' +
 '            </emission>\n' +
@@ -429,13 +437,13 @@ def exportDae(obj, fp):
 '          <v>\n' +
 '           ')
 
-	print(vertexWeights)
+	#print(vertexWeights)
 	for (vn,wts) in vertexWeights.items():
 		wtot = 0.0
 		for (bn,wn) in wts:
 			wtot += wn
 		if wtot < 0.01:
-			print("wtot", vn, wtot)
+			# print("wtot", vn, wtot)
 			wtot = 1
 		for (bn,wn) in wts:
 			fp.write(' %d %d' % (bn, wn))
