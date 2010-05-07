@@ -2059,10 +2059,12 @@ class Human(gui3d.Object):
             f.write('ethnic %s %f\n' % (target, value))
 
         for t in self.targetsDetailStack.keys():
-            if '/details/' in t:
+            if '/details' in t:
                 f.write('detail %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
-            elif '/microdetails/' in t:
+            elif '/microdetails' in t:
                 f.write('microdetail %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
+            else:
+                print('Error, %s was not saved' % t)
         f.close()
 
 
