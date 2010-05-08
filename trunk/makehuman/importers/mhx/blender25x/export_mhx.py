@@ -115,7 +115,7 @@ RegisteredBlocks = {
 	'FCurve' : (True, False, "'drivers.new(\"%s\")' % (name)"),
 	'DriverVariable' : (True, False, "'variables.new(\"%s\")' % (name)"),
 
-	'Nurb' : (True, False, "'rna.modifiers.new(\"%s\",\"%s\")' % (name, subtype)"),
+	'Spline' : (True, False, "'rna.modifiers.new(\"%s\",\"%s\")' % (name, subtype)"),
 	'BezierSplinePoint' : (True, False, "'rna.modifiers.new(\"%s\",\"%s\")' % (name, subtype)"),
 
 }
@@ -125,7 +125,7 @@ createdLocal = {
 	'Constraint' : {},
 	'Bone' : {}, 
 	'BoneGroup' : {}, 
-	'Nurb' : {},
+	'Spline' : {},
 	'BezierSplinePoint' : {},
 
 	'MeshTextureFaceLayer' : {},
@@ -1559,7 +1559,7 @@ def exportRestObject(ob,fp):
 
 #
 #	exportCurve(ob, fp):
-#	exportNurb(spl, pad, fp):
+#	exportSpline(spl, pad, fp):
 #	exportBezierPoint(bz, pad, fp):
 #
 
@@ -1569,25 +1569,25 @@ def exportCurve(ob, fp):
 	obname = ob.name.replace(' ', '_') 
 	fp.write("Curve %s %s\n" % (cuname, obname))
 	writeDir(cu, ['splines', 'points'], "  ", fp)
-	for nurb in cu.splines:
-		exportNurb(nurb, "  ", fp)
+	for spline in cu.splines:
+		exportSpline(spline, "  ", fp)
 	fp.write("end Curve\n")
 
-def exportNurb(nurb, pad, fp):
-	fp.write("%sNurb\n" % pad)
-	writeDir(nurb, ['bezier_points', 'points'], "    ", fp)
-	for bz in nurb.bezier_points:
+def exportSpline(spline, pad, fp):
+	fp.write("%sSpline %s %d %d\n" % (pad, spline.type, spline.point_count_u, spline.point_count_v))
+	writeDir(spline, ['bezier_points', 'character_index', 'points', 'point_count_u', 'point_count_v'], "    ", fp)
+	for bz in spline.bezier_points:
 		fp.write("%s  bz " % pad)
 		writeTuple(bz.co, fp)
 		writeTuple(bz.handle1, fp)
 		fp.write("%s " % bz.handle1_type)
 		writeTuple(bz.handle2, fp)
 		fp.write("%s ;\n" % bz.handle2_type)
-	for pt in nurb.points:
+	for pt in spline.points:
 		fp.write("%s  pt " % pad)
 		writeTuple(pt.co, fp)
 		fp.write(" ;\n")
-	fp.write("%send Nurb\n" % pad)
+	fp.write("%send Spline\n" % pad)
 
 #
 #	exportLattice(ob, fp):

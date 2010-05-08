@@ -206,7 +206,7 @@ Plural = {
 #
 #	Creators
 #
-
+'''
 def uvtexCreator(me, name):
 	print("uvtexCreator", me, name)
 	me.add_uv_texture()
@@ -221,7 +221,7 @@ def vertcolCreator(me, name):
 	vcol = me.vertex_colors[-1]
 	vcol.name = name
 	return vcol
-		
+'''		
 
 #
 #	loadMhx(filePath, context, flags):
@@ -302,7 +302,7 @@ def readMhxFile(filePath, rigFlags):
 	
 	for (expr, glbals, lcals) in todo:
 		try:
-			# print("Doing %s" % expr)
+			print("Doing %s" % expr)
 			exec(expr, glbals, lcals)
 		except:
 			msg = "Failed: "+expr
@@ -412,6 +412,7 @@ def parse(tokens):
 			data = parseMaterial(val, sub)
 		elif key == "Texture":
 			data = parseTexture(val, sub)
+
 		elif key == "Image":
 			data = parseImage(val, sub)
 		elif key == "Process":
@@ -921,9 +922,7 @@ def parseObject(args, tokens):
 		#print("Found data")
 	except:
 		ob = createObject(typ, name, data, datName)
-	if bpy.context.object != ob:
-		print("Context", ob, bpy.context.object, bpy.context.scene.objects.active)
-		# ob = foo 
+		linkObject(ob, data)
 
 	for (key, val, sub) in tokens:
 		if key == 'Modifier':
@@ -939,14 +938,18 @@ def parseObject(args, tokens):
 			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
 
 	# Needed for updating layers
-	bpy.ops.object.mode_set(mode='EDIT')
-	bpy.ops.object.mode_set(mode='OBJECT')
+	if bpy.context.object == ob and ob.data:
+		bpy.ops.object.mode_set(mode='EDIT')
+		bpy.ops.object.mode_set(mode='OBJECT')
+	else:
+		print("Context", ob, bpy.context.object, bpy.context.scene.objects.active)
 	return
 
 def createObject(typ, name, data, datName):
-	#print( "Creating object %s %s %s" % (typ, name, data) )	
+	# print( "Creating object %s %s %s" % (typ, name, data) )	
 	ob = bpy.data.objects.new(name, data)
-	loadedData[typ][datName] = data
+	if data:
+		loadedData[typ][datName] = data
 	loadedData['Object'][name] = ob
 	return ob
 	
@@ -1410,17 +1413,17 @@ def parseRigify(amtname, obname, tokens):
 				bone = None
 			print(" -> ", bone)
 			if bone:
-				parseBone(bone, amt.edit_bones, sub, heads, tails)
+				parseBone(bone, amt, sub, heads, tails)
 		else:
 			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
 	bpy.ops.object.mode_set(mode='OBJECT')
 	return amt
 		
 #
-#	parseBone(bone, bones, tokens, heads, tails):
+#	parseBone(bone, amt, tokens, heads, tails):
 #
 
-def parseBone(bone, bones, tokens, heads, tails):
+def parseBone(bone, amt, tokens, heads, tails):
 	global todo
 
 	for (key, val, sub) in tokens:
@@ -1428,22 +1431,6 @@ def parseBone(bone, bones, tokens, heads, tails):
 			bone.head = (float(val[0]), float(val[1]), float(val[2]))
 		elif key == "tail":
 			bone.tail = (float(val[0]), float(val[1]), float(val[2]))
-		elif key == "head-as":
-			target = val[0]
-			if val[1] == 'head':
-				bone.head = heads[bone.name] + bones[target].head - heads[target]
-			elif val[1] == 'tail':
-				bone.head = heads[bone.name] + bones[target].tail - tails[target]
-			else:
-				raise NameError("head-as %s" % val)
-		elif key == "tail-as":
-			target = val[0]
-			if val[1] == 'head':
-				bone.tail = tails[bone.name] + bones[target].head - heads[target]
-			elif val[1] == 'tail':
-				bone.tail = tails[bone.name] + bones[target].tail - tails[target]
-			else:
-				raise NameError("tail-as %s" % val)
 		elif key == 'restrict_select':
 			pass
 		else:
@@ -1616,8 +1603,8 @@ def insertInfluenceIpo(cns, bone):
 
 #
 #	parseCurve (args, tokens):
-#	parseNurb(cu, nNurbs, args, tokens):
-#	parseBezier(nurb, n, args, tokens):
+#	parseSpline(cu, args, tokens):
+#	parseBezier(spline, n, args, tokens):
 #
 
 def parseCurve (args, tokens):
@@ -1626,39 +1613,38 @@ def parseCurve (args, tokens):
 		print( "Parsing curve %s" % args )
 	cu = createObjectAndData(args, 'Curve')
 
-	nNurbs = 0
 	for (key, val, sub) in tokens:
-		if key == 'Nurb':
-			parseNurb(cu, nNurbs, val, sub)
-			nNurbs += 1
+		if key == 'Spline':
+			parseSpline(cu, val, sub)
 		else:
 			defaultKey(key, val, sub, "cu", [], globals(), locals())
 	return
 
-def parseNurb(cu, nNurbs, args, tokens):
-	if nNurbs > 0:
-		bpy.ops.object.curve_add(type='BEZIER_CURVE')
-	print(cu.splines, list(cu.splines), nNurbs)
-	nurb = cu.splines[nNurbs]
-	nPoints = int(args[0])
-	print(nurb, nPoints)
-	for n in range(2, nPoints):
-		bpy.ops.curve.extrude(mode=1)		
+def parseSpline(cu, args, tokens):
+	typ = args[0]
+	spline = cu.splines.new(typ)
+	nPointsU = int(args[1])
+	nPointsV = int(args[2])
+	#spline.point_count_u = nPointsU
+	#spline.point_count_v = nPointsV
+	if typ == 'BEZIER' or typ == 'BSPLINE':
+		spline.bezier_points.add(nPointsU)
+	else:
+		spline.points.add(nPointsU)
 
 	n = 0
 	for (key, val, sub) in tokens:
 		if key == 'bz':
-			parseBezier(nurb, n, val, sub)
+			parseBezier(spline.bezier_points[n], val, sub)
 			n += 1
 		elif key == 'pt':
-			parsePoint(nurb, n, val, sub)
+			parsePoint(spline.points[n], val, sub)
 			n += 1
 		else:
-			defaultKey(key, val, sub, "nurb", [], globals(), locals())
+			defaultKey(key, val, sub, "spline", [], globals(), locals())
 	return
 	
-def parseBezier(nurb, n, args, tokens):
-	bez = nurb[n]
+def parseBezier(bez, args, tokens):
 	bez.co = eval(args[0])	
 	bez.handle1 = eval(args[1])	
 	bez.handle1_type = args[2]
@@ -1666,8 +1652,7 @@ def parseBezier(nurb, n, args, tokens):
 	bez.handle2_type = args[4]
 	return
 
-def parsePoint(nurb, n, args, tokens):
-	pt = nurb[n]
+def parsePoint(pt, args, tokens):
 	pt.co = eval(args[0])
 	return
 
@@ -1753,6 +1738,7 @@ def postProcess():
 			bpy.ops.pose.metarig_generate()
 			print("Metarig generated")
 			#bpy.context.scene.objects.unlink(rig)
+
 			rig = bpy.context.scene.objects.active
 			print("Rigged", rig, bpy.context.object)
 			ob = loadedData['Object']['Human']
@@ -1764,6 +1750,7 @@ def postProcess():
 		
 #
 #	parseProcess(args, tokens):
+#	applyTransform(objects, rig, parents):
 #
 
 def parseProcess(args, tokens):
@@ -1773,6 +1760,7 @@ def parseProcess(args, tokens):
 	objects = []
 
 	for (key, val, sub) in tokens:
+		print(key)
 		if key == 'Reparent':
 			bname = val[0]
 			try:
@@ -1792,19 +1780,35 @@ def parseProcess(args, tokens):
 				for i in range(4):
 					for j in range(4):
 						pb.matrix_local[i][j] = prod[i][j]
-				print("Done", pb.matrix_local)
 			except:
 				pass
-		elif key == 'Pose':
+		elif key == 'Snap':
+			print(val)
+			eb = ebones[val[0]]
+			tb = ebones[val[1]]
+			print("snap", eb, tb, val[2])
+			if int(val[2]):
+				eb.head = tb.tail
+				eb.tail = tb.head
+			else:
+				eb.head = tb.head
+				eb.tail = tb.tail
+			print(eb.head, tb.head, eb.tail, tb.tail)
+		elif key == 'PoseMode':
 			bpy.context.scene.objects.active = rig
 			bpy.ops.object.mode_set(mode='POSE')
 			pbones = rig.pose.bones	
-		elif key == 'Edit':
+		elif key == 'ObjectMode':
+			bpy.context.scene.objects.active = rig
+			bpy.ops.object.mode_set(mode='POSE')
+			pbones = rig.pose.bones	
+		elif key == 'EditMode':
 			bpy.context.scene.objects.active = rig
 			bpy.ops.object.mode_set(mode='EDIT')
 			ebones = rig.data.edit_bones	
+		elif key == 'Apply':
+			applyTransform(objects, rig, parents)
 		elif key == 'Object':
-			bpy.ops.object.mode_set(mode='OBJECT')
 			try:
 				ob = loadedData['Object'][val[0]]
 				objects.append((ob,sub))
@@ -1818,24 +1822,6 @@ def parseProcess(args, tokens):
 					if key1 == 'Modifier':
 						parseModifier(ob, val1, sub1)
 
-	for (ob,tokens) in objects:
-		bpy.context.scene.objects.active = ob
-		bpy.ops.object.visual_transform_apply()
-		#print("vis", list(ob.modifiers))
-		bpy.ops.object.modifier_apply(apply_as='DATA', modifier='Armature')
-		#print("app", list(ob.modifiers))
-
-	bpy.context.scene.objects.active = rig
-	bpy.ops.object.mode_set(mode='POSE')
-	bpy.ops.pose.armature_apply()
-	bpy.ops.object.mode_set(mode='EDIT')
-	ebones = rig.data.edit_bones
-	for (bname, pname) in parents.items():
-		eb = ebones[bname]
-		par = ebones[pname]
-		if eb.connected:
-			par.tail = eb.head
-		eb.parent = par
 	bpy.ops.object.mode_set(mode='OBJECT')
 
 	for (ob,tokens) in objects:
@@ -1843,6 +1829,32 @@ def parseProcess(args, tokens):
 		for (key, val, sub) in tokens:
 			if key == 'Modifier':
 				parseModifier(ob, val, sub)
+		return
+
+def applyTransform(objects, rig, parents):
+	for (ob,tokens) in objects:
+		bpy.context.scene.objects.active = ob
+		bpy.ops.object.visual_transform_apply()
+		print("vis", list(ob.modifiers))
+		bpy.ops.object.modifier_apply(apply_as='DATA', modifier='Armature')
+		print("app", list(ob.modifiers))
+
+	bpy.context.scene.objects.active = rig
+	bpy.ops.object.mode_set(mode='POSE')
+	print("apply")
+	bpy.ops.pose.armature_apply()
+	print("applied")
+	bpy.ops.object.mode_set(mode='OBJECT')
+	bpy.ops.object.mode_set(mode='EDIT')
+	ebones = rig.data.edit_bones
+	print("parents", parents.items())
+	for (bname, pname) in parents.items():
+		eb = ebones[bname]
+		par = ebones[pname]
+		if eb.connected:
+			par.tail = eb.head
+		eb.parent = par
+		print(eb, eb.parent)
 
 	return			
 

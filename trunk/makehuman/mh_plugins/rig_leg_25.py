@@ -238,10 +238,10 @@ LegArmature = [
 	('KneePT_R', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
 
 	# IK Gobo
-	('LegTarget_L', 'rigLeg&T_GoboFoot',	0.0, 'FootGobo_L', F_RES, L_HELP, (1,1,1)),
-	('LegTarget_R', 'rigLeg&T_GoboFoot',	0.0, 'FootGobo_R', F_RES, L_HELP, (1,1,1)),
 	('FootGobo_L', 'rigLeg&T_GoboFoot',	0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
 	('FootGobo_R', 'rigLeg&T_GoboFoot',	0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
+	('LegTarget_L', 'rigLeg&T_GoboFoot',	0.0, 'FootGobo_L', F_RES, L_HELP, (1,1,1)),
+	('LegTarget_R', 'rigLeg&T_GoboFoot',	0.0, 'FootGobo_R', F_RES, L_HELP, (1,1,1)),
 	('KneePT_L', 'rigLeg&T_GoboFoot',	0.0, 'FootGobo_L', F_WIR, L_LEGIK, (1,1,1)),
 	('KneePT_R', 'rigLeg&T_GoboFoot',	0.0, 'FootGobo_R', F_WIR, L_LEGIK, (1,1,1)),
 
@@ -519,10 +519,10 @@ def LegWritePoses(fp):
 	# IK both
 
 	addPoseBone(fp, True, 'KneeHandle_L', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['StretchTo', 'KneePT_L', 'X'])])
+		[('StretchTo', 0, ['StretchTo', 'KneePT_L', 'PLANE_X'])])
 
 	addPoseBone(fp, True, 'KneeHandle_R', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['StretchTo', 'KneePT_R', 'X'])])
+		[('StretchTo', 0, ['StretchTo', 'KneePT_R', 'PLANE_X'])])
 
 	return
 

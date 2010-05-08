@@ -268,7 +268,7 @@ def ArmWritePoses(fp):
 		('ChildOf', C_CHILDOF, ['Wrist', 'WristCtrl_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, True, 'ElbowHandle_L', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['StretchTo', 'ElbowPT_L', 'X'])])
+		[('StretchTo', 0, ['StretchTo', 'ElbowPT_L', 'PLANE_X'])])
 
 
 	addPoseBone(fp, True, 'UpArmIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,0,1), 0,
@@ -292,7 +292,7 @@ def ArmWritePoses(fp):
 		('ChildOf', C_CHILDOF, ['Wrist', 'WristCtrl_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, True, 'ElbowHandle_R', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['StretchTo', 'ElbowPT_R', 'X'])])
+		[('StretchTo', 0, ['StretchTo', 'ElbowPT_R', 'PLANE_X'])])
 
 
 	# Finger curl

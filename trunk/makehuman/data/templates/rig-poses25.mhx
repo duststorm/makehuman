@@ -36,15 +36,18 @@ Process HumanRig
   end Object
 end Process
 
+# --------------- Actions ----------------------------- # 
+
+Pose HumanRig 
+end Pose
+
+*** rig-actions
+
 Pose HumanRig 
   *** rig-poses
   active_bone_group_index 0 ;
   ik_solver 'LEGACY' ;
 end Pose
-
-# --------------- Actions ----------------------------- # 
-
-*** rig-actions
 
 AnimationData HumanRig
    *** rig-drivers
@@ -53,6 +56,5 @@ AnimationData HumanRig
   action_influence 1 ;
   nla_enabled True ;
 end AnimationData
-
 
 

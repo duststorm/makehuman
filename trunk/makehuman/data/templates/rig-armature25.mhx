@@ -23,6 +23,7 @@ end Mesh
 
 Object MHCube01 MESH MHCube01
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -50,6 +51,7 @@ end Mesh
 
 Object MHCube025 MESH MHCube025
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -77,6 +79,7 @@ end Mesh
 
 Object MHCube05 MESH MHCube05
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -124,6 +127,7 @@ Object MHFootCtrl_L MESH MHFootCtrl_L
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 Mesh MHWristCtrl_L MHWristCtrl_L 
@@ -187,6 +191,7 @@ Object MHWristCtrl_L MESH MHWristCtrl_L
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -253,6 +258,7 @@ Object MHWristCtrl_R MESH MHWristCtrl_R
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -280,6 +286,7 @@ end Mesh
 
 Object MHFoot MESH MHFoot
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -307,6 +314,7 @@ end Mesh
 
 Object MHRevFoot MESH MHRevFoot
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -334,6 +342,7 @@ end Mesh
 
 Object MHToe MESH MHToe
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -361,6 +370,7 @@ end Mesh
 
 Object MHRevToe MESH MHRevToe
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -389,6 +399,7 @@ end Mesh
 
 Object MHHand MESH MHHand
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -436,6 +447,7 @@ Object MHFootCtrl_R MESH MHFootCtrl_R
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -462,6 +474,7 @@ end Mesh
 
 Object GoboArrows MESH GoboArrows
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -503,6 +516,7 @@ Object MHHead MESH MHHead
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -544,6 +558,7 @@ Object GoboCircle MESH GoboCircle
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -591,6 +606,7 @@ Object GoboFootCtrl_L MESH GoboFootCtrl_L
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 Mesh GoboHandCtrl_L GoboHandCtrl_L 
@@ -630,6 +646,7 @@ Object GoboHandCtrl_L MESH GoboHandCtrl_L
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -672,6 +689,7 @@ Object GoboHandCtrl_R MESH GoboHandCtrl_R
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -721,6 +739,7 @@ Object GoboFootCtrl_R MESH GoboFootCtrl_R
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -749,6 +768,7 @@ end Mesh
 
 Object GoboHand_L MESH GoboHand_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -778,6 +798,7 @@ end Mesh
 
 Object GoboHand_R MESH GoboHand_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -820,6 +841,7 @@ Object GoboHead MESH GoboHead
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -857,6 +879,7 @@ end Mesh
 
 Object GoboHips MESH GoboHips
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1136,6 +1159,7 @@ end Mesh
 
 Object GoboIkfk MESH GoboDoubleArrow
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1178,6 +1202,7 @@ Object GoboJaw MESH GoboJaw
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1220,6 +1245,7 @@ Object GoboNeck MESH GoboNeck
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1262,6 +1288,7 @@ Object GoboRotate_L MESH GoboRotate_L
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1304,6 +1331,7 @@ Object GoboRotate_R MESH GoboRotate_R
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1351,6 +1379,7 @@ Object GoboShldr_L MESH GoboShldr_L
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1398,6 +1427,7 @@ Object GoboShldr_R MESH GoboShldr_R
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1451,6 +1481,7 @@ end Mesh
 
 Object GoboSpine3 MESH GoboSpine3
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1511,6 +1542,7 @@ Object GoboRoot MESH GoboRoot
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -1558,6 +1590,7 @@ Object GoboTipToe_L MESH GoboTipToe_L
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1606,6 +1639,7 @@ Object GoboTipToe_R MESH GoboTipToe_R
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -1647,6 +1681,7 @@ Object MHJaw MESH MHJaw
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1689,6 +1724,7 @@ Object MHNeck MESH MHNeck
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -1749,6 +1785,7 @@ Object MHRoot MESH MHRoot
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object 
 
 # ----------------------------- ARMATURE --------------------- # 

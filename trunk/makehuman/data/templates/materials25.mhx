@@ -184,12 +184,10 @@ Material SSS_skinshader
   Ramp diffuse_ramp
     Element (0.569697,0.0276216,0.0473347,0.449231) 0.0666667 ;
     Element (1,0.990444,0.961778,1) 0.525252 ;
-    interpolation 'LINEAR' ;
   end Ramp
   Ramp specular_ramp
     Element (0.468774,0.306093,0.187666,0.2) 0.2 ;
     Element (1,0.925912,0.843177,0.5) 0.8 ;
-    interpolation 'LINEAR' ;
   end Ramp
   SSS
     back 2 ;

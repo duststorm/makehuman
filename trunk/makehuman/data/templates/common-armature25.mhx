@@ -1,4 +1,8 @@
 
+Object CustomShapes EMPTY None
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+end Object
+
 Mesh MHFace MHFace 
   Verts
     v 0.629052 0.00514853 -0.904545 ;
@@ -294,6 +298,7 @@ end Mesh
 
 Object MHFace MESH MHFace
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -322,6 +327,7 @@ end Mesh
 
 Object MHSolid025 MESH MHSolid025
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -371,6 +377,7 @@ end Mesh
 
 Object MHCircle01 MESH MHCircle01
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -448,6 +455,7 @@ end Mesh
 
 Object MHCircle025 MESH MHCircle025
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -526,6 +534,7 @@ end Mesh
 
 Object MHCircle05 MESH MHCircle05
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -604,6 +613,7 @@ end Mesh
 
 Object MHCircle10 MESH MHCircle10
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -681,6 +691,7 @@ end Mesh
 
 Object MHCircle15 MESH MHCircle15
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -707,5 +718,6 @@ end Mesh
 
 Object MHArrows MESH doubleArrow
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+  parent Refer Object CustomShapes ;
 end Object
 
