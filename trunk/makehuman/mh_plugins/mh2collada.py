@@ -270,10 +270,14 @@ def exportDae(obj, fp):
 	nUvVerts = len(obj.uvValues)
 	nNormals = nVerts
 	nFaces = len(faces)
-	
+
 	texture = os.path.expanduser("~/makehuman/texture.tif")
 	texture_ref = os.path.expanduser("~/makehuman/texture_ref.tif")	
 	date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
+
+#
+#	Images, materials and effects
+#
 
 	fp.write('<?xml version="1.0" encoding="utf-8"?>\n' +
 '<COLLADA version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">\n' +
@@ -356,7 +360,13 @@ def exportDae(obj, fp):
 '    <material id="SSS_skinshader" name="SSS_skinshader">\n' +
 '      <instance_effect url="#SSS_skinshader-effect"/>\n' +
 '    </material>\n' +
-'  </library_materials>\n' +
+'  </library_materials>\n')
+
+#
+#	Controllers
+#
+
+	fp.write('\n' +
 '    <library_controllers>\n' +
 '    <controller id="Human-skin">\n' +
 '      <skin source="#HumanMesh">\n' +
@@ -452,8 +462,57 @@ def exportDae(obj, fp):
 '          </v>\n' +
 '        </vertex_weights>\n' +
 '      </skin>\n' +
-'    </controller>\n' +
-'  </library_controllers>\n' +
+'    </controller>\n')
+
+	"""
+	targets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
+	nTargets = len(targets)
+	fp.write('\n' +
+'   <controller id="HumanMorphs" name="HumanMorphs">\n' +
+'     <morph method="NORMALIZED" source="#HumanMesh">\n' +
+'       <source id="Human-targets">\n' +
+'         <IDREF_array id="Human-targets-array" count="%d">\n' % nTargets)
+
+	for (name, morphs) in targets:
+		fp.write(' %s' % name)
+
+	fp.write('\n' +
+'         </IDREF_array>\n' +
+'         <technique_common>\n' +
+'           <accessor source="Human-targets-array" count="%d" stride="1">\n' % nTargets +
+'             <param name="MORPH_TARGET" type="IDREF"/>\n' +
+'           </accessor>\n' +
+'         </technique_common>\n' +
+'       </source>\n' +
+'       <source id="Human-morph_weights">\n' +
+'         <float_array id="Human-morph_weights-array" count="%d">\n' % nTargets)
+
+	for target in targets:
+		fp.write("0.0 ")
+
+	fp.write('\n' +
+'         </float_array>\n' +
+'         <technique_common>\n' +
+'           <accessor source="#Human-morph_weights-array" count="%d" stride="1">\n' % nTargets +
+'             <param name="MORPH_WEIGHT" type="float"/>\n' +
+'           </accessor>\n' +
+'         </technique_common>\n' +
+'       </source>\n' +
+'       <targets>\n' +
+'         <input semantic="MORPH_TARGET" source="#Human-targets"/>\n' +
+'         <input semantic="MORPH_WEIGHT" source="#Human-morph_weights"/>\n' +
+'       </targets>\n' +
+'     </morph>\n' +
+'   </controller>\n')
+	"""
+	fp.write('\n' +
+'  </library_controllers>\n')
+
+#
+#	Geometries
+#
+
+	fp.write('\n' +
 '  <library_geometries>\n' +
 '    <geometry id="HumanMesh" name="Human">\n' +
 '      <mesh>\n' +
@@ -492,6 +551,7 @@ def exportDae(obj, fp):
 '          </technique_common>\n' +
 '        </source>\n' +
 '        <source id="Human-UV">\n' +
+
 '          <float_array count="%d" id="Human-UV-array">\n' % (2*nUvVerts) +
 '           ')
 
@@ -520,6 +580,7 @@ def exportDae(obj, fp):
 		fp.write('          <p>')
 		for vs in fc:
 			v = vs[0]
+
 			uv = vs[1]
 			if v > nVerts:
 				raise NameError("v %d > %d" % (v, nVerts))
@@ -531,8 +592,46 @@ def exportDae(obj, fp):
 	fp.write('\n' +
 '        </polygons>\n' +
 '      </mesh>\n' +
-'    </geometry>\n' +
-'  </library_geometries>\n' +
+'    </geometry>\n')
+
+	"""
+	for target in targets:
+		(name, morphs) = target
+		fp.write('\n' +
+'   <geometry id="%s" name="%s">\n' % (name, name) +
+'     <mesh>\n' +
+'       <source id="%s-positions" name="%s-position">\n' % (name, name) +
+'         <float_array id="%s-positions-array" count="%d">\n' % (name, 3*nVerts) +
+'          ')
+		for (vn,v) in enumerate(obj.verts):
+			try:
+				offs = morphs[vn]
+				loc = vadd(v.co, offs)
+			except:
+				loc = v.co
+			fp.write("%.4f %.4f %.4f " % (loc[0], -loc[2], loc[1]))
+
+		fp.write('\n'+
+'         </float_array>\n' +
+'         <technique_common>\n' +
+'           <accessor source="#%s-positions-array" count="%d" stride="3">\n' % (name, nVerts) +
+'             <param name="X" type="float"/>\n' +
+'             <param name="Y" type="float"/>\n' +
+'             <param name="Z" type="float"/>\n' +
+'           </accessor>\n' +
+'         </technique_common>\n' +
+'       </source>\n' +
+'     </mesh>\n' +
+'   </geometry>\n')
+	"""
+	fp.write('\n' +
+'  </library_geometries>\n')
+
+#
+#	Visual scenes
+#
+
+	fp.write('\n' +
 '  <library_visual_scenes>\n' +
 '    <visual_scene id="Scene" name="Scene">\n')
 
@@ -563,4 +662,36 @@ def exportDae(obj, fp):
 '  </scene>\n' +
 '</COLLADA>\n')
 
+#
+#	loadShapeKeys(tmplName):	
+#	ShapeKey BrowsDown LR toggle&T_Face
+#  	sv 2139 0 0 -0.0109844
+#
+
+def loadShapeKeys(tmplName):
+	tmpl = open(tmplName, "rU")
+	if tmpl == None:
+		print("Cannot open template "+tmplName)
+		return []
+
+	targets = []
+	for line in tmpl:
+		lineSplit= line.split()
+
+		if len(lineSplit) == 0:
+			pass
+		elif lineSplit[0] == 'ShapeKey':
+			morph = {}
+			targets.append((lineSplit[1], morph))
+		elif lineSplit[0] == 'wv':
+			v = int(lineSplit[1])
+			x = float(lineSplit[2])
+			y = float(lineSplit[3])
+			z = float(lineSplit[4])
+			morph[v] = [x,y,z]
+
+	tmpl.close()
+	return targets
+
+	
 

@@ -127,17 +127,17 @@ ArmArmature = [
 	# IK common
 	('UpArmIK_L', True,		upArmRoll, 'ArmRoot_L', F_CON, L_HLPIK, (1,1,1) ),
 	('LoArmIK_L', True,		loArmRoll, 'UpArmIK_L', F_CON, L_HLPIK, (1,1,1) ),
-	('WristCtrl_L', True,		loArmRoll, 'Root', F_WIR, L_ARMIK, (1,1,1)),
+	('WristCtrl_L', True,		loArmRoll, None, F_WIR, L_ARMIK, (1,1,1)),
 	('HandIK_L', True,		handRoll, 'LoArmIK_L', F_WIR, L_ARMIK, (1,1,1)),
 	('ElbowHandle_L', True,		0.0, 'LoArmIK_L', F_RES, L_ARMIK, (1,1,1)),
-	('ElbowPT_L', True,		loArmRoll, 'ArmRoot_L', F_WIR,  L_ARMIK, (1,1,1)),
+	('ElbowPT_L', True,		loArmRoll, None, F_WIR,  L_ARMIK, (1,1,1)),
 
 	('UpArmIK_R', True,		-upArmRoll, 'ArmRoot_R', F_CON, L_HLPIK, (1,1,1) ),
 	('LoArmIK_R', True,		-loArmRoll, 'UpArmIK_R', F_CON, L_HLPIK, (1,1,1) ),
-	('WristCtrl_R', True,		-loArmRoll, 'Root', F_WIR, L_ARMIK, (1,1,1)),
+	('WristCtrl_R', True,		-loArmRoll, None, F_WIR, L_ARMIK, (1,1,1)),
 	('HandIK_R', True,		-handRoll, 'LoArmIK_R', F_WIR, L_ARMIK, (1,1,1)),
 	('ElbowHandle_R', True,		0.0, 'LoArmIK_R', F_RES, L_ARMIK, (1,1,1)),
-	('ElbowPT_R', True,		-loArmRoll, 'ArmRoot_R', F_WIR, L_ARMIK, (1,1,1)),
+	('ElbowPT_R', True,		-loArmRoll, None, F_WIR, L_ARMIK, (1,1,1)),
 
 ]
 

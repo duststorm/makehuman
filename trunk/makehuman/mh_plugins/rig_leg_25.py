@@ -225,17 +225,17 @@ LegArmature = [
 	('ToeIK_R', 'True',		-toeRoll, 'FootIK_R', F_CON, L_HLPIK, (1,1,1)),
 
 	# IK Inverse foot
-	('FootCtrl_L', 'rigLeg&T_InvFoot',	footCtrlRoll, 'Root', F_WIR, L_LEGIK, (1,1,1) ),
+	('FootCtrl_L', 'rigLeg&T_InvFoot',	footCtrlRoll, None, F_WIR, L_LEGIK, (1,1,1) ),
 	('ToeRevIK_L', 'rigLeg&T_InvFoot',	0, 'FootCtrl_L', F_CON+F_WIR, L_LEGIK, (1,1,1)),
 	('FootRevIK_L', 'rigLeg&T_InvFoot',	deg180, 'ToeRevIK_L', F_CON+F_WIR, L_LEGIK, (1,1,1)),
 	('Ankle_L', 'rigLeg&T_InvFoot',		deg180, 'FootRevIK_L', F_CON, L_HELP, (1,1,1) ),
-	('KneePT_L', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_L', F_WIR, L_LEGIK, (1,1,1)),
+	('KneePT_L', 'rigLeg&T_InvFoot',	0.0, None, F_WIR, L_LEGIK, (1,1,1)),
 
-	('FootCtrl_R', 'rigLeg&T_InvFoot',	-footCtrlRoll, 'Root', F_WIR, L_LEGIK, (1,1,1) ),
+	('FootCtrl_R', 'rigLeg&T_InvFoot',	-footCtrlRoll, None, F_WIR, L_LEGIK, (1,1,1) ),
 	('ToeRevIK_R', 'rigLeg&T_InvFoot',	0, 'FootCtrl_R', F_CON+F_WIR, L_LEGIK, (1,1,1)),
 	('FootRevIK_R', 'rigLeg&T_InvFoot',	deg180, 'ToeRevIK_R', F_CON+F_WIR, L_LEGIK, (1,1,1)),
 	('Ankle_R', 'rigLeg&T_InvFoot',		deg180, 'FootRevIK_R', F_CON, L_HELP, (1,1,1) ),
-	('KneePT_R', 'rigLeg&T_InvFoot',	0.0, 'FootCtrl_R', F_WIR, L_LEGIK, (1,1,1)),
+	('KneePT_R', 'rigLeg&T_InvFoot',	0.0, None, F_WIR, L_LEGIK, (1,1,1)),
 
 	# IK Gobo
 	('FootGobo_L', 'rigLeg&T_GoboFoot',	0.0, 'Root', F_WIR, L_LEGIK, (1,1,1)),
@@ -417,12 +417,12 @@ def LegWritePoses(fp):
 		[('IK', 0, ['IK', 'ToeRevIK_R', 1, None, (True, False), 1.0])]),
 
 	addPoseBone(fp, 'rigLeg&T_InvFoot', 'KneePT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['Root', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Foot', 'FootCtrl_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		[('ChildOf', C_CHILDOF, ['Foot', 'FootCtrl_L', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, 'rigLeg&T_InvFoot', 'KneePT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['Root', 'FootCtrl_R', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Foot', 'FootCtrl_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		[('ChildOf', C_CHILDOF, ['Foot', 'FootCtrl_R', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 
 
@@ -439,20 +439,22 @@ def LegWritePoses(fp):
 		])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootGobo_L', 'GoboFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['ChildOf', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Local', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'LegRoot_L'])])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootGobo_R', 'GoboFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['ChildOf', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Local', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'LegRoot_R'])])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'KneePT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['Root', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		[('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_L', 1.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'KneePT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['Root', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		[('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_R', 1.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 
 

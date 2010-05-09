@@ -767,7 +767,7 @@ def addLimitDistConstraint(fp, switch, flags, data):
 
 def addChildOfConstraint(fp, switch, flags, data):
 	global Mhx25
-	return
+	# return
 	name = data[0]
 	subtar = data[1]
 	inf = data[2]

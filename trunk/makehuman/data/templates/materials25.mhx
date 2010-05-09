@@ -2,7 +2,7 @@
 if Blender24
   error 'This file can only be read with Blender 2.5' ;
 end if
-MHX 0 9 ;
+MHX 0 10 ;
 
 # --------------- Images ----------------------------- # 
  

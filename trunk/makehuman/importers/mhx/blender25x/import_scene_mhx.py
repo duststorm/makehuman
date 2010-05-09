@@ -48,7 +48,7 @@ import geometry
 import string
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 9
+MINOR_VERSION = 10
 MHX249 = False
 Blender24 = False
 Blender25 = True
@@ -412,6 +412,7 @@ def parse(tokens):
 			data = parseMaterial(val, sub)
 		elif key == "Texture":
 			data = parseTexture(val, sub)
+
 
 		elif key == "Image":
 			data = parseImage(val, sub)
@@ -1497,24 +1498,24 @@ def parsePoseBone(pbones, ob, args, tokens):
 		return
 	name = args[0]
 	pb = pbones[name]
+	amt = ob.data
 
 	# Make posebone active - don't know how to do this in pose mode
 	bpy.ops.object.mode_set(mode='OBJECT')
-	ob.data.bones.active = pb.bone
+	amt.bones.active = amt.bones[name]
 	bpy.ops.object.mode_set(mode='POSE')
 
 	for (key, val, sub) in tokens:
 		if key == 'Constraint':
 			cns = parseConstraint(pb.constraints, val, sub)
 		elif key == 'bpyops':
+			bpy.ops.object.mode_set(mode='OBJECT')
+			amt.bones.active = amt.bones[name]
+			ob.constraints.active = cns			
 			expr = "bpy.ops.%s" % val[0]
 			print(expr)
-			print("ob", bpy.context.active_object)
-			print("b", bpy.context.active_bone)
-			print("pb", bpy.context.active_pose_bone)
-			print("md", bpy.context.mode)
 			exec(expr)
-			print("alive")
+			bpy.ops.object.mode_set(mode='POSE')
 		elif key == 'ik_dof':
 			parseArray(pb, ["ik_dof_x", "ik_dof_y", "ik_dof_z"], val)
 		elif key == 'ik_limit':
