@@ -1,119 +1,96 @@
 
-//(c) MakeHuman team 2007 - www.makehuman.org
+//(c) MakeHuman team 2007-2010 - www.makehuman.org
+//Photorealistic skin shader for renderman engine (tested on Aqsis)
+
+color
+wrappeddiffuse( normal N; float wrappedangle )
+{
+	color C = 0;
+	normal Nn;
+    vector Ln;
+    extern point P;
+    float wrapper;
+	Nn = normalize(N);
+	illuminance( P, Nn, PI ) {
+		Ln = normalize(L);
+        wrapper = 1 - acos(Ln.Nn) / wrappedangle;
+        if ( wrapper >= 0){
+		    C += Cl * wrapper;
+            }
+        }
+	return C;
+}
 
 
-//color
-//wrappeddiffuse( normal N; float wrappedangle )
-//{
-	//color C = 0;
-	//normal Nn;
-    //vector Ln;
-    //extern point P;
-	//Nn = normalize(N);
-	//illuminance( P, Nn, PI/2 ) {
-		//Ln = normalize(L);
-		//C += Cl * (1 - acos(Ln.Nn) / wrappedangle); 	}
-	//return C;
-//}
-
-//color
-//test( normal N )
-//{
-	//color C = 0;
-    //extern point P;
-    //normal Nn = normalize(N);
-	//illuminance( P, Nn, PI) {		
-		//C += Cl; 	}
-	//return C;
-//}
-
-
-//color screen(color F; color B)
-    //{
-       //color W = (1,1,1);
-	   //color R = W - (W - F)*(W - B);
-	   //return R;
-    //}
-
-color powC(color ColToPow; float Factor)
+color screen(color F; color B)
     {
-    float R1 = comp(ColToPow, 0);
-	float G1 = comp(ColToPow, 1);
-	float B1 = comp(ColToPow, 2);	
-	
-	float R2 = pow(R1,Factor);
-	float G2 = pow(G1,Factor);
-	float B2 = pow(B1,Factor);
-    
-    return color(R2, G2, B2);    
+       color W = (1,1,1);
+	   color R = W - (W - F)*(W - B);
+	   return R;
     }
 
-surface skin (
-            string ssstexture = "";
-			string texturename = "";			
-            string speculartexture = "";
-            string mixtexture = "";
+surface skin(
+			string skintexture = "";
+            string refltexture = "";
 			float Ks = .5;
-			float roughness = .1;
-			color specularcolor = 1;
-			float desaturation = 1;            
-            ) 
-{	
+            float Ka = .5;
+            float Kd = .8;
+			float roughness = .1;		
+
+            )
+{
     normal Nf;
     vector V;
-    color Csss;
 	color Cflat;
-    color Cdiff;
-    float spec;
-    float mixVal;
-	
-    if (texturename != ""){
-        Cflat = color texture (texturename);
-        Oi = float texture (texturename[3], "fill", 1);
+    color Crefl;
+
+    color Cscatt1 = color(1.0,.81,.23);
+    color Cscatt2 = color(.6,.4,.4);
+    color Cscatt3 = color(.83,.69,.63);
+
+	if (skintexture != ""){
+        Cflat = color texture (skintexture);
+        Oi = float texture (skintexture[3], "fill", 1);
+        //refl = comp(Cflat,0)+((1-comp(Cflat,1))+(1-comp(Cflat,2)))/2;
         }
     else Cflat = 1;
     
-    if (mixtexture != "")
-        mixVal = float texture (mixtexture);       
-	else mixVal = 1;
-    
-    if (speculartexture != "")
-        spec = float texture (speculartexture);       
-	else spec = 1;
-    
-	if (ssstexture != "")	
-        Csss = color texture (ssstexture);		
-    else Csss = 1;
-	
-	
+    if (refltexture != ""){
+        Crefl = color texture (refltexture);          
+        }
+    else Crefl = 1;
+
 	Nf = faceforward (normalize(N),I);
     V = -normalize(I);
+    
 	float angle_ramp = max(0,(1-( V.Nf)));
 	float  noise3D = float noise(P*100);
-	float skin_matte = comp(diffuse(Nf), 0);	
+    float skin_matte = comp(diffuse(Nf), 0);
     color glancing_highlight = angle_ramp*skin_matte;
-    
-    Cdiff = (Cflat+ambient())*skin_matte;//-(1-ambient())/2;
 
-    Ci = mix(Cdiff,Csss,mixVal);        
-   
-    float desaturate_factor = 0.5* min((desaturation*skin_matte+ comp(noise3D*specular(Nf,V,roughness)*spec,0)),1) ;
-    color desaturate_tone = color(comp(Ci, 0)*0.6,comp(Ci, 0),comp(Ci, 0));
-    color x2 = color((1-comp(Ci, 0))*0.5+1,1,1);
-    color x = color(pow((1-angle_ramp),0.5)/10,0,0);
-    Ci = mix(Ci,desaturate_tone,desaturate_factor)-x;
-    
+    color layer1 = max(0,min(wrappeddiffuse(Nf, 1.6)*Cscatt1,0.2));
+    color layer2 = max(0,min(wrappeddiffuse(Nf, 1.65)*Cscatt2,0.2));
+    color layer3 = Ks*Crefl*noise3D*specular(Nf,V,roughness);
+    color layer4 = angle_ramp * max(0,min(wrappeddiffuse(Nf, 1.65),0.3));
+    color layer5 = color(1,1,1) + pow((1.0 - skin_matte),6)*color(1,0,0);
 
-    Ci = Ci+ specularcolor * Ks*noise3D*specular(Nf,V,roughness)*spec; 
-    Ci = Oi*(Ci*Cflat*x2)*Cflat;
+    Ci = screen(layer1,layer2);
+    Ci = screen(Ci,layer3);
+    Ci = screen(Ci,layer4) * 2 * layer5;
 
-   Ci = Ci+Ci/2.5; 
-   
+    float desaturate_factor = max(0,pow(skin_matte,3)*50*noise3D);
+    color desaturate_tone = color(comp(Ci, 0),comp(Ci, 0),comp(Ci, 0));
 
+    Ci = mix(Ci,desaturate_tone,desaturate_factor)+glancing_highlight;
+
+    Ci = Cflat*Oi*(ambient()+(Kd*Ci)+(Cs*color(1,0.5,0.1)));
+    //Ci = Oi*(ambient()+Cflat*Ci);
     
+    float R = comp(Ci,0);
+    float G = comp(Ci,1);
+    float B = comp(Ci,2);
     
-	
-	
-    	
-	
+    color desat = (R+G+B)/3;
+    Ci = mix(Ci,desat,desat);
+
 }
