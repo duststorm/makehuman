@@ -1,0 +1,51 @@
+# Written by makehuman 1.0.0 alpha 5
+version 1.0.0
+tags africa-nilotid-male-child
+gender 1.000000
+age 0.000000
+muscle 0.500000
+weight 0.414894
+genitals 0.000000
+breastSize 0.372340
+breastFirmness 0.500000
+stomach 0.000000
+nose 0.202128
+mouth 0.202128
+eyes 0.000000
+ears 0.000000
+head 0.840426
+headAge 0.000000
+faceAngle -0.276595
+jaw 0.000000
+pelvisTone 0.340426
+buttocks -0.255319
+height 0.085106
+ethnic neutral 1.000000
+microdetail l-ear-helix-trans-backward 0.350000
+microdetail l-torso-upper-shoulder-trans-out -0.350000
+detail r-lowerleg-scale-vert-incr 0.400000
+microdetail l-torso-front-shoulder-trans-out -0.250000
+detail r-lowerarm-scale-vert-incr 0.050000
+detail l-lowerarm-scale-vert-incr 0.050000
+microdetail r-head-zygoma-trans-out 0.450000
+microdetail l-ear-helix-trans-up 0.050000
+microdetail r-ear-helix-trans-up 0.050000
+detail eye-trans-down 0.450000
+detail jaw-trans-forward 0.300000
+detail mouth-trans-forward 0.300000
+detail head-trans-up 0.200000
+microdetail head-brow-trans-forward 0.100000
+microdetail l-torso-front-shoulder-trans-up 0.100000
+microdetail l-hip-trans-in -0.400000
+detail head-scale-vert-decr 0.050000
+detail l-lowerleg-scale-vert-incr 0.400000
+detail l-lowerarm-scale-horiz-incr 0.550000
+detail head-scale-horiz-decr 0.300000
+microdetail r-torso-upper-shoulder-trans-out 0.350000
+microdetail r-hip-trans-in 0.400000
+detail r-lowerarm-scale-horiz-incr 0.550000
+microdetail l-head-zygoma-trans-out -0.450000
+microdetail r-torso-front-shoulder-trans-out 0.250000
+microdetail r-torso-front-shoulder-trans-up 0.100000
+microdetail r-ear-helix-trans-backward 0.350000
+microdetail head-brow-scale-horiz-incr 0.150000
