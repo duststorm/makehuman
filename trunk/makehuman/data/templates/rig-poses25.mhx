@@ -1,4 +1,8 @@
 Process HumanRig
+
+  ApplyArmature Human ;
+  ApplyArmature HumanProxy ;
+
   *** rig-process
 
   Object Human 
@@ -34,7 +38,13 @@ Process HumanRig
       use_vertex_groups True ;
     end Modifier
   end Object
+
 end Process
+
+# --------------- Shapekeys ----------------------------- # 
+
+*** proxy-shapeKey
+*** mesh-shapeKey
 
 # --------------- Actions ----------------------------- # 
 

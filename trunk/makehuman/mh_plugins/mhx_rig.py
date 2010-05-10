@@ -123,6 +123,11 @@ def newSetupJoints (obj, joints, headTails):
 			pass
 		elif typ == 'b':
 			locations[key] = locations[data]
+		elif typ == 'p':
+			x = locations[data[0]]
+			y = locations[data[1]]
+			z = locations[data[2]]
+			locations[key] = [x[0],y[1],z[2]]
 		elif typ == 'v':
 			pass
 		elif typ == 'x':
@@ -1041,6 +1046,7 @@ def writeAllProcesses(fp):
 	processes = rig_arm_25.ArmProcess + rig_leg_25.LegProcess
 	for (bone, axis, angle) in processes:
 		fp.write("  Bend %s %s %.6g ;\n" % (bone, axis, angle))
+	fp.write("  EditMode ;\n")
 	fp.write("  ObjectMode ;\n")
 
 	fp.write("  Apply ;\n")
@@ -1049,6 +1055,14 @@ def writeAllProcesses(fp):
 	snaps = rig_arm_25.ArmSnaps + rig_leg_25.LegSnaps
 	for (bone, target, rev) in snaps:
 		fp.write("  Snap %s %s %s ;\n" % (bone, target, rev))
+
+	fp.write("  ObjectMode ;\n")
+	fp.write("  EditMode ;\n")
+	selects = rig_arm_25.ArmSelects + rig_leg_25.LegSelects
+	for bone in selects:
+		fp.write("  Select %s ;\n" % bone)
+	fp.write("  RollUp ;\n")
+	
 	fp.write("  ObjectMode ;\n")
 
 	return

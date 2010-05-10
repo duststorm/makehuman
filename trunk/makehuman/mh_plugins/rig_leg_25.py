@@ -11,16 +11,20 @@ LegJoints = [
 	('r-knee',			'j', 'r-knee'),
 	('r-ankle',			'j', 'r-ankle'),
 	('r-ball',			'v', 5742),
-	('r-heel',			'v', 5721),
-	('r-toes-tip',			'v', 12262),
+	('r-heel0',			'v', 5721),
+	('r-toes-tip0',			'v', 12262),
+	('r-heel',			'p', ['r-toes-tip0', 'r-ball', 'r-heel0']),
+	('r-toes-tip',			'p', ['r-toes-tip0', 'r-ball', 'r-toes-tip0']),
 	('r-ankle-tip',			'o', ('r-ankle', [0.0, 0.0, -1.0])),
 
 	('l-upper-leg',			'j', 'l-upper-leg'),
 	('l-knee',			'j', 'l-knee'),
 	('l-ankle',			'j', 'l-ankle'),
 	('l-ball',			'v', 13320),
-	('l-heel',			'v', 13338),
-	('l-toes-tip',			'v', 13254),
+	('l-heel0',			'v', 13338),
+	('l-toes-tip0',			'v', 13254),
+	('l-heel',			'p', ['l-toes-tip0', 'l-ball', 'l-heel0']),
+	('l-toes-tip',			'p', ['l-toes-tip0', 'l-ball', 'l-toes-tip0']),
 	('l-ankle-tip',			'o', ('l-ankle', [0.0, 0.0, -1.0])),
 
 	# Control classic
@@ -173,13 +177,11 @@ LegHeadsTails = [
 
 ]
 
-# hipRoll = 1.62316
-# upLegRoll = -3.08923
 upLegRoll = deg180
 loLegRoll = deg180
 footRoll = deg180
-toeRoll = -2.813
-footCtrlRoll = -2.597
+toeRoll = deg180
+footCtrlRoll = 0.0
 
 LegArmature = [
 	# Root
@@ -374,21 +376,21 @@ def LegWritePoses(fp):
 
 	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootCtrl_L', 'MHFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Local', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'LegRoot_L'])])
 
 	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootCtrl_R', 'MHFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Local', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'LegRoot_R'])])
 
 	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Ankle_L', 2, (70*deg1, 'KneePT_L'), (True, False), 1.0]),
+		[('IK', 0, ['IK', 'Ankle_L', 2, (90*deg1, 'KneePT_L'), (True, False), 1.0]),
 		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)])
 		])
 
 	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Ankle_R', 2, (110*deg1, 'KneePT_R'), (True, False), 1.0]),
+		[('IK', 0, ['IK', 'Ankle_R', 2, (90*deg1, 'KneePT_R'), (True, False), 1.0]),
 		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)])
 		])
 
@@ -440,12 +442,12 @@ def LegWritePoses(fp):
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootGobo_L', 'GoboFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Local', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'LegRoot_L'])])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootGobo_R', 'GoboFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Local', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'LegRoot_R'])])
 
 	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'KneePT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
@@ -600,6 +602,7 @@ LegSnaps = [
 	("FootFK_L", "Foot_L", 0),
 	("FootIK_L", "Foot_L", 0),
 	("FootRevIK_L", "Foot_L", 1),
+	("ToeFK_L", "Toe_L", 0),
 	("ToeIK_L", "Toe_L", 0),
 	("ToeRevIK_L", "Toe_L", 1),
 
@@ -611,6 +614,7 @@ LegSnaps = [
 	("FootFK_R", "Foot_R", 0),
 	("FootIK_R", "Foot_R", 0),
 	("FootRevIK_R", "Foot_R", 1),
+	("ToeFK_R", "Toe_R", 0),
 	("ToeIK_R", "Toe_R", 0),
 	("ToeRevIK_R", "Toe_R", 1),
 ]
@@ -619,14 +623,18 @@ LegSnaps = [
 LegParents = [
 	('KneePT_L', 'UpLeg_L'),
 	('Ankle_L', 'LoLeg_L'),
-	('FootCtrl_L', 'ToeRevIK_L'),
+	('FootCtrl_L', 'Foot_L'),
 
 	('KneePT_R', 'UpLeg_R'),
 	('Ankle_R', 'LoLeg_R'),
-	('FootCtrl_R', 'ToeRevIK_R'),
+	('FootCtrl_R', 'Foot_R'),
 
-	("FootGobo_L", "LoLegIK_L"),
-	("FootGobo_R", "LoLegIK_R"),
+	("FootGobo_L", "LoLeg_L"),
+	("FootGobo_R", "LoLeg_R"),
 ]
-	
+
+LegSelects = [
+	'Foot_L', 'Toe_L', 'FootFK_L', 'ToeFK_L', 'FootIK_L', 'ToeIK_L', 'FootRevIK_L', 'ToeRevIK_L', 'FootCtrl_L', 'FootGobo_L',
+	'Foot_R', 'Toe_R', 'FootFK_R', 'ToeFK_R', 'FootIK_R', 'ToeIK_R', 'FootRevIK_R', 'ToeRevIK_R', 'FootCtrl_R', 'FootGobo_R',
+]	
 

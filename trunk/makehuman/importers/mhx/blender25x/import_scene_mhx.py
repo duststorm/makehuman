@@ -913,7 +913,9 @@ def parseObject(args, tokens):
 	except:
 		data = None
 
-	if data == None and typ != 'EMPTY':
+	if typ == 'EMPTY':
+		print("EMPTY")
+	elif data == None:
 		print("Failed to find data: %s %s %s" % (name, typ, datName))
 		return
 
@@ -922,8 +924,12 @@ def parseObject(args, tokens):
 		bpy.context.scene.objects.active = ob
 		#print("Found data")
 	except:
+		ob = None
+
+	if ob == None:
 		ob = createObject(typ, name, data, datName)
 		linkObject(ob, data)
+		bpy.context.scene.objects.active = ob
 
 	for (key, val, sub) in tokens:
 		if key == 'Modifier':
@@ -958,6 +964,7 @@ def linkObject(ob, data):
 	#print("Data", data, ob.data)
 	if data and ob.data == None:
 		ob.data = data
+		print("Data linked", ob, ob.data)
 	scn = bpy.context.scene
 	scn.objects.link(ob)
 	scn.objects.active = ob
@@ -1166,6 +1173,10 @@ def parseFaces2(tokens, me):
 			f.material_index = int(val[0])
 			f.smooth = int(val[1])
 			n += 1
+		elif key == 'mn':
+			f = me.faces[int(val[0])]
+			f.material_index = int(val[1])
+			#print("mn", f, f.material_index)
 		elif key == 'ftall':
 			mat = int(val[0])
 			smooth = int(val[1])
@@ -1755,13 +1766,12 @@ def postProcess():
 #
 
 def parseProcess(args, tokens):
-	return
+	#return
 	rig = loadedData['Object'][args[0]]
 	parents = {}
 	objects = []
 
 	for (key, val, sub) in tokens:
-		print(key)
 		if key == 'Reparent':
 			bname = val[0]
 			try:
@@ -1771,7 +1781,6 @@ def parseProcess(args, tokens):
 			except:
 				pass
 		elif key == 'Bend':
-			print(val)
 			axis = val[1]
 			angle = float(val[2])
 			mat = mathutils.RotationMatrix(angle, 4, axis)
@@ -1782,19 +1791,17 @@ def parseProcess(args, tokens):
 					for j in range(4):
 						pb.matrix_local[i][j] = prod[i][j]
 			except:
+				print("No bone "+val[0])
 				pass
 		elif key == 'Snap':
-			print(val)
 			eb = ebones[val[0]]
 			tb = ebones[val[1]]
-			print("snap", eb, tb, val[2])
 			if int(val[2]):
 				eb.head = tb.tail
 				eb.tail = tb.head
 			else:
 				eb.head = tb.head
 				eb.tail = tb.tail
-			print(eb.head, tb.head, eb.tail, tb.tail)
 		elif key == 'PoseMode':
 			bpy.context.scene.objects.active = rig
 			bpy.ops.object.mode_set(mode='POSE')
@@ -1807,56 +1814,65 @@ def parseProcess(args, tokens):
 			bpy.context.scene.objects.active = rig
 			bpy.ops.object.mode_set(mode='EDIT')
 			ebones = rig.data.edit_bones	
+			bpy.ops.armature.select_all(action='DESELECT')
+		elif key == 'Select':
+			try:
+				eb = ebones[val[0]]
+				eb.selected = True
+				eb.layer[0] = True
+			except:
+				pass
+		elif key == 'RollUp':
+			bpy.ops.armature.calculate_roll(type='GLOBALUP')
+			for eb in ebones:
+				if eb.selected:
+					eb.layer[0] = False
+					if eb.roll < 1.5 and eb.roll > -1.5:
+						eb.roll = 0.0
+					else:
+						eb.roll = 3.1415
 		elif key == 'Apply':
 			applyTransform(objects, rig, parents)
-		elif key == 'Object':
+		elif key == 'ApplyArmature':
 			try:
 				ob = loadedData['Object'][val[0]]
 				objects.append((ob,sub))
 			except:
 				ob = None
+		elif key == 'Object':
+			try:
+				ob = loadedData['Object'][val[0]]
+			except:
+				ob = None
 			if ob:
 				bpy.context.scene.objects.active = ob
-				mod = ob.modifiers[0]
-				ob.modifiers.remove(mod)
+				#mod = ob.modifiers[0]
+				#ob.modifiers.remove(mod)
 				for (key1, val1, sub1) in sub:
 					if key1 == 'Modifier':
 						parseModifier(ob, val1, sub1)
-
-	bpy.ops.object.mode_set(mode='OBJECT')
-
-	for (ob,tokens) in objects:
-		bpy.context.scene.objects.active = ob
-		for (key, val, sub) in tokens:
-			if key == 'Modifier':
-				parseModifier(ob, val, sub)
-		return
+	return
 
 def applyTransform(objects, rig, parents):
 	for (ob,tokens) in objects:
 		bpy.context.scene.objects.active = ob
 		bpy.ops.object.visual_transform_apply()
-		print("vis", list(ob.modifiers))
 		bpy.ops.object.modifier_apply(apply_as='DATA', modifier='Armature')
-		print("app", list(ob.modifiers))
 
 	bpy.context.scene.objects.active = rig
 	bpy.ops.object.mode_set(mode='POSE')
-	print("apply")
 	bpy.ops.pose.armature_apply()
-	print("applied")
 	bpy.ops.object.mode_set(mode='OBJECT')
 	bpy.ops.object.mode_set(mode='EDIT')
 	ebones = rig.data.edit_bones
-	print("parents", parents.items())
 	for (bname, pname) in parents.items():
 		eb = ebones[bname]
 		par = ebones[pname]
 		if eb.connected:
 			par.tail = eb.head
 		eb.parent = par
-		print(eb, eb.parent)
 
+	bpy.ops.object.mode_set(mode='OBJECT')
 	return			
 
 #

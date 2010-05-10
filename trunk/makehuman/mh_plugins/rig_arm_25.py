@@ -257,14 +257,14 @@ def ArmWritePoses(fp):
 
 	addPoseBone(fp, True, 'WristCtrl_L', 'MHCube025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Local', 'ArmRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Shoulder', 'ArmRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'Clavicle_L'])])
 
 	addPoseBone(fp, True, 'HandIK_L', 'MHHand', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_L, (True, True, True)])])
 
 	addPoseBone(fp, True, 'ElbowPT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['Arm', 'ArmRoot_L', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['Shoulder', 'ArmRoot_L', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Wrist', 'WristCtrl_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, True, 'ElbowHandle_L', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
@@ -281,14 +281,14 @@ def ArmWritePoses(fp):
 
 	addPoseBone(fp, True, 'WristCtrl_R', 'MHCube025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Local', 'ArmRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Shoulder', 'ArmRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Const', 'Clavicle_R'])])
 
 	addPoseBone(fp, True, 'HandIK_R', 'MHHand', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_R, (True, True, True)])])
 
 	addPoseBone(fp, True, 'ElbowPT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['Arm', 'ArmRoot_R', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['Shoulder', 'ArmRoot_R', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Wrist', 'WristCtrl_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, True, 'ElbowHandle_R', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
@@ -345,15 +345,20 @@ ArmSnaps = [
 	("LoArmTwist_L", "LoArm_L", 0),
 	("LoArmFK_L", "LoArm_L", 0),
 	("LoArmIK_L", "LoArm_L", 0),
+	("HandFK_L", "Hand_L", 0),
 	("HandIK_L", "Hand_L", 0),
 
 	("LoArmTwist_R", "LoArm_R", 0),
 	("LoArmFK_R", "LoArm_R", 0),
 	("LoArmIK_R", "LoArm_R", 0),
+	("HandFK_R", "Hand_R", 0),
 	("HandIK_R", "Hand_R", 0),
 ]
 
 ArmParents = [
-	("WristCtrl_L", "LoArmIK_L"),
-	("WristCtrl_R", "LoArmIK_R"),
+	("WristCtrl_L", "LoArm_L"),
+	("WristCtrl_R", "LoArm_R"),
 ]
+
+ArmSelects = []
+

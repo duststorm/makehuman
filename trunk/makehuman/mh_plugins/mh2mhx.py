@@ -197,6 +197,10 @@ def copyFile25(obj, tmplName, rig, fp):
 					for v in f:
 						fp.write(" %d" % v[0])
 					fp.write(" ;\n")
+			elif lineSplit[1] == 'FTTriangles':
+				for (fn,f) in enumerate(faces):
+					if len(f) < 4:
+						fp.write("    mn %d 1 ;\n" % fn)
 			elif lineSplit[1] == 'ProxyTexVerts':
 				for f in proxyFaces:
 					fp.write("    vt")
