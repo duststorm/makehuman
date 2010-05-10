@@ -585,16 +585,17 @@ LegDrivers = [
 
 LegProcess = [
 	("UpLeg_L", "X", 0.2),
+	("UpLegTwist_L", "X", 0.2),
 	("LoLeg_L", "X", -0.4),
 	("Foot_L", "X", 0.2),
 
 	("UpLeg_R", "X", 0.2),
+	("UpLegTwist_R", "X", 0.2),
 	("LoLeg_R", "X", -0.4),
 	("Foot_R", "X", 0.2),
 ]	
 
 LegSnaps = [
-	("UpLegTwist_L", "UpLeg_L", 0),
 	("UpLegFK_L", "UpLeg_L", 0),
 	("UpLegIK_L", "UpLeg_L", 0),
 	("LoLegFK_L", "LoLeg_L", 0),
@@ -606,7 +607,6 @@ LegSnaps = [
 	("ToeIK_L", "Toe_L", 0),
 	("ToeRevIK_L", "Toe_L", 1),
 
-	("UpLegTwist_R", "UpLeg_R", 0),
 	("UpLegFK_R", "UpLeg_R", 0),
 	("UpLegIK_R", "UpLeg_R", 0),
 	("LoLegFK_R", "LoLeg_R", 0),

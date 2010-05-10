@@ -339,16 +339,16 @@ ArmDrivers = [
 ArmProcess = [
 	("LoArm_L", "Z", -deg20),
 	("LoArm_R", "Z", deg20),
+	("LoArmTwist_L", "Z", -deg20),
+	("LoArmTwist_R", "Z", deg20),
 ]	
 
 ArmSnaps = [
-	("LoArmTwist_L", "LoArm_L", 0),
 	("LoArmFK_L", "LoArm_L", 0),
 	("LoArmIK_L", "LoArm_L", 0),
 	("HandFK_L", "Hand_L", 0),
 	("HandIK_L", "Hand_L", 0),
 
-	("LoArmTwist_R", "LoArm_R", 0),
 	("LoArmFK_R", "LoArm_R", 0),
 	("LoArmIK_R", "LoArm_R", 0),
 	("HandFK_R", "Hand_R", 0),
