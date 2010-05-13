@@ -59,8 +59,8 @@ def loadVertsCoo(path):
     fileDescriptor.close()
 
     return verts
-    
-    
+
+
 def loadFacesIndices(path):
     """
     This function serves as a small utility function to load just the  face indices
@@ -93,12 +93,12 @@ def loadFacesIndices(path):
     fileDescriptor.close()
     return faces
 
-def subdivideObj(faces, vertices, loops):  
-    for n in range(loops):        
+def subdivideObj(faces, vertices, loops):
+    for n in range(loops):
         faces,vertices = tessellate(faces, vertices)
     return (faces,vertices)
-    
-    
+
+
 
 def tessellate(faces, vertices):
     """
@@ -121,12 +121,12 @@ def tessellate(faces, vertices):
 
     subdividedVerts = []
     subdividedFaces = []
-    
+
     idx = len(vertices)-1
     vertsUsed = {}
     for face in faces:
         centroidVerts = []
-        
+
         if len(face) == 4:
             i0 = face[0]
             i1 = face[1]
@@ -137,7 +137,7 @@ def tessellate(faces, vertices):
             newVert3 = centroid([vertices[i2],vertices[i3]])
             newVert4 = centroid([vertices[i3],vertices[i0]])
             newVert5 = centroid([newVert1,newVert2,newVert3,newVert4])
-      
+
 
             k1 = [i0,i1]
             k2 = [i1,i2]
@@ -150,68 +150,68 @@ def tessellate(faces, vertices):
             k3.sort()
             k4.sort()
             k5.sort()
-            
+
             key1 = str(k1)
             key2 = str(k2)
             key3 = str(k3)
             key4 = str(k4)
-            key5 = str(k5)                          
-      
-            
+            key5 = str(k5)
+
+
             if not vertsUsed.has_key(key1):
                 idx += 1
                 vertsUsed[key1] = idx
                 subdividedVerts.append(newVert1)
-                n1 = idx                
+                n1 = idx
             else:
                 n1 = vertsUsed[key1]
-                
+
             if not vertsUsed.has_key(key2):
                 idx += 1
                 vertsUsed[key2] = idx
                 subdividedVerts.append(newVert2)
-                n2 = idx                
+                n2 = idx
             else:
                 n2 = vertsUsed[key2]
-                
+
             if not vertsUsed.has_key(key3):
                 idx += 1
                 vertsUsed[key3] = idx
                 subdividedVerts.append(newVert3)
-                n3 = idx                
+                n3 = idx
             else:
                 n3 = vertsUsed[key3]
-                
+
             if not vertsUsed.has_key(key4):
                 idx += 1
                 vertsUsed[key4] = idx
                 subdividedVerts.append(newVert4)
-                n4 = idx                
+                n4 = idx
             else:
                 n4 = vertsUsed[key4]
-                
+
             if not vertsUsed.has_key(key5):
                 idx += 1
                 vertsUsed[key5] = idx
                 subdividedVerts.append(newVert5)
-                n5 = idx                
+                n5 = idx
             else:
-                n5 = vertsUsed[key5]     
-                
+                n5 = vertsUsed[key5]
+
             newFace1 = [i0,n1,n5,n4]
             newFace2 = [n1,i1,n2,n5]
             newFace3 = [n5,n2,i2,n3]
             newFace4 = [n5,n3,i3,n4]
 
-            
-            
-            subdividedFaces.extend([newFace1,newFace2,newFace3,newFace4])            
-         
+
+
+            subdividedFaces.extend([newFace1,newFace2,newFace3,newFace4])
+
         elif len(face) == 3:
             i0 = face[0]
             i1 = face[1]
             i2 = face[2]
-            
+
             newVert1 = centroid([vertices[i0],vertices[i1]])
             newVert2 = centroid([vertices[i1],vertices[i2]])
             newVert3 = centroid([vertices[i2],vertices[i0]])
@@ -226,54 +226,54 @@ def tessellate(faces, vertices):
             k1.sort()
             k2.sort()
             k3.sort()
-            k4.sort()            
+            k4.sort()
             key1 = str(k1)
             key2 = str(k2)
             key3 = str(k3)
-            key4 = str(k4)   
-            
+            key4 = str(k4)
 
-            
+
+
             if not vertsUsed.has_key(key1):
                 idx += 1
                 vertsUsed[key1] = idx
                 subdividedVerts.append(newVert1)
-                n1 = idx                
+                n1 = idx
             else:
                 n1 = vertsUsed[key1]
-                
+
             if not vertsUsed.has_key(key2):
                 idx += 1
                 vertsUsed[key2] = idx
                 subdividedVerts.append(newVert2)
-                n2 = idx                
+                n2 = idx
             else:
                 n2 = vertsUsed[key2]
-                
+
             if not vertsUsed.has_key(key3):
                 idx += 1
                 vertsUsed[key3] = idx
                 subdividedVerts.append(newVert3)
-                n3 = idx                
+                n3 = idx
             else:
                 n3 = vertsUsed[key3]
-                
+
             if not vertsUsed.has_key(key4):
                 idx += 1
                 vertsUsed[key4] = idx
                 subdividedVerts.append(newVert4)
-                n4 = idx                
+                n4 = idx
             else:
                 n4 = vertsUsed[key4]
-                
+
             newFace1 = [i0,n1,n4]
             newFace2 = [n1,i1,n4]
             newFace3 = [i1,n2,n4]
             newFace4 = [n2,i2,n4]
             newFace5 = [i2,n3,n4]
             newFace6 = [n3,i0,n4]
-            subdividedFaces.extend([newFace1,newFace2,newFace3,newFace4,newFace5,newFace6])     
-    
+            subdividedFaces.extend([newFace1,newFace2,newFace3,newFace4,newFace5,newFace6])
+
     finalVertList = vertices + subdividedVerts
     finalFacesList = subdividedFaces
     print "ORIGINAL VERTS: %i"%(len(vertices))
@@ -351,8 +351,8 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
     #to have a better result in linking new mesh.
     vertsList1 = loadVertsCoo(mesh1)
     vertices2 = loadVertsCoo(mesh2)
-    
-    faces = loadFacesIndices(mesh2)  
+
+    faces = loadFacesIndices(mesh2)
     tess = subdivideObj(faces, vertices2, 2)
     vertsList2 = tess[1]
     notLinked = 0
@@ -381,7 +381,7 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
 
         #This dictionary is needed to have an ordered list of distances
         distData = {}
-        
+
 
         #... find nearest verts on old mesh
         for i2,v2 in enumerate(vertsList3.verts):
@@ -393,8 +393,8 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
         dKeys = distData.keys()
         dKeys.sort()
         dmin = dKeys[0] #The first one is the smallest.
-        
-        if dmin < epsilon: #A vert is found in the given epsilon           
+
+        if dmin < epsilon: #A vert is found in the given epsilon
 
             #in case of smaller distance < 0.005
             #new vert and old vert are coincided, so no more verts are needed.
@@ -408,7 +408,7 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
                     vDistances = dKeys[:7]
                 else:
                     vDistances = dKeys[:(len(dKeys)-1)]
-                vIndices = [distData[n] for n in vDistances]            
+                vIndices = [distData[n] for n in vDistances]
 
             #Now we have verts indices and distances from the input vert, so
             #we can calculate their weights
@@ -441,94 +441,7 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
 
 
 
-def convertTargets(mesh1, mesh2, targetPath, dataPath):
-
-    """
-    This function load the mesh2 verts, morph it and transfer the
-    deformations on the mesh1 verts. In simple English, it fit mesh1 to
-    mesh2, to convert targets from mesh2 to mesh1.
-
-
-    Parameters
-    ----------
-    targetPath:
-        *string*. The path of morph target to convert
-
-    mesh1:
-        *string*. The path of the new wavefront obj
-
-    mesh2:
-        *string*. The path of the old wavefront obj
-
-    dataPath:
-        *string*. The path of data file to use for fitting
-
-    """
-    print "DATAPTH: ",dataPath
-    #Load the mesh1, to be fitted to mesh2
-    verts1 = loadVertsCoo(mesh1) 
-
-    #Load the mesh2, morph it and then tessellate
-    faces2 = loadFacesIndices(mesh2)
-    verts2BeforeMorph = loadVertsCoo(mesh2)
-    
-    #morph 
-    verts2AfterMorph = applyMorph(verts2BeforeMorph, targetPath)
-    
-    #tesselate    
-    tessBefore = subdivideObj(faces2, verts2BeforeMorph, 2)
-    tessAfter = subdivideObj(faces2, verts2AfterMorph, 2) 
-    verts2TessellatedBefore = tessBefore[1]
-    verts2TessellatedAfter = tessAfter[1]
-
-    #We need to consider only verts that get deformed by the morph
-    morphedVerts = set()
-    for i in range(len(verts2TessellatedBefore)):        
-        if verts2TessellatedBefore[i] != verts2TessellatedAfter[i]:
-            morphedVerts.add(i)     
-    
-      
-    #Fit the mesh1 to morphed mesh2
-    try:
-        fileDescriptor = open(dataPath)
-    except:
-        print 'Unable to open %s'%(dataPath)
-        return
-
-    
-    for idx,line in enumerate(fileDescriptor):
-        translationData = line.split()
-
-        halfList = len(translationData)/2
-
-        #The first half of line are verts Indices
-        xIdx = translationData[:halfList]
-        #The second half of line are verts weight
-        xWeight = translationData[halfList:]
-        
-        xSum = [0,0,0]
-        sumWeight = 0
-        for w in xWeight:
-            sumWeight += float(w)
-
-        isMorphed = False
-        for i in range(len(xIdx)):
-            index = int(xIdx[i])
-            if index in morphedVerts:
-                isMorphed = True            
-            weight = float(xWeight[i])
-            linkedVert = vmul(verts2TessellatedAfter[index],weight)
-            xSum = vadd(xSum,linkedVert)
-
-        if isMorphed:
-            verts1[idx] = vmul(xSum,1.0/sumWeight)
-        
-    fileDescriptor.close()
-    return verts1
-
-
-
-def convertDirect(mesh1, mesh2, dataPath):
+def straightConversion(mesh1, mesh2, dataPath, targetPath=None):
 
     """
     This function load the mesh1 and the mesh2, and then fit
@@ -552,24 +465,38 @@ def convertDirect(mesh1, mesh2, dataPath):
 
     """
     #load the mesh1
-    verts1 = loadVertsCoo(mesh1) 
+    verts1 = loadVertsCoo(mesh1)
 
     #Load the mesh2
     faces2 = loadFacesIndices(mesh2)
-    verts2 = loadVertsCoo(mesh2)    
-    
-    #tesselate    
-    vertTess = subdivideObj(faces2, verts2, 2)[1]    
-    
-      
-    
+    verts2 = loadVertsCoo(mesh2)
+
+
+    #apply target, in case
+    if targetPath:
+        morphedVerts = set() #Set of indices of vertices affected by target
+        verts2U = copy.deepcopy(verts2) #unmorphed verts
+        verts2 = applyMorph(verts2, targetPath) #morphed verts
+
+        #We need to consider only verts that get deformed by the morph
+        vertTessU = subdivideObj(faces2, verts2U, 2)[1] #unmorphed subdivided verts
+        vertTess = subdivideObj(faces2, verts2, 2)[1] #morphed subdivided verts
+
+        #Fill the list of verts affected by the target
+        for i in range(len(vertTessU)):
+            if vertTessU[i] != vertTess[i]:
+                morphedVerts.add(i)
+    else:
+        #tesselate
+        vertTess = subdivideObj(faces2, verts2, 2)[1]
+
     try:
         fileDescriptor = open(dataPath)
     except:
         print 'Unable to open %s'%(dataPath)
         return
 
-    
+
     for idx,line in enumerate(fileDescriptor):
         translationData = line.split()
 
@@ -580,23 +507,27 @@ def convertDirect(mesh1, mesh2, dataPath):
             xIdx = translationData[:halfList]
             #The second half of line are verts weight
             xWeight = translationData[halfList:]
-            
+
             xSum = [0,0,0]
             sumWeight = 0
             for w in xWeight:
                 sumWeight += float(w)
-           
+
             for i in range(len(xIdx)):
-                index = int(xIdx[i])                    
+                index = int(xIdx[i])
                 weight = float(xWeight[i])
                 vertOld = vmul(vertTess[index],weight)
                 xSum = vadd(xSum,vertOld)
-                verts1[idx] = vmul(xSum,1.0/sumWeight)
-        
+                if targetPath: #If target, we must check the vert is affected by it
+                    if index in morphedVerts:
+                        verts1[idx] = vmul(xSum,1.0/sumWeight)
+                else:
+                    verts1[idx] = vmul(xSum,1.0/sumWeight)
+
     fileDescriptor.close()
     return verts1
 
-    
+
 
 
 
@@ -623,7 +554,7 @@ def saveTestObj(faces, verts, objTestPath):
     except:
         print 'Unable to open %s'%(objTestPath)
         return
-    
+
     for v in verts:
         fileDescriptor.write('v %f %f %f\n' % (v[0], v[1], v[2]))
     for f in faces:
@@ -632,11 +563,16 @@ def saveTestObj(faces, verts, objTestPath):
         if len(f) == 3:
             fileDescriptor.write('f %i %i %i\n' % (f[0]+1, f[1]+1, f[2]+1))
     print "Saved a test obj in %s"%(objTestPath)
-        
+
     fileDescriptor.close()
 
 
-def saveConvertedTarget(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
+def convertDirectory(mesh1, mesh2, datafile, folder) :
+    #os.listdir(folder)
+    pass
+
+
+def convertFile(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
 
     """
     This function call the main functions in order to convert the morphing.
@@ -646,7 +582,7 @@ def saveConvertedTarget(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=
     Parameters
     ----------
     targetToConvert:
-        *string*. The path of old morph target to convert    
+        *string*. The path of old morph target to convert
 
     mesh1:
         *string*. The path of the new wavefront obj
@@ -661,40 +597,40 @@ def saveConvertedTarget(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=
         *float*. The threshold to decide when consider or not a modification as
         morph to be saved.
 
-    """ 
+    """
     convertDirectory = os.path.join(os.path.dirname(mesh1), "converted")
     if not os.path.isdir(convertDirectory):
         os.mkdir(convertDirectory)
-    
+
     if os.path.isfile(mesh1) and os.path.isfile(mesh2):
-        if targetToConvert:      
+        if targetToConvert:
             #verts are modified by target
             newTargetPath = os.path.join(convertDirectory, os.path.basename(targetToConvert))
-            modifiedVerts = convertTargets(mesh1, mesh2, targetToConvert, dataPath)
-        else: 
+            modifiedVerts = straightConversion(mesh1, mesh2, dataPath, targetToConvert)
+        else:
             #verts are modified by direct fitting
             newTargetPath = os.path.join(convertDirectory, os.path.basename(mesh2)+".target")
-            modifiedVerts = convertDirect(mesh1, mesh2, dataPath)
+            modifiedVerts = straightConversion(mesh1, mesh2, dataPath)
     else:
         print "Error opening %s or %s"%(mesh1,mesh2)
         return
 
     #original verts are the verts of new mesh, unmodified.
-    originalVerts = loadVertsCoo(mesh1)  
+    originalVerts = loadVertsCoo(mesh1)
 
-    
-    
+
+
 
     print "Conversion of %s, from %s to %s"%(targetToConvert,mesh2,mesh1)
     print "Using datafile %s"%(dataPath)
     print "Saved target as %s"%(newTargetPath)
-    
+
     modifiedVertsIndices = []
     nVertsExported = 0
     for i in range(len(modifiedVerts)):
         originalVertex = originalVerts[i]
-        targetVertex = modifiedVerts[i]       
-        delta = vsub(targetVertex, originalVertex)       
+        targetVertex = modifiedVerts[i]
+        delta = vsub(targetVertex, originalVertex)
         dist = vdist(originalVertex, targetVertex)
         if dist > epsilon:
             nVertsExported += 1
@@ -713,24 +649,29 @@ def saveConvertedTarget(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=
     print 'Exported %d verts '%(nVertsExported)
 
 
-def usage():    
+def usage():
     print""
     print"NAME"
     print"    %s: a program to translate a  morph target from"%(sys.argv[0])
     print"    a mesh with topology 1 to a mesh with topology 2"
-    print"    The shape of old and new objs must be similar."
-    print"    We assume the new mesh is done using a retopology tool."
+    print"    In order to have a correct conversion, the diff.data "
+    print"    must be build using a base mesh1 and base mesh2 very "
+    print"    similar in shape (not in topology)"
+    print"    For this reason we assume the base mesh1 is done "
+    print"    using a retopology tool, upon base mesh2."
     print""
     print"SYNOPSIS"
     print"    %s [options]"%(sys.argv[0])
     print""
     print"OPTIONS:"
-    print"    --build; build the database to be used in conversion (-b also available)"
-    print"    --target path; to specify the target file to convert (-t also available)"
-    print"    --oldbase path; to specify the old base wavefront obj (-o also available)"
-    print"    --newbase path; to specify the new base wavefront obj (-n also available)"
-    print"    --help; what you're looking at right now. (-h also available)"
-    print"    --testObj: path; Save a subdivided version of the obj passes as argument (-w also available)" 
+    print"    --build; build the database of differences to be used in conversion"
+    print"    --target path; to specify the target file to convert"
+    print"    --targetbase path; to specify the obj to be used as reference to save targets"
+    print"    --folder path; to specify the folder with all targets to convert"
+    print"    --mesh2 path; to specify the reference mesh obj"
+    print"    --mesh1 path; to specify the obj to fit to the reference"
+    print"    --help; what you're looking at right now."
+    print"    --testObj: path; Save a subdivided version of the obj passes as argument"
     print""
     print"AUTHOR:"
     print"    Manuel Bastioni (info@makehuman.org)"
@@ -738,7 +679,7 @@ def usage():
     print"SEE ALSO:"
     print"    MakeHuman web page:"
     print"    http://www.makehuman.org"
-    print""        
+    print""
     exit()
 
 
@@ -746,43 +687,52 @@ def main(argv):
 
     target = None
     mesh2 = "mesh2.obj"
-    mesh1 = "mesh1.obj"    
+    mesh1 = "mesh1.obj"
     datafile = "diff.data"
+    targetbase = "base.obj"
     buildit = None
     testobj = None
+    folder = None
 
     #handle options
     try:
-        opts, args = getopt.getopt(argv, "hbt:m:M:d:w:", ["help","build","target=","mesh1=","mesh2=","datafile=","testobj="])
+        opts, args = getopt.getopt(argv, "h", ["help","build","target=","targetbase=","mesh1=","mesh2=","datafile=","testobj=","folder="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
-            sys.exit()        
-        elif opt in ("-t", "--target"):
+            sys.exit()
+        elif opt in ("--target"):
             target = arg
-        elif opt in ("-m", "--mesh1"):
+        elif opt in ("--targetbase"):
+            targetbase = arg
+        elif opt in ("--mesh1"):
             mesh1 = arg
-        elif opt in ("-M", "--mesh2"):
+        elif opt in ("--mesh2"):
             mesh2 = arg
-        elif opt in ("-d", "--datafile"):
+        elif opt in ("--datafile"):
             datafile = arg
-        elif opt in ("-b", "--build"):
+        elif opt in ("--build"):
             buildit = 1
-        elif opt in ("-w", "--testobj"):
-            testobj = arg             
+        elif opt in ("--testobj"):
+            testobj = arg
+        elif opt in ("--folder"):
+            folder = arg
 
     if buildit:
         saveData(mesh1, mesh2, datafile)
     elif testobj:
         vertices = loadVertsCoo(testobj)
-        faces = loadFacesIndices(testobj)  
-        tess = subdivideObj(faces, vertices, 2)               
-        saveTestObj(tess[0], tess[1], testobj+".subdivided.obj")        
+        faces = loadFacesIndices(testobj)
+        tess = subdivideObj(faces, vertices, 2)
+        saveTestObj(tess[0], tess[1], testobj+".subdivided.obj")
     else:
-        saveConvertedTarget(mesh1, mesh2, datafile, target)        
+        if folder:
+            convertDirectory(mesh1, mesh2, datafile, folder)
+        else:
+            convertFile(mesh1, mesh2, datafile, target)
 
 
 if __name__ == "__main__":
