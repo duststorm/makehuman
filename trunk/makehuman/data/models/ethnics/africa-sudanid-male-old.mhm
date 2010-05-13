@@ -1,0 +1,47 @@
+# Written by makehuman 1.0.0 alpha 5
+version 1.0.0
+tags africa-sudanid-male-old
+gender 1.000000
+age 1.000000
+muscle 0.372340
+weight 0.712766
+genitals 0.000000
+breastSize 0.500000
+breastFirmness 0.500000
+stomach 0.000000
+nose 0.148936
+mouth 0.212766
+eyes 0.000000
+ears 0.000000
+head 0.000000
+headAge 0.000000
+faceAngle -0.425532
+jaw 0.638298
+pelvisTone 0.000000
+buttocks 0.000000
+height 0.000000
+ethnic neutral 1.000000
+detail r-lowerleg-scale-vert-incr 0.750000
+detail r-upperleg-scale-horiz-incr 0.250000
+detail nose-scale-horiz-incr 0.750000
+microdetail r-head-zygoma-trans-out 0.400000
+detail eye-trans-down 0.200000
+detail r-upperleg-scale-vert-incr 0.050000
+detail mouth-trans-forward 0.450000
+microdetail nose-glabella-scale-vert-decr 0.550000
+detail head-scale-horiz-incr 0.400000
+detail l-lowerleg-scale-horiz-incr 0.650000
+detail r-lowerleg-scale-horiz-incr 0.650000
+detail hip-scale-horiz-incr 0.550000
+detail l-upperleg-scale-horiz-incr 0.250000
+detail l-lowerleg-scale-vert-incr 0.750000
+detail l-lowerarm-scale-horiz-incr 0.700000
+detail l-upperleg-scale-vert-incr 0.050000
+detail torso-scale-horiz-incr 0.250000
+detail r-lowerarm-scale-horiz-incr 0.700000
+microdetail l-head-zygoma-trans-out -0.400000
+detail mouth-scale-horiz-incr 0.850000
+detail mouth-scale-depth-incr 0.350000
+detail l-upperarm-scale-vert-incr 0.450000
+detail torso-scale-vert-incr 0.100000
+detail r-upperarm-scale-vert-incr 0.450000
