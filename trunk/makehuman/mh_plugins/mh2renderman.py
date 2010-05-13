@@ -69,15 +69,26 @@ def writeHairs(ribRepository, mesh):
         else:
             hDiameter = hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
-        hairFile.write('Curves "cubic" [')
+        
+
+            
+           
+        
         for hair in hSet.hairs:
             totalNumberOfHairs += 1
-            hairFile.write('%i ' % len(hair.controlPoints))
-        hairFile.write('] "nonperiodic" "P" [')
-        for hair in hSet.hairs:
+            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(hair.controlPoints))
+            
             for cP in hair.controlPoints:
                 hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
-        hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
+           
+            if random.randint(0, 3) >= 1:
+                hairFile.write(']\n"N" [') 
+                for cP in hair.controlPoints:
+                        hairFile.write('0 1 0 ')  # arbitrary normals  
+            hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)    
+       
+            
+        
     hairFile.close()
     print 'Totals hairs written: ', totalNumberOfHairs
     print 'Number of tufts', len(hairsClass.hairStyle)
@@ -181,126 +192,6 @@ def clamp(min, max, val):
     if val < min:
         val = min
     return val
-
-
-def writeLightMapObj(fileName, mesh, referenceFile, pointLightCoords, pointLightIntensity):
-    """
-    This function exports a Renderman format object that can be used as a
-    light map in the rendering engine.
-
-    A light map is a bake texture with light information already assigned
-    to it.
-    To enable this light map to be rendered without using a Renderman
-    implementation (which is not standard practice and needs to be done in
-    very different ways on different engines) we build a flattened mesh
-    using the U,V coordinates as X,Y coordinates. Then we assign to each
-    vertex a color calculated as pointLightCoord (in practice, this is used
-    as a matte shader).
-    This light map is very important as, by blurring it, we can quickly
-    produce sub-surface scattering (SSS).
-
-    Internally MakeHuman represents all objects as triangles, but
-    for rendering it is better to use quads. So to export the rib we
-    retrieve the face indices from the original wavefront object file
-    (the reference file).
-
-    Parameters
-    ----------
-
-    fileName:
-        *string*. The file system path to the output file that needs to be generated.
-
-    mesh:
-        *3D object*. The object to export.
-
-    referenceFile:
-        *string*. The file system path to a reference file (the wavefront
-        base object).
-    """
-
-    # fileName = "renderman_output/ribFiles/base.obj_map.rib"
-    # referenceFile = "data/3dobjs/testUV.obj"
-
-    objFile = file(fileName, 'w')
-
-    facesIndices = files3d.loadFacesIndices(referenceFile)
-
-    # facesUVvalues = mesh.uvValues #files3d.loadUV(referenceFile)
-
-    facesUVvalues = files3d.loadUV(referenceFile)
-
-    facesUVcolor = []
-
-    # because we set only the blue component, facesUVcolor is a list of float.
-
-    for i in xrange(len(facesUVvalues)):
-
-        # faceUVvalues is a list of [u,v]: [[u0,v0],[u1,v1],[u2,v2]...[un,vn]]
-
-        facesUVcolor.append(0)  # All indices of color initially equal to zero.
-
-    indicesProcessed = set()
-    for faceIndices in facesIndices:
-        for idx in faceIndices:
-            vertId = idx[0]
-            uvId = idx[1]
-            if uvId not in indicesProcessed:
-                color = facesUVcolor[uvId]
-                v = mesh.verts[vertId]
-                for (i, pointLightCoord) in enumerate(pointLightCoords):
-                    lightRay = aljabr.vsub(pointLightCoord, v.co)
-                    lightRay = aljabr.vnorm(lightRay)
-                    color += clamp(0, 1, aljabr.vdot(lightRay, v.no) * pointLightIntensity[i])
-                facesUVcolor[uvId] = color
-            indicesProcessed.add(uvId)
-
-    objFile.write('PointsPolygons ')
-
-    # Writing polygon n faces
-
-    objFile.write('[ ')
-    for face in facesIndices:
-        objFile.write('%s ' % len(face))
-    objFile.write('] \n')
-
-    # Writing face indices. Note we use UV indices as vert indices
-    # (idx[1] is the index of UV couples, idx[0] is the index of vert coord)
-
-    objFile.write('[ ')
-    for face in facesIndices:
-        for idx in face:
-            objFile.write('%s ' % idx[1])
-    objFile.write('] \n')
-
-    # Writing verts coords. Note we use uv coords, as verts coords
-
-    objFile.write('"P" [')
-    for uv in facesUVvalues:
-        objFile.write('%s %s %s \n' % (uv[0], uv[1], 0))
-    objFile.write('] ')
-
-    # Writing verts color. We use a simple Goraud matte
-
-    objFile.write('\n"Cs" [')
-    for color in facesUVcolor:
-        objFile.write('%s %s %s \n' % (0, 0, color))
-    objFile.write(']')
-    objFile.write('\n')
-
-    # Writing uv info
-
-    objFile.write('\n"st" [')
-    for uv in facesUVvalues:
-        objFile.write('%s %s\n' % (uv[0], 1 - uv[1]))
-    objFile.write(']')
-
-    objFile.close()
-
-
-
-
-
-
 
 
 
@@ -586,18 +477,6 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
 
 
 
-def calculateHeadCentroid(obj):
-    # 4 Reference vertices to calculate head centroid
-    v1 = obj.verts[4311]
-    v2 = obj.verts[8194]
-    v3 = obj.verts[8218]
-    v4 = obj.verts[8688]
-    vertsList = [v1.co, v2.co, v3.co, v4.co]
-    centr = aljabr.centroid(vertsList)
-
-    return [centr[0], centr[1], -centr[2]]
-
-
 def mh2Aqsis(camera, scene, fName, ribRepository):
     """
     This function creates the frame definition for a Renderman scene.
@@ -706,13 +585,12 @@ def mh2Aqsis(camera, scene, fName, ribRepository):
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
             writeHairs(ribRepository, obj)
-            headCentr = calculateHeadCentroid(obj)
+
 
     ribfile.write('\tAttributeBegin\n')
-
+    ribfile.write('\tReverseOrientation #<<-- required\n')
     ribfile.write('\t\tColor [%f %f %f]\n' % (scene.selectedHuman.hairColor[0], scene.selectedHuman.hairColor[1], scene.selectedHuman.hairColor[2]))
-    ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [.8] "float headX" [%s] "float headY" [%s] "float headZ" [%s] \n' % (headCentr[0], headCentr[1],
-                  headCentr[2]))
+    ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] \n')
     ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(ribRepository, 'hairs.rib').replace('\\', '/'))
     ribfile.write('\tAttributeEnd\n')
     ribfile.write('WorldEnd\n')
