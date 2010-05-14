@@ -17,7 +17,9 @@ python topology_translator.py --mesh1 baseNew.obj --mesh2 baseOld.obj --target t
 c) Create a target for mesh1.obj topology, using an obj mesh2.obj as reference.
 The target is automatically saved in convert/mesh1.obj.target
 
-python topology_translator.py  --mesh1 mesh1.obj --mesh2 mesh2.obj --datafile link.dat
+python topology_translator.py  --mesh1 mesh1.obj --mesh2 mesh2.obj --datafile diff.data
 
+d) For debug only. Save a the subdivided version of an obj.
 
+python topology_translator.py --testobj mesh1.obj
 

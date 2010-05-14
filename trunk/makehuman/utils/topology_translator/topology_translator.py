@@ -355,6 +355,9 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
     faces = loadFacesIndices(mesh2)
     tess = subdivideObj(faces, vertices2, 2)
     vertsList2 = tess[1]
+
+
+
     notLinked = 0
 
     overwrite = 0 #Just for more elegant one-line print output progress
@@ -401,6 +404,7 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
             if  dKeys[0] < 0.005:
                 vIndices = [distData[dKeys[0]]]
                 vDistances = [dKeys[0]]
+                weights = [1]
 
             #else we get the 7 first verts with smaller distance
             else:
@@ -409,13 +413,9 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
                 else:
                     vDistances = dKeys[:(len(dKeys)-1)]
                 vIndices = [distData[n] for n in vDistances]
-
-            #Now we have verts indices and distances from the input vert, so
-            #we can calculate their weights
-            if dmin > 0:
                 weights = [dmin/dst for dst in vDistances]
-            else:
-                weights = [1]
+
+
 
             #Finally we write the data
             for index in vIndices:
@@ -441,7 +441,7 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
 
 
 
-def straightConversion(mesh1, mesh2, dataPath, targetPath=None):
+def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
 
     """
     This function load the mesh1 and the mesh2, and then fit
@@ -496,40 +496,39 @@ def straightConversion(mesh1, mesh2, dataPath, targetPath=None):
         print 'Unable to open %s'%(dataPath)
         return
 
-
+    #print "LEN OF MORPHEDVERTS", len(morphedVerts)
     for idx,line in enumerate(fileDescriptor):
         translationData = line.split()
 
-        if len(translationData) > 1:
-            halfList = len(translationData)/2
+        halfList = len(translationData)/2
 
-            #The first half of line are verts Indices
-            xIdx = translationData[:halfList]
-            #The second half of line are verts weight
-            xWeight = translationData[halfList:]
+        #The first half of line are verts Indices
+        xIdx = translationData[:halfList]
+        #The second half of line are verts weight
+        xWeight = translationData[halfList:]
+        
+        xSum = [0,0,0]
+        sumWeight = 0
+        for w in xWeight:
+            sumWeight += float(w)
 
-            xSum = [0,0,0]
-            sumWeight = 0
-            for w in xWeight:
-                sumWeight += float(w)
+        isMorphed = False
+        for i in range(len(xIdx)):
+            index = int(xIdx[i])
+            if targetPath: #If target, we must check the vert is affected by it
+                if index in morphedVerts:
+                    isMorphed = True  
+            else:
+                isMorphed = True  #If not target, all verts are assumed as morphed
+            weight = float(xWeight[i])
+            linkedVert = vmul(vertTess[index],weight)
+            xSum = vadd(xSum,linkedVert)
 
-            for i in range(len(xIdx)):
-                index = int(xIdx[i])
-                weight = float(xWeight[i])
-                vertOld = vmul(vertTess[index],weight)
-                xSum = vadd(xSum,vertOld)
-                if targetPath: #If target, we must check the vert is affected by it
-                    if index in morphedVerts:
-                        verts1[idx] = vmul(xSum,1.0/sumWeight)
-                else:
-                    verts1[idx] = vmul(xSum,1.0/sumWeight)
-
+        if isMorphed:
+            verts1[idx] = vmul(xSum,1.0/sumWeight)
+        
     fileDescriptor.close()
     return verts1
-
-
-
-
 
 
 
@@ -606,11 +605,11 @@ def convertFile(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
         if targetToConvert:
             #verts are modified by target
             newTargetPath = os.path.join(convertDirectory, os.path.basename(targetToConvert))
-            modifiedVerts = straightConversion(mesh1, mesh2, dataPath, targetToConvert)
+            modifiedVerts = fitMesh(mesh1, mesh2, dataPath, targetToConvert)
         else:
             #verts are modified by direct fitting
             newTargetPath = os.path.join(convertDirectory, os.path.basename(mesh2)+".target")
-            modifiedVerts = straightConversion(mesh1, mesh2, dataPath)
+            modifiedVerts = fitMesh(mesh1, mesh2, dataPath)
     else:
         print "Error opening %s or %s"%(mesh1,mesh2)
         return
