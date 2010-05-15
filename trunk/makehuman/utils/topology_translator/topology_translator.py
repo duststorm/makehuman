@@ -470,6 +470,8 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
     #Load the mesh2
     faces2 = loadFacesIndices(mesh2)
     verts2 = loadVertsCoo(mesh2)
+    
+    
 
 
     #apply target, in case
@@ -495,9 +497,14 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
     except:
         print 'Unable to open %s'%(dataPath)
         return
+    
+    fileData =  fileDescriptor.readlines()   
+    #The datafile must have the same lines as the verts of mesh1
+    if len(fileData) != len(verts1):
+        print "ERROR: data file was done for a different meshtofit"
+        return None
 
-    #print "LEN OF MORPHEDVERTS", len(morphedVerts)
-    for idx,line in enumerate(fileDescriptor):
+    for idx,line in enumerate(fileData):
         translationData = line.split()
 
         halfList = len(translationData)/2
@@ -521,7 +528,11 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
             else:
                 isMorphed = True  #If not target, all verts are assumed as morphed
             weight = float(xWeight[i])
-            linkedVert = vmul(vertTess[index],weight)
+            try:
+                linkedVert = vmul(vertTess[index],weight)
+            except:
+                print "ERROR: wrong datafile used"
+                return None
             xSum = vadd(xSum,linkedVert)
 
         if isMorphed:
@@ -614,38 +625,41 @@ def convertFile(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
         print "Error opening %s or %s"%(mesh1,mesh2)
         return
 
-    #original verts are the verts of new mesh, unmodified.
-    originalVerts = loadVertsCoo(mesh1)
+    if modifiedVerts:
+        #original verts are the verts of new mesh, unmodified.
+        originalVerts = loadVertsCoo(mesh1)
 
 
 
 
-    print "Conversion of %s, from %s to %s"%(targetToConvert,mesh2,mesh1)
-    print "Using datafile %s"%(dataPath)
-    print "Saved target as %s"%(newTargetPath)
+        print "Conversion of %s, from %s to %s"%(targetToConvert,mesh2,mesh1)
+        print "Using datafile %s"%(dataPath)
+        print "Saved target as %s"%(newTargetPath)
 
-    modifiedVertsIndices = []
-    nVertsExported = 0
-    for i in range(len(modifiedVerts)):
-        originalVertex = originalVerts[i]
-        targetVertex = modifiedVerts[i]
-        delta = vsub(targetVertex, originalVertex)
-        dist = vdist(originalVertex, targetVertex)
-        if dist > epsilon:
-            nVertsExported += 1
-            dataToExport = [i, delta[0], delta[1], delta[2]]
-            modifiedVertsIndices.append(dataToExport)
-    try:
-        fileDescriptor = open(newTargetPath, 'w')
-    except:
-        print 'Unable to open %s'%(newTargetPath)
-        return None
+        modifiedVertsIndices = []
+        nVertsExported = 0
+        for i in range(len(modifiedVerts)):
+            originalVertex = originalVerts[i]
+            targetVertex = modifiedVerts[i]
+            delta = vsub(targetVertex, originalVertex)
+            dist = vdist(originalVertex, targetVertex)
+            if dist > epsilon:
+                nVertsExported += 1
+                dataToExport = [i, delta[0], delta[1], delta[2]]
+                modifiedVertsIndices.append(dataToExport)
+        try:
+            fileDescriptor = open(newTargetPath, 'w')
+        except:
+            print 'Unable to open %s'%(newTargetPath)
+            return None
 
-    for data in modifiedVertsIndices:
-        fileDescriptor.write('%d %f %f %f\n' % (data[0], data[1], data[2], data[3]))
-    fileDescriptor.close()
+        for data in modifiedVertsIndices:
+            fileDescriptor.write('%d %f %f %f\n' % (data[0], data[1], data[2], data[3]))
+        fileDescriptor.close()
 
-    print 'Exported %d verts '%(nVertsExported)
+        print 'Exported %d verts '%(nVertsExported)
+    else:
+        print "ERROR in fitting mesh, file not converted"
 
 
 def usage():
