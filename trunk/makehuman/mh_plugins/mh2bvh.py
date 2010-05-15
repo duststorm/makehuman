@@ -90,19 +90,24 @@ def exportSkeleton(obj, filename):
     calcJointOffsets(obj, skeletonRoot)
 
     # Write bvh file
+    joints = 0
 
     f = open(filename, 'w')
     f.write('HIERARCHY\n')
     f.write('ROOT ' + skeletonRoot.name + '\n')
     f.write('{\n')
-    f.write("\tOFFSET	0.00	0.00	0.00\n")
+    f.write("\tOFFSET	%f  %f  %f\n" %(skeletonRoot.position[0],skeletonRoot.position[1],skeletonRoot.position[2]))
     f.write('\tCHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n')
     for joint in skeletonRoot.children:
-        writeJoint(f, joint, 1)
+        joints += writeJoint(f, joint, 1)
     f.write('}\n')
     f.write('MOTION\n')
-    f.write('Frames:    0\n')
+    f.write('Frames:    1\n')
     f.write('Frame Time: 0.0\n')
+    f.write(" %f  %f  %f" %(skeletonRoot.position[0],skeletonRoot.position[1],skeletonRoot.position[2]) )
+    for i in xrange(joints):
+      f.write(" 0.0000 0.0000 0.0000")
+    f.write("\n")
     f.close()
 
 
@@ -120,6 +125,7 @@ def writeJoint(f, joint, ident):
   ident:     
     *integer*.  The joint identifier.
   """
+    joints = 1
 
     f.write('\t' * ident + 'JOINT ' + joint.name + '\n')
     f.write('\t' * ident + '{\n')
@@ -127,13 +133,16 @@ def writeJoint(f, joint, ident):
     f.write('\t' * (ident + 1) + 'CHANNELS 3 Zrotation Xrotation Yrotation\n')
     if joint.children:
         for joint in joint.children:
-            writeJoint(f, joint, ident + 1)
+            joints += writeJoint(f, joint, ident + 1)
     else:
         f.write('\t' * (ident + 1) + 'End Site\n')
         f.write('\t' * (ident + 1) + '{\n')
         f.write('\t' * (ident + 2) + "OFFSET	0.00	0.00	0.00\n")
         f.write('\t' * (ident + 1) + '}\n')
+        joints += 1
     f.write('\t' * ident + '}\n')
+    
+    return joints
 
 
 def calcJointOffsets(obj, joint, parent=None):
