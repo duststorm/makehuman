@@ -94,7 +94,7 @@ def loadFacesIndices(path):
     return faces
 
 def subdivideObj(faces, vertices, loops):
-    for n in range(loops):
+    for n in xrange(loops):
         faces,vertices = tessellate(faces, vertices)
     return (faces,vertices)
 
@@ -282,6 +282,11 @@ def tessellate(faces, vertices):
     return (finalFacesList, finalVertList)
 
 
+
+
+
+
+
 def applyMorph(vertsList, targetPath):
     """
     This function load and apply, with value 1, a morph target.
@@ -296,11 +301,6 @@ def applyMorph(vertsList, targetPath):
     path:
         *string*. The wavefront obj to tesselate. It's needed to get the
         faces informations.
-
-    vertsList:
-        *list*. The vertices to be subdivided. They can't be loaded from
-        the wavefront above, because it's supposed the coordinates are
-        changed by previously applied morphs.
 
     """
     newVertsList = copy.deepcopy(vertsList)
@@ -344,6 +344,9 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
     dataPath:
         *string*. The path of data file to save
 
+    epsilon:
+        *float*. Threshold
+
     """
     print "building data..."
 
@@ -356,16 +359,18 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
     tess = subdivideObj(faces, vertices2, 2)
     vertsList2 = tess[1]
 
-
-
+    deltaVectors = []
     notLinked = 0
 
     overwrite = 0 #Just for more elegant one-line print output progress
 
+    #We need to add index information to each vert.
     for i,v in enumerate(vertsList2):
         v.append(i)
 
+    #Init of the octree
     octree = simpleoctree.SimpleOctree(vertsList2, .25)
+
     try:
         fileDescriptor = open(dataPath, 'w')
     except:
@@ -374,7 +379,6 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
 
     #For each vert of new mesh we found the nearest verts of old one
     for i1,v1 in enumerate(vertsList1):
-
 
         vIndices = []
         vDistances = []
@@ -389,7 +393,7 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
         #... find nearest verts on old mesh
         for i2,v2 in enumerate(vertsList3.verts):
             d = vdist(v1, v2)
-            distData[d]=v2[3]
+            distData[d]=v2[3] #v2[3] is the vert index
 
         #The trick to have an ordered list of distances, linked to the indices.
         #We use distances as keys.
@@ -415,7 +419,10 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
                 vIndices = [distData[n] for n in vDistances]
                 weights = [dmin/dst for dst in vDistances]
 
-
+            #The delta vector, between the vert of v1 and the centroid of neighbours verts of v2
+            vx = centroid([vertsList2[vIndx] for vIndx in vIndices])
+            deltaVect = vsub(vx,v1)
+            deltaVectors.append(deltaVect)
 
             #Finally we write the data
             for index in vIndices:
@@ -425,8 +432,8 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
             fileDescriptor.write('\n')
         else:
             fileDescriptor.write('%i\n' % (-1))
+            deltaVectors.append(-1)
             notLinked += 1
-
 
         word = "Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
         sys.stdout.write("%s%s\r" % (word, " "*overwrite ))
@@ -435,6 +442,20 @@ def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
 
 
     fileDescriptor.close()
+
+    try:
+        fileDescriptor = open(dataPath+".delta", 'w')
+    except:
+        print 'Unable to open %s'%(dataPath)
+        return None
+
+    for delta in deltaVectors:
+        if delta != -1:
+            fileDescriptor.write('%f %f %f\n' % (delta[0], delta[1], delta[2]))
+        else:
+            fileDescriptor.write('-1 \n')
+    fileDescriptor.close()
+
     print "Data saved in %s"%(dataPath)
     print "Verts not linked with a epsilon radius of %f: %i"%(epsilon,notLinked)
 
@@ -454,14 +475,15 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
     Parameters
     ----------
 
-    obj1:
-        *string*. The path of the new wavefront obj
+    mesh1:
+        *string*. The path of the obj to fit
 
-    obj2:
-        *string*. The path of the old wavefront obj
+    mesh2:
+        *string*. The path of mold obj
 
-    dataPath:
-        *string*. The path of data file to use for fitting
+    targetPath:
+        *string*. The path of data file to use for fitting. If noe, it's
+        assumed that mesh2 is the final form of mesh1.
 
     """
     #load the mesh1
@@ -470,8 +492,8 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
     #Load the mesh2
     faces2 = loadFacesIndices(mesh2)
     verts2 = loadVertsCoo(mesh2)
-    
-    
+
+
 
 
     #apply target, in case
@@ -485,7 +507,7 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
         vertTess = subdivideObj(faces2, verts2, 2)[1] #morphed subdivided verts
 
         #Fill the list of verts affected by the target
-        for i in range(len(vertTessU)):
+        for i in xrange(len(vertTessU)):
             if vertTessU[i] != vertTess[i]:
                 morphedVerts.add(i)
     else:
@@ -497,8 +519,19 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
     except:
         print 'Unable to open %s'%(dataPath)
         return
-    
-    fileData =  fileDescriptor.readlines()   
+
+    fileData =  fileDescriptor.readlines()
+    fileDescriptor.close()
+
+    try:
+        fileDescriptor = open(dataPath+".delta")
+    except:
+        print 'Unable to open %s'%(dataPath)
+        return
+
+    fileDelta =  fileDescriptor.readlines()
+    fileDescriptor.close()
+
     #The datafile must have the same lines as the verts of mesh1
     if len(fileData) != len(verts1):
         print "ERROR: data file was done for a different meshtofit"
@@ -507,24 +540,29 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
     for idx,line in enumerate(fileData):
         translationData = line.split()
 
+        deltaData = fileDelta[idx].split()
+        if deltaData[0] != '-1':
+
+            deltaVect = (float(deltaData[0]), float(deltaData[1]), float(deltaData[2]))
+
         halfList = len(translationData)/2
 
         #The first half of line are verts Indices
         xIdx = translationData[:halfList]
         #The second half of line are verts weight
         xWeight = translationData[halfList:]
-        
+
         xSum = [0,0,0]
         sumWeight = 0
         for w in xWeight:
             sumWeight += float(w)
 
         isMorphed = False
-        for i in range(len(xIdx)):
+        for i in xrange(len(xIdx)):
             index = int(xIdx[i])
             if targetPath: #If target, we must check the vert is affected by it
                 if index in morphedVerts:
-                    isMorphed = True  
+                    isMorphed = True
             else:
                 isMorphed = True  #If not target, all verts are assumed as morphed
             weight = float(xWeight[i])
@@ -536,9 +574,10 @@ def fitMesh(mesh1, mesh2, dataPath, targetPath=None):
             xSum = vadd(xSum,linkedVert)
 
         if isMorphed:
-            verts1[idx] = vmul(xSum,1.0/sumWeight)
-        
-    fileDescriptor.close()
+            #verts1[idx] = vmul(xSum,1.0/sumWeight)
+            verts1[idx] = vsub(vmul(xSum,1.0/sumWeight),deltaVect)
+
+
     return verts1
 
 
@@ -577,12 +616,9 @@ def saveTestObj(faces, verts, objTestPath):
     fileDescriptor.close()
 
 
-def convertDirectory(mesh1, mesh2, datafile, folder) :
-    #os.listdir(folder)
-    pass
 
 
-def convertFile(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
+def convertFile(mesh1, mesh2, dataPath, targetbase = None, targetToConvert = None, epsilon=0.001):
 
     """
     This function call the main functions in order to convert the morphing.
@@ -593,6 +629,9 @@ def convertFile(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
     ----------
     targetToConvert:
         *string*. The path of old morph target to convert
+
+    targetbase:
+        *string*. The obj to use as target base.
 
     mesh1:
         *string*. The path of the new wavefront obj
@@ -625,12 +664,14 @@ def convertFile(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
         print "Error opening %s or %s"%(mesh1,mesh2)
         return
 
-    if modifiedVerts:
-        #original verts are the verts of new mesh, unmodified.
-        originalVerts = loadVertsCoo(mesh1)
+    #Load unmorphed base file
+    if not targetbase:
+            targetbase = mesh1
+    originalVerts = loadVertsCoo(targetbase)
 
 
-
+    if modifiedVerts and originalVerts:
+        #If not target base, we assume to save the target for a mesh1 base.
 
         print "Conversion of %s, from %s to %s"%(targetToConvert,mesh2,mesh1)
         print "Using datafile %s"%(dataPath)
@@ -638,7 +679,7 @@ def convertFile(mesh1, mesh2, dataPath, targetToConvert = None, epsilon=0.001):
 
         modifiedVertsIndices = []
         nVertsExported = 0
-        for i in range(len(modifiedVerts)):
+        for i in xrange(len(modifiedVerts)):
             originalVertex = originalVerts[i]
             targetVertex = modifiedVerts[i]
             delta = vsub(targetVertex, originalVertex)
@@ -681,8 +722,8 @@ def usage():
     print"    --target path; to specify the target file to convert"
     print"    --targetbase path; to specify the obj to be used as reference to save targets"
     print"    --folder path; to specify the folder with all targets to convert"
-    print"    --mesh2 path; to specify the reference mesh obj"
-    print"    --mesh1 path; to specify the obj to fit to the reference"
+    print"    --mold path; to specify the mesh obj to be fitted to"
+    print"    --tofit path; to specify the obj to fit to the mold"
     print"    --help; what you're looking at right now."
     print"    --testObj: path; Save a subdivided version of the obj passes as argument"
     print""
@@ -702,14 +743,14 @@ def main(argv):
     mesh2 = "mesh2.obj"
     mesh1 = "mesh1.obj"
     datafile = "diff.data"
-    targetbase = "base.obj"
+    targetbase = None
     buildit = None
     testobj = None
     folder = None
 
     #handle options
     try:
-        opts, args = getopt.getopt(argv, "h", ["help","build","target=","targetbase=","mesh1=","mesh2=","datafile=","testobj=","folder="])
+        opts, args = getopt.getopt(argv, "h", ["help","build","target=","targetbase=","tofit=","mold=","datafile=","testobj=","folder="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -721,9 +762,9 @@ def main(argv):
             target = arg
         elif opt in ("--targetbase"):
             targetbase = arg
-        elif opt in ("--mesh1"):
+        elif opt in ("--tofit"):
             mesh1 = arg
-        elif opt in ("--mesh2"):
+        elif opt in ("--mold"):
             mesh2 = arg
         elif opt in ("--datafile"):
             datafile = arg
@@ -743,9 +784,13 @@ def main(argv):
         saveTestObj(tess[0], tess[1], testobj+".subdivided.obj")
     else:
         if folder:
-            convertDirectory(mesh1, mesh2, datafile, folder)
+            fileList = os.listdir(folder)
+            for fileName in fileList:
+                filePath = os.path.join(folder,fileName)
+                if os.path.isfile(filePath):
+                    convertFile(mesh1, filePath, datafile, targetbase, target)
         else:
-            convertFile(mesh1, mesh2, datafile, target)
+            convertFile(mesh1, mesh2, datafile, targetbase, target)
 
 
 if __name__ == "__main__":
