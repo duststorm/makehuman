@@ -23,7 +23,6 @@ TO DO
 """
 
 import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig, rig_panel_25
-import classic_bones, gobo_bones #, sintel_bones
 import os
 
 
@@ -105,12 +104,15 @@ def exportMhx_25(obj, rig, fp):
 	copyFile25(obj, "data/templates/common-armature25.mhx", rig, fp)	
 	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp)	
 	fp.write("end if\n")
+	'''
 	fp.write("if toggle&T_Proxy\n")
 	copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
 	fp.write("end if\n")
+	'''
 	fp.write("if toggle&T_Mesh\n")
 	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
 	fp.write("end if\n")
+
 	fp.write("if toggle&T_Armature\n")
 	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp)	
 	fp.write("end if\n")
@@ -142,17 +144,17 @@ def copyFile25(obj, tmplName, rig, fp):
 			if ignoreLine:
 				if lineSplit[1] == 'EndIgnore':
 					ignoreLine = False
-			elif lineSplit[1] == 'Particles':
-				if writeHairCurves(hair, hairStep, amount, fp):
-					ignoreLine = True
-			elif lineSplit[1] == 'ParticleSystem':
-				pass
-				# copyFile25(obj, "data/templates/particles25.mhx", rig, fp)	
+			#elif lineSplit[1] == 'Particles':
+			#	if writeHairCurves(hair, hairStep, amount, fp):
+			#		ignoreLine = True
+			#elif lineSplit[1] == 'ParticleSystem':
+			#	pass
+			# copyFile25(obj, "data/templates/particles25.mhx", rig, fp)	
 			elif lineSplit[1] == 'Bone':
 				bone = lineSplit[2]
 				fp.write("    Bone %s\n" % bone)
-			elif lineSplit[1] == 'Rigify':
-				mhxbones_rigify.writeBones(obj, fp)
+			#elif lineSplit[1] == 'Rigify':
+			#	mhxbones_rigify.writeBones(obj, fp)
 			elif lineSplit[1] == 'head':
 				(x, y, z) = mhxbones.boneHead[bone]
 				fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
@@ -217,24 +219,11 @@ def copyFile25(obj, tmplName, rig, fp):
 						fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 					fp.write(" ;\n")
 			elif lineSplit[1] == 'VertexGroup':
-				if rig == 'rig':
-					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-foot25.mhx", fp, proxyVerts)
-				elif rig == 'classic':
-					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	
-				elif rig == 'gobo':
-					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-foot25.mhx", fp, proxyVerts)	
-				elif rig == 'rigify':
-					copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-rigify25.mhx", fp, proxyVerts)	
-					copyProxy("data/templates/vertexgroups-foot25.mhx", fp, proxyVerts)	
+				pass
+				copyProxy("data/templates/vertexgroups-bones25.mhx", fp, proxyVerts)	
+				copyProxy("data/templates/vertexgroups-leftright25.mhx", fp, proxyVerts)	
 			elif lineSplit[1] == 'mesh-shapeKey':
+				pass
 				writeShapeKeys(fp, "Human", None)
 			elif lineSplit[1] == 'proxy-shapeKey':
 				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
@@ -535,11 +524,7 @@ def exportProxy24(obj, fp):
 			copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxyVerts)	
 			copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxyVerts)	
 			copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxyVerts)	
-			# copyProxy("data/templates/vertexgroups24.mhx", fp, proxyVerts)	
 		elif lineSplit[0] == 'shapekey':
-			# shpfp = open("data/templates/shapekeys24.mhx", "rU")
-			# exportShapeKeys(obj, shpfp, fp, proxyVerts)
-			# shpfp.close()
 			fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
 			copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxyVerts)	
 			copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)	

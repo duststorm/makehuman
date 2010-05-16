@@ -11,6 +11,7 @@ FaceJoints = [
 	('r-eye',			'j', 'r-eye'),
 	('jaw-tip',			'v', 8162),
 	('tounge-tip',			'v', 8049),
+	('tounge-midfront',		'v', 8089),
 	('tounge-mid',			'v', 8103),
 	('tounge-root',			'v', 8099),
 	('l-upLid-v',			'v', 12630),
@@ -39,7 +40,8 @@ FaceHeadsTails = [
 	#('Head-inv',			'head-end', 'mouth'),
 	('Jaw',				'mouth', 'jaw-tip'),
 	('ToungeBase',			'tounge-root', 'tounge-mid'),
-	('ToungeTip',			'tounge-mid', 'tounge-tip'),
+	('ToungeMid',			'tounge-mid', 'tounge-midfront'),
+	('ToungeTip',			'tounge-midfront', 'tounge-tip'),
 	('Eye_R',			'l-eye', 'Eye_R_tail'),
 	('UpLid_R',			'l-eye', 'l-upLid'),
 	('LoLid_R',			'l-eye', 'l-loLid'),
@@ -55,16 +57,17 @@ FaceHeadsTails = [
 FaceArmature = [
 	('Jaw', 'True',			0.0, 'Head', F_DEF+F_WIR, L_MAIN+L_HEAD+L_DEF, (1,1,1) ),
 	('ToungeBase', 'True',		0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeTip', 'True',		0.0, 'ToungeBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('ToungeMid', 'True',		0.0, 'ToungeBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('ToungeTip', 'True',		0.0, 'ToungeMid', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
 	('Eye_R', 'True',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('Eye_L', 'True',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('UpLid_R', 'True',		0.279253, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
-	('LoLid_R', 'True',		0.296705, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
-	('UpLid_L', 'True',		-0.279253, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
-	('LoLid_L', 'True',		-0.296705, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
-	('Gaze', 'True',		-3.14159, 'Root', F_WIR, L_HEAD, (1,1,1) ),
-	('Gaze_R', 'True',		-3.14159, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
-	('Gaze_L', 'True',		-3.14159, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
+	('UpLid_R', 'True',		0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
+	('LoLid_R', 'True',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
+	('UpLid_L', 'True',		-0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
+	('LoLid_L', 'True',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
+	('Gaze', 'True',		pi, 'Root', F_WIR, L_HEAD, (1,1,1) ),
+	('Gaze_R', 'True',		pi, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
+	('Gaze_L', 'True',		pi, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
 ]
 
 #
@@ -74,29 +77,47 @@ FaceArmature = [
 def FaceWritePoses(fp):
 	addPoseBone(fp, 'True', 'Jaw', 'MHJaw', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'True', 'ToungeBase', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'ToungeBase', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'True', 'ToungeTip', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'ToungeMid', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'True', 'UpLid_R', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'ToungeTip', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'True', 'LoLid_R', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'UpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'True', 'UpLid_L', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'LoLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'True', 'LoLid_L', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'True', 'UpLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp, 'True', 'LoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'True', 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'True', 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'True', 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Gaze_R', 1, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'Gaze_R', 1, None, (True, False,False), 1.0])])
 
 	addPoseBone(fp, 'True', 'Gaze_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'True', 'Eye_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Gaze_L', 1, None, (True, False), 1.0])])
+		[('IK', 0, ['IK', 'Gaze_L', 1, None, (True, False,False), 1.0])])
 
 	return
+
+lidBones = [
+	('UpLid_L', 'PUpLid_L', (0, 40*deg1)),
+	('LoLid_L', 'PLoLid_L', (0, 20*deg1)),
+	('UpLid_R', 'PUpLid_R', (0, 40*deg1)),
+	('LoLid_R', 'PLoLid_R', (0, 20*deg1)),
+]
+
+def FaceWriteDrivers(fp):
+	drivers = []
+	for (driven, driver, coeff) in lidBones:
+		drivers.append(	(driven, 'ROTQ', None, 1, coeff,
+		 [("var", 'TRANSFORMS', [('HumanRig', driver, 'LOC_Z', C_LOCAL)])]) )
+	writeDrivers(fp, T_Panel, drivers)
+	return
+
 

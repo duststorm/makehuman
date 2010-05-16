@@ -34,12 +34,20 @@ deg20 = pi/9
 deg10 = pi/18
 deg1 = pi/180
 
+yunit = [0,1,0]
+zunit = [0,0,-1]
+
+
+unlimited = (-pi,pi, -pi,pi, -pi,pi)
+
+T_Panel = 'toggle&T_Panel'
+
 #
 #	Bone layers
 #
 
 L_MAIN = 	0x0001
-L_SKEL =	0x0002
+L_SPINE =	0x0002
 L_ARMIK =	0x0004
 L_ARMFK =	0x0008
 L_LEGIK =	0x0010
@@ -77,10 +85,13 @@ P_LKROT4 = 0x0001
 P_LKROTW = 0x0002
 P_IKLIN = 0x0004
 P_IKROT = 0x0008
+P_STRETCH = 0x0010
 
-P_ROTMODE = 0x00f0
+P_ROTMODE = 0x0f00
 P_QUAT = 0x0000
-P_XYZ = 0x0010
+P_XYZ = 0x0100
+
+
 
 C_ACT = 0x0004
 C_EXP = 0x0008
@@ -273,6 +284,34 @@ def writeBoneGroups(fp, groups):
 #	addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 #
 
+def addIKHandle(fp, bone, customShape, limit):
+	if limit:
+		cns = [('LimitDist', 0, ['LimitDist', 1.0, limit])]
+	else:
+		cns = []
+	addPoseBone(fp, 'True', bone, customShape, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, cns)
+
+def addSingleIK(fp, bone, lockRot, target, limit):
+	cns = [('IK', 0, ['IK', target, 1, None, (True, False, True), 1.0])]
+	if limit:
+		cns.append( ('LimitRot', C_OW_LOCAL, ['LimitRot', limit, (True, True, True)]) )
+	addPoseBone(fp, True, bone, None, None, (1,1,1), lockRot, (1,1,1), (1,1,1), 0, cns)
+
+def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
+	space = cflags & (C_OW_MASK + C_TG_MASK)
+	constraints = [
+		('CopyRot', space, ['RotIK', ikBone, 0.0, ikRot, (0,0,0), False]),
+		('CopyRot', space, ['RotFK', fkBone, 1.0, fkRot, (0,0,0), False])
+		]
+	if pflags & P_STRETCH:
+		constraints += [
+		('CopyScale', 0, ['StretchIK', ikBone, 0.0, (0,1,0), False]),
+		('CopyScale', 0, ['StretchFK', fkBone, 1.0, (0,1,0), False]),
+		]		
+	addPoseBone(fp, True, bone, None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
+	return
+
+
 def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 	global boneGroups, Mhx25
 
@@ -304,7 +343,7 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 	(xmin, ymin, zmin) = (-pi, -pi, -pi)
 	(xmax, ymax, zmax) = (pi, pi, pi)
 
-	for (label, flags, data) in constraints:
+	for (label, cflags, data) in constraints:
 		if type(label) == str:
 			typ = label
 			switch = True
@@ -312,31 +351,33 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 			(typ, switch) = label
 
 		if typ == 'IK':
-			addIkConstraint(fp, switch, flags, data, lockLoc, lockRot)
+			addIkConstraint(fp, switch, cflags, data, lockLoc, lockRot)
 		elif typ == 'Action':
-			addActionConstraint(fp, switch, flags, data)
+			addActionConstraint(fp, switch, cflags, data)
 		elif typ == 'CopyLoc':
-			addCopyLocConstraint(fp, switch, flags, data)
+			addCopyLocConstraint(fp, switch, cflags, data)
 		elif typ == 'CopyRot':
-			addCopyRotConstraint(fp, switch, flags, data)
+			addCopyRotConstraint(fp, switch, cflags, data)
 		elif typ == 'CopyScale':
-			addCopyScaleConstraint(fp, switch, flags, data)
+			addCopyScaleConstraint(fp, switch, cflags, data)
 		elif typ == 'CopyTrans':
-			addCopyTransConstraint(fp, switch, flags, data)
+			addCopyTransConstraint(fp, switch, cflags, data)
 		elif typ == 'LimitRot':
-			addLimitRotConstraint(fp, switch, flags, data)
+			addLimitRotConstraint(fp, switch, cflags, data)
 			(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
 			(usex,usey,usez) = data[2]			
 		elif typ == 'LimitLoc':
-			addLimitLocConstraint(fp, switch, flags, data)
+			addLimitLocConstraint(fp, switch, cflags, data)
+		elif typ == 'LimitScale':
+			addLimitScaleConstraint(fp, switch, cflags, data)
 		elif typ == 'DampedTrack':
-			addDampedTrackConstraint(fp, switch, flags, data)
+			addDampedTrackConstraint(fp, switch, cflags, data)
 		elif typ == 'StretchTo':
-			addStretchToConstraint(fp, switch, flags, data)
+			addStretchToConstraint(fp, switch, cflags, data)
 		elif typ == 'LimitDist':
-			addLimitDistConstraint(fp, switch, flags, data)
+			addLimitDistConstraint(fp, switch, cflags, data)
 		elif typ == 'ChildOf':
-			addChildOfConstraint(fp, switch, flags, data)
+			addChildOfConstraint(fp, switch, cflags, data)
 		else:
 			print(label)
 			print(typ)
@@ -369,8 +410,14 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 "    ik_lin_control %s ; \n" % ikLin +
 "    ik_lin_weight 0 ; \n"+
 "    ik_rot_control %s ; \n" % ikRot +
-"    ik_rot_weight 0 ; \n"+
-"    ik_stretch 0 ; \n"+
+"    ik_rot_weight 0 ; \n")
+	
+	if flags & P_STRETCH:
+		fp.write("    ik_stretch 0.1 ; \n")
+	else:
+		fp.write("    ik_stretch 0 ; \n")
+
+	fp.write(
 "    location (0,0,0) ; \n"+
 "    lock_location Array %d %d %d ;\n"  % (lockLocX, lockLocY, lockLocZ)+
 "    lock_rotation Array %d %d %d ;\n"  % (lockRotX, lockRotY, lockRotZ)+
@@ -389,6 +436,7 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 #	addCopyTransConstraint(fp, switch, flags, data):
 #	addLimitRotConstraint(fp, switch, flags, data):
 #	addLimitLocConstraint(fp, switch, flags, data):
+#	addLimitScaleConstraint(fp, switch, flags, data):
 #	addDampedTrackConstraint(fp, switch, flags, data):
 #	addStretchToConstraint(fp, switch, flags, data):
 #	addLimitDistConstraint(fp, switch, flags, data):
@@ -400,7 +448,7 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 	subtar = data[1]
 	chainlen = data[2]
 	pole = data[3]
-	(useLoc, useRot) = data[4]
+	(useLoc, useRot, useStretch) = data[4]
 	inf = data[5]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
@@ -436,7 +484,7 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 "      target_space '%s' ;\n" % targsp +
 "      use_position %s ;\n" % useLoc +
 "      use_rotation %s ;\n" % useRot +
-"      use_stretch True ;\n" +
+"      use_stretch %s ;\n" % useStretch +
 "      use_tail True ;\n" +
 "      use_target True ;\n" +
 "      weight 1 ;\n" +
@@ -688,6 +736,38 @@ def addLimitLocConstraint(fp, switch, flags, data):
 
 	return
 
+def addLimitScaleConstraint(fp, switch, flags, data):
+	global Mhx25
+	name = data[0]
+	(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
+	(usex, usey, usez) = data[2]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+	
+	if Mhx25:
+		fp.write(
+"    Constraint %s LIMIT_SCALE %s\n" % (name, switch) +
+"      active %s ;\n" % active +
+"      expanded %s ;\n" % expanded +
+"      influence 1 ;\n" +
+"      limit_transform True ;\n" +
+"      maximum_x %.6g ;\n" % xmax +
+"      maximum_y %.6g ;\n" % ymax +
+"      maximum_z %.6g ;\n" % zmax +
+"      minimum_x %.6g ;\n" % xmin +
+"      minimum_y %.6g ;\n" % ymin +
+"      minimum_z %.6g ;\n" % zmin +
+"      owner_space '%s' ;\n" % ownsp +
+"      proxy_local False ;\n" +
+"      target_space '%s' ;\n" % targsp +
+"      use_maximum_x %s ;\n" % usex +
+"      use_maximum_y %s ;\n" % usey +
+"      use_maximum_z %s ;\n" % usez +
+"      use_minimum_x %s ;\n" % usex +
+"      use_minimum_y %s ;\n" % usey +
+"      use_minimum_z %s ;\n" % usez +
+"    end Constraint\n")
+	return
+
 def addDampedTrackConstraint(fp, switch, flags, data):
 	global Mhx25
 	name = data[0]
@@ -745,7 +825,8 @@ def addStretchToConstraint(fp, switch, flags, data):
 def addLimitDistConstraint(fp, switch, flags, data):
 	global Mhx25
 	name = data[0]
-	subtar = data[1]
+	inf = data[1]
+	subtar = data[2]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -754,7 +835,7 @@ def addLimitDistConstraint(fp, switch, flags, data):
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
 "      expanded %s ;\n" % expanded +
-"      influence 1 ;\n" +
+"      influence %s ;\n" % inf +
 "      limit_mode 'LIMITDIST_INSIDE' ;\n" +
 "      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
@@ -889,12 +970,13 @@ def writeFkIkSwitch(fp, drivers):
 def writeFkIkSwitch(fp, drivers):
 	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
 		if PanelWorks:
-			cns = ("ik", 'SINGLE_PROP', [('HumanRig', targ)])
+			cnsData = ("ik", 'SINGLE_PROP', [('HumanRig', targ)])
 		else:
-			cns = ("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])
-		if cnsFK:
-			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, (1,-1), [cns])
-		writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), [cns])
+			cnsData = ("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])
+		for cnsName in cnsFK:
+			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (1,-1), [cnsData])
+		for cnsName in cnsIK:
+			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), [cnsData])
 
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 
@@ -988,7 +1070,7 @@ def setupRig(obj):
 		rig_arm_25.ArmJoints +
 		rig_finger_25.FingerJoints +
 		rig_leg_25.LegJoints +
-		rig_toe_25.ToeJoints +
+		#rig_toe_25.ToeJoints +
 		rig_face_25.FaceJoints +
 		rig_panel_25.PanelJoints,
 		
@@ -996,7 +1078,7 @@ def setupRig(obj):
 		rig_arm_25.ArmHeadsTails +
 		rig_finger_25.FingerHeadsTails +
 		rig_leg_25.LegHeadsTails +
-		rig_toe_25.ToeHeadsTails +
+		#rig_toe_25.ToeHeadsTails +
 		rig_face_25.FaceHeadsTails +
 		rig_panel_25.PanelHeadsTails)
 	return
@@ -1007,7 +1089,7 @@ def writeAllArmatures(fp):
 		rig_arm_25.ArmArmature +
 		rig_finger_25.FingerArmature +
 		rig_leg_25.LegArmature +
-		rig_toe_25.ToeArmature +
+		#rig_toe_25.ToeArmature +
 		rig_face_25.FaceArmature +
 		rig_panel_25.PanelArmature, True)
 	return
@@ -1017,7 +1099,7 @@ def writeAllPoses(fp):
 	rig_arm_25.ArmWritePoses(fp)
 	rig_finger_25.FingerWritePoses(fp)
 	rig_leg_25.LegWritePoses(fp)
-	rig_toe_25.ToeWritePoses(fp)
+	#rig_toe_25.ToeWritePoses(fp)
 	rig_face_25.FaceWritePoses(fp)
 	rig_panel_25.PanelWritePoses(fp)
 	return
@@ -1032,6 +1114,7 @@ def writeAllDrivers(fp):
 	writeFkIkSwitch(fp, rig_arm_25.ArmDrivers)
 	writeFkIkSwitch(fp, rig_leg_25.LegDrivers)
 	rig_finger_25.FingerWriteDrivers(fp)
+	rig_face_25.FaceWriteDrivers(fp)
 	return
 
 def writeAllProcesses(fp):

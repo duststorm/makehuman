@@ -59,8 +59,8 @@ TexDir = "~/makehuman/exports"
 #
 
 theScale = 1.0
+doBend = True
 useMesh = 1
-doSmash = 1
 verbosity = 2
 warnedTextureDir = False
 warnedVersion = False
@@ -79,6 +79,7 @@ todo = []
 
 T_ArmIK = 0x01
 T_LegIK = 0x02
+T_Stretch = 0x04
 T_Replace = 0x20
 T_Face = 0x40
 T_Shape = 0x80
@@ -92,17 +93,15 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face + T_Stretch
 
 #
 #	setFlagsAndFloats(rigFlags):
 #
 #	Global floats
-fLegIK = 0.0
-fArmIK = 0.0
 fFingerPanel = 0.0
 fFingerIK = 0.0
-fFingerCurl = 0.0
+fNoStretch = 0.0
 
 #	rigLeg and rigArm flags
 T_Toes = 0x0001
@@ -110,7 +109,7 @@ T_GoboFoot = 0x0002
 T_InvFoot = 0x0004
 
 T_FingerPanel = 0x100
-T_FingerCurl = 0x0200
+T_FingerRot = 0x0200
 T_FingerIK = 0x0400
 
 
@@ -129,18 +128,14 @@ def setFlagsAndFloats(rigFlags):
 	elif footRig == 'Gobo': rigLeg |= T_GoboFoot
 
 	if fingerRig == 'Panel': rigArm |= T_FingerPanel
+	elif fingerRig == 'Rotation': rigArm |= T_FingerRot
 	elif fingerRig == 'IK': rigArm |= T_FingerIK
-	elif fingerRig == 'Curl': rigArm |= T_FingerCurl
 
 	toggle |= T_Panel
 
-	# Global floats, used as influences
-	global fFingerCurl, fLegIK, fArmIK, fFingerIK
-
-	fFingerCurl = 1.0 if rigArm&T_FingerCurl else 0.0
-	fLegIK = 1.0 if toggle&T_LegIK else 0.0
-	fArmIK = 1.0 if toggle&T_ArmIK else 0.0
-	fFingerIK = 1.0 if rigArm&T_FingerIK else 0.0
+	global fNoStretch
+	if toggle&T_Stretch: fNoStretch == 0.0
+	else: fNoStretch = 1.0
 
 	return
 
@@ -908,28 +903,31 @@ def parseObject(args, tokens):
 	name = args[0]
 	typ = args[1]
 	datName = args[2]
-	try:
-		data = loadedData[typ.capitalize()][datName]	
-	except:
-		data = None
 
 	if typ == 'EMPTY':
 		print("EMPTY")
-	elif data == None:
-		print("Failed to find data: %s %s %s" % (name, typ, datName))
-		return
+		ob = bpy.data.objects.new(name, None)
+		loadedData['Object'][name] = ob
+		linkObject(ob, None)
+	else:
+		try:
+			data = loadedData[typ.capitalize()][datName]	
+		except:
+			raise NameError("Failed to find data: %s %s %s" % (name, typ, datName))
+			return
 
 	try:
 		ob = loadedData['Object'][name]
 		bpy.context.scene.objects.active = ob
-		#print("Found data")
+		#print("Found data", ob)
 	except:
 		ob = None
 
 	if ob == None:
+		print("Create", name, data, datName)
 		ob = createObject(typ, name, data, datName)
+		print("created", ob)
 		linkObject(ob, data)
-		bpy.context.scene.objects.active = ob
 
 	for (key, val, sub) in tokens:
 		if key == 'Modifier':
@@ -1110,11 +1108,8 @@ def parseMesh (args, tokens):
 		
 	mats = []
 	for (key, val, sub) in tokens:
-		if key == 'Verts' or \
-		   key == 'Edges':
-				pass
-		elif key == 'Faces':
-			parseFaces2(sub, me)
+		if key == 'Verts' or key == 'Edges' or key == 'Faces':
+			pass
 		elif key == 'MeshTextureFaceLayer':
 			parseUvTexture(val, sub, me)
 		elif key == 'MeshColorLayer':
@@ -1125,12 +1120,19 @@ def parseMesh (args, tokens):
 			parseShapeKeys(ob, me, val, sub)
 		elif key == 'Material':
 			try:
-				me.add_material(loadedData['Material'][val[0]])
+				mat = loadedData['Material'][val[0]]
+				me.add_material(mat)
 			except:
 				print("Could not add material", val[0])
 		else:
 			defaultKey(key, val,  sub, "me", [], globals(), locals())
 
+	for (key, val, sub) in tokens:
+		if key == 'Faces':
+			parseFaces2(sub, me)
+
+	for n,mat in enumerate(list(me.materials)):
+		print(n, mat)
 	return me
 
 #
@@ -1174,9 +1176,10 @@ def parseFaces2(tokens, me):
 			f.smooth = int(val[1])
 			n += 1
 		elif key == 'mn':
-			f = me.faces[int(val[0])]
-			f.material_index = int(val[1])
-			#print("mn", f, f.material_index)
+			fn = int(val[0])
+			mn = int(val[1])
+			f = me.faces[fn]
+			f.material_index = mn
 		elif key == 'ftall':
 			mat = int(val[0])
 			smooth = int(val[1])
@@ -1378,7 +1381,7 @@ def parseArmature (args, tokens):
 			bname = val[0]
 			if not invalid(val[1]):
 				bone = amt.edit_bones.new(bname)
-				parseBone(bone, amt.edit_bones, sub, heads, tails)
+				parseBone(bone, amt, sub, heads, tails)
 				loadedData['Bone'][bname] = bone
 		else:
 			defaultKey(key, val,  sub, "amt", ['MetaRig'], globals(), locals())
@@ -1443,8 +1446,17 @@ def parseBone(bone, amt, tokens, heads, tails):
 			bone.head = (float(val[0]), float(val[1]), float(val[2]))
 		elif key == "tail":
 			bone.tail = (float(val[0]), float(val[1]), float(val[2]))
-		elif key == 'restrict_select':
-			pass
+		#elif key == 'restrict_select':
+		#	pass
+		elif key == 'hidden' and val[0] == 'True':
+			name = bone.name
+			'''
+			#bpy.ops.object.mode_set(mode='OBJECT')
+			pbone = amt.bones[name]
+			pbone.hidden = True
+			print("Hide", pbone, pbone.hidden)
+			#bpy.ops.object.mode_set(mode='EDIT')			
+			'''
 		else:
 			defaultKey(key, val,  sub, "bone", [], globals(), locals())
 
@@ -1524,7 +1536,7 @@ def parsePoseBone(pbones, ob, args, tokens):
 			amt.bones.active = amt.bones[name]
 			ob.constraints.active = cns			
 			expr = "bpy.ops.%s" % val[0]
-			print(expr)
+			# print(expr)
 			exec(expr)
 			bpy.ops.object.mode_set(mode='POSE')
 		elif key == 'ik_dof':
@@ -1734,6 +1746,7 @@ def parseGroupObjects(args, tokens, grp):
 				pass
 	return
 
+
 #
 #	postProcess()
 #	setInfluence(bones, cnsName, w):
@@ -1766,7 +1779,8 @@ def postProcess():
 #
 
 def parseProcess(args, tokens):
-	#return
+	if not doBend:
+		return
 	rig = loadedData['Object'][args[0]]
 	parents = {}
 	objects = []
@@ -1796,12 +1810,19 @@ def parseProcess(args, tokens):
 		elif key == 'Snap':
 			eb = ebones[val[0]]
 			tb = ebones[val[1]]
-			if int(val[2]):
+			typ = val[2]
+			if typ == 'Inv':
 				eb.head = tb.tail
 				eb.tail = tb.head
-			else:
+			elif typ == 'Head':
+				eb.head = tb.head
+			elif typ == 'Tail':
+				eb.tail = tb.tail
+			elif typ == 'Both':
 				eb.head = tb.head
 				eb.tail = tb.tail
+			else:
+				raise NameError("Snap type %s" % typ)
 		elif key == 'PoseMode':
 			bpy.context.scene.objects.active = rig
 			bpy.ops.object.mode_set(mode='POSE')
@@ -2125,18 +2146,16 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	#preset = BoolProperty(name="Use rig preset", description="Use rig preset (Classic/Gobo)?", default=True)
-	#presetRig = EnumProperty(name="Rig", description="Choose preset rig", 
-	#	items = [('Classic','Classic','Classic'), ('Gobo','Gobo','Gobo')], default = '1')
 	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
 		items = [('Reverse foot','Reverse foot','Reverse foot'), ('Gobo','Gobo','Gobo')], default = '1')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
-		items = [('Panel','Panel','Panel'), ('Curl','Curl','Curl'), ('IK','IK','IK')], default = '1')
+		items = [('Rotation','Rotation','Rotation'), ('Panel','Panel','Panel'), ('IK','IK','IK')], default = '1')
 
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	proxy = BoolProperty(name="Proxy", description="Use proxy object", default=toggle&T_Proxy)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
+	stretch = BoolProperty(name="Stretchy limbs", description="Stretchy limbs", default=toggle&T_Stretch)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
 	symm = BoolProperty(name="Symmetric shapes", description="Keep shapekeys symmetric", default=toggle&T_Symm)
@@ -2147,11 +2166,12 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Armature = T_Armature if self.properties.armature else 0
 		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_Replace = T_Replace if self.properties.replace else 0
+		O_Stretch = T_Stretch if self.properties.stretch else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		#O_Preset = T_Preset if self.properties.preset else 0
-		toggle =  O_Mesh | O_Armature | O_Proxy | T_ArmIK | T_LegIK | O_Replace | O_Face | O_Shape | O_Symm | T_MHX 
+		toggle =  O_Mesh | O_Armature | O_Proxy | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | T_MHX 
 
 		
 		readMhxFile(self.properties.path, 	

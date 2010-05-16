@@ -108,52 +108,52 @@ PanelHeadsTails = [
 
 
 PanelArmature = [
-	('PFace', 'toggle&T_Panel',		pi, None, F_WIR, L_PANEL, (1,1,1) ),
-	('PFaceDisp', 'toggle&T_Panel',		pi, 'PFace', F_WIR+F_RES, L_PANEL, (1,1,1) ),
-	('PBrow_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PBrow_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PBrows', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLid_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLid_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLid_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLid_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PCheek_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PCheek_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PNose', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PUpLip', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PLoLip', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PMouth', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLip_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLip_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLip_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLip_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PMouth_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PMouth_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PTounge', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PJaw', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFace', T_Panel,		pi, None, F_WIR, L_PANEL, (1,1,1) ),
+	('PFaceDisp', T_Panel,		pi, 'PFace', F_WIR+F_RES, L_PANEL, (1,1,1) ),
+	('PBrow_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PBrow_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PBrows', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLid_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLid_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLid_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLid_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PCheek_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PCheek_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PNose', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PUpLip', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PLoLip', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PMouth', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLip_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLip_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLip_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLip_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PMouth_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PMouth_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PTounge', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PJaw', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
-	('PArmIK_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PArmIK_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLegIK_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLegIK_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PHandLocal_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PHandLocal_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PFootLocal_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PFootLocal_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PArmIK_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PArmIK_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLegIK_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLegIK_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PHandLocal_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PHandLocal_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PFootLocal_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PFootLocal_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
-	('MHRelax_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCurl_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCone_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHSpread_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHScrunch_L', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHLean_L', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHRelax_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCurl_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCone_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHSpread_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHScrunch_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHLean_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
-	('MHRelax_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCurl_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCone_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHSpread_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHScrunch_R', 'toggle&T_Panel',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHLean_R', 'toggle&T_Panel',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHRelax_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCurl_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHCone_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHSpread_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHScrunch_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHLean_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
 ]
 
@@ -165,9 +165,9 @@ MX = 0.25
 
 
 def PanelWritePoses(fp):
-	addPoseBone(fp, 'toggle&T_Panel', 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+	addPoseBone(fp, T_Panel, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'toggle&T_Panel', 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, T_Panel, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	cSlider(fp,  'PBrow_L', MX)
 	cSlider(fp,  'PBrow_R', MX)
@@ -214,11 +214,11 @@ def PanelWritePoses(fp):
 	return
 
 def cSlider(fp, bone, mx):
-	addPoseBone(fp, 'toggle&T_Panel', bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-mx,mx, 0,0, -mx,mx), (1,1,1,1,1,1)])])
 
 def xSlider(fp, bone, mn, mx):
-	addPoseBone(fp, 'toggle&T_Panel', bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, 0,0, 0,0), (1,1,1,1,1,1)])])
 
 '''
@@ -251,10 +251,10 @@ FaceDrivers = {
 	'BrowsOutUp_R' : ('PBrow_R', 'LOC_Z', (0,-K)),
 
 #	Lids
-	'UpLidDown_L' : ('PUpLid_L', 'LOC_Z', (0,K)),
-	'UpLidDown_R' : ('PUpLid_R', 'LOC_Z', (0,K)),
-	'LoLidUp_L' : ('PLoLid_L', 'LOC_Z', (0,-K)),
-	'LoLidUp_R' : ('PLoLid_R', 'LOC_Z', (0,-K)),
+	#'UpLidDown_L' : ('PUpLid_L', 'LOC_Z', (0,K)),
+	#'UpLidDown_R' : ('PUpLid_R', 'LOC_Z', (0,K)),
+	#'LoLidUp_L' : ('PLoLid_L', 'LOC_Z', (0,-K)),
+	#'LoLidUp_R' : ('PLoLid_R', 'LOC_Z', (0,-K)),
 
 #	Nose and jaw
 

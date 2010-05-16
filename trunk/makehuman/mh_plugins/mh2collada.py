@@ -107,7 +107,7 @@ def boneOK(flags, bone, parent):
 		return reparents[bone]
 	elif flags & F_DEF:
 		return parent
-	elif bone in ['Torso', 'Pelvis']:
+	elif bone in ['HipsInv']:
 		return parent
 	return None
 	
@@ -241,10 +241,7 @@ def exportDae(obj, fp):
 	nBones = len(bones)
 
 	weights = {}
-	readSkinWeights(weights, "data/templates/vertexgroups-common25.mhx")	
-	readSkinWeights(weights, "data/templates/vertexgroups-classic25.mhx")	
-	readSkinWeights(weights, "data/templates/vertexgroups-toes25.mhx")	
-	readSkinWeights(weights, "data/templates/vertexgroups-foot25.mhx")
+	readSkinWeights(weights, "data/templates/vertexgroups-bones25.mhx")	
 	# fixTwistWeights(fp, weights)
 	
 	vertexWeights = {}

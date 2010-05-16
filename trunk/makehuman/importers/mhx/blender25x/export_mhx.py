@@ -1163,6 +1163,10 @@ def exportMesh(ob, fp):
 	
 	if expMsk & M_MHX and obName == "Human":
 		fp.write("    *** VertexGroup\n")
+		fp1 = mhxOpen(M_VGroup, "vertexgroups25.mhx")
+		exportVertexGroups(ob, me, 'All', fp1)
+		mhxClose(fp1)
+		'''
 		fp1 = mhxOpen(M_VGroup, "vertexgroups-common25.mhx")
 		exportVertexGroups(ob, me, 'Common', fp1)
 		mhxClose(fp1)
@@ -1179,6 +1183,7 @@ def exportMesh(ob, fp):
 		fp1 = mhxOpen(M_VGroup, "vertexgroups-%s25.mhx" % theRig)
 		exportVertexGroups(ob, me, 'Rig', fp1)
 		mhxClose(fp1)
+		'''
 	else:
 		exportVertexGroups(ob, me, 'All', fp)
 
@@ -1259,8 +1264,8 @@ def exportVertexGroups(ob, me, typ, fp):
 			fp.write("  VertexGroup %s\n" % (vgName))
 			for v in me.verts:
 				for grp in v.groups:
-					if grp.group == index:
-						fp.write("    wv %d %.6g ;\n" % (v.index, grp.weight))
+					if grp.group == index and grp.weight > 0.00005:
+						fp.write("    wv %d %.4g ;\n" % (v.index, grp.weight))
 						if doToe:
 							addToeWeight(toeDict, v.index, grp.weight)
 							
@@ -1829,7 +1834,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	mask = M_MHX+M_Mat+M_Geo+M_Amt+M_Shape+M_VGroup
+	mask = M_Geo+M_VGroup
 
 	mhx = BoolProperty(name="MHX", description="Include materials", default=mask&M_MHX)
 	xall = BoolProperty(name="Everything", description="Include everything", default=mask&M_All)
