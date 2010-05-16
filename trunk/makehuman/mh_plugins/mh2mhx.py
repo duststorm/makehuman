@@ -443,11 +443,9 @@ def copyMeshFile249(obj, tmpl, fp):
 				mainMesh = False
 				exportProxy24(obj, fp)
 			elif lineSplit[1] == 'mesh' and mainMesh:
-				#shpfp = open("data/templates/shapekeys24.mhx", "rU")
-				#exportShapeKeys(obj, shpfp, fp, None)
-				#shpfp.close()
 				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
 				copyProxy("data/templates/shapekeys-facial25.mhx", fp, None)	
+				copyProxy("data/templates/shapekeys-extra24.mhx", fp, None)	
 				copyProxy("data/templates/shapekeys-body25.mhx", fp, None)	
 				writeIpo(fp)
 				fp.write(line)
@@ -527,6 +525,7 @@ def exportProxy24(obj, fp):
 		elif lineSplit[0] == 'shapekey':
 			fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
 			copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxyVerts)	
+			copyProxy("data/templates/shapekeys-extra24.mhx", fp, proxyVerts)	
 			copyProxy("data/templates/shapekeys-body25.mhx", fp, proxyVerts)	
 			writeIpo(fp)
 		else:
