@@ -43,6 +43,7 @@ import mh2obj
 import mh2bvh
 import mh2mhx
 import mh2collada
+import mh2md5
 import humanmodifier
 import hairgenerator
 
@@ -170,6 +171,8 @@ class ExportTaskView(gui3d.TaskView):
                                      ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 140, 9.2])
         self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                          'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 140, 9.2])
+        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
+                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[138, 140, 9.2])
                                          
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 160, 9.2], selected=True)
@@ -201,6 +204,8 @@ class ExportTaskView(gui3d.TaskView):
                 mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
             elif self.collada.selected:
                 mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".dae"))
+            elif self.md5.selected:
+                mh2md5.exportMd5(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
 
             if len(filename)> 0 and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
                if self.hairMesh.selected:
