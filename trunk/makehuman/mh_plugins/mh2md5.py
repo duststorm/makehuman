@@ -101,7 +101,8 @@ def exportMd5(obj, filename):
     f.write('\n\tnumverts %d\n' % (len(obj.verts)))
     for vert in obj.verts:
         if obj.uvValues:
-            u, v = obj.uvValues[vert.idx]
+            face = vert.sharedFaces[0]
+            u, v = obj.uvValues[face.uv[face.verts.index(vert)]]
         else:
             u, v = 0, 0
         # vert [vertIndex] ( [texU] [texV] ) [weightIndex] [weightElem]
