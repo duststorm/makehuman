@@ -61,6 +61,9 @@ class Human(gui3d.Object):
         self.editMode = 'macro'
         self.modellingType = 'translation'
         self.symmetryModeEnabled = False
+	
+	self.enableUVInterpolation = 0
+	self.targetUVBuffer = {}
 
         self.detailTargetX1a = None
         self.detailTargetX2a = None
