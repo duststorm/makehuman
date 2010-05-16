@@ -61,7 +61,7 @@ Object Human MESH Human
       quaternion False ;
       realtime True ;
       render True ;
-      use_bone_envelopes True ;
+      use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
   active_material Refer Material SSS_skinshader ;
