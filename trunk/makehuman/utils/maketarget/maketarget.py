@@ -302,6 +302,43 @@ def saveTranslationTarget(targetPath):
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
 
+
+def saveIndexSelectedVerts(filePath):
+    """
+    This function saves the indices of selected verts
+
+    Parameters
+    ----------
+
+    filePath:
+        *string*. A string containing the operating system path to the
+        file to be written.    
+
+    """
+    
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)    
+    activeObjs = Blender.Object.GetSelected()
+    activeObj = activeObjs[0]
+    obj = activeObj.getData(mesh=True)    
+    
+    try:
+        fileDescriptor = open(filePath, "w")
+    except:
+        print "Unable to open %s",(filePath)
+        return  None
+
+    nVertsExported = 0
+    for index in xrange(len(obj.verts)):       
+        if obj.verts[index].sel == 1:
+            fileDescriptor.write("%d\n"%(index))
+    fileDescriptor.close()
+
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
+
+    
+
 def saveTranslationTargetAndHisSymm(targetPath):
     """
     This function saves a morph target file and his symmetric.
@@ -814,6 +851,8 @@ def event(event, value):
         Window.FileSelector (utility1, "Select files")
     elif event == Draw.UKEY:
         Window.FileSelector (utility5, "Select files")
+    elif event == Draw.PKEY:
+        Window.FileSelector (saveIndexSelectedVerts, "Select files")
 
 
 def b_event(event):
