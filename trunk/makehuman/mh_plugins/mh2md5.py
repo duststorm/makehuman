@@ -93,11 +93,10 @@ def exportMd5(obj, filename):
     f = open(filename, 'w')
     f.write('MD5Version 10\n')
     f.write('commandline ""\n\n')
-    f.write('numJoints %d\n' % (joints+1))
+    f.write('numJoints %d\n' % (joints+1)) # Amount of joints + the hardcoded origin below
     f.write('numMeshes %d\n\n' % (1)) # TODO: 2 in case of hair
     f.write('joints {\n')
-    f.write('\t"%s" %d ( %f %f %f ) ( %f %f %f )\n' % ('origin', -1,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    f.write('\t"%s" %d ( %f %f %f ) ( %f %f %f )\n' % ('origin', -1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     writeJoint(f, skeletonRoot)
     f.write('}\n\n')
     f.write('mesh {\n')
@@ -114,13 +113,13 @@ def exportMd5(obj, filename):
     f.write('\n\tnumtris %d\n' % (len(obj.faces)))
     for face in obj.faces:
         # tri [triIndex] [vertIndex1] [vertIndex2] [vertIndex3]
-        f.write('\ttri %d %d %d %d\n' % (face.idx, face.verts[0].idx, face.verts[1].idx, face.verts[2].idx))
+        f.write('\ttri %d %d %d %d\n' % (face.idx, face.verts[2].idx, face.verts[1].idx, face.verts[0].idx))
     f.write('\n\tnumweights %d\n' % (len(obj.verts)))
     for vert in obj.verts:
         # TODO: We attach all vertices to the root with weight 1.0, this should become
         # real weights to the correct bones
         # weight [weightIndex] [jointIndex] [weightValue] ( [xPos] [yPos] [zPos] )
-        f.write('\tweight %d %d %f ( %f %f %f )\n' % (vert.idx, 0, 1.0, vert.co[0], vert.co[1], vert.co[2]))
+        f.write('\tweight %d %d %f ( %f %f %f )\n' % (vert.idx, 0, 1.0, vert.co[0], -vert.co[2], vert.co[1]))
     f.write('}\n\n')
     f.close()
 
@@ -168,9 +167,6 @@ def calcJointOffsets(obj, joint, index = 0, parent=None):
       *Joint Object*.  The parent joint object or 'None' if not specified.
     """
     
-    # Joints counter
-    joints = 1
-    
     # Store parent
     joint.parent = parent
 
@@ -181,6 +177,7 @@ def calcJointOffsets(obj, joint, index = 0, parent=None):
         for v in f.verts:
             verts.append(v.co)
     joint.position = aljabr.centroid(verts)
+    joint.position[1], joint.position[2] = -joint.position[2], joint.position[1]
 
     # Calculate offset
     if parent:
@@ -202,8 +199,6 @@ def calcJointOffsets(obj, joint, index = 0, parent=None):
 
     # Calculate child offsets
     for child in joint.children:
-        childJoints = calcJointOffsets(obj, child, index, joint)
-        index += childJoints
-        joints += childJoints
+        index = calcJointOffsets(obj, child, index, joint)
 
-    return joints
+    return index

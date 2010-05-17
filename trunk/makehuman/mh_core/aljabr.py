@@ -613,11 +613,3 @@ def axisAngleToQuaternion(axis, angle):
     qz = axis[2] * s
     qw = cos(angle/2.0)
     return (qx, qy, qz, qw)
-    
-def axisAngleToQuaternion(axis, angle):
-    s = sin(angle/2.0)
-    qx = axis[0] * s
-    qy = axis[1] * s
-    qz = axis[2] * s
-    qw = cos(angle/2.0)
-    return (qx, qy, qz, qw)
