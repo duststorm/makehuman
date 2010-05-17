@@ -324,6 +324,99 @@ def applyMorph(vertsList, targetPath):
 
 
 
+def meshComparison(mesh1, mesh2, indexListPath = None):
+    """
+    This function measure the similarity of 2 meshes.
+    Instead to have ray intersection to measure the surfaces differences,
+    we subdivide the mesh2, in order to in increase the density, and then
+    we use the vert to vert distance.
+
+
+    Parameters
+    ----------
+
+    mesh1:
+        *string*. The path of the new wavefront obj
+
+    mesh2:
+        *string*. The path of the old wavefront obj
+   
+
+    """    
+
+    #We load the old mesh coords, and then tesselate it
+    vertsList1 = loadVertsCoo(mesh1)
+    vertices2 = loadVertsCoo(mesh2)
+
+
+    if indexListPath:
+        indexList = []
+        try:
+            fileDescriptor = open(indexListPath)
+        except:
+            print 'Error opening %s file' % path
+            return        
+        for data in fileDescriptor:
+            lineData = data.split()            
+            i = int(lineData[0])
+            indexList.append(i)
+        fileDescriptor.close()
+    else:
+        indexList = xrange(len(vertsList1))
+
+    faces = loadFacesIndices(mesh2)
+    tess = subdivideObj(faces, vertices2, 2)
+    vertsList2 = tess[1]    
+
+    overwrite = 0 #Just for more elegant one-line print output progress
+    
+    #Init of the octree
+    octree = simpleoctree.SimpleOctree(vertsList2, .25)
+    
+
+    #For each vert of new mesh we found the nearest verts of old one
+    vDistances = []
+    for i1 in indexList:
+        v1 = vertsList1[i1]       
+
+        #We use octree to search only on a small part of the whole old mesh.
+        vertsList3 = octree.root.getSmallestChild(v1)
+
+        #... find nearest verts on old mesh
+        dMin = 100
+        for v2 in vertsList3.verts:
+            d = vdist(v1, v2)            
+            if d < dMin:
+                dMin = d
+
+        vDistances.append(dMin)
+        
+
+        word = "Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
+        sys.stdout.write("%s%s\r" % (word, " "*overwrite ))
+        sys.stdout.flush()
+        overwrite = len(word)
+
+    dSum = 0
+    for d in vDistances:
+        dSum += d
+
+    averageDist = dSum/len(vDistances)
+
+    print "Average distance %s %s = %s"%(mesh1,mesh2,averageDist)
+    return averageDist
+        
+
+
+
+
+
+
+
+
+
+
+
 def saveData(mesh1, mesh2, dataPath, epsilon = 0.2):
     """
     This function link the mesh1 to the mesh2.
@@ -747,10 +840,11 @@ def main(argv):
     buildit = None
     testobj = None
     folder = None
+    simil = None
 
     #handle options
     try:
-        opts, args = getopt.getopt(argv, "h", ["help","build","target=","targetbase=","tofit=","mold=","datafile=","testobj=","folder="])
+        opts, args = getopt.getopt(argv, "h", ["help","build","simil=","target=","targetbase=","tofit=","mold=","datafile=","testobj=","folder="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -774,6 +868,9 @@ def main(argv):
             testobj = arg
         elif opt in ("--folder"):
             folder = arg
+        elif opt in ("--simil"):
+            print "SIMIL"
+            simil = arg
 
     if buildit:
         saveData(mesh1, mesh2, datafile)
@@ -782,6 +879,9 @@ def main(argv):
         faces = loadFacesIndices(testobj)
         tess = subdivideObj(faces, vertices, 2)
         saveTestObj(tess[0], tess[1], testobj+".subdivided.obj")
+    elif simil:
+        print "COMPAISON"
+        meshComparison(mesh1, mesh2, simil)        
     else:
         if folder:
             fileList = os.listdir(folder)
