@@ -56,6 +56,12 @@ loadFile = ""
 targetBuffer = [] #Last target loaded
 originalVerts = [] #Original base mesh coords
 
+try:
+    from topologylib import *
+    import simpleoctree
+except:
+    print "topology libs not found"
+
 
 #Some math stuff
 def vsub(vect1,vect2):
@@ -170,6 +176,168 @@ def doMorph(mFactor):
     print "Target time", time.time() - t1
 
 
+
+
+def meshComparison(indexListPath, subdivide = None):
+    """
+    This function measure the similarity of 2 meshes.
+    Instead to have ray intersection to measure the surfaces differences,
+    we subdivide the mesh2, in order to in increase the density, and then
+    we use the vert to vert distance.
+    """
+    
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)
+    activeObjs = Blender.Object.GetSelected()
+    activeObj1 = activeObjs[0]
+    activeObj2 = activeObjs[1]
+    obj1 = activeObj1.getData(mesh=True)
+    obj2 = activeObj2.getData(mesh=True)
+
+    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
+    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
+    faces = [[v.index for v in f.verts] for f in obj2.faces]     
+   
+    if subdivide:
+        vertsList2toProcess = subdivideObj(faces, vertsList2, 2)[1]
+    vertsList2toProcess = vertsList2
+
+    if indexListPath:
+        indexList = []
+        try:
+            fileDescriptor = open(indexListPath)
+        except:
+            print 'Error opening %s file' % path
+            return        
+        for data in fileDescriptor:
+            lineData = data.split()            
+            i = int(lineData[0])
+            indexList.append(i)
+        fileDescriptor.close()
+    else:
+        indexList = xrange(len(vertsList1))        
+
+    overwrite = 0 #Just for more elegant one-line print output progress
+    
+    #Init of the octree
+    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)    
+
+    #For each vert of new mesh we found the nearest verts of old one
+    vDistances = []
+    for i1 in indexList:
+        v1 = vertsList1[i1]       
+
+        #We use octree to search only on a small part of the whole old mesh.
+        vertsList3 = octree.root.getSmallestChild(v1)
+
+        #... find nearest verts on old mesh
+        dMin = 100
+        for v2 in vertsList3.verts:
+            d = vdist(v1, v2)            
+            if d < dMin:
+                dMin = d
+        vDistances.append(dMin)        
+
+        word = "Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
+        sys.stdout.write("%s%s\r" % (word, " "*overwrite ))
+        sys.stdout.flush()
+        overwrite = len(word)
+
+    dSum = 0
+    for d in vDistances:
+        dSum += d
+
+    averageDist = dSum/len(vDistances)
+    print "Average distance = %s"%(averageDist)
+    return averageDist
+
+
+def findCloserMesh(filepath):
+    #Because Blender filechooser return a file
+    #it's needed to extract the dirname
+    
+    folderToScan = os.path.dirname(filepath)
+    targetList = os.listdir(folderToScan)
+    results = {}
+    for targetName in targetList:
+        targetPath = os.path.join(folderToScan,targetName)
+        loadTranslationTarget(targetPath)
+        doMorph(1.0)
+        n = meshComparison("confrontation.verts")#Hardcoded path!
+        results[n] = targetPath
+        doMorph(-1.0)
+    dKeys = results.keys()
+    dKeys.sort()
+    closerTarget = results[dKeys[0]]
+    loadTranslationTarget(closerTarget)
+    doMorph(1.0)
+    print "Closer target = %s"%(closerTarget)
+    
+
+
+
+def fitTo():
+    """
+    This function loads a morph target file.
+
+    Parameters
+    ----------
+
+    targetPath:
+        *string*. A string containing the operating system path to the
+        file to be read.
+
+    """
+    global targetBuffer,current_target
+    try:
+        fileDescriptor = open(targetPath)
+    except:
+        Draw.PupMenu("Unable to open %s",(targetPath))
+        return  None
+    activeObjs = Blender.Object.GetSelected()
+    if len(activeObjs) > 0:
+        activeObj = activeObjs[0]
+    else:
+        Draw.PupMenu("No object selected")
+        return None
+
+    obj = activeObj.getData(mesh=True)
+    try:
+        obj.verts
+    except:
+        Draw.PupMenu("The selected obj is not a mesh")
+        return None
+
+    #check mesh version
+    if len(obj.verts) == 11787:
+        print "Working on Mesh MH1.0.0prealpha"
+        if len(obj.verts) < 11787:
+            Draw.PupMenu("The selected obj is not last version of MHmesh")
+            if len(obj.verts) == 11751:
+                print "Working on Mesh MH0.9.2NR"
+            elif len(obj.verts) < 11751:
+                print "Working on Mesh 0.9.1 or earlier"
+
+
+    current_target = targetPath
+    targetData = fileDescriptor.readlines()
+    fileDescriptor.close()
+    targetBuffer = []
+    maxIndexOfVerts = len(obj.verts)
+    for vData in targetData:
+        vectorData = vData.split()
+        if vectorData[0].find('#')==-1:
+            if len(vectorData) < 4:
+                vectorData = vData.split(',') #compatible old format
+            mainPointIndex = int(vectorData[0])
+            if mainPointIndex < maxIndexOfVerts:
+                pointX = float(vectorData[1])
+                pointY = float(vectorData[2])
+                pointZ = float(vectorData[3])
+                targetBuffer.append([mainPointIndex, pointX,pointY,pointZ])
+            #else:
+            #    Draw.PupMenu("WARNING: target has more verts than Base mesh")
+    return 1
 
 def loadTranslationTarget(targetPath):
     """
@@ -853,6 +1021,9 @@ def event(event, value):
         Window.FileSelector (utility5, "Select files")
     elif event == Draw.PKEY:
         Window.FileSelector (saveIndexSelectedVerts, "Select files")
+    elif event == Draw.AKEY:
+        Window.FileSelector (findCloserMesh, "Select files")
+        
 
 
 def b_event(event):
