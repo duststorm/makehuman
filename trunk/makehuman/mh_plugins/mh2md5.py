@@ -34,7 +34,7 @@ __docformat__ = 'restructuredtext'
 
 import module3d
 import aljabr
-
+from math import acos
 
 class Joint:
 
@@ -47,10 +47,12 @@ class Joint:
 
     def __init__(self, name, children):
         self.name = name
+        self.parent = None
         self.children = children
-        self.position = [0.0, 0.0, 0.0]
-        self.offset = [0.0, 0.0, 0.0]
-        self.parentIndex = 0
+        self.position = [0.0, 0.0, 0.0]         # Global position in the scene
+        self.offset = [0.0, 0.0, 0.0]           # Position Relative to the parent joint
+        self.direction = [0.0, 0.0, 0.0, 0.0]   # Global rotation in the scene
+        self.rotation = [0.0, 0.0, 0.0, 0.0]    # Rotation relative to the parent joint
         self.index = 0
 
 skeletonRoot = Joint('joint-pelvis', [Joint('joint-spine3', [Joint('joint-spine2', [Joint('joint-spine1', [Joint('joint-neck', [Joint('joint-head', [Joint('joint-mouth',
@@ -91,12 +93,14 @@ def exportMd5(obj, filename):
     f = open(filename, 'w')
     f.write('MD5Version 10\n')
     f.write('commandline ""\n\n')
-    f.write('numJoints %d\n' % (joints))
+    f.write('numJoints %d\n' % (joints+1))
     f.write('numMeshes %d\n\n' % (1)) # TODO: 2 in case of hair
-    f.write('joints\n{\n')
+    f.write('joints {\n')
+    f.write('\t"%s" %d ( %f %f %f ) ( %f %f %f )\n' % ('origin', -1,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     writeJoint(f, skeletonRoot)
     f.write('}\n\n')
-    f.write('mesh\n{\n')
+    f.write('mesh {\n')
     f.write('\tshader "%s"\n' % (obj.texture or "")) # TODO: create the shader file
     f.write('\n\tnumverts %d\n' % (len(obj.verts)))
     for vert in obj.verts:
@@ -135,16 +139,19 @@ def writeJoint(f, joint):
   ident:     
     *integer*.  The joint identifier.
   """
-    # TODO: Calculate the quaternion correctly
+    if joint.parent:
+        parentIndex = joint.parent.index
+    else:
+        parentIndex = 0
     # "[boneName]"   [parentIndex] ( [xPos] [yPos] [zPos] ) ( [xOrient] [yOrient] [zOrient] )
-    f.write('\t"%s" %d ( %f %f %f ) ( %f %f %f )\n' % (joint.name, joint.parentIndex,
-        joint.offset[0], joint.offset[1], joint.offset[2],
-        0.0, 0.0, 0.0))
+    f.write('\t"%s" %d ( %f %f %f ) ( %f %f %f )\n' % (joint.name, parentIndex,
+        joint.position[0], joint.position[1], joint.position[2],
+        joint.direction[0], joint.direction[1], joint.direction[2]))
 
     for joint in joint.children:
         writeJoint(f, joint)
 
-def calcJointOffsets(obj, joint, index = -1, parent=None):
+def calcJointOffsets(obj, joint, index = 0, parent=None):
     """
     This function calculates the position and offset for a joint and calls itself for 
     each 'child' joint in the hierarchical joint structure. It returns the amount of joints
@@ -163,11 +170,13 @@ def calcJointOffsets(obj, joint, index = -1, parent=None):
     
     # Joints counter
     joints = 1
+    
+    # Store parent
+    joint.parent = parent
 
-    # Calculate joint positions
+    # Calculate position
     g = obj.getFaceGroup(joint.name)
     verts = []
-    #print joint.name
     for f in g.faces:
         for v in f.verts:
             verts.append(v.co)
@@ -177,12 +186,24 @@ def calcJointOffsets(obj, joint, index = -1, parent=None):
     if parent:
         joint.offset = aljabr.vsub(joint.position, parent.position)
         
+    # Calculate direction
+    direction = aljabr.vnorm(joint.offset)
+    axis = aljabr.vnorm(aljabr.vcross([0.0, 0.0, 1.0], direction))
+    angle = acos(aljabr.vdot([0.0, 0.0, 1.0], direction))
+    joint.direction = aljabr.axisAngleToQuaternion(axis, angle)
+    
+    # Calculate rotation
+    if parent:
+        pass
+        
     # Calculate index
-    joint.parentIndex = index
-    joint.index = index + 1
+    index += 1
+    joint.index = index
 
     # Calculate child offsets
     for child in joint.children:
-        joints += calcJointOffsets(obj, child, joint.index, joint)
+        childJoints = calcJointOffsets(obj, child, index, joint)
+        index += childJoints
+        joints += childJoints
 
     return joints
