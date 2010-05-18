@@ -175,7 +175,106 @@ def doMorph(mFactor):
     Blender.Window.RedrawAll()
     print "Target time", time.time() - t1
 
+def linkMask(filePath, subdivide = None):
+    """
+    This function measure the similarity of 2 meshes.
+    Instead to have ray intersection to measure the surfaces differences,
+    we subdivide the mesh2, in order to in increase the density, and then
+    we use the vert to vert distance.
+    """
+    
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)
+    activeObjs = Blender.Object.GetSelected()
+    activeObj1 = activeObjs[0]#The mask must belates selected obj
+    activeObj2 = activeObjs[1]
+    obj1 = activeObj1.getData(mesh=True)
+    obj2 = activeObj2.getData(mesh=True)
 
+    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
+    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
+    faces = [[v.index for v in f.verts] for f in obj2.faces]     
+   
+    if subdivide:
+        vertsList2toProcess = subdivideObj(faces, vertsList2, 2)[1]
+    vertsList2toProcess = vertsList2
+
+    indexList = xrange(len(vertsList1))        
+
+    #We need to add index information to each vert.    
+    for i,v in enumerate(vertsList2toProcess):
+        v.append(i)
+    
+    #Init of the octree
+    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)    
+
+    #For each vert of new mesh we found the nearest verts of old one
+    linked = []
+    for i1 in indexList:
+        v1 = vertsList1[i1]       
+
+        #We use octree to search only on a small part of the whole old mesh.
+        vertsList3 = octree.root.getSmallestChild(v1)
+
+        #... find nearest verts on old mesh
+        i2 = 0
+        dMin = 100
+        for v2 in vertsList3.verts:
+            d = vdist(v1, v2)            
+            if d < dMin:
+                dMin = d
+                i2 = v2[3]
+                print dMin
+        linked.append([i1,i2])
+                
+               
+
+        print"Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
+
+        
+    try:
+        fileDescriptor = open(filePath, "w")
+    except:
+        print "Unable to open %s",(filePath)
+        return  None
+
+    for data in linked:
+        fileDescriptor.write("%d %d\n" % (data[0],data[1]))
+    fileDescriptor.close()
+
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
+
+def maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientIndices):
+    """
+    This function measure the similarity of 2 meshes.
+    Instead to have ray intersection to measure the surfaces differences,
+    we subdivide the mesh2, in order to in increase the density, and then
+    we use the vert to vert distance.
+    """
+    
+
+    
+    
+
+  
+
+    #For each vert of base Mask we found the nearest verts of scan Mask
+    vDistances = []
+    dSum = 0
+    for i in xrange(len(linkMaskBaseIndices)):
+        i1 = linkMaskBaseIndices[i]
+        i2 = linkMaskClientIndices[i]
+        v1 = vertsList1[i1]
+        v2 = vertsList2[i2]
+        dst = vdist(v1, v2)
+        vDistances.append(dst)        
+        dSum += dst   
+      
+
+    averageDist = dSum/len(vDistances)
+
+    return averageDist  
 
 
 def meshComparison(indexListPath, subdivide = None):
@@ -249,12 +348,51 @@ def meshComparison(indexListPath, subdivide = None):
 
     averageDist = dSum/len(vDistances)
     print "Average distance = %s"%(averageDist)
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
     return averageDist
 
 
 def findCloserMesh(filepath):
     #Because Blender filechooser return a file
     #it's needed to extract the dirname
+    
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)
+    activeObjs = Blender.Object.GetSelected()
+    activeObj1 = activeObjs[0]#The base must be latest selected obj
+    activeObj2 = activeObjs[1]
+    obj1 = activeObj1.getData(mesh=True)
+    obj2 = activeObj2.getData(mesh=True)
+
+    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
+    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
+    faces = [[v.index for v in f.verts] for f in obj2.faces]  
+    
+    linkMaskBaseIndices = []
+    linkMaskClientIndices = []
+    
+    try:
+        fileDescriptor = open("mask.linked")
+    except:
+        print 'Error opening %s file' % path
+        return        
+    for data in fileDescriptor:
+        lineData = data.split()            
+        i = int(lineData[1])
+        linkMaskBaseIndices.append(i)
+    fileDescriptor.close()
+        
+    try:
+        fileDescriptor = open("temp.linked")
+    except:
+        print 'Error opening %s file' % path
+        return        
+    for data in fileDescriptor:
+        lineData = data.split()            
+        i = int(lineData[1])
+        linkMaskClientIndices.append(i)
+    fileDescriptor.close()
     
     folderToScan = os.path.dirname(filepath)
     targetList = os.listdir(folderToScan)
@@ -263,7 +401,7 @@ def findCloserMesh(filepath):
         targetPath = os.path.join(folderToScan,targetName)
         loadTranslationTarget(targetPath)
         doMorph(1.0)
-        n = meshComparison("confrontation.verts")#Hardcoded path!
+        n = maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientIndices)
         results[n] = targetPath
         doMorph(-1.0)
     dKeys = results.keys()
@@ -271,73 +409,16 @@ def findCloserMesh(filepath):
     closerTarget = results[dKeys[0]]
     loadTranslationTarget(closerTarget)
     doMorph(1.0)
+    
+
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
     print "Closer target = %s"%(closerTarget)
     
 
 
 
-def fitTo():
-    """
-    This function loads a morph target file.
 
-    Parameters
-    ----------
-
-    targetPath:
-        *string*. A string containing the operating system path to the
-        file to be read.
-
-    """
-    global targetBuffer,current_target
-    try:
-        fileDescriptor = open(targetPath)
-    except:
-        Draw.PupMenu("Unable to open %s",(targetPath))
-        return  None
-    activeObjs = Blender.Object.GetSelected()
-    if len(activeObjs) > 0:
-        activeObj = activeObjs[0]
-    else:
-        Draw.PupMenu("No object selected")
-        return None
-
-    obj = activeObj.getData(mesh=True)
-    try:
-        obj.verts
-    except:
-        Draw.PupMenu("The selected obj is not a mesh")
-        return None
-
-    #check mesh version
-    if len(obj.verts) == 11787:
-        print "Working on Mesh MH1.0.0prealpha"
-        if len(obj.verts) < 11787:
-            Draw.PupMenu("The selected obj is not last version of MHmesh")
-            if len(obj.verts) == 11751:
-                print "Working on Mesh MH0.9.2NR"
-            elif len(obj.verts) < 11751:
-                print "Working on Mesh 0.9.1 or earlier"
-
-
-    current_target = targetPath
-    targetData = fileDescriptor.readlines()
-    fileDescriptor.close()
-    targetBuffer = []
-    maxIndexOfVerts = len(obj.verts)
-    for vData in targetData:
-        vectorData = vData.split()
-        if vectorData[0].find('#')==-1:
-            if len(vectorData) < 4:
-                vectorData = vData.split(',') #compatible old format
-            mainPointIndex = int(vectorData[0])
-            if mainPointIndex < maxIndexOfVerts:
-                pointX = float(vectorData[1])
-                pointY = float(vectorData[2])
-                pointZ = float(vectorData[3])
-                targetBuffer.append([mainPointIndex, pointX,pointY,pointZ])
-            #else:
-            #    Draw.PupMenu("WARNING: target has more verts than Base mesh")
-    return 1
 
 def loadTranslationTarget(targetPath):
     """
@@ -1018,7 +1099,7 @@ def event(event, value):
     elif event == Draw.HKEY:
         Window.FileSelector (utility1, "Select files")
     elif event == Draw.UKEY:
-        Window.FileSelector (utility5, "Select files")
+        Window.FileSelector (linkMask, "Select files")
     elif event == Draw.PKEY:
         Window.FileSelector (saveIndexSelectedVerts, "Select files")
     elif event == Draw.AKEY:
