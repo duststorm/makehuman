@@ -173,7 +173,7 @@ def doMorph(mFactor):
     obj.calcNormals()
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
-    print "Target time", time.time() - t1
+    #print "Target time", time.time() - t1
 
 def linkMask(filePath, subdivide = None):
     """
@@ -186,13 +186,18 @@ def linkMask(filePath, subdivide = None):
     wem = Blender.Window.EditMode()
     Blender.Window.EditMode(0)
     activeObjs = Blender.Object.GetSelected()
-    activeObj1 = activeObjs[0]#The mask must belates selected obj
+    activeObj1 = activeObjs[0]#The mask must be latest selected obj
     activeObj2 = activeObjs[1]
     obj1 = activeObj1.getData(mesh=True)
     obj2 = activeObj2.getData(mesh=True)
 
-    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
-    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
+    vertsList1 = [[v.co[0],v.co[1],v.co[2],v.index] for v in obj1.verts] 
+    vertsList2 = []
+    for v in obj2.verts:
+        if v.sel == 1:
+            vertsList2.append([v.co[0],v.co[1],v.co[2],v.index])
+    
+    #vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
     faces = [[v.index for v in f.verts] for f in obj2.faces]     
    
     if subdivide:
@@ -202,8 +207,8 @@ def linkMask(filePath, subdivide = None):
     indexList = xrange(len(vertsList1))        
 
     #We need to add index information to each vert.    
-    for i,v in enumerate(vertsList2toProcess):
-        v.append(i)
+    #for i,v in enumerate(vertsList2toProcess):
+    #    v.append(i)
     
     #Init of the octree
     octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)    
@@ -244,6 +249,70 @@ def linkMask(filePath, subdivide = None):
 
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
+
+def generateTargetsDB(filepath):
+    #Because Blender filechooser return a file
+    #it's needed to extract the dirname
+    
+    folderToScan = os.path.dirname(filepath)
+    
+    folderToScanMoveX = os.path.join(folderToScan,"movex")
+    folderToScanMoveY = os.path.join(folderToScan,"movey")
+    folderToScanMoveZ = os.path.join(folderToScan,"movez")
+
+    folderToScanScaleX = os.path.join(folderToScan,"scalex")
+    folderToScanScaleY = os.path.join(folderToScan,"scaley")
+    folderToScanScaleZ = os.path.join(folderToScan,"scalez")
+    
+    targetListMoveX = os.listdir(folderToScanMoveX)
+    targetListMoveY = os.listdir(folderToScanMoveY)
+    targetListMoveZ = os.listdir(folderToScanMoveZ)
+    targetListScaleX = os.listdir(folderToScanScaleX)
+    targetListScaleY = os.listdir(folderToScanScaleY)
+    targetListScaleZ = os.listdir(folderToScanScaleZ)
+
+    counter = 0
+    for mx in targetListMoveX:               
+        for my in targetListMoveY:
+            for mz in targetListMoveZ:
+                for sx in targetListScaleX:
+                    for sy in targetListScaleY:
+                        for sz in targetListScaleZ:
+                            print "Iteration %s"%(counter)  
+                            
+                            n1 =os.path.splitext(mx)[0] 
+                            n2 =os.path.splitext(my)[0] 
+                            n3 =os.path.splitext(mz)[0]
+                            n4 =os.path.splitext(sx)[0] 
+                            n5 =os.path.splitext(sy)[0] 
+                            n6 =os.path.splitext(sz)[0] 
+                            
+                            t = "%s-%s-%s-%s-%s-%s"%(n1,n2,n3,n4,n5,n6)           
+                            
+                            moveX = os.path.join(folderToScanMoveX,mx)
+                            moveY = os.path.join(folderToScanMoveY,my)
+                            moveZ = os.path.join(folderToScanMoveZ,mz)
+                            scaleX = os.path.join(folderToScanScaleX,sx)
+                            scaleY = os.path.join(folderToScanScaleY,sy)
+                            scaleZ = os.path.join(folderToScanScaleZ,sz)
+
+                            loadTranslationTarget(moveX)
+                            doMorph(1)
+                            loadTranslationTarget(moveY)
+                            doMorph(1)
+                            loadTranslationTarget(moveZ)
+                            doMorph(1)
+                            loadTranslationTarget(scaleX)
+                            doMorph(1)
+                            loadTranslationTarget(scaleY)
+                            doMorph(1)
+                            loadTranslationTarget(scaleZ)
+                            doMorph(1)                                                    
+                            newTargetPath = os.path.join(folderToScan,t+".target")
+                            saveTranslationTarget(newTargetPath)
+                            resetMesh()
+                            counter += 1
+
 
 def maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientIndices):
     """
@@ -965,6 +1034,29 @@ def selectSymmetricVerts():
     Blender.Window.RedrawAll()
 
 
+def selectVerts(listOfIndices):
+    """
+    
+
+    """
+
+    global pairsPath
+    print "selecting symm"
+    activeObjs = Blender.Object.GetSelected()
+    activeObj = activeObjs[0]
+    data = activeObj.getData(mesh=True)
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)
+    for i in listOfIndices:
+        vertToSelect = data.verts[i]
+        vertToSelect.sel = 1        
+ 
+
+    data.update()
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
+
+
 def resetMesh():
     """
     This function restores the initial base mesh coordinates.
@@ -1097,7 +1189,7 @@ def event(event, value):
     elif event == Draw.CKEY:
         Window.FileSelector (absoluteToRelative, "Select base_female")
     elif event == Draw.HKEY:
-        Window.FileSelector (utility1, "Select files")
+        Window.FileSelector (generateTargetsDB, "Select files")
     elif event == Draw.UKEY:
         Window.FileSelector (linkMask, "Select files")
     elif event == Draw.PKEY:
@@ -1105,6 +1197,20 @@ def event(event, value):
     elif event == Draw.AKEY:
         Window.FileSelector (findCloserMesh, "Select files")
         
+
+
+#selectVerts([12704,12721,12674,12717,12647,12539])
+#selectVerts([63971,78953,57098,92786,78321,64630])
+
+
+
+
+
+
+
+
+
+
 
 
 def b_event(event):
