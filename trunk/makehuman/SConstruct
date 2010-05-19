@@ -16,6 +16,10 @@ if not env.GetOption('clean'):
   if not (conf.CheckLibWithHeader('SDL', 'SDL.h', 'c')):
     print "The SDL development libraries must be installed"
     exit(1)
+  env.Append(LIBS = ['GLEW'])
+  if not (conf.CheckLib('GLEW')):
+    print "The GLEW must be installed"
+    exit(1)
   env.Append(LIBS = ['GL','GLU'])
 env=conf.Finish()
 
