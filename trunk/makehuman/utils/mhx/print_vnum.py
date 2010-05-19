@@ -11,7 +11,19 @@ def printVertNums():
 	print("End")
 	#bpy.ops.object.mode_set('EDIT')
 
+def selectQuads():
+	ob = bpy.context.object
+	me = ob.data
+	for f in me.faces:
+		if len(f.verts) == 4:
+			f.selected = True
+		else:
+			f.selected = False
+	return
+	
 #printVertNums()
+selectQuads()
+
 
 
 

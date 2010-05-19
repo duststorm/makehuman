@@ -34,6 +34,9 @@ splitLeftRight = True
 def exportMhx(obj, filename):	
 	(name, ext) = os.path.splitext(filename)
 
+	#proxyFile = "proxy"
+	proxyFile = "low_poly_base"
+
 	filename = name+"-24"+ext
 	print("Writing MHX 2.4x file " + filename )
 	fp = open(filename, 'w')
@@ -95,35 +98,38 @@ def exportRawMhx(obj, fp):
 #	exportMhx_25(obj, rig, fp):
 #
 
+proxyList = ["Rorkimaru", "forsaken"]
+
 def exportMhx_25(obj, rig, fp):
-	copyFile25(obj, "data/templates/materials25.mhx", rig, fp)	
+	copyFile25(obj, "data/templates/materials25.mhx", rig, fp, None)	
 
 	mhx_rig.setupRig(obj)
 
 	fp.write("if toggle&T_Armature\n")
-	copyFile25(obj, "data/templates/common-armature25.mhx", rig, fp)	
-	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp)	
+	copyFile25(obj, "data/templates/common-armature25.mhx", rig, fp, None)	
+	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp, None)	
 	fp.write("end if\n")
-	'''
-	fp.write("if toggle&T_Proxy\n")
-	copyFile25(obj, "data/templates/proxy25.mhx", rig, fp)	
-	fp.write("end if\n")
-	'''
+
+	for proxyFile in proxyList:
+		fp.write("if theProxy=='%s'\n" % proxyFile)
+		copyFile25(obj, "data/templates/proxy25.mhx", rig, fp, proxyFile)	
+		fp.write("end if\n")
+
 	fp.write("if toggle&T_Mesh\n")
-	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp)	
+	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp, None)	
 	fp.write("end if\n")
 
 	fp.write("if toggle&T_Armature\n")
-	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp)	
+	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp, None)	
 	fp.write("end if\n")
 	return
 
 		
 #
-#	copyFile25(obj, tmplName, rig, fp):
+#	copyFile25(obj, tmplName, rig, fp, proxyFile):
 #
 
-def copyFile25(obj, tmplName, rig, fp):
+def copyFile25(obj, tmplName, rig, fp, proxyFile):
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	if tmpl == None:
@@ -144,12 +150,6 @@ def copyFile25(obj, tmplName, rig, fp):
 			if ignoreLine:
 				if lineSplit[1] == 'EndIgnore':
 					ignoreLine = False
-			#elif lineSplit[1] == 'Particles':
-			#	if writeHairCurves(hair, hairStep, amount, fp):
-			#		ignoreLine = True
-			#elif lineSplit[1] == 'ParticleSystem':
-			#	pass
-			# copyFile25(obj, "data/templates/particles25.mhx", rig, fp)	
 			elif lineSplit[1] == 'Bone':
 				bone = lineSplit[2]
 				fp.write("    Bone %s\n" % bone)
@@ -175,7 +175,7 @@ def copyFile25(obj, tmplName, rig, fp):
 			elif lineSplit[1] == 'rig-process':
 				mhx_rig.writeAllProcesses(fp)
 			elif lineSplit[1] == 'ProxyVerts':
-				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
+				(proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = readProxyFile(obj.verts, proxyFile)
 				for v in realVerts:
 					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 			elif lineSplit[1] == 'Verts':
@@ -189,7 +189,7 @@ def copyFile25(obj, tmplName, rig, fp):
 				for f in proxyFaces:
 					fp.write("    f")
 					for v in f:
-						fp.write(" %d" % v)
+						fp.write(" %s" % v)
 					fp.write(" ;\n")
 				for mat in proxyMaterials:
 					fp.write("    ft %d 1 ;\n" % mat)
@@ -203,13 +203,12 @@ def copyFile25(obj, tmplName, rig, fp):
 				for (fn,f) in enumerate(faces):
 					if len(f) < 4:
 						fp.write("    mn %d 1 ;\n" % fn)
-			elif lineSplit[1] == 'ProxyTexVerts':
-				for f in proxyFaces:
+			elif lineSplit[1] == 'ProxyUVCoords':
+				for f in proxyTexFaces:
 					fp.write("    vt")
-					for v0 in f:
-						v = realVerts[v0]
-						uv = obj.uvValues[v.idx]
-						fp.write(" %.6g %.6g" %(uv[0], uv[1]))
+					for v in f:
+						uv = proxyTexVerts[v]
+						fp.write(" %.6g %.6g" % (uv[0], uv[1]))
 					fp.write(" ;\n")
 			elif lineSplit[1] == 'TexVerts':
 				for f in faces:
@@ -226,8 +225,14 @@ def copyFile25(obj, tmplName, rig, fp):
 				pass
 				writeShapeKeys(fp, "Human", None)
 			elif lineSplit[1] == 'proxy-shapeKey':
-				(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
-				writeShapeKeys(fp, "HumanProxy", proxyVerts)
+				for proxyFile in proxyList:
+					fp.write("if theProxy=='%s'\n" % proxyFile)
+					(proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = readProxyFile(obj.verts, proxyFile)
+					if proxyVerts:
+						writeShapeKeys(fp, "HumanProxy", proxyVerts)
+					else:
+						raise NameError("No proxyVerts from %s" % proxyFile)
+					fp.write("end if ;\n")
 			elif lineSplit[1] == 'mesh-animationData':
 				writeAnimationData(fp, "Human", None)
 			elif lineSplit[1] == 'proxy-animationData':
@@ -259,11 +264,14 @@ def writeShapeKeys(fp, name, proxyVerts):
 	return
 
 #
-#	readProxyFile(verts):
+#	readProxyFile(verts, proxyFile):
 #
 
-def readProxyFile(verts):
-	tmplName = "./data/templates/proxy_mesh.txt"
+def readProxyFile(verts, proxyFile):
+	if not proxyFile:
+		return ([],[],[],[],[])
+
+	tmplName = "./data/templates/%s.proxy" % proxyFile
 	tmpl = open(tmplName, "rU")
 	if tmpl == None:
 		print("Cannot open proxy template "+tmplName)
@@ -272,11 +280,15 @@ def readProxyFile(verts):
 	realVerts = []
 	proxyFaces = []
 	proxyVerts = {}
+	proxyTexFaces = []
+	proxyTexVerts = []
 	proxyMaterials = []
+
 	vn = 0
 	doVerts = False
 	doFaces = False
 	doMaterials = False
+	doTexVerts = False
 	for line in tmpl:
 		lineSplit= line.split()
 		if len(lineSplit) == 0:
@@ -290,74 +302,90 @@ def readProxyFile(verts):
 			doVerts = False
 			doFaces = False
 			doMaterials = True
+		elif lineSplit[0] == 'TexVerts':
+			doVerts = False
+			doFaces = False
+			doMaterials = False
+			doTexVerts = True
 		elif doVerts:
 			v = int(lineSplit[0])
 			realVerts.append(verts[v])
-			proxyVerts[v] = vn
+			try:
+				vlist = proxyVerts[v]
+			except:
+				proxyVerts[v] = []
+			proxyVerts[v].append(vn)
 			vn += 1
 		elif doFaces:
 			face = []
-			for n in range(len(lineSplit)):
-				f = int(lineSplit[n])
-				face.append(f)
+			texface = []
+			nCorners = len(lineSplit)
+			for n in range(nCorners):
+				words = lineSplit[n].split('/')
+				face.append(int(words[0])-1)
+				if len(words) > 1:
+					texface.append(int(words[1])-1)
 			proxyFaces.append(face)
+			if texface:
+				proxyTexFaces.append(texface)
+				if len(face) != len(texface):
+					raise NameError("texface %s %s", face, texface)
+		elif doTexVerts:
+			vt = []
+			nCoords = len(lineSplit)
+			for n in range(nCoords):
+				uv = float(lineSplit[n])
+				vt.append(uv)
+			proxyTexVerts.append(vt)
 		elif doMaterials:
 			proxyMaterials.append(int(lineSplit[0]))
 
-	return (proxyVerts, realVerts, proxyFaces, proxyMaterials)
+	return (proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts)
 	
 #
 #	exportProxyObj(obj, filename):	
+#	exportProxyObj1(obj, filename, proxyFile):
 #
 
 def exportProxyObj(obj, filename):
 	(name, ext) = os.path.splitext(filename)
-	(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
-	matNames = ['ProxySkin', 'ProxyWhite', 'ProxyRed', 'ProxyGum', 'ProxyBlue', 'ProxyBlack']
+	for proxyFile in proxyList:
+		exportProxyObj1(obj, "%s-%s.%s" % (name, proxyFile, ext), proxyFile)
+	return
+
+def exportProxyObj1(obj, filename, proxyFile):
+	(proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = readProxyFile(obj.verts, proxyFile)
 
 	fp = open(filename, 'w')
 	fp.write(
 "# MakeHuman exported OBJ for proxy mesh\n" +
-"# www.makehuman.org\n" +
-"mtllib %s.mtl\n" % name)
+"# www.makehuman.org\n\n")
 
 	for v in realVerts:
 		fp.write("v %.6g %.6g %.6g\n" %(v.co[0], v.co[1], v.co[2]))
 
-	mat = -1
-	n = 0
-	for f in proxyFaces:
-		if proxyMaterials[n] != mat:
-			mat = proxyMaterials[n]
-			fp.write("usemtl %s\n" % matNames[mat])
-		n += 1
-		fp.write("f")
-		for v in f:
-			fp.write(" %d" % (v+1))
-		fp.write("\n")
-	fp.close()
+	for uv in proxyTexVerts:
+		fp.write("vt %s %s\n" % (uv[0], uv[1]))
 
-	fp = open(name + ".mtl", 'w')
-	fp.write(
-"# MakeHuman exported MTL for proxy\n"+
-"# www.makehuman.org\n"+
-"newmtl ProxySkin \n"+
-"Kd 0.92 0.73 0.58\n"+ 
-"\n"+
-"newmtl ProxyWhite\n"+ 
-"Kd 1.0 1.0 1.0 \n"+
-"\n"+
-"newmtl ProxyRed \n"+
-"Kd 1.0 0.0 0.0\n"+
-"\n"+
-"newmtl ProxyGum \n"+
-"Kd 0.6 0.2 0.3 \n"+
-"\n"+
-"newmtl ProxyBlue \n"+
-"Kd 0.0 0.0 1.0\n"+
-"\n"+
-"newmtl ProxyBlack\n"+
-"Kd 0.0 0.0 0.0 \n")
+	mat = -1
+	fn = 0
+	for f in proxyFaces:
+		if proxyMaterials and proxyMaterials[fn] != mat:
+			mat = proxyMaterials[fn]
+			fp.write("usemtl %s\n" % matNames[mat])
+		fp.write("f")
+		if proxyTexFaces:
+			ft = proxyTexFaces[fn]
+			vn = 0
+			for v in f:
+				vt = ft[vn]
+				fp.write(" %d/%d" % (v+1, vt+1))
+				vn += 1
+		else:
+			for v in f:
+				fp.write(" %d" % (v+1))
+		fp.write("\n")
+		fn += 1
 	fp.close()
 	return
 	
@@ -381,17 +409,19 @@ def copyProxy(tmplName, fp, proxyVerts):
 			elif lineSplit[0] == 'sv':
 				v = int(lineSplit[1])
 				try:
-					pv = proxyVerts[v]
-					fp.write("    sv %d %s %s %s ;\n" % (pv, lineSplit[2], lineSplit[3], lineSplit[4]))
+					vlist = proxyVerts[v]
 				except:
-					pass
+					vlist = []
+				for pv in vlist:
+					fp.write("    sv %d %s %s %s ;\n" % (pv, lineSplit[2], lineSplit[3], lineSplit[4]))
 			elif lineSplit[0] == 'wv':
 				v = int(lineSplit[1])
 				try:
-					pv = proxyVerts[v]
-					fp.write("    wv %d %s ;\n" % (pv, lineSplit[2]))
+					vlist = proxyVerts[v]
 				except:
-					pass
+					vlist = []
+				for pv in vlist:
+					fp.write("    wv %d %s ;\n" % (pv, lineSplit[2]))
 			else:
 				fp.write(line)
 	else:
@@ -490,6 +520,9 @@ def exportProxy24(obj, fp):
 	realVerts = None
 	proxyFaces = None
 	proxyMaterials = None
+	proxyTexVerts = None
+	proxyTexFaces = None
+	proxyFile = "Rorkimaru"
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
 	fp.write("if useProxy\n")
 	for line in tmpl:
@@ -497,7 +530,7 @@ def exportProxy24(obj, fp):
 		if len(lineSplit) == 0:
 			fp.write(line)
 		elif lineSplit[0] == 'v':
-			(proxyVerts, realVerts, proxyFaces, proxyMaterials) = readProxyFile(obj.verts)
+			(proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = readProxyFile(obj.verts, proxyFile)
 			for v in realVerts:
 				fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 		elif lineSplit[0] == 'f':
@@ -511,11 +544,10 @@ def exportProxy24(obj, fp):
 				fp.write("    fx %d %d 1 ;\n" % (fn,mat))
 				fn += 1
 		elif lineSplit[0] == 'vt':
-			for f in proxyFaces:
+			for f in proxyTexFaces:
 				fp.write("    vt")
-				for v0 in f:
-					v = realVerts[v0]
-					uv = obj.uvValues[v.idx]
+				for v in f:
+					uv = proxyTexVerts[v]
 					fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 				fp.write(" ;\n")
 		elif lineSplit[0] == 'vertgroup':
@@ -713,10 +745,11 @@ def writeShapeKey(fp, shapekey, shapeVerts, vgroup, sliderMin, sliderMax, proxyV
 			lineSplit = line.split()
 			v = int(lineSplit[1])
 			try:
-				pv = proxyVerts[v]
-				fp.write("    sv %d %s %s %s ;\n" % (pv, lineSplit[2], lineSplit[3], lineSplit[4]))
+				vlist = proxyVerts[v]
 			except:
-				pass
+				vlist = []
+			for pv in vlist:
+				fp.write("    sv %d %s %s %s ;\n" % (pv, lineSplit[2], lineSplit[3], lineSplit[4]))
 	else:
 		for line in shapeVerts:
 			fp.write(line)

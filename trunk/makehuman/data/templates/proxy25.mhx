@@ -1,42 +1,17 @@
-Material ProxySkin 
-  diffuse_color Array  0.92 0.73 0.58  ;
-end Material
-
-Material ProxyWhite 
-  diffuse_color Array 1.0 1.0 1.0  ;
-end Material
-
-Material ProxyRed 
-  diffuse_color Array 1.0 0.0 0.0 ;
-end Material
-
-Material ProxyGum 
-  diffuse_color Array 0.6 0.2 0.3  ;
-end Material
-
-Material ProxyBlue 
-  diffuse_color Array 0.0 0.0 1.0  ;
-end Material
-
-Material ProxyBlack
-  diffuse_color Array 0.0 0.0 0.0  ;
-end Material
-
 
 Mesh HumanProxy HumanProxy 
-  Material ProxySkin ;
-  Material ProxyWhite ;
-  Material ProxyRed ;
-  Material ProxyGum ;
-  Material ProxyBlue ;
-  Material ProxyBlack ;
   Verts
   *** ProxyVerts
   end Verts
   Faces
   *** ProxyFaces
   end Faces
-    *** VertexGroup
+  MeshTextureFaceLayer UVTex
+    Data 
+    *** ProxyUVCoords
+    end Data
+  end MeshTextureFaceLayer
+  *** VertexGroup
   vertex_normal_flip True ;
 end Mesh
 
