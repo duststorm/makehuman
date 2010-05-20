@@ -375,7 +375,7 @@ def meshComparison(indexListPath, subdivide = None):
         try:
             fileDescriptor = open(indexListPath)
         except:
-            print 'Error opening %s file' % path
+            print 'Error opening %s file' % indexListPath
             return        
         for data in fileDescriptor:
             lineData = data.split()            
@@ -434,17 +434,16 @@ def findCloserMesh(filepath):
     obj1 = activeObj1.getData(mesh=True)
     obj2 = activeObj2.getData(mesh=True)
 
-    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
-    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
-    faces = [[v.index for v in f.verts] for f in obj2.faces]  
     
+    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
+        
     linkMaskBaseIndices = []
     linkMaskClientIndices = []
     
     try:
         fileDescriptor = open("mask.linked")
     except:
-        print 'Error opening %s file' % path
+        print 'Error opening %s file' % "mask.linked"
         return        
     for data in fileDescriptor:
         lineData = data.split()            
@@ -455,7 +454,7 @@ def findCloserMesh(filepath):
     try:
         fileDescriptor = open("temp.linked")
     except:
-        print 'Error opening %s file' % path
+        print 'Error opening %s file' % "temp.linked"
         return        
     for data in fileDescriptor:
         lineData = data.split()            
@@ -470,7 +469,9 @@ def findCloserMesh(filepath):
         targetPath = os.path.join(folderToScan,targetName)
         loadTranslationTarget(targetPath)
         doMorph(1.0)
+        vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
         n = maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientIndices)
+        print targetPath,n
         results[n] = targetPath
         doMorph(-1.0)
     dKeys = results.keys()
@@ -482,7 +483,7 @@ def findCloserMesh(filepath):
 
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
-    print "Closer target = %s"%(closerTarget)
+    print "Closer target = %s, %s"%(closerTarget,dKeys[0])
     
 
 
