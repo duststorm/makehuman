@@ -82,49 +82,43 @@ BodyArmature = [
 	('Hip_R', 'True',		0.0, 'Hips', F_DEF+F_CON, L_DEF, (1,1,1) ),
 ]
 
-def BodyWritePoses(fp):
-	global boneGroups
-	boneGroups = {}
+BodyPoses = [
+	('poseBone', 'True', 'MasterFloor', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'True', 'MasterFloor', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'True', 'MasterHips', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'True', 'MasterHips', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'True', 'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'True', 'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'True', 'Root', 'MHCube025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	('poseBone', 'True', 'Root', 'MHCube025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['Floor', 'MasterFloor', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Hips', 'MasterHips', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Neck', 'MasterNeck', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		('ChildOf', C_CHILDOF, ['Neck', 'MasterNeck', 0.0, (1,1,1), (1,1,1), (1,1,1)])]),
 
-	addPoseBone(fp, 'True', 'Hips', 'MHHips', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'True', 'Hips', 'MHHips', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'True', 'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'True', 'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'True', 'Hip_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'True', 'Hip_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
 	# Spinal column
-	#addPoseBone(fp, 'True', 'Pelvis', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	#('poseBone', 'True', 'Pelvis', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	#spineConstraints = [('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['CopyRot', 'Spine1', 1.0, (1,1,1), (0,0,0), True])]
+	('poseBone', 'True', 'Spine1', 'MHCircle10', None, (0,0,0), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, []),
 
-	addPoseBone(fp, 'True', 'Spine1', 'MHCircle10', None, (0,0,0), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
+	('poseBone', 'True', 'Spine2', 'MHCircle15', None, (0,0,0), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, []),
 
-	addPoseBone(fp, 'True', 'Spine2', 'MHCircle15', None, (0,0,0), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
+	('poseBone', 'True', 'Spine3', 'MHCircle10', None, (0,0,0), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, []),
 
-	addPoseBone(fp, 'True', 'Spine3', 'MHCircle10', None, (0,0,0), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
+	('poseBone', 'True', 'Neck', 'GoboNeck', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'True', 'Neck', 'GoboNeck', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'True', 'Head', 'GoboHead', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'True', 'Head', 'GoboHead', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
 	# Deform
 
-	addPoseBone(fp, 'True', 'Stomach_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['UpLeg_L', 'UpLeg_L', 'PLANE_X'])])
+	('poseBone', 'True', 'Stomach_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, ['UpLeg_L', 'UpLeg_L', 'PLANE_X'])]),
 
-	addPoseBone(fp, 'True', 'Stomach_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['UpLeg_R', 'UpLeg_R', 'PLANE_X'])])
+	('poseBone', 'True', 'Stomach_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, ['UpLeg_R', 'UpLeg_R', 'PLANE_X'])]),
+]
 
-	return
-	

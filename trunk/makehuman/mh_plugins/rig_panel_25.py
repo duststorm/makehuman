@@ -164,62 +164,53 @@ PanelArmature = [
 MX = 0.25
 
 
-def PanelWritePoses(fp):
-	addPoseBone(fp, T_Panel, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+PanelPoses = [
+	('poseBone', T_Panel, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, []),
 
-	addPoseBone(fp, T_Panel, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', T_Panel, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
 
-	cSlider(fp,  'PBrow_L', MX)
-	cSlider(fp,  'PBrow_R', MX)
-	cSlider(fp,  'PBrows', MX)
-	cSlider(fp,  'PUpLid_L', MX)
-	cSlider(fp,  'PUpLid_R', MX)
-	cSlider(fp,  'PLoLid_L', MX)
-	cSlider(fp,  'PLoLid_R', MX)
-	cSlider(fp,  'PCheek_L', MX)
-	cSlider(fp,  'PCheek_R', MX)
-	cSlider(fp,  'PNose', MX)
-	cSlider(fp,  'PUpLip_L', MX)
-	cSlider(fp,  'PUpLip_R', MX)
-	cSlider(fp,  'PLoLip_L', MX)
-	cSlider(fp,  'PLoLip_R', MX)
-	cSlider(fp,  'PMouth_L', MX)
-	cSlider(fp,  'PMouth_R', MX)
-	cSlider(fp,  'PTounge', MX)
-	cSlider(fp,  'PJaw', MX)
+	('cSlider',  'PBrow_L', MX),
+	('cSlider',  'PBrow_R', MX),
+	('cSlider',  'PBrows', MX),
+	('cSlider',  'PUpLid_L', MX),
+	('cSlider',  'PUpLid_R', MX),
+	('cSlider',  'PLoLid_L', MX),
+	('cSlider',  'PLoLid_R', MX),
+	('cSlider',  'PCheek_L', MX),
+	('cSlider',  'PCheek_R', MX),
+	('cSlider',  'PNose', MX),
+	('cSlider',  'PUpLip_L', MX),
+	('cSlider',  'PUpLip_R', MX),
+	('cSlider',  'PLoLip_L', MX),
+	('cSlider',  'PLoLip_R', MX),
+	('cSlider',  'PMouth_L', MX),
+	('cSlider',  'PMouth_R', MX),
+	('cSlider',  'PTounge', MX),
+	('cSlider',  'PJaw', MX),
 
-	xSlider(fp, 'PArmIK_L', 0.0, 1.0)
-	xSlider(fp, 'PArmIK_R', 0.0, 1.0)
-	xSlider(fp, 'PLegIK_L', 0.0, 1.0)
-	xSlider(fp, 'PLegIK_R', 0.0, 1.0)
-	#xSlider(fp, 'PHandLocal_L', 0.0, 1.0)
-	#xSlider(fp, 'PHandLocal_R', 0.0, 1.0)
-	#xSlider(fp, 'PFootLocal_L', 0.0, 1.0)
-	#xSlider(fp, 'PFootLocal_R', 0.0, 1.0)
+	('xSlider', 'PArmIK_L', 0.0, 1.0),
+	('xSlider', 'PArmIK_R', 0.0, 1.0),
+	('xSlider', 'PLegIK_L', 0.0, 1.0),
+	('xSlider', 'PLegIK_R', 0.0, 1.0),
+	#('xSlider', 'PHandLocal_L', 0.0, 1.0),
+	#('xSlider', 'PHandLocal_R', 0.0, 1.0),
+	#('xSlider', 'PFootLocal_L', 0.0, 1.0),
+	#('xSlider', 'PFootLocal_R', 0.0, 1.0),
 
-	xSlider(fp, 'MHRelax_L', -0.25, 0.5)
-	xSlider(fp, 'MHCurl_L', -0.25, 0.5)
-	xSlider(fp, 'MHCone_L', -0.25, 0.5)
-	xSlider(fp, 'MHSpread_L', -0.25, 0.5)
-	xSlider(fp, 'MHScrunch_L', -0.25, 0.5)
-	xSlider(fp, 'MHLean_L', -0.5, 0.5)
+	('xSlider', 'MHRelax_L', -0.25, 0.5),
+	('xSlider', 'MHCurl_L', -0.25, 0.5),
+	('xSlider', 'MHCone_L', -0.25, 0.5),
+	('xSlider', 'MHSpread_L', -0.25, 0.5),
+	('xSlider', 'MHScrunch_L', -0.25, 0.5),
+	('xSlider', 'MHLean_L', -0.5, 0.5),
 
-	xSlider(fp, 'MHRelax_R', -0.5, 0.25)
-	xSlider(fp, 'MHCurl_R', -0.5, 0.25)
-	xSlider(fp, 'MHCone_R', -0.5, 0.25)
-	xSlider(fp, 'MHSpread_R', -0.5, 0.25)
-	xSlider(fp, 'MHScrunch_R', -0.5, 0.25)
-	xSlider(fp, 'MHLean_R', -0.5, 0.5)
-
-	return
-
-def cSlider(fp, bone, mx):
-	addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-mx,mx, 0,0, -mx,mx), (1,1,1,1,1,1)])])
-
-def xSlider(fp, bone, mn, mx):
-	addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, 0,0, 0,0), (1,1,1,1,1,1)])])
+	('xSlider', 'MHRelax_R', -0.5, 0.25),
+	('xSlider', 'MHCurl_R', -0.5, 0.25),
+	('xSlider', 'MHCone_R', -0.5, 0.25),
+	('xSlider', 'MHSpread_R', -0.5, 0.25),
+	('xSlider', 'MHScrunch_R', -0.5, 0.25),
+	('xSlider', 'MHLean_R', -0.5, 0.5),
+]
 
 '''
 	'BendElbowForward_L' : ('LoArm_L', 'ROT_X', 1, 0, 1)],

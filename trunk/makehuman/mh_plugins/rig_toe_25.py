@@ -118,66 +118,64 @@ ToeArmature = [
 	('Toe-5-3_R', 'rigLeg&T_Toes',		2.98449, 'Toe-5-2_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
 ]
 
-def ToeWritePoses(fp):
-	global boneGroups
-	boneGroups = {}
-
+ToePoses = [
 	# Left toes
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-1-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-1-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-1-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-1-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-2-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-2-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-2-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-2-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-2-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-2-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-3-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-3-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-3-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-3-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-3-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-3-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-4-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-4-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-4-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-4-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-4-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-4-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-5-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-5-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-5-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-5-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-5-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-5-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
 	# Right toes
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-1-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-1-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-1-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-1-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-2-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-2-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-2-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-2-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-2-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-2-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-3-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-3-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-3-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-3-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-3-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-3-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-4-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-4-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-4-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-4-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-4-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-4-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-5-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-5-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-5-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_Toes', 'Toe-5-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_Toes', 'Toe-5-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
-	return
+	('poseBone', 'rigLeg&T_Toes', 'Toe-5-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+]
+
 

@@ -22,26 +22,43 @@ joint-finger-1-2
 1 0 1.0 # vertex, joint, weight
 '''
  
-
-joints = rig_body_25.BodyJoints +\
+theJoints = rig_body_25.BodyJoints +\
 	rig_arm_25.ArmJoints +\
 	rig_finger_25.FingerJoints +\
 	rig_leg_25.LegJoints +\
 	rig_face_25.FaceJoints
 	
-headTails = rig_body_25.BodyHeadsTails +\
+theHeadTails = rig_body_25.BodyHeadsTails +\
 	rig_arm_25.ArmHeadsTails +\
 	rig_finger_25.FingerHeadsTails +\
 	rig_leg_25.LegHeadsTails +\
 	rig_face_25.FaceHeadsTails
 	
-armature = rig_body_25.BodyArmature +\
+theArmature = rig_body_25.BodyArmature +\
 	rig_arm_25.ArmArmature +\
 	rig_finger_25.FingerArmature +\
 	rig_leg_25.LegArmature +\
 	rig_face_25.FaceArmature
 	
+thePoses = rig_body_25.BodyPoses +\
+	rig_arm_25.ArmPoses +\
+	rig_finger_25.FingerPoses +\
+	rig_leg_25.LegPoses +\
+	rig_face_25.FacePoses
 
+#
+#
+#
+
+def includeBone(cond, flags, bone, parent): 		
+		if 0:
+			return mh2collada.boneOK(flags, bone, parent)
+		elif bone == 'Root':
+			return 'None'
+		elif cond == 'rigLeg&T_GoboFoot' or cond == 'rigArm&T_FingerPanel':
+			return None
+		else:
+			return parent
 	
 #
 #	writeSkeleton(fileName):
@@ -49,9 +66,11 @@ armature = rig_body_25.BodyArmature +\
 
 def writeSkeleton(fileName):
 	fp = open(fileName, "w")
-	(rig, usedJoint) = setupRig(headTails, armature)
-	jointNum = writeJoints(fp, usedJoint, joints)
-	boneNum = writeRig(fp, armature, rig, jointNum)
+	(rig, usedJoint) = setupRig(theHeadTails, theArmature)
+	jointNum = writeJoints(fp, usedJoint, theJoints)
+	boneNum = writeRig(fp, theArmature, rig, jointNum)
+	
+	writePoses(fp, thePoses, boneNum)
 
 	weights = {}
 	mh2collada.readSkinWeights(weights, "data/templates/vertexgroups-bones25.mhx")	
@@ -74,19 +93,22 @@ def setupRig(headTails, armature):
 	rig = {}
 	usedJoint = {}
 	for (bone, cond, roll, parent, flags, layers, bbone) in armature:
-		par = mh2collada.boneOK(flags, bone, parent)
+		par = includeBone(cond, flags, bone, parent)
 		if par:
 			rig[bone] = [0.0, 0.0]
 	for (bone, head, tail) in headTails:
+		print(bone, head, tail)
 		try:
 			rigBone = rig[bone]
 		except:
 			rigBone = None
-		if rigBone:
+		if rigBone:			
 			rigBone[0] = head
 			rigBone[1] = tail
-			usedJoint[head] = True
-			usedJoint[tail] = True
+			if type(head) == str:
+				usedJoint[head] = True
+			if type(tail) == str:
+				usedJoint[tail] = True			
 	return (rig, usedJoint)
 	
 #
@@ -153,7 +175,7 @@ def writeRig(fp, armature, rig, jointNum):
 			boneNum[bone] = bn
 			head = rigBone[0]
 			tail = rigBone[1]
-			par = mh2collada.boneOK(flags, bone, parent)
+			par = includeBone(cond, flags, bone, parent)
 			print("   ", head, tail, roll, par)
 			fp.write("  %s %d %d %.4f" % (bone, jointNum[head], jointNum[tail], roll))
 			if parent:
@@ -164,7 +186,83 @@ def writeRig(fp, armature, rig, jointNum):
 			bn += 1
 	return boneNum
 	
-	
+#
+#	writePoses(fp, poses, boneNum)
+#
+
+def writePoses(fp, poses, boneNum):
+	for pose in poses:
+		print(pose)
+		try:
+			(typ, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints) = pose
+		except:
+			typ = None
+		if not typ:
+			try:
+				(typ, bone, mx) = pose
+			except:
+				typ = None
+		if not typ:
+			try:
+				(typ, bone, mn, mx) = pose
+			except:
+				typ = None
+		if not typ:
+			try:
+				(typ, bone, lockRot, target, limit) = pose
+			except:
+				typ = None
+		if not typ:
+			try:
+				(typ, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags) = pose
+			except:
+				typ = None
+				
+		if typ == 'poseBone':
+			pass			
+		elif typ == 'cSlider':
+			(lockLoc, lockRot, lockScale, ik_dof, flags) = ((0,1,0), (1,1,1), (1,1,1), (1,1,1), 0)
+			constraints = [('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-mx,mx, 0,0, -mx,mx), (1,1,1,1,1,1)])]
+
+		elif typ == 'xSlider':
+			(lockLoc, lockRot, lockScale, ik_dof, flags) = ((0,1,1), (1,1,1), (1,1,1), (1,1,1), 0)
+			constraints = [('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, 0,0, 0,0), (1,1,1,1,1,1)])]
+
+		elif typ == 'ikHandle':
+			if limit:
+				constraints = [('LimitDist', 0, ['LimitDist', 1.0, limit])]
+			else:
+				constraints = []
+			(cond, lockLoc, lockRot, lockScale, ik_dof, flags) = (True, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0)
+
+		elif typ == 'singleIK':
+			constraints = [('IK', 0, ['IK', target, 1, None, (True, False, True), 1.0])]
+			if limit:
+				constraints.append( ('LimitRot', C_OW_LOCAL, ['LimitRot', limit, (True, True, True)]) )
+			(cond, lockLoc, lockScale, ik_dof, flags) = (True, (1,1,1), (1,1,1), (1,1,1), 0)
+
+		elif typ == 'deformLimb':
+			space = cflags & (C_OW_MASK + C_TG_MASK)
+			constraints = [
+				('CopyRot', space, ['RotIK', ikBone, 0.0, ikRot, (0,0,0), False]),
+				('CopyRot', space, ['RotFK', fkBone, 1.0, fkRot, (0,0,0), False])
+				]
+			if pflags & P_STRETCH:
+				constraints += [
+				('CopyScale', 0, ['StretchIK', ikBone, 0.0, (0,1,0), False]),
+				('CopyScale', 0, ['StretchFK', fkBone, 1.0, (0,1,0), False]),
+				]		
+			(cond, lockLoc, lockRot, lockScale, ik_dof, flags) = (True, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0)
+
+		else:
+			raise NameError("Unknown pose type %s" % typ)
+
+
+		if includeBone(cond, flags, bone, True):
+			fp.write("\nposebone %d %s %s %s %s\n" % (boneNum[bone], lockLoc, lockRot, lockScale, ik_dof) )
+			for (ctyp, cflags, cdata) in constraints:
+				fp.write("  constraint %s %x %s\n" % (ctyp, cflags, cdata))
+	return
 
 			
 		

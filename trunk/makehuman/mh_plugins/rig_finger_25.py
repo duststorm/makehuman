@@ -384,158 +384,123 @@ def FingerWriteDrivers(fp):
 				driven = 'Finger-%d-%d%s' % (fnum, lnum, suffix)
 				drivers += rotationDrivers(fnum, suffix, driven)
 	writeDrivers(fp, T_FRot, drivers)
+
+
+	#fingerSetProps(fp)
+	#for fnum in range(1,6):
+	#	addControlFinger(fp, fnum, "_L")
+	#	addControlFinger(fp, fnum, "_R")
 	return
 
-def FingerWritePoses(fp):
-	global boneGroups
-	boneGroups = {}
+#
+#	defineFingerConstraints():
+#
 
-	customShape = 'MHCircle05'
-	customShape = None
-	# Deform with finger IK
-
-	fingerSetProps(fp)
-
-	constraints = fingerConstraints(1, 1, "_L") 
-	addPoseBone(fp, True, 'Finger-1-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(1, 2, "_L") 
-	addPoseBone(fp, True, 'Finger-1-2_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(1, 3, "_L") 
-	constraints += [ (('IK', T_FIK), 0, ['IK', 'Finger-1-IK_L', 3, None, (True, False,True), 1.0]) ]
-	addPoseBone(fp, True, 'Finger-1-3_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(1, 1, "_R") 
-	addPoseBone(fp, True, 'Finger-1-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(1, 2, "_R") 
-	addPoseBone(fp, True, 'Finger-1-2_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(1, 3, "_R") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-1-IK_R', 3,  None, (True, False,True), 1.0])]
-	addPoseBone(fp, True, 'Finger-1-3_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(2, 1, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-2-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(2, 2, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-2-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(2, 3, "_L") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-2-IK_L', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-2-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(2, 1, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-2-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(2, 2, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-2-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(2, 3, "_R") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-2-IK_R', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-2-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(3, 1, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-3-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(3, 2, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-3-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(3, 3, "_L") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-3-IK_L', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-3-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(3, 1, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-3-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(3, 2, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-3-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(3, 3, "_R") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-3-IK_R', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-3-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(4, 1, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-4-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(4, 2, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-4-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(4, 3, "_L") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-4-IK_L', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-4-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(4, 1, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-4-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(4, 2, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-4-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(4, 3, "_R") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-4-IK_R', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-4-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(5, 1, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-5-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, constraints)
-
-	constraints = fingerConstraints(5, 2, "_L") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-5-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(5, 3, "_L") 
-	constraints += [(('IK', T_FIK), 0, ['IK', 'Finger-5-IK_L', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-5-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	constraints = fingerConstraints(5, 1, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.6, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-5-1_R', customShape, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, constraints)
-
-	constraints = fingerConstraints(5, 2, "_R") 
-	constraints += [('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-5-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0,  constraints)
-
-	constraints = fingerConstraints(5, 3, "_R") 
-	constraints +=	[(('IK', T_FIK), 0, ['IK', 'Finger-5-IK_R', 3,  None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)])]
-	addPoseBone(fp, True, 'Finger-5-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, constraints)
-
-	# Control
-	addPoseBone(fp, T_FPanel, 'DrvHand_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), P_XYZ, [])
-	addPoseBone(fp, T_FPanel, 'DrvHand_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), P_XYZ, [])
+def defineFingerConstraints():
+	fconstraints = {}
 	for fnum in range(1,6):
-		addControlFinger(fp, fnum, "_L")
-		addControlFinger(fp, fnum, "_R")
-	return
+		for suffix in ["_L", "_R"]:
+			for lnum in range(1,4):
+				constraints = fingerConstraints(fnum, lnum, suffix)
+				if lnum == 3:
+					constraints.append( (('IK', T_FIK), 0, ['IK', 'Finger-%d-IK_L' % fnum, 3, None, (True, False,True), 1.0]) )
+				if fnum >= 2:
+					constraints.append( ('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]) )
+				fconstraints["%d-%d%s" % (fnum, lnum, suffix)] = constraints
+	return fconstraints
+	
+fconstraints = defineFingerConstraints()	
+customShape = 'MHCircle05'
+customShape = None
+		
+FingerPoses = [
+	('poseBone', True, 'Finger-1-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["1-1_L"]),
+	('poseBone', True, 'Finger-1-2_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, fconstraints["1-2_L"]),
+	('poseBone', True, 'Finger-1-3_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, fconstraints["1-3_L"]),
+
+	('poseBone', True, 'Finger-1-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["1-1_R"]),
+	('poseBone', True, 'Finger-1-2_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, fconstraints["1-2_R"]),
+	('poseBone', True, 'Finger-1-3_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, fconstraints["1-3_R"]),
+
+	('poseBone', True, 'Finger-2-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["2-1_L"]),
+	('poseBone', True, 'Finger-2-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-2_L"]),
+	('poseBone', True, 'Finger-2-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-3_L"]),
+
+	('poseBone', True, 'Finger-2-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["2-1_R"]),
+	('poseBone', True, 'Finger-2-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-2_R"]),
+	('poseBone', True, 'Finger-2-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-3_R"]),
+
+	('poseBone', True, 'Finger-3-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["3-1_L"]),
+	('poseBone', True, 'Finger-3-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-2_L"]),
+	('poseBone', True, 'Finger-3-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-3_L"]),
+
+	('poseBone', True, 'Finger-3-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["3-1_R"]),
+	('poseBone', True, 'Finger-3-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-2_R"]),
+	('poseBone', True, 'Finger-3-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-3_R"]),
+
+	('poseBone', True, 'Finger-4-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["4-1_L"]),
+	('poseBone', True, 'Finger-4-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-2_L"]),
+	('poseBone', True, 'Finger-4-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-3_L"]),
+
+	('poseBone', True, 'Finger-4-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["4-1_R"]),
+	('poseBone', True, 'Finger-4-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-2_R"]),
+	('poseBone', True, 'Finger-4-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-3_R"]),
+
+	('poseBone', True, 'Finger-5-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["5-1_L"]),
+	('poseBone', True, 'Finger-5-2_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-2_L"]),
+	('poseBone', True, 'Finger-5-3_L', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-3_L"]),
+
+	('poseBone', True, 'Finger-5-1_R', customShape, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, fconstraints["5-1_R"]),
+	('poseBone', True, 'Finger-5-2_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-2_R"]),
+	('poseBone', True, 'Finger-5-3_R', customShape, None, (0,0,0), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-3_R"]),
+
+	# Panel fingers
+	('poseBone', T_FPanel, 'DrvHand_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), P_XYZ, []),
+	('poseBone', T_FPanel, 'DrvFinger-1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-2_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-3_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-4_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-5_L', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	
+	('poseBone', T_FPanel, 'DrvHand_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), P_XYZ, []),
+	('poseBone', T_FPanel, 'DrvFinger-1_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-2_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-3_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-4_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	('poseBone', T_FPanel, 'DrvFinger-5_R', None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, []),
+	
+	# Control fingers
+	('poseBone', True, 'Finger-1_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-2_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-3_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-4_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-5_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	
+	('poseBone', True, 'Finger-1_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-2_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-3_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-4_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+	('poseBone', True, 'Finger-5_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+]	
 
 
 def addControlFinger(fp, fnum, suffix):
-	addPoseBone(fp, True, 'Finger-%s%s' % (fnum, suffix), 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
+	('poseBone', True, 'Finger-%s%s' % (fnum, suffix), 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
 		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])])
 
-	addPoseBone(fp, T_FIK, 'Finger-%s-IK%s' % (fnum, suffix), None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	('poseBone', T_FIK, 'Finger-%s-IK%s' % (fnum, suffix), None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, T_FPanel, 'DrvFinger-%s%s' % (fnum, suffix), None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, [])
+	('poseBone', T_FPanel, 'DrvFinger-%s%s' % (fnum, suffix), None, None, (0,0,0), (0,0,0), (0,0,0), (0,0,0), 0, [])
 	return 
 
 #

@@ -279,226 +279,223 @@ limRevToe_L = (-deg45,deg45, 0,0, 0,0)
 limRevToe_R = (-deg45,deg45, 0,0, 0,0)
 
 
-def LegWritePoses(fp):
-	global boneGroups
-	boneGroups = {}
-
+LegPoses = [
 	# Root
 	
-	addPoseBone(fp, True, 'LegRoot_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
-	addPoseBone(fp, True, 'LegRoot_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])	
+	('poseBone', True, 'LegRoot_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', True, 'LegRoot_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),	
 
 	# Deform 
 
-	addDeformLimb(fp, 'UpLeg_L', 'UpLegIK_L', (1,1,1), 'UpLegFK_L', (1,1,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH)
-	addPoseBone(fp, True, 'UpLegTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IK', 'LoLeg_L', 1, None, (True, False,False), 1.0])])
-	addDeformLimb(fp, 'LoLeg_L', 'LoLegIK_L', (1,1,1), 'LoLegFK_L', (1,1,1), 0, P_STRETCH)
-	addDeformLimb(fp, 'Foot_L', 'FootIK_L', (1,1,1), 'FootFK_L', (1,1,1), 0, 0)
-	addDeformLimb(fp, 'Toe_L', 'ToeIK_L', (1,1,1), 'ToeFK_L', (1,1,1), 0, 0)
+	('deformLimb', 'UpLeg_L', 'UpLegIK_L', (1,1,1), 'UpLegFK_L', (1,1,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH),
+	('poseBone', True, 'UpLegTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+		[('IK', 0, ['IK', 'LoLeg_L', 1, None, (True, False,False), 1.0])]),
+	('deformLimb', 'LoLeg_L', 'LoLegIK_L', (1,1,1), 'LoLegFK_L', (1,1,1), 0, P_STRETCH),
+	('deformLimb', 'Foot_L', 'FootIK_L', (1,1,1), 'FootFK_L', (1,1,1), 0, 0),
+	('deformLimb', 'Toe_L', 'ToeIK_L', (1,1,1), 'ToeFK_L', (1,1,1), 0, 0),
 
-	addDeformLimb(fp, 'UpLeg_R', 'UpLegIK_R', (1,1,1), 'UpLegFK_R', (1,0,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH)
-	addPoseBone(fp, True, 'UpLegTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IK', 'LoLeg_R', 1, None, (True, False,False), 1.0])])
-	addDeformLimb(fp, 'LoLeg_R', 'LoLegIK_R', (1,1,1), 'LoLegFK_R', (1,1,1), 0, P_STRETCH)
-	addDeformLimb(fp, 'Foot_R', 'FootIK_R', (1,1,1), 'FootFK_R', (1,1,1), 0, 0)
-	addDeformLimb(fp, 'Toe_R', 'ToeIK_R', (1,1,1), 'ToeFK_R', (1,1,1), 0, 0)
+	('deformLimb', 'UpLeg_R', 'UpLegIK_R', (1,1,1), 'UpLegFK_R', (1,0,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH),
+	('poseBone', True, 'UpLegTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+		[('IK', 0, ['IK', 'LoLeg_R', 1, None, (True, False,False), 1.0])]),
+	('deformLimb', 'LoLeg_R', 'LoLegIK_R', (1,1,1), 'LoLegFK_R', (1,1,1), 0, P_STRETCH),
+	('deformLimb', 'Foot_R', 'FootIK_R', (1,1,1), 'FootFK_R', (1,1,1), 0, 0),
+	('deformLimb', 'Toe_R', 'ToeIK_R', (1,1,1), 'ToeFK_R', (1,1,1), 0, 0),
 
 
 	# FK
-	addPoseBone(fp, 'True', 'UpLegFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_L, (1,1,1)])])
+	('poseBone', 'True', 'UpLegFK_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+ 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_L, (1,1,1)])]),
 
-	addPoseBone(fp, 'True', 'LoLegFK_L', 'MHCircle025', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (1,0,0)])])
+	('poseBone', 'True', 'LoLegFK_L', 'MHCircle025', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (1,0,0)])]),
 
-	addPoseBone(fp, 'True', 'FootFK_L', 'MHFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_L, (1,0,0)])])
+	('poseBone', 'True', 'FootFK_L', 'MHFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_L, (1,0,0)])]),
 
-	addPoseBone(fp, 'True', 'ToeFK_L', 'MHToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limToe_L, (1,0,0)])])
+	('poseBone', 'True', 'ToeFK_L', 'MHToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limToe_L, (1,0,0)])]),
 
-	addPoseBone(fp, 'True', 'UpLegFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_R, (1,1,1)])])
+	('poseBone', 'True', 'UpLegFK_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+ 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_R, (1,1,1)])]),
 
-	addPoseBone(fp, 'True', 'LoLegFK_R', 'MHCircle025', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (1,0,0)])])
+	('poseBone', 'True', 'LoLegFK_R', 'MHCircle025', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (1,0,0)])]),
 
-	addPoseBone(fp, 'True', 'FootFK_R', 'MHFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_R, (1,0,0)])])
+	('poseBone', 'True', 'FootFK_R', 'MHFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_R, (1,0,0)])]),
 
-	addPoseBone(fp, 'True', 'ToeFK_R', 'MHToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limToe_R, (1,0,0)])])
+	('poseBone', 'True', 'ToeFK_R', 'MHToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limToe_R, (1,0,0)])]),
 
 
 
 	# IK Common
 
-	addPoseBone(fp, True, 'UpLegIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_L, (True, True, True)])])
+	('poseBone', True, 'UpLegIK_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_L, (True, True, True)])]),
 
 
-	addPoseBone(fp, True, 'UpLegIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_R, (True, True, True)])])
+	('poseBone', True, 'UpLegIK_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_R, (True, True, True)])]),
 
 
 	# IK reverse foot
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootCtrl_L', 'MHFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	('poseBone', 'rigLeg&T_InvFoot', 'FootCtrl_L', 'MHFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['LegRoot_L', 'fNoStretch', 'LegRoot_L'])])
+		('LimitDist', 0, ['LegRoot_L', 'fNoStretch', 'LegRoot_L'])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootCtrl_R', 'MHFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	('poseBone', 'rigLeg&T_InvFoot', 'FootCtrl_R', 'MHFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['LegRoot_R', 'fNoStretch', 'LegRoot_R'])])
+		('LimitDist', 0, ['LegRoot_R', 'fNoStretch', 'LegRoot_R'])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
+	('poseBone', 'rigLeg&T_InvFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'Ankle_L', 2, (90*deg1, 'KneePT_L'), (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)])
-		])
+		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)]),
+		]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
+	('poseBone', 'rigLeg&T_InvFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'Ankle_R', 2, (90*deg1, 'KneePT_R'), (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)])
-		])
+		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)]),
+		]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootRevIK_L', 'MHRevFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevFoot_L, (True, True, True)])])
+	('poseBone', 'rigLeg&T_InvFoot', 'FootRevIK_L', 'MHRevFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevFoot_L, (True, True, True)])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootRevIK_R', 'MHRevFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevFoot_R, (True, True, True)])])
+	('poseBone', 'rigLeg&T_InvFoot', 'FootRevIK_R', 'MHRevFoot', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevFoot_R, (True, True, True)])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootIK_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'FootRevIK_L', 1, None, (True, False,True), 1.0])])
+	('poseBone', 'rigLeg&T_InvFoot', 'FootIK_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['IK', 'FootRevIK_L', 1, None, (True, False,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'FootIK_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+	('poseBone', 'rigLeg&T_InvFoot', 'FootIK_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, ['IK', 'FootRevIK_R', 1, None, (True, False,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'ToeRevIK_L', 'MHRevToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevToe_L, (True, True, True)])])
+	('poseBone', 'rigLeg&T_InvFoot', 'ToeRevIK_L', 'MHRevToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevToe_L, (True, True, True)])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'ToeRevIK_R', 'MHRevToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevToe_R, (True, True, True)])])
+	('poseBone', 'rigLeg&T_InvFoot', 'ToeRevIK_R', 'MHRevToe', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevToe_R, (True, True, True)])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'ToeIK_L', None, None, (1,1,1), (0,1,1), (1,1,0), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'ToeRevIK_L', 1, None, (True, False,True), 1.0])])
+	('poseBone', 'rigLeg&T_InvFoot', 'ToeIK_L', None, None, (1,1,1), (0,1,1), (1,1,0), (1,1,1), 0, 
+		[('IK', 0, ['IK', 'ToeRevIK_L', 1, None, (True, False,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'ToeIK_R', None, None, (1,1,1), (0,1,1), (1,1,0), (1,1,1), 0, 
+	('poseBone', 'rigLeg&T_InvFoot', 'ToeIK_R', None, None, (1,1,1), (0,1,1), (1,1,0), (1,1,1), 0, 
 		[('IK', 0, ['IK', 'ToeRevIK_R', 1, None, (True, False,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'KneePT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+	('poseBone', 'rigLeg&T_InvFoot', 'KneePT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('ChildOf', C_CHILDOF, ['Foot', 'FootCtrl_L', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)])]),
 
-	addPoseBone(fp, 'rigLeg&T_InvFoot', 'KneePT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+	('poseBone', 'rigLeg&T_InvFoot', 'KneePT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('ChildOf', C_CHILDOF, ['Foot', 'FootCtrl_R', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])])
+		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)])]),
 
 
 
 	# IK Gobo
 		
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
+	('poseBone', 'rigLeg&T_GoboFoot', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'LegTarget_L', 2, (1.2708, 'KneePT_L'), (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])
-		])
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)]),
+		]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,1), (1,1,1), (1,1,1), P_STRETCH,
+	('poseBone', 'rigLeg&T_GoboFoot', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,1), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'LegTarget_R', 2, (1.8708, 'KneePT_R'), (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)])
-		])
+		('LimitRot', C_OW_LOCAL, ['LimitRot', (-2.6,0, 0,0, 0,0), (True, True, True)]),
+		]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootGobo_L', 'GoboFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootGobo_L', 'GoboFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['LegRoot_L', 'fNoStretch',  'LegRoot_L'])])
+		('LimitDist', 0, ['LegRoot_L', 'fNoStretch',  'LegRoot_L'])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootGobo_R', 'GoboFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootGobo_R', 'GoboFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['LegRoot_R', 'fNoStretch', 'LegRoot_R'])])
+		('LimitDist', 0, ['LegRoot_R', 'fNoStretch', 'LegRoot_R'])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'KneePT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+	('poseBone', 'rigLeg&T_GoboFoot', 'KneePT_L', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_L', 1.0, (1,1,1), (1,1,1), (1,1,1)])])
+		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_L', 1.0, (1,1,1), (1,1,1), (1,1,1)])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'KneePT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+	('poseBone', 'rigLeg&T_GoboFoot', 'KneePT_R', 'MHCube05', 'ik', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_R', 1.0, (1,1,1), (1,1,1), (1,1,1)])])
+		('ChildOf', C_CHILDOF, ['Foot', 'FootGobo_R', 1.0, (1,1,1), (1,1,1), (1,1,1)])]),
 
 
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootIK_L', 'MHFoot', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'FootTarget_L', 1, None, (True, True,True), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootIK_L', 'MHFoot', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['IK', 'FootTarget_L', 1, None, (True, True,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'ToeIK_L', 'MHToe', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'ToeTarget_L', 1, None, (True, True,True), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'ToeIK_L', 'MHToe', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['IK', 'ToeTarget_L', 1, None, (True, True,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'TipToe_L', 'GoboTipToe_L', None, (1,1,1), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (0,2.96706, 0,0, 0,0), (1,0,0)])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'TipToe_L', 'GoboTipToe_L', None, (1,1,1), (0,0,1), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', (0,2.96706, 0,0, 0,0), (1,0,0)])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootRoll_L', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootRoll_L', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootTumble_L', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootTumble_L', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'TumbleOut_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'TumbleOut_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'TumbleIn_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'TumbleIn_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'Heel_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'Heel_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'RotateToe_L', 'GoboRotate_L', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_GoboFoot', 'RotateToe_L', 'GoboRotate_L', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootTarget_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootTarget_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_L', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootIK_R', 'MHFoot', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'FootTarget_R', 1, None, (True, True,True), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootIK_R', 'MHFoot', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['IK', 'FootTarget_R', 1, None, (True, True,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'ToeIK_R', 'MHToe', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'ToeTarget_R', 1, None, (True, True,True), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'ToeIK_R', 'MHToe', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, ['IK', 'ToeTarget_R', 1, None, (True, True,True), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'TipToe_R', 'GoboTipToe_R', None, (1,1,1), (0,0,1), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', (0,2.96706, 0,0, 0,0), (1,0,0)])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'TipToe_R', 'GoboTipToe_R', None, (1,1,1), (0,0,1), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OW_LOCAL, ['LimitRot', (0,2.96706, 0,0, 0,0), (1,0,0)])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootRoll_R', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootRoll_R', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootTumble_R', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootTumble_R', 'GoboArrows', 'grabable', (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL, ['LimitLoc', (-0.5,0.5, 0,0, 0,0), (1,1, 0,0, 0,0)])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'TumbleOut_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'TumbleOut_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'TumbleIn_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'TumbleIn_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootTumble', 'FootTumble_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'Heel_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'Heel_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'RotateToe_R', 'GoboRotate_R', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	('poseBone', 'rigLeg&T_GoboFoot', 'RotateToe_R', 'GoboRotate_R', None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	addPoseBone(fp, 'rigLeg&T_GoboFoot', 'FootTarget_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])])
+	('poseBone', 'rigLeg&T_GoboFoot', 'FootTarget_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		 [('Action', C_TG_LOCAL, ['Action', 'goboFootRoll', 'FootRoll_R', 'LOCATION_X', (1,21), (-0.5,0.5), 1.0])]),
 
 
 	# IK both
 
-	addPoseBone(fp, True, 'KneeHandle_L', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['StretchTo', 'KneePT_L', 'PLANE_X'])])
+	('poseBone', True, 'KneeHandle_L', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, ['StretchTo', 'KneePT_L', 'PLANE_X'])]),
 
-	addPoseBone(fp, True, 'KneeHandle_R', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['StretchTo', 'KneePT_R', 'PLANE_X'])])
+	('poseBone', True, 'KneeHandle_R', None, 'ik', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, ['StretchTo', 'KneePT_R', 'PLANE_X'])]),
+]
 
-	return
 
 #
 #	LegWriteActions(fp)
