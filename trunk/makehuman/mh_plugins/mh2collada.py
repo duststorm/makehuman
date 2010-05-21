@@ -38,8 +38,11 @@ from mhx_rig import *
 # ....exportCollada(obj, filename):
 #
 
+import mh2spec
 
 def exportCollada(obj, filename):
+	#mh2spec.writeSkeleton("/home/thomas/bonedef.txt")
+	#return
 	print 'Writing Collada file %s' % filename
 	fp = open(filename, 'w')
 	exportDae(obj, fp)
