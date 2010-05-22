@@ -51,7 +51,7 @@ thePoses = rig_body_25.BodyPoses +\
 #
 
 def includeBone(cond, flags, bone, parent): 		
-		if 0:
+		if 1:
 			return mh2collada.boneOK(flags, bone, parent)
 		elif bone == 'Root':
 			return 'None'
@@ -70,18 +70,25 @@ def writeSkeleton(fileName):
 	jointNum = writeJoints(fp, usedJoint, theJoints)
 	boneNum = writeRig(fp, theArmature, rig, jointNum)
 	
-	writePoses(fp, thePoses, boneNum)
+	# writePoses(fp, thePoses, boneNum)
 
 	weights = {}
-	mh2collada.readSkinWeights(weights, "data/templates/vertexgroups-bones25.mhx")	
-	fp.write("\n# weights\n")
+	mh2collada.readSkinWeights(weights, "data/templates/vertexgroups-minimal.mhx")	
+
+	bones = []
 	for (bone, bn) in boneNum.items():
+		bones.append((bn,bone))
+	bones.sort()
+	
+	for (bn, bone) in bones:
 		try:
 			wts = weights[bone]
 		except:
 			wts = []
-		for (vn,w) in wts:
-			fp.write("  %s %s %s\n" % (vn, bn, w))
+		if wts:
+			fp.write("\n# weights %s\n" % bone)
+			for (vn,w) in wts:
+				fp.write("  %s %s\n" % (vn, w))
 	fp.close()
 	return
 
@@ -144,13 +151,13 @@ def writeJoints(fp, usedJoint, joints):
 				pass
 			elif typ == 'o':
 				(point, offs) = data
-				fp.write("  %s offset %d %s %s %s\n" % (loc, jointNum[point], offs[0], offs[1], offs[2]))
+				fp.write("  %s offset %s %s %s %s\n" % (loc, point, offs[0], offs[1], offs[2]))
 			elif typ == 'l':
 				((k1, x1), (k2, x2)) = data
-				fp.write("  %s line %s %d %s %d \n" % (loc, k1, jointNum[x1], k2, jointNum[x2]))
+				fp.write("  %s line %s %s %s %s \n" % (loc, k1, x1, k2, x2))
 			elif typ == 'p':
 				(x, y, z) = data
-				fp.write("  %s position %d %d %d \n" % (loc, jointNum[x], jointNum[y], jointNum[z]))
+				fp.write("  %s position %s %s %s \n" % (loc, x, y, z))
 			else:
 				raise NameError("Unknown joint type %s" % typ)
 			jn += 1
@@ -177,9 +184,9 @@ def writeRig(fp, armature, rig, jointNum):
 			tail = rigBone[1]
 			par = includeBone(cond, flags, bone, parent)
 			print("   ", head, tail, roll, par)
-			fp.write("  %s %d %d %.4f" % (bone, jointNum[head], jointNum[tail], roll))
+			fp.write("  %s %s %s %.4f" % (bone, head, tail, roll))
 			if parent:
-				fp.write(" %d" % boneNum[par])
+				fp.write(" %s" % par)
 			else:
 				fp.write(" -")
 			fp.write("\n")
@@ -259,7 +266,7 @@ def writePoses(fp, poses, boneNum):
 
 
 		if includeBone(cond, flags, bone, True):
-			fp.write("\nposebone %d %s %s %s %s\n" % (boneNum[bone], lockLoc, lockRot, lockScale, ik_dof) )
+			fp.write("\nposebone %s %s %s %s %s\n" % (bone, lockLoc, lockRot, lockScale, ik_dof) )
 			for (ctyp, cflags, cdata) in constraints:
 				fp.write("  constraint %s %x %s\n" % (ctyp, cflags, cdata))
 	return

@@ -33,12 +33,13 @@ import mh2bvh
 import os, time
 import mhx_rig, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 from mhx_rig import *
+import read_rig
 
 #
 # ....exportCollada(obj, filename):
 #
 
-import mh2spec
+#import mh2spec
 
 def exportCollada(obj, filename):
 	#mh2spec.writeSkeleton("/home/thomas/bonedef.txt")
@@ -101,11 +102,15 @@ twistBones = {
 	'UpLegTwist_R' 	: 'UpLeg_R',
 }
 
+skipBones = [ 'Rib_L', 'Rib_R', 'Stomach_L', 'Stomach_R', 'Scapula_L', 'Scapula_R']
+
 def boneOK(flags, bone, parent):
 	if bone == 'Root':
 		return 'None'
-	#elif bone in twistBones.keys():
-	#	return None
+	elif bone in twistBones.keys():
+		return None
+	elif bone in skipBones:
+		return None
 	elif bone in reparents.keys():
 		return reparents[bone]
 	elif flags & F_DEF:
@@ -201,12 +206,10 @@ def printNode(fp, name, vec, extra, pad):
 
 
 #
-#	exportDae(obj, fp):
+#	getArmatureFromMhx(obj):
 #
 
-def exportDae(obj, fp):
-	global rigHead, rigTail
-
+def getArmatureFromMhx(obj):
 	mhx_rig.newSetupJoints(obj, 
 		rig_body_25.BodyJoints +
 		rig_arm_25.ArmJoints +
@@ -222,31 +225,64 @@ def exportDae(obj, fp):
 		rig_toe_25.ToeHeadsTails +
 		rig_face_25.FaceHeadsTails)
 		
-	rigHead = mhx_rig.rigHead
-	rigTail = mhx_rig.rigTail
-	
-	rigHier = []
+	hier = []
 	armature = rig_body_25.BodyArmature + rig_arm_25.ArmArmature + rig_finger_25.FingerArmature + rig_leg_25.LegArmature + rig_toe_25.ToeArmature + rig_face_25.FaceArmature
 
 	for (bone, cond, roll, parent, flags, layers, bbone) in armature:
 		par = boneOK(flags, bone, parent)
 		if par:
 			if par == 'None':
-				rigHier.append((bone, []))
+				hier.append((bone, []))
 			else:
-				#print("find", bone, par, rigHier)
-				(p, children) = findInHierarchy(par, rigHier)
+				#print("find", bone, par, hier)
+				(p, children) = findInHierarchy(par, hier)
 				children.append((bone, []))
 	#print("hier", rigHier)
 	
 	bones = []
-	flatten(rigHier, bones)	
-	nBones = len(bones)
+	flatten(hier, bones)	
 
 	weights = {}
-	readSkinWeights(weights, "data/templates/vertexgroups-bones25.mhx")	
+	readSkinWeights(weights, "data/templates/vertexgroups-minimal.mhx")	
 	# fixTwistWeights(fp, weights)
+	return (mhx_rig.rigHead, mhx_rig.rigTail, hier, bones, weights)
+
+#
+#	getArmatureFromRigFile(fileName, obj):	
+#
+
+def getArmatureFromRigFile(fileName, obj):	
+	(locations, armature, weights) = read_rig.readRigFile(fileName, obj)
 	
+	hier = []
+	heads = {}
+	tails = {}
+	bones = []
+	for (bone, head, tail, roll, parent) in armature:
+		bones.append(bone)
+		heads[bone] = head
+		tails[bone] = tail
+		if parent == '-':
+			hier.append((bone, []))
+		else:
+			(p, children) = findInHierarchy(parent, hier)
+			children.append((bone, []))
+
+	return (heads, tails, hier, bones, weights)
+
+#
+#	exportDae(obj, fp):
+#
+
+def exportDae(obj, fp):
+	global rigHead, rigTail
+
+	#(rigHead, rigTail, rigHier, bones, weights) = getArmatureFromMhx(obj)
+
+	(rigHead, rigTail, rigHier, bones, weights) = getArmatureFromRigFile('data/templates/minimal.rig', obj)
+
+	nBones = len(bones)
+
 	vertexWeights = {}
 	for (vn,v) in enumerate(obj.verts):
 		vertexWeights[vn] = []
