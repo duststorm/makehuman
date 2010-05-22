@@ -234,8 +234,11 @@ def getArmatureFromMhx(obj):
 			if par == 'None':
 				hier.append((bone, []))
 			else:
-				#print("find", bone, par, hier)
-				(p, children) = findInHierarchy(par, hier)
+				parHier = findInHierarchy(par, hier)
+				try:
+					(p, children) = parHier
+				except:
+					raise NameError("Did not find %s parent %s" % (bone, parent))
 				children.append((bone, []))
 	#print("hier", rigHier)
 	
@@ -257,18 +260,45 @@ def getArmatureFromRigFile(fileName, obj):
 	hier = []
 	heads = {}
 	tails = {}
-	bones = []
 	for (bone, head, tail, roll, parent) in armature:
-		bones.append(bone)
 		heads[bone] = head
 		tails[bone] = tail
 		if parent == '-':
 			hier.append((bone, []))
 		else:
-			(p, children) = findInHierarchy(parent, hier)
+			parHier = findInHierarchy(parent, hier)
+			try:
+				(p, children) = parHier
+			except:
+				raise NameError("Did not find %s parent %s" % (bone, parent))
 			children.append((bone, []))
+	
+	newHier = addInvBones(hier, heads, tails)
+	bones = []
+	flatten(newHier, bones)
+	return (heads, tails, newHier, bones, weights)
 
-	return (heads, tails, hier, bones, weights)
+#
+#	addInvBones(hier, heads, tails):
+#
+
+def addInvBones(hier, heads, tails):
+	newHier = []
+	for (bone, children) in hier:
+		newChildren = addInvBones(children, heads, tails)
+		n = len(children)
+		if n == 1:
+			(child, subChildren) = children[0]
+			offs = vsub(tails[bone], heads[child])
+		if n > 1 or (n == 1 and vlen(offs) > 1e-4):
+			boneInv = bone+"Inv"
+			heads[boneInv] = tails[bone]
+			tails[boneInv] = heads[bone]
+			newHier.append( (bone, [(boneInv, newChildren)]) )
+		else:
+			newHier.append( (bone, newChildren) )
+
+	return newHier
 
 #
 #	exportDae(obj, fp):
