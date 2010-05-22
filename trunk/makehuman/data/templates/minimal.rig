@@ -88,7 +88,7 @@
   l-loLid-v vertex 12594
   r-upLid-v vertex 2442
   r-loLid-v vertex 2520
-  root-head offset pelvis 0 -1.5 0
+  root-head offset pelvis 0 0 0
   mid-feet line 0.5 l-toe-1-1 0.5 r-toe-1-1 
   floor offset mid-feet 0 -0.3 0
   r-loarm-vec line 1 r-hand -1 r-elbow 
@@ -125,14 +125,14 @@
   knee_R_head offset knee_R_tail 0 -0.6 0
   heel_L_tail offset r-heel 0 0.6 0
   heel_R_tail offset l-heel 0 0.6 0
-  l-upLid line 2.5 l-upLid-v -1.5 l-eye 
-  l-loLid line 2.5 l-loLid-v -1.5 l-eye 
-  r-upLid line 2.5 r-upLid-v -1.5 r-eye 
-  r-loLid line 2.5 r-loLid-v -1.5 r-eye 
+  l-upLid line 2 l-upLid-v -1 l-eye 
+  l-loLid line 2 l-loLid-v -1 l-eye 
+  r-upLid line 2 r-upLid-v -1 r-eye 
+  r-loLid line 2 r-loLid-v -1 r-eye 
   head-end line 2.0 head -1.0 neck 
   mouth-end line 3.0 mouth -2.0 head 
-  Eye_R_tail offset l-eye 0.0 0.0 0.5
-  Eye_L_tail offset r-eye 0.0 0.0 0.5
+  Eye_R_tail offset l-eye 0.0 0.0 0.4
+  Eye_L_tail offset r-eye 0.0 0.0 0.4
 
 # bones
   Root root-head spine3 0.0000 -
