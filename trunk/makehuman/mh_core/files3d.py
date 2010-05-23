@@ -165,32 +165,19 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
                 t = f.uv[i]
 
                 # If this is the first occurrence of this vertex add it
-                # into the vertex array. A list element is added into the
-                # groupVerts dictionary for this vertex. This list element is used
-                # to hold 'key, value' pairs mapping the vertex index to the
-                # corresponding UV index.
+                # into the vertex array. A dictionary maps the vertex and
+                # UV index to the corresponding full index as a cache.
 
-                if v.idx not in groupVerts:
+                if (v.idx, t) not in groupVerts:
                     v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[v.idx] = {}
-                    groupVerts[v.idx][t] = fullArrayIndex  # Add the UV-index as a 'key'. Add the vertex index as a 'value'.
-                    obj.indexBuffer.append(fullArrayIndex)
-                    fullArrayIndex += 1
-                elif t not in groupVerts[v.idx]:
-
-                # If this vertex exists, but this UV index has not yet been
-                # added as the 'key' of an element in the groupVerts list,
-                # split it off to form a separate vertex.
-
-                    v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[v.idx][t] = fullArrayIndex  # Add the UV-index as a 'key'. Add the vertex index as a 'value'.
+                    groupVerts[(v.idx, t)] = fullArrayIndex  # Add the UV-index as a 'key'. Add the vertex index as a 'value'.
                     obj.indexBuffer.append(fullArrayIndex)
                     fullArrayIndex += 1
                 else:
 
                 # If this vertex exists and the UV index exists ...:
 
-                    obj.indexBuffer.append(groupVerts[v.idx][t])
+                    obj.indexBuffer.append(groupVerts[(v.idx, t)])
 
             f.idx = fIndex
             f.group = fg

@@ -1182,7 +1182,7 @@ class Scene3D:
         mh.world.append(obj.object3d)
 
         for g in obj.facesGroups:
-            groupVerts = {}
+            groupVerts = set()
             for f in g.faces:
                 faceColor = f.color
                 if faceColor == None:
@@ -1193,7 +1193,7 @@ class Scene3D:
 
                 i = 0
                 for v in f.verts:
-                    if v.idx not in groupVerts:
+                    if (v.idx, fUV[i]) not in groupVerts:
 
                         # obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
 
@@ -1201,24 +1201,7 @@ class Scene3D:
                         obj.object3d.setNormCoord(coIdx, v.no)
                         obj.object3d.setColorIDComponent(coIdx, f.colorID)
                         obj.object3d.setColorComponent(colIdx, faceColor[i])
-                        groupVerts[v.idx] = set()
-                        groupVerts[v.idx].add(fUV[i])
-
-                        coIdx += 1
-                        colIdx += 1
-
-                        if obj.uvValues:
-                            obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
-                            uvIdx += 1
-                    elif fUV[i] not in groupVerts[v.idx]:
-
-                        # obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
-
-                        obj.object3d.setVertCoord(coIdx, v.co)
-                        obj.object3d.setNormCoord(coIdx, v.no)
-                        obj.object3d.setColorIDComponent(coIdx, f.colorID)
-                        obj.object3d.setColorComponent(colIdx, faceColor[i])
-                        groupVerts[v.idx].add(fUV[i])
+                        groupVerts.add((v.idx, fUV[i]))
 
                         coIdx += 1
                         colIdx += 1
