@@ -1,4 +1,4 @@
-from scipy.linalg import pinv
+from scipy.linalg import pinv,svd
 import numpy as np
 
 
@@ -82,4 +82,47 @@ def align_scan(mask_scan,mask_mh,scan):
 	scale,R,T = find_transform(mask_scan,mask_mh)
 	return apply_transform(scale,R,T,scan)
 
+def compute_base(targets,rcond = None):
+	"""
+		Compute the projection base to project a new target on
+		the base of known targets.
+		
+		arguments :
+			- targets : a list of targets. each target is given
+			as a 2D array with one 3D vertex per raw.
+			- rcond : cut-off on singular values. Singular values
+			  smaller than rcond*greatest-singular-value are considered
+			  as zero.
+			  
+		returns the projection base B so that B*target give the coefficient
+		of the targets to use.
+		
+		NB : the rcond value [0,1] allows to control the precision of the
+		projection base. Value 1 will give a higher precision. Smaller
+		values will 'smooth' the result.
+	"""
 	
+	targets = np.array(targets)
+	ntargs,nverts,dim = targets.shape
+	targets = targets.reshape(ntargs,nverts*dim)
+	u,s,vt = svd(targets.T)
+	return u.T[s>=rcond*s[0]]
+
+def project_target(base,target):
+	"""
+		Rebuild 'target' as a combinaison of 'targets' using 'base'.
+		t' = base^T * base * t
+		
+		arguments :
+		- base : projection base as given by 'compute_base'
+	"""
+	if not isinstance(target,np.ndarray) :
+		target = np.array(target)
+	try :
+		nverts,dim = target.shape
+		target = target.reshape(nverts*dim)
+		return np.dot(np.dot(target,base.T),base).reshape(nverts,dim)
+	except ValueError :
+		ntargs,nverts,dim = target.shape
+		target = target.reshape(ntargs,nverts*dim)
+		return np.dot(np.dot(target,base.T),base).reshape(ntargs,nverts,dim)
