@@ -129,7 +129,7 @@ class Mesh(object) :
 			out+="vt %0.6f %0.6f\n"%tuple(vt)
 		
 		for gname,gr in self.groups.iteritems() :
-			if gname != "all_faces\n" :
+			if gname != "all_faces" :
 				out+="g %s\n"%gname
 			if gr.material is not None :
 				out+="usemtl %s\n"%gr.material
