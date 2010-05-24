@@ -85,6 +85,18 @@ def align_scan(mask_scan,mask_mh,scan):
 
 
 class TargetBase(object):
+	"""
+		Object used to manage target projection bases.
+		
+		important attributes are :
+		- names : list of target names. This can be used for creating
+		          the combinaison of targets to use (boddy setting files)
+		- vert_list : the vertices that will be used. 
+		- targets : the targets as a 3D array (ntargets,nvertices,3)
+		- prefix  : prefix used to load or save the different components
+		            of the base.
+	
+	"""
 	def __init__(self,names = None,vert_list=None,targets=None,prefix = None):
 		self._names = names
 		self._vert_list = vert_list
@@ -159,6 +171,9 @@ class TargetBase(object):
 			
 			arguments :
 			- target : target to fit
+			- rcond : cut off on the singular values as a fraction of
+			          the biggest one. Only base vectors corresponding
+			          to singular values bigger than rcond*largest_singular_value
 		"""
 		
 		u = self.u[ : , self.s>= rcond*self.s[0]]
@@ -175,6 +190,17 @@ class TargetBase(object):
 			return np.dot(np.dot(target,u),u.T).reshape(ntargs,nverts,dim)
 			
 	def compute_combinaison(self,target,rcond = 0.0):
+		"""
+			Computes the combination of base targets allowing to reproduce
+			'target' (or giving the best approximation).
+			
+			arguments :
+			- target : target to fit
+			- rcond : cut off on the singular values as a fraction of
+			          the biggest one. Only base vectors corresponding
+			          to singular values bigger than rcond*largest_singular_value
+			
+		"""
 		cond = self.s>= rcond*self.s[0]
 		u = self.u[ : , cond ]
 		vt = self.vt[ cond ]
@@ -183,6 +209,21 @@ class TargetBase(object):
 		return np.dot(np.dot(target,u),vt*1./s)
 		
 	def compute_combinaison_safe(self,target,rcond = 0.0,regul = None):
+		"""
+			Computes the combination of base targets allowing to reproduce
+			'target' (or giving the best approximation), while keeping
+			coefficients between 0 and 1.
+
+			arguments :
+			- target : target to fit
+			- rcond : cut off on the singular values as a fraction of
+			          the biggest one. Only base vectors corresponding
+			          to singular values bigger than rcond*largest_singular_value
+			          
+			- regul : regularisation factor for least square fitting. This force
+			          the algorithm to use fewer targets.
+			
+		"""
 		from cvxmod import optvar,param,norm2,norm1,problem,matrix,minimize
 		if type(target) is str or type(target) is unicode :
 			target = read_target(target)
@@ -294,7 +335,11 @@ def save_target(filename,target):
 if __name__ == '__main__' :
 	import sys
 	
-	cmd = sys.argv[1]
+	try :
+		cmd = sys.argv[1]
+	except IndexError :
+		print "usage : python scan_fit.py build|project args"
+		sys.exit(-1)
 	
 	if cmd == 'build' :
 		try : 
@@ -330,7 +375,7 @@ if __name__ == '__main__' :
 			prefix = sys.argv[7]
 			output = sys.argv[8]
 		except IndexError :
-			print "usage : python scan_fit.py fit head_mesh head_mask scan_mesh scan_mesh fit_verts prefix output_obj"
+			print "usage : python scan_fit.py fit head_mesh head_mask scan_mesh scan_mask fit_verts prefix output_target"
 			sys.exit(-1)
 
 		head_mesh = wf.read_obj(head_mesh)
