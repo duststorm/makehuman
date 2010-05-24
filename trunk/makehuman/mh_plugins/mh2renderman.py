@@ -36,7 +36,6 @@ import files3d
 import subprocess
 import hairgenerator
 import random
-import types
 
 hairsClass = hairgenerator.Hairgenerator()
 
@@ -320,14 +319,14 @@ def writeSubdivisionMesh(fileName, mesh, referenceFile=None, group = None, vertC
         gFlag = False
         gFacesIndices = []
         for faceIdx in facesIndices:
-            if type(faceIdx) is types.StringType:
+            if isinstance(faceIdx, str):
                 print faceIdx
                 if faceIdx == group:
                     gFlag = True
                 else:
                     gFlag = False
             if gFlag == True:
-                if type(faceIdx) is not types.StringType:
+                if not isinstance(faceIdx, types.StringType):
                     gFacesIndices.append(faceIdx)
 
         facesIndices = gFacesIndices

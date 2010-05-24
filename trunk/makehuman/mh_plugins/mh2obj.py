@@ -31,7 +31,6 @@ Requires:
 __docformat__ = 'restructuredtext'
 
 import files3d
-import types
 
 
 def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True):
@@ -71,7 +70,7 @@ def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True):
     if originalQuadsFile:
       faces = files3d.loadFacesIndices(originalQuadsFile, True)
       for fc in faces:
-         if type(fc) is types.StringType:
+         if isinstance(fc, str):
             if exportGroups:
                 f.write('g %s\n' % fc)
          else :

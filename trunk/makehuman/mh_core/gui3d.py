@@ -29,7 +29,6 @@ import events3d
 import files3d
 import animation3d
 import module3d
-import types
 import mh
 import os
 import font3d
@@ -41,7 +40,7 @@ class Object(events3d.EventHandler):
     def __init__(self, view, mesh, texture=None, position=[0, 0, 9], camera=1, shadeless=1, visible=True):
         self.app = view.app
         self.view = view
-        if type(mesh) is str:
+        if isinstance(mesh, str):
          self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
          self.meshName = mesh
         else: #its of type module3d.Object3D
@@ -572,7 +571,7 @@ class Slider(View):
     position=[0, 0, 15], value=0.0, min=0.0, max=1.0,\
     label=None):
         #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
-        if type(label) is str:
+        if isinstance(label, str):
             createText(parent,label, [position[0]+10,position[1]-5,position[2]])
         View.__init__(self, parent)
         self.background = Object(self, 'data/3dobjs/slider_background.obj', texture=backgroundTexture, position=position)
@@ -604,7 +603,7 @@ class Slider(View):
         self.slider.setPosition(sliderPos)
         value = (sliderPos[0] - self.sliderMinX) / float(self.sliderMaxX - self.sliderMinX)
         self.__value = value * (self.max - self.min) + self.min
-        if type(self.min) is int:
+        if isinstance(self.min, int):
             self.__value = int(self.__value)
 
         self.callEvent('onChanging', self.__value)
@@ -617,7 +616,7 @@ class Slider(View):
         self.slider.setPosition(sliderPos)
         value = (sliderPos[0] - self.sliderMinX) / float(self.sliderMaxX - self.sliderMinX)
         self.__value = value * (self.max - self.min) + self.min
-        if type(self.min) is int:
+        if isinstance(self.min, int):
             self.__value = int(self.__value)
 
         self.callEvent('onChange', self.__value)
@@ -665,7 +664,7 @@ class Button(View):
         else:
             t = texture
         self.button = Object(self, mesh, texture=t, position=position)
-        if type(label) is str:
+        if isinstance(label, str):
             createText(parent,label, [position[0]+5,position[1]-8,position[2]+0.001])
             #assumes button obj origin is upper left corner
             #TODO text should be in the middle of button, calculate this from text length
@@ -988,11 +987,11 @@ class FileChooser(View):
 
     def onShow(self, event):
         self.files = []
-        if type(self.extension) is types.StringType:
+        if isinstance(self.extension, str):
             for f in os.listdir(self.path):
                 if f.endswith('.' + self.extension):
                     self.files.append(f)
-        elif type(self.extension) is types.ListType:
+        elif isinstance(self.extension, list):
             for f in os.listdir(self.path):
                 for ext in self.extension:
                     if f.endswith('.' + ext):
