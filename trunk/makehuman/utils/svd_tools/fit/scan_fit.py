@@ -299,11 +299,10 @@ if __name__ == '__main__' :
 	if cmd == 'build' :
 		try : 
 			target_dir = sys.argv[2]
-			mask_verts_file = sys.argv[3]
-			output = sys.argv[4]
+			output = sys.argv[3]
 
 		except IndexError :
-			print "usage : python scan_fit.py build target_dir mask_verts output_prefix"
+			print "usage : python scan_fit.py build target_dir output_prefix"
 			sys.exit(-1)
 
 		print "Read targets...",
