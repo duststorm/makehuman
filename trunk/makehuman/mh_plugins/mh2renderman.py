@@ -215,7 +215,7 @@ def sssColor(mesh, referenceFile, pointLightCoords, pointLightIntensity, refl = 
         
     sssIterations = [vertsColor]
     
-    for n in range(sssSteps):
+    for n in xrange(sssSteps):
         colorsToScatter = sssIterations[-1]
         sssColors = []
         for v in mesh.verts:
@@ -552,7 +552,7 @@ def mh2Aqsis(camera, scene, fName, ribRepository):
     # ribfile.write('\tLightSource "pointlight" 2 "from" [%f %f %f] "intensity" 1000\n'%(spot1Pos[0],spot1Pos[1],spot1Pos[2]))
     # ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [%f %f %f] "to" [0 0 0] "intensity" 1000  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'%(ribRepository + "/zmap.shad",spot1Pos[0],spot1Pos[1],spot1Pos[2]))
 
-    for i in range(len(pointLightCoords)):
+    for i in xrange(len(pointLightCoords)):
         ribfile.write('\tLightSource "pointlight" %i  "from" [%f %f %f] "intensity" %f\n' % (i, pointLightCoords[i][0], pointLightCoords[i][1], -pointLightCoords[i][2],
                       pointLightIntensity[i] * 75))
 

@@ -426,7 +426,7 @@ def saveTranslationTarget(obj, targetPath, groupToSave=None, epsilon=0.001):
     originalVerts = files3d.loadVertsCoo(obj.path)
 
     if not groupToSave:
-        vertsToSave = range(len(obj.verts))
+        vertsToSave = xrange(len(obj.verts))
     else:
         pass  # TODO verts from group
 
@@ -715,7 +715,7 @@ def loadVertsColors(obj, colorsPath, update=1, mode='new'):
 
     # TODO THE CODE  COMMENTED BELOW IS WRONG: must be updated with new color structure
     # if mode == "new":
-    #    obj.colors = range(len(obj.verts))
+    #    obj.colors = xrange(len(obj.verts))
 
     if len(colorData) != len(obj.faces):
         print 'Warning: Color data does not match number of vertices ( %i vs %i)' % (len(colorData), len(obj.faces))

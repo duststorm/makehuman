@@ -46,8 +46,8 @@ def byteToBit(val, numdigits=8, base=2):
     
     """
 
-    digits = [0 for i in range(numdigits)]
-    for i in range(numdigits):
+    digits = [0 for i in xrange(numdigits)]
+    for i in xrange(numdigits):
         (val, digits[i]) = divmod(val, base)
     return digits
 
