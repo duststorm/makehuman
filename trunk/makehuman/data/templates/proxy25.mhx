@@ -1,5 +1,5 @@
 
-Mesh HumanProxy HumanProxy 
+*** ProxyMesh
   Verts
   *** ProxyVerts
   end Verts
@@ -15,7 +15,7 @@ Mesh HumanProxy HumanProxy
   vertex_normal_flip True ;
 end Mesh
 
-Object HumanProxy MESH HumanProxy
+*** ProxyObject
   layers Array 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
     Modifier Armature ARMATURE
       b_bone_rest False ;

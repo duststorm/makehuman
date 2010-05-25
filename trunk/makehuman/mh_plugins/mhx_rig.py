@@ -286,7 +286,7 @@ def writeBoneGroups(fp, groups):
 
 def writePoses(fp, poses):
 	for pose in poses:
-		print(pose)
+		#print(pose)
 		try:
 			(typ, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints) = pose
 		except:
@@ -1206,5 +1206,26 @@ def writeAllProcesses(fp):
 	fp.write("  ObjectMode ;\n")
 
 	return
+
+def reapplyArmature(fp, name):
+	fp.write("\n" +
+"  Object %s  \n" % name +
+"    Modifier Armature ARMATURE \n" +
+"      b_bone_rest False ; \n" +
+"      editmode False ; \n" +
+"      expanded True ; \n" +
+"      invert False ; \n" +
+"      multi_modifier False ; \n" +
+"      object Refer Object HumanRig ; \n" +
+"      on_cage False ; \n" +
+"      quaternion False ; \n" +
+"      realtime True ; \n" +
+"      render True ; \n" +
+"      use_bone_envelopes False ; \n" +
+"      use_vertex_groups True ; \n" +
+"    end Modifier \n" +
+"  end Object\n")
+
+
 
 

@@ -85,6 +85,7 @@ T_Face = 0x40
 T_Shape = 0x80
 T_Mesh = 0x100
 T_Armature = 0x200
+T_Proxy = 0x400
 T_Panel = 0x800
 
 T_Rigify = 0x1000
@@ -116,12 +117,11 @@ T_LocalFKIK = 0x8000
 
 rigLeg = 0
 rigArm = 0
-theProxy = 'None'
 
 def setFlagsAndFloats(rigFlags):
-	global toggle, rigLeg, rigArm, theProxy, doBend
+	global toggle, rigLeg, rigArm, doBend
 
-	(footRig, fingerRig, theProxy) = rigFlags
+	(footRig, fingerRig) = rigFlags
 	rigLeg = 0
 	if footRig == 'Reverse foot': rigLeg |= T_InvFoot
 	elif footRig == 'Gobo': rigLeg |= T_GoboFoot
@@ -2154,13 +2154,9 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		items = [('Reverse foot','Reverse foot','Reverse foot'), ('Gobo','Gobo','Gobo')], default = '1')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
 		items = [('Rotation','Rotation','Rotation'), ('Panel','Panel','Panel'), ('IK','IK','IK')], default = '1')
-	proxy = EnumProperty(name="Proxy", description="Choose proxy mesh", 
-		items = [('None','None','None'), 
-			 ('forsaken','forsaken','forsaken'), 
-			 ('Rorkimaru','Rorkimaru','Rorkimaru'),
-			], default = '1')
 
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
+	proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
 	stretch = BoolProperty(name="Stretchy limbs", description="Stretchy limbs", default=toggle&T_Stretch)
@@ -2171,6 +2167,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	def execute(self, context):
 		global toggle
 		O_Mesh = T_Mesh if self.properties.mesh else 0
+		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_Armature = T_Armature if self.properties.armature else 0
 		O_Replace = T_Replace if self.properties.replace else 0
 		O_Stretch = T_Stretch if self.properties.stretch else 0
@@ -2178,13 +2175,12 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		#O_Preset = T_Preset if self.properties.preset else 0
-		toggle =  O_Mesh | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | T_MHX 
+		toggle =  O_Mesh | O_Proxy | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | T_MHX 
 
 		
 		readMhxFile(self.properties.path, 	
 			(self.properties.footRig, 
-			self.properties.fingerRig,
-			self.properties.proxy))
+			self.properties.fingerRig))
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
