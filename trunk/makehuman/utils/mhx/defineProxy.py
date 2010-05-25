@@ -9,16 +9,17 @@ def findProxy():
 	
 	bestVerts = []
 	for pv in proxy.verts:
-		pindex = pv.groups[0].group
+		try:
+			pindex = pv.groups[0].group
+		except:
+			raise NameError("Proxy vert %d not member of any group" % pv.index)
 		name = pob.vertex_groups[pindex].name
 		bindex = None
 		for bvg in bob.vertex_groups:
 			if bvg.name == name:
 				bindex = bvg.index
 
-		print(pv.index, name, pindex, bindex)
-
-		mv = 0
+		mv = None
 		mindist = 1e6
 		for bv in base.verts:
 			if len(bv.groups) > 0 and bv.groups[0].group == bindex:
@@ -26,6 +27,14 @@ def findProxy():
 				if vec.length < mindist:
 					mv = bv
 					mindist = vec.length
+
+		if mv:
+			print(pv.index, mv.index, mindist, name, pindex, bindex)
+		else:
+			raise NameError("Failed to find vert %d in group %d %d" % (pv.index, pindex, bindex))
+		if mindist > 5:
+			raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
+
 		if mindist > 0.9e6:
 			raise NameError("Failed to match vertex %s" % pv)
 		bestVerts.append((pv, mv, []))
@@ -159,6 +168,7 @@ def printProxy(path, faces):
 	return
 
 path = '~/makehuman/myproxy.proxy'
+path = '/home/thomas/myproxy.proxy'
 print("Doing %s" % path)
 verts = findProxy()
 printProxy(path, verts)
