@@ -96,7 +96,7 @@ def exportRawMhx(obj, fp):
 #
 
 def proxyConfig():
-	paths = ['~/makehuman/proxy.cfg', './proxy.cfg']
+	paths = ['~/makehuman/proxy.cfg', '/proxy.cfg', './proxy.cfg']
 	
 	fp = None
 	for path in paths:
@@ -104,6 +104,7 @@ def proxyConfig():
 		fileName = os.path.realpath(path1)
 		try:
 			fp = open(fileName, "r")
+			print("Using config file %s" % fileName)
 			break
 		except:
 			print("No file %s" % fileName)

@@ -1,6 +1,16 @@
 import bpy
 import os
 
+threshold = -0.2
+mListLength = 2
+
+
+def printMverts(stuff, mverts):
+	for n in range(mListLength):
+		(v,dist) = mverts[n]
+		if v:
+			print(stuff, v.index, dist)
+
 def findProxy():
 	bob = bpy.data.objects['Human']
 	pob = bpy.data.objects['Proxy']
@@ -19,25 +29,35 @@ def findProxy():
 			if bvg.name == name:
 				bindex = bvg.index
 
-		mv = None
-		mindist = 1e6
+		mverts = []
+		for n in range(mListLength):
+			mverts.append((None, 1e6))
+
 		for bv in base.verts:
 			if len(bv.groups) > 0 and bv.groups[0].group == bindex:
 				vec = pv.co - bv.co
-				if vec.length < mindist:
-					mv = bv
-					mindist = vec.length
+				n = 0
+				for (mv,mdist) in mverts:
+					if vec.length < mdist:
+						for k in range(n+1, mListLength):
+							j = mListLength-k+n
+							mverts[j] = mverts[j-1]
+						mverts[n] = (bv, vec.length)
+						#print(bv.index)
+						#printMverts(bv.index, mverts)
+						break
+					n += 1
 
+		(mv, mindist) = mverts[0]
 		if mv:
 			print(pv.index, mv.index, mindist, name, pindex, bindex)
+			#printMverts("  ", mverts)
 		else:
 			raise NameError("Failed to find vert %d in group %d %d" % (pv.index, pindex, bindex))
 		if mindist > 5:
 			raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
 
-		if mindist > 0.9e6:
-			raise NameError("Failed to match vertex %s" % pv)
-		bestVerts.append((pv, mv, []))
+		bestVerts.append((pv, mverts, []))
 
 	print("Setting up face table")
 	vfaces = {}
@@ -49,18 +69,20 @@ def findProxy():
 				vfaces[v] = [f]
 	
 	print("Finding weights")
-	for (pv, bv, fcs) in bestVerts:
+	for (pv, mverts, fcs) in bestVerts:
 		print(pv.index)
-		for f in vfaces[bv.index]:
-			verts = []
-			for v in f.verts:
-				verts.append(base.verts[v].co)
-			wts = cornerWeights(pv.co, verts)
-			fcs.append((f.verts, wts))
+		for (bv,mdist) in mverts:
+			if bv:
+				for f in vfaces[bv.index]:
+					verts = []
+					for v in f.verts:
+						verts.append(base.verts[v].co)
+					wts = cornerWeights(pv.co, verts)
+					fcs.append((f.verts, wts))
 
 	print("Finding best weights")
 	bestFaces = []
-	for (pv, bv, fcs) in bestVerts:
+	for (pv, mverts, fcs) in bestVerts:
 		print(pv.index)
 		minmax = -1e6
 		for (fverts, wts) in fcs:
@@ -69,10 +91,11 @@ def findProxy():
 				minmax = w
 				bWts = wts
 				bVerts = fverts
-		if minmax > -0.15:
+		if minmax > threshold:
 			bestFaces.append((pv, bVerts, bWts))	
 		else:
-			bestFaces.append((pv, [bv.index,0,1], [1,0,0]))
+			(mv, mdist) = mverts[0]
+			bestFaces.append((pv, [mv.index,0,1], [1,0,0]))
 				
 	print("Done")
 	return bestFaces
@@ -155,22 +178,32 @@ def printProxy(path, faces):
 
 	fp.write("Verts\n")
 	for (pv, verts, wts) in faces:
+		print(pv.index,verts,wts)
 		fp.write("%5d %5d %5d %.5f %.5f %.5f\n" % (verts[0], verts[1], verts[2], wts[0], wts[1], wts[2]))
-	proxy =  bpy.data.objects['Proxy'].data
 
+	'''
+	proxy =  bpy.data.objects['Proxy'].data
 	fp.write("Faces\n")
 	for f in proxy.faces:
 		for v in f.verts:
 			fp.write("%d " % (v+1))
 		fp.write("\n")
-
+	'''
 	fp.close()
 	return
 
-path = '~/makehuman/myproxy.proxy'
-path = '/home/thomas/myproxy.proxy'
-print("Doing %s" % path)
-verts = findProxy()
-printProxy(path, verts)
-print("%s done" % path)
+#
+#
+#
+
+def printAll():
+	path = '~/makehuman/myproxy.proxy'
+	path = '/home/thomas/myproxy.proxy'
+	print("Doing %s" % path)
+	verts = findProxy()
+	printProxy(path, verts)
+	print("%s done" % path)
+
+
+printAll()	
 
