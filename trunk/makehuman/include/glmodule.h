@@ -28,8 +28,10 @@
 #ifndef GLMODULE_H
 #define GLMODULE_H 1
 
+#include <GL/glew.h>
+
 #include <SDL.h>
-#include <SDL_opengl.h>
+/*#include <SDL_opengl.h>*/
 
 
 #ifdef __cplusplus

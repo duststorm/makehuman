@@ -29,6 +29,8 @@
 
  */
 
+#include <GL/glew.h>
+
 #ifdef _DEBUG
 #undef _DEBUG
 #include <Python.h>
@@ -81,32 +83,7 @@ static void *g_sdlImageHandle = NULL;
 static PFN_IMG_LOAD IMG_Load = NULL;
 #endif
 
-#ifndef __APPLE__ /* Mac OS X already supports this! */
-static PFNGLCREATESHADERPROC glCreateShader = NULL;
-static PFNGLSHADERSOURCEPROC glShaderSource = NULL;
-static PFNGLCOMPILESHADERPROC glCompileShader = NULL;
-static PFNGLCREATEPROGRAMPROC glCreateProgram = NULL;
-static PFNGLATTACHSHADERPROC glAttachShader = NULL;
-static PFNGLLINKPROGRAMPROC glLinkProgram = NULL;
-static PFNGLUSEPROGRAMPROC glUseProgram = NULL;
-static PFNGLGETSHADERIVPROC glGetShaderiv = NULL;
-static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = NULL;
-static PFNGLGETPROGRAMIVPROC glGetProgramiv = NULL;
-static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = NULL;
-static PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform = NULL;
-#ifdef __WIN32__
-static PFNGLACTIVETEXTUREPROC glActiveTexture = NULL;
-#endif
-static PFNGLUNIFORM1FPROC glUniform1f = NULL;
-static PFNGLUNIFORM2FPROC glUniform2f = NULL;
-static PFNGLUNIFORM3FPROC glUniform3f = NULL;
-static PFNGLUNIFORM4FPROC glUniform4f = NULL;
-static PFNGLUNIFORM1IPROC glUniform1i = NULL;
-
 static int g_ShadersSupported = 0;
-#else
-static int g_ShadersSupported = 1;
-#endif /* ifndef __APPLE__*/
 
 typedef struct
 {
@@ -490,7 +467,7 @@ void mhDrawText(float x, float y, const char *message)
 }
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-/** \brief Perform a byte swapping of a long value by reversing all bytes 
+/** \brief Perform a byte swapping of a long value by reversing all bytes
  *         (e.g. 0x12345678 becomes 0x78563412).
  *  \param inValue The long to swap to.
  *  \return The long value swapped.
@@ -508,7 +485,7 @@ static uint32_t swapLong(uint32_t inValue)
         __asm__("bswap %0" : "=r" (word) : "0" (inValue));
         return word;
 #   endif
-#endif    
+#endif
     return (((inValue      ) & 0xff) << 24) |
            (((inValue >>  8) & 0xff) << 16) |
            (((inValue >> 16) & 0xff) <<  8) |
@@ -516,15 +493,15 @@ static uint32_t swapLong(uint32_t inValue)
 }
 #endif // #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
-/** \brief Copy one Array of long values (32 bits) to another location in 
+/** \brief Copy one Array of long values (32 bits) to another location in
  *         memory by considering the endian correctness.
- *         The rule here is that if the machine this method is a big endian 
+ *         The rule here is that if the machine this method is a big endian
  *         architecture (e.g. PowerPC) then every long is swapped accordingly.
  *         On big endian architectures (as x86) no byte swapping will be done.
  *
  *  \param destPtr the destination pointer (the target of the copy process).
  *  \param srcPtr the source pointer which points to the data to copy from.
- *  \param inLongs The count of long values to copy to. Note that this is not 
+ *  \param inLongs The count of long values to copy to. Note that this is not
  *         in bytes but in long values (1 long consumes 4 bytes)
  *  \return The numer of longs copied.
  */
@@ -554,25 +531,25 @@ static void mhFlipSurface(SDL_Surface *surface)
     unsigned char *line = (unsigned char*)malloc(surface->pitch);
     const size_t lineBytes = surface->pitch;
     const size_t lineLongs = lineBytes >> 2;
-        
+
     unsigned char *pixelsA;
     unsigned char *pixelsB;
-        
+
     int lineIndex;
 
     if (line)
     {
         if (SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
-        
+
         pixelsA = (unsigned char*)surface->pixels;
         pixelsB = (unsigned char*)surface->pixels + (surface->h - 1) * lineBytes;
-        
+
         for (lineIndex = 0; lineIndex < surface->h >> 1; lineIndex++)
         {
             memcpy((uint32_t*)line,    (const uint32_t*)pixelsA, lineBytes);
             longCopyEndianSafe((uint32_t*)pixelsA, (const uint32_t*)pixelsB, lineLongs);
             longCopyEndianSafe((uint32_t*)pixelsB, (const uint32_t*)line,    lineLongs);
-            
+
             pixelsA += lineBytes;
             pixelsB -= lineBytes;
         }
@@ -620,7 +597,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
     }
 #endif // ifndef __APPLE__
     surface = (SDL_Surface*)IMG_Load(fname);
-        
+
     if (!surface)
     {
         PyErr_Format(PyExc_RuntimeError, "Could not load %s, %s", fname, SDL_GetError());
@@ -1341,6 +1318,10 @@ void OnInit(void)
     const float MatShn[] = {50.0f};                           /* Material - Shininess */
     //const float MatEms[] = {0.1f, 0.05f, 0.0f, 1.0f};         /* Material - emission Values */
 
+    glewInit();
+
+    g_ShadersSupported = (GLEW_VERSION_2_0 != GL_FALSE);
+
     glEnable(GL_DEPTH_TEST);                                  /* Hidden surface removal */
     //glEnable(GL_CULL_FACE);                                   /* Inside face removal */
     //glEnable(GL_ALPHA_TEST);
@@ -1368,40 +1349,6 @@ void OnInit(void)
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
-
-#ifndef __APPLE__ /* Omit initialization 'cos Mac OS X already supports this! */
-    // Init shader functions
-    glCreateShader = (PFNGLCREATESHADERPROC)SDL_GL_GetProcAddress("glCreateShader");
-    glShaderSource = (PFNGLSHADERSOURCEPROC)SDL_GL_GetProcAddress("glShaderSource");
-    glCompileShader = (PFNGLCOMPILESHADERPROC)SDL_GL_GetProcAddress("glCompileShader");
-    glCreateProgram = (PFNGLCREATEPROGRAMPROC)SDL_GL_GetProcAddress("glCreateProgram");
-    glAttachShader = (PFNGLATTACHSHADERPROC)SDL_GL_GetProcAddress("glAttachShader");
-    glLinkProgram = (PFNGLLINKPROGRAMPROC)SDL_GL_GetProcAddress("glLinkProgram");
-    glUseProgram = (PFNGLUSEPROGRAMPROC)SDL_GL_GetProcAddress("glUseProgram");
-    glGetShaderiv = (PFNGLGETSHADERIVPROC)SDL_GL_GetProcAddress("glGetShaderiv");
-    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)SDL_GL_GetProcAddress("glGetShaderInfoLog");
-    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)SDL_GL_GetProcAddress("glGetProgramiv");
-    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
-    glGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)SDL_GL_GetProcAddress("glGetActiveUniform");
-#ifdef __WIN32__
-    glActiveTexture = (PFNGLACTIVETEXTUREPROC)SDL_GL_GetProcAddress("glActiveTexture");
-#endif
-    glUniform1f = (PFNGLUNIFORM1FPROC)SDL_GL_GetProcAddress("glUniform1f");
-    glUniform2f = (PFNGLUNIFORM2FPROC)SDL_GL_GetProcAddress("glUniform2f");
-    glUniform3f = (PFNGLUNIFORM3FPROC)SDL_GL_GetProcAddress("glUniform3f");
-    glUniform4f = (PFNGLUNIFORM4FPROC)SDL_GL_GetProcAddress("glUniform4f");
-    glUniform1i = (PFNGLUNIFORM1IPROC)SDL_GL_GetProcAddress("glUniform1i");
-
-    g_ShadersSupported = glCreateShader && glShaderSource && glCompileShader &&
-                         glCreateProgram && glAttachShader && glLinkProgram && glUseProgram &&
-                         glGetShaderiv && glGetShaderInfoLog && glGetProgramiv && glGetProgramInfoLog &&
-                         glGetActiveUniform &&
-#ifdef __WIN32__
-                         glActiveTexture &&
-#endif
-                         glUniform1f && glUniform2f && glUniform3f && glUniform4f &&
-                         glUniform1i && glGetString(GL_SHADING_LANGUAGE_VERSION);
-#endif // #ifndef __APPLE__
 
     // Init font
     G.fontOffset = glGenLists(256);

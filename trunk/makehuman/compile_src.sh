@@ -1,1 +1,1 @@
-gcc -g -o makehuman ./src/main.c ./src/glmodule.c ./src/core.c ./include/core.h ./include/glmodule.h -I/usr/include/SDL/ -I/usr/include/python2.6/ -I/usr/X11R6/include -I./include -lpython2.6 -lX11 -lGL -lGLU -lSDL -Wall
+gcc -g -o makehuman ./src/main.c ./src/glmodule.c ./src/core.c /usr/src/glew/glew.c -I/usr/include/SDL/ -I/usr/include/python2.6/ -I/usr/X11R6/include -I./include -DGLEW_STATIC -lpython2.6 -lX11 -lGL -lGLU -lSDL -Wall
