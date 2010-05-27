@@ -2,6 +2,8 @@
 // Prefix header for all source files of the 'MHPhoenix' target in the 'MHPhoenix' project
 //
 
+#include <glew/glew.h>
+
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 #endif
@@ -12,13 +14,10 @@
 #include <stdint.h>
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
+#include <SDL.h>
+#include <Python.h>
 
 #include "OSXTools.h"
 #include "SDLMain.h"
 #include "NSFont_OpenGL.h"
-//#include "SDLMain.h"
-
-
-//#include "core.h"
-//#include "glmodule.h"
 

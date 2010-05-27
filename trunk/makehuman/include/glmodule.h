@@ -28,7 +28,11 @@
 #ifndef GLMODULE_H
 #define GLMODULE_H 1
 
-#include <GL/glew.h>
+#if defined(__APPLE__)
+#	include <glew/glew.h> // OS X uses the glew.framework -> special include ;)
+#else
+#	include <GL/glew.h>
+#endif
 
 #include <SDL.h>
 /*#include <SDL_opengl.h>*/

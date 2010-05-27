@@ -28,9 +28,6 @@
  (Simple DirectMedia Layer) libraries.
 
  */
-
-#include <GL/glew.h>
-
 #ifdef _DEBUG
 #undef _DEBUG
 #include <Python.h>
