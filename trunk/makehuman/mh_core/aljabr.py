@@ -31,7 +31,7 @@ The paper was so important that Al-jabr is the root of modern word I{algebra} an
 
 __docformat__ = 'restructuredtext'
 
-from math import sqrt, cos, sin, tan, atan2
+from math import sqrt, cos, sin, tan, atan2, fabs
 
 machine_epsilon = 1.0e-16
 
@@ -272,6 +272,7 @@ def mulmatvec3x3(m, vect):
         *float list*. The vector - in the format[x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
+
 
     r = [0.0, 0.0, 0.0]
     r[0] = vect[0] * m[0][0] + vect[1] * m[1][0] + vect[2] * m[2][0]
@@ -586,7 +587,7 @@ def jacobianEllipticFunction(u,m):
     twon=1.0
     i=0
     
-    while math.fabs(c[i]/a[i])>machine_epsilon:
+    while fabs(c[i]/a[i])>machine_epsilon:
         if i>7:
             print "Overflow in the calculation of Jacobian elliptic functions"
             break
@@ -605,6 +606,21 @@ def jacobianEllipticFunction(u,m):
         phi=(math.asin(t)+phi)/2.0
         i=i-1            
     return sin(phi),cn,cn/cos(phi-b),phi
+
+
+def newton_raphson(f, f_diff, value, start, iterations=4, epsilon = 1e-4):
+    """ Returns a root of the polynomial, with a starting value.
+    To get both roots in a quadratic, try using with n = 1 and n = -1."""
+
+    x = start - (float(f(start)-value) / f_diff(start))
+
+    x = start
+    counter = 0
+
+    while fabs(x-start)>epsilon or counter<iterations:
+        x = x - (float(f(x)-value) / f_diff(x))
+        counter += 1
+        return x
 
 def axisAngleToQuaternion(axis, angle):
     s = sin(angle/2.0)

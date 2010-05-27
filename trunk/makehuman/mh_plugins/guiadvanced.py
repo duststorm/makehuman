@@ -37,7 +37,7 @@ __docformat__ = 'restructuredtext'
 import gui3d, hair, mh
 from aljabr import *
 import random
-import math
+from math import sqrt, pow, log
 
 
 class MakeHairTaskView(gui3d.TaskView):
@@ -138,26 +138,61 @@ class MakeHairTaskView(gui3d.TaskView):
             scn.selectedHuman.hairObj = obj
             scn.update()
             
+        #see ADD website for details
+        def f(x):
+            u = pow(x,1.5)
+            k = 16*self.gravity*self.gravity
+            asinh = sqrt(k)*pow(u,1.5)
+            asinh = log(asinh + sqrt(asinh*asinh + 1)) #taking asinh(sqrt(k)*pow(u,1.5))
+            return sqrt(k*u*u*u +1)*(asinh/sqrt(k*k*u*u*u+k)+pow(u,1.5))/2
+        
+        def f_diff(x):
+            k = 16*self.gravity*self.gravity
+            return sqrt(1 + k*pow(x,6))
+        
         def gravitize(curve,gFactor,start=1,res=0.04):
-            length  = vdist(curve[start],curve[len(curve)-1]) #length of hair!
+            delta  = vdist(curve[0],curve[len(curve)-1])/(len(curve)-1) #length of hair!
+            
+            """
             temp = vdist(vnorm(vsub(curve[len(curve)-1],curve[start])),[0,1,0])
-            delta = math.pow(math.pow(length,2.0)-math.pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
-            X= delta*math.pow(2.0,gFactor)
-            c = math.pow(2.0,-8.0+gFactor)
+            delta = pow(pow(length,2.0)-pow(curve[start][1]-curve[len(curve)-1][1],2.0),0.5)
+            X= delta*pow(2.0,gFactor)
+            c = pow(2.0,-8.0+gFactor)
             p0  = curve[start][:]
             p1 = curve[len(curve)-1][:]
             #print "Debug: length =",length," len(curve)=", len(curve), "delta= ", delta
             interval = length/(len(curve)-start-1)
+            """
+            k=self.gravity
+            N = len(curve) - start
+            vec1 = vsub(curve[len(curve)-1], curve[start])
+            l = vlen(vec1) #should be more than 0
+            cost = vdot(vec1,[0,1,0])/l
+            xlen = l*sqrt(1-cost*cost)
+            point1 = curve[start]
+            point2 = curve[len(curve)-1]
             for i in xrange(start+1, len(curve)):
-                x=math.pow(interval*(i-start)/(4*c),1.0/3.0)
+                #y=g(x)
+                #vec1 = vsub(curve[i],curve[i-1])
+                #l = vlen(vec1) #should be more than 0
+                #cost = vdot(vec1,[0,1,0])/l
+                #x = l*sqrt(1-cost*cost)
+                x= newton_raphson(f,f_diff, delta*(i-start),delta*(i-start))
+                curve[i] = in2pts(point1,point2,x/xlen) #two coordinates remain the same, one is gravitized.. thats y-axis
+                curve[i][1] = k*pow(x,4)
+                #curve[i][0]= #x
+                #curve{i][1]=  #y
+                
+            """
+                x=pow(interval*(i-start)/(4*c),1.0/3.0)
                 curve[i] = in2pts(p0,p1,x/X)
                 if temp < 3.0:
                     #print "Debug: detected normal strand on the middle of the head"
-                    curve[i][1] = curve[i][1] - 0.005*math.pow(x,4)#curve[0][1] - (curve[i][1] - curve[0][1])
+                    curve[i][1] = curve[i][1] - 0.005*pow(x,4)#curve[0][1] - (curve[i][1] - curve[0][1])
                 else:
-                    curve[i][1] = curve[i][1] - c*math.pow(x,4)
-
-                        
+                    curve[i][1] = curve[i][1] - c*pow(x,4)
+            """
+            
 
 class AdvancedCategory(gui3d.Category):
 

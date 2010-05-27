@@ -463,15 +463,16 @@ class Hairgenerator:
             listOfLists.append(listToSplit[i:i + sublistLength])
         return listOfLists
 
-    def loadHairs(self, path):
+    def loadHairs(self, name):
         try:
-            fileDescriptor = open(path)
+            objFile = open(name + ".obj")
+            fileDescriptor = open(name+".hair")
         except:
-            print 'Impossible to load %s' % path
+            print 'Unable to load .obj and .hair file of %s' % name
             return
 
         self.resetHairs()
-        self.path = path
+        self.path = name
         for data in fileDescriptor:
             datalist = data.split()
             if datalist[0] == 'written':
@@ -511,6 +512,8 @@ class Hairgenerator:
                 self.rootColor[0] = float(datalist[1])
                 self.rootColor[1] = float(datalist[2])
                 self.rootColor[2] = float(datalist[3])
+                
+            """
             elif datalist[0] == 'guideGroup':
                 currentGroup = self.addGuideGroup(datalist[1])
             elif datalist[0] == 'guide':
@@ -520,7 +523,25 @@ class Hairgenerator:
                     controlPointsCoo[i] = float(controlPointsCoo[i])
                 guidePoints = self.extractSubList(controlPointsCoo, 3)
                 self.addHairGuide(guidePoints, guideName, currentGroup)
+            """
 
         fileDescriptor.close()
+        
+        guidePoints=[]
+        for data in objFile:
+            datalist = data.split()
+            if datalist[0] == "v":
+                for i in xrange(1,4):
+                    datalist[i] = float(datalist[i])
+                guidePoints.append(datalist[1:])
+            elif datalist[0] == "g":
+                datalist[1] = datalist[1].split("_") #first entry = group, second entry= guidename)
+                #Josenow! Todo Guidegroup problem adding
+                currentGroup = self.addGuideGroup(datalist[1][0])
+                self.addHairGuide(guidePoints, datalist[1][1],currentGroup)
+                guidePoints=[]
+                
+        objFile.close()
+                
 
 

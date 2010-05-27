@@ -1,4 +1,4 @@
-""" 
+"""
 **Project Name:**      MakeHuman
 
 **Product Home Page:** http://www.makehuman.org/
@@ -30,6 +30,7 @@ from animation3d import ThreeDQBspline
 from aljabr import *
 from random import random
 from math import radians
+import os
 
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -42,13 +43,16 @@ class HairTaskView(gui3d.TaskView):
     
     @self.filechooser.event
     def onFileSelected(filename,update=1):
+      #hair files comes in pair, .obj and .hair.
+      #.obj files contain geometric detail of the hair (can be edited by any 3rd party modelling software that opens wavefront .obj)
+      #.hair files contain metadata of hair used by the makehair utility
+      filename = os.path.splitext(filename)[0]
       print("Loading %s" %(filename))
       #human = self.app.scene3d.selectedHuman
       wFactor = self.app.categories["Modelling"].tasksByName["Hair"].widthSlider.getValue() 
       if (wFactor <= 100.00) and (wFactor >= 1.00): self.widthFactor = wFactor
       human = self.app.scene3d.selectedHuman
       human.setHairFile("data/hairs/" + filename)    
-      print "Debug: Filename.. ", filename
       human.scene.clear(human.hairObj)
       hairsClass = hairgenerator.Hairgenerator()
       hairsClass.humanVerts = human.mesh.verts
@@ -162,7 +166,6 @@ def loadHairsFile(scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,
           obj.uvValues.append([0.0,(uvLength - i+1)*uvFactor])
           #end of please...
           
-          #shallow copies used
           fg.createFace(w1, w4, w2)
           fg.faces[len(fg.faces) -1].uv= [w1.idx,w4.idx,w2.idx]
           fg.createFace(w2, w4, w3)
