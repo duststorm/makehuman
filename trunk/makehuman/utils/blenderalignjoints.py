@@ -23,22 +23,48 @@ def closerVert(diamondIndices):
     centroidVerts = [[obj.verts[i].co[0],obj.verts[i].co[1],obj.verts[i].co[2]] for i in diamondIndices]
     center = aljabr.centroid(centroidVerts)
 
-    vertsList1 = []
-    vertsList1Indices = []
-    for v in obj.verts:
-        if v.sel == 1:
-            vertsList1.append([v.co[0],v.co[1],v.co[2]])
-            vertsList1Indices.append(v.index)
-          
+    vertsList = []
+    vertsListIndices = []
+    vertsToUse = getSkinVerts()
+    for i in vertsToUse:
+        v = obj.verts[i]
+        vertsList.append([v.co[0],v.co[1],v.co[2]])
+        vertsListIndices.append(v.index)          
     
-    kd = KDTree(vertsList1)
+    kd = KDTree(vertsList)
     dist,indx = kd.query([center])
-    i = vertsList1Indices[indx]
+    i = vertsListIndices[indx]
 
     return i
 
 
+def getSkinVerts():
+    """
+    
 
+    """ 
+   
+    activeObjs = Blender.Object.GetSelected()
+    obj = activeObjs[0].getData(mesh=True)
+    vertsGroupsNames = obj.getVertGroupNames()    
+
+    forbiddenWords = ("joint","lash","teeth","eyebrow")
+    skinVerts = set()
+    for name in vertsGroupsNames:
+        words = set(name.split('-'))
+        proceed = True
+        for fWord in forbiddenWords:
+            if fWord in words:
+                proceed = None
+
+        if proceed:
+            verts = obj.getVertsFromGroup(name)
+            for i in verts:
+                v = obj.verts[i]
+                v.sel = 1
+                skinVerts.add(v.index)
+
+    return skinVerts
 
 
 
@@ -146,5 +172,6 @@ def loadJointDelta(path):
 
     return 1
 
-saveJointDeltas("data.joints")
+#saveJointDeltas("data.joints")
 #loadJointDelta("data.joints")
+#getSkinVerts()
