@@ -30,6 +30,8 @@ hand-crafted models.
 
 __docformat__ = 'restructuredtext'
 
+import sys
+sys.path.append("/home/manuel/archive/archive_makehuman/makehuman_src/utils/svd_tools/fit")
 
 import Blender
 import math
@@ -44,6 +46,14 @@ from Blender.BGL import *
 from Blender import Draw
 from Blender import Window
 from Blender.Mathutils import *
+
+import scipy
+from scipy.spatial import KDTree
+import numpy as np
+
+import scan_fit
+import blenderalignjoints
+
 
 current_path = Blender.sys.dirname(Blender.Get('filename'))
 basePath = Blender.sys.join(current_path,'base.obj')
@@ -170,10 +180,106 @@ def doMorph(mFactor):
         v.co[1] += pointY*mFactor
         v.co[2] += pointZ*mFactor
     obj.update()
-    obj.calcNormals()
+    #obj.calcNormals()
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
     #print "Target time", time.time() - t1
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+def alignMasks():
+    """
+    This function measure the similarity of 2 meshes.
+    Instead to have ray intersection to measure the surfaces differences,
+    we subdivide the mesh2, in order to in increase the density, and then
+    we use the vert to vert distance.
+    """
+
+    print "align"
+    
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)
+    activeObjs = Blender.Object.GetSelected()
+    
+    mask_scan_obj = Blender.Object.Get("mask_scan")
+    mask_mh_obj = Blender.Object.Get("mask_mh")
+    scan_obj = Blender.Object.Get("scan")
+    
+    mask_scan_data = mask_scan_obj.getData(mesh=True)
+    mask_mh_data = mask_mh_obj.getData(mesh=True)
+    scan_data = scan_obj.getData(mesh=True)
+
+    mask_scan = [[v.co[0],v.co[1],v.co[2]] for v in mask_scan_data.verts]
+    mask_mh = [[v.co[0],v.co[1],v.co[2]] for v in mask_mh_data.verts]
+    scan = [[v.co[0],v.co[1],v.co[2]] for v in scan_data.verts]
+    
+    aligned_verts = scan_fit.align_scan(mask_scan,mask_mh,scan)  
+    aligned_mask = scan_fit.align_scan(mask_scan,mask_mh,mask_scan)  
+    
+    for i,v in enumerate(aligned_verts):
+        scan_data.verts[i].co[0] = v[0]
+        scan_data.verts[i].co[1] = v[1]
+        scan_data.verts[i].co[2] = v[2]
+        
+    for i,v in enumerate(aligned_mask):
+        mask_scan_data.verts[i].co[0] = v[0]
+        mask_scan_data.verts[i].co[1] = v[1]
+        mask_scan_data.verts[i].co[2] = v[2]
+        
+    scan_data.update()
+    mask_scan_data.update()
+    
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 def linkMask(filePath, subdivide = None):
     """
@@ -182,7 +288,7 @@ def linkMask(filePath, subdivide = None):
     we subdivide the mesh2, in order to in increase the density, and then
     we use the vert to vert distance.
     """
-    
+
     wem = Blender.Window.EditMode()
     Blender.Window.EditMode(0)
     activeObjs = Blender.Object.GetSelected()
@@ -191,32 +297,85 @@ def linkMask(filePath, subdivide = None):
     obj1 = activeObj1.getData(mesh=True)
     obj2 = activeObj2.getData(mesh=True)
 
-    vertsList1 = [[v.co[0],v.co[1],v.co[2],v.index] for v in obj1.verts] 
+    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts]
+    vertsList2 = []
+    vertsList2_index = []
+    for v in obj2.verts:
+        if v.sel == 1:
+            vertsList2_index.append(v.index)
+            vertsList2.append([v.co[0],v.co[1],v.co[2]])
+
+    #scipy code
+    kd = KDTree(vertsList2)
+    dists,indx = kd.query(vertsList1)
+    indx = [vertsList2_index[i] for i in indx]
+    dist = np.array(dists).mean()
+
+    try:
+        fileDescriptor = open(filePath, "w")
+    except:
+        print "Unable to open %s",(filePath)
+        return  None
+
+    for i1,i2 in enumerate(indx):
+        fileDescriptor.write("%d %d\n" % (i1,i2))
+    fileDescriptor.close()
+    
+    for v in obj2.verts:
+        v.sel = 0
+    
+    for i in indx:
+       obj2.verts[i].sel = 1 
+
+
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
+
+
+
+
+def linkMaskBug(filePath, subdivide = None):
+    """
+    This function measure the similarity of 2 meshes.
+    Instead to have ray intersection to measure the surfaces differences,
+    we subdivide the mesh2, in order to in increase the density, and then
+    we use the vert to vert distance.
+    """
+
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)
+    activeObjs = Blender.Object.GetSelected()
+    activeObj1 = activeObjs[0]#The mask must be latest selected obj
+    activeObj2 = activeObjs[1]
+    obj1 = activeObj1.getData(mesh=True)
+    obj2 = activeObj2.getData(mesh=True)
+
+    vertsList1 = [[v.co[0],v.co[1],v.co[2],v.index] for v in obj1.verts]
     vertsList2 = []
     for v in obj2.verts:
         if v.sel == 1:
             vertsList2.append([v.co[0],v.co[1],v.co[2],v.index])
-    
-    #vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
-    faces = [[v.index for v in f.verts] for f in obj2.faces]     
-   
+
+    #vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts]
+    faces = [[v.index for v in f.verts] for f in obj2.faces]
+
     if subdivide:
         vertsList2toProcess = subdivideObj(faces, vertsList2, 2)[1]
     vertsList2toProcess = vertsList2
 
-    indexList = xrange(len(vertsList1))        
+    indexList = xrange(len(vertsList1))
 
-    #We need to add index information to each vert.    
+    #We need to add index information to each vert.
     #for i,v in enumerate(vertsList2toProcess):
     #    v.append(i)
-    
+
     #Init of the octree
-    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)    
+    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)
 
     #For each vert of new mesh we found the nearest verts of old one
     linked = []
     for i1 in indexList:
-        v1 = vertsList1[i1]       
+        v1 = vertsList1[i1]
 
         #We use octree to search only on a small part of the whole old mesh.
         vertsList3 = octree.root.getSmallestChild(v1)
@@ -225,18 +384,18 @@ def linkMask(filePath, subdivide = None):
         i2 = 0
         dMin = 100
         for v2 in vertsList3.verts:
-            d = vdist(v1, v2)            
+            d = vdist(v1, v2)
             if d < dMin:
                 dMin = d
                 i2 = v2[3]
                 print dMin
         linked.append([i1,i2])
-                
-               
+
+
 
         print"Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
 
-        
+
     try:
         fileDescriptor = open(filePath, "w")
     except:
@@ -247,15 +406,102 @@ def linkMask(filePath, subdivide = None):
         fileDescriptor.write("%d %d\n" % (data[0],data[1]))
     fileDescriptor.close()
 
+    for v in obj2.verts:
+        v.sel = 0
+    
+    for i in linked:
+       obj2.verts[i[1]].sel = 1 
+
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
+
+
+
+
+
+def fitMesh(subdivide = None):
+    """
+    This function measure the similarity of 2 meshes.
+    Instead to have ray intersection to measure the surfaces differences,
+    we subdivide the mesh2, in order to in increase the density, and then
+    we use the vert to vert distance.
+    """
+
+    wem = Blender.Window.EditMode()
+    Blender.Window.EditMode(0)
+    activeObjs = Blender.Object.GetSelected()
+    activeObj1 = activeObjs[0]#The base mesh must be latest selected
+    activeObj2 = activeObjs[1]
+    obj1 = activeObj1.getData(mesh=True)
+    obj2 = activeObj2.getData(mesh=True)
+
+
+    vertsList1 = []
+    for v in obj1.verts:
+        if v.sel == 1:
+            vertsList1.append([v.co[0],v.co[1],v.co[2],v.index])
+    vertsList2 = [[v.co[0],v.co[1],v.co[2],v.index] for v in obj2.verts]
+
+    #vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts]
+    faces = [[v.index for v in f.verts] for f in obj2.faces]
+
+    if subdivide:
+        vertsList2toProcess = subdivideObj(faces, vertsList2, 2)[1]
+    vertsList2toProcess = vertsList2
+
+
+
+    #We need to add index information to each vert.
+    #for i,v in enumerate(vertsList2toProcess):
+    #    v.append(i)
+
+    #Init of the octree
+    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)
+
+    #For each vert of new mesh we found the nearest verts of old one
+    linked = []
+    for v1 in vertsList1:
+
+        i1 = v1[3]
+        #We use octree to search only on a small part of the whole old mesh.
+        vertsList3 = octree.root.getSmallestChild(v1)
+
+        #... find nearest verts on old mesh
+        i2 = 0
+        dMin = 100
+        for v2 in vertsList3.verts:
+            d = vdist(v1, v2)
+            if d < dMin:
+                dMin = d
+                i2 = v2[3]
+
+        linked.append([i1,i2])
+
+
+
+        print"Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
+
+    for l in linked:
+        obj1.verts[l[0]].co[0] = obj2.verts[l[1]].co[0]
+        obj1.verts[l[0]].co[1] = obj2.verts[l[1]].co[1]
+        obj1.verts[l[0]].co[2] = obj2.verts[l[1]].co[2]
+
+    obj1.update()
+    Blender.Window.EditMode(wem)
+    Blender.Window.RedrawAll()
+
+
+
+
+
+
 
 def generateTargetsDB(filepath):
     #Because Blender filechooser return a file
     #it's needed to extract the dirname
-    
+
     folderToScan = os.path.dirname(filepath)
-    
+
     folderToScanMoveX = os.path.join(folderToScan,"movex")
     folderToScanMoveY = os.path.join(folderToScan,"movey")
     folderToScanMoveZ = os.path.join(folderToScan,"movez")
@@ -263,55 +509,62 @@ def generateTargetsDB(filepath):
     folderToScanScaleX = os.path.join(folderToScan,"scalex")
     folderToScanScaleY = os.path.join(folderToScan,"scaley")
     folderToScanScaleZ = os.path.join(folderToScan,"scalez")
-    
+    folderToScanTypes = os.path.join(folderToScan,"types")
+
     targetListMoveX = os.listdir(folderToScanMoveX)
     targetListMoveY = os.listdir(folderToScanMoveY)
     targetListMoveZ = os.listdir(folderToScanMoveZ)
     targetListScaleX = os.listdir(folderToScanScaleX)
     targetListScaleY = os.listdir(folderToScanScaleY)
     targetListScaleZ = os.listdir(folderToScanScaleZ)
+    targetListTypes = os.listdir(folderToScanTypes)
 
     counter = 0
-    for mx in targetListMoveX:               
-        for my in targetListMoveY:
-            for mz in targetListMoveZ:
-                for sx in targetListScaleX:
-                    for sy in targetListScaleY:
-                        for sz in targetListScaleZ:
-                            print "Iteration %s"%(counter)  
-                            
-                            n1 =os.path.splitext(mx)[0] 
-                            n2 =os.path.splitext(my)[0] 
-                            n3 =os.path.splitext(mz)[0]
-                            n4 =os.path.splitext(sx)[0] 
-                            n5 =os.path.splitext(sy)[0] 
-                            n6 =os.path.splitext(sz)[0] 
-                            
-                            t = "%s-%s-%s-%s-%s-%s"%(n1,n2,n3,n4,n5,n6)           
-                            
-                            moveX = os.path.join(folderToScanMoveX,mx)
-                            moveY = os.path.join(folderToScanMoveY,my)
-                            moveZ = os.path.join(folderToScanMoveZ,mz)
-                            scaleX = os.path.join(folderToScanScaleX,sx)
-                            scaleY = os.path.join(folderToScanScaleY,sy)
-                            scaleZ = os.path.join(folderToScanScaleZ,sz)
+    for tp in targetListTypes:
+        for mx in targetListMoveX:
+            for my in targetListMoveY:
+                for mz in targetListMoveZ:
+                    for sx in targetListScaleX:
+                        for sy in targetListScaleY:
+                            for sz in targetListScaleZ:
+                                print "Iteration %s"%(counter)
 
-                            loadTranslationTarget(moveX)
-                            doMorph(1)
-                            loadTranslationTarget(moveY)
-                            doMorph(1)
-                            loadTranslationTarget(moveZ)
-                            doMorph(1)
-                            loadTranslationTarget(scaleX)
-                            doMorph(1)
-                            loadTranslationTarget(scaleY)
-                            doMorph(1)
-                            loadTranslationTarget(scaleZ)
-                            doMorph(1)                                                    
-                            newTargetPath = os.path.join(folderToScan,t+".target")
-                            saveTranslationTarget(newTargetPath)
-                            resetMesh()
-                            counter += 1
+                                n1 =os.path.splitext(mx)[0]
+                                n2 =os.path.splitext(my)[0]
+                                n3 =os.path.splitext(mz)[0]
+                                n4 =os.path.splitext(sx)[0]
+                                n5 =os.path.splitext(sy)[0]
+                                n6 =os.path.splitext(sz)[0]
+                                n7 =os.path.splitext(tp)[0]
+
+                                t = "%s-%s-%s-%s-%s-%s-%s"%(n1,n2,n3,n4,n5,n6,n7)
+
+                                moveX = os.path.join(folderToScanMoveX,mx)
+                                moveY = os.path.join(folderToScanMoveY,my)
+                                moveZ = os.path.join(folderToScanMoveZ,mz)
+                                scaleX = os.path.join(folderToScanScaleX,sx)
+                                scaleY = os.path.join(folderToScanScaleY,sy)
+                                scaleZ = os.path.join(folderToScanScaleZ,sz)
+                                type = os.path.join(folderToScanTypes,tp)
+
+                                loadTranslationTarget(type)
+                                doMorph(1)
+                                loadTranslationTarget(moveX)
+                                doMorph(1)
+                                loadTranslationTarget(moveY)
+                                doMorph(1)
+                                loadTranslationTarget(moveZ)
+                                doMorph(1)
+                                loadTranslationTarget(scaleX)
+                                doMorph(1)
+                                loadTranslationTarget(scaleY)
+                                doMorph(1)
+                                loadTranslationTarget(scaleZ)
+                                doMorph(1)
+                                newTargetPath = os.path.join(folderToScan,t+".target")
+                                saveTranslationTarget(newTargetPath)
+                                resetMesh()
+                                counter += 1
 
 
 def maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientIndices):
@@ -321,12 +574,12 @@ def maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientInd
     we subdivide the mesh2, in order to in increase the density, and then
     we use the vert to vert distance.
     """
-    
 
-    
-    
 
-  
+
+
+
+
 
     #For each vert of base Mask we found the nearest verts of scan Mask
     vDistances = []
@@ -337,13 +590,13 @@ def maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientInd
         v1 = vertsList1[i1]
         v2 = vertsList2[i2]
         dst = vdist(v1, v2)
-        vDistances.append(dst)        
-        dSum += dst   
-      
+        vDistances.append(dst)
+        dSum += dst
+
 
     averageDist = dSum/len(vDistances)
 
-    return averageDist  
+    return averageDist
 
 
 def meshComparison(indexListPath, subdivide = None):
@@ -353,7 +606,7 @@ def meshComparison(indexListPath, subdivide = None):
     we subdivide the mesh2, in order to in increase the density, and then
     we use the vert to vert distance.
     """
-    
+
     wem = Blender.Window.EditMode()
     Blender.Window.EditMode(0)
     activeObjs = Blender.Object.GetSelected()
@@ -362,10 +615,10 @@ def meshComparison(indexListPath, subdivide = None):
     obj1 = activeObj1.getData(mesh=True)
     obj2 = activeObj2.getData(mesh=True)
 
-    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
-    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
-    faces = [[v.index for v in f.verts] for f in obj2.faces]     
-   
+    vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts]
+    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts]
+    faces = [[v.index for v in f.verts] for f in obj2.faces]
+
     if subdivide:
         vertsList2toProcess = subdivideObj(faces, vertsList2, 2)[1]
     vertsList2toProcess = vertsList2
@@ -376,24 +629,24 @@ def meshComparison(indexListPath, subdivide = None):
             fileDescriptor = open(indexListPath)
         except:
             print 'Error opening %s file' % indexListPath
-            return        
+            return
         for data in fileDescriptor:
-            lineData = data.split()            
+            lineData = data.split()
             i = int(lineData[0])
             indexList.append(i)
         fileDescriptor.close()
     else:
-        indexList = xrange(len(vertsList1))        
+        indexList = xrange(len(vertsList1))
 
     overwrite = 0 #Just for more elegant one-line print output progress
-    
+
     #Init of the octree
-    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)    
+    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)
 
     #For each vert of new mesh we found the nearest verts of old one
     vDistances = []
     for i1 in indexList:
-        v1 = vertsList1[i1]       
+        v1 = vertsList1[i1]
 
         #We use octree to search only on a small part of the whole old mesh.
         vertsList3 = octree.root.getSmallestChild(v1)
@@ -401,10 +654,10 @@ def meshComparison(indexListPath, subdivide = None):
         #... find nearest verts on old mesh
         dMin = 100
         for v2 in vertsList3.verts:
-            d = vdist(v1, v2)            
+            d = vdist(v1, v2)
             if d < dMin:
                 dMin = d
-        vDistances.append(dMin)        
+        vDistances.append(dMin)
 
         word = "Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
         sys.stdout.write("%s%s\r" % (word, " "*overwrite ))
@@ -425,7 +678,7 @@ def meshComparison(indexListPath, subdivide = None):
 def findCloserMesh(filepath):
     #Because Blender filechooser return a file
     #it's needed to extract the dirname
-    
+
     wem = Blender.Window.EditMode()
     Blender.Window.EditMode(0)
     activeObjs = Blender.Object.GetSelected()
@@ -434,57 +687,77 @@ def findCloserMesh(filepath):
     obj1 = activeObj1.getData(mesh=True)
     obj2 = activeObj2.getData(mesh=True)
 
-    
-    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts] 
-        
+
+    vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts]
+
     linkMaskBaseIndices = []
     linkMaskClientIndices = []
-    
+
     try:
         fileDescriptor = open("mask.linked")
     except:
         print 'Error opening %s file' % "mask.linked"
-        return        
+        return
     for data in fileDescriptor:
-        lineData = data.split()            
+        lineData = data.split()
         i = int(lineData[1])
         linkMaskBaseIndices.append(i)
     fileDescriptor.close()
-        
+
     try:
         fileDescriptor = open("temp.linked")
     except:
         print 'Error opening %s file' % "temp.linked"
-        return        
+        return
     for data in fileDescriptor:
-        lineData = data.split()            
+        lineData = data.split()
         i = int(lineData[1])
         linkMaskClientIndices.append(i)
     fileDescriptor.close()
-    
+
     folderToScan = os.path.dirname(filepath)
     targetList = os.listdir(folderToScan)
     results = {}
+
+    val = 0.2
+
     for targetName in targetList:
         targetPath = os.path.join(folderToScan,targetName)
         loadTranslationTarget(targetPath)
-        doMorph(1.0)
-        vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts] 
+        doMorph(val)
+        vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts]
         n = maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientIndices)
-        print targetPath,n
+        print n
         results[n] = targetPath
-        doMorph(-1.0)
+        doMorph(-val)
     dKeys = results.keys()
     dKeys.sort()
+
+    if dKeys[0] > 0.05:
+        val = 1.0
+        for targetName in targetList:
+            targetPath = os.path.join(folderToScan,targetName)
+            loadTranslationTarget(targetPath)
+            doMorph(val)
+            vertsList1 = [[v.co[0],v.co[1],v.co[2]] for v in obj1.verts]
+            n = maskComparison(vertsList1, vertsList2, linkMaskBaseIndices,linkMaskClientIndices)
+            #print targetPath,n
+            results[n] = targetPath
+            doMorph(-val)
+    #dKeys = results.keys()
+    dKeys.sort()
     closerTarget = results[dKeys[0]]
+
+
+
     loadTranslationTarget(closerTarget)
-    doMorph(1.0)
-    
+    doMorph(val)
+
 
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
     print "Closer target = %s, %s"%(closerTarget,dKeys[0])
-    
+
 
 
 
@@ -631,16 +904,16 @@ def saveIndexSelectedVerts(filePath):
 
     filePath:
         *string*. A string containing the operating system path to the
-        file to be written.    
+        file to be written.
 
     """
-    
+
     wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)    
+    Blender.Window.EditMode(0)
     activeObjs = Blender.Object.GetSelected()
     activeObj = activeObjs[0]
-    obj = activeObj.getData(mesh=True)    
-    
+    obj = activeObj.getData(mesh=True)
+
     try:
         fileDescriptor = open(filePath, "w")
     except:
@@ -648,7 +921,7 @@ def saveIndexSelectedVerts(filePath):
         return  None
 
     nVertsExported = 0
-    for index in xrange(len(obj.verts)):       
+    for index in xrange(len(obj.verts)):
         if obj.verts[index].sel == 1:
             fileDescriptor.write("%d\n"%(index))
     fileDescriptor.close()
@@ -656,7 +929,7 @@ def saveIndexSelectedVerts(filePath):
     Blender.Window.EditMode(wem)
     Blender.Window.RedrawAll()
 
-    
+
 
 def saveTranslationTargetAndHisSymm(targetPath):
     """
@@ -753,7 +1026,7 @@ def utility2(targetPath):
             return  None
         targetData = fileDescriptor.readlines()
         fileDescriptor.close()
-        targetData2 = []        
+        targetData2 = []
         for vData in targetData:
             vectorData = vData.split()
             if vectorData[0].find('#')==-1:
@@ -797,8 +1070,8 @@ def utility5(filepath):
     """
 
     folderToScan = os.path.dirname(filepath)
-    fileName = os.path.basename(filepath)    
-    
+    fileName = os.path.basename(filepath)
+
     targetList = os.listdir(folderToScan)
 
     for targetName in targetList:
@@ -807,9 +1080,9 @@ def utility5(filepath):
         objPath = os.path.join(folderToScan,objFileName)
         if os.path.isfile(targetPath):
             print "Processing %s"%(targetPath)
-            loadTranslationTarget(targetPath)            
-            doMorph(1.0)         
-            saveObj(objPath) 
+            loadTranslationTarget(targetPath)
+            doMorph(1.0)
+            saveObj(objPath)
             doMorph(-1.0)
 
 
@@ -820,7 +1093,7 @@ def utility4(filepath):
     """
 
 
-    folderToScan = os.path.dirname(filepath)   
+    folderToScan = os.path.dirname(filepath)
     targetList = os.listdir(folderToScan)
 
     for targetName in targetList:
@@ -828,10 +1101,35 @@ def utility4(filepath):
         if os.path.isfile(targetPath):
             print "Processing %s"%(targetPath)
             loadTranslationTarget(targetPath)
-            
+
             doMorph(1.0)
+
+            saveTranslationTarget(targetPath)
+
+
+            doMorph(-1.0)
             
-            saveTranslationTarget(targetPath)            
+def utility6(filepath):
+    """
+    This function is used to adjust little changes on base
+    meshes, correcting all targets
+    """
+
+
+    folderToScan = os.path.dirname(filepath)
+    targetList = os.listdir(folderToScan)
+
+    for targetName in targetList:
+        targetPath = os.path.join(folderToScan,targetName)
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetPath)
+            loadTranslationTarget(targetPath)
+            doMorph(1.0)
+            blenderalignjoints.loadJointDelta("data.joints")
+
+            
+
+            saveTranslationTarget(targetPath)
 
 
             doMorph(-1.0)
@@ -1037,7 +1335,7 @@ def selectSymmetricVerts():
 
 def selectVerts(listOfIndices):
     """
-    
+
 
     """
 
@@ -1050,8 +1348,8 @@ def selectVerts(listOfIndices):
     Blender.Window.EditMode(0)
     for i in listOfIndices:
         vertToSelect = data.verts[i]
-        vertToSelect.sel = 1        
- 
+        vertToSelect.sel = 1
+
 
     data.update()
     Blender.Window.EditMode(wem)
@@ -1154,6 +1452,8 @@ def draw():
     Draw.Text("_____________________________________________")
     glRasterPos2i(10, 120)
 
+    Draw.Button("Align", 20, 10, 150, 50, 20, "Align scans")
+
     Draw.Button("Load", 2, 10, 100, 50, 20, "Load target")
     Draw.Button("Morph", 3, 60, 100, 50, 20, "Morph "+current_target.replace(current_path,""))
     Draw.Button("<=", 5, 110, 100, 30, 20, "Make left side symetrical to right side")
@@ -1188,23 +1488,17 @@ def event(event, value):
     elif event == Draw.LKEY:
         Window.FileSelector (loadAllTargetInFolder, "Load from folder")
     elif event == Draw.CKEY:
-        Window.FileSelector (absoluteToRelative, "Select base_female")
+        alignMasks()
     elif event == Draw.HKEY:
-        Window.FileSelector (generateTargetsDB, "Select files")
+        Window.FileSelector (generateTargetsDB, "Generate DB from")
     elif event == Draw.UKEY:
-        Window.FileSelector (linkMask, "Select files")
+        Window.FileSelector (linkMaskBug, "Link Mask")
     elif event == Draw.PKEY:
-        Window.FileSelector (saveIndexSelectedVerts, "Select files")
+        Window.FileSelector (saveIndexSelectedVerts, "Save index of selected vertices")
     elif event == Draw.AKEY:
-        Window.FileSelector (findCloserMesh, "Select files")
-        
-
-
-#selectVerts([12704,12721,12674,12717,12647,12539])
-#selectVerts([63971,78953,57098,92786,78321,64630])
-
-
-
+        Window.FileSelector (findCloserMesh, "Reconstruct")
+    elif event == Draw.JKEY:
+        Window.FileSelector (utility6, "adjust foints")
 
 
 
@@ -1243,5 +1537,7 @@ def b_event(event):
         loadSymVertsIndex(1)
     elif event == 10:
         resetMesh()
+    elif event == 20:
+        alignMasks()
     Draw.Draw()
 Draw.Register(draw, event, b_event)
