@@ -42,6 +42,7 @@ import os
 import mh2obj
 import mh2bvh
 import mh2mhx
+import mh2proxy
 import mh2collada
 import mh2md5
 import humanmodifier
@@ -197,13 +198,13 @@ class ExportTaskView(gui3d.TaskView):
 
             if self.wavefrontObj.selected:
                 mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".obj"), 'data/3dobjs/base.obj', self.exportGroups.selected)
-                mh2mhx.exportProxyObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + "-proxy.obj"))
+                mh2proxy.exportProxyObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename))
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".bvh"))
             elif self.mhx.selected:
                 mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
             elif self.collada.selected:
-                mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".dae"))
+                mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename))
             elif self.md5.selected:
                 mh2md5.exportMd5(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
 

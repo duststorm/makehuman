@@ -31,22 +31,33 @@ import mh
 import files3d
 import mh2bvh
 import os, time
+import mh2proxy
 import mhx_rig, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 from mhx_rig import *
 import read_rig
 
 #
 # ....exportCollada(obj, filename):
+#	exportCollada1(obj, filename, proxyData):
 #
 
 #import mh2spec
 
-def exportCollada(obj, filename):
-	#mh2spec.writeSkeleton("/home/thomas/bonedef.txt")
-	#return
+def exportCollada(obj, name):
+	exportCollada1(obj, name+".dae", "Human", None)
+	proxyList = mh2proxy.proxyConfig()
+	for proxyFile in proxyList:
+		proxyData = mh2proxy.readProxyFile(obj.verts, proxyFile)
+		(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = proxyData
+		if proxyName:
+			filename = "%s-%s.dae" % (name, proxyName)
+			exportCollada1(obj, filename, proxyName, proxyData)
+	return
+
+def exportCollada1(obj, filename, name, proxyData):
 	print 'Writing Collada file %s' % filename
 	fp = open(filename, 'w')
-	exportDae(obj, fp)
+	exportDae(obj, fp, name, proxyData)
 	fp.close()
 	print 'Collada file %s written' % filename
 	return
@@ -301,20 +312,23 @@ def addInvBones(hier, heads, tails):
 	return newHier
 
 #
-#	exportDae(obj, fp):
+#	exportDae(obj, fp, name, proxyData):
 #
 
-def exportDae(obj, fp):
+def exportDae(obj, fp, name, proxyData):
 	global rigHead, rigTail
 
-	#(rigHead, rigTail, rigHier, bones, weights) = getArmatureFromMhx(obj)
+	#(rigHead, rigTail, rigHier, bones, rawWeights) = getArmatureFromMhx(obj)
 
-	(rigHead, rigTail, rigHier, bones, weights) = getArmatureFromRigFile('data/templates/minimal.rig', obj)
+	(rigHead, rigTail, rigHier, bones, rawWeights) = getArmatureFromRigFile('data/templates/minimal.rig', obj)
 
-	nBones = len(bones)
+	#rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
+	rawTargets = []
+
+	(verts, vnormals, uvValues, faces, weights, targets) = mh2proxy.getMeshInfo(obj, proxyData, rawWeights, rawTargets)
 
 	vertexWeights = {}
-	for (vn,v) in enumerate(obj.verts):
+	for (vn,v) in enumerate(verts):
 		vertexWeights[vn] = []
 
 	skinWeights = []
@@ -328,14 +342,14 @@ def exportDae(obj, fp):
 			vertexWeights[int(vn)].append((bn,wn))
 			wn += 1
 		skinWeights.extend(wts)
-	nWeights = len(skinWeights)
 
-	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
-
-	nVerts = len(obj.verts)
-	nUvVerts = len(obj.uvValues)
+	nVerts = len(verts)
+	nUvVerts = len(uvValues)
 	nNormals = nVerts
 	nFaces = len(faces)
+	nWeights = len(skinWeights)
+	nBones = len(bones)
+	nTargets = len(targets)
 
 	texture = os.path.expanduser("~/makehuman/texture.tif")
 	texture_ref = os.path.expanduser("~/makehuman/texture_ref.tif")	
@@ -434,16 +448,16 @@ def exportDae(obj, fp):
 
 	fp.write('\n' +
 '    <library_controllers>\n' +
-'    <controller id="Human-skin">\n' +
-'      <skin source="#HumanMesh">\n' +
+'    <controller id="%s-skin">\n' % name +
+'      <skin source="#%sMesh">\n' % name +
 '        <bind_shape_matrix>\n' +
 '          1.0 0.0 0.0 0.0 \n' +
 '          0.0 1.0 0.0 0.0 \n' +
 '          0.0 0.0 1.0 0.0 \n' +
 '          0.0 0.0 0.0 1.0 \n' +
 '        </bind_shape_matrix>\n' +
-'        <source id="Human-skin-joints">\n' +
-'          <IDREF_array count="%d" id="Human-skin-joints-array">\n' % nBones +
+'        <source id="%s-skin-joints">\n' % name +
+'          <IDREF_array count="%d" id="%s-skin-joints-array">\n' % (nBones,name) +
 '           ')
 
 	for b in bones:
@@ -452,13 +466,13 @@ def exportDae(obj, fp):
 	fp.write('\n' +
 '          </IDREF_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#Human-skin-joints-array" stride="1">\n' % nBones +
+'            <accessor count="%d" source="#%s-skin-joints-array" stride="1">\n' % (nBones,name) +
 '              <param type="IDREF" name="JOINT"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="Human-skin-weights">\n' +
-'          <float_array count="%d" id="Human-skin-weights-array">\n' % nWeights +
+'        <source id="%s-skin-weights">\n' % name +
+'          <float_array count="%d" id="%s-skin-weights-array">\n' % (nWeights,name) +
 '           ')
 
 	for (n,b) in enumerate(skinWeights):
@@ -468,13 +482,13 @@ def exportDae(obj, fp):
 	fp.write('\n' +
 '          </float_array>\n' +	
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#Human-skin-weights-array" stride="1">\n' % nWeights +
+'            <accessor count="%d" source="#%s-skin-weights-array" stride="1">\n' % (nWeights,name) +
 '              <param type="float" name="WEIGHT"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="Human-skin-poses">\n' +
-'          <float_array count="%d" id="Human-skin-poses-array">' % (16*nBones))
+'        <source id="%s-skin-poses">\n' % name +
+'          <float_array count="%d" id="%s-skin-poses-array">' % (16*nBones,name))
 
 	mat = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
 	for b in bones:
@@ -490,18 +504,18 @@ def exportDae(obj, fp):
 	fp.write('\n' +
 '          </float_array>\n' +	
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#Human-skin-poses-array" stride="16">\n' % nBones +
+'            <accessor count="%d" source="#%s-skin-poses-array" stride="16">\n' % (nBones,name) +
 '              <param type="float4x4"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
 '        <joints>\n' +
-'          <input semantic="JOINT" source="#Human-skin-joints"/>\n' +
-'          <input semantic="INV_BIND_MATRIX" source="#Human-skin-poses"/>\n' +
+'          <input semantic="JOINT" source="#%s-skin-joints"/>\n' % name +
+'          <input semantic="INV_BIND_MATRIX" source="#%s-skin-poses"/>\n' % name +
 '        </joints>\n' +
 '        <vertex_weights count="%d">\n' % nVerts +
-'          <input offset="0" semantic="JOINT" source="#Human-skin-joints"/>\n' +
-'          <input offset="1" semantic="WEIGHT" source="#Human-skin-weights"/>\n' +
+'          <input offset="0" semantic="JOINT" source="#%s-skin-joints"/>\n' % name +
+'          <input offset="1" semantic="WEIGHT" source="#%s-skin-weights"/>\n' % name +
 '          <vcount>\n' +
 '            ')
 
@@ -531,13 +545,11 @@ def exportDae(obj, fp):
 '    </controller>\n')
 
 	"""
-	targets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
-	nTargets = len(targets)
 	fp.write('\n' +
-'   <controller id="HumanMorphs" name="HumanMorphs">\n' +
-'     <morph method="NORMALIZED" source="#HumanMesh">\n' +
-'       <source id="Human-targets">\n' +
-'         <IDREF_array id="Human-targets-array" count="%d">\n' % nTargets)
+'   <controller id="%sMorphs" name="%sMorphs">\n' % (name,name) +
+'     <morph method="NORMALIZED" source="#%sMesh">\n' % name +
+'       <source id="%s-targets">\n' % name +
+'         <IDREF_array id="%s-targets-array" count="%d">\n'  % (name, nTargets))
 
 	for (name, morphs) in targets:
 		fp.write(' %s' % name)
@@ -545,13 +557,13 @@ def exportDae(obj, fp):
 	fp.write('\n' +
 '         </IDREF_array>\n' +
 '         <technique_common>\n' +
-'           <accessor source="Human-targets-array" count="%d" stride="1">\n' % nTargets +
+'           <accessor source="%s-targets-array" count="%d" stride="1">\n' % (name,nTargets) +
 '             <param name="MORPH_TARGET" type="IDREF"/>\n' +
 '           </accessor>\n' +
 '         </technique_common>\n' +
 '       </source>\n' +
-'       <source id="Human-morph_weights">\n' +
-'         <float_array id="Human-morph_weights-array" count="%d">\n' % nTargets)
+'       <source id="%s-morph_weights">\n' % name +
+'         <float_array id="%s-morph_weights-array" count="%d">\n' % (name,nTargets))
 
 	for target in targets:
 		fp.write("0.0 ")
@@ -559,14 +571,14 @@ def exportDae(obj, fp):
 	fp.write('\n' +
 '         </float_array>\n' +
 '         <technique_common>\n' +
-'           <accessor source="#Human-morph_weights-array" count="%d" stride="1">\n' % nTargets +
+'           <accessor source="#%s-morph_weights-array" count="%d" stride="1">\n' % (name,nTargets) +
 '             <param name="MORPH_WEIGHT" type="float"/>\n' +
 '           </accessor>\n' +
 '         </technique_common>\n' +
 '       </source>\n' +
 '       <targets>\n' +
-'         <input semantic="MORPH_TARGET" source="#Human-targets"/>\n' +
-'         <input semantic="MORPH_WEIGHT" source="#Human-morph_weights"/>\n' +
+'         <input semantic="MORPH_TARGET" source="#%s-targets"/>\n' % name +
+'         <input semantic="MORPH_WEIGHT" source="#%s-morph_weights"/>\n' % name +
 '       </targets>\n' +
 '     </morph>\n' +
 '   </controller>\n')
@@ -580,73 +592,73 @@ def exportDae(obj, fp):
 
 	fp.write('\n' +
 '  <library_geometries>\n' +
-'    <geometry id="HumanMesh" name="Human">\n' +
+'    <geometry id="%sMesh" name="%s">\n' % (name,name) +
 '      <mesh>\n' +
-'        <source id="Human-Position">\n' +
-'          <float_array count="%d" id="Human-Position-array">\n' % (3*nVerts) +
+'        <source id="%s-Position">\n' % name +
+'          <float_array count="%d" id="%s-Position-array">\n' % (3*nVerts,name) +
 '          ')
 
-	for v in obj.verts:
-		fp.write('%.6g %.6g %.6g ' % (v.co[0], -v.co[2], v.co[1]))
+
+	for v in verts:
+		fp.write('%.6g %.6g %.6g ' % (v[0], -v[2], v[1]))
 
 	fp.write('\n' +
 '          </float_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#Human-Position-array" stride="3">\n' % nVerts +
+'            <accessor count="%d" source="#%s-Position-array" stride="3">\n' % (nVerts,name) +
 '              <param type="float" name="X"></param>\n' +
 '              <param type="float" name="Y"></param>\n' +
 '              <param type="float" name="Z"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="Human-Normals">\n' +
-'          <float_array count="%d" id="Human-Normals-array">\n' % (3*nNormals) +
+'        <source id="%s-Normals">\n' % name +
+'          <float_array count="%d" id="%s-Normals-array">\n' % (3*nNormals,name) +
 '          ')
 
-	for v in obj.verts:
-		fp.write('%.6g %.6g %.6g ' % (v.no[0], -v.no[2], v.no[1]))
+	for no in vnormals:
+		fp.write('%.6g %.6g %.6g ' % (no[0], -no[2], no[1]))
 
 	fp.write('\n' +
 '          </float_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#Human-Normals-array" stride="3">\n' % nNormals +
+'            <accessor count="%d" source="#%s-Normals-array" stride="3">\n' % (nNormals,name) +
 '              <param type="float" name="X"></param>\n' +
 '              <param type="float" name="Y"></param>\n' +
 '              <param type="float" name="Z"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="Human-UV">\n' +
+'        <source id="%s-UV">\n' % name +
 
-'          <float_array count="%d" id="Human-UV-array">\n' % (2*nUvVerts) +
+'          <float_array count="%d" id="%s-UV-array">\n' % (2*nUvVerts,name) +
 '           ')
 
 
-	for uv in obj.uvValues:
+	for uv in uvValues:
 		fp.write(" %.4f %.4f" %(uv[0], uv[1]))
 
 	fp.write('\n' +
 '          </float_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#Human-UV-array" stride="2">\n' % nUvVerts +
+'            <accessor count="%d" source="#%s-UV-array" stride="2">\n' % (nUvVerts,name) +
 '              <param type="float" name="S"></param>\n' +
 '              <param type="float" name="T"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <vertices id="Human-Vertex">\n' +
-'          <input semantic="POSITION" source="#Human-Position"/>\n' +
+'        <vertices id="%s-Vertex">\n' % name +
+'          <input semantic="POSITION" source="#%s-Position"/>\n' % name +
 '        </vertices>\n' +
 '        <polygons count="%d">\n' % nFaces +
-'          <input offset="0" semantic="VERTEX" source="#Human-Vertex"/>\n' +
-'          <input offset="1" semantic="NORMAL" source="#Human-Normals"/>\n' +
-'          <input offset="2" semantic="TEXCOORD" source="#Human-UV"/>\n')
+'          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % name +
+'          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % name +
+'          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % name)
 
 	for fc in faces:
 		fp.write('          <p>')
 		for vs in fc:
 			v = vs[0]
-
 			uv = vs[1]
 			if v > nVerts:
 				raise NameError("v %d > %d" % (v, nVerts))
@@ -669,12 +681,12 @@ def exportDae(obj, fp):
 '       <source id="%s-positions" name="%s-position">\n' % (name, name) +
 '         <float_array id="%s-positions-array" count="%d">\n' % (name, 3*nVerts) +
 '          ')
-		for (vn,v) in enumerate(obj.verts):
+		for (vn,v) in enumerate(verts):
 			try:
 				offs = morphs[vn]
-				loc = vadd(v.co, offs)
+				loc = vadd(v, offs)
 			except:
-				loc = v.co
+				loc = v
 			fp.write("%.4f %.4f %.4f " % (loc[0], -loc[2], loc[1]))
 
 		fp.write('\n'+
@@ -704,13 +716,13 @@ def exportDae(obj, fp):
 	writeBones(fp, rigHier, [0,0,0], 'layer="L1"', '')
 	
 	fp.write('\n' +
-'      <node layer="L1" id="HumanObject" name="Human">\n' +
+'      <node layer="L1" id="%sObject" name="%s">\n' % (name,name) +
 '        <translate sid="translate">0 0 0</translate>\n' +
 '        <rotate sid="rotateZ">0 0 1 0</rotate>\n' +
 '        <rotate sid="rotateY">0 1 0 0</rotate>\n' +
 '        <rotate sid="rotateX">1 0 0 0</rotate>\n' +
 '        <scale sid="scale">1 1 1</scale>\n' +
-'        <instance_controller url="#Human-skin">\n' +
+'        <instance_controller url="#%s-skin">\n' % name +
 '          <skeleton>#Root</skeleton>\n' +
 '          <bind_material>\n' +
 '            <technique_common>\n' +

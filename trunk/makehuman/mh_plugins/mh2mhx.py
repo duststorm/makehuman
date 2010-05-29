@@ -22,7 +22,7 @@ TO DO
 
 """
 
-import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig, rig_panel_25
+import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig, rig_panel_25, mh2proxy
 import os
 
 
@@ -92,39 +92,6 @@ def exportRawMhx(obj, fp):
 	return
 
 #
-#	proxyConfig():
-#
-
-def proxyConfig():
-	paths = ['~/makehuman/proxy.cfg', '/proxy.cfg', './proxy.cfg']
-	
-	fp = None
-	for path in paths:
-		path1 = os.path.expanduser(path)
-		fileName = os.path.realpath(path1)
-		try:
-			fp = open(fileName, "r")
-			print("Using config file %s" % fileName)
-			break
-		except:
-			print("No file %s" % fileName)
-
-	if not fp: return []	
-	proxyList = []
-	for line in fp:
-		lineSplit = line.split()
-		if len(lineSplit) == 0 or lineSplit[0][0] == '#':
-			pass
-		else:
-			proxyFile = os.path.expanduser(lineSplit[0])
-			proxyList.append(proxyFile)
-	fp.close()
-	print(proxyList)
-	return proxyList
-
-	
-
-#
 #	exportMhx_25(obj, rig, fp):
 #
 
@@ -138,7 +105,7 @@ def exportMhx_25(obj, rig, fp):
 	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp, None, [])	
 	fp.write("end if\n")
 
-	proxyList = proxyConfig()
+	proxyList = mh2proxy.proxyConfig()
 	proxyData = {}
 	fp.write("if toggle&T_Proxy\n")
 	for proxyFile in proxyList:
@@ -213,13 +180,16 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 					if proxyName:
 						mhx_rig.reapplyArmature(fp, proxyName)
 			elif lineSplit[1] == 'ProxyMesh':
-				(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = readProxyFile(obj.verts, proxyFile)
+				(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, 
+				proxyTexVerts) = mh2proxy.readProxyFile(obj.verts, proxyFile)
 				fp.write("Mesh %s %s \n" % (proxyName, proxyName))
 				proxyData[proxyName] = (proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts)
 			elif lineSplit[1] == 'ProxyObject':
 				fp.write("Object %s MESH %s \n" % (proxyName, proxyName))
 			elif lineSplit[1] == 'ProxyVerts':
-				printRealVerts(fp, realVerts, True)
+				for bary in realVerts:
+					(x,y,z) = mh2proxy.proxyCoord(bary)
+					fp.write("v %.6g %.6g %.6g ;\n" % (x, -z, y))
 			elif lineSplit[1] == 'Verts':
 				proxyVerts = None
 				realVerts = None
@@ -304,161 +274,6 @@ def writeShapeKeys(fp, name, proxyVerts):
 	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceDrivers)
 	fp.write("  end AnimationData\n")
 	fp.write("end ShapeKeys\n")
-	return
-
-#
-#	readProxyFile(verts, proxyFile):
-#
-
-def readProxyFile(verts, proxyFile):
-	if not proxyFile:
-		return (None, [],[],[],[],[],[])
-
-	#tmplName = "./data/templates/%s.proxy" % proxyFile
-	try:
-		tmpl = open(proxyFile, "rU")
-	except:
-		tmpl = None
-	if tmpl == None:
-		print("Cannot open proxy file %s" % proxyFile)
-		return (None, [],[],[],[],[],[])
-
-	realVerts = []
-	proxyFaces = []
-	proxyVerts = {}
-	proxyTexFaces = []
-	proxyTexVerts = []
-	proxyMaterials = []
-	proxyName = "MyProxy"
-
-	vn = 0
-	doVerts = False
-	doFaces = False
-	doMaterials = False
-	doTexVerts = False
-	for line in tmpl:
-		lineSplit= line.split()
-		if len(lineSplit) == 0:
-			pass
-		elif lineSplit[0] == 'Verts':
-			doVerts = True
-		elif lineSplit[0] == 'Faces':
-			doVerts = False
-			doFaces = True
-		elif lineSplit[0] == 'Materials':
-			doVerts = False
-			doFaces = False
-			doMaterials = True
-		elif lineSplit[0] == 'TexVerts':
-			doVerts = False
-			doFaces = False
-			doMaterials = False
-			doTexVerts = True
-		elif lineSplit[0] == 'Name':
-			proxyName = lineSplit[1]
-		elif doVerts:
-			v0 = int(lineSplit[0])
-			v1 = int(lineSplit[1])
-			v2 = int(lineSplit[2])
-			w0 = float(lineSplit[3])
-			w1 = float(lineSplit[4])
-			w2 = float(lineSplit[5])
-
-			realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2))
-			addProxyVert(v0, vn, w0, proxyVerts)
-			addProxyVert(v1, vn, w1, proxyVerts)
-			addProxyVert(v2, vn, w2, proxyVerts)
-			vn += 1
-		elif doFaces:
-			face = []
-			texface = []
-			nCorners = len(lineSplit)
-			for n in range(nCorners):
-				words = lineSplit[n].split('/')
-				face.append(int(words[0])-1)
-				if len(words) > 1:
-					texface.append(int(words[1])-1)
-			proxyFaces.append(face)
-			if texface:
-				proxyTexFaces.append(texface)
-				if len(face) != len(texface):
-					raise NameError("texface %s %s", face, texface)
-		elif doTexVerts:
-			vt = []
-			nCoords = len(lineSplit)
-			for n in range(nCoords):
-				uv = float(lineSplit[n])
-				vt.append(uv)
-			proxyTexVerts.append(vt)
-		elif doMaterials:
-			proxyMaterials.append(int(lineSplit[0]))
-
-	return (proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts)
-
-def addProxyVert(v, vn, w, proxyVerts):
-	try:
-		proxyVerts[v].append((vn, w))
-	except:
-		proxyVerts[v] = [(vn,w)]
-	return
-
-def printRealVerts(fp, realVerts, flip):
-	for (v0, v1, v2, w0, w1, w2) in realVerts:
-		r0 = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0]
-		r1 = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1]
-		r2 = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2]
-		if flip:
-			fp.write("v %.6g %.6g %.6g ;\n" % (r0, -r2, r1))
-		else:
-			fp.write("v %.6g %.6g %.6g ;\n" % (r0, r1, r2))
-
-	
-#
-#	exportProxyObj(obj, filename):	
-#	exportProxyObj1(obj, filename, proxyFile):
-#
-
-def exportProxyObj(obj, filename):
-	(name, ext) = os.path.splitext(filename)
-	proxyList = proxyConfig()
-	for proxyFile in proxyList:
-		(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = readProxyFile(obj.verts, proxyFile)
-		if proxyName:
-			filename = "%s-%s%s" % (name, proxyName, ext)
-			exportProxyObj1(obj, filename, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts)
-	return
-
-def exportProxyObj1(obj, filename, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts):
-	fp = open(filename, 'w')
-	fp.write(
-"# MakeHuman exported OBJ for proxy mesh\n" +
-"# www.makehuman.org\n\n")
-
-	printRealVerts(fp, realVerts, False)
-
-	for uv in proxyTexVerts:
-		fp.write("vt %s %s\n" % (uv[0], uv[1]))
-
-	mat = -1
-	fn = 0
-	for f in proxyFaces:
-		if proxyMaterials and proxyMaterials[fn] != mat:
-			mat = proxyMaterials[fn]
-			fp.write("usemtl %s\n" % matNames[mat])
-		fp.write("f")
-		if proxyTexFaces:
-			ft = proxyTexFaces[fn]
-			vn = 0
-			for v in f:
-				vt = ft[vn]
-				fp.write(" %d/%d" % (v+1, vt+1))
-				vn += 1
-		else:
-			for v in f:
-				fp.write(" %d" % (v+1))
-		fp.write("\n")
-		fn += 1
-	fp.close()
 	return
 	
 
@@ -597,7 +412,11 @@ def copyMeshFile249(obj, tmpl, fp):
 				skipOne = True
 				fp.write("end if\n")
 				mainMesh = False
-				exportProxy24(obj, fp)
+				proxyList = mh2proxy.proxyConfig()
+				fp.write("if useProxy\n")
+				for proxyFile in proxyList:
+					exportProxy24(obj, proxyFile, fp)
+				fp.write("end if\n")
 			elif lineSplit[1] == 'mesh' and mainMesh:
 				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
 				copyProxy("data/templates/shapekeys-facial25.mhx", fp, None)	
@@ -637,31 +456,26 @@ def copyMeshFile249(obj, tmpl, fp):
 	return
 
 #
-#	exportProxy24(obj, fp):
+#	exportProxy24(obj, proxyFile, fp):
 #
 
-def exportProxy24(obj, fp):
-	tmpl = open("data/templates/proxy24.mhx", "rU")
-	proxyVerts = None
-	realVerts = None
-	proxyFaces = None
-	proxyMaterials = None
-	proxyTexVerts = None
-	proxyTexFaces = None
-	proxyList = proxyConfig()
-	try:
-		proxyFile = proxyList[0]
-	except:
-		proxyFile = None
+def exportProxy24(obj, proxyFile, fp):
+	proxyData = mh2proxy.readProxyFile(obj.verts, proxyFile)
+	(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = proxyData
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
-	fp.write("if useProxy\n")
+	tmpl = open("data/templates/proxy24.mhx", "rU")
 	for line in tmpl:
 		lineSplit= line.split()
 		if len(lineSplit) == 0:
 			fp.write(line)
+		elif lineSplit[0] == 'mesh':
+			fp.write("mesh %s %s\n" % (proxyName, proxyName))
+		elif lineSplit[0] == 'object':
+			fp.write("object %s Mesh %s\n" % (proxyName, proxyName))
 		elif lineSplit[0] == 'v':
-			(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = readProxyFile(obj.verts, proxyFile)
-			printRealVerts(fp, realVerts, True)
+			for bary in realVerts:
+				(x,y,z) = mh2proxy.proxyCoord(bary)
+				fp.write("v %.6g %.6g %.6g ;\n" % (x, -z, y))
 		elif lineSplit[0] == 'f':
 			for f in proxyFaces:
 				fp.write("    f")
@@ -692,7 +506,6 @@ def exportProxy24(obj, fp):
 		else:
 			fp.write(line)
 	tmpl.close()
-	fp.write("end if\n")
 	return
 
 #
