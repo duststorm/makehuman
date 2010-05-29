@@ -5,8 +5,8 @@ OBJS = $(addsuffix .o,$(basename $(CSRCS) $(CCSRCS) ))
 
 CCOPTS = -Wall -O0 -g
 
-PYTHONVER     = 2.5
-EXTRAFMWKS    = -lX11 -lGL -lGLU -lSDL
+PYTHONVER     = 2.6
+EXTRAFMWKS    = -lX11 -lGL -lGLU -lSDL -lGLEW
 EXTRALIBS     = -lpython$(PYTHONVER)
 EXTRADEFINES  =
 INCLUDEPATH   = -I/usr/include/SDL/ -I/usr/include/python$(PYTHONVER)/ -I/usr/X11R6/include -I./include
