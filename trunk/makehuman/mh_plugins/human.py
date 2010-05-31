@@ -38,7 +38,7 @@ import math
 
 class Human(gui3d.Object):
 
-    def __init__(self, globalScene, objFilePath, hairObj):
+    def __init__(self, globalScene, objFilePath, hairObj=None):
 
         gui3d.Object.__init__(self, globalScene.application, objFilePath, position=[0, 0, 0], camera=0, shadeless=0, visible=True)
         self.meshData = self.mesh
@@ -213,7 +213,7 @@ class Human(gui3d.Object):
 
     def show(self):
         self.visible = True
-        self.hairObj.setVisibility(1)
+        if self.hairObj: self.hairObj.setVisibility(1)
         self.setVisibility(True)
 
     def hide(self):
@@ -221,18 +221,18 @@ class Human(gui3d.Object):
       # print("hiding ", self.meshName)
 
         self.visible = False
-        self.hairObj.setVisibility(0)
+        if self.hairObj: self.hairObj.setVisibility(0)
         self.setVisibility(False)
 
     # Overriding setPosition and setRotation to account for both hair and base object
 
     def setPosition(self, position):
         gui3d.Object.setPosition(self, position)
-        self.hairObj.setLoc(position[0], position[1], position[2])
+        if self.hairObj: self.hairObj.setLoc(position[0], position[1], position[2])
 
     def setRotation(self, rotation):
         gui3d.Object.setRotation(self, rotation)
-        self.hairObj.setRot(rotation[0], rotation[1], rotation[2])
+        if self.hairObj: self.hairObj.setRot(rotation[0], rotation[1], rotation[2])
 
     def setTexture(self, texturePath):
         self.meshData.setTexture(texturePath)

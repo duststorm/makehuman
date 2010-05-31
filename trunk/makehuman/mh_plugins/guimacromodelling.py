@@ -148,11 +148,12 @@ class MacroModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(MacroAction(human, 'Gender', value, self.syncSliders,False))
             self.syncStatus()
-            fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
-            if fileChooser.files:
-              fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
+            if human.hairObj:
+                fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
+                if fileChooser.files:
+                    fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
             human.meshData.update()
-            human.hairObj.update()
+            if human.hairObj: human.hairObj.update()
 
 
         @self.ageSlider.event
@@ -160,11 +161,12 @@ class MacroModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(MacroAction(human, 'Age', value, self.syncSliders,False))
             self.syncStatus()
-            fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
-            if fileChooser.files:
-              fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
+            if human.hairObj:
+                fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
+                if fileChooser.files:
+                    fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
             human.meshData.update()
-            human.hairObj.update()
+            if human.hairObj: human.hairObj.update()
 
         @self.muscleSlider.event
         def onChange(value):
@@ -194,12 +196,13 @@ class MacroModelingTaskView(gui3d.TaskView):
             human.applyAllTargets(self.app.progress,update=False)
             #Best method is to reload hair and readjust.. other methods arent very convincing
             #May be expensive? since our changes are not realtime we can live with it for the time being
-            fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
-            if fileChooser.files:
-              fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
+            if human.hairObj:
+                fileChooser=self.app.categories["Library"].tasksByName["Hair"].filechooser
+                if fileChooser.files:
+                    fileChooser.onFileSelected(fileChooser.files[fileChooser.selectedFile],update=1)
             #self.app.categories["Library"].tasksByName["Hair"].adjustHairObj(human.hairObj, human.meshData)
             human.meshData.update()
-            human.hairObj.update()
+            if human.hairObj : human.hairObj.update()
             #self.app.scene3d.redraw(True)
 
 
