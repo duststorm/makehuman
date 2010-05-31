@@ -1931,6 +1931,9 @@ class Human(gui3d.Object):
                 self.targetsDetailStack[targetSym] = targetSymVal
 
         self.scene.redraw()
+        
+    def posehuman(self, targetPath, morphFactor):
+        algos3d.mhloadRotationTarget(self.meshData, targetPath, morphFactor, 0)
 
     def resetMeshValues(self):
         self.childVal = 0.0
