@@ -116,33 +116,33 @@ class TargetBase(object):
 	@property
 	def u(self):
 		if self._u is None and self.prefix is not None :
-			self._u  = np.load(prefix+"_u.npy")
+			self._u  = np.load(self.prefix+"_u.npy")
 		return self._u
 
 	@property
 	def s(self):
 		if self._s is None and self.prefix is not None :
-			self._s  = np.load(prefix+"_s.npy")
+			self._s  = np.load(self.prefix+"_s.npy")
 		return self._s
 
 	@property
 	def vt(self):
 		if self._vt is None and self.prefix is not None :
-			self._vt  = np.load(prefix+"_vt.npy")
+			self._vt  = np.load(self.prefix+"_vt.npy")
 		return self._vt
 
 	@property
 	def vert_list(self):
 		if self._vert_list is None and self.prefix is not None :
 			try :
-				self._vert_list  = np.loadtxt(prefix+".verts",'int')
+				self._vert_list  = np.loadtxt(self.prefix+".verts",'int')
 			except IOError : pass
 		return self._vert_list
 	
 	@property
 	def targets(self):
 		if self._targets is None and self.prefix is not None :
-			self._targets  = np.load(prefix+"_targets.npy")
+			self._targets  = np.load(self.prefix+"_targets.npy")
 		return self._targets
 
 	@property
@@ -155,14 +155,14 @@ class TargetBase(object):
 	def save(self,prefix = None):
 		if prefix is not None : self.prefix = prefix
 
-		with open(prefix+".names","w") as f :
+		with open(self.prefix+".names","w") as f :
 			f.write("\n".join(self.names)+"\n")
 		
-		if self.vert_list is not None : np.savetxt(prefix+".verts",self.vert_list,"%i")
-		np.save(prefix+"_targets.npy",self.targets)
-		np.save(prefix+"_u.npy",self.u)
-		np.save(prefix+"_s.npy",self.s)
-		np.save(prefix+"_vt.npy",self.vt)
+		if self.vert_list is not None : np.savetxt(self.prefix+".verts",self.vert_list,"%i")
+		np.save(self.prefix+"_targets.npy",self.targets)
+		np.save(self.prefix+"_u.npy",self.u)
+		np.save(self.prefix+"_s.npy",self.s)
+		np.save(self.prefix+"_vt.npy",self.vt)
 
 	def project_target(self,target,rcond = 0.0):
 		"""
@@ -205,8 +205,8 @@ class TargetBase(object):
 		u = self.u[ : , cond ]
 		vt = self.vt[ cond ]
 		s = self.s[cond]
-		
-		return np.dot(np.dot(target,u),vt*1./s)
+		print target
+		return np.dot(np.dot(target.flatten(),u),vt*1./s.reshape(len(s),1))
 		
 	def compute_combinaison_safe(self,target,rcond = 0.0,regul = None):
 		"""
@@ -251,7 +251,8 @@ class TargetBase(object):
 		
 	
 	def combine_targets(self,coefs):
-		return (self.targets*coefs).sum(0)
+		ntargs,dim,dummy = self.targets.shape
+		return (self.targets*coefs.reshape(ntargs,1,1)).sum(0)
 
 def select(choice,subchoice):
 	lup = dict([(v,i) for i,v in enumerate(choice)])
@@ -291,42 +292,53 @@ def build_matrix(vert_list,targets):
 			base[i,look_up[v]]=coords
 	return base
 
-
-
-def fine_fit(head_mesh,scan_mesh,prefix,tofit_verts,niter,alpha = 0.2,rcond = 0.0,constrained = False,regul = None):
-	import sys
+def fit_mask(head_mesh,head_mask,scan_mesh,scan_mask,base,rcond = 0.0, constrained = False,regul = None):
+	if isinstance(base,str):
+		base = TargetBase(prefix = base)
+	kd_head = KDTree(head_mesh)
+	dist,indx = kd_head.query(head_mask)
+	head_v = head_mesh[indx]
 	
-	tofit_verts = np.loadtxt(tofit_verts,'int')
-	base = TargetBase(prefix = prefix)
+	kd_scan = KDTree(scan_mesh)
+	dist,indx = kd_scan.query(scan_mask)
+	scan_v = scan_mesh[indx]
+	
+	target = scan_v - head_v
+	print target
+	if constrained :
+		return base.compute_combinaison_safe(target,rcond,regul = regul)
+	else :
+		return base.compute_combinaison(target,rcond)
+
+def fit_mesh(head_mesh,scan_mesh,base,tofit_verts,init_coefs = None,constrained = False,regul = None):
+	if isinstance(tofit_verts,str):
+		tofit_verts = np.loadtxt(tofit_verts,'int')
+	if isinstance(base,str):
+		base = TargetBase(prefix = prefix)
+		
 	verts = base.vert_list
 	ntargs = len(base.targets)
-	print "init...",
-	sys.stdout.flush()
-	# initial fit
 	
 	m = head_mesh.copy()
-	nverts = len(scan_mesh.vertices)
+	nverts = len(scan_mesh)
 	
-	kd = KDTree(scan_mesh.vertices)
-	
-	for i in xrange(niter) :
-		dist,indx = kd.query(m.vertices[tofit_verts])
+	kd = KDTree(scan_mesh)
+	dist,indx = kd.query(m[tofit_verts])
+	target = np.zeros((nverts,3))
+	target[tofit_verts] = scan_mesh[indx] - m[tofit_verts]
+	target = target[verts]
 
-		target = np.zeros((nverts,3))
-		target[tofit_verts] = scan_mesh.vertices[indx] - m.vertices[tofit_verts]
-		target = target[verts]
-		if constrained :
-			coefs = base.compute_combinaison_safe(target,rcond,regul = regul)
-			proj = (coefs.reshape(ntargs,1,1)*base.targets).sum(0)
+	if init_coefs is not None :
+		init_target = base.combine_targets(init_coefs)
+		target -= init_target
+
+	if constrained :
+		coefs = base.compute_combinaison_safe(target,rcond,regul = regul)
+		proj = base.combine_targets(coefs)
+	else :
 		proj = base.project_target(target)
-
-		m.vertices[verts] += proj
-
-		if alpha> 0.0 :
-			m.vertices[tofit_verts] = scan_mesh.vertices[indx]
-			m.smooth(tofit_verts,alpha = alpha)
-	
-	return dict(zip(verts,(m.vertices - head_mesh.vertices)[verts]))
+	m[verts]+=proj
+	return m
 
 def save_target(filename,target):
 	with open(filename,'w') as f :
@@ -379,13 +391,10 @@ if __name__ == '__main__' :
 		dhead,ihead = kdhead.query(head_mask.vertices)
 		
 		mask_targets = targs[:,select(head_verts,ihead)]
-		
-		head_base = TargetBase(names,ihead,mask_targets)
-		head_base.save(output+"_mask")
+		mask_base = TargetBase(names,ihead,mask_targets) 
+		mask_base.save(output+"_mask")
 
 		base = TargetBase(names,head_verts,targs)
-		
-		print "OK"
 		base.save(output)
 
 	elif cmd == 'fit' :
@@ -406,19 +415,17 @@ if __name__ == '__main__' :
 		head_mask = wf.read_obj(head_mask)
 		scan_mask = wf.read_obj(scan_mask)
 		scan_mesh = wf.read_obj(scan_mesh)
-		
-		print "Align masks...",
-		sys.stdout.flush()
-		scan_mesh.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
-		print "OK"
-		
-		# fit
-		print "fit...",		
-		sys.stdout.flush()
-					
-		target = fine_fit(head_mesh,scan_mesh,prefix,fit_verts,1,alpha = 0.0,rcond = 0.0,constrained = True)
-		print "OK"
 
-		save_target(output,target)
+		scan_mesh.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
+		scan_mask.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mask.vertices)
+		
+		coefs = fit_mask(head_mesh.vertices,head_mask.vertices,scan_mesh.vertices,scan_mask.vertices,prefix+"_mask",constrained = True)
+
+		base = TargetBase(prefix = prefix)
+		target = fit_mesh(head_mesh.vertices,scan_mesh.vertices,base,fit_verts,init_coefs = coefs)
+		
+#		target = fine_fit(head_mesh,scan_mesh,prefix,fit_verts,1,alpha = 0.0,rcond = 0.0,constrained = True)
+		save_target(output,dict(zip(base.vert_list,target)))
+
 	else :
 		print "usage : python scan_fit.py build|project args"
