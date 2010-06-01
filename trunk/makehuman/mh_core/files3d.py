@@ -157,27 +157,28 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
             # Where the UV-map needs a sharp transition (e.g. where the eyelids
             # meet the eyeball) we therefore create duplicate vertices.
 
-            for (i, v) in enumerate(f.verts):
+            if not 'joint' in fg.name:
+                for (i, v) in enumerate(f.verts):
 
-                  # Retrieve the index to the UV data for this vertex on this face.
-                  # This index will be used as the 'key' of an element in the groupVerts dictionary.
+                      # Retrieve the index to the UV data for this vertex on this face.
+                      # This index will be used as the 'key' of an element in the groupVerts dictionary.
 
-                t = f.uv[i]
+                    t = f.uv[i]
 
-                # If this is the first occurrence of this vertex add it
-                # into the vertex array. A dictionary maps the vertex and
-                # UV index to the corresponding full index as a cache.
+                    # If this is the first occurrence of this vertex add it
+                    # into the vertex array. A dictionary maps the vertex and
+                    # UV index to the corresponding full index as a cache.
 
-                if (v.idx, t) not in groupVerts:
-                    v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[(v.idx, t)] = fullArrayIndex  # Add the UV-index as a 'key'. Add the vertex index as a 'value'.
-                    obj.indexBuffer.append(fullArrayIndex)
-                    fullArrayIndex += 1
-                else:
+                    if (v.idx, t) not in groupVerts:
+                        v.indicesInFullVertArray.append(fullArrayIndex)
+                        groupVerts[(v.idx, t)] = fullArrayIndex  # Add the UV-index as a 'key'. Add the vertex index as a 'value'.
+                        obj.indexBuffer.append(fullArrayIndex)
+                        fullArrayIndex += 1
+                    else:
 
-                # If this vertex exists and the UV index exists ...:
+                    # If this vertex exists and the UV index exists ...:
 
-                    obj.indexBuffer.append(groupVerts[(v.idx, t)])
+                        obj.indexBuffer.append(groupVerts[(v.idx, t)])
 
             f.idx = fIndex
             f.group = fg

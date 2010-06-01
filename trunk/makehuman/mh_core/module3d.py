@@ -617,6 +617,8 @@ class Object3D:
         fullArrayIndex = 0
         groupVerts = {}
         for f in self.faces:
+            if 'joint' in f.group.name:
+                continue
             for (i, v) in enumerate(f.verts):
                 if f.uv:
                     t = f.uv[i]
@@ -1182,6 +1184,8 @@ class Scene3D:
         mh.world.append(obj.object3d)
 
         for g in obj.facesGroups:
+            if 'joint' in g.name:
+                continue
             groupVerts = set()
             for f in g.faces:
                 faceColor = f.color
