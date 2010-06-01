@@ -254,7 +254,7 @@ class TargetBase(object):
 		return (self.targets*coefs).sum(0)
 
 def select(choice,subchoice):
-	lup = dict([(v,i) for i,v in enumerate(choices)])
+	lup = dict([(v,i) for i,v in enumerate(choice)])
 	return [lup[c] for c in subchoice]
 
 def find_match(mask,mesh):
@@ -290,6 +290,8 @@ def build_matrix(vert_list,targets):
 		for v,coords in t.iteritems() :
 			base[i,look_up[v]]=coords
 	return base
+
+
 
 def fine_fit(head_mesh,scan_mesh,prefix,tofit_verts,niter,alpha = 0.2,rcond = 0.0,constrained = False,regul = None):
 	import sys
@@ -333,6 +335,7 @@ def save_target(filename,target):
 				f.write( "%i %s\n"%(v," ".join(["%0.6f"%cc for cc in c]) ) )		
 
 if __name__ == '__main__' :
+	import wavefront as wf
 	import sys
 	
 	try :
@@ -344,10 +347,14 @@ if __name__ == '__main__' :
 	if cmd == 'build' :
 		try : 
 			target_dir = sys.argv[2]
-			output = sys.argv[3]
+			head_mesh = sys.argv[3]
+			head_mask = sys.argv[4]
+			scan_mesh = sys.argv[5]
+			scan_mask = sys.argv[6]
+			output = sys.argv[7]
 
 		except IndexError :
-			print "usage : python scan_fit.py build target_dir output_prefix"
+			print "usage : python scan_fit.py build target_dir  head_mesh head_mask scan_mesh scan_mask output_prefix"
 			sys.exit(-1)
 
 		print "Read targets...",
@@ -357,15 +364,32 @@ if __name__ == '__main__' :
 		
 		print "Build bases...",
 		sys.stdout.flush()
-		
 		targs = build_matrix(head_verts,targets)
+		
+		head_mesh = wf.read_obj(head_mesh)
+		head_mask = wf.read_obj(head_mask)
+		scan_mask = wf.read_obj(scan_mask)
+		scan_mesh = wf.read_obj(scan_mesh)
+		scan_mesh.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
+		
+		kdmask = KDTree(scan_mesh.vertices)
+		dscan,iscan = kdmask.query(scan_mask.vertices)
+		
+		kdhead = KDTree(head_mesh.vertices)
+		dhead,ihead = kdhead.query(head_mask.vertices)
+		
+		mask_targets = targs[:,select(head_verts,ihead)]
+		
+		head_base = TargetBase(names,ihead,mask_targets)
+		head_base.save(output+"_mask")
+
 		base = TargetBase(names,head_verts,targs)
 		
 		print "OK"
 		base.save(output)
 
 	elif cmd == 'fit' :
-		import wavefront as wf
+
 		try :
 			head_mesh = sys.argv[2]
 			head_mask = sys.argv[3]
