@@ -53,7 +53,7 @@ def findProxy():
 			print(pv.index, mv.index, mindist, name, pindex, bindex)
 			#printMverts("  ", mverts)
 		else:
-			raise NameError("Failed to find vert %d in group %d %d" % (pv.index, pindex, bindex))
+			raise NameError("Failed to find vert %d in group %s %s" % (pv.index, pindex, bindex))
 		if mindist > 5:
 			raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
 
