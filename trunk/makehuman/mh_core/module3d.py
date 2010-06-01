@@ -624,19 +624,13 @@ class Object3D:
                     t = f.uv[i]
                 else:
                     t = -1
-                if v.idx not in groupVerts:
+                if (v.idx, t) not in groupVerts:
                     v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[v.idx] = {}
-                    groupVerts[v.idx][t] = fullArrayIndex
-                    self.indexBuffer.append(fullArrayIndex)
-                    fullArrayIndex += 1
-                elif t not in groupVerts[v.idx]:
-                    v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[v.idx][t] = fullArrayIndex
+                    groupVerts[(v.idx, t)] = fullArrayIndex
                     self.indexBuffer.append(fullArrayIndex)
                     fullArrayIndex += 1
                 else:
-                    self.indexBuffer.append(groupVerts[v.idx][t])
+                    self.indexBuffer.append(groupVerts[(v.idx, t)])
 
         self.vertexBufferSize = fullArrayIndex
 
