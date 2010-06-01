@@ -294,7 +294,8 @@ def calcTargetNormal(obj, targetPath):
     return True
 
 
-def mhloadRotationTarget2(obj, targetPath, morphFactor, calcNorm=1):
+
+def loadRotationTarget(obj, targetPath, morphFactor):  
     """
     This function loads a rotation target file and applies the rotations to 
     specific vertices on the mesh object by rotating them around a common axis 
@@ -340,51 +341,64 @@ def mhloadRotationTarget2(obj, targetPath, morphFactor, calcNorm=1):
 
     """
 
-    a = time.time()
+    a = time.time()  
 
     try:
-        infoFile = open(targetPath + '.info')
-        infoData = infoFile.readlines()
-        rotAxeVerts = infoData[0].split(',')
-        infoFile.close()
+        f = open(targetPath)
+        fileDescriptor = f.readlines()
+        f.close()
     except:
-        print 'Error%t|Error opening info file: ' + targetPath + '.info'
+        print "Error opening target file: %s"%(targetPath)
         return 0
 
-    axisP1 = obj.verts[int(rotAxeVerts[0])]
-    axisP2 = obj.verts[int(rotAxeVerts[1])]
-    rotAxis = [axisP2.co[0] - axisP1.co[0], axisP2.co[1] - axisP1.co[1], axisP2.co[2] - axisP1.co[2]]
-    rotAxis = aljabr.vunit(rotAxis)
+
+    #Get info of axis from the first line of file
+    rotAxeInfo = fileDescriptor[0].split()
+
+    #Calculate the rotation axis vector
+    axisP1  = obj.verts[int(rotAxeInfo[0])]
+    axisP2  = obj.verts[int(rotAxeInfo[1])]
+    axis = rotAxeInfo[2]
+    #rotAxis = [axisP2.co[0]-axisP1.co[0],axisP2.co[1]-axisP1.co[1],axisP2.co[2]-axisP1.co[2]]
+    #rotAxis = vunit(rotAxis)
+    #axis = axisID(rotAxis)
+
     indicesToUpdate = []
-    print rotAxis
-    v1 = [axisP1.co[0], axisP1.co[1], axisP1.co[2]]
-    v2 = [axisP2.co[0], axisP2.co[1], axisP2.co[2]]
-    actualRotCenter = aljabr.centroid([v1, v2])
-    try:
-        fileDescriptor = open(targetPath)
-    except:
-        print 'Error opening target file' + targetPath
-        return 0
 
-    for stringData in fileDescriptor:
+    v1= [axisP1.co[0],axisP1.co[1],axisP1.co[2]]
+    v2= [axisP2.co[0],axisP2.co[1],axisP2.co[2]]
+    actualRotCenter = aljabr.centroid([v1,v2])
+
+    for stringData in fileDescriptor[1:]:
         listData = stringData.split()
-        pointIndex = int(listData[0])
-        indicesToUpdate.append(pointIndex)
-        theta = float(listData[1])
-        theta = theta * morphFactor
-        Rmtx = aljabr.makeRotMatrix(-theta, rotAxis)
-        pointToRotate = [obj.verts[pointIndex].co[0], obj.verts[pointIndex].co[1], obj.verts[pointIndex].co[2]]
-        pointRotated = aljabr.rotatePoint(actualRotCenter, pointToRotate, Rmtx)
+        theta = float(listData[0])
+        theta = theta*morphFactor
+        #Rmtx = makeRotMatrix(-theta, rotAxis)
+        if axis == "X":
+            Rmtx = aljabr.makeRotEulerMtx3D(theta,0,0)
+        if axis == "Y":
+            Rmtx = aljabr.makeRotEulerMtx3D(0,theta,0)
+        if axis == "Z":
+            Rmtx = aljabr.makeRotEulerMtx3D(0,0,theta)
 
-        obj.verts[pointIndex].co[0] = pointRotated[0]
-        obj.verts[pointIndex].co[1] = pointRotated[1]
-        obj.verts[pointIndex].co[2] = pointRotated[2]
+        for pIndex in listData[1:]:
+            pointIndex = int(pIndex)
+            indicesToUpdate.append(pointIndex)
+            pointToRotate = [obj.verts[pointIndex].co[0],obj.verts[pointIndex].co[1],obj.verts[pointIndex].co[2]]
+            pointRotated = aljabr.rotatePoint(actualRotCenter,pointToRotate,Rmtx)
 
-    fileDescriptor.close()
+            obj.verts[pointIndex].co[0] = pointRotated[0]
+            obj.verts[pointIndex].co[1] = pointRotated[1]
+            obj.verts[pointIndex].co[2] = pointRotated[2]
 
-    obj.update(indicesToUpdate)
-    print 'time: ', time.time() - a
+    
+    verticesToUpdate = [obj.verts[i] for i in indicesToUpdate]
+    obj.update(verticesToUpdate)
+    print "ROTATION TIME", time.time()-a
+
     return 1
+
+
 
 
 def saveTranslationTarget(obj, targetPath, groupToSave=None, epsilon=0.001):
