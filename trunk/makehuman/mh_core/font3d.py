@@ -10,6 +10,7 @@ class Font:
         f = open(filename, 'r')
 
         self.charMap = {}
+        self.kerning = {}
 
         for data in f.readlines():
             lineData = data.split()
@@ -57,6 +58,20 @@ class Font:
         # print(charRecord)
 
                 self.charMap[charRecord['id']] = charRecord
+                
+            elif lineData[0] == 'kerning':
+                
+                for paramValue in lineData[1:]:
+                    paramData = paramValue.split('=')
+
+                    if paramData[0] == 'first':
+                        first = int(paramData[1])
+                    elif paramData[0] == 'second':
+                        second = int(paramData[1])
+                    elif paramData[0] == 'amount':
+                        amount = int(paramData[1])
+                        
+                self.kerning[(first, second)] = amount
 
     # print(self.charMap)
 
@@ -89,10 +104,13 @@ class Font:
     # Returns the width of the string
     def stringWidth(self, text):
         width = 0.0
+        previous = -1
 
         for char in text:
             co = self.getAbsoluteCoordsForChar(char)
-            width += co[4]
+            kerning = font.kerning.get((previous, char), 0.0)
+            previous = ord(char)
+            width += co[4] + kerning
             
         return width
 
@@ -126,10 +144,15 @@ def createMesh(font, text, position=[0.0,0.0,0.0]):
 
     index = 0
     xoffset = 0.0
+    previous = -1
 
     for char in text:
         co = font.getAbsoluteCoordsForChar(char)
         uv = font.getTextureCoordinatesForChar(char)
+        kerning = font.kerning.get((previous, char), 0.0)
+        previous = ord(char)
+        
+        xoffset += kerning
 
     # create vertices
 
