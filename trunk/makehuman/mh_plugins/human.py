@@ -78,6 +78,8 @@ class Human(gui3d.Object):
         self.detailTargetZ1b = None
         self.detailTargetZ2b = None
 
+        self.meshStored = []
+
         self.childVal = 0.0  # child
         self.oldVal = 0.0  # old
         self.youngVal = 1.0
@@ -1932,8 +1934,26 @@ class Human(gui3d.Object):
 
         self.scene.redraw()
         
-    def posehuman(self, targetPath, morphFactor):
-        algos3d.mhloadRotationTarget(self.meshData, targetPath, morphFactor, 0)
+    def rotateLimb(self, targetPath, morphFactor):        
+        targetPath1 = targetPath+".target"  
+        targetPath2 = targetPath+".rot"   
+        algos3d.loadTranslationTarget(self.meshData, targetPath1, morphFactor, None, 1, 0)
+        algos3d.loadRotationTarget(self.meshData, targetPath2, morphFactor)
+        
+
+    def storeMesh(self):
+        print "Storing mesh status"
+        self.meshStored = []
+        for v in self.meshData.verts:
+            self.meshStored.append((v.co[0],v.co[1],v.co[2]))
+
+    def restoreMesh(self):
+        for i,v in enumerate(self.meshData.verts):
+            v.co[0] = self.meshStored[i][0]
+            v.co[1] = self.meshStored[i][1]
+            v.co[2] = self.meshStored[i][2]
+        
+        
 
     def resetMeshValues(self):
         self.childVal = 0.0
