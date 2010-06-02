@@ -108,76 +108,78 @@ class Font:
 
         for char in text:
             co = self.getAbsoluteCoordsForChar(char)
-            kerning = font.kerning.get((previous, char), 0.0)
+            kerning = self.kerning.get((previous, char), 0.0)
             previous = ord(char)
             width += co[4] + kerning
             
         return width
 
 #returns font as object3d with 0 visibility
-def createMesh(font, text, position=[0.0,0.0,0.0]):
+def createMesh(font, text, position=[0.0,0.0,0.0], object = None):
 
-  # create object
+    object = object or module3d.Object3D(text)
+        
+    object.x = position[0]
+    object.y = position[1]
+    object.z = position[2]
+    object.rx = 0.0
+    object.ry = 0.0
+    object.rz = 0.0
+    object.sx = 1.0
+    object.sy = 1.0
+    object.sz = 1.0
+    object.visibility = 1
+    object.shadeless = 1
+    object.pickable = 0
+    object.cameraMode = 1
+    object.text = ''
+    object.uvValues = []
+    object.indexBuffer = []
 
-    #obj = scene.newObj(text)
-    obj = module3d.Object3D(text)
-    obj.x = position[0]
-    obj.y = position[1]
-    obj.z = position[2]
-    obj.rx = 0.0
-    obj.ry = 0.0
-    obj.rz = 0.0
-    obj.sx = 1.0
-    obj.sy = 1.0
-    obj.sz = 1.0
-    obj.visibility = 1
-    obj.shadeless = 1
-    obj.pickable = 0
-    obj.cameraMode = 1
-    obj.text = ''
-    obj.uvValues = []
-    obj.indexBuffer = []
-
-  # create group
-
-    fg = obj.createFaceGroup('text')
+    # create group
+    fg = object.createFaceGroup('text')
 
     index = 0
     xoffset = 0.0
+    yoffset = 0.0
     previous = -1
 
     for char in text:
-        co = font.getAbsoluteCoordsForChar(char)
-        uv = font.getTextureCoordinatesForChar(char)
-        kerning = font.kerning.get((previous, char), 0.0)
-        previous = ord(char)
-        
-        xoffset += kerning
+        if char == '\n':
+            xoffset = 0.0
+            yoffset += font.lineHeight
+        else:
+            co = font.getAbsoluteCoordsForChar(char)
+            uv = font.getTextureCoordinatesForChar(char)
+            kerning = font.kerning.get((previous, char), 0.0)
+            previous = ord(char)
+            
+            xoffset += kerning
 
-    # create vertices
+            # create vertices
 
-        v1 = obj.createVertex([xoffset + co[0], co[1], 0.0])
-        v2 = obj.createVertex([xoffset + co[2], co[1], 0.0])
-        v3 = obj.createVertex([xoffset + co[2], co[3], 0.0])
-        v4 = obj.createVertex([xoffset + co[0], co[3], 0.0])
+            v1 = object.createVertex([xoffset + co[0], yoffset + co[1], 0.0])
+            v2 = object.createVertex([xoffset + co[2], yoffset + co[1], 0.0])
+            v3 = object.createVertex([xoffset + co[2], yoffset + co[3], 0.0])
+            v4 = object.createVertex([xoffset + co[0], yoffset + co[3], 0.0])
 
-        xoffset += co[4]
+            xoffset += co[4]
 
-        uv1 = [uv[0], uv[1]]
-        uv2 = [uv[2], uv[1]]
-        uv3 = [uv[2], uv[3]]
-        uv4 = [uv[0], uv[3]]
+            uv1 = [uv[0], uv[1]]
+            uv2 = [uv[2], uv[1]]
+            uv3 = [uv[2], uv[3]]
+            uv4 = [uv[0], uv[3]]
 
-    # create faces
+            # create faces
 
-        f1 = fg.createFace(v1, v4, v2, uv=(uv1, uv4, uv2))
-        f2 = fg.createFace(v2, v4, v3, uv=(uv2, uv4, uv3))
+            f1 = fg.createFace(v1, v4, v2, uv=(uv1, uv4, uv2))
+            f2 = fg.createFace(v2, v4, v3, uv=(uv2, uv4, uv3))
 
-    obj.updateIndexBuffer()
+    object.updateIndexBuffer()
 
-    obj.texture = font.file
+    object.texture = font.file
 
-    return obj
+    return object
     #scene.update()
 
 

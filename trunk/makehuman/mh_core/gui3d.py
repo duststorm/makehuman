@@ -572,7 +572,7 @@ class Slider(View):
     label=None):
         #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
         if isinstance(label, str):
-            createText(parent,label, [position[0]+10,position[1]-5,position[2]])
+            createText(parent, label, [position[0]+10,position[1]-5,position[2]])
         View.__init__(self, parent)
         self.background = Object(self, 'data/3dobjs/slider_background.obj', texture=backgroundTexture, position=position)
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj', texture=sliderTexture, position=[position[0], position[1] + 16, position[2] + 0.01])
@@ -835,10 +835,14 @@ class TextView(View):
 
     def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9]):
         View.__init__(self, parent)
-        self.object = Object(self, mesh, texture=texture, position=position)
+        self.object = Object(self, mesh, texture=texture, position=position) # TODO: remove this
+        self.textObject = None
 
     def setText(self, text):
-        self.object.setText(text)
+        if self.textObject:
+            self.app.scene3d.clear(self.textObject)
+        self.textObject = createText(self, text, self.object.getPosition(), object = self.textObject)
+        self.app.scene3d.update()
 
 
 # TextEdit widget
@@ -852,9 +856,7 @@ class TextEdit(View):
         # Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
 
         self.background = Object(self, mesh=mesh, texture=texture, position=position)
-        self.textObject = Object(self, mesh='data/3dobjs/empty.obj', texture=None, position=[position[0] + 10.0, position[1] + 14.0, position[2] + 0.1])
-
-        # self.textObject = Object(self, mesh, texture, position)
+        self.textObject = None
 
         self.text = ''
         self.texture = texture
@@ -866,14 +868,18 @@ class TextEdit(View):
             text = self.text[lenText - 100:]
         else:
             text = self.text
-        self.textObject.setText(text)
+        if self.textObject:
+            self.app.scene3d.clear(self.textObject)
+        position = self.background.getPosition()
+        self.textObject = createText(self, text, [position[0] + 10.0, position[1] + 1.0, position[2] + 0.1], object = self.textObject)
+        self.app.scene3d.update()
 
     def setText(self, text):
         self.text = text
         self.__updateTextObject()
 
     def getText(self):
-        return self.textObject.getText()
+        return self.text
 
     def onKeyDown(self, event):
         if event.modifiers & events3d.KMOD_CTRL:
@@ -941,7 +947,7 @@ class FileChooser(View):
         self.currentFile = Object(self, mesh='data/3dobjs/file.obj', position=self.currentPos, visible=False)
         self.nextFile = Object(self, mesh='data/3dobjs/nextfile.obj', position=self.nextPos, visible=False)
         self.previousFile = Object(self, mesh='data/3dobjs/previousfile.obj', position=self.previousPos, visible=False)
-        self.filename = Object(self, mesh='data/3dobjs/empty.obj', position=[330, 390, 0], visible=False)
+        self.filename = None
         self.path = path
         self.extension = extension
         self.previewExtension = previewExtension
@@ -983,7 +989,10 @@ class FileChooser(View):
     def updateText(self):
         text = self.files[self.selectedFile]
         text = text.replace(os.path.splitext(text)[-1], '')
-        self.filename.setText(text)
+        if self.filename:
+            self.app.scene3d.clear(self.filename)
+        self.filename = createText(self, text, [330, 390, 0], object = self.filename)
+        self.app.scene3d.update()
 
     def onShow(self, event):
         self.files = []
@@ -1019,26 +1028,26 @@ class FileChooser(View):
           self.currentFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile]))
           self.updateText()
           self.currentFile.show()
-          self.filename.show()
+          self.filename.setVisibility(1)
 
           """
           if self.selectedFile < len(self.files):
               self.currentFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile]))
               self.updateText()
               self.currentFile.show()
-              self.filename.show()
+              self.filename.setVisibility(1)
           else:
               self.currentFile.clearTexture()
               self.currentFile.hide()
-              self.filename.hide()
+              self.filename.setVisibility(0)
           """
 
           if self.selectedFile + 1 < len(self.files):
               self.nextFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile + 1]))
-              self.nextFile.show()
+              self.filename.setVisibility(1)
           else:
               self.nextFile.clearTexture()
-              self.nextFile.hide()
+              self.filename.setVisibility(0)
 
         self.app.scene3d.redraw()
 
@@ -1125,9 +1134,9 @@ class FileChooser(View):
 
         self.app.scene3d.redraw()
 
-def createText(view, text,position=[0.0,0.0,9.0],scale=[0.5,0.5,0.5],fontFileName="data/fonts/arial.fnt"):
+def createText(view, text, position=[0.0,0.0,9.0], scale=[0.5,0.5,0.5], fontFileName="data/fonts/arial.fnt", object = None):
         font = font3d.Font(fontFileName)
-        obj=font3d.createMesh(font, text,position);
-        obj.setScale(scale[0],scale[1],scale[2])
-        Object(view,obj)
-        return obj
+        object = font3d.createMesh(font, text,position, object);
+        object.setScale(scale[0], scale[1], scale[2])
+        Object(view, object)
+        return object
