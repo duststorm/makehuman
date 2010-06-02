@@ -52,6 +52,37 @@ def load(app):
     category = gui3d.Category(app, 'Example', app.getThemeResource('images', 'button_pose.png'))
     taskview = PoseTaskView(category)
     print 'pose loaded'
+    
+    @taskview.event
+    def onMouseWheel(event):
+        if event.wheelDelta > 0:
+            mh.cameras[0].eyeZ -= 0.65
+            app.scene3d.redraw()
+        else:
+            mh.cameras[0].eyeZ += 0.65
+            app.scene3d.redraw()
+
+    @taskview.event
+    def onMouseDragged(event):
+        diff = app.scene3d.getMouseDiff()
+        leftButtonDown = event.button & 1
+        middleButtonDown = event.button & 2
+        rightButtonDown = event.button & 4
+
+        if leftButtonDown and rightButtonDown or middleButtonDown:
+            mh.cameras[0].eyeZ += 0.05 * diff[1]
+        elif leftButtonDown:
+            human = app.scene3d.selectedHuman
+            rot = human.getRotation()
+            rot[0] += 0.5 * diff[1]
+            rot[1] += 0.5 * diff[0]
+            human.setRotation(rot)
+        elif rightButtonDown:
+            human = app.scene3d.selectedHuman
+            trans = human.getPosition()
+            trans[0] += 0.1 * diff[0]
+            trans[1] -= 0.1 * diff[1]
+            human.setPosition(trans)
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
