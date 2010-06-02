@@ -128,67 +128,23 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
         groupVerts = {}
 
         fg = module3d.FaceGroup(groupName)  # create group with name groupName
-        fg.elementIndex = fullArrayIndex  # first index in opengl array
         obj.addFaceGroup(fg)  # add group to object
         for face in group:  # for each face in the group [co_index1, co_index2, co_index3]
             v0 = obj.verts[face[0]]  # look up vertices, these are in the same order as in the file
             v1 = obj.verts[face[1]]
             v2 = obj.verts[face[2]]
+            
+            f = fg.createFace(v0, v1, v2)
 
             if len(uvFaceData) > 0:  # look up uv, if existing, these are in the same order as in the file
                 uvIndices = uvFaceData[fIndex]
                 t0 = uvIndices[0]
                 t1 = uvIndices[1]
                 t2 = uvIndices[2]
-            else:
-                t0 = -1
-                t1 = -1
-                t2 = -1
-
-            f = module3d.Face(v0, v1, v2)
-
-            f.uv = [t0, t1, t2]
-
-            # Build the lists of vertex indices and UV-indices for this face group.
-            # In the Python data structures a single vertex can be shared between
-            # multiple faces in the same face group. However, if a single vertex
-            # has multiple UV-settings, then we generate additional vertices so
-            # that we have a place to record the separate UV-indices.
-            # Where the UV-map needs a sharp transition (e.g. where the eyelids
-            # meet the eyeball) we therefore create duplicate vertices.
-
-            if not 'joint' in fg.name:
-                for (i, v) in enumerate(f.verts):
-
-                      # Retrieve the index to the UV data for this vertex on this face.
-                      # This index will be used as the 'key' of an element in the groupVerts dictionary.
-
-                    t = f.uv[i]
-
-                    # If this is the first occurrence of this vertex add it
-                    # into the vertex array. A dictionary maps the vertex and
-                    # UV index to the corresponding full index as a cache.
-
-                    if (v.idx, t) not in groupVerts:
-                        v.indicesInFullVertArray.append(fullArrayIndex)
-                        groupVerts[(v.idx, t)] = fullArrayIndex  # Add the UV-index as a 'key'. Add the vertex index as a 'value'.
-                        obj.indexBuffer.append(fullArrayIndex)
-                        fullArrayIndex += 1
-                    else:
-
-                    # If this vertex exists and the UV index exists ...:
-
-                        obj.indexBuffer.append(groupVerts[(v.idx, t)])
+                f.uv = [t0, t1, t2]
 
             f.idx = fIndex
-            f.group = fg
-            fg.faces.append(f)
-            obj.faces.append(f)
             fIndex += 1
-
-        fg.elementCount = fg.elementIndex - fullArrayIndex
-
-    obj.vertexBufferSize = fullArrayIndex
 
     if addSharedFaces:
         for v in obj.verts:
@@ -200,6 +156,7 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
 
     print 'time to build mesh: ', time.time() - time1
 
+    obj.updateIndexBuffer()
     obj.calcNormals()
 
 

@@ -613,24 +613,34 @@ class Object3D:
         #self.textSize = 12
 
     def updateIndexBuffer(self):
+        # Build the lists of vertex indices and UV-indices for this face group.
+        # In the Python data structures a single vertex can be shared between
+        # multiple faces in the same face group. However, if a single vertex
+        # has multiple UV-settings, then we generate additional vertices so
+        # that we have a place to record the separate UV-indices.
+        # Where the UV-map needs a sharp transition (e.g. where the eyelids
+        # meet the eyeball) we therefore create duplicate vertices.
         del self.indexBuffer[:]
         fullArrayIndex = 0
-        groupVerts = {}
-        for f in self.faces:
-            if 'joint' in f.group.name:
-                continue
-            for (i, v) in enumerate(f.verts):
-                if f.uv:
-                    t = f.uv[i]
-                else:
-                    t = -1
-                if (v.idx, t) not in groupVerts:
-                    v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[(v.idx, t)] = fullArrayIndex
-                    self.indexBuffer.append(fullArrayIndex)
-                    fullArrayIndex += 1
-                else:
-                    self.indexBuffer.append(groupVerts[(v.idx, t)])
+        for g in self.facesGroups:
+          if 'joint' in g.name:
+            continue
+          g.elementIndex = fullArrayIndex  # first index in opengl array
+          groupVerts = {}
+          for f in g.faces:
+              for (i, v) in enumerate(f.verts):
+                  if f.uv:
+                      t = f.uv[i]
+                  else:
+                      t = -1
+                  if (v.idx, t) not in groupVerts:
+                      v.indicesInFullVertArray.append(fullArrayIndex)
+                      groupVerts[(v.idx, t)] = fullArrayIndex
+                      self.indexBuffer.append(fullArrayIndex)
+                      fullArrayIndex += 1
+                  else:
+                      self.indexBuffer.append(groupVerts[(v.idx, t)])
+          g.elementCount = g.elementIndex - fullArrayIndex
 
         self.vertexBufferSize = fullArrayIndex
 
@@ -1151,8 +1161,9 @@ class Scene3D:
         return 'scene_type'
 
     def clear(self, obj):
-        mh.world.remove(obj.object3d)
-        obj.object3d = None
+        if obj.object3d:
+            mh.world.remove(obj.object3d)
+            obj.object3d = None
         if obj.indexBuffer:
             del obj.indexBuffer[:]
         del obj.faces[:]
