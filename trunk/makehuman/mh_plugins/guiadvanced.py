@@ -79,7 +79,8 @@ class MakeHairTaskView(gui3d.TaskView):
         @self.createButton.event
         def onClicked(event):
             scn = self.app.scene3d
-            scn.clear(scn.selectedHuman.hairObj)
+            if scn.selectedHuman.hairObj:
+                scn.clear(scn.selectedHuman.hairObj)
             obj = scn.newObj("hair")
             position = scn.selectedHuman.getPosition()
             rotation = scn.selectedHuman.getRotation()
