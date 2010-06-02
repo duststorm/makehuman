@@ -3,6 +3,7 @@
 # We need this for gui controls
 
 import gui3d
+import mh
 print 'Pose plugin imported'
 
 
@@ -11,35 +12,87 @@ class PoseTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_pose.png'))        
         
-        self.rscapulaProtractionVal = 0 
-        self.rscapulaTiltingUpVal = 0       
         
-        self.rscapulaProtractionSlider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, label = "Scapula protraction")
-        self.rscapulaTiltingUpSlider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, label = "Scapula tilting up")
-
-
-        @self.rscapulaProtractionSlider.event
-        def onChange(value):
-            self.rscapulaProtractionVal = value
-            self.applyPose()   
+        self.acromioclavicularAbductionVal = 0       
+        self.acromioclavicularProtractionVal = 0 
+        self.sternoclavicularAbductionVal = 0 
+        self.sternoclavicularProtractionVal = 0 
+        self.lordosiVal = 0
+        self.testVal = 0
+        self.test2Val = 0
+       
+        self.acromioclavicularAbductionSlider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, label = "Acromio Abdct")
+        self.acromioclavicularProtractionSlider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, label = "Acromnio Protr")
+        self.sternoclavicularAbductionSlider = gui3d.Slider(self, position=[10, 220, 9.5], value = 0.0, label = "Sterno Abdct")
+        self.sternoclavicularProtractionSlider = gui3d.Slider(self, position=[10, 180, 9.5], value = 0.0, label = "Sterno Protr")
+        #self.lordosiSlider = gui3d.Slider(self, position=[10, 260, 9.5], value = 0.0, label = "Lordosi")
+        self.testSlider = gui3d.Slider(self, position=[10, 300, 9.5], value = 0.0, label = "test")
+        self.test2Slider = gui3d.Slider(self, position=[10, 340, 9.5], value = 0.0, label = "test2")
+           
             
-        @self.rscapulaTiltingUpSlider.event
+        @self.acromioclavicularAbductionSlider.event
         def onChange(value):
-            self.rscapulaTiltingUpVal = value
+            self.acromioclavicularAbductionVal = value
             self.applyPose() 
+            
+        @self.acromioclavicularProtractionSlider.event
+        def onChange(value):
+            self.acromioclavicularProtractionVal = value
+            self.applyPose()
+            
+        @self.sternoclavicularAbductionSlider.event
+        def onChange(value):
+            self.sternoclavicularAbductionVal = value
+            self.applyPose()
+            
+        @self.sternoclavicularProtractionSlider.event
+        def onChange(value):
+            self.sternoclavicularProtractionVal = value
+            self.applyPose()
+            
+        #@self.lordosiSlider.event
+        #def onChange(value):
+            #self.lordosiVal = value
+            #self.applyPose()
+            
+        @self.testSlider.event
+        def onChange(value):
+            self.testVal = value
+            self.applyPose()
+            
+        @self.test2Slider.event
+        def onChange(value):
+            self.test2Val = value
+            self.applyPose()
         
     #maybe this should be moved in human class
     def applyPose(self):
+        
         self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
         
         #Now all rotations are applied, taking account of hierarchy.
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/rscapula-tilting-up", self.rscapulaTiltingUpVal)
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/rscapula-protraction", self.rscapulaProtractionVal)
+        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/test", self.testVal)
+        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/acromioclavicular-abduction", self.acromioclavicularAbductionVal)
+        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/acromioclavicular-protraction", self.acromioclavicularProtractionVal)
+        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/sternoclavicular-abduction", self.sternoclavicularAbductionVal)
+        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/sternoclavicular-protraction", self.sternoclavicularProtractionVal)
+        #self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/lordosi", self.lordosiVal)
+        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/test2", self.test2Val)
+        self.app.scene3d.selectedHuman.meshData.calcNormals(facesToUpdate=[f for f in self.app.scene3d.selectedHuman.meshData.faces])
+        self.app.scene3d.selectedHuman.meshData.update()
+        #self.app.scene3d.redraw()
+        
 
 
     def onShow(self, event):
         self.app.scene3d.selectedHuman.storeMesh()
+        self.applyPose()
         gui3d.TaskView.onShow(self, event)
+       
+    def onHide(self, event):
+        self.app.scene3d.selectedHuman.restoreMesh()
+        self.app.scene3d.selectedHuman.meshData.update()
+        gui3d.TaskView.onHide(self, event)
         
 category = None
 taskview = None
