@@ -6,59 +6,57 @@ import mhx_rig
 from mhx_rig import *
 
 FaceJoints = [
+	('head-end',			'l', ((2.0, 'head'), (-1.0, 'neck'))),
 	('mouth',			'j', 'mouth'),
+	('jaw',				'j', 'jaw'),
+
+	('tongue-1',			'j', 'tongue-1'),
+	('tongue-2',			'j', 'tongue-2'),
+	('tongue-3',			'j', 'tongue-3'),
+	('tongue-4',			'j', 'tongue-4'),
+
 	('l-eye',			'j', 'l-eye'),
 	('r-eye',			'j', 'r-eye'),
-	('jaw-tip',			'v', 8162),
-	('tounge-tip',			'v', 8049),
-	('tounge-midfront',		'v', 8089),
-	('tounge-mid',			'v', 8103),
-	('tounge-root',			'v', 8099),
-	('l-upLid-v',			'v', 12630),
-	('l-loLid-v',			'v', 12594),
-	('r-upLid-v',			'v', 2442),
-	('r-loLid-v',			'v', 2520),
-	('l-upLid',			'l', ((2.5, 'l-upLid-v'), (-1.5, 'l-eye'))),
-	('l-loLid',			'l', ((2.5, 'l-loLid-v'), (-1.5, 'l-eye'))),
-	('r-upLid',			'l', ((2.5, 'r-upLid-v'), (-1.5, 'r-eye'))),
-	('r-loLid',			'l', ((2.5, 'r-loLid-v'), (-1.5, 'r-eye'))),
-	('head-end',			'l', ((2.0, 'head'), (-1.0, 'neck'))),
+	('l-eye-target',		'j', 'l-eye-target'),
+	('r-eye-target',		'j', 'r-eye-target'),
+	('l-upperlid',			'j', 'l-upperlid'),
+	('l-lowerlid',			'j', 'l-lowerlid'),
+	('r-upperlid',			'j', 'r-upperlid'),
+	('r-lowerlid',			'j', 'r-lowerlid'),
 
-	('mouth-end',			'l', ((3.0, 'mouth'), (-2.0, 'head'))),
-	('Eye_R_tail',			'o', ('l-eye', [0.0, 0.0, 0.5])),
-	('Eye_L_tail',			'o', ('r-eye', [0.0, 0.0, 0.5])),
 	('mid-eyes',			'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
-	('Gaze_head',			'o', ('mid-eyes', [0.0, 0.0, 5.2])),
-	('Gaze_tail',			'o', ('mid-eyes', [0.0, 0.0, 4.2])),
-	('Gaze_R_head',			'o', ('l-eye', [0.0, 0.0, 5.0])),
-	('Gaze_R_tail',			'o', ('l-eye', [0.0, 0.0, 4.5])),
-	('Gaze_L_head',			'o', ('r-eye', [0.0, 0.0, 5.0])),
-	('Gaze_L_tail',			'o', ('r-eye', [0.0, 0.0, 4.5])),
+	('gaze',			'o', ('mid-eyes', [0.0, 0.0, 5.2])),
+	('gaze-target',			'o', ('mid-eyes', [0.0, 0.0, 4.2])),
+	('l-gaze',			'o', ('l-eye', [0.0, 0.0, 5.0])),
+	('l-gaze-target',		'o', ('l-eye', [0.0, 0.0, 4.5])),
+	('r-gaze',			'o', ('r-eye', [0.0, 0.0, 5.0])),
+	('r-gaze-target',		'o', ('r-eye', [0.0, 0.0, 4.5])),
 ]
 
 FaceHeadsTails = [
-	#('Head-inv',			'head-end', 'mouth'),
-	('Jaw',				'mouth', 'jaw-tip'),
-	('ToungeBase',			'tounge-root', 'tounge-mid'),
-	('ToungeMid',			'tounge-mid', 'tounge-midfront'),
-	('ToungeTip',			'tounge-midfront', 'tounge-tip'),
-	('Eye_R',			'l-eye', 'Eye_R_tail'),
-	('UpLid_R',			'l-eye', 'l-upLid'),
-	('LoLid_R',			'l-eye', 'l-loLid'),
-	('Eye_L',			'r-eye', 'Eye_L_tail'),
-	('UpLid_L',			'r-eye', 'r-upLid'),
-	('LoLid_L',			'r-eye', 'r-loLid'),
-	('Gaze',			'Gaze_head', 'Gaze_tail'),
-	('Gaze_R',			'Gaze_R_head', 'Gaze_R_tail'),
-	('Gaze_L',			'Gaze_L_head', 'Gaze_L_tail'),
+	('Jaw',				'mouth', 'jaw'),
+	('TongueBase',			'tongue-1', 'tongue-2'),
+	('TongueMid',			'tongue-2', 'tongue-3'),
+	('TongueTip',			'tongue-3', 'tongue-4'),
+
+	('Eye_R',			'l-eye', 'l-eye-target'),
+	('UpLid_R',			'l-eye', 'l-upperlid'),
+	('LoLid_R',			'l-eye', 'l-lowerlid'),
+	('Eye_L',			'r-eye', 'r-eye-target'),
+	('UpLid_L',			'r-eye', 'r-upperlid'),
+	('LoLid_L',			'r-eye', 'r-lowerlid'),
+
+	('Gaze',			'gaze', 'gaze-target'),
+	('Gaze_R',			'l-gaze', 'l-gaze-target'),
+	('Gaze_L',			'r-gaze', 'r-gaze-target'),
 ]
 
 
 FaceArmature = [
 	('Jaw', 'True',			0.0, 'Head', F_DEF+F_WIR, L_MAIN+L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeBase', 'True',		0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeMid', 'True',		0.0, 'ToungeBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeTip', 'True',		0.0, 'ToungeMid', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('TongueBase', 'True',		0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('TongueMid', 'True',		0.0, 'TongueBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('TongueTip', 'True',		0.0, 'TongueMid', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
 	('Eye_R', 'True',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('Eye_L', 'True',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('UpLid_R', 'True',		0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
@@ -77,11 +75,11 @@ FaceArmature = [
 FacePoses = [
 	('poseBone', 'True', 'Jaw', 'MHJaw', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'True', 'ToungeBase', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
+	('poseBone', 'True', 'TongueBase', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
 
-	('poseBone', 'True', 'ToungeMid', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
+	('poseBone', 'True', 'TongueMid', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
 
-	('poseBone', 'True', 'ToungeTip', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
+	('poseBone', 'True', 'TongueTip', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
 
 	('poseBone', 'True', 'UpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 

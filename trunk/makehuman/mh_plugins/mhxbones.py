@@ -231,9 +231,9 @@ midLocations = [
 vertLocations = [
 	( "chest-front", 7292 ),
 	( "jaw-tip", 8162 ),
-	( "tounge-tip", 8049 ),
-	( "tounge-mid", 8103 ),
-	( "tounge-root", 8099 ),
+	( "tongue-tip", 8049 ),
+	( "tongue-mid", 8103 ),
+	( "tongue-root", 8099 ),
 	( "l-upLid", 12630 ),
 	( "l-loLid", 12594 ),
 	( "r-upLid", 2442 ),
@@ -267,8 +267,8 @@ armature = [
 	("Head", "Neck", "head", 0, "head-end", 0, F_CON, L_FK+L_DEFORM+L_TORSO+L_HEAD, "MHCircle10", 0),
 	("Head-inv", "Head", "head-end", 0, "mouth", 0, F_CON+F_NODEF, L_HELP, None, 0),
 	("Jaw", "Head-inv", "mouth", 0, "jaw-tip", 0, F_CON, L_FK+L_DEFORM+L_HEAD, None, 0),
-	("ToungeBase", "Jaw", "tounge-root", 0, "tounge-mid", 0, 0, L_DEFORM+L_HEAD, None, 0),
-	("ToungeTip", "ToungeBase", "tounge-mid", 0, "tounge-tip", 0, F_CON, L_DEFORM+L_HEAD, None, 0),
+	("TongueBase", "Jaw", "tongue-root", 0, "tongue-mid", 0, 0, L_DEFORM+L_HEAD, None, 0),
+	("TongueTip", "TongueBase", "tongue-mid", 0, "tongue-tip", 0, F_CON, L_DEFORM+L_HEAD, None, 0),
 
 	("Eye_R", "Head", "l-eye", 0, "l-eye", [0,0,0.5], 0, L_DEFORM, None, 0),
 	("UpLid_R", "Head", "l-eye", 0, "l-upLid", 0, 0, L_DEFORM+L_HEAD, None, 0),
@@ -479,7 +479,7 @@ armature = [
 	("PMouth_R", "PFace", "origin", [-2.5*dx,-2.5*dx,0], "origin", [-2.5*dx,-2.5*dx,dz], F_NODEF, L_PANEL, None, 0),
 	("PMouth_L", "PFace", "origin", [2.5*dx,-2.5*dx,0], "origin", [2.5*dx,-2.5*dx,dz], F_NODEF, L_PANEL, None, 0),
 
-	("PTounge", "PFace", "origin", [0,-4.9*dx,0], "origin", [0,-4.9*dx,dz], F_NODEF, L_PANEL, None, 0),
+	("PTongue", "PFace", "origin", [0,-4.9*dx,0], "origin", [0,-4.9*dx,dz], F_NODEF, L_PANEL, None, 0),
 	("PJaw", "PFace", "origin", [0,-5.7*dx,0], "origin", [0,-5.7*dx,dz], F_NODEF, L_PANEL, None, 0),
 
 	("PArmIK_R", "PFace", "origin", [-1.1,2,0], "origin", [-1.1,2,dz], F_NODEF, L_PANEL, None, 0),
@@ -487,7 +487,8 @@ armature = [
 	("PLegIK_R", "PFace", "origin", [-1.1,1.5,0], "origin", [-1.1,1.5,dz], F_NODEF, L_PANEL, None, 0),
 	("PLegIK_L", "PFace", "origin", [0.1,1.5,0], "origin", [0.1,1.5,dz], F_NODEF, L_PANEL, None, 0),
 ]
-
+
+
 #
 #	boneRoll - computer generated list
 #
@@ -627,7 +628,7 @@ boneRoll = {
 	'PMouth_L'	 : (  0, 180),
 	'PMouth_R'	 : (  0, 180),
 	'PNose'	 : (  0, 180),
-	'PTounge'	 : (  0, 180),
+	'PTongue'	 : (  0, 180),
 	'PUpLid_L'	 : (  0, 180),
 	'PUpLid_R'	 : (  0, 180),
 	'PUpLip'	 : (  0, 180),
@@ -674,8 +675,8 @@ boneRoll = {
 	'Toe_L'	 : (  5, -164),
 	'Toe_R'	 : ( -5, 164),
 	'Torso'	 : (  0, 180),
-	'ToungeBase'	 : (  0,   0),
-	'ToungeTip'	 : (  0,   0),
+	'TongueBase'	 : (  0,   0),
+	'TongueTip'	 : (  0,   0),
 	'UpArmTwist_L'	 : (  0,  97),
 	'UpArmTwist_R'	 : (  0, -97),
 	'UpArm_L'	 : (  0,  97),
@@ -768,7 +769,8 @@ constraints = [
 	("Finger-1-3_L" , "IKSOLVER", 1.0, "Finger-1-IK_L", "FingerIK_L", 3, Bone),
 	("Finger-2-3_L" , "IKSOLVER", 1.0, "Finger-2-IK_L", "FingerIK_L", 3, Bone),
 	("Finger-3-3_L" , "IKSOLVER", 1.0, "Finger-3-IK_L", "FingerIK_L", 3, Bone),
-	("Finger-4-3_L" , "IKSOLVER", 1.0, "Finger-4-IK_L", "FingerIK_L", 3, Bone),
+	("Finger-4-3_L" , "IKSOLVER", 1.0, "Finger-4-IK_L", "FingerIK_L", 3, Bone),
+
 	("Finger-5-3_L" , "IKSOLVER", 1.0, "Finger-5-IK_L", "FingerIK_L", 3, Bone),	
 
 	("Finger-1-1_R" , "IKSOLVER", 1.0, "Finger-1-Pole_R", "FingerIK_L", 1, Bone),
@@ -1062,7 +1064,7 @@ def writePose25(obj, fp):
 
 colladaBones = [
 	("Chin", "Jaw", "jaw-tip", 0, "jaw-tip", [0,0,0.3], 0, 0, None, 0),
-	("ToungeParent", "Head-inv", "mouth", 0, "tounge-root", 0, 0, 0, None, 0),
+	("TongueParent", "Head-inv", "mouth", 0, "tongue-root", 0, 0, 0, None, 0),
 	("Head_L", "Head", "head-end", 0, "r-eye", 0, 0, 0, None, 0),
 	("Head_R", "Head", "head-end", 0, "l-eye", 0, 0, 0, None, 0),
 	("EyeEnd_L", "Eye_L", "r-eye", [0,0,0.5], "r-eye", [0,0,0.75], 0, 0, None, 0),

@@ -11,7 +11,7 @@ def printMverts(stuff, mverts):
 		if v:
 			print(stuff, v.index, dist)
 
-def findProxy():
+def findProxy(log):
 	bob = bpy.data.objects['Human']
 	pob = bpy.data.objects['Proxy']
 	base = bob.data
@@ -28,6 +28,8 @@ def findProxy():
 		for bvg in bob.vertex_groups:
 			if bvg.name == name:
 				bindex = bvg.index
+		if bindex == None:
+			raise NameError("Did not find vertex group %s in base mesh" % name)
 
 		mverts = []
 		for n in range(mListLength):
@@ -51,6 +53,7 @@ def findProxy():
 		(mv, mindist) = mverts[0]
 		if mv:
 			print(pv.index, mv.index, mindist, name, pindex, bindex)
+			log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
 			#printMverts("  ", mverts)
 		else:
 			raise NameError("Failed to find vert %d in group %s %s" % (pv.index, pindex, bindex))
@@ -200,7 +203,10 @@ def printAll():
 	path = '~/makehuman/myproxy.proxy'
 	path = '/home/thomas/myproxy.proxy'
 	print("Doing %s" % path)
-	verts = findProxy()
+	logfile = os.path.expanduser('~/makehuman/proxy.log')
+	log = open(logfile, "w")
+	verts = findProxy(log)
+	log.close()
 	printProxy(path, verts)
 	print("%s done" % path)
 

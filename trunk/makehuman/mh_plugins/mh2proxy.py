@@ -87,6 +87,8 @@ def readProxyFile(verts, proxyFile):
 	doFaces = False
 	doMaterials = False
 	doTexVerts = False
+	doObjData = False
+	theGroup = None
 	for line in tmpl:
 		lineSplit= line.split()
 		if len(lineSplit) == 0:
@@ -105,8 +107,18 @@ def readProxyFile(verts, proxyFile):
 			doFaces = False
 			doMaterials = False
 			doTexVerts = True
+		elif lineSplit[0] == 'ObjData':
+			doVerts = False		
+			doObjData = True
 		elif lineSplit[0] == 'Name':
 			proxyName = lineSplit[1]
+		elif doObjData:
+			if lineSplit[0] == 'vt':
+				newTexVert(1, lineSplit, proxyTexVerts)
+			elif lineSplit[0] == 'f':
+				newFace(1, lineSplit, theGroup, proxyFaces, proxyTexFaces)
+			elif lineSplit[0] == 'g':
+				theGroup = lineSplit[1]
 		elif doVerts:
 			v0 = int(lineSplit[0])
 			v1 = int(lineSplit[1])
@@ -121,30 +133,38 @@ def readProxyFile(verts, proxyFile):
 			addProxyVert(v2, vn, w2, proxyVerts)
 			vn += 1
 		elif doFaces:
-			face = []
-			texface = []
-			nCorners = len(lineSplit)
-			for n in range(nCorners):
-				words = lineSplit[n].split('/')
-				face.append(int(words[0])-1)
-				if len(words) > 1:
-					texface.append(int(words[1])-1)
-			proxyFaces.append(face)
-			if texface:
-				proxyTexFaces.append(texface)
-				if len(face) != len(texface):
-					raise NameError("texface %s %s", face, texface)
+			newFace(0, lineSplit, theGroup, proxyFaces, proxyTexFaces)
 		elif doTexVerts:
-			vt = []
-			nCoords = len(lineSplit)
-			for n in range(nCoords):
-				uv = float(lineSplit[n])
-				vt.append(uv)
-			proxyTexVerts.append(vt)
+			newTexVert(0, lineSplit, proxyTexVerts)
 		elif doMaterials:
 			proxyMaterials.append(int(lineSplit[0]))
 
 	return (proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts)
+
+def newFace(first, lineSplit, group, proxyFaces, proxyTexFaces):
+	face = []
+	texface = []
+	nCorners = len(lineSplit)
+	for n in range(first, nCorners):
+		words = lineSplit[n].split('/')
+		face.append(int(words[0])-1)
+		if len(words) > 1:
+			texface.append(int(words[1])-1)
+	proxyFaces.append((face,group))
+	if texface:
+		proxyTexFaces.append(texface)
+		if len(face) != len(texface):
+			raise NameError("texface %s %s", face, texface)
+	return
+
+def newTexVert(first, lineSplit, proxyTexVerts):
+	vt = []
+	nCoords = len(lineSplit)
+	for n in range(first, nCoords):
+		uv = float(lineSplit[n])
+		vt.append(uv)
+	proxyTexVerts.append(vt)
+	return
 
 def addProxyVert(v, vn, w, proxyVerts):
 	try:
@@ -188,12 +208,14 @@ def getMeshInfo(obj, proxyData, rawWeights, rawShapes):
 			vnormals.append(v)
 
 		faces = []
-		for (fn,f) in enumerate(proxyFaces):
+		fn = 0
+		for (f,g) in proxyFaces:
 			texFace = proxyTexFaces[fn]
 			face = []
 			for (vn,v) in enumerate(f):
 				face.append((v, texFace[vn]))
 			faces.append(face)
+			n += 1
 
 		weights = getProxyWeights(rawWeights, proxyVerts)
 		shapes = getProxyShapes(rawShapes, proxyVerts)
@@ -307,10 +329,14 @@ def exportProxyObj1(obj, filename, proxyData):
 
 	mat = -1
 	fn = 0
-	for f in proxyFaces:
+	grp = None
+	for (f,g) in proxyFaces:
 		if proxyMaterials and proxyMaterials[fn] != mat:
 			mat = proxyMaterials[fn]
 			fp.write("usemtl %s\n" % matNames[mat])
+		if g != grp:
+			fp.write("g %s\n" % g)
+			grp = g
 		fp.write("f")
 		if proxyTexFaces:
 			ft = proxyTexFaces[fn]

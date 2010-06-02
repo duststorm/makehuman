@@ -198,7 +198,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 				for v in obj.verts:
 					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
 			elif lineSplit[1] == 'ProxyFaces':
-				for f in proxyFaces:
+				for (f,g) in proxyFaces:
 					fp.write("    f")
 					for v in f:
 						fp.write(" %s" % v)
@@ -477,7 +477,7 @@ def exportProxy24(obj, proxyFile, fp):
 				(x,y,z) = mh2proxy.proxyCoord(bary)
 				fp.write("v %.6g %.6g %.6g ;\n" % (x, -z, y))
 		elif lineSplit[0] == 'f':
-			for f in proxyFaces:
+			for (f,g) in proxyFaces:
 				fp.write("    f")
 				for v in f:
 					fp.write(" %d" % v)

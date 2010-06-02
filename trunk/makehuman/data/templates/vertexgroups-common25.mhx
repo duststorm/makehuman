@@ -31773,7 +31773,7 @@
     wv 15080 1 ;
     wv 15081 1 ;
   end VertexGroup
-  VertexGroup ToungeBase
+  VertexGroup TongueBase
     wv 381 0.2 ;
     wv 382 0.2 ;
     wv 383 0.2 ;
@@ -31856,7 +31856,7 @@
     wv 8145 0.2 ;
     wv 8146 0.2 ;
   end VertexGroup
-  VertexGroup ToungeTip
+  VertexGroup TongueTip
     wv 381 0.202894 ;
     wv 382 0.204364 ;
     wv 383 0.185764 ;

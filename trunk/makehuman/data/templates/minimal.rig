@@ -5,215 +5,221 @@
   spine1 joint spine1
   neck joint neck
   head joint head
-  chest-front vertex 7292
-  l-rib-top vertex 10134
-  r-rib-top vertex 3667
-  l-rib-bot vertex 10361
-  r-rib-bot vertex 3400
-  l-hip vertex 6754
-  r-hip vertex 6558
-  abdomen-front vertex 7359
-  abdomen-back vertex 7186
-  r-toe-1-1 joint r-toe-1-1
-  l-toe-1-1 joint l-toe-1-1
+  head-end line 2.0 head -1.0 neck 
+  mouth joint mouth
+  jaw joint jaw
+
+  tongue-1 joint tongue-1
+  tongue-2 joint tongue-2
+  tongue-3 joint tongue-3
+  tongue-4 joint tongue-4
+
+  l-eye joint l-eye
+  r-eye joint r-eye
+  l-eye-target joint l-eye-target
+  r-eye-target joint r-eye-target
+  l-upperlid joint l-upperlid
+  l-lowerlid joint l-lowerlid
+  r-upperlid joint r-upperlid
+  r-lowerlid joint r-lowerlid
+
   r-clavicle joint r-clavicle
   r-shoulder joint r-shoulder
   r-elbow joint r-elbow
   r-hand joint r-hand
-  hand_L_tail joint r-finger-3-1
-  r-clavicle-back vertex 2583
-  r-scapula-top vertex 3048
-  r-scapula-bot vertex 3600
+  r-hand-2 joint r-hand-2
+  r-hand-3 joint r-hand-3
+
   l-clavicle joint l-clavicle
   l-shoulder joint l-shoulder
   l-elbow joint l-elbow
   l-hand joint l-hand
-  hand_R_tail joint l-finger-3-1
-  l-clavicle-back vertex 11025
-  l-scapula-top vertex 10683
-  l-scapula-bot vertex 10192
+  l-hand-2 joint l-hand-2
+  l-hand-3 joint l-hand-3
+
   r-finger-1-1 joint r-finger-1-1
   r-finger-1-2 joint r-finger-1-2
   r-finger-1-3 joint r-finger-1-3
+  r-finger-1-4 joint r-finger-1-4
   r-finger-2-1 joint r-finger-2-1
   r-finger-2-2 joint r-finger-2-2
   r-finger-2-3 joint r-finger-2-3
+  r-finger-2-4 joint r-finger-2-4
   r-finger-3-1 joint r-finger-3-1
   r-finger-3-2 joint r-finger-3-2
   r-finger-3-3 joint r-finger-3-3
+  r-finger-3-4 joint r-finger-3-4
   r-finger-4-1 joint r-finger-4-1
   r-finger-4-2 joint r-finger-4-2
   r-finger-4-3 joint r-finger-4-3
+  r-finger-4-4 joint r-finger-4-4
   r-finger-5-1 joint r-finger-5-1
   r-finger-5-2 joint r-finger-5-2
   r-finger-5-3 joint r-finger-5-3
+  r-finger-5-4 joint r-finger-5-4
+
   l-finger-1-1 joint l-finger-1-1
   l-finger-1-2 joint l-finger-1-2
   l-finger-1-3 joint l-finger-1-3
+  l-finger-1-4 joint l-finger-1-4
   l-finger-2-1 joint l-finger-2-1
   l-finger-2-2 joint l-finger-2-2
   l-finger-2-3 joint l-finger-2-3
+  l-finger-2-4 joint l-finger-2-4
   l-finger-3-1 joint l-finger-3-1
   l-finger-3-2 joint l-finger-3-2
   l-finger-3-3 joint l-finger-3-3
+  l-finger-3-4 joint l-finger-3-4
   l-finger-4-1 joint l-finger-4-1
   l-finger-4-2 joint l-finger-4-2
   l-finger-4-3 joint l-finger-4-3
+  l-finger-4-4 joint l-finger-4-4
   l-finger-5-1 joint l-finger-5-1
   l-finger-5-2 joint l-finger-5-2
   l-finger-5-3 joint l-finger-5-3
+  l-finger-5-4 joint l-finger-5-4
+
   r-upper-leg joint r-upper-leg
   r-knee joint r-knee
   r-ankle joint r-ankle
+
   r-ball vertex 5742
-  r-heel0 vertex 5721
   r-toes-tip0 vertex 12262
+  r-toes-tip position r-toes-tip0 r-ball r-toes-tip0 
+
   l-upper-leg joint l-upper-leg
   l-knee joint l-knee
   l-ankle joint l-ankle
+
   l-ball vertex 13320
-  l-heel0 vertex 13338
   l-toes-tip0 vertex 13254
-  foot_L_center vertex 5736
-  foot_R_center vertex 13326
-  mouth joint mouth
-  l-eye joint l-eye
-  r-eye joint r-eye
-  jaw-tip vertex 8162
-  tounge-tip vertex 8049
-  tounge-midfront vertex 8089
-  tounge-mid vertex 8103
-  tounge-root vertex 8099
-  l-upLid-v vertex 12630
-  l-loLid-v vertex 12594
-  r-upLid-v vertex 2442
-  r-loLid-v vertex 2520
-  root-head offset pelvis 0 0 0
-  mid-feet line 0.5 l-toe-1-1 0.5 r-toe-1-1 
-  floor offset mid-feet 0 -0.3 0
-  r-loarm-vec line 1 r-hand -1 r-elbow 
-  wristCtrl_L_tail line 1 r-hand 1 r-loarm-vec 
-  r-scapula-root line 0.2 r-clavicle 0.8 r-clavicle-back 
-  l-loarm-vec line 1 l-hand -1 l-elbow 
-  wristCtrl_R_tail line 1 l-hand 1 l-loarm-vec 
-  l-scapula-root line 0.2 l-clavicle 0.8 l-clavicle-back 
-  r-loarm-vec line 0.25 r-hand -0.25 r-elbow 
-  l-loarm-vec line 0.25 l-hand -0.25 l-elbow 
-  l-finger-1-end line 2.0 l-finger-1-3 -1.0 l-finger-1-2 
-  l-finger-2-end line 2.0 l-finger-2-3 -1.0 l-finger-2-2 
-  l-finger-3-end line 2.0 l-finger-3-3 -1.0 l-finger-3-2 
-  l-finger-4-end line 2.0 l-finger-4-3 -1.0 l-finger-4-2 
-  l-finger-5-end line 2.0 l-finger-5-3 -1.0 l-finger-5-2 
-  r-finger-1-end line 2.0 r-finger-1-3 -1.0 r-finger-1-2 
-  r-finger-2-end line 2.0 r-finger-2-3 -1.0 r-finger-2-2 
-  r-finger-3-end line 2.0 r-finger-3-3 -1.0 r-finger-3-2 
-  r-finger-4-end line 2.0 r-finger-4-3 -1.0 r-finger-4-2 
-  r-finger-5-end line 2.0 r-finger-5-3 -1.0 r-finger-5-2 
-  l-palm-1 line 0.6 l-hand 0.4 l-finger-2-1 
-  l-palm-2 line 0.6 l-hand 0.4 l-finger-5-1 
-  r-palm-1 line 0.6 r-hand 0.4 r-finger-2-1 
-  r-palm-2 line 0.6 r-hand 0.4 r-finger-5-1 
-  r-heel position r-toes-tip0 r-ball r-heel0 
-  r-toes-tip position r-toes-tip0 r-ball r-toes-tip0 
-  r-ankle-tip offset r-ankle 0.0 0.0 -1.0
-  l-heel position l-toes-tip0 l-ball l-heel0 
   l-toes-tip position l-toes-tip0 l-ball l-toes-tip0 
-  l-ankle-tip offset l-ankle 0.0 0.0 -1.0
-  knee_L_tail offset r-knee 0 0 6.0
-  knee_L_head offset knee_L_tail 0 -0.6 0
-  knee_R_tail offset l-knee 0 0 6.0
-  knee_R_head offset knee_R_tail 0 -0.6 0
-  heel_L_tail offset r-heel 0 0.6 0
-  heel_R_tail offset l-heel 0 0.6 0
-  l-upLid line 2 l-upLid-v -1 l-eye 
-  l-loLid line 2 l-loLid-v -1 l-eye 
-  r-upLid line 2 r-upLid-v -1 r-eye 
-  r-loLid line 2 r-loLid-v -1 r-eye 
-  head-end line 2.0 head -1.0 neck 
-  mouth-end line 3.0 mouth -2.0 head 
-  Eye_R_tail offset l-eye 0.0 0.0 0.4
-  Eye_L_tail offset r-eye 0.0 0.0 0.4
+
+  r-toe-1-1 joint r-toe-1-1
+  r-toe-1-2 joint r-toe-1-2
+  r-toe-1-3 joint r-toe-1-3
+  r-toe-2-1 joint r-toe-2-1
+  r-toe-2-2 joint r-toe-2-2
+  r-toe-2-3 joint r-toe-2-3
+  r-toe-3-1 joint r-toe-3-1
+  r-toe-3-2 joint r-toe-3-2
+  r-toe-3-3 joint r-toe-3-3
+  r-toe-4-1 joint r-toe-4-1
+  r-toe-4-2 joint r-toe-4-2
+  r-toe-4-3 joint r-toe-4-3
+  r-toe-5-1 joint r-toe-5-1
+  r-toe-5-2 joint r-toe-5-2
+  r-toe-5-3 joint r-toe-5-3
+
+  l-toe-1-1 joint l-toe-1-1
+  l-toe-1-2 joint l-toe-1-2
+  l-toe-1-3 joint l-toe-1-3
+  l-toe-2-1 joint l-toe-2-1
+  l-toe-2-2 joint l-toe-2-2
+  l-toe-2-3 joint l-toe-2-3
+  l-toe-3-1 joint l-toe-3-1
+  l-toe-3-2 joint l-toe-3-2
+  l-toe-3-3 joint l-toe-3-3
+  l-toe-4-1 joint l-toe-4-1
+  l-toe-4-2 joint l-toe-4-2
+  l-toe-4-3 joint l-toe-4-3
+  l-toe-5-1 joint l-toe-5-1
+  l-toe-5-2 joint l-toe-5-2
+  l-toe-5-3 joint l-toe-5-3
+
 
 # bones
-  Root root-head spine3 0.0000 -
-  Hips spine3 root-head 3.1416 Root
-  Spine1 spine3 spine2 0.0000 Hips
-  Spine2 spine2 spine1 0.0000 Spine1
-  Spine3 spine1 neck 0.0000 Spine2
-  Neck neck head 0.0000 Spine3
-  Head head head-end 0.0000 Neck
-  Hip_L root-head r-upper-leg 0.0000 Hips
-  Hip_R root-head l-upper-leg 0.0000 Hips
-  Clavicle_L r-clavicle r-shoulder 0.0000 Spine3
-  Clavicle_R l-clavicle l-shoulder 0.0000 Spine3
-  UpArm_L r-shoulder r-elbow 0.0000 Clavicle_L
-  LoArm_L r-elbow r-hand 0.0000 UpArm_L
-  Hand_L r-hand hand_L_tail 0.0000 LoArm_L
-  UpArm_R l-shoulder l-elbow 0.0000 Clavicle_R
-  LoArm_R l-elbow l-hand 0.0000 UpArm_R
-  Hand_R l-hand hand_R_tail 0.0000 LoArm_R
-  Wrist-1_L r-hand r-palm-1 0.0000 Hand_L
-  Wrist-2_L r-hand r-palm-2 0.0000 Hand_L
-  Palm-1_L r-hand r-finger-1-1 0.0000 Hand_L
-  Palm-2_L r-palm-1 r-finger-2-1 0.0000 Wrist-1_L
-  Palm-3_L r-palm-1 r-finger-3-1 0.0000 Wrist-1_L
-  Palm-4_L r-palm-2 r-finger-4-1 0.0000 Wrist-2_L
-  Palm-5_L r-palm-2 r-finger-5-1 0.0000 Wrist-2_L
-  Wrist-1_R l-hand l-palm-1 0.0000 Hand_R
-  Wrist-2_R l-hand l-palm-2 0.0000 Hand_R
-  Palm-1_R l-hand l-finger-1-1 0.0000 Hand_R
-  Palm-2_R l-palm-1 l-finger-2-1 0.0000 Wrist-1_R
-  Palm-3_R l-palm-1 l-finger-3-1 0.0000 Wrist-1_R
-  Palm-4_R l-palm-2 l-finger-4-1 0.0000 Wrist-2_R
-  Palm-5_R l-palm-2 l-finger-5-1 0.0000 Wrist-2_R
+
+  Root pelvis spine3 0.0 -
+  Hips spine3 pelvis 3.1416 Root
+  Spine1 spine3 spine2 0.0 Hips
+  Spine2 spine2 spine1 0.0 Spine1
+  Spine3 spine1 neck 0.0 Spine2
+  Neck neck head 0.0 Spine3
+  Head head head-end 0.0 Neck
+
+  Jaw mouth jaw 0.0 Head
+  TongueBase tongue-1 tongue-2 0.0 Jaw
+  TongueMid tongue-2 tongue-3 0.0 TongueBase
+  TongueTip tongue-3 tongue-4 0.0 TongueMid
+
+  Eye_R l-eye l-eye-target 0.0 Head
+  Eye_L r-eye r-eye-target 0.0 Head
+  UpLid_R l-eye l-upperlid 0.2793 Head
+  LoLid_R l-eye l-lowerlid 0.0 Head
+  UpLid_L r-eye r-upperlid -0.2793 Head
+  LoLid_L r-eye r-lowerlid 0.0 Head
+
+  Clavicle_L r-clavicle r-shoulder 0.0 Spine3
+  UpArm_L r-shoulder r-elbow 0.0 Clavicle_L
+  LoArm_L r-elbow r-hand 0.0 UpArm_L
+  Hand_L r-hand r-finger-3-1 0.0 LoArm_L
+
+  Wrist-1_L r-hand r-hand-3 0.0 Hand_L
+  Wrist-2_L r-hand r-hand-2 0.0 Hand_L
+  Palm-1_L r-hand r-finger-1-1 0.0 Hand_L
+  Palm-2_L r-hand-3 r-finger-2-1 0.0 Wrist-1_L
+  Palm-3_L r-hand-3 r-finger-3-1 0.0 Wrist-1_L
+  Palm-4_L r-hand-2 r-finger-4-1 0.0 Wrist-2_L
+  Palm-5_L r-hand-2 r-finger-5-1 0.0 Wrist-2_L
+
+  Clavicle_R l-clavicle l-shoulder 0.0 Spine3
+  UpArm_R l-shoulder l-elbow 0.0 Clavicle_R
+  LoArm_R l-elbow l-hand 0.0 UpArm_R
+  Hand_R l-hand l-finger-3-1 0.0 LoArm_R
+
+  Wrist-1_R l-hand l-hand-3 0.0 Hand_R
+  Wrist-2_R l-hand l-hand-2 0.0 Hand_R
+  Palm-1_R l-hand l-finger-1-1 0.0 Hand_R
+  Palm-2_R l-hand-3 l-finger-2-1 0.0 Wrist-1_R
+  Palm-3_R l-hand-3 l-finger-3-1 0.0 Wrist-1_R
+  Palm-4_R l-hand-2 l-finger-4-1 0.0 Wrist-2_R
+  Palm-5_R l-hand-2 l-finger-5-1 0.0 Wrist-2_R
+
   Finger-1-1_L r-finger-1-1 r-finger-1-2 1.5708 Palm-1_L
   Finger-1-2_L r-finger-1-2 r-finger-1-3 1.5708 Finger-1-1_L
-  Finger-1-3_L r-finger-1-3 r-finger-1-end 1.5708 Finger-1-2_L
-  Finger-2-1_L r-finger-2-1 r-finger-2-2 0.0000 Palm-2_L
-  Finger-2-2_L r-finger-2-2 r-finger-2-3 0.0000 Finger-2-1_L
-  Finger-2-3_L r-finger-2-3 r-finger-2-end 0.0000 Finger-2-2_L
-  Finger-3-1_L r-finger-3-1 r-finger-3-2 0.0000 Palm-3_L
-  Finger-3-2_L r-finger-3-2 r-finger-3-3 0.0000 Finger-3-1_L
-  Finger-3-3_L r-finger-3-3 r-finger-3-end 0.0000 Finger-3-2_L
-  Finger-4-1_L r-finger-4-1 r-finger-4-2 0.0000 Palm-4_L
-  Finger-4-2_L r-finger-4-2 r-finger-4-3 0.0000 Finger-4-1_L
-  Finger-4-3_L r-finger-4-3 r-finger-4-end 0.0000 Finger-4-2_L
-  Finger-5-1_L r-finger-5-1 r-finger-5-2 0.0000 Palm-5_L
-  Finger-5-2_L r-finger-5-2 r-finger-5-3 0.0000 Finger-5-1_L
-  Finger-5-3_L r-finger-5-3 r-finger-5-end 0.0000 Finger-5-2_L
+  Finger-1-3_L r-finger-1-3 r-finger-1-4 1.5708 Finger-1-2_L
+  Finger-2-1_L r-finger-2-1 r-finger-2-2 0.0 Palm-2_L
+  Finger-2-2_L r-finger-2-2 r-finger-2-3 0.0 Finger-2-1_L
+  Finger-2-3_L r-finger-2-3 r-finger-2-4 0.0 Finger-2-2_L
+  Finger-3-1_L r-finger-3-1 r-finger-3-2 0.0 Palm-3_L
+  Finger-3-2_L r-finger-3-2 r-finger-3-3 0.0 Finger-3-1_L
+  Finger-3-3_L r-finger-3-3 r-finger-3-4 0.0 Finger-3-2_L
+  Finger-4-1_L r-finger-4-1 r-finger-4-2 0.0 Palm-4_L
+  Finger-4-2_L r-finger-4-2 r-finger-4-3 0.0 Finger-4-1_L
+  Finger-4-3_L r-finger-4-3 r-finger-4-4 0.0 Finger-4-2_L
+  Finger-5-1_L r-finger-5-1 r-finger-5-2 0.0 Palm-5_L
+  Finger-5-2_L r-finger-5-2 r-finger-5-3 0.0 Finger-5-1_L
+  Finger-5-3_L r-finger-5-3 r-finger-5-4 0.0 Finger-5-2_L
+
   Finger-1-1_R l-finger-1-1 l-finger-1-2 -1.5708 Palm-1_R
   Finger-1-2_R l-finger-1-2 l-finger-1-3 -1.5708 Finger-1-1_R
-  Finger-1-3_R l-finger-1-3 l-finger-1-end -1.5708 Finger-1-2_R
-  Finger-2-1_R l-finger-2-1 l-finger-2-2 0.0000 Palm-2_R
-  Finger-2-2_R l-finger-2-2 l-finger-2-3 0.0000 Finger-2-1_R
-  Finger-2-3_R l-finger-2-3 l-finger-2-end 0.0000 Finger-2-2_R
-  Finger-3-1_R l-finger-3-1 l-finger-3-2 0.0000 Palm-3_R
-  Finger-3-2_R l-finger-3-2 l-finger-3-3 0.0000 Finger-3-1_R
-  Finger-3-3_R l-finger-3-3 l-finger-3-end 0.0000 Finger-3-2_R
-  Finger-4-1_R l-finger-4-1 l-finger-4-2 0.0000 Palm-4_R
-  Finger-4-2_R l-finger-4-2 l-finger-4-3 0.0000 Finger-4-1_R
-  Finger-4-3_R l-finger-4-3 l-finger-4-end 0.0000 Finger-4-2_R
-  Finger-5-1_R l-finger-5-1 l-finger-5-2 0.0000 Palm-5_R
-  Finger-5-2_R l-finger-5-2 l-finger-5-3 0.0000 Finger-5-1_R
-  Finger-5-3_R l-finger-5-3 l-finger-5-end 0.0000 Finger-5-2_R
+  Finger-1-3_R l-finger-1-3 l-finger-1-4 -1.5708 Finger-1-2_R
+  Finger-2-1_R l-finger-2-1 l-finger-2-2 0.0 Palm-2_R
+  Finger-2-2_R l-finger-2-2 l-finger-2-3 0.0 Finger-2-1_R
+  Finger-2-3_R l-finger-2-3 l-finger-2-4 0.0 Finger-2-2_R
+  Finger-3-1_R l-finger-3-1 l-finger-3-2 0.0 Palm-3_R
+  Finger-3-2_R l-finger-3-2 l-finger-3-3 0.0 Finger-3-1_R
+  Finger-3-3_R l-finger-3-3 l-finger-3-4 0.0 Finger-3-2_R
+  Finger-4-1_R l-finger-4-1 l-finger-4-2 0.0 Palm-4_R
+  Finger-4-2_R l-finger-4-2 l-finger-4-3 0.0 Finger-4-1_R
+  Finger-4-3_R l-finger-4-3 l-finger-4-4 0.0 Finger-4-2_R
+  Finger-5-1_R l-finger-5-1 l-finger-5-2 0.0 Palm-5_R
+  Finger-5-2_R l-finger-5-2 l-finger-5-3 0.0 Finger-5-1_R
+  Finger-5-3_R l-finger-5-3 l-finger-5-4 0.0 Finger-5-2_R
+
+  Hip_L pelvis r-upper-leg 0.0 Hips
   UpLeg_L r-upper-leg r-knee 3.1416 Hip_L
   LoLeg_L r-knee r-ankle 3.1416 UpLeg_L
   Foot_L r-ankle r-ball 3.1416 LoLeg_L
   Toe_L r-ball r-toes-tip 3.1416 Foot_L
+
+  Hip_R pelvis l-upper-leg 0.0 Hips
   UpLeg_R l-upper-leg l-knee -3.1416 Hip_R
   LoLeg_R l-knee l-ankle -3.1416 UpLeg_R
   Foot_R l-ankle l-ball -3.1416 LoLeg_R
   Toe_R l-ball l-toes-tip -3.1416 Foot_R
-  Jaw mouth jaw-tip 0.0000 Head
-  ToungeBase tounge-root tounge-mid 0.0000 Jaw
-  ToungeMid tounge-mid tounge-midfront 0.0000 ToungeBase
-  ToungeTip tounge-midfront tounge-tip 0.0000 ToungeMid
-  Eye_R l-eye Eye_R_tail 0.0000 Head
-  Eye_L r-eye Eye_L_tail 0.0000 Head
-  UpLid_R l-eye l-upLid 0.2793 Head
-  LoLid_R l-eye l-loLid 0.0000 Head
-  UpLid_L r-eye r-upLid -0.2793 Head
-  LoLid_L r-eye r-loLid 0.0000 Head
+
 
 # weights Hips
   2114 0.1533
@@ -10840,7 +10846,7 @@
   12608 0.03357
   12726 0.0483
 
-# weights ToungeBase
+# weights TongueBase
   381 0.5556
   382 0.5556
   383 0.5556
@@ -10912,7 +10918,7 @@
   8145 0.5556
   8146 0.5556
 
-# weights ToungeMid
+# weights TongueMid
   399 0.5
   400 1
   401 1
@@ -10956,7 +10962,7 @@
   8124 1
   8125 0.5
 
-# weights ToungeTip
+# weights TongueTip
   423 1
   424 1
   425 1
