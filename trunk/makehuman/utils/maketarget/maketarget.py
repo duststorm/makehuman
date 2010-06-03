@@ -51,7 +51,7 @@ import scipy
 from scipy.spatial import KDTree
 import numpy as np
 
-import scan_fit
+#import scan_fit
 import blenderalignjoints
 
 
@@ -151,6 +151,26 @@ def vdot(vect1,vect2):
 
 
 #Starting maketarget specific functions
+
+
+def findGroupName():
+    activeObjs = Blender.Object.GetSelected()
+    obj = activeObjs[0].getData(mesh=True)
+    vertsGroupsNames = obj.getVertGroupNames()
+    print "------"
+    gNames = set()
+    for v in obj.verts:
+        if v.sel == 1:
+            for vertsGroupsName in vertsGroupsNames:
+                idxs = set(obj.getVertsFromGroup(vertsGroupsName))
+                if v.index in idxs:
+                    gNames.add(vertsGroupsName)
+    for gName in gNames:
+        print gName
+
+
+
+
 
 def doMorph(mFactor):
     """
@@ -1499,6 +1519,8 @@ def event(event, value):
         Window.FileSelector (findCloserMesh, "Reconstruct")
     elif event == Draw.JKEY:
         Window.FileSelector (utility6, "adjust foints")
+    elif event == Draw.KKEY:
+        findGroupName()
 
 
 
