@@ -1166,6 +1166,8 @@ class Scene3D:
             obj.object3d = None
         if obj.indexBuffer:
             del obj.indexBuffer[:]
+        if obj.uvValues:
+            del obj.uvValues[:]
         del obj.faces[:]
         del obj.verts[:]
         del obj.facesGroups[:]

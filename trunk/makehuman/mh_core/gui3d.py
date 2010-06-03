@@ -47,6 +47,7 @@ class Object(events3d.EventHandler):
          self.mesh=mesh
          self.app.scene3d.objects.append(mesh)
          self.meshName = mesh.name
+         self.mesh.setLoc(position[0], position[1], position[2])
         self.texture = texture
         if texture:
             self.mesh.setTexture(texture)
@@ -1126,7 +1127,7 @@ class FileChooser(View):
 class TextObject(Object):
     def __init__(self, view, fontFamily = 'arial', text = '', position=[0, 0, 9], fontSize = 0.5):
         self.font = font3d.Font("data/fonts/%s.fnt" % fontFamily)
-        mesh = font3d.createMesh(self.font, text, position);
+        mesh = font3d.createMesh(self.font, text);
         mesh.setScale(0.5, 0.5, 0.5)
         Object.__init__(self, view, mesh, None, position)
         self.text = text
@@ -1134,11 +1135,8 @@ class TextObject(Object):
         
     def setText(self, text):
         self.text = text
-        visibility = self.mesh.visibility
         self.app.scene3d.clear(self.mesh)
-        self.mesh = font3d.createMesh(self.font, text, self.getPosition(), self.mesh);
-        self.mesh.setScale(self.fontSize, self.fontSize, self.fontSize)
-        self.mesh.visibility = visibility
+        self.mesh = font3d.createMesh(self.font, text, self.mesh);
         self.app.scene3d.update()
         
     def getText(self):

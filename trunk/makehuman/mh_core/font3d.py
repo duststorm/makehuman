@@ -115,27 +115,12 @@ class Font:
         return width
 
 #returns font as object3d with 1 visibility
-def createMesh(font, text, position=[0.0,0.0,0.0], object = None):
+def createMesh(font, text, object = None):
 
     object = object or module3d.Object3D(text)
-        
-    object.x = position[0]
-    object.y = position[1]
-    object.z = position[2]
-    object.rx = 0.0
-    object.ry = 0.0
-    object.rz = 0.0
-    object.sx = 1.0
-    object.sy = 1.0
-    object.sz = 1.0
-    object.visibility = 1
-    object.shadeless = 1
-    object.pickable = 0
-    object.cameraMode = 1
-    object.text = ''
-    object.uvValues = []
-    object.indexBuffer = []
-
+    object.uvValues = object.uvValues or []
+    object.indexBuffer = object.indexBuffer or []
+    
     # create group
     fg = object.createFaceGroup('text')
 
