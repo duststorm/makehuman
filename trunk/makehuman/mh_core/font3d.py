@@ -114,7 +114,7 @@ class Font:
             
         return width
 
-#returns font as object3d with 0 visibility
+#returns font as object3d with 1 visibility
 def createMesh(font, text, position=[0.0,0.0,0.0], object = None):
 
     object = object or module3d.Object3D(text)
