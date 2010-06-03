@@ -767,9 +767,9 @@ class Object3D:
         """
 
         self.texture = path
-        print 'loading ' + path
         if path in textureCache:
             if os.stat(path).st_mtime != textureCache[path].modified:
+                print 'reloading ' + path
                 try:
                     mh.loadTexture(path, textureCache[path].id)
                 except RuntimeError, text:
@@ -783,6 +783,7 @@ class Object3D:
             except AttributeError, text:
                 pass
         else:
+            print 'loading ' + path
             texture = None
             try:
                 texture = mh.loadTexture(path, 0)

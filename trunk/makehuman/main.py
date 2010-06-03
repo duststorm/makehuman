@@ -64,7 +64,7 @@ sys.path.append("./")
 sys.path.append("./mh_plugins")
 sys.path.append("./mh_core")
 
-import gui3d, events3d
+import gui3d, events3d, font3d
 import human, hair, background
 import guimodelling, guifiles, guirender, guiadvanced
 from aljabr import centroid
@@ -90,6 +90,8 @@ class MHApplication(gui3d.Application):
 
     self.setTheme("default")
     #self.setTheme("3d")
+    
+    self.fonts = {}
     
     self.settings = Settings
     self.settings.realtimeUpdates = True
@@ -305,6 +307,11 @@ class MHApplication(gui3d.Application):
       return "data/themes/" + self.theme + "/" + folder + "/"+ id
     else:
       return "data/themes/default/" + folder + "/"+ id
+      
+  def getFont(self, fontFamily):
+    if fontFamily not in self.fonts:
+      self.fonts[fontFamily] = font3d.Font("data/fonts/%s.fnt" % fontFamily)
+    return self.fonts[fontFamily]
 
   def progress(self, value):
     self.progressBar.setProgress(value)

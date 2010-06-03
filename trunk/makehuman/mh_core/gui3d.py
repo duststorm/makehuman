@@ -879,9 +879,8 @@ class TextEdit(View):
             self.text = self.text[:-1]
         elif event.key == events3d.SDLK_RETURN:
             if len(self.text):
-                pass
-
-        # self.onFileSelected(self.text)
+                View.onKeyDown(self, event)
+                #self.onFileSelected(self.text)
 
             return
         elif event.key < 256:
@@ -915,6 +914,14 @@ class FileEntryView(View):
         def onClicked(event):
             if len(self.edit.getText()):
                 self.onFileSelected(self.edit.getText())
+                
+    def onKeyDown(self, event):
+        if event.modifiers & events3d.KMOD_CTRL:
+            View.onKeyDown(self, event)
+            return
+
+        if event.key == events3d.SDLK_RETURN:
+            self.onFileSelected(self.edit.getText())
                 
     def onFocus(self, event):
         self.edit.setFocus()
@@ -1120,7 +1127,7 @@ class FileChooser(View):
         
 class TextObject(Object):
     def __init__(self, view, fontFamily = 'arial', text = '', position=[0, 0, 9], fontSize = 0.5):
-        self.font = font3d.Font("data/fonts/%s.fnt" % fontFamily)
+        self.font = view.app.getFont(fontFamily)
         mesh = font3d.createMesh(self.font, text);
         mesh.setScale(0.5, 0.5, 0.5)
         Object.__init__(self, view, mesh, None, position)
