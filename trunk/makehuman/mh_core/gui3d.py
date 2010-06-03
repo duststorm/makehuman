@@ -116,12 +116,6 @@ class Object(events3d.EventHandler):
         else:
             self.mesh.setScale(scale, scale, 1)
 
-    def setText(self, text):
-        self.mesh.setText(text)
-
-    def getText(self):
-        return self.mesh.text
-
     def onMouseDown(self, event):
         self.view.callEvent('onMouseDown', event)
 

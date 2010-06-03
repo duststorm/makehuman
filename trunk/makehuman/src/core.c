@@ -89,7 +89,6 @@ static PyMethodDef Object3D_methods[] =
 static PyGetSetDef Object3D_getset[] =
 {
     {"shaderParameters", (getter)Object3D_getShaderParameters, (setter)NULL, "The dictionary containing the shader parameters, read only.", NULL},
-    {"text", (getter)Object3D_getText, (setter)Object3D_setText, "The text of the object as a String or None if it doesn't have text.", NULL},
     {"translation", (getter)Object3D_getTranslation, (setter)Object3D_setTranslation, "The translation of the object as a 3 component vector.", NULL},
     {"rotation", (getter)Object3D_getRotation, (setter)Object3D_setRotation, "The rotation of the object as a 3 component vector.", NULL},
     {"scale", (getter)Object3D_getScale, (setter)Object3D_setScale, "The scale of the object as a 3 component vector.", NULL},
@@ -169,8 +168,6 @@ void Object3D_dealloc(Object3D *self)
     free(self->colors);
     free(self->colors2);
 
-    free(self->textString);
-
     // Free Python data
     self->ob_type->tp_free((PyObject*)self);
 }
@@ -218,9 +215,6 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->nNorms = 0;
         self->nColors = 0;
         self->nColors2 = 0;
-
-        self->textString = NULL;
-        //self->textSize = 12;
     }
 
     return (PyObject*)self;
@@ -465,39 +459,6 @@ PyObject *Object3D_getShaderParameters(Object3D *self, void *closure)
 
     Py_INCREF(self->shaderParameters);
     return self->shaderParameters;
-}
-
-/** \brief Gets a text string for this Object3D object.
- *  \param self An 3D object.
- *
- *  This function gets a text string for this Object3D object.
- */
-PyObject *Object3D_getText(Object3D *self, void *closure)
-{
-    if (self->textString)
-        return PyString_FromString(self->textString);
-    else
-        return Py_BuildValue("");
-}
-
-/** \brief Sets a text string for this Object3D object.
- *  \param self The 3D object.
- *  \param value The new text as a Python String.
- *
- *  This function sets a text string for this Object3D object.
- */
-int Object3D_setText(Object3D *self, PyObject *value, void *closure)
-{
-    char *text = PyString_AsString(value);
-
-    if (text)
-    {
-        free(self->textString);
-        self->textString = strdup(text);
-        return 0;
-    }
-    else
-        return -1;
 }
 
 /** \brief Gets the translation for this Object3D object as a list.

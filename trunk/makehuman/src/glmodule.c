@@ -44,14 +44,6 @@
 #include <windows.h>
 #include <SDL_syswm.h>
 #elif __APPLE__
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-    void buildFont(GLint inBase, int inCount, char inStartCode, const char* inFontName, int inFontSize);
-#ifdef __cplusplus
-}
-#endif
 #include "SDL_image/SDL_image.h"
 #else
 #include <X11/Xlib.h>
@@ -417,50 +409,6 @@ static PyObject *Texture_loadImage(Texture *texture, PyObject *path)
         return NULL;
 
     return Py_BuildValue("");
-}
-
-/** \brief Draw text at a specified location on the screen.
- *  \param x a float specifying the horizontal position in the GUI window.
- *  \param y a float specifying the vertical position in the GUI window.
- *  \param message a character string pointer to the text to display.
- *
- *  This function displays a piece of text at the specified position on the screen.
- */
-void mhDrawText(float x, float y, const char *message)
-{
-    /* raster pos sets the current raster position
-     * mapped via the modelview and projection matrices
-     */
-    char *line;
-    int lineindex = 0;
-
-    /*Turn off lighting*/
-    glDisable(GL_LIGHTING);
-
-    /*Set text color and position*/
-    glColor3f(1.0, 1.0, 1.0);
-    glRasterPos3f(x, y, 0.0f);
-
-    /*Draw the text*/
-    glListBase(G.fontOffset);
-
-    line = strchr(message, '\n');
-    if (line)
-    {
-        do
-        {
-            glCallLists(line - message, GL_UNSIGNED_BYTE, message);
-            glRasterPos3f(x, y + 14.0f * (float)(++lineindex), 0.0f); // fontsize = 12, linespacing = 14 .. no kidding?
-            message = line + 1;
-            line = strchr(message, '\n');
-        }
-        while (line);
-    }
-
-    glCallLists((GLsizei)strlen(message), GL_UNSIGNED_BYTE, message);
-
-    /* restore lighting */
-    glEnable(GL_LIGHTING);
 }
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -1346,56 +1294,6 @@ void OnInit(void)
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
-
-    // Init font
-    G.fontOffset = glGenLists(256);
-
-#ifdef __WIN32__
-    {
-        HDC   hDC;
-        HFONT font;
-        SDL_SysWMinfo wmi;
-        SDL_VERSION(&wmi.version);
-        SDL_GetWMInfo(&wmi);
-
-        hDC = GetDC(wmi.window);
-        font = CreateFont(-16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, 0	, FF_DONTCARE | DEFAULT_PITCH, TEXT("Arial")); //Comic Sans MS
-        SelectObject(hDC, font);
-        wglUseFontBitmaps(hDC, 0, 256, G.fontOffset);
-        ReleaseDC(wmi.window, hDC);
-    }
-#elif defined(__APPLE__)
-    buildFont(G.fontOffset, 256, 0, "Lucida Grande", 10);
-#else
-    {   //it must then be linux? :P .. TODO: add a condition here!
-        Display *dpy = XOpenDisplay(NULL);
-
-        assert(dpy);  // Display valid?
-        if (NULL != dpy)
-        {
-            // 1st attempt: Try to load an helvetica font of the adobe foundry.
-            // (see Encoding of the font desription in https://www.msu.edu/~huntharo/xwin/docs/xwindows/XLFD.pdf)
-            XFontStruct *XFont = XLoadQueryFont(dpy, "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
-
-            // If this fails then start an 2nd attempt: Try to load *any* font which has a point size of 120.
-            if (NULL == XFont)
-            {
-                printf("Cannot load Helvetica fonts, attempting to load another font\n");
-                XFont = XLoadQueryFont(dpy, "-*-*-*-*-*--*-120-*");
-            }
-            assert(XFont); // Failed anyway? :-(
-
-            if (NULL != XFont)
-            {
-                glXUseXFont(XFont->fid, 0, 256, G.fontOffset);
-                XFreeFont(dpy, XFont);
-            }
-            else printf("Sorry, cannot load fonts.. attempting to run Makehuman anyway\n");
-            XCloseDisplay(dpy);
-        }
-        else printf("Invalid Display, is this Linux?\n");
-    }
-#endif
 }
 
 /** \brief Delete materials/textures when the event loop exits.
@@ -1577,10 +1475,6 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 {
                     /*Use color to draw i */
                     glColorPointer(4, GL_UNSIGNED_BYTE, 0, obj->colors2);
-                    /*draw text attribute if there is one; because this function
-                    restores lighting, it can be used only in non picking mode*/
-                    if (obj->textString && obj->textString[0] != '\0')
-                        mhDrawText(0.0, 0.0, obj->textString);
                 }
 
                 /*Disable lighting if the object is shadeless*/

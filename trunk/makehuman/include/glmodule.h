@@ -44,7 +44,6 @@ extern "C"
 #endif
 
 // Text, shader and texture services
-    void mhDrawText(float x, float y, const char *message);
     GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height);
     GLuint mhCreateVertexShader(const char *source);
     GLuint mhCreateFragmentShader(const char *source);

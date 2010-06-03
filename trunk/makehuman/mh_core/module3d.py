@@ -557,8 +557,6 @@ class Object3D:
     - **self.indexBuffer**: *faces list* The list of faces as indices to the vertexbuffer.
     - **self.vertexBufferSize**: *int* size in vertices of the vertexbuffer.
     - **self.uvValues**: *uv list* The list of uv values referenced to by the faces.
-    - **self.text**: string* A text to be printed near the obj
-    - **self.textSize**: int* text-size in pixels for self.text, its 12pt by default
     - **self.pickable**: *int flag* A flag to indicate whether this object is pickable by mouse or not.
 
     """
@@ -609,8 +607,6 @@ class Object3D:
         self.indexBuffer = []
         self.vertexBufferSize = None
         self.uvValues = None
-        self.text = ''
-        #self.textSize = 12
 
     def updateIndexBuffer(self):
         # Build the lists of vertex indices and UV-indices for this face group.
@@ -857,24 +853,6 @@ class Object3D:
         self.shadeless = shadeless
         try:
             self.object3d.shadeless = self.shadeless
-        except AttributeError, text:
-            pass
-
-    def setText(self, text):
-        """
-        Ths method sets the text to print on the object.
-
-        Parameters
-        ----------
-
-        text:
-            *string* The text to print on the object.
-
-        """
-
-        self.text = text
-        try:
-            self.object3d.text = self.text
         except AttributeError, text:
             pass
 
@@ -1238,7 +1216,6 @@ class Scene3D:
         obj.object3d.shadeless = obj.shadeless
         obj.object3d.pickable = obj.pickable
         obj.object3d.cameraMode = obj.cameraMode
-        obj.object3d.text = obj.text
 
         # TODO add all obj attributes
 
@@ -1877,7 +1854,6 @@ def drawQuad(scn, verts, name='quad', position=[0.0, 0.0, 0.0]):
     obj.shadeless = 0
     obj.pickable = 0
     obj.cameraMode = 0
-    obj.text = ''
 
   # obj.uvValues = []
 

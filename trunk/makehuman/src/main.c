@@ -82,9 +82,6 @@ static void initGlobals(void)
     G.millisecTimer = 10;
     G.pendingTimer = 0;
 
-    // Rendering
-    G.fontOffset = 0;
-
     // Events
     G.loop = 1;
 }

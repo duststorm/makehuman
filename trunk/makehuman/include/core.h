@@ -108,10 +108,6 @@ extern "C"
                     have a value of 0-255.
                     The Red, Green, Blue and Alpha Channel components of a single color are
                     stored sequentially in this list.                                           */
-        char *textString;           /**< \brief Pointer to the start of a text string.                                      */
-        /**<        A pointer to a string of chars.                                             */
-        //int textSize;               /**< \brief The textsize of the text string in this object                                   */
-        /**<        An int holding the pixel size of text string in this object. */
 
     } Object3D;
 
@@ -167,7 +163,6 @@ extern "C"
         double mouseGUIZ;/*mouse 3D GUI coords*/
         unsigned int millisecTimer; /*millisecond delay for SDL_AddTimer*/
 
-        int fontOffset; /*first index of the font display list*/
         int pendingUpdate; /*1 if an update is already pending*/
         int pendingTimer; /*1 if a timer is already pending*/
         int loop; /*1 if we haven't quit yet*/
