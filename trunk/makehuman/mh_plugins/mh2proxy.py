@@ -215,7 +215,7 @@ def getMeshInfo(obj, proxyData, rawWeights, rawShapes):
 			for (vn,v) in enumerate(f):
 				face.append((v, texFace[vn]))
 			faces.append(face)
-			n += 1
+			fn += 1
 
 		weights = getProxyWeights(rawWeights, proxyVerts)
 		shapes = getProxyShapes(rawShapes, proxyVerts)

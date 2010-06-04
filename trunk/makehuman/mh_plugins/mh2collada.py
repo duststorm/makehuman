@@ -42,6 +42,7 @@ import read_rig
 #
 
 #import mh2spec
+#import weight_diamonds
 
 def exportCollada(obj, name):
 	exportCollada1(obj, name+".dae", "Human", None)
