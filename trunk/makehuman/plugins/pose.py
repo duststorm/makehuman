@@ -18,7 +18,9 @@ class PoseTaskView(gui3d.TaskView):
         self.acromioclavicularProtractionVal = 0 
         self.sternoclavicularAbductionVal = 0 
         self.sternoclavicularProtractionVal = 0 
-        self.compoVal = 0
+        self.compo1Val = 0
+        self.compo2Val = 0
+        self.compoMixVal = 0
         self.testVal = 0
         self.test2Val = 0
        
@@ -26,7 +28,9 @@ class PoseTaskView(gui3d.TaskView):
         self.acromioclavicularProtractionSlider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, label = "Acromnio Protr")
         self.sternoclavicularAbductionSlider = gui3d.Slider(self, position=[10, 220, 9.5], value = 0.0, label = "Sterno Abdct")
         self.sternoclavicularProtractionSlider = gui3d.Slider(self, position=[10, 180, 9.5], value = 0.0, label = "Sterno Protr")
-        self.compo1Slider = gui3d.Slider(self, position=[10, 260, 9.5], value = 0.0, label = "Compo1")
+        self.compo1Slider = gui3d.Slider(self, position=[10, 380, 9.5], value = 0.0, label = "Compo1")
+        self.compo2Slider = gui3d.Slider(self, position=[10, 420, 9.5], value = 0.0, label = "Compo2")
+        self.compoMixSlider = gui3d.Slider(self, position=[10, 460, 9.5], value = 0.0, label = "CompoMix")
         self.testSlider = gui3d.Slider(self, position=[10, 300, 9.5], value = 0.0, label = "test")
         self.test2Slider = gui3d.Slider(self, position=[10, 340, 9.5], value = 0.0, label = "test2")
            
@@ -53,8 +57,19 @@ class PoseTaskView(gui3d.TaskView):
             
         @self.compo1Slider.event
         def onChange(value):
-            self.compoVal = value
-            self.combo1Experiment(value)
+            self.compo1Val = value
+            self.applyCombo()
+
+        @self.compo2Slider.event
+        def onChange(value):
+            self.compo2Val = value
+            self.applyCombo()
+
+        @self.compoMixSlider.event
+        def onChange(value):
+            self.compo1Val = 1-value
+            self.compo2Val = value
+            self.applyCombo()
             
         @self.testSlider.event
         def onChange(value):
@@ -65,15 +80,31 @@ class PoseTaskView(gui3d.TaskView):
         def onChange(value):
             self.test2Val = value
             self.applyPose()
+
+
+
+
+    def combo1Experiment(self, human, val):
+        #hardcoded sample for angle rotX = 0, rotY = 50, rotZ = 90       
+        algos3d.loadTranslationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/t1.target", val, None, 1, 0)
+        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/r1.rot", val)
+        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/r2.rot", val)
+
             
-    def combo1Experiment(self, val):
-        #hardcoded sample for angle rotX = 0, rotY = 50, rotZ = 90
+            
+    def combo2Experiment(self, human, val):
+        #hardcoded sample for angle rotX = 0, rotY = 90, rotZ = 90        
+        algos3d.loadTranslationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/t1.target", val, None, 1, 0)
+        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/r1.rot", val)
+        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/r2.rot", val)
+        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/r3.rot", val)
+
+
+    def applyCombo(self):
         h = self.app.scene3d.selectedHuman
         self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
-        algos3d.loadTranslationTarget(h.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/t1.target", val, None, 1, 0)
-        algos3d.loadRotationTarget(h.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/r1.rot", val)
-        algos3d.loadRotationTarget(h.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/r2.rot", val)
-        
+        self.combo1Experiment(h,self.compo1Val)
+        self.combo2Experiment(h,self.compo2Val)
         #This update ALL! faces. To be optimised, of course.
         self.app.scene3d.selectedHuman.meshData.calcNormals(facesToUpdate=[f for f in self.app.scene3d.selectedHuman.meshData.faces])
         self.app.scene3d.selectedHuman.meshData.update()
