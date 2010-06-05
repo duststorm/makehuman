@@ -80,6 +80,7 @@ todo = []
 T_ArmIK = 0x01
 T_LegIK = 0x02
 T_Stretch = 0x04
+T_Diamond = 0x10
 T_Replace = 0x20
 T_Face = 0x40
 T_Shape = 0x80
@@ -415,6 +416,8 @@ def parse(tokens):
 			parseProcess(val, sub)
 		elif key == 'AnimationData':
 			try:
+
+
 				ob = loadedData['Object'][val[0]]
 			except:
 				ob = None
@@ -1750,14 +1753,19 @@ def parseGroupObjects(args, tokens, grp):
 
 #
 #	postProcess()
-#	setInfluence(bones, cnsName, w):
+#	deleteDiamonds(ob)
 #
 
 def postProcess():
 	if not toggle & T_MHX:
 		return
-	if toggle & T_Rigify:
-		return
+	try:
+		ob = loadedData['Object']['Human']
+	except:
+		ob = None
+	if toggle & T_Diamond == 0 and ob:
+		deleteDiamonds(ob)
+	if toggle & T_Rigify and False:
 		for rig in loadedData['Rigify'].values():
 			bpy.context.scene.objects.active = rig
 			print("Rigify", rig)
@@ -1773,7 +1781,23 @@ def postProcess():
 			mod.object = rig
 			print("Rig changed", mod.object)
 	return			
-		
+
+def deleteDiamonds(ob):
+	bpy.context.scene.objects.active = ob
+	bpy.ops.object.mode_set(mode='EDIT')
+	bpy.ops.mesh.select_all(action='DESELECT')
+	bpy.ops.object.mode_set(mode='OBJECT')
+	me = ob.data
+	for f in me.faces:		
+		if len(f.verts) < 4:
+			for vn in f.verts:
+				me.verts[vn].selected = True
+	bpy.ops.object.mode_set(mode='EDIT')
+	bpy.ops.mesh.delete(type='VERT')
+	bpy.ops.object.mode_set(mode='OBJECT')
+	return
+
+	
 #
 #	parseProcess(args, tokens):
 #	applyTransform(objects, rig, parents):
@@ -1782,11 +1806,18 @@ def postProcess():
 def parseProcess(args, tokens):
 	if not doBend:
 		return
-	rig = loadedData['Object'][args[0]]
+	try:
+		rig = loadedData['Object'][args[0]]
+	except:
+		rig = None
+	if not rig:
+		return
+
 	parents = {}
 	objects = []
 
 	for (key, val, sub) in tokens:
+		#print(key, val)
 		if key == 'Reparent':
 			bname = val[0]
 			try:
@@ -2163,6 +2194,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
 	symm = BoolProperty(name="Symmetric shapes", description="Keep shapekeys symmetric", default=toggle&T_Symm)
+	diamond = BoolProperty(name="Diamonds", description="Keep joint diamonds", default=toggle&T_Diamond)
 		
 	def execute(self, context):
 		global toggle
@@ -2174,8 +2206,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
-		#O_Preset = T_Preset if self.properties.preset else 0
-		toggle =  O_Mesh | O_Proxy | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | T_MHX 
+		O_Diamond = T_Diamond if self.properties.diamond else 0
+		toggle =  O_Mesh | O_Proxy | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | T_MHX 
 
 		
 		readMhxFile(self.properties.path, 	
