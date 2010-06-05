@@ -80,7 +80,7 @@ def findProxy(log):
 					verts = []
 					for v in f.verts:
 						verts.append(base.verts[v].co)
-					wts = cornerWeights(pv.co, verts)
+					wts = cornerWeights(pv, verts)
 					fcs.append((f.verts, wts))
 
 	print("Finding best weights")
@@ -145,7 +145,7 @@ def cornerWeights(pv, verts):
 	n = u01.cross(u02)
 	n.normalize()
 
-	u = pv-r0
+	u = pv.co-r0
 	r = r0 + u - n*u.dot(n)
 
 	'''
@@ -165,12 +165,31 @@ def cornerWeights(pv, verts):
 	b1 = r[1]-r2[1]
 	
 	det = a00*a11 - a01*a10
+	if abs(det) < 1e-20:
+		print("Proxy vert %d mapped to degenerate triangle (det = %g) with corners" % (pv.index, det))
+		print("r0", r0[0], r0[1], r0[2])
+		print("r1", r1[0], r1[1], r1[2])
+		print("r2", r2[0], r2[1], r2[2])
+		highlight(pv, 'Proxy')
+		raise NameError("Singular matrix in cornerWeights")
 
 	w0 = (a11*b0 - a01*b1)/det
 	w1 = (-a10*b0 + a00*b1)/det
 	
 	return (w0, w1, 1-w0-w1)
 
+#
+#	highlight(pv, obname):
+#
+
+def highlight(pv, obname):
+	ob = bpy.data.objects[obname]
+	me = ob.data
+	for v in me.verts:
+		v.selected = False
+	pv.selected = True
+	return
+	
 #
 #	printProxy(path, faces):	
 #
