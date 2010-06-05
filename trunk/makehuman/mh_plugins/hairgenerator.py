@@ -116,6 +116,11 @@ class Hairgenerator:
         self.guideGroups = []
 
     def addGuideGroup(self, name):
+        
+        for g in self.guideGroups:
+            if g.name == name:
+                return g                
+        
         g = GuideGroup(name)
         self.guideGroups.append(g)
         return g

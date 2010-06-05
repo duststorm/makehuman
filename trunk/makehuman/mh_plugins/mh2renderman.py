@@ -41,8 +41,11 @@ hairsClass = hairgenerator.Hairgenerator()
 
 
 def loadHairsFile(path):
-
-    hairsClass.loadHairs(path)
+    tail,head = os.path.split(path)
+    nameWithoutExt = os.path.splitext(head)[0]
+    pathWithoutExt = os.path.join(tail,nameWithoutExt)
+    print "DEBUG HAIR", pathWithoutExt
+    hairsClass.loadHairs(pathWithoutExt)
 
 
     # TODO: add the loading of wavefront obj preview
@@ -589,7 +592,7 @@ def mh2Aqsis(camera, scene, fName, ribRepository):
     ribfile.write('\tAttributeBegin\n')
     ribfile.write('\tReverseOrientation #<<-- required\n')
     ribfile.write('\t\tColor [%f %f %f]\n' % (scene.selectedHuman.hairColor[0], scene.selectedHuman.hairColor[1], scene.selectedHuman.hairColor[2]))
-    ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] \n')
+    ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] "float roughness" [0.08] \n')
     ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(ribRepository, 'hairs.rib').replace('\\', '/'))
     ribfile.write('\tAttributeEnd\n')
     ribfile.write('WorldEnd\n')
