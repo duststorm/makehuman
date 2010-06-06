@@ -109,7 +109,6 @@ class HairTaskView(gui3d.TaskView):
       scale[0] = (headBB[1][0]-headBB[0][0])/float(self.oHeadBoundingBox[1][0]-self.oHeadBoundingBox[0][0])
       scale[1] = (headBB[1][1]-headBB[0][1])/float(self.oHeadBoundingBox[1][1]-self.oHeadBoundingBox[0][1])
       scale[2] = (headBB[1][2]-headBB[0][2])/float(self.oHeadBoundingBox[1][2]-self.oHeadBoundingBox[0][2])
-      i=0
       for group in hairsClass.guideGroups:
         for guide in group.guides:
             for cP in guide.controlPoints:
@@ -117,9 +116,6 @@ class HairTaskView(gui3d.TaskView):
                 cP[0] = cP[0] + delta[0]
                 cP[1] = cP[1] + delta[1]
                 cP[2] = cP[2] + delta[2]
-                if i==0: 
-                    print "Debug controlpt: ", hairsClass.guideGroups[0].guides[0].controlPoints[0]
-                    i=1
                 #Scale
                 temp = cP #needed for shallow copy, as vsub and vadd methods disrupts the fun of shallow-copying
                 temp = vsub(temp,headCentroid)
@@ -129,7 +125,6 @@ class HairTaskView(gui3d.TaskView):
                 cP[1]=temp[1]
                 cP[2]=temp[2]
             loadStrands(obj,guide.controlPoints, widthFactor, res)
-      print "Debug controlpt after scale: ", hairsClass.guideGroups[0].guides[0].controlPoints[0]
 
         
       #HACK: set hair color to default black 
