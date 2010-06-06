@@ -1,3 +1,4 @@
+NoScale True ;
 
 Object CustomShapes EMPTY None
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;

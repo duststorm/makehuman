@@ -73,6 +73,7 @@ L_DEF =		0x8000
 F_CON = 0x0001
 F_DEF = 0x0002
 F_RES = 0x0004
+F_RES = 0
 F_WIR = 0x0008
 F_NOSCALE = 0x0010
 F_GLOC = 0x0020
@@ -315,11 +316,12 @@ def writePoses(fp, poses):
 		if typ == 'poseBone':
 			addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints)
 		elif typ == 'cSlider':
+			mn = '-'+mx
 			addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (-mx,mx, 0,0, -mx,mx), (1,1,1,1,1,1)])])
+				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'xSlider':
 			addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, 0,0, 0,0), (1,1,1,1,1,1)])])
+				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'ikHandle':
 			addIKHandle(fp, bone, mn, mx)
 		elif typ == 'singleIK':
@@ -566,7 +568,7 @@ def addActionConstraint(fp, switch, flags, data):
 	(amin, amax) = data[5]
 	inf = data[6]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
-	
+
 	fp.write(
 "    Constraint %s ACTION %s\n" % (name, switch) +
 "      target Refer Object HumanRig ; \n"+
@@ -575,9 +577,18 @@ def addActionConstraint(fp, switch, flags, data):
 "      expanded %s ;\n" % expanded +
 "      frame_start %s ; \n" % sframe +
 "      frame_end %d ; \n" % eframe+
-"      influence %s ; \n" % inf +
-"      maximum %f ; \n" % amax +
-"      minimum %f ; \n" % amin +
+"      influence %s ; \n" % inf)
+
+	if channel[0:3] == 'LOC':
+		fp.write(
+"      maximum %.4f*theScale ; \n" % amax +
+"      minimum %.4f*theScale ; \n" % amin)
+	else:
+		fp.write(
+"      maximum %.4f ; \n" % amax +
+"      minimum %.4f ; \n" % amin)
+	
+	fp.write(
 "      owner_space '%s' ; \n" % ownsp +
 "      proxy_local False ; \n"+
 "      subtarget '%s' ; \n" % subtar +
@@ -759,12 +770,12 @@ def addLimitLocConstraint(fp, switch, flags, data):
 "      expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
 "      limit_transform True ;\n" +
-"      maximum_x %.6g ;\n" % xmax +
-"      maximum_y %.6g ;\n" % ymax +
-"      maximum_z %.6g ;\n" % zmax +
-"      minimum_x %.6g ;\n" % xmin +
-"      minimum_y %.6g ;\n" % ymin +
-"      minimum_z %.6g ;\n" % zmin +
+"      maximum_x %s*theScale ;\n" % xmax +
+"      maximum_y %s*theScale ;\n" % ymax +
+"      maximum_z %s*theScale ;\n" % zmax +
+"      minimum_x %s*theScale ;\n" % xmin +
+"      minimum_y %s*theScale ;\n" % ymin +
+"      minimum_z %s*theScale ;\n" % zmin +
 "      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
 "      target_space '%s' ;\n" % targsp +
@@ -861,7 +872,6 @@ def addStretchToConstraint(fp, switch, flags, data):
 "      bulge 1 ;\n" +
 "      influence 1 ;\n" +
 "      keep_axis '%s' ;\n" % axis +
-#"      original_length 0.0477343 ;\n" +
 "      owner_space '%s' ;\n" % ownsp+
 "      proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
@@ -1011,18 +1021,9 @@ def writeFCurves(fp, name, quats):
 #
 #	writeFkIkSwitch(fp, drivers)
 #	writeDrivers(fp, cond, drivers):
-#	writeDriver(fp, channel, index, coeffs, variables):
+#	writeDriver(fp, cond, extra, channel, index, coeffs, variables):
 #
 
-'''
-def writeFkIkSwitch(fp, drivers):
-	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
-		if cnsFK:
-			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsFK), -1, (1,-1),
-				[])
-		writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsIK), -1, (0,1), 
-			[("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])])
-'''
 def writeFkIkSwitch(fp, drivers):
 	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
 		if PanelWorks:
@@ -1030,9 +1031,9 @@ def writeFkIkSwitch(fp, drivers):
 		else:
 			cnsData = ("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])
 		for cnsName in cnsFK:
-			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (1,-1), [cnsData])
+			writeDriver(fp, cond, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (1,-1), [cnsData])
 		for cnsName in cnsIK:
-			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), [cnsData])
+			writeDriver(fp, cond, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), [cnsData])
 
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 
@@ -1041,27 +1042,28 @@ def writeShapeDrivers(fp, drivers):
 		drvVars = []
 		(targ, channel, coeff) = vlist
 		drvVars.append( (targ, 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)]) )
-		writeDriver(fp, True, "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+		writeDriver(fp, True, "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
 def writeDrivers(fp, cond, drivers):
 	for drv in drivers:
 		(bone, typ, name, index, coeffs, variables) = drv
 		if typ == 'INFL':
-			writeDriver(fp, cond, "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
+			writeDriver(fp, cond, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
 		elif typ == 'ROTE':
-			writeDriver(fp, cond, "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, "", "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
 		elif typ == 'ROTQ':
-			writeDriver(fp, cond, "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, "", "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
 		elif typ == 'LOC':
-			writeDriver(fp, cond, "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, "*theScale", "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
 		elif typ == 'SCALE':
-			writeDriver(fp, cond, "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, "", "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
 		else:
 			print drv
 			raise NameError("Unknown driver type %s" % typ)
 
-def writeDriver(fp, cond, channel, index, coeffs, variables):
+def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
+	loc = False
 	fp.write("\n"+
 "    FCurve %s %d %s\n" % (channel, index, cond) +
 "      Driver AVERAGE\n")
@@ -1070,6 +1072,8 @@ def writeDriver(fp, cond, channel, index, coeffs, variables):
 
 		if typ == 'TRANSFORMS':
 			for (targ, boneTarg, ttype, flags) in targets:
+				if ttype[0:3] == 'LOC':
+					loc = True
 				local = boolString(flags & C_LOCAL)
 				fp.write(
 "          Target %s OBJECT\n" % targ +
@@ -1093,12 +1097,18 @@ def writeDriver(fp, cond, channel, index, coeffs, variables):
 "        show_debug_info True ;\n" +
 "      end Driver\n")
 
-	(a0,a1) = coeffs
 	fp.write(
 "      FModifier GENERATOR \n" +
 "        active False ;\n" +
-"        additive False ;\n" +
-"        coefficients Array %f %f ;\n" % (a0,a1) +
+"        additive False ;\n")
+
+	(a0,a1) = coeffs
+	if loc:
+		fp.write("        coefficients Array %s %s*One%s ;\n" % (a0,a1,extra))
+	else:
+		fp.write("        coefficients Array %s %s%s ;\n" % (a0,a1,extra))
+
+	fp.write(
 "        expanded True ;\n" +
 "        mode 'POLYNOMIAL' ;\n" +
 "        muted False ;\n" +

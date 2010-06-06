@@ -48,7 +48,7 @@ import geometry
 import string
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 10
+MINOR_VERSION = 11
 MHX249 = False
 Blender24 = False
 Blender25 = True
@@ -58,8 +58,8 @@ TexDir = "~/makehuman/exports"
 #
 #
 
-theScale = 1.0
-doBend = True
+theScale = 0.1
+One = 10
 useMesh = 1
 verbosity = 2
 warnedTextureDir = False
@@ -80,10 +80,13 @@ todo = []
 T_ArmIK = 0x01
 T_LegIK = 0x02
 T_Stretch = 0x04
+T_Bend = 0x08
+
 T_Diamond = 0x10
 T_Replace = 0x20
 T_Face = 0x40
 T_Shape = 0x80
+
 T_Mesh = 0x100
 T_Armature = 0x200
 T_Proxy = 0x400
@@ -120,7 +123,7 @@ rigLeg = 0
 rigArm = 0
 
 def setFlagsAndFloats(rigFlags):
-	global toggle, rigLeg, rigArm, doBend
+	global toggle, rigLeg, rigArm
 
 	(footRig, fingerRig) = rigFlags
 	rigLeg = 0
@@ -220,22 +223,26 @@ def vertcolCreator(me, name):
 '''		
 
 #
-#	loadMhx(filePath, context, flags):
+#	loadMhx(filePath, context, flags, scale):
 #
 
-def loadMhx(filePath, context, flags):
+def loadMhx(filePath, context, flags, scale):
 	global toggle
 	toggle = flags
-	readMhxFile(filePath)
+	readMhxFile(filePath, flags, scale)
 	return
 
 #
-#	readMhxFile(filePath, rigFlags):
+#	readMhxFile(filePath, rigFlags, scale):
 #
 
-def readMhxFile(filePath, rigFlags):
-	global todo, nErrors
-	
+def readMhxFile(filePath, rigFlags, scale):
+	global todo, nErrors, theScale, defaultScale, One
+
+	theScale = scale
+	defaultScale = scale
+	One = 1.0/theScale
+
 	fileName = os.path.expanduser(filePath)
 	(shortName, ext) = os.path.splitext(fileName)
 	if ext != ".mhx":
@@ -340,7 +347,7 @@ def getObject(name, var, glbals, lcals):
 ifResult = False
 
 def parse(tokens):
-	global warnedVersion, MHX249, ifResult
+	global warnedVersion, MHX249, ifResult, theScale, defaultScale, One
 	
 	for (key, val, sub) in tokens:	
 		# print("Parse %s" % key)
@@ -387,7 +394,13 @@ def parse(tokens):
 			print(msg)
 		elif key == 'error':
 			msg = concatList(val)
-			raise NameError(msg)			
+			raise NameError(msg)	
+		elif key == 'NoScale':
+			if eval(val[0]):
+				theScale = 1.0
+			else:
+				theScale = defaultScale		
+			One = 1.0/theScale
 		elif key == "Object":
 			parseObject(val, sub)
 		elif key == "Mesh":
@@ -416,6 +429,7 @@ def parse(tokens):
 			parseProcess(val, sub)
 		elif key == 'AnimationData':
 			try:
+
 
 
 				ob = loadedData['Object'][val[0]]
@@ -1066,6 +1080,7 @@ def unpackList(list_of_tuples):
 		l.extend(t)
 	return l
 
+
 #
 #	parseMesh (args, tokens):
 #
@@ -1149,7 +1164,7 @@ def parseVerts(tokens):
 	verts = []
 	for (key, val, sub) in tokens:
 		if key == 'v':
-			verts.append( (float(val[0]), float(val[1]), float(val[2])) )
+			verts.append( (theScale*float(val[0]), theScale*float(val[1]), theScale*float(val[2])) )
 	return verts
 
 def parseEdges(tokens):
@@ -1340,9 +1355,9 @@ def addShapeKey(ob, name, vgroup, tokens):
 		if key == 'sv':
 			index = int(val[0])
 			pt = skey.data[index].co
-			pt[0] += float(val[1])
-			pt[1] += float(val[2])
-			pt[2] += float(val[3])
+			pt[0] += theScale*float(val[1])
+			pt[1] += theScale*float(val[2])
+			pt[2] += theScale*float(val[3])
 		else:
 			defaultKey(key, val,  sub, "skey", [], globals(), locals())
 
@@ -1354,7 +1369,7 @@ def addShapeKey(ob, name, vgroup, tokens):
 #
 
 def parseArmature (args, tokens):
-	global toggle,  theScale
+	global toggle
 	if verbosity > 2:
 		print( "Parsing armature %s" % args )
 	
@@ -1364,11 +1379,9 @@ def parseArmature (args, tokens):
 	
 	if mode == 'Rigify':
 		toggle |= T_Rigify
-		theScale = 0.1
 		return parseRigify(amtname, obname, tokens)
 
 	toggle &= ~T_Rigify
-	theScale = 1.0
 	amt = bpy.data.armatures.new(amtname)
 	ob = createObject('Armature', obname, amt, amtname)	
 
@@ -1447,9 +1460,9 @@ def parseBone(bone, amt, tokens, heads, tails):
 
 	for (key, val, sub) in tokens:
 		if key == "head":
-			bone.head = (float(val[0]), float(val[1]), float(val[2]))
+			bone.head = (theScale*float(val[0]), theScale*float(val[1]), theScale*float(val[2]))
 		elif key == "tail":
-			bone.tail = (float(val[0]), float(val[1]), float(val[2]))
+			bone.tail = (theScale*float(val[0]), theScale*float(val[1]), theScale*float(val[2]))
 		#elif key == 'restrict_select':
 		#	pass
 		elif key == 'hidden' and val[0] == 'True':
@@ -1673,7 +1686,8 @@ def parseSpline(cu, args, tokens):
 	return
 	
 def parseBezier(bez, args, tokens):
-	bez.co = eval(args[0])	
+	bez.co = eval(args[0])
+	bez.co = theScale*bez.co	
 	bez.handle1 = eval(args[1])	
 	bez.handle1_type = args[2]
 	bez.handle2 = eval(args[3])	
@@ -1682,6 +1696,7 @@ def parseBezier(bez, args, tokens):
 
 def parsePoint(pt, args, tokens):
 	pt.co = eval(args[0])
+	pt.co = theScale*pt.co
 	return
 
 #
@@ -1707,15 +1722,15 @@ def parseLatticePoints(args, tokens, points):
 		if key == 'pt':
 			v = points[n].co
 			(x,y,z) = eval(val[0])
-			v.x = x
-			v.y = y
-			v.z = z
+			v.x = theScale*x
+			v.y = theScale*y
+			v.z = theScale*z
 
 			v = points[n].deformed_co
 			(x,y,z) = eval(val[1])
-			v.x = x
-			v.y = y
-			v.z = z
+			v.x = theScale*x
+			v.y = theScale*y
+			v.z = theScale*z
 
 			n += 1
 	return
@@ -1804,7 +1819,7 @@ def deleteDiamonds(ob):
 #
 
 def parseProcess(args, tokens):
-	if not doBend:
+	if toggle & T_Bend == 0:
 		return
 	try:
 		rig = loadedData['Object'][args[0]]
@@ -1840,10 +1855,15 @@ def parseProcess(args, tokens):
 				print("No bone "+val[0])
 				pass
 		elif key == 'Snap':
-			eb = ebones[val[0]]
+			try:
+				eb = ebones[val[0]]
+			except:
+				eb = None
 			tb = ebones[val[1]]
 			typ = val[2]
-			if typ == 'Inv':
+			if eb == None:
+				pass
+			elif typ == 'Inv':
 				eb.head = tb.tail
 				eb.tail = tb.head
 			elif typ == 'Head':
@@ -2181,6 +2201,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
+	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
+
 	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
 		items = [('Reverse foot','Reverse foot','Reverse foot'), ('Gobo','Gobo','Gobo')], default = '1')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
@@ -2195,6 +2217,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
 	symm = BoolProperty(name="Symmetric shapes", description="Keep shapekeys symmetric", default=toggle&T_Symm)
 	diamond = BoolProperty(name="Diamonds", description="Keep joint diamonds", default=toggle&T_Diamond)
+	bend = BoolProperty(name="Bend joints", description="Bend joints for better IK", default=toggle&T_Bend)
 		
 	def execute(self, context):
 		global toggle
@@ -2207,12 +2230,14 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		O_Diamond = T_Diamond if self.properties.diamond else 0
-		toggle =  O_Mesh | O_Proxy | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | T_MHX 
+		O_Bend = T_Bend if self.properties.bend else 0
+		toggle =  O_Mesh | O_Proxy | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX 
 
 		
 		readMhxFile(self.properties.path, 	
 			(self.properties.footRig, 
-			self.properties.fingerRig))
+			self.properties.fingerRig),
+			self.properties.scale)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):

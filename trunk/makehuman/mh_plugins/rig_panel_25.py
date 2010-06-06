@@ -144,14 +144,14 @@ PanelArmature = [
 	('MHRelax_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHCurl_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHCone_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHSpread_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHSpread_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHScrunch_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHLean_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
 	('MHRelax_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHCurl_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHCone_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHSpread_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('MHSpread_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHScrunch_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('MHLean_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
@@ -161,8 +161,12 @@ PanelArmature = [
 #	PanelWritePoses(fp):
 #
 
-MX = 0.25
+#MX = 0.25
+#K = 1.0/MX
 
+MX = "0.25"
+pos = ('0', '4.0')
+neg = ('0', '-4.0')
 
 PanelPoses = [
 	('poseBone', T_Panel, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, []),
@@ -197,88 +201,73 @@ PanelPoses = [
 	#('xSlider', 'PFootLocal_L', 0.0, 1.0),
 	#('xSlider', 'PFootLocal_R', 0.0, 1.0),
 
-	('xSlider', 'MHRelax_L', -0.25, 0.5),
-	('xSlider', 'MHCurl_L', -0.25, 0.5),
-	('xSlider', 'MHCone_L', -0.25, 0.5),
-	('xSlider', 'MHSpread_L', -0.25, 0.5),
-	('xSlider', 'MHScrunch_L', -0.25, 0.5),
-	('xSlider', 'MHLean_L', -0.5, 0.5),
+	('xSlider', 'MHRelax_L', '-0.25', '0.5'),
+	('xSlider', 'MHCurl_L', '-0.25', '0.5'),
+	('xSlider', 'MHCone_L', '-0.25', '0.5'),
+	('xSlider', 'MHSpread_L', '-0.25', '0.5'),
+	('xSlider', 'MHScrunch_L', '-0.25', '0.5'),
+	('xSlider', 'MHLean_L', '-0.5', '0.5'),
 
-	('xSlider', 'MHRelax_R', -0.5, 0.25),
-	('xSlider', 'MHCurl_R', -0.5, 0.25),
-	('xSlider', 'MHCone_R', -0.5, 0.25),
-	('xSlider', 'MHSpread_R', -0.5, 0.25),
-	('xSlider', 'MHScrunch_R', -0.5, 0.25),
-	('xSlider', 'MHLean_R', -0.5, 0.5),
+	('xSlider', 'MHRelax_R', '-0.5', '0.25'),
+	('xSlider', 'MHCurl_R', '-0.5', '0.25'),
+	('xSlider', 'MHCone_R', '-0.5', '0.25'),
+	('xSlider', 'MHSpread_R', '-0.5', '0.25'),
+	('xSlider', 'MHScrunch_R', '-0.5', '0.25'),
+	('xSlider', 'MHLean_R', '-0.5', '0.5'),
 ]
 
-'''
-	'BendElbowForward_L' : ('LoArm_L', 'ROT_X', 1, 0, 1)],
-	'BendElbowForward_R' : ('LoArm_R', 'ROT_X', 1, 0, 1)],
-	'BendHeadForward' : ('Head', 'ROT_X', 3, 0, 1)],
-	'BendKneeBack_L' : ('LoLeg_L', 'ROT_X', -2, -1, 0)],
-	'BendKneeBack_R' : ('LoLeg_R', 'ROT_X', -2, -1, 0)],
-	'BendLegBack_L' : ('UpLeg_L'), 'ROT_X', -1, -1, 0)],
-	'BendLegBack_R' : ('UpLeg_R', 'ROT_X', -1, -1, 0)],
-	'BendLegForward_L' : ('UpLeg_L', 'ROT_X', 1, 0, 1)],
-	'BendLegForward_R' : ('UpLeg_R', 'ROT_X', 1, 0, 1)],
-	'ShoulderDown_L' : ('UpArm_L', 'ROT_Z', 1, -1, 0)],
-	'ShoulderDown_R' : ('UpArm_R', 'ROT_Z', 1, 0, 1)],
-'''
 #
 #	Face representation
 #
 
-K = 1.0/MX
-
 FaceDrivers = {
 	# Brows
-	'BrowsMidDown' : ('PBrows', 'LOC_Z', (0,K)),
-	'BrowsMidUp' : ('PBrows', 'LOC_Z', (0,-K)),
-	'BrowsSqueeze' : ('PBrows', 'LOC_X', (0,-K)),
-	'BrowsDown_L' : ('PBrow_L', 'LOC_Z', (0,K)),
-	'BrowsDown_R' : ('PBrow_R', 'LOC_Z', (0,K)),
-	'BrowsOutUp_L' : ('PBrow_L', 'LOC_Z', (0,-K)),
-	'BrowsOutUp_R' : ('PBrow_R', 'LOC_Z', (0,-K)),
+	'BrowsMidDown' : ('PBrows', 'LOC_Z', pos),
+	'BrowsMidUp' : ('PBrows', 'LOC_Z', neg),
+	'BrowsSqueeze' : ('PBrows', 'LOC_X', neg),
+	'BrowsDown_L' : ('PBrow_L', 'LOC_Z', pos),
+	'BrowsDown_R' : ('PBrow_R', 'LOC_Z', pos),
+	'BrowsOutUp_L' : ('PBrow_L', 'LOC_Z', neg),
+	'BrowsOutUp_R' : ('PBrow_R', 'LOC_Z', neg),
 
 #	Lids
-	#'UpLidDown_L' : ('PUpLid_L', 'LOC_Z', (0,K)),
-	#'UpLidDown_R' : ('PUpLid_R', 'LOC_Z', (0,K)),
-	#'LoLidUp_L' : ('PLoLid_L', 'LOC_Z', (0,-K)),
-	#'LoLidUp_R' : ('PLoLid_R', 'LOC_Z', (0,-K)),
+	#'UpLidDown_L' : ('PUpLid_L', 'LOC_Z', pos),
+	#'UpLidDown_R' : ('PUpLid_R', 'LOC_Z', pos),
+	#'LoLidUp_L' : ('PLoLid_L', 'LOC_Z', neg),
+	#'LoLidUp_R' : ('PLoLid_R', 'LOC_Z', neg),
 
 #	Nose and jaw
 
-	'Sneer_L' : ('PNose', 'LOC_X', (0,K)), 
-	'Sneer_R' : ('PNose', 'LOC_X', (0,-K)), 
-	'CheekUp_L' : ('PCheek_L', 'LOC_Z', (0,-K)),
-	'CheekUp_R' : ('PCheek_R', 'LOC_Z', (0,-K)),
-	'Squint_L' : ('PCheek_L', 'LOC_X', (0,K)),
-	'Squint_R' : ('PCheek_R', 'LOC_X', (0,-K)),
+	'Sneer_L' : ('PNose', 'LOC_X', pos), 
+	'Sneer_R' : ('PNose', 'LOC_X', neg), 
+	'CheekUp_L' : ('PCheek_L', 'LOC_Z', neg),
+	'CheekUp_R' : ('PCheek_R', 'LOC_Z', neg),
+	'Squint_L' : ('PCheek_L', 'LOC_X', pos),
+	'Squint_R' : ('PCheek_R', 'LOC_X', neg),
 
 #	Jaw and tounge
-	'MouthOpen' : ('PJaw', 'LOC_Z', (0,K)),
-	'TongueOut' : ('PJaw', 'LOC_X', (0,-K)),
-	'ToungeUp' : ('PTounge', 'LOC_Z', (0,-K)),
-	'ToungeLeft' : ('PTounge', 'LOC_X', (0,K)),
-	'ToungeRight' : ('PTounge', 'LOC_X', (0,-K)),
+	'MouthOpen' : ('PJaw', 'LOC_Z', pos),
+	'TongueOut' : ('PJaw', 'LOC_X', neg),
+	'ToungeUp' : ('PTounge', 'LOC_Z', neg),
+	'ToungeLeft' : ('PTounge', 'LOC_X', pos),
+	'ToungeRight' : ('PTounge', 'LOC_X', neg),
 
 #	Mouth expressions
-	'Smile_L' : ('PMouth_L', 'LOC_X', (0,K)),
-	'Smile_R' : ('PMouth_R', 'LOC_X', (0,-K)),
-	'Frown_L' : ('PMouth_L', 'LOC_Z', (0,K)),
-	'Frown_R' : ('PMouth_R', 'LOC_Z', (0,K)), 
-	'Narrow_L' : ('PMouth_L', 'LOC_X', (0,-K)), 
-	'Narrow_R' : ('PMouth_R', 'LOC_X', (0,K)),
+	'Smile_L' : ('PMouth_L', 'LOC_X', pos),
+	'Smile_R' : ('PMouth_R', 'LOC_X', neg),
+	'Frown_L' : ('PMouth_L', 'LOC_Z', pos),
+	'Frown_R' : ('PMouth_R', 'LOC_Z', pos), 
+	'Narrow_L' : ('PMouth_L', 'LOC_X', neg), 
+	'Narrow_R' : ('PMouth_R', 'LOC_X', pos),
 
 #	Lips
-	'UpLipUp_L' : ('PUpLip_L', 'LOC_Z', (0,-K)), 
-	'UpLipUp_R' : ('PUpLip_R', 'LOC_Z', (0,-K)), 
-	'UpLipDown_L' : ('PUpLip_L', 'LOC_Z', (0,K)), 
-	'UpLipDown_R' : ('PUpLip_R', 'LOC_Z', (0,K)), 
-	'LoLipUp_L' : ('PLoLip_L', 'LOC_Z', (0,-K)), 
-	'LoLipUp_R' : ('PLoLip_R', 'LOC_Z', (0,-K)), 
-	'LoLipDown_L' : ('PLoLip_L', 'LOC_Z', (0,K)), 
-	'LoLipDown_R' : ('PLoLip_R', 'LOC_Z', (0,K)), 
+	'UpLipUp_L' : ('PUpLip_L', 'LOC_Z', neg), 
+	'UpLipUp_R' : ('PUpLip_R', 'LOC_Z', neg), 
+	'UpLipDown_L' : ('PUpLip_L', 'LOC_Z', pos), 
+	'UpLipDown_R' : ('PUpLip_R', 'LOC_Z', pos), 
+	'LoLipUp_L' : ('PLoLip_L', 'LOC_Z', neg), 
+	'LoLipUp_R' : ('PLoLip_R', 'LOC_Z', neg), 
+	'LoLipDown_L' : ('PLoLip_L', 'LOC_Z', pos), 
+	'LoLipDown_R' : ('PLoLip_R', 'LOC_Z', pos), 
 }
 

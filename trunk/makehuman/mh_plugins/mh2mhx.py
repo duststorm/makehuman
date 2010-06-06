@@ -105,6 +105,8 @@ def exportMhx_25(obj, rig, fp):
 	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp, None, [])	
 	fp.write("end if\n")
 
+	fp.write("\nNoScale False ;\n\n")
+
 	proxyList = mh2proxy.proxyConfig()
 	proxyData = {}
 	fp.write("if toggle&T_Proxy\n")
