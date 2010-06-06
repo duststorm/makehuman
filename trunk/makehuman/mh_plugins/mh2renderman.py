@@ -36,11 +36,14 @@ import files3d
 import subprocess
 import hairgenerator
 import random
+from hair import calculateBoundingBox
+
 
 hairsClass = hairgenerator.Hairgenerator()
 
 
-def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0]):
+#def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0]):
+def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0],headCentroid=[0.0, 7.436, 0.03]):
     tail,head = os.path.split(path)
     nameWithoutExt = os.path.splitext(head)[0]
     pathWithoutExt = os.path.join(tail,nameWithoutExt)
@@ -57,9 +60,9 @@ def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0]):
                 cP[2] = cP[2] + delta[2]
                 #Scale
                 temp = cP #needed for shallow copy, as vsub and vadd methods disrupts the fun of shallow-copying
-                temp = vsub(temp,headCentroid)
+                temp = aljabr.vsub(temp,headCentroid)
                 temp = [temp[0]*scale[0],temp[1]*scale[1],temp[2]*scale[2]]
-                temp = vadd(temp, headCentroid)
+                temp = aljabr.vadd(temp, headCentroid)
                 cP[0]=temp[0]
                 cP[1]=temp[1]
                 cP[2]=temp[2]
@@ -650,7 +653,8 @@ def saveScene(camera, scene, fName, ribDir, engine):
     scale[1] = (headBB[1][1]-headBB[0][1])/float(oHeadBoundingBox[1][1]-oHeadBoundingBox[0][1])
     scale[2] = (headBB[1][2]-headBB[0][2])/float(oHeadBoundingBox[1][2]-oHeadBoundingBox[0][2])
 
-    loadHairsFile(human.hairFile,delta,scale)
+    #loadHairsFile(human.hairFile,delta,scale)
+    loadHairsFile(human.hairFile,delta,scale,headCentroid)
     if not os.path.isdir(ribDir):
         os.makedirs(ribDir)
     ribRepository = os.path.join(ribDir, 'ribFiles')
