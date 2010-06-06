@@ -7,71 +7,71 @@ import module3d
 class Font:
 
     def __init__(self, filename):
-        with open(filename, 'r') as f:
+        f = open(filename, 'r')
 
-            self.charMap = {}
-            self.kerning = {}
+        self.charMap = {}
+        self.kerning = {}
 
-            for data in f.readlines():
-                lineData = data.split()
+        for data in f.readlines():
+            lineData = data.split()
 
-                if lineData[0] == 'common':
-                    for paramValue in lineData[1:]:
-                        paramData = paramValue.split('=')
+            if lineData[0] == 'common':
+                for paramValue in lineData[1:]:
+                    paramData = paramValue.split('=')
 
-                        if paramData[0] == 'lineHeight':
-                            self.lineHeight = int(paramData[1])
-                        elif paramData[0] == 'scaleW':
-                            self.width = int(paramData[1])
-                        elif paramData[0] == 'scaleH':
-                            self.height = int(paramData[1])
-                elif lineData[0] == 'page':
+                    if paramData[0] == 'lineHeight':
+                        self.lineHeight = int(paramData[1])
+                    elif paramData[0] == 'scaleW':
+                        self.width = int(paramData[1])
+                    elif paramData[0] == 'scaleH':
+                        self.height = int(paramData[1])
+            elif lineData[0] == 'page':
 
-                    for paramValue in lineData[1:]:
-                        paramData = paramValue.split('=')
+                for paramValue in lineData[1:]:
+                    paramData = paramValue.split('=')
 
-                        if paramData[0] == 'file':
-                            self.file = 'data/fonts/' + (paramData[1])[1:-1]  # Removes the ""
-                elif lineData[0] == 'char':
+                    if paramData[0] == 'file':
+                        self.file = 'data/fonts/' + (paramData[1])[1:-1]  # Removes the ""
+            elif lineData[0] == 'char':
 
-                    charRecord = {}
-                    for paramValue in lineData[1:]:
-                        paramData = paramValue.split('=')
+                charRecord = {}
+                for paramValue in lineData[1:]:
+                    paramData = paramValue.split('=')
 
-                        if paramData[0] == 'id':
-                            charRecord['id'] = int(paramData[1])
-                        elif paramData[0] == 'x':
-                            charRecord['x'] = int(paramData[1])
-                        elif paramData[0] == 'y':
-                            charRecord['y'] = int(paramData[1])
-                        elif paramData[0] == 'width':
-                            charRecord['width'] = int(paramData[1])
-                        elif paramData[0] == 'height':
-                            charRecord['height'] = int(paramData[1])
-                        elif paramData[0] == 'xoffset':
-                            charRecord['xoffset'] = int(paramData[1])
-                        elif paramData[0] == 'yoffset':
-                            charRecord['yoffset'] = int(paramData[1])
-                        elif paramData[0] == 'xadvance':
-                            charRecord['xadvance'] = int(paramData[1])
+                    if paramData[0] == 'id':
+                        charRecord['id'] = int(paramData[1])
+                    elif paramData[0] == 'x':
+                        charRecord['x'] = int(paramData[1])
+                    elif paramData[0] == 'y':
+                        charRecord['y'] = int(paramData[1])
+                    elif paramData[0] == 'width':
+                        charRecord['width'] = int(paramData[1])
+                    elif paramData[0] == 'height':
+                        charRecord['height'] = int(paramData[1])
+                    elif paramData[0] == 'xoffset':
+                        charRecord['xoffset'] = int(paramData[1])
+                    elif paramData[0] == 'yoffset':
+                        charRecord['yoffset'] = int(paramData[1])
+                    elif paramData[0] == 'xadvance':
+                        charRecord['xadvance'] = int(paramData[1])
 
-            # print(charRecord)
+        # print(charRecord)
 
-                    self.charMap[charRecord['id']] = charRecord
-                    
-                elif lineData[0] == 'kerning':
-                    
-                    for paramValue in lineData[1:]:
-                        paramData = paramValue.split('=')
+                self.charMap[charRecord['id']] = charRecord
+                
+            elif lineData[0] == 'kerning':
+                
+                for paramValue in lineData[1:]:
+                    paramData = paramValue.split('=')
 
-                        if paramData[0] == 'first':
-                            first = int(paramData[1])
-                        elif paramData[0] == 'second':
-                            second = int(paramData[1])
-                        elif paramData[0] == 'amount':
-                            amount = int(paramData[1])
-                            
-                    self.kerning[(first, second)] = amount
+                    if paramData[0] == 'first':
+                        first = int(paramData[1])
+                    elif paramData[0] == 'second':
+                        second = int(paramData[1])
+                    elif paramData[0] == 'amount':
+                        amount = int(paramData[1])
+                        
+                self.kerning[(first, second)] = amount
 
         # print(self.charMap)
 
