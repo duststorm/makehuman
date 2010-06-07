@@ -1208,10 +1208,9 @@ def writeAllProcesses(fp):
 
 	fp.write("  ObjectMode ;\n")
 	fp.write("  EditMode ;\n")
-	selects = rig_arm_25.ArmSelects + rig_leg_25.LegSelects
-	for bone in selects:
-		fp.write("  Select %s ;\n" % bone)
-	fp.write("  RollUp ;\n")
+	rolls = rig_arm_25.ArmRolls + rig_leg_25.LegRolls
+	for (bone, roll) in rolls:
+		fp.write("  Roll %s %.4f ;\n" % (bone, roll))
 	
 	fp.write("  ObjectMode ;\n")
 

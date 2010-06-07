@@ -97,7 +97,7 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face + T_Stretch
+toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face + T_Stretch + T_Bend
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -1082,6 +1082,7 @@ def unpackList(list_of_tuples):
 
 
 #
+
 #	parseMesh (args, tokens):
 #
 
@@ -1873,6 +1874,7 @@ def parseProcess(args, tokens):
 			elif typ == 'Both':
 				eb.head = tb.head
 				eb.tail = tb.tail
+				eb.roll = tb.roll
 			else:
 				raise NameError("Snap type %s" % typ)
 		elif key == 'PoseMode':
@@ -1888,22 +1890,17 @@ def parseProcess(args, tokens):
 			bpy.ops.object.mode_set(mode='EDIT')
 			ebones = rig.data.edit_bones	
 			bpy.ops.armature.select_all(action='DESELECT')
-		elif key == 'Select':
+		elif key == 'Roll':
 			try:
 				eb = ebones[val[0]]
-				eb.selected = True
-				eb.layer[0] = True
 			except:
-				pass
+				eb = None
+			if eb:
+				eb.roll = float(val[1])
+		elif key == 'Select':
+			pass
 		elif key == 'RollUp':
-			bpy.ops.armature.calculate_roll(type='GLOBALUP')
-			for eb in ebones:
-				if eb.selected:
-					eb.layer[0] = False
-					if eb.roll < 1.5 and eb.roll > -1.5:
-						eb.roll = 0.0
-					else:
-						eb.roll = 3.1415
+			pass
 		elif key == 'Apply':
 			applyTransform(objects, rig, parents)
 		elif key == 'ApplyArmature':

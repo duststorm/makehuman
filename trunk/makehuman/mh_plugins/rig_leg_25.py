@@ -581,12 +581,41 @@ LegParents = [
 	('Ankle_R', 'LoLeg_R'),
 	('FootCtrl_R', 'Foot_R'),
 
-	("FootGobo_L", "LoLeg_L"),
-	("FootGobo_R", "LoLeg_R"),
+	('FootGobo_L', 'LoLeg_L'),
+	('LegTarget_L', 'LoLeg_L'),
+	('TipToe_L', 'Toe_L'),
+	('TumbleOut_L', 'Foot_L'),
+	('TumbleIn_L', 'Foot_L'),
+	('Heel_L', 'Foot_L',),
+	('RotateToe_L', 'Toe_L'),
+	('FootRoll_L', 'Toe_L'),
+	('FootTumble_L', 'Toe_L'),
+	('FootTarget_L', 'Foot_L'),
+	('ToeTarget_L', 'Toe_L'),
+
+	('FootGobo_R', 'LoLeg_R'),
+	('LegTarget_R', 'LoLeg_R'),
+	('TipToe_R', 'Toe_R'),
+	('TumbleOut_R', 'Foot_R'),
+	('TumbleIn_R', 'Foot_R'),
+	('Heel_R', 'Foot_R',),
+	('RotateToe_R', 'Toe_R'),
+	('FootRoll_R', 'Toe_R'),
+	('FootTumble_R', 'Toe_R'),
+	('FootTarget_R', 'Foot_R'),
+	('ToeTarget_R', 'Toe_R'),
 ]
 
 LegSelects = [
 	'Foot_L', 'Toe_L', 'FootFK_L', 'ToeFK_L', 'FootIK_L', 'ToeIK_L', 'FootRevIK_L', 'ToeRevIK_L', 'FootCtrl_L', 'FootGobo_L',
 	'Foot_R', 'Toe_R', 'FootFK_R', 'ToeFK_R', 'FootIK_R', 'ToeIK_R', 'FootRevIK_R', 'ToeRevIK_R', 'FootCtrl_R', 'FootGobo_R',
 ]	
+
+LegRolls = [
+	('FootCtrl_L', -0.23),
+	('FootCtrl_R', 0.23),
+	('FootRevIK_L', pi),
+	('FootRevIK_R', pi),
+]
+
 
