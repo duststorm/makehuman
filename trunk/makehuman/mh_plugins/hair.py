@@ -147,8 +147,6 @@ class HairTaskView(gui3d.TaskView):
       self.filechooser.onShow(event) 
     gui3d.TaskView.onShow(self, event)
     self.filechooser.setFocus()
-    # HACK: otherwise the toolbar background disappears for some weird reason
-    self.app.scene3d.redraw(0)
     
   def onHide(self, event):
     self.app.scene3d.selectedHuman.show()
