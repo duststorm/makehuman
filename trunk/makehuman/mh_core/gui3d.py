@@ -1035,10 +1035,10 @@ class FileChooser(View):
 
           if self.selectedFile + 1 < len(self.files):
               self.nextFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile + 1]))
-              self.filename.setVisibility(1)
+              self.nextFile.show()
           else:
               self.nextFile.clearTexture()
-              self.filename.setVisibility(0)
+              self.nextFile.hide()
 
         self.app.scene3d.redraw()
 
