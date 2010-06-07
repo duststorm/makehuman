@@ -60,9 +60,9 @@ class HairTaskView(gui3d.TaskView):
       human.hairObj = loadHairsFile(path="./data/hairs/"+filename, hairsClass=hairsClass, update=update)
       #human.hairObj = loadHairsFile(human.scene, path="./data/hairs/"+filename, position=self.app.scene3d.selectedHuman.getPosition(), rotation=self.app.scene3d.selectedHuman.getRotation(), hairsClass=hairsClass, update=update, widthFactor=self.widthFactor)
       #Jose: TODO collision detection
-      self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(self.app.scene3d.selectedHuman.hairFile.replace(".hair", '.png'))
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(os.path.join('data/hairs', filename + '.png'))
       self.app.switchCategory("Modelling")
-      human.setHairFile("data/hairs/" + filename + ".obj")
+      human.setHairFile(os.path.join('data/hairs', filename + ".obj"))
       
     def loadHairsFile(path,res=0.04,  hairsClass = None, update = True):
     #scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
