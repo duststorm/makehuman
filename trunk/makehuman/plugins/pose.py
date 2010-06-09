@@ -4,7 +4,9 @@
 
 import gui3d
 import mh
+import os
 import algos3d
+import aljabr
 print 'Pose plugin imported'
 
 
@@ -14,102 +16,102 @@ class PoseTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_pose.png'))        
         
         
-        self.acromioclavicularAbductionVal = 0       
-        self.acromioclavicularProtractionVal = 0 
-        self.sternoclavicularAbductionVal = 0 
-        self.sternoclavicularProtractionVal = 0 
-        self.compo1Val = 0
-        self.compo2Val = 0
-        self.compoMixVal = 0
-        self.testVal = 0
-        self.test2Val = 0
+        self.shoulderX = 0       
+        self.shoulderY = 0 
+        self.shoulderZ = 0
+        self.shoulderSamples = []
+        
+        sData = os.listdir("data/targets/poseengine/female-young/right-shoulder")      
+        for dat in sData:
+            if dat not in ("shoulder-girdle",".svn"):
+                d = dat.split('_')
+                x = float(d[0])
+                y = float(d[1])
+                z = float(d[2])
+                self.shoulderSamples.append((x,y,z))
+        
        
-        self.acromioclavicularAbductionSlider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, label = "Acromio Abdct")
-        self.acromioclavicularProtractionSlider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, label = "Acromnio Protr")
-        self.sternoclavicularAbductionSlider = gui3d.Slider(self, position=[10, 220, 9.5], value = 0.0, label = "Sterno Abdct")
-        self.sternoclavicularProtractionSlider = gui3d.Slider(self, position=[10, 180, 9.5], value = 0.0, label = "Sterno Protr")
-        self.compo1Slider = gui3d.Slider(self, position=[10, 380, 9.5], value = 0.0, label = "Compo1")
-        self.compo2Slider = gui3d.Slider(self, position=[10, 420, 9.5], value = 0.0, label = "Compo2")
-        self.compoMixSlider = gui3d.Slider(self, position=[10, 460, 9.5], value = 0.0, label = "CompoMix")
-        self.testSlider = gui3d.Slider(self, position=[10, 300, 9.5], value = 0.0, label = "test")
-        self.test2Slider = gui3d.Slider(self, position=[10, 340, 9.5], value = 0.0, label = "test2")
+        self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, label = "Shoulder RotX")
+        self.shoulderYslider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, label = "Shoulder RotY")
+        self.shoulderZslider = gui3d.Slider(self, position=[10, 180, 9.5], value = 0.0, label = "Shoulder RotZ")       
            
             
-        @self.acromioclavicularAbductionSlider.event
+        @self.shoulderXslider.event
         def onChange(value):
-            self.acromioclavicularAbductionVal = value
-            self.applyPose() 
-            
-        @self.acromioclavicularProtractionSlider.event
-        def onChange(value):
-            self.acromioclavicularProtractionVal = value
+            self.shoulderX = value*85
             self.applyPose()
-            
-        @self.sternoclavicularAbductionSlider.event
-        def onChange(value):
-            self.sternoclavicularAbductionVal = value
-            self.applyPose()
-            
-        @self.sternoclavicularProtractionSlider.event
-        def onChange(value):
-            self.sternoclavicularProtractionVal = value
-            self.applyPose()
-            
-        @self.compo1Slider.event
-        def onChange(value):
-            self.compo1Val = value
-            self.applyCombo()
 
-        @self.compo2Slider.event
+        @self.shoulderYslider.event
         def onChange(value):
-            self.compo2Val = value
-            self.applyCombo()
-
-        @self.compoMixSlider.event
-        def onChange(value):
-            self.compo1Val = 1-value
-            self.compo2Val = value
-            self.applyCombo()
-            
-        @self.testSlider.event
-        def onChange(value):
-            self.testVal = value
+            self.shoulderY = value*50
             self.applyPose()
-            
-        @self.test2Slider.event
+
+        @self.shoulderZslider.event
         def onChange(value):
-            self.test2Val = value
+            self.shoulderZ = value*90
             self.applyPose()
 
 
 
+    def applyShoulderTargets(self,angle):
 
-    def combo1Experiment(self, human, val):
-        #hardcoded sample for angle rotX = 0, rotY = 50, rotZ = 90       
-        algos3d.loadTranslationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/t1.target", val, None, 1, 0)
-        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/r1.rot", val)
-        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-50-90/r2.rot", val)
+        dirpath = "data/targets/poseengine/female-young/right-shoulder"
+        closerSamples = {}
+        for s in self.shoulderSamples:
+            d = aljabr.vdist(angle,s)
+            closerSamples[d] = s
+            
+        k = closerSamples.keys()
+        k.sort()
 
-            
-            
-    def combo2Experiment(self, human, val):
-        #hardcoded sample for angle rotX = 0, rotY = 90, rotZ = 90        
-        algos3d.loadTranslationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/t1.target", val, None, 1, 0)
-        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/r1.rot", val)
-        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/r2.rot", val)
-        algos3d.loadRotationTarget(human.meshData, "data/targets/poseengine/female-young/right-shoulder/0-90-90/r3.rot", val)
+        #Normalize 1
+        weight1 = k[0]/k[0]#It's always 1, but I keep for clarity
+        weight2 = k[0]/k[1]
+        weight3 = k[0]/k[2]
 
+        #Normalize 2
+        n = weight1+weight2+weight3
+        weight1 = weight1/n
+        weight2 = weight2/n
+        weight3 = weight3/n
 
-    def applyCombo(self):
-        h = self.app.scene3d.selectedHuman
-        self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
-        self.combo1Experiment(h,self.compo1Val)
-        self.combo2Experiment(h,self.compo2Val)
-        #This update ALL! faces. To be optimised, of course.
-        self.app.scene3d.selectedHuman.meshData.calcNormals(facesToUpdate=[f for f in self.app.scene3d.selectedHuman.meshData.faces])
-        self.app.scene3d.selectedHuman.meshData.update()
-            
-            
+        sample1 = closerSamples[k[0]]
+        sample2 = closerSamples[k[1]]
+        sample3 = closerSamples[k[2]]
+        
+        sampleTarget1 = str(int(sample1[0]))+"_"+str(int(sample1[1]))+"_"+str(int(sample1[2]))
+        sampleTarget2 = str(int(sample2[0]))+"_"+str(int(sample2[1]))+"_"+str(int(sample2[2]))
+        sampleTarget3 = str(int(sample3[0]))+"_"+str(int(sample3[1]))+"_"+str(int(sample3[2]))
+        
+        path1 = os.path.join(dirpath,sampleTarget1)
+        path2 = os.path.join(dirpath,sampleTarget2)
+        path3 = os.path.join(dirpath,sampleTarget3)
+        
+        print "-------"
+        self.applyTargetsInFolder(path1,weight1)
+        self.applyTargetsInFolder(path2,weight2)
+        self.applyTargetsInFolder(path3,weight3)          
+ 
+ 
+    def applyTargetsInFolder(self,path,morphFactor):
+        print path,morphFactor
+        targets = os.listdir(path)        
+        traslations = []
+        rotations = []
+        for t in targets:
+            tpath = os.path.join(path,t)            
+            if os.path.isfile(tpath):
+                if os.path.splitext(t)[1] == ".rot":
+                    rotations.append(tpath)
+                if os.path.splitext(t)[1] == ".target":
+                    traslations.append(tpath)
+         
+        for targetPath in traslations:
+            algos3d.loadTranslationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor, None, 1, 0)
+        for targetPath in rotations:
+            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)               
+                
+ 
             
         
     #maybe this should be moved in human class
@@ -117,14 +119,9 @@ class PoseTaskView(gui3d.TaskView):
         
         self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
         
-        #Now all rotations are applied, taking account of hierarchy.
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/test", self.testVal)
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/acromioclavicular-abduction", self.acromioclavicularAbductionVal)
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/acromioclavicular-protraction", self.acromioclavicularProtractionVal)
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/sternoclavicular-abduction", self.sternoclavicularAbductionVal)
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/sternoclavicular-protraction", self.sternoclavicularProtractionVal)
-        #self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/lordosi", self.lordosiVal)
-        self.app.scene3d.selectedHuman.rotateLimb("data/targets/poseengine/female-young/right-shoulder/shoulder-girdle/test2", self.test2Val)
+        angle = (self.shoulderX,self.shoulderY,self.shoulderZ)
+        self.applyShoulderTargets(angle)
+        
         self.app.scene3d.selectedHuman.meshData.calcNormals(facesToUpdate=[f for f in self.app.scene3d.selectedHuman.meshData.faces])
         self.app.scene3d.selectedHuman.meshData.update()
         #self.app.scene3d.redraw()
