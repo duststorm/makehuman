@@ -64,8 +64,6 @@ static int g_windowWidth = 800;
 static int g_windowHeight = 600;
 static SDL_Surface *g_screen = NULL;
 
-#define GL_CLAMP_TO_EDGE_EXT 0x812F
-
 #ifndef __APPLE__
 typedef SDL_Surface *(*PFN_IMG_LOAD)(const char *);
 static void *g_sdlImageHandle = NULL;
@@ -1819,7 +1817,10 @@ void mhEventLoop(void)
     while (G.loop)
     {
         SDL_Event event;
+
+        Py_BEGIN_ALLOW_THREADS
         SDL_WaitEvent(&event);
+        Py_END_ALLOW_THREADS
 
         /* On OS-X SDL continuously posts events even when a native dialog or
          * Window is opened. So if the ActiveWindow (focused Window) is not
