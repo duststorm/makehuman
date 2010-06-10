@@ -31,24 +31,50 @@ class PoseTaskView(gui3d.TaskView):
                 self.shoulderSamples.append((x,y,z))
         
        
-        self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, label = "Shoulder RotX")
-        self.shoulderYslider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, label = "Shoulder RotY")
-        self.shoulderZslider = gui3d.Slider(self, position=[10, 180, 9.5], value = 0.0, label = "Shoulder RotZ")       
+        self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, min = -85, max = 80, label = "Shoulder RotX")
+        self.shoulderYslider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, min = -140, max = 50, label = "Shoulder RotY")
+        self.shoulderZslider = gui3d.Slider(self, position=[10, 180, 9.5], value = 0.0, min = -120, max = 90, label = "Shoulder RotZ")
+
+
+        self.shoulderXLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[180, 100, 9.5])  
+        self.shoulderYLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[180, 140, 9.5])   
+        self.shoulderZLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[180, 180, 9.5])
+        
+
+        self.shoulderXLabel.setText('0')
+        self.shoulderYLabel.setText('0')        
+        self.shoulderZLabel.setText('0')
+        
+        self.resetPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Reset", position=[50, 240, 9.5])
+
+        @self.resetPoseButton.event
+        def onClicked(event):
+            self.shoulderX = 0       
+            self.shoulderY = 0 
+            self.shoulderZ = 0
+            self.shoulderXslider.setValue(0.0)
+            self.shoulderYslider.setValue(0.0)
+            self.shoulderZslider.setValue(0.0)
+            self.applyPose()
+            
            
             
         @self.shoulderXslider.event
         def onChange(value):
-            self.shoulderX = value*85
+            self.shoulderX = value
+            self.shoulderXLabel.setText('%d' % self.shoulderX)
             self.applyPose()
 
         @self.shoulderYslider.event
         def onChange(value):
-            self.shoulderY = value*50
+            self.shoulderY = value
+            self.shoulderYLabel.setText('%d' % self.shoulderY)
             self.applyPose()
 
         @self.shoulderZslider.event
         def onChange(value):
-            self.shoulderZ = value*90
+            self.shoulderZ = value
+            self.shoulderZLabel.setText('%d' % self.shoulderZ)
             self.applyPose()
 
 
