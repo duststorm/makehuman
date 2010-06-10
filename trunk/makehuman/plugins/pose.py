@@ -28,7 +28,10 @@ class PoseTaskView(gui3d.TaskView):
                 x = float(d[0])
                 y = float(d[1])
                 z = float(d[2])
-                self.shoulderSamples.append((x,y,z))
+                for i in xrange(1,10):
+                    i = float(i)/10.0
+                    fillerSample = (x*i,y*i,z*i,x,y,z,i)                   
+                    self.shoulderSamples.append(fillerSample)
         
        
         self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, min = -85, max = 80, label = "Shoulder RotX")
@@ -88,7 +91,8 @@ class PoseTaskView(gui3d.TaskView):
         dirpath = "data/targets/poseengine/female-young/right-shoulder"
         closerSamples = {}
         for s in self.shoulderSamples:
-            d = aljabr.vdist(angle,s)
+            s1 = (s[0],s[1],s[2])
+            d = aljabr.vdist(angle,s1)
             closerSamples[d] = s
             
         k = closerSamples.keys()
@@ -96,9 +100,9 @@ class PoseTaskView(gui3d.TaskView):
 
         print "K ", k[0],k[1],k[2]
         #Normalize 1. "+0.001" is to prevent division by zero.
-        weight1 = k[0]/(k[0]+0.001)
-        weight2 = k[0]/(k[1]+0.001)
-        weight3 = k[0]/(k[2]+0.001)
+        weight1 = (k[0]+0.001)/(k[0]+0.001)
+        weight2 = (k[0]+0.001)/(k[1]+0.001)
+        weight3 = (k[0]+0.001)/(k[2]+0.001)
 
         #Normalize 2. "+0.001" is to prevent division by zero.
         n = weight1+weight2+weight3+0.001
@@ -110,18 +114,22 @@ class PoseTaskView(gui3d.TaskView):
         sample2 = closerSamples[k[1]]
         sample3 = closerSamples[k[2]]
         
-        sampleTarget1 = str(int(sample1[0]))+"_"+str(int(sample1[1]))+"_"+str(int(sample1[2]))
-        sampleTarget2 = str(int(sample2[0]))+"_"+str(int(sample2[1]))+"_"+str(int(sample2[2]))
-        sampleTarget3 = str(int(sample3[0]))+"_"+str(int(sample3[1]))+"_"+str(int(sample3[2]))
+        sampleTarget1 = str(int(sample1[3]))+"_"+str(int(sample1[4]))+"_"+str(int(sample1[5]))
+        sampleTarget2 = str(int(sample2[3]))+"_"+str(int(sample2[4]))+"_"+str(int(sample2[5]))
+        sampleTarget3 = str(int(sample3[3]))+"_"+str(int(sample3[4]))+"_"+str(int(sample3[5]))
+        
+        morphVal1 = sample1[6]*weight1
+        morphVal2 = sample2[6]*weight2
+        morphVal3 = sample3[6]*weight3
         
         path1 = os.path.join(dirpath,sampleTarget1)
         path2 = os.path.join(dirpath,sampleTarget2)
         path3 = os.path.join(dirpath,sampleTarget3)
         
         print "-------"
-        self.applyTargetsInFolder(path1,weight1)
-        self.applyTargetsInFolder(path2,weight2)
-        self.applyTargetsInFolder(path3,weight3)          
+        self.applyTargetsInFolder(path1,morphVal1)
+        self.applyTargetsInFolder(path2,morphVal2)
+        self.applyTargetsInFolder(path3,morphVal3)          
  
  
     def applyTargetsInFolder(self,path,morphFactor):
