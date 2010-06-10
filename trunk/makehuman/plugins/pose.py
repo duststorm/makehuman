@@ -49,15 +49,7 @@ class PoseTaskView(gui3d.TaskView):
 
         @self.resetPoseButton.event
         def onClicked(event):
-            self.shoulderX = 0       
-            self.shoulderY = 0 
-            self.shoulderZ = 0
-            self.shoulderXslider.setValue(0.0)
-            self.shoulderYslider.setValue(0.0)
-            self.shoulderZslider.setValue(0.0)
-            self.applyPose()
-            
-           
+            self.resetShoulder()           
             
         @self.shoulderXslider.event
         def onChange(value):
@@ -78,7 +70,19 @@ class PoseTaskView(gui3d.TaskView):
             self.applyPose()
 
 
+    def resetShoulder(self):
+        self.shoulderX = 0       
+        self.shoulderY = 0 
+        self.shoulderZ = 0
+        self.shoulderXslider.setValue(0.0)
+        self.shoulderYslider.setValue(0.0)
+        self.shoulderZslider.setValue(0.0)
+        self.shoulderXLabel.setText('0')
+        self.shoulderYLabel.setText('0')        
+        self.shoulderZLabel.setText('0')
+        self.applyPose()
 
+        
     def applyShoulderTargets(self,angle):
 
         dirpath = "data/targets/poseengine/female-young/right-shoulder"
@@ -90,13 +94,14 @@ class PoseTaskView(gui3d.TaskView):
         k = closerSamples.keys()
         k.sort()
 
-        #Normalize 1
-        weight1 = k[0]/k[0]#It's always 1, but I keep for clarity
-        weight2 = k[0]/k[1]
-        weight3 = k[0]/k[2]
+        print "K ", k[0],k[1],k[2]
+        #Normalize 1. "+0.001" is to prevent division by zero.
+        weight1 = k[0]/(k[0]+0.001)
+        weight2 = k[0]/(k[1]+0.001)
+        weight3 = k[0]/(k[2]+0.001)
 
-        #Normalize 2
-        n = weight1+weight2+weight3
+        #Normalize 2. "+0.001" is to prevent division by zero.
+        n = weight1+weight2+weight3+0.001
         weight1 = weight1/n
         weight2 = weight2/n
         weight3 = weight3/n
