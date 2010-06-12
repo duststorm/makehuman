@@ -23,11 +23,11 @@ ipo Key KeyIpo
       driverChannel 1 ;
       driverExpression 'p.ctrlUpLidDown_R()' ;
     end icu
-  icu ToungeUp 0 2 
+  icu TongueUp 0 2 
       driver 2 ;
       driverObject _object['Human'] ;
       driverChannel 1 ;
-      driverExpression 'p.ctrlToungeUp()' ;
+      driverExpression 'p.ctrlTongueUp()' ;
     end icu
   icu LoLipUp_L 0 2 
       driver 2 ;
@@ -83,11 +83,11 @@ ipo Key KeyIpo
       driverChannel 1 ;
       driverExpression 'p.ctrlBrowsDown_R()' ;
     end icu
-  icu ToungeLeft 0 2 
+  icu TongueLeft 0 2 
       driver 2 ;
       driverObject _object['Human'] ;
       driverChannel 1 ;
-      driverExpression 'p.ctrlToungeLeft()' ;
+      driverExpression 'p.ctrlTongueLeft()' ;
     end icu
   icu Smile_L 0 2 
       driver 2 ;
@@ -173,11 +173,11 @@ ipo Key KeyIpo
       driverChannel 1 ;
       driverExpression 'p.ctrlLoLipDown_R()' ;
     end icu
-  icu ToungeRight 0 2 
+  icu TongueRight 0 2 
       driver 2 ;
       driverObject _object['Human'] ;
       driverChannel 1 ;
-      driverExpression 'p.ctrlToungeRight()' ;
+      driverExpression 'p.ctrlTongueRight()' ;
     end icu
   icu Sneer_L 0 2 
       driver 2 ;

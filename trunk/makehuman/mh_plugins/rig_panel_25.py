@@ -28,7 +28,7 @@ PanelJoints = [
 	('PLoLip_L',		'o', ('origin', [0.2, -0.6, 0.0])),
 	('PMouth_R',		'o', ('origin', [-0.5, -0.5, 0.0])),
 	('PMouth_L',		'o', ('origin', [0.5, -0.5, 0.0])),
-	('PTounge',		'o', ('origin', [0.0, -1.0, 0.0])),
+	('PTongue',		'o', ('origin', [0.0, -1.0, 0.0])),
 	('PJaw',		'o', ('origin', [0.0, -1.1, 0.0])),
 
 	('PArmIK_R',		'o', ('origin', [-1.1, 2.0, 0.0])),
@@ -79,7 +79,7 @@ PanelHeadsTails = [
 	('PLoLip_L',			'PLoLip_L', ('PLoLip_L', offs)),
 	('PMouth_R',			'PMouth_R', ('PMouth_R', offs)),
 	('PMouth_L',			'PMouth_L', ('PMouth_L', offs)),
-	('PTounge',			'PTounge', ('PTounge', offs)),
+	('PTongue',			'PTongue', ('PTongue', offs)),
 	('PJaw',			'PJaw', ('PJaw', offs)),
 
 	('PArmIK_R',			'PArmIK_R', ('PArmIK_R', offs)),
@@ -129,7 +129,7 @@ PanelArmature = [
 	('PLoLip_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PMouth_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PMouth_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PTounge', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PTongue', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PJaw', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
 	('PArmIK_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
@@ -189,7 +189,7 @@ PanelPoses = [
 	('cSlider',  'PLoLip_R', MX),
 	('cSlider',  'PMouth_L', MX),
 	('cSlider',  'PMouth_R', MX),
-	('cSlider',  'PTounge', MX),
+	('cSlider',  'PTongue', MX),
 	('cSlider',  'PJaw', MX),
 
 	('xSlider', 'PArmIK_L', 0.0, 1.0),
@@ -245,12 +245,12 @@ FaceDrivers = {
 	'Squint_L' : ('PCheek_L', 'LOC_X', pos),
 	'Squint_R' : ('PCheek_R', 'LOC_X', neg),
 
-#	Jaw and tounge
+#	Jaw and tongue
 	'MouthOpen' : ('PJaw', 'LOC_Z', pos),
 	'TongueOut' : ('PJaw', 'LOC_X', neg),
-	'ToungeUp' : ('PTounge', 'LOC_Z', neg),
-	'ToungeLeft' : ('PTounge', 'LOC_X', pos),
-	'ToungeRight' : ('PTounge', 'LOC_X', neg),
+	'TongueUp' : ('PTongue', 'LOC_Z', neg),
+	'TongueLeft' : ('PTongue', 'LOC_X', pos),
+	'TongueRight' : ('PTongue', 'LOC_X', neg),
 
 #	Mouth expressions
 	'Smile_L' : ('PMouth_L', 'LOC_X', pos),

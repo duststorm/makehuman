@@ -5509,7 +5509,7 @@
   sv 8146 0 -0.085558 0.00187778 ;
   sv 8846 7.00355e-06 2.50041e-05 2.86102e-06 ;
   end ShapeKey
-  ShapeKey ToungeUp Sym toggle&T_Face
+  ShapeKey TongueUp Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -9628,7 +9628,7 @@
   sv 12725 3.09944e-05 -0.000424981 0.000955105 ;
   sv 12726 0.000138998 -0.022506 0.029521 ;
   end ShapeKey
-  ShapeKey ToungeLeft Sym toggle&T_Face
+  ShapeKey TongueLeft Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;
@@ -9807,7 +9807,7 @@
   sv 8144 6.10054e-05 -1.09999e-05 0 ;
   sv 8146 0.000247002 -3.09981e-05 0 ;
   end ShapeKey
-  ShapeKey ToungeRight Sym toggle&T_Face
+  ShapeKey TongueRight Sym toggle&T_Face
     interpolation 'KEY_CARDINAL' ;
     mute False ;
     slider_max 1 ;

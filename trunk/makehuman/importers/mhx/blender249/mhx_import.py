@@ -122,6 +122,7 @@ def readMhxFile(fileName):
 	level = 0
 	nErrors = 0
 
+	print "Opening MHX file "+ fileName
 	file= open(fileName, "rU")
 	print "Tokenizing"
 	lineNo = 0
@@ -188,7 +189,8 @@ def readMhxFile(fileName):
 	msg = "File "+fileName+" loaded"
 	if nErrors:
 		msg += " but there where %d errors. " % (nErrors)
-	Draw.PupMenu(msg)
+	print(msg)
+	#Draw.PupMenu(msg)
 	return	# readMhxFile
 
 #
@@ -704,7 +706,7 @@ def rot90(x, y, z, doRot):
 
 def parseMesh (args, tokens):
 	global todo
-	# print "parsing mesh %s" % (args[0])
+	print "parsing mesh %s" % (args[0])
 	editmode = Window.EditMode()   
 	if editmode: Window.EditMode(0)
 
@@ -763,6 +765,7 @@ def parseMesh (args, tokens):
 	ob = createObject(args[1], me)
 
 	mats = []
+	noShapes = True
 	for (key, val, sub) in tokens:
 		if key == 'v' or \
 			 key == 'e' or \
@@ -807,6 +810,7 @@ def parseMesh (args, tokens):
 			parseVertGroup(me, val, sub)
 		elif key == 'ShapeKey':
 			if doShape(val[0]):
+				noShapes = False
 				parseShapeKey(ob, me, val, sub)
 		elif key == 'ipo':
 			if toggleShape or toggleFace:
@@ -818,8 +822,28 @@ def parseMesh (args, tokens):
 			defaultKey(key, val, "me", globals(), locals())
 
 	me.materials = mats
+	if mainMesh and noShapes:
+		deleteDiamonds(me)
 
 	return me
+
+#
+#	deleteDiamonds(me):
+#	Unfortunately verts cannot be removed from a mesh with shape keys
+#
+
+def deleteDiamonds(me):
+	vnums = {}
+	for f in me.faces:		
+		if len(f.verts) < 4:
+			for v in f.verts:
+				vnums[v.index] = True
+	verts = list(vnums.keys())
+	verts.sort()
+	#print(verts)
+	me.verts.delete(verts)
+	return
+
 
 def doShape(name):
 	if (toggleShape or toggleFace) and (name == 'Basis'):
@@ -1467,7 +1491,6 @@ def main(filePath):
 	if ext != ".mhx":
 		Draw.PupMenu("Error: Not a mhx file: " + fileName)
 		return
-	print "Opening MHX file "+ fileName
 	readMhxFile(fileName)
 	done = 1
 
@@ -1492,6 +1515,7 @@ def clearScene(scn):
 	scn.makeCurrent()
 	Scene.Unlink(oldScn)
 	del oldScn
+
 	return scn
 
 #

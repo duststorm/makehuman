@@ -168,14 +168,14 @@ def ctrlMouthOpen():
 def ctrlTongueOut():
 	return factor*clamp(pbones['PJaw'].loc.x, -fullScale, 2*fullScale)
 
-def ctrlToungeUp():
-	return -factor*clamp(pbones['PTounge'].loc.z, -3*fullScale, 0)
+def ctrlTongueUp():
+	return -factor*clamp(pbones['PTongue'].loc.z, -3*fullScale, 0)
 
-def ctrlToungeLeft():
-	return factor*clamp(pbones['PTounge'].loc.x, 0, 2*fullScale)
+def ctrlTongueLeft():
+	return factor*clamp(pbones['PTongue'].loc.x, 0, 2*fullScale)
 
-def ctrlToungeRight():
-	return -factor*clamp(pbones['PTounge'].loc.x, -2*fullScale, 0)
+def ctrlTongueRight():
+	return -factor*clamp(pbones['PTongue'].loc.x, -2*fullScale, 0)
 
 #
 #	Mouth expressions

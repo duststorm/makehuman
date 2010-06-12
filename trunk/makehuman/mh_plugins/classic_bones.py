@@ -183,9 +183,9 @@ FaceJoints = [
 	('l-eye',			'j', 'l-eye'),
 	('r-eye',			'j', 'r-eye'),
 	('jaw-tip',			'v', 8162),
-	('tounge-tip',			'v', 8049),
-	('tounge-mid',			'v', 8103),
-	('tounge-root',			'v', 8099),
+	('tongue-tip',			'v', 8049),
+	('tongue-mid',			'v', 8103),
+	('tongue-root',			'v', 8099),
 	('l-upLid-v',			'v', 12630),
 	('l-loLid-v',			'v', 12594),
 	('r-upLid-v',			'v', 2442),
@@ -248,8 +248,8 @@ PanelJoints = [
 	('PMouth_R_tail',		'o', ('origin', [-0.5, -0.5, 0.3])),
 	('PMouth_L_head',		'o', ('origin', [0.5, -0.5, 0.0])),
 	('PMouth_L_tail',		'o', ('origin', [0.5, -0.5, 0.3])),
-	('PTounge_head',		'o', ('origin', [0.0, -1.0, 0.0])),
-	('PTounge_tail',		'o', ('origin', [0.0, -1.0, 0.3])),
+	('PTongue_head',		'o', ('origin', [0.0, -1.0, 0.0])),
+	('PTongue_tail',		'o', ('origin', [0.0, -1.0, 0.3])),
 	('PJaw_head',			'o', ('origin', [0.0, -1.1, 0.0])),
 	('PJaw_tail',			'o', ('origin', [0.0, -1.1, 0.3])),
 	('PArmIK_R_head',		'o', ('origin', [-1.1, 2.0, 0.0])),
@@ -441,8 +441,8 @@ ClassicHeadsTails = [
 FaceHeadsTails = [
 	#('Head-inv',			'head-end', 'mouth'),
 	('Jaw',				'mouth', 'jaw-tip'),
-	('ToungeBase',			'tounge-root', 'tounge-mid'),
-	('ToungeTip',			'tounge-mid', 'tounge-tip'),
+	('TongueBase',			'tongue-root', 'tongue-mid'),
+	('TongueTip',			'tongue-mid', 'tongue-tip'),
 	('Eye_R',			'l-eye', 'Eye_R_tail'),
 	('UpLid_R',			'l-eye', 'l-upLid'),
 	('LoLid_R',			'l-eye', 'l-loLid'),
@@ -475,7 +475,7 @@ PanelHeadsTails = [
 	('PLoLip_L',			'PLoLip_L_head', 'PLoLip_L_tail'),
 	('PMouth_R',			'PMouth_R_head', 'PMouth_R_tail'),
 	('PMouth_L',			'PMouth_L_head', 'PMouth_L_tail'),
-	('PTounge',			'PTounge_head', 'PTounge_tail'),
+	('PTongue',			'PTongue_head', 'PTongue_tail'),
 	('PJaw',			'PJaw_head', 'PJaw_tail'),
 	('PArmIK_R',			'PArmIK_R_head', 'PArmIK_R_tail'),
 	('PArmIK_L',			'PArmIK_L_head', 'PArmIK_L_tail'),
@@ -679,8 +679,8 @@ ClassicArmature = [
 FaceArmature = [
 	#('Head-inv',			-3.14159, 'Head', F_CON, L_HELP, (1,1,1) ),
 	('Jaw',				0.0, 'Head', F_DEF+F_WIR, L_MAIN+L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeBase',			0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('ToungeTip',			0.0, 'ToungeBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('TongueBase',			0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('TongueTip',			0.0, 'TongueBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
 	('Eye_R',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('Eye_L',			0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('UpLid_R',			0.279253, 'Head', F_DEF, L_DEF+L_HEAD, (1,1,1) ),
@@ -713,7 +713,7 @@ PanelArmature = [
 	('PLoLip_L',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PMouth_R',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PMouth_L',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PTounge',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PTongue',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PJaw',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PArmIK_R',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PArmIK_L',			-3.14159, 'PFace', 0, L_PANEL, (1,1,1) ),
@@ -1149,9 +1149,9 @@ def FaceWritePoses(fp):
 
 	addPoseBone(fp, 'Jaw', 'MHJaw', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'ToungeBase', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'TongueBase', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'ToungeTip', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'TongueTip', 'MHCircle025', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'UpLid_R', 'MHCircle01', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, [])
 
@@ -1220,7 +1220,7 @@ def PanelWritePoses(fp):
 
 	addPoseBone(fp, 'PMouth_L', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'PTounge', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'PTongue', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'PJaw', None, None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
