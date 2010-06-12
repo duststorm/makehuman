@@ -156,9 +156,8 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
 
     print 'time to build mesh: ', time.time() - time1
 
-    obj.updateIndexBuffer()
     obj.calcNormals()
-
+    obj.updateIndexBuffer()
 
 def wavefrontToData(path):
     """

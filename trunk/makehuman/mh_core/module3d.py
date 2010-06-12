@@ -1154,6 +1154,8 @@ class Scene3D:
     def attach(self, obj):
         if obj.object3d:
             return
+        if not obj.vertexBufferSize:
+            return
 
         self.assignSelectionID(obj)
 
@@ -1250,7 +1252,7 @@ class Scene3D:
         for obj in self.objects:
             self.attach(obj)
 
-        print 'Regeneration done in' + str(time.time() - a)
+        print 'Regeneration done in %f' % (time.time() - a)
 
     def reloadTextures(self):
         print 'Reloading textures'

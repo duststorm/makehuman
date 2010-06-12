@@ -129,9 +129,9 @@ class HairTaskView(gui3d.TaskView):
         
       #HACK: set hair color to default black 
       fg.setColor([0,0,0,255]) #rgba
-      obj.updateIndexBuffer()
       obj.calcNormals()
-      obj.shadeless = 1 
+      obj.shadeless = 1
+      obj.updateIndexBuffer()
       if update:
           scn.update()
       return obj

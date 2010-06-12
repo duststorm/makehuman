@@ -133,10 +133,10 @@ class MakeHairTaskView(gui3d.TaskView):
                 hair.loadStrands(obj,curve)
 
             fg.setColor([0,0,0,255]) #rgba
-            obj.updateIndexBuffer()
             obj.calcNormals()
             obj.shadeless = 1
             scn.selectedHuman.hairObj = obj
+            obj.updateIndexBuffer()
             scn.update()
             
         #see ADD website for details
