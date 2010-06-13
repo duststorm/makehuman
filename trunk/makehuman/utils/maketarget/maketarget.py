@@ -217,10 +217,6 @@ def doMorph(mFactor):
     
 def alignMasks():
     """
-    This function measure the similarity of 2 meshes.
-    Instead to have ray intersection to measure the surfaces differences,
-    we subdivide the mesh2, in order to in increase the density, and then
-    we use the vert to vert distance.
     """
 
     print "align"
@@ -241,8 +237,7 @@ def alignMasks():
     mask_mh = [[v.co[0],v.co[1],v.co[2]] for v in mask_mh_data.verts]
     scan = [[v.co[0],v.co[1],v.co[2]] for v in scan_data.verts]
     
-    aligned_verts = scan_fit.align_scan(mask_scan,mask_mh,scan)  
-    aligned_mask = scan_fit.align_scan(mask_scan,mask_mh,mask_scan)  
+    aligned_verts, aligned_mask = scan_fit.align_scan(mask_scan,mask_mh,scan)  
     
     for i,v in enumerate(aligned_verts):
         scan_data.verts[i].co[0] = v[0]
