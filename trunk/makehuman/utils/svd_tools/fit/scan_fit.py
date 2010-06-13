@@ -1,7 +1,38 @@
 from scipy.linalg import pinv,svd
 from scipy.spatial import KDTree
+from scipy.optimize import leastsq
 import numpy as np
 import os
+
+def rotX(angle):
+	cosa = np.cos(angle)
+	sina = np.sin(angle)
+	
+	return np.array(
+		[[ 1.0 ,   0.0 ,   0.0 ],
+		 [ 0.0 ,  cosa ,  sina ],
+		 [ 0.0 , -sina ,  cosa ]])
+
+def rotY(angle):
+	cosa = np.cos(angle)
+	sina = np.sin(angle)
+	
+	return np.array(
+		[[  cosa , 0.0  ,-sina ],
+		 [   0.0 , 1.0  ,  0.0 ],
+		 [  sina , 0.0  , cosa]])
+
+def rotZ(angle):
+	cosa = np.cos(angle)
+	sina = np.sin(angle)
+
+	return np.array(
+		[[  cosa , sina ,  0.0 ],
+		 [ -sina , cosa ,  0.0 ],
+		 [   0.0 ,  0.0 ,  1.0 ]])
+
+def rot(alpha,beta,gamma):
+	return np.dot(rotZ(gamma),np.dot(rotY(beta),rotZ(alpha)))
 
 def find_transform(mask_scan,mask_mh):
 	"""
@@ -23,55 +54,29 @@ def find_transform(mask_scan,mask_mh):
 			T : the translation
 			
 	"""
+	
 	mask_scan = np.array(mask_scan)
 	mask_mh = np.array(mask_mh)
 	
-	# compute barycenters
-	mscan = mask_scan.mean(0)
-	mmh = mask_mh.mean(0)
+	def loss(transform):
+		alpha,beta,gamma,scale,tx,ty,tz = transform
+		verts = apply_transform(scale,(alpha,beta,gamma),(tx,ty,tz),mask_scan)
+		return (mask_mh - verts).flatten()
 
-	# compute mean distance to barycenter
-	sscan = np.sqrt(((mask_scan - mscan)**2).sum(1)).mean()
-	smh =   np.sqrt(((mask_mh - mmh)**2).sum(1)).mean()
+	tr0 = [0.0,0.0,0.0,1.0,0.0,0.0,0.0]
+	res = leastsq(loss,tr0)[0]
+	alpha,beta,gamma,scale,tx,ty,tz = res
+	return scale,(alpha,beta,gamma),(tx,ty,tz)
 
-	scale = smh/sscan
 
-	# Put both meshes barycenter to origin
-
-	mask_scan -= mscan
-	mask_mh -= mmh
-	
-	# rescale  mask_scan
-	mask_scan *= scale
-
-	# find rotation matrix
-	# Let X be the vertices coordinates (one vertex per row) and we apply
-	# a rotation R :   X' = X*R^T
-	#              X^T*X' = X^T*X*R^T 
-    #      (X^T*X)*X.^T*X' = R^T
-    #                 R^T = X^+ * X'
-    # where X^+ stands for the pseudo invert of X'
-
-	R = np.dot(pinv(mask_scan),mask_mh).T
-    
-	# We want to have x' = scale * R * x +  T
-	# What we have is
-	#                 x' = scale * R * (x - c) + c'
-	# where c and c' are the barycenters of mask_scan
-	# and mask_mh respectively.
-	#                 x' = scale * R * x - scale*R*c + c'
-	# hence :         T = c' - scale * R * c
-	
-	T = mmh - scale * np.dot(mscan,R.T)
-	return scale,R,T
-
-def apply_transform(scale,R,T,points):
+def apply_transform(scale,R,T,vertices,center = None):
 	"""
 		Apply the transformation 
 		x' = scale*R*x + T
 		for each point in points (one point per row).
 	"""
-	return scale*np.dot(points,R.T) + T
+	mean = vertices.mean(0) if center is None  else center
+	return scale*np.dot(vertices-mean,rot(*R).T) + mean + T
 
 def align_scan(mask_scan,mask_mh,scan):
 	"""
@@ -81,7 +86,7 @@ def align_scan(mask_scan,mask_mh,scan):
 		with one 3d point per row
 	"""
 	scale,R,T = find_transform(mask_scan,mask_mh)
-	return apply_transform(scale,R,T,scan)
+	return apply_transform(scale,R,T,scan,center = mask_scan.mean(0)),apply_transform(scale,R,T,mask_scan)
 
 
 class TargetBase(object):
@@ -304,13 +309,13 @@ def fit_mask(head_mesh,head_mask,scan_mesh,scan_mask,base,rcond = 0.0, constrain
 	scan_v = scan_mesh[indx]
 	
 	target = scan_v - head_v
-	print target
 	if constrained :
-		return base.compute_combinaison_safe(target,rcond,regul = regul)
+		coefs = base.compute_combinaison_safe(target,rcond,regul = regul)
 	else :
-		return base.compute_combinaison(target,rcond)
+		coefs = base.compute_combinaison(target,rcond)
+	return coefs
 
-def fit_mesh(head_mesh,scan_mesh,base,tofit_verts,init_coefs = None,constrained = False,regul = None):
+def fit_mesh(head_mesh,scan_mesh,base,tofit_verts,init_coefs = None,constrained = False,regul = None,niter = 1):
 	if isinstance(tofit_verts,str):
 		tofit_verts = np.loadtxt(tofit_verts,'int')
 	if isinstance(base,str):
@@ -318,33 +323,38 @@ def fit_mesh(head_mesh,scan_mesh,base,tofit_verts,init_coefs = None,constrained 
 		
 	verts = base.vert_list
 	ntargs = len(base.targets)
-	
+
 	m = head_mesh.copy()
 	nverts = len(scan_mesh)
 	
-	kd = KDTree(scan_mesh)
-	dist,indx = kd.query(m[tofit_verts])
-	target = np.zeros((nverts,3))
-	target[tofit_verts] = scan_mesh[indx] - m[tofit_verts]
-	target = target[verts]
-
 	if init_coefs is not None :
 		init_target = base.combine_targets(init_coefs)
-		target -= init_target
 
-	if constrained :
-		coefs = base.compute_combinaison_safe(target,rcond,regul = regul)
-		proj = base.combine_targets(coefs)
-	else :
-		proj = base.project_target(target)
-	m[verts]+=proj
-	return m
+	m[verts]+=init_target
+	
+	kd = KDTree(scan_mesh)
+	
+	for iter in xrange(niter):
+		target = np.zeros((nverts,3))
+		dist,indx = kd.query(m[tofit_verts])
+		target[tofit_verts] = scan_mesh[indx] - m[tofit_verts]
+		target = target[verts]
+		if constrained :
+			coefs = base.compute_combinaison_safe(target,rcond,regul = regul)
+			proj = base.combine_targets(coefs)
+		else :
+			proj = base.project_target(target)
+		if niter > 1 : m[verts]+=(1./niter)*(niter)**(float(iter)/(niter-1)) * proj
+		else : m[verts]+= proj
+
+	return m-head_mesh
 
 def save_target(filename,target):
 	with open(filename,'w') as f :
 		for v,c in target.iteritems():
-			if np.abs(c).max()>=1e-6 :
-				f.write( "%i %s\n"%(v," ".join(["%0.6f"%cc for cc in c]) ) )		
+			if np.abs(c).max()>0 :
+				f.write( "%i %s\n"%(v," ".join(["%0.12e"%cc for cc in c]) ) )
+
 
 if __name__ == '__main__' :
 	import wavefront as wf
@@ -366,7 +376,7 @@ if __name__ == '__main__' :
 			output = sys.argv[7]
 
 		except IndexError :
-			print "usage : python scan_fit.py build target_dir  head_mesh head_mask scan_mesh scan_mask output_prefix"
+			print "usage : python scan_fit.py build target_dir  head_mesh head_mask output_prefix"
 			sys.exit(-1)
 
 		print "Read targets...",
@@ -380,12 +390,6 @@ if __name__ == '__main__' :
 		
 		head_mesh = wf.read_obj(head_mesh)
 		head_mask = wf.read_obj(head_mask)
-		scan_mask = wf.read_obj(scan_mask)
-		scan_mesh = wf.read_obj(scan_mesh)
-		scan_mesh.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
-		
-		kdmask = KDTree(scan_mesh.vertices)
-		dscan,iscan = kdmask.query(scan_mask.vertices)
 		
 		kdhead = KDTree(head_mesh.vertices)
 		dhead,ihead = kdhead.query(head_mask.vertices)
@@ -416,16 +420,19 @@ if __name__ == '__main__' :
 		scan_mask = wf.read_obj(scan_mask)
 		scan_mesh = wf.read_obj(scan_mesh)
 
-		scan_mesh.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
-		scan_mask.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mask.vertices)
+		scan_mesh.vertices,scan_mask.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
 		
-		coefs = fit_mask(head_mesh.vertices,head_mask.vertices,scan_mesh.vertices,scan_mask.vertices,prefix+"_mask",constrained = True)
+		base_mask = TargetBase(prefix = prefix+"_mask")
+		coefs = fit_mask(head_mesh.vertices,head_mask.vertices,scan_mesh.vertices,scan_mask.vertices,base_mask,constrained = True, regul = 0.005)
 
 		base = TargetBase(prefix = prefix)
-		target = fit_mesh(head_mesh.vertices,scan_mesh.vertices,base,fit_verts,init_coefs = coefs)
-		
-#		target = fine_fit(head_mesh,scan_mesh,prefix,fit_verts,1,alpha = 0.0,rcond = 0.0,constrained = True)
-		save_target(output,dict(zip(base.vert_list,target)))
 
+		target = fit_mesh(head_mesh.vertices,scan_mesh.vertices,base,fit_verts,init_coefs = coefs,niter = 1)
+		tmask = base_mask.combine_targets(coefs)
+
+		head_mesh.vertices+=target
+		head_mesh.save(output.replace(".target",".obj"))
+
+		save_target(output,dict(zip(base.vert_list,target[base.vert_list])))
 	else :
 		print "usage : python scan_fit.py build|project args"
