@@ -371,9 +371,7 @@ if __name__ == '__main__' :
 			target_dir = sys.argv[2]
 			head_mesh = sys.argv[3]
 			head_mask = sys.argv[4]
-			scan_mesh = sys.argv[5]
-			scan_mask = sys.argv[6]
-			output = sys.argv[7]
+			output = sys.argv[5]
 
 		except IndexError :
 			print "usage : python scan_fit.py build target_dir  head_mesh head_mask output_prefix"
