@@ -86,7 +86,7 @@ def align_scan(mask_scan,mask_mh,scan):
 		with one 3d point per row
 	"""
 	scale,R,T = find_transform(mask_scan,mask_mh)
-	return apply_transform(scale,R,T,scan,center = np.mean(mask_scan,0),apply_transform(scale,R,T,mask_scan)
+	return apply_transform(scale,R,T,scan,center = np.mean(mask_scan,0)),apply_transform(scale,R,T,mask_scan)
 
 
 class TargetBase(object):
