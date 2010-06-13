@@ -426,7 +426,6 @@ if __name__ == '__main__' :
 		base = TargetBase(prefix = prefix)
 
 		target = fit_mesh(head_mesh.vertices,scan_mesh.vertices,base,fit_verts,init_coefs = coefs,niter = 1)
-		tmask = base_mask.combine_targets(coefs)
 
 		head_mesh.vertices+=target
 		head_mesh.save(output.replace(".target",".obj"))
