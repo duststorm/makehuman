@@ -75,7 +75,7 @@ def apply_transform(scale,R,T,vertices,center = None):
 		x' = scale*R*x + T
 		for each point in points (one point per row).
 	"""
-	mean = vertices.mean(0) if center is None  else center
+	mean = np.mean(vertices,0) if center is None  else center
 	return scale*np.dot(vertices-mean,rot(*R).T) + mean + T
 
 def align_scan(mask_scan,mask_mh,scan):
