@@ -31,10 +31,21 @@ hand-crafted models.
 __docformat__ = 'restructuredtext'
 
 import sys
-sys.path.append("/home/manuel/archive/archive_makehuman/makehuman_src/utils/svd_tools/fit")
+sys.path.append("../")
+sys.path.append("../svd_tools/fit")
+sys.path.append("../../mh_core")
+sys.path.append("../topology_translator")
 
+import aljabr
+import scipy
+from scipy.spatial import KDTree
+import numpy as np
+
+import scan_fit
+import blenderalignjoints
+from topologylib import *
+import simpleoctree
 import Blender
-import math
 import time
 from blendersaveobj import *
 try:
@@ -45,20 +56,11 @@ except:
 from Blender.BGL import *
 from Blender import Draw
 from Blender import Window
-from Blender.Mathutils import *
 
-import scipy
-from scipy.spatial import KDTree
-import numpy as np
+basePath = 'base.obj'
+pairsPath = 'base.sym'
+centersPath = 'base.sym.centers'
 
-#import scan_fit
-import blenderalignjoints
-
-
-current_path = Blender.sys.dirname(Blender.Get('filename'))
-basePath = Blender.sys.join(current_path,'base.obj')
-pairsPath = Blender.sys.join(current_path,'base.sym')
-centersPath = Blender.sys.join(current_path,'base.sym.centers')
 morphFactor = Draw.Create(1.0)
 saveOnlySelectedVerts = Draw.Create(0)
 current_target = ""
@@ -66,110 +68,76 @@ loadFile = ""
 targetBuffer = [] #Last target loaded
 originalVerts = [] #Original base mesh coords
 
-try:
-    from topologylib import *
-    import simpleoctree
-except:
-    print "topology libs not found"
 
-
-#Some math stuff
-def vsub(vect1,vect2):
+#===========Blender Wrapper============#
+#A minimal wrapper to make the code more Blender 
+#independent, so we have to write only the GUI
+class BlenderVert:
     """
-    This utility function returns a list of 3 float values containing the
-    difference between two 3D vectors (vect1-vect2).
+    A simple wrapper for Blender vert.
+    We use it to make the code more Blender API independent
+    """
+    def __init__(self,x,y,z,s=0,i=0): 
+        self.co = [x,y,z]
+        self.sel = s
+        self.index = i
 
-    Parameters
-    ----------
-
-    vect1:
-        *list of floats*. A list of 3 floats containing the x, y and z
-        coordinates of a vector.
-
-    vect2:
-        *list of floats*. A list of 3 floats containing the x, y and z
-        coordinates of a vector.
+class BlenderObj:
 
     """
-    return [vect1[0]-vect2[0], vect1[1]-vect2[1], vect1[2]-vect2[2]]
-
-def vdist(vect1,vect2):
+    A simple wrapper for Blender mesh.
+    We use it to make the code more Blender API independent
     """
-    This utility function returns a single float value containing the
-    euclidean distance between two coordinate vectors (the length of
-    the line between them).
 
-    Parameters
-    ----------
-
-    vect1:
-        *list of floats*. A list of 3 floats containing the x, y and z
-        coordinates of a vector.
-
-    vect2:
-        *list of floats*. A list of 3 floats containing the x, y and z
-        coordinates of a vector.
-
-    """
-    joiningVect = vsub(vect1,vect2)
-    return vlen(joiningVect)
-
-def vlen(vect):
-    """
-    This utility function returns a single float value containing the length
-    of a vector [x,y,z].
-
-    Parameters
-    ----------
-
-    vect:
-        *list of floats*. A list of 3 floats containing the x, y and z
-        coordinates of a vector.
-
-    """
-    return math.sqrt(vdot(vect,vect))
-
-def vdot(vect1,vect2):
-
-    """
-    This utility function returns a single float value containing the dot
-    (scalar) product of two vectors.
-
-    Parameters
-    ----------
-
-    vect1:
-        *list of floats*. A list of 3 floats containing the x, y and z
-        coordinates of a vector.
-
-    vect2:
-        *list of floats*. A list of 3 floats containing the x, y and z
-        coordinates of a vector.
-
-    """
-    return vect1[0]*vect2[0] + vect1[1]*vect2[1] + vect1[2]*vect2[2]
-
-
-#Starting maketarget specific functions
-
+    def __init__(self, blenderObjName = None): 
+    
+        self.verts = []
+        self.name = blenderObjName
+        if blenderObjName:
+            self.blenderData = Blender.Object.Get(blenderObjName).getData(mesh=True)
+        else:
+            self.blenderData = Blender.Object.GetSelected()[0].getData(mesh=True)
+            print self.blenderData
+        self.vertsGroups = {}
+        for v in self.blenderData.verts:
+            vertex = BlenderVert(v.co[0],v.co[1],v.co[2],v.sel,v.index)
+            self.verts.append(vertex)  
+            
+        for gName in self.blenderData.getVertGroupNames():
+            self.vertsGroups[gName] = self.blenderData.getVertsFromGroup(gName)
+        self.VertGroupsNames = self.vertsGroups.keys()
+        
+    def update(self):
+        for v in self.verts:
+            self.blenderData.verts[v.index].co[0] = v.co[0]
+            self.blenderData.verts[v.index].co[1] = v.co[1]
+            self.blenderData.verts[v.index].co[2] = v.co[2]
+            self.blenderData.verts[v.index].sel = v.sel
+        self.blenderData.update()
+        self.blenderData.calcNormals()
+        Blender.Window.RedrawAll()
+        
+            
+            
+#=======================================
+        
+  
+  
+BaseMesh = BlenderObj("Base")
+            
 
 def findGroupName():
-    activeObjs = Blender.Object.GetSelected()
-    obj = activeObjs[0].getData(mesh=True)
-    vertsGroupsNames = obj.getVertGroupNames()
+    o = BlenderObj("Base")
     print "------"
     gNames = set()
-    for v in obj.verts:
+    for v in o.verts:
         if v.sel == 1:
-            for vertsGroupsName in vertsGroupsNames:
-                idxs = set(obj.getVertsFromGroup(vertsGroupsName))
+            for vertsGroupsName in o.VertGroupsNames:
+                idxs = set(o.vertsGroups[vertsGroupsName])
                 if v.index in idxs:
                     gNames.add(vertsGroupsName)
     for gName in gNames:
         print gName
-
-
-
 
 
 def doMorph(mFactor):
@@ -183,55 +151,27 @@ def doMorph(mFactor):
         *float*. Morphing factor.
 
     """
-    t1 = time.time()
-    global targetBuffer
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
-    activeObjs = Blender.Object.GetSelected()
-    activeObj = activeObjs[0]
-    obj = activeObj.getData(mesh=True)
+    global targetBuffer,BaseMesh   
+    o = BlenderObj()  
     for vData in targetBuffer:
         mainPointIndex = vData[0]
         pointX = vData[1]
         pointY = vData[2]
         pointZ = vData[3]
-        v = obj.verts[mainPointIndex]
+        v = o.verts[mainPointIndex]
         v.co[0] += pointX*mFactor
         v.co[1] += pointY*mFactor
         v.co[2] += pointZ*mFactor
-    obj.update()
-    #obj.calcNormals()
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
-    #print "Target time", time.time() - t1
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    o.update()   
     
     
 def alignMasks():
     """
     """
-
-    print "align"
-    
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
-    activeObjs = Blender.Object.GetSelected()
-    
-    mask_scan_obj = Blender.Object.Get("mask_scan")
-    mask_mh_obj = Blender.Object.Get("mask_mh")
-    scan_obj = Blender.Object.Get("scan")
-    
-    mask_scan_data = mask_scan_obj.getData(mesh=True)
-    mask_mh_data = mask_mh_obj.getData(mesh=True)
-    scan_data = scan_obj.getData(mesh=True)
+    global BaseMesh    
+    mask_scan_data = BlenderObj("mask_scan")
+    mask_mh_data = BlenderObj("mask_mh")
+    scan_data = BlenderObj("scan")
 
     mask_scan = [[v.co[0],v.co[1],v.co[2]] for v in mask_scan_data.verts]
     mask_mh = [[v.co[0],v.co[1],v.co[2]] for v in mask_mh_data.verts]
@@ -248,12 +188,11 @@ def alignMasks():
         mask_scan_data.verts[i].co[0] = v[0]
         mask_scan_data.verts[i].co[1] = v[1]
         mask_scan_data.verts[i].co[2] = v[2]
-        
+                
     scan_data.update()
     mask_scan_data.update()
     
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
+
     
     
     
@@ -347,88 +286,6 @@ def linkMask(filePath, subdivide = None):
     Blender.Window.RedrawAll()
 
 
-
-
-def linkMaskBug(filePath, subdivide = None):
-    """
-    This function measure the similarity of 2 meshes.
-    Instead to have ray intersection to measure the surfaces differences,
-    we subdivide the mesh2, in order to in increase the density, and then
-    we use the vert to vert distance.
-    """
-
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
-    activeObjs = Blender.Object.GetSelected()
-    activeObj1 = activeObjs[0]#The mask must be latest selected obj
-    activeObj2 = activeObjs[1]
-    obj1 = activeObj1.getData(mesh=True)
-    obj2 = activeObj2.getData(mesh=True)
-
-    vertsList1 = [[v.co[0],v.co[1],v.co[2],v.index] for v in obj1.verts]
-    vertsList2 = []
-    for v in obj2.verts:
-        if v.sel == 1:
-            vertsList2.append([v.co[0],v.co[1],v.co[2],v.index])
-
-    #vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts]
-    faces = [[v.index for v in f.verts] for f in obj2.faces]
-
-    if subdivide:
-        vertsList2toProcess = subdivideObj(faces, vertsList2, 2)[1]
-    vertsList2toProcess = vertsList2
-
-    indexList = xrange(len(vertsList1))
-
-    #We need to add index information to each vert.
-    #for i,v in enumerate(vertsList2toProcess):
-    #    v.append(i)
-
-    #Init of the octree
-    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)
-
-    #For each vert of new mesh we found the nearest verts of old one
-    linked = []
-    for i1 in indexList:
-        v1 = vertsList1[i1]
-
-        #We use octree to search only on a small part of the whole old mesh.
-        vertsList3 = octree.root.getSmallestChild(v1)
-
-        #... find nearest verts on old mesh
-        i2 = 0
-        dMin = 100
-        for v2 in vertsList3.verts:
-            d = vdist(v1, v2)
-            if d < dMin:
-                dMin = d
-                i2 = v2[3]
-                print dMin
-        linked.append([i1,i2])
-
-
-
-        print"Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
-
-
-    try:
-        fileDescriptor = open(filePath, "w")
-    except:
-        print "Unable to open %s",(filePath)
-        return  None
-
-    for data in linked:
-        fileDescriptor.write("%d %d\n" % (data[0],data[1]))
-    fileDescriptor.close()
-
-    for v in obj2.verts:
-        v.sel = 0
-    
-    for i in linked:
-       obj2.verts[i[1]].sel = 1 
-
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
 
 
 
@@ -923,11 +780,7 @@ def saveIndexSelectedVerts(filePath):
 
     """
 
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
-    activeObjs = Blender.Object.GetSelected()
-    activeObj = activeObjs[0]
-    obj = activeObj.getData(mesh=True)
+    o = BlenderObj("Base")
 
     try:
         fileDescriptor = open(filePath, "w")
@@ -936,13 +789,12 @@ def saveIndexSelectedVerts(filePath):
         return  None
 
     nVertsExported = 0
-    for index in xrange(len(obj.verts)):
-        if obj.verts[index].sel == 1:
+    for index in xrange(len(o.verts)):
+        if o.verts[index].sel == 1:
             fileDescriptor.write("%d\n"%(index))
     fileDescriptor.close()
 
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
+
 
 
 
@@ -1378,65 +1230,15 @@ def resetMesh():
     **Parameters:** This method has no parameters.
 
     """
-    activeObjs = Blender.Object.GetSelected()
-    activeObj = activeObjs[0]
-    actual_mesh = activeObj.getData(mesh=True)
-    global originalVerts
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
+    o = BlenderObj()
+    global originalVerts    
     for pointIndex, vCoords in enumerate(originalVerts):
-        actual_mesh.verts[pointIndex].co[0] = vCoords[0]
-        actual_mesh.verts[pointIndex].co[1] = vCoords[1]
-        actual_mesh.verts[pointIndex].co[2] = vCoords[2]
-    actual_mesh.update()
-    actual_mesh.calcNormals()
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
+        o.verts[pointIndex].co[0] = vCoords[0]
+        o.verts[pointIndex].co[1] = vCoords[1]
+        o.verts[pointIndex].co[2] = vCoords[2]
+    o.update()
 
-
-def absoluteToRelative(path):
-    """
-    It resave all targets in path from absolute (it mean
-    the targets are referred to base neutral mesh) from relative (it mean the
-    targets are referred to a different morph of base mesh). In example
-    the target female_young_nilotid is saved not from base mesh, but from
-    female_young. In other words, it's needed to apply female_young before apply
-    female_young_nilotid.
-
-    Parameters
-    ----------
-
-    path:
-      *path*.  Path of folder to examine.
-    """
-    activeObjs = Blender.Object.GetSelected()
-    activeObj = activeObjs[0]
-    data = activeObj.getData(mesh=True)
-    path = os.path.split(path)[0]
-
-    targetsFiles = os.listdir(path)
-    targetsNames = []
-    for targetFile in targetsFiles:
-        if targetFile != "base_female.target" and \
-            targetFile != "base_male.target":
-
-            #targetFile != "base_female_child.target" and \
-            #targetFile != "base_male_child.target" and \
-            #targetFile != "base_female_old.target" and \
-            #targetFile != "base_male_old.target":
-            fileName = os.path.splitext(targetFile)
-            targetName = fileName[0]
-            targetPath = os.path.join(path, targetFile)
-            if "female" in targetName:
-                absoluteTarget = os.path.join(path,"base_female.target")
-            else:
-                absoluteTarget = os.path.join(path,"base_male.target")
-            loadTranslationTarget(targetPath)
-            doMorph(1.0)
-            loadTranslationTarget(absoluteTarget)
-            doMorph(-1.0)
-            saveTranslationTarget(targetPath)#Note it overwrite
-            resetMesh()
+ 
 
 originalVerts = loadInitialBaseCoords(basePath)
 
@@ -1470,7 +1272,7 @@ def draw():
     Draw.Button("Align", 20, 10, 150, 50, 20, "Align scans")
 
     Draw.Button("Load", 2, 10, 100, 50, 20, "Load target")
-    Draw.Button("Morph", 3, 60, 100, 50, 20, "Morph "+current_target.replace(current_path,""))
+    Draw.Button("Morph", 3, 60, 100, 50, 20, "Morph ")
     Draw.Button("<=", 5, 110, 100, 30, 20, "Make left side symetrical to right side")
     Draw.Button("Reset", 10, 140, 100, 40, 20, "Return base object to its original state")
     Draw.Button("=>", 6, 180, 100, 30, 20, "Make right side symetrical to left side")
