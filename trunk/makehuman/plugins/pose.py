@@ -21,7 +21,7 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderZ = 0
         self.shoulderSamples = []
         
-        sData = os.listdir("data/targets/poseengine/female-young/right-shoulder")      
+        sData = os.listdir("data/targets/poseengine/female-young/right-shoulder/r-shoulder")      
         for dat in sData:
             if dat not in ("shoulder-girdle",".svn"):
                 d = dat.split('_')
@@ -88,7 +88,7 @@ class PoseTaskView(gui3d.TaskView):
         
     def applyShoulderTargets(self,angle):
 
-        dirpath = "data/targets/poseengine/female-young/right-shoulder"
+        dirpath = "data/targets/poseengine/female-young/right-shoulder/r-shoulder"
         closerSamples = {}
         for s in self.shoulderSamples:
             s1 = (s[0],s[1],s[2])
