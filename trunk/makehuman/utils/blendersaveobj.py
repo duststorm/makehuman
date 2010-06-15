@@ -131,4 +131,3 @@ def saveObj(path,prefix="no"):
     data.update()
 
 
-saveObj("base.obj")
