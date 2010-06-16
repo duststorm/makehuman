@@ -21,14 +21,14 @@ import os
 
 def seekGroupName(vertices, vertSelect, vertGroups):
 
-    #gNames = set()
-    #for i in vertSelect:
-        #for i2,vertsGroupsName in enumerate(vertGroupNames):
-                #idxs = set(vertGroups[i2]) #I use set of a quicker lookup
-                #if i in idxs:
-                    #gNames.add(vertsGroupsName)
-    #for gName in gNames:
-        #print gName
+    gNames = set()
+    for i in vertSelect:
+        for groupsName,groupIndices in vertGroups.items():
+                idxs = set(groupIndices) #I use set of a quicker lookup
+                if i in idxs:
+                    gNames.add(groupsName)
+    for gName in gNames:
+        print gName
 
 
 def applyTarget(vertices, targetBuffer, mFactor):
@@ -82,77 +82,6 @@ def alignMasks():
     mask_scan_data.update()
 
 
-def fitMesh(subdivide = None):
-    """
-    This function measure the similarity of 2 meshes.
-    Instead to have ray intersection to measure the surfaces differences,
-    we subdivide the mesh2, in order to in increase the density, and then
-    we use the vert to vert distance.
-    """
-
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
-    activeObjs = Blender.Object.GetSelected()
-    activeObj1 = activeObjs[0]#The base mesh must be latest selected
-    activeObj2 = activeObjs[1]
-    obj1 = activeObj1.getData(mesh=True)
-    obj2 = activeObj2.getData(mesh=True)
-
-
-    vertsList1 = []
-    for v in obj1.verts:
-        if v.sel == 1:
-            vertsList1.append([v.co[0],v.co[1],v.co[2],v.index])
-    vertsList2 = [[v.co[0],v.co[1],v.co[2],v.index] for v in obj2.verts]
-
-    #vertsList2 = [[v.co[0],v.co[1],v.co[2]] for v in obj2.verts]
-    faces = [[v.index for v in f.verts] for f in obj2.faces]
-
-    if subdivide:
-        vertsList2toProcess = subdivideObj(faces, vertsList2, 2)[1]
-    vertsList2toProcess = vertsList2
-
-
-
-    #We need to add index information to each vert.
-    #for i,v in enumerate(vertsList2toProcess):
-    #    v.append(i)
-
-    #Init of the octree
-    octree = simpleoctree.SimpleOctree(vertsList2toProcess, .25)
-
-    #For each vert of new mesh we found the nearest verts of old one
-    linked = []
-    for v1 in vertsList1:
-
-        i1 = v1[3]
-        #We use octree to search only on a small part of the whole old mesh.
-        vertsList3 = octree.root.getSmallestChild(v1)
-
-        #... find nearest verts on old mesh
-        i2 = 0
-        dMin = 100
-        for v2 in vertsList3.verts:
-            d = vdist(v1, v2)
-            if d < dMin:
-                dMin = d
-                i2 = v2[3]
-
-        linked.append([i1,i2])
-
-
-
-        print"Linking verts: %.2f%c."%((float(i1)/len(vertsList1))*100, "%")
-
-    for l in linked:
-        obj1.verts[l[0]].co[0] = obj2.verts[l[1]].co[0]
-        obj1.verts[l[0]].co[1] = obj2.verts[l[1]].co[1]
-        obj1.verts[l[0]].co[2] = obj2.verts[l[1]].co[2]
-
-    obj1.update()
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
-
 def loadTarget(targetPath):
     """
     This function loads a morph target file.
@@ -184,6 +113,8 @@ def loadTarget(targetPath):
             targetBuffer.append([mainPointIndex, pointX,pointY,pointZ])
     fileDescriptor.close()
     return targetBuffer
+
+    
 
 def saveTarget(vertices, targetPath, basePath, verticesTosave):
     """
@@ -219,10 +150,40 @@ def saveTarget(vertices, targetPath, basePath, verticesTosave):
     fileDescriptor.close()
 
     if nVertsExported == 0:
-        print "Warning%t|Zero verts exported in file "+targetPath
+        print "Warning: Zero verts exported in file %s"%(targetPath)
 
 
-def saveIndexSelectedVerts(filePath):
+
+def adaptMesh(vertices1, vertices2, vertices2Selected):
+    """
+    
+    """
+    vertsList1 = vertices1 
+    vertsList2 = []    
+    for i in vertices2Selected:
+        v = vertices2[i]       
+        vertsList2.append([v.co[0],v.co[1],v.co[2]])
+
+    #scipy code
+    #indx[i] = i2 mean vertsList2[i2] is the closest to vertsList1[i]
+    kd = KDTree(vertsList2)
+    dists,indx = kd.query(vertsList1)
+    
+    indx = [vertices2Selected[i] for i in indx]
+    #dist = np.array(dists).mean()
+
+    for i in xrange(len(indx)):
+    vertsList2[indx[i]][0] = vertsList1[i][0]
+    vertsList2[indx[i]][1] = vertsList1[i][1]
+    vertsList2[indx[i]][2] = vertsList1[i][2]
+
+
+
+
+
+
+
+def saveIndexSelectedVerts(selectVerts, path):
     """
     This function saves the indices of selected verts
 
@@ -235,18 +196,13 @@ def saveIndexSelectedVerts(filePath):
 
     """
 
-    o = BlenderObj("Base")
-
     try:
-        fileDescriptor = open(filePath, "w")
+        fileDescriptor = open(path, "w")
     except:
-        print "Unable to open %s",(filePath)
+        print "Unable to open %s",(path)
         return  None
-
-    nVertsExported = 0
-    for index in xrange(len(o.verts)):
-        if o.verts[index].sel == 1:
-            fileDescriptor.write("%d\n"%(index))
+    for v in selectVerts:
+        fileDescriptor.write("%d\n"%(v))
     fileDescriptor.close()
 
 
@@ -302,12 +258,8 @@ def processingTargets(filepath):
         if os.path.isfile(targetPath):
             print "Processing %s"%(targetPath)
             loadTarget(targetPath)
-
             applyTarget(1.0)
-
-            saveTranslationTarget(targetPath)
-
-
+            saveTarget(targetPath)
             applyTarget(-1.0)
 
 
