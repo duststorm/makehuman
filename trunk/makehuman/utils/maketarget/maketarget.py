@@ -27,6 +27,9 @@ hand-crafted models.
 
 __docformat__ = 'restructuredtext'
 
+import sys
+sys.path.append("./")
+
 import Blender
 import maketargetlib
 from Blender.BGL import *
@@ -55,29 +58,29 @@ def endEditing():
     Blender.Window.EditMode(windowEditMode)
     Blender.Window.RedrawAll()
 
-def getVertices():
-    obj = Blender.Object.GetSelected()[0].getData(mesh=True)
+def getVertices(n=0):
+    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     vertices = [[v.co[0],v.co[1],v.co[2]] for v in obj.verts]
     return vertices
 
-def getVertGroups():
+def getVertGroups(n=0):
     vertGroups = {}
-    obj = Blender.Object.GetSelected()[0].getData(mesh=True)
+    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     vertGroupNames = obj.getVertGroupNames()
     for n in vertGroupNames:
         vertGroups[n] = obj.getVertsFromGroup(n)
     return vertGroups
 
-def getSelectedVertices():
+def getSelectedVertices(n=0):
     selectedVertices = []
-    obj = Blender.Object.GetSelected()[0].getData(mesh=True)
+    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     for i,v in enumerate(obj.verts):
         if v.sel == 1:
             selectedVertices.append(i)
     return selectedVertices
 
-def updateVertices(vertices):
-    obj = Blender.Object.GetSelected()[0].getData(mesh=True)
+def updateVertices(vertices, n=0):
+    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     for i,v in enumerate(vertices):
        obj.verts[i].co[0], obj.verts[i].co[1],obj.verts[i].co[2] = v[0],v[1],v[2]
     obj.update()
@@ -85,7 +88,7 @@ def updateVertices(vertices):
 #-------MAKETARGET CALLBACKS----------------------
   
 def lTarget(path):
-    global targetBuffer     
+    global targetBuffer,loadedTarget     
     targetBuffer = maketargetlib.loadTarget(path)
     loadedTarget = path
 
@@ -121,7 +124,23 @@ def rMesh():
     maketargetlib.resetMesh(vertices, basePath)
     updateVertices(vertices)
     endEditing()
-
+    
+def symm(rightMirror):
+    global pairsPath, centersPath
+    startEditing() 
+    vertices = getVertices()
+    maketargetlib.symmetrise(vertices, pairsPath, centersPath, rightMirror)    
+    updateVertices(vertices)
+    endEditing()
+    
+def adapt():
+    startEditing()
+    vertices1 = getVertices(0)
+    vertices2 = getVertices(1)
+    verticesToAdapt = getSelectedVertices(1)
+    maketargetlib.adaptMesh(vertices1, vertices2, verticesToAdapt)
+    updateVertices(vertices,1)
+    endEditing()
 
 #-----------------BLENDER GUI------------------
 
@@ -191,7 +210,7 @@ def event(event, value):
     elif event == Draw.AKEY:
         Window.FileSelector (findCloserMesh, "Reconstruct")
     elif event == Draw.JKEY:
-        Window.FileSelector (utility6, "adjust foints")
+        adapt()
     elif event == Draw.KKEY:
         sGroupName()
 
@@ -216,9 +235,9 @@ def b_event(event):
     elif event == 3:
         aTarget(morphFactor.val)
     elif event == 5:
-        loadSymVertsIndex(0)
+        symm(0)
     elif event == 6:
-        loadSymVertsIndex(1)
+        symm(1)
     elif event == 10:
         rMesh()
     elif event == 20:

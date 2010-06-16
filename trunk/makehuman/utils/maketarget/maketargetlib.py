@@ -154,28 +154,30 @@ def saveTarget(vertices, targetPath, basePath, verticesTosave):
 
 
 
-def adaptMesh(vertices1, vertices2, vertices2Selected):
+def adaptMesh(vertices1, vertices2, verticesToAdapt):
     """
     
     """
+    
+    #TODO: to complete
     vertsList1 = vertices1 
     vertsList2 = []    
-    for i in vertices2Selected:
+    for i in verticesToAdapt:
         v = vertices2[i]       
-        vertsList2.append([v.co[0],v.co[1],v.co[2]])
+        vertsList2.append([v[0],v[1],v[2]])
 
     #scipy code
     #indx[i] = i2 mean vertsList2[i2] is the closest to vertsList1[i]
     kd = KDTree(vertsList2)
     dists,indx = kd.query(vertsList1)
     
-    indx = [vertices2Selected[i] for i in indx]
+    indx = [verticesToAdapt[i] for i in indx]
     #dist = np.array(dists).mean()
 
     for i in xrange(len(indx)):
-    vertsList2[indx[i]][0] = vertsList1[i][0]
-    vertsList2[indx[i]][1] = vertsList1[i][1]
-    vertsList2[indx[i]][2] = vertsList1[i][2]
+        vertsList2[indx[i]][0] = vertsList1[i][0]
+        vertsList2[indx[i]][1] = vertsList1[i][1]
+        vertsList2[indx[i]][2] = vertsList1[i][2]
 
 
 
@@ -367,7 +369,7 @@ def saveSymVertsIndices(filePath):
     file.close()
     data.update()
 
-def loadSymVertsIndex(right=1):
+def symmetrise(vertices, pairsPath, centersPath, rightMirror):
     """
     Make the mesh symmetrical by reflecting the existing vertices across
     to the left or right. By default this function reflects left to right.
@@ -381,29 +383,22 @@ def loadSymVertsIndex(right=1):
 
     """
 
-    global pairsPath
-    global centersPath
-    activeObjs = Blender.Object.GetSelected()
-    activeObj = activeObjs[0]
-    data = activeObj.getData(mesh=True)
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
     try:
         symmFile = open(pairsPath)
     except:
         print"File Sym not found"
         return 0
     for symmCouple in symmFile:
-        leftVert = data.verts[int(symmCouple.split(',')[0])]
-        rightVert = data.verts[int(symmCouple.split(',')[1])]
-        if right == 1:
-            rightVert.co[0] = -1*(leftVert.co[0])
-            rightVert.co[1] = leftVert.co[1]
-            rightVert.co[2] = leftVert.co[2]
+        leftVert = vertices[int(symmCouple.split(',')[0])]
+        rightVert = vertices[int(symmCouple.split(',')[1])]
+        if rightMirror == 1:
+            rightVert[0] = -1*(leftVert[0])
+            rightVert[1] = leftVert[1]
+            rightVert[2] = leftVert[2]
         else:
-            leftVert.co[0] = -1*(rightVert.co[0])
-            leftVert.co[1] = rightVert.co[1]
-            leftVert.co[2] = rightVert.co[2]
+            leftVert[0] = -1*(rightVert[0])
+            leftVert[1] = rightVert[1]
+            leftVert[2] = rightVert[2]
     symmFile.close()
 
     try:
@@ -412,11 +407,9 @@ def loadSymVertsIndex(right=1):
         print"File Sym not found"
         return 0
     for i in centerFile:
-        data.verts[int(i)].co[0] = 0.0
+        vertices[int(i)][0] = 0.0
     symmFile.close()
-    data.update()
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
+   
 
 
 def selectSymmetricVerts():
