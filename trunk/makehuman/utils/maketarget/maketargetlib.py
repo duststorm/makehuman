@@ -154,36 +154,17 @@ def saveTarget(vertices, targetPath, basePath, verticesTosave):
 
 
 
-def adaptMesh(vertices1, vertices2, verticesToAdapt):
+def adaptMesh(base, scan, verticesToAdapt):
     """
     
     """
-    
-    #TODO: to complete
-    vertsList1 = vertices1 
-    vertsList2 = []    
-    for i in verticesToAdapt:
-        v = vertices2[i]       
-        vertsList2.append([v[0],v[1],v[2]])
+    kd = KDTree(scan)
+    dists,neighbs = kd.query(np.array(base)[verticesToAdapt])
 
-    #scipy code
-    #indx[i] = i2 mean vertsList2[i2] is the closest to vertsList1[i]
-    kd = KDTree(vertsList2)
-    dists,indx = kd.query(vertsList1)
-    
-    indx = [verticesToAdapt[i] for i in indx]
-    #dist = np.array(dists).mean()
-
-    for i in xrange(len(indx)):
-        vertsList2[indx[i]][0] = vertsList1[i][0]
-        vertsList2[indx[i]][1] = vertsList1[i][1]
-        vertsList2[indx[i]][2] = vertsList1[i][2]
-
-
-
-
-
-
+    for iadapt,ineighb in zip(verticesToAdapt,neighbs):
+        base[iadapt][0] = scan[ineighb][0]
+        base[iadapt][1] = scan[ineighb][1]
+        base[iadapt][2] = scan[ineighb][2]
 
 def saveIndexSelectedVerts(selectVerts, path):
     """
