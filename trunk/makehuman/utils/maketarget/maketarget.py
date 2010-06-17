@@ -46,7 +46,7 @@ saveOnlySelectedVerts = Draw.Create(0)
 loadedTarget = ""
 targetBuffer = [] #Loaded target Data    
   
-#--------SOME BLENDER SPECIFICS SHORTCUT------------
+#--------SOME BLENDER SPECIFICS SHORTCUTS------------
 
 def startEditing():
     global windowEditMode
@@ -84,6 +84,7 @@ def updateVertices(vertices, n=0):
     for i,v in enumerate(vertices):
        obj.verts[i].co[0], obj.verts[i].co[1],obj.verts[i].co[2] = v[0],v[1],v[2]
     obj.update()
+    obj.calcNormals()
 
 #-------MAKETARGET CALLBACKS----------------------
   
@@ -135,12 +136,32 @@ def symm(rightMirror):
     
 def adapt():
     startEditing()
-    vertices1 = getVertices(0)
-    vertices2 = getVertices(1)
-    verticesToAdapt = getSelectedVertices(1)
-    maketargetlib.adaptMesh(vertices1, vertices2, verticesToAdapt)
-    updateVertices(vertices,1)
+    base = getVertices(0)
+    verticesToAdapt = getSelectedVertices(0)
+    scan = getVertices(1)    
+    maketargetlib.adaptMesh(base, scan, verticesToAdapt)
+    updateVertices(base,0)
     endEditing()
+
+def adapt():
+    startEditing()
+    base = getVertices(0)
+    verticesToAdapt = getSelectedVertices(0)
+    scan = getVertices(1)    
+    maketargetlib.adaptMesh(base, scan, verticesToAdapt)
+    updateVertices(base,0)
+    endEditing()
+
+def align():
+    startEditing()
+    maskBaseVerts = getVertices(0)
+    maskScanVerts = getVertices(1)
+    scanVerts = getVertices(2)    
+    maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
+    updateVertices(scanVerts,2)
+    updateVertices(maskScanVerts,1)
+    endEditing()        
+
 
 #-----------------BLENDER GUI------------------
 
@@ -241,6 +262,6 @@ def b_event(event):
     elif event == 10:
         rMesh()
     elif event == 20:
-        alignMasks()
+        align()
     Draw.Draw()
 Draw.Register(draw, event, b_event)

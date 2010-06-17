@@ -9,7 +9,7 @@ import aljabr
 import scipy
 from scipy.spatial import KDTree
 import numpy as np
-#import scan_fit
+import scan_fit
 import blenderalignjoints
 from topologylib import *
 import simpleoctree
@@ -53,33 +53,23 @@ def applyTarget(vertices, targetBuffer, mFactor):
         v[2] += vZ*mFactor
 
 
-
-def alignMasks():
+def alignScan(maskBaseVerts, maskScanVerts, scanVerts):
     """
     """
-    global BaseMesh
-    mask_scan_data = BlenderObj("mask_scan")
-    mask_mh_data = BlenderObj("mask_mh")
-    scan_data = BlenderObj("scan")
 
-    mask_scan = [[v.co[0],v.co[1],v.co[2]] for v in mask_scan_data.verts]
-    mask_mh = [[v.co[0],v.co[1],v.co[2]] for v in mask_mh_data.verts]
-    scan = [[v.co[0],v.co[1],v.co[2]] for v in scan_data.verts]
-
-    aligned_verts, aligned_mask = scan_fit.align_scan(mask_scan,mask_mh,scan)
+    aligned_verts, aligned_mask = scan_fit.align_scan(maskScanVerts,maskBaseVerts,scanVerts)
 
     for i,v in enumerate(aligned_verts):
-        scan_data.verts[i].co[0] = v[0]
-        scan_data.verts[i].co[1] = v[1]
-        scan_data.verts[i].co[2] = v[2]
+        scanVerts[i][0] = v[0]
+        scanVerts[i][1] = v[1]
+        scanVerts[i][2] = v[2]
 
     for i,v in enumerate(aligned_mask):
-        mask_scan_data.verts[i].co[0] = v[0]
-        mask_scan_data.verts[i].co[1] = v[1]
-        mask_scan_data.verts[i].co[2] = v[2]
+        maskScanVerts[i][0] = v[0]
+        maskScanVerts[i][1] = v[1]
+        maskScanVerts[i][2] = v[2]        
+      
 
-    scan_data.update()
-    mask_scan_data.update()
 
 
 def loadTarget(targetPath):
