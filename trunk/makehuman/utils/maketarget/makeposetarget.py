@@ -235,9 +235,10 @@ def saveRotTargets(targetFile):
 
 
 
-def scaleRot(targetRotPath1):    
+def scaleRot(targetRotPath1):
+    global morphFactor 
     targetRotPath2 = targetRotPath1+".scaled"
-    scaleFactor = 0.75
+    scaleFactor = morphFactor.val
     try:
         f = open(targetRotPath1)
         fileDescriptor = f.readlines()
@@ -259,7 +260,7 @@ def scaleRot(targetRotPath1):
         print "Error in opening %s" %targetRotPath2
         return 0
     #Write info about rotation: index of verts of rot axis
-    fileDescriptor.write("%i %i %s #Indices of axis verts and axis\n" % (rotAxe[0],\
+    fileDescriptor.write("%s %s %s #Indices of axis verts and axis\n" % (rotAxe[0],\
                                                                         rotAxe[1],\
                                                                         rotAxe[2]))
     for rData in rotData:
