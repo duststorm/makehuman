@@ -419,6 +419,7 @@ if __name__ == '__main__' :
 		scan_mesh = wf.read_obj(scan_mesh)
 
 		scan_mesh.vertices,scan_mask.vertices = align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
+        scan_mesh.save("aligned.obj")
 		
 		base_mask = TargetBase(prefix = prefix+"_mask")
 		coefs = fit_mask(head_mesh.vertices,head_mask.vertices,scan_mesh.vertices,scan_mask.vertices,base_mask,constrained = True, regul = 0.005)
