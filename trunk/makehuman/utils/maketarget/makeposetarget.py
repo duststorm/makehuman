@@ -233,6 +233,53 @@ def saveRotTargets(targetFile):
     fileDescriptor.close()
     return 1
 
+
+
+def scaleRot(targetRotPath1):    
+    targetRotPath2 = targetRotPath1+".scaled"
+    scaleFactor = 0.75
+    try:
+        f = open(targetRotPath1)
+        fileDescriptor = f.readlines()
+        f.close()
+    except:
+        Draw.PupMenu("Error opening target file: %s"%(targetRotPath))
+        return 0
+
+    rotAxe = fileDescriptor[0].split()
+    rotData = []
+    for stringData in fileDescriptor[1:]:
+        listData = stringData.split()
+        theta = float(listData[0])*scaleFactor
+        listData[0] = theta     
+        rotData.append(listData)
+    try:
+        fileDescriptor = open(targetRotPath2,'w')
+    except:
+        print "Error in opening %s" %targetRotPath2
+        return 0
+    #Write info about rotation: index of verts of rot axis
+    fileDescriptor.write("%i %i %s #Indices of axis verts and axis\n" % (rotAxe[0],\
+                                                                        rotAxe[1],\
+                                                                        rotAxe[2]))
+    for rData in rotData:
+        fileDescriptor.write("%f " % (rData[0]))
+        for vertIndex in rData[1:]:
+            fileDescriptor.write("%s " % (vertIndex))
+        fileDescriptor.write("\n")
+    fileDescriptor.close()
+    return 1
+
+
+
+
+
+
+
+
+
+
+
 def doScaleMorph(mFactor):
     global originalVerts,targetScalePath
     a = time.time()
@@ -409,6 +456,37 @@ def selectVertsbyIndex(Index):
     data.update()
 
 
+def selectAxisVertices():
+
+    global originalVerts,targetRotPath
+
+    obj = Mesh.Get("Base")
+
+    try:
+        f = open(targetRotPath)
+        fileDescriptor = f.readlines()
+        f.close()
+    except:
+        Draw.PupMenu("Error opening target file: %s"%(targetRotPath))
+        return 0
+
+
+    #Get info of axis from the first line of file
+    rotAxeInfo = fileDescriptor[0].split()
+
+    #Calculate the rotation axis vector
+    axisP1  = obj.verts[int(rotAxeInfo[0])]
+    axisP2  = obj.verts[int(rotAxeInfo[1])]
+
+    axisP1.sel = 1
+    axisP2.sel = 1
+
+    obj.update()
+
+
+
+
+
 def loadInitialBaseCoords(path):
     """
     Little utility function to load only the verts data from a wavefront obj file.
@@ -532,9 +610,12 @@ def event(event, value):
     elif event == Draw.SKEY:
         Window.FileSelector (loadScaleTarget, "Load scale data")
     elif event == Draw.VKEY:
-        selectVertsbyIndex(9120)
+        selectAxisVertices()
     elif event == Draw.LKEY:
         Window.FileSelector (MHloadRotationTarget2, "Load rot data")
+    elif event == Draw.KKEY:
+        Window.FileSelector (scaleRot, "Scale rot data")
+
 
 def b_event(event):
     global symmPath,selAxis
