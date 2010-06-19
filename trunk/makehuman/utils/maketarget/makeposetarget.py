@@ -596,7 +596,7 @@ def draw():
     Draw.Button("<=", 5, 110, 100, 30, 20, "Make left side symetrical to right side")
     Draw.Button("Fix", 10, 140, 100, 40, 20, "Return base object to its original state")
     Draw.Button("=>", 6, 180, 100, 30, 20, "Make right side symetrical to left side")
-    morphFactor = Draw.Number("Value: ", 0, 10, 80, 100, 20, morphFactor.val, -1, 1, "Insert the value to apply the target")
+    morphFactor = Draw.Number("Value: ", 0, 10, 80, 100, 20, morphFactor.val, -2, 2, "Insert the value to apply the target")
     Draw.Button("Save", 1, 110, 80, 100, 20, "Save target")
     scaleMode = Draw.Toggle("Scale Mode",0,10,60,200,20,scaleMode.val,"Load/save scale target instead rot target")
 

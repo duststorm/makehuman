@@ -78,6 +78,12 @@ def getSelectedVertices(n=0):
         if v.sel == 1:
             selectedVertices.append(i)
     return selectedVertices
+    
+def selectVert(i, n=0):
+    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
+    obj.verts[i].sel = 1
+    obj.update()
+    obj.calcNormals()
 
 def updateVertices(vertices, n=0):
     obj = Blender.Object.GetSelected()[n].getData(mesh=True)
@@ -143,15 +149,6 @@ def adapt():
     updateVertices(base,0)
     endEditing()
 
-def adapt():
-    startEditing()
-    base = getVertices(0)
-    verticesToAdapt = getSelectedVertices(0)
-    scan = getVertices(1)    
-    maketargetlib.adaptMesh(base, scan, verticesToAdapt)
-    updateVertices(base,0)
-    endEditing()
-
 def align():
     startEditing()
     maskBaseVerts = getVertices(0)
@@ -160,7 +157,18 @@ def align():
     maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
     updateVertices(scanVerts,2)
     updateVertices(maskScanVerts,1)
-    endEditing()        
+    endEditing()  
+    
+def saveSelVerts(path, n= 0):
+    maketargetlib.saveIndexSelectedVerts(getSelectedVertices(n), path)
+    
+def loadSelVerts(path, n= 0):
+    startEditing()
+    selVerts = maketargetlib.loadIndexSelectedVerts(path)
+    for i in selVerts:
+        selectVert(i)
+    endEditing()  
+    
 
 
 #-----------------BLENDER GUI------------------
@@ -212,28 +220,30 @@ def event(event, value):
 
     """
     if event == Draw.ESCKEY and not value: Draw.Exit()
-    elif event == Draw.SKEY:
-        Window.FileSelector (saveSymVertsIndices, "Save Symm data")
-    elif event == Draw.DKEY:
-        selectSymmetricVerts()
-    elif event == Draw.TKEY:
-        Window.FileSelector (saveTranslationTargetAndHisSymm, "Save Target")
-    elif event == Draw.LKEY:
-        Window.FileSelector (loadAllTargetInFolder, "Load from folder")
-    elif event == Draw.CKEY:
-        alignMasks()
-    elif event == Draw.HKEY:
-        Window.FileSelector (generateTargetsDB, "Generate DB from")
-    elif event == Draw.UKEY:
-        Window.FileSelector (linkMaskBug, "Link Mask")
-    elif event == Draw.PKEY:
-        Window.FileSelector (saveIndexSelectedVerts, "Save index of selected vertices")
     elif event == Draw.AKEY:
+        Window.FileSelector (saveSymVertsIndices, "Save Symm data")
+    elif event == Draw.BKEY:
+        selectSymmetricVerts()
+    elif event == Draw.CKEY:
+        Window.FileSelector (saveTranslationTargetAndHisSymm, "Save Target")
+    elif event == Draw.DKEY:
+        Window.FileSelector (loadAllTargetInFolder, "Load from folder")
+    elif event == Draw.EKEY:
+        alignMasks()
+    elif event == Draw.FKEY:
+        Window.FileSelector (generateTargetsDB, "Generate DB from")
+    elif event == Draw.GKEY:
+        Window.FileSelector (linkMaskBug, "Link Mask")
+    elif event == Draw.HKEY:
+        Window.FileSelector (saveSelVerts, "Save index of selected vertices")
+    elif event == Draw.IKEY:
         Window.FileSelector (findCloserMesh, "Reconstruct")
-    elif event == Draw.JKEY:
+    elif event == Draw.LKEY:
         adapt()
-    elif event == Draw.KKEY:
+    elif event == Draw.MKEY:
         sGroupName()
+    elif event == Draw.NKEY:
+        Window.FileSelector (loadSelVerts, "Load index of verts to select")
 
 def b_event(event):
     """
@@ -264,4 +274,5 @@ def b_event(event):
     elif event == 20:
         align()
     Draw.Draw()
+    
 Draw.Register(draw, event, b_event)

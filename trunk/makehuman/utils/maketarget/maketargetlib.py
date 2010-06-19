@@ -168,7 +168,6 @@ def saveIndexSelectedVerts(selectVerts, path):
         file to be written.
 
     """
-
     try:
         fileDescriptor = open(path, "w")
     except:
@@ -178,7 +177,31 @@ def saveIndexSelectedVerts(selectVerts, path):
         fileDescriptor.write("%d\n"%(v))
     fileDescriptor.close()
 
+def loadIndexSelectedVerts(path):
+    """
+    This function load the indices of selected verts
 
+    Parameters
+    ----------
+
+    filePath:
+        *string*. A string containing the operating system path to the
+        file to be written.
+
+    """
+    selectedIndices = []
+    try:
+        fileDescriptor = open(path)
+    except:
+        print "Unable to open %s",(path)
+        return  None
+    for vData in fileDescriptor:
+        i = int(vData.split()[0])
+        selectedIndices.append(i)
+    fileDescriptor.close()
+    return selectedIndices
+    
+    
 def saveTranslationTargetAndHisSymm(targetPath):
     """
     This function saves a morph target file and his symmetric.
