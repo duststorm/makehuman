@@ -91,6 +91,20 @@ def updateVertices(vertices, n=0):
        obj.verts[i].co[0], obj.verts[i].co[1],obj.verts[i].co[2] = v[0],v[1],v[2]
     obj.update()
     obj.calcNormals()
+    
+def colorVertices(vertColors, n=0):
+    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
+    obj.vertexColors = True
+    for f in obj.faces:
+        for i, v in enumerate(f):            
+            col = f.col[i]
+            col2 = vertColors[v.index]
+            print col2
+            col.r = col2[0]
+            col.g = col2[1]
+            col.b = col2[2]
+    obj.update()
+    obj.calcNormals()
 
 #-------MAKETARGET CALLBACKS----------------------
   
@@ -99,10 +113,10 @@ def lTarget(path):
     targetBuffer = maketargetlib.loadTarget(path)
     loadedTarget = path
 
-def aTarget(mFactor):
+def aTarget(mFactor, n= 0):
     global targetBuffer
     startEditing()
-    vertices = getVertices()
+    vertices = getVertices(n)
     maketargetlib.applyTarget(vertices, targetBuffer, mFactor)
     updateVertices(vertices)
     endEditing()
@@ -132,10 +146,10 @@ def rMesh():
     updateVertices(vertices)
     endEditing()
     
-def symm(rightMirror):
+def symm(rightMirror, n=0):
     global pairsPath, centersPath
     startEditing() 
-    vertices = getVertices()
+    vertices = getVertices(n)
     maketargetlib.symmetrise(vertices, pairsPath, centersPath, rightMirror)    
     updateVertices(vertices)
     endEditing()
@@ -150,6 +164,7 @@ def adapt():
     endEditing()
 
 def align():
+    #TODO for Alexis: this function doesn't work because an error in fit_mesh
     startEditing()
     maskBaseVerts = getVertices(0)
     maskScanVerts = getVertices(1)
@@ -168,6 +183,12 @@ def loadSelVerts(path, n= 0):
     for i in selVerts:
         selectVert(i)
     endEditing()  
+    
+def analyseTarget(n=0):
+    global targetBuffer
+    vertices = getVertices(n)
+    vertColors = maketargetlib.analyzeTarget(vertices, targetBuffer, 1)
+    colorVertices(vertColors, n=0)
     
 
 
@@ -244,6 +265,12 @@ def event(event, value):
         sGroupName()
     elif event == Draw.NKEY:
         Window.FileSelector (loadSelVerts, "Load index of verts to select")
+    elif event == Draw.OKEY:
+        analyseTarget()
+        
+        
+        
+        
 
 def b_event(event):
     """

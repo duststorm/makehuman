@@ -18,6 +18,27 @@ from blendersaveobj import *
 import os
 
 
+def analyzeTarget(vertices, targetBuffer, scale=0.5):
+
+    vertColors = [[0,0,0] for x in vertices]
+    lenMax = 0
+    for vect in targetBuffer:
+         lenght = vlen([vect[1],vect[2],vect[3]])
+         if  lenght > lenMax:
+             lenMax = lenght
+    for vect in targetBuffer:
+         lenght = vlen([vect[1],vect[2],vect[3]])
+         colorR = int(255*(lenght/lenMax))
+         colorG = 255-int(255*(lenght/(lenMax*scale)))
+         vertColors[vect[0]] = [colorR,colorG,0]
+    return vertColors
+         
+         
+             
+        
+   
+
+
 
 def seekGroupName(vertices, vertSelect, vertGroups):
 
