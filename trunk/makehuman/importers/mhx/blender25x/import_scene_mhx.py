@@ -2196,7 +2196,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	bl_space_type = "PROPERTIES"
 	bl_region_type = "WINDOW"
 
-	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
+	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
 	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
 
@@ -2230,8 +2230,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Bend = T_Bend if self.properties.bend else 0
 		toggle =  O_Mesh | O_Proxy | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX 
 
-		
-		readMhxFile(self.properties.path, 	
+		print("Load", self.properties.filepath)
+		readMhxFile(self.properties.filepath, 	
 			(self.properties.footRig, 
 			self.properties.fingerRig),
 			self.properties.scale)

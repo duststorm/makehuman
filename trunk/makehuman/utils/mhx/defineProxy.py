@@ -11,6 +11,14 @@ def printMverts(stuff, mverts):
 		if v:
 			print(stuff, v.index, dist)
 
+def selectVert(vn, ob):
+	bpy.context.scene.objects.active = ob
+	bpy.ops.object.mode_set(mode='EDIT')
+	bpy.ops.mesh.select_all(action='DESELECT')
+	bpy.ops.object.mode_set(mode='OBJECT')
+	ob.data.verts[vn].selected = True
+	return	
+
 def findProxy(log):
 	bob = bpy.data.objects['Human']
 	pob = bpy.data.objects['Proxy']
@@ -22,7 +30,12 @@ def findProxy(log):
 		try:
 			pindex = pv.groups[0].group
 		except:
-			raise NameError("Proxy vert %d not member of any group" % pv.index)
+			pindex = -1
+		if pindex < 0:
+			vn = pv.index
+			selectVert(vn, pob)
+			raise NameError("Proxy vert %d not member of any group" % vn)
+
 		name = pob.vertex_groups[pindex].name
 		bindex = None
 		for bvg in bob.vertex_groups:
