@@ -629,7 +629,7 @@ def axisAngleToQuaternion(axis, angle):
     qz = axis[2] * s
     qw = cos(angle/2.0)
     return (qx, qy, qz, qw)
-    
+	
 #Note: Quaternions have to of normalized form
 # Quaternions are of the form (x,y,z,w) 
 def quaternionToMatrix(q):
