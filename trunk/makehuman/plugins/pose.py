@@ -21,7 +21,9 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderZ = 0
         self.shoulderSamples = []
         self.trasl = {}
-        self.rot = {}       
+        self.rotx = {}   
+        self.roty = {}  
+        self.rotz = {}      
            
 
                     
@@ -47,6 +49,11 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderZLabel.setText('0')
         
         self.resetPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Reset", position=[50, 240, 9.5])
+        self.testPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Test", position=[50, 260, 9.5])
+        
+        @self.testPoseButton.event
+        def onClicked(event):
+            self.testShoulder()         
 
         @self.resetPoseButton.event
         def onClicked(event):
@@ -114,7 +121,7 @@ class PoseTaskView(gui3d.TaskView):
         IAR2 = self.calcIAR(angle, nearestSample2)
         factor1 = IAS1* IAR1
         factor2 = IAS2* IAR2
-        print "DEBUG",nearestSample2,nearestSample1
+        print "DEBUG",nearestSample2,nearestSample1,factor1,factor2
         if factor1 > 1 or factor2 >1:
             print "WARNING. Angle %f,%f,%f is impossible for human shoulder"% (angle[0],angle[1],angle[2])        
         return (nearestSample1,nearestSample2,factor1,factor2)
@@ -132,6 +139,9 @@ class PoseTaskView(gui3d.TaskView):
         path1 = os.path.join(shoulderDir,target1)
         path2 = os.path.join(shoulderDir,target2)
         print "-------"
+        print "DEBUG2"
+        print path1
+        print path2
         self.storeTargetsFromFolder(path1,morphVal1)
         self.storeTargetsFromFolder(path2,morphVal2)  
  
@@ -156,15 +166,45 @@ class PoseTaskView(gui3d.TaskView):
         for targetPath in traslations:
             self.trasl[targetPath] = morphFactor
         for targetPath in rotations:
-            self.rot[targetPath] = morphFactor  
+            f = open(targetPath)
+            fileDescriptor = f.readlines()
+            f.close()
+            rotAxeInfo = fileDescriptor[0].split()
+            axis = rotAxeInfo[2]
+            if axis =="X":
+                 self.rotx[targetPath] = morphFactor  
+            if axis =="Y":
+                 self.roty[targetPath] = morphFactor  
+            if axis =="Z":
+                 self.rotz[targetPath] = morphFactor  
+            
+           
              
                 
- 
+    def testShoulder(self):
+        self.shoulderX = 0       
+        self.shoulderY = -140 
+        self.shoulderZ = -120
+        for i in range(190):
+            self.shoulderY += 1
+            for i in range(210):
+                self.shoulderZ += 1
+                self.shoulderXslider.setValue(0.0)
+                self.shoulderYslider.setValue(self.shoulderY)
+                self.shoulderZslider.setValue(self.shoulderZ)
+                self.shoulderXLabel.setText('0')
+                self.shoulderYLabel.setText(str(self.shoulderY))        
+                self.shoulderZLabel.setText(str(self.shoulderZ))
+                self.applyPose()  
+                self.app.scene3d.redraw()
             
         
     #maybe this should be moved in human class
     def applyPose(self):
-        self.rot = {}
+        self.rotx = {}
+        self.roty = {}
+        self.rotz = {}
+        
         self.trasl = {}
         
         self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
@@ -172,17 +212,39 @@ class PoseTaskView(gui3d.TaskView):
         angle = (self.shoulderX,self.shoulderY,self.shoulderZ)
         self.applyShoulderTargets(angle)
         
-        rotPaths = self.rot.keys()
+        rotPathsX = self.rotx.keys()
+        rotPathsY = self.roty.keys()
+        rotPathsZ = self.rotz.keys()
         traslPaths = self.trasl.keys()
         
-        rotPaths.sort()
+        rotPathsX.sort()
+        rotPathsY.sort()
+        rotPathsZ.sort()
         traslPaths.sort()
+        
+        print "DEBUGROT X"
+        for a in rotPathsX:
+            print a,self.rotx[a]
+        print "DEBUGROT Y"
+        for a in rotPathsY:
+            print a,self.roty[a]
+        print "DEBUGROT Z"
+        for a in rotPathsZ:
+            print a,self.rotz[a]
+        
+        
         
         for targetPath in traslPaths:
             morphFactor = self.trasl[targetPath]
             algos3d.loadTranslationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor, None, 1, 0)
-        for targetPath in rotPaths:
-            morphFactor = self.rot[targetPath]
+        for targetPath in rotPathsX:
+            morphFactor = self.rotx[targetPath]
+            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)  
+        for targetPath in rotPathsY:
+            morphFactor = self.roty[targetPath]
+            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)  
+        for targetPath in rotPathsZ:
+            morphFactor = self.rotz[targetPath]
             algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)  
         
         self.app.scene3d.selectedHuman.meshData.calcNormals(facesToUpdate=[f for f in self.app.scene3d.selectedHuman.meshData.faces])
