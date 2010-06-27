@@ -121,7 +121,7 @@ class PoseTaskView(gui3d.TaskView):
         IAR2 = self.calcIAR(angle, nearestSample2)
         factor1 = IAS1* IAR1
         factor2 = IAS2* IAR2
-        print "DEBUG",nearestSample2,nearestSample1,factor1,factor2
+        
         if factor1 > 1 or factor2 >1:
             print "WARNING. Angle %f,%f,%f is impossible for human shoulder"% (angle[0],angle[1],angle[2])        
         return (nearestSample1,nearestSample2,factor1,factor2)
@@ -140,15 +140,15 @@ class PoseTaskView(gui3d.TaskView):
         path2 = os.path.join(shoulderDir,target2)
         print "-------"
         print "DEBUG2"
-        print path1
-        print path2
+        print path1,morphVal1
+        print path2,morphVal2
         self.storeTargetsFromFolder(path1,morphVal1)
         self.storeTargetsFromFolder(path2,morphVal2)  
  
         
         
     def storeTargetsFromFolder(self,path,morphFactor):
-        print path,morphFactor
+        
         targets = os.listdir(path)        
         traslations = []
         rotations = []
@@ -184,10 +184,11 @@ class PoseTaskView(gui3d.TaskView):
     def testShoulder(self):
         self.shoulderX = 0       
         self.shoulderY = -140 
-        self.shoulderZ = -120
+        
         for i in range(190):
             self.shoulderY += 1
-            for i in range(210):
+            self.shoulderZ = -120
+            for i2 in range(210):
                 self.shoulderZ += 1
                 self.shoulderXslider.setValue(0.0)
                 self.shoulderYslider.setValue(self.shoulderY)
@@ -196,7 +197,7 @@ class PoseTaskView(gui3d.TaskView):
                 self.shoulderYLabel.setText(str(self.shoulderY))        
                 self.shoulderZLabel.setText(str(self.shoulderZ))
                 self.applyPose()  
-                self.app.scene3d.redraw()
+                self.app.scene3d.redraw(0)
             
         
     #maybe this should be moved in human class
