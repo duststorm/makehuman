@@ -29,6 +29,7 @@ __docformat__ = 'restructuredtext'
 
 import sys
 sys.path.append("./")
+import os
 
 import Blender
 import maketargetlib
@@ -43,7 +44,9 @@ windowEditMode = Blender.Window.EditMode()
 
 morphFactor = Draw.Create(1.0)
 saveOnlySelectedVerts = Draw.Create(0)
-loadedTarget = ""
+rotationMode = Draw.Create(0)
+loadedTraslTarget = ""
+loadedRotTarget = ""
 targetBuffer = [] #Loaded target Data    
   
 #--------SOME BLENDER SPECIFICS SHORTCUTS------------
@@ -107,19 +110,33 @@ def colorVertices(vertColors, n=0):
     obj.calcNormals()
 
 #-------MAKETARGET CALLBACKS----------------------
-  
-def lTarget(path):
-    global targetBuffer,loadedTarget     
-    targetBuffer = maketargetlib.loadTarget(path)
-    loadedTarget = path
 
-def aTarget(mFactor, n= 0):
-    global targetBuffer
+def lTarget(path):
+    global loadedTraslTarget,rotationMode,loadedRotTarget
+    startEditing()    
+    if os.path.splitext(path)[1] == ".rot":
+        loadedRotTarget = path
+        rotationMode.val = 1
+    else:
+        loadedTraslTarget = path
+        rotationMode.val = 0
+    endEditing()
+
+
+
+  
+def aTarget(mFactor, n=0):
+    global loadedTraslTarget,rotationMode,loadedRotTarget
     startEditing()
     vertices = getVertices(n)
-    maketargetlib.applyTarget(vertices, targetBuffer, mFactor)
+    if rotationMode.val:
+        maketargetlib.loadRotTarget(vertices,loadedRotTarget,mFactor)
+    else:
+        maketargetlib.loadTarget(vertices,loadedTraslTarget,mFactor)
     updateVertices(vertices)
     endEditing()
+
+
 
 def sTarget(path):
     global saveOnlySelectedVerts,basePath
@@ -129,7 +146,12 @@ def sTarget(path):
         verticesTosave = getSelectedVertices()
     else:
         verticesTosave = xrange(len(vertices))
-    maketargetlib.saveTarget(vertices, path, basePath, verticesTosave)
+    if os.path.splitext(path)[1] == ".rot":
+        print os.path.splitext(path)[1], "SAVING ROT"
+        maketargetlib.saveRotTargets(vertices, path, basePath,getSelectedVertices())
+    else:
+        maketargetlib.saveTarget(vertices, path, basePath, verticesTosave)
+    
 
 def sGroupName():
     vertGroups = []
@@ -189,6 +211,9 @@ def analyseTarget(n=0):
     vertices = getVertices(n)
     vertColors = maketargetlib.analyzeTarget(vertices, targetBuffer, 1)
     colorVertices(vertColors, n=0)
+
+
+    
     
 
 
@@ -202,7 +227,7 @@ def draw():
     **Parameters:** This method has no parameters.
 
     """
-    global targetPath,morphFactor,rotVal,rotSum,current_target,selAxis
+    global targetPath,morphFactor,rotVal,rotSum,current_target,selAxis,rotationMode
     global saveOnlySelectedVerts
 
     glClearColor(0.5, 0.5, 0.5, 0.0)
@@ -214,7 +239,7 @@ def draw():
     
     glRasterPos2i(10, 120)
 
-    Draw.Button("Align", 20, 10, 150, 50, 20, "Align scans")
+    #Draw.Button("Align", 20, 10, 150, 50, 20, "Align scans")
 
     Draw.Button("Load", 2, 10, 100, 50, 20, "Load target")
     Draw.Button("Morph", 3, 60, 100, 50, 20, "Morph ")
@@ -224,6 +249,7 @@ def draw():
     morphFactor = Draw.Number("Value: ", 0, 10, 80, 100, 20, morphFactor.val, -1, 1, "Insert the value to apply the target")
     Draw.Button("Save", 1, 110, 80, 100, 20, "Save target")
     saveOnlySelectedVerts = Draw.Toggle("Save only selected verts",0,10,60,200,20,saveOnlySelectedVerts.val,"The target will affect only the selected verts")
+    rotationMode = Draw.Toggle("Rotations",0,10,40,200,20,rotationMode.val,"Work with rotation targets")
 
 
 def event(event, value):
@@ -287,7 +313,7 @@ def b_event(event):
     global current_target
     if event == 0: pass
     elif event == 1:
-        Window.FileSelector (sTarget, "Save Target",loadedTarget)
+        Window.FileSelector (sTarget, "Save Target",loadedTraslTarget)
     elif event == 2:
         Window.FileSelector (lTarget, "Load Target")
     elif event == 3:

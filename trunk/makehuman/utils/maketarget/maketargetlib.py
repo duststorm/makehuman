@@ -16,6 +16,7 @@ import simpleoctree
 import time
 from blendersaveobj import *
 import os
+from math import *
 
 
 def analyzeTarget(vertices, targetBuffer, scale=0.5):
@@ -34,8 +35,64 @@ def analyzeTarget(vertices, targetBuffer, scale=0.5):
     return vertColors
          
          
-             
+
+def axisID(axisVect):
+    #TODO comments
+    if fabs(axisVect[0]) > fabs(axisVect[1]) and fabs(axisVect[0]) > fabs(axisVect[2]):
+        return "X"
+    if fabs(axisVect[1]) > fabs(axisVect[0]) and fabs(axisVect[1]) > fabs(axisVect[2]):
+        return "Y"
+    if fabs(axisVect[2]) > fabs(axisVect[0]) and fabs(axisVect[2]) > fabs(axisVect[1]):
+        return "Z"
         
+def loadRotTarget(vertices,targetRotPath,mFactor):   
+
+    
+    try:
+        f = open(targetRotPath)
+        fileDescriptor = f.readlines()
+        f.close()
+    except:
+        print "Error opening target file: %s"%(targetRotPath)
+        return 0
+
+
+    #Get info of axis from the first line of file
+    rotAxeInfo = fileDescriptor[0].split()
+
+    #Calculate the rotation axis vector
+    axisP1  = vertices[int(rotAxeInfo[0])]
+    axisP2  = vertices[int(rotAxeInfo[1])]
+    axis = rotAxeInfo[2]
+
+    indicesToUpdate = []
+
+    v1= [axisP1[0],axisP1[1],axisP1[2]]
+    v2= [axisP2[0],axisP2[1],axisP2[2]]
+    actualRotCenter = centroid([v1,v2])
+
+    for stringData in fileDescriptor[1:]:
+        listData = stringData.split()
+        theta = float(listData[0])
+        theta = theta*mFactor
+
+        if axis == "X":
+            Rmtx = makeRotEulerMtx3D(theta,0,0)
+        if axis == "Y":
+            Rmtx = makeRotEulerMtx3D(0,theta,0)
+        if axis == "Z":
+            Rmtx = makeRotEulerMtx3D(0,0,theta)
+
+        for pIndex in listData[1:]:
+            pointIndex = int(pIndex)
+            indicesToUpdate.append(pointIndex)
+            pointToRotate = [vertices[pointIndex][0],vertices[pointIndex][1],vertices[pointIndex][2]]
+            pointRotated = rotatePoint(actualRotCenter,pointToRotate,Rmtx)
+
+            vertices[pointIndex][0] = pointRotated[0]
+            vertices[pointIndex][1] = pointRotated[1]
+            vertices[pointIndex][2] = pointRotated[2]
+    return 1        
    
 
 
@@ -52,26 +109,42 @@ def seekGroupName(vertices, vertSelect, vertGroups):
         print gName
 
 
-def applyTarget(vertices, targetBuffer, mFactor):
+
+
+def loadTarget(vertices,targetPath,mFactor):
     """
-    This function applies the currently loaded morph target to the base mesh.
+    This function loads a morph target file.
 
     Parameters
     ----------
 
-    mFactor:
-        *float*. Morphing factor.
+    targetPath:
+        *string*. A string containing the operating system path to the
+        file to be read.
 
     """
-    for vData in targetBuffer:
-        vIndex = vData[0]
-        vX = vData[1]
-        vY = vData[2]
-        vZ = vData[3]
-        v = vertices[vIndex]
-        v[0] += vX*mFactor
-        v[1] += vY*mFactor
-        v[2] += vZ*mFactor
+    try:
+        fileDescriptor = open(targetPath)
+    except:
+        print"Unable to open %s",(targetPath)
+        return  None
+
+    current_target = targetPath
+    targetBuffer = []
+    for vData in fileDescriptor:
+        vectorData = vData.split()
+        if vectorData[0].find('#')==-1:
+            vIndex = int(vectorData[0])
+            vX = float(vectorData[1])
+            vY = float(vectorData[2])
+            vZ = float(vectorData[3]) 
+            v = vertices[vIndex]
+            v[0] += vX*mFactor
+            v[1] += vY*mFactor
+            v[2] += vZ*mFactor
+    fileDescriptor.close()
+  
+
 
 
 def alignScan(maskBaseVerts, maskScanVerts, scanVerts):
@@ -88,42 +161,7 @@ def alignScan(maskBaseVerts, maskScanVerts, scanVerts):
     for i,v in enumerate(aligned_mask):
         maskScanVerts[i][0] = v[0]
         maskScanVerts[i][1] = v[1]
-        maskScanVerts[i][2] = v[2]        
-      
-
-
-
-def loadTarget(targetPath):
-    """
-    This function loads a morph target file.
-
-    Parameters
-    ----------
-
-    targetPath:
-        *string*. A string containing the operating system path to the
-        file to be read.
-
-    """
-    targetBuffer = []
-    try:
-        fileDescriptor = open(targetPath)
-    except:
-        print"Unable to open %s",(targetPath)
-        return  None
-
-    current_target = targetPath
-    targetBuffer = []
-    for vData in fileDescriptor:
-        vectorData = vData.split()
-        if vectorData[0].find('#')==-1:
-            mainPointIndex = int(vectorData[0])
-            pointX = float(vectorData[1])
-            pointY = float(vectorData[2])
-            pointZ = float(vectorData[3])
-            targetBuffer.append([mainPointIndex, pointX,pointY,pointZ])
-    fileDescriptor.close()
-    return targetBuffer
+        maskScanVerts[i][2] = v[2] 
 
     
 
@@ -162,6 +200,137 @@ def saveTarget(vertices, targetPath, basePath, verticesTosave):
 
     if nVertsExported == 0:
         print "Warning: Zero verts exported in file %s"%(targetPath)
+
+
+
+def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
+
+    epsilon = 0.00001
+    originalVertices = loadVertices(basePath)    
+    rotData = {}
+
+
+    #Rotation axis is caluclated using 2 selected verts
+    if len(vertsSelected) == 2:
+        axisVertsIdx1 = vertsSelected[0]
+        axisVertsIdx2 = vertsSelected[1]
+    else:
+        
+        print"You must select only 2 verts to define the rotation axis"
+        return 0
+
+
+    axeVerts = [originalVertices[axisVertsIdx1],originalVertices[axisVertsIdx2]]
+    originalRotCenter = centroid(axeVerts)
+
+    
+    rotAxe = axisID(vsub(originalVertices[axisVertsIdx1],originalVertices[axisVertsIdx2]))
+
+    print "ROTAXE",rotAxe
+
+    for index, vert in enumerate(vertices):
+        sourceVertex = originalVertices[index]
+        targetVertex = [vertices[0],vertices[1],vertices[2]]
+
+        if  vdist(sourceVertex,targetVertex) > epsilon:
+            pointIndex = index
+
+            pointX = targetVertex[0]
+            pointY = targetVertex[1]
+            pointZ = targetVertex[2]
+            if rotAxe == "X":
+                originalRotCenter=[0,originalRotCenter[1],originalRotCenter[2]]
+                targetPoint = [0,pointY,pointZ]
+                basePoint = [0,originalVertices[pointIndex][1],originalVertices[pointIndex][2]]
+            elif rotAxe == "Y":
+                originalRotCenter=[originalRotCenter[0],0,originalRotCenter[2]]
+                targetPoint = [pointX,0,pointZ]
+                basePoint = [originalVertices[pointIndex][0],0,originalVertices[pointIndex][2]]
+            elif rotAxe == "Z":
+                originalRotCenter=[originalRotCenter[0],originalRotCenter[1],0]
+                targetPoint = [pointX,pointY,0]
+                basePoint = [originalVertices[pointIndex][0],originalVertices[pointIndex][1],0]
+
+            V1 = vsub(basePoint,originalRotCenter)
+            V2 = vsub(targetPoint,originalRotCenter)
+            v1 = vlen(V1)
+            v2 = vlen(V2)
+
+            if v1 != 0 and v2 != 0:
+                #This method return some artifacts when
+                #the distance between rotation center and
+                #point is near to zero. For this reason
+                #I've added a correction factor, that reduce
+                #to zero the transformations near the rotation
+                #point
+                if v1 > 0.25:
+                    correctionFactor = 1
+                else:
+                    correctionFactor = v1/0.25#ODO try to not reduce completely to 0
+
+                #Some trigonometry stuff to get the rotation angle
+                cos_theta = (vdot(V1,V2)/(v1*v2))
+                if cos_theta < -1: cos_theta = -1
+                if cos_theta > 1: cos_theta = 1
+                theta = acos(cos_theta)
+
+                #As polar coords, we need angle and a distance.
+                #in our case, we use a scale factor to indicate
+
+                scaleFactor = v2/v1
+
+                #This is just a test to check the sign of rotation
+                if rotAxe == "X":
+                    Rmtx1 = makeRotEulerMtx3D(theta,0,0)
+                    Rmtx2 = makeRotEulerMtx3D(-theta,0,0)
+                if rotAxe == "Y":
+                    Rmtx1 = makeRotEulerMtx3D(0,theta,0)
+                    Rmtx2 = makeRotEulerMtx3D(0,-theta,0)
+                if rotAxe == "Z":
+                    Rmtx1 = makeRotEulerMtx3D(0,0,theta)
+                    Rmtx2 = makeRotEulerMtx3D(0,0,-theta)
+                pointToRotate = originalVertices[index]
+                actualPoint = [pointX,pointY,pointZ]
+                rotatedP1_1 = rotatePoint(originalRotCenter,pointToRotate,Rmtx1)
+                rotatedP1_2 = rotatePoint(originalRotCenter,pointToRotate,Rmtx2)
+                testVect1 = vsub(actualPoint,rotatedP1_1)
+                testVect2 = vsub(actualPoint,rotatedP1_2)
+                if vlen(testVect1) < vlen(testVect2):
+                    Rmtx =  Rmtx1
+                else:
+                    Rmtx =  Rmtx2
+                    theta = -theta
+
+                #Round the results, and apply correction factor
+                k = round(theta,2)#*correctionFactor
+
+
+                #Store the results
+                if rotData.has_key(k):
+                    rotData[k].append(pointIndex)
+                else:
+                    rotData[k] = [pointIndex]
+
+            else:
+                print "Problem calculating theta: v1,v2 =",v1,v2
+
+    try:
+        fileDescriptor = open(targetFile,'w+')
+    except:
+        print "Error in opening %s" %targetFile
+        return 0
+    #Write info about rotation: index of verts of rot axis
+    fileDescriptor.write("%i %i %s #Indices of axis verts and axis\n" % (axisVertsIdx1,axisVertsIdx2,rotAxe))
+    for angl, vertIndices in rotData.iteritems():
+        fileDescriptor.write("%f " % (angl))
+        for vertIndex in vertIndices:
+            fileDescriptor.write("%i " % (vertIndex))
+        fileDescriptor.write("\n")
+    fileDescriptor.close()
+    return 1
+
+
+
 
 
 
