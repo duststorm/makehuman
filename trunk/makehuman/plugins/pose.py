@@ -180,8 +180,9 @@ class PoseTaskView(gui3d.TaskView):
         if os.path.isdir(path):
             targets = os.listdir(path) 
             for t in targets:
-                tpath = os.path.join(path,t) 
-                rotations.append(tpath)
+                if "svn" not in t:
+                    tpath = os.path.join(path,t) 
+                    rotations.append(tpath)
         else:
             tpath = path+".target"
             traslations.append(tpath)        
@@ -209,14 +210,14 @@ class PoseTaskView(gui3d.TaskView):
              
                 
     def testShoulder(self):
-        self.shoulderX = 0       
-        self.shoulderY = -140 
+        self.shoulderX = 0 
         
-        for i in range(190):
-            self.shoulderY += 1
-            self.shoulderZ = -120
-            for i2 in range(210):
-                self.shoulderZ += 1
+        
+        for i in range(-140,45,10):
+            self.shoulderY = i
+            
+            for i2 in range(-120,90,10):
+                self.shoulderZ = i2
                 self.shoulderXslider.setValue(0.0)
                 self.shoulderYslider.setValue(self.shoulderY)
                 self.shoulderZslider.setValue(self.shoulderZ)
@@ -263,7 +264,7 @@ class PoseTaskView(gui3d.TaskView):
 
         if saveData == True:
 
-            outFilePath = "%s_%s_%s.data"%(self.shoulderX,self.shoulderY,self.shoulderZ)
+            outFilePath = "%s_%s_%s.pose"%(self.shoulderX,self.shoulderY,self.shoulderZ)
             
             fDescriptor = open(outFilePath, 'w')
             print "SAVED IN ", outFilePath
