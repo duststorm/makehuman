@@ -45,8 +45,10 @@ windowEditMode = Blender.Window.EditMode()
 morphFactor = Draw.Create(1.0)
 saveOnlySelectedVerts = Draw.Create(0)
 rotationMode = Draw.Create(0)
-loadedTraslTarget = ""
+poseMode = False
+loadedTrasloadTarget = ""
 loadedRotTarget = ""
+loadedPoseTarget = ""
 targetBuffer = [] #Loaded target Data    
   
 #--------SOME BLENDER SPECIFICS SHORTCUTS------------
@@ -111,34 +113,36 @@ def colorVertices(vertColors, n=0):
 
 #-------MAKETARGET CALLBACKS----------------------
 
-def lTarget(path):
-    global loadedTraslTarget,rotationMode,loadedRotTarget
+def loadTarget(path):
+    global loadedTrasloadTarget,rotationMode,loadedRotTarget,loadedPoseTarget    
     startEditing()    
     if os.path.splitext(path)[1] == ".rot":
         loadedRotTarget = path
         rotationMode.val = 1
-    else:
-        loadedTraslTarget = path
+        poseMode = False
+    if os.path.splitext(path)[1] == ".target":
+        loadedTrasloadTarget = path
         rotationMode.val = 0
+        poseMode = False
+    if os.path.splitext(path)[1] == ".pose":
+        loadedPoseTarget = path
+        poseMode = True    
     endEditing()
-
-
-
   
-def aTarget(mFactor, n=0):
-    global loadedTraslTarget,rotationMode,loadedRotTarget
+def applyTarget(mFactor, n=0):
+    global loadedTrasloadTarget,rotationMode,loadedRotTarget,loadedPoseTarget
     startEditing()
     vertices = getVertices(n)
     if rotationMode.val:
         maketargetlib.loadRotTarget(vertices,loadedRotTarget,mFactor)
     else:
-        maketargetlib.loadTarget(vertices,loadedTraslTarget,mFactor)
+        maketargetlib.loadTraslTarget(vertices,loadedTrasloadTarget,mFactor)
+    if poseMode:
+        maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor)
     updateVertices(vertices)
     endEditing()
 
-
-
-def sTarget(path):
+def saveTarget(path):
     global saveOnlySelectedVerts,basePath
     verticesTosave = []    
     vertices = getVertices()   
@@ -150,17 +154,16 @@ def sTarget(path):
         print os.path.splitext(path)[1], "SAVING ROT"
         maketargetlib.saveRotTargets(vertices, path, basePath,getSelectedVertices())
     else:
-        maketargetlib.saveTarget(vertices, path, basePath, verticesTosave)
-    
+        maketargetlib.saveTrasloadTarget(vertices, path, basePath, verticesTosave)    
 
-def sGroupName():
+def seekGroup():
     vertGroups = []
     vertSelect = getSelectedVertices()   
     vertices = getVertices()
     vertGroups  = getVertGroups()    
     maketargetlib.seekGroupName(vertices, vertSelect, vertGroups)
     
-def rMesh():
+def reset():
     global basePath
     startEditing()    
     vertices = getVertices()
@@ -234,22 +237,22 @@ def draw():
     glClear(GL_COLOR_BUFFER_BIT)
 
     glColor3f(0.0, 0.0, 0.0)
-    glRasterPos2i(10, 150)
-    Draw.Text("Make MH targets v3.0")
+    glRasterPos2i(10, 250)
+    Draw.Text("Make MH targets v3.1")
     
     glRasterPos2i(10, 120)
 
     #Draw.Button("Align", 20, 10, 150, 50, 20, "Align scans")
 
-    Draw.Button("Load", 2, 10, 100, 50, 20, "Load target")
-    Draw.Button("Morph", 3, 60, 100, 50, 20, "Morph ")
-    Draw.Button("<=", 5, 110, 100, 30, 20, "Make left side symetrical to right side")
-    Draw.Button("Reset", 10, 140, 100, 40, 20, "Return base object to its original state")
-    Draw.Button("=>", 6, 180, 100, 30, 20, "Make right side symetrical to left side")
-    morphFactor = Draw.Number("Value: ", 0, 10, 80, 100, 20, morphFactor.val, -1, 1, "Insert the value to apply the target")
-    Draw.Button("Save", 1, 110, 80, 100, 20, "Save target")
-    saveOnlySelectedVerts = Draw.Toggle("Save only selected verts",0,10,60,200,20,saveOnlySelectedVerts.val,"The target will affect only the selected verts")
-    rotationMode = Draw.Toggle("Rotations",0,10,40,200,20,rotationMode.val,"Work with rotation targets")
+    Draw.Button("Load", 2, 10, 200, 50, 20, "Load target")
+    Draw.Button("Morph", 3, 60, 200, 50, 20, "Morph ")
+    Draw.Button("<=", 5, 110, 200, 30, 20, "Make left side symetrical to right side")
+    Draw.Button("Reset", 10, 140, 200, 40, 20, "Return base object to its original state")
+    Draw.Button("=>", 6, 180, 200, 30, 20, "Make right side symetrical to left side")
+    morphFactor = Draw.Number("Value: ", 0, 10, 180, 100, 20, morphFactor.val, -2, 2, "Insert the value to apply the target")
+    Draw.Button("Save", 1, 110, 180, 100, 20, "Save target")
+    saveOnlySelectedVerts = Draw.Toggle("Save only selected verts",0,10,160,200,20,saveOnlySelectedVerts.val,"The target will affect only the selected verts")
+    rotationMode = Draw.Toggle("Rotations",0,10,140,200,20,rotationMode.val,"Work with rotation targets")
 
 
 def event(event, value):
@@ -274,7 +277,7 @@ def event(event, value):
     elif event == Draw.CKEY:
         Window.FileSelector (saveTranslationTargetAndHisSymm, "Save Target")
     elif event == Draw.DKEY:
-        Window.FileSelector (loadAllTargetInFolder, "Load from folder")
+        Window.FileSelector (loadAlloadTargetInFolder, "Load from folder")
     elif event == Draw.EKEY:
         alignMasks()
     elif event == Draw.FKEY:
@@ -284,18 +287,19 @@ def event(event, value):
     elif event == Draw.HKEY:
         Window.FileSelector (saveSelVerts, "Save index of selected vertices")
     elif event == Draw.IKEY:
-        Window.FileSelector (findCloserMesh, "Reconstruct")
+        Window.FileSelector (findClosereset, "Reconstruct")
     elif event == Draw.LKEY:
         adapt()
     elif event == Draw.MKEY:
-        sGroupName()
+        seekGroup()
     elif event == Draw.NKEY:
         Window.FileSelector (loadSelVerts, "Load index of verts to select")
     elif event == Draw.OKEY:
         analyseTarget()
+
         
         
-        
+  
         
 
 def b_event(event):
@@ -313,17 +317,17 @@ def b_event(event):
     global current_target
     if event == 0: pass
     elif event == 1:
-        Window.FileSelector (sTarget, "Save Target",loadedTraslTarget)
+        Window.FileSelector (saveTarget, "Save Target",loadedTrasloadTarget)
     elif event == 2:
-        Window.FileSelector (lTarget, "Load Target")
+        Window.FileSelector (loadTarget, "Load Target")
     elif event == 3:
-        aTarget(morphFactor.val)
+        applyTarget(morphFactor.val)
     elif event == 5:
         symm(0)
     elif event == 6:
         symm(1)
     elif event == 10:
-        rMesh()
+        reset()
     elif event == 20:
         align()
     Draw.Draw()

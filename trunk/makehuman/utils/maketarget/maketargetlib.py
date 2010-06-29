@@ -45,8 +45,7 @@ def axisID(axisVect):
     if fabs(axisVect[2]) > fabs(axisVect[0]) and fabs(axisVect[2]) > fabs(axisVect[1]):
         return "Z"
         
-def loadRotTarget(vertices,targetRotPath,mFactor):   
-
+def loadRotTarget(vertices,targetRotPath,mFactor):
     
     try:
         f = open(targetRotPath)
@@ -64,9 +63,7 @@ def loadRotTarget(vertices,targetRotPath,mFactor):
     axisP1  = vertices[int(rotAxeInfo[0])]
     axisP2  = vertices[int(rotAxeInfo[1])]
     axis = rotAxeInfo[2]
-
     indicesToUpdate = []
-
     v1= [axisP1[0],axisP1[1],axisP1[2]]
     v2= [axisP2[0],axisP2[1],axisP2[2]]
     actualRotCenter = centroid([v1,v2])
@@ -88,11 +85,10 @@ def loadRotTarget(vertices,targetRotPath,mFactor):
             indicesToUpdate.append(pointIndex)
             pointToRotate = [vertices[pointIndex][0],vertices[pointIndex][1],vertices[pointIndex][2]]
             pointRotated = rotatePoint(actualRotCenter,pointToRotate,Rmtx)
-
             vertices[pointIndex][0] = pointRotated[0]
             vertices[pointIndex][1] = pointRotated[1]
             vertices[pointIndex][2] = pointRotated[2]
-    return 1        
+        
    
 
 
@@ -111,7 +107,7 @@ def seekGroupName(vertices, vertSelect, vertGroups):
 
 
 
-def loadTarget(vertices,targetPath,mFactor):
+def loadTraslTarget(vertices,targetPath,mFactor):
     """
     This function loads a morph target file.
 
@@ -165,7 +161,7 @@ def alignScan(maskBaseVerts, maskScanVerts, scanVerts):
 
     
 
-def saveTarget(vertices, targetPath, basePath, verticesTosave):
+def saveTraslTarget(vertices, targetPath, basePath, verticesTosave):
     """
     This function saves a morph target file containing the difference between
     the *originalVerts* positions and the actual vertex coordinates.
@@ -209,7 +205,6 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
     originalVertices = loadVertices(basePath)    
     rotData = {}
 
-
     #Rotation axis is caluclated using 2 selected verts
     if len(vertsSelected) == 2:
         axisVertsIdx1 = vertsSelected[0]
@@ -219,11 +214,8 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
         print"You must select only 2 verts to define the rotation axis"
         return 0
 
-
     axeVerts = [originalVertices[axisVertsIdx1],originalVertices[axisVertsIdx2]]
-    originalRotCenter = centroid(axeVerts)
-
-    
+    originalRotCenter = centroid(axeVerts)    
     rotAxe = axisID(vsub(originalVertices[axisVertsIdx1],originalVertices[axisVertsIdx2]))
 
     print "ROTAXE",rotAxe
@@ -234,7 +226,6 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
 
         if  vdist(sourceVertex,targetVertex) > epsilon:
             pointIndex = index
-
             pointX = targetVertex[0]
             pointY = targetVertex[1]
             pointZ = targetVertex[2]
@@ -300,17 +291,13 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
                 else:
                     Rmtx =  Rmtx2
                     theta = -theta
-
                 #Round the results, and apply correction factor
                 k = round(theta,2)#*correctionFactor
-
-
                 #Store the results
                 if rotData.has_key(k):
                     rotData[k].append(pointIndex)
                 else:
                     rotData[k] = [pointIndex]
-
             else:
                 print "Problem calculating theta: v1,v2 =",v1,v2
 
@@ -330,10 +317,6 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
     return 1
 
 
-
-
-
-
 def adaptMesh(base, scan, verticesToAdapt):
     """
     
@@ -345,6 +328,31 @@ def adaptMesh(base, scan, verticesToAdapt):
         base[iadapt][0] = scan[ineighb][0]
         base[iadapt][1] = scan[ineighb][1]
         base[iadapt][2] = scan[ineighb][2]
+        
+
+def loadPoseFromFile(vertices,filePath,scale = 1):
+    fileDescriptor = open(filePath)
+    poseData = fileDescriptor.readlines()
+    fileDescriptor.close()
+    if scale < 0:
+        poseData.reverse()
+    for data in poseData:
+        targetdata = data.split()
+        fileName = os.path.basename(targetdata[0])
+        mFactor = float(os.path.basename(targetdata[1]))
+        
+        mFactor = scale*mFactor
+        ext = os.path.splitext(fileName)[1]        
+        if ext == ".rot":
+            #It assume script is called from makehuman/utils/maketarget
+            targetRotPath = os.path.join("../../",targetdata[0])            
+            loadRotTarget(vertices,targetRotPath,mFactor)
+            #print targetPath,mFactor
+        if ext == ".target":
+            targetPath = os.path.join("../../",targetdata[0]) 
+            loadTraslTarget(vertices,targetPath,mFactor)            
+            print targetPath,mFactor
+
 
 def saveIndexSelectedVerts(selectVerts, path):
     """
@@ -409,7 +417,7 @@ def saveTranslationTargetAndHisSymm(targetPath):
 
     saveTranslationTarget(targetPath)
     loadSymVertsIndex(1)
-    loadTarget(targetPath)
+    loadTraslTarget(targetPath)
     pathParts = os.path.split(targetPath)
     headPath = pathParts[0]
     tailPath = pathParts[1]
@@ -419,15 +427,7 @@ def saveTranslationTargetAndHisSymm(targetPath):
     saveTranslationTarget(targetPath)
     resetMesh()
 
-def loadAllTargetInFolder(filepath):
-    #Because Blender filechooser return a file
-    #it's needed to extract the dirname
-    folderToScan = os.path.dirname(filepath)
-    targetList = os.listdir(folderToScan)
-    for targetName in targetList:
-        targetPath = os.path.join(folderToScan,targetName)
-        loadTarget(targetPath)
-        applyTarget(0.5)
+
 
 def processingTargets(filepath):
     """
@@ -443,9 +443,9 @@ def processingTargets(filepath):
         targetPath = os.path.join(folderToScan,targetName)
         if os.path.isfile(targetPath):
             print "Processing %s"%(targetPath)
-            loadTarget(targetPath)
+            loadTraslTarget(targetPath)
             applyTarget(1.0)
-            saveTarget(targetPath)
+            saveTraslTarget(targetPath)
             applyTarget(-1.0)
 
 
