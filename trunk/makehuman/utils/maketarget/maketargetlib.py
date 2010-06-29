@@ -330,8 +330,8 @@ def adaptMesh(base, scan, verticesToAdapt):
         base[iadapt][2] = scan[ineighb][2]
         
 
-def loadPoseFromFile(vertices,filePath,scale = 1,onlyRot = False):
-    fileDescriptor = open(filePath)
+def loadPoseFromFile(vertices,path,scale = 1,onlyRot = False):
+    fileDescriptor = open(path)
     poseData = fileDescriptor.readlines()
     fileDescriptor.close()
     if scale < 0:
@@ -352,6 +352,40 @@ def loadPoseFromFile(vertices,filePath,scale = 1,onlyRot = False):
             targetPath = os.path.join("../../",targetdata[0]) 
             loadTraslTarget(vertices,targetPath,mFactor)            
             print targetPath,mFactor
+
+def saveScaledRotTarget(path,scaleFactor):
+    
+    path2 = path+".scaled"    
+    try:
+        f = open(path)
+        fileDescriptor = f.readlines()
+        f.close()
+    except:
+        print "Error opening target file: %s"%(path)
+        return 0
+
+    rotAxe = fileDescriptor[0].split()
+    rotData = []
+    for stringData in fileDescriptor[1:]:
+        listData = stringData.split()
+        theta = float(listData[0])*scaleFactor
+        listData[0] = theta     
+        rotData.append(listData)
+    try:
+        fileDescriptor = open(path2,'w')
+    except:
+        print "Error in opening %s" %path2
+        return 0
+    #Write info about rotation: index of verts of rot axis
+    fileDescriptor.write("%s %s %s #Indices of axis verts and axis\n" % (rotAxe[0],\
+                                                                        rotAxe[1],\
+                                                                        rotAxe[2]))
+    for rData in rotData:
+        fileDescriptor.write("%f " % (rData[0]))
+        for vertIndex in rData[1:]:
+            fileDescriptor.write("%s " % (vertIndex))
+        fileDescriptor.write("\n")
+    fileDescriptor.close()    
 
 
 def saveIndexSelectedVerts(selectVerts, path):

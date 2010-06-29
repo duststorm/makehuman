@@ -179,6 +179,10 @@ def symm(rightMirror, n=0):
     maketargetlib.symmetrise(vertices, pairsPath, centersPath, rightMirror)    
     updateVertices(vertices)
     endEditing()
+
+def scaleRotTarget(path):
+    global morphFactor
+    maketargetlib.saveScaledRotTarget(path,morphFactor.val)
     
 def adapt():
     startEditing()
@@ -297,6 +301,8 @@ def event(event, value):
         Window.FileSelector (loadSelVerts, "Load index of verts to select")
     elif event == Draw.OKEY:
         analyseTarget()
+    elif event == Draw.PKEY:
+        Window.FileSelector (scaleRotTarget, "Scale Rot target")       
 
         
         
