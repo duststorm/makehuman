@@ -330,7 +330,7 @@ def adaptMesh(base, scan, verticesToAdapt):
         base[iadapt][2] = scan[ineighb][2]
         
 
-def loadPoseFromFile(vertices,filePath,scale = 1):
+def loadPoseFromFile(vertices,filePath,scale = 1,onlyRot = False):
     fileDescriptor = open(filePath)
     poseData = fileDescriptor.readlines()
     fileDescriptor.close()
@@ -348,7 +348,7 @@ def loadPoseFromFile(vertices,filePath,scale = 1):
             targetRotPath = os.path.join("../../",targetdata[0])            
             loadRotTarget(vertices,targetRotPath,mFactor)
             #print targetPath,mFactor
-        if ext == ".target":
+        if ext == ".target" and not onlyRot:
             targetPath = os.path.join("../../",targetdata[0]) 
             loadTraslTarget(vertices,targetPath,mFactor)            
             print targetPath,mFactor

@@ -114,7 +114,7 @@ def colorVertices(vertColors, n=0):
 #-------MAKETARGET CALLBACKS----------------------
 
 def loadTarget(path):
-    global loadedTrasloadTarget,rotationMode,loadedRotTarget,loadedPoseTarget    
+    global loadedTrasloadTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode    
     startEditing()    
     if os.path.splitext(path)[1] == ".rot":
         loadedRotTarget = path
@@ -133,12 +133,14 @@ def applyTarget(mFactor, n=0):
     global loadedTrasloadTarget,rotationMode,loadedRotTarget,loadedPoseTarget
     startEditing()
     vertices = getVertices(n)
-    if rotationMode.val:
+    if rotationMode.val and not poseMode:
         maketargetlib.loadRotTarget(vertices,loadedRotTarget,mFactor)
-    else:
+    if not rotationMode.val and not poseMode:
         maketargetlib.loadTraslTarget(vertices,loadedTrasloadTarget,mFactor)
-    if poseMode:
+    if not rotationMode.val and poseMode:        
         maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor)
+    if rotationMode.val and poseMode:
+        maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor,onlyRot = True)        
     updateVertices(vertices)
     endEditing()
 
@@ -150,11 +152,10 @@ def saveTarget(path):
         verticesTosave = getSelectedVertices()
     else:
         verticesTosave = xrange(len(vertices))
-    if os.path.splitext(path)[1] == ".rot":
-        print os.path.splitext(path)[1], "SAVING ROT"
+    if os.path.splitext(path)[1] == ".rot":        
         maketargetlib.saveRotTargets(vertices, path, basePath,getSelectedVertices())
     else:
-        maketargetlib.saveTrasloadTarget(vertices, path, basePath, verticesTosave)    
+        maketargetlib.saveTraslTarget(vertices, path, basePath, verticesTosave)    
 
 def seekGroup():
     vertGroups = []
