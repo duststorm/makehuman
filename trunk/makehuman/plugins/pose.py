@@ -19,19 +19,28 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderX = 0       
         self.shoulderY = 0 
         self.shoulderZ = 0
-        self.shoulderSamples = []
+        self.shoulderSamplesRot = []
+        self.shoulderSamplesTrasl = []
         self.trasl = {}
         self.rotx = {}   
         self.roty = {}  
-        self.rotz = {}      
-           
+        self.rotz = {}
 
-                    
-        sData = os.listdir("data/targets/poseengine/female-young/right-shoulder/r-shoulder")      
-        for dat in sData:
+
+        #Roughly hardcoded
+        rotData = os.listdir("data/targets/poseengine/female-young/right-shoulder/test_rot")      
+        for dat in rotData:
             if dat not in ("shoulder-girdle",".svn"):        
                 sample = [float(x) for x in dat.split('_')]               
-                self.shoulderSamples.append(sample)
+                self.shoulderSamplesRot.append(sample)
+
+        traslData = os.listdir("data/targets/poseengine/female-young/right-shoulder/test_trasl")      
+        for dat in traslData:
+            fileName = os.path.join("data/targets/poseengine/female-young/right-shoulder/test_trasl",dat)
+            if os.path.isfile(fileName):
+                n = os.path.splitext(dat)[0]       
+                sample = [float(x) for x in n.split('_')]               
+                self.shoulderSamplesTrasl.append(sample)       
         
        
         self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, min = -85, max = 80, label = "Shoulder RotX")
@@ -87,9 +96,10 @@ class PoseTaskView(gui3d.TaskView):
 
     def calcIAR(self,v1,v2):
     #Index of Angle Ratio
+        #print "IAR: ", v1, v2
         l1 = aljabr.vlen(v1)
         l2 = aljabr.vlen(v2)
-        return l1/l2
+        return l1/(l2+0.001) #+0.001 to avoid zero division
         
 
 
@@ -106,10 +116,11 @@ class PoseTaskView(gui3d.TaskView):
         self.applyPose()
         
         
-    def seekNearestSamples(self,angle):
+    def seekNearestSamples(self,angle,samples):
         direction = aljabr.vnorm(angle)
         similarity = {}
-        for sample in self.shoulderSamples:
+        for sample in samples:
+            print sample
             direction2 = aljabr.vnorm(sample)
             similarity[aljabr.vdist(direction,direction2)] = sample                
         d = similarity.keys()
@@ -128,37 +139,53 @@ class PoseTaskView(gui3d.TaskView):
 
         
     def applyShoulderTargets(self,angle):
+
+        #Just a rough testing function
         
-        shoulderDir = "data/targets/poseengine/female-young/right-shoulder/r-shoulder"
-        samples = self.seekNearestSamples(angle)
-        target1 = "_".join([str(int(x)) for x in samples[0]])
-        target2 = "_".join([str(int(x)) for x in samples[1]])
-        morphVal1 = samples[2]
-        morphVal2 = samples[3]
+        shoulderRotDir = "data/targets/poseengine/female-young/right-shoulder/test_rot"
+        shoulderTraslDir = "data/targets/poseengine/female-young/right-shoulder/test_trasl"
+        samplesRot = self.seekNearestSamples(angle,self.shoulderSamplesRot)
+        samplesTrasl = self.seekNearestSamples(angle,self.shoulderSamplesTrasl)
+        targetRot1 = "_".join([str(int(x)) for x in samplesRot[0]])
+        targetRot2 = "_".join([str(int(x)) for x in samplesRot[1]])
+        targetTrasl1 = "_".join([str(int(x)) for x in samplesTrasl[0]])
+        targetTrasl2 = "_".join([str(int(x)) for x in samplesTrasl[1]])
+        morphRotVal1 = samplesRot[2]
+        morphRotVal2 = samplesRot[3]
+        morphTraslVal1 = samplesTrasl[2]
+        morphTraslVal2 = samplesTrasl[3]
         
-        path1 = os.path.join(shoulderDir,target1)
-        path2 = os.path.join(shoulderDir,target2)
+        pathRot1 = os.path.join(shoulderRotDir,targetRot1)
+        pathRot2 = os.path.join(shoulderRotDir,targetRot2)
+        pathTrasl1 = os.path.join(shoulderTraslDir,targetTrasl1)
+        pathTrasl2 = os.path.join(shoulderTraslDir,targetTrasl2)
         print "-------"
-        print "DEBUG2"
-        print path1,morphVal1
-        print path2,morphVal2
-        self.storeTargetsFromFolder(path1,morphVal1)
-        self.storeTargetsFromFolder(path2,morphVal2)  
+        print "SAMPLES USED"
+        print pathRot1,morphRotVal1
+        print pathRot2,morphRotVal1
+        print pathTrasl1,morphTraslVal1
+        print pathTrasl1,morphTraslVal2
+        self.storeTargets(pathRot1,morphRotVal1)
+        self.storeTargets(pathRot2,morphRotVal2)
+        self.storeTargets(pathTrasl1,morphTraslVal1)
+        self.storeTargets(pathTrasl2,morphTraslVal2)  
  
         
         
-    def storeTargetsFromFolder(self,path,morphFactor):
+    def storeTargets(self,path,morphFactor):
         
-        targets = os.listdir(path)        
         traslations = []
         rotations = []
-        for t in targets:
-            tpath = os.path.join(path,t)            
-            if os.path.isfile(tpath):
-                if os.path.splitext(t)[1] == ".rot":
-                    rotations.append(tpath)
-                if os.path.splitext(t)[1] == ".target":
-                    traslations.append(tpath)
+        
+        if os.path.isdir(path):
+            targets = os.listdir(path) 
+            for t in targets:
+                tpath = os.path.join(path,t) 
+                rotations.append(tpath)
+        else:
+            tpath = path+".target"
+            traslations.append(tpath)        
+
                     
         rotations.sort()
         traslations.sort()
@@ -201,7 +228,7 @@ class PoseTaskView(gui3d.TaskView):
             
         
     #maybe this should be moved in human class
-    def applyPose(self):
+    def applyPose(self,saveData = False):
         self.rotx = {}
         self.roty = {}
         self.rotz = {}
@@ -223,15 +250,36 @@ class PoseTaskView(gui3d.TaskView):
         rotPathsZ.sort()
         traslPaths.sort()
         
-        print "DEBUGROT X"
-        for a in rotPathsX:
-            print a,self.rotx[a]
-        print "DEBUGROT Y"
-        for a in rotPathsY:
-            print a,self.roty[a]
-        print "DEBUGROT Z"
-        for a in rotPathsZ:
-            print a,self.rotz[a]
+        #print "DEBUGROT X"
+        #for a in rotPathsX:
+            #print a,self.rotx[a]
+        #print "DEBUGROT Y"
+        #for a in rotPathsY:
+            #print a,self.roty[a]
+        #print "DEBUGROT Z"
+        #for a in rotPathsZ:
+            #print a,self.rotz[a]
+
+
+        if saveData == True:
+
+            outFilePath = "%s_%s_%s.data"%(self.shoulderX,self.shoulderY,self.shoulderZ)
+            
+            fDescriptor = open(outFilePath, 'w')
+            print "SAVED IN ", outFilePath
+            for targetPath in traslPaths:
+                morphFactor = self.trasl[targetPath]
+                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
+            for targetPath in rotPathsX:
+                morphFactor = self.rotx[targetPath]
+                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
+            for targetPath in rotPathsY:
+                morphFactor = self.roty[targetPath]
+                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
+            for targetPath in rotPathsZ:
+                morphFactor = self.rotz[targetPath]
+                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
+            fDescriptor.close()
         
         
         
