@@ -33,8 +33,8 @@ def analyzeTarget(vertices, targetBuffer, scale=0.5):
          colorG = 255-int(255*(lenght/(lenMax*scale)))
          vertColors[vect[0]] = [colorR,colorG,0]
     return vertColors
-         
-         
+
+
 
 def axisID(axisVect):
     #TODO comments
@@ -44,9 +44,9 @@ def axisID(axisVect):
         return "Y"
     if fabs(axisVect[2]) > fabs(axisVect[0]) and fabs(axisVect[2]) > fabs(axisVect[1]):
         return "Z"
-        
+
 def loadRotTarget(vertices,targetRotPath,mFactor):
-    
+
     try:
         f = open(targetRotPath)
         fileDescriptor = f.readlines()
@@ -88,8 +88,8 @@ def loadRotTarget(vertices,targetRotPath,mFactor):
             vertices[pointIndex][0] = pointRotated[0]
             vertices[pointIndex][1] = pointRotated[1]
             vertices[pointIndex][2] = pointRotated[2]
-        
-   
+
+
 
 
 
@@ -133,13 +133,13 @@ def loadTraslTarget(vertices,targetPath,mFactor):
             vIndex = int(vectorData[0])
             vX = float(vectorData[1])
             vY = float(vectorData[2])
-            vZ = float(vectorData[3]) 
+            vZ = float(vectorData[3])
             v = vertices[vIndex]
             v[0] += vX*mFactor
             v[1] += vY*mFactor
             v[2] += vZ*mFactor
     fileDescriptor.close()
-  
+
 
 
 
@@ -157,9 +157,9 @@ def alignScan(maskBaseVerts, maskScanVerts, scanVerts):
     for i,v in enumerate(aligned_mask):
         maskScanVerts[i][0] = v[0]
         maskScanVerts[i][1] = v[1]
-        maskScanVerts[i][2] = v[2] 
+        maskScanVerts[i][2] = v[2]
 
-    
+
 
 def saveTraslTarget(vertices, targetPath, basePath, verticesTosave):
     """
@@ -183,15 +183,15 @@ def saveTraslTarget(vertices, targetPath, basePath, verticesTosave):
     except:
         print "Unable to open %s",(targetPath)
         return  None
-        
+
     for index in verticesTosave:
         originalVertex = originalVertices[index]
         targetVertex = vertices[index]
         delta = vsub(targetVertex,originalVertex)
         dist =  vdist(originalVertex,targetVertex)
         if dist > epsilon:
-            nVertsExported += 1         
-            fileDescriptor.write("%d %f %f %f\n" % (index,delta[0],delta[1],delta[2]))        
+            nVertsExported += 1
+            fileDescriptor.write("%d %f %f %f\n" % (index,delta[0],delta[1],delta[2]))
     fileDescriptor.close()
 
     if nVertsExported == 0:
@@ -202,7 +202,7 @@ def saveTraslTarget(vertices, targetPath, basePath, verticesTosave):
 def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
 
     epsilon = 0.00001
-    originalVertices = loadVertices(basePath)    
+    originalVertices = loadVertices(basePath)
     rotData = {}
 
     #Rotation axis is caluclated using 2 selected verts
@@ -210,12 +210,12 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
         axisVertsIdx1 = vertsSelected[0]
         axisVertsIdx2 = vertsSelected[1]
     else:
-        
+
         print"You must select only 2 verts to define the rotation axis"
         return 0
 
     axeVerts = [originalVertices[axisVertsIdx1],originalVertices[axisVertsIdx2]]
-    originalRotCenter = centroid(axeVerts)    
+    originalRotCenter = centroid(axeVerts)
     rotAxe = axisID(vsub(originalVertices[axisVertsIdx1],originalVertices[axisVertsIdx2]))
 
     print "ROTAXE",rotAxe
@@ -319,7 +319,7 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
 
 def adaptMesh(base, scan, verticesToAdapt):
     """
-    
+
     """
     kd = KDTree(scan)
     dists,neighbs = kd.query(np.array(base)[verticesToAdapt])
@@ -328,7 +328,7 @@ def adaptMesh(base, scan, verticesToAdapt):
         base[iadapt][0] = scan[ineighb][0]
         base[iadapt][1] = scan[ineighb][1]
         base[iadapt][2] = scan[ineighb][2]
-        
+
 
 def loadPoseFromFile(vertices,path,scale = 1,onlyRot = False):
     fileDescriptor = open(path)
@@ -340,22 +340,41 @@ def loadPoseFromFile(vertices,path,scale = 1,onlyRot = False):
         targetdata = data.split()
         fileName = os.path.basename(targetdata[0])
         mFactor = float(os.path.basename(targetdata[1]))
-        
+
         mFactor = scale*mFactor
-        ext = os.path.splitext(fileName)[1]        
+        ext = os.path.splitext(fileName)[1]
         if ext == ".rot":
             #It assume script is called from makehuman/utils/maketarget
-            targetRotPath = os.path.join("../../",targetdata[0])            
-            loadRotTarget(vertices,targetRotPath,mFactor)
-            #print targetPath,mFactor
+            targetRotPath = os.path.join("../../",targetdata[0])
+            loadRotTarget(vertices,targetRotPath,mFactor)            
         if ext == ".target" and not onlyRot:
-            targetPath = os.path.join("../../",targetdata[0]) 
-            loadTraslTarget(vertices,targetPath,mFactor)            
-            print targetPath,mFactor
+            targetPath = os.path.join("../../",targetdata[0])
+            loadTraslTarget(vertices,targetPath,mFactor)
+            
+
+
+def loadPoseFromFolder(vertices,path,mFactor = 1,onlyRot = False):
+    folderToScan = os.path.dirname(path)#because Blender fselector always return a file
+    targetList = os.listdir(folderToScan)
+    targetList.sort()
+    if mFactor < 0:
+        targetList.reverse()
+    for fileName in targetList:
+        ext = os.path.splitext(fileName)[1]
+        if ext == ".rot":
+            #It assume script is called from makehuman/utils/maketarget
+            targetRotPath = os.path.join(folderToScan,fileName)
+            loadRotTarget(vertices,targetRotPath,mFactor)            
+        if ext == ".target" and not onlyRot:
+            targetPath = os.path.join(folderToScan,fileName)
+            loadTraslTarget(vertices,targetPath,mFactor)
+            
+
+
 
 def saveScaledRotTarget(path,scaleFactor):
-    
-    path2 = path+".scaled"    
+
+    path2 = path+".scaled"
     try:
         f = open(path)
         fileDescriptor = f.readlines()
@@ -369,7 +388,7 @@ def saveScaledRotTarget(path,scaleFactor):
     for stringData in fileDescriptor[1:]:
         listData = stringData.split()
         theta = float(listData[0])*scaleFactor
-        listData[0] = theta     
+        listData[0] = theta
         rotData.append(listData)
     try:
         fileDescriptor = open(path2,'w')
@@ -385,7 +404,7 @@ def saveScaledRotTarget(path,scaleFactor):
         for vertIndex in rData[1:]:
             fileDescriptor.write("%s " % (vertIndex))
         fileDescriptor.write("\n")
-    fileDescriptor.close()    
+    fileDescriptor.close()
 
 
 def saveIndexSelectedVerts(selectVerts, path):
@@ -432,8 +451,8 @@ def loadIndexSelectedVerts(path):
         selectedIndices.append(i)
     fileDescriptor.close()
     return selectedIndices
-    
-    
+
+
 def saveTranslationTargetAndHisSymm(targetPath):
     """
     This function saves a morph target file and his symmetric.
@@ -460,7 +479,6 @@ def saveTranslationTargetAndHisSymm(targetPath):
     applyTarget(-1)
     saveTranslationTarget(targetPath)
     resetMesh()
-
 
 
 def processingTargets(filepath):
@@ -627,7 +645,7 @@ def symmetrise(vertices, pairsPath, centersPath, rightMirror):
     for i in centerFile:
         vertices[int(i)][0] = 0.0
     symmFile.close()
-   
+
 
 
 def selectSymmetricVerts():

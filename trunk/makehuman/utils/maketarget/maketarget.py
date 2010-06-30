@@ -144,6 +144,14 @@ def applyTarget(mFactor, n=0):
     updateVertices(vertices)
     endEditing()
 
+def applyPoseFromFolder(path, n=0):
+    global morphFactor
+    startEditing()
+    vertices = getVertices(n)
+    maketargetlib.loadPoseFromFolder(vertices,path,morphFactor.val)
+    updateVertices(vertices)
+    endEditing()
+
 def saveTarget(path):
     global saveOnlySelectedVerts,basePath
     verticesTosave = []    
@@ -302,7 +310,9 @@ def event(event, value):
     elif event == Draw.OKEY:
         analyseTarget()
     elif event == Draw.PKEY:
-        Window.FileSelector (scaleRotTarget, "Scale Rot target")       
+        Window.FileSelector (scaleRotTarget, "Scale Rot target")
+    elif event == Draw.QKEY:
+        Window.FileSelector (applyPoseFromFolder, "Load pose from folder") 
 
         
         
