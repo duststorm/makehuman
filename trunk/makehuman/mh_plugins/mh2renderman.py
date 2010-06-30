@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """
@@ -36,12 +37,12 @@ import files3d
 import subprocess
 import hairgenerator
 import random
-from hair import calculateBoundingBox
+from hair import adjustHair
 
 
 hairsClass = hairgenerator.Hairgenerator()
 
-
+"""
 #def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0]):
 def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0],headCentroid=[0.0, 7.436, 0.03]):
     tail,head = os.path.split(path)
@@ -68,7 +69,7 @@ def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0],headCentroid=[0.0
                 cP[2]=temp[2]
                 
     # TODO: add the loading of wavefront obj preview
-
+"""
 
 def writeHairs(ribRepository, mesh):
 
@@ -76,7 +77,7 @@ def writeHairs(ribRepository, mesh):
 
     totalNumberOfHairs = 0
     hairsClass.humanVerts = mesh.verts
-    hairsClass.adjustGuides()
+    #hairsClass.adjustGuides()
 
     # hairsClass.generateHairStyle1()
 
@@ -640,8 +641,9 @@ def saveScene(camera, scene, fName, ribDir, engine):
         should be used to render the exported file.
 
     """
-    
     human = scene.selectedHuman
+    
+    """
     oHeadCentroid = [0.0, 7.436, 0.03]
     oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]] 
 
@@ -652,9 +654,9 @@ def saveScene(camera, scene, fName, ribDir, engine):
     scale[0] = (headBB[1][0]-headBB[0][0])/float(oHeadBoundingBox[1][0]-oHeadBoundingBox[0][0])
     scale[1] = (headBB[1][1]-headBB[0][1])/float(oHeadBoundingBox[1][1]-oHeadBoundingBox[0][1])
     scale[2] = (headBB[1][2]-headBB[0][2])/float(oHeadBoundingBox[1][2]-oHeadBoundingBox[0][2])
-
-    #loadHairsFile(human.hairFile,delta,scale)
-    loadHairsFile(human.hairFile,delta,scale,headCentroid)
+    """
+    #loadHairsFile(human.hairFile,delta,scale,headCentroid)
+    adjustHair(human, hairsClass)
     if not os.path.isdir(ribDir):
         os.makedirs(ribDir)
     ribRepository = os.path.join(ribDir, 'ribFiles')

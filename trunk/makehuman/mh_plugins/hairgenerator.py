@@ -22,6 +22,7 @@ import math
 import simpleoctree
 import aljabr
 from collision import collision
+from os import path
 
 
 class Hair:
@@ -127,9 +128,6 @@ class Hairgenerator:
 
     def adjustGuides(self): 
 
-        """
-        
-        """
         try:
             fileDescriptor = open(self.path)
         except:
@@ -472,6 +470,7 @@ class Hairgenerator:
 
     def loadHairs(self, name):
         try:
+            name = path.splitext(name)[0]
             objFile = open(name + ".obj")
             fileDescriptor = open(name+".hair")
         except:

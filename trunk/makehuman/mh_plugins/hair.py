@@ -239,3 +239,31 @@ def calculateBoundingBox(verts):
             boundingBox[1][2] = v.co[2]
     return boundingBox
 
+# - out : populated hairsClass
+def adjustHair(human, hairsClass):
+    oHeadCentroid = [0.0, 7.436, 0.03]
+    oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]] 
+    hairsClass.loadHairs(human.hairFile)
+    headBB=calculateBoundingBox(human.headVertices)
+    headCentroid = in2pts(headBB[0],headBB[1],0.5)
+    delta = vsub(headCentroid,oHeadCentroid)
+    scale = [1.0,1.0,1.0]
+    scale[0] = (headBB[1][0]-headBB[0][0])/float(oHeadBoundingBox[1][0]-oHeadBoundingBox[0][0])
+    scale[1] = (headBB[1][1]-headBB[0][1])/float(oHeadBoundingBox[1][1]-oHeadBoundingBox[0][1])
+    scale[2] = (headBB[1][2]-headBB[0][2])/float(oHeadBoundingBox[1][2]-oHeadBoundingBox[0][2])
+    for group in hairsClass.guideGroups:
+        for guide in group.guides:
+            for cP in guide.controlPoints:
+                #Translate
+                cP[0] = cP[0] + delta[0]
+                cP[1] = cP[1] + delta[1]
+                cP[2] = cP[2] + delta[2]
+                #Scale
+                temp = cP #needed for shallow copy, as vsub and vadd methods disrupts the fun of shallow-copying
+                temp = vsub(temp,headCentroid)
+                temp = [temp[0]*scale[0],temp[1]*scale[1],temp[2]*scale[2]]
+                temp = vadd(temp, headCentroid)
+                cP[0]=temp[0]
+                cP[1]=temp[1]
+                cP[2]=temp[2]
+    # TODO: add the loading of wavefront obj preview
