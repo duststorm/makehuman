@@ -39,7 +39,7 @@ class PoseTaskView(gui3d.TaskView):
             fileName = os.path.join("data/targets/poseengine/female-young/right-shoulder/test_trasl",dat)
             if os.path.isfile(fileName):
                 n = os.path.splitext(dat)[0]       
-                sample = [float(x) for x in n.split('_')]               
+                sample = [float(x) for x in n.split('_')]                       
                 self.shoulderSamplesTrasl.append(sample)       
         
        
@@ -87,12 +87,18 @@ class PoseTaskView(gui3d.TaskView):
             self.applyPose()
 
             
-    def calcIAS(self,d1,d2):
+    def calcIAS(self,d1,d2,d3):
     #Index of Angle Similarity
-        D = d1+d2
-        IAS1 = 1-(d1/D)
-        IAS2 = 1-(d2/D)
-        return IAS1,IAS2
+        D = d1+d2+d3
+        D1 = D/(d1+0.0001)
+        D2 = D/(d2+0.0001)
+        D3 = D/(d3+0.0001)
+        Dtot = D1+D2+D3
+        IAS1 = D1/Dtot
+        IAS2 = D2/Dtot
+        IAS3 = D3/Dtot
+        print "IAS: %f,%f,%f"%(IAS1,IAS2,IAS3)
+        return IAS1,IAS2,IAS3
 
     def calcIAR(self,v1,v2):
     #Index of Angle Ratio
@@ -119,23 +125,30 @@ class PoseTaskView(gui3d.TaskView):
     def seekNearestSamples(self,angle,samples):
         direction = aljabr.vnorm(angle)
         similarity = {}
-        for sample in samples:
-            print sample
-            direction2 = aljabr.vnorm(sample)
-            similarity[aljabr.vdist(direction,direction2)] = sample                
-        d = similarity.keys()
-        d.sort()
-        nearestSample1 = similarity[d[0]]
-        nearestSample2 = similarity[d[1]]
-        IAS1,IAS2 = self.calcIAS(d[0],d[1])
-        IAR1 = self.calcIAR(angle, nearestSample1)
-        IAR2 = self.calcIAR(angle, nearestSample2)
-        factor1 = IAS1* IAR1
-        factor2 = IAS2* IAR2
+        if angle != [0.0,0.0,0.0]:                 
+            for sample in samples:                     
+                direction2 = aljabr.vnorm(sample)
+                similarity[aljabr.vdist(direction,direction2)] = sample                         
+            d = similarity.keys()
+            d.sort()
+            nearestSample1 = similarity[d[0]]
+            nearestSample2 = similarity[d[1]]
+            nearestSample3 = similarity[d[2]]
+            IAS1,IAS2,IAS3 = self.calcIAS(d[0],d[1],d[2])
+            IAR1 = self.calcIAR(angle, nearestSample1)
+            IAR2 = self.calcIAR(angle, nearestSample2)
+            IAR3 = self.calcIAR(angle, nearestSample3)
+            factor1 = IAS1* IAR1
+            factor2 = IAS2* IAR2
+            factor3 = IAS3* IAR3
+            if factor1 > 1 or factor2 >1 or factor3 > 1:
+                print "WARNING. Angle %f,%f,%f is impossible for human shoulder"% (angle[0],angle[1],angle[2])        
+            return (nearestSample1,nearestSample2,nearestSample3,factor1,factor2,factor3)
+        else:
+            return ([0,0,0],[0,0,0],[0,0,0],0,0,0)
+            
         
-        if factor1 > 1 or factor2 >1:
-            print "WARNING. Angle %f,%f,%f is impossible for human shoulder"% (angle[0],angle[1],angle[2])        
-        return (nearestSample1,nearestSample2,factor1,factor2)
+        
 
         
     def applyShoulderTargets(self,angle):
@@ -146,29 +159,47 @@ class PoseTaskView(gui3d.TaskView):
         shoulderTraslDir = "data/targets/poseengine/female-young/right-shoulder/test_trasl"
         samplesRot = self.seekNearestSamples(angle,self.shoulderSamplesRot)
         samplesTrasl = self.seekNearestSamples(angle,self.shoulderSamplesTrasl)
+        
         targetRot1 = "_".join([str(int(x)) for x in samplesRot[0]])
         targetRot2 = "_".join([str(int(x)) for x in samplesRot[1]])
+        targetRot3 = "_".join([str(int(x)) for x in samplesRot[2]])
+        
         targetTrasl1 = "_".join([str(int(x)) for x in samplesTrasl[0]])
         targetTrasl2 = "_".join([str(int(x)) for x in samplesTrasl[1]])
-        morphRotVal1 = samplesRot[2]
-        morphRotVal2 = samplesRot[3]
-        morphTraslVal1 = samplesTrasl[2]
-        morphTraslVal2 = samplesTrasl[3]
+        targetTrasl3 = "_".join([str(int(x)) for x in samplesTrasl[2]])
+        
+        morphRotVal1 = samplesRot[3]
+        morphRotVal2 = samplesRot[4]
+        morphRotVal3 = samplesRot[5]
+        
+        morphTraslVal1 = samplesTrasl[3]
+        morphTraslVal2 = samplesTrasl[4]
+        morphTraslVal3 = samplesTrasl[5]
         
         pathRot1 = os.path.join(shoulderRotDir,targetRot1)
         pathRot2 = os.path.join(shoulderRotDir,targetRot2)
+        pathRot3 = os.path.join(shoulderRotDir,targetRot3)
+        
         pathTrasl1 = os.path.join(shoulderTraslDir,targetTrasl1)
         pathTrasl2 = os.path.join(shoulderTraslDir,targetTrasl2)
+        pathTrasl3 = os.path.join(shoulderTraslDir,targetTrasl3)
+        
         print "-------"
         print "SAMPLES USED"
         print pathRot1,morphRotVal1
-        print pathRot2,morphRotVal1
+        print pathRot2,morphRotVal2
+        print pathRot3,morphRotVal3
+        
         print pathTrasl1,morphTraslVal1
-        print pathTrasl1,morphTraslVal2
+        print pathTrasl2,morphTraslVal2
+        print pathTrasl3,morphTraslVal3
+        
         self.storeTargets(pathRot1,morphRotVal1)
         self.storeTargets(pathRot2,morphRotVal2)
+        self.storeTargets(pathRot3,morphRotVal3)
         self.storeTargets(pathTrasl1,morphTraslVal1)
-        self.storeTargets(pathTrasl2,morphTraslVal2)  
+        self.storeTargets(pathTrasl2,morphTraslVal2)
+        self.storeTargets(pathTrasl3,morphTraslVal3)  
  
         
         
@@ -238,7 +269,7 @@ class PoseTaskView(gui3d.TaskView):
         
         self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
         
-        angle = (self.shoulderX,self.shoulderY,self.shoulderZ)
+        angle = [self.shoulderX,self.shoulderY,self.shoulderZ]
         self.applyShoulderTargets(angle)
         
         rotPathsX = self.rotx.keys()
