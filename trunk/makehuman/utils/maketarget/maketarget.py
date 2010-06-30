@@ -46,9 +46,9 @@ morphFactor = Draw.Create(1.0)
 saveOnlySelectedVerts = Draw.Create(0)
 rotationMode = Draw.Create(0)
 poseMode = False
-loadedTrasloadTarget = ""
-loadedRotTarget = ""
-loadedPoseTarget = ""
+loadedTrasloadTarget = None
+loadedRotTarget = None
+loadedPoseTarget = None
 targetBuffer = [] #Loaded target Data    
   
 #--------SOME BLENDER SPECIFICS SHORTCUTS------------
@@ -118,14 +118,20 @@ def loadTarget(path):
     startEditing()    
     if os.path.splitext(path)[1] == ".rot":
         loadedRotTarget = path
+        loadedTrasloadTarget = None
+        loadedPoseTarget = None
         rotationMode.val = 1
         poseMode = False
     if os.path.splitext(path)[1] == ".target":
         loadedTrasloadTarget = path
+        loadedRotTarget = None
+        loadedPoseTarget = None
         rotationMode.val = 0
         poseMode = False
     if os.path.splitext(path)[1] == ".pose":
         loadedPoseTarget = path
+        loadedTrasloadTarget = None
+        loadedRotTarget = None
         poseMode = True    
     endEditing()
   
@@ -244,7 +250,8 @@ def draw():
 
     """
     global targetPath,morphFactor,rotVal,rotSum,current_target,selAxis,rotationMode
-    global saveOnlySelectedVerts
+    global saveOnlySelectedVerts,loadedTrasloadTarget, loadedRotTarget, loadedPoseTarget
+    fileText = ""
 
     glClearColor(0.5, 0.5, 0.5, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
@@ -252,6 +259,14 @@ def draw():
     glColor3f(0.0, 0.0, 0.0)
     glRasterPos2i(10, 250)
     Draw.Text("Make MH targets v3.1")
+    if loadedTrasloadTarget:
+        fileText = os.path.basename(loadedTrasloadTarget)
+    elif loadedRotTarget:
+        fileText = os.path.basename(loadedRotTarget)
+    elif loadedPoseTarget:
+        fileText = os.path.basename(loadedPoseTarget)
+    glRasterPos2i(10, 230)
+    Draw.Text("Target: %s"%(fileText))
     
     glRasterPos2i(10, 120)
 
