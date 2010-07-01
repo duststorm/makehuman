@@ -128,7 +128,8 @@ class PoseTaskView(gui3d.TaskView):
         if angle != [0.0,0.0,0.0]:                 
             for sample in samples:                     
                 direction2 = aljabr.vnorm(sample)
-                similarity[aljabr.vdist(direction,direction2)] = sample                         
+                similarity[aljabr.vdist(direction,direction2)] = sample 
+                print angle,sample,aljabr.vdist(direction,direction2)                        
             d = similarity.keys()
             d.sort()
             nearestSample1 = similarity[d[0]]
@@ -269,7 +270,7 @@ class PoseTaskView(gui3d.TaskView):
         
         self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
         
-        angle = [self.shoulderX,self.shoulderY,self.shoulderZ]
+        angle = [self.shoulderX,self.shoulderZ,self.shoulderY]
         self.applyShoulderTargets(angle)
         
         rotPathsX = self.rotx.keys()
@@ -285,12 +286,13 @@ class PoseTaskView(gui3d.TaskView):
         #print "DEBUGROT X"
         #for a in rotPathsX:
             #print a,self.rotx[a]
-        #print "DEBUGROT Y"
-        #for a in rotPathsY:
-            #print a,self.roty[a]
         #print "DEBUGROT Z"
         #for a in rotPathsZ:
             #print a,self.rotz[a]
+        #print "DEBUGROT Y"
+        #for a in rotPathsY:
+            #print a,self.roty[a]
+
 
 
         if saveData == True:
@@ -320,13 +322,14 @@ class PoseTaskView(gui3d.TaskView):
             algos3d.loadTranslationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor, None, 1, 0)
         for targetPath in rotPathsX:
             morphFactor = self.rotx[targetPath]
-            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)  
+            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor) 
+        for targetPath in rotPathsZ:
+            morphFactor = self.rotz[targetPath]
+            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)
         for targetPath in rotPathsY:
             morphFactor = self.roty[targetPath]
             algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)  
-        for targetPath in rotPathsZ:
-            morphFactor = self.rotz[targetPath]
-            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)  
+          
         
         self.app.scene3d.selectedHuman.meshData.calcNormals(facesToUpdate=[f for f in self.app.scene3d.selectedHuman.meshData.faces])
         self.app.scene3d.selectedHuman.meshData.update()
