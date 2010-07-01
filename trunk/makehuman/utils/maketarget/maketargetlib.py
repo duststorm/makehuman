@@ -55,7 +55,7 @@ def loadRotTarget(vertices,targetRotPath,mFactor):
         print "Error opening target file: %s"%(targetRotPath)
         return 0
 
-
+    print  "ROT: ",targetRotPath,mFactor
     #Get info of axis from the first line of file
     rotAxeInfo = fileDescriptor[0].split()
 
@@ -126,7 +126,7 @@ def loadTraslTarget(vertices,targetPath,mFactor):
         return  None
 
     current_target = targetPath
-    targetBuffer = []
+    print  targetPath,mFactor 
     for vData in fileDescriptor:
         vectorData = vData.split()
         if vectorData[0].find('#')==-1:
@@ -356,17 +356,32 @@ def loadPoseFromFile(vertices,path,scale = 1,onlyRot = False):
 def loadPoseFromFolder(vertices,path,mFactor = 1,onlyRot = False):
     folderToScan = os.path.dirname(path)#because Blender fselector always return a file
     targetList = os.listdir(folderToScan)
+    translTargets = []
+    rotTargets = []
     targetList.sort()
+    
     if mFactor < 0:
         targetList.reverse()
     for fileName in targetList:
         ext = os.path.splitext(fileName)[1]
-        if ext == ".rot":
-            #It assume script is called from makehuman/utils/maketarget
+        if ext == ".rot":            
             targetRotPath = os.path.join(folderToScan,fileName)
-            loadRotTarget(vertices,targetRotPath,mFactor)            
+            rotTargets.append(targetRotPath)
+                      
         if ext == ".target" and not onlyRot:
-            targetPath = os.path.join(folderToScan,fileName)
+            targetTraslPath = os.path.join(folderToScan,fileName)
+            translTargets.append(targetTraslPath)
+
+    if mFactor > 0:
+        for targetPath in translTargets:
+            loadTraslTarget(vertices,targetPath,mFactor)
+        for targetPath in rotTargets:
+            loadRotTarget(vertices,targetPath,mFactor)
+
+    if mFactor < 0:        
+        for targetPath in rotTargets:
+            loadRotTarget(vertices,targetPath,mFactor)
+        for targetPath in translTargets:
             loadTraslTarget(vertices,targetPath,mFactor)
             
 
