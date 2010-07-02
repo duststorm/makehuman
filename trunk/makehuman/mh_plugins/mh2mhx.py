@@ -35,18 +35,18 @@ def exportMhx(obj, filename):
 	(name, ext) = os.path.splitext(filename)
 	
 	filename = name+"-24"+ext
-	print("Writing MHX 2.4x file " + filename )
+	#print("Writing MHX 2.4x file " + filename )
 	fp = open(filename, 'w')
 	exportMhx_24(obj, fp)
 	fp.close()
-	print("MHX 2.4x file %s written" % filename)
+	#print("MHX 2.4x file %s written" % filename)
 	
 	filename = name+"-25"+ext
-	print("Writing MHX 2.5x file " + filename )
+	#print("Writing MHX 2.5x file " + filename )
 	fp = open(filename, 'w')
 	exportMhx_25(obj, "rig", fp)
 	fp.close()
-	print("MHX 2.5x file %s written" % filename)
+	#print("MHX 2.5x file %s written" % filename)
 
 	return
 
