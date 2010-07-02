@@ -245,10 +245,12 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderX = 0 
         
         
-        for i in range(-140,45,10):
+        #for i in range(-140,45,10):
+        for i in [-135,-67,0,45]:
             self.shoulderY = i
             
-            for i2 in range(-120,90,10):
+            #for i2 in range(-120,90,10):
+            for i2 in [-115,-90,-67,-45,-22,0,22,45,67,90]:
                 self.shoulderZ = i2
                 self.shoulderXslider.setValue(0.0)
                 self.shoulderYslider.setValue(self.shoulderY)
