@@ -509,6 +509,8 @@ static void mhFlipSurface(SDL_Surface *surface)
  */
 GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 {
+    printf("Loading texture '%s'\n", fname);
+    
     int internalFormat, format;
     SDL_Surface *surface;
 
@@ -592,10 +594,33 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
+
+// hdusel: Just a test for Mac OS X in order to prevent that the fonts look so ugly (blurry) on the Mac port. 
+// So try to permit MIPMAP Interpolation for fonts.
+#if defined(__APPLE__)
+        const int isFont = (strstr(fname, "/fonts/") != NULL);
+        if (isFont)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
+        else 
+        {
+    #if defined(__ppc__)
+            // On PowerPC Macs just don't use mipmapping
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    #else
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    #endif
+        }
+#else
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //glTexImage2D(GL_TEXTURE_2D, 0, components, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
+#endif
         gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
+//        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
