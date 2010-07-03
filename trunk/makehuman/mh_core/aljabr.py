@@ -635,7 +635,7 @@ def axisAngleToQuaternion(axis, angle):
 def quaternionToMatrix(q):
     m = [[0,0,0],[0,0,0],[0,0,0]]  # will be a 3x3 euler rotation matrix
     m[0][0] = float(q[3]*q[3] + q[0]*q[0] - q[1]*q[1] - q[2]*q[2])
-    m[0][1] = 2.0*(q[0]*q[2]-q[3]*q[2])
+    m[0][1] = 2.0*(q[0]*q[1]-q[3]*q[2])
     m[0][2] = 2.0*(q[0]*q[2]+q[3]*q[1])
     
     m[1][0] = 2.0*(q[1]*q[0]+q[3]*q[2])
