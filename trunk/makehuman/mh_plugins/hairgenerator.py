@@ -121,7 +121,6 @@ class Hairgenerator:
         for g in self.guideGroups:
             if g.name == name:
                 return g                
-        
         g = GuideGroup(name)
         self.guideGroups.append(g)
         return g
@@ -162,7 +161,6 @@ class Hairgenerator:
                     
 
     def addHairGuide(self, guidePoints, guideName, guideGroup):
-
         g = HairGuide(guideName)
         for p in guidePoints:
             g.controlPoints.append([p[0], p[1], p[2]])
@@ -534,17 +532,28 @@ class Hairgenerator:
         fileDescriptor.close()
         
         guidePoints=[]
+        temp =[]
+        currentGroup=None
+        guideName = None
         for data in objFile:
             datalist = data.split()
             if datalist[0] == "v":
                 for i in xrange(1,4):
                     datalist[i] = float(datalist[i])
-                guidePoints.append(datalist[1:])
+                temp.append(datalist[1:])
+            elif datalist[0] == "curv":
+                #n = len(datalist[3:])
+                #guidePoints=[None]*n
+                for index in datalist[3:]:
+                    guidePoints.append(temp[int(index)])
+                temp=[]
             elif datalist[0] == "g":
                 datalist[1] = datalist[1].split("_") #first entry = group, second entry= guidename)
                 #Josenow! Todo Guidegroup problem adding
                 currentGroup = self.addGuideGroup(datalist[1][0])
-                self.addHairGuide(guidePoints, datalist[1][1],currentGroup)
+                guideName = datalist[1][1]             
+            elif datalist[0] == "end":
+                self.addHairGuide(guidePoints, guideName,currentGroup)
                 guidePoints=[]
                 
         objFile.close()
