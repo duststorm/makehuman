@@ -77,8 +77,6 @@ todo = []
 #	toggle flags
 #
 
-T_ArmIK = 0x01
-T_LegIK = 0x02
 T_Stretch = 0x04
 T_Bend = 0x08
 
@@ -97,7 +95,7 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_Replace + T_ArmIK + T_LegIK + T_Mesh + T_Armature + T_Face + T_Stretch + T_Bend
+toggle = T_Replace + T_Mesh + T_Armature + T_Face + T_Stretch
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -1607,41 +1605,6 @@ def parseConstraint(constraints, args, tokens):
 			defaultKey(key, val,  sub, "cns", [], globals(), locals())
 	#print("cns %s done" % cns.name)
 	return cns
-	
-def insertInfluenceIpo(cns, bone):
-	global todo
-	if bone != 'PArmIK_L' and bone != 'PArmIK_R' and bone != 'PLegIK_L' and bone != 'PLegIK_R':
-		return False
-
-	if (toggle & T_FKIK):
-		fcurve = cns.driver_add("influence", 0)
-		fcurve.driver.type = 'AVERAGE'
-
-		var = fcurve.driver.variables.new()
-		var.name = bone
-		var.targets[0].id_type = 'OBJECT'
-		var.targets[0].id = getObject('HumanRig', 'var.targets[0].id', globals(), locals())
-		var.targets[0].bone_target = bone
-		var.targets[0].transform_type = 'LOC_X'
-		# controller_path = fk_chain.arm_p.path_to_id()
-		#var.targets[0].data_path = controller_path + '["hinge"]'
-
-		mod = fcurve.modifiers[0]
-		mod.poly_order = 2
-		mod.coefficients[0] = 0.0
-		mod.coefficients[1] = 1.0
-	elif bone == 'PArmIK_L' or bone == 'PArmIK_R':
-		if toggle & T_ArmIK:
-			cns.influence = 1.0
-		else:
-			cns.influence = 0.0
-	elif bone == 'PLegIK_L' or bone == 'PLegIK_R':
-		if toggle & T_LegIK:
-			cns.influence = 1.0
-		else:
-			cns.influence = 0.0
-
-	return True
 
 #
 #	parseCurve (args, tokens):
@@ -1800,6 +1763,7 @@ def postProcess():
 
 def deleteDiamonds(ob):
 	bpy.context.scene.objects.active = ob
+	print("Delete diamonds in %s" % bpy.context.object)
 	bpy.ops.object.mode_set(mode='EDIT')
 	bpy.ops.mesh.select_all(action='DESELECT')
 	bpy.ops.object.mode_set(mode='OBJECT')
@@ -2228,7 +2192,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Symm = T_Symm if self.properties.symm else 0
 		O_Diamond = T_Diamond if self.properties.diamond else 0
 		O_Bend = T_Bend if self.properties.bend else 0
-		toggle =  O_Mesh | O_Proxy | O_Armature | T_ArmIK | T_LegIK | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX 
+		toggle =  O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX 
 
 		print("Load", self.properties.filepath)
 		readMhxFile(self.properties.filepath, 	
@@ -2328,7 +2292,7 @@ if __name__ == "__main__":
 """
 theScale = 1.0
 
-toggle = T_Replace + T_Mesh + T_Armature + T_MHX + T_ArmIK + T_LegIK
+toggle = T_Replace + T_Mesh + T_Armature + T_MHX
 #rigLeg = T_Toes + T_GoboFoot
 #rigArm = T_ElbowPT + T_FingerCurl
 

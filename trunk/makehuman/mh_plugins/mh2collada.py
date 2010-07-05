@@ -48,17 +48,16 @@ def exportCollada(obj, name):
 	exportCollada1(obj, name+".dae", "Human", None)
 	proxyList = mh2proxy.proxyConfig()
 	for proxyFile in proxyList:
-		proxyData = mh2proxy.readProxyFile(obj.verts, proxyFile)
-		(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = proxyData
-		if proxyName:
-			filename = "%s-%s.dae" % (name, proxyName)
-			exportCollada1(obj, filename, proxyName, proxyData)
+		proxy = mh2proxy.readProxyFile(obj, proxyFile)
+		if proxy.name:
+			filename = "%s-%s.dae" % (name, proxy.name)
+			exportCollada1(obj, filename, proxy.name, proxy)
 	return
 
-def exportCollada1(obj, filename, name, proxyData):
+def exportCollada1(obj, filename, name, proxy):
 	print 'Writing Collada file %s' % filename
 	fp = open(filename, 'w')
-	exportDae(obj, fp, name, proxyData)
+	exportDae(obj, fp, name, proxy)
 	fp.close()
 	print 'Collada file %s written' % filename
 	return
@@ -313,10 +312,10 @@ def addInvBones(hier, heads, tails):
 	return newHier
 
 #
-#	exportDae(obj, fp, name, proxyData):
+#	exportDae(obj, fp, name, proxy):
 #
 
-def exportDae(obj, fp, name, proxyData):
+def exportDae(obj, fp, name, proxy):
 	global rigHead, rigTail
 
 	#(rigHead, rigTail, rigHier, bones, rawWeights) = getArmatureFromMhx(obj)
@@ -326,7 +325,7 @@ def exportDae(obj, fp, name, proxyData):
 	#rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
 	rawTargets = []
 
-	(verts, vnormals, uvValues, faces, weights, targets) = mh2proxy.getMeshInfo(obj, proxyData, rawWeights, rawTargets)
+	(verts, vnormals, uvValues, faces, weights, targets) = mh2proxy.getMeshInfo(obj, proxy, rawWeights, rawTargets)
 
 	vertexWeights = {}
 	for (vn,v) in enumerate(verts):
@@ -573,6 +572,7 @@ def exportDae(obj, fp, name, proxyData):
 '         </float_array>\n' +
 '         <technique_common>\n' +
 '           <accessor source="#%s-morph_weights-array" count="%d" stride="1">\n' % (name,nTargets) +
+
 '             <param name="MORPH_WEIGHT" type="float"/>\n' +
 '           </accessor>\n' +
 '         </technique_common>\n' +

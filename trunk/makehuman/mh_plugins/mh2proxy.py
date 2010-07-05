@@ -23,7 +23,31 @@ TO DO
 
 import module3d, aljabr, files3d
 import os
+from aljabr import *
 
+
+#
+#	class CProxy
+#
+
+class CProxy:
+	def __init__(self):
+		self.name = None
+		self.verts = {}
+		self.realVerts = []
+		self.faces = []
+		self.materials = []
+		self.texFaces = []
+		self.texVerts = []
+		self.bones = []
+		self.weights = {}
+		self.weighted = False
+
+#
+#	Flags
+#
+
+F_CON = 0x01
 
 #
 #	proxyConfig():
@@ -58,12 +82,12 @@ def proxyConfig():
 
 	
 #
-#	readProxyFile(verts, proxyFile):
+#	readProxyFile(obj, proxyFile):
 #
 
-def readProxyFile(verts, proxyFile):
+def readProxyFile(obj, proxyFile):
 	if not proxyFile:
-		return (None, [],[],[],[],[],[])
+		return CProxy()
 
 	#tmplName = "./data/templates/%s.proxy" % proxyFile
 	try:
@@ -72,51 +96,51 @@ def readProxyFile(verts, proxyFile):
 		tmpl = None
 	if tmpl == None:
 		print("Cannot open proxy file %s" % proxyFile)
-		return (None, [],[],[],[],[],[])
+		return CProxy()
 
-	realVerts = []
-	proxyFaces = []
-	proxyVerts = {}
-	proxyTexFaces = []
-	proxyTexVerts = []
-	proxyMaterials = []
-	proxyName = "MyProxy"
+	verts = obj.verts
+	locations = {}
+	tails = {}
+	proxy = CProxy()
+	proxy.name = "MyProxy"
 
 	vn = 0
-	doVerts = False
-	doFaces = False
-	doMaterials = False
-	doTexVerts = False
-	doObjData = False
-	theGroup = None
 	for line in tmpl:
 		lineSplit= line.split()
 		if len(lineSplit) == 0:
 			pass
-		elif lineSplit[0] == 'Verts':
-			doVerts = True
-		elif lineSplit[0] == 'Faces':
-			doVerts = False
-			doFaces = True
-		elif lineSplit[0] == 'Materials':
-			doVerts = False
-			doFaces = False
-			doMaterials = True
-		elif lineSplit[0] == 'TexVerts':
+		elif lineSplit[0] == '#':
 			doVerts = False
 			doFaces = False
 			doMaterials = False
-			doTexVerts = True
-		elif lineSplit[0] == 'ObjData':
-			doVerts = False		
-			doObjData = True
-		elif lineSplit[0] == 'Name':
-			proxyName = lineSplit[1]
+			doTexVerts = False
+			doObjData = False
+			doBones = False
+			weightBone = None
+			theGroup = None
+			if lineSplit[1] == 'verts':
+				doVerts = True
+			elif lineSplit[1] == 'faces':
+				doFaces = True
+			elif lineSplit[1] == 'bones':
+				doBones = True
+			elif lineSplit[1] == 'weights':
+				weightBone = lineSplit[2]
+				proxy.weights[weightBone] = []
+				proxy.weighted = True
+			elif lineSplit[1] == 'materials':
+				doMaterials = True
+			elif lineSplit[1] == 'texVerts':
+				doTexVerts = True
+			elif lineSplit[1] == 'objData':
+				doObjData = True
+			elif lineSplit[1] == 'name':
+				proxy.name = lineSplit[2]
 		elif doObjData:
 			if lineSplit[0] == 'vt':
-				newTexVert(1, lineSplit, proxyTexVerts)
+				newTexVert(1, lineSplit, proxy)
 			elif lineSplit[0] == 'f':
-				newFace(1, lineSplit, theGroup, proxyFaces, proxyTexFaces)
+				newFace(1, lineSplit, theGroup, proxy)
 			elif lineSplit[0] == 'g':
 				theGroup = lineSplit[1]
 		elif doVerts:
@@ -127,21 +151,117 @@ def readProxyFile(verts, proxyFile):
 			w1 = float(lineSplit[4])
 			w2 = float(lineSplit[5])
 
-			realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2))
-			addProxyVert(v0, vn, w0, proxyVerts)
-			addProxyVert(v1, vn, w1, proxyVerts)
-			addProxyVert(v2, vn, w2, proxyVerts)
+			proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2))
+			addProxyVert(v0, vn, w0, proxy)
+			addProxyVert(v1, vn, w1, proxy)
+			addProxyVert(v2, vn, w2, proxy)
 			vn += 1
 		elif doFaces:
-			newFace(0, lineSplit, theGroup, proxyFaces, proxyTexFaces)
+			newFace(0, lineSplit, theGroup, proxy)
 		elif doTexVerts:
-			newTexVert(0, lineSplit, proxyTexVerts)
+			newTexVert(0, lineSplit, proxy)
 		elif doMaterials:
-			proxyMaterials.append(int(lineSplit[0]))
+			proxy.materials.append(int(lineSplit[0]))
+		elif doBones:
+			bone = lineSplit[0]
+			head = getJoint(lineSplit[1], obj, locations)
+			tail = getJoint(lineSplit[2], obj, locations)
+			roll = float(lineSplit[3])
+			if lineSplit[4] == '-':
+				parent = None
+			else:
+				parent = lineSplit[4]			
+			tails[bone] = tail
+			flags = 0
+			if parent:
+				offs = vsub(head, tails[parent])
+				if vlen(offs) < 1e-4:
+					flags |= F_CON
+			proxy.bones.append((bone,head,tail,roll,parent,flags))
+		elif weightBone:
+			v = int(lineSplit[0])
+			w = float(lineSplit[1])
+			proxy.weights[weightBone].append((v,w))
 
-	return (proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts)
+	return proxy
 
-def newFace(first, lineSplit, group, proxyFaces, proxyTexFaces):
+#
+#	getLoc(joint, obj):
+#
+
+import mhxbones
+
+def getJoint(joint, obj, locations):
+	try:
+		loc = locations[joint]
+	except:
+		loc = mhxbones.calcJointPos(obj, joint)
+		locations[joint] = loc
+	return loc
+
+#
+#	writeProxyArmature(fp, proxy)
+#	writeProxyBone(fp, boneInfo):	
+#	writeProxyPose(fp, proxy):
+#	writeProxyWeights(fp, proxy):
+#
+
+def writeProxyArmature(fp, proxy):
+	for boneInfo in proxy.bones:
+		writeProxyBone(fp, boneInfo)
+	return
+
+def writeProxyBone(fp, boneInfo):
+	(bone,head,tail,roll,parent,flags) = boneInfo
+
+	fp.write("\n  Bone %s True\n" % bone)
+	(x, y, z) = head
+	fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
+	(x, y, z) = tail
+	fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
+	if parent:
+		fp.write("    parent Refer Bone %s ; \n" % (parent))
+
+	if flags & F_CON:
+		conn = True
+	else:
+		conn = False
+	
+	fp.write(
+"    roll %.6g ; \n" % (roll)+
+"    connected %s ; \n" % (conn) +
+"    deform True ; \n" +
+"  end Bone \n")
+	return
+
+def writeProxyPose(fp, proxy):
+	fp.write("\nPose %sRig" % proxy.name)
+	for boneInfo in proxy.bones:
+		(bone,head,tail,roll,parent,flags) = boneInfo			
+		if parent:
+			fp.write("\n" +
+"  Posebone %s True \n" % bone +
+"    lock_location Array 1 1 1 ;\n" +
+"    lock_scale Array 1 1 1  ; \n"+
+"  end Posebone\n")
+	fp.write("\n"+
+"end Pose\n\n")
+
+def writeProxyWeights(fp, proxy):
+	for grp in proxy.weights.keys():
+		fp.write("\n  VertexGroup %s\n" % grp)
+		for (v,w) in proxy.weights[grp]:
+			fp.write("    wv %d %.4f ;\n" % (v,w))
+		fp.write("  end VertexGroup\n")
+	return
+
+#
+#	newFace(first, lineSplit, group, proxy):
+#	newTexVert(first, lineSplit, proxy):
+#	addProxyVert(v, vn, w, proxy):
+#
+
+def newFace(first, lineSplit, group, proxy):
 	face = []
 	texface = []
 	nCorners = len(lineSplit)
@@ -150,27 +270,27 @@ def newFace(first, lineSplit, group, proxyFaces, proxyTexFaces):
 		face.append(int(words[0])-1)
 		if len(words) > 1:
 			texface.append(int(words[1])-1)
-	proxyFaces.append((face,group))
+	proxy.faces.append((face,group))
 	if texface:
-		proxyTexFaces.append(texface)
+		proxy.texFaces.append(texface)
 		if len(face) != len(texface):
 			raise NameError("texface %s %s", face, texface)
 	return
 
-def newTexVert(first, lineSplit, proxyTexVerts):
+def newTexVert(first, lineSplit, proxy):
 	vt = []
 	nCoords = len(lineSplit)
 	for n in range(first, nCoords):
 		uv = float(lineSplit[n])
 		vt.append(uv)
-	proxyTexVerts.append(vt)
+	proxy.texVerts.append(vt)
 	return
 
-def addProxyVert(v, vn, w, proxyVerts):
+def addProxyVert(v, vn, w, proxy):
 	try:
-		proxyVerts[v].append((vn, w))
+		proxy.verts[v].append((vn, w))
 	except:
-		proxyVerts[v] = [(vn,w)]
+		proxy.verts[v] = [(vn,w)]
 	return
 
 #
@@ -185,11 +305,35 @@ def proxyCoord(barycentric):
 	return [x,y,z]
 
 #
-#	getMeshInfo(obj, proxyData, rawWeights, rawShapes):
+#	getMeshInfo(obj, proxy, rawWeights, rawShapes):
 #
 
-def getMeshInfo(obj, proxyData, rawWeights, rawShapes):
-	if proxyData == None:
+def getMeshInfo(obj, proxy, rawWeights, rawShapes):
+	if proxy:
+		verts = []
+		vnormals = []
+		for bary in proxy.realVerts:
+			v = proxyCoord(bary)
+			verts.append(v)
+			vnormals.append(v)
+
+		faces = []
+		fn = 0
+		for (f,g) in proxy.faces:
+			texFace = proxy.texFaces[fn]
+			face = []
+			for (vn,v) in enumerate(f):
+				face.append((v, texFace[vn]))
+			faces.append(face)
+			fn += 1
+
+		if proxy.weighted:
+			weights = proxy.weights
+		else:
+			weights = getProxyWeights(rawWeights, proxy)
+		shapes = getProxyShapes(rawShapes, proxy.verts)
+		return (verts, vnormals, proxy.texVerts, faces, weights, shapes)
+	else:
 		verts = []
 		vnormals = []
 		for v in obj.verts:
@@ -197,42 +341,19 @@ def getMeshInfo(obj, proxyData, rawWeights, rawShapes):
 			vnormals.append(v.no)
 		faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
 		return (verts, vnormals, obj.uvValues, faces, rawWeights, rawShapes)
-	else:
-		(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = proxyData
-
-		verts = []
-		vnormals = []
-		for bary in realVerts:
-			v = proxyCoord(bary)
-			verts.append(v)
-			vnormals.append(v)
-
-		faces = []
-		fn = 0
-		for (f,g) in proxyFaces:
-			texFace = proxyTexFaces[fn]
-			face = []
-			for (vn,v) in enumerate(f):
-				face.append((v, texFace[vn]))
-			faces.append(face)
-			fn += 1
-
-		weights = getProxyWeights(rawWeights, proxyVerts)
-		shapes = getProxyShapes(rawShapes, proxyVerts)
-		return (verts, vnormals, proxyTexVerts, faces, weights, shapes)
 
 #
-#	getProxyWeights(rawWeights, proxyVerts):
+#	getProxyWeights(rawWeights, proxy):
 #	fixProxyVGroup(fp, vgroup):
 #
 
-def getProxyWeights(rawWeights, proxyVerts):
+def getProxyWeights(rawWeights, proxy):
 	weights = {}
 	for key in rawWeights.keys():
 		vgroup = []
 		for (v,wt) in rawWeights[key]:
 			try:
-				vlist = proxyVerts[v]
+				vlist = proxy.verts[v]
 			except:
 				vlist = []
 			for (pv, w) in vlist:
@@ -257,17 +378,17 @@ def fixProxyVGroup(vgroup):
 	return fixedVGroup
 
 #
-#	getProxyShapes(rawShapes, proxyVerts):
+#	getProxyShapes(rawShapes, proxy):
 #	fixProxyShape(fp, shape)
 #
 
-def getProxyShapes(rawShapes, proxyVerts):
+def getProxyShapes(rawShapes, proxy):
 	shapes = []
 	for (key, rawShape) in rawShapes:
 		shape = []
 		for (v,(dx,dy,dz)) in rawShape.items():
 			try:
-				vlist = proxyVerts[v]
+				vlist = proxy.verts[v]
 			except:
 				vlist = []
 			for (pv, w) in vlist:
@@ -300,46 +421,44 @@ def fixProxyShape(shape):
 
 #
 #	exportProxyObj(obj, filename):	
-#	exportProxyObj1(obj, filename, proxyData):
+#	exportProxyObj1(obj, filename, proxy):
 #
 
 def exportProxyObj(obj, name):
 	proxyList = proxyConfig()
 	for proxyFile in proxyList:
-		proxyData = readProxyFile(obj.verts, proxyFile)
-		(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = proxyData
-		if proxyName:
-			filename = "%s-%s.obj" % (name, proxyName)
-			exportProxyObj1(obj, filename, proxyData)
+		proxy = readProxyFile(obj, proxyFile)
+		if proxy.name:
+			filename = "%s-%s.obj" % (name, proxy.name)
+			exportProxyObj1(obj, filename, proxy)
 	return
 
-def exportProxyObj1(obj, filename, proxyData):
-	(proxyName, proxyVerts, realVerts, proxyFaces, proxyMaterials, proxyTexFaces, proxyTexVerts) = proxyData
+def exportProxyObj1(obj, filename, proxy):
 	fp = open(filename, 'w')
 	fp.write(
 "# MakeHuman exported OBJ for proxy mesh\n" +
 "# www.makehuman.org\n\n")
 
-	for bary in realVerts:
+	for bary in proxy.realVerts:
 		(x,y,z) = proxyCoord(bary)
 		fp.write("v %.6g %.6g %.6g\n" % (x, y, z))
 
-	for uv in proxyTexVerts:
+	for uv in proxy.texVerts:
 		fp.write("vt %s %s\n" % (uv[0], uv[1]))
 
 	mat = -1
 	fn = 0
 	grp = None
-	for (f,g) in proxyFaces:
-		if proxyMaterials and proxyMaterials[fn] != mat:
-			mat = proxyMaterials[fn]
+	for (f,g) in proxy.faces:
+		if proxy.materials and proxy.materials[fn] != mat:
+			mat = proxy.materials[fn]
 			fp.write("usemtl %s\n" % matNames[mat])
 		if g != grp:
 			fp.write("g %s\n" % g)
 			grp = g
 		fp.write("f")
-		if proxyTexFaces:
-			ft = proxyTexFaces[fn]
+		if proxy.texFaces:
+			ft = proxy.texFaces[fn]
 			vn = 0
 			for v in f:
 				vt = ft[vn]

@@ -1,3 +1,39 @@
+NoScale False ;
+
+*** ProxyRigStart
+  auto_ik False ;
+  deform_bbone_rest False ;
+  deform_envelope True ;
+  deform_quaternion True ;
+  deform_vertexgroups True ;
+  delay_deform False ;
+  draw_axes False ;
+  draw_custom_bone_shapes True ;
+  draw_group_colors True ;
+  draw_names False ;
+  drawtype 'STICK' ;
+  ghost_frame_end 0 ;
+  ghost_only_selected False ;
+  ghost_size 1 ;
+  ghost_frame_start 0 ;
+  ghost_step 0 ;
+  ghost_type 'CURRENT_FRAME' ;
+  layer Array 1 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layer_protection Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  pose_position 'POSE' ;
+  x_axis_mirror False ;
+end Armature
+
+*** ProxyRigObject
+  layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  up_axis 'Z' ;
+  x_ray True ;
+end Object
+
+*** ProxyPose
+
+end if
+
 
 *** ProxyMesh
   Verts
@@ -23,7 +59,7 @@ end Mesh
       expanded True ;
       invert False ;
       multi_modifier False ;
-      object Refer Object HumanRig ;
+      *** ProxyReferRig
       on_cage True ;
       quaternion False ;
       realtime True ;
