@@ -246,19 +246,19 @@ class PoseTaskView(gui3d.TaskView):
         
         
         #for i in range(-140,45,10):
-        for i in [-135,-67,0,45]:
-            self.shoulderY = i
+        for i in [-115,-90,-67,-45,-22,0,22,45,67,90]:
+            self.shoulderZ = i
             
             #for i2 in range(-120,90,10):
-            for i2 in [-115,-90,-67,-45,-22,0,22,45,67,90]:
-                self.shoulderZ = i2
+            for i2 in [-135,-67,0,45]:
+                self.shoulderY = i2
                 self.shoulderXslider.setValue(0.0)
                 self.shoulderYslider.setValue(self.shoulderY)
                 self.shoulderZslider.setValue(self.shoulderZ)
                 self.shoulderXLabel.setText('0')
                 self.shoulderYLabel.setText(str(self.shoulderY))        
                 self.shoulderZLabel.setText(str(self.shoulderZ))
-                self.applyPose()  
+                self.applyPose(True)  
                 self.app.scene3d.redraw(0)
             
         
@@ -299,7 +299,7 @@ class PoseTaskView(gui3d.TaskView):
 
         if saveData == True:
 
-            outFilePath = "%s_%s_%s.pose"%(self.shoulderX,self.shoulderY,self.shoulderZ)
+            outFilePath = "%s_%s_%s.pose"%(self.shoulderX,self.shoulderZ,self.shoulderY)
             
             fDescriptor = open(outFilePath, 'w')
             print "SAVED IN ", outFilePath
@@ -309,12 +309,13 @@ class PoseTaskView(gui3d.TaskView):
             for targetPath in rotPathsX:
                 morphFactor = self.rotx[targetPath]
                 fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
-            for targetPath in rotPathsY:
-                morphFactor = self.roty[targetPath]
-                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
             for targetPath in rotPathsZ:
                 morphFactor = self.rotz[targetPath]
                 fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
+            for targetPath in rotPathsY:
+                morphFactor = self.roty[targetPath]
+                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
+            
             fDescriptor.close()
         
         
