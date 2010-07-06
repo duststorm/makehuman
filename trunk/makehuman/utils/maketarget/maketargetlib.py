@@ -17,6 +17,7 @@ import time
 from blendersaveobj import *
 import os
 from math import *
+from scipy.linalg import eigh,pinv
 
 
 def analyzeTarget(vertices, targetBuffer, scale=0.5):
@@ -35,6 +36,33 @@ def analyzeTarget(vertices, targetBuffer, scale=0.5):
     return vertColors
 
 
+
+
+def align_PCA(vertices0, vertices1):
+    """
+     it accepts and returns lists of lists
+     vertices0 can be either MH mesh
+     or the concatenation of a few manually aligned scans
+    """
+    vertices0 = np.array(vertices0)
+    vertices1 = np.array(vertices1)
+
+    # Computes the barycenter
+    mean0 = np.mean(vertices0,0)
+    mean1 = np.mean(vertices1,0)
+
+    # computes covariance matrix and principal axes
+    cov0 = np.cov(vertices0.T)
+    w0,u0 = eigh(cov0)
+
+    cov1 = np.cov(vertices1.T)
+    w1,u1 = eigh(cov1)
+
+    # Computes rotation matrix to go from 1 to 0
+    R = np.dot(u0,pinv(u1))
+
+    #apply the transformation
+    return (w0[-1]/w1[-1]*np.dot(vertices1-mean1,R.T) + mean0).tolist()
 
 def axisID(axisVect):
     #TODO comments

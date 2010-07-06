@@ -46,9 +46,9 @@ morphFactor = Draw.Create(1.0)
 saveOnlySelectedVerts = Draw.Create(0)
 rotationMode = Draw.Create(0)
 poseMode = False
-loadedTrasloadTarget = None
-loadedRotTarget = None
-loadedPoseTarget = None
+loadedTraslTarget = ""
+loadedRotTarget = ""
+loadedPoseTarget = ""
 targetBuffer = [] #Loaded target Data    
   
 #--------SOME BLENDER SPECIFICS SHORTCUTS------------
@@ -114,35 +114,35 @@ def colorVertices(vertColors, n=0):
 #-------MAKETARGET CALLBACKS----------------------
 
 def loadTarget(path):
-    global loadedTrasloadTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode    
+    global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode    
     startEditing()    
     if os.path.splitext(path)[1] == ".rot":
         loadedRotTarget = path
-        loadedTrasloadTarget = None
-        loadedPoseTarget = None
+        loadedTraslTarget = ""
+        loadedPoseTarget = ""
         rotationMode.val = 1
         poseMode = False
     if os.path.splitext(path)[1] == ".target":
-        loadedTrasloadTarget = path
-        loadedRotTarget = None
-        loadedPoseTarget = None
+        loadedTraslTarget = path
+        loadedRotTarget = ""
+        loadedPoseTarget = ""
         rotationMode.val = 0
         poseMode = False
     if os.path.splitext(path)[1] == ".pose":
         loadedPoseTarget = path
-        loadedTrasloadTarget = None
-        loadedRotTarget = None
+        loadedTraslTarget = ""
+        loadedRotTarget = ""
         poseMode = True    
     endEditing()
   
 def applyTarget(mFactor, n=0):
-    global loadedTrasloadTarget,rotationMode,loadedRotTarget,loadedPoseTarget
+    global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget
     startEditing()
     vertices = getVertices(n)
     if rotationMode.val and not poseMode:
         maketargetlib.loadRotTarget(vertices,loadedRotTarget,mFactor)
     if not rotationMode.val and not poseMode:
-        maketargetlib.loadTraslTarget(vertices,loadedTrasloadTarget,mFactor)
+        maketargetlib.loadTraslTarget(vertices,loadedTraslTarget,mFactor)
     if not rotationMode.val and poseMode:        
         maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor)
     if rotationMode.val and poseMode:
@@ -156,6 +156,13 @@ def applyPoseFromFolder(path, n=0):
     vertices = getVertices(n)
     maketargetlib.loadPoseFromFolder(vertices,path,morphFactor.val)
     updateVertices(vertices)
+    endEditing()
+    
+def alignPCA():
+    startEditing()
+    vertices0 = getVertices(0)
+    vertices1 = getVertices(1)    
+    updateVertices(maketargetlib.align_PCA(vertices0, vertices1),1)
     endEditing()
 
 def saveTarget(path):
@@ -250,7 +257,7 @@ def draw():
 
     """
     global targetPath,morphFactor,rotVal,rotSum,current_target,selAxis,rotationMode
-    global saveOnlySelectedVerts,loadedTrasloadTarget, loadedRotTarget, loadedPoseTarget
+    global saveOnlySelectedVerts,loadedTraslTarget, loadedRotTarget, loadedPoseTarget
     fileText = ""
 
     glClearColor(0.5, 0.5, 0.5, 0.0)
@@ -259,8 +266,8 @@ def draw():
     glColor3f(0.0, 0.0, 0.0)
     glRasterPos2i(10, 250)
     Draw.Text("Make MH targets v3.1")
-    if loadedTrasloadTarget:
-        fileText = os.path.basename(loadedTrasloadTarget)
+    if loadedTraslTarget:
+        fileText = os.path.basename(loadedTraslTarget)
     elif loadedRotTarget:
         fileText = os.path.basename(loadedRotTarget)
     elif loadedPoseTarget:
@@ -328,6 +335,8 @@ def event(event, value):
         Window.FileSelector (scaleRotTarget, "Scale Rot target")
     elif event == Draw.QKEY:
         Window.FileSelector (applyPoseFromFolder, "Load pose from folder") 
+    elif event == Draw.RKEY:
+        alignPCA()
 
         
         
@@ -345,11 +354,11 @@ def b_event(event):
         *int*. An indicator of the event to be processed
 
     """
-    global symmPath,selAxis,morphFactor
+    global symmPath,selAxis,morphFactor,loadedTraslTarget
     global current_target
     if event == 0: pass
     elif event == 1:
-        Window.FileSelector (saveTarget, "Save Target",loadedTrasloadTarget)
+        Window.FileSelector (saveTarget, "Save Target",loadedTraslTarget)
     elif event == 2:
         Window.FileSelector (loadTarget, "Load Target")
     elif event == 3:
