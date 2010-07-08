@@ -63,8 +63,11 @@ def endEditing():
     Blender.Window.EditMode(windowEditMode)
     Blender.Window.RedrawAll()
 
-def getVertices(n=0):
-    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
+def getVertices(n=0,name = None):
+    if name:
+        obj = Blender.Object.Get(name).getData(mesh=True)
+    else:    
+        obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     vertices = [[v.co[0],v.co[1],v.co[2]] for v in obj.verts]
     return vertices
 
@@ -90,8 +93,11 @@ def selectVert(i, n=0):
     obj.update()
     obj.calcNormals()
 
-def updateVertices(vertices, n=0):
-    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
+def updateVertices(vertices, n=0, name = None):
+    if name:
+        obj = Blender.Object.Get(name).getData(mesh=True)
+    else:    
+        obj = Blender.Object.GetSelected()[n].getData(mesh=True)    
     for i,v in enumerate(vertices):
        obj.verts[i].co[0], obj.verts[i].co[1],obj.verts[i].co[2] = v[0],v[1],v[2]
     obj.update()
@@ -214,15 +220,17 @@ def adapt():
     updateVertices(base,0)
     endEditing()
 
-def align():
-    #TODO for Alexis: this function doesn't work because an error in fit_mesh
+def align():    
     startEditing()
-    maskBaseVerts = getVertices(0)
-    maskScanVerts = getVertices(1)
-    scanVerts = getVertices(2)    
+    maskBaseVerts = getVertices(name="mask_mh")
+    maskScanVerts = getVertices(name="mask_scan")
+    if len(maskBaseVerts) != len(maskScanVerts):
+        print "Error: Masks with different number of vertices: %d vs %d"%(len(maskBaseVerts),len(maskScanVerts))
+        return
+    scanVerts = getVertices(0)    
     maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
-    updateVertices(scanVerts,2)
-    updateVertices(maskScanVerts,1)
+    updateVertices(scanVerts,0)
+    updateVertices(maskScanVerts,name="mask_scan")
     endEditing()  
     
 def saveSelVerts(path, n= 0):
@@ -314,7 +322,7 @@ def event(event, value):
     elif event == Draw.DKEY:
         Window.FileSelector (loadAlloadTargetInFolder, "Load from folder")
     elif event == Draw.EKEY:
-        alignMasks()
+        align()
     elif event == Draw.FKEY:
         Window.FileSelector (generateTargetsDB, "Generate DB from")
     elif event == Draw.GKEY:
