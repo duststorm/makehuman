@@ -37,6 +37,25 @@ def analyzeTarget(vertices, targetBuffer, scale=0.5):
 
 
 
+def turn_around(vertices,axis,angle):
+    """
+        Rotate vertices around 'axis' with angle value 'angle'
+    """
+
+    P = np.dot(axis[:,np.newaxis],axis[np.newaxis,:])
+    I = np.identity(len(axis))
+    Q = np.array([
+        [   0     , -axis[2] , axis[1] ],
+        [ axis[2] ,     0    , -axis[0]],
+        [-axis[1] ,  axis[0] ,   0     ]])
+    cosa = np.cos(angle)
+    sina = np.sin(angle)
+    return P + (I-P)*cosa + Q*sina
+
+def compute_distance(vertices0, vertices1):
+    kd = KDTree(vertices0)
+    dist,indx = kd.query(vertices1)
+    return sum(dist)
 
 def align_PCA(vertices0, vertices1):
     """
@@ -62,7 +81,35 @@ def align_PCA(vertices0, vertices1):
     R = np.dot(u0,pinv(u1))
 
     #apply the transformation
-    return (w0[-1]/w1[-1]*np.dot(vertices1-mean1,R.T) + mean0).tolist()
+    vertices = w0[-1]/w1[-1]*np.dot(vertices1-mean1,R.T)
+    
+    # axis can be arbitrarily oriented so we have to check if some rotations
+    # around main axes are needed
+    dmin = None
+    amin = bmin = cmin = None
+    
+    for a in [0,np.pi]:
+        if a != 0 : va = turn_around(vertices[::10],u0[:,0],a)
+        else : va = vertices[::2]
+        for b in [0,np.pi] :
+            if b != 0 : vb = turn_around(va,u0[:,1],b)
+            else : vb = va
+            for c in [0,np.pi] :
+                if c != 0 : vc = turn_around(vb,u0[:,2],c)
+                else : vc = vb
+                dist = compute_distance(vc+mean0,vertices0)
+                if dmin is None or dist < dmin :
+                    dmin = dist
+                    amin = a
+                    bmin = b
+                    cmin = c
+
+    if amin : vertices = turn_around(vertices,u0[:,0],amin)
+    if bmin : vertices = turn_around(vertices,u0[:,1],bmin)
+    if cmin : vertices = turn_around(vertices,u0[:,2],cmin)
+        
+    return vertices + mean0
+
 
 def axisID(axisVect):
     #TODO comments
