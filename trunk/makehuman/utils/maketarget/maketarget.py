@@ -49,7 +49,8 @@ poseMode = False
 loadedTraslTarget = ""
 loadedRotTarget = ""
 loadedPoseTarget = ""
-targetBuffer = [] #Loaded target Data    
+targetBuffer = [] #Loaded target Data
+message = ""  
   
 #--------SOME BLENDER SPECIFICS SHORTCUTS------------
 
@@ -61,6 +62,9 @@ def startEditing():
 def endEditing():
     global windowEditMode
     Blender.Window.EditMode(windowEditMode)
+    Blender.Window.RedrawAll()
+
+def redrawAll():
     Blender.Window.RedrawAll()
 
 def getVertices(n=0,name = None):
@@ -171,8 +175,12 @@ def alignPCA():
     updateVertices(maketargetlib.align_PCA(vertices0, vertices1),1)
     endEditing()
 
-def saveTarget(path):
-    global saveOnlySelectedVerts,basePath
+def saveTarget(path):    
+    global saveOnlySelectedVerts,basePath, message
+    if os.path.exists(path):
+        message =  "Error: file already exist"
+        redrawAll()
+        return    
     verticesTosave = []    
     vertices = getVertices()   
     if saveOnlySelectedVerts.val:
@@ -182,7 +190,9 @@ def saveTarget(path):
     if os.path.splitext(path)[1] == ".rot":        
         maketargetlib.saveRotTargets(vertices, path, basePath,getSelectedVertices())
     else:
-        maketargetlib.saveTraslTarget(vertices, path, basePath, verticesTosave)    
+        maketargetlib.saveTraslTarget(vertices, path, basePath, verticesTosave)
+    message = "Saved in %s"%(path)
+    redrawAll()
 
 def seekGroup():
     vertGroups = []
@@ -208,8 +218,17 @@ def symm(rightMirror, n=0):
     endEditing()
 
 def scaleRotTarget(path):
-    global morphFactor
+    global morphFactor,basePath
     maketargetlib.saveScaledRotTarget(path,morphFactor.val)
+    
+def processingTargets(path, n=0):
+    global morphFactor
+    startEditing() 
+    vertices = getVertices(n)
+    verticesTosave = xrange(len(vertices))
+    maketargetlib.processingTargets(path,basePath,vertices,morphFactor.val,verticesTosave)
+    updateVertices(vertices,n)
+    endEditing()
     
 def adapt():
     startEditing()
@@ -225,15 +244,20 @@ def align():
     maskBaseVerts = getVertices(name="mask_mh")
     maskScanVerts = getVertices(name="mask_scan")
     if len(maskBaseVerts) != len(maskScanVerts):
-        print "Error: Masks with different number of vertices: %d vs %d"%(len(maskBaseVerts),len(maskScanVerts))
+        message = "Error: Masks with different number of vertices: %d vs %d"%(len(maskBaseVerts),len(maskScanVerts))
         return
     scanVerts = getVertices(0)    
     maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
     updateVertices(scanVerts,0)
     updateVertices(maskScanVerts,name="mask_scan")
+    message = "Alignment done!"
     endEditing()  
     
 def saveSelVerts(path, n= 0):
+    if os.path.exists(path):
+        message =  "Error: file already exist"
+        redrawAll()
+        return 
     maketargetlib.saveIndexSelectedVerts(getSelectedVertices(n), path)
     
 def loadSelVerts(path, n= 0):
@@ -264,28 +288,32 @@ def draw():
     **Parameters:** This method has no parameters.
 
     """
-    global targetPath,morphFactor,rotVal,rotSum,current_target,selAxis,rotationMode
+    global message
+    global targetPath,morphFactor,rotVal,rotSum,currentTarget,selAxis,rotationMode
     global saveOnlySelectedVerts,loadedTraslTarget, loadedRotTarget, loadedPoseTarget
-    fileText = ""
-
+    
     glClearColor(0.5, 0.5, 0.5, 0.0)
     glClear(GL_COLOR_BUFFER_BIT)
 
     glColor3f(0.0, 0.0, 0.0)
+    glRasterPos2i(10, 300)
+    Draw.Text("MakeTargets v3.2")
+
+    glColor3f(0.5, 0.0, 0.0)
     glRasterPos2i(10, 250)
-    Draw.Text("Make MH targets v3.1")
+    Draw.Text("Msg: %s"%(message))
+
+    glColor3f(0.0, 0.0, 0.0)
+    glRasterPos2i(10, 230)
+    Draw.Text("Target: %s"%(os.path.basename(loadedTraslTarget)))
+    
     if loadedTraslTarget:
         fileText = os.path.basename(loadedTraslTarget)
     elif loadedRotTarget:
         fileText = os.path.basename(loadedRotTarget)
     elif loadedPoseTarget:
         fileText = os.path.basename(loadedPoseTarget)
-    glRasterPos2i(10, 230)
-    Draw.Text("Target: %s"%(fileText))
     
-    glRasterPos2i(10, 120)
-
-    #Draw.Button("Align", 20, 10, 150, 50, 20, "Align scans")
 
     Draw.Button("Load", 2, 10, 200, 50, 20, "Load target")
     Draw.Button("Morph", 3, 60, 200, 50, 20, "Morph ")
@@ -344,14 +372,14 @@ def event(event, value):
     elif event == Draw.QKEY:
         Window.FileSelector (applyPoseFromFolder, "Load pose from folder") 
     elif event == Draw.RKEY:
-        alignPCA()
-
-        
+        alignPCA()    
+    elif event == Draw.SKEY:
+        Window.FileSelector (processingTargets, "Process targets") 
         
   
         
 
-def b_event(event):
+def buttonEvents(event):
     """
     This function handles events when the morph target is being processed.
 
@@ -363,7 +391,7 @@ def b_event(event):
 
     """
     global symmPath,selAxis,morphFactor,loadedTraslTarget
-    global current_target
+    global currentTarget
     if event == 0: pass
     elif event == 1:
         Window.FileSelector (saveTarget, "Save Target",loadedTraslTarget)
@@ -381,4 +409,4 @@ def b_event(event):
         align()
     Draw.Draw()
     
-Draw.Register(draw, event, b_event)
+Draw.Register(draw, event, buttonEvents)

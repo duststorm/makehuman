@@ -201,7 +201,7 @@ def loadTraslTarget(vertices,targetPath,mFactor):
         return  None
 
     current_target = targetPath
-    print  targetPath,mFactor 
+    #print  targetPath,mFactor 
     for vData in fileDescriptor:
         vectorData = vData.split()
         if vectorData[0].find('#')==-1:
@@ -258,7 +258,7 @@ def saveTraslTarget(vertices, targetPath, basePath, verticesTosave):
     except:
         print "Unable to open %s",(targetPath)
         return  None
-
+    print "saving %s"%(targetPath)
     for index in verticesTosave:
         originalVertex = originalVertices[index]
         targetVertex = vertices[index]
@@ -571,24 +571,26 @@ def saveTranslationTargetAndHisSymm(targetPath):
     resetMesh()
 
 
-def processingTargets(filepath):
+def processingTargets(path,basePath,vertices,mFactor,verticesTosave):
     """
     This function is used to adjust little changes on base
     meshes, correcting all targets
     """
 
+    targetDir = os.path.dirname(path)
+    targetToApply = os.path.basename(path)
+    targetsList = os.listdir(targetDir)
 
-    folderToScan = os.path.dirname(filepath)
-    targetList = os.listdir(folderToScan)
-
-    for targetName in targetList:
-        targetPath = os.path.join(folderToScan,targetName)
-        if os.path.isfile(targetPath):
-            print "Processing %s"%(targetPath)
-            loadTraslTarget(targetPath)
-            applyTarget(1.0)
-            saveTraslTarget(targetPath)
-            applyTarget(-1.0)
+    for targetName in targetsList:
+        if targetName != targetToApply:
+            targetPath = os.path.join(targetDir,targetName)
+            if os.path.isfile(targetPath):
+                #print "Processing %s"%(targetPath)
+                loadTraslTarget(vertices,targetPath,1.0)                
+                loadTraslTarget(vertices,path,mFactor) 
+                saveTraslTarget(vertices, targetPath+".mod.target", basePath, verticesTosave)
+                loadTraslTarget(vertices,path,-mFactor) 
+                loadTraslTarget(vertices,targetPath,-1.0)                
 
 
 
