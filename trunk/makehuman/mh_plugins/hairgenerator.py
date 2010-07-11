@@ -551,7 +551,7 @@ class Hairgenerator:
                 datalist[1] = datalist[1].split("_") #first entry = group, second entry= guidename)
                 #Josenow! Todo Guidegroup problem adding
                 currentGroup = self.addGuideGroup(datalist[1][0])
-                guideName = datalist[1][1]             
+                if len(datalist[1])>1: guideName = datalist[1][1]             
             elif datalist[0] == "end":
                 self.addHairGuide(guidePoints, guideName,currentGroup)
                 guidePoints=[]

@@ -167,8 +167,10 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
           if j==N and i==len(curve)-1 : cPs.append(curve[i-1])
           else: cPs.append(ThreeDQBspline(curve[i-2],curve[i-1],\
                            curve[i],j*res*4/d))
-      uvFactor = 1.0/(len(cPs) -3) #here obviously guides must have ctrlPts  > 4!
       uvLength=len(cPs)-3
+      if (uvLength<=0): return #neglects uv for strands with less than 4 control points
+      uvFactor = 1.0/uvLength 
+      
       vtemp1, vtemp2 = None, None
       uvtemp1, uvtemp2 = None, None
       dist =  widthFactor*res/2
