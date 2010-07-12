@@ -297,7 +297,7 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
 
     for index, vert in enumerate(vertices):
         sourceVertex = originalVertices[index]
-        targetVertex = [vertices[0],vertices[1],vertices[2]]
+        targetVertex = vertices[index]
 
         if  vdist(sourceVertex,targetVertex) > epsilon:
             pointIndex = index
@@ -376,11 +376,9 @@ def saveRotTargets(vertices, targetPath, basePath, vertsSelected):
             else:
                 print "Problem calculating theta: v1,v2 =",v1,v2
 
-    try:
-        fileDescriptor = open(targetFile,'w+')
-    except:
-        print "Error in opening %s" %targetFile
-        return 0
+    
+    fileDescriptor = open(targetPath,'w+')
+    
     #Write info about rotation: index of verts of rot axis
     fileDescriptor.write("%i %i %s #Indices of axis verts and axis\n" % (axisVertsIdx1,axisVertsIdx2,rotAxe))
     for angl, vertIndices in rotData.iteritems():
