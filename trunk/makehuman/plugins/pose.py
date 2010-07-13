@@ -144,10 +144,20 @@ class PoseTaskView(gui3d.TaskView):
         #Assuming order is x_z_y
         y = angle[2]
         z = angle[1]
-        
+        x = angle[0]
+
+        xLabel = [0,0,0]
         yLabel = [0,0,0]
         zLabel = [0,0,0]
-        yVal,zVal = 0.0,0.0
+        xVal,yVal,zVal = 0.0,0.0,0.0
+
+        if x < 0:
+            xLabel = [-90,0,0]
+            xVal = x/-90.0            
+            
+        if x > 0:
+            xLabel = [90,0,0]
+            xVal = x/90.0
         
         if y < 0:
             yLabel = [0,0,-135]
@@ -166,10 +176,11 @@ class PoseTaskView(gui3d.TaskView):
             zVal = z/90.0
             
         print "ROTATIONS"
+        print xLabel,xVal
         print yLabel,yVal
         print zLabel,zVal
         
-        return (yLabel,zLabel,yVal,zVal)
+        return (xLabel,yLabel,zLabel,xVal,yVal,zVal)
         
             
         
@@ -231,15 +242,15 @@ class PoseTaskView(gui3d.TaskView):
 
         targetRot1 = "_".join([str(int(x)) for x in samplesRot[0]])
         targetRot2 = "_".join([str(int(x)) for x in samplesRot[1]])
-        #targetRot3 = "_".join([str(int(x)) for x in samplesRot[2]])
+        targetRot3 = "_".join([str(int(x)) for x in samplesRot[2]])
 
         targetTrasl1 = "_".join([str(int(x)) for x in samplesTrasl[0]])
         targetTrasl2 = "_".join([str(int(x)) for x in samplesTrasl[1]])
         targetTrasl3 = "_".join([str(int(x)) for x in samplesTrasl[2]])
 
-        morphRotVal1 = samplesRot[2]
-        morphRotVal2 = samplesRot[3]
-        #morphRotVal3 = samplesRot[5]
+        morphRotVal1 = samplesRot[3]
+        morphRotVal2 = samplesRot[4]
+        morphRotVal3 = samplesRot[5]
 
         morphTraslVal1 = samplesTrasl[3]
         morphTraslVal2 = samplesTrasl[4]
@@ -247,7 +258,7 @@ class PoseTaskView(gui3d.TaskView):
 
         pathRot1 = os.path.join(shoulderRotDir,targetRot1)
         pathRot2 = os.path.join(shoulderRotDir,targetRot2)
-        #pathRot3 = os.path.join(shoulderRotDir,targetRot3)
+        pathRot3 = os.path.join(shoulderRotDir,targetRot3)
 
         pathTrasl1 = os.path.join(shoulderTraslDir,targetTrasl1)
         pathTrasl2 = os.path.join(shoulderTraslDir,targetTrasl2)
@@ -257,7 +268,7 @@ class PoseTaskView(gui3d.TaskView):
         print "SAMPLES USED ", angle
         print os.path.basename(pathRot1),morphRotVal1
         print os.path.basename(pathRot2),morphRotVal2
-        #print os.path.basename(pathRot3),morphRotVal3
+        print os.path.basename(pathRot3),morphRotVal3
 
         #print pathTrasl1,morphTraslVal1
         #print pathTrasl2,morphTraslVal2
@@ -265,7 +276,7 @@ class PoseTaskView(gui3d.TaskView):
 
         self.storeTargets(pathRot1,morphRotVal1)
         self.storeTargets(pathRot2,morphRotVal2)
-        #self.storeTargets(pathRot3,morphRotVal3)
+        self.storeTargets(pathRot3,morphRotVal3)
         self.storeTargets(pathTrasl1,morphTraslVal1)
         self.storeTargets(pathTrasl2,morphTraslVal2)
         self.storeTargets(pathTrasl3,morphTraslVal3)
@@ -310,24 +321,21 @@ class PoseTaskView(gui3d.TaskView):
 
 
     def testShoulder(self):
-        self.shoulderX = 0
-
-
-        #for i in range(-140,45,10):
-        for i in [-115,-90,-67,-45,-22,0,22,45,67,90]:
-            self.shoulderZ = i
-
-            #for i2 in range(-120,90,10):
+        self.shoulderX = 0  
+        for i1 in [-115,-90,-67,-45,-22,0,22,45,67,90]:
+            self.shoulderZ = i1
             for i2 in [-135,-67,0,45]:
-                self.shoulderY = i2
-                self.shoulderXslider.setValue(0.0)
-                self.shoulderYslider.setValue(self.shoulderY)
-                self.shoulderZslider.setValue(self.shoulderZ)
-                self.shoulderXLabel.setText('0')
-                self.shoulderYLabel.setText(str(self.shoulderY))
-                self.shoulderZLabel.setText(str(self.shoulderZ))
-                self.applyPose()
-                self.app.scene3d.redraw(0)
+                self.shoulderY = i2                    
+                for i3 in[-90,90]:
+                    self.shoulderX = i3
+                    self.shoulderXslider.setValue(self.shoulderX)
+                    self.shoulderYslider.setValue(self.shoulderY)
+                    self.shoulderZslider.setValue(self.shoulderZ)
+                    self.shoulderXLabel.setText(str(self.shoulderX))
+                    self.shoulderYLabel.setText(str(self.shoulderY))
+                    self.shoulderZLabel.setText(str(self.shoulderZ))
+                    self.applyPose(True)
+                    self.app.scene3d.redraw(0)
 
 
     #maybe this should be moved in human class
