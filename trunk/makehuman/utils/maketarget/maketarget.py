@@ -390,11 +390,21 @@ def buttonEvents(event):
         *int*. An indicator of the event to be processed
 
     """
-    global symmPath,selAxis,morphFactor,loadedTraslTarget
+    global symmPath,selAxis,morphFactor
+    global loadedTraslTarget, loadedRotTarget, loadedPoseTarget
     global currentTarget
+
+    fileToSaveName = ""
+    if loadedTraslTarget != "":
+        fileToSaveName = loadedTraslTarget
+    if loadedRotTarget != "":
+        fileToSaveName = loadedRotTarget
+    if loadedPoseTarget != "":
+        fileToSaveName = loadedPoseTarget
+    
     if event == 0: pass
     elif event == 1:
-        Window.FileSelector (saveTarget, "Save Target",loadedTraslTarget)
+        Window.FileSelector (saveTarget, "Save Target",fileToSaveName)
     elif event == 2:
         Window.FileSelector (loadTarget, "Load Target")
     elif event == 3:
