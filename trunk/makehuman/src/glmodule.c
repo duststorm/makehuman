@@ -509,10 +509,10 @@ static void mhFlipSurface(SDL_Surface *surface)
  */
 GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 {
-    printf("Loading texture '%s'\n", fname);
-    
     int internalFormat, format;
     SDL_Surface *surface;
+
+    printf("Loading texture '%s'\n", fname);
 
     if (!texture)
         glGenTextures(1, &texture);
