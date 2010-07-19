@@ -495,6 +495,32 @@ def saveScaledRotTarget(path,scaleFactor):
     fileDescriptor.close()
 
 
+def saveGroups(vertGroups, path, filter = None):
+    """
+    This function saves the indices of selected verts
+
+    Parameters
+    ----------
+
+    filePath:
+        *string*. A string containing the operating system path to the
+        file to be written.
+
+    """
+    try:
+        fileDescriptor = open(path, "w")
+    except:
+        print "Unable to open %s",(path)
+        return  None
+    for g in vertGroups:
+        if filter:
+            if filter in g:
+                fileDescriptor.write("%s\n"%(g))
+        else:
+            fileDescriptor.write("%s\n"%(g))
+    fileDescriptor.close()
+
+
 def saveIndexSelectedVerts(selectVerts, path):
     """
     This function saves the indices of selected verts

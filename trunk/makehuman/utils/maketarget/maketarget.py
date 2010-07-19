@@ -194,12 +194,16 @@ def saveTarget(path):
     message = "Saved in %s"%(path)
     redrawAll()
 
-def seekGroup():
-    vertGroups = []
+def seekGroup():    
     vertSelect = getSelectedVertices()   
     vertices = getVertices()
     vertGroups  = getVertGroups()    
     maketargetlib.seekGroupName(vertices, vertSelect, vertGroups)
+
+def saveGroups(path):    
+    vertGroups  = getVertGroups().keys()
+    vertGroups.sort()   
+    maketargetlib.saveGroups(vertGroups, path, "joint")
     
 def reset():
     global basePath
@@ -374,7 +378,9 @@ def event(event, value):
     elif event == Draw.RKEY:
         alignPCA()    
     elif event == Draw.SKEY:
-        Window.FileSelector (processingTargets, "Process targets") 
+        Window.FileSelector (processingTargets, "Process targets")
+    elif event == Draw.TKEY:
+        Window.FileSelector (saveGroups, "Save vertgroups") 
         
   
         
