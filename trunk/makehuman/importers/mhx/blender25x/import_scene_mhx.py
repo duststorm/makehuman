@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.9
+Version 0.13
 
 """
 
 bl_addon_info = {
 	'name': 'Import MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.9',
+	'version': '0.13',
 	'blender': (2, 5, 3),
 	'location': 'File > Import',
 	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
@@ -34,6 +34,9 @@ Place this file in the .blender/scripts/addons dir
 You have to activated the script in the "Add-Ons" tab (user preferences).
 Access from the File > Import menu.
 """
+
+MAJOR_VERSION = 0
+MINOR_VERSION = 13
 
 #
 #
@@ -47,8 +50,6 @@ from mathutils import *
 import geometry
 import string
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 11
 MHX249 = False
 Blender24 = False
 Blender25 = True
@@ -77,6 +78,7 @@ todo = []
 #	toggle flags
 #
 
+T_EnforceVersion = 0x01
 T_Stretch = 0x04
 T_Bend = 0x08
 
@@ -95,7 +97,7 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_Replace + T_Mesh + T_Armature + T_Face + T_Stretch
+toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Stretch
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -339,21 +341,44 @@ def getObject(name, var, glbals, lcals):
 	return ob
 
 #
+#	checkMhxVersion(major, minor):
+#
+
+def checkMhxVersion(major, minor):
+	global warnedVersion
+	if  major != MAJOR_VERSION or minor != MINOR_VERSION:
+		if warnedVersion:
+			return
+		else:
+			msg = (
+"Wrong MHX version\n" +
+"Expected MHX %d.%d but the loaded file has version MHX %d.%d\n" % (MAJOR_VERSION, MINOR_VERSION, major, minor) +
+"You can disable this error message by deselecting the Enforce version option when importing. " +
+"Alternatively, you can try to download the most recent nightly build from www.makehuman.org. " +
+"The current version of the import script is located in the importers/mhx/blender25x folder and is called import_scene_mhx.py. " +
+"The version distributed with Blender builds from www.graphicall.org may be out of date.\n"
+)
+		if toggle & T_EnforceVersion:
+			raise NameError(msg)
+		else:
+			print(msg)
+			warnedVersion = True
+	return
+
+#
 #	parse(tokens):
 #
 
 ifResult = False
 
 def parse(tokens):
-	global warnedVersion, MHX249, ifResult, theScale, defaultScale, One
+	global MHX249, ifResult, theScale, defaultScale, One
 	
 	for (key, val, sub) in tokens:	
 		# print("Parse %s" % key)
 		data = None
 		if key == 'MHX':
-			if int(val[0]) != MAJOR_VERSION and int(val[1]) != MINOR_VERSION and not warnedVersion:
-				print("Warning: \nThis file was created with another version of MHX\n")
-				warnedVersion = True
+			checkMhxVersion(int(val[0]), int(val[1]))
 
 		elif key == 'MHX249':
 			MHX249 = eval(val[0])
@@ -2169,6 +2194,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
 		items = [('Rotation','Rotation','Rotation'), ('Panel','Panel','Panel'), ('IK','IK','IK')], default = '1')
 
+	enforce = BoolProperty(name="Enforce version", description="Only accept MHX files of correct version", default=toggle&T_EnforceVersion)
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
@@ -2182,6 +2208,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		
 	def execute(self, context):
 		global toggle
+		O_EnforceVersion = T_EnforceVersion if self.properties.enforce else 0
 		O_Mesh = T_Mesh if self.properties.mesh else 0
 		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_Armature = T_Armature if self.properties.armature else 0
@@ -2192,7 +2219,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Symm = T_Symm if self.properties.symm else 0
 		O_Diamond = T_Diamond if self.properties.diamond else 0
 		O_Bend = T_Bend if self.properties.bend else 0
-		toggle =  O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX 
+		toggle = O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX 
 
 		print("Load", self.properties.filepath)
 		readMhxFile(self.properties.filepath, 	

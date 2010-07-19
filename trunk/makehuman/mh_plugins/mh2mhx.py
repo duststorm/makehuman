@@ -25,7 +25,8 @@ TO DO
 import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig, rig_panel_25, mh2proxy
 import os
 
-
+MAJOR_VERSION = 0
+MINOR_VERSION = 13
 splitLeftRight = True
 
 #
@@ -96,6 +97,14 @@ def exportRawMhx(obj, fp):
 #
 
 def exportMhx_25(obj, rig, fp):
+	fp.write(
+"# MakeHuman exported MHX\n" +
+"# www.makehuman.org\n" +
+"MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION) +
+"if Blender24\n" +
+"  error 'This file can only be read with Blender 2.5' ;\n" +
+"end if\n")
+
 	copyFile25(obj, "data/templates/materials25.mhx", rig, fp, None, [])	
 
 	mhx_rig.setupRig(obj)
