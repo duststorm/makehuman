@@ -86,26 +86,29 @@ def writeHairs(ribRepository, mesh):
     hairName = os.path.join(ribRepository, 'hairs.rib')
     hairFile = open(hairName, 'w')
     for hSet in hairsClass.hairStyle:
-        if 'clump' in hSet.name:
+        #at the moment we are only using hairstyle2---
+        """
+        if 'clump' in hSet.name: #clump is default!
             hDiameter = hairsClass.hairDiameterClump * random.uniform(0.5, 1)
         else:
-            hDiameter = hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
+        """
+        hDiameter = hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
         
 
             
            
         
-        for hair in hSet.hairs:
+        for hair in hSet:
             totalNumberOfHairs += 1
-            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(hair.controlPoints))
+            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(hair))
             
-            for cP in hair.controlPoints:
+            for cP in hair:
                 hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
            
             if random.randint(0, 3) >= 1:
                 hairFile.write(']\n"N" [') 
-                for cP in hair.controlPoints:
+                for cP in hair:
                         hairFile.write('0 1 0 ')  # arbitrary normals  
             hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)    
        

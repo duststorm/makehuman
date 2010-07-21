@@ -110,8 +110,8 @@ class HairTaskView(gui3d.TaskView):
       scale[1] = (headBB[1][1]-headBB[0][1])/float(self.oHeadBoundingBox[1][1]-self.oHeadBoundingBox[0][1])
       scale[2] = (headBB[1][2]-headBB[0][2])/float(self.oHeadBoundingBox[1][2]-self.oHeadBoundingBox[0][2])
       for group in hairsClass.guideGroups:
-        for guide in group.guides:
-            for cP in guide.controlPoints:
+        for guide in hairsClass.guideGroups[group]:
+            for cP in guide:
                 #Translate
                 cP[0] = cP[0] + delta[0]
                 cP[1] = cP[1] + delta[1]
@@ -124,7 +124,7 @@ class HairTaskView(gui3d.TaskView):
                 cP[0]=temp[0]
                 cP[1]=temp[1]
                 cP[2]=temp[2]
-            loadStrands(obj,guide.controlPoints, widthFactor, res)
+            loadStrands(obj,guide, widthFactor, res)
 
         
       #HACK: set hair color to default black 
@@ -254,8 +254,8 @@ def adjustHair(human, hairsClass):
     scale[1] = (headBB[1][1]-headBB[0][1])/float(oHeadBoundingBox[1][1]-oHeadBoundingBox[0][1])
     scale[2] = (headBB[1][2]-headBB[0][2])/float(oHeadBoundingBox[1][2]-oHeadBoundingBox[0][2])
     for group in hairsClass.guideGroups:
-        for guide in group.guides:
-            for cP in guide.controlPoints:
+        for guide in hairsClass.guideGroups[group]:
+            for cP in guide:
                 #Translate
                 cP[0] = cP[0] + delta[0]
                 cP[1] = cP[1] + delta[1]

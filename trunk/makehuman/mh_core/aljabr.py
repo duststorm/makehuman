@@ -31,7 +31,7 @@ The paper was so important that Al-jabr is the root of modern word I{algebra} an
 
 __docformat__ = 'restructuredtext'
 
-from math import sqrt, cos, sin, tan, atan2, fabs, acos
+from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow
 
 machine_epsilon = 1.0e-16
 
@@ -656,3 +656,15 @@ def vectorsToRotMatrix(v1,v2):
     angle = acos(vdot(v1,v2)/(vlen(v1)*vlen(v2)))
     q = axisAngleToQuaternion(normal, angle)
     return quaternionToMatrix(q)
+
+# http://mathworld.wolfram.com/Quadrilateral.html
+def convexQuadrilateralArea(v1,v2,v3,v4):
+    #a=vdist(v2,v1)
+    #b=vdist(v3,v2)
+    #c=vdist(v4,v3)
+    #d=vdist(v1,v4)
+    p=vdist(v2,v4)
+    q=vdist(v1,v3)
+    pq = vdot(vsub(v3,v1),vsub(v4,v2))
+    return 0.5*sqrt(p*p*q*q - pq*pq)
+    #return sqrt(4*p*p*q*q - pow((b*b+d*d-a*a-c*c),2))/4
