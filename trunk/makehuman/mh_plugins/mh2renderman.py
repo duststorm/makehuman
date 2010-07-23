@@ -42,36 +42,7 @@ from hair import adjustHair
 
 hairsClass = hairgenerator.Hairgenerator()
 
-"""
-#def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0]):
-def loadHairsFile(path,delta=[0.0,0.0,0.0],scale=[1.0,1.0,1.0],headCentroid=[0.0, 7.436, 0.03]):
-    tail,head = os.path.split(path)
-    nameWithoutExt = os.path.splitext(head)[0]
-    pathWithoutExt = os.path.join(tail,nameWithoutExt)
-    print "DEBUG HAIR", pathWithoutExt
-    #oHeadCentroid = [0.0, 7.436, 0.03]
-    #oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]] 
-    hairsClass.loadHairs(pathWithoutExt)
-    for group in hairsClass.guideGroups:
-        for guide in group.guides:
-            for cP in guide.controlPoints:
-                #Translate
-                cP[0] = cP[0] + delta[0]
-                cP[1] = cP[1] + delta[1]
-                cP[2] = cP[2] + delta[2]
-                #Scale
-                temp = cP #needed for shallow copy, as vsub and vadd methods disrupts the fun of shallow-copying
-                temp = aljabr.vsub(temp,headCentroid)
-                temp = [temp[0]*scale[0],temp[1]*scale[1],temp[2]*scale[2]]
-                temp = aljabr.vadd(temp, headCentroid)
-                cP[0]=temp[0]
-                cP[1]=temp[1]
-                cP[2]=temp[2]
-                
-    # TODO: add the loading of wavefront obj preview
-"""
-
-def writeHairs(ribRepository, mesh):
+def writeHairs(ribRepository, mesh, Area):
 
     # Write the full hairstyle
 
@@ -81,11 +52,11 @@ def writeHairs(ribRepository, mesh):
 
     # hairsClass.generateHairStyle1()
 
-    hairsClass.generateHairStyle2()
+    hairStyle = hairsClass.generateHairStyle2(Area=Area)
     print 'Writing hairs'
     hairName = os.path.join(ribRepository, 'hairs.rib')
     hairFile = open(hairName, 'w')
-    for hSet in hairsClass.hairStyle:
+    for hSet in hairStyle:
         #at the moment we are only using hairstyle2---
         """
         if 'clump' in hSet.name: #clump is default!
@@ -94,10 +65,6 @@ def writeHairs(ribRepository, mesh):
         """
         hDiameter = hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
-        
-
-            
-           
         
         for hair in hSet:
             totalNumberOfHairs += 1
@@ -116,7 +83,7 @@ def writeHairs(ribRepository, mesh):
         
     hairFile.close()
     print 'Totals hairs written: ', totalNumberOfHairs
-    print 'Number of tufts', len(hairsClass.hairStyle)
+    print 'Number of tufts', len(hairStyle)
 
 
 def writePolyObj(fileName, mesh, referenceFile=None):
@@ -264,55 +231,6 @@ def sssColor(mesh, referenceFile, pointLightCoords, pointLightIntensity, refl = 
             facesColor.append(color)
     return facesColor
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def writeSubdivisionMesh(fileName, mesh, referenceFile=None, group = None, vertColors = None):
     """
     This function exports a Renderman format object from the MakeHuman
@@ -356,11 +274,6 @@ def writeSubdivisionMesh(fileName, mesh, referenceFile=None, group = None, vertC
                     gFacesIndices.append(faceIdx)
 
         facesIndices = gFacesIndices
-
-
-
-
-
 
 
     objFile = file(fileName, 'w')
@@ -502,7 +415,7 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
 
 
 
-def mh2Aqsis(camera, scene, fName, ribRepository):
+def mh2Aqsis(camera, scene, fName, ribRepository, Area):
     """
     This function creates the frame definition for a Renderman scene.
 
@@ -609,7 +522,7 @@ def mh2Aqsis(camera, scene, fName, ribRepository):
             #ribfile.write('\t\tSurface "constant"')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
-            writeHairs(ribRepository, obj)
+            writeHairs(ribRepository, obj, Area)
 
 
     ribfile.write('\tAttributeBegin\n')
@@ -622,7 +535,7 @@ def mh2Aqsis(camera, scene, fName, ribRepository):
     ribfile.write('FrameEnd\n')
     ribfile.close()
 
-def saveScene(camera, scene, fName, ribDir, engine):
+def saveScene(camera, scene, fName, ribDir, engine, Area=0.6):
     """
     This function exports a Renderman format scene and then invokes either
     Aqsis or Renderman to render it.
@@ -646,19 +559,6 @@ def saveScene(camera, scene, fName, ribDir, engine):
     """
     human = scene.selectedHuman
     
-    """
-    oHeadCentroid = [0.0, 7.436, 0.03]
-    oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]] 
-
-    headBB=calculateBoundingBox(human.headVertices)
-    headCentroid = aljabr.in2pts(headBB[0],headBB[1],0.5)
-    delta = aljabr.vsub(headCentroid,oHeadCentroid)
-    scale = [1.0,1.0,1.0]
-    scale[0] = (headBB[1][0]-headBB[0][0])/float(oHeadBoundingBox[1][0]-oHeadBoundingBox[0][0])
-    scale[1] = (headBB[1][1]-headBB[0][1])/float(oHeadBoundingBox[1][1]-oHeadBoundingBox[0][1])
-    scale[2] = (headBB[1][2]-headBB[0][2])/float(oHeadBoundingBox[1][2]-oHeadBoundingBox[0][2])
-    """
-    #loadHairsFile(human.hairFile,delta,scale,headCentroid)
     adjustHair(human, hairsClass)
     if not os.path.isdir(ribDir):
         os.makedirs(ribDir)
@@ -675,7 +575,7 @@ def saveScene(camera, scene, fName, ribDir, engine):
     # writeShadowScene(scene, ribfile, ribRepository)
 
     if engine == 'aqsis':
-        mh2Aqsis(camera, scene, fName, ribRepository)
+        mh2Aqsis(camera, scene, fName, ribRepository, Area)
     if engine == 'pixie':
         print 'write pixie'
         mh2Pixie(scene, fName, ribRepository)

@@ -39,8 +39,9 @@ import gui3d
 class RenderingCategory(gui3d.Category):
 
     def __init__(self, parent):
-        gui3d.Category.__init__(self, parent, 'Rendering', parent.app.getThemeResource('images', 'button_render.png'), parent.app.getThemeResource('images',
-                                'button_render_on.png'))
+        gui3d.Category.__init__(self, parent, 'Rendering', parent.app.getThemeResource('images', 'button_render.png'), parent.app.getThemeResource('images', 'button_render_on.png'))
+        self.guideArea = gui3d.Slider(self, position=[10, 150, 9], value=0.6, min=0.2,max=1.0, label = "Hair Coverage") 
+
 
     def onShow(self, event):
         self.setFocus()

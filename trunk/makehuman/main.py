@@ -190,7 +190,7 @@ class MHApplication(gui3d.Application):
             module = imp.load_source(name, path)
             self.modules[name] = module
             module.load(self)
-        except Exception as e:
+        except e:
             print('Could not load %s' % name)
             print e
 

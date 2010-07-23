@@ -25,36 +25,6 @@ import aljabr
 from collision import collision
 from os import path
 
-"""
-class Hair: #this is just a strand aka. curve!
-
-    def __init__(self):
-        self.controlPoints = []
-
-
-class HairGuide(Hair): # a curve!
-
-
-    def __init__(self, name):
-        Hair.__init__(self)
-        self.name = name
-
-
-class HairGroup:
-
-    def __init__(self, name):
-        self.name = name
-        self.hairs = []
-
-
-class GuideGroup: #contains 2 curves (2 guides)
-
-    def __init__(self, name):
-        self.name = name
-        self.guides = []
-
-"""
-
 class Hairgenerator:
 
     """
@@ -64,7 +34,7 @@ class Hairgenerator:
 
     def __init__(self):
         #simplifying the class... removed 
-        self.hairStyle = [] #this will become a list of n-tuples of guides (after the interpolation)
+        #self.hairStyle = [] #this will become a list of n-tuples of guides (after the interpolation)
 
         self.tipMagnet = 0.9
          
@@ -86,7 +56,8 @@ class Hairgenerator:
         self.rootColor = [0.109, 0.037, 0.007]
         #we use dictionary because if we save the obj with groups we need some kind of container that understands the group-name
         #Dictionary's hash  with keyvalues is an appropriate container
-        self.guideGroups = dict() #dictionary of guide tuple (guidegroup)
+        #self.guideGroups = dict() #dictionary of guide tuple (guidegroup)
+        self.guides =[]
         self.version = '1.0 alpha 2'
         self.tags = []
         self.humanVerts = []
@@ -97,38 +68,7 @@ class Hairgenerator:
         self.noCPoints = 15
         self.gFactor = 1.5
         self.Delta=None #Delta of the very first controlpoint of the very first guide in our guide list! This will be used as a reference
-
-    def adjustGuides(self): 
-
-        try:
-            fileDescriptor = open(self.path)
-        except:
-            print 'Impossible to load %s' % self.path
-            return
-
-        # Guides and Deltas have the same name, so it's
-        # easy to associate them. Anyway we must a dd a check to
-        # be sure the hairs to adjust are the same as saved in
-        # the file.
-
-        for data in fileDescriptor:
-            datalist = data.split()
-            if datalist[0] == 'delta':
-                name = datalist[1]
-                guidesDelta = datalist[2:]
-
-        for group in self.guideGroups:
-            for guide in self.guideGroups[group]:
-                for i in range(len(deltaVector)):
-                    cpDelta = deltaVector[i]
-                    if self.Delta == None:
-                       self.Delta=cpDelta[:]
-                    cpGuide = guide[i]
-                    v = self.humanVerts[int(cpDelta[0])]
-                    cpGuide[0] = v.co[0] + float(cpDelta[1])
-                    cpGuide[1] = v.co[1] + float(cpDelta[2])
-                    cpGuide[2] = v.co[2] + float(cpDelta[3])
-
+        
     def generateHairStyle1(self):
         """
         Calling this function, for each guide in each guideGroup,
@@ -140,9 +80,11 @@ class Hairgenerator:
         No parameters
         """
      
-        for guideGroup in self.guideGroups: #taking tuples from list of tuples of curves
-            for guide in guideGroup.guides: #taking curves from a tuple of curves
-                self.generateHairInterpolation1(guide) #guide is a curve
+        #for guideGroup in self.guideGroups: #taking tuples from list of tuples of curves
+        hairStyle = []
+        for guide in self.guides: #taking curves from a tuple of curves
+            hairStyle.append(self.generateHairInterpolation1(guide)) #guide is a curve
+        return hairStyle
 
     def getFromListbyName(self, list, name):
         """
@@ -154,7 +96,7 @@ class Hairgenerator:
                 return i
         return None
 
-    def generateHairStyle2(self, humanMesh=None, isCollision=False):
+    def generateHairStyle2(self, Area=0.6, humanMesh=None, isCollision=False):
         """
         Calling this function, each guide is interpolated with all other guides
         to add a new strand of hairs to the hairstyle.
@@ -167,15 +109,17 @@ class Hairgenerator:
 
         # near = 0.08
         # far = 1.6
-
+        hairStyle = []
         if humanMesh == None:
             isCollision = False
-        for guideGroup in self.guideGroups:
+        
+        guideGroups = self.populateGuideGroups(Area)
+        for guideGroup in guideGroups:
             if len(guideGroup) > 0:
 
                 # Find the bounding box of the cloud of controlPoints[2]
 
-                print 'WORKING ON GROUP %s' % guideGroup
+                #print 'WORKING ON GROUP %s' % guideGroup
                 guideOrder = {}
                 xMin = 1000
                 xMax = -1000
@@ -183,7 +127,7 @@ class Hairgenerator:
                 yMax = -1000
                 zMin = 1000
                 zMax = -1000
-                for guide in self.guideGroups[guideGroup]:
+                for guide in guideGroup:
                     p = guide[2]
                     #print guide.name, p
                     if p[0] < xMin:
@@ -219,7 +163,7 @@ class Hairgenerator:
 
                 # Order the guides along the main dimension
 
-                for guide1 in self.guideGroups[guideGroup]:
+                for guide1 in guideGroup:
                     p1 = guide1[2]
                     guideOrder[p1[mainDirection]] = guide1
 
@@ -231,10 +175,12 @@ class Hairgenerator:
                     guide1 = guideOrder[k1]
                     guide2 = guideOrder[k2]
                     #print 'INTERP. GUIDE', guide1.name, guide2.name
-                    self.generateHairInterpolation2(guide1, guide2, humanMesh, isCollision)
+                    hairStyle.append(self.generateHairInterpolation2(guide1, guide2, humanMesh, isCollision))
+        return hairStyle
 
     def generateHairInterpolation1(self, guide):
         #hairName = 'clump%s' % guide.name
+        #hairStyle=[]
         hSet = [] #empty list of list of curves  #HairGroup(hairName).. one whole group of hairstrands
         nVerts = len(guide)
         interpFactor1 = 0
@@ -271,7 +217,8 @@ class Hairgenerator:
                     h.append([vert1[0] + offsetVector[0] * magnet + randomVect[0], vert1[1] + offsetVector[1] * magnet + randomVect[1], vert1[2]
                                             + offsetVector[2] * magnet + randomVect[2]])
                 hSet.append(h)
-        self.hairStyle.append(hSet) #list of (list of curves) clumps
+        #hairStyle.append(hSet) #list of (list of curves) clumps
+        return hSet
 
     # humanMesh is a blender object.. the format can be changed later on if the necessity arises!
     # for the time being we have a blender object and gravity direction is [0,-1,0]
@@ -356,7 +303,7 @@ class Hairgenerator:
                 for j in (0, len(h)):
                     h[i][2] = -h[i][2]  # Blender to Renderman coordinates!
             hSet.append(h)
-        self.hairStyle.append(hSet)
+        return hSet
 
     def saveHairs(self, path):
         """
@@ -499,7 +446,7 @@ class Hairgenerator:
         temp =[]
         #currentGroup=None
         #guideName = None
-        guides = [] #set of curves
+        self.guides = [] #set of curves
         #Forget the format of manuel make your own!
         reGroup = True
         for data in objFile:
@@ -514,6 +461,7 @@ class Hairgenerator:
                 for index in datalist[3:]:
                     guidePoints.append(temp[int(index)])
                 temp=[]
+                """
             elif datalist[0] == "g":
                 #datalist[1] = datalist[1].split("_") #first entry = group, second entry= guidename)
                 #Josenow! Todo Guidegroup problem adding
@@ -526,36 +474,39 @@ class Hairgenerator:
                 else:
                     self.guideGroups[datalist[1]] = [guidePoints]
                     reGroup = True
+                """
             elif datalist[0] == "end":
-                guides.append(guidePoints); #apppend takes a deep copy
+                self.guides.append(guidePoints); #apppend takes a deep copy
                 #self.addHairGuide(guidePoints, guideName,currentGroup)
                 #if currentGroup == None: reGroup = True;
                 guidePoints=[]
         objFile.close()
-        if reGroup: self.populateGuideGroups(guides,0.6)
+        #if reGroup: self.populateGuideGroups(guides,0.6)
 
     #guides is of type list of curves
     #self.guideGroups is a list of tuples (as in pairs) of guides (curves)
-    def populateGuideGroups(self,guides,Area):
-        self.guideGroups.clear()
+    def populateGuideGroups(self,Area):
+        #guideGroups = {}
+        guideGroups =[]
         Summarize = 0
         S = set() #emptyset of indices.. hashing trick
-        for i in xrange(0,len(guides)):
+        for i in xrange(0,len(self.guides)):
             if i in S: continue
             else: S.add(i)
             k=0
             A=[] #ordered as infinity!
-            for j in xrange(0,len(guides)):
+            for j in xrange(0,len(self.guides)):
                 if (j != i):
-                    B = curvePairArea(guides[i],guides[j])
+                    B = curvePairArea(self.guides[i],self.guides[j])
                     if B==0: continue #duplicate strands can occur!
                     if A>B and B>=Area:
                         k=j
                         A=B
             S.add(k)
             Summarize = Summarize + A
-            self.guideGroups[str(i)] = (guides[i],guides[k])
-        print "Debug Average Area: ", Summarize/len(guides)
+            guideGroups.append((self.guides[i],self.guides[k]))
+        return guideGroups
+
 
 def curvePairArea(c1, c2):
     n=min(len(c1),len(c2))
