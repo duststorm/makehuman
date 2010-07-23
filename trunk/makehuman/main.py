@@ -182,13 +182,17 @@ class MHApplication(gui3d.Application):
     hair.HairTaskView(library)
     background.BackgroundTaskView(library)
 
-    # Load plugins not starting with _
+    # Load plugins not starting with _    
     self.modules = {}
     for path in glob.glob(join("plugins/",'[!_]*.py')):
-        name, ext = splitext(basename(path))
-        module = imp.load_source(name, path)
-        self.modules[name] = module
-        module.load(self)
+        try:
+            name, ext = splitext(basename(path))
+            module = imp.load_source(name, path)
+            self.modules[name] = module
+            module.load(self)
+        except Exception as e:
+            print('Could not load %s' % name)
+            print e
 
     category = gui3d.Category(self, "Help", self.getThemeResource("images", "button_about.png"),
       self.getThemeResource("images", "button_about_on.png"))
