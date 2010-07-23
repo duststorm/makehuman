@@ -82,7 +82,7 @@ class Target:
         try:
             fileDescriptor = open(name)
         except:
-            print 'Unable to open %s', name
+            print 'Unable to open %s'%(name)
             return
 
         facesToRecalculate = set()  # Indices of faces affected by the target, to put in buffer
@@ -212,7 +212,7 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=No
     try:
         target = targetBuffer[targetPath]
     except:
-        print 'Probably %s does not exist' % targetPath
+        print 'Probably %s does not exist'%(targetPath)
         return
 
     # if a facegroup is provided, apply it ONLY to the verts used
@@ -467,7 +467,7 @@ def saveTranslationTarget(obj, targetPath, groupToSave=None, epsilon=0.001):
     try:
         fileDescriptor = open(targetPath, 'w')
     except:
-        print 'Unable to open %s', targetPath
+        print 'Unable to open %s'%(targetPath)
         return None
 
     # for fidx in modifiedFacesIndices.values():
@@ -611,7 +611,7 @@ def analyzeTarget(obj, targetPath):
     try:
         fileDescriptor = open(targetPath)
     except:
-        print 'Unable to open %s', targetPath
+        print 'Unable to open %s'%(targetPath)
         return 0
 
     targetData = fileDescriptor.readlines()
@@ -654,7 +654,7 @@ def colorizeVerts(obj, color, targetPath=None, faceGroupName=None):
         try:
             fileDescriptor = open(targetPath)
         except:
-            print 'Unable to open %s', targetPath
+            print 'Unable to open %s'%(targetPath)
             return 0
 
         for vData in fileDescriptor:
