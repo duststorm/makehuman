@@ -218,7 +218,7 @@ class ExportTaskView(gui3d.TaskView):
                   #hairsClass.adjustGuides()
                   hair.adjustHair(self.app.scene3d.selectedHuman, hairsClass)
                   file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
-                  mh2obj.exportAsCurves(file, hairsClass.guideGroups)
+                  mh2obj.exportAsCurves(file, hairsClass.guides)
                   file.close()
 
             self.app.switchCategory('Modelling')
