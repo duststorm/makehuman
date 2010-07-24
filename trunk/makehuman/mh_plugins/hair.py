@@ -268,4 +268,3 @@ def adjustHair(human, hairsClass):
             cP[0]=temp[0]
             cP[1]=temp[1]
             cP[2]=temp[2]
-# TODO: add the loading of wavefront obj preview
