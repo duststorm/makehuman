@@ -2,7 +2,6 @@ NoScale False ;
 
 *** ProxyRigStart
   auto_ik False ;
-  deform_bbone_rest False ;
   deform_envelope True ;
   deform_quaternion True ;
   deform_vertexgroups True ;
@@ -13,7 +12,6 @@ NoScale False ;
   draw_names False ;
   drawtype 'STICK' ;
   ghost_frame_end 0 ;
-  ghost_only_selected False ;
   ghost_size 1 ;
   ghost_frame_start 0 ;
   ghost_step 0 ;
@@ -54,7 +52,6 @@ end Mesh
 *** ProxyObject
   layers Array 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
     Modifier Armature ARMATURE
-      b_bone_rest False ;
       editmode True ;
       expanded True ;
       invert False ;
@@ -109,15 +106,14 @@ end Mesh
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
   pass_index 0 ;
-  restrict_render False ;
-  restrict_select False ;
-  restrict_view False ;
+  hide_render False ;
+  hide_select False ;
   rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
   rotation_euler (0,-0,0) ;
   rotation_mode 'XYZ' ;
   rotation_quaternion (1,0,0,0) ;
   scale (1,1,1) ;
-  selected True ;
+  select True ;
   shape_key_edit_mode False ;
   shape_key_lock False ;
   slow_parent False ;

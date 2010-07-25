@@ -207,8 +207,8 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	wire = boolString(flags & F_WIR)
 	scale = boolString(flags & F_NOSCALE == 0)
 	lloc = boolString(flags & F_GLOC == 0)
-	locked = boolString(flags & F_LOCK)
-	hidden = boolString(flags & F_HID)
+	lock = boolString(flags & F_LOCK)
+	hide = boolString(flags & F_HID)
 	cyc = boolString(flags & F_NOCYC == 0)
 	(bin, bout, bseg) = bbone
 
@@ -227,7 +227,7 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 "    connected %s ; \n" % (conn) +
 "    cyclic_offset %s ; \n" % cyc +
 "    deform %s ; \n" % (deform)+
-"    hidden %s ; \n" % hidden +
+"    hide %s ; \n" % hide +
 "    draw_wire %s ; \n" % (wire) +
 "    hinge True ; \n"+
 "    inherit_scale %s ; \n" % (scale) +
@@ -243,9 +243,9 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 
 	fp.write(" ; \n" +
 "    local_location %s ; \n" % lloc +
-"    locked %s ; \n" % locked +
+"    lock %s ; \n" % lock +
 "    multiply_vertexgroup_with_envelope False ; \n"+
-"    restrict_select %s ; \n" % (restr) +
+"    hide_select %s ; \n" % (restr) +
 "  end Bone \n")
 
 def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
@@ -1111,12 +1111,12 @@ def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
 	fp.write(
 "        expanded True ;\n" +
 "        mode 'POLYNOMIAL' ;\n" +
-"        muted False ;\n" +
+"        mute False ;\n" +
 "        poly_order 1 ;\n" +
 "      end FModifier\n" +
 "      extrapolation 'CONSTANT' ;\n" +
-"      locked False ;\n" +
-"      selected False ;\n" +
+"      lock False ;\n" +
+"      select False ;\n" +
 "    end FCurve\n")
 	return
 
@@ -1220,7 +1220,6 @@ def reapplyArmature(fp, name):
 	fp.write("\n" +
 "  Object %s  \n" % name +
 "    Modifier Armature ARMATURE \n" +
-"      b_bone_rest False ; \n" +
 "      editmode False ; \n" +
 "      expanded True ; \n" +
 "      invert False ; \n" +

@@ -1947,7 +1947,6 @@ Armature HumanRig HumanRig   Normal
   *** rig-bones
 
   auto_ik False ;
-  deform_bbone_rest False ;
   deform_envelope True ;
   deform_quaternion True ;
   deform_vertexgroups True ;

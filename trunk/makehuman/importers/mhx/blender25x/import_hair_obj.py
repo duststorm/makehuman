@@ -36,7 +36,7 @@ bl_addon_info = {
 	'name': 'Import MakeHuman hair (.obj)',
 	'author': 'Thomas Larsson',
 	'version': '0.7',
-	'blender': (2, 5, 3),
+	'blender': (2, 53, 0),
 	'location': 'File > Import',
 	'description': 'Import MakeHuman hair file (.obj)',
 	'url': 'http://www.makehuman.org',
@@ -66,7 +66,6 @@ v 0.450719 8.241523 0.873019
 v 0.415614 7.887863 1.029564
 v 0.297117 7.653935 1.108557
 v -0.113154 7.533733 1.182444
-g hfront_Curve.328
 cstype bspline
 deg 3
 curv 0.0 1.0 -1 -2 -3 -4 -5 -6 -7
@@ -74,20 +73,24 @@ parm u 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 end
 """
 
+theScale = 1.0
+
 #
 #	importHair(filename):
 #
 
-def importHair(filename):
+def importHair(filename, scale):
+	global theScale
+	theScale = scale
 	guides = readHairFile(filename)
 	(nmax,nguides) = equalizeHairLengths(guides)
 	print("%d guides, %d steps" % (len(nguides), nmax))
-	makeHair(nmax-1, nguides)
+	makeHair('Hair', nmax-1, nguides)
 	return
 
 #
 #	writeHairFile(fileName):
-#	For debugging, export har as obj
+#	For debugging, export hair as obj
 #
 
 def writeHairFile(fileName):
@@ -104,10 +107,10 @@ def writeHairFile(fileName):
 	fp = open(filePath, "w")
 
 	for n,par in enumerate(psys.particles):
-		v = par.location
+		v = par.location / theScale
 		fp.write("v %.6f %.6f %.6f\n" % (v[0], v[1], v[2]))
 		for h in par.hair:
-			v = h.location
+			v = h.location / theScale
 			fp.write("v %.6f %.6f %.6f\n" % (v[0], v[1], v[2]))
 		fp.write("g Hair.%03d\n" % n)
 		fp.write("end\n\n")
@@ -120,6 +123,7 @@ def writeHairFile(fileName):
 #
 
 def readHairFile(fileName):
+	global theScale
 	path1 = os.path.expanduser(fileName)
 	filePath = os.path.realpath(path1)
 	print( "Reading hair " + filePath )
@@ -129,17 +133,17 @@ def readHairFile(fileName):
 	lineNo = 0
 
 	for line in fp: 
-		lineSplit= line.split()
+		words= line.split()
 		lineNo += 1
-		if len(lineSplit) == 0:
+		if len(words) == 0:
 			pass
-		elif lineSplit[0] == 'v':
-			guide.append(Vector([float(lineSplit[1]), -float(lineSplit[3]), float(lineSplit[2])]))
-		elif lineSplit[0] == 'g':
+		elif words[0] == 'v':
+			(x,y,z) = (float(words[1]), float(words[2]), float(words[3]))
+			guide.append(theScale*Vector((x,-z,y)))
+		elif words[0] == 'end':
 			guides.append(guide)
-		elif lineSplit[0] == 'end':
 			guide = []
-		elif lineSplit[0] == 'f':
+		elif words[0] == 'f':
 			raise NameError("Hair file '%s' must only contain curves, not meshes" % filePath)
 		else:
 			pass
@@ -232,17 +236,16 @@ def printGuideAndHair(fp, guide, par, nmax):
 	return
 	
 #	
-#	makeHair(hstep, guides):
+#	makeHair(name, hstep, guides):
 #	Create particle hair from guide curves. 
 #	hstep = hair_step setting
 #
 
-def makeHair(hstep, guides):
+def makeHair(name, hstep, guides):
 	ob = bpy.context.object
 	bpy.ops.object.particle_system_add()
 	psys = ob.active_particle_system
-	#psys = ob.particle_systems[-1]
-	psys.name = 'Hair'
+	psys.name = name
 	# psys.global_hair = True	
 	print(psys)
 
@@ -256,7 +259,7 @@ def makeHair(hstep, guides):
 	settings.emitter = True
 
 	settings.hair_bspline = False
-	settings.hair_geometry = True
+	#settings.hair_geometry = True
 	#settings.grid_resolution = 
 	#settings.draw_step = 1
 
@@ -264,12 +267,13 @@ def makeHair(hstep, guides):
 	settings.material_color = True
 	settings.render_strand = True
 
+	'''
 	settings.child_type = 'PARTICLES'
 	settings.child_nbr = 6
 	settings.rendered_child_nbr = 60
 	settings.child_length = 1.0
 	settings.child_length_thres = 0.0
-	'''
+
 	settings.clump_factor = 0.0
 	settings.clumppow = 0.0
 
@@ -297,22 +301,27 @@ def makeHair(hstep, guides):
 			nmax = len(guide)-1
 			#raise NameError("Wrong length %d != %d" % (len(guide), hstep))
 		par = psys.particles[m]
-		par.location = guide[0]
-		for n in range(0, nmax):
-			point = guide[n+1]
+		par.location = hairRot(guide[0])
+		#par.location = (0,0,0)
+		for n in range(1, nmax):
+			point = guide[n]
 			h = par.hair[n]
-			h.location = point
+			h.location = hairRot(point)
 			h.time = n*dt
 			h.weight = 1.0 - n*dw
 		for n in range(nmax, hstep):
 			point = guide[nmax]
 			h = par.hair[n]
-			h.location = point
+			h.location = hairRot(point)
 			h.time = n*dt
 			h.weight = 1.0 - n*dw
 
+		print(par.location)
+		for n in range(0, hstep):
+			print("  ", par.hair[n].location)
+
 	bpy.ops.particle.select_all(action='SELECT')
-	bpy.ops.particle.connect_hair(all=True)
+	#bpy.ops.particle.connect_hair(all=True)
 	bpy.ops.particle.particle_edit_toggle()
 
 	'''
@@ -324,6 +333,12 @@ def makeHair(hstep, guides):
 	'''
 	return
 
+def hairRot(point):
+	return point
+	x = point[0]
+	y = point[1]
+	z = point[2]
+	return Vector((-y,x,z))
 #
 #	User interface
 #
@@ -332,17 +347,19 @@ DEBUG= False
 from bpy.props import *
 
 class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
-	'''Import MakeHuman hair from OBJ curves file (.obj)'''
+	"""Import MakeHuman hair from OBJ curves file (.obj)"""
 	bl_idname = "import_hair.makehuman_obj"
 	bl_description = 'Import MakeHuman hair from OBJ curves file (.obj)'
 	bl_label = "Import MakeHuman hair"
 	bl_space_type = "PROPERTIES"
 	bl_region_type = "WINDOW"
 
-	path = StringProperty(name="File Path", description="File path used for importing the .obj file", maxlen= 1024, default= "")
+	filepath = StringProperty(name="File Path", description="File path used for importing the .obj file", maxlen= 1024, default= "")
+
+	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
 	
 	def execute(self, context):
-		importHair(self.properties.path)
+		importHair(self.properties.filepath, self.properties.scale)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
@@ -362,15 +379,19 @@ def unregister():
 
 if __name__ == "__main__":
 	register()
+
 #
 #	Testing
 #
 
 '''
-guide1 = [ [0, 0, 0], [0, 1, 0], [0, 1, 1] ]
+guide1 = [ [0, 1, 0], [0, 2, 0], [0, 2, 1] ]
 guide2 = [ [1, 0, 0], [1, 1, 0], [1, 1, 1] ]
 guide3 = [ [2, 0, 0], [2, 1, 0], [2, 1, 1] ]
-#makeHair(3, [guide1, guide2, guide3], None)
+makeHair('H1', 3, [guide1, guide2, guide3])
+makeHair('H2', 3, [guide2])
+makeHair('H3', 3, [guide3])
+
 
 readHairFile('/home/thomas/myblends/hair/hair_hairy.obj')
 writeHairFile('/home/thomas/myblends/hair/haired.obj')

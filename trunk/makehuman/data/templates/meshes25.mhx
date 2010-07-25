@@ -51,7 +51,6 @@ end Mesh
 Object Human MESH Human
   layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
     Modifier Armature ARMATURE
-      b_bone_rest False ;
       editmode False ;
       expanded True ;
       invert False ;
@@ -106,15 +105,14 @@ Object Human MESH Human
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
   pass_index 0 ;
-  restrict_render False ;
-  restrict_select False ;
-  restrict_view False ;
+  hide_render False ;
+  hide_select False ;
   rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
   rotation_euler (0,-0,0) ;
   rotation_mode 'XYZ' ;
   rotation_quaternion (1,0,0,0) ;
   scale (1,1,1) ;
-  selected True ;
+  select True ;
   shape_key_edit_mode False ;
   shape_key_lock False ;
   slow_parent False ;

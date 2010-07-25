@@ -15,15 +15,15 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.13
+Version 0.14
 
 """
 
 bl_addon_info = {
 	'name': 'Import MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.13',
-	'blender': (2, 5, 3),
+	'version': '0.14',
+	'blender': (2, 53, 0),
 	'location': 'File > Import',
 	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
 	'url': 'http://www.makehuman.org',
@@ -36,7 +36,8 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 13
+MINOR_VERSION = 14
+BLENDER_VERSION = (2, 53, 0)
 
 #
 #
@@ -203,26 +204,6 @@ Plural = {
 }
 
 #
-#	Creators
-#
-'''
-def uvtexCreator(me, name):
-	print("uvtexCreator", me, name)
-	me.add_uv_texture()
-	uvtex = me.uv_textures[-1]
-	uvtex.name = name
-	return uvtex
-
-
-def vertcolCreator(me, name):
-	print("vertcolCreator", me, name)
-	me.add_vertex_color()
-	vcol = me.vertex_colors[-1]
-	vcol.name = name
-	return vcol
-'''		
-
-#
 #	loadMhx(filePath, context, flags, scale):
 #
 
@@ -233,12 +214,30 @@ def loadMhx(filePath, context, flags, scale):
 	return
 
 #
+#	checkBlenderVersion()
+#
+
+def checkBlenderVersion():
+	print("Found Blender", bpy.app.version)
+	(A, B, C) = bpy.app.version
+	(a, b, c) = BLENDER_VERSION
+	if a > A or b > B or c > C:
+		msg = (
+"This version of the MHX importer only works with Blender (%d, %d, %d) or later. " % (a, b, c) +
+"Download a more recent Blender from www.blender.org or www.graphicall.org.\n"
+		)
+		raise NameError(msg)
+	return
+
+#
 #	readMhxFile(filePath, rigFlags, scale):
 #
 
 def readMhxFile(filePath, rigFlags, scale):
 	global todo, nErrors, theScale, defaultScale, One
 
+	checkBlenderVersion()	
+	
 	theScale = scale
 	defaultScale = scale
 	One = 1.0/theScale
@@ -1489,13 +1488,13 @@ def parseBone(bone, amt, tokens, heads, tails):
 			bone.tail = (theScale*float(val[0]), theScale*float(val[1]), theScale*float(val[2]))
 		#elif key == 'restrict_select':
 		#	pass
-		elif key == 'hidden' and val[0] == 'True':
+		elif key == 'hide' and val[0] == 'True':
 			name = bone.name
 			'''
 			#bpy.ops.object.mode_set(mode='OBJECT')
 			pbone = amt.bones[name]
-			pbone.hidden = True
-			print("Hide", pbone, pbone.hidden)
+			pbone.hide = True
+			print("Hide", pbone, pbone.hide)
 			#bpy.ops.object.mode_set(mode='EDIT')			
 			'''
 		else:
@@ -1757,7 +1756,6 @@ def parseGroupObjects(args, tokens, grp):
 
 #
 #	postProcess()
-#	deleteDiamonds(ob)
 #
 
 def postProcess():
@@ -1786,8 +1784,15 @@ def postProcess():
 			print("Rig changed", mod.object)
 	return			
 
+#
+#	deleteDiamonds(ob)
+#	Delete joint diamonds in main mesh
+#
+
 def deleteDiamonds(ob):
 	bpy.context.scene.objects.active = ob
+	if not ob:
+		return
 	print("Delete diamonds in %s" % bpy.context.object)
 	bpy.ops.object.mode_set(mode='EDIT')
 	bpy.ops.mesh.select_all(action='DESELECT')
@@ -1796,7 +1801,7 @@ def deleteDiamonds(ob):
 	for f in me.faces:		
 		if len(f.verts) < 4:
 			for vn in f.verts:
-				me.verts[vn].selected = True
+				me.verts[vn].select = True
 	bpy.ops.object.mode_set(mode='EDIT')
 	bpy.ops.mesh.delete(type='VERT')
 	bpy.ops.object.mode_set(mode='OBJECT')
