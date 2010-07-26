@@ -46,6 +46,7 @@ import time
 import aljabr
 import textures3d
 import files3d
+import os
 
 targetBuffer = {}
 
@@ -209,47 +210,44 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=No
     # if the target is already buffered, just get it using
     # the path as key
 
-    try:
-        target = targetBuffer[targetPath]
-    except:
-        print 'Probably %s does not exist'%(targetPath)
-        return
+    if os.path.isfile(targetPath): 
+        target = targetBuffer[targetPath]   
 
-    # if a facegroup is provided, apply it ONLY to the verts used
-    # by the specified facegroup.
+        # if a facegroup is provided, apply it ONLY to the verts used
+        # by the specified facegroup.
 
-    if faceGroupToUpdateName:
+        if faceGroupToUpdateName:
 
-        faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
-        indicesToUpdate = set()
-        facesToRecalculate = list(faceGroupToUpdate.faces)
-        for f in facesToRecalculate:
-            for v in f.verts:
-                verticesToUpdate.add(v)
-    else:
+            faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
+            indicesToUpdate = set()
+            facesToRecalculate = list(faceGroupToUpdate.faces)
+            for f in facesToRecalculate:
+                for v in f.verts:
+                    verticesToUpdate.add(v)
+        else:
 
-        # if a vertgroup is not provided, all verts affected by
-        # the targets will be modified
+            # if a vertgroup is not provided, all verts affected by
+            # the targets will be modified
 
-        facesToRecalculate = [obj.faces[i] for i in target.faces]
-        verticesToUpdate = [obj.verts[i] for i in target.verts]
+            facesToRecalculate = [obj.faces[i] for i in target.faces]
+            verticesToUpdate = [obj.verts[i] for i in target.verts]
 
-    # Adding the translation vector
+        # Adding the translation vector
 
-    for v in verticesToUpdate:
-        targetVect = target.data[v.idx]
-        v.co[0] += targetVect[0] * morphFactor
-        v.co[1] += targetVect[1] * morphFactor
-        v.co[2] += targetVect[2] * morphFactor
+        for v in verticesToUpdate:
+            targetVect = target.data[v.idx]
+            v.co[0] += targetVect[0] * morphFactor
+            v.co[1] += targetVect[1] * morphFactor
+            v.co[2] += targetVect[2] * morphFactor
 
-    if calcNorm == 1:
-        obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
-    if update:
-        obj.update(verticesToUpdate)
+        if calcNorm == 1:
+            obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
+        if update:
+            obj.update(verticesToUpdate)
 
-    # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+        # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
 
-    return True
+        return True
 
 
 def calcTargetNormal(obj, targetPath):
