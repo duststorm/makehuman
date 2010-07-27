@@ -38,18 +38,22 @@ import gui3d, hair, mh
 from aljabr import *
 import random
 from math import sqrt, pow, log
-
+from collision import collision
+import simpleoctree
 
 class MakeHairTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'MakeHair', category.app.getThemeResource('images', 'makehair.png'), category.app.getThemeResource('images', 'makehair_on.png'))
         
-        #member variables:
+        #member variables
         self.number = 25
         self.gravity = 1.5
         self.cP = 14
         self.length=5.0
-        
+        scn = self.app.scene3d
+        if len(scn.selectedHuman.meshStored)==0: 
+            scn.selectedHuman.storeMesh()
+        self.octree = simpleoctree.SimpleOctree(scn.selectedHuman.meshStored,0.09)   
         #sliders
         self.cPSlider = gui3d.Slider(self, position=[600, 100, 9.2], value=14,min=4,max=30,label="Control Points")
         self.lengthSlider = gui3d.Slider(self, position=[600, 140, 9.2], value=5.0,min=0.0,max=7.0,label="Strand Length")
@@ -73,9 +77,22 @@ class MakeHairTaskView(gui3d.TaskView):
             self.gravity = value;
 
         #buttons
+        self.collisionButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[100,270,9.2],label="Avoid Collision")
+        
         self.createButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[600,270,9.2],label="Create Hair")
         self.deleteButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[600,290,9.2],label="Delete Hair")
-
+        
+        @self.collisionButton.event
+        def onClicked(event):
+            scn = self.app.scene3d
+            #headVerts = scn.selectedHuman.meshStored
+            #if self.octree=None : octree = simpleoctree.SimpleOctree(headVerts,0.09)
+            hairTaskView = self.app.categories['Library'].tasksByName['Hair']
+            guides = hairTaskView.hairsClass.guides
+            for curve in guides:
+                collision(self.octree,curve,scn.selectedHuman.meshData.verts,0.09,9,True) #collision avoidance will start after 9th controlPoint!!!
+            hairTaskView.loadHairsFile(None,  reload=True)
+        
         @self.createButton.event
         def onClicked(event):
             scn = self.app.scene3d

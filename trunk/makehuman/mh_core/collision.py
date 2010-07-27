@@ -8,52 +8,14 @@ import simpleoctree
 from aljabr import *
 
 
-def drawLine(point1, point2, name):
-    coords = [point1, point2]
-    faces = [[0, 1]]
-    me = Mesh.New()  # create a new mesh
-    me.verts.extend(coords)  # add vertices to mesh
-    me.faces.extend(faces)  # add faces to the mesh (also adds edges)
-    scn = Scene.GetCurrent()  # get current scene
-    scn.objects.new(me, name)
-    Blender.Redraw()
-
-
-# Normal direction is from point1 to point2!
-# i is an integer corresponding to the vertex order of the mesh
-
-
-def drawNormal(i, obj, size, name):
-    mesh = obj.getData()
-    normal = mesh.verts[i].no
-    point1 = local2World(mesh.verts[i].co, obj.getMatrix())
-    point2 = vadd(point1, vmul(normal, size))
-    drawLine(point1, point2, name)
-
-
-def local2World(vec, matrix):
-    (x, y, z) = vec
-    (xloc, yloc, zloc) = (matrix[3][0], matrix[3][1], matrix[3][2])
-    return [x * matrix[0][0] + y * matrix[1][0] + z * matrix[2][0] + xloc, x * matrix[0][1] + y * matrix[1][1] + z * matrix[2][1] + yloc, x * matrix[0][2] + y
-             * matrix[1][2] + z * matrix[2][2] + zloc]
-
-
-def world2Local(vec, matrix):
-    (x, y, z) = vec
-    (xloc, yloc, zloc) = (matrix[3][0], matrix[3][1], matrix[3][2])
-    return [(x - xloc) * matrix[0][0] + (y - yloc) * matrix[0][1] + (z - zloc) * matrix[0][2], (x - xloc) * matrix[1][0] + (y - yloc) * matrix[1][1] + (z - zloc)
-             * matrix[1][2], (x - xloc) * matrix[2][0] + (y - yloc) * matrix[2][1] + (z - zloc) * matrix[2][2]]
-
-
-def getTangent(point, i, obj, size, isNurb=False, res=0.08):  # default Octree Resolution is set to 0.08
+def getTangent(point, i, verts, size, isNurb=False, res=0.08):  # default Octree Resolution is set to 0.08
     l = (1.5 * res) * math.sqrt(3.0)  # longest distance of an octree smallest cube
     if size < l:
         l = size
     size = size - l  # josenow
-    mesh = obj.getData()
-    L2 = local2World(mesh.verts[i].co, obj.getMatrix())
+    L2 = verts[i].co
     vec1 = vsub(point, L2)
-    normal = mesh.verts[i].no
+    normal = verts[i].no
 
     # if math.abs(diffang(vec1,normal))
 
@@ -78,10 +40,6 @@ def getTangent(point, i, obj, size, isNurb=False, res=0.08):  # default Octree R
             point2 = vadd(L2, tangent)
             point2 = vadd(point2, vmul(normal, res))
         else:
-
-            # return[L2,point2]
-              # collision and normal lines are parallel
-
             print 'Collision and normal lines are parallel'
             tangent = [normal[0], -normal[2], normal[1]]  # arbitrary rotation of 90deg.. choose x-axis rotation!
             tangent = vmul(tangent, l)
@@ -194,20 +152,19 @@ def lineInColoredLeaf(line, root):  # root is of type SimpleOctreeVolume found i
 # curve and not the line connecting controlpoints
 
 
-def deflect(line, obj, gravity, isNurb=True):  # assume gravity is negative y-direction!
+def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-direction!
     G = [0, -1, 0]  # vector direction of gravity
-    mesh = obj.getData()
-
+  
     # dist = distance(line[0],mesh.verts[0].co)
 
     dist = ()  # infinity in python
     near = []
-    for j in range(0, len(mesh.verts)):
-        if [mesh.verts[j].co[0], mesh.verts[j].co[1], mesh.verts[j].co[2]] == line[1]:
+    for j in range(0, len(verts)):
+        if [verts[j].co[0], verts[j].co[1], verts[j].co[2]] == line[1]:
             return 0  # 0 means do not change the curve
             print 'line[1] and mesh verts match'
-        if gravity and mesh.verts[j].co[1] < line[0][1] or not gravity:  # assume G=[0,-1,0]
-            distTemp = vdist(line[0], mesh.verts[j].co)
+        if gravity and verts[j].co[1] < line[0][1] or not gravity:  # assume G=[0,-1,0]
+            distTemp = vdist(line[0], verts[j].co)
             if distTemp < dist:
                 dist = distTemp
                 near = j
@@ -217,40 +174,32 @@ def deflect(line, obj, gravity, isNurb=True):  # assume gravity is negative y-di
 
         return 0
     else:
-        size = vdist(mesh.verts[near].co, line[1])
+        size = vdist(verts[near].co, line[1])
 
     # get unit normal
 
     if size > 0.0001:  # TODO add minimal unit
         if not gravity:
-            return getTangent(line[0], near, obj, size, isNurb)
+            return getTangent(line[0], near, mesh, size, isNurb)
         else:
-            point = [mesh.verts[near].co[0], mesh.verts[near].co[1], mesh.verts[near].co[2]]
+            point = [verts[near].co[0], verts[near].co[1], verts[near].co[2]]
             point = vsub(point, G)
-            return getTangent(point, near, obj, size, isNurb)
+            return getTangent(point, near, verts, size, isNurb)
 
 
 # res = resolution of minsize of octree
 # i is the index of curve where collision should start!
 
 
-def collision(curve, obj, res, i=1, gravity=True):
-
-    # newcurve = curve[:] #make deep copy of curve
-
-    mesh = obj.getData()  # NOTICE : we assume obj is centered at [0,0,0]
-    mat = obj.getMatrix()
-    octree = simpleoctree.SimpleOctree(mesh.verts, res)
+def collision(octree, curve, verts, res, i=1, gravity=True):
     N = len(curve)
     while i < N:
-        point1 = world2Local(curve[i - 1], mat)
-        point2 = world2Local(curve[i], mat)
-        print 'i, N : ', i, N  # todelete
-        if lineInColoredLeaf([point1, point2], octree.root):
+        #print 'Debug : i, N : ', i, N  # todelete
+        if lineInColoredLeaf([curve[i-1], curve[i]], octree.root):
             if i == N - 1:
-                tangent = deflect([curve[i - 1], curve[i]], obj, gravity)
+                tangent = deflect([curve[i - 1], curve[i]], verts, gravity)
             else:
-                tangent = deflect([curve[i - 1], curve[i], curve[i + 1]], obj, gravity)
+                tangent = deflect([curve[i - 1], curve[i], curve[i + 1]], verts, gravity)
             n = 1
             if not tangent == 0:
                 if not curve[i - 1] == tangent[0]:  # TODO in case after Tangent deflection we passthrough a second part of the body!
