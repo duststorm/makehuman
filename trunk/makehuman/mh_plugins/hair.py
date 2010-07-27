@@ -57,16 +57,18 @@ class HairTaskView(gui3d.TaskView):
       if human.hairObj: human.scene.clear(human.hairObj)
       #hairsClass = hairgenerator.Hairgenerator()
       #hairsClass.humanVerts = human.mesh.verts
-      human.hairObj = loadHairsFile(path="./data/hairs/"+filename, update=update)
+      human.hairObj = self.loadHairsFile(path="./data/hairs/"+filename, update=update)
       self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(os.path.join('data/hairs', filename + '.png'))
       self.app.switchCategory("Modelling")
       human.setHairFile(os.path.join('data/hairs', filename + ".obj"))
       
-    def loadHairsFile(path,res=0.04, update = True, reload=False):
-    #scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
+  def loadHairsFile(self, path,res=0.04, update = True, reload=False):
+      #scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
       human = self.app.scene3d.selectedHuman
       scn = human.scene
-      if reload : obj = human.hairObj
+      if reload:
+          obj = human.hairObj
+          fg = obj.getFaceGroup("ribbons")
       else:
           self.hairsClass.loadHairs(path)         
           position = human.getPosition()
@@ -92,15 +94,15 @@ class HairTaskView(gui3d.TaskView):
           obj.indexBuffer = []
           fg = obj.createFaceGroup("ribbons")
           
-          #temporary vectors    
-      
-          headBB=calculateBoundingBox(human.headVertices)
-          headCentroid = in2pts(headBB[0],headBB[1],0.5)
-          delta = vsub(headCentroid,self.oHeadCentroid)
-          scale = [1.0,1.0,1.0]
-          scale[0] = (headBB[1][0]-headBB[0][0])/float(self.oHeadBoundingBox[1][0]-self.oHeadBoundingBox[0][0])
-          scale[1] = (headBB[1][1]-headBB[0][1])/float(self.oHeadBoundingBox[1][1]-self.oHeadBoundingBox[0][1])
-          scale[2] = (headBB[1][2]-headBB[0][2])/float(self.oHeadBoundingBox[1][2]-self.oHeadBoundingBox[0][2])
+      #temporary vectors    
+
+      headBB=calculateBoundingBox(human.headVertices)
+      headCentroid = in2pts(headBB[0],headBB[1],0.5)
+      delta = vsub(headCentroid,self.oHeadCentroid)
+      scale = [1.0,1.0,1.0]
+      scale[0] = (headBB[1][0]-headBB[0][0])/float(self.oHeadBoundingBox[1][0]-self.oHeadBoundingBox[0][0])
+      scale[1] = (headBB[1][1]-headBB[0][1])/float(self.oHeadBoundingBox[1][1]-self.oHeadBoundingBox[0][1])
+      scale[2] = (headBB[1][2]-headBB[0][2])/float(self.oHeadBoundingBox[1][2]-self.oHeadBoundingBox[0][2])
       
       for guide in self.hairsClass.guides:
         for cP in guide:
