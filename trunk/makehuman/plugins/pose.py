@@ -8,41 +8,18 @@ import os
 import algos3d
 import aljabr
 import math
+import poseengine
 print 'Pose plugin imported'
 
 
 class PoseTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_pose.png'))
+        gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_pose.png'))      
 
-
-        self.shoulderX = 0
-        self.shoulderY = 0
-        self.shoulderZ = 0
-        self.shoulderSamplesRot = []
-        self.shoulderSamplesTrasl = []
-        self.trasl = {}
-        self.rotx = {}
-        self.roty = {}
-        self.rotz = {}
-
-
-        #Roughly hardcoded
-        rotData = os.listdir("data/targets/poseengine/female-young/right-shoulder/test_rot")
-        for dat in rotData:
-            if dat not in ("shoulder-girdle",".svn"):
-                sample = [float(x) for x in dat.split('_')]
-                self.shoulderSamplesRot.append(sample)
-
-        traslData = os.listdir("data/targets/poseengine/female-young/right-shoulder/test_trasl")
-        for dat in traslData:
-            fileName = os.path.join("data/targets/poseengine/female-young/right-shoulder/test_trasl",dat)
-            if os.path.isfile(fileName):
-                n = os.path.splitext(dat)[0]
-                sample = [float(x) for x in n.split('_')]
-                self.shoulderSamplesTrasl.append(sample)
-
+        self.engine = poseengine.Poseengine(self.app.scene3d.selectedHuman)        
+        self.shoulder = self.engine.getLimb("joint-r-shoulder")
+        self.shoulder.rotOrder = "xzy"
 
         self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, min = -85, max = 80, label = "Shoulder RotX")
         self.shoulderYslider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, min = -140, max = 50, label = "Shoulder RotY")
@@ -60,6 +37,7 @@ class PoseTaskView(gui3d.TaskView):
 
         self.resetPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Reset", position=[50, 240, 9.5])
         self.testPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Test", position=[50, 260, 9.5])
+            
 
         @self.testPoseButton.event
         def onClicked(event):
@@ -70,355 +48,26 @@ class PoseTaskView(gui3d.TaskView):
             self.resetShoulder()
 
         @self.shoulderXslider.event
-        def onChange(value):
-            self.shoulderX = value
-            self.shoulderXLabel.setText('%d' % self.shoulderX)
-            self.applyPose()
+        def onChange(value):            
+            self.shoulder.angle[0] = value
+            self.shoulderXLabel.setText('%d' % value)
+            self.shoulder.applyPose()            
 
         @self.shoulderYslider.event
-        def onChange(value):
-            self.shoulderY = value
-            self.shoulderYLabel.setText('%d' % self.shoulderY)
-            self.applyPose()
+        def onChange(value):            
+            self.shoulder.angle[1] = value 
+            self.shoulderYLabel.setText('%d' % value)
+            self.shoulder.applyPose()           
 
         @self.shoulderZslider.event
         def onChange(value):
-            self.shoulderZ = value
-            self.shoulderZLabel.setText('%d' % self.shoulderZ)
-            self.applyPose()
-
-
-    def calcIAS(self,d1,d2,d3):
-    #Index of Angle Similarity
-        D = d1+d2+d3
-        D1 = D/(d1+0.0001)
-        D2 = D/(d2+0.0001)
-        D3 = D/(d3+0.0001)
-        Dtot = D1+D2+D3
-        IAS1 = D1/Dtot
-        IAS2 = D2/Dtot
-        IAS3 = D3/Dtot
-        #print "IAS: %f,%f,%f"%(IAS1,IAS2,IAS3)
-        return IAS1,IAS2,IAS3
-
-    def calcIAR(self,v1,v2):
-    #Index of Angle Ratio
-        #print "IAR: ", v1, v2
-        l1 = aljabr.vlen(v1)
-        l2 = aljabr.vlen(v2)
-        ratio = l1/(l2+0.001) #+0.001 to avoid zero division
-        if ratio < 10:
-            return 1-(2/(25**(-(ratio-1))+25**(ratio-1))) #Hyperbolic secant like
-        else:
-            return 1.0
-
-
-
-    def resetShoulder(self):
-        self.shoulderX = 0
-        self.shoulderY = 0
-        self.shoulderZ = 0
-        self.shoulderXslider.setValue(0.0)
-        self.shoulderYslider.setValue(0.0)
-        self.shoulderZslider.setValue(0.0)
-        self.shoulderXLabel.setText('0')
-        self.shoulderYLabel.setText('0')
-        self.shoulderZLabel.setText('0')
-        self.applyPose()
-
-
-    def listToString(self,listToConvert):
-        stringList = [str(x) for x in listToConvert]
-        return "-".join(stringList)
-        
-        
-    def composeRotation(self,angle):
-        
-        #Roughly hardcoded
-        
-        zMax = 90
-        zMin = -115
-        yMax = 45
-        yMin = -135
-        
-        #Assuming order is x_z_y
-        y = angle[2]
-        z = angle[1]
-        x = angle[0]
-
-        xLabel = [0,0,0]
-        yLabel = [0,0,0]
-        zLabel = [0,0,0]
-        xVal,yVal,zVal = 0.0,0.0,0.0
-
-        if x < 0:
-            xLabel = [-90,0,0]
-            xVal = x/-90.0            
+            self.shoulder.angle[2] = value 
+            self.shoulderZLabel.setText('%d' % value)
+            self.shoulder.applyPose()
             
-        if x > 0:
-            xLabel = [90,0,0]
-            xVal = x/90.0
-        
-        if y < 0:
-            yLabel = [0,0,-135]
-            yVal = y/-135.0
-            
-        if y > 0:
-            yLabel = [0,0,45]
-            yVal = y/45.0
-            
-        if z < 0:
-            zLabel = [0,-115,0]
-            zVal = z/-115.0
-            
-        if z > 0:
-            zLabel = [0,90,0]
-            zVal = z/90.0
-            
-        print "ROTATIONS"
-        print xLabel,xVal
-        print yLabel,yVal
-        print zLabel,zVal
-        
-        return (xLabel,yLabel,zLabel,xVal,yVal,zVal)
-        
-            
-        
-        
-
-   
-
-    def seekNearestSamples(self,angle,samples):
-        direction = aljabr.vnorm(angle)
-        similarity = {}
-        trajectories = set()
-        sampleDistance1Min = 100
-        sampleDistance2Min = 100
-        if angle != [0.0,0.0,0.0]:
-            for sample in samples:
-                direction2 = aljabr.vnorm(sample)
-                sampleDistance1 = aljabr.vdist(direction,direction2)
-                sampleDistance2 = math.fabs(aljabr.vlen(aljabr.vsub(angle,sample)))
-
-                similarity[sampleDistance1+sampleDistance2] = sample
-
-
-
-
-            d = similarity.keys()
-            d.sort()
-            #print "SEEKING...",angle
-            #for a in d:
-                 #print similarity[a],a
-
-            nearestSample1 = similarity[d[0]]
-            nearestSample2 = similarity[d[1]]
-            nearestSample3 = similarity[d[2]]
-            factor1,factor2,factor3 = self.calcIAS(d[0],d[1],d[2])
-            #print "FACTORS: ",factor1,factor2,factor3
-            #print "SAMPLES",nearestSample1,nearestSample2,nearestSample3
-
-            if factor1 > 1 or factor2 >1 or factor3 > 1:
-                print "WARNING. Angle %f,%f,%f is impossible for human shoulder"% (angle[0],angle[1],angle[2])
-            return (nearestSample1,nearestSample2,nearestSample3,factor1,factor2,factor3)
-        else:
-            return ([0,0,0],[0,0,0],[0,0,0],0,0,0)
-
-
-
-
-
-    def applyShoulderTargets(self,angle):
-
-        #Just a rough testing function
-
-        shoulderRotDir = "data/targets/poseengine/female-young/right-shoulder/test_rot"
-        shoulderTraslDir = "data/targets/poseengine/female-young/right-shoulder/test_trasl"
-        #samplesRot = self.seekNearestSamples(angle,self.shoulderSamplesRot)
-        
-        samplesRot = self.composeRotation(angle)        
-        
-        samplesTrasl = self.seekNearestSamples(angle,self.shoulderSamplesTrasl)
-
-        targetRot1 = "_".join([str(int(x)) for x in samplesRot[0]])
-        targetRot2 = "_".join([str(int(x)) for x in samplesRot[1]])
-        targetRot3 = "_".join([str(int(x)) for x in samplesRot[2]])
-
-        targetTrasl1 = "_".join([str(int(x)) for x in samplesTrasl[0]])
-        targetTrasl2 = "_".join([str(int(x)) for x in samplesTrasl[1]])
-        targetTrasl3 = "_".join([str(int(x)) for x in samplesTrasl[2]])
-
-        morphRotVal1 = samplesRot[3]
-        morphRotVal2 = samplesRot[4]
-        morphRotVal3 = samplesRot[5]
-
-        morphTraslVal1 = samplesTrasl[3]
-        morphTraslVal2 = samplesTrasl[4]
-        morphTraslVal3 = samplesTrasl[5]
-
-        pathRot1 = os.path.join(shoulderRotDir,targetRot1)
-        pathRot2 = os.path.join(shoulderRotDir,targetRot2)
-        pathRot3 = os.path.join(shoulderRotDir,targetRot3)
-
-        pathTrasl1 = os.path.join(shoulderTraslDir,targetTrasl1)
-        pathTrasl2 = os.path.join(shoulderTraslDir,targetTrasl2)
-        pathTrasl3 = os.path.join(shoulderTraslDir,targetTrasl3)
-
-        print "-------"
-        print "SAMPLES USED ", angle
-        print os.path.basename(pathRot1),morphRotVal1
-        print os.path.basename(pathRot2),morphRotVal2
-        print os.path.basename(pathRot3),morphRotVal3
-
-        #print pathTrasl1,morphTraslVal1
-        #print pathTrasl2,morphTraslVal2
-        #print pathTrasl3,morphTraslVal3
-
-        self.storeTargets(pathRot1,morphRotVal1)
-        self.storeTargets(pathRot2,morphRotVal2)
-        self.storeTargets(pathRot3,morphRotVal3)
-        self.storeTargets(pathTrasl1,morphTraslVal1)
-        self.storeTargets(pathTrasl2,morphTraslVal2)
-        self.storeTargets(pathTrasl3,morphTraslVal3)
-
-
-
-    def storeTargets(self,path,morphFactor):
-
-        traslations = []
-        rotations = []
-
-        if os.path.isdir(path):
-            targets = os.listdir(path)
-            for t in targets:
-                if "svn" not in t:
-                    tpath = os.path.join(path,t)
-                    rotations.append(tpath)
-        else:
-            tpath = path+".target"
-            traslations.append(tpath)
-
-
-        rotations.sort()
-        traslations.sort()
-
-        for targetPath in traslations:
-            self.trasl[targetPath] = morphFactor
-        for targetPath in rotations:
-            f = open(targetPath)
-            fileDescriptor = f.readlines()
-            f.close()
-            rotAxeInfo = fileDescriptor[0].split()
-            axis = rotAxeInfo[2]
-            if axis =="X":
-                 self.rotx[targetPath] = morphFactor
-            if axis =="Y":
-                 self.roty[targetPath] = morphFactor
-            if axis =="Z":
-                 self.rotz[targetPath] = morphFactor
-
-
-
-
-    def testShoulder(self):
-        self.shoulderX = 0  
-        for i1 in [-115,-90,-67,-45,-22,0,22,45,67,90]:
-            self.shoulderZ = i1
-            for i2 in [-135,-67,0,45]:
-                self.shoulderY = i2                    
-                for i3 in[-90,90]:
-                    self.shoulderX = i3
-                    self.shoulderXslider.setValue(self.shoulderX)
-                    self.shoulderYslider.setValue(self.shoulderY)
-                    self.shoulderZslider.setValue(self.shoulderZ)
-                    self.shoulderXLabel.setText(str(self.shoulderX))
-                    self.shoulderYLabel.setText(str(self.shoulderY))
-                    self.shoulderZLabel.setText(str(self.shoulderZ))
-                    self.applyPose(True)
-                    self.app.scene3d.redraw(0)
-
-
-    #maybe this should be moved in human class
-    def applyPose(self,saveData = False):
-        self.rotx = {}
-        self.roty = {}
-        self.rotz = {}
-
-        self.trasl = {}
-
-        self.app.scene3d.selectedHuman.restoreMesh() #restore the mesh without rotations
-
-        angle = [self.shoulderX,self.shoulderZ,self.shoulderY]
-        self.applyShoulderTargets(angle)
-
-        rotPathsX = self.rotx.keys()
-        rotPathsY = self.roty.keys()
-        rotPathsZ = self.rotz.keys()
-        traslPaths = self.trasl.keys()
-
-        rotPathsX.sort()
-        rotPathsY.sort()
-        rotPathsZ.sort()
-        traslPaths.sort()
-
-        #print "DEBUGROT X"
-        #for a in rotPathsX:
-            #print a,self.rotx[a]
-        #print "DEBUGROT Z"
-        #for a in rotPathsZ:
-            #print a,self.rotz[a]
-        #print "DEBUGROT Y"
-        #for a in rotPathsY:
-            #print a,self.roty[a]
-
-
-
-        if saveData == True:
-
-            outFilePath = "%s_%s_%s.pose"%(self.shoulderX,self.shoulderZ,self.shoulderY)
-
-            fDescriptor = open(outFilePath, 'w')
-            print "SAVED IN ", outFilePath
-            for targetPath in traslPaths:
-                morphFactor = self.trasl[targetPath]
-                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
-            for targetPath in rotPathsX:
-                morphFactor = self.rotx[targetPath]
-                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
-            for targetPath in rotPathsZ:
-                morphFactor = self.rotz[targetPath]
-                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
-            for targetPath in rotPathsY:
-                morphFactor = self.roty[targetPath]
-                fDescriptor.write("%s %s\n"%(targetPath, morphFactor))
-
-            fDescriptor.close()
-
-
-
-        for targetPath in traslPaths:
-            morphFactor = self.trasl[targetPath]
-            algos3d.loadTranslationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor, None, 1, 0)
-        for targetPath in rotPathsX:
-            morphFactor = self.rotx[targetPath]
-            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)
-        for targetPath in rotPathsZ:
-            morphFactor = self.rotz[targetPath]
-            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)
-        for targetPath in rotPathsY:
-            morphFactor = self.roty[targetPath]
-            algos3d.loadRotationTarget(self.app.scene3d.selectedHuman.meshData, targetPath, morphFactor)
-
-
-        self.app.scene3d.selectedHuman.meshData.calcNormals(facesToUpdate=[f for f in self.app.scene3d.selectedHuman.meshData.faces])
-        self.app.scene3d.selectedHuman.meshData.update()
-        #self.app.scene3d.redraw()
-
-
-
     def onShow(self, event):
         self.app.scene3d.selectedHuman.storeMesh()
-        self.applyPose()
+        #self.applyPose()
         gui3d.TaskView.onShow(self, event)
 
     def onHide(self, event):
@@ -473,5 +122,5 @@ def load(app):
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 def unload(app):
-    print 'example unloaded'
+    print 'pose unloaded'
 
