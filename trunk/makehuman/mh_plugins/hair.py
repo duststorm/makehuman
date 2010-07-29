@@ -96,6 +96,7 @@ class HairTaskView(gui3d.TaskView):
       obj.calcNormals()
       obj.shadeless = 1
       obj.updateIndexBuffer()
+      human.hairObj.update()
       human.hairObj = obj
       scn.update()
 
