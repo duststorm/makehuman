@@ -20,6 +20,10 @@ class PoseTaskView(gui3d.TaskView):
         self.engine = poseengine.Poseengine(self.app.scene3d.selectedHuman)        
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
         self.shoulder.rotOrder = "xzy"
+        
+        self.shoulder.keyRot0 = [-90,90]
+        self.shoulder.keyRot1 = [-135,-67,0,45]
+        self.shoulder.keyRot2 = [-115,-90,-67,-45,-22,0,22,45,67,90]
 
         self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, min = -85, max = 80, label = "Shoulder RotX")
         self.shoulderYslider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, min = -140, max = 50, label = "Shoulder RotY")
@@ -41,11 +45,23 @@ class PoseTaskView(gui3d.TaskView):
 
         @self.testPoseButton.event
         def onClicked(event):
-            self.testShoulder()
+            self.test(self.shoulder,
+                    self.shoulderXslider,
+                    self.shoulderYslider,
+                    self.shoulderZslider,
+                    self.shoulderXLabel,
+                    self.shoulderYLabel,
+                    self.shoulderZLabel)
 
         @self.resetPoseButton.event
         def onClicked(event):
-            self.resetShoulder()
+            self.reset(self.shoulder,
+                    self.shoulderXslider,
+                    self.shoulderYslider,
+                    self.shoulderZslider,
+                    self.shoulderXLabel,
+                    self.shoulderYLabel,
+                    self.shoulderZLabel)
 
         @self.shoulderXslider.event
         def onChange(value):            
@@ -74,6 +90,35 @@ class PoseTaskView(gui3d.TaskView):
         self.app.scene3d.selectedHuman.restoreMesh()
         self.app.scene3d.selectedHuman.meshData.update()
         gui3d.TaskView.onHide(self, event)
+
+    def test(self, limbToTest, sliderX,sliderY,sliderZ,labelX,labelY,labelZ):
+        limbToTest.angle = [0,0,0]
+        for i0 in limbToTest.keyRot0:
+            limbToTest.angle[0] = i0
+            for i1 in limbToTest.keyRot1:
+                limbToTest.angle[1] = i1                  
+                for i2 in limbToTest.keyRot2:
+                    limbToTest.angle[2] = i2 
+                    labelX.setText('%d'%(i0))
+                    labelY.setText('%d'%(i1))
+                    labelZ.setText('%d'%(i2))
+                    sliderX.setValue(i0)
+                    sliderY.setValue(i1)
+                    sliderZ.setValue(i2)
+                    limbToTest.applyPose()
+                    self.app.scene3d.redraw(0)
+
+    def reset(self, limbToTest, sliderX,sliderY,sliderZ,labelX,labelY,labelZ):
+        limbToTest.angle = [0,0,0]        
+        labelX.setText('0')
+        labelY.setText('0')
+        labelZ.setText('0')
+        sliderX.setValue(0.0)
+        sliderY.setValue(0.0)
+        sliderZ.setValue(0.0)
+        limbToTest.applyPose()
+        self.app.scene3d.redraw(0)
+        
 
 category = None
 taskview = None

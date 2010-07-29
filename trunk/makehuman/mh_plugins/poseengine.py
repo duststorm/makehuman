@@ -67,9 +67,21 @@ class Limb():
             if s[2] > self.angleMax[2]:
                 self.angleMax[2] = s[2]
 
+        #Key rotations are only used to automatically produce
+        #rough key files, to be manually adjust by designer
+        #to create the database
+        self.keyRot0 = [self.angleMin[0],self.angleMax[0]]
+        self.keyRot1 = [self.angleMin[1],self.angleMax[1]]
+        self.keyRot2 = [self.angleMin[2],self.angleMax[2]]
+ 
 
+    def resetTransf(self):
+        self.rotx = {}
+        self.roty = {}
+        self.rotz = {}
+        self.trasl = {}
+        
     def equalize(self,d1,d2,d3):
-
         D = d1+d2+d3
         D1 = D/(d1+0.0001)
         D2 = D/(d2+0.0001)
@@ -82,7 +94,6 @@ class Limb():
 
 
     def chooseRotSamples(self):
-
         rotExamples = []
         rotValues = []
         rotAxis = []
@@ -261,10 +272,7 @@ class Limb():
 
     def applyPose(self):
 
-        self.rotx = {}
-        self.roty = {}
-        self.rotz = {}
-        self.trasl = {}
+        self.resetTransf()        
 
         self.character.restoreMesh() #restore the mesh without rotations
         self.loadTargets()
