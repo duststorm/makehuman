@@ -60,7 +60,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
     
-        self.widthSlider = gui3d.Slider(self, position=[10, 150, 9], value=1.0, min=1.0,max=30.0, label = "Hair width") 
+        self.widthSlider = gui3d.Slider(self, position=[10, 150, 9], value=1.0, min=0.3,max=30.0, label = "Hair width") 
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
                     

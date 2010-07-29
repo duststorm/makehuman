@@ -193,6 +193,7 @@ def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-
 
 def collision(octree, curve, verts, res, i=1, gravity=True):
     N = len(curve)
+    changed = False
     while i < N:
         #print 'Debug : i, N : ', i, N  # todelete
         if lineInColoredLeaf([curve[i-1], curve[i]], octree.root):
@@ -210,8 +211,10 @@ def collision(octree, curve, verts, res, i=1, gravity=True):
                         curve.insert(i, tangent[(n - 1) - k])
                     for j in range(i + n, len(curve)):
                         curve[j] = vadd(curve[j], delta)
+                    changed = True
                     N = N + n
             i = i + n
         i = i + 1
+    return changed
 
 

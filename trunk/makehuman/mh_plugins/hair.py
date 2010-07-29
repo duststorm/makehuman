@@ -62,37 +62,71 @@ class HairTaskView(gui3d.TaskView):
       self.app.switchCategory("Modelling")
       human.setHairFile(os.path.join('data/hairs', filename + ".obj"))
       
-  def loadHairsFile(self, path,res=0.04, update = True, reload=False):
+  def reloadGuides(self):
+      human = self.app.scene3d.selectedHuman
+      scn = human.scene
+      scn.clear(human.hairObj)
+      position = human.getPosition()
+      rotation = human.getRotation()
+      #if hairsClass == None :
+      #  hairsClass = hairgenerator.Hairgenerator()
+      obj = scn.newObj("somehair")
+      obj.x = position[0]
+      obj.y = position[1]
+      obj.z = position[2]
+      obj.rx = rotation[0]
+      obj.ry = rotation[1]
+      obj.rz = rotation[2]
+      obj.sx = 1.0
+      obj.sy = 1.0
+      obj.sz = 1.0
+      obj.visibility = 1
+      obj.shadeless = 0
+      obj.pickable = 0
+      obj.cameraMode = 0
+      obj.text = ""
+      obj.uvValues = []
+      obj.indexBuffer = []
+      fg = obj.createFaceGroup("ribbons")
+      
+      for guide in self.hairsClass.guides:
+        loadStrands(obj,guide, self.widthFactor, 0.04)
+    
+      fg.setColor([0,0,0,255]) #rgba
+      obj.calcNormals()
+      obj.shadeless = 1
+      obj.updateIndexBuffer()
+      human.hairObj = obj
+      scn.update()
+
+
+  def loadHairsFile(self, path,res=0.04, update = True):
       #scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
       human = self.app.scene3d.selectedHuman
       scn = human.scene
-      if reload:
-          obj = human.hairObj
-          fg = obj.getFaceGroup("ribbons")
-      else:
-          self.hairsClass.loadHairs(path)         
-          position = human.getPosition()
-          rotation = human.getRotation()
-          #if hairsClass == None :
-          #  hairsClass = hairgenerator.Hairgenerator()
-          obj = scn.newObj(path)
-          obj.x = position[0]
-          obj.y = position[1]
-          obj.z = position[2]
-          obj.rx = rotation[0]
-          obj.ry = rotation[1]
-          obj.rz = rotation[2]
-          obj.sx = 1.0
-          obj.sy = 1.0
-          obj.sz = 1.0
-          obj.visibility = 1
-          obj.shadeless = 0
-          obj.pickable = 0
-          obj.cameraMode = 0
-          obj.text = ""
-          obj.uvValues = []
-          obj.indexBuffer = []
-          fg = obj.createFaceGroup("ribbons")
+      self.hairsClass.loadHairs(path)         
+      position = human.getPosition()
+      rotation = human.getRotation()
+      #if hairsClass == None :
+      #  hairsClass = hairgenerator.Hairgenerator()
+      obj = scn.newObj(path)
+      obj.x = position[0]
+      obj.y = position[1]
+      obj.z = position[2]
+      obj.rx = rotation[0]
+      obj.ry = rotation[1]
+      obj.rz = rotation[2]
+      obj.sx = 1.0
+      obj.sy = 1.0
+      obj.sz = 1.0
+      obj.visibility = 1
+      obj.shadeless = 0
+      obj.pickable = 0
+      obj.cameraMode = 0
+      obj.text = ""
+      obj.uvValues = []
+      obj.indexBuffer = []
+      fg = obj.createFaceGroup("ribbons")
           
       #temporary vectors    
 
