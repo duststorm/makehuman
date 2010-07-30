@@ -33,8 +33,6 @@ class Hairgenerator:
     """
 
     def __init__(self):
-        #simplifying the class... removed 
-        #self.hairStyle = [] #this will become a list of n-tuples of guides (after the interpolation)
 
         self.tipMagnet = 0.9
          
@@ -54,9 +52,6 @@ class Hairgenerator:
 
         self.tipColor = [0.518, 0.325, 0.125]
         self.rootColor = [0.109, 0.037, 0.007]
-        #we use dictionary because if we save the obj with groups we need some kind of container that understands the group-name
-        #Dictionary's hash  with keyvalues is an appropriate container
-        #self.guideGroups = dict() #dictionary of guide tuple (guidegroup)
         self.guides =[]
         self.version = '1.0 alpha 2'
         self.tags = []
@@ -179,8 +174,6 @@ class Hairgenerator:
         return hairStyle
 
     def generateHairInterpolation1(self, guide):
-        #hairName = 'clump%s' % guide.name
-        #hairStyle=[]
         hSet = [] #empty list of list of curves  #HairGroup(hairName).. one whole group of hairstrands
         nVerts = len(guide)
         interpFactor1 = 0
@@ -223,7 +216,6 @@ class Hairgenerator:
     # humanMesh is a blender object.. the format can be changed later on if the necessity arises!
     # for the time being we have a blender object and gravity direction is [0,-1,0]
 
-    #Josenow
     def generateHairInterpolation2(self, guide1, guide2, humanMesh, isCollision, startIndex=9, gravity=True):
         if isCollision:
             octree = simpleoctree.SimpleOctree(humanMesh.getData().verts, 0.08)
@@ -268,7 +260,7 @@ class Hairgenerator:
 
                 dotProd = aljabr.vdot(aljabr.vnorm(vert1), aljabr.vnorm(vert2))
 
-                # Python has a very very bad numerical accuracy.. we need to do this for very small angle between guides
+                # Python is not perfect with numerical accuracy.. we need to do this for very small angle between guides
                 # this occurs when we do collision detection
 
                 if dotProd > 1:
@@ -294,10 +286,6 @@ class Hairgenerator:
             if isCollision:
                 print 'h is: ', h
                 for j in (0, len(h)):
-
-                    # print "h.controlPts is : ", h.controlPoints[i]
-                    # print "h.controlPts[i] length is: ", len(h.controlPoints[i])
-
                     h[i][2] = -h[i][2]  # Renderman to Blender coordinates!
                 collision(h, humanMesh, octree.minsize, startIndex, gravity)
                 for j in (0, len(h)):
@@ -428,18 +416,6 @@ class Hairgenerator:
                 self.rootColor[1] = float(datalist[2])
                 self.rootColor[2] = float(datalist[3])
                 
-            """
-            elif datalist[0] == 'guideGroup':
-                currentGroup = self.addGuideGroup(datalist[1])
-            elif datalist[0] == 'guide':
-                guideName = datalist[1]
-                controlPointsCoo = datalist[2:]
-                for i in range(len(controlPointsCoo)):
-                    controlPointsCoo[i] = float(controlPointsCoo[i])
-                guidePoints = self.extractSubList(controlPointsCoo, 3)
-                self.addHairGuide(guidePoints, guideName, currentGroup)
-            """
-
         fileDescriptor.close()
         
         guidePoints=[]
@@ -461,25 +437,15 @@ class Hairgenerator:
                 for index in datalist[3:]:
                     guidePoints.append(temp[int(index)])
                 temp=[]
-                """
-            elif datalist[0] == "g":
-                #datalist[1] = datalist[1].split("_") #first entry = group, second entry= guidename)
-                #Josenow! Todo Guidegroup problem adding
-                #currentGroup = self.addGuideGroup(datalist[1][0])
-                #if len(datalist[1])>1: guideName = datalist[1][1]
-                if datalist[1] in self.guideGroups :
-                    self.guideGroups[datalist[1]].append(guidePoints)
-                    self.guideGroups[datalist[1]] = tuple(self.guideGroups[datalist[1]])
-                    reGroup = False
-                else:
-                    self.guideGroups[datalist[1]] = [guidePoints]
-                    reGroup = True
-                """
             elif datalist[0] == "end":
+                #used for collision:
+                if guidePoints[0][1] < guidePoints[len(guidePoints)-1][1]: #is the first point lower than the last control point? 
+                    guidePoints.reverse()
                 self.guides.append(guidePoints); #apppend takes a deep copy
                 #self.addHairGuide(guidePoints, guideName,currentGroup)
                 #if currentGroup == None: reGroup = True;
                 guidePoints=[]
+                
         objFile.close()
         #if reGroup: self.populateGuideGroups(guides,0.6)
 
