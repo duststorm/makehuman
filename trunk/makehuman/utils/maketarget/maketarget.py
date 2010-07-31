@@ -36,6 +36,9 @@ import maketargetlib
 from Blender.BGL import *
 from Blender import Draw
 from Blender import Window
+import bpy
+from Blender import Mathutils
+from Blender.Mathutils import *
 
 basePath = 'base.obj'
 pairsPath = 'base.sym'
@@ -175,6 +178,30 @@ def alignPCA():
     updateVertices(maketargetlib.align_PCA(vertices0, vertices1),1)
     endEditing()
 
+def scanReg(scan):
+    startEditing()
+    (vertsM, facesM) = maketargetlib.scanRegistration(scan)
+    name = scan.split('\\')[-1].split('/')[-1]
+    ob = createMesh(vertsM, facesM, name)
+    #apply rotation matrix as the base
+    matrixR = RotationMatrix(90, 4, 'x')
+    #put scan on the left of base
+    matrixT = TranslationMatrix(Vector(-3, 0, 7))
+    ob.setMatrix(matrixR * matrixT)
+    endEditing()
+
+def createMesh(verts, faces, name):
+    """
+    Create mesh on the Blender scene
+    """
+    scn = bpy.data.scenes.active 
+    mesh = bpy.data.meshes.new(name)
+    mesh.verts.extend(verts)
+    mesh.faces.extend(faces)
+    ob = scn.objects.new(mesh, name)
+    return ob
+   
+        
 def saveTarget(path):    
     global saveOnlySelectedVerts,basePath, message
     if os.path.exists(path):
@@ -381,6 +408,8 @@ def event(event, value):
         Window.FileSelector (processingTargets, "Process targets")
     elif event == Draw.TKEY:
         Window.FileSelector (saveGroups, "Save vertgroups") 
+    elif event == Draw.UKEY:
+        Window.FileSelector (scanReg, "Load scan") 
         
   
         

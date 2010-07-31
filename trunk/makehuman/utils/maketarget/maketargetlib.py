@@ -10,6 +10,7 @@ import scipy
 from scipy.spatial import KDTree
 import numpy as np
 import scan_fit
+import scan_reg
 import blenderalignjoints
 from topologylib import *
 import simpleoctree
@@ -110,7 +111,52 @@ def align_PCA(vertices0, vertices1):
         
     return vertices + mean0
 
+    
+def loadObj(path):
+    """
+    TODO da togliere
+    """
+    try:
+        fileDescriptor = open(path)
+    except:
+        print "Error opening %s file"%(path)
+        return
+    data = fileDescriptor.readline()
+    vertsCoo = []
+    faces = []
+    normal = []
 
+    while data:
+        dataList = data.split()
+        if dataList[0] == "v":
+            co = (float(dataList[1]),\
+                    float(dataList[2]),\
+                    float(dataList[3]))
+            vertsCoo.append(co)
+        if dataList[0] == "vn":
+            co = (float(dataList[1]),\
+                    float(dataList[2]),\
+                    float(dataList[3]))
+            normal.append(co)
+        if dataList[0] == "f":
+            tmp = []
+            for faceData in dataList[1:]:    
+                vInfo = faceData.split('/')
+                vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
+                tmp.append(vIdx)
+            faces.append(tmp)
+        data = fileDescriptor.readline()
+    fileDescriptor.close()
+    return vertsCoo, faces, normal
+    
+    
+def scanRegistration(scan):
+    vertsM, facesM, normM = loadObj(scan)
+    vertsB, facesB, normB = loadObj("base.obj")
+    scan_reg.findOptimalTransformation(vertsM, normM, facesM, vertsB, normB)
+    return (vertsM, facesM)
+    
+    
 def axisID(axisVect):
     #TODO comments
     if fabs(axisVect[0]) > fabs(axisVect[1]) and fabs(axisVect[0]) > fabs(axisVect[2]):
