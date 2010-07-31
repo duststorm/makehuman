@@ -35,7 +35,6 @@ main OpenGL/SDL/Application event handling loop.
 __docformat__ = 'restructuredtext'
 
 import gui3d, hair, mh
-import copy
 from aljabr import *
 import random
 from math import sqrt, pow, log
@@ -86,18 +85,8 @@ class MakeHairTaskView(gui3d.TaskView):
         @self.collisionButton.event
         def onClicked(event):
             scn = self.app.scene3d
-            #headVerts = scn.selectedHuman.meshStored
-            #if self.octree=None : octree = simpleoctree.SimpleOctree(headVerts,0.09)
-            #hairTaskView = self.app.categories['Library'].tasksByName['Hair']
             for curve in self.app.categories['Library'].tasksByName['Hair'].hairsClass.guides:
                 collision(self.octree,curve,scn.selectedHuman.meshData.verts,0.09,9,True)
-                #To debug replace above one-liner with below
-                #temp = copy.deepcopy(curve)
-                #if collision(self.octree,curve,scn.selectedHuman.meshData.verts,0.09,9,True): #collision avoidance will start after 9th controlPoint!!!
-                    #debugging
-                    #print "Debug temp==curve", temp==curve
-                    #break
-                    #debugging
             self.app.categories['Library'].tasksByName['Hair'].reloadGuides()
         
         @self.createButton.event
@@ -222,7 +211,7 @@ class MakeHairTaskView(gui3d.TaskView):
 class AdvancedCategory(gui3d.Category):
 
     def __init__(self, category):
-        gui3d.Category.__init__(self, category, 'Advance', category.app.getThemeResource('images', 'button_advance.png'), category.app.getThemeResource('images', 'button_advance_on.png'))
+        gui3d.Category.__init__(self, category, 'Advanced', category.app.getThemeResource('images', 'button_advance.png'), category.app.getThemeResource('images', 'button_advance_on.png'))
         
         makehairView = MakeHairTaskView(self);
         

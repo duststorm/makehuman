@@ -175,8 +175,7 @@ class MHApplication(gui3d.Application):
     self.progressBar.setProgress(0.8)
     guirender.RenderingCategory(self)
     guiadvanced.AdvancedCategory(self)
-    #guiadvance.AdvanceCategory(self)
-
+  
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),
       self.getThemeResource("images", "button_library_on.png"))
     hair.HairTaskView(library)
