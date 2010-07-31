@@ -129,14 +129,14 @@ def loadObj(path):
     while data:
         dataList = data.split()
         if dataList[0] == "v":
-            co = (float(dataList[1]),\
+            co = [float(dataList[1]),\
                     float(dataList[2]),\
-                    float(dataList[3]))
+                    float(dataList[3])]
             vertsCoo.append(co)
         if dataList[0] == "vn":
-            co = (float(dataList[1]),\
+            co = [float(dataList[1]),\
                     float(dataList[2]),\
-                    float(dataList[3]))
+                    float(dataList[3])]
             normal.append(co)
         if dataList[0] == "f":
             tmp = []

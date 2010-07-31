@@ -65,6 +65,16 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     matrixS = sp.mat([[factor,0,0], [0,factor,0], [0,0,factor]])
     #apply the scale matrix
     applyTransformation(vertsM, matrixS)
+    
+    #adjust the pivot
+    bb = calcbb(vertsM)
+    print bb
+    dx = (math.sqrt(math.pow(bb[0] - bb[1], 2)) / 2) - bb[1]
+    dy = (math.sqrt(math.pow(bb[2] - bb[3], 2)) / 2) - bb[3]
+    for v in vertsM:
+        v[0] = v[0] + dx
+        v[1] = v[1] + dy
+    print dx, dy 
     return (vertsM, facesM)
     
     
