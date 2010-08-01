@@ -25,13 +25,18 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
             noy += i[1]
             noz += i[2]
     #if the normals aren't storaged in the obj file
-    else:
+    elif len(facesM) > 0:
         for f in facesM:
             n = planeNorm(vertsM[f[0]], vertsM[f[1]], vertsM[f[2]])
             nox += n[0]
             noy += n[1]
             noz += n[2]
             normM.append(n)
+    else:
+		nox = 0
+		noy = 0
+		noz = 1
+		normM.append(1)
         
     noM = [nox/len(normM), noy/len(normM), noz/len(normM)]   
     
@@ -68,13 +73,11 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     
     #adjust the pivot
     bb = calcbb(vertsM)
-    print bb
     dx = (math.sqrt(math.pow(bb[0] - bb[1], 2)) / 2) - bb[1]
     dy = (math.sqrt(math.pow(bb[2] - bb[3], 2)) / 2) - bb[3]
     for v in vertsM:
         v[0] = v[0] + dx
         v[1] = v[1] + dy
-    print dx, dy 
     return (vertsM, facesM)
     
     
