@@ -1,0 +1,67 @@
+========================
+General code guidelines
+========================
+
+
+
+About C code
+---------------
+
+MakeHuman has a small part in C.
+It's the 3d engine, opengl based. We don't use pyopenGL for 2 reasons:
+
+ - So as not to force the Windows user to install the full python package.
+ - So as not to force the Windows user to install manually (not always problem free) a 
+   series of extra packages and dependencies.
+   
+So we have our own small (very small), optimized and stable
+3d engine. It's entirely in *glmodule.c*. We have coded it in
+"only-what-is-absolutely-needed" style, avoiding pointers where
+possible, and avoiding complex patterns. In other words,
+it's a dummy, and must be a dummy forever. All difficults parts, even
+the most expensive, like subdivision, are developed in python.
+Remember, MakeHuman is 99.9 % a python application,
+developed by python coders. No matter if python is a bit slow for
+some algos: it's the price we pay to have a really human readable
+code, "silent crash" free, "easy to find coders contributors", "easy to debug"
+application. 
+
+
+Code Style
+----------
+
+The code must be written following the rules of PEP 8 [#]_.
+and  PEP 12 [#]_.
+
+.. [#] http://www.python.org/dev/peps/pep-0008/
+.. [#] http://www.python.org/dev/peps/pep-0012/
+
+C code must be formatted using Astyle software, from
+http://astyle.sourceforge.net/ (ANSI style).
+
+
+Getters and setters are evil
+---------------------------
+
+According with the famous article from
+http://dirtsimple.org/2004/12/python-is-not-java.html :
+
+*Getters and setters are evil. Evil, evil, I say! 
+Python objects are not Java beans. 
+Do not write getters and setters. This is what 
+the 'property' built-in is for. And do not
+take that to mean that you should write getters 
+and setters, and then wrap them in 'property'. 
+That means that until you prove that you need 
+anything more than a simple attribute access, 
+don't write getters and setters. They are a 
+waste of CPU time, but more important, they are 
+a waste of programmer time. Not just for the 
+people writing the code and tests, but for the 
+people who have to read and understand them as well.*
+
+So we use getters and setters only if they include a series of
+subfunctions to do.
+
+
+
