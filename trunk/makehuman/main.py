@@ -61,8 +61,8 @@ import glob, imp
 from os.path import join, basename, splitext
 
 sys.path.append("./")
-sys.path.append("./mh_plugins")
-sys.path.append("./mh_core")
+sys.path.append("./apps")
+sys.path.append("./core")
 
 import gui3d, events3d, font3d
 import human, hair, background
