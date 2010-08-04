@@ -55,8 +55,6 @@
 		68D349CE12098879008E9DD6 /* importers in Resources */ = {isa = PBXBuildFile; fileRef = 68D349BC12098879008E9DD6 /* importers */; };
 		68D349F912098883008E9DD6 /* apps in Resources */ = {isa = PBXBuildFile; fileRef = 68D349CF12098883008E9DD6 /* apps */; };
 		68D349FA12098883008E9DD6 /* apps in Resources */ = {isa = PBXBuildFile; fileRef = 68D349CF12098883008E9DD6 /* apps */; };
-		68D349FF120988AC008E9DD6 /* models in Resources */ = {isa = PBXBuildFile; fileRef = 68D349FB120988AC008E9DD6 /* models */; };
-		68D34A00120988AC008E9DD6 /* models in Resources */ = {isa = PBXBuildFile; fileRef = 68D349FB120988AC008E9DD6 /* models */; };
 		68D34A0D120988C0008E9DD6 /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A01120988C0008E9DD6 /* plugins */; };
 		68D34A0E120988C0008E9DD6 /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A01120988C0008E9DD6 /* plugins */; };
 		68D34A28120988D0008E9DD6 /* pythonmodules in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A0F120988D0008E9DD6 /* pythonmodules */; };
@@ -145,7 +143,6 @@
 		68D349AD1209885C008E9DD6 /* core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = core; path = ../core; sourceTree = SOURCE_ROOT; };
 		68D349BC12098879008E9DD6 /* importers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = importers; path = ../importers; sourceTree = SOURCE_ROOT; };
 		68D349CF12098883008E9DD6 /* apps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = apps; path = ../apps; sourceTree = SOURCE_ROOT; };
-		68D349FB120988AC008E9DD6 /* models */ = {isa = PBXFileReference; lastKnownFileType = folder; name = models; path = ../models; sourceTree = SOURCE_ROOT; };
 		68D34A01120988C0008E9DD6 /* plugins */ = {isa = PBXFileReference; lastKnownFileType = folder; name = plugins; path = ../plugins; sourceTree = SOURCE_ROOT; };
 		68D34A0F120988D0008E9DD6 /* pythonmodules */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pythonmodules; path = ../pythonmodules; sourceTree = SOURCE_ROOT; };
 		68D8631C0FA5D1810097F73F /* SDLMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SDLMain.mm; path = src/SDLMain.mm; sourceTree = "<group>"; };
@@ -275,7 +272,6 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				68D349FB120988AC008E9DD6 /* models */,
 				68D349CF12098883008E9DD6 /* apps */,
 				68DFFDA40FC1F059009CA434 /* data */,
 				68C80AE10FE3E41D0090D1E5 /* utils */,
@@ -508,7 +504,6 @@
 				68D349BB1209885C008E9DD6 /* core in Resources */,
 				68D349CE12098879008E9DD6 /* importers in Resources */,
 				68D349FA12098883008E9DD6 /* apps in Resources */,
-				68D34A00120988AC008E9DD6 /* models in Resources */,
 				68D34A0E120988C0008E9DD6 /* plugins in Resources */,
 				68D34A29120988D0008E9DD6 /* pythonmodules in Resources */,
 			);
@@ -535,7 +530,6 @@
 				68D349BA1209885C008E9DD6 /* core in Resources */,
 				68D349CD12098879008E9DD6 /* importers in Resources */,
 				68D349F912098883008E9DD6 /* apps in Resources */,
-				68D349FF120988AC008E9DD6 /* models in Resources */,
 				68D34A0D120988C0008E9DD6 /* plugins in Resources */,
 				68D34A28120988D0008E9DD6 /* pythonmodules in Resources */,
 			);
