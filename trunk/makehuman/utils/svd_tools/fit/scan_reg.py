@@ -33,12 +33,13 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
             noz += n[2]
             normM.append(n)
     else:
-		nox = 0
-		noy = 0
-		noz = 1
-		normM.append(1)
+        nox = 0
+        noy = 0
+        noz = 1
+        normM.append(1)
         
     noM = [nox/len(normM), noy/len(normM), noz/len(normM)]   
+    
     
     #find the rotation matrix
     matrixR = vectorsToRotMatrix(noB,noM) 
@@ -54,12 +55,16 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     #linear regression
     angle = fitline(vertsM)
     angleDeg = angle*(180/math.pi)
-    #stop condition: angle < 1
-    while math.fabs(angle*(180/math.pi)) > 1:
+    #stop condition: angle < 1 or condStop = 0
+    condStop = -1
+    while math.fabs(angle*(180/math.pi)) > 1 and condStop == -1:
         matrixR2 = sp.mat([[cos(-angle),-sin(-angle),0], [sin(-angle),cos(-angle),0], [0,0,1]])
          #apply the rotation matrix
         applyTransformation(vertsM, matrixR2)
+        angleOld = angle
         angle = fitline(vertsM)
+        if math.fabs(angle) > math.fabs(angleOld):
+			condStop = 0
     
     #find the scale matrix
     bbM = calcbb(vertsM)
