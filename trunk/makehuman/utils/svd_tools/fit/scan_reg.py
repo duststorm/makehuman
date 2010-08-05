@@ -27,10 +27,14 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     #if the normals aren't storaged in the obj file
     elif len(facesM) > 0:
         for f in facesM:
-            n = planeNorm(vertsM[f[0]], vertsM[f[1]], vertsM[f[2]])
+            if len(f) >= 3:
+                n = planeNorm(vertsM[f[0]], vertsM[f[1]], vertsM[f[2]])
+            else:
+                n = [0,0,1] #edges
+                
             nox += n[0]
             noy += n[1]
-            noz += n[2]
+            noz += n[2]      
             normM.append(n)
     else:
         nox = 0
@@ -64,7 +68,7 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
         angleOld = angle
         angle = fitline(vertsM)
         if math.fabs(angle) > math.fabs(angleOld):
-			condStop = 0
+            condStop = 0
     
     #find the scale matrix
     bbM = calcbb(vertsM)
