@@ -190,7 +190,7 @@ def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-
 # res = resolution of minsize of octree
 # i is the index of curve where collision should start!
 
-
+#i-> vertInterval
 def collision(octree, curve, verts, res, i=1, gravity=True):
     N = len(curve)
     changed = False
