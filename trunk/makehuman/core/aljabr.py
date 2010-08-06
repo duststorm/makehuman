@@ -19,7 +19,7 @@ Common 3D Algebric functions.
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
 Abstract
---------
+========
 
 This module contains the most common 3D algebraic operations used in MakeHuman.
 These are mostly the vector and matrix operations core to any 3D application.
@@ -37,24 +37,21 @@ machine_epsilon = 1.0e-16
 
 def vsub(vect1, vect2):
     """
-
-    This function returns the difference between two 3D vectors (vect1-vect2).
+    This function returns the difference between two 3D vectors (vect1-vect2).  
     The input parameters to this function can be 4D vectors, but only
     the first 3 dimensions are used and only a 3D vector is returned.
     This effectively returns the vector required to get from the coordinates of
     vect2 to the coordinates of vect1.
-
-    Parameters
-    ----------
-
-    vect1:
-        *float list*. The first vector - in the format [x,y,z]
+    
+    @rtype:       float list
+    @return:      The resulting vector M{vect1-vect2}
+    @type  vect1: float list
+    @param vect1: The first vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    vect2:
-        *float list*. The second vector [x,y,z]
+    @type  vect2: float list
+    @param vect2: The second vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
+        
     """
 
     return [vect1[0] - vect2[0], vect1[1] - vect2[1], vect1[2] - vect2[2]]
@@ -62,20 +59,17 @@ def vsub(vect1, vect2):
 
 def vdot(vect1, vect2):
     """
-
-    This function returns the dot (scalar) product between two 3D vectors (vect1.vect2)
+    This function returns the dot (scalar) product between two 3D vectors (vect1.vect2)  
     The input parameters to this function can be 4D vectors, but only
     the first 3 dimensions are used and only a 3D vector is returned.
 
-    Parameters
-    ----------
-
-    vect1:
-        *float list*. The first vector - in the format[x,y,z]
+    @rtype:       float
+    @return:      Dot-Product of X(vect1) and X(vect2)
+    @type  vect1: float list
+    @param vect1: The first vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    vect2:
-        *float list*. The second vector - in the format [x,y,z]
+    @type  vect2: float list
+    @param vect2: The second vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
@@ -86,13 +80,11 @@ def vlen(vect):
     """
     This function returns the length of a vector [x,y,z] (as a float).
 
-    Parameters
-    ----------
-
-    vect:
-        *float list*. The vector - in the format [x,y,z]
+    @rtype:       float
+    @return:      euclidean norm in 3D space of X(vect)
+    @type  vect: float list
+    @param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
     """
 
     return sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
@@ -101,15 +93,14 @@ def vlen(vect):
 def vnorm(vect):
     """
     This function returns a normalized vector [x,y,z] ie a unit length
-    vector pointing in the same direction as the input vector. This performs
+    vector pointing in the same direction as the input vector.  This performs
     essentially the same function as vunit(vect) except that this function
     handles potential zero length vectors.
 
-    Parameters
-    ----------
-
-    vect:
-        *float list*. The vector - in the format [x,y,z]
+    @rtype:       float list
+    @return:      normalized form of X(vect)
+    @type  vect: float list
+    @param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
@@ -133,15 +124,13 @@ def vdist(vect1, vect2):
     between two vector coordinates.
     The distance between two points is the length of the vector joining them.
 
-    Parameters
-    ----------
-
-    vect1:
-        *float list*. The first vector - in the format[x,y,z]
+    @rtype:       float
+    @return:      euclidean distance between X(vect1) and X(vect2) in 3D space
+    @type  vect1: float list
+    @param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    vect2:
-        *float list*. The second vector - in the format [x,y,z]
+    @type  vect2: float list
+    @param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
