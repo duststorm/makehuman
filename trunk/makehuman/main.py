@@ -47,18 +47,11 @@ specific Python modules.
 
 """
 
-__docformat__ = 'restructuredtext'
-
 import sys
 #print sys.builtin_module_names
 #if 'nt' in sys.builtin_module_names:
 sys.path.append("./pythonmodules")
-import mh
-import os, fnmatch
-import subprocess
-import webbrowser
-import glob, imp
-from os.path import join, basename, splitext
+import os
 
 def recursiveDirNames(root):
   pathlist=[]
@@ -72,10 +65,16 @@ def recursiveDirNames(root):
 
 sys.path.append("./")
 sys.path.append("./apps")
-sys.path + recursiveDirNames("./apps")
+sys.path=sys.path + recursiveDirNames("./apps")
 sys.path.append("./core")
-sys.path + recursiveDirNames("./core")
+sys.path=sys.path + recursiveDirNames("./core")
 
+import subprocess
+import webbrowser
+import glob, imp
+from os.path import join, basename, splitext
+
+import mh
 import gui3d, events3d, font3d
 import human, hair, background
 import guimodelling, guifiles, guirender, guiadvanced
