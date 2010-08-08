@@ -26,10 +26,7 @@ These are mostly the vector and matrix operations core to any 3D application.
 
 The name is a tribute to \"Al-jabr wa'l muqabalah\" the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
 The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}.
-
 """
-
-__docformat__ = 'restructuredtext'
 
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow
 
@@ -64,7 +61,7 @@ def vdot(vect1, vect2):
     the first 3 dimensions are used and only a 3D vector is returned.
 
     @rtype:       float
-    @return:      Dot-Product of X(vect1) and X(vect2)
+    @return:      Dot-Product of X{vect1} and X{vect2}
     @type  vect1: float list
     @param vect1: The first vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
@@ -81,7 +78,7 @@ def vlen(vect):
     This function returns the length of a vector [x,y,z] (as a float).
 
     @rtype:       float
-    @return:      euclidean norm in 3D space of X(vect)
+    @return:      euclidean norm in 3D space of X{vect}
     @type  vect: float list
     @param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
@@ -98,7 +95,7 @@ def vnorm(vect):
     handles potential zero length vectors.
 
     @rtype:       float list
-    @return:      normalized form of X(vect)
+    @return:      normalized form of X{vect}
     @type  vect: float list
     @param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
@@ -125,7 +122,7 @@ def vdist(vect1, vect2):
     The distance between two points is the length of the vector joining them.
 
     @rtype:       float
-    @return:      euclidean distance between X(vect1) and X(vect2) in 3D space
+    @return:      euclidean distance between X{vect1} and X{vect2} in 3D space
     @type  vect1: float list
     @param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
@@ -142,15 +139,13 @@ def vcross(vect1, vect2):
     """
     This function returns the cross product of two vectors.
 
-    Parameters
-    ----------
-
-    vect1:
-        *float list*. The first vector - in the format[x,y,z]
+    @rtype:       float list
+    @return:      cross product M{vect1 S{times} vect2}
+    @type  vect1: float list
+    @param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    vect2:
-        *float list*. The second vector - in the format [x,y,z]
+    @type  vect2: float list
+    @param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
@@ -164,11 +159,10 @@ def centroid(vertsList):
     formatted as a float list [float X,float Y, float Z].
     This is the sum of all of the vectors divided by the number of vectors.
 
-    Parameters
-    ----------
-
-    vertsList:
-        *float list*. List of list. Each vector is in the format [x,y,z]
+    @rtype:       float list
+    @return:      the centroid of the convex hull of all the vertices in M(vertsList)
+    @type  vertsList: list of float lists
+    @param vertsList: each vector in the list is in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
@@ -194,16 +188,14 @@ def vadd(vect1, vect2):
     """
     This function returns the sum of two vectors as a vector.
 
-    Parameters
-    ----------
-
-    vect1:
-        *float list*. The first vector - in the format[x,y,z]
+    @rtype:       float list
+    @return:      The resulting vector M{vect1+vect2}
+    @type  vect1: float list
+    @param vect1: The first vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    vect2:
-        *float list*. The second vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
+    @type  vect2: float list
+    @param vect2: The second vector - in the format [x,y,z]
+        (or [x,y,z,0] for affine transformations in an homogeneous space).    
     """
 
     return [vect1[0] + vect2[0], vect1[1] + vect2[1], vect1[2] + vect2[2]]
@@ -211,17 +203,16 @@ def vadd(vect1, vect2):
 
 def vmul(vect, s):
     """
-    This function returns the result of multiplying a vector by a scalar (a float).
+    We consider the 3D space as a vector space whose scalars are real. 
+    This function returns the result of multiplying a vector by a scalar.
 
-    Parameters
-    ----------
-
-    vect:
-        *float list*. The vector - in the format[x,y,z]
+    @rtype:       float list
+    @return:      The resulting vector M{s(vect1)}
+    @type     s: float
+    @param    s: the scalar value
+    @type  vect: float list
+    @param vect: The first vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    s:
-        *float*. The scalar value.
     """
 
     return [vect[0] * s, vect[1] * s, vect[2] * s]
