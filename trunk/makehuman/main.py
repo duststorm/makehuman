@@ -54,15 +54,27 @@ import sys
 #if 'nt' in sys.builtin_module_names:
 sys.path.append("./pythonmodules")
 import mh
-import os
+import os, fnmatch
 import subprocess
 import webbrowser
 import glob, imp
 from os.path import join, basename, splitext
 
+def recursiveDirNames(root):
+  pathlist=[]
+  #root=os.path.dirname(root)
+  for filename in os.listdir(root):
+    path=os.path.join(root,filename)
+    if not (os.path.isfile(path) or filename=="." or filename==".." or filename==".svn"):
+      pathlist.append(path)
+      pathlist = pathlist + recursiveDirNames(path) 
+  return(pathlist)
+
 sys.path.append("./")
 sys.path.append("./apps")
+sys.path + recursiveDirNames("./apps")
 sys.path.append("./core")
+sys.path + recursiveDirNames("./core")
 
 import gui3d, events3d, font3d
 import human, hair, background
