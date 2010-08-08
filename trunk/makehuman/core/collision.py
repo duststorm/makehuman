@@ -10,7 +10,7 @@ Collision Avoidance Algorithm for Hair
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Jose
+**Authors:**           Jose Capco
 
 **Copyright(c):**      MakeHuman Team 2001-2010
 
