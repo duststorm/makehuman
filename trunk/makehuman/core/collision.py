@@ -1,7 +1,32 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Note 1: I am using the latest simnpleoctree.py in the makehuman svn
+"""
+Collision Avoidance Algorithm for Hair
+
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Jose
+
+**Copyright(c):**      MakeHuman Team 2001-2010
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+========
+
+This module contains methods for collision avoidance of hair strands. When MakeHuman loads a hair, this hair is a model based
+on a neutral body model. However when the model properties are changed (for instance: age, height, etc.) then there is the possibility of
+hair strands to pierce through the model mesh. Thus hair appears to go inside the body. The methods in this module will allow the hair strand to
+be re-edited such that they follow the tangent of the mesh of the body instead of piercing through the body. Costume made hair may also pierce 
+through the body. The methods can be used to enhance some costume modelled hair for MakeHuman.
+"""
 
 import math
 import simpleoctree
@@ -9,6 +34,9 @@ from aljabr import *
 
 
 def getTangent(point, i, verts, size, isNurb=False, res=0.08):  # default Octree Resolution is set to 0.08
+    """
+    To be Documented
+    """
     l = (1.5 * res) * math.sqrt(3.0)  # longest distance of an octree smallest cube
     if size < l:
         l = size
@@ -72,6 +100,18 @@ def intIntersects(int1, int2):
 
 
 def lineInCube(line, cube):
+    """
+    This methods returns true if the given line passes through the cube (a cuboid can be used). Otherwise it returns false. Note that our
+    definition of cuboid is based on U(http://mathworld.wolfram.com/Cuboid.html) rather than the more general 
+    U(http://en.wikipedia.org/wiki/Cuboid).
+    
+    @rtype: bool
+    @return: True if line passes through a cuboid, otherwise false
+    @type line: List of list of floats
+    @param line: This is a list consisting of two endpoints in the 3D space representing a line. Each endpoint is a list of 3 float coordinates.
+    @type cube: List of list of floats
+    @param cube: This is a list consisting of two corner points of a cuboid in 3D. Each corner point is a list of 3 float coordinates.
+    """
     returnValue = False
     x = [line[0][0], line[1][0]]
 
@@ -154,8 +194,6 @@ def lineInColoredLeaf(line, root):  # root is of type SimpleOctreeVolume found i
 
 def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-direction!
     G = [0, -1, 0]  # vector direction of gravity
-  
-    # dist = distance(line[0],mesh.verts[0].co)
 
     dist = ()  # infinity in python
     near = []
@@ -169,14 +207,9 @@ def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-
                 dist = distTemp
                 near = j
     if near == []:
-
-        # print "near was []. this usually SHOULD NOT happen!"
-
         return 0
     else:
         size = vdist(verts[near].co, line[1])
-
-    # get unit normal
 
     if size > 0.0001:  # TODO add minimal unit
         if not gravity:
@@ -186,35 +219,38 @@ def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-
             point = vsub(point, G)
             return getTangent(point, near, verts, size, isNurb)
 
-
-# res = resolution of minsize of octree
-# i is the index of curve where collision should start!
-
-#i-> vertInterval
-def collision(octree, curve, verts, res, i=1, gravity=True):
-    N = len(curve)
-    changed = False
-    while i < N:
-        #print 'Debug : i, N : ', i, N  # todelete
-        if lineInColoredLeaf([curve[i-1], curve[i]], octree.root):
-            if i == N - 1:
-                tangent = deflect([curve[i - 1], curve[i]], verts, gravity)
-            else:
-                tangent = deflect([curve[i - 1], curve[i], curve[i + 1]], verts, gravity)
-            n = 1
-            if not tangent == 0:
-                if not curve[i - 1] == tangent[0]:  # TODO in case after Tangent deflection we passthrough a second part of the body!
-                    if len(tangent) == 3:
-                        n = 2
-                    delta = vsub(tangent[1], curve[i])
-                    for k in range(0, n):
-                        curve.insert(i, tangent[(n - 1) - k])
-                    for j in range(i + n, len(curve)):
-                        curve[j] = vadd(curve[j], delta)
-                    changed = True
-                    N = N + n
-            i = i + n
-        i = i + 1
-    return changed
+def collision(octree, curve, verts, res, cPIndices, gravity=True):
+    """
+    To be documented
+    """
+    j=1
+    for j in xrange(1,len(cPIndices),2):
+        i=cPIndices[j]
+        if i>= len(curve): break
+        if (j==(len(cPIndices)-1)):
+            N = len(curve)
+        else:
+            N = cPIndices[j+1]
+        #changed = False #for debugging
+        while i < N:
+            if lineInColoredLeaf([curve[i-1], curve[i]], octree.root):
+                if i == N - 1:
+                    tangent = deflect([curve[i - 1], curve[i]], verts, gravity)
+                else:
+                    tangent = deflect([curve[i - 1], curve[i], curve[i + 1]], verts, gravity)
+                n = 1
+                if not tangent == 0:
+                    if not curve[i - 1] == tangent[0]:  # TODO in case after Tangent deflection we passthrough a second part of the body!
+                        if len(tangent) == 3:
+                            n = 2
+                        delta = vsub(tangent[1], curve[i])
+                        for k in range(0, n):
+                            curve.insert(i, tangent[(n - 1) - k])
+                        for j in range(i + n, len(curve)):
+                            curve[j] = vadd(curve[j], delta)
+                        #changed = True #for debugging
+                        N = N + n
+                i = i + n
+            i = i + 1
 
 

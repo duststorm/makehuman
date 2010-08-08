@@ -28,7 +28,7 @@ class MakeHairTaskView(gui3d.TaskView):
         self.lengthSlider = gui3d.Slider(self, position=[600, 140, 9.2], value=5.0,min=0.0,max=7.0,label="Strand Length")
         self.numberSlider = gui3d.Slider(self, position=[600, 180, 9.2], value=25,min=1,max=260,label="Strands Number")
         self.gravitySlider = gui3d.Slider(self, position=[600, 220, 9.2], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
-        self.cPEntry = gui3d.TextEdit(self, mesh='data/3dobjs/text_entry.obj', text="TEST",texture=self.app.getThemeResource('images', 'texedit_off.png'),position=[100, 320, 9.2])
+        self.cPEntry = gui3d.TextEdit(self, mesh='data/3dobjs/text_entry.obj', text="9,12",texture=self.app.getThemeResource('images', 'texedit_off.png'),position=[100, 320, 9.2])
         
         @self.cPSlider.event
         def onChange(value):
@@ -54,9 +54,11 @@ class MakeHairTaskView(gui3d.TaskView):
         
         @self.collisionButton.event
         def onClicked(event):
-            scn = self.app.scene3d
+            #todo try catch when self.cPEntry has invalid values
+            #showing my lambda skills..
+            cPIndices = map(lambda x: int(x), self.cPEntry.text.split(","))
             for curve in self.app.categories['Library'].tasksByName['Hair'].hairsClass.guides:
-                collision(self.octree,curve,scn.selectedHuman.meshData.verts,0.09,9,True)
+                collision(self.octree,curve,scn.selectedHuman.meshData.verts,0.09,cPIndices,True)
             self.app.categories['Library'].tasksByName['Hair'].reloadGuides()
         
         @self.createButton.event
@@ -194,14 +196,14 @@ def load(app):
     def onMouseWheel(event):
         if event.wheelDelta > 0:
             mh.cameras[0].eyeZ -= 0.65
-            self.app.scene3d.redraw()
+            app.scene3d.redraw()
         else:
             mh.cameras[0].eyeZ += 0.65
-            self.app.scene3d.redraw()
+            app.scene3d.redraw()
 
     @makehairView.event
     def onMouseDragged(event):
-        diff = self.app.scene3d.getMouseDiff()
+        diff = app.scene3d.getMouseDiff()
         leftButtonDown = event.button & 1
         middleButtonDown = event.button & 2
         rightButtonDown = event.button & 4
@@ -209,13 +211,13 @@ def load(app):
         if leftButtonDown and rightButtonDown or middleButtonDown:
             mh.cameras[0].eyeZ += 0.05 * diff[1]
         elif leftButtonDown:
-            human = self.app.scene3d.selectedHuman
+            human = app.scene3d.selectedHuman
             rot = human.getRotation()
             rot[0] += 0.5 * diff[1]
             rot[1] += 0.5 * diff[0]
             human.setRotation(rot)
         elif rightButtonDown:
-            human = self.app.scene3d.selectedHuman
+            human = app.scene3d.selectedHuman
             trans = human.getPosition()
             trans[0] += 0.1 * diff[0]
             trans[1] -= 0.1 * diff[1]
