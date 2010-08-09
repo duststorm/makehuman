@@ -1,5 +1,5 @@
 import aljabr
-from aljabr import *
+
 import scipy as sp
 import numpy as np
 import math
@@ -46,7 +46,7 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     
     
     #find the rotation matrix
-    matrixR = vectorsToRotMatrix(noB,noM) 
+    matrixR = aljabr.vectorsToRotMatrix(noB,noM) 
     #apply the rotation matrix
     applyTransformation(vertsM, matrixR)
     
