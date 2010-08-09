@@ -4,19 +4,19 @@
 """
 Common 3D Algebric functions.
 
-**Project Name:**      MakeHuman
+B{Project Name:}      MakeHuman
 
-**Product Home Page:** http://www.makehuman.org/
+B{Product Home Page:} U{http://www.makehuman.org/}
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-**Authors:**           Manuel Bastioni, Marc Flerackers
+B{Authors:}           Manuel Bastioni, Marc Flerackers
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+B{Copyright(c):}      MakeHuman Team 2001-2010
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
 
 Abstract
 ========
@@ -24,7 +24,7 @@ Abstract
 This module contains the most common 3D algebraic operations used in MakeHuman.
 These are mostly the vector and matrix operations core to any 3D application.
 
-The name is a tribute to \"Al-jabr wa'l muqabalah\" the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
+The name is a tribute to I{"Al-jabr wa'l muqabalah"} the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
 The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}.
 """
 
