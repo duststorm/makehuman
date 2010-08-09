@@ -16,7 +16,7 @@
 Abstract
 --------
 MHX (MakeHuman eXchange format) exporter for Blender 2.5.
-Version 0.8
+Version 0.14
 
 """
 
@@ -36,6 +36,9 @@ You have to activated the script in the "Add-Ons" tab (user preferences).
 Access from the File > Export menu.
 """
 
+MAJOR_VERSION = 0
+MINOR_VERSION = 14
+
 
 import bpy
 import mathutils
@@ -44,8 +47,6 @@ import types
 import array
 import struct
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 8
 verbosity = 1
 Epsilon = 1e-5
 done = 0
@@ -66,12 +67,13 @@ M_Scn	= 0x20
 M_Tool	= 0x40
 M_Anim	= 0x80
 
-M_Rigify = 0x100
+M_Nodes = 0x0100
 M_MHX	= 0x200
 M_Shape	= 0x400
 M_VGroup = 0x800
 M_Part = 0x1000
 M_MHPart = 0x2000
+M_Rigify = 0x8000
 
 M_All = ~(M_MHX)
 
@@ -274,11 +276,14 @@ MinBlockLevel = {
 }
 		
 #
-#	exportDefault(typ, data, header, prio, exclude, fp):
+#	exportDefault(typ, data, header, prio, exclude, pad, fp):
 #
 
-def exportDefault(typ, data, header, prio, exclude, fp):
-	pad = ""
+def exportDefault(typ, data, header, prio, exclude, pad, fp):
+	if not data:
+		return
+	if verbosity > 2:
+		print("**", data)
 	try:
 		if not data.enabled:
 			return
@@ -355,7 +360,8 @@ def writeQuoted(arg, fp):
 			c = ','
 		fp.write("]")
 	else:
-		raise NameError("Unknown property %s %s" % (arg, typ))
+		#raise NameError("Unknown property %s %s" % (arg, typ))
+		fp.write('%s' % arg)
 
 def stringQuote(string):
 	s = ""
@@ -377,6 +383,8 @@ def stringQuote(string):
 
 def writeExt(ext, name, exclude, pad, depth, fp, globals, locals):		
 	expr = name+"."+ext
+	if verbosity > 2:
+		print(pad, ext)
 	try:
 		arg = eval(expr, globals, locals)
 		success = True
@@ -396,7 +404,7 @@ excludeList = [\
 	'bl_rna', 'fake_user', 'id_data', 'rna_type', 'name', 'tag', 'users', 'type'
 ]
 
-Danger = []	# ['ParticleEdit', 'color_ramp']
+Danger = ['particle_edit']	# ['ParticleEdit', 'color_ramp']
 
 
 def writeValue(ext, arg, exclude, pad, depth, fp):
@@ -525,12 +533,14 @@ def writeClass(list, ext, arg, pad, depth, fp):
 			fp.write("%send PropertyRNA\n" % pad)
 		return
 	elif classSplit[0] == "method":
-		return
-		print("METHOD", arg)
+		fp.write("%s# **METHOD** %s \n" % (pad, arg))
+		pass
 	else:
-		fp.write("# **CLASS** %s %s %s \n" % (ext, classSplit, arg))
+		fp.write("%s# **CLASS** %s %s %s \n" % (pad, ext, classSplit, arg))
 	return
 	
+#
+#	writeProperty(propName, ext, prop, pad, depth, fp):
 #
 
 def writeProperty(propName, ext, prop, pad, depth, fp):
@@ -830,7 +840,7 @@ def exportKeyFramePoint(kpt, pad, fp):
 def writeTuple(list, fp):
 	c = '('
 	for elt in list:
-		fp.write("%s%s" % (c, elt))
+		fp.write("%s%.2f" % (c, elt))
 		c = ','
 	fp.write(") ")
 	return
@@ -851,11 +861,14 @@ def exportMaterial(mat, fp):
 	writePrio(mat, prio, "  ", fp)
 	exportRamp(mat.diffuse_ramp, 'diffuse_ramp', fp)
 	exportRamp(mat.specular_ramp, 'specular_ramp', fp)
-	exportSSS(mat.subsurface_scattering, fp)
-	exportStrand(mat.strand, fp)
-	writeDir(mat, prio+['texture_slots', 'volume', 
+	exportDefault("Halo", mat.halo, [], [], [], '  ', fp)
+	exportDefault("RaytraceTransparency", mat.raytrace_transparency, [], [], [], '  ', fp)
+	exportDefault("SSS", mat.subsurface_scattering, [], [], [], '  ', fp)
+	exportDefault("Strand", mat.strand, [], [], [], '  ', fp)
+	exportNodeTree(mat.node_tree, fp)
+	writeDir(mat, prio+['texture_slots', 'volume', 'node_tree',
 		'diffuse_ramp', 'specular_ramp', 'use_diffuse_ramp', 'use_specular_ramp', 
-		'subsurface_scattering', 'strand'], "  ", fp)
+		'halo', 'raytrace_transparency', 'subsurface_scattering', 'strand'], "  ", fp)
 	fp.write("end Material\n\n")
 
 MapToTypes = {
@@ -910,8 +923,8 @@ def exportTexture(tex, fp):
 		return
 
 	exportRamp(tex.color_ramp, "color_ramp", fp)
-	#exportNodeTree(tex.node_tree, "node_tree", fp)
-	writeDir(tex, ['color_ramp', 'node_tree', 'image_user', 'use_nodes', 'use_textures', 'type'], "  ", fp)
+	exportNodeTree(tex.node_tree, fp)
+	writeDir(tex, ['color_ramp', 'node_tree', 'image_user', 'use_nodes', 'use_textures', 'type', 'users_material'], "  ", fp)
 	fp.write("end Texture\n\n")
 
 def exportImage(img, fp):
@@ -920,10 +933,10 @@ def exportImage(img, fp):
 		return
 	fp.write("Image %s\n" % imgName)
 	if expMsk & M_MHX:
-		(path, name) = os.path.split(img.filename)
+		(path, name) = os.path.split(img.filepath)
 		fp.write("  *** Filename %s ;\n" % (name))
 	else:
-		fp.write("  Filename %s ;\n" % (img.filename))
+		fp.write("  Filename %s ;\n" % (img.filepath))
 	# writeDir(img, [], "  ", fp)
 	fp.write("end Image\n\n")
 
@@ -939,29 +952,100 @@ def exportRamp(ramp, name, fp):
 	writeDir(ramp, ['elements'], "    ", fp)
 	fp.write("  end Ramp\n")
 
-def exportNodeTree(tree, name, fp):
+#
+#	exportWorld(world, fp):
+#	exportScene(scn, fp):
+#
+
+def exportWorld(world, fp):
+	fp.write("World %s\n" % (world.name.replace(' ', '_')))
+	exportDefault("Lighting", world.lighting, [], [], [], '  ', fp)
+	exportDefault("Mist", world.mist, [], [], [], '  ', fp)
+	exportDefault("Stars", world.stars, [], [], [], '  ', fp)
+	writeDir(world, ['lighting', 'mist', 'stars'], "  ", fp)
+	fp.write("end World\n\n")
+
+def exportScene(scn, fp):
+	fp.write("Scene %s\n" % (scn.name.replace(' ', '_')))
+	exportNodeTree(scn.nodetree, fp)
+	exportGameData(scn.game_data, fp)
+	for kset in scn.all_keying_sets:
+		exportDefault("KeyingSet", kset, [kset.name], [], ['type_info'], '  ', fp)
+	for obase in scn.bases:
+		exportDefault("ObjectBase", obase, [], [], [], '  ', fp)
+	for ob in scn.objects:
+		fp.write("  Object %s ;\n" % (ob.name.replace(' ','_')))
+	exportRenderSettings(scn.render, fp)
+	exportToolSettings(scn.tool_settings, fp)
+	exportDefault("UnitSettings", scn.unit_settings, [], [], [], '  ', fp)
+	writeDir(scn, 
+		['bases', 'all_keying_sets', 'game_data', 'network_render', 'nodetree', 'objects', 'render',
+		'pose_templates', 'tool_settings', 'unit_settings'], "  ", fp)
+	fp.write("end Scene\n\n")
+
+def exportToolSettings(tset, fp):
+	fp.write("  ToolSettings\n")
+	exportDefault("ImagePaint", tset.image_paint, [], [], [], '    ', fp)
+	exportDefault("Sculpt", tset.sculpt, [], [], [], '    ', fp)
+	exportDefault("VertexPaint", tset.vertex_paint, [], [], [], '    ', fp)
+	exportDefault("WeightPaint", tset.weight_paint, [], [], [], '    ', fp)
+	writeDir(tset, ['image_paint', 'sculpt', 'vertex_paint', 'weight_paint'], '    ', fp)
+	fp.write("  end ToolSettings\n")
+
+def exportGameData(gdata, fp):
+	fp.write("  GameData\n")
+	writeDir(gdata, [], "    ", fp)
+	fp.write("  end GameData\n")
+
+def exportRenderSettings(render, fp):
+	fp.write("  RenderSettings\n")
+	for layer in render.layers:
+		exportDefault("Layer", layer, [], [], [], '    ', fp)	
+	writeDir(render, ['layers'], "    ", fp)
+	fp.write("  end RenderSettings\n")
+
+
+#
+#	exportNodeTree(tree, fp)
+#	exportNode(node, fp)
+#
+
+def exportNodeTree(tree, fp):
 	if tree == None:
 		return
 	print(tree)
-	fp.write("  NodeTree %s\n" % name)
+	fp.write("  NodeTree %s\n" % tree.name.replace(' ', '_'))
+	exportAnimationData(tree.animation_data, fp)
+	for node in tree.nodes:
+		exportNode(node, fp)
+	writeDir(tree, ['nodes'], "  ", fp)
+	fp.write("  end NodeTree\n")
 	return
-	#for node in tree.nodes:
 
-def exportSSS(sss, fp):
-	if sss == None:
-		return
-	fp.write("  SSS\n")
-	writeDir(sss, [], "    ", fp)
-	fp.write("  end SSS\n")
-		
-def exportStrand(strand, fp):
-	if strand == None:
-		return
-	fp.write("  Strand\n")
-	writeDir(strand, [], "    ", fp)
-	fp.write("  end Strand\n")
-		
+def exportNode(node, fp):
+	fp.write("    Node %s\n" % node.name.replace(' ', '_'))
+	loc = node.location
+	fp.write("      location (%.3f, %3.f) ;\n" % (loc[0], loc[1]))
+	fp.write("      Inputs\n")
+	for inp in node.inputs:
+		exportNodeSocket(inp, fp)
+	fp.write("      end Inputs\n")
+	fp.write("      Outputs\n")
+	for outp in node.outputs:
+		exportNodeSocket(outp, fp)
+	fp.write("      end Outputs\n")
+	fp.write("    end Node\n")
+	return
 
+def exportNodeSocket(socket, fp):
+	print(dir(socket.rna_type))
+	fp.write("        Socket %s %s\n" % (socket.name.replace(' ', '_'), socket.rna_type.name.replace(' ', '_')))
+	writeDir(socket, [], "          ", fp)
+	#fp.write("          default_value %s ; \n" %socket.default_value)
+	#fp.write("          rna_type %s ; \n" %socket.rna_type)
+	fp.write("        end Socket\n")
+	return
+	
 
 #
 #	exportObject(ob, fp):
@@ -979,10 +1063,14 @@ def exportObject(ob, fp):
 		pass
 	elif ob.type == "CURVE":
 		exportCurve(ob, fp)
+	elif ob.type == "SURFACE":
+		exportSurface(ob, fp)
 	elif ob.type == 'LATTICE':
 		exportLattice(ob, fp)
 	elif not expMsk & M_Obj:
 		return
+	elif ob.type == 'LAMP':
+		exportLamp(ob, fp)
 	else:
 		exportRestObject(ob,fp)
 
@@ -1010,8 +1098,9 @@ def exportObject(ob, fp):
 			exportParticleSystem(psys, "  ", fp)
 
 	exportAnimationData(ob.animation_data, fp)
+	exportDefault("FieldSettings", ob.field, [], [], [], '  ', fp)
 	writeDir(ob, 
-		['data','parent_vertices', 'mode', 'scene_users', 'children', 'pose', 
+		['data','parent_vertices', 'mode', 'scene_users', 'children', 'pose', 'field',
 		'material_slots', 'modifiers', 'constraints', 'layers', 'bound_box', 'group_users',
 		'animation_visualisation', 'animation_data', 'particle_systems', 'active_particle_system',
 		'active_shape_key', 'vertex_groups', 'active_vertex_group', 'materials'], "  ", fp)
@@ -1192,6 +1281,7 @@ def exportMesh(ob, fp):
 		if expMsk & M_MHX and obName == "Human":
 			fp.write("    *** ShapeKey\n")
 			fp1 = mhxOpen(M_Shape, "shapekeys-facial25.mhx")
+
 			exportShapeKeys(me, FacialKey, "toggle&T_Face", fp1)
 			mhxClose(fp1)
 			#fp1 = mhxOpen(M_Shape, "shapekeys-body25.mhx")
@@ -1561,9 +1651,36 @@ def exportRestObject(ob,fp):
 	fp.write("%s %s \n" % (obtype, data.name.replace(' ', '_')))
 	writeDir(data, [], "  ", fp)
 	fp.write("end %s\n" % obtype)
+	return
+
+#
+#	exportLamp(ob, fp):
+#
+
+def exportLamp(ob, fp):
+	la = ob.data
+	fp.write("Lamp %s %s\n" % (la.name.replace(' ', '_'), ob.name.replace(' ', '_') ))
+	writeDir(la, ['falloff_curve'], "  ", fp)
+	exportFalloffCurve(la.falloff_curve, fp)
+	fp.write("end Lamp\n")
+
+def exportFalloffCurve(focu, fp):
+	fp.write("  FalloffCurve\n")
+	writeDir(focu, ['curves'], "    ", fp)
+	for cu in focu.curves:
+		exportCurveMap(cu, fp)
+	fp.write("  end FalloffCurve\n")
+
+def exportCurveMap(cu, fp):
+	fp.write("    CurveMap\n")
+	for pt in cu.points:
+		exportDefault('CurveMapPoint', pt, [], [], [], '      ', fp)
+	writeDir(cu, ['points'], "    ", fp)
+	fp.write("    end CurveMap\n")
 
 #
 #	exportCurve(ob, fp):
+#	exportSurface(ob, fp):
 #	exportSpline(spl, pad, fp):
 #	exportBezierPoint(bz, pad, fp):
 #
@@ -1577,6 +1694,17 @@ def exportCurve(ob, fp):
 	for spline in cu.splines:
 		exportSpline(spline, "  ", fp)
 	fp.write("end Curve\n")
+
+def exportSurface(ob, fp):
+	su = ob.data
+	suname = su.name.replace(' ', '_') 
+	obname = ob.name.replace(' ', '_') 
+	fp.write("Surface %s %s\n" % (suname, obname))
+	writeDir(su, ['splines', 'points'], "  ", fp)
+	for spline in su.splines:
+		exportSpline(spline, "  ", fp)
+	fp.write("end Surface\n")
+	
 
 def exportSpline(spline, pad, fp):
 	fp.write("%sSpline %s %d %d\n" % (pad, spline.type, spline.point_count_u, spline.point_count_v))
@@ -1709,36 +1837,41 @@ def writeHumanMesh(fp):
 
 def writeTools(fp):
 	if bpy.data.brushes:
-		print(bpy.data.brushes)
+		print(list(bpy.data.brushes))
 		for brush in bpy.data.brushes:
 			initLocalData()
-			exportDefault('Brush', brush, [], [], [], fp)
+			exportDefault('Brush', brush, [], [], [], '', fp)
 
 	if bpy.data.libraries:		
 		fp.write("\n# --------------- Libraries ----------------------------- # \n \n")
+		print(list(bpy.data.libraries))
 		for lib in bpy.data.libraries:
 			initLocalData()
-			exportDefault("Library", lib, [], [], [], fp)
+			exportDefault("Library", lib, [], [], [], '', fp)
 	return
-		
-def writeScenes(fp):
-	if bpy.data.node_groups:		
-		fp.write("\n# --------------- Node groups ----------------------------- # \n \n")
-		for grp in bpy.data.node_groups:
-			initLocalData()
-			exportDefault("Node_group", grp, [], [], [], fp)
 
+def writeNodeTrees(fp):		
+	print("NT", list(bpy.data.node_groups))
+	if bpy.data.node_groups:		
+		fp.write("\n# --------------- Node trees ----------------------------- # \n \n")
+		for ngrp in bpy.data.node_groups:
+			print("Grp", ngrp)
+			initLocalData()
+			exportDefault("NodeGroup", ngrp, [], [], [], '', fp)
+
+
+def writeScenes(fp):
 	if bpy.data.worlds:
 		fp.write("\n# --------------- Worlds ----------------------------- # \n \n")
 		for world in bpy.data.worlds:
 			initLocalData()
-			exportDefault("World", world, [], [], [], fp)
+			exportWorld(world, fp)
 
 	if bpy.data.scenes:
 		fp.write("\n# --------------- Scenes ----------------------------- # \n \n")
 		for scn in bpy.data.scenes:
 			initLocalData()
-			exportDefault("Scene", scn, [], [], [], fp)
+			exportScene(scn, fp)
 	return
 
 #
@@ -1755,6 +1888,8 @@ def writeMhxFile(fileName, msk):
 		raise NameError("Not a mhx file: " + fileName)
 	fp = open(fileName, "w")
 	writeHeader(fp)
+	if expMsk & M_Nodes:
+		writeNodeTrees(fp)
 	if expMsk & M_Mat:
 		writeMaterials(fp)
 	if expMsk & M_Amt:
@@ -1820,7 +1955,7 @@ def mhxClose(fp):
 #
 #	User interface
 #
-
+"""
 DEBUG= False
 from bpy.props import *
 
@@ -1832,7 +1967,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 	bl_space_type = "PROPERTIES"
 	bl_region_type = "WINDOW"
 
-	path = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
+	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
 	mask = M_Geo+M_VGroup
 
@@ -1860,7 +1995,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 		mask = O_MHX | O_All | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_VGroup | O_Obj
 		
-		writeMhxFile(self.properties.path, mask)
+		writeMhxFile(self.properties.filepath, mask)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
@@ -1888,13 +2023,10 @@ if __name__ == "__main__":
 hairFile = "particles25.mhx"
 theRig = "classic"
 #theRig = "gobo"
-writeMhxFile('/home/thomas/myblends/test.mhx', M_MHX+M_Geo+M_VGroup)
+writeMhxFile('/home/thomas/myblends/test.mhx', M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape+M_Obj+M_Nodes+M_Scn)
+#writeMhxFile('/home/thomas/myblends/test.mhx', M_All)
 #writeMhxFile('/home/thomas/myblends/sintel/simple2.mhx', M_Amt+M_Anim)
 #writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
-#writeMhxTemplates(M_MHX+M_Geo+M_VGroup)
-#writeMhxTemplates(M_MHX+M_Mat)
-#theRig = "rigify"
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
-"""
 
 
