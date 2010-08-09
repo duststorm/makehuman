@@ -852,6 +852,8 @@ class TextEdit(View):
         self.text = text
         self.texture = texture
         self.focusedTexture = focusedTexture
+        
+        self.__updateTextObject()
 
     def __updateTextObject(self):
         lenText = len(self.text)
