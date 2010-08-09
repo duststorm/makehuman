@@ -2,7 +2,7 @@ import sys
 sys.path.append("../")
 sys.path.append("./")
 sys.path.append("../svd_tools/fit")
-sys.path.append("../../mh_core")
+sys.path.append("../../core")
 sys.path.append("../topology_translator")
 
 import aljabr
@@ -168,14 +168,10 @@ def axisID(axisVect):
 
 def loadRotTarget(vertices,targetRotPath,mFactor):
 
-    try:
-        f = open(targetRotPath)
-        fileDescriptor = f.readlines()
-        f.close()
-    except:
-        print "Error opening target file: %s"%(targetRotPath)
-        return 0
-
+    f = open(targetRotPath)
+    fileDescriptor = f.readlines()
+    f.close()
+    
     print  "ROT: ",targetRotPath,mFactor
     #Get info of axis from the first line of file
     rotAxeInfo = fileDescriptor[0].split()
