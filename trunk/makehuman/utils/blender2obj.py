@@ -154,7 +154,7 @@ class Blender2obj:
                 self.vertGroups[g] = groupElements
             self.ungrouped = self.toSave.difference(self.grouped)
         else:
-            self.groupNames = ("raw")
+            self.groupNames = ["raw"]
             self.vertGroups["raw"] = self.toSave
             self.ungrouped = set()
                         
@@ -204,8 +204,9 @@ class Blender2obj:
                     v.sel = 1
         print "Exported in %s sec"%(time.time()-a)
 
-
-activeObjs = Blender.Object.GetSelected()
-activeObj = activeObjs[0]
-bExporter = Blender2obj(activeObj,None)
-bExporter.write("testing_base.obj")
+#Autotest is called as main
+if __name__ == 'main': 
+    activeObjs = Blender.Object.GetSelected()
+    activeObj = activeObjs[0]
+    bExporter = Blender2obj(activeObj,1)
+    bExporter.write("testing_base.obj")
