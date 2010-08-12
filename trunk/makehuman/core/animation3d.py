@@ -208,7 +208,7 @@ def lerpVector(v0, v1, alpha, interpolator=linearInterpolate):
 
     # return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
 
-
+# Base action class, does nothing
 class Action:
 
     def __init__():
