@@ -126,6 +126,26 @@ def colorVertices(vertColors, n=0):
 
 #-------MAKETARGET CALLBACKS----------------------
 
+def buildScan2Mesh(path):
+    main_dir = os.path.dirname(path)
+    target_dir = os.path.join(main_dir,"targets_db")
+    head_mesh = os.path.join(main_dir,"base_mesh.obj")
+    head_mask = os.path.join(main_dir,"base_mask.obj")
+    prefix = os.path.join(main_dir,"fitdata")
+    maketargetlib.scan2meshBuild(target_dir, head_mesh ,head_mask,prefix)
+    
+def fitScan2Mesh(path):
+    main_dir = os.path.dirname(path)
+    target_dir = os.path.join(main_dir,"targets_db")
+    head_mesh = os.path.join(main_dir,"base_mesh.obj")
+    head_mask = os.path.join(main_dir,"base_mask.obj")
+    scan_mesh = os.path.join(main_dir,"scan_mesh.obj")
+    scan_mask = os.path.join(main_dir,"scan_mask.obj")
+    fit_verts = os.path.join(main_dir,"base_mesh.verts")
+    output = os.path.join(main_dir,"result.target")
+    prefix = os.path.join(main_dir,"fitdata")    
+    maketargetlib.scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output)
+
 def loadTarget(path):
     global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode    
     startEditing()    
@@ -410,6 +430,11 @@ def event(event, value):
         Window.FileSelector (saveGroups, "Save vertgroups") 
     elif event == Draw.UKEY:
         Window.FileSelector (scanReg, "Load scan") 
+    elif event == Draw.WKEY:
+        Window.FileSelector (buildScan2Mesh, "build db") 
+    elif event == Draw.XKEY:
+        Window.FileSelector (fitScan2Mesh, "svd fitting") 
+        
         
   
         
@@ -455,3 +480,6 @@ def buttonEvents(event):
     Draw.Draw()
     
 Draw.Register(draw, event, buttonEvents)
+
+
+

@@ -15,10 +15,113 @@ import blenderalignjoints
 from topologylib import *
 import simpleoctree
 import time
-from blendersaveobj import *
 import os
 from math import *
 from scipy.linalg import eigh,pinv
+
+
+import wavefront as wf
+import sys
+ 
+def scan2meshBuild(target_dir,head_mesh,head_mask,output):
+   
+    print "Read targets...",
+    sys.stdout.flush()
+    names,head_verts,targets = scan_fit.load_targets(target_dir)
+    print "OK"
+    
+    print "Build bases...",
+    sys.stdout.flush()
+    targs = scan_fit.build_matrix(head_verts,targets)
+    
+    head_mesh = wf.read_obj(head_mesh)
+    head_mask = wf.read_obj(head_mask)
+    
+    kdhead = KDTree(head_mesh.vertices)
+    dhead,ihead = kdhead.query(head_mask.vertices)
+    
+    mask_targets = targs[:,scan_fit.select(head_verts,ihead)]
+    mask_base = scan_fit.TargetBase(names,ihead,mask_targets) 
+    mask_base.save(output+"_mask")
+
+    base = scan_fit.TargetBase(names,head_verts,targs)
+    base.save(output)
+
+    
+def scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output):    
+
+    head_mesh = wf.read_obj(head_mesh)
+    head_mask = wf.read_obj(head_mask)
+    scan_mask = wf.read_obj(scan_mask)
+    scan_mesh = wf.read_obj(scan_mesh)
+
+    scan_mesh.vertices,scan_mask.vertices = scan_fit.align_scan(scan_mask.vertices,head_mask.vertices,scan_mesh.vertices)
+    scan_mesh.save("aligned.obj")
+    
+    base_mask = scan_fit.TargetBase(prefix = prefix+"_mask")
+    coefs = scan_fit.fit_mask(head_mesh.vertices,head_mask.vertices,scan_mesh.vertices,scan_mask.vertices,base_mask,constrained = True, regul = 0.005)
+
+    base = scan_fit.TargetBase(prefix = prefix)
+
+    target = scan_fit.fit_mesh(head_mesh.vertices,scan_mesh.vertices,base,fit_verts,init_coefs = coefs,niter = 1)
+
+    head_mesh.vertices+=target
+    head_mesh.save(output.replace(".target",".obj"))
+
+    scan_fit.save_target(output,dict(zip(base.vert_list,target[base.vert_list])))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def analyzeTarget(vertices, targetBuffer, scale=0.5):
