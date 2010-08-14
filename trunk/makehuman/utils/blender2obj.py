@@ -68,7 +68,10 @@ class Element:
 
         if type(element) == Types.MFaceType:
             self.verts = element.verts
-            self.uv = element.uv
+            try:
+                self.uv = element.uv
+            except:
+                self.uv = [[0,0] for x in element.verts]
         if type(element) == Types.MEdgeType:
             self.verts = [element.v1,element.v2]
             self.uv = [[0,0],[0,0]]
