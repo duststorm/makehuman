@@ -33,7 +33,7 @@ import time
 class SortedSet:
     """
     I use this enhanced version of the list, that use a set to be
-    avoid double entries. 
+    avoid double entries.
     """
     def __init__(self):
         self.checkElements = set()
@@ -60,7 +60,7 @@ class SortedSet:
 class Element:
 
     """
-    Because Blender has different interface to face and edge, 
+    Because Blender has different interface to face and edge,
     I've used this simple wrapper to have a more uniform access to verts and uv.
     """
 
@@ -86,22 +86,23 @@ class Blender2obj:
         @return: None
         @type  blenderObj: Blender.Mesh obj
         @param blenderObj: It the Mesh obj of Blender 2.4x
-        
+
         The init function extract some features from the Blender obj.
         - self.mesh: an istance of blender Mesh data
         - self.UV: an sorted set of the UV coords
         - self.groupNames: a list of names of verts group
-        - self.vertGroups: a dictionary that use as key the group name, 
+        - self.vertGroups: a dictionary that use as key the group name,
           and as value the list of grouped verts
         - self.xNames: a list of names of special groups, to be moved at the end of the obj
           in order to be draw at the correct zbuffer position (for example,
           eyelashes have do be draw after the eye.
-        - self.toSave: all element to export, usually the faces. If the obj has no faces, 
+        - self.toSave: all element to export, usually the faces. If the obj has no faces,
           the elements are the edges.
         - self.specialGroups: the special groups to be draw at the end of the zbuffer.
         """
-        
+
         self.mesh = blenderObj.getData(mesh=True)
+        self.matrix = blenderObj.getMatrix()
         self.UV = SortedSet()
         self.groupNames = self.mesh.getVertGroupNames()
         self.groupNames.sort()
@@ -160,20 +161,24 @@ class Blender2obj:
             self.groupNames = ["raw"]
             self.vertGroups["raw"] = self.toSave
             self.ungrouped = set()
-                        
-        print "TIME ",time.time()-a 
+
+        print "TIME ",time.time()-a
 
 
-    def write(self,path):
+    def write(self,path,worldSpace = None):
         """
         @return: None
         @type  path: string
-        @param path: The path of wavefront obj to save        
+        @param path: The path of wavefront obj to save
         """
         a = time.time()
         fileDescriptor = open(path, "w")
+        verts = self.mesh.verts[:]          # Save a copy of the vertices
+        if worldSpace:
+            self.mesh.transform(self.matrix)      # Convert verts to world space
         for v in self.mesh.verts:
             fileDescriptor.write("v %f %f %f\n" % (v.co[0],v.co[1],v.co[2]))
+        self.mesh.verts = verts             # Restore the original verts
         for vt in self.UV.elements:
             fileDescriptor.write("vt %f %f\n" % (vt[0],vt[1]))
         for g in self.groupNames:
@@ -208,7 +213,7 @@ class Blender2obj:
         print "Exported in %s sec"%(time.time()-a)
 
 #Autotest is called as main
-if __name__ == 'main': 
+if __name__ == 'main':
     activeObjs = Blender.Object.GetSelected()
     activeObj = activeObjs[0]
     bExporter = Blender2obj(activeObj,1)
