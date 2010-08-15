@@ -1,2 +1,2 @@
 svn update
-cp -f ./bin/linux/32bit/*
+cp -f ./bin/linux/32bit/* ./
