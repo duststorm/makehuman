@@ -276,10 +276,10 @@ MinBlockLevel = {
 }
 		
 #
-#	exportDefault(typ, data, header, prio, exclude, pad, fp):
+#	exportDefault(typ, data, header, prio, exclude, arrays, pad, fp):
 #
 
-def exportDefault(typ, data, header, prio, exclude, pad, fp):
+def exportDefault(typ, data, header, prio, exclude, arrays, pad, fp):
 	if not data:
 		return
 	if verbosity > 2:
@@ -299,7 +299,13 @@ def exportDefault(typ, data, header, prio, exclude, pad, fp):
 		fp.write(" %s" % val)
 	fp.write("\n")
 	writePrio(data, prio, pad+"  ", fp)
-	writeDir(data, prio+exclude, pad+"  ", fp)
+
+	for (arrname, arr) in arrays:
+		#fp.write(%s%s\n" % (pad, arrname))
+		for elt in arr:
+			exportDefault(arrname, elt, [], [], [], [], pad+'  ', fp)
+
+	writeDir(data, prio+exclude+arrays, pad+"  ", fp)
 	fp.write("%send %s\n" % (pad,typ))
 	return
 
@@ -331,9 +337,14 @@ def writeDir(data, exclude, pad, fp):
 		props = []
 	for (key,val) in props:
 		if key != '_RNA_UI':
-			fp.write("%sProperty %s " % (pad, key))
-			writeQuoted(val, fp)
-			fp.write(" ;\n")
+			print(key, val)
+			print(dir(val))
+			fp.write('%sProperty %s\n' % (pad, key))
+			writeDir(val, [], pad+'  ', fp)
+			fp.write('%send Property\n' %pad)
+			#fp.write("%s%sProperty %s" % (pad, key, val.name))
+			#writeQuoted(val, fp)
+			#fp.write(" ;\n")
 	return
 
 def writeSubDir(data, exclude, pad, depth, fp):
@@ -360,7 +371,7 @@ def writeQuoted(arg, fp):
 			c = ','
 		fp.write("]")
 	else:
-		#raise NameError("Unknown property %s %s" % (arg, typ))
+		raise NameError("Unknown property %s %s" % (arg, typ))
 		fp.write('%s' % arg)
 
 def stringQuote(string):
@@ -861,10 +872,10 @@ def exportMaterial(mat, fp):
 	writePrio(mat, prio, "  ", fp)
 	exportRamp(mat.diffuse_ramp, 'diffuse_ramp', fp)
 	exportRamp(mat.specular_ramp, 'specular_ramp', fp)
-	exportDefault("Halo", mat.halo, [], [], [], '  ', fp)
-	exportDefault("RaytraceTransparency", mat.raytrace_transparency, [], [], [], '  ', fp)
-	exportDefault("SSS", mat.subsurface_scattering, [], [], [], '  ', fp)
-	exportDefault("Strand", mat.strand, [], [], [], '  ', fp)
+	exportDefault("Halo", mat.halo, [], [], [], [], '  ', fp)
+	exportDefault("RaytraceTransparency", mat.raytrace_transparency, [], [], [], [], '  ', fp)
+	exportDefault("SSS", mat.subsurface_scattering, [], [], [], [], '  ', fp)
+	exportDefault("Strand", mat.strand, [], [], [], [], '  ', fp)
 	exportNodeTree(mat.node_tree, fp)
 	writeDir(mat, prio+['texture_slots', 'volume', 'node_tree',
 		'diffuse_ramp', 'specular_ramp', 'use_diffuse_ramp', 'use_specular_ramp', 
@@ -959,9 +970,9 @@ def exportRamp(ramp, name, fp):
 
 def exportWorld(world, fp):
 	fp.write("World %s\n" % (world.name.replace(' ', '_')))
-	exportDefault("Lighting", world.lighting, [], [], [], '  ', fp)
-	exportDefault("Mist", world.mist, [], [], [], '  ', fp)
-	exportDefault("Stars", world.stars, [], [], [], '  ', fp)
+	exportDefault("Lighting", world.lighting, [], [], [], [], '  ', fp)
+	exportDefault("Mist", world.mist, [], [], [], [], '  ', fp)
+	exportDefault("Stars", world.stars, [], [], [], [], '  ', fp)
 	writeDir(world, ['lighting', 'mist', 'stars'], "  ", fp)
 	fp.write("end World\n\n")
 
@@ -970,14 +981,14 @@ def exportScene(scn, fp):
 	exportNodeTree(scn.nodetree, fp)
 	exportGameData(scn.game_data, fp)
 	for kset in scn.all_keying_sets:
-		exportDefault("KeyingSet", kset, [kset.name], [], ['type_info'], '  ', fp)
+		exportDefault("KeyingSet", kset, [kset.name], [], ['type_info'], [], '  ', fp)
 	for obase in scn.bases:
-		exportDefault("ObjectBase", obase, [], [], [], '  ', fp)
+		exportDefault("ObjectBase", obase, [], [], [], [], '  ', fp)
 	for ob in scn.objects:
 		fp.write("  Object %s ;\n" % (ob.name.replace(' ','_')))
-	exportRenderSettings(scn.render, fp)
+	exportDefault("RenderSettings", scn.render, [], [], [], [('Layer', scn.render.layers)], '  ', fp)
 	exportToolSettings(scn.tool_settings, fp)
-	exportDefault("UnitSettings", scn.unit_settings, [], [], [], '  ', fp)
+	exportDefault("UnitSettings", scn.unit_settings, [], [], [], [], '  ', fp)
 	writeDir(scn, 
 		['bases', 'all_keying_sets', 'game_data', 'network_render', 'nodetree', 'objects', 'render',
 		'pose_templates', 'tool_settings', 'unit_settings'], "  ", fp)
@@ -985,10 +996,10 @@ def exportScene(scn, fp):
 
 def exportToolSettings(tset, fp):
 	fp.write("  ToolSettings\n")
-	exportDefault("ImagePaint", tset.image_paint, [], [], [], '    ', fp)
-	exportDefault("Sculpt", tset.sculpt, [], [], [], '    ', fp)
-	exportDefault("VertexPaint", tset.vertex_paint, [], [], [], '    ', fp)
-	exportDefault("WeightPaint", tset.weight_paint, [], [], [], '    ', fp)
+	exportDefault("ImagePaint", tset.image_paint, [], [], [], [], '    ', fp)
+	exportDefault("Sculpt", tset.sculpt, [], [], [], [], '    ', fp)
+	exportDefault("VertexPaint", tset.vertex_paint, [], [], [], [], '    ', fp)
+	exportDefault("WeightPaint", tset.weight_paint, [], [], [], [], '    ', fp)
 	writeDir(tset, ['image_paint', 'sculpt', 'vertex_paint', 'weight_paint'], '    ', fp)
 	fp.write("  end ToolSettings\n")
 
@@ -996,13 +1007,6 @@ def exportGameData(gdata, fp):
 	fp.write("  GameData\n")
 	writeDir(gdata, [], "    ", fp)
 	fp.write("  end GameData\n")
-
-def exportRenderSettings(render, fp):
-	fp.write("  RenderSettings\n")
-	for layer in render.layers:
-		exportDefault("Layer", layer, [], [], [], '    ', fp)	
-	writeDir(render, ['layers'], "    ", fp)
-	fp.write("  end RenderSettings\n")
 
 
 #
@@ -1067,12 +1071,14 @@ def exportObject(ob, fp):
 		exportSurface(ob, fp)
 	elif ob.type == 'LATTICE':
 		exportLattice(ob, fp)
+	elif ob.type == 'TEXT':
+		exportTextCurve(ob, fp)
 	elif not expMsk & M_Obj:
 		return
 	elif ob.type == 'LAMP':
 		exportLamp(ob, fp)
 	else:
-		exportRestObject(ob,fp)
+		exportDefaultObject(ob,fp)
 
 	if ob.data:
 		datName = ob.data.name.replace(' ','_')
@@ -1098,7 +1104,7 @@ def exportObject(ob, fp):
 			exportParticleSystem(psys, "  ", fp)
 
 	exportAnimationData(ob.animation_data, fp)
-	exportDefault("FieldSettings", ob.field, [], [], [], '  ', fp)
+	exportDefault("FieldSettings", ob.field, [], [], [], [], '  ', fp)
 	writeDir(ob, 
 		['data','parent_vertices', 'mode', 'scene_users', 'children', 'pose', 'field',
 		'material_slots', 'modifiers', 'constraints', 'layers', 'bound_box', 'group_users',
@@ -1438,6 +1444,7 @@ def exportShapeKeys(me, keyList, toggle, fp):
 				if dv.length > Epsilon:
 					fp.write("    sv %d %.6g %.6g %.6g ;\n" %(n, dv[0], dv[1], dv[2]))
 			fp.write("  end ShapeKey\n")
+
 			print(skey)
 		createdLocal['ShapeKey'].append(skeyName)
 
@@ -1642,10 +1649,10 @@ def exportModifier(mod, fp):
 	return
 
 #
-#	exportRestObject(ob,fp):
+#	exportDefaultObject(ob,fp):
 #
 
-def exportRestObject(ob,fp):
+def exportDefaultObject(ob,fp):
 	data = ob.data
 	obtype = ob.type.capitalize()
 	fp.write("%s %s \n" % (obtype, data.name.replace(' ', '_')))
@@ -1667,16 +1674,27 @@ def exportLamp(ob, fp):
 def exportFalloffCurve(focu, fp):
 	fp.write("  FalloffCurve\n")
 	writeDir(focu, ['curves'], "    ", fp)
-	for cu in focu.curves:
-		exportCurveMap(cu, fp)
+	exportDefault('CurveMap', focu.curves, [], [], [], [('CurveMapPoint', focu.curves.points)], '    ', fp)
 	fp.write("  end FalloffCurve\n")
 
-def exportCurveMap(cu, fp):
-	fp.write("    CurveMap\n")
-	for pt in cu.points:
-		exportDefault('CurveMapPoint', pt, [], [], [], '      ', fp)
-	writeDir(cu, ['points'], "    ", fp)
-	fp.write("    end CurveMap\n")
+#
+#
+#
+#
+
+def exportTextCurve(ob, fp):
+	txt = ob.data
+	fp.write("TextCurve %s %s\n" % (txt.name.replace(' ', '_'), ob.name.replace(' ', '_')))
+	writeDir(txt, ['splines', 'points', 'body_format', 'edit_format', 'font', 'textboxes'], "  ", fp)
+	for bfmt in txt.body_format:
+		exportDefault('BodyFormat', bfmt, [], [], [], [], '  ', fp)
+	exportDefault('EditFormat', txt.edit_format, [], [], [], [], '  ', fp)
+	exportDefault('Font', txt.font, [], [], [], [], '  ', fp)
+	for tbox in txt.textboxes:
+		exportDefault('TextBox', tbox, [], [], [], [], '  ', fp)
+	for spline in txt.splines:
+		exportSpline(spline, "  ", fp)
+	fp.write("end TextCurve\n")
 
 #
 #	exportCurve(ob, fp):
@@ -1840,14 +1858,14 @@ def writeTools(fp):
 		print(list(bpy.data.brushes))
 		for brush in bpy.data.brushes:
 			initLocalData()
-			exportDefault('Brush', brush, [], [], [], '', fp)
+			exportDefault('Brush', brush, [], [], [], [], '', fp)
 
 	if bpy.data.libraries:		
 		fp.write("\n# --------------- Libraries ----------------------------- # \n \n")
 		print(list(bpy.data.libraries))
 		for lib in bpy.data.libraries:
 			initLocalData()
-			exportDefault("Library", lib, [], [], [], '', fp)
+			exportDefault("Library", lib, [], [], [], [], '', fp)
 	return
 
 def writeNodeTrees(fp):		
@@ -1857,7 +1875,7 @@ def writeNodeTrees(fp):
 		for ngrp in bpy.data.node_groups:
 			print("Grp", ngrp)
 			initLocalData()
-			exportDefault("NodeGroup", ngrp, [], [], [], '', fp)
+			exportDefault("NodeGroup", ngrp, [], [], [], [], '', fp)
 
 
 def writeScenes(fp):

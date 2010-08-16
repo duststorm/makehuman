@@ -246,8 +246,9 @@ def makeHair(name, hstep, guides):
 	bpy.ops.object.particle_system_add()
 	psys = ob.active_particle_system
 	psys.name = name
-	# psys.global_hair = True	
-	print(psys)
+	#psys.global_hair = True	
+	print(psys.global_hair)
+	return
 
 	settings = psys.settings
 	settings.type = 'HAIR'
@@ -301,18 +302,18 @@ def makeHair(name, hstep, guides):
 			nmax = len(guide)-1
 			#raise NameError("Wrong length %d != %d" % (len(guide), hstep))
 		par = psys.particles[m]
-		par.location = hairRot(guide[0])
+		par.location = guide[0]
 		#par.location = (0,0,0)
 		for n in range(1, nmax):
 			point = guide[n]
 			h = par.hair[n]
-			h.location = hairRot(point)
+			h.location = point
 			h.time = n*dt
 			h.weight = 1.0 - n*dw
 		for n in range(nmax, hstep):
 			point = guide[nmax]
 			h = par.hair[n]
-			h.location = hairRot(point)
+			h.location = point
 			h.time = n*dt
 			h.weight = 1.0 - n*dw
 
@@ -333,12 +334,6 @@ def makeHair(name, hstep, guides):
 	'''
 	return
 
-def hairRot(point):
-	return point
-	x = point[0]
-	y = point[1]
-	z = point[2]
-	return Vector((-y,x,z))
 #
 #	User interface
 #

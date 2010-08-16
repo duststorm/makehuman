@@ -23,7 +23,7 @@ bl_addon_info = {
 	'name': 'Import MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
 	'version': '0.14',
-	'blender': (2, 53, 0),
+	'blender': (2, 53, 1),
 	'location': 'File > Import',
 	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
 	'url': 'http://www.makehuman.org',
@@ -159,6 +159,7 @@ loadedData = {
 	'Camera' : {},
 	'Lattice' : {},
 	'Curve' : {},
+	'Text' : {},
 
 	'Material' : {},
 	'Image' : {},
@@ -188,6 +189,7 @@ Plural = {
 	'Mesh' : 'meshes',
 	'Lattice' : 'lattices',
 	'Curve' : 'curves',
+	'Text' : 'texts',
 	'Group' : 'groups',
 	'Empty' : 'empties',
 	'Armature' : 'armatures',
@@ -403,11 +405,8 @@ def parse(tokens):
 		elif key == 'else':
 			if not ifResult:
 				parse(sub)
-		
-
 		elif MHX249:
 			pass
-
 		elif key == 'print':
 			msg = concatList(val)
 			print(msg)
@@ -427,12 +426,6 @@ def parse(tokens):
 			parseObject(val, sub)
 		elif key == "Mesh":
 			data = parseMesh(val, sub)
-		elif key == "Curve":
-			data = parseCurve(val, sub)
-		elif key == "Lattice":
-			data = parseLattice(val, sub)
-		elif key == "Group":
-			data = parseGroup(val, sub)
 		elif key == "Armature":
 			data = parseArmature(val, sub)
 		elif key == "Pose":
@@ -443,17 +436,26 @@ def parse(tokens):
 			data = parseMaterial(val, sub)
 		elif key == "Texture":
 			data = parseTexture(val, sub)
-
-
 		elif key == "Image":
 			data = parseImage(val, sub)
+		elif key == "Curve":
+			data = parseCurve(val, sub)
+		elif key == "TextCurve":
+			data = parseTextCurve(val, sub)
+		elif key == "Lattice":
+			data = parseLattice(val, sub)
+		elif key == "Group":
+			data = parseGroup(val, sub)
+		elif key == "Lamp":
+			data = parseLamp(val, sub)
+		elif key == "World":
+			data = parseWorld(val, sub)
+		elif key == "Scene":
+			data = parseScene(val, sub)
 		elif key == "Process":
 			parseProcess(val, sub)
 		elif key == 'AnimationData':
 			try:
-
-
-
 				ob = loadedData['Object'][val[0]]
 			except:
 				ob = None
@@ -770,10 +772,19 @@ def parseMaterial(args, tokens):
 			parseMTex(mat, val, sub)
 		elif key == 'Ramp':
 			parseRamp(mat, val, sub)
+		elif key == 'RaytraceTransparency':
+			parseDefault(mat.raytrace_transparency, sub, {}, [])
+		elif key == 'Halo':
+			parseDefault(mat.halo, sub, {}, [])
 		elif key == 'SSS':
-			parseSSS(mat, val, sub)
+			parseDefault(mat.subsurface_scattering, sub, {}, [])
+			#parseSSS(mat, val, sub)
 		elif key == 'Strand':
-			parseStrand(mat, val, sub)
+			parseDefault(mat.strand, sub, {}, [])
+			#parseStrand(mat, val, sub)
+		elif key == 'NodeTree':
+			mat.use_nodes = True
+			parseNodeTree(mat.node_tree, val, sub)
 		else:
 			exclude = ['specular_intensity', 'tangent_shading']
 			defaultKey(key, val, sub, 'mat', [], globals(), locals())
@@ -818,6 +829,9 @@ def parseTexture(args, tokens):
 				msg = "Unable to load image '%s'" % val[0]
 		elif key == 'Ramp':
 			parseRamp(tex, val, sub)
+		elif key == 'NodeTree':
+			tex.use_nodes = True
+			parseNodeTree(tex.node_tree, val, sub)
 		else:
 			defaultKey(key, val,  sub, "tex", ['use_nodes', 'use_textures', 'contrast'], globals(), locals())
 
@@ -848,6 +862,58 @@ def parseStrand(mat, args, tokens):
 	strand = mat.strand
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, "strand", [], globals(), locals())
+
+#
+#	parseNodeTree(tree, args, tokens):
+#	parseNode(node, args, tokens):
+#	parseSocket(socket, args, tokens):
+#
+
+def parseNodeTree(tree, args, tokens):
+	return
+	print("Tree", tree, args)
+	print(list(tree.nodes))
+	tree.name = args[0]
+	for (key, val, sub) in tokens:
+		if key == 'Node':
+			parseNodes(tree.nodes, val, sub)
+		else:
+			defaultKey(key, val, sub, "tree", [], globals(), locals())
+
+def parseNodes(nodes, args, tokens):
+	print("Nodes", nodes, args)
+	print(list(nodes))
+	node.name = args[0]
+	for (key, val, sub) in tokens:
+		if key == 'Inputs':
+			parseSocket(node.inputs, val, sub)
+		elif key == 'Outputs':
+			parseSocket(node.outputs, val, sub)
+		else:
+			defaultKey(key, val, sub, "node", [], globals(), locals())
+
+def parseNode(node, args, tokens):
+	print("Node", node, args)
+	print(list(node.inputs), list(node.outputs))
+	node.name = args[0]
+	for (key, val, sub) in tokens:
+		if key == 'Inputs':
+			parseSocket(node.inputs, val, sub)
+		elif key == 'Outputs':
+			parseSocket(node.outputs, val, sub)
+		else:
+			defaultKey(key, val, sub, "node", [], globals(), locals())
+
+def parseSocket(socket, args, tokens):
+	print("Socket", socket, args)
+	socket.name = args[0]
+	for (key, val, sub) in tokens:
+		if key == 'Node':
+			parseNode(tree.nodes, val, sub)
+		else:
+			defaultKey(key, val, sub, "tree", [], globals(), locals())
+
+
 
 #
 #	doLoadImage(filepath):
@@ -933,7 +999,7 @@ def parseImage(args, tokens):
 #
 #	parseObject(args, tokens):
 #	createObject(type, name, data, datName):
-#	createObjectAndData(args, typ):
+#	setObjectAndData(args, typ):
 #
 	
 def parseObject(args, tokens):
@@ -978,13 +1044,20 @@ def parseObject(args, tokens):
 				parseAnimationData(ob, sub)
 		elif key == 'ParticleSystem':
 			parseParticleSystem(ob, val, sub)
+		elif key == 'FieldSettings':
+			parseDefault(ob.field, sub, {}, [])
 		else:
 			defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
 
 	# Needed for updating layers
-	if bpy.context.object == ob and ob.data:
-		bpy.ops.object.mode_set(mode='EDIT')
-		bpy.ops.object.mode_set(mode='OBJECT')
+	if bpy.context.object == ob:
+		pass
+		'''
+		if ob.data in ['MESH', 'ARMATURE']:
+			print(ob, ob.data)
+			bpy.ops.object.mode_set(mode='EDIT')
+			bpy.ops.object.mode_set(mode='OBJECT')
+		'''
 	else:
 		print("Context", ob, bpy.context.object, bpy.context.scene.objects.active)
 	return
@@ -993,7 +1066,7 @@ def createObject(typ, name, data, datName):
 	# print( "Creating object %s %s %s" % (typ, name, data) )	
 	ob = bpy.data.objects.new(name, data)
 	if data:
-		loadedData[typ][datName] = data
+		loadedData[typ.capitalize()][datName] = data
 	loadedData['Object'][name] = ob
 	return ob
 	
@@ -1011,10 +1084,10 @@ def linkObject(ob, data):
 	#print("Context", bpy.context.object)
 	return ob
 
-def createObjectAndData(args, typ):
+def setObjectAndData(args, typ):
 	datName = args[0]
 	obName = args[1]
-	bpy.ops.object.add(type=typ.upper())
+	#bpy.ops.object.add(type=typ)
 	ob = bpy.context.object
 	ob.name = obName
 	ob.data.name = datName
@@ -1116,7 +1189,7 @@ def parseMesh (args, tokens):
 	mename = args[0]
 	obname = args[1]
 	me = bpy.data.meshes.new(mename)
-	ob = createObject('Mesh', obname, me, mename)
+	ob = createObject('MESH', obname, me, mename)
 
 	verts = []
 	edges = []
@@ -1406,7 +1479,7 @@ def parseArmature (args, tokens):
 
 	toggle &= ~T_Rigify
 	amt = bpy.data.armatures.new(amtname)
-	ob = createObject('Armature', obname, amt, amtname)	
+	ob = createObject('ARMATURE', obname, amt, amtname)	
 
 	linkObject(ob, amt)
 	print("Linked")
@@ -1627,6 +1700,7 @@ def parseConstraint(constraints, args, tokens):
 			parseArray(cns, ["rot_lock_x", "rot_lock_y", "rot_lock_z"], val)
 		else:
 			defaultKey(key, val,  sub, "cns", [], globals(), locals())
+
 	#print("cns %s done" % cns.name)
 	return cns
 
@@ -1640,7 +1714,8 @@ def parseCurve (args, tokens):
 	global todo
 	if verbosity > 2:
 		print( "Parsing curve %s" % args )
-	cu = createObjectAndData(args, 'Curve')
+	bpy.ops.object.add(type='CURVE')
+	cu = setObjectAndData(args, 'Curve')
 
 	for (key, val, sub) in tokens:
 		if key == 'Spline':
@@ -1648,6 +1723,29 @@ def parseCurve (args, tokens):
 		else:
 			defaultKey(key, val, sub, "cu", [], globals(), locals())
 	return
+
+def parseTextCurve (args, tokens):
+	global todo
+	if verbosity > 2:
+		print( "Parsing text curve %s" % args )
+	bpy.ops.object.text_add()
+	txt = setObjectAndData(args, 'Text')
+
+	for (key, val, sub) in tokens:
+		if key == 'Spline':
+			parseSpline(txt, val, sub)
+		elif key == 'BodyFormat':
+			parseCollection(txt.body_format, sub, [])
+		elif key == 'EditFormat':
+			parseDefault(txt.edit_format, sub, {}, [])
+		elif key == 'Font':
+			parseDefault(txt.font, sub, {}, [])
+		elif key == 'TextBox':
+			parseCollection(txt.body_format, sub, [])
+		else:
+			defaultKey(key, val, sub, "txt", [], globals(), locals())
+	return
+
 
 def parseSpline(cu, args, tokens):
 	typ = args[0]
@@ -1695,7 +1793,8 @@ def parseLattice (args, tokens):
 	global todo
 	if verbosity > 2:
 		print( "Parsing lattice %s" % args )
-	lat = createObjectAndData(args, 'Lattice')	
+	bpy.ops.object.add(type='LATTICE')
+	lat = setObjectAndData(args, 'Lattice')	
 	for (key, val, sub) in tokens:
 		if key == 'Points':
 			parseLatticePoints(val, sub, lat.points)
@@ -1724,7 +1823,29 @@ def parseLatticePoints(args, tokens, points):
 	return
 
 #
+#	parseLamp (args, tokens):
+#	parseFalloffCurve(focu, args, tokens):
+#
+
+def parseLamp (args, tokens):
+	global todo
+	if verbosity > 2:
+		print( "Parsing lamp %s" % args )
+	bpy.ops.object.add(type='LAMP')
+	lamp = setObjectAndData(args, 'Lamp')	
+	for (key, val, sub) in tokens:
+		if key == 'FalloffCurve':
+			parseFalloffCurve(lamp.falloff_curve, val, sub)
+		else:
+			defaultKey(key, val, sub, "lamp", [], globals(), locals())
+	return
+
+def parseFalloffCurve(focu, args, tokens):
+	return
+
+#
 #	parseGroup (args, tokens):
+#	parseGroupObjects(args, tokens, grp):
 #
 
 def parseGroup (args, tokens):
@@ -1753,6 +1874,74 @@ def parseGroupObjects(args, tokens, grp):
 				pass
 	return
 
+#
+#	parseWorld (args, tokens):
+#
+
+def parseWorld (args, tokens):
+	global todo
+	if verbosity > 2:
+		print( "Parsing world %s" % args )
+	world = bpy.context.scene.world
+	for (key, val, sub) in tokens:
+		if key == 'Lighting':
+			parseDefault(world.lighting, sub, {}, [])
+		elif key == 'Mist':
+			parseDefault(world.mist, sub, {}, [])
+		elif key == 'Stars':
+			parseDefault(world.stars, sub, {}, [])
+		else:
+			defaultKey(key, val, sub, "world", [], globals(), locals())
+	return
+
+#
+#	parseScene (args, tokens):
+#	parseRenderSettings(render, args, tokens):
+#	parseToolSettings(tool, args, tokens):
+#
+
+def parseScene (args, tokens):
+	global todo
+	if verbosity > 2:
+		print( "Parsing scene %s" % args )
+	scn = bpy.context.scene
+	for (key, val, sub) in tokens:
+		if key == 'NodeTree':
+			scn.use_nodes = True
+			parseNodeTree(scn, val, sub)
+		elif key == 'GameData':
+			parseDefault(scn.game_data, sub, {}, [])
+		elif key == 'KeyingSet':
+			pass
+			#parseDefault(scn.keying_sets, sub, {}, [])
+		elif key == 'ObjectBase':
+			pass
+			#parseDefault(scn.bases, sub, {}, [])
+		elif key == 'RenderSettings':
+			parseRenderSettings(scn.render, sub, [])
+		elif key == 'ToolSettings':
+			subkeys = {'ImagePaint' : "image_paint",  
+				'Sculpt' : "sculpt",  
+				'VertexPaint' : "vertex_paint",  
+				'WeightPaint' : "weight_paint" }
+			parseDefault(scn.tool_settings, sub, subkeys, [])
+		elif key == 'UnitSettings':
+			parseDefault(scn.unit_settings, sub, {}, [])
+		else:
+			defaultKey(key, val, sub, "scn", [], globals(), locals())
+	return
+
+def parseRenderSettings(render, args, tokens):
+	global todo
+	if verbosity > 2:
+		print( "Parsing RenderSettings %s" % args )
+	for (key, val, sub) in tokens:
+		if key == 'Layer':
+			pass
+			#parseDefault(scn.layers, sub, [])
+		else:
+			defaultKey(key, val, sub, "render", [], globals(), locals())
+	return
 
 #
 #	postProcess()
@@ -1948,10 +2137,13 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 	global todo
 
 	if ext == 'Property':
-		expr = "%s['%s'] = %s" % (var, args[0], args[1])
+		try:
+			expr = "%s['%s'] = %s" % (var, args[0], args[1])
+		except:
+			expr = None
 		print("Property", expr)
-		exec(expr, glbals, lcals)
-		#print("execd")
+		if expr:
+			exec(expr, glbals, lcals)
 		return
 		
 	nvar = "%s.%s" % (var, ext)
@@ -2086,12 +2278,19 @@ def parseMatrix(args, tokens):
 	return matrix
 
 #
-#	parseDefault(data, tokens, exclude):
+#	parseDefault(data, tokens, subkeys, exclude):
 #
 
-def parseDefault(data, tokens):
+def parseDefault(data, tokens, subkeys, exclude):
 	for (key, val, sub) in tokens:	
-		defaultKey(key, val, sub, "data", exclude, globals(), locals())
+		if key in subkeys.keys():
+			for (key2, val2, sub2) in sub:
+				defaultKey(key2, val2, sub2, "data.%s" % subkeys[key], [], globals(), locals())
+		else:
+			defaultKey(key, val, sub, "data", exclude, globals(), locals())
+
+def parseCollection(data, tokens, exclude):
+	return
 
 
 #
@@ -2316,29 +2515,22 @@ def unregister():
 	bpy.types.INFO_MT_file_import.remove(menu_func)
 
 if __name__ == "__main__":
+	try:
+		unregister()
+	except:
+		pass
 	register()
 
 #
 #	Testing
 #
 """
-theScale = 1.0
-
 toggle = T_Replace + T_Mesh + T_Armature + T_MHX
-#rigLeg = T_Toes + T_GoboFoot
-#rigArm = T_ElbowPT + T_FingerCurl
+#readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-25.mhx", 'Classic')
+readMhxFile("/home/thomas/myblends/test.mhx", ('Gobo', 'IK'), 1.0)
+#readMhxFile("/home/thomas/makehuman/exports/foo.mhx", ('Reverse Foot', 'IK'), 1.0)
 
-#readMhxFile("/home/thomas/makehuman/exports/foo-25.mhx")
-
-#toggle = T_Replace + T_Armature 
-#readMhxFile("/home/thomas/makehuman/exports/foo-sintel-25.mhx")
-
-readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-25.mhx", 'Classic')
-#readMhxFile("/home/thomas/mhx5/test1.mhx")
-#readMhxFile("/home/thomas/myblends/gobo/gobo.mhx")
-#readMhxFile("/home/thomas/myblends/sintel/simple.mhx")
 """
-
 
 
 
