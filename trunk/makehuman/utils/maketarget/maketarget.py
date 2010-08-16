@@ -39,6 +39,8 @@ from Blender import Window
 import bpy
 from Blender import Mathutils
 from Blender.Mathutils import *
+import blender2obj
+from Blender import Types
 
 basePath = 'base.obj'
 pairsPath = 'base.sym'
@@ -78,17 +80,23 @@ def getVertices(n=0,name = None):
     vertices = [[v.co[0],v.co[1],v.co[2]] for v in obj.verts]
     return vertices
 
-def getVertGroups(n=0):
+def getVertGroups(n=0, name = None):
     vertGroups = {}
-    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
+    if name:
+        obj = Blender.Object.Get(name).getData(mesh=True)
+    else:    
+        obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     vertGroupNames = obj.getVertGroupNames()
     for n in vertGroupNames:
         vertGroups[n] = obj.getVertsFromGroup(n)
     return vertGroups
 
-def getSelectedVertices(n=0):
+def getSelectedVertices(n=0, name = None):
     selectedVertices = []
-    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
+    if name:
+        obj = Blender.Object.Get(name).getData(mesh=True)
+    else:    
+        obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     for i,v in enumerate(obj.verts):
         if v.sel == 1:
             selectedVertices.append(i)
@@ -106,7 +114,7 @@ def updateVertices(vertices, n=0, name = None):
     else:    
         obj = Blender.Object.GetSelected()[n].getData(mesh=True)    
     for i,v in enumerate(vertices):
-       obj.verts[i].co[0], obj.verts[i].co[1],obj.verts[i].co[2] = v[0],v[1],v[2]
+        obj.verts[i].co[0], obj.verts[i].co[1],obj.verts[i].co[2] = v[0],v[1],v[2]
     obj.update()
     obj.calcNormals()
     
@@ -123,6 +131,35 @@ def colorVertices(vertColors, n=0):
             col.b = col2[2]
     obj.update()
     obj.calcNormals()
+    
+def createMesh(verts, faces, name):
+    """
+    Create mesh on the Blender scene
+    """
+    scn = bpy.data.scenes.active 
+    mesh = bpy.data.meshes.new(name)
+    mesh.verts.extend(verts)
+    mesh.faces.extend(faces)
+    ob = scn.objects.new(mesh, name)
+    return ob
+    
+def applyTransforms():
+    objs = Blender.Object.Get()
+    for obj in objs:        
+            
+            
+        if type(obj.getData(mesh=True)) == Types.MeshType:
+            mesh = obj.getData(mesh=True)
+            m = obj.getMatrix()
+           
+            obj.setLocation(0,0,0)
+            obj.setSize(1,1,1)
+            obj.setEuler(0,0,0)
+            mesh.transform(m)      # Convert verts to world space
+            
+            
+            mesh.update()
+        
 
 #-------MAKETARGET CALLBACKS----------------------
 
@@ -141,10 +178,38 @@ def fitScan2Mesh(path):
     head_mask = os.path.join(main_dir,"base_mask.obj")
     scan_mesh = os.path.join(main_dir,"scan_mesh.obj")
     scan_mask = os.path.join(main_dir,"scan_mask.obj")
-    fit_verts = os.path.join(main_dir,"base_mesh.verts")
+    fit_verts = os.path.join(main_dir,"face.verts")
     output = os.path.join(main_dir,"result.target")
     prefix = os.path.join(main_dir,"fitdata")    
     maketargetlib.scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output)
+    
+def saveScanMask(path):
+    mainDir = os.path.dirname(path)
+    scanMask = Blender.Object.Get("scan_mask") 
+    scanMaskPath = os.path.join(mainDir,"scan_mask.obj")   
+    bExporter = blender2obj.Blender2obj(scanMask,1)    
+    bExporter.write(scanMaskPath,1)
+    
+def saveBaseMask(path):
+    mainDir = os.path.dirname(path)
+    baseMask = Blender.Object.Get("base_mask") 
+    baseMaskPath = os.path.join(mainDir,"base_mask.obj")   
+    bExporter = blender2obj.Blender2obj(baseMask,1)    
+    bExporter.write(baseMaskPath,1)
+    
+def saveScanMesh(path):
+    mainDir = os.path.dirname(path)
+    scanMesh = Blender.Object.GetSelected()[0]    
+    scanMeshPath = os.path.join(mainDir,"scan_mesh.obj")   
+    bExporter = blender2obj.Blender2obj(scanMesh,1)    
+    bExporter.write(scanMeshPath,1)
+    
+def saveScanElements(path):
+    saveScanMask(path)    
+    saveBaseMask(path)
+    saveScanMesh(path)
+    buildScan2Mesh(path)
+    fitScan2Mesh(path)
 
 def loadTarget(path):
     global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode    
@@ -208,19 +273,7 @@ def scanReg(scan):
     #put scan on the left of base
     matrixT = TranslationMatrix(Vector(-3, 0, 7))
     ob.setMatrix(matrixR * matrixT)
-    endEditing()
-
-def createMesh(verts, faces, name):
-    """
-    Create mesh on the Blender scene
-    """
-    scn = bpy.data.scenes.active 
-    mesh = bpy.data.meshes.new(name)
-    mesh.verts.extend(verts)
-    mesh.faces.extend(faces)
-    ob = scn.objects.new(mesh, name)
-    return ob
-   
+    endEditing()   
         
 def saveTarget(path):    
     global saveOnlySelectedVerts,basePath, message
@@ -281,26 +334,28 @@ def processingTargets(path, n=0):
     updateVertices(vertices,n)
     endEditing()
     
-def adapt():
+def adapt(path):
+    print "Fitting face...final step"
     startEditing()
-    base = getVertices(0)
-    verticesToAdapt = getSelectedVertices(0)
-    scan = getVertices(1)    
+    base = getVertices(name="Base")
+    verticesToAdapt = maketargetlib.loadVertsIndex(path)
+    print verticesToAdapt
+    scan = getVertices(0)    
     maketargetlib.adaptMesh(base, scan, verticesToAdapt)
-    updateVertices(base,0)
+    updateVertices(base,name="Base")
     endEditing()
 
 def align():    
     startEditing()
-    maskBaseVerts = getVertices(name="mask_mh")
-    maskScanVerts = getVertices(name="mask_scan")
+    maskBaseVerts = getVertices(name="base_mask")
+    maskScanVerts = getVertices(name="scan_mask")
     if len(maskBaseVerts) != len(maskScanVerts):
         message = "Error: Masks with different number of vertices: %d vs %d"%(len(maskBaseVerts),len(maskScanVerts))
         return
     scanVerts = getVertices(0)    
     maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
     updateVertices(scanVerts,0)
-    updateVertices(maskScanVerts,name="mask_scan")
+    updateVertices(maskScanVerts,name="scan_mask")
     message = "Alignment done!"
     endEditing()  
     
@@ -313,7 +368,7 @@ def saveSelVerts(path, n= 0):
     
 def loadSelVerts(path, n= 0):
     startEditing()
-    selVerts = maketargetlib.loadIndexSelectedVerts(path)
+    selVerts = maketargetlib.loadVertsIndex(path)
     for i in selVerts:
         selectVert(i)
     endEditing()  
@@ -401,6 +456,7 @@ def event(event, value):
     elif event == Draw.DKEY:
         Window.FileSelector (loadAlloadTargetInFolder, "Load from folder")
     elif event == Draw.EKEY:
+        print "EKEY"
         align()
     elif event == Draw.FKEY:
         Window.FileSelector (generateTargetsDB, "Generate DB from")
@@ -411,7 +467,7 @@ def event(event, value):
     elif event == Draw.IKEY:
         Window.FileSelector (findClosereset, "Reconstruct")
     elif event == Draw.LKEY:
-        adapt()
+        adapt("face.verts")
     elif event == Draw.MKEY:
         seekGroup()
     elif event == Draw.NKEY:
@@ -434,9 +490,13 @@ def event(event, value):
         Window.FileSelector (buildScan2Mesh, "build db") 
     elif event == Draw.XKEY:
         Window.FileSelector (fitScan2Mesh, "svd fitting") 
+    elif event == Draw.YKEY:
+        Window.FileSelector (saveScanElements, "save scan elements") 
+    elif event == Draw.KKEY:
+        applyTransforms()
         
         
-  
+
         
 
 def buttonEvents(event):

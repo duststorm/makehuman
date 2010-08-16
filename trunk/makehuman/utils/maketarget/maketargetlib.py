@@ -71,59 +71,6 @@ def scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output
     scan_fit.save_target(output,dict(zip(base.vert_list,target[base.vert_list])))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def analyzeTarget(vertices, targetBuffer, scale=0.5):
 
     vertColors = [[0,0,0] for x in vertices]
@@ -687,7 +634,7 @@ def saveIndexSelectedVerts(selectVerts, path):
         fileDescriptor.write("%d\n"%(v))
     fileDescriptor.close()
 
-def loadIndexSelectedVerts(path):
+def loadVertsIndex(path):
     """
     This function load the indices of selected verts
 
