@@ -28,7 +28,7 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     elif len(facesM) > 0:
         for f in facesM:
             if len(f) >= 3:
-                n = planeNorm(vertsM[f[0]], vertsM[f[1]], vertsM[f[2]])
+                n = aljabr.planeNorm(vertsM[f[0]], vertsM[f[1]], vertsM[f[2]])
             else:
                 n = [0,0,1] #edges
                 
@@ -52,7 +52,7 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     
     #special case: if the normal vector is -1 on z-axis then rotate the mesh 180 degrees on z
     if noM[2] < -0.30:
-        matrixR1 = sp.mat([[cos(math.pi),-sin(math.pi),0], [sin(math.pi),cos(math.pi),0], [0,0,1]])
+        matrixR1 = sp.mat([[math.cos(math.pi),-math.sin(math.pi),0], [math.sin(math.pi),math.cos(math.pi),0], [0,0,1]])
         #applica la matrice di rotazione
         applyTransformation(vertsM, matrixR1)
     
@@ -62,7 +62,7 @@ def findOptimalTransformation(vertsM, normM, facesM, vertsB, normB):
     #stop condition: angle < 1 or condStop = 0
     condStop = -1
     while math.fabs(angle*(180/math.pi)) > 1 and condStop == -1:
-        matrixR2 = sp.mat([[cos(-angle),-sin(-angle),0], [sin(-angle),cos(-angle),0], [0,0,1]])
+        matrixR2 = sp.mat([[math.cos(-angle),-math.sin(-angle),0], [math.sin(-angle),math.cos(-angle),0], [0,0,1]])
          #apply the rotation matrix
         applyTransformation(vertsM, matrixR2)
         angleOld = angle
