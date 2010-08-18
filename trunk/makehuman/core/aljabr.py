@@ -637,8 +637,20 @@ def vectorsToRotMatrix(v1,v2):
     q = axisAngleToQuaternion(normal, angle)
     return quaternionToMatrix(q)
 
-# http://mathworld.wolfram.com/Quadrilateral.html
 def convexQuadrilateralArea(v1,v2,v3,v4):
+    """
+        This function returns the area of a Quadrilateral. See U{http://mathworld.wolfram.com/Quadrilateral.html}.
+    @rtype:       float 
+    @return:      The area of a Quadrilateral determined by v1 to v4 (clockwise or counterclockwise order)
+    @type  v1: float list
+    @param v1: first vertex of a parallelogram - in the format [x,y,z]
+    @type  v2: float list
+    @param v2: second vertex of a parallelogram - in the format [x,y,z]
+    @type  v3: float list
+    @param v3: third vertex of a parallelogram - in the format [x,y,z]
+    @type  v4: float list
+    @param v4: fourth vertex of a parallelogram - in the format [x,y,z]
+    """
     #a=vdist(v2,v1)
     #b=vdist(v3,v2)
     #c=vdist(v4,v3)
