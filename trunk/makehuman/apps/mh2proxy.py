@@ -229,8 +229,8 @@ def writeProxyBone(fp, boneInfo):
 	
 	fp.write(
 "    roll %.6g ; \n" % (roll)+
-"    connected %s ; \n" % (conn) +
-"    deform True ; \n" +
+"    use_connect %s ; \n" % (conn) +
+"    use_deform True ; \n" +
 "  end Bone \n")
 	return
 

@@ -6,17 +6,12 @@ NoScale False ;
   deform_quaternion True ;
   deform_vertexgroups True ;
   delay_deform False ;
-  draw_axes False ;
-  draw_custom_bone_shapes True ;
-  draw_group_colors True ;
-  draw_names False ;
+  show_axes False ;
+  show_bone_custom_shapes True ;
+  show_group_colors True ;
+  show_names False ;
   drawtype 'STICK' ;
-  ghost_frame_end 0 ;
-  ghost_size 1 ;
-  ghost_frame_start 0 ;
-  ghost_step 0 ;
-  ghost_type 'CURRENT_FRAME' ;
-  layer Array 1 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layers Array 1 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   layer_protection Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
   x_axis_mirror False ;
@@ -25,7 +20,7 @@ end Armature
 *** ProxyRigObject
   layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
-  x_ray True ;
+  show_x_ray True ;
 end Object
 
 *** ProxyPose
@@ -46,21 +41,12 @@ end if
     end Data
   end MeshTextureFaceLayer
   *** VertexGroup
-  vertex_normal_flip True ;
 end Mesh
 
 *** ProxyObject
   layers Array 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
     Modifier Armature ARMATURE
-      editmode True ;
-      expanded True ;
-      invert False ;
-      multi_modifier False ;
       *** ProxyReferRig
-      on_cage True ;
-      quaternion False ;
-      realtime True ;
-      render True ;
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
@@ -70,64 +56,15 @@ end Mesh
   active_shape_key_index 0 ;
   active_vertex_group_index 8 ;
   color Array 1.0 1.0 1.0 1.0  ;
-  delta_location (0,0,0) ;
-  delta_rotation_euler (0,0,0) ;
-  delta_rotation_quaternion (0,0,0,0) ;
-  delta_scale (0,0,0) ;
-  dimensions (16.3674,3.02534,16.7043) ;
-  draw_axis False ;
-  draw_bounds False ;
-  draw_bounds_type 'BOX' ;
-  draw_name False ;
-  draw_texture_space False ;
-  draw_transparent False ;
-  draw_wire False ;
-  dupli_faces_scale 1 ;
-  dupli_frames_end 100 ;
-  dupli_frames_off 0 ;
-  dupli_frames_on 1 ;
-  dupli_frames_start 1 ;
-  dupli_type 'NONE' ;
-  empty_draw_size 1 ;
-  empty_draw_type 'ARROWS' ;
-  location (0,0,0) ;
-  lock_location Array 0 0 0  ;
-  lock_rotation Array 0 0 0  ;
-  lock_rotation_w False ;
-  lock_rotations_4d False ;
-  lock_scale Array 0 0 0  ;
-  matrix Matrix
-    row 1.0 0.0 0.0 0.0 ;
-    row 0.0 1.0 0.0 0.0 ;
-    row 0.0 0.0 1.0 0.0 ;
-    row 0.0 0.0 0.0 1.0 ;
-  end Matrix
+  show_name False ;
+  show_wire False ;
   max_draw_type 'TEXTURED' ;
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
-  pass_index 0 ;
-  hide_render False ;
-  hide_select False ;
-  rotation_axis_angle Array 0.0 0.0 1.0 0.0  ;
-  rotation_euler (0,-0,0) ;
-  rotation_mode 'XYZ' ;
-  rotation_quaternion (1,0,0,0) ;
-  scale (1,1,1) ;
   select True ;
-  shape_key_edit_mode False ;
-  shape_key_lock False ;
-  slow_parent False ;
-  time_offset 0 ;
-  time_offset_add_parent False ;
-  time_offset_edit True ;
-  time_offset_parent True ;
-  time_offset_particle False ;
   track_axis 'POS_Y' ;
   up_axis 'Z' ;
-  use_dupli_faces_scale False ;
-  use_dupli_frames_speed True ;
-  use_dupli_verts_rotation False ;
-  x_ray False ;
+  show_x_ray False ;
 end Object
 
 

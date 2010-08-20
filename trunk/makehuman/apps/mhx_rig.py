@@ -224,14 +224,14 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 "    bbone_in %d ; \n" % (bin) +
 "    bbone_out %d ; \n" % (bout) +
 "    bbone_segments %d ; \n" % (bseg) +
-"    connected %s ; \n" % (conn) +
-"    cyclic_offset %s ; \n" % cyc +
-"    deform %s ; \n" % (deform)+
+"    use_connect %s ; \n" % (conn) +
+"    use_cyclic_offset %s ; \n" % cyc +
+"    use_deform %s ; \n" % (deform)+
 "    hide %s ; \n" % hide +
-"    draw_wire %s ; \n" % (wire) +
-"    hinge True ; \n"+
-"    inherit_scale %s ; \n" % (scale) +
-"    layer Array ")
+"    show_wire %s ; \n" % (wire) +
+"    use_hinge True ; \n"+
+"    use_inherit_scale %s ; \n" % (scale) +
+"    layers Array ")
 
 	bit = 1
 	for n in range(32):
@@ -242,9 +242,9 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 		bit = bit << 1
 
 	fp.write(" ; \n" +
-"    local_location %s ; \n" % lloc +
+"    use_local_location %s ; \n" % lloc +
 "    lock %s ; \n" % lock +
-"    multiply_vertexgroup_with_envelope False ; \n"+
+"    use_envelope_multiply False ; \n"+
 "    hide_select %s ; \n" % (restr) +
 "  end Bone \n")
 
@@ -519,7 +519,7 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 "      pos_lock Array 1 1 1  ;\n" +
 "      rot_lock Array 1 1 1  ;\n" +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      axis_reference 'BONE' ;\n" +
 "      chain_length %d ;\n" % chainlen +
 "      ik_type 'COPY_POSE' ;\n" +
@@ -574,7 +574,7 @@ def addActionConstraint(fp, switch, flags, data):
 "      target Refer Object HumanRig ; \n"+
 "      action Refer Action %s ; \n" % action+
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      frame_start %s ; \n" % sframe +
 "      frame_end %d ; \n" % eframe+
 "      influence %s ; \n" % inf)
@@ -614,7 +614,7 @@ def addCopyRotConstraint(fp, switch, flags, data):
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence %s ; \n" % inf +
 "      owner_space '%s' ; \n" % ownsp+
 "      proxy_local False ; \n"+
@@ -650,7 +650,7 @@ def addCopyLocConstraint(fp, switch, flags, data):
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence %s ; \n" % inf +
 "      owner_space '%s' ; \n" % ownsp +
 "      proxy_local False ; \n"+
@@ -681,7 +681,7 @@ def addCopyScaleConstraint(fp, switch, flags, data):
 "      target Refer Object HumanRig ;\n" +
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
@@ -702,7 +702,7 @@ def addCopyTransConstraint(fp, switch, flags, data):
 "    Constraint %s COPY_TRANSFORMS\n" % (name, switch) +
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
@@ -724,7 +724,7 @@ def addLimitRotConstraint(fp, switch, flags, data):
 		fp.write(	
 "    Constraint %s LIMIT_ROTATION %s\n" % (name, switch) +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence 1 ; \n"+
 "      limit_transform %s ; \n" % ltra+
 "      maximum_x %.6g ;\n" % xmax +
@@ -767,7 +767,7 @@ def addLimitLocConstraint(fp, switch, flags, data):
 		fp.write(
 "    Constraint %s LIMIT_LOCATION %s\n" % (name, switch) +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
 "      limit_transform True ;\n" +
 "      maximum_x %s*theScale ;\n" % xmax +
@@ -814,7 +814,7 @@ def addLimitScaleConstraint(fp, switch, flags, data):
 		fp.write(
 "    Constraint %s LIMIT_SCALE %s\n" % (name, switch) +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
 "      limit_transform True ;\n" +
 "      maximum_x %.6g ;\n" % xmax +
@@ -846,7 +846,7 @@ def addDampedTrackConstraint(fp, switch, flags, data):
 "    Constraint %s DAMPED_TRACK %s\n" % (name, switch) +
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
 "      owner_space '%s' ;\n" % ownsp+
 "      proxy_local False ;\n" +
@@ -868,7 +868,7 @@ def addStretchToConstraint(fp, switch, flags, data):
 "    Constraint %s STRETCH_TO %s\n" % (name, switch) +
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      bulge 1 ;\n" +
 "      influence 1 ;\n" +
 "      keep_axis '%s' ;\n" % axis +
@@ -900,7 +900,7 @@ def addLimitDistConstraint(fp, switch, flags, data):
 "    Constraint %s LIMIT_DISTANCE %s\n" % (name, switch) +
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
 "      limit_mode 'LIMITDIST_INSIDE' ;\n" +
 "      owner_space '%s' ;\n" % ownsp +
@@ -933,7 +933,7 @@ def addChildOfConstraint(fp, switch, flags, data):
 "    Constraint %s CHILD_OF %s\n" % (name, switch) +
 "      target Refer Object HumanRig ;\n" +
 "      active %s ;\n" % active +
-"      expanded %s ;\n" % expanded +
+"      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
 "      proxy_local False ;\n" +
@@ -1079,7 +1079,7 @@ def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
 "          Target %s OBJECT\n" % targ +
 "            transform_type '%s' ;\n" % ttype +
 "            bone_target '%s' ;\n" % boneTarg +
-"            use_local_space_transforms %s ;\n" % local +
+"            use_local_space_transform %s ;\n" % local +
 "          end Target\n")
 
 		elif typ == 'SINGLE_PROP':
@@ -1100,7 +1100,7 @@ def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
 	fp.write(
 "      FModifier GENERATOR \n" +
 "        active False ;\n" +
-"        additive False ;\n")
+"        use_additive False ;\n")
 
 	(a0,a1) = coeffs
 	if loc:
@@ -1109,7 +1109,7 @@ def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
 		fp.write("        coefficients Array %s %s%s ;\n" % (a0,a1,extra))
 
 	fp.write(
-"        expanded True ;\n" +
+"        show_expanded True ;\n" +
 "        mode 'POLYNOMIAL' ;\n" +
 "        mute False ;\n" +
 "        poly_order 1 ;\n" +
@@ -1220,15 +1220,10 @@ def reapplyArmature(fp, name):
 	fp.write("\n" +
 "  Object %s  \n" % name +
 "    Modifier Armature ARMATURE \n" +
-"      editmode False ; \n" +
-"      expanded True ; \n" +
-"      invert False ; \n" +
+"      show_expanded True ; \n" +
 "      multi_modifier False ; \n" +
 "      object Refer Object HumanRig ; \n" +
-"      on_cage False ; \n" +
 "      quaternion False ; \n" +
-"      realtime True ; \n" +
-"      render True ; \n" +
 "      use_bone_envelopes False ; \n" +
 "      use_vertex_groups True ; \n" +
 "    end Modifier \n" +

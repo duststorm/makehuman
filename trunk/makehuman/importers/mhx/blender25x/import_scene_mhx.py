@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.14
+Version 0.15
 
 """
 
 bl_addon_info = {
 	'name': 'Import MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.14',
+	'version': '0.15',
 	'blender': (2, 53, 1),
 	'location': 'File > Import',
 	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
@@ -36,8 +36,8 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 14
-BLENDER_VERSION = (2, 53, 0)
+MINOR_VERSION = 15
+BLENDER_VERSION = (2, 53, 1)
 
 #
 #
@@ -223,12 +223,14 @@ def checkBlenderVersion():
 	print("Found Blender", bpy.app.version)
 	(A, B, C) = bpy.app.version
 	(a, b, c) = BLENDER_VERSION
-	if a > A or b > B or c > C:
-		msg = (
+	if a <= A: return
+	if b <= B: return
+	if c <= C: return
+	msg = (
 "This version of the MHX importer only works with Blender (%d, %d, %d) or later. " % (a, b, c) +
 "Download a more recent Blender from www.blender.org or www.graphicall.org.\n"
-		)
-		raise NameError(msg)
+	)
+	raise NameError(msg)
 	return
 
 #
@@ -335,9 +337,7 @@ def getObject(name, var, glbals, lcals):
 		ob = loadedData['Object'][name]
 	except:
 		if name != "None":
-			expr = "%s = loadedData['Object'][name]" % var
-			print("Todo ", expr)
-			todo.append((expr, glbals, lcals))
+			pushOnTodoList(None, "ob = loadedData['Object'][name]" % globals(), locals())
 		ob = None
 	return ob
 
@@ -461,7 +461,7 @@ def parse(tokens):
 				ob = None
 			if ob:
 				bpy.context.scene.objects.active = ob
-				parseAnimationData(ob, sub)
+				parseAnimationData(ob, val, sub)
 		elif key == 'ShapeKeys':
 			try:
 				ob = loadedData['Object'][val[0]]
@@ -645,13 +645,13 @@ def parseKeyFramePoint(pt, args, tokens):
 	return pt
 
 #
-#	parseAnimationData(rna, tokens):
+#	parseAnimationData(rna, args, tokens):
 #	parseDriver(drv, args, tokens):
 #	parseDriverVariable(var, args, tokens):
 #
 
-def parseAnimationData(rna, tokens):
-	if 0 and toggle & T_MHX:
+def parseAnimationData(rna, args, tokens):
+	if not eval(args[1]):
 		return
 	if rna.animation_data == None:	
 		rna.animation_data_create()
@@ -778,10 +778,8 @@ def parseMaterial(args, tokens):
 			parseDefault(mat.halo, sub, {}, [])
 		elif key == 'SSS':
 			parseDefault(mat.subsurface_scattering, sub, {}, [])
-			#parseSSS(mat, val, sub)
 		elif key == 'Strand':
 			parseDefault(mat.strand, sub, {}, [])
-			#parseStrand(mat, val, sub)
 		elif key == 'NodeTree':
 			mat.use_nodes = True
 			parseNodeTree(mat.node_tree, val, sub)
@@ -1040,8 +1038,7 @@ def parseObject(args, tokens):
 		elif key == 'Constraint':
 			parseConstraint(ob.constraints, val, sub)
 		elif key == 'AnimationData':
-			if eval(val[0]):
-				parseAnimationData(ob, sub)
+			parseAnimationData(ob, val, sub)
 		elif key == 'ParticleSystem':
 			parseParticleSystem(ob, val, sub)
 		elif key == 'FieldSettings':
@@ -1206,18 +1203,10 @@ def parseMesh (args, tokens):
 			faces = parseFaces(sub)
 
 	if faces:
-		#x = me.from_pydata(verts, [], faces)
-		me.add_geometry(len(verts), 0, len(faces))
-		me.verts.foreach_set("co", unpackList(verts))
-		me.faces.foreach_set("verts_raw", unpackList(faces))
+		me.from_pydata(verts, [], faces)
 	else:
-		#x = me.from_pydata(verts, edges, [])
-		me.add_geometry(len(verts), len(edges), 0)
-		me.verts.foreach_set("co", unpackList(verts))
-		me.edges.foreach_set("verts", unpackList(edges))
-	#print(x)
+		me.from_pydata(verts, edges, [])
 	me.update()
-	#print(me)
 	linkObject(ob, me)
 		
 	mats = []
@@ -1275,7 +1264,7 @@ def parseFaces(tokens):
 	for (key, val, sub) in tokens:
 		if key == 'f':
 			if len(val) == 3:
-				face = [int(val[0]), int(val[1]), int(val[2]), 0]
+				face = [int(val[0]), int(val[1]), int(val[2])]
 			elif len(val) == 4:
 				face = [int(val[0]), int(val[1]), int(val[2]), int(val[3])]
 			faces.append(face)
@@ -1287,7 +1276,7 @@ def parseFaces2(tokens, me):
 		if key == 'ft':
 			f = me.faces[n]
 			f.material_index = int(val[0])
-			f.smooth = int(val[1])
+			f.use_smooth = int(val[1])
 			n += 1
 		elif key == 'mn':
 			fn = int(val[0])
@@ -1299,7 +1288,7 @@ def parseFaces2(tokens, me):
 			smooth = int(val[1])
 			for f in me.faces:
 				f.material_index = mat
-				f.smooth = smooth
+				f.use_smooth = smooth
 	return
 
 
@@ -1415,7 +1404,7 @@ def parseShapeKeys(ob, me, args, tokens):
 			parseShapeKey(ob, me, val, sub)
 		elif key == 'AnimationData':
 			if me.shape_keys:
-				parseAnimationData(me.shape_keys, sub)
+				parseAnimationData(me.shape_keys, val, sub)
 	ob.active_shape_key_index = 0
 	return
 
@@ -1701,6 +1690,7 @@ def parseConstraint(constraints, args, tokens):
 		else:
 			defaultKey(key, val,  sub, "cns", [], globals(), locals())
 
+
 	#print("cns %s done" % cns.name)
 	return cns
 
@@ -1980,7 +1970,7 @@ def postProcess():
 
 def deleteDiamonds(ob):
 	bpy.context.scene.objects.active = ob
-	if not ob:
+	if not bpy.context.object:
 		return
 	print("Delete diamonds in %s" % bpy.context.object)
 	bpy.ops.object.mode_set(mode='EDIT')
@@ -1988,9 +1978,9 @@ def deleteDiamonds(ob):
 	bpy.ops.object.mode_set(mode='OBJECT')
 	me = ob.data
 	for f in me.faces:		
-		if len(f.verts) < 4:
-			for vn in f.verts:
-				me.verts[vn].select = True
+		if len(f.vertices) < 4:
+			for vn in f.vertices:
+				me.vertices[vn].select = True
 	bpy.ops.object.mode_set(mode='EDIT')
 	bpy.ops.mesh.delete(type='VERT')
 	bpy.ops.object.mode_set(mode='OBJECT')
@@ -2028,7 +2018,7 @@ def parseProcess(args, tokens):
 		elif key == 'Bend':
 			axis = val[1]
 			angle = float(val[2])
-			mat = mathutils.RotationMatrix(angle, 4, axis)
+			mat = mathutils.Matrix.Rotation(angle, 4, axis)
 			try:
 				pb = pbones[val[0]]
 				prod = pb.matrix_local * mat
@@ -2122,7 +2112,7 @@ def applyTransform(objects, rig, parents):
 	for (bname, pname) in parents.items():
 		eb = ebones[bname]
 		par = ebones[pname]
-		if eb.connected:
+		if eb.use_connect:
 			par.tail = eb.head
 		eb.parent = par
 
@@ -2147,7 +2137,7 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 		return
 		
 	nvar = "%s.%s" % (var, ext)
-	# print(ext)
+	#print(ext)
 	if ext in exclude:
 		return
 	#print("D", nvar)
@@ -2245,9 +2235,21 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 	try:
 		exec(expr, glbals, lcals)
 	except:
-		#print("Failed ",expr)
-		todo.append((expr, glbals, lcals))
+		pushOnTodoList(var, expr, glbals, lcals)
 	return
+
+#
+#
+#
+
+def pushOnTodoList(var, expr, glbals, lcals):
+	global todo
+	print("Tdo", var)
+	print(dir(eval(var, glbals, lcals)))
+	raise NameError("Todo", expr)
+	todo.append((expr, glbals, lcals))
+	return
+
 			
 #
 #	parseBoolArray(mask):

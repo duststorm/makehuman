@@ -22,12 +22,12 @@ Pose HumanRig
   ik_solver 'LEGACY' ;
 end Pose
 
-AnimationData HumanRig
+AnimationData HumanRig True
    *** rig-drivers
-  action_blending 'REPLACE' ;
+  action_blend_type 'REPLACE' ;
   action_extrapolation 'HOLD' ;
   action_influence 1 ;
-  nla_enabled True ;
+  use_nla True ;
 end AnimationData
 
 

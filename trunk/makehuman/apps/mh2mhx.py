@@ -26,7 +26,7 @@ import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 14
+MINOR_VERSION = 15
 splitLeftRight = True
 
 #
@@ -291,7 +291,7 @@ def writeShapeKeys(fp, name, proxy):
 	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
 	copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxy)	
 	copyProxy("data/templates/shapekeys-body25.mhx", fp, proxy)
-	fp.write("  AnimationData toggle&(T_Face)\n")	
+	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
 	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceDrivers)
 	fp.write("  end AnimationData\n")
 	fp.write("end ShapeKeys\n")

@@ -217,13 +217,7 @@ end Mesh
 Object MHFootCtrl_L MESH MHFootCtrl_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -281,13 +275,7 @@ end Mesh
 Object MHWristCtrl_L MESH MHWristCtrl_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -348,13 +336,7 @@ end Mesh
 Object MHWristCtrl_R MESH MHWristCtrl_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -586,13 +568,7 @@ end Mesh
 Object MHFootCtrl_R MESH MHFootCtrl_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -655,13 +631,7 @@ end Mesh
 Object MHHead MESH MHHead
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -697,13 +667,7 @@ end Mesh
 Object GoboCircle MESH GoboCircle
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -745,13 +709,7 @@ end Mesh
 Object GoboFootCtrl_L MESH GoboFootCtrl_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -785,13 +743,7 @@ end Mesh
 Object GoboHandCtrl_L MESH GoboHandCtrl_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -828,13 +780,7 @@ end Mesh
 Object GoboHandCtrl_R MESH GoboHandCtrl_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -878,13 +824,7 @@ end Mesh
 Object GoboFootCtrl_R MESH GoboFootCtrl_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -980,13 +920,7 @@ end Mesh
 Object GoboHead MESH GoboHead
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1341,13 +1275,7 @@ end Mesh
 Object GoboJaw MESH GoboJaw
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1384,13 +1312,7 @@ end Mesh
 Object GoboNeck MESH GoboNeck
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1427,13 +1349,7 @@ end Mesh
 Object GoboRotate_L MESH GoboRotate_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1470,13 +1386,7 @@ end Mesh
 Object GoboRotate_R MESH GoboRotate_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1518,13 +1428,7 @@ end Mesh
 Object GoboShldr_L MESH GoboShldr_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1566,13 +1470,7 @@ end Mesh
 Object GoboShldr_R MESH GoboShldr_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1681,13 +1579,7 @@ end Mesh
 Object GoboRoot MESH GoboRoot
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage False ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1729,13 +1621,7 @@ end Mesh
 Object GoboTipToe_L MESH GoboTipToe_L
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1778,13 +1664,7 @@ end Mesh
 Object GoboTipToe_R MESH GoboTipToe_R
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1820,13 +1700,7 @@ end Mesh
 Object MHJaw MESH MHJaw
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1863,13 +1737,7 @@ end Mesh
 Object MHNeck MESH MHNeck
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage True ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1924,13 +1792,7 @@ end Mesh
 Object MHMaster MESH MHMaster
   layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
     Modifier Subsurf SUBSURF
-      editmode True ;
-      expanded True ;
       levels 2 ;
-      on_cage False ;
-      optimal_display False ;
-      realtime True ;
-      render True ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
       subsurf_uv True ;
@@ -1951,18 +1813,12 @@ Armature HumanRig HumanRig   Normal
   deform_quaternion True ;
   deform_vertexgroups True ;
   delay_deform False ;
-  draw_axes False ;
-  draw_custom_bone_shapes True ;
-  draw_group_colors True ;
-  draw_names False ;
+  show_axes False ;
+  show_bone_custom_shapes True ;
+  show_group_colors True ;
+  show_names False ;
   drawtype 'STICK' ;
-  ghost_frame_end 0 ;
-  ghost_only_selected False ;
-  ghost_size 1 ;
-  ghost_frame_start 0 ;
-  ghost_step 0 ;
-  ghost_type 'CURRENT_FRAME' ;
-  layer Array 1 1 1 1 1 1 1 1  1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layers Array 1 1 1 1 1 1 1 1  1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   layer_protection Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
   x_axis_mirror False ;
@@ -1971,7 +1827,7 @@ end Armature
 Object HumanRig ARMATURE HumanRig
   layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
-  x_ray True ;
+  show_x_ray True ;
 end Object
 
 
