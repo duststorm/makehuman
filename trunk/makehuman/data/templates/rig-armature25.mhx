@@ -220,7 +220,7 @@ Object MHFootCtrl_L MESH MHFootCtrl_L
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -278,7 +278,7 @@ Object MHWristCtrl_L MESH MHWristCtrl_L
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -339,7 +339,7 @@ Object MHWristCtrl_R MESH MHWristCtrl_R
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -571,7 +571,7 @@ Object MHFootCtrl_R MESH MHFootCtrl_R
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -634,7 +634,7 @@ Object MHHead MESH MHHead
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -670,7 +670,7 @@ Object GoboCircle MESH GoboCircle
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -712,7 +712,7 @@ Object GoboFootCtrl_L MESH GoboFootCtrl_L
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -746,7 +746,7 @@ Object GoboHandCtrl_L MESH GoboHandCtrl_L
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -783,7 +783,7 @@ Object GoboHandCtrl_R MESH GoboHandCtrl_R
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -827,7 +827,7 @@ Object GoboFootCtrl_R MESH GoboFootCtrl_R
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -923,7 +923,7 @@ Object GoboHead MESH GoboHead
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1278,7 +1278,7 @@ Object GoboJaw MESH GoboJaw
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1315,7 +1315,7 @@ Object GoboNeck MESH GoboNeck
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1352,7 +1352,7 @@ Object GoboRotate_L MESH GoboRotate_L
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1389,7 +1389,7 @@ Object GoboRotate_R MESH GoboRotate_R
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1431,7 +1431,7 @@ Object GoboShldr_L MESH GoboShldr_L
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1473,7 +1473,7 @@ Object GoboShldr_R MESH GoboShldr_R
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1582,7 +1582,7 @@ Object GoboRoot MESH GoboRoot
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1624,7 +1624,7 @@ Object GoboTipToe_L MESH GoboTipToe_L
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1667,7 +1667,7 @@ Object GoboTipToe_R MESH GoboTipToe_R
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1703,7 +1703,7 @@ Object MHJaw MESH MHJaw
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1740,7 +1740,7 @@ Object MHNeck MESH MHNeck
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object
@@ -1795,7 +1795,7 @@ Object MHMaster MESH MHMaster
       levels 2 ;
       render_levels 2 ;
       subdivision_type 'CATMULL_CLARK' ;
-      subsurf_uv True ;
+      use_subsurf_uv True ;
     end Modifier
   parent Refer Object CustomShapes ;
 end Object 
@@ -1808,20 +1808,20 @@ Armature HumanRig HumanRig   Normal
 
   *** rig-bones
 
-  auto_ik False ;
-  deform_envelope True ;
-  deform_quaternion True ;
-  deform_vertexgroups True ;
-  delay_deform False ;
+  use_auto_ik False ;
+  use_deform_envelopes True ;
+  # use_deform_quaternion True ;
+  use_deform_vertex_groups True ;
+  use_deform_delay False ;
   show_axes False ;
   show_bone_custom_shapes True ;
   show_group_colors True ;
   show_names False ;
-  drawtype 'STICK' ;
+  draw_type 'STICK' ;
   layers Array 1 1 1 1 1 1 1 1  1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
-  layer_protection Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layers_protected Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
-  x_axis_mirror False ;
+  use_mirror_x False ;
 end Armature
 
 Object HumanRig ARMATURE HumanRig

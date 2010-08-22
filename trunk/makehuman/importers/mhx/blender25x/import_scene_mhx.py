@@ -797,7 +797,7 @@ def parseMTex(mat, args, tokens):
 	texco = args[2]
 	mapto = args[3]
 
-	mat.add_texture(texture = loadedData['Texture'][texname], texture_coordinates = texco, map_to = mapto)
+	mat.add_texture(texture = loadedData['Texture'][texname], texture_coords = texco, map_to = mapto)
 	mtex = mat.texture_slots[index]
 	#mat.use_textures[index] = Bool(use)
 
@@ -1684,9 +1684,9 @@ def parseConstraint(constraints, args, tokens):
 		elif key == 'use':
 			parseArray(cns, ["use_x", "use_y", "use_z"], val)
 		elif key == 'pos_lock':
-			parseArray(cns, ["pos_lock_x", "pos_lock_y", "pos_lock_z"], val)
+			parseArray(cns, ["lock_location_x", "lock_location_y", "lock_location_z"], val)
 		elif key == 'rot_lock':
-			parseArray(cns, ["rot_lock_x", "rot_lock_y", "rot_lock_z"], val)
+			parseArray(cns, ["lock_rotation_x", "lock_rotation_y", "lock_rotation_z"], val)
 		else:
 			defaultKey(key, val,  sub, "cns", [], globals(), locals())
 

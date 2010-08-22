@@ -1,20 +1,20 @@
 NoScale False ;
 
 *** ProxyRigStart
-  auto_ik False ;
-  deform_envelope True ;
-  deform_quaternion True ;
-  deform_vertexgroups True ;
-  delay_deform False ;
+  use_auto_ik False ;
+  use_deform_envelopes False ;
+  # use_deform_quaternion True ;
+  use_deform_vertex_groups True ;
+  use_deform_delay False ;
   show_axes False ;
   show_bone_custom_shapes True ;
   show_group_colors True ;
   show_names False ;
-  drawtype 'STICK' ;
+  draw_type 'STICK' ;
   layers Array 1 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
-  layer_protection Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layers_protected Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
-  x_axis_mirror False ;
+  use_mirror_x False ;
 end Armature
 
 *** ProxyRigObject
@@ -58,7 +58,7 @@ end Mesh
   color Array 1.0 1.0 1.0 1.0  ;
   show_name False ;
   show_wire False ;
-  max_draw_type 'TEXTURED' ;
+  # max_draw_type 'TEXTURED' ;
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
   select True ;

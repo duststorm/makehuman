@@ -465,10 +465,10 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 		fp.write("  rotation_mode 'XYZ' ;\n")
 
 	fp.write(
-"    ik_lin_control %s ; \n" % ikLin +
-"    ik_lin_weight 0 ; \n"+
-"    ik_rot_control %s ; \n" % ikRot +
-"    ik_rot_weight 0 ; \n")
+"    use_ik_linear_control %s ; \n" % ikLin +
+"    ik_linear_weight 0 ; \n"+
+"    use_ik_rotation_control %s ; \n" % ikRot +
+"    ik_rotation_weight 0 ; \n")
 	
 	if flags & P_STRETCH:
 		fp.write("    ik_stretch 0.1 ; \n")
@@ -520,8 +520,8 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 "      rot_lock Array 1 1 1  ;\n" +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
-"      axis_reference 'BONE' ;\n" +
-"      chain_length %d ;\n" % chainlen +
+"      reference_axis 'BONE' ;\n" +
+"      chain_count %d ;\n" % chainlen +
 "      ik_type 'COPY_POSE' ;\n" +
 "      influence %s ;\n" % inf +
 "      iterations 500 ;\n" +
@@ -537,10 +537,10 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 "      pole_target Refer Object HumanRig ;\n")
 
 		fp.write(
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
-"      use_position %s ;\n" % useLoc +
+"      use_location %s ;\n" % useLoc +
 "      use_rotation %s ;\n" % useRot +
 "      use_stretch %s ;\n" % useStretch +
 "      use_tail True ;\n" +
@@ -590,7 +590,7 @@ def addActionConstraint(fp, switch, flags, data):
 	
 	fp.write(
 "      owner_space '%s' ; \n" % ownsp +
-"      proxy_local False ; \n"+
+"      is_proxy_local False ; \n"+
 "      subtarget '%s' ; \n" % subtar +
 "      target_space '%s' ; \n" % targsp +
 "      transform_channel '%s' ;\n" % channel +
@@ -617,7 +617,7 @@ def addCopyRotConstraint(fp, switch, flags, data):
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ; \n" % inf +
 "      owner_space '%s' ; \n" % ownsp+
-"      proxy_local False ; \n"+
+"      is_proxy_local False ; \n"+
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ; \n" % targsp+
 "      use_offset %s ; \n" % useOffs +
@@ -653,7 +653,7 @@ def addCopyLocConstraint(fp, switch, flags, data):
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ; \n" % inf +
 "      owner_space '%s' ; \n" % ownsp +
-"      proxy_local False ; \n"+
+"      is_proxy_local False ; \n"+
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ; \n" % targsp+
 "      use_offset %s ; \n" % useOffs +
@@ -684,7 +684,7 @@ def addCopyScaleConstraint(fp, switch, flags, data):
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
 "      use_offset %s ;\n" % useOffs +
@@ -705,7 +705,7 @@ def addCopyTransConstraint(fp, switch, flags, data):
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
 "    end Constraint\n")
@@ -726,15 +726,15 @@ def addLimitRotConstraint(fp, switch, flags, data):
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence 1 ; \n"+
-"      limit_transform %s ; \n" % ltra+
-"      maximum_x %.6g ;\n" % xmax +
-"      maximum_y %.6g ;\n" % ymax +
-"      maximum_z %.6g ;\n" % zmax +
-"      minimum_x %.6g ;\n" % xmin +
-"      minimum_y %.6g ;\n" % ymin +
-"      minimum_z %.6g ;\n" % zmin +
+"      use_transform_limit %s ; \n" % ltra+
+"      max_x %.6g ;\n" % xmax +
+"      max_y %.6g ;\n" % ymax +
+"      max_z %.6g ;\n" % zmax +
+"      min_x %.6g ;\n" % xmin +
+"      min_y %.6g ;\n" % ymin +
+"      min_z %.6g ;\n" % zmin +
 "      owner_space '%s' ; \n" % ownsp+
-"      proxy_local False ; \n"+
+"      is_proxy_local False ; \n"+
 "      target_space '%s' ; \n" % targsp+
 "      use_limit_x %s ; \n" % usex +
 "      use_limit_y %s ; \n" % usey +
@@ -769,22 +769,22 @@ def addLimitLocConstraint(fp, switch, flags, data):
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
-"      limit_transform True ;\n" +
-"      maximum_x %s*theScale ;\n" % xmax +
-"      maximum_y %s*theScale ;\n" % ymax +
-"      maximum_z %s*theScale ;\n" % zmax +
-"      minimum_x %s*theScale ;\n" % xmin +
-"      minimum_y %s*theScale ;\n" % ymin +
-"      minimum_z %s*theScale ;\n" % zmin +
+"      use_transform_limit True ;\n" +
+"      max_x %s*theScale ;\n" % xmax +
+"      max_y %s*theScale ;\n" % ymax +
+"      max_z %s*theScale ;\n" % zmax +
+"      min_x %s*theScale ;\n" % xmin +
+"      min_y %s*theScale ;\n" % ymin +
+"      min_z %s*theScale ;\n" % zmin +
 "      owner_space '%s' ;\n" % ownsp +
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      target_space '%s' ;\n" % targsp +
-"      use_maximum_x %s ;\n" % usemaxx +
-"      use_maximum_y %s ;\n" % usemaxy +
-"      use_maximum_z %s ;\n" % usemaxz +
-"      use_minimum_x %s ;\n" % useminx +
-"      use_minimum_y %s ;\n" % useminy +
-"      use_minimum_z %s ;\n" % useminz +
+"      use_max_x %s ;\n" % usemaxx +
+"      use_max_y %s ;\n" % usemaxy +
+"      use_max_z %s ;\n" % usemaxz +
+"      use_min_x %s ;\n" % useminx +
+"      use_min_y %s ;\n" % useminy +
+"      use_min_z %s ;\n" % useminz +
 "    end Constraint\n")
 
 	else:
@@ -816,22 +816,22 @@ def addLimitScaleConstraint(fp, switch, flags, data):
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
-"      limit_transform True ;\n" +
-"      maximum_x %.6g ;\n" % xmax +
-"      maximum_y %.6g ;\n" % ymax +
-"      maximum_z %.6g ;\n" % zmax +
-"      minimum_x %.6g ;\n" % xmin +
-"      minimum_y %.6g ;\n" % ymin +
-"      minimum_z %.6g ;\n" % zmin +
+"      use_transform_limit True ;\n" +
+"      max_x %.6g ;\n" % xmax +
+"      max_y %.6g ;\n" % ymax +
+"      max_z %.6g ;\n" % zmax +
+"      min_x %.6g ;\n" % xmin +
+"      min_y %.6g ;\n" % ymin +
+"      min_z %.6g ;\n" % zmin +
 "      owner_space '%s' ;\n" % ownsp +
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      target_space '%s' ;\n" % targsp +
-"      use_maximum_x %s ;\n" % usex +
-"      use_maximum_y %s ;\n" % usey +
-"      use_maximum_z %s ;\n" % usez +
-"      use_minimum_x %s ;\n" % usex +
-"      use_minimum_y %s ;\n" % usey +
-"      use_minimum_z %s ;\n" % usez +
+"      use_max_x %s ;\n" % usex +
+"      use_max_y %s ;\n" % usey +
+"      use_max_z %s ;\n" % usez +
+"      use_min_x %s ;\n" % usex +
+"      use_min_y %s ;\n" % usey +
+"      use_min_z %s ;\n" % usez +
 "    end Constraint\n")
 	return
 
@@ -849,7 +849,7 @@ def addDampedTrackConstraint(fp, switch, flags, data):
 "      show_expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
 "      owner_space '%s' ;\n" % ownsp+
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
 "      track '%s' ;\n" % track + 
@@ -873,7 +873,7 @@ def addStretchToConstraint(fp, switch, flags, data):
 "      influence 1 ;\n" +
 "      keep_axis '%s' ;\n" % axis +
 "      owner_space '%s' ;\n" % ownsp+
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
 "      volume 'NO_VOLUME' ;\n" +
@@ -904,7 +904,7 @@ def addLimitDistConstraint(fp, switch, flags, data):
 "      influence %s ;\n" % inf +
 "      limit_mode 'LIMITDIST_INSIDE' ;\n" +
 "      owner_space '%s' ;\n" % ownsp +
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
 "    end Constraint\n")
@@ -936,7 +936,7 @@ def addChildOfConstraint(fp, switch, flags, data):
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
-"      proxy_local False ;\n" +
+"      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
 "      use_location_x %s ;\n" % locx +

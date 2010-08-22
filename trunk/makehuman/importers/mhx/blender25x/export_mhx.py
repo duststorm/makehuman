@@ -16,15 +16,15 @@
 Abstract
 --------
 MHX (MakeHuman eXchange format) exporter for Blender 2.5.
-Version 0.14
+Version 0.15
 
 """
 
 bl_addon_info = {
 	'name': 'Export MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.8',
-	'blender': (2, 5, 3),
+	'version': '0.15',
+	'blender': (2, 53, 1),
 	'location': 'File > Export',
 	'description': 'Export files in the MakeHuman eXchange format (.mhx)',
 	'url': 'http://www.makehuman.org',
@@ -37,7 +37,7 @@ Access from the File > Export menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 14
+MINOR_VERSION = 15
 
 
 import bpy
@@ -883,27 +883,27 @@ def exportMaterial(mat, fp):
 	fp.write("end Material\n\n")
 
 MapToTypes = {
-	'map_alpha' : 'ALPHA',
-	'map_ambient' : 'AMBIENT',
-	'map_colordiff' : 'COLOR',
-	'map_coloremission' : 'COLOR_EMISSION',
-	'map_colorreflection' : 'COLOR_REFLECTION',
-	'map_colorspec' : 'COLOR_SPEC',
-	'map_colortransmission' : 'COLOR_TRANSMISSION',
-	'map_density' : 'DENSITY',
-	'map_diffuse' : 'DIFFUSE',
-	'map_displacement' : 'DISPLACEMENT',
-	'map_emission' : 'EMISSION',
-	'map_emit' : 'EMIT', 
-	'map_hardness' : 'HARDNESS',
-	'map_mirror' : 'MIRROR',
-	'map_normal' : 'NORMAL',
-	'map_raymir' : 'RAYMIR',
-	'map_reflection' : 'REFLECTION',
-	'map_scattering' : 'SCATTERING',
-	'map_specular' : 'SPECULAR_COLOR', 
-	'map_translucency' : 'TRANSLUCENCY',
-	'map_warp' : 'WARP',
+	'use_map_alpha' : 'ALPHA',
+	'use_map_ambient' : 'AMBIENT',
+	'use_map_color_diffuse' : 'COLOR',
+	'use_map_color_emission' : 'COLOR_EMISSION',
+	'use_map_color_reflection' : 'COLOR_REFLECTION',
+	'use_map_color_spec' : 'COLOR_SPEC',
+	'use_map_color_transmission' : 'COLOR_TRANSMISSION',
+	'use_map_density' : 'DENSITY',
+	'use_map_diffuse' : 'DIFFUSE',
+	'use_map_displacement' : 'DISPLACEMENT',
+	'use_map_emission' : 'EMISSION',
+	'use_map_emit' : 'EMIT', 
+	'use_map_hardness' : 'HARDNESS',
+	'use_map_mirror' : 'MIRROR',
+	'use_map_normal' : 'NORMAL',
+	'use_map_raymir' : 'RAYMIR',
+	'use_map_reflect' : 'REFLECTION',
+	'use_map_scatter' : 'SCATTERING',
+	'use_map_specular' : 'SPECULAR_COLOR', 
+	'use_map_translucency' : 'TRANSLUCENCY',
+	'use_map_warp' : 'WARP',
 }
 
 def exportMTex(index, mtex, use, fp):
@@ -918,10 +918,10 @@ def exportMTex(index, mtex, use, fp):
 			prio.append(ext)	
 			print("Mapto", ext, mapto)
 			
-	fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coordinates, mapto))
+	fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coords, mapto))
 	writePrio(mtex, ['texture']+prio, "    ", fp)
 	print("MTEX", texname,  list(MapToTypes.keys()) )
-	writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coordinates', 'offset'], "    ", fp)
+	writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coords', 'offset'], "    ", fp)
 	print("DONE MTEX", texname)
 	fp.write("  end MTex\n\n")
 	return
@@ -1178,14 +1178,14 @@ def exportMesh(ob, fp):
 
 	fp.write("Mesh %s %s \n" % (meName, obName))
 
-	if me.verts:
+	if me.vertices:
 		fp.write("  Verts\n")
 		if expMsk & M_MHX and obName == "Human":
 			fp.write("  *** Verts\n")
 		else:
-			for v in me.verts:
+			for v in me.vertices:
 				fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
-		v = me.verts[0]
+		v = me.vertices[0]
 		#writeDir(v, ['co', 'index', 'normal'], "      ", fp)
 		fp.write("  end Verts\n")
 
@@ -1196,22 +1196,22 @@ def exportMesh(ob, fp):
 		else:
 			for f in me.faces:
 				fp.write("    f ")
-				for v in f.verts:
+				for v in f.vertices:
 					fp.write("%d " % v)
 				fp.write(";\n")
 		if len(me.materials) <= 1:
 			f = me.faces[0]
-			fp.write("    ftall %d %d ;\n" % (f.material_index, f.smooth))
+			fp.write("    ftall %d %d ;\n" % (f.material_index, f.use_smooth))
 		else:
 			for f in me.faces:
-				fp.write("    ft %d %d ;\n" % (f.material_index, f.smooth))
+				fp.write("    ft %d %d ;\n" % (f.material_index, f.use_smooth))
 		fp.write("  end Faces\n")
 	elif me.edges:
 		fp.write("  Edges\n")
 		for e in me.edges:
-			fp.write("    e %d %d ;\n" % (e.verts[0], e.verts[1]))
+			fp.write("    e %d %d ;\n" % (e.vertices[0], e.vertices[1]))
 		e = me.edges[0]
-		writeDir(e, ['verts'], "      ", fp)
+		writeDir(e, ['vertices'], "      ", fp)
 		fp.write("  end Edges\n")
 
 	for uvtex in me.uv_textures:
@@ -1302,7 +1302,7 @@ def exportMesh(ob, fp):
 
 	#writePrio(me, ['vertex_colors'], "  ", fp)
 
-	exclude = ['edge_face_count', 'edge_face_count_dict', 'edge_keys', 'edges', 'faces', 'verts', 'texspace_loc', 
+	exclude = ['edge_face_count', 'edge_face_count_dict', 'edge_keys', 'edges', 'faces', 'vertices', 'texspace_loc', 
 		'texspace_size', 'active_uv_texture', 'active_vertex_color', 'uv_texture_clone', 'uv_texture_stencil',
 		'float_layers', 'int_layers', 'string_layers', 'shape_keys', 'uv_textures', 'vertex_colors', 'materials', 
 		'total_face_sel', 'total_edge_sel', 'total_vert_sel']
@@ -1358,7 +1358,7 @@ def exportVertexGroups(ob, me, typ, fp):
 
 		if doExport:
 			fp.write("  VertexGroup %s\n" % (vgName))
-			for v in me.verts:
+			for v in me.vertices:
 				for grp in v.groups:
 					if grp.group == index and grp.weight > 0.00005:
 						fp.write("    wv %d %.4g ;\n" % (v.index, grp.weight))
@@ -1440,10 +1440,11 @@ def exportShapeKeys(me, keyList, toggle, fp):
 			fp.write("  ShapeKey %s %s %s\n" % (skeyName, lr, toggle))
 			writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
 			for (n,pt) in enumerate(skey.data):
-				dv = pt.co - me.verts[n].co
+				dv = pt.co - me.vertices[n].co
 				if dv.length > Epsilon:
 					fp.write("    sv %d %.6g %.6g %.6g ;\n" %(n, dv[0], dv[1], dv[2]))
 			fp.write("  end ShapeKey\n")
+
 
 			print(skey)
 		createdLocal['ShapeKey'].append(skeyName)
@@ -1973,7 +1974,7 @@ def mhxClose(fp):
 #
 #	User interface
 #
-"""
+
 DEBUG= False
 from bpy.props import *
 
@@ -1987,7 +1988,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	mask = M_Geo+M_VGroup
+	mask = M_Geo+M_Mat+M_MHX
 
 	mhx = BoolProperty(name="MHX", description="Include materials", default=mask&M_MHX)
 	xall = BoolProperty(name="Everything", description="Include everything", default=mask&M_All)
@@ -2032,6 +2033,10 @@ def unregister():
 	bpy.types.INFO_MT_file_export.remove(menu_func)
 
 if __name__ == "__main__":
+	try:
+		unregister()
+	except:
+		pass
 	register()
 
 #
@@ -2046,5 +2051,5 @@ writeMhxFile('/home/thomas/myblends/test.mhx', M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim
 #writeMhxFile('/home/thomas/myblends/sintel/simple2.mhx', M_Amt+M_Anim)
 #writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
 #writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
-
+"""
 
