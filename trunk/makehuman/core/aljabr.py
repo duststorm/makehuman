@@ -639,9 +639,10 @@ def vectorsToRotMatrix(v1,v2):
 
 def convexQuadrilateralArea(v1,v2,v3,v4):
     """
-        This function returns the area of a Quadrilateral. See U{http://mathworld.wolfram.com/Quadrilateral.html}.
-    @rtype:       float 
-    @return:      The area of a Quadrilateral determined by v1 to v4 (clockwise or counterclockwise order)
+    This function returns the area of a Quadrilateral. See U{http://mathworld.wolfram.com/Quadrilateral.html}.
+    
+    @rtype:    float 
+    @return:   The area of a Quadrilateral determined by v1 to v4 (clockwise or counterclockwise order)
     @type  v1: float list
     @param v1: first vertex of a parallelogram - in the format [x,y,z]
     @type  v2: float list
