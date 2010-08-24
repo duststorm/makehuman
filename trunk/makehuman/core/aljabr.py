@@ -225,12 +225,10 @@ def vunit(vect):
     essentially the same function as vnorm(vect) except that vnorm handles
     potential zero length vectors.
 
-    Parameters
-    ----------
-
-    vect:
-        *float list*. The vector - in the format[x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
+    @rtype:       float list
+    @return:      normalized vector of M{vect1}
+    @type     s:  float list
+    @param    s:  the vector to be normalized
     """
 
     length = sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
@@ -667,9 +665,9 @@ def zeros(*shape):
     This function returns an multidimensional zero-matrix (row-major, list of lists) or zero-vector (list of doubles). For instance: If you want to have a zero-vector of 3-dimensions you type 
     zeros(3). If you want a 2x3 zero-matrix, we write zeros(2,3).
 
-    @rtype:    list of list of floats
+    @rtype:    list of float lists
     @return:   a matrix represented as list of lists. Each entry of the list represents a row of the matrix (if this is a nxm matrix). The representation is a row-major order.
-    @type  shape:  any sequence of integer (e.g. 2,3 or 2) 
+    @type  shape:  sequence of integers (e.g. 2,3 or 2) 
     @param shape:  this represent the dimensions (in integer tuples) of the output matrix (e.g. for 2x3 matrix shape is 2,2)
     """
     if len(shape) == 0: 
@@ -682,7 +680,7 @@ def unitMatrix(n):
     """
     This function returns an nxn unit matrix of floats.
     
-    @rtype:    list of list of floats
+    @rtype:    list of float lists
     @return:   an nxn unit-matrix, row-major order.
     @type  n:  integer
     @param n:  the size of the row of the unit-matrix
