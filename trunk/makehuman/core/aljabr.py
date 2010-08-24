@@ -186,7 +186,7 @@ def centroid(vertsList):
 
 def vadd(vect1, vect2):
     """
-    This function returns the sum of two vectors as a vector.
+    This function returns the sum of two vectors as a vector. 
 
     @rtype:       float list
     @return:      The resulting vector M{vect1+vect2}
@@ -693,4 +693,39 @@ def unitMatrix(n):
             else: row.append(0.0)
         M.append(row)
     return M
+
+def adjoint(M):
+    """
+    This function returns the adjoint of a matrix
     
+    @rtype:    list of lists (of arbitrary type, eg. float, int)
+    @return:   a matrix that is the adjoint of the input matrix
+    @type  M:  list of lists (of arbitrary type)
+    @param M:  the input matrix that we want to take the adjoint of
+    """
+    returnValue =[]
+    for i in xrange(len(M[0])): #len of row
+        row=[] #row of M' = column of M
+        for j in xrange(len(M)): #len of column
+            row.append(M[j][i])
+        returnValue.append(row)
+    return returnValue
+    
+def vmulv(u,v):
+    """
+    This function returns the matrix B{uv^T} (where T here means adjoint). 
+    
+    @rtype:    list of list of floats
+    @return:   the matrix B{uv^T}
+    @type  u:  list of floats
+    @param u:  the vector multiplied from left
+    @type  v:  list of floats
+    @param v:  the vector multiplied whose adjoint is multiplied from right
+    """
+    M=[]
+    for i in xrange(len(u)):
+        row=[]
+        for j in xrange(len(v)):
+            row.append(u[i]*v[j])
+        M.append(row)
+    return M
