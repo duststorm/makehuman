@@ -661,3 +661,38 @@ def convexQuadrilateralArea(v1,v2,v3,v4):
     pq = vdot(vsub(v3,v1),vsub(v4,v2))
     return 0.5*sqrt(p*p*q*q - pq*pq)
     #return sqrt(4*p*p*q*q - pow((b*b+d*d-a*a-c*c),2))/4
+	
+def zeros(*shape):
+    """
+    This function returns an multidimensional zero-matrix (row-major, list of lists) or zero-vector (list of doubles). For instance: If you want to have a zero-vector of 3-dimensions you type 
+    zeros(3). If you want a 2x3 zero-matrix, we write zeros(2,3).
+
+    @rtype:    list of list of floats
+    @return:   a matrix represented as list of lists. Each entry of the list represents a row of the matrix (if this is a nxm matrix). The representation is a row-major order.
+    @type  shape:  any sequence of integer (e.g. 2,3 or 2) 
+    @param shape:  this represent the dimensions (in integer tuples) of the output matrix (e.g. for 2x3 matrix shape is 2,2)
+    """
+    if len(shape) == 0: 
+        return 0.0
+    car = shape[0] 
+    cdr = shape[1:] 
+    return [zeros(*cdr) for i in xrange(car)] 
+ 
+def unitMatrix(n):
+    """
+    This function returns an nxn unit matrix of floats.
+    
+    @rtype:    list of list of floats
+    @return:   an nxn unit-matrix, row-major order.
+    @type  n:  integer
+    @param n:  the size of the row of the unit-matrix
+    """
+    M=[]
+    for i in xrange(n):
+        row=[]
+        for j in xrange(n):
+            if (i==j): row.append(1.0)
+            else: row.append(0.0)
+        M.append(row)
+    return M
+    
