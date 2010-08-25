@@ -20,14 +20,16 @@ Version 0.15
 """
 
 bl_addon_info = {
-	'name': 'Import MakeHuman (.mhx)',
+	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
 	'version': '0.15',
 	'blender': (2, 53, 1),
-	'location': 'File > Import',
-	'description': 'Import files in the MakeHuman eXchange format (.mhx)',
-	'url': 'http://www.makehuman.org',
-	'category': 'Import/Export'}
+	"location": "File > Import",
+	"description": "Import files in the MakeHuman eXchange format (.mhx)",
+	"warning": "",
+	"wiki_url": "http://wiki.blender.org/index.php/Extensions:2.5/Py/Scripts/File_I-O/Make_Human",
+	"tracker_url": "https://projects.blender.org/tracker/index.php?func=detail&aid=21872&group_id=153&atid=469",
+	"category": "Import/Export"}
 
 """
 Place this file in the .blender/scripts/addons dir
@@ -2502,17 +2504,13 @@ def unregisterPanels():
 	bpy.types.unregister(MakeHumanFingerPanel)
 	'''
 
+def menu_func(self, context):
+    self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+
 def register():
-	# registerPanels()
-	bpy.types.register(IMPORT_OT_makehuman_mhx)
-	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 	bpy.types.INFO_MT_file_import.append(menu_func)
-	return
- 
+
 def unregister():
-	# unregisterPanels()
-	bpy.types.unregister(IMPORT_OT_makehuman_mhx)
-	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
 	bpy.types.INFO_MT_file_import.remove(menu_func)
 
 if __name__ == "__main__":
