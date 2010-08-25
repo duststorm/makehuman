@@ -98,7 +98,7 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Stretch
+toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Bend
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -1298,10 +1298,9 @@ def parseFaces2(tokens, me):
 #
 
 def parseUvTexture(args, tokens, me):
-	me.add_uv_texture()
-	uvtex = me.uv_textures[-1]
 	name = args[0]
-	uvtex.name = name
+	me.uv_textures.new(name = name)
+	uvtex = me.uv_textures[-1]
 	loadedData['MeshTextureFaceLayer'][name] = uvtex
 	for (key, val, sub) in tokens:
 		if key == 'Data':
@@ -2527,12 +2526,13 @@ if __name__ == "__main__":
 #	Testing
 #
 """
-toggle = T_Replace + T_Mesh + T_Armature + T_MHX
 #readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-25.mhx", 'Classic')
-readMhxFile("/home/thomas/myblends/test.mhx", ('Gobo', 'IK'), 1.0)
-#readMhxFile("/home/thomas/makehuman/exports/foo.mhx", ('Reverse Foot', 'IK'), 1.0)
+readMhxFile("/home/thomas/makehuman/exports/foo-25.mhx", ('Reverse Foot', 'IK'), 1.0)
 
+toggle = T_Replace + T_Mesh + T_Armature + T_MHX
+#readMhxFile("/home/thomas/myblends/test.mhx", ('Gobo', 'IK'), 1.0)
 """
+
 
 
 

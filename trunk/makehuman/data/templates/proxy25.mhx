@@ -1,14 +1,9 @@
 NoScale False ;
 
 *** ProxyRigStart
-  use_auto_ik False ;
   use_deform_envelopes False ;
-  # use_deform_quaternion True ;
   use_deform_vertex_groups True ;
-  use_deform_delay False ;
-  show_axes False ;
   show_bone_custom_shapes True ;
-  show_group_colors True ;
   show_names False ;
   draw_type 'STICK' ;
   layers Array 1 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
@@ -50,21 +45,11 @@ end Mesh
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
-  active_material Refer Material SSS_skinshader ;
-  active_material_index 0 ;
-  active_particle_system_index 0 ;
-  active_shape_key_index 0 ;
-  active_vertex_group_index 8 ;
   color Array 1.0 1.0 1.0 1.0  ;
-  show_name False ;
-  show_wire False ;
-  # max_draw_type 'TEXTURED' ;
+  show_name True ;
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
   select True ;
-  track_axis 'POS_Y' ;
-  up_axis 'Z' ;
-  show_x_ray False ;
 end Object
 
 

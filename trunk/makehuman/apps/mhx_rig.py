@@ -1221,9 +1221,7 @@ def reapplyArmature(fp, name):
 "  Object %s  \n" % name +
 "    Modifier Armature ARMATURE \n" +
 "      show_expanded True ; \n" +
-"      multi_modifier False ; \n" +
 "      object Refer Object HumanRig ; \n" +
-"      quaternion False ; \n" +
 "      use_bone_envelopes False ; \n" +
 "      use_vertex_groups True ; \n" +
 "    end Modifier \n" +

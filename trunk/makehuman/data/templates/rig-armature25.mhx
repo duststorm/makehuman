@@ -1808,11 +1808,8 @@ Armature HumanRig HumanRig   Normal
 
   *** rig-bones
 
-  use_auto_ik False ;
-  use_deform_envelopes True ;
-  # use_deform_quaternion True ;
+  use_deform_envelopes False ;
   use_deform_vertex_groups True ;
-  use_deform_delay False ;
   show_axes False ;
   show_bone_custom_shapes True ;
   show_group_colors True ;

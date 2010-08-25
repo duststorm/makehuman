@@ -208,7 +208,8 @@ ArmPoses = [
 
 	('deformLimb', 'UpArm_L', 'UpArmIK_L', (1,1,1), 'UpArmFK_L', (1,1,1), 0, P_STRETCH),
 	('poseBone', True, 'UpArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IK', 'LoArm_L', 1, None, (True, False,False), 1.0])]),
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['CopyRotY', 'UpArm_L', 1.0, (1,1,1), (0,0,0), False])]),
+	#	[('IK', 0, ['IK', 'LoArm_L', 1, None, (True, False,False), 1.0])]),
 	('deformLimb', 'LoArm_L', 'LoArmIK_L', (1,1,1), 'LoArmFK_L', (1,1,1), 0, P_STRETCH),
 	('poseBone', True, 'LoArmTwist_L', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'Hand_L', 1, None, (True, False,True), 1.0])]),
@@ -216,7 +217,8 @@ ArmPoses = [
 
 	('deformLimb', 'UpArm_R', 'UpArmIK_R', (1,1,1), 'UpArmFK_R', (1,1,1), 0, P_STRETCH),
 	('poseBone', True, 'UpArmTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IK', 'LoArm_R', 1, None, (True, False,False), 1.0])]),
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['CopyRotY', 'UpArm_R', 1.0, (1,1,1), (0,0,0), False])]),
+	#	[('IK', 0, ['IK', 'LoArm_R', 1, None, (True, False,False), 1.0])]),
 	('deformLimb', 'LoArm_R', 'LoArmIK_R', (1,1,1), 'LoArmFK_R', (1,1,1), 0, P_STRETCH),
 	('poseBone', True, 'LoArmTwist_R', None, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'Hand_R', 1, None, (True, False,True), 1.0])]),

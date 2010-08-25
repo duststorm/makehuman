@@ -14835,16 +14835,6 @@ Mesh Human Human
   Material Hair ;
   Material Skin_no_SSS ;
     *** VertexGroup
-  active_uv_texture_index 0 ;
-  show_all_edges True ;
-  use_auto_texspace True ;
-  use_auto_smooth False ;
-  auto_smooth_angle 30 ;
-  show_double_sided True ;
-  show_edges True ;
-  show_faces True ;
-  uv_texture_clone_index 0 ;
-  uv_texture_stencil_index 0 ;
 end Mesh
 
 Object Human MESH Human
@@ -14854,16 +14844,10 @@ Object Human MESH Human
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
-  active_material Refer Material SSS_skinshader ;
-  active_material_index 0 ;
-  active_particle_system_index 0 ;
-  active_shape_key_index 0 ;
-  active_vertex_group_index 7 ;
   color Array 1.0 1.0 1.0 1.0  ;
-  # max_draw_type 'TEXTURED' ;
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
-  show_x_ray False ;
+  select True ;
 end Object
 
 

@@ -109,7 +109,7 @@ def writeHairFile(fileName):
 	for n,par in enumerate(psys.particles):
 		v = par.location / theScale
 		fp.write("v %.6f %.6f %.6f\n" % (v[0], v[1], v[2]))
-		for h in par.hair:
+		for h in par.is_hair:
 			v = h.location / theScale
 			fp.write("v %.6f %.6f %.6f\n" % (v[0], v[1], v[2]))
 		fp.write("g Hair.%03d\n" % n)
@@ -226,10 +226,10 @@ def printGuideAndHair(fp, guide, par, nmax):
 		if n == 0:
 			nv = par.location
 		else:
-			nv = par.hair[n-1].location
+			nv = par.is_hair[n-1].location
 		fp.write("(%.6f %.6f %.6f)\t=> (%.6f %.6f %.6f)" % (v[0], v[1], v[2], nv[0], nv[1], nv[2]))
 		if n > 0:
-			h = par.hair[n-1]
+			h = par.is_hair[n-1]
 			fp.write(" %f %f\n" % (h.time, h.weight))
 		else:
 			fp.write("\n")
@@ -246,27 +246,24 @@ def makeHair(name, hstep, guides):
 	bpy.ops.object.particle_system_add()
 	psys = ob.active_particle_system
 	psys.name = name
-	#psys.global_hair = True	
-	print(psys.global_hair)
-	return
 
 	settings = psys.settings
 	settings.type = 'HAIR'
 	settings.name = 'HairSettings'
-	settings.amount = len(guides)
+	settings.count = len(guides)
 	settings.hair_step = hstep-1
 	# [‘VERT’, ‘FACE’, ‘VOLUME’, ‘PARTICLE’]
 	settings.emit_from = 'FACE'
-	settings.emitter = True
+	settings.use_render_emitter = True
 
-	settings.hair_bspline = False
+	#settings.use_hair_bspline = False
 	#settings.hair_geometry = True
 	#settings.grid_resolution = 
 	#settings.draw_step = 1
 
 	settings.material = 3
-	settings.material_color = True
-	settings.render_strand = True
+	#settings.use_render_adaptive = True
+	#settings.use_strand_primitive = True
 
 	'''
 	settings.child_type = 'PARTICLES'
@@ -306,20 +303,20 @@ def makeHair(name, hstep, guides):
 		#par.location = (0,0,0)
 		for n in range(1, nmax):
 			point = guide[n]
-			h = par.hair[n]
-			h.location = point
+			h = par.is_hair[n]
+			h.co = point
 			h.time = n*dt
 			h.weight = 1.0 - n*dw
 		for n in range(nmax, hstep):
 			point = guide[nmax]
-			h = par.hair[n]
-			h.location = point
+			h = par.is_hair[n]
+			h.co = point
 			h.time = n*dt
 			h.weight = 1.0 - n*dw
 
 		print(par.location)
-		for n in range(0, hstep):
-			print("  ", par.hair[n].location)
+		#for n in range(0, hstep):
+		#	print("  ", par.is_hair[n].co)
 
 	bpy.ops.particle.select_all(action='SELECT')
 	#bpy.ops.particle.connect_hair(all=True)
@@ -373,6 +370,10 @@ def unregister():
 	bpy.types.INFO_MT_file_import.remove(menu_func)
 
 if __name__ == "__main__":
+	try:
+		unregister()
+	except:
+		pass
 	register()
 
 #
