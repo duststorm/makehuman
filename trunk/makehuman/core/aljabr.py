@@ -22,10 +22,11 @@ Abstract
 ========
 
 This module contains the most common 3D algebraic operations used in MakeHuman.
-These are mostly the vector and matrix operations core to any 3D application.
+These are mostly the vector and matrix operations core to any 3D application. For  efficiency and speed, all matrix 
+operation will be done thru flat arrays. 
 
 The name is a tribute to I{"Al-jabr wa'l muqabalah"} the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
-The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}.
+The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}. 
 """
 
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow
@@ -35,7 +36,7 @@ machine_epsilon = 1.0e-16
 
 def vsub(u, v):
     """
-    This function returns the difference between two vectors of the same dimension.
+    This function returns the difference between two vectors of the same dimension. Works also for flat matrices
     
     @rtype: float array
     @return: The resulting vector M{vect1-vect2}
@@ -102,7 +103,7 @@ def vnorm(vect):
     # Dividing each element by the length will result in a
     # unit normal vector.
     ret = array('f')
-    for i in xrange(len(vect))
+    for i in xrange(len(vect)):
         ret.append(vect[i]/length)
     return ret
 
@@ -177,7 +178,7 @@ def centroid(vertsList):
 def vadd(*vlist):
     """
     This function sums several vectors of the same dimension. If for instance one has vectors v1,v2,v3,v4 all four having dimension n, then one can use
-    vadd(v1,v2,v3,v4). This works for arbitrary number of vectors (with the same dimension), vadd(v1) is also valid.
+    vadd(v1,v2,v3,v4). This works for arbitrary number of vectors (with the same dimension), vadd(v1) is also valid. Works also for flat matrices
 
     @rtype:       float or integer array
     @return:      the sum of vectors to be added
@@ -667,47 +668,55 @@ def unitMatrix(n):
         M.append(row)
     return M
 
-def adjoint(M):
+def transpose(M,rows,cols):
     """
-    This function returns the adjoint of a matrix
+    This function returns the transpose of a flat matrix
     
-    @rtype:    list of lists (of arbitrary type, eg. float, int)
-    @return:   a matrix that is the adjoint of the input matrix
-    @type  M:  list of lists (of arbitrary type)
-    @param M:  the input matrix that we want to take the adjoint of
+    @rtype:    float array
+    @return:   a matrix that is the adjoint of the input matrix (row-major)
+    @type  M:  iterable of floats or integers
+    @param M:  the input flat matrix (row-major) that we want to transpose
     """
-    returnValue =[]
-    for i in xrange(len(M[0])): #len of row
-        row=[] #row of M' = column of M
-        for j in xrange(len(M)): #len of column
-            row.append(M[j][i])
-        returnValue.append(row)
-    return returnValue
+    ret = array('f')
+    for i in xrange(cols):
+        for j in xrange(rows):
+            ret.append(M[i+j*rows])
+    return ret
     
 def vmulv(u,v):
     """
-    This function returns the matrix B{uv^T} (where T here means adjoint). 
+    This function returns the matrix B{uv^T} (where T here means transpose). 
     
-    @rtype:    list of list of floats
-    @return:   the matrix B{uv^T}
-    @type  u:  list of floats
+    @rtype:    array of floats
+    @return:   flat matrix B{uv^T} (row-major)
+    @type  u:  float iterable
     @param u:  the vector multiplied from left
-    @type  v:  list of floats
+    @type  v:  float iterable
     @param v:  the vector multiplied whose adjoint is multiplied from right
     """
-    M=[]
+    M=array('f')
     for i in xrange(len(u)):
-        row=[]
         for j in xrange(len(v)):
-            row.append(u[i]*v[j])
-        M.append(row)
+            M.append(u[i]*v[j])
     return M
+
+def QR(M,n)
+    """
+    QR-Decomposition of a flat singular square matrix using Householder transformations
     
-def msub(M, N):
+    @rtype:    array of floats
+    @return:   a tuple of flat matrices first matrix is an array representing Q, second matrix represents R for the QR-decomposition of M
+    @type  u:  float iterable
+    @param u:  the vector multiplied from left
+    @type  v:  float iterable
+    @param v:  the vector multiplied whose adjoint is multiplied from right
     """
-    This function returns the difference between two Matrices of the same dimensions    
-    """
-    returnValue=[]
-    for i in xrange(len(M)):
-        returnValue.insert(vsub(M[i],N[i]))
-    return returnValue
+    x=array('f')
+    e=array('f')
+    for i in xrange(n):
+        x.append(M[i])
+        if i=1: e.append(1.0)
+        else: e.append(0.0)
+    v = vadd(x,vmul(vlen(x),e))
+    #v is not zero because the matrix is singular
+    #jocapsco: Todo .. finish this...
