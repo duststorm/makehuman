@@ -29,6 +29,7 @@ The paper was so important that Al-jabr is the root of modern word I{algebra} an
 """
 
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow
+from array import array
 
 machine_epsilon = 1.0e-16
 
@@ -36,24 +37,27 @@ def vsub(u, v):
     """
     This function returns the difference between two vectors of the same dimension.
     
-    @rtype: float list
+    @rtype: float array
     @return: The resulting vector M{vect1-vect2}
-    @type  u: float list
+    @type  u: float iterable
     @param u: the subrahend 
-    @type  v: float list
+    @type  v: float iterable
     @param v: the minuend 
     """
-    return [u[i]-v[i] for i in xrange(len(u))]
+    ret=array('f')
+    for i in xrange(len(u)):
+        ret.append(u[i]-v[i])
+    return ret
 
 def vdot(u, v):
     """
     This function returns the dot product between two vectors of the same dimension
 
-    @rtype:       float or integer
-    @return:      Dot-Product of X{u} and X{v}
-    @type  u: float or integer list
+    @rtype:  float or integer
+    @return: dot-Product of X{u} and X{v}
+    @type  u: float or integer iterable
     @param u: The first vector
-    @type  v: float or integer list
+    @type  v: float or integer iterable
     @param v: The second vector
     """
     a=0
@@ -67,7 +71,7 @@ def vlen(v):
 
     @rtype:       float
     @return:      euclidean norm of X{v}
-    @type  vect: float or integer list
+    @type  vect: float or integer iterable
     @param vect: The vector
     """
     return sqrt(vdot(v,v))
@@ -80,9 +84,9 @@ def vnorm(vect):
     essentially the same function as vunit(vect) except that this function
     handles potential zero length vectors.
 
-    @rtype:       float list
+    @rtype:       float array
     @return:      normalized form of X{vect}
-    @type  vect: float list
+    @type  vect: float iterable
     @param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
@@ -93,12 +97,14 @@ def vnorm(vect):
     # value for vectors whose length may be calculated too close to zero.
 
     if length == 0.0:
-        return len(vect)*[0.0]
+        return len(vect)*array('f',[0.0])
 
     # Dividing each element by the length will result in a
     # unit normal vector.
-
-    return [vect[i] / length for i in xrange(len(vect))]
+    ret = array('f')
+    for i in xrange(len(vect))
+        ret.append(vect[i]/length)
+    return ret
 
 
 def vdist(vect1, vect2):
@@ -109,10 +115,10 @@ def vdist(vect1, vect2):
 
     @rtype:       float
     @return:      euclidean distance between X{vect1} and X{vect2} in 3D space
-    @type  vect1: float list
+    @type  vect1: float iterable
     @param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: float list
+    @type  vect2: float iterable
     @param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
@@ -173,12 +179,12 @@ def vadd(*vlist):
     This function sums several vectors of the same dimension. If for instance one has vectors v1,v2,v3,v4 all four having dimension n, then one can use
     vadd(v1,v2,v3,v4). This works for arbitrary number of vectors (with the same dimension), vadd(v1) is also valid.
 
-    @rtype:       float or integer list
+    @rtype:       float or integer array
     @return:      the sum of vectors to be added
     @type  vlist: a sequence of list of integers of floats
     @param vlist: the sequence without paranthesis, that determines all the vectors to be added together. See above for usage.
     """
-    returnValue=[]
+    returnValue=array('f')
     for i in xrange(len(vlist[0])):
         a=0
         for j in xrange(len(vlist)):
@@ -190,32 +196,17 @@ def vmul(vect, s):
     """
     This function returns the vector result of multiplying each entries of a vector by a scalar.
 
-    @rtype:       float or integer list
+    @rtype:       float iterable
     @return:      The resulting vector M{s(vect1)}
     @type     s: float or integer
     @param    s: the scalar value
-    @type  vect: float or integer list
+    @type  vect: float or integer iterable
     @param vect: the vector to be multiplied with the scalar value
     """
-    return [vect[i]*s for i in xrange(len(vect))]
-
-
-def vunit(vect):
-    """
-    This function returns a normalized vector [x,y,z] ie a unit length
-    vector pointing in the same direction as the input vector. This performs
-    essentially the same function as vnorm(vect) except that vnorm handles
-    potential zero length vectors.
-
-    @rtype:       float list
-    @return:      normalized vector of M{vect1}
-    @type     s:  float list
-    @param    s:  the vector to be normalized
-    """
-
-    length = sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
-    return [vect[0] / length, vect[1] / length, vect[2] / length]
-
+    ret=array('f')
+    for i in xrange(len(vect)):
+        ret.append(vect[i]*s)
+    return ret
 
 def mulmatvec3x3(m, vect):
     """
