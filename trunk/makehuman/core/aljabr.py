@@ -56,7 +56,10 @@ def vdot(u, v):
     @type  v: float or integer list
     @param v: The second vector
     """
-    return reduce(lambda x,y: x+y,u*v)
+    a=0
+    for i in xrange(len(u)):
+        a=a+u[i]*v[i]
+    return a
 
 def vlen(v):
     """
