@@ -152,7 +152,7 @@ class Blender2obj:
                             isFaceInVgroup = 0
                             break
                     if isFaceInVgroup == 1:
-                        if e.index not in self.grouped:
+                        if e not in self.grouped:
                             self.grouped.add(e)
                             groupElements.append(e)
                 self.vertGroups[g] = groupElements
@@ -172,6 +172,7 @@ class Blender2obj:
         @param path: The path of wavefront obj to save
         """
         a = time.time()
+        exportedElements = 0
         fileDescriptor = open(path, "w")
         verts = self.mesh.verts[:]          # Save a copy of the vertices
         if worldSpace:
@@ -185,6 +186,7 @@ class Blender2obj:
             fileDescriptor.write("g %s\n" % (g))
             for e in self.vertGroups[g]:
                 fileDescriptor.write("f ")
+                exportedElements += 1
                 for i,v in enumerate(e.verts):
                     vertUV = (e.uv[i][0],e.uv[i][1])
                     #+1 obj indices are 1 based, not 0 based as python
@@ -192,6 +194,7 @@ class Blender2obj:
                     #uvIndex = 1
                     fileDescriptor.write("%i/%i " % (v.index+1,uvIndex))
                 fileDescriptor.write("\n")
+        print "Exported %d elements"%(exportedElements)
 
         print "Ungrouped elements: ", len(self.ungrouped)
         for e in self.ungrouped:
@@ -213,8 +216,8 @@ class Blender2obj:
         print "Exported in %s sec"%(time.time()-a)
 
 #Autotest is called as main
-if __name__ == 'main':
+if __name__ == '__main__':
     activeObjs = Blender.Object.GetSelected()
     activeObj = activeObjs[0]
-    bExporter = Blender2obj(activeObj,1)
+    bExporter = Blender2obj(activeObj,None)
     bExporter.write("testing_base.obj")
