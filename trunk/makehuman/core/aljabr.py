@@ -32,64 +32,47 @@ from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow
 
 machine_epsilon = 1.0e-16
 
-def vsub(vect1, vect2):
+def vsub(u, v):
     """
-    This function returns the difference between two 3D vectors (vect1-vect2).  
-    The input parameters to this function can be 4D vectors, but only
-    the first 3 dimensions are used and only a 3D vector is returned.
-    This effectively returns the vector required to get from the coordinates of
-    vect2 to the coordinates of vect1.
+    This function returns the difference between two vectors of the same dimension.
     
-    @rtype:       float list
-    @return:      The resulting vector M{vect1-vect2}
-    @type  vect1: float list
-    @param vect1: The first vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: float list
-    @param vect2: The second vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-        
+    @rtype: float list
+    @return: The resulting vector M{vect1-vect2}
+    @type  u: float list
+    @param u: the subrahend 
+    @type  v: float list
+    @param v: the minuend 
     """
+    return [u[i]-v[i] for i in xrange(len(u))]
 
-    return [vect1[0] - vect2[0], vect1[1] - vect2[1], vect1[2] - vect2[2]]
-
-
-def vdot(vect1, vect2):
+def vdot(u, v):
     """
-    This function returns the dot (scalar) product between two 3D vectors (vect1.vect2)  
-    The input parameters to this function can be 4D vectors, but only
-    the first 3 dimensions are used and only a 3D vector is returned.
+    This function returns the dot product between two vectors of the same dimension
+
+    @rtype:       float or integer
+    @return:      Dot-Product of X{u} and X{v}
+    @type  u: float or integer list
+    @param u: The first vector
+    @type  v: float or integer list
+    @param v: The second vector
+    """
+    return reduce(lambda x,y: x+y,u*v)
+
+def vlen(v):
+    """
+    This function returns the norm (length) of a vector (as a float).
 
     @rtype:       float
-    @return:      Dot-Product of X{vect1} and X{vect2}
-    @type  vect1: float list
-    @param vect1: The first vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: float list
-    @param vect2: The second vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
+    @return:      euclidean norm of X{v}
+    @type  vect: float or integer list
+    @param vect: The vector
     """
-
-    return vect1[0] * vect2[0] + vect1[1] * vect2[1] + vect1[2] * vect2[2]
-
-
-def vlen(vect):
-    """
-    This function returns the length of a vector [x,y,z] (as a float).
-
-    @rtype:       float
-    @return:      euclidean norm in 3D space of X{vect}
-    @type  vect: float list
-    @param vect: The vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-    """
-
-    return sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
+    return sqrt(vdot(v,v))
 
 
 def vnorm(vect):
     """
-    This function returns a normalized vector [x,y,z] ie a unit length
+    This function returns a normalized vector ie a unit length
     vector pointing in the same direction as the input vector.  This performs
     essentially the same function as vunit(vect) except that this function
     handles potential zero length vectors.
@@ -100,19 +83,19 @@ def vnorm(vect):
     @param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
-
-    length = sqrt(vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2])
+    
+    length = vlen(vect)
 
     # Keep the program from blowing up by providing an acceptable
     # value for vectors whose length may be calculated too close to zero.
 
     if length == 0.0:
-        return [0.0, 0.0, 0.0]
+        return len(vect)*[0.0]
 
     # Dividing each element by the length will result in a
     # unit normal vector.
 
-    return [vect[0] / length, vect[1] / length, vect[2] / length]
+    return [vect[i] / length for i in xrange(len(vect))]
 
 
 def vdist(vect1, vect2):
@@ -130,9 +113,7 @@ def vdist(vect1, vect2):
     @param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
-
-    joiningVect = [vect1[0] - vect2[0], vect1[1] - vect2[1], vect1[2] - vect2[2]]
-    return sqrt(joiningVect[0] * joiningVect[0] + joiningVect[1] * joiningVect[1] + joiningVect[2] * joiningVect[2])
+    return vlen(vsub(vect1,vect2))
 
 
 def vcross(vect1, vect2):
@@ -184,38 +165,36 @@ def centroid(vertsList):
     return [centrX, centrY, centrZ]
 
 
-def vadd(vect1, vect2):
+def vadd(*vlist):
     """
-    This function returns the sum of two vectors as a vector. 
+    This function sums several vectors of the same dimension. If for instance one has vectors v1,v2,v3,v4 all four having dimension n, then one can use
+    vadd(v1,v2,v3,v4). This works for arbitrary number of vectors (with the same dimension), vadd(v1) is also valid.
 
-    @rtype:       float list
-    @return:      The resulting vector M{vect1+vect2}
-    @type  vect1: float list
-    @param vect1: The first vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: float list
-    @param vect2: The second vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).    
+    @rtype:       float or integer list
+    @return:      the sum of vectors to be added
+    @type  vlist: a sequence of list of integers of floats
+    @param vlist: the sequence without paranthesis, that determines all the vectors to be added together. See above for usage.
     """
-
-    return [vect1[0] + vect2[0], vect1[1] + vect2[1], vect1[2] + vect2[2]]
-
+    returnValue=[]
+    for i in xrange(len(vlist[0])):
+        a=0
+        for j in xrange(len(vlist)):
+            a=a+vlist[j][i]
+        returnValue.append(a)
+    return returnValue
 
 def vmul(vect, s):
     """
-    We consider the 3D space as a vector space whose scalars are real. 
-    This function returns the result of multiplying a vector by a scalar.
+    This function returns the vector result of multiplying each entries of a vector by a scalar.
 
-    @rtype:       float list
+    @rtype:       float or integer list
     @return:      The resulting vector M{s(vect1)}
-    @type     s: float
+    @type     s: float or integer
     @param    s: the scalar value
-    @type  vect: float list
-    @param vect: The first vector - in the format [x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
+    @type  vect: float or integer list
+    @param vect: the vector to be multiplied with the scalar value
     """
-
-    return [vect[0] * s, vect[1] * s, vect[2] * s]
+    return [vect[i]*s for i in xrange(len(vect))]
 
 
 def vunit(vect):
@@ -729,3 +708,12 @@ def vmulv(u,v):
             row.append(u[i]*v[j])
         M.append(row)
     return M
+    
+def msub(M, N):
+    """
+    This function returns the difference between two Matrices of the same dimensions    
+    """
+    returnValue=[]
+    for i in xrange(len(M)):
+        returnValue.insert(vsub(M[i],N[i]))
+    return returnValue
