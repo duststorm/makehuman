@@ -22,8 +22,9 @@ Abstract
 ========
 
 This module contains the most common 3D algebraic operations used in MakeHuman.
-These are mostly the vector and matrix operations core to any 3D application. For  efficiency and speed, all matrix 
-operation will be done thru flat arrays. 
+These are mostly the vector and matrix operations core to any 3D application. For efficiency and speed, all matrix 
+operation will be done thru flat arrays. Function with matrices as flat arrays are written with underscore "_", whilst
+functions with matrices as list of lists will have the same name without the underscore.
 
 The name is a tribute to I{"Al-jabr wa'l muqabalah"} the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
 The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}. 
@@ -38,14 +39,14 @@ def vsub(u, v):
     """
     This function returns the difference between two vectors of the same dimension. Works also for flat matrices
     
-    @rtype: float array
+    @rtype: double array
     @return: The resulting vector M{vect1-vect2}
     @type  u: float iterable
     @param u: the subrahend 
     @type  v: float iterable
     @param v: the minuend 
     """
-    ret=array('f')
+    ret=array('d')
     for i in xrange(len(u)):
         ret.append(u[i]-v[i])
     return ret
@@ -54,7 +55,7 @@ def vdot(u, v):
     """
     This function returns the dot product between two vectors of the same dimension
 
-    @rtype:  float or integer
+    @rtype:  double or integer
     @return: dot-Product of X{u} and X{v}
     @type  u: float or integer iterable
     @param u: The first vector
@@ -70,7 +71,7 @@ def vlen(v):
     """
     This function returns the norm (length) of a vector (as a float).
 
-    @rtype:       float
+    @rtype:       double
     @return:      euclidean norm of X{v}
     @type  vect: float or integer iterable
     @param vect: The vector
@@ -85,9 +86,9 @@ def vnorm(vect):
     essentially the same function as vunit(vect) except that this function
     handles potential zero length vectors.
 
-    @rtype:       float array
+    @rtype:       double array
     @return:      normalized form of X{vect}
-    @type  vect: float iterable
+    @type  vect: double iterable
     @param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
@@ -98,11 +99,11 @@ def vnorm(vect):
     # value for vectors whose length may be calculated too close to zero.
 
     if length == 0.0:
-        return len(vect)*array('f',[0.0])
+        return len(vect)*array('d',[0.0])
 
     # Dividing each element by the length will result in a
     # unit normal vector.
-    ret = array('f')
+    ret = array('d')
     for i in xrange(len(vect)):
         ret.append(vect[i]/length)
     return ret
@@ -114,12 +115,12 @@ def vdist(vect1, vect2):
     between two vector coordinates.
     The distance between two points is the length of the vector joining them.
 
-    @rtype:       float
+    @rtype:       double
     @return:      euclidean distance between X{vect1} and X{vect2} in 3D space
-    @type  vect1: float iterable
+    @type  vect1: double iterable
     @param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: float iterable
+    @type  vect2: double iterable
     @param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
@@ -130,12 +131,12 @@ def vcross(vect1, vect2):
     """
     This function returns the cross product of two vectors.
 
-    @rtype:       float list
+    @rtype:       double list
     @return:      cross product M{vect1 S{times} vect2}
-    @type  vect1: float list
+    @type  vect1: double list
     @param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: float list
+    @type  vect2: double list
     @param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
@@ -147,12 +148,12 @@ def centroid(vertsList):
     """
     This function returns the baricenter of a set of coordinate vectors
     [[x1,y1,z1],[x2,y2,z2],...,[xn,yn,zn]], returning a coordinate vector
-    formatted as a float list [float X,float Y, float Z].
+    formatted as a double list [double X,double Y, double Z].
     This is the sum of all of the vectors divided by the number of vectors.
 
-    @rtype:       float list
+    @rtype:       double list
     @return:      the centroid of the convex hull of all the vertices in M(vertsList)
-    @type  vertsList: list of float lists
+    @type  vertsList: list of double lists
     @param vertsList: each vector in the list is in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
@@ -180,12 +181,12 @@ def vadd(*vlist):
     This function sums several vectors of the same dimension. If for instance one has vectors v1,v2,v3,v4 all four having dimension n, then one can use
     vadd(v1,v2,v3,v4). This works for arbitrary number of vectors (with the same dimension), vadd(v1) is also valid. Works also for flat matrices
 
-    @rtype:       float or integer array
+    @rtype:       double or integer array
     @return:      the sum of vectors to be added
-    @type  vlist: a sequence of list of integers of floats
+    @type  vlist: a sequence of list of integers of doubles
     @param vlist: the sequence without paranthesis, that determines all the vectors to be added together. See above for usage.
     """
-    returnValue=array('f')
+    returnValue=array('d')
     for i in xrange(len(vlist[0])):
         a=0
         for j in xrange(len(vlist)):
@@ -195,16 +196,16 @@ def vadd(*vlist):
 
 def vmul(vect, s):
     """
-    This function returns the vector result of multiplying each entries of a vector by a scalar.
+    This function returns the vector result of multiplying each entries of a vector by a scalar. Works also for flat matrices
 
-    @rtype:       float iterable
+    @rtype:       double iterable
     @return:      The resulting vector M{s(vect1)}
-    @type     s: float or integer
+    @type     s: double or integer
     @param    s: the scalar value
-    @type  vect: float or integer iterable
+    @type  vect: double or integer iterable
     @param vect: the vector to be multiplied with the scalar value
     """
-    ret=array('f')
+    ret=array('d')
     for i in xrange(len(vect)):
         ret.append(vect[i]*s)
     return ret
@@ -633,13 +634,34 @@ def convexQuadrilateralArea(v1,v2,v3,v4):
     pq = vdot(vsub(v3,v1),vsub(v4,v2))
     return 0.5*sqrt(p*p*q*q - pq*pq)
     #return sqrt(4*p*p*q*q - pow((b*b+d*d-a*a-c*c),2))/4
+
+def flatten(M):
+    """
+    For readability it is easier to write matrices as list of list of doubles. In most cases we do this. But for speed and efficiency,
+    we it is best to have these matrices as an (flattened matrix) array. This function converts a list of list into an array.
+    """
+    N=array('f')
+    for i in xrange(len(M)):
+        for j in xrange(len(M[0])):
+            N.append(M[i][j])
+    return N
+    
+def _unFlatten(M,rows,cols):
+    N=[]
+    for i in xrange(rows):
+        row = []
+        n=i*cols
+        for j in xrange(cols):
+            row.append(N[n+j])
+        N.append(row)
+    return N
 	
 def zeros(*shape):
     """
     This function returns an multidimensional zero-matrix (row-major, list of lists) or zero-vector (list of doubles). For instance: If you want to have a zero-vector of 3-dimensions you type 
     zeros(3). If you want a 2x3 zero-matrix, we write zeros(2,3).
 
-    @rtype:    list of float lists
+    @rtype:    list of double lists
     @return:   a matrix represented as list of lists. Each entry of the list represents a row of the matrix (if this is a nxm matrix). The representation is a row-major order.
     @type  shape:  sequence of integers (e.g. 2,3 or 2) 
     @param shape:  this represent the dimensions (in integer tuples) of the output matrix (e.g. for 2x3 matrix shape is 2,2)
@@ -650,73 +672,104 @@ def zeros(*shape):
     cdr = shape[1:] 
     return [zeros(*cdr) for i in xrange(car)] 
  
-def unitMatrix(n):
+def _unitMatrix(n):
     """
-    This function returns an nxn unit matrix of floats.
+    This function returns an nxn unit matrix of doubles.
     
-    @rtype:    list of float lists
-    @return:   an nxn unit-matrix, row-major order.
+    @rtype:    array of doubles
+    @return:   an nxn flat unit-matrix, row-major order.
     @type  n:  integer
     @param n:  the size of the row of the unit-matrix
     """
-    M=[]
+    M=array('d')
     for i in xrange(n):
-        row=[]
         for j in xrange(n):
-            if (i==j): row.append(1.0)
-            else: row.append(0.0)
-        M.append(row)
+            if (i==j): M.append(1.0)
+            else: M.append(0.0)
     return M
 
-def transpose(M,rows,cols):
+def _transpose(M,rows=0,cols=0):
     """
     This function returns the transpose of a flat matrix
     
-    @rtype:    float array
-    @return:   a matrix that is the adjoint of the input matrix (row-major)
-    @type  M:  iterable of floats or integers
+    @rtype:    double array
+    @return:   a matrix that is the transpose of the input matrix (row-major)
+    @type  M:  iterable of doubles or integers
     @param M:  the input flat matrix (row-major) that we want to transpose
     """
-    ret = array('f')
+    ret = array('d')
     for i in xrange(cols):
         for j in xrange(rows):
             ret.append(M[i+j*rows])
     return ret
     
-def vmulv(u,v):
+def _vmulv(u,v):
     """
     This function returns the matrix B{uv^T} (where T here means transpose). 
     
-    @rtype:    array of floats
+    @rtype:    array of doubles
     @return:   flat matrix B{uv^T} (row-major)
-    @type  u:  float iterable
+    @type  u:  double iterable
     @param u:  the vector multiplied from left
-    @type  v:  float iterable
+    @type  v:  double iterable
     @param v:  the vector multiplied whose adjoint is multiplied from right
     """
-    M=array('f')
+    M=array('d')
     for i in xrange(len(u)):
         for j in xrange(len(v)):
             M.append(u[i]*v[j])
     return M
 
-def QR(M,n)
+def _QR(M,n):
     """
     QR-Decomposition of a flat singular square matrix using Householder transformations
     
-    @rtype:    array of floats
+    @rtype:    tuple of array of doubles
     @return:   a tuple of flat matrices first matrix is an array representing Q, second matrix represents R for the QR-decomposition of M
-    @type  u:  float iterable
-    @param u:  the vector multiplied from left
-    @type  v:  float iterable
-    @param v:  the vector multiplied whose adjoint is multiplied from right
+    @type  M:  array of doubles
+    @param M:  flat square matrix (row-major) that we want to take the QR-decomposition
+    @type  n:  integer
+    @param n:  dimension of the square matrix M 
     """
-    x=array('f')
-    e=array('f')
+    A=M[:] #deep copy for a flat iterable. warning [:] does shallow copy for multidimensional iterables
+    x=array('d')
+    e=n*array('d',[0])
+    e[0]=1.0
     for i in xrange(n):
-        x.append(M[i])
-        if i=1: e.append(1.0)
-        else: e.append(0.0)
+        x.append(A[i])
     v = vadd(x,vmul(vlen(x),e))
+    d=vlen(v) #nonzero because A is singular
+    d=2/(d*d)
+    P=vsub(unitMatrix(n),vmul(vmulv(v,v),d))
+    A=_mmul(P,A)
     #v is not zero because the matrix is singular
     #jocapsco: Todo .. finish this...
+    
+def _mmul(M,N,rowsM,colsM,colsN):
+    """
+    This is the naive matrix multiplication. There are faster matrix multiplication algorithms (like those by 
+    U{Strassen <http://en.wikipedia.org/wiki/Strassen_algorithm>} or 
+    U{Coppersmith-Winograd <http://en.wikipedia.org/wiki/Coppersmith–Winograd_algorithm>}. But fast algorithms will make our 
+    code uneccessarily long and complicated and for small sized matrix (in 3D programming most matrix
+    operation are limited to 3x3 matrices) the performance improvement is insignifcant.
+    
+    @rtype:    array of doubles
+    @return:   a flat mxp matrix reprenting the product of M and N
+    @type  M:  array of doubles
+    @param M:  flat mxn matrix (row-major), that is supposed to be the left-multiplier
+    @type  rowsM:  integer
+    @param rowsM:  number of rows of M
+    @type  colsM:  integer
+    @param colsM:  number of columns of M = number of rows of N
+    @type  colsN:  integer
+    @param colsN:  number of columns of N
+    """
+    P=array('d')
+    for i in xrange(rowsM):
+        n=i*colsM
+        for j in xrange(colsN):
+            a=0
+            for k in xrange(colsM):
+                a=a+M[n+k]*N[k*colsM+j]
+            P.append(a)
+    return P
