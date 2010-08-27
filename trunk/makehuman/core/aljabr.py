@@ -749,7 +749,7 @@ def _mmul(M,N,rowsM,colsM,colsN):
     """
     This is the naive matrix multiplication. There are faster matrix multiplication algorithms (like those by 
     U{Strassen <http://en.wikipedia.org/wiki/Strassen_algorithm>} or 
-    U{Coppersmith-Winograd <http://en.wikipedia.org/wiki/Coppersmith–Winograd_algorithm>}. But fast algorithms will make our 
+    U{Coppersmith-Winograd <http://en.wikipedia.org/wiki/Coppersmith-Winograd_algorithm>}. But fast algorithms will make our 
     code uneccessarily long and complicated and for small sized matrix (in 3D programming most matrix
     operation are limited to 3x3 matrices) the performance improvement is insignifcant.
     
