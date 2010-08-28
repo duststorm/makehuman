@@ -454,7 +454,7 @@ class Hairgenerator:
     def populateGuideGroups(self,Area):
         #guideGroups = {}
         guideGroups =[]
-        Summarize = 0
+        #Summarize = 0 #debug variable
         S = set() #emptyset of indices.. hashing trick
         for i in xrange(0,len(self.guides)):
             if i in S: continue
@@ -468,9 +468,10 @@ class Hairgenerator:
                     if A>B and B>=Area:
                         k=j
                         A=B
-            S.add(k)
-            Summarize = Summarize + A
-            guideGroups.append((self.guides[i],self.guides[k]))
+            if (k!=0):
+               S.add(k)
+               #Summarize = Summarize + A #debugging Area
+               guideGroups.append((self.guides[i],self.guides[k]))
         return guideGroups
 
 
