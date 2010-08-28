@@ -1221,11 +1221,14 @@ def parseMesh (args, tokens):
 		elif key == 'ShapeKeys':
 			parseShapeKeys(ob, me, val, sub)
 		elif key == 'Material':
-			try:
+			try:				
 				mat = loadedData['Material'][val[0]]
-				me.add_material(mat)
 			except:
-				print("Could not add material", val[0])
+				mat = None
+			if mat:
+				#me.materials.new(mat)
+				#me.add_material(mat)
+				print("Adding materials seems dead now!")
 		else:
 			defaultKey(key, val,  sub, "me", [], globals(), locals())
 
@@ -1332,9 +1335,8 @@ def parseUvTexData(args, tokens, data):
 def parseVertColorLayer(args, tokens, me):
 	name = args[0]
 	print("VertColorLayer", name)
-	me.add_vertex_color()
-	vcol = me.vertex_colors[-1]
-	vcol.name = name
+	vcol = me.vertex_colors.new(name)
+	#vcol.name = name
 	loadedData['MeshColorLayer'][name] = vcol
 	for (key, val, sub) in tokens:
 		if key == 'Data':
@@ -1372,12 +1374,12 @@ def parseVertexGroup(ob, me, args, tokens):
 		return
 
 	if (toggle & T_Armature) or (grpName in ['Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'Middle', 'Right', 'Scalp']):
-		group = ob.add_vertex_group(grpName)
-		group.name = grpName
+		group = ob.vertex_groups.new(grpName)
 		loadedData['VertexGroup'][grpName] = group
 		for (key, val, sub) in tokens:
 			if key == 'wv':
-				ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
+				ob.vertex_groups.assign( int(val[0]), group, float(val[1]), 'REPLACE' )
+				#ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
 	return
 
 

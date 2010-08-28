@@ -41,7 +41,7 @@ MAJOR_VERSION = 0
 MINOR_VERSION = 1
 BLENDER_VERSION = (2, 53, 1)
 
-import bpy, mathutils, os
+import bpy, os, mathutils
 from mathutils import *
 from bpy.props import *
 
@@ -66,9 +66,14 @@ visemes = ({
 	'L' : [('PMouth', (0,0)), ('PUpLip', (0,-0.2)), ('PLoLip', (0,0.2)), ('PJaw', (0.2,0.2)), ('PTongue', (0,-0.8))], 
 	'G' : [('PMouth', (0,0)), ('PUpLip', (0,-0.1)), ('PLoLip', (0,0.1)), ('PJaw', (-0.3,0.1)), ('PTongue', (0,-0.6))], 
 
-	'Blink' : [('PUpLid', (0,1.0)), ('PLoLid', (0,-0.5))], 
+	'Blink' : [('PUpLid', (0,1.0)), ('PLoLid', (0,-1.0))], 
 	'UnBlink' : [('PUpLid', (0,0)), ('PLoLid', (0,0))], 
 })
+
+#
+#	mohoVisemes
+#	magpieVisemes
+#
 
 mohoVisemes = dict({
 	'rest' : 'Rest', 
@@ -96,34 +101,40 @@ magpieVisemes = dict({
 })
 
 #
-#	setViseme(self, context, vis):
+#	setViseme(self, context, vis, setKey, frame):
+#	setBoneLocation(context, pbone, loc, mirror, setKey, frame):
 #
 
-def setViseme(self, context, vis):
-	overallScale = 0.2
-	rig = context.object
-	if rig.type != 'ARMATURE':
-		return False
-	pbones = rig.pose.bones
-	for (bone, (x, z)) in self.Visemes[vis]:
+def setViseme(self, context, vis, setKey, frame):
+	pbones = context.object.pose.bones
+	for (b, (x, z)) in self.Visemes[vis]:
 		loc = self.Mathutils.Vector((float(x),0,float(z)))
 		try:
-			pbones[bone].location = loc*overallScale
-			lr = False
+			pb = pbones[b]
 		except:
-			lr = True
-		if lr:
-			pbones[bone+"_L"].location = loc*overallScale
-			loc[0] = -loc[0]
-			pbones[bone+"_R"].location = loc*overallScale
-	return	True
+			pb = None
+			
+		if pb:
+			self.SetBoneLocation(context, pb, loc, False, setKey, frame)
+		else:
+			self.SetBoneLocation(context, pbones[b+'_L'], loc, False, setKey, frame)
+			self.SetBoneLocation(context, pbones[b+'_R'], loc, True, setKey, frame)
+	return
+
+def setBoneLocation(self, context, pb, loc, mirror, setKey, frame):
+	scale = context.object['MhxScale']
+	if mirror:
+		loc[0] = -loc[0]
+	pb.location = loc*scale*0.2
+	if setKey or context.scene['MhxAutoKeyframe']:
+		for n in range(3):
+			pb.keyframe_insert('location', index=n, frame=frame, group=pb.name)
+	return
 
 #
 #	openFile(self, context, file):
-#	readMoho(self, fp, ob, offs):
-#	readMagpie(self, fp, ob, offs):
-#	readPose(self, frame, vis, ob):
-#	setBonePose(self, pb, frame, loc):
+#	readMoho(self, context, fp, offs):
+#	readMagpie(self, context, fp, offs):
 #
 
 def openFile(self, context, file):
@@ -134,88 +145,82 @@ def openFile(self, context, file):
 	(name, ext) = self.Os.path.splitext(fileName)
 	return open(file, "rU")
 
-def readMoho(self, fp, ob, offs):
+def readMoho(self, context, fp, offs):
 	for line in fp:
 		words= line.split()
 		if len(words) < 2:
 			pass
 		else:
 			vis = self.MohoVisemes[words[1]]
-			self.ReadPose(int(words[0])+offs, vis, ob)
+			self.SetViseme(context, vis, True, int(words[0])+offs)
 	return
 	
-def readMagpie(self, fp, ob, offs):
-	overallScale = 0.2
+def readMagpie(self, context, fp, offs):
 	for line in fp: 
 		words= line.split()
 		if len(words) < 3:
 			pass
 		elif words[2] == 'X':
 			vis = self.MagpieVisemes[words[3]]
-			self.ReadPose(int(words[0])+offs, vis, ob)
+			self.SetViseme(context, vis, True, int(words[0])+offs)
 	return
 	
-def readPose(self, frame, vis, ob):
-	overallScale = 0.2
-	pbones = ob.pose.bones
-	for (b, (x, z)) in self.Visemes[vis]:
-		loc = self.Mathutils.Vector((float(x),0,float(z)))*overallScale
-		try:
-			pb = pbones[b]
-		except:
-			pb = None
-			
-		if pb:
-			self.SetBonePose(pb, frame, loc)
-		else:
-			self.SetBonePose(pbones[b+'_L'], frame, loc)
-			loc[0] *= -1
-			self.SetBonePose(pbones[b+'_R'], frame, loc)
-	return
-	
-def setBonePose(self, pb, frame, loc):
-	pb.location = loc
-	for n in range(3):
-		pb.keyframe_insert('location', index=n, frame=frame, group=pb.name)
-	return
-
 #
 #	User interface
+#	BoolProperty
+#	class MhxLipsyncPanel(bpy.types.Panel):
 #
-holder = bpy.ops.object.add(type='EMPTY')
-#holder['autoKeyframe'] = BoolProperty(name="Auto keyframes", default=False)
+
+bpy.types.Scene.BoolProperty(attr="MhxAutoKeyframe", name="Auto keyframe", description="Auto keyframe", default=False)
+bpy.context.scene['MhxAutoKeyframe'] = False
 
 class MhxLipsyncPanel(bpy.types.Panel):
 	bl_label = "MHX Lipsync"
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
-	#bl_options = {'REGISTER', 'UNDO'}
 	
+	@classmethod
+	def poll(cls, context):
+		if context.object and context.object.type == 'ARMATURE':
+			try:
+				scale = context.object['MhxScale']
+				return True
+			except:
+				pass
+		return False
+
 	def draw(self, context):
-		global holder
 		layout = self.layout
-		layout.label(text="visemes")
-		layout.operator("object.RestButton")
-		layout.operator("object.EtcButton")
-		layout.operator("object.MBPButton")
-		layout.operator("object.OOButton")
-		layout.operator("object.OButton")
-		layout.operator("object.RButton")
-		layout.operator("object.FVButton")
-		layout.operator("object.SButton")
-		layout.operator("object.SHButton")
-		layout.operator("object.EEButton")
-		layout.operator("object.AHButton")
-		layout.operator("object.EHButton")
-		layout.operator("object.THButton")
-		layout.operator("object.LButton")
-		layout.operator("object.GButton")
-		layout.label(text="Other")
-		layout.operator("object.BlinkButton")
-		layout.operator("object.UnBlinkButton")
+		layout.prop(context.scene, 'MhxAutoKeyframe', text="Auto keyframe", icon='BLENDER', toggle=True)
+		layout.label(text="Visemes")
+		row = layout.row()
+		row.operator("object.RestButton")
+		row.operator("object.EtcButton")
+		row.operator("object.AHButton")
+		row = layout.row()
+		row.operator("object.MBPButton")
+		row.operator("object.OOButton")
+		row.operator("object.OButton")
+		row = layout.row()
+		row.operator("object.RButton")
+		row.operator("object.FVButton")
+		row.operator("object.SButton")
+		row = layout.row()
+		row.operator("object.SHButton")
+		row.operator("object.EEButton")
+		row.operator("object.EHButton")
+		row = layout.row()
+		row.operator("object.THButton")
+		row.operator("object.LButton")
+		row.operator("object.GButton")
+		layout.separator()
+		row = layout.row()
+		row.operator("object.BlinkButton")
+		row.operator("object.UnBlinkButton")
 		layout.label(text="Load file")
-		layout.operator("object.LoadMohoButton")
-		layout.operator("object.LoadMagpieButton")
+		row = layout.row()
+		row.operator("object.LoadMohoButton")
+		row.operator("object.LoadMagpieButton")
 
 # Define viseme buttons
 
@@ -228,20 +233,25 @@ def defineVisemeButtons():
 "	SetViseme = setViseme\n" +
 "	Visemes = visemes\n" +
 "	Mathutils = mathutils\n" +
-"\n" +
+"	SetBoneLocation = setBoneLocation\n" +
 "	def invoke(self, context, event):\n" +
-"		self.SetViseme(context, '%s')\n" % vis +
+"		self.SetViseme(context, '%s', False, context.scene.frame_current)\n" % vis +
 "		return{'FINISHED'}\n"
 		)
-		print(expr)
+		# print(expr)
 		exec(expr, globals(), locals())
 	return
 
 defineVisemeButtons()
 
+# 
+#	class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
+#	class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
+#
+
 class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadMohoButton"
-	bl_label = "Load Moho (.dat)"
+	bl_label = "Moho (.dat)"
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
@@ -250,15 +260,15 @@ class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 	Mathutils = mathutils
 	OpenFile = openFile
 	ReadMoho = readMoho
-	ReadPose = readPose
-	SetBonePose = setBonePose
+	SetBoneLocation = setBoneLocation
+	SetViseme = setViseme
 	Visemes = visemes
 	MohoVisemes = mohoVisemes
 
 	def execute(self, context):
 		fp = self.OpenFile(context, self.properties.filepath)		
 		self.Bpy.ops.object.mode_set(mode='POSE')	
-		self.ReadMoho(fp, context.object, self.properties.startFrame-1)
+		self.ReadMoho(context, fp, self.properties.startFrame-1)
 		fp.close()
 		return{'FINISHED'}	
 
@@ -268,7 +278,7 @@ class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 
 class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadMagpieButton"
-	bl_label = "Load Magpie (.mag)"
+	bl_label = "Magpie (.mag)"
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
@@ -277,15 +287,15 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 	Mathutils = mathutils
 	OpenFile = openFile
 	ReadMagpie = readMagpie
-	ReadPose = readPose
-	SetBonePose = setBonePose
+	SetBoneLocation = setBoneLocation
+	SetViseme = setViseme
 	Visemes = visemes
 	MagpieVisemes = magpieVisemes
 	
 	def execute(self, context):
 		fp = self.OpenFile(context, self.properties.filepath)		
 		self.Bpy.ops.object.mode_set(mode='POSE')	
-		self.ReadMoho(fp, context.object, self.properties.startFrame-1)
+		self.ReadMagpie(context, fp, self.properties.startFrame-1)
 		fp.close()
 		return{'FINISHED'}	
 
@@ -293,20 +303,4 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 		context.manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}	
 
-'''		  
-def menu_func(self, context):
-	self.layout.operator(MhxLipsyncPanel.bl_idname, text="MakeHuman (.mhx)...")
 
-def register():
-	bpy.types.INFO_MT_file_import.append(menu_func)
-
-def unregister():
-	bpy.types.INFO_MT_file_import.remove(menu_func)
-
-if __name__ == "__main__":
-	try:
-		unregister()
-	except:
-		pass
-	register()
-'''
