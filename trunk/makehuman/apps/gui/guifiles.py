@@ -5,22 +5,22 @@
 """ 
 Class for handling File mode in the GUI.
 
-**Project Name:**      MakeHuman
+B{Project Name:}      MakeHuman
 
-**Product Home Page:** http://www.makehuman.org/
+B{Product Home Page:} U{http://www.makehuman.org/}
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-**Authors:**           Marc Flerackers
+B{Authors:}           Marc Flerackers
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+B{Copyright(c):}      MakeHuman Team 2001-2010
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
 
 Abstract
---------
+========
 
 This module implements the 'guifiles' class structures and methods to support GUI 
 File mode operations.
@@ -30,8 +30,6 @@ this class for processing. Having processed an event this class returns control 
 main OpenGL/SDL/Application event handling loop.  
 
 """
-
-__docformat__ = 'restructuredtext'
 
 import mh
 import files3d
@@ -158,7 +156,7 @@ class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'), category.app.getThemeResource('images', 'button_export_file_on.png'))
-        gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0])
+        gui3d.Object(self, 'data/3dobjs/group_158x256.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0])
         self.fileentry = gui3d.FileEntryView(self)
 
         self.exportBodyGroup = []
@@ -172,8 +170,7 @@ class ExportTaskView(gui3d.TaskView):
                                      ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 140, 9.2])
         self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                          'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 140, 9.2])
-        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[138, 140, 9.2])
+        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images','export_md5.png'), selectedTexture=self.app.getThemeResource('images', 'export_md5_on.png'), position=[138, 140, 9.2])
                                          
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 160, 9.2], selected=True)

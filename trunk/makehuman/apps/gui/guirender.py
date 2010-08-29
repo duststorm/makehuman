@@ -4,22 +4,22 @@
 """ 
 Class for handling Render mode in the GUI.
 
-**Project Name:**      MakeHuman
+B{Project Name:}      MakeHuman
 
-**Product Home Page:** http://www.makehuman.org/
+B{Product Home Page:} U{http://www.makehuman.org/}
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-**Authors:**           Marc Flerackers
+B{Authors:}           Manuel Bastioni, Marc Flerackers
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+B{Copyright(c):}      MakeHuman Team 2001-2010
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
 
 Abstract
---------
+========
 
 This module implements the 'guirender' class structures and methods to support GUI 
 Render mode operations.
@@ -30,8 +30,6 @@ this class for processing. Having processed an event this class returns control 
 main OpenGL/SDL/Application event handling loop.  
 
 """
-
-__docformat__ = 'restructuredtext'
 
 import gui3d
 

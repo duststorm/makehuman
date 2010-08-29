@@ -1643,16 +1643,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.2382812"
-     inkscape:cx="137.86899"
-     inkscape:cy="500.68844"
+     inkscape:zoom="4.4765624"
+     inkscape:cx="84.479809"
+     inkscape:cy="607.7156"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="778"
      inkscape:window-x="0"
-     inkscape:window-y="116"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -5825,5 +5825,57 @@
            id="tspan3084"
            sodipodi:role="line">group</tspan></text>
     </g>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_on.png"
+       ry="2.3011835"
+       y="481.17358"
+       x="153.19196"
+       height="15.341223"
+       width="31.341223"
+       id="rect3091"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_on.png"
+       transform="scale(0.994692,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3093"
+       y="489.77002"
+       x="156.7193"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       xml:space="preserve"><tspan
+         y="489.77002"
+         x="156.7193"
+         id="tspan3095"
+         sodipodi:role="line">.md5</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3097"
+       width="31.341223"
+       height="15.341223"
+       x="153.63089"
+       y="459.47153"
+       ry="2.3011835"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="157.16057"
+       y="468.18314"
+       id="text3099"
+       sodipodi:linespacing="125%"
+       transform="scale(0.994692,1.0053363)"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3101"
+         x="157.16057"
+         y="468.18314">.md5</tspan></text>
   </g>
 </svg>
