@@ -31,11 +31,8 @@ def load(app):
   # Create aqsis shaders
   # subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o %s" % (os.path.join(usrShaderPath, "lightmap.slx")), shell=True)
 
-    subprocess.Popen('aqsl data/shaders/renderman/skin.sl -o "%s"' % os.path.join(usrShaderPath, 'skin.slx'), shell=True)
-    subprocess.Popen('aqsl data/shaders/renderman/onlyci.sl -o "%s"' % os.path.join(usrShaderPath, 'onlyci.slx'), shell=True)
-    subprocess.Popen('aqsl data/shaders/renderman/lightmap.sl -o "%s"' % os.path.join(usrShaderPath, 'lightmap.slx'), shell=True)
-    subprocess.Popen('aqsl data/shaders/renderman/hair.sl -o "%s"' % os.path.join(usrShaderPath, 'hair.slx'), shell=True)
-    subprocess.Popen('aqsl data/shaders/renderman/shadowspot.sl -o "%s"' % os.path.join(usrShaderPath, 'shadowspot.slx'), shell=True)
+    subprocess.Popen('aqsl data/shaders/aqsis/skin.sl -o "%s"' % os.path.join(usrShaderPath, 'skin.slx'), shell=True)
+    subprocess.Popen('aqsl data/shaders/aqsis/hair.sl -o "%s"' % os.path.join(usrShaderPath, 'hair.slx'), shell=True)
 
     aqsis = gui3d.TaskView(app.categories['Rendering'], 'Aqsis', app.getThemeResource('images', 'button_aqsis.png'))
 

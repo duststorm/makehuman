@@ -47,12 +47,9 @@ def writeHairs(ribRepository, mesh, Area):
     # Write the full hairstyle
 
     totalNumberOfHairs = 0
-    hairsClass.humanVerts = mesh.verts
-    #hairsClass.adjustGuides()
-
-    # hairsClass.generateHairStyle1()
-
+    hairsClass.humanVerts = mesh.verts   
     hairStyle = hairsClass.generateHairStyle2(Area=Area)
+    
     print 'Writing hairs'
     hairName = os.path.join(ribRepository, 'hairs.rib')
     hairFile = open(hairName, 'w')
@@ -350,7 +347,7 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
     rotY = cameraData[4]
     ribfile.write('FrameBegin 4\n')
     ribfile.write('Option "statistics" "endofframe" [1]\n')
-    ribfile.write('Option "searchpath" "shader" "data/shaders/renderman:&"\n')
+    ribfile.write('Option "searchpath" "shader" "data/shaders/aqsis:&"\n')
     ribfile.write('Option "searchpath" "texture" "data/textures:&"\n')
     ribfile.write('Projection "perspective" "fov" %f\n' % fov)
     ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
