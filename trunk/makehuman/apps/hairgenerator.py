@@ -456,6 +456,7 @@ class Hairgenerator:
         guideGroups =[]
         #Summarize = 0 #debug variable
         S = set() #emptyset of indices.. hashing trick
+        print "Number of strands: ", len(self.guides)
         for i in xrange(0,len(self.guides)):
             if i in S: continue
             else: S.add(i)

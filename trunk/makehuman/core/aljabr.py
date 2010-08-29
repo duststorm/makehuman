@@ -732,16 +732,33 @@ def _QR(M,n):
     @param n:  dimension of the square matrix M 
     """
     A=M[:] #deep copy for a flat iterable. warning [:] does shallow copy for multidimensional iterables
-    x=array('d')
-    e=n*array('d',[0])
-    e[0]=1.0
-    for i in xrange(n):
-        x.append(A[i])
-    v = vadd(x,vmul(vlen(x),e))
-    d=vlen(v) #nonzero because A is singular
-    d=2/(d*d)
-    P=vsub(unitMatrix(n),vmul(vmulv(v,v),d))
-    A=_mmul(P,A)
+    R=n*n*array('d',[0]) #zero matrix
+    for j in xrange(n):
+        x=array('d')
+        e=(n-i)*array('d',[0])
+        e[0]=1.0
+        for i in xrange(n-j):
+            x.append(A[i])
+        v = vadd(x,vmul(vlen(x),e))
+        d=vlen(v) #nonzero because A is singular
+        d=2/(d*d)
+        P=vsub(unitMatrix(n),vmul(vmulv(v,v),d))
+        #A=_mmul(P,A,n,n,n)
+        
+        B=array('d')
+        #smart matrix matrix multiplication extracting the lower submatrix into B
+        #i.e. : removing the first row and column of the multiplication of P and A and assigning B to it
+        # see how Householder Transformation are created in QR-Decomposition!
+        for i in xrange(n):
+            m=i*n
+            for j2 in xrange(n):
+                a=0
+                for k in xrange(n):
+                    a=a+P[m+k]*A[k*n+j2]
+                if i<n: R.append(a)
+                elif j2>0: B.append(a)
+        A=B
+        #A= A
     #v is not zero because the matrix is singular
     #jocapsco: Todo .. finish this...
     
