@@ -42,7 +42,10 @@ class RenderingCategory(gui3d.Category):
         gui3d.Category.__init__(self, parent, 'Rendering', parent.app.getThemeResource('images', 'button_render.png'), parent.app.getThemeResource('images', 'button_render_on.png'))
         self.guideArea = gui3d.Slider(self, position=[10, 150, 9], value=0.6, min=0.2,max=1.0, label = "0.6") 
         self.guideArea.label.setPosition([20,135,9])
-    
+        #self.guidesOnly = gui3d.Button(self, position=[10,200,9],label="Guides Only")
+        self.guidesOnly = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', position=[15, 200,9], label="Guides Only")
+
+        
         @self.guideArea.event
         def onChanging(value):
             self.guideArea.label.setText(str(self.guideArea.getValue()))

@@ -721,8 +721,8 @@ class Button(View):
 
 class RadioButton(Button):
 
-    def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None, position=[0, 0, 9], selected=False):
-        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected)
+    def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None, position=[0, 0, 9], selected=False, label=None):
+        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, label=label)
         self.group = group
         self.group.append(self)
 
@@ -748,9 +748,9 @@ class RadioButton(Button):
 
 class ToggleButton(Button):
 
-    def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None):
+    def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None, label=None):
 
-        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture)
+        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label)
 
     def onClicked(self, event):
         if self.selected:
