@@ -37,11 +37,13 @@ import font3d
 
 class Object(events3d.EventHandler):
 
-    def __init__(self, view, mesh, texture=None, position=[0, 0, 9], camera=1, shadeless=1, visible=True):
+    def __init__(self, view, mesh, texture=None, position=[0, 0, 9], width=None, height=None,camera=1, shadeless=1, visible=True):
         self.app = view.app
         self.view = view
         if isinstance(mesh, str):
          self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
+         if (width!=None) and (height!=None): #we assume automatically that the unit_square is the mesh
+            self.mesh.setScale(width, height, 1.0)
          self.meshName = mesh
         else: #its of type module3d.Object3D
          self.mesh=mesh
@@ -652,13 +654,15 @@ class Button(View):
 
     def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture="data/themes/default/images/button_unselected.png",\
     selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None,\
-    label=None):
+    label=None, width=None, height=None):
         View.__init__(self, parent)
         if selectedTexture and selected:
             t = selectedTexture
         else:
             t = texture
-        self.button = Object(self, mesh, texture=t, position=position)
+        if (width!=None) and (height!=None):
+            self.button = Object(self, mesh='data/3dobjs/unit_square.obj', texture=t, position=position, width=width, height=height)
+        else: self.button = Object(self, mesh, texture=t, position=position)
         if isinstance(label, str):
             TextObject(self, text = label, position = [position[0]+5,position[1]-8,position[2]+0.001])
             #assumes button obj origin is upper left corner

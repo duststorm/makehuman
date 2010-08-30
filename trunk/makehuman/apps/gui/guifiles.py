@@ -156,7 +156,8 @@ class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'), category.app.getThemeResource('images', 'button_export_file_on.png'))
-        gui3d.Object(self, 'data/3dobjs/group_158x256.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0])
+        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0],\
+        158, 256)
         self.fileentry = gui3d.FileEntryView(self)
 
         self.exportBodyGroup = []

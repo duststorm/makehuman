@@ -129,9 +129,9 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         self.status = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 575, 9.1])
 
-        gui3d.Object(self, 'data/3dobjs/group_128x256.obj', self.app.getThemeResource('images', 'group_main.png'), [10, 80, 9.0])
-        gui3d.Object(category, 'data/3dobjs/group_128x64.obj', self.app.getThemeResource('images', 'group_actions.png'), [10, 472, 9.0])
-        #gui3d.Object(self, 'data/3dobjs/group_128x128.obj', self.app.getThemeResource('images', 'group_ethnics.png'), [10, 340, 9.0])
+        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_main.png'), [10, 80, 9.0], 128,256)
+        gui3d.Object(category, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_actions.png'), [10, 472, 9.0], 128,64)
+        #gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_ethnics.png'), [10, 340, 9.0],128,128)
 
     # Macro sliders
 
