@@ -154,7 +154,7 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
 
                 v.sharedFaces.append(obj.faces[i])
 
-    print 'time to build mesh: ', time.time() - time1
+    #print 'time to build mesh: ', time.time() - time1
 
     obj.calcNormals()
     obj.updateIndexBuffer()

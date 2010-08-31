@@ -783,7 +783,7 @@ class Object3D:
             except AttributeError, text:
                 pass
         else:
-            print 'loading ' + path
+            #print 'loading ' + path
             texture = None
             try:
                 texture = mh.loadTexture(path, 0)
@@ -1252,7 +1252,7 @@ class Scene3D:
         for obj in self.objects:
             self.attach(obj)
 
-        print 'Regeneration done in %f' % (time.time() - a)
+        #print 'Regeneration done in %f' % (time.time() - a)
 
     def reloadTextures(self):
         print 'Reloading textures'
