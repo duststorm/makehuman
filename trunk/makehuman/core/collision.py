@@ -79,8 +79,6 @@ def getTangent(point, i, verts, size, isNurb=False, res=0.08):  # default Octree
 
 
 # check if an unordered interval (i.e. we can have [a,b] with a>=b) is in an ordered interval (i.e. [a,b] has always a<=b)
-
-
 def unordInOrd(unord, ord):
     if unord[0] <= unord[1]:
         return unord[0] <= ord[1] and ord[0] <= unord[1]
@@ -102,8 +100,8 @@ def intIntersects(int1, int2):
 def lineInCube(line, cube):
     """
     This methods returns true if the given line passes through the cube (a cuboid can be used). Otherwise it returns false. Note that our
-    definition of cuboid is based on U(http://mathworld.wolfram.com/Cuboid.html) rather than the more general 
-    U(http://en.wikipedia.org/wiki/Cuboid).
+    definition of cuboid is based on U{http://mathworld.wolfram.com/Cuboid.html} rather than the more general 
+    U{http://en.wikipedia.org/wiki/Cuboid}.
     
     @rtype: bool
     @return: True if line passes through a cuboid, otherwise false
@@ -130,7 +128,6 @@ def lineInCube(line, cube):
                 x[0] = cube[1][0]
 
         # Projection on 2dimensions, x and y-axes
-
         y = [[], []]
         (t1, t2) = ([], [])
         if not line[1][0] == line[0][0]:
@@ -139,16 +136,13 @@ def lineInCube(line, cube):
             t2 = (x[1] - line[0][0]) / (line[1][0] - line[0][0])
             y[1] = line[0][1] * (1 - t2) + line[1][1] * t2
         else:
-
-              # line is vertical, i.e. x remains constant!
-
+            # line is vertical, i.e. x remains constant!
             y[0] = line[0][1]
             y[1] = line[1][1]
             (t1, t2) = (0, 1)
+        
         if unordInOrd(y, [cube[0][1], cube[1][1]]):
-
             # Entire 3D
-
             z = [[], []]
             z[0] = line[0][2] * (1 - t1) + line[1][2] * t1  # intersection between line and cube in z-axis
             z[1] = line[0][2] * (1 - t2) + line[1][2] * t2
@@ -156,22 +150,18 @@ def lineInCube(line, cube):
     return returnValue
 
 
+def lineThruQuad(line,quad):
+    pass
+    
 def lineInColoredLeaf(line, root):  # root is of type SimpleOctreeVolume found in simpleoctree.py
     cube = [root.bounds[0], root.bounds[6]]  # take the two corners that fully defines a cube
     if not lineInCube(line, cube):
         return False
     elif len(root.children) == 0:
-
-                                  # is it a leaf?
-
+        # is it a leaf?
         if len(root.verts) == 0:  # is it an empty leaf?
             return False
         else:
-
-            # print "cube where line is located is in: ", cube
-            # print "line is : ", line
-            # drawLine(line[0],line[1],"l")
-
             return True  # line passes through a colored leaf!
     else:
         returnValue = False
@@ -190,8 +180,6 @@ def lineInColoredLeaf(line, root):  # root is of type SimpleOctreeVolume found i
 # i is the ith vertex of object by which line must be deflected
 # isNurb asks whether line is subsequent controlPoint of a nurb, if yes then the algorithm is improved so deflection regards the actualy
 # curve and not the line connecting controlpoints
-
-
 def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-direction!
     G = [0, -1, 0]  # vector direction of gravity
 

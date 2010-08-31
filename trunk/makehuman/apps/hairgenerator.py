@@ -454,25 +454,26 @@ class Hairgenerator:
     def populateGuideGroups(self,Area):
         #guideGroups = {}
         guideGroups =[]
+        N= len(self.guides)
+        #pair[n] contains the index of the guide that should be a guide-pair partner with the nth-guide
+        pairs=[-1]*N
+        #bunch of infinities
+        areas = [[]]*N
         #Summarize = 0 #debug variable
-        S = set() #emptyset of indices.. hashing trick
-        print "Number of strands: ", len(self.guides)
+        print "Number of strands: ", N
         for i in xrange(0,len(self.guides)):
-            if i in S: continue
-            else: S.add(i)
-            k=0
-            A=[] #ordered as infinity!
-            for j in xrange(0,len(self.guides)):
-                if (j != i):
-                    B = curvePairArea(self.guides[i],self.guides[j])
-                    if B==0: continue #duplicate strands can occur!
-                    if A>B and B>=Area:
-                        k=j
-                        A=B
-            if (k!=0):
-               S.add(k)
-               #Summarize = Summarize + A #debugging Area
-               guideGroups.append((self.guides[i],self.guides[k]))
+            if (pairs[i]>-1) and areas[i]==areas[pairs[i]]: continue 
+            for j in xrange(i+1,len(self.guides)):                
+                B = curvePairArea(self.guides[i],self.guides[j])
+                if (B==0): continue #duplicate strands can occur!
+                if areas[j]>B and B>=Area:
+                    areas[j] = B
+                    areas[i] = B
+                    pairs[j] = i
+                    pairs[i] = j
+            if pairs[i]> -1:
+                guideGroups.append((self.guides[i],self.guides[pairs[i]]))
+        print "Number of Guide Groups to be rendered: ", len(guideGroups)
         return guideGroups
 
 
