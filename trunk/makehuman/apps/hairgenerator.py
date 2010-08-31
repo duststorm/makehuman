@@ -458,15 +458,15 @@ class Hairgenerator:
         #pair[n] contains the index of the guide that should be a guide-pair partner with the nth-guide
         pairs=[-1]*N
         #bunch of infinities
-        areas = [[]]*N
+        areas = [-1e6]*N
         #Summarize = 0 #debug variable
         print "Number of strands: ", N
         for i in xrange(0,len(self.guides)):
-            if (pairs[i]>-1) and areas[i]==areas[pairs[i]]: continue 
+            if (pairs[i]>-1) and pairs[pairs[i]]==i: continue 
             for j in xrange(i+1,len(self.guides)):                
                 B = curvePairArea(self.guides[i],self.guides[j])
                 if (B==0): continue #duplicate strands can occur!
-                if areas[j]>B and B>=Area:
+                if areas[j]<B and B<=Area:
                     areas[j] = B
                     areas[i] = B
                     pairs[j] = i
@@ -478,12 +478,27 @@ class Hairgenerator:
 
 
 def curvePairArea(c1, c2):
-    n=min(len(c1),len(c2))
+    #returns infinity if the curve Pair dont have almost the same c.p.
+    #good fix for long hair interpolation!
+    #TODO: write a guideline/tutorial about control points
+    if math.fabs(len(c1)-len(c2)) > 3: return 1e6
+    d1=None
+    d2=None
+    if len(c1)>len(c2):
+        d1=c1
+        d2=c2
+    else:
+        d1=c2
+        d2=c1
     A=0
     temp=0
-    for i in xrange(1,n):
+    n=len(d1)-1
+    for i in xrange(1,len(d2)):
         try:
-            temp = aljabr.convexQuadrilateralArea(c1[i-1],c2[i-1],c2[i],c1[i])
+            if i>len(d1):
+                temp = aljabr.convexQuadrilateralArea(d1[n-1],d2[i-1],d2[i],d1[n])
+            else:
+                temp = aljabr.convexQuadrilateralArea(d1[i-1],d2[i-1],d2[i],d1[i])
         except:
             return 0
         A = A+temp
