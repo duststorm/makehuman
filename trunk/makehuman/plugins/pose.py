@@ -162,6 +162,10 @@ def load(app):
             trans[0] += 0.1 * diff[0]
             trans[1] -= 0.1 * diff[1]
             human.setPosition(trans)
+    @taskview.event
+    def onMouseDown(event):
+        part = app.scene3d.getSelectedFacesGroup()
+        print part.name
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
