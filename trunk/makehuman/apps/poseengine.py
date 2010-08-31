@@ -326,7 +326,7 @@ class Poseengine():
 
     def getLimb(self,limbName):
         for l in self.limbs:
-            print repr(l.name),repr(limbName)
+            #print repr(l.name),repr(limbName)
             if l.name == limbName:
                 return l
 
