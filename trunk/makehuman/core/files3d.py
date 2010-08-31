@@ -275,7 +275,7 @@ def wavefrontToData(path):
     if len(faceGroupsNames) == 0:
         faceGroupsNames.append('default-dummy-group')
 
-    print 'loading wavefront %s in %f sec' % (path, time.time() - t1)
+    #print 'loading wavefront %s in %f sec' % (path, time.time() - t1)
     return [verts, vertsSharedFaces, uvValues, faceGroups, faceGroupsNames, uvFaceData]
 
 
@@ -376,7 +376,7 @@ def wavefrontToData_simple(path):
 
         objData = ObjFile.readline()
     ObjFile.close()
-    print 'loading wavefront in s.', time.time() - t1
+    #print 'loading wavefront in s.', time.time() - t1
     return [verts, vertsSharedFaces, vertsUV, [fg], ['dummy']]
 
 
