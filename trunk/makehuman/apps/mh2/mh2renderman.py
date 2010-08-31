@@ -5,22 +5,22 @@
 """
 Renderman Export functions
 
-**Project Name:**      MakeHuman
+B{Project Name:}      MakeHuman
 
-**Product Home Page:** http://www.makehuman.org/
+B{Product Home Page:} U{http://www.makehuman.org/}
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-**Authors:**           Manuel Bastioni
+B{Authors:}           Manuel Bastioni, Marc Flerackers
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+B{Copyright(c):}      MakeHuman Team 2001-2010
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
 
 Abstract
---------
+========
 
 This module implements functions to export a human model in Renderman format and render it
 using either the Aqsis or Renderman engine.
@@ -29,7 +29,6 @@ The MakeHuman data structures are transposed into renderman objects.
 
 """
 
-__docformat__ = 'restructuredtext'
 
 import os
 import aljabr
@@ -38,11 +37,12 @@ import subprocess
 import hairgenerator
 import random
 from hair import adjustHair
+import time
 
 
 hairsClass = hairgenerator.Hairgenerator()
 
-def writeHairs(ribRepository, mesh, Area):
+def writeHairs(ribRepository, mesh, Area, fallingHair):
 
     # Write the full hairstyle
 
@@ -52,7 +52,7 @@ def writeHairs(ribRepository, mesh, Area):
 
     # hairsClass.generateHairStyle1()
 
-    hairStyle = hairsClass.generateHairStyle2(Area=Area)
+    hairStyle = hairsClass.generateHairStyle2(Area=Area, fallingHair=fallingHair)
     print 'Writing hairs'
     hairName = os.path.join(ribRepository, 'hairs.rib')
     hairFile = open(hairName, 'w')
@@ -186,6 +186,76 @@ def clamp(min, max, val):
     return val
 
 
+def loadAllFaceGroups(referenceFile):
+    
+    
+    facesIndices = files3d.loadFacesIndices(referenceFile, True)
+    
+    currentGroup = "Empty"
+    indices = []
+    faceGroups = {}
+    for faceIdx in facesIndices:
+        if type(faceIdx) == type("abc"):           
+            faceGroups[currentGroup]=indices
+            indices = []
+            currentGroup = faceIdx
+        else:
+            indices.append(faceIdx)
+    faceGroups[currentGroup]=indices #add latest group
+    return faceGroups
+
+    
+faceGroupsGlobal = loadAllFaceGroups('data/3dobjs/base.obj')
+
+    
+def combFacesGroups(groupsToComb):
+    indices = []
+    for g in groupsToComb:
+        gIndices = faceGroupsGlobal[g]
+        indices.extend(gIndices)
+    return indices
+        
+        
+pieces =[]    
+def defineGroups(mesh):
+    global pieces
+    groupsToComb = []
+    for f in mesh.facesGroups:
+        if 'joint' not in f.name:
+            groupsToComb.append(f.name)
+            print "debug", f.name
+    pieces.append(groupsToComb)
+                
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
 
 def sssColor(mesh, referenceFile, pointLightCoords, pointLightIntensity, refl = 0.5, sssSteps = 2):
     """
@@ -224,14 +294,10 @@ def sssColor(mesh, referenceFile, pointLightCoords, pointLightIntensity, refl = 
             sssColors.append(scattering)
         sssIterations.append(sssColors)
     vertsColorSSS = sssIterations[-1]
+    return vertsColorSSS
 
-    for f in facesIndices:
-        for idx in f:
-            color = vertsColorSSS[idx[0]]
-            facesColor.append(color)
-    return facesColor
 
-def writeSubdivisionMesh(fileName, mesh, referenceFile=None, group = None, vertColors = None):
+def writeSubdivisionMesh(fileName, mesh, referenceFile=None, groups = None, vertColors = None):
     """
     This function exports a Renderman format object from the MakeHuman
     subdivided mesh object (smoothed).
@@ -249,32 +315,16 @@ def writeSubdivisionMesh(fileName, mesh, referenceFile=None, group = None, vertC
         *string*. The file system path to a reference file (the wavefront
         base object).
     """
+    global faceGroupsGlobal
+    a = time.time()
 
-    if referenceFile and group:
-        facesIndices = files3d.loadFacesIndices(referenceFile, True)
-        facesUVvalues = mesh.uvValues  # files3d.loadUV(referenceFile)
-    elif referenceFile:
-        facesIndices = files3d.loadFacesIndices(referenceFile)
-        facesUVvalues = mesh.uvValues  # files3d.loadUV(referenceFile)
-    else:
-        print 'Error: no reference file'
 
-    if group != None:
-        gFlag = False
-        gFacesIndices = []
-        for faceIdx in facesIndices:
-            if isinstance(faceIdx, str):
-                print faceIdx
-                if faceIdx == group:
-                    gFlag = True
-                else:
-                    gFlag = False
-            if gFlag == True:
-                if not isinstance(faceIdx, types.StringType):
-                    gFacesIndices.append(faceIdx)
-
-        facesIndices = gFacesIndices
-
+    
+    #facesIndices = faceGroupsGlobal[group]
+    
+    facesIndices = combFacesGroups(groups)
+    
+    facesUVvalues = mesh.uvValues  # files3d.loadUV(referenceFile)
 
     objFile = file(fileName, 'w')
     objFile.write('Declare "st" "facevarying float[2]"\n')
@@ -292,14 +342,10 @@ def writeSubdivisionMesh(fileName, mesh, referenceFile=None, group = None, vertC
             objFile.write('%i %i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0], faceIdx[3][0]))
     objFile.write(']')
 
-    objFile.write('''
-["interpolateboundary"] [0 0] [] []
-"P" [''')
+    objFile.write('''["interpolateboundary"] [0 0] [] []"P" [''')
     for vert in mesh.verts:
         objFile.write('%f %f %f ' % (vert.co[0], vert.co[1], -vert.co[2]))
     objFile.write('] ')
-
-
 
     objFile.write('\n"st" [')
     for faceIdx in facesIndices:
@@ -309,20 +355,32 @@ def writeSubdivisionMesh(fileName, mesh, referenceFile=None, group = None, vertC
             objFile.write('%s %s ' % (uvValue[0], 1 - uvValue[1]))
     objFile.write(']')
 
-
-
-    objFile.write('\n"Cs" [')
-    for color in vertColors:
-        objFile.write('%s %s %s \n' % (color, color, color))
-    objFile.write(']')
-    objFile.write('\n')
-
+    if vertColors:
+        objFile.write('\n"Cs" [')
+        for faceIdx in facesIndices:
+            for idx in faceIdx:                
+                color = vertColors[idx[0]]        
+       
+                objFile.write('%s %s %s \n' % (color, color, color))
+        objFile.write(']')
+        objFile.write('\n')
 
     objFile.close()
+    print "Time to save subdivided: ", time.time()-a
+
+
+#groupsToCombine = [['head-brow','head-upper-skull','l-head-zygoma','l-head-temple','l-head-cheek','l-eye-eyebrown']]
 
 
 
-def writeMainSceneFrame(scene, ribfile, ribRepository):
+
+
+
+
+
+
+
+def mh2Aqsis(camera, scene, fName, ribRepository, Area, fallingHair):
     """
     This function creates the frame definition for a Renderman scene.
 
@@ -339,99 +397,7 @@ def writeMainSceneFrame(scene, ribfile, ribRepository):
         *string*. The file system path to the rib repository.
     """
 
-    cameraData = scene.getCameraSettings()
-    yResolution = cameraData[6]
-    xResolution = cameraData[7]
-    fov = cameraData[5]
-    locX = cameraData[0]
-    locY = cameraData[1]
-    zoom = cameraData[2]
-    rotX = cameraData[3]
-    rotY = cameraData[4]
-    ribfile.write('FrameBegin 4\n')
-    ribfile.write('Option "statistics" "endofframe" [1]\n')
-    ribfile.write('Option "searchpath" "shader" "data/shaders/renderman:&"\n')
-    ribfile.write('Option "searchpath" "texture" "data/textures:&"\n')
-    ribfile.write('Projection "perspective" "fov" %f\n' % fov)
-    ribfile.write('Format %s %s 1\n' % (xResolution, yResolution))
-    ribfile.write('Clipping 0.1 100\n')
-    ribfile.write('PixelSamples %s %s\n' % (2, 2))
-    ribfile.write('ShadingRate %s \n' % 2)
-
-    # ribfile.write('Sides 2\n')
-
-    ribfile.write('Declare "lighttexture" "string"\n')
-    ribfile.write('Declare "skintexture" "string"\n')
-    ribfile.write('Declare "bumptexture" "string"\n')
-    ribfile.write('Declare "shadowname" "string"\n')
-    ribfile.write('Declare "blur" "float"\n')
-    ribfile.write('Declare "falloff" "float"\n')
-    ribfile.write('Display "00001.tif" "framebuffer" "rgb"\n')
-    ribfile.write('Display "+rendering.tif" "file" "rgba"\n')
-    ribfile.write('\t\tTranslate %s %s %s\n' % (locX, locY, zoom))
-    ribfile.write('\t\tRotate %s 1 0 0\n' % -rotX)
-    ribfile.write('\t\tRotate %s 0 1 0\n' % -rotY)
-    ribfile.write('WorldBegin\n')
-    ribfile.write('\tLightSource "ambientlight" 1 "intensity" [.05] "color lightcolor" [1 1 1]\n')
-    ribfile.write('\tLightSource "shadowspot" 2 "shadowname" "%s" "from" [9.39 12.80 -25.80] "to" [0 0 0] "intensity" 600  "coneangle" [0.785] "blur" [0.005] "float width" [1]\n'
-                   % (ribRepository + '/zmap.shad'))
-
-    # ribfile.write('\tLightSource "spotlight" 2 "from" [2.39 10.64 -5] "to" [0 0 0] "intensity" 30  "coneangle" [1.0] \n')
-    # ribfile.write('\tLightSource "spotlight" 3 "from" [-4.14 4.84 -7.45] "to" [0 0 0] "intensity" 35  "coneangle" [1.0]\n')
-
-    for obj in scene.objects:
-        name = obj.name
-        if name == 'base.obj':  # TODO: attribute isRendered
-            ribPath = os.path.join(ribRepository, name + '.rib')
-            objPath = os.path.join('data/3dobjs', base.obj)
-
-            lightMap = os.path.join(ribRepository, 'textures', name + '_map' + '.tif')
-
-            ribfile.write('\tAttributeBegin\n')
-            ribfile.write('\t\tColor [%s %s %s]\n' % (0.8, 0.8, 0.8))
-            ribfile.write('\t\tOpacity [%s %s %s]\n' % (1, 1, 1))
-            ribfile.write('\t\tTranslate %s %s %s\n' % (0, 0, 0))
-            ribfile.write('\t\tRotate %s 0 0 1\n' % 0)
-            ribfile.write('\t\tRotate %s 0 1 0\n' % 0)
-            ribfile.write('\t\tRotate %s 1 0 0\n' % 0)
-            ribfile.write('\t\tScale %s %s %s\n' % (1, 1, 1))
-            writeSubdivisionMesh(ribPath, obj, objPath)
-            ribfile.write('\t\tSurface "skin" "string opacitytexture" "%s" "string texturename" "%s" "string speculartexture" "%s" "string ssstexture" "%s" "float Ks" [.4] "float dark" [2]\n'
-                           % ('texture_opacity.tif', 'texture.tif', 'texture_ref.tif', lightMap))
-            ribfile.write('\t\tReadArchive "%s"\n' % ribPath)
-            ribfile.write('\tAttributeEnd\n')
-
-    ribfile.write('\tAttributeBegin\n')
-    ribfile.write('\t\tDeclare "rootcolor" "color"\n')
-    ribfile.write('\t\tDeclare "tipcolor" "color"\n')
-    ribfile.write('\t\tSurface "hair" "rootcolor" [%s %s %s] "tipcolor" [%s %s %s]\n' % (hairsClass.rootColor[0], hairsClass.rootColor[1], hairsClass.rootColor[2],
-                  hairsClass.tipColor[0], hairsClass.tipColor[1], hairsClass.tipColor[2]))
-
-    ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(ribRepository, 'hairs.rib'))
-    ribfile.write('\tAttributeEnd\n')
-
-    ribfile.write('WorldEnd\n')
-    ribfile.write('FrameEnd\n')
-
-
-
-def mh2Aqsis(camera, scene, fName, ribRepository, Area):
-    """
-    This function creates the frame definition for a Renderman scene.
-
-    Parameters
-    ----------
-
-    scene:
-        *scene3D*. The scene object.
-
-    ribfile:
-        *string*. The file system path to the output file that needs to be generated.
-
-    ribRepository:
-        *string*. The file system path to the rib repository.
-    """
-
+    global pieces
     ribfile = file(fName, 'w')
     print 'RENDERING IN AQSIS'
     applicationPath = os.getcwd()  # TODO: this may not always return the app folder
@@ -496,33 +462,43 @@ def mh2Aqsis(camera, scene, fName, ribRepository, Area):
                       pointLightIntensity[i] * 75))
 
         # note z has the negative sign of renderman light because opengl->renderman
-        # factor 75 is just an empirical. TODO: modify it in proportion of light distance
+        # factor 75 is just an empirical. TODO: modify it in proportion of light distance 
 
-    headCentr = [0, 0, 0]
     for obj in scene.objects:
         name = obj.name
         if name == 'base.obj':  # TODO: attribute isRendered
-            ribPath = os.path.join(ribRepository, name + '.rib')
             objPath = os.path.join('data/3dobjs', 'base.obj')
-
+            defineGroups(obj)
             vcolors = sssColor(obj, objPath, pointLightCoords, pointLightIntensity)
+            for fGroup in pieces:
+                gName = fGroup[0]
+                print "rendering....", gName
+        
+        
+                ribPath = os.path.join(ribRepository, gName + '.rib')
+                
 
-            ribfile.write('\tAttributeBegin\n')
-            ribfile.write('\t\tColor [%s %s %s]\n' % (0.8, 0.8, 0.8))
-            ribfile.write('\t\tOpacity [%s %s %s]\n' % (1, 1, 1))
-            ribfile.write('\t\tTranslate %s %s %s\n' % (0, 0, 0))
-            ribfile.write('\t\tRotate %s 0 0 1\n' % 0)
-            ribfile.write('\t\tRotate %s 0 1 0\n' % 0)
-            ribfile.write('\t\tRotate %s 1 0 0\n' % 0)
-            ribfile.write('\t\tScale %s %s %s\n' % (1, 1, 1))
-            #writeSubdivisionMesh(ribPath, obj, objPath, "l-eye-ball")
-            writeSubdivisionMesh(ribPath, obj, objPath, vertColors = vcolors)
-#Surface "skin2" "string texturename" "texture.tif"
-            ribfile.write('\t\tSurface "skin" "skintexture" "%s" "string refltexture" "%s" "float Ks" [2.5] \n'% ('texture.texture','texture_ref.texture'))
-            #ribfile.write('\t\tSurface "constant"')
-            ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
-            ribfile.write('\tAttributeEnd\n')
-            writeHairs(ribRepository, obj, Area)
+                
+
+                ribfile.write('\tAttributeBegin\n')
+                ribfile.write('\t\tColor [%s %s %s]\n' % (0.8, 0.8, 0.8))
+                ribfile.write('\t\tOpacity [%s %s %s]\n' % (1, 1, 1))
+                ribfile.write('\t\tTranslate %s %s %s\n' % (0, 0, 0))
+                ribfile.write('\t\tRotate %s 0 0 1\n' % 0)
+                ribfile.write('\t\tRotate %s 0 1 0\n' % 0)
+                ribfile.write('\t\tRotate %s 1 0 0\n' % 0)
+                ribfile.write('\t\tScale %s %s %s\n' % (1, 1, 1))
+                
+                writeSubdivisionMesh(ribPath, obj, objPath, fGroup,vertColors = vcolors)
+                #writeSubdivisionMesh(ribPath, obj, objPath, vertColors = vcolors)
+
+                #ribfile.write('\t\tSurface "matte"')
+                ribfile.write('\t\tSurface "skin" "skintexture" "%s" "string refltexture" "%s" "float Ks" [2.5] \n'% ('texture.texture','texture_ref.texture'))
+                #ribfile.write('\t\tSurface "constant"')
+                ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
+                ribfile.write('\tAttributeEnd\n')
+                
+            writeHairs(ribRepository, obj, Area, fallingHair)
 
 
     ribfile.write('\tAttributeBegin\n')
@@ -535,7 +511,7 @@ def mh2Aqsis(camera, scene, fName, ribRepository, Area):
     ribfile.write('FrameEnd\n')
     ribfile.close()
 
-def saveScene(camera, scene, fName, ribDir, engine, Area=0.6):
+def saveScene(camera, scene, fName, ribDir, engine, Area=0.6, fallingHair=False):
     """
     This function exports a Renderman format scene and then invokes either
     Aqsis or Renderman to render it.
@@ -575,7 +551,7 @@ def saveScene(camera, scene, fName, ribDir, engine, Area=0.6):
     # writeShadowScene(scene, ribfile, ribRepository)
 
     if engine == 'aqsis':
-        mh2Aqsis(camera, scene, fName, ribRepository, Area)
+        mh2Aqsis(camera, scene, fName, ribRepository, Area, fallingHair)
     if engine == 'pixie':
         print 'write pixie'
         mh2Pixie(scene, fName, ribRepository)

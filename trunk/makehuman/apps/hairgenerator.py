@@ -3,16 +3,22 @@
 # -*- coding: utf-8 -*-
 
 """
-===========================  ===============================================================
-Project Name:                **MakeHuman**
-Product Home Page:           http://www.makehuman.org/
-Google Home Page:            http://code.google.com/p/makehuman/
-Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2010
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
-Coding Standards:            See http://sites.google.com/site/makehumandocs/developers-guide
-===========================  ===============================================================
+B{Project Name:}      MakeHuman
 
+B{Product Home Page:} U{http://www.makehuman.org/}
+
+B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
+
+B{Authors:}           Manuel Bastioni, Marc Flerackers
+
+B{Copyright(c):}      MakeHuman Team 2001-2010
+
+B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
+
+B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
+
+Abstract
+========
 
 This module contain the classes needed to load, save and generate (from guides)
 makehuman hairs.
@@ -91,7 +97,7 @@ class Hairgenerator:
                 return i
         return None
 
-    def generateHairStyle2(self, Area=0.6, humanMesh=None, isCollision=False):
+    def generateHairStyle2(self, Area=0.6, fallingHair=False, humanMesh=None, isCollision=False):
         """
         Calling this function, each guide is interpolated with all other guides
         to add a new strand of hairs to the hairstyle.
@@ -108,7 +114,8 @@ class Hairgenerator:
         if humanMesh == None:
             isCollision = False
         
-        guideGroups = self.populateGuideGroups(Area)
+        if (fallingHair): guideGroups=self.groupFallingHair(Area)
+        else: guideGroups = self.groupPeakyHair(Area)
         for guideGroup in guideGroups:
             if len(guideGroup) > 0:
 
@@ -451,22 +458,45 @@ class Hairgenerator:
 
     #guides is of type list of curves
     #self.guideGroups is a list of tuples (as in pairs) of guides (curves)
-    def populateGuideGroups(self,Area):
-        #guideGroups = {}
+    def groupFallingHair(self,Area):
         guideGroups =[]
         N= len(self.guides)
         #pair[n] contains the index of the guide that should be a guide-pair partner with the nth-guide
         pairs=[-1]*N
         #bunch of infinities
         areas = [-1e6]*N
-        #Summarize = 0 #debug variable
         print "Number of strands: ", N
         for i in xrange(0,len(self.guides)):
             if (pairs[i]>-1) and pairs[pairs[i]]==i: continue 
             for j in xrange(i+1,len(self.guides)):                
                 B = curvePairArea(self.guides[i],self.guides[j])
                 if (B==0): continue #duplicate strands can occur!
+                #taking greatest lower bound to Area
                 if areas[j]<B and B<=Area:
+                    areas[j] = B
+                    areas[i] = B
+                    pairs[j] = i
+                    pairs[i] = j
+            if pairs[i]> -1:
+                guideGroups.append((self.guides[i],self.guides[pairs[i]]))
+        print "Number of Guide Groups to be rendered: ", len(guideGroups)
+        return guideGroups
+        
+    def groupPeakyHair(self,Area):
+        guideGroups =[]
+        N= len(self.guides)
+        #pair[n] contains the index of the guide that should be a guide-pair partner with the nth-guide
+        pairs=[-1]*N
+        #bunch of infinities
+        areas = [1e6]*N
+        print "Number of strands: ", N
+        for i in xrange(0,len(self.guides)):
+            if (pairs[i]>-1) and pairs[pairs[i]]==i: continue 
+            for j in xrange(i+1,len(self.guides)):                
+                B = curvePairArea(self.guides[i],self.guides[j])
+                if (B==0): continue #duplicate strands can occur!
+                #taking least upper bound to Area
+                if areas[j]>B and B>=Area:
                     areas[j] = B
                     areas[i] = B
                     pairs[j] = i

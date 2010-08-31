@@ -50,7 +50,8 @@ def load(app):
         if not os.path.exists(renderPath):
             os.makedirs(renderPath)
         Area = app.categories['Rendering'].guideArea.getValue()
-        mh2renderman.saveScene(app.modelCamera, app.scene3d, 'scena.rib', renderPath, 'aqsis', Area)
+        fallingHair = app.categories['Rendering'].fallingHair.selected
+        mh2renderman.saveScene(app.modelCamera, app.scene3d, 'scena.rib', renderPath, 'aqsis', Area, fallingHair)
 
     print 'aqsis loaded'
 

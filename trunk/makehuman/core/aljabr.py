@@ -734,28 +734,29 @@ def _QR(M,n):
     A=M[:] #deep copy for a flat iterable. warning [:] does shallow copy for multidimensional iterables
     R=n*n*array('d',[0]) #zero matrix
     for j in xrange(n):
+        m=n-j
         x=array('d')
-        e=(n-i)*array('d',[0])
+        e=m*array('d',[0])
         e[0]=1.0
-        for i in xrange(n-j):
+        for i in xrange(m):
             x.append(A[i])
         v = vadd(x,vmul(vlen(x),e))
         d=vlen(v) #nonzero because A is singular
         d=2/(d*d)
-        P=vsub(unitMatrix(n),vmul(vmulv(v,v),d))
+        P=vsub(unitMatrix(m),vmul(vmulv(v,v),d))
         #A=_mmul(P,A,n,n,n)
         
         B=array('d')
         #smart matrix matrix multiplication extracting the lower submatrix into B
         #i.e. : removing the first row and column of the multiplication of P and A and assigning B to it
         # see how Householder Transformation are created in QR-Decomposition!
-        for i in xrange(n):
-            m=i*n
-            for j2 in xrange(n):
+        for i in xrange(m):
+            m=i*(n-j)
+            for j2 in xrange(m):
                 a=0
-                for k in xrange(n):
-                    a=a+P[m+k]*A[k*n+j2]
-                if i<n: R.append(a)
+                for k in xrange(m):
+                    a=a+P[m+k]*A[k*m+j2]
+                if i<m: R.append(a)
                 elif j2>0: B.append(a)
         A=B
         #A= A
