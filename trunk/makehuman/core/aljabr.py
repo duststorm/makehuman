@@ -756,8 +756,8 @@ def _QR(M,n):
                 a=0
                 for k in xrange(m):
                     a=a+P[m+k]*A[k*m+j2]
-                if i<m: R.append(a)
-                elif j2>0: B.append(a)
+                if j2=0: R[j2+j+j*n]=a
+                else: B.append(a)
         A=B
         #A= A
     #v is not zero because the matrix is singular
