@@ -19,23 +19,22 @@ print 'aqsis imported'
 
 aqsis = None
 
+
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 
 
 def load(app):
-    usrShaderPath = os.path.join(mh.getPath('render'), 'ribFiles', 'shaders')
-    if not os.path.isdir(usrShaderPath):
-        os.makedirs(usrShaderPath)
 
-  # Create aqsis shaders
-  # subprocess.Popen("aqsl data/shaders/aqsis/lightmap_aqsis.sl -o %s" % (os.path.join(usrShaderPath, "lightmap.slx")), shell=True)
+    sceneToRender = mh2renderman.RMRScene(app.scene3d,app.modelCamera)
 
-    subprocess.Popen('aqsl data/shaders/aqsis/skin.sl -o "%s"' % os.path.join(usrShaderPath, 'skin.slx'), shell=True)
-    subprocess.Popen('aqsl data/shaders/aqsis/hair.sl -o "%s"' % os.path.join(usrShaderPath, 'hair.slx'), shell=True)
+    #Create aqsis shaders
+    subprocess.Popen('aqsl data/shaders/aqsis/skin.sl -o "%s"' % os.path.join(sceneToRender.usrShaderPath, 'skin.slx'), shell=True)
+    subprocess.Popen('aqsl data/shaders/aqsis/hair.sl -o "%s"' % os.path.join(sceneToRender.usrShaderPath, 'hair.slx'), shell=True)
 
     aqsis = gui3d.TaskView(app.categories['Rendering'], 'Aqsis', app.getThemeResource('images', 'button_aqsis.png'))
-
+    
+    
     @aqsis.event
     def onShow(event):
         pass
@@ -45,13 +44,12 @@ def load(app):
         pass
 
     @aqsis.button.event
-    def onClicked(event):
-        renderPath = mh.getPath('render')
-        if not os.path.exists(renderPath):
-            os.makedirs(renderPath)
+    def onClicked(event):        
         Area = app.categories['Rendering'].guideArea.getValue()
         fallingHair = app.categories['Rendering'].fallingHair.selected
-        mh2renderman.saveScene(app.modelCamera, app.scene3d, 'scena.rib', renderPath, 'aqsis', Area, fallingHair)
+        sceneToRender.render("scene.rib",Area,fallingHair)
+        #mh2renderman.saveScene(app.modelCamera, app.scene3d, 'scena.rib', renderPath, 'aqsis', Area)
+        
 
     print 'aqsis loaded'
 
