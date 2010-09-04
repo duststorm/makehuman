@@ -41,6 +41,8 @@ class Hairgenerator:
     def __init__(self):
 
         self.tipMagnet = 0.9
+        self.fallingHair = False
+        self.hairCoverage = 0.6
          
         self.numberOfHairsClump = 10
         self.numberOfHairsMultiStrand = 20
@@ -392,6 +394,10 @@ class Hairgenerator:
                 self.numberOfHairsClump = int(datalist[1])
             elif datalist[0] == 'numberOfHairsMultiStrand':
                 self.numberOfHairsMultiStrand = int(datalist[1])
+            elif datalist[0] == 'hairCoverage':
+                self.hairCoverage = float(datalist[1])
+            elif datalist[0] == 'fallingHair':
+                self.fallingHair = bool(datalist[1])
             elif datalist[0] == 'randomFactClump':
                 self.randomFactClump = float(datalist[1])
             elif datalist[0] == 'randomFactMultiStrand':

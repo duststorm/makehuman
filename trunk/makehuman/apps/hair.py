@@ -103,7 +103,11 @@ class HairTaskView(gui3d.TaskView):
       #scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
       human = self.app.scene3d.selectedHuman
       scn = human.scene
-      self.hairsClass.loadHairs(path)         
+      self.hairsClass.loadHairs(path)
+      renderGui  = self.app.categories['Rendering']
+      renderGui.fallingHair.setSelected(self.hairsClass.fallingHair)
+      renderGui.guideArea.setValue(self.hairsClass.hairCoverage)
+      renderGui.guideArea.label.setText(str(self.hairsClass.hairCoverage))
       position = human.getPosition()
       rotation = human.getRotation()
       #if hairsClass == None :

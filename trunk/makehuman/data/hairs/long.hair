@@ -14,4 +14,5 @@ sizeMultiStrand 0.200000
 blendDistance 0.800000
 tipcolor 0.109000 0.037000 0.007000
 rootcolor 0.109000 0.037000 0.007000
-coverage 0.353191
+hairCoverage 0.8
+fallingHair 1
