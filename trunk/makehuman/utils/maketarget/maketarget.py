@@ -23,12 +23,19 @@ development cycle to create these extreme morph target files from
 hand-crafted models.
 
 """
+import os.path
 
 
 __docformat__ = 'restructuredtext'
 
 import sys
 sys.path.append("./")
+makehuman_src = "../../"
+sys.path.append(os.path.join(makehuman_src, "/utils/maketarget/") )
+sys.path.append(os.path.join(makehuman_src, "/utils/svd_tools/fit/") )
+sys.path.append(os.path.join(makehuman_src, "/utils/") )
+sys.path.append(os.path.join(makehuman_src, "/core/") )
+sys.path.append(os.path.join(makehuman_src, "/utils/topology_translator/") )
 import os
 
 import Blender
@@ -37,7 +44,6 @@ from Blender.BGL import *
 from Blender import Draw
 from Blender import Window
 import bpy
-from Blender import Mathutils
 from Blender.Mathutils import *
 import blender2obj
 from Blender import Types
@@ -46,6 +52,7 @@ basePath = 'base.obj'
 pairsPath = 'base.sym'
 centersPath = 'base.sym.centers'
 windowEditMode = Blender.Window.EditMode()
+GUIswitch = 1
 
 morphFactor = Draw.Create(1.0)
 saveOnlySelectedVerts = Draw.Create(0)
@@ -72,13 +79,21 @@ def endEditing():
 def redrawAll():
     Blender.Window.RedrawAll()
 
-def getVertices(n=0,name = None):
+def getVertices(n=0,name = None, copy = True):
     if name:
         obj = Blender.Object.Get(name).getData(mesh=True)
     else:    
         obj = Blender.Object.GetSelected()[n].getData(mesh=True)
-    vertices = [[v.co[0],v.co[1],v.co[2]] for v in obj.verts]
+    if copy:
+        vertices = [[v.co[0],v.co[1],v.co[2]] for v in obj.verts]
+    else:
+        vertices = obj.verts
     return vertices
+
+def getObjName(n=0):
+
+    obj = Blender.Object.GetSelected()[n]
+    return obj.getName()
 
 def getVertGroups(n=0, name = None):
     vertGroups = {}
@@ -102,9 +117,13 @@ def getSelectedVertices(n=0, name = None):
             selectedVertices.append(i)
     return selectedVertices
     
-def selectVert(i, n=0):
-    obj = Blender.Object.GetSelected()[n].getData(mesh=True)
-    obj.verts[i].sel = 1
+def selectVert(vertsToSelect, n=0, name = None):
+    if name:
+        obj = Blender.Object.Get(name).getData(mesh=True)
+    else:
+        obj = Blender.Object.GetSelected()[n].getData(mesh=True)
+    for i in vertsToSelect:
+        obj.verts[i].sel = 1
     obj.update()
     obj.calcNormals()
 
@@ -145,27 +164,40 @@ def createMesh(verts, faces, name):
     
 def applyTransforms():
     objs = Blender.Object.Get()
-    for obj in objs:        
-            
-            
+    for obj in objs:            
         if type(obj.getData(mesh=True)) == Types.MeshType:
             mesh = obj.getData(mesh=True)
-            m = obj.getMatrix()
-           
+            m = obj.getMatrix()           
             obj.setLocation(0,0,0)
             obj.setSize(1,1,1)
             obj.setEuler(0,0,0)
-            mesh.transform(m)      # Convert verts to world space
-            
-            
+            mesh.transform(m)      # Convert verts to world space            
             mesh.update()
         
 
 #-------MAKETARGET CALLBACKS----------------------
 
+def checkSelectedMesh():
+    global message
+    name = getObjName()
+    if name == "Base" or name == "scan_mask" or name == "base_mask":
+        message = "WARNING: you have selected %s instead the scanner mesh"%(name)
+        print message
+        return 0
+    else:
+        return 1
+
+
 def buildScan2Mesh(path):
+    global message
+    checkSelectedMesh()
     main_dir = os.path.dirname(path)
     target_dir = os.path.join(main_dir,"targets_db")
+    if not os.path.isdir(target_dir):
+        message = "The build folder must contain a 'target_db' folder with the db"
+        print message
+        return
+
     head_mesh = os.path.join(main_dir,"base_mesh.obj")
     head_mask = os.path.join(main_dir,"base_mask.obj")
     prefix = os.path.join(main_dir,"fitdata")
@@ -173,7 +205,7 @@ def buildScan2Mesh(path):
     
 def fitScan2Mesh(path):
     main_dir = os.path.dirname(path)
-    target_dir = os.path.join(main_dir,"targets_db")
+    #target_dir = os.path.join(main_dir,"targets_db")
     head_mesh = os.path.join(main_dir,"base_mesh.obj")
     head_mask = os.path.join(main_dir,"base_mask.obj")
     scan_mesh = os.path.join(main_dir,"scan_mesh.obj")
@@ -196,6 +228,13 @@ def saveBaseMask(path):
     baseMaskPath = os.path.join(mainDir,"base_mask.obj")   
     bExporter = blender2obj.Blender2obj(baseMask,1)    
     bExporter.write(baseMaskPath,1)
+
+def saveBaseMesh(path):
+    mainDir = os.path.dirname(path)
+    baseMask = Blender.Object.Get("Base")
+    baseMaskPath = os.path.join(mainDir,"base_mesh.obj")
+    bExporter = blender2obj.Blender2obj(baseMask,1)
+    bExporter.write(baseMaskPath,1)
     
 def saveScanMesh(path):
     mainDir = os.path.dirname(path)
@@ -208,8 +247,22 @@ def saveScanElements(path):
     saveScanMask(path)    
     saveBaseMask(path)
     saveScanMesh(path)
+    #buildScan2Mesh(path)
+    loadSelVertsBase(path)
+    #fitScan2Mesh(path)
+
+def buildSVNdb(path):
+
+    saveBaseMesh(path)
+    saveBaseMask(path)
     buildScan2Mesh(path)
+
+
+def scan2mh(path):
+    saveScanMask(path)
+    saveScanMesh(path)
     fitScan2Mesh(path)
+    
 
 def loadTarget(path):
     global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode    
@@ -336,27 +389,31 @@ def processingTargets(path, n=0):
     
 def adapt(path):
     print "Fitting face...final step"
+    if checkSelectedMesh == 0:
+        return
     startEditing()
     base = getVertices(name="Base")
     verticesToAdapt = maketargetlib.loadVertsIndex(path)
-    print verticesToAdapt
+    #print verticesToAdapt
     scan = getVertices(0)    
     maketargetlib.adaptMesh(base, scan, verticesToAdapt)
     updateVertices(base,name="Base")
     endEditing()
 
-def align():    
+def align():
+    global message
     startEditing()
     maskBaseVerts = getVertices(name="base_mask")
     maskScanVerts = getVertices(name="scan_mask")
+    
     if len(maskBaseVerts) != len(maskScanVerts):
         message = "Error: Masks with different number of vertices: %d vs %d"%(len(maskBaseVerts),len(maskScanVerts))
         return
-    scanVerts = getVertices(0)    
+    scanVerts = getVertices(0)
+    print len(scanVerts)
     maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
     updateVertices(scanVerts,0)
-    updateVertices(maskScanVerts,name="scan_mask")
-    message = "Alignment done!"
+    updateVertices(maskScanVerts,name="scan_mask")    
     endEditing()  
     
 def saveSelVerts(path, n= 0):
@@ -366,12 +423,20 @@ def saveSelVerts(path, n= 0):
         return 
     maketargetlib.saveIndexSelectedVerts(getSelectedVertices(n), path)
     
-def loadSelVerts(path, n= 0):
+def loadSelVerts(path):
     startEditing()
     selVerts = maketargetlib.loadVertsIndex(path)
-    for i in selVerts:
-        selectVert(i)
-    endEditing()  
+    selectVert(selVerts)
+    endEditing()
+
+def loadSelVertsBase(path):
+    print "Loading verts to select"
+    mainDir = os.path.dirname(path)
+    path = os.path.join(mainDir, "face.verts")
+    startEditing()
+    selVerts = maketargetlib.loadVertsIndex(path)    
+    selectVert(selVerts, name = "Base")
+    endEditing()
     
 def analyseTarget(n=0):
     global targetBuffer
@@ -380,8 +445,7 @@ def analyseTarget(n=0):
     colorVertices(vertColors, n=0)
 
 
-    
-    
+
 
 
 #-----------------BLENDER GUI------------------
@@ -397,39 +461,66 @@ def draw():
     global message
     global targetPath,morphFactor,rotVal,rotSum,currentTarget,selAxis,rotationMode
     global saveOnlySelectedVerts,loadedTraslTarget, loadedRotTarget, loadedPoseTarget
-    
-    glClearColor(0.5, 0.5, 0.5, 0.0)
-    glClear(GL_COLOR_BUFFER_BIT)
 
-    glColor3f(0.0, 0.0, 0.0)
-    glRasterPos2i(10, 300)
-    Draw.Text("MakeTargets v3.2")
+    if GUIswitch == 1:
 
-    glColor3f(0.5, 0.0, 0.0)
-    glRasterPos2i(10, 250)
-    Draw.Text("Msg: %s"%(message))
+        glClearColor(0.5, 0.5, 0.5, 0.0)
+        glClear(GL_COLOR_BUFFER_BIT)
 
-    glColor3f(0.0, 0.0, 0.0)
-    glRasterPos2i(10, 230)
-    Draw.Text("Target: %s"%(os.path.basename(loadedTraslTarget)))
-    
-    if loadedTraslTarget:
-        fileText = os.path.basename(loadedTraslTarget)
-    elif loadedRotTarget:
-        fileText = os.path.basename(loadedRotTarget)
-    elif loadedPoseTarget:
-        fileText = os.path.basename(loadedPoseTarget)
-    
+        glColor3f(0.0, 0.0, 0.0)
+        glRasterPos2i(10, 300)
+        Draw.Text("MakeTargets v3.2")
 
-    Draw.Button("Load", 2, 10, 200, 50, 20, "Load target")
-    Draw.Button("Morph", 3, 60, 200, 50, 20, "Morph ")
-    Draw.Button("<=", 5, 110, 200, 30, 20, "Make left side symetrical to right side")
-    Draw.Button("Reset", 10, 140, 200, 40, 20, "Return base object to its original state")
-    Draw.Button("=>", 6, 180, 200, 30, 20, "Make right side symetrical to left side")
-    morphFactor = Draw.Number("Value: ", 0, 10, 180, 100, 20, morphFactor.val, -2, 2, "Insert the value to apply the target")
-    Draw.Button("Save", 1, 110, 180, 100, 20, "Save target")
-    saveOnlySelectedVerts = Draw.Toggle("Save only selected verts",0,10,160,200,20,saveOnlySelectedVerts.val,"The target will affect only the selected verts")
-    rotationMode = Draw.Toggle("Rotations",0,10,140,200,20,rotationMode.val,"Work with rotation targets")
+        glColor3f(0.5, 0.0, 0.0)
+        glRasterPos2i(10, 250)
+        Draw.Text("Msg: %s"%(message))
+
+        glColor3f(0.0, 0.0, 0.0)
+        glRasterPos2i(10, 230)
+
+        fileText = ""
+        if loadedTraslTarget:
+            fileText = os.path.basename(loadedTraslTarget)
+        elif loadedRotTarget:
+            fileText = os.path.basename(loadedRotTarget)
+        elif loadedPoseTarget:
+            fileText = os.path.basename(loadedPoseTarget)
+        Draw.Text("Target: %s"%(fileText))
+
+
+        Draw.Button("Load", 1, 10, 200, 50, 20, "Load target")
+        Draw.Button("Morph", 2, 60, 200, 50, 20, "Morph ")
+        Draw.Button("<=", 3, 110, 200, 30, 20, "Make left side symetrical to right side")
+        Draw.Button("Reset", 4, 140, 200, 40, 20, "Return base object to its original state")
+        Draw.Button("=>", 5, 180, 200, 30, 20, "Make right side symetrical to left side")
+        morphFactor = Draw.Number("Value: ", 0, 10, 180, 100, 20, morphFactor.val, -2, 2, "Insert the value to apply the target")
+        Draw.Button("Save", 6, 110, 180, 100, 20, "Save target")
+        saveOnlySelectedVerts = Draw.Toggle("Save only selected verts",0,10,160,200,20,saveOnlySelectedVerts.val,"The target will affect only the selected verts")
+        rotationMode = Draw.Toggle("Rotations",0,10,140,200,20,rotationMode.val,"Work with rotation targets")
+
+    if GUIswitch == 2:
+
+        glClearColor(0.5, 0.5, 0.5, 0.0)
+        glClear(GL_COLOR_BUFFER_BIT)
+
+        glColor3f(0.0, 0.0, 0.0)
+        glRasterPos2i(10, 300)
+        Draw.Text("ScanToMH vers. 1")
+
+        glColor3f(0.5, 0.0, 0.0)
+        glRasterPos2i(10, 250)
+        Draw.Text("Msg: %s"%(message))
+
+        glColor3f(0.0, 0.0, 0.0)
+        glRasterPos2i(10, 230)
+
+        Draw.Button("Load ob", 30, 10, 200, 80, 20, "Load wavefront obj")
+        Draw.Button("Fit", 32, 90, 200, 80, 20, "Morph ")
+        Draw.Button("Build", 31, 170, 200, 80, 20, "Build targets db")
+        Draw.Button("Save verts", 33, 10, 180, 80, 20, "Save selected verts")
+        
+       
+        
 
 
 def event(event, value):
@@ -446,6 +537,8 @@ def event(event, value):
         *int*. A value **EDITORIAL NOTE: Need to find out what this is used for**
 
     """
+    global GUIswitch
+    GUIswitchMax = 2
     if event == Draw.ESCKEY and not value: Draw.Exit()
     elif event == Draw.AKEY:
         Window.FileSelector (saveSymVertsIndices, "Save Symm data")
@@ -455,8 +548,7 @@ def event(event, value):
         Window.FileSelector (saveTranslationTargetAndHisSymm, "Save Target")
     elif event == Draw.DKEY:
         Window.FileSelector (loadAlloadTargetInFolder, "Load from folder")
-    elif event == Draw.EKEY:
-        print "EKEY"
+    elif event == Draw.EKEY:        
         align()
     elif event == Draw.FKEY:
         Window.FileSelector (generateTargetsDB, "Generate DB from")
@@ -477,27 +569,33 @@ def event(event, value):
     elif event == Draw.PKEY:
         Window.FileSelector (scaleRotTarget, "Scale Rot target")
     elif event == Draw.QKEY:
-        Window.FileSelector (applyPoseFromFolder, "Load pose from folder") 
+        Window.FileSelector (applyPoseFromFolder, "Load pose from folder")
     elif event == Draw.RKEY:
-        alignPCA()    
+        alignPCA()
     elif event == Draw.SKEY:
         Window.FileSelector (processingTargets, "Process targets")
     elif event == Draw.TKEY:
-        Window.FileSelector (saveGroups, "Save vertgroups") 
+        Window.FileSelector (saveGroups, "Save vertgroups")
     elif event == Draw.UKEY:
-        Window.FileSelector (scanReg, "Load scan") 
+        Window.FileSelector (scanReg, "Load scan")
     elif event == Draw.WKEY:
-        Window.FileSelector (buildScan2Mesh, "build db") 
+        Window.FileSelector (buildScan2Mesh, "build db")
     elif event == Draw.XKEY:
-        Window.FileSelector (fitScan2Mesh, "svd fitting") 
+        Window.FileSelector (fitScan2Mesh, "svd fitting")
     elif event == Draw.YKEY:
-        Window.FileSelector (saveScanElements, "save scan elements") 
+        Window.FileSelector (saveScanElements, "save scan elements")
     elif event == Draw.KKEY:
         applyTransforms()
-        
-        
+    elif event == Draw.PAGEDOWNKEY and not value and GUIswitch < GUIswitchMax:
+        GUIswitch += 1
+    elif event == Draw.PAGEUPKEY and not value and GUIswitch > 1:
+        GUIswitch -= 1
+    print GUIswitch
+    Draw.Draw()
 
-        
+
+
+
 
 def buttonEvents(event):
     """
@@ -521,24 +619,30 @@ def buttonEvents(event):
         fileToSaveName = loadedRotTarget
     if loadedPoseTarget != "":
         fileToSaveName = loadedPoseTarget
-    
+
     if event == 0: pass
     elif event == 1:
-        Window.FileSelector (saveTarget, "Save Target",fileToSaveName)
-    elif event == 2:
         Window.FileSelector (loadTarget, "Load Target")
-    elif event == 3:
+    elif event == 2:
         applyTarget(morphFactor.val)
-    elif event == 5:
+    elif event == 3:
         symm(0)
-    elif event == 6:
-        symm(1)
-    elif event == 10:
+    elif event == 4:
         reset()
-    elif event == 20:
-        align()
+    elif event == 5:
+        symm(1)
+    elif event == 6:
+        Window.FileSelector (saveTarget, "Save Target",fileToSaveName)
+    elif event == 30:
+        Window.FileSelector (scanReg, "Load scan")
+    elif event == 31:
+        Window.FileSelector (buildSVNdb, "Build svn db","build.tmp")
+    elif event == 32:
+        Window.FileSelector (scan2mh, "Fit scan to mh")
+    elif event == 33:
+        Window.FileSelector (saveSelVerts, "Save selected vert", "face.verts")
     Draw.Draw()
-    
+
 Draw.Register(draw, event, buttonEvents)
 
 
