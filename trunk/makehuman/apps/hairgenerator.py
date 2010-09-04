@@ -74,11 +74,6 @@ class Hairgenerator:
         """
         Calling this function, for each guide in each guideGroup,
         a new hairtuft will be added to the hairstyle.
-
-        Parameters
-        ----------
-
-        No parameters
         """
      
         #for guideGroup in self.guideGroups: #taking tuples from list of tuples of curves
@@ -472,6 +467,8 @@ class Hairgenerator:
                 B = curvePairArea(self.guides[i],self.guides[j])
                 if (B==0): continue #duplicate strands can occur!
                 #taking greatest lower bound to Area
+                #exerimental
+                #n=math.fabs(len(self.guides[i])-len(self.guides[j]))
                 if areas[j]<B and B<=Area:
                     areas[j] = B
                     areas[i] = B
