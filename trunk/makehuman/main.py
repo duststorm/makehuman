@@ -1,22 +1,22 @@
 """
 The main MakeHuman Python Application file.
 
-**Project Name:**      MakeHuman
+B{Project Name:}      MakeHuman
 
-**Product Home Page:** http://www.makehuman.org/
+B{Product Home Page:} U{http://www.makehuman.org/}
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-**Authors:**           Manuel Bastioni, Marc Flerackers
+B{Authors:}           Manuel Bastioni, Marc Flerackers
 
-**Copyright(c):**      MakeHuman Team 2001-2010
+B{Copyright(c):}      MakeHuman Team 2001-2010
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
 
 Abstract
---------
+========
 
 This is the main MakeHuman Python Application file which participates in the
 application startup process. It contains functions that respond to events
@@ -44,7 +44,6 @@ low-level event loop.
 This Python module responds to high-level GUI toolbar events to switch
 between different GUI modes, but otherwise events are handled by GUI mode
 specific Python modules.
-
 """
 
 import sys
