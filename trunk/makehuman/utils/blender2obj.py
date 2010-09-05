@@ -29,6 +29,7 @@ the end of obj file, according the zbuffer drawing.
 import Blender
 from Blender import Types
 import time
+import os
 
 class SortedSet:
     """
@@ -140,7 +141,7 @@ class Blender2obj:
 
         #Assigning the elements to facegroup (it's a bit messy, because
         #Blender doesn't have facegroups, but vertgroups only.
-        a = time.time()
+        
         if not raw:
             for g in self.groupNames:
                 vIndices = set(self.mesh.getVertsFromGroup(g))
@@ -160,9 +161,7 @@ class Blender2obj:
         else:
             self.groupNames = ["raw"]
             self.vertGroups["raw"] = self.toSave
-            self.ungrouped = set()
-
-        print "TIME ",time.time()-a
+            self.ungrouped = set()        
 
 
     def write(self,path,worldSpace = None):
@@ -171,6 +170,8 @@ class Blender2obj:
         @type  path: string
         @param path: The path of wavefront obj to save
         """
+
+        print "Saving... %s"%(os.path.basename(path))
         a = time.time()
         exportedElements = 0
         fileDescriptor = open(path, "w")
