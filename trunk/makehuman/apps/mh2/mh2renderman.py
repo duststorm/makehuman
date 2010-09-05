@@ -69,6 +69,8 @@ class RMRMaterial:
 
 class RMRLight:
 
+    lightCounter = 0
+
     def __init__(self, position = [0,0,0], lookAt = [1,1,1], intensity = 1.0, type = "pointlight"):
 
         self.position = position
@@ -76,6 +78,8 @@ class RMRLight:
         self.type = type
         self.intensity = intensity
         self.color = [1,1,1]
+        RMRLight.lightCounter += 1
+        self.counter = RMRLight.lightCounter
 
     def writeRibCode(self, ribfile, n=0):
         # remember z in opengl -> -z in renderman
@@ -393,11 +397,10 @@ class RMRHuman(RMNObject):
 
 class RMRTexture:
 
-    def __init__(self, picturename, texturePath):
-
-        self.texturePath = texturePath
-        self.picturename = os.path.join(texturePath, picturename).replace('\\', '/')
-        self.texturename = os.path.join(texturePath,os.path.splitext(picturename)[0]+".texture").replace('\\', '/')
+    def __init__(self, picturename, appTexturePath, usrTexturePath):
+        
+        self.picturename = os.path.join(appTexturePath, picturename).replace('\\', '/')
+        self.texturename = os.path.join(usrTexturePath,os.path.splitext(picturename)[0]+".texture").replace('\\', '/')
         self.swrap = "periodic"
         self.twrap = "periodic"
         self.filterfunc = "box"
@@ -432,9 +435,9 @@ class RMRScene:
         self.renderPath = mh.getPath('render')
         self.ribsPath = os.path.join(self.renderPath, 'ribFiles')
         self.usrShaderPath = os.path.join(self.ribsPath, 'shaders')
-        self.usrRMRTexturePath = os.path.join(self.ribsPath, 'textures')
+        self.usrTexturePath = os.path.join(self.ribsPath, 'textures')
         self.applicationPath = os.getcwd()  # TODO: this may not always return the app folder
-        self.appRMRTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
+        self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
 
         #creating resources folders
@@ -442,8 +445,8 @@ class RMRScene:
             os.makedirs(self.renderPath)
         if not os.path.isdir(self.ribsPath):
             os.makedirs(self.ribsPath)
-        if not os.path.isdir(self.usrRMRTexturePath):
-            os.makedirs(self.usrRMRTexturePath)
+        if not os.path.isdir(self.usrTexturePath):
+            os.makedirs(self.usrTexturePath)
         if not os.path.isdir(self.usrShaderPath):
             os.makedirs(self.usrShaderPath)
 
@@ -454,8 +457,8 @@ class RMRScene:
         self.shadingRate = 2
 
         #textures used in the scene
-        texture1 = RMRTexture("texture.tif", self.appRMRTexturePath)
-        texture2 = RMRTexture("texture_ref.tif", self.appRMRTexturePath)
+        texture1 = RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath)
+        texture2 = RMRTexture("texture_ref.tif", self.appTexturePath, self.usrTexturePath)
         self.textures = [texture1,texture2]
 
     def __str__(self):
@@ -484,7 +487,7 @@ class RMRScene:
         ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
         ribfile.write('Option "statistics" "endofframe" [1]\n')
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
-        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrRMRTexturePath.replace('\\', '/'))
+        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
         ribfile.write('Projection "perspective" "fov" %f\n' % self.camera.fovAngle)
         ribfile.write('Format %s %s 1\n' % (self.xResolution, self.yResolution))
         ribfile.write('Clipping 0.1 100\n')
@@ -499,12 +502,10 @@ class RMRScene:
         ribfile.write('\t\tTranslate %f %f %f\n' % (pos[0], pos[1], 0.0)) # Model
         ribfile.write('\t\tRotate %f 1 0 0\n' % -pos[2])
         ribfile.write('\t\tRotate %f 0 1 0\n' % -pos[3])
-        ribfile.write('WorldBegin\n')
+        ribfile.write('WorldBegin\n')        
         
-        n = 0
         for l in self.lights:
-            l.writeRibCode(ribfile, n)
-            n += 1
+            l.writeRibCode(ribfile, l.counter)
         for subObj in self.humanCharacter.subObjects:
 
             print "rendering....", subObj.name
