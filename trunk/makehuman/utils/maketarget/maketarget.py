@@ -55,6 +55,7 @@ windowEditMode = Blender.Window.EditMode()
 GUIswitch = 1
 
 morphFactor = Draw.Create(1.0)
+regulFactor = Draw.Create(0.005)
 saveOnlySelectedVerts = Draw.Create(0)
 rotationMode = Draw.Create(0)
 poseMode = False
@@ -177,20 +178,8 @@ def applyTransforms():
 
 #-------MAKETARGET CALLBACKS----------------------
 
-def checkSelectedMesh():
-    global message
-    name = getObjName()
-    if name == "Base" or name == "scan_mask" or name == "base_mask":
-        message = "WARNING: you have selected %s instead the scanner mesh"%(name)
-        print message
-        return 0
-    else:
-        return 1
-
-
 def buildScan2Mesh(path):
-    global message
-    checkSelectedMesh()
+    global message    
     main_dir = os.path.dirname(path)
     target_dir = os.path.join(main_dir,"targets_db")
     if not os.path.isdir(target_dir):
@@ -204,6 +193,8 @@ def buildScan2Mesh(path):
     maketargetlib.scan2meshBuild(target_dir, head_mesh ,head_mask,prefix)
     
 def fitScan2Mesh(path):
+    global message, regulFactor
+    print "Fitting using a regul = %f"%(regulFactor.val)
     main_dir = os.path.dirname(path)
     #target_dir = os.path.join(main_dir,"targets_db")
     head_mesh = os.path.join(main_dir,"base_mesh.obj")
@@ -212,8 +203,12 @@ def fitScan2Mesh(path):
     scan_mask = os.path.join(main_dir,"scan_mask.obj")
     fit_verts = os.path.join(main_dir,"face.verts")
     output = os.path.join(main_dir,"result.target")
-    prefix = os.path.join(main_dir,"fitdata")    
-    maketargetlib.scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output)
+    prefix = os.path.join(main_dir,"fitdata")
+    if os.path.isfile(fit_verts):
+        maketargetlib.scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output,regulFactor.val)
+    else:
+        message = "Error: face.verts not found!"
+        print message
     
 def saveScanMask(path):
     mainDir = os.path.dirname(path)
@@ -238,18 +233,11 @@ def saveBaseMesh(path):
     
 def saveScanMesh(path):
     mainDir = os.path.dirname(path)
-    scanMesh = Blender.Object.GetSelected()[0]    
+    scanMesh = Blender.Object.Get("scan_mesh")
     scanMeshPath = os.path.join(mainDir,"scan_mesh.obj")   
     bExporter = blender2obj.Blender2obj(scanMesh,1)    
-    bExporter.write(scanMeshPath,1)
-    
-def saveScanElements(path):
-    saveScanMask(path)    
-    saveBaseMask(path)
-    saveScanMesh(path)
-    #buildScan2Mesh(path)
-    loadSelVertsBase(path)
-    #fitScan2Mesh(path)
+    bExporter.write(scanMeshPath,1)    
+
 
 def buildSVNdb(path):
 
@@ -258,10 +246,22 @@ def buildSVNdb(path):
     buildScan2Mesh(path)
 
 
+def loadFitTarget(path):
+    
+    mainDir = os.path.dirname(path)
+    tPath = os.path.join(mainDir,"result.target")
+    loadTarget(tPath)
+    applyTarget(1.0, meshName = "Base")
+
 def scan2mh(path):
     saveScanMask(path)
     saveScanMesh(path)
     fitScan2Mesh(path)
+    loadFitTarget(path)
+    applyTransforms()
+    align()
+    loadSelVertsBase(path)
+    adapt(path)
     
 
 def loadTarget(path):
@@ -286,10 +286,10 @@ def loadTarget(path):
         poseMode = True    
     endEditing()
   
-def applyTarget(mFactor, n=0):
+def applyTarget(mFactor, n=0, meshName = None):
     global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget
     startEditing()
-    vertices = getVertices(n)
+    vertices = getVertices(n, name = meshName)
     if rotationMode.val and not poseMode:
         maketargetlib.loadRotTarget(vertices,loadedRotTarget,mFactor)
     if not rotationMode.val and not poseMode:
@@ -298,7 +298,7 @@ def applyTarget(mFactor, n=0):
         maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor)
     if rotationMode.val and poseMode:
         maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor,onlyRot = True)        
-    updateVertices(vertices)
+    updateVertices(vertices, n, name = meshName)
     endEditing()
 
 def applyPoseFromFolder(path, n=0):
@@ -389,13 +389,13 @@ def processingTargets(path, n=0):
     
 def adapt(path):
     print "Fitting face...final step"
-    if checkSelectedMesh == 0:
-        return
+    mainDir = os.path.dirname(path)
+    path = os.path.join(mainDir, "face.verts")
     startEditing()
     base = getVertices(name="Base")
     verticesToAdapt = maketargetlib.loadVertsIndex(path)
     #print verticesToAdapt
-    scan = getVertices(0)    
+    scan = getVertices(name="scan_mesh")
     maketargetlib.adaptMesh(base, scan, verticesToAdapt)
     updateVertices(base,name="Base")
     endEditing()
@@ -409,18 +409,13 @@ def align():
     if len(maskBaseVerts) != len(maskScanVerts):
         message = "Error: Masks with different number of vertices: %d vs %d"%(len(maskBaseVerts),len(maskScanVerts))
         return
-    scanVerts = getVertices(0)
-    print len(scanVerts)
+    scanVerts = getVertices(name="scan_mesh")
     maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
-    updateVertices(scanVerts,0)
-    updateVertices(maskScanVerts,name="scan_mask")    
+    updateVertices(scanVerts,name="scan_mesh")
+    #updateVertices(maskScanVerts,name="scan_mask")
     endEditing()  
     
-def saveSelVerts(path, n= 0):
-    if os.path.exists(path):
-        message =  "Error: file already exist"
-        redrawAll()
-        return 
+def saveSelVerts(path, n= 0):    
     maketargetlib.saveIndexSelectedVerts(getSelectedVertices(n), path)
     
 def loadSelVerts(path):
@@ -458,7 +453,7 @@ def draw():
     **Parameters:** This method has no parameters.
 
     """
-    global message
+    global message, regulFactor
     global targetPath,morphFactor,rotVal,rotSum,currentTarget,selAxis,rotationMode
     global saveOnlySelectedVerts,loadedTraslTarget, loadedRotTarget, loadedPoseTarget
 
@@ -518,6 +513,7 @@ def draw():
         Draw.Button("Fit", 32, 90, 200, 80, 20, "Morph ")
         Draw.Button("Build", 31, 170, 200, 80, 20, "Build targets db")
         Draw.Button("Save verts", 33, 10, 180, 80, 20, "Save selected verts")
+        regulFactor = Draw.Number("Regul: ", 0, 90, 180, 100, 20, regulFactor.val, 0, 1, "0 mean fine fitting, but less constrain")
         
        
         
@@ -590,7 +586,7 @@ def event(event, value):
         GUIswitch += 1
     elif event == Draw.PAGEUPKEY and not value and GUIswitch > 1:
         GUIswitch -= 1
-    print GUIswitch
+    
     Draw.Draw()
 
 
@@ -638,7 +634,7 @@ def buttonEvents(event):
     elif event == 31:
         Window.FileSelector (buildSVNdb, "Build svn db","build.tmp")
     elif event == 32:
-        Window.FileSelector (scan2mh, "Fit scan to mh")
+        Window.FileSelector (scan2mh, "Start Fitting")
     elif event == 33:
         Window.FileSelector (saveSelVerts, "Save selected vert", "face.verts")
     Draw.Draw()
