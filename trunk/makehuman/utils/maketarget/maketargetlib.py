@@ -289,7 +289,7 @@ def loadTraslTarget(vertices,targetPath,mFactor):
     try:
         fileDescriptor = open(targetPath)
     except:
-        print"Unable to open %s",(targetPath)
+        print"Unable to open %s"%(targetPath)
         return  None
 
     current_target = targetPath
@@ -348,7 +348,7 @@ def saveTraslTarget(vertices, targetPath, basePath, verticesTosave):
     try:
         fileDescriptor = open(targetPath, "w")
     except:
-        print "Unable to open %s",(targetPath)
+        print "Unable to open %s"%(targetPath)
         return  None
     print "saving %s"%(targetPath)
     for index in verticesTosave:
@@ -602,7 +602,7 @@ def saveGroups(vertGroups, path, filter = None):
     try:
         fileDescriptor = open(path, "w")
     except:
-        print "Unable to open %s",(path)
+        print "Unable to open %s"%(path)
         return  None
     for g in vertGroups:
         if filter:
@@ -628,7 +628,7 @@ def saveIndexSelectedVerts(selectVerts, path):
     try:
         fileDescriptor = open(path, "w")
     except:
-        print "Unable to open %s",(path)
+        print "Unable to open %s"%(path)
         return  None
     for v in selectVerts:
         fileDescriptor.write("%d\n"%(v))
@@ -650,7 +650,7 @@ def loadVertsIndex(path):
     try:
         fileDescriptor = open(path)
     except:
-        print "Unable to open %s",(path)
+        print "Unable to open %s"%(path)
         return  None
     for vData in fileDescriptor:
         i = int(vData.split()[0])
