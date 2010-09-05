@@ -48,7 +48,7 @@ def scan2meshBuild(target_dir,head_mesh,head_mask,output):
     base.save(output)
 
     
-def scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output):    
+def scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output,regul = 0.005):
 
     head_mesh = wf.read_obj(head_mesh)
     head_mask = wf.read_obj(head_mask)
