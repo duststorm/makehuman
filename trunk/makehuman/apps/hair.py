@@ -205,14 +205,14 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
       vtemp1, vtemp2 = None, None
       uvtemp1, uvtemp2 = None, None
       dist =  widthFactor*res/2
-      for i in xrange(2,len(cPs)-1):
+      for i in xrange(1,len(cPs)):
           cp1=cPs[i-1]
           cp2=cPs[i]
           verts=[[],[],[],[]]
           
           #compute ribbon plane
           #vec = vmul(vnorm(vcross(vsub(cp2,cp1), vsub(cp2,headCentroid))), dist)
-          if i==2:
+          if i==1:
             #trick to make normals face always outside the head
             vec = vmul(vnorm(vcross(vsub(headCentroid,cp2),vsub(cp1,cp2))), dist)
             verts[0] = vsub(cp1,vec)
