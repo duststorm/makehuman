@@ -320,12 +320,12 @@ def scanReg(scan):
     startEditing()
     (vertsM, facesM) = maketargetlib.scanRegistration(scan)
     name = scan.split('\\')[-1].split('/')[-1]
-    ob = createMesh(vertsM, facesM, name)
+    ob = createMesh(vertsM, facesM, "scan_reg")
     #apply rotation matrix as the base
-    matrixR = RotationMatrix(90, 4, 'x')
+    #matrixR = RotationMatrix(90, 4, 'x')
     #put scan on the left of base
-    matrixT = TranslationMatrix(Vector(-3, 0, 7))
-    ob.setMatrix(matrixR * matrixT)
+    matrixT = TranslationMatrix(Vector(-3, 7, 0))
+    ob.setMatrix(matrixT)
     endEditing()   
         
 def saveTarget(path):    
