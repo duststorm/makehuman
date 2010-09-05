@@ -14,8 +14,8 @@
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
 Abstract
-MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.15
+Lipsync for the MHX rig and Blender 2.5x.
+Version 0.1
 
 """
 
@@ -24,17 +24,15 @@ bl_addon_info = {
 	'author': 'Thomas Larsson',
 	'version': '0.1',
 	'blender': (2, 53, 1),
-	"location": "File > Import",
+    "api": 31683,
+	"location": "UI panel",
 	"description": "Lipsync for the MHX rig",
 	"warning": "",
-	"wiki_url": "http://wiki.blender.org/index.php/Extensions:2.5/Py/Scripts/",
-	"tracker_url": "https://projects.blender.org/tracker/index.php?func=detail&aid=21872&group_id=153&atid=469",
 	"category": "Import/Export"}
 
 """
-Place this file in the .blender/scripts/addons dir
-You have to activated the script in the "Add-Ons" tab (user preferences).
-Access from the File > Import menu.
+Run from text window. 
+Access from UI panel (N-key) when MHX rig is active.
 """
 
 MAJOR_VERSION = 0
@@ -101,27 +99,27 @@ magpieVisemes = dict({
 })
 
 #
-#	setViseme(self, context, vis, setKey, frame):
+#	setViseme(context, vis, setKey, frame):
 #	setBoneLocation(context, pbone, loc, mirror, setKey, frame):
 #
 
-def setViseme(self, context, vis, setKey, frame):
+def setViseme(context, vis, setKey, frame):
 	pbones = context.object.pose.bones
-	for (b, (x, z)) in self.Visemes[vis]:
-		loc = self.Mathutils.Vector((float(x),0,float(z)))
+	for (b, (x, z)) in visemes[vis]:
+		loc = mathutils.Vector((float(x),0,float(z)))
 		try:
 			pb = pbones[b]
 		except:
 			pb = None
 			
 		if pb:
-			self.SetBoneLocation(context, pb, loc, False, setKey, frame)
+			setBoneLocation(context, pb, loc, False, setKey, frame)
 		else:
-			self.SetBoneLocation(context, pbones[b+'_L'], loc, False, setKey, frame)
-			self.SetBoneLocation(context, pbones[b+'_R'], loc, True, setKey, frame)
+			setBoneLocation(context, pbones[b+'_L'], loc, False, setKey, frame)
+			setBoneLocation(context, pbones[b+'_R'], loc, True, setKey, frame)
 	return
 
-def setBoneLocation(self, context, pb, loc, mirror, setKey, frame):
+def setBoneLocation(context, pb, loc, mirror, setKey, frame):
 	scale = context.object['MhxScale']
 	if mirror:
 		loc[0] = -loc[0]
@@ -132,37 +130,37 @@ def setBoneLocation(self, context, pb, loc, mirror, setKey, frame):
 	return
 
 #
-#	openFile(self, context, file):
-#	readMoho(self, context, fp, offs):
-#	readMagpie(self, context, fp, offs):
+#	openFile(context, file):
+#	readMoho(context, fp, offs):
+#	readMagpie(context, fp, offs):
 #
 
-def openFile(self, context, file):
+def openFile(context, file):
 	ob = context.object
 	if ob.type != 'ARMATURE':
 		raise NameError("No armature selected")
-	(path, fileName) = self.Os.path.split(file)
-	(name, ext) = self.Os.path.splitext(fileName)
+	(path, fileName) = os.path.split(file)
+	(name, ext) = os.path.splitext(fileName)
 	return open(file, "rU")
 
-def readMoho(self, context, fp, offs):
+def readMoho(context, fp, offs):
 	for line in fp:
 		words= line.split()
 		if len(words) < 2:
 			pass
 		else:
-			vis = self.MohoVisemes[words[1]]
-			self.SetViseme(context, vis, True, int(words[0])+offs)
+			vis = mohoVisemes[words[1]]
+			setViseme(context, vis, True, int(words[0])+offs)
 	return
 	
-def readMagpie(self, context, fp, offs):
+def readMagpie(context, fp, offs):
 	for line in fp: 
 		words= line.split()
 		if len(words) < 3:
 			pass
 		elif words[2] == 'X':
-			vis = self.MagpieVisemes[words[3]]
-			self.SetViseme(context, vis, True, int(words[0])+offs)
+			vis = magpieVisemes[words[3]]
+			setViseme(context, vis, True, int(words[0])+offs)
 	return
 	
 #
@@ -183,8 +181,7 @@ class MhxLipsyncPanel(bpy.types.Panel):
 	def poll(cls, context):
 		if context.object and context.object.type == 'ARMATURE':
 			try:
-				scale = context.object['MhxScale']
-				return True
+				return context.object['MhxRig']
 			except:
 				pass
 		return False
@@ -230,12 +227,9 @@ def defineVisemeButtons():
 "class OBJECT_OT_%sButton(bpy.types.Operator):\n" % vis+
 "	bl_idname = 'OBJECT_OT_%sButton'\n" % vis+
 "	bl_label = '%s'\n" % vis +	
-"	SetViseme = setViseme\n" +
-"	Visemes = visemes\n" +
-"	Mathutils = mathutils\n" +
-"	SetBoneLocation = setBoneLocation\n" +
 "	def invoke(self, context, event):\n" +
-"		self.SetViseme(context, '%s', False, context.scene.frame_current)\n" % vis +
+"		global bpy, mathutils\n" +
+"		setViseme(context, '%s', False, context.scene.frame_current)\n" % vis +
 "		return{'FINISHED'}\n"
 		)
 		# print(expr)
@@ -246,7 +240,6 @@ defineVisemeButtons()
 
 # 
 #	class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
-#	class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 #
 
 class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
@@ -255,20 +248,11 @@ class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
-	Bpy = bpy
-	Os = os
-	Mathutils = mathutils
-	OpenFile = openFile
-	ReadMoho = readMoho
-	SetBoneLocation = setBoneLocation
-	SetViseme = setViseme
-	Visemes = visemes
-	MohoVisemes = mohoVisemes
-
 	def execute(self, context):
-		fp = self.OpenFile(context, self.properties.filepath)		
-		self.Bpy.ops.object.mode_set(mode='POSE')	
-		self.ReadMoho(context, fp, self.properties.startFrame-1)
+		global bpy, os, mathutils
+		fp = openFile(context, self.properties.filepath)		
+		bpy.ops.object.mode_set(mode='POSE')	
+		readMoho(context, fp, self.properties.startFrame-1)
 		fp.close()
 		return{'FINISHED'}	
 
@@ -276,26 +260,21 @@ class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 		context.manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}	
 
+#
+#	class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
+#
+
 class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadMagpieButton"
 	bl_label = "Magpie (.mag)"
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
-	Bpy = bpy
-	Os = os
-	Mathutils = mathutils
-	OpenFile = openFile
-	ReadMagpie = readMagpie
-	SetBoneLocation = setBoneLocation
-	SetViseme = setViseme
-	Visemes = visemes
-	MagpieVisemes = magpieVisemes
-	
 	def execute(self, context):
-		fp = self.OpenFile(context, self.properties.filepath)		
-		self.Bpy.ops.object.mode_set(mode='POSE')	
-		self.ReadMagpie(context, fp, self.properties.startFrame-1)
+		global bpy, os, mathutils
+		fp = openFile(context, self.properties.filepath)		
+		bpy.ops.object.mode_set(mode='POSE')	
+		readMagpie(context, fp, self.properties.startFrame-1)
 		fp.close()
 		return{'FINISHED'}	
 

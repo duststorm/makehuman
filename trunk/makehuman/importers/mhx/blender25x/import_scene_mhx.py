@@ -23,7 +23,8 @@ bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
 	'version': '0.15',
-	'blender': (2, 53, 1),
+	'blender': (2, 5, 3),
+    "api": 31683,
 	"location": "File > Import",
 	"description": "Import files in the MakeHuman eXchange format (.mhx)",
 	"warning": "",
@@ -82,6 +83,7 @@ todo = []
 #
 
 T_EnforceVersion = 0x01
+T_PoleTar = 0x02
 T_Stretch = 0x04
 T_Bend = 0x08
 
@@ -100,7 +102,7 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Bend
+toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Bend + T_PoleTar
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -113,7 +115,10 @@ fNoStretch = 0.0
 #	rigLeg and rigArm flags
 T_Toes = 0x0001
 T_GoboFoot = 0x0002
-T_InvFoot = 0x0004
+
+T_InvFoot = 0x0010
+T_InvFootPT = 0x0020
+T_InvFootNoPT = 0x0040
 
 T_FingerPanel = 0x100
 T_FingerRot = 0x0200
@@ -130,8 +135,13 @@ def setFlagsAndFloats(rigFlags):
 
 	(footRig, fingerRig) = rigFlags
 	rigLeg = 0
-	if footRig == 'Reverse foot': rigLeg |= T_InvFoot
-	elif footRig == 'Gobo': rigLeg |= T_GoboFoot
+	if footRig == 'Reverse foot': 
+		rigLeg |= T_InvFoot
+		if toggle & T_PoleTar:
+			rigLeg |= T_InvFootPT
+		else:
+			rigLeg |= T_InvFootNoPT
+	elif footRig == 'Gobo': rigLeg |= T_GoboFoot		
 
 	rigArm = 0
 	if fingerRig == 'Panel': rigArm |= T_FingerPanel
@@ -1226,9 +1236,7 @@ def parseMesh (args, tokens):
 			except:
 				mat = None
 			if mat:
-				#me.materials.new(mat)
-				#me.add_material(mat)
-				print("Adding materials seems dead now!")
+				me.materials.link(mat)
 		else:
 			defaultKey(key, val,  sub, "me", [], globals(), locals())
 
@@ -1378,7 +1386,7 @@ def parseVertexGroup(ob, me, args, tokens):
 		loadedData['VertexGroup'][grpName] = group
 		for (key, val, sub) in tokens:
 			if key == 'wv':
-				ob.vertex_groups.assign( int(val[0]), group, float(val[1]), 'REPLACE' )
+				ob.vertex_groups.assign( [int(val[0])], group, float(val[1]), 'REPLACE' )
 				#ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
 	return
 
@@ -1618,7 +1626,6 @@ def parseBoneGroup(pose, nGrps, args, tokens):
 
 def parsePoseBone(pbones, ob, args, tokens):
 	global todo
-	#print( "Parsing posebone %s" % args )
 	if invalid(args[1]):
 		return
 	name = args[0]
@@ -2359,7 +2366,7 @@ def clearScene():
 		return scn
 
 	for ob in scn.objects:
-		if ob.type == "MESH" or ob.type == "ARMATURE":
+		if ob.type == "MESH" or ob.type == "ARMATURE" or ob.type == 'EMPTY':
 			scn.objects.active = ob
 			bpy.ops.object.mode_set(mode='OBJECT')
 			scn.objects.unlink(ob)
@@ -2396,7 +2403,9 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
 
 	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
-		items = [('Reverse foot','Reverse foot','Reverse foot'), ('Gobo','Gobo','Gobo')], default = '1')
+		items = [('Reverse foot','Reverse foot','Reverse foot'), 
+				('Gobo','Gobo','Gobo')], 
+				default = '1')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
 		items = [('Rotation','Rotation','Rotation'), ('Panel','Panel','Panel'), ('IK','IK','IK')], default = '1')
 
@@ -2405,6 +2414,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
+	poletar = BoolProperty(name="Pole targets", description="Pole targets for IK", default=toggle&T_PoleTar)
 	stretch = BoolProperty(name="Stretchy limbs", description="Stretchy limbs", default=toggle&T_Stretch)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
@@ -2419,13 +2429,15 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_Armature = T_Armature if self.properties.armature else 0
 		O_Replace = T_Replace if self.properties.replace else 0
+		O_PoleTar = T_PoleTar if self.properties.poletar else 0
 		O_Stretch = T_Stretch if self.properties.stretch else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		O_Diamond = T_Diamond if self.properties.diamond else 0
 		O_Bend = T_Bend if self.properties.bend else 0
-		toggle = O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX 
+		toggle = ( O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_PoleTar | O_Stretch | 
+				O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX )
 
 		print("Load", self.properties.filepath)
 		readMhxFile(self.properties.filepath, 	
