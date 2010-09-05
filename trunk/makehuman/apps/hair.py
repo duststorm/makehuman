@@ -100,7 +100,6 @@ class HairTaskView(gui3d.TaskView):
 
 
   def loadHairsFile(self, path,res=0.04, update = True):
-      #scn, path,res=0.04, position=[0.0,0.0,0.0], rotation=[0.0,0.0,0.0],  hairsClass = None, update = True, widthFactor=1.0):
       human = self.app.scene3d.selectedHuman
       scn = human.scene
       self.hairsClass.loadHairs(path)
@@ -110,8 +109,6 @@ class HairTaskView(gui3d.TaskView):
       renderGui.guideArea.label.setText(str(self.hairsClass.hairCoverage))
       position = human.getPosition()
       rotation = human.getRotation()
-      #if hairsClass == None :
-      #  hairsClass = hairgenerator.Hairgenerator()
       obj = scn.newObj(path)
       obj.x = position[0]
       obj.y = position[1]
@@ -131,8 +128,6 @@ class HairTaskView(gui3d.TaskView):
       obj.indexBuffer = []
       fg = obj.createFaceGroup("ribbons")
           
-      #temporary vectors    
-
       headBB=calculateBoundingBox(human.headVertices)
       headCentroid = in2pts(headBB[0],headBB[1],0.5)
       delta = vsub(headCentroid,self.oHeadCentroid)
@@ -156,7 +151,6 @@ class HairTaskView(gui3d.TaskView):
             cP[1]=temp[1]
             cP[2]=temp[2]
         loadStrands(obj,guide, self.widthFactor, res)
-
         
       #HACK: set hair color to default black 
       fg.setColor([0,0,0,255]) #rgba
@@ -211,7 +205,6 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
           verts=[[],[],[],[]]
           
           #compute ribbon plane
-          #vec = vmul(vnorm(vcross(vsub(cp2,cp1), vsub(cp2,headCentroid))), dist)
           if i==1:
             #trick to make normals face always outside the head
             vec = vmul(vnorm(vcross(vsub(headCentroid,cp2),vsub(cp1,cp2))), dist)

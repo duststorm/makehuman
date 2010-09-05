@@ -397,7 +397,7 @@ class Hairgenerator:
             elif datalist[0] == 'hairCoverage':
                 self.hairCoverage = float(datalist[1])
             elif datalist[0] == 'fallingHair':
-                self.fallingHair = bool(datalist[1])
+                self.fallingHair = bool(int(datalist[1]))
             elif datalist[0] == 'randomFactClump':
                 self.randomFactClump = float(datalist[1])
             elif datalist[0] == 'randomFactMultiStrand':
