@@ -40,7 +40,6 @@ import bpy, os, mathutils, math
 from mathutils import *
 from bpy.props import *
 
-
 #
 #	FkArmature
 #
@@ -628,7 +627,6 @@ def deleteFKRig(context, rig00, action):
 	del rig00
 	for act in bpy.data.actions:
 		if act.name[0:2] == 'Y_':
-			print('del', act)
 			act.use_fake_user = False
 			bpy.data.actions.remove(act)
 			del act
@@ -670,7 +668,6 @@ def init(scn):
 			default = ''
 		)
 		bvh = getBvh(mhx)
-		print(bvh)
 		if bvh:
 			scn[mhx] = bvh
 	return
@@ -719,14 +716,17 @@ class Bvh2MhxPanel(bpy.types.Panel):
 #	importAndRename(context, filepath, scale, frame_start, loop):
 #	class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 #
-
-import import_anim_bvh
+import sys
+bvhPath = os.path.realpath('./2.53/scripts/op/io_anim_bvh')
+if bvhPath not in sys.path:
+	sys.path.append(bvhPath)
+import import_bvh
 
 def importAndRename(context, filepath, scale, frame_start, loop):
-	bvh_nodes = import_anim_bvh.read_bvh(context, filepath,
+	bvh_nodes = import_bvh.read_bvh(context, filepath,
 		ROT_MODE='QUATERNION',
 		GLOBAL_SCALE=scale)
-	import_anim_bvh.bvh_node_dict2armature(context, bvh_nodes,
+	import_bvh.bvh_node_dict2armature(context, bvh_nodes,
 		ROT_MODE='QUATERNION',
 		IMPORT_START_FRAME=frame_start,
 		IMPORT_LOOP=loop)
@@ -741,7 +741,7 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 	loop = BoolProperty(name="Loop", description="Loop the animation playback", default=False)
 
 	def execute(self, context):
-		import bpy, os, import_anim_bvh
+		import bpy, os, import_bvh
 		importAndRename(context, self.properties.filepath, self.properties.scale, self.properties.frame_start, self.properties.loop)
 		return{'FINISHED'}	
 
@@ -772,7 +772,7 @@ class OBJECT_OT_LoadAndRetargetButton(bpy.types.Operator):
 	loop = BoolProperty(name="Loop", description="Loop the animation playback", default=False)
 
 	def execute(self, context):
-		import bpy, os, import_anim_bvh, mathutils
+		import bpy, os, import_bvh, mathutils
 		loadAndRetarget(context, self.properties.filepath, self.properties.scale, self.properties.frame_start, self.properties.loop)
 		return{'FINISHED'}	
 
@@ -794,7 +794,6 @@ def readDirectory(directory, prefix):
 		(name, ext) = os.path.splitext(fileName)
 		if name[:n] == prefix and ext == '.bvh':
 			paths.append("%s/%s" % (realdir, fileName))
-	print(paths)
 	return paths
 
 class OBJECT_OT_BatchButton(bpy.types.Operator):
@@ -802,7 +801,7 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 	bl_label = "Batch load BVH and retarget rig"
 
 	def execute(self, context):
-		import bpy, os, import_anim_bvh, mathutils
+		import bpy, os, import_bvh, mathutils
 		paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
 		for filepath in paths:
 			loadAndRetarget(context, filepath, 0.1, 1, False)
