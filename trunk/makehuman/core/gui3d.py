@@ -51,6 +51,9 @@ class Object(events3d.EventHandler):
          self.meshName = mesh.name
          self.mesh.setLoc(position[0], position[1], position[2])
         self.texture = texture
+        # TL: added this to avoid crash on startup
+        if not self.mesh:
+         return
         if texture:
             self.mesh.setTexture(texture)
         view.objects.append(self)
