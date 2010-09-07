@@ -6,37 +6,6 @@ import mhx_rig
 from mhx_rig import *
 
 ToeJoints = [
-
-	('r-toe-1-1',			'j', 'r-toe-1-1'),
-	('r-toe-1-2',			'j', 'r-toe-1-2'),
-	('r-toe-2-1',			'j', 'r-toe-2-1'),
-	('r-toe-2-2',			'j', 'r-toe-2-2'),
-	('r-toe-2-3',			'j', 'r-toe-2-3'),
-	('r-toe-3-1',			'j', 'r-toe-3-1'),
-	('r-toe-3-2',			'j', 'r-toe-3-2'),
-	('r-toe-3-3',			'j', 'r-toe-3-3'),
-	('r-toe-4-1',			'j', 'r-toe-4-1'),
-	('r-toe-4-2',			'j', 'r-toe-4-2'),
-	('r-toe-4-3',			'j', 'r-toe-4-3'),
-	('r-toe-5-1',			'j', 'r-toe-5-1'),
-	('r-toe-5-2',			'j', 'r-toe-5-2'),
-	('r-toe-5-3',			'j', 'r-toe-5-3'),
-
-	('l-toe-1-1',			'j', 'l-toe-1-1'),
-	('l-toe-1-2',			'j', 'l-toe-1-2'),
-	('l-toe-2-1',			'j', 'l-toe-2-1'),
-	('l-toe-2-2',			'j', 'l-toe-2-2'),
-	('l-toe-2-3',			'j', 'l-toe-2-3'),
-	('l-toe-3-1',			'j', 'l-toe-3-1'),
-	('l-toe-3-2',			'j', 'l-toe-3-2'),
-	('l-toe-3-3',			'j', 'l-toe-3-3'),
-	('l-toe-4-1',			'j', 'l-toe-4-1'),
-	('l-toe-4-2',			'j', 'l-toe-4-2'),
-	('l-toe-4-3',			'j', 'l-toe-4-3'),
-	('l-toe-5-1',			'j', 'l-toe-5-1'),
-	('l-toe-5-2',			'j', 'l-toe-5-2'),
-	('l-toe-5-3',			'j', 'l-toe-5-3'),
-
 	('l-toe-1-end',			'l', ((2.0, 'l-toe-1-2'), (-1.0, 'l-toe-1-1'))),
 	('l-toe-2-end',			'l', ((2.0, 'l-toe-2-3'), (-1.0, 'l-toe-2-2'))),
 	('l-toe-3-end',			'l', ((2.0, 'l-toe-3-3'), (-1.0, 'l-toe-3-2'))),
@@ -86,96 +55,96 @@ ToeHeadsTails = [
 
 ToeArmature = [
 	# Left toes
-	('Toe-1-1_L', 'rigLeg&T_Toes',		2.42599, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-1-2_L', 'rigLeg&T_Toes',		2.42596, 'Toe-1-1_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-2-1_L', 'rigLeg&T_Toes',		1.79768, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-2-2_L', 'rigLeg&T_Toes',		-0.506141, 'Toe-2-1_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-2-3_L', 'rigLeg&T_Toes',		-0.506141, 'Toe-2-2_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-3-1_L', 'rigLeg&T_Toes',		2.77507, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-3-2_L', 'rigLeg&T_Toes',		3.05438, 'Toe-3-1_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-3-3_L', 'rigLeg&T_Toes',		3.05438, 'Toe-3-2_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-4-1_L', 'rigLeg&T_Toes',		-2.82743, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-4-2_L', 'rigLeg&T_Toes',		3.00198, 'Toe-4-1_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-4-3_L', 'rigLeg&T_Toes',		3.00198, 'Toe-4-2_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-5-1_L', 'rigLeg&T_Toes',		2.79252, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-5-2_L', 'rigLeg&T_Toes',		-2.9845, 'Toe-5-1_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-5-3_L', 'rigLeg&T_Toes',		-2.9845, 'Toe-5-2_L', F_DEF+F_CON, L_TOE, (1,1,1) ),
+	('Toe-1-1_L',		2.42599, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-1-2_L',		2.42596, 'Toe-1-1_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-2-1_L',		1.79768, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-2-2_L',		-0.506141, 'Toe-2-1_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-2-3_L',		-0.506141, 'Toe-2-2_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-3-1_L',		2.77507, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-3-2_L',		3.05438, 'Toe-3-1_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-3-3_L',		3.05438, 'Toe-3-2_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-4-1_L',		-2.82743, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-4-2_L',		3.00198, 'Toe-4-1_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-4-3_L',		3.00198, 'Toe-4-2_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-5-1_L',		2.79252, 'Toe_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-5-2_L',		-2.9845, 'Toe-5-1_L', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-5-3_L',		-2.9845, 'Toe-5-2_L', F_DEF, L_TOE, (1,1,1) ),
 
 	# Right toes
-	('Toe-1-1_R', 'rigLeg&T_Toes',		-2.42599, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-1-2_R', 'rigLeg&T_Toes',		-2.42598, 'Toe-1-1_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-2-1_R', 'rigLeg&T_Toes',		-1.79768, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-2-2_R', 'rigLeg&T_Toes',		0.506136, 'Toe-2-1_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-2-3_R', 'rigLeg&T_Toes',		0.506138, 'Toe-2-2_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-3-1_R', 'rigLeg&T_Toes',		-2.77507, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-3-2_R', 'rigLeg&T_Toes',		-3.05438, 'Toe-3-1_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-3-3_R', 'rigLeg&T_Toes',		-3.05439, 'Toe-3-2_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-4-1_R', 'rigLeg&T_Toes',		2.82743, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-4-2_R', 'rigLeg&T_Toes',		-3.00197, 'Toe-4-1_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-4-3_R', 'rigLeg&T_Toes',		-3.00197, 'Toe-4-2_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-5-1_R', 'rigLeg&T_Toes',		-2.79252, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
-	('Toe-5-2_R', 'rigLeg&T_Toes',		2.98449, 'Toe-5-1_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
-	('Toe-5-3_R', 'rigLeg&T_Toes',		2.98449, 'Toe-5-2_R', F_DEF+F_CON, L_TOE, (1,1,1) ),
+	('Toe-1-1_R',		-2.42599, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-1-2_R',		-2.42598, 'Toe-1-1_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-2-1_R',		-1.79768, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-2-2_R',		0.506136, 'Toe-2-1_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-2-3_R',		0.506138, 'Toe-2-2_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-3-1_R',		-2.77507, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-3-2_R',		-3.05438, 'Toe-3-1_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-3-3_R',		-3.05439, 'Toe-3-2_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-4-1_R',		2.82743, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-4-2_R',		-3.00197, 'Toe-4-1_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-4-3_R',		-3.00197, 'Toe-4-2_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-5-1_R',		-2.79252, 'Toe_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-5-2_R',		2.98449, 'Toe-5-1_R', F_DEF, L_TOE, (1,1,1) ),
+	('Toe-5-3_R',		2.98449, 'Toe-5-2_R', F_DEF, L_TOE, (1,1,1) ),
 ]
 
 ToePoses = [
 	# Left toes
-	('poseBone', 'rigLeg&T_Toes', 'Toe-1-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-1-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-1-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-1-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-2-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-2-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-2-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-2-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-2-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-2-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-3-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-3-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-3-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-3-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-3-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-3-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-4-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-4-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-4-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-4-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-4-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-4-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-5-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-5-1_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-5-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-5-2_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-5-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-5-3_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
 	# Right toes
-	('poseBone', 'rigLeg&T_Toes', 'Toe-1-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-1-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-1-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-1-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-2-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-2-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-2-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-2-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-2-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-2-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-3-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-3-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-3-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-3-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-3-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-3-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-4-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-4-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-4-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-4-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-4-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-4-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-5-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-5-1_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-5-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-5-2_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'rigLeg&T_Toes', 'Toe-5-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Toe-5-3_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
 ]
 
 

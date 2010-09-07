@@ -14848,6 +14848,8 @@ Object Human MESH Human
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
   select True ;
+  Property MhxScale theScale ;
+  Property MhxMesh True ;
 end Object
 
 

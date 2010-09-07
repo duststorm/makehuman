@@ -40,8 +40,6 @@ zunit = [0,0,-1]
 
 unlimited = (-pi,pi, -pi,pi, -pi,pi)
 
-T_Panel = 'toggle&T_Panel'
-
 #
 #	Bone layers
 #
@@ -185,11 +183,11 @@ def writeArmature(fp, armature, mhx25):
 	global Mhx25
 	Mhx25 = mhx25
 	if Mhx25:
-		for (bone, cond, roll, parent, flags, layers, bbone) in armature:
-			addBone25(bone, cond, roll, parent, flags, layers, bbone, fp)
+		for (bone, roll, parent, flags, layers, bbone) in armature:
+			addBone25(bone, True, roll, parent, flags, layers, bbone, fp)
 	else:
-		for (bone, cond, roll, parent, flags, layers, bbone) in armature:
-			addBone24(bone, cond, roll, parent, flags, layers, bbone, fp)
+		for (bone, roll, parent, flags, layers, bbone) in armature:
+			addBone24(bone, True, roll, parent, flags, layers, bbone, fp)
 	return
 
 def boolString(val):
@@ -201,7 +199,8 @@ def boolString(val):
 def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	global rigHead, rigTail
 
-	conn = boolString(flags & F_CON)
+	#conn = boolString(flags & F_CON)
+	conn = False
 	deform = boolString(flags & F_DEF)
 	restr = boolString(flags & F_RES)
 	wire = boolString(flags & F_WIR)
@@ -289,7 +288,7 @@ def writePoses(fp, poses):
 	for pose in poses:
 		#print(pose)
 		try:
-			(typ, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints) = pose
+			(typ, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints) = pose
 		except:
 			typ = None
 		if not typ:
@@ -314,13 +313,13 @@ def writePoses(fp, poses):
 				typ = None
 				
 		if typ == 'poseBone':
-			addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints)
+			addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints)
 		elif typ == 'cSlider':
 			mn = '-'+mx
-			addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+			addPoseBone(fp, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
 				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'xSlider':
-			addPoseBone(fp, T_Panel, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+			addPoseBone(fp, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'ikHandle':
 			addIKHandle(fp, bone, mn, mx)
@@ -344,13 +343,13 @@ def addIKHandle(fp, bone, customShape, limit):
 		cns = [('LimitDist', 0, ['LimitDist', 1.0, limit])]
 	else:
 		cns = []
-	addPoseBone(fp, 'True', bone, customShape, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, cns)
+	addPoseBone(fp, bone, customShape, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, cns)
 
 def addSingleIK(fp, bone, lockRot, target, limit):
 	cns = [('IK', 0, ['IK', target, 1, None, (True, False, True), 1.0])]
 	if limit:
 		cns.append( ('LimitRot', C_OW_LOCAL, ['LimitRot', limit, (True, True, True)]) )
-	addPoseBone(fp, True, bone, None, None, (1,1,1), lockRot, (1,1,1), (1,1,1), 0, cns)
+	addPoseBone(fp, bone, None, None, (1,1,1), lockRot, (1,1,1), (1,1,1), 0, cns)
 
 def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 	space = cflags & (C_OW_MASK + C_TG_MASK)
@@ -363,14 +362,14 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 		('CopyScale', 0, ['StretchIK', ikBone, 0.0, (0,1,0), False]),
 		('CopyScale', 0, ['StretchFK', fkBone, 1.0, (0,1,0), False]),
 		]		
-	addPoseBone(fp, True, bone, None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
+	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
 	return
 
 #
-#	addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
+#	addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 #
 
-def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
+def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
 	global boneGroups, Mhx25
 
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
@@ -384,7 +383,7 @@ def addPoseBone(fp, cond, bone, customShape, boneGroup, lockLoc, lockRot, lockSc
 	lkRotW = boolString(flags & P_LKROTW)
 
 	if Mhx25:
-		fp.write("\n  Posebone %s %s \n" % (bone, cond))
+		fp.write("\n  Posebone %s %s \n" % (bone, True))
 	else:
 		# limitX = flags & 1
 		# limitY = (flags >> 1) & 1
@@ -1128,10 +1127,11 @@ def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
 #	writeAllDrivers(fp)	
 #	writeAllProcesses(fp):
 #
-import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
+import rig_joints_25, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 
 def setupRig(obj):
 	newSetupJoints(obj, 
+		rig_joints_25.DeformJoints +
 		rig_body_25.BodyJoints +
 		rig_arm_25.ArmJoints +
 		rig_finger_25.FingerJoints +
@@ -1172,15 +1172,15 @@ def writeAllPoses(fp):
 	return
 	
 def writeAllActions(fp):
-	rig_arm_25.ArmWriteActions(fp)
-	rig_leg_25.LegWriteActions(fp)
-	rig_finger_25.FingerWriteActions(fp)
+	#rig_arm_25.ArmWriteActions(fp)
+	#rig_leg_25.LegWriteActions(fp)
+	#rig_finger_25.FingerWriteActions(fp)
 	return
 
 def writeAllDrivers(fp):
 	writeFkIkSwitch(fp, rig_arm_25.ArmDrivers)
 	writeFkIkSwitch(fp, rig_leg_25.LegDrivers)
-	rig_finger_25.FingerWriteDrivers(fp)
+	#rig_finger_25.FingerWriteDrivers(fp)
 	rig_face_25.FaceWriteDrivers(fp)
 	return
 

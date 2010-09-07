@@ -51,7 +51,7 @@ Material SSS_skinshader
     blend_type 'MIX' ;
     color Array 1.0 0.0 1.0  ;
     diffuse_color_factor 0.945272 ;
-    color_emission_factor 0.945272 ;
+    emission_color_factor 0.945272 ;
     reflection_color_factor 0.945272 ;
     specular_color_factor 0.945272 ;
     transmission_color_factor 0.945272 ;
@@ -93,7 +93,7 @@ Material SSS_skinshader
     blend_type 'ADD' ;
     color Array 1.0 0.0 1.0  ;
     diffuse_color_factor 1 ;
-    color_emission_factor 1 ;
+    emission_color_factor 1 ;
     reflection_color_factor 1 ;
     specular_color_factor 1 ;
     transmission_color_factor 1 ;
@@ -135,7 +135,7 @@ Material SSS_skinshader
     blend_type 'MIX' ;
     color Array 1.0 0.0 1.0  ;
     diffuse_color_factor 1 ;
-    color_emission_factor 1 ;
+    emission_color_factor 1 ;
     reflection_color_factor 1 ;
     specular_color_factor 1 ;
     transmission_color_factor 1 ;
@@ -262,7 +262,7 @@ Material Skin_no_SSS
     ambient_factor 1 ;
     blend_type 'MIX' ;
     color Array 1.0 0.0 1.0  ;
-    color_emission_factor 0.945272 ;
+    emission_color_factor 0.945272 ;
     default_value 1 ;
     density_factor 1 ;
     diffuse_color_factor 0.945272 ;
@@ -307,7 +307,7 @@ Material Skin_no_SSS
     ambient_factor 1 ;
     blend_type 'ADD' ;
     color Array 1.0 0.0 1.0  ;
-    color_emission_factor 1 ;
+    emission_color_factor 1 ;
     default_value 0.15 ;
     density_factor 1 ;
     diffuse_color_factor 1 ;

@@ -2018,8 +2018,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
-		wm = context.manager
-		wm.add_fileselect(self)
+		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
 def register():

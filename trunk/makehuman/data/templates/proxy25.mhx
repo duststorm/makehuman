@@ -50,6 +50,8 @@ end Mesh
   parent Refer Object HumanRig ;
   parent_type 'OBJECT' ;
   select True ;
+  Property MhxScale theScale ;
+  Property MhxProxy True ;
 end Object
 
 

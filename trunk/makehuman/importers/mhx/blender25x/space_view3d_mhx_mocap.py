@@ -45,8 +45,8 @@ from bpy.props import *
 #
 
 FkArmature = {
-	'Hips' : ('Hips', None),
-	'ToSpine' :  ('Spine1', 'Hips'),
+	'Hips' : ('Root', None),
+	'ToSpine' :  ('Spine1', 'Root'),
 	'Spine' :  ('Spine2', 'Spine1'),
 	'Spine1' :  ('Spine3', 'Spine2'),
 	'Neck' :  ('Neck', 'Spine3'),
@@ -62,19 +62,19 @@ FkArmature = {
 	'RightForeArm' :  ('LoArmFK_R', 'UpArmFK_R'),
 	'RightHand' :  ('HandFK_R', 'LoArmFK_R'),
 
-	'LeftUpLeg' :  ('UpLegFK_L', 'Hips'),
+	'LeftUpLeg' :  ('UpLegFK_L', 'Root'),
 	'LeftLeg' :  ('LoLegFK_L', 'UpLegFK_L'),
 	'LeftFoot' :  ('FootFK_L', 'LoLegFK_L'),
 	'LeftToeBase' :  ('ToeFK_L', 'FootFK_L'),
 
-	'RightUpLeg' :  ('UpLegFK_R', 'Hips'),
+	'RightUpLeg' :  ('UpLegFK_R', 'Root'),
 	'RightLeg' :  ('LoLegFK_R', 'UpLegFK_R'),
 	'RightFoot' :  ('FootFK_R', 'LoLegFK_R'),
 	'RightToeBase' :  ('ToeFK_R', 'FootFK_R'),
 }
 
 FkAmtList = [
-	'Hips', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
+	'Root', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
 	'Clavicle_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
 	'Clavicle_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
 	'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
@@ -311,7 +311,7 @@ IkArmature = {
 	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
 	'HandIK' : ('HandFK', 0, None),
 
-	'UpLegIK' : ('UpLegFK', 0, 'Hips'),
+	'UpLegIK' : ('UpLegFK', 0, 'Root'),
 	'LoLegIK' : ('LoLegFK', F_LR, 'UpLegIK'),
 	#'FootIK' : ('FootFK', 0, None),
 	#'ToeIK' : ('ToeFK', F_LR, 'FootIK'),
@@ -428,7 +428,7 @@ def createFCurveDict(rig90):
 	bpy.ops.object.mode_set(mode='POSE')
 	locs = makeVectorDict(rig90, '].location')
 	rots = makeVectorDict(rig90, '].rotation_quaternion')
-	root = 'Hips'
+	root = 'Root'
 	insertAnimRoot(root, animations, len(rots[root]), locs[root], rots[root])
 	for name in FkAmtList:
 		if name != root:
@@ -632,6 +632,26 @@ def deleteFKRig(context, rig00, action):
 			del act
 	return
 
+#
+#
+#
+
+def simplifyFCurves(context):
+	rig = context.object
+	try:
+		act = rig.animation_data.action
+	except:
+		print("No FCurves to simplify")
+		return
+
+	nact = bpy.data.actions.new()
+	for fcu in act.fcurves:
+		nfcu = simplifyFCurve(fcu)
+		nact.fcurves.link(fcu)
+	
+	return
+
+
 #	
 #	User interface
 #	getBvh(mhx)
@@ -746,8 +766,34 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.manager.add_fileselect(self)
+		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}	
+
+#
+#	class OBJECT_OT_Rotate90Button(bpy.types.Operator):
+#
+
+class OBJECT_OT_Rotate90Button(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_Rotate90Button"
+	bl_label = "Rotate rig 90 degrees"
+
+	def execute(self, context):
+		import bpy, mathutils
+		rotateRig90(context)
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_CreateIKButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_CreateIKButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_CreateIKButton"
+	bl_label = "Create IK rig"
+
+	def execute(self, context):
+		import bpy, mathutils
+		createIKRig(context)
+		return{'FINISHED'}	
 
 #
 #	loadAndRetarget(context, filepath, scale, frame_start, loop):
@@ -777,7 +823,7 @@ class OBJECT_OT_LoadAndRetargetButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.manager.add_fileselect(self)
+		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}	
 
 #
@@ -805,32 +851,6 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 		paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
 		for filepath in paths:
 			loadAndRetarget(context, filepath, 0.1, 1, False)
-		return{'FINISHED'}	
-
-#
-#	class OBJECT_OT_Rotate90Button(bpy.types.Operator):
-#
-
-class OBJECT_OT_Rotate90Button(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_Rotate90Button"
-	bl_label = "Rotate rig 90 degrees"
-
-	def execute(self, context):
-		import bpy, mathutils
-		rotateRig90(context)
-		return{'FINISHED'}	
-
-#
-#	class OBJECT_OT_CreateIKButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_CreateIKButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_CreateIKButton"
-	bl_label = "Create IK rig"
-
-	def execute(self, context):
-		import bpy, mathutils
-		createIKRig(context)
 		return{'FINISHED'}	
 
 #createIKRig(bpy.context)

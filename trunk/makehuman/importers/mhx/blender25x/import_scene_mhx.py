@@ -63,8 +63,8 @@ TexDir = "~/makehuman/exports"
 #
 #
 
-theScale = 0.1
-One = 10
+theScale = 1.0
+One = 1.0/theScale
 useMesh = 1
 verbosity = 2
 warnedTextureDir = False
@@ -83,7 +83,7 @@ todo = []
 #
 
 T_EnforceVersion = 0x01
-T_PoleTar = 0x02
+#T_PoleTar = 0x02
 T_Stretch = 0x04
 T_Bend = 0x08
 
@@ -95,42 +95,43 @@ T_Shape = 0x80
 T_Mesh = 0x100
 T_Armature = 0x200
 T_Proxy = 0x400
-T_Panel = 0x800
+#T_Panel = 0x800
 
 T_Rigify = 0x1000
 T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Bend + T_PoleTar
+toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Stretch
 
 #
 #	setFlagsAndFloats(rigFlags):
 #
 #	Global floats
-fFingerPanel = 0.0
-fFingerIK = 0.0
+#fFingerPanel = 0.0
+#fFingerIK = 0.0
 fNoStretch = 0.0
 
 #	rigLeg and rigArm flags
 T_Toes = 0x0001
-T_GoboFoot = 0x0002
+#T_GoboFoot = 0x0002
 
-T_InvFoot = 0x0010
-T_InvFootPT = 0x0020
-T_InvFootNoPT = 0x0040
+#T_InvFoot = 0x0010
+#T_InvFootPT = 0x0020
+#T_InvFootNoPT = 0x0040
 
-T_FingerPanel = 0x100
-T_FingerRot = 0x0200
-T_FingerIK = 0x0400
+#T_FingerPanel = 0x100
+#T_FingerRot = 0x0200
+#T_FingerIK = 0x0400
 
 
-T_LocalFKIK = 0x8000
+#T_LocalFKIK = 0x8000
 
-rigLeg = 0
-rigArm = 0
+#rigLeg = 0
+#rigArm = 0
 
-def setFlagsAndFloats(rigFlags):
+def setFlagsAndFloats():
+	'''
 	global toggle, rigLeg, rigArm
 
 	(footRig, fingerRig) = rigFlags
@@ -149,7 +150,7 @@ def setFlagsAndFloats(rigFlags):
 	elif fingerRig == 'IK': rigArm |= T_FingerIK
 
 	toggle |= T_Panel
-
+	'''
 	global fNoStretch
 	if toggle&T_Stretch: fNoStretch == 0.0
 	else: fNoStretch = 1.0
@@ -218,16 +219,6 @@ Plural = {
 }
 
 #
-#	loadMhx(filePath, context, flags, scale):
-#
-
-def loadMhx(filePath, context, flags, scale):
-	global toggle
-	toggle = flags
-	readMhxFile(filePath, flags, scale)
-	return
-
-#
 #	checkBlenderVersion()
 #
 
@@ -246,10 +237,10 @@ def checkBlenderVersion():
 	return
 
 #
-#	readMhxFile(filePath, rigFlags, scale):
+#	readMhxFile(filePath, scale):
 #
 
-def readMhxFile(filePath, rigFlags, scale):
+def readMhxFile(filePath, scale):
 	global todo, nErrors, theScale, defaultScale, One
 
 	checkBlenderVersion()	
@@ -273,7 +264,7 @@ def readMhxFile(filePath, rigFlags, scale):
 	level = 0
 	nErrors = 0
 
-	setFlagsAndFloats(rigFlags)
+	setFlagsAndFloats()
 
 	file= open(fileName, "rU")
 	print( "Tokenizing" )
@@ -338,7 +329,7 @@ def readMhxFile(filePath, rigFlags, scale):
 	if nErrors:
 		msg += " but there where %d errors. " % (nErrors)
 	print(msg)
-	return	# loadMhx
+	return
 
 #
 #	getObject(name, var, glbals, lcals):
@@ -808,10 +799,11 @@ def parseMTex(mat, args, tokens):
 	texname = args[1]
 	texco = args[2]
 	mapto = args[3]
-
-	mat.add_texture(texture = loadedData['Texture'][texname], texture_coords = texco, map_to = mapto)
-	mtex = mat.texture_slots[index]
-	#mat.use_textures[index] = Bool(use)
+	tex = loadedData['Texture'][texname]
+	print(dir(mat.texture_slots))
+	return
+	#mtex = mat.texture_slots.new(texture = tex, texture_coords = texco, map_to = mapto)
+	#mtex = mat.texture_slots[index]
 
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, "mtex", [], globals(), locals())
@@ -1236,7 +1228,8 @@ def parseMesh (args, tokens):
 			except:
 				mat = None
 			if mat:
-				me.materials.link(mat)
+				pass
+				#me.materials.link(mat)
 		else:
 			defaultKey(key, val,  sub, "me", [], globals(), locals())
 
@@ -2401,20 +2394,20 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
 	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
-
+	'''
 	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
 		items = [('Reverse foot','Reverse foot','Reverse foot'), 
 				('Gobo','Gobo','Gobo')], 
 				default = '1')
 	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
 		items = [('Rotation','Rotation','Rotation'), ('Panel','Panel','Panel'), ('IK','IK','IK')], default = '1')
-
+	'''
 	enforce = BoolProperty(name="Enforce version", description="Only accept MHX files of correct version", default=toggle&T_EnforceVersion)
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
-	poletar = BoolProperty(name="Pole targets", description="Pole targets for IK", default=toggle&T_PoleTar)
+	#poletar = BoolProperty(name="Pole targets", description="Pole targets for IK", default=toggle&T_PoleTar)
 	stretch = BoolProperty(name="Stretchy limbs", description="Stretchy limbs", default=toggle&T_Stretch)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
@@ -2429,26 +2422,22 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_Armature = T_Armature if self.properties.armature else 0
 		O_Replace = T_Replace if self.properties.replace else 0
-		O_PoleTar = T_PoleTar if self.properties.poletar else 0
+		#O_PoleTar = T_PoleTar if self.properties.poletar else 0
 		O_Stretch = T_Stretch if self.properties.stretch else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		O_Diamond = T_Diamond if self.properties.diamond else 0
 		O_Bend = T_Bend if self.properties.bend else 0
-		toggle = ( O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_PoleTar | O_Stretch | 
+		toggle = ( O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | 
 				O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX )
 
 		print("Load", self.properties.filepath)
-		readMhxFile(self.properties.filepath, 	
-			(self.properties.footRig, 
-			self.properties.fingerRig),
-			self.properties.scale)
+		readMhxFile(self.properties.filepath, self.properties.scale)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
-		wm = context.manager
-		wm.add_fileselect(self)
+		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
 '''
@@ -2536,12 +2525,11 @@ if __name__ == "__main__":
 #
 """
 #readMhxFile("C:/Documents and Settings/xxxxxxxxxxxxxxxxxxxx/Mina dokument/makehuman/exports/foo-25.mhx", 'Classic')
-readMhxFile("/home/thomas/makehuman/exports/foo-25.mhx", ('Reverse Foot', 'IK'), 1.0)
+readMhxFile("/home/thomas/makehuman/exports/foo-25.mhx", 1.0)
 
-toggle = T_Replace + T_Mesh + T_Armature + T_MHX
-#readMhxFile("/home/thomas/myblends/test.mhx", ('Gobo', 'IK'), 1.0)
+#toggle = T_Replace + T_Mesh + T_Armature + T_MHX
+#readMhxFile("/home/thomas/myblends/test.mhx", 1.0)
 """
-
 
 
 

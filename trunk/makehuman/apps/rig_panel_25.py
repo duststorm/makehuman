@@ -35,26 +35,6 @@ PanelJoints = [
 	('PArmIK_L',		'o', ('origin', [0.1, 2.0, 0.0])),
 	('PLegIK_R',		'o', ('origin', [-1.1, 1.5, 0.0])),
 	('PLegIK_L',		'o', ('origin', [0.1, 1.5, 0.0])),
-
-	('PHandLocal_R',	'o', ('origin', [-1.1, 2.0, 0.0])),
-	('PHandLocal_L',	'o', ('origin', [0.1, 2.0, 0.0])),
-	('PFootLocal_R',	'o', ('origin', [-1.1, 1.5, 0.0])),
-	('PFootLocal_L',	'o', ('origin', [0.1, 1.5, 0.0])),
-
-	('MHRelax_L',		'o', ('origin', [1.5, 1.0, 0.0])),
-	('MHCurl_L',		'o', ('MHRelax_L', [0.0, -0.5, 0.0])),
-	('MHCone_L',		'o', ('MHRelax_L', [0.0, -1.0, 0.0])),
-	('MHSpread_L',		'o', ('MHRelax_L', [0.0, -1.5, 0.0])),
-	('MHScrunch_L',		'o', ('MHRelax_L', [0.0, -2.0, 0.0])),
-	('MHLean_L',		'o', ('MHRelax_L', [0.0, -2.5, 0.0])),
-
-	('MHRelax_R',		'o', ('origin', [-1.5, 1.0, 0.0])),
-	('MHCurl_R',		'o', ('MHRelax_R', [0.0, -0.5, 0.0])),
-	('MHCone_R',		'o', ('MHRelax_R', [0.0, -1.0, 0.0])),
-	('MHSpread_R',		'o', ('MHRelax_R', [0.0, -1.5, 0.0])),
-	('MHScrunch_R',		'o', ('MHRelax_R', [0.0, -2.0, 0.0])),
-	('MHLean_R',		'o', ('MHRelax_R', [0.0, -2.5, 0.0])),
-
 ]
 
 PanelHeadsTails = [
@@ -86,75 +66,38 @@ PanelHeadsTails = [
 	('PArmIK_L',			'PArmIK_L', ('PArmIK_L', offs)),
 	('PLegIK_R',			'PLegIK_R', ('PLegIK_R', offs)),
 	('PLegIK_L',			'PLegIK_L', ('PLegIK_L', offs)),
-	#('PHandLocal_R',		'PHandLocal_R', ('PHandLocal_R', offs)),
-	#('PHandLocal_L',		'PHandLocal_L', ('PHandLocal_L', offs)),
-	#('PFootLocal_R',		'PFootLocal_R', ('PFootLocal_R', offs)),
-	#('PFootLocal_L',		'PFootLocal_L', ('PFootLocal_L', offs)),
-
-	('MHRelax_L',			'MHRelax_L', ('MHRelax_L', offs)),
-	('MHCurl_L',			'MHCurl_L', ('MHCurl_L', offs)),
-	('MHCone_L',			'MHCone_L', ('MHCone_L', offs)),
-	('MHSpread_L',			'MHSpread_L', ('MHSpread_L', offs)),
-	('MHScrunch_L',			'MHScrunch_L', ('MHScrunch_L', offs)),
-	('MHLean_L',			'MHLean_L', ('MHLean_L', offs)),
-
-	('MHRelax_R',			'MHRelax_R', ('MHRelax_R', offs)),
-	('MHCurl_R',			'MHCurl_R', ('MHCurl_R', offs)),
-	('MHCone_R',			'MHCone_R', ('MHCone_R', offs)),
-	('MHSpread_R',			'MHSpread_R', ('MHSpread_R', offs)),
-	('MHScrunch_R',			'MHScrunch_R', ('MHScrunch_R', offs)),
-	('MHLean_R',			'MHLean_R', ('MHLean_R', offs)),
-	]
+]
 
 
 PanelArmature = [
-	('PFace', T_Panel,		pi, None, F_WIR, L_PANEL, (1,1,1) ),
-	('PFaceDisp', T_Panel,		pi, 'PFace', F_WIR+F_RES, L_PANEL, (1,1,1) ),
-	('PBrow_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PBrow_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PBrows', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLid_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLid_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLid_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLid_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PCheek_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PCheek_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PNose', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PUpLip', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PLoLip', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PMouth', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLip_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PUpLip_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLip_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLoLip_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PMouth_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PMouth_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PTongue', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PJaw', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFace',		pi, None, F_WIR, L_PANEL, (1,1,1) ),
+	('PFaceDisp',	pi, 'PFace', F_WIR+F_RES, L_PANEL, (1,1,1) ),
+	('PBrow_R',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PBrow_L',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PBrows',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLid_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLid_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLid_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLid_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PCheek_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PCheek_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PNose',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PUpLip',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PLoLip',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	#('PMouth',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLip_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLip_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLip_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLip_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PMouth_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PMouth_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PTongue',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PJaw',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 
-	('PArmIK_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PArmIK_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLegIK_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('PLegIK_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PHandLocal_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PHandLocal_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PFootLocal_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PFootLocal_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-
-	('MHRelax_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCurl_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCone_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHSpread_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHScrunch_L', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHLean_L', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-
-	('MHRelax_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCurl_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHCone_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHSpread_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHScrunch_R', T_Panel,	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	('MHLean_R', T_Panel,		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-
+	('PArmIK_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PArmIK_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLegIK_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLegIK_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 ]
 
 #
@@ -169,9 +112,10 @@ pos = ('0', '4.0')
 neg = ('0', '-4.0')
 
 PanelPoses = [
-	('poseBone', T_Panel, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, []),
+	('poseBone', 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]) ]),
 
-	('poseBone', T_Panel, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
 
 	('cSlider',  'PBrow_L', MX),
 	('cSlider',  'PBrow_R', MX),
@@ -196,24 +140,6 @@ PanelPoses = [
 	('xSlider', 'PArmIK_R', 0.0, 1.0),
 	('xSlider', 'PLegIK_L', 0.0, 1.0),
 	('xSlider', 'PLegIK_R', 0.0, 1.0),
-	#('xSlider', 'PHandLocal_L', 0.0, 1.0),
-	#('xSlider', 'PHandLocal_R', 0.0, 1.0),
-	#('xSlider', 'PFootLocal_L', 0.0, 1.0),
-	#('xSlider', 'PFootLocal_R', 0.0, 1.0),
-
-	('xSlider', 'MHRelax_L', '-0.25', '0.5'),
-	('xSlider', 'MHCurl_L', '-0.25', '0.5'),
-	('xSlider', 'MHCone_L', '-0.25', '0.5'),
-	('xSlider', 'MHSpread_L', '-0.25', '0.5'),
-	('xSlider', 'MHScrunch_L', '-0.25', '0.5'),
-	('xSlider', 'MHLean_L', '-0.5', '0.5'),
-
-	('xSlider', 'MHRelax_R', '-0.5', '0.25'),
-	('xSlider', 'MHCurl_R', '-0.5', '0.25'),
-	('xSlider', 'MHCone_R', '-0.5', '0.25'),
-	('xSlider', 'MHSpread_R', '-0.5', '0.25'),
-	('xSlider', 'MHScrunch_R', '-0.5', '0.25'),
-	('xSlider', 'MHLean_R', '-0.5', '0.5'),
 ]
 
 #
