@@ -98,11 +98,6 @@ class Hairgenerator:
         """
         Calling this function, each guide is interpolated with all other guides
         to add a new strand of hairs to the hairstyle.
-
-        Parameters
-        ----------
-
-        No parameters
         """
 
         # near = 0.08
@@ -157,6 +152,8 @@ class Hairgenerator:
                     mainDirection = 1
                 if diffZ > diffX and diffZ > diffY:
                     mainDirection = 2
+                if  not fallingHair:
+                    mainDirection = 1
 
                 print 'MaindDirection', mainDirection
 
