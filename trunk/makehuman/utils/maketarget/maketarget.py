@@ -53,6 +53,7 @@ pairsPath = 'base.sym'
 centersPath = 'base.sym.centers'
 windowEditMode = Blender.Window.EditMode()
 GUIswitch = 1
+objToCOnvertPath = None
 
 morphFactor = Draw.Create(1.0)
 regulFactor = Draw.Create(0.005)
@@ -254,6 +255,7 @@ def loadFitTarget(path):
     applyTarget(1.0, meshName = "Base")
 
 def scan2mh(path):
+    global loadedTraslTarget,objToCOnvertPath
     saveScanMask(path)
     saveScanMesh(path)
     fitScan2Mesh(path)
@@ -262,6 +264,7 @@ def scan2mh(path):
     align()
     loadSelVertsBase(path)
     adapt(path)
+    loadedTraslTarget = objToCOnvertPath
     
 
 def loadTarget(path):
@@ -317,9 +320,12 @@ def alignPCA():
     endEditing()
 
 def scanReg(scan):
+    global objToCOnvertPath
+    objToCOnvertPath = os.path.basename(scan)
+    print "wavefront ",objToCOnvertPath
     startEditing()
     (vertsM, facesM) = maketargetlib.scanRegistration(scan)
-    name = scan.split('\\')[-1].split('/')[-1]
+    #name = scan.split('\\')[-1].split('/')[-1]
     ob = createMesh(vertsM, facesM, "scan_mesh")
     #apply rotation matrix as the base
     #matrixR = RotationMatrix(90, 4, 'x')
@@ -329,11 +335,7 @@ def scanReg(scan):
     endEditing()   
         
 def saveTarget(path):    
-    global saveOnlySelectedVerts,basePath, message
-    if os.path.exists(path):
-        message =  "Error: file already exist"
-        redrawAll()
-        return    
+    global saveOnlySelectedVerts,basePath, message     
     verticesTosave = []    
     vertices = getVertices()   
     if saveOnlySelectedVerts.val:
