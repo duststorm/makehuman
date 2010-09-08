@@ -36,11 +36,15 @@ LegHeadsTails = [
 	('LoLegFK_L',		'r-knee', 'r-ankle'),
 	('FootFK_L',		'r-ankle', 'r-foot-1'),
 	('ToeFK_L',			'r-foot-1', 'r-foot-2'),
+	('LegFK_L',			'r-heel', 'r-foot-2'),
+	('AnkleFK_L',		'r-ankle', 'r-ankle-tip'),
 
 	('UpLegFK_R',		'l-upper-leg', 'l-knee'),
 	('LoLegFK_R',		'l-knee', 'l-ankle'),
 	('FootFK_R',		'l-ankle', 'l-foot-1'),
 	('ToeFK_R',			'l-foot-1', 'l-foot-2'),
+	('LegFK_R',			'l-heel', 'l-foot-2'),
+	('AnkleFK_R',		'l-ankle', 'l-ankle-tip'),
 	
 	# IK 
 	('UpLegIK_L',		'r-upper-leg', 'r-knee'),
@@ -51,7 +55,7 @@ LegHeadsTails = [
 	('LegIK_L',			'r-heel', 'r-foot-2'),
 	('ToeRevIK_L',		'r-foot-2', 'r-foot-1'),
 	('FootRevIK_L',		'r-foot-1', 'r-ankle'),
-	('Ankle_L',			'r-ankle', 'r-ankle-tip'),
+	('AnkleIK_L',		'r-ankle', 'r-ankle-tip'),
 
 	('UpLegIK_R',		'l-upper-leg', 'l-knee'),
 	('LoLegIK_R',		'l-knee', 'l-ankle'),
@@ -61,7 +65,7 @@ LegHeadsTails = [
 	('LegIK_R',			'l-heel', 'l-foot-2'),
 	('ToeRevIK_R',		'l-foot-2', 'l-foot-1'),
 	('FootRevIK_R',		'l-foot-1', 'l-ankle'),
-	('Ankle_R',			'l-ankle', 'l-ankle-tip'),
+	('AnkleIK_R',		'l-ankle', 'l-ankle-tip'),
 ]
 
 upLegRoll = 0
@@ -91,11 +95,15 @@ LegArmature = [
 	('LoLegFK_L',		loLegRoll, 'UpLegFK_L', F_WIR, L_LEGFK, (1,1,1) ),
 	('FootFK_L',		footRoll, 'LoLegFK_L', F_WIR, L_LEGFK, (1,1,1) ),
 	('ToeFK_L',			toeRoll, 'FootFK_L', F_WIR, L_LEGFK, (1,1,1) ),
+	('LegFK_L',			footCtrlRoll, 'ToeFK_L', 0, L_HELP, (1,1,1) ),
+	('AnkleFK_L',		0, 'LoLegFK_L', 0, L_HELP, (1,1,1) ),
 
 	('UpLegFK_R',		-upLegRoll, legRoot, F_WIR, L_LEGFK, (1,1,1) ),
 	('LoLegFK_R',		-loLegRoll, 'UpLegFK_R', F_WIR, L_LEGFK, (1,1,1) ),
 	('FootFK_R',		-footRoll, 'LoLegFK_R', F_WIR, L_LEGFK, (1,1,1) ),
 	('ToeFK_R',			-toeRoll, 'FootFK_R', F_WIR, L_LEGFK, (1,1,1) ),
+	('LegFK_R',			-footCtrlRoll, 'ToeFK_R', 0, L_HELP, (1,1,1) ),
+	('AnkleFK_R',		0, 'LoLegFK_L', 0, L_HELP, (1,1,1) ),
 
 	# IK
 	('UpLegIK_L',		upLegRoll, legRoot, 0, L_LEGIK, (1,1,1) ),
@@ -104,8 +112,8 @@ LegArmature = [
 	('ToeIK_L',			toeRoll, 'FootIK_L', 0, L_HLPIK, (1,1,1)),
 	('LegIK_L',			footCtrlRoll, None, F_WIR, L_LEGIK, (1,1,1) ),
 	('ToeRevIK_L',		0, 'LegIK_L', F_WIR, L_LEGIK, (1,1,1)),
-	('FootRevIK_L',		deg180, 'ToeRevIK_L', F_WIR, L_LEGIK, (1,1,1)),
-	('Ankle_L',			deg180, 'FootRevIK_L', 0, L_HELP, (1,1,1) ),
+	('FootRevIK_L',		0, 'ToeRevIK_L', F_WIR, L_LEGIK, (1,1,1)),
+	('AnkleIK_L',		0, 'FootRevIK_L', 0, L_HELP, (1,1,1) ),
 
 	('UpLegIK_R',		-upLegRoll, legRoot, 0, L_LEGIK, (1,1,1) ),
 	('LoLegIK_R',		-loLegRoll, 'UpLegIK_R', 0, L_LEGIK, (1,1,1) ),
@@ -113,8 +121,8 @@ LegArmature = [
 	('ToeIK_R',			-toeRoll, 'FootIK_R', 0, L_HLPIK, (1,1,1)),
 	('LegIK_R',			-footCtrlRoll, None, F_WIR, L_LEGIK, (1,1,1) ),
 	('ToeRevIK_R',		0, 'LegIK_R', F_WIR, L_LEGIK, (1,1,1)),
-	('FootRevIK_R',		deg180, 'ToeRevIK_R', F_WIR, L_LEGIK, (1,1,1)),
-	('Ankle_R',			deg180, 'FootRevIK_R', 0, L_HELP, (1,1,1) ),
+	('FootRevIK_R',		0, 'ToeRevIK_R', F_WIR, L_LEGIK, (1,1,1)),
+	('AnkleIK_R',		0, 'FootRevIK_R', 0, L_HELP, (1,1,1) ),
 ]
 
 limUpLeg_L = (-140*deg1,60*deg1, -70*deg1,70*deg1, -deg90,deg45)
@@ -183,32 +191,32 @@ LegPoses = [
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_R, (True, True, True)])]),
 
 	('poseBone', 'LegIK_L', 'MHFootCtrl_L', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['LegRoot_L', 'fNoStretch', 'LegRoot_L'])]),
 
 	('poseBone', 'LegIK_R', 'MHFootCtrl_R', 'ik', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, ['Hip', 'LegRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['LegRoot_R', 'fNoStretch', 'LegRoot_R'])]),
 
 	('poseBone', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKPT', 'Ankle_L', 2, (90*deg1, 'KneePT_L'), (True, False,True), 1.0]),
+		[('IK', 0, ['IKPT', 'AnkleIK_L', 2, (90*deg1, 'KneePT_L'), (True, False,True), 1.0]),
 		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)]),
 		]),
 
 	('poseBone', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKPT', 'Ankle_R', 2, (90*deg1, 'KneePT_R'), (True, False,True), 1.0]),
+		[('IK', 0, ['IKPT', 'AnkleIK_R', 2, (90*deg1, 'KneePT_R'), (True, False,True), 1.0]),
 		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)]),
 		]),
 
 	('poseBone', 'LoLegIK_L', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKNoPT', 'Ankle_L', 2, None, (True, False,True), 1.0]),
+		[('IK', 0, ['IKNoPT', 'AnkleIK_L', 2, None, (True, False,True), 1.0]),
 		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)]),
 		]),
 
 	('poseBone', 'LoLegIK_R', None, 'ik', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKNoPT', 'Ankle_R', 2, None, (True, False,True), 1.0]),
+		[('IK', 0, ['IKNoPT', 'AnkleIK_R', 2, None, (True, False,True), 1.0]),
 		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)]),
 		]),
 
@@ -299,9 +307,9 @@ LegSnaps = [
 
 
 LegParents = [
-	('Ankle_L', 'LoLeg_L'),
+	('AnkleIK_L', 'LoLeg_L'),
 	('LegIK_L', 'Foot_L'),
-	('Ankle_R', 'LoLeg_R'),
+	('AnkleIK_R', 'LoLeg_R'),
 	('LegIK_R', 'Foot_R'),
 ]
 

@@ -30,6 +30,16 @@ bl_addon_info = {
 """
 Run from text window. 
 Access from UI panel (N-key) when MHX rig is active.
+Buttons:
+Load BVH file (.bvh): 
+	Load bvh file with Z up
+Retarget selected to MHX: 
+	Retarget actions of selected BVH rigs to the active MHX rig.
+Load BVH and retarget rig:
+	Load bvh file and retarget the action to the active MHX rig.
+Batch load BVH and retarget rig:
+	Load all bvh files in the given directory, whose name start with the
+	given prefix, and create actions for the active MHX rig.
 """
 
 MAJOR_VERSION = 0
@@ -106,19 +116,6 @@ class CEditBone():
 		return ("%s p %s\n  h %s\n  t %s\n" % (self.name, self.parent, self.head, self.tail))
 
 #
-#	readOriginalRig(context):
-#
-
-def readOriginalRig(context):
-	rig = context.object
-	bones = []
-	bpy.ops.object.mode_set(mode='EDIT')
-	for bone in rig.data.edit_bones:
-		bones.append( CEditBone(bone) )
-	bpy.ops.object.mode_set(mode='POSE')
-	return (rig, bones)
-
-#
 #	createFKRig(context, bones, rig):
 #
 
@@ -190,17 +187,17 @@ def setupTranformMatrix(bones, bones90):
 	return (tMatrix, tInverse)
 
 #
-#	insertAction(bones, rig, rig90, tMatrix, tInverse):
+#	insertAction(bones00, rig00, rig90, tMatrix, tInverse):
 #
 
-def insertAction(bones, rig, rig90, tMatrix, tInverse):
-	locs = makeVectorDict(rig, '].location')
-	rots = makeVectorDict(rig, '].rotation_quaternion')
-	root = bones[0]
+def insertAction(bones00, rig00, rig90, tMatrix, tInverse):
+	locs = makeVectorDict(rig00, '].location')
+	rots = makeVectorDict(rig00, '].rotation_quaternion')
+	root = bones00[0]
 	nFrames = len(rots[root.name])
 
 	for frame in range(nFrames):
-		for bone in bones:
+		for bone in bones00:
 			name00 = bone.name
 			(name90, parent) = FkArmature[name00]
 			pb = rig90.pose.bones[name90]
@@ -230,15 +227,15 @@ def insertAction(bones, rig, rig90, tMatrix, tInverse):
 	return
 
 #
-#	rotateRig90(context):
+#	rotateRig90(context, rig00, bones00):
 #
 
-def rotateRig90(context):
-	(rig, bones) = readOriginalRig(context)
-	(rig90, bones90) = createFKRig(context, bones, rig)
-	(tMatrix, tInverse) = setupTranformMatrix(bones, bones90)
-	insertAction(bones, rig, rig90, tMatrix, tInverse)
-	return
+def rotateRig90(context, rig00, bones00):
+	#(rig, bones) = readOriginalRig(context)
+	(rig90, bones90) = createFKRig(context, bones00, rig00)
+	(tMatrix, tInverse) = setupTranformMatrix(bones00, bones90)
+	insertAction(bones00, rig00, rig90, tMatrix, tInverse)
+	return rig90
 
 #
 #	makeVectorDict(ob, channel):
@@ -279,12 +276,18 @@ def makeVectorDict(ob, channel):
 def renameBvhRig(context, filepath):
 	base = os.path.basename(filepath)
 	(name, ext) = os.path.splitext(base)
-	rig = context.object
-	rig.name = 'Y_'+name
-	action = rig.animation_data.action
+	rig00 = context.object
+	rig00.name = 'Y_'+name
+	action = rig00.animation_data.action
 	action.name = 'Y_'+name
-	#print("Action %s imported" % name)
-	return (rig, action)
+
+	bones00 = []
+	bpy.ops.object.mode_set(mode='EDIT')
+	for bone in rig00.data.edit_bones:
+		bones00.append( CEditBone(bone) )
+	bpy.ops.object.mode_set(mode='POSE')
+
+	return (rig00, bones00, action)
 
 #
 #	checkMyRig(context):
@@ -351,23 +354,23 @@ def createIKBones(rig90):
 	return
 
 #
-#	constrainIKBones(rig90):
+#	constrainIkBones(rig90):
 #
 
-def constrainIKBones(rig90):
+def constrainIkBones(rig90):
 	bpy.ops.object.mode_set(mode='POSE')
-	pbs = rig90.pose.bones
-	for pb in pbs:
+	pbones = rig90.pose.bones
+	for pb in pbones:
 		if pb.parent:
 			pb.lock_location = (True, True, True)		
 
 	for suffix in ['_L', '_R']:
-		cns = pbs['LoArmIK'+suffix].constraints.new(type='IK')
+		cns = pbones['LoArmIK'+suffix].constraints.new(type='IK')
 		cns.target = rig90
 		cns.subtarget = 'HandIK'+suffix
 		cns.chain_count = 2
 
-		cns = pbs['LoLegIK'+suffix].constraints.new(type='IK')
+		cns = pbones['LoLegIK'+suffix].constraints.new(type='IK')
 		cns.target = rig90
 		cns.subtarget = 'AnkleIK'+suffix
 		cns.chain_count = 2
@@ -381,12 +384,21 @@ class CAnimData():
 	def __init__(self, name):
 		self.nFrames = 0
 		self.parent = None
+
 		self.headRest = None
 		self.vecRest = None
 		self.tailRest = None
 		self.offsetRest = None
 		self.matrixRest = None
 		self.inverseRest = None
+
+		self.headMhxRest = None
+		self.vecMhxRest = None
+		self.tailMhxRest = None
+		self.offsetMhxRest = None
+		self.matrixMhxRest = None
+		self.inverseMhxRest = None
+
 		self.heads = {}
 		self.tails = {}
 		self.quats = {}
@@ -407,8 +419,8 @@ def createAnimData(name, animations, ebones):
 	matrix = eb.matrix.rotation_part()
 	if eb.parent:
 		anim.parent = eb.parent.name
-		parAnim = animations[anim.parent]
-		anim.offsetRest = anim.headRest - parAnim.headRest
+		animPar = animations[anim.parent]
+		anim.offsetRest = anim.headRest - animPar.headRest
 	else:
 		anim.offsetRest = Vector((0,0,0))	
 	anim.matrixRest = matrix
@@ -416,18 +428,35 @@ def createAnimData(name, animations, ebones):
 	return anim
 
 #
-#	createFCurveDict(rig90):
+#	createFCurveDict(context, rig90, mhxrig):
 #
 	
-def createFCurveDict(rig90):
-	animations = {}
+def createFCurveDict(context, rig90, mhxrig):
+	mhxAnimations = {}
 	bpy.ops.object.mode_set(mode='EDIT')
 	for name in FkAmtList:
-		anim = createAnimData(name, animations, rig90.data.edit_bones)
-		
+		createAnimData(name, mhxAnimations, mhxrig.data.edit_bones)
 	bpy.ops.object.mode_set(mode='POSE')
-	locs = makeVectorDict(rig90, '].location')
-	rots = makeVectorDict(rig90, '].rotation_quaternion')
+
+	context.scene.objects.active = rig90
+	rig90Animations = {}
+	bpy.ops.object.mode_set(mode='EDIT')
+	for name in FkAmtList:
+		createAnimData(name, rig90Animations, rig90.data.edit_bones)
+
+	insertAnimation(rig90, rig90Animations)
+	return (rig90Animations, mhxAnimations)
+
+#
+#	insertAnimation(rig, animations):
+#	insertAnimRoot(root, animations, nFrames, locs, rots):
+#	insertAnimChild(name, animations, rots):
+#
+
+def insertAnimation(rig, animations):
+	bpy.ops.object.mode_set(mode='POSE')
+	locs = makeVectorDict(rig, '].location')
+	rots = makeVectorDict(rig, '].rotation_quaternion')
 	root = 'Root'
 	insertAnimRoot(root, animations, len(rots[root]), locs[root], rots[root])
 	for name in FkAmtList:
@@ -437,12 +466,6 @@ def createFCurveDict(rig90):
 			except:
 				rot = None
 			insertAnimChild(name, animations, rot)
-	return animations
-
-#
-#	insertAnimRoot(root, animations, nFrames, locs, rots):
-#	insertAnimChild(name, animations, rots):
-#
 
 def insertAnimRoot(root, animations, nFrames, locs, rots):
 	anim = animations[root]
@@ -458,18 +481,18 @@ def insertAnimRoot(root, animations, nFrames, locs, rots):
 
 def insertAnimChild(name, animations, rots):
 	anim = animations[name]
-	parAnim = animations[anim.parent]
-	anim.nFrames = parAnim.nFrames
+	animPar = animations[anim.parent]
+	anim.nFrames = animPar.nFrames
 	quat = Quaternion().identity()
 	for frame in range(anim.nFrames):
-		parmat = parAnim.matrices[frame]
+		parmat = animPar.matrices[frame]
 		if rots:
 			quat = Quaternion(rots[frame])
 		anim.quats[frame] = quat
 		locmat = anim.matrixRest * quat.to_matrix() * anim.inverseRest
 		matrix = parmat * locmat
 		anim.matrices[frame] = matrix
-		anim.heads[frame] = parAnim.heads[frame] + parmat*anim.offsetRest
+		anim.heads[frame] = animPar.heads[frame] + parmat*anim.offsetRest
 		anim.tails[frame] = anim.heads[frame] + matrix*anim.vecRest
 	return
 
@@ -499,66 +522,95 @@ def createEmpty(context, name, locs, nFrames):
 	return
 		
 #
-#	poseIKBones(rig90, animations):
+#		poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
 #
 
-def poseIKBones(rig90, animations):
-	scn = bpy.context.scene
+def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
+	context.scene.objects.active = mhxrig
 	bpy.ops.object.mode_set(mode='POSE')
-	pbones = rig90.pose.bones
+	pbones = mhxrig.pose.bones
+
+	root = 'Root'
+	anim = rig90Animations[root]
+	pb = pbones[root]
+	for frame in range(anim.nFrames):
+		pb.location = anim.heads[frame]
+		for n in range(3):
+			pb.keyframe_insert('location', index=n, frame=frame, group=root)	
+
+	for name in FkAmtList:
+		anim = rig90Animations[name]
+		pb = pbones[name]
+		for frame in range(anim.nFrames):
+			quat = anim.quats[frame]
+			pb.rotation_quaternion = quat
+			for n in range(4):
+				pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+
+	insertAnimation(mhxrig, mhxAnimations)
+	return
+
+#
+#	poseMhxIKBones(context, mhxrig, rig90Animations, mhxAnimations)
+#
+
+def poseMhxIKBones(context, mhxrig, rig90Animations, mhxAnimations):
+	bpy.ops.object.mode_set(mode='POSE')
+	pbones = mhxrig.pose.bones
 	for suffix in ['_L', '_R']:
 		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
 			nameIK = name+'IK'+suffix
-			anim = animations[name+'FK'+suffix]
-			pboneIK = pbones[nameIK]
+			anim = mhxAnimations[name+'FK'+suffix]
+			pbIK = pbones[nameIK]
+			print(pbIK, anim.nFrames)
 			for frame in range(anim.nFrames):
 				quat = anim.quats[frame]
-				pboneIK.rotation_quaternion = quat
+				pbIK.rotation_quaternion = quat
 				for n in range(4):
-					pboneIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
+					pbIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
 
 		for name in ['Hand', 'Leg']:
 			nameIK = name+'IK'+suffix
-			anim = animations[name+'FK'+suffix]
-			pboneIK = pbones[nameIK]
+			anim = mhxAnimations[name+'FK'+suffix]
+			pbIK = pbones[nameIK]
 			locs = []
 			rots = []
 			for frame in range(anim.nFrames):
 				loc = anim.inverseRest * (anim.heads[frame] - anim.headRest)
-				pboneIK.location = loc
+				pbIK.location = loc
 				locs.append(loc)
 				mat = anim.inverseRest * anim.matrices[frame] * anim.matrixRest
 				quat = mat.to_quat()
-				pboneIK.rotation_quaternion = quat
+				pbIK.rotation_quaternion = quat
 				rots.append(quat)
 				for n in range(3):
-					pboneIK.keyframe_insert('location', index=n, frame=frame, group=nameIK)
+					pbIK.keyframe_insert('location', index=n, frame=frame, group=nameIK)
 				for n in range(4):
-					pboneIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
+					pbIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
 			bpy.ops.object.mode_set(mode='EDIT')
-			createAnimData(nameIK, animations, rig90.data.edit_bones)		
+			createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
 			bpy.ops.object.mode_set(mode='POSE')
-			insertAnimRoot(nameIK, animations, anim.nFrames, locs, rots)
+			insertAnimRoot(nameIK, mhxAnimations, anim.nFrames, locs, rots)
 
 		mirror = Matrix.Rotation(math.pi, 3, 'Z')
 		for name in ['Toe', 'Foot']:
 			nameIK = name+'RevIK'+suffix
 			bpy.ops.object.mode_set(mode='EDIT')
-			animIK = createAnimData(nameIK, animations, rig90.data.edit_bones)		
+			animIK = createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
 			bpy.ops.object.mode_set(mode='POSE')
-			animFK = animations[name+'FK'+suffix]
-			animPar = animations[animIK.parent]
-			pboneIK = pbones[nameIK]
+			animFK = mhxAnimations[name+'FK'+suffix]
+			animPar = mhxAnimations[animIK.parent]
+			pbIK = pbones[nameIK]
 			rots = []
 			for frame in range(anim.nFrames):
 				locmat = animPar.matrices[frame].copy().invert() * animFK.matrices[frame]
 				mat = animIK.inverseRest * locmat * animIK.matrixRest
 				quat = mat.to_quat()
-				pboneIK.rotation_quaternion = quat
+				pbIK.rotation_quaternion = quat
 				rots.append(quat)
 				for n in range(4):
-					pboneIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
-			insertAnimChild(nameIK, animations, rots)
+					pbIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
+			insertAnimChild(nameIK, mhxAnimations, rots)
 	return
 
 #
@@ -602,19 +654,43 @@ def prettifyBones(rig):
 	return
 
 #
-#	createIKRig(context):
+#	silenceConstraints(rig):
 #
 
-def createIKRig(context):
-	rig = checkMyRig(context)
-	if not rig:
-		return	
-	createIKBones(rig)
-	animations = createFCurveDict(rig)
-	poseIKBones(rig, animations)
-	constrainIKBones(rig)
-	prettifyBones(rig)
+def silenceConstraints(rig):
+	for pb in rig.pose.bones:
+		pb.lock_location = (False, False, False)
+		pb.lock_rotation = (False, False, False)
+		pb.lock_scale = (False, False, False)
+		for cns in pb.constraints:
+			if cns.type == 'CHILD_OF':
+				cns.influence = 0.0
+			elif False and (cns.type == 'LIMIT_LOCATION' or
+				cns.type == 'LIMIT_ROTATION' or
+				cns.type == 'LIMIT_DISTANCE' or
+				cns.type == 'LIMIT_SCALE'):
+				cns.influence = 0.0
+	return
+
+#
+#	retargetMhxRig(context, rig90):
+#
+
+def retargetMhxRig(context, rig90):
+	mhxrig = context.object
+	print("Retarget %s --> %s" % (rig90, mhxrig))
+	if mhxrig.animation_data:
+		mhxrig.animation_data.action = None
+	#silenceConstraints(mhxrig)
+	(rig90Animations, mhxAnimations) = createFCurveDict(context, rig90, mhxrig)
+	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
+	poseMhxIKBones(context, mhxrig, rig90Animations, mhxAnimations)
+	#constrainIkBones(rig90)
+	#prettifyBones(mhxrig)
 	#createEmpties(context, animations)
+	words = rig90.name.split('_')
+	name = '_'.join([mhxrig.name] + words[1:])
+	mhxrig.animation_data.action.name = name
 	return
 
 #
@@ -703,6 +779,15 @@ class MhxBvhAssocPanel(bpy.types.Panel):
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
 	
+	@classmethod
+	def poll(cls, context):
+		if context.object and context.object.type == 'ARMATURE':
+			try:
+				return context.object['MhxRig']
+			except:
+				pass
+		return False
+
 	def draw(self, context):
 		layout = self.layout
 		for mhx in FkAmtList:
@@ -721,11 +806,19 @@ class Bvh2MhxPanel(bpy.types.Panel):
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
 	
+	@classmethod
+	def poll(cls, context):
+		if context.object and context.object.type == 'ARMATURE':
+			try:
+				return context.object['MhxRig']
+			except:
+				pass
+		return False
+
 	def draw(self, context):
 		layout = self.layout
 		layout.operator("object.LoadBvhButton")
-		layout.operator("object.Rotate90Button")
-		layout.operator("object.CreateIKButton")
+		layout.operator("object.RetargetMhxButton")
 		layout.operator("object.LoadAndRetargetButton")
 		layout.prop(context.scene, "MhxDirectory")
 		layout.prop(context.scene, "MhxPrefix")
@@ -750,7 +843,10 @@ def importAndRename(context, filepath, scale, frame_start, loop):
 		ROT_MODE='QUATERNION',
 		IMPORT_START_FRAME=frame_start,
 		IMPORT_LOOP=loop)
-	return renameBvhRig(context, filepath)
+	(rig00, bones00, action) =  renameBvhRig(context, filepath)
+	rig90 = rotateRig90(context, rig00, bones00)
+	deleteFKRig(context, rig00, action)
+	return
 
 class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadBvhButton"
@@ -763,6 +859,7 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 	def execute(self, context):
 		import bpy, os, import_bvh
 		importAndRename(context, self.properties.filepath, self.properties.scale, self.properties.frame_start, self.properties.loop)
+		print("%s imported" % self.properties.filepath)
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
@@ -770,29 +867,20 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 		return {'RUNNING_MODAL'}	
 
 #
-#	class OBJECT_OT_Rotate90Button(bpy.types.Operator):
+#	class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_Rotate90Button(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_Rotate90Button"
-	bl_label = "Rotate rig 90 degrees"
+class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_RetargetMhxButton"
+	bl_label = "Retarget selected to MHX"
 
 	def execute(self, context):
 		import bpy, mathutils
-		rotateRig90(context)
-		return{'FINISHED'}	
-
-#
-#	class OBJECT_OT_CreateIKButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_CreateIKButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_CreateIKButton"
-	bl_label = "Create IK rig"
-
-	def execute(self, context):
-		import bpy, mathutils
-		createIKRig(context)
+		mhxrig = context.object
+		for rig90 in context.selected_objects:
+			if rig90 != mhxrig:
+				retargetMhxRig(context, rig90)
+				print("Done retarget %s --> %s" % (rig90, mhxrig))
 		return{'FINISHED'}	
 
 #
@@ -802,10 +890,9 @@ class OBJECT_OT_CreateIKButton(bpy.types.Operator):
 
 def loadAndRetarget(context, filepath, scale, frame_start, loop):
 	print("Load and retarget %s" % filepath)
-	(rig00, action) = importAndRename(context, filepath, scale, frame_start, loop)
-	rotateRig90(context)
-	createIKRig(context)
-	deleteFKRig(context, rig00, action)
+	(rig90, action) = importAndRename(context, filepath, scale, frame_start, loop)
+	retargetMhxRig(context, rig90)
+	deleteFKRig(context, rig90, action)
 	print("%s finished" % filepath)
 	return
 
@@ -853,6 +940,6 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 			loadAndRetarget(context, filepath, 0.1, 1, False)
 		return{'FINISHED'}	
 
-#createIKRig(bpy.context)
+#retargetMhxRig(bpy.context)
 
 

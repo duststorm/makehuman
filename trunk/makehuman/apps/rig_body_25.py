@@ -54,7 +54,7 @@ BodyArmature = [
 	('MasterNeck',		0.0, None, F_WIR+F_HID, L_HELP, (1,1,1) ),
 
 	('Root',			0.0, None, F_WIR, L_MAIN+L_SPINE, (1,1,1) ),
-	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,1) ),
+	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_DEF, (1,1,1) ),
 
 	('Spine1',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,5) ),
 	('Spine2',			0.0, 'Spine1', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,5) ),

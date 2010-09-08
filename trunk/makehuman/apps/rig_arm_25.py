@@ -195,8 +195,8 @@ ArmPoses = [
 		]),
 
 	('poseBone', 'HandIK_L', 'GoboHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Shoulder', 'ArmRoot_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Shoulder', 'Clavicle_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Clavicle_L', 'fNoStretch', 'Clavicle_L'])]),
 
 	('poseBone', 'UpArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
@@ -209,8 +209,8 @@ ArmPoses = [
 		]),
 
 	('poseBone', 'HandIK_R', 'GoboHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Shoulder', 'ArmRoot_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		[('ChildOf', C_CHILDOF, ['World', 'Root', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Shoulder', 'Clavicle_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Clavicle_R', 'fNoStretch', 'Clavicle_R'])]),
 ]
 
