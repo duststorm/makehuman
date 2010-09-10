@@ -116,14 +116,12 @@ class CEditBone():
 		return ("%s p %s\n  h %s\n  t %s\n" % (self.name, self.parent, self.head, self.tail))
 
 #
-#	createFKRig(context, bones, rig):
+#	createFKRig(scn, bones, rig):
 #
 
-def createFKRig(context, bones, rig):
-	scn = context.scene
+def createFKRig(scn, bones, rig):
 	amt = bpy.data.armatures.new(rig.data.name[2:])
 	rig90 = bpy.data.objects.new(rig.name[2:], amt)
-	rig90['MyRig'] = True
 	scn.objects.link(rig90)
 	scn.objects.active = rig90
 
@@ -231,8 +229,7 @@ def insertAction(bones00, rig00, rig90, tMatrix, tInverse):
 #
 
 def rotateRig90(context, rig00, bones00):
-	#(rig, bones) = readOriginalRig(context)
-	(rig90, bones90) = createFKRig(context, bones00, rig00)
+	(rig90, bones90) = createFKRig(context.scene, bones00, rig00)
 	(tMatrix, tInverse) = setupTranformMatrix(bones00, bones90)
 	insertAction(bones00, rig00, rig90, tMatrix, tInverse)
 	return rig90
@@ -270,13 +267,12 @@ def makeVectorDict(ob, channel):
 			
 	
 #
-#	renameBvhRig(context, filepath):
+#	renameBvhRig(rig00, filepath):
 #
 
-def renameBvhRig(context, filepath):
+def renameBvhRig(rig00, filepath):
 	base = os.path.basename(filepath)
 	(name, ext) = os.path.splitext(base)
-	rig00 = context.object
 	rig00.name = 'Y_'+name
 	action = rig00.animation_data.action
 	action.name = 'Y_'+name
@@ -288,19 +284,6 @@ def renameBvhRig(context, filepath):
 	bpy.ops.object.mode_set(mode='POSE')
 
 	return (rig00, bones00, action)
-
-#
-#	checkMyRig(context):
-#
-
-def checkMyRig(context):
-	rig90 = context.object
-	try:
-		ok = rig90['MyRig']
-		return rig90
-	except:
-		return None
-
 
 #
 #	createIKBones(rig90):
@@ -428,32 +411,23 @@ def createAnimData(name, animations, ebones):
 	return anim
 
 #
-#	createFCurveDict(context, rig90, mhxrig):
-#
-	
-def createFCurveDict(context, rig90, mhxrig):
-	mhxAnimations = {}
-	bpy.ops.object.mode_set(mode='EDIT')
-	for name in FkAmtList:
-		createAnimData(name, mhxAnimations, mhxrig.data.edit_bones)
-	bpy.ops.object.mode_set(mode='POSE')
-
-	context.scene.objects.active = rig90
-	rig90Animations = {}
-	bpy.ops.object.mode_set(mode='EDIT')
-	for name in FkAmtList:
-		createAnimData(name, rig90Animations, rig90.data.edit_bones)
-
-	insertAnimation(rig90, rig90Animations)
-	return (rig90Animations, mhxAnimations)
-
-#
-#	insertAnimation(rig, animations):
+#	createAnimation(context, rig):
+#	insertAnimation(context, rig, animations):
 #	insertAnimRoot(root, animations, nFrames, locs, rots):
 #	insertAnimChild(name, animations, rots):
 #
 
-def insertAnimation(rig, animations):
+def createAnimation(context, rig):
+	context.scene.objects.active = rig
+	animations = {}
+	bpy.ops.object.mode_set(mode='EDIT')
+	for name in FkAmtList:
+		createAnimData(name, animations, rig.data.edit_bones)
+	bpy.ops.object.mode_set(mode='POSE')
+	return animations
+
+def insertAnimation(context, rig, animations):
+	context.scene.objects.active = rig
 	bpy.ops.object.mode_set(mode='POSE')
 	locs = makeVectorDict(rig, '].location')
 	rots = makeVectorDict(rig, '].rotation_quaternion')
@@ -547,14 +521,14 @@ def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
 			for n in range(4):
 				pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
 
-	insertAnimation(mhxrig, mhxAnimations)
+	insertAnimation(context, mhxrig, mhxAnimations)
 	return
 
 #
-#	poseMhxIKBones(context, mhxrig, rig90Animations, mhxAnimations)
+#	poseMhxIKBones(context, mhxrig, mhxAnimations)
 #
 
-def poseMhxIKBones(context, mhxrig, rig90Animations, mhxAnimations):
+def poseMhxIKBones(context, mhxrig, mhxAnimations):
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = mhxrig.pose.bones
 	for suffix in ['_L', '_R']:
@@ -673,21 +647,26 @@ def silenceConstraints(rig):
 	return
 
 #
-#	retargetMhxRig(context, rig90):
+#	retargetMhxRig(context, rig90, mhxrig):
 #
 
-def retargetMhxRig(context, rig90):
-	mhxrig = context.object
+def retargetMhxRig(context, rig90, mhxrig):
 	print("Retarget %s --> %s" % (rig90, mhxrig))
 	if mhxrig.animation_data:
 		mhxrig.animation_data.action = None
 	#silenceConstraints(mhxrig)
-	(rig90Animations, mhxAnimations) = createFCurveDict(context, rig90, mhxrig)
+
+	mhxAnimations = createAnimation(context, mhxrig)
+	rig90Animations = createAnimation(context, rig90)
+	insertAnimation(context, rig90, rig90Animations)
 	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
-	poseMhxIKBones(context, mhxrig, rig90Animations, mhxAnimations)
-	#constrainIkBones(rig90)
-	#prettifyBones(mhxrig)
-	#createEmpties(context, animations)
+
+	#simplifyFCurves(context, mhxrig)
+
+	mhxAnimations = createAnimation(context, mhxrig)
+	insertAnimation(context, mhxrig, mhxAnimations)
+	poseMhxIKBones(context, mhxrig, mhxAnimations)
+
 	words = rig90.name.split('_')
 	name = '_'.join([mhxrig.name] + words[1:])
 	mhxrig.animation_data.action.name = name
@@ -701,32 +680,100 @@ def deleteFKRig(context, rig00, action):
 	context.scene.objects.unlink(rig00)
 	bpy.data.objects.remove(rig00)
 	del rig00
-	for act in bpy.data.actions:
-		if act.name[0:2] == 'Y_':
-			act.use_fake_user = False
-			bpy.data.actions.remove(act)
-			del act
+	if bpy.data.actions:
+		for act in bpy.data.actions:
+			if act.name[0:2] == 'Y_':
+				act.use_fake_user = False
+				bpy.data.actions.remove(act)
+				del act
 	return
 
 #
-#
+#	simplifyFCurves(context, mhxrig):
 #
 
-def simplifyFCurves(context):
-	rig = context.object
+def simplifyFCurves(context, mhxrig):
+	if not context.scene.MhxDoSimplify:
+		return
 	try:
-		act = rig.animation_data.action
+		act = mhxrig.animation_data.action
 	except:
+		act = None
+	if not act:
 		print("No FCurves to simplify")
 		return
 
-	nact = bpy.data.actions.new()
+	maxErrLoc = context.scene.MhxErrorLoc
+	maxErrRot = context.scene.MhxErrorRot * math.pi/180
 	for fcu in act.fcurves:
-		nfcu = simplifyFCurve(fcu)
-		nact.fcurves.link(fcu)
-	
+		simplifyFCurve(fcu, act, maxErrLoc, maxErrRot)
 	return
 
+#
+#	simplifyFCurve(fcu, act, maxErrLoc, maxErrRot):
+#
+
+def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot):
+	print(fcu.data_path)
+	words = fcu.data_path.split('.')
+	if words[-1] == 'location':
+		maxErr = maxErrLoc
+	elif words[-1] == 'rotation_quaternion':
+		maxErr = maxErrRot
+	else:
+		raise NameError("Unknown FCurve type %s" % words[-1])
+
+	points = fcu.keyframe_points
+	nPoints = len(points)
+	if nPoints <= 2:
+		return
+	keeps = []
+	new = [0, nPoints-1]
+	while new:
+		keeps += new
+		keeps.sort()
+		new = iterateFCurves(points, keeps, maxErr)
+
+	newVerts = []
+	for n in keeps:
+		newVerts.append(points[n].co)
+
+	path = fcu.data_path
+	index = fcu.array_index
+	grp = fcu.group.name
+	act.fcurves.remove(fcu)
+	nfcu = act.fcurves.new(path, index, grp)
+	for co in newVerts:
+		nfcu.keyframe_points.add(frame=co[0], value=co[1])
+
+	return
+
+#
+#	iterateFCurves(points, keeps, maxErr):
+#
+
+def iterateFCurves(points, keeps, maxErr):
+	new = []
+	for edge in range(len(keeps)-1):
+		n0 = keeps[edge]
+		n1 = keeps[edge+1]
+		(x0, y0) = points[n0].co
+		(x1, y1) = points[n1].co
+		if x1 > x0:
+			dxdn = (x1-x0)/(n1-n0)
+			dydx = (y1-y0)/(x1-x0)
+			err = 0
+			for n in range(n0+1, n1):
+				(x, y) = points[n].co
+				xn = n0 + dxdn*(n-n0)
+				yn = y0 + dydx*(xn-x0)
+				if abs(y-yn) > err:
+					err = abs(y-yn)
+					worst = n
+			if err > maxErr:
+				new.append(worst)
+	return new
+		
 
 #	
 #	User interface
@@ -742,6 +789,26 @@ def getBvh(mhx):
 	return None
 
 def init(scn):
+	bpy.types.Scene.BoolProperty(
+		attr= "MhxDoSimplify", 
+		name="Simplify FCurves", 
+		description="Simplify FCurves")
+	scn['MhxDoSimplify'] = True
+
+	bpy.types.Scene.FloatProperty(
+		attr= "MhxErrorLoc", 
+		name="Max loc error", 
+		description="Max error for location FCurves when doing simplification",
+		min=0.001)
+	scn['MhxErrorLoc'] = 0.1
+
+	bpy.types.Scene.FloatProperty(
+		attr= "MhxErrorRot", 
+		name="Max rot error", 
+		description="Max error for rotation (degrees) FCurves when doing simplification",
+		min=0.001)
+	scn['MhxErrorRot'] = 1.0
+
 	bpy.types.Scene.StringProperty(
 		attr= "MhxDirectory", 
 		name="Directory", 
@@ -778,6 +845,7 @@ class MhxBvhAssocPanel(bpy.types.Panel):
 	bl_label = "Mhx Bvh associations"
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
+	bl_options = "HIDE_HEADER"
 	
 	@classmethod
 	def poll(cls, context):
@@ -817,11 +885,17 @@ class Bvh2MhxPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		layout = self.layout
+		scn = context.scene
+		layout.prop(scn, "MhxDoSimplify")
+		layout.prop(scn, "MhxErrorLoc")
+		layout.prop(scn, "MhxErrorRot")
 		layout.operator("object.LoadBvhButton")
 		layout.operator("object.RetargetMhxButton")
-		layout.operator("object.LoadAndRetargetButton")
-		layout.prop(context.scene, "MhxDirectory")
-		layout.prop(context.scene, "MhxPrefix")
+		layout.operator("object.SimplifyFCurvesButton")
+		layout.separator()
+		layout.operator("object.LoadRetargetSimplifyButton")
+		layout.prop(scn, "MhxDirectory")
+		layout.prop(scn, "MhxPrefix")
 		layout.operator("object.BatchButton")
 		return
 
@@ -843,10 +917,10 @@ def importAndRename(context, filepath, scale, frame_start, loop):
 		ROT_MODE='QUATERNION',
 		IMPORT_START_FRAME=frame_start,
 		IMPORT_LOOP=loop)
-	(rig00, bones00, action) =  renameBvhRig(context, filepath)
+	(rig00, bones00, action) =  renameBvhRig(context.object, filepath)
 	rig90 = rotateRig90(context, rig00, bones00)
 	deleteFKRig(context, rig00, action)
-	return
+	return (rig90, action)
 
 class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadBvhButton"
@@ -879,26 +953,41 @@ class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
 		mhxrig = context.object
 		for rig90 in context.selected_objects:
 			if rig90 != mhxrig:
-				retargetMhxRig(context, rig90)
+				retargetMhxRig(context, rig90, mhxrig)
 				print("Done retarget %s --> %s" % (rig90, mhxrig))
 		return{'FINISHED'}	
 
 #
-#	loadAndRetarget(context, filepath, scale, frame_start, loop):
-#	class OBJECT_OT_LoadAndRetargetButton(bpy.types.Operator):
+#	class OBJECT_OT_SimplifyFCurvesButton(bpy.types.Operator):
 #
 
-def loadAndRetarget(context, filepath, scale, frame_start, loop):
+class OBJECT_OT_SimplifyFCurvesButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SimplifyFCurvesButton"
+	bl_label = "Simplify FCurves"
+
+	def execute(self, context):
+		import bpy, mathutils
+		simplifyFCurves(context, context.object)
+		return{'FINISHED'}	
+
+#
+#	loadRetargetSimplify(context, filepath, scale, frame_start, loop):
+#	class OBJECT_OT_LoadRetargetSimplify(bpy.types.Operator):
+#
+
+def loadRetargetSimplify(context, filepath, scale, frame_start, loop):
 	print("Load and retarget %s" % filepath)
+	mhxrig = context.object
 	(rig90, action) = importAndRename(context, filepath, scale, frame_start, loop)
-	retargetMhxRig(context, rig90)
+	print(rig90, action)
+	retargetMhxRig(context, rig90, mhxrig)
 	deleteFKRig(context, rig90, action)
 	print("%s finished" % filepath)
 	return
 
-class OBJECT_OT_LoadAndRetargetButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_LoadAndRetargetButton"
-	bl_label = "Load BVH and retarget rig"
+class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_LoadRetargetSimplifyButton"
+	bl_label = "Load, retarget, simplify"
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the OBJ file", maxlen=1024, default="")
 	scale = FloatProperty(name="Scale", description="Scale the BVH by this value", min=0.0001, max=1000000.0, soft_min=0.001, soft_max=100.0, default=0.1)
 	frame_start = IntProperty(name="Start Frame", description="Starting frame for the animation", default=1)
@@ -906,7 +995,7 @@ class OBJECT_OT_LoadAndRetargetButton(bpy.types.Operator):
 
 	def execute(self, context):
 		import bpy, os, import_bvh, mathutils
-		loadAndRetarget(context, self.properties.filepath, self.properties.scale, self.properties.frame_start, self.properties.loop)
+		loadRetargetSimplify(context, self.properties.filepath, self.properties.scale, self.properties.frame_start, self.properties.loop)
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
