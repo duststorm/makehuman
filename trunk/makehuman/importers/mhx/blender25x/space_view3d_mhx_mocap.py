@@ -30,16 +30,29 @@ bl_addon_info = {
 """
 Run from text window. 
 Access from UI panel (N-key) when MHX rig is active.
+
+Properties:
+Scale:	for BVH import
+Start frame:	for BVH import
+Loop:	for BVH import
+Simplify FCurves:	Include FCurve simplifcation.
+Max loc error:	Max error allowed for simplification of location FCurves
+Max rot error:	Max error allowed for simplification of rotation FCurves
+
 Buttons:
 Load BVH file (.bvh): 
 	Load bvh file with Z up
+Silence constraints:
+	Turn off constraints that may conflict with mocap data.
 Retarget selected to MHX: 
 	Retarget actions of selected BVH rigs to the active MHX rig.
-Load BVH and retarget rig:
-	Load bvh file and retarget the action to the active MHX rig.
-Batch load BVH and retarget rig:
+Simplify FCurves:
+	Simplifiy FCurves of active action, allowing max errors specified above.
+Load, retarget, simplify:
+	Load bvh file, retarget the action to the active MHX rig, and simplify FCurves.
+Batch run:
 	Load all bvh files in the given directory, whose name start with the
-	given prefix, and create actions for the active MHX rig.
+	given prefix, and create actions (with simplified FCurves) for the active MHX rig.
 """
 
 MAJOR_VERSION = 0
@@ -83,7 +96,7 @@ FkArmature = {
 	'RightToeBase' :  ('ToeFK_R', 'FootFK_R'),
 }
 
-FkAmtList = [
+FkBoneList = [
 	'Root', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
 	'Clavicle_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
 	'Clavicle_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
@@ -93,6 +106,42 @@ FkAmtList = [
 	'LegFK_R', 'AnkleFK_R',
 ]
 
+F_Rev = 1
+F_LR = 2
+
+IkArmature = {
+	'UpArmIK' : ('UpArmFK', F_LR, 'Clavicle'),
+	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
+	'HandIK' : ('HandFK', 0, None),
+
+	'UpLegIK' : ('UpLegFK', 0, 'Root'),
+	'LoLegIK' : ('LoLegFK', F_LR, 'UpLegIK'),
+	#'FootIK' : ('FootFK', 0, None),
+	#'ToeIK' : ('ToeFK', F_LR, 'FootIK'),
+
+	'LegIK' : ('LegFK', 0, None),
+	'ToeRevIK' : ('ToeFK', F_LR+F_Rev, 'LegIK'),
+	'FootRevIK' : ('FootFK', F_LR+F_Rev, 'ToeRevIK'),
+	'AnkleIK' : ('AnkleFK', F_LR, 'FootRevIK'),
+}
+
+IkBoneList = [
+	'UpArmIK', 'LoArmIK', 'HandIK',
+	'UpLegIK', 'LoLegIK', 'LegIK', 'ToeRevIK', 'FootRevIK', 'AnkleIK'
+]
+
+GlobalBoneList = [
+	'Root', 
+]
+'''
+	'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
+	'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
+	'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
+	'UpLegFK_R', 'LoLegFK_R', 'FootFK_R', 'ToeFK_R',
+	'LegFK_L', 'AnkleFK_L',
+	'LegFK_R', 'AnkleFK_R',
+]
+'''
 #			
 #	class CEditBone():
 #
@@ -232,6 +281,7 @@ def rotateRig90(context, rig00, bones00):
 	(rig90, bones90) = createFKRig(context.scene, bones00, rig00)
 	(tMatrix, tInverse) = setupTranformMatrix(bones00, bones90)
 	insertAction(bones00, rig00, rig90, tMatrix, tInverse)
+	setInterpolation(rig90)
 	return rig90
 
 #
@@ -289,35 +339,11 @@ def renameBvhRig(rig00, filepath):
 #	createIKBones(rig90):
 #
 
-F_Rev = 1
-F_LR = 2
-
-IkArmature = {
-	'UpArmIK' : ('UpArmFK', F_LR, 'Clavicle'),
-	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
-	'HandIK' : ('HandFK', 0, None),
-
-	'UpLegIK' : ('UpLegFK', 0, 'Root'),
-	'LoLegIK' : ('LoLegFK', F_LR, 'UpLegIK'),
-	#'FootIK' : ('FootFK', 0, None),
-	#'ToeIK' : ('ToeFK', F_LR, 'FootIK'),
-
-	'LegIK' : ('LegFK', 0, None),
-	'ToeRevIK' : ('ToeFK', F_LR+F_Rev, 'LegIK'),
-	'FootRevIK' : ('FootFK', F_LR+F_Rev, 'ToeRevIK'),
-	'AnkleIK' : ('AnkleFK', F_LR, 'FootRevIK'),
-}
-
-IkAmtList = [
-	'UpArmIK', 'LoArmIK', 'HandIK',
-	'UpLegIK', 'LoLegIK', 'LegIK', 'ToeRevIK', 'FootRevIK', 'AnkleIK'
-]
-
 def createIKBones(rig90):
 	bpy.ops.object.mode_set(mode='EDIT')
 	ebones = rig90.data.edit_bones
 	for suffix in ['_L', '_R']:
-		for nameIK in IkAmtList:
+		for nameIK in IkBoneList:
 			(nameFK, flags, parent) = IkArmature[nameIK]
 			eb = ebones.new(name=nameIK+suffix)
 			fb = ebones[nameFK+suffix]
@@ -389,8 +415,18 @@ class CAnimData():
 		self.name = name
 		
 #
+#	createAnimation(context, rig):
 #	createAnimData(name, animations, ebones):
 #
+
+def createAnimation(context, rig):
+	context.scene.objects.active = rig
+	animations = {}
+	bpy.ops.object.mode_set(mode='EDIT')
+	for name in FkBoneList:
+		createAnimData(name, animations, rig.data.edit_bones)
+	bpy.ops.object.mode_set(mode='POSE')
+	return animations
 
 def createAnimData(name, animations, ebones):
 	eb = ebones[name]
@@ -411,20 +447,10 @@ def createAnimData(name, animations, ebones):
 	return anim
 
 #
-#	createAnimation(context, rig):
 #	insertAnimation(context, rig, animations):
 #	insertAnimRoot(root, animations, nFrames, locs, rots):
 #	insertAnimChild(name, animations, rots):
 #
-
-def createAnimation(context, rig):
-	context.scene.objects.active = rig
-	animations = {}
-	bpy.ops.object.mode_set(mode='EDIT')
-	for name in FkAmtList:
-		createAnimData(name, animations, rig.data.edit_bones)
-	bpy.ops.object.mode_set(mode='POSE')
-	return animations
 
 def insertAnimation(context, rig, animations):
 	context.scene.objects.active = rig
@@ -433,7 +459,7 @@ def insertAnimation(context, rig, animations):
 	rots = makeVectorDict(rig, '].rotation_quaternion')
 	root = 'Root'
 	insertAnimRoot(root, animations, len(rots[root]), locs[root], rots[root])
-	for name in FkAmtList:
+	for name in FkBoneList:
 		if name != root:
 			try:
 				rot = rots[name]
@@ -477,7 +503,7 @@ def insertAnimChild(name, animations, rots):
 #
 
 def createEmpties(context, animations):
-	for name in FkAmtList:
+	for name in FkBoneList:
 		anim = animations[name]
 		createEmpty(context, name+'HD', anim.heads, anim.nFrames)
 		createEmpty(context, name+'TL', anim.tails, anim.nFrames)
@@ -496,33 +522,77 @@ def createEmpty(context, name, locs, nFrames):
 	return
 		
 #
-#		poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
+#	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
 #
 
 def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
 	context.scene.objects.active = mhxrig
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = mhxrig.pose.bones
-
-	root = 'Root'
-	anim = rig90Animations[root]
-	pb = pbones[root]
-	for frame in range(anim.nFrames):
-		pb.location = anim.heads[frame]
-		for n in range(3):
-			pb.keyframe_insert('location', index=n, frame=frame, group=root)	
-
-	for name in FkAmtList:
-		anim = rig90Animations[name]
-		pb = pbones[name]
-		for frame in range(anim.nFrames):
-			quat = anim.quats[frame]
-			pb.rotation_quaternion = quat
-			for n in range(4):
-				pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+	
+	name = 'Root'
+	insertLocationKeyFrames(name, pbones[name], rig90Animations[name], mhxAnimations[name])
+	for name in FkBoneList:
+		if name in GlobalBoneList:
+			insertGlobalRotationKeyFrames(name, pbones[name], rig90Animations[name], mhxAnimations[name])
+		else:
+			insertLocalRotationKeyFrames(name, pbones[name], rig90Animations[name], mhxAnimations[name])
 
 	insertAnimation(context, mhxrig, mhxAnimations)
+	setInterpolation(mhxrig)
 	return
+
+#
+#	insertLocationKeyFrames(name, pb, anim90, animMhx):
+#	insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
+#	insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
+#	insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
+#
+
+def insertLocationKeyFrames(name, pb, anim90, animMhx):
+	locs = []
+	for frame in range(anim90.nFrames):
+		loc0 = anim90.heads[frame] - animMhx.headRest
+		loc = animMhx.inverseRest * loc0
+		locs.append(loc)
+		pb.location = loc
+		for n in range(3):
+			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
+	return locs
+
+def insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
+	rots = []
+	for frame in range(anim90.nFrames):
+		mat90 = anim90.matrices[frame]
+		matMhx = animMhx.inverseRest * mat90 * animMhx.matrixRest
+		rot = matMhx.to_quat()
+		rots.append(rot)
+		pb.rotation_quaternion = rot
+		for n in range(4):
+			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+	return rots
+
+def insertLocalRotationKeyFrames(name, pb, anim90, animMhx):
+	rots = []
+	for frame in range(anim90.nFrames):
+		rot = anim90.quats[frame]
+		rots.append(rots)
+		pb.rotation_quaternion = rot
+		for n in range(4):
+			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+	return rots
+
+def insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
+	rots = []
+	for frame in range(animFK.nFrames):
+		matFK = animPar.matrices[frame].copy().invert() * animFK.matrices[frame]
+		matIK = animIK.inverseRest * matFK * animIK.matrixRest
+		rot = matIK.to_quat()
+		rots.append(rot)
+		pb.rotation_quaternion = rot
+		for n in range(4):
+			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+	return rots
 
 #
 #	poseMhxIKBones(context, mhxrig, mhxAnimations)
@@ -531,60 +601,37 @@ def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
 def poseMhxIKBones(context, mhxrig, mhxAnimations):
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = mhxrig.pose.bones
+	rots = makeVectorDict(mhxrig, '].rotation_quaternion')
 	for suffix in ['_L', '_R']:
 		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
 			nameIK = name+'IK'+suffix
-			anim = mhxAnimations[name+'FK'+suffix]
-			pbIK = pbones[nameIK]
-			print(pbIK, anim.nFrames)
-			for frame in range(anim.nFrames):
-				quat = anim.quats[frame]
-				pbIK.rotation_quaternion = quat
-				for n in range(4):
-					pbIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
+			nameFK = name+'FK'+suffix
+			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], mhxAnimations[nameFK], mhxAnimations[nameFK])
 
 		for name in ['Hand', 'Leg']:
 			nameIK = name+'IK'+suffix
-			anim = mhxAnimations[name+'FK'+suffix]
-			pbIK = pbones[nameIK]
-			locs = []
-			rots = []
-			for frame in range(anim.nFrames):
-				loc = anim.inverseRest * (anim.heads[frame] - anim.headRest)
-				pbIK.location = loc
-				locs.append(loc)
-				mat = anim.inverseRest * anim.matrices[frame] * anim.matrixRest
-				quat = mat.to_quat()
-				pbIK.rotation_quaternion = quat
-				rots.append(quat)
-				for n in range(3):
-					pbIK.keyframe_insert('location', index=n, frame=frame, group=nameIK)
-				for n in range(4):
-					pbIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
+			nameFK = name+'FK'+suffix
+			insertAnimChild(nameFK, mhxAnimations, rots[nameFK])
 			bpy.ops.object.mode_set(mode='EDIT')
 			createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
 			bpy.ops.object.mode_set(mode='POSE')
-			insertAnimRoot(nameIK, mhxAnimations, anim.nFrames, locs, rots)
+			animFK = mhxAnimations[nameFK]
+			loc = insertLocationKeyFrames(nameIK, pbones[nameIK], animFK, mhxAnimations[nameIK])
+			rot = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],animFK, mhxAnimations[nameIK])
+			insertAnimRoot(nameIK, mhxAnimations, animFK.nFrames, loc, rot)
 
-		mirror = Matrix.Rotation(math.pi, 3, 'Z')
 		for name in ['Toe', 'Foot']:
 			nameIK = name+'RevIK'+suffix
+			nameFK = name+'FK'+suffix
 			bpy.ops.object.mode_set(mode='EDIT')
-			animIK = createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
+			createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
 			bpy.ops.object.mode_set(mode='POSE')
-			animFK = mhxAnimations[name+'FK'+suffix]
-			animPar = mhxAnimations[animIK.parent]
-			pbIK = pbones[nameIK]
-			rots = []
-			for frame in range(anim.nFrames):
-				locmat = animPar.matrices[frame].copy().invert() * animFK.matrices[frame]
-				mat = animIK.inverseRest * locmat * animIK.matrixRest
-				quat = mat.to_quat()
-				pbIK.rotation_quaternion = quat
-				rots.append(quat)
-				for n in range(4):
-					pbIK.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=nameIK)
-			insertAnimChild(nameIK, mhxAnimations, rots)
+			animFK = mhxAnimations[nameFK]
+			animIK = mhxAnimations[nameIK]
+			rot = insertReverseRotationKeyFrames(nameIK, pbones[nameIK], animFK, animIK, mhxAnimations[animIK.parent])
+			insertAnimChild(nameIK, mhxAnimations, rot)
+
+	setInterpolation(mhxrig)
 	return
 
 #
@@ -611,7 +658,7 @@ def prettifyBones(rig):
 		bgrpFK.color_set = colorSet[index+1]
 		bgrpFK.name = 'FK'+suffix
 
-		for nameIK in IkAmtList:
+		for nameIK in IkBoneList:
 			(nameFK, flags, parent) = IkArmature[nameIK]
 			pb = rig.pose.bones[nameIK+suffix]
 			pb.bone_group = bgrpIK
@@ -660,11 +707,6 @@ def retargetMhxRig(context, rig90, mhxrig):
 	rig90Animations = createAnimation(context, rig90)
 	insertAnimation(context, rig90, rig90Animations)
 	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
-
-	#simplifyFCurves(context, mhxrig)
-
-	mhxAnimations = createAnimation(context, mhxrig)
-	insertAnimation(context, mhxrig, mhxAnimations)
 	poseMhxIKBones(context, mhxrig, mhxAnimations)
 
 	words = rig90.name.split('_')
@@ -707,6 +749,7 @@ def simplifyFCurves(context, mhxrig):
 	maxErrRot = context.scene.MhxErrorRot * math.pi/180
 	for fcu in act.fcurves:
 		simplifyFCurve(fcu, act, maxErrLoc, maxErrRot)
+	setInterpolation(mhxrig)
 	return
 
 #
@@ -714,7 +757,6 @@ def simplifyFCurves(context, mhxrig):
 #
 
 def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot):
-	print(fcu.data_path)
 	words = fcu.data_path.split('.')
 	if words[-1] == 'location':
 		maxErr = maxErrLoc
@@ -737,15 +779,36 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot):
 	newVerts = []
 	for n in keeps:
 		newVerts.append(points[n].co)
-
+	
 	path = fcu.data_path
 	index = fcu.array_index
 	grp = fcu.group.name
 	act.fcurves.remove(fcu)
 	nfcu = act.fcurves.new(path, index, grp)
 	for co in newVerts:
-		nfcu.keyframe_points.add(frame=co[0], value=co[1])
+		t = co[0]
+		dt = t - int(t)
+		if abs(dt) > 1e-5:
+			print(path, co)
+		else:
+			nfcu.keyframe_points.add(frame=co[0], value=co[1])
 
+	return
+
+#
+#	setInterpolation(rig):
+#
+
+def setInterpolation(rig):
+	if not rig.animation_data:
+		return
+	act = rig.animation_data.action
+	if not act:
+		return
+	for fcu in act.fcurves:
+		for pt in fcu.keyframe_points:
+			pt.interpolation = 'LINEAR'
+		fcu.extrapolation = 'CONSTANT'
 	return
 
 #
@@ -789,6 +852,26 @@ def getBvh(mhx):
 	return None
 
 def init(scn):
+	bpy.types.Scene.FloatProperty(
+		attr="MhxBvhScale",
+		name="Scale", 
+		description="Scale the BVH by this value", 
+		min=0.0001, max=1000000.0, 
+		soft_min=0.001, soft_max=100.0)
+	scn['MhxBvhScale'] = 0.1
+
+	bpy.types.Scene.IntProperty(
+		attr="MhxStartFrame",
+		name="Start Frame", 
+		description="Starting frame for the animation")
+	scn['MhxStartFrame'] = 1
+
+	bpy.types.Scene.BoolProperty(
+		attr="MhxLoopAnim",
+		name="Loop", 
+		description="Loop the animation playback")
+	scn['MhxLoopAnim'] = False
+
 	bpy.types.Scene.BoolProperty(
 		attr= "MhxDoSimplify", 
 		name="Simplify FCurves", 
@@ -823,7 +906,7 @@ def init(scn):
 		maxlen=1024)
 	scn['MhxPrefix'] = "Female1_A"
 
-	for mhx in FkAmtList:
+	for mhx in FkBoneList:
 		bpy.types.Scene.StringProperty(
 			attr=mhx, 
 			name=mhx, 
@@ -840,7 +923,7 @@ init(bpy.context.scene)
 #
 #	class MhxBvhAssocPanel(bpy.types.Panel):
 #
-
+"""
 class MhxBvhAssocPanel(bpy.types.Panel):
 	bl_label = "Mhx Bvh associations"
 	bl_space_type = "VIEW_3D"
@@ -858,13 +941,13 @@ class MhxBvhAssocPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		layout = self.layout
-		for mhx in FkAmtList:
+		for mhx in FkBoneList:
 			try:				
 				layout.prop(context.scene, mhx)
 			except:
 				pass
 		return
-
+"""
 #
 #	class Bvh2MhxPanel(bpy.types.Panel):
 #
@@ -886,21 +969,27 @@ class Bvh2MhxPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scn = context.scene
+		layout.prop(scn, "MhxBvhScale")
+		layout.prop(scn, "MhxStartFrame")
+		layout.prop(scn, "MhxLoopAnim")
 		layout.prop(scn, "MhxDoSimplify")
 		layout.prop(scn, "MhxErrorLoc")
 		layout.prop(scn, "MhxErrorRot")
+		layout.separator()
 		layout.operator("object.LoadBvhButton")
+		layout.operator("object.SilenceConstraintsButton")
 		layout.operator("object.RetargetMhxButton")
 		layout.operator("object.SimplifyFCurvesButton")
 		layout.separator()
 		layout.operator("object.LoadRetargetSimplifyButton")
+		layout.separator()
 		layout.prop(scn, "MhxDirectory")
 		layout.prop(scn, "MhxPrefix")
 		layout.operator("object.BatchButton")
 		return
 
 #
-#	importAndRename(context, filepath, scale, frame_start, loop):
+#	importAndRename(context, filepath):
 #	class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 #
 import sys
@@ -909,14 +998,14 @@ if bvhPath not in sys.path:
 	sys.path.append(bvhPath)
 import import_bvh
 
-def importAndRename(context, filepath, scale, frame_start, loop):
+def importAndRename(context, filepath):
 	bvh_nodes = import_bvh.read_bvh(context, filepath,
 		ROT_MODE='QUATERNION',
-		GLOBAL_SCALE=scale)
+		GLOBAL_SCALE=context.scene['MhxBvhScale'])
 	import_bvh.bvh_node_dict2armature(context, bvh_nodes,
 		ROT_MODE='QUATERNION',
-		IMPORT_START_FRAME=frame_start,
-		IMPORT_LOOP=loop)
+		IMPORT_START_FRAME=context.scene['MhxStartFrame'],
+		IMPORT_LOOP=context.scene['MhxLoopAnim'])
 	(rig00, bones00, action) =  renameBvhRig(context.object, filepath)
 	rig90 = rotateRig90(context, rig00, bones00)
 	deleteFKRig(context, rig00, action)
@@ -926,13 +1015,10 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadBvhButton"
 	bl_label = "Load BVH file (.bvh)"
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the OBJ file", maxlen=1024, default="")
-	scale = FloatProperty(name="Scale", description="Scale the BVH by this value", min=0.0001, max=1000000.0, soft_min=0.001, soft_max=100.0, default=0.1)
-	frame_start = IntProperty(name="Start Frame", description="Starting frame for the animation", default=1)
-	loop = BoolProperty(name="Loop", description="Loop the animation playback", default=False)
 
 	def execute(self, context):
 		import bpy, os, import_bvh
-		importAndRename(context, self.properties.filepath, self.properties.scale, self.properties.frame_start, self.properties.loop)
+		importAndRename(context, self.properties.filepath)
 		print("%s imported" % self.properties.filepath)
 		return{'FINISHED'}	
 
@@ -968,20 +1054,36 @@ class OBJECT_OT_SimplifyFCurvesButton(bpy.types.Operator):
 	def execute(self, context):
 		import bpy, mathutils
 		simplifyFCurves(context, context.object)
+		print("Curves simplified")
 		return{'FINISHED'}	
 
 #
-#	loadRetargetSimplify(context, filepath, scale, frame_start, loop):
+#	class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SilenceConstraintsButton"
+	bl_label = "Silence constraints"
+
+	def execute(self, context):
+		import bpy, mathutils
+		silenceConstraints(context.object)
+		print("Constraints silenced")
+		return{'FINISHED'}	
+
+#
+#	loadRetargetSimplify(context, filepath):
 #	class OBJECT_OT_LoadRetargetSimplify(bpy.types.Operator):
 #
 
-def loadRetargetSimplify(context, filepath, scale, frame_start, loop):
+def loadRetargetSimplify(context, filepath):
 	print("Load and retarget %s" % filepath)
 	mhxrig = context.object
-	(rig90, action) = importAndRename(context, filepath, scale, frame_start, loop)
-	print(rig90, action)
+	(rig90, action) = importAndRename(context, filepath)
 	retargetMhxRig(context, rig90, mhxrig)
 	deleteFKRig(context, rig90, action)
+	if context.scene['MhxDoSimplify']:
+		simplifyFCurves(context, mhxrig)
 	print("%s finished" % filepath)
 	return
 
@@ -989,13 +1091,10 @@ class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadRetargetSimplifyButton"
 	bl_label = "Load, retarget, simplify"
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the OBJ file", maxlen=1024, default="")
-	scale = FloatProperty(name="Scale", description="Scale the BVH by this value", min=0.0001, max=1000000.0, soft_min=0.001, soft_max=100.0, default=0.1)
-	frame_start = IntProperty(name="Start Frame", description="Starting frame for the animation", default=1)
-	loop = BoolProperty(name="Loop", description="Loop the animation playback", default=False)
 
 	def execute(self, context):
 		import bpy, os, import_bvh, mathutils
-		loadRetargetSimplify(context, self.properties.filepath, self.properties.scale, self.properties.frame_start, self.properties.loop)
+		loadRetargetSimplify(context, self.properties.filepath)
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
@@ -1020,15 +1119,16 @@ def readDirectory(directory, prefix):
 
 class OBJECT_OT_BatchButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_BatchButton"
-	bl_label = "Batch load BVH and retarget rig"
+	bl_label = "Batch run"
 
 	def execute(self, context):
 		import bpy, os, import_bvh, mathutils
 		paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
+		mhxrig = context.object
 		for filepath in paths:
-			loadAndRetarget(context, filepath, 0.1, 1, False)
+			context.scene.objects.active = mhxrig
+			loadRetargetSimplify(context, filepath)
 		return{'FINISHED'}	
 
-#retargetMhxRig(bpy.context)
 
 
