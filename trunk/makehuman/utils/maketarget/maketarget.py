@@ -47,6 +47,8 @@ import bpy
 from Blender.Mathutils import *
 import blender2obj
 from Blender import Types
+from Blender import Scene
+from Blender.Scene import Render
 
 basePath = 'base.obj'
 pairsPath = 'base.sym'
@@ -176,7 +178,19 @@ def applyTransforms():
             mesh.transform(m)      # Convert verts to world space            
             mesh.update()
         
+def render(path = "//myRenderdir/", imageName = "001.tga"):
+    scn = Scene.GetCurrent()
+    context = scn.getRenderingContext()
 
+    Render.EnableDispWin()
+    context.extensions = True
+    context.renderPath = path
+    context.sizePreset(Render.PC)
+
+    context.imageType = Render.TARGA   
+    context.render()
+    context.saveRenderedImage(imageName)
+    Render.CloseRenderWindow()
 #-------MAKETARGET CALLBACKS----------------------
 
 def buildScan2Mesh(path):
@@ -379,13 +393,43 @@ def symm(rightMirror, n=0):
 def scaleRotTarget(path):
     global morphFactor,basePath
     maketargetlib.saveScaledRotTarget(path,morphFactor.val)
+
+
+
+def processingTargetsRender(path,basePath,mFactor):
+    """
+    This function is used to adjust little changes on base
+    meshes, correcting all targets
+    """
+
+    targetDir = os.path.dirname(path)
+    targetToApply = os.path.basename(path)
+    targetsList = os.listdir(targetDir)
+
+    for targetName in targetsList:
+        if targetName != targetToApply:
+            targetPath = os.path.join(targetDir,targetName)
+            if os.path.isfile(targetPath):
+                #print "Processing %s"%(targetPath)
+                loadTarget(targetPath)
+                applyTarget(mFactor)
+                #loadTraslTarget(vertices,targetPath,1.0)
+                #loadTraslTarget(vertices,path,mFactor)
+                #saveTraslTarget(vertices, targetPath+".mod.target", basePath, verticesTosave)
+                #loadTraslTarget(vertices,path,-mFactor)
+                redrawAll()
+                imageName = os.path.splitext(targetName)[0] + ".tga"
+                render("//myRenderdir/", imageName)
+                applyTarget(-mFactor)
+                redrawAll()
+
     
 def processingTargets(path, n=0):
     global morphFactor
     startEditing() 
     vertices = getVertices(n)
     verticesTosave = xrange(len(vertices))
-    maketargetlib.processingTargets(path,basePath,vertices,morphFactor.val,verticesTosave)
+    processingTargetsCustom(path,basePath,morphFactor.val)
     updateVertices(vertices,n)
     endEditing()
     

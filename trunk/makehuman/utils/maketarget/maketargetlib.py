@@ -687,29 +687,6 @@ def saveTranslationTargetAndHisSymm(targetPath):
     resetMesh()
 
 
-def processingTargets(path,basePath,vertices,mFactor,verticesTosave):
-    """
-    This function is used to adjust little changes on base
-    meshes, correcting all targets
-    """
-
-    targetDir = os.path.dirname(path)
-    targetToApply = os.path.basename(path)
-    targetsList = os.listdir(targetDir)
-
-    for targetName in targetsList:
-        if targetName != targetToApply:
-            targetPath = os.path.join(targetDir,targetName)
-            if os.path.isfile(targetPath):
-                #print "Processing %s"%(targetPath)
-                loadTraslTarget(vertices,targetPath,1.0)                
-                loadTraslTarget(vertices,path,mFactor) 
-                saveTraslTarget(vertices, targetPath+".mod.target", basePath, verticesTosave)
-                loadTraslTarget(vertices,path,-mFactor) 
-                loadTraslTarget(vertices,targetPath,-1.0)                
-
-
-
 def loadVertices(path):
     """
     This function is a little utility function to load only the vertex data
