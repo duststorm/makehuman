@@ -75,7 +75,7 @@ from os.path import join, basename, splitext
 
 import mh
 import gui3d, events3d, font3d
-import human, hair, background
+import human, hair, background, human_texture
 import guimodelling, guifiles, guirender, guiadvanced
 from aljabr import centroid
 #import font3d
@@ -190,6 +190,7 @@ class MHApplication(gui3d.Application):
       self.getThemeResource("images", "button_library_on.png"))
     hair.HairTaskView(library)
     background.BackgroundTaskView(library)
+    human_texture.HumanTextureTaskView(library)
 
     # Load plugins not starting with _    
     self.modules = {}
