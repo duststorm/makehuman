@@ -224,6 +224,7 @@ def fitScan2Mesh(path):
     else:
         message = "Error: face.verts not found!"
         print message
+
     
 def saveScanMask(path):
     mainDir = os.path.dirname(path)
@@ -325,13 +326,6 @@ def applyPoseFromFolder(path, n=0):
     maketargetlib.loadPoseFromFolder(vertices,path,morphFactor.val)
     updateVertices(vertices)
     endEditing()
-    
-def alignPCA():
-    startEditing()
-    vertices0 = getVertices(0)
-    vertices1 = getVertices(1)    
-    updateVertices(maketargetlib.align_PCA(vertices0, vertices1),1)
-    endEditing()
 
 def scanReg(scan):
     global objToCOnvertPath
@@ -395,27 +389,36 @@ def scaleRotTarget(path):
     maketargetlib.saveScaledRotTarget(path,morphFactor.val)
 
 
+def processingTargetsSimple(path,basePath,mFactor):
+    """
+    Load and then save all targets in a dir
+    """
+    reset()
+    targetDir = os.path.dirname(path)
+    targetsList = os.listdir(targetDir)
+    for targetName in targetsList:
+        targetPath = os.path.join(targetDir,targetName)           
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetName)
+            loadTarget(targetPath)
+            applyTarget(mFactor)
+            #it should do something here
+            saveTarget(targetPath)
+            reset()
+
 
 def processingTargetsRender(path,basePath,mFactor):
     """
-    This function is used to adjust little changes on base
-    meshes, correcting all targets
+    This function is used to render all targets in a dir
     """
 
     targetDir = os.path.dirname(path)    
     targetsList = os.listdir(targetDir)
-
-    for targetName in targetsList:
-        
+    for targetName in targetsList:        
         targetPath = os.path.join(targetDir,targetName)
         if os.path.isfile(targetPath):
-            #print "Processing %s"%(targetPath)
             loadTarget(targetPath)
             applyTarget(mFactor)
-            #loadTraslTarget(vertices,targetPath,1.0)
-            #loadTraslTarget(vertices,path,mFactor)
-            #saveTraslTarget(vertices, targetPath+".mod.target", basePath, verticesTosave)
-            #loadTraslTarget(vertices,path,-mFactor)
             redrawAll()
             imageName = os.path.splitext(targetName)[0] + ".tga"
             render("//myRenderdir/", imageName)
@@ -424,8 +427,7 @@ def processingTargetsRender(path,basePath,mFactor):
 
 def processingTargetsSymm(path,basePath,mFactor):
     """
-    This function is used to adjust little changes on base
-    meshes, correcting all targets
+    This function is used to save the symmetric targets
     """
     targetDir = os.path.dirname(path)
     targetsList = os.listdir(targetDir)
@@ -444,14 +446,15 @@ def processingTargetsSymm(path,basePath,mFactor):
                              
                 
 
-def processingTargets(path, n=0, processingType=2):
+def processingTargets(path, n=0, processingType=1):
     global morphFactor
     startEditing()
     if processingType == 1:
-        processingTargetsCustom(path,basePath,morphFactor.val)
-    if processingType == 2:
-        print "DEBUG"
+        processingTargetsRender(path,basePath,morphFactor.val)
+    if processingType == 2:       
         processingTargetsSymm(path,basePath,morphFactor.val)
+    if processingType == 3:
+        processingTargetsSimple(path,basePath,morphFactor.val)
     endEditing()
 
 
@@ -614,6 +617,7 @@ def event(event, value):
         Window.FileSelector (processingTargetsSymm, "Save Target")
     elif event == Draw.DKEY:
         pass
+        
     elif event == Draw.EKEY:        
         align()
     elif event == Draw.FKEY:
