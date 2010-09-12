@@ -659,34 +659,6 @@ def loadVertsIndex(path):
     return selectedIndices
 
 
-def saveTranslationTargetAndHisSymm(targetPath):
-    """
-    This function saves a morph target file and his symmetric.
-    In example, saving l-ear-move-up.target, will be automatically
-    calculated and saved r-ear-move-up.target
-
-    Parameters
-    ----------
-
-    targetPath:
-        *string*. A string containing the operating system path to the
-        file to be written. Must start with "l-" prefix.
-
-    """
-
-    saveTranslationTarget(targetPath)
-    loadSymVertsIndex(1)
-    loadTraslTarget(targetPath)
-    pathParts = os.path.split(targetPath)
-    headPath = pathParts[0]
-    tailPath = pathParts[1]
-    nameSuffix = tailPath[1:]
-    targetPath = os.path.join(headPath,"r"+nameSuffix)
-    applyTarget(-1)
-    saveTranslationTarget(targetPath)
-    resetMesh()
-
-
 def loadVertices(path):
     """
     This function is a little utility function to load only the vertex data

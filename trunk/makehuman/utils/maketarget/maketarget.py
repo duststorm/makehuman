@@ -351,7 +351,7 @@ def scanReg(scan):
 def saveTarget(path):    
     global saveOnlySelectedVerts,basePath, message     
     verticesTosave = []    
-    vertices = getVertices()   
+    vertices = getVertices()
     if saveOnlySelectedVerts.val:
         verticesTosave = getSelectedVertices()
     else:
@@ -402,36 +402,60 @@ def processingTargetsRender(path,basePath,mFactor):
     meshes, correcting all targets
     """
 
-    targetDir = os.path.dirname(path)
-    targetToApply = os.path.basename(path)
+    targetDir = os.path.dirname(path)    
     targetsList = os.listdir(targetDir)
 
     for targetName in targetsList:
-        if targetName != targetToApply:
-            targetPath = os.path.join(targetDir,targetName)
-            if os.path.isfile(targetPath):
-                #print "Processing %s"%(targetPath)
-                loadTarget(targetPath)
-                applyTarget(mFactor)
-                #loadTraslTarget(vertices,targetPath,1.0)
-                #loadTraslTarget(vertices,path,mFactor)
-                #saveTraslTarget(vertices, targetPath+".mod.target", basePath, verticesTosave)
-                #loadTraslTarget(vertices,path,-mFactor)
-                redrawAll()
-                imageName = os.path.splitext(targetName)[0] + ".tga"
-                render("//myRenderdir/", imageName)
-                applyTarget(-mFactor)
-                redrawAll()
+        
+        targetPath = os.path.join(targetDir,targetName)
+        if os.path.isfile(targetPath):
+            #print "Processing %s"%(targetPath)
+            loadTarget(targetPath)
+            applyTarget(mFactor)
+            #loadTraslTarget(vertices,targetPath,1.0)
+            #loadTraslTarget(vertices,path,mFactor)
+            #saveTraslTarget(vertices, targetPath+".mod.target", basePath, verticesTosave)
+            #loadTraslTarget(vertices,path,-mFactor)
+            redrawAll()
+            imageName = os.path.splitext(targetName)[0] + ".tga"
+            render("//myRenderdir/", imageName)
+            applyTarget(-mFactor)
+            redrawAll()
 
-    
-def processingTargets(path, n=0):
+def processingTargetsSymm(path,basePath,mFactor):
+    """
+    This function is used to adjust little changes on base
+    meshes, correcting all targets
+    """
+    targetDir = os.path.dirname(path)
+    targetsList = os.listdir(targetDir)
+    for targetName in targetsList:       
+        targetPath = os.path.join(targetDir,targetName)
+        targetNameNoExt = os.path.splitext(targetName)[0]
+        targetPathSym = os.path.join(targetDir,targetNameNoExt+"-symm.target")
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetName)
+            loadTarget(targetPath)            
+            applyTarget(mFactor)    
+            symm(1,0)
+            applyTarget(-mFactor)
+            saveTarget(targetPathSym)
+            reset()
+                             
+                
+
+def processingTargets(path, n=0, processingType=2):
     global morphFactor
-    startEditing() 
-    vertices = getVertices(n)
-    verticesTosave = xrange(len(vertices))
-    processingTargetsCustom(path,basePath,morphFactor.val)
-    updateVertices(vertices,n)
+    startEditing()
+    if processingType == 1:
+        processingTargetsCustom(path,basePath,morphFactor.val)
+    if processingType == 2:
+        print "DEBUG"
+        processingTargetsSymm(path,basePath,morphFactor.val)
     endEditing()
+
+
+
     
 def adapt(path):
     print "Fitting face...final step"
@@ -587,9 +611,9 @@ def event(event, value):
     elif event == Draw.BKEY:
         selectSymmetricVerts()
     elif event == Draw.CKEY:
-        Window.FileSelector (saveTranslationTargetAndHisSymm, "Save Target")
+        Window.FileSelector (processingTargetsSymm, "Save Target")
     elif event == Draw.DKEY:
-        Window.FileSelector (loadAlloadTargetInFolder, "Load from folder")
+        pass
     elif event == Draw.EKEY:        
         align()
     elif event == Draw.FKEY:
