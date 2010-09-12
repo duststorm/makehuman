@@ -521,8 +521,8 @@ class RMRScene:
 
         ribfile.write('\tAttributeBegin\n')
         ribfile.write('\tReverseOrientation #<<-- required\n')
-        ribfile.write('\t\tColor [%f %f %f]\n' % (self.humanCharacter.human.hairColor[0], self.humanCharacter.human.hairColor[1], self.humanCharacter.human.hairColor[2]))
-        ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] "float roughness" [0.08] \n')
+        ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] "float roughness" [0.08] "color rootcolor" [%s %s %s]\n' % 
+                        (self.humanCharacter.human.hairColor[0], self.humanCharacter.human.hairColor[1], self.humanCharacter.human.hairColor[2]))
         ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(self.ribsPath, 'hairs.rib').replace('\\', '/'))
         ribfile.write('\tAttributeEnd\n')
         ribfile.write('WorldEnd\n')

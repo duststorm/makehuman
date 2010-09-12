@@ -1,20 +1,8 @@
-
-
-
-
-
-
-surface hair (float Ka = 1, Kd = .6, Ks = .35, roughness = .15;
- 
-          
-
-         
+surface hair (float Ka = 1, Kd = .6, Ks = .35, roughness = .15;            
+            color rootcolor = (0.2, 0.11, 0.04);        
 	     )
-{
-        
-   
-    color tipcolor = Cs;
-    color rootcolor = Cs*0.5;
+{   
+    color tipcolor = rootcolor*1.5;
     color specularcolor = (color(1) + tipcolor) / 2;
     vector V = -normalize(I);
     normal Nf = faceforward (normalize(N),I);
@@ -27,9 +15,7 @@ surface hair (float Ka = 1, Kd = .6, Ks = .35, roughness = .15;
     Oi = 0.85*(1-pow(v,5));
     Ci = Oi *diffuse(Nf) * mix(rootcolor, tipcolor, v) ;             
 
-    Ci = Ci + (Oi *specularcolor * Ks * specular(Nf, -normalize(I), roughness));
-
-    
+    Ci = Ci + (Oi *specularcolor * Ks * specular(Nf, -normalize(I), roughness));    
    
 
 }
