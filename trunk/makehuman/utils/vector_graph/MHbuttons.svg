@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,7 +14,7 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.46"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="MHbuttons.svg"
    inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_load.png"
    inkscape:export-xdpi="90.000084"
@@ -1643,16 +1644,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.4765624"
-     inkscape:cx="84.479809"
-     inkscape:cy="607.7156"
+     inkscape:zoom="6.3308153"
+     inkscape:cx="37.643272"
+     inkscape:cy="271.28165"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="778"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-height="977"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -5877,5 +5878,105 @@
          id="tspan3101"
          x="157.16057"
          y="468.18314">.md5</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_on.png"
+       ry="2.3011835"
+       y="743.18048"
+       x="-21.051666"
+       height="15.341223"
+       width="31.341223"
+       id="rect3091-0"
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_on.png"
+       transform="scale(0.99469202,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3093-9"
+       y="750.38617"
+       x="-18.454142"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       xml:space="preserve"><tspan
+         y="750.38617"
+         x="-18.454142"
+         id="tspan3095-4"
+         sodipodi:role="line">.md5</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3097-8"
+       width="31.341223"
+       height="15.341223"
+       x="46.203308"
+       y="746.11975"
+       ry="2.3011835"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g4489"
+       transform="matrix(0.82673809,0,0,0.82673809,10.682828,108.33284)">
+      <path
+         sodipodi:nodetypes="sssssccczcccssss"
+         inkscape:connector-curvature="0"
+         id="rect4466"
+         d="m 47.950914,774.35693 27.936886,0 c 1.274856,0 2.301184,1.02633 2.301184,2.30119 l 0,7.08649 c 0,1.27485 -1.026328,2.30118 -2.301184,2.30118 l -3.492111,0 -3.492111,0 -3.49211,0 c 0,0 -0.709606,-7.58196 -3.492111,-7.58196 -2.782505,0 -3.492111,7.58196 -3.492111,7.58196 l -3.492111,0 -3.49211,0 -3.492111,0 c -1.274855,0 -2.301183,-1.02633 -2.301183,-2.30118 l 0,-7.08649 c 0,-1.27486 1.026328,-2.30119 2.301183,-2.30119 z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <rect
+         ry="2.5477388"
+         y="775.49646"
+         x="46.755432"
+         height="9.4436045"
+         width="9.7933674"
+         id="rect4469"
+         style="fill:#ff0000" />
+      <rect
+         ry="2.5477388"
+         y="775.47955"
+         x="67.289917"
+         height="9.4436045"
+         width="9.7933674"
+         id="rect4469-4"
+         style="fill:#0000ff" />
+    </g>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.65877777;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3097-8-3"
+       width="31.341223"
+       height="15.341223"
+       x="46.722614"
+       y="766.84424"
+       ry="2.3011835"
+       inkscape:export-filename="C:\Documents and Settings\jcapco\Desktop\md5_off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g4489-7"
+       transform="matrix(0.82673809,0,0,0.82673809,11.202136,129.05735)">
+      <path
+         sodipodi:nodetypes="sssssccczcccssss"
+         inkscape:connector-curvature="0"
+         id="rect4466-5"
+         d="m 47.950914,774.35693 27.936886,0 c 1.274856,0 2.301184,1.02633 2.301184,2.30119 l 0,7.08649 c 0,1.27485 -1.026328,2.30118 -2.301184,2.30118 l -3.492111,0 -3.492111,0 -3.49211,0 c 0,0 -0.709606,-7.58196 -3.492111,-7.58196 -2.782505,0 -3.492111,7.58196 -3.492111,7.58196 l -3.492111,0 -3.49211,0 -3.492111,0 c -1.274855,0 -2.301183,-1.02633 -2.301183,-2.30118 l 0,-7.08649 c 0,-1.27486 1.026328,-2.30119 2.301183,-2.30119 z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <rect
+         ry="2.5477388"
+         y="775.49646"
+         x="46.755432"
+         height="9.4436045"
+         width="9.7933674"
+         id="rect4469-8"
+         style="fill:#ff0000" />
+      <rect
+         ry="2.5477388"
+         y="775.47955"
+         x="67.289917"
+         height="9.4436045"
+         width="9.7933674"
+         id="rect4469-4-1"
+         style="fill:#0000ff" />
+    </g>
   </g>
 </svg>
