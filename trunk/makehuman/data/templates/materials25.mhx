@@ -3,10 +3,12 @@
  
 Image texture.tif
   *** Filename texture.tif ;
+  use_premultiply True ;
 end Image
 
 Image texture_ref.tif
   *** Filename texture_ref.tif ;
+  use_premultiply True ;
 end Image
 
 
@@ -86,6 +88,7 @@ Material SSS_skinshader
 
   MTex 1 specularity UV SPECULAR_COLOR
     texture Refer Texture specularity ;
+    use_map_color_diffuse False ;
     use_map_specular True ;
     use_map_reflect True ;
     alpha_factor 1 ;
@@ -129,6 +132,7 @@ Material SSS_skinshader
 
   MTex 2 normals UV NORMAL
     texture Refer Texture normals ;
+    use_map_color_diffuse False ;
     use_map_normal True ;
     alpha_factor 1 ;
     ambient_factor 1 ;
@@ -299,6 +303,7 @@ Material Skin_no_SSS
 
   MTex 1 specularity UV SPECULAR_COLOR
     texture Refer Texture specularity ;
+    use_map_color_diffuse False ;
     use_map_reflect True ;
     use_map_specular True ;
     use_map_color_spec True ;

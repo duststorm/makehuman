@@ -25,7 +25,6 @@ BodyJoints = [
 	('floor',				'o', ('mid-feet', [0,-0.3,0])),
 ]
 
-
 BodyHeadsTails = [
 
 	('MasterFloor',			'floor', ('floor', zunit)),
@@ -75,10 +74,7 @@ BodyPoses = [
 
 	('poseBone', 'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'Root', 'MHCube05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['Floor', 'MasterFloor', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Hips', 'MasterHips', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Neck', 'MasterNeck', 0.0, (1,1,1), (1,1,1), (1,1,1)])]),
+	('poseBone', 'Root', 'MHCube05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints),
 
 	('poseBone', 'Hips', 'MHHips', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 

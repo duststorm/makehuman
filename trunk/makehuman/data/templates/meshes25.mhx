@@ -1,7 +1,7 @@
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh Human Human 
+Mesh HumanMesh HumanMesh
   Verts
   *** Verts
   end Verts
@@ -14837,15 +14837,15 @@ Mesh Human Human
     *** VertexGroup
 end Mesh
 
-Object Human MESH Human
+Object HumanMesh MESH HumanMesh
   layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
     Modifier Armature ARMATURE
-      object Refer Object HumanRig ;
+      object Refer Object Human ;
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
   color Array 1.0 1.0 1.0 1.0  ;
-  parent Refer Object HumanRig ;
+  parent Refer Object Human ;
   parent_type 'OBJECT' ;
   select True ;
   Property MhxScale theScale ;

@@ -195,7 +195,7 @@ ArmPoses = [
 		]),
 
 	('poseBone', 'HandIK_L', 'GoboHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['World', 'Root', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, ['Shoulder', 'Clavicle_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Clavicle_L', 'fNoStretch', 'Clavicle_L'])]),
 
@@ -208,8 +208,8 @@ ArmPoses = [
 		#('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_R, (True, True, True)])
 		]),
 
-	('poseBone', 'HandIK_R', 'GoboHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('ChildOf', C_CHILDOF, ['World', 'Root', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+	('poseBone', 'HandIK_R', 'GoboHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, ['Shoulder', 'Clavicle_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Clavicle_R', 'fNoStretch', 'Clavicle_R'])]),
 ]

@@ -113,7 +113,7 @@ def FaceWriteDrivers(fp):
 	drivers = []
 	for (driven, driver, coeff) in lidBones:
 		drivers.append(	(driven, 'ROTQ', None, 1, coeff,
-		 [("var", 'TRANSFORMS', [('HumanRig', driver, 'LOC_Z', C_LOCAL)])]) )
+		 [("var", 'TRANSFORMS', [('Human', driver, 'LOC_Z', C_LOCAL)])]) )
 	writeDrivers(fp, True, drivers)
 	return
 

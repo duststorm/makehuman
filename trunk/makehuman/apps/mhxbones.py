@@ -890,7 +890,7 @@ def writePose24(obj, fp):
 					if arg2 == Bone:
 						fp.write(
 "\t\t\tCHAINLEN	int %d ; \n" % arg1 +
-"\t\t\tTARGET	obj HumanRig ; \n" +
+"\t\t\tTARGET	obj Human ; \n" +
 "\t\t\tBONE	str %s ; \n" % target)
 					else:
 						fp.write(
@@ -900,24 +900,24 @@ def writePose24(obj, fp):
 
 				elif type == 'COPYROT':
 					fp.write(
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ; \n" % target +
 "\t\t\tCOPY	hex %x ;\n" %  arg1)
 
 				elif type == 'COPYLOC':
 					fp.write(
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ;\n" % target)
 
 				elif type == 'STRETCHTO':
 					fp.write(
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ;\n" % target +
 "\t\t\tPLANE	hex 2 ;\n")
 
 				elif type == 'LIMITDIST':
 					fp.write(
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ;\n" % target)
 
 				elif type == 'LIMITROT':
@@ -996,7 +996,7 @@ def writePose25(obj, fp):
 					if arg2 == Bone:
 						fp.write(
 "\t\t\tchain_length	int %d ; \n" % arg1 +
-"\t\t\ttarget		obj HumanRig ; \n" +
+"\t\t\ttarget		obj Human ; \n" +
 "\t\t\tsubtarget	str %s ; \n" % target)
 					else:
 						fp.write(
@@ -1006,24 +1006,24 @@ def writePose25(obj, fp):
 
 				elif type == 'COPYROT':
 					fp.write(
-"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\ttarget		obj Human ;\n" +
 "\t\t\tsubtarget	str %s ; \n" % target +
 "\t\t\tCOPY		hex %x ;\n" %  arg1)
 
 				elif type == 'COPYLOC':
 					fp.write(
-"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\ttarget		obj Human ;\n" +
 "\t\t\tsubtarget	str %s ;\n" % target)
 
 				elif type == 'STRETCHTO':
 					fp.write(
-"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\ttarget		obj Human ;\n" +
 "\t\t\tsubtarget	str %s ;\n" % target +
 "\t\t\tplane		hex 2 ;\n")
 
 				elif type == 'LIMITDIST':
 					fp.write(
-"\t\t\ttarget		obj HumanRig ;\n" +
+"\t\t\ttarget		obj Human ;\n" +
 "\t\t\tsubtarget	str %s ;\n" % target)
 
 				elif type == 'LIMITROT':

@@ -26,7 +26,7 @@ import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 15
+MINOR_VERSION = 16
 splitLeftRight = True
 
 #
@@ -82,11 +82,11 @@ def exportRawMhx(obj, fp):
 	exportArmature(obj, fp)
 	fp.write(
 "if useMesh \n" +
-"mesh Human Human \n")
+"mesh HumanMesh HumanMesh \n")
 	exportRawData(obj, fp)
 	fp.write(
 "end mesh\n" +
-"\nobject Human Mesh Human \n" +
+"\nobject HumanMesh Mesh HumanMesh \n" +
 "\tlayers 1 0 ;\n" +
 "end object\n" +
 "end useMesh\n")
@@ -179,12 +179,12 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 			elif lineSplit[1] == 'rig-drivers':
 				mhx_rig.writeAllDrivers(fp)
 			elif lineSplit[1] == 'rig-process':
-				fp.write("\n  ApplyArmature Human ;\n")
+				fp.write("\n  ApplyArmature HumanMesh ;\n")
 				for proxy in proxyData.values():
 					if proxy.name and not proxy.bones:
-						fp.write("  ApplyArmature %s ;\n" % proxy.name)
+						fp.write("  ApplyArmature %sMesh ;\n" % proxy.name)
 				mhx_rig.writeAllProcesses(fp)
-				mhx_rig.reapplyArmature(fp, "Human")
+				mhx_rig.reapplyArmature(fp, "HumanMesh")
 				for proxy in proxyData.values():
 					if proxy.name and not proxy.bones:
 						mhx_rig.reapplyArmature(fp, proxy.name)
@@ -195,21 +195,21 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 					fp.write("if True\n")
 				else:
 					fp.write("if False\n")
-				fp.write("Armature %sRig %sRig   Normal \n" % (proxy.name, proxy.name))
+				fp.write("Armature %s %s   Normal \n" % (proxy.name, proxy.name))
 				mh2proxy.writeProxyArmature(fp, proxy)
 			elif lineSplit[1] == 'ProxyRigObject':
-				fp.write("Object %sRig ARMATURE %sRig \n" % (proxy.name, proxy.name))
+				fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
 			elif lineSplit[1] == 'ProxyPose':
 				mh2proxy.writeProxyPose(fp, proxy)
 			elif lineSplit[1] == 'ProxyMesh':
-				fp.write("Mesh %s %s \n" % (proxy.name, proxy.name))
+				fp.write("Mesh %sMesh %sMesh \n" % (proxy.name, proxy.name))
 			elif lineSplit[1] == 'ProxyObject':
-				fp.write("Object %s MESH %s \n" % (proxy.name, proxy.name))
+				fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
 			elif lineSplit[1] == 'ProxyReferRig':
 				if proxy.bones:
-					fp.write("      object Refer Object %sRig ;\n" % proxy.name)
+					fp.write("      object Refer Object %s ;\n" % proxy.name)
 				else:
-					fp.write("      object Refer Object HumanRig ;\n")
+					fp.write("      object Refer Object Human ;\n")
 			elif lineSplit[1] == 'ProxyVerts':
 				for bary in proxy.realVerts:
 					(x,y,z) = mh2proxy.proxyCoord(bary)
@@ -258,7 +258,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 					copyProxy("data/templates/vertexgroups-leftright25.mhx", fp, proxy)	
 			elif lineSplit[1] == 'mesh-shapeKey':
 				pass
-				writeShapeKeys(fp, "Human", None)
+				writeShapeKeys(fp, "HumanMesh", None)
 			elif lineSplit[1] == 'proxy-shapeKey':
 				fp.write("if toggle&T_Proxy\n")
 				for proxy in proxyData.values():
@@ -266,7 +266,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 						writeShapeKeys(fp, proxy.name, proxy)
 				fp.write("end if\n")
 			elif lineSplit[1] == 'mesh-animationData':
-				writeAnimationData(fp, "Human", None)
+				writeAnimationData(fp, "HumanMesh", None)
 			elif lineSplit[1] == 'proxy-animationData':
 				for proxy in proxyData.values():
 					if proxy.name:
@@ -452,11 +452,11 @@ def copyMeshFile249(obj, tmpl, fp):
 				mainMesh = False
 				inZone = False
 				skip = False
-		elif lineSplit[0] == 'mesh' and lineSplit[1] == 'Human':
+		elif lineSplit[0] == 'mesh' and lineSplit[1] == 'HumanMesh':
 			inZone = True
 			mainMesh = True
 			fp.write("if useMesh\n")
-		elif lineSplit[0] == 'object' and lineSplit[1] == 'Human':
+		elif lineSplit[0] == 'object' and lineSplit[1] == 'HumanMesh':
 			mainMesh = True
 			fp.write("if useMesh\n")
 		elif lineSplit[0] == 'vertgroup':
@@ -565,7 +565,7 @@ def oldExportArmature24(obj, fp):
 
 	fp.write(
 "\nif useArmature\n" +
-"armature HumanRig HumanRig\n")
+"armature Human Human\n")
 	mhxbones.writeBones(obj, fp)
 	fp.write(
 "\tlayerMask 0x515 ;\n" +
@@ -579,12 +579,12 @@ def oldExportArmature24(obj, fp):
 "\tvertexGroups true ;\n" +
 "end armature\n")
 
-	fp.write("\npose HumanRig\n")
+	fp.write("\npose Human\n")
 	mhxbones.writePose24(obj, fp)
 	fp.write("end pose\n")
 
 	fp.write(
-"\nobject HumanRig Armature HumanRig \n" +
+"\nobject Human Armature Human \n" +
 "\tlayers 1 0 ;\n" +
 "\txRay true ;\n" +
 "end object\n" +
@@ -600,7 +600,7 @@ def newExportArmature24(obj, fp):
 
 	fp.write(
 "\nif useArmature\n" +
-"armature HumanRig HumanRig\n")
+"armature Human Human\n")
 	mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.PanelArmature, False)
 	fp.write(
 "\tlayerMask 0x515 ;\n" +
@@ -614,12 +614,12 @@ def newExportArmature24(obj, fp):
 "\tvertexGroups true ;\n" +
 "end armature\n")
 
-	fp.write("\npose HumanRig\n")
+	fp.write("\npose Human\n")
 	classic_bones.ClassicWritePoses(fp)
 	fp.write("end pose\n")
 		
 	fp.write(
-"\nobject HumanRig Armature HumanRig \n" +
+"\nobject Human Armature Human \n" +
 "\tlayers 1 0 ;\n" +
 "\txRay true ;\n" +
 "end object\n" +
@@ -732,7 +732,7 @@ def writeIcu(fp, shape, expr):
 	fp.write(
 "\ticu %s 0 1\n" % shape +
 "\t\tdriver 2 ;\n" +
-"\t\tdriverObject _object['Human'] ;\n" +
+"\t\tdriverObject _object['HumanMesh'] ;\n" +
 "\t\tdriverChannel 1 ;\n" +
 "\t\tdriverExpression '%s' ;\n" % expr +
 "\tend icu\n")

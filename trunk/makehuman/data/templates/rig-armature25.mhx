@@ -1803,7 +1803,7 @@ end Object
 
 NoScale False ;
 
-Armature HumanRig HumanRig   Normal 
+Armature Human Human   Normal 
 
   *** rig-bones
 
@@ -1820,12 +1820,23 @@ Armature HumanRig HumanRig   Normal
   use_mirror_x False ;
 end Armature
 
-Object HumanRig ARMATURE HumanRig
+Object Human ARMATURE Human
   layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
   show_x_ray True ;
   Property MhxScale theScale ;
   Property MhxRig True ;
+  Property MhxIkArmLeft 0.0 ;
+  Property MhxIkArmRight 0.0 ;
+  Property MhxIkLegLeft 0.0 ;
+  Property MhxIkLegRight 0.0 ;
+  Property MhxChildOfFloor 1.0 ;
+  Property MhxChildOfHips 0.0 ;
+  Property MhxChildOfNeck 0.0 ;
+  Property MhxVisibleFloor True ;
+  Property MhxVisibleHips False ;
+  Property MhxVisibleNeck False ;
+  Property MhxAutoKey False ;
 end Object
 
 

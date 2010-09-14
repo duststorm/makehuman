@@ -19,9 +19,9 @@
 bl_addon_info = {
     "name": "MHX Mocap",
     "author": "Thomas Larsson",
-    "version": 0.1,
-    "blender": (2, 5, 3),
-    "api": 31683,
+    "version": 0.2,
+    "blender": (2, 5, 4),
+    "api": 31913,
     "location": "View3D > Properties > MHX Mocap",
     "description": "Mocap tool for MHX rig",
     "warning": "",
@@ -32,12 +32,19 @@ Run from text window.
 Access from UI panel (N-key) when MHX rig is active.
 
 Properties:
-Scale:	for BVH import
-Start frame:	for BVH import
-Loop:	for BVH import
-Simplify FCurves:	Include FCurve simplifcation.
-Max loc error:	Max error allowed for simplification of location FCurves
-Max rot error:	Max error allowed for simplification of rotation FCurves
+Scale:	
+	for BVH import. Choose scale so that the vertical distance between hands and feet
+	are the same for MHX and BVH rigs.
+Start frame:	
+	for BVH import
+Loop:	
+	for BVH import
+Simplify FCurves:	
+	Include FCurve simplifcation.
+Max loc error:	
+	Max error allowed for simplification of location FCurves
+Max rot error:	
+	Max error allowed for simplification of rotation FCurves
 
 Buttons:
 Load BVH file (.bvh): 
@@ -169,8 +176,8 @@ class CEditBone():
 #
 
 def createFKRig(scn, bones, rig):
-	amt = bpy.data.armatures.new(rig.data.name[2:])
-	rig90 = bpy.data.objects.new(rig.name[2:], amt)
+	amt = bpy.data.armatures.new('Z_'+rig.data.name[2:])
+	rig90 = bpy.data.objects.new('Z_'+rig.name[2:], amt)
 	scn.objects.link(rig90)
 	scn.objects.active = rig90
 
@@ -322,10 +329,15 @@ def makeVectorDict(ob, channel):
 
 def renameBvhRig(rig00, filepath):
 	base = os.path.basename(filepath)
-	(name, ext) = os.path.splitext(base)
-	rig00.name = 'Y_'+name
+	(filename, ext) = os.path.splitext(base)
+	words = filename.split('_')
+	name = 'Y_'
+	for word in words[1:]:
+		name += word.capitalize()
+
+	rig00.name = name
 	action = rig00.animation_data.action
-	action.name = 'Y_'+name
+	action.name = name
 
 	bones00 = []
 	bpy.ops.object.mode_set(mode='EDIT')
@@ -601,7 +613,7 @@ def insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
 def poseMhxIKBones(context, mhxrig, mhxAnimations):
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = mhxrig.pose.bones
-	rots = makeVectorDict(mhxrig, '].rotation_quaternion')
+	#rots = makeVectorDict(mhxrig, '].rotation_quaternion')
 	for suffix in ['_L', '_R']:
 		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
 			nameIK = name+'IK'+suffix
@@ -611,7 +623,7 @@ def poseMhxIKBones(context, mhxrig, mhxAnimations):
 		for name in ['Hand', 'Leg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
-			insertAnimChild(nameFK, mhxAnimations, rots[nameFK])
+			#insertAnimChild(nameFK, mhxAnimations, rots[nameFK])
 			bpy.ops.object.mode_set(mode='EDIT')
 			createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
 			bpy.ops.object.mode_set(mode='POSE')
@@ -709,25 +721,24 @@ def retargetMhxRig(context, rig90, mhxrig):
 	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
 	poseMhxIKBones(context, mhxrig, mhxAnimations)
 
-	words = rig90.name.split('_')
-	name = '_'.join([mhxrig.name] + words[1:])
-	mhxrig.animation_data.action.name = name
+	mhxrig.animation_data.action.name = mhxrig.name[:4] + rig90.name[2:]
 	return
 
 #
-#	deleteFKRig(context, rig00, action):
+#	deleteFKRig(context, rig00, action, prefix):
 #
 
-def deleteFKRig(context, rig00, action):
+def deleteFKRig(context, rig00, action, prefix):
 	context.scene.objects.unlink(rig00)
 	bpy.data.objects.remove(rig00)
 	del rig00
 	if bpy.data.actions:
 		for act in bpy.data.actions:
-			if act.name[0:2] == 'Y_':
+			if act.name[0:2] == prefix:
 				act.use_fake_user = False
-				bpy.data.actions.remove(act)
-				del act
+				if act.users == 0:
+					bpy.data.actions.remove(act)
+					del act
 	return
 
 #
@@ -852,67 +863,61 @@ def getBvh(mhx):
 	return None
 
 def init(scn):
-	bpy.types.Scene.FloatProperty(
-		attr="MhxBvhScale",
+	bpy.types.Scene.MhxBvhScale = FloatProperty(
 		name="Scale", 
 		description="Scale the BVH by this value", 
 		min=0.0001, max=1000000.0, 
 		soft_min=0.001, soft_max=100.0)
 	scn['MhxBvhScale'] = 0.1
 
-	bpy.types.Scene.IntProperty(
-		attr="MhxStartFrame",
+	bpy.types.Scene.MhxStartFrame = IntProperty(
 		name="Start Frame", 
 		description="Starting frame for the animation")
 	scn['MhxStartFrame'] = 1
 
-	bpy.types.Scene.BoolProperty(
-		attr="MhxLoopAnim",
+	bpy.types.Scene.MhxLoopAnim = BoolProperty(
 		name="Loop", 
 		description="Loop the animation playback")
 	scn['MhxLoopAnim'] = False
 
-	bpy.types.Scene.BoolProperty(
-		attr= "MhxDoSimplify", 
+	bpy.types.Scene.MhxDoSimplify = BoolProperty(
 		name="Simplify FCurves", 
 		description="Simplify FCurves")
 	scn['MhxDoSimplify'] = True
 
-	bpy.types.Scene.FloatProperty(
-		attr= "MhxErrorLoc", 
+	bpy.types.Scene.MhxErrorLoc = FloatProperty(
 		name="Max loc error", 
 		description="Max error for location FCurves when doing simplification",
 		min=0.001)
 	scn['MhxErrorLoc'] = 0.1
 
-	bpy.types.Scene.FloatProperty(
-		attr= "MhxErrorRot", 
+	bpy.types.Scene.MhxErrorRot = FloatProperty(
 		name="Max rot error", 
 		description="Max error for rotation (degrees) FCurves when doing simplification",
 		min=0.001)
 	scn['MhxErrorRot'] = 1.0
 
-	bpy.types.Scene.StringProperty(
-		attr= "MhxDirectory", 
+	bpy.types.Scene.MhxDirectory = StringProperty(
 		name="Directory", 
 		description="Directory", 
 		maxlen=1024)
 	scn['MhxDirectory'] = "~/makehuman/bvh/Female1_bvh"
 
-	bpy.types.Scene.StringProperty(
-		attr="MhxPrefix", 
+	bpy.types.Scene.MhxPrefix = StringProperty(
 		name="Prefix", 
 		description="Prefix", 
 		maxlen=1024)
 	scn['MhxPrefix'] = "Female1_A"
 
 	for mhx in FkBoneList:
+		'''
 		bpy.types.Scene.StringProperty(
 			attr=mhx, 
 			name=mhx, 
 			description="Bvh bone corresponding to %s" % mhx, 
 			default = ''
 		)
+		'''
 		bvh = getBvh(mhx)
 		if bvh:
 			scn[mhx] = bvh
@@ -1008,7 +1013,7 @@ def importAndRename(context, filepath):
 		IMPORT_LOOP=context.scene['MhxLoopAnim'])
 	(rig00, bones00, action) =  renameBvhRig(context.object, filepath)
 	rig90 = rotateRig90(context, rig00, bones00)
-	deleteFKRig(context, rig00, action)
+	deleteFKRig(context, rig00, action, 'Y_')
 	return (rig90, action)
 
 class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
@@ -1081,7 +1086,7 @@ def loadRetargetSimplify(context, filepath):
 	mhxrig = context.object
 	(rig90, action) = importAndRename(context, filepath)
 	retargetMhxRig(context, rig90, mhxrig)
-	deleteFKRig(context, rig90, action)
+	deleteFKRig(context, rig90, action, 'Z_')
 	if context.scene['MhxDoSimplify']:
 		simplifyFCurves(context, mhxrig)
 	print("%s finished" % filepath)

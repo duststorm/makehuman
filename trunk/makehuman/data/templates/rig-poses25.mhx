@@ -1,4 +1,4 @@
-Process HumanRig
+Process Human
 
   *** rig-process
 
@@ -11,17 +11,17 @@ end Process
 
 # --------------- Actions ----------------------------- # 
 
-Pose HumanRig 
+Pose Human
 end Pose
 
 *** rig-actions
 
-Pose HumanRig 
+Pose Human
   *** rig-poses
   ik_solver 'LEGACY' ;
 end Pose
 
-AnimationData HumanRig True
+AnimationData Human True
    *** rig-drivers
   action_blend_type 'REPLACE' ;
   action_extrapolation 'HOLD' ;

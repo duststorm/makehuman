@@ -244,7 +244,7 @@ def printGuideAndHair(fp, guide, par, nmax):
 def makeHair(name, hstep, guides):
 	ob = bpy.context.object
 	bpy.ops.object.particle_system_add()
-	psys = ob.active_particle_system
+	psys = ob.particle_systems.active
 	psys.name = name
 
 	settings = psys.settings
@@ -355,8 +355,7 @@ class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
-		wm = context.manager
-		wm.add_fileselect(self)
+		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}
 
 def register():

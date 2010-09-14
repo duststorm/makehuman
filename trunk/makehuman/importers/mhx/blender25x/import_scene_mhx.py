@@ -15,16 +15,16 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.15
+Version 0.16
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.15',
-	'blender': (2, 5, 3),
-    "api": 31683,
+	'version': '0.16',
+	'blender': (2, 5, 4),
+    "api": 31913,
 	"location": "File > Import",
 	"description": "Import files in the MakeHuman eXchange format (.mhx)",
 	"warning": "",
@@ -39,8 +39,8 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 15
-BLENDER_VERSION = (2, 53, 1)
+MINOR_VERSION = 16
+BLENDER_VERSION = (2, 54, 0)
 
 #
 #
@@ -746,12 +746,9 @@ def parseFModifier(fcu, args, tokens):
 """
 def parseDriverTarget(var, nTarget, rna, args, tokens):
 	targ = var.targets[nTarget]
-	# targ.rna_path = args[0]
-	# targ.id_type = args[1]
 	targ.id = loadedData['Object'][args[0]]
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, 'targ', [], globals(), locals())
-	#print("Targ", targ, targ.id, targ.data_path, targ.id_type, targ.bone_target, targ.use_local_space_transforms)
 	return targ
 
 	
@@ -764,12 +761,10 @@ def parseDriverTarget(var, nTarget, rna, args, tokens):
 def parseMaterial(args, tokens):
 	global todo
 	name = args[0]
-	#print("Parse material "+name)
 	mat = bpy.data.materials.new(name)
 	if mat == None:
 		return None
 	loadedData['Material'][name] = mat
-	#print("Material %s %s %s" % (mat, name, loadedData['Material'][name]))
 	for (key, val, sub) in tokens:
 		if key == 'MTex':
 			parseMTex(mat, val, sub)
@@ -789,7 +784,6 @@ def parseMaterial(args, tokens):
 		else:
 			exclude = ['specular_intensity', 'tangent_shading']
 			defaultKey(key, val, sub, 'mat', [], globals(), locals())
-	#print("Done ", mat)
 	
 	return mat
 
@@ -800,10 +794,9 @@ def parseMTex(mat, args, tokens):
 	texco = args[2]
 	mapto = args[3]
 	tex = loadedData['Texture'][texname]
-	print(dir(mat.texture_slots))
-	return
-	#mtex = mat.texture_slots.new(texture = tex, texture_coords = texco, map_to = mapto)
-	#mtex = mat.texture_slots[index]
+	mtex = mat.texture_slots.add()
+	mtex.texture_coords = texco
+	mtex.texture = tex
 
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, "mtex", [], globals(), locals())
@@ -1228,8 +1221,7 @@ def parseMesh (args, tokens):
 			except:
 				mat = None
 			if mat:
-				pass
-				#me.materials.link(mat)
+				me.materials.append(mat)
 		else:
 			defaultKey(key, val,  sub, "me", [], globals(), locals())
 
@@ -1606,14 +1598,15 @@ def parsePose (args, tokens):
 
 def parseBoneGroup(pose, nGrps, args, tokens):
 	global todo
-	return
 	print( "Parsing bonegroup %s" % args )
 	name = args[0]
+	bpy.ops.pose.group_add()
 	print(dir(pose.bone_groups))
-	bg = pose.bone_groups.add()
+	bg = pose.bone_groups.active
 	print("Created", bg)
 	loadedData['BoneGroup'][name] = bg
 	for (key, val, sub) in tokens:
+		print(key,val)
 		defaultKey(key, val,  sub, "bg", [], globals(), locals())
 	return
 
@@ -1941,7 +1934,7 @@ def postProcess():
 	if not toggle & T_MHX:
 		return
 	try:
-		ob = loadedData['Object']['Human']
+		ob = loadedData['Object']['HumanMesh']
 	except:
 		ob = None
 	if toggle & T_Diamond == 0 and ob:
@@ -1956,7 +1949,7 @@ def postProcess():
 
 			rig = bpy.context.scene.objects.active
 			print("Rigged", rig, bpy.context.object)
-			ob = loadedData['Object']['Human']
+			ob = loadedData['Object']['HumanMesh']
 			mod = ob.modifiers[0]
 			print(ob, mod, mod.object)
 			mod.object = rig
@@ -2394,14 +2387,6 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
 	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
-	'''
-	footRig = EnumProperty(name="Foot rig", description="Foot rig", 
-		items = [('Reverse foot','Reverse foot','Reverse foot'), 
-				('Gobo','Gobo','Gobo')], 
-				default = '1')
-	fingerRig = EnumProperty(name="Finger rig", description="Finger rig", 
-		items = [('Rotation','Rotation','Rotation'), ('Panel','Panel','Panel'), ('IK','IK','IK')], default = '1')
-	'''
 	enforce = BoolProperty(name="Enforce version", description="Only accept MHX files of correct version", default=toggle&T_EnforceVersion)
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)
@@ -2441,68 +2426,76 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		return {'RUNNING_MODAL'}
 
 '''
+MhxBoolProps = [
+	('MhxVisibleFloor', 'Floor visible', 'Floor visible', 'object.MhxVisibleFloorButton'),
+	('MhxVisibleHips', 'Hips visible', 'Hips visible', 'object.MhxVisibleHipsButton'),
+	('MhxVisibleNeck', 'Neck visible', 'Neck visible', 'object.MhxVisibleNeckButton'),
+]
+MhxFloatProps = [
+	('MhxIkArmLeft', 'FK/IK left arm', 'Influence for left arm IK chain', 'object.MhxIkArmLeftButton'),
+	('MhxIkArmRight', 'FK/IK right arm', 'Influence for right arm IK chain', 'object.MhxIkArmRightButton'),
+	('MhxIkLegLeft', 'FK/IK left leg', 'Influence for left leg IK chain', 'object.MhxIkLegLeftButton'),
+	('MhxIkLegRight', 'FK/IK right leg', 'Influence for right leg IK chain', 'object.MhxIkLegRightButton'),
+
+	('MhxChildOfFloor', 'Child of floor', 'Influence for ChildOf to MasterFloor constraint', 'object.MhxChildOfFloorButton'),
+	('MhxChildOfHips', 'Child of hips', 'Influence for ChildOf to MasterHips constraint', 'object.MhxChildOfHipsButton'),
+	('MhxChildOfNeck', 'Child of neck', 'Influence for ChildOf to MasterNeck constraint', 'object.MhxChildOfNeckButton'),
+]
+
+def initFKIKPanel():
+	bpy.types.Object.MhxAutoKey = BoolProperty(name="MhxAutoKey", description="Auto key")
+	for (prop, name, desc, op) in MhxFloatProps:
+		expr = 'bpy.types.Object.%s = FloatProperty(name="%s", description="%s", min=0.0, max=1.0)' % (prop, name, desc)
+		exec(expr)
+	for (prop, name, desc, op) in MhxBoolProps:
+		expr = 'bpy.types.Object.%s = BoolProperty(name="%s", description="%s")' % (prop, name, desc)
+		exec(expr)
+	for (prop, name, desc, op) in MhxFloatProps+MhxBoolProps:
+		expr = (
+"class OBJECT_OT_%sButton(bpy.types.Operator):\n" % prop +
+"	bl_idname = 'OBJECT_OT_%sButton'\n" %  prop +
+"	bl_label = 'Set'\n" +
+"\n" +
+"	def execute(self, context):\n" +
+"		import bpy\n" +
+"		setInfluence(context, '%s', '%s')\n" % (prop, name) +
+"		return{'FINISHED'}\n"
+		)
+		print(expr)
+		exec(expr)
+
+	return
+
+def setInfluence(context, prop, name):
+	print("Inf", prop, name)
+	return
+
+initFKIKPanel()
+
 class MakeHumanFKIKPanel(bpy.types.Panel):
 	bl_label = "MakeHuman FK/IK"
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
 	
+	@classmethod
+	def poll(cls, context):
+		if context.object and context.object.type == 'ARMATURE':
+			try:
+				return context.object['MhxRig']
+			except:
+				pass
+		return False
+
 	def draw(self, context):
 		layout = self.layout
-		ob = bpy.context.active_object
-		if ob.type == 'ARMATURE':
-			layout.row().prop(ob, "PArmIK_L")
-			layout.row().prop(ob, "PArmIK_R")
-			layout.row().prop(ob, "PLegIK_L")
-			layout.row().prop(ob, "PLegIK_R")
-
-			layout.row().prop(ob, "PHandLocal_L")
-			layout.row().prop(ob, "PHandLocal_R")
-			layout.row().prop(ob, "PFootLocal_L")
-			layout.row().prop(ob, "PFootLocal_R")
+		ob = context.object
+		layout.prop(ob, 'MhxAutoKey')
+		for (prop,name,desc,op) in MhxFloatProps + MhxBoolProps:
+			row = layout.row()
+			row.prop(ob, prop)
+			row.operator(op)
 		return
-		  
-class MakeHumanFingerPanel(bpy.types.Panel):
-	bl_label = "MakeHuman Fingers"
-	bl_space_type = "VIEW_3D"
-	bl_region_type = "UI"
-	
-	def draw(self, context):
-		layout = self.layout
-		pb = bpy.context.active_pose_bone
-		layout.row().prop(pb, "MHRelax")
-		layout.row().prop(pb, "MHCurl")
-		layout.row().prop(pb, "MHCone")
-		layout.row().prop(pb, "MHSpread")
-		layout.row().prop(pb, "MHScrunch")
-		layout.row().prop(pb, "MHLean")
-		return
-		  
-
-def registerPanels():
-	bpy.types.Object.FloatProperty(attr="PArmIK_L", name="L arm - IK", default = 0, min = 0.0, max = 1.0)
-	bpy.types.Object.FloatProperty(attr="PArmIK_R", name="R arm - IK", default = 0, min = 0.0, max = 1.0)
-	bpy.types.Object.FloatProperty(attr="PLegIK_L", name="L leg - IK", default = 0, min = 0.0, max = 1.0)
-	bpy.types.Object.FloatProperty(attr="PLegIK_R", name="R leg - IK", default = 0, min = 0.0, max = 1.0)
-
-	bpy.types.Object.FloatProperty(attr="PHandLocal_L", name="L hand - Loc", default = 0, min = 0.0, max = 1.0)
-	bpy.types.Object.FloatProperty(attr="PHandLocal_R", name="R hand - Loc", default = 0, min = 0.0, max = 1.0)
-	bpy.types.Object.FloatProperty(attr="PFootLocal_L", name="L foot - Loc", default = 0, min = 0.0, max = 1.0)
-	bpy.types.Object.FloatProperty(attr="PFootLocal_R", name="R foot - Loc", default = 0, min = 0.0, max = 1.0)
-
-	bpy.types.PoseBone.FloatProperty(attr="MHCone", name="Cone", default = 0, min = -0.5, max = 1.0)
-	bpy.types.PoseBone.FloatProperty(attr="MHRelax", name="Relax", default = 0, min = -0.5, max = 1.0)
-	bpy.types.PoseBone.FloatProperty(attr="MHCurl", name="Curl", default = 0, min = -0.5, max = 1.0)
-	bpy.types.PoseBone.FloatProperty(attr="MHLean", name="Lean", default = 0, min = -1.0, max = 1.0)
-	bpy.types.PoseBone.FloatProperty(attr="MHScrunch", name="Scrunch", default = 0, min = -0.5, max = 1.0)
-	bpy.types.PoseBone.FloatProperty(attr="MHSpread", name="Spread", default = 0, min = -0.5, max = 1.0)
-
-	bpy.types.register(MakeHumanFKIKPanel)
-	bpy.types.register(MakeHumanFingerPanel)
-
-def unregisterPanels():
-	bpy.types.unregister(MakeHumanFKIKPanel)
-	bpy.types.unregister(MakeHumanFingerPanel)
-	'''
+'''
 
 def menu_func(self, context):
     self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")

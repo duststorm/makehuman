@@ -37,7 +37,6 @@ deg1 = pi/180
 yunit = [0,1,0]
 zunit = [0,0,-1]
 
-
 unlimited = (-pi,pi, -pi,pi, -pi,pi)
 
 #
@@ -110,6 +109,12 @@ C_TG_LOCPAR = 0x2000
 C_TG_POSE = 0x3000
 
 C_CHILDOF = C_OW_POSE+C_TG_WORLD
+
+rootChildOfConstraints = [
+		('ChildOf', C_CHILDOF, ['Floor', 'MasterFloor', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Hips', 'MasterHips', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, ['Neck', 'MasterNeck', 0.0, (1,1,1), (1,1,1), (1,1,1)])
+]
 
 #
 #	newSetupJoints (obj, joints, headTails):
@@ -268,11 +273,26 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 	return
 
 #
-#	writeBoneGroups(fp, groups):
+#	writeBoneGroups(fp):
 #
 
-def writeBoneGroups(fp, groups):
-	for (name, theme) in groups:
+BoneGroups = [
+	('FK_L', 'THEME01'),
+	('FK_R', 'THEME02'),
+	('IK_L', 'THEME01'),
+	('IK_R', 'THEME02'),
+]
+
+def boneGroupIndex(grp):
+	index = 0
+	for (name, theme) in BoneGroups:
+		if name == grp:
+			return index
+		index += 1
+	return None
+
+def writeBoneGroups(fp):
+	for (name, theme) in BoneGroups:
 		fp.write(
 "    BoneGroup %s\n" % name +
 "      color_set '%s' ;\n" % theme +
@@ -370,7 +390,7 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 #
 
 def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
-	global boneGroups, Mhx25
+	global BoneGroups, Mhx25
 
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
 	(lockRotX, lockRotY, lockRotZ) = lockRot
@@ -395,6 +415,9 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 		fp.write("\tposebone %s %x \n" % (bone, ikFlags))
 		if customShape:
 			fp.write("\t\tdisplayObject _object['%s'] ;\n" % customShape)
+		if boneGroup:
+			index = boneGroupIndex(boneGroup)
+			fp.write("\t\tbone_group_index %d ;\n" % index)
 
 	(usex,usey,usez) = (0,0,0)
 	(xmin, ymin, zmin) = (-pi, -pi, -pi)
@@ -453,8 +476,6 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 "    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
 "    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
 	'''
-	#if boneGroup:
-	#	fp.write("    bone_group Refer BoneGroup %s ; \n" % (boneGroup))
 
 	if customShape:
 		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
@@ -514,7 +535,7 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 	if Mhx25:
 		fp.write(
 "    Constraint %s IK %s\n" % (name, switch) +
-"      target Refer Object HumanRig ;\n" +
+"      target Refer Object Human ;\n" +
 "      pos_lock Array 1 1 1  ;\n" +
 "      rot_lock Array 1 1 1  ;\n" +
 "      active %s ;\n" % active +
@@ -533,7 +554,7 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 			fp.write(
 "      pole_angle %.6g ;\n" % angle +
 "      pole_subtarget '%s' ;\n" % ptar +
-"      pole_target Refer Object HumanRig ;\n")
+"      pole_target Refer Object Human ;\n")
 
 		fp.write(
 "      is_proxy_local False ;\n" +
@@ -551,7 +572,7 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 		fp.write("\t\tconstraint IKSOLVER %s 1.0 \n" % name)
 		fp.write(
 "\t\t\tCHAINLEN	int %d ; \n" % chainlen +
-"\t\t\tTARGET	obj HumanRig ; \n" +
+"\t\t\tTARGET	obj Human ; \n" +
 "\t\t\tBONE	str %s ; \n" % subtar +
 "\t\tend constraint\n")
 
@@ -570,7 +591,7 @@ def addActionConstraint(fp, switch, flags, data):
 
 	fp.write(
 "    Constraint %s ACTION %s\n" % (name, switch) +
-"      target Refer Object HumanRig ; \n"+
+"      target Refer Object Human ; \n"+
 "      action Refer Action %s ; \n" % action+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -609,7 +630,7 @@ def addCopyRotConstraint(fp, switch, flags, data):
 	if Mhx25:
 		fp.write(
 "    Constraint %s COPY_ROTATION %s\n" % (name, switch) +
-"      target Refer Object HumanRig ; \n"+
+"      target Refer Object Human ; \n"+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -626,7 +647,7 @@ def addCopyRotConstraint(fp, switch, flags, data):
 		copy = useX + 2*useY + 4*useZ
 		fp.write(
 "\t\tconstraint COPYROT %s 1.0 \n" % name +
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ; \n" % subtar +
 "\t\t\tCOPY	hex %x ;\n" %  copy +
 "\t\tend constraint\n")
@@ -645,7 +666,7 @@ def addCopyLocConstraint(fp, switch, flags, data):
 	if Mhx25:
 		fp.write(
 "    Constraint %s COPY_LOCATION %s\n" % (name, switch) +
-"      target Refer Object HumanRig ; \n"+
+"      target Refer Object Human ; \n"+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -661,7 +682,7 @@ def addCopyLocConstraint(fp, switch, flags, data):
 	else:
 		fp.write(
 "\t\tconstraint COPYLOC %s 1.0 \n" % name +
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ; \n" % subtar +
 "\t\tend constraint\n")
 	return
@@ -677,7 +698,7 @@ def addCopyScaleConstraint(fp, switch, flags, data):
 
 	fp.write(
 "    Constraint %s COPY_SCALE %s\n" % (name, switch) +
-"      target Refer Object HumanRig ;\n" +
+"      target Refer Object Human ;\n" +
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -699,7 +720,7 @@ def addCopyTransConstraint(fp, switch, flags, data):
 	
 	fp.write(
 "    Constraint %s COPY_TRANSFORMS\n" % (name, switch) +
-"      target Refer Object HumanRig ;\n" +
+"      target Refer Object Human ;\n" +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -843,7 +864,7 @@ def addDampedTrackConstraint(fp, switch, flags, data):
 
 	fp.write(
 "    Constraint %s DAMPED_TRACK %s\n" % (name, switch) +
-"      target Refer Object HumanRig ;\n" +
+"      target Refer Object Human ;\n" +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence 1 ;\n" +
@@ -865,7 +886,7 @@ def addStretchToConstraint(fp, switch, flags, data):
 	if Mhx25:
 		fp.write(
 "    Constraint %s STRETCH_TO %s\n" % (name, switch) +
-"      target Refer Object HumanRig ;\n" +
+"      target Refer Object Human ;\n" +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      bulge 1 ;\n" +
@@ -881,7 +902,7 @@ def addStretchToConstraint(fp, switch, flags, data):
 	else:
 		fp.write(
 "\t\tconstraint STRETCHTO %s 1.0 \n" % name +
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ;\n" % subtar +
 "\t\t\tPLANE	hex 2 ;\n" +
 "\t\tend constraint\n")
@@ -897,7 +918,7 @@ def addLimitDistConstraint(fp, switch, flags, data):
 	if Mhx25:
 		fp.write(
 "    Constraint %s LIMIT_DISTANCE %s\n" % (name, switch) +
-"      target Refer Object HumanRig ;\n" +
+"      target Refer Object Human ;\n" +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -911,7 +932,7 @@ def addLimitDistConstraint(fp, switch, flags, data):
 	else:
 		fp.write(
 "\t\tconstraint LIMITDIST %s 1.0 \n" % name +
-"\t\t\tTARGET	obj HumanRig ;\n" +
+"\t\t\tTARGET	obj Human ;\n" +
 "\t\t\tBONE	str %s ;\n" % subtar +
 "\t\tend constraint\n")
 	return
@@ -930,7 +951,7 @@ def addChildOfConstraint(fp, switch, flags, data):
 	if Mhx25:
 		fp.write(
 "    Constraint %s CHILD_OF %s\n" % (name, switch) +
-"      target Refer Object HumanRig ;\n" +
+"      target Refer Object Human ;\n" +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1026,9 +1047,9 @@ def writeFCurves(fp, name, quats):
 def writeFkIkSwitch(fp, drivers):
 	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
 		if PanelWorks:
-			cnsData = ("ik", 'SINGLE_PROP', [('HumanRig', targ)])
+			cnsData = ("ik", 'SINGLE_PROP', [('Human', targ)])
 		else:
-			cnsData = ("ik", 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)])
+			cnsData = ("ik", 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)])
 		for cnsName in cnsFK:
 			writeDriver(fp, cond, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (1,-1), [cnsData])
 		for cnsName in cnsIK:
@@ -1040,7 +1061,7 @@ def writeShapeDrivers(fp, drivers):
 	for (shape, vlist) in drivers.items():
 		drvVars = []
 		(targ, channel, coeff) = vlist
-		drvVars.append( (targ, 'TRANSFORMS', [('HumanRig', targ, channel, C_LOCAL)]) )
+		drvVars.append( (targ, 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)]) )
 		writeDriver(fp, True, "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
@@ -1221,7 +1242,7 @@ def reapplyArmature(fp, name):
 "  Object %s  \n" % name +
 "    Modifier Armature ARMATURE \n" +
 "      show_expanded True ; \n" +
-"      object Refer Object HumanRig ; \n" +
+"      object Refer Object Human ; \n" +
 "      use_bone_envelopes False ; \n" +
 "      use_vertex_groups True ; \n" +
 "    end Modifier \n" +
