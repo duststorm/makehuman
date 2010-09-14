@@ -63,8 +63,8 @@ Batch run:
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 1
-BLENDER_VERSION = (2, 53, 1)
+MINOR_VERSION = 2
+BLENDER_VERSION = (2, 54, 0)
 
 import bpy, os, mathutils, math
 from mathutils import *
@@ -998,7 +998,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
 #	class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 #
 import sys
-bvhPath = os.path.realpath('./2.53/scripts/op/io_anim_bvh')
+bvhPath = os.path.realpath('./2.54/scripts/op/io_anim_bvh')
 if bvhPath not in sys.path:
 	sys.path.append(bvhPath)
 import import_bvh
