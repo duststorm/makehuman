@@ -730,15 +730,16 @@ def retargetMhxRig(context, rig90, mhxrig):
 
 def deleteFKRig(context, rig00, action, prefix):
 	context.scene.objects.unlink(rig00)
-	bpy.data.objects.remove(rig00)
-	del rig00
+	if rig00.users == 0:
+		bpy.data.objects.remove(rig00)
+		#del rig00
 	if bpy.data.actions:
 		for act in bpy.data.actions:
 			if act.name[0:2] == prefix:
 				act.use_fake_user = False
 				if act.users == 0:
 					bpy.data.actions.remove(act)
-					del act
+					#del act
 	return
 
 #
@@ -1137,3 +1138,11 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 
 
 
+def register():
+    pass
+
+def unregister():
+    pass
+
+if __name__ == "__main__":
+    register()
