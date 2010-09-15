@@ -16,6 +16,19 @@ end Armature
   layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
   show_x_ray True ;
+  Property MhxScale theScale ;
+  Property MhxRig True ;
+  Property MhxIkArmLeft 0.0 ;
+  Property MhxIkArmRight 0.0 ;
+  Property MhxIkLegLeft 0.0 ;
+  Property MhxIkLegRight 0.0 ;
+  Property MhxChildOfFloor 1.0 ;
+  Property MhxChildOfHips 0.0 ;
+  Property MhxChildOfNeck 0.0 ;
+  Property MhxVisibleFloor True ;
+  Property MhxVisibleHips False ;
+  Property MhxVisibleNeck False ;
+  Property MhxAutoKey False ;
 end Object
 
 *** ProxyPose
@@ -47,7 +60,7 @@ end Mesh
     end Modifier
   color Array 1.0 1.0 1.0 1.0  ;
   show_name True ;
-  parent Refer Object HumanRig ;
+  parent Refer Object Human ;
   parent_type 'OBJECT' ;
   select True ;
   Property MhxScale theScale ;

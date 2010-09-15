@@ -1,5 +1,23 @@
-import bpy
-import os
+""" 
+**Project Name:**	  MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**	http://code.google.com/p/makehuman/
+
+**Authors:**		   Thomas Larsson
+
+**Copyright(c):**	  MakeHuman Team 2001-2010
+
+**Licensing:**		 GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+Define proxy utility
+
+"""
+import bpy, os
 
 threshold = -0.2
 mListLength = 2
@@ -16,7 +34,7 @@ def selectVert(vn, ob):
 	bpy.ops.object.mode_set(mode='EDIT')
 	bpy.ops.mesh.select_all(action='DESELECT')
 	bpy.ops.object.mode_set(mode='OBJECT')
-	ob.data.verts[vn].selected = True
+	ob.data.vertices[vn].select = True
 	return	
 
 def findProxy(log):
@@ -26,7 +44,7 @@ def findProxy(log):
 	proxy = pob.data
 	
 	bestVerts = []
-	for pv in proxy.verts:
+	for pv in proxy.vertices:
 		try:
 			pindex = pv.groups[0].group
 		except:
@@ -48,7 +66,7 @@ def findProxy(log):
 		for n in range(mListLength):
 			mverts.append((None, 1e6))
 
-		for bv in base.verts:
+		for bv in base.vertices:
 			if len(bv.groups) > 0 and bv.groups[0].group == bindex:
 				vec = pv.co - bv.co
 				n = 0
@@ -78,7 +96,7 @@ def findProxy(log):
 	print("Setting up face table")
 	vfaces = {}
 	for f in base.faces:
-		for v in f.verts:
+		for v in f.vertices:
 			try:
 				vfaces[v].append(f)
 			except:
@@ -91,10 +109,10 @@ def findProxy(log):
 			if bv:
 				for f in vfaces[bv.index]:
 					verts = []
-					for v in f.verts:
-						verts.append(base.verts[v].co)
+					for v in f.vertices:
+						verts.append(base.vertices[v].co)
 					wts = cornerWeights(pv, verts)
-					fcs.append((f.verts, wts))
+					fcs.append((f.vertices, wts))
 
 	print("Finding best weights")
 	bestFaces = []
@@ -198,9 +216,9 @@ def cornerWeights(pv, verts):
 def highlight(pv, obname):
 	ob = bpy.data.objects[obname]
 	me = ob.data
-	for v in me.verts:
-		v.selected = False
-	pv.selected = True
+	for v in me.vertices:
+		v.select = False
+	pv.select = True
 	return
 	
 #
@@ -220,7 +238,7 @@ def printProxy(path, faces):
 	proxy =  bpy.data.objects['Proxy'].data
 	fp.write("Faces\n")
 	for f in proxy.faces:
-		for v in f.verts:
+		for v in f.vertices:
 			fp.write("%d " % (v+1))
 		fp.write("\n")
 	'''

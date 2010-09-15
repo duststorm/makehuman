@@ -235,7 +235,7 @@ def writeProxyBone(fp, boneInfo):
 	return
 
 def writeProxyPose(fp, proxy):
-	fp.write("\nPose %sRig" % proxy.name)
+	fp.write("\nPose %s" % proxy.name)
 	for boneInfo in proxy.bones:
 		(bone,head,tail,roll,parent,flags) = boneInfo			
 		if parent:
