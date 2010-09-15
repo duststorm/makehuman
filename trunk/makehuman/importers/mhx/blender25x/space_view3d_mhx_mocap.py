@@ -66,9 +66,232 @@ MAJOR_VERSION = 0
 MINOR_VERSION = 2
 BLENDER_VERSION = (2, 54, 0)
 
-import bpy, os, mathutils, math
+import bpy, os, mathutils, math, time
 from mathutils import *
 from bpy.props import *
+
+#
+#	Custom BVH importer. 
+#	The importer that comes with Blender has memory leaks which leads to instability.
+#
+
+#
+#	class CNode:
+#
+
+class CNode:
+	def __init__(self, name, parent):
+		self.name = name
+		self.parent = parent
+		self.children = []
+		self.head = Vector((0,0,0))
+		self.offset = Vector((0,0,0))
+		if parent:
+			parent.children.append(self)
+		self.channels = []
+		self.matrix = None
+		self.inverse = None
+		return
+
+	def __repr__(self):
+		return "CNode %s" % (self.name)
+
+	def display(self, pad):
+		vec = self.offset
+		print("%s%10s (%8.3f %8.3f %8.3f)" % (pad, self.name, vec[0], vec[1], vec[2]))
+		for child in self.children:
+			child.display(pad+"  ")
+		return
+
+	def build(self, amt, orig, parent):
+		self.head = orig + self.offset
+		if not self.children:
+			return self.head
+		
+		eb = amt.edit_bones.new(self.name)		
+		if parent:
+			eb.parent = parent
+		eb.head = self.head
+		tails = Vector((0,0,0))
+		for child in self.children:
+			tails += child.build(amt, eb.head, eb)
+		n = len(self.children)
+		eb.tail = tails/n
+		self.matrix = eb.matrix.rotation_part()
+		self.inverse = self.matrix.copy().invert()
+		return self.head
+
+#
+#	readBvhFile(context, filepath, scale):
+#
+
+Location = 1
+Rotation = 2
+Hierarchy = 1
+Motion = 2
+Frames = 3
+
+Deg2Rad = math.pi/180
+Z_UP = False
+
+def readBvhFile(context, filepath, scale):
+	print(filepath)
+	fileName = os.path.realpath(os.path.expanduser(filepath))
+	(shortName, ext) = os.path.splitext(fileName)
+	if ext.lower() != ".bvh":
+		raise NameError("Not a bvh file: " + fileName)
+	print( "Loading BVH file "+ fileName )
+
+	time1 = time.clock()
+	level = 0
+	nErrors = 0
+	scn = context.scene
+			
+	fp = open(fileName, "rU")
+	print( "Reading skeleton" )
+	lineNo = 0
+	for line in fp: 
+		words= line.split()
+		lineNo += 1
+		if len(words) == 0:
+			continue
+		key = words[0].upper()
+		if key == 'HIERARCHY':
+			status = Hierarchy
+		elif key == 'MOTION':
+			if level != 0:
+				raise NameError("Tokenizer out of kilter %d" % level)	
+			amt = bpy.data.armatures.new("BvhAmt")
+			rig = bpy.data.objects.new("BvhRig", amt)
+			scn.objects.link(rig)
+			scn.objects.active = rig
+			bpy.ops.object.mode_set(mode='EDIT')
+			root.build(amt, Vector((0,0,0)), None)
+			#root.display('')
+			bpy.ops.object.mode_set(mode='OBJECT')
+			status = Motion
+		elif status == Hierarchy:
+			if key == 'ROOT':	
+				node = CNode(words[1], None)
+				root = node
+				nodes = [root]
+			elif key == 'JOINT':
+				node = CNode(words[1], node)
+				nodes.append(node)
+			elif key == 'OFFSET':
+				(x,y,z) = (float(words[1]), float(words[2]), float(words[3]))
+				if Z_UP:					
+					node.offset = scale*Vector((x,-z,y))
+				else:
+					node.offset = scale*Vector((x,y,z))
+			elif key == 'END':
+				node = CNode(words[1], node)
+			elif key == 'CHANNELS':
+				oldmode = None
+				for word in words[2:]:
+					if Z_UP:
+						(index, mode, sign) = channelZup(word)
+					else:
+						(index, mode, sign) = channelYup(word)
+					if mode != oldmode:
+						indices = []
+						node.channels.append((mode, indices))
+						oldmode = mode
+					indices.append((index, sign))
+			elif key == '{':
+				level += 1
+			elif key == '}':
+				level -= 1
+				node = node.parent
+			else:
+				raise NameError("Did not expect %s" % words[0])
+		elif status == Motion:
+			if key == 'FRAMES:':
+				nFrames = int(words[1])
+			elif key == 'FRAME' and words[1].upper() == 'TIME:':
+				frameTime = float(words[2])
+				frameTime = 1
+				status = Frames
+				frame = 0
+				t = 0
+				bpy.ops.object.mode_set(mode='POSE')
+				pbones = rig.pose.bones
+				for pb in pbones:
+					pb.rotation_mode = 'QUATERNION'
+		elif status == Frames:
+			addFrame(words, frame, nodes, pbones, scale)
+			t += frameTime
+			frame += 1
+
+	fp.close()
+	setInterpolation(rig)
+	time2 = time.clock()
+	print("Bvh file loaded in %.3f s" % (time2-time1))
+	return rig
+
+#
+#	addFrame(words, frame, nodes, pbones, scale):
+#
+
+def addFrame(words, frame, nodes, pbones, scale):
+	m = 0
+	for node in nodes:
+		name = node.name
+		pb = pbones[name]
+		for (mode, indices) in node.channels:
+			if mode == Location:
+				vec = Vector((0,0,0))
+				for (index, sign) in indices:
+					vec[index] = sign*float(words[m])
+					m += 1
+				pb.location = node.inverse * (scale * vec - node.head)				
+				for n in range(3):
+					pb.keyframe_insert('location', index=n, frame=frame, group=name)
+			elif mode == Rotation:
+				mats = []
+				for (axis, sign) in indices:
+					angle = sign*float(words[m])*Deg2Rad
+					mats.append(Matrix.Rotation(angle, 3, axis))
+					m += 1
+				mat = node.inverse * mats[0] * mats[1] * mats[2] * node.matrix
+				pb.rotation_quaternion = mat.to_quat()
+				for n in range(4):
+					pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+	return
+
+#
+#	channelYup(word):
+#	channelZup(word):
+#
+
+def channelYup(word):
+	if word == 'Xrotation':
+		return ('X', Rotation, +1)
+	elif word == 'Yrotation':
+		return ('Y', Rotation, +1)
+	elif word == 'Zrotation':
+		return ('Z', Rotation, +1)
+	elif word == 'Xposition':
+		return (0, Location, +1)
+	elif word == 'Yposition':
+		return (1, Location, +1)
+	elif word == 'Zposition':
+		return (2, Location, +1)
+
+def channelZup(word):
+	if word == 'Xrotation':
+		return ('X', Rotation, +1)
+	elif word == 'Yrotation':
+		return ('Z', Rotation, +1)
+	elif word == 'Zrotation':
+		return ('Y', Rotation, -1)
+	elif word == 'Xposition':
+		return (0, Location, +1)
+	elif word == 'Yposition':
+		return (2, Location, +1)
+	elif word == 'Zposition':
+		return (1, Location, -1)
+
 
 #
 #	FkArmature
@@ -333,7 +556,7 @@ def renameBvhRig(rig00, filepath):
 	words = filename.split('_')
 	name = 'Y_'
 	for word in words[1:]:
-		name += word.capitalize()
+		name += word
 
 	rig00.name = name
 	action = rig00.animation_data.action
@@ -507,7 +730,6 @@ def insertAnimChild(name, animations, rots):
 		anim.heads[frame] = animPar.heads[frame] + parmat*anim.offsetRest
 		anim.tails[frame] = anim.heads[frame] + matrix*anim.vecRest
 	return
-
 
 #
 #	createEmpties(context, animations):
@@ -790,7 +1012,7 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot):
 
 	newVerts = []
 	for n in keeps:
-		newVerts.append(points[n].co)
+		newVerts.append(points[n].co.copy())
 	
 	path = fcu.data_path
 	index = fcu.array_index
@@ -799,7 +1021,10 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot):
 	nfcu = act.fcurves.new(path, index, grp)
 	for co in newVerts:
 		t = co[0]
-		dt = t - int(t)
+		try:
+			dt = t - int(t)
+		except:
+			dt = 0.5
 		if abs(dt) > 1e-5:
 			print(path, co)
 		else:
@@ -998,13 +1223,13 @@ class Bvh2MhxPanel(bpy.types.Panel):
 #	importAndRename(context, filepath):
 #	class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 #
+"""
 import sys
 bvhPath = os.path.realpath('./2.54/scripts/op/io_anim_bvh')
 if bvhPath not in sys.path:
 	sys.path.append(bvhPath)
 import import_bvh
 
-def importAndRename(context, filepath):
 	bvh_nodes = import_bvh.read_bvh(context, filepath,
 		ROT_MODE='QUATERNION',
 		GLOBAL_SCALE=context.scene['MhxBvhScale'])
@@ -1012,7 +1237,13 @@ def importAndRename(context, filepath):
 		ROT_MODE='QUATERNION',
 		IMPORT_START_FRAME=context.scene['MhxStartFrame'],
 		IMPORT_LOOP=context.scene['MhxLoopAnim'])
-	(rig00, bones00, action) =  renameBvhRig(context.object, filepath)
+	rig = context.object
+"""
+
+def importAndRename(context, filepath):
+	print("iar", filepath)
+	rig = readBvhFile(context, filepath, context.scene['MhxBvhScale'])
+	(rig00, bones00, action) =  renameBvhRig(rig, filepath)
 	rig90 = rotateRig90(context, rig00, bones00)
 	deleteFKRig(context, rig00, action, 'Y_')
 	return (rig90, action)
@@ -1023,7 +1254,7 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the OBJ file", maxlen=1024, default="")
 
 	def execute(self, context):
-		import bpy, os, import_bvh
+		import bpy, os
 		importAndRename(context, self.properties.filepath)
 		print("%s imported" % self.properties.filepath)
 		return{'FINISHED'}	
@@ -1096,10 +1327,10 @@ def loadRetargetSimplify(context, filepath):
 class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadRetargetSimplifyButton"
 	bl_label = "Load, retarget, simplify"
-	filepath = StringProperty(name="File Path", description="Filepath used for importing the OBJ file", maxlen=1024, default="")
+	filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
 	def execute(self, context):
-		import bpy, os, import_bvh, mathutils
+		import bpy, os, mathutils
 		loadRetargetSimplify(context, self.properties.filepath)
 		return{'FINISHED'}	
 
@@ -1128,7 +1359,7 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 	bl_label = "Batch run"
 
 	def execute(self, context):
-		import bpy, os, import_bvh, mathutils
+		import bpy, os, mathutils
 		paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
 		mhxrig = context.object
 		for filepath in paths:
@@ -1146,3 +1377,5 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+
+#readBvhFile(bpy.context, '/home/thomas/myblends/bvh/Male1_bvh/Male1_A5_PickUpBox.bvh')
