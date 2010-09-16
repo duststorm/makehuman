@@ -66,7 +66,13 @@ loadedTraslTarget = ""
 loadedRotTarget = ""
 loadedPoseTarget = ""
 targetBuffer = [] #Loaded target Data
-message = ""  
+message = "" 
+
+targetVertexList = None
+targetVertexLookup = None
+targetBasePath = None
+
+regularise = maketargetlib.RegularisationTool(basePath)
   
 #--------SOME BLENDER SPECIFICS SHORTCUTS------------
 
@@ -191,6 +197,10 @@ def render(path = "//myRenderdir/", imageName = "001.tga"):
     context.render()
     context.saveRenderedImage(imageName)
     Render.CloseRenderWindow()
+
+
+
+    
 #-------MAKETARGET CALLBACKS----------------------
 
 def buildScan2Mesh(path):
@@ -373,6 +383,13 @@ def reset():
     startEditing()    
     vertices = getVertices()
     maketargetlib.resetMesh(vertices, basePath)
+    updateVertices(vertices)
+    endEditing()
+
+def regulariseMesh():
+    startEditing()
+    vertices = getVertices()
+    regularise.projectTarget(vertices)
     updateVertices(vertices)
     endEditing()
     
@@ -587,6 +604,29 @@ def draw():
         Draw.Button("Build", 31, 170, 200, 80, 20, "Build targets db")
         Draw.Button("Save verts", 33, 10, 180, 80, 20, "Save selected verts")
         regulFactor = Draw.Number("Regul: ", 0, 90, 180, 100, 20, regulFactor.val, 0, 1, "0 mean fine fitting, but less constrain")
+
+
+    if GUIswitch == 3:
+
+        glClearColor(0.5, 0.5, 0.5, 0.0)
+        glClear(GL_COLOR_BUFFER_BIT)
+
+        glColor3f(0.0, 0.0, 0.0)
+        glRasterPos2i(10, 300)
+        Draw.Text("Regulariser vers. 1")
+
+        glColor3f(0.5, 0.0, 0.0)
+        glRasterPos2i(10, 250)
+        Draw.Text("Msg: %s"%(message))
+
+        glColor3f(0.0, 0.0, 0.0)
+        glRasterPos2i(10, 230)
+
+        Draw.Button("Load db data", 40, 10, 200, 80, 20, "Load targets db")
+        Draw.Button("Regularise", 41, 90, 200, 80, 20, "Regularise the mesh ")
+        
+        
+        
         
        
         
@@ -607,7 +647,7 @@ def event(event, value):
 
     """
     global GUIswitch
-    GUIswitchMax = 2
+    GUIswitchMax = 3
     if event == Draw.ESCKEY and not value: Draw.Exit()
     elif event == Draw.AKEY:
         Window.FileSelector (saveSymVertsIndices, "Save Symm data")
@@ -623,13 +663,13 @@ def event(event, value):
     elif event == Draw.FKEY:
         Window.FileSelector (generateTargetsDB, "Generate DB from")
     elif event == Draw.GKEY:
-        Window.FileSelector (linkMaskBug, "Link Mask")
+        regulariseMesh()
     elif event == Draw.HKEY:
         Window.FileSelector (saveSelVerts, "Save index of selected vertices")
     elif event == Draw.IKEY:
         Window.FileSelector (findClosereset, "Reconstruct")
     elif event == Draw.LKEY:
-        adapt("face.verts")
+        Window.FileSelector (adapt, "*.verts")
     elif event == Draw.MKEY:
         seekGroup()
     elif event == Draw.NKEY:
@@ -655,7 +695,7 @@ def event(event, value):
     elif event == Draw.YKEY:
         Window.FileSelector (saveScanElements, "save scan elements")
     elif event == Draw.KKEY:
-        applyTransforms()
+         Window.FileSelector (regularise.loadTargetBase, "Load regularise base")
     elif event == Draw.PAGEDOWNKEY and not value and GUIswitch < GUIswitchMax:
         GUIswitch += 1
     elif event == Draw.PAGEUPKEY and not value and GUIswitch > 1:
@@ -711,6 +751,10 @@ def buttonEvents(event):
         Window.FileSelector (scan2mh, "Start Fitting")
     elif event == 33:
         Window.FileSelector (saveSelVerts, "Save selected vert", "face.verts")
+    elif event == 40:
+        Window.FileSelector (regularise.loadTargetBase, "Load regularise base")
+    elif event == 41:
+        regulariseMesh()
     Draw.Draw()
 
 Draw.Register(draw, event, buttonEvents)

@@ -74,7 +74,8 @@ if __name__ == '__main__' :
 		directory = sys.argv[1]
 		list_file = sys.argv[2]
 	except IndexError :
-		print "usage: python build_base.py <target_directory> <verts file with _vertices suffix> [<cut off>]"
+		print "usage: python buildbase.py <target_directory> <verts file with _vertices suffix> [<cut off>]"
+                print "example: python buildbase.py targetsdb head_vertices.dat 2"
 		sys.exit(-1)
 		
 	try : cutoff = float(sys.argv[3])

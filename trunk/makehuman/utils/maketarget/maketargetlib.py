@@ -18,6 +18,8 @@ import time
 import os
 from math import *
 from scipy.linalg import eigh,pinv
+import target_projection
+import buildbase
 
 
 import wavefront as wf
@@ -293,7 +295,7 @@ def loadTraslTarget(vertices,targetPath,mFactor):
         return  None
 
     current_target = targetPath
-    #print  targetPath,mFactor 
+    fail = 0
     for vData in fileDescriptor:
         vectorData = vData.split()
         if vectorData[0].find('#')==-1:
@@ -301,10 +303,15 @@ def loadTraslTarget(vertices,targetPath,mFactor):
             vX = float(vectorData[1])
             vY = float(vectorData[2])
             vZ = float(vectorData[3])
-            v = vertices[vIndex]
-            v[0] += vX*mFactor
-            v[1] += vY*mFactor
-            v[2] += vZ*mFactor
+            try:
+                v = vertices[vIndex]
+                v[0] += vX*mFactor
+                v[1] += vY*mFactor
+                v[2] += vZ*mFactor
+            except:
+                fail = 1
+    if fail == 1:
+        print "WARNING: Target applied on a different topology mesh!"
     fileDescriptor.close()
 
 
@@ -842,30 +849,7 @@ def selectSymmetricVerts():
 
     data.update()
     Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
-
-
-def selectVerts(listOfIndices):
-    """
-
-
-    """
-
-    global pairsPath
-    print "selecting symm"
-    activeObjs = Blender.Object.GetSelected()
-    activeObj = activeObjs[0]
-    data = activeObj.getData(mesh=True)
-    wem = Blender.Window.EditMode()
-    Blender.Window.EditMode(0)
-    for i in listOfIndices:
-        vertToSelect = data.verts[i]
-        vertToSelect.sel = 1
-
-
-    data.update()
-    Blender.Window.EditMode(wem)
-    Blender.Window.RedrawAll()
+    Blender.Window.RedrawAll()  
 
 
 def resetMesh(vertices, basePath):
@@ -876,13 +860,67 @@ def resetMesh(vertices, basePath):
 
     """
     originalVertices = loadVertices(basePath)
+    fail = 0
     for pointIndex, vCoords in enumerate(originalVertices):
-        vertices[pointIndex][0] = vCoords[0]
-        vertices[pointIndex][1] = vCoords[1]
-        vertices[pointIndex][2] = vCoords[2]
+        try:
+            vertices[pointIndex][0] = vCoords[0]
+            vertices[pointIndex][1] = vCoords[1]
+            vertices[pointIndex][2] = vCoords[2]
+        except:
+            fail = 1
+    if fail == 1:
+        print "WARNING: Reset applied on a different topology mesh!"
 
 
+class RegularisationTool:
+
+    def __init__(self, basePath):
+        
+        self.pBase = None
+        self.pVertexList = None
+        self.pVertexLookup = None
+        self.originalVerts = loadVertices(basePath)
+
+    def loadTargetBase(self,baseFile):
+        self.pBase,self.pVertexList,self.pVertexLookup = target_projection.load_base(baseFile)
+
+    def get_target_vector(self,vertices):
+        nverts = len(self.pVertexList)
+
+        targ = [0]*(3*nverts)
+        for i in self.pVertexList :
+            originalVertex = self.originalVerts[i]
+            targetVertex = vertices[i]
+            delta = vsub(targetVertex,originalVertex)
+            dnorm = vlen(delta)
+            if dnorm < 1.0e-3 : continue
+            ii = self.pVertexLookup[i]
+            targ[3*ii]   = delta[0]
+            targ[3*ii+1] = delta[1]
+            targ[3*ii+2] = delta[2]
+        return targ
+
+    def projectTarget(self,vertices):
+
+        
+        epsilon = 1e-4
+
+       # Computing projection
+        targ = self.get_target_vector(vertices)
+        proj = target_projection.apply_projection(self.pBase,targ)
+
+        t1 = time.time()
+
+        for i in self.pVertexList :
+            originalVertex = self.originalVerts[i]
+            idx = self.pVertexLookup[i]
+            delta = proj[3*idx:3*(idx+1)]
+            if vlen(delta) < epsilon : continue
+            v = vertices[i]
+            v[0] = originalVertex[0]+delta[0]
+            v[1] = originalVertex[1]+delta[1]
+            v[2] = originalVertex[2]+delta[2]
+        print "Proj time", time.time() - t1
 
 
-#originalVerts = loadInitialBaseCoords(basePath)
 
