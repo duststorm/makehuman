@@ -123,6 +123,7 @@ def readProxyFile(obj, proxyFile):
 			elif lineSplit[1] == 'faces':
 				doFaces = True
 			elif lineSplit[1] == 'bones':
+				return proxy
 				doBones = True
 			elif lineSplit[1] == 'weights':
 				weightBone = lineSplit[2]
