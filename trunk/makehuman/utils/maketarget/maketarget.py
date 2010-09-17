@@ -206,9 +206,9 @@ def render(path = "//myRenderdir/", imageName = "001.tga"):
 def buildScan2Mesh(path):
     global message    
     main_dir = os.path.dirname(path)
-    target_dir = os.path.join(main_dir,"targets_db")
+    target_dir = os.path.join(main_dir,"targets_db_scan2mesh")
     if not os.path.isdir(target_dir):
-        message = "The build folder must contain a 'target_db' folder with the db"
+        message = "The build folder must contain a 'targets_db_scan2mesh' folder with the db"
         print message
         return
 
@@ -624,12 +624,7 @@ def draw():
 
         Draw.Button("Load db data", 40, 10, 200, 80, 20, "Load targets db")
         Draw.Button("Regularise", 41, 90, 200, 80, 20, "Regularise the mesh ")
-        
-        
-        
-        
-       
-        
+        Draw.Button("Build", 42, 170, 200, 80, 20, "Build targets db")       
 
 
 def event(event, value):
@@ -695,7 +690,7 @@ def event(event, value):
     elif event == Draw.YKEY:
         Window.FileSelector (saveScanElements, "save scan elements")
     elif event == Draw.KKEY:
-         Window.FileSelector (regularise.loadTargetBase, "Load regularise base")
+         pass
     elif event == Draw.PAGEDOWNKEY and not value and GUIswitch < GUIswitchMax:
         GUIswitch += 1
     elif event == Draw.PAGEUPKEY and not value and GUIswitch > 1:
@@ -748,13 +743,15 @@ def buttonEvents(event):
     elif event == 31:
         Window.FileSelector (buildSVNdb, "Build svn db","build.tmp")
     elif event == 32:
-        Window.FileSelector (scan2mh, "Start Fitting")
+        Window.FileSelector (scan2mh, "*_vertices.dat")
     elif event == 33:
-        Window.FileSelector (saveSelVerts, "Save selected vert", "face.verts")
+        Window.FileSelector (saveSelVerts, "Save selected vert", "*_vertices.dat")
     elif event == 40:
-        Window.FileSelector (regularise.loadTargetBase, "Load regularise base")
+        Window.FileSelector (regularise.loadTargetBase, "*_base.dat")
     elif event == 41:
         regulariseMesh()
+    elif event == 42:
+        Window.FileSelector (regularise.buildBaseDB, "*_vertices.dat")
     Draw.Draw()
 
 Draw.Register(draw, event, buttonEvents)

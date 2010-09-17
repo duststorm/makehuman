@@ -1,3 +1,4 @@
+import os.path
 import sys
 sys.path.append("../")
 sys.path.append("./")
@@ -8,6 +9,7 @@ sys.path.append("../topology_translator")
 import aljabr
 import scipy
 from scipy.spatial import KDTree
+from scipy.io import mmwrite
 import numpy as np
 import scan_fit
 import scan_reg
@@ -20,6 +22,7 @@ from math import *
 from scipy.linalg import eigh,pinv
 import target_projection
 import buildbase
+
 
 
 import wavefront as wf
@@ -880,6 +883,8 @@ class RegularisationTool:
         self.pVertexList = None
         self.pVertexLookup = None
         self.originalVerts = loadVertices(basePath)
+        self.targetDBFolder = "target_db_regularise"
+        self.cutOff = 2
 
     def loadTargetBase(self,baseFile):
         self.pBase,self.pVertexList,self.pVertexLookup = target_projection.load_base(baseFile)
@@ -899,6 +904,35 @@ class RegularisationTool:
             targ[3*ii+1] = delta[1]
             targ[3*ii+2] = delta[2]
         return targ
+
+    def buildBaseDB(self, verticesPath):
+
+        mainDir = os.path.dirname(verticesPath)
+        verticesFileName = os.path.basename(verticesPath)
+        targetsDBPath = os.path.join(mainDir,self.targetDBFolder)
+
+        if "_vertices" not in verticesFileName:
+            print "Error: the vertices file name must have the form of *_vertices.dat"
+            return
+
+        if not os.path.isdir(targetsDBPath):
+            print "Error: targets folder %s not found"%(targetsDBPath)
+            return
+
+        base_file = os.path.join(mainDir, verticesFileName.replace("_vertices","_base"))
+	vertices,lookup  = buildbase.read_vertices(verticesPath)
+
+	print "Loading targets..."
+	rb,target_names = buildbase.load_targets(targetsDBPath,vertices,lookup)
+	print "Making base..."
+	base,back = buildbase.make_base(rb,self.cutOff)
+	del rb
+	print "Saving base..."
+	f = open(base_file,'w')
+	mmwrite(f,base)
+	f.close()
+	del base
+        print "Saved in %s"%(base_file)
 
     def projectTarget(self,vertices):
 
