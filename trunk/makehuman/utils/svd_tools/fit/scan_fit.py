@@ -1,3 +1,4 @@
+import os.path
 from scipy.linalg import pinv,svd
 from scipy.spatial import KDTree
 from scipy.optimize import leastsq
@@ -283,9 +284,11 @@ def load_targets(dirname):
     targets = []
     vertices = set()
     for f in files:
-        t = load_target(dirname+"/"+f)
-        targets.append(t)
-        vertices |= set(t.keys())
+        fPath = os.path.join(dirname, f)
+        if os.path.isfile(fPath):
+            t = load_target(fPath)
+            targets.append(t)
+            vertices |= set(t.keys())
         
     return [os.path.splitext(f)[1] for f in files],list(vertices),targets
 

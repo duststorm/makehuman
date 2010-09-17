@@ -206,9 +206,9 @@ def render(path = "//myRenderdir/", imageName = "001.tga"):
 def buildScan2Mesh(path):
     global message    
     main_dir = os.path.dirname(path)
-    target_dir = os.path.join(main_dir,"targets_db_scan2mesh")
+    target_dir = os.path.join(main_dir,"target_db_scan2mesh")
     if not os.path.isdir(target_dir):
-        message = "The build folder must contain a 'targets_db_scan2mesh' folder with the db"
+        message = "The build folder must contain a 'target_db_scan2mesh' folder with the db"
         print message
         return
 
@@ -226,13 +226,13 @@ def fitScan2Mesh(path):
     head_mask = os.path.join(main_dir,"base_mask.obj")
     scan_mesh = os.path.join(main_dir,"scan_mesh.obj")
     scan_mask = os.path.join(main_dir,"scan_mask.obj")
-    fit_verts = os.path.join(main_dir,"face.verts")
+    fit_verts = os.path.join(main_dir,"head_vertices.dat")
     output = os.path.join(main_dir,"result.target")
     prefix = os.path.join(main_dir,"fitdata")
     if os.path.isfile(fit_verts):
         maketargetlib.scan2meshFit(head_mesh,head_mask,scan_mesh,scan_mask,fit_verts,prefix,output,regulFactor.val)
     else:
-        message = "Error: face.verts not found!"
+        message = "Error: head_vertices.dat not found!"
         print message
 
     
@@ -265,8 +265,7 @@ def saveScanMesh(path):
     bExporter.write(scanMeshPath,1)    
 
 
-def buildSVNdb(path):
-
+def buildSVDdb(path):
     saveBaseMesh(path)
     saveBaseMask(path)
     buildScan2Mesh(path)
@@ -480,7 +479,7 @@ def processingTargets(path, n=0, processingType=1):
 def adapt(path):
     print "Fitting face...final step"
     mainDir = os.path.dirname(path)
-    path = os.path.join(mainDir, "face.verts")
+    path = os.path.join(mainDir, "verts_to_fit.verts")#TODO: Avoid the hardcoded
     startEditing()
     base = getVertices(name="Base")
     verticesToAdapt = maketargetlib.loadVertsIndex(path)
@@ -517,7 +516,7 @@ def loadSelVerts(path):
 def loadSelVertsBase(path):
     print "Loading verts to select"
     mainDir = os.path.dirname(path)
-    path = os.path.join(mainDir, "face.verts")
+    path = os.path.join(mainDir, "verts_to_fit.verts")#TODO: no hardcoded!
     startEditing()
     selVerts = maketargetlib.loadVertsIndex(path)    
     selectVert(selVerts, name = "Base")
@@ -741,17 +740,17 @@ def buttonEvents(event):
     elif event == 30:
         Window.FileSelector (scanReg, "Load scan")
     elif event == 31:
-        Window.FileSelector (buildSVNdb, "Build svn db","build.tmp")
+        Window.FileSelector (buildSVDdb, "Build scan->mh db","head_vertices.dat")
     elif event == 32:
-        Window.FileSelector (scan2mh, "*_vertices.dat")
+        Window.FileSelector (scan2mh, "Do scan->mh","head_vertices.dat")
     elif event == 33:
-        Window.FileSelector (saveSelVerts, "Save selected vert", "*_vertices.dat")
+        Window.FileSelector (saveSelVerts, "Save verts", "head_vertices.dat")
     elif event == 40:
-        Window.FileSelector (regularise.loadTargetBase, "*_base.dat")
+        Window.FileSelector (regularise.loadTargetBase, "Load regularise db","head_base.dat")
     elif event == 41:
         regulariseMesh()
     elif event == 42:
-        Window.FileSelector (regularise.buildBaseDB, "*_vertices.dat")
+        Window.FileSelector (regularise.buildBaseDB, "Build regularise db", "head_vertices.dat")
     Draw.Draw()
 
 Draw.Register(draw, event, buttonEvents)
