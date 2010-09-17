@@ -61,6 +61,9 @@ morphFactor = Draw.Create(1.0)
 regulFactor = Draw.Create(0.005)
 saveOnlySelectedVerts = Draw.Create(0)
 rotationMode = Draw.Create(0)
+fitVert1 = Draw.Create("head_vertices.dat")
+fitVert2 = Draw.Create("verts_to_fit.verts")
+fitVert3 = Draw.Create("head_vertices.dat")
 poseMode = False
 loadedTraslTarget = ""
 loadedRotTarget = ""
@@ -218,7 +221,7 @@ def buildScan2Mesh(path):
     maketargetlib.scan2meshBuild(target_dir, head_mesh ,head_mask,prefix)
     
 def fitScan2Mesh(path):
-    global message, regulFactor
+    global message, regulFactor,fitVert1
     print "Fitting using a regul = %f"%(regulFactor.val)
     main_dir = os.path.dirname(path)
     #target_dir = os.path.join(main_dir,"targets_db")
@@ -226,7 +229,7 @@ def fitScan2Mesh(path):
     head_mask = os.path.join(main_dir,"base_mask.obj")
     scan_mesh = os.path.join(main_dir,"scan_mesh.obj")
     scan_mask = os.path.join(main_dir,"scan_mask.obj")
-    fit_verts = os.path.join(main_dir,"head_vertices.dat")
+    fit_verts = os.path.join(main_dir,fitVert1.val)
     output = os.path.join(main_dir,"result.target")
     prefix = os.path.join(main_dir,"fitdata")
     if os.path.isfile(fit_verts):
@@ -269,6 +272,11 @@ def buildSVDdb(path):
     saveBaseMesh(path)
     saveBaseMask(path)
     buildScan2Mesh(path)
+
+def buildRegulariseDb(path):
+    mainDir = os.path.dirname(path)
+    vPath = os.path.join(mainDir,fitVert3.val)
+    regularise.buildBaseDB(vPath)
 
 
 def loadFitTarget(path):
@@ -477,9 +485,9 @@ def processingTargets(path, n=0, processingType=1):
 
     
 def adapt(path):
-    print "Fitting face...final step"
+    global fitVert2
     mainDir = os.path.dirname(path)
-    path = os.path.join(mainDir, "verts_to_fit.verts")#TODO: Avoid the hardcoded
+    path = os.path.join(mainDir,fitVert2.val)
     startEditing()
     base = getVertices(name="Base")
     verticesToAdapt = maketargetlib.loadVertsIndex(path)
@@ -545,6 +553,7 @@ def draw():
     global message, regulFactor
     global targetPath,morphFactor,rotVal,rotSum,currentTarget,selAxis,rotationMode
     global saveOnlySelectedVerts,loadedTraslTarget, loadedRotTarget, loadedPoseTarget
+    global fitVert1,fitVert2,fitVert3
 
     if GUIswitch == 1:
 
@@ -603,7 +612,8 @@ def draw():
         Draw.Button("Build", 31, 170, 200, 80, 20, "Build targets db")
         Draw.Button("Save verts", 33, 10, 180, 80, 20, "Save selected verts")
         regulFactor = Draw.Number("Regul: ", 0, 90, 180, 100, 20, regulFactor.val, 0, 1, "0 mean fine fitting, but less constrain")
-
+        fitVert1 = Draw.String("verts to compute: ", 34, 10, 150, 240, 20, fitVert1.val, 300,"None")
+        fitVert2 = Draw.String("verts to fit: ", 35, 10, 130, 240, 20, fitVert2.val, 300,"None")
 
     if GUIswitch == 3:
 
@@ -623,7 +633,8 @@ def draw():
 
         Draw.Button("Load db data", 40, 10, 200, 80, 20, "Load targets db")
         Draw.Button("Regularise", 41, 90, 200, 80, 20, "Regularise the mesh ")
-        Draw.Button("Build", 42, 170, 200, 80, 20, "Build targets db")       
+        Draw.Button("Build", 42, 170, 200, 80, 20, "Build targets db")
+        fitVert3 = Draw.String("verts to fit: ", 35, 10, 130, 240, 20, fitVert3.val, 300,"None")
 
 
 def event(event, value):
@@ -750,7 +761,7 @@ def buttonEvents(event):
     elif event == 41:
         regulariseMesh()
     elif event == 42:
-        Window.FileSelector (regularise.buildBaseDB, "Build regularise db", "head_vertices.dat")
+        Window.FileSelector (buildRegulariseDb, "Build regularise db", "head_vertices.dat")
     Draw.Draw()
 
 Draw.Register(draw, event, buttonEvents)
