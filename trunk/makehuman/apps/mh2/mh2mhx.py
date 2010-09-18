@@ -26,7 +26,7 @@ import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig
 import os
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 16
+MINOR_VERSION = 17
 splitLeftRight = True
 
 #

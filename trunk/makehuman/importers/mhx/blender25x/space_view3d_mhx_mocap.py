@@ -35,6 +35,7 @@ Properties:
 Scale:	
 	for BVH import. Choose scale so that the vertical distance between hands and feet
 	are the same for MHX and BVH rigs.
+	Good values are: CMU: 0.6, OSU: 0.1
 Start frame:	
 	for BVH import
 Loop:	
@@ -70,11 +71,35 @@ import bpy, os, mathutils, math, time
 from mathutils import *
 from bpy.props import *
 
-#
-#	Custom BVH importer. 
+###################################################################################
+#	BVH importer. 
 #	The importer that comes with Blender has memory leaks which leads to instability.
+#	It also creates a weird skeleton from CMU data, with hands theat start at the wrist
+#	and ends at the elbow.
 #
 
+"""
+#
+#	readBvhFile(context, filepath, scale, startFrame, loop):
+#	Default importer
+#
+
+import sys
+bvhPath = os.path.realpath('./2.54/scripts/op/io_anim_bvh')
+if bvhPath not in sys.path:
+	sys.path.append(bvhPath)
+import import_bvh
+
+def readBvhFile(context, filepath, scale, startFrame, loop):
+	bvh_nodes = import_bvh.read_bvh(context, filepath,
+		ROT_MODE='QUATERNION',
+		GLOBAL_SCALE=scale)
+	import_bvh.bvh_node_dict2armature(context, bvh_nodes,
+		ROT_MODE='QUATERNION',
+		IMPORT_START_FRAME=startFrame,
+		IMPORT_LOOP=loop)
+	return context.object
+"""
 #
 #	class CNode:
 #
@@ -98,7 +123,11 @@ class CNode:
 
 	def display(self, pad):
 		vec = self.offset
-		print("%s%10s (%8.3f %8.3f %8.3f)" % (pad, self.name, vec[0], vec[1], vec[2]))
+		if vec.length < Epsilon:
+			c = '*'
+		else:
+			c = ' '
+		print("%s%s%10s (%8.3f %8.3f %8.3f)" % (c, pad, self.name, vec[0], vec[1], vec[2]))
 		for child in self.children:
 			child.display(pad+"  ")
 		return
@@ -108,21 +137,26 @@ class CNode:
 		if not self.children:
 			return self.head
 		
+		zero = (self.offset.length < Epsilon)
 		eb = amt.edit_bones.new(self.name)		
 		if parent:
 			eb.parent = parent
 		eb.head = self.head
 		tails = Vector((0,0,0))
 		for child in self.children:
-			tails += child.build(amt, eb.head, eb)
+			tails += child.build(amt, self.head, eb)
 		n = len(self.children)
 		eb.tail = tails/n
 		self.matrix = eb.matrix.rotation_part()
 		self.inverse = self.matrix.copy().invert()
-		return self.head
+		if zero:
+			return eb.tail
+		else:		
+			return eb.head
 
 #
-#	readBvhFile(context, filepath, scale):
+#	readBvhFile(context, filepath, scale, startFrame, loop):
+#	Custom importer
 #
 
 Location = 1
@@ -132,9 +166,10 @@ Motion = 2
 Frames = 3
 
 Deg2Rad = math.pi/180
+Epsilon = 1e-5
 Z_UP = False
 
-def readBvhFile(context, filepath, scale):
+def readBvhFile(context, filepath, scale, startFrame, loop):
 	print(filepath)
 	fileName = os.path.realpath(os.path.expanduser(filepath))
 	(shortName, ext) = os.path.splitext(fileName)
@@ -237,26 +272,30 @@ def addFrame(words, frame, nodes, pbones, scale):
 	m = 0
 	for node in nodes:
 		name = node.name
-		pb = pbones[name]
-		for (mode, indices) in node.channels:
-			if mode == Location:
-				vec = Vector((0,0,0))
-				for (index, sign) in indices:
-					vec[index] = sign*float(words[m])
-					m += 1
-				pb.location = node.inverse * (scale * vec - node.head)				
-				for n in range(3):
-					pb.keyframe_insert('location', index=n, frame=frame, group=name)
-			elif mode == Rotation:
-				mats = []
-				for (axis, sign) in indices:
-					angle = sign*float(words[m])*Deg2Rad
-					mats.append(Matrix.Rotation(angle, 3, axis))
-					m += 1
-				mat = node.inverse * mats[0] * mats[1] * mats[2] * node.matrix
-				pb.rotation_quaternion = mat.to_quat()
-				for n in range(4):
-					pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+		try:
+			pb = pbones[name]
+		except:
+			pb = None
+		if pb:
+			for (mode, indices) in node.channels:
+				if mode == Location:
+					vec = Vector((0,0,0))
+					for (index, sign) in indices:
+						vec[index] = sign*float(words[m])
+						m += 1
+					pb.location = node.inverse * (scale * vec - node.head)				
+					for n in range(3):
+						pb.keyframe_insert('location', index=n, frame=frame, group=name)
+				elif mode == Rotation:
+					mats = []
+					for (axis, sign) in indices:
+						angle = sign*float(words[m])*Deg2Rad
+						mats.append(Matrix.Rotation(angle, 3, axis))
+						m += 1
+					mat = node.inverse * mats[0] * mats[1] * mats[2] * node.matrix
+					pb.rotation_quaternion = mat.to_quat()
+					for n in range(4):
+						pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
 	return
 
 #
@@ -292,46 +331,99 @@ def channelZup(word):
 	elif word == 'Zposition':
 		return (1, Location, -1)
 
+#
+# 	end Bvh importer
+###################################################################################
 
 #
-#	FkArmature
+#	OsuArmature
+#	www.accad.osu.edu/research/mocap/mocap_data.htm
 #
 
-FkArmature = {
-	'Hips' : ('Root', None),
-	'ToSpine' :  ('Spine1', 'Root'),
-	'Spine' :  ('Spine2', 'Spine1'),
-	'Spine1' :  ('Spine3', 'Spine2'),
-	'Neck' :  ('Neck', 'Spine3'),
-	'Head' :  ('Head', 'Neck'),
+OsuArmature = {
+	'Hips' : 'Root',
+	'ToSpine' : 'Spine1',
+	'Spine' : 'Spine2',
+	'Spine1' : 'Spine3', 
+	'Neck' : 'Neck', 
+	'Head' : 'Head', 
 
-	'LeftShoulder' :  ('Clavicle_L', 'Spine3'),
-	'LeftArm' :  ('UpArmFK_L', 'Clavicle_L'),
-	'LeftForeArm' :  ('LoArmFK_L', 'UpArmFK_L'),
-	'LeftHand' :  ('HandFK_L', 'LoArmFK_L'),
+	'LeftShoulder' : 'Clavicle_L',
+	'LeftArm' : 'UpArmFK_L', 
+	'LeftForeArm' : 'LoArmFK_L',
+	'LeftHand' : 'HandFK_L', 
 
-	'RightShoulder' :  ('Clavicle_R', 'Spine3'),
-	'RightArm' :  ('UpArmFK_R', 'Clavicle_R'),
-	'RightForeArm' :  ('LoArmFK_R', 'UpArmFK_R'),
-	'RightHand' :  ('HandFK_R', 'LoArmFK_R'),
+	'RightShoulder' : 'Clavicle_R',
+	'RightArm' : 'UpArmFK_R', 
+	'RightForeArm' : 'LoArmFK_R',
+	'RightHand' : 'HandFK_R',
 
-	'LeftUpLeg' :  ('UpLegFK_L', 'Root'),
-	'LeftLeg' :  ('LoLegFK_L', 'UpLegFK_L'),
-	'LeftFoot' :  ('FootFK_L', 'LoLegFK_L'),
-	'LeftToeBase' :  ('ToeFK_L', 'FootFK_L'),
+	'LeftUpLeg' : 'UpLegFK_L', 
+	'LeftLeg' : 'LoLegFK_L', 
+	'LeftFoot' : 'FootFK_L', 
+	'LeftToeBase' : 'ToeFK_L',
 
-	'RightUpLeg' :  ('UpLegFK_R', 'Root'),
-	'RightLeg' :  ('LoLegFK_R', 'UpLegFK_R'),
-	'RightFoot' :  ('FootFK_R', 'LoLegFK_R'),
-	'RightToeBase' :  ('ToeFK_R', 'FootFK_R'),
+	'RightUpLeg' : 'UpLegFK_R',
+	'RightLeg' : 'LoLegFK_R', 
+	'RightFoot' : 'FootFK_R', 
+	'RightToeBase' : 'ToeFK_R',
 }
+
+#
+#	CmuArmature
+#
+
+CmuArmature = {
+	'Hips' : 'Root', 
+	'LowerBack' : 'Spine1',
+	'Spine' : 'Spine2', 
+	'Spine1' : 'Spine3',
+	'Neck' : 'Neck',
+	'Neck1' : 'Head', 
+	'Head' : None,
+
+	'LeftShoulder' : 'Clavicle_L',
+	'LeftArm' : 'UpArmFK_L', 
+	'LeftForeArm' : 'LoArmFK_L',
+	'LeftHand' : 'HandFK_L',
+	'LeftFingerBase' : None,
+	'LFingers' : None,
+	'LThumb' : None, 
+
+	'RightShoulder' : 'Clavicle_R', 
+	'RightArm' : 'UpArmFK_R', 
+	'RightForeArm' : 'LoArmFK_R',
+	'RightHand' : 'HandFK_R',
+	'RightFingerBase' : None,
+	'RFingers' : None,
+	'RThumb' : None, 
+
+	'LHipJoint' : 'Hip_L', 
+	'LeftUpLeg' : 'UpLegFK_L',
+	'LeftLeg' : 'LoLegFK_L', 
+	'LeftFoot' : 'FootFK_L', 
+	'LeftToeBase' : 'ToeFK_L',
+
+	'RHipJoint' : 'Hip_R', 
+	'RightUpLeg' : 'UpLegFK_R',
+	'RightLeg' : 'LoLegFK_R', 
+	'RightFoot' : 'FootFK_R', 
+	'RightToeBase' : 'ToeFK_R',
+}
+
+theArmatures = {
+	'CMU' : CmuArmature, 
+	'OSU' : OsuArmature,
+}
+
+theArmature = None
 
 FkBoneList = [
 	'Root', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
 	'Clavicle_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
 	'Clavicle_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
-	'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
-	'UpLegFK_R', 'LoLegFK_R', 'FootFK_R', 'ToeFK_R',
+	'Hip_L', 'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
+	'Hip_R', 'UpLegFK_R', 'LoLegFK_R', 'FootFK_R', 'ToeFK_R',
 	'LegFK_L', 'AnkleFK_L',
 	'LegFK_R', 'AnkleFK_R',
 ]
@@ -344,7 +436,7 @@ IkArmature = {
 	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
 	'HandIK' : ('HandFK', 0, None),
 
-	'UpLegIK' : ('UpLegFK', 0, 'Root'),
+	'UpLegIK' : ('UpLegFK', 0, 'Hip'),
 	'LoLegIK' : ('LoLegFK', F_LR, 'UpLegIK'),
 	#'FootIK' : ('FootFK', 0, None),
 	#'ToeIK' : ('ToeFK', F_LR, 'FootIK'),
@@ -398,40 +490,45 @@ class CEditBone():
 #	createFKRig(scn, bones, rig):
 #
 
-def createFKRig(scn, bones, rig):
+def createFKRig(scn, bones00, rig):
 	amt = bpy.data.armatures.new('Z_'+rig.data.name[2:])
 	rig90 = bpy.data.objects.new('Z_'+rig.name[2:], amt)
 	scn.objects.link(rig90)
 	scn.objects.active = rig90
 
+	bones90 = {}
 	bpy.ops.object.mode_set(mode='EDIT')
 	ebones = amt.edit_bones
-	for bone in bones:
-		(name90, parent) = FkArmature[bone.name]
-		eb = ebones.new(name=name90)
-		eb.head = rot90(bone.head)
-		eb.tail = rot90(bone.tail)
-		if bone.parent:
-			eb.parent = ebones[parent]
-			eb.use_connect = bone.use_connect
-		eb.roll = bone.roll
-	bones90 = []
+	for bone00 in bones00:
+		name00 = bone00.name
+		name90 = theArmature[name00]
+		if name90:
+			eb = ebones.new(name=name90)
+			eb.head = rot90(bone00.head)
+			eb.tail = rot90(bone00.tail)
+			if bone00.parent:
+				parent = theArmature[bone00.parent]
+				eb.parent = ebones[parent]
+				#eb.use_connect = bone00.use_connect
+			eb.roll = bone00.roll
+			bones90[name90] = CEditBone(eb)
 
 	for suffix in ['_L', '_R']:
-		eb = ebones.new(name='LegFK'+suffix)
+		name90 = 'LegFK'+suffix
+		eb = ebones.new(name=name90)
 		toe = ebones['ToeFK'+suffix]
 		eb.head = 2*toe.head - toe.tail
 		eb.tail = 4*toe.head - 3*toe.tail
 		eb.parent = toe
+		bones90[name90] = CEditBone(eb)
 
-		eb = ebones.new(name='AnkleFK'+suffix)
+		name90 = 'AnkleFK'+suffix
+		eb = ebones.new(name=name90)
 		foot = ebones['FootFK'+suffix]
 		eb.head = foot.head
 		eb.tail = 2*foot.head - foot.tail
 		eb.parent = ebones['LoLegFK'+suffix]
-
-	for bone in rig90.data.edit_bones:
-		bones90.append( CEditBone(bone) )
+		bones90[name90] = CEditBone(eb)
 
 	bpy.ops.object.mode_set(mode='POSE')
 	return (rig90, bones90)
@@ -449,18 +546,20 @@ def printMatrices(name, bones, bones90):
 	print(bones90[n].matrix)
 
 #
-#	setupTranformMatrix(bones, bones90):
+#	setupTranformMatrix(bones00, bones90):
 #
 
-def setupTranformMatrix(bones, bones90):
+def setupTranformMatrix(bones00, bones90):
 	tMatrix = {}
 	tInverse = {}
 	tRot90 = Matrix.Rotation(-math.pi/2, 3, 'X')
-	for n in range(len(bones)):
-		bone = bones[n]
-		newBone = bones90[n]
-		tMatrix[bone.name] = newBone.matrix * tRot90 * bone.inverse
-		tInverse[bone.name] = tMatrix[bone.name].copy().invert()
+	for bone00 in bones00:
+		name00 = bone00.name
+		name90 = theArmature[name00]
+		if name90:
+			bone90 = bones90[name90]
+			tMatrix[name00] = bone90.matrix * tRot90 * bone00.inverse
+			tInverse[name00] = tMatrix[name00].copy().invert()
 	return (tMatrix, tInverse)
 
 #
@@ -473,46 +572,35 @@ def insertAction(bones00, rig00, rig90, tMatrix, tInverse):
 	root = bones00[0]
 	nFrames = len(rots[root.name])
 
-	for frame in range(nFrames):
-		for bone in bones00:
-			name00 = bone.name
-			(name90, parent) = FkArmature[name00]
-			pb = rig90.pose.bones[name90]
-			
-			try:
-				vec = Vector(locs[name00][frame])
-			except:
-				vec = None
-			if vec:
-				nloc = tMatrix[name00] * vec
-				pb.location = nloc
-				for n in range(3):
-					pb.keyframe_insert('location', index=n, frame=frame, group=name90)
+	for bone in bones00:
+		name00 = bone.name
+		name90 = theArmature[name00]
+		if name90:
+			pb = rig90.pose.bones[name90]			
+			for frame in range(nFrames):
+				try:
+					vec = Vector(locs[name00][frame])
+				except:
+					vec = None
+				if vec:
+					nloc = tMatrix[name00] * vec
+					pb.location = nloc
+					for n in range(3):
+						pb.keyframe_insert('location', index=n, frame=frame, group=name90)
 
-			try:
-				quat = Quaternion(rots[name00][frame])
-			except:
-				quat = None
-			if quat:
-				mat = quat.to_matrix()
-				nmat = tMatrix[name00] * mat * tInverse[name00]
-				pb.rotation_quaternion = nmat.to_quat()
-				for n in range(4):
-					pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name90)
+				try:
+					quat = Quaternion(rots[name00][frame])
+				except:
+					quat = None
+				if quat:
+					mat = quat.to_matrix()
+					nmat = tMatrix[name00] * mat * tInverse[name00]
+					pb.rotation_quaternion = nmat.to_quat()
+					for n in range(4):
+						pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name90)
 
 		frame += 1
 	return
-
-#
-#	rotateRig90(context, rig00, bones00):
-#
-
-def rotateRig90(context, rig00, bones00):
-	(rig90, bones90) = createFKRig(context.scene, bones00, rig00)
-	(tMatrix, tInverse) = setupTranformMatrix(bones00, bones90)
-	insertAction(bones00, rig00, rig90, tMatrix, tInverse)
-	setInterpolation(rig90)
-	return rig90
 
 #
 #	makeVectorDict(ob, channel):
@@ -553,10 +641,15 @@ def makeVectorDict(ob, channel):
 def renameBvhRig(rig00, filepath):
 	base = os.path.basename(filepath)
 	(filename, ext) = os.path.splitext(base)
-	words = filename.split('_')
-	name = 'Y_'
-	for word in words[1:]:
-		name += word
+	print("File", filename, len(filename))
+	if len(filename) > 12:
+		words = filename.split('_')
+		name = 'Y_'
+		for word in words[1:]:
+			name += word
+	else:
+		name = 'Y_' + filename
+	print("Name", name)
 
 	rig00.name = name
 	action = rig00.animation_data.action
@@ -621,6 +714,60 @@ def constrainIkBones(rig90):
 	return
 
 #
+#	guessArmature(rig):
+#	setArmature(rig)
+#
+
+def guessArmature(rig):
+	global theArmature, theArmatures
+	bestMisses = 1000
+	bones = rig.data.bones
+	for (name, amt) in theArmatures.items():
+		nMisses = 0
+		for bone in bones:
+			try:
+				amt[bone.name]
+			except:
+				#print("Miss", bone.name)
+				nMisses += 1
+		if nMisses < bestMisses:
+			best = amt
+			bestName = name
+			bestMisses = nMisses
+	if bestMisses > 0:
+		raise NameError('Did not find matching armature')
+	theArmature = best
+	rig['MhxArmature'] = bestName
+	print("Using matching armature %s." % rig['MhxArmature'])
+	return
+
+def setArmature(rig):
+	global theArmature, theArmatures
+	try:
+		name = rig['MhxArmature']
+	except:
+		raise NameError("No armature set")
+	theArmature = theArmatures[name]
+	print("Set armature %s" % name)
+	return
+	
+#
+#	importAndRename(context, filepath):
+#
+
+def importAndRename(context, filepath):
+	rig = readBvhFile(context, filepath, context.scene['MhxBvhScale'], context.scene['MhxStartFrame'], context.scene['MhxLoopAnim'])
+	(rig00, bones00, action) =  renameBvhRig(rig, filepath)
+	guessArmature(rig00)
+	(rig90, bones90) = createFKRig(context.scene, bones00, rig00)
+	rig90['MhxArmature'] = rig00['MhxArmature']
+	(tMatrix, tInverse) = setupTranformMatrix(bones00, bones90)
+	insertAction(bones00, rig00, rig90, tMatrix, tInverse)
+	setInterpolation(rig90)
+	deleteFKRig(context, rig00, action, 'Y_')
+	return (rig90, action)
+
+#
 #	class CAnimData():
 #
 
@@ -664,7 +811,10 @@ def createAnimation(context, rig):
 	return animations
 
 def createAnimData(name, animations, ebones):
-	eb = ebones[name]
+	try:
+		eb = ebones[name]
+	except:
+		return
 	anim = CAnimData(name)
 	animations[name] = anim
 	anim.headRest = eb.head.copy()
@@ -679,7 +829,7 @@ def createAnimData(name, animations, ebones):
 		anim.offsetRest = Vector((0,0,0))	
 	anim.matrixRest = matrix
 	anim.inverseRest = anim.matrixRest.copy().invert()
-	return anim
+	return
 
 #
 #	insertAnimation(context, rig, animations):
@@ -715,7 +865,10 @@ def insertAnimRoot(root, animations, nFrames, locs, rots):
 	return
 
 def insertAnimChild(name, animations, rots):
-	anim = animations[name]
+	try:
+		anim = animations[name]
+	except:
+		return
 	animPar = animations[anim.parent]
 	anim.nFrames = animPar.nFrames
 	quat = Quaternion().identity()
@@ -738,9 +891,13 @@ def insertAnimChild(name, animations, rots):
 
 def createEmpties(context, animations):
 	for name in FkBoneList:
-		anim = animations[name]
-		createEmpty(context, name+'HD', anim.heads, anim.nFrames)
-		createEmpty(context, name+'TL', anim.tails, anim.nFrames)
+		try:
+			anim = animations[name]
+		except:
+			anim = None
+		if anim:
+			createEmpty(context, name+'HD', anim.heads, anim.nFrames)
+			createEmpty(context, name+'TL', anim.tails, anim.nFrames)
 	return
 
 def createEmpty(context, name, locs, nFrames):
@@ -767,10 +924,19 @@ def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
 	name = 'Root'
 	insertLocationKeyFrames(name, pbones[name], rig90Animations[name], mhxAnimations[name])
 	for name in FkBoneList:
-		if name in GlobalBoneList:
-			insertGlobalRotationKeyFrames(name, pbones[name], rig90Animations[name], mhxAnimations[name])
+		try:
+			pb = pbones[name]
+			anim90 = rig90Animations[name]
+			animMhx =  mhxAnimations[name]
+			success = True
+		except:
+			success = False
+		if not success:
+			pass
+		elif name in GlobalBoneList:
+			insertGlobalRotationKeyFrames(name, pb, anim90, animMhx)
 		else:
-			insertLocalRotationKeyFrames(name, pbones[name], rig90Animations[name], mhxAnimations[name])
+			insertLocalRotationKeyFrames(name, pb, anim90, animMhx)
 
 	insertAnimation(context, mhxrig, mhxAnimations)
 	setInterpolation(mhxrig)
@@ -837,7 +1003,7 @@ def poseMhxIKBones(context, mhxrig, mhxAnimations):
 	pbones = mhxrig.pose.bones
 	#rots = makeVectorDict(mhxrig, '].rotation_quaternion')
 	for suffix in ['_L', '_R']:
-		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
+		for name in ['UpArm', 'UpLeg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
 			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], mhxAnimations[nameFK], mhxAnimations[nameFK])
@@ -932,10 +1098,10 @@ def silenceConstraints(rig):
 #
 
 def retargetMhxRig(context, rig90, mhxrig):
+	setArmature(rig90)
 	print("Retarget %s --> %s" % (rig90, mhxrig))
 	if mhxrig.animation_data:
 		mhxrig.animation_data.action = None
-	#silenceConstraints(mhxrig)
 
 	mhxAnimations = createAnimation(context, mhxrig)
 	rig90Animations = createAnimation(context, rig90)
@@ -1075,15 +1241,15 @@ def iterateFCurves(points, keeps, maxErr):
 	return new
 		
 
-#	
+###################################################################################	
 #	User interface
+#
 #	getBvh(mhx)
 #	init()
 #
 
 def getBvh(mhx):
-	for (bvh, value) in FkArmature.items():
-		(mhx1, parent) = value
+	for (bvh, mhx1) in theArmature.items():
 		if mhx == mhx1:
 			return bvh
 	return None
@@ -1094,7 +1260,7 @@ def init(scn):
 		description="Scale the BVH by this value", 
 		min=0.0001, max=1000000.0, 
 		soft_min=0.001, soft_max=100.0)
-	scn['MhxBvhScale'] = 0.1
+	scn['MhxBvhScale'] = 0.6
 
 	bpy.types.Scene.MhxStartFrame = IntProperty(
 		name="Start Frame", 
@@ -1135,18 +1301,20 @@ def init(scn):
 		maxlen=1024)
 	scn['MhxPrefix'] = "Female1_A"
 
+	bpy.types.Object.MhxArmature = StringProperty()
+
+	'''
 	for mhx in FkBoneList:
-		'''
 		bpy.types.Scene.StringProperty(
 			attr=mhx, 
 			name=mhx, 
 			description="Bvh bone corresponding to %s" % mhx, 
 			default = ''
 		)
-		'''
 		bvh = getBvh(mhx)
 		if bvh:
 			scn[mhx] = bvh
+	'''
 	return
 
 init(bpy.context.scene)
@@ -1220,33 +1388,8 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		return
 
 #
-#	importAndRename(context, filepath):
 #	class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 #
-"""
-import sys
-bvhPath = os.path.realpath('./2.54/scripts/op/io_anim_bvh')
-if bvhPath not in sys.path:
-	sys.path.append(bvhPath)
-import import_bvh
-
-	bvh_nodes = import_bvh.read_bvh(context, filepath,
-		ROT_MODE='QUATERNION',
-		GLOBAL_SCALE=context.scene['MhxBvhScale'])
-	import_bvh.bvh_node_dict2armature(context, bvh_nodes,
-		ROT_MODE='QUATERNION',
-		IMPORT_START_FRAME=context.scene['MhxStartFrame'],
-		IMPORT_LOOP=context.scene['MhxLoopAnim'])
-	rig = context.object
-"""
-
-def importAndRename(context, filepath):
-	print("iar", filepath)
-	rig = readBvhFile(context, filepath, context.scene['MhxBvhScale'])
-	(rig00, bones00, action) =  renameBvhRig(rig, filepath)
-	rig90 = rotateRig90(context, rig00, bones00)
-	deleteFKRig(context, rig00, action, 'Y_')
-	return (rig90, action)
 
 class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_LoadBvhButton"
@@ -1315,13 +1458,15 @@ class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
 
 def loadRetargetSimplify(context, filepath):
 	print("Load and retarget %s" % filepath)
+	time1 = time.clock()
 	mhxrig = context.object
 	(rig90, action) = importAndRename(context, filepath)
 	retargetMhxRig(context, rig90, mhxrig)
 	deleteFKRig(context, rig90, action, 'Z_')
 	if context.scene['MhxDoSimplify']:
 		simplifyFCurves(context, mhxrig)
-	print("%s finished" % filepath)
+	time2 = time.clock()
+	print("%s finished in %.3f s" % (filepath, time2-time1))
 	return
 
 class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
@@ -1378,4 +1523,6 @@ def unregister():
 if __name__ == "__main__":
     register()
 
-#readBvhFile(bpy.context, '/home/thomas/myblends/bvh/Male1_bvh/Male1_A5_PickUpBox.bvh')
+#readBvhFile(context, filepath, scale, startFrame, loop)
+#readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/Male1_bvh/Male1_A5_PickUpBox.bvh', 1.0, 1, False)
+#readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/cmu/10/10_03.bvh', 1.0, 1, False)

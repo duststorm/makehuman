@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.16
+Version 0.17
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.16',
+	'version': '0.17',
 	'blender': (2, 5, 4),
     "api": 31913,
 	"location": "File > Import",
@@ -39,7 +39,7 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 16
+MINOR_VERSION = 17
 BLENDER_VERSION = (2, 54, 0)
 
 #
