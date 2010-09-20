@@ -557,11 +557,15 @@ class Application(events3d.EventHandler):
         else:
             self.currentTask.callEvent('onKeyUp', event)
             
-    def getCategory(self, name, image):
+    def getCategory(self, name, image, image_on = None):
         try:
             return self.categories[name]
         except:
-            return Category(self, name, self.getThemeResource('images', image))
+            if image_on:
+                return Category(self, name, self.getThemeResource('images', image),\
+                        self.getThemeResource('images', image_on))
+            else:
+                return Category(self, name, self.getThemeResource('images', image))
         
 
 
