@@ -556,6 +556,13 @@ class Application(events3d.EventHandler):
             self.focusView.callEvent('onKeyUp', event)
         else:
             self.currentTask.callEvent('onKeyUp', event)
+            
+    def getCategory(self, name, image):
+        try:
+            return self.categories[name]
+        except:
+            return Category(self, name, self.getThemeResource('images', image))
+        
 
 
 # Widgets
