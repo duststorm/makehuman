@@ -189,7 +189,7 @@ makehairView = None
 
 
 def load(app):
-    category = app.getCategory('Experiments','button_experiments.png')
+    category = app.getCategory('Experiments','button_experiments.png','button_experiments_on.png')
     makehairView = MakeHairTaskView(category)
 
     @makehairView.event

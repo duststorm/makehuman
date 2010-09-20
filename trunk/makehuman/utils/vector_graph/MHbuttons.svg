@@ -14,7 +14,7 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="MHbuttons.svg"
    inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_load.png"
    inkscape:export-xdpi="90.000084"
@@ -1636,6 +1636,48 @@
        x2="129.78709"
        y2="661.21381"
        gradientTransform="translate(-58.642235,21.902264)" />
+    <inkscape:perspective
+       id="perspective3554"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3591"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3628"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3668"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3705"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3742"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1646,14 +1688,14 @@
      inkscape:pageshadow="2"
      inkscape:zoom="2.2382812"
      inkscape:cx="-65.345043"
-     inkscape:cy="999.86843"
+     inkscape:cy="1017.7393"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="977"
-     inkscape:window-x="-4"
-     inkscape:window-y="-4"
+     inkscape:window-width="1920"
+     inkscape:window-height="1005"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -1791,17 +1833,6 @@
        y="165.25987"
        ry="2.2610447"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_measure.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <rect
-       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3737-2-0-8-5-3"
-       width="63.073643"
-       height="15.073632"
-       x="-36.151028"
-       y="191.52385"
-       ry="2.2610447"
-       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -3009,26 +3040,6 @@
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="-34.114582"
-       y="202.01938"
-       id="text3802-14"
-       sodipodi:linespacing="100%"
-       transform="scale(0.994692,1.0053363)"
-       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><tspan
-         sodipodi:role="line"
-         id="tspan3804-35"
-         x="-34.114582"
-         y="202.01938"
-         style="-inkscape-font-specification:Arial Bold;font-family:Arial;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;font-size:10px;text-anchor:start;text-align:start;writing-mode:lr;line-height:100%">Advanced</tspan><tspan
-         sodipodi:role="line"
-         x="-34.114582"
-         y="202.01938"
-         id="tspan3071" /></text>
-    <text
-       xml:space="preserve"
-       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
        x="-34.12035"
        y="226.63675"
        id="text3802-6"
@@ -3132,25 +3143,6 @@
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_library.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <path
-       sodipodi:type="star"
-       style="fill:#cccccc;fill-opacity:1;stroke:none"
-       id="path4831-2-0"
-       sodipodi:sides="3"
-       sodipodi:cx="-122.22846"
-       sodipodi:cy="148.27567"
-       sodipodi:r1="11.1575"
-       sodipodi:r2="5.5787497"
-       sodipodi:arg1="1.5707963"
-       sodipodi:arg2="2.6179939"
-       inkscape:flatsided="false"
-       inkscape:rounded="0"
-       inkscape:randomized="0"
-       d="m -122.22846,159.43317 -4.83134,-8.36813 -4.83134,-8.36812 9.66268,0 9.66268,-1e-5 -4.83134,8.36813 -4.83134,8.36813 z"
-       transform="matrix(0.37063632,0,0,0.37063632,68.208531,143.07048)"
-       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
     <rect
        style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-27"
@@ -3221,17 +3213,6 @@
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_measure_on.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <rect
-       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3737-2-0-8-5-3-0"
-       width="63.073643"
-       height="15.073632"
-       x="49.673954"
-       y="190.25529"
-       ry="2.2610447"
-       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance_on.png"
-       inkscape:export-xdpi="89.999977"
-       inkscape:export-ydpi="89.999977" />
     <rect
        style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636877;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-1"
@@ -3314,22 +3295,6 @@
          id="tspan3804-4-6"
          x="52.191448"
          y="174.44933">Measure</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="52.168377"
-       y="200.75757"
-       id="text3802-14-4"
-       sodipodi:linespacing="100%"
-       transform="scale(0.994692,1.0053363)"
-       inkscape:export-filename="C:\Projects\makehuman\data\themes\default\images\button_advance_on.png"
-       inkscape:export-xdpi="89.999977"
-       inkscape:export-ydpi="89.999977"><tspan
-         sodipodi:role="line"
-         id="tspan3804-35-3"
-         x="52.168377"
-         y="200.75757"
-         style="-inkscape-font-specification:Arial Bold;font-family:Arial;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;font-size:10px;text-anchor:start;text-align:start;writing-mode:lr;line-height:100%">Advanced</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
@@ -6012,9 +5977,9 @@
        x="50.549137"
        y="26.312706"
        ry="2.2610445"
-       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default/button_experiments_on.png"
-       inkscape:export-xdpi="45"
-       inkscape:export-ydpi="45" />
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_experiments_on.png"
+       inkscape:export-xdpi="89.999657"
+       inkscape:export-ydpi="89.999657" />
     <text
        xml:space="preserve"
        style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
@@ -6023,9 +5988,9 @@
        id="text3802-0-5"
        sodipodi:linespacing="125%"
        transform="scale(0.99469202,1.0053363)"
-       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default/button_experiments_on.png"
-       inkscape:export-xdpi="45"
-       inkscape:export-ydpi="45"><tspan
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_experiments_on.png"
+       inkscape:export-xdpi="89.999657"
+       inkscape:export-ydpi="89.999657"><tspan
          sodipodi:role="line"
          id="tspan3804-40-7"
          x="53.071304"
@@ -6051,7 +6016,7 @@
           <path
              transform="translate(0,-0.47387351)"
              inkscape:transform-center-y="4.2648535"
-             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 z"
+             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 -7.38695,12.79456 z"
              inkscape:randomized="0"
              inkscape:rounded="0"
              inkscape:flatsided="false"
@@ -6067,7 +6032,7 @@
              sodipodi:type="star" />
           <path
              inkscape:transform-center-y="4.2648535"
-             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 z"
+             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 -7.38695,12.79456 z"
              inkscape:randomized="0"
              inkscape:rounded="0"
              inkscape:flatsided="false"
@@ -6098,7 +6063,7 @@
            inkscape:flatsided="false"
            inkscape:rounded="0"
            inkscape:randomized="0"
-           d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 z"
+           d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 -7.38695,12.79456 z"
            inkscape:transform-center-y="4.2648535" />
       </g>
     </g>
@@ -6122,5 +6087,265 @@
        sodipodi:ry="1.7870855"
        d="m -92.034905,-38.206768 a 1.7870855,1.7870855 0 1 1 -3.574171,0 1.7870855,1.7870855 0 1 1 3.574171,0 z"
        transform="matrix(3.0601972,0,0,3.0601972,267.29012,54.777704)" />
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-3-4"
+       width="63.073643"
+       height="15.073632"
+       x="-79.81057"
+       y="2.2484589"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_advance.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-77.984032"
+       y="12.718203"
+       id="text3802-22-3"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_advance.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-1-0"
+         x="-77.984032"
+         y="12.718203">Advanced</tspan></text>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-27-8-3"
+       width="63.073643"
+       height="15.073632"
+       x="6.014411"
+       y="0.97988892"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_advance_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="8.2989292"
+       y="11.456362"
+       id="text3802-0-5-0"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_advance_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-40-7-9"
+         x="8.2989292"
+         y="11.456362">Advanced</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-3-4-3"
+       width="63.073643"
+       height="15.073632"
+       x="-284.43185"
+       y="21.906401"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_asymm.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-283.69724"
+       y="32.271801"
+       id="text3802-22-3-7"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_asymm.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-1-0-8"
+         x="-283.69724"
+         y="32.271801">Asymm.</tspan></text>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-27-8-3-8"
+       width="63.073643"
+       height="15.073632"
+       x="-198.60687"
+       y="20.637831"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_asymm_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-197.41429"
+       y="31.00996"
+       id="text3802-0-5-0-6"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_asymm_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-40-7-9-0"
+         x="-197.41429"
+         y="31.00996">Asymm.</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-3-4-4"
+       width="63.073643"
+       height="15.073632"
+       x="-283.53833"
+       y="-1.3257122"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_pose.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-282.79892"
+       y="9.163003"
+       id="text3802-22-3-5"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_pose.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-1-0-0"
+         x="-282.79892"
+         y="9.163003">Pose</tspan></text>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-27-8-3-5"
+       width="63.073643"
+       height="15.073632"
+       x="-197.71335"
+       y="-2.5942822"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_pose_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-196.51598"
+       y="7.9011626"
+       id="text3802-0-5-0-7"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_pose_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-40-7-9-3"
+         x="-196.51598"
+         y="7.9011626">Pose</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-3-4-3-4"
+       width="63.073643"
+       height="15.073632"
+       x="-279.96417"
+       y="-27.238451"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnics.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-279.20569"
+       y="-16.612194"
+       id="text3802-22-3-7-3"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnics.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-1-0-8-7"
+         x="-279.20569"
+         y="-16.612194">Ethnics</tspan></text>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-27-8-3-8-9"
+       width="63.073643"
+       height="15.073632"
+       x="-194.13918"
+       y="-28.507021"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnics_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-192.92273"
+       y="-17.874035"
+       id="text3802-0-5-0-6-0"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_ethnics_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-40-7-9-0-0"
+         x="-192.92273"
+         y="-17.874035">Ethnics</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-3-4-3-4-0"
+       width="63.073643"
+       height="15.073632"
+       x="-277.28354"
+       y="-53.597961"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_makereal.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-276.51074"
+       y="-42.831791"
+       id="text3802-22-3-7-3-0"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_makereal.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-1-0-8-7-6"
+         x="-276.51074"
+         y="-42.831791">MakeReal</tspan></text>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-27-8-3-8-9-8"
+       width="63.073643"
+       height="15.073632"
+       x="-191.45854"
+       y="-54.866531"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_makereal_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="-190.22778"
+       y="-44.093632"
+       id="text3802-0-5-0-6-0-5"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_makereal_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-40-7-9-0-0-4"
+         x="-190.22778"
+         y="-44.093632">MakeReal</tspan></text>
   </g>
 </svg>

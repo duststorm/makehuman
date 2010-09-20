@@ -15,7 +15,7 @@ print 'Pose plugin imported'
 class PoseTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_pose.png'))      
+        gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_pose.png'), category.app.getThemeResource('images', 'button_pose_on.png'))      
 
         self.engine = poseengine.Poseengine(self.app.scene3d.selectedHuman)        
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
@@ -128,7 +128,7 @@ taskview = None
 
 
 def load(app):
-    category = gui3d.Category(app, 'Example', app.getThemeResource('images', 'button_pose.png'))
+    category = app.getCategory('Experiments','button_experiments.png','button_experiments_on.png')
     taskview = PoseTaskView(category)
     print 'pose loaded'
 

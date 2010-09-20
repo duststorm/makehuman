@@ -11,7 +11,7 @@ import mh
 class MeasurementTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_measure.png'), category.app.getThemeResource('images',
+        gui3d.TaskView.__init__(self, category, 'Measurement', category.app.getThemeResource('images', 'button_measure.png'), category.app.getThemeResource('images',
                                 'button_measure_on.png'))
         gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
         self.measureList = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 100, 9.4])
@@ -129,7 +129,7 @@ class MeasurementTaskView(gui3d.TaskView):
 
 
 def load(app):
-    category = gui3d.Category(app, 'Measurement', app.getThemeResource('images', 'button_measure.png'), app.getThemeResource('images', 'button_measure_on.png'))
+    category = app.getCategory('Experiments','button_experiments.png','button_experiments_on.png')
     taskview = MeasurementTaskView(category)
 
   # Zoom the camera
