@@ -98,6 +98,10 @@ BodyPoses = [
 	('poseBone', 'Head', 'GoboHead', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
 	# Deform
+	('poseBone', 'Rib_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
+
+	('poseBone', 'Rib_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
+
 	('poseBone', 'Stomach_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('StretchTo', 0, ['UpLeg_L', 'UpLeg_L', 'PLANE_X'])]),
 
