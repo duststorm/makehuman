@@ -15,7 +15,8 @@ Coding Standards:            See http://sites.google.com/site/makehumandocs/deve
 
 
 """
-
+import sys
+sys.path.append("../../core/")
 from math import sqrt
 from aljabr import *
 import simpleoctree
