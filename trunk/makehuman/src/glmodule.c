@@ -512,7 +512,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
     int internalFormat, format;
     SDL_Surface *surface;
 
-    printf("Loading texture '%s'\n", fname);
+    //printf("Loading texture '%s'\n", fname);
 
     if (!texture)
         glGenTextures(1, &texture);
