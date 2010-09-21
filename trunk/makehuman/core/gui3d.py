@@ -678,7 +678,7 @@ class Button(View):
             self.button = Object(self, mesh='data/3dobjs/unit_square.obj', texture=t, position=position, width=width, height=height)
         else: self.button = Object(self, mesh, texture=t, position=position)
         if isinstance(label, str):
-            TextObject(self, text = label, position = [position[0]+5,position[1]-8,position[2]+0.001])
+            self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-8,position[2]+0.001])
             #assumes button obj origin is upper left corner
             #TODO text should be in the middle of button, calculate this from text length
         self.texture = texture
