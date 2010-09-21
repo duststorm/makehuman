@@ -148,7 +148,7 @@ LegPoses = [
 	('deformLimb', 'Foot_L', 'FootIK_L', (1,1,1), 'FootFK_L', (1,1,1), 0, 0),
 	('deformLimb', 'Toe_L', 'ToeIK_L', (1,1,1), 'ToeFK_L', (1,1,1), 0, 0),
 
-	('deformLimb', 'UpLeg_R', 'UpLegIK_R', (1,1,1), 'UpLegFK_R', (1,0,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH),
+	('deformLimb', 'UpLeg_R', 'UpLegIK_R', (1,1,1), 'UpLegFK_R', (1,1,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH),
 	('deformLimb', 'LoLeg_R', 'LoLegIK_R', (1,1,1), 'LoLegFK_R', (1,1,1), 0, P_STRETCH),
 	('deformLimb', 'Foot_R', 'FootIK_R', (1,1,1), 'FootFK_R', (1,1,1), 0, 0),
 	('deformLimb', 'Toe_R', 'ToeIK_R', (1,1,1), 'ToeFK_R', (1,1,1), 0, 0),

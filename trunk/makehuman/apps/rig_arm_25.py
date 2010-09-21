@@ -163,7 +163,7 @@ ArmPoses = [
 	('ikHandle', 'ScapulaIK_R', 'MHCube01', None),
 
 	# FK
-	('poseBone', 'UpArmFK_L', 'MHCircle025', 'FK_L', (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
+	('poseBone', 'UpArmFK_L', 'MHCircle025', 'FK_L', (1,1,1), (0,1,0), (0,0,0), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_L, (True, True, True)])]),
 
 	('poseBone', 'LoArmFK_L', 'MHCircle025', 'FK_L', (1,1,1), (1,0,0), (0,0,0), (1,1,1), 0,
@@ -173,7 +173,7 @@ ArmPoses = [
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_L, (True, True, True)])]),
 		
 
-	('poseBone', 'UpArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
+	('poseBone', 'UpArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,1,0), (0,0,0), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_R, (True, True, True)])]),
 
 	('poseBone', 'LoArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (1,0,0), (0,0,0), (1,1,1), 0, 
@@ -185,10 +185,10 @@ ArmPoses = [
 
 	# IK
 
-	('poseBone', 'UpArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+	('poseBone', 'UpArmIK_L', None, 'IK_L', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_L, (True, True, True)])]),
 
-	('poseBone', 'LoArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+	('poseBone', 'LoArmIK_L', None, 'IK_L', (1,1,1), (1,0,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'HandIK_L', 2, None, (True, False,True), 1.0]),
 		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['CopyRotY', 'HandIK_L', 1.0, (0,1,0), (0,0,0), False]),
 		#('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_L, (True, True, True)])
@@ -199,10 +199,11 @@ ArmPoses = [
 		('ChildOf', C_CHILDOF, ['Shoulder', 'Clavicle_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, ['Clavicle_L', 'fNoStretch', 'Clavicle_L'])]),
 
-	('poseBone', 'UpArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+
+	('poseBone', 'UpArmIK_R', None, 'IK_R', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_R, (True, True, True)])]),
 
-	('poseBone', 'LoArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+	('poseBone', 'LoArmIK_R', None, 'IK_R', (1,1,1), (1,0,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('IK', 0, ['IK', 'HandIK_R', 2, None, (True, False,True), 1.0]),
 		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['CopyRotY', 'HandIK_R', 1.0, (0,1,0), (0,0,0), False]),
 		#('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_R, (True, True, True)])
