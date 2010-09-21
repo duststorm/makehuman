@@ -147,7 +147,7 @@ def pushTargetInBuffer(obj, targetPath):
 
     targetBuffer[targetPath] = Target(obj, targetPath)
 
-    print 'Buffer time', time.time() - t1
+    #print 'Buffer time', time.time() - t1
 
 
 def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1):
@@ -751,7 +751,7 @@ def loadVertsColors(obj, colorsPath, update=1, mode='new'):
         if update:
             f.updateColors()
 
-    print 'Time to apply colors ', time.time() - t1
+    #print 'Time to apply colors ', time.time() - t1
 
 
 def saveVertsColorsFromBitmap(obj, imagePath):
