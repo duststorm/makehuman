@@ -22,7 +22,7 @@ TO DO
 
 """
 
-import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, mhx_rig, rig_panel_25, mh2proxy
+import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, rig_panel_25, mhx_rig, mh2proxy
 import os
 
 MAJOR_VERSION = 0
@@ -292,7 +292,9 @@ def writeShapeKeys(fp, name, proxy):
 	copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxy)	
 	copyProxy("data/templates/shapekeys-body25.mhx", fp, proxy)
 	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
-	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceDrivers)
+	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
+	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
+	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
 	fp.write("  end AnimationData\n")
 	fp.write("end ShapeKeys\n")
 	return

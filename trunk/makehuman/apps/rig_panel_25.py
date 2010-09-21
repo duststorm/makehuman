@@ -146,7 +146,7 @@ PanelPoses = [
 #	Face representation
 #
 
-FaceDrivers = {
+FaceShapeDrivers = {
 	# Brows
 	'BrowsMidDown' : ('PBrows', 'LOC_Z', pos),
 	'BrowsMidUp' : ('PBrows', 'LOC_Z', neg),
@@ -195,5 +195,63 @@ FaceDrivers = {
 	'LoLipUp_R' : ('PLoLip_R', 'LOC_Z', neg), 
 	'LoLipDown_L' : ('PLoLip_L', 'LOC_Z', pos), 
 	'LoLipDown_R' : ('PLoLip_R', 'LOC_Z', pos), 
+}
+
+#
+#	ArmShapeDrivers
+#	Shape : (Driver, channel, (min, max))
+#
+
+ArmShapeDrivers = {
+	'BendElbowForward_L' : ( pi/2, 
+		('PArmIK_L', 'LOC_X', pos), 
+		('LoArmFK_L', 'ROT_X', (0, deg90)), 
+		('LoArmIK_L', 'ROT_X', (0, deg90)) ),
+	'BendArmUp_L' : ( pi/2, 
+		('PArmIK_L', 'LOC_X', pos), 
+		('UpArmFK_L', 'ROT_X', (0, deg90)), 
+		('UpArmIK_L', 'ROT_X', (0, deg90)) ),
+	'BendArmDown_L' : ( pi/2, 
+		('PArmIK_L', 'LOC_X', pos), 
+		('UpArmFK_L', 'ROT_X', (-deg90, 0)), 
+		('UpArmIK_L', 'ROT_X', (-deg90, 0)) ),
+
+	'BendElbowForward_R' : ( pi/2, 
+		('PArmIK_R', 'LOC_X', pos), 
+		('LoArmFK_R', 'ROT_X', (0, deg90)), 
+		('LoArmIK_R', 'ROT_X', (0, deg90)) ),
+	'BendArmUp_R' : ( pi/2, 
+		('PArmIK_R', 'LOC_X', pos), 
+		('UpArmFK_R', 'ROT_X', (0, deg90)), 
+		('UpArmIK_R', 'ROT_X', (0, deg90)) ),
+	'BendArmDown_R' : ( pi/2, 
+		('PArmIK_R', 'LOC_X', pos), 
+		('UpArmFK_R', 'ROT_X', (-deg90, 0)), 
+		('UpArmIK_R', 'ROT_X', (-deg90, 0)) ),
+}
+
+#
+#	LegShapeDrivers
+#	Shape : (Driver, channel, (min, max))
+#
+
+LegShapeDrivers = {
+	'BendKneeBack_L' : ( pi/2, 
+		('PLegIK_L', 'LOC_X', pos), 
+		('LoLegFK_L', 'ROT_X', (0, deg90)), 
+		('LoLegIK_L', 'ROT_X', (0, deg90)) ),
+	'BendLegForward_L' : ( pi/2, 
+		('PLegIK_L', 'LOC_X', pos), 
+		('UpLegFK_L', 'ROT_X', (0, deg90)), 
+		('UpLegIK_L', 'ROT_X', (0, deg90)) ),
+
+	'BendKneeBack_R' : ( pi/2, 
+		('PLegIK_R', 'LOC_X', pos), 
+		('LoLegFK_R', 'ROT_X', (0, deg90)), 
+		('LoLegIK_R', 'ROT_X', (0, deg90)) ),
+	'BendLegForward_R' : ( pi/2, 
+		('PLegIK_R', 'LOC_X', pos), 
+		('UpLegFK_R', 'ROT_X', (0, deg90)), 
+		('UpLegIK_R', 'ROT_X', (0, deg90)) ),
 }
 

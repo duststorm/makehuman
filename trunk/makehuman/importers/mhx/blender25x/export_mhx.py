@@ -1570,13 +1570,13 @@ def exportPoseBone(fp, pb):
 	fp.write("\n  Posebone %s True\n" % (pb.name.replace(' ', '_')))
 	for cns in pb.constraints:
 		exportConstraint(cns, fp)
-	writeArray('ik_dof', [pb.ik_dof_x, pb.ik_dof_y, pb.ik_dof_z], "    ", 1, fp)
-	writeArray('ik_limit', [pb.ik_limit_x, pb.ik_limit_y, pb.ik_limit_z], "    ", 1, fp)
+	writeArray('lock_ik', [pb.lock_ik_x, pb.lock_ik_y, pb.lock_ik_z], "    ", 1, fp)
+	writeArray('use_ik_limit', [pb.use_ik_limit_x, pb.use_ik_limit_y, pb.use_ik_limit_z], "    ", 1, fp)
 	writeArray('ik_max', [pb.ik_max_x, pb.ik_max_y, pb.ik_max_z], "    ", 1, fp)
 	writeArray('ik_min', [pb.ik_min_x, pb.ik_min_y, pb.ik_min_z], "    ", 1, fp)
 	writeArray('ik_stiffness', [pb.ik_stiffness_x, pb.ik_stiffness_y, pb.ik_stiffness_z], "    ", 1, fp)
-	exclude = ['constraints', 'ik_dof_x', 'ik_dof_y', 'ik_dof_z', 
-		'ik_limit_x', 'ik_limit_y', 'ik_limit_z', 
+	exclude = ['constraints', 'lock_ik_x', 'lock_ik_y', 'lock_ik_z', 
+		'use_ik_limit_x', 'use_ik_limit_y', 'use_ik_limit_z', 
 		'ik_max_x', 'ik_max_y', 'ik_max_z', 
 		'ik_min_x', 'ik_min_y', 'ik_min_z', 
 		'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',

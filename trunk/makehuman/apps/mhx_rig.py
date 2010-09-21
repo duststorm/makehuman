@@ -1041,7 +1041,7 @@ def writeFCurves(fp, name, quats):
 #
 #	writeFkIkSwitch(fp, drivers)
 #	writeDrivers(fp, cond, drivers):
-#	writeDriver(fp, cond, extra, channel, index, coeffs, variables):
+#	writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 #
 
 def writeFkIkSwitch(fp, drivers):
@@ -1051,9 +1051,9 @@ def writeFkIkSwitch(fp, drivers):
 		else:
 			cnsData = ("ik", 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)])
 		for cnsName in cnsFK:
-			writeDriver(fp, cond, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (1,-1), [cnsData])
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (1,-1), [cnsData])
 		for cnsName in cnsIK:
-			writeDriver(fp, cond, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), [cnsData])
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), [cnsData])
 
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 
@@ -1062,31 +1062,53 @@ def writeShapeDrivers(fp, drivers):
 		drvVars = []
 		(targ, channel, coeff) = vlist
 		drvVars.append( (targ, 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)]) )
-		writeDriver(fp, True, "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+		writeDriver(fp, True, 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+	return
+
+def writeFKIKShapeDrivers(fp, drivers):
+	for (shape, data) in drivers.items():
+		(scale, fkik, fklist, iklist) = data
+		drvVars = []
+		vnames = ['x', 'fk', 'ik']
+		vlists = [fkik, fklist, iklist]
+		for n in range(3):
+			vname = vnames[n]
+			(targ, channel, coeff) = vlists[n]
+			drvVars.append( (vname, 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)]) )
+		writeDriver(fp, True, ('SCRIPTED', '(x*ik+(1-x)*fk)/%.4f' % scale), "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
 def writeDrivers(fp, cond, drivers):
 	for drv in drivers:
 		(bone, typ, name, index, coeffs, variables) = drv
 		if typ == 'INFL':
-			writeDriver(fp, cond, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
 		elif typ == 'ROTE':
-			writeDriver(fp, cond, "", "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
 		elif typ == 'ROTQ':
-			writeDriver(fp, cond, "", "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
 		elif typ == 'LOC':
-			writeDriver(fp, cond, "*theScale", "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, 'AVERAGE', "*theScale", "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
 		elif typ == 'SCALE':
-			writeDriver(fp, cond, "", "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
 		else:
 			print drv
 			raise NameError("Unknown driver type %s" % typ)
 
-def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
+def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 	loc = False
+	try:
+		(drvtype, expr) = drvdata
+	except:
+		drvtype = drvdata
+
 	fp.write("\n"+
 "    FCurve %s %d %s\n" % (channel, index, cond) +
-"      Driver AVERAGE\n")
+"      Driver %s\n" % drvtype )
+
+	if drvtype == 'SCRIPTED':
+		fp.write("        expression '%s' ;\n" % expr)
+
 	for (var, typ, targets) in variables:
 		fp.write("        DriverVariable %s %s\n" % (var,typ))
 
@@ -1113,31 +1135,36 @@ def writeDriver(fp, cond, extra, channel, index, coeffs, variables):
 			raise NameError("Unknown driver type %s" % typ)
 
 		fp.write("        end DriverVariable\n")
+
 	fp.write(
 "        show_debug_info True ;\n" +
 "      end Driver\n")
 
-	fp.write(
+	if drvtype == 'AVERAGE':
+		fp.write(
 "      FModifier GENERATOR \n" +
 "        active False ;\n" +
 "        use_additive False ;\n")
 
-	(a0,a1) = coeffs
-	if loc:
-		fp.write("        coefficients Array %s %s*One%s ;\n" % (a0,a1,extra))
-	else:
-		fp.write("        coefficients Array %s %s%s ;\n" % (a0,a1,extra))
+		(a0,a1) = coeffs
+		if loc:
+			fp.write("        coefficients Array %s %s*One%s ;\n" % (a0,a1,extra))
+		else:
+			fp.write("        coefficients Array %s %s%s ;\n" % (a0,a1,extra))
 
-	fp.write(
+		fp.write(
 "        show_expanded True ;\n" +
 "        mode 'POLYNOMIAL' ;\n" +
 "        mute False ;\n" +
 "        poly_order 1 ;\n" +
-"      end FModifier\n" +
+"      end FModifier\n")
+
+	fp.write(
 "      extrapolation 'CONSTANT' ;\n" +
 "      lock False ;\n" +
 "      select False ;\n" +
 "    end FCurve\n")
+
 	return
 
 #

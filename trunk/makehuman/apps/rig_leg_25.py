@@ -258,10 +258,7 @@ LegDrivers = [
 	("Toe_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X"),
 
 ]
-'''
-	("LegIK_L", True, "World", "Local", "PFootLocal_L", "LOC_X"),
-	("LegIK_R", True, "World", "Local", "PFootLocal_R", "LOC_X"),
-'''
+
 #
 #	LegProcess
 #	(bone, axis, angle)
