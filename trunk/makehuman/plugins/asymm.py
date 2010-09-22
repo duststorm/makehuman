@@ -6,6 +6,7 @@ import gui3d
 import os
 import random
 import algos3d
+import mh
 
 
 class AsymmTaskView(gui3d.TaskView):
@@ -55,6 +56,39 @@ def load(app):
     category = app.getCategory('Advanced','button_advance.png','button_advance_on.png')
     taskview = AsymmTaskView(category)
     print 'Asymm loaded'
+
+    #Zoom the camera
+
+    @taskview.event
+    def onMouseWheel(event):
+        if event.wheelDelta > 0:
+            mh.cameras[0].eyeZ -= 0.65
+            app.scene3d.redraw()
+        else:
+            mh.cameras[0].eyeZ += 0.65
+            app.scene3d.redraw()
+
+    @taskview.event
+    def onMouseDragged(event):
+        diff = app.scene3d.getMouseDiff()
+        leftButtonDown = event.button & 1
+        middleButtonDown = event.button & 2
+        rightButtonDown = event.button & 4
+
+        if leftButtonDown and rightButtonDown or middleButtonDown:
+            mh.cameras[0].eyeZ += 0.05 * diff[1]
+        elif leftButtonDown:
+            human = app.scene3d.selectedHuman
+            rot = human.getRotation()
+            rot[0] += 0.5 * diff[1]
+            rot[1] += 0.5 * diff[0]
+            human.setRotation(rot)
+        elif rightButtonDown:
+            human = app.scene3d.selectedHuman
+            trans = human.getPosition()
+            trans[0] += 0.1 * diff[0]
+            trans[1] -= 0.1 * diff[1]
+            human.setPosition(trans)
 
 
 
