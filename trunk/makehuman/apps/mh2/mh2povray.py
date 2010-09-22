@@ -48,6 +48,7 @@ import subprocess
 import mh2povray_ini
 import hairgenerator
 import random
+from math import atan2, pi, sqrt
 
 # Create an instance of the Hairgenerator class with a global context.
 
@@ -595,13 +596,16 @@ def povrayCameraData(camera, resolution, outputFileDescriptor):
   outputFileDescriptor:
       *file descriptor*. The file to which the camera settings need to be written. 
   """
+    vx = camera.focusX - camera.eyeX;
+    vy = camera.focusY - camera.eyeY;
+    vz = camera.focusZ - camera.eyeZ;
 
     outputFileDescriptor.write('// MakeHuman Camera and Viewport Settings. \n')
     outputFileDescriptor.write('#declare MakeHuman_CameraX     = %s;\n' % camera.eyeX)
     outputFileDescriptor.write('#declare MakeHuman_CameraY     = %s;\n' % camera.eyeY) # might be -camera.eyeY
     outputFileDescriptor.write('#declare MakeHuman_CameraZ     = %s;\n' % camera.eyeZ)
-    outputFileDescriptor.write('#declare MakeHuman_CameraXRot  = %s;\n' % 0.0) # actually acos(eye . focus) * 180 / pi
-    outputFileDescriptor.write('#declare MakeHuman_CameraYRot  = %s;\n' % 0.0) # since up is always up
+    outputFileDescriptor.write('#declare MakeHuman_CameraXRot  = %s;\n' % (atan2(vx, vz) * 180 / pi))
+    outputFileDescriptor.write('#declare MakeHuman_CameraYRot  = %s;\n' % (atan2(vy, sqrt(vx*vx+vz*vz)) * 180 / pi))
     outputFileDescriptor.write('#declare MakeHuman_CameraFOV   = %s;\n' % camera.fovAngle)
     outputFileDescriptor.write('#declare MakeHuman_ImageHeight = %s;\n' % resolution[1])
     outputFileDescriptor.write('#declare MakeHuman_ImageWidth  = %s;\n' % resolution[0])
