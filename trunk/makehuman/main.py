@@ -217,6 +217,17 @@ class MHApplication(gui3d.Application):
     @category.button.event
     def onClicked(event):
       self.stop()
+      
+    self.globalButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 560, 9.2], label="Global cam")
+    self.faceButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 585, 9.2], label="Face cam")
+    
+    @self.globalButton.event
+    def onClicked(event):
+      self.app.setGlobalCamera()
+      
+    @self.faceButton.event
+    def onClicked(event):
+      self.app.setFaceCamera()
 
     self.switchCategory("Modelling")
 

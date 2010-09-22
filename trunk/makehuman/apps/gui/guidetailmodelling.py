@@ -688,17 +688,6 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
             self.parent.tasksByName['Micro modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
-            
-        self.globalButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 480, 9.2], label="Global cam")
-        self.faceButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 500, 9.2], label="Face cam")
-        
-        @self.globalButton.event
-        def onClicked(event):
-          self.app.setGlobalCamera()
-          
-        @self.faceButton.event
-        def onClicked(event):
-          self.app.setFaceCamera()
 
     def onShow(self, event):
         self.app.tool = self.tool
