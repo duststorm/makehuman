@@ -228,10 +228,12 @@ def povrayExportArray(obj, camera, resolution, path):
 
 ''')
 
+    faces = [f for f in obj.faces if not 'joint-' in f.group.name]
+
   # UV Vectors - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % (len(obj.faces) * 3))
-    for f in obj.faces:
+    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % (len(faces) * 3))
+    for f in faces:
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[0]][0], obj.uvValues[f.uv[0]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[1]][0], obj.uvValues[f.uv[1]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[2]][0], obj.uvValues[f.uv[2]][1]))
@@ -245,8 +247,8 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # Faces - Write a POV-Ray array of arrays to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_FaceArray = array[%s][3] {\n  ' % len(obj.faces))
-    for f in obj.faces:
+    outputFileDescriptor.write('#declare MakeHuman_FaceArray = array[%s][3] {\n  ' % len(faces))
+    for f in faces:
         outputFileDescriptor.write('{%s,%s,%s}' % (f.verts[0].idx, f.verts[1].idx, f.verts[2].idx))
     outputFileDescriptor.write('''
 }
@@ -269,8 +271,8 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # FaceGroupIndex - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_FaceGroupIndexArray = array[%s] {\n  ' % len(obj.faces))
-    for f in obj.faces:
+    outputFileDescriptor.write('#declare MakeHuman_FaceGroupIndexArray = array[%s] {\n  ' % len(faces))
+    for f in faces:
         outputFileDescriptor.write('%s,' % faceGroupIndex[f.group.name])
     outputFileDescriptor.write('''
 }
@@ -279,8 +281,8 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # UV Indices for each face - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVIndexArray = array[%s][3] {\n  ' % len(obj.faces))
-    for f in obj.faces:
+    outputFileDescriptor.write('#declare MakeHuman_UVIndexArray = array[%s][3] {\n  ' % len(faces))
+    for f in faces:
         outputFileDescriptor.write('{%s,%s,%s}' % (f.idx * 3, f.idx * 3 + 1, f.idx * 3 + 2))
     outputFileDescriptor.write('''
 }
@@ -490,11 +492,13 @@ def povrayExportMesh2(obj, camera, resolution, path):
 
 ''')
 
+    faces = [f for f in obj.faces if not 'joint-' in f.group.name]
+
   # UV Vectors - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % (len(obj.faces) * 3))
-    for f in obj.faces:
+    outputFileDescriptor.write('    %s\n  ' % (len(faces) * 3))
+    for f in faces:
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[0]][0], obj.uvValues[f.uv[0]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[1]][0], obj.uvValues[f.uv[1]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[2]][0], obj.uvValues[f.uv[2]][1]))
@@ -506,8 +510,8 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # Faces - Write a POV-Ray array of arrays to the output stream
 
     outputFileDescriptor.write('  face_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(obj.faces))
-    for f in obj.faces:
+    outputFileDescriptor.write('    %s\n  ' % len(faces))
+    for f in faces:
         outputFileDescriptor.write('<%s,%s,%s>' % (f.verts[0].idx, f.verts[1].idx, f.verts[2].idx))
     outputFileDescriptor.write('''
   }
@@ -517,8 +521,8 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # UV Indices for each face - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(obj.faces))
-    for f in obj.faces:
+    outputFileDescriptor.write('    %s\n  ' % len(faces))
+    for f in faces:
         outputFileDescriptor.write('<%s,%s,%s>' % (f.idx * 3, f.idx * 3 + 1, f.idx * 3 + 2))
     outputFileDescriptor.write('''
   }
