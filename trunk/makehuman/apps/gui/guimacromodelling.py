@@ -3,7 +3,7 @@
 import gui3d, time
 import animation3d
 import humanmodifier
-
+import mh
 
 class MacroAction:
 
@@ -283,7 +283,31 @@ class MacroModelingTaskView(gui3d.TaskView):
                 self.app.switchCategory('Library')
                 self.app.switchTask('Background')
             self.app.scene3d.redraw(1)
+            
+        self.anaglyphsButton = gui3d.ToggleButton(category, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_3dglasses.png'),
+                                       selectedTexture=self.app.getThemeResource('images', 'button_3dglasses_on.png'), position=[68, 522, 9.1])
 
+        @self.anaglyphsButton.event
+        def onClicked(event):
+            stereoMode = mh.cameras[0].stereoMode
+            stereoMode += 1
+            if stereoMode > 2:
+                stereoMode = 0
+            mh.cameras[0].stereoMode = stereoMode
+            
+            # We need a black background for stereo
+            background = self.app.categories["Modelling"].tasksByName["Macro modelling"].background
+            if stereoMode:
+                color = [  0,   0,   0, 255]
+                self.anaglyphsButton.setSelected(True)
+            else:
+                color = [100, 100, 100, 255]
+                self.anaglyphsButton.setSelected(False)
+            for g in background.mesh.facesGroups:
+                g.setColor(color)
+
+            self.app.scene3d.redraw()
+            
     # Ethnics buttons
         '''
         self.ethnicsGroup = []

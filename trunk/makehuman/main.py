@@ -265,8 +265,10 @@ class MHApplication(gui3d.Application):
           background = self.app.categories["Modelling"].tasksByName["Macro modelling"].background
           if stereoMode:
             color = [  0,   0,   0, 255]
+            self.app.categories["Modelling"].tasksByName["Macro modelling"].anaglyphsButton.setSelected(True)
           else:
             color = [100, 100, 100, 255]
+            self.app.categories["Modelling"].tasksByName["Macro modelling"].anaglyphsButton.setSelected(False)
           for g in background.mesh.facesGroups:
             g.setColor(color)
 
