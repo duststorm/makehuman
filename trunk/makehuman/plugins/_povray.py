@@ -41,8 +41,7 @@ def load(app):
       # Only process the humanoid figure
 
             if obj.name == 'base.obj':
-                cameraData = app.scene3d.getCameraSettings()
-                mh2povray.povrayExport(obj, cameraData)
+                mh2povray.povrayExport(obj, app.modelCamera, app.scene3d.getWindowSize())
 
     print 'povray loaded'
 

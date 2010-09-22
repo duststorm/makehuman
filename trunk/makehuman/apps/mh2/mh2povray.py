@@ -54,7 +54,7 @@ import random
 hairsClass = hairgenerator.Hairgenerator()
 
 
-def povrayExport(obj, cameraSettings):
+def povrayExport(obj, camera, resolution):
     """
   This function exports data in a format that can be used to reconstruct the humanoid 
   object in POV-Ray. It supports a range of options that can be specified in the Python 
@@ -68,12 +68,8 @@ def povrayExport(obj, cameraSettings):
       *3D object*. The object to export. This should be the humanoid object with
       uv-mapping data and Face Groups defined.
 
-  cameraSettings:
-      *list of floats*. A list of float values conveying camera and image related 
-      information. This includes the position, orientation and field of view of the
-      camera along with the screen dimensions from MakeHuman. These values are passed 
-      along to POV-Ray as variables so that the default rendered image can mimic the
-      image last displayed in MakeHuman. 
+  camera:
+      *Camera object*. The camera to render from 
   
   """
 
@@ -90,9 +86,9 @@ def povrayExport(obj, cameraSettings):
   # or the more flexible but slower array and macro combo is to be generated.
 
     if mh2povray_ini.format == 'array':
-        povrayExportArray(obj, cameraSettings, path)
+        povrayExportArray(obj, camera, resolution, path)
     if mh2povray_ini.format == 'mesh2':
-        povrayExportMesh2(obj, cameraSettings, path)
+        povrayExportMesh2(obj, camera, resolution, path)
 
     outputDirectory = os.path.dirname(path)
 
@@ -120,7 +116,7 @@ def povrayExport(obj, cameraSettings):
         pathHandle = subprocess.Popen(cwd=outputDirectory, args=mh2povray_ini.povray_path + ' ' + cmdLineOpt + baseName)
 
 
-def povrayExportArray(obj, cameraSettings, path):
+def povrayExportArray(obj, camera, resolution, path):
     """
   This function exports data in the form of arrays of data the can be used to 
   reconstruct a humanoid object using some very simple POV-Ray macros. These macros 
@@ -142,12 +138,8 @@ def povrayExportArray(obj, cameraSettings, path):
       *3D object*. The object to export. This should be the humanoid object with
       uv-mapping data and Face Groups defined.
   
-  cameraSettings:
-      *list of floats*. A list of float values conveying camera and image related 
-      information. This includes the position, orientation and field of view of the
-      camera along with the screen dimensions from MakeHuman. These values are passed 
-      along to POV-Ray as variables so that the default rendered image can mimic the
-      image last displayed in MakeHuman. 
+  camera:
+      *Camera object*. The camera to render from. 
   
   path:
       *string*. The file system path to the output files that need to be generated. 
@@ -206,9 +198,9 @@ def povrayExportArray(obj, cameraSettings, path):
 ''')
     headerFileDescriptor.close()
 
-  # Declare POV_Ray variables containing the current makehuman camera settings.
+  # Declare POV_Ray variables containing the current makehuman camera.
 
-    povrayCameraData(cameraSettings, outputFileDescriptor)
+    povrayCameraData(camera, resolution, outputFileDescriptor)
 
   # Calculate some useful values and add them to the output as POV-Ray variable
   # declarations so they can be readily accessed from a POV-Ray scene file.
@@ -390,7 +382,7 @@ def povrayExportArray(obj, cameraSettings, path):
     print 'Sample POV-Ray scene file generated: ', outputSceneFile
 
 
-def povrayExportMesh2(obj, cameraSettings, path):
+def povrayExportMesh2(obj, camera, resolution, path):
     """
   This function exports data in the form of a mesh2 humanoid object. The POV-Ray 
   file generated is fairly inflexible, but is highly efficient. 
@@ -402,12 +394,8 @@ def povrayExportMesh2(obj, cameraSettings, path):
       *3D object*. The object to export. This should be the humanoid object with
       uv-mapping data and Face Groups defined.
   
-  cameraSettings:
-      *list of floats*. A list of float values conveying camera and image related 
-      information. This includes the position, orientation and field of view of the
-      camera along with the screen dimensions from MakeHuman. These values are passed 
-      along to POV-Ray as variables so that the default rendered image can mimic the
-      image last displayed in MakeHuman. 
+  camera:
+      *Camera object*. The camera to render from. 
   
   path:
       *string*. The file system path to the output files that need to be generated. 
@@ -465,9 +453,9 @@ def povrayExportMesh2(obj, cameraSettings, path):
 ''')
     headerFileDescriptor.close()
 
-  # Declare POV_Ray variables containing the current makehuman camera settings.
+  # Declare POV_Ray variables containing the current makehuman camera.
 
-    povrayCameraData(cameraSettings, outputFileDescriptor)
+    povrayCameraData(camera, resolution, outputFileDescriptor)
 
   # Calculate some useful values and add them to the output as POV-Ray variable
   # declarations so they can be readily accessed from a POV-Ray scene file.
@@ -590,7 +578,7 @@ def povrayExportMesh2(obj, cameraSettings, path):
     print 'Sample POV-Ray scene file generated: ', outputSceneFile
 
 
-def povrayCameraData(cameraSettings, outputFileDescriptor):
+def povrayCameraData(camera, resolution, outputFileDescriptor):
     """
   This function outputs standard camera data common to all POV-Ray format exports. 
 
@@ -609,14 +597,14 @@ def povrayCameraData(cameraSettings, outputFileDescriptor):
   """
 
     outputFileDescriptor.write('// MakeHuman Camera and Viewport Settings. \n')
-    outputFileDescriptor.write('#declare MakeHuman_CameraX     = %s;\n' % cameraSettings[0])
-    outputFileDescriptor.write('#declare MakeHuman_CameraY     = %s;\n' % cameraSettings[1])
-    outputFileDescriptor.write('#declare MakeHuman_CameraZ     = %s;\n' % cameraSettings[2])
-    outputFileDescriptor.write('#declare MakeHuman_CameraXRot  = %s;\n' % cameraSettings[3])
-    outputFileDescriptor.write('#declare MakeHuman_CameraYRot  = %s;\n' % cameraSettings[4])
-    outputFileDescriptor.write('#declare MakeHuman_CameraFOV   = %s;\n' % cameraSettings[5])
-    outputFileDescriptor.write('#declare MakeHuman_ImageHeight = %s;\n' % cameraSettings[6])
-    outputFileDescriptor.write('#declare MakeHuman_ImageWidth  = %s;\n' % cameraSettings[7])
+    outputFileDescriptor.write('#declare MakeHuman_CameraX     = %s;\n' % camera.eyeX)
+    outputFileDescriptor.write('#declare MakeHuman_CameraY     = %s;\n' % camera.eyeY) # might be -camera.eyeY
+    outputFileDescriptor.write('#declare MakeHuman_CameraZ     = %s;\n' % camera.eyeZ)
+    outputFileDescriptor.write('#declare MakeHuman_CameraXRot  = %s;\n' % 0.0) # actually acos(eye . focus) * 180 / pi
+    outputFileDescriptor.write('#declare MakeHuman_CameraYRot  = %s;\n' % 0.0) # since up is always up
+    outputFileDescriptor.write('#declare MakeHuman_CameraFOV   = %s;\n' % camera.fovAngle)
+    outputFileDescriptor.write('#declare MakeHuman_ImageHeight = %s;\n' % resolution[1])
+    outputFileDescriptor.write('#declare MakeHuman_ImageWidth  = %s;\n' % resolution[0])
     outputFileDescriptor.write('''
 
 ''')
@@ -686,7 +674,7 @@ def povrayWriteHairs(outputDirectory, mesh):
   mesh:
       *mesh object*. The humanoid mesh object to which hair is added. 
   """
-
+    return # This code needs to be updated
     print 'Writing hair'
 
     hairsClass.humanVerts = mesh.verts
