@@ -1062,7 +1062,7 @@ def writeShapeDrivers(fp, drivers):
 		drvVars = []
 		(targ, channel, coeff) = vlist
 		drvVars.append( (targ, 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)]) )
-		writeDriver(fp, True, 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+		writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
 def writeFKIKShapeDrivers(fp, drivers):
@@ -1075,7 +1075,7 @@ def writeFKIKShapeDrivers(fp, drivers):
 			vname = vnames[n]
 			(targ, channel, coeff) = vlists[n]
 			drvVars.append( (vname, 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)]) )
-		writeDriver(fp, True, ('SCRIPTED', '(x*ik+(1-x)*fk)/%.4f' % scale), "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+		writeDriver(fp, 'toggle&T_Shape', ('SCRIPTED', '(x*ik+(1-x)*fk)/%.4f' % scale), "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
 def writeDrivers(fp, cond, drivers):

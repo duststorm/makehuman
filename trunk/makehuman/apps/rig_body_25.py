@@ -80,7 +80,7 @@ BodyPoses = [
 
 	('poseBone', 'Root', 'MHCube05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints),
 
-	('poseBone', 'Hips', 'MHHips', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Hips', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
 	('poseBone', 'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 

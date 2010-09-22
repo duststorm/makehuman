@@ -240,18 +240,20 @@ LegShapeDrivers = {
 		('PLegIK_L', 'LOC_X', pos), 
 		('LoLegFK_L', 'ROT_X', (0, deg90)), 
 		('LoLegIK_L', 'ROT_X', (0, deg90)) ),
-	'BendLegForward_L' : ( -pi/2, 
-		('PLegIK_L', 'LOC_X', pos), 
-		('UpLegFK_L', 'ROT_X', (0, deg90)), 
-		('UpLegIK_L', 'ROT_X', (0, deg90)) ),
 
 	'BendKneeBack_R' : ( pi/2, 
 		('PLegIK_R', 'LOC_X', pos), 
 		('LoLegFK_R', 'ROT_X', (0, deg90)), 
 		('LoLegIK_R', 'ROT_X', (0, deg90)) ),
+}
+
+"""
+	'BendLegForward_L' : ( -pi/2, 
+		('PLegIK_L', 'LOC_X', pos), 
+		('UpLegFK_L', 'ROT_X', (0, deg90)), 
+		('UpLegIK_L', 'ROT_X', (0, deg90)) ),
 	'BendLegForward_R' : ( -pi/2, 
 		('PLegIK_R', 'LOC_X', pos), 
 		('UpLegFK_R', 'ROT_X', (0, deg90)), 
 		('UpLegIK_R', 'ROT_X', (0, deg90)) ),
-}
-
+"""
