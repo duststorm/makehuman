@@ -9,6 +9,9 @@ FaceJoints = [
 	('head-end',			'l', ((2.0, 'head'), (-1.0, 'neck'))),
 	('mouth',			'j', 'mouth'),
 	('jaw',				'j', 'jaw'),
+	
+	('r-mouth',			'v', 2490),
+	('l-mouth',			'v', 8907),
 
 	('tongue-1',			'j', 'tongue-1'),
 	('tongue-2',			'j', 'tongue-2'),

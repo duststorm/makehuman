@@ -5,8 +5,8 @@ def printVertNums():
 	print("Verts in ", ob)
 	#bpy.ops.object.mode_set('OBJECT')
 	me = ob.data
-	for v in me.verts:
-		if v.selected:
+	for v in me.vertices:
+		if v.select:
 			print(v.index)
 	print("End")
 	#bpy.ops.object.mode_set('EDIT')
@@ -16,13 +16,13 @@ def selectQuads():
 	me = ob.data
 	for f in me.faces:
 		if len(f.verts) == 4:
-			f.selected = True
+			f.select = True
 		else:
-			f.selected = False
+			f.select = False
 	return
 	
-#printVertNums()
-selectQuads()
+printVertNums()
+#selectQuads()
 
 
 

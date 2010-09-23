@@ -229,10 +229,11 @@ def printProxy(path, faces):
 	file = os.path.expanduser(path)
 	fp= open(file, "w")
 
-	fp.write("Verts\n")
+	fp.write("# name MyName\n# verts\n")
 	for (pv, verts, wts) in faces:
 		print(pv.index,verts,wts)
 		fp.write("%5d %5d %5d %.5f %.5f %.5f\n" % (verts[0], verts[1], verts[2], wts[0], wts[1], wts[2]))
+	fp.write("# objData\n")
 
 	'''
 	proxy =  bpy.data.objects['Proxy'].data

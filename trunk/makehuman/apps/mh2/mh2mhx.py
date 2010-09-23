@@ -149,36 +149,36 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
 	ignoreLine = False
 	for line in tmpl:
-		lineSplit= line.split()
-		if len(lineSplit) == 0:
+		words= line.split()
+		if len(words) == 0:
 			fp.write(line)
-		elif lineSplit[0] == '***':
+		elif words[0] == '***':
 			if ignoreLine:
-				if lineSplit[1] == 'EndIgnore':
+				if words[1] == 'EndIgnore':
 					ignoreLine = False
-			elif lineSplit[1] == 'Bone':
-				bone = lineSplit[2]
+			elif words[1] == 'Bone':
+				bone = words[2]
 				fp.write("    Bone %s\n" % bone)
-			#elif lineSplit[1] == 'Rigify':
+			#elif words[1] == 'Rigify':
 			#	mhxbones_rigify.writeBones(obj, fp)
-			elif lineSplit[1] == 'head':
+			elif words[1] == 'head':
 				(x, y, z) = mhxbones.boneHead[bone]
 				fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
-			elif lineSplit[1] == 'tail':
+			elif words[1] == 'tail':
 				(x, y, z) = mhxbones.boneTail[bone]
 				fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
-			elif lineSplit[1] == 'roll':
+			elif words[1] == 'roll':
 				(x, y) = mhxbones.boneRoll[bone]
 				fp.write("    roll %.6g ;\n" % (y))
-			elif lineSplit[1] == 'rig-bones':
+			elif words[1] == 'rig-bones':
 				mhx_rig.writeAllArmatures(fp)
-			elif lineSplit[1] == 'rig-poses':
+			elif words[1] == 'rig-poses':
 				mhx_rig.writeAllPoses(fp)
-			elif lineSplit[1] == 'rig-actions':
+			elif words[1] == 'rig-actions':
 				mhx_rig.writeAllActions(fp)
-			elif lineSplit[1] == 'rig-drivers':
+			elif words[1] == 'rig-drivers':
 				mhx_rig.writeAllDrivers(fp)
-			elif lineSplit[1] == 'rig-process':
+			elif words[1] == 'rig-process':
 				fp.write("\n  ApplyArmature HumanMesh ;\n")
 				for proxy in proxyData.values():
 					if proxy.name and not proxy.bones:
@@ -188,7 +188,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 				for proxy in proxyData.values():
 					if proxy.name and not proxy.bones:
 						mhx_rig.reapplyArmature(fp, proxy.name)
-			elif lineSplit[1] == 'ProxyRigStart':
+			elif words[1] == 'ProxyRigStart':
 				proxy = mh2proxy.readProxyFile(obj, proxyFile)
 				proxyData[proxy.name] = proxy
 				if proxy.bones:
@@ -197,28 +197,28 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 					fp.write("if False\n")
 				fp.write("Armature %s %s   Normal \n" % (proxy.name, proxy.name))
 				mh2proxy.writeProxyArmature(fp, proxy)
-			elif lineSplit[1] == 'ProxyRigObject':
+			elif words[1] == 'ProxyRigObject':
 				fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
-			elif lineSplit[1] == 'ProxyPose':
+			elif words[1] == 'ProxyPose':
 				mh2proxy.writeProxyPose(fp, proxy)
-			elif lineSplit[1] == 'ProxyMesh':
+			elif words[1] == 'ProxyMesh':
 				fp.write("Mesh %sMesh %sMesh \n" % (proxy.name, proxy.name))
-			elif lineSplit[1] == 'ProxyObject':
+			elif words[1] == 'ProxyObject':
 				fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
-			elif lineSplit[1] == 'ProxyReferRig':
+			elif words[1] == 'ProxyReferRig':
 				if proxy.bones:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
 				else:
 					fp.write("      object Refer Object Human ;\n")
-			elif lineSplit[1] == 'ProxyVerts':
+			elif words[1] == 'ProxyVerts':
 				for bary in proxy.realVerts:
 					(x,y,z) = mh2proxy.proxyCoord(bary)
 					fp.write("v %.6g %.6g %.6g ;\n" % (x, -z, y))
-			elif lineSplit[1] == 'Verts':
+			elif words[1] == 'Verts':
 				proxy = None
 				for v in obj.verts:
 					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
-			elif lineSplit[1] == 'ProxyFaces':
+			elif words[1] == 'ProxyFaces':
 				for (f,g) in proxy.faces:
 					fp.write("    f")
 					for v in f:
@@ -226,58 +226,58 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 					fp.write(" ;\n")
 				for mat in proxy.materials:
 					fp.write("    ft %d 1 ;\n" % mat)
-			elif lineSplit[1] == 'Faces':
+			elif words[1] == 'Faces':
 				for f in faces:
 					fp.write("    f")
 					for v in f:
 						fp.write(" %d" % v[0])
 					fp.write(" ;\n")
-			elif lineSplit[1] == 'FTTriangles':
+			elif words[1] == 'FTTriangles':
 				for (fn,f) in enumerate(faces):
 					if len(f) < 4:
 						fp.write("    mn %d 1 ;\n" % fn)
-			elif lineSplit[1] == 'ProxyUVCoords':
+			elif words[1] == 'ProxyUVCoords':
 				for f in proxy.texFaces:
 					fp.write("    vt")
 					for v in f:
 						uv = proxy.texVerts[v]
 						fp.write(" %.6g %.6g" % (uv[0], uv[1]))
 					fp.write(" ;\n")
-			elif lineSplit[1] == 'TexVerts':
+			elif words[1] == 'TexVerts':
 				for f in faces:
 					fp.write("    vt")
 					for v in f:
 						uv = obj.uvValues[v[1]]
 						fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 					fp.write(" ;\n")
-			elif lineSplit[1] == 'VertexGroup':
+			elif words[1] == 'VertexGroup':
 				if proxy and proxy.weighted:
 					mh2proxy.writeProxyWeights(fp, proxy)
 				else:
-					copyProxy("data/templates/vertexgroups-bones25.mhx", fp, proxy)	
-					copyProxy("data/templates/vertexgroups-leftright25.mhx", fp, proxy)	
-			elif lineSplit[1] == 'mesh-shapeKey':
+					copyVertGroups("data/templates/vertexgroups-bones25.mhx", fp, proxy)	
+					copyVertGroups("data/templates/vertexgroups-leftright25.mhx", fp, proxy)	
+			elif words[1] == 'mesh-shapeKey':
 				pass
 				writeShapeKeys(fp, "HumanMesh", None)
-			elif lineSplit[1] == 'proxy-shapeKey':
+			elif words[1] == 'proxy-shapeKey':
 				fp.write("if toggle&T_Proxy\n")
 				for proxy in proxyData.values():
 					if proxy.name and not proxy.bones:
 						writeShapeKeys(fp, proxy.name, proxy)
 				fp.write("end if\n")
-			elif lineSplit[1] == 'mesh-animationData':
+			elif words[1] == 'mesh-animationData':
 				writeAnimationData(fp, "HumanMesh", None)
-			elif lineSplit[1] == 'proxy-animationData':
+			elif words[1] == 'proxy-animationData':
 				for proxy in proxyData.values():
 					if proxy.name:
 						writeAnimationData(fp, proxy.name, proxy)
-			elif lineSplit[1] == 'Filename':
+			elif words[1] == 'Filename':
 				path1 = os.path.expanduser("./data/textures/")
-				(path, filename) = os.path.split(lineSplit[2])
+				(path, filename) = os.path.split(words[2])
 				file1 = os.path.realpath(path1+filename)
 				fp.write("  Filename %s ;\n" % file1)
 			else:
-				raise NameError("Unknown *** %s" % lineSplit[1])
+				raise NameError("Unknown *** %s" % words[1])
 		else:
 			fp.write(line)
 
@@ -286,25 +286,11 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 
 	return
 
-def writeShapeKeys(fp, name, proxy):
-	fp.write("ShapeKeys %s\n" % name)
-	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
-	copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxy)	
-	copyProxy("data/templates/shapekeys-body25.mhx", fp, proxy)
-	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
-	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
-	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
-	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
-	fp.write("  end AnimationData\n")
-	fp.write("end ShapeKeys\n")
-	return
-	
-
 #
-#	copyProxy(tmplName, fp, proxy):
+#	copyVertGroups(tmplName, fp, proxy):
 #
 
-def copyProxy(tmplName, fp, proxy):
+def copyVertGroups(tmplName, fp, proxy):
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	shapes = []
@@ -316,37 +302,22 @@ def copyProxy(tmplName, fp, proxy):
 	if not proxy:
 		for line in tmpl:
 			fp.write(line)
-	elif proxy.bones:
-		pass
+	#elif proxy.bones:
+	#	pass
 	else:
 		for line in tmpl:
-			lineSplit= line.split()
-			if len(lineSplit) == 0:
+			words= line.split()
+			if len(words) == 0:
 				fp.write(line)
-			elif lineSplit[0] == 'sv':
-				v = int(lineSplit[1])
-				dx = float(lineSplit[2])
-				dy = float(lineSplit[3])
-				dz = float(lineSplit[4])
-				try:
-					vlist = proxy.verts[v]
-				except:
-					vlist = []
-				for (pv, w) in vlist:
-					shapes.append((pv, w*dx, w*dy, w*dz))
-			elif lineSplit[0] == 'wv':
-				v = int(lineSplit[1])
-				wt = float(lineSplit[2])
+			elif words[0] == 'wv':
+				v = int(words[1])
+				wt = float(words[2])
 				try:
 					vlist = proxy.verts[v]
 				except:
 					vlist = []
 				for (pv, w) in vlist:
 					vgroups.append((pv, w*wt))
-			elif shapes:
-				printProxyShape(fp, shapes)
-				shapes = []
-				fp.write(line)
 			elif vgroups:
 				printProxyVGroup(fp, vgroups)
 				vgroups = []
@@ -355,27 +326,6 @@ def copyProxy(tmplName, fp, proxy):
 				fp.write(line)
 	print("Closing "+tmplName)
 	tmpl.close()
-	return
-
-#
-#	printProxyShape(fp, shapes)
-#
-
-def printProxyShape(fp, shapes):
-	shapes.sort()
-	pv = -1
-	while shapes:
-		(pv0, dx0, dy0, dz0) = shapes.pop()
-		if pv0 == pv:
-			dx += dx0
-			dy += dy0
-			dz += dz0
-		else:
-			if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
-				fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
-			(pv, dx, dy, dz) = (pv0, dx0, dy0, dz0)		
-	if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
-		fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
 	return
 
 #
@@ -398,18 +348,169 @@ def printProxyVGroup(fp, vgroups):
 	return
 
 #
+#	copyShapeKeys(tmplName, fp, proxy):
+#
+
+eyeDist = 0.598002
+mouthDist = 0.478831
+tongueDist = 0.283124
+
+ShapeKeyScale = {
+	'BendElbowForward' 	: ('r-shoulder', 'r-hand', 4.705061),
+	'BendKneeBack'		: ('r-upper-leg', 'r-ankle', 8.207247),
+	'BendArmDown'		: ('r-shoulder', 'l-shoulder', 3.388347),
+	'BendArmUp'		: ('r-shoulder', 'l-shoulder', 3.388347),
+
+	'BrowsDown'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsMidDown'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsMidUp'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsOutUp'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsSqueeze'		: ('r-eye', 'l-eye', eyeDist),
+	'Frown'			: ('r-mouth', 'l-mouth', mouthDist),
+	'Narrow'		: ('r-mouth', 'l-mouth', mouthDist),
+	'Smile'			: ('r-mouth', 'l-mouth', mouthDist),
+	'Sneer'			: ('r-mouth', 'l-mouth', mouthDist),
+	'Squint'		: ('r-eye', 'l-eye', eyeDist),
+	'TongueOut'		: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueUp'		: ('tongue-1', 'tongue-2', tongueDist),
+	'UpLipUp'		: ('r-mouth', 'l-mouth', mouthDist),
+	'LoLipDown'		: ('r-mouth', 'l-mouth', mouthDist),
+	'MouthOpen'		: ('r-mouth', 'l-mouth', mouthDist),
+	'UpLipDown'		: ('r-mouth', 'l-mouth', mouthDist),
+	'LoLipUp'		: ('r-mouth', 'l-mouth', mouthDist),
+	'CheekUp'		: ('r-mouth', 'l-mouth', mouthDist),
+	'TongueLeft'		: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueRight'		: ('tongue-1', 'tongue-2', tongueDist),
+
+}
+
+def copyShapeKeys(tmplName, fp, proxy):
+	print("Trying to open "+tmplName)
+	tmpl = open(tmplName)
+	shapes = []
+	vgroups = []
+	scale = 1.0
+
+	if tmpl == None:
+		print("Cannot open "+tmplName)
+		return
+	if not proxy:
+		for line in tmpl:
+			words = line.split()
+			if len(words) == 0:
+				fp.write(line)
+			elif words[0] == 'sv':
+				v = int(words[1])
+				dx = float(words[2])*scale
+				dy = float(words[3])*scale
+				dz = float(words[4])*scale
+				fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
+			elif words[0] == 'ShapeKey':
+				scale = setShapeScale(words)
+				fp.write(line)
+			else:
+				fp.write(line)
+	#elif proxy.bones:
+	#	pass
+	else:
+		for line in tmpl:
+			words= line.split()
+			if len(words) == 0:
+				fp.write(line)
+			elif words[0] == 'sv':
+				v = int(words[1])
+				dx = float(words[2])*scale
+				dy = float(words[3])*scale
+				dz = float(words[4])*scale
+				try:
+					vlist = proxy.verts[v]
+				except:
+					vlist = []
+				for (pv, w) in vlist:
+					shapes.append((pv, w*dx, w*dy, w*dz))
+			elif words[0] == 'ShapeKey':
+				scale = setShapeScale(words)
+				fp.write(line)
+			elif shapes:
+				printProxyShape(fp, shapes)
+				shapes = []
+				fp.write(line)
+			else:	
+				fp.write(line)
+	print("Closing "+tmplName)
+	tmpl.close()
+	return
+
+#
+#	setShapeScale(words):	
+#
+
+def setShapeScale(words):
+	key = words[1]
+	try:
+		(p1, p2, length0) = ShapeKeyScale[key]
+	except:
+		print('No scale	%s' % key)
+		return 1.0
+	x1 = mhx_rig.locations[p1]
+	x2 = mhx_rig.locations[p2]
+	dist = aljabr.vsub(x1, x2)
+	length = aljabr.vlen(dist)
+	scale = length/length0
+	print("Scale %s %f %f" % (key, length, scale))
+	return scale
+				
+#
+#	printProxyShape(fp, shapes)
+#
+
+def printProxyShape(fp, shapes):
+	shapes.sort()
+	pv = -1
+	while shapes:
+		(pv0, dx0, dy0, dz0) = shapes.pop()
+		if pv0 == pv:
+			dx += dx0
+			dy += dy0
+			dz += dz0
+		else:
+			if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
+				fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
+			(pv, dx, dy, dz) = (pv0, dx0, dy0, dz0)		
+	if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
+		fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
+	return
+
+#
+#	writeShapeKeys(fp, name, proxy):
+#
+
+def writeShapeKeys(fp, name, proxy):
+	fp.write("ShapeKeys %s\n" % name)
+	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
+	copyShapeKeys("data/templates/shapekeys-facial25.mhx", fp, proxy)	
+	copyShapeKeys("data/templates/shapekeys-body25.mhx", fp, proxy)
+	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
+	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
+	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
+	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
+	fp.write("  end AnimationData\n")
+	fp.write("end ShapeKeys\n")
+	return	
+
+#
 #	copyMaterialFile(infile, fp):
 #
 
 def copyMaterialFile(infile, fp):
 	tmpl = open(infile, "rU")
 	for line in tmpl:
-		lineSplit= line.split()
-		if len(lineSplit) == 0:
+		words= line.split()
+		if len(words) == 0:
 			fp.write(line)
-		elif lineSplit[0] == 'filename':
+		elif words[0] == 'filename':
 			path1 = os.path.expanduser("./data/textures/")
-			(path, filename) = os.path.split(lineSplit[1])
+			(path, filename) = os.path.split(words[1])
 			file1 = os.path.realpath(path1+filename)
 			fp.write("  filename %s ;\n" % file1)
 		else:
@@ -426,13 +527,13 @@ def copyMeshFile249(obj, tmpl, fp):
 	mainMesh = False
 
 	for line in tmpl:
-		lineSplit= line.split()
+		words= line.split()
 		skipOne = False
 
-		if len(lineSplit) == 0:
+		if len(words) == 0:
 			pass
-		elif lineSplit[0] == 'end':
-			if lineSplit[1] == 'object' and mainMesh:
+		elif words[0] == 'end':
+			if words[1] == 'object' and mainMesh:
 				fp.write(line)
 				skipOne = True
 				fp.write("end if\n")
@@ -442,11 +543,11 @@ def copyMeshFile249(obj, tmpl, fp):
 				for proxyFile in proxyList:
 					exportProxy24(obj, proxyFile, fp)
 				fp.write("end if\n")
-			elif lineSplit[1] == 'mesh' and mainMesh:
+			elif words[1] == 'mesh' and mainMesh:
 				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-				copyProxy("data/templates/shapekeys-facial25.mhx", fp, None)	
-				copyProxy("data/templates/shapekeys-extra24.mhx", fp, None)	
-				copyProxy("data/templates/shapekeys-body25.mhx", fp, None)	
+				copyShapeKeys("data/templates/shapekeys-facial25.mhx", fp, None)	
+				copyShapeKeys("data/templates/shapekeys-extra24.mhx", fp, None)	
+				copyShapeKeys("data/templates/shapekeys-body25.mhx", fp, None)	
 				writeIpo(fp)
 				fp.write(line)
 				skipOne = True
@@ -454,24 +555,24 @@ def copyMeshFile249(obj, tmpl, fp):
 				mainMesh = False
 				inZone = False
 				skip = False
-		elif lineSplit[0] == 'mesh' and lineSplit[1] == 'HumanMesh':
+		elif words[0] == 'mesh' and words[1] == 'HumanMesh':
 			inZone = True
 			mainMesh = True
 			fp.write("if useMesh\n")
-		elif lineSplit[0] == 'object' and lineSplit[1] == 'HumanMesh':
+		elif words[0] == 'object' and words[1] == 'HumanMesh':
 			mainMesh = True
 			fp.write("if useMesh\n")
-		elif lineSplit[0] == 'vertgroup':
-			copyProxy("data/templates/vertexgroups-common25.mhx", fp, None)	
-			copyProxy("data/templates/vertexgroups-classic25.mhx", fp, None)	
-			copyProxy("data/templates/vertexgroups-toes25.mhx", fp, None)	
+		elif words[0] == 'vertgroup':
+			copyVertGroups("data/templates/vertexgroups-common25.mhx", fp, None)	
+			copyVertGroups("data/templates/vertexgroups-classic25.mhx", fp, None)	
+			copyVertGroups("data/templates/vertexgroups-toes25.mhx", fp, None)	
 			skipOne = True
 			skip = False
-		elif lineSplit[0] == 'v' and inZone:
+		elif words[0] == 'v' and inZone:
 			if not skip:
 				exportRawData(obj, fp)
 				skip = True
-		elif lineSplit[0] == 'f' and skip:
+		elif words[0] == 'f' and skip:
 			skip = False
 			skipOne = True
 
@@ -489,18 +590,18 @@ def exportProxy24(obj, proxyFile, fp):
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
 	tmpl = open("data/templates/proxy24.mhx", "rU")
 	for line in tmpl:
-		lineSplit= line.split()
-		if len(lineSplit) == 0:
+		words= line.split()
+		if len(words) == 0:
 			fp.write(line)
-		elif lineSplit[0] == 'mesh':
+		elif words[0] == 'mesh':
 			fp.write("mesh %s %s\n" % (proxy.name, proxy.name))
-		elif lineSplit[0] == 'object':
+		elif words[0] == 'object':
 			fp.write("object %s Mesh %s\n" % (proxy.name, proxy.name))
-		elif lineSplit[0] == 'v':
+		elif words[0] == 'v':
 			for bary in proxy.realVerts:
 				(x,y,z) = mh2proxy.proxyCoord(bary)
 				fp.write("v %.6g %.6g %.6g ;\n" % (x, -z, y))
-		elif lineSplit[0] == 'f':
+		elif words[0] == 'f':
 			for (f,g) in proxy.faces:
 				fp.write("    f")
 				for v in f:
@@ -510,22 +611,22 @@ def exportProxy24(obj, proxyFile, fp):
 			for mat in proxy.materials:
 				fp.write("    fx %d %d 1 ;\n" % (fn,mat))
 				fn += 1
-		elif lineSplit[0] == 'vt':
+		elif words[0] == 'vt':
 			for f in proxy.texFaces:
 				fp.write("    vt")
 				for v in f:
 					uv = proxy.texVerts[v]
 					fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 				fp.write(" ;\n")
-		elif lineSplit[0] == 'vertgroup':
-			copyProxy("data/templates/vertexgroups-common25.mhx", fp, proxy)	
-			copyProxy("data/templates/vertexgroups-classic25.mhx", fp, proxy)	
-			copyProxy("data/templates/vertexgroups-toes25.mhx", fp, proxy)	
-		elif lineSplit[0] == 'shapekey':
+		elif words[0] == 'vertgroup':
+			copyVertGroups("data/templates/vertexgroups-common25.mhx", fp, proxy)	
+			copyVertGroups("data/templates/vertexgroups-classic25.mhx", fp, proxy)	
+			copyVertGroups("data/templates/vertexgroups-toes25.mhx", fp, proxy)	
+		elif words[0] == 'shapekey':
 			fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-			copyProxy("data/templates/shapekeys-facial25.mhx", fp, proxy)	
-			copyProxy("data/templates/shapekeys-extra24.mhx", fp, proxy)	
-			copyProxy("data/templates/shapekeys-body25.mhx", fp, proxy)	
+			copyShapeKeys("data/templates/shapekeys-facial25.mhx", fp, proxy)	
+			copyShapeKeys("data/templates/shapekeys-extra24.mhx", fp, proxy)	
+			copyShapeKeys("data/templates/shapekeys-body25.mhx", fp, proxy)	
 			writeIpo(fp)
 		else:
 			fp.write(line)
@@ -642,25 +743,25 @@ def exportShapeKeys(obj, tmpl, fp, proxy):
 	store = False
 	for line in tmpl:
 		lineNo += 1
-		lineSplit= line.split()
-		if len(lineSplit) == 0:
+		words= line.split()
+		if len(words) == 0:
 			pass
-		elif lineSplit[0] == 'end' and lineSplit[1] == 'shapekey' and store:
+		elif words[0] == 'end' and words[1] == 'shapekey' and store:
 			if leftRightKey[shapekey] and splitLeftRight:
 				writeShapeKey(fp, shapekey+"_L", shapeVerts, "Left", sliderMin, sliderMax, proxy)
 				writeShapeKey(fp, shapekey+"_R", shapeVerts, "Right", sliderMin, sliderMax, proxy)
 			else:
 				writeShapeKey(fp, shapekey, shapeVerts, "None", sliderMin, sliderMax, proxy)
-		elif lineSplit[0] == 'shapekey':
-			shapekey = lineSplit[1]
-			sliderMin = lineSplit[2]
-			sliderMax = lineSplit[3]
+		elif words[0] == 'shapekey':
+			shapekey = words[1]
+			sliderMin = words[2]
+			sliderMax = words[3]
 			shapeVerts = []
 			if shapekey[5:] == 'Bend' or shapekey[5:] == 'Shou':
 				store = False
 			else:
 				store = True
-		elif lineSplit[0] == 'sv' and store:
+		elif words[0] == 'sv' and store:
 			shapeVerts.append(line)
 	return
 
@@ -709,11 +810,11 @@ def writeShapeKey(fp, shapekey, shapeVerts, vgroup, sliderMin, sliderMax, proxy)
 	if proxy:
 		shapes = []
 		for line in shapeVerts:
-			lineSplit = line.split()
-			v = int(lineSplit[1])
-			dx = float(lineSplit[2])
-			dy = float(lineSplit[3])
-			dz = float(lineSplit[4])
+			words = line.split()
+			v = int(words[1])
+			dx = float(words[2])
+			dy = float(words[3])
+			dz = float(words[4])
 			try:
 				vlist = proxy.verts[v]
 			except:

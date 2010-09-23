@@ -1003,7 +1003,7 @@ def poseMhxIKBones(context, mhxrig, mhxAnimations):
 	pbones = mhxrig.pose.bones
 	#rots = makeVectorDict(mhxrig, '].rotation_quaternion')
 	for suffix in ['_L', '_R']:
-		for name in ['UpArm', 'UpLeg']:
+		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
 			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], mhxAnimations[nameFK], mhxAnimations[nameFK])
