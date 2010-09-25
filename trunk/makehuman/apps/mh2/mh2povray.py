@@ -232,8 +232,8 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # UV Vectors - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % (len(faces) * 3))
-    for f in faces:
+    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % (len(obj.faces) * 3))
+    for f in obj.faces:
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[0]][0], obj.uvValues[f.uv[0]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[1]][0], obj.uvValues[f.uv[1]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[2]][0], obj.uvValues[f.uv[2]][1]))
@@ -497,8 +497,8 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # UV Vectors - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % (len(faces) * 3))
-    for f in faces:
+    outputFileDescriptor.write('    %s\n  ' % (len(obj.faces) * 3))
+    for f in obj.faces:
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[0]][0], obj.uvValues[f.uv[0]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[1]][0], obj.uvValues[f.uv[1]][1]))
         outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[2]][0], obj.uvValues[f.uv[2]][1]))
