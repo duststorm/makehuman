@@ -67,20 +67,12 @@ class Limb():
             if s[2] > self.angleMax[2]:
                 self.angleMax[2] = s[2]
 
-        #Key rotations are only used to automatically produce
-        #rough key files, to be manually adjust by designer
-        #to create the database
-        self.keyRot0 = [self.angleMin[0],self.angleMax[0]]
-        self.keyRot1 = [self.angleMin[1],self.angleMax[1]]
-        self.keyRot2 = [self.angleMin[2],self.angleMax[2]]
- 
-
     def resetTransf(self):
         self.rotx = {}
         self.roty = {}
         self.rotz = {}
         self.trasl = {}
-        
+
     def equalize(self,d1,d2,d3):
         D = d1+d2+d3
         D1 = D/(d1+0.0001)
@@ -156,8 +148,8 @@ class Limb():
                             "_flaccid_heavy",
                             "_flaccid_light",
                             "_muscle_heavy",
-                            "_muscle_light"]        
-        humanAges = ["_young", "_old","_child"]        
+                            "_muscle_light"]
+        humanAges = ["_young", "_old","_child"]
         humanTypes = ["female","male"]
 
         #Generation of values, in order to apply the corrections data
@@ -180,12 +172,12 @@ class Limb():
             for n2,h2 in enumerate(humanAges):
                 targetLabel1 = h1+h2
                 targetValue1 = humanTypesVal[n1]*humanAgesVal[n2]
-                traslExamples[targetLabel1] = targetValue1                
+                traslExamples[targetLabel1] = targetValue1
                 for n3,h3 in enumerate(humanCategories):
                     targetLabel2 = h1+h2+h3
                     targetValue2 = humanTypesVal[n1]*humanAgesVal[n2]*humanCategoriesVal[n3]
                     traslExamples[targetLabel2] = targetValue2
-                    
+
 
 
         #translations
@@ -270,10 +262,15 @@ class Limb():
 
 
 
-    def applyPose(self):
+    def applyPose(self,savePath=None):
 
-        self.resetTransf()        
+        if savePath:
+            try:
+                fileDescriptor = open(savePath,'w')
+            except:
+                print "Error in saving %s" %savePath
 
+        self.resetTransf()
         self.character.restoreMesh() #restore the mesh without rotations
         self.loadTargets()
 
@@ -295,17 +292,27 @@ class Limb():
         for targetPath in traslPaths:
             morphFactor = self.trasl[targetPath]
             algos3d.loadTranslationTarget(self.character.meshData, targetPath, morphFactor, None, 1, 0)
+            if savePath:
+                fileDescriptor.write("%s %f\n" % (targetPath, morphFactor))
 
         for rotation in rotSequence:
             rotPaths = rotation.keys()
             rotPaths.sort()
             for targetPath in rotPaths:
-
                 morphFactor = rotation[targetPath]
                 algos3d.loadRotationTarget(self.character.meshData, targetPath, morphFactor)
+                if savePath:
+                    fileDescriptor.write("%s %f\n" % (targetPath, morphFactor))
 
         self.character.meshData.calcNormals(facesToUpdate=[f for f in self.character.meshData.faces])
         self.character.meshData.update()
+        if savePath:
+            fileDescriptor.close()
+
+
+
+
+
 
 
 class Poseengine():

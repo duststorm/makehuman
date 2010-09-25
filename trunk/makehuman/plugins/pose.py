@@ -1,3 +1,4 @@
+import os.path
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # We need this for gui controls
@@ -38,10 +39,21 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderXLabel.setText('0')
         self.shoulderYLabel.setText('0')
         self.shoulderZLabel.setText('0')
+        self.savePoseFiles = 0
 
         self.resetPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Reset", position=[50, 240, 9.5])
         self.testPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Test", position=[50, 260, 9.5])
-            
+        
+        self.aToggleButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', label = "SavePose", position=[20, 280, 9])
+
+        @self.aToggleButton.event
+        def onClicked(event):
+            gui3d.ToggleButton.onClicked(self.aToggleButton, event)
+            if self.aToggleButton.selected:
+                self.savePoseFiles = 1
+                print "Save Pose activated"
+            else:
+                self.savePoseFiles = 0
 
         @self.testPoseButton.event
         def onClicked(event):
@@ -51,7 +63,8 @@ class PoseTaskView(gui3d.TaskView):
                     self.shoulderZslider,
                     self.shoulderXLabel,
                     self.shoulderYLabel,
-                    self.shoulderZLabel)
+                    self.shoulderZLabel,
+                    self.savePoseFiles)
 
         @self.resetPoseButton.event
         def onClicked(event):
@@ -91,22 +104,31 @@ class PoseTaskView(gui3d.TaskView):
         self.app.scene3d.selectedHuman.meshData.update()
         gui3d.TaskView.onHide(self, event)
 
-    def test(self, limbToTest, sliderX,sliderY,sliderZ,labelX,labelY,labelZ):
-        limbToTest.angle = [0,0,0]
-        for i0 in limbToTest.keyRot0:
-            limbToTest.angle[0] = i0
-            for i1 in limbToTest.keyRot1:
-                limbToTest.angle[1] = i1                  
-                for i2 in limbToTest.keyRot2:
-                    limbToTest.angle[2] = i2 
-                    labelX.setText('%d'%(i0))
-                    labelY.setText('%d'%(i1))
-                    labelZ.setText('%d'%(i2))
-                    sliderX.setValue(i0)
-                    sliderY.setValue(i1)
-                    sliderZ.setValue(i2)
-                    limbToTest.applyPose()
-                    self.app.scene3d.redraw(0)
+    def test(self, limbToSave, sliderX,sliderY,sliderZ,labelX,labelY,labelZ,savePose = None):
+
+        homedir = os.path.expanduser('~')
+        if savePose:
+            poseDir = os.path.join(homedir, limbToSave.name)
+            if not os.path.isdir(poseDir):
+                os.mkdir(poseDir)
+
+        for angle in limbToSave.examplesTrasl:
+            
+            if savePose:
+                tName = "limb_%s_%s_%s.pose"%(angle[0],angle[1],angle[2])
+                savePath = os.path.join(poseDir,tName)
+                print "saved in %s"%(savePath)
+
+            labelX.setText('%d'%(angle[0]))
+            labelY.setText('%d'%(angle[1]))
+            labelZ.setText('%d'%(angle[2]))
+            sliderX.setValue(angle[0])
+            sliderY.setValue(angle[1])
+            sliderZ.setValue(angle[2])
+            limbToSave.angle = angle
+            limbToSave.applyPose(savePath)
+            self.app.scene3d.redraw(0)
+
 
     def reset(self, limbToTest, sliderX,sliderY,sliderZ,labelX,labelY,labelZ):
         limbToTest.angle = [0,0,0]        
