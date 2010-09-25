@@ -213,6 +213,9 @@ class HairTaskView(gui3d.TaskView):
             guidePoints=[]
             
     objFile.close()
+    
+  def generateHairToRender(self):
+    return self.guides
 
 
   def onShow(self, event):

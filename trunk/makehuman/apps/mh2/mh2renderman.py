@@ -114,20 +114,20 @@ class RMRHairs:
         for strands in hairs:
             hDiameter = self.hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
             totalNumberOfHairs += 1
-            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(hair))
+            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(strands))
 
             for cP in strands:
                 hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
 
             if random.randint(0, 3) >= 1:
                 hairFile.write(']\n"N" [')
-                for cP in hair:
+                for cP in strands:
                         hairFile.write('0 1 0 ')  # arbitrary normals
             hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
 
         hairFile.close()
         print 'Totals hairs written: ', totalNumberOfHairs
-        print 'Number of tufts', len(hairStyle)
+        #print 'Number of tufts', len(hairs)
 
 
 class RMNObject:
@@ -410,7 +410,7 @@ class RMRScene:
     def __init__(self, app):
         MHscene = app.scene3d
         camera = app.modelCamera
-        self.hairClass = app.categories["Library"].tasksByName["Hair"]
+        self.hairsClass = app.categories["Library"].tasksByName["Hair"]
         #default lights
         self.light1 = RMRLight([-8, 10, -15],intensity = 49.5)
         self.light2 = RMRLight([1, 10, -15],intensity = 19.5)
@@ -468,7 +468,7 @@ class RMRScene:
         ribfile = file(fName, 'w')
         
         #Init and write rib code for hairs
-        humanHairs = RMRHairs(self.humanCharacter)        
+        humanHairs = RMRHairs(self.humanCharacter, self.hairsClass)        
         humanHairs.writeRibCode(self.ribsPath)       
         
         #Write rib code for textures
