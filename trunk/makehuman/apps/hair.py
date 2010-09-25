@@ -21,44 +21,47 @@ TO DO
 """
 
 
-import gui3d, events3d, hairgenerator, guifiles, mh, os
+import gui3d, events3d, guifiles, mh, os
 from mh2obj import *
 from module3d import drawQuad
 from animation3d import ThreeDQBspline
 from aljabr import *
 from random import random
 from math import radians
-import os
+from os import path
 
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
     gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"),  category.app.getThemeResource("images", "button_hair_on.png"))
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
     self.default = True
-    self.hairsClass = hairgenerator.Hairgenerator() #this will have more points than the .hair file, as we will use curve interpolations on the controlpoints
     self.saveAsCurves = True
+    self.path = None
+    self.guides = []
     self.widthFactor = 1.0
     self.oHeadCentroid = [0.0, 7.436, 0.03]
     self.oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]] 
+    self.hairDiameterMultiStrand = 0.006
+    self.tipColor = [0.518, 0.325, 0.125]
+    self.rootColor = [0.109, 0.037, 0.007]
+
     
     @self.filechooser.event
     def onFileSelected(filename,update=1):
       #hair files comes in pair, .obj and .hair.
       #.obj files contain geometric detail of the hair (can be edited by any 3rd party modelling software that opens wavefront .obj)
       #.hair files contain metadata of hair used by the makehair utility
-      filename = os.path.splitext(filename)[0]
+      filename = path.splitext(filename)[0]
       print("Loading %s" %(filename))
       #human = self.app.scene3d.selectedHuman
       wFactor = self.app.categories["Modelling"].tasksByName["Hair"].widthSlider.getValue() 
       if (wFactor <= 100.00) and (wFactor >= 1.00): self.widthFactor = wFactor
       human = self.app.scene3d.selectedHuman
       if human.hairObj: human.scene.clear(human.hairObj)
-      #hairsClass = hairgenerator.Hairgenerator()
-      #hairsClass.humanVerts = human.mesh.verts
-      human.hairObj = self.loadHairsFile(path="./data/hairs/"+filename, update=update)
-      self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(os.path.join('data/hairs', filename + '.png'))
+      human.hairObj = self.loadHair(path="./data/hairs/"+filename, update=update)
+      self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(path.join('data/hairs', filename + '.png'))
       self.app.switchCategory("Modelling")
-      human.setHairFile(os.path.join('data/hairs', filename + ".obj"))
+      human.setHairFile(path.join('data/hairs', filename + ".obj"))
       
   def reloadGuides(self):
       human = self.app.scene3d.selectedHuman
@@ -66,8 +69,6 @@ class HairTaskView(gui3d.TaskView):
       scn.clear(human.hairObj)
       position = human.getPosition()
       rotation = human.getRotation()
-      #if hairsClass == None :
-      #  hairsClass = hairgenerator.Hairgenerator()
       obj = scn.newObj("somehair")
       obj.x = position[0]
       obj.y = position[1]
@@ -87,7 +88,7 @@ class HairTaskView(gui3d.TaskView):
       obj.indexBuffer = []
       fg = obj.createFaceGroup("ribbons")
       
-      for guide in self.hairsClass.guides:
+      for guide in self.guides:
         loadStrands(obj,guide, self.widthFactor, 0.04)
     
       fg.setColor([0,0,0,255]) #rgba
@@ -99,14 +100,11 @@ class HairTaskView(gui3d.TaskView):
       scn.update()
 
 
-  def loadHairsFile(self, path,res=0.04, update = True):
+  def loadHair(self, path,res=0.04, update = True):
       human = self.app.scene3d.selectedHuman
       scn = human.scene
-      self.hairsClass.loadHairs(path)
+      self.loadHairFile(path)
       renderGui  = self.app.categories['Rendering']
-      renderGui.fallingHair.setSelected(self.hairsClass.fallingHair)
-      renderGui.guideArea.setValue(self.hairsClass.hairCoverage)
-      renderGui.guideArea.label.setText(str(self.hairsClass.hairCoverage))
       position = human.getPosition()
       rotation = human.getRotation()
       obj = scn.newObj(path)
@@ -136,7 +134,7 @@ class HairTaskView(gui3d.TaskView):
       scale[1] = (headBB[1][1]-headBB[0][1])/float(self.oHeadBoundingBox[1][1]-self.oHeadBoundingBox[0][1])
       scale[2] = (headBB[1][2]-headBB[0][2])/float(self.oHeadBoundingBox[1][2]-self.oHeadBoundingBox[0][2])
       
-      for guide in self.hairsClass.guides:
+      for guide in self.guides:
         for cP in guide:
             #Translate
             cP[0] = cP[0] + delta[0]
@@ -160,8 +158,62 @@ class HairTaskView(gui3d.TaskView):
       if update:
           scn.update()
       return obj
+      
+  def loadHairFile(self, name):
+    #try:
+    name = path.splitext(name)[0]
+    objFile = open(name + ".obj")
+    fileDescriptor = open(name+".hair")
+    """
+    except:
+        print 'Unable to load .obj and .hair file of %s' % name
+        return
+    """
 
+    #self.resetHairs()
+    self.path = name
+    for data in fileDescriptor:
+        datalist = data.split()
+        if datalist[0] == 'hairDiameterMultiStrand':
+            self.hairDiameterMultiStrand = float(datalist[1])
+        elif datalist[0] == 'sizeMultiStrand':
+            self.sizeMultiStrand = float(datalist[1])
+        elif datalist[0] == 'blendDistance':
+            self.blendDistance = float(datalist[1])
+        elif datalist[0] == 'tipcolor':
+
+            self.tipColor[0] = float(datalist[1])
+            self.tipColor[1] = float(datalist[2])
+            self.tipColor[2] = float(datalist[3])
+        elif datalist[0] == 'rootcolor':
+            self.rootColor[0] = float(datalist[1])
+            self.rootColor[1] = float(datalist[2])
+            self.rootColor[2] = float(datalist[3])
+            
+    fileDescriptor.close()
     
+    guidePoints=[]
+    temp =[]
+    self.guides = [] #set of curves
+    reGroup = True
+    for data in objFile:
+        datalist = data.split()
+        if datalist[0] == "v":
+            for i in xrange(1,4):
+                datalist[i] = float(datalist[i])
+            temp.append(datalist[1:])
+        elif datalist[0] == "curv":
+            for index in datalist[3:]:
+                guidePoints.append(temp[int(index)])
+            temp=[]
+        elif datalist[0] == "end":
+            if guidePoints[0][1] < guidePoints[len(guidePoints)-1][1]: #is the first point lower than the last control point? 
+                guidePoints.reverse()
+            self.guides.append(guidePoints); #apppend takes a deep copy
+            guidePoints=[]
+            
+    objFile.close()
+
 
   def onShow(self, event):
     # When the task gets shown, set the focus to the file chooser
@@ -269,7 +321,7 @@ def calculateBoundingBox(verts):
 def adjustHair(human, hairsClass):
     oHeadCentroid = [0.0, 7.436, 0.03]
     oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]] 
-    hairsClass.loadHairs(human.hairFile)
+    hairsClass.loadHairFile(human.hairFile)
     headBB=calculateBoundingBox(human.headVertices)
     headCentroid = in2pts(headBB[0],headBB[1],0.5)
     delta = vsub(headCentroid,oHeadCentroid)

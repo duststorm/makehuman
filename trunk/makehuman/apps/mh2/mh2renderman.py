@@ -1,5 +1,4 @@
 #!/usr/bin/python
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """
@@ -34,7 +33,6 @@ import os
 import aljabr
 import files3d
 import subprocess
-import hairgenerator
 import random
 import hair
 import time
@@ -92,14 +90,14 @@ class RMRLight:
 
 class RMRHairs:
 
-    def __init__(self, human):
+    def __init__(self, human, hairsClass):
 
-        self.hairsClass = hairgenerator.Hairgenerator()
+        self.hairsClass = hairsClass
         self.humanToGrowHairs = human
         hair.adjustHair(human.human, self.hairsClass)
 
 
-    def writeRibCode(self, ribRepository, Area, fallingHair):
+    def writeRibCode(self, ribRepository):
 
 
         # Write the full hairstyle
@@ -107,33 +105,25 @@ class RMRHairs:
         totalNumberOfHairs = 0
         self.hairsClass.humanVerts = self.humanToGrowHairs.meshData.verts
 
-        hairStyle = self.hairsClass.generateHairStyle2(Area=Area, fallingHair=fallingHair)
+        hairs = self.hairsClass.generateHairToRender()
         print 'Writing hairs'
         hairName = os.path.join(ribRepository, 'hairs.rib')
         hairFile = open(hairName, 'w')
-
-        for hSet in hairStyle:
-            #at the moment we are only using hairstyle2---
-            """
-            if 'clump' in hSet.name: #clump is default!
-                hDiameter = hairsClass.hairDiameterClump * random.uniform(0.5, 1)
-            else:
-            """
+        
+        hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
+        for strands in hairs:
             hDiameter = self.hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
-            hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
+            totalNumberOfHairs += 1
+            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(hair))
 
-            for hair in hSet:
-                totalNumberOfHairs += 1
-                hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(hair))
+            for cP in strands:
+                hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
 
+            if random.randint(0, 3) >= 1:
+                hairFile.write(']\n"N" [')
                 for cP in hair:
-                    hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
-
-                if random.randint(0, 3) >= 1:
-                    hairFile.write(']\n"N" [')
-                    for cP in hair:
-                            hairFile.write('0 1 0 ')  # arbitrary normals
-                hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
+                        hairFile.write('0 1 0 ')  # arbitrary normals
+            hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
 
         hairFile.close()
         print 'Totals hairs written: ', totalNumberOfHairs
@@ -416,8 +406,11 @@ class RMRTexture:
 
 class RMRScene:
 
-    def __init__(self, MHscene, camera):
-
+    #def __init__(self, MHscene, camera):
+    def __init__(self, app):
+        MHscene = app.scene3d
+        camera = app.modelCamera
+        self.hairClass = app.categories["Library"].tasksByName["Hair"]
         #default lights
         self.light1 = RMRLight([-8, 10, -15],intensity = 49.5)
         self.light2 = RMRLight([1, 10, -15],intensity = 19.5)
@@ -465,7 +458,7 @@ class RMRScene:
         return "Renderman Scene"
 
 
-    def writeRibFile(self, fName, Area, fallingHair):
+    def writeRibFile(self, fName):
         """
         This function creates the frame definition for a Renderman scene.
         """
@@ -476,7 +469,7 @@ class RMRScene:
         
         #Init and write rib code for hairs
         humanHairs = RMRHairs(self.humanCharacter)        
-        humanHairs.writeRibCode(self.ribsPath, Area, fallingHair)       
+        humanHairs.writeRibCode(self.ribsPath)       
         
         #Write rib code for textures
         for t in self.textures:
@@ -530,9 +523,9 @@ class RMRScene:
         ribfile.close()
 
 
-    def render(self, fName, Area=0.6, fallingHair=False):
+    def render(self, fName):
         fName = os.path.join(self.ribsPath, fName)
-        self.writeRibFile(fName, Area, fallingHair)
+        self.writeRibFile(fName)
         command = '%s "%s"' % ('aqsis -progress', fName)
         subprocess.Popen(command, shell=True)
 

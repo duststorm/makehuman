@@ -26,7 +26,7 @@ aqsis = None
 
 def load(app):
 
-    sceneToRender = mh2renderman.RMRScene(app.scene3d,app.modelCamera)
+    sceneToRender = mh2renderman.RMRScene(app)
 
     #Create aqsis shaders
     subprocess.Popen('aqsl data/shaders/aqsis/skin.sl -o "%s"' % os.path.join(sceneToRender.usrShaderPath, 'skin.slx'), shell=True)
@@ -45,9 +45,7 @@ def load(app):
 
     @aqsis.button.event
     def onClicked(event):        
-        Area = app.categories['Rendering'].guideArea.getValue()
-        fallingHair = app.categories['Rendering'].fallingHair.selected
-        sceneToRender.render("scene.rib",Area,fallingHair)
+        sceneToRender.render("scene.rib")
         #mh2renderman.saveScene(app.modelCamera, app.scene3d, 'scena.rib', renderPath, 'aqsis', Area)
         
 

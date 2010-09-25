@@ -43,7 +43,6 @@ import mh2mhx
 import mh2proxy
 import mh2collada
 import mh2md5
-import hairgenerator
 import hair
 
 class SaveTaskView(gui3d.TaskView):
@@ -210,10 +209,7 @@ class ExportTaskView(gui3d.TaskView):
                if self.hairMesh.selected:
                   mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
                else:
-                  hairsClass = hairgenerator.Hairgenerator()
-                  #hairsClass.humanVerts = self.app.scene3d.selectedHuman.mesh.verts
-                  #hairsClass.loadHairs(self.app.scene3d.selectedHuman.hairFile)
-                  #hairsClass.adjustGuides()
+                  hairsClass = self.app.categories["Library"].tasksByName["Hair"]
                   hair.adjustHair(self.app.scene3d.selectedHuman, hairsClass)
                   file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
                   mh2obj.exportAsCurves(file, hairsClass.guides)

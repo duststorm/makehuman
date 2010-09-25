@@ -39,23 +39,17 @@ prefix so that you end up with your own unique prefix.
 
 """
 
-__docformat__ = 'restructuredtext'
-
 import os
 import string
 import shutil
 import subprocess
 import mh2povray_ini
-import hairgenerator
 import random
 from math import atan2, pi, sqrt
 
 # Create an instance of the Hairgenerator class with a global context.
 
-hairsClass = hairgenerator.Hairgenerator()
-
-
-def povrayExport(obj, camera, resolution):
+def povrayExport(obj, app):
     """
   This function exports data in a format that can be used to reconstruct the humanoid 
   object in POV-Ray. It supports a range of options that can be specified in the Python 
@@ -79,6 +73,9 @@ def povrayExport(obj, camera, resolution):
   # Read settings from an ini file. This reload enables the settings to be
   # changed dynamically without forcing the user to restart the MH
   # application for the changes to take effect.
+  
+    camera = app.modelCamera
+    resolution = app.scene3d.getWindowSize()
 
     reload(mh2povray_ini)
     path = mh2povray_ini.outputpath
@@ -95,9 +92,10 @@ def povrayExport(obj, camera, resolution):
 
   # Export the hair model as a set of spline definitions.
   # Load the test hair dataand write it out in POV-Ray format.
-
-    povrayLoadHairsFile('data/hairs/test.hair')
-    povrayWriteHairs(outputDirectory, obj)
+  
+    #still unsupported
+    #povrayLoadHairsFile('data/hairs/test.hair')
+    #povrayWriteHairs(outputDirectory, obj)
 
   # The ini action option defines whether or not to attempt to render the file once
   # it's been written.
@@ -664,7 +662,8 @@ def povraySizeData(obj, outputFileDescriptor):
 
 def povrayLoadHairsFile(path):
 
-    hairsClass.loadHairs(path)
+    pass
+    #hairsClass.loadHairs(path)
 
 
 def povrayWriteHairs(outputDirectory, mesh):
