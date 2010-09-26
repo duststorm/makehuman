@@ -20,15 +20,15 @@ TO DO
 
 """
 
-
+#import zipfile 
 import gui3d, events3d, guifiles, mh, os
 from mh2obj import *
 from module3d import drawQuad
 from animation3d import ThreeDQBspline
 from aljabr import *
-from random import random
 from math import radians
 from os import path
+from random import random
 
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -44,6 +44,7 @@ class HairTaskView(gui3d.TaskView):
     self.hairDiameterMultiStrand = 0.006
     self.tipColor = [0.518, 0.325, 0.125]
     self.rootColor = [0.109, 0.037, 0.007]
+    self.interpolationRadius = 0.09
 
     
     @self.filechooser.event
@@ -160,15 +161,16 @@ class HairTaskView(gui3d.TaskView):
       return obj
       
   def loadHairFile(self, name):
-    #try:
-    name = path.splitext(name)[0]
-    objFile = open(name + ".obj")
-    fileDescriptor = open(name+".hair")
-    """
+    try:
+      name = path.splitext(name)[0]
+      objFile = open(name + ".obj")
+      #files = zipfile.ZipFile(name+".zip","r")
+      #objFile = files.open(files.namelist()[0])
+      fileDescriptor = open(name+".hair")
     except:
         print 'Unable to load .obj and .hair file of %s' % name
         return
-    """
+
 
     #self.resetHairs()
     self.path = name
@@ -215,7 +217,8 @@ class HairTaskView(gui3d.TaskView):
     objFile.close()
     
   def generateHairToRender(self):
-    return self.guides
+    return clumpInterpolation(self.guides, 0.09, 50)
+    #return self.guides
 
 
   def onShow(self, event):
@@ -332,8 +335,7 @@ def adjustHair(human, hairsClass):
     scale[0] = (headBB[1][0]-headBB[0][0])/float(oHeadBoundingBox[1][0]-oHeadBoundingBox[0][0])
     scale[1] = (headBB[1][1]-headBB[0][1])/float(oHeadBoundingBox[1][1]-oHeadBoundingBox[0][1])
     scale[2] = (headBB[1][2]-headBB[0][2])/float(oHeadBoundingBox[1][2]-oHeadBoundingBox[0][2])
-    #for group in hairsClass.guideGroups:
-    for guide in hairsClass.guides: #hairsClass.guideGroups[group]:
+    for guide in hairsClass.guides:
         for cP in guide:
             #Translate
             cP[0] = cP[0] + delta[0]
@@ -347,3 +349,28 @@ def adjustHair(human, hairsClass):
             cP[0]=temp[0]
             cP[1]=temp[1]
             cP[2]=temp[2]
+
+            
+def multiNStrands(guides, N):
+    #create N-tuples from all guides
+    pass
+    #interpolate N-tuples and submit 
+
+# Clump-based interpolation : 
+# 1. A strand (guides ) is taken
+# 2. The first and second control point determine a (normal) vector and a perpendicular plane
+# 3. A circle is drawn on the perpendicular plane (with radius : radius)  with center othe first control point
+# 4. n-hair strands paralel to the guide strand is created randumly within this radius of the plane.
+def clumpInterpolation(guides, radius, n):
+  hairs = []
+  for guide in guides:
+    hairs.append(guide)
+    if len(guide)<2 : continue
+    v = vnorm(vsub(guide[1],guide[0])) #1,#2
+    for i in xrange(0,n): #3,#4
+      w = vmul(vnorm(randomPointFromNormal(v)), radius*random())
+      child = []
+      for j in xrange(0,len(guide)):
+        child.append(vadd(guide[j],w))
+      hairs.append(child)
+  return hairs
