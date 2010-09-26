@@ -335,6 +335,37 @@ def applyTarget(mFactor, n=0, meshName = None):
         maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor,onlyRot = True)        
     updateVertices(vertices, n, name = meshName)
     endEditing()
+    
+
+def applyPosesFromLibrary(path, n=0, meshName = None, onlyRot = False):
+    
+    mainDir = os.path.dirname(path)
+    poseFiles = os.listdir(mainDir)
+    homedir = os.path.expanduser('~')
+
+    saveDir = os.path.join(homedir, "poseLibBlender")
+    if not os.path.isdir(saveDir):
+        os.mkdir(saveDir)    
+    
+    for poseFile in poseFiles:
+
+        blendFile = os.path.join(saveDir,poseFile+".blend")
+        
+        startEditing()
+        vertices = getVertices(n, name = meshName)
+        pPath = os.path.join(mainDir,poseFile)
+        maketargetlib.loadPoseFromFile(vertices,pPath,1.00,onlyRot)
+        updateVertices(vertices, n, name = meshName)
+        endEditing()
+
+        Blender.Save(blendFile)
+
+        startEditing()
+        vertices = getVertices(n, name = meshName)
+        pPath = os.path.join(mainDir,poseFile)
+        maketargetlib.loadPoseFromFile(vertices,pPath,-1.00,onlyRot)
+        updateVertices(vertices, n, name = meshName)
+        endEditing()
 
 def applyPoseFromFolder(path, n=0):
     global morphFactor
@@ -698,7 +729,7 @@ def event(event, value):
     elif event == Draw.XKEY:
         Window.FileSelector (fitScan2Mesh, "svd fitting")
     elif event == Draw.YKEY:
-        Window.FileSelector (saveScanElements, "save scan elements")
+        Window.FileSelector (applyPosesFromLibrary, "Create poses to correct")
     elif event == Draw.KKEY:
          pass
     elif event == Draw.PAGEDOWNKEY and not value and GUIswitch < GUIswitchMax:
