@@ -115,10 +115,8 @@ class AsymmTaskView(gui3d.TaskView):
 
         @self.asymmTrunkSlider.event
         def onChange(value):
-            before = self.getTargetsAndValues(self.asymmTargets)
-            self.applyAsymm(self.calcAsymm(value,"trunk"))
-            after = self.getTargetsAndValues(self.asymmTargets)
-            self.app.did(AsymmAction(self.human, self.applyAsymm, before, after))
+            self.changeValue("trunk",value)
+
 
     def changeValue(self,bodyPartName,value):
         """
