@@ -29,6 +29,7 @@ from aljabr import *
 from math import radians
 from os import path
 from random import random
+from simpleoctree import SimpleOctree
 
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
@@ -349,12 +350,40 @@ def adjustHair(human, hairsClass):
             cP[0]=temp[0]
             cP[1]=temp[1]
             cP[2]=temp[2]
-
             
-def multiNStrands(guides, N):
-    #create N-tuples from all guides
-    pass
-    #interpolate N-tuples and submit 
+            
+def faceInterpolation(guides, scalp, n):
+    """
+    Suppose we have a scalp with faces and normal vector of them. We create a container for each face,
+    each container will contain the guide hair attached to it (nearest neighbour thru guide roots and centroid of face).
+    Once the container is created we, for each guide hair, choose a random face from the scalp. From this random face we
+    choose a random guide attached to it. We then interpolate the given guide hair with this random guide on a random position
+    on that particular random face we chose (having normal of that face).
+    """
+    hairs = []
+    guideRoots = []
+    for i in xrange(0,guides):
+      guideRoots.append(guides[i])
+    octree = SimpleOctree(guideRoots,0.09)
+    container = []
+    #for face in scalp:
+    #for v in face:
+        
+            
+#1 Create an octree of all guide roots
+#2 Iterate thru all the gudes by i
+#3 for guide i get n random colored leaf
+#4 for each random colored leaf get a random guide
+#5 interpolate between guide i and this random guide on that leaf.. normal should be that of random guide
+def octreeInterpolation(guides, n):
+    guideRoots = []
+    for i in xrange(0,guides):
+      guideRoots.append(guides[i])
+    octree = SimpleOctree(guideRoots,0.09)
+    hairs=[]
+    for i in xrange(0,guides):
+      hairs.append(guides[i])
+      
 
 # Clump-based interpolation : 
 # 1. A strand (guides ) is taken
@@ -363,14 +392,26 @@ def multiNStrands(guides, N):
 # 4. n-hair strands paralel to the guide strand is created randumly within this radius of the plane.
 def clumpInterpolation(guides, radius, n):
   hairs = []
+  e = 1.0e-6
   for guide in guides:
     hairs.append(guide)
     if len(guide)<2 : continue
-    v = vnorm(vsub(guide[1],guide[0])) #1,#2
+    v=[0.0,0.0,0.0]
+    index = 0
+    found = False
+    
+    while (not found) and index<len(guide): #precaution needed for very curly hair
+      v = vnorm(vsub(guide[index],guide[0]))
+      if vdot(v,v) > 1e-6 : found = True
+      index = index + 1 
+    if not found: continue
+    
     for i in xrange(0,n): #3,#4
       w = vmul(vnorm(randomPointFromNormal(v)), radius*random())
       child = []
       for j in xrange(0,len(guide)):
         child.append(vadd(guide[j],w))
       hairs.append(child)
+
   return hairs
+  
