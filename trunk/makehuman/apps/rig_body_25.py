@@ -55,9 +55,9 @@ BodyArmature = [
 	('MasterNeck',		0.0, None, F_WIR+F_HID, L_HELP, (1,1,1) ),
 
 	('Root',			0.0, None, F_WIR, L_MAIN+L_SPINE, (1,1,1) ),
-	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_DEF, (1,1,1) ),
-	('Hip_L',			0.0, 'Root', 0, L_HELP, (1,1,1) ),
-	('Hip_R',			0.0, 'Root', 0, L_HELP, (1,1,1) ),
+	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_DEF+L_SPINE, (1,1,1) ),
+	('Hip_L',			0.0, 'Hips', 0, L_HELP, (1,1,1) ),
+	('Hip_R',			0.0, 'Hips', 0, L_HELP, (1,1,1) ),
 
 	('Spine1',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,5) ),
 	('Spine2',			0.0, 'Spine1', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,5) ),
@@ -78,9 +78,9 @@ BodyPoses = [
 
 	('poseBone', 'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'Root', 'MHCube05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints),
+	('poseBone', 'Root', 'MHHips', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints),
 
-	('poseBone', 'Hips', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Hips', 'MHCircle15', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
 	('poseBone', 'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 

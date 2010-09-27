@@ -130,20 +130,22 @@ def setBoneLocation(context, pb, loc, mirror, setKey, frame):
 	return
 
 #
-#	openFile(context, file):
-#	readMoho(context, fp, offs):
-#	readMagpie(context, fp, offs):
+#	openFile(context, filepath):
+#	readMoho(context, filepath, offs):
+#	readMagpie(context, filepath, offs):
 #
 
-def openFile(context, file):
+def openFile(context, filepath):
 	ob = context.object
 	if ob.type != 'ARMATURE':
 		raise NameError("No armature selected")
-	(path, fileName) = os.path.split(file)
+	(path, fileName) = os.path.split(filepath)
 	(name, ext) = os.path.splitext(fileName)
-	return open(file, "rU")
+	return open(filepath, "rU")
 
-def readMoho(context, fp, offs):
+def readMoho(context, filepath, offs):
+	bpy.ops.object.mode_set(mode='POSE')	
+	fp = openFile(context, filepath)		
 	for line in fp:
 		words= line.split()
 		if len(words) < 2:
@@ -151,9 +153,14 @@ def readMoho(context, fp, offs):
 		else:
 			vis = mohoVisemes[words[1]]
 			setViseme(context, vis, True, int(words[0])+offs)
+	fp.close()
+	setInterpolation(context.object)
+	print("Moho file %s loaded" % filepath)
 	return
-	
-def readMagpie(context, fp, offs):
+
+def readMagpie(context, filepath, offs):
+	bpy.ops.object.mode_set(mode='POSE')	
+	fp = openFile(context, filepath)		
 	for line in fp: 
 		words= line.split()
 		if len(words) < 3:
@@ -161,16 +168,45 @@ def readMagpie(context, fp, offs):
 		elif words[2] == 'X':
 			vis = magpieVisemes[words[3]]
 			setViseme(context, vis, True, int(words[0])+offs)
+	fp.close()
+	setInterpolation(context.object)
+	print("Magpie file %s loaded" % filepath)
 	return
-	
+
 #
-#	User interface
-#	BoolProperty
-#	class MhxLipsyncPanel(bpy.types.Panel):
+#	setInterpolation(rig):
 #
 
-bpy.types.Scene.BoolProperty(attr="MhxAutoKeyframe", name="Auto keyframe", description="Auto keyframe", default=False)
-bpy.context.scene['MhxAutoKeyframe'] = False
+def setInterpolation(rig):
+	if not rig.animation_data:
+		return
+	act = rig.animation_data.action
+	if not act:
+		return
+	for fcu in act.fcurves:
+		for pt in fcu.keyframe_points:
+			pt.interpolation = 'LINEAR'
+		fcu.extrapolation = 'CONSTANT'
+	return
+	
+###################################################################################	
+#	User interface
+#
+#	initInterface()
+#
+
+def initInterface(scn):
+	bpy.types.Scene.MhxAutoKeyframe = BoolProperty(
+		name="Auto keyframe", 
+		description="Auto keyframe")
+	scn['MhxAutoKeyframe'] = False
+	return
+
+initInterface(bpy.context.scene)
+
+#
+#	class MhxLipsyncPanel(bpy.types.Panel):
+#
 
 class MhxLipsyncPanel(bpy.types.Panel):
 	bl_label = "MHX Lipsync"
@@ -188,6 +224,8 @@ class MhxLipsyncPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		layout = self.layout
+		layout.operator("object.InitInterfaceButton")
+		layout.separator()
 		layout.prop(context.scene, 'MhxAutoKeyframe', text="Auto keyframe", icon='BLENDER', toggle=True)
 		layout.label(text="Visemes")
 		row = layout.row()
@@ -238,6 +276,20 @@ def defineVisemeButtons():
 
 defineVisemeButtons()
 
+#
+#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_InitInterfaceButton"
+	bl_label = "Initialize"
+
+	def execute(self, context):
+		import bpy
+		initInterface(context.scene)
+		print("Interface initialized")
+		return{'FINISHED'}	
+
 # 
 #	class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 #
@@ -249,15 +301,12 @@ class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
 	def execute(self, context):
-		global bpy, os, mathutils
-		fp = openFile(context, self.properties.filepath)		
-		bpy.ops.object.mode_set(mode='POSE')	
-		readMoho(context, fp, self.properties.startFrame-1)
-		fp.close()
+		import bpy, os, mathutils
+		readMoho(context, self.properties.filepath, self.properties.startFrame-1)		
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.manager.add_fileselect(self)
+		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}	
 
 #
@@ -271,15 +320,12 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
 	def execute(self, context):
-		global bpy, os, mathutils
-		fp = openFile(context, self.properties.filepath)		
-		bpy.ops.object.mode_set(mode='POSE')	
-		readMagpie(context, fp, self.properties.startFrame-1)
-		fp.close()
+		import bpy, os, mathutils
+		readMagpie(context, self.properties.filepath, self.properties.startFrame-1)		
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.manager.add_fileselect(self)
+		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}	
 
 

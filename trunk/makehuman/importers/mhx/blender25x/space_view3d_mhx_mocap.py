@@ -105,7 +105,11 @@ def readBvhFile(context, filepath, scale, startFrame, loop):
 #
 
 class CNode:
-	def __init__(self, name, parent):
+	def __init__(self, words, parent):
+		name = words[1]
+		for word in words[2:]:
+			name += ' '+word
+		
 		self.name = name
 		self.parent = parent
 		self.children = []
@@ -207,11 +211,11 @@ def readBvhFile(context, filepath, scale, startFrame, loop):
 			status = Motion
 		elif status == Hierarchy:
 			if key == 'ROOT':	
-				node = CNode(words[1], None)
+				node = CNode(words, None)
 				root = node
 				nodes = [root]
 			elif key == 'JOINT':
-				node = CNode(words[1], node)
+				node = CNode(words, node)
 				nodes.append(node)
 			elif key == 'OFFSET':
 				(x,y,z) = (float(words[1]), float(words[2]), float(words[3]))
@@ -220,7 +224,7 @@ def readBvhFile(context, filepath, scale, startFrame, loop):
 				else:
 					node.offset = scale*Vector((x,y,z))
 			elif key == 'END':
-				node = CNode(words[1], node)
+				node = CNode(words, node)
 			elif key == 'CHANNELS':
 				oldmode = None
 				for word in words[2:]:
@@ -335,6 +339,10 @@ def channelZup(word):
 # 	end Bvh importer
 ###################################################################################
 
+###################################################################################
+#
+#	Supported armatures
+
 #
 #	OsuArmature
 #	www.accad.osu.edu/research/mocap/mocap_data.htm
@@ -411,15 +419,107 @@ CmuArmature = {
 	'RightToeBase' : 'ToeFK_R',
 }
 
+#
+#	Xx1Armature
+#
+
+Xx1Armature = {
+	'Hip' : 'Root', 
+	'Abdomen' : 'Spine1',
+	'Chest' : 'Spine3',
+	'Neck' : 'Neck',
+	'Head' : 'Head', 
+	'Left Eye' : None,
+	'Right Eye' : None,
+
+	'Left Collar' : 'Clavicle_L',
+	'Left Shoulder' : 'UpArmFK_L', 
+	'Left Forearm' : 'LoArmFK_L',
+	'Left Hand' : 'HandFK_L',
+	'Left Thumb 1' : None, 
+	'Left Thumb 2' : None, 
+	'Left Thumb 3' : None, 
+	'Left Index 1' : None, 
+	'Left Index 2' : None, 
+	'Left Index 3' : None, 
+	'Left Mid 1' : None, 
+	'Left Mid 2' : None, 
+	'Left Mid 3' : None, 
+	'Left Ring 1' : None, 
+	'Left Ring 2' : None, 
+	'Left Ring 3' : None, 
+	'Left Pinky 1' : None, 
+	'Left Pinky 2' : None, 
+	'Left Pinky 3' : None, 
+
+	'Right Collar' : 'Clavicle_R',
+	'Right Shoulder' : 'UpArmFK_R', 
+	'Right Forearm' : 'LoArmFK_R',
+	'Right Hand' : 'HandFK_R',
+	'Right Thumb 1' : None, 
+	'Right Thumb 2' : None, 
+	'Right Thumb 3' : None, 
+	'Right Index 1' : None, 
+	'Right Index 2' : None, 
+	'Right Index 3' : None, 
+	'Right Mid 1' : None, 
+	'Right Mid 2' : None, 
+	'Right Mid 3' : None, 
+	'Right Ring 1' : None, 
+	'Right Ring 2' : None, 
+	'Right Ring 3' : None, 
+	'Right Pinky 1' : None, 
+	'Right Pinky 2' : None, 
+	'Right Pinky 3' : None, 
+
+	'Left Thigh' : 'UpLegFK_L',
+	'Left Shin' : 'LoLegFK_L', 
+	'Left Foot' : 'FootFK_L', 
+	'Left Toe' : 'ToeFK_L',
+
+	'Right Thigh' : 'UpLegFK_R',
+	'Right Shin' : 'LoLegFK_R', 
+	'Right Foot' : 'FootFK_R', 
+	'Right Toe' : 'ToeFK_R',
+}
+
+Xx2Armature = {
+	'Hips' : 'Root',
+	'LeftHip' : 'UpLegFK_L',
+	'LeftKnee' : 'LoLegFK_L',
+	'LeftAnkle' : 'FootFK_L',
+	'RightHip' : 'UpLegFK_R',
+	'RightKnee' : 'LoLegFK_R',
+	'RightAnkle' : 'FootFK_R',
+	'Chest' : 'Spine2',
+	'LeftCollar' : 'Clavicle_L',
+	'LeftShoulder' : 'UpArmFK_L',
+	'LeftElbow' : 'LoArmFK_L',
+	'LeftWrist' : 'HandFK_L',
+	'RightCollar' : 'Clavicle_R',
+	'RightShoulder' : 'UpArmFK_R',
+	'RightElbow' : 'LoArmFK_R',
+	'RightWrist' : 'HandFK_R',
+	'Neck' : 'Neck',
+	'Head' : 'Head',
+}
+
+
 theArmatures = {
 	'CMU' : CmuArmature, 
 	'OSU' : OsuArmature,
+	'XX1' : Xx1Armature,
+	'XX2' : Xx2Armature,
 }
+
+#
+#	end supported armatures
+###################################################################################
 
 theArmature = None
 
 FkBoneList = [
-	'Root', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
+	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
 	'Clavicle_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
 	'Clavicle_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
 	'Hip_L', 'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
@@ -514,9 +614,25 @@ def createFKRig(scn, bones00, rig):
 			bones90[name90] = CEditBone(eb)
 
 	for suffix in ['_L', '_R']:
+		try:
+			foot = ebones['FootFK'+suffix]
+		except:
+			foot = None
+		try:
+			toe = ebones['ToeFK'+suffix]
+		except:
+			toe = None
+
+		if not toe:
+			name90 = 'ToeFK'+suffix
+			toe = ebones.new(name=name90)
+			toe.head = foot.tail
+			toe.tail = toe.head - Vector((0, 0.5*foot.length, 0))
+			toe.parent = foot
+			bones90[name90] = CEditBone(toe)
+			
 		name90 = 'LegFK'+suffix
 		eb = ebones.new(name=name90)
-		toe = ebones['ToeFK'+suffix]
 		eb.head = 2*toe.head - toe.tail
 		eb.tail = 4*toe.head - 3*toe.tail
 		eb.parent = toe
@@ -524,7 +640,6 @@ def createFKRig(scn, bones00, rig):
 
 		name90 = 'AnkleFK'+suffix
 		eb = ebones.new(name=name90)
-		foot = ebones['FootFK'+suffix]
 		eb.head = foot.head
 		eb.tail = 2*foot.head - foot.tail
 		eb.parent = ebones['LoLegFK'+suffix]
@@ -721,6 +836,7 @@ def constrainIkBones(rig90):
 def guessArmature(rig):
 	global theArmature, theArmatures
 	bestMisses = 1000
+	misses = {}
 	bones = rig.data.bones
 	for (name, amt) in theArmatures.items():
 		nMisses = 0
@@ -728,14 +844,18 @@ def guessArmature(rig):
 			try:
 				amt[bone.name]
 			except:
-				#print("Miss", bone.name)
 				nMisses += 1
+		misses[name] = nMisses
 		if nMisses < bestMisses:
 			best = amt
 			bestName = name
 			bestMisses = nMisses
 	if bestMisses > 0:
-		raise NameError('Did not find matching armature')
+		for bone in bones:
+			print("'%s'" % bone.name)
+		for (name, n) in misses.items():
+			print(name, n)
+		raise NameError('Did not find matching armature. nMisses = %d' % bestMisses)
 	theArmature = best
 	rig['MhxArmature'] = bestName
 	print("Using matching armature %s." % rig['MhxArmature'])
@@ -1110,6 +1230,7 @@ def retargetMhxRig(context, rig90, mhxrig):
 	poseMhxIKBones(context, mhxrig, mhxAnimations)
 
 	mhxrig.animation_data.action.name = mhxrig.name[:4] + rig90.name[2:]
+	print("Retargeted %s --> %s" % (rig90, mhxrig))
 	return
 
 #
@@ -1131,14 +1252,14 @@ def deleteFKRig(context, rig00, action, prefix):
 	return
 
 #
-#	simplifyFCurves(context, mhxrig):
+#	simplifyFCurves(context, rig):
 #
 
-def simplifyFCurves(context, mhxrig):
+def simplifyFCurves(context, rig):
 	if not context.scene.MhxDoSimplify:
 		return
 	try:
-		act = mhxrig.animation_data.action
+		act = rig.animation_data.action
 	except:
 		act = None
 	if not act:
@@ -1149,7 +1270,8 @@ def simplifyFCurves(context, mhxrig):
 	maxErrRot = context.scene.MhxErrorRot * math.pi/180
 	for fcu in act.fcurves:
 		simplifyFCurve(fcu, act, maxErrLoc, maxErrRot)
-	setInterpolation(mhxrig)
+	setInterpolation(rig)
+	print("Curves simplified")
 	return
 
 #
@@ -1245,7 +1367,7 @@ def iterateFCurves(points, keeps, maxErr):
 #	User interface
 #
 #	getBvh(mhx)
-#	init()
+#	initInterface()
 #
 
 def getBvh(mhx):
@@ -1254,13 +1376,13 @@ def getBvh(mhx):
 			return bvh
 	return None
 
-def init(scn):
+def initInterface(scn):
 	bpy.types.Scene.MhxBvhScale = FloatProperty(
 		name="Scale", 
 		description="Scale the BVH by this value", 
 		min=0.0001, max=1000000.0, 
 		soft_min=0.001, soft_max=100.0)
-	scn['MhxBvhScale'] = 0.6
+	scn['MhxBvhScale'] = 1.0
 
 	bpy.types.Scene.MhxStartFrame = IntProperty(
 		name="Start Frame", 
@@ -1281,13 +1403,13 @@ def init(scn):
 		name="Max loc error", 
 		description="Max error for location FCurves when doing simplification",
 		min=0.001)
-	scn['MhxErrorLoc'] = 0.1
+	scn['MhxErrorLoc'] = 0.01
 
 	bpy.types.Scene.MhxErrorRot = FloatProperty(
 		name="Max rot error", 
 		description="Max error for rotation (degrees) FCurves when doing simplification",
 		min=0.001)
-	scn['MhxErrorRot'] = 1.0
+	scn['MhxErrorRot'] = 0.1
 
 	bpy.types.Scene.MhxDirectory = StringProperty(
 		name="Directory", 
@@ -1317,7 +1439,7 @@ def init(scn):
 	'''
 	return
 
-init(bpy.context.scene)
+initInterface(bpy.context.scene)
 
 #
 #	class MhxBvhAssocPanel(bpy.types.Panel):
@@ -1359,6 +1481,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
 	@classmethod
 	def poll(cls, context):
 		if context.object and context.object.type == 'ARMATURE':
+			#return True
 			try:
 				return context.object['MhxRig']
 			except:
@@ -1368,16 +1491,19 @@ class Bvh2MhxPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scn = context.scene
+		layout.operator("object.InitInterfaceButton")
+		layout.separator()
 		layout.prop(scn, "MhxBvhScale")
 		layout.prop(scn, "MhxStartFrame")
 		layout.prop(scn, "MhxLoopAnim")
 		layout.prop(scn, "MhxDoSimplify")
-		layout.prop(scn, "MhxErrorLoc")
-		layout.prop(scn, "MhxErrorRot")
-		layout.separator()
 		layout.operator("object.LoadBvhButton")
+		layout.separator()
 		layout.operator("object.SilenceConstraintsButton")
 		layout.operator("object.RetargetMhxButton")
+		layout.separator()
+		layout.prop(scn, "MhxErrorLoc")
+		layout.prop(scn, "MhxErrorRot")
 		layout.operator("object.SimplifyFCurvesButton")
 		layout.separator()
 		layout.operator("object.LoadRetargetSimplifyButton")
@@ -1420,7 +1546,6 @@ class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
 		for rig90 in context.selected_objects:
 			if rig90 != mhxrig:
 				retargetMhxRig(context, rig90, mhxrig)
-				print("Done retarget %s --> %s" % (rig90, mhxrig))
 		return{'FINISHED'}	
 
 #
@@ -1434,7 +1559,6 @@ class OBJECT_OT_SimplifyFCurvesButton(bpy.types.Operator):
 	def execute(self, context):
 		import bpy, mathutils
 		simplifyFCurves(context, context.object)
-		print("Curves simplified")
 		return{'FINISHED'}	
 
 #
@@ -1452,6 +1576,20 @@ class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_InitInterfaceButton"
+	bl_label = "Initialize"
+
+	def execute(self, context):
+		import bpy
+		initInterface(context.scene)
+		print("Interface initialized")
+		return{'FINISHED'}	
+
+#
 #	loadRetargetSimplify(context, filepath):
 #	class OBJECT_OT_LoadRetargetSimplify(bpy.types.Operator):
 #
@@ -1462,9 +1600,9 @@ def loadRetargetSimplify(context, filepath):
 	mhxrig = context.object
 	(rig90, action) = importAndRename(context, filepath)
 	retargetMhxRig(context, rig90, mhxrig)
-	deleteFKRig(context, rig90, action, 'Z_')
 	if context.scene['MhxDoSimplify']:
 		simplifyFCurves(context, mhxrig)
+	deleteFKRig(context, rig90, action, 'Z_')
 	time2 = time.clock()
 	print("%s finished in %.3f s" % (filepath, time2-time1))
 	return
