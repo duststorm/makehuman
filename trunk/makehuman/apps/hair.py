@@ -46,7 +46,8 @@ class HairTaskView(gui3d.TaskView):
     self.tipColor = [0.518, 0.325, 0.125]
     self.rootColor = [0.109, 0.037, 0.007]
     self.interpolationRadius = 0.09
-
+    self.clumpInterpolationNumber = 50
+    self.app.categories["Rendering"].hairsClass = self
     
     @self.filechooser.event
     def onFileSelected(filename,update=1):
@@ -218,7 +219,7 @@ class HairTaskView(gui3d.TaskView):
     objFile.close()
     
   def generateHairToRender(self):
-    return clumpInterpolation(self.guides, 0.09, 50)
+    return clumpInterpolation(self.guides, self.interpolationRadius, self.clumpInterpolationNumber)
     #return self.guides
 
 
