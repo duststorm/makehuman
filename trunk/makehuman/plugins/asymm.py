@@ -59,6 +59,7 @@ class AsymmTaskView(gui3d.TaskView):
         self.asymmTempleSlider = gui3d.Slider(self,  position=[20, 360, 9.3], value=0.0, min=-1.0, max=1.0, label="Temple asymmetry")
         self.asymmTopSlider = gui3d.Slider(self,  position=[20, 400, 9.3], value=0.0, min=-1.0, max=1.0, label="Top asymmetry")
         self.asymmTrunkSlider = gui3d.Slider(self,  position=[20, 440, 9.3], value=0.0, min=-1.0, max=1.0, label="Trunk asymmetry")
+        self.asymmBreastSlider = gui3d.Slider(self,  position=[20, 480, 9.3], value=0.0, min=-1.0, max=1.0, label="Breast asymmetry")
 
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"
@@ -156,6 +157,14 @@ class AsymmTaskView(gui3d.TaskView):
         @self.asymmTrunkSlider.event
         def onChanging(value):
             self.changeValue("trunk",value,self.human.breastVertices)
+
+        @self.asymmBreastSlider.event
+        def onChange(value):
+            self.changeValue("breast",value)
+
+        @self.asymmBreastSlider.event
+        def onChanging(value):
+            self.changeValue("breast",value,self.human.breastVertices)
 
 
     def changeValue(self,bodyPartName,value,vertices=None):
