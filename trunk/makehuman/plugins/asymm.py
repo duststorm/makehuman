@@ -49,7 +49,7 @@ class AsymmTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Asymm', category.app.getThemeResource('images', 'button_asymm.png'), category.app.getThemeResource('images', 'button_asymm_on.png'))
 
         #Sliders       
-        self.asymmBrownSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label="Brown asymmetry")
+        self.asymmBrowSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label="Brow asymmetry")
         self.asymmCheekSlider = gui3d.Slider(self,  position=[20, 120, 9.3], value=0.0, min=-1.0, max=1.0, label="Cheek asymmetry")
         self.asymmEarsSlider = gui3d.Slider(self,  position=[20, 160, 9.3], value=0.0, min=-1.0, max=1.0, label="Ears asymmetry")
         self.asymmEyeSlider = gui3d.Slider(self,  position=[20, 200, 9.3], value=0.0, min=-1.0, max=1.0, label="Eye asymmetry")
@@ -77,48 +77,88 @@ class AsymmTaskView(gui3d.TaskView):
 
         #Sliders events
 
-        @self.asymmBrownSlider.event
+        @self.asymmBrowSlider.event
         def onChange(value):
             self.changeValue("brown",value)
+            
+        @self.asymmBrowSlider.event
+        def onChanging(value):
+            self.changeValue("brown",value,self.human.eyesVertices)
 
         @self.asymmCheekSlider.event
         def onChange(value):
             self.changeValue("cheek",value)
+            
+        @self.asymmCheekSlider.event
+        def onChanging(value):
+            self.changeValue("cheek",value,self.human.headVertices)
 
         @self.asymmEarsSlider.event
         def onChange(value):
             self.changeValue("ear",value)
+            
+        @self.asymmEarsSlider.event
+        def onChanging(value):
+            self.changeValue("ear",value,self.human.earsVertices)
 
         @self.asymmEyeSlider.event
         def onChange(value):
             self.changeValue("eye",value)
+            
+        @self.asymmEyeSlider.event
+        def onChanging(value):
+            self.changeValue("eye",value,self.human.eyesVertices)
 
         @self.asymmJawSlider.event
         def onChange(value):
             self.changeValue("jaw",value)
+            
+        @self.asymmJawSlider.event
+        def onChanging(value):
+            self.changeValue("jaw",value,self.human.jawVertices)
 
         @self.asymmMouthSlider.event
         def onChange(value):
             self.changeValue("mouth",value)
+            
+        @self.asymmMouthSlider.event
+        def onChanging(value):
+            self.changeValue("mouth",value,self.human.mouthVertices)
 
         @self.asymmNoseSlider.event
         def onChange(value):
             self.changeValue("nose",value)
+            
+        @self.asymmNoseSlider.event
+        def onChanging(value):
+            self.changeValue("nose",value,self.human.noseVertices)
 
         @self.asymmTempleSlider.event
         def onChange(value):
             self.changeValue("temple",value)
+            
+        @self.asymmTempleSlider.event
+        def onChanging(value):
+            self.changeValue("temple",value,self.human.headVertices)
 
         @self.asymmTopSlider.event
         def onChange(value):
             self.changeValue("top",value)
+            
+        @self.asymmTopSlider.event
+        def onChanging(value):
+            self.changeValue("top",value,self.human.headVertices)
 
         @self.asymmTrunkSlider.event
         def onChange(value):
             self.changeValue("trunk",value)
+            
+        @self.asymmTrunkSlider.event
+        def onChanging(value):
+            self.changeValue("trunk",value,self.human.breastVertices)
 
 
-    def changeValue(self,bodyPartName,value):
+    def changeValue(self,bodyPartName,value,vertices=None):
         """
         This function apply the targets, and inform the undo system about the changes.
         @return: None
@@ -128,7 +168,10 @@ class AsymmTaskView(gui3d.TaskView):
         @param value: The amount of asymmetry
         """
         before = self.getTargetsAndValues(self.asymmTargets)
-        self.applyAsymm(self.calcAsymm(value,bodyPartName))
+        if vertices:
+            self.applyAsymmFast(self.calcAsymm(value,bodyPartName),vertices)
+        else:
+            self.applyAsymm(self.calcAsymm(value,bodyPartName))
         after = self.getTargetsAndValues(self.asymmTargets)
         self.app.did(AsymmAction(self.human, self.applyAsymm, before, after))
 
@@ -204,7 +247,18 @@ class AsymmTaskView(gui3d.TaskView):
             self.human.targetsDetailStack[k] = v
         self.human.applyAllTargets(self.human.app.progress)
 
-
+    def applyAsymmFast(self,asymDict,vertices):
+        """
+        This function apply on the human the asymmetry targets, passed using
+        a dictionary,  and update the human target stack.
+        @return: None
+        @type  asymDict: Dictonary
+        @param asymDict: A dictionary with "targetpath:val" items.
+        """
+        for k, v in asymDict.items():
+            algos3d.loadTranslationTarget(self.human.meshData, k, v - self.human.targetsDetailStack.get(k, 0.0), None, 0, 0)
+            self.human.targetsDetailStack[k] = v
+        self.human.meshData.update(vertices)
 
 def load(app):
     """
