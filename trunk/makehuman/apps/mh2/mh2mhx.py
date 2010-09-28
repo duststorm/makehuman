@@ -22,12 +22,17 @@ TO DO
 
 """
 
-import module3d, aljabr, mh, files3d, mh2bvh, mhxbones, mhxbones_rigify, rig_panel_25, mhx_rig, mh2proxy
-import os
-
 MAJOR_VERSION = 0
 MINOR_VERSION = 17
 splitLeftRight = True
+
+import module3d, aljabr, mh, files3d, mh2bvh, os
+
+import sys
+mhxPath = os.path.realpath('./shared/mhx')
+if mhxPath not in sys.path:
+	sys.path.append(mhxPath)
+import mh2proxy, mhxbones, mhx_rig, rig_panel_25
 
 #
 #	exportMhx(obj, filename):
@@ -450,14 +455,14 @@ def setShapeScale(words):
 	try:
 		(p1, p2, length0) = ShapeKeyScale[key]
 	except:
-		print('No scale	%s' % key)
+		#print('No scale	%s' % key)
 		return 1.0
 	x1 = mhx_rig.locations[p1]
 	x2 = mhx_rig.locations[p2]
 	dist = aljabr.vsub(x1, x2)
 	length = aljabr.vlen(dist)
 	scale = length/length0
-	print("Scale %s %f %f" % (key, length, scale))
+	#print("Scale %s %f %f" % (key, length, scale))
 	return scale
 				
 #

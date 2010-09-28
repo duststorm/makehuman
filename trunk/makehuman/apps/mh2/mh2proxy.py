@@ -70,11 +70,11 @@ def proxyConfig():
 	if not fp: return []	
 	proxyList = []
 	for line in fp:
-		lineSplit = line.split()
-		if len(lineSplit) == 0 or lineSplit[0][0] == '#':
+		words = line.split()
+		if len(words) == 0 or words[0][0] == '#':
 			pass
 		else:
-			proxyFile = os.path.expanduser(lineSplit[0])
+			proxyFile = os.path.expanduser(words[0])
 			proxyList.append(proxyFile)
 	fp.close()
 	print(proxyList)
@@ -106,51 +106,51 @@ def readProxyFile(obj, proxyFile):
 
 	vn = 0
 	for line in tmpl:
-		lineSplit= line.split()
-		if len(lineSplit) == 0:
+		words= line.split()
+		if len(words) == 0:
 			pass
-		elif lineSplit[0] == '#':
+		elif words[0] == '#':
 			doVerts = False
 			doFaces = False
-			doMaterials = False
+			doMaterial = False
 			doTexVerts = False
 			doObjData = False
 			doBones = False
 			weightBone = None
 			theGroup = None
-			if lineSplit[1] == 'verts':
+			if words[1] == 'verts':
 				doVerts = True
-			elif lineSplit[1] == 'faces':
+			elif words[1] == 'faces':
 				doFaces = True
-			elif lineSplit[1] == 'bones':
+			elif words[1] == 'bones':
 				return proxy
 				doBones = True
-			elif lineSplit[1] == 'weights':
-				weightBone = lineSplit[2]
+			elif words[1] == 'weights':
+				weightBone = words[2]
 				proxy.weights[weightBone] = []
 				proxy.weighted = True
-			elif lineSplit[1] == 'materials':
-				doMaterials = True
-			elif lineSplit[1] == 'texVerts':
+			elif words[1] == 'material':
+				doMaterial = True
+			elif words[1] == 'texVerts':
 				doTexVerts = True
-			elif lineSplit[1] == 'objData':
+			elif words[1] == 'obj_data':
 				doObjData = True
-			elif lineSplit[1] == 'name':
-				proxy.name = lineSplit[2]
+			elif words[1] == 'name':
+				proxy.name = words[2]
 		elif doObjData:
-			if lineSplit[0] == 'vt':
-				newTexVert(1, lineSplit, proxy)
-			elif lineSplit[0] == 'f':
-				newFace(1, lineSplit, theGroup, proxy)
-			elif lineSplit[0] == 'g':
-				theGroup = lineSplit[1]
+			if words[0] == 'vt':
+				newTexVert(1, words, proxy)
+			elif words[0] == 'f':
+				newFace(1, words, theGroup, proxy)
+			elif words[0] == 'g':
+				theGroup = words[1]
 		elif doVerts:
-			v0 = int(lineSplit[0])
-			v1 = int(lineSplit[1])
-			v2 = int(lineSplit[2])
-			w0 = float(lineSplit[3])
-			w1 = float(lineSplit[4])
-			w2 = float(lineSplit[5])
+			v0 = int(words[0])
+			v1 = int(words[1])
+			v2 = int(words[2])
+			w0 = float(words[3])
+			w1 = float(words[4])
+			w2 = float(words[5])
 
 			proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2))
 			addProxyVert(v0, vn, w0, proxy)
@@ -158,20 +158,36 @@ def readProxyFile(obj, proxyFile):
 			addProxyVert(v2, vn, w2, proxy)
 			vn += 1
 		elif doFaces:
-			newFace(0, lineSplit, theGroup, proxy)
+			newFace(0, words, theGroup, proxy)
 		elif doTexVerts:
-			newTexVert(0, lineSplit, proxy)
-		elif doMaterials:
-			proxy.materials.append(int(lineSplit[0]))
+			newTexVert(0, words, proxy)
+		elif doMaterial:
+			words= line.split()
+			key = words[0]
+			if key == 'diffuse_color':
+				pass
+			elif key == 'diffuse_shader':
+				pass
+			elif key == 'diffuse_intensity':
+				pass
+			elif key == 'specular_color':
+				pass
+			elif key == 'specular_shader':
+				pass
+			elif key == 'specular_intensity':
+				pass
+			else:
+				raise NameError("Material %s?" % key)
+			#proxy.materials.append(int(words[0]))
 		elif doBones:
-			bone = lineSplit[0]
-			head = getJoint(lineSplit[1], obj, locations)
-			tail = getJoint(lineSplit[2], obj, locations)
-			roll = float(lineSplit[3])
-			if lineSplit[4] == '-':
+			bone = words[0]
+			head = getJoint(words[1], obj, locations)
+			tail = getJoint(words[2], obj, locations)
+			roll = float(words[3])
+			if words[4] == '-':
 				parent = None
 			else:
-				parent = lineSplit[4]			
+				parent = words[4]			
 			tails[bone] = tail
 			flags = 0
 			if parent:
@@ -180,8 +196,8 @@ def readProxyFile(obj, proxyFile):
 					flags |= F_CON
 			proxy.bones.append((bone,head,tail,roll,parent,flags))
 		elif weightBone:
-			v = int(lineSplit[0])
-			w = float(lineSplit[1])
+			v = int(words[0])
+			w = float(words[1])
 			proxy.weights[weightBone].append((v,w))
 
 	return proxy
@@ -257,20 +273,20 @@ def writeProxyWeights(fp, proxy):
 	return
 
 #
-#	newFace(first, lineSplit, group, proxy):
-#	newTexVert(first, lineSplit, proxy):
+#	newFace(first, words, group, proxy):
+#	newTexVert(first, words, proxy):
 #	addProxyVert(v, vn, w, proxy):
 #
 
-def newFace(first, lineSplit, group, proxy):
+def newFace(first, words, group, proxy):
 	face = []
 	texface = []
-	nCorners = len(lineSplit)
+	nCorners = len(words)
 	for n in range(first, nCorners):
-		words = lineSplit[n].split('/')
-		face.append(int(words[0])-1)
-		if len(words) > 1:
-			texface.append(int(words[1])-1)
+		numbers = words[n].split('/')
+		face.append(int(numbers[0])-1)
+		if len(numbers) > 1:
+			texface.append(int(numbers[1])-1)
 	proxy.faces.append((face,group))
 	if texface:
 		proxy.texFaces.append(texface)
@@ -278,11 +294,11 @@ def newFace(first, lineSplit, group, proxy):
 			raise NameError("texface %s %s", face, texface)
 	return
 
-def newTexVert(first, lineSplit, proxy):
+def newTexVert(first, words, proxy):
 	vt = []
-	nCoords = len(lineSplit)
+	nCoords = len(words)
 	for n in range(first, nCoords):
-		uv = float(lineSplit[n])
+		uv = float(words[n])
 		vt.append(uv)
 	proxy.texVerts.append(vt)
 	return

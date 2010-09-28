@@ -14,14 +14,37 @@
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
 Abstract
-Define proxy utility
+Utility for making clothes to MH characters
+Used to be called defineProxy.py, because a proxy is just a full-body dress.
 
 """
+bl_addon_info = {
+    "name": "Make clothes to MakeHuman",
+    "author": "Thomas Larsson",
+    "version": 0.2,
+    "blender": (2, 5, 4),
+    "api": 31913,
+    "location": "View3D > Properties > Make MH clothes",
+    "description": "Make clothes for MakeHuman characters",
+    "warning": "",
+    "category": "3D View"}
+
+"""
+Access from UI panel (N-key).
+Select clothes or proxies, then select mesh to make it active.
+Press make clothes
+Takes filename from clothe.
+"""
+
 import bpy, os
 
 threshold = -0.2
 mListLength = 2
 
+
+#
+#	printMverts(stuff, mverts):
+#
 
 def printMverts(stuff, mverts):
 	for n in range(mListLength):
@@ -29,17 +52,23 @@ def printMverts(stuff, mverts):
 		if v:
 			print(stuff, v.index, dist)
 
-def selectVert(vn, ob):
-	bpy.context.scene.objects.active = ob
+#
+#	selectVert(context, vn, ob):
+#
+
+def selectVert(context, vn, ob):
+	context.scene.objects.active = ob
 	bpy.ops.object.mode_set(mode='EDIT')
 	bpy.ops.mesh.select_all(action='DESELECT')
 	bpy.ops.object.mode_set(mode='OBJECT')
 	ob.data.vertices[vn].select = True
 	return	
 
-def findProxy(log):
-	bob = bpy.data.objects['Human']
-	pob = bpy.data.objects['Proxy']
+#
+#	findClothes(context, bob, pob, log):
+#
+
+def findClothes(context, bob, pob, log):
 	base = bob.data
 	proxy = pob.data
 	
@@ -51,8 +80,8 @@ def findProxy(log):
 			pindex = -1
 		if pindex < 0:
 			vn = pv.index
-			selectVert(vn, pob)
-			raise NameError("Proxy vert %d not member of any group" % vn)
+			selectVert(context, vn, pob)
+			raise NameError("Clothes vert %d not member of any group" % vn)
 
 		name = pob.vertex_groups[pindex].name
 		bindex = None
@@ -111,7 +140,7 @@ def findProxy(log):
 					verts = []
 					for v in f.vertices:
 						verts.append(base.vertices[v].co)
-					wts = cornerWeights(pv, verts)
+					wts = cornerWeights(pv, verts, pob)
 					fcs.append((f.vertices, wts))
 
 	print("Finding best weights")
@@ -146,7 +175,7 @@ def minWeight(wts):
 	return best
 
 #
-#	cornerWeights(pv, verts):
+#	cornerWeights(pv, verts, pob):
 #
 #	px = w0*x0 + w1*x1 + w2*x2
 #	py = w0*y0 + w1*y1 + w2*y2
@@ -166,7 +195,7 @@ def minWeight(wts):
 #	det*w1 = -a10*b0 + a00*b1
 #
 
-def cornerWeights(pv, verts):
+def cornerWeights(pv, verts, pob):
 	r0 = verts[0]
 	r1 = verts[1]
 	r2 = verts[2]
@@ -197,11 +226,11 @@ def cornerWeights(pv, verts):
 	
 	det = a00*a11 - a01*a10
 	if abs(det) < 1e-20:
-		print("Proxy vert %d mapped to degenerate triangle (det = %g) with corners" % (pv.index, det))
+		print("Clothes vert %d mapped to degenerate triangle (det = %g) with corners" % (pv.index, det))
 		print("r0", r0[0], r0[1], r0[2])
 		print("r1", r1[0], r1[1], r1[2])
 		print("r2", r2[0], r2[1], r2[2])
-		highlight(pv, 'Proxy')
+		highlight(pv, pob)
 		raise NameError("Singular matrix in cornerWeights")
 
 	w0 = (a11*b0 - a01*b1)/det
@@ -210,11 +239,10 @@ def cornerWeights(pv, verts):
 	return (w0, w1, 1-w0-w1)
 
 #
-#	highlight(pv, obname):
+#	highlight(pv, ob):
 #
 
-def highlight(pv, obname):
-	ob = bpy.data.objects[obname]
+def highlight(pv, ob):
 	me = ob.data
 	for v in me.vertices:
 		v.select = False
@@ -222,45 +250,114 @@ def highlight(pv, obname):
 	return
 	
 #
-#	printProxy(path, faces):	
+#	printClothes(path, faces):	
 #
 		
-def printProxy(path, faces):	
+def printClothes(path, proxy, faces):	
 	file = os.path.expanduser(path)
 	fp= open(file, "w")
 
-	fp.write("# name MyName\n# verts\n")
-	for (pv, verts, wts) in faces:
-		print(pv.index,verts,wts)
-		fp.write("%5d %5d %5d %.5f %.5f %.5f\n" % (verts[0], verts[1], verts[2], wts[0], wts[1], wts[2]))
-	fp.write("# objData\n")
+	fp.write("# name %s\n" % proxy.name)
+	fp.write("# author Unknown\n")
+	me = proxy.data
 
-	'''
-	proxy =  bpy.data.objects['Proxy'].data
-	fp.write("Faces\n")
-	for f in proxy.faces:
-		for v in f.vertices:
-			fp.write("%d " % (v+1))
-		fp.write("\n")
-	'''
+	if me.materials:
+		mat = me.materials[0]
+		fp.write("# material %s\n" % mat.name)
+		writeColor(fp, 'diffuse_color', mat.diffuse_color)
+		fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
+		fp.write('diffuse_intensity %.4f\n' % mat.diffuse_intensity)
+		writeColor(fp, 'specular_color', mat.specular_color)
+		fp.write('specular_shader %s\n' % mat.specular_shader)
+		fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
+
+	fp.write("# verts\n")
+	for (pv, verts, wts) in faces:
+		#print(pv.index,verts,wts)
+		fp.write("%5d %5d %5d %.5f %.5f %.5f\n" % (verts[0], verts[1], verts[2], wts[0], wts[1], wts[2]))
+
+	fp.write("# obj_data\n")
+	if me.uv_textures:
+		uvtex = me.uv_textures[0]
+		#fp.write("# texverts\n")
+		fn = 0
+		for data in uvtex.data.values():
+			uv = data.uv_raw
+			f = me.faces[fn]
+			for n in range(len(f.vertices)):
+				fp.write("vt %.4f %.4f\n" % (uv[2*n], uv[2*n+1]))
+
+	#fp.write("# faces\n")
+
+	if me.uv_textures:
+		n = 1
+		for f in me.faces:
+			fp.write("f ")
+			for v in f.vertices:
+				fp.write("%d/%d " % (v+1, n))
+				n += 1
+			fp.write("\n")
+	else:
+		for f in me.faces:
+			fp.write("f ")
+			for v in f.vertices:
+				fp.write("%d " % (v+1))
+			fp.write("\n")
+
+	fp.write('\n')
 	fp.close()
 	return
 
+def writeColor(fp, string, color):
+	fp.write("%s %.4f %.4f %.4f\n" % (string, color[0], color[1], color[2]))
+
 #
-#
+#	makeClothes(context):
 #
 
-def printAll():
-	path = '~/makehuman/myproxy.proxy'
-	path = '/home/thomas/myproxy.proxy'
-	print("Doing %s" % path)
-	logfile = os.path.expanduser('~/makehuman/proxy.log')
-	log = open(logfile, "w")
-	verts = findProxy(log)
-	log.close()
-	printProxy(path, verts)
-	print("%s done" % path)
+def makeClothes(context):
+	bob = context.object
+	for pob in context.selected_objects:
+		if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
+			print(bob, pob)
+			path = '~/makehuman/%s.mhclo' % pob.name
+			print("Doing %s" % path)
+			logfile = os.path.expanduser('~/makehuman/clothes.log')
+			log = open(logfile, "w")
+			verts = findClothes(context, bob, pob, log)
+			log.close()
+			printClothes(path, pob, verts)
+			print("%s done" % path)
+		
+#
+#	class MakeClothesPanel(bpy.types.Panel):
+#
 
+class MakeClothesPanel(bpy.types.Panel):
+	bl_label = "Make clothes"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	@classmethod
+	def poll(cls, context):
+		return (context.object and context.object.type == 'MESH')
 
-printAll()	
+	def draw(self, context):
+		layout = self.layout
+		scn = context.scene
+		layout.operator("object.MakeClothesButton")
+		return
+
+#
+#	class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_MakeClothesButton"
+	bl_label = "Make clothes"
+
+	def execute(self, context):
+		import bpy, mathutils
+		makeClothes(context)
+		return{'FINISHED'}	
 
