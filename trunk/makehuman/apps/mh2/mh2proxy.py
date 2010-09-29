@@ -28,21 +28,32 @@ from aljabr import *
 
 #
 #	class CProxy
+#	class CMaterial
 #
 
 class CProxy:
 	def __init__(self):
 		self.name = None
+		self.material = None
 		self.verts = {}
 		self.realVerts = []
 		self.faces = []
-		self.materials = []
 		self.texFaces = []
 		self.texVerts = []
+		self.materials = []
 		self.bones = []
 		self.weights = {}
 		self.weighted = False
 
+class CMaterial:
+	def __init__(self):
+		self.diffuse_color = None
+		self.diffuse_intensity = None
+		self.diffuse_shader = None
+		self.specular_color = None
+		self.specular_intensity = None
+		self.specular_shader = None
+		return
 #
 #	Flags
 #
@@ -131,6 +142,7 @@ def readProxyFile(obj, proxyFile):
 				proxy.weighted = True
 			elif words[1] == 'material':
 				doMaterial = True
+				proxy.material = CMaterial()
 			elif words[1] == 'texVerts':
 				doTexVerts = True
 			elif words[1] == 'obj_data':
@@ -151,8 +163,14 @@ def readProxyFile(obj, proxyFile):
 			w0 = float(words[3])
 			w1 = float(words[4])
 			w2 = float(words[5])
+			try:
+				d0 = float(words[6])
+				d1 = float(words[7])
+				d2 = float(words[8])
+			except:
+				(d0,d1,d2) = (0,0,0)
 
-			proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2))
+			proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2, d0, d1, d2))
 			addProxyVert(v0, vn, w0, proxy)
 			addProxyVert(v1, vn, w1, proxy)
 			addProxyVert(v2, vn, w2, proxy)
@@ -162,23 +180,7 @@ def readProxyFile(obj, proxyFile):
 		elif doTexVerts:
 			newTexVert(0, words, proxy)
 		elif doMaterial:
-			words= line.split()
-			key = words[0]
-			if key == 'diffuse_color':
-				pass
-			elif key == 'diffuse_shader':
-				pass
-			elif key == 'diffuse_intensity':
-				pass
-			elif key == 'specular_color':
-				pass
-			elif key == 'specular_shader':
-				pass
-			elif key == 'specular_intensity':
-				pass
-			else:
-				raise NameError("Material %s?" % key)
-			#proxy.materials.append(int(words[0]))
+			readMaterial(line, proxy.material)
 		elif doBones:
 			bone = words[0]
 			head = getJoint(words[1], obj, locations)
@@ -201,6 +203,28 @@ def readProxyFile(obj, proxyFile):
 			proxy.weights[weightBone].append((v,w))
 
 	return proxy
+
+#
+#	readMaterial(line, mat):
+#
+
+def readMaterial(line, mat):
+	words= line.split()
+	key = words[0]
+	if key == 'diffuse_color':
+		mat.diffuse_color = (float(words[1]), float(words[2]), float(words[3]))
+	elif key == 'diffuse_shader':
+		mat.diffuse_shader = words[1]
+	elif key == 'diffuse_intensity':
+		mat.diffuse_intensity = float(words[1])
+	elif key == 'specular_color':
+		mat.specular_color = (float(words[1]), float(words[2]), float(words[3]))
+	elif key == 'specular_shader':
+		mat.specular_shader = words[1]
+	elif key == 'specular_intensity':
+		mat.specular_intensity = float(words[1])
+	else:
+		raise NameError("Material %s?" % key)
 
 #
 #	getLoc(joint, obj):
@@ -315,10 +339,10 @@ def addProxyVert(v, vn, w, proxy):
 #
 
 def proxyCoord(barycentric):
-	(v0, v1, v2, w0, w1, w2) = barycentric
-	x = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0]
-	y = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1]
-	z = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2]
+	(v0, v1, v2, w0, w1, w2, d0, d1, d2) = barycentric
+	x = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0
+	y = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1
+	z = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2
 	return [x,y,z]
 
 #

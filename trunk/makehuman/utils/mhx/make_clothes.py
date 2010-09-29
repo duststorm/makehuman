@@ -36,7 +36,7 @@ Press make clothes
 Takes filename from clothe.
 """
 
-import bpy, os
+import bpy, os, mathutils
 
 threshold = -0.2
 mListLength = 2
@@ -154,11 +154,24 @@ def findClothes(context, bob, pob, log):
 				minmax = w
 				bWts = wts
 				bVerts = fverts
-		if minmax > threshold:
-			bestFaces.append((pv, bVerts, bWts))	
-		else:
+		if minmax < threshold:
 			(mv, mdist) = mverts[0]
-			bestFaces.append((pv, [mv.index,0,1], [1,0,0]))
+			bVerts = [mv.index,0,1]
+			bWts = [1,0,0]
+
+		vec0 = base.vertices[bVerts[0]].co
+		vec1 = base.vertices[bVerts[1]].co
+		vec2 = base.vertices[bVerts[2]].co
+
+		est = bWts[0]*vec0 + bWts[1]*vec1 + bWts[2]*vec2
+		diff = pv.co - est
+		'''
+		e01 = vec1 - vec0
+		e02 = vec2 - vec0
+		normal = e01.cross(e02)
+		proj = diff.dot(normal)/(normal.length * normal.length)
+		'''
+		bestFaces.append((pv, bVerts, bWts, diff))	
 				
 	print("Done")
 	return bestFaces
@@ -250,16 +263,16 @@ def highlight(pv, ob):
 	return
 	
 #
-#	printClothes(path, faces):	
+#	printClothes(path, pob, data):	
 #
 		
-def printClothes(path, proxy, faces):	
+def printClothes(path, pob, data):
 	file = os.path.expanduser(path)
 	fp= open(file, "w")
 
-	fp.write("# name %s\n" % proxy.name)
+	fp.write("# name %s\n" % pob.name)
 	fp.write("# author Unknown\n")
-	me = proxy.data
+	me = pob.data
 
 	if me.materials:
 		mat = me.materials[0]
@@ -272,17 +285,18 @@ def printClothes(path, proxy, faces):
 		fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
 
 	fp.write("# verts\n")
-	for (pv, verts, wts) in faces:
+	for (pv, verts, wts, diff) in data:
 		#print(pv.index,verts,wts)
-		fp.write("%5d %5d %5d %.5f %.5f %.5f\n" % (verts[0], verts[1], verts[2], wts[0], wts[1], wts[2]))
+		fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
+			verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[1], diff[2]))
 
 	fp.write("# obj_data\n")
 	if me.uv_textures:
 		uvtex = me.uv_textures[0]
 		#fp.write("# texverts\n")
 		fn = 0
-		for data in uvtex.data.values():
-			uv = data.uv_raw
+		for uvdata in uvtex.data.values():
+			uv = uvdata.uv_raw
 			f = me.faces[fn]
 			for n in range(len(f.vertices)):
 				fp.write("vt %.4f %.4f\n" % (uv[2*n], uv[2*n+1]))
@@ -319,16 +333,35 @@ def makeClothes(context):
 	bob = context.object
 	for pob in context.selected_objects:
 		if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
-			print(bob, pob)
-			path = '~/makehuman/%s.mhclo' % pob.name
-			print("Doing %s" % path)
-			logfile = os.path.expanduser('~/makehuman/clothes.log')
+			outpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
+			outfile = os.path.realpath(os.path.expanduser(outpath))
+			print("Creating clothes file %s" % outfile)
+			logpath = '%s/clothes.log' % context.scene['MakeClothesDirectory']
+			logfile = os.path.realpath(os.path.expanduser(logpath))
 			log = open(logfile, "w")
-			verts = findClothes(context, bob, pob, log)
+			data = findClothes(context, bob, pob, log)
 			log.close()
-			printClothes(path, pob, verts)
-			print("%s done" % path)
+			printClothes(outpath, pob, data)
+			print("%s done" % outpath)
 		
+
+###################################################################################	
+#	User interface
+#
+#	initInterface()
+#
+
+from bpy.props import *
+
+def initInterface(scn):
+	bpy.types.Scene.MakeClothesDirectory = StringProperty(
+		name="Directory", 
+		description="Directory", 
+		maxlen=1024)
+	scn['MakeClothesDirectory'] = "~/makehuman"
+
+initInterface(bpy.context.scene)
+
 #
 #	class MakeClothesPanel(bpy.types.Panel):
 #
@@ -344,9 +377,24 @@ class MakeClothesPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		layout = self.layout
-		scn = context.scene
+		layout.operator("object.InitInterfaceButton")
+		layout.prop(context.scene, "MakeClothesDirectory")
 		layout.operator("object.MakeClothesButton")
 		return
+
+#
+#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_InitInterfaceButton"
+	bl_label = "Initialize"
+
+	def execute(self, context):
+		import bpy
+		initInterface(context.scene)
+		print("Interface initialized")
+		return{'FINISHED'}	
 
 #
 #	class OBJECT_OT_MakeClothesButton(bpy.types.Operator):

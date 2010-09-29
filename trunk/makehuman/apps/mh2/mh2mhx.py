@@ -71,9 +71,9 @@ def exportMhx_24(obj, fp):
 "  error This file can not be opened in Blender 2.5x. Try the -classic25 file instead. ;\n "+
 "end if\n")
 
-	copyMaterialFile("data/templates/materials24.mhx", fp)	
+	copyMaterialFile("shared/mhx/templates/materials24.mhx", fp)	
 	exportArmature(obj, fp)
-	tmpl = open("data/templates/meshes24.mhx")
+	tmpl = open("shared/mhx/templates/meshes24.mhx")
 	if tmpl:
 		copyMeshFile249(obj, tmpl, fp)	
 		tmpl.close()
@@ -110,13 +110,13 @@ def exportMhx_25(obj, rig, fp):
 "  error 'This file can only be read with Blender 2.5' ;\n" +
 "end if\n")
 
-	copyFile25(obj, "data/templates/materials25.mhx", rig, fp, None, [])	
+	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
 
 	mhx_rig.setupRig(obj)
 
 	fp.write("if toggle&T_Armature\n")
-	copyFile25(obj, "data/templates/common-armature25.mhx", rig, fp, None, [])	
-	copyFile25(obj, "data/templates/%s-armature25.mhx" % rig, rig, fp, None, [])	
+	copyFile25(obj, "shared/mhx/templates/common-armature25.mhx", rig, fp, None, [])	
+	copyFile25(obj, "shared/mhx/templates/%s-armature25.mhx" % rig, rig, fp, None, [])	
 	fp.write("end if\n")
 
 	fp.write("\nNoScale False ;\n\n")
@@ -125,15 +125,15 @@ def exportMhx_25(obj, rig, fp):
 	proxyData = {}
 	fp.write("if toggle&T_Proxy\n")
 	for proxyFile in proxyList:
-		copyFile25(obj, "data/templates/proxy25.mhx", rig, fp, proxyFile, proxyData)	
+		copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyFile, proxyData)	
 	fp.write("end if\n")
 
 	fp.write("if toggle&T_Mesh\n")
-	copyFile25(obj, "data/templates/meshes25.mhx", rig, fp, None, proxyData)	
+	copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
 	fp.write("end if\n")
 
 	fp.write("if toggle&T_Armature\n")
-	copyFile25(obj, "data/templates/%s-poses25.mhx" % rig, rig, fp, None, proxyData)	
+	copyFile25(obj, "shared/mhx/templates/%s-poses25.mhx" % rig, rig, fp, None, proxyData)	
 	fp.write("end if\n")
 	return
 
@@ -259,8 +259,8 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 				if proxy and proxy.weighted:
 					mh2proxy.writeProxyWeights(fp, proxy)
 				else:
-					copyVertGroups("data/templates/vertexgroups-bones25.mhx", fp, proxy)	
-					copyVertGroups("data/templates/vertexgroups-leftright25.mhx", fp, proxy)	
+					copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)	
+					copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)	
 			elif words[1] == 'mesh-shapeKey':
 				pass
 				writeShapeKeys(fp, "HumanMesh", None)
@@ -493,8 +493,8 @@ def printProxyShape(fp, shapes):
 def writeShapeKeys(fp, name, proxy):
 	fp.write("ShapeKeys %s\n" % name)
 	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
-	copyShapeKeys("data/templates/shapekeys-facial25.mhx", fp, proxy)	
-	copyShapeKeys("data/templates/shapekeys-body25.mhx", fp, proxy)
+	copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy)	
+	copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy)
 	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
 	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
 	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
@@ -550,9 +550,9 @@ def copyMeshFile249(obj, tmpl, fp):
 				fp.write("end if\n")
 			elif words[1] == 'mesh' and mainMesh:
 				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-				copyShapeKeys("data/templates/shapekeys-facial25.mhx", fp, None)	
-				copyShapeKeys("data/templates/shapekeys-extra24.mhx", fp, None)	
-				copyShapeKeys("data/templates/shapekeys-body25.mhx", fp, None)	
+				copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, None)	
+				copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, None)	
+				copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, None)	
 				writeIpo(fp)
 				fp.write(line)
 				skipOne = True
@@ -568,9 +568,9 @@ def copyMeshFile249(obj, tmpl, fp):
 			mainMesh = True
 			fp.write("if useMesh\n")
 		elif words[0] == 'vertgroup':
-			copyVertGroups("data/templates/vertexgroups-common25.mhx", fp, None)	
-			copyVertGroups("data/templates/vertexgroups-classic25.mhx", fp, None)	
-			copyVertGroups("data/templates/vertexgroups-toes25.mhx", fp, None)	
+			copyVertGroups("shared/mhx/templates/vertexgroups-common25.mhx", fp, None)	
+			copyVertGroups("shared/mhx/templates/vertexgroups-classic25.mhx", fp, None)	
+			copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, None)	
 			skipOne = True
 			skip = False
 		elif words[0] == 'v' and inZone:
@@ -593,7 +593,7 @@ def copyMeshFile249(obj, tmpl, fp):
 def exportProxy24(obj, proxyFile, fp):
 	proxy = mh2proxy.readProxyFile(obj, proxyFile)
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
-	tmpl = open("data/templates/proxy24.mhx", "rU")
+	tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
 	for line in tmpl:
 		words= line.split()
 		if len(words) == 0:
@@ -624,14 +624,14 @@ def exportProxy24(obj, proxyFile, fp):
 					fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 				fp.write(" ;\n")
 		elif words[0] == 'vertgroup':
-			copyVertGroups("data/templates/vertexgroups-common25.mhx", fp, proxy)	
-			copyVertGroups("data/templates/vertexgroups-classic25.mhx", fp, proxy)	
-			copyVertGroups("data/templates/vertexgroups-toes25.mhx", fp, proxy)	
+			copyVertGroups("shared/mhx/templates/vertexgroups-common25.mhx", fp, proxy)	
+			copyVertGroups("shared/mhx/templates/vertexgroups-classic25.mhx", fp, proxy)	
+			copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, proxy)	
 		elif words[0] == 'shapekey':
 			fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-			copyShapeKeys("data/templates/shapekeys-facial25.mhx", fp, proxy)	
-			copyShapeKeys("data/templates/shapekeys-extra24.mhx", fp, proxy)	
-			copyShapeKeys("data/templates/shapekeys-body25.mhx", fp, proxy)	
+			copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy)	
+			copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, proxy)	
+			copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy)	
 			writeIpo(fp)
 		else:
 			fp.write(line)
@@ -848,7 +848,7 @@ def writeIcu(fp, shape, expr):
 def writeIpo(fp):
 	global splitLeftRight
 
-	mhxFile = "data/templates/mhxipos.mhx"
+	mhxFile = "shared/mhx/templates/mhxipos.mhx"
 	try:
 		print("Trying to open "+mhxFile)
 		tmpl = open(mhxFile, "rU")
