@@ -283,7 +283,13 @@ class AsymmTaskView(gui3d.TaskView):
         if modifiers:
             return modifiers[0].getValue()
         else:
-            return 0.5
+            return 0.0
+            
+    def onShow(self, event):
+
+        gui3d.TaskView.onShow(self, event)
+        self.asymmBrowSlider.setFocus()
+        self.syncSliders()
             
     def syncSliders(self):
         self.asymmBrowSlider.setValue(self.getValue('brown'))
