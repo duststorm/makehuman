@@ -65,6 +65,8 @@ def recursiveDirNames(root):
 sys.path.append("./")
 sys.path.append("./apps")
 sys.path.append("./shared")
+sys.path.append("./shared/mhx/templates")
+sys.path.append("./shared/mhx")
 sys.path=sys.path + recursiveDirNames("./apps")
 sys.path.append("./core")
 sys.path=sys.path + recursiveDirNames("./core")
