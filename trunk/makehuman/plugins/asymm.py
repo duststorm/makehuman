@@ -44,6 +44,8 @@ class AsymmTaskView(gui3d.TaskView):
         
         # Modifiers
         self.modifiers = {}
+        for bodypart in ["brown", "cheek","ear","eye", "jaw", "mouth","nose","temple","top","trunk","breast"]:
+            self.getModifiers(bodypart)
         
         # Undo memory
         self.before = None
@@ -179,7 +181,7 @@ class AsymmTaskView(gui3d.TaskView):
                 prefix = targetName[:-2]
                 suffix = targetName[-2:]
                 if suffix == "-r":
-                    f2 = os.path.join(dirPath, prefix+"-l.target")
+                    f2 = dirPath + "/" + prefix + "-l.target"
                     pair = [f,f2]
                     pairs.append(pair)
         return pairs
@@ -230,7 +232,7 @@ class AsymmTaskView(gui3d.TaskView):
         return modifiers
         
     def getSliderValue(self, bodypart):
-        modifiers = self.modifiers.get(bodypart, None)
+        modifiers = self.modifiers[bodypart]
         if modifiers:
             return modifiers[0].getValue()
         else:

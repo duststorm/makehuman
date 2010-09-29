@@ -94,5 +94,8 @@ class Modifier:
             return value
         else:
             return 0.0
+            
+    def __str__(self):
+        return "%s: %f\n%s: %f" % (self.left, self.human.getDetail(self.left), self.right, self.human.getDetail(self.right))
 
 
