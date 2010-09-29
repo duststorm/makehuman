@@ -1845,7 +1845,7 @@ class Human(gui3d.Object):
                     self.setPelvisTone(float(lineData[1]))
                 elif lineData[0] == 'buttocks':
                     self.setButtocks(float(lineData[1]))
-                elif lineData[0] == 'asym':
+                elif lineData[0] == 'asymmetry':
                     self.targetsDetailStack['data/targets/asym/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] == 'ethnic':
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
@@ -1899,7 +1899,7 @@ class Human(gui3d.Object):
             elif '/microdetails' in t:
                 f.write('microdetail %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
             elif '/asym' in t:
-               f.write('asym %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
+               f.write('asymmetry %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
             else:
                 print('Error, %s was not saved' % t)
         f.close()
