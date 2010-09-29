@@ -76,6 +76,9 @@ class AsymmTaskView(gui3d.TaskView):
         
         # Modifiers
         self.modifiers = {}
+        
+        # Undo memory
+        self.before = None
 
         #Sliders events
 
@@ -167,7 +170,6 @@ class AsymmTaskView(gui3d.TaskView):
         def onChanging(value):
             self.changeValue("breast",value,self.human.breastVertices)
 
-
     def changeValue(self,bodyPartName,value,vertices=None):
         """
         This function apply the targets, and inform the undo system about the changes.
@@ -177,13 +179,17 @@ class AsymmTaskView(gui3d.TaskView):
         @type  value: Float
         @param value: The amount of asymmetry
         """
-        before = self.getTargetsAndValues(self.asymmTargets)
         if vertices:
+            if not self.before:
+                self.before = self.getTargetsAndValues(self.asymmTargets)
+                
             self.applyAsymmFast(self.calcAsymm(value,bodyPartName),vertices)
         else:
             self.applyAsymm(self.calcAsymm(value,bodyPartName))
-        after = self.getTargetsAndValues(self.asymmTargets)
-        self.app.did(AsymmAction(self.human, self.applyAsymm, before, after))
+            
+            after = self.getTargetsAndValues(self.asymmTargets)
+            self.app.did(AsymmAction(self.human, self.applyAsymm, self.before, after))
+            self.before = None
 
     def buildListOfTargetPairs(self, name):
         """
@@ -219,8 +225,7 @@ class AsymmTaskView(gui3d.TaskView):
 
         targetsAndValues = {}
         for t in targets:
-            v = self.human.getDetail(t)
-            targetsAndValues[t] = v
+            targetsAndValues[t] = self.human.getDetail(t)
         return targetsAndValues
 
 
@@ -262,8 +267,9 @@ class AsymmTaskView(gui3d.TaskView):
         @param asymDict: A dictionary with "targetpath:val" items.
         """
         for k, v in asymDict.items():
-            self.human.targetsDetailStack[k] = v
+            self.human.setDetail(k, v)
         self.human.applyAllTargets(self.human.app.progress)
+        self.syncSliders()
 
     def applyAsymmFast(self,asymDict,vertices):
         """
@@ -274,8 +280,8 @@ class AsymmTaskView(gui3d.TaskView):
         @param asymDict: A dictionary with "targetpath:val" items.
         """
         for k, v in asymDict.items():
-            algos3d.loadTranslationTarget(self.human.meshData, k, v - self.human.targetsDetailStack.get(k, 0.0), None, 0, 0)
-            self.human.targetsDetailStack[k] = v
+            algos3d.loadTranslationTarget(self.human.meshData, k, v - self.human.getDetail(k), None, 0, 0)
+            self.human.setDetail(k, v)
         self.human.meshData.update(vertices)
         
     def getValue(self, bodypart):
