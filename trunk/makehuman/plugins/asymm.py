@@ -64,11 +64,9 @@ class AsymmTaskView(gui3d.TaskView):
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"
         self.asymmTargets = []
-        for dir in os.listdir(self.asymmDataPath):
-            if os.path.isdir(os.path.join(self.asymmDataPath, dir)) and dir != "svn":
-                for f in os.listdir(os.path.join(self.asymmDataPath, dir)):
-                    if os.path.isfile(os.path.join(self.asymmDataPath, dir, f)):
-                        self.asymmTargets.append(os.path.join(self.asymmDataPath, dir, f))
+        for f in os.listdir(self.asymmDataPath):
+            if os.path.isfile(os.path.join(self.asymmDataPath, f)):
+                self.asymmTargets.append(os.path.join(self.asymmDataPath, f))
 
         #The human mesh
         self.human = self.app.scene3d.selectedHuman

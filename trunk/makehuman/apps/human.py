@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" 
+"""
 **Project Name:**      MakeHuman
 
 **Product Home Page:** http://www.makehuman.org/
@@ -61,7 +61,7 @@ class Human(gui3d.Object):
         self.editMode = 'macro'
         self.modellingType = 'translation'
         self.symmetryModeEnabled = False
-    
+
         self.enableUVInterpolation = 0
         self.targetUVBuffer = {}
 
@@ -178,36 +178,36 @@ class Human(gui3d.Object):
 
         self.hairFile = 'data/hairs/default.hair'
         self.hairColor = [0.41, 0.23, 0.04]
-        
+
         self.genitalVertices, self.genitalFaces = self.meshData.getVerticesAndFacesForGroups(["pelvis-genital-area"])
-        
+
         breastNames = ["l-torso-inner-pectoralis", "l-torso-middle-pectoralis", "l-torso-outer-pectoralis", "l-torso-upper-pectoralis",
                 "l-torso-lower-pectoralis", "l-torso-nipple",
                 "r-torso-inner-pectoralis", "r-torso-middle-pectoralis", "r-torso-outer-pectoralis", "r-torso-upper-pectoralis",
                 "r-torso-lower-pectoralis", "r-torso-nipple"]
         self.breastVertices, self.breastFaces = self.meshData.getVerticesAndFacesForGroups(breastNames)
-        
+
         noseNames = [group.name for group in self.meshData.facesGroups if "nose" in group.name]
         self.noseVertices, self.noseFaces = self.meshData.getVerticesAndFacesForGroups(noseNames)
-        
+
         mouthNames = [group.name for group in self.meshData.facesGroups if "mouth" in group.name]
         self.mouthVertices, self.mouthFaces = self.meshData.getVerticesAndFacesForGroups(mouthNames)
 
         eyesNames = [group.name for group in self.meshData.facesGroups if "eye" in group.name]
         self.eyesVertices, self.eyesFaces = self.meshData.getVerticesAndFacesForGroups(eyesNames)
-        
+
         earsNames = [group.name for group in self.meshData.facesGroups if "ear" in group.name]
         self.earsVertices, self.earsFaces = self.meshData.getVerticesAndFacesForGroups(earsNames)
-        
+
         headNames = [group.name for group in self.meshData.facesGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
         self.headVertices, self.headFaces = self.meshData.getVerticesAndFacesForGroups(headNames)
-        
+
         pelvisNames = [group.name for group in self.meshData.facesGroups if "pelvis" in group.name]
         self.pelvisVertices, self.pelvisFaces = self.meshData.getVerticesAndFacesForGroups(pelvisNames)
-        
+
         stomachNames = [group.name for group in self.meshData.facesGroups if "hip" in group.name]
         self.stomachVertices, self.stomachFaces = self.meshData.getVerticesAndFacesForGroups(stomachNames)
-        
+
         jawNames = [group.name for group in self.meshData.facesGroups if ("jaw" in group.name or "mouth" in group.name)]
         self.jawVertices, self.jawFaces = self.meshData.getVerticesAndFacesForGroups(jawNames)
 
@@ -268,7 +268,7 @@ class Human(gui3d.Object):
     def setGender(self, gender):
         """
         Sets the gender of the model. 0 is female, 1 is male.
-        
+
         Parameters
         ----------
 
@@ -292,7 +292,7 @@ class Human(gui3d.Object):
         """
         Sets the age of the model. 0 if 12 years old, 1 is 70. To set a particular age in years, use the
         formula age_value = (age_in_years - 12) / (70 - 12).
-        
+
         Parameters
         ----------
 
@@ -327,7 +327,7 @@ class Human(gui3d.Object):
     def setWeight(self, weight):
         """
         Sets the amount of weight of the model. 0 for underweight, 1 for overweight.
-        
+
         Parameters
         ----------
 
@@ -361,7 +361,7 @@ class Human(gui3d.Object):
     def setMuscle(self, muscle):
         """
         Sets the amount of muscle of the model. 0 for flacid, 1 for muscular.
-        
+
         Parameters
         ----------
 
@@ -395,7 +395,7 @@ class Human(gui3d.Object):
     def setGenitals(self, value):
         """
         Sets the amount of genitals of the model. -1 for female, 0 for none, 1 for male.
-        
+
         Parameters
         ----------
 
@@ -420,7 +420,7 @@ class Human(gui3d.Object):
 
     def getBreastFirmness(self):
         return self.breastFirmness
-        
+
     def setStomach(self, value):
         self.stomach = min(1.0, max(-1.0, value))
 
@@ -432,55 +432,55 @@ class Human(gui3d.Object):
 
     def getNose(self):
        return self.nose
-       
+
     def setMouth(self, value):
         self.mouth = min(1.0, max(0.0, value))
 
     def getMouth(self):
        return self.mouth
-   
+
     def setEyes(self, value):
         self.eyes = min(1.0, max(0.0, value))
 
     def getEyes(self):
        return self.eyes
-       
+
     def setEars(self, value):
         self.ears = min(1.0, max(0.0, value))
 
     def getEars(self):
        return self.ears
-       
+
     def setHead(self, value):
         self.head = min(1.0, max(0.0, value))
 
     def getHead(self):
        return self.head
-       
+
     def setHeadAge(self, value):
         self.headAge = min(1.0, max(-1.0, value))
 
     def getHeadAge(self):
        return self.headAge
-       
+
     def setFaceAngle(self, value):
         self.faceAngle = min(1.0, max(-1.0, value))
 
     def getFaceAngle(self):
        return self.faceAngle
-       
+
     def setJaw(self, value):
         self.jaw = min(1.0, max(0.0, value))
 
     def getJaw(self):
        return self.jaw
-       
+
     def setPelvisTone(self, value):
        self.pelvisTone = min(1.0, max(-1.0, value))
 
     def getPelvisTone(self):
        return self.pelvisTone
-       
+
     def setButtocks(self, value):
        self.buttocks = min(1.0, max(-1.0, value))
 
@@ -547,33 +547,33 @@ class Human(gui3d.Object):
             return name.replace('r-', 'l-', 1)
         else:
             return None
-            
+
     def updateGenitals(self, previous, next, recalcNormals = True, update = True):
         self.applyGenitalTargets(max(0.0, next) - max(0.0, previous), min(0.0, previous) - min(0.0, next))
-            
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.genitalVertices, self.genitalFaces)
         if update:
           self.meshData.update(self.genitalVertices)
-            
+
     def applyGenitalTargets(self, maleGenitals, femaleGenitals):
         detailTargets = {}
-        
+
         detailTargets[self.targetFemaleGenitalsChild] = femaleGenitals * self.childVal
         detailTargets[self.targetFemaleGenitalsYoung] = femaleGenitals * self.youngVal
         detailTargets[self.targetFemaleGenitalsOld] = femaleGenitals * self.oldVal
         detailTargets[self.targetMaleGenitalsChild] = maleGenitals * self.childVal
         detailTargets[self.targetMaleGenitalsYoung] = maleGenitals * self.youngVal
         detailTargets[self.targetMaleGenitalsOld] = maleGenitals * self.oldVal
-        
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-            
+
     def updateBreastSize(self, previous, next, recalcNormals = True, update = True):
         breastCupValues = [0 for i in xrange(0, 9)]
-        
+
         # Remove previous
         previousBreastSize = 1 + previous * 7
         i = int(math.floor(previousBreastSize))
@@ -581,7 +581,7 @@ class Human(gui3d.Object):
         breastCupValues[i] -= 1 - value
         if i < 8:
             breastCupValues[i + 1] -= value
-            
+
         # Add next
         nextBreastSize = 1 + next * 7
         i = int(math.floor(nextBreastSize))
@@ -589,37 +589,37 @@ class Human(gui3d.Object):
         breastCupValues[i] += 1 - value
         if i < 8:
             breastCupValues[i + 1] += value
-            
+
         self.applyBreastTargets(breastCupValues, [1 - self.breastFirmness, self.breastFirmness])
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
         if update:
           self.meshData.update(self.breastVertices)
-        
+
     def updateBreastFirmness(self, previous, next, recalcNormals = True, update = True):
         breastCupValues = [0 for i in xrange(0, 9)]
-        
+
         breastSize = 1 + self.breastSize * 7
         i = int(math.floor(breastSize))
         value = breastSize - i
         breastCupValues[i] = 1 - value
         if i < 8:
             breastCupValues[i + 1] = value
-            
+
         self.applyBreastTargets(breastCupValues, [previous - next, next - previous])
-            
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.breastVertices, self.breastFaces)
         if update:
           self.meshData.update(self.breastVertices)
-          
-    def applyBreastTargets(self, values, firmness):  
+
+    def applyBreastTargets(self, values, firmness):
         averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
         averageToneVal = 1 - (self.muscleVal + self.flaccidVal)
-        
+
         detailTargets = {}
-            
+
         for i in xrange(1, 9):
 
             detailTargets['data/targets/details/neutral_female-young-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
@@ -729,7 +729,7 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/female-child-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
                      * self.femaleVal) * firmness[1]) * values[i]
-                     
+
             detailTargets['data/targets/details/neutral_female-old-cup%i-firmness0.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
                      * self.femaleVal) * firmness[0]) * values[i]
 
@@ -783,42 +783,42 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/female-old-muscle-heavy-cup%i-firmness1.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
                      * self.femaleVal) * firmness[1]) * values[i]
-                     
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateStomach(self, previous, next, recalcNormals = True, update = True):
         stomachValues = [0 for i in xrange(0, 3)]
-        
+
         # remove previous
         if previous < 0.0:
           stomachValues[1] += previous
         elif previous > 0.0:
           stomachValues[2] -= previous
-            
+
         # add next
         if next < 0.0:
           stomachValues[1] -= next
         elif next > 0.0:
           stomachValues[2] += next
-          
+
         self.applyStomachTargets(stomachValues)
-            
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.stomachVertices, self.stomachFaces)
         if update:
           self.meshData.update(self.stomachVertices)
-                
-    def applyStomachTargets(self, values):  
+
+    def applyStomachTargets(self, values):
         averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
         averageToneVal = 1 - (self.muscleVal + self.flaccidVal)
-        
+
         detailTargets = {}
-        
+
         for i in xrange(1, 3):
-            
+
             detailTargets['data/targets/details/female-young-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
                      * self.femaleVal) * values[i])
 
@@ -872,7 +872,7 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/female-child-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
                      * self.femaleVal) * values[i])
-                     
+
             detailTargets['data/targets/details/female-old-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
                      * self.femaleVal) * values[i])
 
@@ -899,7 +899,7 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/female-old-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
                      * self.femaleVal) * values[i])
-                     
+
             detailTargets['data/targets/details/male-young-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.youngVal)
                      * self.maleVal) * values[i])
 
@@ -953,7 +953,7 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/male-child-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.childVal)
                      * self.maleVal) * values[i])
-                     
+
             detailTargets['data/targets/details/male-old-stomach%i.target' % i] = ((((averageToneVal * averageWeightVal) * self.oldVal)
                      * self.maleVal) * values[i])
 
@@ -980,15 +980,15 @@ class Human(gui3d.Object):
 
             detailTargets['data/targets/details/male-old-muscle-heavy-stomach%i.target' % i] = ((((self.muscleVal * self.overweightVal) * self.oldVal)
                      * self.maleVal) * values[i])
-                     
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-            
+
     def updateNose(self, previous, next, recalcNormals = True, update = True):
         noseValues = [0 for i in xrange(0, 13)]
-        
+
         # remove previous
         previousNose = previous * 12
         i = int(math.floor(previousNose))
@@ -996,7 +996,7 @@ class Human(gui3d.Object):
         noseValues[i] -= 1 - value
         if i < 12:
             noseValues[i + 1] -= value
-            
+
         # add next
         nextNose = next * 12
         i = int(math.floor(nextNose))
@@ -1004,9 +1004,9 @@ class Human(gui3d.Object):
         noseValues[i] += 1 - value
         if i < 12:
             noseValues[i + 1] += value
-            
+
         self.applyNoseTargets(noseValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.noseVertices, self.noseFaces)
         if update:
@@ -1014,7 +1014,7 @@ class Human(gui3d.Object):
 
     def applyNoseTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 13):
             detailTargets['data/targets/details/neutral_male-young-nose%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-nose%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1022,7 +1022,7 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/neutral_female-young-nose%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-child-nose%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-old-nose%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
@@ -1030,7 +1030,7 @@ class Human(gui3d.Object):
 
     def updateMouth(self, previous, next, recalcNormals = True, update = True):
         mouthValues = [0 for i in xrange(0, 14)]
-        
+
         # remove previous
         previousMouth = previous * 13
         i = int(math.floor(previousMouth))
@@ -1038,7 +1038,7 @@ class Human(gui3d.Object):
         mouthValues[i] -= 1 - value
         if i < 13:
             mouthValues[i + 1] -= value
-            
+
         # add next
         nextMouth = next * 13
         i = int(math.floor(nextMouth))
@@ -1046,9 +1046,9 @@ class Human(gui3d.Object):
         mouthValues[i] += 1 - value
         if i < 13:
             mouthValues[i + 1] += value
-            
+
         self.applyMouthTargets(mouthValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.mouthVertices, self.mouthFaces)
         if update:
@@ -1056,7 +1056,7 @@ class Human(gui3d.Object):
 
     def applyMouthTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 14):
             detailTargets['data/targets/details/neutral_male-young-mouth%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-mouth%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1064,15 +1064,15 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/neutral_female-young-mouth%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-child-mouth%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-old-mouth%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateEyes(self, previous, next, recalcNormals = True, update = True):
         eyesValues = [0 for i in xrange(0, 31)]
-        
+
         # remove previous
         previousEyes = previous * 30
         i = int(math.floor(previousEyes))
@@ -1080,7 +1080,7 @@ class Human(gui3d.Object):
         eyesValues[i] -= 1 - value
         if i < 30:
             eyesValues[i + 1] -= value
-            
+
         # add next
         nextEyes = next * 30
         i = int(math.floor(nextEyes))
@@ -1088,9 +1088,9 @@ class Human(gui3d.Object):
         eyesValues[i] += 1 - value
         if i < 30:
             eyesValues[i + 1] += value
-            
+
         self.applyEyesTargets(eyesValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.eyesVertices, self.eyesFaces)
         if update:
@@ -1098,7 +1098,7 @@ class Human(gui3d.Object):
 
     def applyEyesTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 31):
             detailTargets['data/targets/details/neutral_male-young-eye%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-eye%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1106,15 +1106,15 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/neutral_female-young-eye%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-child-eye%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-old-eye%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateEars(self, previous, next, recalcNormals = True, update = True):
         earsValues = [0 for i in xrange(0, 9)]
-        
+
         # remove previous
         previousEars = previous * 8
         i = int(math.floor(previousEars))
@@ -1122,7 +1122,7 @@ class Human(gui3d.Object):
         earsValues[i] -= 1 - value
         if i < 8:
             earsValues[i + 1] -= value
-            
+
         # add next
         nextEars = next * 8
         i = int(math.floor(nextEars))
@@ -1130,9 +1130,9 @@ class Human(gui3d.Object):
         earsValues[i] += 1 - value
         if i < 8:
             earsValues[i + 1] += value
-            
+
         self.applyEarsTargets(earsValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.earsVertices, self.earsFaces)
         if update:
@@ -1140,7 +1140,7 @@ class Human(gui3d.Object):
 
     def applyEarsTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 9):
             detailTargets['data/targets/details/male-young-ears%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/male-child-ears%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1148,15 +1148,15 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-young-ears%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-child-ears%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-old-ears%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateHead(self, previous, next, recalcNormals = True, update = True):
         headValues = [0 for i in xrange(0, 9)]
-        
+
         # remove previous
         previousHead = previous * 8
         i = int(math.floor(previousHead))
@@ -1164,7 +1164,7 @@ class Human(gui3d.Object):
         headValues[i] -= 1 - value
         if i < 8:
             headValues[i + 1] -= value
-            
+
         # add next
         nextHead = next * 8
         i = int(math.floor(nextHead))
@@ -1172,9 +1172,9 @@ class Human(gui3d.Object):
         headValues[i] += 1 - value
         if i < 8:
             headValues[i + 1] += value
-            
+
         self.applyHeadTargets(headValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.headVertices, self.headFaces)
         if update:
@@ -1182,7 +1182,7 @@ class Human(gui3d.Object):
 
     def applyHeadTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 9):
             detailTargets['data/targets/details/neutral_male-young-head%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/neutral_male-child-head%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1190,29 +1190,29 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/neutral_female-young-head%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-child-head%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/neutral_female-old-head%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateHeadAge(self, previous, next, recalcNormals = True, update = True):
         headAgeValues = [0 for i in xrange(0, 3)]
-        
+
         # remove previous
         if previous < 0.0:
           headAgeValues[1] += previous
         elif previous > 0.0:
           headAgeValues[2] -= previous
-            
+
         # add next
         if next < 0.0:
           headAgeValues[1] -= next
         elif next > 0.0:
           headAgeValues[2] += next
-          
+
         self.applyHeadAgeTargets(headAgeValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.headVertices, self.headFaces)
         if update:
@@ -1220,7 +1220,7 @@ class Human(gui3d.Object):
 
     def applyHeadAgeTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 3):
             detailTargets['data/targets/details/male-young-head-age%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/male-child-head-age%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1228,29 +1228,29 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-young-head-age%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-child-head-age%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-old-head-age%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateFaceAngle(self, previous, next, recalcNormals = True, update = True):
         faceAngleValues = [0 for i in xrange(0, 3)]
-        
+
         # remove previous
         if previous < 0.0:
           faceAngleValues[1] += previous
         elif previous > 0.0:
           faceAngleValues[2] -= previous
-            
+
         # add next
         if next < 0.0:
           faceAngleValues[1] -= next
         elif next > 0.0:
           faceAngleValues[2] += next
-          
+
         self.applyFaceAngleTargets(faceAngleValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.headVertices, self.headFaces)
         if update:
@@ -1258,18 +1258,18 @@ class Human(gui3d.Object):
 
     def applyFaceAngleTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 3):
             detailTargets['data/targets/details/facial-angle%i.target'% i] = values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateJaw(self, previous, next, recalcNormals = True, update = True):
         jawValues = [0 for i in xrange(0, 8)]
-        
+
         # remove previous
         previousJaw = previous * 7
         i = int(math.floor(previousJaw))
@@ -1277,7 +1277,7 @@ class Human(gui3d.Object):
         jawValues[i] -= 1 - value
         if i < 7:
             jawValues[i + 1] -= value
-            
+
         # add next
         nextJaw = next * 7
         i = int(math.floor(nextJaw))
@@ -1285,9 +1285,9 @@ class Human(gui3d.Object):
         jawValues[i] += 1 - value
         if i < 7:
             jawValues[i + 1] += value
-            
+
         self.applyJawTargets(jawValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.jawVertices, self.jawFaces)
         if update:
@@ -1295,7 +1295,7 @@ class Human(gui3d.Object):
 
     def applyJawTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 8):
             detailTargets['data/targets/details/male-young-jaw%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/male-child-jaw%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1303,29 +1303,29 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-young-jaw%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-child-jaw%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-old-jaw%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updatePelvisTone(self, previous, next, recalcNormals = True, update = True):
         pelvisToneValues = [0 for i in xrange(0, 3)]
-        
+
         # remove previous
         if previous < 0.0:
           pelvisToneValues[1] += previous
         elif previous > 0.0:
           pelvisToneValues[2] -= previous
-            
+
         # add next
         if next < 0.0:
           pelvisToneValues[1] -= next
         elif next > 0.0:
           pelvisToneValues[2] += next
-          
+
         self.applyPelvisToneTargets(pelvisToneValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.pelvisVertices, self.pelvisFaces)
         if update:
@@ -1333,7 +1333,7 @@ class Human(gui3d.Object):
 
     def applyPelvisToneTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 3):
             detailTargets['data/targets/details/male-young-pelvis-tone%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/male-child-pelvis-tone%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1341,29 +1341,29 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-young-pelvis-tone%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-child-pelvis-tone%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-old-pelvis-tone%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-                
+
     def updateButtocks(self, previous, next, recalcNormals = True, update = True):
         buttocksValues = [0 for i in xrange(0, 3)]
-        
+
         # remove previous
         if previous < 0.0:
           buttocksValues[1] += previous
         elif previous > 0.0:
           buttocksValues[2] -= previous
-            
+
         # add next
         if next < 0.0:
           buttocksValues[1] -= next
         elif next > 0.0:
           buttocksValues[2] += next
-          
+
         self.applyButtocksTargets(buttocksValues)
-        
+
         if recalcNormals:
           self.meshData.calcNormals(1, 1, self.pelvisVertices, self.pelvisFaces)
         if update:
@@ -1371,7 +1371,7 @@ class Human(gui3d.Object):
 
     def applyButtocksTargets(self, values):
         detailTargets = {}
-        
+
         for i in xrange(1, 3):
             detailTargets['data/targets/details/male-young-nates%i.target'% i] = self.youngVal * self.maleVal * values[i]
             detailTargets['data/targets/details/male-child-nates%i.target'% i] = self.childVal * self.maleVal * values[i]
@@ -1379,7 +1379,7 @@ class Human(gui3d.Object):
             detailTargets['data/targets/details/female-young-nates%i.target'% i] = self.youngVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-child-nates%i.target'% i] = self.childVal * self.femaleVal * values[i]
             detailTargets['data/targets/details/female-old-nates%i.target'% i] = self.oldVal * self.femaleVal * values[i]
-            
+
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
                 #print 'APP: %s, VAL: %f' % (k, v)
@@ -1388,7 +1388,7 @@ class Human(gui3d.Object):
     def applyAllTargets(self, progressCallback=None, update=True):
         """
         This method applies all targets, in function of age and sex
-        
+
         **Parameters:** None.
 
         """
@@ -1486,7 +1486,7 @@ class Human(gui3d.Object):
 
         maleGenitals = max(0.0, self.genitals)
         femaleGenitals = -min(0.0, self.genitals)
-        
+
         self.applyGenitalTargets(maleGenitals, femaleGenitals)
 
         # breastCup goes from 1 to 8
@@ -1498,7 +1498,7 @@ class Human(gui3d.Object):
         if i < 8:
             breastCupValues[i + 1] = value
         self.applyBreastTargets(breastCupValues, [1.0 - self.breastFirmness, self.breastFirmness])
-        
+
         # There are two stomach targets, 1 and 2, 0 is no target
         stomachValues = [0 for i in xrange(0, 3)]
         if self.stomach < 0.0:
@@ -1517,7 +1517,7 @@ class Human(gui3d.Object):
             noseValues[i + 1] = value
 
         self.applyNoseTargets(noseValues)
-        
+
         # mouth goes from 0 to 13, 0 is no target
         mouth = self.mouth * 13
         mouthValues = [0 for i in xrange(0, 14)]
@@ -1528,7 +1528,7 @@ class Human(gui3d.Object):
             mouthValues[i + 1] = value
 
         self.applyMouthTargets(mouthValues)
-        
+
         # eyes goes from 0 to 30, 0 is no target
         eyes = self.eyes * 30
         eyesValues = [0 for i in xrange(0, 31)]
@@ -1539,7 +1539,7 @@ class Human(gui3d.Object):
             eyesValues[i + 1] = value
 
         self.applyEyesTargets(eyesValues)
-        
+
         # ears goes from 0 to 8, 0 is no target
         ears = self.ears * 8
         earsValues = [0 for i in xrange(0, 9)]
@@ -1550,7 +1550,7 @@ class Human(gui3d.Object):
             earsValues[i + 1] = value
 
         self.applyEarsTargets(earsValues)
-        
+
         # head goes from 0 to 8, 0 is no target
         head = self.head * 8
         headValues = [0 for i in xrange(0, 9)]
@@ -1561,25 +1561,25 @@ class Human(gui3d.Object):
             headValues[i + 1] = value
 
         self.applyHeadTargets(headValues)
-        
+
         # There are two head age targets, 1 and 2, 0 is no target
         headAgeValues = [0 for i in xrange(0, 3)]
         if self.headAge < 0.0:
           headAgeValues[1] = -self.headAge
         elif self.headAge > 0.0:
           headAgeValues[2] = self.headAge
-          
+
         self.applyHeadAgeTargets(headAgeValues)
-        
+
         # There are face angle targets, 1 and 2, 0 is no target
         faceAngleValues = [0 for i in xrange(0, 3)]
         if self.faceAngle < 0.0:
           faceAngleValues[1] -= self.faceAngle
         elif self.faceAngle > 0.0:
           faceAngleValues[2] += self.faceAngle
-          
+
         self.applyFaceAngleTargets(faceAngleValues)
-        
+
         # jaw goes from 0 to 7, 0 is no target
         jaw = self.jaw * 7
         jawValues = [0 for i in xrange(0, 8)]
@@ -1588,25 +1588,25 @@ class Human(gui3d.Object):
         jawValues[i] = 1 - value
         if i < 7:
             jawValues[i + 1] = value
-            
+
         self.applyJawTargets(jawValues)
-        
+
         # There are two pelvis targets, 1 and 2, 0 is no target
         pelvisToneValues = [0 for i in xrange(0, 3)]
         if self.pelvisTone < 0.0:
           pelvisToneValues[1] = -self.pelvisTone
         elif self.pelvisTone > 0.0:
           pelvisToneValues[2] = self.pelvisTone
-          
+
         self.applyPelvisToneTargets(pelvisToneValues)
-        
+
         # There are two buttocks targets, 1 and 2, 0 is no target
         buttocksValues = [0 for i in xrange(0, 3)]
         if self.buttocks < 0.0:
           buttocksValues[1] = -self.buttocks
         elif self.buttocks > 0.0:
           buttocksValues[2] = self.buttocks
-          
+
         self.applyButtocksTargets(buttocksValues)
 
         for (ethnicGroup, ethnicVal) in self.targetsEthnicStack.iteritems():
@@ -1642,7 +1642,7 @@ class Human(gui3d.Object):
     def applyDetailsTargets(self, targetPath, incrVal, totVal):
         """
         This method .....
-        
+
         Parameters
         ----------
 
@@ -1664,7 +1664,7 @@ class Human(gui3d.Object):
         self.lastTargetApplied = targetPath
         return True
 
-    def getPartNameForGroupName(self, groupName):        
+    def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:
             if k in groupName:
                 return k
@@ -1672,9 +1672,9 @@ class Human(gui3d.Object):
 
     def applySymmetryLeft(self):
         """
-        This method applies right to left symmetry to the currently selected 
+        This method applies right to left symmetry to the currently selected
         body parts.
-        
+
         **Parameters:** None.
 
         """
@@ -1683,9 +1683,9 @@ class Human(gui3d.Object):
 
     def applySymmetryRight(self):
         """
-        This method applies left to right symmetry to the currently selected 
+        This method applies left to right symmetry to the currently selected
         body parts.
-        
+
         **Parameters:** None.
 
         """
@@ -1694,15 +1694,15 @@ class Human(gui3d.Object):
 
     def symmetrize(self, direction='r'):
         """
-        This method applies either left to right or right to left symmetry to 
+        This method applies either left to right or right to left symmetry to
         the currently selected body parts.
-        
-        
+
+
         Parameters
         ----------
 
         direction:
-            *string*. A string indicating whether to apply left to right 
+            *string*. A string indicating whether to apply left to right
             symmetry (\"r\") or right to left symmetry (\"l\").
 
         """
@@ -1740,13 +1740,13 @@ class Human(gui3d.Object):
                 self.targetsDetailStack[targetSym] = targetSymVal
 
         self.scene.redraw()
-        
-    def rotateLimb(self, targetPath, morphFactor):        
-        targetPath1 = targetPath+".target"  
-        targetPath2 = targetPath+".rot"   
+
+    def rotateLimb(self, targetPath, morphFactor):
+        targetPath1 = targetPath+".target"
+        targetPath2 = targetPath+".rot"
         algos3d.loadTranslationTarget(self.meshData, targetPath1, morphFactor, None, 1, 0)
         algos3d.loadRotationTarget(self.meshData, targetPath2, morphFactor)
-        
+
 
     def storeMesh(self):
         print "Storing mesh status"
@@ -1759,8 +1759,8 @@ class Human(gui3d.Object):
             v.co[0] = self.meshStored[i][0]
             v.co[1] = self.meshStored[i][1]
             v.co[2] = self.meshStored[i][2]
-        
-        
+
+
 
     def resetMeshValues(self):
         self.childVal = 0.0
@@ -1845,6 +1845,8 @@ class Human(gui3d.Object):
                     self.setPelvisTone(float(lineData[1]))
                 elif lineData[0] == 'buttocks':
                     self.setButtocks(float(lineData[1]))
+                elif lineData[0] == 'asym':
+                    self.targetsDetailStack['data/targets/asym/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] == 'ethnic':
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
@@ -1896,6 +1898,8 @@ class Human(gui3d.Object):
                 f.write('detail %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
             elif '/microdetails' in t:
                 f.write('microdetail %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
+            elif '/asym' in t:
+               f.write('asym %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
             else:
                 print('Error, %s was not saved' % t)
         f.close()
