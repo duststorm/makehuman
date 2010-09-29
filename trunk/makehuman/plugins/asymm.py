@@ -9,6 +9,7 @@ import random
 import algos3d
 import mh
 import humanmodifier
+import events3d
 
 class AsymmTaskView(gui3d.TaskView):
 
@@ -253,6 +254,16 @@ class AsymmTaskView(gui3d.TaskView):
         self.asymmTopSlider.setValue(self.getSliderValue('top'))
         self.asymmTrunkSlider.setValue(self.getSliderValue('trunk'))
         self.asymmBreastSlider.setValue(self.getSliderValue('breast'))
+        
+    def onKeyDown(self, event):
+
+        # Undo redo
+        if event.key == events3d.SDLK_y:
+            self.app.redo()
+        elif event.key == events3d.SDLK_z:
+            self.app.undo()
+            
+        gui3d.TaskView.onKeyDown(self, event)
 
 def load(app):
     """
