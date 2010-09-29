@@ -10,39 +10,6 @@ import algos3d
 import mh
 import humanmodifier
 
-
-
-class AsymmAction:
-
-    def __init__(self, human, callback, before, after):
-        """
-        Init function.
-
-        @return: None
-        @type  human: Human object
-        @param human: The makehuman human model.
-        @type  callback: Function
-        @param callback: The function to be called in do and undo
-        @type  before: Dictionary
-        @param before: A dictionary with the target:value pairs, before the action
-        @type  before: Dictionary
-        @param before: A dictionary with the target:value pairs, after the action
-        """
-        self.name = "asymm"
-        self.human = human
-        self.before = before
-        self.callback = callback
-        self.after = after
-
-    def do(self):
-        self.callback(self.after)
-        return True
-
-    def undo(self):
-        self.callback(self.before)
-        return True
-
-
 class AsymmTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -181,14 +148,18 @@ class AsymmTaskView(gui3d.TaskView):
         """
         if vertices:
             if not self.before:
-                self.before = self.getTargetsAndValues(self.asymmTargets)
+                self.before = self.getTargetsAndValues(bodyPartName)
                 
-            self.applyAsymmFast(self.calcAsymm(value,bodyPartName),vertices)
+            self.calcAsymm(value,bodyPartName)
+            self.human.meshData.update(vertices)
         else:
-            self.applyAsymm(self.calcAsymm(value,bodyPartName))
+            self.calcAsymm(value,bodyPartName)
+            self.human.applyAllTargets(self.human.app.progress)
             
-            after = self.getTargetsAndValues(self.asymmTargets)
-            self.app.did(AsymmAction(self.human, self.applyAsymm, self.before, after))
+            after = self.getTargetsAndValues(bodyPartName)
+            
+            self.app.did(humanmodifier.Action(self.human, self.before, after, self.syncSliders))
+            
             self.before = None
 
     def buildListOfTargetPairs(self, name):
@@ -213,7 +184,7 @@ class AsymmTaskView(gui3d.TaskView):
         return pairs
 
 
-    def getTargetsAndValues(self, targets):
+    def getTargetsAndValues(self, bodypart):
         """
         This function return a dictionary with "targetPath:val" items, getting them
         from the human details stack.
@@ -222,13 +193,13 @@ class AsymmTaskView(gui3d.TaskView):
         @type  targets: List
         @param targets: List of targets to get
         """
-
+        modifiers = self.getModifiers(bodypart)
+           
         targetsAndValues = {}
-        for t in targets:
-            targetsAndValues[t] = self.human.getDetail(t)
+        for modifier in modifiers:                
+            targetsAndValues[modifier.left] = self.human.getDetail(modifier.left)
+            targetsAndValues[modifier.right] = self.human.getDetail(modifier.right)
         return targetsAndValues
-
-
 
     def calcAsymm(self, value, bodypart):
             """
@@ -241,50 +212,23 @@ class AsymmTaskView(gui3d.TaskView):
             @type  bodypart: String
             @param bodypart: The name of part to asymmetrize.
             """
-            modifiers = self.modifiers.get(bodypart, None)
-            if not modifiers:
-                modifiers = []
-                targets = self.buildListOfTargetPairs(bodypart)
-                for pair in targets:
-                    modifier = humanmodifier.Modifier(self.human, pair[0], pair[1])
-                    modifiers.append(modifier)
-                self.modifiers[bodypart] = modifiers
+            modifiers = self.getModifiers(bodypart)
            
-            targetsAndValues = {}
             for modifier in modifiers:                
                 modifier.setValue(value)
-                targetsAndValues[modifier.left] = self.human.getDetail(modifier.left)
-                targetsAndValues[modifier.right] = self.human.getDetail(modifier.right)
-            return targetsAndValues
-
-
-    def applyAsymm(self,asymDict):
-        """
-        This function apply on the human the asymmetry targets, passed using
-        a dictionary,  and update the human target stack.
-        @return: None
-        @type  asymDict: Dictonary
-        @param asymDict: A dictionary with "targetpath:val" items.
-        """
-        for k, v in asymDict.items():
-            self.human.setDetail(k, v)
-        self.human.applyAllTargets(self.human.app.progress)
-        self.syncSliders()
-
-    def applyAsymmFast(self,asymDict,vertices):
-        """
-        This function apply on the human the asymmetry targets, passed using
-        a dictionary,  and update the human target stack.
-        @return: None
-        @type  asymDict: Dictonary
-        @param asymDict: A dictionary with "targetpath:val" items.
-        """
-        for k, v in asymDict.items():
-            algos3d.loadTranslationTarget(self.human.meshData, k, v - self.human.getDetail(k), None, 0, 0)
-            self.human.setDetail(k, v)
-        self.human.meshData.update(vertices)
+                
+    def getModifiers(self, bodypart):
+        modifiers = self.modifiers.get(bodypart, None)
+        if not modifiers:
+            modifiers = []
+            targets = self.buildListOfTargetPairs(bodypart)
+            for pair in targets:
+                modifier = humanmodifier.Modifier(self.human, pair[0], pair[1])
+                modifiers.append(modifier)
+            self.modifiers[bodypart] = modifiers
+        return modifiers
         
-    def getValue(self, bodypart):
+    def getSliderValue(self, bodypart):
         modifiers = self.modifiers.get(bodypart, None)
         if modifiers:
             return modifiers[0].getValue()
@@ -298,17 +242,17 @@ class AsymmTaskView(gui3d.TaskView):
         self.syncSliders()
             
     def syncSliders(self):
-        self.asymmBrowSlider.setValue(self.getValue('brown'))
-        self.asymmCheekSlider.setValue(self.getValue('cheek'))
-        self.asymmEarsSlider.setValue(self.getValue('ear'))
-        self.asymmEyeSlider.setValue(self.getValue('eye'))
-        self.asymmJawSlider.setValue(self.getValue('jaw'))
-        self.asymmMouthSlider.setValue(self.getValue('mouth'))
-        self.asymmNoseSlider.setValue(self.getValue('nose'))
-        self.asymmTempleSlider.setValue(self.getValue('temple'))
-        self.asymmTopSlider.setValue(self.getValue('top'))
-        self.asymmTrunkSlider.setValue(self.getValue('trunk'))
-        self.asymmBreastSlider.setValue(self.getValue('breast'))
+        self.asymmBrowSlider.setValue(self.getSliderValue('brown'))
+        self.asymmCheekSlider.setValue(self.getSliderValue('cheek'))
+        self.asymmEarsSlider.setValue(self.getSliderValue('ear'))
+        self.asymmEyeSlider.setValue(self.getSliderValue('eye'))
+        self.asymmJawSlider.setValue(self.getSliderValue('jaw'))
+        self.asymmMouthSlider.setValue(self.getSliderValue('mouth'))
+        self.asymmNoseSlider.setValue(self.getSliderValue('nose'))
+        self.asymmTempleSlider.setValue(self.getSliderValue('temple'))
+        self.asymmTopSlider.setValue(self.getSliderValue('top'))
+        self.asymmTrunkSlider.setValue(self.getSliderValue('trunk'))
+        self.asymmBreastSlider.setValue(self.getSliderValue('breast'))
 
 def load(app):
     """
