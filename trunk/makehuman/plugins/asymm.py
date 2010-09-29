@@ -73,6 +73,9 @@ class AsymmTaskView(gui3d.TaskView):
 
         #Random factor from Slider
         self.randomVal = 0.5
+        
+        # Modifiers
+        self.modifiers = {}
 
         #Sliders events
 
@@ -233,12 +236,20 @@ class AsymmTaskView(gui3d.TaskView):
             @type  bodypart: String
             @param bodypart: The name of part to asymmetrize.
             """
-            targets = self.buildListOfTargetPairs(bodypart)
+            modifiers = self.modifiers.get(bodypart, None)
+            if not modifiers:
+                modifiers = []
+                targets = self.buildListOfTargetPairs(bodypart)
+                for pair in targets:
+                    modifier = humanmodifier.Modifier(self.human, pair[0], pair[1])
+                    modifiers.append(modifier)
+                self.modifiers[bodypart] = modifiers
+           
             targetsAndValues = {}
-            for pair in targets:                
-                humanmodifier.Modifier(self.human, pair[0], pair[1]).setValue(value)
-                targetsAndValues[pair[0]] = self.human.getDetail(pair[0])
-                targetsAndValues[pair[1]] = self.human.getDetail(pair[1])
+            for modifier in modifiers:                
+                modifier.setValue(value)
+                targetsAndValues[modifier.left] = self.human.getDetail(modifier.left)
+                targetsAndValues[modifier.right] = self.human.getDetail(modifier.right)
             return targetsAndValues
 
 
@@ -266,6 +277,26 @@ class AsymmTaskView(gui3d.TaskView):
             algos3d.loadTranslationTarget(self.human.meshData, k, v - self.human.targetsDetailStack.get(k, 0.0), None, 0, 0)
             self.human.targetsDetailStack[k] = v
         self.human.meshData.update(vertices)
+        
+    def getValue(self, bodypart):
+        modifiers = self.modifiers.get(bodypart, None)
+        if modifiers:
+            return modifiers[0].getValue()
+        else:
+            return 0.5
+            
+    def syncSliders(self):
+        self.asymmBrowSlider.setValue(self.getValue('brown'))
+        self.asymmCheekSlider.setValue(self.getValue('cheek'))
+        self.asymmEarsSlider.setValue(self.getValue('ear'))
+        self.asymmEyeSlider.setValue(self.getValue('eye'))
+        self.asymmJawSlider.setValue(self.getValue('jaw'))
+        self.asymmMouthSlider.setValue(self.getValue('mouth'))
+        self.asymmNoseSlider.setValue(self.getValue('nose'))
+        self.asymmTempleSlider.setValue(self.getValue('temple'))
+        self.asymmTopSlider.setValue(self.getValue('top'))
+        self.asymmTrunkSlider.setValue(self.getValue('trunk'))
+        self.asymmBreastSlider.setValue(self.getValue('breast'))
 
 def load(app):
     """
