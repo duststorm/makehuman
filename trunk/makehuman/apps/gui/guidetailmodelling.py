@@ -360,11 +360,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.genitalsSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.genitals == None:
                     self.genitals = human.getGenitals()
-                human.updateGenitals(self.genitals, value, self.app.settings.realtimeNormalUpdates)
+                human.updateGenitals(self.genitals, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.genitals = min(max(value, -1.0), 1.0)
             
         @self.genitalsSlider.event
@@ -379,11 +379,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.breastSizeSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.breastSize == None:
                     self.breastSize = human.getBreastSize()
-                human.updateBreastSize(self.breastSize, value, self.app.settings.realtimeNormalUpdates)
+                human.updateBreastSize(self.breastSize, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.breastSize = min(1.0, max(0.0, value))
             
         @self.breastSizeSlider.event
@@ -398,11 +398,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.breastFirmnessSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.breastFirmness == None:
                     self.breastFirmness = human.getBreastFirmness()
-                human.updateBreastFirmness(self.breastFirmness, value, self.app.settings.realtimeNormalUpdates)
+                human.updateBreastFirmness(self.breastFirmness, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.breastFirmness = min(1.0, max(0.0, value))
         
         @self.breastFirmnessSlider.event
@@ -417,11 +417,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.stomachSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.stomach == None:
                     self.stomach = human.getStomach()
-                human.updateStomach(self.stomach, value, self.app.settings.realtimeNormalUpdates)
+                human.updateStomach(self.stomach, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.stomach = min(1.0, max(-1.0, value))
         
         @self.stomachSlider.event
@@ -436,11 +436,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.noseSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.nose == None:
                     self.nose = human.getNose()
-                human.updateNose(self.nose, value, self.app.settings.realtimeNormalUpdates)
+                human.updateNose(self.nose, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.nose = min(1.0, max(0.0, value))
         
         @self.noseSlider.event
@@ -455,11 +455,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.mouthSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.mouth == None:
                     self.mouth = human.getMouth()
-                human.updateMouth(self.mouth, value, self.app.settings.realtimeNormalUpdates)
+                human.updateMouth(self.mouth, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.mouth = min(1.0, max(0.0, value))
         
         @self.mouthSlider.event
@@ -474,11 +474,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.eyesSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.eyes == None:
                     self.eyes = human.getEyes()
-                human.updateEyes(self.eyes, value, self.app.settings.realtimeNormalUpdates)
+                human.updateEyes(self.eyes, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.eyes = min(1.0, max(0.0, value))
         
         @self.eyesSlider.event
@@ -493,11 +493,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.earsSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.ears == None:
                     self.ears = human.getEars()
-                human.updateEars(self.ears, value, self.app.settings.realtimeNormalUpdates)
+                human.updateEars(self.ears, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.ears = min(1.0, max(0.0, value))
         
         @self.earsSlider.event
@@ -512,11 +512,11 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.headShapeSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.head == None:
                     self.head = human.getHead()
-                human.updateHead(self.head, value, self.app.settings.realtimeNormalUpdates)
+                human.updateHead(self.head, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.head = min(1.0, max(0.0, value))
 
         @self.headShapeSlider.event
@@ -531,11 +531,11 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.headAgeSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.headAge == None:
                     self.headAge = human.getHeadAge()
-                human.updateHeadAge(self.headAge, value, self.app.settings.realtimeNormalUpdates)
+                human.updateHeadAge(self.headAge, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.headAge = min(1.0, max(-1.0, value))
 
         @self.headAgeSlider.event
@@ -550,11 +550,11 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.faceAngleSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.faceAngle == None:
                     self.faceAngle = human.getFaceAngle()
-                human.updateFaceAngle(self.faceAngle, value, self.app.settings.realtimeNormalUpdates)
+                human.updateFaceAngle(self.faceAngle, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.faceAngle = min(1.0, max(-1.0, value))
 
         @self.faceAngleSlider.event
@@ -569,11 +569,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.jawSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.jaw == None:
                     self.jaw = human.getJaw()
-                human.updateJaw(self.jaw, value, self.app.settings.realtimeNormalUpdates)
+                human.updateJaw(self.jaw, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.jaw = min(1.0, max(0.0, value))
         
         @self.jawSlider.event
@@ -588,11 +588,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.pelvisToneSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.pelvisTone == None:
                     self.pelvisTone = human.getPelvisTone()
-                human.updatePelvisTone(self.pelvisTone, value, self.app.settings.realtimeNormalUpdates)
+                human.updatePelvisTone(self.pelvisTone, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.pelvisTone = min(1.0, max(-1.0, value))
                 
         @self.pelvisToneSlider.event
@@ -607,11 +607,11 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.buttocksSlider.event
         def onChanging(value):
-            if self.app.settings.realtimeUpdates:
+            if self.app.settings.get('realtimeUpdates', True):
                 human = self.app.scene3d.selectedHuman
                 if self.buttocks == None:
                     self.buttocks = human.getButtocks()
-                human.updateButtocks(self.buttocks, value, self.app.settings.realtimeNormalUpdates)
+                human.updateButtocks(self.buttocks, value, self.app.settings.get('realtimeNormalUpdates', True))
                 self.buttocks = min(1.0, max(-1.0, value))
                 
         @self.buttocksSlider.event

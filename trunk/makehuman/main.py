@@ -83,10 +83,6 @@ import guimodelling, guifiles, guirender
 from aljabr import centroid
 #import font3d
 
-class Settings:
-    def __init__():
-        pass
-
 class MHApplication(gui3d.Application):
   def __init__(self):
     gui3d.Application.__init__(self)
@@ -106,9 +102,7 @@ class MHApplication(gui3d.Application):
     
     self.fonts = {}
     
-    self.settings = Settings
-    self.settings.realtimeUpdates = True
-    self.settings.realtimeNormalUpdates = True
+    self.settings = {}
 
     # Display the initial splash screen and the progress bar during startup
     self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
