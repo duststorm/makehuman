@@ -46,7 +46,7 @@ class HairTaskView(gui3d.TaskView):
     self.tipColor = [0.518, 0.325, 0.125]
     self.rootColor = [0.109, 0.037, 0.007]
     self.interpolationRadius = 0.09
-    self.clumpInterpolationNumber = 50
+    self.clumpInterpolationNumber = 0
     self.app.categories["Rendering"].hairsClass = self
     
     @self.filechooser.event
@@ -219,7 +219,10 @@ class HairTaskView(gui3d.TaskView):
     objFile.close()
     
   def generateHairToRender(self):
-    return clumpInterpolation(self.guides, self.interpolationRadius, self.clumpInterpolationNumber)
+    if (self.clumpInterpolationNumber > 1):
+      return clumpInterpolation(self.guides, self.interpolationRadius, self.clumpInterpolationNumber)
+    else:
+      return self.guides
     #return self.guides
 
 
@@ -243,15 +246,12 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
       headCentroid = [0.0,7.8,0.4]
       fg = obj.facesGroups[0]
       cPs = [curve[0]]
-      for i in xrange(2,len(curve)-1): #piecewise continuous polynomial
-        d1=vdist(curve[i-1],curve[i-2])
-        d=d1+vdist(curve[i-1],curve[i])
-        if i==len(curve)-1: N=int(d1/(res*4))
-        else: N=int(d/(res*4))
-        for j in xrange(1,N+1):
-          if j==N and i==len(curve)-1 : cPs.append(curve[i-1])
-          else: cPs.append(ThreeDQBspline(curve[i-2],curve[i-1],\
-                           curve[i],j*res*4/d))
+      for i in xrange(2,len(curve)): #piecewise continuous polynomial
+        d=vdist(curve[i],curve[i-1])+vdist(curve[i-1],curve[i-2])
+        N=int(d/(res*4))
+        for j in xrange(0,N):
+          cPs.append(ThreeDQBspline(curve[i-2],curve[i-1],curve[i],j*res*4/d))
+        cPs.append(curve[i])
       uvLength=len(cPs)-3
       if (uvLength<=0): return #neglects uv for strands with less than 4 control points
       uvFactor = 1.0/uvLength 
