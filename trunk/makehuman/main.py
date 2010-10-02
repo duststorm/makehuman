@@ -214,6 +214,34 @@ class MHApplication(gui3d.Application):
     def onClicked(event):
       self.stop()
       
+    self.undoButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.getThemeResource('images', 'button_undo.png'),
+                                       selectedTexture=self.getThemeResource('images', 'button_undo_on.png'), position=[33, 503, 9.1],
+                                       focusedTexture=self.getThemeResource('images', 'button_undo_focused.png'))
+    self.redoButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.getThemeResource('images', 'button_redo.png'),
+                                   selectedTexture=self.getThemeResource('images', 'button_redo_on.png'), position=[68, 503, 9.1],
+                                   focusedTexture=self.getThemeResource('images', 'button_redo_focused.png'))
+    self.resetButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.getThemeResource('images', 'button_reset.png'),
+                                    selectedTexture=self.getThemeResource('images', 'button_reset_on.png'), position=[103, 503, 9.1],
+                                    focusedTexture=self.getThemeResource('images', 'button_reset_focused.png'))
+                                    
+    @self.undoButton.event
+    def onClicked(event):
+        self.app.undo()
+
+    @self.redoButton.event
+    def onClicked(event):
+        self.app.redo()
+
+    @self.resetButton.event
+    def onClicked(event):
+        human = self.scene3d.selectedHuman
+        human.resetMeshValues()
+        human.applyAllTargets(self.progress)
+        self.syncSliders()
+        self.syncEthnics()
+        self.syncStatus()
+        self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
+      
     self.globalButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 560, 9.2], label="Global cam")
     self.faceButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 585, 9.2], label="Face cam")
     

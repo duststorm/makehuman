@@ -229,33 +229,6 @@ class MacroModelingTaskView(gui3d.TaskView):
     # Common controls
 
         self.background = gui3d.Object(category, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
-        self.undoButton = gui3d.Button(category, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_undo.png'),
-                                       selectedTexture=self.app.getThemeResource('images', 'button_undo_on.png'), position=[33, 503, 9.1],
-                                       focusedTexture=self.app.getThemeResource('images', 'button_undo_focused.png'))
-        self.redoButton = gui3d.Button(category, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_redo.png'),
-                                       selectedTexture=self.app.getThemeResource('images', 'button_redo_on.png'), position=[68, 503, 9.1],
-                                       focusedTexture=self.app.getThemeResource('images', 'button_redo_focused.png'))
-        self.resetButton = gui3d.Button(category, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_reset.png'),
-                                        selectedTexture=self.app.getThemeResource('images', 'button_reset_on.png'), position=[103, 503, 9.1],
-                                        focusedTexture=self.app.getThemeResource('images', 'button_reset_focused.png'))
-
-        @self.undoButton.event
-        def onClicked(event):
-            self.app.undo()
-
-        @self.redoButton.event
-        def onClicked(event):
-            self.app.redo()
-
-        @self.resetButton.event
-        def onClicked(event):
-            human = self.app.scene3d.selectedHuman
-            human.resetMeshValues()
-            human.applyAllTargets(self.app.progress)
-            self.syncSliders()
-            self.syncEthnics()
-            self.syncStatus()
-            self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
 
         self.currentHair = gui3d.Button(category, mesh='data/3dobjs/button_standard_little.obj', texture=self.app.scene3d.selectedHuman.hairFile.replace('.hair', '.png'
                                         ), position=[600, 580, 9.2])
