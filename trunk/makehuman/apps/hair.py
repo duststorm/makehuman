@@ -137,7 +137,7 @@ class Hairs:
 
         #HACK: set hair color to default black
         fg.setColor([0,0,0,255]) #rgba
-        obj.calcNormals()
+        #obj.calcNormals( ) : Do not recalculate normals for ribbons of hair, if there are lot of hairs this can be too expensive and for too curly hair our normal calc is not good
         obj.shadeless = 1
         obj.updateIndexBuffer()
         if update:
