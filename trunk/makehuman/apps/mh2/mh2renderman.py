@@ -403,14 +403,15 @@ class RMRTexture:
                         self.filterfunc,self.swidth,self.twidth))
 
 
-
 class RMRScene:
 
     #def __init__(self, MHscene, camera):
     def __init__(self, app):
         MHscene = app.scene3d
         camera = app.modelCamera
-        self.hairsClass = app.categories["Library"].tasksByName["Hair"]
+
+        self.app = app
+        
         #default lights
         self.light1 = RMRLight([-8, 10, -15],intensity = 49.5)
         self.light2 = RMRLight([1, 10, -15],intensity = 19.5)
@@ -423,6 +424,7 @@ class RMRScene:
         self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"))
         self.humanCharacter.calcSSSvertcolor(self.lights)
         self.humanCharacter.subObjectsInit()
+        self.hairsClass = MHscene.selectedHuman.hairs
 
         #resources paths
         self.renderPath = mh.getPath('render')
@@ -443,8 +445,7 @@ class RMRScene:
         if not os.path.isdir(self.usrShaderPath):
             os.makedirs(self.usrShaderPath)
 
-        #rendering properties
-        self.xResolution, self.yResolution = MHscene.getWindowSize()
+        #rendering properties        
         self.camera = camera
         self.pixelSamples = [2,2]
         self.shadingRate = 2
@@ -462,6 +463,9 @@ class RMRScene:
         """
         This function creates the frame definition for a Renderman scene.
         """
+
+        #Getting global settings
+        self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
 
         pos = self.humanCharacter.getObjPosition()
         imgFile = str(time.time())+".tif"

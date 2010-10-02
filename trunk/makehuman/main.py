@@ -78,8 +78,8 @@ from os.path import join, basename, splitext
 
 import mh
 import gui3d, events3d, font3d
-import human, hair, background, human_texture
-import guimodelling, guifiles, guirender
+import human, hair_chooser, background, human_texture
+import guimodelling, guifiles#, guirender
 from aljabr import centroid
 #import font3d
 
@@ -180,11 +180,11 @@ class MHApplication(gui3d.Application):
     self.progressBar.setProgress(0.7)
     guifiles.FilesCategory(self)
     self.progressBar.setProgress(0.8)
-    guirender.RenderingCategory(self)
+    #guirender.RenderingCategory(self)
   
     library = gui3d.Category(self, "Library", self.getThemeResource("images", "button_library.png"),
       self.getThemeResource("images", "button_library_on.png"))
-    hair.HairTaskView(library)
+    hair_chooser.HairTaskView(library)
     background.BackgroundTaskView(library)
     human_texture.HumanTextureTaskView(library)
 

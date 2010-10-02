@@ -34,6 +34,7 @@ import os
 import mh
 import humanmodifier
 import math
+import hair
 
 
 class Human(gui3d.Object):
@@ -79,6 +80,9 @@ class Human(gui3d.Object):
         self.detailTargetZ2b = None
 
         self.meshStored = []
+        self.hairs = hair.Hairs(self)
+        self.hairFile = 'data/hairs/default.hair'
+        self.hairColor = [0.41, 0.23, 0.04]
 
         self.childVal = 0.0  # child
         self.oldVal = 0.0  # old
@@ -174,10 +178,7 @@ class Human(gui3d.Object):
         self.targetFemaleGenitalsOld = '%s/genitals_female_old.target' % targetFolder
         self.targetMaleGenitalsChild = '%s/genitals_male_child.target' % targetFolder
         self.targetMaleGenitalsYoung = '%s/genitals_male_young.target' % targetFolder
-        self.targetMaleGenitalsOld = '%s/genitals_male_old.target' % targetFolder
-
-        self.hairFile = 'data/hairs/default.hair'
-        self.hairColor = [0.41, 0.23, 0.04]
+        self.targetMaleGenitalsOld = '%s/genitals_male_old.target' % targetFolder        
 
         self.genitalVertices, self.genitalFaces = self.meshData.getVerticesAndFacesForGroups(["pelvis-genital-area"])
 
