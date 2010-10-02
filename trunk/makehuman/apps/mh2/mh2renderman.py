@@ -118,11 +118,11 @@ class RMRHairs:
 
             for cP in strands:
                 hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
-
-            if random.randint(0, 3) >= 1:
-                hairFile.write(']\n"N" [')
-                for cP in strands:
-                        hairFile.write('0 1 0 ')  # arbitrary normals
+            
+            #if random.randint(0, 3) >= 1:
+            #    hairFile.write(']\n"N" [')
+            #    for cP in strands:
+            #            hairFile.write('0 1 0 ')  # arbitrary normals
             hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
 
         hairFile.close()
@@ -517,7 +517,7 @@ class RMRScene:
             ribfile.write('\tAttributeEnd\n')
 
         ribfile.write('\tAttributeBegin\n')
-        ribfile.write('\tReverseOrientation #<<-- required\n')
+        #ribfile.write('\tReverseOrientation #<<-- required\n')
         ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] "float roughness" [0.08] "color rootcolor" [%s %s %s]\n' % 
                         (self.humanCharacter.human.hairColor[0], self.humanCharacter.human.hairColor[1], self.humanCharacter.human.hairColor[2]))
         ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(self.ribsPath, 'hairs.rib').replace('\\', '/'))
