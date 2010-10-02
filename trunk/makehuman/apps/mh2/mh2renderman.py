@@ -112,12 +112,20 @@ class RMRHairs:
         
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
         for strands in hairs:
+            
             hDiameter = self.hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
             totalNumberOfHairs += 1
             hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(strands))
-
+            
+            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints 
+            hairFile.write('%s %s %s ' % (strands[0][0], strands[0][1], -strands[0][2]))  # z * -1 blender  to renderman coords
+            
             for cP in strands:
                 hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
+            
+            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
+            hairFile.write('%s %s %s ' % (strands[len(strands)-1][0], strands[len(strands)-1][1],\
+            -strands[len(strands)-1][2]))  # z * -1 blender  to renderman coords
             
             #if random.randint(0, 3) >= 1:
             #    hairFile.write(']\n"N" [')

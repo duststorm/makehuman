@@ -191,8 +191,9 @@ class Hairs:
                     guidePoints.append(temp[int(index)])
                 temp=[]
             elif datalist[0] == "end":
-                if guidePoints[0][1] < guidePoints[len(guidePoints)-1][1]: #is the first point lower than the last control point?
-                    guidePoints.reverse()
+                #if guidePoints[0][1] < guidePoints[len(guidePoints)-1][1]: #is the first point lower than the last control point?
+                #    guidePoints.reverse()
+                guidePoints.reverse() #all hairs are exported from blender, blender particles start counting from hair tip not from hair root!
                 self.guides.append(guidePoints); #apppend takes a deep copy
                 guidePoints=[]
         objFile.close()
