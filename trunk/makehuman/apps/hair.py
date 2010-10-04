@@ -37,6 +37,7 @@ class Hairs:
         self.saveAsCurves = True
         self.path = None
         self.guides = []
+        self.grouping = {} #dictionary of list of guide indices
         self.widthFactor = 1.0
         self.oHeadCentroid = [0.0, 7.436, 0.03]
         self.oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
@@ -45,6 +46,7 @@ class Hairs:
         self.rootColor = [0.109, 0.037, 0.007]
         self.interpolationRadius = 0.09
         self.clumpInterpolationNumber = 0
+        self.multiStrandNumber = 0
         self.human = human
 
 
@@ -179,7 +181,7 @@ class Hairs:
         guidePoints=[]
         temp =[]
         self.guides = [] #set of curves
-        reGroup = True
+        guideIndex=0
         for data in objFile:
             datalist = data.split()
             if datalist[0] == "v":
@@ -190,20 +192,60 @@ class Hairs:
                 for index in datalist[3:]:
                     guidePoints.append(temp[int(index)])
                 temp=[]
+            elif datalist[0] == "g":
+                try:
+                  self.grouping[datalist[1]].append(guideIndex)
+                except:
+                  self.grouping[datalist[1]]=[guideIndex]
             elif datalist[0] == "end":
                 #if guidePoints[0][1] < guidePoints[len(guidePoints)-1][1]: #is the first point lower than the last control point?
                 #    guidePoints.reverse()
                 guidePoints.reverse() #all hairs are exported from blender, blender particles start counting from hair tip not from hair root!
                 self.guides.append(guidePoints); #apppend takes a deep copy
                 guidePoints=[]
+                guideIndex=guideIndex+1
         objFile.close()
 
     def generateHairToRender(self):
+        hairs = multiStrandInterpolation()
+        hairs = hairs + self.guides
         if (self.clumpInterpolationNumber > 1):
-            return clumpInterpolation(self.guides, self.interpolationRadius, self.clumpInterpolationNumber)
+            return clumpInterpolation(hairs, self.interpolationRadius, self.clumpInterpolationNumber)
         else:
             return self.guides
-
+            
+    def multiStrandInterpolation(self):
+          if self.multiStrandNumber<2: return []
+          hairs=[]
+          for group in self.grouping.values():
+            n = len(group)
+            if n==0: 
+              continue
+            for i in xrange(0,self.multiStrandNumber):
+              
+              #random computation of weights
+              temp=0;
+              weights=[]
+              mAx=0
+              for i in xrange(0,n):
+                r=random()
+                temp = temp+r
+                weight.append(r)
+                if weight[mAx] > r: mAx=i
+              #normalize weight sum
+              for i in xrange(0,n):
+                weight[i]=weight[i]/temp
+              tempStrand=[]
+              m = len(self.guides[group[mAx]]) #length of strand with highest weight
+              tempV=[0.0,0.0,0.0]
+              
+              for j in xrange(0,m): #interpolated strand has controlPoints = controlPoint of the strand with heighest weight!
+                for k in xrange(0,n):
+                  tempV=vadd(tempV,vmul(self.guides[group[k]][j],weight[i]))
+                tempStrand.append(tempV)
+              hairs.append(tempStrand)
+            
+            return hairs
 
 def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
     headNormal = [0.0,1.0,0.0]
@@ -381,7 +423,3 @@ def clumpInterpolation(guides, radius, n):
             hairs.append(child)
 
     return hairs
-
-
-
-
