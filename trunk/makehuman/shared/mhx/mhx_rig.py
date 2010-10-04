@@ -1045,15 +1045,15 @@ def writeFCurves(fp, name, quats):
 #
 
 def writeFkIkSwitch(fp, drivers):
-	for (bone, cond, cnsFK, cnsIK, targ, channel) in drivers:
+	for (bone, cond, cnsFK, cnsIK, targ, channel, mx) in drivers:
 		if PanelWorks:
 			cnsData = ("ik", 'SINGLE_PROP', [('Human', targ)])
 		else:
 			cnsData = ("ik", 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)])
 		for cnsName in cnsFK:
-			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (1,-1), [cnsData])
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (mx,-mx), [cnsData])
 		for cnsName in cnsIK:
-			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), [cnsData])
+			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,mx), [cnsData])
 
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 
@@ -1228,7 +1228,7 @@ def writeAllActions(fp):
 def writeAllDrivers(fp):
 	writeFkIkSwitch(fp, rig_arm_25.ArmDrivers)
 	writeFkIkSwitch(fp, rig_leg_25.LegDrivers)
-	#rig_finger_25.FingerWriteDrivers(fp)
+	rig_panel_25.FingerWriteDrivers(fp)
 	rig_face_25.FaceWriteDrivers(fp)
 	return
 

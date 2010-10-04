@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.17
+Version 0.18
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.17',
+	'version': '0.18',
 	'blender': (2, 5, 4),
     "api": 31913,
 	"location": "File > Import",
@@ -39,7 +39,7 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 17
+MINOR_VERSION = 18
 BLENDER_VERSION = (2, 54, 0)
 
 #
@@ -102,7 +102,7 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape + T_Stretch
+toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape 
 
 #
 #	setFlagsAndFloats(rigFlags):

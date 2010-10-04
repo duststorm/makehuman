@@ -35,6 +35,18 @@ PanelJoints = [
 	('PArmIK_L',		'o', ('origin', [0.1, 2.0, 0.0])),
 	('PLegIK_R',		'o', ('origin', [-1.1, 1.5, 0.0])),
 	('PLegIK_L',		'o', ('origin', [0.1, 1.5, 0.0])),
+
+	('PFinger-1_R',		'o', ('origin', [-2.0, 1.0, 0.0])),
+	('PFinger-2_R',		'o', ('origin', [-2.0, 0.5, 0.0])),
+	('PFinger-3_R',		'o', ('origin', [-2.0, 0.0, 0.0])),
+	('PFinger-4_R',		'o', ('origin', [-2.0, -0.5, 0.0])),
+	('PFinger-5_R',		'o', ('origin', [-2.0, -1.0, 0.0])),
+
+	('PFinger-1_L',		'o', ('origin', [1.2, 1.0, 0.0])),
+	('PFinger-2_L',		'o', ('origin', [1.2, 0.5, 0.0])),
+	('PFinger-3_L',		'o', ('origin', [1.2, 0.0, 0.0])),
+	('PFinger-4_L',		'o', ('origin', [1.2, -0.5, 0.0])),
+	('PFinger-5_L',		'o', ('origin', [1.2, -1.0, 0.0])),
 ]
 
 PanelHeadsTails = [
@@ -66,6 +78,19 @@ PanelHeadsTails = [
 	('PArmIK_L',			'PArmIK_L', ('PArmIK_L', offs)),
 	('PLegIK_R',			'PLegIK_R', ('PLegIK_R', offs)),
 	('PLegIK_L',			'PLegIK_L', ('PLegIK_L', offs)),
+
+	('PFinger-1_L',			'PFinger-1_L', ('PFinger-1_L', offs)),
+	('PFinger-2_L',			'PFinger-2_L', ('PFinger-2_L', offs)),
+	('PFinger-3_L',			'PFinger-3_L', ('PFinger-3_L', offs)),
+	('PFinger-4_L',			'PFinger-4_L', ('PFinger-4_L', offs)),
+	('PFinger-5_L',			'PFinger-5_L', ('PFinger-5_L', offs)),
+
+	('PFinger-1_R',			'PFinger-1_R', ('PFinger-1_R', offs)),
+	('PFinger-2_R',			'PFinger-2_R', ('PFinger-2_R', offs)),
+	('PFinger-3_R',			'PFinger-3_R', ('PFinger-3_R', offs)),
+	('PFinger-4_R',			'PFinger-4_R', ('PFinger-4_R', offs)),
+	('PFinger-5_R',			'PFinger-5_R', ('PFinger-5_R', offs)),
+
 ]
 
 
@@ -98,6 +123,18 @@ PanelArmature = [
 	('PArmIK_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PLegIK_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PLegIK_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+
+	('PFinger-1_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-2_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-3_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-4_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-5_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+
+	('PFinger-1_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-2_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-3_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-4_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PFinger-5_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 ]
 
 #
@@ -110,6 +147,8 @@ PanelArmature = [
 MX = "0.25"
 pos = ('0', '4.0')
 neg = ('0', '-4.0')
+
+FMX = 0.7
 
 PanelPoses = [
 	('poseBone', 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
@@ -140,6 +179,18 @@ PanelPoses = [
 	('xSlider', 'PArmIK_R', 0.0, 1.0),
 	('xSlider', 'PLegIK_L', 0.0, 1.0),
 	('xSlider', 'PLegIK_R', 0.0, 1.0),
+
+	('xSlider', 'PFinger-1_L', 0.0, FMX),
+	('xSlider', 'PFinger-2_L', 0.0, FMX),
+	('xSlider', 'PFinger-3_L', 0.0, FMX),
+	('xSlider', 'PFinger-4_L', 0.0, FMX),
+	('xSlider', 'PFinger-5_L', 0.0, FMX),
+
+	('xSlider', 'PFinger-1_R', 0.0, FMX),
+	('xSlider', 'PFinger-2_R', 0.0, FMX),
+	('xSlider', 'PFinger-3_R', 0.0, FMX),
+	('xSlider', 'PFinger-4_R', 0.0, FMX),
+	('xSlider', 'PFinger-5_R', 0.0, FMX),
 ]
 
 #
@@ -196,6 +247,22 @@ FaceShapeDrivers = {
 	'LoLipDown_L' : ('PLoLip_L', 'LOC_Z', pos), 
 	'LoLipDown_R' : ('PLoLip_R', 'LOC_Z', pos), 
 }
+
+#
+#	FingerWriteDrivers(fp):
+#
+
+def FingerWriteDrivers(fp):
+	drivers = []
+	coeff = (0, 1.0/FMX)
+	for suffix in ['_L', '_R']:
+		for fnum in range(1,6):
+			driver = "PFinger-%d%s" % (fnum, suffix)
+			for lnum in range(1,4):
+				driven = "Finger-%d-%d%s" % (fnum, lnum, suffix)
+				cnsData = ("var", 'TRANSFORMS', [('Human', driver, 'LOC_X', C_LOCAL)])
+				writeDriver(fp, True, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"Rot\"].influence" % driven, -1, coeff, [cnsData])
+	return
 
 #
 #	ArmShapeDrivers

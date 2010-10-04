@@ -10,12 +10,12 @@ BodyJoints = [
 	('mid-uplegs',			'l', ((0.5, 'l-upper-leg'), (0.5, 'r-upper-leg'))),
 
 	('chest-front',			'v', 7292),
-	('l-rib-top',			'v', 10134),
 	('r-rib-top',			'v', 3667),
-	('l-rib-bot',			'v', 10361),
 	('r-rib-bot',			'v', 3400),
-	('l-hip',				'v', 6754),
-	('r-hip',				'v', 6558),
+	('r-hip',				'v', 6563),
+	('l-rib-top',			'v', 10134),
+	('l-rib-bot',			'v', 10361),
+	('l-hip',				'v', 6749),
 	('abdomen-front',		'v', 7359),
 	('abdomen-back',		'v', 7186),
 
@@ -25,8 +25,9 @@ BodyJoints = [
 	('floor',				'o', ('mid-feet', [0,-0.3,0])),
 ]
 
-BodyHeadsTails = [
+offs = [0,0.1,0]
 
+BodyHeadsTails = [
 	('MasterFloor',			'floor', ('floor', zunit)),
 	('MasterHips',			'pelvis', ('pelvis', zunit)),
 	('MasterNeck',			'neck', ('neck', zunit)),
@@ -43,9 +44,13 @@ BodyHeadsTails = [
 	('Head',			'head', 'head-end'),
 
 	('Rib_L',			'r-rib-top', 'r-rib-bot'),
-	('Stomach_L',		'r-rib-bot', 'r-upper-leg'),
+	('Stomach_L',		'r-rib-bot', 'r-hip'),
+	('StomachTarget_L',	'r-hip', ('r-hip', offs)),
 	('Rib_R',			'l-rib-top', 'l-rib-bot'),
-	('Stomach_R',		'l-rib-bot', 'l-upper-leg'),
+	('Stomach_R',		'l-rib-bot', 'l-hip'),
+	('StomachTarget_R',	'l-hip', ('l-hip', offs)),
+
+
 	('Abdomen',			'abdomen-front', 'abdomen-back'),
 ]
 
@@ -69,6 +74,8 @@ BodyArmature = [
 	('Rib_R',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
 	('Stomach_L',		0.0, 'Rib_L', F_DEF, L_DEF, (1,1,1) ),
 	('Stomach_R',		0.0, 'Rib_R', F_DEF, L_DEF, (1,1,1) ),
+	('StomachTarget_L',		0.0, 'Hips', 0, L_HELP, (1,1,1) ),
+	('StomachTarget_R',		0.0, 'Hips', 0, L_HELP, (1,1,1) ),
 ]
 
 BodyPoses = [
@@ -103,9 +110,9 @@ BodyPoses = [
 	('poseBone', 'Rib_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
 
 	('poseBone', 'Stomach_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['UpLeg_L', 'UpLeg_L', 'PLANE_X'])]),
+		[('StretchTo', 0, ['Stretch', 'StomachTarget_L', 'PLANE_X'])]),
 
 	('poseBone', 'Stomach_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['UpLeg_R', 'UpLeg_R', 'PLANE_X'])]),
+		[('StretchTo', 0, ['Stretch', 'StomachTarget_R', 'PLANE_X'])]),
 ]
 

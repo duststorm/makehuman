@@ -23,7 +23,7 @@ TO DO
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 17
+MINOR_VERSION = 18
 splitLeftRight = True
 
 import module3d, aljabr, mh, files3d, mh2bvh, os
@@ -494,10 +494,10 @@ def writeShapeKeys(fp, name, proxy):
 	fp.write("ShapeKeys %s\n" % name)
 	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
 	copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy)	
-	copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy)
+	#copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy)
 	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
-	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
-	mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
+	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
+	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
 	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
 	fp.write("  end AnimationData\n")
 	fp.write("end ShapeKeys\n")

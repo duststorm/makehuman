@@ -349,74 +349,76 @@ def channelZup(word):
 #
 
 OsuArmature = {
-	'Hips' : 'Root',
-	'ToSpine' : 'Spine1',
-	'Spine' : 'Spine2',
-	'Spine1' : 'Spine3', 
-	'Neck' : 'Neck', 
-	'Head' : 'Head', 
+	'hips' : 'Root',
+	'tospine' : 'Spine1',
+	'spine' : 'Spine2',
+	'spine1' : 'Spine3', 
+	'neck' : 'Neck', 
+	'head' : 'Head', 
 
-	'LeftShoulder' : 'Clavicle_L',
-	'LeftArm' : 'UpArmFK_L', 
-	'LeftForeArm' : 'LoArmFK_L',
-	'LeftHand' : 'HandFK_L', 
+	'leftshoulder' : 'Clavicle_L',
+	'leftarm' : 'UpArmFK_L', 
+	'leftforearm' : 'LoArmFK_L',
+	'lefthand' : 'HandFK_L', 
 
-	'RightShoulder' : 'Clavicle_R',
-	'RightArm' : 'UpArmFK_R', 
-	'RightForeArm' : 'LoArmFK_R',
-	'RightHand' : 'HandFK_R',
+	'rightshoulder' : 'Clavicle_R',
+	'rightarm' : 'UpArmFK_R', 
+	'rightforearm' : 'LoArmFK_R',
+	'righthand' : 'HandFK_R',
 
-	'LeftUpLeg' : 'UpLegFK_L', 
-	'LeftLeg' : 'LoLegFK_L', 
-	'LeftFoot' : 'FootFK_L', 
-	'LeftToeBase' : 'ToeFK_L',
+	'leftupleg' : 'UpLegFK_L', 
+	'leftleg' : 'LoLegFK_L', 
+	'leftfoot' : 'FootFK_L', 
+	'lefttoebase' : 'ToeFK_L',
 
-	'RightUpLeg' : 'UpLegFK_R',
-	'RightLeg' : 'LoLegFK_R', 
-	'RightFoot' : 'FootFK_R', 
-	'RightToeBase' : 'ToeFK_R',
+	'rightupleg' : 'UpLegFK_R',
+	'rightleg' : 'LoLegFK_R', 
+	'rightfoot' : 'FootFK_R', 
+	'righttoebase' : 'ToeFK_R',
 }
 
 #
-#	CmuArmature
+#	MBArmature
 #
 
-CmuArmature = {
-	'Hips' : 'Root', 
-	'LowerBack' : 'Spine1',
-	'Spine' : 'Spine2', 
-	'Spine1' : 'Spine3',
-	'Neck' : 'Neck',
-	'Neck1' : 'Head', 
-	'Head' : None,
+MBArmature = {
+	'hips' : 'Root', 
+	'lowerback' : 'Spine1',
+	'spine' : 'Spine2', 
+	'spine1' : 'Spine3',
+	'neck' : 'Neck',
+	'neck1' : 'Head', 
+	'head' : None,
 
-	'LeftShoulder' : 'Clavicle_L',
-	'LeftArm' : 'UpArmFK_L', 
-	'LeftForeArm' : 'LoArmFK_L',
-	'LeftHand' : 'HandFK_L',
-	'LeftFingerBase' : None,
-	'LFingers' : None,
-	'LThumb' : None, 
+	'leftshoulder' : 'Clavicle_L',
+	'leftarm' : 'UpArmFK_L', 
+	'leftforearm' : 'LoArmFK_L',
+	'lefthand' : 'HandFK_L',
+	'lefthandindex1' : None,
+	'leftfingerbase' : None,
+	'lfingers' : None,
+	'lthumb' : None, 
 
-	'RightShoulder' : 'Clavicle_R', 
-	'RightArm' : 'UpArmFK_R', 
-	'RightForeArm' : 'LoArmFK_R',
-	'RightHand' : 'HandFK_R',
-	'RightFingerBase' : None,
-	'RFingers' : None,
-	'RThumb' : None, 
+	'rightshoulder' : 'Clavicle_R', 
+	'rightarm' : 'UpArmFK_R', 
+	'rightforearm' : 'LoArmFK_R',
+	'righthand' : 'HandFK_R',
+	'righthandindex1' : None,
+	'rightfingerbase' : None,
+	'rfingers' : None,
+	'rthumb' : None, 
 
-	'LHipJoint' : 'Hip_L', 
-	'LeftUpLeg' : 'UpLegFK_L',
-	'LeftLeg' : 'LoLegFK_L', 
-	'LeftFoot' : 'FootFK_L', 
-	'LeftToeBase' : 'ToeFK_L',
+	'lhipjoint' : 'Hip_L', 
+	'leftupleg' : 'UpLegFK_L',
+	'leftleg' : 'LoLegFK_L', 
+	'leftfoot' : 'FootFK_L', 
+	'lefttoebase' : 'ToeFK_L',
 
-	'RHipJoint' : 'Hip_R', 
-	'RightUpLeg' : 'UpLegFK_R',
-	'RightLeg' : 'LoLegFK_R', 
-	'RightFoot' : 'FootFK_R', 
-	'RightToeBase' : 'ToeFK_R',
+	'rhipjoint' : 'Hip_R', 
+	'rightupleg' : 'UpLegFK_R',
+	'rightleg' : 'LoLegFK_R', 
+	'rightfoot' : 'FootFK_R', 
+	'righttoebase' : 'ToeFK_R',
 }
 
 #
@@ -424,92 +426,156 @@ CmuArmature = {
 #
 
 Xx1Armature = {
-	'Hip' : 'Root', 
-	'Abdomen' : 'Spine1',
-	'Chest' : 'Spine3',
-	'Neck' : 'Neck',
-	'Head' : 'Head', 
-	'Left Eye' : None,
-	'Right Eye' : None,
+	'hip' : 'Root', 
+	'abdomen' : 'Spine1',
+	'chest' : 'Spine3',
+	'neck' : 'Neck',
+	'head' : 'Head', 
+	'left eye' : None,
+	'right eye' : None,
 
-	'Left Collar' : 'Clavicle_L',
-	'Left Shoulder' : 'UpArmFK_L', 
-	'Left Forearm' : 'LoArmFK_L',
-	'Left Hand' : 'HandFK_L',
-	'Left Thumb 1' : None, 
-	'Left Thumb 2' : None, 
-	'Left Thumb 3' : None, 
-	'Left Index 1' : None, 
-	'Left Index 2' : None, 
-	'Left Index 3' : None, 
-	'Left Mid 1' : None, 
-	'Left Mid 2' : None, 
-	'Left Mid 3' : None, 
-	'Left Ring 1' : None, 
-	'Left Ring 2' : None, 
-	'Left Ring 3' : None, 
-	'Left Pinky 1' : None, 
-	'Left Pinky 2' : None, 
-	'Left Pinky 3' : None, 
+	'left collar' : 'Clavicle_L',
+	'left shoulder' : 'UpArmFK_L', 
+	'left forearm' : 'LoArmFK_L',
+	'left hand' : 'HandFK_L',
+	'left thumb 1' : None, 
+	'left thumb 2' : None, 
+	'left thumb 3' : None, 
+	'left index 1' : None, 
+	'left index 2' : None, 
+	'left index 3' : None, 
+	'left mid 1' : None, 
+	'left mid 2' : None, 
+	'left mid 3' : None, 
+	'left ring 1' : None, 
+	'left ring 2' : None, 
+	'left ring 3' : None, 
+	'left pinky 1' : None, 
+	'left pinky 2' : None, 
+	'left pinky 3' : None, 
 
-	'Right Collar' : 'Clavicle_R',
-	'Right Shoulder' : 'UpArmFK_R', 
-	'Right Forearm' : 'LoArmFK_R',
-	'Right Hand' : 'HandFK_R',
-	'Right Thumb 1' : None, 
-	'Right Thumb 2' : None, 
-	'Right Thumb 3' : None, 
-	'Right Index 1' : None, 
-	'Right Index 2' : None, 
-	'Right Index 3' : None, 
-	'Right Mid 1' : None, 
-	'Right Mid 2' : None, 
-	'Right Mid 3' : None, 
-	'Right Ring 1' : None, 
-	'Right Ring 2' : None, 
-	'Right Ring 3' : None, 
-	'Right Pinky 1' : None, 
-	'Right Pinky 2' : None, 
-	'Right Pinky 3' : None, 
+	'right collar' : 'Clavicle_R',
+	'right shoulder' : 'UpArmFK_R', 
+	'right forearm' : 'LoArmFK_R',
+	'right hand' : 'HandFK_R',
+	'right thumb 1' : None, 
+	'right thumb 2' : None, 
+	'right thumb 3' : None, 
+	'right index 1' : None, 
+	'right index 2' : None, 
+	'right index 3' : None, 
+	'right mid 1' : None, 
+	'right mid 2' : None, 
+	'right mid 3' : None, 
+	'right ring 1' : None, 
+	'right ring 2' : None, 
+	'right ring 3' : None, 
+	'right pinky 1' : None, 
+	'right pinky 2' : None, 
+	'right pinky 3' : None, 
 
-	'Left Thigh' : 'UpLegFK_L',
-	'Left Shin' : 'LoLegFK_L', 
-	'Left Foot' : 'FootFK_L', 
-	'Left Toe' : 'ToeFK_L',
+	'left thigh' : 'UpLegFK_L',
+	'left shin' : 'LoLegFK_L', 
+	'left foot' : 'FootFK_L', 
+	'left toe' : 'ToeFK_L',
 
-	'Right Thigh' : 'UpLegFK_R',
-	'Right Shin' : 'LoLegFK_R', 
-	'Right Foot' : 'FootFK_R', 
-	'Right Toe' : 'ToeFK_R',
+	'right thigh' : 'UpLegFK_R',
+	'right shin' : 'LoLegFK_R', 
+	'right foot' : 'FootFK_R', 
+	'right toe' : 'ToeFK_R',
 }
 
 Xx2Armature = {
-	'Hips' : 'Root',
-	'LeftHip' : 'UpLegFK_L',
-	'LeftKnee' : 'LoLegFK_L',
-	'LeftAnkle' : 'FootFK_L',
-	'RightHip' : 'UpLegFK_R',
-	'RightKnee' : 'LoLegFK_R',
-	'RightAnkle' : 'FootFK_R',
-	'Chest' : 'Spine2',
-	'LeftCollar' : 'Clavicle_L',
-	'LeftShoulder' : 'UpArmFK_L',
-	'LeftElbow' : 'LoArmFK_L',
-	'LeftWrist' : 'HandFK_L',
-	'RightCollar' : 'Clavicle_R',
-	'RightShoulder' : 'UpArmFK_R',
-	'RightElbow' : 'LoArmFK_R',
-	'RightWrist' : 'HandFK_R',
-	'Neck' : 'Neck',
-	'Head' : 'Head',
+	'hips' : 'Root',
+	'lefthip' : 'UpLegFK_L',
+	'leftknee' : 'LoLegFK_L',
+	'leftankle' : 'FootFK_L',
+	'righthip' : 'UpLegFK_R',
+	'rightknee' : 'LoLegFK_R',
+	'rightankle' : 'FootFK_R',
+	'chest' : 'Spine2',
+	'leftcollar' : 'Clavicle_L',
+	'leftshoulder' : 'UpArmFK_L',
+	'leftelbow' : 'LoArmFK_L',
+	'leftwrist' : 'HandFK_L',
+	'rightcollar' : 'Clavicle_R',
+	'rightshoulder' : 'UpArmFK_R',
+	'rightelbow' : 'LoArmFK_R',
+	'rightwrist' : 'HandFK_R',
+	'neck' : 'Neck',
+	'head' : 'Head',
 }
 
+PoserArmature = {
+	'hip' : 'Root', 
+	'abdomen' : 'Spine1',
+
+	'chest' : 'Spine3',
+	'neck' : 'Neck',
+	'head' : 'Head', 
+	'lefteye' : None,
+	'righteye' : None,
+	'figurehair' : None,
+
+	'lcollar' : 'Clavicle_L',
+	'lshldr' : 'UpArmFK_L', 
+	'lforearm' : 'LoArmFK_L',
+	'lhand' : 'HandFK_L',
+	'lthumb1' : None, 
+	'lthumb2' : None, 
+	'lthumb3' : None, 
+	'lindex1' : None, 
+	'lindex2' : None, 
+	'lindex3' : None, 
+	'lmid1' : None, 
+	'lmid2' : None, 
+	'lmid3' : None, 
+	'lring1' : None, 
+	'lring2' : None, 
+	'lring3' : None, 
+	'lpinky1' : None, 
+	'lpinky2' : None, 
+	'lpinky3' : None, 
+
+	'rcollar' : 'Clavicle_R',
+	'rshldr' : 'UpArmFK_R', 
+	'rforearm' : 'LoArmFK_R',
+	'rhand' : 'HandFK_R',
+	'rthumb1' : None, 
+	'rthumb2' : None, 
+	'rthumb3' : None, 
+	'rindex1' : None, 
+	'rindex2' : None, 
+	'rindex3' : None, 
+	'rmid1' : None, 
+	'rmid2' : None, 
+	'rmid3' : None, 
+	'rring1' : None, 
+	'rring2' : None, 
+	'rring3' : None, 
+	'rpinky1' : None, 
+	'rpinky2' : None, 
+	'rpinky3' : None, 
+
+	'lbuttock' : 'Hip_L',
+	'lthigh' : 'UpLegFK_L',
+	'lshin' : 'LoLegFK_L', 
+	'lfoot' : 'FootFK_L', 
+	'ltoe' : 'ToeFK_L',
+
+	'rbuttock' : 'Hip_R',
+	'rthigh' : 'UpLegFK_R',
+	'rshin' : 'LoLegFK_R', 
+	'rfoot' : 'FootFK_R', 
+	'rtoe' : 'ToeFK_R',
+}
 
 theArmatures = {
-	'CMU' : CmuArmature, 
+	'MB' : MBArmature, 
 	'OSU' : OsuArmature,
 	'XX1' : Xx1Armature,
 	'XX2' : Xx2Armature,
+	'Poser' : PoserArmature,
 }
 
 #
@@ -601,13 +667,13 @@ def createFKRig(scn, bones00, rig):
 	ebones = amt.edit_bones
 	for bone00 in bones00:
 		name00 = bone00.name
-		name90 = theArmature[name00]
+		name90 = theArmature[name00.lower()]
 		if name90:
 			eb = ebones.new(name=name90)
 			eb.head = rot90(bone00.head)
 			eb.tail = rot90(bone00.tail)
 			if bone00.parent:
-				parent = theArmature[bone00.parent]
+				parent = theArmature[bone00.parent.lower()]
 				eb.parent = ebones[parent]
 				#eb.use_connect = bone00.use_connect
 			eb.roll = bone00.roll
@@ -670,7 +736,7 @@ def setupTranformMatrix(bones00, bones90):
 	tRot90 = Matrix.Rotation(-math.pi/2, 3, 'X')
 	for bone00 in bones00:
 		name00 = bone00.name
-		name90 = theArmature[name00]
+		name90 = theArmature[name00.lower()]
 		if name90:
 			bone90 = bones90[name90]
 			tMatrix[name00] = bone90.matrix * tRot90 * bone00.inverse
@@ -689,7 +755,7 @@ def insertAction(bones00, rig00, rig90, tMatrix, tInverse):
 
 	for bone in bones00:
 		name00 = bone.name
-		name90 = theArmature[name00]
+		name90 = theArmature[name00.lower()]
 		if name90:
 			pb = rig90.pose.bones[name90]			
 			for frame in range(nFrames):
@@ -842,7 +908,7 @@ def guessArmature(rig):
 		nMisses = 0
 		for bone in bones:
 			try:
-				amt[bone.name]
+				amt[bone.name.lower()]
 			except:
 				nMisses += 1
 		misses[name] = nMisses

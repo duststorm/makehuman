@@ -243,19 +243,19 @@ LegPoses = [
 
 #
 #	LegDrivers
-#	(Bone, cond, FK constraint, IK constraint, driver, channel)
+#	(Bone, cond, FK constraint, IK constraint, driver, channel, max)
 #
 
 LegDrivers = [
-	("UpLeg_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_L", "LOC_X"),
-	("LoLeg_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_L", "LOC_X"),
-	("Foot_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X"),
-	("Toe_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X"),
+	("UpLeg_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_L", "LOC_X", 1.0),
+	("LoLeg_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_L", "LOC_X", 1.0),
+	("Foot_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X", 1.0),
+	("Toe_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X", 1.0),
 	
-	("UpLeg_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_R", "LOC_X"),
-	("LoLeg_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_R", "LOC_X"),
-	("Foot_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X"),
-	("Toe_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X"),
+	("UpLeg_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_R", "LOC_X", 1.0),
+	("LoLeg_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_R", "LOC_X", 1.0),
+	("Foot_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X", 1.0),
+	("Toe_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X", 1.0),
 
 ]
 
