@@ -111,9 +111,9 @@ C_TG_POSE = 0x3000
 C_CHILDOF = C_OW_POSE+C_TG_WORLD
 
 rootChildOfConstraints = [
-		('ChildOf', C_CHILDOF, ['Floor', 'MasterFloor', 1.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Hips', 'MasterHips', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('ChildOf', C_CHILDOF, ['Neck', 'MasterNeck', 0.0, (1,1,1), (1,1,1), (1,1,1)])
+		('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
+		('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
 ]
 
 #
@@ -337,10 +337,10 @@ def writePoses(fp, poses):
 		elif typ == 'cSlider':
 			mn = '-'+mx
 			addPoseBone(fp, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
+				[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'xSlider':
 			addPoseBone(fp, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-				[('LimitLoc', C_OW_LOCAL+C_LTRA, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
+				[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'ikHandle':
 			addIKHandle(fp, bone, mn, mx)
 		elif typ == 'singleIK':
@@ -360,27 +360,27 @@ def writePoses(fp, poses):
 
 def addIKHandle(fp, bone, customShape, limit):
 	if limit:
-		cns = [('LimitDist', 0, ['LimitDist', 1.0, limit])]
+		cns = [('LimitDist', 0, 1, ['LimitDist', limit])]
 	else:
 		cns = []
 	addPoseBone(fp, bone, customShape, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, cns)
 
 def addSingleIK(fp, bone, lockRot, target, limit):
-	cns = [('IK', 0, ['IK', target, 1, None, (True, False, True), 1.0])]
+	cns = [('IK', 0, 1, ['IK', target, 1, None, (True, False, True), 1.0])]
 	if limit:
-		cns.append( ('LimitRot', C_OW_LOCAL, ['LimitRot', limit, (True, True, True)]) )
+		cns.append( ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limit, (True, True, True)]) )
 	addPoseBone(fp, bone, None, None, (1,1,1), lockRot, (1,1,1), (1,1,1), 0, cns)
 
 def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 	space = cflags & (C_OW_MASK + C_TG_MASK)
 	constraints = [
-		('CopyRot', space, ['RotIK', ikBone, 0.0, ikRot, (0,0,0), False]),
-		('CopyRot', space, ['RotFK', fkBone, 1.0, fkRot, (0,0,0), False])
+		('CopyRot', space, 0, ['RotIK', ikBone, ikRot, (0,0,0), False]),
+		('CopyRot', space, 1, ['RotFK', fkBone, fkRot, (0,0,0), False])
 		]
 	if pflags & P_STRETCH:
 		constraints += [
-		('CopyScale', 0, ['StretchIK', ikBone, 0.0, (0,1,0), False]),
-		('CopyScale', 0, ['StretchFK', fkBone, 1.0, (0,1,0), False]),
+		('CopyScale', 0, 0, ['StretchIK', ikBone, (0,1,0), False]),
+		('CopyScale', 0, 1, ['StretchFK', fkBone, (0,1,0), False]),
 		]		
 	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
 	return
@@ -423,7 +423,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 	(xmin, ymin, zmin) = (-pi, -pi, -pi)
 	(xmax, ymax, zmax) = (pi, pi, pi)
 
-	for (label, cflags, data) in constraints:
+	for (label, cflags, inf, data) in constraints:
 		if type(label) == str:
 			typ = label
 			switch = True
@@ -431,33 +431,35 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 			(typ, switch) = label
 
 		if typ == 'IK':
-			addIkConstraint(fp, switch, cflags, data, lockLoc, lockRot)
+			addIkConstraint(fp, switch, cflags, inf, data, lockLoc, lockRot)
 		elif typ == 'Action':
-			addActionConstraint(fp, switch, cflags, data)
+			addActionConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'CopyLoc':
-			addCopyLocConstraint(fp, switch, cflags, data)
+			addCopyLocConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'CopyRot':
-			addCopyRotConstraint(fp, switch, cflags, data)
+			addCopyRotConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'CopyScale':
-			addCopyScaleConstraint(fp, switch, cflags, data)
+			addCopyScaleConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'CopyTrans':
-			addCopyTransConstraint(fp, switch, cflags, data)
+			addCopyTransConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'LimitRot':
-			addLimitRotConstraint(fp, switch, cflags, data)
+			addLimitRotConstraint(fp, switch, cflags, inf, data)
 			(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
 			(usex,usey,usez) = data[2]			
 		elif typ == 'LimitLoc':
-			addLimitLocConstraint(fp, switch, cflags, data)
+			addLimitLocConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'LimitScale':
-			addLimitScaleConstraint(fp, switch, cflags, data)
+			addLimitScaleConstraint(fp, switch, cflags, inf, data)
+		elif typ == 'Transform':
+			addTransformConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'DampedTrack':
-			addDampedTrackConstraint(fp, switch, cflags, data)
+			addDampedTrackConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'StretchTo':
-			addStretchToConstraint(fp, switch, cflags, data)
+			addStretchToConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'LimitDist':
-			addLimitDistConstraint(fp, switch, cflags, data)
+			addLimitDistConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'ChildOf':
-			addChildOfConstraint(fp, switch, cflags, data)
+			addChildOfConstraint(fp, switch, cflags, inf, data)
 		else:
 			print(label)
 			print(typ)
@@ -506,28 +508,27 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 	return
 
 #
-#	addIkConstraint(fp, switch, flags, data, lockLoc, lockRot)
-#	addActionConstraint(fp, switch, flags, data):
-#	addCopyLocConstraint(fp, switch, flags, data):
-#	addCopyRotConstraint(fp, switch, flags, data):
-#	addCopyScaleConstraint(fp, switch, flags, data):
-#	addCopyTransConstraint(fp, switch, flags, data):
-#	addLimitRotConstraint(fp, switch, flags, data):
-#	addLimitLocConstraint(fp, switch, flags, data):
-#	addLimitScaleConstraint(fp, switch, flags, data):
-#	addDampedTrackConstraint(fp, switch, flags, data):
-#	addStretchToConstraint(fp, switch, flags, data):
-#	addLimitDistConstraint(fp, switch, flags, data):
+#	addIkConstraint(fp, switch, flags, inf, data, lockLoc, lockRot)
+#	addActionConstraint(fp, switch, flags, inf, data):
+#	addCopyLocConstraint(fp, switch, flags, inf, data):
+#	addCopyRotConstraint(fp, switch, flags, inf, data):
+#	addCopyScaleConstraint(fp, switch, flags, inf, data):
+#	addCopyTransConstraint(fp, switch, flags, inf, data):
+#	addLimitRotConstraint(fp, switch, flags, inf, data):
+#	addLimitLocConstraint(fp, switch, flags, inf, data):
+#	addLimitScaleConstraint(fp, switch, flags, inf, data):
+#	addDampedTrackConstraint(fp, switch, flags, inf, data):
+#	addStretchToConstraint(fp, switch, flags, inf, data):
+#	addLimitDistConstraint(fp, switch, flags, inf, data):
 #
 
-def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
+def addIkConstraint(fp, switch, flags, inf, data, lockLoc, lockRot):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
 	chainlen = data[2]
 	pole = data[3]
 	(useLoc, useRot, useStretch) = data[4]
-	inf = data[5]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
 	(lockRotX, lockRotY, lockRotZ) = lockRot
@@ -578,7 +579,7 @@ def addIkConstraint(fp, switch, flags, data, lockLoc, lockRot):
 
 	return
 
-def addActionConstraint(fp, switch, flags, data):
+def addActionConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	action = data[1]
@@ -617,14 +618,13 @@ def addActionConstraint(fp, switch, flags, data):
 "    end Constraint \n")
 	return
 
-def addCopyRotConstraint(fp, switch, flags, data):
+def addCopyRotConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
-	inf = data[2]
-	(useX, useY, useZ) = data[3]
-	(invertX, invertY, invertZ) = data[4]
-	useOffs = data[5]
+	(useX, useY, useZ) = data[2]
+	(invertX, invertY, invertZ) = data[3]
+	useOffs = data[4]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -653,14 +653,13 @@ def addCopyRotConstraint(fp, switch, flags, data):
 "\t\tend constraint\n")
 	return
 
-def addCopyLocConstraint(fp, switch, flags, data):
+def addCopyLocConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
-	inf = data[2]
-	(useX, useY, useZ) = data[3]
-	(invertX, invertY, invertZ) = data[4]
-	useOffs = data[5]
+	(useX, useY, useZ) = data[2]
+	(invertX, invertY, invertZ) = data[3]
+	useOffs = data[4]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -687,13 +686,12 @@ def addCopyLocConstraint(fp, switch, flags, data):
 "\t\tend constraint\n")
 	return
 
-def addCopyScaleConstraint(fp, switch, flags, data):
+def addCopyScaleConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
-	inf = data[2]
-	(useX, useY, useZ) = data[3]
-	useOffs = data[4]
+	(useX, useY, useZ) = data[2]
+	useOffs = data[3]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	fp.write(
@@ -711,7 +709,7 @@ def addCopyScaleConstraint(fp, switch, flags, data):
 "    end Constraint\n")
 	return
 
-def addCopyTransConstraint(fp, switch, flags, data):
+def addCopyTransConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
@@ -732,7 +730,7 @@ def addCopyTransConstraint(fp, switch, flags, data):
 	return
 
 
-def addLimitRotConstraint(fp, switch, flags, data):
+def addLimitRotConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
@@ -745,7 +743,7 @@ def addLimitRotConstraint(fp, switch, flags, data):
 "    Constraint %s LIMIT_ROTATION %s\n" % (name, switch) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
-"      influence 1 ; \n"+
+"      influence %s ; \n" % inf +
 "      use_transform_limit %s ; \n" % ltra+
 "      max_x %.6g ;\n" % xmax +
 "      max_y %.6g ;\n" % ymax +
@@ -776,7 +774,7 @@ def addLimitRotConstraint(fp, switch, flags, data):
 "\t\tend constraint\n")
 	return
 
-def addLimitLocConstraint(fp, switch, flags, data):
+def addLimitLocConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
@@ -788,7 +786,7 @@ def addLimitLocConstraint(fp, switch, flags, data):
 "    Constraint %s LIMIT_LOCATION %s\n" % (name, switch) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
-"      influence 1 ;\n" +
+"      influence %s ;\n" % inf +
 "      use_transform_limit True ;\n" +
 "      max_x %s*theScale ;\n" % xmax +
 "      max_y %s*theScale ;\n" % ymax +
@@ -823,7 +821,7 @@ def addLimitLocConstraint(fp, switch, flags, data):
 
 	return
 
-def addLimitScaleConstraint(fp, switch, flags, data):
+def addLimitScaleConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
@@ -835,7 +833,7 @@ def addLimitScaleConstraint(fp, switch, flags, data):
 "    Constraint %s LIMIT_SCALE %s\n" % (name, switch) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
-"      influence 1 ;\n" +
+"      influence %s ;\n" % inf +
 "      use_transform_limit True ;\n" +
 "      max_x %.6g ;\n" % xmax +
 "      max_y %.6g ;\n" % ymax +
@@ -855,7 +853,48 @@ def addLimitScaleConstraint(fp, switch, flags, data):
 "    end Constraint\n")
 	return
 
-def addDampedTrackConstraint(fp, switch, flags, data):
+def addTransformConstraint(fp, switch, flags, inf, data):
+	global Mhx25
+	name = data[0]
+	subtar = data[1]
+	map_from = data[2]
+	from_min = data[3]
+	from_max = data[4]
+	map_to = data[5]
+	to_min = data[6]
+	to_max = data[7]
+	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+	fp.write(
+"    Constraint %s TRANSFORM %s\n" % (name, switch) +
+"      target Refer Object Human ;\n" +
+"      active %s ;\n" % active +
+"      show_expanded %s ;\n" % expanded +
+"      influence %s ;\n" % inf +
+"      use_motion_extrapolate 0 ;\n" +
+"      owner_space '%s' ;\n" % ownsp+
+"      is_proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp+
+"      map_from '%s' ;\n" % map_from + 
+"      from_min_x %.3f ;\n" % from_min[0] + 
+"      from_min_y %.3f ;\n" % from_min[1] + 
+"      from_min_z %.3f ;\n" % from_min[2] + 
+"      from_max_x %.3f ;\n" % from_max[0] + 
+"      from_max_y %.3f ;\n" % from_max[1] + 
+"      from_max_z %.3f ;\n" % from_max[2] + 
+"      map_to '%s' ;\n" % map_to + 
+"      to_min_x %.3f ;\n" % to_min[0] + 
+"      to_min_y %.3f ;\n" % to_min[1] + 
+"      to_min_z %.3f ;\n" % to_min[2] + 
+"      to_max_x %.3f ;\n" % to_max[0] + 
+"      to_max_y %.3f ;\n" % to_max[1] + 
+"      to_max_z %.3f ;\n" % to_max[2] + 
+"    end Constraint\n")
+	return
+
+
+def addDampedTrackConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
@@ -867,7 +906,7 @@ def addDampedTrackConstraint(fp, switch, flags, data):
 "      target Refer Object Human ;\n" +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
-"      influence 1 ;\n" +
+"      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp+
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
@@ -876,7 +915,7 @@ def addDampedTrackConstraint(fp, switch, flags, data):
 "    end Constraint\n")
 	return
 
-def addStretchToConstraint(fp, switch, flags, data):
+def addStretchToConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
@@ -890,7 +929,7 @@ def addStretchToConstraint(fp, switch, flags, data):
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      bulge 1 ;\n" +
-"      influence 1 ;\n" +
+"      influence %s ;\n" % inf +
 "      keep_axis '%s' ;\n" % axis +
 "      owner_space '%s' ;\n" % ownsp+
 "      is_proxy_local False ;\n" +
@@ -908,11 +947,10 @@ def addStretchToConstraint(fp, switch, flags, data):
 "\t\tend constraint\n")
 	return
 
-def addLimitDistConstraint(fp, switch, flags, data):
+def addLimitDistConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
-	inf = data[1]
-	subtar = data[2]
+	subtar = data[1]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -937,15 +975,14 @@ def addLimitDistConstraint(fp, switch, flags, data):
 "\t\tend constraint\n")
 	return
 
-def addChildOfConstraint(fp, switch, flags, data):
+def addChildOfConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	# return
 	name = data[0]
 	subtar = data[1]
-	inf = data[2]
-	(locx, locy, locz) = data[3]
-	(rotx, roty, rotz) = data[4]
-	(scalex, scaley, scalez) = data[5]
+	(locx, locy, locz) = data[2]
+	(rotx, roty, rotz) = data[3]
+	(scalex, scaley, scalez) = data[4]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:

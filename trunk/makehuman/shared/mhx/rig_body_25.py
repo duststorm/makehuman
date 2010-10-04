@@ -13,11 +13,19 @@ BodyJoints = [
 	('r-rib-top',			'v', 3667),
 	('r-rib-bot',			'v', 3400),
 	('r-hip',				'v', 6563),
+	('r-buttock-top',		'v', 4473),
+	('r-buttock-bot',		'v', 4476),
+
 	('l-rib-top',			'v', 10134),
 	('l-rib-bot',			'v', 10361),
 	('l-hip',				'v', 6749),
+	('l-buttock-top',		'v', 6892),
+	('l-buttock-bot',		'v', 6889),
+
 	('abdomen-front',		'v', 7359),
 	('abdomen-back',		'v', 7186),
+	('stomach-top',			'v', 7336),
+	('stomach-bot',			'v', 7297),
 
 	('r-toe-1-1',			'j', 'r-toe-1-1'),
 	('l-toe-1-1',			'j', 'l-toe-1-1'),
@@ -46,12 +54,15 @@ BodyHeadsTails = [
 	('Rib_L',			'r-rib-top', 'r-rib-bot'),
 	('Stomach_L',		'r-rib-bot', 'r-hip'),
 	('StomachTarget_L',	'r-hip', ('r-hip', offs)),
+	('Buttock_L',		'r-buttock-top', 'r-buttock-bot'),
+	
 	('Rib_R',			'l-rib-top', 'l-rib-bot'),
 	('Stomach_R',		'l-rib-bot', 'l-hip'),
 	('StomachTarget_R',	'l-hip', ('l-hip', offs)),
-
+	('Buttock_R',		'l-buttock-top', 'l-buttock-bot'),
 
 	('Abdomen',			'abdomen-front', 'abdomen-back'),
+	('Stomach',			'stomach-bot', 'stomach-top'),
 ]
 
 BodyArmature = [
@@ -74,8 +85,12 @@ BodyArmature = [
 	('Rib_R',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
 	('Stomach_L',		0.0, 'Rib_L', F_DEF, L_DEF, (1,1,1) ),
 	('Stomach_R',		0.0, 'Rib_R', F_DEF, L_DEF, (1,1,1) ),
-	('StomachTarget_L',		0.0, 'Hips', 0, L_HELP, (1,1,1) ),
-	('StomachTarget_R',		0.0, 'Hips', 0, L_HELP, (1,1,1) ),
+	('StomachTarget_L',	0.0, 'Hips', 0, L_HELP, (1,1,1) ),
+	('StomachTarget_R',	0.0, 'Hips', 0, L_HELP, (1,1,1) ),
+	#('Buttock_L',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
+	#('Buttock_R',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
+	
+	('Stomach',			0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),	
 ]
 
 BodyPoses = [
@@ -109,10 +124,15 @@ BodyPoses = [
 
 	('poseBone', 'Rib_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'Stomach_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['Stretch', 'StomachTarget_L', 'PLANE_X'])]),
+	('poseBone', 'Stomach_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget_L', 'PLANE_X'])]),
 
-	('poseBone', 'Stomach_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['Stretch', 'StomachTarget_R', 'PLANE_X'])]),
+	('poseBone', 'Stomach_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget_R', 'PLANE_X'])]),
+
+	('poseBone', 'Stomach', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('Transform', C_OW_LOCAL+C_TG_LOCAL, 1, ['Transform', 'Spine1',
+			'ROTATION', (-20,0,-45), (50,0,45),
+			'ROTATION', (-20,0,-45), (50,0,45)])]),
 ]
 

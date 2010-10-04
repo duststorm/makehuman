@@ -152,7 +152,7 @@ FMX = 0.7
 
 PanelPoses = [
 	('poseBone', 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, ['World', 'Root', 1.0, (1,1,1), (1,1,1), (1,1,1)]) ]),
+		[('ChildOf', C_CHILDOF, 1, ['World', 'Root', (1,1,1), (1,1,1), (1,1,1)]) ]),
 
 	('poseBone', 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
 

@@ -8,26 +8,34 @@ from mhx_rig import *
 offs = [0,0.6,0]
 
 LegJoints = [
-	# Deform
+
 	('r-heel0',			'v', 5721),
 	('r-heel',			'p', ['r-foot-2', 'r-foot-1', 'r-heel0']),
 	('r-ankle-tip',		'o', ('r-ankle', [0.0, 0.0, -1.0])),
+	('r-upleg-fan',		'l', ((0.75, 'r-upper-leg'), (0.25, 'r-knee'))),
+	('r-loleg-fan',		'l', ((0.75, 'r-knee'), (0.25, 'r-ankle'))),
 
 	('l-heel0',			'v', 13338),
 	('l-heel',			'p', ['l-foot-2', 'l-foot-1', 'l-heel0']),
-	('l-ankle-tip',			'o', ('l-ankle', [0.0, 0.0, -1.0])),
+	('l-ankle-tip',		'o', ('l-ankle', [0.0, 0.0, -1.0])),
+	('l-upleg-fan',		'l', ((0.75, 'l-upper-leg'), (0.25, 'l-knee'))),
+	('l-loleg-fan',		'l', ((0.75, 'l-knee'), (0.25, 'l-ankle'))),
 
 ]
 
 LegHeadsTails = [
 	# Deform 
 	('UpLeg_L',			'r-upper-leg', 'r-knee'),
+	('UpLegFan_L',		'r-upper-leg', 'r-upleg-fan'),
 	('LoLeg_L',			'r-knee', 'r-ankle'),
+	('LoLegFan_L',		'r-knee', 'r-loleg-fan'),
 	('Foot_L',			'r-ankle', 'r-foot-1'),
 	('Toe_L',			'r-foot-1', 'r-foot-2'),
 
 	('UpLeg_R',			'l-upper-leg', 'l-knee'),
+	('UpLegFan_R',		'l-upper-leg', 'l-upleg-fan'),
 	('LoLeg_R',			'l-knee', 'l-ankle'),
+	('LoLegFan_R',		'l-knee', 'l-loleg-fan'),
 	('Foot_R',			'l-ankle', 'l-foot-1'),
 	('Toe_R',			'l-foot-1', 'l-foot-2'),
 
@@ -78,12 +86,16 @@ footCtrlRoll = 0.0
 LegArmature = [
 	# Deform
 	('UpLeg_L',			upLegRoll, 'Hip_L', F_DEF, L_DEF, (1,1,1) ),
+	('UpLegFan_L',		upLegRoll, 'Hip_L', F_DEF, L_DEF, (1,1,1) ),
 	('LoLeg_L',			loLegRoll, 'UpLeg_L', F_DEF, L_DEF, (1,1,1) ),
+	('LoLegFan_L',		loLegRoll, 'UpLeg_L', F_DEF, L_DEF, (1,1,1) ),
 	('Foot_L',			footRoll, 'LoLeg_L', F_DEF, L_DEF, (1,1,1) ),
 	('Toe_L',			toeRoll, 'Foot_L', F_DEF, L_DEF, (1,1,1) ),
 
 	('UpLeg_R',			-upLegRoll, 'Hip_R', F_DEF, L_DEF, (1,1,1) ),
+	('UpLegFan_R',		-upLegRoll, 'Hip_R', F_DEF, L_DEF, (1,1,1) ),
 	('LoLeg_R',			-loLegRoll, 'UpLeg_R', F_DEF, L_DEF, (1,1,1) ),
+	('LoLegFan_R',		-loLegRoll, 'UpLeg_R', F_DEF, L_DEF, (1,1,1) ),
 	('Foot_R',			-footRoll, 'LoLeg_R', F_DEF, L_DEF, (1,1,1) ),
 	('Toe_R',			-toeRoll, 'Foot_R', F_DEF, L_DEF, (1,1,1) ),
 
@@ -144,101 +156,120 @@ limRevToe_R = (-deg45,deg45, 0,0, 0,0)
 LegPoses = [
 	# Deform 
 	('deformLimb', 'UpLeg_L', 'UpLegIK_L', (1,1,1), 'UpLegFK_L', (1,1,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH),
+
+	('poseBone', 'UpLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Rot', 'UpLeg_L', (1,0,1), (0,0,0), False])]),
+
 	('deformLimb', 'LoLeg_L', 'LoLegIK_L', (1,1,1), 'LoLegFK_L', (1,1,1), 0, P_STRETCH),
+
+	('poseBone', 'LoLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Rot', 'LoLeg_L', (1,0,1), (0,0,0), False])]),
+
 	('deformLimb', 'Foot_L', 'FootIK_L', (1,1,1), 'FootFK_L', (1,1,1), 0, 0),
+
 	('deformLimb', 'Toe_L', 'ToeIK_L', (1,1,1), 'ToeFK_L', (1,1,1), 0, 0),
 
+
 	('deformLimb', 'UpLeg_R', 'UpLegIK_R', (1,1,1), 'UpLegFK_R', (1,1,1), C_OW_LOCAL+C_TG_LOCAL, P_STRETCH),
+
+	('poseBone', 'UpLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Rot', 'UpLeg_R', (1,0,1), (0,0,0), False])]),
+
 	('deformLimb', 'LoLeg_R', 'LoLegIK_R', (1,1,1), 'LoLegFK_R', (1,1,1), 0, P_STRETCH),
+
+	('poseBone', 'LoLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Rot', 'LoLeg_R', (1,0,1), (0,0,0), False])]),
+
 	('deformLimb', 'Foot_R', 'FootIK_R', (1,1,1), 'FootFK_R', (1,1,1), 0, 0),
+
 	('deformLimb', 'Toe_R', 'ToeIK_R', (1,1,1), 'ToeFK_R', (1,1,1), 0, 0),
 
 	# FK
 	('poseBone', 'UpLegFK_L', 'MHCircle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_L, (1,1,1)])]),
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_L, (1,1,1)])]),
 
 	('poseBone', 'LoLegFK_L', 'MHCircle025', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (1,0,0)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (1,0,0)])]),
 
 	('poseBone', 'FootFK_L', 'MHFoot', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_L, (1,0,0)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_L, (1,0,0)])]),
 
 	('poseBone', 'ToeFK_L', 'MHToe', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limToe_L, (1,0,0)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limToe_L, (1,0,0)])]),
 
 	('poseBone', 'UpLegFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_R, (1,1,1)])]),
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_R, (1,1,1)])]),
 
 	('poseBone', 'LoLegFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (1,0,0)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,0,0)])]),
 
 	('poseBone', 'FootFK_R', 'MHFoot', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limFoot_R, (1,0,0)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_R, (1,0,0)])]),
 
 	('poseBone', 'ToeFK_R', 'MHToe', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limToe_R, (1,0,0)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limToe_R, (1,0,0)])]),
 
 
 	# IK 
 	('poseBone', 'UpLegIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_L, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_L, (True, True, True)])]),
 
 	('poseBone', 'UpLegIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpLeg_R, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_R, (True, True, True)])]),
 
 	('poseBone', 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
-		('ChildOf', C_CHILDOF, ['Hip', 'Hip_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['Hip_L', 'fNoStretch', 'Hip_L'])]),
+		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]),
+		('LimitDist', 0, 1, ['Hip_L', 'fNoStretch', 'Hip_L'])]),
 
 	('poseBone', 'LegIK_R', 'MHFootCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
-		('ChildOf', C_CHILDOF, ['Hip', 'Hip_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['Hip_R', 'fNoStretch', 'Hip_R'])]),
+		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]),
+		('LimitDist', 0, 1, ['Hip_R', 'fNoStretch', 'Hip_R'])]),
 
 	('poseBone', 'LoLegIK_L', None, 'IK_L', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKPT', 'AnkleIK_L', 2, (90*deg1, 'KneePT_L'), (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)]),
+		[('IK', 0, 1, ['IKPT', 'AnkleIK_L', 2, (90*deg1, 'KneePT_L'), (True, False,True)]),
+		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (True, True, True)]),
 		]),
 
 	('poseBone', 'LoLegIK_R', None, 'IK_R', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKPT', 'AnkleIK_R', 2, (90*deg1, 'KneePT_R'), (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)]),
+		[('IK', 0, 1, ['IKPT', 'AnkleIK_R', 2, (90*deg1, 'KneePT_R'), (True, False,True)]),
+		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (True, True, True)]),
 		]),
 
 	('poseBone', 'LoLegIK_L', None, 'IK_L', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKNoPT', 'AnkleIK_L', 2, None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_L, (True, True, True)]),
+		[('IK', 0, 1, ['IKNoPT', 'AnkleIK_L', 2, None, (True, False,True)]),
+		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (True, True, True)]),
 		]),
 
 	('poseBone', 'LoLegIK_R', None, 'IK_R', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IKNoPT', 'AnkleIK_R', 2, None, (True, False,True), 1.0]),
-		('LimitRot', C_OW_LOCAL, ['LimitRot', limLoLeg_R, (True, True, True)]),
+		[('IK', 0, 1, ['IKNoPT', 'AnkleIK_R', 2, None, (True, False,True)]),
+		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (True, True, True)]),
 		]),
 
 	('poseBone', 'FootRevIK_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevFoot_L, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_L, (True, True, True)])]),
 
 	('poseBone', 'FootRevIK_R', 'MHRevFoot', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevFoot_R, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_R, (True, True, True)])]),
 
 	('poseBone', 'FootIK_L', None, 'IK_L', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'FootRevIK_L', 1, None, (True, False,True), 1.0])]),
+		[('IK', 0, 1, ['IK', 'FootRevIK_L', 1, None, (True, False,True)])]),
 
 	('poseBone', 'FootIK_R', None, 'IK_R', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'FootRevIK_R', 1, None, (True, False,True), 1.0])]),
+		[('IK', 0, 1, ['IK', 'FootRevIK_R', 1, None, (True, False,True)])]),
 
 	('poseBone', 'ToeRevIK_L', 'MHRevToe', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevToe_L, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_L, (True, True, True)])]),
 
 	('poseBone', 'ToeRevIK_R', 'MHRevToe', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limRevToe_R, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_R, (True, True, True)])]),
 
 	('poseBone', 'ToeIK_L', None, 'IK_L', (1,1,1), (0,1,1), (1,1,0), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'ToeRevIK_L', 1, None, (True, False,True), 1.0])]),
+		[('IK', 0, 1, ['IK', 'ToeRevIK_L', 1, None, (True, False,True)])]),
 
 	('poseBone', 'ToeIK_R', None, 'IK_R', (1,1,1), (0,1,1), (1,1,0), (1,1,1), 0, 
-		[('IK', 0, ['IK', 'ToeRevIK_R', 1, None, (True, False,True), 1.0])]),
+		[('IK', 0, 1, ['IK', 'ToeRevIK_R', 1, None, (True, False,True)])]),
 ]
 
 #

@@ -154,11 +154,11 @@ def defineFingerConstraints():
 			finger = "Finger-%d%s" % (fnum, suffix)
 			for lnum in range(1,4):
 				if lnum == 1:
-					cnss = [ ('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['Rot', finger, 1.0, (1,0,1), (0,0,0), True]) ]
+					cnss = [ ('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['Rot', finger, (1,0,1), (0,0,0), True]) ]
 				else:
-					cnss = [ ('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['Rot', finger, 1.0, (1,0,0), (0,0,0), True]) ]
+					cnss = [ ('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['Rot', finger, (1,0,0), (0,0,0), True]) ]
 				if fnum >= 2:
-					cnss.append( ('LimitRot', C_OW_LOCAL, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]) )
+					cnss.append( ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-1.37,0.5, 0,0, 0,0), (1,0,0)]) )
 				fconstraints["%d-%d%s" % (fnum, lnum, suffix)] = cnss
 	return fconstraints
 	
@@ -209,26 +209,26 @@ FingerPoses = [
 	
 	# Control fingers
 	('poseBone', 'Finger-1_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-2_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-3_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-4_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-5_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	
 	('poseBone', 'Finger-1_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-2_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-3_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-4_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 	('poseBone', 'Finger-5_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, 
-		[('LimitScale', 0, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
+		[('LimitScale', 0, 1, ['LimitScale', (1,1, 0.1,1.5, 1,1), (0,1,0)])]),
 ]	
 
 

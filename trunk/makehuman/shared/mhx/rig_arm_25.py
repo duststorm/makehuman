@@ -9,6 +9,7 @@ ArmJoints = [
 	('hand_L_tail',			'j', 'r-finger-3-1'),
 	('r-shoulder-head',		'l', ((0.7, 'r-shoulder'), (0.3, 'l-shoulder'))),
 	('r-loarm-mid',			'l', ((0.5, 'r-hand'), (0.5, 'r-elbow'))),
+	('r-loarm-fan',			'l', ((0.25, 'r-hand'), (0.75, 'r-elbow'))),
 	('r-shoulder-bump',		'v', 5876),
 	('r-clavicle-back',		'v', 2583),
 	('r-clavicle-end',		'v', 2879),
@@ -22,6 +23,7 @@ ArmJoints = [
 	('hand_R_tail',			'j', 'l-finger-3-1'),
 	('l-shoulder-head',		'l', ((0.7, 'l-shoulder'), (0.3, 'r-shoulder'))),
 	('l-loarm-mid',			'l', ((0.5, 'l-hand'), (0.5, 'l-elbow'))),
+	('l-loarm-fan',			'l', ((0.25, 'l-hand'), (0.75, 'l-elbow'))),
 	('l-shoulder-bump',		'v', 15328),
 	('l-clavicle-back',		'v', 11025),
 	('l-clavicle-end',		'v', 10795),
@@ -66,11 +68,13 @@ ArmHeadsTails = [
 	# Deform
 	('UpArm_L',				'r-shoulder', 'r-elbow'),
 	('LoArmTwist_L',		'r-elbow', 'r-loarm-mid'),
+	('LoArmFan_L',			'r-elbow', 'r-loarm-fan'),
 	('LoArm_L',				'r-loarm-mid', 'r-hand'),
 	('Hand_L',				'r-hand', 'hand_L_tail'),
 
 	('UpArm_R',				'l-shoulder', 'l-elbow'),
 	('LoArmTwist_R',		'l-elbow', 'l-loarm-mid'),
+	('LoArmFan_R',			'l-elbow', 'l-loarm-fan'),
 	('LoArm_R',				'l-loarm-mid', 'l-hand'),
 	('Hand_R',				'l-hand', 'hand_R_tail'),
 
@@ -123,11 +127,13 @@ ArmArmature = [
 	# Deform
 	('UpArm_L',			upArmRoll, 'Shoulder_L', F_DEF, L_DEF, (1,1,1) ),
 	('LoArmTwist_L',	loArmRoll, 'UpArm_L', F_DEF, L_DEF, (1,1,1) ),
+	('LoArmFan_L',		loArmRoll, 'UpArm_L', F_DEF, L_DEF, (1,1,1) ),
 	('LoArm_L',			loArmRoll, 'LoArmTwist_L', F_DEF, L_DEF, (1,1,1) ),
 	('Hand_L',			handRoll, 'LoArm_L', F_DEF, L_DEF, (1,1,1) ),
 
 	('UpArm_R',			upArmRoll, 'Shoulder_R', F_DEF, L_DEF, (1,1,1) ),
 	('LoArmTwist_R',	loArmRoll, 'UpArm_R', F_DEF, L_DEF, (1,1,1) ),
+	('LoArmFan_R',		loArmRoll, 'UpArm_R', F_DEF, L_DEF, (1,1,1) ),
 	('LoArm_R',			loArmRoll, 'LoArmTwist_R', F_DEF, L_DEF, (1,1,1) ),
 	('Hand_R',			handRoll, 'LoArm_R', F_DEF, L_DEF, (1,1,1) ),
 
@@ -168,41 +174,43 @@ limHand_R = (-deg90,70*deg1, 0,0, -deg20,deg20)
 
 ArmPoses = [
 	# Shoulder
-	('poseBone', 'Shoulder_L', 'GoboShldr_L', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Shoulder_L', 'GoboShldr_L', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'Clavicle_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['Stretch', 'ClavicleTarget_L', 'PLANE_X'])]),
+	('poseBone', 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'ClavicleTarget_L', 'PLANE_X'])]),
 
-	('poseBone', 'Pectoralis_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['Stretch', 'PectoralisTarget_L', 'PLANE_X'])]),
+	('poseBone', 'Pectoralis_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'PectoralisTarget_L', 'PLANE_X'])]),
 
 
-	('poseBone', 'Shoulder_R', 'GoboShldr_R', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	('poseBone', 'Shoulder_R', 'GoboShldr_R', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
-	('poseBone', 'Clavicle_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['Stretch', 'ClavicleTarget_R', 'PLANE_X'])]),
+	('poseBone', 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'ClavicleTarget_R', 'PLANE_X'])]),
 
-	('poseBone', 'Pectoralis_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, ['Stretch', 'PectoralisTarget_R', 'PLANE_X'])]),
+	('poseBone', 'Pectoralis_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'PectoralisTarget_R', 'PLANE_X'])]),
 
 	# Scapula
 	('poseBone', 'Scapula_L', 'MHCube01', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-
-		[('IK', 0, ['IK', 'ScapulaIK_L', 1, None, (True, False,False), 1.0])]),
+		[('IK', 0, 1, ['IK', 'ScapulaIK_L', 1, None, (True, False,False)])]),
 	('ikHandle', 'ScapulaIK_L', 'MHCube01', None),
 
 	('poseBone', 'Scapula_R', 'MHCube01', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IK', 'ScapulaIK_R', 1, None, (True, False,False), 1.0])]),
+		[('IK', 0, 1, ['IK', 'ScapulaIK_R', 1, None, (True, False,False)])]),
 	('ikHandle', 'ScapulaIK_R', 'MHCube01', None),
 
 	# Deform
 	('deformLimb', 'UpArm_L', 'UpArmIK_L', (1,1,1), 'UpArmFK_L', (1,1,1), 0, P_STRETCH),
 
-	('poseBone', 'LoArmTwist_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
-		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotIKXZ', 'LoArmIK_L', 0.0, (1,0,1), (0,0,0), False]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotFKXZ', 'LoArmFK_L', 0.5, (1,0,1), (0,0,0), False]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotIKY', 'LoArmIK_L', 0.0, (0,1,0), (0,0,0), False]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotFKY', 'LoArmFK_L', 0.5, (0,1,0), (0,0,0), False])]),
+	('poseBone', 'LoArmTwist_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0, ['RotIKXZ', 'LoArmIK_L', (1,0,1), (0,0,0), False]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['RotFKXZ', 'LoArmFK_L', (1,0,1), (0,0,0), False]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0, ['RotIKY', 'LoArmIK_L', (0,1,0), (0,0,0), False]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['RotFKY', 'LoArmFK_L', (0,1,0), (0,0,0), False])]),
+
+	('poseBone', 'LoArmFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Rot', 'LoArmTwist_L', (1,0,1), (0,0,0), False])]),
 
 	('deformLimb', 'LoArm_L', 'LoArmIK_L', (1,1,1), 'LoArmFK_L', (1,1,1), 0, P_STRETCH),
 
@@ -210,11 +218,14 @@ ArmPoses = [
 
 	('deformLimb', 'UpArm_R', 'UpArmIK_R', (1,1,1), 'UpArmFK_R', (1,1,1), 0, P_STRETCH),
 
-	('poseBone', 'LoArmTwist_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
-		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotIKXZ', 'LoArmIK_R', 0.0, (1,0,1), (0,0,0), False]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotFKXZ', 'LoArmFK_R', 0.5, (1,0,1), (0,0,0), False]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotIKY', 'LoArmIK_R', 0.0, (0,1,0), (0,0,0), False]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['RotFKY', 'LoArmFK_R', 0.5, (0,1,0), (0,0,0), False])]),
+	('poseBone', 'LoArmTwist_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0, ['RotIKXZ', 'LoArmIK_R', (1,0,1), (0,0,0), False]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['RotFKXZ', 'LoArmFK_R', (1,0,1), (0,0,0), False]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0, ['RotIKY', 'LoArmIK_R', (0,1,0), (0,0,0), False]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['RotFKY', 'LoArmFK_R', (0,1,0), (0,0,0), False])]),
+
+	('poseBone', 'LoArmFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Rot', 'LoArmTwist_R', (1,0,1), (0,0,0), False])]),
 
 	('deformLimb', 'LoArm_R', 'LoArmIK_R', (1,1,1), 'LoArmFK_R', (1,1,1), 0, P_STRETCH),
 
@@ -222,55 +233,55 @@ ArmPoses = [
 
 	# FK
 	('poseBone', 'UpArmFK_L', 'MHCircle025', 'FK_L', (1,1,1), (0,1,0), (0,0,0), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_L, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)])]),
 
 	('poseBone', 'LoArmFK_L', 'MHCircle025', 'FK_L', (1,1,1), (1,0,0), (0,0,0), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_L, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)])]),
 
 	('poseBone', 'HandFK_L', 'MHHand', 'FK_L', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_L, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limHand_L, (True, True, True)])]),
 		
 
 	('poseBone', 'UpArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,1,0), (0,0,0), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_R, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)])]),
 
 	('poseBone', 'LoArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (1,0,0), (0,0,0), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_R, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_R, (True, True, True)])]),
 
 	('poseBone', 'HandFK_R', 'MHHand', 'FK_R', (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limHand_R, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limHand_R, (True, True, True)])]),
 
 
 	# IK
 
 	('poseBone', 'UpArmIK_L', None, 'IK_L', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_L, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)])]),
 
 	('poseBone', 'LoArmIK_L', None, 'IK_L', (1,1,1), (1,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IK', 'HandIK_L', 2, None, (True, False,True), 1.0]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['CopyRotY', 'HandIK_L', 1.0, (0,1,0), (0,0,0), False]),
-		#('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_L, (True, True, True)])
+		[('IK', 0, 1, ['IK', 'HandIK_L', 2, None, (True, False,True)]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyRotY', 'HandIK_L', (0,1,0), (0,0,0), False]),
+		#('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)])
 		]),
 
 	('poseBone', 'HandIK_L', 'GoboHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
-		('ChildOf', C_CHILDOF, ['Shoulder', 'Shoulder_L', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['Shoulder_L', 'fNoStretch', 'Shoulder_L'])]),
+		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
+		('LimitDist', 0, 1, ['Shoulder_L', 'fNoStretch', 'Shoulder_L'])]),
 
 
 	('poseBone', 'UpArmIK_R', None, 'IK_R', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('LimitRot', C_OW_LOCAL, ['LimitRot', limUpArm_R, (True, True, True)])]),
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)])]),
 
 	('poseBone', 'LoArmIK_R', None, 'IK_R', (1,1,1), (1,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, ['IK', 'HandIK_R', 2, None, (True, False,True), 1.0]),
-		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, ['CopyRotY', 'HandIK_R', 1.0, (0,1,0), (0,0,0), False]),
-		#('LimitRot', C_OW_LOCAL, ['LimitRot', limLoArm_R, (True, True, True)])
+		[('IK', 0, 1, ['IK', 'HandIK_R', 2, None, (True, False,True)]),
+		('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyRotY', 'HandIK_R', (0,1,0), (0,0,0), False]),
+		#('LimitRot', C_OW_LOCAL, 0, ['LimitRot', limLoArm_R, (True, True, True)])
 		]),
 
 	('poseBone', 'HandIK_R', 'GoboHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
 		mhx_rig.rootChildOfConstraints + [
-		('ChildOf', C_CHILDOF, ['Shoulder', 'Shoulder_R', 0.0, (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, ['Shoulder_R', 'fNoStretch', 'Shoulder_R'])]),
+		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
+		('LimitDist', 0, 1, ['Shoulder_R', 'fNoStretch', 'Shoulder_R'])]),
 ]
 
 #
@@ -287,13 +298,13 @@ def ArmWriteActions(fp):
 
 ArmDrivers = [
 	("UpArm_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_L", "LOC_X", 1.0),
-	("LoArmTwist_L", True, ["RotFKXZ"], ["RotIKXZ"], "PArmIK_L", "LOC_X", 1.0),
+	("LoArmTwist_L", True, ["RotFKXZ"], ["RotIKXZ"], "PArmIK_L", "LOC_X", 1),
 	("LoArmTwist_L", True, ["RotFKY"], ["RotIKY"], "PArmIK_L", "LOC_X", 0.5),
 	("LoArm_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_L", "LOC_X", 1.0),
 	("Hand_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 
 	("UpArm_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_R", "LOC_X", 1.0),
-	("LoArmTwist_R", True, ["RotFKXZ"], ["RotIKXZ"], "PArmIK_R", "LOC_X", 1.0),
+	("LoArmTwist_R", True, ["RotFKXZ"], ["RotIKXZ"], "PArmIK_R", "LOC_X", 1),
 	("LoArmTwist_R", True, ["RotFKY"], ["RotIKY"], "PArmIK_R", "LOC_X", 0.5),
 	("LoArm_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_R", "LOC_X", 1.0),
 	("Hand_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),

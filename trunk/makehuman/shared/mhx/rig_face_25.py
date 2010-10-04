@@ -97,12 +97,12 @@ FacePoses = [
 	('poseBone', 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
 	('poseBone', 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Gaze_R', 1, None, (True, False,False), 1.0])]),
+		[('IK', 0, 1, ['IK', 'Gaze_R', 1, None, (True, False,False), 1.0])]),
 
 	('poseBone', 'Gaze_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
 
 	('poseBone', 'Eye_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, ['IK', 'Gaze_L', 1, None, (True, False,False), 1.0])]),
+		[('IK', 0, 1, ['IK', 'Gaze_L', 1, None, (True, False,False), 1.0])]),
 ]
 
 lidBones = [
