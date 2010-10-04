@@ -217,40 +217,42 @@ class Hairs:
             return hairs
             
     def multiStrandInterpolation(self):
-          if self.multiStrandNumber<2: return []
-          hairs=[]
-          for group in self.grouping.values():
-            n = len(group)
-            if n==0: 
-              continue
-            for i in xrange(0,self.multiStrandNumber):
-              
-              #random computation of weights
-              temp=0.0;
-              weights=[]
-              tempStrand=[]
-              mAx=0
-              for j in xrange(0,n):
-                r=random()
-                temp = temp+r
-                weights.append(r)
-                if weights[mAx] < r: mAx=j
-              #normalize weight sum
-              for j in xrange(0,n):
-                weights[j]=weights[j]/temp
-                
-              m = len(self.guides[group[mAx]]) #length of strand with highest weight
-              
-              for k in xrange(0,m): #interpolated strand has controlPoints = controlPoint of the strand with heighest weight!
-                tempV=[0.0,0.0,0.0]
-                for l in xrange(0,n):
-                  index = min(k, len(self.guides[group[l]]))
-                  v = vmul(self.guides[group[l]][index],weights[l])
-                  tempV=vadd(tempV,v)
-                  
-                tempStrand.append(tempV)
-              hairs.append(tempStrand)
-            return hairs
+       if self.multiStrandNumber<2: return []
+       hairs=[]
+       for group in self.grouping.values():
+         n = len(group)
+         if n==0: 
+           continue
+         for i in xrange(0,self.multiStrandNumber):
+           
+           #random computation of weights
+           temp=0.0;
+           weights=[]
+           tempStrand=[]
+           mAx=0
+           for j in xrange(0,n):
+             r=random()
+             temp = temp+r
+             weights.append(r)
+             if weights[mAx] < r: mAx=j
+           #normalize weight sum
+           for j in xrange(0,n):
+             weights[j]=weights[j]/temp
+             
+           m = len(self.guides[group[mAx]]) #length of strand with highest weight
+           
+           for k in xrange(0,m): #interpolated strand has controlPoints = controlPoint of the strand with heighest weight!
+             tempV=[0.0,0.0,0.0]
+             for l in xrange(0,n):
+               index = min(k, len(self.guides[group[l]])-1)
+               v = vmul(self.guides[group[l]][index],weights[l])
+               tempV=vadd(tempV,v)
+               
+             tempStrand.append(tempV)
+           hairs.append(tempStrand)
+         
+       print len(hairs), "generated hair through multistrand interpolation"
+       return hairs
 
 def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
     headNormal = [0.0,1.0,0.0]
