@@ -89,7 +89,6 @@ class Hairs:
 
 
     def loadHair(self, path, res=0.04, update = True):
-        
         scn = self.human.scene
         self.loadHairFile(path)        
         position = self.human.getPosition()
@@ -158,7 +157,7 @@ class Hairs:
         except:
             print 'Unable to load .obj and .hair file of %s' % name
             return
-
+        
         #self.resetHairs()
         self.path = name
         for data in fileDescriptor:
@@ -181,6 +180,7 @@ class Hairs:
         guidePoints=[]
         temp =[]
         self.guides = [] #set of curves
+        self.grouping = {} #dictionary of list of guide indicesself.grouping 
         guideIndex=0
         for data in objFile:
             datalist = data.split()
@@ -205,14 +205,16 @@ class Hairs:
                 guidePoints=[]
                 guideIndex=guideIndex+1
         objFile.close()
+        print "Loaded", len(self.guides), "strands"
+        print "Loaded", len(self.grouping.keys()), "groupings"
 
     def generateHairToRender(self):
-        hairs = multiStrandInterpolation()
+        hairs = self.multiStrandInterpolation()
         hairs = hairs + self.guides
         if (self.clumpInterpolationNumber > 1):
             return clumpInterpolation(hairs, self.interpolationRadius, self.clumpInterpolationNumber)
         else:
-            return self.guides
+            return hairs
             
     def multiStrandInterpolation(self):
           if self.multiStrandNumber<2: return []
@@ -224,27 +226,30 @@ class Hairs:
             for i in xrange(0,self.multiStrandNumber):
               
               #random computation of weights
-              temp=0;
+              temp=0.0;
               weights=[]
+              tempStrand=[]
               mAx=0
-              for i in xrange(0,n):
+              for j in xrange(0,n):
                 r=random()
                 temp = temp+r
-                weight.append(r)
-                if weight[mAx] > r: mAx=i
+                weights.append(r)
+                if weights[mAx] < r: mAx=j
               #normalize weight sum
-              for i in xrange(0,n):
-                weight[i]=weight[i]/temp
-              tempStrand=[]
+              for j in xrange(0,n):
+                weights[j]=weights[j]/temp
+                
               m = len(self.guides[group[mAx]]) #length of strand with highest weight
-              tempV=[0.0,0.0,0.0]
               
-              for j in xrange(0,m): #interpolated strand has controlPoints = controlPoint of the strand with heighest weight!
-                for k in xrange(0,n):
-                  tempV=vadd(tempV,vmul(self.guides[group[k]][j],weight[i]))
+              for k in xrange(0,m): #interpolated strand has controlPoints = controlPoint of the strand with heighest weight!
+                tempV=[0.0,0.0,0.0]
+                for l in xrange(0,n):
+                  index = min(k, len(self.guides[group[l]]))
+                  v = vmul(self.guides[group[l]][index],weights[l])
+                  tempV=vadd(tempV,v)
+                  
                 tempStrand.append(tempV)
               hairs.append(tempStrand)
-            
             return hairs
 
 def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
