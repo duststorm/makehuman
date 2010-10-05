@@ -28,7 +28,7 @@ from animation3d import ThreeDQBspline
 from aljabr import *
 from math import radians
 from os import path
-from random import random
+from random import random, randint
 from simpleoctree import SimpleOctree
 
 class Hairs:
@@ -138,7 +138,7 @@ class Hairs:
 
         #HACK: set hair color to default black
         fg.setColor([0,0,0,255]) #rgba
-        #obj.calcNormals( ) : Do not recalculate normals for ribbons of hair, if there are lot of hairs this can be too expensive and for too curly hair our normal calc is not good
+        obj.calcNormals() # Do not recalculate normals for ribbons of hair, if there are lot of hairs this can be too expensive and for too curly hair our normal calc is not good
         obj.shadeless = 1
         obj.updateIndexBuffer()
         if update:
@@ -197,6 +197,10 @@ class Hairs:
                   self.grouping[datalist[1]].append(guideIndex)
                 except:
                   self.grouping[datalist[1]]=[guideIndex]
+                  """
+                  print "Creating Hair Group: ", datalist[1]
+                  print self.grouping
+                  """
             elif datalist[0] == "end":
                 #if guidePoints[0][1] < guidePoints[len(guidePoints)-1][1]: #is the first point lower than the last control point?
                 #    guidePoints.reverse()
@@ -206,7 +210,6 @@ class Hairs:
                 guideIndex=guideIndex+1
         objFile.close()
         print "Loaded", len(self.guides), "strands"
-        print "Loaded", len(self.grouping.keys()), "groupings"
 
     def generateHairToRender(self):
         hairs = self.multiStrandInterpolation()
@@ -225,27 +228,30 @@ class Hairs:
            continue
          for i in xrange(0,self.multiStrandNumber):
            
-           #random computation of weights
-           temp=0.0;
-           weights=[]
+           #random point the convex hull
            tempStrand=[]
-           mAx=0
-           for j in xrange(0,n):
-             r=random()
-             temp = temp+r
-             weights.append(r)
-             if weights[mAx] < r: mAx=j
+           weights=n*[0.0]
+           mAx = randint(0,n-1)
+           weights[mAx] = n*random() #fair distribution that doesn't cluster on the centroid
+           temp = weights[mAx]
+           for j in xrange(0,n):             
+             if j!=mAx: 
+              r=random()
+              weights[j]  = r
+              temp = temp + r
+             #if weights[mAx] < r: mAx=j
            #normalize weight sum
+           
            for j in xrange(0,n):
              weights[j]=weights[j]/temp
              
            m = len(self.guides[group[mAx]]) #length of strand with highest weight
            
-           for k in xrange(0,m): #interpolated strand has controlPoints = controlPoint of the strand with heighest weight!
+           for j in xrange(0,m): #interpolated strand has controlPoints = controlPoint of the strand with heighest weight!
              tempV=[0.0,0.0,0.0]
-             for l in xrange(0,n):
-               index = min(k, len(self.guides[group[l]])-1)
-               v = vmul(self.guides[group[l]][index],weights[l])
+             for k in xrange(0,n):
+               index = min(j, len(self.guides[group[k]])-1)
+               v = vmul(self.guides[group[k]][index],weights[k])
                tempV=vadd(tempV,v)
                
              tempStrand.append(tempV)
