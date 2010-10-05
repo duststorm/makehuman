@@ -47,6 +47,7 @@ class Hairs:
         self.interpolationRadius = 0.09
         self.clumpInterpolationNumber = 0
         self.multiStrandNumber = 0
+        self.randomness = 0.04
         self.human = human
 
 
@@ -215,9 +216,19 @@ class Hairs:
         hairs = self.multiStrandInterpolation()
         hairs = hairs + self.guides
         if (self.clumpInterpolationNumber > 1):
-            return clumpInterpolation(hairs, self.interpolationRadius, self.clumpInterpolationNumber)
-        else:
-            return hairs
+            hairs = clumpInterpolation(hairs, self.interpolationRadius, self.clumpInterpolationNumber)
+        #else:
+        #    return hairs
+        r = self.randomness
+        for strand in hairs:
+          for cp in strand:
+            rx= r*random()
+            ry= r*random()
+            rz= r*random()
+            cp=[cp[0]+rx, cp[1]+ry, cp[2]+rz]
+        
+        return hairs
+        
             
     def multiStrandInterpolation(self):
        if self.multiStrandNumber<2: return []

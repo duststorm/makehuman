@@ -21,6 +21,8 @@ class RenderingSettingTaskView(gui3d.TaskView):
         self.clumpChildren.label.setPosition([20,280,8])
         self.multiStrand= gui3d.Slider(self, position=[10, 360, 9], value=0, min=0, max=150, label = "Multistrand children: 0")
         self.multiStrand.label.setPosition([20,345,8])
+        self.randomHair= gui3d.Slider(self, position=[10, 425, 9], value=0.04, min=0.0, max=0.09, label = "Hair Randomness: 0.04")
+        self.randomHair.label.setPosition([20,410,8])
 
 
         self.human = self.app.scene3d.selectedHuman
@@ -39,6 +41,11 @@ class RenderingSettingTaskView(gui3d.TaskView):
         def onChanging(value):
             self.multiStrand.label.setText("Multistrand children: "+str(self.multiStrand.getValue()))
             self.human.hairs.multiStrandNumber = self.multiStrand.getValue()
+        
+        @self.randomHair.event
+        def onChanging(value):
+            self.randomHair.label.setText("Hair Randomness: "+str(round(self.randomHair.getValue(),4)))
+            self.human.hairs.randomness = self.randomHair.getValue()
 
 
         @self.widthSize.event
