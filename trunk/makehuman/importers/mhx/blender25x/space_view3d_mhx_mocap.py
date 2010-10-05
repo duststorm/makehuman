@@ -356,12 +356,12 @@ OsuArmature = {
 	'neck' : 'Neck', 
 	'head' : 'Head', 
 
-	'leftshoulder' : 'Clavicle_L',
+	'leftshoulder' : 'Shoulder_L',
 	'leftarm' : 'UpArmFK_L', 
 	'leftforearm' : 'LoArmFK_L',
 	'lefthand' : 'HandFK_L', 
 
-	'rightshoulder' : 'Clavicle_R',
+	'rightshoulder' : 'Shoulder_R',
 	'rightarm' : 'UpArmFK_R', 
 	'rightforearm' : 'LoArmFK_R',
 	'righthand' : 'HandFK_R',
@@ -390,7 +390,7 @@ MBArmature = {
 	'neck1' : 'Head', 
 	'head' : None,
 
-	'leftshoulder' : 'Clavicle_L',
+	'leftshoulder' : 'Shoulder_L',
 	'leftarm' : 'UpArmFK_L', 
 	'leftforearm' : 'LoArmFK_L',
 	'lefthand' : 'HandFK_L',
@@ -399,7 +399,7 @@ MBArmature = {
 	'lfingers' : None,
 	'lthumb' : None, 
 
-	'rightshoulder' : 'Clavicle_R', 
+	'rightshoulder' : 'Shoulder_R', 
 	'rightarm' : 'UpArmFK_R', 
 	'rightforearm' : 'LoArmFK_R',
 	'righthand' : 'HandFK_R',
@@ -434,7 +434,7 @@ Xx1Armature = {
 	'left eye' : None,
 	'right eye' : None,
 
-	'left collar' : 'Clavicle_L',
+	'left collar' : 'Shoulder_L',
 	'left shoulder' : 'UpArmFK_L', 
 	'left forearm' : 'LoArmFK_L',
 	'left hand' : 'HandFK_L',
@@ -454,7 +454,7 @@ Xx1Armature = {
 	'left pinky 2' : None, 
 	'left pinky 3' : None, 
 
-	'right collar' : 'Clavicle_R',
+	'right collar' : 'Shoulder_R',
 	'right shoulder' : 'UpArmFK_R', 
 	'right forearm' : 'LoArmFK_R',
 	'right hand' : 'HandFK_R',
@@ -494,11 +494,11 @@ Xx2Armature = {
 	'rightknee' : 'LoLegFK_R',
 	'rightankle' : 'FootFK_R',
 	'chest' : 'Spine2',
-	'leftcollar' : 'Clavicle_L',
+	'leftcollar' : 'Shoulder_L',
 	'leftshoulder' : 'UpArmFK_L',
 	'leftelbow' : 'LoArmFK_L',
 	'leftwrist' : 'HandFK_L',
-	'rightcollar' : 'Clavicle_R',
+	'rightcollar' : 'Shoulder_R',
 	'rightshoulder' : 'UpArmFK_R',
 	'rightelbow' : 'LoArmFK_R',
 	'rightwrist' : 'HandFK_R',
@@ -517,7 +517,7 @@ PoserArmature = {
 	'righteye' : None,
 	'figurehair' : None,
 
-	'lcollar' : 'Clavicle_L',
+	'lcollar' : 'Shoulder_L',
 	'lshldr' : 'UpArmFK_L', 
 	'lforearm' : 'LoArmFK_L',
 	'lhand' : 'HandFK_L',
@@ -537,7 +537,7 @@ PoserArmature = {
 	'lpinky2' : None, 
 	'lpinky3' : None, 
 
-	'rcollar' : 'Clavicle_R',
+	'rcollar' : 'Shoulder_R',
 	'rshldr' : 'UpArmFK_R', 
 	'rforearm' : 'LoArmFK_R',
 	'rhand' : 'HandFK_R',
@@ -586,8 +586,8 @@ theArmature = None
 
 FkBoneList = [
 	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
-	'Clavicle_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
-	'Clavicle_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
+	'Shoulder_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
+	'Shoulder_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
 	'Hip_L', 'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
 	'Hip_R', 'UpLegFK_R', 'LoLegFK_R', 'FootFK_R', 'ToeFK_R',
 	'LegFK_L', 'AnkleFK_L',
@@ -598,7 +598,7 @@ F_Rev = 1
 F_LR = 2
 
 IkArmature = {
-	'UpArmIK' : ('UpArmFK', F_LR, 'Clavicle'),
+	'UpArmIK' : ('UpArmFK', F_LR, 'Shoulder'),
 	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
 	'HandIK' : ('HandFK', 0, None),
 
