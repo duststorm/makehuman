@@ -123,97 +123,210 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("neckcirc",value)
             self.updateMeasures()
+            
+        @self.neckCircumferenceSlider.event
+        def onChanging(value):
+            self.changeValue("neckcirc",value,True)
+            lbl = "Neck circum.: cm "+ str(round(self.ruler.getMeasure("neckcirc")))
+            self.neckCircumferenceSlider.label.setText(lbl)
 
         @self.neckHeightSlider.event
         def onChange(value):
             self.changeValue("neckheight",value)
             self.updateMeasures()
+            
+        @self.neckHeightSlider.event
+        def onChanging(value):
+            self.changeValue("neckheight",value,True)
+            lbl = "Neck height: cm "+ str(round(self.ruler.getMeasure("neckheight")))
+            self.neckHeightSlider.label.setText(lbl)
 
         @self.upperArmCircumferenceSlider.event
         def onChange(value):
             self.changeValue("upperarm",value)
             self.updateMeasures()
+            
+        @self.upperArmCircumferenceSlider.event
+        def onChanging(value):
+            self.changeValue("upperarm",value,True)
+            lbl = "Upper arm circum.: cm "+ str(round(self.ruler.getMeasure("upperarm")))
+            self.upperArmCircumferenceSlider.label.setText(lbl)
 
         @self.upperArmLenghtSlider.event
         def onChange(value):
             self.changeValue("upperarmlenght",value)
             self.updateMeasures()
             
+        @self.upperArmLenghtSlider.event
+        def onChanging(value):
+            self.changeValue("upperarmlenght",value,True)
+            lbl = "Upperarm lenght: cm "+ str(round(self.ruler.getMeasure("upperarmlenght")))
+            self.upperArmLenghtSlider.label.setText(lbl)
+            
         @self.lowerarmLenghtSlider.event
         def onChange(value):
             self.changeValue("lowerarmlenght",value)
             self.updateMeasures()
+            
+        @self.lowerarmLenghtSlider.event
+        def onChanging(value):
+            self.changeValue("lowerarmlenght",value,True)
+            lbl = "Lowerarm lenght: cm "+ str(round(self.ruler.getMeasure("lowerarmlenght")))
+            self.lowerarmLenghtSlider.label.setText(lbl)
 
         @self.wristCircumferenceSlider.event
         def onChange(value):
             self.changeValue("wrist",value)
             self.updateMeasures()
+            
+        @self.wristCircumferenceSlider.event
+        def onChanging(value):
+            self.changeValue("wrist",value,True)
+            lbl = "Wrist circum.: cm "+ str(round(self.ruler.getMeasure("wrist")))
+            self.wristCircumferenceSlider.label.setText(lbl)
 
         @self.frontChestSlider.event
         def onChange(value):
             self.changeValue("frontchest",value)
             self.updateMeasures()
+            
+        @self.frontChestSlider.event
+        def onChanging(value):
+            self.changeValue("frontchest",value,True)
+            lbl = "Front chest dist: cm "+ str(round(self.ruler.getMeasure("frontchest")))
+            self.frontChestSlider.label.setText(lbl)
 
         @self.bustCircumferenceSlider.event
         def onChange(value):
             self.changeValue("bust",value)
             self.updateMeasures()
+            
+        @self.bustCircumferenceSlider.event
+        def onChanging(value):
+            self.changeValue("bust",value,True)
+            lbl = "Bust circ.: cm "+ str(round(self.ruler.getMeasure("bust")))
+            self.bustCircumferenceSlider.label.setText(lbl)
 
         @self.underBustCircumferenceSlider.event
         def onChange(value):
             self.changeValue("underbust",value)
             self.updateMeasures()
+            
+        @self.underBustCircumferenceSlider.event
+        def onChanging(value):
+            self.changeValue("underbust",value,True)
+            lbl = "Underbust circ.: cm "+ str(round(self.ruler.getMeasure("underbust")))
+            self.underBustCircumferenceSlider.label.setText(lbl)
 
         @self.waistCircumferenceSlider.event
         def onChange(value):
             self.changeValue("waist",value)
             self.updateMeasures()
+            
+        @self.waistCircumferenceSlider.event
+        def onChanging(value):
+            self.changeValue("waist",value,True)
+            lbl = "Waist circ.: cm "+ str(round(self.ruler.getMeasure("waist")))
+            self.waistCircumferenceSlider.label.setText(lbl)
 
         @self.napeToWaistSlider.event
         def onChange(value):
             self.changeValue("napetowaist",value)
             self.updateMeasures()
+            
+        @self.napeToWaistSlider.event
+        def onChanging(value):
+            self.changeValue("napetowaist",value,True)
+            lbl = "Nape to waist: cm "+ str(round(self.ruler.getMeasure("napetowaist")))
+            self.napeToWaistSlider.label.setText(lbl)
 
         @self.waistToHipSlider.event
         def onChange(value):
             self.changeValue("waisttohip",value)
             self.updateMeasures()
+            
+        @self.waistToHipSlider.event
+        def onChanging(value):
+            self.changeValue("waisttohip",value,True)
+            lbl = "Waist to hip: cm "+ str(round(self.ruler.getMeasure("waisttohip")))
+            self.waistToHipSlider.label.setText(lbl)
 
         @self.shoulderDistanceSlider.event
         def onChange(value):
             self.changeValue("shoulder",value)
             self.updateMeasures()
+            
+        @self.shoulderDistanceSlider.event
+        def onChanging(value):
+            self.changeValue("shoulder",value,True)
+            lbl = "Shoulder Dist.: cm "+ str(round(self.ruler.getMeasure("shoulder")))
+            self.shoulderDistanceSlider.label.setText(lbl)
 
         @self.upperLegHeightSlider.event
         def onChange(value):
             self.changeValue("upperlegheight",value)
             self.updateMeasures()
             
+        @self.upperLegHeightSlider.event
+        def onChanging(value):
+            self.changeValue("upperlegheight",value,True)
+            lbl = "Upperleg height: cm "+ str(round(self.ruler.getMeasure("upperlegheight")))
+            self.upperLegHeightSlider.label.setText(lbl)
+            
         @self.lowerLegHeightSlider.event
         def onChange(value):
             self.changeValue("lowerlegheight",value)
             self.updateMeasures()
             
+        @self.lowerLegHeightSlider.event
+        def onChanging(value):
+            self.changeValue("lowerlegheight",value,True)
+            lbl = "Lowerleg height: cm "+ str(round(self.ruler.getMeasure("lowerlegheight")))
+            self.lowerLegHeightSlider.label.setText(lbl)
+            
         @self.calfSlider.event
         def onChange(value):
             self.changeValue("calf",value)
             self.updateMeasures()
+            
+        @self.calfSlider.event
+        def onChanging(value):
+            self.changeValue("calf",value,True)
+            lbl = "Calf circ.: cm "+ str(round(self.ruler.getMeasure("calf")))
+            self.calfSlider.label.setText(lbl)
 
         @self.ankleSlider.event
         def onChange(value):
             self.changeValue("ankle",value)
             self.updateMeasures()
+            
+        @self.ankleSlider.event
+        def onChanging(value):
+            self.changeValue("ankle",value,True)
+            lbl = "Ankle circ.: cm "+ str(round(self.ruler.getMeasure("ankle")))
+            self.ankleSlider.label.setText(lbl)
 
         @self.upperThighSlider.event
         def onChange(value):
             self.changeValue("thighcirc",value)
             self.updateMeasures()
+            
+        @self.upperThighSlider.event
+        def onChanging(value):
+            self.changeValue("thighcirc",value,True)
+            lbl = "Thigh circ.: cm "+ str(round(self.ruler.getMeasure("thighcirc")))
+            self.upperThighSlider.label.setText(lbl)
 
         @self.hipsSlider.event
         def onChange(value):
             self.changeValue("hips",value)
             self.updateMeasures()
-
+            
+        @self.hipsSlider.event
+        def onChanging(value):
+            self.changeValue("hips",value,True)
+            lbl = "Hips circ.: cm "+ str(round(self.ruler.getMeasure("hips")))
+            self.hipsSlider.label.setText(lbl)
 
     def updateMeasures(self):
 
@@ -275,23 +388,22 @@ class MeasureTaskView(gui3d.TaskView):
         self.hipsSlider.label.setText(lbl)
 
 
-    def changeValue(self,IDName,value,vertices=None):
+    def changeValue(self, IDName, value, realtime=False):
         """
-        This function apply the targets, and inform the undo system about the changes.
+        This function applies the targets, and informs the undo system about the changes.
         @return: None
         @type  IDName: String
         @param IDName: Name of the body part to asymmetrise
         @type  value: Float
         @param value: The amount of asymmetry
         """
-        if vertices:
+        if realtime:
             if not self.before:
                 self.before = self.getTargetsAndValues(IDName)
 
-            self.setModifierValue(value,IDName)
-            self.human.meshData.update(vertices)
+            self.setModifierValue(value, IDName)
         else:
-            self.setModifierValue(value,IDName)
+            self.setModifierValue(value, IDName)
             self.human.applyAllTargets(self.human.app.progress)
 
             after = self.getTargetsAndValues(IDName)
@@ -302,7 +414,7 @@ class MeasureTaskView(gui3d.TaskView):
 
     def buildListOfTargetPairs(self, name):
         """
-        This function scan all targets and build a list of list:
+        This function scans all targets and builds a list of lists:
         [[target1-left,target1-right],...,[targetN-left,targetN-right]]
         @return: List of lists
         @type  name: String
@@ -322,7 +434,7 @@ class MeasureTaskView(gui3d.TaskView):
 
     def getTargetsAndValues(self, IDName):
         """
-        This function return a dictionary with "targetPath:val" items, getting them
+        This function returns a dictionary with "targetPath:val" items, getting them
         from the human details stack.
         It's used to get both "before" and "after" dictionaries.
         @return: Dictionary
@@ -339,8 +451,8 @@ class MeasureTaskView(gui3d.TaskView):
 
     def setModifierValue(self, value, IDName):
             """
-            This function load all asymmetry targets for the specified part of body
-            (for example brown, eyes, etc..) and return a dictionary with
+            This function loads all asymmetry targets for the specified part of body
+            (for example brown, eyes, etc..) and returns a dictionary with
             the applied targets, used as "after" parameter in undo system
             @return: Dictionary
             @type  value: Float
@@ -379,9 +491,6 @@ class MeasureTaskView(gui3d.TaskView):
 
         #Update the measures when the measure mode is activated
         self.updateMeasures()
-
-
-
 
     def syncSliders(self):
         self.neckCircumferenceSlider.setValue(self.getSliderValue('neckcirc'))
