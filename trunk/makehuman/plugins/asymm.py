@@ -58,7 +58,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmBrowSlider.event
         def onChanging(value):
-            self.changeValue("brown",value,self.human.eyesVertices)
+            self.changeValue("brown",value,True)
 
         @self.asymmCheekSlider.event
         def onChange(value):
@@ -66,7 +66,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmCheekSlider.event
         def onChanging(value):
-            self.changeValue("cheek",value,self.human.headVertices)
+            self.changeValue("cheek",value,True)
 
         @self.asymmEarsSlider.event
         def onChange(value):
@@ -74,7 +74,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmEarsSlider.event
         def onChanging(value):
-            self.changeValue("ear",value,self.human.earsVertices)
+            self.changeValue("ear",value,True)
 
         @self.asymmEyeSlider.event
         def onChange(value):
@@ -82,7 +82,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmEyeSlider.event
         def onChanging(value):
-            self.changeValue("eye",value,self.human.eyesVertices)
+            self.changeValue("eye",value,True)
 
         @self.asymmJawSlider.event
         def onChange(value):
@@ -90,7 +90,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmJawSlider.event
         def onChanging(value):
-            self.changeValue("jaw",value,self.human.jawVertices)
+            self.changeValue("jaw",value,True)
 
         @self.asymmMouthSlider.event
         def onChange(value):
@@ -98,7 +98,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmMouthSlider.event
         def onChanging(value):
-            self.changeValue("mouth",value,self.human.mouthVertices)
+            self.changeValue("mouth",value,True)
 
         @self.asymmNoseSlider.event
         def onChange(value):
@@ -106,7 +106,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmNoseSlider.event
         def onChanging(value):
-            self.changeValue("nose",value,self.human.noseVertices)
+            self.changeValue("nose",value,True)
 
         @self.asymmTempleSlider.event
         def onChange(value):
@@ -114,7 +114,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmTempleSlider.event
         def onChanging(value):
-            self.changeValue("temple",value,self.human.headVertices)
+            self.changeValue("temple",value,True)
 
         @self.asymmTopSlider.event
         def onChange(value):
@@ -122,7 +122,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmTopSlider.event
         def onChanging(value):
-            self.changeValue("top",value,self.human.headVertices)
+            self.changeValue("top",value,True)
 
         @self.asymmTrunkSlider.event
         def onChange(value):
@@ -130,7 +130,7 @@ class AsymmTaskView(gui3d.TaskView):
             
         @self.asymmTrunkSlider.event
         def onChanging(value):
-            self.changeValue("trunk",value,self.human.breastVertices)
+            self.changeValue("trunk",value,True)
 
         @self.asymmBreastSlider.event
         def onChange(value):
@@ -138,9 +138,9 @@ class AsymmTaskView(gui3d.TaskView):
 
         @self.asymmBreastSlider.event
         def onChanging(value):
-            self.changeValue("breast",value,self.human.breastVertices)
+            self.changeValue("breast",value,True)
 
-    def changeValue(self,bodyPartName,value,vertices=None):
+    def changeValue(self, bodyPartName, value, realtime=False):
         """
         This function apply the targets, and inform the undo system about the changes.
         @return: None
@@ -149,12 +149,11 @@ class AsymmTaskView(gui3d.TaskView):
         @type  value: Float
         @param value: The amount of asymmetry
         """
-        if vertices:
+        if realtime:
             if not self.before:
                 self.before = self.getTargetsAndValues(bodyPartName)
                 
             self.calcAsymm(value,bodyPartName)
-            self.human.meshData.update(vertices)
         else:
             self.calcAsymm(value,bodyPartName)
             self.human.applyAllTargets(self.human.app.progress)
