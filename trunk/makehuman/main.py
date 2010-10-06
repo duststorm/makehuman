@@ -237,9 +237,8 @@ class MHApplication(gui3d.Application):
         human = self.scene3d.selectedHuman
         human.resetMeshValues()
         human.applyAllTargets(self.progress)
-        self.syncSliders()
-        self.syncEthnics()
-        self.syncStatus()
+        self.app.categories['Modelling'].tasksByName['Macro modelling'].syncSliders()
+        self.app.categories['Modelling'].tasksByName['Macro modelling'].syncStatus()
         self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
       
     self.globalButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 560, 9.2], label="Global cam")
