@@ -75,35 +75,35 @@ FaceArmature = [
 #	FaceWritePoses(fp):
 #
 
-FacePoses = [
-	('poseBone', 'Jaw', 'MHJaw', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+def FaceWritePoses(fp):
+	addPoseBone(fp, 'Jaw', 'MHJaw', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'TongueBase', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'TongueBase', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-	('poseBone', 'TongueMid', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'TongueMid', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-	('poseBone', 'TongueTip', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'TongueTip', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-	('poseBone', 'UpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'UpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'LoLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'LoLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'UpLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'UpLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'LoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'LoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, 1, ['IK', 'Gaze_R', 1, None, (True, False,False), 1.0])]),
+	addPoseBone(fp, 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, 1, ['IK', 'Gaze_R', 1, None, (True, False,False), 1.0])])
 
-	('poseBone', 'Gaze_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'Gaze_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Eye_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('IK', 0, 1, ['IK', 'Gaze_L', 1, None, (True, False,False), 1.0])]),
-]
+	addPoseBone(fp, 'Eye_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('IK', 0, 1, ['IK', 'Gaze_L', 1, None, (True, False,False), 1.0])])
+	return
 
 lidBones = [
 	('UpLid_L', 'PUpLid_L', (0, 40*deg1)),

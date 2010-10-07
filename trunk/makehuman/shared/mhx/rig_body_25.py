@@ -12,15 +12,18 @@ BodyJoints = [
 	('chest-front',			'v', 7292),
 	('r-rib-top',			'v', 3667),
 	('r-rib-bot',			'v', 3400),
+	('r-stomach',			'v', 6568),
 	('r-hip',				'v', 6563),
-	('r-buttock-top',		'v', 4473),
-	('r-buttock-bot',		'v', 4476),
 
 	('l-rib-top',			'v', 10134),
 	('l-rib-bot',			'v', 10361),
 	('l-hip',				'v', 6749),
-	('l-buttock-top',		'v', 6892),
-	('l-buttock-bot',		'v', 6889),
+	('l-stomach',			'v', 6744),
+
+	('mid-rib-top',			'l', ((0.5, 'r-rib-top'), (0.5, 'l-rib-top'))),
+	('mid-rib-bot',			'l', ((0.5, 'r-rib-bot'), (0.5, 'l-rib-bot'))),
+	('mid-stomach',			'l', ((0.5, 'r-stomach'), (0.5, 'l-stomach'))),
+	('mid-hip',				'l', ((0.5, 'r-hip'), (0.5, 'l-hip'))),
 
 	('abdomen-front',		'v', 7359),
 	('abdomen-back',		'v', 7186),
@@ -33,7 +36,7 @@ BodyJoints = [
 	('floor',				'o', ('mid-feet', [0,-0.3,0])),
 ]
 
-offs = [0,0.1,0]
+offs = [0,0.3,0]
 
 BodyHeadsTails = [
 	('MasterFloor',			'floor', ('floor', zunit)),
@@ -51,24 +54,15 @@ BodyHeadsTails = [
 	('Neck',			'neck', 'head'),
 	('Head',			'head', 'head-end'),
 
-	('Rib_L',			'r-rib-top', 'r-rib-bot'),
-	('Stomach_L',		'r-rib-bot', 'r-hip'),
-	('StomachTarget_L',	'r-hip', ('r-hip', offs)),
-	('Buttock_L',		'r-buttock-top', 'r-buttock-bot'),
-	
-	('Rib_R',			'l-rib-top', 'l-rib-bot'),
-	('Stomach_R',		'l-rib-bot', 'l-hip'),
-	('StomachTarget_R',	'l-hip', ('l-hip', offs)),
-	('Buttock_R',		'l-buttock-top', 'l-buttock-bot'),
-
-	('Abdomen',			'abdomen-front', 'abdomen-back'),
-	('Stomach',			'stomach-bot', 'stomach-top'),
+	('Rib',				'mid-rib-top', 'mid-rib-bot'),
+	('Stomach',			'mid-rib-bot', 'mid-hip'),
+	('StomachTarget',	'mid-hip', ('mid-hip', offs)),
 ]
 
 BodyArmature = [
 	('MasterFloor',		0.0, None, F_WIR, L_MAIN, (1,1,1) ),
-	('MasterHips',		0.0, None, F_WIR+F_HID, L_HELP, (1,1,1) ),
-	('MasterNeck',		0.0, None, F_WIR+F_HID, L_HELP, (1,1,1) ),
+	('MasterHips',		0.0, None, F_WIR+F_HID, L_MAIN, (1,1,1) ),
+	('MasterNeck',		0.0, None, F_WIR+F_HID, L_MAIN, (1,1,1) ),
 
 	('Root',			0.0, None, F_WIR, L_MAIN+L_SPINE, (1,1,1) ),
 	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_DEF+L_SPINE, (1,1,1) ),
@@ -81,58 +75,53 @@ BodyArmature = [
 	('Neck',			0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 
-	('Rib_L',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
-	('Rib_R',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
-	('Stomach_L',		0.0, 'Rib_L', F_DEF, L_DEF, (1,1,1) ),
-	('Stomach_R',		0.0, 'Rib_R', F_DEF, L_DEF, (1,1,1) ),
-	('StomachTarget_L',	0.0, 'Hips', 0, L_HELP, (1,1,1) ),
-	('StomachTarget_R',	0.0, 'Hips', 0, L_HELP, (1,1,1) ),
-	#('Buttock_L',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
-	#('Buttock_R',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
-	
-	('Stomach',			0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),	
+	('Rib',				0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
+	('Stomach',			0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
+	('StomachTarget',	-deg90, 'Hips', F_DEF, L_DEF, (1,1,1) ),
 ]
 
-BodyPoses = [
-	('poseBone', 'MasterFloor', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+#
+#	BodyWritePoses(fp):
+#
 
-	('poseBone', 'MasterHips', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+def BodyWritePoses(fp):
+	addPoseBone(fp,  'MasterFloor', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'MasterHips', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Root', 'MHHips', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints),
+	addPoseBone(fp,  'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Hips', 'MHCircle15', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'Root', 'MHHips', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints)
 
-	('poseBone', 'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'Hips', 'MHCircle15', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Hip_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp,  'Hip_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Spinal column
-	('poseBone', 'Spine1', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, []),
+	addPoseBone(fp,  'Spine1', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
 
-	('poseBone', 'Spine2', 'MHCircle15', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, []),
+	addPoseBone(fp,  'Spine2', 'MHCircle15', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
 
-	('poseBone', 'Spine3', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, []),
+	addPoseBone(fp,  'Spine3', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
 
-	('poseBone', 'Neck', 'GoboNeck', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'Neck', 'GoboNeck', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Head', 'GoboHead', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'Head', 'GoboHead', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Deform
-	('poseBone', 'Rib_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'Rib', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	('poseBone', 'Rib_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp,  'Stomach', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 1])])
 
-	('poseBone', 'Stomach_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget_L', 'PLANE_X'])]),
-
-	('poseBone', 'Stomach_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget_R', 'PLANE_X'])]),
-
-	('poseBone', 'Stomach', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp,  'StomachTarget', None, None, (0,0,0), (0,1,0), (0,0,0), (1,1,1), 0, 
 		[('Transform', C_OW_LOCAL+C_TG_LOCAL, 1, ['Transform', 'Spine1',
-			'ROTATION', (-20,0,-45), (50,0,45),
-			'ROTATION', (-20,0,-45), (50,0,45)])]),
-]
+			'ROTATION', (0,0,0), (90,0,0), ('X', 'X', 'X'),
+			'LOCATION', (0,0,0), ('0.5*theScale','-0.9*theScale',0)])
+		])
+
+	return
+
 

@@ -303,7 +303,7 @@ def writeBoneGroups(fp):
 #
 #	writePoses(fp, poses)
 #
-
+'''
 def writePoses(fp, poses):
 	for pose in poses:
 		#print(pose)
@@ -350,22 +350,24 @@ def writePoses(fp, poses):
 		else:
 			raise NameError("Unknown pose type %s" % typ)
 	return
-		
+'''		
 
 #
-#	addIKHandle(fp, bone, customShape, limit):
-#	addSingleIK(fp, bone, lockRot, target, limit):
+#	addIkHandle(fp, bone, customShape, limit):
+#	addSingleIk(fp, bone, lockRot, target, limit):
 #	addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
+#	addCSlider(fp, bone, mx):
+#	addXSlider(fp, bone, mn, mx):
 #
 
-def addIKHandle(fp, bone, customShape, limit):
+def addIkHandle(fp, bone, customShape, limit):
 	if limit:
 		cns = [('LimitDist', 0, 1, ['LimitDist', limit])]
 	else:
 		cns = []
 	addPoseBone(fp, bone, customShape, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, cns)
 
-def addSingleIK(fp, bone, lockRot, target, limit):
+def addSingleIk(fp, bone, lockRot, target, limit):
 	cns = [('IK', 0, 1, ['IK', target, 1, None, (True, False, True), 1.0])]
 	if limit:
 		cns.append( ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limit, (True, True, True)]) )
@@ -384,6 +386,15 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 		]		
 	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
 	return
+
+def addCSlider(fp, bone, mx):
+	mn = "-"+mx
+	addPoseBone(fp, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
+	
+def addXSlider(fp, bone, mn, mx):
+	addPoseBone(fp, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 
 #
 #	addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
@@ -860,9 +871,10 @@ def addTransformConstraint(fp, switch, flags, inf, data):
 	map_from = data[2]
 	from_min = data[3]
 	from_max = data[4]
-	map_to = data[5]
-	to_min = data[6]
-	to_max = data[7]
+	map_to_from = data[5]
+	map_to = data[6]
+	to_min = data[7]
+	to_max = data[8]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	fp.write(
@@ -877,19 +889,22 @@ def addTransformConstraint(fp, switch, flags, inf, data):
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
 "      map_from '%s' ;\n" % map_from + 
-"      from_min_x %.3f ;\n" % from_min[0] + 
-"      from_min_y %.3f ;\n" % from_min[1] + 
-"      from_min_z %.3f ;\n" % from_min[2] + 
-"      from_max_x %.3f ;\n" % from_max[0] + 
-"      from_max_y %.3f ;\n" % from_max[1] + 
-"      from_max_z %.3f ;\n" % from_max[2] + 
+"      from_min_x %s ;\n" % from_min[0] + 
+"      from_min_y %s ;\n" % from_min[1] + 
+"      from_min_z %s ;\n" % from_min[2] + 
+"      from_max_x %s ;\n" % from_max[0] + 
+"      from_max_y %s ;\n" % from_max[1] + 
+"      from_max_z %s ;\n" % from_max[2] + 
 "      map_to '%s' ;\n" % map_to + 
-"      to_min_x %.3f ;\n" % to_min[0] + 
-"      to_min_y %.3f ;\n" % to_min[1] + 
-"      to_min_z %.3f ;\n" % to_min[2] + 
-"      to_max_x %.3f ;\n" % to_max[0] + 
-"      to_max_y %.3f ;\n" % to_max[1] + 
-"      to_max_z %.3f ;\n" % to_max[2] + 
+"      map_to_x_from '%s' ;\n" % map_to_from[0] +
+"      map_to_y_from '%s' ;\n" % map_to_from[1] +
+"      map_to_z_from '%s' ;\n" % map_to_from[2] +
+"      to_min_x %s ;\n" % to_min[0] + 
+"      to_min_y %s ;\n" % to_min[1] + 
+"      to_min_z %s ;\n" % to_min[2] + 
+"      to_max_x %s ;\n" % to_max[0] + 
+"      to_max_y %s ;\n" % to_max[1] + 
+"      to_max_z %s ;\n" % to_max[2] + 
 "    end Constraint\n")
 	return
 
@@ -920,6 +935,7 @@ def addStretchToConstraint(fp, switch, flags, inf, data):
 	name = data[0]
 	subtar = data[1]
 	axis = data[2]
+	head_tail = data[3]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -929,6 +945,7 @@ def addStretchToConstraint(fp, switch, flags, inf, data):
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      bulge 1 ;\n" +
+"      head_tail %s ;\n" % head_tail +
 "      influence %s ;\n" % inf +
 "      keep_axis '%s' ;\n" % axis +
 "      owner_space '%s' ;\n" % ownsp+
@@ -1246,14 +1263,13 @@ def writeAllArmatures(fp):
 	return
 
 def writeAllPoses(fp):
-	writePoses(fp, 
-		rig_body_25.BodyPoses +
-		rig_arm_25.ArmPoses +
-		rig_finger_25.FingerPoses +
-		rig_leg_25.LegPoses +
-		#rig_toe_25.ToePoses +
-		rig_face_25.FacePoses +
-		rig_panel_25.PanelPoses)
+	rig_body_25.BodyWritePoses(fp)
+	rig_arm_25.ArmWritePoses(fp)
+	rig_finger_25.FingerWritePoses(fp)
+	rig_leg_25.LegWritePoses(fp)
+	#rig_toe_25.ToeWritePoses(fp)
+	rig_face_25.FaceWritePoses(fp)
+	rig_panel_25.PanelWritePoses(fp)
 	return
 	
 def writeAllActions(fp):

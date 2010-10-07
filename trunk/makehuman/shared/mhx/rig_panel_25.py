@@ -150,48 +150,48 @@ neg = ('0', '-4.0')
 
 FMX = 0.7
 
-PanelPoses = [
-	('poseBone', 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, 1, ['World', 'Root', (1,1,1), (1,1,1), (1,1,1)]) ]),
+def PanelWritePoses(fp):
+	addPoseBone(fp, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
+		[('ChildOf', C_CHILDOF, 1, ['World', 'Root', (1,1,1), (1,1,1), (1,1,1)]) ])
 
-	('poseBone', 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, []),
+	addPoseBone(fp, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	('cSlider',  'PBrow_L', MX),
-	('cSlider',  'PBrow_R', MX),
-	('cSlider',  'PBrows', MX),
-	('cSlider',  'PUpLid_L', MX),
-	('cSlider',  'PUpLid_R', MX),
-	('cSlider',  'PLoLid_L', MX),
-	('cSlider',  'PLoLid_R', MX),
-	('cSlider',  'PCheek_L', MX),
-	('cSlider',  'PCheek_R', MX),
-	('cSlider',  'PNose', MX),
-	('cSlider',  'PUpLip_L', MX),
-	('cSlider',  'PUpLip_R', MX),
-	('cSlider',  'PLoLip_L', MX),
-	('cSlider',  'PLoLip_R', MX),
-	('cSlider',  'PMouth_L', MX),
-	('cSlider',  'PMouth_R', MX),
-	('cSlider',  'PTongue', MX),
-	('cSlider',  'PJaw', MX),
+	addCSlider(fp, 'PBrow_L', MX)
+	addCSlider(fp, 'PBrow_R', MX)
+	addCSlider(fp, 'PBrows', MX)
+	addCSlider(fp, 'PUpLid_L', MX)
+	addCSlider(fp, 'PUpLid_R', MX)
+	addCSlider(fp, 'PLoLid_L', MX)
+	addCSlider(fp, 'PLoLid_R', MX)
+	addCSlider(fp, 'PCheek_L', MX)
+	addCSlider(fp, 'PCheek_R', MX)
+	addCSlider(fp, 'PNose', MX)
+	addCSlider(fp, 'PUpLip_L', MX)
+	addCSlider(fp, 'PUpLip_R', MX)
+	addCSlider(fp, 'PLoLip_L', MX)
+	addCSlider(fp, 'PLoLip_R', MX)
+	addCSlider(fp, 'PMouth_L', MX)
+	addCSlider(fp, 'PMouth_R', MX)
+	addCSlider(fp, 'PTongue', MX)
+	addCSlider(fp, 'PJaw', MX)
 
-	('xSlider', 'PArmIK_L', 0.0, 1.0),
-	('xSlider', 'PArmIK_R', 0.0, 1.0),
-	('xSlider', 'PLegIK_L', 0.0, 1.0),
-	('xSlider', 'PLegIK_R', 0.0, 1.0),
+	addXSlider(fp, 'PArmIK_L', 0.0, 1.0)
+	addXSlider(fp, 'PArmIK_R', 0.0, 1.0)
+	addXSlider(fp, 'PLegIK_L', 0.0, 1.0)
+	addXSlider(fp, 'PLegIK_R', 0.0, 1.0)
 
-	('xSlider', 'PFinger-1_L', 0.0, FMX),
-	('xSlider', 'PFinger-2_L', 0.0, FMX),
-	('xSlider', 'PFinger-3_L', 0.0, FMX),
-	('xSlider', 'PFinger-4_L', 0.0, FMX),
-	('xSlider', 'PFinger-5_L', 0.0, FMX),
+	addXSlider(fp, 'PFinger-1_L', 0.0, FMX)
+	addXSlider(fp, 'PFinger-2_L', 0.0, FMX)
+	addXSlider(fp, 'PFinger-3_L', 0.0, FMX)
+	addXSlider(fp, 'PFinger-4_L', 0.0, FMX)
+	addXSlider(fp, 'PFinger-5_L', 0.0, FMX)
 
-	('xSlider', 'PFinger-1_R', 0.0, FMX),
-	('xSlider', 'PFinger-2_R', 0.0, FMX),
-	('xSlider', 'PFinger-3_R', 0.0, FMX),
-	('xSlider', 'PFinger-4_R', 0.0, FMX),
-	('xSlider', 'PFinger-5_R', 0.0, FMX),
-]
+	addXSlider(fp, 'PFinger-1_R', 0.0, FMX)
+	addXSlider(fp, 'PFinger-2_R', 0.0, FMX)
+	addXSlider(fp, 'PFinger-3_R', 0.0, FMX)
+	addXSlider(fp, 'PFinger-4_R', 0.0, FMX)
+	addXSlider(fp, 'PFinger-5_R', 0.0, FMX)
+	return
 
 #
 #	Face representation
