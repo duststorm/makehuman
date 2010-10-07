@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.18
+Version 0.19
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.18',
+	'version': '0.19',
 	'blender': (2, 5, 4),
     "api": 31913,
 	"location": "File > Import",
@@ -39,7 +39,7 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 18
+MINOR_VERSION = 19
 BLENDER_VERSION = (2, 54, 0)
 
 #
@@ -1644,6 +1644,11 @@ def parsePoseBone(pbones, ob, args, tokens):
 			parseArray(pb, ["ik_min_x", "ik_min_y", "ik_min_z"], val)
 		elif key == 'ik_stiffness':
 			parseArray(pb, ["ik_stiffness_x", "ik_stiffness_y", "ik_stiffness_z"], val)
+		elif key == 'hide':
+			#bpy.ops.object.mode_set(mode='OBJECT')
+			amt.bones[name].hide = eval(val[0])
+			#bpy.ops.object.mode_set(mode='POSE')
+			
 		else:
 			defaultKey(key, val,  sub, "pb", [], globals(), locals())
 	#print("pb %s done" % name)

@@ -84,6 +84,7 @@ P_LKROTW = 0x0002
 P_IKLIN = 0x0004
 P_IKROT = 0x0008
 P_STRETCH = 0x0010
+P_HID = 0x0020
 
 P_ROTMODE = 0x0f00
 P_QUAT = 0x0000
@@ -412,6 +413,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 	ikRot = boolString(flags & P_IKROT)
 	lkRot4 = boolString(flags & P_LKROT4)
 	lkRotW = boolString(flags & P_LKROTW)
+	hide = boolString(flags & P_HID)
 
 	if Mhx25:
 		fp.write("\n  Posebone %s %s \n" % (bone, True))
@@ -501,7 +503,8 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 "    use_ik_linear_control %s ; \n" % ikLin +
 "    ik_linear_weight 0 ; \n"+
 "    use_ik_rotation_control %s ; \n" % ikRot +
-"    ik_rotation_weight 0 ; \n")
+"    ik_rotation_weight 0 ; \n" +
+"    hide %s ; \n" % hide)
 	
 	if flags & P_STRETCH:
 		fp.write("    ik_stretch 0.1 ; \n")

@@ -23,7 +23,7 @@ TO DO
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 18
+MINOR_VERSION = 19
 splitLeftRight = True
 
 import module3d, aljabr, mh, files3d, mh2bvh, os

@@ -29,6 +29,8 @@ BodyJoints = [
 	('abdomen-back',		'v', 7186),
 	('stomach-top',			'v', 7336),
 	('stomach-bot',			'v', 7297),
+	('stomach-front',		'v', 7313),
+	('stomach-back',		'v', 7472),
 
 	('r-toe-1-1',			'j', 'r-toe-1-1'),
 	('l-toe-1-1',			'j', 'l-toe-1-1'),
@@ -55,8 +57,9 @@ BodyHeadsTails = [
 	('Head',			'head', 'head-end'),
 
 	('Rib',				'mid-rib-top', 'mid-rib-bot'),
-	('Stomach',			'mid-rib-bot', 'mid-hip'),
-	('StomachTarget',	'mid-hip', ('mid-hip', offs)),
+	('Stomach',			'mid-rib-bot', 'stomach-front'),
+	('StomachLo',			'mid-hip', 'stomach-front'),
+	('StomachTarget',	'stomach-front', ('stomach-front', offs)),
 ]
 
 BodyArmature = [
@@ -77,7 +80,8 @@ BodyArmature = [
 
 	('Rib',				0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
 	('Stomach',			0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
-	('StomachTarget',	-deg90, 'Hips', F_DEF, L_DEF, (1,1,1) ),
+	('StomachLo',			0.0, 'Spine1', F_DEF, L_DEF, (1,1,1) ),
+	('StomachTarget',	0, 'Spine1', 0, L_HELP, (1,1,1) ),
 ]
 
 #
@@ -87,9 +91,9 @@ BodyArmature = [
 def BodyWritePoses(fp):
 	addPoseBone(fp,  'MasterFloor', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp,  'MasterHips', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp,  'MasterHips', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_HID, [])
 
-	addPoseBone(fp,  'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp,  'MasterNeck', 'MHMaster', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_HID, [])
 
 	addPoseBone(fp,  'Root', 'MHHips', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints)
 
@@ -111,16 +115,28 @@ def BodyWritePoses(fp):
 	addPoseBone(fp,  'Head', 'GoboHead', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Deform
-	addPoseBone(fp,  'Rib', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp,  'Stomach', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 1])])
+	vec = aljabr.vsub(mhx_rig.locations['stomach-front'], mhx_rig.locations['stomach-back'])
+	dist = aljabr.vlen(vec) - 0.4
+	if dist < 0: dist = 0.0
+	stomachFwdPos = str(1.0*dist) + '*theScale'
+	#stomachUpPos = str(-0.8*dist) + '*theScale'
+	stomachFwdNeg = str(-0.5*dist) + '*theScale'
+	#stomachUpNeg = str(0.4*dist) + '*theScale'
+	stomachUpPos = 0
+	stomachUpNeg = 0
 
 	addPoseBone(fp,  'StomachTarget', None, None, (0,0,0), (0,1,0), (0,0,0), (1,1,1), 0, 
 		[('Transform', C_OW_LOCAL+C_TG_LOCAL, 1, ['Transform', 'Spine1',
-			'ROTATION', (0,0,0), (90,0,0), ('X', 'X', 'X'),
-			'LOCATION', (0,0,0), ('0.5*theScale','-0.9*theScale',0)])
+			'ROTATION', (-45,0,0), (90,0,0), ('X', 'X', 'X'),
+			'LOCATION', (0,stomachUpNeg, stomachFwdNeg),(0, stomachUpPos, stomachFwdPos)])
 		])
+
+	addPoseBone(fp,  'Stomach', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0])])
+
+	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0])])
 
 	return
 
