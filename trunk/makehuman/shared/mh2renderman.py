@@ -38,6 +38,7 @@ import hair
 import time
 
 
+
 class MaterialParameter:
 
     def __init__(self, type, name, val):
@@ -78,6 +79,9 @@ class RMRLight:
         self.color = [1,1,1]
         RMRLight.lightCounter += 1
         self.counter = RMRLight.lightCounter
+        self.samples = 64
+        self.blur = 0.025
+        self.AOmap = ""
 
     def writeRibCode(self, ribfile, n=0):
         # remember z in opengl -> -z in renderman
@@ -86,6 +90,10 @@ class RMRLight:
                       self.intensity, self.color[0], self.color[1], self.color[2]))
         if self.type == "ambient":
             ribfile.write('\tLightSource "ambientlight" %i "intensity" [%f] "color lightcolor" [%f %f %f]\n'%(n, self.intensity, self.color[0], self.color[1], self.color[2]))
+        if self.type == "envlight":
+            ribfile.write('\tLightSource "envlight" %i "string filename" "%s" "intensity" [%f] "float samples" [ %f ] "float blur" [ %f ]\n'%(n, self.AOmap, self.intensity, self.samples, self.blur))
+
+
 
 
 class RMRHairs:
@@ -425,8 +433,7 @@ class RMRScene:
         self.light2 = RMRLight([1, 10, -15],intensity = 19.5)
         self.light3 = RMRLight([1, 15, 8],intensity = 67.5)
         self.light4 = RMRLight([-8, 0, 0],intensity = 9.75)
-        self.light5 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
-        self.lights = [self.light1,self.light2,self.light3,self.light4,self.light5]
+        self.lights = [self.light1,self.light2,self.light3,self.light4]
 
         #Human in the scene
         self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"))
@@ -442,6 +449,18 @@ class RMRScene:
         self.applicationPath = os.getcwd()  # TODO: this may not always return the app folder
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
+
+        #Ambient Occlusion paths
+        self.ambientOcclusionWorldFileName = os.path.join(self.ribsPath,"world.rib" )
+        self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib" )
+        self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" )
+
+        
+        #self.light5 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
+        self.light5 = RMRLight([0, 0, 0],intensity = 0.2, type = "envlight")
+        self.light5.AOmap = self.ambientOcclusionData
+        self.lights.append(self.light5)
+        
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
@@ -525,7 +544,6 @@ class RMRScene:
             ribfile.write('\tAttributeEnd\n')
 
         ribfile.write('\tAttributeBegin\n')
-        #ribfile.write('\tReverseOrientation #<<-- required\n')
         ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] "float roughness" [0.08] "color rootcolor" [%s %s %s]\n' % 
                         (self.humanCharacter.human.hairColor[0], self.humanCharacter.human.hairColor[1], self.humanCharacter.human.hairColor[2]))
         ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(self.ribsPath, 'hairs.rib').replace('\\', '/'))
@@ -535,10 +553,53 @@ class RMRScene:
         ribfile.close()
 
 
-    def render(self, fName):
-        fName = os.path.join(self.ribsPath, fName)
-        self.writeRibFile(fName)
-        command = '%s "%s"' % ('aqsis -progress', fName)
+    def writeAOWorldRibFile(self, fName):
+        """
+
+        """
+        ribfile = file(fName, 'w')
+        for subObj in self.humanCharacter.subObjects:
+            ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
+            ribfile.write('\tAttributeBegin\n')
+            ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
+            ribfile.write('\tAttributeEnd\n')
+        ribfile.write('\tAttributeBegin\n')
+        ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(self.ribsPath, 'hairs.rib').replace('\\', '/'))
+        ribfile.write('\tAttributeEnd\n')
+        ribfile.close()
+
+
+
+
+    def copyAOfile(self, src, dst, oldString1, newString1, oldString2, newString2):
+
+        i = open(src)
+        o = i.read()
+        o = o.replace(oldString1, newString1)
+        o = o.replace(oldString2, newString2)
+        i.close()       
+
+        f = open(dst, 'w')
+        f.write(o)
+        f.close()
+
+    def renderAOdata(self):
+
+
+        self.writeAOWorldRibFile(ambientOcclusionWorldFileName)
+        self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
+                        self.ambientOcclusionFileName,\
+                        "%DATAPATH%",self.ambientOcclusionData,\
+                        "%WORLDPATH%",self.ambientOcclusionWorldFileName)
+        command = '%s "%s"' % ('aqsis -progress', ambientOcclusionFileName)
+        subprocess.Popen(command, shell=True)
+
+
+    def render(self, ribFileName):
+
+        sceneFileName = os.path.join(self.ribsPath, ribFileName)
+        self.writeRibFile(sceneFileName)
+        command = '%s "%s"' % ('aqsis -progress', sceneFileName)
         subprocess.Popen(command, shell=True)
 
 
