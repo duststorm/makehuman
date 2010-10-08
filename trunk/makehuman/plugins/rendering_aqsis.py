@@ -23,11 +23,18 @@ class AqsisTaskView(gui3d.TaskView):
         subprocess.Popen('aqsl data/shaders/aqsis/hair.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'hair.slx'), shell=True)
 
         self.renderButton = gui3d.Button(self, mesh='data/3dobjs/button_generic.obj', texture=self.app.getThemeResource('images', 'button_rendering_start.png'),
-                                    selectedTexture=self.app.getThemeResource('images', 'button_rendering_start_on.png'), position=[20, 100, 9])  # getThemeResource returns a texture for a gui element according to the chosen theme
+                                    selectedTexture=self.app.getThemeResource('images', 'button_rendering_start_on.png'), position=[20, 80, 9])  # getThemeResource returns a texture for a gui element according to the chosen theme
+
+        self.renderAOButton = gui3d.Button(self, mesh='data/3dobjs/button_generic.obj', texture=self.app.getThemeResource('images', 'button_rendering_start.png'),
+                                    selectedTexture=self.app.getThemeResource('images', 'button_rendering_start_on.png'), position=[20, 120, 9])
 
         @self.renderButton.event
         def onClicked(event):            
-            self.sceneToRender.render("scene.rib")    
+            self.sceneToRender.render("scene.rib")
+
+        @self.renderAOButton.event
+        def onClicked(event):
+            self.sceneToRender.renderAOdata()
 
 
 def load(app):
