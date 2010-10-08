@@ -9,20 +9,20 @@ class RenderingSettingTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Rendering Setting', category.app.getThemeResource('images', 'button_setting.png'), category.app.getThemeResource('images', 'button_setting_on.png'))
 
         #Rendering size
-        self.widthSize= gui3d.Slider(self, position=[10, 100, 9], value=800, min=10, max=5000, label = "Rendering Width: 800")
-        self.widthSize.label.setPosition([20,85,8])
-        self.heightSize= gui3d.Slider(self, position=[10, 165, 9], value=600, min=10, max=5000, label = "Rendering Height: 600")
-        self.heightSize.label.setPosition([20,150,8])
+        self.widthSize= gui3d.Slider(self, position=[10, 80, 9.3], value=800, min=10, max=5000, label = "Rendering Width: 800")
+        self.widthSize.label.setPosition([15,75,9.5])
+        self.heightSize= gui3d.Slider(self, position=[10, 120, 9.3], value=600, min=10, max=5000, label = "Rendering Height: 600")
+        self.heightSize.label.setPosition([15,115,9.5])
 
         #Hair data
-        self.clumpRadius = gui3d.Slider(self, position=[10, 230, 9], value=0.09, min=0.05,max=0.5, label = "Hair clump radius: 0.09")
-        self.clumpRadius.label.setPosition([20,215,8])
-        self.clumpChildren= gui3d.Slider(self, position=[10, 295, 9], value=0, min=0, max=150, label = "Hair clump children: 0")
-        self.clumpChildren.label.setPosition([20,280,8])
-        self.multiStrand= gui3d.Slider(self, position=[10, 360, 9], value=0, min=0, max=150, label = "Multistrand children: 0")
-        self.multiStrand.label.setPosition([20,345,8])
-        self.randomHair= gui3d.Slider(self, position=[10, 425, 9], value=0.04, min=0.0, max=0.09, label = "Hair Randomness: 0.04")
-        self.randomHair.label.setPosition([20,410,8])
+        self.clumpRadius = gui3d.Slider(self, position=[10, 160, 9.3], value=0.09, min=0.05,max=0.5, label = "Hair clump radius: 0.09")
+        self.clumpRadius.label.setPosition([15,155,9.5])
+        self.clumpChildren= gui3d.Slider(self, position=[10, 200, 9.3], value=0, min=0, max=150, label = "Hair clump children: 0")
+        self.clumpChildren.label.setPosition([15,195,9.5])
+        self.multiStrand= gui3d.Slider(self, position=[10, 240, 9.3], value=0, min=0, max=150, label = "Multistrand children: 0")
+        self.multiStrand.label.setPosition([15,235,9.5])
+        self.randomHair= gui3d.Slider(self, position=[10, 280, 9.3], value=0.04, min=0.0, max=0.09, label = "Hair Randomness: 0.04")
+        self.randomHair.label.setPosition([15,275,9.5])
 
 
         self.human = self.app.scene3d.selectedHuman
