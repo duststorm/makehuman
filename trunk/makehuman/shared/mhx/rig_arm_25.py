@@ -10,7 +10,7 @@ ArmJoints = [
 	('r-shoulder-head',		'l', ((0.7, 'r-shoulder'), (0.3, 'l-shoulder'))),
 	('r-loarm-mid',			'l', ((0.5, 'r-hand'), (0.5, 'r-elbow'))),
 	('r-loarm-fan',			'l', ((0.25, 'r-hand'), (0.75, 'r-elbow'))),
-	('r-shoulder-bump',		'v', 5876),
+	('r-shoulder-bump',		'v', 5878),
 	('r-clavicle-back',		'v', 2583),
 	('r-clavicle-end',		'v', 2879),
 	('r-pectoralis',		'v', 3341),
@@ -31,7 +31,7 @@ ArmJoints = [
 	('l-shoulder-head',		'l', ((0.7, 'l-shoulder'), (0.3, 'r-shoulder'))),
 	('l-loarm-mid',			'l', ((0.5, 'l-hand'), (0.5, 'l-elbow'))),
 	('l-loarm-fan',			'l', ((0.25, 'l-hand'), (0.75, 'l-elbow'))),
-	('l-shoulder-bump',		'v', 15328),
+	('l-shoulder-bump',		'v', 9663),
 	('l-clavicle-back',		'v', 11025),
 	('l-clavicle-end',		'v', 10795),
 	('l-pectoralis',		'v', 10410),
@@ -71,15 +71,8 @@ ArmHeadsTails = [
 	#('BackArm_R',			'l-dorsal', 'l-uparm-025'),
 
 	# Scapula
-	('ScapulaTop_L',		'r-clavicle', 'r-scapula-top'),
-	('ScapulaTopIK_L',		'r-scapula-top', ('r-scapula-top', yunit)),
 	('Scapula_L',			'r-scapula-top', 'r-scapula-bot'),
-	('ScapulaIK_L',			'r-scapula-bot', ('r-scapula-bot', yunit)),
-
-	('ScapulaTop_R',		'l-clavicle', 'l-scapula-top'),
-	('ScapulaTopIK_R',		'l-scapula-top', ('l-scapula-top', yunit)),
 	('Scapula_R',			'l-scapula-top', 'l-scapula-bot'),
-	('ScapulaIK_R',			'l-scapula-bot', ('l-scapula-bot', yunit)),
 
 	# Deform
 	('UpArm_L',				'r-shoulder', 'r-elbow'),
@@ -141,10 +134,8 @@ ArmArmature = [
 	('ClavicleTarget_R',	0.0, 'Shoulder_R', 0, L_HELP, (1,1,1) ),
 
 	# Scapula
-	('Scapula_L',		0.0, spineTop, F_WIR+F_DEF, L_SHOULDER+L_DEF, (1,1,1) ),
-	('ScapulaIK_L',		0.0, spineTop, F_WIR,L_SHOULDER, (1,1,1) ),
-	('Scapula_R',		0.0, spineTop, F_WIR+F_DEF, L_SHOULDER+L_DEF, (1,1,1) ),
-	('ScapulaIK_R',		0.0, spineTop, F_WIR, L_SHOULDER, (1,1,1) ),
+	('Scapula_L',		0.0, 'Shoulder_L', F_DEF, L_DEF, (1,1,1) ),
+	('Scapula_R',		0.0, 'Shoulder_R', F_DEF, L_DEF, (1,1,1) ),
 
 	# Deform
 	('UpArm_L',			upArmRoll, 'Shoulder_L', F_DEF, L_DEF, (1,1,1) ),
@@ -198,8 +189,8 @@ ArmArmature = [
 limClavicle_L = (-deg45,deg45, 0,0, -deg20,deg20)
 limClavicle_R = (-deg45,deg45, 0,0, -deg20,deg20)
 
-limUpArm_L = (-deg90,deg90, -deg45,deg45, -deg90,deg45)
-limUpArm_R = (-deg90,deg90, -deg45,deg45, -deg45,deg90)
+limUpArm_L = (-deg90,deg90, -deg45,deg90, -deg90,deg45)
+limUpArm_R = (-deg90,deg90, -deg90,deg45, -deg45,deg90)
 
 limLoArmDwn_L = (0,0, -deg90,deg90, -deg90,deg10)
 limLoArmDwn_R = (0,0, -deg90,deg90, -deg10,deg90)
@@ -216,8 +207,8 @@ def ArmWritePoses(fp):
 
 	addPoseBone(fp, 'ShoulderBump_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('Transform', C_OW_LOCAL+C_TG_LOCAL, 1, ['Transform', 'UpArm_L',
-			'ROTATION', (0,0,0), (45,0,0), ('X', 'X', 'X'),
-			'LOCATION', (0,0,0), (0,'0.5*theScale',0)])
+			'ROTATION', (0,0,0), (60,0,0), ('X', 'X', 'X'),
+			'LOCATION', (0,0,0), (0,'0.3*theScale',0)])
 		])
 
 	addPoseBone(fp, 'Shoulder_R', 'GoboShldr_R', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
@@ -227,8 +218,9 @@ def ArmWritePoses(fp):
 
 	addPoseBone(fp, 'ShoulderBump_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
 		[('Transform', C_OW_LOCAL+C_TG_LOCAL, 1, ['Transform', 'UpArm_R',
-			'ROTATION', (0,0,0), (45,0,0), ('X', 'X', 'X'),
-			'LOCATION', (0,0,0), (0,'0.5*theScale',0)])
+
+			'ROTATION', (0,0,0), (60,0,0), ('X', 'X', 'X'),
+			'LOCATION', (0,0,0), (0,'0.3*theScale',0)])
 		])
 
 	# Pectoralis & BackArm
@@ -245,13 +237,9 @@ def ArmWritePoses(fp):
 		[('StretchTo', 0, 1, ['Stretch', 'PectoralisTarget_R', 'PLANE_X', 0])])
 	'''
 	# Scapula
-	addPoseBone(fp, 'Scapula_L', 'MHCube01', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'ScapulaIK_L', 1, None, (True, False,False)])])
-	addIkHandle(fp, 'ScapulaIK_L', 'MHCube01', None)
+	addPoseBone(fp, 'Scapula_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Scapula_R', 'MHCube01', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'ScapulaIK_R', 1, None, (True, False,False)])])
-	addIkHandle(fp, 'ScapulaIK_R', 'MHCube01', None)
+	addPoseBone(fp, 'Scapula_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Biceps
 	vec = aljabr.vsub(mhx_rig.locations['r-uparm-front'], mhx_rig.locations['r-uparm-back'])

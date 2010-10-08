@@ -57,7 +57,7 @@ BodyHeadsTails = [
 	('Head',			'head', 'head-end'),
 
 	('Rib',				'mid-rib-top', 'mid-rib-bot'),
-	('Stomach',			'mid-rib-bot', 'stomach-front'),
+	('StomachUp',			'mid-rib-bot', 'stomach-front'),
 	('StomachLo',			'mid-hip', 'stomach-front'),
 	('StomachTarget',	'stomach-front', ('stomach-front', offs)),
 ]
@@ -79,8 +79,8 @@ BodyArmature = [
 	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 
 	('Rib',				0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
-	('Stomach',			0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
-	('StomachLo',			0.0, 'Spine1', F_DEF, L_DEF, (1,1,1) ),
+	('StomachUp',			0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
+	('StomachLo',			0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
 	('StomachTarget',	0, 'Spine1', 0, L_HELP, (1,1,1) ),
 ]
 
@@ -117,14 +117,13 @@ def BodyWritePoses(fp):
 	# Deform
 
 	vec = aljabr.vsub(mhx_rig.locations['stomach-front'], mhx_rig.locations['stomach-back'])
-	dist = aljabr.vlen(vec) - 0.4
+	dist = aljabr.vlen(vec) - 0.5
 	if dist < 0: dist = 0.0
-	stomachFwdPos = str(1.0*dist) + '*theScale'
-	#stomachUpPos = str(-0.8*dist) + '*theScale'
-	stomachFwdNeg = str(-0.5*dist) + '*theScale'
-	#stomachUpNeg = str(0.4*dist) + '*theScale'
-	stomachUpPos = 0
-	stomachUpNeg = 0
+	stomachFwdPos = str(0.4*dist) + '*theScale'
+	stomachUpPos = str(0.8*dist) + '*theScale'
+	stomachFwdNeg = str(-0.2*dist) + '*theScale'
+	stomachUpNeg = str(-0.4*dist) + '*theScale'
+	print('Stm', stomachFwdPos)
 
 	addPoseBone(fp,  'StomachTarget', None, None, (0,0,0), (0,1,0), (0,0,0), (1,1,1), 0, 
 		[('Transform', C_OW_LOCAL+C_TG_LOCAL, 1, ['Transform', 'Spine1',
@@ -132,7 +131,7 @@ def BodyWritePoses(fp):
 			'LOCATION', (0,stomachUpNeg, stomachFwdNeg),(0, stomachUpPos, stomachFwdPos)])
 		])
 
-	addPoseBone(fp,  'Stomach', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp,  'StomachUp', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0])])
 
 	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
