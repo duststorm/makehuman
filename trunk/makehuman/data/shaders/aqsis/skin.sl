@@ -35,7 +35,8 @@ surface skin(
 			float Ks = .5;
             float Ka = .5;
             float Kd = .8;
-			float roughness = .1;		
+			float roughness = .1;
+            float Value = 1.0
 
             )
 {
@@ -50,8 +51,7 @@ surface skin(
 
 	if (skintexture != ""){
         Cflat = color texture (skintexture);
-        Oi = float texture (skintexture[3], "fill", 1);
-        //refl = comp(Cflat,0)+((1-comp(Cflat,1))+(1-comp(Cflat,2)))/2;
+        Oi = float texture (skintexture[3], "fill", 1);        
         }
     else Cflat = 1;
     
@@ -83,7 +83,7 @@ surface skin(
 
     Ci = mix(Ci,desaturate_tone,desaturate_factor)+glancing_highlight;
 
-    Ci = Cflat*Oi*(ambient()+(Kd*Ci)+(Cs*color(1,0.5,0.1)));
+    Ci = Cflat*Oi*(ambient()+(Kd*Ci)*(Cs*color(1,0.5,0.1)*Value));
     //Ci = Oi*(ambient()+Cflat*Ci);
     
     float R = comp(Ci,0);
