@@ -21,7 +21,7 @@ class RenderingSettingTaskView(gui3d.TaskView):
         self.clumpChildren.label.setPosition([15,195,9.5])
         self.multiStrand= gui3d.Slider(self, position=[10, 240, 9.3], value=0, min=0, max=150, label = "Multistrand children: 0")
         self.multiStrand.label.setPosition([15,235,9.5])
-        self.randomHair= gui3d.Slider(self, position=[10, 280, 9.3], value=0.04, min=0.0, max=0.09, label = "Hair Randomness: 0.04")
+        self.randomHair= gui3d.Slider(self, position=[10, 280, 9.3], value=0.04, min=0.0, max=0.5, label = "Hair Randomness: 0.04")
         self.randomHair.label.setPosition([15,275,9.5])
 
 
