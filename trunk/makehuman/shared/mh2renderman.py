@@ -63,6 +63,8 @@ class RMRMaterial:
                 file.write('"%s %s" [%f] '%(p.type, p.name, p.val))
             if p.type == "string":
                 file.write('"%s %s" "%s" '%(p.type, p.name, p.val))
+            if p.type == "color":
+                file.write('"%s %s" [%f %f %f] '%(p.type, p.name, p.val[0],  p.val[1],  p.val[2]))
         file.write('\n')
 
 
@@ -98,14 +100,15 @@ class RMRLight:
 
 class RMRHairs:
 
-    def __init__(self, human, hairsClass):
+    def __init__(self, human, hairsClass,ribRepository):
 
         self.hairsClass = hairsClass
         self.humanToGrowHairs = human
         hair.adjustHair(human.human, self.hairsClass)
+        self.hairFilePath = os.path.join(ribRepository, 'hairs.rib')
 
 
-    def writeRibCode(self, ribRepository):
+    def writeCurvesRibCode(self):
 
 
         # Write the full hairstyle
@@ -115,8 +118,8 @@ class RMRHairs:
 
         hairs = self.hairsClass.generateHairToRender()
         print 'Writing hairs'
-        hairName = os.path.join(ribRepository, 'hairs.rib')
-        hairFile = open(hairName, 'w')
+        
+        hairFile = open(self.hairFilePath, 'w')
         
         hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
         for strands in hairs:
@@ -144,6 +147,11 @@ class RMRHairs:
         hairFile.close()
         print 'Totals hairs written: ', totalNumberOfHairs
         #print 'Number of tufts', len(hairs)
+        
+    def writeRibCode(self, file):
+        archivePath = self.hairFilePath.replace('\\', '/')
+        file.write('\t\tReadArchive "%s" '%(archivePath))
+
 
 
 class RMNObject:
@@ -306,12 +314,16 @@ class RMRHuman(RMNObject):
         self.skinMat = RMRMaterial("skin")
         self.skinMat.parameters.append(MaterialParameter("string", "skintexture", "texture.texture"))
         self.skinMat.parameters.append(MaterialParameter("string", "refltexture", "texture_ref.texture"))
-        self.skinMat.parameters.append(MaterialParameter("float", "Ks", 2.5))
+        self.skinMat.parameters.append(MaterialParameter("float", "Ks", 1.5))
+        self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
+
 
         self.hairMat = RMRMaterial("hair")
-        self.hairMat.parameters.append(MaterialParameter("float", "Kd", 8))
-        self.hairMat.parameters.append(MaterialParameter("float", "Ks", 8))
+        self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5))
+        self.hairMat.parameters.append(MaterialParameter("float", "Ks", 1))
         self.hairMat.parameters.append(MaterialParameter("float", "roughness", 0.08))
+        self.hairMat.parameters.append(MaterialParameter("color", "rootcolor", self.human.hairColor))
+        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))
 
     def subObjectsInit(self):
 
@@ -429,11 +441,9 @@ class RMRScene:
         self.app = app
         
         #default lights
-        self.light1 = RMRLight([-8, 10, -15],intensity = 49.5)
-        self.light2 = RMRLight([1, 10, -15],intensity = 19.5)
-        self.light3 = RMRLight([1, 15, 8],intensity = 67.5)
-        self.light4 = RMRLight([-8, 0, 0],intensity = 9.75)
-        self.lights = [self.light1,self.light2,self.light3,self.light4]
+        self.light1 = RMRLight([-9, 9, 9],intensity = 65)
+        self.light2 = RMRLight([-9, 9, -9],intensity = 90)        
+        self.lights = [self.light1,self.light2]
 
         #Human in the scene
         self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"))
@@ -456,10 +466,10 @@ class RMRScene:
         self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" )
 
         
-        #self.light5 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
-        self.light5 = RMRLight([0, 0, 0],intensity = 0.2, type = "envlight")
-        self.light5.AOmap = self.ambientOcclusionData
-        self.lights.append(self.light5)
+        #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
+        self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "envlight")
+        self.light3.AOmap = self.ambientOcclusionData
+        self.lights.append(self.light3)
         
 
         #creating resources folders
@@ -499,8 +509,8 @@ class RMRScene:
         ribfile = file(fName, 'w')
         
         #Init and write rib code for hairs
-        humanHairs = RMRHairs(self.humanCharacter, self.hairsClass)        
-        humanHairs.writeRibCode(self.ribsPath)       
+        humanHairs = RMRHairs(self.humanCharacter, self.hairsClass, self.ribsPath)        
+        humanHairs.writeCurvesRibCode()       
         
         #Write rib code for textures
         for t in self.textures:
@@ -544,9 +554,10 @@ class RMRScene:
             ribfile.write('\tAttributeEnd\n')
 
         ribfile.write('\tAttributeBegin\n')
-        ribfile.write('\t\tSurface "hair" "float Kd" [8] "float Ks" [8] "float roughness" [0.08] "color rootcolor" [%s %s %s]\n' % 
-                        (self.humanCharacter.human.hairColor[0], self.humanCharacter.human.hairColor[1], self.humanCharacter.human.hairColor[2]))
-        ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(self.ribsPath, 'hairs.rib').replace('\\', '/'))
+        
+        self.humanCharacter.hairMat.writeRibCode(ribfile)
+        humanHairs.writeRibCode(ribfile)
+        
         ribfile.write('\tAttributeEnd\n')
         ribfile.write('WorldEnd\n')
         ribfile.write('FrameEnd\n')
@@ -586,12 +597,12 @@ class RMRScene:
     def renderAOdata(self):
 
 
-        self.writeAOWorldRibFile(ambientOcclusionWorldFileName)
+        self.writeAOWorldRibFile(self.ambientOcclusionWorldFileName)
         self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
                         self.ambientOcclusionFileName,\
                         "%DATAPATH%",self.ambientOcclusionData,\
                         "%WORLDPATH%",self.ambientOcclusionWorldFileName)
-        command = '%s "%s"' % ('aqsis -progress', ambientOcclusionFileName)
+        command = '%s "%s"' % ('aqsis -progress', self.ambientOcclusionFileName)
         subprocess.Popen(command, shell=True)
 
 
