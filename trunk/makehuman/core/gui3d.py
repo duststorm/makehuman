@@ -1155,6 +1155,8 @@ class TextObject(Object):
         self.fontSize = fontSize
         
     def setText(self, text):
+        if self.text == text:
+            return
         self.text = text
         self.app.scene3d.clear(self.mesh)
         self.mesh = font3d.createMesh(self.font, text, self.mesh);
