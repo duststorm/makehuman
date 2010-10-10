@@ -187,66 +187,66 @@ class RMNObject:
 
 
 
-    def clamp(self, min, max, val):
-        """
-        This function clips a value so that it is no less and no greater than the
-        minimum and maximum values specified.  This only works within the decimal
-        accuracy limits of the comparison operation, so the returned value could be
-        very slightly smaller or greater than the min and max values specified.
+    #def clamp(self, min, max, val):
+        #"""
+        #This function clips a value so that it is no less and no greater than the
+        #minimum and maximum values specified.  This only works within the decimal
+        #accuracy limits of the comparison operation, so the returned value could be
+        #very slightly smaller or greater than the min and max values specified.
 
-        Parameters
-        ----------
+        #Parameters
+        #----------
 
-        min:
-            *decimal*. The minimum permitted value.
+        #min:
+            #*decimal*. The minimum permitted value.
 
-        max:
-            *decimal*. The maximum permitted value.
+        #max:
+            #*decimal*. The maximum permitted value.
 
-        val:
-            *decimal*. The value to be clipped.
-        """
+        #val:
+            #*decimal*. The value to be clipped.
+        #"""
 
-        if val > max:
-            val = max
-        if val < min:
-            val = min
-        return val
+        #if val > max:
+            #val = max
+        #if val < min:
+            #val = min
+        #return val
 
 
 
-    def calcSSSvertcolor(self, lights, refl = 0.006, sssSteps = 2):
-        """
-        ...
+    #def calcSSSvertcolor(self, lights, refl = 0.006, sssSteps = 2):
+        #"""
+        #...
 
-        """
-        print "Calculating SSS..."
-        vertsColor = []
-        for v in self.meshData.verts:
-            color = 0
-            for l in lights:
-                lightRay = aljabr.vsub(l.position, v.co)
-                lightRay = aljabr.vnorm(lightRay)
-                color += self.clamp(0, 1, aljabr.vdot(lightRay, v.no) * l.intensity * refl)
-            vertsColor.append(color)
-        sssIterations = [vertsColor]
-        for n in xrange(sssSteps):
-            colorsToScatter = sssIterations[-1]
-            sssColors = []
-            for v in self.meshData.verts:
-                sharedColors = []
-                scattering = 0
-                for v2 in v.vertsShared():
-                    sharedColors.append(colorsToScatter[v2.idx])
-                    sharedColors.sort()
-                if colorsToScatter[v.idx] < sharedColors[-1]:
-                    scattering = (colorsToScatter[v.idx] + sharedColors[-1])/2
-                else:
-                    scattering = vertsColor[v.idx]
-                sssColors.append(scattering)
-            sssIterations.append(sssColors)
-        self.vertsColorSSS = sssIterations[-1]
-        print "vertsColors = ", len(self.vertsColorSSS)
+        #"""
+        #print "Calculating SSS..."
+        #vertsColor = []
+        #for v in self.meshData.verts:
+            #color = 0
+            #for l in lights:
+                #lightRay = aljabr.vsub(l.position, v.co)
+                #lightRay = aljabr.vnorm(lightRay)
+                #color += self.clamp(0, 1, aljabr.vdot(lightRay, v.no) * l.intensity * refl)
+            #vertsColor.append(color)
+        #sssIterations = [vertsColor]
+        #for n in xrange(sssSteps):
+            #colorsToScatter = sssIterations[-1]
+            #sssColors = []
+            #for v in self.meshData.verts:
+                #sharedColors = []
+                #scattering = 0
+                #for v2 in v.vertsShared():
+                    #sharedColors.append(colorsToScatter[v2.idx])
+                    #sharedColors.sort()
+                #if colorsToScatter[v.idx] < sharedColors[-1]:
+                    #scattering = (colorsToScatter[v.idx] + sharedColors[-1])/2
+                #else:
+                    #scattering = vertsColor[v.idx]
+                #sssColors.append(scattering)
+            #sssIterations.append(sssColors)
+        #self.vertsColorSSS = sssIterations[-1]
+        #print "vertsColors = ", len(self.vertsColorSSS)
 
 
     def writeRibCode(self, ribPath ):
@@ -449,8 +449,8 @@ class RMRScene:
 
         #Human in the scene
         self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"))
-        self.humanCharacter.calcSSSvertcolor(self.lights)
-        self.humanCharacter.subObjectsInit()
+        #self.humanCharacter.calcSSSvertcolor(self.lights)
+        
         self.hairsClass = MHscene.selectedHuman.hairs
 
         #resources paths
@@ -467,12 +467,12 @@ class RMRScene:
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib" )
         self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" )
 
-        
+        #Ambient Occlusion
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
         self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "envlight")
         self.light3.AOmap = self.ambientOcclusionData
-        self.lights.append(self.light3)
-        
+        self.lights.append(self.light3)       
+       
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
@@ -485,9 +485,7 @@ class RMRScene:
             os.makedirs(self.usrShaderPath)
 
         #rendering properties        
-        self.camera = camera
-        self.pixelSamples = [2,2]
-        self.shadingRate = 2
+        self.camera = camera        
 
         #textures used in the scene
         texture1 = RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath)
@@ -505,6 +503,9 @@ class RMRScene:
 
         #Getting global settings
         self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
+        self.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
+        self.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
+        self.humanCharacter.subObjectsInit()
 
         pos = self.humanCharacter.getObjPosition()
         imgFile = str(time.time())+".tif"

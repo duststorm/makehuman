@@ -1692,6 +1692,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3596-1"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1707,9 +1714,9 @@
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1005"
+     inkscape:window-height="1003"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="25"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -6438,7 +6445,7 @@
          sodipodi:role="line"
          id="tspan3804-1-0-1-1"
          x="77.872925"
-         y="-87.271782">Start Rend</tspan></text>
+         y="-87.271782">Run</tspan></text>
     <rect
        style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-27-8-3-7-7"
@@ -6464,6 +6471,58 @@
          sodipodi:role="line"
          id="tspan3804-40-7-9-5-9"
          x="164.15588"
-         y="-88.533623">Start Rend</tspan></text>
+         y="-88.533623">Run</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-3-4-6-6-5"
+       width="63.073643"
+       height="15.073632"
+       x="64.49659"
+       y="-127.31525"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_calc_ao.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="67.093185"
+       y="-116.15778"
+       id="text3802-22-3-2-3-9"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_calc_ao.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-1-0-1-1-4"
+         x="67.093185"
+         y="-116.15778">Calc. AO</tspan></text>
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-27-8-3-7-7-9"
+       width="63.073643"
+       height="15.073632"
+       x="150.32156"
+       y="-128.58382"
+       ry="2.2610445"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_calc_ao_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="153.37614"
+       y="-117.41962"
+       id="text3802-0-5-0-8-5-0"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_calc_ao_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-40-7-9-5-9-9"
+         x="153.37614"
+         y="-117.41962">Calc. AO</tspan></text>
   </g>
 </svg>
