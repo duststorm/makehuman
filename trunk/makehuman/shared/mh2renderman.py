@@ -264,6 +264,7 @@ class RMNObject:
 
         ribObjFile.write('[')
         for faceIdx in self.facesIndices:
+            faceIdx.reverse()
             if len(faceIdx) == 3:
                 ribObjFile.write('%i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0]))
             if len(faceIdx) == 4:
@@ -272,7 +273,7 @@ class RMNObject:
 
         ribObjFile.write('''["interpolateboundary"] [0 0] [] []"P" [''')
         for vert in self.meshData.verts:
-            ribObjFile.write('%f %f %f ' % (vert.co[0], vert.co[1], vert.co[2]))
+            ribObjFile.write('%f %f %f ' % (vert.co[0], vert.co[1], -vert.co[2]))
         ribObjFile.write('] ')
 
         ribObjFile.write('\n"st" [')
@@ -549,7 +550,7 @@ class RMRScene:
 
             subObj.writeRibCode(ribPath)
             #subObj.material.writeRibCode(ribfile)
-            ribfile.write('\t\tRotate 180.000000 0 1 0')
+            #ribfile.write('\t\tRotate 180.000000 0 1 0')
             ribfile.write('\t\tSurface "testShader"')
             ribfile.write('\tSphere 2 -2 2 360\n')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
