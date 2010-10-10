@@ -442,10 +442,10 @@ class RMRScene:
         self.app = app
         
         #default lights
-        #self.light1 = RMRLight([-9, 9, 9],intensity = 65)
+        self.light1 = RMRLight([-9, 9, 9],intensity = 65)
         self.light2 = RMRLight([-9, 9, -9],intensity = 90)        
-        #self.lights = [self.light1,self.light2]
-        self.lights = [self.light2]
+        self.lights = [self.light1,self.light2]
+        
 
         #Human in the scene
         self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"))
@@ -471,7 +471,7 @@ class RMRScene:
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
         self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "envlight")
         self.light3.AOmap = self.ambientOcclusionData
-        #self.lights.append(self.light3)
+        self.lights.append(self.light3)
         
 
         #creating resources folders
@@ -549,10 +549,9 @@ class RMRScene:
             ribfile.write('\tAttributeBegin\n')
 
             subObj.writeRibCode(ribPath)
-            #subObj.material.writeRibCode(ribfile)
-            #ribfile.write('\t\tRotate 180.000000 0 1 0')
-            ribfile.write('\t\tSurface "testShader"')
-            ribfile.write('\tSphere 2 -2 2 360\n')
+            subObj.material.writeRibCode(ribfile)            
+            #ribfile.write('\t\tSurface "plastic"')
+            #ribfile.write('\tSphere 2 -2 2 360\n')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
         
