@@ -23,7 +23,7 @@ TO DO
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 19
+MINOR_VERSION = 20
 splitLeftRight = True
 
 import module3d, aljabr, mh, files3d, mh2bvh, os
@@ -64,12 +64,12 @@ def exportMhx_24(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
-"MHX 0 7 ;\n")
+"MHX 0 20 ;\n")
 
 	fp.write(
-"if Blender25\n"+
+"#if Blender25\n"+
 "  error This file can not be opened in Blender 2.5x. Try the -classic25 file instead. ;\n "+
-"end if\n")
+"#endif\n")
 
 	copyMaterialFile("shared/mhx/templates/materials24.mhx", fp)	
 	exportArmature(obj, fp)
@@ -86,7 +86,7 @@ def exportMhx_24(obj, fp):
 def exportRawMhx(obj, fp):
 	exportArmature(obj, fp)
 	fp.write(
-"if useMesh \n" +
+"#if useMesh \n" +
 "mesh HumanMesh HumanMesh \n")
 	exportRawData(obj, fp)
 	fp.write(
@@ -106,35 +106,35 @@ def exportMhx_25(obj, rig, fp):
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
 "MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION) +
-"if Blender24\n" +
+"#if Blender24\n" +
 "  error 'This file can only be read with Blender 2.5' ;\n" +
-"end if\n")
+"#endif\n")
 
 	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
 
 	mhx_rig.setupRig(obj)
 
-	fp.write("if toggle&T_Armature\n")
+	fp.write("#if toggle&T_Armature\n")
 	copyFile25(obj, "shared/mhx/templates/common-armature25.mhx", rig, fp, None, [])	
 	copyFile25(obj, "shared/mhx/templates/%s-armature25.mhx" % rig, rig, fp, None, [])	
-	fp.write("end if\n")
+	fp.write("#endif\n")
 
 	fp.write("\nNoScale False ;\n\n")
 
 	proxyList = mh2proxy.proxyConfig()
 	proxyData = {}
-	fp.write("if toggle&T_Proxy\n")
-	for proxyFile in proxyList:
+	for (typ, proxyFile) in proxyList:
+		fp.write("#if toggle&T_%s\n" % typ)
 		copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyFile, proxyData)	
-	fp.write("end if\n")
+		fp.write("#endif\n")
 
-	fp.write("if toggle&T_Mesh\n")
+	fp.write("#if toggle&T_Mesh\n")
 	copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
-	fp.write("end if\n")
+	fp.write("#endif\n")
 
-	fp.write("if toggle&T_Armature\n")
+	fp.write("#if toggle&T_Armature\n")
 	copyFile25(obj, "shared/mhx/templates/%s-poses25.mhx" % rig, rig, fp, None, proxyData)	
-	fp.write("end if\n")
+	fp.write("#endif\n")
 	return
 
 		
@@ -197,9 +197,9 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 				proxy = mh2proxy.readProxyFile(obj, proxyFile)
 				proxyData[proxy.name] = proxy
 				if proxy.bones:
-					fp.write("if True\n")
+					fp.write("#if True\n")
 				else:
-					fp.write("if False\n")
+					fp.write("#if False\n")
 				fp.write("Armature %s %s   Normal \n" % (proxy.name, proxy.name))
 				mh2proxy.writeProxyArmature(fp, proxy)
 			elif words[1] == 'ProxyRigObject':
@@ -207,9 +207,33 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 			elif words[1] == 'ProxyPose':
 				mh2proxy.writeProxyPose(fp, proxy)
 			elif words[1] == 'ProxyMesh':
+				mat = proxy.material
+				if mat:
+					col = mat.diffuse_color
+					spc = mat.specular_color
+					fp.write(
+"Material %s \n" % mat.name +
+"  diffuse_color Array %.4f %.4f %.4f ;\n" % (col[0], col[1], col[2]) +
+"  diffuse_shader '%s' ;\n" % mat.diffuse_shader +
+"  diffuse_intensity %.4f ;\n" % mat.diffuse_intensity +
+"  specular_color Array %.4f %.4f %.4f ;\n" % (spc[0], spc[1], spc[2]) +
+"  specular_shader '%s' ;\n" % mat.specular_shader +
+"  specular_intensity %.4f ;\n" % mat.specular_intensity +
+"end Material\n\n")
 				fp.write("Mesh %sMesh %sMesh \n" % (proxy.name, proxy.name))
+				if mat:
+					fp.write("  Material %s ;\n" % mat.name)
+
 			elif words[1] == 'ProxyObject':
 				fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
+			elif words[1] == 'ProxyLayers':
+				fp.write("layers Array ")
+				for n in range(20):
+					if n == proxy.layer:
+						fp.write("1 ")
+					else:
+						fp.write("0 ")
+				fp.write(";\n")
 			elif words[1] == 'ProxyReferRig':
 				if proxy.bones:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
@@ -265,11 +289,11 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 				pass
 				writeShapeKeys(fp, "HumanMesh", None)
 			elif words[1] == 'proxy-shapeKey':
-				fp.write("if toggle&T_Proxy\n")
+				fp.write("#if toggle&T_Proxy\n")
 				for proxy in proxyData.values():
 					if proxy.name and not proxy.bones:
 						writeShapeKeys(fp, proxy.name, proxy)
-				fp.write("end if\n")
+				fp.write("#endif\n")
 			elif words[1] == 'mesh-animationData':
 				writeAnimationData(fp, "HumanMesh", None)
 			elif words[1] == 'proxy-animationData':
@@ -389,7 +413,7 @@ ShapeKeyScale = {
 
 }
 
-def copyShapeKeys(tmplName, fp, proxy):
+def copyShapeKeys(tmplName, fp, proxy, doScale):
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	shapes = []
@@ -411,7 +435,8 @@ def copyShapeKeys(tmplName, fp, proxy):
 				dz = float(words[4])*scale
 				fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
 			elif words[0] == 'ShapeKey':
-				scale = setShapeScale(words)
+				if doScale:
+					scale = setShapeScale(words)
 				fp.write(line)
 			else:
 				fp.write(line)
@@ -434,7 +459,8 @@ def copyShapeKeys(tmplName, fp, proxy):
 				for (pv, w) in vlist:
 					shapes.append((pv, w*dx, w*dy, w*dz))
 			elif words[0] == 'ShapeKey':
-				scale = setShapeScale(words)
+				if doScale:
+					scale = setShapeScale(words)
 				fp.write(line)
 			elif shapes:
 				printProxyShape(fp, shapes)
@@ -493,8 +519,8 @@ def printProxyShape(fp, shapes):
 def writeShapeKeys(fp, name, proxy):
 	fp.write("ShapeKeys %s\n" % name)
 	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
-	copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy)	
-	#copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy)
+	copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
+	#copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
 	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
 	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
@@ -541,32 +567,34 @@ def copyMeshFile249(obj, tmpl, fp):
 			if words[1] == 'object' and mainMesh:
 				fp.write(line)
 				skipOne = True
-				fp.write("end if\n")
+				fp.write("#endif\n")
 				mainMesh = False
 				proxyList = mh2proxy.proxyConfig()
-				fp.write("if useProxy\n")
-				for proxyFile in proxyList:
-					exportProxy24(obj, proxyFile, fp)
-				fp.write("end if\n")
+				fp.write("#if useProxy\n")
+				for (typ, proxyStuff) in proxyList:
+					if typ == 'Proxy':
+						(proxyFile, layer) = proxyStuff
+						exportProxy24(obj, proxyFile, fp)
+				fp.write("#endif\n")
 			elif words[1] == 'mesh' and mainMesh:
 				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-				copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, None)	
-				copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, None)	
-				copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, None)	
+				copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, None, False)	
+				copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, None, False)	
+				copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, None, False)	
 				writeIpo(fp)
 				fp.write(line)
 				skipOne = True
-				fp.write("end if\n")
+				fp.write("#endif\n")
 				mainMesh = False
 				inZone = False
 				skip = False
 		elif words[0] == 'mesh' and words[1] == 'HumanMesh':
 			inZone = True
 			mainMesh = True
-			fp.write("if useMesh\n")
+			fp.write("#if useMesh\n")
 		elif words[0] == 'object' and words[1] == 'HumanMesh':
 			mainMesh = True
-			fp.write("if useMesh\n")
+			fp.write("#if useMesh\n")
 		elif words[0] == 'vertgroup':
 			copyVertGroups("shared/mhx/templates/vertexgroups-common25.mhx", fp, None)	
 			copyVertGroups("shared/mhx/templates/vertexgroups-classic25.mhx", fp, None)	
@@ -629,9 +657,9 @@ def exportProxy24(obj, proxyFile, fp):
 			copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, proxy)	
 		elif words[0] == 'shapekey':
 			fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-			copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy)	
-			copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, proxy)	
-			copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy)	
+			copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, False)	
+			copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, proxy, False)	
+			copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, False)	
 			writeIpo(fp)
 		else:
 			fp.write(line)
@@ -672,7 +700,7 @@ def oldExportArmature24(obj, fp):
 	mhxbones.writeJoints(obj, fp)
 
 	fp.write(
-"\nif useArmature\n" +
+"\n#if useArmature\n" +
 "armature Human Human\n")
 	mhxbones.writeBones(obj, fp)
 	fp.write(
@@ -696,7 +724,7 @@ def oldExportArmature24(obj, fp):
 "\tlayers 1 0 ;\n" +
 "\txRay true ;\n" +
 "end object\n" +
-"end useArmature\n")
+"#endif useArmature\n")
 
 	return 
 
@@ -707,7 +735,7 @@ def newExportArmature24(obj, fp):
 	mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, classic_bones.ClassicHeadsTails)
 
 	fp.write(
-"\nif useArmature\n" +
+"\n#if useArmature\n" +
 "armature Human Human\n")
 	mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.PanelArmature, False)
 	fp.write(
@@ -731,7 +759,7 @@ def newExportArmature24(obj, fp):
 "\tlayers 1 0 ;\n" +
 "\txRay true ;\n" +
 "end object\n" +
-"end useArmature\n")
+"#endif useArmature\n")
 
 	return 
 

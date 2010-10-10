@@ -32,8 +32,9 @@ from aljabr import *
 #
 
 class CProxy:
-	def __init__(self):
+	def __init__(self, layer):
 		self.name = None
+		self.layer = layer
 		self.material = None
 		self.verts = {}
 		self.realVerts = []
@@ -46,7 +47,8 @@ class CProxy:
 		self.weighted = False
 
 class CMaterial:
-	def __init__(self):
+	def __init__(self, name):
+		self.name = name
 		self.diffuse_color = None
 		self.diffuse_intensity = None
 		self.diffuse_shader = None
@@ -61,58 +63,68 @@ class CMaterial:
 F_CON = 0x01
 
 #
-#	proxyConfig():
+#	proxyFilePtr(name):
 #
 
-def proxyConfig():
-	paths = ['~/makehuman/proxy.cfg', '/proxy.cfg', './proxy.cfg']
-	
-	fp = None
-	for path in paths:
-		path1 = os.path.expanduser(path)
+def proxyFilePtr(name):
+	for path in ['~/makehuman/', '/', './']:
+		path1 = os.path.expanduser(path+name)
 		fileName = os.path.realpath(path1)
 		try:
 			fp = open(fileName, "r")
 			print("Using config file %s" % fileName)
-			break
+			return fp
 		except:
 			print("No file %s" % fileName)
+	return None
+	
+#
+#	proxyConfig():
+#
 
+def proxyConfig():
+	fp = proxyFilePtr('proxy.cfg')
 	if not fp: return []	
 	proxyList = []
+	typ = 'Proxy'
+	layer = 2
 	for line in fp:
 		words = line.split()
 		if len(words) == 0 or words[0][0] == '#':
 			pass
+		elif words[0] == '-':
+			typ = words[1]
+			layer = int(words[2])
 		else:
 			proxyFile = os.path.expanduser(words[0])
-			proxyList.append(proxyFile)
+			proxyList.append((typ, (proxyFile, layer)))
 	fp.close()
 	print(proxyList)
 	return proxyList
 
 	
 #
-#	readProxyFile(obj, proxyFile):
+#	readProxyFile(obj, proxyStuff):
 #
 
-def readProxyFile(obj, proxyFile):
-	if not proxyFile:
-		return CProxy()
+def readProxyFile(obj, proxyStuff):
+	if not proxyStuff:
+		return CProxy(2)
 
 	#tmplName = "./data/templates/%s.proxy" % proxyFile
+	(proxyFile, layer) = proxyStuff
 	try:
 		tmpl = open(proxyFile, "rU")
 	except:
 		tmpl = None
 	if tmpl == None:
 		print("Cannot open proxy file %s" % proxyFile)
-		return CProxy()
+		return CProxy(layer)
 
 	verts = obj.verts
 	locations = {}
 	tails = {}
-	proxy = CProxy()
+	proxy = CProxy(layer)
 	proxy.name = "MyProxy"
 
 	vn = 0
@@ -129,7 +141,9 @@ def readProxyFile(obj, proxyFile):
 			doBones = False
 			weightBone = None
 			theGroup = None
-			if words[1] == 'verts':
+			if len(words) == 1:
+				pass
+			elif words[1] == 'verts':
 				doVerts = True
 			elif words[1] == 'faces':
 				doFaces = True
@@ -142,7 +156,7 @@ def readProxyFile(obj, proxyFile):
 				proxy.weighted = True
 			elif words[1] == 'material':
 				doMaterial = True
-				proxy.material = CMaterial()
+				proxy.material = CMaterial(words[2])
 			elif words[1] == 'texVerts':
 				doTexVerts = True
 			elif words[1] == 'obj_data':
@@ -164,11 +178,21 @@ def readProxyFile(obj, proxyFile):
 			w1 = float(words[4])
 			w2 = float(words[5])
 			try:
-				d0 = float(words[6])
-				d1 = float(words[7])
-				d2 = float(words[8])
+				proj = float(words[6])
 			except:
-				(d0,d1,d2) = (0,0,0)
+				proj = 0
+
+			if proj:
+				n0 = aljabr.vmul(verts[v0].no, w0)
+				n1 = aljabr.vmul(verts[v1].no, w1)
+				n2 = aljabr.vmul(verts[v2].no, w2)
+				norm = aljabr.vadd(n0, n1)
+				norm = aljabr.vadd(norm, n2)
+				d0 = proj*norm[0]
+				d1 = proj*norm[1]
+				d2 = proj*norm[2]
+			else:
+				(d0, d1, d2) = (0, 0, 0)
 
 			proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2, d0, d1, d2))
 			addProxyVert(v0, vn, w0, proxy)
@@ -467,11 +491,12 @@ def fixProxyShape(shape):
 
 def exportProxyObj(obj, name):
 	proxyList = proxyConfig()
-	for proxyFile in proxyList:
-		proxy = readProxyFile(obj, proxyFile)
-		if proxy.name:
-			filename = "%s-%s.obj" % (name, proxy.name)
-			exportProxyObj1(obj, filename, proxy)
+	for (typ, proxyStuff) in proxyList:
+		if typ == 'Proxy':
+			proxy = readProxyFile(obj, proxyStuff)
+			if proxy.name:
+				filename = "%s-%s.obj" % (name, proxy.name)
+				exportProxyObj1(obj, filename, proxy)
 	return
 
 def exportProxyObj1(obj, filename, proxy):

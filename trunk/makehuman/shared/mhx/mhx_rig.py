@@ -507,7 +507,10 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 "    hide %s ; \n" % hide)
 	
 	if flags & P_STRETCH:
-		fp.write("    ik_stretch 0.1 ; \n")
+		fp.write(
+"#if toggle&T_STRETCH\n" +
+"    ik_stretch 0.1 ; \n" +
+"#endif\n")
 	else:
 		fp.write("    ik_stretch 0 ; \n")
 

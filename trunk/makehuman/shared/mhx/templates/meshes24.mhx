@@ -182,7 +182,7 @@ end object
 
 # ----------------------------- Mesh --------------------- # 
 
-mesh Human Human 
+mesh HumanMesh HumanMesh 
   material SSS_skinshader ;
   material Invisio ;
   v 0.318170 7.556727 1.005098 ;
@@ -5334,6 +5334,7 @@ mesh Human Human
   ft 5140 0 1 0 0 1 ;
   ft 5141 0 1 0 0 1 ;
   ft 5142 0 1 0 0 1 ;
+
   ft 5143 0 1 0 0 1 ;
   ft 5144 0 1 0 0 1 ;
   ft 5145 0 1 0 0 1 ;
@@ -14507,7 +14508,7 @@ mesh Human Human
   ft 14313 0 1 0 0 1 ;
   vertgroup ;
 end mesh
-object Human Mesh Human 
+object HumanMesh Mesh HumanMesh 
   layers 1 0 ;
   matrix 
     row 1.000000 0.000000 0.000000 0.000000 ;
@@ -14515,10 +14516,10 @@ object Human Mesh Human
     row 0.000000 0.000000 1.000000 0.000000 ;
     row 0.000000 0.000000 0.000000 1.000000 ;
   end matrix
-  parent HumanRig 0 None ;
+  parent Human 0 None ;
   modifier ARMATURE
     RENDER     hex 1 ;
-    OBJECT     obj HumanRig ;
+    OBJECT     obj Human ;
     ENVELOPES     hex 1 ;
     EDITMODE     hex 1 ;
     REALTIME     hex 1 ;

@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.19
+Version 0.20
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.19',
+	'version': '0.20',
 	'blender': (2, 5, 4),
     "api": 31913,
 	"location": "File > Import",
@@ -39,7 +39,7 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 19
+MINOR_VERSION = 20
 BLENDER_VERSION = (2, 54, 0)
 
 #
@@ -83,7 +83,7 @@ todo = []
 #
 
 T_EnforceVersion = 0x01
-#T_PoleTar = 0x02
+T_Clothes = 0x02
 T_Stretch = 0x04
 T_Bend = 0x08
 
@@ -95,14 +95,14 @@ T_Shape = 0x80
 T_Mesh = 0x100
 T_Armature = 0x200
 T_Proxy = 0x400
-#T_Panel = 0x800
+T_Cage = 0x800
 
 T_Rigify = 0x1000
 T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape 
+toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape + T_Proxy + T_Cage + T_Clothes
 
 #
 #	setFlagsAndFloats(rigFlags):
@@ -241,7 +241,7 @@ def checkBlenderVersion():
 #
 
 def readMhxFile(filePath, scale):
-	global todo, nErrors, theScale, defaultScale, One
+	global todo, nErrors, theScale, defaultScale, One, toggle
 
 	checkBlenderVersion()	
 	
@@ -263,6 +263,8 @@ def readMhxFile(filePath, scale):
 	key = "toplevel"
 	level = 0
 	nErrors = 0
+	comment = 0
+	nesting = 0
 
 	setFlagsAndFloats()
 
@@ -275,7 +277,32 @@ def readMhxFile(filePath, scale):
 		lineNo += 1
 		if len(lineSplit) == 0:
 			pass
-		elif lineSplit[0] == '#':
+		elif lineSplit[0][0] == '#':
+			if lineSplit[0] == '#if':
+				if comment == nesting:
+					print('eval', line, toggle, nesting, comment)
+					try:
+						res = eval(lineSplit[1])
+					except:
+						res = False
+					print('res', res)
+					if res:
+						comment += 1
+				nesting += 1
+				print(line, nesting, comment)
+			elif lineSplit[0] == '#else':
+				if comment == nesting-1:
+					comment += 1
+				elif comment == nesting:
+					comment -= 1
+				print(line, nesting, comment)
+			elif lineSplit[0] == '#endif':
+				if comment == nesting:
+					comment -= 1
+				nesting -= 1
+				print(line, nesting, comment)
+		elif comment < nesting:
+			#print(line)
 			pass
 		elif lineSplit[0] == 'end':
 			try:
@@ -383,31 +410,9 @@ def parse(tokens):
 		data = None
 		if key == 'MHX':
 			checkMhxVersion(int(val[0]), int(val[1]))
-
 		elif key == 'MHX249':
 			MHX249 = eval(val[0])
 			print("Blender 2.49 compatibility mode is %s\n" % MHX249)
-
-		elif key == 'if':
-			try:
-				ifResult = eval(val[0])
-			except:
-				ifResult = False
-			if ifResult:
-				parse(sub)
-				
-		elif key == 'elif':
-			if not ifResult:
-				try:
-					ifResult = eval(val[0])
-				except:
-					ifResult = False
-				if ifResult:
-					parse(sub)
-		
-		elif key == 'else':
-			if not ifResult:
-				parse(sub)
 		elif MHX249:
 			pass
 		elif key == 'print':
@@ -1693,6 +1698,7 @@ def parseConstraint(constraints, args, tokens):
 	return cns
 
 #
+
 #	parseCurve (args, tokens):
 #	parseSpline(cu, args, tokens):
 #	parseBezier(spline, n, args, tokens):
@@ -2368,7 +2374,7 @@ def clearScene():
 def hideLayers():
 	scn = bpy.context.scene
 	for n in range(len(scn.layers)):
-		if n < 3:
+		if n < 8:
 			scn.layers[n] = True
 		else:
 			scn.layers[n] = False
@@ -2397,7 +2403,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)
 	armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
 	replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
-	#poletar = BoolProperty(name="Pole targets", description="Pole targets for IK", default=toggle&T_PoleTar)
+	cage = BoolProperty(name="Cage", description="Load mesh deform cage", default=toggle&T_Cage)
+	clothes = BoolProperty(name="Clothes", description="Include clothes", default=toggle&T_Clothes)
 	stretch = BoolProperty(name="Stretchy limbs", description="Stretchy limbs", default=toggle&T_Stretch)
 	face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
 	shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
@@ -2412,15 +2419,16 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Proxy = T_Proxy if self.properties.proxy else 0
 		O_Armature = T_Armature if self.properties.armature else 0
 		O_Replace = T_Replace if self.properties.replace else 0
-		#O_PoleTar = T_PoleTar if self.properties.poletar else 0
+		O_Cage = T_Cage if self.properties.cage else 0
+		O_Clothes = T_Clothes if self.properties.clothes else 0
 		O_Stretch = T_Stretch if self.properties.stretch else 0
 		O_Face = T_Face if self.properties.face else 0
 		O_Shape = T_Shape if self.properties.shape else 0
 		O_Symm = T_Symm if self.properties.symm else 0
 		O_Diamond = T_Diamond if self.properties.diamond else 0
 		O_Bend = T_Bend if self.properties.bend else 0
-		toggle = ( O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | 
-				O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | T_MHX )
+		toggle = ( O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | O_Cage | 
+				O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | O_Clothes | T_MHX )
 
 		print("Load", self.properties.filepath)
 		readMhxFile(self.properties.filepath, self.properties.scale)
@@ -2429,78 +2437,6 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	def invoke(self, context, event):
 		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}
-
-'''
-MhxBoolProps = [
-	('MhxVisibleFloor', 'Floor visible', 'Floor visible', 'object.MhxVisibleFloorButton'),
-	('MhxVisibleHips', 'Hips visible', 'Hips visible', 'object.MhxVisibleHipsButton'),
-	('MhxVisibleNeck', 'Neck visible', 'Neck visible', 'object.MhxVisibleNeckButton'),
-]
-MhxFloatProps = [
-	('MhxIkArmLeft', 'FK/IK left arm', 'Influence for left arm IK chain', 'object.MhxIkArmLeftButton'),
-	('MhxIkArmRight', 'FK/IK right arm', 'Influence for right arm IK chain', 'object.MhxIkArmRightButton'),
-	('MhxIkLegLeft', 'FK/IK left leg', 'Influence for left leg IK chain', 'object.MhxIkLegLeftButton'),
-	('MhxIkLegRight', 'FK/IK right leg', 'Influence for right leg IK chain', 'object.MhxIkLegRightButton'),
-
-	('MhxChildOfFloor', 'Child of floor', 'Influence for ChildOf to MasterFloor constraint', 'object.MhxChildOfFloorButton'),
-	('MhxChildOfHips', 'Child of hips', 'Influence for ChildOf to MasterHips constraint', 'object.MhxChildOfHipsButton'),
-	('MhxChildOfNeck', 'Child of neck', 'Influence for ChildOf to MasterNeck constraint', 'object.MhxChildOfNeckButton'),
-]
-
-def initFKIKPanel():
-	bpy.types.Object.MhxAutoKey = BoolProperty(name="MhxAutoKey", description="Auto key")
-	for (prop, name, desc, op) in MhxFloatProps:
-		expr = 'bpy.types.Object.%s = FloatProperty(name="%s", description="%s", min=0.0, max=1.0)' % (prop, name, desc)
-		exec(expr)
-	for (prop, name, desc, op) in MhxBoolProps:
-		expr = 'bpy.types.Object.%s = BoolProperty(name="%s", description="%s")' % (prop, name, desc)
-		exec(expr)
-	for (prop, name, desc, op) in MhxFloatProps+MhxBoolProps:
-		expr = (
-"class OBJECT_OT_%sButton(bpy.types.Operator):\n" % prop +
-"	bl_idname = 'OBJECT_OT_%sButton'\n" %  prop +
-"	bl_label = 'Set'\n" +
-"\n" +
-"	def execute(self, context):\n" +
-"		import bpy\n" +
-"		setInfluence(context, '%s', '%s')\n" % (prop, name) +
-"		return{'FINISHED'}\n"
-		)
-		print(expr)
-		exec(expr)
-
-	return
-
-def setInfluence(context, prop, name):
-	print("Inf", prop, name)
-	return
-
-initFKIKPanel()
-
-class MakeHumanFKIKPanel(bpy.types.Panel):
-	bl_label = "MakeHuman FK/IK"
-	bl_space_type = "VIEW_3D"
-	bl_region_type = "UI"
-	
-	@classmethod
-	def poll(cls, context):
-		if context.object and context.object.type == 'ARMATURE':
-			try:
-				return context.object['MhxRig']
-			except:
-				pass
-		return False
-
-	def draw(self, context):
-		layout = self.layout
-		ob = context.object
-		layout.prop(ob, 'MhxAutoKey')
-		for (prop,name,desc,op) in MhxFloatProps + MhxBoolProps:
-			row = layout.row()
-			row.prop(ob, prop)
-			row.operator(op)
-		return
-'''
 
 def menu_func(self, context):
     self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")

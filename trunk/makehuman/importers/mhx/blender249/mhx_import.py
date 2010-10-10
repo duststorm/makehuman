@@ -8,7 +8,7 @@ Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.7'
+__version__= '0.20'
 __bpydoc__= '''\
 MHX exporter for Blender
 '''
@@ -51,7 +51,7 @@ TexDir = os.path.expanduser("~/makehuman/exports")
 #
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 7
+MINOR_VERSION = 20
 
 #
 #	Button flags
@@ -110,7 +110,7 @@ todo = []
 #
 
 def readMhxFile(fileName):
-	global todo, nErrors
+	global todo, nErrors, Blender25, Blender24
 	
 	scn = Scene.GetCurrent()
 	scn = clearScene(scn)
@@ -121,6 +121,8 @@ def readMhxFile(fileName):
 	key = "toplevel"
 	level = 0
 	nErrors = 0
+	comment = 0
+	nesting = 0
 
 	print "Opening MHX file "+ fileName
 	file= open(fileName, "rU")
@@ -131,7 +133,32 @@ def readMhxFile(fileName):
 		lineNo += 1
 		if len(lineSplit) == 0:
 			pass
-		elif lineSplit[0] == '#':
+		elif lineSplit[0][0] == '#':
+			if lineSplit[0] == '#if':
+				if comment == nesting:
+					print('eval', line, nesting, comment)
+					try:
+						res = eval(lineSplit[1])
+					except:
+						res = False
+					print('res', res)
+					if res:
+						comment += 1
+				nesting += 1
+				print(line, nesting, comment)
+			elif lineSplit[0] == '#else':
+				if comment == nesting-1:
+					comment += 1
+				elif comment == nesting:
+					comment -= 1
+				print(line, nesting, comment)
+			elif lineSplit[0] == '#endif':
+				if comment == nesting:
+					comment -= 1
+				nesting -= 1
+				print(line, nesting, comment)
+		elif comment < nesting:
+			#print(line)
 			pass
 		elif lineSplit[0] == 'end':
 			try:
@@ -266,13 +293,13 @@ def parse(scn, tokens):
 			if (int(val[0]) != MAJOR_VERSION or int(val[1]) != MINOR_VERSION):
 				Draw.PupMenu("Warning: \nThis file was created with another version of MHX\n")
 			data = None
-		elif key == 'if':
-			try:
-				res = eval(val[0])
-			except:
-				res = False
-			if res:
-				parse(val, sub)
+		#elif key == 'if':
+		#	try:
+		#		res = eval(val[0])
+		#	except:
+		#		res = False
+		#	if res:
+		#		parse(val, sub)
 		elif key == 'print':
 			msg = concatList(val)
 			print(msg)
@@ -712,7 +739,7 @@ def parseMesh (args, tokens):
 
 	name = args[0]
 	me = bpy.data.meshes.new(name)
-	if name == 'Human':
+	if name == 'HumanMesh':
 		mainMesh = True
 	else:
 		mainMesh = False

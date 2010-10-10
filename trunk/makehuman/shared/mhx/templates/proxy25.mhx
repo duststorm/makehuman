@@ -33,7 +33,7 @@ end Object
 
 *** ProxyPose
 
-end if
+#endif
 
 
 *** ProxyMesh
@@ -42,6 +42,7 @@ end if
   end Verts
   Faces
   *** ProxyFaces
+    ftall 0 1 ;
   end Faces
   MeshTextureFaceLayer UVTex
     Data 
@@ -52,7 +53,7 @@ end if
 end Mesh
 
 *** ProxyObject
-  layers Array 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+*** ProxyLayers
     Modifier Armature ARMATURE
       *** ProxyReferRig
       use_bone_envelopes False ;

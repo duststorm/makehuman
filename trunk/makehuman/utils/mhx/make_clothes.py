@@ -146,7 +146,7 @@ def findClothes(context, bob, pob, log):
 	print("Finding best weights")
 	bestFaces = []
 	for (pv, mverts, fcs) in bestVerts:
-		print(pv.index)
+		#print(pv.index)
 		minmax = -1e6
 		for (fverts, wts) in fcs:
 			w = minWeight(wts)
@@ -165,13 +165,9 @@ def findClothes(context, bob, pob, log):
 
 		est = bWts[0]*vec0 + bWts[1]*vec1 + bWts[2]*vec2
 		diff = pv.co - est
-		'''
-		e01 = vec1 - vec0
-		e02 = vec2 - vec0
-		normal = e01.cross(e02)
-		proj = diff.dot(normal)/(normal.length * normal.length)
-		'''
-		bestFaces.append((pv, bVerts, bWts, diff))	
+		no = pv.normal
+		proj = diff.dot(pv.normal)
+		bestFaces.append((pv, bVerts, bWts, proj))	
 				
 	print("Done")
 	return bestFaces
@@ -263,6 +259,22 @@ def highlight(pv, ob):
 	return
 	
 #
+#	proxyFilePtr(name):
+#
+
+def proxyFilePtr(name):
+	for path in ['~/makehuman/', '/']:
+		path1 = os.path.expanduser(path+name)
+		fileName = os.path.realpath(path1)
+		try:
+			fp = open(fileName, "r")
+			print("Using header file %s" % fileName)
+			return fp
+		except:
+			print("No file %s" % fileName)
+	return None
+
+#
 #	printClothes(path, pob, data):	
 #
 		
@@ -270,8 +282,17 @@ def printClothes(path, pob, data):
 	file = os.path.expanduser(path)
 	fp= open(file, "w")
 
+	infp = proxyFilePtr('proxy_header.txt')
+	if infp:
+		for line in infp:
+			fp.write('# '+line)
+	else:
+		fp.write(
+"# author Unknown\n" +
+"# license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)\n" +
+"# homepage http://www.makehuman.org/\n")
+
 	fp.write("# name %s\n" % pob.name)
-	fp.write("# author Unknown\n")
 	me = pob.data
 
 	if me.materials:
@@ -285,10 +306,10 @@ def printClothes(path, pob, data):
 		fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
 
 	fp.write("# verts\n")
-	for (pv, verts, wts, diff) in data:
+	for (pv, verts, wts, proj) in data:
 		#print(pv.index,verts,wts)
-		fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
-			verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[1], diff[2]))
+		fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
+			verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
 
 	fp.write("# obj_data\n")
 	if me.uv_textures:
@@ -408,4 +429,5 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
 		import bpy, mathutils
 		makeClothes(context)
 		return{'FINISHED'}	
+
 
