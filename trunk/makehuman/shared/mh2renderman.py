@@ -272,7 +272,7 @@ class RMNObject:
 
         ribObjFile.write('''["interpolateboundary"] [0 0] [] []"P" [''')
         for vert in self.meshData.verts:
-            ribObjFile.write('%f %f %f ' % (vert.co[0], vert.co[1], -vert.co[2]))
+            ribObjFile.write('%f %f %f ' % (vert.co[0], vert.co[1], vert.co[2]))
         ribObjFile.write('] ')
 
         ribObjFile.write('\n"st" [')
@@ -283,14 +283,14 @@ class RMNObject:
                 ribObjFile.write('%s %s ' % (uvValue[0], 1 - uvValue[1]))
         ribObjFile.write(']')
 
-        if self.vertsColorSSS:
-            ribObjFile.write('\n"Cs" [')
-            for faceIdx in self.facesIndices:
-                for idx in faceIdx:
-                    color = self.vertsColorSSS[idx[0]]
-                    ribObjFile.write('%s %s %s \n' % (color, color, color))
-            ribObjFile.write(']')
-            ribObjFile.write('\n')
+        #if self.vertsColorSSS:
+            #ribObjFile.write('\n"Cs" [')
+            #for faceIdx in self.facesIndices:
+                #for idx in faceIdx:
+                    #color = self.vertsColorSSS[idx[0]]
+                    #ribObjFile.write('%s %s %s \n' % (color, color, color))
+            #ribObjFile.write(']')
+            #ribObjFile.write('\n')
         ribObjFile.close()
 
 
@@ -549,11 +549,12 @@ class RMRScene:
 
             subObj.writeRibCode(ribPath)
             #subObj.material.writeRibCode(ribfile)
-
+            ribfile.write('\t\tRotate 180.000000 0 1 0')
             ribfile.write('\t\tSurface "testShader"')
+            ribfile.write('\tSphere 2 -2 2 360\n')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
-        ribfile.write('\tSphere 2 -2 2 360\n')
+        
         ribfile.write('\tAttributeBegin\n')
         
         self.humanCharacter.hairMat.writeRibCode(ribfile)
