@@ -553,7 +553,7 @@ class RMRScene:
             ribfile.write('\t\tSurface "testShader"')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
-
+        ribfile.write('\tSphere 2 -2 2 360\n')
         ribfile.write('\tAttributeBegin\n')
         
         self.humanCharacter.hairMat.writeRibCode(ribfile)
