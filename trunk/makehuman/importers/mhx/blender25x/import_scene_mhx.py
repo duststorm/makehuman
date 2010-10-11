@@ -102,7 +102,7 @@ T_Preset = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
-toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape + T_Proxy + T_Cage + T_Clothes
+toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape + T_Proxy + T_Clothes
 
 #
 #	setFlagsAndFloats(rigFlags):

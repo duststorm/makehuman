@@ -123,10 +123,11 @@ def exportMhx_25(obj, rig, fp):
 
 	proxyList = mh2proxy.proxyConfig()
 	proxyData = {}
-	for (typ, proxyFile) in proxyList:
-		fp.write("#if toggle&T_%s\n" % typ)
-		copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyFile, proxyData)	
-		fp.write("#endif\n")
+	for (typ, useObj, useMhx, proxyFile) in proxyList:
+		if useMhx:
+			fp.write("#if toggle&T_%s\n" % typ)
+			copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyFile, proxyData)	
+			fp.write("#endif\n")
 
 	fp.write("#if toggle&T_Mesh\n")
 	copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
@@ -226,6 +227,8 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 
 			elif words[1] == 'ProxyObject':
 				fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
+				if proxy.wire:
+					fp.write("  draw_type 'WIRE' ;\n")
 			elif words[1] == 'ProxyLayers':
 				fp.write("layers Array ")
 				for n in range(20):
@@ -234,6 +237,11 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 					else:
 						fp.write("0 ")
 				fp.write(";\n")
+				if proxy.cage:
+					fp.write("  #if False\n")
+				else:
+					fp.write("  #if toggle&T_Cage\n")
+
 			elif words[1] == 'ProxyReferRig':
 				if proxy.bones:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
@@ -285,6 +293,10 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 				else:
 					copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)	
 					copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)	
+					if not (proxy and proxy.cage):
+						fp.write("#if toggle&T_Cage\n")
+						copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)	
+						fp.write("#endif\n")
 			elif words[1] == 'mesh-shapeKey':
 				pass
 				writeShapeKeys(fp, "HumanMesh", None)
@@ -571,10 +583,9 @@ def copyMeshFile249(obj, tmpl, fp):
 				mainMesh = False
 				proxyList = mh2proxy.proxyConfig()
 				fp.write("#if useProxy\n")
-				for (typ, proxyStuff) in proxyList:
-					if typ == 'Proxy':
-						(proxyFile, layer) = proxyStuff
-						exportProxy24(obj, proxyFile, fp)
+				for (typ, useObj, useMhx, proxyStuff) in proxyList:
+					if useObj:
+						exportProxy24(obj, proxyStuff, fp)
 				fp.write("#endif\n")
 			elif words[1] == 'mesh' and mainMesh:
 				fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
@@ -615,11 +626,11 @@ def copyMeshFile249(obj, tmpl, fp):
 	return
 
 #
-#	exportProxy24(obj, proxyFile, fp):
+#	exportProxy24(obj, proxyStuff, fp):
 #
 
-def exportProxy24(obj, proxyFile, fp):
-	proxy = mh2proxy.readProxyFile(obj, proxyFile)
+def exportProxy24(obj, proxyStuff, fp):
+	proxy = mh2proxy.readProxyFile(obj, proxyStuff)
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
 	tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
 	for line in tmpl:

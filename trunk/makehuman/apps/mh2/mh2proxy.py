@@ -45,6 +45,8 @@ class CProxy:
 		self.bones = []
 		self.weights = {}
 		self.weighted = False
+		self.wire = False
+		self.cage = False
 
 class CMaterial:
 	def __init__(self, name):
@@ -88,16 +90,23 @@ def proxyConfig():
 	proxyList = []
 	typ = 'Proxy'
 	layer = 2
+	useMhx = True
+	useObj = True
 	for line in fp:
 		words = line.split()
 		if len(words) == 0 or words[0][0] == '#':
 			pass
-		elif words[0] == '-':
-			typ = words[1]
-			layer = int(words[2])
+		elif words[0] == '@':
+			if words[1] == 'Obj':
+				useObj = eval(words[2])
+			elif words[1] == 'Mhx':
+				useMhx = eval(words[2])
+			else:
+				typ = words[1]
+				layer = int(words[2])
 		else:
 			proxyFile = os.path.expanduser(words[0])
-			proxyList.append((typ, (proxyFile, layer)))
+			proxyList.append((typ, useObj, useMhx, (proxyFile, layer)))
 	fp.close()
 	print(proxyList)
 	return proxyList
@@ -111,7 +120,6 @@ def readProxyFile(obj, proxyStuff):
 	if not proxyStuff:
 		return CProxy(2)
 
-	#tmplName = "./data/templates/%s.proxy" % proxyFile
 	(proxyFile, layer) = proxyStuff
 	try:
 		tmpl = open(proxyFile, "rU")
@@ -163,6 +171,10 @@ def readProxyFile(obj, proxyStuff):
 				doObjData = True
 			elif words[1] == 'name':
 				proxy.name = words[2]
+			elif words[1] == 'wire':
+				proxy.wire = True
+			elif words[1] == 'cage':
+				proxy.cage = True
 		elif doObjData:
 			if words[0] == 'vt':
 				newTexVert(1, words, proxy)
@@ -491,11 +503,11 @@ def fixProxyShape(shape):
 
 def exportProxyObj(obj, name):
 	proxyList = proxyConfig()
-	for (typ, proxyStuff) in proxyList:
-		if typ == 'Proxy':
+	for (typ, useObj, useMhx, proxyStuff) in proxyList:
+		if useObj:
 			proxy = readProxyFile(obj, proxyStuff)
 			if proxy.name:
-				filename = "%s-%s.obj" % (name, proxy.name)
+				filename = "%s_%s.obj" % (name.lower(), proxy.name)
 				exportProxyObj1(obj, filename, proxy)
 	return
 
