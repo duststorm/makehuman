@@ -21,7 +21,7 @@ class AqsisTaskView(gui3d.TaskView):
         #Create aqsis shaders
         subprocess.Popen('aqsl data/shaders/aqsis/skin.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'skin.slx'), shell=True)
         subprocess.Popen('aqsl data/shaders/aqsis/hair.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'hair.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/testShader.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'testShader.slx'), shell=True)
+        subprocess.Popen('aqsl data/shaders/aqsis/envlight.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'envlight.slx'), shell=True)
 
         #Buttons
         self.renderButton = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images', 'button_rendering_start.png'),
