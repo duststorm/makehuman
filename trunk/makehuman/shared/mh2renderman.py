@@ -570,11 +570,13 @@ class RMRScene:
         """
 
         """
+        self.humanCharacter.subObjectsInit()
         if len(self.humanCharacter.subObjects) < 1:
             print "Warning: AO calculation on 0 objects" 
         ribfile = file(fName, 'w')
         for subObj in self.humanCharacter.subObjects:
             ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
+            subObj.writeRibCode(ribPath)
             ribfile.write('\tAttributeBegin\n')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
