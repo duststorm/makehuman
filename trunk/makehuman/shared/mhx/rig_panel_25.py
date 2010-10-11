@@ -175,22 +175,22 @@ def PanelWritePoses(fp):
 	addCSlider(fp, 'PTongue', MX)
 	addCSlider(fp, 'PJaw', MX)
 
-	addXSlider(fp, 'PArmIK_L', 0.0, 1.0)
-	addXSlider(fp, 'PArmIK_R', 0.0, 1.0)
-	addXSlider(fp, 'PLegIK_L', 0.0, 1.0)
-	addXSlider(fp, 'PLegIK_R', 0.0, 1.0)
+	addXSlider(fp, 'PArmIK_L', 0.0, 1.0, 1.0)
+	addXSlider(fp, 'PArmIK_R', 0.0, 1.0, 1.0)
+	addXSlider(fp, 'PLegIK_L', 0.0, 1.0, 1.0)
+	addXSlider(fp, 'PLegIK_R', 0.0, 1.0, 1.0)
 
-	addXSlider(fp, 'PFinger-1_L', 0.0, FMX)
-	addXSlider(fp, 'PFinger-2_L', 0.0, FMX)
-	addXSlider(fp, 'PFinger-3_L', 0.0, FMX)
-	addXSlider(fp, 'PFinger-4_L', 0.0, FMX)
-	addXSlider(fp, 'PFinger-5_L', 0.0, FMX)
+	addXSlider(fp, 'PFinger-1_L', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-2_L', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-3_L', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-4_L', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-5_L', 0.0, FMX, FMX)
 
-	addXSlider(fp, 'PFinger-1_R', 0.0, FMX)
-	addXSlider(fp, 'PFinger-2_R', 0.0, FMX)
-	addXSlider(fp, 'PFinger-3_R', 0.0, FMX)
-	addXSlider(fp, 'PFinger-4_R', 0.0, FMX)
-	addXSlider(fp, 'PFinger-5_R', 0.0, FMX)
+	addXSlider(fp, 'PFinger-1_R', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-2_R', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-3_R', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-4_R', 0.0, FMX, FMX)
+	addXSlider(fp, 'PFinger-5_R', 0.0, FMX, FMX)
 	return
 
 #

@@ -393,17 +393,24 @@ def addCSlider(fp, bone, mx):
 	addPoseBone(fp, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 	
-def addXSlider(fp, bone, mn, mx):
-	addPoseBone(fp, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+def addXSlider(fp, bone, mn, mx, dflt):
+	addPoseBone(fp, bone, 'MHSolid025', None, ((0,1,1), (dflt,0,0)), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 
 #
-#	addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
+#	addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik_dof, flags, constraints):
 #
 
-def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints):
+def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik_dof, flags, constraints):
 	global BoneGroups, Mhx25
 
+	try:
+		(lockLoc, location) = locArg
+	except:
+		lockLoc = locArg
+		location = (0,0,0)		
+	
+	(locX, locY, locZ) = location
 	(lockLocX, lockLocY, lockLocZ) = lockLoc
 	(lockRotX, lockRotY, lockRotZ) = lockRot
 	(lockScaleX, lockScaleY, lockScaleZ) = lockScale
@@ -515,7 +522,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, i
 		fp.write("    ik_stretch 0 ; \n")
 
 	fp.write(
-"    location (0,0,0) ; \n"+
+"    location Array %.3f %.3f %.3f ; \n" % (locX, locY, locZ) +
 "    lock_location Array %d %d %d ;\n"  % (lockLocX, lockLocY, lockLocZ)+
 "    lock_rotation Array %d %d %d ;\n"  % (lockRotX, lockRotY, lockRotZ)+
 "    lock_rotation_w %s ; \n" % lkRotW +
