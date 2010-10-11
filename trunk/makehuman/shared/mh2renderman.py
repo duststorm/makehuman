@@ -463,16 +463,15 @@ class RMRScene:
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
 
         #Ambient Occlusion paths
-        self.ambientOcclusionWorldFileName = os.path.join(self.ribsPath,"world.rib" )
-        self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib" )
-        self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" )
+        self.ambientOcclusionWorldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
+        self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
+        self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')       
 
         #Ambient Occlusion
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
         self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "envlight")
         self.light3.AOmap = self.ambientOcclusionData
-        self.lights.append(self.light3)       
-       
+        self.lights.append(self.light3)        
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
@@ -542,7 +541,7 @@ class RMRScene:
         ribfile.write('WorldBegin\n')        
         
         for l in self.lights:
-            l.writeRibCode(ribfile, l.counter)
+            l.writeRibCode(ribfile, l.counter)        
         for subObj in self.humanCharacter.subObjects:
 
             print "rendering....", subObj.name
@@ -571,6 +570,8 @@ class RMRScene:
         """
 
         """
+        if len(self.humanCharacter.subObjects) < 1:
+            print "Warning: AO calculation on 0 objects" 
         ribfile = file(fName, 'w')
         for subObj in self.humanCharacter.subObjects:
             ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
