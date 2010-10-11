@@ -66,7 +66,12 @@ class RMRMaterial:
             if p.type == "color":
                 file.write('"%s %s" [%f %f %f] '%(p.type, p.name, p.val[0],  p.val[1],  p.val[2]))
         file.write('\n')
-
+        
+    def setParameter(self, name, val):
+        for p in self.parameters:
+            if p.name == name:
+                p.val = val
+            
 
 class RMRLight:
 
@@ -186,69 +191,6 @@ class RMNObject:
                 self.groupsDict[currentGroup]=indices #add latest group
 
 
-
-    #def clamp(self, min, max, val):
-        #"""
-        #This function clips a value so that it is no less and no greater than the
-        #minimum and maximum values specified.  This only works within the decimal
-        #accuracy limits of the comparison operation, so the returned value could be
-        #very slightly smaller or greater than the min and max values specified.
-
-        #Parameters
-        #----------
-
-        #min:
-            #*decimal*. The minimum permitted value.
-
-        #max:
-            #*decimal*. The maximum permitted value.
-
-        #val:
-            #*decimal*. The value to be clipped.
-        #"""
-
-        #if val > max:
-            #val = max
-        #if val < min:
-            #val = min
-        #return val
-
-
-
-    #def calcSSSvertcolor(self, lights, refl = 0.006, sssSteps = 2):
-        #"""
-        #...
-
-        #"""
-        #print "Calculating SSS..."
-        #vertsColor = []
-        #for v in self.meshData.verts:
-            #color = 0
-            #for l in lights:
-                #lightRay = aljabr.vsub(l.position, v.co)
-                #lightRay = aljabr.vnorm(lightRay)
-                #color += self.clamp(0, 1, aljabr.vdot(lightRay, v.no) * l.intensity * refl)
-            #vertsColor.append(color)
-        #sssIterations = [vertsColor]
-        #for n in xrange(sssSteps):
-            #colorsToScatter = sssIterations[-1]
-            #sssColors = []
-            #for v in self.meshData.verts:
-                #sharedColors = []
-                #scattering = 0
-                #for v2 in v.vertsShared():
-                    #sharedColors.append(colorsToScatter[v2.idx])
-                    #sharedColors.sort()
-                #if colorsToScatter[v.idx] < sharedColors[-1]:
-                    #scattering = (colorsToScatter[v.idx] + sharedColors[-1])/2
-                #else:
-                    #scattering = vertsColor[v.idx]
-                #sssColors.append(scattering)
-            #sssIterations.append(sssColors)
-        #self.vertsColorSSS = sssIterations[-1]
-        #print "vertsColors = ", len(self.vertsColorSSS)
-
-
     def writeRibCode(self, ribPath ):
 
 
@@ -283,15 +225,6 @@ class RMNObject:
                 uvValue = facesUVvalues[uvIdx]
                 ribObjFile.write('%s %s ' % (uvValue[0], 1 - uvValue[1]))
         ribObjFile.write(']')
-
-        #if self.vertsColorSSS:
-            #ribObjFile.write('\n"Cs" [')
-            #for faceIdx in self.facesIndices:
-                #for idx in faceIdx:
-                    #color = self.vertsColorSSS[idx[0]]
-                    #ribObjFile.write('%s %s %s \n' % (color, color, color))
-            #ribObjFile.write(']')
-            #ribObjFile.write('\n')
         ribObjFile.close()
 
 
@@ -449,7 +382,6 @@ class RMRScene:
 
         #Human in the scene
         self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"))
-        #self.humanCharacter.calcSSSvertcolor(self.lights)
         
         self.hairsClass = MHscene.selectedHuman.hairs
 
@@ -504,7 +436,14 @@ class RMRScene:
         self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
         self.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
         self.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
+        
+        self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.25))
+        
+        
         self.humanCharacter.subObjectsInit()
+        
+        
+        
 
         pos = self.humanCharacter.getObjPosition()
         imgFile = str(time.time())+".tif"
@@ -601,8 +540,6 @@ class RMRScene:
         f.close()
 
     def renderAOdata(self):
-
-
         self.writeAOWorldRibFile(self.ambientOcclusionWorldFileName)
         self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
                         self.ambientOcclusionFileName,\

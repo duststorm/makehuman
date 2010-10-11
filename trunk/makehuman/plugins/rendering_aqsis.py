@@ -35,7 +35,9 @@ class AqsisTaskView(gui3d.TaskView):
         self.shadingRateSlider= gui3d.Slider(self, position=[10, 140, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.000")
         self.shadingRateSlider.label.setPosition([15,135,9.5])
         self.samplesSlider= gui3d.Slider(self, position=[10, 180, 9.3], value=2, min=1.0, max=10, label = "Samples: 2.000")
-        self.samplesSlider.label.setPosition([15,175,9.5])
+        self.samplesSlider.label.setPosition([15,175,9.5])        
+        self.skinOilSlider= gui3d.Slider(self, position=[10, 400, 9.3], value=0.25, min=0.0, max=3, label = "Skin Oil: 1.000")
+        self.skinOilSlider.label.setPosition([15,395,9.5])
 
         @self.renderButton.event
         def onClicked(event):            
@@ -54,6 +56,11 @@ class AqsisTaskView(gui3d.TaskView):
         def onChanging(value):
             self.samplesSlider.label.setText("Samples: "+str(round(self.samplesSlider.getValue(),3)))
             self.app.settings['rendering_aqsis_samples'] = self.samplesSlider.getValue() 
+            
+        @self.skinOilSlider.event
+        def onChanging(value):
+            self.skinOilSlider.label.setText("Skin Oil: "+str(round(self.skinOilSlider.getValue(),3)))
+            self.app.settings['rendering_aqsis_oil'] = self.skinOilSlider.getValue() 
 
 
 def load(app):
