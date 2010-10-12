@@ -99,7 +99,7 @@ def main():
     else:
         coneangle = 0.0;
 
-    if len(sys.argv): 
+    if len(sys.argv) > 7: 
         roll = float(sys.argv[8])
     else:
         roll = 0.0;
