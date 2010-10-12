@@ -279,9 +279,9 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
     for i in xrange(2,len(curve)): #piecewise continuous polynomial
         d=vdist(curve[i],curve[i-1])+vdist(curve[i-1],curve[i-2])
         N=int(d/(res*4))
-        for j in xrange(0,N):
+        for j in xrange(1,N):
             cPs.append(ThreeDQBspline(curve[i-2],curve[i-1],curve[i],j*res*4/d))
-        cPs.append(curve[i])
+    cPs.append(curve[len(curve)-1])
     uvLength=len(cPs)-3
     if (uvLength<=0):
         return #neglects uv for strands with less than 4 control points
@@ -311,7 +311,7 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
         v1=verts[3][:]
         v2=verts[2][:]
 
-        #plain orientation:
+        #plain oc1rientation:
         # xy :  1 2      uv:   (0,v[j-1])  (1,v[j-1])
         #         4 3             (0,0)          (1,v[j])
 
