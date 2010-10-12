@@ -161,13 +161,14 @@ def findClothes(context, bob, pob, log):
 			bVerts = [mv.index,0,1]
 			bWts = [1,0,0]
 
-		vec0 = base.vertices[bVerts[0]].co
-		vec1 = base.vertices[bVerts[1]].co
-		vec2 = base.vertices[bVerts[2]].co
+		v0 = base.vertices[bVerts[0]]
+		v1 = base.vertices[bVerts[1]]
+		v2 = base.vertices[bVerts[2]]
 
-		est = bWts[0]*vec0 + bWts[1]*vec1 + bWts[2]*vec2
+		est = bWts[0]*v0.co + bWts[1]*v1.co + bWts[2]*v2.co
+		norm = bWts[0]*v0.normal + bWts[1]*v1.normal + bWts[2]*v2.normal
 		diff = pv.co - est
-		proj = diff.dot(pv.normal)
+		proj = diff.dot(norm)
 		if proj < 0 and alwaysOutside:
 			proj = -proj
 		bestFaces.append((pv, bVerts, bWts, proj))	
