@@ -96,19 +96,20 @@ def findClothes(context, bob, pob, log):
 			mverts.append((None, 1e6))
 
 		for bv in base.vertices:
-			if len(bv.groups) > 0 and bv.groups[0].group == bindex:
-				vec = pv.co - bv.co
-				n = 0
-				for (mv,mdist) in mverts:
-					if vec.length < mdist:
-						for k in range(n+1, mListLength):
-							j = mListLength-k+n
-							mverts[j] = mverts[j-1]
-						mverts[n] = (bv, vec.length)
-						#print(bv.index)
-						#printMverts(bv.index, mverts)
-						break
-					n += 1
+			for grp in bv.groups:
+				if grp.group == bindex:
+					vec = pv.co - bv.co
+					n = 0
+					for (mv,mdist) in mverts:
+						if vec.length < mdist:
+							for k in range(n+1, mListLength):
+								j = mListLength-k+n
+								mverts[j] = mverts[j-1]
+							mverts[n] = (bv, vec.length)
+							#print(bv.index)
+							#printMverts(bv.index, mverts)
+							break
+						n += 1
 
 		(mv, mindist) = mverts[0]
 		if mv:
@@ -116,7 +117,7 @@ def findClothes(context, bob, pob, log):
 			log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
 			#printMverts("  ", mverts)
 		else:
-			raise NameError("Failed to find vert %d in group %s %s" % (pv.index, pindex, bindex))
+			raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, name, pindex, bindex))
 		if mindist > 5:
 			raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
 
@@ -144,6 +145,7 @@ def findClothes(context, bob, pob, log):
 					fcs.append((f.vertices, wts))
 
 	print("Finding best weights")
+	alwaysOutside = context.scene['MakeClothesOutside']
 	bestFaces = []
 	for (pv, mverts, fcs) in bestVerts:
 		#print(pv.index)
@@ -165,8 +167,9 @@ def findClothes(context, bob, pob, log):
 
 		est = bWts[0]*vec0 + bWts[1]*vec1 + bWts[2]*vec2
 		diff = pv.co - est
-		no = pv.normal
 		proj = diff.dot(pv.normal)
+		if proj < 0 and alwaysOutside:
+			proj = -proj
 		bestFaces.append((pv, bVerts, bWts, proj))	
 				
 	print("Done")
@@ -381,6 +384,13 @@ def initInterface(scn):
 		maxlen=1024)
 	scn['MakeClothesDirectory'] = "~/makehuman"
 
+	bpy.types.Scene.MakeClothesOutside = BoolProperty(
+		name="Always outside", 
+		description="Invert projection if negative")
+	scn['MakeClothesOutside'] = True
+
+	return
+
 initInterface(bpy.context.scene)
 
 #
@@ -400,6 +410,7 @@ class MakeClothesPanel(bpy.types.Panel):
 		layout = self.layout
 		layout.operator("object.InitInterfaceButton")
 		layout.prop(context.scene, "MakeClothesDirectory")
+		layout.prop(context.scene, "MakeClothesOutside")
 		layout.operator("object.MakeClothesButton")
 		return
 
