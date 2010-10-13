@@ -78,21 +78,22 @@ class RMRLight:
 
     lightCounter = 0
 
-    def __init__(self, position = [0,0,0], lookAt = [0,0,0], intensity = 1.0, type = "pointlight"):
+    def __init__(self, ribsPath, position = [0,0,0], lookAt = [0,0,0], intensity = 1.0, type = "pointlight"):
 
+        RMRLight.lightCounter += 1
+        self.ribsPath = ribsPath
         self.position = position
         self.lookAt = lookAt
         self.type = type
         self.intensity = intensity
-        self.color = [1,1,1]
-        RMRLight.lightCounter += 1
+        self.color = [1,1,1]        
         self.counter = RMRLight.lightCounter
         self.samples = 64
         self.blur = 0.025
         self.AOmap = ""
         self.coneangle = 0.25
-        self.roll = None
-        self.shadowMap = ""
+        self.roll = None              
+        self.shadowMapDataFile = os.path.join(self.ribsPath,"%sshadow%d.zfile"%(self.type, self.counter)).replace('\\', '/')
 
     def writeRibCode(self, ribfile, n=0):
         # remember z in opengl -> -z in renderman
@@ -103,6 +104,11 @@ class RMRLight:
             ribfile.write('\tLightSource "ambientlight" %i "intensity" [%f] "color lightcolor" [%f %f %f]\n'%(n, self.intensity, self.color[0], self.color[1], self.color[2]))
         if self.type == "envlight":
             ribfile.write('\tLightSource "envlight" %i "string filename" "%s" "intensity" [%f] "float samples" [ %f ] "float blur" [ %f ]\n'%(n, self.AOmap, self.intensity, self.samples, self.blur))
+        if self.type == "shadowspot":
+            ribfile.write('\tLightSource "shadowspot" %i "intensity" [%f] "from" [%f %f -%f] "to" [%f %f %f] "coneangle" [%f] "shadowname" [%s"] "blur" [%f]\n'%(n, self.intensity,\
+             self.position[0],self.position[1],self.position[2], self.lookAt[0], self.lookAt[1], self.lookAt[2],\
+             self.coneangle, self.shadowMapDataFile, self.blur))
+
 
 
     def shadowRotate(self, ribfile, angle, x, y, z):
@@ -448,12 +454,7 @@ class RMRScene:
         MHscene = app.scene3d
         camera = app.modelCamera
 
-        self.app = app
-
-        #default lights
-        self.light1 = RMRLight([20, 20, 20],intensity = 500)
-        self.light2 = RMRLight([-20, 20, -20],intensity = 800)
-        self.lights = [self.light1,self.light2]
+        self.app = app       
 
 
         #Human in the scene
@@ -475,16 +476,23 @@ class RMRScene:
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
         self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')
         
-        #Shadow path
+        #Shadow path        
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
 
-
+        #default lights
+        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 500)
+        self.light2 = RMRLight(self.ribsPath,[-20, 20, -20],intensity = 800)
+        
+        
         #Ambient Occlusion
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
-        self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "envlight")
+        self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.2, type = "envlight")
         self.light3.AOmap = self.ambientOcclusionData
-        self.lights.append(self.light3)
+        
+        #Lights list
+        self.lights = [self.light1,self.light2,self.light3]
+        
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
@@ -601,12 +609,8 @@ class RMRScene:
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
 
         for l in self.lights:
-            #ShadowMaps path
-            shadowMapName = "%sshadow%d.zfile"%(l.type, l.counter)
-            shadowMapDataFile = os.path.join(self.ribsPath,shadowMapName).replace('\\', '/')
-
             ribfile.write('FrameBegin %d\n'%(l.counter))
-            ribfile.write('Display "%s" "zfile" "z"\n'%(shadowMapDataFile))
+            ribfile.write('Display "%s" "zfile" "z"\n'%(l.shadowMapDataFile))
             l.placeShadowCamera(ribfile)
             
         ribfile.close()
