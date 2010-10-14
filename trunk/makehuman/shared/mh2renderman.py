@@ -78,7 +78,7 @@ class RMRLight:
 
     lightCounter = 0
 
-    def __init__(self, ribsPath, position = [0,0,0], lookAt = [0,0,0], intensity = 1.0, type = "pointlight"):
+    def __init__(self, ribsPath, position = [0,0,0], lookAt = [0,0,0], intensity = 1.0, type = "pointlight", blur = 0.025):
 
         RMRLight.lightCounter += 1
         self.ribsPath = ribsPath
@@ -89,7 +89,7 @@ class RMRLight:
         self.color = [1,1,1]        
         self.counter = RMRLight.lightCounter
         self.samples = 64
-        self.blur = 0.025
+        self.blur = blur
         self.AOmap = ""
         self.coneangle = 0.25
         self.roll = None              
@@ -105,7 +105,7 @@ class RMRLight:
         if self.type == "envlight":
             ribfile.write('\tLightSource "envlight" %i "string filename" "%s" "intensity" [%f] "float samples" [ %f ] "float blur" [ %f ]\n'%(n, self.AOmap, self.intensity, self.samples, self.blur))
         if self.type == "shadowspot":
-            ribfile.write('\tLightSource "shadowspot" %i "intensity" [%f] "from" [%f %f -%f] "to" [%f %f %f] "coneangle" [%f] "shadowname" [%s"] "blur" [%f]\n'%(n, self.intensity,\
+            ribfile.write('\tLightSource "shadowspot" %i "intensity" [%f] "from" [%f %f %f] "to" [%f %f %f] "coneangle" [%f] "string shadowname" ["%s"] "float blur" [%f]\n'%(n, self.intensity,\
              self.position[0],self.position[1],self.position[2], self.lookAt[0], self.lookAt[1], self.lookAt[2],\
              self.coneangle, self.shadowMapDataFile, self.blur))
 
@@ -335,8 +335,8 @@ class RMRHuman(RMNObject):
 
 
         self.hairMat = RMRMaterial("hair")
-        self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5))
-        self.hairMat.parameters.append(MaterialParameter("float", "Ks", 1))
+        self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5)) 
+        self.hairMat.parameters.append(MaterialParameter("float", "Ks", 5)) 
         self.hairMat.parameters.append(MaterialParameter("float", "roughness", 0.08))
         self.hairMat.parameters.append(MaterialParameter("color", "rootcolor", self.human.hairColor))
         self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))
@@ -469,10 +469,10 @@ class RMRScene:
         self.usrTexturePath = os.path.join(self.ribsPath, 'textures')
         self.applicationPath = os.getcwd()  # TODO: this may not always return the app folder
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
-        self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
-
+        self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')        
+        self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
+        
         #Ambient Occlusion paths
-        self.ambientOcclusionWorldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
         self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')
         
@@ -481,8 +481,8 @@ class RMRScene:
 
 
         #default lights
-        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 500)
-        self.light2 = RMRLight(self.ribsPath,[-20, 20, -20],intensity = 800)
+        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 500, type = "shadowspot", blur = 0.005)
+        self.light2 = RMRLight(self.ribsPath,[-20, 20, -20],intensity = 800, type = "shadowspot",  blur = 0.005)
         
         
         #Ambient Occlusion
@@ -514,6 +514,37 @@ class RMRScene:
 
     def __str__(self):
         return "Renderman Scene"
+        
+        
+    def writeWorldRibFile(self, fName, shadowMode = None):
+        """
+
+        """
+        
+        #Init and write rib code for hairs
+        humanHairs = RMRHairs(self.humanCharacter, self.hairsClass, self.ribsPath)
+        self.humanCharacter.subObjectsInit()
+        humanHairs.writeCurvesRibCode()
+        
+        if len(self.humanCharacter.subObjects) < 1:
+            print "Warning: AO calculation on 0 objects"
+        ribfile = file(fName, 'w')
+        for subObj in self.humanCharacter.subObjects:
+            print "rendering....", subObj.name
+            ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')            
+            ribfile.write('\tAttributeBegin\n')
+            subObj.writeRibCode(ribPath)
+            if shadowMode:
+                ribfile.write('\tSurface "null"\n')
+            else:
+                subObj.material.writeRibCode(ribfile)
+            ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
+            ribfile.write('\tAttributeEnd\n')
+        ribfile.write('\tAttributeBegin\n')
+        self.humanCharacter.hairMat.writeRibCode(ribfile)
+        humanHairs.writeRibCode(ribfile)
+        ribfile.write('\tAttributeEnd\n')
+        ribfile.close()
 
 
     def writeRibFile(self, fName):
@@ -530,18 +561,13 @@ class RMRScene:
         self.humanCharacter.subObjectsInit()
         pos = self.humanCharacter.getObjPosition()
         imgFile = str(time.time())+".tif"
-        ribfile = file(fName, 'w')
-
-        #Init and write rib code for hairs
-        humanHairs = RMRHairs(self.humanCharacter, self.hairsClass, self.ribsPath)
-        humanHairs.writeCurvesRibCode()
+        ribfile = file(fName, 'w')        
 
         #Write rib code for textures
         for t in self.textures:
             t.writeRibCode(ribfile)
 
         #Write headers
-        ribfile.write('FrameBegin 1\n')
         ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
         ribfile.write('Option "statistics" "endofframe" [1]\n')
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
@@ -556,38 +582,20 @@ class RMRScene:
         ribfile.write('Declare "bumptexture" "string"\n')
         ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
         ribfile.write('Display "+%s" "file" "rgba"\n' % os.path.join(self.ribsPath, imgFile).replace('\\', '/'))
-        ribfile.write('\t\tTranslate %f %f %f\n' % (self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)) # Camera
-        ribfile.write('\t\tTranslate %f %f %f\n' % (pos[0], pos[1], 0.0)) # Model
-        ribfile.write('\t\tRotate %f 1 0 0\n' % -pos[2])
-        ribfile.write('\t\tRotate %f 0 1 0\n' % -pos[3])
+        ribfile.write('\tTranslate %f %f %f\n' % (self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)) # Camera
+        ribfile.write('\tTranslate %f %f %f\n' % (pos[0], pos[1], 0.0)) # Model
+        ribfile.write('\tRotate %f 1 0 0\n' % -pos[2])
+        ribfile.write('\tRotate %f 0 1 0\n' % -pos[3])
         ribfile.write('WorldBegin\n')
 
         for l in self.lights:
             l.writeRibCode(ribfile, l.counter)
-        for subObj in self.humanCharacter.subObjects:
-
-            print "rendering....", subObj.name
-            ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
-            ribfile.write('\tAttributeBegin\n')
-
-            subObj.writeRibCode(ribPath)
-            subObj.material.writeRibCode(ribfile)
-            #ribfile.write('\t\tSurface "plastic"')
-            #ribfile.write('\tSphere 2 -2 2 360\n')
-            ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
-            ribfile.write('\tAttributeEnd\n')
-
-        ribfile.write('\tAttributeBegin\n')
-
-        self.humanCharacter.hairMat.writeRibCode(ribfile)
-        humanHairs.writeRibCode(ribfile)
-
-        ribfile.write('\tAttributeEnd\n')
+        self.writeWorldRibFile(self.worldFileName)
+        ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))        
         ribfile.write('WorldEnd\n')
-        ribfile.write('FrameEnd\n')
         ribfile.close()
 
-    def writeShadowFile(self,):
+    def writeShadowFile(self):
         """
         This function creates the frame definition for a Renderman scene.
         """
@@ -607,36 +615,26 @@ class RMRScene:
         ribfile.write('ShadingRate 2\n')
         ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
+        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
+        self.writeWorldRibFile(self.worldFileName, 1)
 
         for l in self.lights:
-            ribfile.write('FrameBegin %d\n'%(l.counter))
-            ribfile.write('Display "%s" "zfile" "z"\n'%(l.shadowMapDataFile))
-            l.placeShadowCamera(ribfile)
+            if l.type == "shadowspot":
+                ribfile.write('FrameBegin %d\n'%(l.counter))
+                ribfile.write('Display "%s" "zfile" "z"\n'%(l.shadowMapDataFile))
+                l.placeShadowCamera(ribfile)
+                ribfile.write('WorldBegin\n')
+                ribfile.write('\tSurface "null"\n')
+                ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
+                ribfile.write('WorldEnd\n') 
+                ribfile.write('FrameEnd\n') 
+                shadowMapDataFileFinal = l.shadowMapDataFile.replace("zfile","shad")                
+                ribfile.write('MakeShadow "%s" "%s"\n'%(l.shadowMapDataFile,shadowMapDataFileFinal))
             
-        ribfile.close()
-
-
-
-
-
-    def writeAOWorldRibFile(self, fName):
-        """
-
-        """
-        self.humanCharacter.subObjectsInit()
-        if len(self.humanCharacter.subObjects) < 1:
-            print "Warning: AO calculation on 0 objects"
-        ribfile = file(fName, 'w')
-        for subObj in self.humanCharacter.subObjects:
-            ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
-            subObj.writeRibCode(ribPath)
-            ribfile.write('\tAttributeBegin\n')
-            ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
-            ribfile.write('\tAttributeEnd\n')
-        ribfile.write('\tAttributeBegin\n')
-        ribfile.write('\t\tReadArchive "%s"\n' % os.path.join(self.ribsPath, 'hairs.rib').replace('\\', '/'))
-        ribfile.write('\tAttributeEnd\n')
-        ribfile.close()
+        ribfile.close()  
+        
+    
+        
 
 
 
@@ -652,13 +650,19 @@ class RMRScene:
         f = open(dst, 'w')
         f.write(o)
         f.close()
+        
+    def renderShadow(self):
+        self.writeShadowFile()
+        command = '%s "%s"' % ('aqsis -progress', self.shadowFileName)
+        subprocess.Popen(command, shell=True)
+            
 
     def renderAOdata(self):
-        self.writeAOWorldRibFile(self.ambientOcclusionWorldFileName)
+        self.writeWorldRibFile(self.worldFileName, 1)
         self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
                         self.ambientOcclusionFileName,\
                         "%DATAPATH%",self.ambientOcclusionData,\
-                        "%WORLDPATH%",self.ambientOcclusionWorldFileName)
+                        "%WORLDPATH%",self.worldFileName)
         command = '%s "%s"' % ('aqsis -progress', self.ambientOcclusionFileName)
         subprocess.Popen(command, shell=True)
 
