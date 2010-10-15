@@ -182,62 +182,7 @@ class RMRLight:
         self.pointToAim(ribfile, direction);
         self.shadowTranslate(ribfile, -self.position[0], -self.position[1], -self.position[2])
 
-
-
-
-class RMRHairs:
-
-    def __init__(self, human, hairsClass,ribRepository):
-
-        self.hairsClass = hairsClass
-        self.humanToGrowHairs = human
-        hair.adjustHair(human.human, self.hairsClass)
-        self.hairFilePath = os.path.join(ribRepository, 'hairs.rib')
-
-
-    def writeCurvesRibCode(self):
-
-
-        # Write the full hairstyle
-
-        totalNumberOfHairs = 0
-        self.hairsClass.humanVerts = self.humanToGrowHairs.meshData.verts
-
-        hairs = self.hairsClass.generateHairToRender()
-        print 'Writing hairs'
-
-        hairFile = open(self.hairFilePath, 'w')
-
-        hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
-        for strands in hairs:
-
-            hDiameter = self.hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
-            totalNumberOfHairs += 1
-            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(strands))
-
-            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
-            hairFile.write('%s %s %s ' % (strands[0][0], strands[0][1], -strands[0][2]))  # z * -1 blender  to renderman coords
-
-            for cP in strands:
-                hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
-
-            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
-            hairFile.write('%s %s %s ' % (strands[len(strands)-1][0], strands[len(strands)-1][1],\
-            -strands[len(strands)-1][2]))  # z * -1 blender  to renderman coords
-
-            #if random.randint(0, 3) >= 1:
-            #    hairFile.write(']\n"N" [')
-            #    for cP in strands:
-            #            hairFile.write('0 1 0 ')  # arbitrary normals
-            hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
-
-        hairFile.close()
-        print 'Totals hairs written: ', totalNumberOfHairs
-        #print 'Number of tufts', len(hairs)
-
-    def writeRibCode(self, file):
-        archivePath = self.hairFilePath.replace('\\', '/')
-        file.write('\t\tReadArchive "%s" '%(archivePath))
+ 
 
 
 
@@ -307,24 +252,99 @@ class RMNObject:
                 uvValue = facesUVvalues[uvIdx]
                 ribObjFile.write('%s %s ' % (uvValue[0], 1 - uvValue[1]))
         ribObjFile.write(']')
-        ribObjFile.close()
+        
+        #if self.vertsColorSSS:
+            #ribObjFile.write('\n"Cs" [')
+            #for faceIdx in self.facesIndices:
+                #for idx in faceIdx:
+                    #color = self.vertsColorSSS[idx[0]]
+                    #ribObjFile.write('%s %s %s \n' % (color, color, color))
+            #ribObjFile.write(']')
+            #ribObjFile.write('\n')
+            
+        ribObjFile.close()       
 
 
     def joinGroupIndices(self):
         for g in self.facesGroup:
             gIndices = self.groupsDict[g]
             self.facesIndices.extend(gIndices)
+            
+    def clamp(self, min, max, val):
+        """
+        This function clips a value so that it is no less and no greater than the
+        minimum and maximum values specified.  This only works within the decimal
+        accuracy limits of the comparison operation, so the returned value could be
+        very slightly smaller or greater than the min and max values specified.
+
+        Parameters
+        ----------
+
+        min:
+            *decimal*. The minimum permitted value.
+
+        max:
+            *decimal*. The maximum permitted value.
+
+        val:
+            *decimal*. The value to be clipped.
+        """
+
+        if val > max:
+            val = max
+        if val < min:
+            val = min
+        return val
+
+
+
+    def calcSSSvertcolor(self, lights, refl = 0.006, sssSteps = 2):
+        """
+        ...
+
+        """
+        print "Calculating SSS..."
+        vertsColor = []
+        for v in self.meshData.verts:
+            color = 0
+            for l in lights:
+                lightRay = aljabr.vsub(l.position, v.co)
+                lightRay = aljabr.vnorm(lightRay)
+                color += self.clamp(0, 1, aljabr.vdot(lightRay, v.no) * l.intensity * refl)
+            vertsColor.append(color)
+        sssIterations = [vertsColor]
+        for n in xrange(sssSteps):
+            colorsToScatter = sssIterations[-1]
+            sssColors = []
+            for v in self.meshData.verts:
+                sharedColors = []
+                scattering = 0
+                for v2 in v.vertsShared():
+                    sharedColors.append(colorsToScatter[v2.idx])
+                    sharedColors.sort()
+                if colorsToScatter[v.idx] < sharedColors[-1]:
+                    scattering = (colorsToScatter[v.idx] + sharedColors[-1])/2
+                else:
+                    scattering = vertsColor[v.idx]
+                sssColors.append(scattering)
+            sssIterations.append(sssColors)
+        self.vertsColorSSS = sssIterations[-1]
+        
 
 
 
 class RMRHuman(RMNObject):
 
-    def __init__(self, human, name, obj):
+    def __init__(self, human, name, obj, ribRepository):
 
         RMNObject.__init__(self, name, obj)
-
         self.subObjects = []
         self.human = human
+        self.hairFileName = name + "_hairs.rib"
+        
+        #hairs
+        self.hairsClass = human.hairs
+        self.hairFilePath = os.path.join(ribRepository, self.hairFileName)
 
         #materials
         self.skinMat = RMRMaterial("skin")
@@ -333,13 +353,12 @@ class RMRHuman(RMNObject):
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 1.5))
         self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
 
-
         self.hairMat = RMRMaterial("hair")
         self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5)) 
         self.hairMat.parameters.append(MaterialParameter("float", "Ks", 5)) 
         self.hairMat.parameters.append(MaterialParameter("float", "roughness", 0.08))
         self.hairMat.parameters.append(MaterialParameter("color", "rootcolor", self.human.hairColor))
-        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))
+        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))  
 
     def subObjectsInit(self):
 
@@ -423,6 +442,53 @@ class RMRHuman(RMNObject):
     def getObjPosition(self):
         return (self.human.getPosition()[0], self.human.getPosition()[1],\
                 self.human.getRotation()[0], self.human.getRotation()[1])
+                
+    def adjustHairStyle(self):
+        hair.adjustHair(self.human, self.hairsClass)
+        
+    def writeHairsInclusion(self, ribfile):
+        archivePath = self.hairFilePath.replace('\\', '/')
+        self.hairMat.writeRibCode(ribfile)
+        ribfile.write('\t\tReadArchive "%s" '%(archivePath))
+        
+    def writeHairsCurve(self):
+
+
+        # Write the full hairstyle
+
+        totalNumberOfHairs = 0
+        self.hairsClass.humanVerts = self.human.meshData.verts
+        hairs = self.hairsClass.generateHairToRender()
+        print 'Writing hairs'
+
+        hairFile = open(self.hairFilePath, 'w')
+
+        hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
+        for strands in hairs:
+
+            hDiameter = self.hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
+            totalNumberOfHairs += 1
+            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(strands))
+
+            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
+            hairFile.write('%s %s %s ' % (strands[0][0], strands[0][1], -strands[0][2]))  # z * -1 blender  to renderman coords
+
+            for cP in strands:
+                hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
+
+            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
+            hairFile.write('%s %s %s ' % (strands[len(strands)-1][0], strands[len(strands)-1][1],\
+            -strands[len(strands)-1][2]))  # z * -1 blender  to renderman coords
+
+            #if random.randint(0, 3) >= 1:
+            #    hairFile.write(']\n"N" [')
+            #    for cP in strands:
+            #            hairFile.write('0 1 0 ')  # arbitrary normals
+            hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
+
+        hairFile.close()
+        print 'Totals hairs written: ', totalNumberOfHairs
+        #print 'Number of tufts', len(hairs)
 
 
     def __str__(self):
@@ -453,14 +519,7 @@ class RMRScene:
     def __init__(self, app):
         MHscene = app.scene3d
         camera = app.modelCamera
-
-        self.app = app       
-
-
-        #Human in the scene
-        self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"))
-
-        self.hairsClass = MHscene.selectedHuman.hairs
+        self.app = app              
 
         #resources paths
         self.renderPath = mh.getPath('render')
@@ -472,6 +531,10 @@ class RMRScene:
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')        
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         
+        #Human in the scene
+        self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
+        self.humanCharacter.calcSSSvertcolor(self.lights)   
+        
         #Ambient Occlusion paths
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
         self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')
@@ -479,11 +542,9 @@ class RMRScene:
         #Shadow path        
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
-
         #default lights
         self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 500, type = "shadowspot", blur = 0.005)
-        self.light2 = RMRLight(self.ribsPath,[-20, 20, -20],intensity = 800, type = "shadowspot",  blur = 0.005)
-        
+        self.light2 = RMRLight(self.ribsPath,[-20, 20, -20],intensity = 800, type = "shadowspot",  blur = 0.005)        
         
         #Ambient Occlusion
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
@@ -516,15 +577,15 @@ class RMRScene:
         return "Renderman Scene"
         
         
-    def writeWorldRibFile(self, fName, shadowMode = None):
+    def writeWorldFile(self, fName, shadowMode = None):
         """
 
         """
         
         #Init and write rib code for hairs
-        humanHairs = RMRHairs(self.humanCharacter, self.hairsClass, self.ribsPath)
+
         self.humanCharacter.subObjectsInit()
-        humanHairs.writeCurvesRibCode()
+        self.humanCharacter.writeHairsCurve()
         
         if len(self.humanCharacter.subObjects) < 1:
             print "Warning: AO calculation on 0 objects"
@@ -541,13 +602,12 @@ class RMRScene:
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
         ribfile.write('\tAttributeBegin\n')
-        self.humanCharacter.hairMat.writeRibCode(ribfile)
-        humanHairs.writeRibCode(ribfile)
+        self.humanCharacter.writeHairsInclusion(ribfile)
         ribfile.write('\tAttributeEnd\n')
         ribfile.close()
 
 
-    def writeRibFile(self, fName):
+    def writeSceneFile(self, fName):
         """
         This function creates the frame definition for a Renderman scene.
         """
@@ -590,7 +650,7 @@ class RMRScene:
 
         for l in self.lights:
             l.writeRibCode(ribfile, l.counter)
-        self.writeWorldRibFile(self.worldFileName)
+        self.writeWorldFile(self.worldFileName)
         ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))        
         ribfile.write('WorldEnd\n')
         ribfile.close()
@@ -616,7 +676,7 @@ class RMRScene:
         ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
         ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
-        self.writeWorldRibFile(self.worldFileName, 1)
+        self.writeWorldFile(self.worldFileName, 1)
 
         for l in self.lights:
             if l.type == "shadowspot":
@@ -632,11 +692,6 @@ class RMRScene:
                 ribfile.write('MakeShadow "%s" "%s"\n'%(l.shadowMapDataFile,shadowMapDataFileFinal))
             
         ribfile.close()  
-        
-    
-        
-
-
 
 
     def copyAOfile(self, src, dst, oldString1, newString1, oldString2, newString2):
@@ -658,7 +713,7 @@ class RMRScene:
             
 
     def renderAOdata(self):
-        self.writeWorldRibFile(self.worldFileName, 1)
+        self.writeWorldFile(self.worldFileName, 1)
         self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
                         self.ambientOcclusionFileName,\
                         "%DATAPATH%",self.ambientOcclusionData,\
@@ -670,7 +725,7 @@ class RMRScene:
     def render(self, ribFileName):
         self.writeShadowFile()
         sceneFileName = os.path.join(self.ribsPath, ribFileName)
-        self.writeRibFile(sceneFileName)
+        self.writeSceneFile(sceneFileName)
         command = '%s "%s"' % ('aqsis -progress', sceneFileName)
         subprocess.Popen(command, shell=True)
 
