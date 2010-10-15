@@ -191,8 +191,7 @@ class RMNObject:
     def __init__(self, name, obj = None):
 
         self.groupsDict = {}
-        self.facesGroup = None
-        self.vertsColorSSS = None
+        self.facesGroup = None        
         self.material = None
         self.name = name
         self.facesIndices = []
@@ -251,84 +250,15 @@ class RMNObject:
                 uvIdx = idx[1]
                 uvValue = facesUVvalues[uvIdx]
                 ribObjFile.write('%s %s ' % (uvValue[0], 1 - uvValue[1]))
-        ribObjFile.write(']')
-        
-        #if self.vertsColorSSS:
-            #ribObjFile.write('\n"Cs" [')
-            #for faceIdx in self.facesIndices:
-                #for idx in faceIdx:
-                    #color = self.vertsColorSSS[idx[0]]
-                    #ribObjFile.write('%s %s %s \n' % (color, color, color))
-            #ribObjFile.write(']')
-            #ribObjFile.write('\n')
-            
+        ribObjFile.write(']')            
         ribObjFile.close()       
 
 
     def joinGroupIndices(self):
         for g in self.facesGroup:
             gIndices = self.groupsDict[g]
-            self.facesIndices.extend(gIndices)
-            
-    def clamp(self, min, max, val):
-        """
-        This function clips a value so that it is no less and no greater than the
-        minimum and maximum values specified.  This only works within the decimal
-        accuracy limits of the comparison operation, so the returned value could be
-        very slightly smaller or greater than the min and max values specified.
-
-        Parameters
-        ----------
-
-        min:
-            *decimal*. The minimum permitted value.
-
-        max:
-            *decimal*. The maximum permitted value.
-
-        val:
-            *decimal*. The value to be clipped.
-        """
-
-        if val > max:
-            val = max
-        if val < min:
-            val = min
-        return val
-
-
-
-    def calcSSSvertcolor(self, lights, refl = 0.006, sssSteps = 2):
-        """
-        ...
-
-        """
-        print "Calculating SSS..."
-        vertsColor = []
-        for v in self.meshData.verts:
-            color = 0
-            for l in lights:
-                lightRay = aljabr.vsub(l.position, v.co)
-                lightRay = aljabr.vnorm(lightRay)
-                color += self.clamp(0, 1, aljabr.vdot(lightRay, v.no) * l.intensity * refl)
-            vertsColor.append(color)
-        sssIterations = [vertsColor]
-        for n in xrange(sssSteps):
-            colorsToScatter = sssIterations[-1]
-            sssColors = []
-            for v in self.meshData.verts:
-                sharedColors = []
-                scattering = 0
-                for v2 in v.vertsShared():
-                    sharedColors.append(colorsToScatter[v2.idx])
-                    sharedColors.sort()
-                if colorsToScatter[v.idx] < sharedColors[-1]:
-                    scattering = (colorsToScatter[v.idx] + sharedColors[-1])/2
-                else:
-                    scattering = vertsColor[v.idx]
-                sssColors.append(scattering)
-            sssIterations.append(sssColors)
-        self.vertsColorSSS = sssIterations[-1]
+            self.facesIndices.extend(gIndices)         
+    
         
 
 
@@ -365,32 +295,28 @@ class RMRHuman(RMNObject):
         #SubObjects
         self.rEyeBall = RMNObject(name = "right_eye_ball")
         self.rEyeBall.groupsDict = self.groupsDict
-        self.rEyeBall.meshData = self.meshData
-        self.rEyeBall.vertsColorSSS = self.vertsColorSSS
+        self.rEyeBall.meshData = self.meshData        
         self.rEyeBall.facesGroup = set(['r-eye-ball'])
         self.rEyeBall.material = self.skinMat
         self.rEyeBall.joinGroupIndices()
 
         self.lEyeBall = RMNObject(name = "left_eye_ball")
         self.lEyeBall.groupsDict = self.groupsDict
-        self.lEyeBall.meshData = self.meshData
-        self.lEyeBall.vertsColorSSS = self.vertsColorSSS
+        self.lEyeBall.meshData = self.meshData        
         self.lEyeBall.facesGroup = set(['l-eye-ball'])
         self.lEyeBall.material = self.skinMat
         self.lEyeBall.joinGroupIndices()
 
         self.rCornea = RMNObject(name = "right_cornea")
         self.rCornea.groupsDict = self.groupsDict
-        self.rCornea.meshData = self.meshData
-        self.rCornea.vertsColorSSS = self.vertsColorSSS
+        self.rCornea.meshData = self.meshData        
         self.rCornea.facesGroup = set(['r-eye-cornea'])
         self.rCornea.material = self.skinMat
         self.rCornea.joinGroupIndices()
 
         self.lCornea = RMNObject(name = "left_cornea")
         self.lCornea.groupsDict = self.groupsDict
-        self.lCornea.meshData = self.meshData
-        self.lCornea.vertsColorSSS = self.vertsColorSSS
+        self.lCornea.meshData = self.meshData        
         self.lCornea.facesGroup = set(['l-eye-cornea'])
         self.lCornea.material = self.skinMat
         self.lCornea.joinGroupIndices()
@@ -409,16 +335,14 @@ class RMRHuman(RMNObject):
 
         self.teeth = RMNObject(name = "teeth")
         self.teeth.groupsDict = self.groupsDict
-        self.teeth.meshData = self.meshData
-        self.teeth.vertsColorSSS = self.vertsColorSSS
+        self.teeth.meshData = self.meshData        
         self.teeth.facesGroup = teethGr
         self.teeth.material = self.skinMat
         self.teeth.joinGroupIndices()
 
         self.nails = RMNObject(name = "nails")
         self.nails.groupsDict = self.groupsDict
-        self.nails.meshData = self.meshData
-        self.nails.vertsColorSSS = self.vertsColorSSS
+        self.nails.meshData = self.meshData        
         self.nails.facesGroup = nailsGr
         self.nails.material = self.skinMat
         self.nails.joinGroupIndices()
@@ -429,8 +353,7 @@ class RMRHuman(RMNObject):
 
         self.skin = RMNObject(name = "skin")
         self.skin.groupsDict = self.groupsDict
-        self.skin.meshData = self.meshData
-        self.skin.vertsColorSSS = self.vertsColorSSS
+        self.skin.meshData = self.meshData        
         self.skin.facesGroup = allGr.difference(toSubtract)
         self.skin.material = self.skinMat
         self.skin.joinGroupIndices()
@@ -532,8 +455,7 @@ class RMRScene:
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         
         #Human in the scene
-        self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
-        self.humanCharacter.calcSSSvertcolor(self.lights)   
+        self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)         
         
         #Ambient Occlusion paths
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
@@ -552,8 +474,7 @@ class RMRScene:
         self.light3.AOmap = self.ambientOcclusionData
         
         #Lights list
-        self.lights = [self.light1,self.light2,self.light3]
-        
+        self.lights = [self.light1,self.light2,self.light3]      
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
