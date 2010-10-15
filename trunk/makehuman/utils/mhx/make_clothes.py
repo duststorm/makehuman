@@ -14,8 +14,76 @@
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
 Abstract
-Utility for making clothes to MH characters
-Used to be called defineProxy.py, because a proxy is just a full-body dress.
+Utility for making clothes to MH characters.
+
+Used to be called defineProxy.py, because a proxy is just a full-body
+dress. Below the word clothes refers both to proxies, make-deform
+cages, and proper clothes.
+
+Import a MH character *with the joint diamonds present*. In the MHX
+importer the Diamonds option must be selected; the OBJ file is
+probably useless, because I think that the diamonds have been filtered
+out.
+
+Model your clothes over the reference character. It does not really
+matter which character you use as reference, but the final result will
+probably look better on characters which do not deviate too much from
+the reference. The clothing may optionally be UV-unwrapped.
+
+Both the clothes and the character must be given vertex groups with
+the same names. If the character has been brought into Blender with
+the mhx importer, it is a good idea to first delete all bone groups.
+Each clothing vertex must belong to a single group (more precisely,
+any additional group is ignored), whereas character verts can belong
+to several groups. The character mesh, but not the clothes, should
+also be triangulated (Ctrl-T in Edit mode) for best results.
+
+The algorithm assigns each clothing vertex to the "best" triangle in
+the character mesh. The face number and the verts barycentric
+coordinates (a weighted sum of the corner coordinates) are stored in
+the mhclo file. The best triangle is charactized by a small distance
+between the vert and face, and that the projection onto the
+face falls within the face (all weights lie between 0 and 1), or
+almost so. The normal distance between the vertex and the face is
+also recorded.
+
+Finding the best face for each vertex is sometimes difficult in
+regions where separate parts of the character mesh are very close or
+overlap. The mouth area is especially tricky, for proxy meshes with
+articulate tongue, teeth, and inner mouth wall. For trousers it can be
+difficult to distinguish between the groin area and the left and right
+inner thighs. You can help the script distinguish between different
+body parts by assigning vertex groups. The algorithm only looks for
+the best triangle within the given vertex group.
+
+At the very least the mesh should be divided into a Left, Right and
+Mid (with x = 0) group. Joint diamonds should not be assigned to any
+group at all, to ensure that the clothing does not follow the
+diamonds.
+
+Vertex groups can also be used to prune the search tree and speed
+up the program. 
+
+-------
+
+Access this script from the UI panel (N-key).
+
+Assign vertex groups to the main character and to all clothes or
+proxies. The name of the vertex groups must match exactly.
+
+Select all clothes or proxies that you want to export, then select the
+character to make it active.
+
+Press the Make clothes button.
+
+A separate .mhclo file for each piece of clothing will now be created
+in the specified directory.
+
+The file proxy.cfg defines which clothes will be exported with the
+character. This file is located in the MakeHuman's main program
+directory, but MH will first look for this files in the ~/makehuman/
+and C:/ folders. In this way you can keep your own private version of
+proxy.cfg. The syntax is described in the beginning of the file.
 
 """
 bl_addon_info = {
@@ -29,12 +97,6 @@ bl_addon_info = {
     "warning": "",
     "category": "3D View"}
 
-"""
-Access from UI panel (N-key).
-Select clothes or proxies, then select mesh to make it active.
-Press make clothes
-Takes filename from clothe.
-"""
 
 import bpy, os, mathutils
 
