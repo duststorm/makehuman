@@ -19,7 +19,7 @@ class AqsisTaskView(gui3d.TaskView):
 
         self.sceneToRender = mh2renderman.RMRScene(self.app)
         #Create aqsis shaders
-        subprocess.Popen('aqsl data/shaders/aqsis/skin.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'skin.slx'), shell=True)
+        subprocess.Popen('aqsl data/shaders/aqsis/skin2.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'skin2.slx'), shell=True)
         subprocess.Popen('aqsl data/shaders/aqsis/hair.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'hair.slx'), shell=True)
         subprocess.Popen('aqsl data/shaders/aqsis/envlight.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'envlight.slx'), shell=True)
 

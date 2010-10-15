@@ -277,11 +277,11 @@ class RMRHuman(RMNObject):
         self.hairFilePath = os.path.join(ribRepository, self.hairFileName)
 
         #materials
-        self.skinMat = RMRMaterial("skin")
-        self.skinMat.parameters.append(MaterialParameter("string", "skintexture", "texture.texture"))
-        self.skinMat.parameters.append(MaterialParameter("string", "refltexture", "texture_ref.texture"))
-        self.skinMat.parameters.append(MaterialParameter("float", "Ks", 1.5))
-        self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
+        self.skinMat = RMRMaterial("skin2")
+        self.skinMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
+        #self.skinMat.parameters.append(MaterialParameter("string", "refltexture", "texture_ref.texture"))
+        self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
+        #self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
 
         self.hairMat = RMRMaterial("hair")
         self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5)) 
@@ -465,12 +465,13 @@ class RMRScene:
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
         #default lights
-        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 500, type = "shadowspot", blur = 0.005)
-        self.light2 = RMRLight(self.ribsPath,[-20, 20, -20],intensity = 800, type = "shadowspot",  blur = 0.005)        
+        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 500, type = "shadowspot", blur = 0.010)
+        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 800, type = "shadowspot",  blur = 0.010)   
+        self.light2.coneangle = 0.35
         
         #Ambient Occlusion
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
-        self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.2, type = "envlight")
+        self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.1, type = "envlight")
         self.light3.AOmap = self.ambientOcclusionData
         
         #Lights list
