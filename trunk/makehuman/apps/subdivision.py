@@ -303,10 +303,10 @@ def addEdgeVert(v0, v1, v2, face, edges, object):
     # Just make an unique key
 
     if v0.idx > v1.idx:
-        key = str(v0.idx) + '-' + str(v1.idx)
+        key = (v0.idx, v1.idx)
         edge = [v0, v1]
     else:
-        key = str(v1.idx) + '-' + str(v0.idx)
+        key = (v1.idx, v0.idx)
         edge = [v1, v0]
 
     if not edges.has_key(key):
@@ -365,7 +365,6 @@ def calcSubData(ob, scene):
     subdividedObj.shadeless = ob.shadeless
     subdividedObj.pickable = ob.pickable
     subdividedObj.cameraMode = ob.cameraMode
-    subdividedObj.text = ob.text
     subdividedObj.uvValues = ob.uvValues[:]
     subdividedObj.indexBuffer = []
     for v in ob.verts:
@@ -399,11 +398,7 @@ def calcSubData(ob, scene):
 
     print 'time to add edge verts: ', time.time() - t4
 
-    fg = module3d.FaceGroup('subobj')
-    fg.parent = subdividedObj
-    subdividedObj.facesGroups.append(fg)
-    fullArrayIndex = 0
-    groupVerts = {}
+    fg = subdividedObj.createFaceGroup('subobj')
     for f in ob.faces:
         v0 = subdividedObj.verts[f.verts[0].idx]
         v2 = subdividedObj.verts[f.verts[1].idx]
@@ -412,10 +407,10 @@ def calcSubData(ob, scene):
         v3 = f.sub_verts[1]
         v5 = f.sub_verts[2]
 
-        f1 = module3d.Face(v0, v1, v5)
-        f2 = module3d.Face(v1, v2, v3)
-        f3 = module3d.Face(v1, v3, v5)
-        f4 = module3d.Face(v5, v3, v4)
+        f1 = fg.createFace(v0, v1, v5)
+        f2 = fg.createFace(v1, v2, v3)
+        f3 = fg.createFace(v1, v3, v5)
+        f4 = fg.createFace(v5, v3, v4)
 
         # Simple UV linear interpolation: uv are not subdivided
 
@@ -425,9 +420,9 @@ def calcSubData(ob, scene):
             uv4 = subdividedObj.uvValues[f.uv[2]]
             uv1 = len(subdividedObj.uvValues)
             subdividedObj.uvValues.append([uv0[0] + (uv2[0] - uv0[0]) * 0.5, uv0[1] + (uv2[1] - uv0[1]) * 0.5])
-            uv3 = len(subdividedObj.uvValues)
+            uv3 = uv1+1
             subdividedObj.uvValues.append([uv2[0] + (uv4[0] - uv2[0]) * 0.5, uv2[1] + (uv4[1] - uv2[1]) * 0.5])
-            uv5 = len(subdividedObj.uvValues)
+            uv5 = uv3+1
             subdividedObj.uvValues.append([uv4[0] + (uv0[0] - uv4[0]) * 0.5, uv4[1] + (uv0[1] - uv4[1]) * 0.5])
             uv0 = f.uv[0]
             uv2 = f.uv[1]
@@ -438,30 +433,7 @@ def calcSubData(ob, scene):
             f3.uv = [uv1, uv3, uv5]
             f4.uv = [uv5, uv3, uv4]
 
-        faces = [f1, f2, f3, f4]
-
-        for f in faces:
-            for (i, v) in enumerate(f.verts):
-                t = f.uv[i]
-                if v.idx not in groupVerts:
-                    v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[v.idx] = {}
-                    groupVerts[v.idx][t] = fullArrayIndex
-                    subdividedObj.indexBuffer.append(fullArrayIndex)
-                    fullArrayIndex += 1
-                elif t not in groupVerts[v.idx]:
-                    v.indicesInFullVertArray.append(fullArrayIndex)
-                    groupVerts[v.idx][t] = fullArrayIndex
-                    subdividedObj.indexBuffer.append(fullArrayIndex)
-                    fullArrayIndex += 1
-                else:
-                    subdividedObj.indexBuffer.append(groupVerts[v.idx][t])
-
-            f.group = fg
-            fg.faces.append(f)
-            subdividedObj.faces.append(f)
-
-    subdividedObj.vertexBufferSize = fullArrayIndex
+    subdividedObj.updateIndexBuffer()
     subdividedObj.texture = ob.texture
 
     scene.update()
