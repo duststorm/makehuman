@@ -370,8 +370,7 @@ class RMRHuman(RMNObject):
         hair.adjustHair(self.human, self.hairsClass)
         
     def writeHairsInclusion(self, ribfile):
-        archivePath = self.hairFilePath.replace('\\', '/')
-        self.hairMat.writeRibCode(ribfile)
+        archivePath = self.hairFilePath.replace('\\', '/')        
         ribfile.write('\t\tReadArchive "%s" '%(archivePath))
         
     def writeHairsCurve(self):
@@ -465,17 +464,19 @@ class RMRScene:
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
         #default lights
-        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 500, type = "shadowspot", blur = 0.010)
-        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 800, type = "shadowspot",  blur = 0.010)   
+        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 300, type = "shadowspot", blur = 0.010)
+        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 300, type = "shadowspot",  blur = 0.010)   
         self.light2.coneangle = 0.35
+        self.light4 = RMRLight(self.ribsPath,[20, 10, -20],intensity = 300, type = "shadowspot",  blur = 0.010)   
+        self.light4.coneangle = 0.35
         
         #Ambient Occlusion
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
-        self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.1, type = "envlight")
+        self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.2, type = "envlight")
         self.light3.AOmap = self.ambientOcclusionData
         
         #Lights list
-        self.lights = [self.light1,self.light2,self.light3]      
+        self.lights = [self.light1,self.light2,self.light3,self.light4]      
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
@@ -524,6 +525,10 @@ class RMRScene:
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
         ribfile.write('\tAttributeBegin\n')
+        if shadowMode:
+            ribfile.write('\tSurface "null"\n')
+        else:
+            self.humanCharacter.hairMat.writeRibCode(ribfile)
         self.humanCharacter.writeHairsInclusion(ribfile)
         ribfile.write('\tAttributeEnd\n')
         ribfile.close()
@@ -538,7 +543,7 @@ class RMRScene:
         self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
         self.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
         self.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
-        self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.25))
+        self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.3))
 
         self.humanCharacter.subObjectsInit()
         pos = self.humanCharacter.getObjPosition()

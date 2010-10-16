@@ -39,7 +39,7 @@ class AqsisTaskView(gui3d.TaskView):
         self.shadingRateSlider.label.setPosition([15,135,9.5])
         self.samplesSlider= gui3d.Slider(self, position=[10, 180, 9.3], value=2, min=1.0, max=10, label = "Samples: 2.000")
         self.samplesSlider.label.setPosition([15,175,9.5])        
-        self.skinOilSlider= gui3d.Slider(self, position=[10, 400, 9.3], value=0.25, min=0.0, max=3, label = "Skin Oil: 1.000")
+        self.skinOilSlider= gui3d.Slider(self, position=[10, 400, 9.3], value=0.3, min=0.0, max=3, label = "Skin Oil: 1.000")
         self.skinOilSlider.label.setPosition([15,395,9.5])
         
         @self.renderShadowButton.event

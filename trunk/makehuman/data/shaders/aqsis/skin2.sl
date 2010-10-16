@@ -5,7 +5,7 @@ surface skin2(
             string colortexture = "";  
             string roughtexture = "";  			
             string spectexture = ""; 
-			float poresdensity = 100;
+			float poresdensity = 1000;
 			float sweat = 2;
             float Kd = 3;
             float Ks = 0.001;             		
@@ -22,8 +22,9 @@ surface skin2(
 	vector Vf = -normalize(I);
 	float ill = 0;
 	Oi = Os;
-	float f = (float noise((poresdensity)*P));
-	float f2 = (float noise((poresdensity/2)*P));
+	//float f = (float noise((poresdensity)*P));
+	float f2 = 1+(float noise(poresdensity*P))/2;
+    float f3 = 1+(float noise(poresdensity*P))/6;
 	
 	//SHADOWS
 	float dark_side = 0;	
@@ -38,14 +39,14 @@ surface skin2(
 	//RAMP COLORS
 	float angle_ramp = (max(0,(1-( Vf.Nn))))/4;//POSSIBILE PARAMETRO QUI.
 	float angle_ramp2 = max(0,(1-( Vf.Nn)));//POSSIBILE PARAMETRO QUI.
-	color glancing_highlight = max(0,((1-(( Vf.Nn)/0.6))*is_under_light))*0.6;//POSSIBILE PARAMETRO QUI.	
+	color glancing_highlight = max(0,((1-(( Vf.Nn)/0.6))*is_under_light))*0.4;//POSSIBILE PARAMETRO QUI.	
 
 	//TEXTURES
 	if (roughtexture != "")
 	roughness = float texture(roughtexture);	
 	
 	if (spectexture != "")
-	     specularity = f * sweat * float texture (spectexture);	 
+	     specularity = f2 * sweat * float texture (spectexture);	 
 	
 	if (colortexture != "")
 	    skin_color = color texture (colortexture);
@@ -77,7 +78,7 @@ surface skin2(
 	
 	final_skin_color *= dark_side;	
 	final_skin_color *= skin_color*Ka/2;
-	final_skin_color += glancing_highlight * f2 *1.3;	
+	final_skin_color += glancing_highlight * f2;	
 	
 	final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),roughness)* angle_ramp2;	
 	final_skin_color = final_skin_color * Kd;
@@ -105,7 +106,7 @@ surface skin2(
     final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),oil_width/10)* dark_side2 * sweat;
     final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),oil_width)* dark_side2 * sweat * 0.01;	
 
-    Ci = final_skin_color * (1/(melanin+1));
+    Ci = final_skin_color * (1/(melanin+1))*f3;
 	
 
 	
