@@ -193,6 +193,7 @@ class RMNObject:
         self.groupsDict = {}
         self.facesGroup = None        
         self.material = None
+        self.materialBump = None
         self.name = name
         self.facesIndices = []
 
@@ -279,7 +280,7 @@ class RMRHuman(RMNObject):
         #materials
         self.skinMat = RMRMaterial("skin2")
         self.skinMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
-        #self.skinMat.parameters.append(MaterialParameter("string", "refltexture", "texture_ref.texture"))
+        self.skinMat.parameters.append(MaterialParameter("string", "spectexture", "texture_ref.texture"))
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
         #self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
 
@@ -288,7 +289,12 @@ class RMRHuman(RMNObject):
         self.hairMat.parameters.append(MaterialParameter("float", "Ks", 5)) 
         self.hairMat.parameters.append(MaterialParameter("float", "roughness", 0.08))
         self.hairMat.parameters.append(MaterialParameter("color", "rootcolor", self.human.hairColor))
-        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))  
+        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor)) 
+        
+        self.skinBump = RMRMaterial("skinbump")
+        self.skinBump.type = "Displacement"
+        self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
+        self.skinBump.parameters.append(MaterialParameter("float", "bumpVal", 0.01)) 
 
     def subObjectsInit(self):
 
@@ -297,7 +303,7 @@ class RMRHuman(RMNObject):
         self.rEyeBall.groupsDict = self.groupsDict
         self.rEyeBall.meshData = self.meshData        
         self.rEyeBall.facesGroup = set(['r-eye-ball'])
-        self.rEyeBall.material = self.skinMat
+        self.rEyeBall.material = self.skinMat        
         self.rEyeBall.joinGroupIndices()
 
         self.lEyeBall = RMNObject(name = "left_eye_ball")
@@ -356,6 +362,7 @@ class RMRHuman(RMNObject):
         self.skin.meshData = self.meshData        
         self.skin.facesGroup = allGr.difference(toSubtract)
         self.skin.material = self.skinMat
+        self.skin.materialBump = self.skinBump
         self.skin.joinGroupIndices()
 
         #parts to render with different material
@@ -464,10 +471,10 @@ class RMRScene:
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
         #default lights
-        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 300, type = "shadowspot", blur = 0.010)
-        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 300, type = "shadowspot",  blur = 0.010)   
+        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 200, type = "shadowspot", blur = 0.010)
+        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 200, type = "shadowspot",  blur = 0.010)   
         self.light2.coneangle = 0.35
-        self.light4 = RMRLight(self.ribsPath,[20, 10, -20],intensity = 300, type = "shadowspot",  blur = 0.010)   
+        self.light4 = RMRLight(self.ribsPath,[20, 10, -20],intensity = 100, type = "shadowspot",  blur = 0.010)   
         self.light4.coneangle = 0.35
         
         #Ambient Occlusion
@@ -494,7 +501,8 @@ class RMRScene:
         #textures used in the scene
         texture1 = RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath)
         texture2 = RMRTexture("texture_ref.tif", self.appTexturePath, self.usrTexturePath)
-        self.textures = [texture1,texture2]
+        texture3 = RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath)
+        self.textures = [texture1,texture2,texture3]
 
     def __str__(self):
         return "Renderman Scene"
@@ -521,7 +529,10 @@ class RMRScene:
             if shadowMode:
                 ribfile.write('\tSurface "null"\n')
             else:
-                subObj.material.writeRibCode(ribfile)
+                if subObj.materialBump:
+                    subObj.materialBump.writeRibCode(ribfile)
+                if subObj.material:
+                    subObj.material.writeRibCode(ribfile)
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
         ribfile.write('\tAttributeBegin\n')
