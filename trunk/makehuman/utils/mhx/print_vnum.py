@@ -1,5 +1,5 @@
 import bpy
-
+ 
 def printVertNums():
 	ob = bpy.context.object
 	print("Verts in ", ob)
