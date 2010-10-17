@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 0.20
+Version 1.0
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.20',
+	'version': '1.0',
 	'blender': (2, 5, 4),
     "api": 31913,
 	"location": "File > Import",
@@ -38,8 +38,8 @@ You have to activated the script in the "Add-Ons" tab (user preferences).
 Access from the File > Import menu.
 """
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 20
+MAJOR_VERSION = 1
+MINOR_VERSION = 0
 BLENDER_VERSION = (2, 54, 0)
 
 #
@@ -251,7 +251,7 @@ def readMhxFile(filePath, scale):
 
 	fileName = os.path.expanduser(filePath)
 	(shortName, ext) = os.path.splitext(fileName)
-	if ext != ".mhx":
+	if ext.lower() != ".mhx":
 		print("Error: Not a mhx file: " + fileName)
 		return
 	print( "Opening MHX file "+ fileName )
@@ -1698,6 +1698,7 @@ def parseConstraint(constraints, args, tokens):
 	return cns
 
 #
+
 
 #	parseCurve (args, tokens):
 #	parseSpline(cu, args, tokens):

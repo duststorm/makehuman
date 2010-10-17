@@ -22,8 +22,8 @@ TO DO
 
 """
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 20
+MAJOR_VERSION = 1
+MINOR_VERSION = 0
 splitLeftRight = True
 
 import module3d, aljabr, mh, files3d, mh2bvh, os
