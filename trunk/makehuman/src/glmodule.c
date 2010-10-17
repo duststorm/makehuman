@@ -70,8 +70,6 @@ static void *g_sdlImageHandle = NULL;
 static PFN_IMG_LOAD IMG_Load = NULL;
 #endif
 
-static int g_ShadersSupported = 0;
-
 typedef struct
 {
     PyObject_HEAD
@@ -639,111 +637,229 @@ GLuint mhCreateVertexShader(const char *source)
     GLuint v;
     GLint status;
 
-    if (!g_ShadersSupported)
-        return 0;
-
-    v = glCreateShader(GL_VERTEX_SHADER);
-
-    glShaderSource(v, 1, &source, NULL);
-
-    glCompileShader(v);
-    glGetShaderiv(v, GL_COMPILE_STATUS, &status);
-    if (status != GL_TRUE)
+    if (GLEW_VERSION_2_0)
     {
+      v = glCreateShader(GL_VERTEX_SHADER);
+
+      glShaderSource(v, 1, &source, NULL);
+
+      glCompileShader(v);
+      glGetShaderiv(v, GL_COMPILE_STATUS, &status);
+      if (status != GL_TRUE)
+      {
+          GLsizei logLength;
+
+          glGetShaderiv(v, GL_INFO_LOG_LENGTH, &logLength);
+
+          if (logLength > 0)
+          {
+              char *log;
+              GLsizei charsWritten;
+
+              log = (char*)malloc(logLength);
+              glGetShaderInfoLog(v, logLength, &charsWritten, log);
+              PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
+              free(log);
+          }
+          else
+              PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
+
+          return 0;
+      }
+
+      return v;
+    }
+    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+    {
+      v = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+
+      glShaderSourceARB(v, 1, &source, NULL);
+
+      glCompileShaderARB(v);
+      glGetObjectParameterivARB(v, GL_OBJECT_COMPILE_STATUS_ARB, &status);
+      if (status != GL_TRUE)
+      {
         GLsizei logLength;
 
-        glGetShaderiv(v, GL_INFO_LOG_LENGTH, &logLength);
+        glGetObjectParameterivARB(v, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
 
         if (logLength > 0)
         {
-            char *log;
-            GLsizei charsWritten;
+          char *log;
+          GLsizei charsWritten;
 
-            log = (char*)malloc(logLength);
-            glGetShaderInfoLog(v, logLength, &charsWritten, log);
-            PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
-            free(log);
+          log = (char*)malloc(logLength);
+          glGetInfoLogARB(v, logLength, &charsWritten, log);
+          PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
+          free(log);
         }
         else
-            PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
+          PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
 
         return 0;
-    }
+      }
 
-    return v;
+      return v;
+    }
+    else
+    {
+      PyErr_SetString(PyExc_RuntimeError, "No shader support detected");
+      return 0;
+    }
 }
 
 GLuint mhCreateFragmentShader(const char *source)
 {
     GLuint f;
     GLint status;
-
-    f = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glShaderSource(f, 1, &source, NULL);
-
-    glCompileShader(f);
-    glGetShaderiv(f, GL_COMPILE_STATUS, &status);
-    if (status != GL_TRUE)
+    
+    if (GLEW_VERSION_2_0)
     {
+      f = glCreateShader(GL_FRAGMENT_SHADER);
+
+      glShaderSource(f, 1, &source, NULL);
+
+      glCompileShader(f);
+      glGetShaderiv(f, GL_COMPILE_STATUS, &status);
+      if (status != GL_TRUE)
+      {
         GLsizei logLength;
 
         glGetShaderiv(f, GL_INFO_LOG_LENGTH, &logLength);
 
         if (logLength > 0)
         {
-            char *log;
-            GLsizei charsWritten;
+          char *log;
+          GLsizei charsWritten;
 
-            log = (char*)malloc(logLength);
-            glGetShaderInfoLog(f, logLength, &charsWritten, log);
-            PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
-            free(log);
+          log = (char*)malloc(logLength);
+          glGetShaderInfoLog(f, logLength, &charsWritten, log);
+          PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
+          free(log);
         }
         else
-            PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
+          PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
 
         return 0;
-    }
+      }
 
-    return f;
+      return f;
+    }
+    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+    {
+      f = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+
+      glShaderSourceARB(f, 1, &source, NULL);
+
+      glCompileShaderARB(f);
+      glGetObjectParameterivARB(f, GL_OBJECT_COMPILE_STATUS_ARB, &status);
+      if (status != GL_TRUE)
+      {
+        GLsizei logLength;
+
+        glGetObjectParameterivARB(f, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
+
+        if (logLength > 0)
+        {
+          char *log;
+          GLsizei charsWritten;
+
+          log = (char*)malloc(logLength);
+          glGetInfoLogARB(f, logLength, &charsWritten, log);
+          PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
+          free(log);
+        }
+        else
+          PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
+
+        return 0;
+      }
+
+      return f;
+    }
+    else
+    {
+      PyErr_SetString(PyExc_RuntimeError, "No shader support detected");
+      return 0;
+    }
 }
 
 GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader)
 {
     GLuint p;
     GLint status;
-
-    p = glCreateProgram();
-
-    glAttachShader(p, vertexShader);
-    glAttachShader(p, fragmentShader);
-
-    glLinkProgram(p);
-    glGetProgramiv(p, GL_LINK_STATUS, &status);
-    if (status != GL_TRUE)
+    
+    if (GLEW_VERSION_2_0)
     {
+      p = glCreateProgram();
+
+      glAttachShader(p, vertexShader);
+      glAttachShader(p, fragmentShader);
+
+      glLinkProgram(p);
+      glGetProgramiv(p, GL_LINK_STATUS, &status);
+      if (status != GL_TRUE)
+      {
         GLsizei logLength;
 
         glGetProgramiv(p, GL_INFO_LOG_LENGTH, &logLength);
 
         if (logLength > 0)
         {
-            char *log;
-            GLsizei charsWritten;
+          char *log;
+          GLsizei charsWritten;
 
-            log = (char*)malloc(logLength);
-            glGetProgramInfoLog(p, logLength, &charsWritten, log);
-            PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
-            free(log);
+          log = (char*)malloc(logLength);
+          glGetProgramInfoLog(p, logLength, &charsWritten, log);
+          PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
+          free(log);
         }
         else
-            PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
+          PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
 
         return 0;
-    }
+      }
 
-    return p;
+      return p;
+    }
+    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+    {
+      p = glCreateProgramObjectARB();
+
+      glAttachObjectARB(p, vertexShader);
+      glAttachObjectARB(p, fragmentShader);
+
+      glLinkProgramARB(p);
+      glGetObjectParameterivARB(p, GL_OBJECT_LINK_STATUS_ARB , &status);
+      if (status != GL_TRUE)
+      {
+        GLsizei logLength;
+
+        glGetObjectParameterivARB(p, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
+
+        if (logLength > 0)
+        {
+          char *log;
+          GLsizei charsWritten;
+
+          log = (char*)malloc(logLength);
+          glGetInfoLogARB(p, logLength, &charsWritten, log);
+          PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
+          free(log);
+        }
+        else
+          PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
+
+        return 0;
+      }
+
+      return p;
+    }
+    else
+    {
+        PyErr_SetString(PyExc_RuntimeError, "No shader support detected");
+        return 0;
+    }
 }
 
 /** \brief Capture a rectangular area from the screen into an image file.
@@ -1288,8 +1404,6 @@ void OnInit(void)
 
     glewInit();
 
-    g_ShadersSupported = (GLEW_VERSION_2_0 != GL_FALSE);
-
     glEnable(GL_DEPTH_TEST);                                  /* Hidden surface removal */
     //glEnable(GL_CULL_FACE);                                   /* Inside face removal */
     //glEnable(GL_ALPHA_TEST);
@@ -1507,13 +1621,11 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 }
 
                 // Enable the shader if the driver supports it and there is a shader assigned
-                if (!pickMode && g_ShadersSupported && obj->shader)
+                if (!pickMode && obj->shader)
                 {
-                    //int isValid;
-                    //glValidateProgram(ProgramObject);
-                    //glGetProgramiv(ProgramObject, GL_VALIDATE_STATUS, &isValid);
-                    //glGetProgramInfoLog
-
+                  if (GLEW_VERSION_2_0)
+                  {
+                  
                     glUseProgram(obj->shader);
 
                     // This should be optimized, since we only need to do it when it's changed
@@ -1588,15 +1700,96 @@ void mhDrawMeshes(int pickMode, int cameraType)
                             }
                         }
                     }
+                  }
+                  else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+                  {
+                    glUseProgramObjectARB(obj->shader);
+
+                    // This should be optimized, since we only need to do it when it's changed
+                    // Validation should also only be done when it is set
+                    if (obj->shaderParameters)
+                    {
+                      GLint parameterCount = 0;
+                      int index;
+                      int currentTextureSampler = 1;
+
+                      glGetObjectParameterivARB(obj->shader, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &parameterCount);
+
+                      for (index = 0; index < parameterCount; index++)
+                      {
+                        GLsizei length;
+                        GLint size;
+                        GLenum type;
+                        GLchar name[32];
+                        PyObject *value;
+
+                        glGetActiveUniformARB(obj->shader, index, sizeof(name), &length, &size, &type, name);
+
+                        value = PyDict_GetItemString(obj->shaderParameters, name);
+
+                        if (value)
+                        {
+                          switch (type)
+                          {
+                          case GL_FLOAT:
+                            {
+                              glUniform1fARB(index, PyFloat_AsDouble(value));
+                              break;
+                            }
+                          case GL_FLOAT_VEC2:
+                            {
+                              if (!PyList_Check(value) || PyList_Size(value) != 2)
+                                break;
+                              glUniform2fARB(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)));
+                              break;
+                            }
+                          case GL_FLOAT_VEC3:
+                            {
+                              if (!PyList_Check(value) || PyList_Size(value) != 3)
+                                break;
+                              glUniform3fARB(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                PyFloat_AsDouble(PyList_GetItem(value, 2)));
+                              break;
+                            }
+                          case GL_FLOAT_VEC4:
+                            {
+                              if (!PyList_Check(value) || PyList_Size(value) != 4)
+                                break;
+                              glUniform4fARB(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
+                              break;
+                            }
+                          case GL_SAMPLER_1D:
+                            {
+                              glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                              glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
+                              glUniform1iARB(index, currentTextureSampler++);
+                              break;
+                            }
+                          case GL_SAMPLER_2D:
+                            {
+                              glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                              glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
+                              glUniform1iARB(index, currentTextureSampler++);
+                              break;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
 
                 /*draw the mesh*/
                 glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
-                if (!pickMode && g_ShadersSupported && obj->shader)
+                if (!pickMode && obj->shader)
                 {
-                    glUseProgram(0);
+                    if (GLEW_VERSION_2_0)
+                      glUseProgram(0);
+                    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+                      glUseProgramObjectARB(0);
                     glActiveTexture(GL_TEXTURE0);
                 }
 
