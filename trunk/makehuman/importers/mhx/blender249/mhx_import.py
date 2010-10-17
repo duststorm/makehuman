@@ -8,7 +8,7 @@ Tooltip: 'Import from MakeHuman eXchange format (.mhx)'
 
 __author__= ['Thomas Larsson']
 __url__ = ("www.makehuman.org")
-__version__= '0.20'
+__version__= '1.0'
 __bpydoc__= '''\
 MHX exporter for Blender
 '''
@@ -50,8 +50,8 @@ TexDir = os.path.expanduser("~/makehuman/exports")
 #
 #
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 20
+MAJOR_VERSION = 1
+MINOR_VERSION = 0
 
 #
 #	Button flags
@@ -1151,7 +1151,7 @@ def insertInfluenceIpo(cns, bone):
 			except:
 				n -= 1
 		icu.driver = 1
-		icu.driverObject = getObject('HumanRig', 'icu.driverObject', globals(), locals())
+		icu.driverObject = getObject('Human', 'icu.driverObject', globals(), locals())
 		try:
 			icu.driverBone = bone
 		except:
@@ -1495,7 +1495,7 @@ def postProcess():
 		setInfluence(fingerBonesFK, 'Action', 0.0)
 	
 def setInfluence(bones, cnsName, w):
-	ob = _object['HumanRig']
+	ob = _object['Human']
 	pbones = ob.getPose().bones	
 	for pb in pbones.values():
 		if pb.name in bones:

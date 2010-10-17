@@ -1,6 +1,6 @@
 import Blender
 
-pbones = Blender.Object.Get('HumanRig').getPose().bones
+pbones = Blender.Object.Get('Human').getPose().bones
 
 def clamp(x, xmin, xmax):
 	if x < xmin:

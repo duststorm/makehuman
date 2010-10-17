@@ -64,11 +64,11 @@ def exportMhx_24(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
-"MHX 0 20 ;\n")
+"MHX 1 0 ;\n")
 
 	fp.write(
 "#if Blender25\n"+
-"  error This file can not be opened in Blender 2.5x. Try the -classic25 file instead. ;\n "+
+"  error This file can not be opened in Blender 2.5x. Try the -25 file instead. ;\n "+
 "#endif\n")
 
 	copyMaterialFile("shared/mhx/templates/materials24.mhx", fp)	
