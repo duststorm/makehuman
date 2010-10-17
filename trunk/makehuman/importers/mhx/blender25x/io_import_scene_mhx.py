@@ -280,29 +280,23 @@ def readMhxFile(filePath, scale):
 		elif lineSplit[0][0] == '#':
 			if lineSplit[0] == '#if':
 				if comment == nesting:
-					print('eval', line, toggle, nesting, comment)
 					try:
 						res = eval(lineSplit[1])
 					except:
 						res = False
-					print('res', res)
 					if res:
 						comment += 1
 				nesting += 1
-				print(line, nesting, comment)
 			elif lineSplit[0] == '#else':
 				if comment == nesting-1:
 					comment += 1
 				elif comment == nesting:
 					comment -= 1
-				print(line, nesting, comment)
 			elif lineSplit[0] == '#endif':
 				if comment == nesting:
 					comment -= 1
 				nesting -= 1
-				print(line, nesting, comment)
 		elif comment < nesting:
-			#print(line)
 			pass
 		elif lineSplit[0] == 'end':
 			try:
