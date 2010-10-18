@@ -5,6 +5,7 @@ surface skin2(
             string colortexture = "";  
             string roughtexture = "";  			
             string spectexture = ""; 
+            string ssstexture = ""; 
 			float poresdensity = 1000;
 			float sweat = 2;
             float Kd = 3;
@@ -34,7 +35,7 @@ surface skin2(
 	//COLORS 
 	color skin_color = Cs;
 	color final_skin_color = skin_color;
-	
+	color ssslight= 0;
 	
 	//RAMP COLORS
 	float angle_ramp = (max(0,(1-( Vf.Nn))))/4;//POSSIBILE PARAMETRO QUI.
@@ -51,6 +52,10 @@ surface skin2(
 	if (colortexture != "")
 	    skin_color = color texture (colortexture);
         Oi = float texture (colortexture[3], "fill", 1);  
+        
+    if (ssstexture != "")
+	    ssslight= color texture (ssstexture);
+        
 	
 
 	//LIGHT MODEL
@@ -107,6 +112,7 @@ surface skin2(
     final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),oil_width)* dark_side2 * sweat * 0.01;	
 
     Ci = final_skin_color * (1/(melanin+1))*f3;
+    Ci = Ci + (ssslight*color(.66,0,0));
 	
 
 	

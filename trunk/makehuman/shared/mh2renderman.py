@@ -86,13 +86,13 @@ class RMRLight:
         self.lookAt = lookAt
         self.type = type
         self.intensity = intensity
-        self.color = [1,1,1]        
+        self.color = [1,1,1]
         self.counter = RMRLight.lightCounter
         self.samples = 64
         self.blur = blur
         self.AOmap = ""
         self.coneangle = 0.25
-        self.roll = None              
+        self.roll = None
         self.shadowMapDataFile = os.path.join(self.ribsPath,"%sshadow%d.zfile"%(self.type, self.counter)).replace('\\', '/')
 
     def writeRibCode(self, ribfile, n=0):
@@ -130,7 +130,7 @@ class RMRLight:
             ribfile.write("Projection \"perspective\" \"fov\" [%0.2f]\n"%(fov))
 
     def pointToAim(self, ribfile, direction):
-        """        
+        """
         pointToAim(): rotate the world so the direction vector points in
         positive z by rotating about the y axis, then x. The cosine
         of each rotation is given by components of the normalized
@@ -182,7 +182,7 @@ class RMRLight:
         self.pointToAim(ribfile, direction);
         self.shadowTranslate(ribfile, -self.position[0], -self.position[1], -self.position[2])
 
- 
+
 
 
 
@@ -191,7 +191,7 @@ class RMNObject:
     def __init__(self, name, obj = None):
 
         self.groupsDict = {}
-        self.facesGroup = None        
+        self.facesGroup = None
         self.material = None
         self.materialBump = None
         self.name = name
@@ -251,16 +251,16 @@ class RMNObject:
                 uvIdx = idx[1]
                 uvValue = facesUVvalues[uvIdx]
                 ribObjFile.write('%s %s ' % (uvValue[0], 1 - uvValue[1]))
-        ribObjFile.write(']')            
-        ribObjFile.close()       
+        ribObjFile.write(']')
+        ribObjFile.close()
 
 
     def joinGroupIndices(self):
         for g in self.facesGroup:
             gIndices = self.groupsDict[g]
-            self.facesIndices.extend(gIndices)         
-    
-        
+            self.facesIndices.extend(gIndices)
+
+
 
 
 
@@ -272,7 +272,7 @@ class RMRHuman(RMNObject):
         self.subObjects = []
         self.human = human
         self.hairFileName = name + "_hairs.rib"
-        
+
         #hairs
         self.hairsClass = human.hairs
         self.hairFilePath = os.path.join(ribRepository, self.hairFileName)
@@ -285,44 +285,44 @@ class RMRHuman(RMNObject):
         #self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
 
         self.hairMat = RMRMaterial("hair")
-        self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5)) 
-        self.hairMat.parameters.append(MaterialParameter("float", "Ks", 5)) 
+        self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5))
+        self.hairMat.parameters.append(MaterialParameter("float", "Ks", 5))
         self.hairMat.parameters.append(MaterialParameter("float", "roughness", 0.08))
         self.hairMat.parameters.append(MaterialParameter("color", "rootcolor", self.human.hairColor))
-        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor)) 
-        
+        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))
+
         self.skinBump = RMRMaterial("skinbump")
         self.skinBump.type = "Displacement"
         self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
-        self.skinBump.parameters.append(MaterialParameter("float", "bumpVal", 0.01)) 
+        self.skinBump.parameters.append(MaterialParameter("float", "bumpVal", 0.01))
 
     def subObjectsInit(self):
 
         #SubObjects
         self.rEyeBall = RMNObject(name = "right_eye_ball")
         self.rEyeBall.groupsDict = self.groupsDict
-        self.rEyeBall.meshData = self.meshData        
+        self.rEyeBall.meshData = self.meshData
         self.rEyeBall.facesGroup = set(['r-eye-ball'])
-        self.rEyeBall.material = self.skinMat        
+        self.rEyeBall.material = self.skinMat
         self.rEyeBall.joinGroupIndices()
 
         self.lEyeBall = RMNObject(name = "left_eye_ball")
         self.lEyeBall.groupsDict = self.groupsDict
-        self.lEyeBall.meshData = self.meshData        
+        self.lEyeBall.meshData = self.meshData
         self.lEyeBall.facesGroup = set(['l-eye-ball'])
         self.lEyeBall.material = self.skinMat
         self.lEyeBall.joinGroupIndices()
 
         self.rCornea = RMNObject(name = "right_cornea")
         self.rCornea.groupsDict = self.groupsDict
-        self.rCornea.meshData = self.meshData        
+        self.rCornea.meshData = self.meshData
         self.rCornea.facesGroup = set(['r-eye-cornea'])
         self.rCornea.material = self.skinMat
         self.rCornea.joinGroupIndices()
 
         self.lCornea = RMNObject(name = "left_cornea")
         self.lCornea.groupsDict = self.groupsDict
-        self.lCornea.meshData = self.meshData        
+        self.lCornea.meshData = self.meshData
         self.lCornea.facesGroup = set(['l-eye-cornea'])
         self.lCornea.material = self.skinMat
         self.lCornea.joinGroupIndices()
@@ -341,14 +341,14 @@ class RMRHuman(RMNObject):
 
         self.teeth = RMNObject(name = "teeth")
         self.teeth.groupsDict = self.groupsDict
-        self.teeth.meshData = self.meshData        
+        self.teeth.meshData = self.meshData
         self.teeth.facesGroup = teethGr
         self.teeth.material = self.skinMat
         self.teeth.joinGroupIndices()
 
         self.nails = RMNObject(name = "nails")
         self.nails.groupsDict = self.groupsDict
-        self.nails.meshData = self.meshData        
+        self.nails.meshData = self.meshData
         self.nails.facesGroup = nailsGr
         self.nails.material = self.skinMat
         self.nails.joinGroupIndices()
@@ -359,7 +359,7 @@ class RMRHuman(RMNObject):
 
         self.skin = RMNObject(name = "skin")
         self.skin.groupsDict = self.groupsDict
-        self.skin.meshData = self.meshData        
+        self.skin.meshData = self.meshData
         self.skin.facesGroup = allGr.difference(toSubtract)
         self.skin.material = self.skinMat
         self.skin.materialBump = self.skinBump
@@ -369,17 +369,22 @@ class RMRHuman(RMNObject):
         self.subObjects = [self.skin,self.rEyeBall,self.lEyeBall,
                         self.rCornea,self.lCornea,self.nails]
 
-    def getObjPosition(self):
+    def getSubObject(self, name):
+        for subOb in self.subObjects:
+            if subOb.name == name:
+                return subObj
+
+    def getHumanPosition(self):
         return (self.human.getPosition()[0], self.human.getPosition()[1],\
                 self.human.getRotation()[0], self.human.getRotation()[1])
-                
+
     def adjustHairStyle(self):
         hair.adjustHair(self.human, self.hairsClass)
-        
+
     def writeHairsInclusion(self, ribfile):
-        archivePath = self.hairFilePath.replace('\\', '/')        
+        archivePath = self.hairFilePath.replace('\\', '/')
         ribfile.write('\t\tReadArchive "%s" '%(archivePath))
-        
+
     def writeHairsCurve(self):
 
 
@@ -448,7 +453,7 @@ class RMRScene:
     def __init__(self, app):
         MHscene = app.scene3d
         camera = app.modelCamera
-        self.app = app              
+        self.app = app
 
         #resources paths
         self.renderPath = mh.getPath('render')
@@ -457,33 +462,43 @@ class RMRScene:
         self.usrTexturePath = os.path.join(self.ribsPath, 'textures')
         self.applicationPath = os.getcwd()  # TODO: this may not always return the app folder
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
-        self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')        
+        self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
-        
+
         #Human in the scene
-        self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)         
-        
+        self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
+
         #Ambient Occlusion paths
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
         self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')
-        
-        #Shadow path        
+
+        #Shadow path
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
+        #SSS path
+        self.bakeFilename = os.path.join(self.ribsPath,"skinbake.rib").replace('\\', '/')
+        self.lightmapFileName = os.path.join(self.ribsPath,"lightmap.rib").replace('\\', '/')
+        self.bakeTMPTexture = os.path.join(self.usrTexturePath,"bake.bake").replace('\\', '/')
+        self.bakeTexture = os.path.join(self.usrTexturePath,"bake.texture").replace('\\', '/')
+        self.lightmapTMPTexture = os.path.join(self.usrTexturePath,"lightmap.tif").replace('\\', '/')
+        self.lightmapTexture = os.path.join(self.usrTexturePath,"lightmap.texture").replace('\\', '/')
+        
+        
+        
         #default lights
         self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 200, type = "shadowspot", blur = 0.010)
-        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 200, type = "shadowspot",  blur = 0.010)   
+        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 200, type = "shadowspot",  blur = 0.010)
         self.light2.coneangle = 0.35
-        self.light4 = RMRLight(self.ribsPath,[20, 10, -20],intensity = 100, type = "shadowspot",  blur = 0.010)   
+        self.light4 = RMRLight(self.ribsPath,[20, 10, -20],intensity = 100, type = "shadowspot",  blur = 0.010)
         self.light4.coneangle = 0.35
-        
+
         #Ambient Occlusion
         #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
         self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.2, type = "envlight")
         self.light3.AOmap = self.ambientOcclusionData
-        
+
         #Lights list
-        self.lights = [self.light1,self.light2,self.light3,self.light4]      
+        self.lights = [self.light1,self.light2,self.light3,self.light4]
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
@@ -501,47 +516,55 @@ class RMRScene:
         #textures used in the scene
         texture1 = RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath)
         texture2 = RMRTexture("texture_ref.tif", self.appTexturePath, self.usrTexturePath)
-        texture3 = RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath)
+        texture3 = RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath)        
         self.textures = [texture1,texture2,texture3]
 
     def __str__(self):
         return "Renderman Scene"
-        
-        
-    def writeWorldFile(self, fName, shadowMode = None):
+
+
+    def writeWorldFile(self, fName, shadowMode = None, bakeMode = None):
         """
 
         """
-        
+
         #Init and write rib code for hairs
 
         self.humanCharacter.subObjectsInit()
         self.humanCharacter.writeHairsCurve()
-        
+
         if len(self.humanCharacter.subObjects) < 1:
             print "Warning: AO calculation on 0 objects"
         ribfile = file(fName, 'w')
-        for subObj in self.humanCharacter.subObjects:
-            print "rendering....", subObj.name
-            ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')            
+        if not bakeMode:
+            for subObj in self.humanCharacter.subObjects:
+                print "rendering....", subObj.name
+                ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
+                ribfile.write('\tAttributeBegin\n')
+                subObj.writeRibCode(ribPath)
+                if shadowMode:
+                    ribfile.write('\tSurface "null"\n')
+                else:
+                    if subObj.materialBump:
+                        subObj.materialBump.writeRibCode(ribfile)
+                    if subObj.material:
+                        subObj.material.writeRibCode(ribfile)
+                ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
+                ribfile.write('\tAttributeEnd\n')
             ribfile.write('\tAttributeBegin\n')
-            subObj.writeRibCode(ribPath)
             if shadowMode:
                 ribfile.write('\tSurface "null"\n')
             else:
-                if subObj.materialBump:
-                    subObj.materialBump.writeRibCode(ribfile)
-                if subObj.material:
-                    subObj.material.writeRibCode(ribfile)
+                self.humanCharacter.hairMat.writeRibCode(ribfile)
+            self.humanCharacter.writeHairsInclusion(ribfile)
+            ribfile.write('\tAttributeEnd\n')
+        else:
+            ribfile.write('\tAttributeBegin\n')
+            ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, os.path.join(self.usrTexturePath,"texture.texture").replace('\\', '/')))
+            ribPath = os.path.join(self.ribsPath, 'skin.rib')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
-        ribfile.write('\tAttributeBegin\n')
-        if shadowMode:
-            ribfile.write('\tSurface "null"\n')
-        else:
-            self.humanCharacter.hairMat.writeRibCode(ribfile)
-        self.humanCharacter.writeHairsInclusion(ribfile)
-        ribfile.write('\tAttributeEnd\n')
+
         ribfile.close()
 
 
@@ -557,9 +580,9 @@ class RMRScene:
         self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.3))
 
         self.humanCharacter.subObjectsInit()
-        pos = self.humanCharacter.getObjPosition()
+        pos = self.humanCharacter.getHumanPosition()
         imgFile = str(time.time())+".tif"
-        ribfile = file(fName, 'w')        
+        ribfile = file(fName, 'w')
 
         #Write rib code for textures
         for t in self.textures:
@@ -589,8 +612,58 @@ class RMRScene:
         for l in self.lights:
             l.writeRibCode(ribfile, l.counter)
         self.writeWorldFile(self.worldFileName)
-        ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))        
+        ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
         ribfile.write('WorldEnd\n')
+        ribfile.close()
+        
+        
+    def writeSkinBakeFile(self):
+        """
+        This function creates the frame definition for a Renderman scene.
+        """
+
+        #Getting global settings
+        self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
+        self.pixelSamples = [2,2]
+        self.shadingRate = 0.5
+        
+
+        self.humanCharacter.subObjectsInit()
+        pos = self.humanCharacter.getHumanPosition()
+        imgFile = str(time.time())+".tif"
+        ribfile = file(self.bakeFilename, 'w')
+
+        #Write rib code for textures
+        for t in self.textures:
+            t.writeRibCode(ribfile)
+
+        #Write headers
+        ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
+        ribfile.write('Option "statistics" "endofframe" [1]\n')
+        ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
+        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
+        ribfile.write('Projection "perspective" "fov" %f\n' % self.camera.fovAngle)
+        ribfile.write('Format %s %s 1\n' % (self.xResolution, self.yResolution))
+        ribfile.write('Clipping 0.1 100\n')
+        ribfile.write('PixelSamples %s %s\n' % (self.pixelSamples[0], self.pixelSamples[1]))
+        ribfile.write('ShadingRate %s \n' % self.shadingRate)
+        ribfile.write('Declare "refltexture" "string"\n')
+        ribfile.write('Declare "skintexture" "string"\n')
+        ribfile.write('Declare "bumptexture" "string"\n')
+        ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
+        ribfile.write('Display "+%s" "file" "rgba"\n' % os.path.join(self.ribsPath, imgFile).replace('\\', '/'))
+        ribfile.write('\tTranslate %f %f %f\n' % (self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)) # Camera
+        ribfile.write('\tTranslate %f %f %f\n' % (pos[0], pos[1], 0.0)) # Model
+        ribfile.write('\tRotate %f 1 0 0\n' % -pos[2])
+        ribfile.write('\tRotate %f 0 1 0\n' % -pos[3])
+        ribfile.write('WorldBegin\n')
+
+        for l in self.lights:
+            l.writeRibCode(ribfile, l.counter)
+        self.writeWorldFile(self.worldFileName, bakeMode = 1)
+        ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
+        ribfile.write('WorldEnd\n')
+        ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.bakeTMPTexture, self.bakeTexture))
         ribfile.close()
 
     def writeShadowFile(self):
@@ -624,12 +697,37 @@ class RMRScene:
                 ribfile.write('WorldBegin\n')
                 ribfile.write('\tSurface "null"\n')
                 ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
-                ribfile.write('WorldEnd\n') 
-                ribfile.write('FrameEnd\n') 
-                shadowMapDataFileFinal = l.shadowMapDataFile.replace("zfile","shad")                
+                ribfile.write('WorldEnd\n')
+                ribfile.write('FrameEnd\n')
+                shadowMapDataFileFinal = l.shadowMapDataFile.replace("zfile","shad")
                 ribfile.write('MakeShadow "%s" "%s"\n'%(l.shadowMapDataFile,shadowMapDataFileFinal))
-            
-        ribfile.close()  
+
+        ribfile.close()
+
+    def writelightmapFile(self):
+        """
+        This function creates the frame definition for a Renderman scene.
+        """
+
+        ribfile = file(self.lightmapFileName, 'w')
+        #Write headers
+        ribfile.write('Sides 2\n')
+        ribfile.write('Format 1024 1024 1\n')
+        ribfile.write('PixelSamples 2 2\n')
+        ribfile.write('ShadingInterpolation "smooth"\n')
+        ribfile.write('Projection "orthographic"\n')
+        ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
+        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/')) 
+        ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
+        ribfile.write('Display "+%s" "file" "rgba"\n' % self.lightmapTMPTexture) 
+        ribfile.write('WorldBegin\n')
+        ribfile.write('Color [ 1 1 1 ]\n')
+        ribfile.write('\tSurface "textureonly" "string colorTexture" "%s"\n'%(self.bakeTexture))        
+        ribfile.write('Translate 0 0 0.02\n')
+        ribfile.write('Polygon "P" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]"st" [ 0 1  1 1  1 0  0 0  ]\n')
+        ribfile.write('WorldEnd\n')
+        ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.lightmapTMPTexture, self.lightmapTexture))
+        ribfile.close()
 
 
     def copyAOfile(self, src, dst, oldString1, newString1, oldString2, newString2):
@@ -643,12 +741,12 @@ class RMRScene:
         f = open(dst, 'w')
         f.write(o)
         f.close()
-        
+
     def renderShadow(self):
         self.writeShadowFile()
         command = '%s "%s"' % ('aqsis -progress', self.shadowFileName)
         subprocess.Popen(command, shell=True)
-            
+
 
     def renderAOdata(self):
         self.writeWorldFile(self.worldFileName, 1)
@@ -661,7 +759,8 @@ class RMRScene:
 
 
     def render(self, ribFileName):
-        self.writeShadowFile()
+        #self.writeSkinBakeFile()
+        #self.writelightmapFile()
         sceneFileName = os.path.join(self.ribsPath, ribFileName)
         self.writeSceneFile(sceneFileName)
         command = '%s "%s"' % ('aqsis -progress', sceneFileName)
