@@ -669,7 +669,7 @@ GLuint mhCreateVertexShader(const char *source)
 
       return v;
     }
-    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+    else if (GLEW_ARB_shader_objects)
     {
       v = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
 
@@ -745,7 +745,7 @@ GLuint mhCreateFragmentShader(const char *source)
 
       return f;
     }
-    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+    else if (GLEW_ARB_shader_objects)
     {
       f = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 
@@ -822,7 +822,7 @@ GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader)
 
       return p;
     }
-    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+    else if (GLEW_ARB_shader_objects)
     {
       p = glCreateProgramObjectARB();
 
@@ -1701,7 +1701,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                         }
                     }
                   }
-                  else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+                  else if (GLEW_ARB_shader_objects)
                   {
                     glUseProgramObjectARB(obj->shader);
 
@@ -1788,7 +1788,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 {
                     if (GLEW_VERSION_2_0)
                       glUseProgram(0);
-                    else if (GLEW_ARB_vertex_shader  && GLEW_ARB_fragment_shader)
+                    else if (GLEW_ARB_shader_objects)
                       glUseProgramObjectARB(0);
                     glActiveTexture(GL_TEXTURE0);
                 }
