@@ -36,6 +36,9 @@ class AqsisTaskView(gui3d.TaskView):
         self.renderShadowButton = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images', 'button_calc_ao.png'),
                                     selectedTexture=self.app.getThemeResource('images', 'button_calc_ao_on.png'), position=[50, 120, 9])
                                     
+        self.renderSSSButton = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images', 'button_calc_ao.png'),
+                                    selectedTexture=self.app.getThemeResource('images', 'button_calc_ao_on.png'), position=[50, 140, 9])
+                                    
                                     
         #Sliders                            
         self.shadingRateSlider= gui3d.Slider(self, position=[10, 140, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.000")
@@ -44,6 +47,10 @@ class AqsisTaskView(gui3d.TaskView):
         self.samplesSlider.label.setPosition([15,175,9.5])        
         self.skinOilSlider= gui3d.Slider(self, position=[10, 400, 9.3], value=0.3, min=0.0, max=3, label = "Skin Oil: 1.000")
         self.skinOilSlider.label.setPosition([15,395,9.5])
+        
+        @self.renderSSSButton.event
+        def onClicked(event):            
+            self.sceneToRender.renderSSS()
         
         @self.renderShadowButton.event
         def onClicked(event):            
