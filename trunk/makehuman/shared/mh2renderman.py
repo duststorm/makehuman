@@ -763,11 +763,37 @@ class RMRScene:
         #self.writelightmapFile()
         sceneFileName = os.path.join(self.ribsPath, ribFileName)
         self.writeSceneFile(sceneFileName)
-        command = '%s "%s"' % ('aqsis -progress', sceneFileName)
-        subprocess.Popen(command, shell=True)
+        
+        renderThread = RenderThread(self.app, sceneFileName)
+        renderThread.start()
 
+from threading import Thread
 
+class RenderThread(Thread):
 
+    def __init__(self, app, filename):
+    
+        Thread.__init__(self)
+        self.app = app
+        self.filename = filename
+    
+    def run(self):
+
+        command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', self.filename)
+        renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+        
+        self.app.progress(0.0)
+        self.app.scene3d.redraw()
+
+        for line in renderProc.stdout:
+          if line.startswith("progress"):
+            progress = line.split()
+            self.app.progress(float(progress[2])/100.0)
+            self.app.scene3d.redraw()
+            #print progress
+           
+        self.app.progress(1.0)
+        self.app.scene3d.redraw()
 
 
 
