@@ -538,10 +538,8 @@ class RMRScene:
 
         if len(self.humanCharacter.subObjects) < 1:
             print "Warning: AO calculation on 0 objects"
-        if shadowMode:
-            ribfile = file(fName+"shad.rib", 'w')
-        else:
-            ribfile = file(fName, 'w')
+
+        ribfile = file(fName, 'w')
         if not bakeMode:
             print "Writing world"
             for subObj in self.humanCharacter.subObjects:
@@ -743,8 +741,7 @@ class RMRScene:
 
 
     def copyAOfile(self, src, dst, oldString1, newString1, oldString2, newString2):
-        #TODO: this function must be converted in writeAOfile type.
-        self.writeWorldFile(self.worldFileName, 1)
+        #TODO: this function must be converted in writeAOfile type.        
         i = open(src)
         o = i.read()
         o = o.replace(oldString1, newString1)
@@ -757,40 +754,42 @@ class RMRScene:
 
     def renderShadow(self):
         print "render shadow not enabled"
-        #self.writeShadowFile()        
-        #renderThread = RenderThread(self.app, self.shadowFileName)
-        #renderThread.start()
+        self.writeShadowFile()        
+        command = '%s "%s"' % ('aqsis -progress', self.shadowFileName)
+        subprocess.Popen(command, shell=True)
 
 
     def renderAOdata(self):
-        print "renderAO not enabled"
-        #self.writeWorldFile(self.worldFileName, 1)
-        #self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
-                        #self.ambientOcclusionFileName,\
-                        #"%DATAPATH%",self.ambientOcclusionData,\
-                        #"%WORLDPATH%",self.worldFileName)
-                        
-        #renderThread = RenderThread(self.app, self.ambientOcclusionFileName)
-        #renderThread.start()
-       
-
-    def render(self):
+        
+        self.writeWorldFile(self.worldFileName, 1)
         self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
                         self.ambientOcclusionFileName,\
                         "%DATAPATH%",self.ambientOcclusionData,\
-                        "%WORLDPATH%",self.worldFileName+"shad.rib")
-        self.writeSkinBakeFile()
-        self.writelightmapFile() 
-        self.writeShadowFile()       
-        self.writeSceneFile()
+                        "%WORLDPATH%",self.worldFileName)                        
+        command = '%s "%s"' % ('aqsis -progress', self.ambientOcclusionFileName)
+        subprocess.Popen(command, shell=True)
+       
+
+    def render(self):
+        #self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
+                        #self.ambientOcclusionFileName,\
+                        #"%DATAPATH%",self.ambientOcclusionData,\
+                        #"%WORLDPATH%",self.worldFileName+"shad.rib")
+        #self.writeSkinBakeFile()
+        #self.writelightmapFile() 
+        #self.writeShadowFile()       
+        self.writeSceneFile()  
         
-        #renderThread = RenderThread(self.app, [self.ambientOcclusionFileName])
-        renderThread = RenderThread(self.app, [self.ambientOcclusionFileName,\
-                                            self.shadowFileName,\
-                                            self.bakeFilename,\
-                                            self.lightmapFileName,\
-                                            self.sceneFileName])
-        renderThread.start()
+        command = '%s "%s"' % ('aqsis -progress', self.sceneFileName)
+        subprocess.Popen(command, shell=True)      
+        
+        #renderThread = RenderThread(self.app, [self.ambientOcclusionFileName,\
+                                            #self.shadowFileName,\
+                                            #self.bakeFilename,\
+                                            #self.lightmapFileName,\
+                                            #self.sceneFileName])
+                                            
+        #renderThread.start()
 
 from threading import Thread
 
@@ -810,17 +809,17 @@ class RenderThread(Thread):
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             
             self.app.progress(0.0)
-            self.app.scene3d.redraw()
+            #self.app.scene3d.redraw()
 
             for line in renderProc.stdout:
               if line.startswith("progress"):
                 progress = line.split()
                 self.app.progress(float(progress[2])/100.0)
-                self.app.scene3d.redraw()
+                #self.app.scene3d.redraw()
                 #print progress
                
             self.app.progress(1.0)
-            self.app.scene3d.redraw()
+            #self.app.scene3d.redraw()
 
 
 
