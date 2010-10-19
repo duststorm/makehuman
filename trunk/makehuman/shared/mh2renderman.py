@@ -764,36 +764,38 @@ class RMRScene:
         sceneFileName = os.path.join(self.ribsPath, ribFileName)
         self.writeSceneFile(sceneFileName)
         
-        renderThread = RenderThread(self.app, sceneFileName)
+        renderThread = RenderThread(self.app, [sceneFileName])
         renderThread.start()
 
 from threading import Thread
 
 class RenderThread(Thread):
 
-    def __init__(self, app, filename):
+    def __init__(self, app, filenames):
     
         Thread.__init__(self)
         self.app = app
-        self.filename = filename
+        self.filenames = filenames
     
     def run(self):
 
-        command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', self.filename)
-        renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-        
-        self.app.progress(0.0)
-        self.app.scene3d.redraw()
-
-        for line in renderProc.stdout:
-          if line.startswith("progress"):
-            progress = line.split()
-            self.app.progress(float(progress[2])/100.0)
+        for filename in self.filenames:
+            
+            command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
+            renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            
+            self.app.progress(0.0)
             self.app.scene3d.redraw()
-            #print progress
-           
-        self.app.progress(1.0)
-        self.app.scene3d.redraw()
+
+            for line in renderProc.stdout:
+              if line.startswith("progress"):
+                progress = line.split()
+                self.app.progress(float(progress[2])/100.0)
+                self.app.scene3d.redraw()
+                #print progress
+               
+            self.app.progress(1.0)
+            self.app.scene3d.redraw()
 
 
 
