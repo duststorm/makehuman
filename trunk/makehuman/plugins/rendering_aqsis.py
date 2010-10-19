@@ -51,7 +51,7 @@ class AqsisTaskView(gui3d.TaskView):
 
         @self.renderButton.event
         def onClicked(event):            
-            self.sceneToRender.render("scene.rib")
+            self.sceneToRender.render()
 
         @self.renderAOButton.event
         def onClicked(event):
