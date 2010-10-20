@@ -556,6 +556,8 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    PyEval_InitThreads();
+
     PySys_SetArgv(argc, argv);
 
     initGlobals(); /* initialize all our globals */
