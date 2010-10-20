@@ -283,7 +283,7 @@ class RMRHuman(RMNObject):
         self.skinMat.parameters.append(MaterialParameter("string", "spectexture", "texture_ref.texture"))
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
         self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lightmap.texture"))
-        
+
         #self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
 
         self.hairMat = RMRMaterial("hair")
@@ -455,7 +455,7 @@ class RMRScene:
     def __init__(self, app):
         MHscene = app.scene3d
         camera = app.modelCamera
-        self.app = app       
+        self.app = app
 
         #resources paths
         self.renderPath = mh.getPath('render')
@@ -466,8 +466,8 @@ class RMRScene:
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
-        
-        #mainscenefile 
+
+        #mainscenefile
         self.sceneFileName = os.path.join(self.ribsPath, "scene.rib")
 
         #Human in the scene
@@ -487,9 +487,9 @@ class RMRScene:
         self.bakeTexture = os.path.join(self.usrTexturePath,"bake.texture").replace('\\', '/')
         self.lightmapTMPTexture = os.path.join(self.usrTexturePath,"lightmap.tif").replace('\\', '/')
         self.lightmapTexture = os.path.join(self.usrTexturePath,"lightmap.texture").replace('\\', '/')
-        
-        
-        
+
+
+
         #default lights
         self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 300, type = "shadowspot", blur = 0.010)
         self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 300, type = "shadowspot",  blur = 0.010)
@@ -521,7 +521,7 @@ class RMRScene:
         #textures used in the scene
         texture1 = RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath)
         texture2 = RMRTexture("texture_ref.tif", self.appTexturePath, self.usrTexturePath)
-        texture3 = RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath)        
+        texture3 = RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath)
         self.textures = [texture1,texture2,texture3]
 
     def __str__(self):
@@ -623,8 +623,8 @@ class RMRScene:
         ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
         ribfile.write('WorldEnd\n')
         ribfile.close()
-        
-        
+
+
     def writeSkinBakeFile(self):
         """
         This function creates the frame definition for a Renderman scene.
@@ -634,7 +634,7 @@ class RMRScene:
         self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
         self.pixelSamples = [2,2]
         self.shadingRate = 0.5
-        
+
 
         self.humanCharacter.subObjectsInit()
         pos = self.humanCharacter.getHumanPosition()
@@ -643,9 +643,9 @@ class RMRScene:
 
         #Write rib code for textures
         for t in self.textures:
-            t.writeRibCode(ribfile)          
-            
-        
+            t.writeRibCode(ribfile)
+
+
 
         ribfile.write('FrameBegin 1\n')
         ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
@@ -672,9 +672,9 @@ class RMRScene:
         self.writeWorldFile(self.worldFileName, bakeMode = 1)
         ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
         ribfile.write('WorldEnd\n')
-        ribfile.write('FrameEnd\n')        
+        ribfile.write('FrameEnd\n')
         ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.bakeTMPTexture, self.bakeTexture))
-        
+
         ribfile.write('FrameBegin 2\n')
         ribfile.write('Sides 2\n')
         ribfile.write('Format 1024 1024 1\n')
@@ -682,20 +682,20 @@ class RMRScene:
         ribfile.write('ShadingInterpolation "smooth"\n')
         ribfile.write('Projection "orthographic"\n')
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
-        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/')) 
+        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
         ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
-        ribfile.write('Display "+%s" "file" "rgba"\n' % self.lightmapTMPTexture) 
+        ribfile.write('Display "+%s" "file" "rgba"\n' % self.lightmapTMPTexture)
         ribfile.write('WorldBegin\n')
         ribfile.write('Color [ 1 1 1 ]\n')
-        ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))        
+        ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))
         ribfile.write('Translate 0 0 0.02\n')
         ribfile.write('Polygon "P" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]"st" [ 0 1  1 1  1 0  0 0  ]\n')
         ribfile.write('WorldEnd\n')
         ribfile.write('FrameEnd\n')
-        
+
         ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.lightmapTMPTexture, self.lightmapTexture))
-               
-        
+
+
 
     def writeShadowFile(self):
         """
@@ -749,23 +749,23 @@ class RMRScene:
         #ribfile.write('ShadingInterpolation "smooth"\n')
         #ribfile.write('Projection "orthographic"\n')
         #ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
-        #ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/')) 
+        #ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
         #ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
-        #ribfile.write('Display "+%s" "file" "rgba"\n' % self.lightmapTMPTexture) 
+        #ribfile.write('Display "+%s" "file" "rgba"\n' % self.lightmapTMPTexture)
         #ribfile.write('WorldBegin\n')
         #ribfile.write('Color [ 1 1 1 ]\n')
-        #ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))        
+        #ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))
         #ribfile.write('Translate 0 0 0.02\n')
         #ribfile.write('Polygon "P" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]"st" [ 0 1  1 1  1 0  0 0  ]\n')
         #ribfile.write('WorldEnd\n')
         #ribfile.write('FrameEnd\n')
-        
+
         #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.lightmapTMPTexture, self.lightmapTexture))
         #ribfile.close()
 
 
     def copyAOfile(self, src, dst, oldString1, newString1, oldString2, newString2):
-        #TODO: this function must be converted in writeAOfile type.        
+        #TODO: this function must be converted in writeAOfile type.
         i = open(src)
         o = i.read()
         o = o.replace(oldString1, newString1)
@@ -776,78 +776,76 @@ class RMRScene:
         f.write(o)
         f.close()
 
-    def renderShadow(self):        
-        self.writeShadowFile()        
+    def renderShadow(self):
+        self.writeShadowFile()
         command = '%s "%s"' % ('aqsis -progress', self.shadowFileName)
         subprocess.Popen(command, shell=True)
 
 
     def renderAOdata(self):
-        
+
         self.writeWorldFile(self.worldFileName, 1)
         self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
                         self.ambientOcclusionFileName,\
                         "%DATAPATH%",self.ambientOcclusionData,\
-                        "%WORLDPATH%",self.worldFileName)                        
+                        "%WORLDPATH%",self.worldFileName)
         command = '%s "%s"' % ('aqsis -progress', self.ambientOcclusionFileName)
         subprocess.Popen(command, shell=True)
-        
-    def renderSSS(self):        
-        self.writeSkinBakeFile()   
+
+    def renderSSS(self):
+        self.writeSkinBakeFile()
         command = '%s "%s"' % ('aqsis -progress', self.bakeFilename)
         subprocess.Popen(command, shell=True)
-       
+
 
     def render(self):
-        #self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
-                        #self.ambientOcclusionFileName,\
-                        #"%DATAPATH%",self.ambientOcclusionData,\
-                        #"%WORLDPATH%",self.worldFileName+"shad.rib")
-        #self.writeSkinBakeFile()
-        #self.writelightmapFile() 
-        #self.writeShadowFile()       
-        self.writeSceneFile()  
-        
-        command = '%s "%s"' % ('aqsis -progress', self.sceneFileName)
-        subprocess.Popen(command, shell=True)      
-        
-        #renderThread = RenderThread(self.app, [self.ambientOcclusionFileName,\
-                                            #self.shadowFileName,\
-                                            #self.bakeFilename,\
-                                            #self.lightmapFileName,\
-                                            #self.sceneFileName])
-                                            
-        #renderThread.start()
+        self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
+                        self.ambientOcclusionFileName,\
+                        "%DATAPATH%",self.ambientOcclusionData,\
+                        "%WORLDPATH%",self.worldFileName+"shad.rib")
+        self.writeSkinBakeFile()
+        self.writeShadowFile()
+        self.writeSceneFile()
+
+        #command = '%s "%s"' % ('aqsis -progress', self.sceneFileName)
+        #subprocess.Popen(command, shell=True)
+
+        renderThread = RenderThread(self.app, [self.ambientOcclusionFileName,\
+                                            self.shadowFileName,\
+                                            self.bakeFilename,\
+                                            self.sceneFileName])
+
+        renderThread.start()
 
 from threading import Thread
 
 class RenderThread(Thread):
 
     def __init__(self, app, filenames):
-    
+
         Thread.__init__(self)
         self.app = app
         self.filenames = filenames
-    
+
     def run(self):
 
         for filename in self.filenames:
-            
+
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-            
+
             self.app.progress(0.0)
-            #self.app.scene3d.redraw()
+            self.app.scene3d.redraw()
 
             for line in renderProc.stdout:
               if line.startswith("progress"):
                 progress = line.split()
                 self.app.progress(float(progress[2])/100.0)
-                #self.app.scene3d.redraw()
+                self.app.scene3d.redraw()
                 #print progress
-               
+
             self.app.progress(1.0)
-            #self.app.scene3d.redraw()
+            self.app.scene3d.redraw()
 
 
 
