@@ -12,11 +12,13 @@ BodyJoints = [
 	('chest-front',			'v', 7292),
 	('r-rib-top',			'v', 3667),
 	('r-rib-bot',			'v', 3400),
+	('r-tit',				'v', 3718),
 	('r-stomach',			'v', 6568),
 	('r-hip',				'v', 6563),
 
 	('l-rib-top',			'v', 10134),
 	('l-rib-bot',			'v', 10361),
+	('l-tit',				'v', 10115),
 	('l-hip',				'v', 6749),
 	('l-stomach',			'v', 6744),
 
@@ -38,28 +40,28 @@ BodyJoints = [
 	('floor',				'o', ('mid-feet', [0,-0.3,0])),
 ]
 
-offs = [0,0.3,0]
-
 BodyHeadsTails = [
 	('MasterFloor',			'floor', ('floor', zunit)),
 	('MasterHips',			'pelvis', ('pelvis', zunit)),
 	('MasterNeck',			'neck', ('neck', zunit)),
 
-	('Root',			'spine3', 'spine4'),
-	('Hips',			'pelvis', 'hips-tail'),
-	('Hip_L',			'pelvis', 'r-upper-leg'),
-	('Hip_R',			'pelvis', 'l-upper-leg'),
+	('Root',				'spine3', 'spine4'),
+	('Hips',				'pelvis', 'hips-tail'),
+	('Hip_L',				'pelvis', 'r-upper-leg'),
+	('Hip_R',				'pelvis', 'l-upper-leg'),
+	
+	('Spine1',				'spine3', 'spine2'),
+	('Spine2',				'spine2', 'spine1'),
+	('Spine3',				'spine1', 'neck'),
+	('Neck',				'neck', 'head'),
+	('Head',				'head', 'head-end'),
 
-	('Spine1',			'spine3', 'spine2'),
-	('Spine2',			'spine2', 'spine1'),
-	('Spine3',			'spine1', 'neck'),
-	('Neck',			'neck', 'head'),
-	('Head',			'head', 'head-end'),
-
-	('Rib',				'mid-rib-top', 'mid-rib-bot'),
+	('Rib',					'mid-rib-top', 'mid-rib-bot'),
 	('StomachUp',			'mid-rib-bot', 'stomach-front'),
 	('StomachLo',			'mid-hip', 'stomach-front'),
-	('StomachTarget',	'stomach-front', ('stomach-front', offs)),
+	('StomachTarget',		'stomach-front', ('stomach-front', zunit)),
+	('Breast_L',			'r-tit', ('r-tit', zunit)),
+	('Breast_R',			'l-tit', ('l-tit', zunit)),
 ]
 
 BodyArmature = [
@@ -79,9 +81,11 @@ BodyArmature = [
 	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 
 	('Rib',				0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
-	('StomachUp',			0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
-	('StomachLo',			0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
-	('StomachTarget',	0, 'Spine1', 0, L_HELP, (1,1,1) ),
+	('Breast_L',		0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,1) ),
+	('Breast_R',		0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,1) ),
+	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
+	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
+	('StomachTarget',	0, 'Spine1', F_WIR, L_SPINE, (1,1,1) ),
 ]
 
 #
@@ -114,29 +118,23 @@ def BodyWritePoses(fp):
 
 	addPoseBone(fp,  'Head', 'GoboHead', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	# Deform
+	# Stomach
+	addPoseBone(fp,  'StomachTarget', 'MHCube01', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
+		[('LimitDist', 0, 1, ['LimitDist', 1, 'Rib'])])
 
-	vec = aljabr.vsub(mhx_rig.locations['stomach-front'], mhx_rig.locations['stomach-back'])
-	dist = aljabr.vlen(vec) - 0.5
-	if dist < 0: dist = 0.0
-	stomachFwdPos = str(0.4*dist) + '*theScale'
-	stomachUpPos = str(0.8*dist) + '*theScale'
-	stomachFwdNeg = str(-0.2*dist) + '*theScale'
-	stomachUpNeg = str(-0.4*dist) + '*theScale'
-	print('Stm', stomachFwdPos)
-
-	addPoseBone(fp,  'StomachTarget', None, None, (0,0,0), (0,1,0), (0,0,0), (1,1,1), 0, 
-		[('Transform', C_OW_LOCAL+C_TG_LOCAL, 1, ['Transform', 'Spine1',
-			'ROTATION', (-45,0,0), (90,0,0), ('X', 'X', 'X'),
-			'LOCATION', (0,stomachUpNeg, stomachFwdNeg),(0, stomachUpPos, stomachFwdPos)])
+	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0]),
+		 ('CopyScale', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
 		])
 
 	addPoseBone(fp,  'StomachUp', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0]),
+		 ('CopyScale', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
+		])
 
-	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0])])
+	addPoseBone(fp,  'Breast_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
+	addPoseBone(fp,  'Breast_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 	return
 
 

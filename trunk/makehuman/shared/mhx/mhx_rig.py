@@ -70,7 +70,7 @@ L_DEF =		0x8000
 F_CON = 0x0001
 F_DEF = 0x0002
 F_RES = 0x0004
-F_RES = 0
+#F_RES = 0
 F_WIR = 0x0008
 F_NOSCALE = 0x0010
 F_GLOC = 0x0020
@@ -415,6 +415,9 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 	(lockRotX, lockRotY, lockRotZ) = lockRot
 	(lockScaleX, lockScaleY, lockScaleZ) = lockScale
 	(ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof
+	ikLockX = 1-ik_dof_x
+	ikLockY = 1-ik_dof_y
+	ikLockZ = 1-ik_dof_z
 
 	ikLin = boolString(flags & P_IKLIN)
 	ikRot = boolString(flags & P_IKROT)
@@ -489,15 +492,18 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 	if not Mhx25:
 		fp.write("\tend posebone\n")
 		return
-	'''
+	
 	fp.write(
-"    ik_dof Array %d %d %d  ; \n" % (ik_dof_x, ik_dof_y, ik_dof_z) +
-"    ik_limit Array %d %d %d  ; \n" % (usex,usey,usez)+
+"    lock_ik_x %d ;\n" % ikLockX +
+"    lock_ik_y %d ;\n" % ikLockY +
+"    lock_ik_z %d ;\n" % ikLockZ +
+"    use_ik_limit_x %d ;\n" % usex +
+"    use_ik_limit_y %d ;\n" % usey +
+"    use_ik_limit_z %d ;\n" % usez +
 "    ik_stiffness Array 0.0 0.0 0.0  ; \n")
 	fp.write(
 "    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
 "    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
-	'''
 
 	if customShape:
 		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
