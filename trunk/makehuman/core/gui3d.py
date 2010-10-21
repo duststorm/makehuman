@@ -739,7 +739,7 @@ class Button(View):
 
 class RadioButton(Button):
 
-    def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None, position=[0, 0, 9], selected=False, label=None):
+    def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, label=None):
         Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, label=label)
         self.group = group
         self.group.append(self)
