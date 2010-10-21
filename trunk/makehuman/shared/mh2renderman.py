@@ -385,7 +385,7 @@ class RMRHuman(RMNObject):
 
     def writeHairsInclusion(self, ribfile):
         archivePath = self.hairFilePath.replace('\\', '/')
-        ribfile.write('\t\tReadArchive "%s" '%(archivePath))
+        ribfile.write('\t\tReadArchive "%s"\n'%(archivePath))
 
     def writeHairsCurve(self):
 
@@ -472,6 +472,11 @@ class RMRScene:
 
         #Human in the scene
         self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
+        
+        #Rendering options
+        self.calcAmbientOcclusion = False
+        self.calcShadow = False
+        self.calcSSS = False
 
         #Ambient Occlusion paths
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
@@ -488,7 +493,23 @@ class RMRScene:
         self.lightmapTMPTexture = os.path.join(self.usrTexturePath,"lightmap.tif").replace('\\', '/')
         self.lightmapTexture = os.path.join(self.usrTexturePath,"lightmap.texture").replace('\\', '/')
 
-
+        #Matrix for world tranformation to place lights in AO calculation    
+        self.matrixAO = [[0.0, -0.0, 1.0, -0.0, 1.0, 0.0, -0.0, 0.0, 0.0, 1.0, 0.0, -0.0, -0.0, 0.0, 10.0, 1.0],\
+                        [1.0, -0.0, 0.0, -0.0, -0.0, -0.8315, -0.5556, 0.0, 0.0, 0.5556, -0.8315, -0.0, -0.0, -1.2359e-16, 10.0, 1.0],\
+                        [0.8214, 0.2744, 0.5, -0.0, 0.5703, -0.3952, -0.7201, 0.0, 2.5506e-17, 0.8767, -0.4811, -0.0, 2.534e-16, -3.700e-16, 1.0, 1.0],\
+                        [0.8618, -0.0857, -0.5, -0.0, -0.5073, -0.1456, -0.8494, 0.0, -6.6136e-18, 0.9856, -0.1690, -0.0, -2.2542e-16, 4.4832e-17, 10.0, 1.0],\
+                        [0.6542, -0.0976, 0.75, -0.0, 0.7563, 0.0844, -0.6487, 0.0, 1.0774e-18, 0.9916, 0.1290, -0.0, -1.6816e-16, -7.3780e-17, 10.0, 1.0],\
+                        [0.9550, 0.1595, -0.25, -0.0, -0.2966, 0.5137, -0.8050, 0.0, 6.234e-19, 0.8430, 0.5380, -0.0, 6.5757e-17, -3.0092e-16, 10.0, 1.0],\
+                        [0.9068, -0.3393, 0.25, -0.0, 0.4214, 0.7301, -0.5380, 0.0, -1.2943e-17, 0.5932, 0.8050, -0.0, -9.3567e-17, -4.2555e-16, 10.0, 1.0],\
+                        [0.1696, 0.6393, -0.75, -0.0, -0.9855, 0.1100, -0.1290, 0.0, 1.7124e-17, 0.7610, 0.6487, -0.0, 5.4752e-17, 1.6306e-16, 10.0000, 1.0],\
+                        [-0.1073, -0.4720, 0.875, -0.0, 0.9942, -0.0509, 0.0944, 0.0, -1.8872e-18, 0.8801, 0.4748, -0.0, 5.5226e-17, 9.4542e-17, 10.0, 1.0],\
+                        [-0.9752, 0.1824, -0.1250, -0.0, -0.2211, -0.8045, 0.5512, 0.0, -4.2894e-18, 0.5652, 0.8249, -0.0, -9.8228e-17, -4.8268e-16, 10.0, 1.0],\
+                        [-0.8992, -0.2253, 0.375, -0.0, 0.4375, -0.4631, 0.7708, 0.0, -2.1684e-19, 0.8572, 0.5150, -0.0, 1.9413e-16, -2.0546e-16, 10.0, 1.0],\
+                        [-0.7747, 0.0963, -0.625, -0.0, -0.6323, -0.1180, 0.7656, 0.0, 5.1635e-18, 0.9883, 0.1523, -0.0, -2.8087e-16, 5.7300e-17, 10.0, 1.0],\
+                        [-0.7747, 0.0963, 0.625, -0.0, 0.6323, 0.1180, 0.7656, 0.0, -2.8596e-18, 0.9883, -0.1523, -0.0, 2.8018e-16, 5.2367e-17, 10.0, 1.0],\
+                        [-0.8992, -0.2253, -0.375, -0.0, -0.4375, 0.4631, 0.7708, 0.0, 1.9298e-17, 0.8572, -0.5150, -0.0, -9.7144e-17, 4.8350e-16, 10.0, 1.0],\
+                        [-0.9752, 0.18244, 0.125, -0.0, 0.2211, 0.8045, 0.5512, 0.0, 2.7782e-18, 0.5652, -0.8250, -0.0, 5.4210e-20, -1.252e-16, 10.0, 1.0],\
+                        [-0.1073, -0.4721, -0.875, -0.0, -0.9942, 0.0509, 0.0944, 0.0, -8.955e-18, 0.8801, -0.4748, -0.0, -2.7593e-17, 1.9689e-16, 10.0, 1.0]]
 
         #default lights
         self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 300, type = "shadowspot", blur = 0.010)
@@ -594,25 +615,7 @@ class RMRScene:
 
         #Write rib code for textures
         for t in self.textures:
-            t.writeRibCode(ribfile)
-        
-        #Matrix for world tranformation to place lights in AO calculation    
-        self.matrixAO = [[0.0, -0.0, 1.0, -0.0, 1.0, 0.0, -0.0, 0.0, 0.0, 1.0, 0.0, -0.0, -0.0, 0.0, 10.0, 1.0],\
-                                        [1.0, -0.0, 0.0, -0.0, -0.0, -0.8315, -0.5556, 0.0, 0.0, 0.5556, -0.8315, -0.0, -0.0, -1.2359e-16, 10.0, 1.0],\
-                                        [0.8214, 0.2744, 0.5, -0.0, 0.5703, -0.3952, -0.7201, 0.0, 2.5506e-17, 0.8767, -0.4811, -0.0, 2.534e-16, -3.700e-16, 1.0, 1.0],\
-                                        [0.8618, -0.0857, -0.5, -0.0, -0.5073, -0.1456, -0.8494, 0.0, -6.6136e-18, 0.9856, -0.1690, -0.0, -2.2542e-16, 4.4832e-17, 10.0, 1.0],\
-                                        [0.6542, -0.0976, 0.75, -0.0, 0.7563, 0.0844, -0.6487, 0.0, 1.0774e-18, 0.9916, 0.1290, -0.0, -1.6816e-16, -7.3780e-17, 10.0, 1.0],\
-                                        [0.9550, 0.1595, -0.25, -0.0, -0.2966, 0.5137, -0.8050, 0.0, 6.234e-19, 0.8430, 0.5380, -0.0, 6.5757e-17, -3.0092e-16, 10.0, 1.0],\
-                                        [0.9068, -0.3393, 0.25, -0.0, 0.4214, 0.7301, -0.5380, 0.0, -1.2943e-17, 0.5932, 0.8050, -0.0, -9.3567e-17, -4.2555e-16, 10.0, 1.0],\
-                                        [0.1696, 0.6393, -0.75, -0.0, -0.9855, 0.1100, -0.1290, 0.0, 1.7124e-17, 0.7610, 0.6487, -0.0, 5.4752e-17, 1.6306e-16, 10.0000, 1.0],\
-                                        [-0.1073, -0.4720, 0.875, -0.0, 0.9942, -0.0509, 0.0944, 0.0, -1.8872e-18, 0.8801, 0.4748, -0.0, 5.5226e-17, 9.4542e-17, 10.0, 1.0],\
-                                        [-0.9752, 0.1824, -0.1250, -0.0, -0.2211, -0.8045, 0.5512, 0.0, -4.2894e-18, 0.5652, 0.8249, -0.0, -9.8228e-17, -4.8268e-16, 10.0, 1.0],\
-                                        [-0.8992, -0.2253, 0.375, -0.0, 0.4375, -0.4631, 0.7708, 0.0, -2.1684e-19, 0.8572, 0.5150, -0.0, 1.9413e-16, -2.0546e-16, 10.0, 1.0],\
-                                        [-0.7747, 0.0963, -0.625, -0.0, -0.6323, -0.1180, 0.7656, 0.0, 5.1635e-18, 0.9883, 0.1523, -0.0, -2.8087e-16, 5.7300e-17, 10.0, 1.0],\
-                                        [-0.7747, 0.0963, 0.625, -0.0, 0.6323, 0.1180, 0.7656, 0.0, -2.8596e-18, 0.9883, -0.1523, -0.0, 2.8018e-16, 5.2367e-17, 10.0, 1.0],\
-                                        [-0.8992, -0.2253, -0.375, -0.0, -0.4375, 0.4631, 0.7708, 0.0, 1.9298e-17, 0.8572, -0.5150, -0.0, -9.7144e-17, 4.8350e-16, 10.0, 1.0],\
-                                        [-0.9752, 0.18244, 0.125, -0.0, 0.2211, 0.8045, 0.5512, 0.0, 2.7782e-18, 0.5652, -0.8250, -0.0, 5.4210e-20, -1.252e-16, 10.0, 1.0],\
-                                        [-0.1073, -0.4721, -0.875, -0.0, -0.9942, 0.0509, 0.0944, 0.0, -8.955e-18, 0.8801, -0.4748, -0.0, -2.7593e-17, 1.9689e-16, 10.0, 1.0]]
+            t.writeRibCode(ribfile)        
 
         #Write headers
         ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
@@ -636,8 +639,7 @@ class RMRScene:
         ribfile.write('WorldBegin\n')
 
         for l in self.lights:
-            l.writeRibCode(ribfile, l.counter)
-        self.writeWorldFile(self.worldFileName)
+            l.writeRibCode(ribfile, l.counter)        
         ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
         ribfile.write('WorldEnd\n')
         ribfile.close()
@@ -686,9 +688,8 @@ class RMRScene:
         ribfile.write('\tRotate %f 0 1 0\n' % -pos[3])
         ribfile.write('WorldBegin\n')
         for l in self.lights:
-            l.writeRibCode(ribfile, l.counter)
-        self.writeWorldFile(self.worldFileName, bakeMode = 1)
-        ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
+            l.writeRibCode(ribfile, l.counter)        
+        ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName+"bake.rib"))
         ribfile.write('WorldEnd\n')
         ribfile.write('FrameEnd\n')
         ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.bakeTMPTexture, self.bakeTexture))
@@ -701,8 +702,8 @@ class RMRScene:
         ribfile.write('Projection "orthographic"\n')
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
         ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
-        ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
-        ribfile.write('Display "+%s" "file" "rgba"\n' % self.lightmapTMPTexture)
+        #ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
+        ribfile.write('Display "%s" "file" "rgba"\n' % self.lightmapTMPTexture)
         ribfile.write('WorldBegin\n')
         ribfile.write('Color [ 1 1 1 ]\n')
         ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))
@@ -735,8 +736,7 @@ class RMRScene:
         ribfile.write('ShadingRate 2\n')
         ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
         ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
-        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
-        self.writeWorldFile(self.worldFileName, 1)
+        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))        
 
         for l in self.lights:
             if l.type == "shadowspot":
@@ -745,94 +745,67 @@ class RMRScene:
                 l.placeShadowCamera(ribfile)
                 ribfile.write('WorldBegin\n')
                 ribfile.write('\tSurface "null"\n')
-                ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
+                ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName+"shad.rib"))
                 ribfile.write('WorldEnd\n')
                 ribfile.write('FrameEnd\n')
                 shadowMapDataFileFinal = l.shadowMapDataFile.replace("zfile","shad")
                 ribfile.write('MakeShadow "%s" "%s"\n'%(l.shadowMapDataFile,shadowMapDataFileFinal))
 
-        ribfile.close()
-
-    #def writelightmapFile(self):
-        #"""
-        #This function creates the frame definition for a Renderman scene.
-        #"""
-
-        #ribfile = file(self.lightmapFileName, 'w')
-        ##Write headers
-        #ribfile.write('FrameBegin 1\n')
-        #ribfile.write('Sides 2\n')
-        #ribfile.write('Format 1024 1024 1\n')
-        #ribfile.write('PixelSamples 2 2\n')
-        #ribfile.write('ShadingInterpolation "smooth"\n')
-        #ribfile.write('Projection "orthographic"\n')
-        #ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
-        #ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
-        #ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
-        #ribfile.write('Display "+%s" "file" "rgba"\n' % self.lightmapTMPTexture)
-        #ribfile.write('WorldBegin\n')
-        #ribfile.write('Color [ 1 1 1 ]\n')
-        #ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))
-        #ribfile.write('Translate 0 0 0.02\n')
-        #ribfile.write('Polygon "P" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]"st" [ 0 1  1 1  1 0  0 0  ]\n')
-        #ribfile.write('WorldEnd\n')
-        #ribfile.write('FrameEnd\n')
-
-        #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.lightmapTMPTexture, self.lightmapTexture))
-        #ribfile.close()
-
-
-    def copyAOfile(self, src, dst, oldString1, newString1, oldString2, newString2):
-        #TODO: this function must be converted in writeAOfile type.
-        i = open(src)
-        o = i.read()
-        o = o.replace(oldString1, newString1)
-        o = o.replace(oldString2, newString2)
-        i.close()
-
-        f = open(dst, 'w')
-        f.write(o)
-        f.close()
-
-    def renderShadow(self):
-        self.writeShadowFile()
-        command = '%s "%s"' % ('aqsis -progress', self.shadowFileName)
-        subprocess.Popen(command, shell=True)
-
-
-    def renderAOdata(self):
-
-        self.writeWorldFile(self.worldFileName, 1)
-        self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
-                        self.ambientOcclusionFileName,\
-                        "%DATAPATH%",self.ambientOcclusionData,\
-                        "%WORLDPATH%",self.worldFileName)
-        command = '%s "%s"' % ('aqsis -progress', self.ambientOcclusionFileName)
-        subprocess.Popen(command, shell=True)
-
-    def renderSSS(self):
-        self.writeSkinBakeFile()
-        command = '%s "%s"' % ('aqsis -progress', self.bakeFilename)
-        subprocess.Popen(command, shell=True)
+        ribfile.close()   
+    
+        
+    def writeAOfile(self):        
+        ribfile = file(self.ambientOcclusionFileName, 'w')       
+        ribfile.write('version 3.03\n')
+        ribfile.write('Hider "hidden" "string depthfilter" ["midpoint"]\n')
+        ribfile.write('PixelSamples 1 1\n')
+        ribfile.write('PixelFilter "box" 1 1\n')
+        ribfile.write('ScreenWindow -10.0 10.0 -10.0 10.0\n')
+        ribfile.write('Format 256 256 1\n')
+        ribfile.write('Clipping 1 20.0\n')       
+        for worldTransformation in self.matrixAO:
+            ribfile.write('FrameBegin %d\n'%(self.matrixAO.index(worldTransformation)))
+            ribfile.write('Display "%s" "shadow" "z" "float append" [1.0] "string compression" ["lzw"]\n'%(self.ambientOcclusionData))
+            ribfile.write('Transform [')
+            for n in worldTransformation:
+                ribfile.write('%f '%(n))
+            ribfile.write(']\n')
+            ribfile.write('WorldBegin\n')
+            ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName+"ao.rib"))
+            ribfile.write('WorldEnd\n')
+            ribfile.write('FrameEnd\n')   
 
 
     def render(self):
-        self.copyAOfile("data/shaders/aqsis/occlmap.rib",\
-                        self.ambientOcclusionFileName,\
-                        "%DATAPATH%",self.ambientOcclusionData,\
-                        "%WORLDPATH%",self.worldFileName+"shad.rib")
-        self.writeSkinBakeFile()
-        self.writeShadowFile()
+        
+        filesTorender = []
+        
+        if self.calcShadow == True:  
+            print "Calc SHADOW"
+            self.writeWorldFile(self.worldFileName+"shad.rib", shadowMode = 1)               
+            self.writeShadowFile()
+            filesTorender.append(self.shadowFileName)
+        
+        if self.calcAmbientOcclusion == True:
+            print "Calc AO"
+            self.writeAOfile() 
+            self.writeWorldFile(self.worldFileName+"ao.rib", shadowMode = 1)
+            filesTorender.append(self.ambientOcclusionFileName)
+        
+        if self.calcSSS == True:
+            print "Calc SSS"
+            self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
+            self.writeSkinBakeFile()
+            filesTorender.append(self.bakeFilename)
+        
+        self.writeWorldFile(self.worldFileName)
         self.writeSceneFile()
+        filesTorender.append(self.sceneFileName)
 
         #command = '%s "%s"' % ('aqsis -progress', self.sceneFileName)
         #subprocess.Popen(command, shell=True)
 
-        renderThread = RenderThread(self.app, [self.ambientOcclusionFileName,\
-                                            self.shadowFileName,\
-                                            self.bakeFilename,\
-                                            self.sceneFileName])
-
+        renderThread = RenderThread(self.app, filesTorender)
         renderThread.start()
 
 from threading import Thread
@@ -848,6 +821,8 @@ class RenderThread(Thread):
     def run(self):
 
         for filename in self.filenames:
+            
+            print "Rendering: %s"%(filename)
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
