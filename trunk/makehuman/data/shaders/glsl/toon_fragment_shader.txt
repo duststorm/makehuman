@@ -1,12 +1,15 @@
 varying vec3 vNormal;
 varying vec3 vVertex;
+uniform sampler2D unit0;
 
 #define silhouetteThreshold 0.2
 #define shininess 20.0
 
 void main (void)
 {
-
+  // Texture color
+	vec4 tex_color = texture2D(unit0, gl_TexCoord[0].st);
+  
   // Material Color:
   vec4 materialColor = vec4(0.6, 0.6, 0.6, 1.0);//gl_FrontMaterial.diffuse;
 
@@ -14,7 +17,7 @@ void main (void)
   vec4 silhouetteColor = vec4(0.0, 0.0, 0.0, 1.0);
 
   // Specular Color:
-  vec4 specularColor = vec4(1.0, 1.0, 1.0, 1.0);//gl_FrontMaterial.specular;
+  vec4 specularColor = vec4(0.7, 0.7, 0.7, 1.0) * tex_color;//gl_FrontMaterial.specular;
 
   // Lighting
   vec3 eyePos = normalize(-vVertex); 
@@ -31,7 +34,7 @@ void main (void)
     gl_FragColor = silhouetteColor;
   else 
   {
-    gl_FragColor = materialColor;
+    gl_FragColor = materialColor * tex_color;
   
       // Specular part
       float spec = pow(max(dot(Normal, EyeLight), 0.0), shininess);
@@ -44,6 +47,8 @@ void main (void)
       // Diffuse part
       float diffuse = max(dot(Normal, LightVert), 0.0);
       if( diffuse < 0.5 )
-        gl_FragColor *= 0.9;
+        gl_FragColor *= 0.6;
   }
+  
+  gl_FragColor.a = tex_color.a;
 }
