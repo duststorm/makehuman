@@ -447,6 +447,77 @@ class RMRTexture:
         ribfile.write('MakeTexture "%s" "%s" "%s" "%s" "%s" %d %d\n' %\
                         (self.picturename,self.texturename,self.swrap,self.twrap,\
                         self.filterfunc,self.swidth,self.twidth))
+                        
+                        
+class RMRHeader:
+    
+    def __init__(self):
+        
+        self.screenwindow = [-1.333, 1.333, -1, 1]
+        self.options = {}       
+        self.statistics =  ["endofframe", '[1]']
+        self.projection = "perspective"
+        self.sizeFormat = [800,600]
+        self.clipping = [0.1, 100]
+        self.pixelsamples = [2, 2]
+        self.fov = None
+        self.shadingRate = 1  
+        self.displayName = "Rendering" 
+        self.displayType = "framebuffer" 
+        self.displayColor = "rgb"
+        self.cameraX = 0
+        self.cameraY = 0
+        self.cameraZ = 0    
+        self.searchShaderPath = ""
+        self.searchTexturePath = ""
+        self.searchArchivePath = ""
+        self.bucketSize = None
+        self.eyesplits = None
+        self.depthfilter = None
+        self.sides = 2
+        self.pixelFilter = None
+        
+    def setCameraPosition(self, camX,camY,camZ):
+        self.cameraX = camX
+        self.cameraY = camY
+        self.cameraZ = camZ        
+    
+    def setSearchShaderPath(self, usrShaderPath):
+        self.searchShaderPath = "%s:&"%(usrShaderPath.replace('\\', '/'))
+        
+    def setSearchTexturePath(self, usrTexturePath):
+        self.searchTexturePath = "%s:&"%(usrTexturePath.replace('\\', '/'))
+        
+    def setSearchArchivePath(self, usrArchivePath):
+        self.searchArchivePath = "%s:&"%(usrArchivePath.replace('\\', '/'))  
+        
+    def writeRibCode(self, ribfile):        
+        #Write headers
+        if self.bucketSize:
+            ribfile.write('Option "limits" "bucketsize" [%d %d]\n'%(self.bucketSize[0], self.bucketSize[1]))
+        if self.eyesplits:
+            ribfile.write('Option "limits" "eyesplits" [%d]\n'%(self.eyesplits))
+        if self.depthfilter:
+            ribfile.write('Hider "hidden" "depthfilter" "%s"\n'%(self.depthfilter))
+        if self.pixelFilter:
+            ribfile.write('PixelFilter "%s" 1 1\n'%(self.pixelFilter))
+        if self.fov:
+            ribfile.write('Projection "%s" "fov" %f\n' % (self.projection, self.fov))
+            
+        ribfile.write('ScreenWindow %f %f %d %d\n'%(self.screenwindow[0], self.screenwindow[1], self.screenwindow[2], self.screenwindow[3]))
+        ribfile.write('Option "statistics" "%s" %s\n'%(self.statistics[0], self.statistics[1]))
+        ribfile.write('Option "searchpath" "shader" "%s"\n' %(self.searchShaderPath))
+        ribfile.write('Option "searchpath" "texture" "%s"\n' %(self.searchTexturePath))        
+        ribfile.write('Format %s %s 1\n' % (self.sizeFormat[0],self.sizeFormat[1]))
+        ribfile.write('Sides %d\n' % (self.sides))
+        ribfile.write('Clipping %f %f\n'%(self.clipping[0], self.clipping[1]))
+        ribfile.write('PixelSamples %s %s\n' % (self.pixelSamples[0], self.pixelSamples[1]))
+        ribfile.write('ShadingRate %s \n' % self.shadingRate)
+        ribfile.write('Display "%s" "%s" "%s"\n'%(self.displayName, self.displayType, self.displayColor))        
+        ribfile.write('\tTranslate %f %f %f\n' % (self.cameraX, self.cameraY, self.cameraZ))
+
+
+    
 
 
 class RMRScene:
@@ -547,6 +618,8 @@ class RMRScene:
 
     def __str__(self):
         return "Renderman Scene"
+        
+    
 
 
     def writeWorldFile(self, fName, shadowMode = None, bakeMode = None):
@@ -601,11 +674,17 @@ class RMRScene:
         """
         This function creates the frame definition for a Renderman scene.
         """
-
+        
         #Getting global settings
-        self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
-        self.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
-        self.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
+        ribSceneHeader = RMRHeader()
+        ribSceneHeader.sizeFormat = [self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)]
+        ribSceneHeader.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
+        ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
+        ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)     
+        ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
+        ribSceneHeader.setSearchTexturePath(self.usrTexturePath)  
+        ribSceneHeader.fov = self.camera.fovAngle      
+        
         self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.3))
 
         self.humanCharacter.subObjectsInit()
@@ -617,27 +696,14 @@ class RMRScene:
         for t in self.textures:
             t.writeRibCode(ribfile)        
 
-        #Write headers
-        ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
-        ribfile.write('Option "statistics" "endofframe" [1]\n')
-        ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
-        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))
-        ribfile.write('Projection "perspective" "fov" %f\n' % self.camera.fovAngle)
-        ribfile.write('Format %s %s 1\n' % (self.xResolution, self.yResolution))
-        ribfile.write('Clipping 0.1 100\n')
-        ribfile.write('PixelSamples %s %s\n' % (self.pixelSamples[0], self.pixelSamples[1]))
-        ribfile.write('ShadingRate %s \n' % self.shadingRate)
-        ribfile.write('Declare "refltexture" "string"\n')
-        ribfile.write('Declare "skintexture" "string"\n')
-        ribfile.write('Declare "bumptexture" "string"\n')
-        ribfile.write('Display "Rendering" "framebuffer" "rgb"\n')
-        ribfile.write('Display "+%s" "file" "rgba"\n' % os.path.join(self.ribsPath, imgFile).replace('\\', '/'))
-        ribfile.write('\tTranslate %f %f %f\n' % (self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)) # Camera
+        #Write rib header
+        ribSceneHeader.writeRibCode(ribfile)       
+        
+        #Write rib body
         ribfile.write('\tTranslate %f %f %f\n' % (pos[0], pos[1], 0.0)) # Model
         ribfile.write('\tRotate %f 1 0 0\n' % -pos[2])
         ribfile.write('\tRotate %f 0 1 0\n' % -pos[3])
         ribfile.write('WorldBegin\n')
-
         for l in self.lights:
             l.writeRibCode(ribfile, l.counter)        
         ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName))
@@ -722,22 +788,22 @@ class RMRScene:
         """
 
         ribfile = file(self.shadowFileName, 'w')
+        
+        #Getting global settings
+        ribSceneHeader = RMRHeader()
+        ribSceneHeader.sizeFormat = [1024,1024]
+        ribSceneHeader.pixelSamples = [1,1]
+        ribSceneHeader.shadingRate = 2
+        ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)     
+        ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
+        ribSceneHeader.setSearchTexturePath(self.usrTexturePath) 
+        ribSceneHeader.bucketSize = [32,32]
+        ribSceneHeader.eyesplits = 10
+        ribSceneHeader.depthfilter = "midpoint"      
+        ribSceneHeader.pixelFilter = "box"
 
-        #Write headers
-        ribfile.write('Option "limits" "bucketsize" [32 32]\n')
-        ribfile.write('Option "limits" "eyesplits" [10]\n')
-        ribfile.write('Declare "bias" "float"\n')
-        ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
-        ribfile.write('Clipping 0.01 1000\n')
-        ribfile.write('Sides 2\n')
-        ribfile.write('Format 1024 1024 1\n')
-        ribfile.write('PixelFilter "box" 1 1\n')
-        ribfile.write('PixelSamples 1 1\n')
-        ribfile.write('ShadingRate 2\n')
-        ribfile.write('Hider "hidden" "depthfilter" "midpoint"\n')
-        ribfile.write('Option "searchpath" "shader" "%s:&"\n' % self.usrShaderPath.replace('\\', '/'))
-        ribfile.write('Option "searchpath" "texture" "%s:&"\n' % self.usrTexturePath.replace('\\', '/'))        
-
+        #Write rib header
+        ribSceneHeader.writeRibCode(ribfile)        
         for l in self.lights:
             if l.type == "shadowspot":
                 ribfile.write('FrameBegin %d\n'%(l.counter))
@@ -750,7 +816,6 @@ class RMRScene:
                 ribfile.write('FrameEnd\n')
                 shadowMapDataFileFinal = l.shadowMapDataFile.replace("zfile","shad")
                 ribfile.write('MakeShadow "%s" "%s"\n'%(l.shadowMapDataFile,shadowMapDataFileFinal))
-
         ribfile.close()   
     
         
