@@ -443,14 +443,16 @@ def planeNorm(vect1, vect2, vect3):
     # Take the cross product
 
     normal = [v1[1] * v2[2] - v1[2] * v2[1], v1[2] * v2[0] - v1[0] * v2[2], v1[0] * v2[1] - v1[1] * v2[0]]
-
+    
+    return normal
+    '''
     # Normalize
     length = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2])
     if length < machine_epsilon: #should not happen but it does for badly formed meshes
       return [0.0,0.0,0.0]
     else:
       return [normal[0] / length, normal[1] / length, normal[2] / length]
-
+    '''
 
 def focalToFov(dimension, focal):
     if focal == 0:
