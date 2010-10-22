@@ -9,15 +9,9 @@ void main (void)
 {
   // Texture color
 	vec4 tex_color = texture2D(unit0, gl_TexCoord[0].st);
-  
-  // Material Color:
-  vec4 materialColor = vec4(0.6, 0.6, 0.6, 1.0);//gl_FrontMaterial.diffuse;
 
   // Silhouette Color:
   vec4 silhouetteColor = vec4(0.0, 0.0, 0.0, 1.0);
-
-  // Specular Color:
-  vec4 specularColor = vec4(0.7, 0.7, 0.7, 1.0) * tex_color;//gl_FrontMaterial.specular;
 
   // Lighting
   vec3 eyePos = normalize(-vVertex); 
@@ -34,20 +28,17 @@ void main (void)
     gl_FragColor = silhouetteColor;
   else 
   {
-    gl_FragColor = materialColor * tex_color;
-  
-      // Specular part
-      float spec = pow(max(dot(Normal, EyeLight), 0.0), shininess);
-  
-      if( spec < 0.2 )
-        gl_FragColor *= 0.98;
-      else
-        gl_FragColor = specularColor;
-  
-      // Diffuse part
-      float diffuse = max(dot(Normal, LightVert), 0.0);
-      if( diffuse < 0.5 )
-        gl_FragColor *= 0.6;
+    float multiplier = 0.4;
+    
+    // Specular part
+    float spec = pow(max(dot(Normal, EyeLight), 0.0), shininess);
+    multiplier += 0.1 * smoothstep(0.29, 0.3, spec);
+
+    // Diffuse part
+    float diffuse = max(dot(Normal, LightVert), 0.0);
+    multiplier += 0.2 * smoothstep(0.49, 0.5, diffuse);
+      
+    gl_FragColor = multiplier * tex_color;
   }
   
   gl_FragColor.a = tex_color.a;
