@@ -304,14 +304,14 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 				fp.write("#if toggle&T_Proxy\n")
 				for proxy in proxyData.values():
 					if proxy.name and not proxy.bones:
-						writeShapeKeys(fp, proxy.name, proxy)
+						writeShapeKeys(fp, proxy.name+"Mesh", proxy)
 				fp.write("#endif\n")
 			elif words[1] == 'mesh-animationData':
 				writeAnimationData(fp, "HumanMesh", None)
 			elif words[1] == 'proxy-animationData':
 				for proxy in proxyData.values():
 					if proxy.name:
-						writeAnimationData(fp, proxy.name, proxy)
+						writeAnimationData(fp, proxy.name+"Mesh", proxy)
 			elif words[1] == 'Filename':
 				path1 = os.path.expanduser("./data/textures/")
 				(path, filename) = os.path.split(words[2])

@@ -100,10 +100,12 @@ ArmHeadsTails = [
 	('HandIK_R',			'l-hand', 'hand_R_tail'),
 
 	# Pole Target
-	('ElbowPT_L',			'r-elbow-pt', ('r-elbow-pt', yunit)),
-	('ElbowLinkPT_L',		'r-elbow', 'r-elbow-pt'),
-	('ElbowPT_R',			'l-elbow-pt', ('l-elbow-pt', yunit)),
-	('ElbowLinkPT_R',		'l-elbow', 'l-elbow-pt'),
+	('ElbowPTIK_L',			'r-elbow-pt', ('r-elbow-pt', yunit)),
+	('ElbowPTIK_R',			'l-elbow-pt', ('l-elbow-pt', yunit)),
+	('ElbowLinkPTIK_L',		'r-elbow', 'r-elbow-pt'),
+	('ElbowLinkPTIK_R',		'l-elbow', 'l-elbow-pt'),
+	('ElbowPTFK_L',			'r-elbow-pt', ('r-elbow-pt', yunit)),
+	('ElbowPTFK_R',			'l-elbow-pt', ('l-elbow-pt', yunit)),
 ]
 
 #upArmRoll = 1.69297
@@ -175,10 +177,12 @@ ArmArmature = [
 	('HandIK_R',		-handRoll, None, F_WIR, L_ARMIK, (1,1,1)),
 
 	# Pole target
-	('ElbowPT_L',		0.0, 'Shoulder_L', F_WIR, L_ARMIK, (1,1,1)),
-	('ElbowLinkPT_L',	0.0, 'UpArmIK_L', F_RES, L_ARMIK, (1,1,1)),
-	('ElbowPT_R',		0.0, 'Shoulder_R', F_WIR, L_ARMIK, (1,1,1)),
-	('ElbowLinkPT_R',	0.0, 'UpArmIK_R', F_RES, L_ARMIK, (1,1,1)),
+	('ElbowPTIK_L',		0.0, 'Shoulder_L', F_WIR, L_ARMIK, (1,1,1)),
+	('ElbowPTIK_R',		0.0, 'Shoulder_R', F_WIR, L_ARMIK, (1,1,1)),
+	('ElbowLinkPTIK_L',	0.0, 'UpArmIK_L', F_RES, L_ARMIK, (1,1,1)),
+	('ElbowLinkPTIK_R',	0.0, 'UpArmIK_R', F_RES, L_ARMIK, (1,1,1)),
+	('ElbowPTFK_L',		0.0, 'UpArmFK_L', 0, L_HELP, (1,1,1)),
+	('ElbowPTFK_R',		0.0, 'UpArmFK_R', 0, L_HELP, (1,1,1)),
 ]
 
 #
@@ -320,7 +324,7 @@ def ArmWritePoses(fp):
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)])])
 
 	addPoseBone(fp, 'LoArmIK_L', None, 'IK_L', (1,1,1), (1,0,0), (1,1,1), (0,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'HandIK_L', 2, (pi, 'ElbowPT_L'), (True, False,True)]),
+		[('IK', 0, 1, ['IK', 'HandIK_L', 2, (pi, 'ElbowPTIK_L'), (True, False,True)]),
 		#('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyRotY', 'HandIK_L', (0,1,0), (0,0,0), False]),
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)])
 		])
@@ -335,7 +339,7 @@ def ArmWritePoses(fp):
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)])])
 
 	addPoseBone(fp, 'LoArmIK_R', None, 'IK_R', (1,1,1), (1,0,0), (1,1,1), (0,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'HandIK_R', 2, (0, 'ElbowPT_R'), (True, False,True)]),
+		[('IK', 0, 1, ['IK', 'HandIK_R', 2, (0, 'ElbowPTIK_R'), (True, False,True)]),
 		#('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyRotY', 'HandIK_R', (0,1,0), (0,0,0), False]),
 		('LimitRot', C_OW_LOCAL, 0, ['LimitRot', limLoArm_R, (True, True, True)])
 		])
@@ -347,15 +351,15 @@ def ArmWritePoses(fp):
 
 	# Pole target
 
-	addPoseBone(fp, 'ElbowPT_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'ElbowPTIK_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'ElbowLinkPT_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'ElbowPT_L', 'PLANE_X', 0])])
+	addPoseBone(fp, 'ElbowLinkPTIK_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+		[('StretchTo', 0, 1, ['Stretch', 'ElbowPTIK_L', 'PLANE_X', 0])])
 
-	addPoseBone(fp, 'ElbowPT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'ElbowPTIK_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'ElbowLinkPT_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'ElbowPT_R', 'PLANE_X', 0])])
+	addPoseBone(fp, 'ElbowLinkPTIK_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+		[('StretchTo', 0, 1, ['Stretch', 'ElbowPTIK_R', 'PLANE_X', 0])])
 
 	return
 	

@@ -19,7 +19,7 @@
 bl_addon_info = {
     "name": "MHX Mocap",
     "author": "Thomas Larsson",
-    "version": 0.2,
+    "version": 0.3,
     "blender": (2, 5, 4),
     "api": 31913,
     "location": "View3D > Properties > MHX Mocap",
@@ -590,8 +590,8 @@ FkBoneList = [
 	'Shoulder_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
 	'Hip_L', 'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
 	'Hip_R', 'UpLegFK_R', 'LoLegFK_R', 'FootFK_R', 'ToeFK_R',
-	'LegFK_L', 'AnkleFK_L',
-	'LegFK_R', 'AnkleFK_R',
+	'LegFK_L', 'AnkleFK_L', 'ElbowPTFK_L', 'KneePTFK_L',
+	'LegFK_R', 'AnkleFK_R', 'ElbowPTFK_R', 'KneePTFK_R',
 ]
 
 F_Rev = 1
@@ -601,6 +601,7 @@ IkArmature = {
 	'UpArmIK' : ('UpArmFK', F_LR, 'Shoulder'),
 	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
 	'HandIK' : ('HandFK', 0, None),
+	'ElbowPTIK' : ('ElbowPTFK', F_LR, 'Shoulder'),
 
 	'UpLegIK' : ('UpLegFK', 0, 'Hip'),
 	'LoLegIK' : ('LoLegFK', F_LR, 'UpLegIK'),
@@ -611,11 +612,12 @@ IkArmature = {
 	'ToeRevIK' : ('ToeFK', F_LR+F_Rev, 'LegIK'),
 	'FootRevIK' : ('FootFK', F_LR+F_Rev, 'ToeRevIK'),
 	'AnkleIK' : ('AnkleFK', F_LR, 'FootRevIK'),
+	'KneePTIK' : ('KneePTFK', F_LR, 'FootRevIK'),
 }
 
 IkBoneList = [
-	'UpArmIK', 'LoArmIK', 'HandIK',
-	'UpLegIK', 'LoLegIK', 'LegIK', 'ToeRevIK', 'FootRevIK', 'AnkleIK'
+	'UpArmIK', 'LoArmIK', 'HandIK', 'ElbowPTIK',
+	'UpLegIK', 'LoLegIK', 'LegIK', 'ToeRevIK', 'FootRevIK', 'AnkleIK', 'KneePTIK',
 ]
 
 GlobalBoneList = [
@@ -677,6 +679,7 @@ def createFKRig(scn, bones00, rig):
 				eb.parent = ebones[parent]
 				#eb.use_connect = bone00.use_connect
 			eb.roll = bone00.roll
+			eb.use_local_location = False
 			bones90[name90] = CEditBone(eb)
 
 	for suffix in ['_L', '_R']:
@@ -864,6 +867,7 @@ def createIKBones(rig90):
 				eb.head = fb.head
 				eb.tail = fb.tail
 				eb.roll = fb.roll
+			eb.use_local_location = False
 			if parent:
 				if flags & F_LR:
 					eb.parent = ebones[parent+suffix]
@@ -981,6 +985,7 @@ class CAnimData():
 		self.quats = {}
 		self.matrices = {}
 		self.name = name
+
 		
 #
 #	createAnimation(context, rig):
@@ -1194,12 +1199,14 @@ def poseMhxIKBones(context, mhxrig, mhxAnimations):
 			nameFK = name+'FK'+suffix
 			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], mhxAnimations[nameFK], mhxAnimations[nameFK])
 
-		for name in ['Hand', 'Leg']:
+		for name in ['Hand', 'Leg', 'ElbowPT', 'KneePT']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
 			#insertAnimChild(nameFK, mhxAnimations, rots[nameFK])
-			bpy.ops.object.mode_set(mode='EDIT')
-			createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
+			bpy.ops.object.mode_set(mode='EDIT')		
+			ebones = mhxrig.data.edit_bones
+			ebones[nameIK].parent = None
+			createAnimData(nameIK, mhxAnimations, ebones)		
 			bpy.ops.object.mode_set(mode='POSE')
 			animFK = mhxAnimations[nameFK]
 			loc = insertLocationKeyFrames(nameIK, pbones[nameIK], animFK, mhxAnimations[nameIK])
@@ -1535,6 +1542,19 @@ class MhxBvhAssocPanel(bpy.types.Panel):
 				pass
 		return
 """
+
+#
+#	makeMhxRig(ob)
+#
+
+def makeMhxRig(ob):
+		try:
+			test = ob['MhxRig']
+		except:
+			test = False
+		if not test:
+			return
+
 #
 #	class Bvh2MhxPanel(bpy.types.Panel):
 #
@@ -1547,12 +1567,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
 	@classmethod
 	def poll(cls, context):
 		if context.object and context.object.type == 'ARMATURE':
-			#return True
-			try:
-				return context.object['MhxRig']
-			except:
-				pass
-		return False
+			return True
 
 	def draw(self, context):
 		layout = self.layout
