@@ -674,6 +674,7 @@ class RMRScene:
         """
         This function creates the frame definition for a Renderman scene.
         """
+        imgFile = str(time.time())+".tif"
         
         #Getting global settings
         ribSceneHeader = RMRHeader()
@@ -683,7 +684,10 @@ class RMRScene:
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)     
         ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
         ribSceneHeader.setSearchTexturePath(self.usrTexturePath)  
-        ribSceneHeader.fov = self.camera.fovAngle      
+        ribSceneHeader.fov = self.camera.fovAngle    
+        ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
+        ribSceneHeader.displayType = "file" 
+        ribSceneHeader.displayColor = "rgba"  
         
         self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.3))
 
@@ -721,17 +725,14 @@ class RMRScene:
         self.pixelSamples = [2,2]
         self.shadingRate = 0.5
 
-
         self.humanCharacter.subObjectsInit()
         pos = self.humanCharacter.getHumanPosition()
-        imgFile = str(time.time())+".tif"
+        
         ribfile = file(self.bakeFilename, 'w')
 
         #Write rib code for textures
         for t in self.textures:
             t.writeRibCode(ribfile)
-
-
 
         ribfile.write('FrameBegin 1\n')
         ribfile.write('ScreenWindow -1.333 1.333 -1 1\n')
@@ -787,9 +788,8 @@ class RMRScene:
         This function creates the frame definition for a Renderman scene.
         """
 
-        ribfile = file(self.shadowFileName, 'w')
+        ribfile = file(self.shadowFileName, 'w')        
         
-        #Getting global settings
         ribSceneHeader = RMRHeader()
         ribSceneHeader.sizeFormat = [1024,1024]
         ribSceneHeader.pixelSamples = [1,1]
@@ -820,14 +820,26 @@ class RMRScene:
     
         
     def writeAOfile(self):        
-        ribfile = file(self.ambientOcclusionFileName, 'w')       
-        ribfile.write('version 3.03\n')
-        ribfile.write('Hider "hidden" "string depthfilter" ["midpoint"]\n')
-        ribfile.write('PixelSamples 1 1\n')
-        ribfile.write('PixelFilter "box" 1 1\n')
-        ribfile.write('ScreenWindow -10.0 10.0 -10.0 10.0\n')
-        ribfile.write('Format 256 256 1\n')
-        ribfile.write('Clipping 1 20.0\n')       
+        ribfile = file(self.ambientOcclusionFileName, 'w') 
+        
+        ribSceneHeader = RMRHeader()
+        ribSceneHeader.sizeFormat = [256,256]
+        ribSceneHeader.pixelSamples = [1,1]
+        ribSceneHeader.shadingRate = 2
+        ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)     
+        ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
+        ribSceneHeader.setSearchTexturePath(self.usrTexturePath) 
+        ribSceneHeader.bucketSize = [32,32]
+        ribSceneHeader.eyesplits = 10
+        ribSceneHeader.depthfilter = "midpoint"      
+        ribSceneHeader.pixelFilter = "box"  
+        ribSceneHeader.clipping = [1,20] 
+        ribSceneHeader.screenwindow = [-10.0, 10.0, -10.0, 10.0]  
+        
+        #Write rib header
+        ribSceneHeader.writeRibCode(ribfile)         
+
+        #Write rib body
         for worldTransformation in self.matrixAO:
             ribfile.write('FrameBegin %d\n'%(self.matrixAO.index(worldTransformation)))
             ribfile.write('Display "%s" "shadow" "z" "float append" [1.0] "string compression" ["lzw"]\n'%(self.ambientOcclusionData))
