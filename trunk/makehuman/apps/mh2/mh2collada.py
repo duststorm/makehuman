@@ -47,7 +47,7 @@ import read_rig
 def exportCollada(obj, name):
 	exportCollada1(obj, name+".dae", "Human", None)
 	proxyList = mh2proxy.proxyConfig()
-	for proxyFile in proxyList:
+	for (typ, useObj, useMhx, proxyFile) in proxyList:
 		proxy = mh2proxy.readProxyFile(obj, proxyFile)
 		if proxy.name:
 			filename = "%s-%s.dae" % (name, proxy.name)
