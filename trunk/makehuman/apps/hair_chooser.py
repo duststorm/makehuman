@@ -56,13 +56,9 @@ class HairTaskView(gui3d.TaskView):
       #.hair files contain metadata of hair used by the makehair utility
       filename = path.splitext(filename)[0]
       print("Loading %s" %(filename))
-      #human = self.app.scene3d.selectedHuman
-      #wFactor = self.app.categories["Modelling"].tasksByName["Hair"].widthSlider.getValue()
-      #if (wFactor <= 100.00) and (wFactor >= 1.00): self.widthFactor = wFactor
       human = self.app.scene3d.selectedHuman
       if human.hairObj: human.scene.clear(human.hairObj)
 
-      #human.hairObj = self.loadHair(path="./data/hairs/"+filename, update=update)
       human.hairObj = human.hairs.loadHair(path="./data/hairs/"+filename, update=update)
       
       #self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(path.join('data/hairs', filename + '.png'))

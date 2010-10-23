@@ -209,8 +209,9 @@ class ExportTaskView(gui3d.TaskView):
                if self.hairMesh.selected:
                   mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
                else:
-                  hairsClass = self.app.categories["Library"].tasksByName["Hair"]
-                  hair.adjustHair(self.app.scene3d.selectedHuman, hairsClass)
+                  hairsClass = self.app.scene3d.selectedHuman.hairs
+                  #hairsClass = self.app.categories["Library"].tasksByName["Hair"]
+                  #hair.adjustHair(self.app.scene3d.selectedHuman, hairsClass)
                   file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
                   mh2obj.exportAsCurves(file, hairsClass.guides)
                   file.close()

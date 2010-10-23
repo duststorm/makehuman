@@ -357,6 +357,7 @@ def calculateBoundingBox(verts):
     return boundingBox
 
 # - out : populated hairsClass
+""" #depracated
 def adjustHair(human, hairsClass):
     oHeadCentroid = [0.0, 7.436, 0.03]
     oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
@@ -382,7 +383,7 @@ def adjustHair(human, hairsClass):
             cP[0]=temp[0]
             cP[1]=temp[1]
             cP[2]=temp[2]
-
+"""
 
 def faceInterpolation(guides, scalp, n):
     """
