@@ -36,7 +36,7 @@ class SettingsTaskView(gui3d.TaskView):
                 human.fragment_shader = mh.createFragmentShader(open(fragment).read())
                 human.shader_program = mh.createShader(human.vertex_shader, human.fragment_shader)
                 human.mesh.setShader(human.shader_program)
-            except Exception as e:
+            except Exception, e:
                 print "No shader support: " + str(e)
 
 def load(app):
