@@ -297,6 +297,11 @@ class RMRHuman(RMNObject):
         self.skinBump.type = "Displacement"
         self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
         self.skinBump.parameters.append(MaterialParameter("float", "bumpVal", 0.001))
+        
+        self.corneaMat = RMRMaterial("cornea")        
+        
+        self.eyeBallMat = RMRMaterial("eyeball")        
+        self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
 
     def subObjectsInit(self):
 
@@ -305,28 +310,28 @@ class RMRHuman(RMNObject):
         self.rEyeBall.groupsDict = self.groupsDict
         self.rEyeBall.meshData = self.meshData
         self.rEyeBall.facesGroup = set(['r-eye-ball'])
-        self.rEyeBall.material = self.skinMat
+        self.rEyeBall.material = self.eyeBallMat
         self.rEyeBall.joinGroupIndices()
 
         self.lEyeBall = RMNObject(name = "left_eye_ball")
         self.lEyeBall.groupsDict = self.groupsDict
         self.lEyeBall.meshData = self.meshData
         self.lEyeBall.facesGroup = set(['l-eye-ball'])
-        self.lEyeBall.material = self.skinMat
+        self.lEyeBall.material = self.eyeBallMat
         self.lEyeBall.joinGroupIndices()
 
         self.rCornea = RMNObject(name = "right_cornea")
         self.rCornea.groupsDict = self.groupsDict
         self.rCornea.meshData = self.meshData
         self.rCornea.facesGroup = set(['r-eye-cornea'])
-        self.rCornea.material = self.skinMat
+        self.rCornea.material = self.corneaMat
         self.rCornea.joinGroupIndices()
 
         self.lCornea = RMNObject(name = "left_cornea")
         self.lCornea.groupsDict = self.groupsDict
         self.lCornea.meshData = self.meshData
         self.lCornea.facesGroup = set(['l-eye-cornea'])
-        self.lCornea.material = self.skinMat
+        self.lCornea.material = self.corneaMat
         self.lCornea.joinGroupIndices()
 
         teethGr = set()
@@ -465,6 +470,9 @@ class RMRHeader:
         self.displayName = "Rendering" 
         self.displayType = "framebuffer" 
         self.displayColor = "rgb"
+        self.displayName2 = None
+        self.displayType2 = None
+        self.displayColor2 = None
         self.cameraX = 0
         self.cameraY = 0
         self.cameraZ = 0    
@@ -513,7 +521,11 @@ class RMRHeader:
         ribfile.write('Clipping %f %f\n'%(self.clipping[0], self.clipping[1]))
         ribfile.write('PixelSamples %s %s\n' % (self.pixelSamples[0], self.pixelSamples[1]))
         ribfile.write('ShadingRate %s \n' % self.shadingRate)
-        ribfile.write('Display "%s" "%s" "%s"\n'%(self.displayName, self.displayType, self.displayColor))        
+        ribfile.write('Display "%s" "%s" "%s"\n'%(self.displayName, self.displayType, self.displayColor))   
+        if self.displayName2:
+            ribfile.write('Display "+%s" "%s" "%s"\n'%(self.displayName2, self.displayType2, self.displayColor2))   
+        
+             
         ribfile.write('\tTranslate %f %f %f\n' % (self.cameraX, self.cameraY, self.cameraZ))
 
 
@@ -688,6 +700,9 @@ class RMRScene:
         ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
         ribSceneHeader.displayType = "file" 
         ribSceneHeader.displayColor = "rgba"  
+        ribSceneHeader.displayName2 = "Final Render"
+        ribSceneHeader.displayType2 = "framebuffer" 
+        ribSceneHeader.displayColor2 = "rgb"  
         
         self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.3))
 
@@ -896,10 +911,11 @@ class RenderThread(Thread):
         self.filenames = filenames
 
     def run(self):
-
+        n = 0
         for filename in self.filenames:
             
-            print "Rendering: %s"%(filename)
+            #print "Rendering: %s"%(filename)
+            print "Percentage: %f"%(n*(100/len(self.filenames)))
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
@@ -916,6 +932,7 @@ class RenderThread(Thread):
 
             self.app.progress(1.0)
             self.app.scene3d.redraw()
+            n = n+1
 
 
 

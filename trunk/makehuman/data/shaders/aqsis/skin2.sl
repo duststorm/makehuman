@@ -43,7 +43,7 @@ surface skin2(
 	//RAMP COLORS
 	float angle_ramp = (max(0,(1-( Vf.Nn))))/4;//POSSIBILE PARAMETRO QUI.
 	float angle_ramp2 = max(0,(1-( Vf.Nn)));//POSSIBILE PARAMETRO QUI.
-	color glancing_highlight = max(0,((1-(( Vf.Nn)/0.6))*is_under_light))*0.4;//POSSIBILE PARAMETRO QUI.	
+	color glancing_highlight = max(0,((1-(( Vf.Nn)/0.6))*is_under_light))*0.1;//POSSIBILE PARAMETRO QUI.	
 
 	//TEXTURES
 	if (roughtexture != "")
