@@ -586,12 +586,12 @@ theArmature = None
 
 FkBoneList = [
 	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
-	'Shoulder_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L',
-	'Shoulder_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R',
+	'Shoulder_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L', 'ElbowPTFK_L',
+	'Shoulder_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R', 'ElbowPTFK_R',
 	'Hip_L', 'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
 	'Hip_R', 'UpLegFK_R', 'LoLegFK_R', 'FootFK_R', 'ToeFK_R',
-	'LegFK_L', 'AnkleFK_L', 'ElbowPTFK_L', 'KneePTFK_L',
-	'LegFK_R', 'AnkleFK_R', 'ElbowPTFK_R', 'KneePTFK_R',
+	'LegFK_L', 'AnkleFK_L', 'KneePTFK_L',
+	'LegFK_R', 'AnkleFK_R', 'KneePTFK_R',
 ]
 
 F_Rev = 1
@@ -601,7 +601,7 @@ IkArmature = {
 	'UpArmIK' : ('UpArmFK', F_LR, 'Shoulder'),
 	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
 	'HandIK' : ('HandFK', 0, None),
-	'ElbowPTIK' : ('ElbowPTFK', F_LR, 'Shoulder'),
+	'ElbowPTIK' : ('ElbowPTFK', 0, None),
 
 	'UpLegIK' : ('UpLegFK', 0, 'Hip'),
 	'LoLegIK' : ('LoLegFK', F_LR, 'UpLegIK'),
@@ -612,7 +612,7 @@ IkArmature = {
 	'ToeRevIK' : ('ToeFK', F_LR+F_Rev, 'LegIK'),
 	'FootRevIK' : ('FootFK', F_LR+F_Rev, 'ToeRevIK'),
 	'AnkleIK' : ('AnkleFK', F_LR, 'FootRevIK'),
-	'KneePTIK' : ('KneePTFK', F_LR, 'FootRevIK'),
+	'KneePTIK' : ('KneePTFK', 0, None),
 }
 
 IkBoneList = [
@@ -663,6 +663,9 @@ def createFKRig(scn, bones00, rig):
 	rig90 = bpy.data.objects.new('Z_'+rig.name[2:], amt)
 	scn.objects.link(rig90)
 	scn.objects.active = rig90
+
+	yunit = Vector((0,1,0))
+	zunit = Vector((0,0,1))
 
 	bones90 = {}
 	bpy.ops.object.mode_set(mode='EDIT')
@@ -995,12 +998,12 @@ class CAnimData():
 def createAnimation(context, rig):
 	context.scene.objects.active = rig
 	animations = {}
-	bpy.ops.object.mode_set(mode='EDIT')
+	#bpy.ops.object.mode_set(mode='EDIT')
 	for name in FkBoneList:
-		createAnimData(name, animations, rig.data.edit_bones)
-	bpy.ops.object.mode_set(mode='POSE')
+		createAnimData(name, animations, rig.data.bones)
+	#bpy.ops.object.mode_set(mode='POSE')
 	return animations
-
+'''
 def createAnimData(name, animations, ebones):
 	try:
 		eb = ebones[name]
@@ -1014,6 +1017,27 @@ def createAnimData(name, animations, ebones):
 	matrix = eb.matrix.rotation_part()
 	if eb.parent:
 		anim.parent = eb.parent.name
+		animPar = animations[anim.parent]
+		anim.offsetRest = anim.headRest - animPar.headRest
+	else:
+		anim.offsetRest = Vector((0,0,0))	
+	anim.matrixRest = matrix
+	anim.inverseRest = anim.matrixRest.copy().invert()
+	return
+'''
+def createAnimData(name, animations, bones):
+	try:
+		b = bones[name]
+	except:
+		return
+	anim = CAnimData(name)
+	animations[name] = anim
+	anim.headRest = b.head_local.copy()
+	anim.tailRest = b.tail_local.copy()
+	anim.vecRest = anim.tailRest - anim.headRest
+	matrix = b.matrix_local.rotation_part()
+	if b.parent:
+		anim.parent = b.parent.name
 		animPar = animations[anim.parent]
 		anim.offsetRest = anim.headRest - animPar.headRest
 	else:
@@ -1055,11 +1079,21 @@ def insertAnimRoot(root, animations, nFrames, locs, rots):
 		anim.tails[frame] = anim.heads[frame] + matrix*anim.vecRest
 	return
 
+def insertAnimChildLoc(nameIK, nameFK, animations, locs):
+	animIK = animations[nameIK]
+	animFK = animations[nameFK]
+	animPar = animations[animFK.parent]
+	animIK.nFrames = animFK.nFrames
+	for frame in range(animFK.nFrames):
+		parmat = animPar.matrices[frame]
+		animIK.heads[frame] = animPar.heads[frame] + parmat*animFK.offsetRest
+	return
+
 def insertAnimChild(name, animations, rots):
 	try:
 		anim = animations[name]
 	except:
-		return
+		return None
 	animPar = animations[anim.parent]
 	anim.nFrames = animPar.nFrames
 	quat = Quaternion().identity()
@@ -1073,7 +1107,7 @@ def insertAnimChild(name, animations, rots):
 		anim.matrices[frame] = matrix
 		anim.heads[frame] = animPar.heads[frame] + parmat*anim.offsetRest
 		anim.tails[frame] = anim.heads[frame] + matrix*anim.vecRest
-	return
+	return anim
 
 #
 #	createEmpties(context, animations):
@@ -1130,6 +1164,12 @@ def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
 			insertLocalRotationKeyFrames(name, pb, anim90, animMhx)
 
 	insertAnimation(context, mhxrig, mhxAnimations)
+
+	for suffix in ['_L', '_R']:
+		for name in ['ElbowPT', 'KneePT']:
+			nameFK = name+'FK'+suffix
+			insertAnimChild(nameFK, mhxAnimations, None)
+
 	setInterpolation(mhxrig)
 	return
 
@@ -1150,6 +1190,33 @@ def insertLocationKeyFrames(name, pb, anim90, animMhx):
 		for n in range(3):
 			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
 	return locs
+
+def insertIKFKLocationKeyFrames(nameIK, nameFK, pb, animations):
+	pb.select = True
+	animIK = animations[nameIK]
+	animFK = animations[nameFK]
+	if animIK.parent:
+		animPar = animations[animIK.parent]
+		print(nameIK, animIK.parent)
+	else:
+		animPar = None
+	locs = []
+	for frame in range(animFK.nFrames):		
+		if animPar:
+			loc0 = animPar.heads[frame] + animPar.matrices[frame]*animIK.offsetRest
+			offset = animFK.heads[frame] - loc0
+			#offset = Vector((0,0,0))
+			mat = animPar.matrices[frame] * animIK.matrixRest
+			loc = mat.invert() * offset
+			print(loc)
+		else:
+			offset = animFK.heads[frame] - animIK.headRest
+			loc = animIK.inverseRest * offset
+		pb.location = loc
+		for n in range(3):
+			pb.keyframe_insert('location', index=n, frame=frame, group=nameIK)	
+	return
+
 
 def insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
 	rots = []
@@ -1192,33 +1259,31 @@ def insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
 def poseMhxIKBones(context, mhxrig, mhxAnimations):
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = mhxrig.pose.bones
-	#rots = makeVectorDict(mhxrig, '].rotation_quaternion')
 	for suffix in ['_L', '_R']:
 		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
 			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], mhxAnimations[nameFK], mhxAnimations[nameFK])
 
-		for name in ['Hand', 'Leg', 'ElbowPT', 'KneePT']:
+		for name in ['Hand', 'Leg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
-			#insertAnimChild(nameFK, mhxAnimations, rots[nameFK])
-			bpy.ops.object.mode_set(mode='EDIT')		
-			ebones = mhxrig.data.edit_bones
-			ebones[nameIK].parent = None
-			createAnimData(nameIK, mhxAnimations, ebones)		
-			bpy.ops.object.mode_set(mode='POSE')
+			createAnimData(nameIK, mhxAnimations, mhxrig.data.bones)		
 			animFK = mhxAnimations[nameFK]
 			loc = insertLocationKeyFrames(nameIK, pbones[nameIK], animFK, mhxAnimations[nameIK])
 			rot = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],animFK, mhxAnimations[nameIK])
 			insertAnimRoot(nameIK, mhxAnimations, animFK.nFrames, loc, rot)
 
+		for name in ['ElbowPT', 'KneePT']:
+			nameIK = name+'IK'+suffix
+			nameFK = name+'FK'+suffix
+			createAnimData(nameIK, mhxAnimations, mhxrig.data.bones)		
+			insertIKFKLocationKeyFrames(nameIK, nameFK, pbones[nameIK], mhxAnimations)
+
 		for name in ['Toe', 'Foot']:
 			nameIK = name+'RevIK'+suffix
 			nameFK = name+'FK'+suffix
-			bpy.ops.object.mode_set(mode='EDIT')
-			createAnimData(nameIK, mhxAnimations, mhxrig.data.edit_bones)		
-			bpy.ops.object.mode_set(mode='POSE')
+			createAnimData(nameIK, mhxAnimations, mhxrig.data.bones)		
 			animFK = mhxAnimations[nameFK]
 			animIK = mhxAnimations[nameIK]
 			rot = insertReverseRotationKeyFrames(nameIK, pbones[nameIK], animFK, animIK, mhxAnimations[animIK.parent])
@@ -1455,7 +1520,7 @@ def initInterface(scn):
 		description="Scale the BVH by this value", 
 		min=0.0001, max=1000000.0, 
 		soft_min=0.001, soft_max=100.0)
-	scn['MhxBvhScale'] = 1.0
+	scn['MhxBvhScale'] = 0.1
 
 	bpy.types.Scene.MhxStartFrame = IntProperty(
 		name="Start Frame", 
