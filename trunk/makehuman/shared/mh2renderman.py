@@ -89,11 +89,13 @@ class RMRLight:
         self.color = [1,1,1]
         self.counter = RMRLight.lightCounter
         self.samples = 64
-        self.blur = blur
-        self.AOmap = ""
+        self.blur = blur        
         self.coneangle = 0.25
         self.roll = None
         self.shadowMapDataFile = os.path.join(self.ribsPath,"%sshadow%d.zfile"%(self.type, self.counter)).replace('\\', '/')
+        self.ambientOcclusionDataFile = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')
+    def __str__(self):
+        return "Renderman %s Light, from [%f,%f,%f] to [%f %f %f]"%(self.type,self.position[0],self.position[1],self.position[2],self.lookAt[0],self.lookAt[1],self.lookAt[2])
 
     def writeRibCode(self, ribfile, n=0):
         # remember z in opengl -> -z in renderman
@@ -103,7 +105,7 @@ class RMRLight:
         if self.type == "ambient":
             ribfile.write('\tLightSource "ambientlight" %i "intensity" [%f] "color lightcolor" [%f %f %f]\n'%(n, self.intensity, self.color[0], self.color[1], self.color[2]))
         if self.type == "envlight":
-            ribfile.write('\tLightSource "envlight" %i "string filename" "%s" "intensity" [%f] "float samples" [ %f ] "float blur" [ %f ]\n'%(n, self.AOmap, self.intensity, self.samples, self.blur))
+            ribfile.write('\tLightSource "envlight" %i "string filename" "%s" "intensity" [%f] "float samples" [ %f ] "float blur" [ %f ]\n'%(n, self.ambientOcclusionDataFile, self.intensity, self.samples, self.blur))
         if self.type == "shadowspot":
             ribfile.write('\tLightSource "shadowspot" %i "intensity" [%f] "from" [%f %f %f] "to" [%f %f %f] "coneangle" [%f] "string shadowname" ["%s"] "float blur" [%f]\n'%(n, self.intensity,\
              self.position[0],self.position[1],self.position[2], self.lookAt[0], self.lookAt[1], self.lookAt[2],\
@@ -549,6 +551,7 @@ class RMRScene:
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
+        self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')
 
         #mainscenefile
         self.sceneFileName = os.path.join(self.ribsPath, "scene.rib")
@@ -563,7 +566,8 @@ class RMRScene:
 
         #Ambient Occlusion paths
         self.ambientOcclusionFileName = os.path.join(self.ribsPath, "occlmap.rib").replace('\\', '/')
-        self.ambientOcclusionData = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')
+        self.ambientOcclusionDataFile = os.path.join(self.ribsPath,"occlmap.sm" ).replace('\\', '/')
+        
 
         #Shadow path
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
@@ -594,20 +598,20 @@ class RMRScene:
                         [-0.9752, 0.18244, 0.125, -0.0, 0.2211, 0.8045, 0.5512, 0.0, 2.7782e-18, 0.5652, -0.8250, -0.0, 5.4210e-20, -1.252e-16, 10.0, 1.0],\
                         [-0.1073, -0.4721, -0.875, -0.0, -0.9942, 0.0509, 0.0944, 0.0, -8.955e-18, 0.8801, -0.4748, -0.0, -2.7593e-17, 1.9689e-16, 10.0, 1.0]]
 
-        #default lights
-        self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 300, type = "shadowspot", blur = 0.010)
-        self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 300, type = "shadowspot",  blur = 0.010)
-        self.light2.coneangle = 0.35
-        self.light4 = RMRLight(self.ribsPath,[20, 10, -20],intensity = 100, type = "shadowspot",  blur = 0.010)
-        self.light4.coneangle = 0.35
+        ##default lights
+        #self.light1 = RMRLight(self.ribsPath,[20, 20, 20],intensity = 300, type = "shadowspot", blur = 0.010)
+        #self.light2 = RMRLight(self.ribsPath,[-20, 10, -20],intensity = 300, type = "shadowspot",  blur = 0.010)
+        #self.light2.coneangle = 0.35
+        #self.light4 = RMRLight(self.ribsPath,[20, 10, -20],intensity = 100, type = "shadowspot",  blur = 0.010)
+        #self.light4.coneangle = 0.35
 
-        #Ambient Occlusion
-        #self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
-        self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.3, type = "envlight")
-        self.light3.AOmap = self.ambientOcclusionData
+        ##Ambient Occlusion
+        ##self.light3 = RMRLight([0, 0, 0],intensity = 0.2, type = "ambient")
+        #self.light3 = RMRLight(self.ribsPath,[0, 0, 0],intensity = 0.3, type = "envlight")
+        #self.light3.AOmap = self.ambientOcclusionData
 
         #Lights list
-        self.lights = [self.light1,self.light2,self.light3,self.light4]
+        self.lights = []
 
         #creating resources folders
         if not os.path.isdir(self.renderPath):
@@ -630,6 +634,32 @@ class RMRScene:
 
     def __str__(self):
         return "Renderman Scene"
+        
+        
+    def loadLighting(self, lightsFolderPath, lightFile):
+  
+        path = os.path.join(lightsFolderPath,lightFile)        
+        fileDescriptor = open(path) 
+        
+        for data in fileDescriptor:
+            print data
+            dataList = data.split()
+            fromX = float(dataList[0])
+            fromY = float(dataList[1])
+            fromZ = float(dataList[2])
+            toX = float(dataList[3])
+            toY = float(dataList[4])
+            toZ = float(dataList[5])
+            lIntensity = float(dataList[6])
+            lType = dataList[7]   
+                
+            l = RMRLight(self.ribsPath,[fromX, fromY, fromZ], [toX, toY, toZ], intensity = lIntensity, type = lType)            
+            if len(dataList) >= 9:            
+                l.blur = float(dataList[8]) 
+            if len(dataList) >= 10:            
+                l.coneangle = float(dataList[9])                 
+            print l
+            self.lights.append(l)
         
     
 
@@ -686,7 +716,8 @@ class RMRScene:
         """
         This function creates the frame definition for a Renderman scene.
         """
-        imgFile = str(time.time())+".tif"
+        imgFile = str(time.time())+".tif"      
+        
         
         #Getting global settings
         ribSceneHeader = RMRHeader()
@@ -857,7 +888,7 @@ class RMRScene:
         #Write rib body
         for worldTransformation in self.matrixAO:
             ribfile.write('FrameBegin %d\n'%(self.matrixAO.index(worldTransformation)))
-            ribfile.write('Display "%s" "shadow" "z" "float append" [1.0] "string compression" ["lzw"]\n'%(self.ambientOcclusionData))
+            ribfile.write('Display "%s" "shadow" "z" "float append" [1.0] "string compression" ["lzw"]\n'%(self.ambientOcclusionDataFile))
             ribfile.write('Transform [')
             for n in worldTransformation:
                 ribfile.write('%f '%(n))
@@ -871,6 +902,7 @@ class RMRScene:
     def render(self):
         
         filesTorender = []
+        self.loadLighting(self.lightsFolderPath, "default.lights")
         
         if self.calcShadow == True:  
             print "Calc SHADOW"

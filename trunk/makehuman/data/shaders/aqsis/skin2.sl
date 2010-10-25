@@ -57,7 +57,7 @@ surface skin2(
         Oi = float texture (colortexture[3], "fill", 1);  
         
     if (ssstexture != ""){
-	    ssslight= color texture (ssstexture);
+	    ssslight= color texture (ssstexture)*3;
         sssVal = 0.5;
         }
 	
