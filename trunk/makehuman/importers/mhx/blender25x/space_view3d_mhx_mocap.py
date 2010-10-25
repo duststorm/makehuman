@@ -664,9 +664,6 @@ def createFKRig(scn, bones00, rig):
 	scn.objects.link(rig90)
 	scn.objects.active = rig90
 
-	yunit = Vector((0,1,0))
-	zunit = Vector((0,0,1))
-
 	bones90 = {}
 	bpy.ops.object.mode_set(mode='EDIT')
 	ebones = amt.edit_bones
@@ -757,6 +754,7 @@ def insertAction(bones00, rig00, rig90, tMatrix, tInverse):
 	locs = makeVectorDict(rig00, '].location')
 	rots = makeVectorDict(rig00, '].rotation_quaternion')
 	root = bones00[0]
+	print("Root", root.name)
 	nFrames = len(rots[root.name])
 
 	for bone in bones00:
@@ -1197,7 +1195,6 @@ def insertIKFKLocationKeyFrames(nameIK, nameFK, pb, animations):
 	animFK = animations[nameFK]
 	if animIK.parent:
 		animPar = animations[animIK.parent]
-		print(nameIK, animIK.parent)
 	else:
 		animPar = None
 	locs = []
@@ -1205,10 +1202,8 @@ def insertIKFKLocationKeyFrames(nameIK, nameFK, pb, animations):
 		if animPar:
 			loc0 = animPar.heads[frame] + animPar.matrices[frame]*animIK.offsetRest
 			offset = animFK.heads[frame] - loc0
-			#offset = Vector((0,0,0))
 			mat = animPar.matrices[frame] * animIK.matrixRest
 			loc = mat.invert() * offset
-			print(loc)
 		else:
 			offset = animFK.heads[frame] - animIK.headRest
 			loc = animIK.inverseRest * offset
