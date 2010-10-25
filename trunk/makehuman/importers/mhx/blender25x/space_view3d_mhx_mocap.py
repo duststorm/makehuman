@@ -38,8 +38,8 @@ Scale:
 	Good values are: CMU: 0.6, OSU: 0.1
 Start frame:	
 	for BVH import
-Loop:	
-	for BVH import
+Rot90:	
+	for BVH import. Rotate armature 90 degrees, so Z points up.
 Simplify FCurves:	
 	Include FCurve simplifcation.
 Max loc error:	
@@ -73,33 +73,11 @@ from bpy.props import *
 
 ###################################################################################
 #	BVH importer. 
-#	The importer that comes with Blender has memory leaks which leads to instability.
+#	The importer that comes with Blender had memory leaks which led to instability.
 #	It also creates a weird skeleton from CMU data, with hands theat start at the wrist
 #	and ends at the elbow.
 #
 
-"""
-#
-#	readBvhFile(context, filepath, scale, startFrame, loop):
-#	Default importer
-#
-
-import sys
-bvhPath = os.path.realpath('./2.54/scripts/op/io_anim_bvh')
-if bvhPath not in sys.path:
-	sys.path.append(bvhPath)
-import import_bvh
-
-def readBvhFile(context, filepath, scale, startFrame, loop):
-	bvh_nodes = import_bvh.read_bvh(context, filepath,
-		ROT_MODE='QUATERNION',
-		GLOBAL_SCALE=scale)
-	import_bvh.bvh_node_dict2armature(context, bvh_nodes,
-		ROT_MODE='QUATERNION',
-		IMPORT_START_FRAME=startFrame,
-		IMPORT_LOOP=loop)
-	return context.object
-"""
 #
 #	class CNode:
 #
@@ -159,7 +137,7 @@ class CNode:
 			return eb.head
 
 #
-#	readBvhFile(context, filepath, scale, startFrame, loop):
+#	readBvhFile(context, filepath, scale, startFrame, rot90):
 #	Custom importer
 #
 
@@ -171,9 +149,8 @@ Frames = 3
 
 Deg2Rad = math.pi/180
 Epsilon = 1e-5
-Z_UP = False
 
-def readBvhFile(context, filepath, scale, startFrame, loop):
+def readBvhFile(context, filepath, scale, startFrame, rot90):
 	print(filepath)
 	fileName = os.path.realpath(os.path.expanduser(filepath))
 	(shortName, ext) = os.path.splitext(fileName)
@@ -219,7 +196,7 @@ def readBvhFile(context, filepath, scale, startFrame, loop):
 				nodes.append(node)
 			elif key == 'OFFSET':
 				(x,y,z) = (float(words[1]), float(words[2]), float(words[3]))
-				if Z_UP:					
+				if rot90:					
 					node.offset = scale*Vector((x,-z,y))
 				else:
 					node.offset = scale*Vector((x,y,z))
@@ -228,7 +205,7 @@ def readBvhFile(context, filepath, scale, startFrame, loop):
 			elif key == 'CHANNELS':
 				oldmode = None
 				for word in words[2:]:
-					if Z_UP:
+					if rot90:
 						(index, mode, sign) = channelZup(word)
 					else:
 						(index, mode, sign) = channelYup(word)
@@ -506,7 +483,7 @@ Xx2Armature = {
 	'head' : 'Head',
 }
 
-PoserArmature = {
+DazArmature = {
 	'hip' : 'Root', 
 	'abdomen' : 'Spine1',
 
@@ -575,7 +552,7 @@ theArmatures = {
 	'OSU' : OsuArmature,
 	'XX1' : Xx1Armature,
 	'XX2' : Xx2Armature,
-	'Poser' : PoserArmature,
+	'Daz' : DazArmature,
 }
 
 #
@@ -655,33 +632,35 @@ class CEditBone():
 		return ("%s p %s\n  h %s\n  t %s\n" % (self.name, self.parent, self.head, self.tail))
 
 #
-#	createFKRig(scn, bones, rig):
+#	renameFKBones(bones00, rig00, action):
 #
 
-def createFKRig(scn, bones00, rig):
-	amt = bpy.data.armatures.new('Z_'+rig.data.name[2:])
-	rig90 = bpy.data.objects.new('Z_'+rig.name[2:], amt)
-	scn.objects.link(rig90)
-	scn.objects.active = rig90
-
+def renameFKBones(bones00, rig00, action):
 	bones90 = {}
 	bpy.ops.object.mode_set(mode='EDIT')
-	ebones = amt.edit_bones
+	ebones = rig00.data.edit_bones
+	setbones = []
 	for bone00 in bones00:
 		name00 = bone00.name
 		name90 = theArmature[name00.lower()]
 		if name90:
-			eb = ebones.new(name=name90)
-			eb.head = rot90(bone00.head)
-			eb.tail = rot90(bone00.tail)
-			if bone00.parent:
-				parent = theArmature[bone00.parent.lower()]
-				eb.parent = ebones[parent]
-				#eb.use_connect = bone00.use_connect
-			eb.roll = bone00.roll
-			eb.use_local_location = False
+			eb = ebones[name00]
+			eb.name = name90
 			bones90[name90] = CEditBone(eb)
+			grp = action.groups[name00]
+			grp.name = name90
+			setbones.append((eb, name90))
+	for (eb, name) in setbones:
+		eb.name = name
+	createExtraBones(ebones, bones90)
+	bpy.ops.object.mode_set(mode='POSE')
+	return
 
+#
+#	createExtraBones(ebones, bones90):
+#
+
+def createExtraBones(ebones, bones90):
 	for suffix in ['_L', '_R']:
 		try:
 			foot = ebones['FootFK'+suffix]
@@ -713,78 +692,6 @@ def createFKRig(scn, bones00, rig):
 		eb.tail = 2*foot.head - foot.tail
 		eb.parent = ebones['LoLegFK'+suffix]
 		bones90[name90] = CEditBone(eb)
-
-	bpy.ops.object.mode_set(mode='POSE')
-	return (rig90, bones90)
-
-def rot90(vec):
-	#return vec
-	return (vec[0], -vec[2], vec[1])
-
-def printMatrices(name, bones, bones90):
-	n = 0
-	while bones[n].name != name:
-		n += 1
-	print(name)
-	print(bones[n].matrix)
-	print(bones90[n].matrix)
-
-#
-#	setupTranformMatrix(bones00, bones90):
-#
-
-def setupTranformMatrix(bones00, bones90):
-	tMatrix = {}
-	tInverse = {}
-	tRot90 = Matrix.Rotation(-math.pi/2, 3, 'X')
-	for bone00 in bones00:
-		name00 = bone00.name
-		name90 = theArmature[name00.lower()]
-		if name90:
-			bone90 = bones90[name90]
-			tMatrix[name00] = bone90.matrix * tRot90 * bone00.inverse
-			tInverse[name00] = tMatrix[name00].copy().invert()
-	return (tMatrix, tInverse)
-
-#
-#	insertAction(bones00, rig00, rig90, tMatrix, tInverse):
-#
-
-def insertAction(bones00, rig00, rig90, tMatrix, tInverse):
-	locs = makeVectorDict(rig00, '].location')
-	rots = makeVectorDict(rig00, '].rotation_quaternion')
-	root = bones00[0]
-	print("Root", root.name)
-	nFrames = len(rots[root.name])
-
-	for bone in bones00:
-		name00 = bone.name
-		name90 = theArmature[name00.lower()]
-		if name90:
-			pb = rig90.pose.bones[name90]			
-			for frame in range(nFrames):
-				try:
-					vec = Vector(locs[name00][frame])
-				except:
-					vec = None
-				if vec:
-					nloc = tMatrix[name00] * vec
-					pb.location = nloc
-					for n in range(3):
-						pb.keyframe_insert('location', index=n, frame=frame, group=name90)
-
-				try:
-					quat = Quaternion(rots[name00][frame])
-				except:
-					quat = None
-				if quat:
-					mat = quat.to_matrix()
-					nmat = tMatrix[name00] * mat * tInverse[name00]
-					pb.rotation_quaternion = nmat.to_quat()
-					for n in range(4):
-						pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name90)
-
-		frame += 1
 	return
 
 #
@@ -947,16 +854,12 @@ def setArmature(rig):
 #
 
 def importAndRename(context, filepath):
-	rig = readBvhFile(context, filepath, context.scene['MhxBvhScale'], context.scene['MhxStartFrame'], context.scene['MhxLoopAnim'])
+	rig = readBvhFile(context, filepath, context.scene['MhxBvhScale'], context.scene['MhxStartFrame'], context.scene['MhxRot90Anim'])
 	(rig00, bones00, action) =  renameBvhRig(rig, filepath)
 	guessArmature(rig00)
-	(rig90, bones90) = createFKRig(context.scene, bones00, rig00)
-	rig90['MhxArmature'] = rig00['MhxArmature']
-	(tMatrix, tInverse) = setupTranformMatrix(bones00, bones90)
-	insertAction(bones00, rig00, rig90, tMatrix, tInverse)
-	setInterpolation(rig90)
-	deleteFKRig(context, rig00, action, 'Y_')
-	return (rig90, action)
+	renameFKBones(bones00, rig00, action)
+	setInterpolation(rig00)
+	return (rig00, action)
 
 #
 #	class CAnimData():
@@ -1001,28 +904,7 @@ def createAnimation(context, rig):
 		createAnimData(name, animations, rig.data.bones)
 	#bpy.ops.object.mode_set(mode='POSE')
 	return animations
-'''
-def createAnimData(name, animations, ebones):
-	try:
-		eb = ebones[name]
-	except:
-		return
-	anim = CAnimData(name)
-	animations[name] = anim
-	anim.headRest = eb.head.copy()
-	anim.tailRest = eb.tail.copy()
-	anim.vecRest = anim.tailRest - anim.headRest
-	matrix = eb.matrix.rotation_part()
-	if eb.parent:
-		anim.parent = eb.parent.name
-		animPar = animations[anim.parent]
-		anim.offsetRest = anim.headRest - animPar.headRest
-	else:
-		anim.offsetRest = Vector((0,0,0))	
-	anim.matrixRest = matrix
-	anim.inverseRest = anim.matrixRest.copy().invert()
-	return
-'''
+
 def createAnimData(name, animations, bones):
 	try:
 		b = bones[name]
@@ -1106,34 +988,6 @@ def insertAnimChild(name, animations, rots):
 		anim.heads[frame] = animPar.heads[frame] + parmat*anim.offsetRest
 		anim.tails[frame] = anim.heads[frame] + matrix*anim.vecRest
 	return anim
-
-#
-#	createEmpties(context, animations):
-#	For debugging
-#
-
-def createEmpties(context, animations):
-	for name in FkBoneList:
-		try:
-			anim = animations[name]
-		except:
-			anim = None
-		if anim:
-			createEmpty(context, name+'HD', anim.heads, anim.nFrames)
-			createEmpty(context, name+'TL', anim.tails, anim.nFrames)
-	return
-
-def createEmpty(context, name, locs, nFrames):
-	empty = bpy.data.objects.new(name, None)
-	empty.show_name = True
-	empty.layers[1] = True
-	empty.layers[0] = False
-	context.scene.objects.link(empty)
-	for frame in range(nFrames):
-		empty.location = locs[frame]
-		for n in range(3):
-			empty.keyframe_insert('location', index=n, frame=frame, group=name)
-	return
 		
 #
 #	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
@@ -1522,10 +1376,10 @@ def initInterface(scn):
 		description="Starting frame for the animation")
 	scn['MhxStartFrame'] = 1
 
-	bpy.types.Scene.MhxLoopAnim = BoolProperty(
-		name="Loop", 
-		description="Loop the animation playback")
-	scn['MhxLoopAnim'] = False
+	bpy.types.Scene.MhxRot90Anim = BoolProperty(
+		name="Rotate 90 deg", 
+		description="Rotate 90 degress so Z points up")
+	scn['MhxRot90Anim'] = True
 
 	bpy.types.Scene.MhxDoSimplify = BoolProperty(
 		name="Simplify FCurves", 
@@ -1636,7 +1490,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout.separator()
 		layout.prop(scn, "MhxBvhScale")
 		layout.prop(scn, "MhxStartFrame")
-		layout.prop(scn, "MhxLoopAnim")
+		layout.prop(scn, "MhxRot90Anim")
 		layout.prop(scn, "MhxDoSimplify")
 		layout.operator("object.LoadBvhButton")
 		layout.separator()
@@ -1743,7 +1597,7 @@ def loadRetargetSimplify(context, filepath):
 	retargetMhxRig(context, rig90, mhxrig)
 	if context.scene['MhxDoSimplify']:
 		simplifyFCurves(context, mhxrig)
-	deleteFKRig(context, rig90, action, 'Z_')
+	deleteFKRig(context, rig90, action, 'Y_')
 	time2 = time.clock()
 	print("%s finished in %.3f s" % (filepath, time2-time1))
 	return
@@ -1802,6 +1656,6 @@ def unregister():
 if __name__ == "__main__":
     register()
 
-#readBvhFile(context, filepath, scale, startFrame, loop)
+#readBvhFile(context, filepath, scale, startFrame, rot90)
 #readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/Male1_bvh/Male1_A5_PickUpBox.bvh', 1.0, 1, False)
 #readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/cmu/10/10_03.bvh', 1.0, 1, False)

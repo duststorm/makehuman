@@ -32,8 +32,9 @@ from aljabr import *
 #
 
 class CProxy:
-	def __init__(self, layer):
+	def __init__(self, typ, layer):
 		self.name = None
+		self.type = typ
 		self.layer = layer
 		self.material = None
 		self.verts = {}
@@ -106,7 +107,7 @@ def proxyConfig():
 				layer = int(words[2])
 		else:
 			proxyFile = os.path.expanduser(words[0])
-			proxyList.append((typ, useObj, useMhx, (proxyFile, layer)))
+			proxyList.append((typ, useObj, useMhx, (proxyFile, typ, layer)))
 	fp.close()
 	print(proxyList)
 	return proxyList
@@ -118,21 +119,21 @@ def proxyConfig():
 
 def readProxyFile(obj, proxyStuff):
 	if not proxyStuff:
-		return CProxy(2)
+		return CProxy('Proxy', 2)
 
-	(proxyFile, layer) = proxyStuff
+	(proxyFile, typ, layer) = proxyStuff
 	try:
 		tmpl = open(proxyFile, "rU")
 	except:
 		tmpl = None
 	if tmpl == None:
 		print("Cannot open proxy file %s" % proxyFile)
-		return CProxy(layer)
+		return CProxy(typ, layer)
 
 	verts = obj.verts
 	locations = {}
 	tails = {}
-	proxy = CProxy(layer)
+	proxy = CProxy(typ, layer)
 	proxy.name = "MyProxy"
 
 	vn = 0

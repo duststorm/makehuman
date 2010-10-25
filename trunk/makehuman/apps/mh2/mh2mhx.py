@@ -123,10 +123,10 @@ def exportMhx_25(obj, rig, fp):
 
 	proxyList = mh2proxy.proxyConfig()
 	proxyData = {}
-	for (typ, useObj, useMhx, proxyFile) in proxyList:
+	for (typ, useObj, useMhx, proxyStuff) in proxyList:
 		if useMhx:
 			fp.write("#if toggle&T_%s\n" % typ)
-			copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyFile, proxyData)	
+			copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyStuff, proxyData)	
 			fp.write("#endif\n")
 
 	fp.write("#if toggle&T_Mesh\n")
@@ -140,10 +140,10 @@ def exportMhx_25(obj, rig, fp):
 
 		
 #
-#	copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
+#	copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 #
 
-def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
+def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	if tmpl == None:
@@ -195,7 +195,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 					if proxy.name and not proxy.bones:
 						mhx_rig.reapplyArmature(fp, proxy.name)
 			elif words[1] == 'ProxyRigStart':
-				proxy = mh2proxy.readProxyFile(obj, proxyFile)
+				proxy = mh2proxy.readProxyFile(obj, proxyStuff)
 				proxyData[proxy.name] = proxy
 				if proxy.bones:
 					fp.write("#if True\n")
@@ -303,7 +303,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyFile, proxyData):
 			elif words[1] == 'proxy-shapeKey':
 				fp.write("#if toggle&T_Proxy\n")
 				for proxy in proxyData.values():
-					if proxy.name and not proxy.bones:
+					if proxy.name and proxy.type == 'Proxy' and not proxy.bones:
 						writeShapeKeys(fp, proxy.name+"Mesh", proxy)
 				fp.write("#endif\n")
 			elif words[1] == 'mesh-animationData':
