@@ -11,8 +11,6 @@
 		680EA9CF11A432B000DDEFEB /* glew.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
 		680EAADA11A4394300DDEFEB /* glew.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
 		6839A7AF10179EFF008AF603 /* HelpLinks.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6839A7AD10179EFF008AF603 /* HelpLinks.strings */; };
-		684223F2127355DC007177E4 /* apps in Resources */ = {isa = PBXBuildFile; fileRef = 684223F1127355DC007177E4 /* apps */; };
-		684224331273573F007177E4 /* shared in Resources */ = {isa = PBXBuildFile; fileRef = 6842240A1273573F007177E4 /* shared */; };
 		685701AF1001D79200F9C649 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
 		685701B01001D79200F9C649 /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
 		685701B11001D79200F9C649 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
@@ -40,7 +38,6 @@
 		6869C0E710322A4200DF62C3 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
 		6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
 		6869C0FA10322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
-		686FD6FD0FC06DA4006C12DA /* main.py in Resources */ = {isa = PBXBuildFile; fileRef = 686FD6FC0FC06DA4006C12DA /* main.py */; };
 		687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */; };
 		6894C4E20FA188D000A52097 /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
 		6894C50E0FA1893900A52097 /* SDL_image.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
@@ -51,15 +48,11 @@
 		689F33E60E61999C00E37E9F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
 		689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
 		689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
-		68D349BA1209885C008E9DD6 /* core in Resources */ = {isa = PBXBuildFile; fileRef = 68D349AD1209885C008E9DD6 /* core */; };
 		68D349BB1209885C008E9DD6 /* core in Resources */ = {isa = PBXBuildFile; fileRef = 68D349AD1209885C008E9DD6 /* core */; };
-		68D349CD12098879008E9DD6 /* importers in Resources */ = {isa = PBXBuildFile; fileRef = 68D349BC12098879008E9DD6 /* importers */; };
 		68D349CE12098879008E9DD6 /* importers in Resources */ = {isa = PBXBuildFile; fileRef = 68D349BC12098879008E9DD6 /* importers */; };
 		68D349F912098883008E9DD6 /* apps in Resources */ = {isa = PBXBuildFile; fileRef = 68D349CF12098883008E9DD6 /* apps */; };
 		68D349FA12098883008E9DD6 /* apps in Resources */ = {isa = PBXBuildFile; fileRef = 68D349CF12098883008E9DD6 /* apps */; };
-		68D34A0D120988C0008E9DD6 /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A01120988C0008E9DD6 /* plugins */; };
 		68D34A0E120988C0008E9DD6 /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A01120988C0008E9DD6 /* plugins */; };
-		68D34A28120988D0008E9DD6 /* pythonmodules in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A0F120988D0008E9DD6 /* pythonmodules */; };
 		68D34A29120988D0008E9DD6 /* pythonmodules in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A0F120988D0008E9DD6 /* pythonmodules */; };
 		68D8631D0FA5D1810097F73F /* SDLMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.mm */; };
 		68E53136118C2EAC0077AF3A /* arial_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68E53135118C2EAC0077AF3A /* arial_0_trans.png */; };
@@ -519,7 +512,6 @@
 				6839A7AF10179EFF008AF603 /* HelpLinks.strings in Resources */,
 				689F331E0E6192CB00E37E9F /* InfoPlist.strings in Resources */,
 				68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */,
-				686FD6FD0FC06DA4006C12DA /* main.py in Resources */,
 				6806287A0FC136C9006C372E /* data in Resources */,
 				6859C28110178958000E212C /* SDLMain.xib in Resources */,
 				6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */,
@@ -529,13 +521,7 @@
 				68E6BB1C10395B2C00BAA9F5 /* GeneralPreferences.tiff in Resources */,
 				68E6BB471039619700BAA9F5 /* GeneralPreferences.xib in Resources */,
 				68E53136118C2EAC0077AF3A /* arial_0_trans.png in Resources */,
-				68D349BA1209885C008E9DD6 /* core in Resources */,
-				68D349CD12098879008E9DD6 /* importers in Resources */,
 				68D349F912098883008E9DD6 /* apps in Resources */,
-				68D34A0D120988C0008E9DD6 /* plugins in Resources */,
-				68D34A28120988D0008E9DD6 /* pythonmodules in Resources */,
-				684223F2127355DC007177E4 /* apps in Resources */,
-				684224331273573F007177E4 /* shared in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
