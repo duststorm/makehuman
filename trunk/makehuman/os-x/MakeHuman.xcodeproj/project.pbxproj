@@ -852,6 +852,7 @@
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
 				);
+				OTHER_LDFLAGS = "-lz";
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
@@ -875,6 +876,7 @@
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
 				);
+				OTHER_LDFLAGS = "-lz";
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
