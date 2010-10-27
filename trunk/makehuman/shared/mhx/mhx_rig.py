@@ -234,7 +234,6 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 "    use_deform %s ; \n" % (deform)+
 "    hide %s ; \n" % hide +
 "    show_wire %s ; \n" % (wire) +
-"    use_hinge True ; \n"+
 "    use_inherit_scale %s ; \n" % (scale) +
 "    layers Array ")
 

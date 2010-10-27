@@ -148,8 +148,8 @@ LegArmature = [
 	('AnkleIK_R',		0, 'FootRevIK_R', 0, L_HELP, (1,1,1) ),
 
 	# Pole target
-	('KneePTIK_L',		0.0, 'LegIK_L', F_WIR, L_LEGIK, (1,1,1)),
-	('KneePTIK_R',		0.0, 'LegIK_R', F_WIR, L_LEGIK, (1,1,1)),
+	('KneePTIK_L',		0.0, 'Hip_L', F_WIR, L_LEGIK, (1,1,1)),
+	('KneePTIK_R',		0.0, 'Hip_R', F_WIR, L_LEGIK, (1,1,1)),
 	('KneeLinkPTIK_L',	0.0, 'UpLegIK_L', F_RES, L_LEGIK, (1,1,1)),
 	('KneeLinkPTIK_R',	0.0, 'UpLegIK_R', F_RES, L_LEGIK, (1,1,1)),
 	('KneePTFK_L',		0.0, 'UpLegFK_L', 0, L_HELP, (1,1,1)),
