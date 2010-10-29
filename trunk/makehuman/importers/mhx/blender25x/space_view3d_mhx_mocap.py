@@ -17,15 +17,15 @@
 # ##### END GPL LICENSE BLOCK #####
 
 bl_addon_info = {
-    "name": "MHX Mocap",
-    "author": "Thomas Larsson",
-    "version": 0.3,
-    "blender": (2, 5, 4),
-    "api": 31913,
-    "location": "View3D > Properties > MHX Mocap",
-    "description": "Mocap tool for MHX rig",
-    "warning": "",
-    "category": "3D View"}
+	"name": "MHX Mocap",
+	"author": "Thomas Larsson",
+	"version": 0.3,
+	"blender": (2, 5, 4),
+	"api": 31913,
+	"location": "View3D > Properties > MHX Mocap",
+	"description": "Mocap tool for MHX rig",
+	"warning": "",
+	"category": "3D View"}
 
 """
 Run from text window. 
@@ -137,7 +137,7 @@ class CNode:
 			return eb.head
 
 #
-#	readBvhFile(context, filepath, scale, startFrame, rot90):
+#	readBvhFile(context, filepath, scn):
 #	Custom importer
 #
 
@@ -150,7 +150,11 @@ Frames = 3
 Deg2Rad = math.pi/180
 Epsilon = 1e-5
 
-def readBvhFile(context, filepath, scale, startFrame, rot90):
+def readBvhFile(context, filepath, scn):
+	scale = scn['MhxBvhScale']
+	startFrame = scn['MhxStartFrame']
+	rot90 = scn['MhxRot90Anim']
+	subsample = scn['MhxSubsample']
 	print(filepath)
 	fileName = os.path.realpath(os.path.expanduser(filepath))
 	(shortName, ext) = os.path.splitext(fileName)
@@ -186,6 +190,7 @@ def readBvhFile(context, filepath, scale, startFrame, rot90):
 			#root.display('')
 			bpy.ops.object.mode_set(mode='OBJECT')
 			status = Motion
+			print("Reading motion")
 		elif status == Hierarchy:
 			if key == 'ROOT':	
 				node = CNode(words, None)
@@ -229,13 +234,19 @@ def readBvhFile(context, filepath, scale, startFrame, rot90):
 				frameTime = 1
 				status = Frames
 				frame = 0
+				frameno = 1
 				t = 0
 				bpy.ops.object.mode_set(mode='POSE')
 				pbones = rig.pose.bones
 				for pb in pbones:
 					pb.rotation_mode = 'QUATERNION'
 		elif status == Frames:
-			addFrame(words, frame, nodes, pbones, scale)
+			if (frame >= startFrame and
+				frame % subsample == 0):
+				addFrame(words, frameno, nodes, pbones, scale)
+				frameno += 1
+				if frameno % 200 == 0:
+					print(frame)
 			t += frameTime
 			frame += 1
 
@@ -854,7 +865,7 @@ def setArmature(rig):
 #
 
 def importAndRename(context, filepath):
-	rig = readBvhFile(context, filepath, context.scene['MhxBvhScale'], context.scene['MhxStartFrame'], context.scene['MhxRot90Anim'])
+	rig = readBvhFile(context, filepath, context.scene)
 	(rig00, bones00, action) =  renameBvhRig(rig, filepath)
 	guessArmature(rig00)
 	renameFKBones(bones00, rig00, action)
@@ -1182,25 +1193,6 @@ def prettifyBones(rig):
 	return
 
 #
-#	silenceConstraints(rig):
-#
-
-def silenceConstraints(rig):
-	for pb in rig.pose.bones:
-		pb.lock_location = (False, False, False)
-		pb.lock_rotation = (False, False, False)
-		pb.lock_scale = (False, False, False)
-		for cns in pb.constraints:
-			if cns.type == 'CHILD_OF':
-				cns.influence = 0.0
-			elif False and (cns.type == 'LIMIT_LOCATION' or
-				cns.type == 'LIMIT_ROTATION' or
-				cns.type == 'LIMIT_DISTANCE' or
-				cns.type == 'LIMIT_SCALE'):
-				cns.influence = 0.0
-	return
-
-#
 #	retargetMhxRig(context, rig90, mhxrig):
 #
 
@@ -1235,7 +1227,7 @@ def deleteFKRig(context, rig00, action, prefix):
 				act.use_fake_user = False
 				if act.users == 0:
 					bpy.data.actions.remove(act)
-					#del act
+					del act
 	return
 
 #
@@ -1349,12 +1341,91 @@ def iterateFCurves(points, keeps, maxErr):
 				new.append(worst)
 	return new
 		
+#
+#	togglePoleTargets(mhxrig):
+#	toggleIKLimits(mhxrig):
+#	toggleLimitConstraints(mhxrig):
+#
+
+def togglePoleTargets(mhxrig):
+	bones = mhxrig.data.bones
+	pbones = mhxrig.pose.bones
+	if bones['ElbowPTIK_L'].hide:
+		hide = False
+		poletar = mhxrig
+		res = 'ON'
+	else:
+		hide = True
+		poletar = None
+		res = 'OFF'
+	for suffix in ['_L', '_R']:
+		for name in ['ElbowPTIK', 'ElbowLinkPTIK', 'ElbowPTFK', 'KneePTIK', 'KneeLinkPTIK', 'KneePTFK']:
+			bones[name+suffix].hide = hide
+		cns = pbones['LoLegIK'+suffix].constraints['IK']
+		cns.pole_target = poletar
+	return res
+
+def toggleIKLimits(mhxrig):
+	pbones = mhxrig.pose.bones
+	if pbones['UpLegIK_L'].use_ik_limit_x:
+		use = False
+		res = 'OFF'
+	else:
+		use = True
+		res = 'ON'
+	for suffix in ['_L', '_R']:
+		for name in ['UpArmIK', 'LoArmIK', 'UpLegIK', 'LoLegIK']:
+			pb = pbones[name+suffix]
+			pb.use_ik_limit_x = use
+			pb.use_ik_limit_y = use
+			pb.use_ik_limit_z = use
+	return res
+
+def toggleLimitConstraints(mhxrig):
+	pbones = mhxrig.pose.bones
+	first = True
+	for pb in pbones:
+		for cns in pb.constraints:
+			if (cns.type == 'LIMIT_LOCATION' or
+				cns.type == 'LIMIT_ROTATION' or
+				cns.type == 'LIMIT_DISTANCE' or
+				cns.type == 'LIMIT_SCALE'):
+				if first:
+					first = False
+					if cns.influence > 0.5:
+						inf = 0.0
+						res = 'OFF'
+					else:
+						inf = 1.0
+						res = 'ON'
+				cns.influence = inf
+	return res
+
+#
+#	silenceConstraints(rig):
+#
+
+def silenceConstraints(rig):
+	for pb in rig.pose.bones:
+		pb.lock_location = (False, False, False)
+		pb.lock_rotation = (False, False, False)
+		pb.lock_scale = (False, False, False)
+		for cns in pb.constraints:
+			if cns.type == 'CHILD_OF':
+				cns.influence = 0.0
+			elif False and (cns.type == 'LIMIT_LOCATION' or
+				cns.type == 'LIMIT_ROTATION' or
+				cns.type == 'LIMIT_DISTANCE' or
+				cns.type == 'LIMIT_SCALE'):
+				cns.influence = 0.0
+	return
+
 
 ###################################################################################	
 #	User interface
 #
 #	getBvh(mhx)
-#	initInterface()
+#	initInterface(context)
 #
 
 def getBvh(mhx):
@@ -1363,7 +1434,8 @@ def getBvh(mhx):
 			return bvh
 	return None
 
-def initInterface(scn):
+def initInterface(context):
+	scn = context.scene
 	bpy.types.Scene.MhxBvhScale = FloatProperty(
 		name="Scale", 
 		description="Scale the BVH by this value", 
@@ -1375,6 +1447,11 @@ def initInterface(scn):
 		name="Start Frame", 
 		description="Starting frame for the animation")
 	scn['MhxStartFrame'] = 1
+
+	bpy.types.Scene.MhxSubsample = IntProperty(
+		name="Subsample", 
+		description="Sample only every n:th frame")
+	scn['MhxSubsample'] = 1
 
 	bpy.types.Scene.MhxRot90Anim = BoolProperty(
 		name="Rotate 90 deg", 
@@ -1404,6 +1481,14 @@ def initInterface(scn):
 		maxlen=1024)
 	scn['MhxDirectory'] = "~/makehuman/bvh/Female1_bvh"
 
+	bpy.types.Scene.MhxReallyDelete = BoolProperty(
+		name="Really delete action", 
+		description="Delete button deletes action permanently")
+	scn['MhxReallyDelete'] = False
+
+	listAllActions(context)
+	setAction()
+
 	bpy.types.Scene.MhxPrefix = StringProperty(
 		name="Prefix", 
 		description="Prefix", 
@@ -1425,8 +1510,6 @@ def initInterface(scn):
 			scn[mhx] = bvh
 	'''
 	return
-
-initInterface(bpy.context.scene)
 
 #
 #	class MhxBvhAssocPanel(bpy.types.Panel):
@@ -1490,22 +1573,30 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout.separator()
 		layout.prop(scn, "MhxBvhScale")
 		layout.prop(scn, "MhxStartFrame")
+		layout.prop(scn, "MhxSubsample")
 		layout.prop(scn, "MhxRot90Anim")
 		layout.prop(scn, "MhxDoSimplify")
 		layout.operator("object.LoadBvhButton")
+		layout.operator("object.LoadRetargetSimplifyButton")
 		layout.separator()
-		layout.operator("object.SilenceConstraintsButton")
-		layout.operator("object.RetargetMhxButton")
+		layout.operator("object.TogglePoleTargetsButton")
+		layout.operator("object.ToggleIKLimitsButton")
+		layout.operator("object.ToggleLimitConstraintsButton")
 		layout.separator()
 		layout.prop(scn, "MhxErrorLoc")
 		layout.prop(scn, "MhxErrorRot")
 		layout.operator("object.SimplifyFCurvesButton")
 		layout.separator()
-		layout.operator("object.LoadRetargetSimplifyButton")
-		layout.separator()
 		layout.prop(scn, "MhxDirectory")
 		layout.prop(scn, "MhxPrefix")
 		layout.operator("object.BatchButton")
+		layout.separator()
+		listAllActions(context)
+		setAction()
+		layout.prop_menu_enum(scn, "MhxActions")
+		layout.operator("object.SelectButton")
+		layout.prop(scn, "MhxReallyDelete")
+		layout.operator("object.DeleteButton")
 		return
 
 #
@@ -1571,6 +1662,48 @@ class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	class OBJECT_OT_TogglePoleTargetsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_TogglePoleTargetsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_TogglePoleTargetsButton"
+	bl_label = "Toggle pole targets"
+
+	def execute(self, context):
+		import bpy
+		res = togglePoleTargets(context.object)
+		print("Pole targets toggled", res)
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_ToggleIKLimitsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ToggleIKLimitsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ToggleIKLimitsButton"
+	bl_label = "Toggle IK limits"
+
+	def execute(self, context):
+		import bpy
+		res = toggleIKLimits(context.object)
+		print("IK limits toggled", res)
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_ToggleLimitConstraintsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ToggleLimitConstraintsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ToggleLimitConstraintsButton"
+	bl_label = "Toggle Limit constraints"
+
+	def execute(self, context):
+		import bpy
+		res = toggleLimitConstraints(context.object)
+		print("Limit constraints toggled", res)
+		return{'FINISHED'}	
+
+#
 #	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 #
 
@@ -1580,7 +1713,7 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 
 	def execute(self, context):
 		import bpy
-		initInterface(context.scene)
+		initInterface(context)
 		print("Interface initialized")
 		return{'FINISHED'}	
 
@@ -1646,16 +1779,106 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 
+#
+#	Select or delete action
+#   Delete button really deletes action. Handle with care.
+#
+#	listAllActions(context):
+#	findAction(name):
+#	OBJECT_OT_SelectButton(bpy.types.Operator):
+#	class OBJECT_OT_DeleteButton(bpy.types.Operator):
+#
+
+def listAllActions(context):
+	global theActions
+	actions = [] 
+	for act in bpy.data.actions:
+		name = act.name
+		actions.append((name, name, name))
+	theActions = actions
+	return
+
+def setAction():
+	global theActions
+	bpy.types.Scene.MhxActions = EnumProperty(
+		items = theActions,
+		name = "Actions")
+	return theActions
+
+def findAction(name):
+	global theActions
+	for n,action in enumerate(theActions):
+		(name1, name2, name3) = action		
+		if name == name1:
+			return n
+	raise NameError("Unrecognized action %s" % name)
+
+class OBJECT_OT_SelectButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SelectButton"
+	bl_label = "Select action"
+
+	@classmethod
+	def poll(cls, context):
+		return context.object
+
+	def execute(self, context):
+		import bpy
+		global theActions
+		ob = context.ob
+		name = scn.MhxActions		
+		print('Select action', name)	
+		try:
+			act = bpy.data.actions[name]
+		except:
+			act = None
+		if act and ob.animation_data:
+			ob.animation_data.action = act
+		return{'FINISHED'}	
+
+class OBJECT_OT_DeleteButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_DeleteButton"
+	bl_label = "Delete action"
+
+	@classmethod
+	def poll(cls, context):
+		return context.scene.MhxReallyDelete
+
+	def execute(self, context):
+		import bpy
+		global theActions
+		scn = context.scene
+		name = scn.MhxActions		
+		print('Delete action', name)	
+		try:
+			act = bpy.data.actions[name]
+		except:
+			act = None
+		if act:
+			act.use_fake_user = False
+			if act.users == 0:
+				print("Deleting", act)
+				n = findAction(name)
+				theActions.pop(n)
+				bpy.data.actions.remove(act)
+				print('Action', act, 'deleted')
+				listAllActions(context)
+				setAction()
+				#del act
+
+		return{'FINISHED'}	
+
+initInterface(bpy.context)
+
 
 def register():
-    pass
+	pass
 
 def unregister():
-    pass
+	pass
 
 if __name__ == "__main__":
-    register()
+	register()
 
-#readBvhFile(context, filepath, scale, startFrame, rot90)
+#readBvhFile(context, filepath, scale, startFrame, rot90, 1)
 #readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/Male1_bvh/Male1_A5_PickUpBox.bvh', 1.0, 1, False)
 #readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/cmu/10/10_03.bvh', 1.0, 1, False)

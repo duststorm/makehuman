@@ -15,16 +15,16 @@
 
 Abstract
 Lipsync for the MHX rig and Blender 2.5x.
-Version 0.2
+Version 0.3
 
 """
 
 bl_addon_info = {
 	'name': 'MakeHuman lipsync',
 	'author': 'Thomas Larsson',
-	'version': '0.2',
-	'blender': (2, 54, 0),
-    "api": 32127,
+	'version': '0.3',
+	'blender': (2, 53, 0),
+    "api": 32742,
     "location": "View3D > UI panel > MHX Mocap",
 	"description": "Lipsync for the MHX rig",
     "warning": "",
@@ -120,11 +120,11 @@ def setViseme(context, vis, setKey, frame):
 	return
 
 def setBoneLocation(context, pb, loc, mirror, setKey, frame):
-	scale = context.object['MhxScale']
+	scale = context.scene['MhxSyncScale']
 	if mirror:
 		loc[0] = -loc[0]
 	pb.location = loc*scale*0.2
-	if setKey or context.scene['MhxAutoKeyframe']:
+	if setKey or context.scene['MhxSyncAutoKeyframe']:
 		for n in range(3):
 			pb.keyframe_insert('location', index=n, frame=frame, group=pb.name)
 	return
@@ -196,10 +196,18 @@ def setInterpolation(rig):
 #
 
 def initInterface(scn):
-	bpy.types.Scene.MhxAutoKeyframe = BoolProperty(
+	bpy.types.Scene.MhxSyncScale = FloatProperty(
+		name="Scale", 
+		description="Scale of the MHX rig", 
+		min=0.0001, max=1000000.0, 
+		soft_min=0.001, soft_max=100.0)
+	scn['MhxSyncScale'] = 1.0
+
+	bpy.types.Scene.MhxSyncAutoKeyframe = BoolProperty(
 		name="Auto keyframe", 
 		description="Auto keyframe")
-	scn['MhxAutoKeyframe'] = False
+	scn['MhxSyncAutoKeyframe'] = False
+
 	return
 
 initInterface(bpy.context.scene)
@@ -215,18 +223,14 @@ class MhxLipsyncPanel(bpy.types.Panel):
 	
 	@classmethod
 	def poll(cls, context):
-		if context.object and context.object.type == 'ARMATURE':
-			try:
-				return context.object['MhxRig']
-			except:
-				pass
-		return False
+		return context.object and context.object.type == 'ARMATURE'
 
 	def draw(self, context):
 		layout = self.layout
 		layout.operator("object.InitInterfaceButton")
 		layout.separator()
-		layout.prop(context.scene, 'MhxAutoKeyframe', text="Auto keyframe", icon='BLENDER', toggle=True)
+		layout.prop(context.scene, 'MhxSyncScale')
+		layout.prop(context.scene, 'MhxSyncAutoKeyframe')
 		layout.label(text="Visemes")
 		row = layout.row()
 		row.operator("object.RestButton")
