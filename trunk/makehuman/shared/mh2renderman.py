@@ -600,6 +600,7 @@ class RMRScene:
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')
+        self.texturesFileName = os.path.join(self.ribsPath, "texture.rib")
 
         #mainscenefile
         self.sceneFileName = os.path.join(self.ribsPath, "scene.rib")
@@ -735,6 +736,18 @@ class RMRScene:
         ribfile.close()
 
 
+    def writeTextureFile(self):
+        """        
+        """ 
+        
+        
+        ribfile = file(self.texturesFileName, 'w')
+
+        #Write rib code for textures
+        for t in self.textures:
+            t.writeRibCode(ribfile)  
+
+
     def writeSceneFile(self):
         """
         This function creates the frame definition for a Renderman scene.
@@ -762,11 +775,7 @@ class RMRScene:
         
         pos = self.humanCharacter.getHumanPosition()
         imgFile = str(time.time())+".tif"
-        ribfile = file(self.sceneFileName, 'w')
-
-        #Write rib code for textures
-        for t in self.textures:
-            t.writeRibCode(ribfile)        
+        ribfile = file(self.sceneFileName, 'w')      
 
         #Write rib header
         ribSceneHeader.writeRibCode(ribfile)       
@@ -940,8 +949,9 @@ class RMRScene:
 
     def render(self):
         
-        filesTorender = []
-        self.loadLighting(self.lightsFolderPath, "default.lights")       
+        filesTorender = [self.texturesFileName]
+        self.loadLighting(self.lightsFolderPath, "default.lights")    
+        self.writeTextureFile()   
         
         if self.calcShadow == True:             
             self.writeWorldFile(self.worldFileName+"shad.rib", shadowMode = 1)               
