@@ -7,8 +7,8 @@
 
 surface
 eyeball ( float Ks = 3;
-          float Kd = 1;
-          float Ka = 1.5;
+          float Kd = 3;
+          float Ka = 0.1;
           string colortexture = "";  
           float roughness = .02;
 	      color specularcolor = 1;
@@ -29,6 +29,6 @@ eyeball ( float Ks = 3;
     color Spec = Ks*specular(Nf,-normalize(I),roughness);
     
     Oi = 1;
-    Ci = eyetexture * (Ka*ambient() + Kd*diffuse(Nf)) + specularcolor * Spec;
+    Ci =  (Ka*ambient() +eyetexture * Kd*diffuse(Nf)) + specularcolor * Spec;
     Ci = Ci -darkRamp;
 }
