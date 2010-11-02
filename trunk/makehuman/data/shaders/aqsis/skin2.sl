@@ -6,15 +6,24 @@ surface skin2(
             string roughtexture = "";  			
             string spectexture = ""; 
             string ssstexture = ""; 
+            string aotexture = "";            
 			float poresdensity = 1000;
 			float sweat = 2;
             float Kd = 3;
             float Ks = 0.001;             		
-            float Ka = 2, Ka2 = 0.2;
+            float Ka = 1;
             float melanin = 1;	            	
 			  ) 
-   {			  
-		
+   {	
+   
+    //Precalculated Ambient Occlusion values
+    float ambientOcclusion = 1;
+    
+   
+    //AMBIENT OCCLUSION TEXTURES
+	if (aotexture != "")
+	ambientOcclusion = float texture(aotexture);   
+    
 
 	float roughness = 1;
   	float specularity = 1;
@@ -70,7 +79,7 @@ surface skin2(
 	}
 
 
-	final_skin_color = skin_color * Ka * ambient();		
+	final_skin_color = skin_color * Ka * ambientOcclusion; //ambient();		
 	float CiR, CiG, CiB;
 	CiR = comp(final_skin_color, 0);
 	CiG = comp(final_skin_color, 1);
@@ -121,6 +130,8 @@ surface skin2(
 
 	
 Ci *= Oi;
+
+
 
 
 }
