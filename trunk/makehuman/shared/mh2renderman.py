@@ -59,7 +59,9 @@ class RMRMaterial:
 
     def writeRibCode(self, file):
         file.write('\t\t%s "%s" '%(self.type,self.name))
+        print "Writing %s material"%(self.name)
         for p in self.parameters:
+            print p.name, p.val
             if p.type == "float":
                 file.write('"%s %s" [%f] '%(p.type, p.name, p.val))
             if p.type == "string":
@@ -68,10 +70,19 @@ class RMRMaterial:
                 file.write('"%s %s" [%f %f %f] '%(p.type, p.name, p.val[0],  p.val[1],  p.val[2]))
         file.write('\n')
 
-    def setParameter(self, name, val):
+    def setParameter(self, name, val, pType = "float"):
+        newParamater = True
         for p in self.parameters:
             if p.name == name:
+                newParamater = False
                 p.val = val
+        if newParamater == True:
+            print "Setting paramater %s with value %s"%(name, str(val))
+            self.parameters.append(MaterialParameter(pType, name, val))
+            for p in  self.parameters:
+                print p.name, p.val
+            
+            
 
 
 class RMRLight:
@@ -338,13 +349,13 @@ class RMRHuman(RMNObject):
                 targetLabel1 = h1+h2
                 targetValue1 = humanTypesVal[n1]*humanAgesVal[n2]
                 #traslExamples[targetLabel1] = targetValue1
-                print targetLabel1,targetValue1
+                #print targetLabel1,targetValue1
                 parameters.append([targetLabel1,targetValue1])
                 for n3,h3 in enumerate(humanCategories):
                     targetLabel2 = h1+h2+h3
                     targetValue2 = humanTypesVal[n1]*humanAgesVal[n2]*humanCategoriesVal[n3]
                     #traslExamples[targetLabel2] = targetValue2
-                    print targetLabel2,targetValue2
+                    #print targetLabel2,targetValue2
                     parameters.append([targetLabel2,targetValue2])
         return parameters
 
@@ -597,6 +608,7 @@ class RMRScene:
         self.lastUndoItem = None
         self.lastRotation = [0,0,0]
         self.lastCameraPosition = [self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ]
+        self.firstTimeRendering = True
 
         #resources paths
         self.renderPath = mh.getPath('render')
@@ -704,6 +716,10 @@ class RMRScene:
         """
         #Init and write rib code for hairs        
         self.humanCharacter.writeHairsCurve()
+        
+        #Get global subobjs parameteres.
+        self.humanCharacter.skinMat.setParameter("sweat", self.app.settings.get('rendering_aqsis_oil', 0.3))
+        self.humanCharacter.subObjectsInit()
 
         if len(self.humanCharacter.subObjects) < 1:
             print "Warning: AO calculation on 0 objects"
@@ -763,7 +779,11 @@ class RMRScene:
         
         
         #Getting global settings
+        
+        
+        
         ribSceneHeader = RMRHeader()
+        
         ribSceneHeader.sizeFormat = [self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)]
         ribSceneHeader.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
@@ -776,9 +796,9 @@ class RMRScene:
         ribSceneHeader.displayColor = "rgba"  
         ribSceneHeader.displayName2 = "Final Render"
         ribSceneHeader.displayType2 = "framebuffer" 
-        ribSceneHeader.displayColor2 = "rgb"  
+        ribSceneHeader.displayColor2 = "rgb"      
         
-        self.humanCharacter.skinMat.setParameter("Ks", self.app.settings.get('rendering_aqsis_oil', 0.3))
+        
         
         pos = self.humanCharacter.getHumanPosition()
         imgFile = str(time.time())+".tif"
@@ -968,17 +988,26 @@ class RMRScene:
         print "DEBUG1", self.app.scene3d.selectedHuman.getRotation(), self.lastRotation
         
         if (self.app.scene3d.selectedHuman.getRotation() != self.lastRotation) or ([self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ] != self.lastCameraPosition):
+            print "CONDICIO 1"
             recalculateSSS = 1            
             self.lastRotation = self.app.scene3d.selectedHuman.getRotation()  
             
         if len(self.app.undoStack) > 0:  
+            
             print "DEBUG2", self.app.undoStack[-1], self.lastUndoItem
-            if self.app.undoStack[-1] != self.lastUndoItem:                
+            if self.app.undoStack[-1] != self.lastUndoItem:  
+                print "CONDICIO 2"
                 self.lastUndoItem = self.app.undoStack[-1]
                 recalculateAll = 1
-        else:
+        else:            
             if recalculateSSS == 0:
                 recalculateAll = 1
+                print "CONDICIO 3"
+                
+        if self.firstTimeRendering == True:
+            recalculateAll = 1
+            self.firstTimeRendering = False
+            print "CONDICIO 4"
             
             
         if  recalculateAll == 1:

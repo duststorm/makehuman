@@ -34,51 +34,15 @@ class AqsisTaskView(gui3d.TaskView):
                                     selectedTexture=self.app.getThemeResource('images', 'button_rendering_start_on.png'), position=[50, 80, 9])  # getThemeResource returns a texture for a gui element according to the chosen theme
 
         
-        self.AOToggle = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images', 'button_calc_ao.png'),
-                                                selectedTexture=self.app.getThemeResource('images', 'button_calc_ao_on.png'), position=[50, 100, 9])
-        
-        self.shadowToggle = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images', 'button_calc_ao.png'),
-                                                selectedTexture=self.app.getThemeResource('images', 'button_calc_ao_on.png'), position=[50, 120, 9])
-                                                
-        self.sssToggle = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images', 'button_calc_ao.png'),
-                                                selectedTexture=self.app.getThemeResource('images', 'button_calc_ao_on.png'), position=[50, 140, 9])
-        
-        
-       
-                                            
+                                              
         #Sliders                            
-        self.shadingRateSlider= gui3d.Slider(self, position=[10, 140, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.000")
+        self.shadingRateSlider= gui3d.Slider(self, position=[10, 140, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.00")
         self.shadingRateSlider.label.setPosition([15,135,9.5])
-        self.samplesSlider= gui3d.Slider(self, position=[10, 180, 9.3], value=2, min=1.0, max=10, label = "Samples: 2.000")
+        self.samplesSlider= gui3d.Slider(self, position=[10, 180, 9.3], value=2, min=1.0, max=10, label = "Samples: 2.00")
         self.samplesSlider.label.setPosition([15,175,9.5])        
-        self.skinOilSlider= gui3d.Slider(self, position=[10, 400, 9.3], value=0.3, min=0.0, max=3, label = "Skin Oil: 1.000")
-        self.skinOilSlider.label.setPosition([15,395,9.5])
-        
-        @self.AOToggle.event
-        def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.AOToggle, event)
-            if self.AOToggle.selected:
-                self.sceneToRender.calcAmbientOcclusion = True
-            else:
-                self.sceneToRender.calcAmbientOcclusion = False           
-            
-        
-        @self.shadowToggle.event
-        def onClicked(event):           
-            gui3d.ToggleButton.onClicked(self.shadowToggle, event)
-            if self.shadowToggle.selected:
-                self.sceneToRender.calcShadow = True
-            else:
-                self.sceneToRender.calcShadow = False  
-            
-            
-        @self.sssToggle.event
-        def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.sssToggle, event)
-            if self.sssToggle.selected:
-                self.sceneToRender.calcSSS = True
-            else:
-                self.sceneToRender.calcSSS = False  
+        self.skinOilSlider= gui3d.Slider(self, position=[10, 400, 9.3], value=0.3, min=0.0, max=10, label = "Skin Oil: 0.3")
+        self.skinOilSlider.label.setPosition([15,395,9.5])        
+         
 
         @self.renderButton.event
         def onClicked(event):            
