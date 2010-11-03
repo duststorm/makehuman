@@ -588,7 +588,15 @@ class RMRScene:
     def __init__(self, app):
         MHscene = app.scene3d
         camera = app.modelCamera
+        
+        #rendering properties
+        self.camera = camera
+        
+        
         self.app = app
+        self.lastUndoItem = None
+        self.lastRotation = [0,0,0]
+        self.lastCameraPosition = [self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ]
 
         #resources paths
         self.renderPath = mh.getPath('render')
@@ -644,8 +652,7 @@ class RMRScene:
         if not os.path.isdir(self.usrShaderPath):
             os.makedirs(self.usrShaderPath)
 
-        #rendering properties
-        self.camera = camera
+        
 
         #textures used in the scene
         self.textures = []
@@ -951,22 +958,47 @@ class RMRScene:
         
         filesTorender = [self.texturesFileName]
         self.loadLighting(self.lightsFolderPath, "default.lights")    
-        self.writeTextureFile()   
+        self.writeTextureFile() #TODO move in the init
         
-        if self.calcShadow == True:             
+        recalculateAll = 0
+        recalculateSSS = 0
+        
+        
+            
+        print "DEBUG1", self.app.scene3d.selectedHuman.getRotation(), self.lastRotation
+        
+        if (self.app.scene3d.selectedHuman.getRotation() != self.lastRotation) or ([self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ] != self.lastCameraPosition):
+            recalculateSSS = 1            
+            self.lastRotation = self.app.scene3d.selectedHuman.getRotation()  
+            
+        if len(self.app.undoStack) > 0:  
+            print "DEBUG2", self.app.undoStack[-1], self.lastUndoItem
+            if self.app.undoStack[-1] != self.lastUndoItem:                
+                self.lastUndoItem = self.app.undoStack[-1]
+                recalculateAll = 1
+        else:
+            if recalculateSSS == 0:
+                recalculateAll = 1
+            
+            
+        if  recalculateAll == 1:
+            print "RECALCULATING ALL"
             self.writeWorldFile(self.worldFileName+"shad.rib", shadowMode = 1)               
             self.writeShadowFile()
-            filesTorender.append(self.shadowFileName)
-        
-        if self.calcAmbientOcclusion == True:           
+            filesTorender.append(self.shadowFileName)        
             self.writeAOFile()            
-            filesTorender.append(self.ambientOcclusionFileName)
-        
-        if self.calcSSS == True:
+            filesTorender.append(self.ambientOcclusionFileName) 
+            self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
+            self.writeSkinBakeFile()
+            filesTorender.append(self.bakeFilename)           
             
+            
+        if (recalculateSSS == 1) and (recalculateAll == 0):
+            print "RECALCULATING SSS"
             self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
             self.writeSkinBakeFile()
             filesTorender.append(self.bakeFilename)
+        
         
         self.writeWorldFile(self.worldFileName)
         self.writeSceneFile()

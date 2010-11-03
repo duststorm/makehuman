@@ -8,7 +8,7 @@ surface skin2(
             string ssstexture = ""; 
             string aotexture = "";            
 			float poresdensity = 1000;
-			float sweat = 2;
+			float sweat = .25;
             float Kd = 3;
             float Ks = 0.001;             		
             float Ka = 1;
@@ -59,7 +59,7 @@ surface skin2(
 	roughness = float texture(roughtexture);	
 	
 	if (spectexture != "")
-	     specularity = f2 * sweat * float texture (spectexture);	 
+	     specularity = f2 * float texture (spectexture);	 
 	
 	if (colortexture != "")
 	    skin_color = color texture (colortexture);
@@ -119,13 +119,14 @@ surface skin2(
     
     final_skin_color = final_skin_color*Kd;
 	
-    //SWEAT	
-    float oil_width = 0.8;	
-    final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),oil_width/10)* dark_side2 * sweat;
-    final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),oil_width)* dark_side2 * sweat * 0.01;	
+    //SWEAT    
+    final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),0.08)* dark_side2 * 0.05;
+    final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),0.8)* dark_side2 * 0.01;	
 
     Ci = final_skin_color * (1/(melanin+1))*f3;
     Ci = mix(Ci,ssslight,sssVal);
+    
+    Ci = Ci + specularity * sweat * specular(Nn,-normalize(I),0.1);
 	
 
 	
