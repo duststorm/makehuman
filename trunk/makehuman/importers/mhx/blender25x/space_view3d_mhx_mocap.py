@@ -153,6 +153,7 @@ Epsilon = 1e-5
 def readBvhFile(context, filepath, scn):
 	scale = scn['MhxBvhScale']
 	startFrame = scn['MhxStartFrame']
+	endFrame = scn['MhxEndFrame']
 	rot90 = scn['MhxRot90Anim']
 	subsample = scn['MhxSubsample']
 	print(filepath)
@@ -242,11 +243,12 @@ def readBvhFile(context, filepath, scn):
 					pb.rotation_mode = 'QUATERNION'
 		elif status == Frames:
 			if (frame >= startFrame and
+				frame <= endFrame and
 				frame % subsample == 0):
 				addFrame(words, frameno, nodes, pbones, scale)
-				frameno += 1
 				if frameno % 200 == 0:
 					print(frame)
+				frameno += 1
 			t += frameTime
 			frame += 1
 
@@ -654,13 +656,15 @@ def renameFKBones(bones00, rig00, action):
 	for bone00 in bones00:
 		name00 = bone00.name
 		name90 = theArmature[name00.lower()]
+		eb = ebones[name00]
 		if name90:
-			eb = ebones[name00]
 			eb.name = name90
 			bones90[name90] = CEditBone(eb)
 			grp = action.groups[name00]
 			grp.name = name90
 			setbones.append((eb, name90))
+		else:
+			eb.name = '_' + name00
 	for (eb, name) in setbones:
 		eb.name = name
 	createExtraBones(ebones, bones90)
@@ -817,6 +821,20 @@ def constrainIkBones(rig90):
 		cns.chain_count = 2
 	return
 
+#
+#	copyAnglesFKIK():
+#	'UpArmIK' : ('UpArmFK', F_LR, 'Shoulder')
+
+def copyAnglesFKIK(context):
+	bpy.ops.object.mode_set(mode='EDIT')
+	ebones = context.object.data.edit_bones
+	for nameIK in IkBoneList:
+		(nameFK, flags, parent) = IkArmature[nameIK]
+		for suffix in ['_L', '_R']:
+			ebones[nameIK+suffix].roll = ebones[nameFK+suffix].roll
+	bpy.ops.object.mode_set(mode='POSE')
+	return
+	
 #
 #	guessArmature(rig):
 #	setArmature(rig)
@@ -1205,8 +1223,10 @@ def retargetMhxRig(context, rig90, mhxrig):
 	mhxAnimations = createAnimation(context, mhxrig)
 	rig90Animations = createAnimation(context, rig90)
 	insertAnimation(context, rig90, rig90Animations)
+	setLimitConstraints(mhxrig, 0.0)
 	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
 	poseMhxIKBones(context, mhxrig, mhxAnimations)
+	setLimitConstraints(mhxrig, 1.0)
 
 	mhxrig.animation_data.action.name = mhxrig.name[:4] + rig90.name[2:]
 	print("Retargeted %s --> %s" % (rig90, mhxrig))
@@ -1345,6 +1365,7 @@ def iterateFCurves(points, keeps, maxErr):
 #	togglePoleTargets(mhxrig):
 #	toggleIKLimits(mhxrig):
 #	toggleLimitConstraints(mhxrig):
+#	setLimitConstraints(mhxrig, inf):
 #
 
 def togglePoleTargets(mhxrig):
@@ -1401,6 +1422,17 @@ def toggleLimitConstraints(mhxrig):
 				cns.influence = inf
 	return res
 
+def setLimitConstraints(mhxrig, inf):
+	pbones = mhxrig.pose.bones
+	for pb in pbones:
+		for cns in pb.constraints:
+			if (cns.type == 'LIMIT_LOCATION' or
+				cns.type == 'LIMIT_ROTATION' or
+				cns.type == 'LIMIT_DISTANCE' or
+				cns.type == 'LIMIT_SCALE'):
+				cns.influence = inf
+	return
+
 #
 #	silenceConstraints(rig):
 #
@@ -1419,7 +1451,6 @@ def silenceConstraints(rig):
 				cns.type == 'LIMIT_SCALE'):
 				cns.influence = 0.0
 	return
-
 
 ###################################################################################	
 #	User interface
@@ -1441,12 +1472,17 @@ def initInterface(context):
 		description="Scale the BVH by this value", 
 		min=0.0001, max=1000000.0, 
 		soft_min=0.001, soft_max=100.0)
-	scn['MhxBvhScale'] = 0.1
+	scn['MhxBvhScale'] = 0.65
 
 	bpy.types.Scene.MhxStartFrame = IntProperty(
 		name="Start Frame", 
 		description="Starting frame for the animation")
 	scn['MhxStartFrame'] = 1
+
+	bpy.types.Scene.MhxEndFrame = IntProperty(
+		name="Last Frame", 
+		description="Last frame for the animation")
+	scn['MhxEndFrame'] = 32000
 
 	bpy.types.Scene.MhxSubsample = IntProperty(
 		name="Subsample", 
@@ -1570,27 +1606,34 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout = self.layout
 		scn = context.scene
 		layout.operator("object.InitInterfaceButton")
-		layout.separator()
+		layout.operator("object.CopyAnglesFKIKButton")
+
+		layout.label('Load')
 		layout.prop(scn, "MhxBvhScale")
 		layout.prop(scn, "MhxStartFrame")
+		layout.prop(scn, "MhxEndFrame")
 		layout.prop(scn, "MhxSubsample")
 		layout.prop(scn, "MhxRot90Anim")
 		layout.prop(scn, "MhxDoSimplify")
 		layout.operator("object.LoadBvhButton")
 		layout.operator("object.LoadRetargetSimplifyButton")
-		layout.separator()
+
+		layout.label('Toggle')
 		layout.operator("object.TogglePoleTargetsButton")
 		layout.operator("object.ToggleIKLimitsButton")
 		layout.operator("object.ToggleLimitConstraintsButton")
-		layout.separator()
+
+		layout.label('Simplify')
 		layout.prop(scn, "MhxErrorLoc")
 		layout.prop(scn, "MhxErrorRot")
 		layout.operator("object.SimplifyFCurvesButton")
-		layout.separator()
+
+		layout.label('Batch conversion')
 		layout.prop(scn, "MhxDirectory")
 		layout.prop(scn, "MhxPrefix")
 		layout.operator("object.BatchButton")
-		layout.separator()
+
+		layout.label('Manage actions')
 		listAllActions(context)
 		setAction()
 		layout.prop_menu_enum(scn, "MhxActions")
@@ -1715,6 +1758,34 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 		import bpy
 		initInterface(context)
 		print("Interface initialized")
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_InitInterfaceButton"
+	bl_label = "Initialize"
+
+	def execute(self, context):
+		import bpy
+		initInterface(context)
+		print("Interface initialized")
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_CopyAnglesFKIKButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_CopyAnglesFKIKButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_CopyAnglesFKIKButton"
+	bl_label = "Angles FK --> IK"
+
+	def execute(self, context):
+		import bpy
+		copyAnglesFKIK(context)
+		print("Angles copied")
 		return{'FINISHED'}	
 
 #
@@ -1864,6 +1935,8 @@ class OBJECT_OT_DeleteButton(bpy.types.Operator):
 				listAllActions(context)
 				setAction()
 				#del act
+			else:
+				print("Cannot delete. %s has %d users." % (act, act.users))
 
 		return{'FINISHED'}	
 
