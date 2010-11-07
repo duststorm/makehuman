@@ -22,9 +22,9 @@ Version 0.3
 bl_addon_info = {
 	'name': 'MakeHuman lipsync',
 	'author': 'Thomas Larsson',
-	'version': '0.3',
-	'blender': (2, 53, 0),
-    "api": 32742,
+	'version': '0.4',
+	'blender': (2, 5, 5),
+    "api": 32930,
     "location": "View3D > UI panel > MHX Mocap",
 	"description": "Lipsync for the MHX rig",
     "warning": "",
@@ -210,8 +210,6 @@ def initInterface(scn):
 
 	return
 
-initInterface(bpy.context.scene)
-
 #
 #	class MhxLipsyncPanel(bpy.types.Panel):
 #
@@ -278,8 +276,6 @@ def defineVisemeButtons():
 		exec(expr, globals(), locals())
 	return
 
-defineVisemeButtons()
-
 #
 #	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 #
@@ -331,5 +327,17 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 	def invoke(self, context, event):
 		context.window_manager.add_fileselect(self)
 		return {'RUNNING_MODAL'}	
+
+initInterface(bpy.context.scene)
+defineVisemeButtons()
+
+def register():
+	pass
+
+def unregister():
+	pass
+
+if __name__ == "__main__":
+	register()
 
 

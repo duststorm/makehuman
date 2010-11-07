@@ -22,9 +22,9 @@ Version 1.0
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '1.0',
-	'blender': (2, 5, 4),
-    "api": 31913,
+	'version': '1.0.1',
+	'blender': (2, 5, 5),
+    "api": 32930,
 	"location": "File > Import",
 	"description": "Import files in the MakeHuman eXchange format (.mhx)",
 	"warning": "",
@@ -40,7 +40,8 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 0
-BLENDER_VERSION = (2, 54, 0)
+SUB_VERSION = 1
+BLENDER_VERSION = (2, 55, 0)
 
 #
 #
@@ -51,8 +52,8 @@ import os
 import time
 import mathutils
 from mathutils import *
-import geometry
-import string
+#import geometry
+#import string
 
 MHX249 = False
 Blender24 = False
@@ -1419,8 +1420,7 @@ def parseShapeKey(ob, me, args, tokens):
 	return
 
 def addShapeKey(ob, name, vgroup, tokens):
-	bpy.ops.object.shape_key_add(False)
-	skey = ob.active_shape_key
+	skey = ob.add_shape_key(name=name, from_mix=False)
 	if name != 'Basis':
 		skey.relative_key = loadedData['ShapeKey']['Basis']
 	skey.name = name

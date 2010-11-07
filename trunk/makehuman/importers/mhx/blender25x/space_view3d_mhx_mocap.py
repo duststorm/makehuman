@@ -19,9 +19,9 @@
 bl_addon_info = {
 	"name": "MHX Mocap",
 	"author": "Thomas Larsson",
-	"version": 0.3,
-	"blender": (2, 5, 4),
-	"api": 31913,
+	"version": "0.5",
+	"blender": (2, 5, 5),
+	"api": 32930,
 	"location": "View3D > Properties > MHX Mocap",
 	"description": "Mocap tool for MHX rig",
 	"warning": "",
@@ -1761,20 +1761,6 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_InitInterfaceButton"
-	bl_label = "Initialize"
-
-	def execute(self, context):
-		import bpy
-		initInterface(context)
-		print("Interface initialized")
-		return{'FINISHED'}	
-
-#
 #	class OBJECT_OT_CopyAnglesFKIKButton(bpy.types.Operator):
 #
 
@@ -1904,6 +1890,7 @@ class OBJECT_OT_SelectButton(bpy.types.Operator):
 			act = None
 		if act and ob.animation_data:
 			ob.animation_data.action = act
+
 		return{'FINISHED'}	
 
 class OBJECT_OT_DeleteButton(bpy.types.Operator):
@@ -1941,7 +1928,6 @@ class OBJECT_OT_DeleteButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 initInterface(bpy.context)
-
 
 def register():
 	pass
