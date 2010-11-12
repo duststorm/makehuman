@@ -475,7 +475,7 @@ Xx1Armature = {
 	'right toe' : 'ToeFK_R',
 }
 
-Xx2Armature = {
+MocapDataArmature = {
 	'hips' : 'Root',
 	'lefthip' : 'UpLegFK_L',
 	'leftknee' : 'LoLegFK_L',
@@ -484,6 +484,7 @@ Xx2Armature = {
 	'rightknee' : 'LoLegFK_R',
 	'rightankle' : 'FootFK_R',
 	'chest' : 'Spine2',
+	'chest2' : 'Spine3',
 	'leftcollar' : 'Shoulder_L',
 	'leftshoulder' : 'UpArmFK_L',
 	'leftelbow' : 'LoArmFK_L',
@@ -564,8 +565,32 @@ theArmatures = {
 	'MB' : MBArmature, 
 	'OSU' : OsuArmature,
 	'XX1' : Xx1Armature,
-	'XX2' : Xx2Armature,
+	'McpD' : MocapDataArmature,
 	'Daz' : DazArmature,
+}
+
+MBFixes = {
+	'UpLegFK_L' : Matrix.Rotation(-0.4, 3, 'Z'),
+	'UpLegFK_R' : Matrix.Rotation(0.4, 3, 'Z'),
+}
+
+OsuFixes = {}
+
+XX1Fixes = {}
+
+McpdFixes = {
+	'UpArmFK_L' : Matrix.Rotation(1.57, 3, Vector((0.3,0,1))),
+	'UpArmFK_R' : Matrix.Rotation(1.57, 3, Vector((0,0.3,-1))),
+}
+
+DazFixes = {}
+
+fixMatrices = {
+	'MB'  : MBFixes,
+	'OSU' : OsuFixes,
+	'XX1' : XX1Fixes,
+	'McpD': McpdFixes,
+	'Daz' : DazFixes,
 }
 
 #
@@ -905,13 +930,8 @@ class CAnimData():
 		self.offsetRest = None
 		self.matrixRest = None
 		self.inverseRest = None
-
-		self.headMhxRest = None
-		self.vecMhxRest = None
-		self.tailMhxRest = None
-		self.offsetMhxRest = None
-		self.matrixMhxRest = None
-		self.inverseMhxRest = None
+		self.matrixRel = None
+		self.inverseRel = None
 
 		self.heads = {}
 		self.tails = {}
@@ -944,17 +964,31 @@ def createAnimData(name, animations, bones):
 	anim.headRest = b.head_local.copy()
 	anim.tailRest = b.tail_local.copy()
 	anim.vecRest = anim.tailRest - anim.headRest
-	matrix = b.matrix_local.rotation_part()
 	if b.parent:
 		anim.parent = b.parent.name
 		animPar = animations[anim.parent]
 		anim.offsetRest = anim.headRest - animPar.headRest
 	else:
 		anim.offsetRest = Vector((0,0,0))	
-	anim.matrixRest = matrix
+	anim.matrixRest = b.matrix_local.rotation_part()
 	anim.inverseRest = anim.matrixRest.copy().invert()
+	anim.matrixRel = b.matrix.copy()
+	anim.inverseRel = anim.matrixRel.copy().invert()
 	return
-
+'''
+def relativizeBones(rig90, mhxrig, mhxAnims):
+	for bone90 in rig90.data.bones:
+		if bone90.parent:
+			name = bone90.name
+			pname = bone90.parent.name
+			anim = mhxAnims[name]
+			bone = mhxrig.data.bones[name].parent
+			while bone and bone.name != pname:			
+				anim.matrixRel = bone.matrix * anim.matrixRel
+				bone = bone.parent
+			anim.inverseRel = anim.matrixRel.copy().invert()
+	return
+'''
 #
 #	insertAnimation(context, rig, animations):
 #	insertAnimRoot(root, animations, nFrames, locs, rots):
@@ -1019,10 +1053,10 @@ def insertAnimChild(name, animations, rots):
 	return anim
 		
 #
-#	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
+#	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixMats)
 #
 
-def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
+def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixMats):
 	context.scene.objects.active = mhxrig
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = mhxrig.pose.bones
@@ -1042,7 +1076,14 @@ def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations):
 		elif name in GlobalBoneList:
 			insertGlobalRotationKeyFrames(name, pb, anim90, animMhx)
 		else:
-			insertLocalRotationKeyFrames(name, pb, anim90, animMhx)
+			try:
+				fixMat = fixMats[name]
+			except:
+				fixMat = None
+			if fixMat:
+				fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fixMat)
+			else:
+				insertLocalRotationKeyFrames(name, pb, anim90, animMhx)
 
 	insertAnimation(context, mhxrig, mhxAnimations)
 
@@ -1100,6 +1141,7 @@ def insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
 	rots = []
 	for frame in range(anim90.nFrames):
 		mat90 = anim90.matrices[frame]
+		animMhx.matrices[frame] = mat90
 		matMhx = animMhx.inverseRest * mat90 * animMhx.matrixRest
 		rot = matMhx.to_quat()
 		rots.append(rot)
@@ -1112,7 +1154,19 @@ def insertLocalRotationKeyFrames(name, pb, anim90, animMhx):
 	rots = []
 	for frame in range(anim90.nFrames):
 		rot = anim90.quats[frame]
-		rots.append(rots)
+		rots.append(rot)
+		pb.rotation_quaternion = rot
+		for n in range(4):
+			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
+	return rots
+
+def fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fixMat):
+	rots = []
+	for frame in range(anim90.nFrames):
+		rot90 = anim90.quats[frame]
+		matMhx = fixMat * rot90.to_matrix()
+		rot = matMhx.to_quat()
+		rots.append(rot)
 		pb.rotation_quaternion = rot
 		for n in range(4):
 			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
@@ -1215,6 +1269,7 @@ def prettifyBones(rig):
 #
 
 def retargetMhxRig(context, rig90, mhxrig):
+	scn = context.scene
 	setArmature(rig90)
 	print("Retarget %s --> %s" % (rig90, mhxrig))
 	if mhxrig.animation_data:
@@ -1224,7 +1279,11 @@ def retargetMhxRig(context, rig90, mhxrig):
 	rig90Animations = createAnimation(context, rig90)
 	insertAnimation(context, rig90, rig90Animations)
 	setLimitConstraints(mhxrig, 0.0)
-	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations)
+	if scn['MhxApplyFixes']:
+		fixMats = fixMatrices[rig90['MhxArmature']]
+	else:
+		fixMats = None
+	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixMats)
 	poseMhxIKBones(context, mhxrig, mhxAnimations)
 	setLimitConstraints(mhxrig, 1.0)
 
@@ -1333,6 +1392,85 @@ def setInterpolation(rig):
 		for pt in fcu.keyframe_points:
 			pt.interpolation = 'LINEAR'
 		fcu.extrapolation = 'CONSTANT'
+	return
+
+#
+#	plantKeys(context)
+#	plantFCurves(fcurves, first, last):
+#
+
+def plantKeys(context):
+	rig = context.object
+	scn = context.scene
+	if not rig.animation_data:
+		print("Cannot plant: no animation data")
+		return
+	act = rig.animation_data.action
+	if not act:
+		print("Cannot plant: no action")
+		return
+	bone = rig.data.bones.active
+	if not bone:
+		print("Cannot plant: no active bone")
+		return
+
+	markers = []
+	for mrk in scn.timeline_markers:
+		if mrk.select:
+			markers.append(mrk.frame)
+	markers.sort()
+	if len(markers) >= 2:
+		first = markers[0]
+		last = markers[-1]
+		print("Delete keys between %d and %d" % (first, last))
+	else:
+		print("Cannot plant: need two selected time markers")
+		return
+
+	locPath = 'pose.bones["%s"].location' % bone.name
+	rotPath = 'pose.bones["%s"].rotation_quaternion' % bone.name
+	rots = []
+	locs = []
+	for fcu in act.fcurves:
+		if fcu.data_path == locPath:
+			locs.append(fcu)
+		if fcu.data_path == rotPath:
+			rots.append(fcu)
+
+	pb = rig.pose.bones[bone.name]
+	useCrnt = scn['MhxPlantCurrent']
+	if scn['MhxPlantLoc']:
+		plantFCurves(locs, first, last, useCrnt, pb.location)
+	if scn['MhxPlantRot']:
+		plantFCurves(rots, first, last, useCrnt, pb.rotation_quaternion)
+	return
+
+def plantFCurves(fcurves, first, last, useCrnt, values):
+	for fcu in fcurves:
+		print("Plant", fcu.data_path, fcu.array_index)
+		kpts = fcu.keyframe_points
+		sum = 0.0
+		dellist = []
+		firstx = first - 1e-4
+		lastx = last + 1e-4
+		print("Btw", firstx, lastx)
+		for kp in kpts:
+			(x,y) = kp.co
+			if x > firstx and x < lastx:
+				dellist.append(kp)
+				sum += y
+		nterms = len(dellist)
+		if nterms == 0:
+			return
+		if useCrnt:
+			ave = values[fcu.array_index]
+			print("Current", ave)
+		else:
+			ave = sum/nterms
+		for kp in dellist:
+			kp.co[1] = ave
+		kpts.add(first, ave, fast=True)
+		kpts.add(last, ave, fast=False)
 	return
 
 #
@@ -1499,6 +1637,26 @@ def initInterface(context):
 		description="Simplify FCurves")
 	scn['MhxDoSimplify'] = True
 
+	bpy.types.Scene.MhxApplyFixes = BoolProperty(
+		name="Apply found fixes", 
+		description="Apply found fixes")
+	scn['MhxApplyFixes'] = True
+
+	bpy.types.Scene.MhxPlantCurrent = BoolProperty(
+		name="Use current", 
+		description="Plant at current")
+	scn['MhxPlantCurrent'] = True
+
+	bpy.types.Scene.MhxPlantLoc = BoolProperty(
+		name="Loc", 
+		description="Plant location keys")
+	scn['MhxPlantLoc'] = True
+
+	bpy.types.Scene.MhxPlantRot = BoolProperty(
+		name="Rot", 
+		description="Plant rotation keys")
+	scn['MhxPlantRot'] = False
+
 	bpy.types.Scene.MhxErrorLoc = FloatProperty(
 		name="Max loc error", 
 		description="Max error for location FCurves when doing simplification",
@@ -1615,13 +1773,23 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout.prop(scn, "MhxSubsample")
 		layout.prop(scn, "MhxRot90Anim")
 		layout.prop(scn, "MhxDoSimplify")
+		layout.prop(scn, "MhxApplyFixes")
 		layout.operator("object.LoadBvhButton")
+		layout.operator("object.RetargetMhxButton")
+		layout.separator()
 		layout.operator("object.LoadRetargetSimplifyButton")
 
 		layout.label('Toggle')
 		layout.operator("object.TogglePoleTargetsButton")
 		layout.operator("object.ToggleIKLimitsButton")
 		layout.operator("object.ToggleLimitConstraintsButton")
+
+		layout.label('Plant')
+		row = layout.row()
+		row.prop(scn, "MhxPlantLoc")
+		row.prop(scn, "MhxPlantRot")
+		layout.prop(scn, "MhxPlantCurrent")
+		layout.operator("object.PlantButton")
 
 		layout.label('Simplify')
 		layout.prop(scn, "MhxErrorLoc")
@@ -1758,6 +1926,20 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 		import bpy
 		initInterface(context)
 		print("Interface initialized")
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_PlantButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_PlantButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_PlantButton"
+	bl_label = "Plant"
+
+	def execute(self, context):
+		import bpy
+		plantKeys(context)
+		print("Keys planted")
 		return{'FINISHED'}	
 
 #
