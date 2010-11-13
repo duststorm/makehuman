@@ -156,6 +156,7 @@ def readBvhFile(context, filepath, scn):
 	endFrame = scn['MhxEndFrame']
 	rot90 = scn['MhxRot90Anim']
 	subsample = scn['MhxSubsample']
+	defaultSS = scn['MhxDefaultSS']
 	print(filepath)
 	fileName = os.path.realpath(os.path.expanduser(filepath))
 	(shortName, ext) = os.path.splitext(fileName)
@@ -232,11 +233,12 @@ def readBvhFile(context, filepath, scn):
 				nFrames = int(words[1])
 			elif key == 'FRAME' and words[1].upper() == 'TIME:':
 				frameTime = float(words[2])
-				frameTime = 1
+				frameFactor = int(1.0/(25*frameTime) + 0.49)
+				if defaultSS:
+					subsample = frameFactor
 				status = Frames
 				frame = 0
 				frameno = 1
-				t = 0
 				bpy.ops.object.mode_set(mode='POSE')
 				pbones = rig.pose.bones
 				for pb in pbones:
@@ -249,7 +251,6 @@ def readBvhFile(context, filepath, scn):
 				if frameno % 200 == 0:
 					print(frame)
 				frameno += 1
-			t += frameTime
 			frame += 1
 
 	fp.close()
@@ -279,7 +280,7 @@ def addFrame(words, frame, nodes, pbones, scale):
 						vec[index] = sign*float(words[m])
 						m += 1
 					if first:
-						pb.location = node.inverse * (scale * vec - node.head)				
+						pb.location = (scale * vec - node.head) * node.inverse
 						for n in range(3):
 							pb.keyframe_insert('location', index=n, frame=frame, group=name)
 					first = False
@@ -488,6 +489,7 @@ MocapDataArmature = {
 	'rightankle' : 'FootFK_R',
 	'chest' : 'Spine2',
 	'chest2' : 'Spine3',
+	'cs_bvh' : 'Spine3',
 	'leftcollar' : 'Shoulder_L',
 	'leftshoulder' : 'UpArmFK_L',
 	'leftelbow' : 'LoArmFK_L',
@@ -1028,8 +1030,8 @@ def insertAnimRoot(root, animations, nFrames, locs, rots):
 		anim.quats[frame] = quat
 		matrix = anim.matrixRest * quat.to_matrix() * anim.inverseRest
 		anim.matrices[frame] = matrix
-		anim.heads[frame] = anim.matrixRest * Vector(locs[frame]) + anim.headRest
-		anim.tails[frame] = anim.heads[frame] + matrix*anim.vecRest
+		anim.heads[frame] =  Vector(locs[frame]) * anim.matrixRest + anim.headRest
+		anim.tails[frame] = anim.heads[frame] + anim.vecRest * matrix
 	return
 
 def insertAnimChildLoc(nameIK, nameFK, animations, locs):
@@ -1039,7 +1041,7 @@ def insertAnimChildLoc(nameIK, nameFK, animations, locs):
 	animIK.nFrames = animFK.nFrames
 	for frame in range(animFK.nFrames):
 		parmat = animPar.matrices[frame]
-		animIK.heads[frame] = animPar.heads[frame] + parmat*animFK.offsetRest
+		animIK.heads[frame] = animPar.heads[frame] + animFK.offsetRest * parmat
 	return
 
 def insertAnimChild(name, animations, rots):
@@ -1058,8 +1060,8 @@ def insertAnimChild(name, animations, rots):
 		locmat = anim.matrixRest * quat.to_matrix() * anim.inverseRest
 		matrix = parmat * locmat
 		anim.matrices[frame] = matrix
-		anim.heads[frame] = animPar.heads[frame] + parmat*anim.offsetRest
-		anim.tails[frame] = anim.heads[frame] + matrix*anim.vecRest
+		anim.heads[frame] = animPar.heads[frame] + anim.offsetRest*parmat
+		anim.tails[frame] = anim.heads[frame] + anim.vecRest*matrix
 	return anim
 		
 #
@@ -1116,7 +1118,7 @@ def insertLocationKeyFrames(name, pb, anim90, animMhx):
 	locs = []
 	for frame in range(anim90.nFrames):
 		loc0 = anim90.heads[frame] - animMhx.headRest
-		loc = animMhx.inverseRest * loc0
+		loc = loc0 * animMhx.inverseRest
 		locs.append(loc)
 		pb.location = loc
 		for n in range(3):
@@ -1134,13 +1136,13 @@ def insertIKFKLocationKeyFrames(nameIK, nameFK, pb, animations):
 	locs = []
 	for frame in range(animFK.nFrames):		
 		if animPar:
-			loc0 = animPar.heads[frame] + animPar.matrices[frame]*animIK.offsetRest
+			loc0 = animPar.heads[frame] + animIK.offsetRest*animPar.matrices[frame]
 			offset = animFK.heads[frame] - loc0
 			mat = animPar.matrices[frame] * animIK.matrixRest
-			loc = mat.invert() * offset
+			loc = offset*mat.invert()
 		else:
 			offset = animFK.heads[frame] - animIK.headRest
-			loc = animIK.inverseRest * offset
+			loc = offset * animIK.inverseRest
 		pb.location = loc
 		for n in range(3):
 			pb.keyframe_insert('location', index=n, frame=frame, group=nameIK)	
@@ -1655,6 +1657,10 @@ def initInterface(context):
 		description="Sample only every n:th frame")
 	scn['MhxSubsample'] = 1
 
+	bpy.types.Scene.MhxDefaultSS = BoolProperty(
+		name="Use default subsample")
+	scn['MhxDefaultSS'] = True
+
 	bpy.types.Scene.MhxRot90Anim = BoolProperty(
 		name="Rotate 90 deg", 
 		description="Rotate 90 degress so Z points up")
@@ -1837,6 +1843,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout.prop(scn, "MhxStartFrame")
 		layout.prop(scn, "MhxEndFrame")
 		layout.prop(scn, "MhxSubsample")
+		layout.prop(scn, "MhxDefaultSS")
 		layout.prop(scn, "MhxRot90Anim")
 		layout.prop(scn, "MhxDoSimplify")
 		layout.prop(scn, "MhxApplyFixes")
