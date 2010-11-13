@@ -264,6 +264,7 @@ def readBvhFile(context, filepath, scn):
 
 def addFrame(words, frame, nodes, pbones, scale):
 	m = 0
+	first = True
 	for node in nodes:
 		name = node.name
 		try:
@@ -277,9 +278,11 @@ def addFrame(words, frame, nodes, pbones, scale):
 					for (index, sign) in indices:
 						vec[index] = sign*float(words[m])
 						m += 1
-					pb.location = node.inverse * (scale * vec - node.head)				
-					for n in range(3):
-						pb.keyframe_insert('location', index=n, frame=frame, group=name)
+					if first:
+						pb.location = node.inverse * (scale * vec - node.head)				
+						for n in range(3):
+							pb.keyframe_insert('location', index=n, frame=frame, group=name)
+					first = False
 				elif mode == Rotation:
 					mats = []
 					for (axis, sign) in indices:
@@ -570,8 +573,10 @@ theArmatures = {
 }
 
 MBFixes = {
-	'UpLegFK_L' : Matrix.Rotation(-0.4, 3, 'Z'),
-	'UpLegFK_R' : Matrix.Rotation(0.4, 3, 'Z'),
+	'UpLegFK_L' : (Matrix.Rotation(-0.32, 3, 'Z'), None),
+	'UpLegFK_R' : (Matrix.Rotation(0.32, 3, 'Z'), None),
+	'UpArmFK_L' : (Matrix.Rotation(0.1, 3, 'X'), None),
+	'UpArmFK_R' : (Matrix.Rotation(0.1, 3, 'X'), None),
 }
 
 OsuFixes = {}
@@ -579,13 +584,18 @@ OsuFixes = {}
 XX1Fixes = {}
 
 McpdFixes = {
-	'UpArmFK_L' : Matrix.Rotation(1.57, 3, Vector((0.3,0,1))),
-	'UpArmFK_R' : Matrix.Rotation(1.57, 3, Vector((0,0.3,-1))),
+	'Spine2' : (Matrix.Rotation(0.3, 3, 'X'), None),
+	'UpArmFK_L' :  (Matrix.Rotation(1.57, 3, 'Z'), 'XZ'),
+	'LoArmFK_L' :  (None, 'XZ'),
+	'HandFK_L' :  (None, 'XZ'),
+	'UpArmFK_R' :  (Matrix.Rotation(-1.57, 3, 'Z'), 'ZX'),
+	'LoArmFK_R' :  (None, 'ZX'),
+	'HandFK_R' :  (None, 'ZX'),
 }
 
 DazFixes = {}
 
-fixMatrices = {
+FixesList = {
 	'MB'  : MBFixes,
 	'OSU' : OsuFixes,
 	'XX1' : XX1Fixes,
@@ -1053,10 +1063,10 @@ def insertAnimChild(name, animations, rots):
 	return anim
 		
 #
-#	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixMats)
+#	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixes)
 #
 
-def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixMats):
+def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixes):
 	context.scene.objects.active = mhxrig
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = mhxrig.pose.bones
@@ -1077,11 +1087,11 @@ def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixMats):
 			insertGlobalRotationKeyFrames(name, pb, anim90, animMhx)
 		else:
 			try:
-				fixMat = fixMats[name]
+				fix = fixes[name]
 			except:
-				fixMat = None
-			if fixMat:
-				fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fixMat)
+				fix = None
+			if fix:
+				fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fix)
 			else:
 				insertLocalRotationKeyFrames(name, pb, anim90, animMhx)
 
@@ -1160,12 +1170,26 @@ def insertLocalRotationKeyFrames(name, pb, anim90, animMhx):
 			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
 	return rots
 
-def fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fixMat):
+def fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fix):
 	rots = []
+	(fixMat, exchange) = fix
 	for frame in range(anim90.nFrames):
-		rot90 = anim90.quats[frame]
-		matMhx = fixMat * rot90.to_matrix()
-		rot = matMhx.to_quat()
+		mat90 = anim90.quats[frame].to_matrix()
+		if fixMat:
+			matMhx = fixMat * mat90
+		else:
+			matMhx = mat90
+		rot0 = matMhx.to_quat()
+		if exchange == 'XZ':
+			rot = rot0.copy()
+			rot.z = rot0.x
+			rot.x = -rot0.z
+		elif exchange == 'ZX':
+			rot = rot0.copy()
+			rot.z = -rot0.x
+			rot.x = rot0.z
+		else:
+			rot = rot0
 		rots.append(rot)
 		pb.rotation_quaternion = rot
 		for n in range(4):
@@ -1278,14 +1302,18 @@ def retargetMhxRig(context, rig90, mhxrig):
 	mhxAnimations = createAnimation(context, mhxrig)
 	rig90Animations = createAnimation(context, rig90)
 	insertAnimation(context, rig90, rig90Animations)
+	onoff = toggleLimitConstraints(mhxrig)
 	setLimitConstraints(mhxrig, 0.0)
 	if scn['MhxApplyFixes']:
-		fixMats = fixMatrices[rig90['MhxArmature']]
+		fixes = FixesList[rig90['MhxArmature']]
 	else:
-		fixMats = None
-	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixMats)
+		fixes = None
+	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixes)
 	poseMhxIKBones(context, mhxrig, mhxAnimations)
-	setLimitConstraints(mhxrig, 1.0)
+	if onoff == 'OFF':
+		setLimitConstraints(mhxrig, 1.0)
+	else:
+		setLimitConstraints(mhxrig, 0.0)
 
 	mhxrig.animation_data.action.name = mhxrig.name[:4] + rig90.name[2:]
 	print("Retargeted %s --> %s" % (rig90, mhxrig))
@@ -1703,9 +1731,46 @@ def initInterface(context):
 		if bvh:
 			scn[mhx] = bvh
 	'''
+
+	loadDefaults(context)
 	return
 
 #
+#	saveDefaults(context):
+#	loadDefaults(context):
+#
+
+def saveDefaults(context):
+	filename = os.path.realpath(os.path.expanduser("~/makehuman/mhx_defaults.txt"))
+	try:
+		fp = open(filename, "w")
+	except:
+		print("Unable to open %s for writing" % filename)
+		return
+	for (key,value) in context.scene.items():
+		if key[:3] == 'Mhx':
+			fp.write("%s %s\n" % (key, value))
+	fp.close()
+	return
+
+def loadDefaults(context):
+	filename = os.path.realpath(os.path.expanduser("~/makehuman/mhx_defaults.txt"))
+	try:
+		fp = open(filename, "r")
+	except:
+		print("Unable to open %s for reading" % filename)
+		return
+	for line in fp:
+		words = line.split()
+		try:
+			val = eval(words[1])
+		except:
+			val = words[1]
+		context.scene[words[0]] = val
+	fp.close()
+	return
+
+#		
 #	class MhxBvhAssocPanel(bpy.types.Panel):
 #
 """
@@ -1764,6 +1829,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout = self.layout
 		scn = context.scene
 		layout.operator("object.InitInterfaceButton")
+		layout.operator("object.SaveDefaultsButton")
 		layout.operator("object.CopyAnglesFKIKButton")
 
 		layout.label('Load')
@@ -1926,6 +1992,18 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 		import bpy
 		initInterface(context)
 		print("Interface initialized")
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_SaveDefaultsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_SaveDefaultsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SaveDefaultsButton"
+	bl_label = "Save defaults"
+
+	def execute(self, context):
+		saveDefaults(context)
 		return{'FINISHED'}	
 
 #
