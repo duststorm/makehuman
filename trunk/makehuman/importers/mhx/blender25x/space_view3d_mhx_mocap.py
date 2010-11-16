@@ -577,6 +577,8 @@ theArmatures = {
 MBFixes = {
 	'UpLegFK_L' : (Matrix.Rotation(-0.32, 3, 'Z'), None),
 	'UpLegFK_R' : (Matrix.Rotation(0.32, 3, 'Z'), None),
+	'FootFK_L' : (Matrix.Rotation(0.32, 3, 'Z'), None),
+	'FootFK_R' : (Matrix.Rotation(-0.32, 3, 'Z'), None),
 	'UpArmFK_L' : (Matrix.Rotation(0.1, 3, 'X'), None),
 	'UpArmFK_R' : (Matrix.Rotation(0.1, 3, 'X'), None),
 }

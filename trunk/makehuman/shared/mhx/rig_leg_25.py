@@ -93,8 +93,8 @@ LegHeadsTails = [
 upLegRoll = 0
 loLegRoll = 0
 footRoll = 0
-toeRoll = 0
-#toeRoll = -0.646
+#toeRoll = 0
+toeRoll = -63.5*deg1
 footCtrlRoll = 0.0
 
 LegArmature = [
