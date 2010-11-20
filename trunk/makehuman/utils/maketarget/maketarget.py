@@ -444,7 +444,7 @@ def scaleRotTarget(path):
     maketargetlib.saveScaledRotTarget(path,morphFactor.val)
 
 
-def processingTargetsSimple(path,basePath,mFactor):
+def processingTargetsSimple(path,mFactor):
     """
     Load and then save all targets in a dir
     """
@@ -462,7 +462,7 @@ def processingTargetsSimple(path,basePath,mFactor):
             reset()
 
 
-def processingTargetsRender(path,basePath,mFactor):
+def processingTargetsRender(path,mFactor):
     """
     This function is used to render all targets in a dir
     """
@@ -480,7 +480,7 @@ def processingTargetsRender(path,basePath,mFactor):
             applyTarget(-mFactor)
             redrawAll()
 
-def processingTargetsSymm(path,basePath,mFactor):
+def processingTargetsSymm(path,mFactor):
     """
     This function is used to save the symmetric targets
     """
@@ -495,21 +495,21 @@ def processingTargetsSymm(path,basePath,mFactor):
             loadTarget(targetPath)            
             applyTarget(mFactor)    
             symm(1,0)
-            applyTarget(-mFactor)
-            saveTarget(targetPathSym)
+            #applyTarget(-mFactor)
+            saveTarget(targetPath)
             reset()
                              
                 
 
-def processingTargets(path, n=0, processingType=1):
+def processingTargets(path, processingType=2):
     global morphFactor
     startEditing()
     if processingType == 1:
-        processingTargetsRender(path,basePath,morphFactor.val)
+        processingTargetsRender(path,morphFactor.val)
     if processingType == 2:       
-        processingTargetsSymm(path,basePath,morphFactor.val)
+        processingTargetsSymm(path,morphFactor.val)
     if processingType == 3:
-        processingTargetsSimple(path,basePath,morphFactor.val)
+        processingTargetsSimple(path,morphFactor.val)
     endEditing()
 
 
