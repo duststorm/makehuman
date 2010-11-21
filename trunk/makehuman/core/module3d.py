@@ -947,6 +947,8 @@ class Object3D:
 
         for v in verticesToUpdate:
             v.update(updateNor=updateN)
+            
+        print "updated %d vertices" % len(verticesToUpdate)
 
     def applySelectionColor(self):
         """
@@ -1020,6 +1022,23 @@ class Object3D:
                 verticesToUpdate = self.verts
             for v in verticesToUpdate:
                 v.calcNorm()
+                
+    def calcBBox(self):
+        bbox =  [self.verts[0].co[:],self.verts[0].co[:]]
+        for v in self.verts:
+            if v.co[0] < bbox[0][0]: #minX
+                bbox[0][0] = v.co[0]
+            if v.co[0] > bbox[1][0]: #maxX
+                bbox[1][0] = v.co[0]
+            if v.co[1] < bbox[0][1]: #minY
+                bbox[0][1] = v.co[1]
+            if v.co[1] > bbox[1][1]: #maxY
+                bbox[1][1] = v.co[1]
+            if v.co[2] < bbox[0][2]: #minZ
+                bbox[0][2] = v.co[2]
+            if v.co[2] > bbox[1][2]: #maxX
+                bbox[1][2] = v.co[2]
+        return bbox
 
     def __str__(self):
         """
