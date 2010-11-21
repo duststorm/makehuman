@@ -41,19 +41,19 @@ class Object(events3d.EventHandler):
         self.app = view.app
         self.view = view
         if isinstance(mesh, str):
-         self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
-         if (width!=None) and (height!=None): #we assume automatically that the unit_square is the mesh
-            self.mesh.setScale(width, height, 1.0)
-         self.meshName = mesh
+            self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
+            if (width!=None) and (height!=None): #we assume automatically that the unit_square is the mesh
+                self.mesh.setScale(width, height, 1.0)
+            self.meshName = mesh
         else: #its of type module3d.Object3D
-         self.mesh=mesh
-         self.app.scene3d.objects.append(mesh)
-         self.meshName = mesh.name
-         self.mesh.setLoc(position[0], position[1], position[2])
+            self.mesh=mesh
+            self.app.scene3d.objects.append(mesh)
+            self.meshName = mesh.name
+            self.mesh.setLoc(position[0], position[1], position[2])
         self.texture = texture
         # TL: added this to avoid crash on startup
         if not self.mesh:
-         return
+            return
         if texture:
             self.mesh.setTexture(texture)
         view.objects.append(self)
@@ -65,6 +65,7 @@ class Object(events3d.EventHandler):
         self.mesh.setShadeless(shadeless)
         self.visible = visible
         self.mesh.object = self
+        self.__bbox = None
 
     # print("Created object with mesh ", mesh, texture, position)
 
@@ -120,6 +121,11 @@ class Object(events3d.EventHandler):
             self.mesh.setScale(scale, scaleY, 1)
         else:
             self.mesh.setScale(scale, scale, 1)
+            
+    def getBBox():
+        if not self.__bbox:
+            self.__bbox = self.mesh.calcBBox()
+        return self.__bbox
 
     def onMouseDown(self, event):
         self.view.callEvent('onMouseDown', event)
@@ -184,6 +190,30 @@ class View(events3d.EventHandler):
 
     def hasFocus(self):
         return self.app.focusView is self
+        
+    def getBBox(self):
+        if not self.objects:
+            return 0
+        
+        bbox = self.objects[0].getBBox()
+        for i in xrange(1, len(self.objects)):
+            bb = self.objects[i].getBBox()
+            bbox = [[min(bbox[0], bb[0]), min(bbox[1], bb[1]), min(bbox[2], bb[2])],
+                [max(bbox[0], bb[0]), max(bbox[1], bb[1]), max(bbox[2], bb[2])]]
+                
+        return bbox
+        
+    def getWidth(self):
+        bbox = self.getBBox()
+        return bbox[1][0] - bbox[0][0]
+        
+    def getHeight(self):
+        bbox = self.getBBox()
+        return bbox[1][1] - bbox[0][1]
+        
+    def getDepth(self):
+        bbox = self.getBBox()
+        return bbox[1][2] - bbox[0][2]
 
     def __updateVisibility(self):
         previousVisibility = self.__totalVisibility
