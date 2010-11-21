@@ -207,7 +207,7 @@ class ExportTaskView(gui3d.TaskView):
             elif self.md5.selected:
                 mh2md5.exportMd5(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
             elif self.stl.selected:
-                mh2stl.exportStlAscii(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".stl"))
+                mh2stl.exportStlBinary(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".stl"))
 
             if len(filename)> 0 and self.app.scene3d.selectedHuman.hairObj and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
                if self.hairMesh.selected:
