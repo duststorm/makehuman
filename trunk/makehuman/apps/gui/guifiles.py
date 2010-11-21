@@ -43,6 +43,7 @@ import mh2mhx
 import mh2proxy
 import mh2collada
 import mh2md5
+import mh2stl
 import hair
 
 class SaveTaskView(gui3d.TaskView):
@@ -171,6 +172,7 @@ class ExportTaskView(gui3d.TaskView):
         self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
                                          'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 140, 9.2])
         self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images','export_md5.png'), selectedTexture=self.app.getThemeResource('images', 'export_md5_on.png'), position=[138, 140, 9.2])
+        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images','export_md5.png'), selectedTexture=self.app.getThemeResource('images', 'export_md5_on.png'), position=[173, 140, 9.2])
                                          
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
                                                  selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 160, 9.2], selected=True)
@@ -204,6 +206,8 @@ class ExportTaskView(gui3d.TaskView):
                 mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename))
             elif self.md5.selected:
                 mh2md5.exportMd5(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
+            elif self.stl.selected:
+                mh2stl.exportStlAscii(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".stl"))
 
             if len(filename)> 0 and self.app.scene3d.selectedHuman.hairObj and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
                if self.hairMesh.selected:
