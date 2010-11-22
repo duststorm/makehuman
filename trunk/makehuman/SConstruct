@@ -1,12 +1,16 @@
 import platform
+import sys
 
-env = Environment(CPPPATH=['include','/usr/include/python2.6','/usr/include/GL','/usr/include/SDL'],
+pyver = sys.version_info
+pyver = '%d.%d' % (pyver[0], pyver[1])
+
+env = Environment(CPPPATH=['include','/usr/include/python' + pyver,'/usr/include/GL','/usr/include/SDL'],
 LIBS =  [], CCFLAGS = '-O2')
 conf = Configure(env)  
 if not env.GetOption('clean'):
-  env.Append(LIBS = ['python2.6'])
-  if not (conf.CheckLibWithHeader('python2.6', 'Python.h', 'c')):
-    print "The Python 2.6 development libraries must be installed"
+  env.Append(LIBS = ['python' + pyver])
+  if not (conf.CheckLibWithHeader('python' + pyver, 'Python.h', 'c')):
+    print "The Python " + pyver + " development libraries must be installed"
     exit(1)
   env.Append(LIBS = ['X11'])
   if not (conf.CheckLib('X11')):
