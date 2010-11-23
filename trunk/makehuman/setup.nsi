@@ -13,78 +13,34 @@ Section "Copy files"
   # Copy root files
   SetOutPath $INSTDIR
   File makehuman.exe
-  File mh.pyd
+  # File mh.pyd
   File *.dll
   File main.py
   File license.txt
 
   # Copy data files
-  SetOutPath $INSTDIR\data
-  File /r /x .svn data\3dobjs
-  SetOutPath $INSTDIR\data
-  File /r /x .svn data\hairs
-  SetOutPath $INSTDIR\data
-  File /r /x .svn data\povray
-  SetOutPath $INSTDIR\data
-  File /r /x .svn data\rotations
-  
-  # Copy shaders
-  SetOutPath $INSTDIR\data\shaders\3delight
-  File /r /x .svn data\shaders\3delight\*.sl
-  SetOutPath $INSTDIR\data\shaders\aqsis
-  File /r /x .svn data\shaders\aqsis\*.sl
-  SetOutPath $INSTDIR\data\shaders\pixie
-  File /r /x .svn data\shaders\pixie\*.sl
-  SetOutPath $INSTDIR\data\shaders\renderman
-  File /r /x .svn data\shaders\renderman\*.sl
-  
-  # Copy targets
-  SetOutPath $INSTDIR\data\targets\details
-  File /r /x .svn data\targets\details\*.target
-  SetOutPath $INSTDIR\data\targets\macrodetails
-  File /r /x .svn data\targets\macrodetails\*.target
-  SetOutPath $INSTDIR\data\targets\microdetails
-  File /r /x .svn data\targets\microdetails\*.target
-
-  # Copy templates
-  SetOutPath $INSTDIR\data\templates
-  File /r /x .svn data\templates\*.mhx
-  File /r /x .svn data\templates\*.dae
-  File /r /x .svn data\templates\*.txt
-  
-  # Copy textures
-  SetOutPath $INSTDIR\data\textures
-  File /r /x .svn data\textures\*.tif
-
-  # Copy fonts
-  SetOutPath $INSTDIR\data\fonts
-  File /r /x .svn data\fonts\*.fnt
-  File /r /x .svn data\fonts\*.png
-  
-  # Copy themes
-  SetOutPath $INSTDIR\data
-  File /r /x .svn data\themes
+  SetOutPath $INSTDIR
+  File /r /x .svn data\  
 
   # Copy importers
-  SetOutPath $INSTDIR\importers\mhx\blender25x
-  File /r /x .svn importers\mhx\blender25x\*.py 
-  SetOutPath $INSTDIR\importers\mhx\blender249
-  File /r /x .svn importers\mhx\blender249\*.py
-  File /r /x .svn importers\mhx\blender249\*.txt
+  SetOutPath $INSTDIR
+  File /r /x .svn importers\
   
   # Copy docs
   SetOutPath $INSTDIR\docs
   File /r /x .svn docs\*.pdf
 
   # Copy python files
-  SetOutPath $INSTDIR\mh_core
-  File /r /x .svn mh_core\*.py
-  SetOutPath $INSTDIR\mh_plugins
-  File /r /x .svn mh_plugins\*.py
+  SetOutPath $INSTDIR\core
+  File /r /x .svn core\*.py
   SetOutPath $INSTDIR\pythonmodules
-  File /r /x .svn pythonmodules\*.py
+  File /r /x .svn pythonmodules\*.pyc
   SetOutPath $INSTDIR\plugins
   File /r /x .svn plugins\*.py
+  SetOutPath $INSTDIR\shared
+  File /r /x .svn shared\*.py
+   SetOutPath $INSTDIR\apps
+  File /r /x .svn apps\*.py
   
   CreateDirectory $INSTDIR\models
   CreateDirectory $INSTDIR\exports
@@ -121,9 +77,9 @@ Section "Uninstall"
   # Remove Makehuman data folders
   RMDir /r $INSTDIR\data
   RMDir /r $INSTDIR\docs
-  RMDir /r $INSTDIR\mh_core
-  RMDir /r $INSTDIR\mh_plugins
+  RMDir /r $INSTDIR\core
   RMDir /r $INSTDIR\plugins
+  RMDir /r $INSTDIR\shared
   RMDir /r $INSTDIR\pythonmodules
   RMDir /r $INSTDIR\importers
   
