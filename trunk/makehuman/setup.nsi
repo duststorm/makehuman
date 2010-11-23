@@ -19,12 +19,12 @@ Section "Copy files"
   File license.txt
 
   # Copy data files
-  SetOutPath $INSTDIR
-  File /r /x .svn data\  
+  SetOutPath $INSTDIR\data
+  File /r /x .svn data\*.*  
 
   # Copy importers
-  SetOutPath $INSTDIR
-  File /r /x .svn importers\
+  SetOutPath $INSTDIR\importers
+  File /r /x .svn importers\*.*
   
   # Copy docs
   SetOutPath $INSTDIR\docs
