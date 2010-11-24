@@ -8,6 +8,8 @@ env = Environment(CPPPATH=['include','/usr/include/python' + pyver,'/usr/include
 LIBS =  [], CCFLAGS = '-O2')
 conf = Configure(env)  
 if not env.GetOption('clean'):
+  if conf.CheckLib('m'):
+    env.Append(LIBS = ['m']);
   env.Append(LIBS = ['python' + pyver])
   if not (conf.CheckLibWithHeader('python' + pyver, 'Python.h', 'c')):
     print "The Python " + pyver + " development libraries must be installed"
