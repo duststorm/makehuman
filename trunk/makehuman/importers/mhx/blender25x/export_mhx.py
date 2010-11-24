@@ -16,15 +16,15 @@
 Abstract
 --------
 MHX (MakeHuman eXchange format) exporter for Blender 2.5.
-Version 0.15
+Version 1.0
 
 """
 
 bl_addon_info = {
 	'name': 'Export MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '0.15',
-	'blender': (2, 53, 1),
+	'version': '1.0',
+	'blender': (2, 55, 0),
 	'location': 'File > Export',
 	'description': 'Export files in the MakeHuman eXchange format (.mhx)',
 	'url': 'http://www.makehuman.org',
@@ -36,8 +36,8 @@ You have to activated the script in the "Add-Ons" tab (user preferences).
 Access from the File > Export menu.
 """
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 15
+MAJOR_VERSION = 1
+MINOR_VERSION = 0
 
 
 import bpy
@@ -1978,6 +1978,8 @@ def mhxClose(fp):
 DEBUG= False
 from bpy.props import *
 
+mask = M_Geo+M_VGroup+M_Shape
+
 class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 	'''Export to MHX file format (.mhx)'''
 	bl_idname = "export.makehuman_mhx"
@@ -1988,10 +1990,8 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	mask = M_Geo+M_Mat+M_MHX
-
 	mhx = BoolProperty(name="MHX", description="Include materials", default=mask&M_MHX)
-	xall = BoolProperty(name="Everything", description="Include everything", default=mask&M_All)
+	#xall = BoolProperty(name="Everything", description="Include everything", default=mask&M_All)
 	mat = BoolProperty(name="Materials", description="Include materials", default=mask&M_Mat)
 	geo = BoolProperty(name="Geometry", description="Include geometry", default=mask&M_Geo)
 	amt = BoolProperty(name="Armatures", description="Include armature", default=mask&M_Amt)
@@ -2003,7 +2003,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 	def execute(self, context):
 		global toggle
 		O_MHX = M_MHX if self.properties.mhx else 0
-		O_All = M_All if self.properties.xall else 0
+		#O_All = M_All if self.properties.xall else 0
 		O_Mat = M_Mat if self.properties.mat else 0
 		O_Geo = M_Geo if self.properties.geo else 0
 		O_Amt = M_Amt if self.properties.amt else 0
@@ -2012,7 +2012,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_VGroup = M_VGroup if self.properties.vgroup else 0
 		O_Obj = M_Obj if self.properties.obj else 0
 
-		mask = O_MHX | O_All | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_VGroup | O_Obj
+		mask = O_MHX | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_VGroup | O_Obj
 		
 		writeMhxFile(self.properties.filepath, mask)
 		return {'FINISHED'}

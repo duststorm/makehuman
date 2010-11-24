@@ -36,7 +36,7 @@ bl_addon_info = {
 	'name': 'Import MakeHuman hair (.obj)',
 	'author': 'Thomas Larsson',
 	'version': '0.7',
-	'blender': (2, 53, 0),
+	'blender': (2, 55, 0),
 	'location': 'File > Import',
 	'description': 'Import MakeHuman hair file (.obj)',
 	'url': 'http://www.makehuman.org',
@@ -51,7 +51,6 @@ Access from the File > Import menu.
 import bpy
 import mathutils
 from mathutils import *
-import geometry
 import os
 
 #
