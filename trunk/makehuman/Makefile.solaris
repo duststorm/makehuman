@@ -7,11 +7,11 @@ OBJS = $(addsuffix .o,$(basename $(CSRCS) $(CCSRCS) ))
 
 CCOPTS =
 
-PYTHONVER     = 2.5
+PYTHONVER     = 2.6
 EXTRAFMWKS    = -L/usr/openwin/lib -R/usr/openwin/lib -lX11 -lGL -lGLU -L/usr/local/lib -R/usr/local/lib -lSDL -lSDL_image -lGLEW
-EXTRALIBS     = -L/opt/csw/lib -R/opt/csw/lib -lpython$(PYTHONVER)
+EXTRALIBS     = -L/usr/local/lib -R/usr/local/lib -lpython$(PYTHONVER)
 EXTRADEFINES  =
-INCLUDEPATH   = -I/usr/local/include/SDL/ -I/opt/csw/include/python$(PYTHONVER)/ -I/usr/openwin/include -I./include -I/usr/local/include
+INCLUDEPATH   = -I/usr/local/include/SDL/ -I/usr/local/include/python$(PYTHONVER)/ -I/usr/openwin/include -I./include -I/usr/local/include
 
 EXE = makehuman
 
