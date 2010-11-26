@@ -466,7 +466,7 @@ Material Hair
     size_min 0.001 ;
     root_size 1 ;
     shape 0 ;
-    use_surface_diffuse True ;
+    # use_surface_diffuse True ;
     use_tangent_shading True ;
     tip_size 1 ;
     width_fade 0 ;
