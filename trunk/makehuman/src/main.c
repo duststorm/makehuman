@@ -369,8 +369,12 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #else
 #ifndef MAX_PATH
 #define MAX_PATH 1024
-#endif // __WIN32__ and linux
-    char path[MAX_PATH];
+#endif // MAX_PATH
+#ifdef __WIN32__
+    WCHAR path[MAX_PATH];
+#else
+    char path[MAX_PATH]; // linux
+#endif // __WIN32__
 #endif // __APPLE__
     const char *typeStr;
 
@@ -402,9 +406,9 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
 #ifdef CSIDL_MYDOCUMENTS
-        HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+        HRESULT hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
 #else
-        HRESULT hr = SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, path);
+        HRESULT hr = SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, path);
 #endif
         if (FAILED(hr))
         {
@@ -413,19 +417,19 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 
         if (0 == strcmp(typeStr, "exports"))
         {
-            strcat(path, "\\makehuman\\exports\\");
+            wcscat(path, L"\\makehuman\\exports\\");
         }
         else if (0 == strcmp(typeStr, "models"))
         {
-            strcat(path, "\\makehuman\\models\\");
+            wcscat(path, L"\\makehuman\\models\\");
         }
         else if (0 == strcmp(typeStr, "grab"))
         {
-            strcat(path, "\\makehuman\\grab\\");
+            wcscat(path, L"\\makehuman\\grab\\");
         }
         else if (0 == strcmp(typeStr, "render"))
         {
-            strcat(path, "\\makehuman\\renderman_output\\");
+            wcscat(path, L"\\makehuman\\renderman_output\\");
         }
     }
 #else
@@ -459,7 +463,11 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         PyErr_Format(PyExc_ValueError, "Unknown property %s for getPath()!", typeStr);
         return NULL;
     }
+#ifdef __WIN32__
+    return Py_BuildValue("u", path);
+#else
     return Py_BuildValue("s", path);
+#endif
 }
 
 /** \brief Defines a set of functions as an array that can be passed into the Py_InitModule function.
