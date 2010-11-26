@@ -192,11 +192,11 @@ ArmArmature = [
 limShoulder_L = (-deg90,deg45, 0,0, -30*deg1,30*deg1)
 limShoulder_R = (-deg45,deg90, 0,0, -30*deg1,30*deg1)
 
-limUpArm_L = (-deg90,deg90, -deg45,deg90, -deg90,deg45)
-limUpArm_R = (-deg90,deg90, -deg90,deg45, -deg45,deg90)
+limUpArm_L = (-deg120,deg120, -deg45,deg120, -deg90,deg45)
+limUpArm_R = (-deg120,deg120, -deg120,deg45, -deg45,deg90)
 
-limLoArm_L = (0,0, -deg90,deg90, -deg180,0)
-limLoArm_R = (0,0, -deg90,deg90, 0,deg180)
+limLoArm_L = (0,0, -deg180,deg45, -deg180,0)
+limLoArm_R = (0,0, -deg45,deg180, 0,deg180)
 
 limHand_L = (-deg90,70*deg1, 0,0, -deg20,deg20)
 limHand_R = (-deg90,70*deg1, 0,0, -deg20,deg20)
@@ -378,13 +378,13 @@ def ArmWriteActions(fp):
 ArmDrivers = [
 	("UpArm_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_L", "LOC_X", 1.0),
 	("LoArmUp_L", True, ["RotFKXZ"], ["RotIKXZ"], "PArmIK_L", "LOC_X", 1),
-	("LoArmUp_L", True, ["RotFKY"], ["RotIKY"], "PArmIK_L", "LOC_X", 0.5),
+	("LoArmUp_L", True, ["RotFKY"], ["RotIKY"], "PArmIK_L", "LOC_X", 0.6),
 	("LoArmDwn_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_L", "LOC_X", 1.0),
 	("Hand_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 
 	("UpArm_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_R", "LOC_X", 1.0),
 	("LoArmUp_R", True, ["RotFKXZ"], ["RotIKXZ"], "PArmIK_R", "LOC_X", 1),
-	("LoArmUp_R", True, ["RotFKY"], ["RotIKY"], "PArmIK_R", "LOC_X", 0.5),
+	("LoArmUp_R", True, ["RotFKY"], ["RotIKY"], "PArmIK_R", "LOC_X", 0.6),
 	("LoArmDwn_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PArmIK_R", "LOC_X", 1.0),
 	("Hand_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 

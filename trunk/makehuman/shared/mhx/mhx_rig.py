@@ -26,8 +26,10 @@ PanelWorks = False
 
 pi = 3.14159
 deg180 = pi
+deg120 = 2*pi/3
 deg90 = pi/2
 deg80 = 4*pi/9
+deg60 = pi/3
 deg45 = pi/4
 deg40 = 2*pi/9
 deg20 = pi/9
