@@ -200,14 +200,17 @@ def initInterface(scn):
 		name="Scale", 
 		description="Scale of the MHX rig", 
 		min=0.0001, max=1000000.0, 
-		soft_min=0.001, soft_max=100.0)
-	scn['MhxSyncScale'] = 1.0
+		soft_min=0.001, soft_max=100.0,
+		default=1.0)
 
 	bpy.types.Scene.MhxSyncAutoKeyframe = BoolProperty(
 		name="Auto keyframe", 
-		description="Auto keyframe")
-	scn['MhxSyncAutoKeyframe'] = False
+		description="Auto keyframe",
+		default=False)
 
+	if scn:
+		scn['MhxSyncScale'] = 1.0
+		scn['MhxSyncAutoKeyframe'] = False
 	return
 
 #

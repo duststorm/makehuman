@@ -1636,94 +1636,114 @@ def getBvh(mhx):
 	return None
 
 def initInterface(context):
-	scn = context.scene
 	bpy.types.Scene.MhxBvhScale = FloatProperty(
 		name="Scale", 
 		description="Scale the BVH by this value", 
 		min=0.0001, max=1000000.0, 
-		soft_min=0.001, soft_max=100.0)
-	scn['MhxBvhScale'] = 0.65
+		soft_min=0.001, soft_max=100.0,
+		default=0.65)
 
 	bpy.types.Scene.MhxStartFrame = IntProperty(
 		name="Start Frame", 
-		description="Starting frame for the animation")
-	scn['MhxStartFrame'] = 1
+		description="Starting frame for the animation",
+		default=1)
 
 	bpy.types.Scene.MhxEndFrame = IntProperty(
 		name="Last Frame", 
-		description="Last frame for the animation")
-	scn['MhxEndFrame'] = 32000
+		description="Last frame for the animation",
+		default=32000)
 
 	bpy.types.Scene.MhxSubsample = IntProperty(
 		name="Subsample", 
-		description="Sample only every n:th frame")
-	scn['MhxSubsample'] = 1
+		description="Sample only every n:th frame",
+		default=1)
 
 	bpy.types.Scene.MhxDefaultSS = BoolProperty(
-		name="Use default subsample")
-	scn['MhxDefaultSS'] = True
+		name="Use default subsample",
+		default=True)
 
 	bpy.types.Scene.MhxRot90Anim = BoolProperty(
 		name="Rotate 90 deg", 
-		description="Rotate 90 degress so Z points up")
-	scn['MhxRot90Anim'] = True
+		description="Rotate 90 degress so Z points up",
+		default=True)
 
 	bpy.types.Scene.MhxDoSimplify = BoolProperty(
 		name="Simplify FCurves", 
-		description="Simplify FCurves")
-	scn['MhxDoSimplify'] = True
+		description="Simplify FCurves",
+		default=True)
 
 	bpy.types.Scene.MhxApplyFixes = BoolProperty(
 		name="Apply found fixes", 
-		description="Apply found fixes")
-	scn['MhxApplyFixes'] = True
+		description="Apply found fixes",
+		default=True)
 
 	bpy.types.Scene.MhxPlantCurrent = BoolProperty(
 		name="Use current", 
-		description="Plant at current")
-	scn['MhxPlantCurrent'] = True
+		description="Plant at current",
+		default=True)
 
 	bpy.types.Scene.MhxPlantLoc = BoolProperty(
 		name="Loc", 
-		description="Plant location keys")
-	scn['MhxPlantLoc'] = True
+		description="Plant location keys",
+		default=True)
 
 	bpy.types.Scene.MhxPlantRot = BoolProperty(
 		name="Rot", 
-		description="Plant rotation keys")
-	scn['MhxPlantRot'] = False
+		description="Plant rotation keys",
+		default=False)
 
 	bpy.types.Scene.MhxErrorLoc = FloatProperty(
 		name="Max loc error", 
 		description="Max error for location FCurves when doing simplification",
-		min=0.001)
-	scn['MhxErrorLoc'] = 0.01
+		min=0.001,
+		default=0.01)
 
 	bpy.types.Scene.MhxErrorRot = FloatProperty(
 		name="Max rot error", 
 		description="Max error for rotation (degrees) FCurves when doing simplification",
-		min=0.001)
-	scn['MhxErrorRot'] = 0.1
+		min=0.001,
+		default=0.1)
 
 	bpy.types.Scene.MhxDirectory = StringProperty(
 		name="Directory", 
 		description="Directory", 
-		maxlen=1024)
-	scn['MhxDirectory'] = "~/makehuman/bvh/Female1_bvh"
+		maxlen=1024,
+		default='')
 
 	bpy.types.Scene.MhxReallyDelete = BoolProperty(
 		name="Really delete action", 
-		description="Delete button deletes action permanently")
-	scn['MhxReallyDelete'] = False
-
-	listAllActions(context)
-	setAction()
+		description="Delete button deletes action permanently",
+		default=False)
 
 	bpy.types.Scene.MhxPrefix = StringProperty(
 		name="Prefix", 
 		description="Prefix", 
-		maxlen=1024)
-	scn['MhxPrefix'] = "Female1_A"
+		maxlen=1024,
+		default='')
+
+	scn = context.scene
+	if scn:
+		scn['MhxPlantCurrent'] = True
+		scn['MhxPlantLoc'] = True
+		scn['MhxBvhScale'] = 0.65
+		scn['MhxStartFrame'] = 1
+		scn['MhxEndFrame'] = 32000
+		scn['MhxSubsample'] = 1
+		scn['MhxDefaultSS'] = True
+		scn['MhxRot90Anim'] = True
+		scn['MhxDoSimplify'] = True
+		scn['MhxApplyFixes'] = True
+
+		scn['MhxPlantLoc'] = True
+		scn['MhxPlantRot'] = False
+		scn['MhxErrorLoc'] = 0.01
+		scn['MhxErrorRot'] = 0.1
+
+		scn['MhxPrefix'] = "Female1_A"
+		scn['MhxDirectory'] = "~/makehuman/bvh/Female1_bvh"
+		scn['MhxReallyDelete'] = False
+		listAllActions(context)
+		setAction()
 
 	bpy.types.Object.MhxArmature = StringProperty()
 
@@ -1749,6 +1769,8 @@ def initInterface(context):
 #
 
 def saveDefaults(context):
+	if not context.scene:
+		return
 	filename = os.path.realpath(os.path.expanduser("~/makehuman/mhx_defaults.txt"))
 	try:
 		fp = open(filename, "w")
@@ -1762,6 +1784,8 @@ def saveDefaults(context):
 	return
 
 def loadDefaults(context):
+	if not context.scene:
+		return
 	filename = os.path.realpath(os.path.expanduser("~/makehuman/mhx_defaults.txt"))
 	try:
 		fp = open(filename, "r")
