@@ -108,15 +108,20 @@ def BodyWritePoses(fp):
 	addPoseBone(fp,  'Hip_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Spinal column
-	addPoseBone(fp,  'Spine1', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
+	addPoseBone(fp,  'Spine1', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg20,deg90, -deg60,deg60, -deg60,deg60), (1,1,1)])])
 
-	addPoseBone(fp,  'Spine2', 'MHCircle15', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
+	addPoseBone(fp,  'Spine2', 'MHCircle15', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg20,deg30, -deg45,deg45, -deg30,deg30), (1,1,1)])])
 
-	addPoseBone(fp,  'Spine3', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH, [])
+	addPoseBone(fp,  'Spine3', 'MHCircle10', None, (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg20,deg20, -deg20,deg20, -deg20,deg20), (1,1,1)])])
 
-	addPoseBone(fp,  'Neck', 'GoboNeck', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp,  'Neck', 'GoboNeck', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg60,deg30, -deg45,deg45, -deg60,deg60), (1,1,1)])])
 
-	addPoseBone(fp,  'Head', 'GoboHead', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp,  'Head', 'GoboHead', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg60,deg30, -deg60,deg60, -deg45,deg45), (1,1,1)])])
 
 	# Stomach
 	addPoseBone(fp,  'StomachTarget', 'MHCube01', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 

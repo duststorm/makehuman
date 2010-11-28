@@ -195,8 +195,8 @@ limShoulder_R = (-deg45,deg90, 0,0, -30*deg1,30*deg1)
 limUpArm_L = (-deg120,deg120, -deg45,deg120, -deg90,deg45)
 limUpArm_R = (-deg120,deg120, -deg120,deg45, -deg45,deg90)
 
-limLoArm_L = (0,0, -deg180,deg45, -deg180,0)
-limLoArm_R = (0,0, -deg45,deg180, 0,deg180)
+limLoArm_L = (0,0, -deg180,deg45, -135*deg1,0)
+limLoArm_R = (0,0, -deg45,deg180, 0,135*deg1)
 
 limHand_L = (-deg90,70*deg1, 0,0, -deg20,deg20)
 limHand_R = (-deg90,70*deg1, 0,0, -deg20,deg20)

@@ -32,6 +32,7 @@ deg80 = 4*pi/9
 deg60 = pi/3
 deg45 = pi/4
 deg40 = 2*pi/9
+deg30 = pi/6
 deg20 = pi/9
 deg10 = pi/18
 deg1 = pi/180

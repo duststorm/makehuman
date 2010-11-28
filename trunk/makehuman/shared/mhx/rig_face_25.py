@@ -76,7 +76,8 @@ FaceArmature = [
 #
 
 def FaceWritePoses(fp):
-	addPoseBone(fp, 'Jaw', 'MHJaw', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Jaw', 'MHJaw', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-5*deg1,deg45, 0,0, -deg20,deg20), (1,1,1)])])
 
 	addPoseBone(fp, 'TongueBase', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
@@ -92,7 +93,8 @@ def FaceWritePoses(fp):
 
 	addPoseBone(fp, 'LoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('ChildOf', C_CHILDOF, 1, ['ChildOf', 'Head', (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 

@@ -258,7 +258,11 @@ def FingerWriteDrivers(fp):
 	for suffix in ['_L', '_R']:
 		for fnum in range(1,6):
 			driver = "PFinger-%d%s" % (fnum, suffix)
-			for lnum in range(1,4):
+			if fnum == 1:
+				first = 2
+			else:
+				first = 1
+			for lnum in range(first,4):
 				driven = "Finger-%d-%d%s" % (fnum, lnum, suffix)
 				cnsData = ("var", 'TRANSFORMS', [('Human', driver, 'LOC_X', C_LOCAL)])
 				writeDriver(fp, True, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"Rot\"].influence" % driven, -1, coeff, [cnsData])
