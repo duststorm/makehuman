@@ -24,7 +24,7 @@ Section "Copy files"
 
   # Copy importers
   SetOutPath $INSTDIR\importers
-  File /r /x .svn importers\*.*
+  File /r /x .svn /x .pyc importers\*.*
   
   # Copy docs
   SetOutPath $INSTDIR\docs
@@ -32,15 +32,15 @@ Section "Copy files"
 
   # Copy python files
   SetOutPath $INSTDIR\core
-  File /r /x .svn core\*.py
+  File /r /x .svn /x .pyc core\*.py
   SetOutPath $INSTDIR\pythonmodules
   File /r /x .svn pythonmodules\*.pyc
   SetOutPath $INSTDIR\plugins
-  File /r /x .svn plugins\*.py
+  File /r /x .svn /x .pyc plugins\*.py
   SetOutPath $INSTDIR\shared
-  File /r /x .svn shared\*.py
+  File /r /x .svn /x .pyc shared\*.*
    SetOutPath $INSTDIR\apps
-  File /r /x .svn apps\*.py
+  File /r /x .svn /x .pyc apps\*.py
   
   CreateDirectory $INSTDIR\models
   CreateDirectory $INSTDIR\exports
