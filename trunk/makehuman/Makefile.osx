@@ -6,8 +6,8 @@
 #######################################################################
 
 DEPS=src/core.d src/main.d src/glmodule.d
+PYTHON_VER=2.5
 RM=rm -rf
-
 cleanbuild: clean build
 
 build: debug
@@ -33,7 +33,7 @@ mh.so:
 	                       os-x/src/SDLMain.mm src/core.c \
 	                       src/main.c \
 	                       src/glmodule.c \
-	                       -I/usr/include/python2.5/ \
+	                       -I/usr/include/python$(PYTHON_VER)/ \
 	                       -I./include/ \
 	                       -I./os-x/include/ \
 	                       -I./os-x/frameworks/SDL.framework/Headers/ \
@@ -60,12 +60,19 @@ doc:
 # Cleanup unused stuff
 # ---------------------------------------------------------------------
 clean:
-	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak core *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
+	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug  clean
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release  clean
 	make -C utils/fixmesh/ -f Makefile.osx clean
 	
+
+up:
+	@echo "Updating von SVN ..."
+	svn up
+	@make clean
+	@make debug
 # ---------------------------------------------------------------------
 # Include dependencies if exists
 # ---------------------------------------------------------------------
 -include $(DEPS)
+
