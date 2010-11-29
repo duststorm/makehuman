@@ -75,6 +75,7 @@ Section "Uninstall"
   Delete $INSTDIR\license.txt
   
   # Remove Makehuman data folders
+  RMDir /r $INSTDIR\apps
   RMDir /r $INSTDIR\data
   RMDir /r $INSTDIR\docs
   RMDir /r $INSTDIR\core
