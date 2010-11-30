@@ -17,6 +17,7 @@ Section "Copy files"
   File *.dll
   File main.py
   File license.txt
+  File proxy.cfg
 
   # Copy data files
   SetOutPath $INSTDIR\data
