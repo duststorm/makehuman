@@ -1,0 +1,40 @@
+import platform
+import sys
+
+pyver = sys.version_info
+pyver = '%d.%d' % (pyver[0], pyver[1])
+
+env = Environment(CPPPATH=['include','/usr/include/python' + pyver,'/usr/include/GL','/usr/include/SDL'],
+LIBS =  [], CCFLAGS = '-O2')
+conf = Configure(env)  
+if not env.GetOption('clean'):
+  if conf.CheckLib('m'):
+    env.Append(LIBS = ['m']);
+  env.Append(LIBS = ['python' + pyver])
+  if not (conf.CheckLibWithHeader('python' + pyver, 'Python.h', 'c')):
+    print "The Python " + pyver + " development libraries must be installed"
+    exit(1)
+  env.Append(LIBS = ['X11'])
+  if not (conf.CheckLib('X11')):
+    print "The X11 development libraries must be installed"
+    exit(1)
+  env.Append(LIBS = ['SDL'])
+  if not (conf.CheckLibWithHeader('SDL', 'SDL.h', 'c')):
+    print "The SDL development libraries must be installed"
+    exit(1)
+  env.Append(LIBS = ['GLEW'])
+  if not (conf.CheckLib('GLEW')):
+    print "The GLEW must be installed"
+    exit(1)
+  env.Append(LIBS = ['GL','GLU'])
+env=conf.Finish()
+
+# Build application
+env.Program("makehuman", Glob("src/*.c"))
+
+# Build module
+moduleEnv = env.Clone(CPPDEFINES = "MAKEHUMAN_AS_MODULE", SHLIBPREFIX = "")
+if platform.system() == "Windows":
+    moduleEnv["SHLIBSUFFIX"] = ".pyd"
+moduleEnv.LoadableModule("mh", Glob("src/*.c"))
+

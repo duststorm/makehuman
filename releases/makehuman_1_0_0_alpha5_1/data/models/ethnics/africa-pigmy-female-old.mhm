@@ -1,0 +1,65 @@
+# Written by makehuman 1.0.0 alpha 5
+version 1.0.0
+tags africa-pigmy-female-old
+gender 0.000000
+age 1.000000
+muscle 0.723404
+weight 0.712766
+genitals 0.000000
+breastSize 0.510638
+breastFirmness 0.063830
+stomach -0.404255
+nose 0.148936
+mouth 0.531915
+eyes 0.000000
+ears 0.000000
+head 0.468085
+headAge 0.000000
+faceAngle -0.723404
+jaw 0.606383
+pelvisTone 0.000000
+buttocks -0.638298
+height -0.574468
+ethnic neutral 1.000000
+detail head-scale-vert-incr 0.100000
+microdetail r-torso-upper-shoulder-scale-vert-decr 0.800000
+detail mouth-scale-vert-decr 0.100000
+detail r-lowerleg-scale-vert-incr 0.750000
+microdetail l-torso-upper-shoulder-scale-vert-decr 0.800000
+detail nose-scale-horiz-incr 0.300000
+microdetail r-head-zygoma-trans-out 0.400000
+microdetail jaw-chin-trans-in 0.100000
+detail eye-trans-down 0.200000
+detail r-upperleg-scale-vert-incr 0.050000
+detail jaw-trans-forward 0.100000
+detail mouth-trans-forward 0.450000
+microdetail nose-glabella-scale-vert-decr 0.550000
+detail hip-scale-vert-decr 0.100000
+detail l-upperarm-scale-horiz-decr 0.200000
+detail head-scale-horiz-incr 0.400000
+microdetail r-nose-nostril-trans-down 0.050000
+microdetail jaw-chin-trans-up 0.550000
+detail r-upperarm-scale-horiz-decr 0.200000
+detail torso-scale-horiz-decr 0.300000
+microdetail r-nose-nostril-trans-in -0.550000
+detail l-lowerleg-scale-horiz-incr 0.650000
+detail r-lowerleg-scale-horiz-incr 0.650000
+detail hip-scale-horiz-incr 0.100000
+detail jaw-trans-up 0.900000
+detail l-lowerleg-scale-vert-incr 0.750000
+microdetail l-nose-nostril-trans-in 0.550000
+microdetail nose-sellion-scale-horiz-incr 0.450000
+detail l-lowerarm-scale-horiz-incr 0.700000
+detail l-upperleg-scale-horiz-decr 0.950000
+detail l-upperleg-scale-vert-incr 0.050000
+microdetail nose-glabella-scale-depth-incr 0.500000
+detail hip-trans-forward 1.000000
+detail r-lowerarm-scale-horiz-incr 0.700000
+microdetail l-head-zygoma-trans-out -0.400000
+detail mouth-scale-horiz-incr 0.200000
+detail mouth-scale-depth-incr 0.350000
+detail l-upperarm-scale-vert-incr 0.350000
+detail torso-scale-vert-incr 0.100000
+microdetail l-nose-nostril-trans-down 0.050000
+detail r-upperleg-scale-horiz-decr 0.950000
+detail r-upperarm-scale-vert-incr 0.350000
