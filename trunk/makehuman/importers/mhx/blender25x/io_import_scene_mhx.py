@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.0
+Version 1.0.2
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '1.0.1',
+	'version': '1.0.2',
 	'blender': (2, 5, 5),
     "api": 32930,
 	"location": "File > Import",
@@ -40,7 +40,7 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 0
-SUB_VERSION = 1
+SUB_VERSION = 2
 BLENDER_VERSION = (2, 55, 0)
 
 #
@@ -465,6 +465,16 @@ def parse(tokens):
 			if ob:
 				bpy.context.scene.objects.active = ob
 				parseAnimationData(ob, val, sub)
+		elif key == 'MaterialAnimationData':
+			try:
+				ob = loadedData['Object'][val[0]]
+			except:
+				ob = None
+			if ob:
+				bpy.context.scene.objects.active = ob
+				mat = ob.data.materials[int(val[2])]
+				print("matanim", ob, mat)
+				parseAnimationData(mat, val, sub)
 		elif key == 'ShapeKeys':
 			try:
 				ob = loadedData['Object'][val[0]]
@@ -1387,6 +1397,7 @@ def doShape(name):
 	if (toggle & T_Shape+T_Face) and (name == 'Basis'):
 		return True
 	else:
+
 		return (toggle & T_Face)
 
 def parseShapeKeys(ob, me, args, tokens):

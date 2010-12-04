@@ -47,8 +47,8 @@ BodyHeadsTails = [
 
 	('Root',				'spine3', 'spine4'),
 	('Hips',				'pelvis', 'hips-tail'),
-	('Hip_L',				'pelvis', 'r-upper-leg'),
-	('Hip_R',				'pelvis', 'l-upper-leg'),
+	('Hip_L',				'spine3', 'r-upper-leg'),
+	('Hip_R',				'spine3', 'l-upper-leg'),
 	
 	('Spine1',				'spine3', 'spine2'),
 	('Spine2',				'spine2', 'spine1'),

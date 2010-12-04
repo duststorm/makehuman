@@ -48,7 +48,7 @@ import array
 import struct
 
 verbosity = 1
-Epsilon = 1e-5
+Epsilon = 1e-3
 done = 0
 
 #
@@ -73,6 +73,7 @@ M_Shape	= 0x400
 M_VGroup = 0x800
 M_Part = 0x1000
 M_MHPart = 0x2000
+M_UnselShape = 0x4000
 M_Rigify = 0x8000
 
 M_All = ~(M_MHX)
@@ -1284,18 +1285,8 @@ def exportMesh(ob, fp):
 
 	if me.shape_keys:
 		global FacialKey, BodyKey
-		if expMsk & M_MHX and obName == "Human":
-			fp.write("    *** ShapeKey\n")
-			fp1 = mhxOpen(M_Shape, "shapekeys-facial25.mhx")
-
-			exportShapeKeys(me, FacialKey, "toggle&T_Face", fp1)
-			mhxClose(fp1)
-			#fp1 = mhxOpen(M_Shape, "shapekeys-body25.mhx")
-			#exportShapeKeys(me, BodyKey, "toggle&T_Shape", fp1)
-			#mhxClose(fp1)
-		else:
-			if expMsk & M_Shape:
-				exportShapeKeys(me, None, "True", fp)
+		if expMsk & M_Shape:
+			exportShapeKeys(ob, FacialKey, "True", fp)
 
 	if me.animation_data:		 
 		exportAnimationData(me.animation_data, fp)
@@ -1387,48 +1378,83 @@ def dumpVertexGroup(toeDict, vgName, fp):
 	
 
 #
-#	exportShapeKeys(me, keyList, toggle, fp):
+#	exportShapeKeys(ob, keyList, toggle, fp):
 #
 
 FacialKey = {
-	"BrowsDown" : "LR",
-	"BrowsMidDown" : "Sym",
-	"BrowsMidUp" : "Sym",
-	"BrowsOutUp" : "LR",
-	"BrowsSqueeze" : "Sym",
-	"CheekUp" : "LR",
-	"Frown" : "LR",
-	"UpLidDown" : "LR",
-	"LoLidUp" : "LR",
-	"Narrow" : "LR",
-	"Smile" : "LR",
-	"Sneer" : "LR",
-	"Squint" : "LR",
-	"TongueOut" : "Sym",
-	"ToungeUp" : "Sym",
-	"ToungeLeft" : "Sym",
-	"ToungeRight" : "Sym",
-	"UpLipUp" : "LR",
-	"LoLipDown" : "LR",
-	"MouthOpen" : "Sym",
-	"UpLipDown" : "LR",
-	"LoLipUp" : "LR",
+	"Basis"	: (None, 0, 1),
+
+	"BrowsDown" : ("LR", 0, 1),
+	"BrowsMidDown" : ("Sym", 0, 1),
+	"BrowsMidUp" : ("Sym", 0, 1),
+	"BrowsOutUp" : ("LR", 0, 1),
+	#"BrowsSqueeze" : ("Sym", 0, 1),
+	"CheekUp" : ("LR", 0, 1),
+	"Frown" : ("LR", 0, 1),
+	"UpLidDown" : ("LR", 0, 1),
+	"LoLidUp" : ("LR", 0, 1),
+	"Narrow" : ("LR", 0, 1),
+	"Smile" : ("LR", 0, 1),
+	"Sneer" : ("LR", 0, 1),
+	#"Squint" : ("LR", 0, 1),
+	"TongueOut" : ("Sym", 0, 1),
+	"ToungeUp" : ("Sym", 0, 1),
+	"ToungeLeft" : ("Sym", 0, 1),
+	"ToungeRight" : ("Sym", 0, 1),
+	"UpLipUp" : ("LR", 0, 1),
+	"LoLipDown" : ("LR", 0, 1),
+	#"MouthOpen" : ("Sym", 0, 1),
+	"UpLipDown" : ("LR", 0, 1),
+	"LoLipUp" : ("LR", 0, 1),
+
+	"MouthOpen" : ("Sym", 0, 2.0),
+	"MouthCornerDepth" : ("LR", -1.0, 2.0),
+	"LipsOut" : ("HJ", 0, 2.0),
+	"LipsIn" : ("HJ", 0, 2.0),
+	"MouthHeight" : ("LR", -1.0, 2.0),
+	"LipsMidHeight" : ("HJ", -1.0, 2.0),
+	"MouthCornerHeight" : ("LRHJ", -1.0, 2.0),
+	"MouthWidth" : ("LR", 0, 1.0),
+	"MouthNarrow" : ("LR", 0, 1.0),
+	"LipsPart" : ("Sym", -1.0, 2.0),
+	"TongueHeight" : ("Sym", -1.0, 2.0),
+	"TongueDepth" : ("Sym", -1.0, 2.0),
+	"TongueWidth" : ("Sym", 0, 1.0),
+	"TongueBackHeight" : ("Sym", 0, 1.0),
+	"BrowsMidHeight" : ("Sym", -1.0, 2.0),
+	"BrowsSqueeze" : ("Sym", 0.0, 2.0),
+	"BrowsOuterHeight" : ("LR", -1.0, 2.0),
+	"NoseWrinkle" : ("Sym", 0.0, 2.0),
+	"CheekFlex" : ("LR", -0.0, 2.0),
+	"Squint" : ("LR", 0, 2.0),
+	"CheekBalloon" : ("Sym", -1, 2.0),
 }
 
 BodyKey = {
-	"BendElbowForward" : "LR",
-	"BendHeadForward" : "Sym",
-	"BendLegForward" : "LR",
-	"BendLegBack" : "LR",
-	"BendKneeBack" : "LR",
-	"ShoulderDown" : "LR",
+	"BendElbowForward" : ("LR", 0, 1),
+	"BendHeadForward" : ("Sym", 0, 1),
+	"BendLegForward" : ("LR", 0, 1),
+	"BendLegBack" : ("LR", 0, 1),
+	"BendKneeBack" : ("LR", 0, 1),
+	"ShoulderDown" : ("LR", 0, 1),
 }
 
-def exportShapeKeys(me, keyList, toggle, fp):
+def findGroup(ob, name):
+	for grp in ob.vertex_groups:
+		if grp.name == name:
+			return grp.index
+	raise NameError("%s has no vertex group %s" % (ob, name))
+
+def exportShapeKeys(ob, keyList, toggle, fp):
+	me = ob.data
 	skeys = me.shape_keys
 	fp.write("ShapeKeys\n")
+	headgrp = findGroup(ob, 'Head')
+	jawgrp = findGroup(ob, 'Jaw')
 	for skey in skeys.keys:
-		skeyName = skey.name.replace(' ','_')
+		skeyName = skey.name.replace(' ','_')	
+		(lr, slidermin, slidermax) = keyList[skeyName]
+		'''
 		try:
 			lr = keyList[skeyName]
 		except:
@@ -1436,22 +1462,47 @@ def exportShapeKeys(me, keyList, toggle, fp):
 				lr = None
 			else:
 				lr = "Sym"
+		'''
 		if lr:
+			if lr == 'LRHJ':
+				exportShapeKey('Up'+skeyName, me.vertices, 'LR', skey, toggle, headgrp, slidermin, slidermax, fp)
+				exportShapeKey('Lo'+skeyName, me.vertices, 'LR', skey, toggle, jawgrp, slidermin, slidermax, fp)
+			elif lr == 'HJ':
+				exportShapeKey('Up'+skeyName, me.vertices, 'Sym', skey, toggle, headgrp, slidermin, slidermax, fp)
+				exportShapeKey('Lo'+skeyName, me.vertices, 'Sym', skey, toggle, jawgrp, slidermin, slidermax, fp)
+			else:
+				exportShapeKey(skeyName, me.vertices, lr, skey, toggle, -1, slidermin, slidermax, fp)
+		else:
 			fp.write("  ShapeKey %s %s %s\n" % (skeyName, lr, toggle))
 			writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
-			for (n,pt) in enumerate(skey.data):
-				dv = pt.co - me.vertices[n].co
-				if dv.length > Epsilon:
-					fp.write("    sv %d %.6g %.6g %.6g ;\n" %(n, dv[0], dv[1], dv[2]))
 			fp.write("  end ShapeKey\n")
-
-
-			print(skey)
-		createdLocal['ShapeKey'].append(skeyName)
 
 	if skeys.animation_data:		 
 		exportAnimationData(skeys.animation_data, fp)
 	fp.write("end ShapeKeys\n")
+	return
+
+def exportShapeKey(skeyName, verts, lr, skey, toggle, vgroup, slidermin, slidermax, fp):
+	print(skeyName)
+	fp.write("  ShapeKey %s %s %s\n" % (skeyName, lr, toggle))
+	#writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
+	fp.write("    slider_min %s ;\n" % slidermin)
+	fp.write("    slider_max %s ;\n" % slidermax)
+	for (n,pt) in enumerate(skey.data):
+		vert = verts[n]
+		if (expMsk & M_UnselShape or vert.select):
+			dv = pt.co - vert.co
+			if vgroup >= 0:
+				w = 0
+				for grp in vert.groups:
+					if grp.group == vgroup:
+						w = grp.weight
+				dv *= w
+			if dv.length > Epsilon:
+				fp.write("    sv %d %.4f %.4f %.4f ;\n" %(n, dv[0], dv[1], dv[2]))
+	fp.write("  end ShapeKey\n")
+	print(skey)
+	createdLocal['ShapeKey'].append(skeyName)
 	return
 
 #
@@ -1997,6 +2048,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 	amt = BoolProperty(name="Armatures", description="Include armature", default=mask&M_Amt)
 	anim = BoolProperty(name="Animations", description="Include animations and drivers", default=mask&M_Anim)
 	shape = BoolProperty(name="Shapes", description="Include shapes", default=mask&M_Shape)
+	unselshape = BoolProperty(name="Unselected shapes", description="Include unselected verts in shapes", default=mask&M_UnselShape)
 	vgroup = BoolProperty(name="Vertex groups", description="Include vertex groups", default=mask&M_VGroup)
 	obj = BoolProperty(name="Objects", description="Include other objects", default=mask&M_Obj)
 
@@ -2009,10 +2061,11 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_Amt = M_Amt if self.properties.amt else 0
 		O_Anim = M_Anim if self.properties.anim else 0
 		O_Shape = M_Shape if self.properties.shape else 0
+		O_UnselShape = M_UnselShape if self.properties.unselshape else 0
 		O_VGroup = M_VGroup if self.properties.vgroup else 0
 		O_Obj = M_Obj if self.properties.obj else 0
 
-		mask = O_MHX | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_VGroup | O_Obj
+		mask = O_MHX | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_UnselShape | O_VGroup | O_Obj
 		
 		writeMhxFile(self.properties.filepath, mask)
 		return {'FINISHED'}

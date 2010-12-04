@@ -29,4 +29,9 @@ AnimationData Human True
   use_nla True ;
 end AnimationData
 
+#if False
+MaterialAnimationData HumanMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0
+  *** material-drivers
+end MaterialAnimationData
+#endif
 

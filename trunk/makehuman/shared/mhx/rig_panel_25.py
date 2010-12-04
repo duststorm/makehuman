@@ -17,18 +17,19 @@ PanelJoints = [
 	('PUpLid_L',		'o', ('origin', [0.4, 0.6, 0.0])),
 	('PLoLid_R',		'o', ('origin', [-0.4, 0.2, 0.0])),
 	('PLoLid_L',		'o', ('origin', [0.4, 0.2, 0.0])),
+	('PNose',		'o', ('origin', [0.0, 0.1, 0.0])),
 	('PCheek_R',		'o', ('origin', [-0.4, 0.0, 0.0])),
 	('PCheek_L',		'o', ('origin', [0.4, 0.0, 0.0])),
-	('PUpLip',		'o', ('origin', [0.0, -0.2, 0.0])),
-	('PLoLip',		'o', ('origin', [0.0, -0.8, 0.0])),
-	('PMouth',		'o', ('origin', [0.0, -0.5, 0.0])),
-	('PUpLip_R',		'o', ('origin', [-0.2, -0.4, 0.0])),
-	('PUpLip_L',		'o', ('origin', [0.2, -0.4, 0.0])),
-	('PLoLip_R',		'o', ('origin', [-0.2, -0.6, 0.0])),
-	('PLoLip_L',		'o', ('origin', [0.2, -0.6, 0.0])),
+	('PUpLipMid',		'o', ('origin', [0.0, -0.2, 0.0])),
+	('PLoLipMid',		'o', ('origin', [0.0, -0.8, 0.0])),
+	('PMouthMid',		'o', ('origin', [0.0, -0.5, 0.0])),
+	('PUpLip_R',		'o', ('origin', [-0.25, -0.3, 0.0])),
+	('PUpLip_L',		'o', ('origin', [0.25, -0.3, 0.0])),
+	('PLoLip_R',		'o', ('origin', [-0.25, -0.7, 0.0])),
+	('PLoLip_L',		'o', ('origin', [0.25, -0.7, 0.0])),
 	('PMouth_R',		'o', ('origin', [-0.5, -0.5, 0.0])),
 	('PMouth_L',		'o', ('origin', [0.5, -0.5, 0.0])),
-	('PTongue',		'o', ('origin', [0.0, -1.0, 0.0])),
+	('PTongue',		'o', ('origin', [0.45, -1.5, 0.0])),
 	('PJaw',		'o', ('origin', [0.0, -1.1, 0.0])),
 
 	('PArmIK_R',		'o', ('origin', [-1.1, 2.0, 0.0])),
@@ -61,10 +62,10 @@ PanelHeadsTails = [
 	('PLoLid_L',			'PLoLid_L', ('PLoLid_L', offs)),
 	('PCheek_R',			'PCheek_R', ('PCheek_R', offs)),
 	('PCheek_L',			'PCheek_L', ('PCheek_L', offs)),
-	('PNose',			'origin', ('origin', offs)),
-	#('PUpLip',			'PUpLip', ('PUpLip', offs)),
-	#('PLoLip',			'PLoLip', ('PLoLip', offs)),
-	#('PMouth',			'PMouth', ('PMouth', offs)),
+	('PNose',			'PNose', ('PNose', offs)),
+	('PUpLipMid',			'PUpLipMid', ('PUpLipMid', offs)),
+	('PLoLipMid',			'PLoLipMid', ('PLoLipMid', offs)),
+	('PMouthMid',			'PMouthMid', ('PMouthMid', offs)),
 	('PUpLip_R',			'PUpLip_R', ('PUpLip_R', offs)),
 	('PUpLip_L',			'PUpLip_L', ('PUpLip_L', offs)),
 	('PLoLip_R',			'PLoLip_R', ('PLoLip_R', offs)),
@@ -107,9 +108,9 @@ PanelArmature = [
 	('PCheek_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PCheek_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PNose',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PUpLip',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PLoLip',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
-	#('PMouth',		pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PUpLipMid',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PLoLipMid',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
+	('PMouthMid',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PUpLip_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PUpLip_L',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
 	('PLoLip_R',	pi, 'PFace', 0, L_PANEL, (1,1,1) ),
@@ -156,24 +157,27 @@ def PanelWritePoses(fp):
 
 	addPoseBone(fp, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addCSlider(fp, 'PBrow_L', MX)
-	addCSlider(fp, 'PBrow_R', MX)
+	addYSlider(fp, 'PBrow_L', MX)
+	addYSlider(fp, 'PBrow_R', MX)
 	addCSlider(fp, 'PBrows', MX)
-	addCSlider(fp, 'PUpLid_L', MX)
-	addCSlider(fp, 'PUpLid_R', MX)
-	addCSlider(fp, 'PLoLid_L', MX)
-	addCSlider(fp, 'PLoLid_R', MX)
+	addYSlider(fp, 'PUpLid_L', MX)
+	addYSlider(fp, 'PUpLid_R', MX)
+	addYSlider(fp, 'PLoLid_L', MX)
+	addYSlider(fp, 'PLoLid_R', MX)
 	addCSlider(fp, 'PCheek_L', MX)
 	addCSlider(fp, 'PCheek_R', MX)
 	addCSlider(fp, 'PNose', MX)
-	addCSlider(fp, 'PUpLip_L', MX)
-	addCSlider(fp, 'PUpLip_R', MX)
-	addCSlider(fp, 'PLoLip_L', MX)
-	addCSlider(fp, 'PLoLip_R', MX)
+	addCSlider(fp, 'PUpLipMid', MX)
+	addCSlider(fp, 'PLoLipMid', MX)
+	addYSlider(fp, 'PUpLip_L', MX)
+	addYSlider(fp, 'PUpLip_R', MX)
+	addYSlider(fp, 'PLoLip_L', MX)
+	addYSlider(fp, 'PLoLip_R', MX)
+	addCSlider(fp, 'PMouthMid', MX)
 	addCSlider(fp, 'PMouth_L', MX)
 	addCSlider(fp, 'PMouth_R', MX)
 	addCSlider(fp, 'PTongue', MX)
-	addCSlider(fp, 'PJaw', MX)
+	addYSlider(fp, 'PJaw', MX)
 
 	addXSlider(fp, 'PArmIK_L', 0.0, 1.0, 1.0)
 	addXSlider(fp, 'PArmIK_R', 0.0, 1.0, 1.0)
@@ -246,6 +250,92 @@ FaceShapeDrivers = {
 	'LoLipUp_R' : ('PLoLip_R', 'LOC_Z', neg), 
 	'LoLipDown_L' : ('PLoLip_L', 'LOC_Z', pos), 
 	'LoLipDown_R' : ('PLoLip_R', 'LOC_Z', pos), 
+}
+
+"""
+	"MouthOpen" : ("Sym", -0.5, 2.0),
+	"MouthCornerDepth" : ("LR", -0.5, 2.0),
+	"LipsOut" : ("LRHJ", -0.5, 2.0),
+	"LipsIn" : ("LRHJ", -0.5, 2.0),
+	"MouthHeight" : ("LR", -0.5, 2.0),
+	"LipsMidHeight" : ("HJ", -0.5, 2.0),
+	"MouthCornerHeight" : ("LRHJ", -0.5, 2.0),
+	"MouthWidth" : ("LR", 0, 2.0),
+	"MouthNarrow" : ("Sym", 0, 2.0),
+	"LipsPart" : ("Sym", -0.5, 2.0),
+	"TongueHeight" : ("Sym", -0.5, 2.0),
+	"TongueDepth" : ("Sym", -0.5, 2.0),
+	"TongueWidth" : ("Sym", -0.5, 2.0),
+	"TongueBackHeight" : ("Sym", -0.5, 2.0),
+	"BrowsMidHeight" : ("Sym", 0, 2.0),
+	"BrowsMidDown" : ("Sym", 0, 2.0),
+	"BrowsSqueeze" : ("Sym", -0.5, 2.0),
+	"BrowsOuterHeight" : ("LR", -0.5, 2.0),
+	"NoseWrinkle" : ("Sym", -0.5, 2.0),
+	"CheekFlex" : ("LR", -0.0, 2.0),
+	"Squint" : ("LR", -0.5, 2.0),
+	"CheekBalloon" : ("Sym", -1, 2.0),
+"""
+
+BodyLanguageShapeDrivers = {
+	# Brows
+	'BrowsMidHeight' : ('PBrows', 'LOC_Z', neg),
+	'BrowsMidDown' : ('PBrows', 'LOC_Z', pos),
+	'BrowsSqueeze' : ('PBrows', 'LOC_X', neg),
+	'BrowsOuterHeight_L' : ('PBrow_L', 'LOC_Z', neg),
+	'BrowsOuterHeight_R' : ('PBrow_R', 'LOC_Z', neg),
+
+#	Nose and jaw
+
+	'NoseWrinkle' : ('PNose', 'LOC_Z', neg), 
+	'CheekBalloon' : ('PNose', 'LOC_X', pos), 
+	'CheekFlex_L' : ('PCheek_L', 'LOC_Z', neg),
+	'CheekFlex_R' : ('PCheek_R', 'LOC_Z', neg),
+	'Squint_L' : ('PCheek_L', 'LOC_X', pos),
+	'Squint_R' : ('PCheek_R', 'LOC_X', neg),
+
+#	Jaw and tongue
+	'MouthOpen' : ('PJaw', 'LOC_Z', pos),
+	'TongueDepth' : ('PJaw', 'LOC_X', neg),
+	'TongueHeight' : ('PTongue', 'LOC_Z', neg),
+	'TongueWidth' : ('PTongue', 'LOC_X', pos),
+	'TongueBackHeight' : ('PTongue', 'LOC_X', neg),
+
+#	Mouth expressions
+	'MouthWidth_L' : ('PMouth_L', 'LOC_X', pos),
+	'MouthWidth_R' : ('PMouth_R', 'LOC_X', neg),
+	'MouthCornerDepth_L' : ('PMouth_L', 'LOC_Z', neg),
+	'MouthCornerDepth_R' : ('PMouth_R', 'LOC_Z', neg), 
+	'MouthNarrow_L' : ('PMouth_L', 'LOC_X', neg), 
+	'MouthNarrow_R' : ('PMouth_R', 'LOC_X', pos),
+
+#	Lips part
+	'LipsPart' : ('PMouthMid', 'LOC_Z', neg),
+
+#
+	'UpMouthCornerHeight_L' : ('PUpLip_L', 'LOC_Z', neg),
+	'LoMouthCornerHeight_L' : ('PLoLip_L', 'LOC_Z', neg),
+	'UpMouthCornerHeight_R' : ('PUpLip_R', 'LOC_Z', neg),
+	'LoMouthCornerHeight_R' : ('PLoLip_R', 'LOC_Z', neg),
+
+#	Lips in - out
+	'UpLipsOut' : ('PUpLipMid', 'LOC_X', pos), 
+	'UpLipsIn' : ('PUpLipMid', 'LOC_X', neg), 
+	'LoLipsOut' : ('PLoLipMid', 'LOC_X', pos), 
+	'LoLipsIn' : ('PLoLipMid', 'LOC_X', neg), 
+
+#	Lips up - down
+	'UpLipsMidHeight' : ('PUpLipMid', 'LOC_Z', neg), 
+	'LoLipsMidHeight' : ('PLoLipMid', 'LOC_Z', neg), 
+
+}
+
+BodyLanguageTextureDrivers = {
+	# Brows
+	'browsMidDown' : (3, 'PBrows', 'LOC_Z', neg),
+	'browsSqueeze' : (4, 'PBrows', 'LOC_X', neg),
+	'squint_L' : (5, 'PCheek_L', 'LOC_X', pos),
+	'squint_R' : (6, 'PCheek_R', 'LOC_X', neg),
 }
 
 #

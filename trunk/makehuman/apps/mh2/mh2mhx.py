@@ -25,6 +25,7 @@ TO DO
 MAJOR_VERSION = 1
 MINOR_VERSION = 0
 splitLeftRight = True
+BODY_LANGUAGE = True
 
 import module3d, aljabr, mh, files3d, mh2bvh, os
 
@@ -110,8 +111,6 @@ def exportMhx_25(obj, rig, fp):
 "  error 'This file can only be read with Blender 2.5' ;\n" +
 "#endif\n")
 
-	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
-
 	mhx_rig.setupRig(obj)
 
 	fp.write("#if toggle&T_Armature\n")
@@ -120,6 +119,8 @@ def exportMhx_25(obj, rig, fp):
 	fp.write("#endif\n")
 
 	fp.write("\nNoScale False ;\n\n")
+
+	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
 
 	proxyList = mh2proxy.proxyConfig()
 	proxyData = {}
@@ -312,8 +313,11 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 				for proxy in proxyData.values():
 					if proxy.name:
 						writeAnimationData(fp, proxy.name+"Mesh", proxy)
+			elif words[1] == 'material-drivers':
+				if BODY_LANGUAGE:
+					mhx_rig.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
 			elif words[1] == 'Filename':
-				path1 = os.path.expanduser("./data/textures/")
+				path1 = os.path.expanduser(words[3])
 				(path, filename) = os.path.split(words[2])
 				file1 = os.path.realpath(path1+filename)
 				fp.write("  Filename %s ;\n" % file1)
@@ -531,12 +535,18 @@ def printProxyShape(fp, shapes):
 def writeShapeKeys(fp, name, proxy):
 	fp.write("ShapeKeys %s\n" % name)
 	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
-	copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
+	if BODY_LANGUAGE:
+		copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)	
+	else:
+		copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
 	#copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
 	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
 	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
-	mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
+	if BODY_LANGUAGE:
+		mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers)
+	else:
+		mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
 	fp.write("  end AnimationData\n")
 	fp.write("end ShapeKeys\n")
 	return	
@@ -668,7 +678,10 @@ def exportProxy24(obj, proxyStuff, fp):
 			copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, proxy)	
 		elif words[0] == 'shapekey':
 			fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-			copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, False)	
+			if BODY_LANGUAGE:
+				copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, False)	
+			else:
+				copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, False)	
 			copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, proxy, False)	
 			copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, False)	
 			writeIpo(fp)

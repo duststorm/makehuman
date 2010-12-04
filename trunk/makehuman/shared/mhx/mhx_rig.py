@@ -360,6 +360,7 @@ def writePoses(fp, poses):
 #	addSingleIk(fp, bone, lockRot, target, limit):
 #	addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 #	addCSlider(fp, bone, mx):
+#	addYSlider(fp, bone, mx):
 #	addXSlider(fp, bone, mn, mx):
 #
 
@@ -394,6 +395,11 @@ def addCSlider(fp, bone, mx):
 	mn = "-"+mx
 	addPoseBone(fp, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
+	
+def addYSlider(fp, bone, mx):
+	mn = "-"+mx
+	addPoseBone(fp, bone, 'MHSolid025', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', ('0','0', '0','0', mn,mx), (1,1,1,1,1,1)])])
 	
 def addXSlider(fp, bone, mn, mx, dflt):
 	addPoseBone(fp, bone, 'MHSolid025', None, ((0,1,1), (dflt,0,0)), (1,1,1), (1,1,1), (1,1,1), 0,
@@ -1129,6 +1135,14 @@ def writeFkIkSwitch(fp, drivers):
 			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (mx,-mx), [cnsData])
 		for cnsName in cnsIK:
 			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,mx), [cnsData])
+
+def writeTextureDrivers(fp, drivers):
+	for (tex, vlist) in drivers.items():
+		drvVars = []
+		(texnum, targ, channel, coeff) = vlist
+		drvVars.append( (targ, 'TRANSFORMS', [('Human', targ, channel, C_LOCAL)]) )
+		writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
+	return
 
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 

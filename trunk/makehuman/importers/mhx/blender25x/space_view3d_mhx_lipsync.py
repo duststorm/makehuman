@@ -47,22 +47,195 @@ from bpy.props import *
 #	visemes
 #
 
-visemes = ({
-	'Rest' : [('PMouth', (0,0)), ('PUpLip', (0,-0.1)), ('PLoLip', (0,0.1)), ('PJaw', (0,0.05)), ('PTongue', (0,0.0))], 
-	'Etc' : [('PMouth', (0,0)), ('PUpLip', (0,-0.1)), ('PLoLip', (0,0.1)), ('PJaw', (0,0.15)), ('PTongue', (0,0.0))], 
-	'MBP' : [('PMouth', (-0.3,0)), ('PUpLip', (0,1)), ('PLoLip', (0,0)), ('PJaw', (0,0.1)), ('PTongue', (0,0.0))], 
-	'OO' : [('PMouth', (-1.5,0)), ('PUpLip', (0,0)), ('PLoLip', (0,0)), ('PJaw', (0,0.2)), ('PTongue', (0,0.0))], 
-	'O' : [('PMouth', (-1.1,0)), ('PUpLip', (0,0)), ('PLoLip', (0,0)), ('PJaw', (0,0.5)), ('PTongue', (0,0.0))], 
-	'R' : [('PMouth', (-0.9,0)), ('PUpLip', (0,-0.2)), ('PLoLip', (0,0.2)), ('PJaw', (0,0.2)), ('PTongue', (0,0.0))], 
-	'FV' : [('PMouth', (0,0)), ('PUpLip', (0,0)), ('PLoLip', (0,-0.8)), ('PJaw', (0,0.1)), ('PTongue', (0,0.0))], 
-	'S' : [('PMouth', (0,0)), ('PUpLip', (0,-0.2)), ('PLoLip', (0,0.2)), ('PJaw', (0,0.05)), ('PTongue', (0,0.0))], 
-	'SH' : [('PMouth', (-0.6,0)), ('PUpLip', (0,-0.5)), ('PLoLip', (0,0.5)), ('PJaw', (0,0)), ('PTongue', (0,0.0))], 
-	'EE' : [('PMouth', (0.3,0)), ('PUpLip', (0,-0.3)), ('PLoLip', (0,0.3)), ('PJaw', (0,0.025)), ('PTongue', (0,0.0))], 
-	'AH' : [('PMouth', (-0.1,0)), ('PUpLip', (0,-0.4)), ('PLoLip', (0,0)), ('PJaw', (0,0.35)), ('PTongue', (0,0.0))], 
-	'EH' : [('PMouth', (0.1,0)), ('PUpLip', (0,-0.2)), ('PLoLip', (0,0.2)), ('PJaw', (0,0.2)), ('PTongue', (0,0.0))], 
-	'TH' : [('PMouth', (0,0)), ('PUpLip', (0,-0.5)), ('PLoLip', (0,0.5)), ('PJaw', (-0.2,0.1)), ('PTongue', (0,-0.6))], 
-	'L' : [('PMouth', (0,0)), ('PUpLip', (0,-0.2)), ('PLoLip', (0,0.2)), ('PJaw', (0.2,0.2)), ('PTongue', (0,-0.8))], 
-	'G' : [('PMouth', (0,0)), ('PUpLip', (0,-0.1)), ('PLoLip', (0,0.1)), ('PJaw', (-0.3,0.1)), ('PTongue', (0,-0.6))], 
+stopStaringVisemes = ({
+	'Rest' : [
+		('PMouth', (0,0)), 
+		('PUpLip', (0,-0.1)), 
+		('PLoLip', (0,0.1)), 
+		('PJaw', (0,0.05)), 
+		('PTongue', (0,0.0))], 
+	'Etc' : [
+		('PMouth', (0,0)),
+		('PUpLip', (0,-0.1)),
+		('PLoLip', (0,0.1)),
+		('PJaw', (0,0.15)),
+		('PTongue', (0,0.0))], 
+	'MBP' : [('PMouth', (-0.3,0)),
+		('PUpLip', (0,1)),
+		('PLoLip', (0,0)),
+		('PJaw', (0,0.1)),
+		('PTongue', (0,0.0))], 
+	'OO' : [('PMouth', (-1.5,0)),
+		('PUpLip', (0,0)),
+		('PLoLip', (0,0)),
+		('PJaw', (0,0.2)),
+		('PTongue', (0,0.0))], 
+	'O' : [('PMouth', (-1.1,0)),
+		('PUpLip', (0,0)),
+		('PLoLip', (0,0)),
+		('PJaw', (0,0.5)),
+		('PTongue', (0,0.0))], 
+	'R' : [('PMouth', (-0.9,0)),
+		('PUpLip', (0,-0.2)),
+		('PLoLip', (0,0.2)),
+		('PJaw', (0,0.2)),
+		('PTongue', (0,0.0))], 
+	'FV' : [('PMouth', (0,0)),
+		('PUpLip', (0,0)),
+		('PLoLip', (0,-0.8)),
+		('PJaw', (0,0.1)),
+		('PTongue', (0,0.0))], 
+	'S' : [('PMouth', (0,0)),
+		('PUpLip', (0,-0.2)),
+		('PLoLip', (0,0.2)),
+		('PJaw', (0,0.05)),
+		('PTongue', (0,0.0))], 
+	'SH' : [('PMouth', (-0.6,0)),
+		('PUpLip', (0,-0.5)),
+		('PLoLip', (0,0.5)),
+		('PJaw', (0,0)),
+		('PTongue', (0,0.0))], 
+	'EE' : [('PMouth', (0.3,0)),
+		('PUpLip', (0,-0.3)),
+		('PLoLip', (0,0.3)),
+		('PJaw', (0,0.025)),
+		('PTongue', (0,0.0))], 
+	'AH' : [('PMouth', (-0.1,0)),
+		('PUpLip', (0,-0.4)),
+		('PLoLip', (0,0)),
+		('PJaw', (0,0.35)),
+		('PTongue', (0,0.0))], 
+	'EH' : [('PMouth', (0.1,0)),
+		('PUpLip', (0,-0.2)),
+		('PLoLip', (0,0.2)),
+		('PJaw', (0,0.2)),
+		('PTongue', (0,0.0))], 
+	'TH' : [('PMouth', (0,0)),
+		('PUpLip', (0,-0.5)),
+		('PLoLip', (0,0.5)),
+		('PJaw', (-0.2,0.1)),
+		('PTongue', (0,-0.6))], 
+	'L' : [('PMouth', (0,0)),
+		('PUpLip', (0,-0.2)),
+		('PLoLip', (0,0.2)),
+		('PJaw', (0.2,0.2)),
+		('PTongue', (0,-0.8))], 
+	'G' : [('PMouth', (0,0)),
+		('PUpLip', (0,-0.1)),
+		('PLoLip', (0,0.1)),
+		('PJaw', (-0.3,0.1)),
+		('PTongue', (0,-0.6))], 
+
+	'Blink' : [('PUpLid', (0,1.0)), ('PLoLid', (0,-1.0))], 
+	'UnBlink' : [('PUpLid', (0,0)), ('PLoLid', (0,0))], 
+})
+
+bodyLanguageVisemes = ({
+	'Rest' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,-0.6)), 
+		('PUpLipMid', (0,0)), 
+		('PLoLipMid', (0,0)), 
+		('PJaw', (0,0)), 
+		('PTongue', (0,0))], 
+	'Etc' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,-0.4)), 
+		('PUpLipMid', (0,0)), 
+		('PLoLipMid', (0,0)), 
+		('PJaw', (0,0)), 
+		('PTongue', (0,0))], 
+	'MBP' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,0)), 
+		('PLoLipMid', (0,0)), 
+		('PJaw', (0,0)), 
+		('PTongue', (0,0))], 
+	'OO' : [
+		('PMouth', (-1.0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,0)), 
+		('PLoLipMid', (0,0)), 
+		('PJaw', (0,0.4)), 
+		('PTongue', (0,0))], 
+	'O' : [
+		('PMouth', (-0.9,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,0)), 
+		('PLoLipMid', (0,0)), 
+		('PJaw', (0,0.8)), 
+		('PTongue', (0,0))], 
+	'R' : [
+		('PMouth', (-0.5,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-0.2)), 
+		('PLoLipMid', (0,0.2)), 
+		('PJaw', (0,0)), 
+		('PTongue', (0,0))], 
+	'FV' : [
+		('PMouth', (-0.2,0)), 
+		('PMouthMid', (0,1.0)), 
+		('PUpLipMid', (0,0)), 
+		('PLoLipMid', (-0.6,-0.3)), 
+		('PJaw', (0,0)), 
+		('PTongue', (0,0))], 
+	'S' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-0.5)), 
+		('PLoLipMid', (0,0.7)), 
+		('PJaw', (0,0)), 
+		('PTongue', (0,0))], 
+	'SH' : [
+		('PMouth', (-0.8,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-1.0)), 
+		('PLoLipMid', (0,1.0)), 
+		('PJaw', (0,0)), 
+		('PTongue', (0,0))], 
+	'EE' : [
+		('PMouth', (0.2,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-0.6)), 
+		('PLoLipMid', (0,0.6)), 
+		('PJaw', (0,0.05)), 
+		('PTongue', (0,0))], 
+	'AH' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-0.4)), 
+		('PLoLipMid', (0,0)), 
+		('PJaw', (0,0.7)), 
+		('PTongue', (0,0))], 
+	'EH' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-0.5)), 
+		('PLoLipMid', (0,0.6)), 
+		('PJaw', (0,0.25)), 
+		('PTongue', (0,0))], 
+	'TH' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,0)), 
+		('PLoLipMid', (0,0)), 
+		('PJaw', (0,0.2)), 
+		('PTongue', (1.0,1.0))], 
+	'L' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-0.5)), 
+		('PLoLipMid', (0,0.5)), 
+		('PJaw', (0,-0.2)), 
+		('PTongue', (1.0,1.0))], 
+	'G' : [
+		('PMouth', (0,0)), 
+		('PMouthMid', (0,0)), 
+		('PUpLipMid', (0,-0.5)), 
+		('PLoLipMid', (0,0.5)), 
+		('PJaw', (0,-0.2)), 
+		('PTongue', (-1.0,0))], 
 
 	'Blink' : [('PUpLid', (0,1.0)), ('PLoLid', (0,-1.0))], 
 	'UnBlink' : [('PUpLid', (0,0)), ('PLoLid', (0,0))], 
@@ -103,8 +276,15 @@ magpieVisemes = dict({
 #	setBoneLocation(context, pbone, loc, mirror, setKey, frame):
 #
 
+def getVisemeSet(context):
+	if context.scene['MhxBodyLanguage'] == True:
+		return bodyLanguageVisemes
+	else:
+		return stopStaringVisemes
+
 def setViseme(context, vis, setKey, frame):
 	pbones = context.object.pose.bones
+	visemes = getVisemeSet(context)
 	for (b, (x, z)) in visemes[vis]:
 		loc = mathutils.Vector((float(x),0,float(z)))
 		try:
@@ -208,9 +388,15 @@ def initInterface(scn):
 		description="Auto keyframe",
 		default=False)
 
+	bpy.types.Scene.MhxBodyLanguage = BoolProperty(
+		name="Body Language", 
+		description="Use Body Language shapekey set",
+		default=True)
+
 	if scn:
 		scn['MhxSyncScale'] = 1.0
 		scn['MhxSyncAutoKeyframe'] = False
+		scn['MhxBodyLanguage'] = True
 	return
 
 #
@@ -232,6 +418,7 @@ class MhxLipsyncPanel(bpy.types.Panel):
 		layout.separator()
 		layout.prop(context.scene, 'MhxSyncScale')
 		layout.prop(context.scene, 'MhxSyncAutoKeyframe')
+		layout.prop(context.scene, 'MhxBodyLanguage')
 		layout.label(text="Visemes")
 		row = layout.row()
 		row.operator("object.RestButton")
@@ -265,6 +452,7 @@ class MhxLipsyncPanel(bpy.types.Panel):
 # Define viseme buttons
 
 def defineVisemeButtons():
+	visemes = bodyLanguageVisemes
 	for vis in visemes.keys():
 		expr = (
 "class OBJECT_OT_%sButton(bpy.types.Operator):\n" % vis+

@@ -502,6 +502,45 @@ MocapDataArmature = {
 	'head' : 'Head',
 }
 
+MaxArmature = {
+	'hips' : 'Root',
+
+	'lhipjoint' : 'Hip_L',
+	'lefthip' : 'UpLegFK_L',
+	'leftknee' : 'LoLegFK_L',
+	'leftankle' : 'FootFK_L',
+	'lefttoe' : 'ToeFK_L',
+
+	'rhipjoint' : 'Hip_R',
+	'righthip' : 'UpLegFK_R',
+	'rightknee' : 'LoLegFK_R',
+	'rightankle' : 'FootFK_R',
+	'righttoe' : 'ToeFK_R',
+
+	'lowerback' : 'Spine1',
+	'chest' : 'Spine2',
+	'chest2' : 'Spine3',
+	'lowerneck' : 'LowerNeck',
+	'neck' : 'Neck',
+	'head' : 'Head',
+
+	'leftcollar' : 'Shoulder_L',
+	'leftshoulder' : 'UpArmFK_L',
+	'leftelbow' : 'LoArmFK_L',
+	'leftwrist' : 'HandFK_L',
+	'lhand' : None,
+	'lfingers' : None,
+	'lthumb' : None,
+
+	'rightcollar' : 'Shoulder_R',
+	'rightshoulder' : 'UpArmFK_R',
+	'rightelbow' : 'LoArmFK_R',
+	'rightwrist' : 'HandFK_R',
+	'rhand' : None,
+	'rfingers' : None,
+	'rthumb' : None,
+}
+
 DazArmature = {
 	'hip' : 'Root', 
 	'abdomen' : 'Spine1',
@@ -570,22 +609,41 @@ theArmatures = {
 	'MB' : MBArmature, 
 	'OSU' : OsuArmature,
 	'XX1' : Xx1Armature,
+	'3dsMax' : MaxArmature,
 	'McpD' : MocapDataArmature,
 	'Daz' : DazArmature,
 }
 
 MBFixes = {
-	'UpLegFK_L' : (Matrix.Rotation(-0.32, 3, 'Z'), None),
-	'UpLegFK_R' : (Matrix.Rotation(0.32, 3, 'Z'), None),
-	'FootFK_L' : (Matrix.Rotation(0.32, 3, 'Z'), None),
-	'FootFK_R' : (Matrix.Rotation(-0.32, 3, 'Z'), None),
-	'UpArmFK_L' : (Matrix.Rotation(0.1, 3, 'X'), None),
-	'UpArmFK_R' : (Matrix.Rotation(0.1, 3, 'X'), None),
+	'UpLegFK_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), None),
+	'UpLegFK_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), None),
+	'LoLegFK_L' : ( Matrix.Rotation(-0.2, 3, 'Y'), None),
+	'LoLegFK_R' : ( Matrix.Rotation(0.2, 3, 'Y'), None),
+	'FootFK_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), None),
+	'FootFK_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), None),
+	'UpArmFK_L' : ( Matrix.Rotation(0.1, 3, 'X'), None),
+	'UpArmFK_R' : ( Matrix.Rotation(0.1, 3, 'X'), None),
 }
 
 OsuFixes = {}
 
 XX1Fixes = {}
+
+MaxFixes = {
+	'UpLegFK_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), None),
+	'UpLegFK_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), None),
+	'LoLegFK_L' : ( Matrix.Rotation(-0.2, 3, 'Y'), None),
+	'LoLegFK_R' : ( Matrix.Rotation(0.2, 3, 'Y'), None),
+	'FootFK_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), None),
+	'FootFK_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), None),
+
+	'UpArmFK_L' :  (Matrix.Rotation(1.57, 3, 'Z'), 'XZ'),
+	'LoArmFK_L' :  (None, 'XZ'),
+	'HandFK_L'  :  (None, 'XZ'),
+	'UpArmFK_R' :  (Matrix.Rotation(-1.57, 3, 'Z'), 'ZX'),
+	'LoArmFK_R' :  (None, 'ZX'),
+	'HandFK_R'  :  (None, 'ZX'),
+}
 
 McpdFixes = {
 	'Spine2' : (Matrix.Rotation(0.3, 3, 'X'), None),
@@ -603,6 +661,7 @@ FixesList = {
 	'MB'  : MBFixes,
 	'OSU' : OsuFixes,
 	'XX1' : XX1Fixes,
+	'3dsMax': MaxFixes,
 	'McpD': McpdFixes,
 	'Daz' : DazFixes,
 }
@@ -614,7 +673,7 @@ FixesList = {
 theArmature = None
 
 FkBoneList = [
-	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Head',
+	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'LowerNeck', 'Neck', 'Head',
 	'Shoulder_L', 'UpArmFK_L', 'LoArmFK_L', 'HandFK_L', 'ElbowPTFK_L',
 	'Shoulder_R', 'UpArmFK_R', 'LoArmFK_R', 'HandFK_R', 'ElbowPTFK_R',
 	'Hip_L', 'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
@@ -962,10 +1021,8 @@ class CAnimData():
 def createAnimation(context, rig):
 	context.scene.objects.active = rig
 	animations = {}
-	#bpy.ops.object.mode_set(mode='EDIT')
 	for name in FkBoneList:
 		createAnimData(name, animations, rig.data.bones)
-	#bpy.ops.object.mode_set(mode='POSE')
 	return animations
 
 def createAnimData(name, animations, bones):
@@ -1016,8 +1073,14 @@ def insertAnimation(context, rig, animations):
 	rots = makeVectorDict(rig, '].rotation_quaternion')
 	root = 'Root'
 	insertAnimRoot(root, animations, len(rots[root]), locs[root], rots[root])
+	bones = rig.data.bones
 	for name in FkBoneList:
-		if name != root:
+		try:
+			bones[name]
+			success = (name != root)
+		except:
+			success = False
+		if success:
 			try:
 				rot = rots[name]
 			except:
@@ -1590,6 +1653,8 @@ def toggleLimitConstraints(mhxrig):
 						inf = 1.0
 						res = 'ON'
 				cns.influence = inf
+	if first:
+		return 'NOT FOUND'
 	return res
 
 def setLimitConstraints(mhxrig, inf):

@@ -1,19 +1,21 @@
 
-# --------------- Images ----------------------------- # 
+# --------------- Images and textures ----------------------------- # 
  
 Image texture.tif
-  *** Filename texture.tif ;
+  *** Filename texture.tif ./data/textures/ ;
   use_premultiply True ;
 end Image
 
 Image texture_ref.tif
-  *** Filename texture_ref.tif ;
+  *** Filename texture_ref.tif ./data/textures/ ;
   use_premultiply True ;
 end Image
 
+Image ambient.tif
+  *** Filename .female_young.tif /data/textures/ ;
+  use_premultiply True ;
+end Image
 
-# --------------- Textures ----------------------------- # 
- 
 Texture diffuse IMAGE
   Image texture.tif ;
 end Texture
@@ -22,22 +24,49 @@ Texture specularity IMAGE
   Image texture_ref.tif ;
 end Texture
 
-Texture normals CLOUDS
-  intensity 1 ;
-  contrast 1 ;
-  factor_blue 1 ;
-  factor_green 1 ;
-  factor_red 1 ;
-  nabla 0.025 ;
-  noise_basis 'BLENDER_ORIGINAL' ;
-  noise_depth 2 ;
-  noise_scale 0.05001 ;
-  noise_type 'SOFT_NOISE' ;
-  cloud_type 'GREYSCALE' ;
-  use_color_ramp False ;
-  use_preview_alpha False ;
+Texture ambient IMAGE
+  Image ambient.tif ;
 end Texture
 
+# --------------- Textures for facial morphs  ----------------------------- # 
+
+#if False
+Image brows_mid_down.png
+  *** Filename brows_mid_down.png ./shared/mhx/textures/ ;
+  use_premultiply True ;
+end Image
+
+Image brows_squeeze.png
+  *** Filename brows_squeeze.png ./shared/mhx/textures/ ;
+  use_premultiply True ;
+end Image
+
+Image squint_left.png
+  *** Filename squint_left.png ./shared/mhx/textures/ ;
+  use_premultiply True ;
+end Image
+
+Image squint_right.png
+  *** Filename squint_right.png ./shared/mhx/textures/ ;
+  use_premultiply True ;
+end Image
+
+Texture browsMidDown IMAGE
+  Image brows_mid_down.png ;
+end Texture
+
+Texture browsSqueeze IMAGE
+  Image brows_squeeze.png ;
+end Texture
+
+Texture squint_L IMAGE
+  Image squint_left.png ;
+end Texture
+
+Texture squint_R IMAGE
+  Image squint_right.png ;
+end Texture
+#endif
 
 # --------------- Materials ----------------------------- # 
 
@@ -130,48 +159,50 @@ Material SSS_skinshader
     mapping_z 'Z' ;
   end MTex
 
-  MTex 2 normals UV NORMAL
-    texture Refer Texture normals ;
+  MTex 2 ambient UV AMBIENT_COLOR
+    texture Refer Texture ambient ;
+    use_map_color_diffuse False ;
+    use_map_ambient True ;
+    ambient_factor 1 ;
+  end MTex
+
+#if False
+  MTex 3 browsMidDown UV NORMAL
+    texture Refer Texture browsMidDown ;
     use_map_color_diffuse False ;
     use_map_normal True ;
-    alpha_factor 1 ;
-    ambient_factor 1 ;
-    blend_type 'MIX' ;
-    color Array 1.0 0.0 1.0  ;
-    diffuse_color_factor 1 ;
-    emission_color_factor 1 ;
-    reflection_color_factor 1 ;
-    specular_color_factor 1 ;
-    transmission_color_factor 1 ;
-    default_value 1 ;
-    density_factor 1 ;
-    diffuse_factor 1 ;
-    displacement_factor 0.2 ;
-    emission_factor 1 ;
-    emit_factor 1 ;
-    use True ;
-    use_from_dupli False ;
-    use_from_original False ;
-    hardness_factor 1 ;
-    mapping 'FLAT' ;
-    mirror_factor 1 ;
-    invert False ;
-    use_old_bump True ;
-    normal_factor 0.2 ;
-    normal_map_space 'TANGENT' ;
-    raymir_factor 1 ;
-    reflection_factor 1 ;
-    use_rgb_to_intensity False ;
-    scattering_factor 1 ;
-    scale (1,1,1) ;
-    specular_factor 1 ;
+    normal_factor -1.0 ;
+    use_rgb_to_intensity True ;
     use_stencil False ;
-    translucency_factor 1 ;
-    warp_factor 0 ;
-    mapping_x 'X' ;
-    mapping_y 'Y' ;
-    mapping_z 'Z' ;
   end MTex
+
+  MTex 4 browsSqueeze UV NORMAL
+    texture Refer Texture browsSqueeze ;
+    use_map_color_diffuse False ;
+    use_map_normal True ;
+    normal_factor -1.0 ;
+    use_rgb_to_intensity True ;
+    use_stencil False ;
+  end MTex
+
+  MTex 5 squint_L UV NORMAL
+    texture Refer Texture squint_L ;
+    use_map_color_diffuse False ;
+    use_map_normal True ;
+    normal_factor -1.0 ;
+    use_rgb_to_intensity True ;
+    use_stencil False ;
+  end MTex
+
+  MTex 6 squint_R UV NORMAL
+    texture Refer Texture squint_R ;
+    use_map_color_diffuse False ;
+    use_map_normal True ;
+    normal_factor -1.0 ;
+    use_rgb_to_intensity True ;
+    use_stencil False ;
+  end MTex
+#endif
 
   diffuse_color Array 1.0 1.0 1.0  ;
   diffuse_shader 'LAMBERT' ;
@@ -249,7 +280,7 @@ Material SSS_skinshader
   transparency_method 'Z_TRANSPARENCY' ;
   use_nodes False ;
   use_sky False ;
-  use_textures Array 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
+  use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
   use_vertex_color_light False ;
   use_vertex_color_paint False ;
   offset_z 0 ;
