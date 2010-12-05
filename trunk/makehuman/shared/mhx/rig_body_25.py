@@ -80,12 +80,12 @@ BodyArmature = [
 	('Neck',			0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 
-	('Rib',				0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
-	('Breast_L',		0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,1) ),
-	('Breast_R',		0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,1) ),
+	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
+	('Breast_L',		0.0, 'Rib', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
+	('Breast_R',		0.0, 'Rib', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
 	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
 	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
-	('StomachTarget',	0, 'Spine1', F_WIR, L_SPINE, (1,1,1) ),
+	('StomachTarget',	0, 'Spine1', F_WIR, L_TORSO, (1,1,1) ),
 ]
 
 #
@@ -136,6 +136,8 @@ def BodyWritePoses(fp):
 		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0]),
 		 ('CopyScale', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
 		])
+
+	addPoseBone(fp,  'Rib', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp,  'Breast_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 

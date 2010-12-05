@@ -1397,7 +1397,6 @@ def doShape(name):
 	if (toggle & T_Shape+T_Face) and (name == 'Basis'):
 		return True
 	else:
-
 		return (toggle & T_Face)
 
 def parseShapeKeys(ob, me, args, tokens):
@@ -2404,6 +2403,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
 	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
+
 	enforce = BoolProperty(name="Enforce version", description="Only accept MHX files of correct version", default=toggle&T_EnforceVersion)
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
 	proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)

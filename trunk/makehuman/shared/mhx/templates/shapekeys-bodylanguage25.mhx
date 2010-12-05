@@ -1,4 +1,4 @@
- ShapeKey MouthOpen Sym True
+ ShapeKey MouthOpen Sym toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 381 0 0.168578 0.0286045 ;
@@ -5569,7 +5569,7 @@
     sv 14012 -0.0069375 -0.00321642 0.00585318 ;
     sv 14013 -0.00533092 -0.00321391 0.00579309 ;
   end ShapeKey
-  ShapeKey MouthCornerDepth LR True
+  ShapeKey MouthCornerDepth LR toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 2158 -0.000388011 0.0180258 0.0139656 ;
@@ -5787,7 +5787,7 @@
     sv 9055 -0.000213921 0.0172004 0.0116744 ;
     sv 9056 -0.000388011 0.0180258 0.0137444 ;
   end ShapeKey
-  ShapeKey UpLipsOut Sym True
+  ShapeKey UpLipsOut Sym toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 2166 0.000142131 -0.0111143 0.00170374 ;
@@ -5921,7 +5921,7 @@
     sv 9047 3.71244e-05 -0.0114012 0.00159883 ;
     sv 9048 -0.000142131 -0.0111143 0.00170374 ;
   end ShapeKey
-  ShapeKey LoLipsOut Sym True
+  ShapeKey LoLipsOut Sym toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 2159 0.000515103 -0.0401112 -0.00240278 ;
@@ -5973,7 +5973,7 @@
     sv 9046 0.000691295 -0.0562918 -0.00766516 ;
     sv 9055 0.000709772 -0.0391529 -0.00232315 ;
   end ShapeKey
-  ShapeKey UpLipsIn Sym True
+  ShapeKey UpLipsIn Sym toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 2162 -0.000370818 0.000833976 0.00181236 ;
@@ -6221,7 +6221,7 @@
     sv 9051 0.000380051 0.000547087 0.00131216 ;
     sv 9052 0.000370818 0.000833976 0.00181236 ;
   end ShapeKey
-  ShapeKey LoLipsIn Sym True
+  ShapeKey LoLipsIn Sym toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 2158 0.0016465 0.0127189 0.00827503 ;
@@ -6386,7 +6386,7 @@
     sv 9055 -0.0015469 0.0171809 0.0131221 ;
     sv 9056 -0.0016465 0.0127189 0.00827503 ;
   end ShapeKey
-  ShapeKey MouthHeight LR True
+  ShapeKey MouthHeight LR toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 2158 0.000778019 0 -0.0126791 ;
@@ -6582,7 +6582,7 @@
     sv 9055 -0.000811905 0 -0.0133481 ;
     sv 9056 -0.000778019 0 -0.0126791 ;
   end ShapeKey
-  ShapeKey UpLipsMidHeight Sym True
+  ShapeKey UpLipsMidHeight Sym toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 2162 -0.00111588 -3.44515e-06 0.00457516 ;
@@ -7068,7 +7068,7 @@
     sv 14635 -0.00529876 0 1.04904e-05 ;
     sv 14636 -0.00356518 0 9.53674e-07 ;
   end ShapeKey
-  ShapeKey LoLipsMidHeight Sym True
+  ShapeKey LoLipsMidHeight Sym toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 2148 1.18464e-06 0 0.00135899 ;
@@ -7283,7 +7283,7 @@
     sv 9064 1.98036e-05 0 0.00292873 ;
     sv 9066 -1.18464e-06 0 0.00135899 ;
   end ShapeKey
-  ShapeKey UpMouthCornerHeight LR True
+  ShapeKey UpMouthCornerHeight LR toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 2162 0 0 -0.00830088 ;
@@ -7453,7 +7453,7 @@
     sv 9051 0 0 -0.0072752 ;
     sv 9052 0 0 -0.00830088 ;
   end ShapeKey
-  ShapeKey LoMouthCornerHeight LR True
+  ShapeKey LoMouthCornerHeight LR toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 2158 0 0 -0.0233793 ;
@@ -7599,7 +7599,7 @@
     sv 9055 0 0 -0.0239577 ;
     sv 9056 0 0 -0.0233793 ;
   end ShapeKey
-  ShapeKey MouthWidth LR True
+  ShapeKey MouthWidth LR toggle&T_Face
     slider_min 0 ;
     slider_max 1.0 ;
     sv 2147 0 -0.0025776 0 ;
@@ -8121,7 +8121,7 @@
     sv 14633 0 -0.0013622 0 ;
     sv 14634 0 -0.00106901 0 ;
   end ShapeKey
-  ShapeKey MouthNarrow LR True
+  ShapeKey MouthNarrow LR toggle&T_Face
     slider_min 0 ;
     slider_max 1.0 ;
     sv 2147 -0.00190464 -0.00134444 0.000121117 ;
@@ -8610,7 +8610,7 @@
     sv 14633 0.00199347 -0.00478017 0.000183582 ;
     sv 14634 0.000935037 -0.00467938 0.000109673 ;
   end ShapeKey
-  ShapeKey LipsPart Sym True
+  ShapeKey LipsPart Sym toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 381 0 0.0247127 -0.000374794 ;
@@ -11090,7 +11090,7 @@
     sv 12608 0 -0.000248969 -0.00118637 ;
     sv 12726 0 -0.000173867 -0.00151348 ;
   end ShapeKey
-  ShapeKey TongueHeight Sym True
+  ShapeKey TongueHeight Sym toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 381 -0.0277403 1.2666e-07 9.53674e-07 ;
@@ -11260,7 +11260,7 @@
     sv 8145 0.02749 1.41095e-07 9.53674e-07 ;
     sv 8146 0.0277403 1.2666e-07 9.53674e-07 ;
   end ShapeKey
-  ShapeKey TongueDepth Sym True
+  ShapeKey TongueDepth Sym toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 381 -0.0317228 1.56462e-07 9.53674e-07 ;
@@ -11430,7 +11430,7 @@
     sv 8145 0.0314366 1.11293e-07 9.53674e-07 ;
     sv 8146 0.0317228 1.56462e-07 9.53674e-07 ;
   end ShapeKey
-  ShapeKey TongueWidth Sym True
+  ShapeKey TongueWidth Sym toggle&T_Face
     slider_min 0 ;
     slider_max 1.0 ;
     sv 399 0 -0.00854644 0.00859737 ;
@@ -11552,7 +11552,7 @@
     sv 8124 0 -0.0288627 0.025805 ;
     sv 8125 0 -0.00854644 0.00859737 ;
   end ShapeKey
-  ShapeKey TongueBackHeight Sym True
+  ShapeKey TongueBackHeight Sym toggle&T_Face
     slider_min 0 ;
     slider_max 1.0 ;
     sv 381 0 -0.0110503 0.0190868 ;
@@ -11729,7 +11729,7 @@
     sv 8145 0 -0.0175027 0.030232 ;
     sv 8146 0 -0.0110503 0.0190868 ;
   end ShapeKey
-  ShapeKey BrowsMidHeight Sym True
+  ShapeKey BrowsMidHeight Sym toggle&T_Face
     slider_min 0 ;
     slider_max 1 ;
     sv 2139 -0.00011228 0 0.114979 ;
@@ -12198,7 +12198,7 @@
     sv 15038 5.14686e-05 0 0.00371218 ;
     sv 15039 5.74887e-05 0 0.00376225 ;
   end ShapeKey
-ShapeKey BrowsMidDown Sym True
+ShapeKey BrowsMidDown Sym toggle&T_Face
     slider_min 0 ;
     slider_max 1 ;
     sv 2137 0.000101805 -0.0173747 0.0270834 ;
@@ -13428,7 +13428,7 @@ ShapeKey BrowsMidDown Sym True
     sv 15210 -0.000504434 -0.000788987 -0.00349474 ;
     sv 15213 -0.000567824 -0.0010103 -0.00459003 ;
   end ShapeKey
-  ShapeKey BrowsOuterHeight LR True
+  ShapeKey BrowsOuterHeight LR toggle&T_Face
     slider_min -1.0 ;
     slider_max 2.0 ;
     sv 2137 -0.00721334 -0.00919941 0.00189209 ;
@@ -14548,7 +14548,7 @@ ShapeKey BrowsMidDown Sym True
     sv 15080 -0.00228891 0.0089246 0.0101728 ;
     sv 15081 -0.00269297 0.00854516 0.0129728 ;
   end ShapeKey
-  ShapeKey BrowsSqueeze Sym True
+  ShapeKey BrowsSqueeze Sym toggle&T_Face
     slider_min 0.0 ;
     slider_max 2.0 ;
     sv 2139 -0.0173268 -0.000244975 0.00240707 ;
@@ -15132,7 +15132,7 @@ ShapeKey BrowsMidDown Sym True
     sv 15065 0.00147295 -0.00147128 -7.15256e-06 ;
     sv 15066 0.00115341 -0.00136179 8.10623e-06 ;
   end ShapeKey
-  ShapeKey NoseWrinkle Sym True
+  ShapeKey NoseWrinkle Sym toggle&T_Face
     slider_min 0.0 ;
     slider_max 2.0 ;
     sv 2187 -0.00701915 -5.75781e-05 0.0336266 ;
@@ -16117,7 +16117,7 @@ ShapeKey BrowsMidDown Sym True
     sv 15078 0.000376016 0 0.00201702 ;
     sv 15080 0.000299901 0 0.0017004 ;
   end ShapeKey
-  ShapeKey CheekFlex LR True
+  ShapeKey CheekFlex LR toggle&T_Face
     slider_min -0.0 ;
     slider_max 2.0 ;
     sv 2187 0.000576779 -4.52995e-06 0.00259924 ;
@@ -17061,7 +17061,7 @@ ShapeKey BrowsMidDown Sym True
     sv 15080 -7.94232e-05 -0.00625628 0.0172319 ;
     sv 15081 6.49393e-05 -0.00397182 0.00812483 ;
   end ShapeKey
-  ShapeKey Squint LR True
+  ShapeKey Squint LR toggle&T_Face
     slider_min 0 ;
     slider_max 2.0 ;
     sv 2234 -5.82635e-05 0.000627995 0.00175428 ;
@@ -18287,7 +18287,7 @@ ShapeKey BrowsMidDown Sym True
     sv 15080 0.00648502 0.00683832 0.00923681 ;
     sv 15081 0.00562319 0.00586504 -0.0113597 ;
   end ShapeKey
-  ShapeKey CheekBalloon Sym True
+  ShapeKey CheekBalloon Sym toggle&T_Face
     slider_min -1 ;
     slider_max 2.0 ;
     sv 2147 -0.000857547 -0.00471449 0.000486374 ;

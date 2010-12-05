@@ -533,22 +533,38 @@ def printProxyShape(fp, shapes):
 #
 
 def writeShapeKeys(fp, name, proxy):
-	fp.write("ShapeKeys %s\n" % name)
-	fp.write("  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n  end ShapeKey\n")
+	fp.write(
+"#if toggle&(T_Face+T_Shape)\n" +
+"ShapeKeys %s\n" % name +
+"  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n" +
+"  end ShapeKey\n" +
+"#endif\n" +
+
+"#if toggle&T_Face\n")
 	if BODY_LANGUAGE:
 		copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)	
 	else:
 		copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
+	fp.write(
+"#endif\n" +
+
+"#if toggle&T_Shape\n")
 	#copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
-	fp.write("  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
+	fp.write(
+"#endif\n" +
+
+"#if toggle&(T_Face+T_Shape)\n" +
+"  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
 	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
 	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
 	if BODY_LANGUAGE:
 		mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers)
 	else:
 		mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
-	fp.write("  end AnimationData\n")
-	fp.write("end ShapeKeys\n")
+	fp.write(
+"  end AnimationData\n" +
+"end ShapeKeys\n" +
+"#endif\n")
 	return	
 
 #
