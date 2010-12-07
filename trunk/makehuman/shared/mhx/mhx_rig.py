@@ -114,6 +114,7 @@ C_TG_LOCPAR = 0x2000
 C_TG_POSE = 0x3000
 
 C_CHILDOF = C_OW_POSE+C_TG_WORLD
+C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
 
 rootChildOfConstraints = [
 		('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
@@ -360,6 +361,7 @@ def writePoses(fp, poses):
 #	addIkHandle(fp, bone, customShape, limit):
 #	addSingleIk(fp, bone, lockRot, target, limit):
 #	addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
+#	addDeformYBone(fp, bone, ikBone, fkBone, cflags, pflags):
 #	addCSlider(fp, bone, mx):
 #	addYSlider(fp, bone, mx):
 #	addXSlider(fp, bone, mn, mx):
@@ -378,6 +380,22 @@ def addSingleIk(fp, bone, lockRot, target, limit):
 		cns.append( ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limit, (True, True, True)]) )
 	addPoseBone(fp, bone, None, None, (1,1,1), lockRot, (1,1,1), (1,1,1), 0, cns)
 
+def addDeformYBone(fp, bone, ikBone, fkBone, cflags, pflags):
+	space = cflags & (C_OW_MASK + C_TG_MASK)
+	constraints = [
+		('CopyRot', space, 0, ['RotIKXZ', ikBone, (1,0,1), (0,0,0), False]),
+		('CopyRot', space, 0, ['RotIKY', ikBone, (0,1,0), (0,0,0), False]),
+		('CopyRot', space, 1, ['RotFKXZ', fkBone, (1,0,1), (0,0,0), False]),
+		('CopyRot', space, 1, ['RotFKY', fkBone, (0,1,0), (0,0,0), False])
+		]
+	if pflags & P_STRETCH:
+		constraints += [
+		('CopyScale', 0, 0, ['StretchIK', ikBone, (0,1,0), False]),
+		('CopyScale', 0, 1, ['StretchFK', fkBone, (0,1,0), False]),
+		]		
+	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
+	return
+
 def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 	space = cflags & (C_OW_MASK + C_TG_MASK)
 	constraints = [
@@ -389,7 +407,8 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 		('CopyScale', 0, 0, ['StretchIK', ikBone, (0,1,0), False]),
 		('CopyScale', 0, 1, ['StretchFK', fkBone, (0,1,0), False]),
 		]		
-	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
+	(fX,fY,fZ) = fkRot
+	addPoseBone(fp, bone, None, None, (1,1,1), (1-fX,1-fY,1-fZ), (0,0,0), (1,1,1), 0, constraints)
 	return
 
 def addCSlider(fp, bone, mx):
