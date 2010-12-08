@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # 
 # name Sweater
+# subsurf 1
 # material Sweater
 diffuse_color 0.0306 0.1626 0.0088
 diffuse_shader LAMBERT

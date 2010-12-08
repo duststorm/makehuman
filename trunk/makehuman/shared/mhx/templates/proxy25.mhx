@@ -76,6 +76,7 @@ end Mesh
       use_vertex_groups True ;
     end Modifier
   #endif
+*** ProxyModifiers
   color Array 1.0 1.0 1.0 1.0  ;
   show_name True ;
   parent Refer Object Human ;

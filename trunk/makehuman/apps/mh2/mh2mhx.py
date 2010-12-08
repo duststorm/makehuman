@@ -242,7 +242,6 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 					fp.write("  #if False\n")
 				else:
 					fp.write("  #if toggle&T_Cage\n")
-
 			elif words[1] == 'ProxyReferRig':
 				if proxy.bones:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
@@ -313,6 +312,23 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 				for proxy in proxyData.values():
 					if proxy.name:
 						writeAnimationData(fp, proxy.name+"Mesh", proxy)
+			elif words[1] == 'ProxyModifiers':
+				for mod in proxy.modifiers:
+					if mod[0] == 'subsurf':
+						sslevels = mod[1]
+						fp.write(
+"    Modifier SubSurf SUBSURF\n" +
+"      levels %d ;\n" % sslevels +
+"      render_levels %d ;\n" % (sslevels+1) +
+"    end Modifier\n")
+					elif mod[0] == 'shrinkwrap':
+						offset = mod[1]
+						fp.write(
+"    Modifier ShrinkWrap SHRINKWRAP\n" +
+"      target Refer Object HumanMesh ;\n" +
+"      offset %.4f ;\n" % offset +
+"      use_keep_above_surface True ;\n" +
+"    end Modifier\n")
 			elif words[1] == 'material-drivers':
 				if BODY_LANGUAGE:
 					mhx_rig.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
