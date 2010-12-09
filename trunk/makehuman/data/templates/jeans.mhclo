@@ -4,7 +4,7 @@
 # 
 # name Jeans
 # subsurf 1
-# # shrinkwrap 0.06
+# shrinkwrap 0.06
 # material Jeans
 diffuse_color 0.0936 0.0652 0.8000
 diffuse_shader LAMBERT

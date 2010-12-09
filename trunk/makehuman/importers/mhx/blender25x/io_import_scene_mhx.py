@@ -15,16 +15,16 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.0.2
+Version 1.0.3
 
 """
 
 bl_addon_info = {
 	'name': 'Import: MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '1.0.2',
+	'version': '1.0.3',
 	'blender': (2, 5, 5),
-    "api": 32930,
+    "api": 33477,
 	"location": "File > Import",
 	"description": "Import files in the MakeHuman eXchange format (.mhx)",
 	"warning": "",
@@ -40,8 +40,8 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 0
-SUB_VERSION = 2
-BLENDER_VERSION = (2, 55, 0)
+SUB_VERSION = 3
+BLENDER_VERSION = (2, 55, 1)
 
 #
 #
@@ -682,11 +682,19 @@ def parseAnimDataFCurve(adata, rna, args, tokens):
 	dataPath = args[0]
 	index = int(args[1])
 	# print("parseAnimDataFCurve", adata, dataPath, index)
+	n = 1
 	for (key, val, sub) in tokens:
 		if key == 'Driver':
 			fcu = parseDriver(adata, dataPath, index, rna, val, sub)
+			fmod = fcu.modifiers[0]
+			fcu.modifiers.remove(fmod)
 		elif key == 'FModifier':
 			parseFModifier(fcu, val, sub)
+		elif key == 'kp':
+			pt = fcu.keyframe_points.add(n, 0)
+			pt.interpolation = 'LINEAR'
+			pt = parseKeyFramePoint(pt, val, sub)
+			n += 1
 		else:
 			defaultKey(key, val, sub, 'fcu', [], globals(), locals())
 	return fcu
@@ -739,10 +747,9 @@ def parseDriverVariable(drv, rna, args, tokens):
 	return var
 
 def parseFModifier(fcu, args, tokens):
-	#fmod = fcu.modifiers.new()
-	fmod = fcu.modifiers[0]
-	#fmod.type = args[0]
-	#print("fmod", fmod, fmod.type)
+	fmod = fcu.modifiers.new(args[0])
+	#fmod = fcu.modifiers[0]
+	print("fmod", fmod, fmod.type)
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, 'fmod', [], globals(), locals())
 	return fmod
@@ -1615,7 +1622,6 @@ def parseBoneGroup(pose, nGrps, args, tokens):
 	print("Created", bg)
 	loadedData['BoneGroup'][name] = bg
 	for (key, val, sub) in tokens:
-		print(key,val)
 		defaultKey(key, val,  sub, "bg", [], globals(), locals())
 	return
 
@@ -2403,6 +2409,8 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
 	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
+
+
 
 	enforce = BoolProperty(name="Enforce version", description="Only accept MHX files of correct version", default=toggle&T_EnforceVersion)
 	mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)

@@ -354,7 +354,7 @@ def FingerWriteDrivers(fp):
 				first = 1
 			for lnum in range(first,4):
 				driven = "Finger-%d-%d%s" % (fnum, lnum, suffix)
-				cnsData = ("var", 'TRANSFORMS', [('Human', driver, 'LOC_X', C_LOCAL)])
+				cnsData = ("var", 'TRANSFORMS', [('Human', driver, 'LOC_X', C_LOC)])
 				writeDriver(fp, True, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"Rot\"].influence" % driven, -1, coeff, [cnsData])
 	return
 
@@ -364,31 +364,8 @@ def FingerWriteDrivers(fp):
 #
 
 ArmShapeDrivers = {
-	'BendElbowForward_L' : ( -pi/2, 
-		('PArmIK_L', 'LOC_X', pos), 
-		('LoArmFK_L', 'ROT_Z', (0, deg90)), 
-		('LoArmIK_L', 'ROT_Z', (0, deg90)) ),
-	'BendArmUp_L' : ( pi/2, 
-		('PArmIK_L', 'LOC_X', pos), 
-		('UpArmFK_L', 'ROT_X', (0, deg90)), 
-		('UpArmIK_L', 'ROT_X', (0, deg90)) ),
-	'BendArmDown_L' : ( -pi/2, 
-		('PArmIK_L', 'LOC_X', pos), 
-		('UpArmFK_L', 'ROT_X', (-deg90, 0)), 
-		('UpArmIK_L', 'ROT_X', (-deg90, 0)) ),
-
-	'BendElbowForward_R' : ( pi/2, 
-		('PArmIK_R', 'LOC_X', pos), 
-		('LoArmFK_R', 'ROT_Z', (0, deg90)), 
-		('LoArmIK_R', 'ROT_Z', (0, deg90)) ),
-	'BendArmUp_R' : ( pi/2, 
-		('PArmIK_R', 'LOC_X', pos), 
-		('UpArmFK_R', 'ROT_X', (0, deg90)), 
-		('UpArmIK_R', 'ROT_X', (0, deg90)) ),
-	'BendArmDown_R' : ( -pi/2, 
-		('PArmIK_R', 'LOC_X', pos), 
-		('UpArmFK_R', 'ROT_X', (-deg90, 0)), 
-		('UpArmIK_R', 'ROT_X', (-deg90, 0)) ),
+	'BendArmDown_L' : ( -pi/2, 'UpArmDwn_L', 'BendArmDown_L', 'ROT_X', (0, 1.0/deg90) ),
+	'BendArmDown_R' : ( -pi/2, 'UpArmDwn_R', 'BendArmDown_R', 'ROT_X', (0, 1.0/deg90) ),
 }
 
 #
@@ -397,24 +374,7 @@ ArmShapeDrivers = {
 #
 
 LegShapeDrivers = {
-	'BendKneeBack_L' : ( pi/2, 
-		('PLegIK_L', 'LOC_X', pos), 
-		('LoLegFK_L', 'ROT_X', (0, deg90)), 
-		('LoLegIK_L', 'ROT_X', (0, deg90)) ),
-
-	'BendKneeBack_R' : ( pi/2, 
-		('PLegIK_R', 'LOC_X', pos), 
-		('LoLegFK_R', 'ROT_X', (0, deg90)), 
-		('LoLegIK_R', 'ROT_X', (0, deg90)) ),
+	'BendLegForward_L' : ( -pi/2, 'UpLegDwn_L', 'BendLegForward_L', 'ROT_X', (0, 1.0/deg90) ),
+	'BendLegForward_R' : ( -pi/2, 'UpLegDwn_R', 'BendLegForward_R', 'ROT_X', (0, 1.0/deg90) ),
 }
 
-"""
-	'BendLegForward_L' : ( -pi/2, 
-		('PLegIK_L', 'LOC_X', pos), 
-		('UpLegFK_L', 'ROT_X', (0, deg90)), 
-		('UpLegIK_L', 'ROT_X', (0, deg90)) ),
-	'BendLegForward_R' : ( -pi/2, 
-		('PLegIK_R', 'LOC_X', pos), 
-		('UpLegFK_R', 'ROT_X', (0, deg90)), 
-		('UpLegIK_R', 'ROT_X', (0, deg90)) ),
-"""

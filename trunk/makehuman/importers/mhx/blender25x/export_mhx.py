@@ -1449,20 +1449,19 @@ def exportShapeKeys(ob, keyList, toggle, fp):
 	me = ob.data
 	skeys = me.shape_keys
 	fp.write("ShapeKeys\n")
-	headgrp = findGroup(ob, 'Head')
-	jawgrp = findGroup(ob, 'Jaw')
+	try:
+		headgrp = findGroup(ob, 'Head')
+		jawgrp = findGroup(ob, 'Jaw')
+	except:
+		headgrp = None
+		jawgrp = None
 	for skey in skeys.keys:
 		skeyName = skey.name.replace(' ','_')	
-		(lr, slidermin, slidermax) = keyList[skeyName]
-		'''
 		try:
-			lr = keyList[skeyName]
+			(lr, slidermin, slidermax) = keyList[skeyName]
 		except:
-			if expMsk & M_MHX:
-				lr = None
-			else:
-				lr = "Sym"
-		'''
+			lr = None
+
 		if lr:
 			if lr == 'LRHJ':
 				exportShapeKey('Up'+skeyName, me.vertices, 'LR', skey, toggle, headgrp, slidermin, slidermax, fp)
@@ -1473,7 +1472,7 @@ def exportShapeKeys(ob, keyList, toggle, fp):
 			else:
 				exportShapeKey(skeyName, me.vertices, lr, skey, toggle, -1, slidermin, slidermax, fp)
 		else:
-			fp.write("  ShapeKey %s %s %s\n" % (skeyName, lr, toggle))
+			fp.write("  ShapeKey %s %s %s\n" % (skeyName, "Sym", toggle))
 			writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
 			fp.write("  end ShapeKey\n")
 

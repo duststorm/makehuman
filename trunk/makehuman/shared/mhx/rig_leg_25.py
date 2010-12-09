@@ -47,6 +47,10 @@ LegHeadsTails = [
 	('Foot_R',			'l-ankle', 'l-foot-1'),
 	('Toe_R',			'l-foot-1', 'l-foot-2'),
 
+	# Rotation diffs
+	('BendLegForward_L',	'r-upper-leg', ('r-upper-leg', (0,0,1))),
+	('BendLegForward_R',	'l-upper-leg', ('l-upper-leg', (0,0,1))),
+
 	# FK
 	('UpLegFK_L',		'r-upper-leg', 'r-knee'),
 	('LoLegFK_L',		'r-knee', 'r-ankle'),
@@ -116,6 +120,10 @@ LegArmature = [
 	('LoLegFan_R',		-loLegRoll, 'UpLegDwn_R', F_DEF, L_DEF, (1,1,1) ),
 	('Foot_R',			-footRoll, 'LoLeg_R', F_DEF, L_DEF, (1,1,1) ),
 	('Toe_R',			-toeRoll, 'Foot_R', F_DEF, L_DEF, (1,1,1) ),
+
+	# Rotation diffs
+	('BendLegForward_L',		pi, 'Hip_L', 0, L_HELP, (1,1,1) ),
+	('BendLegForward_R',		pi, 'Hip_R', 0, L_HELP, (1,1,1) ),
 
 	# FK
 	('UpLegFK_L',		upLegRoll, 'Hip_L', F_WIR, L_LEGFK, (1,1,1) ),

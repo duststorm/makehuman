@@ -124,21 +124,30 @@ def exportMhx_25(obj, rig, fp):
 
 	proxyList = mh2proxy.proxyConfig()
 	proxyData = {}
-	for (typ, useObj, useMhx, proxyStuff) in proxyList:
-		if useMhx:
-			fp.write("#if toggle&T_%s\n" % typ)
-			copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyStuff, proxyData)	
-			fp.write("#endif\n")
+	proxyCopy('Cage', obj, rig, proxyList, proxyData, fp)
 
 	fp.write("#if toggle&T_Mesh\n")
 	copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
 	fp.write("#endif\n")
+
+	proxyCopy('Proxy', obj, rig, proxyList, proxyData, fp)
+	proxyCopy('Clothes', obj, rig, proxyList, proxyData, fp)
 
 	fp.write("#if toggle&T_Armature\n")
 	copyFile25(obj, "shared/mhx/templates/%s-poses25.mhx" % rig, rig, fp, None, proxyData)	
 	fp.write("#endif\n")
 	return
 
+#
+#	proxyCopy(name, obj, rig, proxyList, proxyData, fp)
+#
+
+def proxyCopy(name, obj, rig, proxyList, proxyData, fp):
+	for (typ, useObj, useMhx, proxyStuff) in proxyList:
+		if useMhx and typ == name:
+			fp.write("#if toggle&T_%s\n" % typ)
+			copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyStuff, proxyData)	
+			fp.write("#endif\n")
 		
 #
 #	copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
@@ -571,8 +580,8 @@ def writeShapeKeys(fp, name, proxy):
 
 "#if toggle&(T_Face+T_Shape)\n" +
 "  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
-	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.ArmShapeDrivers)
-	#mhx_rig.writeFKIKShapeDrivers(fp, rig_panel_25.LegShapeDrivers)
+	#mhx_rig.writeRotDiffDrivers(fp, rig_panel_25.ArmShapeDrivers)
+	#mhx_rig.writeRotDiffDrivers(fp, rig_panel_25.LegShapeDrivers)
 	if BODY_LANGUAGE:
 		mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers)
 	else:

@@ -85,6 +85,10 @@ ArmHeadsTails = [
 	('LoArmDwn_R',				'l-elbow', 'l-hand'),
 	('Hand_R',				'l-hand', 'hand_R_tail'),
 
+	# Rotation diffs
+	('BendArmDown_L',		'r-shoulder', ('r-shoulder', (0,-1,0))),
+	('BendArmDown_R',		'l-shoulder', ('l-shoulder', (0,-1,0))),
+	
 	# Biceps
 	('Bicep_L',				'r-bicep-start', 'r-bicep-end'),
 	('BicepTarget_L',		'r-bicep-end', ('r-bicep-end', yunit)),
@@ -169,6 +173,10 @@ ArmArmature = [
 	('Pectoralis_R',		0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
 	#('PectoralisTarget_R',	0.0, 'UpArm_R', 0, L_HELP, (1,1,1) ),
 	#('BackArm_R',			0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
+
+	# Rotation diffs
+	('BendArmDown_L',		deg90, 'Shoulder_L', 0, L_HELP, (1,1,1)),
+	('BendArmDown_R',		-deg90, 'Shoulder_R', 0, L_HELP, (1,1,1)),
 
 	# FK
 	('UpArmFK_L',		upArmRoll, 'Shoulder_L', F_WIR, L_ARMFK, (1,1,1) ),
