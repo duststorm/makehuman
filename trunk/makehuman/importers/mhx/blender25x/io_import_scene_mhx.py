@@ -749,7 +749,6 @@ def parseDriverVariable(drv, rna, args, tokens):
 def parseFModifier(fcu, args, tokens):
 	fmod = fcu.modifiers.new(args[0])
 	#fmod = fcu.modifiers[0]
-	print("fmod", fmod, fmod.type)
 	for (key, val, sub) in tokens:
 		defaultKey(key, val, sub, 'fmod', [], globals(), locals())
 	return fmod
@@ -1420,7 +1419,7 @@ def parseShapeKeys(ob, me, args, tokens):
 
 
 def parseShapeKey(ob, me, args, tokens):
-	if verbosity > 0:
+	if verbosity > 2:
 		print( "Parsing ob %s shape %s" % (bpy.context.object, args[0] ))
 	name = args[0]
 	lr = args[1]
