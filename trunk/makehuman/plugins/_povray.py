@@ -22,7 +22,8 @@ povray = None
 
 
 def load(app):
-    povray = gui3d.TaskView(app.categories['Rendering'], 'Povray', app.getThemeResource('images', 'button_povray.png'))
+    category = app.getCategory('Rendering','button_render.png','button_render_on.png')
+    povray = gui3d.TaskView(category, 'Povray', app.getThemeResource('images', 'button_povray.png'))
 
     @povray.event
     def onShow(event):
