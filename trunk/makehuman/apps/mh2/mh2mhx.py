@@ -33,7 +33,7 @@ import sys
 mhxPath = os.path.realpath('./shared/mhx')
 if mhxPath not in sys.path:
 	sys.path.append(mhxPath)
-import mh2proxy, mhxbones, mhx_rig, rig_panel_25
+import mh2proxy, mhxbones, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_body_25
 
 #
 #	exportMhx(obj, filename):
@@ -574,19 +574,25 @@ def writeShapeKeys(fp, name, proxy):
 "#endif\n" +
 
 "#if toggle&T_Shape\n")
-	#copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
+	copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 	fp.write(
 "#endif\n" +
 
 "#if toggle&(T_Face+T_Shape)\n" +
-"  AnimationData None (toggle&T_Face==T_Face)and(toggle&T_Symm==0)\n")	
-	#mhx_rig.writeRotDiffDrivers(fp, rig_panel_25.ArmShapeDrivers)
-	#mhx_rig.writeRotDiffDrivers(fp, rig_panel_25.LegShapeDrivers)
+"  AnimationData None (toggle&T_Symm==0)\n" +
+"#if toggle&T_Shape\n")
+	mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers)
+	mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers)
+	mhx_rig.writeShapeDrivers(fp, rig_body_25.BodyShapeDrivers)
+	fp.write(
+"#endif\n" +
+"#if toggle&T_Face\n")
 	if BODY_LANGUAGE:
 		mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers)
 	else:
 		mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
 	fp.write(
+"#endif\n" +
 "  end AnimationData\n" +
 "end ShapeKeys\n" +
 "#endif\n")

@@ -88,6 +88,8 @@ ArmHeadsTails = [
 	# Rotation diffs
 	('BendArmDown_L',		'r-shoulder', ('r-shoulder', (0,-1,0))),
 	('BendArmDown_R',		'l-shoulder', ('l-shoulder', (0,-1,0))),
+	('BendArmUp_L',			'r-shoulder', ('r-shoulder', (0,1,0))),
+	('BendArmUp_R',			'l-shoulder', ('l-shoulder', (0,1,0))),
 	
 	# Biceps
 	('Bicep_L',				'r-bicep-start', 'r-bicep-end'),
@@ -177,6 +179,8 @@ ArmArmature = [
 	# Rotation diffs
 	('BendArmDown_L',		deg90, 'Shoulder_L', 0, L_HELP, (1,1,1)),
 	('BendArmDown_R',		-deg90, 'Shoulder_R', 0, L_HELP, (1,1,1)),
+	('BendArmUp_L',		-deg90, 'Shoulder_L', 0, L_HELP, (1,1,1)),
+	('BendArmUp_R',		deg90, 'Shoulder_R', 0, L_HELP, (1,1,1)),
 
 	# FK
 	('UpArmFK_L',		upArmRoll, 'Shoulder_L', F_WIR, L_ARMFK, (1,1,1) ),
@@ -412,6 +416,18 @@ ArmDrivers = [
 	("Hand_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 
 ]
+
+#
+#	ArmShapeDrivers
+#	Shape : (driver, rotdiff, keypoints)
+#
+
+ArmShapeDrivers = {
+	'BendArmDown_L' : ( 'UpArmDwn_L', 'BendArmDown_L',  [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendArmDown_R' : ( 'UpArmDwn_R', 'BendArmDown_R',  [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendArmUp_L' : ( 'UpArmDwn_L', 'BendArmUp_L',  [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendArmUp_R' : ( 'UpArmDwn_R', 'BendArmUp_R',  [(0,1.5), (deg30,1), (deg90,0)] ),
+}
 
 #
 #	ArmProcess

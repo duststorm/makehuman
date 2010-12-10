@@ -358,23 +358,4 @@ def FingerWriteDrivers(fp):
 				writeDriver(fp, True, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"Rot\"].influence" % driven, -1, coeff, [cnsData])
 	return
 
-#
-#	ArmShapeDrivers
-#	Shape : (Driver, channel, (min, max))
-#
-
-ArmShapeDrivers = {
-	'BendArmDown_L' : ( -pi/2, 'UpArmDwn_L', 'BendArmDown_L', 'ROT_X', (0, 1.0/deg90) ),
-	'BendArmDown_R' : ( -pi/2, 'UpArmDwn_R', 'BendArmDown_R', 'ROT_X', (0, 1.0/deg90) ),
-}
-
-#
-#	LegShapeDrivers
-#	Shape : (Driver, channel, (min, max))
-#
-
-LegShapeDrivers = {
-	'BendLegForward_L' : ( -pi/2, 'UpLegDwn_L', 'BendLegForward_L', 'ROT_X', (0, 1.0/deg90) ),
-	'BendLegForward_R' : ( -pi/2, 'UpLegDwn_R', 'BendLegForward_R', 'ROT_X', (0, 1.0/deg90) ),
-}
 

@@ -1141,8 +1141,6 @@ def writeFCurves(fp, name, quats):
 
 #
 #	writeFkIkSwitch(fp, drivers)
-#	writeDrivers(fp, cond, drivers):
-#	writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 #
 
 def writeFkIkSwitch(fp, drivers):
@@ -1156,6 +1154,10 @@ def writeFkIkSwitch(fp, drivers):
 		for cnsName in cnsIK:
 			writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,mx), [cnsData])
 
+#
+#	writeTextureDrivers(fp, drivers):
+#
+
 def writeTextureDrivers(fp, drivers):
 	for (tex, vlist) in drivers.items():
 		drvVars = []
@@ -1164,7 +1166,10 @@ def writeTextureDrivers(fp, drivers):
 		writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
 	return
 
+#
+#	writeShapeDrivers(fp, drivers):
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
+#
 
 def writeShapeDrivers(fp, drivers):
 	for (shape, vlist) in drivers.items():
@@ -1174,29 +1179,23 @@ def writeShapeDrivers(fp, drivers):
 		writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
+#
+#	writeRotDiffDrivers(fp, drivers):
+#
+
 def writeRotDiffDrivers(fp, drivers):
 	for (shape, vlist) in drivers.items():
-		(phi, targ1, targ2, channel, coeff) = vlist
+		(targ1, targ2, keypoints) = vlist
 		drvVars = [('targ1', 'ROTATION_DIFF', [
 		('Human', targ1, C_LOC),
 		('Human', targ2, C_LOC)] )]
-		writeDriver(fp, 'toggle&T_Shape', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+		writeDriver(fp, 'toggle&T_Shape', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, keypoints, drvVars)
 	return
 
-"""
-def writeFKIKShapeDrivers(fp, drivers):
-	for (shape, data) in drivers.items():
-		(scale, fkik, fklist, iklist) = data
-		drvVars = []
-		vnames = ['x', 'fk', 'ik']
-		vlists = [fkik, fklist, iklist]
-		for n in range(3):
-			vname = vnames[n]
-			(targ, channel, coeff) = vlists[n]
-			drvVars.append( (vname, 'TRANSFORMS', [('Human', targ, channel, C_LOC)]) )
-		writeDriver(fp, 'toggle&T_Shape', ('SCRIPTED', '(x*ik+(1-x)*fk)/%.4f' % scale), "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
-	return
-"""
+#
+#	writeDrivers(fp, cond, drivers):
+#
+
 def writeDrivers(fp, cond, drivers):
 	for drv in drivers:
 		(bone, typ, name, index, coeffs, variables) = drv
@@ -1213,6 +1212,10 @@ def writeDrivers(fp, cond, drivers):
 		else:
 			print drv
 			raise NameError("Unknown driver type %s" % typ)
+
+#
+#	writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
+#
 
 def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 	useLoc = False
@@ -1292,9 +1295,8 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 "      end FModifier\n")
 
 	if useKeypoints:
-		fp.write(
-"      kp 0 1.0 ; \n" +
-"      kp 1.58608 0.0 ;\n")
+		for (x,y) in coeffs:
+			fp.write("      kp %.4f %.4f ; \n" % (x,y))
 
 	fp.write(
 "      extrapolation 'CONSTANT' ;\n" +

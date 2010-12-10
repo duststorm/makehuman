@@ -340,6 +340,15 @@ LegDrivers = [
 ]
 
 #
+#	LegShapeDrivers
+#	Shape : (driver, rotdiff, keypoints)
+#
+
+LegShapeDrivers = {
+	'BendLegForward_L' : ( 'UpLegDwn_L', 'BendLegForward_L', [(0,1), (deg30,1), (deg90,0)] ),
+	'BendLegForward_R' : ( 'UpLegDwn_R', 'BendLegForward_R', [(0,1), (deg30,1), (deg90,0)] ),
+}
+#
 #	LegProcess
 #	(bone, axis, angle)
 #

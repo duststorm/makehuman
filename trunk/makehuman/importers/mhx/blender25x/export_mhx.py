@@ -338,8 +338,6 @@ def writeDir(data, exclude, pad, fp):
 		props = []
 	for (key,val) in props:
 		if key != '_RNA_UI':
-			print(key, val)
-			print(dir(val))
 			fp.write('%sProperty %s\n' % (pad, key))
 			writeDir(val, [], pad+'  ', fp)
 			fp.write('%send Property\n' %pad)
@@ -703,7 +701,6 @@ def writeBpyPropCollection(ext, data, pad, depth, fp):
 
 
 def exportAnimationData(adata, fp):
-	print("ob-adata", adata)
 	if adata == None:
 		return
 	pad = "  "
@@ -1287,6 +1284,7 @@ def exportMesh(ob, fp):
 		global FacialKey, BodyKey
 		if expMsk & M_Shape:
 			exportShapeKeys(ob, FacialKey, "True", fp)
+			exportShapeKeys(ob, BodyKey, "True", fp)
 
 	if me.animation_data:		 
 		exportAnimationData(me.animation_data, fp)
@@ -1436,7 +1434,9 @@ BodyKey = {
 	"BendLegForward" : ("LR", 0, 1),
 	"BendLegBack" : ("LR", 0, 1),
 	"BendKneeBack" : ("LR", 0, 1),
-	"ShoulderDown" : ("LR", 0, 1),
+	"BendArmDown" : ("LR", 0, 1),
+	"BendArmUp" : ("LR", 0, 1),
+	"BreatheIn" : ("Sym", 0, 1),
 }
 
 def findGroup(ob, name):

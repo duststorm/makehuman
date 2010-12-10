@@ -60,6 +60,7 @@ BodyHeadsTails = [
 	('StomachUp',			'mid-rib-bot', 'stomach-front'),
 	('StomachLo',			'mid-hip', 'stomach-front'),
 	('StomachTarget',		'stomach-front', ('stomach-front', zunit)),
+	('Breathe',				'mid-rib-bot', ('mid-rib-bot', zunit)),
 	('Breast_L',			'r-tit', ('r-tit', zunit)),
 	('Breast_R',			'l-tit', ('l-tit', zunit)),
 ]
@@ -80,9 +81,10 @@ BodyArmature = [
 	('Neck',			0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 
-	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
+	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_DEF, (1,1,1) ),
 	('Breast_L',		0.0, 'Rib', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
 	('Breast_R',		0.0, 'Rib', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
+	('Breathe',			0.0, 'Rib', F_DEF+F_WIR, L_TORSO, (1,1,1) ),
 	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
 	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
 	('StomachTarget',	0, 'Spine1', F_WIR, L_TORSO, (1,1,1) ),
@@ -137,11 +139,20 @@ def BodyWritePoses(fp):
 		 ('CopyScale', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
 		])
 
-	addPoseBone(fp,  'Rib', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp,  'Breathe', 'MHCube01', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp,  'Breast_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp,  'Breast_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 	return
+
+#
+#	BodyShapeDrivers
+#	Shape : (driver, channel, coeff)
+#
+
+BodyShapeDrivers = {
+	'BreatheIn' : ('Breathe', 'LOC_Z', ('0', '2.0')), 
+}
 
 
