@@ -21,7 +21,7 @@ bl_addon_info = {
 	"author": "Thomas Larsson",
 	"version": "0.5",
 	"blender": (2, 5, 5),
-	"api": 32930,
+	"api": 33590,
 	"location": "View3D > Properties > MHX Mocap",
 	"description": "Mocap tool for MHX rig",
 	"warning": "",
@@ -1227,7 +1227,7 @@ def insertLocationKeyFrames(name, pb, anim90, animMhx):
 	return locs
 
 def insertIKFKLocationKeyFrames(nameIK, nameFK, pb, animations):
-	pb.select = True
+	pb.bone.select = True
 	animIK = animations[nameIK]
 	animFK = animations[nameFK]
 	if animIK.parent:
@@ -2197,7 +2197,7 @@ class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.window_manager.add_fileselect(self)
+		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}	
 
 #

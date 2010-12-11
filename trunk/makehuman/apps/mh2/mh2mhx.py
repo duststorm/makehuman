@@ -310,11 +310,9 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 				pass
 				writeShapeKeys(fp, "HumanMesh", None)
 			elif words[1] == 'proxy-shapeKey':
-				fp.write("#if toggle&T_Proxy\n")
-				for proxy in proxyData.values():
-					if proxy.name and proxy.type == 'Proxy' and not proxy.bones:
-						writeShapeKeys(fp, proxy.name+"Mesh", proxy)
-				fp.write("#endif\n")
+				proxyShapes('Cage', proxyData, fp)
+				proxyShapes('Proxy', proxyData, fp)
+				proxyShapes('Clothes', proxyData, fp)
 			elif words[1] == 'mesh-animationData':
 				writeAnimationData(fp, "HumanMesh", None)
 			elif words[1] == 'proxy-animationData':
@@ -421,39 +419,6 @@ def printProxyVGroup(fp, vgroups):
 #	copyShapeKeys(tmplName, fp, proxy):
 #
 
-eyeDist = 0.598002
-mouthDist = 0.478831
-tongueDist = 0.283124
-
-ShapeKeyScale = {
-	'BendElbowForward' 	: ('r-shoulder', 'r-hand', 4.705061),
-	'BendKneeBack'		: ('r-upper-leg', 'r-ankle', 8.207247),
-	'BendArmDown'		: ('r-shoulder', 'l-shoulder', 3.388347),
-	'BendArmUp'		: ('r-shoulder', 'l-shoulder', 3.388347),
-
-	'BrowsDown'		: ('r-eye', 'l-eye', eyeDist),
-	'BrowsMidDown'		: ('r-eye', 'l-eye', eyeDist),
-	'BrowsMidUp'		: ('r-eye', 'l-eye', eyeDist),
-	'BrowsOutUp'		: ('r-eye', 'l-eye', eyeDist),
-	'BrowsSqueeze'		: ('r-eye', 'l-eye', eyeDist),
-	'Frown'			: ('r-mouth', 'l-mouth', mouthDist),
-	'Narrow'		: ('r-mouth', 'l-mouth', mouthDist),
-	'Smile'			: ('r-mouth', 'l-mouth', mouthDist),
-	'Sneer'			: ('r-mouth', 'l-mouth', mouthDist),
-	'Squint'		: ('r-eye', 'l-eye', eyeDist),
-	'TongueOut'		: ('tongue-1', 'tongue-2', tongueDist),
-	'TongueUp'		: ('tongue-1', 'tongue-2', tongueDist),
-	'UpLipUp'		: ('r-mouth', 'l-mouth', mouthDist),
-	'LoLipDown'		: ('r-mouth', 'l-mouth', mouthDist),
-	'MouthOpen'		: ('r-mouth', 'l-mouth', mouthDist),
-	'UpLipDown'		: ('r-mouth', 'l-mouth', mouthDist),
-	'LoLipUp'		: ('r-mouth', 'l-mouth', mouthDist),
-	'CheekUp'		: ('r-mouth', 'l-mouth', mouthDist),
-	'TongueLeft'		: ('tongue-1', 'tongue-2', tongueDist),
-	'TongueRight'		: ('tongue-1', 'tongue-2', tongueDist),
-
-}
-
 def copyShapeKeys(tmplName, fp, proxy, doScale):
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
@@ -484,10 +449,21 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
 	#elif proxy.bones:
 	#	pass
 	else:
+		ignore = False
 		for line in tmpl:
 			words= line.split()
 			if len(words) == 0:
 				fp.write(line)
+			elif words[0] == 'ShapeKey':
+				if doScale:
+					scale = setShapeScale(words)
+				if useThisShape(words[1], proxy):
+					fp.write(line)
+					ignore = False
+				else:
+					ignore = True
+			elif ignore:
+				pass
 			elif words[0] == 'sv':
 				v = int(words[1])
 				dx = float(words[2])*scale
@@ -499,10 +475,6 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
 					vlist = []
 				for (pv, w) in vlist:
 					shapes.append((pv, w*dx, w*dy, w*dz))
-			elif words[0] == 'ShapeKey':
-				if doScale:
-					scale = setShapeScale(words)
-				fp.write(line)
 			elif shapes:
 				printProxyShape(fp, shapes)
 				shapes = []
@@ -513,17 +485,36 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
 	tmpl.close()
 	return
 
+def useThisShape(name, proxy):
+	if not proxy:
+		return True
+	if proxy.type == 'Proxy':
+		return True
+	if name in proxy.shapekeys:
+		return True
+	if name[:-2] in proxy.shapekeys:
+		return True
+	#print('IGN', name, proxy.name)
+	return False
+
 #
 #	setShapeScale(words):	
 #
 
 def setShapeScale(words):
 	key = words[1]
+	scales = None
 	try:
-		(p1, p2, length0) = ShapeKeyScale[key]
+		scales = rig_panel_25.FaceShapeKeyScale[key]
 	except:
-		#print('No scale	%s' % key)
-		return 1.0
+		pass
+	try:
+		scales = rig_body_25.BodyShapeKeyScale[key]
+	except:
+		pass
+	if not scales:
+		raise NameError("No scale for %s" % key)
+	(p1, p2, length0) = scales
 	x1 = mhx_rig.locations[p1]
 	x2 = mhx_rig.locations[p2]
 	dist = aljabr.vsub(x1, x2)
@@ -561,42 +552,56 @@ def writeShapeKeys(fp, name, proxy):
 	fp.write(
 "#if toggle&(T_Face+T_Shape)\n" +
 "ShapeKeys %s\n" % name +
-"  ShapeKey Basis Sym toggle&(T_Face+T_Shape)\n" +
-"  end ShapeKey\n" +
-"#endif\n" +
+"  ShapeKey Basis Sym True\n" +
+"  end ShapeKey\n")
 
-"#if toggle&T_Face\n")
-	if BODY_LANGUAGE:
-		copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)	
-	else:
-		copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
-	fp.write(
-"#endif\n" +
+	if (not proxy or proxy.type == 'Proxy'):
+		fp.write("#if toggle&T_Face\n")
+		if BODY_LANGUAGE:
+			copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)	
+		else:
+			copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
+		fp.write("#endif\n")
 
-"#if toggle&T_Shape\n")
+	fp.write("#if toggle&T_Shape\n")
 	copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
-	fp.write(
-"#endif\n" +
+	fp.write("#endif\n")
 
-"#if toggle&(T_Face+T_Shape)\n" +
-"  AnimationData None (toggle&T_Symm==0)\n" +
-"#if toggle&T_Shape\n")
-	mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers)
-	mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers)
-	mhx_rig.writeShapeDrivers(fp, rig_body_25.BodyShapeDrivers)
 	fp.write(
-"#endif\n" +
-"#if toggle&T_Face\n")
-	if BODY_LANGUAGE:
-		mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers)
-	else:
-		mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers)
+"  AnimationData None (toggle&T_Symm==0)\n")
+
+	fp.write("#if toggle&T_Shape\n")
+	mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
+	mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
+	mhx_rig.writeShapeDrivers(fp, rig_body_25.BodyShapeDrivers, proxy)
+	fp.write("#endif\n")
+
+	if (not proxy or proxy.type == 'Proxy'):
+		fp.write("#if toggle&T_Face\n")
+		if BODY_LANGUAGE:
+			mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers, None)
+		else:
+			mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers, None)
+		fp.write("#endif\n")
+
 	fp.write(
-"#endif\n" +
 "  end AnimationData\n" +
 "end ShapeKeys\n" +
 "#endif\n")
 	return	
+
+#
+#	proxyShapes(typ, proxyData, fp):
+#
+
+def proxyShapes(typ, proxyData, fp):
+	fp.write("#if toggle&T_%s\n" % typ)
+	for proxy in proxyData.values():
+		if proxy.name and proxy.type == typ and not proxy.bones:
+			writeShapeKeys(fp, proxy.name+"Mesh", proxy)
+	fp.write("#endif\n")
+		
+
 
 #
 #	copyMaterialFile(infile, fp):

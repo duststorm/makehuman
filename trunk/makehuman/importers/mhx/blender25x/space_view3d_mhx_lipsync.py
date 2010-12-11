@@ -24,7 +24,7 @@ bl_addon_info = {
 	'author': 'Thomas Larsson',
 	'version': '0.4',
 	'blender': (2, 5, 5),
-    "api": 32930,
+    "api": 33590,
     "location": "View3D > UI panel > MHX Mocap",
 	"description": "Lipsync for the MHX rig",
     "warning": "",
@@ -497,7 +497,7 @@ class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.window_manager.add_fileselect(self)
+		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}	
 
 #
@@ -516,7 +516,7 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.window_manager.add_fileselect(self)
+		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}	
 
 initInterface(bpy.context.scene)

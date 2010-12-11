@@ -49,6 +49,7 @@ class CProxy:
 		self.wire = False
 		self.cage = False
 		self.modifiers = []
+		self.shapekeys = []
 
 class CMaterial:
 	def __init__(self, name):
@@ -183,6 +184,8 @@ def readProxyFile(obj, proxyStuff):
 			elif words[1] == 'shrinkwrap':
 				offset = float(words[2])
 				proxy.modifiers.append( ['shrinkwrap', offset] )
+			elif words[1] == 'shapekey':
+				proxy.shapekeys.append( words[2] )
 		elif doObjData:
 			if words[0] == 'vt':
 				newTexVert(1, words, proxy)

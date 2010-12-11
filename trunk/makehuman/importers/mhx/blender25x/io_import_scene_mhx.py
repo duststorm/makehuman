@@ -24,7 +24,7 @@ bl_addon_info = {
 	'author': 'Thomas Larsson',
 	'version': '1.0.3',
 	'blender': (2, 5, 5),
-    "api": 33477,
+    "api": 33590,
 	"location": "File > Import",
 	"description": "Import files in the MakeHuman eXchange format (.mhx)",
 	"warning": "",
@@ -479,7 +479,7 @@ def parse(tokens):
 			try:
 				ob = loadedData['Object'][val[0]]
 			except:
-				ob = None
+				raise NameError("ShapeKeys object %s does not exist" % val[0])
 			if ob:
 				bpy.context.scene.objects.active = ob
 				parseShapeKeys(ob, ob.data, val, sub)
@@ -721,7 +721,7 @@ def parseDriver(adata, dataPath, index, rna, args, tokens):
 			expr += "." + words[n]
 		expr += ".driver_add('%s', index)" % channel
 	
-	# print("expr", rna, expr)
+	#print("expr", rna, expr)
 	fcu = eval(expr)
 	drv = fcu.driver
 	drv.type = args[0]
@@ -1018,7 +1018,6 @@ def parseObject(args, tokens):
 	datName = args[2]
 
 	if typ == 'EMPTY':
-		print("EMPTY")
 		ob = bpy.data.objects.new(name, None)
 		loadedData['Object'][name] = ob
 		linkObject(ob, None)
@@ -1345,7 +1344,6 @@ def parseVertColorLayer(args, tokens, me):
 	name = args[0]
 	print("VertColorLayer", name)
 	vcol = me.vertex_colors.new(name)
-	#vcol.name = name
 	loadedData['MeshColorLayer'][name] = vcol
 	for (key, val, sub) in tokens:
 		if key == 'Data':
@@ -1388,7 +1386,6 @@ def parseVertexGroup(ob, me, args, tokens):
 		for (key, val, sub) in tokens:
 			if key == 'wv':
 				ob.vertex_groups.assign( [int(val[0])], group, float(val[1]), 'REPLACE' )
-				#ob.add_vertex_to_group( int(val[0]), group, float(val[1]), 'REPLACE')
 	return
 
 
@@ -1406,8 +1403,6 @@ def doShape(name):
 		return (toggle & T_Face)
 
 def parseShapeKeys(ob, me, args, tokens):
-	if bpy.context.object == None:
-		return
 	for (key, val, sub) in tokens:
 		if key == 'ShapeKey':
 			parseShapeKey(ob, me, val, sub)
@@ -1436,7 +1431,7 @@ def parseShapeKey(ob, me, args, tokens):
 	return
 
 def addShapeKey(ob, name, vgroup, tokens):
-	skey = ob.add_shape_key(name=name, from_mix=False)
+	skey = ob.shape_key_add(name=name, from_mix=False)
 	if name != 'Basis':
 		skey.relative_key = loadedData['ShapeKey']['Basis']
 	skey.name = name
@@ -2145,7 +2140,7 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 			expr = "%s['%s'] = %s" % (var, args[0], args[1])
 		except:
 			expr = None
-		print("Property", expr)
+		# print("Property", expr)
 		if expr:
 			exec(expr, glbals, lcals)
 		return
@@ -2448,7 +2443,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
-		context.window_manager.add_fileselect(self)
+		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
 
 def menu_func(self, context):

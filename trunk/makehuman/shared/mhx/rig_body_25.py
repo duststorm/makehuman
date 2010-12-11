@@ -155,4 +155,19 @@ BodyShapeDrivers = {
 	'BreatheIn' : ('Breathe', 'LOC_Z', ('0', '2.0')), 
 }
 
+#
+#	BodyShapeKeyScale = {
+#
+
+BodyShapeKeyScale = {
+	'BendElbowForward' 	: ('r-shoulder', 'r-hand', 4.705061),
+	'BendKneeBack'		: ('r-upper-leg', 'r-ankle', 8.207247),
+	'BendArmDown'		: ('r-shoulder', 'l-shoulder', 3.388347),
+	'BendArmUp'			: ('r-shoulder', 'l-shoulder', 3.388347),
+	'BendLegForward'	: ('r-upper-leg', 'r-knee', 4.164895),
+	'BendLegBack'		: ('r-upper-leg', 'r-knee', 4.164895),
+	'BendLegOut'		: ('r-upper-leg', 'r-knee', 4.164895),
+	'BreatheIn'			: ('spine1', 'neck', 1.89623),
+}
+
 

@@ -313,10 +313,10 @@ BodyLanguageShapeDrivers = {
 	'LipsPart' : ('PMouthMid', 'LOC_Z', neg),
 
 #
-	'UpMouthCornerHeight_L' : ('PUpLip_L', 'LOC_Z', neg),
-	'LoMouthCornerHeight_L' : ('PLoLip_L', 'LOC_Z', neg),
-	'UpMouthCornerHeight_R' : ('PUpLip_R', 'LOC_Z', neg),
-	'LoMouthCornerHeight_R' : ('PLoLip_R', 'LOC_Z', neg),
+	'UpMouthCornerHeight_L' : ('PUpLip_L', 'LOC_Z', pos),
+	'LoMouthCornerHeight_L' : ('PLoLip_L', 'LOC_Z', pos),
+	'UpMouthCornerHeight_R' : ('PUpLip_R', 'LOC_Z', pos),
+	'LoMouthCornerHeight_R' : ('PLoLip_R', 'LOC_Z', pos),
 
 #	Lips in - out
 	'UpLipsOut' : ('PUpLipMid', 'LOC_X', pos), 
@@ -336,6 +336,65 @@ BodyLanguageTextureDrivers = {
 	'browsSqueeze' : (4, 'PBrows', 'LOC_X', neg),
 	'squint_L' : (5, 'PCheek_L', 'LOC_X', pos),
 	'squint_R' : (6, 'PCheek_R', 'LOC_X', neg),
+}
+
+#
+#	FaceShapeKeyScale
+#
+
+eyeDist = 0.598002
+mouthDist = 0.478831
+tongueDist = 0.283124
+
+FaceShapeKeyScale = {
+	'BrowsDown'			: ('r-eye', 'l-eye', eyeDist),
+	'BrowsMidDown'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsMidUp'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsOutUp'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsSqueeze'		: ('r-eye', 'l-eye', eyeDist),
+	'BrowsMidHeight'	: ('r-eye', 'l-eye', eyeDist),
+	'BrowsOuterHeight'	: ('r-eye', 'l-eye', eyeDist),
+
+	'NoseWrinkle'		: ('r-eye', 'l-eye', eyeDist),
+	'Frown'				: ('r-mouth', 'l-mouth', mouthDist),
+	'Squint'			: ('r-eye', 'l-eye', eyeDist),
+	'CheekUp'			: ('r-mouth', 'l-mouth', mouthDist),
+	'CheekFlex'			: ('r-mouth', 'l-mouth', mouthDist),
+	'CheekBalloon'		: ('r-mouth', 'l-mouth', mouthDist),
+
+	'UpLipUp'			: ('r-mouth', 'l-mouth', mouthDist),
+	'LoLipDown'			: ('r-mouth', 'l-mouth', mouthDist),
+	'UpLipsOut'			: ('r-mouth', 'l-mouth', mouthDist),
+	'LoLipsOut'			: ('r-mouth', 'l-mouth', mouthDist),
+	'UpLipsIn'			: ('r-mouth', 'l-mouth', mouthDist),
+	'LoLipsIn'			: ('r-mouth', 'l-mouth', mouthDist),
+	'UpLipDown'			: ('r-mouth', 'l-mouth', mouthDist),
+	'LoLipUp'			: ('r-mouth', 'l-mouth', mouthDist),
+	'UpLipsMidHeight'	: ('r-mouth', 'l-mouth', mouthDist),
+	'LoLipsMidHeight'	: ('r-mouth', 'l-mouth', mouthDist),
+	'LipsPart'			: ('r-mouth', 'l-mouth', mouthDist),
+
+	'MouthOpen'			: ('r-mouth', 'l-mouth', mouthDist),
+	'MouthCornerDepth'	: ('r-mouth', 'l-mouth', mouthDist),
+	'MouthHeight'		: ('r-mouth', 'l-mouth', mouthDist),
+	'UpMouthCornerHeight'	: ('r-mouth', 'l-mouth', mouthDist),
+	'LoMouthCornerHeight'	: ('r-mouth', 'l-mouth', mouthDist),
+	'MouthWidth'		: ('r-mouth', 'l-mouth', mouthDist),
+	'MouthNarrow'		: ('r-mouth', 'l-mouth', mouthDist),
+
+	'Narrow'			: ('r-mouth', 'l-mouth', mouthDist),
+	'Smile'				: ('r-mouth', 'l-mouth', mouthDist),
+	'Sneer'				: ('r-mouth', 'l-mouth', mouthDist),
+
+	'TongueOut'			: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueUp'			: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueLeft'		: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueRight'		: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueHeight'		: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueDepth'		: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueWidth'		: ('tongue-1', 'tongue-2', tongueDist),
+	'TongueBackHeight'	: ('tongue-1', 'tongue-2', tongueDist),
+
 }
 
 #

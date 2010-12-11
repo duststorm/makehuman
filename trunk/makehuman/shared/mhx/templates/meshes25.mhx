@@ -14866,6 +14866,9 @@ Object HumanMesh MESH HumanMesh
   parent Refer Object Human ;
   parent_type 'OBJECT' ;
   select True ;
+  lock_location Array 1 1 1 ; 
+  lock_rotation Array 1 1 1 ;
+  lock_scale Array 1 1 1  ; 
   Property MhxScale theScale ;
   Property MhxMesh True ;
 end Object

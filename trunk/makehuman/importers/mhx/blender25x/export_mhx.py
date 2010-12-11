@@ -24,7 +24,8 @@ bl_addon_info = {
 	'name': 'Export MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
 	'version': '1.0',
-	'blender': (2, 55, 0),
+	'blender': (2, 5, 5),
+	'api': 33590
 	'location': 'File > Export',
 	'description': 'Export files in the MakeHuman eXchange format (.mhx)',
 	'url': 'http://www.makehuman.org',
@@ -1432,11 +1433,12 @@ BodyKey = {
 	"BendElbowForward" : ("LR", 0, 1),
 	"BendHeadForward" : ("Sym", 0, 1),
 	"BendLegForward" : ("LR", 0, 1),
-	"BendLegBack" : ("LR", 0, 1),
+	"BendLegBack" : ("LR", 0, 1.5),
+	"BendLegOut" : ("LR", 0, 1.5),
 	"BendKneeBack" : ("LR", 0, 1),
 	"BendArmDown" : ("LR", 0, 1),
 	"BendArmUp" : ("LR", 0, 1),
-	"BreatheIn" : ("Sym", 0, 1),
+	"BreatheIn" : ("Sym", 0, 1.5),
 }
 
 def findGroup(ob, name):
@@ -2070,7 +2072,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
-		context.window_manager.add_fileselect(self)
+		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
 
 def register():

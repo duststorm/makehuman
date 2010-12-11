@@ -36,7 +36,8 @@ bl_addon_info = {
 	'name': 'Import MakeHuman hair (.obj)',
 	'author': 'Thomas Larsson',
 	'version': '0.7',
-	'blender': (2, 55, 0),
+	'blender': (2, 5, 5),
+	'api': 33590
 	'location': 'File > Import',
 	'description': 'Import MakeHuman hair file (.obj)',
 	'url': 'http://www.makehuman.org',
@@ -354,7 +355,7 @@ class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
-		context.window_manager.add_fileselect(self)
+		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
 
 def register():

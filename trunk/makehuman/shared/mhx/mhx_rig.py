@@ -19,7 +19,7 @@ Functions shared by all rigs
 
 """
 
-import aljabr, mhxbones
+import aljabr, mhxbones, mh2mhx
 from aljabr import *
 
 PanelWorks = False
@@ -1171,25 +1171,27 @@ def writeTextureDrivers(fp, drivers):
 # 'BrowsMidDown' : [('PBrows', 'LOC_Z', (0,K), 0, fullScale)]
 #
 
-def writeShapeDrivers(fp, drivers):
+def writeShapeDrivers(fp, drivers, proxy):
 	for (shape, vlist) in drivers.items():
-		drvVars = []
-		(targ, channel, coeff) = vlist
-		drvVars.append( (targ, 'TRANSFORMS', [('Human', targ, channel, C_LOC)]) )
-		writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+		if mh2mhx.useThisShape(shape, proxy):
+			drvVars = []
+			(targ, channel, coeff) = vlist
+			drvVars.append( (targ, 'TRANSFORMS', [('Human', targ, channel, C_LOC)]) )
+			writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
 #
-#	writeRotDiffDrivers(fp, drivers):
+#	writeRotDiffDrivers(fp, drivers, proxy):
 #
 
-def writeRotDiffDrivers(fp, drivers):
+def writeRotDiffDrivers(fp, drivers, proxy):
 	for (shape, vlist) in drivers.items():
-		(targ1, targ2, keypoints) = vlist
-		drvVars = [('targ1', 'ROTATION_DIFF', [
-		('Human', targ1, C_LOC),
-		('Human', targ2, C_LOC)] )]
-		writeDriver(fp, 'toggle&T_Shape', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, keypoints, drvVars)
+		if mh2mhx.useThisShape(shape, proxy):
+			(targ1, targ2, keypoints) = vlist
+			drvVars = [('targ1', 'ROTATION_DIFF', [
+			('Human', targ1, C_LOC),
+			('Human', targ2, C_LOC)] )]
+			writeDriver(fp, 'toggle&T_Shape', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, keypoints, drvVars)
 	return
 
 #
