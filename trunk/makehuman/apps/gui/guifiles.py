@@ -115,7 +115,6 @@ class LoadTaskView(gui3d.TaskView):
 
         @self.filechooser.event
         def onFileSelected(filename):
-            print 'Loading %s' % filename
 
             human = self.app.scene3d.selectedHuman
 
