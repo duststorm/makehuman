@@ -537,10 +537,10 @@ def printProxyShape(fp, shapes):
 			dy += dy0
 			dz += dz0
 		else:
-			if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
+			if (pv >= 0 and aljabr.vlen([dx,dy,dz]) > 0):
 				fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
 			(pv, dx, dy, dz) = (pv0, dx0, dy0, dz0)		
-	if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
+	if (pv >= 0 and aljabr.vlen([dx,dy,dz]) > 0):
 		fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
 	return
 

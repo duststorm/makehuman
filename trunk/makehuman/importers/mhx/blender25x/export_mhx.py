@@ -25,7 +25,7 @@ bl_addon_info = {
 	'author': 'Thomas Larsson',
 	'version': '1.0',
 	'blender': (2, 5, 5),
-	'api': 33590
+	'api': 33590,
 	'location': 'File > Export',
 	'description': 'Export files in the MakeHuman eXchange format (.mhx)',
 	'url': 'http://www.makehuman.org',
@@ -1708,6 +1708,7 @@ def exportModifier(mod, fp):
 def exportDefaultObject(ob,fp):
 	data = ob.data
 	obtype = ob.type.capitalize()
+
 	fp.write("%s %s \n" % (obtype, data.name.replace(' ', '_')))
 	writeDir(data, [], "  ", fp)
 	fp.write("end %s\n" % obtype)

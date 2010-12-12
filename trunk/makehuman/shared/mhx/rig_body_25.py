@@ -34,6 +34,15 @@ BodyJoints = [
 	('stomach-front',		'v', 7313),
 	('stomach-back',		'v', 7472),
 
+	('penis-tip',			'v', 7415),
+	('r-penis',				'v', 2792),
+	('l-penis',				'v', 7448),
+	('penis-root',			'l', ((0.5, 'r-penis'), (0.5, 'l-penis'))),
+	('scrotum-tip',			'v', 7444),
+	('r-scrotum',			'v', 2807),
+	('l-scrotum',			'v', 7425),
+	('scrotum-root',		'l', ((0.5, 'r-scrotum'), (0.5, 'l-scrotum'))),
+
 	('r-toe-1-1',			'j', 'r-toe-1-1'),
 	('l-toe-1-1',			'j', 'l-toe-1-1'),
 	('mid-feet',			'l', ((0.5, 'l-toe-1-1'), (0.5, 'r-toe-1-1'))),
@@ -49,7 +58,7 @@ BodyHeadsTails = [
 	('Hips',				'pelvis', 'hips-tail'),
 	('Hip_L',				'spine3', 'r-upper-leg'),
 	('Hip_R',				'spine3', 'l-upper-leg'),
-	
+
 	('Spine1',				'spine3', 'spine2'),
 	('Spine2',				'spine2', 'spine1'),
 	('Spine3',				'spine1', 'neck'),
@@ -63,6 +72,9 @@ BodyHeadsTails = [
 	('Breathe',				'mid-rib-bot', ('mid-rib-bot', zunit)),
 	('Breast_L',			'r-tit', ('r-tit', zunit)),
 	('Breast_R',			'l-tit', ('l-tit', zunit)),
+
+	('Penis',				'penis-root', 'penis-tip'),
+	('Scrotum',				'scrotum-root', 'scrotum-tip'),
 ]
 
 BodyArmature = [
@@ -88,6 +100,9 @@ BodyArmature = [
 	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
 	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
 	('StomachTarget',	0, 'Spine1', F_WIR, L_TORSO, (1,1,1) ),
+
+	('Penis',			0.0, 'Hips', F_DEF, L_DEF+L_TORSO, (1,5,1) ),
+	('Scrotum',			0.0, 'Hips', F_DEF, L_DEF+L_TORSO, (1,1,1) ),
 ]
 
 #
@@ -144,6 +159,11 @@ def BodyWritePoses(fp):
 	addPoseBone(fp,  'Breast_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp,  'Breast_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+
+	addPoseBone(fp,  'Penis', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
+
+	addPoseBone(fp,  'Scrotum', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
+
 	return
 
 #
