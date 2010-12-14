@@ -211,11 +211,11 @@ ArmArmature = [
 #
 #
 
-limShoulder_L = (-deg45,deg90, -deg30,deg30,  -deg30,deg30)
-limShoulder_R = (-deg45,deg90,  -deg30,deg30,  -deg30,deg30)
+limShoulder_L = (-deg30,deg90, -deg30,deg30,  -deg30,deg30)
+limShoulder_R = (-deg30,deg90,  -deg30,deg30,  -deg30,deg30)
 
-limUpArm_L = (-deg120,deg120, -100*deg1,deg45, -deg90,deg45)
-limUpArm_R = (-deg120,deg120, -deg45,100*deg1, -deg45,deg90)
+limUpArm_L = (-deg120,deg90, -100*deg1,deg45, -deg90,deg45)
+limUpArm_R = (-deg120,deg90, -deg45,100*deg1, -deg45,deg90)
 
 limLoArm_L = (0,0, -deg180,deg45, -135*deg1,0)
 limLoArm_R = (0,0, -deg45,deg180, 0,135*deg1)
@@ -423,10 +423,10 @@ ArmDrivers = [
 #
 
 ArmShapeDrivers = {
-	'BendArmDown_L' : ( 'UpArmDwn_L', 'BendArmDown_L',  [(0,1.5), (deg30,1), (deg90,0)] ),
-	'BendArmDown_R' : ( 'UpArmDwn_R', 'BendArmDown_R',  [(0,1.5), (deg30,1), (deg90,0)] ),
-	'BendArmUp_L' : ( 'UpArmDwn_L', 'BendArmUp_L',  [(0,1.5), (deg30,1), (deg90,0)] ),
-	'BendArmUp_R' : ( 'UpArmDwn_R', 'BendArmUp_R',  [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendArmDown_L' : ( 'UpArmUp_L', 'BendArmDown_L',  [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendArmDown_R' : ( 'UpArmUp_R', 'BendArmDown_R',  [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendArmUp_L' : ( 'UpArmUp_L', 'BendArmUp_L',  [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendArmUp_R' : ( 'UpArmUp_R', 'BendArmUp_R',  [(0,1.5), (deg30,1), (deg90,0)] ),
 }
 
 #

@@ -355,13 +355,13 @@ LegDrivers = [
 #
 
 LegShapeDrivers = {
-	'BendLegForward_L' : ( 'UpLegDwn_L', 'BendLegForward_L', [(0,1), (deg30,1), (deg90,0)] ),
-	'BendLegBack_L' : ( 'UpLegDwn_L', 'BendLegBack_L', [(0,1.5), (deg30,1), (deg90,0)] ),
-	'BendLegOut_L' : ( 'UpLegDwn_L', 'BendLegOut_L', [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendLegForward_L' : ( 'UpLegUp_L', 'BendLegForward_L', [(0,0), (15*deg1,1), (deg90,0)] ),
+	'BendLegBack_L' : ( 'UpLegUp_L', 'BendLegBack_L', [(0,1), (deg90,0)] ),
+	'BendLegOut_L' : ( 'UpLegUp_L', 'BendLegOut_L', [(0,1), (deg90,0)] ),
 
-	'BendLegForward_R' : ( 'UpLegDwn_R', 'BendLegForward_R', [(0,1), (deg30,1), (deg90,0)] ),
-	'BendLegBack_R' : ( 'UpLegDwn_R', 'BendLegBack_R', [(0,1.5), (deg30,1), (deg90,0)] ),
-	'BendLegOut_R' : ( 'UpLegDwn_R', 'BendLegOut_R', [(0,1.5), (deg30,1), (deg90,0)] ),
+	'BendLegForward_R' : ( 'UpLegUp_R', 'BendLegForward_R', [(0,0), (15*deg1,1), (deg90,0)] ),
+	'BendLegBack_R' : ( 'UpLegUp_R', 'BendLegBack_R', [(0,1), (deg90,0)] ),
+	'BendLegOut_R' : ( 'UpLegUp_R', 'BendLegOut_R', [(0,1), (deg90,0)] ),
 }
 #
 #	LegProcess

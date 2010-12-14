@@ -142,7 +142,7 @@ def BodyWritePoses(fp):
 
 	# Stomach
 	addPoseBone(fp,  'StomachTarget', 'MHCube01', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
-		[('LimitDist', 0, 1, ['LimitDist', 1, 'Rib'])])
+		[('LimitDist', 0, 1, ['LimitDist', 'Spine1', 'Rib'])])
 
 	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
 		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0]),

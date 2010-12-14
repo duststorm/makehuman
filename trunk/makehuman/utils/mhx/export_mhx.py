@@ -1350,8 +1350,8 @@ def exportVertexGroups(ob, me, typ, fp):
 			fp.write("  VertexGroup %s\n" % (vgName))
 			for v in me.vertices:
 				for grp in v.groups:
-					if grp.group == index and grp.weight > 0.00005:
-						fp.write("    wv %d %.4g ;\n" % (v.index, grp.weight))
+					if grp.group == index and grp.weight > 0.005:
+						fp.write("    wv %d %.3f ;\n" % (v.index, grp.weight))
 						if doToe:
 							addToeWeight(toeDict, v.index, grp.weight)
 							
