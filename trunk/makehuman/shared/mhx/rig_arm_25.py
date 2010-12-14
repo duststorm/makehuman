@@ -10,12 +10,16 @@ ArmJoints = [
 	('r-shoulder-head',		'l', ((0.7, 'r-shoulder'), (0.3, 'l-shoulder'))),
 	('r-loarm-mid',			'l', ((0.5, 'r-hand'), (0.5, 'r-elbow'))),
 	('r-loarm-fan',			'l', ((0.25, 'r-hand'), (0.75, 'r-elbow'))),
-	('r-shoulder-bump',		'v', 5878),
+	('r-uparm-025',			'l', ((0.75, 'r-shoulder'), (0.25, 'r-elbow'))),
+
 	('r-clavicle-back',		'v', 2583),
 	('r-clavicle-end',		'v', 2879),
 	('r-pectoralis',		'v', 3341),
-	('r-uparm-025',			'l', ((0.75, 'r-shoulder'), (0.25, 'r-elbow'))),
-	('r-dorsal',			'v', 2619),
+	('r-trapezeus',			'v', 2607),
+	('r-latdorsi',			'v', 4432),
+
+	('r-shoulder-fan-head',	'v', 2859),
+	('r-shoulder-fan-tail',	'v', 3014),
 
 	('r-scapula-root',		'l', ((0.2, 'r-clavicle'), (0.8, 'r-clavicle-back'))),
 	('r-scapula-top',		'v', 3048),
@@ -31,12 +35,16 @@ ArmJoints = [
 	('l-shoulder-head',		'l', ((0.7, 'l-shoulder'), (0.3, 'r-shoulder'))),
 	('l-loarm-mid',			'l', ((0.5, 'l-hand'), (0.5, 'l-elbow'))),
 	('l-loarm-fan',			'l', ((0.25, 'l-hand'), (0.75, 'l-elbow'))),
-	('l-shoulder-bump',		'v', 9663),
+	('l-uparm-025',			'l', ((0.75, 'l-shoulder'), (0.25, 'l-elbow'))),
+
 	('l-clavicle-back',		'v', 11025),
 	('l-clavicle-end',		'v', 10795),
 	('l-pectoralis',		'v', 10410),
-	('l-uparm-025',			'l', ((0.75, 'l-shoulder'), (0.25, 'l-elbow'))),
-	('l-dorsal',			'v', 10991),
+	('l-trapezeus',			'v', 11003),
+	('l-latdorsi',			'v', 9995),
+
+	('l-shoulder-fan-head',	'v', 10815),
+	('l-shoulder-fan-tail',	'v', 10712),
 
 	('l-bicep-start',		'v', 10321),
 	('l-bicep-end',			'v', 10739),
@@ -47,33 +55,32 @@ ArmJoints = [
 
 	('r-elbow-pt',			'o', ('r-elbow', [0,0,-3])),
 	('l-elbow-pt',			'o', ('l-elbow', [0,0,-3])),
-
 ]
 
 ArmHeadsTails = [
 	# Shoulder
 	('Shoulder_L',			'r-shoulder-head', 'r-shoulder'),
-	('Clavicle_L',			'r-clavicle', 'r-clavicle-end'),
-	('ShoulderBump_L',		'r-shoulder-bump', ('r-shoulder-bump', yunit)),
+	('Clavicle_L',			'r-clavicle', 'r-shoulder'),
+	('Pectoralis_L',		'r-pectoralis', 'r-uparm-025'),
+	('Trapezeus_L',			'r-trapezeus', 'r-shoulder'),
+	('LatDorsi_L',			'r-latdorsi', 'r-uparm-025'),
+	('ShoulderFan_L',		'r-shoulder-fan-head', 'r-shoulder-fan-tail'),
 
 	('Shoulder_R',			'l-shoulder-head', 'l-shoulder'),
-	('Clavicle_R',			'l-clavicle', 'l-clavicle-end'),
-	('ShoulderBump_R',		'l-shoulder-bump', ('l-shoulder-bump', yunit)),
+	('Clavicle_R',			'l-clavicle', 'l-shoulder'),
+	('Pectoralis_R',		'l-pectoralis', 'l-uparm-025'),
+	('Trapezeus_R',			'l-trapezeus', 'l-shoulder'),
+	('LatDorsi_R',			'l-latdorsi', 'l-uparm-025'),
+	('ShoulderFan_R',		'l-shoulder-fan-head', 'l-shoulder-fan-tail'),
 
 	# Scapula
 	('Scapula_L',			'r-scapula-top', 'r-scapula-bot'),
 	('Scapula_R',			'l-scapula-top', 'l-scapula-bot'),
 
-	# Pectoralis
-	('Pectoralis_L',		'r-pectoralis', 'r-uparm-025'),
-	#('PectoralisTarget_L',	'r-uparm-025', ('r-uparm-025', yunit)),
-	('Pectoralis_R',		'l-pectoralis', 'l-uparm-025'),
-	#('PectoralisTarget_R',	'l-uparm-025', ('l-uparm-025', yunit)),
-
 	# Deform
-	('UpArmUp_L',				'r-shoulder', 'r-uparm-025'),
-	('UpArmDwn_L',				'r-shoulder', 'r-elbow'),
-	('LoArmUp_L',		'r-elbow', 'r-loarm-mid'),
+	('UpArmUp_L',			'r-shoulder', 'r-uparm-025'),
+	('UpArmDwn_L',			'r-shoulder', 'r-elbow'),
+	('LoArmUp_L',			'r-elbow', 'r-loarm-mid'),
 	('LoArmFan_L',			'r-elbow', 'r-loarm-fan'),
 	('LoArmDwn_L',				'r-elbow', 'r-hand'),
 	('Hand_L',				'r-hand', 'hand_L_tail'),
@@ -135,12 +142,18 @@ L_SHOULDER = L_ARMFK+L_ARMIK+L_SPINE
 ArmArmature = [
 	# Shoulder
 	('Shoulder_L',			0.0, 'Spine3', F_DEF+F_WIR, L_SHOULDER+L_DEF, (1,1,1) ),
-	#('Clavicle_L',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
-	#('ShoulderBump_L',		0.0, 'Shoulder_L', F_DEF+F_WIR, L_SHOULDER+L_DEF, (1,1,1) ),
+	('Clavicle_L',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
+	('Pectoralis_L',		0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
+	('Trapezeus_L',			0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
+	('LatDorsi_L',			0.0, 'Spine1', F_DEF, L_DEF, (1,1,1) ),
+	('ShoulderFan_L',		0.0, 'Shoulder_L', F_DEF, L_DEF, (1,1,1) ),
 
 	('Shoulder_R',			0.0, 'Spine3', F_DEF+F_WIR, L_SHOULDER+L_DEF, (1,1,1) ),
-	#('Clavicle_R',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
-	#('ShoulderBump_R',		0.0, 'Shoulder_R', F_DEF+F_WIR, L_SHOULDER+L_DEF, (1,1,1) ),
+	('Clavicle_R',			0.0, 'Spine3', F_DEF, L_DEF, (1,1,1) ),
+	('Pectoralis_R',		0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
+	('Trapezeus_R',			0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
+	('LatDorsi_R',			0.0, 'Spine1', F_DEF, L_DEF, (1,1,1) ),
+	('ShoulderFan_R',		0.0, 'Shoulder_R', F_DEF, L_DEF, (1,1,1) ),
 
 	# Scapula
 	#('Scapula_L',		0.0, 'Shoulder_L', F_DEF, L_DEF, (1,1,1) ),
@@ -166,15 +179,6 @@ ArmArmature = [
 	#('BicepTarget_L',	0.0, 'UpArm_L', 0, L_HELP, (1,1,1) ),
 	#('Bicep_R',			upArmRoll, 'UpArm_R', F_DEF, L_DEF, (1,1,1) ),
 	#('BicepTarget_R',	0.0, 'UpArm_R', 0, L_HELP, (1,1,1) ),
-
-	# Pectoralis & BackArm
-	('Pectoralis_L',		0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
-	#('PectoralisTarget_L',	0.0, 'UpArm_L', 0, L_HELP, (1,1,1) ),
-	#('BackArm_L',			0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
-
-	('Pectoralis_R',		0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
-	#('PectoralisTarget_R',	0.0, 'UpArm_R', 0, L_HELP, (1,1,1) ),
-	#('BackArm_R',			0.0, 'Spine2', F_DEF, L_DEF, (1,1,1) ),
 
 	# Rotation diffs
 	('BendArmDown_L',		deg90, 'Shoulder_L', 0, L_HELP, (1,1,1)),
@@ -228,30 +232,44 @@ def ArmWritePoses(fp):
 	addPoseBone(fp, 'Shoulder_L', 'GoboShldr_L', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)])])
 
+	addPoseBone(fp, 'ShoulderFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('Transform', C_LOCAL, 0.5, ['Transform', 'UpArmDwn_L',
+			'ROTATION', (0,0,-90), (90,0,90), ('X', 'Y', 'Z'),
+			'ROTATION', (0,0,-90), (90,0,90)])])
 
-	addPoseBone(fp, 'Shoulder_R', 'GoboShldr_R', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
-
-	'''
 	addPoseBone(fp, 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'UpArm_L', 'PLANE_X', 0])])
-
-	addPoseBone(fp, 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'UpArm_R', 'PLANE_X', 0])])
-
-	addPoseBone(fp, 'ShoulderBump_L', 'MHCube01', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitDist', 0, 0.5, ['LimitDist', 'Shoulder_L'])])
-
-	addPoseBone(fp, 'ShoulderBump_R', 'MHCube01', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('LimitDist', 0, 0.5, ['LimitDist', 'Shoulder_R'])])
-	'''
-	# Pectoralis & BackArm
+		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_L', 'PLANE_X', 0])])
 
 	addPoseBone(fp, 'Pectoralis_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
 		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_L', 'PLANE_X', 1])])
 
+	addPoseBone(fp, 'LatDorsi_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_L', 'PLANE_X', 1])])
+
+	addPoseBone(fp, 'Trapezeus_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_L', 'PLANE_X', 0])])
+
+
+	addPoseBone(fp, 'Shoulder_R', 'GoboShldr_R', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
+
+	addPoseBone(fp, 'ShoulderFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+		[('Transform', C_LOCAL, 0.5, ['Transform', 'UpArmDwn_R',
+			'ROTATION', (0,0,-90), (90,0,90), ('X', 'Y', 'Z'),
+			'ROTATION', (0,0,-90), (90,0,90)])])
+
+	addPoseBone(fp, 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_R', 'PLANE_X', 0])])
+
 	addPoseBone(fp, 'Pectoralis_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
 		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_R', 'PLANE_X', 1])])
+
+	addPoseBone(fp, 'LatDorsi_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_R', 'PLANE_X', 1])])
+
+	addPoseBone(fp, 'Trapezeus_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'UpArmUp_R', 'PLANE_X', 0])])
+
 	'''
 	# Scapula
 	addPoseBone(fp, 'Scapula_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
