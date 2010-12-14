@@ -405,15 +405,40 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     }
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
-#ifdef CSIDL_MYDOCUMENTS
-        HRESULT hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
-#else
-        HRESULT hr = SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, path);
-#endif
-        if (FAILED(hr))
+      typedef HMODULE  (__stdcall *SHGETFOLDERPATH)(HWND, int, HANDLE, DWORD, LPWSTR);        
+      HMODULE hModule = LoadLibrary("SHFOLDER.DLL");
+      if (hModule != NULL)
+      {
+        SHGETFOLDERPATH fnShGetFolderPath;
+        if (WINVER > 0x0501) //vista and above
         {
-            path[0] = '\0';
+          fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetKnownFolderPathW");
         }
+        else //xp and below
+        {
+          fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetFolderPathW");
+        }
+		//maybe its XP and below...
+        if (fnShGetFolderPath == NULL)
+        {  
+          SHGETFOLDERPATH fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetFolderPathW");
+        }
+
+        if (fnShGetFolderPath != NULL)
+        {
+    #ifdef CSIDL_MYDOCUMENTS
+          HRESULT hr = fnShGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+    #else
+          HRESULT hr = fnShGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path);
+    #endif
+
+          if (FAILED(hr))
+          {
+            path[0] = '\0';
+          }
+        }
+        FreeLibrary(hModule);
+      }
 
         if (0 == strcmp(typeStr, "exports"))
         {
