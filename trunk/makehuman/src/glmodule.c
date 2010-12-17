@@ -1620,6 +1620,9 @@ void mhDrawMeshes(int pickMode, int cameraType)
                     glDisable(GL_LIGHTING);
                 }
 
+                if (!obj->isSolid && !pickMode)
+                  glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
+
                 // Enable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && obj->shader)
                 {
@@ -1782,6 +1785,9 @@ void mhDrawMeshes(int pickMode, int cameraType)
 
                 /*draw the mesh*/
                 glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
+
+                if (!obj->isSolid && !pickMode)
+                  glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && obj->shader)

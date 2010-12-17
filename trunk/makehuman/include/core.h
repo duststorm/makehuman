@@ -61,6 +61,8 @@ extern "C"
         /**<        An int defining whether this object uses the Movable or Fixed camera mode.  */
         int isPickable;             /**< \brief Whether this object can be picked.                                          */
         /**<        An int defining whether this object can be picked.                          */
+        int isSolid;                /**< \brief Whether this object is solid or wireframe.                                  */
+        /**<        An int defining whether this object is solid or wireframe.                          */
         float x, y, z;              /**< \brief Tthe object location.                                                       */
         /**<        Array of 3 floats defining the object location (x,y,z).                     */
         float rx, ry, rz;           /**< \brief The object orientation.                                                     */

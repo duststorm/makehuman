@@ -603,6 +603,7 @@ class Object3D:
         self.isSelected = None
         self.faceGroupSelected = None
         self.shadeless = 0
+        self.solid = 1
         self.isSubdivided = None
         self.indexBuffer = []
         self.vertexBufferSize = None
@@ -854,6 +855,13 @@ class Object3D:
         self.shadeless = shadeless
         try:
             self.object3d.shadeless = self.shadeless
+        except AttributeError, text:
+            pass
+            
+    def setSolid(self, solid):
+        self.solid = solid
+        try:
+            self.object3d.solid = self.solid
         except AttributeError, text:
             pass
 
@@ -1237,6 +1245,7 @@ class Scene3D:
         obj.object3d.visibility = obj.visibility
         obj.object3d.shadeless = obj.shadeless
         obj.object3d.pickable = obj.pickable
+        obj.object3d.solid = obj.solid
         obj.object3d.cameraMode = obj.cameraMode
 
         # TODO add all obj attributes
@@ -1875,6 +1884,7 @@ def drawQuad(scn, verts, name='quad', position=[0.0, 0.0, 0.0]):
     obj.visibility = 1
     obj.shadeless = 0
     obj.pickable = 0
+    obj.solid = 1
     obj.cameraMode = 0
 
   # obj.uvValues = []

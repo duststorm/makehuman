@@ -61,6 +61,7 @@ static PyMemberDef Object3D_members[] =
     {"visibility", T_INT, offsetof(Object3D, isVisible), 0, "Whether this object is currently visible or not."},
     {"cameraMode", T_INT, offsetof(Object3D, inMovableCamera), 0, "Whether this object uses the Movable or Fixed camera mode."},
     {"pickable", T_INT, offsetof(Object3D, isPickable), 0, "Whether this object can be picked."},
+    {"solid", T_INT, offsetof(Object3D, isSolid), 0, "Whether this object is solid or wireframe."},
     {NULL}  /* Sentinel */
 };
 
@@ -192,6 +193,7 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->isVisible = 1;
         self->inMovableCamera = 1;
         self->isPickable = 1;
+        self->isSolid = 1;
 
         self->x = 0.0;
         self->y = 0.0;

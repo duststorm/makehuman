@@ -307,6 +307,12 @@ class MHApplication(gui3d.Application):
             g.setColor(color)
 
           self.app.scene3d.redraw()
+      elif event.key == events3d.SDLK_f:
+          if self.scene3d.selectedHuman.mesh.solid:
+              self.scene3d.selectedHuman.mesh.setSolid(0)
+          else:
+              self.scene3d.selectedHuman.mesh.setSolid(1)
+          self.app.scene3d.redraw()
 
   def do(self, action):
     if action.do():
