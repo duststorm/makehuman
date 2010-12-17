@@ -1590,7 +1590,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 glRotatef(obj->rz, 0, 0, 1);
                 glScalef(obj->sx, obj->sy, obj->sz);
 
-                if (obj->texture && !pickMode)
+                if (obj->texture && !pickMode && obj->isSolid)
                 {
                     glEnable(GL_TEXTURE_2D);
                     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1615,16 +1615,13 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 }
 
                 /*Disable lighting if the object is shadeless*/
-                if (obj->shadeless || pickMode)
+                if (obj->shadeless || pickMode || !obj->isSolid)
                 {
                     glDisable(GL_LIGHTING);
                 }
 
-                if (!obj->isSolid && !pickMode)
-                  glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
-
                 // Enable the shader if the driver supports it and there is a shader assigned
-                if (!pickMode && obj->shader)
+                if (!pickMode && obj->shader && obj->isSolid)
                 {
                   if (GLEW_VERSION_2_0)
                   {
@@ -1784,13 +1781,24 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 }
 
                 /*draw the mesh*/
-                glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
-
                 if (!obj->isSolid && !pickMode)
+                {
+                  glDisableClientState(GL_COLOR_ARRAY);
+                  glColor3f(0.0f, 0.0f, 0.0f);
+                  glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
+                  glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
+                  glEnableClientState(GL_COLOR_ARRAY);
                   glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
+                  glEnable(GL_POLYGON_OFFSET_FILL);
+                  glPolygonOffset(1.0, 1.0);
+                  glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
+                  glDisable(GL_POLYGON_OFFSET_FILL);
+                }
+                else
+                  glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
-                if (!pickMode && obj->shader)
+                if (!pickMode && obj->shader && obj->isSolid)
                 {
                     if (GLEW_VERSION_2_0)
                       glUseProgram(0);
@@ -1800,12 +1808,12 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 }
 
                 /*Enable lighting if the object was shadeless*/
-                if (obj->shadeless || pickMode)
+                if (obj->shadeless || pickMode || !obj->isSolid)
                 {
                     glEnable(GL_LIGHTING);
                 }
 
-                if (obj->texture && !pickMode)
+                if (obj->texture && !pickMode && obj->isSolid)
                 {
                     glDisable(GL_TEXTURE_2D);
                     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
