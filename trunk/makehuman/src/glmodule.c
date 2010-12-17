@@ -1615,7 +1615,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 }
 
                 /*Disable lighting if the object is shadeless*/
-                if (obj->shadeless || pickMode || !obj->isSolid)
+                if (obj->shadeless || pickMode)
                 {
                     glDisable(GL_LIGHTING);
                 }
@@ -1808,7 +1808,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 }
 
                 /*Enable lighting if the object was shadeless*/
-                if (obj->shadeless || pickMode || !obj->isSolid)
+                if (obj->shadeless || pickMode)
                 {
                     glEnable(GL_LIGHTING);
                 }
