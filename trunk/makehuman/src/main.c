@@ -439,6 +439,8 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         }
         FreeLibrary(hModule);
       }
+      else
+        SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
 
         if (0 == strcmp(typeStr, "exports"))
         {
