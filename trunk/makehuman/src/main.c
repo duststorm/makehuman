@@ -406,7 +406,13 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
       typedef HMODULE  (__stdcall *SHGETFOLDERPATH)(HWND, int, HANDLE, DWORD, LPWSTR);        
-      HMODULE hModule = LoadLibrary("SHFOLDER.DLL");
+      HMODULE hModule; 
+      
+      if (WINVER > 0x0500) //winxp and above
+        hModule = LoadLibrary("SHELL32.DLL");
+      else //win2k and below (though theoretically we dont support win2k and below)
+        hModule = LoadLibrary("SHFOLDER.DLL");
+      
       if (hModule != NULL)
       {
         SHGETFOLDERPATH fnShGetFolderPath;
@@ -434,8 +440,6 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         }
         FreeLibrary(hModule);
       }
-      else
-        SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
 
         if (0 == strcmp(typeStr, "exports"))
         {
