@@ -153,6 +153,11 @@ def newSetupJoints (obj, joints, headTails):
 			pass
 		elif typ == 'x':
 			pass
+		elif typ == 'X':
+			r = locations[data[0]]
+			(x,y,z) = data[1]
+			r1 = [float(x), float(y), float(z)]
+			locations[key] = aljabr.vcross(r, r1)
 		elif typ == 'l':
 			((k1, joint1), (k2, joint2)) = data
 			locations[key] = vadd(vmul(locations[joint1], k1), vmul(locations[joint2], k2))
@@ -409,6 +414,14 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 		]		
 	(fX,fY,fZ) = fkRot
 	addPoseBone(fp, bone, None, None, (1,1,1), (1-fX,1-fY,1-fZ), (0,0,0), (1,1,1), 0, constraints)
+	return
+
+def addStretchBone(fp, bone, target, parent):
+	addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+		[('StretchTo', 0, 1, ['Stretch', target, 'PLANE_X', 0]),
+ 		 ('LimitScale', C_OW_LOCAL, 0, ['LimitScale', (0,0, 0,0, 0,0), (0,1,0)])])
+	#addPoseBone(fp, target, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+ 	#	[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg90,deg90, 0,0, -deg90,deg90), (1,1,1)])])
 	return
 
 def addCSlider(fp, bone, mx):
@@ -1181,6 +1194,24 @@ def writeShapeDrivers(fp, drivers, proxy):
 	return
 
 #
+#	writeDeformDrivers(fp, drivers):
+# 	("LegForward_L", "StretchTo", expr, [("f", "UpLegDwn_L", "BendLegForward_L")], [(0,1), (deg30,1), (deg45,0)])
+#
+
+def writeDeformDrivers(fp, drivers):
+	for (bone, cnsName, expr, targs, keypoints)  in drivers:
+		drvVars = []
+		if expr:
+			drvdata = ('SCRIPTED', expr)
+		else:
+			drvdata = 'MIN'
+		for (var, targ1, targ2) in targs:
+			drvVars.append( (var, 'ROTATION_DIFF', [('Human', targ1, C_LOC), ('Human', targ2, C_LOC)]) )
+		writeDriver(fp, True, drvdata, "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, keypoints, drvVars)
+	return
+
+
+#
 #	writeRotDiffDrivers(fp, drivers, proxy):
 #
 
@@ -1188,10 +1219,10 @@ def writeRotDiffDrivers(fp, drivers, proxy):
 	for (shape, vlist) in drivers.items():
 		if mh2mhx.useThisShape(shape, proxy):
 			(targ1, targ2, keypoints) = vlist
-			drvVars = [('targ1', 'ROTATION_DIFF', [
+			drvVars = [(targ2, 'ROTATION_DIFF', [
 			('Human', targ1, C_LOC),
 			('Human', targ2, C_LOC)] )]
-			writeDriver(fp, 'toggle&T_Shape', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, keypoints, drvVars)
+			writeDriver(fp, True, 'MIN', "", "keys[\"%s\"].value" % (shape), -1, keypoints, drvVars)
 	return
 
 #
@@ -1366,8 +1397,10 @@ def writeAllActions(fp):
 	return
 
 def writeAllDrivers(fp):
-	writeFkIkSwitch(fp, rig_arm_25.ArmDrivers)
-	writeFkIkSwitch(fp, rig_leg_25.LegDrivers)
+	writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
+	writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
+	writeDeformDrivers(fp, rig_arm_25.ArmDeformDrivers)
+	writeDeformDrivers(fp, rig_leg_25.LegDeformDrivers)
 	rig_panel_25.FingerWriteDrivers(fp)
 	rig_face_25.FaceWriteDrivers(fp)
 	return

@@ -28,11 +28,13 @@ DeformJoints = [
 	# Arms
 	('r-clavicle',			'j', 'r-clavicle'),
 	('r-shoulder',			'j', 'r-shoulder'),
+	('r-scapula',			'j', 'r-scapula'),
 	('r-elbow',			'j', 'r-elbow'),
 	('r-hand',			'j', 'r-hand'),
 
 	('l-clavicle',			'j', 'l-clavicle'),
 	('l-shoulder',			'j', 'l-shoulder'),
+	('l-scapula',			'j', 'l-scapula'),
 	('l-elbow',			'j', 'l-elbow'),
 	('l-hand',			'j', 'l-hand'),
 

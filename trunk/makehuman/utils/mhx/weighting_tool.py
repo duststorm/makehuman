@@ -278,6 +278,52 @@ class OBJECT_OT_SymmetrizeShapesButton(bpy.types.Operator):
 		print("Shapes symmetrized, %d vertices" % n)
 		return{'FINISHED'}	
 
+#
+#	recoverDiamonds(context):
+#	class OBJECT_OT_RecoverDiamondsButton(bpy.types.Operator):
+#
+
+def recoverDiamonds(context):
+	dob = context.scene.objects['DiamondMesh']
+	dverts = dob.data.vertices
+	ob = context.object
+	verts = ob.data.vertices
+	Epsilon = 1e-4
+
+	context.scene.objects.active = dob
+	bpy.ops.object.vertex_group_remove(all=True)
+
+	vassoc = {}
+	dn = 0
+	for v in verts:
+		vec = dverts[dn].co - v.co
+		while vec.length > Epsilon:
+			dn += 1
+			vec = dverts[dn].co - v.co
+		vassoc[v.index] = dn
+
+	for grp in ob.vertex_groups:
+		group = dob.vertex_groups.new(grp.name)
+		index = group.index
+		for v in verts:	
+			for vgrp in v.groups:
+				if vgrp.group == index:
+					dn = vassoc[v.index]
+					dob.vertex_groups.assign( [dn], group, vgrp.weight, 'REPLACE' )
+					continue
+
+	print("Diamonds recovered")
+	return
+	
+
+class OBJECT_OT_RecoverDiamondsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_RecoverDiamondsButton"
+	bl_label = "Recover diamonds"
+
+	def execute(self, context):
+		recoverDiamonds(context)
+		return{'FINISHED'}	
+
 
 #
 #	initInterface(context):
@@ -342,6 +388,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 		layout.operator("object.PrintVnumsButton")
 		layout.operator("object.SelectQuadsButton")
 		layout.operator("object.UnvertexDiamondsButton")
+		layout.operator("object.RecoverDiamondsButton")
 
 		layout.separator()
 		layout.prop(context.scene, 'MhxLeft2Right')
