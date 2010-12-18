@@ -418,11 +418,6 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         {
           fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetFolderPathW");
         }
-		//maybe its XP and below...
-        if (fnShGetFolderPath == NULL)
-        {  
-          SHGETFOLDERPATH fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetFolderPathW");
-        }
 
         if (fnShGetFolderPath != NULL)
         {
