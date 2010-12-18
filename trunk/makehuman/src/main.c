@@ -11,7 +11,7 @@
  <tr><td>Authors:                                        </td>
      <td>Manuel Bastioni, Paolo Colombo, Simone Re, Hans-Peter Dusel</td></tr>
  <tr><td>Copyright(c):                                   </td>
-     <td>MakeHuman Team 2001-2008                        </td></tr>
+     <td>MakeHuman Team 2001-2011                        </td></tr>
  <tr><td>Licensing:                                      </td>
      <td>GPL3 (see also
          http://makehuman.wiki.sourceforge.net/Licensing)</td></tr>
@@ -50,6 +50,15 @@
 #include <shlobj.h>
 #endif // __WIN32__
 
+
+OSVERSIONINFO winVersion(void)
+{
+   OSVERSIONINFO osvi;
+   ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+   osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+   return osvi;
+}
+
 /* Our global struct - all globals must be here */
 Global G;
 
@@ -59,6 +68,7 @@ Global G;
  *  the initial view of the Humanoid figure that the MakeHuman application
  *  manipulates (e.g. Field of View, Window Dimensions, Rotation Settings etc.).
  */
+
 static void initGlobals(void)
 {
     // Objects
@@ -364,6 +374,7 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
  */
 static PyObject* mh_getPath(PyObject *self, PyObject *type)
 {
+
 #ifdef __APPLE__
     const char *path = NULL;
 #else
@@ -405,18 +416,24 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     }
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
-      typedef HMODULE  (__stdcall *SHGETFOLDERPATH)(HWND, int, HANDLE, DWORD, LPWSTR);        
+    
+      
+      typedef HMODULE  (__stdcall *SHGETFOLDERPATH)(HWND, int, HANDLE, DWORD, LPWSTR);
       HMODULE hModule; 
       
-      if (WINVER > 0x0500) //winxp and above
-        hModule = LoadLibrary("SHELL32.DLL");
+      OSVERSIONINFO osvi = winVersion();
+      BOOL WinXPorLater = ((osvi.dwMajorVersion > 5) || ((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion >= 1)));
+      BOOL WinVistaOrLater = (osvi.dwMajorVersion >= 6);
+      
+      if (WinXPorLater) //winxp and above
+        hModule = LoadLibrary(L"SHELL32.DLL");
       else //win2k and below (though theoretically we dont support win2k and below)
-        hModule = LoadLibrary("SHFOLDER.DLL");
+        hModule = LoadLibrary(L"SHFOLDER.DLL");
       
       if (hModule != NULL)
       {
         SHGETFOLDERPATH fnShGetFolderPath;
-        if (WINVER > 0x0501) //vista and above
+        if (WinVistaOrLater) //vista and above
         {
           fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetKnownFolderPathW");
         }
