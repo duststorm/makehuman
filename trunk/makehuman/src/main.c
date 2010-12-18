@@ -48,8 +48,6 @@
 #endif // __APPLE__
 #ifdef __WIN32__
 #include <shlobj.h>
-#endif // __WIN32__
-
 
 OSVERSIONINFO winVersion(void)
 {
@@ -58,6 +56,7 @@ OSVERSIONINFO winVersion(void)
    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
    return osvi;
 }
+#endif // __WIN32__
 
 /* Our global struct - all globals must be here */
 Global G;
