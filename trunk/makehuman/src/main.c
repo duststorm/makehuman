@@ -54,6 +54,7 @@ OSVERSIONINFO winVersion(void)
    OSVERSIONINFO osvi;
    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+   GetVersionEx(&osvi);
    return osvi;
 }
 #endif // __WIN32__
@@ -426,7 +427,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
       
       if (WinXPorLater) //winxp and above
         hModule = LoadLibrary(L"SHELL32.DLL");
-      else //win2k and below (though theoretically we dont support win2k and below)
+      else //win2k and below (though theoretically we don't support win2k and below)
         hModule = LoadLibrary(L"SHFOLDER.DLL");
       
       if (hModule != NULL)
