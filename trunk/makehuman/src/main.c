@@ -426,9 +426,9 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
       BOOL WinVistaOrLater = (osvi.dwMajorVersion >= 6);
       
       if (WinXPorLater) //winxp and above
-        hModule = LoadLibrary(L"SHELL32.DLL");
+        hModule = LoadLibraryW(L"SHELL32.DLL");
       else //win2k and below (though theoretically we don't support win2k and below)
-        hModule = LoadLibrary(L"SHFOLDER.DLL");
+        hModule = LoadLibraryW(L"SHFOLDER.DLL");
       
       if (hModule != NULL)
       {
