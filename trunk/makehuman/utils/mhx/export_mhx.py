@@ -1438,6 +1438,7 @@ BodyKey = {
 	"BendKneeBack" : ("LR", 0, 1),
 	"BendArmDown" : ("LR", 0, 1),
 	"BendArmUp" : ("LR", 0, 1),
+	"BicepFlex" : ("LR", 0, 1),
 	"BreatheIn" : ("Sym", 0, 1.5),
 }
 

@@ -1675,20 +1675,22 @@ def toggleLimitConstraints(mhxrig):
 	pbones = mhxrig.pose.bones
 	first = True
 	for pb in pbones:
-		for cns in pb.constraints:
-			if (cns.type == 'LIMIT_LOCATION' or
-				cns.type == 'LIMIT_ROTATION' or
-				cns.type == 'LIMIT_DISTANCE' or
-				cns.type == 'LIMIT_SCALE'):
-				if first:
-					first = False
-					if cns.influence > 0.5:
-						inf = 0.0
-						res = 'OFF'
-					else:
-						inf = 1.0
-						res = 'ON'
-				cns.influence = inf
+		lay = pb.bone.layers
+		if not (lay[8] or lay[14] or lay[15]):
+			for cns in pb.constraints:
+				if (cns.type == 'LIMIT_LOCATION' or
+					cns.type == 'LIMIT_ROTATION' or
+					cns.type == 'LIMIT_DISTANCE' or
+					cns.type == 'LIMIT_SCALE'):
+					if first:
+						first = False
+						if cns.influence > 0.5:
+							inf = 0.0
+							res = 'OFF'
+						else:
+							inf = 1.0
+							res = 'ON'
+					cns.influence = inf
 	if first:
 		return 'NOT FOUND'
 	return res

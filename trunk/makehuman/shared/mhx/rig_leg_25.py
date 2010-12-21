@@ -313,33 +313,33 @@ def LegWritePoses(fp):
 	# Hip deform
 
 	addPoseBone(fp, 'LegForward_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'LegForwardTrg_L', 'PLANE_X', 0]),
+		[('StretchTo', 0, 1, ['Stretch', 'LegForwardTrg_L', 0]),
  		 ('LimitScale', C_OW_LOCAL, 0, ['Scale', (0,0, 0,0, 0,0), (0,1,0)])])
 
 	addPoseBone(fp, 'LegBack_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'LegBackTrg_L', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'LegBackTrg_L', 0])])
 
 	addPoseBone(fp, 'LegOut_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'LegOutTrg_L', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'LegOutTrg_L', 0])])
 
 
 	addPoseBone(fp, 'LegForward_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'LegForwardTrg_R', 'PLANE_X', 0]),
+		[('StretchTo', 0, 1, ['Stretch', 'LegForwardTrg_R', 0]),
  		 ('LimitScale', C_OW_LOCAL, 0, ['Scale', (0,0, 0,0, 0,0), (0,1,0)])])
 
 	addPoseBone(fp, 'LegBack_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'LegBackTrg_R', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'LegBackTrg_R', 0])])
 
 	addPoseBone(fp, 'LegOut_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'LegOutTrg_R', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'LegOutTrg_R', 0])])
 
 	# Knee deform
 
 	addPoseBone(fp, 'Knee_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'KneeTrg_L', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'KneeTrg_L', 0])])
 
 	addPoseBone(fp, 'Knee_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'KneeTrg_R', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'KneeTrg_R', 0])])
 
 
 	# FK
@@ -424,12 +424,12 @@ def LegWritePoses(fp):
 	addPoseBone(fp, 'KneePTIK_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'KneeLinkPTIK_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'KneePTIK_L', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'KneePTIK_L', 0])])
 
 	addPoseBone(fp, 'KneePTIK_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'KneeLinkPTIK_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', 'KneePTIK_R', 'PLANE_X', 0])])
+		[('StretchTo', 0, 1, ['Stretch', 'KneePTIK_R', 0])])
 
 	return
 
@@ -489,13 +489,6 @@ LegDeformDrivers = [
 #
 
 LegShapeDrivers = {
-	'BendLegForward_L' : ( 'UpLeg1_L', 'BendLegForward_L', [(0,0), (15*deg1,1), (deg90,0)] ),
-	'BendLegBack_L' : ( 'UpLeg1_L', 'BendLegBack_L', [(0,1), (deg90,0)] ),
-	'BendLegOut_L' : ( 'UpLeg1_L', 'BendLegOut_L', [(0,1), (deg90,0)] ),
-
-	'BendLegForward_R' : ( 'UpLeg1_R', 'BendLegForward_R', [(0,0), (15*deg1,1), (deg90,0)] ),
-	'BendLegBack_R' : ( 'UpLeg1_R', 'BendLegBack_R', [(0,1), (deg90,0)] ),
-	'BendLegOut_R' : ( 'UpLeg1_R', 'BendLegOut_R', [(0,1), (deg90,0)] ),
 }
 #
 #	LegProcess

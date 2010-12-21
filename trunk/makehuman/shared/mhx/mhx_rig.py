@@ -26,6 +26,7 @@ PanelWorks = False
 
 pi = 3.14159
 deg180 = pi
+deg135 = 3*pi/4
 deg120 = 2*pi/3
 deg90 = pi/2
 deg80 = 4*pi/9
@@ -100,14 +101,16 @@ C_ACT = 0x0004
 C_EXP = 0x0008
 C_LTRA = 0x0010
 C_LOC = 0x0020
+C_STRVOL = 0x0040
+C_PLANEZ = 0x0080
 
-C_OW_MASK = 0x0f00
+C_OW_MASK = 0x0300
 C_OW_WORLD = 0x0000
 C_OW_LOCAL = 0x0100
 C_OW_LOCPAR = 0x0200
 C_OW_POSE = 0x0300
 
-C_TG_MASK = 0xf000
+C_TG_MASK = 0x3000
 C_TG_WORLD = 0x0000
 C_TG_LOCAL = 0x1000
 C_TG_LOCPAR = 0x2000
@@ -418,7 +421,7 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 
 def addStretchBone(fp, bone, target, parent):
 	addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-		[('StretchTo', 0, 1, ['Stretch', target, 'PLANE_X', 0]),
+		[('StretchTo', 0, 1, ['Stretch', target, 0]),
  		 ('LimitScale', C_OW_LOCAL, 0, ['LimitScale', (0,0, 0,0, 0,0), (0,1,0)])])
 	#addPoseBone(fp, target, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
  	#	[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg90,deg90, 0,0, -deg90,deg90), (1,1,1)])])
@@ -994,9 +997,16 @@ def addStretchToConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
-	axis = data[2]
-	head_tail = data[3]
+	head_tail = data[2]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
+	if flags & C_STRVOL:
+		volume = 'VOLUME_XZX'
+	else:
+		volume = 'NO_VOLUME'
+	if flags & C_PLANEZ:
+		axis = 'PLANE_Z'
+	else:
+		axis = 'PLANE_X'
 
 	if Mhx25:
 		fp.write(
@@ -1012,7 +1022,7 @@ def addStretchToConstraint(fp, switch, flags, inf, data):
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
-"      volume 'NO_VOLUME' ;\n" +
+"      volume '%s' ;\n" % volume +
 "    end Constraint\n")
 
 	else:

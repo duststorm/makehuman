@@ -12,12 +12,18 @@ BodyJoints = [
 	('chest-front',			'v', 7292),
 	('r-rib-top',			'v', 3667),
 	('r-rib-bot',			'v', 3400),
+	('r-breast1',			'v', 3559),
+	('r-breast2',			'v', 2944),
+	('r-breast',			'l', ((0.4, 'r-breast1'), (0.6, 'r-breast2'))),
 	('r-tit',				'v', 3718),
 	('r-stomach',			'v', 6568),
 	('r-hip',				'v', 6563),
 
 	('l-rib-top',			'v', 10134),
 	('l-rib-bot',			'v', 10361),
+	('l-breast1',			'v', 10233),
+	('l-breast2',			'v', 10776),
+	('l-breast',			'l', ((0.4, 'l-breast1'), (0.6, 'l-breast2'))),
 	('l-tit',				'v', 10115),
 	('l-hip',				'v', 6749),
 	('l-stomach',			'v', 6744),
@@ -70,8 +76,8 @@ BodyHeadsTails = [
 	('StomachLo',			'mid-hip', 'stomach-front'),
 	('StomachTarget',		'stomach-front', ('stomach-front', zunit)),
 	('Breathe',				'mid-rib-bot', ('mid-rib-bot', zunit)),
-	('Breast_L',			'r-tit', ('r-tit', zunit)),
-	('Breast_R',			'l-tit', ('l-tit', zunit)),
+	('Breast_L',			'r-breast', 'r-tit'),
+	('Breast_R',			'l-breast', 'l-tit'),
 
 	('Penis',				'penis-root', 'penis-tip'),
 	('Scrotum',				'scrotum-root', 'scrotum-tip'),
@@ -94,8 +100,8 @@ BodyArmature = [
 	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
 
 	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_DEF, (1,1,1) ),
-	('Breast_L',		0.0, 'Rib', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
-	('Breast_R',		0.0, 'Rib', F_DEF+F_WIR, L_TORSO+L_DEF, (1,1,1) ),
+	('Breast_L',		-deg45, 'Rib', F_DEF, L_TORSO+L_DEF, (1,1,1) ),
+	('Breast_R',		deg45, 'Rib', F_DEF, L_TORSO+L_DEF, (1,1,1) ),
 	('Breathe',			0.0, 'Rib', F_DEF+F_WIR, L_TORSO, (1,1,1) ),
 	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
 	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
@@ -145,20 +151,27 @@ def BodyWritePoses(fp):
 		[('LimitDist', 0, 1, ['LimitDist', 'Spine1', 'Rib'])])
 
 	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0]),
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 0]),
 		 ('CopyScale', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
 		])
 
 	addPoseBone(fp,  'StomachUp', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 'PLANE_X', 0]),
+		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 0]),
 		 ('CopyScale', C_OW_LOCAL+C_TG_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
 		])
 
 	addPoseBone(fp,  'Breathe', 'MHCube01', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp,  'Breast_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	limBreastRot = (-deg45,deg45, -10*deg1,10*deg1, -deg20,deg20)
+	limBreastScale =  (0.8,1.25, 0.7,1.5, 0.8,1.25)
 
-	addPoseBone(fp,  'Breast_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp,  'Breast_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
+		 ('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])	])
+
+	addPoseBone(fp,  'Breast_R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
+		 ('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])	])
 
 	addPoseBone(fp,  'Penis', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
@@ -180,14 +193,8 @@ BodyShapeDrivers = {
 #
 
 BodyShapeKeyScale = {
-	'BendElbowForward' 	: ('r-shoulder', 'r-hand', 4.705061),
-	'BendKneeBack'		: ('r-upper-leg', 'r-ankle', 8.207247),
-	'BendArmDown'		: ('r-shoulder', 'l-shoulder', 3.388347),
-	'BendArmUp'			: ('r-shoulder', 'l-shoulder', 3.388347),
-	'BendLegForward'	: ('r-upper-leg', 'r-knee', 4.164895),
-	'BendLegBack'		: ('r-upper-leg', 'r-knee', 4.164895),
-	'BendLegOut'		: ('r-upper-leg', 'r-knee', 4.164895),
 	'BreatheIn'			: ('spine1', 'neck', 1.89623),
+	'BicepFlex'			: ('r-uparm-front', 'r-uparm-back', 0.93219),
 }
 
 
