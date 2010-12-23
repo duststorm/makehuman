@@ -89,7 +89,10 @@ class CNode:
 			name += ' '+word
 		
 		self.name = name
-		self.parent = parent
+		if parent and parent != 'MasterFloor':
+			self.parent = parent
+		else:
+			self.parent = None
 		self.children = []
 		self.head = Vector((0,0,0))
 		self.offset = Vector((0,0,0))
@@ -766,7 +769,7 @@ class CEditBone():
 		self.head = bone.head.copy()
 		self.tail = bone.tail.copy()
 		self.roll = bone.roll
-		if bone.parent:
+		if bone.parent and bone.parent.name != 'MasterFloor':
 			self.parent = bone.parent.name
 			self.use_connect = bone.use_connect
 		else:
@@ -1071,7 +1074,7 @@ def createAnimData(name, animations, bones):
 	anim.headRest = b.head_local.copy()
 	anim.tailRest = b.tail_local.copy()
 	anim.vecRest = anim.tailRest - anim.headRest
-	if b.parent:
+	if b.parent and b.parent.name != 'MasterFloor':
 		anim.parent = b.parent.name
 		animPar = animations[anim.parent]
 		anim.offsetRest = anim.headRest - animPar.headRest
