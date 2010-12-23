@@ -7,25 +7,8 @@ from mhx_rig import *
 
 FaceJoints = [
 	('head-end',			'l', ((2.0, 'head'), (-1.0, 'neck'))),
-	('mouth',			'j', 'mouth'),
-	('jaw',				'j', 'jaw'),
-	
 	('r-mouth',			'v', 2490),
 	('l-mouth',			'v', 8907),
-
-	('tongue-1',			'j', 'tongue-1'),
-	('tongue-2',			'j', 'tongue-2'),
-	('tongue-3',			'j', 'tongue-3'),
-	('tongue-4',			'j', 'tongue-4'),
-
-	('l-eye',			'j', 'l-eye'),
-	('r-eye',			'j', 'r-eye'),
-	('l-eye-target',		'j', 'l-eye-target'),
-	('r-eye-target',		'j', 'r-eye-target'),
-	('l-upperlid',			'j', 'l-upperlid'),
-	('l-lowerlid',			'j', 'l-lowerlid'),
-	('r-upperlid',			'j', 'r-upperlid'),
-	('r-lowerlid',			'j', 'r-lowerlid'),
 
 	('mid-eyes',			'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
 	('gaze',			'o', ('mid-eyes', [0.0, 0.0, 5.2])),

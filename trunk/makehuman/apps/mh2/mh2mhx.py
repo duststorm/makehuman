@@ -122,13 +122,14 @@ def exportMhx_25(obj, rig, fp):
 
 	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
 
-	proxyList = mh2proxy.proxyConfig()
+	(useMain, proxyList) = mh2proxy.proxyConfig()
 	proxyData = {}
 	proxyCopy('Cage', obj, rig, proxyList, proxyData, fp)
 
-	fp.write("#if toggle&T_Mesh\n")
-	copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
-	fp.write("#endif\n")
+	if useMain:
+		fp.write("#if toggle&T_Mesh\n")
+		copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
+		fp.write("#endif\n")
 
 	proxyCopy('Proxy', obj, rig, proxyList, proxyData, fp)
 	proxyCopy('Clothes', obj, rig, proxyList, proxyData, fp)
@@ -143,7 +144,7 @@ def exportMhx_25(obj, rig, fp):
 #
 
 def proxyCopy(name, obj, rig, proxyList, proxyData, fp):
-	for (typ, useObj, useMhx, proxyStuff) in proxyList:
+	for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 		if useMhx and typ == name:
 			fp.write("#if toggle&T_%s\n" % typ)
 			copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyStuff, proxyData)	
@@ -197,22 +198,22 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 			elif words[1] == 'rig-process':
 				fp.write("\n  ApplyArmature HumanMesh ;\n")
 				for proxy in proxyData.values():
-					if proxy.name and not proxy.bones:
+					if proxy.name and not proxy.rig:
 						fp.write("  ApplyArmature %sMesh ;\n" % proxy.name)
 				mhx_rig.writeAllProcesses(fp)
 				mhx_rig.reapplyArmature(fp, "HumanMesh")
 				for proxy in proxyData.values():
-					if proxy.name and not proxy.bones:
+					if proxy.name and not proxy.rig:
 						mhx_rig.reapplyArmature(fp, proxy.name)
 			elif words[1] == 'ProxyRigStart':
 				proxy = mh2proxy.readProxyFile(obj, proxyStuff)
 				proxyData[proxy.name] = proxy
-				if proxy.bones:
+				if proxy.rig:
 					fp.write("#if True\n")
+					fp.write("Armature %s %s   Normal \n" % (proxy.name, proxy.name))
+					mh2proxy.writeProxyArmature(fp, obj, proxy)
 				else:
 					fp.write("#if False\n")
-				fp.write("Armature %s %s   Normal \n" % (proxy.name, proxy.name))
-				mh2proxy.writeProxyArmature(fp, proxy)
 			elif words[1] == 'ProxyRigObject':
 				fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
 			elif words[1] == 'ProxyPose':
@@ -252,7 +253,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 				else:
 					fp.write("  #if toggle&T_Cage\n")
 			elif words[1] == 'ProxyReferRig':
-				if proxy.bones:
+				if proxy.rig:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
 				else:
 					fp.write("      object Refer Object Human ;\n")
@@ -297,7 +298,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 						fp.write(" %.6g %.6g" %(uv[0], uv[1]))
 					fp.write(" ;\n")
 			elif words[1] == 'VertexGroup':
-				if proxy and proxy.weighted:
+				if proxy and proxy.weights:
 					mh2proxy.writeProxyWeights(fp, proxy)
 				else:
 					copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)	
@@ -359,6 +360,8 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 #
 
 def copyVertGroups(tmplName, fp, proxy):
+	if proxy and proxy.rig:
+		return
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	shapes = []
@@ -370,8 +373,6 @@ def copyVertGroups(tmplName, fp, proxy):
 	if not proxy:
 		for line in tmpl:
 			fp.write(line)
-	#elif proxy.bones:
-	#	pass
 	else:
 		for line in tmpl:
 			words= line.split()
@@ -420,6 +421,8 @@ def printProxyVGroup(fp, vgroups):
 #
 
 def copyShapeKeys(tmplName, fp, proxy, doScale):
+	if proxy and proxy.rig:
+		return
 	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	shapes = []
@@ -446,8 +449,6 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
 				fp.write(line)
 			else:
 				fp.write(line)
-	#elif proxy.bones:
-	#	pass
 	else:
 		ignore = False
 		for line in tmpl:
@@ -597,7 +598,7 @@ def writeShapeKeys(fp, name, proxy):
 def proxyShapes(typ, proxyData, fp):
 	fp.write("#if toggle&T_%s\n" % typ)
 	for proxy in proxyData.values():
-		if proxy.name and proxy.type == typ and not proxy.bones:
+		if proxy.name and proxy.type == typ and not proxy.rig:
 			writeShapeKeys(fp, proxy.name+"Mesh", proxy)
 	fp.write("#endif\n")
 		
@@ -643,9 +644,9 @@ def copyMeshFile249(obj, tmpl, fp):
 				skipOne = True
 				fp.write("#endif\n")
 				mainMesh = False
-				proxyList = mh2proxy.proxyConfig()
+				(useMain, proxyList) = mh2proxy.proxyConfig()
 				fp.write("#if useProxy\n")
-				for (typ, useObj, useMhx, proxyStuff) in proxyList:
+				for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 					if useObj:
 						exportProxy24(obj, proxyStuff, fp)
 				fp.write("#endif\n")

@@ -68,6 +68,26 @@ class OBJECT_OT_SelectQuadsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	removeVertexGroups(context):
+#	class OBJECT_OT_RemoveVertexGroupsButton(bpy.types.Operator):
+#
+
+def removeVertexGroups(context):
+	ob = context.object
+	bpy.ops.object.mode_set(mode='OBJECT')
+	bpy.ops.object.vertex_group_remove(all=True)
+	return
+
+class OBJECT_OT_RemoveVertexGroupsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_RemoveVertexGroupsButton"
+	bl_label = "Unvertex all"
+
+	def execute(self, context):
+		removeVertexGroups(context)
+		print("All vertex groups removed")
+		return{'FINISHED'}	
+
+#
 #	unVertexDiamonds(context):
 #	class OBJECT_OT_UnvertexDiamondsButton(bpy.types.Operator):
 #
@@ -324,6 +344,39 @@ class OBJECT_OT_RecoverDiamondsButton(bpy.types.Operator):
 		recoverDiamonds(context)
 		return{'FINISHED'}	
 
+#
+#	exportVertexGroups(filePath)
+#	class OBJECT_OT_ExportVertexGroupsButton(bpy.types.Operator):
+#
+
+def exportVertexGroups(context):
+	filePath = context.scene['MhxVertexGroupFile']
+	fileName = os.path.expanduser(filePath)
+	fp = open(fileName, "w")
+	ob = context.object
+	me = ob.data
+	for vg in ob.vertex_groups:
+		index = vg.index
+		weights = []
+		for v in me.vertices:
+			for grp in v.groups:
+				if grp.group == index and grp.weight > 0.005:
+					weights.append((v.index, grp.weight))
+
+		if len(weights) > 0:
+			fp.write("\n# weights %s\n" % vg.name)
+			for (vn,w) in weights:
+				fp.write("  %d %.3g\n" % (vn, w))
+	fp.close()
+	return
+
+class OBJECT_OT_ExportVertexGroupsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ExportVertexGroupsButton"
+	bl_label = "Export vertex groups"
+
+	def execute(self, context):
+		exportVertexGroups(context)
+		return{'FINISHED'}	
 
 #
 #	initInterface(context):
@@ -350,13 +403,19 @@ def initInterface(context):
 		name="Left -> right", 
 		default=True)
 
+	bpy.types.Scene.MhxVertexGroupFile = StringProperty(
+		name="Vertex group file", 
+		maxlen=100,
+		default='')
+
 
 	scn = context.scene
 	if scn:
 		scn['MhxWeight'] = 1.0
-		scn['Bone1'] = 'Bone1'
-		scn['Bone2'] = 'Bone2'
+		scn['MhxBone1'] = 'Bone1'
+		scn['MhxBone2'] = 'Bone2'
 		scn['MhxLeft2Right'] = True
+		scn['MhxVertexGroupFile'] = '~/vgroups.txt'
 
 	return
 
@@ -387,6 +446,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 		layout = self.layout
 		layout.operator("object.PrintVnumsButton")
 		layout.operator("object.SelectQuadsButton")
+		layout.operator("object.RemoveVertexGroupsButton")
 		layout.operator("object.UnvertexDiamondsButton")
 		layout.operator("object.RecoverDiamondsButton")
 
@@ -394,6 +454,10 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 		layout.prop(context.scene, 'MhxLeft2Right')
 		layout.operator("object.SymmetrizeWeightsButton")	
 		layout.operator("object.SymmetrizeShapesButton")	
+
+		layout.separator()
+		layout.prop(context.scene, 'MhxVertexGroupFile')
+		layout.operator("object.ExportVertexGroupsButton")	
 
 		layout.label('Weight pair')
 		layout.prop(context.scene, 'MhxWeight')

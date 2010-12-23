@@ -41,23 +41,11 @@ import read_rig
 #	exportCollada1(obj, filename, proxyData):
 #
 
-#import mh2spec
-#import weight_diamonds
-
 def exportCollada(obj, name):
-	exportCollada1(obj, name+".dae", "Human", None)
-	proxyList = mh2proxy.proxyConfig()
-	for (typ, useObj, useMhx, proxyFile) in proxyList:
-		proxy = mh2proxy.readProxyFile(obj, proxyFile)
-		if proxy.name:
-			filename = "%s-%s.dae" % (name, proxy.name)
-			exportCollada1(obj, filename, proxy.name, proxy)
-	return
-
-def exportCollada1(obj, filename, name, proxy):
+	filename = name+".dae"
 	print 'Writing Collada file %s' % filename
 	fp = open(filename, 'w')
-	exportDae(obj, fp, name, proxy)
+	exportDae(obj, fp)
 	fp.close()
 	print 'Collada file %s written' % filename
 	return
@@ -173,24 +161,24 @@ def fixTwistWeights(fp, weights):
 	return
 				
 #
-#	writeBone(fp, bone, orig, extra, pad):
+#	writeBones(fp, bones, orig, extra, pad, stuff):
+#	writeBone(fp, bone, orig, extra, pad, stuff):
 #
 
-def writeBones(fp, bones, orig, extra, pad):
+def writeBones(fp, bones, orig, extra, pad, stuff):
 	for bone in bones:
-		writeBone(fp, bone, orig, extra, pad)
+		writeBone(fp, bone, orig, extra, pad, stuff)
 	return
 	
-def writeBone(fp, bone, orig, extra, pad):
-	global rigHead, rigTail
+def writeBone(fp, bone, orig, extra, pad, stuff):
 	(name, children) = bone
-	head = rigHead[name]
+	head = stuff.rigHead[name]
 	vec = aljabr.vsub(head, orig)
 	printNode(fp, name, vec, extra, pad)
 	if children:
-		writeBones(fp, children, head, '', pad+'  ')	
+		writeBones(fp, children, head, '', pad+'  ', stuff)	
 	else:
-		tail = rigTail[name]
+		tail = stuff.rigTail[name]
 		vec = aljabr.vsub(tail, head)
 		printNode(fp, name+"_end", vec, '', pad+'  ')
 		fp.write('\n%s        </node>' % pad)
@@ -312,52 +300,77 @@ def addInvBones(hier, heads, tails):
 	return newHier
 
 #
-#	exportDae(obj, fp, name, proxy):
+#	class CStuff
 #
 
-def exportDae(obj, fp, name, proxy):
-	global rigHead, rigTail
+class CStuff:
+	def __init__(self, name, typ):
+		self.name = name
+		self.type = typ
+		self.bones = None
+		self.rawWeights = None
+		self.verts  = None
+		self.vnormals = None
+		self.uvValues = None
+		self.faces = None
+		self.weights = None
+		self.targets = None
+		self.vertexWeights = None
+		self.skinWeights = None
 
-	#(rigHead, rigTail, rigHier, bones, rawWeights) = getArmatureFromMhx(obj)
+	def setBones(self, amt):
+		(rigHead, rigTail, rigHier, bones, rawWeights) = amt
+		self.rigHead = rigHead
+		self.rigTail = rigTail
+		self.rigHier = rigHier
+		self.bones = bones
+		self.rawWeights = rawWeights
 
-	(rigHead, rigTail, rigHier, bones, rawWeights) = getArmatureFromRigFile('data/templates/minimal.rig', obj)
+	def copyBones(self, rig):
+		self.rigHead = rig.rigHead
+		self.rigTail = rig.rigTail
+		self.rigHier = rig.rigHier
+		self.bones = rig.bones
+		self.rawWeights = rig.rawWeights
 
+	def setMesh(self, mesh):
+		(verts, vnormals, uvValues, faces, weights, targets) = mesh
+		self.verts = verts
+		self.vnormals = vnormals
+		self.uvValues = uvValues
+		self.faces = faces
+		self.weights = weights
+		self.targets = targets
+		return
+
+#
+#	exportDae(obj, fp):
+#
+
+def exportDae(obj, fp):
+	global theStuff
+	(useMain, proxyList) = mh2proxy.proxyConfig()
+	amt = getArmatureFromRigFile('data/templates/minimal.rig', obj)
 	#rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
 	rawTargets = []
 
-	(verts, vnormals, uvValues, faces, weights, targets) = mh2proxy.getMeshInfo(obj, proxy, rawWeights, rawTargets)
+	stuffs = []
+	theStuff = None
+	if 'Dae' in useMain:
+		stuff = CStuff('Human', None)
+		stuff.setBones(amt)
+		mesh = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
+		stuff.setMesh(mesh)
+		stuffs.append(stuff)
+		theStuff = stuff
 
-	vertexWeights = {}
-	for (vn,v) in enumerate(verts):
-		vertexWeights[vn] = []
+	setupProxies('Proxy', obj, stuffs, amt, rawTargets, proxyList)
+	setupProxies('Clothes', obj, stuffs, amt, rawTargets, proxyList)
 
-	skinWeights = []
-	wn = 0	
-	for (bn,b) in enumerate(bones):
-		try:
-			wts = weights[b]
-		except:
-			wts = []
-		for (vn,w) in wts:
-			vertexWeights[int(vn)].append((bn,wn))
-			wn += 1
-		skinWeights.extend(wts)
+	if theStuff == None:
+		raise NameError("No rig found. Neither main mesh nor rigged proxy enabled")
 
-	nVerts = len(verts)
-	nUvVerts = len(uvValues)
-	nNormals = nVerts
-	nFaces = len(faces)
-	nWeights = len(skinWeights)
-	nBones = len(bones)
-	nTargets = len(targets)
-
-	texture = os.path.expanduser("~/makehuman/texture.tif")
-	texture_ref = os.path.expanduser("~/makehuman/texture_ref.tif")	
 	date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
-
-#
-#	Images, materials and effects
-#
 
 	fp.write('<?xml version="1.0" encoding="utf-8"?>\n' +
 '<COLLADA version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">\n' +
@@ -370,15 +383,120 @@ def exportDae(obj, fp, name, proxy):
 '    <unit meter="0.1" name="decimeter"/>\n' +
 '    <up_axis>Z_UP</up_axis>\n' +
 '  </asset>\n' +
-'  <library_images>\n' +
+'  <library_images>\n')
+
+	for stuff in stuffs:
+		writeImages(obj, fp, stuff)
+
+	fp.write(
+'  </library_images>\n' +
+'  <library_effects>\n')
+
+	for stuff in stuffs:
+		writeEffects(obj, fp, stuff)
+
+	fp.write(
+'  </library_effects>\n' +
+'  <library_materials>\n')
+
+	for stuff in stuffs:
+		writeMaterials(obj, fp, stuff)
+
+	fp.write(
+'  </library_materials>\n'+
+'  <library_controllers>\n')
+
+	for stuff in stuffs:
+		writeController(obj, fp, stuff)
+
+	fp.write(
+'  </library_controllers>\n'+
+'  <library_geometries>\n')
+
+	for stuff in stuffs:
+		writeGeometry(obj, fp, stuff)
+
+	fp.write(
+'  </library_geometries>\n\n' +
+'  <library_visual_scenes>\n' +
+'    <visual_scene id="Scene" name="Scene">\n')
+	writeBones(fp, theStuff.rigHier, [0,0,0], 'layer="L1"', '', theStuff)
+	for stuff in stuffs:
+		writeNode(obj, fp, stuff)
+
+	fp.write(
+'    </visual_scene>\n' +
+'  </library_visual_scenes>\n' +
+'  <scene>\n' +
+'    <instance_visual_scene url="#Scene"/>\n' +
+'  </scene>\n' +
+'</COLLADA>\n')
+	return
+
+#
+#	setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
+#
+
+def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
+	global theStuff
+	for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
+		if useDae and typ == typename:
+			proxy = mh2proxy.readProxyFile(obj, proxyStuff)
+			if proxy.name:
+				stuff = CStuff(proxy.name, typ)
+				if proxy.rig:
+					(proxyFile, typ, layer) = proxyStuff
+					amtProxy = getArmatureFromRigFile(proxy.rig, obj)
+					stuff.setBones(amtProxy)
+					if theStuff:
+						print("WARNING: Collada export with several rigged meshes. Ignored %s" % proxy.name)
+						stuff = None
+					else:
+						theStuff = stuff	
+				elif proxy.weightfile:
+					(rigname, filename) = proxy.weightfile
+					if theStuff and rigname == theStuff.name:
+						stuff.copyBones(theStuff)
+					else:
+						stuff.setBones(amt)
+				else:
+					stuff.setBones(amt)
+				if stuff:
+					if theStuff:
+						stuffname = theStuff.name
+					else:
+						stuffname = None
+					mesh = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
+					stuff.setMesh(mesh)
+					stuffs.append(stuff)
+	return
+
+#
+#	writeImages(obj, fp, stuff):
+#
+
+def writeImages(obj, fp, stuff):
+	if stuff.type:
+		return
+	texture = os.path.expanduser("~/makehuman/texture.tif")
+	texture_ref = os.path.expanduser("~/makehuman/texture_ref.tif")	
+	fp.write(
 '    <image id="texture_tif">\n' +
 '      <init_from>%s</init_from>\n' % texture +
 '    </image>\n' +
 '    <image id="texture_ref_tif">\n' +
 '      <init_from>%s</init_from>\n' % texture_ref +
-'    </image>\n' +
-'  </library_images>\n' +
-'  <library_effects>\n' +
+'    </image>\n')
+	return
+
+#
+#	writeEffects(obj, fp, stuff):
+#
+
+def writeEffects(obj, fp, stuff):
+	if stuff.type:
+		return
+	fp.write(
 '    <effect id="SSS_skinshader-effect">\n' +
 '      <profile_COMMON>\n' +
 '        <newparam sid="texture_tif-surface">\n' +
@@ -434,65 +552,96 @@ def exportDae(obj, fp, name, proxy):
 '          </phong>\n' +
 '        </technique>\n' +
 '      </profile_COMMON>\n' +
-'    </effect>\n' +
-'  </library_effects>\n' +
-'  <library_materials>\n' +
+'    </effect>\n')
+
+#
+#	writeMaterials(obj, fp, stuff):
+#
+
+def writeMaterials(obj, fp, stuff):
+	if stuff.type:
+		return
+	fp.write(
 '    <material id="SSS_skinshader" name="SSS_skinshader">\n' +
 '      <instance_effect url="#SSS_skinshader-effect"/>\n' +
-'    </material>\n' +
-'  </library_materials>\n')
+'    </material>\n')
+	return
 
 #
-#	Controllers
+#	writeController(obj, fp, stuff):
 #
+
+def writeController(obj, fp, stuff):
+	stuff.vertexWeights = {}
+	for (vn,v) in enumerate(stuff.verts):
+		stuff.vertexWeights[vn] = []
+
+	stuff.skinWeights = []
+	wn = 0	
+	for (bn,b) in enumerate(stuff.bones):
+		try:
+			wts = stuff.weights[b]
+		except:
+			wts = []
+		for (vn,w) in wts:
+			stuff.vertexWeights[int(vn)].append((bn,wn))
+			wn += 1
+		stuff.skinWeights.extend(wts)
+
+	nVerts = len(stuff.verts)
+	nUvVerts = len(stuff.uvValues)
+	nNormals = nVerts
+	nFaces = len(stuff.faces)
+	nWeights = len(stuff.skinWeights)
+	nBones = len(stuff.bones)
+	nTargets = len(stuff.targets)
 
 	fp.write('\n' +
-'    <library_controllers>\n' +
-'    <controller id="%s-skin">\n' % name +
-'      <skin source="#%sMesh">\n' % name +
+'    <controller id="%s-skin">\n' % stuff.name +
+'      <skin source="#%sMesh">\n' % stuff.name +
 '        <bind_shape_matrix>\n' +
 '          1.0 0.0 0.0 0.0 \n' +
 '          0.0 1.0 0.0 0.0 \n' +
 '          0.0 0.0 1.0 0.0 \n' +
 '          0.0 0.0 0.0 1.0 \n' +
 '        </bind_shape_matrix>\n' +
-'        <source id="%s-skin-joints">\n' % name +
-'          <IDREF_array count="%d" id="%s-skin-joints-array">\n' % (nBones,name) +
+'        <source id="%s-skin-joints">\n' % stuff.name +
+'          <IDREF_array count="%d" id="%s-skin-joints-array">\n' % (nBones,stuff.name) +
 '           ')
 
-	for b in bones:
+	for b in stuff.bones:
 		fp.write(' %s' % b)
 	
 	fp.write('\n' +
 '          </IDREF_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#%s-skin-joints-array" stride="1">\n' % (nBones,name) +
+'            <accessor count="%d" source="#%s-skin-joints-array" stride="1">\n' % (nBones,stuff.name) +
 '              <param type="IDREF" name="JOINT"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="%s-skin-weights">\n' % name +
-'          <float_array count="%d" id="%s-skin-weights-array">\n' % (nWeights,name) +
+'        <source id="%s-skin-weights">\n' % stuff.name +
+'          <float_array count="%d" id="%s-skin-weights-array">\n' % (nWeights,stuff.name) +
 '           ')
 
-	for (n,b) in enumerate(skinWeights):
-		(v,w) = skinWeights[n]
+	for (n,b) in enumerate(stuff.skinWeights):
+		(v,w) = stuff.skinWeights[n]
 		fp.write(' %s' % w)
 
 	fp.write('\n' +
 '          </float_array>\n' +	
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#%s-skin-weights-array" stride="1">\n' % (nWeights,name) +
+'            <accessor count="%d" source="#%s-skin-weights-array" stride="1">\n' % (nWeights,stuff.name) +
 '              <param type="float" name="WEIGHT"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="%s-skin-poses">\n' % name +
-'          <float_array count="%d" id="%s-skin-poses-array">' % (16*nBones,name))
+'        <source id="%s-skin-poses">\n' % stuff.name +
+'          <float_array count="%d" id="%s-skin-poses-array">' % (16*nBones,stuff.name))
 
 	mat = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
-	for b in bones:
-		vec = rigHead[b]
+	for b in stuff.bones:
+		vec = stuff.rigHead[b]
 		mat[0][3] = -vec[0]
 		mat[1][3] = vec[2]
 		mat[2][3] = -vec[1]
@@ -504,22 +653,22 @@ def exportDae(obj, fp, name, proxy):
 	fp.write('\n' +
 '          </float_array>\n' +	
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#%s-skin-poses-array" stride="16">\n' % (nBones,name) +
+'            <accessor count="%d" source="#%s-skin-poses-array" stride="16">\n' % (nBones,stuff.name) +
 '              <param type="float4x4"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
 '        <joints>\n' +
-'          <input semantic="JOINT" source="#%s-skin-joints"/>\n' % name +
-'          <input semantic="INV_BIND_MATRIX" source="#%s-skin-poses"/>\n' % name +
+'          <input semantic="JOINT" source="#%s-skin-joints"/>\n' % stuff.name +
+'          <input semantic="INV_BIND_MATRIX" source="#%s-skin-poses"/>\n' % stuff.name +
 '        </joints>\n' +
 '        <vertex_weights count="%d">\n' % nVerts +
-'          <input offset="0" semantic="JOINT" source="#%s-skin-joints"/>\n' % name +
-'          <input offset="1" semantic="WEIGHT" source="#%s-skin-weights"/>\n' % name +
+'          <input offset="0" semantic="JOINT" source="#%s-skin-joints"/>\n' % stuff.name +
+'          <input offset="1" semantic="WEIGHT" source="#%s-skin-weights"/>\n' % stuff.name +
 '          <vcount>\n' +
 '            ')
 
-	for wts in vertexWeights.values():
+	for wts in stuff.vertexWeights.values():
 		fp.write('%d ' % len(wts))
 
 	fp.write('\n' +
@@ -527,8 +676,8 @@ def exportDae(obj, fp, name, proxy):
 '          <v>\n' +
 '           ')
 
-	#print(vertexWeights)
-	for (vn,wts) in vertexWeights.items():
+	#print(stuff.vertexWeights)
+	for (vn,wts) in stuff.vertexWeights.items():
 		wtot = 0.0
 		for (bn,wn) in wts:
 			wtot += wn
@@ -546,10 +695,10 @@ def exportDae(obj, fp, name, proxy):
 
 	"""
 	fp.write('\n' +
-'   <controller id="%sMorphs" name="%sMorphs">\n' % (name,name) +
-'     <morph method="NORMALIZED" source="#%sMesh">\n' % name +
-'       <source id="%s-targets">\n' % name +
-'         <IDREF_array id="%s-targets-array" count="%d">\n'  % (name, nTargets))
+'   <controller id="%sMorphs" name="%sMorphs">\n' % (stuff.name,stuff.name) +
+'     <morph method="NORMALIZED" source="#%sMesh">\n' % stuff.name +
+'       <source id="%s-targets">\n' % stuff.name +
+'         <IDREF_array id="%s-targets-array" count="%d">\n'  % (stuff.name, nTargets))
 
 	for (name, morphs) in targets:
 		fp.write(' %s' % name)
@@ -557,13 +706,13 @@ def exportDae(obj, fp, name, proxy):
 	fp.write('\n' +
 '         </IDREF_array>\n' +
 '         <technique_common>\n' +
-'           <accessor source="%s-targets-array" count="%d" stride="1">\n' % (name,nTargets) +
+'           <accessor source="%s-targets-array" count="%d" stride="1">\n' % (stuff.name,nTargets) +
 '             <param name="MORPH_TARGET" type="IDREF"/>\n' +
 '           </accessor>\n' +
 '         </technique_common>\n' +
 '       </source>\n' +
 '       <source id="%s-morph_weights">\n' % name +
-'         <float_array id="%s-morph_weights-array" count="%d">\n' % (name,nTargets))
+'         <float_array id="%s-morph_weights-array" count="%d">\n' % (stuff.name,nTargets))
 
 	for target in targets:
 		fp.write("0.0 ")
@@ -571,92 +720,99 @@ def exportDae(obj, fp, name, proxy):
 	fp.write('\n' +
 '         </float_array>\n' +
 '         <technique_common>\n' +
-'           <accessor source="#%s-morph_weights-array" count="%d" stride="1">\n' % (name,nTargets) +
+'           <accessor source="#%s-morph_weights-array" count="%d" stride="1">\n' % (stuff.name,nTargets) +
 
 '             <param name="MORPH_WEIGHT" type="float"/>\n' +
 '           </accessor>\n' +
 '         </technique_common>\n' +
 '       </source>\n' +
 '       <targets>\n' +
-'         <input semantic="MORPH_TARGET" source="#%s-targets"/>\n' % name +
-'         <input semantic="MORPH_WEIGHT" source="#%s-morph_weights"/>\n' % name +
+'         <input semantic="MORPH_TARGET" source="#%s-targets"/>\n' % stuff.name +
+'         <input semantic="MORPH_WEIGHT" source="#%s-morph_weights"/>\n' % stuff.name +
 '       </targets>\n' +
 '     </morph>\n' +
 '   </controller>\n')
 	"""
-	fp.write('\n' +
-'  </library_controllers>\n')
+	return
 
 #
-#	Geometries
+#	writeGeometry(obj, fp, stuff):
 #
+		
+def writeGeometry(obj, fp, stuff):
+	nVerts = len(stuff.verts)
+	nUvVerts = len(stuff.uvValues)
+	nNormals = nVerts
+	nFaces = len(stuff.faces)
+	nWeights = len(stuff.skinWeights)
+	nBones = len(stuff.bones)
+	nTargets = len(stuff.targets)
 
 	fp.write('\n' +
-'  <library_geometries>\n' +
-'    <geometry id="%sMesh" name="%s">\n' % (name,name) +
+'    <geometry id="%sMesh" name="%s">\n' % (stuff.name,stuff.name) +
 '      <mesh>\n' +
-'        <source id="%s-Position">\n' % name +
-'          <float_array count="%d" id="%s-Position-array">\n' % (3*nVerts,name) +
+'        <source id="%s-Position">\n' % stuff.name +
+'          <float_array count="%d" id="%s-Position-array">\n' % (3*nVerts,stuff.name) +
 '          ')
 
 
-	for v in verts:
+	for v in stuff.verts:
 		fp.write('%.6g %.6g %.6g ' % (v[0], -v[2], v[1]))
 
 	fp.write('\n' +
 '          </float_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#%s-Position-array" stride="3">\n' % (nVerts,name) +
+'            <accessor count="%d" source="#%s-Position-array" stride="3">\n' % (nVerts,stuff.name) +
 '              <param type="float" name="X"></param>\n' +
 '              <param type="float" name="Y"></param>\n' +
 '              <param type="float" name="Z"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="%s-Normals">\n' % name +
-'          <float_array count="%d" id="%s-Normals-array">\n' % (3*nNormals,name) +
+'        <source id="%s-Normals">\n' % stuff.name +
+'          <float_array count="%d" id="%s-Normals-array">\n' % (3*nNormals,stuff.name) +
 '          ')
 
-	for no in vnormals:
+	for no in stuff.vnormals:
 		fp.write('%.6g %.6g %.6g ' % (no[0], -no[2], no[1]))
 
 	fp.write('\n' +
 '          </float_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#%s-Normals-array" stride="3">\n' % (nNormals,name) +
+'            <accessor count="%d" source="#%s-Normals-array" stride="3">\n' % (nNormals,stuff.name) +
 '              <param type="float" name="X"></param>\n' +
 '              <param type="float" name="Y"></param>\n' +
 '              <param type="float" name="Z"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <source id="%s-UV">\n' % name +
+'        <source id="%s-UV">\n' % stuff.name +
 
-'          <float_array count="%d" id="%s-UV-array">\n' % (2*nUvVerts,name) +
+'          <float_array count="%d" id="%s-UV-array">\n' % (2*nUvVerts,stuff.name) +
 '           ')
 
 
-	for uv in uvValues:
+	for uv in stuff.uvValues:
 		fp.write(" %.4f %.4f" %(uv[0], uv[1]))
 
 	fp.write('\n' +
 '          </float_array>\n' +
 '          <technique_common>\n' +
-'            <accessor count="%d" source="#%s-UV-array" stride="2">\n' % (nUvVerts,name) +
+'            <accessor count="%d" source="#%s-UV-array" stride="2">\n' % (nUvVerts,stuff.name) +
 '              <param type="float" name="S"></param>\n' +
 '              <param type="float" name="T"></param>\n' +
 '            </accessor>\n' +
 '          </technique_common>\n' +
 '        </source>\n' +
-'        <vertices id="%s-Vertex">\n' % name +
-'          <input semantic="POSITION" source="#%s-Position"/>\n' % name +
+'        <vertices id="%s-Vertex">\n' % stuff.name +
+'          <input semantic="POSITION" source="#%s-Position"/>\n' % stuff.name +
 '        </vertices>\n' +
 '        <polygons count="%d">\n' % nFaces +
-'          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % name +
-'          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % name +
-'          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % name)
+'          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % stuff.name +
+'          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % stuff.name +
+'          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % stuff.name)
 
-	for fc in faces:
+	for fc in stuff.faces:
 		fp.write('          <p>')
 		for vs in fc:
 			v = vs[0]
@@ -693,7 +849,7 @@ def exportDae(obj, fp, name, proxy):
 		fp.write('\n'+
 '         </float_array>\n' +
 '         <technique_common>\n' +
-'           <accessor source="#%s-positions-array" count="%d" stride="3">\n' % (name, nVerts) +
+'           <accessor source="#%s-positions-array" count="%d" stride="3">\n' % (stuff.name, nVerts) +
 '             <param name="X" type="float"/>\n' +
 '             <param name="Y" type="float"/>\n' +
 '             <param name="Z" type="float"/>\n' +
@@ -703,43 +859,37 @@ def exportDae(obj, fp, name, proxy):
 '     </mesh>\n' +
 '   </geometry>\n')
 	"""
-	fp.write('\n' +
-'  </library_geometries>\n')
+	return
 
 #
-#	Visual scenes
+#	writeNode(obj, fp, stuff):
 #
 
+def writeNode(obj, fp, stuff):	
 	fp.write('\n' +
-'  <library_visual_scenes>\n' +
-'    <visual_scene id="Scene" name="Scene">\n')
-
-	writeBones(fp, rigHier, [0,0,0], 'layer="L1"', '')
-	
-	fp.write('\n' +
-'      <node layer="L1" id="%sObject" name="%s">\n' % (name,name) +
+'      <node layer="L1" id="%sObject" name="%s">\n' % (stuff.name,stuff.name) +
 '        <translate sid="translate">0 0 0</translate>\n' +
 '        <rotate sid="rotateZ">0 0 1 0</rotate>\n' +
 '        <rotate sid="rotateY">0 1 0 0</rotate>\n' +
 '        <rotate sid="rotateX">1 0 0 0</rotate>\n' +
 '        <scale sid="scale">1 1 1</scale>\n' +
-'        <instance_controller url="#%s-skin">\n' % name +
-'          <skeleton>#Root</skeleton>\n' +
+'        <instance_controller url="#%s-skin">\n' % stuff.name +
+'          <skeleton>#Root</skeleton>\n')
+
+	if stuff.type == None:
+		fp.write(
 '          <bind_material>\n' +
 '            <technique_common>\n' +
 '              <instance_material symbol="SSS_skinshader" target="#SSS_skinshader">\n' +
 '                <bind_vertex_input semantic="UVTex" input_semantic="TEXCOORD" input_set="0"/>\n' +
 '              </instance_material>\n' +
 '            </technique_common>\n' +
-'          </bind_material>\n' +
+'          </bind_material>\n')
+
+	fp.write(
 '        </instance_controller>\n' +
-'      </node>\n' +
-'    </visual_scene>\n' +
-'  </library_visual_scenes>\n' +
-'  <scene>\n' +
-'    <instance_visual_scene url="#Scene"/>\n' +
-'  </scene>\n' +
-'</COLLADA>\n')
+'      </node>\n')
+	return
 
 #
 #	loadShapeKeys(tmplName):	

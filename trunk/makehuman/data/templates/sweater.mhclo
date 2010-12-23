@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # 
 # name Sweater
+# weightfile Rorkimaru data/templates/sweater.rig
 # subsurf 1
 # shapekey BendArmUp
 # shapekey BendArmDown

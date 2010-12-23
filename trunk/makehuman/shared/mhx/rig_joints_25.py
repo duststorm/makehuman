@@ -11,6 +11,26 @@ DeformJoints = [
 	('spine1',			'j', 'spine1'),
 	('neck',			'j', 'neck'),
 	('head',			'j', 'head'),
+	('head2',			'j', 'head2'),
+
+	# Head
+
+	('mouth',			'j', 'mouth'),
+	('jaw',				'j', 'jaw'),
+	
+	('tongue-1',			'j', 'tongue-1'),
+	('tongue-2',			'j', 'tongue-2'),
+	('tongue-3',			'j', 'tongue-3'),
+	('tongue-4',			'j', 'tongue-4'),
+
+	('l-eye',			'j', 'l-eye'),
+	('r-eye',			'j', 'r-eye'),
+	('l-eye-target',		'j', 'l-eye-target'),
+	('r-eye-target',		'j', 'r-eye-target'),
+	('l-upperlid',			'j', 'l-upperlid'),
+	('l-lowerlid',			'j', 'l-lowerlid'),
+	('r-upperlid',			'j', 'r-upperlid'),
+	('r-lowerlid',			'j', 'r-lowerlid'),
 
 	# Legs
 	('r-upper-leg',			'j', 'r-upper-leg'),

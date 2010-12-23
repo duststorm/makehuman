@@ -24,17 +24,17 @@ TO DO
 import module3d, aljabr, files3d
 import os
 from aljabr import *
-
+import read_rig
 
 #
 #	class CProxy
-#	class CMaterial
 #
 
 class CProxy:
 	def __init__(self, typ, layer):
 		self.name = None
 		self.type = typ
+		self.rig = None
 		self.layer = layer
 		self.material = None
 		self.verts = {}
@@ -43,13 +43,18 @@ class CProxy:
 		self.texFaces = []
 		self.texVerts = []
 		self.materials = []
-		self.bones = []
-		self.weights = {}
-		self.weighted = False
 		self.wire = False
 		self.cage = False
+		self.weightfile = None
 		self.modifiers = []
 		self.shapekeys = []
+		self.bones = []
+		self.weights = None
+		return
+
+#
+#	class CMaterial
+#
 
 class CMaterial:
 	def __init__(self, name):
@@ -61,6 +66,7 @@ class CMaterial:
 		self.specular_intensity = None
 		self.specular_shader = None
 		return
+
 #
 #	Flags
 #
@@ -95,24 +101,32 @@ def proxyConfig():
 	layer = 2
 	useMhx = True
 	useObj = True
+	useDae = True
+	useMain = ['Obj', 'Mhx', 'Dae']
 	for line in fp:
 		words = line.split()
 		if len(words) == 0 or words[0][0] == '#':
 			pass
 		elif words[0] == '@':
-			if words[1] == 'Obj':
+			if words[1] == 'MainMesh':
+				useMain = words[2:]
+			elif words[1] == 'Obj':
 				useObj = eval(words[2])
 			elif words[1] == 'Mhx':
 				useMhx = eval(words[2])
-			else:
+			elif words[1] == 'Dae':
+				useDae = eval(words[2])
+			elif words[1] in ['Proxy', 'Cage', 'Clothes']:
 				typ = words[1]
 				layer = int(words[2])
+			else:
+				raise NameError('Unrecognized command %s in proxy.cfg' % words[1])
 		else:
 			proxyFile = os.path.expanduser(words[0])
-			proxyList.append((typ, useObj, useMhx, (proxyFile, typ, layer)))
+			proxyList.append((typ, useObj, useMhx, useDae, (proxyFile, typ, layer)))
 	fp.close()
-	print(proxyList)
-	return proxyList
+	print((useMain, proxyList))
+	return (useMain, proxyList)
 
 	
 #
@@ -138,46 +152,43 @@ def readProxyFile(obj, proxyStuff):
 	proxy = CProxy(typ, layer)
 	proxy.name = "MyProxy"
 
+	status = 0
+	doVerts = 1
+	doFaces = 2
+	doMaterial = 3
+	doTexVerts = 4
+	doObjData = 5
+
 	vn = 0
 	for line in tmpl:
 		words= line.split()
 		if len(words) == 0:
 			pass
 		elif words[0] == '#':
-			doVerts = False
-			doFaces = False
-			doMaterial = False
-			doTexVerts = False
-			doObjData = False
-			doBones = False
-			weightBone = None
 			theGroup = None
 			if len(words) == 1:
 				pass
 			elif words[1] == 'verts':
-				doVerts = True
+				status = doVerts
 			elif words[1] == 'faces':
-				doFaces = True
-			elif words[1] == 'bones':
-				return proxy
-				doBones = True
-			elif words[1] == 'weights':
-				weightBone = words[2]
-				proxy.weights[weightBone] = []
-				proxy.weighted = True
+				status = doFaces
 			elif words[1] == 'material':
-				doMaterial = True
+				status = doMaterial
 				proxy.material = CMaterial(words[2])
 			elif words[1] == 'texVerts':
-				doTexVerts = True
+				status = doTexVerts
 			elif words[1] == 'obj_data':
-				doObjData = True
+				status = doObjData
 			elif words[1] == 'name':
 				proxy.name = words[2]
+			elif words[1] == 'rig':
+				proxy.rig = words[2]
 			elif words[1] == 'wire':
 				proxy.wire = True
 			elif words[1] == 'cage':
 				proxy.cage = True
+			elif words[1] == 'weightfile':
+				proxy.weightfile = (words[2], words[3])
 			elif words[1] == 'subsurf':
 				subdiv = int(words[2])
 				proxy.modifiers.append( ['subsurf', subdiv] )
@@ -186,14 +197,14 @@ def readProxyFile(obj, proxyStuff):
 				proxy.modifiers.append( ['shrinkwrap', offset] )
 			elif words[1] == 'shapekey':
 				proxy.shapekeys.append( words[2] )
-		elif doObjData:
+		elif status == doObjData:
 			if words[0] == 'vt':
 				newTexVert(1, words, proxy)
 			elif words[0] == 'f':
 				newFace(1, words, theGroup, proxy)
 			elif words[0] == 'g':
 				theGroup = words[1]
-		elif doVerts:
+		elif status == doVerts:
 			v0 = int(words[0])
 			v1 = int(words[1])
 			v2 = int(words[2])
@@ -222,32 +233,12 @@ def readProxyFile(obj, proxyStuff):
 			addProxyVert(v1, vn, w1, proxy)
 			addProxyVert(v2, vn, w2, proxy)
 			vn += 1
-		elif doFaces:
+		elif status == doFaces:
 			newFace(0, words, theGroup, proxy)
-		elif doTexVerts:
+		elif status == doTexVerts:
 			newTexVert(0, words, proxy)
-		elif doMaterial:
+		elif status == doMaterial:
 			readMaterial(line, proxy.material)
-		elif doBones:
-			bone = words[0]
-			head = getJoint(words[1], obj, locations)
-			tail = getJoint(words[2], obj, locations)
-			roll = float(words[3])
-			if words[4] == '-':
-				parent = None
-			else:
-				parent = words[4]			
-			tails[bone] = tail
-			flags = 0
-			if parent:
-				offs = vsub(head, tails[parent])
-				if vlen(offs) < 1e-4:
-					flags |= F_CON
-			proxy.bones.append((bone,head,tail,roll,parent,flags))
-		elif weightBone:
-			v = int(words[0])
-			w = float(words[1])
-			proxy.weights[weightBone].append((v,w))
 
 	return proxy
 
@@ -288,44 +279,35 @@ def getJoint(joint, obj, locations):
 	return loc
 
 #
-#	writeProxyArmature(fp, proxy)
+#	writeProxyArmature(fp, obj, proxy)
 #	writeProxyBone(fp, boneInfo):	
 #	writeProxyPose(fp, proxy):
 #	writeProxyWeights(fp, proxy):
 #
 
-def writeProxyArmature(fp, proxy):
-	for boneInfo in proxy.bones:
-		writeProxyBone(fp, boneInfo)
-	return
+def writeProxyArmature(fp, obj, proxy):
+	if not proxy.rig:
+		return
+	(locs, proxy.bones, proxy.weights) = read_rig.readRigFile(proxy.rig, obj)
 
-def writeProxyBone(fp, boneInfo):
-	(bone,head,tail,roll,parent,flags) = boneInfo
-
-	fp.write("\n  Bone %s True\n" % bone)
-	(x, y, z) = head
-	fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
-	(x, y, z) = tail
-	fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
-	if parent:
-		fp.write("    parent Refer Bone %s ; \n" % (parent))
-
-	if flags & F_CON:
-		conn = True
-	else:
-		conn = False
-	
-	fp.write(
-"    roll %.6g ; \n" % (roll)+
-"    use_connect %s ; \n" % (conn) +
-"    use_deform True ; \n" +
-"  end Bone \n")
+	for (bone, head, tail, roll, parent) in proxy.bones:
+		fp.write("\n  Bone %s True\n" % bone)
+		(x, y, z) = head
+		fp.write("    head  %.4f %.4f %.4f  ;\n" % (x,-z,y))
+		(x, y, z) = tail
+		fp.write("    tail %.4f %.4f %.4f  ;\n" % (x,-z,y))
+		if parent and parent != '-':
+			fp.write("    parent Refer Bone %s ;\n" % parent)
+		fp.write(
+	"    roll %.4f ; \n" % (roll)+
+	"    use_connect False ; \n" +
+	"    use_deform True ; \n" +
+	"  end Bone \n")
 	return
 
 def writeProxyPose(fp, proxy):
 	fp.write("\nPose %s" % proxy.name)
-	for boneInfo in proxy.bones:
-		(bone,head,tail,roll,parent,flags) = boneInfo			
+	for (bone, head, tail, roll, parent) in proxy.bones:
 		if parent:
 			fp.write("\n" +
 "  Posebone %s True \n" % bone +
@@ -393,10 +375,10 @@ def proxyCoord(barycentric):
 	return [x,y,z]
 
 #
-#	getMeshInfo(obj, proxy, rawWeights, rawShapes):
+#	getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
 #
 
-def getMeshInfo(obj, proxy, rawWeights, rawShapes):
+def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
 	if proxy:
 		verts = []
 		vnormals = []
@@ -415,11 +397,19 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes):
 			faces.append(face)
 			fn += 1
 
-		if proxy.weighted:
-			weights = proxy.weights
-		else:
+		weights = None
+		shapes = []
+		if proxy.rig:
+			weights = rawWeights
+			shapes = rawShapes
+		elif rigname and proxy.weightfile:
+			(name, fileName) = proxy.weightfile
+			if rigname == name:
+				(locs, amt, weights) = read_rig.readRigFile(fileName, obj)
+
+		if not weights:
 			weights = getProxyWeights(rawWeights, proxy)
-		shapes = getProxyShapes(rawShapes, proxy.verts)
+			shapes = getProxyShapes(rawShapes, proxy.verts)
 		return (verts, vnormals, proxy.texVerts, faces, weights, shapes)
 	else:
 		verts = []
@@ -513,8 +503,8 @@ def fixProxyShape(shape):
 #
 
 def exportProxyObj(obj, name):
-	proxyList = proxyConfig()
-	for (typ, useObj, useMhx, proxyStuff) in proxyList:
+	(useMain, proxyList) = proxyConfig()
+	for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 		if useObj:
 			proxy = readProxyFile(obj, proxyStuff)
 			if proxy.name:
@@ -530,7 +520,7 @@ def exportProxyObj1(obj, filename, proxy):
 
 	for bary in proxy.realVerts:
 		(x,y,z) = proxyCoord(bary)
-		fp.write("v %.6g %.6g %.6g\n" % (x, y, z))
+		fp.write("v %.4f %.4f %.4f\n" % (x, y, z))
 
 	for uv in proxy.texVerts:
 		fp.write("vt %s %s\n" % (uv[0], uv[1]))

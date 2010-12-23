@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # 
 # name Jeans
+# weightfile Rorkimaru data/templates/jeans.rig
 # subsurf 1
 # shrinkwrap 0.06
 # shapekey BendLegForward
