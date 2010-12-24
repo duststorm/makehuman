@@ -32,9 +32,11 @@ import module3d
 import mh
 import os
 import font3d
+
+defaultFontSize = 0.5
+defaultFontFamily = 'arial'
+
 # Wrapper around Object3D
-
-
 class Object(events3d.EventHandler):
 
 	def __init__(self, view, mesh, texture=None, position=[0, 0, 9], width=None, height=None,camera=1, shadeless=1, visible=True):
@@ -610,11 +612,11 @@ class Slider(View):
 	sliderTexture="data/themes/default/images/slider.png",\
 	focusedSliderTexture="data/themes/default/images/slider_focused.png",\
 	position=[0, 0, 15], value=0.0, min=0.0, max=1.0,\
-	label=None):
+	label=None, fontSize = defaultFontSize):
 		View.__init__(self, parent)
 		#set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
 		if isinstance(label, str):
-			self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-5,position[2]])
+			self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-5,position[2]], fontSize = fontSize)
 		self.background = Object(self, 'data/3dobjs/slider_background.obj', texture=backgroundTexture, position=position)
 		self.slider = Object(self, 'data/3dobjs/slider_cursor.obj', texture=sliderTexture, position=[position[0], position[1] + 16, position[2] + 0.01])
 		self.sliderTexture = sliderTexture
@@ -698,7 +700,7 @@ class Button(View):
 
 	def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture="data/themes/default/images/button_unselected.png",\
 	selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None,\
-	label=None, width=None, height=None):
+	label=None, width=None, height=None, fontSize = defaultFontSize):
 		View.__init__(self, parent)
 		if selectedTexture and selected:
 			t = selectedTexture
@@ -708,7 +710,7 @@ class Button(View):
 			self.button = Object(self, mesh='data/3dobjs/unit_square.obj', texture=t, position=position, width=width, height=height)
 		else: self.button = Object(self, mesh, texture=t, position=position)
 		if isinstance(label, str):
-			self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-8,position[2]+0.001])
+			self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-8,position[2]+0.001], fontSize = fontSize)
 			#assumes button obj origin is upper left corner
 			#TODO text should be in the middle of button, calculate this from text length
 		self.texture = texture
@@ -769,8 +771,8 @@ class Button(View):
 
 class RadioButton(Button):
 
-	def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, label=None):
-		Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, label=label)
+	def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, label=None, fontSize = defaultFontSize):
+		Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, label=label, fontSize = fontSize)
 		self.group = group
 		self.group.append(self)
 
@@ -796,9 +798,9 @@ class RadioButton(Button):
 
 class ToggleButton(Button):
 
-	def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None, label=None):
+	def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None, label=None, fontSize = defaultFontSize):
 
-		Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label)
+		Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, fontSize = fontSize)
 
 	def onClicked(self, event):
 		if self.selected:
@@ -818,8 +820,8 @@ class ToggleButton(Button):
 
 class ToolbarButton(RadioButton):
 
-	def __init__(self, parent, group, texture=None, position=[0, 0, 9]):
-		RadioButton.__init__(self, parent, texture, None, position)
+	def __init__(self, parent, group, texture=None, position=[0, 0, 9], fontSize = defaultFontSize):
+		RadioButton.__init__(self, parent, texture, None, position, fontSize = fontsize)
 
 	def onSelected(self, selected):
 		if selected:
@@ -876,9 +878,9 @@ class ProgressBar(View):
 
 class TextView(View):
 
-	def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9]):
+	def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9], fontSize = defaultFontSize):
 		View.__init__(self, parent)
-		self.textObject = TextObject(self, position=position)
+		self.textObject = TextObject(self, position=position, fontSize = fontSize)
 
 	def setText(self, text):
 		self.textObject.setText(text)
@@ -889,13 +891,13 @@ class TextView(View):
 
 class TextEdit(View):
 
-	def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9], focusedTexture=None):
+	def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9], focusedTexture=None, fontSize = defaultFontSize):
 		View.__init__(self, parent)
 
 		# Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
 
 		self.background = Object(self, mesh=mesh, texture=texture, position=position)
-		self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 1.0, position[2] + 0.1])
+		self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 1.0, position[2] + 0.1], fontSize = fontSize)
 
 		self.text = text
 		self.texture = texture
@@ -1229,10 +1231,10 @@ class FileChooser(View):
 		self.app.scene3d.redraw()
 		
 class TextObject(Object):
-	def __init__(self, view, fontFamily = 'arial', text = '', position=[0, 0, 9], fontSize = 0.5):
+	def __init__(self, view, fontFamily = defaultFontFamily, text = '', position=[0, 0, 9], fontSize = defaultFontSize):
 		self.font = view.app.getFont(fontFamily)
 		mesh = font3d.createMesh(self.font, text);
-		mesh.setScale(0.5, 0.5, 0.5)
+		mesh.setScale(fontSize, fontSize, fontSize)
 		Object.__init__(self, view, mesh, None, position)
 		self.text = text
 		self.fontSize = fontSize
