@@ -1,5 +1,16 @@
 # name Rorkimaru
+# author Rorkimaru
 # rig data/templates/Rorkimaru.rig
+# material Skin
+diffuse_color 0.87 0.65 0.58
+diffuse_shader OREN-NAYAR
+diffuse_intensity 0.80
+specular_color 0.5 0.5 0.5
+specular_shader COOKTORR
+specular_intensity 0.05
+translucency 0.00
+ambient_color 0.5 0.5 0.5
+emit_color 0.0 0.0 0.0
 # verts
  3184  5915  5858 0.44765 0.40723 0.14512
 10565  9683  9653 0.44765 0.14512 0.40723

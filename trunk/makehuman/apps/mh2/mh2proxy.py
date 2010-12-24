@@ -65,6 +65,9 @@ class CMaterial:
 		self.specular_color = None
 		self.specular_intensity = None
 		self.specular_shader = None
+		self.translucency = 0.0
+		self.ambient_color = None
+		self.emit_color = None
 		return
 
 #
@@ -125,7 +128,9 @@ def proxyConfig():
 			proxyFile = os.path.expanduser(words[0])
 			proxyList.append((typ, useObj, useMhx, useDae, (proxyFile, typ, layer)))
 	fp.close()
-	print((useMain, proxyList))
+	print "Proxy configuration: Use %s" % useMain
+	for elt in proxyList:
+		print "  ", elt
 	return (useMain, proxyList)
 
 	
@@ -261,6 +266,12 @@ def readMaterial(line, mat):
 		mat.specular_shader = words[1]
 	elif key == 'specular_intensity':
 		mat.specular_intensity = float(words[1])
+	elif key == 'translucency':
+		mat.translucency = float(words[1])
+	elif key == 'ambient_color':
+		mat.ambient_color =  (float(words[1]), float(words[2]), float(words[3]))
+	elif key == 'emit_color':
+		mat.emit_color =  (float(words[1]), float(words[2]), float(words[3]))
 	else:
 		raise NameError("Material %s?" % key)
 

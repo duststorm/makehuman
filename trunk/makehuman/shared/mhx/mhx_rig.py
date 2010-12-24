@@ -1073,6 +1073,9 @@ def addChildOfConstraint(fp, switch, flags, inf, data):
 	(scalex, scaley, scalez) = data[4]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
+	#ownsp = 'WORLD'
+	#targsp = 'WORLD'
+
 	if Mhx25:
 		fp.write(
 "    Constraint %s CHILD_OF %s\n" % (name, switch) +

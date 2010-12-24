@@ -1,4 +1,15 @@
 # name forsaken
+# author forsaken
+# material Skin
+diffuse_color 0.87 0.65 0.58
+diffuse_shader OREN-NAYAR
+diffuse_intensity 0.80
+specular_color 0.5 0.5 0.5
+specular_shader COOKTORR
+specular_intensity 0.05
+translucency 0.00
+ambient_color 0.5 0.5 0.5
+emit_color 0.0 0.0 0.0
 # verts
 10170 10325 10169 0.01208 0.61135 0.37657
 10703 10710 10712 0.03184 0.90321 0.06495

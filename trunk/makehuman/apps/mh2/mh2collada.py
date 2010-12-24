@@ -37,6 +37,11 @@ from mhx_rig import *
 import read_rig
 
 #
+#	Size of end bones = 1 mm
+#
+Delta = [0,0.01,0]
+
+#
 # ....exportCollada(obj, filename):
 #	exportCollada1(obj, filename, proxyData):
 #
@@ -179,7 +184,8 @@ def writeBone(fp, bone, orig, extra, pad, stuff):
 		writeBones(fp, children, head, '', pad+'  ', stuff)	
 	else:
 		tail = stuff.rigTail[name]
-		vec = aljabr.vsub(tail, head)
+		#vec = aljabr.vsub(tail, head)
+		vec = Delta
 		printNode(fp, name+"_end", vec, '', pad+'  ')
 		fp.write('\n%s        </node>' % pad)
 	fp.write('\n%s      </node>' % pad)
@@ -292,7 +298,8 @@ def addInvBones(hier, heads, tails):
 		if n > 1 or (n == 1 and vlen(offs) > 1e-4):
 			boneInv = bone+"Inv"
 			heads[boneInv] = tails[bone]
-			tails[boneInv] = heads[bone]
+			#tails[boneInv] = heads[bone]
+			tails[boneInv] = aljabr.vadd(tails[bone], Delta)
 			newHier.append( (bone, [(boneInv, newChildren)]) )
 		else:
 			newHier.append( (bone, newChildren) )
@@ -304,9 +311,9 @@ def addInvBones(hier, heads, tails):
 #
 
 class CStuff:
-	def __init__(self, name, typ):
+	def __init__(self, name, proxy):
 		self.name = name
-		self.type = typ
+		self.type = None
 		self.bones = None
 		self.rawWeights = None
 		self.verts  = None
@@ -317,6 +324,10 @@ class CStuff:
 		self.targets = None
 		self.vertexWeights = None
 		self.skinWeights = None
+		self.material = None
+		if proxy:
+			self.type = proxy.type
+			self.material = proxy.material
 
 	def setBones(self, amt):
 		(rigHead, rigTail, rigHier, bones, rawWeights) = amt
@@ -344,6 +355,82 @@ class CStuff:
 		return
 
 #
+#	filterMesh(mesh1):
+#
+
+def filterMesh(mesh1):
+	(verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
+
+	killVerts = {}
+	killUvs = {}
+	for f in faces1:
+		if len(f) == 3:
+			for v in f:
+				killVerts[v[0]] = True
+				killUvs[v[1]] = True
+
+	n = 0
+	nv = {}
+	verts2 = []
+	for m,v in enumerate(verts1):
+		try:
+			killVerts[m]
+		except:
+			verts2.append(v)
+			nv[m] = n
+			n += 1
+
+	vnormals2 = []
+	for m,vn in enumerate(vnormals1):
+		try:
+			killVerts[m]
+		except:
+			vnormals2.append(vn)
+
+	n = 0
+	uvValues2 = []
+	nuv = {}
+	for m,uv in enumerate(uvValues1):
+		try:
+			killUvs[m]
+		except:
+			uvValues2.append(uv)
+			nuv[m] = n
+			n += 1	
+
+	faces2 = []
+	for f in faces1:
+		if len(f) == 4:
+			f2 = []
+			for c in f:
+				v2 = nv[c[0]]
+				uv2 = nuv[c[1]]
+				f2.append([v2, uv2])
+			faces2.append(f2)
+
+	weights2 = {}
+	for (b, wts1) in weights1.items():
+		wts2 = []
+		for (v1,w) in wts1:
+			try:
+				killVerts[v1]
+			except:
+				wts2.append((nv[v1],w))
+		weights2[b] = wts2
+
+	targets2 = []
+	for (name, morphs1) in targets1:
+		morphs2 = []
+		for (v1,dx) in morphs1:
+			try:
+				killVerts[v1]
+			except:
+				morphs2.append((nv[v1],dx))
+		targets2.append(name, morphs2)
+
+	return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
+
+#
 #	exportDae(obj, fp):
 #
 
@@ -355,19 +442,19 @@ def exportDae(obj, fp):
 	rawTargets = []
 
 	stuffs = []
-	theStuff = None
+	stuff = CStuff('Human', None)
+	stuff.setBones(amt)
+	theStuff = stuff
 	if 'Dae' in useMain:
-		stuff = CStuff('Human', None)
-		stuff.setBones(amt)
-		mesh = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-		stuff.setMesh(mesh)
+		mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
+		mesh2 = filterMesh(mesh1)
+		stuff.setMesh(mesh2)
 		stuffs.append(stuff)
-		theStuff = stuff
 
 	setupProxies('Proxy', obj, stuffs, amt, rawTargets, proxyList)
 	setupProxies('Clothes', obj, stuffs, amt, rawTargets, proxyList)
 
-	if theStuff == None:
+	if theStuff.verts == None:
 		raise NameError("No rig found. Neither main mesh nor rigged proxy enabled")
 
 	date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
@@ -443,13 +530,13 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 		if useDae and typ == typename:
 			proxy = mh2proxy.readProxyFile(obj, proxyStuff)
 			if proxy.name:
-				stuff = CStuff(proxy.name, typ)
+				stuff = CStuff(proxy.name, proxy)
 				if proxy.rig:
 					(proxyFile, typ, layer) = proxyStuff
 					amtProxy = getArmatureFromRigFile(proxy.rig, obj)
 					stuff.setBones(amtProxy)
-					if theStuff:
-						print("WARNING: Collada export with several rigged meshes. Ignored %s" % proxy.name)
+					if theStuff.verts:
+						print("WARNING: Collada export with several meshes. Ignored %s" % proxy.name)
 						stuff = None
 					else:
 						theStuff = stuff	
@@ -461,6 +548,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 						stuff.setBones(amt)
 				else:
 					stuff.setBones(amt)
+					theStuff.verts = True
 				if stuff:
 					if theStuff:
 						stuffname = theStuff.name
@@ -478,25 +566,62 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 def writeImages(obj, fp, stuff):
 	if stuff.type:
 		return
-	texture = os.path.expanduser("~/makehuman/texture.tif")
-	texture_ref = os.path.expanduser("~/makehuman/texture_ref.tif")	
+	dd = '~/makehuman'
+	dd = 'data/textures'
+	texdir = os.path.realpath(os.path.expanduser(dd))
 	fp.write(
 '    <image id="texture_tif">\n' +
-'      <init_from>%s</init_from>\n' % texture +
+'      <init_from>%s</init_from>\n' % ("%s/texture.tif" % texdir) +
 '    </image>\n' +
 '    <image id="texture_ref_tif">\n' +
-'      <init_from>%s</init_from>\n' % texture_ref +
+'      <init_from>%s</init_from>\n' % ("%s/texture_ref.tif" % texdir) +
 '    </image>\n')
 	return
 
 #
 #	writeEffects(obj, fp, stuff):
+#	writeColor(fp, name, color, insist):
 #
 
-def writeEffects(obj, fp, stuff):
-	if stuff.type:
+def writeColor(fp, name, color, insist):
+	if color:
+		(r,g,b) = color
+	elif insist:
+		(r,g,b) = insist
+	else:
 		return
 	fp.write(
+'            <%s>\n' % name +
+'              <color>%.4f %.4f %.4f 1</color>\n' % (r,g,b) +
+'            </%s>\n' %name)
+	return 
+
+def writeEffects(obj, fp, stuff):
+	mat = stuff.material
+	if mat:
+		fp.write(
+'    <effect id="%s-effect">\n' % mat.name +
+'      <profile_COMMON>\n' +
+'        <technique sid="common">\n' +
+'          <lambert>\n')
+		writeColor(fp, 'diffuse', mat.diffuse_color, (0.8,0.8,0.8))
+		writeColor(fp, 'specular', mat.specular_color, (1,1,1))
+		writeColor(fp, 'emission', mat.emit_color, None)
+		writeColor(fp, 'ambient', mat.ambient_color, None)
+		fp.write(
+'          </lambert>\n' +
+'          <extra/>\n' +
+'        </technique>\n' +
+'        <extra>\n' +
+'          <technique profile="GOOGLEEARTH">\n' +
+'            <show_double_sided>1</show_double_sided>\n' +
+'          </technique>\n' +
+'        </extra>\n' +
+'      </profile_COMMON>\n' +
+'      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>\n' +
+'    </effect>\n')
+	elif not stuff.type:
+		fp.write(
 '    <effect id="SSS_skinshader-effect">\n' +
 '      <profile_COMMON>\n' +
 '        <newparam sid="texture_tif-surface">\n' +
@@ -521,7 +646,6 @@ def writeEffects(obj, fp, stuff):
 '        </newparam>\n' +
 '        <technique sid="common">\n' +
 '          <phong>\n' +
-
 '            <emission>\n' +
 '              <color>0 0 0 1</color>\n' +
 '            </emission>\n' +
@@ -553,15 +677,21 @@ def writeEffects(obj, fp, stuff):
 '        </technique>\n' +
 '      </profile_COMMON>\n' +
 '    </effect>\n')
+	return
 
 #
 #	writeMaterials(obj, fp, stuff):
 #
 
 def writeMaterials(obj, fp, stuff):
-	if stuff.type:
-		return
-	fp.write(
+	mat = stuff.material
+	if mat:
+		fp.write(
+'    <material id="%s" name="%s">\n' % (mat.name, mat.name) +
+'      <instance_effect url="#%s-effect"/>\n' % mat.name +
+'    </material>\n')
+	elif not stuff.type:
+		fp.write(
 '    <material id="SSS_skinshader" name="SSS_skinshader">\n' +
 '      <instance_effect url="#SSS_skinshader-effect"/>\n' +
 '    </material>\n')
@@ -877,10 +1007,17 @@ def writeNode(obj, fp, stuff):
 '          <skeleton>#Root</skeleton>\n')
 
 	if stuff.type == None:
+		matname = 'SSS_skinshader'
+	elif stuff.material:
+		matname = stuff.material.name
+	else:
+		matname = None
+
+	if matname:
 		fp.write(
 '          <bind_material>\n' +
 '            <technique_common>\n' +
-'              <instance_material symbol="SSS_skinshader" target="#SSS_skinshader">\n' +
+'              <instance_material symbol="%s" target="#%s">\n' % (matname, matname) +
 '                <bind_vertex_input semantic="UVTex" input_semantic="TEXCOORD" input_set="0"/>\n' +
 '              </instance_material>\n' +
 '            </technique_common>\n' +
