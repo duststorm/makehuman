@@ -48,6 +48,7 @@
 #endif // __APPLE__
 #ifdef __WIN32__
 #include <shlobj.h>
+#include <knownfolders.h>
 
 OSVERSIONINFO winVersion(void)
 {
@@ -416,47 +417,19 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     }
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
-    
-      
-      typedef HMODULE  (__stdcall *SHGETFOLDERPATH)(HWND, int, HANDLE, DWORD, LPWSTR);
-      HMODULE hModule; 
-      
-      OSVERSIONINFO osvi = winVersion();
-      BOOL WinXPorLater = ((osvi.dwMajorVersion > 5) || ((osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion >= 1)));
-      BOOL WinVistaOrLater = (osvi.dwMajorVersion >= 6);
-      
-      if (WinXPorLater) //winxp and above
-        hModule = LoadLibraryW(L"SHELL32.DLL");
-      else //win2k and below (though theoretically we don't support win2k and below)
-        hModule = LoadLibraryW(L"SHFOLDER.DLL");
-      
-      if (hModule != NULL)
-      {
-        SHGETFOLDERPATH fnShGetFolderPath;
-        if (WinVistaOrLater) //vista and above
-        {
-          fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetKnownFolderPathW");
-        }
-        else //xp and below
-        {
-          fnShGetFolderPath = (SHGETFOLDERPATH)GetProcAddress(hModule, "SHGetFolderPathW");
-        }
+        HRESULT hr;
 
-        if (fnShGetFolderPath != NULL)
-        {
-    #ifdef CSIDL_MYDOCUMENTS
-          HRESULT hr = fnShGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
-    #else
-          HRESULT hr = fnShGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, path);
-    #endif
+#ifdef CSIDL_MYDOCUMENTS       
+        hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+#else
+        hr = SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, path);
+#endif
 
-          if (FAILED(hr))
-          {
-            path[0] = '\0';
-          }
+        if (FAILED(hr))
+        {
+            PyErr_SetString(PyExc_TypeError, "SHGetFolderPathW failed");
+            return NULL;
         }
-        FreeLibrary(hModule);
-      }
 
         if (0 == strcmp(typeStr, "exports"))
         {
