@@ -948,7 +948,8 @@ def computeScale(oBox, file, obj):
         if dz[0] > vert[2] : dz[0] = vert[2]
         if dz[1] < vert[2] : dz[1] = vert[2]
    scale = [1.0,1.0,1.0]
-   scale[0] = (dx[1]-dx[0])/(oBox[0][1] - oBox[0][0])
-   scale[1] = (dy[1]-dy[0])/(oBox[1][1] - oBox[1][0])
-   scale[2] = (dz[1]-dz[0])/(oBox[2][1] - oBox[2][0])
+   if (len(dx)>0):
+      scale[0] = (dx[1]-dx[0])/(oBox[0][1] - oBox[0][0])
+      scale[1] = (dy[1]-dy[0])/(oBox[1][1] - oBox[1][0])
+      scale[2] = (dz[1]-dz[0])/(oBox[2][1] - oBox[2][0])
    return scale
