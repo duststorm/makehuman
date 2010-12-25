@@ -20,6 +20,7 @@ class PoseTaskView(gui3d.TaskView):
 
         self.engine = poseengine.Poseengine(self.app.scene3d.selectedHuman)        
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
+        self.shoulder.oBoundingBox = [[0.0, 8.1955895],[3.674790375, 6.1586085],[-1.120018, 1.192948875]]
         self.shoulder.rotOrder = "xzy"
         
         self.shoulder.keyRot0 = [-90,90]

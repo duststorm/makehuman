@@ -9,9 +9,6 @@ import algos3d
 import aljabr
 import math
 
-
-
-
 class Limb():
 
     def __init__(self, name, character, dataPath = "data/targets/poseengine/joint-r-shoulder"):
@@ -27,6 +24,7 @@ class Limb():
         self.dataPath = dataPath
         self.angle = [0,0,0]
         self.rotOrder = "xyz"
+        self.oBoundingBox = None
 
 
         try:
@@ -259,9 +257,8 @@ class Limb():
 
         else:
             self.trasl[path+".target"] = morphFactor
-
-
-
+    
+    
     def applyPose(self,savePath=None):
 
         if savePath:
@@ -289,9 +286,11 @@ class Limb():
 
         traslPaths = self.trasl.keys()
         traslPaths.sort()
+        scale = None
         for targetPath in traslPaths:
+            if (scale == None): scale = algos3d.computeScale(self.oBoundingBox, targetPath, self.character.meshData)
             morphFactor = self.trasl[targetPath]
-            algos3d.loadTranslationTarget(self.character.meshData, targetPath, morphFactor, None, 1, 0)
+            algos3d.loadTranslationTarget(self.character.meshData, targetPath, morphFactor, None, 1, 0, scale)
             if savePath:
                 fileDescriptor.write("%s %f\n" % (targetPath, morphFactor))
 
@@ -308,11 +307,6 @@ class Limb():
         self.character.meshData.update()
         if savePath:
             fileDescriptor.close()
-
-
-
-
-
 
 
 class Poseengine():
@@ -336,9 +330,3 @@ class Poseengine():
             #print repr(l.name),repr(limbName)
             if l.name == limbName:
                 return l
-
-
-
-
-
-

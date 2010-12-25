@@ -137,7 +137,7 @@ def pushTargetInBuffer(obj, targetPath):
     targetPath:
         *string*. The file system path to the file containing the morphing targets. 
         The precise format of this string will be operating system dependant.
-
+hi
 
     """
 
@@ -150,7 +150,7 @@ def pushTargetInBuffer(obj, targetPath):
     #print 'Buffer time', time.time() - t1
 
 
-def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1):
+def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1, scale=[1.0,1.0,1.0]):
     """
     This function retrieves a set of translation vectors and applies those 
     translations to the specified vertices of the mesh object. This set of 
@@ -236,9 +236,9 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=No
 
         for v in verticesToUpdate:
             targetVect = target.data[v.idx]
-            v.co[0] += targetVect[0] * morphFactor
-            v.co[1] += targetVect[1] * morphFactor
-            v.co[2] += targetVect[2] * morphFactor
+            v.co[0] += targetVect[0] * morphFactor * scale[0]
+            v.co[1] += targetVect[1] * morphFactor * scale[1]
+            v.co[2] += targetVect[2] * morphFactor * scale[2]
 
         if calcNorm == 1:
             obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
@@ -859,4 +859,96 @@ def resetObj(obj, update=None, calcNorm=None):
     if calcNorm:
         obj.calcNormals()
 
+#scaleList is a list of tuple like this:  [(set(1,2,3,4),[1.0,1.0,2.0]),....]. First entry of tuple is a set of indices, second entry is a triple list of scale.
+def scaleTarget(obj, index, morphFactor, scaleList):
+   targetVect = obj.verts[index]
+   scale = [1.0,1.0,1.0]
+   for tpl in scaleList:
+      if (index in tpl[0]):
+         scale = tpl[1]
+         break
+   return [targetVect[0]*scale[0]*morphFactor ,targetVect[1]*scale[1]*morphFactor, targetVect[2]*scale[2]*morphFactor]
 
+def loadTranslationTarget2(obj, targetPath, morphFactor, scaleList, update=1, calcNorm=1):
+
+    #change this thing
+    #dictionary of targets we will do this manually no need to pushtarget
+    global targetBuffer
+    if not targetBuffer.has_key(targetPath):
+        pushTargetInBuffer(obj, targetPath)
+
+    # if the target is already buffered, just get it using
+    # the path as key
+   
+    if os.path.isfile(targetPath): 
+        target = targetBuffer[targetPath]   
+
+        # if a facegroup is provided, apply it ONLY to the verts used
+        # by the specified facegroup.
+        facesToRecalculate = [obj.faces[i] for i in target.faces]
+        verticesToUpdate = [obj.verts[i] for i in target.verts]
+
+        # Adding the translation vector
+        for v in verticesToUpdate:
+            targetVect = scaleTarget(target.data, v.idx) #jcapco changed
+            v.co[0] += targetVect[0] * morphFactor
+            v.co[1] += targetVect[1] * morphFactor
+            v.co[2] += targetVect[2] * morphFactor
+
+        if calcNorm == 1:
+            obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
+        if update:
+            obj.update(verticesToUpdate)
+
+        return True
+
+def printBox(file, obj):
+   dx = []
+   dy = []
+   dz = []
+   data = open(file)
+   for line in data:
+      line = line.split()
+      i = int(line[0])
+      vert = obj.verts[i].co
+      if (len(dx) == 0):
+        dx = [vert[0], vert[0]]
+        dy = [vert[1], vert[1]]
+        dz = [vert[2], vert[2]]
+      else:
+        if dx[0] > vert[0] : dx[0] = vert[0]
+        if dx[1] < vert[0] : dx[1] = vert[0]
+        if dy[0] > vert[1] : dy[0] = vert[1]
+        if dy[1] < vert[1] : dy[1] = vert[1]
+        if dz[0] > vert[2] : dz[0] = vert[2]
+        if dz[1] < vert[2] : dz[1] = vert[2]
+  
+   print " dx : ", dx
+   print " dy : ", dy
+   print " dz : ", dz
+
+def computeScale(oBox, file, obj):
+   dx = []
+   dy = []
+   dz = []
+   data = open(file)
+   for line in data:
+      line = line.split()
+      i = int(line[0])
+      vert = obj.verts[i].co
+      if (len(dx) == 0):
+        dx = [vert[0], vert[0]]
+        dy = [vert[1], vert[1]]
+        dz = [vert[2], vert[2]]
+      else:
+        if dx[0] > vert[0] : dx[0] = vert[0]
+        if dx[1] < vert[0] : dx[1] = vert[0]
+        if dy[0] > vert[1] : dy[0] = vert[1]
+        if dy[1] < vert[1] : dy[1] = vert[1]
+        if dz[0] > vert[2] : dz[0] = vert[2]
+        if dz[1] < vert[2] : dz[1] = vert[2]
+   scale = [1.0,1.0,1.0]
+   scale[0] = (dx[1]-dx[0])/(oBox[0][1] - oBox[0][0])
+   scale[1] = (dy[1]-dy[0])/(oBox[1][1] - oBox[1][0])
+   scale[2] = (dz[1]-dz[0])/(oBox[2][1] - oBox[2][0])
+   return scale
