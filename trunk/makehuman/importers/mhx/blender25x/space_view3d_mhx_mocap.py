@@ -89,10 +89,7 @@ class CNode:
 			name += ' '+word
 		
 		self.name = name
-		if parent and parent != 'MasterFloor':
-			self.parent = parent
-		else:
-			self.parent = None
+		self.parent = parent
 		self.children = []
 		self.head = Vector((0,0,0))
 		self.offset = Vector((0,0,0))
@@ -338,7 +335,7 @@ def channelZup(word):
 
 ###################################################################################
 #
-#	Supported armatures
+#	Supported source armatures
 
 #
 #	OsuArmature
@@ -706,12 +703,13 @@ FixesList = {
 }
 
 #
-#	end supported armatures
+#	end supported source armatures
 ###################################################################################
+#
+#	Mhx rig
+#
 
-theArmature = None
-
-FkBoneList = [
+MhxFkBoneList = [
 	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'LowerNeck', 'Neck', 'Head',
 	'Shoulder_L', 'UpArmFK_L', 'LoArmFK_L', 'WristFK_L', 'HandFK_L', 'ElbowPTFK_L',
 	'Shoulder_R', 'UpArmFK_R', 'LoArmFK_R', 'WristFK_R', 'HandFK_R', 'ElbowPTFK_R',
@@ -724,7 +722,7 @@ FkBoneList = [
 F_Rev = 1
 F_LR = 2
 
-IkArmature = {
+MhxIkArmature = {
 	'UpArmIK' : ('UpArmFK', F_LR, 'Shoulder'),
 	'LoArmIK' : ('LoArmFK', F_LR, 'UpArmIK'),
 	'HandIK' : ('HandFK', 0, None),
@@ -742,12 +740,12 @@ IkArmature = {
 	'KneePTIK' : ('KneePTFK', 0, None),
 }
 
-IkBoneList = [
+MhxIkBoneList = [
 	'UpArmIK', 'LoArmIK', 'HandIK', 'ElbowPTIK',
 	'UpLegIK', 'LoLegIK', 'LegIK', 'ToeRevIK', 'FootRevIK', 'AnkleIK', 'KneePTIK',
 ]
 
-GlobalBoneList = [
+MhxGlobalBoneList = [
 	'Root', 
 ]
 '''
@@ -759,6 +757,188 @@ GlobalBoneList = [
 	'LegFK_R', 'AnkleFK_R',
 ]
 '''
+
+###################################################################################
+#
+#	Other supported target armatures
+#
+#	If you want to use the mocap tool for your own armature, it should suffice to 
+#	modify this section (down to getParentName()).
+#
+
+T_MHX = 1
+T_Rorkimaru = 2
+T_Minimal = 3
+theTarget = 0
+theArmature = None
+
+RorkimaruBones = [
+	('Hips',		'Root'),
+	('Spine1',		'Spine1'),
+	('Spine2',		'Spine3'),
+	('Neck',		'Neck'),
+	('Head',		'Head'),
+
+	('Clavicle_L',	'Shoulder_L'),
+	('UpArm_L',		'UpArmFK_L'),
+	('LoArm_L',		'LoArmFK_L'),
+	('Hand_L',		'HandFK_L'),
+
+	('Clavicle_R',	'Shoulder_R'),
+	('UpArm_R',		'UpArmFK_R'),
+	('LoArm_R',		'LoArmFK_R'),
+	('Hand_R',		'HandFK_R'),
+
+	('UpLeg_L',		'UpLegFK_L'),
+	('LoLeg_L',		'LoLegFK_L'),
+	('Foot_L',		'FootFK_L'),
+	('Toe_L',		'ToeFK_L'),
+
+	('UpLeg_R',		'UpLegFK_R'),
+	('LoLeg_R',		'LoLegFK_R'),
+	('Foot_R',		'FootFK_R'),
+	('Toe_R',		'ToeFK_R'),
+]
+
+MinimalBones = [
+	('Root',		'Root'),
+	('Spine1',		'Spine1'),
+	('Spine2',		'Spine2'),
+	('Spine3',		'Spine3'),
+	('Neck',		'Neck'),
+	('Head',		'Head'),
+
+	('Clavicle_L',	'Shoulder_L'),
+	('UpArm_L',		'UpArmFK_L'),
+	('LoArm_L',		'LoArmFK_L'),
+	('Hand_L',		'HandFK_L'),
+
+	('Clavicle_R',	'Shoulder_R'),
+	('UpArm_R',		'UpArmFK_R'),
+	('LoArm_R',		'LoArmFK_R'),
+	('Hand_R',		'HandFK_R'),
+
+	('Hip_L',		'Hip_L'),
+	('UpLeg_L',		'UpLegFK_L'),
+	('LoLeg_L',		'LoLegFK_L'),
+	('Foot_L',		'FootFK_L'),
+	('Toe_L',		'ToeFK_L'),
+
+	('Hip_R',		'Hip_R'),
+	('UpLeg_R',		'UpLegFK_R'),
+	('LoLeg_R',		'LoLegFK_R'),
+	('Foot_R',		'FootFK_R'),
+	('Toe_R',		'ToeFK_R'),
+]
+
+MinimalParents = {
+	'RootInv' :		'Root',
+	'HipsInv' :		'Root',
+	'Hips' :		'Root',
+	'Spine3Inv' :	'Spine3',
+}
+
+#
+#	TagBones - unique bone used to recognize target armature
+#
+
+TagBones = {
+	('MHX',	T_MHX, 'KneePTFK_L'),
+	('Rorkimaru', T_Rorkimaru, 'Spine2Inv'),
+	('Minimal', T_Minimal, 'Spine3Inv'),
+}
+
+#
+#	getTrgBone(b):
+#	getSrcBone(b):
+#	getParentName(b):
+#
+
+def getTrgBone(b):
+	if theTarget == T_MHX:
+		return b
+	else:
+		try:
+			return theTrgBone[b]
+		except:
+			return None
+			
+def getSrcBone(b):
+	if theTarget == T_MHX:
+		return b
+	else:
+		try:
+			return theSrcBone[b]
+		except:
+			return None			
+
+def getParentName(b):
+	if b == None:
+		return None
+	elif theTarget == T_MHX:
+		if b == 'MasterFloor':
+			return None
+		else:
+			return b
+	elif theTarget == T_Rorkimaru:
+		if b[-3:] == 'Inv':
+			return b[:-3]
+		else:
+			return b
+	elif theTarget == T_Minimal:
+		print("par", b)
+		try:
+			return MinimalParents[b]
+		except:
+			return b
+
+#
+#	guessTargetArmature(trgRig):
+#	setupTargetArmature():
+#
+
+def guessTargetArmature(trgRig):
+	global theTarget
+	for (name, number, bone) in TagBones:
+		try:
+			trgRig.data.bones[bone]
+			theTarget = number
+			print("Target rig set to %s" % name)
+			setupTargetArmature()
+			return
+		except:
+			pass
+	raise NameError("Did not recognize target armature")	
+
+def setupTargetArmature():
+	global theFkBoneList, theIkBoneList, theGlobalBoneList, theIkArmature, theSrcBone, theTrgBone
+	if theTarget == T_MHX:
+		theFkBoneList = MhxFkBoneList
+		theIkBoneList = MhxIkBoneList
+		theIkArmature = MhxIkArmature
+		theGlobalBoneList = MhxGlobalBoneList
+	else:
+		theFkBoneList = []
+		theIkBoneList = []
+		theGlobalBoneList = []
+		theIkArmature = {}
+		theTrgBone = {}
+		theSrcBone = {}
+		if theTarget == T_Rorkimaru:
+			bones = RorkimaruBones
+		elif theTarget == T_Minimal:
+			bones = MinimalBones
+		for (trg,src) in bones:
+			theFkBoneList.append(trg)
+			theSrcBone[trg] = src
+			theTrgBone[src] = trg
+			if src in MhxGlobalBoneList:
+				theGlobalBoneList.append(trg)
+	return
+
+#	end supported target armatures
+###################################################################################
+
 #			
 #	class CEditBone():
 #
@@ -769,11 +949,13 @@ class CEditBone():
 		self.head = bone.head.copy()
 		self.tail = bone.tail.copy()
 		self.roll = bone.roll
-		if bone.parent and bone.parent.name != 'MasterFloor':
-			self.parent = bone.parent.name
-			self.use_connect = bone.use_connect
+		if bone.parent:
+			self.parent = getParentName(bone.parent.name)
 		else:
 			self.parent = None
+		if self.parent:
+			self.use_connect = bone.use_connect
+		else:
 			self.use_connect = False
 		self.matrix = bone.matrix.copy().rotation_part()
 		self.inverse = self.matrix.copy().invert()
@@ -824,26 +1006,26 @@ def createExtraBones(ebones, bones90):
 			toe = None
 
 		if not toe:
-			name90 = 'ToeFK'+suffix
-			toe = ebones.new(name=name90)
+			nameSrc = 'ToeFK'+suffix
+			toe = ebones.new(name=nameSrc)
 			toe.head = foot.tail
 			toe.tail = toe.head - Vector((0, 0.5*foot.length, 0))
 			toe.parent = foot
-			bones90[name90] = CEditBone(toe)
+			bones90[nameSrc] = CEditBone(toe)
 			
-		name90 = 'LegFK'+suffix
-		eb = ebones.new(name=name90)
+		nameSrc = 'LegFK'+suffix
+		eb = ebones.new(name=nameSrc)
 		eb.head = 2*toe.head - toe.tail
 		eb.tail = 4*toe.head - 3*toe.tail
 		eb.parent = toe
-		bones90[name90] = CEditBone(eb)
+		bones90[nameSrc] = CEditBone(eb)
 
-		name90 = 'AnkleFK'+suffix
-		eb = ebones.new(name=name90)
+		nameSrc = 'AnkleFK'+suffix
+		eb = ebones.new(name=nameSrc)
 		eb.head = foot.head
 		eb.tail = 2*foot.head - foot.tail
 		eb.parent = ebones['LoLegFK'+suffix]
-		bones90[name90] = CEditBone(eb)
+		bones90[nameSrc] = CEditBone(eb)
 	return
 
 #
@@ -908,14 +1090,14 @@ def renameBvhRig(rig00, filepath):
 	return (rig00, bones00, action)
 
 #
-#	createIKBones(rig90):
+#	createIKBones(srcRig):
 #
 
-def createIKBones(rig90):
+def createIKBones(srcRig):
 	bpy.ops.object.mode_set(mode='EDIT')
-	ebones = rig90.data.edit_bones
+	ebones = srcRig.data.edit_bones
 	for suffix in ['_L', '_R']:
-		for nameIK in IkBoneList:
+		for nameIK in theIkBoneList:
 			(nameFK, flags, parent) = IkArmature[nameIK]
 			eb = ebones.new(name=nameIK+suffix)
 			fb = ebones[nameFK+suffix]
@@ -936,24 +1118,24 @@ def createIKBones(rig90):
 	return
 
 #
-#	constrainIkBones(rig90):
+#	constrainIkBones(srcRig):
 #
 
-def constrainIkBones(rig90):
+def constrainIkBones(srcRig):
 	bpy.ops.object.mode_set(mode='POSE')
-	pbones = rig90.pose.bones
+	pbones = srcRig.pose.bones
 	for pb in pbones:
 		if pb.parent:
 			pb.lock_location = (True, True, True)		
 
 	for suffix in ['_L', '_R']:
 		cns = pbones['LoArmIK'+suffix].constraints.new(type='IK')
-		cns.target = rig90
+		cns.target = srcRig
 		cns.subtarget = 'HandIK'+suffix
 		cns.chain_count = 2
 
 		cns = pbones['LoLegIK'+suffix].constraints.new(type='IK')
-		cns.target = rig90
+		cns.target = srcRig
 		cns.subtarget = 'AnkleIK'+suffix
 		cns.chain_count = 2
 	return
@@ -965,7 +1147,7 @@ def constrainIkBones(rig90):
 def copyAnglesFKIK(context):
 	bpy.ops.object.mode_set(mode='EDIT')
 	ebones = context.object.data.edit_bones
-	for nameIK in IkBoneList:
+	for nameIK in theIkBoneList:
 		(nameFK, flags, parent) = IkArmature[nameIK]
 		for suffix in ['_L', '_R']:
 			ebones[nameIK+suffix].roll = ebones[nameFK+suffix].roll
@@ -1051,20 +1233,31 @@ class CAnimData():
 		self.matrices = {}
 		self.name = name
 
+	def __repr__(self):
+		return "<CAnimData n %s p %s f %d>" % (self.name, self.parent, self.nFrames)
+
 		
 #
-#	createAnimation(context, rig):
-#	createAnimData(name, animations, ebones):
+#	createSourceAnimation(context, rig):
+#	createTargetAnimation(context, rig):
+#	createAnimData(name, animations, ebones, isTarget):
 #
 
-def createAnimation(context, rig):
+def createSourceAnimation(context, rig):
 	context.scene.objects.active = rig
 	animations = {}
-	for name in FkBoneList:
-		createAnimData(name, animations, rig.data.bones)
+	for name in MhxFkBoneList:
+		createAnimData(name, animations, rig.data.bones, False)
 	return animations
 
-def createAnimData(name, animations, bones):
+def createTargetAnimation(context, rig):
+	context.scene.objects.active = rig
+	animations = {}
+	for name in theFkBoneList:
+		createAnimData(name, animations, rig.data.bones, True)
+	return animations
+
+def createAnimData(name, animations, bones, isTarget):
 	try:
 		b = bones[name]
 	except:
@@ -1074,8 +1267,14 @@ def createAnimData(name, animations, bones):
 	anim.headRest = b.head_local.copy()
 	anim.tailRest = b.tail_local.copy()
 	anim.vecRest = anim.tailRest - anim.headRest
-	if b.parent and b.parent.name != 'MasterFloor':
-		anim.parent = b.parent.name
+	if b.parent:
+		if isTarget:
+			anim.parent = getParentName(b.parent.name)
+		else:
+			anim.parent = b.parent.name
+	else:
+		anim.parent = None
+	if anim.parent:
 		animPar = animations[anim.parent]
 		anim.offsetRest = anim.headRest - animPar.headRest
 	else:
@@ -1086,13 +1285,13 @@ def createAnimData(name, animations, bones):
 	anim.inverseRel = anim.matrixRel.copy().invert()
 	return
 '''
-def relativizeBones(rig90, mhxrig, mhxAnims):
-	for bone90 in rig90.data.bones:
+def relativizeBones(srcRig, trgRig, mhxAnims):
+	for bone90 in srcRig.data.bones:
 		if bone90.parent:
 			name = bone90.name
 			pname = bone90.parent.name
 			anim = mhxAnims[name]
-			bone = mhxrig.data.bones[name].parent
+			bone = trgRig.data.bones[name].parent
 			while bone and bone.name != pname:			
 				anim.matrixRel = bone.matrix * anim.matrixRel
 				bone = bone.parent
@@ -1102,7 +1301,7 @@ def relativizeBones(rig90, mhxrig, mhxAnims):
 #
 #	insertAnimation(context, rig, animations):
 #	insertAnimRoot(root, animations, nFrames, locs, rots):
-#	insertAnimChild(name, animations, rots):
+#	insertAnimChild(name, animations, nFrames, rots):
 #
 
 def insertAnimation(context, rig, animations):
@@ -1111,25 +1310,28 @@ def insertAnimation(context, rig, animations):
 	locs = makeVectorDict(rig, '].location')
 	rots = makeVectorDict(rig, '].rotation_quaternion')
 	root = 'Root'
-	insertAnimRoot(root, animations, len(rots[root]), locs[root], rots[root])
+	nFrames = len(locs[root])
+	insertAnimRoot(root, animations, nFrames, locs[root], rots[root])
 	bones = rig.data.bones
-	for name in FkBoneList:
+	for nameSrc in MhxFkBoneList:
 		try:
-			bones[name]
-			success = (name != root)
+			bones[nameSrc]
+			success = (nameSrc != root)
 		except:
 			success = False
 		if success:
 			try:
-				rot = rots[name]
+				rot = rots[nameSrc]
 			except:
 				rot = None
-			insertAnimChild(name, animations, rot)
+			insertAnimChild(nameSrc, animations, nFrames, rot)
 
 def insertAnimRoot(root, animations, nFrames, locs, rots):
 	anim = animations[root]
+	if nFrames < 0:
+		nFrames = len(locs)
 	anim.nFrames = nFrames
-	for frame in range(nFrames):
+	for frame in range(anim.nFrames):
 		quat = Quaternion(rots[frame])
 		anim.quats[frame] = quat
 		matrix = anim.matrixRest * quat.to_matrix() * anim.inverseRest
@@ -1148,13 +1350,15 @@ def insertAnimChildLoc(nameIK, nameFK, animations, locs):
 		animIK.heads[frame] = animPar.heads[frame] + animFK.offsetRest * parmat
 	return
 
-def insertAnimChild(name, animations, rots):
+def insertAnimChild(name, animations, nFrames, rots):
 	try:
 		anim = animations[name]
 	except:
 		return None
+	if nFrames < 0:
+		nFrames = len(rots)
 	animPar = animations[anim.parent]
-	anim.nFrames = animPar.nFrames
+	anim.nFrames = nFrames
 	quat = Quaternion().identity()
 	for frame in range(anim.nFrames):
 		parmat = animPar.matrices[frame]
@@ -1167,62 +1371,64 @@ def insertAnimChild(name, animations, rots):
 		anim.heads[frame] = animPar.heads[frame] + anim.offsetRest*parmat
 		anim.tails[frame] = anim.heads[frame] + anim.vecRest*matrix
 	return anim
-		
+			
 #
-#	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixes)
+#	poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes)
 #
 
-def poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixes):
-	context.scene.objects.active = mhxrig
+def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes):
+	context.scene.objects.active = trgRig
 	bpy.ops.object.mode_set(mode='POSE')
-	pbones = mhxrig.pose.bones
+	pbones = trgRig.pose.bones
 	
-	name = 'Root'
-	insertLocationKeyFrames(name, pbones[name], rig90Animations[name], mhxAnimations[name])
-	for name in FkBoneList:
+	nameSrc = 'Root'
+	nameTrg = getTrgBone(nameSrc)
+	insertLocationKeyFrames(nameTrg, pbones[nameTrg], srcAnimations[nameSrc], trgAnimations[nameTrg])
+	for nameTrg in theFkBoneList:
+		nameSrc = getSrcBone(nameTrg)
 		try:
-			pb = pbones[name]
-			anim90 = rig90Animations[name]
-			animMhx =  mhxAnimations[name]
+			pb = pbones[nameTrg]
+			animSrc = srcAnimations[nameSrc]
+			animTrg =  trgAnimations[nameTrg]
 			success = True
 		except:
 			success = False
 		if not success:
 			pass
-		elif name in GlobalBoneList:
-			insertGlobalRotationKeyFrames(name, pb, anim90, animMhx)
+		elif nameTrg in theGlobalBoneList:
+			insertGlobalRotationKeyFrames(nameTrg, pb, animSrc, animTrg)
 		else:
 			try:
-				fix = fixes[name]
+				fix = fixes[nameSrc]
 			except:
 				fix = None
 			if fix:
-				fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fix)
+				fixAndInsertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, fix)
 			else:
-				insertLocalRotationKeyFrames(name, pb, anim90, animMhx)
+				insertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg)
 
-	insertAnimation(context, mhxrig, mhxAnimations)
+	if theTarget == T_MHX:
+		insertAnimation(context, trgRig, trgAnimations)
+		for suffix in ['_L', '_R']:
+			for name in ['ElbowPT', 'KneePT']:
+				nameFK = name+'FK'+suffix
+				insertAnimChild(nameFK, trgAnimations, animSrc.nFrames, None)
 
-	for suffix in ['_L', '_R']:
-		for name in ['ElbowPT', 'KneePT']:
-			nameFK = name+'FK'+suffix
-			insertAnimChild(nameFK, mhxAnimations, None)
-
-	setInterpolation(mhxrig)
+	setInterpolation(trgRig)
 	return
 
 #
-#	insertLocationKeyFrames(name, pb, anim90, animMhx):
-#	insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
-#	insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
+#	insertLocationKeyFrames(name, pb, animSrc, animTrg):
+#	insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg):
+#	insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg):
 #	insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
 #
 
-def insertLocationKeyFrames(name, pb, anim90, animMhx):
+def insertLocationKeyFrames(name, pb, animSrc, animTrg):
 	locs = []
-	for frame in range(anim90.nFrames):
-		loc0 = anim90.heads[frame] - animMhx.headRest
-		loc = loc0 * animMhx.inverseRest
+	for frame in range(animSrc.nFrames):
+		loc0 = animSrc.heads[frame] - animTrg.headRest
+		loc = loc0 * animTrg.inverseRest
 		locs.append(loc)
 		pb.location = loc
 		for n in range(3):
@@ -1253,12 +1459,13 @@ def insertIKFKLocationKeyFrames(nameIK, nameFK, pb, animations):
 	return
 
 
-def insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
+def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg):
 	rots = []
-	for frame in range(anim90.nFrames):
-		mat90 = anim90.matrices[frame]
-		animMhx.matrices[frame] = mat90
-		matMhx = animMhx.inverseRest * mat90 * animMhx.matrixRest
+	animTrg.nFrames = animSrc.nFrames
+	for frame in range(animSrc.nFrames):
+		mat90 = animSrc.matrices[frame]
+		animTrg.matrices[frame] = mat90
+		matMhx = animTrg.inverseRest * mat90 * animTrg.matrixRest
 		rot = matMhx.to_quat()
 		rots.append(rot)
 		pb.rotation_quaternion = rot
@@ -1266,21 +1473,21 @@ def insertGlobalRotationKeyFrames(name, pb, anim90, animMhx):
 			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
 	return rots
 
-def insertLocalRotationKeyFrames(name, pb, anim90, animMhx):
-	rots = []
-	for frame in range(anim90.nFrames):
-		rot = anim90.quats[frame]
-		rots.append(rot)
+def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg):
+	animTrg.nFrames = animSrc.nFrames
+	for frame in range(animSrc.nFrames):
+		rot = animSrc.quats[frame]
+		animTrg.quats[frame] = rot
 		pb.rotation_quaternion = rot
 		for n in range(4):
 			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
-	return rots
+	return
 
-def fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fix):
-	rots = []
+def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix):
 	(fixMat, exchange) = fix
-	for frame in range(anim90.nFrames):
-		mat90 = anim90.quats[frame].to_matrix()
+	animTrg.nFrames = animSrc.nFrames
+	for frame in range(animSrc.nFrames):
+		mat90 = animSrc.quats[frame].to_matrix()
 		if fixMat:
 			matMhx = fixMat * mat90
 		else:
@@ -1296,14 +1503,15 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, anim90, animMhx, fix):
 			rot.x = rot0.z
 		else:
 			rot = rot0
-		rots.append(rot)
 		pb.rotation_quaternion = rot
+		animTrg.quats[frame] = rot
 		for n in range(4):
 			pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=name)
-	return rots
+	return
 
 def insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
 	rots = []
+	animIK.nFrames = animFK.nFrames
 	for frame in range(animFK.nFrames):
 		matFK = animPar.matrices[frame].copy().invert() * animFK.matrices[frame]
 		matIK = animIK.inverseRest * matFK * animIK.matrixRest
@@ -1315,43 +1523,44 @@ def insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
 	return rots
 
 #
-#	poseMhxIKBones(context, mhxrig, mhxAnimations)
+#	poseTrgIkBones(context, trgRig, trgAnimations)
 #
 
-def poseMhxIKBones(context, mhxrig, mhxAnimations):
+def poseTrgIkBones(context, trgRig, trgAnimations):
 	bpy.ops.object.mode_set(mode='POSE')
-	pbones = mhxrig.pose.bones
+	pbones = trgRig.pose.bones
 	for suffix in ['_L', '_R']:
 		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
-			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], mhxAnimations[nameFK], mhxAnimations[nameFK])
+			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
+			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], trgAnimations[nameFK], trgAnimations[nameIK])
 
 		for name in ['Hand', 'Leg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
-			createAnimData(nameIK, mhxAnimations, mhxrig.data.bones)		
-			animFK = mhxAnimations[nameFK]
-			loc = insertLocationKeyFrames(nameIK, pbones[nameIK], animFK, mhxAnimations[nameIK])
-			rot = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],animFK, mhxAnimations[nameIK])
-			insertAnimRoot(nameIK, mhxAnimations, animFK.nFrames, loc, rot)
+			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
+			animFK = trgAnimations[nameFK]
+			animIK = trgAnimations[nameIK]
+			locs = insertLocationKeyFrames(nameIK, pbones[nameIK], animFK, animIK)
+			rots = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],animFK, animIK)
+			insertAnimRoot(nameIK, trgAnimations, -1, locs, rots)
 
 		for name in ['ElbowPT', 'KneePT']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
-			createAnimData(nameIK, mhxAnimations, mhxrig.data.bones)		
-			insertIKFKLocationKeyFrames(nameIK, nameFK, pbones[nameIK], mhxAnimations)
+			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
+			insertIKFKLocationKeyFrames(nameIK, nameFK, pbones[nameIK], trgAnimations)
 
 		for name in ['Toe', 'Foot']:
 			nameIK = name+'RevIK'+suffix
 			nameFK = name+'FK'+suffix
-			createAnimData(nameIK, mhxAnimations, mhxrig.data.bones)		
-			animFK = mhxAnimations[nameFK]
-			animIK = mhxAnimations[nameIK]
-			rot = insertReverseRotationKeyFrames(nameIK, pbones[nameIK], animFK, animIK, mhxAnimations[animIK.parent])
-			insertAnimChild(nameIK, mhxAnimations, rot)
+			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
+			animFK = trgAnimations[nameFK]
+			animIK = trgAnimations[nameIK]
+			rots = insertReverseRotationKeyFrames(nameIK, pbones[nameIK], animFK, animIK, trgAnimations[animIK.parent])
+			insertAnimChild(nameIK, trgAnimations, -1, rots)
 
-	setInterpolation(mhxrig)
 	return
 
 #
@@ -1378,7 +1587,7 @@ def prettifyBones(rig):
 		bgrpFK.color_set = colorSet[index+1]
 		bgrpFK.name = 'FK'+suffix
 
-		for nameIK in IkBoneList:
+		for nameIK in theIkBoneList:
 			(nameFK, flags, parent) = IkArmature[nameIK]
 			pb = rig.pose.bones[nameIK+suffix]
 			pb.bone_group = bgrpIK
@@ -1395,34 +1604,36 @@ def prettifyBones(rig):
 	return
 
 #
-#	retargetMhxRig(context, rig90, mhxrig):
+#	retargetMhxRig(context, srcRig, trgRig):
 #
 
-def retargetMhxRig(context, rig90, mhxrig):
+def retargetMhxRig(context, srcRig, trgRig):
 	scn = context.scene
-	setArmature(rig90)
-	print("Retarget %s --> %s" % (rig90, mhxrig))
-	if mhxrig.animation_data:
-		mhxrig.animation_data.action = None
+	setArmature(srcRig)
+	print("Retarget %s --> %s" % (srcRig, trgRig))
+	if trgRig.animation_data:
+		trgRig.animation_data.action = None
 
-	mhxAnimations = createAnimation(context, mhxrig)
-	rig90Animations = createAnimation(context, rig90)
-	insertAnimation(context, rig90, rig90Animations)
-	onoff = toggleLimitConstraints(mhxrig)
-	setLimitConstraints(mhxrig, 0.0)
+	trgAnimations = createTargetAnimation(context, trgRig)
+	srcAnimations = createSourceAnimation(context, srcRig)
+	insertAnimation(context, srcRig, srcAnimations)
+	onoff = toggleLimitConstraints(trgRig)
+	setLimitConstraints(trgRig, 0.0)
 	if scn['MhxApplyFixes']:
-		fixes = FixesList[rig90['MhxArmature']]
+		fixes = FixesList[srcRig['MhxArmature']]
 	else:
 		fixes = None
-	poseMhxFKBones(context, mhxrig, rig90Animations, mhxAnimations, fixes)
-	poseMhxIKBones(context, mhxrig, mhxAnimations)
+	poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes)
+	if theTarget == T_MHX:
+		poseTrgIkBones(context, trgRig, trgAnimations)
+	setInterpolation(trgRig)
 	if onoff == 'OFF':
-		setLimitConstraints(mhxrig, 1.0)
+		setLimitConstraints(trgRig, 1.0)
 	else:
-		setLimitConstraints(mhxrig, 0.0)
+		setLimitConstraints(trgRig, 0.0)
 
-	mhxrig.animation_data.action.name = mhxrig.name[:4] + rig90.name[2:]
-	print("Retargeted %s --> %s" % (rig90, mhxrig))
+	trgRig.animation_data.action.name = trgRig.name[:4] + srcRig.name[2:]
+	print("Retargeted %s --> %s" % (srcRig, trgRig))
 	return
 
 #
@@ -1634,18 +1845,18 @@ def iterateFCurves(points, keeps, maxErr):
 	return new
 		
 #
-#	togglePoleTargets(mhxrig):
-#	toggleIKLimits(mhxrig):
-#	toggleLimitConstraints(mhxrig):
-#	setLimitConstraints(mhxrig, inf):
+#	togglePoleTargets(trgRig):
+#	toggleIKLimits(trgRig):
+#	toggleLimitConstraints(trgRig):
+#	setLimitConstraints(trgRig, inf):
 #
 
-def togglePoleTargets(mhxrig):
-	bones = mhxrig.data.bones
-	pbones = mhxrig.pose.bones
+def togglePoleTargets(trgRig):
+	bones = trgRig.data.bones
+	pbones = trgRig.pose.bones
 	if bones['ElbowPTIK_L'].hide:
 		hide = False
-		poletar = mhxrig
+		poletar = trgRig
 		res = 'ON'
 	else:
 		hide = True
@@ -1658,8 +1869,8 @@ def togglePoleTargets(mhxrig):
 		cns.pole_target = poletar
 	return res
 
-def toggleIKLimits(mhxrig):
-	pbones = mhxrig.pose.bones
+def toggleIKLimits(trgRig):
+	pbones = trgRig.pose.bones
 	if pbones['UpLegIK_L'].use_ik_limit_x:
 		use = False
 		res = 'OFF'
@@ -1674,8 +1885,8 @@ def toggleIKLimits(mhxrig):
 			pb.use_ik_limit_z = use
 	return res
 
-def toggleLimitConstraints(mhxrig):
-	pbones = mhxrig.pose.bones
+def toggleLimitConstraints(trgRig):
+	pbones = trgRig.pose.bones
 	first = True
 	for pb in pbones:
 		lay = pb.bone.layers
@@ -1698,8 +1909,8 @@ def toggleLimitConstraints(mhxrig):
 		return 'NOT FOUND'
 	return res
 
-def setLimitConstraints(mhxrig, inf):
-	pbones = mhxrig.pose.bones
+def setLimitConstraints(trgRig, inf):
+	pbones = trgRig.pose.bones
 	for pb in pbones:
 		for cns in pb.constraints:
 			if (cns.type == 'LIMIT_LOCATION' or
@@ -1854,7 +2065,7 @@ def initInterface(context):
 	bpy.types.Object.MhxArmature = StringProperty()
 
 	'''
-	for mhx in FkBoneList:
+	for mhx in theFkBoneList:
 		bpy.types.Scene.StringProperty(
 			attr=mhx, 
 			name=mhx, 
@@ -1929,7 +2140,7 @@ class MhxBvhAssocPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		layout = self.layout
-		for mhx in FkBoneList:
+		for mhx in theFkBoneList:
 			try:				
 				layout.prop(context.scene, mhx)
 			except:
@@ -2026,12 +2237,13 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 
 	def execute(self, context):
 		import bpy, os
+		guessTargetArmature(context.object)
 		importAndRename(context, self.properties.filepath)
 		print("%s imported" % self.properties.filepath)
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
-		context.window_manager.add_fileselect(self)
+		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}	
 
 #
@@ -2044,10 +2256,11 @@ class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
 
 	def execute(self, context):
 		import bpy, mathutils
-		mhxrig = context.object
-		for rig90 in context.selected_objects:
-			if rig90 != mhxrig:
-				retargetMhxRig(context, rig90, mhxrig)
+		trgRig = context.object
+		guessTargetArmature(trgRig)
+		for srcRig in context.selected_objects:
+			if srcRig != trgRig:
+				retargetMhxRig(context, srcRig, trgRig)
 		return{'FINISHED'}	
 
 #
@@ -2181,12 +2394,12 @@ class OBJECT_OT_CopyAnglesFKIKButton(bpy.types.Operator):
 def loadRetargetSimplify(context, filepath):
 	print("Load and retarget %s" % filepath)
 	time1 = time.clock()
-	mhxrig = context.object
-	(rig90, action) = importAndRename(context, filepath)
-	retargetMhxRig(context, rig90, mhxrig)
+	trgRig = context.object
+	(srcRig, action) = importAndRename(context, filepath)
+	retargetMhxRig(context, srcRig, trgRig)
 	if context.scene['MhxDoSimplify']:
-		simplifyFCurves(context, mhxrig)
-	deleteFKRig(context, rig90, action, 'Y_')
+		simplifyFCurves(context, trgRig)
+	deleteFKRig(context, srcRig, action, 'Y_')
 	time2 = time.clock()
 	print("%s finished in %.3f s" % (filepath, time2-time1))
 	return
@@ -2198,6 +2411,7 @@ class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
 
 	def execute(self, context):
 		import bpy, os, mathutils
+		guessTargetArmature(context.object)
 		loadRetargetSimplify(context, self.properties.filepath)
 		return{'FINISHED'}	
 
@@ -2228,9 +2442,9 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 	def execute(self, context):
 		import bpy, os, mathutils
 		paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
-		mhxrig = context.object
+		trgRig = context.object
 		for filepath in paths:
-			context.scene.objects.active = mhxrig
+			context.scene.objects.active = trgRig
 			loadRetargetSimplify(context, filepath)
 		return{'FINISHED'}	
 
