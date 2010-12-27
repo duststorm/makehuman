@@ -81,6 +81,7 @@ import gui3d, events3d, font3d
 import human, hair_chooser, background, human_texture
 import guimodelling, guifiles#, guirender
 from aljabr import centroid
+import algos3d
 #import font3d
 
 class MHApplication(gui3d.Application):
@@ -313,6 +314,11 @@ class MHApplication(gui3d.Application):
           else:
               self.scene3d.selectedHuman.mesh.setSolid(1)
           self.app.scene3d.redraw()
+      elif event.key == events3d.SDLK_t:
+          human = self.scene3d.selectedHuman
+          algos3d.saveTranslationTarget(human.meshData, "full_target.target")
+          print "Full target exported"
+          
 
   def do(self, action):
     if action.do():
