@@ -149,8 +149,8 @@ LegHeadsTails = [
 upLegRoll = 0
 loLegRoll = 0
 footRoll = 0
-#toeRoll = 0
-toeRoll = -63.5*deg1
+#toeRoll = -63.5*deg1
+toeRoll = -deg45
 footCtrlRoll = 0.0
 
 LegArmature = [
@@ -208,14 +208,14 @@ LegArmature = [
 	# FK
 	('UpLegFK_L',		upLegRoll, 'Hip_L', F_WIR, L_LEGFK, (1,1,1) ),
 	('LoLegFK_L',		loLegRoll, 'UpLegFK_L', F_WIR, L_LEGFK, (1,1,1) ),
-	('FootFK_L',		footRoll, 'LoLegFK_L', F_WIR, L_LEGFK, (1,1,1) ),
+	('FootFK_L',		footRoll, 'LoLegFK_L', F_CON+F_WIR, L_LEGFK, (1,1,1) ),
 	('ToeFK_L',			toeRoll, 'FootFK_L', F_WIR, L_LEGFK, (1,1,1) ),
 	('LegFK_L',			footCtrlRoll, 'ToeFK_L', 0, L_HELP, (1,1,1) ),
 	('AnkleFK_L',		0, 'LoLegFK_L', 0, L_HELP, (1,1,1) ),
 
 	('UpLegFK_R',		-upLegRoll, 'Hip_R', F_WIR, L_LEGFK, (1,1,1) ),
 	('LoLegFK_R',		-loLegRoll, 'UpLegFK_R', F_WIR, L_LEGFK, (1,1,1) ),
-	('FootFK_R',		-footRoll, 'LoLegFK_R', F_WIR, L_LEGFK, (1,1,1) ),
+	('FootFK_R',		-footRoll, 'LoLegFK_R', F_CON+F_WIR, L_LEGFK, (1,1,1) ),
 	('ToeFK_R',			-toeRoll, 'FootFK_R', F_WIR, L_LEGFK, (1,1,1) ),
 	('LegFK_R',			-footCtrlRoll, 'ToeFK_R', 0, L_HELP, (1,1,1) ),
 	('AnkleFK_R',		0, 'LoLegFK_L', 0, L_HELP, (1,1,1) ),
@@ -261,14 +261,14 @@ limLoLeg_R = (0,150*deg1,-deg30,deg30, -deg30,deg30)
 limFoot_L = (-deg45,deg45, -deg30,deg30, -deg30,deg30)
 limFoot_R = (-deg45,deg45, -deg30,deg30, -deg30,deg30)
 
-limToe_L = (-deg45,deg45, 0,0, 0,0)
-limToe_R = (-deg45,deg45, 0,0, 0,0)
+limToe_L = (-deg20,deg60, 0,0, 0,0)
+limToe_R = (-deg20,deg60, 0,0, 0,0)
 
-limRevFoot_L = (-deg45,deg45, -deg30,deg30, -deg30,deg30)
-limRevFoot_R = (-deg45,deg45, -deg30,deg30, -deg30,deg30)
+limRevFoot_L = (-deg20,deg60, 0,0, 0,0)
+limRevFoot_R = (-deg20,deg60, 0,0, 0,0)
 
-limRevToe_L = (-deg45,deg45, 0,0, 0,0)
-limRevToe_R = (-deg45,deg45, 0,0, 0,0)
+limRevToe_L = (-deg10,deg45, 0,0, 0,0)
+limRevToe_R = (-deg10,deg45, 0,0, 0,0)
 
 
 def LegWritePoses(fp):
@@ -349,8 +349,9 @@ def LegWritePoses(fp):
 	addPoseBone(fp, 'LoLegFK_L', 'MHCircle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (1,1,1)])])
 
-	addPoseBone(fp, 'FootFK_L', 'MHFoot', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_L, (1,1,1)])])
+	addPoseBone(fp, 'FootFK_L', 'MHFoot', 'FK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_L, (1,1,1)]),
+		 ('IK', 0, 1, ['IK', None, 2, None, (True, False,True)])])
 
 	addPoseBone(fp, 'ToeFK_L', 'MHToe', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limToe_L, (1,0,0)])])
@@ -361,8 +362,9 @@ def LegWritePoses(fp):
 	addPoseBone(fp, 'LoLegFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,1,1)])])
 
-	addPoseBone(fp, 'FootFK_R', 'MHFoot', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_R, (1,1,1)])])
+	addPoseBone(fp, 'FootFK_R', 'MHFoot', 'FK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_R, (1,1,1)]),
+		 ('IK', 0, 1, ['IK', None, 2, None, (True, False,True)])])
 
 	addPoseBone(fp, 'ToeFK_R', 'MHToe', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limToe_R, (1,0,0)])])
@@ -395,10 +397,10 @@ def LegWritePoses(fp):
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,1,1)])
 		])
 
-	addPoseBone(fp, 'FootRevIK_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'FootRevIK_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_L, (1,1,1)])])
 
-	addPoseBone(fp, 'FootRevIK_R', 'MHRevFoot', 'IK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'FootRevIK_R', 'MHRevFoot', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_R, (1,1,1)])])
 
 	addPoseBone(fp, 'ToeRevIK_L', 'MHRevToe', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
@@ -407,11 +409,13 @@ def LegWritePoses(fp):
 	addPoseBone(fp, 'ToeRevIK_R', 'MHRevToe', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_R, (1,1,1)])])
 	
-	addPoseBone(fp, 'FootIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, 1, ['IK', 'FootRevIK_L', 1, None, (1,0,1)])])
+	addPoseBone(fp, 'FootIK_L', None, 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('CopyRot', C_LOCAL, 1, ['Rot', 'FootRevIK_L', (0,1,0), (0,0,0), True]),
+		 ('IK', 0, 1, ['IK', 'FootRevIK_L', 1, None, (1,0,1)])])
 
-	addPoseBone(fp, 'FootIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, 1, ['IK', 'FootRevIK_R', 1, None, (1,0,1)])])
+	addPoseBone(fp, 'FootIK_R', None, 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+		[('CopyRot', C_LOCAL, 1, ['Rot', 'FootRevIK_R', (0,1,0), (0,0,0), True]),
+		 ('IK', 0, 1, ['IK', 'FootRevIK_R', 1, None, (1,0,1)])])
 
 	addPoseBone(fp, 'ToeIK_L', None, 'IK_L', (1,1,1), (0,1,1), (1,1,0), (1,1,1), 0, 
 		[('IK', 0, 1, ['IK', 'ToeRevIK_L', 1, None, (1,0,1)])])
@@ -457,30 +461,30 @@ LegFKIKDrivers = [
 
 LegDeformDrivers = [
 	("LegForward_L", "Stretch", None,
-		[("f", "UpLeg1_L", "BendLegForward_L"), ("o", "UpLeg3_L", "BendLegOut_L")], 
-		[(0,1), (60*deg1,1), (deg90,0)]),
+		[("f", "UpLeg1_L", "BendLegForward_L"), ("o", "UpLeg1_L", "BendLegOut_L")], 
+		[(0,1), (60*deg1,1), (deg90,0.3)]),
 	("LegForward_L", "Scale",  "(d-u)*(f<%.2f)" % (75*deg1),
-		[("u", "UpLeg1_L", "BendLegUp_L"), ("d", "UpLeg3_L", "BendLegDown_L"), ("f", "UpLeg3_L", "BendLegForward_L")], 
+		[("u", "UpLeg1_L", "BendLegUp_L"), ("d", "UpLeg1_L", "BendLegDown_L"), ("f", "UpLeg1_L", "BendLegForward_L")], 
 		[(0,0), (deg20,1)]),
-	("LegBack_L", "Stretch",   None,
-		[("b", "UpLeg1_L", "BendLegBack_L"), ("o", "UpLeg3_L", "BendLegOut_L")], 
-		[(0,1), (deg60,1), (deg90,0)]),
+	("LegBack_L", "Stretch",   "min(b,o+0.5)",
+		[("b", "UpLeg1_L", "BendLegBack_L"), ("o", "UpLeg1_L", "BendLegOut_L")], 
+		[(0,1), (deg60,1), (deg90,0.3)]),
 	("LegOut_L", "Stretch",  None,
 		[("o", "UpLeg1_L", "BendLegOut_L")], 
-		[(0,1), (deg60,1), (deg90,0)]),
+		[(0,1), (deg60,1), (deg90,0.3)]),
 
 	("LegForward_R", "Stretch", None,
-		[("f", "UpLeg1_R", "BendLegForward_R"), ("o", "UpLeg3_R", "BendLegOut_R")], 
-		[(0,1), (60*deg1,1), (deg90,0)]),
+		[("f", "UpLeg1_R", "BendLegForward_R"), ("o", "UpLeg1_R", "BendLegOut_R")], 
+		[(0,1), (60*deg1,1), (deg90,0.3)]),
 	("LegForward_R", "Scale",  "(d-u)*(f<%.2f)" % (75*deg1),
-		[("u", "UpLeg1_R", "BendLegUp_R"), ("d", "UpLeg3_R", "BendLegDown_R"), ("f", "UpLeg3_R", "BendLegForward_R")], 
+		[("u", "UpLeg1_R", "BendLegUp_R"), ("d", "UpLeg1_R", "BendLegDown_R"), ("f", "UpLeg1_R", "BendLegForward_R")], 
 		[(0,0), (deg20,1)]),
-	("LegBack_R", "Stretch",   None,
-		[("b", "UpLeg1_R", "BendLegBack_R"), ("o", "UpLeg3_R", "BendLegOut_R")], 
-		[(0,1), (deg60,1), (deg90,0)]),
+	("LegBack_R", "Stretch",   "min(b,o+0.5)",
+		[("b", "UpLeg1_R", "BendLegBack_R"), ("o", "UpLeg1_R", "BendLegOut_R")], 
+		[(0,1), (deg60,1), (deg90,0.3)]),
 	("LegOut_R", "Stretch",  None,
 		[("o", "UpLeg1_R", "BendLegOut_R")], 
-		[(0,1), (deg60,1), (deg90,0)]),
+		[(0,1), (deg60,1), (deg90,0.3)]),
 ]
 
 #

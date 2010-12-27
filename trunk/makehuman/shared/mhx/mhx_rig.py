@@ -219,8 +219,7 @@ def boolString(val):
 def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	global rigHead, rigTail
 
-	#conn = boolString(flags & F_CON)
-	conn = False
+	conn = boolString(flags & F_CON)
 	deform = boolString(flags & F_DEF)
 	restr = boolString(flags & F_RES)
 	wire = boolString(flags & F_WIR)
@@ -610,8 +609,21 @@ def addIkConstraint(fp, switch, flags, inf, data, lockLoc, lockRot):
 
 	if Mhx25:
 		fp.write(
-"    Constraint %s IK %s\n" % (name, switch) +
+"    Constraint %s IK %s\n" % (name, switch))
+
+		if subtar:
+			fp.write(
 "      target Refer Object Human ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp +
+"      use_tail True ;\n" +
+"      use_target True ;\n")
+		else:
+			fp.write(
+"      use_tail False ;\n" +
+"      use_target True ;\n")
+
+		fp.write(
 "      pos_lock Array 1 1 1  ;\n" +
 "      rot_lock Array 1 1 1  ;\n" +
 "      active %s ;\n" % active +
@@ -634,13 +646,9 @@ def addIkConstraint(fp, switch, flags, inf, data, lockLoc, lockRot):
 
 		fp.write(
 "      is_proxy_local False ;\n" +
-"      subtarget '%s' ;\n" % subtar +
-"      target_space '%s' ;\n" % targsp +
 "      use_location %s ;\n" % useLoc +
 "      use_rotation %s ;\n" % useRot +
 "      use_stretch %s ;\n" % useStretch +
-"      use_tail True ;\n" +
-"      use_target True ;\n" +
 "      weight 1 ;\n" +
 "    end Constraint\n")
 
@@ -1420,7 +1428,7 @@ def writeAllDrivers(fp):
 	return
 
 def writeAllProcesses(fp):
-	#return
+	return
 	
 	fp.write("  EditMode ;\n")
 	parents = rig_arm_25.ArmParents + rig_leg_25.LegParents

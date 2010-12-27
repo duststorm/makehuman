@@ -41,8 +41,8 @@ FaceHeadsTails = [
 FaceArmature = [
 	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
 	('TongueBase',	0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('TongueMid',	0.0, 'TongueBase', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('TongueTip',	0.0, 'TongueMid', F_DEF+F_CON+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('TongueMid',	0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
+	('TongueTip',	0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
 	('Eye_R',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('Eye_L',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('UpLid_R',		0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
