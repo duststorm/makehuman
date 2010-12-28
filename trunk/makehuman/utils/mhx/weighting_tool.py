@@ -299,6 +299,44 @@ class OBJECT_OT_SymmetrizeShapesButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	shapekeyFromObject(ob, targ):
+#	class OBJECT_OT_ShapeKeysFromObjectsButton(bpy.types.Operator):
+#
+
+def shapekeyFromObject(ob, targ):
+	verts = ob.data.vertices
+	tverts = targ.data.vertices
+	print("Create shapekey %s" % targ.name)
+	print(len(verts), len(tverts))
+	if len(verts) != len(tverts):
+		print("%s and %s do not have the same number of vertices" % (ob, targ))
+		return
+	if not ob.data.shape_keys:
+		ob.shape_key_add(name='Basis', from_mix=False)
+	skey = ob.shape_key_add(name=targ.name, from_mix=False)
+	for n,v in enumerate(verts):
+		vt = tverts[n].co
+		pt = skey.data[n].co
+		pt[0] = vt[0]
+		pt[1] = vt[1]
+		pt[2] = vt[2]
+	print("Shape %s created" % skey)
+	return	
+
+class OBJECT_OT_ShapeKeysFromObjectsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ShapeKeysFromObjectsButton"
+	bl_label = "Shapes from objects"
+
+	def execute(self, context):
+		import bpy
+		ob = context.object
+		for targ in context.scene.objects:
+			if targ.type == 'MESH' and targ.select and targ != ob:
+				shapekeyFromObject(ob, targ)
+		print("Shapekeys created for %s" % ob)
+		return{'FINISHED'}	
+
+#
 #	recoverDiamonds(context):
 #	class OBJECT_OT_RecoverDiamondsButton(bpy.types.Operator):
 #
@@ -458,6 +496,9 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 		layout.separator()
 		layout.prop(context.scene, 'MhxVertexGroupFile')
 		layout.operator("object.ExportVertexGroupsButton")	
+
+		layout.separator()
+		layout.operator("object.ShapeKeysFromObjectsButton")	
 
 		layout.label('Weight pair')
 		layout.prop(context.scene, 'MhxWeight')
