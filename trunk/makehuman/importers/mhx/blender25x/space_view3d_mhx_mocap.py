@@ -997,6 +997,7 @@ def renameFKBones(bones00, rig00, action):
 def createExtraBones(ebones, bones90):
 	for suffix in ['_L', '_R']:
 		try:
+
 			foot = ebones['FootFK'+suffix]
 		except:
 			foot = None
@@ -1070,8 +1071,12 @@ def renameBvhRig(rig00, filepath):
 	print("File", filename, len(filename))
 	if len(filename) > 12:
 		words = filename.split('_')
+		if len(words) == 1:
+			words = filename.split('-')
 		name = 'Y_'
-		for word in words[1:]:
+		if len(words) > 1:
+			words = words[1:]
+		for word in words:
 			name += word
 	else:
 		name = 'Y_' + filename
@@ -1202,12 +1207,44 @@ def setArmature(rig):
 #
 
 def importAndRename(context, filepath):
+	trgRig = context.object
 	rig = readBvhFile(context, filepath, context.scene)
 	(rig00, bones00, action) =  renameBvhRig(rig, filepath)
 	guessArmature(rig00)
 	renameFKBones(bones00, rig00, action)
 	setInterpolation(rig00)
+	rescaleRig(context.scene, trgRig, rig00, action)
 	return (rig00, action)
+
+#
+#	rescaleRig(scn, trgRig, srcRig, action):
+#
+
+def rescaleRig(scn, trgRig, srcRig, action):
+	if not scn['MhxAutoScale']:
+		return
+	try:
+		trgScale = trgRig.data.bones['UpLegFK_L'].length
+	except:
+		trgScale = trgRig.data.bones['UpLeg_L'].length
+	srcScale = srcRig.data.bones['UpLegFK_L'].length
+	scale = trgScale/srcScale
+	print("Rescale %s with factor %f" % (scn.objects.active, scale))
+	
+	bpy.ops.object.mode_set(mode='EDIT')
+	ebones = srcRig.data.edit_bones
+	for eb in ebones:
+		oldlen = eb.length
+		eb.head *= scale
+		eb.tail *= scale
+	bpy.ops.object.mode_set(mode='POSE')
+	for fcu in action.fcurves:
+		words = fcu.data_path.split('.')
+		if words[-1] == 'location':
+			for kp in fcu.keyframe_points:
+				kp.co[1] *= scale
+	return
+
 
 #
 #	class CAnimData():
@@ -1889,8 +1926,7 @@ def toggleLimitConstraints(trgRig):
 	pbones = trgRig.pose.bones
 	first = True
 	for pb in pbones:
-		lay = pb.bone.layers
-		if not (lay[8] or lay[14] or lay[15]):
+		if onUserLayer(pb.bone.layers):
 			for cns in pb.constraints:
 				if (cns.type == 'LIMIT_LOCATION' or
 					cns.type == 'LIMIT_ROTATION' or
@@ -1909,15 +1945,22 @@ def toggleLimitConstraints(trgRig):
 		return 'NOT FOUND'
 	return res
 
+def onUserLayer(layers):
+	for n in [0,1,2,3,4,5,6,7, 9,10,11,12,13]:
+		if layers[n]:
+			return True
+	return False
+
 def setLimitConstraints(trgRig, inf):
 	pbones = trgRig.pose.bones
 	for pb in pbones:
-		for cns in pb.constraints:
-			if (cns.type == 'LIMIT_LOCATION' or
-				cns.type == 'LIMIT_ROTATION' or
-				cns.type == 'LIMIT_DISTANCE' or
-				cns.type == 'LIMIT_SCALE'):
-				cns.influence = inf
+		if onUserLayer(pb.bone.layers):
+			for cns in pb.constraints:
+				if (cns.type == 'LIMIT_LOCATION' or
+					cns.type == 'LIMIT_ROTATION' or
+					cns.type == 'LIMIT_DISTANCE' or
+					cns.type == 'LIMIT_SCALE'):
+					cns.influence = inf
 	return
 
 #
@@ -1959,6 +2002,11 @@ def initInterface(context):
 		min=0.0001, max=1000000.0, 
 		soft_min=0.001, soft_max=100.0,
 		default=0.65)
+
+	bpy.types.Scene.MhxAutoScale = BoolProperty(
+		name="Auto scale",
+		description="Rescale skeleton to match target",
+		default=True)
 
 	bpy.types.Scene.MhxStartFrame = IntProperty(
 		name="Start Frame", 
@@ -2043,6 +2091,7 @@ def initInterface(context):
 		scn['MhxPlantCurrent'] = True
 		scn['MhxPlantLoc'] = True
 		scn['MhxBvhScale'] = 0.65
+		scn['MhxAutoScale'] = True
 		scn['MhxStartFrame'] = 1
 		scn['MhxEndFrame'] = 32000
 		scn['MhxSubsample'] = 1
@@ -2183,6 +2232,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
 
 		layout.label('Load')
 		layout.prop(scn, "MhxBvhScale")
+		layout.prop(scn, "MhxAutoScale")
 		layout.prop(scn, "MhxStartFrame")
 		layout.prop(scn, "MhxEndFrame")
 		layout.prop(scn, "MhxSubsample")
