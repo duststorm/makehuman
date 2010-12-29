@@ -112,13 +112,25 @@ def proxyConfig():
 			pass
 		elif words[0] == '@':
 			if words[1] == 'MainMesh':
-				useMain = words[2:]
+				try:
+					useMain = words[2:]
+				except:
+					pass
 			elif words[1] == 'Obj':
-				useObj = eval(words[2])
+				try:
+					useObj = eval(words[2])
+				except:
+					pass
 			elif words[1] == 'Mhx':
-				useMhx = eval(words[2])
+				try:
+					useMhx = eval(words[2])
+				except:
+					pass
 			elif words[1] == 'Dae':
-				useDae = eval(words[2])
+				try:
+					useDae = eval(words[2])
+				except:
+					pass
 			elif words[1] in ['Proxy', 'Cage', 'Clothes']:
 				typ = words[1]
 				layer = int(words[2])
