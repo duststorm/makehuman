@@ -1,17 +1,3 @@
-#!BPY
-""" 
-Name: 'MakeHuman hair (.obj)'
-Blender: 250
-Group: 'Import'
-Tooltip: 'Import hair from Wavefront obj (.obj)'
-"""
-
-__author__= ['Thomas Larsson']
-__url__ = ("www.makehuman.org")
-__version__= '0.7'
-__bpydoc__= '''\
-OBJ hair importer for Blender 2.5
-'''
 """ 
 **Project Name:**      MakeHuman
 
@@ -36,8 +22,8 @@ bl_addon_info = {
 	'name': 'Import MakeHuman hair (.obj)',
 	'author': 'Thomas Larsson',
 	'version': '0.7',
-	'blender': (2, 5, 5),
-	'api': 33590
+	'blender': (2, 5, 6),
+	'api': 33590,
 	'location': 'File > Import',
 	'description': 'Import MakeHuman hair file (.obj)',
 	'url': 'http://www.makehuman.org',
@@ -108,10 +94,10 @@ def writeHairFile(fileName):
 
 	for n,par in enumerate(psys.particles):
 		v = par.location / theScale
-		fp.write("v %.6f %.6f %.6f\n" % (v[0], v[1], v[2]))
+		fp.write("v %.3f %.3f %.3f\n" % (v[0], v[1], v[2]))
 		for h in par.is_hair:
 			v = h.location / theScale
-			fp.write("v %.6f %.6f %.6f\n" % (v[0], v[1], v[2]))
+			fp.write("v %.3f %.3f %.3f\n" % (v[0], v[1], v[2]))
 		fp.write("g Hair.%03d\n" % n)
 		fp.write("end\n\n")
 	fp.close()
@@ -203,7 +189,7 @@ def recalcHair(guide, nmax):
 			
 #
 #	printGuides(fp, guide, nguide, nmax):
-#	printGuideAndHair(fp, guide, par, nmax):
+#	printGuideAndHair(fp, guide, par, hs, nmax):
 #	For debugging
 #
 
@@ -214,23 +200,24 @@ def printGuides(fp, guide, nguide, nmax):
 	fp.write("\n\n")
 	for n,v in enumerate(guide):
 		nv = nguide[n]
-		fp.write("(%.6f %.6f %.6f)\t=> (%.6f %.6f %.6f)\n" % (v[0], v[1], v[2], nv[0], nv[1], nv[2]))
+		fp.write("(%.3f %.3f %.3f)\t=> (%.3f %.3f %.3f)\n" % (v[0], v[1], v[2], nv[0], nv[1], nv[2]))
 	for n in range(len(guide), nmax):
 		nv = nguide[n]
-		fp.write("\t\t\t\t=> (%.6f %.6f %.6f)\n" % (nv[0], nv[1], nv[2]))
+		fp.write("\t\t\t\t=> (%.3f %.3f %.3f)\n" % (nv[0], nv[1], nv[2]))
 	return
 	
-def printGuideAndHair(fp, guide, par, nmax):
+def printGuideAndHair(fp, guide, par, hs, nmax):
 	fp.write("\n\n")
 	for n,v in enumerate(guide):
 		if n == 0:
 			nv = par.location
 		else:
-			nv = par.is_hair[n-1].location
-		fp.write("(%.6f %.6f %.6f)\t=> (%.6f %.6f %.6f)" % (v[0], v[1], v[2], nv[0], nv[1], nv[2]))
+			nv = par.is_hair[n-1].co
+		fp.write("%2d %2d  (%.3f %.3f %.3f)\t=> (%.3f %.3f %.3f)" % (n-1, hs, v[0], v[1], v[2], nv[0], nv[1], nv[2]))
 		if n > 0:
 			h = par.is_hair[n-1]
-			fp.write(" %f %f\n" % (h.time, h.weight))
+			lv = h.co_hair_space
+			fp.write(" (%.3f %.3f %.3f) %.3f %.3f\n" % (lv[0], lv[1], lv[2], h.time, h.weight))
 		else:
 			fp.write("\n")
 	return
@@ -251,7 +238,7 @@ def makeHair(name, hstep, guides):
 	settings.type = 'HAIR'
 	settings.name = 'HairSettings'
 	settings.count = len(guides)
-	settings.hair_step = hstep-1
+	settings.hair_step = hstep
 	# [‘VERT’, ‘FACE’, ‘VOLUME’, ‘PARTICLE’]
 	settings.emit_from = 'FACE'
 	settings.use_render_emitter = True
@@ -291,8 +278,8 @@ def makeHair(name, hstep, guides):
 	bpy.ops.particle.disconnect_hair(all=True)
 	bpy.ops.particle.particle_edit_toggle()
 
-	dt = 100.0/(hstep-1)
-	dw = 1.0/(hstep-1)
+	dt = 100.0/(hstep)
+	dw = 1.0/(hstep)
 	for m,guide in enumerate(guides):
 		nmax = hstep
 		if len(guide) < nmax+1:
@@ -301,20 +288,22 @@ def makeHair(name, hstep, guides):
 		par = psys.particles[m]
 		par.location = guide[0]
 		#par.location = (0,0,0)
-		for n in range(1, nmax):
-			point = guide[n]
+		for n in range(0, nmax):
+			point = guide[n+1]
 			h = par.is_hair[n]
-			h.co = point
-			h.time = n*dt
-			h.weight = 1.0 - n*dw
+			#h.co = point
+			h.co_hair_space = point
+			h.time = (n+1)*dt
+			h.weight = 1.0 - (n+1)*dw
 		for n in range(nmax, hstep):
 			point = guide[nmax]
 			h = par.is_hair[n]
-			h.co = point
-			h.time = n*dt
-			h.weight = 1.0 - n*dw
+			#h.co = point
+			h.co_hair_space = point
+			h.time = (n+1)*dt
+			h.weight = 1.0 - (n+1)*dw
 
-		print(par.location)
+		#print(par.location)
 		#for n in range(0, hstep):
 		#	print("  ", par.is_hair[n].co)
 
@@ -326,7 +315,7 @@ def makeHair(name, hstep, guides):
 	fp = open("/home/thomas/myblends/hair/test2.txt", "w")
 	nmax = len(guides[0])
 	for m,guide in enumerate(guides):
-		printGuideAndHair(fp, guide, psys.particles[m], nmax)
+		printGuideAndHair(fp, guide, psys.particles[m], psys.settings.hair_step, nmax)
 	fp.close()	
 	'''
 	return
