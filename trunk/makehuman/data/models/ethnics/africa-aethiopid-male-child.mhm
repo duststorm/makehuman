@@ -33,7 +33,8 @@ detail l-lowerarm-scale-vert-incr 0.050000
 detail neck-scale-vert-incr 0.050000
 microdetail l-ear-helix-trans-up 0.050000
 microdetail r-ear-helix-trans-up 0.050000
-detail eye-trans-down 0.450000
+detail l-eye-trans-down 0.450000
+detail r-eye-trans-down 0.450000
 detail jaw-trans-forward 0.300000
 detail head-trans-up 0.200000
 microdetail l-head-cheek-trans-out 0.150000

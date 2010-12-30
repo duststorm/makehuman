@@ -27,6 +27,8 @@ microdetail r-eye-upper-outer-lid-trans-out 0.300000
 detail r-lowerleg-scale-vert-incr 0.750000
 microdetail l-eye-upper-inner-lid-trans-down 0.050000
 microdetail jaw-chin-scale-vert-incr 0.150000
+microdetail nose-tip-trans-up 0.050000
+microdetail nose-tip-trans-forward 0.350000
 detail nose-scale-horiz-incr 0.100000
 detail eye-scale-horiz-decr 0.650000
 microdetail r-head-zygoma-trans-out 0.400000
