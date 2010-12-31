@@ -1,15 +1,15 @@
 """ 
-**Project Name:**      MakeHuman
+**Project Name:**	  MakeHuman
 
 **Product Home Page:** http://www.makehuman.org/
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+**Code Home Page:**	http://code.google.com/p/makehuman/
 
-**Authors:**           Thomas Larsson
+**Authors:**		   Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**	  MakeHuman Team 2001-2009
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+**Licensing:**		 GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
@@ -59,27 +59,38 @@ parm u 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 end
 """
 
-theScale = 1.0
-
 #
-#	importHair(filename):
+#	importHair(filename, scale, invert, useCurves):
 #
 
-def importHair(filename, scale):
-	global theScale
-	theScale = scale
-	guides = readHairFile(filename)
+def importHair(filename, scale, invert, useCurves):
+	guides = readHairFile(filename, scale)
+	if invert:
+		for guide in guides:
+			guide.reverse()
 	(nmax,nguides) = equalizeHairLengths(guides)
 	print("%d guides, %d steps" % (len(nguides), nmax))
-	makeHair('Hair', nmax-1, nguides)
+	if useCurves:
+		makeCurves('HairCurves', nguides)
+	else:
+		makeHair('Hair', nmax-1, nguides)
+		bpy.ops.particle.particle_edit_toggle()
+
+	'''
+	fp = open("/home/thomas/myblends/hair/test2.txt", "w")
+	nmax = len(guides[0])
+	for m,guide in enumerate(guides):
+		printGuideAndHair(fp, guide, psys.particles[m], psys.settings.hair_step, nmax)
+	fp.close()	
+	'''
 	return
 
 #
-#	writeHairFile(fileName):
+#	writeHairFile(fileName, scale):
 #	For debugging, export hair as obj
 #
 
-def writeHairFile(fileName):
+def writeHairFile(fileName, scale):
 	ob = bpy.context.object
 	psys = ob.active_particle_system
 	if psys and psys.name == 'Hair':
@@ -93,10 +104,10 @@ def writeHairFile(fileName):
 	fp = open(filePath, "w")
 
 	for n,par in enumerate(psys.particles):
-		v = par.location / theScale
+		v = par.location / scale
 		fp.write("v %.3f %.3f %.3f\n" % (v[0], v[1], v[2]))
 		for h in par.is_hair:
-			v = h.location / theScale
+			v = h.location / scale
 			fp.write("v %.3f %.3f %.3f\n" % (v[0], v[1], v[2]))
 		fp.write("g Hair.%03d\n" % n)
 		fp.write("end\n\n")
@@ -104,12 +115,11 @@ def writeHairFile(fileName):
 	return
 
 #
-#	readHairFile(fileName):
+#	readHairFile(fileName, scale):
 #	Read obj file with hair strands as curves
 #
 
-def readHairFile(fileName):
-	global theScale
+def readHairFile(fileName, scale):
 	path1 = os.path.expanduser(fileName)
 	filePath = os.path.realpath(path1)
 	print( "Reading hair " + filePath )
@@ -125,7 +135,7 @@ def readHairFile(fileName):
 			pass
 		elif words[0] == 'v':
 			(x,y,z) = (float(words[1]), float(words[2]), float(words[3]))
-			guide.append(theScale*Vector((x,-z,y)))
+			guide.append(scale*Vector((x,-z,y)))
 		elif words[0] == 'end':
 			guides.append(guide)
 			guide = []
@@ -243,22 +253,22 @@ def makeHair(name, hstep, guides):
 	settings.emit_from = 'FACE'
 	settings.use_render_emitter = True
 
-	#settings.use_hair_bspline = False
+	settings.use_hair_bspline = True
 	#settings.hair_geometry = True
 	#settings.grid_resolution = 
 	#settings.draw_step = 1
 
 	settings.material = 3
 	#settings.use_render_adaptive = True
-	#settings.use_strand_primitive = True
+	settings.use_strand_primitive = True
+
+	settings.child_type = 'PARTICLES'
+	settings.child_nbr = int(1000/settings.count)+1
+	settings.rendered_child_count = 10*settings.child_nbr
+	settings.child_length = 1.0
+	settings.child_radius = 0.2
 
 	'''
-	settings.child_type = 'PARTICLES'
-	settings.child_nbr = 6
-	settings.rendered_child_nbr = 60
-	settings.child_length = 1.0
-	settings.child_length_thres = 0.0
-
 	settings.clump_factor = 0.0
 	settings.clumppow = 0.0
 
@@ -278,46 +288,131 @@ def makeHair(name, hstep, guides):
 	bpy.ops.particle.disconnect_hair(all=True)
 	bpy.ops.particle.particle_edit_toggle()
 
-	dt = 100.0/(hstep)
-	dw = 1.0/(hstep)
 	for m,guide in enumerate(guides):
-		nmax = hstep
-		if len(guide) < nmax+1:
-			nmax = len(guide)-1
-			#raise NameError("Wrong length %d != %d" % (len(guide), hstep))
 		par = psys.particles[m]
-		par.location = guide[0]
-		#par.location = (0,0,0)
-		for n in range(0, nmax):
-			point = guide[n+1]
-			h = par.is_hair[n]
-			#h.co = point
-			h.co_hair_space = point
-			h.time = (n+1)*dt
-			h.weight = 1.0 - (n+1)*dw
-		for n in range(nmax, hstep):
-			point = guide[nmax]
-			h = par.is_hair[n]
-			#h.co = point
-			h.co_hair_space = point
-			h.time = (n+1)*dt
-			h.weight = 1.0 - (n+1)*dw
-
-		#print(par.location)
-		#for n in range(0, hstep):
-		#	print("  ", par.is_hair[n].co)
+		setStrand(guide, par, hstep)
 
 	bpy.ops.particle.select_all(action='SELECT')
-	#bpy.ops.particle.connect_hair(all=True)
-	bpy.ops.particle.particle_edit_toggle()
+	bpy.ops.particle.connect_hair(all=True)
+	return
 
-	'''
-	fp = open("/home/thomas/myblends/hair/test2.txt", "w")
-	nmax = len(guides[0])
-	for m,guide in enumerate(guides):
-		printGuideAndHair(fp, guide, psys.particles[m], psys.settings.hair_step, nmax)
-	fp.close()	
-	'''
+#
+#	setStrand(guide, par, hstep):
+#
+
+def setStrand(guide, par, hstep):
+	nmax = hstep
+	dt = 100.0/(hstep)
+	dw = 1.0/(hstep-1)
+	if len(guide) < nmax+1:
+		nmax = len(guide)-1
+		#raise NameError("Wrong length %d != %d" % (len(guide), hstep))
+	par.location = guide[0]
+	for n in range(0, nmax):
+		point = guide[n+1]
+		h = par.is_hair[n]
+		#h.co = point
+		h.co_hair_space = point
+		h.time = (n+1)*dt
+		w = 1.0 - (n+1)*dw
+		h.weight = max(w, 0.0)
+	for n in range(nmax, hstep):
+		point = guide[nmax]
+		h = par.is_hair[n]
+		#h.co = point
+		h.co_hair_space = point
+		h.time = (n+1)*dt
+		w = 1.0 - (n+1)*dw
+		h.weight = max(w, 0.0)
+
+	#print(par.location)
+	#for n in range(0, hstep):
+	#	print("  ", par.is_hair[n].co)
+	return
+
+#
+#	reverseStrands(ob):
+#	getGuideFromHair(par):
+#
+
+def reverseStrands(ob):
+	psys = ob.particle_systems.active
+	if (not psys) or psys.settings.type != 'HAIR':
+		print("Cannot reverse strands. No active hair.")
+		return
+	for par in psys.particles:
+		if par.select:
+			guide = getGuideFromHair(par)
+			hstep = len(guide)
+			setStrand(guide, par, psys.hair_step)
+	return
+
+def getGuideFromHair(par):
+	guide = [par.location]
+	for h in par.is_hair:
+		guide.append( h.co_hair_space.copy() )
+	guide.reverse()
+	return guide
+
+#
+#	makeCurves(name, guides):
+#	setSplinePoint(pt, x):
+#
+
+def makeCurves(name, guides):
+	cu = bpy.data.curves.new('HairCurve', 'CURVE')
+	ob = bpy.data.objects.new('HairCurve', cu)
+	bpy.context.scene.objects.link(ob)
+	cu.dimensions = '3D'
+
+	for guide in guides:
+		npoints = len(guide)
+		spline = cu.splines.new('NURBS')
+		spline.points.add(npoints-1)
+		for n in range(npoints):
+			setSplinePoint(spline.points[n].co, guide[n])
+	return ob
+
+def setSplinePoint(pt, x):
+	pt[0] = x[0]
+	pt[1] = x[1]
+	pt[2] = x[2]
+	return
+
+#
+#	reverseCurves(ob):
+#
+
+def reverseCurves(ob):
+	for spline in ob.data.splines:
+		selected = False
+		for pt in spline.points:
+			if pt.select:
+				selected = True
+				break
+		if selected:
+			guide = []
+			for pt in spline.points:
+				guide.append(pt.co.copy())
+			guide.reverse()
+			npoints = len(guide)
+			for n in range(npoints):
+				setSplinePoint(spline.points[n].co, guide[n])
+	return
+
+#
+#	makeHairFromCurve(ob, cuOb):
+#
+
+def makeHairFromCurve(ob, cuOb):
+	guides = []
+	for spline in cuOb.data.splines:
+		guide = []
+		for pt in spline.points:
+			x = pt.co
+			guide.append( Vector((x[0], x[1], x[2])) )
+		guides.append(guide)
+	makeHair('Hair', len(guides[0])-1, guides)
 	return
 
 #
@@ -326,6 +421,10 @@ def makeHair(name, hstep, guides):
 
 DEBUG= False
 from bpy.props import *
+
+#
+#	class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
+#
 
 class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 	"""Import MakeHuman hair from OBJ curves file (.obj)"""
@@ -337,15 +436,92 @@ class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 
 	filepath = StringProperty(name="File Path", description="File path used for importing the .obj file", maxlen= 1024, default= "")
 
-	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
+	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default=1.0)
+	invert = BoolProperty(name="Invert", description="Invert hair direction", default=False)
+	useCurves = BoolProperty(name="Curves", description="Import curves as curves", default=False)
 	
 	def execute(self, context):
-		importHair(self.properties.filepath, self.properties.scale)
+		p = self.properties
+		importHair(p.filepath, p.scale, p.invert, p.useCurves)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
+
+#
+#	class MhxHairPanel(bpy.types.Panel):
+#
+
+class MhxHairPanel(bpy.types.Panel):
+	bl_label = "MakeHuman Hair"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	def draw(self, context):
+		layout = self.layout
+		scn = context.scene
+		#layout.operator("object.ReverseStrandsButton")
+		layout.operator("object.ReverseCurveButton")
+		layout.operator("object.MakeHairFromCurvesButton")
+
+#
+#	class OBJECT_OT_ReverseStrandsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ReverseStrandsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ReverseStrandsButton"
+	bl_label = "Reverse strands"
+
+	@classmethod
+	def poll(cls, context):
+		return (context.object and context.object.particle_systems.active)	
+
+	def execute(self, context):
+		reverseStrands(context.object)
+		print("Strands reversed")
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_ReverseCurveButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ReverseCurveButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ReverseCurveButton"
+	bl_label = "Reverse curve"
+
+	@classmethod
+	def poll(cls, context):
+		return (context.object and context.object.type == 'CURVE')
+
+	def execute(self, context):
+		reverseCurves(context.object)
+		print("Curve reversed")
+		return{'FINISHED'}	
+
+#
+#	class OBJECT_OT_MakeHairFromCurvesButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_MakeHairFromCurvesButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_MakeHairFromCurvesButton"
+	bl_label = "Make hair from curves"
+
+	@classmethod
+	def poll(cls, context):
+		return (context.object and context.object.type == 'MESH')	
+
+	def execute(self, context):
+		ob = context.object
+		for cuOb in context.scene.objects:
+			if cuOb.select and cuOb.type == 'CURVE':
+				makeHairFromCurve(ob, cuOb)
+		print("Made hair from curves")
+		return{'FINISHED'}	
+
+#
+#	Register
+#
 
 def register():
 	bpy.types.register(IMPORT_OT_makehuman_hair_obj)
@@ -377,8 +553,8 @@ makeHair('H2', 3, [guide2])
 makeHair('H3', 3, [guide3])
 
 
-readHairFile('/home/thomas/myblends/hair/hair_hairy.obj')
-writeHairFile('/home/thomas/myblends/hair/haired.obj')
+readHairFile('/home/thomas/myblends/hair/hair_hairy.obj', 1.0, False)
+writeHairFile('/home/thomas/myblends/hair/haired.obj', 1.0)
 '''
 
 

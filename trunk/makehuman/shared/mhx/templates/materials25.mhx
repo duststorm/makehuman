@@ -443,10 +443,13 @@ Material Skin_no_SSS
 end Material
 
 Material Hair 
-  diffuse_color Array 0.0 0.0 0.0  ;
+  diffuse_color Array 0.04 0.04 0.04  ;
+  diffuse_intensity 0.5 ;
   diffuse_shader 'LAMBERT' ;
-  specular_color Array 0.219527468085 0.219527468085 0.219527468085  ;
+  specular_color Array 0.22 0.08 0.02  ;
   specular_shader 'COOKTORR' ;
+  specular_intensity 0.3 ;
+  specular_hardness 250 ;
   active_texture_index 0 ;
   alpha 0.609195 ;
   ambient 1 ;
@@ -457,7 +460,6 @@ Material Hair
   darkness 1 ;
   diffuse_fresnel 0.1 ;
   diffuse_fresnel_factor 0.5 ;
-  diffuse_intensity 0.8 ;
   diffuse_ramp_blend 'MIX' ;
   diffuse_ramp_factor 1 ;
   diffuse_ramp_input 'SHADER' ;
@@ -482,8 +484,6 @@ Material Hair
   shadow_ray_bias 0 ;
   use_shadows True ;
   specular_alpha 0 ;
-  specular_hardness 50 ;
-  specular_intensity 0.5 ;
   specular_ior 4 ;
   specular_ramp_blend 'MIX' ;
   specular_ramp_factor 1 ;
@@ -493,13 +493,12 @@ Material Hair
   specular_toon_smooth 0.1 ;
   strand Struct MaterialStrand None 
     blend_distance 0 ;
-    use_blender_units False ;
+    use_blender_units True ;
     size_min 0.001 ;
-    root_size 1 ;
+    root_size 0.01 ;
+    tip_size 0.005 ;
     shape 0 ;
-    # use_surface_diffuse True ;
-    use_tangent_shading True ;
-    tip_size 1 ;
+    use_tangent_shading False ;
     width_fade 0 ;
   end Struct
   use_tangent_shading False ;
