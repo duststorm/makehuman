@@ -119,12 +119,11 @@ C_TG_POSE = 0x3000
 C_CHILDOF = C_OW_POSE+C_TG_WORLD
 C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
 
-rootChildOfConstraints = []
-'''
+rootChildOfConstraints = [
 		('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
-'''
+]
 
 #
 #	newSetupJoints (obj, joints, headTails):

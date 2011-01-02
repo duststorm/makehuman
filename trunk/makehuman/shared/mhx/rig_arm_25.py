@@ -235,10 +235,10 @@ ArmArmature = [
 	# IK 
 	('UpArmIK_L',		upArmRoll, 'Shoulder_L', 0, L_ARMIK, (1,1,1) ),
 	('LoArmIK_L',		loArmRoll, 'UpArmIK_L', 0, L_ARMIK, (1,1,1) ),
-	('HandIK_L',		handRoll, 'MasterFloor', F_WIR, L_ARMIK, (1,1,1)),
+	('HandIK_L',		handRoll, None, F_WIR, L_ARMIK, (1,1,1)),
 	('UpArmIK_R',		-upArmRoll, 'Shoulder_R', 0, L_ARMIK, (1,1,1) ),
 	('LoArmIK_R',		-loArmRoll, 'UpArmIK_R', 0, L_ARMIK, (1,1,1) ),
-	('HandIK_R',		-handRoll, 'MasterFloor', F_WIR, L_ARMIK, (1,1,1)),
+	('HandIK_R',		-handRoll, None, F_WIR, L_ARMIK, (1,1,1)),
 
 	# Pole target
 	('ElbowPTIK_L',		0.0, 'Shoulder_L', F_WIR, L_ARMIK, (1,1,1)),
@@ -387,6 +387,7 @@ def ArmWritePoses(fp):
 
 	addPoseBone(fp, 'UpArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)]),])
+
 
 	addPoseBone(fp, 'LoArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_R, (True, True, True)])])

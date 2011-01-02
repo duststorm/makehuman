@@ -64,16 +64,16 @@ end
 #
 
 def importHair(filename, scale, invert, useCurves):
-	guides = readHairFile(filename, scale)
+	(name, guides) = readHairFile(filename, scale)
 	if invert:
 		for guide in guides:
 			guide.reverse()
 	(nmax,nguides) = equalizeHairLengths(guides)
 	print("%d guides, %d steps" % (len(nguides), nmax))
 	if useCurves:
-		makeCurves('HairCurves', nguides)
+		makeCurves(name, nguides)
 	else:
-		makeHair('Hair', nmax-1, nguides)
+		makeHair(name, nmax-1, nguides)
 		bpy.ops.particle.particle_edit_toggle()
 
 	'''
@@ -98,8 +98,7 @@ def writeHairFile(fileName, scale):
 	else:
 		raise NameError("Active object has no hair")
 
-	path1 = os.path.expanduser(fileName)
-	filePath = os.path.realpath(path1)
+	filePath = os.path.realpath(os.path.expanduser(fileName))
 	print( "Writing hair " + filePath )
 	fp = open(filePath, "w")
 
@@ -120,8 +119,8 @@ def writeHairFile(fileName, scale):
 #
 
 def readHairFile(fileName, scale):
-	path1 = os.path.expanduser(fileName)
-	filePath = os.path.realpath(path1)
+	(name, ext) = os.path.splitext(os.path.basename(fileName))
+	filePath = os.path.realpath(os.path.expanduser(fileName))
 	print( "Reading hair " + filePath )
 	fp = open(filePath, "rU")
 	guide = []
@@ -145,7 +144,7 @@ def readHairFile(fileName, scale):
 			pass
 	fp.close()
 	print("File %s read" % fileName)
-	return guides
+	return (name, guides)
 
 #
 #	equalizeHairLengths(guides):
@@ -360,8 +359,8 @@ def getGuideFromHair(par):
 #
 
 def makeCurves(name, guides):
-	cu = bpy.data.curves.new('HairCurve', 'CURVE')
-	ob = bpy.data.objects.new('HairCurve', cu)
+	cu = bpy.data.curves.new(name, 'CURVE')
+	ob = bpy.data.objects.new(name, cu)
 	bpy.context.scene.objects.link(ob)
 	cu.dimensions = '3D'
 
