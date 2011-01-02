@@ -1,5 +1,5 @@
 #
-#	Face bone definitions
+#	Face bone definitions 
 #
 
 import mhx_rig

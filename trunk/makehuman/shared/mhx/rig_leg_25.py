@@ -1,5 +1,5 @@
 #
-#	Leg bone definitions
+#	Leg bone definitions 
 #
 
 import mhx_rig

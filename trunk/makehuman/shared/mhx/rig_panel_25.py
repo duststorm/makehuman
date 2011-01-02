@@ -1,5 +1,5 @@
 #
-#	Panel bone definitions
+#	Panel bone definitions 
 #
 
 import mhx_rig

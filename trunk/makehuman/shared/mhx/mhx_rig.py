@@ -15,7 +15,7 @@
 
 Abstract
 --------
-Functions shared by all rigs
+Functions shared by all rigs 
 
 """
 

@@ -1,5 +1,5 @@
 #
-#	Arm bone definitions
+#	Arm bone definitions 
 #
 
 import mhx_rig

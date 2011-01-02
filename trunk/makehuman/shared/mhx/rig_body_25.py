@@ -1,5 +1,5 @@
 #
-#	Body bone definitions
+#	Body bone definitions 
 #
 
 import mhx_rig
