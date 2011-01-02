@@ -48,7 +48,6 @@
 #endif // __APPLE__
 #ifdef __WIN32__
 #include <shlobj.h>
-#include <knownfolders.h>
 
 OSVERSIONINFO winVersion(void)
 {
@@ -420,9 +419,9 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         HRESULT hr;
 
 #ifdef CSIDL_MYDOCUMENTS       
-        hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, path);
+        hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, 0, path);
 #else
-        hr = SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, path);
+        hr = SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, path);
 #endif
 
         if (FAILED(hr))
