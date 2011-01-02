@@ -155,38 +155,52 @@ class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'), category.app.getThemeResource('images', 'button_export_file_on.png'))
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0],\
-        158, 256)
+        #gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0], 158, 256)
         self.fileentry = gui3d.FileEntryView(self)
 
         self.exportBodyGroup = []
         self.exportHairGroup = []
         
         #### BODY EXPORT #######
-        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                              'button_export_obj.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_obj_on.png'), position=[33, 140,
-                                              9.2], selected=True)
-        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_mhx.png'
-                                     ), selectedTexture=self.app.getThemeResource('images', 'button_export_mhx_on.png'), position=[68, 140, 9.2])
-        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                         'button_export_collada.png'), selectedTexture=self.app.getThemeResource('images', 'button_export_collada_on.png'), position=[103, 140, 9.2])
-        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images','export_md5.png'), selectedTexture=self.app.getThemeResource('images', 'export_md5_on.png'), position=[138, 140, 9.2])
-        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images','export_md5.png'), selectedTexture=self.app.getThemeResource('images', 'export_md5_on.png'), position=[173, 140, 9.2])
+        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, 'data/3dobjs/button_generic_long.obj', position=[25, 140, 9.2], label="Wavefront obj", selected=True)
+        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 170, 9.2], label="Blender exchange")
+        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 200, 9.2], label="Collada")
+        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 230, 9.2], label="MD5")
+        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 260, 9.2], label="STL")
                                          
-        self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_bvh.png'),
-                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_bvh_on.png'), position=[33, 160, 9.2], selected=True)
+        self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', position=[625, 140, 9.2], label="Skeleton", selected=True)
                                                  
-        self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_export_group.png'),
-                                                 selectedTexture=self.app.getThemeResource('images', 'button_export_group_on.png'), position=[68, 160, 9.2], selected=True)
+        self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', position=[625, 170, 9.2], label="Groups", selected=True)
 
         ####### HAIR EXPORT ###################
-        self.hairMesh = gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images',\
-                         'hair_export_mesh_off.png'), selectedTexture=self.app.getThemeResource('images', 'hair_export_mesh_on.png'),\
-                         position=[68, 220, 9.2], selected=True)
+        self.hairMesh = gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_generic_long.obj', position=[625, 200, 9.2], label="Hair as mesh", selected=True)
 
-        gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images',\
-                         'hair_export_curves_off.png'), selectedTexture=self.app.getThemeResource('images', 'hair_export_curves_on.png'),\
-                         position=[68, 240, 9.2])
+        self.hairCurves = gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_generic_long.obj', position=[625, 230, 9.2], label="Hair as curves")
+        
+        @self.wavefrontObj.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(self.wavefrontObj, event)
+            self.updateGui()
+            
+        @self.mhx.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(self.mhx, event)
+            self.updateGui()
+        
+        @self.collada.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(self.collada, event)
+            self.updateGui()
+        
+        @self.md5.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(self.md5, event)
+            self.updateGui()
+        
+        @self.stl.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(self.stl, event)
+            self.updateGui()
         
         @self.fileentry.event
         def onFileSelected(filename):
@@ -197,8 +211,21 @@ class ExportTaskView(gui3d.TaskView):
             if self.wavefrontObj.selected:
                 mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".obj"), 'data/3dobjs/base.obj', self.exportGroups.selected)
                 mh2proxy.exportProxyObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename))
+                
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".bvh"))
+                    
+                if len(filename)> 0 and self.app.scene3d.selectedHuman.hairObj and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
+                    if self.hairMesh.selected:
+                        mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
+                    else:
+                        hairsClass = self.app.scene3d.selectedHuman.hairs
+                        #hairsClass = self.app.categories["Library"].tasksByName["Hair"]
+                        #hair.adjustHair(self.app.scene3d.selectedHuman, hairsClass)
+                        file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
+                        mh2obj.exportAsCurves(file, hairsClass.guides)
+                        file.close()
+                  
             elif self.mhx.selected:
                 mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
             elif self.collada.selected:
@@ -208,19 +235,20 @@ class ExportTaskView(gui3d.TaskView):
             elif self.stl.selected:
                 mh2stl.exportStlBinary(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".stl"))
 
-            if len(filename)> 0 and self.app.scene3d.selectedHuman.hairObj and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
-               if self.hairMesh.selected:
-                  mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
-               else:
-                  hairsClass = self.app.scene3d.selectedHuman.hairs
-                  #hairsClass = self.app.categories["Library"].tasksByName["Hair"]
-                  #hair.adjustHair(self.app.scene3d.selectedHuman, hairsClass)
-                  file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
-                  mh2obj.exportAsCurves(file, hairsClass.guides)
-                  file.close()
-
             self.app.switchCategory('Modelling')
             self.app.scene3d.redraw(1)
+            
+    def updateGui(self):
+        if self.wavefrontObj.selected:
+            self.exportSkeleton.show()
+            self.exportGroups.show()
+            self.hairMesh.show()
+            self.hairCurves.show()
+        else:
+            self.exportSkeleton.hide()
+            self.exportGroups.hide()
+            self.hairMesh.hide()
+            self.hairCurves.hide()
 
     def onShow(self, event):
 
