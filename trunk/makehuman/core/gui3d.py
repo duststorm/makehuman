@@ -878,9 +878,11 @@ class ProgressBar(View):
 
 class TextView(View):
 
-	def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9], fontSize = defaultFontSize):
+	def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9], fontSize = defaultFontSize, label = ''):
 		View.__init__(self, parent)
 		self.textObject = TextObject(self, position=position, fontSize = fontSize)
+		if label:
+		    self.setText(label)
 
 	def setText(self, text):
 		self.textObject.setText(text)

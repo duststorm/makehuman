@@ -162,12 +162,14 @@ class ExportTaskView(gui3d.TaskView):
         self.exportHairGroup = []
         
         #### BODY EXPORT #######
+        gui3d.TextView(self, label = 'Format', position=[25, 110, 9.2])
         self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, 'data/3dobjs/button_generic_long.obj', position=[25, 140, 9.2], label="Wavefront obj", selected=True)
         self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 170, 9.2], label="Blender exchange")
         self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 200, 9.2], label="Collada")
         self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 230, 9.2], label="MD5")
         self.stl = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 260, 9.2], label="STL")
-                                         
+                 
+        gui3d.TextView(self, label = 'Options', position=[625, 110, 9.2])                        
         self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', position=[625, 140, 9.2], label="Skeleton", selected=True)
                                                  
         self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', position=[625, 170, 9.2], label="Groups", selected=True)
