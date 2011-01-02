@@ -42,10 +42,10 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderZLabel.setText('0')
         self.savePoseFiles = 0
 
-        self.resetPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Reset", position=[50, 240, 9.5])
-        self.testPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', label = "Test", position=[50, 260, 9.5])
+        self.resetPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', label = "Reset", position=[20, 240, 9.5])
+        self.testPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', label = "Test", position=[20, 260, 9.5])
         
-        self.aToggleButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', label = "SavePose", position=[20, 280, 9])
+        self.aToggleButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', label = "SavePose", position=[20, 280, 9])
 
         @self.aToggleButton.event
         def onClicked(event):
