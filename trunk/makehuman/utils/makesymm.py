@@ -13,7 +13,8 @@ Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.ne
 Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards
 ===========================  ==================================================================
 
-This module implements a utility function to check if each target has a good symmetric one.
+This module symmetrize the left target. It check for abnormal left targets too (they are left targets that affect some right vertices).
+The abnormal targets are copied into the tmp folder, and then fixed.
 
 """
 
@@ -26,11 +27,15 @@ import os
 import aljabr
 import math
 import types
+import shutil
 
 theta = 0.01
 failedToOpen = []
 symmCouples = {}
 corrupted = []
+
+if not os.path.isdir("../tmp"):
+    os.mkdir("../tmp")
 
 def loadSymmData(path):
     global symmCouples, corrupted
@@ -49,7 +54,7 @@ def loadSymmData(path):
 
 
 def doMirror(path1, path2):
-    
+    global symmCouples,corrupted
     fileDescriptor = open(path1)        
     simmetrizedData = []
     originalData = fileDescriptor.readlines()
@@ -61,7 +66,7 @@ def doMirror(path1, path2):
             except:
                 corrupted.append(path1)
                 return
-            simmetrizedVector = [simmIndex, -float(vectorData[1]),float(vectorData[2]),float(vectorData[3])]
+            simmetrizedVector = [simmIndex, -1*float(vectorData[1]),float(vectorData[2]),float(vectorData[3])]
             simmetrizedData.append(simmetrizedVector)
     fileDescriptor.close()
     
@@ -71,22 +76,54 @@ def doMirror(path1, path2):
     fileDescriptor.close()
     
 
+def fixAbnormalTargets(path):
+    """
+    This function replace the abnormal target with the one that use only left verts.
+    """
+    global symmCouples
+    fileDescriptor = open(path)        
+    fixedData = []
+    originalData = fileDescriptor.readlines()
+    for targetData in originalData:
+        vectorData = targetData.split()
+        if len(vectorData) > 0:
+            try:
+                simmIndex = symmCouples[int(vectorData[0])] #This line check it's a left vert
+                fixedVector = [int(vectorData[0]), float(vectorData[1]),float(vectorData[2]),float(vectorData[3])]
+                fixedData.append(fixedVector)
+            except:                
+                print "skipped index %i"%(int(vectorData[0]))         
+    fileDescriptor.close()
+    
+    #Overwrite the old corrupted target
+    fileDescriptor = open(path, 'w')       
+    for fixedVector in fixedData:
+        fileDescriptor.write('%i %f %f %f\n' % (fixedVector[0], fixedVector[1], fixedVector[2], fixedVector[3]))
+    fileDescriptor.close()
+
+
 def symmetrize(path):
     loadSymmData("./maketarget/base.sym")
+    nTargets = 0
     for leftTarget in os.listdir(path):
         if "svn" not in leftTarget:
             if leftTarget.split("-")[0] == "l":
+                nTargets += 1
                 rightTarget = "r"+leftTarget[1:]
                 tPath1 = os.path.join(path, leftTarget)
                 tPath2 = os.path.join(path, rightTarget)
                 doMirror(tPath1,tPath2)
-    print "Found %i abnormal left targets (that affect right vertices):"%(len(corrupted))
+    
     for corruptedTarget in corrupted:
-        print corruptedTarget
+        #print corruptedTarget
+        corruptedTarget2 = os.path.join("../tmp",os.path.basename(corruptedTarget))
+        shutil.copyfile(corruptedTarget, corruptedTarget2)
+        fixAbnormalTargets(corruptedTarget2)        
+    print "Found %i abnormal left targets (that affect right vertices)"%(len(corrupted))
+    print "I've simmetrized %i left target"%(nTargets)
 
-
-symmetrize("/home/manuel/archive/archive_makehuman/makehuman_src/data/targets/details")
-#if len(sys.argv) < 2:
-    #print "Usage: checksymm directory"
-#else:
-	#check_symm(sys.argv[1])
+#symmetrize("/home/manuel/archive/archive_makehuman/makehuman_src/data/targets/microdetails")
+if len(sys.argv) < 2:
+    print "Usage: checksymm directory"
+else:
+	symmetrize(sys.argv[1])
