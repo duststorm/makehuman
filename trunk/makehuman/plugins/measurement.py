@@ -530,6 +530,33 @@ def load(app):
     category = app.getCategory('Advanced','button_advance.png','button_advance_on.png')
     taskview = MeasureTaskView(category)
     print 'Asymm loaded'
+    allSliders = [taskview.neckCircumferenceSlider,
+                    taskview.neckHeightSlider,
+                    taskview.upperArmCircumferenceSlider,
+                    taskview.upperArmLenghtSlider,
+                    taskview.lowerarmLenghtSlider,
+                    taskview.wristCircumferenceSlider,
+                    taskview.frontChestSlider,
+                    taskview.bustCircumferenceSlider,
+                    taskview.underBustCircumferenceSlider,
+                    taskview.waistCircumferenceSlider,
+                    taskview.napeToWaistSlider,
+                    taskview.waistToHipSlider,
+                    taskview.shoulderDistanceSlider,
+                    taskview.upperLegHeightSlider,
+                    taskview.lowerLegHeightSlider,
+                    taskview.calfSlider,
+                    taskview.ankleSlider,
+                    taskview.upperThighSlider,
+                    taskview.hipsSlider]
+                
+    def hideAllSliders():
+        for slider in allSliders:
+            slider.hide()
+            
+    def showAllSliders():
+        for slider in allSliders:
+            slider.show()
 
     #Zoom and pan the camera
     @taskview.event
@@ -562,6 +589,50 @@ def load(app):
             trans[0] += 0.1 * diff[0]
             trans[1] -= 0.1 * diff[1]
             human.setPosition(trans)
+            
+    @taskview.event
+    def onMouseDown(event):
+        part = app.scene3d.getSelectedFacesGroup()
+        bodyZone = app.scene3d.selectedHuman.getPartNameForGroupName(part.name)
+        print bodyZone
+        if bodyZone in app.scene3d.selectedHuman.bodyZones:
+            if bodyZone == "neck":
+                hideAllSliders()
+                taskview.neckCircumferenceSlider.show()
+                taskview.neckHeightSlider.show()
+            elif (bodyZone == "r-upperarm") or (bodyZone == "l-upperarm"):
+                hideAllSliders()
+                taskview.upperArmCircumferenceSlider.show()
+                taskview.upperArmLenghtSlider.show() 
+            elif (bodyZone == "r-lowerarm") or (bodyZone == "l-lowerarm"):
+                hideAllSliders()
+                taskview.lowerarmLenghtSlider.show() 
+                taskview.wristCircumferenceSlider.show()  
+            elif (bodyZone == "torso") or (bodyZone == "hip") or (bodyZone == "pelvis"):
+                hideAllSliders()
+                taskview.frontChestSlider.show()
+                taskview.bustCircumferenceSlider.show()
+                taskview.underBustCircumferenceSlider.show()
+                taskview.waistCircumferenceSlider.show()
+                taskview.napeToWaistSlider.show()
+                taskview.waistToHipSlider.show()
+                taskview.shoulderDistanceSlider.show()
+            elif (bodyZone == "l-upperleg") or (bodyZone == "r-upperleg"): 
+                hideAllSliders()
+                taskview.upperLegHeightSlider.show()
+                taskview.upperThighSlider.show()
+            elif (bodyZone == "l-lowerleg") or (bodyZone == "r-lowerleg"):  
+                hideAllSliders()
+                taskview.lowerLegHeightSlider.show()
+                taskview.lowerLegHeightSlider.show()
+                taskview.calfSlider.show()
+            elif (bodyZone == "l-foot") or (bodyZone == "r-foot"): 
+                hideAllSliders()
+                taskview.ankleSlider.show()
+                taskview.upperThighSlider.show()
+                taskview.hipsSlider.show()            
+            else:
+                hideAllSliders()
 
 
 
