@@ -31,72 +31,72 @@ class MeasureTaskView(gui3d.TaskView):
         self.neckHeightSlider.label.setPosition([30,115,9.5])
 
         lbl = "Upper arm circum.: cm "+ str(round(self.ruler.getMeasure("upperarm")))
-        self.upperArmCircumferenceSlider = gui3d.Slider(self,  position=[20, 160, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.upperArmCircumferenceSlider.label.setPosition([30,155,9.5])
+        self.upperArmCircumferenceSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.upperArmCircumferenceSlider.label.setPosition([30,75,9.5])
 
         lbl = "Upperarm lenght: cm "+ str(round(self.ruler.getMeasure("upperarmlenght")))
-        self.upperArmLenghtSlider = gui3d.Slider(self,  position=[20, 200, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.upperArmLenghtSlider.label.setPosition([30,195,9.5])
+        self.upperArmLenghtSlider = gui3d.Slider(self,  position=[20, 120, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.upperArmLenghtSlider.label.setPosition([30,115,9.5])
 
         lbl = "Lowerarm lenght: cm "+ str(round(self.ruler.getMeasure("lowerarmlenght")))
-        self.lowerarmLenghtSlider = gui3d.Slider(self,  position=[20, 240, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.lowerarmLenghtSlider.label.setPosition([30,235,9.5])
+        self.lowerarmLenghtSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.lowerarmLenghtSlider.label.setPosition([30,75,9.5])
 
         lbl = "Wrist circum.: cm "+ str(round(self.ruler.getMeasure("wrist")))
-        self.wristCircumferenceSlider = gui3d.Slider(self,  position=[20, 280, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.wristCircumferenceSlider.label.setPosition([30,275,9.5])
+        self.wristCircumferenceSlider = gui3d.Slider(self,  position=[20, 120, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.wristCircumferenceSlider.label.setPosition([30,115,9.5])
 
         lbl = "Front chest dist: cm "+ str(round(self.ruler.getMeasure("frontchest")))
-        self.frontChestSlider = gui3d.Slider(self,  position=[20, 320, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.frontChestSlider.label.setPosition([30,315,9.5])
+        self.frontChestSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.frontChestSlider.label.setPosition([30,75,9.5])
 
         lbl = "Bust circ.: cm "+ str(round(self.ruler.getMeasure("bust")))
-        self.bustCircumferenceSlider = gui3d.Slider(self,  position=[20, 360, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.bustCircumferenceSlider.label.setPosition([30,355,9.5])
+        self.bustCircumferenceSlider = gui3d.Slider(self,  position=[20, 120, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.bustCircumferenceSlider.label.setPosition([30,115,9.5])
 
         lbl = "Underbust circ.: cm "+ str(round(self.ruler.getMeasure("underbust")))
-        self.underBustCircumferenceSlider = gui3d.Slider(self,  position=[20, 400, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.underBustCircumferenceSlider.label.setPosition([30,395,9.5])
+        self.underBustCircumferenceSlider = gui3d.Slider(self,  position=[20, 160, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.underBustCircumferenceSlider.label.setPosition([30,155,9.5])
 
         lbl = "Waist circ.: cm "+ str(round(self.ruler.getMeasure("waist")))
-        self.waistCircumferenceSlider = gui3d.Slider(self,  position=[20, 440, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.waistCircumferenceSlider.label.setPosition([30,435,9.5])
+        self.waistCircumferenceSlider = gui3d.Slider(self,  position=[20, 200, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.waistCircumferenceSlider.label.setPosition([30,195,9.5])
 
         lbl = "Nape to waist: cm "+ str(round(self.ruler.getMeasure("napetowaist")))
-        self.napeToWaistSlider = gui3d.Slider(self,  position=[20, 480, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.napeToWaistSlider.label.setPosition([30,475,9.5])
+        self.napeToWaistSlider = gui3d.Slider(self,  position=[20, 240, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.napeToWaistSlider.label.setPosition([30,235,9.5])
 
         lbl = "Waist to hip: cm "+ str(round(self.ruler.getMeasure("waisttohip")))
-        self.waistToHipSlider = gui3d.Slider(self,  position=[600, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.waistToHipSlider.label.setPosition([610,75,9.5])
+        self.waistToHipSlider = gui3d.Slider(self,  position=[20, 280, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.waistToHipSlider.label.setPosition([30,275,9.5])
 
         lbl = "Shoulder Dist.: cm "+ str(round(self.ruler.getMeasure("shoulder")))
-        self.shoulderDistanceSlider = gui3d.Slider(self,  position=[600, 120, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.shoulderDistanceSlider.label.setPosition([610,115,9.5])
+        self.shoulderDistanceSlider = gui3d.Slider(self,  position=[20, 320, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.shoulderDistanceSlider.label.setPosition([30,315,9.5])
+        
+        lbl = "Hips circ.: cm "+ str(round(self.ruler.getMeasure("hips")))
+        self.hipsSlider = gui3d.Slider(self,  position=[20, 360, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl )
+        self.hipsSlider.label.setPosition([30,355,9.5])
 
         lbl = "Upperleg height: cm "+ str(round(self.ruler.getMeasure("upperlegheight")))
-        self.upperLegHeightSlider = gui3d.Slider(self,  position=[600, 160, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.upperLegHeightSlider.label.setPosition([610,155,9.5])
+        self.upperLegHeightSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.upperLegHeightSlider.label.setPosition([30,75,9.5])
+
+        lbl = "Thigh circ.: cm "+ str(round(self.ruler.getMeasure("thighcirc")))
+        self.upperThighSlider = gui3d.Slider(self,  position=[20, 120, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl )
+        self.upperThighSlider.label.setPosition([30,115,9.5])
 
         lbl = "Lowerleg height: cm "+ str(round(self.ruler.getMeasure("lowerlegheight")))
-        self.lowerLegHeightSlider = gui3d.Slider(self,  position=[600, 200, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.lowerLegHeightSlider.label.setPosition([610,195,9.5])
+        self.lowerLegHeightSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.lowerLegHeightSlider.label.setPosition([30,75,9.5])
 
         lbl = "Calf circ.: cm "+ str(round(self.ruler.getMeasure("calf")))
-        self.calfSlider = gui3d.Slider(self,  position=[600, 240, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.calfSlider.label.setPosition([610,235,9.5])
+        self.calfSlider = gui3d.Slider(self,  position=[20, 120, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.calfSlider.label.setPosition([30,115,9.5])
 
         lbl = "Ankle circ.: cm "+ str(round(self.ruler.getMeasure("ankle")))
-        self.ankleSlider = gui3d.Slider(self,  position=[600, 280, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
-        self.ankleSlider.label.setPosition([610,275,9.5])
-        
-        lbl = "Thigh circ.: cm "+ str(round(self.ruler.getMeasure("thighcirc")))
-        self.upperThighSlider = gui3d.Slider(self,  position=[600, 320, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl )
-        self.upperThighSlider.label.setPosition([610,315,9.5])
-
-        lbl = "Hips circ.: cm "+ str(round(self.ruler.getMeasure("hips")))
-        self.hipsSlider = gui3d.Slider(self,  position=[600, 360, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl )
-        self.hipsSlider.label.setPosition([610,355,9.5])
+        self.ankleSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
+        self.ankleSlider.label.setPosition([30,75,9.5])       
 
 
         #Get a list with all targes (complete with path) used in measureData library
@@ -107,7 +107,7 @@ class MeasureTaskView(gui3d.TaskView):
                 self.measureTargets.append(os.path.join(self.measureDataPath, f))
 
         #The human mesh
-        self.human = self.app.scene3d.selectedHuman        
+        self.human = self.app.scene3d.selectedHuman
 
         # Modifiers
         self.modifiers = {}
@@ -123,7 +123,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("neckcirc",value)
             self.updateMeasures()
-            
+
         @self.neckCircumferenceSlider.event
         def onChanging(value):
             self.changeValue("neckcirc",value,True)
@@ -134,7 +134,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("neckheight",value)
             self.updateMeasures()
-            
+
         @self.neckHeightSlider.event
         def onChanging(value):
             self.changeValue("neckheight",value,True)
@@ -145,7 +145,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("upperarm",value)
             self.updateMeasures()
-            
+
         @self.upperArmCircumferenceSlider.event
         def onChanging(value):
             self.changeValue("upperarm",value,True)
@@ -156,18 +156,18 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("upperarmlenght",value)
             self.updateMeasures()
-            
+
         @self.upperArmLenghtSlider.event
         def onChanging(value):
             self.changeValue("upperarmlenght",value,True)
             lbl = "Upperarm lenght: cm "+ str(round(self.ruler.getMeasure("upperarmlenght")))
             self.upperArmLenghtSlider.label.setText(lbl)
-            
+
         @self.lowerarmLenghtSlider.event
         def onChange(value):
             self.changeValue("lowerarmlenght",value)
             self.updateMeasures()
-            
+
         @self.lowerarmLenghtSlider.event
         def onChanging(value):
             self.changeValue("lowerarmlenght",value,True)
@@ -178,7 +178,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("wrist",value)
             self.updateMeasures()
-            
+
         @self.wristCircumferenceSlider.event
         def onChanging(value):
             self.changeValue("wrist",value,True)
@@ -189,7 +189,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("frontchest",value)
             self.updateMeasures()
-            
+
         @self.frontChestSlider.event
         def onChanging(value):
             self.changeValue("frontchest",value,True)
@@ -200,7 +200,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("bust",value)
             self.updateMeasures()
-            
+
         @self.bustCircumferenceSlider.event
         def onChanging(value):
             self.changeValue("bust",value,True)
@@ -211,7 +211,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("underbust",value)
             self.updateMeasures()
-            
+
         @self.underBustCircumferenceSlider.event
         def onChanging(value):
             self.changeValue("underbust",value,True)
@@ -222,7 +222,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("waist",value)
             self.updateMeasures()
-            
+
         @self.waistCircumferenceSlider.event
         def onChanging(value):
             self.changeValue("waist",value,True)
@@ -233,7 +233,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("napetowaist",value)
             self.updateMeasures()
-            
+
         @self.napeToWaistSlider.event
         def onChanging(value):
             self.changeValue("napetowaist",value,True)
@@ -244,7 +244,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("waisttohip",value)
             self.updateMeasures()
-            
+
         @self.waistToHipSlider.event
         def onChanging(value):
             self.changeValue("waisttohip",value,True)
@@ -255,7 +255,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("shoulder",value)
             self.updateMeasures()
-            
+
         @self.shoulderDistanceSlider.event
         def onChanging(value):
             self.changeValue("shoulder",value,True)
@@ -266,29 +266,29 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("upperlegheight",value)
             self.updateMeasures()
-            
+
         @self.upperLegHeightSlider.event
         def onChanging(value):
             self.changeValue("upperlegheight",value,True)
             lbl = "Upperleg height: cm "+ str(round(self.ruler.getMeasure("upperlegheight")))
             self.upperLegHeightSlider.label.setText(lbl)
-            
+
         @self.lowerLegHeightSlider.event
         def onChange(value):
             self.changeValue("lowerlegheight",value)
             self.updateMeasures()
-            
+
         @self.lowerLegHeightSlider.event
         def onChanging(value):
             self.changeValue("lowerlegheight",value,True)
             lbl = "Lowerleg height: cm "+ str(round(self.ruler.getMeasure("lowerlegheight")))
             self.lowerLegHeightSlider.label.setText(lbl)
-            
+
         @self.calfSlider.event
         def onChange(value):
             self.changeValue("calf",value)
             self.updateMeasures()
-            
+
         @self.calfSlider.event
         def onChanging(value):
             self.changeValue("calf",value,True)
@@ -299,7 +299,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("ankle",value)
             self.updateMeasures()
-            
+
         @self.ankleSlider.event
         def onChanging(value):
             self.changeValue("ankle",value,True)
@@ -310,7 +310,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("thighcirc",value)
             self.updateMeasures()
-            
+
         @self.upperThighSlider.event
         def onChanging(value):
             self.changeValue("thighcirc",value,True)
@@ -321,7 +321,7 @@ class MeasureTaskView(gui3d.TaskView):
         def onChange(value):
             self.changeValue("hips",value)
             self.updateMeasures()
-            
+
         @self.hipsSlider.event
         def onChanging(value):
             self.changeValue("hips",value,True)
@@ -420,7 +420,7 @@ class MeasureTaskView(gui3d.TaskView):
         @type  name: String
         @param targets: Name of the body part to asymmetrise
         """
-        pairs = []        
+        pairs = []
         fName1 = "measure-"+name+"-decrease.target"
         fName2 = "measure-"+name+"-increase.target"
 
@@ -549,11 +549,11 @@ def load(app):
                     taskview.ankleSlider,
                     taskview.upperThighSlider,
                     taskview.hipsSlider]
-                
+
     def hideAllSliders():
         for slider in allSliders:
             slider.hide()
-            
+
     def showAllSliders():
         for slider in allSliders:
             slider.show()
@@ -589,13 +589,13 @@ def load(app):
             trans[0] += 0.1 * diff[0]
             trans[1] -= 0.1 * diff[1]
             human.setPosition(trans)
-            
+
     @taskview.event
-    def onMouseDown(event):
+    def onMouseDown(event):        
         part = app.scene3d.getSelectedFacesGroup()
         bodyZone = app.scene3d.selectedHuman.getPartNameForGroupName(part.name)
         print bodyZone
-        if bodyZone in app.scene3d.selectedHuman.bodyZones:
+        if bodyZone in app.scene3d.selectedHuman.bodyZones:            
             if bodyZone == "neck":
                 hideAllSliders()
                 taskview.neckCircumferenceSlider.show()
@@ -603,12 +603,12 @@ def load(app):
             elif (bodyZone == "r-upperarm") or (bodyZone == "l-upperarm"):
                 hideAllSliders()
                 taskview.upperArmCircumferenceSlider.show()
-                taskview.upperArmLenghtSlider.show() 
+                taskview.upperArmLenghtSlider.show()
             elif (bodyZone == "r-lowerarm") or (bodyZone == "l-lowerarm"):
                 hideAllSliders()
-                taskview.lowerarmLenghtSlider.show() 
-                taskview.wristCircumferenceSlider.show()  
-            elif (bodyZone == "torso") or (bodyZone == "hip") or (bodyZone == "pelvis"):
+                taskview.lowerarmLenghtSlider.show()
+                taskview.wristCircumferenceSlider.show()
+            elif (bodyZone == "torso") or (bodyZone == "pelvis"):
                 hideAllSliders()
                 taskview.frontChestSlider.show()
                 taskview.bustCircumferenceSlider.show()
@@ -616,23 +616,26 @@ def load(app):
                 taskview.waistCircumferenceSlider.show()
                 taskview.napeToWaistSlider.show()
                 taskview.waistToHipSlider.show()
-                taskview.shoulderDistanceSlider.show()
-            elif (bodyZone == "l-upperleg") or (bodyZone == "r-upperleg"): 
+                taskview.shoulderDistanceSlider.show()                 
+            elif bodyZone == "hip":
+                hideAllSliders()                
+                taskview.hipsSlider.show() 
+            elif (bodyZone == "l-upperleg") or (bodyZone == "r-upperleg"):
                 hideAllSliders()
                 taskview.upperLegHeightSlider.show()
                 taskview.upperThighSlider.show()
-            elif (bodyZone == "l-lowerleg") or (bodyZone == "r-lowerleg"):  
+            elif (bodyZone == "l-lowerleg") or (bodyZone == "r-lowerleg"):
                 hideAllSliders()
                 taskview.lowerLegHeightSlider.show()
                 taskview.lowerLegHeightSlider.show()
                 taskview.calfSlider.show()
-            elif (bodyZone == "l-foot") or (bodyZone == "r-foot"): 
+            elif (bodyZone == "l-foot") or (bodyZone == "r-foot"):
                 hideAllSliders()
                 taskview.ankleSlider.show()
-                taskview.upperThighSlider.show()
-                taskview.hipsSlider.show()            
             else:
                 hideAllSliders()
+                
+    hideAllSliders()
 
 
 
@@ -645,7 +648,7 @@ class Ruler:
     def __init__(self, human):
 
     # these are tables of vertex indices for each body measurement of interest
-        
+
         self.Measures = {}
         self.Measures['thighcirc'] = [7066,7205,7204,7192,7179,7176,7166,6886,7172,6813,7173,7101,7033,7032,7041,7232,7076,7062,7063,7229,7066]
         self.Measures['neckcirc'] = [3131,3236,3058,3059,2868,2865,3055,3137,5867,2857,3483,2856,3382,2916,2915,3417,8186,10347,10786,
@@ -671,7 +674,7 @@ class Ruler:
         self.Measures['hips'] = [7298,2936,3527,2939,2940,3816,3817,3821,4487,3822,3823,3913,3915,4506,5688,4505,4504,4503,6858,6862,6861,6860,
                                             6785,6859,7094,7096,7188,7189,6878,7190,7194,7195,7294,7295,7247,7300]
 
-        self.humanoid = human   
+        self.humanoid = human
 
     def getMeasure(self, measurementname):
         measure = 0
