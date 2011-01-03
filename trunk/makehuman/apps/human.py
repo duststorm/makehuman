@@ -1736,8 +1736,10 @@ class Human(gui3d.Object):
             if targetName[:2] == prefix1:
                 targetSym = os.path.join(os.path.dirname(target), prefix2 + targetName[2:])
                 targetSymVal = self.targetsDetailStack[target]
-                if 'trans-in' in targetSym or 'trans-out' in targetName:
-                    targetSymVal *= -1
+                if 'trans-in' in targetSym:
+                    targetSym = targetSym.replace('trans-in', 'trans-out')
+                elif 'trans-out' in targetSym:
+                    targetSym = targetSym.replace('trans-out', 'trans-in')
 
                 algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
