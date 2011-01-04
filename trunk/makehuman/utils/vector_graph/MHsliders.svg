@@ -14,12 +14,37 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="MHsliders.svg"
    sodipodi:version="0.32"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider_generic.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient4118">
+      <stop
+         style="stop-color:#df802b;stop-opacity:1;"
+         offset="0"
+         id="stop4120" />
+      <stop
+         style="stop-color:#7b4413;stop-opacity:1;"
+         offset="1"
+         id="stop4122" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4076">
+      <stop
+         id="stop4078"
+         offset="0"
+         style="stop-color:#717171;stop-opacity:1;" />
+      <stop
+         id="stop4080"
+         offset="1"
+         style="stop-color:#494949;stop-opacity:1;" />
+    </linearGradient>
     <linearGradient
        id="linearGradient3971">
       <stop
@@ -558,6 +583,80 @@
        x2="286.556"
        y2="255.21246"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4076"
+       id="linearGradient4074"
+       x1="366.89044"
+       y1="82.02858"
+       x2="366.89044"
+       y2="103.01753"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.83164124,0,0,0.83164124,61.045952,-28.668572)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4118"
+       id="linearGradient4074-7"
+       x1="366.89044"
+       y1="82.02858"
+       x2="366.89044"
+       y2="103.01753"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.57910311,0,0,0.57910311,203.06322,-3.9517529)" />
+    <linearGradient
+       id="linearGradient4076-3">
+      <stop
+         id="stop4078-1"
+         offset="0"
+         style="stop-color:#858585;stop-opacity:1;" />
+      <stop
+         id="stop4080-2"
+         offset="1"
+         style="stop-color:#565656;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       gradientTransform="translate(0.61629159,83.021125)"
+       inkscape:collect="always"
+       xlink:href="#linearGradient3545-6"
+       id="linearGradient3551-5"
+       x1="437.66843"
+       y1="252.43895"
+       x2="317.1413"
+       y2="253.03615"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3545-6">
+      <stop
+         style="stop-color:#0a0a0a;stop-opacity:1;"
+         offset="0"
+         id="stop3547-0" />
+      <stop
+         style="stop-color:#0a0a0a;stop-opacity:0;"
+         offset="1"
+         id="stop3549-7" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4076"
+       id="linearGradient4074-7-1"
+       x1="366.89044"
+       y1="82.02858"
+       x2="366.89044"
+       y2="103.01753"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.57910311,0,0,0.57910311,246.15213,-4.6659282)" />
+    <linearGradient
+       id="linearGradient4118-7">
+      <stop
+         style="stop-color:#df802b;stop-opacity:1;"
+         offset="0"
+         id="stop4120-4" />
+      <stop
+         style="stop-color:#7b4413;stop-opacity:1;"
+         offset="1"
+         id="stop4122-0" />
+    </linearGradient>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -566,16 +665,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.970285"
-     inkscape:cx="309.10754"
-     inkscape:cy="783.28019"
+     inkscape:zoom="4.2006174"
+     inkscape:cx="392.94004"
+     inkscape:cy="975.2267"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1006"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-width="1280"
+     inkscape:window-height="977"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -835,26 +934,6 @@
        x="45.425163"
        y="32.229492"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <rect
-       style="fill:none;stroke:none"
-       id="rect3633-0-1"
-       width="31.999964"
-       height="32.000011"
-       x="110.65342"
-       y="15.887666"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_focused.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <rect
-       style="fill:#f58220;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect2816-3-8-6"
-       width="12.397159"
-       height="14.353761"
-       x="120.4548"
-       y="29.319"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_focused.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -2154,6 +2233,138 @@
        x="340.54944"
        y="245.6348"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_generic.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <image
+       y="-4.0125337"
+       x="492.06943"
+       id="image3274"
+       xlink:href="file:///C:/Users/124578/Desktop/2_redesign.png"
+       height="732"
+       width="987" />
+    <rect
+       style="fill:none;stroke:none"
+       id="rect3633-0-1-9"
+       width="31.999964"
+       height="32.000011"
+       x="349.18445"
+       y="26.986731"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#f58220;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect2816-3-8-6-3"
+       width="12.397159"
+       height="14.353761"
+       x="358.98584"
+       y="40.418064"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="opacity:1;fill:url(#linearGradient4074);fill-opacity:1;stroke:none"
+       id="rect3298"
+       width="16.630381"
+       height="16.630381"
+       x="356.63116"
+       y="39.153847"
+       ry="1.8803779"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:none;stroke:none"
+       id="rect3633-0-1-9-9"
+       width="31.999964"
+       height="32.000011"
+       x="398.70096"
+       y="28.415091"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider_focused.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:url(#linearGradient4074-7);fill-opacity:1;stroke:none"
+       id="rect3298-1"
+       width="11.58036"
+       height="11.58036"
+       x="408.89035"
+       y="43.275551"
+       ry="1.3093779"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider_focused.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#6b6b6b;fill-opacity:0;stroke:none"
+       id="rect2630-2"
+       width="127.99837"
+       height="31.99999"
+       x="329.52524"
+       y="296.56665"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/slider_mouth.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;stroke:#4d4d4d"
+       id="rect2759-9"
+       width="127.99837"
+       height="31.99999"
+       x="330.93195"
+       y="315.42004"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider_generic.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="rect4163"
+       width="110.5994"
+       height="4.2850842"
+       x="339.47391"
+       y="334.13443"
+       ry="0.69007665"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider_generic.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:0;stroke:#4d4d4d;stroke-opacity:0"
+       id="rect2759-9-1"
+       width="127.99837"
+       height="31.99999"
+       x="330.57574"
+       y="382.88953"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider_generic.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="rect4163-8"
+       width="110.5994"
+       height="4.2850842"
+       x="339.11771"
+       y="401.60391"
+       ry="0.69007665"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider_generic.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:none;stroke:none"
+       id="rect3633-0-1-9-9-9"
+       width="31.999964"
+       height="32.000011"
+       x="441.78989"
+       y="27.700918"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:url(#linearGradient4074-7-1);fill-opacity:1.0;stroke:none"
+       id="rect3298-1-4"
+       width="11.58036"
+       height="11.58036"
+       x="451.97928"
+       y="42.561378"
+       ry="1.3093779"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\slider.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

@@ -14,7 +14,7 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="MHbuttons.svg"
    inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_load.png"
    inkscape:export-xdpi="90.000084"
@@ -1708,15 +1708,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.2382812"
-     inkscape:cx="142.85042"
-     inkscape:cy="1057.0552"
+     inkscape:cx="1032.9562"
+     inkscape:cy="514.31722"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1003"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-width="1280"
+     inkscape:window-height="977"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -6037,7 +6037,7 @@
           <path
              transform="translate(0,-0.47387351)"
              inkscape:transform-center-y="4.2648535"
-             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 -7.38695,12.79456 z"
+             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 z"
              inkscape:randomized="0"
              inkscape:rounded="0"
              inkscape:flatsided="false"
@@ -6053,7 +6053,7 @@
              sodipodi:type="star" />
           <path
              inkscape:transform-center-y="4.2648535"
-             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 -7.38695,12.79456 z"
+             d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 z"
              inkscape:randomized="0"
              inkscape:rounded="0"
              inkscape:flatsided="false"
@@ -6084,7 +6084,7 @@
            inkscape:flatsided="false"
            inkscape:rounded="0"
            inkscape:randomized="0"
-           d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 -7.38695,12.79456 z"
+           d="m -132.68433,-31.226528 -7.38694,-12.794561 -7.38694,-12.79456 14.77388,0 14.77389,0 -7.38694,12.794561 z"
            inkscape:transform-center-y="4.2648535" />
       </g>
     </g>
@@ -6524,5 +6524,463 @@
          id="tspan3804-40-7-9-5-9-9"
          x="153.37614"
          y="-117.41962">Calc. AO</tspan></text>
+    <rect
+       style="fill:#808080;fill-opacity:0;stroke:none"
+       id="rect3735-4-7-0-6-8-0-9-1"
+       width="125.41099"
+       height="127.99986"
+       x="796.95111"
+       y="401.86603"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_exit.png"
+       inkscape:export-xdpi="90.000084"
+       inkscape:export-ydpi="90.000084" />
+    <rect
+       style="fill:#808080;fill-opacity:0;stroke:none"
+       id="rect3735-4-7-0-6-8-0-9-4-7-3-7"
+       width="125.41099"
+       height="127.99986"
+       x="917.75842"
+       y="556.15173"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/micro.png"
+       inkscape:export-xdpi="90.000084"
+       inkscape:export-ydpi="90.000084" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       id="rect4238-4"
+       width="128"
+       height="255.99969"
+       x="787.91919"
+       y="49.359135"
+       ry="4.2745557"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\group_main.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#4d4d4d;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-0"
+       width="120.00141"
+       height="230.36415"
+       x="791.91846"
+       y="70.595245"
+       ry="0"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\group_main.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="795.40637"
+       y="64.188774"
+       id="text3802-14-9-8-9"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images\group_main.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-48"
+         x="795.40637"
+         y="64.188774">Main param.</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_ethnics.png"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 793.14766,316.83975 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 127.99999,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46874,0 z"
+       id="rect4238-9-8" />
+    <text
+       xml:space="preserve"
+       style="font-size:11.99999996px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="796.37646"
+       y="330.24704"
+       id="text3802-14-9-8-5-2"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_ethnics.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-4"
+         x="796.37646"
+         y="330.24704">Ethnics</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 793.14766,444.83975 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.51472 127.99999,-1e-5 0,102.51473 c 0,2.37693 -1.88189,4.29721 -4.25,4.29721 l -119.46874,0 z"
+       id="rect4238-9-6-5"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_ethnics.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-5"
+       width="120.00141"
+       height="101.55521"
+       x="792.97638"
+       y="338.38791"
+       ry="3.5770829"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_ethnics.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <path
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_actions.png"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 793.89954,456.97099 c -2.3681,0 -4.28125,1.89771 -4.28125,4.24669 l 0,17.14176 128,0 0,-17.14176 c 0,-2.34898 -1.8819,-4.24669 -4.25,-4.24669 l -119.46875,0 z"
+       id="rect4238-9-9-7"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:12.00000002px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="793.89996"
+       y="471.42236"
+       id="text3802-14-9-8-5-9-1"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99873091,1.0012707)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_actions.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-7-1"
+         x="793.89996"
+         y="471.42236">Actions</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 793.89955,520.97099 c -2.3681,0 -4.28125,-1.91203 -4.28125,-4.27875 l 0,-38.86917 127.99999,-10e-6 0,38.86918 c 0,2.36672 -1.88189,4.27875 -4.25,4.27875 l -119.46874,0 z"
+       id="rect4238-9-6-8-5"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_actions.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-2-2"
+       width="120.00141"
+       height="38.649883"
+       x="793.72827"
+       y="477.99695"
+       ry="3.5770829"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_actions.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_gender.png"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 926.08454,49.543614 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 128.00001,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46876,0 z"
+       id="rect4238-9-90-7" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="930.02423"
+       y="64.372635"
+       id="text3802-14-9-8-5-7-6"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_gender.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2-1"
+         x="930.02423"
+         y="64.372635">Gender tool</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 926.08454,177.54361 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.514716 128.00001,-1e-5 0,102.514726 c 0,2.37693 -1.8819,4.29721 -4.25,4.29721 l -119.46876,0 z"
+       id="rect4238-9-6-7-4"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_gender.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29-2"
+       width="120.00141"
+       height="101.55521"
+       x="925.91327"
+       y="71.091759"
+       ry="3.5770829"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_gender.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       id="rect4238-5-3"
+       width="128"
+       height="255.99969"
+       x="921.45087"
+       y="181.65506"
+       ry="4.2745557"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_face.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-6-2"
+       width="120.00141"
+       height="230.36415"
+       x="925.45013"
+       y="202.89116"
+       ry="3.5770829"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_face.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="929.65063"
+       y="195.78246"
+       id="text3802-14-9-8-58-2"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_face.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-8-1"
+         x="929.65063"
+         y="195.78246">Face tool</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_pelvis.png"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 925.73209,443.03835 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 127.99996,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46871,0 z"
+       id="rect4238-9-90-0-6" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="929.66986"
+       y="455.77441"
+       id="text3802-14-9-8-5-7-8-8"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_pelvis.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2-3-5"
+         x="929.66986"
+         y="455.77441">Pelvis tool</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 925.73209,571.03835 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.51472 127.99996,-1e-5 0,102.51473 c 0,2.37693 -1.8818,4.29721 -4.25,4.29721 l -119.46871,0 z"
+       id="rect4238-9-6-7-0-7"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_pelvis.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29-0-6"
+       width="120.00141"
+       height="101.55521"
+       x="925.56079"
+       y="464.58652"
+       ry="3.5770829"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_pelvis.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_modifiers.png"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 1058.4478,48.88835 c -2.3681,0 -4.2812,1.9132 -4.2812,4.28135 l 0,17.28163 128,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.4688,0 z"
+       id="rect4238-9-90-0-9-1" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="1063.0953"
+       y="63.720871"
+       id="text3802-14-9-8-5-7-8-7-8"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_modifiers.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2-3-9-9"
+         x="1063.0953"
+         y="63.720871">Modifiers</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 1058.4478,176.88835 c -2.3681,0 -4.2812,-1.92028 -4.2812,-4.29721 l 0,-102.51472 128,-1e-5 0,102.51473 c 0,2.37693 -1.8819,4.29721 -4.25,4.29721 l -119.4688,0 z"
+       id="rect4238-9-6-7-0-6-2"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_modifiers.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29-0-3-7"
+       width="120.00141"
+       height="101.55521"
+       x="1058.2766"
+       y="70.436501"
+       ry="3.5770829"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_modifiers.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       id="rect4238-5-1-9"
+       width="128"
+       height="255.99969"
+       x="1054.8932"
+       y="181.65504"
+       ry="4.2745557"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_hair_tool.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-6-8-5"
+       width="120.00141"
+       height="230.36415"
+       x="1058.8925"
+       y="202.89114"
+       ry="3.5770829"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_hair_tool.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="1063.8051"
+       y="195.78244"
+       id="text3802-14-9-8-58-5-4"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_hair_tool.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-8-9-3"
+         x="1063.8051"
+         y="195.78244">Hair tool</tspan></text>
+    <rect
+       style="fill:#3c3c3c;fill-opacity:1;stroke:none"
+       id="rect4238-5-1-6-1"
+       width="128"
+       height="255.99969"
+       x="1055.3909"
+       y="441.62714"
+       ry="4.2745557"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-6-8-4-2"
+       width="120.00141"
+       height="230.36415"
+       x="1059.3901"
+       y="462.86325"
+       ry="3.5770829"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <text
+       xml:space="preserve"
+       style="font-size:12.00000003px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="1064.3054"
+       y="454.37457"
+       id="text3802-14-9-8-58-5-9-3"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-8-9-2-3"
+         x="1064.3054"
+         y="454.37457">Export options</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:export-ydpi="90.000107"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_head.png"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 926.62617,575.71948 c -2.3681,0 -4.28125,1.9132 -4.28125,4.28135 l 0,17.28163 127.99998,0 0,-17.28163 c 0,-2.36815 -1.8819,-4.28135 -4.25,-4.28135 l -119.46873,0 z"
+       id="rect4238-9-90-0-4-4" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="930.56873"
+       y="587.74988"
+       id="text3802-14-9-8-5-7-8-2-1"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99468105,1.0053474)"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3804-35-9-9-4-2-3-2-1"
+         x="930.56873"
+         y="587.74988">Head tool</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       d="m 926.62617,703.71948 c -2.3681,0 -4.28125,-1.92028 -4.28125,-4.29721 l 0,-102.51472 127.99998,-10e-6 0,102.51473 c 0,2.37693 -1.8819,4.29721 -4.25,4.29721 l -119.46873,0 z"
+       id="rect4238-9-6-7-0-64-3"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <rect
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.81714761000000002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect4750-1-29-0-1-8"
+       width="120.00141"
+       height="101.55521"
+       x="926.4549"
+       y="597.26764"
+       ry="3.5770829"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/group_details_head.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.60922432px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="1082.8031"
+       y="561.79675"
+       id="text3790-7"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3792-4"
+         x="1082.8031"
+         y="561.79675"
+         style="font-size:13px;fill:#ffff00">Hair</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:15.60922432px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
+       x="1082.8031"
+       y="482.13248"
+       id="text3786-2"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/group_export_option.png"
+       inkscape:export-xdpi="90.000107"
+       inkscape:export-ydpi="90.000107"><tspan
+         sodipodi:role="line"
+         id="tspan3788-7"
+         x="1082.8031"
+         y="482.13248"
+         style="font-size:13px;fill:#ffff00">Body</tspan></text>
   </g>
 </svg>
