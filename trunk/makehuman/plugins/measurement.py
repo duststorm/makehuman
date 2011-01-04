@@ -75,8 +75,8 @@ class MeasureTaskView(gui3d.TaskView):
         self.shoulderDistanceSlider.label.setPosition([30,315,9.5])
         
         lbl = "Hips circ.: cm "+ str(round(self.ruler.getMeasure("hips")))
-        self.hipsSlider = gui3d.Slider(self,  position=[20, 360, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl )
-        self.hipsSlider.label.setPosition([30,355,9.5])
+        self.hipsSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl )
+        self.hipsSlider.label.setPosition([30,75,9.5])
 
         lbl = "Upperleg height: cm "+ str(round(self.ruler.getMeasure("upperlegheight")))
         self.upperLegHeightSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label=lbl)
