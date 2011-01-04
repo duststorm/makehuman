@@ -548,7 +548,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 						stuff.setBones(amt)
 				else:
 					stuff.setBones(amt)
-					theStuff.verts = True
+					#theStuff.verts = True
 				if stuff:
 					if theStuff:
 						stuffname = theStuff.name
