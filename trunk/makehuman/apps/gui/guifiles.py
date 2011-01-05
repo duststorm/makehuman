@@ -49,7 +49,7 @@ import hair
 class SaveTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Save', category.app.getThemeResource('images', 'button_save_file.png'), category.app.getThemeResource('images', 'button_save_file_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Save')
         self.fileentry = gui3d.FileEntryView(self)
 
         @self.fileentry.event
@@ -110,7 +110,7 @@ class LoadTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         modelPath = mh.getPath('models')
-        gui3d.TaskView.__init__(self, category, 'Load', category.app.getThemeResource('images', 'button_load_file.png'), category.app.getThemeResource('images', 'button_load_file_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Load', )
         self.filechooser = gui3d.FileChooser(self, modelPath, 'mhm')
 
         @self.filechooser.event
@@ -154,7 +154,7 @@ class LoadTaskView(gui3d.TaskView):
 class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Export', category.app.getThemeResource('images', 'button_export_file.png'), category.app.getThemeResource('images', 'button_export_file_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Export')
         #gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_export_option.png'), [10, 80, 9.0], 158, 256)
         self.fileentry = gui3d.FileEntryView(self)
 
@@ -286,8 +286,7 @@ class ExportTaskView(gui3d.TaskView):
 class FilesCategory(gui3d.Category):
 
     def __init__(self, parent):
-        gui3d.Category.__init__(self, parent, 'Files', parent.app.getThemeResource('images', 'button_files.png'), parent.app.getThemeResource('images',
-                                'button_files_on.png'))
+        gui3d.Category.__init__(self, parent, 'Files')
 
         SaveTaskView(self)
         LoadTaskView(self)

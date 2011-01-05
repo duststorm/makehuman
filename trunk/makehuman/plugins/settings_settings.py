@@ -6,7 +6,7 @@ import gui3d, mh
 class SettingsTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Settings', category.app.getThemeResource('images', 'button_setting.png'), category.app.getThemeResource('images', 'button_setting_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Settings')
 
         self.shaderGroup = []
         self.shaderNo = gui3d.RadioButton(self,self.shaderGroup,mesh='data/3dobjs/button_generic_long.obj', position=[600,270,9.2],label="No shader",selected=True)
@@ -48,7 +48,7 @@ class SettingsTaskView(gui3d.TaskView):
                 print "No shader support: " + str(e)
 
 def load(app):
-    category = app.getCategory('Settings','button_setting.png','button_setting_on.png')
+    category = app.getCategory('Settings')
     taskview = SettingsTaskView(category)
     print 'Settings imported'
 

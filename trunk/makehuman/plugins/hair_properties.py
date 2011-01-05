@@ -34,8 +34,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
     def __init__(self, category):        
         
-        gui3d.TaskView.__init__(self, category, 'Hair', category.app.getThemeResource('images', 'button_hair_det.png'), category.app.getThemeResource('images',
-                                'button_hair_det_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Hair')
                                 
         gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_hair_tool.png'), [10, 211, 9.0], 128,256)
 

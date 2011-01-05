@@ -342,8 +342,7 @@ class Detail3dTool(events3d.EventHandler):
 class DetailModelingTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Detail modelling', category.app.getThemeResource('images', 'details.png'), category.app.getThemeResource('images',
-                                'details_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Detail modelling', label='Details')
         self.tool = None
 
         # details tool panel background
@@ -717,8 +716,7 @@ class DetailModelingTaskView(gui3d.TaskView):
 class MicroModelingTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Micro modelling', category.app.getThemeResource('images', 'micro.png'), category.app.getThemeResource('images',
-                                'micro_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Micro modelling', label='Micro')
         self.tool = None
         
 

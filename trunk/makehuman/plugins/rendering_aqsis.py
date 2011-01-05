@@ -15,7 +15,7 @@ import mh2renderman
 class AqsisTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Aqsis', category.app.getThemeResource('images', 'button_aqsis.png'), category.app.getThemeResource('images', 'button_aqsis_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Aqsis')
 
         self.sceneToRender = mh2renderman.RMRScene(self.app)
         #Create aqsis shaders
@@ -67,7 +67,7 @@ class AqsisTaskView(gui3d.TaskView):
 
 
 def load(app):
-    category = app.getCategory('Rendering','button_render.png','button_render_on.png')
+    category = app.getCategory('Rendering')
     taskview = AqsisTaskView(category)
 
 def unload(app):

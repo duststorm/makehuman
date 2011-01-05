@@ -124,8 +124,7 @@ class EthnicMapButton(gui3d.RadioButton):
 class MacroModelingTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Macro modelling', category.app.getThemeResource('images', 'macro.png'), category.app.getThemeResource('images',
-                                'macro_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
         self.status = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 575, 9.1])
 

@@ -6,7 +6,7 @@ import gui3d
 class RenderingSettingTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Rendering Setting', category.app.getThemeResource('images', 'button_setting.png'), category.app.getThemeResource('images', 'button_setting_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Rendering Setting', label='Settings')
 
         #Rendering size
         self.widthSize= gui3d.Slider(self, position=[10, 80, 9.3], value=800, min=10, max=5000, label = "Rendering Width: 800")
@@ -60,7 +60,7 @@ class RenderingSettingTaskView(gui3d.TaskView):
 
 
 def load(app):
-    category = app.getCategory('Rendering','button_render.png','button_render_on.png')
+    category = app.getCategory('Rendering')
     taskview = RenderingSettingTaskView(category)
     print 'Rendering setting imported'
 

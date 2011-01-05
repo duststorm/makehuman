@@ -33,7 +33,7 @@ import mh
 class BackgroundTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Background', category.app.getThemeResource('images', 'button_background.png'), category.app.getThemeResource('images', 'button_background_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Background')
         self.filechooser = gui3d.FileChooser(self, 'backgrounds', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
         self.texture = mh.Texture()
 

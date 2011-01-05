@@ -12,7 +12,7 @@ print 'makehair plugin'
 
 class MakeHairTaskView(gui3d.TaskView):
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'MakeHair', category.app.getThemeResource('images', 'makehair.png'), category.app.getThemeResource('images', 'makehair_on.png'))
+        gui3d.TaskView.__init__(self, category, 'MakeHair')
         
         #member variables
         self.number = 25
@@ -189,7 +189,7 @@ makehairView = None
 
 
 def load(app):
-    category = app.getCategory('Experiments','button_experiments.png','button_experiments_on.png')
+    category = app.getCategory('Experiments')
     makehairView = MakeHairTaskView(category)
 
     @makehairView.event

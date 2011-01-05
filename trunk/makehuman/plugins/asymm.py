@@ -14,7 +14,7 @@ import events3d
 class AsymmTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Asymm', category.app.getThemeResource('images', 'button_asymm.png'), category.app.getThemeResource('images', 'button_asymm_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Asymm')
 
         #Sliders       
         self.asymmBrowSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label="Brow asymmetry")
@@ -270,7 +270,7 @@ def load(app):
     """
     Plugin load function, needed by design.
     """
-    category = app.getCategory('Advanced','button_advance.png','button_advance_on.png')
+    category = app.getCategory('Advanced')
     taskview = AsymmTaskView(category)
     print 'Asymm loaded'
 

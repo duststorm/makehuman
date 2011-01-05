@@ -48,8 +48,7 @@ import os
 class ModellingCategory(gui3d.Category):
 
     def __init__(self, parent):
-        gui3d.Category.__init__(self, parent, 'Modelling', parent.app.getThemeResource('images', 'button_modelling.png'), parent.app.getThemeResource('images',
-                                'button_modelling_on.png'))
+        gui3d.Category.__init__(self, parent, 'Modelling')
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)
         guidetailmodelling.MicroModelingTaskView(self)

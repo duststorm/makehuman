@@ -33,7 +33,7 @@ import mh
 class HumanTextureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Human texture', category.app.getThemeResource('images', 'button_background.png'), category.app.getThemeResource('images', 'button_background_on.png'))
+        gui3d.TaskView.__init__(self, category, 'Human texture', label='Texture')
         self.filechooser = gui3d.FileChooser(self, 'data/textures', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
 
         @self.filechooser.event

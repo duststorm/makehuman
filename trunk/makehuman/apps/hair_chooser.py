@@ -33,7 +33,7 @@ from simpleoctree import SimpleOctree
 
 class HairTaskView(gui3d.TaskView):
   def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Hair",  category.app.getThemeResource("images", "button_hair.png"),  category.app.getThemeResource("images", "button_hair_on.png"))
+    gui3d.TaskView.__init__(self, category, "Hair")
     self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
     self.default = True
     self.saveAsCurves = True

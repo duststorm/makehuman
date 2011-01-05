@@ -15,7 +15,7 @@ import aljabr
 class MeasureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Measure', category.app.getThemeResource('images', 'button_measure.png'), category.app.getThemeResource('images', 'button_measure.png'))
+        gui3d.TaskView.__init__(self, category, 'Measure')
 
         self.ruler = Ruler(category.app.scene3d.selectedHuman)
 
@@ -527,7 +527,7 @@ def load(app):
     """
     Plugin load function, needed by design.
     """
-    category = app.getCategory('Advanced','button_advance.png','button_advance_on.png')
+    category = app.getCategory('Advanced')
     taskview = MeasureTaskView(category)
     print 'Asymm loaded'
     allSliders = [taskview.neckCircumferenceSlider,
