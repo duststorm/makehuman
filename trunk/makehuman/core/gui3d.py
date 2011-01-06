@@ -607,9 +607,32 @@ class Application(events3d.EventHandler):
 
 
 class Slider(View):
+    
+    """
+    A slider widget. This widget can be used to choose between a continuous (float) or discrete (int) range.
+    The onChange event is triggered when the slider is released, with the new value as parameter.
+    For real-time feedback the onChanging event is triggered when the slider is being moved, with the
+    current value as parameter.
+    """
 
     def __init__(self, parent, backgroundTexture=None, sliderTexture=None, focusedSliderTexture=None,\
         position=[0, 0, 15], value=0.0, min=0.0, max=1.0, label=None, fontSize = defaultFontSize):
+            
+        """
+        This is the constructor for the Button class. It takes the following parameters:
+
+        - **parent**: *View*. The parent view.
+        - **backgroundTexture**: *String*. The slider background texture.
+        - **sliderTexture**: *String*. The slider texture.
+        - **focusedSliderTexture**: *String*. The focused slider texture.
+        - **position**: *List*. The slider position.
+        - **value**: *Float or Int*. The original value.
+        - **min**: *Float or Int*. The minimum value.
+        - **max**: *Float or Int*. The maximum value.
+        - **label**: *String*. The slider label.
+        - **fontSize**: *Float*. The slider label font size.
+        """
+        
         View.__init__(self, parent)
         #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
         if isinstance(label, str):
@@ -698,10 +721,33 @@ class Slider(View):
 
 
 class Button(View):
+    
+    """
+    A push button widget. This widget can be used to trigger an action by catching the onClicked event.
+    The onClicked event is triggered when the button is clicked and the mouse is released while being
+    over the widget.
+    """
 
     def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture=None,\
-    selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None,\
-    label=None, width=None, height=None, fontSize = defaultFontSize):
+        selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None,\
+        label=None, width=None, height=None, fontSize = defaultFontSize):
+        
+        """
+        This is the constructor for the Button class. It takes the following parameters:
+
+        - **parent**: *View*. The parent view.
+        - **mesh**: *String*. The button object.
+        - **texture**: *String*. The button texture.
+        - **selectedTexture**: *String*. The selected button texture.
+        - **focusedTexture**: *String*. The focused button texture.
+        - **position**: *List*. The button position.
+        - **selected**: *bool*. The button selected state.
+        - **label**: *String*. The button label.
+        - **width**: *Float*. The button width.
+        - **height**: *Float*. The button width.
+        - **fontSize**: *Float*. The button label font size.
+        """
+        
         View.__init__(self, parent)
         
         self.texture = texture or self.app.getThemeResource('images', 'button_unselected.png')
@@ -775,10 +821,32 @@ class Button(View):
 
 class RadioButton(Button):
 
+    """
+    A radio button widget. This widget is used when there is more than one exclusive option to be chosen from.
+    Several radio button widgets form a group when they are created with the same group list.
+    The onClicked event can be used to know when the user changes his/her choice, though generally this choice
+    is determined in an action by checking each radio button's selected property.
+    """
+    
     def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
-        position=[0, 0, 9], selected=False, label=None, fontSize = defaultFontSize):
+        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, fontSize = defaultFontSize):
+            
+        """
+        This is the constructor for the RadioButton class. It takes the following parameters:
+
+        - **parent**: *View*. The parent view.
+        - **group**: *List*. The radio button group.
+        - **mesh**: *String*. The button object.
+        - **texture**: *String*. The button texture.
+        - **selectedTexture**: *String*. The selected button texture.
+        - **focusedTexture**: *String*. The focused button texture.
+        - **position**: *List*. The button position.
+        - **selected**: *bool*. The button selected state.
+        - **label**: *String*. The button label.
+        - **fontSize**: *Float*. The button label font size.
+        """
         
-        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, label=label, fontSize = fontSize)
+        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, fontSize)
         self.group = group
         self.group.append(self)
 
@@ -803,9 +871,30 @@ class RadioButton(Button):
 
 
 class ToggleButton(Button):
+    
+    """
+    A toggle button widget. This widget is used when there is a stat which can be turned on or off.
+    The onClicked event can be used to know when the user changes his/her choice, though generally this choice
+    is determined in an action by checking the toggle button's selected property.
+    """
 
     def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
         position=[0, 0, 9], selected=False, focusedTexture=None, label=None, fontSize = defaultFontSize):
+            
+        """
+        This is the constructor for the ToggleButton class. It takes the following parameters:
+
+        - **parent**: *View*. The parent view.
+        - **group**: *List*. The radio button group.
+        - **mesh**: *String*. The button object.
+        - **texture**: *String*. The button texture.
+        - **selectedTexture**: *String*. The selected button texture.
+        - **focusedTexture**: *String*. The focused button texture.
+        - **position**: *List*. The button position.
+        - **selected**: *bool*. The button selected state.
+        - **label**: *String*. The button label.
+        - **fontSize**: *Float*. The button label font size.
+        """
 
         Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, fontSize = fontSize)
 
@@ -824,22 +913,25 @@ class ToggleButton(Button):
 class ProgressBar(View):
 
     """
-  A ProgressBar widget. This widget can be used to show the user the progress of a 
-  lengthy operation.
-  """
-
-    def __init__(self, parent, backgroundMesh='data/3dobjs/progressbar_background.obj', backgroundTexture=None, backgroundPosition=[650, 580, 9.1],
-                 barMesh='data/3dobjs/progressbar.obj', barTexture=None, barPosition=[650, 580, 9.2], visible=True):
-        """
-    This is the constructor method for the ProgressBar class. It initializes the
-    following attributes:
-
-    - **self.scene**: *scene reference*. The scene the widget is part of.
-    - **self.backgroundMesh**: *String*. The background object.
-    - **self.backgroundTexture**: *String*. The background texture.
-    - **self.barMesh**: *String*. The bar object.
-    - **self.barTexture**: *String*. The bar texture.
+    A ProgressBar widget. This widget can be used to show the user the progress of a 
+    lengthy operation.
     """
+
+    def __init__(self, parent, backgroundMesh='data/3dobjs/progressbar_background.obj', backgroundTexture=None,
+        backgroundPosition=[650, 580, 9.1],
+        barMesh='data/3dobjs/progressbar.obj', barTexture=None, barPosition=[650, 580, 9.2], visible=True):
+    
+        """
+        This is the constructor for the ProgressBar class. It takes the following parameters:
+
+        - **parent**: *View*. The parent view.
+        - **backgroundMesh**: *String*. The background object.
+        - **backgroundTexture**: *String*. The background texture.
+        - **backgroundPosition**: *List*. The background position.
+        - **barMesh**: *String*. The bar object.
+        - **barTexture**: *String*. The bar texture.
+        - **barPosition**: *List*. The bar position.
+        """
 
         View.__init__(self, parent, visible)
         self.background = Object(self, backgroundMesh, texture=backgroundTexture, position=backgroundPosition)
