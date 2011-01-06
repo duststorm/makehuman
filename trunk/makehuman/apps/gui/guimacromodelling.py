@@ -126,7 +126,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        self.status = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 575, 9.1])
+        self.status = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 585, 9.1])
 
         gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_main.png'), [10, 80, 9.0], 128,256)
         gui3d.Object(category, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_actions.png'), [10, 472, 9.0], 128,64)
