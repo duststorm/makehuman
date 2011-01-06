@@ -47,7 +47,7 @@ class Object(events3d.EventHandler):
             if (width!=None) and (height!=None): #we assume automatically that the unit_square is the mesh
                 self.mesh.setScale(width, height, 1.0)
             self.meshName = mesh
-        else: #its of type module3d.Object3D
+        else: # It's of type module3d.Object3D
             self.mesh=mesh
             self.app.scene3d.objects.append(mesh)
             self.meshName = mesh.name
@@ -69,15 +69,12 @@ class Object(events3d.EventHandler):
         self.mesh.object = self
         self.__bbox = None
 
-    # print("Created object with mesh ", mesh, texture, position)
-
     def show(self):
+        
         self.visible = True
         self.setVisibility(True)
 
     def hide(self):
-
-    # print("hiding ", self.meshName)
 
         self.visible = False
         self.setVisibility(False)
@@ -110,8 +107,6 @@ class Object(events3d.EventHandler):
         return self.mesh.hasTexture()
 
     def setVisibility(self, visibility):
-
-    # print("changing visibility of ", self.meshName, "to", self.view.isVisible() and self.visible and visibility)
 
         if self.view.isVisible() and self.visible and visibility:
             self.mesh.setVisibility(1)
@@ -159,6 +154,27 @@ class Object(events3d.EventHandler):
     def onKeyUp(self, event):
         self.view.callEvent('onKeyDown', event)
 
+
+class TextObject(Object):
+    def __init__(self, view, fontFamily = defaultFontFamily, text = '', position=[0, 0, 9], fontSize = defaultFontSize):
+        self.font = view.app.getFont(fontFamily)
+        mesh = font3d.createMesh(self.font, text);
+        mesh.setScale(fontSize, fontSize, fontSize)
+        Object.__init__(self, view, mesh, None, position)
+        self.text = text
+        self.fontSize = fontSize
+        
+    def setText(self, text):
+        if self.text == text:
+            return
+        self.text = text
+        self.app.scene3d.clear(self.mesh)
+        self.mesh = font3d.createMesh(self.font, text, self.mesh);
+        self.app.scene3d.update()
+        
+    def getText(self):
+        return self.text
+        
 
 # Generic view
 
@@ -280,7 +296,7 @@ class TaskView(View):
         self.name = name
         self.focusWidget = None
 
-    # The button is attached to the parent, as it stays visible when the category is hidden
+        # The button is attached to the parent, as it stays visible when the task is hidden
 
         self.button = ToggleButton(self.parent, 'data/3dobjs/button_standard_big.obj',
             position=[18 + len(self.parent.tasks) * 70, 45.0, 9.2],
@@ -300,14 +316,10 @@ class TaskView(View):
 
     def onShow(self, event):
 
-    # print("onShow", self.name, event)
-
         self.button.setSelected(True)
         self.show()
 
     def onHide(self, event):
-
-    # print("onHide", self.name, event)
 
         self.button.setSelected(False)
         self.hide()
@@ -325,7 +337,7 @@ class Category(View):
         self.tasks = []
         self.tasksByName = {}
 
-    # The button is attached to the parent, as it stays visible when the category is hidden
+        # The button is attached to the parent, as it stays visible when the category is hidden
 
         self.button = ToggleButton(self.parent, 'data/3dobjs/button_standard_big.obj',
             position=[18 + len(self.app.categories) * 70, 15.0, 9.1],
@@ -376,10 +388,6 @@ class Application(events3d.EventHandler):
 
     def start(self):
 
-    # self.cursor = Object(self, mesh = "data/3dobjs/cursor.obj",
-    #  texture = self.getThemeResource("images", "cursor.png"), position = [0, 0, 9.5])
-    # self.cursor.mesh.setPickable(0);
-
         self.scene3d.update()
         self.callEvent('onStart', None)
         self.scene3d.startEventLoop()
@@ -424,26 +432,24 @@ class Application(events3d.EventHandler):
 
         self.currentTask = self.currentCategory.tasksByName[name]
 
-    # print("Switched task to ", name)
-
         if self.currentTask:
             self.currentTask.show()
 
     def switchCategory(self, name):
 
-    # Do we need to switch at all
+        # Do we need to switch at all
 
         if self.currentCategory and self.currentCategory.name == name:
             return
 
-    # Does the category exist
+        # Does the category exist
 
         if not name in self.categories:
             return
 
         category = self.categories[name]
 
-    # Does the category have at least one view
+        # Does the category have at least one view
 
         if len(category.tasks) == 0:
             return
@@ -453,13 +459,11 @@ class Application(events3d.EventHandler):
 
         self.currentCategory = category
 
-    # print("Switched category to ", name)
-
         self.currentCategory.show()
 
         self.switchTask(category.tasks[0].name)
 
-  # called from native
+    # called from native
 
     def mouseDown(self, button, x, y):
         if button == 4:
@@ -468,29 +472,28 @@ class Application(events3d.EventHandler):
             self.mouseWheel(-1)
         else:
 
-      # Build event
+            # Build event
 
             mousePos = self.scene3d.getMousePos2D()
             event = events3d.MouseEvent(button, mousePos[0], mousePos[1])
 
-      # Get picked object
+            # Get picked object
 
             pickedObject = self.scene3d.getPickedObject()
             if not pickedObject: return
             object = self.scene3d.getPickedObject()[1]
                
-      # If we have an object
-
-     # Try to give its view focus
+            # If we have an object
+            # Try to give its view focus
    
             self.focusObject = object.object
             self.focusObject.view.setFocus()
    
-     # It is the object which will receive the following mouse messages
+            # It is the object which will receive the following mouse messages
    
             self.mouseDownObject = object.object
    
-     # Send event to the object
+            # Send event to the object
    
             object.object.callEvent('onMouseDown', event)
 
@@ -498,12 +501,13 @@ class Application(events3d.EventHandler):
         if button == 4 or button == 5:
             return
 
-    # Build event
+        # Build event
 
         mousePos = self.scene3d.getMousePos2D()
         event = events3d.MouseEvent(button, mousePos[0], mousePos[1])
 
-    # Get picked object
+        # Get picked object
+        
         pickedObject = self.scene3d.getPickedObject()
         if not pickedObject: return
         object = pickedObject[1]
@@ -514,22 +518,18 @@ class Application(events3d.EventHandler):
 
     def mouseMove(self, mouseState, x, y, xRel, yRel):
 
-    # Move cursor
-    # mousePos = self.scene3d.getMousePosGUI()
-    # self.cursor.setPosition([mousePos[0], mousePos[1], self.cursor.mesh.z])
-
-    # Build event
+        # Build event
 
         mousePos = self.scene3d.getMousePos2D()
         mouseDiff = self.scene3d.getMouseDiff()
         event = events3d.MouseEvent(self.scene3d.mouseState, mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1])
 
-    # Get picked object
+        # Get picked object
 
         picked = self.scene3d.getPickedObject()
         if not picked:
 
-      # self.scene3d.redraw()
+        # self.scene3d.redraw()
 
             return
         group = object = picked[0]
@@ -550,11 +550,9 @@ class Application(events3d.EventHandler):
                     self.enteredObject.callEvent('onMouseEntered', event)
                 object.object.callEvent('onMouseMoved', event)
 
-      # self.scene3d.redraw()
-
     def mouseWheel(self, wheelDelta):
 
-    # Mouse wheel events, like key events are sent to the focus view
+        # Mouse wheel events, like key events are sent to the focus view
 
         mousePos = self.scene3d.getMousePos2D()
         event = events3d.MouseWheelEvent(wheelDelta)
@@ -567,7 +565,7 @@ class Application(events3d.EventHandler):
         if key == events3d.SDLK_TAB:
             if self.focusView:
 
-        # if self.focusView.wantsTab and not (modifiers & events3d.KMOD_CTRL):
+            # if self.focusView.wantsTab and not (modifiers & events3d.KMOD_CTRL):
 
                 index = self.focusView.parent.children.index(self.focusView)
                 if modifiers & events3d.KMOD_SHIFT:
@@ -634,6 +632,7 @@ class Slider(View):
         """
         
         View.__init__(self, parent)
+        
         #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
         if isinstance(label, str):
             self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]], fontSize = fontSize)
@@ -960,6 +959,10 @@ class ProgressBar(View):
 
 
 class TextView(View):
+    
+    """
+    A TextView widget. This widget can be used as a label. The text is not editable by the user.
+    """
 
     def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9], fontSize = defaultFontSize, label = ''):
         View.__init__(self, parent)
@@ -975,6 +978,10 @@ class TextView(View):
 
 
 class TextEdit(View):
+    
+    """
+    A TextEdit widget. This widget can be used to let the user enter some text.
+    """
 
     def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9], focusedTexture=None, fontSize = defaultFontSize):
         View.__init__(self, parent)
@@ -1054,7 +1061,6 @@ class TextEdit(View):
         elif event.key == events3d.SDLK_RETURN:
             if len(self.text):
                 View.onKeyDown(self, event)
-                #self.onFileSelected(self.text)
 
             return
         elif event.key == events3d.SDLK_RIGHT:
@@ -1090,6 +1096,10 @@ class TextEdit(View):
 
 
 class FileEntryView(View):
+    
+    """
+    A FileEntryView widget. This widget can be used to let the user enter a filename.
+    """
 
     def __init__(self, parent):
         View.__init__(self, parent)
@@ -1119,6 +1129,10 @@ class FileEntryView(View):
 
 
 class FileChooser(View):
+    
+    """
+    A FileEntryView widget. This widget can be used to let the user choose an existing file.
+    """
 
     def __init__(self, parent, path, extension, previewExtension='bmp'):
         View.__init__(self, parent)
@@ -1245,15 +1259,15 @@ class FileChooser(View):
         if self.selectedFile == 0:
             return
 
-    # Start animation by hiding the next file
+        # Start animation by hiding the next file
 
         self.nextFile.hide()
 
-    # Animate by moving previous and current file to current and next locations
+        # Animate by moving previous and current file to current and next locations
 
         self.previousFileAnimation.start()
 
-    # End animation by resetting positions and showing new configuration
+        # End animation by resetting positions and showing new configuration
 
         self.previousFile.setPosition(self.previousPos)
         self.previousFile.setScale(1.0)
@@ -1281,15 +1295,15 @@ class FileChooser(View):
         if self.selectedFile + 1 == len(self.files):
             return
 
-    # Start animation by hiding the previous file
+        # Start animation by hiding the previous file
 
         self.previousFile.hide()
 
-    # Animate by moving current and next file to previous and current locations
+        # Animate by moving current and next file to previous and current locations
 
         self.nextFileAnimation.start()
 
-    # End animation by resetting positions and showing new configuration
+        # End animation by resetting positions and showing new configuration
 
         self.currentFile.setPosition(self.currentPos)
         self.currentFile.setScale(1.5)
@@ -1312,24 +1326,4 @@ class FileChooser(View):
             self.nextFile.hide()
 
         self.app.scene3d.redraw()
-        
-class TextObject(Object):
-    def __init__(self, view, fontFamily = defaultFontFamily, text = '', position=[0, 0, 9], fontSize = defaultFontSize):
-        self.font = view.app.getFont(fontFamily)
-        mesh = font3d.createMesh(self.font, text);
-        mesh.setScale(fontSize, fontSize, fontSize)
-        Object.__init__(self, view, mesh, None, position)
-        self.text = text
-        self.fontSize = fontSize
-        
-    def setText(self, text):
-        if self.text == text:
-            return
-        self.text = text
-        self.app.scene3d.clear(self.mesh)
-        self.mesh = font3d.createMesh(self.font, text, self.mesh);
-        self.app.scene3d.update()
-        
-    def getText(self):
-        return self.text
         
