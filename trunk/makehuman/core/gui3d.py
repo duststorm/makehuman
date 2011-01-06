@@ -643,7 +643,7 @@ class Slider(View):
         self.background = Object(self, 'data/3dobjs/slider_background.obj',
             texture=(backgroundTexture or self.app.getThemeResource('images', 'slider_generic.png')), position=position)
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj',
-            texture=self.sliderTexture, position=[position[0], position[1] + 16, position[2] + 0.01])
+            texture=self.sliderTexture, position=[position[0], position[1] + 20, position[2] + 0.01])
         self.sliderMinX = position[0] + 17
         self.sliderMaxX = position[0] + 111
         self.min = min
