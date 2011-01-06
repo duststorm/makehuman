@@ -298,10 +298,10 @@ class TaskView(View):
 
         # The button is attached to the parent, as it stays visible when the task is hidden
 
-        self.button = ToggleButton(self.parent, 'data/3dobjs/button_standard_big.obj',
-            position=[18 + len(self.parent.tasks) * 70, 45.0, 9.2],
-            texture=(texture or self.app.getThemeResource('images', 'button_tab.png')),
-            selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab_on.png')),
+        self.button = ToggleButton(self.parent, 'data/3dobjs/button_tab.obj',
+            position=[2 + len(self.parent.tasks) * 70, 52.0, 9.2],
+            texture=(texture or self.app.getThemeResource('images', 'button_tab2.png')),
+            selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab2_on.png')),
             label=(label or name))
 
         if name in category.tasksByName:
@@ -339,8 +339,8 @@ class Category(View):
 
         # The button is attached to the parent, as it stays visible when the category is hidden
 
-        self.button = ToggleButton(self.parent, 'data/3dobjs/button_standard_big.obj',
-            position=[18 + len(self.app.categories) * 70, 15.0, 9.1],
+        self.button = ToggleButton(self.parent, 'data/3dobjs/button_tab.obj',
+            position=[2 + len(self.app.categories) * 70, 22.0, 9.6],
             texture=(texture or self.app.getThemeResource('images', 'button_tab.png')),
             selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab_on.png')),
             label=(label or name))
