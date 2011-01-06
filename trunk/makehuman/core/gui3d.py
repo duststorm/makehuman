@@ -693,13 +693,13 @@ class Slider(View):
         newValue = self.__value
 
         if event.key == events3d.SDLK_HOME:
-            newValue = 0.0
+            newValue = self.min
         elif event.key == events3d.SDLK_LEFT:
-            newValue -= 0.1
+            newValue -= (self.max - self.min) / 10.0
         elif event.key == events3d.SDLK_RIGHT:
-            newValue += 0.1
+            newValue += (self.max - self.min) / 10.0
         elif event.key == events3d.SDLK_END:
-            newValue = 1.0
+            newValue = self.max
         else:
             View.onKeyDown(self, event)
 
