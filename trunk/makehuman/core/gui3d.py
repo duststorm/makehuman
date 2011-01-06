@@ -749,9 +749,6 @@ class Button(View):
             self.app.scene3d.redraw()
 
     def setSelected(self, selected):
-
-    # print("(de)selecting", self.selected, selected)
-
         if self.selected != selected:
             self.selected = selected
             self.onSelected(selected)
@@ -824,22 +821,6 @@ class ToggleButton(Button):
     def onMouseUp(self, event):
         pass
 
-
-# ToolbarButton widget (unused)
-
-
-class ToolbarButton(RadioButton):
-
-    def __init__(self, parent, group, texture=None, position=[0, 0, 9], fontSize = defaultFontSize):
-        RadioButton.__init__(self, parent, texture, None, position, fontSize = fontsize)
-
-    def onSelected(self, selected):
-        if selected:
-            self.button.setScale(1.5)
-        else:
-            self.button.setScale(1.0)
-
-
 class ProgressBar(View):
 
     """
@@ -905,8 +886,6 @@ class TextEdit(View):
 
     def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9], focusedTexture=None, fontSize = defaultFontSize):
         View.__init__(self, parent)
-
-        # Object(self, mesh='data/3dobjs/backgroundedit.obj', position=position)
 
         self.background = Object(self, mesh=mesh, texture=texture, position=position)
         self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 1.0, position[2] + 0.1], fontSize = fontSize)
