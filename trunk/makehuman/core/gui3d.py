@@ -616,7 +616,7 @@ class Slider(View):
         View.__init__(self, parent)
         #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
         if isinstance(label, str):
-            self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-5,position[2]], fontSize = fontSize)
+            self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]], fontSize = fontSize)
         self.background = Object(self, 'data/3dobjs/slider_background.obj', texture=backgroundTexture, position=position)
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj', texture=sliderTexture, position=[position[0], position[1] + 16, position[2] + 0.01])
         self.sliderTexture = sliderTexture
