@@ -608,19 +608,20 @@ class Application(events3d.EventHandler):
 
 class Slider(View):
 
-    def __init__(self, parent, backgroundTexture="data/themes/default/images/slider_generic.png",\
-    sliderTexture="data/themes/default/images/slider.png",\
-    focusedSliderTexture="data/themes/default/images/slider_focused.png",\
-    position=[0, 0, 15], value=0.0, min=0.0, max=1.0,\
-    label=None, fontSize = defaultFontSize):
+    def __init__(self, parent, backgroundTexture=None, sliderTexture=None, focusedSliderTexture=None,\
+        position=[0, 0, 15], value=0.0, min=0.0, max=1.0, label=None, fontSize = defaultFontSize):
         View.__init__(self, parent)
         #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
         if isinstance(label, str):
             self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]], fontSize = fontSize)
-        self.background = Object(self, 'data/3dobjs/slider_background.obj', texture=backgroundTexture, position=position)
-        self.slider = Object(self, 'data/3dobjs/slider_cursor.obj', texture=sliderTexture, position=[position[0], position[1] + 16, position[2] + 0.01])
-        self.sliderTexture = sliderTexture
-        self.focusedSliderTexture = focusedSliderTexture
+            
+        self.sliderTexture = sliderTexture or self.app.getThemeResource('images', 'slider.png')
+        self.focusedSliderTexture = focusedSliderTexture or self.app.getThemeResource('images', 'slider_focused.png')
+        
+        self.background = Object(self, 'data/3dobjs/slider_background.obj',
+            texture=(backgroundTexture or self.app.getThemeResource('images', 'slider_generic.png')), position=position)
+        self.slider = Object(self, 'data/3dobjs/slider_cursor.obj',
+            texture=self.sliderTexture, position=[position[0], position[1] + 16, position[2] + 0.01])
         self.sliderMinX = position[0] + 17
         self.sliderMaxX = position[0] + 111
         self.min = min
@@ -698,24 +699,30 @@ class Slider(View):
 
 class Button(View):
 
-    def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture="data/themes/default/images/button_unselected.png",\
-    selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None,\
+    def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture=None,\
+    selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None,\
     label=None, width=None, height=None, fontSize = defaultFontSize):
         View.__init__(self, parent)
-        if selectedTexture and selected:
-            t = selectedTexture
+        
+        self.texture = texture or self.app.getThemeResource('images', 'button_unselected.png')
+        self.selectedTexture = selectedTexture or self.app.getThemeResource('images', 'button_selected.png')
+        self.focusedTexture = focusedTexture
+        
+        if selected:
+            t = self.selectedTexture
         else:
-            t = texture
+            t = self.texture
+            
         if (width!=None) and (height!=None):
             self.button = Object(self, mesh='data/3dobjs/unit_square.obj', texture=t, position=position, width=width, height=height)
-        else: self.button = Object(self, mesh, texture=t, position=position)
+        else:
+            self.button = Object(self, mesh, texture=t, position=position)
+        
         if isinstance(label, str):
             self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-7,position[2]+0.001], fontSize = fontSize)
             #assumes button obj origin is upper left corner
             #TODO text should be in the middle of button, calculate this from text length
-        self.texture = texture
-        self.selectedTexture = selectedTexture
-        self.focusedTexture = focusedTexture
+        
         self.selected = selected
 
     def setTexture(self, texture):
@@ -771,7 +778,9 @@ class Button(View):
 
 class RadioButton(Button):
 
-    def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, label=None, fontSize = defaultFontSize):
+    def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
+        position=[0, 0, 9], selected=False, label=None, fontSize = defaultFontSize):
+        
         Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, label=label, fontSize = fontSize)
         self.group = group
         self.group.append(self)
@@ -798,7 +807,8 @@ class RadioButton(Button):
 
 class ToggleButton(Button):
 
-    def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture="data/themes/default/images/button_unselected.png", selectedTexture="data/themes/default/images/button_selected.png", position=[0, 0, 9], selected=False, focusedTexture=None, label=None, fontSize = defaultFontSize):
+    def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
+        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, fontSize = defaultFontSize):
 
         Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, fontSize = fontSize)
 
