@@ -107,8 +107,7 @@ class MHApplication(gui3d.Application):
 
     # Display the initial splash screen and the progress bar during startup
     self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
-    self.progressBar = gui3d.ProgressBar(self, backgroundTexture = self.getThemeResource("images", "progressbar_background.png"),
-      barTexture = self.getThemeResource("images", "progressbar.png"))
+    self.progressBar = gui3d.ProgressBar(self)
     self.scene3d.update()
     self.scene3d.redraw(0)
 

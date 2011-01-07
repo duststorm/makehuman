@@ -933,6 +933,10 @@ class ProgressBar(View):
         """
 
         View.__init__(self, parent, visible)
+        
+        backgroundTexture = backgroundTexture or self.app.getThemeResource("images", "progressbar_background.png")
+        barTexture = barTexture or self.app.getThemeResource("images", "progressbar.png")
+      
         self.background = Object(self, backgroundMesh, texture=backgroundTexture, position=backgroundPosition)
         self.bar = Object(self, barMesh, texture=barTexture, position=barPosition)
         self.bar.mesh.setScale(0.0, 1.0, 1.0)
