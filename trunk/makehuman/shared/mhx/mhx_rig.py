@@ -19,7 +19,7 @@ Functions shared by all rigs
 
 """
 
-import aljabr, mhxbones, mh2mhx
+import aljabr, mhxbones, mh2mhx, math
 from aljabr import *
 
 PanelWorks = False
@@ -119,11 +119,14 @@ C_TG_POSE = 0x3000
 C_CHILDOF = C_OW_POSE+C_TG_WORLD
 C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
 
-rootChildOfConstraints = [
+rootChildOfConstraints = []
+'''
 		('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
 ]
+'''
+Master = 'MasterFloor'
 
 #
 #	newSetupJoints (obj, joints, headTails):
@@ -348,10 +351,10 @@ def writePoses(fp, poses):
 			addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints)
 		elif typ == 'cSlider':
 			mn = '-'+mx
-			addPoseBone(fp, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+			addPoseBone(fp, bone, 'MHCube025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
 				[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'xSlider':
-			addPoseBone(fp, bone, 'MHSolid025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+			addPoseBone(fp, bone, 'MHCube025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 				[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 		elif typ == 'ikHandle':
 			addIKHandle(fp, bone, mn, mx)
@@ -428,16 +431,16 @@ def addStretchBone(fp, bone, target, parent):
 
 def addCSlider(fp, bone, mx):
 	mn = "-"+mx
-	addPoseBone(fp, bone, 'MHSolid025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, bone, 'MHCube025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 	
 def addYSlider(fp, bone, mx):
 	mn = "-"+mx
-	addPoseBone(fp, bone, 'MHSolid025', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, bone, 'MHCube025', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', ('0','0', '0','0', mn,mx), (1,1,1,1,1,1)])])
 	
 def addXSlider(fp, bone, mn, mx, dflt):
-	addPoseBone(fp, bone, 'MHSolid025', None, ((0,1,1), (dflt,0,0)), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, bone, 'MHCube025', None, ((0,1,1), (dflt,0,0)), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 
 #
@@ -1358,6 +1361,70 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 "      select False ;\n" +
 "    end FCurve\n")
 
+	return
+
+#
+#	setupCircle(fp, name, r):
+#	setupCube(fp, name, r):
+#	setupCircles(fp):
+#
+
+def setupCircle(fp, name, r):
+	fp.write("\n"+
+"Mesh %s %s \n" % (name, name) +
+"  Verts\n")
+	for n in range(16):
+		v = n*pi/8
+		fp.write("    v %.3f 0.5 %.3f ;\n" % (r*math.cos(v), r*math.sin(v)))
+	fp.write(
+"  end Verts\n" +
+"  Edges\n")
+	for n in range(15):
+		fp.write("    e %d %d ;\n" % (n, n+1))
+	fp.write("    e 15 0 ;\n")
+	fp.write(
+"  end Edges\n"+
+"end Mesh\n"+
+"Object %s MESH %s\n" % (name, name) +
+"  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n"+
+"  parent Refer Object CustomShapes ;\n"+
+"end Object\n")
+	return
+
+def setupCube(fp, name, r):
+	fp.write("\n"+
+"Mesh %s %s \n" % (name, name) +
+"  Verts\n")
+	for x in [-r,r]:
+		for y in [-r,r]:
+			for z in [-r,r]:
+				fp.write("    v %.2f %.2f %.2f ;\n" % (x,y,z))
+	fp.write(
+"  end Verts\n" +
+"  Faces\n" +
+"    f 0 1 3 2 ;\n" +
+"    f 4 6 7 5 ;\n" +
+"    f 0 2 6 4 ;\n" +
+"    f 1 5 7 3 ;\n" +
+"    f 1 0 4 5 ;\n" +
+"    f 2 3 7 6 ;\n" +
+"  end Faces\n" +
+"end Mesh\n" +
+"Object %s MESH %s\n" % (name, name) +
+"  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
+"  parent Refer Object CustomShapes ;\n" +
+"end Object\n")
+
+def setupCircles(fp):
+	setupCircle(fp, "MHCircle01", 0.1)
+	setupCircle(fp, "MHCircle025", 0.25)
+	setupCircle(fp, "MHCircle05", 0.5)
+	setupCircle(fp, "MHCircle10", 1.0)
+	setupCircle(fp, "MHCircle15", 1.5)
+	setupCircle(fp, "MHCircle20", 2.0)
+	setupCube(fp, "MHCube01", 0.1)
+	setupCube(fp, "MHCube025", 0.25)
+	setupCube(fp, "MHCube05", 0.5)
 	return
 
 #

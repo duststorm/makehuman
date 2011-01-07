@@ -49,7 +49,7 @@ FaceArmature = [
 	('LoLid_R',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('UpLid_L',		-0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
 	('LoLid_L',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('Gaze',		pi, None, F_WIR, L_HEAD, (1,1,1) ),
+	('Gaze',		pi, 'Head', F_WIR, L_HEAD, (1,1,1) ),
 	('Gaze_R',		pi, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
 	('Gaze_L',		pi, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
 ]
@@ -76,8 +76,8 @@ def FaceWritePoses(fp):
 
 	addPoseBone(fp, 'LoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('ChildOf', C_CHILDOF, 1, ['ChildOf', 'Head', (1,1,1), (1,1,1), (1,1,1)])])
+	addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+		#[('ChildOf', C_CHILDOF, 1, ['ChildOf', 'Head', (1,1,1), (1,1,1), (1,1,1)])])
 
 	addPoseBone(fp, 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 

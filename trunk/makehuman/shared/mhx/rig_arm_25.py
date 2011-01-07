@@ -66,6 +66,7 @@ ArmJoints = [
 ArmHeadsTails = [
 	# Shoulder
 	('Shoulder_L',			'r-shoulder-head', 'r-scapula'),
+	#('Shoulder_L',			'r-clavicle', 'r-scapula'),
 	#('ShoulderScapula_L',	'r-shoulder', 'r-scapula'),
 	('Clavicle_L',			'r-clavicle', 'r-scapula'),
 	('Pectoralis_L',		'r-pectoralis', 'r-uparm-front'),
@@ -81,6 +82,7 @@ ArmHeadsTails = [
 	
 
 	('Shoulder_R',			'l-shoulder-head', 'l-scapula'),
+	#('Shoulder_R',			'l-clavicle', 'l-scapula'),
 	#('ShoulderScapula_R',	'l-shoulder', 'l-scapula'),
 	('Clavicle_R',			'l-clavicle', 'l-scapula'),
 	('Pectoralis_R',		'l-pectoralis', 'l-uparm-front'),
@@ -235,10 +237,10 @@ ArmArmature = [
 	# IK 
 	('UpArmIK_L',		upArmRoll, 'Shoulder_L', 0, L_ARMIK, (1,1,1) ),
 	('LoArmIK_L',		loArmRoll, 'UpArmIK_L', 0, L_ARMIK, (1,1,1) ),
-	('HandIK_L',		handRoll, None, F_WIR, L_ARMIK, (1,1,1)),
+	('HandIK_L',		handRoll, Master, F_WIR, L_ARMIK, (1,1,1)),
 	('UpArmIK_R',		-upArmRoll, 'Shoulder_R', 0, L_ARMIK, (1,1,1) ),
 	('LoArmIK_R',		-loArmRoll, 'UpArmIK_R', 0, L_ARMIK, (1,1,1) ),
-	('HandIK_R',		-handRoll, None, F_WIR, L_ARMIK, (1,1,1)),
+	('HandIK_R',		-handRoll, Master, F_WIR, L_ARMIK, (1,1,1)),
 
 	# Pole target
 	('ElbowPTIK_L',		0.0, 'Shoulder_L', F_WIR, L_ARMIK, (1,1,1)),
@@ -267,7 +269,7 @@ limHand_R = (-deg90,70*deg1, 0,0, -deg20,deg20)
 
 def ArmWritePoses(fp):
 	# Shoulder
-	addPoseBone(fp, 'Shoulder_L', 'GoboShldr_L', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_L', 'MHCircle05', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)])])
 
 	addPoseBone(fp, 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
@@ -292,7 +294,7 @@ def ArmWritePoses(fp):
 		[('StretchTo', 0, 1, ['Stretch', 'ElbowTrg_L', 0])])
 
 
-	addPoseBone(fp, 'Shoulder_R', 'GoboShldr_R', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_R', 'MHCircle05', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
 
 	addPoseBone(fp, 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
@@ -408,7 +410,7 @@ def ArmWritePoses(fp):
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)])
 		])
 
-	addPoseBone(fp, 'HandIK_L', 'GoboHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'HandIK_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 'fNoStretch', ['Shoulder_L', 'Shoulder_L'])])
@@ -423,7 +425,7 @@ def ArmWritePoses(fp):
 		('LimitRot', C_OW_LOCAL, 0, ['LimitRot', limLoArm_R, (True, True, True)])
 		])
 
-	addPoseBone(fp, 'HandIK_R', 'GoboHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'HandIK_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 'fNoStretch', ['Shoulder_R', 'Shoulder_R'])])

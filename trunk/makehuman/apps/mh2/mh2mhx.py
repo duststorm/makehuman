@@ -115,6 +115,7 @@ def exportMhx_25(obj, rig, fp):
 
 	fp.write("#if toggle&T_Armature\n")
 	copyFile25(obj, "shared/mhx/templates/common-armature25.mhx", rig, fp, None, [])	
+	mhx_rig.setupCircles(fp)
 	copyFile25(obj, "shared/mhx/templates/%s-armature25.mhx" % rig, rig, fp, None, [])	
 	fp.write("#endif\n")
 
