@@ -768,12 +768,12 @@ MhxGlobalBoneList = [
 
 T_MHX = 1
 T_Rorkimaru = 2
-T_Minimal = 3
+T_Game = 3
 theTarget = 0
 theArmature = None
 
 RorkimaruBones = [
-	('Hips',		'Root'),
+	('Root',		'Root'),
 	('Spine1',		'Spine1'),
 	('Spine2',		'Spine3'),
 	('Neck',		'Neck'),
@@ -800,7 +800,7 @@ RorkimaruBones = [
 	('Toe_R',		'ToeFK_R'),
 ]
 
-MinimalBones = [
+GameBones = [
 	('Root',		'Root'),
 	('Spine1',		'Spine1'),
 	('Spine2',		'Spine2'),
@@ -831,11 +831,25 @@ MinimalBones = [
 	('Toe_R',		'ToeFK_R'),
 ]
 
-MinimalParents = {
+GameIkBones = [ 'Wrist_L', 'Wrist_R', 'Ankle_L', 'Ankle_R' ]
+
+GameParents = {
+	'MasterFloor' :	None,
+	'MasterFloorInv' :	None,
 	'RootInv' :		'Root',
 	'HipsInv' :		'Root',
 	'Hips' :		'Root',
 	'Spine3Inv' :	'Spine3',
+}
+
+RorkimaruParents = {
+	'MasterFloor' :	None,
+	'MasterFloorInv' :	None,
+	'RootInv' :		'Root',
+	'HipsInv' :		'Root',
+	'Hips' :		'Root',
+	'Spine2Inv' :	'Spine2',
+	'Spine3' :		'Spine2',
 }
 
 #
@@ -844,8 +858,8 @@ MinimalParents = {
 
 TagBones = {
 	('MHX',	T_MHX, 'KneePTFK_L'),
-	('Rorkimaru', T_Rorkimaru, 'Spine2Inv'),
-	('Minimal', T_Minimal, 'Spine3Inv'),
+	('Rorkimaru', T_Rorkimaru, 'TagRorkimaru'),
+	('Game', T_Game, 'TagGame'),
 }
 
 #
@@ -880,15 +894,14 @@ def getParentName(b):
 			return None
 		else:
 			return b
-	elif theTarget == T_Rorkimaru:
-		if b[-3:] == 'Inv':
-			return b[:-3]
-		else:
-			return b
-	elif theTarget == T_Minimal:
-		print("par", b)
+	elif theTarget == T_Game:
 		try:
-			return MinimalParents[b]
+			return GameParents[b]
+		except:
+			return b
+	elif theTarget == T_Rorkimaru:
+		try:
+			return RorkimaruParents[b]
 		except:
 			return b
 
@@ -926,8 +939,10 @@ def setupTargetArmature():
 		theSrcBone = {}
 		if theTarget == T_Rorkimaru:
 			bones = RorkimaruBones
-		elif theTarget == T_Minimal:
-			bones = MinimalBones
+			theIkBoneList = GameIkBones
+		elif theTarget == T_Game:
+			bones = GameBones
+			theIkBoneList = GameIkBones
 		for (trg,src) in bones:
 			theFkBoneList.append(trg)
 			theSrcBone[trg] = src
@@ -997,6 +1012,7 @@ def renameFKBones(bones00, rig00, action):
 def createExtraBones(ebones, bones90):
 	for suffix in ['_L', '_R']:
 		try:
+
 
 			foot = ebones['FootFK'+suffix]
 		except:
@@ -1336,12 +1352,12 @@ def relativizeBones(srcRig, trgRig, mhxAnims):
 	return
 '''
 #
-#	insertAnimation(context, rig, animations):
+#	insertAnimation(context, rig, animations, boneList):
 #	insertAnimRoot(root, animations, nFrames, locs, rots):
 #	insertAnimChild(name, animations, nFrames, rots):
 #
 
-def insertAnimation(context, rig, animations):
+def insertAnimation(context, rig, animations, boneList):
 	context.scene.objects.active = rig
 	bpy.ops.object.mode_set(mode='POSE')
 	locs = makeVectorDict(rig, '].location')
@@ -1350,7 +1366,7 @@ def insertAnimation(context, rig, animations):
 	nFrames = len(locs[root])
 	insertAnimRoot(root, animations, nFrames, locs[root], rots[root])
 	bones = rig.data.bones
-	for nameSrc in MhxFkBoneList:
+	for nameSrc in boneList:
 		try:
 			bones[nameSrc]
 			success = (nameSrc != root)
@@ -1444,8 +1460,8 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes):
 			else:
 				insertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg)
 
+	insertAnimation(context, trgRig, trgAnimations, theFkBoneList)
 	if theTarget == T_MHX:
-		insertAnimation(context, trgRig, trgAnimations)
 		for suffix in ['_L', '_R']:
 			for name in ['ElbowPT', 'KneePT']:
 				nameFK = name+'FK'+suffix
@@ -1563,7 +1579,7 @@ def insertReverseRotationKeyFrames(name, pb, animFK, animIK, animPar):
 #	poseTrgIkBones(context, trgRig, trgAnimations)
 #
 
-def poseTrgIkBones(context, trgRig, trgAnimations):
+def poseTrgIkBonesMHX(context, trgRig, trgAnimations):
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = trgRig.pose.bones
 	for suffix in ['_L', '_R']:
@@ -1597,8 +1613,23 @@ def poseTrgIkBones(context, trgRig, trgAnimations):
 			animIK = trgAnimations[nameIK]
 			rots = insertReverseRotationKeyFrames(nameIK, pbones[nameIK], animFK, animIK, trgAnimations[animIK.parent])
 			insertAnimChild(nameIK, trgAnimations, -1, rots)
-
 	return
+
+def poseTrgIkBonesGame(context, trgRig, trgAnimations):
+	bpy.ops.object.mode_set(mode='POSE')
+	pbones = trgRig.pose.bones
+	for suffix in ['_L', '_R']:
+		for (namefk, nameik) in [('Hand', 'Wrist'), ('Foot', 'Ankle')]:
+			nameIK = nameik+suffix
+			nameFK = namefk+suffix
+			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
+			animFK = trgAnimations[nameFK]
+			animIK = trgAnimations[nameIK]
+			locs = insertLocationKeyFrames(nameIK, pbones[nameIK], animFK, animIK)
+			rots = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],animFK, animIK)
+			insertAnimRoot(nameIK, trgAnimations, -1, locs, rots)
+	return
+
 
 #
 #	prettifyBones(rig):
@@ -1653,7 +1684,7 @@ def retargetMhxRig(context, srcRig, trgRig):
 
 	trgAnimations = createTargetAnimation(context, trgRig)
 	srcAnimations = createSourceAnimation(context, srcRig)
-	insertAnimation(context, srcRig, srcAnimations)
+	insertAnimation(context, srcRig, srcAnimations, MhxFkBoneList)
 	onoff = toggleLimitConstraints(trgRig)
 	setLimitConstraints(trgRig, 0.0)
 	if scn['MhxApplyFixes']:
@@ -1662,7 +1693,9 @@ def retargetMhxRig(context, srcRig, trgRig):
 		fixes = None
 	poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes)
 	if theTarget == T_MHX:
-		poseTrgIkBones(context, trgRig, trgAnimations)
+		poseTrgIkBonesMHX(context, trgRig, trgAnimations)
+	elif theTarget == T_Game or theTarget == T_Rorkimaru:
+		poseTrgIkBonesGame(context, trgRig, trgAnimations)
 	setInterpolation(trgRig)
 	if onoff == 'OFF':
 		setLimitConstraints(trgRig, 1.0)

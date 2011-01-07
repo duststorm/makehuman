@@ -134,13 +134,14 @@
 
 # bones
 
-  Master master-head master-tail 0.0 - -nc -nd -circ 30
-  Root pelvis spine3 0.0 Master -nc -nd -box 10
+  MasterFloor master-head master-tail 0.0 - -nc -nd -circ 30
+  Root pelvis spine3 0.0 MasterFloor -nc -nd -box 10
+  TagGame pelvis spine3 0.0 Root -nd
   Hips spine3 pelvis 3.1416 Root -circ 20
   Spine1 spine3 spine2 0.0 Root -circ 15
   Spine2 spine2 spine1 0.0 Spine1 -circ 10
   Spine3 spine1 neck 0.0 Spine2 -circ 10
-  Neck neck head 0.0 Spine2 -circ 10
+  Neck neck head 0.0 Spine3 -circ 10
   Head head head2 0.0 Neck -circ 10
 
   Jaw mouth jaw 0.0 Head
@@ -155,17 +156,17 @@
   UpLid_L r-eye r-upperlid -0.2793 Head
   LoLid_L r-eye r-lowerlid 0.0 Head
 
-  Clavicle_L r-clavicle r-shoulder 0.0 Spine2 -circ 3
+  Clavicle_L r-clavicle r-shoulder 0.0 Spine3 -circ 3
   UpArm_L r-shoulder r-elbow 0.0 Clavicle_L -circ 3
   LoArm_L r-elbow r-hand 0.0 UpArm_L -circ 3 -ik Wrist_L 2 1.0
   Hand_L r-hand r-finger-3-1 0.0 LoArm_L -circ 5
-  Wrist_L r-hand r-wrist-tail 0.0 Master -box 3 -nc -nd
+  Wrist_L r-hand r-wrist-tail 0.0 MasterFloor -box 3 -nc -nd
 
-  Clavicle_R l-clavicle l-shoulder 0.0 Spine2 -circ 3
+  Clavicle_R l-clavicle l-shoulder 0.0 Spine3 -circ 3
   UpArm_R l-shoulder l-elbow 0.0 Clavicle_R -circ 3
   LoArm_R l-elbow l-hand 0.0 UpArm_R -circ 3 -ik Wrist_R 2 1.0
   Hand_R l-hand l-finger-3-1 0.0 LoArm_R -circ 5
-  Wrist_R l-hand l-wrist-tail 0.0 Master -box 3 -nc -nd
+  Wrist_R l-hand l-wrist-tail 0.0 MasterFloor -box 3 -nc -nd
 
   Wrist-1_L r-hand r-hand-3 0.0 Hand_L
   Wrist-2_L r-hand r-hand-2 0.0 Hand_L
@@ -215,19 +216,17 @@
   Finger-5-2_R l-finger-5-2 l-finger-5-3 0.0 Finger-5-1_R
   Finger-5-3_R l-finger-5-3 l-finger-5-4 0.0 Finger-5-2_R
 
-  Hip_L pelvis r-upper-leg 0.0 Hips -nd
-  UpLeg_L r-upper-leg r-knee 3.1416 Hip_L -circ 3
-  LoLeg_L r-knee r-ankle 3.1416 UpLeg_L -circ 3 -ik Ankle_L 2 1.0
-  Foot_L r-ankle r-foot-1 3.1416 LoLeg_L -circ 3
-  Toe_L r-foot-1 r-foot-2 3.1416 Foot_L -circ 3
-  Ankle_L r-ankle r-ankle-tail 0.0 Master -box 3 -nd -nc
+  UpLeg_L r-upper-leg r-knee 0.0 Hips -circ 3
+  LoLeg_L r-knee r-ankle 0.0 UpLeg_L -circ 3 -ik Ankle_L 2 1.0
+  Foot_L r-ankle r-foot-1 0.0 LoLeg_L -circ 3
+  Toe_L r-foot-1 r-foot-2 0.0 Foot_L -circ 3
+  Ankle_L r-ankle r-ankle-tail 0.0 MasterFloor -box 3 -nd -nc
 
-  Hip_R pelvis l-upper-leg 0.0 Hips -nd
-  UpLeg_R l-upper-leg l-knee -3.1416 Hip_R -circ 3
-  LoLeg_R l-knee l-ankle -3.1416 UpLeg_R -circ 3 -ik Ankle_R 2 1.0
-  Foot_R l-ankle l-foot-1 -3.1416 LoLeg_R -circ 3
-  Toe_R l-foot-1 l-foot-2 -3.1416 Foot_R -circ 3
-  Ankle_R l-ankle l-ankle-tail 0.0 Master -box 3 -nd -nc
+  UpLeg_R l-upper-leg l-knee 0.0 Hips -circ 3
+  LoLeg_R l-knee l-ankle 0.0 UpLeg_R -circ 3 -ik Ankle_R 2 1.0
+  Foot_R l-ankle l-foot-1 0.0 LoLeg_R -circ 3
+  Toe_R l-foot-1 l-foot-2 0.0 Foot_R -circ 3
+  Ankle_R l-ankle l-ankle-tail 0.0 MasterFloor -box 3 -nd -nc
 
 # weights Hips
   2114 0.1533
