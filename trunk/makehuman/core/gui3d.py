@@ -917,8 +917,8 @@ class ProgressBar(View):
     """
 
     def __init__(self, parent, backgroundMesh='data/3dobjs/progressbar_background.obj', backgroundTexture=None,
-        backgroundPosition=[650, 580, 9.1],
-        barMesh='data/3dobjs/progressbar.obj', barTexture=None, barPosition=[650, 580, 9.2], visible=True):
+        backgroundPosition=[650, 585, 9.1],
+        barMesh='data/3dobjs/progressbar.obj', barTexture=None, barPosition=[650, 585, 9.2], visible=True):
     
         """
         This is the constructor for the ProgressBar class. It takes the following parameters:
