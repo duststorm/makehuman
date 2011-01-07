@@ -265,7 +265,7 @@ def getArmatureFromRigFile(fileName, obj):
 	hier = []
 	heads = {}
 	tails = {}
-	for (bone, head, tail, roll, parent) in armature:
+	for (bone, head, tail, roll, parent, options) in armature:
 		heads[bone] = head
 		tails[bone] = tail
 		if parent == '-':
@@ -436,8 +436,8 @@ def filterMesh(mesh1):
 
 def exportDae(obj, fp):
 	global theStuff
-	(useMain, proxyList) = mh2proxy.proxyConfig()
-	amt = getArmatureFromRigFile('data/templates/minimal.rig', obj)
+	(useMain, rig, proxyList) = mh2proxy.proxyConfig()
+	amt = getArmatureFromRigFile('data/templates/game.rig', obj)
 	#rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
 	rawTargets = []
 

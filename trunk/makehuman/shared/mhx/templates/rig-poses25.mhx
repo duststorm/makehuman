@@ -13,21 +13,9 @@ end Process
 
 Pose Human
 end Pose
-
 *** rig-actions
-
-Pose Human
-  *** rig-poses
-  ik_solver 'LEGACY' ;
-end Pose
-
-AnimationData Human True
-   *** rig-drivers
-  action_blend_type 'REPLACE' ;
-  action_extrapolation 'HOLD' ;
-  action_influence 1 ;
-  use_nla True ;
-end AnimationData
+*** rig-poses
+*** rig-drivers
 
 #if False
 MaterialAnimationData HumanMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0

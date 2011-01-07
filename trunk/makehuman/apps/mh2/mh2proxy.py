@@ -24,7 +24,7 @@ TO DO
 import module3d, aljabr, files3d
 import os
 from aljabr import *
-import read_rig
+import read_rig, mhx_rig
 
 #
 #	class CProxy
@@ -43,6 +43,7 @@ class CProxy:
 		self.texFaces = []
 		self.texVerts = []
 		self.materials = []
+		self.constraints = []
 		self.wire = False
 		self.cage = False
 		self.weightfile = None
@@ -97,15 +98,17 @@ def proxyFilePtr(name):
 #
 
 def proxyConfig():
-	fp = proxyFilePtr('proxy.cfg')
-	if not fp: return []	
 	proxyList = []
 	typ = 'Proxy'
 	layer = 2
 	useMhx = True
 	useObj = True
 	useDae = True
+	useRig = 'mhx'
 	useMain = ['Obj', 'Mhx', 'Dae']
+	fp = proxyFilePtr('proxy.cfg')
+	if not fp: 
+		return (useMain, useRig, proxyList)
 	for line in fp:
 		words = line.split()
 		if len(words) == 0 or words[0][0] == '#':
@@ -114,6 +117,11 @@ def proxyConfig():
 			if words[1] == 'MainMesh':
 				try:
 					useMain = words[2:]
+				except:
+					pass
+			elif words[1] == 'Rig':
+				try:
+					useRig = words[2].lower()
 				except:
 					pass
 			elif words[1] == 'Obj':
@@ -143,7 +151,7 @@ def proxyConfig():
 	print "Proxy configuration: Use %s" % useMain
 	for elt in proxyList:
 		print "  ", elt
-	return (useMain, proxyList)
+	return (useMain, useRig, proxyList)
 
 	
 #
@@ -303,17 +311,20 @@ def getJoint(joint, obj, locations):
 
 #
 #	writeProxyArmature(fp, obj, proxy)
-#	writeProxyBone(fp, boneInfo):	
-#	writeProxyPose(fp, proxy):
-#	writeProxyWeights(fp, proxy):
+#	writeRigBones(fp, bones):
+#	writeRigPose(fp, name, bones):
+#	writeRigWeights(fp, weights):
 #
 
 def writeProxyArmature(fp, obj, proxy):
 	if not proxy.rig:
 		return
 	(locs, proxy.bones, proxy.weights) = read_rig.readRigFile(proxy.rig, obj)
+	writeRigBones(fp, proxy.bones)
+	return
 
-	for (bone, head, tail, roll, parent) in proxy.bones:
+def writeRigBones(fp, bones):
+	for (bone, head, tail, roll, parent, options) in bones:
 		fp.write("\n  Bone %s True\n" % bone)
 		(x, y, z) = head
 		fp.write("    head  %.4f %.4f %.4f  ;\n" % (x,-z,y))
@@ -323,27 +334,92 @@ def writeProxyArmature(fp, obj, proxy):
 			fp.write("    parent Refer Bone %s ;\n" % parent)
 		fp.write(
 	"    roll %.4f ; \n" % (roll)+
-	"    use_connect False ; \n" +
-	"    use_deform True ; \n" +
-	"  end Bone \n")
+	"    use_connect False ; \n")
+		if ('-circ' in options.keys() or '-box' in options.keys()):
+			fp.write("    show_wire True ;\n")
+		try:
+			options['-nd']
+			fp.write("    use_deform False ; \n")
+		except:
+			fp.write("    use_deform True ; \n")
+		fp.write("  end Bone \n")
 	return
 
-def writeProxyPose(fp, proxy):
-	fp.write("\nPose %s" % proxy.name)
-	for (bone, head, tail, roll, parent) in proxy.bones:
-		if parent:
-			fp.write("\n" +
-"  Posebone %s True \n" % bone +
-"    lock_location Array 1 1 1 ;\n" +
-"    lock_scale Array 1 1 1  ; \n"+
-"  end Posebone\n")
-	fp.write("\n"+
-"end Pose\n\n")
+def getRadius(key, options):
+	try:
+		val = options[key]
+		return int(val[0])
+	except:
+		return None
 
-def writeProxyWeights(fp, proxy):
-	for grp in proxy.weights.keys():
+def writeRigPose(fp, name, bones):
+	circles = []
+	cubes = []
+	for (bone, head, tail, roll, parent, options) in bones:
+		r = getRadius('-circ', options)
+		if r and not (r in circles):
+			mhx_rig.setupCircle(fp, "RigCircle%02d" % r, 0.1*r)
+			circles.append(r)
+		r = getRadius('-box', options)
+		if r and not (r in cubes):
+			mhx_rig.setupCube(fp, "RigCube%02d" % r, 0.1*r)
+			cubes.append(r)
+
+	fp.write("\nPose %s\n" % name)
+	for (bone, head, tail, roll, parent, options) in bones:
+		fp.write("  Posebone %s True \n" % bone)
+
+		# IK constraint
+		try:
+			val = options['-ik']
+		except:
+			val = None
+		if val:
+			(subtar, chainlen, inf) = val
+			fp.write(
+"    Constraint IK IK True\n")
+			if subtar:
+				fp.write(
+"      target Refer Object %s ;\n" % name +
+"      subtarget '%s' ;\n" % subtar +
+"      use_tail True ;\n" +
+"      use_target True ;\n")
+			else:
+				fp.write(
+"      use_tail False ;\n" +
+"      use_target True ;\n")
+			fp.write(
+"      chain_count %s ;\n" % chainlen +
+"      influence %s ;\n" % inf +
+"    end Constraint\n")
+
+		# Not connected
+		try:
+			options['-nc']
+		except:
+			fp.write(
+"    lock_location Array 1 1 1 ;\n" +
+"    lock_scale Array 1 1 1  ; \n")
+
+		# Circle custom shape
+		r = getRadius('-circ', options)
+		if r:
+			fp.write(
+"    custom_shape Refer Object RigCircle%02d ; \n" % r)
+
+		# Box custom shape
+		r = getRadius('-box', options)
+		if r:
+			fp.write(
+"    custom_shape Refer Object RigCube%02d ; \n" % r)
+
+		fp.write("  end Posebone\n")
+	fp.write("end Pose\n\n")
+
+def writeRigWeights(fp, weights):
+	for grp in weights.keys():
 		fp.write("\n  VertexGroup %s\n" % grp)
-		for (v,w) in proxy.weights[grp]:
+		for (v,w) in weights[grp]:
 			fp.write("    wv %d %.4f ;\n" % (v,w))
 		fp.write("  end VertexGroup\n")
 	return
@@ -526,7 +602,7 @@ def fixProxyShape(shape):
 #
 
 def exportProxyObj(obj, name):
-	(useMain, proxyList) = proxyConfig()
+	(useMain, rig, proxyList) = proxyConfig()
 	for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 		if useObj:
 			proxy = readProxyFile(obj, proxyStuff)

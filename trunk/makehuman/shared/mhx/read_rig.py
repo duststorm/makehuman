@@ -30,69 +30,80 @@ import mhxbones
 from aljabr import *
 
 #
-#	setupRigJoint (lineSplit, obj, locations):
+#	setupRigJoint (words, obj, locations):
 #
-def setupRigJoint (lineSplit, obj, locations):
-	key = lineSplit[0]
-	typ = lineSplit[1]
+def setupRigJoint (words, obj, locations):
+	key = words[0]
+	typ = words[1]
 	if typ == 'joint':
-		loc = mhxbones.calcJointPos(obj, lineSplit[2])
+		loc = mhxbones.calcJointPos(obj, words[2])
 		locations[key] = loc
 	elif typ == 'vertex':
-		v = int(lineSplit[2])
+		v = int(words[2])
 		locations[key] = obj.verts[v].co
 	elif typ == 'position':
-		x = locations[lineSplit[2]]
-		y = locations[lineSplit[3]]
-		z = locations[lineSplit[4]]
+		x = locations[words[2]]
+		y = locations[words[3]]
+		z = locations[words[4]]
 		locations[key] = [x[0],y[1],z[2]]
 	elif typ == 'line':
-		k1 = float(lineSplit[2])
-		k2 = float(lineSplit[4])
-		locations[key] = vadd(vmul(locations[lineSplit[3]], k1), vmul(locations[lineSplit[5]], k2))
+		k1 = float(words[2])
+		k2 = float(words[4])
+		locations[key] = vadd(vmul(locations[words[3]], k1), vmul(locations[words[5]], k2))
 	elif typ == 'offset':
-		x = float(lineSplit[3])
-		y = float(lineSplit[4])
-		z = float(lineSplit[5])
-		locations[key] = vadd(locations[lineSplit[2]], [x,y,z])
+		x = float(words[3])
+		y = float(words[4])
+		z = float(words[5])
+		locations[key] = vadd(locations[words[2]], [x,y,z])
 	else:
 		raise NameError("Unknown %s" % typ)
 
 
 def readRigFile(fileName, obj):
 	fp= open(fileName, "rU")
-	inLocations = False
-	inBones = False
-	inWeights = False
+
+	doLocations = 1
+	doBones = 2
+	doWeights = 3
+	status = 0
+
 	locations = {}
 	armature = []
 	weights = {}
+
 	for line in fp: 
-		lineSplit = line.split()
-		if len(lineSplit) == 0:
+		words = line.split()
+		if len(words) == 0:
 			pass
-		elif lineSplit[0] == '#':
-			if lineSplit[1] == 'locations':
-				inLocations = True
-			elif lineSplit[1] == 'bones':
-				inLocations = False
-				inBones = True
-			elif lineSplit[1] == 'weights':
-				inBones = False
-				inWeights = True
+		elif words[0] == '#':
+			if words[1] == 'locations':
+				status = doLocations
+			elif words[1] == 'bones':
+				status = doBones
+			elif words[1] == 'weights':
+				status = doWeights
 				wts = []
-				weights[lineSplit[2]] = wts
-		elif inWeights:
-			wts.append((int(lineSplit[0]), float(lineSplit[1])))
-		elif inLocations:
-			setupRigJoint (lineSplit, obj, locations)
-		elif inBones:
-			bone = lineSplit[0]
-			head = locations[lineSplit[1]]
-			tail = locations[lineSplit[2]]
-			roll = float(lineSplit[3])
-			parent = lineSplit[4]
-			armature.append((bone, head, tail, roll, parent))
+				weights[words[2]] = wts
+		elif status == doWeights:
+			wts.append((int(words[0]), float(words[1])))
+		elif status == doLocations:
+			setupRigJoint (words, obj, locations)
+		elif status == doBones:
+			bone = words[0]
+			head = locations[words[1]]
+			tail = locations[words[2]]
+			roll = float(words[3])
+			parent = words[4]
+			options = {}
+			for word in words[5:]:
+				if word[0] == '-':
+					values = []
+					options[word] = values
+				else:
+					values.append(word)
+			armature.append((bone, head, tail, roll, parent, options))
+		else:
+			raise NameError("Unknown status %d" % status)
 
 	fp.close()
 	return (locations, armature, weights)

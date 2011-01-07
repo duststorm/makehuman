@@ -33,7 +33,7 @@ import sys
 mhxPath = os.path.realpath('./shared/mhx')
 if mhxPath not in sys.path:
 	sys.path.append(mhxPath)
-import mh2proxy, mhxbones, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_body_25
+import mh2proxy, mhxbones, read_rig, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_body_25
 
 #
 #	exportMhx(obj, filename):
@@ -51,7 +51,7 @@ def exportMhx(obj, filename):
 	filename = name+"-25"+ext
 	#print("Writing MHX 2.5x file " + filename )
 	fp = open(filename, 'w')
-	exportMhx_25(obj, "rig", fp)
+	exportMhx_25(obj, fp)
 	fp.close()
 	#print("MHX 2.5x file %s written" % filename)
 
@@ -99,10 +99,10 @@ def exportRawMhx(obj, fp):
 	return
 
 #
-#	exportMhx_25(obj, rig, fp):
+#	exportMhx_25(obj, fp):
 #
 
-def exportMhx_25(obj, rig, fp):
+def exportMhx_25(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -111,19 +111,35 @@ def exportMhx_25(obj, rig, fp):
 "  error 'This file can only be read with Blender 2.5' ;\n" +
 "#endif\n")
 
+	(useMain, rig, proxyList) = mh2proxy.proxyConfig()
 	mhx_rig.setupRig(obj)
 
-	fp.write("#if toggle&T_Armature\n")
-	copyFile25(obj, "shared/mhx/templates/common-armature25.mhx", rig, fp, None, [])	
-	mhx_rig.setupCircles(fp)
-	copyFile25(obj, "shared/mhx/templates/%s-armature25.mhx" % rig, rig, fp, None, [])	
-	fp.write("#endif\n")
+	fp.write(
+"NoScale True ;\n" +
+"Object CustomShapes EMPTY None\n" +
+"  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
+"end Object\n\n")
 
+	if rig == 'mhx':
+		fp.write("#if toggle&T_Armature\n")
+		copyFile25(obj, "shared/mhx/templates/custom-shapes25.mhx", rig, fp, None, [])	
+		mhx_rig.setupCircles(fp)
+		copyFile25(obj, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
+		fp.write("#endif\n")
+	elif rig == 'game':
+		rig = mh2proxy.CProxy('Rig', 0)
+		rig.name = 'Human'
+		(locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/game.rig', obj)
+		fp.write("#if toggle&T_Armature\n")
+		copyFile25(obj, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
+		fp.write("#endif\n")
+	else:
+		raise NameError("Unknown base rig %s" % rig)
+		
 	fp.write("\nNoScale False ;\n\n")
 
 	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
 
-	(useMain, proxyList) = mh2proxy.proxyConfig()
 	proxyData = {}
 	proxyCopy('Cage', obj, rig, proxyList, proxyData, fp)
 
@@ -136,7 +152,7 @@ def exportMhx_25(obj, rig, fp):
 	proxyCopy('Clothes', obj, rig, proxyList, proxyData, fp)
 
 	fp.write("#if toggle&T_Armature\n")
-	copyFile25(obj, "shared/mhx/templates/%s-poses25.mhx" % rig, rig, fp, None, proxyData)	
+	copyFile25(obj, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData)	
 	fp.write("#endif\n")
 	return
 
@@ -174,38 +190,58 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 			if ignoreLine:
 				if words[1] == 'EndIgnore':
 					ignoreLine = False
-			elif words[1] == 'Bone':
-				bone = words[2]
-				fp.write("    Bone %s\n" % bone)
+			#elif words[1] == 'Bone':
+			#	bone = words[2]
+			#	fp.write("    Bone %s\n" % bone)
 			#elif words[1] == 'Rigify':
 			#	mhxbones_rigify.writeBones(obj, fp)
-			elif words[1] == 'head':
-				(x, y, z) = mhxbones.boneHead[bone]
-				fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
-			elif words[1] == 'tail':
-				(x, y, z) = mhxbones.boneTail[bone]
-				fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
-			elif words[1] == 'roll':
-				(x, y) = mhxbones.boneRoll[bone]
-				fp.write("    roll %.6g ;\n" % (y))
+			#elif words[1] == 'head':
+			#	(x, y, z) = mhxbones.boneHead[bone]
+			#	fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
+			#elif words[1] == 'tail':
+			#	(x, y, z) = mhxbones.boneTail[bone]
+			#	fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
+			#elif words[1] == 'roll':
+			#	(x, y) = mhxbones.boneRoll[bone]
+			#	fp.write("    roll %.6g ;\n" % (y))
 			elif words[1] == 'rig-bones':
-				mhx_rig.writeAllArmatures(fp)
+				if rig == 'mhx':
+					mhx_rig.writeAllArmatures(fp)
+				else:
+					mh2proxy.writeRigBones(fp, rig.bones)
 			elif words[1] == 'rig-poses':
-				mhx_rig.writeAllPoses(fp)
+				if rig == 'mhx':
+					fp.write("Pose Human\n")
+					mhx_rig.writeAllPoses(fp)
+					fp.write(
+"  ik_solver 'LEGACY' ;\n" +
+"end Pose\n")
+				else:
+					mh2proxy.writeRigPose(fp, rig.name, rig.bones)
 			elif words[1] == 'rig-actions':
-				mhx_rig.writeAllActions(fp)
+				if rig == 'mhx':
+					mhx_rig.writeAllActions(fp)
 			elif words[1] == 'rig-drivers':
-				mhx_rig.writeAllDrivers(fp)
+				if rig == 'mhx':
+					fp.write("AnimationData Human True\n")
+					mhx_rig.writeAllDrivers(fp)
+					fp.write(
+"  action_blend_type 'REPLACE' ;\n" +
+"  action_extrapolation 'HOLD' ;\n" +
+"  action_influence 1 ;\n" +
+"  use_nla True ;\n" +
+"end AnimationData\n")
 			elif words[1] == 'rig-process':
-				fp.write("\n  ApplyArmature HumanMesh ;\n")
-				for proxy in proxyData.values():
-					if proxy.name and not proxy.rig:
-						fp.write("  ApplyArmature %sMesh ;\n" % proxy.name)
-				mhx_rig.writeAllProcesses(fp)
-				mhx_rig.reapplyArmature(fp, "HumanMesh")
-				for proxy in proxyData.values():
-					if proxy.name and not proxy.rig:
-						mhx_rig.reapplyArmature(fp, proxy.name)
+				pass
+			#	fp.write("\n  ApplyArmature HumanMesh ;\n")
+			#	for proxy in proxyData.values():
+			#		if proxy.name and not proxy.rig:
+			#			fp.write("  ApplyArmature %sMesh ;\n" % proxy.name)
+			#	mhx_rig.writeAllProcesses(fp)
+			#	mhx_rig.reapplyArmature(fp, "HumanMesh")
+			#	for proxy in proxyData.values():
+			#		if proxy.name and not proxy.rig:
+			#			mhx_rig.reapplyArmature(fp, proxy.name)
 			elif words[1] == 'ProxyRigStart':
 				proxy = mh2proxy.readProxyFile(obj, proxyStuff)
 				proxyData[proxy.name] = proxy
@@ -218,7 +254,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 			elif words[1] == 'ProxyRigObject':
 				fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
 			elif words[1] == 'ProxyPose':
-				mh2proxy.writeProxyPose(fp, proxy)
+				mh2proxy.writeRigPose(fp, proxy.name, proxy.bones)
 			elif words[1] == 'ProxyMesh':
 				mat = proxy.material
 				if mat:
@@ -300,9 +336,16 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 					fp.write(" ;\n")
 			elif words[1] == 'VertexGroup':
 				if proxy and proxy.weights:
-					mh2proxy.writeProxyWeights(fp, proxy)
+					mh2proxy.writeRigWeights(fp, proxy.weights)
 				else:
-					copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)	
+					if rig == 'mhx':
+						copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)
+					else:
+						if proxy:
+							weights = mh2proxy.getProxyWeights(rig.weights, proxy)
+						else:
+							weights = rig.weights
+						mh2proxy.writeRigWeights(fp, weights)
 					copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)	
 					if not (proxy and proxy.cage):
 						fp.write("#if toggle&T_Cage\n")
@@ -310,17 +353,19 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 						fp.write("#endif\n")
 			elif words[1] == 'mesh-shapeKey':
 				pass
-				writeShapeKeys(fp, "HumanMesh", None)
+				writeShapeKeys(fp, rig, "HumanMesh", None)
 			elif words[1] == 'proxy-shapeKey':
-				proxyShapes('Cage', proxyData, fp)
-				proxyShapes('Proxy', proxyData, fp)
-				proxyShapes('Clothes', proxyData, fp)
+				proxyShapes('Cage', rig, proxyData, fp)
+				proxyShapes('Proxy', rig, proxyData, fp)
+				proxyShapes('Clothes', rig, proxyData, fp)
 			elif words[1] == 'mesh-animationData':
-				writeAnimationData(fp, "HumanMesh", None)
+				if rig == 'mhx':
+					writeAnimationData(fp, "HumanMesh", None)
 			elif words[1] == 'proxy-animationData':
-				for proxy in proxyData.values():
-					if proxy.name:
-						writeAnimationData(fp, proxy.name+"Mesh", proxy)
+				if rig == 'mhx':
+					for proxy in proxyData.values():
+						if proxy.name:
+							writeAnimationData(fp, proxy.name+"Mesh", proxy)
 			elif words[1] == 'ProxyModifiers':
 				for mod in proxy.modifiers:
 					if mod[0] == 'subsurf':
@@ -547,10 +592,10 @@ def printProxyShape(fp, shapes):
 	return
 
 #
-#	writeShapeKeys(fp, name, proxy):
+#	writeShapeKeys(fp, rig, name, proxy):
 #
 
-def writeShapeKeys(fp, name, proxy):
+def writeShapeKeys(fp, rig, name, proxy):
 	fp.write(
 "#if toggle&(T_Face+T_Shape)\n" +
 "ShapeKeys %s\n" % name +
@@ -568,6 +613,12 @@ def writeShapeKeys(fp, name, proxy):
 	fp.write("#if toggle&T_Shape\n")
 	copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 	fp.write("#endif\n")
+
+	if rig != 'mhx':
+		fp.write(
+"end ShapeKeys\n" +
+"#endif\n")
+		return
 
 	fp.write(
 "  AnimationData None (toggle&T_Symm==0)\n")
@@ -593,14 +644,14 @@ def writeShapeKeys(fp, name, proxy):
 	return	
 
 #
-#	proxyShapes(typ, proxyData, fp):
+#	proxyShapes(typ, rig, proxyData, fp):
 #
 
-def proxyShapes(typ, proxyData, fp):
+def proxyShapes(typ, rig, proxyData, fp):
 	fp.write("#if toggle&T_%s\n" % typ)
 	for proxy in proxyData.values():
 		if proxy.name and proxy.type == typ and not proxy.rig:
-			writeShapeKeys(fp, proxy.name+"Mesh", proxy)
+			writeShapeKeys(fp, rig, proxy.name+"Mesh", proxy)
 	fp.write("#endif\n")
 		
 
@@ -645,7 +696,7 @@ def copyMeshFile249(obj, tmpl, fp):
 				skipOne = True
 				fp.write("#endif\n")
 				mainMesh = False
-				(useMain, proxyList) = mh2proxy.proxyConfig()
+				(useMain, useRig, proxyList) = mh2proxy.proxyConfig()
 				fp.write("#if useProxy\n")
 				for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 					if useObj:
