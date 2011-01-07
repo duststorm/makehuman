@@ -346,13 +346,14 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.tool = None
 
         # details tool panel background
-
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_details_gender.png'), [10, 80, 9.0],128,128)
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_details_face.png'), [10, 211, 9.0],128,256)
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images','group_details_pelvis.png'),[650, 211, 9.0],128,128)
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_details_head.png'), [650, 80, 9.0],128,128)
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_details_modifiers.png'), [650, 342, 9.0],128,128)
-
+        
+        gui3d.GroupBox(self, label = 'Gender', position=[10, 80, 9.0], width=128, height=128)
+        gui3d.GroupBox(self, label = 'Face', position=[10, 211, 9.0], width=128, height=256)
+        gui3d.GroupBox(self, label = 'Palvis', position=[650, 211, 9.0], width=128, height=128)
+        gui3d.GroupBox(self, label = 'Head', position=[650, 80, 9.0], width=128, height=128)
+        gui3d.GroupBox(self, label = 'Modifiers', position=[650, 342, 9.0], width=128, height=128)
+        gui3d.GroupBox(self, label = 'Actions', position=[10, 472, 9.0], width=128, height=64)
+        
         self.genitalsSlider = gui3d.Slider(self, position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0, label="Genitalia")
 
         self.genitals = None
@@ -719,8 +720,8 @@ class MicroModelingTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Micro modelling', label='Micro')
         self.tool = None
         
-
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_details_modifiers.png'), [10, 339, 9.0],128,128)
+        gui3d.GroupBox(self, label = 'Modifiers', position=[10, 339, 9.0], width=128, height=128)
+        gui3d.GroupBox(self, label = 'Actions', position=[10, 472, 9.0], width=128, height=64)
 
         self.microButtonGroup = []
 

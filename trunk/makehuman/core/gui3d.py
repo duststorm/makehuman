@@ -1327,3 +1327,75 @@ class FileChooser(View):
 
         self.app.scene3d.redraw()
         
+class GroupBox(View):
+    
+    """
+    A group box widget. This widget can be used to show which widgets belong together.
+    """
+
+    def __init__(self, parent, texture=None, position=[0, 0, 9],\
+        label=None, width=128, height=64, fontSize = defaultFontSize, border=[8, 24, 8, 8]):
+        
+        """
+        This is the constructor for the Button class. It takes the following parameters:
+
+        - **parent**: *View*. The parent view.
+        - **mesh**: *String*. The box object.
+        - **texture**: *String*. The box texture.
+        - **position**: *List*. The box position.
+        - **label**: *String*. The box label.
+        - **width**: *Float*. The box width.
+        - **height**: *Float*. The box height.
+        - **fontSize**: *Float*. The box label font size.
+        """
+        
+        View.__init__(self, parent)
+        
+        texture = texture or self.app.getThemeResource('images', 'group_box.png')
+        
+        outer=[[0, 0], [width, height]]
+        inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
+        
+        print outer, inner
+            
+        self.box = module3d.Object3D('group_box_' + label)
+        self.box.uvValues = []
+        self.box.indexBuffer = []
+        
+        # create group
+        fg = self.box.createFaceGroup('box')
+        
+        xc = [outer[0][0], inner[0][0], inner[1][0], outer[1][0]]
+        yc = [outer[0][1], inner[0][1], inner[1][1], outer[1][1]]
+        xuv = [0.0, border[0] / 128.0, (128.0 - border[2]) / 128.0, 1.0]
+        yuv = [1.0, 1.0 - border[1] / 64.0, 1.0 - (64.0 - border[3]) / 64.0, 0.0]
+        
+        v = []
+        uv = []
+        
+        for y in yc:
+            for x in xc:  
+                v.append(self.box.createVertex([x, y, 0.0]))
+                
+        for y in yuv:
+            for x in xuv:  
+                uv.append([x, y])
+                
+        print len(v), v
+        print len(uv), uv
+                
+        for y in xrange(3):
+            for x in xrange(3):
+                o = x + y * 4
+                fg.createFace(v[o+4], v[o+1], v[o], uv=(uv[o+4], uv[o+1], uv[o]))
+                fg.createFace(v[o+4], v[o+5], v[o+1], uv=(uv[o+4], uv[o+5], uv[o+1]))
+                
+        self.box.texture = texture
+        self.box.updateIndexBuffer()
+        
+        self.box = Object(self, self.box, None, position)
+        
+        if isinstance(label, str):
+            self.label = TextObject(self, text = label, position = [position[0]+5,position[1] + 2,position[2]+0.001], fontSize = fontSize)
+            #assumes box obj origin is upper left corner
+            #TODO text should be in the middle of button, calculate this from text length

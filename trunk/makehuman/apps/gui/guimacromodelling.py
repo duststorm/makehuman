@@ -128,11 +128,10 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         self.status = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 585, 9.1])
 
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_main.png'), [10, 80, 9.0], 128,256)
-        gui3d.Object(category, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_actions.png'), [10, 472, 9.0], 128,64)
-        #gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_ethnics.png'), [10, 340, 9.0],128,128)
-
-    # Macro sliders
+        gui3d.GroupBox(self, label = 'Main', position=[10, 80, 9.0], width=128, height=256)
+        gui3d.GroupBox(self, label = 'Actions', position=[10, 472, 9.0], width=128, height=64)
+       
+        # Macro sliders
 
         self.genderSlider = gui3d.Slider(self, position=[10, 105, 9.3], value=0.5, label = "Gender")
         self.ageSlider = gui3d.Slider(self, position=[10, 145, 9.01], value=0.5, label = "Age")

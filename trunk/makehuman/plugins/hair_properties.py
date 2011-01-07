@@ -36,7 +36,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Hair')
                                 
-        gui3d.Object(self, 'data/3dobjs/unit_square.obj', self.app.getThemeResource('images', 'group_hair_tool.png'), [10, 211, 9.0], 128,256)
+        gui3d.GroupBox(self, label = 'Hair tool', position=[10, 211, 9.0], width=128, height=256)
 
         #############
         #SLIDERS
