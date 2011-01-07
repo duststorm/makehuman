@@ -25,6 +25,10 @@ import os
 import aljabr
 import math
 import types
+import shutil
+
+if not os.path.isdir("../tmp2"):
+    os.mkdir("../tmp2")
 
 theta = 0.01
 failedToOpen = []
@@ -59,10 +63,17 @@ def check_symm(path):
     for leftTarget in os.listdir(path):
         if "svn" not in leftTarget:
             if leftTarget.split("-")[0] == "l":
-                rightTarget = "r"+leftTarget[1:]
+                if leftTarget.find("trans-in") != -1:
+                    rightTarget = "r"+leftTarget[1:].replace("trans-in","trans-out")
+                elif leftTarget.find("trans-out") != -1:
+                    rightTarget = "r"+leftTarget[1:].replace("trans-out","trans-in")  
+                else:
+                    rightTarget = "r"+leftTarget[1:]
+                    
                 tPath1 = os.path.join(path, leftTarget)
                 tPath2 = os.path.join(path, rightTarget)
-                if analyze_target(tPath1,tPath2) > theta:
+                if analyze_target(tPath1,tPath2) > theta:                    
+                    #shutil.copyfile(os.path.join(path,os.path.basename(leftTarget)), os.path.join("../tmp2",os.path.basename(leftTarget)))
                     print "-> %s"%(rightTarget)
                     n += 1
     print "Found %i problem in symmetric targets"%(n)

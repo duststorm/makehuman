@@ -16,13 +16,178 @@
    version="1.1"
    inkscape:version="0.48.0 r9654"
    sodipodi:docname="MHbuttons.svg"
-   inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_load.png"
-   inkscape:export-xdpi="90.000084"
-   inkscape:export-ydpi="90.000084"
+   inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_toggle.png"
+   inkscape:export-xdpi="45"
+   inkscape:export-ydpi="45"
    sodipodi:version="0.32"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient5432">
+      <stop
+         style="stop-color:#ff6600;stop-opacity:1;"
+         offset="0"
+         id="stop5434" />
+      <stop
+         style="stop-color:#bf4c00;stop-opacity:1;"
+         offset="1"
+         id="stop5436" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5392">
+      <stop
+         style="stop-color:#5a5a5a;stop-opacity:1;"
+         offset="0"
+         id="stop5394" />
+      <stop
+         style="stop-color:#474747;stop-opacity:1;"
+         offset="1"
+         id="stop5396" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5234">
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="0"
+         id="stop5236" />
+      <stop
+         style="stop-color:#808080;stop-opacity:1;"
+         offset="1"
+         id="stop5238" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4925">
+      <stop
+         id="stop4927"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop4929"
+         offset="1"
+         style="stop-color:#474747;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4893">
+      <stop
+         style="stop-color:#474747;stop-opacity:1;"
+         offset="0"
+         id="stop4895" />
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="1"
+         id="stop4897" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4874">
+      <stop
+         style="stop-color:#323232;stop-opacity:1;"
+         offset="0"
+         id="stop4876" />
+      <stop
+         style="stop-color:#060606;stop-opacity:1;"
+         offset="1"
+         id="stop4878" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4866">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4868" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="1"
+         id="stop4870" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4817">
+      <stop
+         style="stop-color:#f58220;stop-opacity:1;"
+         offset="0"
+         id="stop4819" />
+      <stop
+         style="stop-color:#b35608;stop-opacity:1;"
+         offset="1"
+         id="stop4821" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4803">
+      <stop
+         id="stop4805"
+         offset="0"
+         style="stop-color:#333333;stop-opacity:1;" />
+      <stop
+         id="stop4807"
+         offset="1"
+         style="stop-color:#333333;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4841">
+      <stop
+         style="stop-color:#808080;stop-opacity:1;"
+         offset="0"
+         id="stop4843" />
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="1"
+         id="stop4845" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4816">
+      <stop
+         id="stop4818"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop4820"
+         offset="1"
+         style="stop-color:#151515;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4726">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop4728" />
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="1"
+         id="stop4730" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4720">
+      <stop
+         id="stop4722"
+         offset="0"
+         style="stop-color:#333333;stop-opacity:1;" />
+      <stop
+         id="stop4724"
+         offset="1"
+         style="stop-color:#151515;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4700">
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="0"
+         id="stop4702" />
+      <stop
+         style="stop-color:#151515;stop-opacity:1;"
+         offset="1"
+         id="stop4704" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4651">
+      <stop
+         id="stop4653"
+         offset="0"
+         style="stop-color:#333333;stop-opacity:1;" />
+      <stop
+         id="stop4655"
+         offset="1"
+         style="stop-color:#151515;stop-opacity:1;" />
+    </linearGradient>
     <linearGradient
        inkscape:collect="always"
        id="linearGradient3847">
@@ -1699,6 +1864,521 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4651"
+       id="linearGradient4664"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,0,-6.3784494)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4726"
+       id="linearGradient4664-7"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,-0.10032095,33.463569)" />
+    <linearGradient
+       id="linearGradient4651-0">
+      <stop
+         id="stop4653-5"
+         offset="0"
+         style="stop-color:#333333;stop-opacity:1;" />
+      <stop
+         id="stop4655-1"
+         offset="1"
+         style="stop-color:#151515;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4841"
+       id="linearGradient4664-7-2"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,-73.979459,34.843566)" />
+    <linearGradient
+       id="linearGradient4726-4">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop4728-9" />
+      <stop
+         style="stop-color:#151515;stop-opacity:1;"
+         offset="1"
+         id="stop4730-9" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4651-4">
+      <stop
+         id="stop4653-9"
+         offset="0"
+         style="stop-color:#333333;stop-opacity:1;" />
+      <stop
+         id="stop4655-8"
+         offset="1"
+         style="stop-color:#151515;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4726-4-4"
+       id="linearGradient4664-7-2-3"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,-72.812375,-5.6289268)" />
+    <linearGradient
+       id="linearGradient4726-4-4">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop4728-9-6" />
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="1"
+         id="stop4730-9-1" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient4823"
+       x1="-706.94537"
+       y1="-10.235018"
+       x2="-706.94537"
+       y2="-1.9611826"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient4831"
+       x1="-706.77051"
+       y1="11.912613"
+       x2="-706.77051"
+       y2="19.964254"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0160547,0,0,1,11.619501,0)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient4839"
+       x1="-671.47632"
+       y1="10.571428"
+       x2="-671.47632"
+       y2="19.967142"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0209094,0,0,1,14.343786,0)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient4848"
+       x1="-708.86182"
+       y1="49.774666"
+       x2="-708.86182"
+       y2="59.248638"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0160547,0,0,1,11.620847,0)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient4856"
+       x1="-672.00659"
+       y1="50.484749"
+       x2="-672.00659"
+       y2="59.087212"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0209094,0,0,1,14.345532,0)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient4864"
+       x1="-671.12958"
+       y1="68.781754"
+       x2="-671.12958"
+       y2="77.738281"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0209094,0,0,1.0034394,14.336536,-0.2693777)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4874"
+       id="linearGradient4880"
+       x1="518.36218"
+       y1="356.34018"
+       x2="518.43274"
+       y2="371.76172"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4874"
+       id="linearGradient4884"
+       gradientUnits="userSpaceOnUse"
+       x1="518.36218"
+       y1="356.34018"
+       x2="518.43274"
+       y2="371.76172" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4874"
+       id="linearGradient4888"
+       gradientUnits="userSpaceOnUse"
+       x1="518.36218"
+       y1="356.34018"
+       x2="518.43274"
+       y2="371.76172"
+       gradientTransform="matrix(1.0213,0,0,1.0213,-1221.1416,-378.70485)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient4899"
+       x1="-669.69702"
+       y1="-10.673222"
+       x2="-669.69702"
+       y2="-1.4927672"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0209095,0,0,1,14.33465,0)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient4907"
+       x1="-669.90564"
+       y1="31.263659"
+       x2="-669.90564"
+       y2="40.427193"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0209094,0,0,1,14.34831,0)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient4915"
+       x1="-707.65503"
+       y1="31.71043"
+       x2="-707.65503"
+       y2="40.434074"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0160547,0,0,1,11.62299,0)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient4923"
+       x1="-708.6134"
+       y1="68.50631"
+       x2="-708.6134"
+       y2="78.568726"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0160547,0,0,1.0034394,11.627618,-0.26918907)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient5100"
+       x1="-749.04962"
+       y1="116.82771"
+       x2="-749.04962"
+       y2="123.77815"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,15.744658,-5.3461618)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient5102"
+       x1="-710.8092"
+       y1="116.82771"
+       x2="-710.8092"
+       y2="124.10378"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,14.940863,-5.3461618)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient5104"
+       x1="-672.35187"
+       y1="116.82771"
+       x2="-672.35187"
+       y2="123.8336"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,14.132509,-5.3461618)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893"
+       id="linearGradient5106"
+       x1="-634.60101"
+       y1="116.82771"
+       x2="-634.60101"
+       y2="124.79034"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,13.339004,-5.3461618)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient5114"
+       x1="-749.48853"
+       y1="138.52977"
+       x2="-749.48853"
+       y2="145.80583"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,15.753884,-6.278084)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient5116"
+       x1="-711.24817"
+       y1="138.52977"
+       x2="-711.24817"
+       y2="145.50293"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,14.95009,-6.278084)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient5118"
+       x1="-672.79083"
+       y1="138.52977"
+       x2="-672.79083"
+       y2="145.82922"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,14.141736,-6.278084)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925"
+       id="linearGradient5120"
+       x1="-635.03998"
+       y1="138.52977"
+       x2="-635.03998"
+       y2="145.16431"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,13.348231,-6.278084)" />
+    <linearGradient
+       id="linearGradient4925-2">
+      <stop
+         id="stop4927-7"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop4929-3"
+         offset="1"
+         style="stop-color:#474747;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5234"
+       id="linearGradient5118-3"
+       x1="-672.79083"
+       y1="138.52977"
+       x2="-672.79083"
+       y2="145.82922"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,13.715881,25.848813)" />
+    <linearGradient
+       id="linearGradient5137">
+      <stop
+         id="stop5139"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop5141"
+         offset="1"
+         style="stop-color:#474747;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5234"
+       id="linearGradient5116-9"
+       x1="-711.24817"
+       y1="138.52977"
+       x2="-711.24817"
+       y2="145.50293"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,14.524241,25.848813)" />
+    <linearGradient
+       id="linearGradient5144">
+      <stop
+         id="stop5146"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop5148"
+         offset="1"
+         style="stop-color:#474747;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925-2"
+       id="linearGradient5114-2"
+       x1="-749.48853"
+       y1="138.52977"
+       x2="-749.48853"
+       y2="145.80583"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,15.753884,-6.278084)" />
+    <linearGradient
+       id="linearGradient5151">
+      <stop
+         id="stop5153"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop5155"
+         offset="1"
+         style="stop-color:#474747;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       y2="145.80583"
+       x2="-749.48853"
+       y1="138.52977"
+       x1="-749.48853"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,15.328031,25.848813)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient5169"
+       xlink:href="#linearGradient5234"
+       inkscape:collect="always" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5234"
+       id="linearGradient5246"
+       x1="-619.35413"
+       y1="167.48404"
+       x2="-619.35413"
+       y2="178.27541"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       gradientTransform="translate(47.227118,0.061697)"
+       inkscape:collect="always"
+       xlink:href="#linearGradient5234-7"
+       id="linearGradient5246-5"
+       x1="-619.35413"
+       y1="167.48404"
+       x2="-619.35413"
+       y2="178.27541"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5234-7">
+      <stop
+         style="stop-color:#b3b3b3;stop-opacity:1;"
+         offset="0"
+         id="stop5236-3" />
+      <stop
+         style="stop-color:#808080;stop-opacity:1;"
+         offset="1"
+         id="stop5238-9" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4893-7"
+       id="linearGradient5106-0"
+       x1="-634.60101"
+       y1="116.82771"
+       x2="-634.60101"
+       y2="124.79034"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,60.566118,-5.284463)" />
+    <linearGradient
+       id="linearGradient4893-7">
+      <stop
+         style="stop-color:#474747;stop-opacity:1;"
+         offset="0"
+         id="stop4895-2" />
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="1"
+         id="stop4897-7" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925-9"
+       id="linearGradient5120-2"
+       x1="-635.03998"
+       y1="138.52977"
+       x2="-635.03998"
+       y2="145.16431"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,13.348231,-6.278084)" />
+    <linearGradient
+       id="linearGradient4925-9">
+      <stop
+         id="stop4927-0"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop4929-5"
+         offset="1"
+         style="stop-color:#474747;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       y2="145.16431"
+       x2="-635.03998"
+       y1="138.52977"
+       x1="-635.03998"
+       gradientTransform="matrix(1.0210195,0,0,1.0429416,60.575348,-6.216393)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient5299"
+       xlink:href="#linearGradient4925-9"
+       inkscape:collect="always" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5392"
+       id="linearGradient5356"
+       x1="-740.89972"
+       y1="-65.519096"
+       x2="-740.89972"
+       y2="-59.150574"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4925-9-8"
+       id="linearGradient5356-1"
+       x1="-740.89972"
+       y1="-65.519096"
+       x2="-740.89972"
+       y2="-59.150574"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient4925-9-8">
+      <stop
+         id="stop4927-0-8"
+         offset="0"
+         style="stop-color:#808080;stop-opacity:1;" />
+      <stop
+         id="stop4929-5-7"
+         offset="1"
+         style="stop-color:#474747;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5392-2"
+       id="linearGradient5356-5"
+       x1="-740.89972"
+       y1="-65.519096"
+       x2="-740.89972"
+       y2="-59.150574"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5392-2">
+      <stop
+         style="stop-color:#5a5a5a;stop-opacity:1;"
+         offset="0"
+         id="stop5394-7" />
+      <stop
+         style="stop-color:#474747;stop-opacity:1;"
+         offset="1"
+         id="stop5396-9" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5432"
+       id="linearGradient5438"
+       x1="-767.76624"
+       y1="-34.411976"
+       x2="-767.76624"
+       y2="-26.802652"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -1707,16 +2387,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.2382812"
-     inkscape:cx="1032.9562"
-     inkscape:cy="514.31722"
+     inkscape:zoom="3.1654076"
+     inkscape:cx="-769.42151"
+     inkscape:cy="1069.6209"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="977"
-     inkscape:window-x="-4"
-     inkscape:window-y="-4"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -5427,23 +6107,23 @@
          x="-188.16556"
          y="199.23593">Backgr.</tspan></text>
     <rect
-       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.9677037;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.9677037;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-38"
        width="399.03229"
        height="19.032297"
-       x="-447.38757"
-       y="215.17123"
+       x="-830.27667"
+       y="194.95267"
        ry="2.8548443"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/texedit_off.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:#323232;fill-opacity:1;stroke:#f58220;stroke-width:1.35341251;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:1.35341251;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-38-8"
        width="398.64658"
        height="18.646587"
-       x="-446.79428"
-       y="241.06908"
+       x="-829.68335"
+       y="220.85051"
        ry="2.7969878"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/texedit_on.png"
        inkscape:export-xdpi="90"
@@ -6317,31 +6997,16 @@
          x="-192.92273"
          y="-17.874035">Ethnics</tspan></text>
     <rect
-       style="fill:#323232;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:url(#linearGradient5356);fill-opacity:1.0;stroke:none"
        id="rect3737-3-4-3-4-0"
-       width="63.073643"
-       height="15.073632"
-       x="-277.28354"
-       y="-53.597961"
-       ry="2.2610445"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_makereal.png"
+       width="64"
+       height="16"
+       x="-771.41272"
+       y="-75.075813"
+       ry="2.3999996"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_unselected.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <text
-       xml:space="preserve"
-       style="font-size:11.81255817px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
-       x="-276.51074"
-       y="-42.831791"
-       id="text3802-22-3-7-3-0"
-       sodipodi:linespacing="125%"
-       transform="scale(0.99469202,1.0053363)"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_makereal.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"><tspan
-         sodipodi:role="line"
-         id="tspan3804-1-0-8-7-6"
-         x="-276.51074"
-         y="-42.831791">MakeReal</tspan></text>
     <rect
        style="fill:#f58220;fill-opacity:1;stroke:#808080;stroke-width:0.92636871;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-27-8-3-8-9-8"
@@ -6982,5 +7647,839 @@
          x="1082.8031"
          y="482.13248"
          style="font-size:13px;fill:#ffff00">Body</tspan></text>
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4"
+       width="64"
+       height="31.999996"
+       x="319.15094"
+       y="-65.23204"
+       ry="7.1455488"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       rx="7.1455488" />
+    <rect
+       style="fill:url(#linearGradient4664);fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-0"
+       width="64"
+       height="20.690231"
+       x="319.15094"
+       y="-53.922276"
+       ry="0"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-1"
+       width="64"
+       height="31.999996"
+       x="319.05063"
+       y="-25.390022"
+       ry="7.3689342"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       rx="7.3689342" />
+    <rect
+       style="fill:url(#linearGradient4664-7);fill-opacity:1.0;stroke:none"
+       id="rect3737-3-4-6-4-0-0"
+       width="64"
+       height="20.690231"
+       x="319.05063"
+       y="-14.080256"
+       ry="0"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#808080;fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-1-9"
+       width="64"
+       height="31.999996"
+       x="245.17149"
+       y="-24.010025"
+       ry="7.1455488"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab2_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       rx="7.1455488" />
+    <rect
+       style="fill:url(#linearGradient4664-7-2);fill-opacity:1.0;stroke:none"
+       id="rect3737-3-4-6-4-0-0-3"
+       width="64"
+       height="20.690231"
+       x="245.17149"
+       y="-12.70026"
+       ry="0"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab2_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-1-9-5"
+       width="64"
+       height="31.999996"
+       x="246.33856"
+       y="-64.482513"
+       ry="7.1455488"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab2.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       rx="7.1455488" />
+    <rect
+       style="fill:url(#linearGradient4664-7-2-3);fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-0-0-3-6"
+       width="64"
+       height="20.690231"
+       x="246.33856"
+       y="-53.172752"
+       ry="0"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_tab2.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_translation_on.png"
+       ry="2.4000001"
+       y="4.3691416"
+       x="-723.74481"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-8-0-6-2-9"
+       style="fill:url(#linearGradient4831);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_translation_on.png"
+       transform="scale(0.98418257,1.0160716)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-3-7-0-4-2"
+       y="15.806424"
+       x="-732.58008"
+       style="font-size:10.31354332000000085px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="15.806424"
+         x="-732.58008"
+         id="tspan3804-56-401-8-4-8-7-6"
+         sodipodi:role="line">Move</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_scale_on.png"
+       ry="2.4000001"
+       y="4.3691416"
+       x="-685.9964"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-0-0-7-6"
+       style="fill:url(#linearGradient4839);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_scale_on.png"
+       transform="scale(0.98418251,1.0160717)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-2-5-0-2-7-5-4"
+       y="16.517313"
+       x="-694.22498"
+       style="font-size:10.33815384000000037px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="16.517313"
+         x="-694.22498"
+         id="tspan3804-56-401-7-4-0-4-3-4-9"
+         sodipodi:role="line">Scale</tspan></text>
+    <rect
+       style="fill:url(#linearGradient4823);fill-opacity:1.0;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-8-65-8-50"
+       width="32"
+       height="15.999995"
+       x="-723.30835"
+       y="-17.332909"
+       ry="2.3999994"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_translation.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.23173734px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-732.13654"
+       y="-5.5524006"
+       id="text3802-47-0-3-5-1-4"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418267,1.0160715)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_translation.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-8-6-2-8"
+         x="-732.13654"
+         y="-5.5524006">Move</tspan></text>
+    <rect
+       style="fill:url(#linearGradient4899);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-3-9-17"
+       width="32"
+       height="15.999995"
+       x="-685.55743"
+       y="-17.332905"
+       ry="2.3999994"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_scale.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.31922245px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-693.77887"
+       y="-4.8415136"
+       id="text3802-47-0-2-5-0-5-3-2"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418272,1.0160715)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_scale.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         style="font-size:10.31922245px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial"
+         sodipodi:role="line"
+         id="tspan3804-56-401-7-4-0-0-6-7"
+         x="-693.77887"
+         y="-4.8415136">Scale</tspan></text>
+    <rect
+       style="fill:url(#linearGradient4915);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-8-65-8-5-22"
+       width="32"
+       height="16"
+       x="-723.96216"
+       y="24.603975"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmleft.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.31354332px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-732.80103"
+       y="35.721119"
+       id="text3802-47-0-3-5-1-2-6"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418257,1.0160716)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmleft.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-8-6-2-6-1"
+         x="-732.80103"
+         y="35.721119">Sym</tspan></text>
+    <rect
+       style="fill:url(#linearGradient4907);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-3-9-1-0"
+       width="32"
+       height="16"
+       x="-686.21277"
+       y="24.603975"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmright.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.33815384px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-694.44489"
+       y="36.432049"
+       id="text3802-47-0-2-5-0-5-3-3-6"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418251,1.0160717)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmright.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-7-4-0-0-6-3-1"
+         x="-694.44489"
+         y="36.432049">Sym</tspan></text>
+    <path
+       sodipodi:type="star"
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       id="path4831-2-0-7-5"
+       sodipodi:sides="3"
+       sodipodi:cx="-122.22846"
+       sodipodi:cy="148.27567"
+       sodipodi:r1="11.1575"
+       sodipodi:r2="5.5787497"
+       sodipodi:arg1="1.5707963"
+       sodipodi:arg2="2.6179939"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m -122.22846,159.43317 -4.83134,-8.36813 -4.83134,-8.36812 9.66268,0 9.66268,-1e-5 -4.83134,8.36813 z"
+       transform="matrix(0,-0.38655205,0.37842692,0,-753.5273,-13.398946)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmleft.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:transform-center-x="-1.4192425" />
+    <path
+       sodipodi:type="star"
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       id="path4831-2-0-7-8-9"
+       sodipodi:sides="3"
+       sodipodi:cx="-122.22846"
+       sodipodi:cy="148.27567"
+       sodipodi:r1="11.1575"
+       sodipodi:r2="5.5787497"
+       sodipodi:arg1="1.5707963"
+       sodipodi:arg2="2.6179939"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m -122.22846,159.43317 -4.83134,-8.36813 -4.83134,-8.36812 9.66268,0 9.66268,-1e-5 -4.83134,8.36813 z"
+       transform="matrix(0,-0.38655205,-0.37842692,0,-601.66851,-13.398946)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmright.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:transform-center-x="1.4192385" />
+    <rect
+       style="fill:url(#linearGradient4848);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-8-65-8-5-2-4"
+       width="32"
+       height="16"
+       x="-723.82867"
+       y="43.404434"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmleft_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.31354332000000085px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-732.66541"
+       y="54.224216"
+       id="text3802-47-0-3-5-1-2-3-9"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418257,1.0160716)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmleft_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-8-6-2-6-5-0"
+         x="-732.66541"
+         y="54.224216">Sym</tspan></text>
+    <rect
+       style="fill:url(#linearGradient4856);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-3-9-1-7-9"
+       width="32"
+       height="16"
+       x="-686.0799"
+       y="43.404434"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmright_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.33815384000000037px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-694.30988"
+       y="54.935154"
+       id="text3802-47-0-2-5-0-5-3-3-8-1"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418251,1.0160717)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmright_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-7-4-0-0-6-3-9-7"
+         x="-694.30988"
+         y="54.935154">Sym</tspan></text>
+    <path
+       sodipodi:type="star"
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="path4831-2-0-7-4-7"
+       sodipodi:sides="3"
+       sodipodi:cx="-122.22846"
+       sodipodi:cy="148.27567"
+       sodipodi:r1="11.1575"
+       sodipodi:r2="5.5787497"
+       sodipodi:arg1="1.5707963"
+       sodipodi:arg2="2.6179939"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m -122.22846,159.43317 -4.83134,-8.36813 -4.83134,-8.36812 9.66268,0 9.66268,-1e-5 -4.83134,8.36813 z"
+       transform="matrix(0,-0.38655205,0.37842692,0,-753.39382,5.4015341)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmleft_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:transform-center-x="-1.4192435" />
+    <path
+       sodipodi:type="star"
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="path4831-2-0-7-8-1-1"
+       sodipodi:sides="3"
+       sodipodi:cx="-122.22846"
+       sodipodi:cy="148.27567"
+       sodipodi:r1="11.1575"
+       sodipodi:r2="5.5787497"
+       sodipodi:arg1="1.5707963"
+       sodipodi:arg2="2.6179939"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m -122.22846,159.43317 -4.83134,-8.36813 -4.83134,-8.36812 9.66268,0 9.66268,-1e-5 -4.83134,8.36813 z"
+       transform="matrix(0,-0.38655205,-0.37842692,0,-601.53569,5.4015341)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmright_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:transform-center-x="1.4192519" />
+    <rect
+       style="fill:url(#linearGradient4923);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-3-9-1-4-1"
+       width="32"
+       height="16"
+       x="-724.25043"
+       y="62.265972"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmetry.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.33126545px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-729.86865"
+       y="71.828171"
+       id="text3802-47-0-2-5-0-5-3-3-1-5"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418249,1.0160717)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmetry.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-7-4-0-0-6-3-6-9"
+         x="-729.86865"
+         y="71.828171">Sym</tspan></text>
+    <rect
+       style="fill:url(#linearGradient4864);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-3-9-1-4-2-7"
+       width="32"
+       height="16"
+       x="-685.64966"
+       y="62.32082"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmetry_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.35591697999999994px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-690.67194"
+       y="71.888519"
+       id="text3802-47-0-2-5-0-5-3-3-1-8-7"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418254,1.0160717)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_symmetry_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-7-4-0-0-6-3-6-5-6"
+         x="-690.67194"
+         y="71.888519">Sym</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_undo_on.png"
+       ry="2.4000001"
+       y="130.20038"
+       x="-749.48853"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-9-0"
+       style="fill:url(#linearGradient5114);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_undo_on.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-6-5"
+       y="141.31255"
+       x="-750.77814"
+       style="font-size:9.99999997px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="141.31255"
+         x="-750.77814"
+         id="tspan3804-56-401-2-0"
+         sodipodi:role="line">Undo</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_redo_on.png"
+       ry="2.4000001"
+       y="130.20038"
+       x="-711.24817"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-6-75-3"
+       style="fill:url(#linearGradient5116);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_redo_on.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-8-1-1"
+       y="141.31499"
+       x="-712.33368"
+       style="font-size:9.99999997px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="141.31499"
+         x="-712.33368"
+         id="tspan3804-56-401-4-5-8"
+         sodipodi:role="line">Redo</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_reset_on.png"
+       ry="2.4000001"
+       y="130.20038"
+       x="-672.79083"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-8-0-0"
+       style="fill:url(#linearGradient5118);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_reset_on.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-3-7-1"
+       y="141.31499"
+       x="-673.67108"
+       style="font-size:9.99999997px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="141.31499"
+         x="-673.67108"
+         id="tspan3804-56-401-8-4-7"
+         sodipodi:role="line">Reset</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_toggle_on.png"
+       ry="2.4000001"
+       y="130.20038"
+       x="-635.03998"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-0-9"
+       style="fill:url(#linearGradient5120);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_toggle_on.png"
+       transform="scale(0.99469202,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-2-5-0-2-1"
+       y="142.00389"
+       x="-635.71875"
+       style="font-size:10.00000002px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="142.00389"
+         x="-635.71875"
+         id="tspan3804-56-401-7-4-0-4-0"
+         sodipodi:role="line">BckG</tspan></text>
+    <rect
+       style="fill:url(#linearGradient5100);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-3"
+       width="32"
+       height="16"
+       x="-749.04962"
+       y="108.49832"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_undo.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.3192234px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-758.29163"
+       y="118.28599"
+       id="text3802-47-0-5"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418252,1.0160717)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_undo.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-9"
+         x="-758.29163"
+         y="118.28599">Undo</tspan></text>
+    <rect
+       style="fill:url(#linearGradient5102);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-6-4"
+       width="32"
+       height="16"
+       x="-710.8092"
+       y="108.49832"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_redo.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.3192234px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-719.43671"
+       y="118.28851"
+       id="text3802-47-0-8-84"
+       sodipodi:linespacing="125%"
+       transform="scale(0.98418252,1.0160717)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_redo.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-4-6"
+         x="-719.43671"
+         y="118.28851">Redo</tspan></text>
+    <rect
+       style="fill:url(#linearGradient5104);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-8-9"
+       width="32"
+       height="16"
+       x="-672.35187"
+       y="108.49832"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_reset.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-673.2298"
+       y="119.7281"
+       id="text3802-47-0-3-2"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_reset.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-8-9"
+         x="-673.2298"
+         y="119.7281">Reset</tspan></text>
+    <rect
+       style="fill:url(#linearGradient5106);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-30"
+       width="32"
+       height="16"
+       x="-634.60101"
+       y="108.49832"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_toggle.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10.00000002px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-635.27747"
+       y="120.41701"
+       id="text3802-47-0-2-5-0-3"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_toggle.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-7-4-0-3"
+         x="-635.27747"
+         y="120.41701">BckG</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_undo_focused.png"
+       ry="2.4000001"
+       y="162.32727"
+       x="-749.91437"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-9-0-4"
+       style="fill:url(#linearGradient5169);fill-opacity:1.0;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_undo_focused.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-6-5-4"
+       y="173.26892"
+       x="-751.2063"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="173.26892"
+         x="-751.2063"
+         id="tspan3804-56-401-2-0-4"
+         sodipodi:role="line">Undo</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_redo_focused.png"
+       ry="2.4000001"
+       y="162.32727"
+       x="-711.67401"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-6-75-3-9"
+       style="fill:url(#linearGradient5116-9);fill-opacity:1.0;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_redo_focused.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-8-1-1-9"
+       y="173.27136"
+       x="-712.76184"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="173.27136"
+         x="-712.76184"
+         id="tspan3804-56-401-4-5-8-3"
+         sodipodi:role="line">Redo</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_reset_focused.png"
+       ry="2.4000001"
+       y="162.32727"
+       x="-673.21667"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-8-0-0-8"
+       style="fill:url(#linearGradient5118-3);fill-opacity:1.0;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_reset_focused.png"
+       transform="scale(0.99469203,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-3-7-1-3"
+       y="173.27136"
+       x="-674.09924"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="173.27136"
+         x="-674.09924"
+         id="tspan3804-56-401-8-4-7-2"
+         sodipodi:role="line">Reset</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_toggle_focused.png"
+       ry="2.4000001"
+       y="162.32727"
+       x="-635.46582"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-0-9-9"
+       style="fill:url(#linearGradient5246);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="//home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_background_toggle_focused.png"
+       transform="scale(0.99469202,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-2-5-0-2-1-5"
+       y="173.96027"
+       x="-636.14691"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="173.96027"
+         x="-636.14691"
+         id="tspan3804-56-401-7-4-0-4-0-4"
+         sodipodi:role="line">BckG</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_3dglasses_on.png"
+       ry="2.4000001"
+       y="130.26208"
+       x="-587.81287"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-0-9-0"
+       style="fill:url(#linearGradient5299);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_3dglasses_on.png"
+       transform="scale(0.99469202,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-2-5-0-2-1-4"
+       y="142.06526"
+       x="-588.23962"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="142.06526"
+         x="-588.23962"
+         id="tspan3804-56-401-7-4-0-4-0-1"
+         sodipodi:role="line">3Dv</tspan></text>
+    <rect
+       style="fill:url(#linearGradient5106-0);fill-opacity:1;stroke:none"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-30-7"
+       width="32"
+       height="16"
+       x="-587.3739"
+       y="108.56001"
+       ry="2.4000001"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_3dglasses.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       x="-587.79834"
+       y="120.47838"
+       id="text3802-47-0-2-5-0-3-9"
+       sodipodi:linespacing="125%"
+       transform="scale(0.99469202,1.0053363)"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_3dglasses.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3804-56-401-7-4-0-3-3"
+         x="-587.79834"
+         y="120.47838">3Dv</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_3dglasses_focused.png"
+       ry="2.4000001"
+       y="162.38898"
+       x="-588.23871"
+       height="16"
+       width="32"
+       id="rect3737-2-0-8-5-3-8-4-09-1-4-9-0-9-9-6"
+       style="fill:url(#linearGradient5246-5);fill-opacity:1;stroke:none" />
+    <text
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_3dglasses_focused.png"
+       transform="scale(0.99469202,1.0053363)"
+       sodipodi:linespacing="125%"
+       id="text3802-47-0-2-5-0-2-1-5-2"
+       y="174.02164"
+       x="-588.66779"
+       style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
+       xml:space="preserve"><tspan
+         y="174.02164"
+         x="-588.66779"
+         id="tspan3804-56-401-7-4-0-4-0-4-1"
+         sodipodi:role="line">3Dv</tspan></text>
+    <rect
+       style="fill:url(#linearGradient5438);fill-opacity:1;stroke:none"
+       id="rect3737-3-4-3-4-0-1"
+       width="64"
+       height="16"
+       x="-809.46704"
+       y="-42.701614"
+       ry="2.3999996"
+       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_selected.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>
