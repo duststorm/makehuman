@@ -25,7 +25,6 @@ detail head-scale-vert-incr 0.250000
 detail mouth-scale-vert-decr 0.400000
 detail r-lowerleg-scale-vert-incr 0.750000
 detail nose-scale-horiz-incr 0.100000
-microdetail r-head-zygoma-trans-out 0.400000
 detail eye-trans-down 0.200000
 detail r-upperleg-scale-vert-incr 0.050000
 detail mouth-trans-forward 0.450000
@@ -45,6 +44,7 @@ detail l-upperleg-scale-horiz-decr 0.200000
 detail l-upperleg-scale-vert-incr 0.050000
 microdetail nose-glabella-scale-depth-incr 1.000000
 detail hip-trans-forward 0.750000
+microdetail r-head-zygoma-trans-in -0.400000
 detail r-lowerarm-scale-horiz-incr 0.700000
 microdetail l-head-zygoma-trans-out -0.400000
 detail mouth-scale-horiz-incr 0.850000
