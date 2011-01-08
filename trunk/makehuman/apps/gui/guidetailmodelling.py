@@ -661,8 +661,8 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
-        self.rightSymmetryButton = gui3d.Button(self, width=40, height=16, position=[660, 413, 9.2], label='Sym>')
-        self.leftSymmetryButton = gui3d.Button(self, width=40, height=16, position=[708, 413, 9.2], label='Sym<')
+        self.rightSymmetryButton = gui3d.Button(self, width=40, height=16, position=[660, 413, 9.2], label='Sym<')
+        self.leftSymmetryButton = gui3d.Button(self, width=40, height=16, position=[708, 413, 9.2], label='Sym>')
         self.symmetryButton = gui3d.ToggleButton(self, width=40, height=16, position=[660, 433, 9.2], label='Sym')
 
         @self.rightSymmetryButton.event
@@ -734,8 +734,8 @@ class MicroModelingTaskView(gui3d.TaskView):
             self.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
-        self.rightSymmetryButton = gui3d.Button(self, width=40, height=16, position=[18, 399, 9.2], label='Sym>')
-        self.leftSymmetryButton = gui3d.Button(self, width=40, height=16, position=[66, 399, 9.2], label='Sym<')
+        self.rightSymmetryButton = gui3d.Button(self, width=40, height=16, position=[18, 399, 9.2], label='Sym<')
+        self.leftSymmetryButton = gui3d.Button(self, width=40, height=16, position=[66, 399, 9.2], label='Sym>')
         self.symmetryButton = gui3d.ToggleButton(self, width=40, height=16, position=[18, 419, 9.2], label='Sym')
         
         @self.rightSymmetryButton.event
