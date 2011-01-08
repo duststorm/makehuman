@@ -9,10 +9,11 @@ class SettingsTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Settings')
 
         self.shaderGroup = []
-        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup,mesh='data/3dobjs/button_generic_long.obj', position=[600,270,9.2],label="No shader",selected=True)
-        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup,mesh='data/3dobjs/button_generic_long.obj', position=[600,300,9.2],label="Phong shader")
-        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup,mesh='data/3dobjs/button_generic_long.obj', position=[600,330,9.2],label="Toon shader")
-        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup,mesh='data/3dobjs/button_generic_long.obj', position=[600,360,9.2],label="Skin shader")
+        gui3d.GroupBox(self, label = 'Shader', position=[10, 80, 9.0], width=128, height=256)
+        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18, 112, 9.2], label="No shader", selected=True)
+        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,144,9.2],label="Phong shader")
+        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,176,9.2],label="Toon shader")
+        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,208,9.2],label="Skin shader")
         
         @self.shaderNo.event
         def onClicked(event):

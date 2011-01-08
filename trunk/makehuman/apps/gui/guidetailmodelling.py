@@ -349,7 +349,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         gui3d.GroupBox(self, label = 'Gender', position=[10, 80, 9.0], width=128, height=128)
         gui3d.GroupBox(self, label = 'Face', position=[10, 211, 9.0], width=128, height=256)
-        gui3d.GroupBox(self, label = 'Palvis', position=[650, 211, 9.0], width=128, height=128)
+        gui3d.GroupBox(self, label = 'Pelvis', position=[650, 211, 9.0], width=128, height=128)
         gui3d.GroupBox(self, label = 'Head', position=[650, 80, 9.0], width=128, height=128)
         gui3d.GroupBox(self, label = 'Modifiers', position=[650, 342, 9.0], width=128, height=128)
         

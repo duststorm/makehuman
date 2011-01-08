@@ -61,13 +61,13 @@ class SaveTaskView(gui3d.TaskView):
             tags = filename
             filename = filename.split()[0]
 
-      # Save the thumbnail
+            # Save the thumbnail
 
             leftTop = mh.cameras[0].convertToScreen(-10, 9, 0)
             rightBottom = mh.cameras[0].convertToScreen(10, -10, 0)
             self.app.scene3d.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), os.path.join(modelPath, filename + '.bmp'))
 
-      # Save the model
+            # Save the model
 
             human = self.app.scene3d.selectedHuman
             human.save(os.path.join(modelPath, filename + '.mhm'), tags)
@@ -77,7 +77,7 @@ class SaveTaskView(gui3d.TaskView):
 
     def onShow(self, event):
 
-    # When the task gets shown, set the focus to the file entry
+        # When the task gets shown, set the focus to the file entry
 
         gui3d.TaskView.onShow(self, event)
         self.fileentry.setFocus()
@@ -136,13 +136,13 @@ class LoadTaskView(gui3d.TaskView):
 
     def onShow(self, event):
 
-    # When the task gets shown, set the focus to the file chooser
+        # When the task gets shown, set the focus to the file chooser
 
         self.app.scene3d.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
         self.filechooser.setFocus()
 
-    # HACK: otherwise the toolbar background disappears for some weird reason
+        # HACK: otherwise the toolbar background disappears for some weird reason
 
         self.app.scene3d.redraw(0)
 
@@ -161,22 +161,22 @@ class ExportTaskView(gui3d.TaskView):
         self.exportHairGroup = []
         
         #### BODY EXPORT #######
-        gui3d.TextView(self, label = 'Format', position=[25, 110, 9.2])
-        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, 'data/3dobjs/button_generic_long.obj', position=[25, 140, 9.2], label="Wavefront obj", selected=True)
-        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 170, 9.2], label="Blender exchange")
-        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 200, 9.2], label="Collada")
-        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 230, 9.2], label="MD5")
-        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, mesh='data/3dobjs/button_generic_long.obj', position=[25, 260, 9.2], label="STL")
+        gui3d.GroupBox(self, label = 'Format', position=[10, 80, 9.0], width=128, height=256)
+        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 112, 9.2], label="Wavefront obj", selected=True)
+        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 144, 9.2], label="Blender exchange")
+        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 176, 9.2], label="Collada")
+        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 208, 9.2], label="MD5")
+        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 240, 9.2], label="STL")
                  
-        gui3d.TextView(self, label = 'Options', position=[625, 110, 9.2])                        
-        self.exportSkeleton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', position=[625, 140, 9.2], label="Skeleton", selected=True)
+        gui3d.GroupBox(self, label = 'Options', position=[10, 340, 9.0], width=128, height=200)                
+        self.exportSkeleton = gui3d.ToggleButton(self, width=112, height=20, position=[18, 372, 9.2], label="Skeleton", selected=True)
                                                  
-        self.exportGroups = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', position=[625, 170, 9.2], label="Groups", selected=True)
+        self.exportGroups = gui3d.ToggleButton(self, width=112, height=20, position=[18, 403, 9.2], label="Groups", selected=True)
 
         ####### HAIR EXPORT ###################
-        self.hairMesh = gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_generic_long.obj', position=[625, 200, 9.2], label="Hair as mesh", selected=True)
+        self.hairMesh = gui3d.RadioButton(self, self.exportHairGroup, width=112, height=20, position=[18, 435, 9.2], label="Hair as mesh", selected=True)
 
-        self.hairCurves = gui3d.RadioButton(self, self.exportHairGroup, mesh='data/3dobjs/button_generic_long.obj', position=[625, 230, 9.2], label="Hair as curves")
+        self.hairCurves = gui3d.RadioButton(self, self.exportHairGroup, width=112, height=20, position=[18, 467, 9.2], label="Hair as curves")
         
         @self.wavefrontObj.event
         def onClicked(event):
