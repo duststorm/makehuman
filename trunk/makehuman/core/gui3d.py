@@ -1013,61 +1013,67 @@ class TextEdit(View):
         self.text = text
         self.texture = texture
         self.focusedTexture = focusedTexture
-        self.position = len(self.text)
+        self.__position = len(self.text)
+        self.__cursor = False
         
         self.__updateTextObject()
     
-    def _delCursor(self):
-        if self.position == len(self.text):
-            text = self.text[:self.position-1]
+    def __showCursor(self):
+        if self.__cursor:
+            return
+            
+        if self.__position == len(self.text):
+            self.text = self.text + '|'
         else:
-            text = self.text[:self.position-1]+self.text[self.position:]
-        self.position -= 1
-        return text
+            self.text = self.text[:self.__position] + '|' + self.text[self.__position:]
+        
+        self.__cursor = True
 
-    def _addCursor(self):
-        if self.position == len(self.text):
-            text = self.text[:self.position]+'|'
+    def __hideCursor(self):
+        if not self.__cursor:
+            return
+
+        if self.__position == len(self.text) - 1:
+            self.text = self.text[:self.__position]
         else:
-            text = self.text[:self.position]+'|'+self.text[self.position:]
-        self.position += 1
-        return text
+            self.text = self.text[:self.__position] + self.text[self.__position + 1:]
+        
+        self.__cursor = False
     
-    def _addText(self, character):
-        self._delCursor()
-        text = self.text[:self.position]
-        text += character 
-        text += self.text[self.position:]
-        self.position += 1
-        self._addCursor()
-        return text
+    def __addText(self, text):
+        self.__hideCursor()
+        self.text = self.text[:self.__position] + text + self.text[self.__position:]
+        self.__position += len(text)
+        self.__showCursor()
     
-    def _delText(self):
-        self._delCursor()
-        if self.position > 0:
-            text = self.text[:self.position-1] + self.text[self.position:]
-            self.position -= 1
-        else:
-            text=self.text
-        self._addCursor()
-        return text
+    def __delText(self, size = 1):
+        self.__hideCursor()
+        if self.__position > 0:
+            size = min(size, self.__position)
+            self.text = self.text[:self.__position-size] + self.text[self.__position:]
+            self.__position -= size
+        self.__showCursor()
 
     def __updateTextObject(self):
-        lenText = len(self.text)
-        if lenText > 100:
-            text = self.text[lenText - 100:]
+        size = len(self.text)
+        if size > 100:
+            text = self.text[size - 100:]
         else:
             text = self.text
         self.textObject.setText(text)
 
     def setText(self, text):
         self.text = text
-        self.position = len(self.text)
+        self.__position = len(self.text)
+        if self.__cursor:
+            self.cursor = False # To force showing the cursor
+            self.__showCursor()
         self.__updateTextObject()
 
     def getText(self):
-        text = self._delCursor()
-        self._addCursor()
+        self.__hideCursor()
+        text = self.text
+        self.__showCursor()
         return text
 
     def onKeyDown(self, event):
@@ -1078,24 +1084,24 @@ class TextEdit(View):
         # print event #only for DEBUG
 
         if event.key == events3d.SDLK_BACKSPACE:
-            self.text = self._delText()
+            self.__delText()
         elif event.key == events3d.SDLK_RETURN:
             if len(self.text):
                 View.onKeyDown(self, event)
 
             return
         elif event.key == events3d.SDLK_RIGHT:
-            if self.position<len(self.text):
-                self.text = self._delCursor()
-                self.position += 1
-                self.text = self._addCursor()
+            if self.__position<len(self.text)-1:
+                self.__hideCursor()
+                self.__position += 1
+                self.__showCursor()
         elif event.key == events3d.SDLK_LEFT:
-            if self.position > 1:
-                self.text = self._delCursor()
-                self.position -= 1
-                self.text = self._addCursor()
+            if self.__position > 0:
+                self.__hideCursor()
+                self.__position -= 1
+                self.__showCursor()
         elif event.key < 256:
-            self.text = self._addText(event.character)
+            self.__addText(event.character)
 
         self.__updateTextObject()
         self.app.scene3d.redraw()
@@ -1103,13 +1109,13 @@ class TextEdit(View):
     def onFocus(self, event):
         if self.focusedTexture:
             self.background.setTexture(self.focusedTexture)
-            self.text = self._addCursor()
+            self.__showCursor()
             self.__updateTextObject()
 
     def onBlur(self, event):
         if self.focusedTexture:
             self.background.setTexture(self.texture)
-            self.text = self._delCursor()
+            self.__hideCursor()
             self.__updateTextObject()
 
 
