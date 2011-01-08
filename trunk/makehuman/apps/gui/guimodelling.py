@@ -63,10 +63,7 @@ class ModellingCategory(gui3d.Category):
             self.app.scene3d.redraw(1)
 
         self.backgroundImage = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, 1], visible=False)
-        self.backgroundImageToggle = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', position=[33, 522, 9.1],
-                                                        texture=self.app.getThemeResource('images', 'button_background_toggle.png'),
-                                                        selectedTexture=self.app.getThemeResource('images', 'button_background_toggle_on.png'),
-                                                        focusedTexture=self.app.getThemeResource('images', 'button_background_toggle_focused.png'))
+        self.backgroundImageToggle = gui3d.ToggleButton(self, width=32, height=16, position=[15, 514, 9.1], label='Bkg')
 
         @self.backgroundImageToggle.event
         def onClicked(event):
@@ -81,8 +78,7 @@ class ModellingCategory(gui3d.Category):
                 self.app.switchTask('Background')
             self.app.scene3d.redraw(1)
             
-        self.anaglyphsButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images', 'button_3dglasses.png'),
-                                       selectedTexture=self.app.getThemeResource('images', 'button_3dglasses_on.png'), position=[68, 522, 9.1])
+        self.anaglyphsButton = gui3d.ToggleButton(self, width=32, height=16, position=[51, 514, 9.1], label='3D')
 
         @self.anaglyphsButton.event
         def onClicked(event):

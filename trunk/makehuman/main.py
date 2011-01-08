@@ -211,15 +211,9 @@ class MHApplication(gui3d.Application):
     def onClicked(event):
       self.stop()
       
-    self.undoButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.getThemeResource('images', 'button_undo.png'),
-                                       selectedTexture=self.getThemeResource('images', 'button_undo_on.png'), position=[667, 515, 9.1],
-                                       focusedTexture=self.getThemeResource('images', 'button_undo_focused.png'))
-    self.redoButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.getThemeResource('images', 'button_redo.png'),
-                                   selectedTexture=self.getThemeResource('images', 'button_redo_on.png'), position=[715, 515, 9.1],
-                                   focusedTexture=self.getThemeResource('images', 'button_redo_focused.png'))
-    self.resetButton = gui3d.Button(self, mesh='data/3dobjs/button_standard.obj', texture=self.getThemeResource('images', 'button_reset.png'),
-                                    selectedTexture=self.getThemeResource('images', 'button_reset_on.png'), position=[763, 515, 9.1],
-                                    focusedTexture=self.getThemeResource('images', 'button_reset_focused.png'))
+    self.undoButton = gui3d.Button(self, width=40, height=16, position=[650, 508, 9.1], label="Undo")
+    self.redoButton = gui3d.Button(self, width=40, height=16, position=[694, 508, 9.1], label="Redo")
+    self.resetButton = gui3d.Button(self, width=40, height=16, position=[738, 508, 9.1], label="Reset")
                                     
     @self.undoButton.event
     def onClicked(event):
@@ -238,8 +232,8 @@ class MHApplication(gui3d.Application):
         self.app.categories['Modelling'].tasksByName['Macro modelling'].syncStatus()
         self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
       
-    self.globalButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 540, 9.2], label="Global cam")
-    self.faceButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', position=[650, 565, 9.2], label="Face cam")
+    self.globalButton = gui3d.Button(self, width=128, height=20, position=[650, 530, 9.2], label="Global cam")
+    self.faceButton = gui3d.Button(self, width=128, height=20, position=[650, 555, 9.2], label="Face cam")
     
     @self.globalButton.event
     def onClicked(event):

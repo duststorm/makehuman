@@ -729,7 +729,8 @@ class Button(View):
 
     def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture=None,\
         selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None,\
-        label=None, width=None, height=None, fontSize = defaultFontSize):
+        label=None, width=None, height=None, fontSize = defaultFontSize,
+        textureWidth = 64, textureHeight = 16, border = [2, 2, 2, 2]):
         
         """
         This is the constructor for the Button class. It takes the following parameters:
@@ -759,14 +760,16 @@ class Button(View):
             t = self.texture
             
         if (width!=None) and (height!=None):
-            self.button = Object(self, mesh='data/3dobjs/unit_square.obj', texture=t, position=position, width=width, height=height)
+            mesh = Create9SliceMesh(width, height, t, textureWidth, textureHeight, border)
+            self.button = Object(self, mesh, position=position)
+            if isinstance(label, str):
+                self.label = TextObject(self, text = label, position = [position[0]+5,position[1]+2,position[2]+0.001], fontSize = fontSize)
         else:
             self.button = Object(self, mesh, texture=t, position=position)
-        
-        if isinstance(label, str):
-            self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-7,position[2]+0.001], fontSize = fontSize)
-            #assumes button obj origin is upper left corner
-            #TODO text should be in the middle of button, calculate this from text length
+            if isinstance(label, str):
+                #assumes button obj origin is upper left corner
+                #TODO text should be in the middle of button, calculate this from text length
+                self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-7,position[2]+0.001], fontSize = fontSize)
         
         self.selected = selected
 
@@ -828,7 +831,8 @@ class RadioButton(Button):
     """
     
     def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
-        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, fontSize = defaultFontSize):
+        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, width=None, height=None,
+        fontSize = defaultFontSize, textureWidth = 64, textureHeight = 16, border = [2, 2, 2, 2]):
             
         """
         This is the constructor for the RadioButton class. It takes the following parameters:
@@ -845,7 +849,8 @@ class RadioButton(Button):
         - **fontSize**: *Float*. The button label font size.
         """
         
-        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, fontSize)
+        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, width, height,
+        fontSize, textureWidth, textureHeight, border)
         self.group = group
         self.group.append(self)
 
@@ -878,7 +883,8 @@ class ToggleButton(Button):
     """
 
     def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
-        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, fontSize = defaultFontSize):
+        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, width=None, height=None,
+        fontSize = defaultFontSize, textureWidth = 64, textureHeight = 16, border = [2, 2, 2, 2]):
             
         """
         This is the constructor for the ToggleButton class. It takes the following parameters:
@@ -895,7 +901,8 @@ class ToggleButton(Button):
         - **fontSize**: *Float*. The button label font size.
         """
 
-        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, fontSize = fontSize)
+        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, width, height,
+            fontSize, textureWidth, textureHeight, border)
 
     def onClicked(self, event):
         if self.selected:
@@ -1110,7 +1117,7 @@ class FileEntryView(View):
 
         self.edit = TextEdit(self, texture=self.app.getThemeResource('images', 'texedit_off.png'), position=[200, 90, 9.5],
                              focusedTexture=self.app.getThemeResource('images', 'texedit_on.png'))
-        self.bConfirm = Object(self, mesh='data/3dobjs/button_confirm.obj', texture=self.app.getThemeResource('images', 'button_confirm.png'), position=[610, 80, 9.1])
+        self.bConfirm = Button(self, width=40, height=20, position=[610, 90, 9.1], label='Save')
 
         @self.bConfirm.event
         def onClicked(event):
