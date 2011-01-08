@@ -302,6 +302,7 @@ class TaskView(View):
             position=[2 + len(self.parent.tasks) * 70, 52.0, 9.2],
             texture=(texture or self.app.getThemeResource('images', 'button_tab2.png')),
             selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab2_on.png')),
+            focusedTexture=(texture or self.app.getThemeResource('images', 'button_tab2_focused.png')),
             label=(label or name))
 
         if name in category.tasksByName:
@@ -343,6 +344,7 @@ class Category(View):
             position=[2 + len(self.app.categories) * 70, 22.0, 9.6],
             texture=(texture or self.app.getThemeResource('images', 'button_tab.png')),
             selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab_on.png')),
+            focusedTexture=(texture or self.app.getThemeResource('images', 'button_tab_focused.png')),
             label=(label or name))
 
         if name in parent.categories:
