@@ -1,6 +1,6 @@
 # Written by makehuman 1.0.0 alpha 5
 version 1.0.0
-tags africa-khosaid-female-old
+tags africa-khosaid-female-ol
 gender 0.000000
 age 1.000000
 muscle 0.723404
@@ -28,7 +28,6 @@ detail r-lowerleg-scale-vert-incr 0.750000
 microdetail l-torso-upper-shoulder-scale-vert-decr 0.800000
 detail nose-scale-horiz-incr 0.300000
 detail eye-scale-horiz-decr 0.600000
-microdetail r-head-zygoma-trans-out 0.400000
 detail pelvis-trans-down 0.200000
 detail eye-trans-down 0.200000
 detail r-upperleg-scale-vert-incr 0.050000
@@ -42,6 +41,7 @@ detail l-lowerleg-scale-horiz-incr 0.650000
 detail r-lowerleg-scale-horiz-incr 0.650000
 detail hip-scale-horiz-incr 0.100000
 detail l-lowerleg-scale-vert-incr 0.750000
+microdetail r-head-zygoma-trans-in -0.400000
 microdetail nose-sellion-scale-horiz-incr 0.450000
 detail l-lowerarm-scale-horiz-incr 0.700000
 detail l-upperleg-scale-horiz-decr 0.450000
