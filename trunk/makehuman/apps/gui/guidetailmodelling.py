@@ -352,7 +352,6 @@ class DetailModelingTaskView(gui3d.TaskView):
         gui3d.GroupBox(self, label = 'Palvis', position=[650, 211, 9.0], width=128, height=128)
         gui3d.GroupBox(self, label = 'Head', position=[650, 80, 9.0], width=128, height=128)
         gui3d.GroupBox(self, label = 'Modifiers', position=[650, 342, 9.0], width=128, height=128)
-        gui3d.GroupBox(self, label = 'Actions', position=[10, 472, 9.0], width=128, height=64)
         
         self.genitalsSlider = gui3d.Slider(self, position=[10, 105, 9.3], value=0.0, min=-1.0, max=1.0, label="Genitalia")
 
@@ -721,7 +720,6 @@ class MicroModelingTaskView(gui3d.TaskView):
         self.tool = None
         
         gui3d.GroupBox(self, label = 'Modifiers', position=[10, 339, 9.0], width=128, height=128)
-        gui3d.GroupBox(self, label = 'Actions', position=[10, 472, 9.0], width=128, height=64)
 
         self.microButtonGroup = []
 

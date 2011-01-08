@@ -44,7 +44,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
       # self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageChooser.setTexture("backgrounds/" + filename)
 
-            bg = self.app.categories['Modelling'].tasksByName['Macro modelling'].backgroundImage
+            bg = self.app.categories['Modelling'].backgroundImage
             bg.mesh.setTexture('backgrounds/' + filename)
             group = bg.mesh.getFaceGroup('default-dummy-group')
             group.setColor([255, 255, 255, 100])
@@ -54,7 +54,7 @@ class BackgroundTaskView(gui3d.TaskView):
                 bg.setScale(float(self.texture.width) / float(self.texture.height), 1.0)
             bg.mesh.setPickable(0)
             bg.show()
-            self.app.categories['Modelling'].tasksByName['Macro modelling'].backgroundImageToggle.setSelected(True)
+            self.app.categories['Modelling'].backgroundImageToggle.setSelected(True)
             self.app.switchCategory('Modelling')
             self.app.scene3d.redraw(1)
 
