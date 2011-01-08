@@ -752,7 +752,7 @@ class Button(View):
         
         self.texture = texture or self.app.getThemeResource('images', 'button_unselected.png')
         self.selectedTexture = selectedTexture or self.app.getThemeResource('images', 'button_selected.png')
-        self.focusedTexture = focusedTexture
+        self.focusedTexture = focusedTexture or self.app.getThemeResource('images', 'button_focused.png')
         
         if selected:
             t = self.selectedTexture
@@ -810,11 +810,13 @@ class Button(View):
             self.button.setTexture(self.texture)
 
     def onFocus(self, event):
-        if self.focusedTexture:
+        if not self.selected and self.focusedTexture:
             self.button.setTexture(self.focusedTexture)
 
     def onBlur(self, event):
-        if self.focusedTexture:
+        if self.selected and self.selectedTexture:
+            self.button.setTexture(self.selectedTexture)
+        else:
             self.button.setTexture(self.texture)
 
 
@@ -915,6 +917,12 @@ class ToggleButton(Button):
 
     def onMouseUp(self, event):
         pass
+        
+    def onSelected(self, selected):
+        if selected and self.selectedTexture:
+            self.button.setTexture(self.selectedTexture)
+        else:
+            self.button.setTexture(self.texture)
 
 class ProgressBar(View):
 
