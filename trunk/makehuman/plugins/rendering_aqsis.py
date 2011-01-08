@@ -30,8 +30,7 @@ class AqsisTaskView(gui3d.TaskView):
         subprocess.Popen('aqsl data/shaders/aqsis/mixer.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'mixer.slx'), shell=True)
 
         #Buttons
-        self.renderButton = gui3d.Button(self, mesh='data/3dobjs/button_standard_big.obj', texture=self.app.getThemeResource('images', 'button_rendering_start.png'),
-                                    selectedTexture=self.app.getThemeResource('images', 'button_rendering_start_on.png'), position=[50, 80, 9])  # getThemeResource returns a texture for a gui element according to the chosen theme
+        self.renderButton = gui3d.Button(self, width=64, height=20, position=[50, 80, 9], label='Render')
 
         
                                               
