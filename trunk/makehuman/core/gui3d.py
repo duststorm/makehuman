@@ -1433,8 +1433,6 @@ def Create9SliceMesh(width, height, texture, textureWidth, textureHeight, border
         
     outer=[[0, 0], [width, height]]
     inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
-    
-    print outer, inner
         
     mesh = module3d.Object3D('9slice_' + texture)
     mesh.uvValues = []
