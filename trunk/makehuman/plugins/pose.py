@@ -16,7 +16,7 @@ print 'Pose plugin imported'
 class PoseTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Example')      
+        gui3d.TaskView.__init__(self, category, 'Posing')      
 
         self.engine = poseengine.Poseengine(self.app.scene3d.selectedHuman)        
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
