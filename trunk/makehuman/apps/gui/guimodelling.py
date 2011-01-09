@@ -50,7 +50,7 @@ class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
         gui3d.Category.__init__(self, parent, 'Modelling')
         
-        gui3d.GroupBox(self, label = 'Actions', position=[10, 472, 9.0], width=128, height=64)
+        gui3d.GroupBox(self, label = 'View settings', position=[10, 472, 9.0], width=128, height=64)
         
         self.background = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
 
