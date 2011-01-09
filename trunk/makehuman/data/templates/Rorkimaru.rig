@@ -78,7 +78,6 @@
 # bones
   MasterFloor master-head master-tail 0.0 - -nc -nd -circ 20
   Root pelvis spine3 0.0 MasterFloor -nc -box 10
-  TagRorkimaru pelvis spine3 0.0 Root -nd
   Hips spine3 pelvis 3.1416 Root -circ 20
   Spine1 spine3 spine2 0.0 Root -circ 15
   Spine2 spine2 neck 0.0 Spine1 -circ 5

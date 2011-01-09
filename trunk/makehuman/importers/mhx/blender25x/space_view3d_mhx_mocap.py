@@ -853,16 +853,6 @@ RorkimaruParents = {
 }
 
 #
-#	TagBones - unique bone used to recognize target armature
-#
-
-TagBones = {
-	('MHX',	T_MHX, 'KneePTFK_L'),
-	('Rorkimaru', T_Rorkimaru, 'TagRorkimaru'),
-	('Game', T_Game, 'TagGame'),
-}
-
-#
 #	getTrgBone(b):
 #	getSrcBone(b):
 #	getParentName(b):
@@ -908,20 +898,31 @@ def getParentName(b):
 #
 #	guessTargetArmature(trgRig):
 #	setupTargetArmature():
+#	testTargetRig(bones, rigBones):
 #
 
 def guessTargetArmature(trgRig):
 	global theTarget
-	for (name, number, bone) in TagBones:
-		try:
-			trgRig.data.bones[bone]
-			theTarget = number
-			print("Target rig set to %s" % name)
-			setupTargetArmature()
-			return
-		except:
-			pass
-	raise NameError("Did not recognize target armature")	
+	bones = trgRig.data.bones.keys()
+	if 'KneePTFK_L' in bones:
+		theTarget = T_MHX
+		name = "MHX"
+	elif testTargetRig(bones, GameBones):
+		theTarget = T_Game
+		name = "Game"
+	elif testTargetRig(bones, RorkimaruBones):
+		theTarget = T_Rorkimaru
+		name = "Rorkimaru"
+	else:
+		raise NameError("Did not recognize target armature")
+	setupTargetArmature()
+	return
+
+def testTargetRig(bones, rigBones):
+	for (b, mb) in rigBones:
+		if b not in bones:
+			return False
+	return True
 
 def setupTargetArmature():
 	global theFkBoneList, theIkBoneList, theGlobalBoneList, theIkArmature, theSrcBone, theTrgBone
@@ -996,6 +997,7 @@ def renameFKBones(bones00, rig00, action):
 			bones90[name90] = CEditBone(eb)
 			grp = action.groups[name00]
 			grp.name = name90
+
 			setbones.append((eb, name90))
 		else:
 			eb.name = '_' + name00
