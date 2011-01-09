@@ -171,7 +171,6 @@ class TextObject(Object):
         self.app.scene3d.clear(self.mesh)
         self.mesh = font3d.createMesh(self.font, text, self.mesh);
         self.app.scene3d.update()
-        print text
         
     def getText(self):
         return self.text
@@ -652,10 +651,6 @@ class Slider(View):
         
         View.__init__(self, parent)
         
-        #set string label before anything else, otherwise slider alpha border covers the text (alpha doesnt work?)
-        if isinstance(label, str):
-            self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]], fontSize = fontSize)
-            
         self.sliderTexture = sliderTexture or self.app.getThemeResource('images', 'slider.png')
         self.focusedSliderTexture = focusedSliderTexture or self.app.getThemeResource('images', 'slider_focused.png')
         
@@ -663,6 +658,10 @@ class Slider(View):
             texture=(backgroundTexture or self.app.getThemeResource('images', 'slider_generic.png')), position=position)
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj',
             texture=self.sliderTexture, position=[position[0], position[1] + 20, position[2] + 0.01])
+        if isinstance(label, str):
+            self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]+0.5], fontSize = fontSize)
+            
+            
         self.sliderMinX = position[0] + 17
         self.sliderMaxX = position[0] + 111
         self.min = min

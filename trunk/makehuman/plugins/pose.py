@@ -30,11 +30,8 @@ class PoseTaskView(gui3d.TaskView):
         gui3d.GroupBox(self, label = 'Shoulder', position=[10, 80, 9.0], width=128, height=256)
 
         self.shoulderXslider = gui3d.Slider(self, position=[10, 115, 9.3], value = 0.0, min = -85, max = 80, label = "RotX: 0")
-        self.shoulderXslider.label.setPosition([15,110,9.5])
         self.shoulderYslider = gui3d.Slider(self, position=[10, 155, 9.3], value = 0.0, min = -140, max = 50, label = "RotY: 0")
-        self.shoulderYslider.label.setPosition([15,150,9.5])
         self.shoulderZslider = gui3d.Slider(self, position=[10, 195, 9.3], value = 0.0, min = -120, max = 90, label = "RotZ: 0")
-        self.shoulderZslider.label.setPosition([15,190,9.5])
 
         self.savePoseFiles = 0
 

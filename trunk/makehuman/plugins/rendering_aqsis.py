@@ -33,11 +33,8 @@ class AqsisTaskView(gui3d.TaskView):
                                               
         #Sliders                            
         self.shadingRateSlider= gui3d.Slider(self, position=[10, 115, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.00")
-        self.shadingRateSlider.label.setPosition([15,110,9.5])
-        self.samplesSlider= gui3d.Slider(self, position=[10, 155, 9.01], value=2, min=1.0, max=10, label = "Samples: 2.00")
-        self.samplesSlider.label.setPosition([15,150,9.5])        
-        self.skinOilSlider= gui3d.Slider(self, position=[10, 200, 9.02], value=0.3, min=0.0, max=10, label = "Skin Oil: 0.3")
-        self.skinOilSlider.label.setPosition([15,195,9.5])        
+        self.samplesSlider= gui3d.Slider(self, position=[10, 155, 9.01], value=2, min=1.0, max=10, label = "Samples: 2.00")       
+        self.skinOilSlider= gui3d.Slider(self, position=[10, 200, 9.02], value=0.3, min=0.0, max=10, label = "Skin Oil: 0.3")     
         
         #Buttons
         self.renderButton = gui3d.Button(self, width=64, height=20, position=[18, 250, 9.02], label='Render')
