@@ -171,6 +171,7 @@ class TextObject(Object):
         self.app.scene3d.clear(self.mesh)
         self.mesh = font3d.createMesh(self.font, text, self.mesh);
         self.app.scene3d.update()
+        print text
         
     def getText(self):
         return self.text

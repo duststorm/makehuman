@@ -27,73 +27,55 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder.keyRot1 = [-135,-67,0,45]
         self.shoulder.keyRot2 = [-115,-90,-67,-45,-22,0,22,45,67,90]
 
-        self.shoulderXslider = gui3d.Slider(self, position=[10, 100, 9.5], value = 0.0, min = -85, max = 80, label = "Shoulder RotX")
-        self.shoulderYslider = gui3d.Slider(self, position=[10, 140, 9.5], value = 0.0, min = -140, max = 50, label = "Shoulder RotY")
-        self.shoulderZslider = gui3d.Slider(self, position=[10, 180, 9.5], value = 0.0, min = -120, max = 90, label = "Shoulder RotZ")
+        gui3d.GroupBox(self, label = 'Shoulder', position=[10, 80, 9.0], width=128, height=256)
 
+        self.shoulderXslider = gui3d.Slider(self, position=[10, 115, 9.3], value = 0.0, min = -85, max = 80, label = "RotX: 0")
+        self.shoulderXslider.label.setPosition([15,110,9.5])
+        self.shoulderYslider = gui3d.Slider(self, position=[10, 155, 9.3], value = 0.0, min = -140, max = 50, label = "RotY: 0")
+        self.shoulderYslider.label.setPosition([15,150,9.5])
+        self.shoulderZslider = gui3d.Slider(self, position=[10, 195, 9.3], value = 0.0, min = -120, max = 90, label = "RotZ: 0")
+        self.shoulderZslider.label.setPosition([15,190,9.5])
 
-        self.shoulderXLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[180, 100, 9.5])
-        self.shoulderYLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[180, 140, 9.5])
-        self.shoulderZLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[180, 180, 9.5])
-
-
-        self.shoulderXLabel.setText('0')
-        self.shoulderYLabel.setText('0')
-        self.shoulderZLabel.setText('0')
         self.savePoseFiles = 0
 
-        self.resetPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', label = "Reset", position=[20, 240, 9.5])
-        self.testPoseButton = gui3d.Button(self, mesh='data/3dobjs/button_generic_long.obj', label = "Test", position=[20, 260, 9.5])
+        self.resetPoseButton = gui3d.Button(self, width=112, height=20, label = "Reset", position=[18, 235, 9.5])
+        self.testPoseButton = gui3d.Button(self, width=112, height=20, label = "Test", position=[18, 265, 9.5])
         
-        self.aToggleButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_generic_long.obj', label = "SavePose", position=[20, 280, 9])
+        self.savePoseToggle = gui3d.ToggleButton(self, width=112, height=20, label = "SavePose", position=[18, 295, 9.5])
 
-        @self.aToggleButton.event
+        @self.savePoseToggle.event
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.aToggleButton, event)
-            if self.aToggleButton.selected:
-                self.savePoseFiles = 1
+            gui3d.ToggleButton.onClicked(self.savePoseToggle, event)
+            if self.savePoseToggle.selected:
                 print "Save Pose activated"
             else:
-                self.savePoseFiles = 0
+                print "Save Pose deactivated"
 
         @self.testPoseButton.event
         def onClicked(event):
-            self.test(self.shoulder,
-                    self.shoulderXslider,
-                    self.shoulderYslider,
-                    self.shoulderZslider,
-                    self.shoulderXLabel,
-                    self.shoulderYLabel,
-                    self.shoulderZLabel,
-                    self.savePoseFiles)
+            self.test(self.shoulder)
 
         @self.resetPoseButton.event
         def onClicked(event):
-            self.reset(self.shoulder,
-                    self.shoulderXslider,
-                    self.shoulderYslider,
-                    self.shoulderZslider,
-                    self.shoulderXLabel,
-                    self.shoulderYLabel,
-                    self.shoulderZLabel)
+            self.reset(self.shoulder)
 
         @self.shoulderXslider.event
         def onChange(value):            
             self.shoulder.angle[0] = value
-            self.shoulderXLabel.setText('%d' % value)
-            self.shoulder.applyPose()            
-
+            self.shoulder.applyPose()
+            self.shoulderXslider.label.setText('RotX: %d' % value)
+            
         @self.shoulderYslider.event
         def onChange(value):            
             self.shoulder.angle[1] = value 
-            self.shoulderYLabel.setText('%d' % value)
-            self.shoulder.applyPose()           
+            self.shoulder.applyPose()
+            self.shoulderYslider.label.setText('RotY: %d' % value)
 
         @self.shoulderZslider.event
         def onChange(value):
             self.shoulder.angle[2] = value 
-            self.shoulderZLabel.setText('%d' % value)
             self.shoulder.applyPose()
+            self.shoulderZslider.label.setText('RotZ: %d' % value)
             
     def onShow(self, event):
         self.app.scene3d.selectedHuman.storeMesh()
@@ -105,40 +87,40 @@ class PoseTaskView(gui3d.TaskView):
         self.app.scene3d.selectedHuman.meshData.update()
         gui3d.TaskView.onHide(self, event)
 
-    def test(self, limbToSave, sliderX,sliderY,sliderZ,labelX,labelY,labelZ,savePose = None):
+    def test(self, limbToSave, sliderX,sliderY,sliderZ,savePose = None):
 
         homedir = os.path.expanduser('~')
-        if savePose:
+        if self.savePoseToggle.selected:
             poseDir = os.path.join(homedir, limbToSave.name)
             if not os.path.isdir(poseDir):
                 os.mkdir(poseDir)
 
         for angle in limbToSave.examplesTrasl:
             
-            if savePose:
+            if self.savePoseToggle.selected:
                 tName = "limb_%s_%s_%s.pose"%(angle[0],angle[1],angle[2])
                 savePath = os.path.join(poseDir,tName)
                 print "saved in %s"%(savePath)
 
-            labelX.setText('%d'%(angle[0]))
-            labelY.setText('%d'%(angle[1]))
-            labelZ.setText('%d'%(angle[2]))
-            sliderX.setValue(angle[0])
-            sliderY.setValue(angle[1])
-            sliderZ.setValue(angle[2])
+            self.shoulderXslider.label.setText('RotX: %d'%(angle[0]))
+            self.shoulderYslider.label.setText('RotY: %d'%(angle[1]))
+            self.shoulderZslider.label.setText('RotZ: %d'%(angle[2]))
+            self.shoulderXslider.setValue(angle[0])
+            self.shoulderYslider.setValue(angle[1])
+            self.shoulderYslider.setValue(angle[2])
             limbToSave.angle = angle
             limbToSave.applyPose(savePath)
             self.app.scene3d.redraw(0)
 
 
-    def reset(self, limbToTest, sliderX,sliderY,sliderZ,labelX,labelY,labelZ):
+    def reset(self, limbToTest):
         limbToTest.angle = [0,0,0]        
-        labelX.setText('0')
-        labelY.setText('0')
-        labelZ.setText('0')
-        sliderX.setValue(0.0)
-        sliderY.setValue(0.0)
-        sliderZ.setValue(0.0)
+        self.shoulderXslider.label.setText('RotX: 0')
+        self.shoulderYslider.label.setText('RotY: 0')
+        self.shoulderZslider.label.setText('RotZ: 0')
+        self.shoulderXslider.setValue(0.0)
+        self.shoulderYslider.setValue(0.0)
+        self.shoulderZslider.setValue(0.0)
         limbToTest.applyPose()
         self.app.scene3d.redraw(0)
         
