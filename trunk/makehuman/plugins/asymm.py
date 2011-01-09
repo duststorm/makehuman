@@ -16,18 +16,22 @@ class AsymmTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Asymm')
 
-        #Sliders       
-        self.asymmBrowSlider = gui3d.Slider(self,  position=[20, 80, 9.3], value=0.0, min=-1.0, max=1.0, label="Brow asymmetry")
-        self.asymmCheekSlider = gui3d.Slider(self,  position=[20, 120, 9.3], value=0.0, min=-1.0, max=1.0, label="Cheek asymmetry")
-        self.asymmEarsSlider = gui3d.Slider(self,  position=[20, 160, 9.3], value=0.0, min=-1.0, max=1.0, label="Ears asymmetry")
-        self.asymmEyeSlider = gui3d.Slider(self,  position=[20, 200, 9.3], value=0.0, min=-1.0, max=1.0, label="Eye asymmetry")
-        self.asymmJawSlider = gui3d.Slider(self,  position=[20, 240, 9.3], value=0.0, min=-1.0, max=1.0, label="Jaw asymmetry")
-        self.asymmMouthSlider = gui3d.Slider(self,  position=[20, 280, 9.3], value=0.0, min=-1.0, max=1.0, label="Mouth asymmetry")
-        self.asymmNoseSlider = gui3d.Slider(self,  position=[20, 320, 9.3], value=0.0, min=-1.0, max=1.0, label="Nose asymmetry")
-        self.asymmTempleSlider = gui3d.Slider(self,  position=[20, 360, 9.3], value=0.0, min=-1.0, max=1.0, label="Temple asymmetry")
-        self.asymmTopSlider = gui3d.Slider(self,  position=[20, 400, 9.3], value=0.0, min=-1.0, max=1.0, label="Top asymmetry")
-        self.asymmTrunkSlider = gui3d.Slider(self,  position=[20, 440, 9.3], value=0.0, min=-1.0, max=1.0, label="Trunk asymmetry")
-        self.asymmBreastSlider = gui3d.Slider(self,  position=[20, 480, 9.3], value=0.0, min=-1.0, max=1.0, label="Breast asymmetry")
+        #Sliders
+        y = 80
+        gui3d.GroupBox(self, label = 'Face', position=[10, y, 9.0], width=128, height=400);y+=25
+        self.asymmBrowSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Brow asymmetry");y+=40
+        self.asymmCheekSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Cheek asymmetry");y+=40
+        self.asymmEarsSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Ears asymmetry");y+=40
+        self.asymmEyeSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Eye asymmetry");y+=40
+        self.asymmJawSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Jaw asymmetry");y+=40
+        self.asymmMouthSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Mouth asymmetry");y+=40
+        self.asymmNoseSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Nose asymmetry");y+=40
+        self.asymmTempleSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Temple asymmetry");y+=40
+        self.asymmTopSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Top asymmetry");y+=40 + 8
+        y = 80
+        gui3d.GroupBox(self, label = 'Body', position=[650, y, 9.0], width=128, height=120);y+=25
+        self.asymmTrunkSlider = gui3d.Slider(self,  position=[650, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Trunk asymmetry");y+=40
+        self.asymmBreastSlider = gui3d.Slider(self,  position=[650, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Breast asymmetry")
 
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"
