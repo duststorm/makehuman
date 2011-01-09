@@ -186,7 +186,6 @@ class View(events3d.EventHandler):
         self.parent = parent
         self.children = []
         self.objects = []
-        self.canHaveFocus = True
         self.__visible = visible
         self.__totalVisibility = parent.isVisible() and visible
 
@@ -208,6 +207,9 @@ class View(events3d.EventHandler):
 
     def hasFocus(self):
         return self.app.focusView is self
+        
+    def canFocus(self):
+        return True
         
     def getBBox(self):
         if not self.objects:
@@ -292,7 +294,6 @@ class TaskView(View):
 
     def __init__(self, category, name, texture=None, selectedTexture=None, label = None):
         View.__init__(self, parent=category, visible=False)
-        self.canHaveFocus = False
         self.name = name
         self.focusWidget = None
 
@@ -314,6 +315,9 @@ class TaskView(View):
         @self.button.event
         def onClicked(event):
             self.app.switchTask(self.name)
+            
+    def canFocus(self):
+        return False
 
     def onShow(self, event):
 
@@ -333,7 +337,6 @@ class Category(View):
 
     def __init__(self, parent, name, texture=None, selectedTexture=None, label=None):
         View.__init__(self, parent, visible=False)
-        self.canHaveFocus = False
         self.name = name
         self.tasks = []
         self.tasksByName = {}
@@ -355,6 +358,9 @@ class Category(View):
         @self.button.event
         def onClicked(event):
             self.app.switchCategory(self.name)
+            
+    def canFocus(self):
+        return False
 
     def onShow(self, event):
         self.button.setSelected(True)
@@ -374,7 +380,6 @@ class Application(events3d.EventHandler):
         self.scene3d = module3d.Scene3D()
         self.scene3d.application = self
         self.app = self
-        self.canHaveFocus = False
         self.children = []
         self.objects = []
         self.categories = {}
@@ -399,6 +404,9 @@ class Application(events3d.EventHandler):
 
     def isVisible(self):
         return True
+        
+    def canFocus(self):
+        return False
 
     def setFocus(self, view=None):
 
@@ -410,7 +418,7 @@ class Application(events3d.EventHandler):
         if not view:
             view = self
 
-        if view.canHaveFocus:
+        if view.canFocus():
             event = events3d.FocusEvent(self.focusView, view)
 
             if self.focusView:
@@ -571,15 +579,23 @@ class Application(events3d.EventHandler):
 
                 index = self.focusView.parent.children.index(self.focusView)
                 if modifiers & events3d.KMOD_SHIFT:
-                    if index > 0:
-                        self.focusView.parent.children[index - 1].setFocus()
-                    else:
-                        self.focusView.parent.children[len(self.focusView.parent.children) - 1].setFocus()
+                    start = index
+                    index = index - 1 if index > 0 else len(self.focusView.parent.children) - 1
+                    while start != index:
+                        child = self.focusView.parent.children[index]
+                        if child.canFocus():
+                            child.setFocus()
+                            break
+                        index = index - 1 if index > 0 else len(self.focusView.parent.children) - 1
                 else:
-                    if index + 1 < len(self.focusView.parent.children):
-                        self.focusView.parent.children[index + 1].setFocus()
-                    else:
-                        self.focusView.parent.children[0].setFocus()
+                    start = index
+                    index = index + 1 if index < len(self.focusView.parent.children) - 1 else 0
+                    while start != index:
+                        child = self.focusView.parent.children[index]
+                        if child.canFocus():
+                            child.setFocus()
+                            break
+                        index = index + 1 if index < len(self.focusView.parent.children) - 1 else 0
                 self.scene3d.redraw()
                 return
         event = events3d.KeyEvent(key, character, modifiers)
@@ -957,6 +973,9 @@ class ProgressBar(View):
         self.background = Object(self, backgroundMesh, texture=backgroundTexture, position=backgroundPosition)
         self.bar = Object(self, barMesh, texture=barTexture, position=barPosition)
         self.bar.mesh.setScale(0.0, 1.0, 1.0)
+        
+    def canFocus(self):
+        return False
 
     def setProgress(self, progress, redraw=1):
         """
@@ -990,6 +1009,9 @@ class TextView(View):
         self.textObject = TextObject(self, position=position, fontSize = fontSize)
         if label:
             self.setText(label)
+            
+    def canFocus(self):
+        return False
 
     def setText(self, text):
         self.textObject.setText(text)
@@ -1387,6 +1409,9 @@ class GroupBox(View):
             self.label = TextObject(self, text = label, position = [position[0]+5,position[1] + 2,position[2]+0.001], fontSize = fontSize)
             #assumes box obj origin is upper left corner
             #TODO text should be in the middle of button, calculate this from text length
+            
+    def canFocus(self):
+        return False
 
 def Create9SliceMesh(width, height, texture, textureWidth, textureHeight, border):
     

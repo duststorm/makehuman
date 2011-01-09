@@ -36,32 +36,33 @@ class HairPropertiesTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Hair')
                                 
-        gui3d.GroupBox(self, label = 'Hair tool', position=[10, 211, 9.0], width=128, height=256)
+        gui3d.GroupBox(self, label = 'Hair properties', position=[10, 80, 9.0], width=128, height=276)
 
         #############
         #SLIDERS
         #############
+        
+        self.widthSlider = gui3d.Slider(self, position=[10, 105, 9.3], value=1.0, min=0.3,max=30.0, label = "Hair width") 
+        
         self.redSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_red.png'), self.app.getThemeResource('images', 'slider.png'),
-                                      self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.2])
+                                      self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 145, 9.01])
 
-        self.redSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 350, 9.4])
+        self.redSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 280, 9.04])
         self.redSliderLabel.setText('Red: 0')
 
         self.greenSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_green.png'), self.app.getThemeResource('images', 'slider.png'),
-                                        self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 265, 9.2])
+                                        self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 190, 9.02])
 
-        self.greenSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 370, 9.4])
+        self.greenSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 300, 9.4])
         self.greenSliderLabel.setText('Green: 0')
 
         self.blueSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'slider_blue.png'), self.app.getThemeResource('images', 'slider.png'),
-                                       self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 295, 9.2])
+                                       self.app.getThemeResource('images', 'slider_focused.png'), position=[10, 235, 9.03])
 
-        self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 390, 9.4])
+        self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, 320, 9.4])
         self.blueSliderLabel.setText('Blue: 0')
-    
-        self.widthSlider = gui3d.Slider(self, position=[10, 150, 9], value=1.0, min=0.3,max=30.0, label = "Hair width") 
 
-        self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[20, 340, 9.4])
+        self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[18, 280, 9.04])
                     
         @self.redSlider.event
         def onChanging(value):
@@ -112,6 +113,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
     def onShow(self, event):
         gui3d.TaskView.onShow(self, event)
         hairColor = self.app.scene3d.selectedHuman.hairColor
+        self.widthSlider.setFocus()
         self.syncSliders()
 
     def syncSliders(self):

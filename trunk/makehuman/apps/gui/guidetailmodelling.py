@@ -409,25 +409,6 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
             self.breastFirmness = None
-            
-        self.stomachSlider = gui3d.Slider(self, position=[650, 269, 9.2], value=0.0, min=-1.0, max=1.0, label ="Stomach")
-        
-        self.stomach = None
-        
-        @self.stomachSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
-                if self.stomach == None:
-                    self.stomach = human.getStomach()
-                human.updateStomach(self.stomach, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.stomach = min(1.0, max(-1.0, value))
-        
-        @self.stomachSlider.event
-        def onChange(value):
-            human = self.app.scene3d.selectedHuman
-            self.app.do(DetailAction(human, 'Stomach', value, self.syncSliders))
-            self.stomach = None
 
         self.noseSlider = gui3d.Slider(self, position=[10, 235, 9.2], value=0.0, min=0.0, max=1.0, label = "Nose shape")
 
@@ -504,6 +485,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'Ears', value, self.syncSliders))
             self.ears = None
+            
+        self.jawSlider = gui3d.Slider(self, position=[10, 374, 9.2], value=0.0, min=0.0, max=1.0, label = "Jaw shape")
+
+        self.jaw = None
+        
+        @self.jawSlider.event
+        def onChanging(value):
+            if self.app.settings.get('realtimeUpdates', True):
+                human = self.app.scene3d.selectedHuman
+                if self.jaw == None:
+                    self.jaw = human.getJaw()
+                human.updateJaw(self.jaw, value, self.app.settings.get('realtimeNormalUpdates', True))
+                self.jaw = min(1.0, max(0.0, value))
+        
+        @self.jawSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Jaw', value, self.syncSliders))
+            self.jaw = None
 
         self.headShapeSlider = gui3d.Slider(self, position=[650, 106, 9.2], value=0.0,min=0.0,max=1.0,label="Shape")
 
@@ -562,25 +562,6 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'FaceAngle', value, self.syncSliders))
             self.faceAngle = None
             
-        self.jawSlider = gui3d.Slider(self, position=[10, 374, 9.2], value=0.0, min=0.0, max=1.0, label = "Jaw shape")
-
-        self.jaw = None
-        
-        @self.jawSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
-                if self.jaw == None:
-                    self.jaw = human.getJaw()
-                human.updateJaw(self.jaw, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.jaw = min(1.0, max(0.0, value))
-        
-        @self.jawSlider.event
-        def onChange(value):
-            human = self.app.scene3d.selectedHuman
-            self.app.do(DetailAction(human, 'Jaw', value, self.syncSliders))
-            self.jaw = None
-            
         self.pelvisToneSlider = gui3d.Slider(self, position=[650, 235, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone")
 
         self.pelvisTone = None
@@ -599,6 +580,25 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.scene3d.selectedHuman
             self.app.do(DetailAction(human, 'PelvisTone', value, self.syncSliders))
             self.pelvisTone = None
+            
+        self.stomachSlider = gui3d.Slider(self, position=[650, 269, 9.2], value=0.0, min=-1.0, max=1.0, label ="Stomach")
+        
+        self.stomach = None
+        
+        @self.stomachSlider.event
+        def onChanging(value):
+            if self.app.settings.get('realtimeUpdates', True):
+                human = self.app.scene3d.selectedHuman
+                if self.stomach == None:
+                    self.stomach = human.getStomach()
+                human.updateStomach(self.stomach, value, self.app.settings.get('realtimeNormalUpdates', True))
+                self.stomach = min(1.0, max(-1.0, value))
+        
+        @self.stomachSlider.event
+        def onChange(value):
+            human = self.app.scene3d.selectedHuman
+            self.app.do(DetailAction(human, 'Stomach', value, self.syncSliders))
+            self.stomach = None
             
         self.buttocksSlider = gui3d.Slider(self, position=[650, 303, 9.2], value=0.0, min=-1.0, max=1.0, label = "Buttocks")
 
@@ -684,6 +684,7 @@ class DetailModelingTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         self.app.tool = self.tool
+        self.genitalsSlider.setFocus()
         gui3d.TaskView.onShow(self, event)
 
     def onHide(self, event):
@@ -757,6 +758,7 @@ class MicroModelingTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         self.app.tool = self.tool
+        self.translationButton.setFocus()
         gui3d.TaskView.onShow(self, event)
 
     def onHide(self, event):
