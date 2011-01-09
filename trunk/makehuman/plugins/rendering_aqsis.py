@@ -29,15 +29,15 @@ class AqsisTaskView(gui3d.TaskView):
         subprocess.Popen('aqsl data/shaders/aqsis/cornea.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'cornea.slx'), shell=True)
         subprocess.Popen('aqsl data/shaders/aqsis/mixer.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'mixer.slx'), shell=True)
 
-        gui3d.GroupBox(self, label = 'Settings', position=[10, 80, 9.0], width=128, height=256)
+        gui3d.GroupBox(self, label = 'Options', position=[10, 80, 9.0], width=128, height=256)
                                               
         #Sliders                            
-        self.shadingRateSlider= gui3d.Slider(self, position=[10, 105, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.00")
-        self.shadingRateSlider.label.setPosition([15,135,9.5])
-        self.samplesSlider= gui3d.Slider(self, position=[10, 145, 9.01], value=2, min=1.0, max=10, label = "Samples: 2.00")
-        self.samplesSlider.label.setPosition([15,175,9.5])        
-        self.skinOilSlider= gui3d.Slider(self, position=[10, 190, 9.02], value=0.3, min=0.0, max=10, label = "Skin Oil: 0.3")
-        self.skinOilSlider.label.setPosition([15,220,9.5])        
+        self.shadingRateSlider= gui3d.Slider(self, position=[10, 115, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.00")
+        self.shadingRateSlider.label.setPosition([15,110,9.5])
+        self.samplesSlider= gui3d.Slider(self, position=[10, 155, 9.01], value=2, min=1.0, max=10, label = "Samples: 2.00")
+        self.samplesSlider.label.setPosition([15,150,9.5])        
+        self.skinOilSlider= gui3d.Slider(self, position=[10, 200, 9.02], value=0.3, min=0.0, max=10, label = "Skin Oil: 0.3")
+        self.skinOilSlider.label.setPosition([15,195,9.5])        
         
         #Buttons
         self.renderButton = gui3d.Button(self, width=64, height=20, position=[18, 250, 9.02], label='Render')
