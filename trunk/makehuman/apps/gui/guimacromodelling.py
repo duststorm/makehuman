@@ -128,15 +128,16 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         self.status = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 585, 9.1])
 
-        gui3d.GroupBox(self, label = 'Main', position=[10, 80, 9.0], width=128, height=256)
+        y = 80
+        gui3d.GroupBox(self, label = 'Main', position=[10, y, 9.0], width=128, height=256);y+=35
        
         # Macro sliders
 
-        self.genderSlider = gui3d.Slider(self, position=[10, 105, 9.3], value=0.5, label = "Gender")
-        self.ageSlider = gui3d.Slider(self, position=[10, 145, 9.01], value=0.5, label = "Age")
-        self.muscleSlider = gui3d.Slider(self, position=[10, 190, 9.02], value=0.5, label = "Tone")
-        self.weightSlider = gui3d.Slider(self, position=[10, 235, 9.03], value=0.5, label = "Weight")
-        self.heightSlider = gui3d.Slider(self, position=[10, 280, 9.04], value=0.5, label = "Height")
+        self.genderSlider = gui3d.Slider(self, position=[10, y, 9.3], value=0.5, label = "Gender");y+=40
+        self.ageSlider = gui3d.Slider(self, position=[10, y, 9.01], value=0.5, label = "Age");y+=40
+        self.muscleSlider = gui3d.Slider(self, position=[10, y, 9.02], value=0.5, label = "Tone");y+=40
+        self.weightSlider = gui3d.Slider(self, position=[10, y, 9.03], value=0.5, label = "Weight");y+=40
+        self.heightSlider = gui3d.Slider(self, position=[10, y, 9.04], value=0.5, label = "Height");y+=40
 
         #hair update only necessary for : gender, age , height
         

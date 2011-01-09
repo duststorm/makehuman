@@ -18,7 +18,7 @@ class AsymmTaskView(gui3d.TaskView):
 
         #Sliders
         y = 80
-        gui3d.GroupBox(self, label = 'Face', position=[10, y, 9.0], width=128, height=400);y+=25
+        gui3d.GroupBox(self, label = 'Face', position=[10, y, 9.0], width=128, height=400);y+=35
         self.asymmBrowSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Brow asymmetry");y+=40
         self.asymmCheekSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Cheek asymmetry");y+=40
         self.asymmEarsSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Ears asymmetry");y+=40
