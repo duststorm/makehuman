@@ -24,11 +24,13 @@ class MakeHairTaskView(gui3d.TaskView):
             scn.selectedHuman.storeMesh()
         self.octree = simpleoctree.SimpleOctree(scn.selectedHuman.meshStored,0.09)   
         #sliders
-        self.cPSlider = gui3d.Slider(self, position=[600, 100, 9.2], value=14,min=4,max=30,label="Control Points")
-        self.lengthSlider = gui3d.Slider(self, position=[600, 140, 9.2], value=5.0,min=0.0,max=7.0,label="Strand Length")
-        self.numberSlider = gui3d.Slider(self, position=[600, 180, 9.2], value=25,min=1,max=260,label="Strands Number")
-        self.gravitySlider = gui3d.Slider(self, position=[600, 220, 9.2], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
-        self.cPEntry = gui3d.TextEdit(self, mesh='data/3dobjs/text_entry.obj', text="9,12",texture=self.app.getThemeResource('images', 'texedit_off.png'),position=[100, 320, 9.2])
+        gui3d.GroupBox(self, label = 'Options', position=[10, 80, 9.0], width=128, height=350)
+        self.cPSlider = gui3d.Slider(self, position=[10, 115, 9.3], value=14,min=4,max=30,label="Control Points")
+        self.lengthSlider = gui3d.Slider(self, position=[10, 155, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length")
+        self.numberSlider = gui3d.Slider(self, position=[10, 205, 9.3], value=25,min=1,max=260,label="Strands Number")
+        self.gravitySlider = gui3d.Slider(self, position=[10, 245, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
+        self.cPEntry = gui3d.TextEdit(self, mesh='data/3dobjs/text_entry.obj', text="9,12",
+            texture=self.app.getThemeResource('images', 'texedit_off.png'), position=[15, 285, 9.3])
         
         @self.cPSlider.event
         def onChange(value):
@@ -47,19 +49,19 @@ class MakeHairTaskView(gui3d.TaskView):
             self.gravity = value;
 
         #buttons
-        self.collisionButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[100,270,9.2],label="Avoid Collision")
+        self.collisionButton = gui3d.Button(self, width=112, height=20, position=[18, 325, 9.3],label="Avoid Collision")
         
-        self.createButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[600,270,9.2],label="Create Hair")
-        self.deleteButton = gui3d.Button(self,mesh='data/3dobjs/button_generic_long.obj', position=[600,290,9.2],label="Delete Hair")
+        self.createButton = gui3d.Button(self, width=112, height=20, position=[18, 355, 9.3],label="Create Hair")
+        self.deleteButton = gui3d.Button(self, width=112, height=20, position=[18, 385, 9.3],label="Delete Hair")
         
         @self.collisionButton.event
         def onClicked(event):
             #todo try catch when self.cPEntry has invalid values
             #showing my lambda skills..
             cPIndices = map(lambda x: int(x), self.cPEntry.text.split(","))
-            for curve in self.app.categories['Library'].tasksByName['Hair'].hairsClass.guides:
+            for curve in self.app.scene3d.selectedHuman.hairs.guides:
                 collision(self.octree,curve,scn.selectedHuman.meshData.verts,0.09,cPIndices,True)
-            self.app.categories['Library'].tasksByName['Hair'].reloadGuides()
+            self.app.scene3d.selectedHuman.hairs.reloadGuides()
         
         @self.createButton.event
         def onClicked(event):
