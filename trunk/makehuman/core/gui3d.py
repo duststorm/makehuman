@@ -1026,15 +1026,23 @@ class TextEdit(View):
     A TextEdit widget. This widget can be used to let the user enter some text.
     """
 
-    def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9], focusedTexture=None, fontSize = defaultFontSize):
+    def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9],
+        focusedTexture=None, width=None, height=None, fontSize = defaultFontSize,
+        textureWidth = 400, textureHeight = 20, border = [2, 2, 2, 2]):
         View.__init__(self, parent)
+        
+        self.texture = texture or self.app.getThemeResource('images', 'texedit_off.png')
+        self.focusedTexture = focusedTexture or self.app.getThemeResource('images', 'texedit_on.png')
 
-        self.background = Object(self, mesh=mesh, texture=texture, position=position)
-        self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 1.0, position[2] + 0.1], fontSize = fontSize)
+        if (width!=None) and (height!=None):
+            mesh = Create9SliceMesh(width, height, self.texture, textureWidth, textureHeight, border)
+            self.background = Object(self, mesh, position=position)
+        else:
+            self.background = Object(self, mesh=mesh, texture=self.texture, position=position)
+            
+        self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 2.0, position[2] + 0.1], fontSize = fontSize)
 
         self.text = text
-        self.texture = texture
-        self.focusedTexture = focusedTexture
         self.__position = len(self.text)
         self.__cursor = False
         
@@ -1153,8 +1161,7 @@ class FileEntryView(View):
     def __init__(self, parent):
         View.__init__(self, parent)
 
-        self.edit = TextEdit(self, texture=self.app.getThemeResource('images', 'texedit_off.png'), position=[200, 90, 9.5],
-                             focusedTexture=self.app.getThemeResource('images', 'texedit_on.png'))
+        self.edit = TextEdit(self, width=400, height=20, position=[200, 90, 9.5])
         self.bConfirm = Button(self, width=40, height=20, position=[610, 90, 9.1], label='Save')
 
         @self.bConfirm.event

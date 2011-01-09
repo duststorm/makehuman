@@ -29,8 +29,7 @@ class MakeHairTaskView(gui3d.TaskView):
         self.lengthSlider = gui3d.Slider(self, position=[10, 155, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length")
         self.numberSlider = gui3d.Slider(self, position=[10, 205, 9.3], value=25,min=1,max=260,label="Strands Number")
         self.gravitySlider = gui3d.Slider(self, position=[10, 245, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
-        self.cPEntry = gui3d.TextEdit(self, mesh='data/3dobjs/text_entry.obj', text="9,12",
-            texture=self.app.getThemeResource('images', 'texedit_off.png'), position=[15, 285, 9.3])
+        self.cPEntry = gui3d.TextEdit(self, width=112, height=20, text="9,12", position=[18, 285, 9.3])
         
         @self.cPSlider.event
         def onChange(value):
