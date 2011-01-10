@@ -33,7 +33,7 @@ import mh
 import os
 import font3d
 
-defaultFontSize = 0.4
+defaultFontSize = 1.0
 defaultFontFamily = 'arial'
 
 # Wrapper around Object3D
