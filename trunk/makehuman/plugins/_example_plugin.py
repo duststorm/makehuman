@@ -10,31 +10,32 @@ print 'example imported'
 class ExampleTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Example', category.app.getThemeResource('images', 'button_expressions.png'))
+        gui3d.TaskView.__init__(self, category, 'Example')
 
-    # We add a button to the current task
-    # A button just fires an event when it is clicked, if a selected texture is specified, it is used while the mouse is down on the button
+        y = 80
+        gui3d.GroupBox(self, label = 'Example', position=[10, y, 9.0], width=128, height=320);y+=35
+        
+        # We add a button to the current task
+        # A button just fires an event when it is clicked, if a selected texture is specified,
+        # it is used while the mouse is down on the button
 
-        self.aButton = gui3d.Button(self, mesh='data/3dobjs/button_ethnreset.obj', texture=self.app.getThemeResource('images', 'button_ethnreset.png'),
-                                    selectedTexture=self.app.getThemeResource('images', 'button_ethnreset_on.png'), position=[20, 60, 9])  # getThemeResource returns a texture for a gui element according to the chosen theme
-
+        self.aButton = gui3d.Button(self, width=112, height=20, position=[18, y, 9.1], label='Button');y+=28
+        
         self.pushed = 0
-        self.aButtonLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[120, 80, 9])
-        self.aButtonLabel.setText('Pushed 0 times')
+        self.aButtonLabel = gui3d.TextView(self, position=[18, y, 9.1], label='Pushed 0 times');y+=28
 
         @self.aButton.event
         def onClicked(event):
             self.pushed += 1
             self.aButtonLabel.setText('Pushed %d times' % self.pushed)
 
-    # We add a toggle button to the current task
-    # A toggle button fires an event when it is clicked but retains its selected state after the mouse is up, if a selected texture is specified, it is used to show whether the button is toggled
+        # We add a toggle button to the current task
+        # A toggle button fires an event when it is clicked but retains its selected state after the mouse is up,
+        # if a selected texture is specified, it is used to show whether the button is toggled
 
-        self.aToggleButton = gui3d.ToggleButton(self, mesh='data/3dobjs/button_ethnreset.obj', texture=self.app.getThemeResource('images', 'button_ethnreset.png'),
-                                                selectedTexture=self.app.getThemeResource('images', 'button_ethnreset_on.png'), position=[20, 120, 9])
+        self.aToggleButton = gui3d.ToggleButton(self, width=112, height=20, position=[18, y, 9.1], label='ToggleButton');y+=28
 
-        self.aToggleButtonLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[120, 140, 9])
-        self.aToggleButtonLabel.setText('Not selected')
+        self.aToggleButtonLabel = gui3d.TextView(self, position=[18, y, 9.1], label='Not selected');y+=28
 
         @self.aToggleButton.event
         def onClicked(event):
@@ -44,22 +45,17 @@ class ExampleTaskView(gui3d.TaskView):
             else:
                 self.aToggleButtonLabel.setText('Not selected')
 
-    # Next we will add some radio buttons. For this we need a group, since only one in the group can be selected
-    # A radio button fires an event when it is clicked but retains its selected state after the mouse is up, and deselects all other buttons in the group
-    # If a selected texture is specified, it is used to show whether the button is selected
+        # Next we will add some radio buttons. For this we need a group, since only one in the group can be selected
+        # A radio button fires an event when it is clicked but retains its selected state after the mouse is up, and deselects all other buttons in the group
+        # If a selected texture is specified, it is used to show whether the button is selected
 
         self.aRadioButtonGroup = []
 
-        self.aRadioButton1 = gui3d.RadioButton(self, self.aRadioButtonGroup, mesh='data/3dobjs/button_ethnreset.obj', texture=self.app.getThemeResource('images',
-                                               'button_ethnreset.png'), selectedTexture=self.app.getThemeResource('images', 'button_ethnreset_on.png'), position=[20,
-                                               180, 9], selected=True)  # We make the first one selected
+         # We make the first one selected
+        self.aRadioButton1 = gui3d.RadioButton(self, self.aRadioButtonGroup, width=112, height=20, position=[18, y, 9.1], selected=True, label='RadioButton1');y+=28
+        self.aRadioButton2 = gui3d.RadioButton(self, self.aRadioButtonGroup, width=112, height=20, position=[18, y, 9.1], label='RadioButton2');y+=28
 
-        self.aRadioButtonLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[120, 200, 9])
-        self.aRadioButtonLabel.setText('Button 1 is selected')
-
-        self.aRadioButton2 = gui3d.RadioButton(self, self.aRadioButtonGroup, mesh='data/3dobjs/button_ethnreset.obj', texture=self.app.getThemeResource('images',
-                                               'button_ethnreset.png'), selectedTexture=self.app.getThemeResource('images', 'button_ethnreset_on.png'), position=[20,
-                                               220, 9])
+        self.aRadioButtonLabel = gui3d.TextView(self, position=[18, y, 9.1], label='Button 1 is selected');y+=18
 
         @self.aRadioButton1.event
         def onClicked(event):
@@ -71,29 +67,27 @@ class ExampleTaskView(gui3d.TaskView):
             gui3d.RadioButton.onClicked(self.aRadioButton2, event)
             self.aRadioButtonLabel.setText('Button 2 is selected')
 
-    # A slider needs both a background texture and a slider button texture
-    # When the slider is dragged and released, an onChange event is fired
-    # By default a slider goes from 0.0 to 1.0, and the initial position will be 0.0 unless specified
+        # When the slider is dragged and released, an onChange event is fired
+        # By default a slider goes from 0.0 to 1.0, and the initial position will be 0.0 unless specified
 
-        self.aSlider = gui3d.Slider(self, self.app.getThemeResource('images', 'button_gender_macro.png'), self.app.getThemeResource('images', 'slider.png'),
-                                    self.app.getThemeResource('images', 'slider_focused.png'), position=[20, 300, 9], value=0.5)  # We want the slider to start from the middle
+        # We want the slider to start from the middle
+        self.aSlider = gui3d.Slider(self, position=[10, y, 9.1], value=0.5, label='Slider');y+=38
 
-        self.aSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[120, 290, 9])
-        self.aSliderLabel.setText('Value is 0.5')
+        self.aSliderLabel = gui3d.TextView(self, position=[18, y, 9.1], label='Value is 0.5');y+=28
 
         @self.aSlider.event
         def onChange(value):
             self.aSliderLabel.setText('Value is %f' % value)
             self.aProgressBar.setProgress(value, 1)
 
-    # we also create a progressbar, which is updated as the slider moves
+        # we also create a progressbar, which is updated as the slider moves
 
-        self.aProgressBar = gui3d.ProgressBar(self, backgroundTexture=self.app.getThemeResource('images', 'progressbar_background.png'), backgroundPosition=[20, 380,
-                                              9.1], barTexture=self.app.getThemeResource('images', 'progressbar.png'), barPosition=[20, 380, 9.2])
+        self.aProgressBar = gui3d.ProgressBar(self)
         self.aProgressBar.setProgress(0.5, 0)
+        
+        # A text edit
 
-        self.aTextEdit = gui3d.TextEdit(self, mesh='data/3dobjs/empty.obj', position=[20, 420, 9])
-        self.aTextEdit.setText('Some text')
+        self.aTextEdit = gui3d.TextEdit(self, width=112, height=20, position=[18, y, 9.1], text='Some text')
 
 
 category = None
@@ -104,7 +98,7 @@ taskview = None
 
 
 def load(app):
-    category = gui3d.Category(app, 'Example', app.getThemeResource('images', 'button_expressions.png'))
+    category = gui3d.Category(app, 'Example')
     taskview = ExampleTaskView(category)
 
     print 'example loaded'
