@@ -1028,7 +1028,7 @@ class TextEdit(View):
 
     def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9],
         focusedTexture=None, width=None, height=None, fontSize = defaultFontSize,
-        textureWidth = 400, textureHeight = 20, border = [2, 2, 2, 2]):
+        textureWidth = 32, textureHeight = 32, border = [2, 2, 2, 2]):
         View.__init__(self, parent)
         
         self.texture = texture or self.app.getThemeResource('images', 'texedit_off.png')
@@ -1040,7 +1040,7 @@ class TextEdit(View):
         else:
             self.background = Object(self, mesh=mesh, texture=self.texture, position=position)
             
-        self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 2.0, position[2] + 0.1], fontSize = fontSize)
+        self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 4.0, position[2] + 0.1], fontSize = fontSize)
 
         self.text = text
         self.__position = len(self.text)
