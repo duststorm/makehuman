@@ -127,6 +127,7 @@ def createMesh(font, text, object = None):
     index = 0
     xoffset = 0.0
     yoffset = 0.0
+    zoffset = 0.0
     previous = -1
 
     for char in text:
@@ -143,12 +144,13 @@ def createMesh(font, text, object = None):
 
             # create vertices
 
-            v1 = object.createVertex([xoffset + co[0], yoffset + co[1], 0.0])
-            v2 = object.createVertex([xoffset + co[2], yoffset + co[1], 0.0])
-            v3 = object.createVertex([xoffset + co[2], yoffset + co[3], 0.0])
-            v4 = object.createVertex([xoffset + co[0], yoffset + co[3], 0.0])
+            v1 = object.createVertex([xoffset + co[0], yoffset + co[1], zoffset])
+            v2 = object.createVertex([xoffset + co[2], yoffset + co[1], zoffset])
+            v3 = object.createVertex([xoffset + co[2], yoffset + co[3], zoffset])
+            v4 = object.createVertex([xoffset + co[0], yoffset + co[3], zoffset])
 
             xoffset += co[4]
+            zoffset += 0.001
 
             uv1 = [uv[0], uv[1]]
             uv2 = [uv[2], uv[1]]
