@@ -526,6 +526,7 @@ def load(app):
     """
     category = app.getCategory('Advanced')
     taskview = MeasureTaskView(category)
+    
     print 'Asymm loaded'
     allSliders = [taskview.neckGroup,
                     taskview.upperArmGroup,
@@ -610,6 +611,7 @@ def load(app):
                 hideAllSliders()
                 
     hideAllSliders()
+    taskview.torsoGroup.show()
 
 
 
