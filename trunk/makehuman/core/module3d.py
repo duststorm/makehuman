@@ -52,7 +52,7 @@ import os
 textureCache = {}
 
 
-class Texture:
+class Texture(mh.Texture):
 
     """
     A simple handler for textures loaded in the scene.
@@ -64,10 +64,41 @@ class Texture:
     - **self.modified**: *int* A flag to indicate if a texture is modified, used to reload the texture if needed.
     """
 
-    def __init__(self, id, modified):
-        self.id = id
-        self.modified = modified
+    def __init__(self):
+        mh.Texture.__init__(self)
+        self.modified = None
+        
+def getTexture(path):
 
+    texture = None
+    
+    if path in textureCache:
+        
+        texture = textureCache[path]
+        
+        if os.stat(path).st_mtime != texture.modified:
+            
+            print 'reloading ' + path
+            
+            try:
+                texture.loadImage(path)
+            except RuntimeError, text:
+                print text
+                return
+            else:
+                texture.modified = os.stat(path).st_mtime
+    else:
+        
+        try:
+            texture = Texture()
+            texture.loadImage(path)
+        except RuntimeError, text:
+            print text
+        else:
+            texture.modified = os.stat(path).st_mtime
+            textureCache[path] = texture
+            
+    return texture
 
 class Vert:
 
@@ -768,34 +799,14 @@ class Object3D:
         """
 
         self.texture = path
-        if path in textureCache:
-            if os.stat(path).st_mtime != textureCache[path].modified:
-                print 'reloading ' + path
-                try:
-                    mh.loadTexture(path, textureCache[path].id)
-                except RuntimeError, text:
-                    print text
-                    return
-                else:
-                    textureCache[path].modified = os.stat(path).st_mtime
-
+        
+        texture = getTexture(path)
+        
+        if texture:
             try:
-                self.object3d.texture = textureCache[path].id
+                self.object3d.texture = texture.textureId
             except AttributeError, text:
                 pass
-        else:
-            #print 'loading ' + path
-            texture = None
-            try:
-                texture = mh.loadTexture(path, 0)
-            except RuntimeError, text:
-                print text
-            else:
-                try:
-                    textureCache[path] = Texture(texture, os.stat(path).st_mtime)
-                    self.object3d.texture = texture
-                except AttributeError, text:
-                    pass
 
     def clearTexture(self):
         """

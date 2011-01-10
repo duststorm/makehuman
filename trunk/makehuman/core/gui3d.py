@@ -304,7 +304,7 @@ class TaskView(View):
             texture=(texture or self.app.getThemeResource('images', 'button_tab2.png')),
             selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab2_on.png')),
             focusedTexture=(texture or self.app.getThemeResource('images', 'button_tab2_focused.png')),
-            label=(label or name), textureWidth=64, textureHeight=32, border=[7,7,7,7])
+            label=(label or name), border=[7,7,7,7])
 
         if name in category.tasksByName:
             raise KeyError('The task with this name already exists', name)
@@ -348,7 +348,7 @@ class Category(View):
             texture=(texture or self.app.getThemeResource('images', 'button_tab.png')),
             selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab_on.png')),
             focusedTexture=(texture or self.app.getThemeResource('images', 'button_tab_focused.png')),
-            label=(label or name), textureWidth=64, textureHeight=32, border=[7,7,7,7])
+            label=(label or name), border=[7,7,7,7])
 
         if name in parent.categories:
             raise KeyError('The category with this name already exists', name)
@@ -656,6 +656,9 @@ class Slider(View):
         
         self.background = Object(self, 'data/3dobjs/slider_background.obj',
             texture=(backgroundTexture or self.app.getThemeResource('images', 'slider_generic.png')), position=position)
+        
+        #mesh = Create9SliceMesh(16, 16, self.sliderTexture, [2,2,2,2])
+        #self.slider = Object(self, mesh, position=[position[0], position[1] + 20, position[2] + 0.01])
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj',
             texture=self.sliderTexture, position=[position[0], position[1] + 20, position[2] + 0.01])
         if isinstance(label, str):
@@ -748,7 +751,7 @@ class Button(View):
     def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture=None,\
         selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None,\
         label=None, width=None, height=None, fontSize = defaultFontSize,
-        textureWidth = 64, textureHeight = 16, border = [2, 2, 2, 2]):
+        border = [2, 2, 2, 2]):
         
         """
         This is the constructor for the Button class. It takes the following parameters:
@@ -778,7 +781,7 @@ class Button(View):
             t = self.texture
             
         if (width!=None) and (height!=None):
-            mesh = Create9SliceMesh(width, height, t, textureWidth, textureHeight, border)
+            mesh = Create9SliceMesh(width, height, t, border)
             self.button = Object(self, mesh, position=position)
             if isinstance(label, str):
                 self.label = TextObject(self, text = label, position = [position[0]+5,position[1]+2,position[2]+0.001], fontSize = fontSize)
@@ -852,7 +855,7 @@ class RadioButton(Button):
     
     def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
         position=[0, 0, 9], selected=False, focusedTexture=None, label=None, width=None, height=None,
-        fontSize = defaultFontSize, textureWidth = 64, textureHeight = 16, border = [2, 2, 2, 2]):
+        fontSize = defaultFontSize, border = [2, 2, 2, 2]):
             
         """
         This is the constructor for the RadioButton class. It takes the following parameters:
@@ -870,7 +873,7 @@ class RadioButton(Button):
         """
         
         Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, width, height,
-        fontSize, textureWidth, textureHeight, border)
+        fontSize, border)
         self.group = group
         self.group.append(self)
 
@@ -904,7 +907,7 @@ class ToggleButton(Button):
 
     def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
         position=[0, 0, 9], selected=False, focusedTexture=None, label=None, width=None, height=None,
-        fontSize = defaultFontSize, textureWidth = 64, textureHeight = 16, border = [2, 2, 2, 2]):
+        fontSize = defaultFontSize, border = [2, 2, 2, 2]):
             
         """
         This is the constructor for the ToggleButton class. It takes the following parameters:
@@ -922,7 +925,7 @@ class ToggleButton(Button):
         """
 
         Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, width, height,
-            fontSize, textureWidth, textureHeight, border)
+            fontSize, border)
 
     def onClicked(self, event):
         if self.selected:
@@ -1027,15 +1030,14 @@ class TextEdit(View):
     """
 
     def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9],
-        focusedTexture=None, width=None, height=None, fontSize = defaultFontSize,
-        textureWidth = 32, textureHeight = 32, border = [2, 2, 2, 2]):
+        focusedTexture=None, width=None, height=None, fontSize = defaultFontSize, border = [2, 2, 2, 2]):
         View.__init__(self, parent)
         
         self.texture = texture or self.app.getThemeResource('images', 'texedit_off.png')
         self.focusedTexture = focusedTexture or self.app.getThemeResource('images', 'texedit_on.png')
 
         if (width!=None) and (height!=None):
-            mesh = Create9SliceMesh(width, height, self.texture, textureWidth, textureHeight, border)
+            mesh = Create9SliceMesh(width, height, self.texture, border)
             self.background = Object(self, mesh, position=position)
         else:
             self.background = Object(self, mesh=mesh, texture=self.texture, position=position)
@@ -1390,7 +1392,7 @@ class GroupBox(View):
     """
 
     def __init__(self, parent, texture=None, position=[0, 0, 9],\
-        label=None, width=128, height=64, fontSize = defaultFontSize, textureWidth = 128, textureHeight = 64, border=[8, 24, 8, 8]):
+        label=None, width=128, height=64, fontSize = defaultFontSize, border=[8, 24, 8, 8]):
         
         """
         This is the constructor for the Button class. It takes the following parameters:
@@ -1409,7 +1411,7 @@ class GroupBox(View):
         
         texture = texture or self.app.getThemeResource('images', 'group_box.png')
         
-        mesh = Create9SliceMesh(width, height, texture, textureWidth, textureHeight, border)
+        mesh = Create9SliceMesh(width, height, texture, border)
         self.box = Object(self, mesh, None, position)
         
         if isinstance(label, str):
@@ -1420,7 +1422,7 @@ class GroupBox(View):
     def canFocus(self):
         return False
 
-def Create9SliceMesh(width, height, texture, textureWidth, textureHeight, border):
+def Create9SliceMesh(width, height, texture, border):
     
     """
     Creates a 9 slice mesh. It is a mesh with fixed size borders and a resizeable center.
@@ -1429,14 +1431,14 @@ def Create9SliceMesh(width, height, texture, textureWidth, textureHeight, border
     - **width**: *Float*. The width of the mesh.
     - **height**: *Float*. The height of the mesh.
     - **texture**: *String*. The texture.
-    - **textureWidth**: *Float*. The texture width.
-    - **textureHeight**: *Float*. The texture height.
     - **border**: *List*. The left, top, right, bottom border.
     """
     
+    t = module3d.getTexture(texture)
+    
     # Make sure fractions are calculated correctly
-    textureWidth = float(textureWidth)
-    textureHeight = float(textureHeight)
+    textureWidth = float(t.width)
+    textureHeight = float(t.height)
         
     outer=[[0, 0], [width, height]]
     inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
