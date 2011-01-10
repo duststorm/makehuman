@@ -2387,16 +2387,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.1654076"
-     inkscape:cx="-769.42151"
-     inkscape:cy="1069.6209"
+     inkscape:zoom="0.7913519"
+     inkscape:cx="-805.59981"
+     inkscape:cy="824.78671"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1003"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-width="1280"
+     inkscape:window-height="977"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -6107,25 +6107,14 @@
          x="-188.16556"
          y="199.23593">Backgr.</tspan></text>
     <rect
-       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.9677037;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:1.5028584;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3737-2-0-8-5-3-8-4-38"
-       width="399.03229"
-       height="19.032297"
-       x="-830.27667"
-       y="194.95267"
-       ry="2.8548443"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/texedit_off.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <rect
-       style="fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:1.35341251;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3737-2-0-8-5-3-8-4-38-8"
-       width="398.64658"
-       height="18.646587"
-       x="-829.68335"
-       y="220.85051"
-       ry="2.7969878"
-       inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/texedit_on.png"
+       width="30.479691"
+       height="30.497156"
+       x="-830.50476"
+       y="215.22025"
+       ry="0"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/texedit_off.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -8479,6 +8468,49 @@
        y="-42.701614"
        ry="2.3999996"
        inkscape:export-filename="/home/manuel/archive/archive_makehuman/makehuman_src/data/themes/default/images/button_selected.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#f2f2f2;stroke:#f2f2f2;stroke-width:1.5268997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -830.51022,245.51569 30.45566,0"
+       id="path4026-0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/texedit_off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#ececec;stroke:#ececec;stroke-width:1.52658367;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -830.51022,215.48711 30.45566,0"
+       id="path4026"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/texedit_off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#666666;fill-opacity:1;stroke:#666666;stroke-width:1.50285840000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3737-2-0-8-5-3-8-4-38-6"
+       width="30.479691"
+       height="30.497156"
+       x="-866.33063"
+       y="169.03679"
+       ry="0"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/texedit_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#f2f2f2;stroke:#f2f2f2;stroke-width:1.5268997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -866.33607,199.33223 30.45566,0"
+       id="path4026-0-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/texedit_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#ececec;stroke:#ececec;stroke-width:1.52658367;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -866.33607,169.30365 30.45566,0"
+       id="path4026-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/texedit_on.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>
