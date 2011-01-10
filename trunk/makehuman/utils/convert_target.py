@@ -1,4 +1,8 @@
+from os import stat
+
 def convert_target(filename):
+    
+    print('Compressing %s' % filename)
     
     # Load obj to get group information
     groups = {}
@@ -47,6 +51,8 @@ def convert_target(filename):
     #print len(groups)
     #print len(targetGroups)
     #print targetGroups
+    
+    compressedTarget = {}
         
     # Analyze target
     for name, group in targetGroups.iteritems():
@@ -64,14 +70,29 @@ def convert_target(filename):
             
             if len(group) == len(groups[name]):
                 if diffx < 0.00001 and diffy < 0.00001 and diffz < 0.00001:
+                    compressedTarget[name] = (x[0], y[0], z[0])
                     print name, x[0], y[0], z[0]
                 else:
+                    for i in group:
+                        compressedTarget[i] = target[i]
                     print '%s is not compressible because not all vertices are moved by the same distance' % name
             else:
+                for i in group:
+                        compressedTarget[i] = target[i]
                 print '%s is not compressible because not all vertices are used' % name
+                
+    # Write target
+    filename2 = filename.replace('.target', '.target2')
+    with open(filename2, 'wb') as f:
+        for name, distance in compressedTarget.iteritems():
+            f.write("%s %f %f %f\n" % (name, distance[0], distance[1], distance[2]))
+            
+    size = float(stat(filename).st_size)
+    size2 = float(stat(filename2).st_size)
+    print('Compression ratio %f%%' % ((size - size2) * 100 / size))
     
-#convert_target('../data/targets/details/ear-trans-down.target')
-#convert_target('../data/targets/details/r-hand-trans-up.target')
+convert_target('../data/targets/details/ear-trans-down.target') # 24,528 bytes to 24,528 bytes 0%
+convert_target('../data/targets/details/r-hand-trans-up.target') # 46,178 bytes to 14,472 bytes 68%
 
 import sys
 
