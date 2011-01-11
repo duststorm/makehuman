@@ -37,36 +37,36 @@ MAJOR_VERSION = 0
 MINOR_VERSION = 2
 BLENDER_VERSION = (2, 55, 5)
 
-import bpy, cmath
+import bpy, cmath, math
 from bpy.props import *
 
 #
-#	ditfft2(f, n, s, z):
+#	ditfft2(f, N, z):
 #
-#	Y0,...,N−1 ← ditfft2(X, N, s):             DFT of (X0, Xs, X2s, ..., X(N-1)s):
+#	Y_0,...,N−1 ← ditfft2(X, N, s):             DFT of (X0, Xs, X2s, ..., X(N-1)s):
 #    if N = 1 then
-#        Y0 ← X0                                      trivial size-1 DFT base case
+#        Y_0 ← X_0                                      trivial size-1 DFT base case
 #    else
-#        Y0,...,N/2−1 ← ditfft2(X, N/2, 2s)             DFT of (X0, X2s, X4s, ...)
-#        YN/2,...,N−1 ← ditfft2(X+s, N/2, 2s)           DFT of (Xs, Xs+2s, Xs+4s, ...)
+#        Y_0,...,N/2−1 ← ditfft2(X, N/2, 2s)             DFT of (X_0, X_2s, X_4s, ...)
+#        Y_N/2,...,N−1 ← ditfft2(X+s, N/2, 2s)           DFT of (X_s, X_s+2s, X_s+4s, ...)
 #        for k = 0 to N/2−1                           combine DFTs of two halves into full DFT:
-#            t ← Yk
-#            Yk ← t + exp(−2πi k/N) Yk+N/2
-#            Yk+N/2 ← t − exp(−2πi k/N) Yk+N/2
+#            t ← Y_k
+#            Y_k ← t + exp(−2πi k/N) * Y_k+N/2
+#            Y_k+N/2 ← t − exp(−2πi k/N) * Y_k+N/2
 #        endfor
 #    endif
 	
-def ditfft2(f, n, s, z):
-	if n == 1:
+def ditfft2(f, N, z):
+	if N == 1:
 		return f
 	else:
-		n2 = int(n/2)
-		f_even = ditfft2(f[::2], n2, 2*s, z)
-		f_odd = ditfft2(f[1::2], n2, 2*s, z)
+		N2 = int(N/2)
+		f_even = ditfft2(f[::2], N2, z*z)
+		f_odd = ditfft2(f[1::2], N2, z*z)
 		e = 1
 		y_even = []
 		y_odd = []
-		for k in range(n2):
+		for k in range(N2):
 			t0 = f_even[k]
 			t1 = f_odd[k]
 			y_even.append( t0 + e*t1 )
@@ -100,56 +100,133 @@ def fourierFCurves(context):
 def fourierFCurve(fcu, act, scn):
 	words = fcu.data_path.split('.')
 	if words[-1] == 'location':
+		isLoc = True
 		doFourier = scn.MhxFourierLoc
 	elif words[-1] == 'rotation_quaternion':
+		isLoc = False
 		doFourier = scn.MhxFourierRot
 	else:
 		doFourier = False
 	if not doFourier:
 		return
 
-	n = int(2**scn.MhxFourierLevels)
+	N = int(2**scn.MhxFourierLevels)
 	points = fcu.keyframe_points
 	if len(points) <= 2:
 		return
 	t0 = scn.frame_start
 	tn = scn.frame_end
-	dt = (tn-t0+1)/n
+	T = (tn-t0+1)
+	dt = T/N
 	f0 = fcu.evaluate(t0)
-	fn = fcu.evaluate(tn)
-	df = (fn-f0)/(n-1)
+	if isLoc:
+		fn = fcu.evaluate(tn)
+		df = (fn-f0)/N*(T+1)/T
+		# print(f0, fn, N, T)
+	else:
+		df = 0
+	fcu.keyframe_points.add(frame=tn+1, value=f0)
 
 	f = []
-	for i in range(n):
-		fi = fcu.evaluate(t0 + i*dt)
-		f.append( fi - i*df )
-	w = complex( 0, 2*cmath.pi/n )
+	for i in range(N):
+		ti = t0 + i*dt
+		fi = fcu.evaluate(ti)
+		f.append( fi-i*df )
+	#if isLoc:
+	#	print(fcu.data_path, fcu.array_index, df)
+	#	printList(f)
+	w = complex( 0, -2*cmath.pi/N )
 	z = cmath.exp(w)
-	fhat = ditfft2(f, n, 1, z)
-	print(fhat)
-	
+	fhat = ditfft2(f, N, z)
+	#if isLoc:
+	#	print("   ***")
+	#	printList(fhat)
+
 	path = fcu.data_path
 	index = fcu.array_index
 	grp = fcu.group.name
 	act.fcurves.remove(fcu)
 	nfcu = act.fcurves.new(path, index, grp)
-	w = complex( 0, -2*cmath.pi/n )
-	z = 1
-	for t in range(t0, tn+1):
-		y = evalFourier(fhat, 3, z)
-		z *= w
-		nfcu.keyframe_points.add(frame=t, value=y)
-	print(path, index, t, y)
+	w = complex( 0, 2*cmath.pi/T )
+	z = cmath.exp(w)
+	e = 1
+	kmax = int(2**scn.MhxFourierTerms)
+	if kmax > N/2:
+		kmax = N/2
+	for ti in range(t0, tn+2):
+		yi = evalFourier(fhat, kmax, e)/N
+		e *= z
+		nfcu.keyframe_points.add(frame=ti, value=yi)
 	return
+
+#
+#	evalFourier(fhat, kmax, z):
+#
 
 def evalFourier(fhat, kmax, z):
 	e = 1
 	f = 0
-	for k in range(kmax):
-		fn = fhat[k]
+	k = 0
+	for fn in fhat:
 		f += fn*e
 		e *= z
-	return f.real
+		k += 1
+		if k >= kmax:
+			break
+	y = f + f.conjugate()
+	if abs(y.imag) > 1e-3:
+		raise NameError("Not real", f)
+	return y.real
+
+#
+#	Testing
+#	printList(arr):
+#	makeTestCurve(context)
+#	class OBJECT_OT_MakeTestCurve(bpy.types.Operator):
+#
+
+def printList(arr):
+	for elt in arr:
+		if type(elt) == float:
+			print("%.3f" % elt)
+		elif type(elt) == complex:
+			if abs(elt.imag) < 1e-4:
+				print("%.3f" % elt.real)
+			elif abs(elt.real) < 1e-4:
+				print("%.3fj" % elt.imag)
+			else:
+				print("%.3f+%.3fj" % (elt.real, elt.imag))
+
+
+def makeTestCurve(context):
+	scn = context.scene
+	t0 = scn.frame_start
+	tn = scn.frame_end
+	N = tn-t0+1
+	rig = context.object
+	act = rig.animation_data.action
+	fcu = act.fcurves[0]
+	path = fcu.data_path
+	index = fcu.array_index
+	grp = fcu.group.name
+	act.fcurves.remove(fcu)
+	nfcu = act.fcurves.new(path, index, grp)
+	w = 2*cmath.pi/N
+	for k in range(N+1):
+		t = k+t0
+		y = 2*math.sin(w*k) + math.sin(2*w*k)
+		nfcu.keyframe_points.add(frame=t, value=y)
+	setInterpolation(rig)
+	return
+
+class OBJECT_OT_MakeTestCurveButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_MakeTestCurveButton"
+	bl_label = "Make test curve"
+
+	def execute(self, context):
+		makeTestCurve(context)
+		print("Made curve")
+		return{'FINISHED'}	
 
 #
 #	setInterpolation(rig):
@@ -200,12 +277,14 @@ class Bvh2MhxFourierPanel(bpy.types.Panel):
 		layout = self.layout
 		scn = context.scene
 		layout.operator("object.InitInterfaceButton")
+		#layout.operator("object.MakeTestCurveButton")
 
 		layout.label('Fourier')
 		row = layout.row()
 		row.prop(scn, "MhxFourierLoc")
 		row.prop(scn, "MhxFourierRot")
 		layout.prop(scn, "MhxFourierLevels")
+		layout.prop(scn, "MhxFourierTerms")
 		layout.operator("object.FourierButton")
 
 		return
@@ -230,6 +309,12 @@ def initInterface(context):
 		description="Fourier levels",
 		min = 1, max = 6,
 		default=3)
+
+	bpy.types.Scene.MhxFourierTerms = IntProperty(
+		name="Fourier terms", 
+		description="Fourier terms",
+		min = 1, max = 12,
+		default=4)
 
 class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_InitInterfaceButton"
