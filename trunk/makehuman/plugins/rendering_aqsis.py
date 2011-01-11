@@ -47,18 +47,18 @@ class AqsisTaskView(gui3d.TaskView):
             
         @self.shadingRateSlider.event
         def onChanging(value):
-            self.shadingRateSlider.label.setText("ShadingRate: "+str(round(self.shadingRateSlider.getValue(),3)))
-            self.app.settings['rendering_aqsis_shadingrate'] = self.shadingRateSlider.getValue() #Using global dictionary in app for global settings
+            self.shadingRateSlider.label.setText("ShadingRate: "+str(round(value,3)))
+            self.app.settings['rendering_aqsis_shadingrate'] = value #Using global dictionary in app for global settings
             
         @self.samplesSlider.event
         def onChanging(value):
-            self.samplesSlider.label.setText("Samples: "+str(round(self.samplesSlider.getValue(),3)))
-            self.app.settings['rendering_aqsis_samples'] = self.samplesSlider.getValue() 
+            self.samplesSlider.label.setText("Samples: "+str(round(value,3)))
+            self.app.settings['rendering_aqsis_samples'] = value
             
         @self.skinOilSlider.event
         def onChanging(value):
-            self.skinOilSlider.label.setText("Skin Oil: "+str(round(self.skinOilSlider.getValue(),3)))
-            self.app.settings['rendering_aqsis_oil'] = self.skinOilSlider.getValue() 
+            self.skinOilSlider.label.setText("Skin Oil: "+str(round(value,3)))
+            self.app.settings['rendering_aqsis_oil'] = value
     
     def onShow(self, event):
         self.renderButton.setFocus()

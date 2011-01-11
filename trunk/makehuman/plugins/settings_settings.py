@@ -9,11 +9,18 @@ class SettingsTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Settings')
 
         self.shaderGroup = []
-        gui3d.GroupBox(self, label = 'Shader', position=[10, 80, 9.0], width=128, height=256)
-        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18, 112, 9.2], label="No shader", selected=True)
-        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,144,9.2],label="Phong shader")
-        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,176,9.2],label="Toon shader")
-        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,208,9.2],label="Skin shader")
+        y = 80
+        gui3d.GroupBox(self, label = 'Shader', position=[10, y, 9.0], width=128, height=140);y+=35
+        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y, 9.2], label="No shader", selected=True);y+=25
+        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],label="Phong shader");y+=25
+        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],label="Toon shader");y+=25
+        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],label="Skin shader");y+=35
+        
+        gui3d.GroupBox(self, label = 'Slider behavior', position=[10, y, 9.0], width=128, height=128);y+=35
+        self.realtimeUpdates = gui3d.ToggleButton(self,self.shaderGroup, width=112, height=20, position=[18,y, 9.2],
+            label="Update real-time", selected=self.app.settings.get('realtimeUpdates', True));y+=25
+        self.realtimeNormalUpdates = gui3d.ToggleButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],
+            label="Update normals", selected=self.app.settings.get('realtimeNormalUpdates', True));y+=25
         
         @self.shaderNo.event
         def onClicked(event):
@@ -37,6 +44,16 @@ class SettingsTaskView(gui3d.TaskView):
             self.setShader("data/shaders/glsl/skin_vertex_shader.txt", "data/shaders/glsl/skin_fragment_shader.txt")
             self.app.scene3d.selectedHuman.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
             self.app.scene3d.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/female_young.tif", 0))
+                
+        @self.realtimeUpdates.event
+        def onClicked(event):
+            gui3d.ToggleButton.onClicked(self.realtimeUpdates, event)
+            self.app.settings['realtimeUpdates'] = self.realtimeUpdates.selected
+            
+        @self.realtimeNormalUpdates.event
+        def onClicked(event):
+            gui3d.ToggleButton.onClicked(self.realtimeNormalUpdates, event)
+            self.app.settings['realtimeNormalUpdates'] = self.realtimeNormalUpdates.selected
                 
     def setShader(self, vertex, fragment):
             human = self.app.scene3d.selectedHuman
