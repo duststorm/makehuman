@@ -19,9 +19,9 @@
 bl_addon_info = {
 	"name": "MHX Fourier",
 	"author": "Thomas Larsson",
-	"version": "0.1",
-	"blender": (2, 5, 5),
-	"api": 33590,
+	"version": "0.2",
+	"blender": (2, 6, 0),
+	"api": 34076,
 	"location": "View3D > Properties > MHX Fourier",
 	"description": "Fourier tool",
 	"warning": "",
@@ -35,24 +35,25 @@ Access from UI panel (N-key) when rig is active.
 
 MAJOR_VERSION = 0
 MINOR_VERSION = 2
-BLENDER_VERSION = (2, 55, 5)
+BLENDER_VERSION = (2, 56, 0)
+DEBUG = True
 
-import bpy, cmath, math
+import bpy, cmath, math, mathutils
 from bpy.props import *
 
 #
 #	ditfft2(f, N, z):
 #
-#	Y_0,...,N−1 ← ditfft2(X, N, s):             DFT of (X0, Xs, X2s, ..., X(N-1)s):
+#	Y_0,...,N?1 ? ditfft2(X, N, s):             DFT of (X0, Xs, X2s, ..., X(N-1)s):
 #    if N = 1 then
-#        Y_0 ← X_0                                      trivial size-1 DFT base case
+#        Y_0 ? X_0                                      trivial size-1 DFT base case
 #    else
-#        Y_0,...,N/2−1 ← ditfft2(X, N/2, 2s)             DFT of (X_0, X_2s, X_4s, ...)
-#        Y_N/2,...,N−1 ← ditfft2(X+s, N/2, 2s)           DFT of (X_s, X_s+2s, X_s+4s, ...)
-#        for k = 0 to N/2−1                           combine DFTs of two halves into full DFT:
-#            t ← Y_k
-#            Y_k ← t + exp(−2πi k/N) * Y_k+N/2
-#            Y_k+N/2 ← t − exp(−2πi k/N) * Y_k+N/2
+#        Y_0,...,N/2?1 ? ditfft2(X, N/2, 2s)             DFT of (X_0, X_2s, X_4s, ...)
+#        Y_N/2,...,N?1 ? ditfft2(X+s, N/2, 2s)           DFT of (X_s, X_s+2s, X_s+4s, ...)
+#        for k = 0 to N/2?1                           combine DFTs of two halves into full DFT:
+#            t ? Y_k
+#            Y_k ? t + exp(?2?i k/N) * Y_k+N/2
+#            Y_k+N/2 ? t ? exp(?2?i k/N) * Y_k+N/2
 #        endfor
 #    endif
 	
@@ -88,22 +89,151 @@ def fourierFCurves(context):
 		print("No FCurves to Fourier")
 		return
 
+	scn = context.scene
+	t0 = scn.frame_start
+	tn = scn.frame_end
+	rootAnim = modifyFcurves(act, rig, -1, t0, tn)
+	#removeLinearTerm(rootAnim, t0, tn)
+
 	for fcu in act.fcurves:
-		fourierFCurve(fcu, act, context.scene)
+		fourierFCurve(fcu, act, scn, t0, tn)
+	
+	#modifyFcurves(act, rig, 1, t0, tn)
+	
+	for fcu in act.fcurves:
+		f0 = fcu.evaluate(t0)
+		fcu.keyframe_points.add(frame=tn+1, value=f0)
+
 	setInterpolation(rig)
+	return
+	
+#
+#	class CAnimation:
+#
+
+class CAnimation:
+	def __init__(self, name):
+		self.name = name
+		self.fcurves = {}
+		self.locals = {}
+		self.globals = {}
+		self.matrix = None
+		self.inverse = None
+		self.head = None
+
+#
+#	modifyFcurves(act, rig, factor, t0, tn):
+#
+
+def modifyFcurves(act, rig, factor, t0, tn):
+	animations = {}
+	for fcu in act.fcurves:
+		addAnimation(fcu, animations, rig.data.bones)
+	for anim in animations.values():
+		setLocations(anim, t0, tn)
+	rootAnim = animations['Root']	
+	for anim in animations.values():
+		if anim.name != 'Root':
+			addRoot(anim, factor, rootAnim.globals, t0, tn)
+	addRoot(rootAnim, factor, rootAnim.globals, t0, tn)
+	return rootAnim
+
+#
+#	removeLinearTerm(anim, t0, tn):
+#
+
+def removeLinearTerm(anim, t0, tn):
+	for index in range(3):
+		try:
+			fcu = anim.fcurves[index]
+		except:
+			fcu = None
+		if fcu:
+			f0 = fcu.evaluate(t0)
+			fn = fcu.evaluate(tn)
+			df = (fn-f0)/(tn-t0)
+			for pt in fcu.keyframe_points:
+				t = pt.co[0]
+				pt.co[1] -= df*(t-t0)
+	return					
+
+#
+#	addAnimation(fcu, animations, bones):
+#
+
+def addAnimation(fcu, animations, bones):
+	words = fcu.data_path.split('.')
+	if words[2] != 'location':
+		return
+	index = fcu.array_index
+	words2 = words[1].split('"')
+	name = words2[1]
+	try:
+		anim = animations[name]
+		first = False
+	except:
+		anim = CAnimation(name)
+		animations[name] = anim
+		first = True		
+	if first:
+		b = bones[name]	
+		anim.matrix = b.matrix_local.rotation_part()
+		anim.inverse = anim.matrix.copy().invert()
+		anim.head = b.head_local.copy()
+	anim.fcurves[index] = fcu
 	return
 
 #
-#	fourierFCurve(fcu, act, scn):
+#	setLocations(anim, t0, t1):
 #
 
-def fourierFCurve(fcu, act, scn):
-	words = fcu.data_path.split('.')
+def setLocations(anim, t0, t1):
+	if anim.fcurves:
+		xvec = anim.fcurves[0]
+		yvec = anim.fcurves[1]
+		zvec = anim.fcurves[2]
+		for t in range(t0, t1+1):
+			x = xvec.evaluate(t)
+			y = yvec.evaluate(t)
+			z = zvec.evaluate(t)
+			anim.locals[t] = mathutils.Vector((x,y,z))
+			anim.globals[t] = anim.head + anim.locals[t]*anim.matrix
+	return
+
+#
+#	addRoot(anim, factor, rootGlobals, t0, t1):
+#
+
+def addRoot(anim, factor, rootGlobals, t0, t1):
+	if anim.fcurves:
+		for t in range(t0, t1+1):
+			anim.globals[t] += factor*rootGlobals[t]
+			anim.locals[t] = (anim.globals[t] - anim.head)*anim.inverse
+		for index in range(3):
+			pts = anim.fcurves[index].keyframe_points
+			for pt in pts:
+				t = int(pt.co[0])
+				if (t >= t0) and (t <= t1):
+					vec = anim.locals[t]
+					pt.co[1] = vec[index]
+		
+	return
+
+#
+#	fourierFCurve(fcu, act, scn, t0, tn):
+#
+
+def fourierFCurve(fcu, act, scn, t0, tn):
+	path = fcu.data_path
+	index = fcu.array_index
+	grp = fcu.group.name
+	words = path.split('.')
+
+	isLoc = False
 	if words[-1] == 'location':
 		isLoc = True
 		doFourier = scn.MhxFourierLoc
 	elif words[-1] == 'rotation_quaternion':
-		isLoc = False
 		doFourier = scn.MhxFourierRot
 	else:
 		doFourier = False
@@ -114,37 +244,31 @@ def fourierFCurve(fcu, act, scn):
 	points = fcu.keyframe_points
 	if len(points) <= 2:
 		return
-	t0 = scn.frame_start
-	tn = scn.frame_end
 	T = (tn-t0+1)
 	dt = T/N
 	f0 = fcu.evaluate(t0)
-	if isLoc:
-		fn = fcu.evaluate(tn)
-		df = (fn-f0)/N*(T+1)/T
-		# print(f0, fn, N, T)
-	else:
-		df = 0
-	fcu.keyframe_points.add(frame=tn+1, value=f0)
-
+	fn = fcu.evaluate(tn)
+	df = (fn-f0)/(N-1)
+	df = 0
+	fcu.keyframe_points.add(frame=tn+1, value=f0)	
+	
 	f = []
 	for i in range(N):
-		ti = t0 + i*dt
-		fi = fcu.evaluate(ti)
-		f.append( fi-i*df )
-	#if isLoc:
-	#	print(fcu.data_path, fcu.array_index, df)
-	#	printList(f)
+		fi = fcu.evaluate(t0 + i*dt)
+		f.append( fi - i*df)
+
+	if DEBUG and isLoc and index == 2:
+		print(path, index)
+		printList(f)
+	
 	w = complex( 0, -2*cmath.pi/N )
 	z = cmath.exp(w)
 	fhat = ditfft2(f, N, z)
-	#if isLoc:
-	#	print("   ***")
-	#	printList(fhat)
+	
+	if DEBUG and isLoc and index == 2:
+		print("   ***")
+		printList(fhat)
 
-	path = fcu.data_path
-	index = fcu.array_index
-	grp = fcu.group.name
 	act.fcurves.remove(fcu)
 	nfcu = act.fcurves.new(path, index, grp)
 	w = complex( 0, 2*cmath.pi/T )
@@ -179,10 +303,7 @@ def evalFourier(fhat, kmax, z):
 	return y.real
 
 #
-#	Testing
 #	printList(arr):
-#	makeTestCurve(context)
-#	class OBJECT_OT_MakeTestCurve(bpy.types.Operator):
 #
 
 def printList(arr):
@@ -196,7 +317,13 @@ def printList(arr):
 				print("%.3fj" % elt.imag)
 			else:
 				print("%.3f+%.3fj" % (elt.real, elt.imag))
+		else:
+			print(elt)
 
+#
+#	makeTestCurve(context)
+#	class OBJECT_OT_MakeTestCurve(bpy.types.Operator):
+#
 
 def makeTestCurve(context):
 	scn = context.scene
