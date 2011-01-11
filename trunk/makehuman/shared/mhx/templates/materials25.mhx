@@ -12,7 +12,7 @@ Image texture_ref.tif
 end Image
 
 Image ambient.tif
-  *** Filename .female_young.tif /data/textures/ ;
+  *** Filename female_young.tif /data/textures/ ;
   use_premultiply True ;
 end Image
 
@@ -98,7 +98,6 @@ Material SSS_skinshader
     mapping 'FLAT' ;
     mirror_factor 0.945272 ;
     invert False ;
-    use_old_bump True ;
     normal_factor 0.5 ;
     normal_map_space 'TANGENT' ;
     raymir_factor 1 ;
@@ -142,7 +141,6 @@ Material SSS_skinshader
     mapping 'FLAT' ;
     mirror_factor 1 ;
     invert False ;
-    use_old_bump True ;
     normal_factor 0.5 ;
     normal_map_space 'TANGENT' ;
     raymir_factor 1 ;
@@ -326,7 +324,6 @@ Material Skin_no_SSS
     use True ;
     use_from_dupli False ;
     use_from_original False ;
-    use_old_bump True ;
     use_rgb_to_intensity False ;
     use_stencil False ;
     warp_factor 0 ;
@@ -372,7 +369,6 @@ Material Skin_no_SSS
     use True ;
     use_from_dupli False ;
     use_from_original False ;
-    use_old_bump True ;
     use_rgb_to_intensity False ;
     use_stencil False ;
     warp_factor 0 ;

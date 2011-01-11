@@ -79,7 +79,6 @@ end Mesh
 *** ProxyModifiers
   color Array 1.0 1.0 1.0 1.0  ;
   show_name True ;
-  parent Refer Object Human ;
   parent_type 'OBJECT' ;
   select True ;
   lock_location Array 1 1 1 ; 

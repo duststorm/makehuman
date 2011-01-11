@@ -275,6 +275,10 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 
 			elif words[1] == 'ProxyObject':
 				fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
+				if proxy.rig:
+					fp.write("  parent Refer Object %s ;\n" % proxy.name)
+				else:
+					fp.write("  parent Refer Object Human ;\n")
 				if proxy.wire:
 					fp.write("  draw_type 'WIRE' ;\n")
 			elif words[1] == 'ProxyLayers':
