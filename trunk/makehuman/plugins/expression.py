@@ -6,6 +6,15 @@ import gui3d
 
 print 'example imported'
 
+class GroupBoxRadioButton(gui3d.RadioButton):
+    def __init__(self, parent, group, y, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, parent, group, width=112, height=20, position=[650, y, 9.1], selected=selected, label=label)
+        self.groupBox = groupBox
+        
+    def onClicked(self, event):
+        gui3d.RadioButton.onClicked(self, event)
+        self.parent.hideAllBoxes()
+        self.groupBox.show()
 
 class ExpressionTaskView(gui3d.TaskView):
 
@@ -16,26 +25,6 @@ class ExpressionTaskView(gui3d.TaskView):
         human = self.app.scene3d.selectedHuman
 
         y = 80
-
-        self.radioButtons = []
-
-
-        self.smile1RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y, 9.1], selected=True, label='Smile1')
-        self.smile2RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+22, 9.1], label='Smile2')
-        self.smile3RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+44, 9.1], label='Smile3')
-        self.smile4RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+66, 9.1], label='Smile4')
-        self.sadness1RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+88, 9.1], label='Sadness1')
-        self.sadness2RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+110, 9.1], label='Sadness2')
-        self.sadness3RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+132, 9.1], label='Sadness3')
-        self.sadness4RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+154, 9.1], label='Sadness4')
-        self.sadness5RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+176, 9.1], label='Sadness5')
-        self.relaxation1RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+198, 9.1], label='Relaxation1')
-        self.relaxation2RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+220, 9.1], label='Relaxation2')
-        self.surpriseRadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+242, 9.1], label='Surprise')
-        self.anger1RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+264, 9.1], label='Anger1')
-        self.anger2RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+286, 9.1], label='Anger2')
-        self.anger3RadioButton = gui3d.RadioButton(self, self.radioButtons, width=112, height=20, position=[650, y+308, 9.1], label='Anger3')
-
 
         smile1 = gui3d.GroupBox(self, label = 'Smile1', position=[10, y, 9.0], width=128, height=320)
         smile2 = gui3d.GroupBox(self, label = 'Smile2', position=[10, y, 9.0], width=128, height=320)
@@ -57,7 +46,26 @@ class ExpressionTaskView(gui3d.TaskView):
         anger2 = gui3d.GroupBox(self, label = 'Anger2', position=[10, y, 9.0], width=128, height=320)
         anger3 = gui3d.GroupBox(self, label = 'Anger3', position=[10, y, 9.0], width=128, height=320)
 
-        groupBoxes = [smile1,smile2,smile3,smile4,sadness1,sadness2,sadness3,sadness4,sadness5,relaxation1,relaxation2,surprise,anger1,anger2,anger3]
+        self.groupBoxes = [smile1,smile2,smile3,smile4,sadness1,sadness2,sadness3,sadness4,sadness5,relaxation1,relaxation2,surprise,anger1,anger2,anger3]
+
+        self.radioButtons = []
+
+        self.smile1RadioButton = GroupBoxRadioButton(self, self.radioButtons, y, 'Smile1', smile1, selected=True)
+        self.smile2RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+22, 'Smile2', smile2)
+        self.smile3RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+44, 'Smile3', smile3)
+        self.smile4RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+66, 'Smile4', smile4)
+        self.sadness1RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+88, 'Sadness1', sadness1)
+        self.sadness2RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+110, 'Sadness2', sadness2)
+        self.sadness3RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+132, 'Sadness3', sadness3)
+        self.sadness4RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+154, 'Sadness4', sadness4)
+        self.sadness5RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+176, 'Sadness5', sadness5)
+        self.relaxation1RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+198, 'Relaxation1', relaxation1)
+        self.relaxation2RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+220, 'Relaxation2', relaxation2)
+        self.surpriseRadioButton = GroupBoxRadioButton(self, self.radioButtons, y+242, 'Surprise', surprise)
+        self.anger1RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+264, 'Anger1', anger1)
+        self.anger2RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+286, 'Anger2', anger2)
+        self.anger3RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+308, 'Anger3', anger3)
+
 
         self.smileSlider = gui3d.Slider(smile1, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_smile.target'), label='Smile')
         self.hopefulSlider = gui3d.Slider(smile1, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_hopefull.target'), label='Smile')
@@ -133,14 +141,7 @@ class ExpressionTaskView(gui3d.TaskView):
         self.haughtySlider = gui3d.Slider(anger3, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_haughty.target'), label='Haughty')
         self.disgustedSlider = gui3d.Slider(anger3, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_disgusted.target'), label='Disgusted')
 
-
-
-
-        def hideAllBoxes():
-            for box in groupBoxes:
-                box.hide()
-
-        hideAllBoxes()
+        self.hideAllBoxes()
         smile1.show()
 
 
@@ -435,116 +436,6 @@ class ExpressionTaskView(gui3d.TaskView):
             human.setDetail('data/targets/expression/female_young/neutral_female_young_laughing2.target', value)
             human.applyAllTargets(self.app.progress)
 
-
-
-
-
-
-
-        #Radio buttons
-
-        @self.anger1RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.anger1RadioButton, event)
-            hideAllBoxes()
-            anger1.show()
-
-        @self.anger2RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.anger2RadioButton, event)
-            hideAllBoxes()
-            anger2.show()
-
-        @self.anger3RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.anger3RadioButton, event)
-            hideAllBoxes()
-            anger3.show()
-
-
-        @self.relaxation1RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.relaxation1RadioButton, event)
-            hideAllBoxes()
-            relaxation1.show()
-
-        @self.relaxation2RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.relaxation2RadioButton, event)
-            hideAllBoxes()
-            relaxation2.show()
-
-
-        @self.sadness1RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.sadness1RadioButton, event)
-            hideAllBoxes()
-            sadness1.show()
-
-        @self.sadness2RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.sadness2RadioButton, event)
-            hideAllBoxes()
-            sadness2.show()
-
-        @self.sadness3RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.sadness3RadioButton, event)
-            hideAllBoxes()
-            sadness3.show()
-
-        @self.sadness4RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.sadness4RadioButton, event)
-            hideAllBoxes()
-            sadness4.show()
-            
-        @self.sadness5RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.sadness5RadioButton, event)
-            hideAllBoxes()
-            sadness5.show()
-            
-            
-        @self.surpriseRadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.surpriseRadioButton, event)
-            hideAllBoxes()
-            surprise.show()
-
-
-        @self.smile1RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.smile1RadioButton, event)
-            hideAllBoxes()
-            smile1.show()
-
-        @self.smile2RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.smile2RadioButton, event)
-            hideAllBoxes()
-            smile2.show()
-
-        @self.smile3RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.smile3RadioButton, event)
-            hideAllBoxes()
-            smile3.show()
-
-        @self.smile4RadioButton.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.smile4RadioButton, event)
-            hideAllBoxes()
-            smile4.show()
-
-
-
-
-
-
-
-
-
         def changeValue(self, IDName, value, realtime=False):
             """
             """
@@ -552,7 +443,9 @@ class ExpressionTaskView(gui3d.TaskView):
             self.setModifierValue(value, IDName)
             self.human.applyAllTargets(self.human.app.progress)
 
-
+    def hideAllBoxes(self):
+            for box in self.groupBoxes:
+                box.hide()
 
 
 category = None
