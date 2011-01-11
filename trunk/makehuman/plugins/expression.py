@@ -4,7 +4,7 @@
 
 import gui3d
 
-print 'example imported'
+print 'Expression imported'
 
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, parent, group, y, label, groupBox, selected=False):
@@ -15,6 +15,17 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         gui3d.RadioButton.onClicked(self, event)
         self.parent.hideAllBoxes()
         self.groupBox.show()
+        
+class ExpressionSlider(gui3d.Slider):
+    def __init__(self, parent, y, label, detail):
+        human = parent.app.scene3d.selectedHuman
+        gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = human.getDetail(detail), label=label)
+        self.detail = detail
+    
+    def onChange(self, value):
+        human = self.app.scene3d.selectedHuman
+        human.setDetail(self.detail, value)
+        human.applyAllTargets(self.app.progress)
 
 class ExpressionTaskView(gui3d.TaskView):
 
@@ -67,375 +78,83 @@ class ExpressionTaskView(gui3d.TaskView):
         self.anger3RadioButton = GroupBoxRadioButton(self, self.radioButtons, y+308, 'Anger3', anger3)
 
 
-        self.smileSlider = gui3d.Slider(smile1, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_smile.target'), label='Smile')
-        self.hopefulSlider = gui3d.Slider(smile1, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_hopefull.target'), label='Smile')
-        self.innocentSlider = gui3d.Slider(smile1, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_innocent.target'), label='Innocent')
+        self.smileSlider = ExpressionSlider(smile1, y+35, 'Smile', 'data/targets/expression/female_young/neutral_female_young_smile.target')
+        self.hopefulSlider = ExpressionSlider(smile1, y+70, 'Hopeful', 'data/targets/expression/female_young/neutral_female_young_hopefull.target')
+        self.innocentSlider = ExpressionSlider(smile1, y+105, 'Innocent', 'data/targets/expression/female_young/neutral_female_young_innocent.target')
 
-        self.realsmileSlider = gui3d.Slider(smile2, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_smile.target'), label='Real Smile')
-        self.tenderSlider = gui3d.Slider(smile2, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_hopeful.target'), label='Tender')
-        self.seductiveSlider = gui3d.Slider(smile2, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_seductive.target'), label='Seductive')
+        self.realsmileSlider = ExpressionSlider(smile2, y+35, 'Real Smile', 'data/targets/expression/female_young/neutral_female_young_smile.target')
+        self.tenderSlider = ExpressionSlider(smile2, y+70, 'Tender', 'data/targets/expression/female_young/neutral_female_young_tender.target')
+        self.seductiveSlider = ExpressionSlider(smile2, y+105, 'Seductive', 'data/targets/expression/female_young/neutral_female_young_seductive.target')
 
-        self.grinSlider = gui3d.Slider(smile3, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_grin.target'), label='Grin')
-        self.excitedSlider = gui3d.Slider(smile3, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_excited.target'), label='Excited')
-        self.ecstaticSlider = gui3d.Slider(smile3, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_ecstatic.target'), label='Ecstatic')
+        self.grinSlider = ExpressionSlider(smile3, y+35, 'Grin', 'data/targets/expression/female_young/neutral_female_young_grin.target')
+        self.excitedSlider = ExpressionSlider(smile3, y+70, 'Excited', 'data/targets/expression/female_young/neutral_female_young_excited.target')
+        self.ecstaticSlider = ExpressionSlider(smile3, y+105, 'Ecstatic', 'data/targets/expression/female_young/neutral_female_young_ecstatic.target')
 
-        self.proudSlider = gui3d.Slider(smile4, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_proud.target'), label='Proud')
-        self.pleasedSlider = gui3d.Slider(smile4, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_pleased.target'), label='Pleased')
-        self.amusedSlider = gui3d.Slider(smile4, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_amused.target'), label='Amused')
-        self.laughing1Slider = gui3d.Slider(smile4, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_laughing1.target'), label='laughing1')
-        self.laughing2Slider = gui3d.Slider(smile4, position=[10, y+175, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_laughing2.target'), label='laughing2')
+        self.proudSlider = ExpressionSlider(smile4, y+35, 'Proud', 'data/targets/expression/female_young/neutral_female_young_proud.target')
+        self.pleasedSlider = ExpressionSlider(smile4, y+70, 'Pleased', 'data/targets/expression/female_young/neutral_female_young_pleased.target')
+        self.amusedSlider = ExpressionSlider(smile4, y+105, 'Amused', 'data/targets/expression/female_young/neutral_female_young_amused.target')
+        self.laughing1Slider = ExpressionSlider(smile4, y+140, 'laughing1', 'data/targets/expression/female_young/neutral_female_young_laughing1.target')
+        self.laughing2Slider = ExpressionSlider(smile4, y+175, 'laughing2', 'data/targets/expression/female_young/neutral_female_young_laughing2.target')
 
-        self.sosoSlider = gui3d.Slider(sadness1, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_so-so.target'), label='So so')
-        self.blueSlider = gui3d.Slider(sadness1, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_blue.target'), label='Blue')
-        self.depressedSlider = gui3d.Slider(sadness1, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_depressed.target'), label='Depressed')
+        self.sosoSlider = ExpressionSlider(sadness1, y+35, 'So so', 'data/targets/expression/female_young/neutral_female_young_so-so.target')
+        self.blueSlider = ExpressionSlider(sadness1, y+70, 'Blue', 'data/targets/expression/female_young/neutral_female_young_blue.target')
+        self.depressedSlider = ExpressionSlider(sadness1, y+105, 'Depressed', 'data/targets/expression/female_young/neutral_female_young_depressed.target')
 
-        self.sadSlider = gui3d.Slider(sadness2, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_sad.target'), label='Sad')
-        self.distressedSlider = gui3d.Slider(sadness2, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_distressed.target'), label='Distressed')
-        self.cryingSlider = gui3d.Slider(sadness2, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_crying.target'), label='Crying')
-        self.painSlider = gui3d.Slider(sadness2, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_pain.target'), label='Pain')
+        self.sadSlider = ExpressionSlider(sadness2, y+35, 'Sad', 'data/targets/expression/female_young/neutral_female_young_sad.target')
+        self.distressedSlider = ExpressionSlider(sadness2, y+70, 'Distressed', 'data/targets/expression/female_young/neutral_female_young_distressed.target')
+        self.cryingSlider = ExpressionSlider(sadness2, y+105, 'Crying', 'data/targets/expression/female_young/neutral_female_young_crying.target')
+        self.painSlider = ExpressionSlider(sadness2, y+140, 'Pain', 'data/targets/expression/female_young/neutral_female_young_pain.target')
 
-        self.disappointedSlider = gui3d.Slider(sadness3, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_disappointed.target'), label='Disappointed')
-        self.frustratedSlider = gui3d.Slider(sadness3, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_frustrated.target'), label='Frustrated')
-        self.stressedSlider = gui3d.Slider(sadness3, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_stressed.target'), label='Stressed')
+        self.disappointedSlider = ExpressionSlider(sadness3, y+35, 'Disappointed', 'data/targets/expression/female_young/neutral_female_young_disappointed.target')
+        self.frustratedSlider = ExpressionSlider(sadness3, y+70, 'Frustrated', 'data/targets/expression/female_young/neutral_female_young_frustrated.target')
+        self.stressedSlider = ExpressionSlider(sadness3, y+105, 'Stressed', 'data/targets/expression/female_young/neutral_female_young_stressed.target')
 
-        self.worriedSlider = gui3d.Slider(sadness4, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_worried.target'), label='Worried')
-        self.scaredSlider = gui3d.Slider(sadness4, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_scared.target'), label='Scared')
-        self.terrifiedSlider = gui3d.Slider(sadness4, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_terrified.target'), label='Terrified')
+        self.worriedSlider = ExpressionSlider(sadness4, y+35, 'Worried', 'data/targets/expression/female_young/neutral_female_young_worried.target')
+        self.scaredSlider = ExpressionSlider(sadness4, y+70, 'Scared', 'data/targets/expression/female_young/neutral_female_young_scared.target')
+        self.terrifiedSlider = ExpressionSlider(sadness4, y+105, 'Terrified', 'data/targets/expression/female_young/neutral_female_young_terrified.target')
 
-        self.shySlider = gui3d.Slider(sadness5, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_shy.target'), label='Shy')
-        self.guiltySlider = gui3d.Slider(sadness5, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_guilty.target'), label='Guilty')
-        self.embarassedSlider = gui3d.Slider(sadness5, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_embarassed.target'), label='Embarassed')
+        self.shySlider = ExpressionSlider(sadness5, y+35, 'Shy', 'data/targets/expression/female_young/neutral_female_young_shy.target')
+        self.guiltySlider = ExpressionSlider(sadness5, y+70, 'Guilty', 'data/targets/expression/female_young/neutral_female_young_guilty.target')
+        self.embarassedSlider = ExpressionSlider(sadness5, y+105, 'Embarassed', 'data/targets/expression/female_young/neutral_female_young_embarassed.target')
 
-        self.relaxedSlider = gui3d.Slider(relaxation1, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_relaxed.target'), label='Relaxed')
-        self.peacefulSlider = gui3d.Slider(relaxation1, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_peaceful.target'), label='Peaceful')
-        self.refreshedSlider = gui3d.Slider(relaxation1, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_refreshed.target'), label='Refreshed')
-        self.pleasuredSlider = gui3d.Slider(relaxation1, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_pleased.target'), label='Pleasured')
+        self.relaxedSlider = ExpressionSlider(relaxation1, y+35, 'Relaxed', 'data/targets/expression/female_young/neutral_female_young_relaxed.target')
+        self.peacefulSlider = ExpressionSlider(relaxation1, y+70, 'Peaceful', 'data/targets/expression/female_young/neutral_female_young_peaceful.target')
+        self.refreshedSlider = ExpressionSlider(relaxation1, y+105, 'Refreshed', 'data/targets/expression/female_young/neutral_female_young_refreshed.target')
+        self.pleasuredSlider = ExpressionSlider(relaxation1, y+140, 'Pleasured', 'data/targets/expression/female_young/neutral_female_young_pleased.target')
 
-        self.lazySlider = gui3d.Slider(relaxation2, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_lazy.target'), label='Lazy')
-        self.boredSlider = gui3d.Slider(relaxation2, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_bored.target'), label='Bored')
-        self.tiredSlider = gui3d.Slider(relaxation2, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_tired.target'), label='Tired')
-        self.drainedSlider = gui3d.Slider(relaxation2, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_drained.target'), label='Drained')
-        self.sleepySlider = gui3d.Slider(relaxation2, position=[10, y+175, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_sleepy.target'), label='Sleepy')
-        self.groggySlider = gui3d.Slider(relaxation2, position=[10, y+210, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_groggy.target'), label='Groggy')
+        self.lazySlider = ExpressionSlider(relaxation2, y+35, 'Lazy', 'data/targets/expression/female_young/neutral_female_young_lazy.target')
+        self.boredSlider = ExpressionSlider(relaxation2, y+70, 'Bored', 'data/targets/expression/female_young/neutral_female_young_bored.target')
+        self.tiredSlider = ExpressionSlider(relaxation2, y+105, 'Tired', 'data/targets/expression/female_young/neutral_female_young_tired.target')
+        self.drainedSlider = ExpressionSlider(relaxation2, y+140, 'Drained', 'data/targets/expression/female_young/neutral_female_young_drained.target')
+        self.sleepySlider = ExpressionSlider(relaxation2, y+175, 'Sleepy', 'data/targets/expression/female_young/neutral_female_young_sleepy.target')
+        self.groggySlider = ExpressionSlider(relaxation2, y+210, 'Groggy', 'data/targets/expression/female_young/neutral_female_young_groggy.target')
 
-        self.curiousSlider = gui3d.Slider(surprise, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_curious.target'), label='Curious')
-        self.surprisedSlider = gui3d.Slider(surprise, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_surprised.target'), label='Surprised')
-        self.impressedSlider = gui3d.Slider(surprise, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_impressed.target'), label='Impressed')
-        self.puzzledSlider = gui3d.Slider(surprise, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_puzzled.target'), label='Puzzled')
-        self.shockedSlider = gui3d.Slider(surprise, position=[10, y+175, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_shocked.target'), label='Shocked')
+        self.curiousSlider = ExpressionSlider(surprise, y+35, 'Curious', 'data/targets/expression/female_young/neutral_female_young_curious.target')
+        self.surprisedSlider = ExpressionSlider(surprise, y+70, 'Surprised', 'data/targets/expression/female_young/neutral_female_young_surprised.target')
+        self.impressedSlider = ExpressionSlider(surprise, y+105, 'Impressed', 'data/targets/expression/female_young/neutral_female_young_impressed.target')
+        self.puzzledSlider = ExpressionSlider(surprise, y+140, 'Puzzled', 'data/targets/expression/female_young/neutral_female_young_puzzled.target')
+        self.shockedSlider = ExpressionSlider(surprise, y+175, 'Shocked', 'data/targets/expression/female_young/neutral_female_young_shocked.target')
 
-        self.frownSlider = gui3d.Slider(anger1, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_frown.target'), label='Frown')
-        self.upsetSlider = gui3d.Slider(anger1, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_upset.target'), label='Upset')
-        self.angrySlider = gui3d.Slider(anger1, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_angry.target'), label='Angry')
-        self.furiousSlider = gui3d.Slider(anger1, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_furious.target'), label='Furious')
-        self.enragedSlider = gui3d.Slider(anger1, position=[10, y+175, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_enraged.target'), label='Enraged')
+        self.frownSlider = ExpressionSlider(anger1, y+35, 'Frown', 'data/targets/expression/female_young/neutral_female_young_frown.target')
+        self.upsetSlider = ExpressionSlider(anger1, y+70, 'Upset', 'data/targets/expression/female_young/neutral_female_young_upset.target')
+        self.angrySlider = ExpressionSlider(anger1, y+105, 'Angry', 'data/targets/expression/female_young/neutral_female_young_angry.target')
+        self.furiousSlider = ExpressionSlider(anger1, y+140, 'Furious', 'data/targets/expression/female_young/neutral_female_young_furious.target')
+        self.enragedSlider = ExpressionSlider(anger1, y+175, 'Enraged', 'data/targets/expression/female_young/neutral_female_young_enraged.target')
 
-        self.skepticalSlider = gui3d.Slider(anger2, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_skeptical.target'), label='Skeptical')
-        self.vindictiveSlider = gui3d.Slider(anger2, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_vindictive.target'), label='Vindictive')
-        self.poutSlider = gui3d.Slider(anger2, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_pout.target'), label='Pout')
-        self.furiousSlider = gui3d.Slider(anger2, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_furious.target'), label='Furious')
-        self.grumpySlider = gui3d.Slider(anger2, position=[10, y+175, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_grumpy.target'), label='Grumpy')
+        self.skepticalSlider = ExpressionSlider(anger2, y+35, 'Skeptical', 'data/targets/expression/female_young/neutral_female_young_skeptical.target')
+        self.vindictiveSlider = ExpressionSlider(anger2, y+70, 'Vindictive', 'data/targets/expression/female_young/neutral_female_young_vindictive.target')
+        self.poutSlider = ExpressionSlider(anger2, y+105, 'Pout', 'data/targets/expression/female_young/neutral_female_young_pout.target')
+        self.furiousSlider = ExpressionSlider(anger2, y+140, 'Furious', 'data/targets/expression/female_young/neutral_female_young_furious.target')
+        self.grumpySlider = ExpressionSlider(anger2, y+175, 'Grumpy', 'data/targets/expression/female_young/neutral_female_young_grumpy.target')
 
-        self.arrogantSlider = gui3d.Slider(anger3, position=[10, y+35, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_arrogant.target'), label='Arrogant')
-        self.sneeringSlider = gui3d.Slider(anger3, position=[10, y+70, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_sneering.target'), label='Sneering')
-        self.haughtySlider = gui3d.Slider(anger3, position=[10, y+105, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_haughty.target'), label='Haughty')
-        self.disgustedSlider = gui3d.Slider(anger3, position=[10, y+140, 9.1], value = human.getDetail('data/targets/expression/female_young/neutral_female_young_disgusted.target'), label='Disgusted')
+        self.arrogantSlider = ExpressionSlider(anger3, y+35, 'Arrogant', 'data/targets/expression/female_young/neutral_female_young_arrogant.target')
+        self.sneeringSlider = ExpressionSlider(anger3, y+70, 'Sneering', 'data/targets/expression/female_young/neutral_female_young_sneering.target')
+        self.haughtySlider = ExpressionSlider(anger3, y+105, 'Haughty', 'data/targets/expression/female_young/neutral_female_young_haughty.target')
+        self.disgustedSlider = ExpressionSlider(anger3, y+140, 'Disgusted', 'data/targets/expression/female_young/neutral_female_young_disgusted.target')
 
         self.hideAllBoxes()
         smile1.show()
-
-
-        @self.disappointedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_disappointed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.frustratedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_frustrated.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.stressedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_stressed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-
-        @self.worriedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_worried.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.scaredSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_scared.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.terrifiedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_terrified.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.shySlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_shy.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.guiltySlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_guilty.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.embarassedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_embarassed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.relaxedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_relaxed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.peacefulSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_peaceful.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.refreshedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_refreshed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.pleasuredSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_pleased.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.lazySlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_lazy.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.boredSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_bored.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.tiredSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_tired.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.drainedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_drained.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.sleepySlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_sleepy.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.groggySlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_groggy.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.curiousSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_curious.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.surprisedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_surprised.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.impressedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_impressed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.puzzledSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_puzzled.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.shockedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_shocked.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.skepticalSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_skeptical.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.vindictiveSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_vindictive.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.poutSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_pout.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.grumpySlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_grumpy.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.arrogantSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_arrogant.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.sneeringSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_sneering.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.haughtySlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_haughty.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.disgustedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_disgusted.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.worriedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_worried.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.scaredSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_scared.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.terrifiedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_terrified.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.sadSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_sad.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.distressedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_distressed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.cryingSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_crying.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.painSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_pain.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.sadSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_sad.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.distressedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_distressed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.cryingSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_crying.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.painSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_pain.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.sosoSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_so-so.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.blueSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_blue.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.depressedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_depressed.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.smileSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_smile.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.innocentSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_innocent.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.realsmileSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_realsmile.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.seductiveSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_seductive.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.grinSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_grin.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.excitedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_excited.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.ecstaticSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_ecstatic.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.proudSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_proud.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.pleasedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_pleased.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.amusedSlider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_amused.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.laughing1Slider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_laughing1.target', value)
-            human.applyAllTargets(self.app.progress)
-
-        @self.laughing2Slider.event
-        def onChange(value):
-            human.setDetail('data/targets/expression/female_young/neutral_female_young_laughing2.target', value)
-            human.applyAllTargets(self.app.progress)
-
+        
         def changeValue(self, IDName, value, realtime=False):
             """
             """
@@ -459,15 +178,13 @@ def load(app):
     category = app.getCategory('Advanced')
     taskview = ExpressionTaskView(category)
 
-    print 'example loaded'
-    print 'Hello world'
-
+    print 'Expression loaded'
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'example unloaded'
+    print 'Expression unloaded'
 
 
