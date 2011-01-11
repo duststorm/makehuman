@@ -7,6 +7,30 @@ from algos3d import loadTranslationTarget
 
 print 'Expression imported'
 
+class Action:
+
+    def __init__(self, human, detail, before, after, postAction=None):
+        self.name = 'Change expression'
+        self.human = human
+        self.detail = detail
+        self.before = before
+        self.after = after
+        self.postAction = postAction
+
+    def do(self):
+        self.human.setDetail(self.detail, self.after)
+        self.human.applyAllTargets()
+        if self.postAction:
+            self.postAction()
+        return True
+
+    def undo(self):
+        self.human.setDetail(self.detail, self.before)
+        self.human.applyAllTargets()
+        if self.postAction:
+            self.postAction()
+        return True
+
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, parent, group, y, label, groupBox, selected=False):
         gui3d.RadioButton.__init__(self, parent, group, width=112, height=20, position=[650, y, 9.1], selected=selected, label=label)
@@ -22,20 +46,27 @@ class ExpressionSlider(gui3d.Slider):
         human = parent.app.scene3d.selectedHuman
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = human.getDetail(detail), label=label)
         self.detail = detail
+        self.before = None
     
     def onChange(self, value):
         human = self.app.scene3d.selectedHuman
-        human.setDetail(self.detail, value)
-        human.applyAllTargets(self.app.progress)
+        self.app.do(Action(human, self.detail, self.before, value, self.update))
+        self.before = None
         
     def onChanging(self, value):
         human = self.app.scene3d.selectedHuman
+        if self.before is None:
+            self.before = human.getDetail(self.detail)
         loadTranslationTarget(human.meshData, self.detail, -human.getDetail(self.detail), None, 0, 0)
         human.setDetail(self.detail, value)
         loadTranslationTarget(human.meshData, self.detail, value, None, 0, 0)
         #human.meshData.calcNormals(1, 1, human.headVertices, human.headFaces)
         human.meshData.update(human.headVertices)
         human.meshData.update(human.teethVertices)
+        
+    def update(self):
+        human = self.app.scene3d.selectedHuman
+        self.setValue(human.getDetail(self.detail))
 
 class ExpressionTaskView(gui3d.TaskView):
 
