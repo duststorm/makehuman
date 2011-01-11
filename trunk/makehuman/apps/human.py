@@ -213,6 +213,9 @@ class Human(gui3d.Object):
 
         jawNames = [group.name for group in self.meshData.facesGroups if ("jaw" in group.name or "mouth" in group.name)]
         self.jawVertices, self.jawFaces = self.meshData.getVerticesAndFacesForGroups(jawNames)
+        
+        teethNames = [group.name for group in self.meshData.facesGroups if ("teeth" in group.name)]
+        self.teethVertices, self.teethFaces = self.meshData.getVerticesAndFacesForGroups(teethNames)
 
     # Overriding hide and show to account for both human base and the hairs!
 

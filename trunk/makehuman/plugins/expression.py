@@ -3,6 +3,7 @@
 # We need this for gui controls
 
 import gui3d
+from algos3d import loadTranslationTarget
 
 print 'Expression imported'
 
@@ -26,6 +27,15 @@ class ExpressionSlider(gui3d.Slider):
         human = self.app.scene3d.selectedHuman
         human.setDetail(self.detail, value)
         human.applyAllTargets(self.app.progress)
+        
+    def onChanging(self, value):
+        human = self.app.scene3d.selectedHuman
+        loadTranslationTarget(human.meshData, self.detail, -human.getDetail(self.detail), None, 0, 0)
+        human.setDetail(self.detail, value)
+        loadTranslationTarget(human.meshData, self.detail, value, None, 0, 0)
+        #human.meshData.calcNormals(1, 1, human.headVertices, human.headFaces)
+        human.meshData.update(human.headVertices)
+        human.meshData.update(human.teethVertices)
 
 class ExpressionTaskView(gui3d.TaskView):
 
