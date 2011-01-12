@@ -105,9 +105,53 @@ class Target:
         self.verts = tuple(verticesToRecalculate)
 
         fileDescriptor.close()
+        
+    def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
+        
+        if morphFactor == 0:
+            return
+
+        if self.verts:
+            
+            if faceGroupToUpdateName:
+
+                # if a facegroup is provided, apply it ONLY to the verts used
+                # by the specified facegroup.
+            
+                faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
+                verticesToUpdate = set()
+                facesToRecalculate = list(faceGroupToUpdate.faces)
+                for f in facesToRecalculate:
+                    for v in f.verts:
+                        verticesToUpdate.add(v)
+                        
+            else:
+
+                # if a vertgroup is not provided, all verts affected by
+                # the targets will be modified
+
+                facesToRecalculate = [obj.faces[i] for i in self.faces]
+                verticesToUpdate = [obj.verts[i] for i in self.verts]
+
+            # Adding the translation vector
+
+            for v in verticesToUpdate:
+                targetVect = self.data[v.idx]
+                v.co[0] += targetVect[0] * morphFactor * scale[0]
+                v.co[1] += targetVect[1] * morphFactor * scale[1]
+                v.co[2] += targetVect[2] * morphFactor * scale[2]
+
+            if calcNormals:
+                obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
+            if update:
+                obj.update(verticesToUpdate)
+
+            # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+
+            return True
 
 
-def pushTargetInBuffer(obj, targetPath):
+def getTarget(obj, targetPath):
     """
     This function retrieves a set of translation vectors from a morphing 
     target file and stores them in a buffer. It is usually only called if 
@@ -137,18 +181,21 @@ def pushTargetInBuffer(obj, targetPath):
     targetPath:
         *string*. The file system path to the file containing the morphing targets. 
         The precise format of this string will be operating system dependant.
-hi
-
     """
-
-    t1 = time.time()
 
     global targetBuffer
 
-    targetBuffer[targetPath] = Target(obj, targetPath)
-
-    #print 'Buffer time', time.time() - t1
-
+    try:
+        target = targetBuffer[targetPath]
+    except KeyError, text:
+        pass
+    else:
+        return target
+        
+    target = Target(obj, targetPath)
+    targetBuffer[targetPath] = target
+    
+    return target
 
 def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1, scale=[1.0,1.0,1.0]):
     """
@@ -202,52 +249,9 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=No
     if morphFactor == 0:
         return
 
-    t1 = time.time()
-    global targetBuffer
-    if not targetBuffer.has_key(targetPath):
-        pushTargetInBuffer(obj, targetPath)
+    target = getTarget(obj, targetPath)
 
-    # if the target is already buffered, just get it using
-    # the path as key
-
-    if os.path.isfile(targetPath): 
-        target = targetBuffer[targetPath]   
-
-        # if a facegroup is provided, apply it ONLY to the verts used
-        # by the specified facegroup.
-
-        if faceGroupToUpdateName:
-
-            faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
-            indicesToUpdate = set()
-            facesToRecalculate = list(faceGroupToUpdate.faces)
-            for f in facesToRecalculate:
-                for v in f.verts:
-                    verticesToUpdate.add(v)
-        else:
-
-            # if a vertgroup is not provided, all verts affected by
-            # the targets will be modified
-
-            facesToRecalculate = [obj.faces[i] for i in target.faces]
-            verticesToUpdate = [obj.verts[i] for i in target.verts]
-
-        # Adding the translation vector
-
-        for v in verticesToUpdate:
-            targetVect = target.data[v.idx]
-            v.co[0] += targetVect[0] * morphFactor * scale[0]
-            v.co[1] += targetVect[1] * morphFactor * scale[1]
-            v.co[2] += targetVect[2] * morphFactor * scale[2]
-
-        if calcNorm == 1:
-            obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
-        if update:
-            obj.update(verticesToUpdate)
-
-        # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
-
-        return True
+    target.apply(obj, morphFactor, update, calcNorm, faceGroupToUpdateName, scale)
 
 
 def calcTargetNormal(obj, targetPath):
@@ -270,27 +274,22 @@ def calcTargetNormal(obj, targetPath):
 
     """
 
-    global targetBuffer
-    if not targetBuffer.has_key(targetPath):
-        pushTargetInBuffer(obj, targetPath)
+    target = getTarget(obj, targetPath)
 
     # if the target is already buffered, just get it using
     # the path as key
 
-    try:
-        target = targetBuffer[targetPath]
-    except:
-        print 'Probably %s does not exist' % targetPath
-        return
-    facesToRecalculate = [obj.faces[i] for i in target.faces]
-    verticesToUpdate = [obj.verts[i] for i in target.verts]
-    obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
-    obj.update(verticesToUpdate)
+    if target:
+        facesToRecalculate = [obj.faces[i] for i in target.faces]
+        verticesToUpdate = [obj.verts[i] for i in target.verts]
+        obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
+        obj.update(verticesToUpdate)
 
-    # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
+        # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
 
-    return True
-
+        return True
+    else:
+        return False
 
 
 def loadRotationTarget(obj, targetPath, morphFactor):  

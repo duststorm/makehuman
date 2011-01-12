@@ -60,11 +60,8 @@ class ExpressionSlider(gui3d.Slider):
                 self.before = human.getDetail(self.detail)
             loadTranslationTarget(human.meshData, self.detail, -human.getDetail(self.detail), None, 0, 0)
             human.setDetail(self.detail, value)
-            loadTranslationTarget(human.meshData, self.detail, value, None, 0, 0)
-            if self.app.settings.get('realtimeNormalUpdates', True):
-                human.meshData.calcNormals(1, 1, human.headVertices, human.headFaces)
-            human.meshData.update(human.headVertices)
-            human.meshData.update(human.teethVertices)
+            loadTranslationTarget(human.meshData, self.detail, value, None, 1,
+                self.app.settings.get('realtimeNormalUpdates', True))
         
     def update(self):
         human = self.app.scene3d.selectedHuman
