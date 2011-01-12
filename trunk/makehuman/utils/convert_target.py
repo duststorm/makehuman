@@ -1,4 +1,5 @@
 from os import stat
+import zlib
 
 def convert_target(filename):
     
@@ -83,16 +84,22 @@ def convert_target(filename):
                 
     # Write target
     filename2 = filename.replace('.target', '.target2')
+    
+    target2 = 'version 1.1\n'
+    
+    for name, distance in compressedTarget.iteritems():
+        target2 += "%s %f %f %f\n" % (name, distance[0], distance[1], distance[2])
+    
     with open(filename2, 'wb') as f:
-        for name, distance in compressedTarget.iteritems():
-            f.write("%s %f %f %f\n" % (name, distance[0], distance[1], distance[2]))
+        f.write(zlib.compress(target2))
             
     size = float(stat(filename).st_size)
     size2 = float(stat(filename2).st_size)
+    print('Original %d Compressed %d' % (size, size2))
     print('Compression ratio %f%%' % ((size - size2) * 100 / size))
     
-convert_target('../data/targets/details/ear-trans-down.target') # 24,528 bytes to 24,528 bytes 0%
-convert_target('../data/targets/details/r-hand-trans-up.target') # 46,178 bytes to 14,472 bytes 68%
+convert_target('../data/targets/details/ear-trans-down.target') # 24,528 bytes to 24,528 bytes 0% zlib 6077 75.224234%
+convert_target('../data/targets/details/r-hand-trans-up.target') # 46,178 bytes to 14,472 bytes 68% zlib 2007 95.653775%
 
 import sys
 
