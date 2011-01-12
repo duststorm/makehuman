@@ -1066,9 +1066,13 @@ def makeVectorDict(ob, channel):
 	vecDict = {}
 	for name in fcuDict.keys():
 		fcuDict[name].sort()		
+		(index, fcu) = fcuDict[name][0]
+		m = len(fcu.keyframe_points)
+		for (index, fcu) in fcuDict[name]:
+			if len(fcu.keyframe_points) != m:
+				raise NameError("Not all F-Curves for %s have the same length" % name)
 		vectors = []
-		(index,fcu) = fcuDict[name][0]
-		for kp in fcu.keyframe_points:
+		for kp in range(m):
 			vectors.append([])
 		for (index, fcu) in fcuDict[name]:			
 			n = 0
@@ -1165,16 +1169,26 @@ def constrainIkBones(srcRig):
 
 #
 #	copyAnglesFKIK():
-#	'UpArmIK' : ('UpArmFK', F_LR, 'Shoulder')
+#
 
 def copyAnglesFKIK(context):
-	bpy.ops.object.mode_set(mode='EDIT')
-	ebones = context.object.data.edit_bones
-	for nameIK in theIkBoneList:
-		(nameFK, flags, parent) = IkArmature[nameIK]
-		for suffix in ['_L', '_R']:
-			ebones[nameIK+suffix].roll = ebones[nameFK+suffix].roll
-	bpy.ops.object.mode_set(mode='POSE')
+	trgRig = context.object
+	guessTargetArmature(trgRig)
+	trgAnimations = createTargetAnimation(context, trgRig)
+	insertAnimation(context, trgRig, trgAnimations, theFkBoneList)
+	onoff = toggleLimitConstraints(trgRig)
+	setLimitConstraints(trgRig, 0.0)
+	print(trgRig, theTarget)
+	print(trgAnimations)
+	if theTarget == T_MHX:
+		poseTrgIkBonesMHX(context, trgRig, trgAnimations)
+	elif theTarget == T_Game or theTarget == T_Rorkimaru:
+		poseTrgIkBonesGame(context, trgRig, trgAnimations)
+	setInterpolation(trgRig)
+	if onoff == 'OFF':
+		setLimitConstraints(trgRig, 1.0)
+	else:
+		setLimitConstraints(trgRig, 0.0)
 	return
 	
 #
@@ -1628,8 +1642,8 @@ def poseTrgIkBonesGame(context, trgRig, trgAnimations):
 			animFK = trgAnimations[nameFK]
 			animIK = trgAnimations[nameIK]
 			locs = insertLocationKeyFrames(nameIK, pbones[nameIK], animFK, animIK)
-			rots = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],animFK, animIK)
-			insertAnimRoot(nameIK, trgAnimations, -1, locs, rots)
+			#rots = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],animFK, animIK)
+			#insertAnimRoot(nameIK, trgAnimations, -1, locs, rots)
 	return
 
 
@@ -2145,6 +2159,8 @@ def initInterface(context):
 		scn['MhxReallyDelete'] = False
 		listAllActions(context)
 		setAction()
+	else:
+		print("Warning - no scene - scene properties not set")
 
 	bpy.types.Object.MhxArmature = StringProperty()
 

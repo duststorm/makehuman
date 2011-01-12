@@ -92,13 +92,11 @@ def fourierFCurves(context):
 	scn = context.scene
 	t0 = scn.frame_start
 	tn = scn.frame_end
-	rootAnim = modifyFcurves(act, rig, -1, t0, tn)
-	#removeLinearTerm(rootAnim, t0, tn)
+	if scn.MhxRemoveRoot:
+		modifyFcurves(act, rig, -1, scn, t0, tn)
 
 	for fcu in act.fcurves:
 		fourierFCurve(fcu, act, scn, t0, tn)
-	
-	#modifyFcurves(act, rig, 1, t0, tn)
 	
 	for fcu in act.fcurves:
 		f0 = fcu.evaluate(t0)
@@ -122,10 +120,10 @@ class CAnimation:
 		self.head = None
 
 #
-#	modifyFcurves(act, rig, factor, t0, tn):
+#	modifyFcurves(act, rig, factor, scn, t0, tn):
 #
 
-def modifyFcurves(act, rig, factor, t0, tn):
+def modifyFcurves(act, rig, factor, scn, t0, tn):
 	animations = {}
 	for fcu in act.fcurves:
 		addAnimation(fcu, animations, rig.data.bones)
@@ -134,8 +132,9 @@ def modifyFcurves(act, rig, factor, t0, tn):
 	rootAnim = animations['Root']	
 	for anim in animations.values():
 		if anim.name != 'Root':
-			addRoot(anim, factor, rootAnim.globals, t0, tn)
-	addRoot(rootAnim, factor, rootAnim.globals, t0, tn)
+			addRoot(anim, factor, rootAnim.globals, scn, t0, tn)
+			removeLinearTerm(anim, t0, tn)
+	addRoot(rootAnim, factor, rootAnim.globals, scn, t0, tn)
 	return rootAnim
 
 #
@@ -152,9 +151,11 @@ def removeLinearTerm(anim, t0, tn):
 			f0 = fcu.evaluate(t0)
 			fn = fcu.evaluate(tn)
 			df = (fn-f0)/(tn-t0)
+			n = tn-t0
+			df0 = df*n/2.0
 			for pt in fcu.keyframe_points:
 				t = pt.co[0]
-				pt.co[1] -= df*(t-t0)
+				pt.co[1] += df0 - df*(t-t0)
 	return					
 
 #
@@ -201,21 +202,22 @@ def setLocations(anim, t0, t1):
 	return
 
 #
-#	addRoot(anim, factor, rootGlobals, t0, t1):
+#	addRoot(anim, factor, rootGlobals, scn, t0, t1):
 #
 
-def addRoot(anim, factor, rootGlobals, t0, t1):
+def addRoot(anim, factor, rootGlobals, scn, t0, t1):
 	if anim.fcurves:
 		for t in range(t0, t1+1):
 			anim.globals[t] += factor*rootGlobals[t]
 			anim.locals[t] = (anim.globals[t] - anim.head)*anim.inverse
 		for index in range(3):
-			pts = anim.fcurves[index].keyframe_points
-			for pt in pts:
-				t = int(pt.co[0])
-				if (t >= t0) and (t <= t1):
-					vec = anim.locals[t]
-					pt.co[1] = vec[index]
+			if (index == 2 or not scn.MhxRemoveZOnly):
+				pts = anim.fcurves[index].keyframe_points
+				for pt in pts:
+					t = int(pt.co[0])
+					if (t >= t0) and (t <= t1):
+						vec = anim.locals[t]
+						pt.co[1] = vec[index]
 		
 	return
 
@@ -231,10 +233,9 @@ def fourierFCurve(fcu, act, scn, t0, tn):
 
 	isLoc = False
 	if words[-1] == 'location':
-		isLoc = True
-		doFourier = scn.MhxFourierLoc
+		doFourier = False 	# scn.MhxFourierLoc
 	elif words[-1] == 'rotation_quaternion':
-		doFourier = scn.MhxFourierRot
+		doFourier = True	# scn.MhxFourierRot
 	else:
 		doFourier = False
 	if not doFourier:
@@ -242,8 +243,6 @@ def fourierFCurve(fcu, act, scn, t0, tn):
 
 	N = int(2**scn.MhxFourierLevels)
 	points = fcu.keyframe_points
-	if len(points) <= 2:
-		return
 	T = (tn-t0+1)
 	dt = T/N
 	f0 = fcu.evaluate(t0)
@@ -372,6 +371,39 @@ def setInterpolation(rig):
 	return
 
 #
+#	toggleIkConstraints(rig):
+#	class OBJECT_OT_ToggleIkConstraintsButton(bpy.types.Operator):
+#
+
+def toggleIkConstraints(rig):
+	pbones = rig.pose.bones
+	first = True
+	for pb in pbones:
+		for cns in pb.constraints:
+			if (cns.type == 'IK'):
+				if first:
+					first = False
+					if cns.influence > 0.5:
+						inf = 0.0
+						res = 'OFF'
+					else:
+						inf = 1.0
+						res = 'ON'
+				cns.influence = inf
+	if first:
+		return 'NOT FOUND'
+	return res
+
+class OBJECT_OT_ToggleIkConstraintsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ToggleIkConstraintsButton"
+	bl_label = "Toggle IK constraints"
+
+	def execute(self, context):
+		res = toggleIkConstraints(context.object)
+		print("IK constraints toggled", res)
+		return{'FINISHED'}	
+
+#
 #	class OBJECT_OT_FourierButton(bpy.types.Operator):
 #
 
@@ -405,11 +437,10 @@ class Bvh2MhxFourierPanel(bpy.types.Panel):
 		scn = context.scene
 		layout.operator("object.InitInterfaceButton")
 		#layout.operator("object.MakeTestCurveButton")
-
-		layout.label('Fourier')
-		row = layout.row()
-		row.prop(scn, "MhxFourierLoc")
-		row.prop(scn, "MhxFourierRot")
+		layout.operator("object.ToggleIkConstraintsButton")
+		layout.separator()
+		layout.prop(scn, "MhxRemoveRoot")
+		layout.prop(scn, "MhxRemoveZOnly")
 		layout.prop(scn, "MhxFourierLevels")
 		layout.prop(scn, "MhxFourierTerms")
 		layout.operator("object.FourierButton")
@@ -421,6 +452,16 @@ class Bvh2MhxFourierPanel(bpy.types.Panel):
 #
 
 def initInterface(context):
+	bpy.types.Scene.MhxRemoveRoot = BoolProperty(
+		name="Remove root animation",
+		description="Remove root animation",
+		default=True)
+
+	bpy.types.Scene.MhxRemoveZOnly = BoolProperty(
+		name="Only Z component",
+		description="Remove only Z-component of root animation",
+		default=True)
+
 	bpy.types.Scene.MhxFourierLoc = BoolProperty(
 		name="Location",
 		description="Fourier transform location F-curves",
