@@ -11,6 +11,18 @@ import mh
 import humanmodifier
 import events3d
 
+class AssymSlider(gui3d.Slider):
+    
+    def __init__(self, parent, x, y, bodypart, label):
+        gui3d.Slider.__init__(self, parent, position=[x, y, 9.3], value=0.0, min=-1.0, max=1.0, label=label)
+        self.bodypart = bodypart
+        
+    def onChange(self, value):
+        self.parent.changeValue(self.bodypart, value)
+        
+    def onChanging(self, value):
+        self.parent.changeValue(self.bodypart, value, True)
+
 class AsymmTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -19,19 +31,19 @@ class AsymmTaskView(gui3d.TaskView):
         #Sliders
         y = 80
         gui3d.GroupBox(self, label = 'Face', position=[10, y, 9.0], width=128, height=400);y+=35
-        self.asymmBrowSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Brow asymmetry");y+=40
-        self.asymmCheekSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Cheek asymmetry");y+=40
-        self.asymmEarsSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Ears asymmetry");y+=40
-        self.asymmEyeSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Eye asymmetry");y+=40
-        self.asymmJawSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Jaw asymmetry");y+=40
-        self.asymmMouthSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Mouth asymmetry");y+=40
-        self.asymmNoseSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Nose asymmetry");y+=40
-        self.asymmTempleSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Temple asymmetry");y+=40
-        self.asymmTopSlider = gui3d.Slider(self,  position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Top asymmetry");y+=40 + 8
+        self.asymmBrowSlider = AssymSlider(self, 10, y, "brown", "Brow asymmetry");y+=40
+        self.asymmCheekSlider = AssymSlider(self, 10, y, "cheek", "Cheek asymmetry");y+=40
+        self.asymmEarsSlider = AssymSlider(self, 10, y,  "ear", "Ears asymmetry");y+=40
+        self.asymmEyeSlider = AssymSlider(self, 10, y, "eye", "Eye asymmetry");y+=40
+        self.asymmJawSlider = AssymSlider(self, 10, y, "jaw", "Jaw asymmetry");y+=40
+        self.asymmMouthSlider = AssymSlider(self, 10, y, "mouth", "Mouth asymmetry");y+=40
+        self.asymmNoseSlider = AssymSlider(self, 10, y, "nose", "Nose asymmetry");y+=40
+        self.asymmTempleSlider = AssymSlider(self, 10, y, "temple", "Temple asymmetry");y+=40
+        self.asymmTopSlider = AssymSlider(self, 10, y, "top", "Top asymmetry");y+=40 + 8
         y = 80
         gui3d.GroupBox(self, label = 'Body', position=[650, y, 9.0], width=128, height=120);y+=25
-        self.asymmTrunkSlider = gui3d.Slider(self,  position=[650, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Trunk asymmetry");y+=40
-        self.asymmBreastSlider = gui3d.Slider(self,  position=[650, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Breast asymmetry")
+        self.asymmTrunkSlider = AssymSlider(self, 650, y, "trunk", "Trunk asymmetry");y+=40
+        self.asymmBreastSlider = AssymSlider(self, 650, y, "breast", "Breast asymmetry")
 
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"
@@ -53,96 +65,6 @@ class AsymmTaskView(gui3d.TaskView):
         
         # Undo memory
         self.before = None
-
-        #Sliders events
-
-        @self.asymmBrowSlider.event
-        def onChange(value):
-            self.changeValue("brown",value)
-            
-        @self.asymmBrowSlider.event
-        def onChanging(value):
-            self.changeValue("brown",value,True)
-
-        @self.asymmCheekSlider.event
-        def onChange(value):
-            self.changeValue("cheek",value)
-            
-        @self.asymmCheekSlider.event
-        def onChanging(value):
-            self.changeValue("cheek",value,True)
-
-        @self.asymmEarsSlider.event
-        def onChange(value):
-            self.changeValue("ear",value)
-            
-        @self.asymmEarsSlider.event
-        def onChanging(value):
-            self.changeValue("ear",value,True)
-
-        @self.asymmEyeSlider.event
-        def onChange(value):
-            self.changeValue("eye",value)
-            
-        @self.asymmEyeSlider.event
-        def onChanging(value):
-            self.changeValue("eye",value,True)
-
-        @self.asymmJawSlider.event
-        def onChange(value):
-            self.changeValue("jaw",value)
-            
-        @self.asymmJawSlider.event
-        def onChanging(value):
-            self.changeValue("jaw",value,True)
-
-        @self.asymmMouthSlider.event
-        def onChange(value):
-            self.changeValue("mouth",value)
-            
-        @self.asymmMouthSlider.event
-        def onChanging(value):
-            self.changeValue("mouth",value,True)
-
-        @self.asymmNoseSlider.event
-        def onChange(value):
-            self.changeValue("nose",value)
-            
-        @self.asymmNoseSlider.event
-        def onChanging(value):
-            self.changeValue("nose",value,True)
-
-        @self.asymmTempleSlider.event
-        def onChange(value):
-            self.changeValue("temple",value)
-            
-        @self.asymmTempleSlider.event
-        def onChanging(value):
-            self.changeValue("temple",value,True)
-
-        @self.asymmTopSlider.event
-        def onChange(value):
-            self.changeValue("top",value)
-            
-        @self.asymmTopSlider.event
-        def onChanging(value):
-            self.changeValue("top",value,True)
-
-        @self.asymmTrunkSlider.event
-        def onChange(value):
-            self.changeValue("trunk",value)
-            
-        @self.asymmTrunkSlider.event
-        def onChanging(value):
-            self.changeValue("trunk",value,True)
-
-        @self.asymmBreastSlider.event
-        def onChange(value):
-            self.changeValue("breast",value)
-
-        @self.asymmBreastSlider.event
-        def onChanging(value):
-            self.changeValue("breast",value,True)
 
     def changeValue(self, bodyPartName, value, realtime=False):
         """
