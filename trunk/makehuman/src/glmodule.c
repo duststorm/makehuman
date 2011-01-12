@@ -395,14 +395,26 @@ static int Texture_init(Texture *self, PyObject *args, PyObject *kwds)
 
 static PyObject *Texture_loadImage(Texture *texture, PyObject *path)
 {
-    if (!PyString_Check(path))
+    if (PyString_Check(path))
     {
-        PyErr_SetString(PyExc_TypeError, "String expected");
+        if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
+            return NULL;
+    }
+    else if (PyUnicode_Check(path))
+    {
+        path = PyUnicode_AsUTF8String(path);
+        if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
+        {
+            Py_DECREF(path);
+            return NULL;
+        }
+        Py_DECREF(path);
+    }
+    else
+    {
+        PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
         return NULL;
     }
-
-    if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
-        return NULL;
 
     return Py_BuildValue("");
 }
