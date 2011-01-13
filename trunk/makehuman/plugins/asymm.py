@@ -228,8 +228,10 @@ def load(app):
         elif rightButtonDown:
             human = app.scene3d.selectedHuman
             trans = human.getPosition()
-            trans[0] += 0.1 * diff[0]
-            trans[1] -= 0.1 * diff[1]
+            trans = app.modelCamera.convertToScreen(trans[0], trans[1], trans[2])
+            trans[0] += diff[0]
+            trans[1] += diff[1]
+            trans = app.modelCamera.convertToWorld3D(trans[0], trans[1], trans[2])
             human.setPosition(trans)
 
 
