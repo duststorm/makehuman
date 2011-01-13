@@ -442,7 +442,7 @@ def filterMesh(mesh1):
 
 def exportDae(obj, fp):
 	global theStuff
-	(useMain, rig, mhxVersion, proxyList) = mh2proxy.proxyConfig()
+	cfg = mh2proxy.proxyConfig()
 	amt = getArmatureFromRigFile('data/templates/game.rig', obj)
 	#rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
 	rawTargets = []
@@ -451,14 +451,14 @@ def exportDae(obj, fp):
 	stuff = CStuff('Human', None)
 	stuff.setBones(amt)
 	theStuff = stuff
-	if 'Dae' in useMain:
+	if 'Dae' in cfg.mainmesh:
 		mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
 		mesh2 = filterMesh(mesh1)
 		stuff.setMesh(mesh2)
 		stuffs.append(stuff)
 
-	setupProxies('Proxy', obj, stuffs, amt, rawTargets, proxyList)
-	setupProxies('Clothes', obj, stuffs, amt, rawTargets, proxyList)
+	setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
+	setupProxies('Clothes', obj, stuffs, amt, rawTargets, cfg.proxyList)
 
 	if theStuff.verts == None:
 		raise NameError("No rig found. Neither main mesh nor rigged proxy enabled")

@@ -97,66 +97,70 @@ def proxyFilePtr(name):
 #	proxyConfig():
 #
 
+class CProxyConfig:
+	def __init__(self):
+		self.mainmesh = ['obj', 'mhx', 'dae']
+		self.useRig = 'mhx'
+		self.mhxversion = [24, 25]
+		self.proxyList = []
+		self.expressions = ['mhx']
+		self.faceshapes = ['mhx']
+		self.bodyshapes = ['mhx']
+
 def proxyConfig():
-	proxyList = []
+	cfg = CProxyConfig()
 	typ = 'Proxy'
 	layer = 2
 	useMhx = True
 	useObj = True
 	useDae = True
-	useRig = 'mhx'
-	useMain = ['Obj', 'Mhx', 'Dae']
-	mhxVersion = [24, 25]
 	fp = proxyFilePtr('proxy.cfg')
 	if not fp: 
-		return (useMain, useRig, proxyList)
+		return cfg
 	for line in fp:
 		words = line.split()
 		if len(words) == 0 or words[0][0] == '#':
 			pass
 		elif words[0] == '@':
-			if words[1] == 'MainMesh':
+			key = words[1].lower()
+			if key in ['mainmesh', 'mhxversion', 'expressions', 'faceshapes', 'bodyshapes']:
 				try:
-					useMain = words[2:]
+					exec("cfg.%s = words[2:]" % key)
 				except:
 					pass
-			elif words[1] == 'MhxVersion':
-				mhxVersion = []
-				for word in words[2:]:
-					mhxVersion.append( int(word) )
-			elif words[1] == 'Rig':
+			elif key == 'rig':
 				try:
-					useRig = words[2].lower()
+					cfg.useRig = words[2].lower()
 				except:
 					pass
-			elif words[1] == 'Obj':
+			elif key == 'obj':
 				try:
 					useObj = eval(words[2])
 				except:
 					pass
-			elif words[1] == 'Mhx':
+			elif key == 'mhx':
 				try:
 					useMhx = eval(words[2])
 				except:
 					pass
-			elif words[1] == 'Dae':
+			elif key == 'dae':
 				try:
 					useDae = eval(words[2])
 				except:
 					pass
-			elif words[1] in ['Proxy', 'Cage', 'Clothes']:
-				typ = words[1]
+			elif key in ['proxy', 'cage', 'clothes']:
+				typ = key.capitalize()
 				layer = int(words[2])
 			else:
 				raise NameError('Unrecognized command %s in proxy.cfg' % words[1])
 		else:
 			proxyFile = os.path.expanduser(words[0])
-			proxyList.append((typ, useObj, useMhx, useDae, (proxyFile, typ, layer)))
+			cfg.proxyList.append((typ, useObj, useMhx, useDae, (proxyFile, typ, layer)))
 	fp.close()
-	print "Proxy configuration: Use %s" % useMain
-	for elt in proxyList:
+	print "Proxy configuration: Use %s" % cfg.mainmesh
+	for elt in cfg.proxyList:
 		print "  ", elt
-	return (useMain, useRig, mhxVersion, proxyList)
+	return cfg
 
 	
 #
@@ -215,7 +219,7 @@ def readProxyFile(obj, proxyStuff):
 				proxy.rig = words[2]
 			elif words[1] == 'wire':
 				proxy.wire = True
-			elif words[1] == 'cage':
+			elif words[1] == 'Cage':
 				proxy.cage = True
 			elif words[1] == 'weightfile':
 				proxy.weightfile = (words[2], words[3])
@@ -607,8 +611,8 @@ def fixProxyShape(shape):
 #
 
 def exportProxyObj(obj, name):
-	(useMain, rig, mhxVersion, proxyList) = proxyConfig()
-	for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
+	cfg = proxyConfig()
+	for (typ, useObj, useMhx, useDae, proxyStuff) in cfg.proxyList:
 		if useObj:
 			proxy = readProxyFile(obj, proxyStuff)
 			if proxy.name:

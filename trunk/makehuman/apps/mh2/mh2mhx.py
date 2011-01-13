@@ -33,33 +33,33 @@ import sys, time
 mhxPath = os.path.realpath('./shared/mhx')
 if mhxPath not in sys.path:
 	sys.path.append(mhxPath)
-import mh2proxy, mhxbones, read_rig, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_body_25
+import mh2proxy, mhxbones, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_body_25
+import read_expression, read_rig
 
 #
 #	exportMhx(obj, filename):
 #
 def exportMhx(obj, filename):	
+	global theConfig
+	theConfig = mh2proxy.proxyConfig()
 	(name, ext) = os.path.splitext(filename)
-
-	cfg = mh2proxy.proxyConfig()
-	(useMain, useRig, mhxVersion, proxyList) = cfg
 	
-	if 24 in mhxVersion:
+	if '24' in theConfig.mhxversion:
 		time1 = time.clock()
 		filename = name+"-24"+ext
 		#print("Writing MHX 2.4x file " + filename )
 		fp = open(filename, 'w')
-		exportMhx_24(obj, cfg, fp)
+		exportMhx_24(obj, fp)
 		fp.close()
 		time2 = time.clock()
 		print("MHX 2.4x file %s written %g s" % (filename, time2-time1))
 	
-	if 25 in mhxVersion:
+	if '25' in theConfig.mhxversion:
 		time1 = time.clock()
 		filename = name+"-25"+ext
 		#print("Writing MHX 2.5x file " + filename )
 		fp = open(filename, 'w')
-		exportMhx_25(obj, cfg, fp)
+		exportMhx_25(obj, fp)
 		fp.close()
 		time2 = time.clock()
 		print("MHX 2.5x file %s written %g s" % (filename, time2-time1))
@@ -67,10 +67,10 @@ def exportMhx(obj, filename):
 	return
 
 #
-#	exportMhx_24(obj, cfg, fp):
+#	exportMhx_24(obj, fp):
 #
 
-def exportMhx_24(obj, cfg, fp):
+def exportMhx_24(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -85,7 +85,7 @@ def exportMhx_24(obj, cfg, fp):
 	exportArmature(obj, fp)
 	tmpl = open("shared/mhx/templates/meshes24.mhx")
 	if tmpl:
-		copyMeshFile249(obj, tmpl, cfg, fp)	
+		copyMeshFile249(obj, tmpl, fp)	
 		tmpl.close()
 	return
 
@@ -108,10 +108,10 @@ def exportRawMhx(obj, fp):
 	return
 
 #
-#	exportMhx_25(obj, cfg, fp):
+#	exportMhx_25(obj, fp):
 #
 
-def exportMhx_25(obj, cfg, fp):
+def exportMhx_25(obj, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -120,7 +120,6 @@ def exportMhx_25(obj, cfg, fp):
 "  error 'This file can only be read with Blender 2.5' ;\n" +
 "#endif\n")
 
-	(useMain, rig, mhxVersion, proxyList) = cfg
 	mhx_rig.setupRig(obj)
 
 	fp.write(
@@ -129,13 +128,14 @@ def exportMhx_25(obj, cfg, fp):
 "  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
 "end Object\n\n")
 
-	if rig == 'mhx':
+	if theConfig.useRig == 'mhx':
+		rig = theConfig.useRig
 		fp.write("#if toggle&T_Armature\n")
 		copyFile25(obj, "shared/mhx/templates/custom-shapes25.mhx", rig, fp, None, [])	
 		mhx_rig.setupCircles(fp)
 		copyFile25(obj, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
 		fp.write("#endif\n")
-	elif rig == 'game':
+	elif theConfig.useRig == 'game':
 		rig = mh2proxy.CProxy('Rig', 0)
 		rig.name = 'Human'
 		(locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/game.rig', obj)
@@ -150,15 +150,15 @@ def exportMhx_25(obj, cfg, fp):
 	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
 
 	proxyData = {}
-	proxyCopy('Cage', obj, rig, proxyList, proxyData, fp)
+	proxyCopy('Cage', obj, rig, theConfig.proxyList, proxyData, fp)
 
-	if useMain:
+	if theConfig.mainmesh:
 		fp.write("#if toggle&T_Mesh\n")
 		copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
 		fp.write("#endif\n")
 
-	proxyCopy('Proxy', obj, rig, proxyList, proxyData, fp)
-	proxyCopy('Clothes', obj, rig, proxyList, proxyData, fp)
+	proxyCopy('Proxy', obj, rig, theConfig.proxyList, proxyData, fp)
+	proxyCopy('Clothes', obj, rig, theConfig.proxyList, proxyData, fp)
 
 	fp.write("#if toggle&T_Armature\n")
 	copyFile25(obj, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData)	
@@ -181,7 +181,6 @@ def proxyCopy(name, obj, rig, proxyList, proxyData, fp):
 #
 
 def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
-	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	if tmpl == None:
 		print("Cannot open "+tmplName)
@@ -409,7 +408,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 		else:
 			fp.write(line)
 
-	print("Closing "+tmplName)
+	print("%s copied" % tmplName)
 	tmpl.close()
 
 	return
@@ -421,7 +420,6 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 def copyVertGroups(tmplName, fp, proxy):
 	if proxy and proxy.rig:
 		return
-	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	shapes = []
 	vgroups = []
@@ -452,7 +450,7 @@ def copyVertGroups(tmplName, fp, proxy):
 				fp.write(line)
 			else:	
 				fp.write(line)
-	print("Closing "+tmplName)
+	print("%s copied" % tmplName)
 	tmpl.close()
 	return
 
@@ -482,7 +480,6 @@ def printProxyVGroup(fp, vgroups):
 def copyShapeKeys(tmplName, fp, proxy, doScale):
 	if proxy and proxy.rig:
 		return
-	print("Trying to open "+tmplName)
 	tmpl = open(tmplName)
 	shapes = []
 	vgroups = []
@@ -541,7 +538,7 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
 				fp.write(line)
 			else:	
 				fp.write(line)
-	print("Closing "+tmplName)
+	print("%s copied" % tmplName)
 	tmpl.close()
 	return
 
@@ -616,16 +613,29 @@ def writeShapeKeys(fp, rig, name, proxy):
 "  end ShapeKey\n")
 
 	if (not proxy or proxy.type == 'Proxy'):
-		fp.write("#if toggle&T_Face\n")
-		if BODY_LANGUAGE:
-			copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)	
-		else:
-			copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
-		fp.write("#endif\n")
+		if theConfig.faceshapes:
+			fp.write("#if toggle&T_Face\n")		
+			if BODY_LANGUAGE:
+				copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)	
+			else:
+				copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)	
+			fp.write("#endif\n")	
 
-	fp.write("#if toggle&T_Shape\n")
-	copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
-	fp.write("#endif\n")
+	if not proxy:
+		if theConfig.expressions:
+			exprList = read_expression.readExpressions()
+			fp.write("#if toggle&T_Face\n")		
+			for (name, verts) in exprList:
+				fp.write("ShapeKey %s Sym True\n" % name)
+				for (v, dx, dy, dz) in verts:
+					fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
+				fp.write("end ShapeKey\n")
+			fp.write("#endif\n")
+
+	if theConfig.bodyshapes:
+		fp.write("#if toggle&T_Shape\n")
+		copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
+		fp.write("#endif\n")
 
 	if rig != 'mhx':
 		fp.write(
@@ -689,10 +699,10 @@ def copyMaterialFile(infile, fp):
 	tmpl.close()
 
 #
-#	copyMeshFile249(obj, tmpl, cfg, fp):
+#	copyMeshFile249(obj, tmpl, fp):
 #
 
-def copyMeshFile249(obj, tmpl, cfg, fp):
+def copyMeshFile249(obj, tmpl, fp):
 	inZone = False
 	skip = False
 	mainMesh = False
@@ -709,9 +719,8 @@ def copyMeshFile249(obj, tmpl, cfg, fp):
 				skipOne = True
 				fp.write("#endif\n")
 				mainMesh = False
-				(useMain, useRig, mhxVersion, proxyList) = cfg
 				fp.write("#if useProxy\n")
-				for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
+				for (typ, useObj, useMhx, useDae, proxyStuff) in theConfig.proxyList:
 					if useObj:
 						exportProxy24(obj, proxyStuff, fp)
 				fp.write("#endif\n")
@@ -1020,10 +1029,9 @@ def writeIpo(fp):
 
 	mhxFile = "shared/mhx/templates/mhxipos.mhx"
 	try:
-		print("Trying to open "+mhxFile)
 		tmpl = open(mhxFile, "rU")
 	except:
-		print("Failed to open "+mhxFile)
+		print("Cannot open "+mhxFile)
 		tmpl = None
 
 	if tmpl and splitLeftRight:
@@ -1042,7 +1050,7 @@ def writeIpo(fp):
 		fp.write("end ipo\n")
 	
 	if tmpl:
-		print(mhxFile+" closed")
+		print("%s copied" % mhxFile)
 		tmpl.close()
 
 	return
