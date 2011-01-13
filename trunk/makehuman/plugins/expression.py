@@ -3,7 +3,7 @@
 # We need this for gui controls
 
 import gui3d
-from algos3d import loadTranslationTarget
+from algos3d import getTarget
 
 print 'Expression imported'
 
@@ -45,27 +45,27 @@ class ExpressionSlider(gui3d.Slider):
     def __init__(self, parent, y, label, detail):
         human = parent.app.scene3d.selectedHuman
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = human.getDetail(detail), label=label)
-        self.detail = detail
+        self.target = getTarget(human.meshData, detail)
         self.before = None
     
     def onChange(self, value):
         human = self.app.scene3d.selectedHuman
-        self.app.do(Action(human, self.detail, self.before, value, self.update))
+        self.app.do(Action(human, self.target.name, self.before, value, self.update))
         self.before = None
         
     def onChanging(self, value):
         if self.app.settings.get('realtimeUpdates', True):
             human = self.app.scene3d.selectedHuman
             if self.before is None:
-                self.before = human.getDetail(self.detail)
-            loadTranslationTarget(human.meshData, self.detail, -human.getDetail(self.detail), None, 0, 0)
-            human.setDetail(self.detail, value)
-            loadTranslationTarget(human.meshData, self.detail, value, None, 1,
+                self.before = human.getDetail(self.target.name)
+            self.target.apply(human.meshData, -human.getDetail(self.target.name), False, False)
+            human.setDetail(self.target.name, value)
+            self.target.apply(human.meshData, value, True,
                 self.app.settings.get('realtimeNormalUpdates', True))
         
     def update(self):
         human = self.app.scene3d.selectedHuman
-        self.setValue(human.getDetail(self.detail))
+        self.setValue(human.getDetail(self.target.name))
 
 class ExpressionTaskView(gui3d.TaskView):
 
