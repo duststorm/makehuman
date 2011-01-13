@@ -106,6 +106,7 @@ def proxyConfig():
 	useDae = True
 	useRig = 'mhx'
 	useMain = ['Obj', 'Mhx', 'Dae']
+	mhxVersion = [24, 25]
 	fp = proxyFilePtr('proxy.cfg')
 	if not fp: 
 		return (useMain, useRig, proxyList)
@@ -119,6 +120,10 @@ def proxyConfig():
 					useMain = words[2:]
 				except:
 					pass
+			elif words[1] == 'MhxVersion':
+				mhxVersion = []
+				for word in words[2:]:
+					mhxVersion.append( int(word) )
 			elif words[1] == 'Rig':
 				try:
 					useRig = words[2].lower()
@@ -151,7 +156,7 @@ def proxyConfig():
 	print "Proxy configuration: Use %s" % useMain
 	for elt in proxyList:
 		print "  ", elt
-	return (useMain, useRig, proxyList)
+	return (useMain, useRig, mhxVersion, proxyList)
 
 	
 #
@@ -602,7 +607,7 @@ def fixProxyShape(shape):
 #
 
 def exportProxyObj(obj, name):
-	(useMain, rig, proxyList) = proxyConfig()
+	(useMain, rig, mhxVersion, proxyList) = proxyConfig()
 	for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 		if useObj:
 			proxy = readProxyFile(obj, proxyStuff)

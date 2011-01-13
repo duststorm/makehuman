@@ -41,6 +41,9 @@ import read_rig
 #
 Delta = [0,0.01,0]
 
+#	Root bone
+Root = 'MasterFloor'
+
 #
 # ....exportCollada(obj, filename):
 #	exportCollada1(obj, filename, proxyData):
@@ -109,7 +112,7 @@ twistBones = {
 skipBones = [ 'Rib_L', 'Rib_R', 'Stomach_L', 'Stomach_R', 'Scapula_L', 'Scapula_R']
 
 def boneOK(flags, bone, parent):
-	if bone == 'Root':
+	if bone == Root:
 		return 'None'
 	elif bone in twistBones.keys():
 		return None
@@ -182,12 +185,14 @@ def writeBone(fp, bone, orig, extra, pad, stuff):
 	printNode(fp, name, vec, extra, pad)
 	if children:
 		writeBones(fp, children, head, '', pad+'  ', stuff)	
+	'''
 	else:
 		tail = stuff.rigTail[name]
 		#vec = aljabr.vsub(tail, head)
 		vec = Delta
 		printNode(fp, name+"_end", vec, '', pad+'  ')
 		fp.write('\n%s        </node>' % pad)
+	'''
 	fp.write('\n%s      </node>' % pad)
 	return
 	
@@ -278,7 +283,8 @@ def getArmatureFromRigFile(fileName, obj):
 				raise NameError("Did not find %s parent %s" % (bone, parent))
 			children.append((bone, []))
 	
-	newHier = addInvBones(hier, heads, tails)
+	# newHier = addInvBones(hier, heads, tails)
+	newHier = hier
 	bones = []
 	flatten(newHier, bones)
 	return (heads, tails, newHier, bones, weights)
@@ -436,7 +442,7 @@ def filterMesh(mesh1):
 
 def exportDae(obj, fp):
 	global theStuff
-	(useMain, rig, proxyList) = mh2proxy.proxyConfig()
+	(useMain, rig, mhxVersion, proxyList) = mh2proxy.proxyConfig()
 	amt = getArmatureFromRigFile('data/templates/game.rig', obj)
 	#rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
 	rawTargets = []
@@ -1004,7 +1010,7 @@ def writeNode(obj, fp, stuff):
 '        <rotate sid="rotateX">1 0 0 0</rotate>\n' +
 '        <scale sid="scale">1 1 1</scale>\n' +
 '        <instance_controller url="#%s-skin">\n' % stuff.name +
-'          <skeleton>#Root</skeleton>\n')
+'          <skeleton>#%s</skeleton>\n' % Root)
 
 	if stuff.type == None:
 		matname = 'SSS_skinshader'

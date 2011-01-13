@@ -29,7 +29,7 @@ BODY_LANGUAGE = True
 
 import module3d, aljabr, mh, files3d, mh2bvh, os
 
-import sys
+import sys, time
 mhxPath = os.path.realpath('./shared/mhx')
 if mhxPath not in sys.path:
 	sys.path.append(mhxPath)
@@ -40,28 +40,37 @@ import mh2proxy, mhxbones, read_rig, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_
 #
 def exportMhx(obj, filename):	
 	(name, ext) = os.path.splitext(filename)
+
+	cfg = mh2proxy.proxyConfig()
+	(useMain, useRig, mhxVersion, proxyList) = cfg
 	
-	filename = name+"-24"+ext
-	#print("Writing MHX 2.4x file " + filename )
-	fp = open(filename, 'w')
-	exportMhx_24(obj, fp)
-	fp.close()
-	#print("MHX 2.4x file %s written" % filename)
+	if 24 in mhxVersion:
+		time1 = time.clock()
+		filename = name+"-24"+ext
+		#print("Writing MHX 2.4x file " + filename )
+		fp = open(filename, 'w')
+		exportMhx_24(obj, cfg, fp)
+		fp.close()
+		time2 = time.clock()
+		print("MHX 2.4x file %s written %g s" % (filename, time2-time1))
 	
-	filename = name+"-25"+ext
-	#print("Writing MHX 2.5x file " + filename )
-	fp = open(filename, 'w')
-	exportMhx_25(obj, fp)
-	fp.close()
-	#print("MHX 2.5x file %s written" % filename)
+	if 25 in mhxVersion:
+		time1 = time.clock()
+		filename = name+"-25"+ext
+		#print("Writing MHX 2.5x file " + filename )
+		fp = open(filename, 'w')
+		exportMhx_25(obj, cfg, fp)
+		fp.close()
+		time2 = time.clock()
+		print("MHX 2.5x file %s written %g s" % (filename, time2-time1))
 
 	return
 
 #
-#	exportMhx_24(obj,fp):
+#	exportMhx_24(obj, cfg, fp):
 #
 
-def exportMhx_24(obj, fp):
+def exportMhx_24(obj, cfg, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -76,7 +85,7 @@ def exportMhx_24(obj, fp):
 	exportArmature(obj, fp)
 	tmpl = open("shared/mhx/templates/meshes24.mhx")
 	if tmpl:
-		copyMeshFile249(obj, tmpl, fp)	
+		copyMeshFile249(obj, tmpl, cfg, fp)	
 		tmpl.close()
 	return
 
@@ -99,10 +108,10 @@ def exportRawMhx(obj, fp):
 	return
 
 #
-#	exportMhx_25(obj, fp):
+#	exportMhx_25(obj, cfg, fp):
 #
 
-def exportMhx_25(obj, fp):
+def exportMhx_25(obj, cfg, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -111,7 +120,7 @@ def exportMhx_25(obj, fp):
 "  error 'This file can only be read with Blender 2.5' ;\n" +
 "#endif\n")
 
-	(useMain, rig, proxyList) = mh2proxy.proxyConfig()
+	(useMain, rig, mhxVersion, proxyList) = cfg
 	mhx_rig.setupRig(obj)
 
 	fp.write(
@@ -680,10 +689,10 @@ def copyMaterialFile(infile, fp):
 	tmpl.close()
 
 #
-#	copyMeshFile249(obj, tmpl, fp):
+#	copyMeshFile249(obj, tmpl, cfg, fp):
 #
 
-def copyMeshFile249(obj, tmpl, fp):
+def copyMeshFile249(obj, tmpl, cfg, fp):
 	inZone = False
 	skip = False
 	mainMesh = False
@@ -700,7 +709,7 @@ def copyMeshFile249(obj, tmpl, fp):
 				skipOne = True
 				fp.write("#endif\n")
 				mainMesh = False
-				(useMain, useRig, proxyList) = mh2proxy.proxyConfig()
+				(useMain, useRig, mhxVersion, proxyList) = cfg
 				fp.write("#if useProxy\n")
 				for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 					if useObj:
