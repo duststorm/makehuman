@@ -22,13 +22,13 @@ Version 0.3
 bl_addon_info = {
 	'name': 'MakeHuman lipsync',
 	'author': 'Thomas Larsson',
-	'version': '0.4',
-	'blender': (2, 5, 5),
-    "api": 33590,
-    "location": "View3D > UI panel > MHX Mocap",
+	'version': '0.5',
+	'blender': (2, 5, 6),
+	"api": 34076,
+	"location": "View3D > UI panel > MHX Mocap",
 	"description": "Lipsync for the MHX rig",
-    "warning": "",
-    "category": "3D View"}
+	"warning": "",
+	"category": "3D View"}
 
 """
 Run from text window. 
@@ -36,8 +36,8 @@ Access from UI panel (N-key) when MHX rig is active.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 2
-BLENDER_VERSION = (2, 54, 0)
+MINOR_VERSION = 5
+BLENDER_VERSION = (2, 56, 0)
 
 import bpy, os, mathutils
 from mathutils import *
@@ -272,6 +272,77 @@ magpieVisemes = dict({
 })
 
 #
+#	Expressions - the same as in read_expression.py
+#
+
+Expressions = [
+	'smile',
+	'hopefull',
+	'innocent',
+	'tender',
+	'seductive',
+
+	'grin',
+	'excited',
+	'ecstatic',
+
+	'proud',
+	'pleased',
+	'amused',
+	'laughing1',
+	'laughing2',
+
+	'so-so',
+	'blue',
+	'depressed',
+	'sad',
+	'distressed',
+	'crying',
+	'pain',
+
+	'disappointed',
+	'frustrated',
+	'stressed',
+	'worried',
+	'scared',
+	'terrified',
+
+	'shy',
+	'guilty',
+	'embarassed',
+	'relaxed',
+	'peaceful',
+	'refreshed',
+
+	'lazy',
+	'bored',
+	'tired',
+	'drained',
+	'sleepy',
+	'groggy',
+
+	'curious',
+	'surprised',
+	'impressed',
+	'puzzled',
+	'shocked',
+	'frown',
+	'upset',
+	'angry',
+	'enraged',
+
+	'skeptical',
+	'vindictive',
+	'pout',
+	'furious',
+	'grumpy',
+	'arrogant',
+	'sneering',
+	'haughty',
+	'disgusted',
+]
+
+#
 #	setViseme(context, vis, setKey, frame):
 #	setBoneLocation(context, pbone, loc, mirror, setKey, frame):
 #
@@ -391,7 +462,7 @@ def initInterface(scn):
 	bpy.types.Scene.MhxBodyLanguage = BoolProperty(
 		name="Body Language", 
 		description="Use Body Language shapekey set",
-		default=True)
+		default=True)		
 
 	if scn:
 		scn['MhxSyncScale'] = 1.0
@@ -448,6 +519,20 @@ class MhxLipsyncPanel(bpy.types.Panel):
 		row = layout.row()
 		row.operator("object.LoadMohoButton")
 		row.operator("object.LoadMagpieButton")
+
+		layout.separator()
+		layout.label(text="Expressions")
+		layout.operator("object.ResetExpressionsButton")
+		layout.separator()
+		keys = expressionKeys(context.object)
+		if keys:
+			for name in Expressions:
+				try:
+					datum = keys.keys[name]
+					layout.prop(datum, 'value', text=name)
+				except:
+					pass
+		return
 
 # Define viseme buttons
 
@@ -518,6 +603,38 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 	def invoke(self, context, event):
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}	
+
+
+#
+#	expressionKeys(rig):
+#	class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
+#
+
+def expressionKeys(rig):		
+	for child in rig.children:
+		if 'guilty' in child.data.shape_keys.keys.keys():
+			return child.data.shape_keys
+	return None
+
+class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ResetExpressionsButton"
+	bl_label = "Reset expressions"
+
+	def execute(self, context):
+		keys = expressionKeys(context.object)
+		if keys:
+			for name in Expressions:
+				try:
+					keys.keys[name].value = 0.0
+				except:
+					pass
+		print("Expressions reset")
+		return{'FINISHED'}	
+
+
+#
+#	initialize and register
+#
 
 initInterface(bpy.context.scene)
 defineVisemeButtons()

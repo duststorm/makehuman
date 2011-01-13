@@ -103,7 +103,7 @@ class CProxyConfig:
 		self.useRig = 'mhx'
 		self.mhxversion = [24, 25]
 		self.proxyList = []
-		self.expressions = ['mhx']
+		self.expressions = []
 		self.faceshapes = ['mhx']
 		self.bodyshapes = ['mhx']
 
