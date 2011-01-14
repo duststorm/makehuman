@@ -87,10 +87,10 @@ def proxyFilePtr(name):
 		fileName = os.path.realpath(path1)
 		try:
 			fp = open(fileName, "r")
-			print("Using config file %s" % fileName)
+			print("    Using config file %s" % fileName)
 			return fp
 		except:
-			print("No file %s" % fileName)
+			print("*** Cannot open %s" % fileName)
 	return None
 	
 #
@@ -177,7 +177,7 @@ def readProxyFile(obj, proxyStuff):
 	except:
 		tmpl = None
 	if tmpl == None:
-		print("Cannot open proxy file %s" % proxyFile)
+		print("*** Cannot open %s" % proxyFile)
 		return CProxy(typ, layer)
 
 	verts = obj.verts

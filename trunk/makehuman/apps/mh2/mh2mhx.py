@@ -183,7 +183,7 @@ def proxyCopy(name, obj, rig, proxyList, proxyData, fp):
 def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 	tmpl = open(tmplName)
 	if tmpl == None:
-		print("Cannot open "+tmplName)
+		print("*** Cannot open "+tmplName)
 		return
 
 	bone = None
@@ -408,7 +408,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 		else:
 			fp.write(line)
 
-	print("%s copied" % tmplName)
+	print("    %s copied" % tmplName)
 	tmpl.close()
 
 	return
@@ -425,7 +425,7 @@ def copyVertGroups(tmplName, fp, proxy):
 	vgroups = []
 
 	if tmpl == None:
-		print("Cannot open "+tmplName)
+		print("*** Cannot open "+tmplName)
 		return
 	if not proxy:
 		for line in tmpl:
@@ -450,7 +450,7 @@ def copyVertGroups(tmplName, fp, proxy):
 				fp.write(line)
 			else:	
 				fp.write(line)
-	print("%s copied" % tmplName)
+	print("    %s copied" % tmplName)
 	tmpl.close()
 	return
 
@@ -486,7 +486,7 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
 	scale = 1.0
 
 	if tmpl == None:
-		print("Cannot open "+tmplName)
+		print("*** Cannot open "+tmplName)
 		return
 	if not proxy:
 		for line in tmpl:
@@ -538,7 +538,7 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
 				fp.write(line)
 			else:	
 				fp.write(line)
-	print("%s copied" % tmplName)
+	print("    %s copied" % tmplName)
 	tmpl.close()
 	return
 
@@ -1031,7 +1031,7 @@ def writeIpo(fp):
 	try:
 		tmpl = open(mhxFile, "rU")
 	except:
-		print("Cannot open "+mhxFile)
+		print("*** Cannot open "+mhxFile)
 		tmpl = None
 
 	if tmpl and splitLeftRight:
@@ -1050,7 +1050,7 @@ def writeIpo(fp):
 		fp.write("end ipo\n")
 	
 	if tmpl:
-		print("%s copied" % mhxFile)
+		print("    %s copied" % mhxFile)
 		tmpl.close()
 
 	return

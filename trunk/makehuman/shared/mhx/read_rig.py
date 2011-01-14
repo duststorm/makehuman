@@ -59,8 +59,12 @@ def setupRigJoint (words, obj, locations):
 		raise NameError("Unknown %s" % typ)
 
 
-def readRigFile(fileName, obj):
-	fp= open(fileName, "rU")
+def readRigFile(filename, obj):
+	try:
+		fp = open(filename, "rU")
+	except:
+		print("*** Cannot open %s" % filename)
+		return
 
 	doLocations = 1
 	doBones = 2

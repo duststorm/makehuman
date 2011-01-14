@@ -25,7 +25,7 @@ import os
 
 Expressions = [
 	'smile',
-	'hopefull',
+	'hopeful',
 	'innocent',
 	'tender',
 	'seductive',
@@ -71,7 +71,7 @@ Expressions = [
 
 	'curious',
 	'surprised',
-	'imporessed',
+	'impressed',
 	'puzzled',
 	'shocked',
 	'frown',
@@ -97,7 +97,7 @@ def readExpressions():
 		try:
 			fp = open(filename, "rU")
 		except:
-			print("Cannot open %s" % filename)
+			print("*** Cannot open %s" % filename)
 			fp = 0
 
 		if fp:
@@ -107,7 +107,7 @@ def readExpressions():
 				expr.append((int(words[0]), float(words[1]), -float(words[3]), float(words[2])))
 			fp.close()
 			exprList.append((name, expr))
-			print("%s copied" % filename)
+			print("    %s copied" % filename)
 	return exprList
 
 

@@ -43,6 +43,9 @@ import bpy, os, mathutils
 from mathutils import *
 from bpy.props import *
 
+theRig = None
+theMesh = None
+
 #
 #	visemes
 #
@@ -277,7 +280,7 @@ magpieVisemes = dict({
 
 Expressions = [
 	'smile',
-	'hopefull',
+	'hopeful',
 	'innocent',
 	'tender',
 	'seductive',
@@ -354,7 +357,12 @@ def getVisemeSet(context):
 		return stopStaringVisemes
 
 def setViseme(context, vis, setKey, frame):
-	pbones = context.object.pose.bones
+	global theRig
+	pbones = theRig.pose.bones
+	try:
+		scale = pbones['PFace'].bone.length
+	except:
+		return
 	visemes = getVisemeSet(context)
 	for (b, (x, z)) in visemes[vis]:
 		loc = mathutils.Vector((float(x),0,float(z)))
@@ -364,14 +372,13 @@ def setViseme(context, vis, setKey, frame):
 			pb = None
 			
 		if pb:
-			setBoneLocation(context, pb, loc, False, setKey, frame)
+			setBoneLocation(context, pb, scale, loc, False, setKey, frame)
 		else:
-			setBoneLocation(context, pbones[b+'_L'], loc, False, setKey, frame)
-			setBoneLocation(context, pbones[b+'_R'], loc, True, setKey, frame)
+			setBoneLocation(context, pbones[b+'_L'], scale, loc, False, setKey, frame)
+			setBoneLocation(context, pbones[b+'_R'], scale, loc, True, setKey, frame)
 	return
 
-def setBoneLocation(context, pb, loc, mirror, setKey, frame):
-	scale = context.scene['MhxSyncScale']
+def setBoneLocation(context, pb, scale, loc, mirror, setKey, frame):
 	if mirror:
 		loc[0] = -loc[0]
 	pb.location = loc*scale*0.2
@@ -387,14 +394,12 @@ def setBoneLocation(context, pb, loc, mirror, setKey, frame):
 #
 
 def openFile(context, filepath):
-	ob = context.object
-	if ob.type != 'ARMATURE':
-		raise NameError("No armature selected")
 	(path, fileName) = os.path.split(filepath)
 	(name, ext) = os.path.splitext(fileName)
 	return open(filepath, "rU")
 
 def readMoho(context, filepath, offs):
+	context.scene.objects.active = theRig
 	bpy.ops.object.mode_set(mode='POSE')	
 	fp = openFile(context, filepath)		
 	for line in fp:
@@ -410,6 +415,7 @@ def readMoho(context, filepath, offs):
 	return
 
 def readMagpie(context, filepath, offs):
+	context.scene.objects.active = theRig
 	bpy.ops.object.mode_set(mode='POSE')	
 	fp = openFile(context, filepath)		
 	for line in fp: 
@@ -447,13 +453,6 @@ def setInterpolation(rig):
 #
 
 def initInterface(scn):
-	bpy.types.Scene.MhxSyncScale = FloatProperty(
-		name="Scale", 
-		description="Scale of the MHX rig", 
-		min=0.0001, max=1000000.0, 
-		soft_min=0.001, soft_max=100.0,
-		default=1.0)
-
 	bpy.types.Scene.MhxSyncAutoKeyframe = BoolProperty(
 		name="Auto keyframe", 
 		description="Auto keyframe",
@@ -465,7 +464,6 @@ def initInterface(scn):
 		default=True)		
 
 	if scn:
-		scn['MhxSyncScale'] = 1.0
 		scn['MhxSyncAutoKeyframe'] = False
 		scn['MhxBodyLanguage'] = True
 	return
@@ -481,57 +479,76 @@ class MhxLipsyncPanel(bpy.types.Panel):
 	
 	@classmethod
 	def poll(cls, context):
-		return context.object and context.object.type == 'ARMATURE'
+		return context.object
 
 	def draw(self, context):
+		global theRig, theMesh, theScale	
+		if context.object.type == 'ARMATURE':
+			theRig = context.object
+			theMesh = None
+			for child in theRig.children:
+				if meshHasExpressions(child):
+					theMesh = child
+					break
+		elif context.object.type == 'MESH':
+			if meshHasExpressions(context.object):
+				theMesh = context.object
+				theRig = theMesh.parent
+			else:
+				return
+		else:
+			return
+		
 		layout = self.layout
 		layout.operator("object.InitInterfaceButton")
-		layout.separator()
-		layout.prop(context.scene, 'MhxSyncScale')
-		layout.prop(context.scene, 'MhxSyncAutoKeyframe')
-		layout.prop(context.scene, 'MhxBodyLanguage')
-		layout.label(text="Visemes")
-		row = layout.row()
-		row.operator("object.RestButton")
-		row.operator("object.EtcButton")
-		row.operator("object.AHButton")
-		row = layout.row()
-		row.operator("object.MBPButton")
-		row.operator("object.OOButton")
-		row.operator("object.OButton")
-		row = layout.row()
-		row.operator("object.RButton")
-		row.operator("object.FVButton")
-		row.operator("object.SButton")
-		row = layout.row()
-		row.operator("object.SHButton")
-		row.operator("object.EEButton")
-		row.operator("object.EHButton")
-		row = layout.row()
-		row.operator("object.THButton")
-		row.operator("object.LButton")
-		row.operator("object.GButton")
-		layout.separator()
-		row = layout.row()
-		row.operator("object.BlinkButton")
-		row.operator("object.UnBlinkButton")
-		layout.label(text="Load file")
-		row = layout.row()
-		row.operator("object.LoadMohoButton")
-		row.operator("object.LoadMagpieButton")
+		
+		if theRig:
+			layout.separator()
+			layout.prop(context.scene, 'MhxSyncAutoKeyframe')
+			layout.prop(context.scene, 'MhxBodyLanguage')
+			layout.label(text="Visemes")
+			row = layout.row()
+			row.operator("object.RestButton")
+			row.operator("object.EtcButton")
+			row.operator("object.AHButton")
+			row = layout.row()
+			row.operator("object.MBPButton")
+			row.operator("object.OOButton")
+			row.operator("object.OButton")
+			row = layout.row()
+			row.operator("object.RButton")
+			row.operator("object.FVButton")
+			row.operator("object.SButton")
+			row = layout.row()
+			row.operator("object.SHButton")
+			row.operator("object.EEButton")
+			row.operator("object.EHButton")
+			row = layout.row()
+			row.operator("object.THButton")
+			row.operator("object.LButton")
+			row.operator("object.GButton")
+			layout.separator()
+			row = layout.row()
+			row.operator("object.BlinkButton")
+			row.operator("object.UnBlinkButton")
+			layout.label(text="Load file")
+			row = layout.row()
+			row.operator("object.LoadMohoButton")
+			row.operator("object.LoadMagpieButton")
 
-		layout.separator()
-		layout.label(text="Expressions")
-		layout.operator("object.ResetExpressionsButton")
-		layout.separator()
-		keys = expressionKeys(context.object)
-		if keys:
-			for name in Expressions:
-				try:
-					datum = keys.keys[name]
-					layout.prop(datum, 'value', text=name)
-				except:
-					pass
+		if theMesh:	
+			layout.separator()
+			layout.label(text="Expressions")
+			layout.operator("object.ResetExpressionsButton")
+			layout.separator()
+			keys = theMesh.data.shape_keys
+			if keys:
+				for name in Expressions:
+					try:
+						datum = keys.keys[name]
+						layout.prop(datum, 'value', text=name)
+					except:
+						pass
 		return
 
 # Define viseme buttons
@@ -606,22 +623,20 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 
 
 #
-#	expressionKeys(rig):
+#	meshHasExpressions(mesh):
 #	class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
 #
-
-def expressionKeys(rig):		
-	for child in rig.children:
-		if 'guilty' in child.data.shape_keys.keys.keys():
-			return child.data.shape_keys
-	return None
+	
+def meshHasExpressions(mesh):
+	return ('guilty' in mesh.data.shape_keys.keys.keys())
 
 class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_ResetExpressionsButton"
 	bl_label = "Reset expressions"
 
 	def execute(self, context):
-		keys = expressionKeys(context.object)
+		global theMesh
+		keys = theMesh.data.shape_keys
 		if keys:
 			for name in Expressions:
 				try:
