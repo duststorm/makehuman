@@ -199,14 +199,20 @@ class MHApplication(gui3d.Application):
             print('Could not load %s' % name)
             print e
 
-    category = gui3d.Category(self, "Help")
+    category = gui3d.Category(self, "Help",
+        texture=self.getThemeResource('images', 'button_tab3.png'),
+        selectedTexture=self.getThemeResource('images', 'button_tab3_on.png'),
+        focusedTexture=self.getThemeResource('images', 'button_tab3_focused.png'), height=22)
     # Help button
     @category.button.event
     def onClicked(event):
       webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
       
     # Exit button
-    category = gui3d.Category(self, "Exit")
+    category = gui3d.Category(self, "Exit",
+        texture=self.getThemeResource('images', 'button_tab3.png'),
+        selectedTexture=self.getThemeResource('images', 'button_tab3_on.png'),
+        focusedTexture=self.getThemeResource('images', 'button_tab3_focused.png'), height=22)
     @category.button.event
     def onClicked(event):
       self.stop()

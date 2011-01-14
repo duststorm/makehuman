@@ -335,7 +335,8 @@ class TaskView(View):
 
 class Category(View):
 
-    def __init__(self, parent, name, texture=None, selectedTexture=None, label=None):
+    def __init__(self, parent, name, texture=None, selectedTexture=None, focusedTexture=None, label=None,
+        width=64, height=26):
         View.__init__(self, parent, visible=False)
         self.name = name
         self.tasks = []
@@ -343,11 +344,11 @@ class Category(View):
 
         # The button is attached to the parent, as it stays visible when the category is hidden
 
-        self.button = ToggleButton(self.parent, width=64, height=26,
+        self.button = ToggleButton(self.parent, width=width, height=height,
             position=[2 + len(self.app.categories) * 66, 6.0, 9.6],
             texture=(texture or self.app.getThemeResource('images', 'button_tab.png')),
-            selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab_on.png')),
-            focusedTexture=(texture or self.app.getThemeResource('images', 'button_tab_focused.png')),
+            selectedTexture=(selectedTexture or self.app.getThemeResource('images', 'button_tab_on.png')),
+            focusedTexture=(focusedTexture or self.app.getThemeResource('images', 'button_tab_focused.png')),
             label=(label or name), border=[7,7,7,7])
 
         if name in parent.categories:
