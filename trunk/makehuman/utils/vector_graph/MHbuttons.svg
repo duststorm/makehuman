@@ -2379,6 +2379,90 @@
        x2="-767.76624"
        y2="-26.802652"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4726-4-4-7"
+       id="linearGradient4664-7-2-3-1"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,-29.246472,-83.439172)" />
+    <linearGradient
+       id="linearGradient4726-4-4-7">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop4728-9-6-4" />
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="1"
+         id="stop4730-9-1-0" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4651-48"
+       id="linearGradient4664-9"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,-21.662715,-111.21836)" />
+    <linearGradient
+       id="linearGradient4651-48">
+      <stop
+         id="stop4653-8"
+         offset="0"
+         style="stop-color:#333333;stop-opacity:1;" />
+      <stop
+         id="stop4655-2"
+         offset="1"
+         style="stop-color:#151515;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4726-1"
+       id="linearGradient4664-7-7"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,14.034508,-65.456623)" />
+    <linearGradient
+       id="linearGradient4726-1">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop4728-1" />
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="1"
+         id="stop4730-5" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4651-7"
+       id="linearGradient4664-2"
+       gradientUnits="userSpaceOnUse"
+       x1="350.64832"
+       y1="-42.035465"
+       x2="350.64832"
+       y2="-33.643597"
+       gradientTransform="matrix(1,0,0,0.80806329,-7.7569698,-76.035114)" />
+    <linearGradient
+       id="linearGradient4651-7">
+      <stop
+         id="stop4653-6"
+         offset="0"
+         style="stop-color:#333333;stop-opacity:1;" />
+      <stop
+         id="stop4655-14"
+         offset="1"
+         style="stop-color:#151515;stop-opacity:1;" />
+    </linearGradient>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -2387,9 +2471,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7913519"
-     inkscape:cx="-805.59981"
-     inkscape:cy="824.78671"
+     inkscape:zoom="2.2382812"
+     inkscape:cx="451.85085"
+     inkscape:cy="1097.6652"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -8513,5 +8597,41 @@
        inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/texedit_on.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
+    <rect
+       style="fill:#323232;fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-2"
+       width="64"
+       height="31.999996"
+       x="413.92801"
+       y="-84.403542"
+       ry="7.1455488"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/button_tab3.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       rx="7.1455488" />
+    <rect
+       style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-1-2"
+       width="64"
+       height="31.999996"
+       x="413.8277"
+       y="-44.56152"
+       ry="7.3689342"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/button_tab3_on.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       rx="7.3689342" />
+    <rect
+       style="fill:#969696;fill-opacity:1;stroke:none"
+       id="rect3737-3-4-6-4-1-2-1"
+       width="64"
+       height="31.999996"
+       x="414.32462"
+       y="-5.5086932"
+       ry="7.3689342"
+       inkscape:export-filename="C:\Users\124578\Documents\mhsrc\data\themes\default\images/button_tab3_focused.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       rx="7.3689342" />
   </g>
 </svg>
