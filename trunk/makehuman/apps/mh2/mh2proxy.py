@@ -26,6 +26,7 @@ import os
 from aljabr import *
 import read_rig, mhx_rig
 
+
 #
 #	class CProxy
 #
@@ -84,13 +85,14 @@ F_CON = 0x01
 def proxyFilePtr(name):
 	for path in ['~/makehuman/', '/', './']:
 		path1 = os.path.expanduser(path+name)
-		fileName = os.path.realpath(path1)
+		filename = os.path.realpath(path1)
+		ascii = filename.encode('ascii','ignore')
 		try:
-			fp = open(fileName, "r")
-			print("    Using config file %s" % fileName)
+			fp = open(filename, "r")
+			print("    Using config file %s" % ascii)
 			return fp
 		except:
-			print("*** Cannot open %s" % fileName)
+			print("*** Cannot open %s" % ascii)
 	return None
 	
 #

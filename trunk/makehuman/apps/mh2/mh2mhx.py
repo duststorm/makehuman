@@ -46,26 +46,27 @@ def exportMhx(obj, filename):
 	global theConfig
 	theConfig = mh2proxy.proxyConfig()
 	(name, ext) = os.path.splitext(filename)
+	ascii = filename.encode('ascii','ignore')
 	
 	if '24' in theConfig.mhxversion:
 		time1 = time.clock()
 		filename = name+"-24"+ext
-		#print("Writing MHX 2.4x file " + filename )
+		print("Writing MHX 2.4x file %s" % ascii )
 		fp = open(filename, 'w')
 		exportMhx_24(obj, fp)
 		fp.close()
 		time2 = time.clock()
-		print("MHX 2.4x file %s written %g s" % (filename, time2-time1))
+		print("MHX 2.4x file %s written in %g s" % (ascii, time2-time1))
 	
 	if '25' in theConfig.mhxversion:
 		time1 = time.clock()
 		filename = name+"-25"+ext
-		#print("Writing MHX 2.5x file " + filename )
+		print("Writing MHX 2.5x file %s " % ascii )
 		fp = open(filename, 'w')
 		exportMhx_25(obj, fp)
 		fp.close()
 		time2 = time.clock()
-		print("MHX 2.5x file %s written %g s" % (filename, time2-time1))
+		print("MHX 2.5x file %s written in %g s" % (ascii, time2-time1))
 
 	return
 

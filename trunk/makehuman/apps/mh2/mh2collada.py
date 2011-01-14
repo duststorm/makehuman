@@ -51,11 +51,14 @@ Root = 'MasterFloor'
 
 def exportCollada(obj, name):
 	filename = name+".dae"
-	print 'Writing Collada file %s' % filename
+	ascii = filename.encode('ascii','ignore')
+	print('Writing Collada file %s' % ascii)
+	time1 = time.clock()
 	fp = open(filename, 'w')
 	exportDae(obj, fp)
 	fp.close()
-	print 'Collada file %s written' % filename
+	time2 = time.clock()
+	print("Collada file %s written in %g s" % (ascii, time2-time1))
 	return
 
 #
