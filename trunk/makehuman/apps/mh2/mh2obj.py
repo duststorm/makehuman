@@ -31,7 +31,7 @@ Requires:
 __docformat__ = 'restructuredtext'
 
 import files3d
-
+from os.path import basename
 
 def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True):
     """
@@ -52,7 +52,7 @@ def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True):
     f = open(filename, 'w')
     f.write('# MakeHuman exported OBJ\n')
     f.write('# www.makehuman.org\n')
-    f.write('mtllib ' + filename + '.mtl\n')
+    f.write('mtllib ' + basename(filename) + '.mtl\n')
 
     for v in obj.verts:
         f.write('v %f %f %f\n' % (v.co[0], v.co[1], v.co[2]))
