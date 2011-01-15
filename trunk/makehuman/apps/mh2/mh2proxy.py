@@ -35,8 +35,20 @@ import read_rig, mhx_rig
 def safePrint( string, filename ):
 	try:
 		print("%s %s" % (string, filename))
+		return
 	except:
-		pass
+		success = False
+	if not success:
+		ascii = ""
+		space = ord(' ')
+		z = ord('z')
+		for c in filename:
+			d = ord(c)
+			if d < space or d > z:
+				ascii += "\\x%x " % d
+			else:
+				ascii += chr(d)
+		print("%s %s" % (string, ascii))
 
 #
 #	class CProxy
