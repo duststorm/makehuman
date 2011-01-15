@@ -28,6 +28,17 @@ import read_rig, mhx_rig
 
 
 #
+#	safePrint( string, filename ):
+#	Utility for evading encoding errors
+#
+
+def safePrint( string, filename ):
+	try:
+		print("%s %s" % (string, filename))
+	except:
+		pass
+
+#
 #	class CProxy
 #
 
@@ -86,13 +97,12 @@ def proxyFilePtr(name):
 	for path in ['~/makehuman/', '/', './']:
 		path1 = os.path.expanduser(path+name)
 		filename = os.path.realpath(path1)
-		ascii = filename.encode('ascii','ignore')
 		try:
 			fp = open(filename, "r")
-			print("    Using config file %s" % ascii)
+			safePrint("    Using config file", filename )
 			return fp
 		except:
-			print("*** Cannot open %s" % ascii)
+			safePrint("*** Cannot open",  filename )
 	return None
 	
 #

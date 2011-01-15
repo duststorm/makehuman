@@ -42,31 +42,41 @@ import read_expression, read_rig
 #
 #	exportMhx(obj, filename):
 #
+
 def exportMhx(obj, filename):	
 	global theConfig
 	theConfig = mh2proxy.proxyConfig()
 	(name, ext) = os.path.splitext(filename)
-	ascii = filename.encode('ascii','ignore')
 	
 	if '24' in theConfig.mhxversion:
 		time1 = time.clock()
 		filename = name+"-24"+ext
-		print("Writing MHX 2.4x file %s" % ascii )
-		fp = open(filename, 'w')
-		exportMhx_24(obj, fp)
-		fp.close()
-		time2 = time.clock()
-		print("MHX 2.4x file %s written in %g s" % (ascii, time2-time1))
+		try:
+			fp = open(filename, 'w')
+			mh2proxy.safePrint("Writing MHX 2.4x file",  filename )
+		except:
+			mh2proxy.safePrint("Unable to open file for writing", filename)
+			fp = 0
+		if fp:
+			exportMhx_24(obj, fp)
+			fp.close()
+			time2 = time.clock()
+			mh2proxy.safePrint("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
 	
 	if '25' in theConfig.mhxversion:
 		time1 = time.clock()
 		filename = name+"-25"+ext
-		print("Writing MHX 2.5x file %s " % ascii )
-		fp = open(filename, 'w')
-		exportMhx_25(obj, fp)
-		fp.close()
-		time2 = time.clock()
-		print("MHX 2.5x file %s written in %g s" % (ascii, time2-time1))
+		try:
+			fp = open(filename, 'w')
+			mh2proxy.safePrint("Writing MHX 2.5x file",  filename )
+		except:
+			mh2proxy.safePrint("Unable to open file for writing", filename)
+			fp = 0
+		if fp:
+			exportMhx_25(obj, fp)
+			fp.close()
+			time2 = time.clock()
+			mh2proxy.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), filename)
 
 	return
 

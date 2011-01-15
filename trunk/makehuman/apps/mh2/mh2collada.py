@@ -51,14 +51,16 @@ Root = 'MasterFloor'
 
 def exportCollada(obj, name):
 	filename = name+".dae"
-	ascii = filename.encode('ascii','ignore')
-	print('Writing Collada file %s' % ascii)
 	time1 = time.clock()
-	fp = open(filename, 'w')
+	try:
+		fp = open(filename, 'w')
+		mh2proxy.safePrint("Writing Collada file", filename)
+	except:
+		mh2proxy.safePrint("Unable to open file for writing", filename)
 	exportDae(obj, fp)
 	fp.close()
 	time2 = time.clock()
-	print("Collada file %s written in %g s" % (ascii, time2-time1))
+	mh2proxy.safePrint("Wrote Collada file in %g s:" % (time2-time1), filename)
 	return
 
 #

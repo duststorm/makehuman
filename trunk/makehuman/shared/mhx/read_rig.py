@@ -63,7 +63,7 @@ def readRigFile(filename, obj):
 	try:
 		fp = open(filename, "rU")
 	except:
-		print("*** Cannot open %s" % filename.encode('ascii','ignore'))
+		print("*** Cannot open %s" % filename)
 		return
 
 	doLocations = 1
