@@ -302,13 +302,33 @@ static PyObject* mh_CreateShader(PyObject *self, PyObject *args)
 static PyObject* mh_GrabScreen(PyObject *self, PyObject *args)
 {
     int x, y, width, height;
-    char *filename;
-    if (!PyArg_ParseTuple(args, "iiiis", &x, &y, &width, &height, &filename))
+    PyObject *path;
+
+    if (!PyArg_ParseTuple(args, "iiiiO", &x, &y, &width, &height, &path))
         return NULL;
-    else if (!mhGrabScreen(x, y, width, height, filename))
+
+    if (PyString_Check(path))
+    {
+      if (!mhGrabScreen(x, y, width, height, PyString_AsString(path)))
         return NULL;
+    }
+    else if (PyUnicode_Check(path))
+    {
+      path = PyUnicode_AsUTF8String(path);
+      if (!mhGrabScreen(x, y, width, height, PyString_AsString(path)))
+      {
+        Py_DECREF(path);
+        return NULL;
+      }
+      Py_DECREF(path);
+    }
     else
-        return Py_BuildValue("");
+    {
+      PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
+      return NULL;
+    }
+
+    return Py_BuildValue("");
 }
 
 /** \brief Set millisec attribute for timer func.
