@@ -373,30 +373,23 @@ def loadRotationTarget(obj, targetPath, morphFactor):
         #Rmtx = makeRotMatrix(-theta, rotAxis)
         if axis == "X":
             Rmtx = aljabr.makeRotEulerMtx3D(theta,0,0)
-        if axis == "Y":
+        elif axis == "Y":
             Rmtx = aljabr.makeRotEulerMtx3D(0,theta,0)
-        if axis == "Z":
+        elif axis == "Z":
             Rmtx = aljabr.makeRotEulerMtx3D(0,0,theta)
 
         for pIndex in listData[1:]:
             pointIndex = int(pIndex)
             indicesToUpdate.append(pointIndex)
-            pointToRotate = [obj.verts[pointIndex].co[0],obj.verts[pointIndex].co[1],obj.verts[pointIndex].co[2]]
-            pointRotated = aljabr.rotatePoint(actualRotCenter,pointToRotate,Rmtx)
+            pointRotated = aljabr.rotatePoint(actualRotCenter, obj.verts[pointIndex].co, Rmtx)
 
-            obj.verts[pointIndex].co[0] = pointRotated[0]
-            obj.verts[pointIndex].co[1] = pointRotated[1]
-            obj.verts[pointIndex].co[2] = pointRotated[2]
-
+            obj.verts[pointIndex].co = list(pointRotated)
     
-    verticesToUpdate = [obj.verts[i] for i in indicesToUpdate]
+    verticesToUpdate = [obj.verts[i] for i in set(indicesToUpdate)]
     obj.update(verticesToUpdate)
     print "ROTATION TIME", time.time()-a
 
     return 1
-
-
-
 
 def saveTranslationTarget(obj, targetPath, groupToSave=None, epsilon=0.001):
     """
