@@ -487,7 +487,7 @@ class MhxLipsyncPanel(bpy.types.Panel):
 			theRig = context.object
 			theMesh = None
 			for child in theRig.children:
-				if meshHasExpressions(child):
+				if (child.type == 'MESH' and meshHasExpressions(child)):
 					theMesh = child
 					break
 		elif context.object.type == 'MESH':
@@ -536,10 +536,24 @@ class MhxLipsyncPanel(bpy.types.Panel):
 			row.operator("object.LoadMohoButton")
 			row.operator("object.LoadMagpieButton")
 
-		if theMesh:	
+		if theRig and rigHasExpressions(theRig):
+			layout.separator()
+			layout.label(text="Expressions (driven)")
+			layout.operator("object.ResetBoneExpressionsButton")
+			layout.separator()
+			pbones = theRig.pose.bones
+			for name in Expressions:
+				try:
+					pb = pbones['P%s' % name]
+					layout.prop(pb, 'location', index=1, text=name)
+				except:
+					pass
+		
+		elif theMesh and meshHasExpressions(theMesh):	
 			layout.separator()
 			layout.label(text="Expressions")
 			layout.operator("object.ResetExpressionsButton")
+			layout.operator("object.CreateDriversButton")
 			layout.separator()
 			keys = theMesh.data.shape_keys
 			if keys:
@@ -624,11 +638,18 @@ class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
 
 #
 #	meshHasExpressions(mesh):
-#	class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
+#	rigHasExpressions(rig):
 #
 	
 def meshHasExpressions(mesh):
 	return ('guilty' in mesh.data.shape_keys.keys.keys())
+
+def rigHasExpressions(rig):
+	return ('Pguilty' in rig.pose.bones.keys())
+
+#
+#	class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
+#
 
 class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
 	bl_idname = "OBJECT_OT_ResetExpressionsButton"
@@ -646,6 +667,96 @@ class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
 		print("Expressions reset")
 		return{'FINISHED'}	
 
+#
+#	class OBJECT_OT_ResetBoneExpressionsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ResetBoneExpressionsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ResetBoneExpressionsButton"
+	bl_label = "Reset expressions"
+
+	def execute(self, context):
+		global theRig
+		pbones = theRig.pose.bones
+		if pbones:
+			for name in Expressions:
+				try:
+					pb = pbones['P%s' % name]
+					pb.location[1] = 0.0
+				except:
+					pass
+		print("Expressions reset")
+		return{'FINISHED'}
+		
+#
+#	createDrivers(context):	
+#
+#	class OBJECT_OT_CreateDriversButton(bpy.types.Operator):
+#
+
+def createDrivers(context):		
+	global theMesh, theRig
+	keys = theMesh.data.shape_keys
+	if keys:
+		context.scene.objects.active = theRig
+		bpy.ops.object.mode_set(mode = 'EDIT')
+		ebones = theRig.data.edit_bones		
+		pface = ebones['PFace']
+		layers = 32*[False]
+		layers[31] = True
+		
+		for name in Expressions:
+			eb = ebones.new("P%s" % name)
+			eb.head = pface.head
+			eb.tail = pface.tail
+			eb.parent = pface
+			eb.layers = layers
+
+		bpy.ops.object.mode_set(mode = 'POSE')
+		for name in Expressions:			
+			try:
+				createDriver(name, keys)
+			except:
+				pass
+	return
+				
+def createDriver(name, keys):
+	global theRig
+	print("Create driver %s" % name)
+	fcu = keys.keys[name].driver_add('value')
+
+	drv = fcu.driver
+	drv.type = 'AVERAGE'
+	drv.show_debug_info = True
+
+	var = drv.variables.new()
+	var.name = 'x'
+	var.type = 'TRANSFORMS'
+	
+	trg = var.targets[0]
+	trg.id = theRig
+	trg.transform_type = 'LOC_Y'
+	trg.bone_target = 'P%s' % name
+	trg.use_local_space_transform = True
+	
+	#fmod = fcu.modifiers.new('GENERATOR')
+	fmod = fcu.modifiers[0]
+	fmod.coefficients = (0, 1.0)
+	fmod.show_expanded = True
+	fmod.mode = 'POLYNOMIAL'
+	fmod.mute = False
+	fmod.poly_order = 1
+
+	return
+	
+class OBJECT_OT_CreateDriversButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_CreateDriversButton"
+	bl_label = "Create drivers"
+
+	def execute(self, context):
+		createDrivers(context)
+		print("Drivers created")
+		return{'FINISHED'}	
 
 #
 #	initialize and register
