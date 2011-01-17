@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-bl_addon_info = {
+bl_info = {
 	"name": "MHX Mocap",
 	"author": "Thomas Larsson",
 	"version": "0.5",

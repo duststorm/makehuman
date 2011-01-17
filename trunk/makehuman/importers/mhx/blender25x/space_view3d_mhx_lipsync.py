@@ -19,7 +19,7 @@ Version 0.3
 
 """
 
-bl_addon_info = {
+bl_info = {
 	'name': 'MakeHuman lipsync',
 	'author': 'Thomas Larsson',
 	'version': '0.5',

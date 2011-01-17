@@ -18,7 +18,7 @@ Hair importer for Blender.2.5
 
 """
 
-bl_addon_info = {
+bl_info = {
 	'name': 'Import MakeHuman hair (.obj)',
 	'author': 'Thomas Larsson',
 	'version': '0.7',
@@ -27,7 +27,7 @@ bl_addon_info = {
 	'location': 'File > Import',
 	'description': 'Import MakeHuman hair file (.obj)',
 	'url': 'http://www.makehuman.org',
-	'category': 'Import/Export'}
+	'category': 'Import-Export'}
 
 """
 Place this file in the .blender/scripts/addons dir
@@ -105,7 +105,7 @@ def writeHairFile(fileName, scale):
 	for n,par in enumerate(psys.particles):
 		v = par.location / scale
 		fp.write("v %.3f %.3f %.3f\n" % (v[0], v[1], v[2]))
-		for h in par.is_hair:
+		for h in par.hair:
 			v = h.location / scale
 			fp.write("v %.3f %.3f %.3f\n" % (v[0], v[1], v[2]))
 		fp.write("g Hair.%03d\n" % n)
@@ -221,10 +221,10 @@ def printGuideAndHair(fp, guide, par, hs, nmax):
 		if n == 0:
 			nv = par.location
 		else:
-			nv = par.is_hair[n-1].co
+			nv = par.hair[n-1].co
 		fp.write("%2d %2d  (%.3f %.3f %.3f)\t=> (%.3f %.3f %.3f)" % (n-1, hs, v[0], v[1], v[2], nv[0], nv[1], nv[2]))
 		if n > 0:
-			h = par.is_hair[n-1]
+			h = par.hair[n-1]
 			lv = h.co_hair_space
 			fp.write(" (%.3f %.3f %.3f) %.3f %.3f\n" % (lv[0], lv[1], lv[2], h.time, h.weight))
 		else:
@@ -261,7 +261,7 @@ def makeHair(name, hstep, guides):
 	#settings.use_render_adaptive = True
 	settings.use_strand_primitive = True
 
-	settings.child_type = 'PARTICLES'
+	settings.child_type = 'SIMPLE'
 	settings.child_nbr = int(1000/settings.count)+1
 	settings.rendered_child_count = 10*settings.child_nbr
 	settings.child_length = 1.0
@@ -309,7 +309,7 @@ def setStrand(guide, par, hstep):
 	par.location = guide[0]
 	for n in range(0, nmax):
 		point = guide[n+1]
-		h = par.is_hair[n]
+		h = par.hair[n]
 		#h.co = point
 		h.co_hair_space = point
 		h.time = (n+1)*dt
@@ -317,7 +317,7 @@ def setStrand(guide, par, hstep):
 		h.weight = max(w, 0.0)
 	for n in range(nmax, hstep):
 		point = guide[nmax]
-		h = par.is_hair[n]
+		h = par.hair[n]
 		#h.co = point
 		h.co_hair_space = point
 		h.time = (n+1)*dt
@@ -326,7 +326,7 @@ def setStrand(guide, par, hstep):
 
 	#print(par.location)
 	#for n in range(0, hstep):
-	#	print("  ", par.is_hair[n].co)
+	#	print("  ", par.hair[n].co)
 	return
 
 #
@@ -348,7 +348,7 @@ def reverseStrands(ob):
 
 def getGuideFromHair(par):
 	guide = [par.location]
-	for h in par.is_hair:
+	for h in par.hair:
 		guide.append( h.co_hair_space.copy() )
 	guide.reverse()
 	return guide
@@ -522,14 +522,13 @@ class OBJECT_OT_MakeHairFromCurvesButton(bpy.types.Operator):
 #	Register
 #
 
+def menu_func(self, context):
+	self.layout.operator(IMPORT_OT_makehuman_hair_obj.bl_idname, text="MakeHuman hair (.obj)...")
+
 def register():
-	bpy.types.register(IMPORT_OT_makehuman_hair_obj)
-	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_hair_obj.bl_idname, text="MakeHuman hair (.obj)...")
 	bpy.types.INFO_MT_file_import.append(menu_func)
  
 def unregister():
-	bpy.types.unregister(IMPORT_OT_makehuman_hair_obj)
-	menu_func = lambda self, context: self.layout.operator(IMPORT_OT_makehuman_hair_obj.bl_idname, text="MakeHuman hair (.obj)...")
 	bpy.types.INFO_MT_file_import.remove(menu_func)
 
 if __name__ == "__main__":

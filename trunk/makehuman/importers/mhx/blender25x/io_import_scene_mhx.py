@@ -19,7 +19,7 @@ Version 1.0.4
 
 """
 
-bl_addon_info = {
+bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
     'version': (1, 0, 4),
@@ -29,10 +29,10 @@ bl_addon_info = {
     'description': 'Import files in the MakeHuman eXchange format (.mhx)',
     'warning': '',
     'wiki_url': 'http://wiki.blender.org/index.php/Extensions:2.5/Py/'\
-        'Scripts/File_I-O/Make_Human',
+        'Scripts/Import-Export/Make_Human',
     'tracker_url': 'https://projects.blender.org/tracker/index.php?'\
-        'func=detail&aid=21872&group_id=153&atid=469',
-    'category': 'Import/Export'}
+        'func=detail&aid=21872',
+    'category': 'Import-Export'}
 
 """
 Place this file in the .blender/scripts/addons dir
@@ -1387,7 +1387,7 @@ def parseVertexGroup(ob, me, args, tokens):
         loadedData['VertexGroup'][grpName] = group
         for (key, val, sub) in tokens:
             if key == 'wv':
-                group.add( [int(val[0])], float(val[1]), 'REPLACE')
+                group.add( [int(val[0])], float(val[1]), 'REPLACE' )
     return
 
 
@@ -2279,7 +2279,7 @@ def parseBoolArray(mask):
 #
 
 def parseMatrix(args, tokens):
-    matrix = Matrix( [1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1] )
+    matrix = Matrix()
     i = 0
     for (key, val, sub) in tokens:
         if key == 'row':    
