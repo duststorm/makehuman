@@ -1297,7 +1297,7 @@ class Scene3D:
         print 'Reloading textures'
         for path in textureCache:
             try:
-                mh.loadTexture(path, textureCache[path].id)
+                textureCache[path].loadImage(path)
             except RuntimeError, text:
                 print text
 
