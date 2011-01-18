@@ -15,7 +15,7 @@ import aljabr
 class MeasureSlider(gui3d.Slider):
     def __init__(self, parent, y, template, measure):
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value=0.0, min=-1.0, max=1.0,
-            label=template % parent.parent.ruler.getMeasure(measure))
+            label=template % parent.parent.getMeasure(measure))
         self.template = template
         self.measure = measure
         
@@ -28,7 +28,7 @@ class MeasureSlider(gui3d.Slider):
         self.update()
         
     def update(self):
-        self.label.setText(self.template % self.parent.parent.ruler.getMeasure(self.measure))
+        self.label.setText(self.template % self.parent.parent.getMeasure(self.measure))
         
     def sync(self):
         self.setValue(self.parent.parent.getSliderValue(self.measure))
@@ -38,7 +38,7 @@ class MeasureTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Measure')
 
-        self.ruler = Ruler(category.app.scene3d.selectedHuman)
+        self.ruler = Ruler()
 
         measurements = [
             ('neck', ['neckcirc', 'neckheight']),
@@ -96,9 +96,6 @@ class MeasureTaskView(gui3d.TaskView):
             if os.path.isfile(os.path.join(self.measureDataPath, f)):
                 self.measureTargets.append(os.path.join(self.measureDataPath, f))
 
-        #The human mesh
-        self.human = self.app.scene3d.selectedHuman
-
         # Modifiers
         self.modifiers = {}
         for IDName in ["neckcirc", "neckheight","upperarm","upperarmlenght", "lowerarmlenght", "wrist", "frontchest", "bust", "underbust","waist", "napetowaist", "waisttohip",
@@ -129,11 +126,12 @@ class MeasureTaskView(gui3d.TaskView):
             self.setModifierValue(value, IDName)
         else:
             self.setModifierValue(value, IDName)
-            self.human.applyAllTargets(self.human.app.progress)
+            human = self.app.scene3d.selectedHuman
+            human.applyAllTargets(self.app.progress)
 
             after = self.getTargetsAndValues(IDName)
 
-            self.app.did(humanmodifier.Action(self.human, self.before, after, self.syncSliders))
+            self.app.did(humanmodifier.Action(human, self.before, after, self.syncSliders))
 
             self.before = None
 
@@ -167,11 +165,12 @@ class MeasureTaskView(gui3d.TaskView):
         @param targets: List of targets to get
         """
         modifiers = self.getModifiers(IDName)
+        human = self.app.scene3d.selectedHuman
 
         targetsAndValues = {}
         for modifier in modifiers:
-            targetsAndValues[modifier.left] = self.human.getDetail(modifier.left)
-            targetsAndValues[modifier.right] = self.human.getDetail(modifier.right)
+            targetsAndValues[modifier.left] = human.getDetail(modifier.left)
+            targetsAndValues[modifier.right] = human.getDetail(modifier.right)
         return targetsAndValues
 
     def setModifierValue(self, value, IDName):
@@ -195,8 +194,9 @@ class MeasureTaskView(gui3d.TaskView):
         if not modifiers:
             modifiers = []
             targets = self.buildListOfTargetPairs(IDName)
+            human = self.app.scene3d.selectedHuman
             for pair in targets:
-                modifier = humanmodifier.Modifier(self.human, pair[0], pair[1])
+                modifier = humanmodifier.Modifier(human, pair[0], pair[1])
                 modifiers.append(modifier)
             self.modifiers[IDName] = modifiers
         return modifiers
@@ -207,6 +207,10 @@ class MeasureTaskView(gui3d.TaskView):
             return modifiers[0].getValue()
         else:
             return 0.0
+            
+    def getMeasure(self, measure):
+        human = self.app.scene3d.selectedHuman
+        return self.ruler.getMeasure(human, measure)
 
     def onShow(self, event):
 
@@ -321,7 +325,7 @@ class Ruler:
   This class contains ...
   """
 
-    def __init__(self, human):
+    def __init__(self):
 
     # these are tables of vertex indices for each body measurement of interest
 
@@ -350,13 +354,11 @@ class Ruler:
         self.Measures['hips'] = [7298,2936,3527,2939,2940,3816,3817,3821,4487,3822,3823,3913,3915,4506,5688,4505,4504,4503,6858,6862,6861,6860,
                                             6785,6859,7094,7096,7188,7189,6878,7190,7194,7195,7294,7295,7247,7300]
 
-        self.humanoid = human
-
-    def getMeasure(self, measurementname):
+    def getMeasure(self, human, measurementname):
         measure = 0
         vindex1 = self.Measures[measurementname][0]
         for vindex2 in self.Measures[measurementname]:
-            measure += aljabr.vdist(self.humanoid.mesh.verts[vindex1].co, self.humanoid.mesh.verts[vindex2].co)
+            measure += aljabr.vdist(human.mesh.verts[vindex1].co, human.mesh.verts[vindex2].co)
             vindex1 = vindex2
         return 10.0 * measure
 
