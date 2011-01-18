@@ -15,7 +15,7 @@ import aljabr
 class MeasureSlider(gui3d.Slider):
     def __init__(self, parent, y, template, measure):
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value=0.0, min=-1.0, max=1.0,
-            label=template % parent.parent.getMeasure(measure))
+            label=template + parent.parent.getMeasure(measure))
         self.template = template
         self.measure = measure
         
@@ -28,7 +28,7 @@ class MeasureSlider(gui3d.Slider):
         self.update()
         
     def update(self):
-        self.label.setText(self.template % self.parent.parent.getMeasure(self.measure))
+        self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
         
     def sync(self):
         self.setValue(self.parent.parent.getSliderValue(self.measure))
@@ -52,25 +52,25 @@ class MeasureTaskView(gui3d.TaskView):
         ]
             
         sliderLabel = {
-            'neckcirc':'Neck circum: %.1f cm',
-            'neckheight':'Neck height: %.1f cm',
-            'upperarm':'Upper arm circum: %.1f cm',
-            'upperarmlenght':'Upperarm lenght: %.1f cm',
-            'lowerarmlenght':'Lowerarm lenght: %.1f cm',
-            'wrist':'Wrist circum: %.1f cm',
-            'frontchest':'Front chest dist: %.1f cm',
-            'bust':'Bust circum: %.1f cm',
-            'underbust':'Underbust circum: %.1f cm',
-            'waist':'Waist circum: %.1f cm',
-            'napetowaist':'Nape to waist: %.1f cm',
-            'waisttohip':'Waist to hip: %.1f cm',
-            'shoulder':'Shoulder dist: %.1f cm',
-            'hips':'Hips circum: %.1f cm',
-            'upperlegheight':'Upperleg height: %.1f cm',
-            'thighcirc':'Thigh circ.: %.1f cm',
-            'lowerlegheight':'Lowerleg height: %.1f cm',
-            'calf':'Calf circum: %.1f cm',
-            'ankle':'Ankle circum: %.1f cm'
+            'neckcirc':'Neck circum: ',
+            'neckheight':'Neck height: ',
+            'upperarm':'Upper arm circum: ',
+            'upperarmlenght':'Upperarm lenght: ',
+            'lowerarmlenght':'Lowerarm lenght: ',
+            'wrist':'Wrist circum: ',
+            'frontchest':'Front chest dist: ',
+            'bust':'Bust circum: ',
+            'underbust':'Underbust circum: ',
+            'waist':'Waist circum: ',
+            'napetowaist':'Nape to waist: ',
+            'waisttohip':'Waist to hip: ',
+            'shoulder':'Shoulder dist: ',
+            'hips':'Hips circum: ',
+            'upperlegheight':'Upperleg height: ',
+            'thighcirc':'Thigh circ.: ',
+            'lowerlegheight':'Lowerleg height: ',
+            'calf':'Calf circum: ',
+            'ankle':'Ankle circum: '
         }
         
         self.groupBoxes = {}
@@ -88,6 +88,27 @@ class MeasureTaskView(gui3d.TaskView):
                 slider = MeasureSlider(box, yy, sliderLabel[subname], subname)
                 self.sliders.append(slider)
                 yy += 35
+                
+        modes = [] 
+               
+        y = 80
+        gui3d.GroupBox(self, label = 'Units', position=[650, y, 9.0], width=128, height=80)
+        y += 25
+        metric = gui3d.RadioButton(self, modes, width=112, height=20, position=[658, y, 9.1], selected=True, label='Metric')
+        y += 22
+        imperial = gui3d.RadioButton(self, modes, width=112, height=20, position=[658, y, 9.1], label='Imperial')
+        
+        @metric.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(metric, event)
+            self.ruler.setMode('metric')
+            self.updateMeasures()
+            
+        @imperial.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(imperial, event)
+            self.ruler.setMode('imperial')
+            self.updateMeasures()
 
         #Get a list with all targes (complete with path) used in measureData library
         self.measureDataPath = "data/targets/measure/"
@@ -325,7 +346,7 @@ class Ruler:
   This class contains ...
   """
 
-    def __init__(self):
+    def __init__(self, mode='metric'):
 
     # these are tables of vertex indices for each body measurement of interest
 
@@ -353,6 +374,11 @@ class Ruler:
         self.Measures['lowerarmlenght'] = [9696,9945]
         self.Measures['hips'] = [7298,2936,3527,2939,2940,3816,3817,3821,4487,3822,3823,3913,3915,4506,5688,4505,4504,4503,6858,6862,6861,6860,
                                             6785,6859,7094,7096,7188,7189,6878,7190,7194,7195,7294,7295,7247,7300]
+                                            
+        self.mode = mode #'imperial'
+        
+    def setMode(self, mode):
+        self.mode = mode
 
     def getMeasure(self, human, measurementname):
         measure = 0
@@ -360,7 +386,11 @@ class Ruler:
         for vindex2 in self.Measures[measurementname]:
             measure += aljabr.vdist(human.mesh.verts[vindex1].co, human.mesh.verts[vindex2].co)
             vindex1 = vindex2
-        return 10.0 * measure
+            
+        if self.mode == 'metric':
+            return '%.1f cm' % (10.0 * measure)
+        else:
+            return '%.1f in' % (10.0 * measure * 0.393700787)
 
 
 
