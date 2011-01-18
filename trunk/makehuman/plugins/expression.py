@@ -33,7 +33,7 @@ class Action:
 
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, parent, group, y, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, parent, group, width=112, height=20, position=[650, y, 9.1], selected=selected, label=label)
+        gui3d.RadioButton.__init__(self, parent, group, width=112, height=20, position=[658, y, 9.1], selected=selected, label=label)
         self.groupBox = groupBox
         
     def onClicked(self, event):
@@ -96,6 +96,9 @@ class ExpressionTaskView(gui3d.TaskView):
         
         self.groupBoxes = []
         self.radioButtons = []
+        
+        gui3d.GroupBox(self, label = 'Category', position=[650, y, 9.0], width=128, height=360)
+        y += 25
         
         for name, subnames in expressions:
             # Create box
