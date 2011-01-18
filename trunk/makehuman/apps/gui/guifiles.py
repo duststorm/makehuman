@@ -160,23 +160,53 @@ class ExportTaskView(gui3d.TaskView):
         self.exportBodyGroup = []
         self.exportHairGroup = []
         
-        #### BODY EXPORT #######
-        gui3d.GroupBox(self, label = 'Format', position=[10, 80, 9.0], width=128, height=256)
-        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 112, 9.2], label="Wavefront obj", selected=True)
-        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 144, 9.2], label="Blender exchange")
-        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 176, 9.2], label="Collada")
-        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 208, 9.2], label="MD5")
-        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, 240, 9.2], label="STL")
-                 
-        gui3d.GroupBox(self, label = 'Options', position=[10, 340, 9.0], width=128, height=200)                
-        self.exportSkeleton = gui3d.ToggleButton(self, width=112, height=20, position=[18, 372, 9.2], label="Skeleton", selected=True)
-                                                 
-        self.exportGroups = gui3d.ToggleButton(self, width=112, height=20, position=[18, 403, 9.2], label="Groups", selected=True)
-
-        ####### HAIR EXPORT ###################
-        self.hairMesh = gui3d.RadioButton(self, self.exportHairGroup, width=112, height=20, position=[18, 435, 9.2], label="Hair as mesh", selected=True)
-
-        self.hairCurves = gui3d.RadioButton(self, self.exportHairGroup, width=112, height=20, position=[18, 467, 9.2], label="Hair as curves")
+        # Formats
+        y = 80
+        gui3d.GroupBox(self, label = 'Format', position=[10, y, 9.0], width=128, height=150);y+=25
+        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="Wavefront obj", selected=True);y+=22
+        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="Blender exchange");y+=22
+        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="Collada");y+=22
+        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="MD5");y+=22
+        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="STL");y+=22
+            
+        # OBJ options
+        y = 240
+        self.objOptions = gui3d.GroupBox(self, label = 'Options', position=[10, y, 9.0], width=128, height=150);y+=25
+        self.exportSkeleton = gui3d.ToggleButton(self.objOptions, width=112, height=20, position=[18, y, 9.2],
+            texture=self.app.getThemeResource('images', 'check_off.png'),
+            selectedTexture=self.app.getThemeResource('images', 'check_on.png'),
+            focusedTexture=self.app.getThemeResource('images', 'check_focus.png'),
+            label="Skeleton", selected=True,
+            border = [18, 18, 2, 2]);y+=22
+        self.exportGroups = gui3d.ToggleButton(self.objOptions, width=112, height=20, position=[18, y, 9.2],
+            texture=self.app.getThemeResource('images', 'check_off.png'),
+            selectedTexture=self.app.getThemeResource('images', 'check_on.png'),
+            focusedTexture=self.app.getThemeResource('images', 'check_focus.png'),
+            label="Groups", selected=True,
+            border = [18, 18, 2, 2]);y+=22
+        self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, width=112, height=20, position=[18, y, 9.2],
+            texture=self.app.getThemeResource('images', 'radio_off.png'),
+            selectedTexture=self.app.getThemeResource('images', 'radio_on.png'),
+            focusedTexture=self.app.getThemeResource('images', 'radio_focus.png'),
+            label="Hair as mesh", selected=True,
+            border = [18, 18, 2, 2]);y+=22
+        self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, width=112, height=20, position=[18, y, 9.2],
+            texture=self.app.getThemeResource('images', 'radio_off.png'),
+            selectedTexture=self.app.getThemeResource('images', 'radio_on.png'),
+            focusedTexture=self.app.getThemeResource('images', 'radio_focus.png'),
+            label="Hair as curves",
+            border = [18, 18, 2, 2]);y+=22
+        
+        # MHX options
+        y = 240
+        self.mhxOptions = gui3d.GroupBox(self, label = 'Options', position=[10, y, 9.0], width=128, height=150);y+=25
+        self.version24 = gui3d.ToggleButton(self.mhxOptions, width=112, height=20, position=[18, y, 9.2], label="Version 2.4", selected=True);y+=22
+        self.version25 = gui3d.ToggleButton(self.mhxOptions, width=112, height=20, position=[18, y, 9.2], label="Version 2.5", selected=True);y+=22
+        self.exportExpressions = gui3d.ToggleButton(self.mhxOptions, width=112, height=20, position=[18, y, 9.2], label="Expressions", selected=True);y+=22
+        rigs = []
+        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, width=112, height=20, position=[18, y, 9.2], label="Use mhx rig", selected=True);y+=22
+        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, width=112, height=20, position=[18, y, 9.2], label="Use game rig");y+=22
+        self.mhxOptions.hide()
         
         @self.wavefrontObj.event
         def onClicked(event):
@@ -241,15 +271,14 @@ class ExportTaskView(gui3d.TaskView):
             
     def updateGui(self):
         if self.wavefrontObj.selected:
-            self.exportSkeleton.show()
-            self.exportGroups.show()
-            self.hairMesh.show()
-            self.hairCurves.show()
+            self.objOptions.show()
         else:
-            self.exportSkeleton.hide()
-            self.exportGroups.hide()
-            self.hairMesh.hide()
-            self.hairCurves.hide()
+            self.objOptions.hide()
+            
+        if self.mhx.selected:
+            self.mhxOptions.show()
+        else:
+            self.mhxOptions.hide()
 
     def onShow(self, event):
 
