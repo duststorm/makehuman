@@ -540,6 +540,7 @@ class MhxLipsyncPanel(bpy.types.Panel):
 			layout.separator()
 			layout.label(text="Expressions (driven)")
 			layout.operator("object.ResetBoneExpressionsButton")
+			layout.operator("object.RemoveDriversButton")
 			layout.separator()
 			pbones = theRig.pose.bones
 			for name in Expressions:
@@ -756,6 +757,41 @@ class OBJECT_OT_CreateDriversButton(bpy.types.Operator):
 	def execute(self, context):
 		createDrivers(context)
 		print("Drivers created")
+		return{'FINISHED'}	
+
+#
+#	removeDrivers(context):		
+#	class OBJECT_OT_RemoveDriversButton(bpy.types.Operator):
+#
+
+def removeDrivers(context):		
+	global theMesh, theRig
+	keys = theMesh.data.shape_keys
+	if keys:
+		context.scene.objects.active = theRig
+		bpy.ops.object.mode_set(mode = 'EDIT')
+		ebones = theRig.data.edit_bones				
+		for name in Expressions:
+			try:
+				ebones.remove(ebones["P%s" % name])
+			except:
+				pass
+		bpy.ops.object.mode_set(mode = 'POSE')
+		for name in Expressions:			
+			try:
+				keys.keys[name].driver_remove('value')
+				print("Removed driver %s" % name)
+			except:
+				pass
+	return
+
+class OBJECT_OT_RemoveDriversButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_RemoveDriversButton"
+	bl_label = "Remove drivers"
+
+	def execute(self, context):
+		removeDrivers(context)
+		print("Drivers removed")
 		return{'FINISHED'}	
 
 #
