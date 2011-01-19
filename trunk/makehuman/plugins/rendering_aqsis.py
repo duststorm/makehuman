@@ -37,7 +37,7 @@ class AqsisTaskView(gui3d.TaskView):
         self.skinOilSlider= gui3d.Slider(self, position=[10, 200, 9.02], value=0.3, min=0.0, max=10, label = "Skin Oil: 0.3")     
         
         #Buttons
-        self.renderButton = gui3d.Button(self, width=64, height=20, position=[18, 250, 9.02], label='Render')
+        self.renderButton = gui3d.Button(self, [18, 250, 9.02], 'Render')
 
         @self.renderButton.event
         def onClicked(event):            

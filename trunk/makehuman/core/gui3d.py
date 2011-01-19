@@ -33,8 +33,12 @@ import mh
 import os
 import font3d
 
+from collections import namedtuple
+
 defaultFontSize = 1.0
 defaultFontFamily = 'arial'
+
+Style = namedtuple('Style', 'width height mesh normal selected focused fontSize border')
 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
@@ -288,23 +292,27 @@ class View(events3d.EventHandler):
 
 
 # A View representing a specific task
-
+TaskTabStyle = Style(**{
+    'width':64,
+    'height':26,
+    'mesh':None,
+    'normal':'button_tab2.png',
+    'selected':'button_tab2_on.png',
+    'focused':'button_tab2_focused.png',
+    'fontSize':defaultFontSize,
+    'border':[7,7,7,7]
+    })
 
 class TaskView(View):
 
-    def __init__(self, category, name, texture=None, selectedTexture=None, label = None):
+    def __init__(self, category, name, label = None, style=TaskTabStyle):
         View.__init__(self, parent=category, visible=False)
         self.name = name
         self.focusWidget = None
 
         # The button is attached to the parent, as it stays visible when the task is hidden
 
-        self.button = ToggleButton(self.parent, width=64, height=26,
-            position=[2 + len(self.parent.tasks) * 66, 38.0, 9.2],
-            texture=(texture or self.app.getThemeResource('images', 'button_tab2.png')),
-            selectedTexture=(texture or self.app.getThemeResource('images', 'button_tab2_on.png')),
-            focusedTexture=(texture or self.app.getThemeResource('images', 'button_tab2_focused.png')),
-            label=(label or name), border=[7,7,7,7])
+        self.button = ToggleButton(self.parent, [2 + len(self.parent.tasks) * 66, 38.0, 9.2], (label or name), style=style)
 
         if name in category.tasksByName:
             raise KeyError('The task with this name already exists', name)
@@ -331,25 +339,39 @@ class TaskView(View):
 
 
 # A category grouping similar tasks
-
+CategoryTabStyle = Style(**{
+    'width':64,
+    'height':26,
+    'mesh':None,
+    'normal':'button_tab.png',
+    'selected':'button_tab_on.png',
+    'focused':'button_tab_focused.png',
+    'fontSize':defaultFontSize,
+    'border':[7,7,7,7]
+    })
+    
+CategoryButtonStyle = Style(**{
+    'width':64,
+    'height':22,
+    'mesh':None,
+    'normal':'button_tab3.png',
+    'selected':'button_tab3_on.png',
+    'focused':'button_tab3_focused.png',
+    'fontSize':defaultFontSize,
+    'border':[7,7,7,7]
+    })
 
 class Category(View):
 
-    def __init__(self, parent, name, texture=None, selectedTexture=None, focusedTexture=None, label=None,
-        width=64, height=26):
-        View.__init__(self, parent, visible=False)
+    def __init__(self, parent, name, label = None, style=CategoryTabStyle):
+        View.__init__(self, parent, visible = False)
         self.name = name
         self.tasks = []
         self.tasksByName = {}
 
         # The button is attached to the parent, as it stays visible when the category is hidden
 
-        self.button = ToggleButton(self.parent, width=width, height=height,
-            position=[2 + len(self.app.categories) * 66, 6.0, 9.6],
-            texture=(texture or self.app.getThemeResource('images', 'button_tab.png')),
-            selectedTexture=(selectedTexture or self.app.getThemeResource('images', 'button_tab_on.png')),
-            focusedTexture=(focusedTexture or self.app.getThemeResource('images', 'button_tab_focused.png')),
-            label=(label or name), border=[7,7,7,7])
+        self.button = ToggleButton(self.parent, [2 + len(self.app.categories) * 66, 6.0, 9.6], (label or name), style = style)
 
         if name in parent.categories:
             raise KeyError('The category with this name already exists', name)
@@ -612,11 +634,11 @@ class Application(events3d.EventHandler):
         else:
             self.currentTask.callEvent('onKeyUp', event)
             
-    def getCategory(self, name, image = None, image_on = None):
+    def getCategory(self, name, style=CategoryTabStyle):
         try:
             return self.categories[name]
         except:
-            return Category(self, name, image, image_on)
+            return Category(self, name, None, style)
 
 # Widgets
 
@@ -739,7 +761,16 @@ class Slider(View):
 
 
 # Button widget
-
+ButtonStyle = Style(**{
+    'width':112,
+    'height':20,
+    'mesh':None,
+    'normal':'button_unselected.png',
+    'selected':'button_selected.png',
+    'focused':'button_focused.png',
+    'fontSize':defaultFontSize,
+    'border':[2, 2, 2, 2]
+    })
 
 class Button(View):
     
@@ -749,10 +780,7 @@ class Button(View):
     over the widget.
     """
 
-    def __init__(self, parent, mesh='data/3dobjs/button_generic.obj', texture=None,\
-        selectedTexture=None, position=[0, 0, 9], selected=False, focusedTexture=None,\
-        label=None, width=None, height=None, fontSize = defaultFontSize,
-        border = [2, 2, 2, 2]):
+    def __init__(self, parent, position, label=None, selected=False, style=ButtonStyle):
         
         """
         This is the constructor for the Button class. It takes the following parameters:
@@ -772,27 +800,32 @@ class Button(View):
         
         View.__init__(self, parent)
         
-        self.texture = texture or self.app.getThemeResource('images', 'button_unselected.png')
-        self.selectedTexture = selectedTexture or self.app.getThemeResource('images', 'button_selected.png')
-        self.focusedTexture = focusedTexture or self.app.getThemeResource('images', 'button_focused.png')
+        self.texture = self.app.getThemeResource('images', style.normal)
+        self.selectedTexture = self.app.getThemeResource('images', style.selected) if style.selected else None
+        self.focusedTexture = self.app.getThemeResource('images', style.focused) if style.focused else None
         
         if selected:
             t = self.selectedTexture
         else:
             t = self.texture
             
-        if (width!=None) and (height!=None):
-            mesh = Create9SliceMesh(width, height, t, border)
-            self.button = Object(self, mesh, position=position)
-            if isinstance(label, str):
-                self.label = TextObject(self, text = label, position = [position[0] + border[0] + 3,position[1]+2,position[2]+0.001], fontSize = fontSize)
-        else:
-            self.button = Object(self, mesh, texture=t, position=position)
+        width = style.width
+        height = style.height
+        fontSize = style.fontSize
+        border = style.border
+            
+        if style.mesh:
+            self.button = Object(self, style.mesh, texture=t, position=position)
             if isinstance(label, str):
                 #assumes button obj origin is upper left corner
                 #TODO text should be in the middle of button, calculate this from text length
                 self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-7,position[2]+0.001], fontSize = fontSize)
-        
+        else:
+            mesh = Create9SliceMesh(width, height, t, border)
+            self.button = Object(self, mesh, position=position)
+            if isinstance(label, str):
+                self.label = TextObject(self, text = label, position = [position[0] + border[0] + 3,position[1]+2,position[2]+0.001], fontSize = fontSize)
+            
         self.selected = selected
 
     def setTexture(self, texture):
@@ -843,7 +876,16 @@ class Button(View):
 
 
 # RadioButton widget
-
+RadioButtonStyle = Style(**{
+    'width':112,
+    'height':20,
+    'mesh':None,
+    'normal':'radio_off.png',
+    'selected':'radio_on.png',
+    'focused':'radio_focus.png',
+    'fontSize':defaultFontSize,
+    'border':[18, 18, 2, 2]
+    })
 
 class RadioButton(Button):
 
@@ -854,9 +896,7 @@ class RadioButton(Button):
     is determined in an action by checking each radio button's selected property.
     """
     
-    def __init__(self, parent, group, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
-        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, width=None, height=None,
-        fontSize = defaultFontSize, border = [2, 2, 2, 2]):
+    def __init__(self, parent, group, position, label=None, selected=False, style=RadioButtonStyle):
             
         """
         This is the constructor for the RadioButton class. It takes the following parameters:
@@ -873,8 +913,7 @@ class RadioButton(Button):
         - **fontSize**: *Float*. The button label font size.
         """
         
-        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, width, height,
-        fontSize, border)
+        Button.__init__(self, parent, position, label, selected, style)
         self.group = group
         self.group.append(self)
 
@@ -906,9 +945,7 @@ class ToggleButton(Button):
     is determined in an action by checking the toggle button's selected property.
     """
 
-    def __init__(self, parent, mesh='data/3dobjs/button_gender.obj', texture=None, selectedTexture=None,
-        position=[0, 0, 9], selected=False, focusedTexture=None, label=None, width=None, height=None,
-        fontSize = defaultFontSize, border = [2, 2, 2, 2]):
+    def __init__(self, parent, position, label=None, selected=False, style=ButtonStyle):
             
         """
         This is the constructor for the ToggleButton class. It takes the following parameters:
@@ -925,8 +962,7 @@ class ToggleButton(Button):
         - **fontSize**: *Float*. The button label font size.
         """
 
-        Button.__init__(self, parent, mesh, texture, selectedTexture, position, selected, focusedTexture, label, width, height,
-            fontSize, border)
+        Button.__init__(self, parent, position, label, selected, style)
 
     def onClicked(self, event):
         if self.selected:
@@ -945,6 +981,23 @@ class ToggleButton(Button):
             self.button.setTexture(self.selectedTexture)
         else:
             self.button.setTexture(self.texture)
+
+CheckBoxStyle = Style(**{
+    'width':112,
+    'height':20,
+    'mesh':None,
+    'normal':'check_off.png',
+    'selected':'check_on.png',
+    'focused':'check_focus.png',
+    'fontSize':defaultFontSize,
+    'border':[18, 18, 2, 2]
+    })
+            
+class CheckBox(ToggleButton):
+    
+    def __init__(self, parent, position, label=None, selected=False, style=CheckBoxStyle):
+        
+        Button.__init__(self, parent, position, label, selected, style)
 
 class ProgressBar(View):
 
@@ -1165,7 +1218,7 @@ class FileEntryView(View):
         View.__init__(self, parent)
 
         self.edit = TextEdit(self, width=400, height=20, position=[200, 90, 9.5])
-        self.bConfirm = Button(self, width=40, height=20, position=[610, 90, 9.1], label='Save')
+        self.bConfirm = Button(self, [610, 90, 9.1], 'Save', style=ButtonStyle._replace(width=40, height=20))
 
         @self.bConfirm.event
         def onClicked(event):
@@ -1444,7 +1497,7 @@ def Create9SliceMesh(width, height, texture, border):
     outer=[[0, 0], [width, height]]
     inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
         
-    mesh = module3d.Object3D('9slice_' + texture)
+    mesh = module3d.Object3D('9slice_' + texture + '_' + str(border))
     mesh.uvValues = []
     mesh.indexBuffer = []
     

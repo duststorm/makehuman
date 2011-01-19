@@ -199,27 +199,21 @@ class MHApplication(gui3d.Application):
             print('Could not load %s' % name)
             print e
 
-    category = gui3d.Category(self, "Help",
-        texture=self.getThemeResource('images', 'button_tab3.png'),
-        selectedTexture=self.getThemeResource('images', 'button_tab3_on.png'),
-        focusedTexture=self.getThemeResource('images', 'button_tab3_focused.png'), height=22)
+    category = gui3d.Category(self, "Help", style=gui3d.CategoryButtonStyle)
     # Help button
     @category.button.event
     def onClicked(event):
       webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
       
     # Exit button
-    category = gui3d.Category(self, "Exit",
-        texture=self.getThemeResource('images', 'button_tab3.png'),
-        selectedTexture=self.getThemeResource('images', 'button_tab3_on.png'),
-        focusedTexture=self.getThemeResource('images', 'button_tab3_focused.png'), height=22)
+    category = gui3d.Category(self, "Exit", style=gui3d.CategoryButtonStyle)
     @category.button.event
     def onClicked(event):
       self.stop()
       
-    self.undoButton = gui3d.Button(self, width=40, height=16, position=[650, 508, 9.1], label="Undo")
-    self.redoButton = gui3d.Button(self, width=40, height=16, position=[694, 508, 9.1], label="Redo")
-    self.resetButton = gui3d.Button(self, width=40, height=16, position=[738, 508, 9.1], label="Reset")
+    self.undoButton = gui3d.Button(self, [650, 508, 9.1], "Undo", style=gui3d.ButtonStyle._replace(width=40, height=16))
+    self.redoButton = gui3d.Button(self, [694, 508, 9.1], "Redo", style=gui3d.ButtonStyle._replace(width=40, height=16))
+    self.resetButton = gui3d.Button(self, [738, 508, 9.1], "Reset", style=gui3d.ButtonStyle._replace(width=40, height=16))
                                     
     @self.undoButton.event
     def onClicked(event):
@@ -238,8 +232,8 @@ class MHApplication(gui3d.Application):
         self.app.categories['Modelling'].tasksByName['Macro modelling'].syncStatus()
         self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
       
-    self.globalButton = gui3d.Button(self, width=128, height=20, position=[650, 530, 9.2], label="Global cam")
-    self.faceButton = gui3d.Button(self, width=128, height=20, position=[650, 555, 9.2], label="Face cam")
+    self.globalButton = gui3d.Button(self, [650, 530, 9.2], "Global cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
+    self.faceButton = gui3d.Button(self, [650, 555, 9.2], "Face cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
     
     @self.globalButton.event
     def onClicked(event):
@@ -361,6 +355,8 @@ class MHApplication(gui3d.Application):
     self.theme = theme
 
   def getThemeResource(self, folder, id):
+    if '/' in id:
+      return id
     if os.path.exists("data/themes/" + self.theme + "/" + folder + "/"+ id):
       return "data/themes/" + self.theme + "/" + folder + "/"+ id
     else:

@@ -1730,8 +1730,10 @@ class Scene3D:
             idR = (self.colorID % 32) * 8
             idG = ((self.colorID >> 5) % 32) * 8
             idB = ((self.colorID >> 10) % 32) * 8
+            
             for f in g.faces:
                 f.colorID = [idR, idG, idB]
+            
             self.faceGroupColorID[self.colorID] = g
 
             # print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s or %s"%(g.name,obj.name,idR,idG,idB, self.colorID)

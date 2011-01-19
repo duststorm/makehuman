@@ -48,10 +48,10 @@ class MakeHairTaskView(gui3d.TaskView):
             self.gravity = value;
 
         #buttons
-        self.collisionButton = gui3d.Button(self, width=112, height=20, position=[18, 325, 9.3],label="Avoid Collision")
+        self.collisionButton = gui3d.Button(self, [18, 325, 9.3], "Avoid Collision")
         
-        self.createButton = gui3d.Button(self, width=112, height=20, position=[18, 355, 9.3],label="Create Hair")
-        self.deleteButton = gui3d.Button(self, width=112, height=20, position=[18, 385, 9.3],label="Delete Hair")
+        self.createButton = gui3d.Button(self, [18, 355, 9.3], "Create Hair")
+        self.deleteButton = gui3d.Button(self, [18, 385, 9.3], "Delete Hair")
         
         @self.collisionButton.event
         def onClicked(event):

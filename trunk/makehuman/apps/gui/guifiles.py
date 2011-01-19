@@ -163,49 +163,29 @@ class ExportTaskView(gui3d.TaskView):
         # Formats
         y = 80
         gui3d.GroupBox(self, label = 'Format', position=[10, y, 9.0], width=128, height=150);y+=25
-        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="Wavefront obj", selected=True);y+=22
-        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="Blender exchange");y+=22
-        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="Collada");y+=22
-        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="MD5");y+=22
-        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, width=112, height=20, position=[18, y, 9.2], label="STL");y+=22
+        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], "Wavefront obj", True, gui3d.ButtonStyle);y+=22
+        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange", style=gui3d.ButtonStyle);y+=22
+        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada", style=gui3d.ButtonStyle);y+=22
+        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="MD5", style=gui3d.ButtonStyle);y+=22
+        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="STL", style=gui3d.ButtonStyle);y+=22
             
         # OBJ options
         y = 240
         self.objOptions = gui3d.GroupBox(self, label = 'Options', position=[10, y, 9.0], width=128, height=150);y+=25
-        self.exportSkeleton = gui3d.ToggleButton(self.objOptions, width=112, height=20, position=[18, y, 9.2],
-            texture=self.app.getThemeResource('images', 'check_off.png'),
-            selectedTexture=self.app.getThemeResource('images', 'check_on.png'),
-            focusedTexture=self.app.getThemeResource('images', 'check_focus.png'),
-            label="Skeleton", selected=True,
-            border = [18, 18, 2, 2]);y+=22
-        self.exportGroups = gui3d.ToggleButton(self.objOptions, width=112, height=20, position=[18, y, 9.2],
-            texture=self.app.getThemeResource('images', 'check_off.png'),
-            selectedTexture=self.app.getThemeResource('images', 'check_on.png'),
-            focusedTexture=self.app.getThemeResource('images', 'check_focus.png'),
-            label="Groups", selected=True,
-            border = [18, 18, 2, 2]);y+=22
-        self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, width=112, height=20, position=[18, y, 9.2],
-            texture=self.app.getThemeResource('images', 'radio_off.png'),
-            selectedTexture=self.app.getThemeResource('images', 'radio_on.png'),
-            focusedTexture=self.app.getThemeResource('images', 'radio_focus.png'),
-            label="Hair as mesh", selected=True,
-            border = [18, 18, 2, 2]);y+=22
-        self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, width=112, height=20, position=[18, y, 9.2],
-            texture=self.app.getThemeResource('images', 'radio_off.png'),
-            selectedTexture=self.app.getThemeResource('images', 'radio_on.png'),
-            focusedTexture=self.app.getThemeResource('images', 'radio_focus.png'),
-            label="Hair as curves",
-            border = [18, 18, 2, 2]);y+=22
+        self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=22
+        self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=22
+        self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as mesh", selected=True);y+=22
+        self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as curves");y+=22
         
         # MHX options
         y = 240
         self.mhxOptions = gui3d.GroupBox(self, label = 'Options', position=[10, y, 9.0], width=128, height=150);y+=25
-        self.version24 = gui3d.ToggleButton(self.mhxOptions, width=112, height=20, position=[18, y, 9.2], label="Version 2.4", selected=True);y+=22
-        self.version25 = gui3d.ToggleButton(self.mhxOptions, width=112, height=20, position=[18, y, 9.2], label="Version 2.5", selected=True);y+=22
-        self.exportExpressions = gui3d.ToggleButton(self.mhxOptions, width=112, height=20, position=[18, y, 9.2], label="Expressions", selected=True);y+=22
+        self.version24 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.4", True);y+=22
+        self.version25 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.5", True);y+=22
+        self.exportExpressions = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Expressions", True);y+=22
         rigs = []
-        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, width=112, height=20, position=[18, y, 9.2], label="Use mhx rig", selected=True);y+=22
-        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, width=112, height=20, position=[18, y, 9.2], label="Use game rig");y+=22
+        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use mhx rig", True);y+=22
+        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use game rig");y+=22
         self.mhxOptions.hide()
         
         @self.wavefrontObj.event

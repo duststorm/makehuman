@@ -33,7 +33,7 @@ class Action:
 
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, parent, group, y, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, parent, group, width=112, height=20, position=[658, y, 9.1], selected=selected, label=label)
+        gui3d.RadioButton.__init__(self, parent, group, [658, y, 9.1], label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):

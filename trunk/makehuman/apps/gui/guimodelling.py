@@ -44,6 +44,16 @@ import mh2bvh
 import mh2mhx
 import os
 
+HairButtonStyle = gui3d.Style(**{
+    'width':None,
+    'height':None,
+    'mesh':'data/3dobjs/button_standard_little.obj',
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontSize':gui3d.defaultFontSize,
+    'border':None
+    })
 
 class ModellingCategory(gui3d.Category):
 
@@ -53,17 +63,18 @@ class ModellingCategory(gui3d.Category):
         gui3d.GroupBox(self, label = 'View settings', position=[10, 472, 9.0], width=128, height=64)
         
         self.background = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
-
-        self.currentHair = gui3d.Button(self, mesh='data/3dobjs/button_standard_little.obj',
-            texture=self.app.scene3d.selectedHuman.hairFile.replace('.hair', '.png'), position=[600, 580, 9.2])
+        '''
+        hairTexture = self.app.scene3d.selectedHuman.hairFile.replace('.hair', '.png')
+        self.currentHair = gui3d.Button(self, [600, 580, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
 
         @self.currentHair.event
         def onClicked(event):
             self.app.switchCategory('Library')
             self.app.scene3d.redraw(1)
-
+        '''
         self.backgroundImage = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, 1], visible=False)
-        self.backgroundImageToggle = gui3d.ToggleButton(self, width=32, height=16, position=[15, 514, 9.1], label='Bkg')
+        self.backgroundImageToggle = gui3d.ToggleButton(self, [15, 514, 9.1], 'Bkg',
+            style=gui3d.ButtonStyle._replace(width=32, height=16))
 
         @self.backgroundImageToggle.event
         def onClicked(event):
@@ -78,7 +89,8 @@ class ModellingCategory(gui3d.Category):
                 self.app.switchTask('Background')
             self.app.scene3d.redraw(1)
             
-        self.anaglyphsButton = gui3d.ToggleButton(self, width=32, height=16, position=[51, 514, 9.1], label='3D')
+        self.anaglyphsButton = gui3d.ToggleButton(self, [51, 514, 9.1], '3D',
+            style=gui3d.ButtonStyle._replace(width=32, height=16))
 
         @self.anaglyphsButton.event
         def onClicked(event):

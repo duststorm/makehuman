@@ -11,16 +11,16 @@ class SettingsTaskView(gui3d.TaskView):
         self.shaderGroup = []
         y = 80
         gui3d.GroupBox(self, label = 'Shader', position=[10, y, 9.0], width=128, height=140);y+=35
-        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y, 9.2], label="No shader", selected=True);y+=25
-        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],label="Phong shader");y+=25
-        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],label="Toon shader");y+=25
-        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],label="Skin shader");y+=35
+        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup, [18,y, 9.2], "No shader", True);y+=25
+        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Phong shader");y+=25
+        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Toon shader");y+=25
+        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Skin shader");y+=35
         
         gui3d.GroupBox(self, label = 'Slider behavior', position=[10, y, 9.0], width=128, height=128);y+=35
-        self.realtimeUpdates = gui3d.ToggleButton(self,self.shaderGroup, width=112, height=20, position=[18,y, 9.2],
-            label="Update real-time", selected=self.app.settings.get('realtimeUpdates', True));y+=25
-        self.realtimeNormalUpdates = gui3d.ToggleButton(self,self.shaderGroup, width=112, height=20, position=[18,y,9.2],
-            label="Update normals", selected=self.app.settings.get('realtimeNormalUpdates', True));y+=25
+        self.realtimeUpdates = gui3d.CheckBox(self,self.shaderGroup, [18,y, 9.2], "Update real-time",
+            self.app.settings.get('realtimeUpdates', True));y+=25
+        self.realtimeNormalUpdates = gui3d.CheckBox(self,self.shaderGroup, [18,y,9.2], "Update normals",
+            self.app.settings.get('realtimeNormalUpdates', True));y+=25
         
         @self.shaderNo.event
         def onClicked(event):

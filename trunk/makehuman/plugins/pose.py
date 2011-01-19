@@ -35,10 +35,10 @@ class PoseTaskView(gui3d.TaskView):
 
         self.savePoseFiles = 0
 
-        self.resetPoseButton = gui3d.Button(self, width=112, height=20, label = "Reset", position=[18, 235, 9.5])
-        self.testPoseButton = gui3d.Button(self, width=112, height=20, label = "Test", position=[18, 265, 9.5])
+        self.resetPoseButton = gui3d.Button(self, [18, 235, 9.5], "Reset")
+        self.testPoseButton = gui3d.Button(self, [18, 265, 9.5], "Test")
         
-        self.savePoseToggle = gui3d.ToggleButton(self, width=112, height=20, label = "SavePose", position=[18, 295, 9.5])
+        self.savePoseToggle = gui3d.CheckBox(self, [18, 295, 9.5], "SavePose")
 
         @self.savePoseToggle.event
         def onClicked(event):
