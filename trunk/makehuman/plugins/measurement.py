@@ -78,7 +78,7 @@ class MeasureTaskView(gui3d.TaskView):
 
         for name, subnames in measurements:
             # Create box
-            box = gui3d.GroupBox(self, label = name.capitalize(), position=[10, 80, 9.0], width=128, height=320)
+            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=320))
             self.groupBoxes[name] = box
             
             # Create sliders
@@ -92,7 +92,7 @@ class MeasureTaskView(gui3d.TaskView):
         modes = [] 
                
         y = 80
-        gui3d.GroupBox(self, label = 'Units', position=[650, y, 9.0], width=128, height=80)
+        gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=80))
         y += 25
         metric = gui3d.RadioButton(self, modes, [658, y, 9.1], 'Metric', True)
         y += 22

@@ -29,7 +29,7 @@ class AqsisTaskView(gui3d.TaskView):
         subprocess.Popen('aqsl data/shaders/aqsis/cornea.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'cornea.slx'), shell=True)
         subprocess.Popen('aqsl data/shaders/aqsis/mixer.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'mixer.slx'), shell=True)
 
-        gui3d.GroupBox(self, label = 'Options', position=[10, 80, 9.0], width=128, height=256)
+        gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=256))
                                               
         #Sliders                            
         self.shadingRateSlider= gui3d.Slider(self, position=[10, 115, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.00")

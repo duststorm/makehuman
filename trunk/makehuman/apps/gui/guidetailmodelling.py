@@ -348,7 +348,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         # details tool panel background
         
         y = 80
-        gui3d.GroupBox(self, label = 'Gender', position=[10, y, 9.0], width=128, height=150);y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=150));y+=35
         
         self.genitalsSlider = gui3d.Slider(self, position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Genitalia");y+=40
 
@@ -407,7 +407,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
             self.breastFirmness = None
             
-        gui3d.GroupBox(self, label = 'Face', position=[10, y, 9.0], width=128, height=235);y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=235));y+=35
 
         self.noseSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.0, min=0.0, max=1.0, label = "Nose shape");y+=40
 
@@ -505,7 +505,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.jaw = None
             
         y = 80
-        gui3d.GroupBox(self, label = 'Head', position=[650, y, 9.0], width=128, height=150);y+=35
+        gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=150));y+=35
         
         self.headShapeSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0,min=0.0,max=1.0,label="Shape");y+=40
 
@@ -564,7 +564,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'FaceAngle', value, self.syncSliders))
             self.faceAngle = None
             
-        gui3d.GroupBox(self, label = 'Pelvis', position=[650, y, 9.0], width=128, height=150);y+=35
+        gui3d.GroupBox(self, [650, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=150));y+=35
         
         self.pelvisToneSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone");y+=40
 
@@ -623,7 +623,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Buttocks', value, self.syncSliders))
             self.buttocks = None
             
-        gui3d.GroupBox(self, label = 'Modifiers', position=[650, y, 9.0], width=128, height=100);y+=35
+        gui3d.GroupBox(self, [650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=100));y+=35
 
         self.detailButtonGroup = []
         
@@ -720,7 +720,7 @@ class MicroModelingTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Micro modelling', label='Micro')
         self.tool = None
         
-        gui3d.GroupBox(self, label = 'Modifiers', position=[10, 339, 9.0], width=128, height=128)
+        gui3d.GroupBox(self, [10, 339, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=128))
 
         self.microButtonGroup = []
 

@@ -1439,39 +1439,43 @@ class FileChooser(View):
 
         self.app.scene3d.redraw()
         
+GroupBoxStyle = Style(**{
+    'width':128,
+    'height':64,
+    'mesh':None,
+    'normal':'group_box.png',
+    'selected':None,
+    'focused':None,
+    'fontSize':defaultFontSize,
+    'border':[8, 24, 8, 8]
+    }) 
+        
 class GroupBox(View):
     
     """
     A group box widget. This widget can be used to show which widgets belong together.
     """
 
-    def __init__(self, parent, texture=None, position=[0, 0, 9],\
-        label=None, width=128, height=64, fontSize = defaultFontSize, border=[8, 24, 8, 8]):
+    def __init__(self, parent, position=[0, 0, 9], label=None, style=GroupBoxStyle):
         
         """
         This is the constructor for the Button class. It takes the following parameters:
 
         - **parent**: *View*. The parent view.
-        - **mesh**: *String*. The box object.
-        - **texture**: *String*. The box texture.
         - **position**: *List*. The box position.
         - **label**: *String*. The box label.
-        - **width**: *Float*. The box width.
-        - **height**: *Float*. The box height.
-        - **fontSize**: *Float*. The box label font size.
+        - **style**: *Style*. The box style.
         """
         
         View.__init__(self, parent)
         
-        texture = texture or self.app.getThemeResource('images', 'group_box.png')
+        texture = self.app.getThemeResource('images', style.normal)
         
-        mesh = Create9SliceMesh(width, height, texture, border)
+        mesh = Create9SliceMesh(style.width, style.height, texture, style.border)
         self.box = Object(self, mesh, None, position)
         
         if isinstance(label, str):
-            self.label = TextObject(self, text = label, position = [position[0]+5,position[1] + 2,position[2]+0.001], fontSize = fontSize)
-            #assumes box obj origin is upper left corner
-            #TODO text should be in the middle of button, calculate this from text length
+            self.label = TextObject(self, text = label, position = [position[0]+5,position[1] + 2,position[2]+0.001], fontSize = style.fontSize)
             
     def canFocus(self):
         return False

@@ -24,7 +24,7 @@ class MakeHairTaskView(gui3d.TaskView):
             scn.selectedHuman.storeMesh()
         self.octree = simpleoctree.SimpleOctree(scn.selectedHuman.meshStored,0.09)   
         #sliders
-        gui3d.GroupBox(self, label = 'Options', position=[10, 80, 9.0], width=128, height=350)
+        gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=350))
         self.cPSlider = gui3d.Slider(self, position=[10, 115, 9.3], value=14,min=4,max=30,label="Control Points")
         self.lengthSlider = gui3d.Slider(self, position=[10, 155, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length")
         self.numberSlider = gui3d.Slider(self, position=[10, 205, 9.3], value=25,min=1,max=260,label="Strands Number")

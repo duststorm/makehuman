@@ -97,12 +97,12 @@ class ExpressionTaskView(gui3d.TaskView):
         self.groupBoxes = []
         self.radioButtons = []
         
-        gui3d.GroupBox(self, label = 'Category', position=[650, y, 9.0], width=128, height=360)
+        gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=360))
         y += 25
         
         for name, subnames in expressions:
             # Create box
-            box = gui3d.GroupBox(self, label = name.capitalize(), position=[10, 80, 9.0], width=128, height=320)
+            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=320))
             self.groupBoxes.append(box)
             
             # Create sliders

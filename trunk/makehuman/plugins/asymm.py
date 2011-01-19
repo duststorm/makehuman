@@ -30,7 +30,7 @@ class AsymmTaskView(gui3d.TaskView):
 
         #Sliders
         y = 80
-        gui3d.GroupBox(self, label = 'Face', position=[10, y, 9.0], width=128, height=400);y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=400));y+=35
         self.asymmBrowSlider = AssymSlider(self, 10, y, "brown", "Brow asymmetry");y+=40
         self.asymmCheekSlider = AssymSlider(self, 10, y, "cheek", "Cheek asymmetry");y+=40
         self.asymmEarsSlider = AssymSlider(self, 10, y,  "ear", "Ears asymmetry");y+=40
@@ -41,7 +41,7 @@ class AsymmTaskView(gui3d.TaskView):
         self.asymmTempleSlider = AssymSlider(self, 10, y, "temple", "Temple asymmetry");y+=40
         self.asymmTopSlider = AssymSlider(self, 10, y, "top", "Top asymmetry");y+=40 + 8
         y = 80
-        gui3d.GroupBox(self, label = 'Body', position=[650, y, 9.0], width=128, height=120);y+=25
+        gui3d.GroupBox(self, [650, y, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=120));y+=25
         self.asymmTrunkSlider = AssymSlider(self, 650, y, "trunk", "Trunk asymmetry");y+=40
         self.asymmBreastSlider = AssymSlider(self, 650, y, "breast", "Breast asymmetry")
 

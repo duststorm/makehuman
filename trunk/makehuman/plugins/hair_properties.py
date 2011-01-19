@@ -37,7 +37,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Hair')
         
         y = 80
-        gui3d.GroupBox(self, label = 'Hair properties', position=[10, y, 9.0], width=128, height=276);y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Hair properties', gui3d.GroupBoxStyle._replace(height=276));y+=35
 
         #############
         #SLIDERS

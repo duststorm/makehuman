@@ -162,7 +162,7 @@ class ExportTaskView(gui3d.TaskView):
         
         # Formats
         y = 80
-        gui3d.GroupBox(self, label = 'Format', position=[10, y, 9.0], width=128, height=150);y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=150));y+=25
         self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], "Wavefront obj", True, gui3d.ButtonStyle);y+=22
         self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange", style=gui3d.ButtonStyle);y+=22
         self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada", style=gui3d.ButtonStyle);y+=22
@@ -171,7 +171,7 @@ class ExportTaskView(gui3d.TaskView):
             
         # OBJ options
         y = 240
-        self.objOptions = gui3d.GroupBox(self, label = 'Options', position=[10, y, 9.0], width=128, height=150);y+=25
+        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=150));y+=25
         self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=22
         self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=22
         self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as mesh", selected=True);y+=22
@@ -179,7 +179,7 @@ class ExportTaskView(gui3d.TaskView):
         
         # MHX options
         y = 240
-        self.mhxOptions = gui3d.GroupBox(self, label = 'Options', position=[10, y, 9.0], width=128, height=150);y+=25
+        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=150));y+=25
         self.version24 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.4", True);y+=22
         self.version25 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.5", True);y+=22
         self.exportExpressions = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Expressions", True);y+=22
