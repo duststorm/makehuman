@@ -266,7 +266,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     def syncStatus(self):
         human = self.app.scene3d.selectedHuman
         status = ''
-        if human.getGender() == 0.5:
+        if abs(human.getGender() - 0.5) < 0.01:
             gender = 'Gender: neutral, '
         else:
             gender = 'Gender: %.2f%% female, %.2f%% male, ' % ((1.0 - human.getGender()) * 100, human.getGender() * 100)
