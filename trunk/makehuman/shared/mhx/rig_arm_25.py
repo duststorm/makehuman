@@ -269,7 +269,7 @@ limHand_R = (-deg90,70*deg1, 0,0, -deg20,deg20)
 
 def ArmWritePoses(fp):
 	# Shoulder
-	addPoseBone(fp, 'Shoulder_L', 'MHCircle05', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_L', 'MHCircle05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)])])
 
 	addPoseBone(fp, 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
@@ -294,7 +294,7 @@ def ArmWritePoses(fp):
 		[('StretchTo', 0, 1, ['Stretch', 'ElbowTrg_L', 0])])
 
 
-	addPoseBone(fp, 'Shoulder_R', 'MHCircle05', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_R', 'MHCircle05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
 
 	addPoseBone(fp, 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
@@ -388,6 +388,7 @@ def ArmWritePoses(fp):
 		
 
 	addPoseBone(fp, 'UpArmFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)]),])
 
 
@@ -401,11 +402,13 @@ def ArmWritePoses(fp):
 
 	# IK
 
+	deltaElbow = 0.6*deg1
+
 	addPoseBone(fp, 'UpArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)])])
 
 	addPoseBone(fp, 'LoArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), (0,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'HandIK_L', 2, (pi, 'ElbowPTIK_L'), (True, False,True)]),
+		[('IK', 0, 1, ['IK', 'HandIK_L', 2, (pi-deltaElbow, 'ElbowPTIK_L'), (True, False,True)]),
 		#('CopyRot', C_LOCAL, 1, ['CopyRotY', 'HandIK_L', (0,1,0), (0,0,0), False]),
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)])
 		])
@@ -420,7 +423,7 @@ def ArmWritePoses(fp):
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)])])
 
 	addPoseBone(fp, 'LoArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), (0,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'HandIK_R', 2, (0, 'ElbowPTIK_R'), (True, False,True)]),
+		[('IK', 0, 1, ['IK', 'HandIK_R', 2, (0+deltaElbow, 'ElbowPTIK_R'), (True, False,True)]),
 		#('CopyRot', C_LOCAL, 1, ['CopyRotY', 'HandIK_R', (0,1,0), (0,0,0), False]),
 		('LimitRot', C_OW_LOCAL, 0, ['LimitRot', limLoArm_R, (True, True, True)])
 		])

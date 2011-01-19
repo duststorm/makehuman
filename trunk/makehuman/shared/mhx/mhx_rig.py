@@ -292,24 +292,27 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 #
 
 BoneGroups = [
-	('FK_L', 'THEME01'),
+	('Master', 'THEME13'),
+	('Spine', 'THEME05'),
+	('FK_L', 'THEME09'),
 	('FK_R', 'THEME02'),
-	('IK_L', 'THEME01'),
-	('IK_R', 'THEME02'),
+	('IK_L', 'THEME03'),
+	('IK_R', 'THEME04'),
 ]
 
 def boneGroupIndex(grp):
-	index = 0
+	index = 1
 	for (name, theme) in BoneGroups:
 		if name == grp:
 			return index
 		index += 1
-	return None
+	raise NameError("Unknown bonegroup %s" % grp)
 
 def writeBoneGroups(fp):
 	for (name, theme) in BoneGroups:
 		fp.write(
 "    BoneGroup %s\n" % name +
+"      name '%s' ;\n" % name +
 "      color_set '%s' ;\n" % theme +
 "    end BoneGroup\n")
 	return
@@ -484,9 +487,10 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 		fp.write("\tposebone %s %x \n" % (bone, ikFlags))
 		if customShape:
 			fp.write("\t\tdisplayObject _object['%s'] ;\n" % customShape)
-		if boneGroup:
-			index = boneGroupIndex(boneGroup)
-			fp.write("\t\tbone_group_index %d ;\n" % index)
+		
+	if boneGroup:
+		index = boneGroupIndex(boneGroup)
+		fp.write("    bone_group Refer BoneGroup %s ;\n" % boneGroup)
 
 	(usex,usey,usez) = (0,0,0)
 	(xmin, ymin, zmin) = (-pi, -pi, -pi)
@@ -1469,6 +1473,7 @@ def writeAllArmatures(fp):
 	return
 
 def writeAllPoses(fp):
+	writeBoneGroups(fp)
 	rig_body_25.BodyWritePoses(fp)
 	rig_arm_25.ArmWritePoses(fp)
 	rig_finger_25.FingerWritePoses(fp)

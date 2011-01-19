@@ -150,7 +150,7 @@ upLegRoll = 0
 loLegRoll = 0
 footRoll = 0
 #toeRoll = -63.5*deg1
-toeRoll = -deg45
+toeRoll = 135*deg1
 footCtrlRoll = 0.0
 
 LegArmature = [
@@ -353,7 +353,7 @@ def LegWritePoses(fp):
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_L, (1,1,1)]),
 		 ('IK', 0, 1, ['IK', None, 2, None, (True, False,True)])])
 
-	addPoseBone(fp, 'ToeFK_L', 'MHToe', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'ToeFK_L', 'MHToe_L', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limToe_L, (1,0,0)])])
 
 	addPoseBone(fp, 'UpLegFK_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
@@ -366,7 +366,7 @@ def LegWritePoses(fp):
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_R, (1,1,1)]),
 		 ('IK', 0, 1, ['IK', None, 2, None, (True, False,True)])])
 
-	addPoseBone(fp, 'ToeFK_R', 'MHToe', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'ToeFK_R', 'MHToe_R', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limToe_R, (1,0,0)])])
 
 
@@ -387,13 +387,15 @@ def LegWritePoses(fp):
 		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 'fNoStretch', ['Hip_R', 'Hip_R'])])
 
+	deltaKnee = -2.5*deg1
+
 	addPoseBone(fp, 'LoLegIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'AnkleIK_L', 2, (-deg90, 'KneePTIK_L'), (1,0,1)]),
+		[('IK', 0, 1, ['IK', 'AnkleIK_L', 2, (-deg90+deltaKnee, 'KneePTIK_L'), (1,0,1)]),
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (1,1,1)])
 		])
 
 	addPoseBone(fp, 'LoLegIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
-		[('IK', 0, 1, ['IK', 'AnkleIK_R', 2, (-deg90, 'KneePTIK_R'), (1,0,1)]),
+		[('IK', 0, 1, ['IK', 'AnkleIK_R', 2, (-deg90-deltaKnee, 'KneePTIK_R'), (1,0,1)]),
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,1,1)])
 		])
 

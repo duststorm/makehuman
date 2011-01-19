@@ -693,7 +693,7 @@ def parseAnimDataFCurve(adata, rna, args, tokens):
         elif key == 'FModifier':
             parseFModifier(fcu, val, sub)
         elif key == 'kp':
-            pt = fcu.keyframe_points.add(n, 0)
+            pt = fcu.keyframe_points.insert(n, 0)
             pt.interpolation = 'LINEAR'
             pt = parseKeyFramePoint(pt, val, sub)
             n += 1
@@ -1610,12 +1610,11 @@ def parsePose (args, tokens):
 
 def parseBoneGroup(pose, nGrps, args, tokens):
     global todo
-    print( "Parsing bonegroup %s" % args )
+    if verbosity > 2:
+        print( "Parsing bonegroup %s" % args )
     name = args[0]
     bpy.ops.pose.group_add()
-    print(dir(pose.bone_groups))
     bg = pose.bone_groups.active
-    print("Created", bg)
     loadedData['BoneGroup'][name] = bg
     for (key, val, sub) in tokens:
         defaultKey(key, val,  sub, "bg", [], globals(), locals())
