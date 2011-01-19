@@ -61,10 +61,10 @@ class HairTaskView(gui3d.TaskView):
 
       human.hairObj = human.hairs.loadHair(path="./data/hairs/"+filename, update=update)
       
-      #self.app.categories["Modelling"].tasksByName["Macro modelling"].currentHair.setTexture(path.join('data/hairs', filename + '.png'))
       self.app.switchCategory("Modelling")
-      human.setHairFile(path.join('data/hairs', filename + ".obj"))  
-
+      human.setHairFile(path.join('data/hairs', filename + ".obj"))
+      hairTexture = human.hairFile.replace('.obj', '.png')
+      self.app.categories["Modelling"].currentHair.setTexture(hairTexture)
 
   def onShow(self, event):
     # When the task gets shown, set the focus to the file chooser

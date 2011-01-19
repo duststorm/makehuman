@@ -63,7 +63,7 @@ class ModellingCategory(gui3d.Category):
         gui3d.GroupBox(self, label = 'View settings', position=[10, 472, 9.0], width=128, height=64)
         
         self.background = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
-        '''
+
         hairTexture = self.app.scene3d.selectedHuman.hairFile.replace('.hair', '.png')
         self.currentHair = gui3d.Button(self, [600, 580, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
 
@@ -71,7 +71,7 @@ class ModellingCategory(gui3d.Category):
         def onClicked(event):
             self.app.switchCategory('Library')
             self.app.scene3d.redraw(1)
-        '''
+
         self.backgroundImage = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, 1], visible=False)
         self.backgroundImageToggle = gui3d.ToggleButton(self, [15, 514, 9.1], 'Bkg',
             style=gui3d.ButtonStyle._replace(width=32, height=16))
