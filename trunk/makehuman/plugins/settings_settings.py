@@ -17,9 +17,9 @@ class SettingsTaskView(gui3d.TaskView):
         self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Skin shader");y+=35
         
         gui3d.GroupBox(self, label = 'Slider behavior', position=[10, y, 9.0], width=128, height=128);y+=35
-        self.realtimeUpdates = gui3d.CheckBox(self,self.shaderGroup, [18,y, 9.2], "Update real-time",
+        self.realtimeUpdates = gui3d.CheckBox(self, [18,y, 9.2], "Update real-time",
             self.app.settings.get('realtimeUpdates', True));y+=25
-        self.realtimeNormalUpdates = gui3d.CheckBox(self,self.shaderGroup, [18,y,9.2], "Update normals",
+        self.realtimeNormalUpdates = gui3d.CheckBox(self, [18,y,9.2], "Update normals",
             self.app.settings.get('realtimeNormalUpdates', True));y+=25
         
         @self.shaderNo.event
