@@ -824,7 +824,7 @@ class Button(View):
             mesh = Create9SliceMesh(width, height, t, border)
             self.button = Object(self, mesh, position=position)
             if isinstance(label, str):
-                self.label = TextObject(self, text = label, position = [position[0] + border[0] + 3,position[1]+2,position[2]+0.001], fontSize = fontSize)
+                self.label = TextObject(self, text = label, position = [position[0] + border[0] + 3,position[1]+height/2-6,position[2]+0.001], fontSize = fontSize)
             
         self.selected = selected
 
