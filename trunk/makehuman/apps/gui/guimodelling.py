@@ -111,6 +111,20 @@ class ModellingCategory(gui3d.Category):
                 g.setColor(color)
 
             self.app.scene3d.redraw()
+            
+        self.wireButton = gui3d.ToggleButton(self, [87, 514, 9.1], 'Wire',
+            style=gui3d.ButtonStyle._replace(width=32, height=16))
+            
+        @self.wireButton.event
+        def onClicked(event):
+            human = self.app.scene3d.selectedHuman
+            if human.mesh.solid:
+                human.mesh.setSolid(0)
+                self.wireButton.setSelected(True)
+            else:
+                human.mesh.setSolid(1)
+                self.wireButton.setSelected(False)
+            self.app.scene3d.redraw()
         
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)
