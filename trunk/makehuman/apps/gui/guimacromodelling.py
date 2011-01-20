@@ -282,6 +282,9 @@ class MacroModelingTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         self.genderSlider.setFocus()
+        self.syncSliders()
+        self.syncEthnics()
+        self.syncStatus()
         gui3d.TaskView.onShow(self, event)
 
 

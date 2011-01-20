@@ -55,11 +55,6 @@ class EthnicsTaskView(gui3d.TaskView):
         human.load(os.path.join('data/models/ethnics', filename), self.app.progress)
         human.setDetail(os.path.join('data/models/ethnics', filename.replace('.mhm', '.target')), 1.0)
 
-        self.app.categories['Modelling'].tasksByName['Macro modelling'].syncSliders()
-        self.app.categories['Modelling'].tasksByName['Macro modelling'].syncEthnics()
-        self.app.categories['Modelling'].tasksByName['Macro modelling'].syncStatus()
-        self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
-
         del self.app.undoStack[:]
         del self.app.redoStack[:]
 
