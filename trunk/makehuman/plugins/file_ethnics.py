@@ -3,6 +3,7 @@
 # We need this for gui controls
 
 import gui3d, mh, os
+from algos3d import getTarget
 class EthnicsTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -53,7 +54,9 @@ class EthnicsTaskView(gui3d.TaskView):
         human = self.app.scene3d.selectedHuman
 
         human.load(os.path.join('data/models/ethnics', filename), self.app.progress)
-        human.setDetail(os.path.join('data/models/ethnics', filename.replace('.mhm', '.target')), 1.0)
+        target = os.path.join('data/models/ethnics', filename.replace('.mhm', '.target'))
+        human.setDetail(target, 1.0)
+        getTarget(human.meshData, target).apply(human.meshData, 1.0, True, True)
 
         del self.app.undoStack[:]
         del self.app.redoStack[:]

@@ -110,6 +110,8 @@ class Target:
         
         if morphFactor == 0:
             return
+            
+        #print 'Applying %s with %f on %d verts' % (self.name, morphFactor, len(self.verts) if self.verts else 0)
 
         if self.verts:
             
@@ -145,8 +147,6 @@ class Target:
                 obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
             if update:
                 obj.update(verticesToUpdate)
-
-            # print "Applied %s with value of %f in %f sec"%(targetPath, morphFactor,(time.time() - t1))
 
             return True
 
