@@ -66,8 +66,8 @@ class EthnicsTaskView(gui3d.TaskView):
         self.app.categories['Files'].tasksByName['Save'].fileentry.text = filename.replace('.mhm', '')
         self.app.categories['Files'].tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
 
-        self.app.switchCategory('Modelling')
-        self.app.scene3d.redraw(1)
+        #self.app.switchCategory('Modelling')
+        #self.app.scene3d.redraw(1)
 
 def load(app):
     category = app.getCategory('Experiments')
