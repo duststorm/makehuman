@@ -800,6 +800,8 @@ class Button(View):
         
         View.__init__(self, parent)
         
+        self.label = None
+        
         self.texture = self.app.getThemeResource('images', style.normal)
         self.selectedTexture = self.app.getThemeResource('images', style.selected) if style.selected else None
         self.focusedTexture = self.app.getThemeResource('images', style.focused) if style.focused else None
@@ -831,6 +833,12 @@ class Button(View):
     def setTexture(self, texture):
         self.texture = texture
         self.button.setTexture(texture)
+        
+    def getLabel(self):
+        if self.label:
+            return self.label.getText()
+        else:
+            return ''
 
     def onMouseDown(self, event):
         self.setSelected(True)
@@ -932,7 +940,11 @@ class RadioButton(Button):
             self.button.setTexture(self.selectedTexture)
         else:
             self.button.setTexture(self.texture)
-
+            
+    def getSelection(self):
+        for radio in self.group:
+            if radio.selected:
+                return radio
 
 # ToggleButton widget
 
