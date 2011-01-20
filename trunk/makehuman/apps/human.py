@@ -1824,7 +1824,7 @@ class Human(gui3d.Object):
                 elif lineData[0] == 'height':
                     modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target',
                                                       'data/targets/macrodetails/universal-stature-giant.target')
-                    modifier.setValue(float(lineData[1]))
+                    modifier.setValue(float(lineData[1]), 0)
                 elif lineData[0] == 'genitals':
                     self.setGenitals(float(lineData[1]))
                 elif lineData[0] == 'breastSize':
