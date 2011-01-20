@@ -283,6 +283,7 @@ class Human(gui3d.Object):
             of the attribute to apply.
         """
 
+        gender = min(max(gender, 0.0), 1.0)
         self._setGenderVals(gender)
 
     def getGender(self):
@@ -307,6 +308,7 @@ class Human(gui3d.Object):
             of the attribute to apply.
         """
 
+        age = min(max(age, 0.0), 1.0)
         self._setAgeVals(-1 + 2 * age)
 
     def getAge(self):
@@ -342,6 +344,7 @@ class Human(gui3d.Object):
             of the attribute to apply.
         """
 
+        weight = min(max(weight, 0.0), 1.0)
         self._setWeightVals(-1 + 2 * weight)
 
     def getWeight(self):
@@ -376,6 +379,7 @@ class Human(gui3d.Object):
             of the attribute to apply.
         """
 
+        muscle = min(max(muscle, 0.0), 1.0)
         self._setMuscleVals(-1 + 2 * muscle)
 
     def getMuscle(self):
