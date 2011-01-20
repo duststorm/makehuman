@@ -42,10 +42,11 @@ class EthnicsTaskView(gui3d.TaskView):
         
         @self.load.event
         def onClicked(event):
+            ethnic = self.africa.getSelection().getLabel().lower()
             subEthnic = self.aethiopid.getSelection().getLabel().lower()
             gender = self.female.getSelection().getLabel().lower()
             age = self.child.getSelection().getLabel().lower()
-            self.loadEthnic('africa-%s-%s-%s.mhm' % (subEthnic, gender, age))
+            self.loadEthnic('%s-%s-%s-%s.mhm' % (ethnic, subEthnic, gender, age))
         
     def loadEthnic(self, filename):
         
@@ -62,14 +63,14 @@ class EthnicsTaskView(gui3d.TaskView):
         del self.app.undoStack[:]
         del self.app.redoStack[:]
 
-        self.parent.tasksByName['Save'].fileentry.text = filename.replace('.mhm', '')
-        self.parent.tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
+        self.app.categories['Files'].tasksByName['Save'].fileentry.text = filename.replace('.mhm', '')
+        self.app.categories['Files'].tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
 
         self.app.switchCategory('Modelling')
         self.app.scene3d.redraw(1)
 
 def load(app):
-    category = app.getCategory('Files')
+    category = app.getCategory('Experiments')
     taskview = EthnicsTaskView(category)
     print 'Ethnics imported'
 
