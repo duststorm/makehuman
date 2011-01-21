@@ -41,7 +41,7 @@ class HumanTextureTaskView(gui3d.TaskView):
             print 'Loading %s' % filename
             self.app.scene3d.selectedHuman.setTexture('data/textures/' + filename)
             
-            self.app.categories['Modelling'].tasksByName['Macro modelling'].backgroundImageToggle.setSelected(True)
+            self.app.categories['Modelling'].backgroundImageToggle.setSelected(True)
             self.app.switchCategory('Modelling')
             self.app.scene3d.redraw(1)
 
