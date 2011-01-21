@@ -243,7 +243,7 @@ def readProxyFile(obj, proxyStuff):
 				proxy.rig = words[2]
 			elif words[1] == 'wire':
 				proxy.wire = True
-			elif words[1] == 'Cage':
+			elif words[1] == 'cage':
 				proxy.cage = True
 			elif words[1] == 'weightfile':
 				proxy.weightfile = (words[2], words[3])
