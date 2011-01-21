@@ -162,7 +162,7 @@ void RegisterObject3D(PyObject *module)
 void Object3D_dealloc(Object3D *self)
 {
     // Free our data
-    free(self->trigs);
+    free(self->quads);
     free(self->verts);
     free(self->norms);
     free(self->UVs);
@@ -205,14 +205,14 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->sy = 1.0;
         self->sz = 1.0;
 
-        self->trigs = NULL;
+        self->quads = NULL;
         self->verts = NULL;
         self->norms = NULL;
         self->UVs = NULL;
         self->colors = NULL;
         self->colors2 = NULL;
 
-        self->nTrigs = 0;
+        self->nQuads = 0;
         self->nVerts = 0;
         self->nNorms = 0;
         self->nColors = 0;
@@ -230,14 +230,14 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 {
-    int numVerts, numTrigs;
+    int numVerts, numQuads;
     PyObject *indexBuffer;
 
     if (!PyArg_ParseTuple(args, "iO", &numVerts, &indexBuffer) || !PyList_Check(indexBuffer))
         return -1;
 
-    // Faces are triangles
-    numTrigs = (int)PyList_Size(indexBuffer) / 3;
+    // Faces are quads
+    numQuads = (int)PyList_Size(indexBuffer) / 4;
 
     // Allocate arrays
     self->verts = makeFloatArray(numVerts * 3);
@@ -248,9 +248,9 @@ int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 
     self->nVerts = numVerts;
 
-    self->trigs = makeIntArray(numTrigs * 3);
+    self->quads = makeIntArray(numQuads * 4);
     self->nNorms = numVerts * 3;
-    self->nTrigs = numTrigs;
+    self->nQuads = numQuads;
     self->nColors = numVerts * 3;
     self->nColors2 = numVerts * 4;
 
@@ -262,7 +262,7 @@ int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 
         for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
         {
-            self->trigs[index++] = PyInt_AsLong(item);
+            self->quads[index++] = PyInt_AsLong(item);
             Py_DECREF(item);
         }
 

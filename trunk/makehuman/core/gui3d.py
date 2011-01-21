@@ -1541,8 +1541,7 @@ def Create9SliceMesh(width, height, texture, border):
     for y in xrange(3):
         for x in xrange(3):
             o = x + y * 4
-            fg.createFace(v[o+4], v[o+1], v[o], uv=(uv[o+4], uv[o+1], uv[o]))
-            fg.createFace(v[o+4], v[o+5], v[o+1], uv=(uv[o+4], uv[o+5], uv[o+1]))
+            fg.createFace(v[o+4], v[o+5], v[o+1], v[o], uv=(uv[o+4], uv[o+5], uv[o+1], uv[o]))
             
     mesh.texture = texture
     mesh.updateIndexBuffer()

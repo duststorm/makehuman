@@ -372,7 +372,7 @@ class Vert:
 class Face:
 
     """
-    A face object. In MakeHuman, all face objects are triangular.
+    A face object. In MakeHuman, all face objects are quads.
 
     Basic usage
     ------------
@@ -381,28 +381,29 @@ class Face:
 
         import module3d
 
-        v1 = module3d.Vert([1,0,0])
+        v1 = module3d.Vert([0,0,0])
         v2 = module3d.Vert([0,1,0])
-        v3 = module3d.Vert([0,0,1])
+        v3 = module3d.Vert([1,1,0])
+        v3 = module3d.Vert([1,0,0])
 
-        f = module3d.Face(v1,v2,v3)
+        f = module3d.Face(v1,v2,v3,v4)
         
     Attributes
     ----------
     
     - **self.no**: *float list* The physical surface normal of the face (x,y,z). Default: [0, 0, 0].
-    - **self.verts**: *verts list* A list of 3 vertices that represent the corners of this face.
+    - **self.verts**: *verts list* A list of 4 vertices that represent the corners of this face.
     - **self.idx**: *int* The index of this face in the list of faces.
     - **self.group**: *FaceGroup* The face group that is the parent of this face.
     - **self.color**: *list of list of ints*. A list of 3 lists of 4 integers (0-255)
       [[r,g,b,a],[r,g,b,a],[r,g,b,a]] used as the 3 vertex colors (including an alpha channel).
     - **self.colorID**: *list of list of ints*. A list of 3 integers (0-255) [index1,index2,index3]
       used as a 'selection' color.
-    - **self.uv**: *list of ints*. A list of 3 ints [i,i,i]
+    - **self.uv**: *list of ints*. A list of 4 ints [i,i,i,i]
       holding the index to the UV coordinates in the objects' uvValues list for the uv-mapping of textures to this face.
     """
 
-    def __init__(self, v0, v1, v2):
+    def __init__(self, v0, v1, v2, v3):
         """
         This is the constructor method for the Face class.
         It initializes all face attributes.
@@ -418,11 +419,14 @@ class Face:
 
         v2:
             *vert*. Third vertex of face
+            
+        v3:
+            *vert*. Fourth vertex of face
 
         """
 
         self.no = [0.0, 0.0, 0.0]
-        self.verts = [v0, v1, v2]
+        self.verts = [v0, v1, v2, v3]
         self.uv = None
         self.color = None
         self.colorID = [0, 0, 0]
@@ -430,7 +434,7 @@ class Face:
         self.group = None
 
     def setColor(self, color):
-        f.color = [color, color, color]
+        f.color = [color, color, color, color]
         f.updateColors()
 
     def calcNormal(self):
@@ -525,8 +529,8 @@ class FaceGroup:
 
         return 'facegroup %s' % self.name
 
-    def createFace(self, v0, v1, v2, uv=None):
-        f = Face(v0, v1, v2)
+    def createFace(self, v0, v1, v2, v3, uv=None):
+        f = Face(v0, v1, v2, v3)
         f.group = self
         self.faces.append(f)
         self.parent.faces.append(f)
@@ -535,13 +539,13 @@ class FaceGroup:
             index = len(self.parent.uvValues)
             for uvpair in uv:
                 self.parent.uvValues.append(uvpair)
-            f.uv = [index, index + 1, index + 2]
+            f.uv = [index, index + 1, index + 2, index + 3]
 
         return f
 
     def setColor(self, color):
         for f in self.faces:
-            f.color = [color, color, color]
+            f.color = [color, color, color, color]
             f.updateColors()
 
 
@@ -1197,7 +1201,7 @@ class Scene3D:
 
         self.assignSelectionID(obj)
 
-        # print "sending: ", obj.name, len(obj.verts)
+        #print "sending: ", obj.name, len(obj.verts)
 
         coIdx = 0
         fidx = 0
@@ -1216,10 +1220,10 @@ class Scene3D:
             for f in g.faces:
                 faceColor = f.color
                 if faceColor == None:
-                    faceColor = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+                    faceColor = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
                 fUV = f.uv
                 if fUV == None:
-                    fUV = [-1, -1, -1]
+                    fUV = [-1, -1, -1, -1]
 
                 i = 0
                 for v in f.verts:
@@ -1914,8 +1918,7 @@ def drawQuad(scn, verts, name='quad', position=[0.0, 0.0, 0.0]):
 
   # create faces
 
-    f1 = fg.createFace(v1, v4, v2)
-    f2 = fg.createFace(v2, v4, v3)
+    f1 = fg.createFace(v1, v4, v3, v2)
 
     obj.updateIndexBuffer()
     scn.update()

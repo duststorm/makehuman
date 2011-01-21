@@ -129,19 +129,21 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
 
         fg = module3d.FaceGroup(groupName)  # create group with name groupName
         obj.addFaceGroup(fg)  # add group to object
-        for face in group:  # for each face in the group [co_index1, co_index2, co_index3]
+        for face in group:  # for each face in the group [co_index1, co_index2, co_index3, co_index4]
             v0 = obj.verts[face[0]]  # look up vertices, these are in the same order as in the file
             v1 = obj.verts[face[1]]
             v2 = obj.verts[face[2]]
+            v3 = obj.verts[face[3]]
             
-            f = fg.createFace(v0, v1, v2)
+            f = fg.createFace(v0, v1, v2, v3)
 
             if len(uvFaceData) > 0:  # look up uv, if existing, these are in the same order as in the file
                 uvIndices = uvFaceData[fIndex]
                 t0 = uvIndices[0]
                 t1 = uvIndices[1]
                 t2 = uvIndices[2]
-                f.uv = [t0, t1, t2]
+                t3 = uvIndices[3]
+                f.uv = [t0, t1, t2, t3]
 
             f.idx = fIndex
             fIndex += 1
@@ -240,33 +242,25 @@ def wavefrontToData(path):
                 # sequence as is done for verts coords.
 
                 if len(uvIndices) == 4:
-                    uvFaceData.append([uvIndices[0], uvIndices[1], uvIndices[2]])
-                    uvFaceData.append([uvIndices[2], uvIndices[3], uvIndices[0]])
+                    uvFaceData.append([uvIndices[0], uvIndices[1], uvIndices[2], uvIndices[3]])
                 elif len(uvIndices) == 3:
-                    uvFaceData.append([uvIndices[0], uvIndices[1], uvIndices[2]])
+                    uvFaceData.append([uvIndices[0], uvIndices[1], uvIndices[2], uvIndices[0]])
 
                 # Split quads in trigs
 
                 if len(vIndices) == 4:
-                    triangle1 = [vIndices[0], vIndices[1], vIndices[2]]
-                    faceGroups[currentFaceGroup].append(triangle1)
                     vertsSharedFaces[vIndices[0]].append(faceIndex)
                     vertsSharedFaces[vIndices[1]].append(faceIndex)
                     vertsSharedFaces[vIndices[2]].append(faceIndex)
-                    faceIndex += 1
-
-                    triangle2 = [vIndices[2], vIndices[3], vIndices[0]]
-                    faceGroups[currentFaceGroup].append(triangle2)
-                    vertsSharedFaces[vIndices[2]].append(faceIndex)
                     vertsSharedFaces[vIndices[3]].append(faceIndex)
-                    vertsSharedFaces[vIndices[0]].append(faceIndex)
+                    faceGroups[currentFaceGroup].append(vIndices)
                     faceIndex += 1
                 elif len(vIndices) == 3:
 
                     vertsSharedFaces[vIndices[0]].append(faceIndex)
                     vertsSharedFaces[vIndices[1]].append(faceIndex)
                     vertsSharedFaces[vIndices[2]].append(faceIndex)
-                    faceGroups[currentFaceGroup].append(vIndices)
+                    faceGroups[currentFaceGroup].append([vIndices[0], vIndices[1], vIndices[2], vIndices[0]])
                     faceIndex += 1
                 else:
                     print 'Warning, malformed faces in %s' % path

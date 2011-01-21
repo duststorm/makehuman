@@ -331,10 +331,8 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
         #end of please...
 
         #shallow copies used
-        fg.createFace(w1, w4, w2)
-        fg.faces[len(fg.faces) -1].uv= [w1.idx,w4.idx,w2.idx]
-        fg.createFace(w2, w4, w3)
-        fg.faces[len(fg.faces) -1].uv=[w2.idx,w4.idx,w3.idx]
+        fg.createFace(w1, w4, w3, w2)
+        fg.faces[len(fg.faces) -1].uv= [w1.idx,w4.idx,w3.idx,w2.idx]
         vtemp1=w4
         vtemp2=w3
 

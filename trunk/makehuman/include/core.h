@@ -71,7 +71,7 @@ extern "C"
         /**<        Array of 3 floats defining the object size (x, y and z scale).              */
         int nVerts;                 /**< \brief The number of vertices in this object.                                      */
         /**<        An int holding the number of vertices in this object.                       */
-        int nTrigs;                 /**< \brief The number of faces in this object.                                         */
+        int nQuads;                 /**< \brief The number of faces in this object.                                         */
         /**<        An int holding the number of triangular faces in this object.
                     MakeHuman only supports triangular faces.                                   */
         int nNorms;                 /**< \brief The number of surface normals in this object.                               */
@@ -81,7 +81,7 @@ extern "C"
         int nColors2;               /**< \brief The number of colors used in this object.                                   */
         /**<        An int holding the number of colors used in this object.
                 <b>EDITORIAL NOTE: One of these may be for 'false' colors. Find out which.</b>  */
-        int *trigs;                 /**< \brief The indices of faces in this object.                                        */
+        int *quads;                 /**< \brief The indices of faces in this object.                                        */
         /**<        Three ints for each triangular face in this object.                         */
         float *verts;               /**< \brief Pointer to the start of the list of vertex coordinates.                     */
         /**<        A pointer to an array of floats containing the list of vertex coordinates

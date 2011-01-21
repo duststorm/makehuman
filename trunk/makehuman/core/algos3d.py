@@ -728,7 +728,10 @@ def loadVertsColors(obj, colorsPath, update=1, mode='new'):
     for (i, f) in enumerate(obj.faces):
         faceColor = colorData[i]
         vColors = [int(x) for x in faceColor.split()]
-        f.color = [[vColors[0], vColors[1], vColors[2], vColors[3]], [vColors[4], vColors[5], vColors[6], vColors[7]], [vColors[8], vColors[9], vColors[10], vColors[11]]]
+        f.color = [[vColors[0], vColors[1], vColors[2], vColors[3]],
+            [vColors[4], vColors[5], vColors[6], vColors[7]],
+            [vColors[8], vColors[9], vColors[10], vColors[11]],
+            [vColors[12], vColors[13], vColors[14], vColors[15]]]
 
         # I assign single verts color too, but without really use them in realtime rendering
         # infact, in realtime rendering we use face.color and not vert.color, but
@@ -737,6 +740,7 @@ def loadVertsColors(obj, colorsPath, update=1, mode='new'):
         f.verts[0].color = [vColors[0], vColors[1], vColors[2], vColors[3]]
         f.verts[1].color = [vColors[4], vColors[5], vColors[6], vColors[7]]
         f.verts[2].color = [vColors[8], vColors[9], vColors[10], vColors[11]]
+        f.verts[3].color = [vColors[12], vColors[13], vColors[14], vColors[15]]
 
         # print f.verts[0].idx, f.verts[0].color
 

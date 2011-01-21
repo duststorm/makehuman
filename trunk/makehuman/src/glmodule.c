@@ -1798,16 +1798,16 @@ void mhDrawMeshes(int pickMode, int cameraType)
                   glDisableClientState(GL_COLOR_ARRAY);
                   glColor3f(0.0f, 0.0f, 0.0f);
                   glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
-                  glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
+                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
                   glEnableClientState(GL_COLOR_ARRAY);
                   glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
                   glEnable(GL_POLYGON_OFFSET_FILL);
                   glPolygonOffset(1.0, 1.0);
-                  glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
+                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
                   glDisable(GL_POLYGON_OFFSET_FILL);
                 }
                 else
-                  glDrawElements(GL_TRIANGLES, obj->nTrigs * 3, GL_UNSIGNED_INT, obj->trigs);
+                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && obj->shader && obj->isSolid)

@@ -158,9 +158,7 @@ def createMesh(font, text, object = None):
             uv4 = [uv[0], uv[3]]
 
             # create faces
-
-            f1 = fg.createFace(v1, v4, v2, uv=(uv1, uv4, uv2))
-            f2 = fg.createFace(v2, v4, v3, uv=(uv2, uv4, uv3))
+            fg.createFace(v1, v4, v3, v2, uv=(uv1, uv4, uv3, uv2))
 
     object.texture = font.file
     object.updateIndexBuffer()
