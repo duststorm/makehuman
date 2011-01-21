@@ -167,6 +167,7 @@ class ExportTaskView(gui3d.TaskView):
         # OBJ options
         y = 240
         self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=150));y+=25
+        self.exportDiamonds = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Diamonds", False);y+=22
         self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=22
         self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=22
         self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as mesh", selected=True);y+=22
@@ -215,7 +216,11 @@ class ExportTaskView(gui3d.TaskView):
                 os.makedirs(exportPath)
 
             if self.wavefrontObj.selected:
-                mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".obj"), 'data/3dobjs/base.obj', self.exportGroups.selected)
+                mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData,
+                    os.path.join(exportPath, filename + ".obj"),
+                    'data/3dobjs/base.obj',
+                    self.exportGroups.selected,
+                    None if self.exportDiamonds.selected else (lambda fg: not 'joint' in fg))
                 mh2proxy.exportProxyObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename))
                 
                 if self.exportSkeleton.selected:
