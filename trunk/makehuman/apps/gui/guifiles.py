@@ -45,6 +45,7 @@ import mh2collada
 import mh2md5
 import mh2stl
 import hair
+from shutil import copyfile
 
 class SaveTaskView(gui3d.TaskView):
 
@@ -236,6 +237,10 @@ class ExportTaskView(gui3d.TaskView):
                         file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
                         mh2obj.exportAsCurves(file, hairsClass.guides)
                         file.close()
+                        
+                texturePath = os.path.join(exportPath, 'texture.png')
+                if not os.path.isfile(texturePath):
+                    copyfile('data/textures/texture.png', texturePath)
                   
             elif self.mhx.selected:
                 mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
