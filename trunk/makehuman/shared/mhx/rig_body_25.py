@@ -93,11 +93,11 @@ BodyArmature = [
 	('Hip_L',			0.0, 'Hips', 0, L_HELP, NoBB),
 	('Hip_R',			0.0, 'Hips', 0, L_HELP, NoBB),
 
-	('Spine1',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (0,0,4) ),
-	('Spine2',			0.0, 'Spine1', F_DEF+F_WIR, L_SPINE+L_DEF, (0,0,2) ),
-	('Spine3',			0.0, 'Spine2', F_DEF+F_WIR, L_SPINE+L_DEF, NoBB),
-	('Neck',			0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (0,0,3) ),
-	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, NoBB),
+	('Spine1',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (0,1,3) ),
+	('Spine2',			0.0, 'Spine1', F_DEF+F_WIR+F_CON, L_SPINE+L_DEF, (1,1,3) ),
+	('Spine3',			0.0, 'Spine2', F_DEF+F_WIR+F_CON, L_SPINE+L_DEF, NoBB ),
+	('Neck',			0.0, 'Spine3', F_DEF+F_WIR+F_CON, L_SPINE+L_HEAD+L_DEF, (1,1,3) ),
+	('Head',			0.0, 'Neck', F_DEF+F_WIR+F_CON, L_SPINE+L_HEAD+L_DEF, NoBB),
 
 	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_DEF, NoBB),
 	('Breast_L',		-deg45, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),

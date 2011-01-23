@@ -681,11 +681,12 @@ MaxFixes = {
 }
 
 McpdFixes = {
+	'Head2' : (Matrix.Rotation(0.2, 3, 'X'), None),
 	'Spine2' : (Matrix.Rotation(0.3, 3, 'X'), None),
-	'UpArmFK_L' :  (Matrix.Rotation(1.57, 3, 'Z'), 'XZ'),
+	'UpArmFK_L' :  (Matrix.Rotation(1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), 'XZ'),
 	'LoArmFK_L' :  (None, 'XZ'),
 	'HandFK_L' :  (None, 'XZ'),
-	'UpArmFK_R' :  (Matrix.Rotation(-1.57, 3, 'Z'), 'ZX'),
+	'UpArmFK_R' :  (Matrix.Rotation(-1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), 'ZX'),
 	'LoArmFK_R' :  (None, 'ZX'),
 	'HandFK_R' :  (None, 'ZX'),
 }
@@ -710,7 +711,7 @@ FixesList = {
 #
 
 MhxFkBoneList = [
-	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'LowerNeck', 'Neck', 'Head',
+	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'LowerNeck', 'Neck', 'Head', 'Sternum',
 	'Shoulder_L', 'UpArmFK_L', 'LoArmFK_L', 'WristFK_L', 'HandFK_L', 'ElbowPTFK_L',
 	'Shoulder_R', 'UpArmFK_R', 'LoArmFK_R', 'WristFK_R', 'HandFK_R', 'ElbowPTFK_R',
 	'Hip_L', 'UpLegFK_L', 'LoLegFK_L', 'FootFK_L', 'ToeFK_L',
@@ -1602,6 +1603,7 @@ def poseTrgIkBonesMHX(context, trgRig, trgAnimations):
 		for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
 			nameIK = name+'IK'+suffix
 			nameFK = name+'FK'+suffix
+
 			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
 			insertLocalRotationKeyFrames(nameIK, pbones[nameIK], trgAnimations[nameFK], trgAnimations[nameIK])
 
@@ -1768,6 +1770,8 @@ def simplifyFCurves(context, rig):
 #
 
 def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot):
+	print("WARNING: F-curve simplification turned off")
+	return
 	words = fcu.data_path.split('.')
 	if words[-1] == 'location':
 		maxErr = maxErrLoc
