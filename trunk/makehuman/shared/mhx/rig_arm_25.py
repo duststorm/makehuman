@@ -269,7 +269,7 @@ limHand_R = (-deg90,70*deg1, 0,0, -deg20,deg20)
 
 def ArmWritePoses(fp):
 	# Shoulder
-	addPoseBone(fp, 'Shoulder_L', 'MHCircle05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_L', 'MHEndCube05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)])])
 
 	addPoseBone(fp, 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
@@ -294,7 +294,7 @@ def ArmWritePoses(fp):
 		[('StretchTo', 0, 1, ['Stretch', 'ElbowTrg_L', 0])])
 
 
-	addPoseBone(fp, 'Shoulder_R', 'MHCircle05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_R', 'MHEndCube05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
 
 	addPoseBone(fp, 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 

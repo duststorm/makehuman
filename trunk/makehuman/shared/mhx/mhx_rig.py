@@ -1395,14 +1395,14 @@ def setupCircle(fp, name, r):
 "end Object\n")
 	return
 
-def setupCube(fp, name, r):
+def setupCube(fp, name, r, offs):
 	fp.write("\n"+
 "Mesh %s %s \n" % (name, name) +
 "  Verts\n")
 	for x in [-r,r]:
 		for y in [-r,r]:
 			for z in [-r,r]:
-				fp.write("    v %.2f %.2f %.2f ;\n" % (x,y,z))
+				fp.write("    v %.2f %.2f %.2f ;\n" % (x,y+offs,z))
 	fp.write(
 "  end Verts\n" +
 "  Faces\n" +
@@ -1426,9 +1426,10 @@ def setupCircles(fp):
 	setupCircle(fp, "MHCircle10", 1.0)
 	setupCircle(fp, "MHCircle15", 1.5)
 	setupCircle(fp, "MHCircle20", 2.0)
-	setupCube(fp, "MHCube01", 0.1)
-	setupCube(fp, "MHCube025", 0.25)
-	setupCube(fp, "MHCube05", 0.5)
+	setupCube(fp, "MHCube01", 0.1, 0)
+	setupCube(fp, "MHCube025", 0.25, 0)
+	setupCube(fp, "MHCube05", 0.5, 0)
+	setupCube(fp, "MHEndCube05", 0.5, 0.5)
 	return
 
 #

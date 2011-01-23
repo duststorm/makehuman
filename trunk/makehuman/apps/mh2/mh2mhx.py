@@ -660,19 +660,21 @@ def writeShapeKeys(fp, rig, name, proxy):
 	fp.write(
 "  AnimationData None (toggle&T_Symm==0)\n")
 
-	fp.write("#if toggle&T_Shape\n")
-	mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
-	mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
-	mhx_rig.writeShapeDrivers(fp, rig_body_25.BodyShapeDrivers, proxy)
-	fp.write("#endif\n")
+	if theConfig.bodyshapes:
+		fp.write("#if toggle&T_Shape\n")
+		mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
+		mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
+		mhx_rig.writeShapeDrivers(fp, rig_body_25.BodyShapeDrivers, proxy)
+		fp.write("#endif\n")
 
 	if (not proxy or proxy.type == 'Proxy'):
-		fp.write("#if toggle&T_Face\n")
-		if BODY_LANGUAGE:
-			mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers, None)
-		else:
-			mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers, None)
-		fp.write("#endif\n")
+		if theConfig.faceshapes:
+			fp.write("#if toggle&T_Face\n")
+			if BODY_LANGUAGE:
+				mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers, None)
+			else:
+				mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers, None)
+			fp.write("#endif\n")
 
 	fp.write(
 "  end AnimationData\n" +

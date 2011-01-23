@@ -23,6 +23,7 @@ Object Human ARMATURE Human
   layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
   show_x_ray True ;
+  draw_type 'WIRE' ;
   Property MhxScale theScale ;
 end Object
 
