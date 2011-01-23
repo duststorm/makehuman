@@ -367,7 +367,8 @@ def recoverDiamonds(context):
 			for vgrp in v.groups:
 				if vgrp.group == index:
 					dn = vassoc[v.index]
-					dob.vertex_groups.assign( [dn], group, vgrp.weight, 'REPLACE' )
+					#dob.vertex_groups.assign( [dn], group, vgrp.weight, 'REPLACE' )
+					group.add( [dn], vgrp.weight, 'REPLACE' )
 					continue
 
 	print("Diamonds recovered")
@@ -414,6 +415,55 @@ class OBJECT_OT_ExportVertexGroupsButton(bpy.types.Operator):
 
 	def execute(self, context):
 		exportVertexGroups(context)
+		return{'FINISHED'}	
+
+#
+#	exportSumGroups(context):
+#	exportListAsVertexGroup(weights, name, fp):
+#	class OBJECT_OT_ExportSumGroupsButton(bpy.types.Operator):
+#
+
+def exportSumGroups(context):
+	filePath = context.scene['MhxVertexGroupFile']
+	fileName = os.path.expanduser(filePath)
+	fp = open(fileName, "w")
+	ob = context.object
+	me = ob.data
+	for name in ['UpArm', 'LoArm', 'UpLeg']:
+		for suffix in ['_L', '_R']:
+			weights = {}
+			for n in range(1,4):
+				vg = ob.vertex_groups["%s%d%s" % (name, n, suffix)]
+				index = vg.index
+				for v in me.vertices:
+					for grp in v.groups:
+						if grp.group == index:
+							try:
+								w = weights[v.index]
+							except:
+								w = 0
+							weights[v.index] = grp.weight + w
+				# ob.vertex_groups.remove(vg)
+			exportListAsVertexGroup(weights.items(), name+'3'+suffix, fp)
+	fp.close()
+	return
+
+def exportListAsVertexGroup(weights, name, fp):
+	#if len(weights) == 0:
+	#	return
+	fp.write("\n  VertexGroup %s\n" % name)
+	for (vn,w) in weights:
+		if w > 0.005:
+			fp.write("    wv %d %.3g ;\n" % (vn, w))
+	fp.write("  end VertexGroup %s\n" % name)
+	return
+
+class OBJECT_OT_ExportSumGroupsButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_ExportSumGroupsButton"
+	bl_label = "Export sum groups"
+
+	def execute(self, context):
+		exportSumGroups(context)
 		return{'FINISHED'}	
 
 #
@@ -496,6 +546,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 		layout.separator()
 		layout.prop(context.scene, 'MhxVertexGroupFile')
 		layout.operator("object.ExportVertexGroupsButton")	
+		layout.operator("object.ExportSumGroupsButton")	
 
 		layout.separator()
 		layout.operator("object.ShapeKeysFromObjectsButton")	

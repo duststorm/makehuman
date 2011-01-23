@@ -39,19 +39,19 @@ FaceHeadsTails = [
 
 
 FaceArmature = [
-	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('TongueBase',	0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('TongueMid',	0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('TongueTip',	0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD+L_DEF, (1,1,1) ),
-	('Eye_R',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('Eye_L',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('UpLid_R',		0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('LoLid_R',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('UpLid_L',		-0.279253, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('LoLid_L',		0.0, 'Head', F_DEF, L_DEF, (1,1,1) ),
-	('Gaze',		pi, 'Head', F_WIR, L_HEAD, (1,1,1) ),
-	('Gaze_R',		pi, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
-	('Gaze_L',		pi, 'Gaze', F_WIR, L_HEAD, (1,1,1) ),
+	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
+	('TongueBase',	0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
+	('TongueMid',	0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
+	('TongueTip',	0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
+	('Eye_R',		0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('Eye_L',		0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('UpLid_R',		0.279253, 'Head', F_DEF, L_DEF, NoBB),
+	('LoLid_R',		0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('UpLid_L',		-0.279253, 'Head', F_DEF, L_DEF, NoBB),
+	('LoLid_L',		0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('Gaze',		pi, 'Head', F_WIR, L_HEAD, NoBB),
+	('Gaze_R',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),
+	('Gaze_L',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),
 ]
 
 #

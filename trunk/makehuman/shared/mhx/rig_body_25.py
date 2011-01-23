@@ -84,31 +84,31 @@ BodyHeadsTails = [
 ]
 
 BodyArmature = [
-	('MasterFloor',		0.0, None, F_WIR, L_MAIN, (1,1,1) ),
-	('MasterHips',		0.0, None, F_WIR+F_HID, L_MAIN, (1,1,1) ),
-	('MasterNeck',		0.0, None, F_WIR+F_HID, L_MAIN, (1,1,1) ),
+	('MasterFloor',		0.0, None, F_WIR, L_MAIN, NoBB),
+	('MasterHips',		0.0, None, F_WIR+F_HID, L_MAIN, NoBB),
+	('MasterNeck',		0.0, None, F_WIR+F_HID, L_MAIN, NoBB),
 
-	('Root',			0.0, Master, F_WIR, L_MAIN+L_SPINE, (1,1,1) ),
-	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_DEF+L_SPINE, (1,1,1) ),
-	('Hip_L',			0.0, 'Hips', 0, L_HELP, (1,1,1) ),
-	('Hip_R',			0.0, 'Hips', 0, L_HELP, (1,1,1) ),
+	('Root',			0.0, Master, F_WIR, L_MAIN+L_SPINE, NoBB),
+	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_DEF+L_SPINE, NoBB),
+	('Hip_L',			0.0, 'Hips', 0, L_HELP, NoBB),
+	('Hip_R',			0.0, 'Hips', 0, L_HELP, NoBB),
 
-	('Spine1',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,5) ),
-	('Spine2',			0.0, 'Spine1', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,5) ),
-	('Spine3',			0.0, 'Spine2', F_DEF+F_WIR, L_SPINE+L_DEF, (1,1,5) ),
-	('Neck',			0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
-	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,1) ),
+	('Spine1',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (0,0,4) ),
+	('Spine2',			0.0, 'Spine1', F_DEF+F_WIR, L_SPINE+L_DEF, (0,0,2) ),
+	('Spine3',			0.0, 'Spine2', F_DEF+F_WIR, L_SPINE+L_DEF, NoBB),
+	('Neck',			0.0, 'Spine3', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, (0,0,3) ),
+	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, NoBB),
 
-	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_DEF, (1,1,1) ),
-	('Breast_L',		-deg45, 'Rib', F_DEF, L_TORSO+L_DEF, (1,1,1) ),
-	('Breast_R',		deg45, 'Rib', F_DEF, L_TORSO+L_DEF, (1,1,1) ),
-	('Breathe',			0.0, 'Rib', F_DEF+F_WIR, L_TORSO, (1,1,1) ),
-	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, (1,1,1) ),
-	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, (1,1,1) ),
-	('StomachTarget',	0, 'Spine1', F_WIR, L_TORSO, (1,1,1) ),
+	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_DEF, NoBB),
+	('Breast_L',		-deg45, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
+	('Breast_R',		deg45, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
+	('Breathe',			0.0, 'Rib', F_DEF+F_WIR, L_TORSO, NoBB),
+	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, NoBB),
+	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, NoBB),
+	('StomachTarget',	0, 'Spine1', F_WIR, L_TORSO, NoBB),
 
 	('Penis',			0.0, 'Hips', F_DEF, L_DEF+L_TORSO, (1,5,1) ),
-	('Scrotum',			0.0, 'Hips', F_DEF, L_DEF+L_TORSO, (1,1,1) ),
+	('Scrotum',			0.0, 'Hips', F_DEF, L_DEF+L_TORSO, NoBB),
 ]
 
 #

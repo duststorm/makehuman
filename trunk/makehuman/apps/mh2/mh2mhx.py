@@ -366,6 +366,9 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 				else:
 					if rig == 'mhx':
 						copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)
+						copyVertGroups("shared/mhx/templates/vertexgroups-unitedbones25.mhx", fp, proxy)
+						#copyVertGroups("shared/mhx/templates/vertexgroups-splitbones25.mhx", fp, proxy)
+						copyVertGroups("shared/mhx/templates/vertexgroups-extra25.mhx", fp, proxy)
 					else:
 						if proxy:
 							weights = mh2proxy.getProxyWeights(rig.weights, proxy)

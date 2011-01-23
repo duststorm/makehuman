@@ -42,6 +42,8 @@ yunit = [0,1,0]
 zunit = [0,0,-1]
 
 unlimited = (-pi,pi, -pi,pi, -pi,pi)
+NoBB = (1,1,1)
+bbMarg = 0.05
 
 #
 #	Bone layers
@@ -319,58 +321,6 @@ def writeBoneGroups(fp):
 
 
 #
-#	writePoses(fp, poses)
-#
-'''
-def writePoses(fp, poses):
-	for pose in poses:
-		#print(pose)
-		try:
-			(typ, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints) = pose
-		except:
-			typ = None
-		if not typ:
-			try:
-				(typ, bone, mx) = pose
-			except:
-				typ = None
-		if not typ:
-			try:
-				(typ, bone, mn, mx) = pose
-			except:
-				typ = None
-		if not typ:
-			try:
-				(typ, bone, lockRot, target, limit) = pose
-			except:
-				typ = None
-		if not typ:
-			try:
-				(typ, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags) = pose
-			except:
-				typ = None
-				
-		if typ == 'poseBone':
-			addPoseBone(fp, bone, customShape, boneGroup, lockLoc, lockRot, lockScale, ik_dof, flags, constraints)
-		elif typ == 'cSlider':
-			mn = '-'+mx
-			addPoseBone(fp, bone, 'MHCube025', None, (0,1,0), (1,1,1), (1,1,1), (1,1,1), 0,
-				[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
-		elif typ == 'xSlider':
-			addPoseBone(fp, bone, 'MHCube025', None, (0,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-				[('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
-		elif typ == 'ikHandle':
-			addIKHandle(fp, bone, mn, mx)
-		elif typ == 'singleIK':
-			addSingleIK(fp, bone, lockRot, target, limit)
-		elif typ == 'deformLimb':
-			addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags)
-		else:
-			raise NameError("Unknown pose type %s" % typ)
-	return
-'''		
-
-#
 #	addIkHandle(fp, bone, customShape, limit):
 #	addSingleIk(fp, bone, lockRot, target, limit):
 #	addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
@@ -423,6 +373,15 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 	(fX,fY,fZ) = fkRot
 	addPoseBone(fp, bone, None, None, (1,1,1), (1-fX,1-fY,1-fZ), (0,0,0), (1,1,1), 0, constraints)
 	return
+
+def addDeformIK(fp, bone, target, pole):
+	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, 1, ['IK', target, 1, pole, (True, False,True)])])
+
+def addDeformIK2(fp, bone, iktar, fktar, pole):
+	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, 1, ['IK', iktar, 1, pole, (True, False,True)]),
+		 ('IK', 0, 1, ['FK', fktar, 1, pole, (True, False,True)])])
 
 def addStretchBone(fp, bone, target, parent):
 	addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
@@ -1429,7 +1388,7 @@ def setupCircles(fp):
 	setupCube(fp, "MHCube01", 0.1, 0)
 	setupCube(fp, "MHCube025", 0.25, 0)
 	setupCube(fp, "MHCube05", 0.5, 0)
-	setupCube(fp, "MHEndCube05", 0.5, 0.5)
+	setupCube(fp, "MHEndCube01", 0.1, 1)
 	return
 
 #
