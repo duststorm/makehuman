@@ -139,11 +139,7 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
 
             if len(uvFaceData) > 0:  # look up uv, if existing, these are in the same order as in the file
                 uvIndices = uvFaceData[fIndex]
-                t0 = uvIndices[0]
-                t1 = uvIndices[1]
-                t2 = uvIndices[2]
-                t3 = uvIndices[3]
-                f.uv = [t0, t1, t2, t3]
+                f.uv = uvIndices[:]
 
             f.idx = fIndex
             fIndex += 1
