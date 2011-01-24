@@ -126,7 +126,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        self.status = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[10, 585, 9.1])
+        self.status = gui3d.TextView(self, [10, 585, 9.1])
 
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=256));y+=35

@@ -56,9 +56,9 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
         self.colorPreview = gui3d.Object(self, 'data/3dobjs/colorpreview.obj', position=[18, y, 9.04])
         
-        self.redSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, y, 9.04], label='Red: 0');y+=16        
-        self.greenSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, y, 9.4], label='Green: 0');y+=16        
-        self.blueSliderLabel = gui3d.TextView(self, mesh='data/3dobjs/empty.obj', position=[60, y, 9.4], label='Blue: 0');y+=16
+        self.redSliderLabel = gui3d.TextView(self, [60, y, 9.04], 'Red: 0');y+=16        
+        self.greenSliderLabel = gui3d.TextView(self, [60, y, 9.4], 'Green: 0');y+=16        
+        self.blueSliderLabel = gui3d.TextView(self, [60, y, 9.4], 'Blue: 0');y+=16
                     
         @self.redSlider.event
         def onChanging(value):

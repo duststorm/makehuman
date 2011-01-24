@@ -1073,7 +1073,7 @@ class TextView(View):
     A TextView widget. This widget can be used as a label. The text is not editable by the user.
     """
 
-    def __init__(self, parent, mesh='data/3dobjs/empty.obj', texture=None, position=[0, 0, 9], fontSize = defaultFontSize, label = ''):
+    def __init__(self, parent, position=[0, 0, 9], label = '', fontSize = defaultFontSize):
         View.__init__(self, parent)
         self.textObject = TextObject(self, position=position, fontSize = fontSize)
         if label:
