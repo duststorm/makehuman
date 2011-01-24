@@ -895,7 +895,7 @@ RadioButtonStyle = Style(**{
     'selected':'radio_on.png',
     'focused':'radio_focus.png',
     'fontSize':defaultFontSize,
-    'border':[19, 19, 1, 1]
+    'border':[19, 19, 4, 1]
     })
 
 class RadioButton(Button):
@@ -1005,7 +1005,7 @@ CheckBoxStyle = Style(**{
     'selected':'check_on.png',
     'focused':'check_focus.png',
     'fontSize':defaultFontSize,
-    'border':[18, 18, 2, 2]
+    'border':[18, 18, 4, 2]
     })
             
 class CheckBox(ToggleButton):
