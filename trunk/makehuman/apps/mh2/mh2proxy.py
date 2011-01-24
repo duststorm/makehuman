@@ -395,7 +395,7 @@ def writeRigPose(fp, name, bones):
 			circles.append(r)
 		r = getRadius('-box', options)
 		if r and not (r in cubes):
-			mhx_rig.setupCube(fp, "RigCube%02d" % r, 0.1*r)
+			mhx_rig.setupCube(fp, "RigCube%02d" % r, 0.1*r, 0)
 			cubes.append(r)
 
 	fp.write("\nPose %s\n" % name)
