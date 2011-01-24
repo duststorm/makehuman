@@ -107,6 +107,7 @@ class MHApplication(gui3d.Application):
         
         self.settings = {}
         self.shortcuts = {
+            # Actions
             (events3d.KMOD_CTRL, events3d.SDLK_z): self.undo,
             (events3d.KMOD_CTRL, events3d.SDLK_y): self.redo,
             (events3d.KMOD_CTRL, events3d.SDLK_m): self.goToModelling,
@@ -121,7 +122,22 @@ class MHApplication(gui3d.Application):
             (events3d.KMOD_ALT, events3d.SDLK_t): self.saveTarget,
             (events3d.KMOD_ALT, events3d.SDLK_e): self.quickExport,
             (events3d.KMOD_ALT, events3d.SDLK_s): self.subdivide,
-            (events3d.KMOD_ALT, events3d.SDLK_g): self.grabScreen
+            (events3d.KMOD_ALT, events3d.SDLK_g): self.grabScreen,
+            # Camera navigation
+            (0, events3d.SDLK_2): self.rotateDown,
+            (0, events3d.SDLK_4): self.rotateLeft,
+            (0, events3d.SDLK_6): self.rotateRight,
+            (0, events3d.SDLK_8): self.rotateUp,
+            (0, events3d.SDLK_UP): self.panUp,
+            (0, events3d.SDLK_DOWN): self.panDown,
+            (0, events3d.SDLK_RIGHT): self.panRight,
+            (0, events3d.SDLK_LEFT): self.panLeft,
+            (0, events3d.SDLK_PLUS): self.zoomIn,
+            (0, events3d.SDLK_MINUS): self.zoomOut,
+            (0, events3d.SDLK_7): self.sideView,
+            (0, events3d.SDLK_1): self.frontView,
+            (0, events3d.SDLK_3): self.topView,
+            (0, events3d.SDLK_PERIOD): self.resetView
         }
 
         # Display the initial splash screen and the progress bar during startup
@@ -276,6 +292,8 @@ class MHApplication(gui3d.Application):
         mh.updatePickingBuffer();
 
     def onKeyDown(self, event):
+        
+        # Normalize modifiers
         modifiers = 0
         if (event.modifiers & events3d.KMOD_CTRL) and (event.modifiers & events3d.KMOD_ALT):
             modifiers = events3d.KMOD_CTRL | events3d.KMOD_ALT
@@ -284,8 +302,19 @@ class MHApplication(gui3d.Application):
         elif event.modifiers & events3d.KMOD_ALT:
             modifiers = events3d.KMOD_ALT
             
-        if (modifiers, event.key) in self.shortcuts:
-            self.shortcuts[(modifiers, event.key)]()
+        # Normalize key
+        key = event.key
+        if key in xrange(events3d.SDLK_KP0, events3d.SDLK_KP9 + 1):
+            key = events3d.SDLK_0 + key - events3d.SDLK_KP0
+        elif key == events3d.SDLK_KP_PERIOD:
+            key = events3d.SDLK_PERIOD
+        elif key == events3d.SDLK_KP_MINUS:
+            key = events3d.SDLK_MINUS
+        elif key == events3d.SDLK_KP_PLUS:
+            key = events3d.SDLK_PLUS
+            
+        if (modifiers, key) in self.shortcuts:
+            self.shortcuts[(modifiers, key)]()
 
     # Undo-redo
     def do(self, action):
@@ -483,6 +512,88 @@ class MHApplication(gui3d.Application):
     def subdivide(self):
         print 'subdividing'
         self.scene3d.selectedHuman.subdivide()
+        
+    # Camera navigation
+    def rotateDown(self):
+        human = self.scene3d.selectedHuman
+        rot = human.getRotation()
+        rot[0] += 5.0
+        human.setRotation(rot)
+        self.scene3d.redraw()
+        
+    def rotateLeft(self):
+        human = self.scene3d.selectedHuman
+        rot = human.getRotation()
+        rot[1] -= 5.0
+        human.setRotation(rot)
+        self.scene3d.redraw()
+        
+    def rotateRight(self):
+        human = self.scene3d.selectedHuman
+        rot = human.getRotation()
+        rot[1] += 5.0
+        human.setRotation(rot)
+        self.scene3d.redraw()
+        
+    def rotateUp(self):
+        human = self.scene3d.selectedHuman
+        rot = human.getRotation()
+        rot[0] -= 5.0
+        human.setRotation(rot)
+        self.scene3d.redraw()
+        
+    def panUp(self):
+        human = self.scene3d.selectedHuman
+        trans = human.getPosition()
+        trans[1] += 0.05
+        human.setPosition(trans)
+        self.scene3d.redraw()
+                    
+    def panDown(self):
+        human = self.scene3d.selectedHuman
+        trans = human.getPosition()
+        trans[1] -= 0.05
+        human.setPosition(trans)
+        self.scene3d.redraw()      
+        
+    def panRight(self):
+        human = self.scene3d.selectedHuman
+        trans = human.getPosition()
+        trans[0] += 0.05
+        human.setPosition(trans)
+        self.scene3d.redraw()
+        
+    def panLeft(self):
+        human = self.scene3d.selectedHuman
+        trans = human.getPosition()
+        trans[0] -= 0.05
+        human.setPosition(trans)
+        self.scene3d.redraw()
+        
+    def zoomOut(self):
+        mh.cameras[0].eyeZ += 0.65
+        self.scene3d.redraw()
+        
+    def zoomIn(self):
+        mh.cameras[0].eyeZ -= 0.65
+        self.scene3d.redraw()
+        
+    def topView(self):
+        self.scene3d.selectedHuman.setRotation([90.0, 0.0, 0.0])
+        self.scene3d.redraw()
+        
+    def frontView(self):
+        self.scene3d.selectedHuman.setRotation([0.0, 0.0, 0.0])
+        self.scene3d.redraw()
+        
+    def sideView(self):
+        self.scene3d.selectedHuman.setRotation([0.0, 90.0, 0.0])
+        self.scene3d.redraw()
+        
+    def resetView(self):
+        self.scene3d.selectedHuman.setPosition([0.0, 0.0, 0.0])
+        mh.cameras[0].eyeZ = 60.0
+        self.scene3d.redraw()
     
 application = MHApplication()
 mainScene = application.scene3d # HACK: Don't remove this, it is needed to receive events from C
