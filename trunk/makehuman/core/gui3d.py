@@ -845,6 +845,9 @@ class Button(View):
 
     def onMouseUp(self, event):
         self.setSelected(False)
+        
+    def onMouseDragged(self, event):
+        pass
 
     def onKeyDown(self, event):
         if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
@@ -1173,6 +1176,9 @@ class TextEdit(View):
         text = self.text
         self.__showCursor()
         return text
+        
+    def onMouseDragged(self, event):
+        pass
 
     def onKeyDown(self, event):
         if event.modifiers & events3d.KMOD_CTRL:
@@ -1494,6 +1500,9 @@ class GroupBox(View):
     def canFocus(self):
         return False
         
+    def onMouseDragged(self, event):
+        pass
+        
 class ShortcutEdit(View):
     def __init__(self, parent, position, shortcut):
         View.__init__(self, parent)
@@ -1518,6 +1527,9 @@ class ShortcutEdit(View):
 
     def onBlur(self, event):
         self.background.setTexture(self.texture)
+        
+    def onMouseDragged(self, event):
+        pass
         
     def onKeyDown(self, event):
         

@@ -106,35 +106,3 @@ class ModellingCategory(gui3d.Category):
         guidetailmodelling.DetailModelingTaskView(self)
         guidetailmodelling.MicroModelingTaskView(self)
 
-    # Rotate and pan the camera
-
-    def onMouseDragged(self, event):
-        diff = self.app.scene3d.getMouseDiff()
-        leftButtonDown = event.button & 1
-        middleButtonDown = event.button & 2
-        rightButtonDown = event.button & 4
-
-        if leftButtonDown and rightButtonDown or middleButtonDown:
-            mh.cameras[0].eyeZ += 0.05 * diff[1]
-        elif leftButtonDown:
-            human = self.app.scene3d.selectedHuman
-            rot = human.getRotation()
-            rot[0] += 0.5 * diff[1]
-            rot[1] += 0.5 * diff[0]
-            human.setRotation(rot)
-        elif rightButtonDown:
-            human = self.app.scene3d.selectedHuman
-            trans = human.getPosition()
-            trans = self.app.modelCamera.convertToScreen(trans[0], trans[1], trans[2])
-            trans[0] += diff[0]
-            trans[1] += diff[1]
-            trans = self.app.modelCamera.convertToWorld3D(trans[0], trans[1], trans[2])
-            human.setPosition(trans)
-
-    # Zoom the camera
-
-    def onMouseWheel(self, event):
-        if event.wheelDelta > 0:
-            self.app.zoomOut()
-        else:
-            self.app.zoomIn()

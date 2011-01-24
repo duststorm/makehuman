@@ -193,39 +193,6 @@ def load(app):
     category = app.getCategory('Experiments')
     makehairView = MakeHairTaskView(category)
 
-    @makehairView.event
-    def onMouseWheel(event):
-        if event.wheelDelta > 0:
-            mh.cameras[0].eyeZ -= 0.65
-            app.scene3d.redraw()
-        else:
-            mh.cameras[0].eyeZ += 0.65
-            app.scene3d.redraw()
-
-    @makehairView.event
-    def onMouseDragged(event):
-        diff = app.scene3d.getMouseDiff()
-        leftButtonDown = event.button & 1
-        middleButtonDown = event.button & 2
-        rightButtonDown = event.button & 4
-
-        if leftButtonDown and rightButtonDown or middleButtonDown:
-            mh.cameras[0].eyeZ += 0.05 * diff[1]
-        elif leftButtonDown:
-            human = app.scene3d.selectedHuman
-            rot = human.getRotation()
-            rot[0] += 0.5 * diff[1]
-            rot[1] += 0.5 * diff[0]
-            human.setRotation(rot)
-        elif rightButtonDown:
-            human = app.scene3d.selectedHuman
-            trans = human.getPosition()
-            trans = app.modelCamera.convertToScreen(trans[0], trans[1], trans[2])
-            trans[0] += diff[0]
-            trans[1] += diff[1]
-            trans = app.modelCamera.convertToWorld3D(trans[0], trans[1], trans[2])
-            human.setPosition(trans)
-
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 

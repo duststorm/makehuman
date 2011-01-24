@@ -286,10 +286,42 @@ class MHApplication(gui3d.Application):
         #font = font3d.Font("data/fonts/arial.fnt")
         #font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 540, 9.6]);
 
+    # Events
     def onStart(self, event):
         self.splash.hide()
         self.scene3d.selectedHuman.applyAllTargets(self.app.progress)
         mh.updatePickingBuffer();
+        
+    def onMouseDragged(self, event):
+        if self.scene3d.selectedHuman.isVisible():
+            diff = self.scene3d.getMouseDiff()
+            leftButtonDown = event.button & 1
+            middleButtonDown = event.button & 2
+            rightButtonDown = event.button & 4
+
+            if leftButtonDown and rightButtonDown or middleButtonDown:
+                mh.cameras[0].eyeZ += 0.05 * diff[1]
+            elif leftButtonDown:
+                human = self.scene3d.selectedHuman
+                rot = human.getRotation()
+                rot[0] += 0.5 * diff[1]
+                rot[1] += 0.5 * diff[0]
+                human.setRotation(rot)
+            elif rightButtonDown:
+                human = self.scene3d.selectedHuman
+                trans = human.getPosition()
+                trans = self.modelCamera.convertToScreen(trans[0], trans[1], trans[2])
+                trans[0] += diff[0]
+                trans[1] += diff[1]
+                trans = self.modelCamera.convertToWorld3D(trans[0], trans[1], trans[2])
+                human.setPosition(trans)
+
+    def onMouseWheel(self, event):
+        if self.scene3d.selectedHuman.isVisible():
+            if event.wheelDelta > 0:
+                self.zoomOut()
+            else:
+                self.zoomIn()
 
     def onKeyDown(self, event):
         
