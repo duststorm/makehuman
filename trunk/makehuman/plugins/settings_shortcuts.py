@@ -10,7 +10,8 @@ class AppShortcutEdit(gui3d.ShortcutEdit):
         self.method = method
 
     def onChanged(self, shortcut):
-        self.app.setShortcut(shortcut[0], shortcut[1], self.method)
+        if not self.app.setShortcut(shortcut[0], shortcut[1], self.method):
+            self.setShortcut(self.app.getShortcut(self.method))
 
 class ShortcutsTaskView(gui3d.TaskView):
 

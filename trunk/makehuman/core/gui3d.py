@@ -1505,6 +1505,10 @@ class ShortcutEdit(View):
         self.background = Object(self, mesh, position=position)
         self.label = TextObject(self, text=self.shortcutToLabel(shortcut[0], shortcut[1]),
             position = [position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001])
+            
+    def setShortcut(self, shortcut):
+        self.label.setText(self.shortcutToLabel(shortcut[0], shortcut[1]))
+        self.app.scene3d.redraw()
         
     def canFocus(self):
         return True
