@@ -39,9 +39,6 @@ import events3d
 import gui3d
 import guimacromodelling
 import guidetailmodelling
-import mh2obj
-import mh2bvh
-import mh2mhx
 import os
 
 HairButtonStyle = gui3d.Style(**{
@@ -94,37 +91,16 @@ class ModellingCategory(gui3d.Category):
 
         @self.anaglyphsButton.event
         def onClicked(event):
-            stereoMode = mh.cameras[0].stereoMode
-            stereoMode += 1
-            if stereoMode > 2:
-                stereoMode = 0
-            mh.cameras[0].stereoMode = stereoMode
-            
-            # We need a black background for stereo
-            if stereoMode:
-                color = [  0,   0,   0, 255]
-                self.anaglyphsButton.setSelected(True)
-            else:
-                color = [100, 100, 100, 255]
-                self.anaglyphsButton.setSelected(False)
-            for g in self.background.mesh.facesGroups:
-                g.setColor(color)
-
-            self.app.scene3d.redraw()
+            self.app.toggleStereo()
+            self.anaglyphsButton.selected = mh.cameras[0].stereoMode
             
         self.wireButton = gui3d.ToggleButton(self, [87, 514, 9.1], 'Wire',
             style=gui3d.ButtonStyle._replace(width=32, height=16))
             
         @self.wireButton.event
         def onClicked(event):
-            human = self.app.scene3d.selectedHuman
-            if human.mesh.solid:
-                human.mesh.setSolid(0)
-                self.wireButton.setSelected(True)
-            else:
-                human.mesh.setSolid(1)
-                self.wireButton.setSelected(False)
-            self.app.scene3d.redraw()
+            self.app.toggleSolid()
+            self.wireButton.selected = self.app.selectedHuman.mesh.solid
         
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)
@@ -167,29 +143,7 @@ class ModellingCategory(gui3d.Category):
 
     def onKeyDown(self, event):
 
-      # Other keybindings
-
-        if event.key == events3d.SDLK_e:
-            exportPath = mh.getPath('exports')
-            if not os.path.exists(exportPath):
-                os.makedirs(exportPath)
-            mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData, exportPath + '/quick_export.obj', 'data/3dobjs/base.obj')
-            mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, exportPath + '/quick_export.bvh')
-            mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, exportPath + '/quick_export.mhx')
-        elif event.key == events3d.SDLK_g:
-            grabPath = mh.getPath('grab')
-            self.app.scene3d.grabScreen(180, 80, 440, 440, grabPath + '/grab.bmp')
-        elif event.key == events3d.SDLK_q:
-            self.app.stop()
-        elif event.key == events3d.SDLK_s:
-            print 'subdividing'
-            self.app.scene3d.selectedHuman.subdivide()
-        elif event.key == events3d.SDLK_y:
-            self.app.redo()
-        elif event.key == events3d.SDLK_z:
-            self.app.undo()
-        else:
-            if not event.modifiers:
+        if not event.modifiers:
 
           # Camera rotation
 
@@ -269,7 +223,7 @@ class ModellingCategory(gui3d.Category):
                     self.app.scene3d.selectedHuman.setPosition([0.0, 0.0, 0.0])
                     mh.cameras[0].eyeZ = 60.0
                     self.app.scene3d.redraw()
-            elif event.modifiers == events3d.KMOD_NUM:
+        if event.modifiers == events3d.KMOD_NUM:
 
           # Camera rotation
 

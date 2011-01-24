@@ -1487,10 +1487,112 @@ class GroupBox(View):
         self.box = Object(self, mesh, None, position)
         
         if isinstance(label, str):
-            self.label = TextObject(self, text = label, position = [position[0]+5,position[1] + 2,position[2]+0.001], fontSize = style.fontSize)
+            self.label = TextObject(self, text = label,
+                position = [position[0]+style.border[0],position[1]+style.border[1]/2-6,position[2]+0.001],
+                fontSize = style.fontSize)
             
     def canFocus(self):
         return False
+        
+class ShortcutEdit(View):
+    def __init__(self, parent, position, shortcut):
+        View.__init__(self, parent)
+        
+        self.texture = self.app.getThemeResource('images', 'button_tab3_on.png')
+        self.focusedTexture = self.app.getThemeResource('images', 'button_tab3_focused.png')
+        
+        mesh = Create9SliceMesh(64, 22, self.texture, [7,7,7,7])
+        self.background = Object(self, mesh, position=position)
+        self.label = TextObject(self, text=self.shortcutToLabel(shortcut[0], shortcut[1]),
+            position = [position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001])
+        
+    def canFocus(self):
+        return True
+        
+    def onFocus(self, event):
+        self.background.setTexture(self.focusedTexture)
+
+    def onBlur(self, event):
+        self.background.setTexture(self.texture)
+        
+    def onKeyDown(self, event):
+        
+        print event.key, event.character, event.modifiers
+            
+        self.label.setText(self.shortcutToLabel(event.modifiers, event.key))
+        self.app.scene3d.redraw()
+        
+        if event.key not in [events3d.SDLK_RCTRL, events3d.SDLK_LCTRL, events3d.SDLK_RALT, events3d.SDLK_LALT]:
+            m = 0
+        
+            if event.modifiers & events3d.KMOD_CTRL:
+                m |= events3d.KMOD_CTRL
+                
+            if event.modifiers & events3d.KMOD_ALT:
+                m |= events3d.KMOD_ALT
+                
+            self.callEvent('onChanged', (m, event.key))
+        
+    def shortcutToLabel(self, modifiers, key):
+        
+        label = ''
+        
+        if modifiers & events3d.KMOD_CTRL:
+            label += 'Ctl-'
+            
+        if modifiers & events3d.KMOD_ALT:
+            label += 'Alt-'
+            
+        if key in self.keyNames:
+            label += self.keyNames[key]
+        elif key < 256:
+            label += chr(key)
+            
+        return label
+        
+    def onChanged(self, shortcut):
+        pass
+        
+    keyNames = {
+        events3d.SDLK_BACKSPACE:'Bck',
+        events3d.SDLK_RETURN:'Enter',
+        events3d.SDLK_PAUSE:'Pause',
+        
+        events3d.SDLK_ESCAPE:'Esc',
+        
+        events3d.SDLK_DELETE:'Del',
+        
+        events3d.SDLK_UP:'Up',
+        events3d.SDLK_DOWN:'Down',
+        events3d.SDLK_RIGHT:'Right',
+        events3d.SDLK_LEFT:'Left',
+        events3d.SDLK_INSERT:'Ins',
+        events3d.SDLK_HOME:'Home',
+        events3d.SDLK_END:'End',
+        events3d.SDLK_PAGEUP:'PgUp',
+        events3d.SDLK_PAGEDOWN:'PgDn',
+
+        events3d.SDLK_F1:'F1',
+        events3d.SDLK_F2:'F2',
+        events3d.SDLK_F3:'F3',
+        events3d.SDLK_F4:'F4',
+        events3d.SDLK_F5:'F5',
+        events3d.SDLK_F6:'F6',
+        events3d.SDLK_F7:'F7',
+        events3d.SDLK_F8:'F8',
+        events3d.SDLK_F9:'F9',
+        events3d.SDLK_F10:'F10',
+        events3d.SDLK_F11:'F11',
+        events3d.SDLK_F12:'F12',
+        events3d.SDLK_F13:'F13',
+        events3d.SDLK_F14:'F14',
+        events3d.SDLK_F15:'F15',
+        
+        events3d.SDLK_RCTRL:'Ctl',
+        events3d.SDLK_LCTRL:'Ctl',
+        events3d.SDLK_RALT:'Alt',
+        events3d.SDLK_LALT:'Alt'
+    }
 
 def Create9SliceMesh(width, height, texture, border):
     

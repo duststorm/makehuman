@@ -78,6 +78,7 @@ from os.path import join, basename, splitext
 
 import mh
 import gui3d, events3d, font3d
+import mh2obj, mh2bvh, mh2mhx
 import human, hair_chooser, background, human_texture
 import guimodelling, guifiles#, guirender
 from aljabr import centroid
@@ -85,316 +86,403 @@ import algos3d
 #import font3d
 
 class MHApplication(gui3d.Application):
-  def __init__(self):
-    gui3d.Application.__init__(self)
-
-    self.modelCamera = mh.Camera()
-
-    mh.cameras.append(self.modelCamera)
-
-    self.guiCamera = mh.Camera()
-    self.guiCamera.fovAngle = 45
-    self.guiCamera.eyeZ = 10
-    self.guiCamera.projection = 0
-    mh.cameras.append(self.guiCamera)
-
-    self.setTheme("default")
-    #self.setTheme("3d")
-    
-    self.fonts = {}
-    
-    self.settings = {}
-
-    # Display the initial splash screen and the progress bar during startup
-    self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
-    self.progressBar = gui3d.ProgressBar(self)
-    self.scene3d.update()
-    self.scene3d.redraw(0)
-
-    self.progressBar.setProgress(0.2)
-
-    gui3d.Object(self, "data/3dobjs/upperbar.obj", self.getThemeResource("images", "upperbar.png"), [0, 0, 9])
-    gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -89.99])
-    gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, 32, 9])
-    gui3d.Object(self, "data/3dobjs/lowerbar2.obj", self.getThemeResource("images", "lowerbar.png"), [0, 580, 9])
-
-    self.progressBar.setProgress(0.3)
-    #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
-    #self.scene3d.clear(hairObj) 
-    self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj")
-    self.scene3d.selectedHuman.setTexture("data/textures/texture.tif")
-    self.progressBar.setProgress(0.6)
-
-    self.tool = None
-    self.selectedGroup = None
-
-    self.undoStack = []
-    self.redoStack = []
-
-    @self.scene3d.selectedHuman.event
-    def onMouseDown(event):
-      if self.tool:
-        self.selectedGroup = self.app.scene3d.getSelectedFacesGroup()
-        self.tool.callEvent("onMouseDown", event)
-      else:
-        self.currentTask.callEvent("onMouseDown", event)
-
-    @self.scene3d.selectedHuman.event
-    def onMouseMoved(event):
-      if self.tool:
-        self.tool.callEvent("onMouseMoved", event)
-      else:
-        self.currentTask.callEvent("onMouseMoved", event)
-
-    @self.scene3d.selectedHuman.event
-    def onMouseDragged(event):
-      if self.tool:
-        self.tool.callEvent("onMouseDragged", event)
-      else:
-        self.currentTask.callEvent("onMouseDragged", event)
-
-    @self.scene3d.selectedHuman.event
-    def onMouseUp(event):
-      if self.tool:
-        self.tool.callEvent("onMouseUp", event)
-      else:
-        self.currentTask.callEvent("onMouseUp", event)
-
-    @self.scene3d.selectedHuman.event
-    def onMouseEntered(event):
-      if self.tool:
-        self.tool.callEvent("onMouseEntered", event)
-      else:
-        self.currentTask.callEvent("onMouseEntered", event)
-
-    @self.scene3d.selectedHuman.event
-    def onMouseExited(event):
-      if self.tool:
-        self.tool.callEvent("onMouseExited", event)
-      else:
-        self.currentTask.callEvent("onMouseExited", event)
-
-    # Set up categories and tasks
-    
-    guimodelling.ModellingCategory(self)
-    self.progressBar.setProgress(0.7)
-    guifiles.FilesCategory(self)
-    self.progressBar.setProgress(0.8)
-    #guirender.RenderingCategory(self)
   
-    library = gui3d.Category(self, "Library")
-    hair_chooser.HairTaskView(library)
-    background.BackgroundTaskView(library)
-    human_texture.HumanTextureTaskView(library)
+    def __init__(self):
+        gui3d.Application.__init__(self)
 
-    # Load plugins not starting with _    
-    self.modules = {}
-    for path in glob.glob(join("plugins/",'[!_]*.py')):
-        try:
-            name, ext = splitext(basename(path))
-            module = imp.load_source(name, path)
-            self.modules[name] = module
-            module.load(self)
-        except Exception, e:
-            print('Could not load %s' % name)
-            print e
+        self.modelCamera = mh.Camera()
 
-    category = gui3d.Category(self, "Help", style=gui3d.CategoryButtonStyle)
-    # Help button
-    @category.button.event
-    def onClicked(event):
-      webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
-      
-    # Exit button
-    category = gui3d.Category(self, "Exit", style=gui3d.CategoryButtonStyle)
-    @category.button.event
-    def onClicked(event):
-      self.stop()
-      
-    self.undoButton = gui3d.Button(self, [650, 508, 9.1], "Undo", style=gui3d.ButtonStyle._replace(width=40, height=16))
-    self.redoButton = gui3d.Button(self, [694, 508, 9.1], "Redo", style=gui3d.ButtonStyle._replace(width=40, height=16))
-    self.resetButton = gui3d.Button(self, [738, 508, 9.1], "Reset", style=gui3d.ButtonStyle._replace(width=40, height=16))
-                                    
-    @self.undoButton.event
-    def onClicked(event):
-        self.app.undo()
+        mh.cameras.append(self.modelCamera)
 
-    @self.redoButton.event
-    def onClicked(event):
-        self.app.redo()
+        self.guiCamera = mh.Camera()
+        self.guiCamera.fovAngle = 45
+        self.guiCamera.eyeZ = 10
+        self.guiCamera.projection = 0
+        mh.cameras.append(self.guiCamera)
 
-    @self.resetButton.event
-    def onClicked(event):
-        human = self.scene3d.selectedHuman
-        human.resetMeshValues()
-        human.applyAllTargets(self.progress)
-        self.app.categories['Modelling'].tasksByName['Macro modelling'].syncSliders()
-        self.app.categories['Modelling'].tasksByName['Macro modelling'].syncStatus()
-        self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
-      
-    self.globalButton = gui3d.Button(self, [650, 530, 9.2], "Global cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
-    self.faceButton = gui3d.Button(self, [650, 555, 9.2], "Face cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
-    
-    @self.globalButton.event
-    def onClicked(event):
-      self.app.setGlobalCamera()
-      
-    @self.faceButton.event
-    def onClicked(event):
-      self.app.setFaceCamera()
+        self.setTheme("default")
+        #self.setTheme("3d")
+        
+        self.fonts = {}
+        
+        self.settings = {}
+        self.shortcuts = {
+            (events3d.KMOD_CTRL, events3d.SDLK_z): self.undo,
+            (events3d.KMOD_CTRL, events3d.SDLK_y): self.redo,
+            (events3d.KMOD_CTRL, events3d.SDLK_m): self.goToModelling,
+            (events3d.KMOD_CTRL, events3d.SDLK_s): self.goToSave,
+            (events3d.KMOD_CTRL, events3d.SDLK_l): self.goToLoad,
+            (events3d.KMOD_CTRL, events3d.SDLK_e): self.goToExport,
+            (events3d.KMOD_CTRL, events3d.SDLK_r): self.goToRendering,
+            (events3d.KMOD_CTRL, events3d.SDLK_h): self.goToHelp,
+            (events3d.KMOD_CTRL, events3d.SDLK_q): self.stop,
+            (events3d.KMOD_CTRL, events3d.SDLK_w): self.toggleStereo,
+            (events3d.KMOD_CTRL, events3d.SDLK_f): self.toggleSolid,
+            (events3d.KMOD_ALT, events3d.SDLK_t): self.saveTarget,
+            (events3d.KMOD_ALT, events3d.SDLK_e): self.quickExport,
+            (events3d.KMOD_ALT, events3d.SDLK_s): self.subdivide,
+            (events3d.KMOD_ALT, events3d.SDLK_g): self.grabScreen
+        }
 
-    self.switchCategory("Modelling")
+        # Display the initial splash screen and the progress bar during startup
+        self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
+        self.progressBar = gui3d.ProgressBar(self)
+        self.scene3d.update()
+        self.scene3d.redraw(0)
 
-    self.progressBar.setProgress(1.0)
-    self.progressBar.hide()
-    
-    #font = font3d.Font("data/fonts/arial.fnt")
-    #font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 540, 9.6]);
+        self.progressBar.setProgress(0.2)
 
-  def onStart(self, event):
-      self.splash.hide()
-      self.scene3d.selectedHuman.applyAllTargets(self.app.progress)
-      mh.updatePickingBuffer();
+        gui3d.Object(self, "data/3dobjs/upperbar.obj", self.getThemeResource("images", "upperbar.png"), [0, 0, 9])
+        gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -89.99])
+        gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, 32, 9])
+        gui3d.Object(self, "data/3dobjs/lowerbar2.obj", self.getThemeResource("images", "lowerbar.png"), [0, 580, 9])
 
-  def onKeyDown(self, event):
-    if event.modifiers & events3d.KMOD_CTRL:
-      if event.key == events3d.SDLK_m:
-          self.app.switchCategory("Modelling")
-          self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_s:
-          self.app.switchCategory("Files")
-          self.app.switchTask("Save")
-          self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_l:
-          self.app.switchCategory("Files")
-          self.app.switchTask("Load")
-      elif event.key == events3d.SDLK_e:
-          self.app.switchCategory("Files")
-          self.app.switchTask("Export")
-          self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_r:
-          self.app.switchCategory("Rendering")
-          self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_q:
-          self.app.scene3d.shutdown()
-      elif event.key == events3d.SDLK_h:
-          webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
-      elif event.key == events3d.SDLK_w:
-          stereoMode = mh.cameras[0].stereoMode
-          stereoMode += 1
-          if stereoMode > 2:
-            stereoMode = 0
-          mh.cameras[0].stereoMode = stereoMode
+        self.progressBar.setProgress(0.3)
+        #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
+        #self.scene3d.clear(hairObj) 
+        self.scene3d.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj")
+        self.scene3d.selectedHuman.setTexture("data/textures/texture.tif")
+        self.progressBar.setProgress(0.6)
 
-          # We need a black background for stereo
-          background = self.app.categories["Modelling"].tasksByName["Macro modelling"].background
-          if stereoMode:
-            color = [  0,   0,   0, 255]
-            self.app.categories["Modelling"].tasksByName["Macro modelling"].anaglyphsButton.setSelected(True)
+        self.tool = None
+        self.selectedGroup = None
+
+        self.undoStack = []
+        self.redoStack = []
+
+        @self.scene3d.selectedHuman.event
+        def onMouseDown(event):
+          if self.tool:
+            self.selectedGroup = self.app.scene3d.getSelectedFacesGroup()
+            self.tool.callEvent("onMouseDown", event)
           else:
+            self.currentTask.callEvent("onMouseDown", event)
+
+        @self.scene3d.selectedHuman.event
+        def onMouseMoved(event):
+          if self.tool:
+            self.tool.callEvent("onMouseMoved", event)
+          else:
+            self.currentTask.callEvent("onMouseMoved", event)
+
+        @self.scene3d.selectedHuman.event
+        def onMouseDragged(event):
+          if self.tool:
+            self.tool.callEvent("onMouseDragged", event)
+          else:
+            self.currentTask.callEvent("onMouseDragged", event)
+
+        @self.scene3d.selectedHuman.event
+        def onMouseUp(event):
+          if self.tool:
+            self.tool.callEvent("onMouseUp", event)
+          else:
+            self.currentTask.callEvent("onMouseUp", event)
+
+        @self.scene3d.selectedHuman.event
+        def onMouseEntered(event):
+          if self.tool:
+            self.tool.callEvent("onMouseEntered", event)
+          else:
+            self.currentTask.callEvent("onMouseEntered", event)
+
+        @self.scene3d.selectedHuman.event
+        def onMouseExited(event):
+          if self.tool:
+            self.tool.callEvent("onMouseExited", event)
+          else:
+            self.currentTask.callEvent("onMouseExited", event)
+
+        # Set up categories and tasks
+        
+        guimodelling.ModellingCategory(self)
+        self.progressBar.setProgress(0.7)
+        guifiles.FilesCategory(self)
+        self.progressBar.setProgress(0.8)
+        #guirender.RenderingCategory(self)
+      
+        library = gui3d.Category(self, "Library")
+        hair_chooser.HairTaskView(library)
+        background.BackgroundTaskView(library)
+        human_texture.HumanTextureTaskView(library)
+
+        # Load plugins not starting with _    
+        self.modules = {}
+        for path in glob.glob(join("plugins/",'[!_]*.py')):
+            try:
+                name, ext = splitext(basename(path))
+                module = imp.load_source(name, path)
+                self.modules[name] = module
+                module.load(self)
+            except Exception, e:
+                print('Could not load %s' % name)
+                print e
+
+        category = gui3d.Category(self, "Help", style=gui3d.CategoryButtonStyle)
+        # Help button
+        @category.button.event
+        def onClicked(event):
+          webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
+          
+        # Exit button
+        category = gui3d.Category(self, "Exit", style=gui3d.CategoryButtonStyle)
+        @category.button.event
+        def onClicked(event):
+          self.stop()
+          
+        self.undoButton = gui3d.Button(self, [650, 508, 9.1], "Undo", style=gui3d.ButtonStyle._replace(width=40, height=16))
+        self.redoButton = gui3d.Button(self, [694, 508, 9.1], "Redo", style=gui3d.ButtonStyle._replace(width=40, height=16))
+        self.resetButton = gui3d.Button(self, [738, 508, 9.1], "Reset", style=gui3d.ButtonStyle._replace(width=40, height=16))
+                                        
+        @self.undoButton.event
+        def onClicked(event):
+            self.app.undo()
+
+        @self.redoButton.event
+        def onClicked(event):
+            self.app.redo()
+
+        @self.resetButton.event
+        def onClicked(event):
+            human = self.scene3d.selectedHuman
+            human.resetMeshValues()
+            human.applyAllTargets(self.progress)
+            self.app.categories['Modelling'].tasksByName['Macro modelling'].syncSliders()
+            self.app.categories['Modelling'].tasksByName['Macro modelling'].syncStatus()
+            self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
+          
+        self.globalButton = gui3d.Button(self, [650, 530, 9.2], "Global cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
+        self.faceButton = gui3d.Button(self, [650, 555, 9.2], "Face cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
+        
+        @self.globalButton.event
+        def onClicked(event):
+          self.app.setGlobalCamera()
+          
+        @self.faceButton.event
+        def onClicked(event):
+          self.app.setFaceCamera()
+
+        self.switchCategory("Modelling")
+
+        self.progressBar.setProgress(1.0)
+        self.progressBar.hide()
+        
+        #font = font3d.Font("data/fonts/arial.fnt")
+        #font3d.createMesh(self.scene3d, font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [60, 540, 9.6]);
+
+    def onStart(self, event):
+        self.splash.hide()
+        self.scene3d.selectedHuman.applyAllTargets(self.app.progress)
+        mh.updatePickingBuffer();
+
+    def onKeyDown(self, event):
+        modifiers = 0
+        if (event.modifiers & events3d.KMOD_CTRL) and (event.modifiers & events3d.KMOD_ALT):
+            modifiers = events3d.KMOD_CTRL | events3d.KMOD_ALT
+        elif event.modifiers & events3d.KMOD_CTRL:
+            modifiers = events3d.KMOD_CTRL
+        elif event.modifiers & events3d.KMOD_ALT:
+            modifiers = events3d.KMOD_ALT
+            
+        if (modifiers, event.key) in self.shortcuts:
+            self.shortcuts[(modifiers, event.key)]()
+
+    # Undo-redo
+    def do(self, action):
+        if action.do():
+            self.undoStack.append(action)
+            del self.redoStack[:]
+            print("do " + action.name)
+            self.scene3d.redraw()
+
+    def did(self, action):
+        self.undoStack.append(action)
+        del self.redoStack[:]
+        print("did " + action.name)
+        self.scene3d.redraw()
+
+    def undo(self):
+        if self.undoStack:
+            action = self.undoStack.pop()
+            print("undo " + action.name)
+            action.undo()
+            self.redoStack.append(action)
+            self.scene3d.redraw()
+
+    def redo(self):
+        if self.redoStack:
+            action = self.redoStack.pop()
+            print("redo " + action.name)
+            action.do()
+            self.undoStack.append(action)
+            self.scene3d.redraw()
+
+    # Themes
+    def setTheme(self, theme):
+        f = open("data/themes/" + theme + ".mht", 'r')
+
+        for data in f.readlines():
+            lineData = data.split()
+
+            if len(lineData) > 0:
+                if lineData[0] == "version":
+                    print("Version " + lineData[1])
+                elif lineData[0] == "color":
+                    if lineData[1] == "clear":
+                        mh.setClearColor(float(lineData[2]), float(lineData[3]), float(lineData[4]), float(lineData[5]))
+
+        self.theme = theme
+
+    def getThemeResource(self, folder, id):
+        if '/' in id:
+            return id
+        if os.path.exists("data/themes/" + self.theme + "/" + folder + "/"+ id):
+            return "data/themes/" + self.theme + "/" + folder + "/"+ id
+        else:
+            return "data/themes/default/" + folder + "/"+ id
+      
+    # Font resources
+    def getFont(self, fontFamily):
+        if fontFamily not in self.fonts:
+            self.fonts[fontFamily] = font3d.Font("data/fonts/%s.fnt" % fontFamily)
+        return self.fonts[fontFamily]
+
+    # Global progress bar
+    def progress(self, value):
+        self.progressBar.setProgress(value)
+        if value <= 0:
+            self.progressBar.show()
+        elif value >= 1.0:
+            self.progressBar.hide()
+      
+    # Camera's
+    def setGlobalCamera(self):
+        self.modelCamera.eyeX = 0
+        self.modelCamera.eyeY = 0
+        self.modelCamera.eyeZ = 60
+        self.modelCamera.focusX = 0
+        self.modelCamera.focusY = 0
+        self.modelCamera.focusZ = 0
+  
+    def setFaceCamera(self):
+        human = self.scene3d.selectedHuman
+        headNames = [group.name for group in human.meshData.facesGroups if ("head" in group.name or "jaw" in group.name)]
+        self.headVertices, self.headFaces = human.meshData.getVerticesAndFacesForGroups(headNames)
+        center = centroid([v.co for v in self.headVertices])
+        self.modelCamera.eyeX = center[0]
+        self.modelCamera.eyeY = center[1]
+        self.modelCamera.eyeZ = 10
+        self.modelCamera.focusX = center[0]
+        self.modelCamera.focusY = center[1]
+        self.modelCamera.focusZ = 0
+        human.setPosition([0.0, 0.0, 0.0])
+        human.setRotation([0.0, 0.0, 0.0])
+        
+    # Shortcuts
+    def setShortcut(self, modifier, key, method):
+        
+        shortcut = (modifier, key)
+        
+        if shortcut in self.shortcuts:
+            print 'Shortcut is in use'
+            return False
+            
+        # Remove old entry
+        for s, m in self.shortcuts.iteritems():
+            if m == method:
+                del self.shortcuts[s]
+                break
+                
+        self.shortcuts[shortcut] = method
+        
+        for shortcut, m in self.shortcuts.iteritems():
+            print shortcut, m
+        
+        return True
+        
+    def getShortcut(self, method):
+        
+        for shortcut, m in self.shortcuts.iteritems():
+            if m == method:
+                return shortcut
+    
+    # Shortcut methods
+    
+    def goToModelling(self):
+        self.switchCategory("Modelling")
+        self.scene3d.redraw()
+        
+    def goToSave(self):
+        self.switchCategory("Files")
+        self.switchTask("Save")
+        self.scene3d.redraw()
+        
+    def goToLoad(self):
+        self.switchCategory("Files")
+        self.switchTask("Load")
+        
+    def goToExport(self):
+        self.switchCategory("Files")
+        self.switchTask("Export")
+        self.scene3d.redraw()
+        
+    def goToRendering(self):
+        self.switchCategory("Rendering")
+        self.scene3d.redraw()
+        
+    def goToHelp(self):
+        webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
+          
+    def toggleStereo(self):
+        stereoMode = mh.cameras[0].stereoMode
+        stereoMode += 1
+        if stereoMode > 2:
+            stereoMode = 0
+        mh.cameras[0].stereoMode = stereoMode
+
+        # We need a black background for stereo
+        background = self.categories["Modelling"].background
+        if stereoMode:
+            color = [  0,   0,   0, 255]
+            self.categories["Modelling"].anaglyphsButton.setSelected(True)
+        else:
             color = [100, 100, 100, 255]
-            self.app.categories["Modelling"].tasksByName["Macro modelling"].anaglyphsButton.setSelected(False)
-          for g in background.mesh.facesGroups:
+            self.categories["Modelling"].anaglyphsButton.setSelected(False)
+        for g in background.mesh.facesGroups:
             g.setColor(color)
 
-          self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_f:
-          if self.scene3d.selectedHuman.mesh.solid:
-              self.scene3d.selectedHuman.mesh.setSolid(0)
-          else:
-              self.scene3d.selectedHuman.mesh.setSolid(1)
-          self.app.scene3d.redraw()
-      elif event.key == events3d.SDLK_t:
-          human = self.scene3d.selectedHuman
-          algos3d.saveTranslationTarget(human.meshData, "full_target.target")
-          print "Full target exported"
-          
-
-  def do(self, action):
-    if action.do():
-      self.undoStack.append(action)
-      del self.redoStack[:]
-      print("do " + action.name)
-      self.scene3d.redraw()
-
-  def did(self, action):
-    self.undoStack.append(action)
-    del self.redoStack[:]
-    print("did " + action.name)
-    self.scene3d.redraw()
-
-  def undo(self):
-    if self.undoStack:
-      action = self.undoStack.pop()
-      print("undo " + action.name)
-      action.undo()
-      self.redoStack.append(action)
-      self.scene3d.redraw()
-
-  def redo(self):
-    if self.redoStack:
-      action = self.redoStack.pop()
-      print("redo " + action.name)
-      action.do()
-      self.undoStack.append(action)
-      self.scene3d.redraw()
-
-  def setTheme(self, theme):
-    f = open("data/themes/" + theme + ".mht", 'r')
-
-    for data in f.readlines():
-      lineData = data.split()
-
-      if len(lineData) > 0:
-        if lineData[0] == "version":
-          print("Version " + lineData[1])
-        elif lineData[0] == "color":
-          if lineData[1] == "clear":
-            mh.setClearColor(float(lineData[2]), float(lineData[3]), float(lineData[4]), float(lineData[5]))
-
-    self.theme = theme
-
-  def getThemeResource(self, folder, id):
-    if '/' in id:
-      return id
-    if os.path.exists("data/themes/" + self.theme + "/" + folder + "/"+ id):
-      return "data/themes/" + self.theme + "/" + folder + "/"+ id
-    else:
-      return "data/themes/default/" + folder + "/"+ id
-      
-  def getFont(self, fontFamily):
-    if fontFamily not in self.fonts:
-      self.fonts[fontFamily] = font3d.Font("data/fonts/%s.fnt" % fontFamily)
-    return self.fonts[fontFamily]
-
-  def progress(self, value):
-    self.progressBar.setProgress(value)
-    if value <= 0:
-      self.progressBar.show()
-    elif value >= 1.0:
-      self.progressBar.hide()
-      
-  def setGlobalCamera(self):
-    self.modelCamera.eyeX = 0
-    self.modelCamera.eyeY = 0
-    self.modelCamera.eyeZ = 60
-    self.modelCamera.focusX = 0
-    self.modelCamera.focusY = 0
-    self.modelCamera.focusZ = 0
-  
-  def setFaceCamera(self):
-    human = self.scene3d.selectedHuman
-    headNames = [group.name for group in human.meshData.facesGroups if ("head" in group.name or "jaw" in group.name)]
-    self.headVertices, self.headFaces = human.meshData.getVerticesAndFacesForGroups(headNames)
-    center = centroid([v.co for v in self.headVertices])
-    self.modelCamera.eyeX = center[0]
-    self.modelCamera.eyeY = center[1]
-    self.modelCamera.eyeZ = 10
-    self.modelCamera.focusX = center[0]
-    self.modelCamera.focusY = center[1]
-    self.modelCamera.focusZ = 0
-    human.setPosition([0.0, 0.0, 0.0])
-    human.setRotation([0.0, 0.0, 0.0])
+        self.scene3d.redraw()
+        
+    def toggleSolid(self):
+        if self.scene3d.selectedHuman.mesh.solid:
+            self.scene3d.selectedHuman.mesh.setSolid(0)
+        else:
+            self.scene3d.selectedHuman.mesh.setSolid(1)
+        self.scene3d.redraw()
+        
+    def saveTarget(self):
+        human = self.scene3d.selectedHuman
+        algos3d.saveTranslationTarget(human.meshData, "full_target.target")
+        print "Full target exported"
+        
+    def quickExport(self):
+        exportPath = mh.getPath('exports')
+        if not os.path.exists(exportPath):
+            os.makedirs(exportPath)
+        mh2obj.exportObj(self.scene3d.selectedHuman.meshData, exportPath + '/quick_export.obj', 'data/3dobjs/base.obj')
+        mh2bvh.exportSkeleton(self.scene3d.selectedHuman.meshData, exportPath + '/quick_export.bvh')
+        mh2mhx.exportMhx(self.scene3d.selectedHuman.meshData, exportPath + '/quick_export.mhx')
+        
+    def grabScreen(self):
+        grabPath = mh.getPath('grab')
+        if not os.path.exists(grabPath):
+            os.makedirs(grabPath)
+        # TODO: use bbox to choose grab region
+        self.scene3d.grabScreen(180, 80, 440, 440, os.path.join(grabPath, 'grab.bmp'))
+        
+    def subdivide(self):
+        print 'subdividing'
+        self.scene3d.selectedHuman.subdivide()
     
 application = MHApplication()
 mainScene = application.scene3d # HACK: Don't remove this, it is needed to receive events from C
