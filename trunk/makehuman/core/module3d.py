@@ -1736,7 +1736,7 @@ class Scene3D:
             idB = ((self.colorID >> 10) % 32) * 8
             
             for f in g.faces:
-                f.colorID = [idR, idG, idB]
+                f.colorID = (idR, idG, idB)
             
             self.faceGroupColorID[self.colorID] = g
 
