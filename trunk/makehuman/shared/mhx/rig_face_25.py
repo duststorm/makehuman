@@ -60,7 +60,7 @@ FaceArmature = [
 
 def FaceWritePoses(fp):
 	addPoseBone(fp, 'Jaw', 'MHJaw', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-5*deg1,deg45, 0,0, -deg20,deg20), (1,1,1)])])
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-5*D,45*D, 0,0, -20*D,20*D), (1,1,1)])])
 
 	addPoseBone(fp, 'TongueBase', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
@@ -91,10 +91,10 @@ def FaceWritePoses(fp):
 	return
 
 lidBones = [
-	('UpLid_L', 'PUpLid_L', (0, 40*deg1)),
-	('LoLid_L', 'PLoLid_L', (0, 20*deg1)),
-	('UpLid_R', 'PUpLid_R', (0, 40*deg1)),
-	('LoLid_R', 'PLoLid_R', (0, 20*deg1)),
+	('UpLid_L', 'PUpLid_L', (0, 40*D)),
+	('LoLid_L', 'PLoLid_L', (0, 20*D)),
+	('UpLid_R', 'PUpLid_R', (0, 40*D)),
+	('LoLid_R', 'PLoLid_R', (0, 20*D)),
 ]
 
 def FaceWriteDrivers(fp):

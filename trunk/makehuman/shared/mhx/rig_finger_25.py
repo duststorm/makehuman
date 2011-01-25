@@ -93,7 +93,7 @@ FingerHeadsTails = [
 
 '''
 
-ThumbRoll = 90*deg1
+ThumbRoll = 90*D
 
 FingerArmature = [
 	# Deform
@@ -147,8 +147,8 @@ FingerArmature = [
 #	defineFingerConstraints():
 #
 
-limitRotThumb = ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-1.37,0.5, 0,0, -deg60,deg60), (1,0,1)]) 
-limitRotFingers = ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-1.37,0.5, 0,0, -deg30,deg30), (1,0,1)]) 
+limitRotThumb = ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-1.37,0.5, 0,0, -60*D,60*D), (1,0,1)]) 
+limitRotFingers = ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-1.37,0.5, 0,0, -30*D,30*D), (1,0,1)]) 
 
 def defineFingerConstraints():
 	fconstraints = {}

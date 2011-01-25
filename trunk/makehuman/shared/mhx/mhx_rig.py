@@ -17,6 +17,8 @@ Abstract
 --------
 Functions shared by all rigs 
 
+Limit angles from http://hippydrome.com/
+
 """
 
 import aljabr, mhxbones, mh2mhx, math
@@ -25,21 +27,10 @@ from aljabr import *
 PanelWorks = False
 
 pi = 3.14159
-deg180 = pi
-deg135 = 3*pi/4
-deg120 = 2*pi/3
-deg90 = pi/2
-deg80 = 4*pi/9
-deg60 = pi/3
-deg45 = pi/4
-deg40 = 2*pi/9
-deg30 = pi/6
-deg20 = pi/9
-deg10 = pi/18
-deg1 = pi/180
-
+D = pi/180
 yunit = [0,1,0]
 zunit = [0,0,-1]
+ybis = [0,2,0]
 
 unlimited = (-pi,pi, -pi,pi, -pi,pi)
 NoBB = (1,1,1)
@@ -378,10 +369,10 @@ def addDeformIK(fp, bone, target, pole):
 	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, 1, ['IK', target, 1, pole, (True, False,True)])])
 
-def addDeformIK2(fp, bone, iktar, fktar, pole):
+def addDeformIK2(fp, bone, iktar, fktar, ikpole, fkpole):
 	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, 1, ['IK', iktar, 1, pole, (True, False,True)]),
-		 ('IK', 0, 1, ['FK', fktar, 1, pole, (True, False,True)])])
+		[('IK', 0, 1, ['IK', iktar, 1, ikpole, (True, False,True)]),
+		 ('IK', 0, 1, ['FK', fktar, 1, fkpole, (True, False,True)])])
 
 def addStretchBone(fp, bone, target, parent):
 	addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
@@ -1355,13 +1346,22 @@ def setupCircle(fp, name, r):
 	return
 
 def setupCube(fp, name, r, offs):
+	try:
+		(rx,ry,rz) = r
+	except:
+		(rx,ry,rz) = (r,r,r)
+	try:
+		(dx,dy,dz) = offs
+	except:
+		(dx,dy,dz) = (0,offs,0)
+
 	fp.write("\n"+
 "Mesh %s %s \n" % (name, name) +
 "  Verts\n")
-	for x in [-r,r]:
-		for y in [-r,r]:
-			for z in [-r,r]:
-				fp.write("    v %.2f %.2f %.2f ;\n" % (x,y+offs,z))
+	for x in [-rx,rx]:
+		for y in [-ry,ry]:
+			for z in [-rz,rz]:
+				fp.write("    v %.2f %.2f %.2f ;\n" % (x+dx,y+dy,z+dz))
 	fp.write(
 "  end Verts\n" +
 "  Faces\n" +
@@ -1389,6 +1389,8 @@ def setupCircles(fp):
 	setupCube(fp, "MHCube025", 0.25, 0)
 	setupCube(fp, "MHCube05", 0.5, 0)
 	setupCube(fp, "MHEndCube01", 0.1, 1)
+	setupCube(fp, "MHChest", (0.7,0.25,0.5), (0,0.5,0.35))
+	setupCube(fp, "MHRoot", (1.25,0.5,1.0), 1)
 	return
 
 #

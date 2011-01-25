@@ -60,7 +60,7 @@ BodyHeadsTails = [
 	('MasterHips',			'pelvis', ('pelvis', zunit)),
 	('MasterNeck',			'neck', ('neck', zunit)),
 
-	('Root',				'spine3', 'spine4'),
+	('Root',				'spine3', ('spine3',[0,-1,0])),
 	('Hips',				'pelvis', 'hips-tail'),
 	('Hip_L',				'spine3', 'r-upper-leg'),
 	('Hip_R',				'spine3', 'l-upper-leg'),
@@ -95,13 +95,13 @@ BodyArmature = [
 
 	('Spine1',			0.0, 'Root', F_DEF+F_WIR, L_SPINE+L_DEF, (0,1,3) ),
 	('Spine2',			0.0, 'Spine1', F_DEF+F_WIR+F_CON, L_SPINE+L_DEF, (1,1,3) ),
-	('Spine3',			0.0, 'Spine2', F_DEF+F_WIR+F_CON, L_SPINE+L_DEF, NoBB ),
+	('Spine3',			0.0, 'Spine2', F_DEF+F_WIR+F_CON, L_SPINE+L_DEF, (1,1,3) ),
 	('Neck',			0.0, 'Spine3', F_DEF+F_WIR+F_CON, L_SPINE+L_HEAD+L_DEF, (1,1,3) ),
 	('Head',			0.0, 'Neck', F_DEF+F_WIR+F_CON, L_SPINE+L_HEAD+L_DEF, NoBB),
 
 	('Rib',				0.0, 'Spine3', F_DEF+F_WIR, L_DEF, NoBB),
-	('Breast_L',		-deg45, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
-	('Breast_R',		deg45, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
+	('Breast_L',		-45*D, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
+	('Breast_R',		45*D, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
 	('Breathe',			0.0, 'Rib', F_DEF+F_WIR, L_TORSO, NoBB),
 	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, NoBB),
 	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, NoBB),
@@ -122,30 +122,32 @@ def BodyWritePoses(fp):
 
 	addPoseBone(fp,  'MasterNeck', 'MHMaster', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_HID, [])
 
-	addPoseBone(fp,  'Root', 'MHHips', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints)
+	addPoseBone(fp,  'Root', 'MHRoot', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, mhx_rig.rootChildOfConstraints)
 
 	addPoseBone(fp,  'Hips', 'MHCircle20', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg60,deg30, -deg45,deg45, -deg30,deg30), (1,1,1)])])
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-50*D,40*D, -45*D,45*D, -16*D,16*D), (1,1,1)])])
 
 	addPoseBone(fp,  'Hip_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp,  'Hip_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Spinal column
-	addPoseBone(fp,  'Spine1', 'MHCircle10', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
- 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg20,deg90, -deg60,deg60, -deg60,deg60), (1,1,1)])])
+	addPoseBone(fp,  'Spine1', 'MHCircle05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-60*D,90*D, -60*D,60*D, -60*D,60*D), (1,1,1)])])
 
-	addPoseBone(fp,  'Spine2', 'MHCircle15', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
- 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg20,deg30, -deg45,deg45, -deg30,deg30), (1,1,1)])])
+	addPoseBone(fp,  'Spine2', 'MHCircle05', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-90*D,70*D, -20*D,20*D, -50*D,50*D), (1,1,1)])])
 
-	addPoseBone(fp,  'Spine3', 'MHCircle10', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,0,1), P_STRETCH,
- 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg20,deg20, -deg20,deg20, -deg20,deg20), (1,1,1)])])
+	addPoseBone(fp,  'Spine3', 'MHChest', 'Spine', (0,0,0), (0,1,0), (1,1,1), (1,0,1), P_STRETCH,
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-20*D,20*D, 0,0, -20*D,20*D), (1,1,1)]),
+		 #('IK', 0, 1, ['IK', None, 2, None, (True, False,True)])
+		])
 
 	addPoseBone(fp,  'Neck', 'MHNeck', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg60,deg30, -deg45,deg45, -deg60,deg60), (1,1,1)])])
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-60*D,40*D, -45*D,45*D, -60*D,60*D), (1,1,1)])])
 
 	addPoseBone(fp,  'Head', 'MHHead', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
- 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg60,deg30, -deg60,deg60, -deg45,deg45), (1,1,1)])])
+ 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-60*D,40*D, -60*D,60*D, -45*D,45*D), (1,1,1)])])
 
 	# Stomach
 	addPoseBone(fp,  'StomachTarget', 'MHCube01', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
@@ -163,7 +165,7 @@ def BodyWritePoses(fp):
 
 	addPoseBone(fp,  'Breathe', 'MHCube01', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-	limBreastRot = (-deg45,deg45, -10*deg1,10*deg1, -deg20,deg20)
+	limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
 	limBreastScale =  (0.8,1.25, 0.7,1.5, 0.8,1.25)
 
 	addPoseBone(fp,  'Breast_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 

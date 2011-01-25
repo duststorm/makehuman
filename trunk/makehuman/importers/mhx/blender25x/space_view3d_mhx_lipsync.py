@@ -468,104 +468,6 @@ def initInterface(scn):
 		scn['MhxBodyLanguage'] = True
 	return
 
-#
-#	class MhxLipsyncPanel(bpy.types.Panel):
-#
-
-class MhxLipsyncPanel(bpy.types.Panel):
-	bl_label = "MHX Lipsync"
-	bl_space_type = "VIEW_3D"
-	bl_region_type = "UI"
-	
-	@classmethod
-	def poll(cls, context):
-		return context.object
-
-	def draw(self, context):
-		global theRig, theMesh, theScale	
-		if context.object.type == 'ARMATURE':
-			theRig = context.object
-			theMesh = None
-			for child in theRig.children:
-				if (child.type == 'MESH' and meshHasExpressions(child)):
-					theMesh = child
-					break
-		elif context.object.type == 'MESH':
-			if meshHasExpressions(context.object):
-				theMesh = context.object
-				theRig = theMesh.parent
-			else:
-				return
-		else:
-			return
-		
-		layout = self.layout
-		layout.operator("object.InitInterfaceButton")
-		
-		if theRig:
-			layout.separator()
-			layout.prop(context.scene, 'MhxSyncAutoKeyframe')
-			layout.prop(context.scene, 'MhxBodyLanguage')
-			layout.label(text="Visemes")
-			row = layout.row()
-			row.operator("object.RestButton")
-			row.operator("object.EtcButton")
-			row.operator("object.AHButton")
-			row = layout.row()
-			row.operator("object.MBPButton")
-			row.operator("object.OOButton")
-			row.operator("object.OButton")
-			row = layout.row()
-			row.operator("object.RButton")
-			row.operator("object.FVButton")
-			row.operator("object.SButton")
-			row = layout.row()
-			row.operator("object.SHButton")
-			row.operator("object.EEButton")
-			row.operator("object.EHButton")
-			row = layout.row()
-			row.operator("object.THButton")
-			row.operator("object.LButton")
-			row.operator("object.GButton")
-			layout.separator()
-			row = layout.row()
-			row.operator("object.BlinkButton")
-			row.operator("object.UnBlinkButton")
-			layout.label(text="Load file")
-			row = layout.row()
-			row.operator("object.LoadMohoButton")
-			row.operator("object.LoadMagpieButton")
-
-		if theRig and rigHasExpressions(theRig):
-			layout.separator()
-			layout.label(text="Expressions (driven)")
-			layout.operator("object.ResetBoneExpressionsButton")
-			layout.operator("object.RemoveDriversButton")
-			layout.separator()
-			pbones = theRig.pose.bones
-			for name in Expressions:
-				try:
-					pb = pbones['P%s' % name]
-					layout.prop(pb, 'location', index=1, text=name)
-				except:
-					pass
-		
-		elif theMesh and meshHasExpressions(theMesh):	
-			layout.separator()
-			layout.label(text="Expressions")
-			layout.operator("object.ResetExpressionsButton")
-			layout.operator("object.CreateDriversButton")
-			layout.separator()
-			keys = theMesh.data.shape_keys
-			if keys:
-				for name in Expressions:
-					try:
-						datum = keys.keys[name]
-						layout.prop(datum, 'value', text=name)
-					except:
-						pass
-		return
-
 # Define viseme buttons
 
 def defineVisemeButtons():
@@ -793,6 +695,235 @@ class OBJECT_OT_RemoveDriversButton(bpy.types.Operator):
 		removeDrivers(context)
 		print("Drivers removed")
 		return{'FINISHED'}	
+
+#
+#	setGlobals(context):
+#
+
+def setGlobals(context):
+	global theRig, theMesh, theScale	
+	if context.object.type == 'ARMATURE':
+		theRig = context.object
+		theMesh = None
+		for child in theRig.children:
+			if (child.type == 'MESH' and meshHasExpressions(child)):
+				theMesh = child
+				break
+	elif context.object.type == 'MESH':
+		if meshHasExpressions(context.object):
+			theMesh = context.object
+			theRig = theMesh.parent
+		else:
+			return
+	else:
+		return
+
+	try:
+		theRig.data.bones['PArmIK_L']
+	except:
+		theRig = None	
+		
+#
+#	setAllFKIK(value):
+#	class OBJECT_OT_SetAllFKButton(bpy.types.Operator):
+#	class OBJECT_OT_SetAllIKButton(bpy.types.Operator):
+#
+
+def setAllFKIK(value):
+	global theRig
+	pbones = theRig.pose.bones
+	for name in ['PArmIK', 'PLegIK']:
+		for suffix in ['_L', '_R']:
+			pbones[name+suffix].location[0] = value
+	return
+
+class OBJECT_OT_SetAllFKButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SetAllFKButton"
+	bl_label = "All FK"
+
+	def execute(self, context):
+		setAllFKIK(0.0)
+		return{'FINISHED'}	
+
+class OBJECT_OT_SetAllIKButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SetAllIKButton"
+	bl_label = "All IK"
+
+	def execute(self, context):
+		setAllFKIK(1.0)
+		return{'FINISHED'}	
+
+
+#
+#	setAllFingers(value):
+#	class OBJECT_OT_SetAllFingersOffButton(bpy.types.Operator):
+#	class OBJECT_OT_SetAllFingersOnButton(bpy.types.Operator):
+#
+
+def setAllFingers(value):
+	global theRig
+	pbones = theRig.pose.bones
+	for n in range(1,6):
+		for suffix in ['_L', '_R']:
+			pbones['PFinger-%d%s' % (n, suffix)].location[0] = value
+	return
+
+class OBJECT_OT_SetAllFingersOffButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SetAllFingersOffButton"
+	bl_label = "All off"
+
+	def execute(self, context):
+		setAllFingers(0.0)
+		return{'FINISHED'}	
+
+class OBJECT_OT_SetAllFingersOnButton(bpy.types.Operator):
+	bl_idname = "OBJECT_OT_SetAllFingersOnButton"
+	bl_label = "All on"
+
+	def execute(self, context):
+		setAllFingers(0.7)
+		return{'FINISHED'}	
+
+#
+#	class MhxDriversPanel(bpy.types.Panel):
+#
+
+class MhxDriversPanel(bpy.types.Panel):
+	bl_label = "MHX Drivers"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	@classmethod
+	def poll(cls, context):
+		return context.object
+
+	def draw(self, context):
+		setGlobals(context)
+		layout = self.layout
+		layout.operator("object.InitInterfaceButton")
+		
+		if theRig:
+			pbones = theRig.pose.bones
+			
+			layout.label("Arm and leg FK/IK")
+			layout.prop(pbones['PArmIK_L'], 'location', index=0, text='Arm IK Left')
+			layout.prop(pbones['PArmIK_R'], 'location', index=0, text='Arm IK Right')
+			layout.prop(pbones['PLegIK_L'], 'location', index=0, text='Leg IK Left')
+			layout.prop(pbones['PLegIK_R'], 'location', index=0, text='Leg IK Right')
+			row = layout.row()
+			row.operator("object.SetAllFKButton")
+			row.operator("object.SetAllIKButton")
+
+			layout.label("Finger control")
+			fingers = ['Thumb', 'Index', 'Long', 'Ring', 'Pinky']
+			for n in range(1,6):				
+				row = layout.row()
+				row.prop(pbones['PFinger-%d_L' % n], 'location', index=0, text='L '+fingers[n-1])
+				row.prop(pbones['PFinger-%d_R' % n], 'location', index=0, text='R '+fingers[n-1])
+			row = layout.row()
+			row.operator("object.SetAllFingersOffButton")
+			row.operator("object.SetAllFingersOnButton")
+
+
+#
+#	class MhxLipsyncPanel(bpy.types.Panel):
+#
+
+class MhxLipsyncPanel(bpy.types.Panel):
+	bl_label = "MHX Lipsync"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	@classmethod
+	def poll(cls, context):
+		return context.object
+
+	def draw(self, context):
+		setGlobals(context)
+		layout = self.layout
+		layout.operator("object.InitInterfaceButton")
+		
+		if theRig:
+			layout.separator()
+			layout.prop(context.scene, 'MhxSyncAutoKeyframe')
+			layout.prop(context.scene, 'MhxBodyLanguage')
+			layout.label(text="Visemes")
+			row = layout.row()
+			row.operator("object.RestButton")
+			row.operator("object.EtcButton")
+			row.operator("object.AHButton")
+			row = layout.row()
+			row.operator("object.MBPButton")
+			row.operator("object.OOButton")
+			row.operator("object.OButton")
+			row = layout.row()
+			row.operator("object.RButton")
+			row.operator("object.FVButton")
+			row.operator("object.SButton")
+			row = layout.row()
+			row.operator("object.SHButton")
+			row.operator("object.EEButton")
+			row.operator("object.EHButton")
+			row = layout.row()
+			row.operator("object.THButton")
+			row.operator("object.LButton")
+			row.operator("object.GButton")
+			layout.separator()
+			row = layout.row()
+			row.operator("object.BlinkButton")
+			row.operator("object.UnBlinkButton")
+			layout.label(text="Load file")
+			row = layout.row()
+			row.operator("object.LoadMohoButton")
+			row.operator("object.LoadMagpieButton")
+
+#
+#	class MhxExpressionsPanel(bpy.types.Panel):
+#
+
+class MhxExpressionsPanel(bpy.types.Panel):
+	bl_label = "MHX Expressions"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	@classmethod
+	def poll(cls, context):
+		return context.object
+
+	def draw(self, context):
+		setGlobals(context)
+		layout = self.layout
+		layout.operator("object.InitInterfaceButton")
+		
+		if theRig and rigHasExpressions(theRig):
+			layout.separator()
+			layout.label(text="Expressions (driven)")
+			layout.operator("object.ResetBoneExpressionsButton")
+			layout.operator("object.RemoveDriversButton")
+			layout.separator()
+			pbones = theRig.pose.bones
+			for name in Expressions:
+				try:
+					pb = pbones['P%s' % name]
+					layout.prop(pb, 'location', index=1, text=name)
+				except:
+					pass
+		
+		elif theMesh and meshHasExpressions(theMesh):	
+			layout.separator()
+			layout.label(text="Expressions")
+			layout.operator("object.ResetExpressionsButton")
+			layout.operator("object.CreateDriversButton")
+			layout.separator()
+			keys = theMesh.data.shape_keys
+			if keys:
+				for name in Expressions:
+					try:
+						datum = keys.keys[name]
+						layout.prop(datum, 'value', text=name)
+					except:
+						pass
+		return
 
 #
 #	initialize and register
