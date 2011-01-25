@@ -2046,6 +2046,17 @@ void mhCreateWindow(int useTimer)
     OnInit();
     mhReshape(G.windowWidth, G.windowHeight);
     mhDraw();
+
+    {
+      SDL_Event event;
+
+      event.type = SDL_USEREVENT;
+      event.user.code = 1;
+      event.user.data1 = NULL;
+      event.user.data2 = NULL;
+
+      SDL_PushEvent(&event);
+    }
 }
 
 
@@ -2126,8 +2137,15 @@ void mhEventLoop(void)
             mhMouseButtonUp(event.button.button, event.button.x, event.button.y);
             break;
         case SDL_USEREVENT:
-            callTimerFunct();
-            G.pendingTimer = 0;
+            if (event.user.code == 0)
+            {
+              callTimerFunct();
+              G.pendingTimer = 0;
+            }
+            else if (event.user.code == 1)
+            {
+              callStartFunct();
+            }
             break;
         case SDL_VIDEORESIZE:
             G.windowWidth = g_windowWidth = event.resize.w;

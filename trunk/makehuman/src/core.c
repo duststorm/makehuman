@@ -582,6 +582,23 @@ void callTimerFunct(void)
         Py_DECREF(v);
 }
 
+/** \brief Invokes the Python timer function.
+ *
+ *  This function invokes the Python startFunc function when the SDL
+ *  module detects idle time between mouse and keyboard events.
+ */
+void callStartFunct(void)
+{
+    PyObject *main_module = PyImport_AddModule("__main__");
+    PyObject *global_dict = PyModule_GetDict(main_module);
+    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
+    PyObject *v;
+    if (!(v = PyObject_CallMethod(mainScene, "startFunc", "")))
+        PyErr_Print();
+    else
+        Py_DECREF(v);
+}
+
 /** \brief Invokes the Python mouseButtonDown function.
  *  \param b an int indicating which button this event relates to.
  *  \param x an int specifying the horizontal mouse pointer position in the GUI window (in pixels).

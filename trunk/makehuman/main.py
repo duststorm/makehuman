@@ -141,7 +141,7 @@ class MHApplication(gui3d.Application):
         }
 
         # Display the initial splash screen and the progress bar during startup
-        self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 0])
+        self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 9.8])
         self.progressBar = gui3d.ProgressBar(self)
         self.scene3d.update()
         self.scene3d.redraw(0)
@@ -288,8 +288,9 @@ class MHApplication(gui3d.Application):
 
     # Events
     def onStart(self, event):
-        self.splash.hide()
         self.scene3d.selectedHuman.applyAllTargets(self.app.progress)
+        self.scene3d.update()
+        self.splash.hide()
         mh.updatePickingBuffer();
         
     def onMouseDragged(self, event):

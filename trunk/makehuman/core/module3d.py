@@ -1282,9 +1282,9 @@ class Scene3D:
 
         """
 
-        a = time.time()
+        #a = time.time()
 
-        nObjs = len(self.objects)
+        #nObjs = len(self.objects)
 
         # self.colorID = 0  # reset the colors selection ID
 
@@ -1331,6 +1331,10 @@ class Scene3D:
 
         if self.sceneTimerCallback:
             self.sceneTimerCallback()
+            
+    def startFunc(self):
+
+        self.application.callEvent('onStart', None)
 
     def getMousePos2D(self):
         """
@@ -1766,7 +1770,7 @@ class Scene3D:
 
             # print groupSelected.name
 
-            print 'Color %s not found' % IDkey
+            print 'Color %s (%s) not found' % (IDkey, picked)
             groupSelected = None
         return groupSelected
 

@@ -418,11 +418,10 @@ class Application(events3d.EventHandler):
 
     def start(self):
 
-        self.scene3d.update()
-        self.callEvent('onStart', None)
         self.scene3d.startEventLoop()
 
     def stop(self):
+        
         self.scene3d.shutdown()
 
     def isVisible(self):
@@ -685,7 +684,7 @@ class Slider(View):
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj',
             texture=self.sliderTexture, position=[position[0], position[1] + 20, position[2] + 0.01])
         if isinstance(label, str):
-            self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]+0.5], fontSize = fontSize)
+            self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]+0.2], fontSize = fontSize)
             
             
         self.sliderMinX = position[0] + 17
@@ -1022,8 +1021,8 @@ class ProgressBar(View):
     """
 
     def __init__(self, parent, backgroundMesh='data/3dobjs/progressbar_background.obj', backgroundTexture=None,
-        backgroundPosition=[650, 585, 9.1],
-        barMesh='data/3dobjs/progressbar.obj', barTexture=None, barPosition=[650, 585, 9.2], visible=True):
+        backgroundPosition=[650, 585, 9.85],
+        barMesh='data/3dobjs/progressbar.obj', barTexture=None, barPosition=[650, 585, 9.9], visible=True):
     
         """
         This is the constructor for the ProgressBar class. It takes the following parameters:
