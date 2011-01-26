@@ -415,22 +415,17 @@ class Application(events3d.EventHandler):
         self.enteredObject = None
         self.fullscreen = False
         
-        mh.setMouseDownCallback(self.mouseDown)
-        mh.setMouseUpCallback(self.mouseUp)
-        mh.setMouseMovedCallback(self.mouseMoved)
-        mh.setKeyDownCallback(self.keyDown)
-        mh.setKeyUpCallback(self.keyUp)
-        mh.setResizeCallback(self.onResized)
+        mh.setMouseDownCallback(self.onMouseDownCallback)
+        mh.setMouseUpCallback(self.onMouseUpCallback)
+        mh.setMouseMovedCallback(self.onMouseMovedCallback)
+        mh.setKeyDownCallback(self.onKeyDownCallback)
+        mh.setKeyUpCallback(self.onKeyUpCallback)
+        mh.setResizeCallback(self.onResizedCallback)
 
         mh.startWindow(0)
         
     def started(self):
         self.callEvent('onStart', None)
-        
-    def onResized(self, width, height, fullscreen):
-        if self.fullscreen != fullscreen:
-            self.scene3d.reloadTextures()
-        self.fullscreen = fullscreen
 
     def run(self):
         mh.callAsync(self.started)
@@ -518,7 +513,7 @@ class Application(events3d.EventHandler):
 
     # called from native
 
-    def mouseDown(self, button, x, y):
+    def onMouseDownCallback(self, button, x, y):
         if button == 4:
             self.mouseWheel(1)
         elif button == 5:
@@ -548,7 +543,7 @@ class Application(events3d.EventHandler):
    
             object.object.callEvent('onMouseDown', event)
 
-    def mouseUp(self, button, x, y):
+    def onMouseUpCallback(self, button, x, y):
         if button == 4 or button == 5:
             return
 
@@ -565,7 +560,7 @@ class Application(events3d.EventHandler):
             if self.mouseDownObject is object.object:
                 self.mouseDownObject.callEvent('onClicked', event)
 
-    def mouseMoved(self, mouseState, x, y, xRel, yRel):
+    def onMouseMovedCallback(self, mouseState, x, y, xRel, yRel):
         
         # Build event
         event = events3d.MouseEvent(mouseState, x, y, xRel, yRel)
@@ -594,7 +589,7 @@ class Application(events3d.EventHandler):
                     self.enteredObject.callEvent('onMouseEntered', event)
                 object.object.callEvent('onMouseMoved', event)
 
-    def mouseWheel(self, wheelDelta):
+    def onMouseWheelCallback(self, wheelDelta):
 
         # Mouse wheel events, like key events are sent to the focus view
 
@@ -604,7 +599,7 @@ class Application(events3d.EventHandler):
         else:
             self.currentTask.callEvent('onMouseWheel', event)
 
-    def keyDown(self, key, character, modifiers):
+    def onKeyDownCallback(self, key, character, modifiers):
         if key == events3d.SDLK_TAB:
             if self.focusView:
 
@@ -637,12 +632,17 @@ class Application(events3d.EventHandler):
         else:
             self.currentTask.callEvent('onKeyDown', event)
 
-    def keyUp(self, key, character, modifiers):
+    def onKeyUpCallback(self, key, character, modifiers):
         event = events3d.KeyEvent(key, character, modifiers)
         if self.focusView:
             self.focusView.callEvent('onKeyUp', event)
         else:
             self.currentTask.callEvent('onKeyUp', event)
+            
+    def onResizedCallback(self, width, height, fullscreen):
+        if self.fullscreen != fullscreen:
+            self.scene3d.reloadTextures()
+        self.fullscreen = fullscreen
             
     def getCategory(self, name, style=CategoryTabStyle):
         try:
