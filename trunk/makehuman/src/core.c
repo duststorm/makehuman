@@ -651,9 +651,9 @@ void callKeyUp(int key, unsigned short character, int modifiers)
     PyErr_Print();
 }
 
-void callResize(int w, int h)
+void callResize(int w, int h, int fullscreen)
 {
-  if (G.resizeCallback && !PyObject_CallFunction(G.resizeCallback, "ii", w, h))
+  if (G.resizeCallback && !PyObject_CallFunction(G.resizeCallback, "iii", w, h, fullscreen))
     PyErr_Print();
 }
 

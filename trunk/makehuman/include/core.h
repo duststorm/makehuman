@@ -181,7 +181,7 @@ extern "C"
     void callStartFunct(void);
     void callKeyDown(int key, unsigned short character, int modifiers);
     void callKeyUp(int key, unsigned short character, int modifiers);
-    void callResize(int w, int h);
+    void callResize(int w, int h, int fullscreen);
 
 // Scene methods
     void setClearColor(float r, float g, float b, float a);

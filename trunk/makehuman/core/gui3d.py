@@ -413,17 +413,24 @@ class Application(events3d.EventHandler):
         self.focusGroup = None
         self.mouseDownObject = None
         self.enteredObject = None
+        self.fullscreen = False
         
         mh.setMouseDownCallback(self.mouseDown)
         mh.setMouseUpCallback(self.mouseUp)
         mh.setMouseMovedCallback(self.mouseMoved)
         mh.setKeyDownCallback(self.keyDown)
         mh.setKeyUpCallback(self.keyUp)
+        mh.setResizeCallback(self.onResized)
 
         mh.startWindow(0)
         
     def started(self):
         self.callEvent('onStart', None)
+        
+    def onResized(self, width, height, fullscreen):
+        if self.fullscreen != fullscreen:
+            self.scene3d.reloadTextures()
+        self.fullscreen = fullscreen
 
     def run(self):
         mh.callAsync(self.started)

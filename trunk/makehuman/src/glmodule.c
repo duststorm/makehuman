@@ -1914,7 +1914,7 @@ void mhSetFullscreen(int fullscreen)
     g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
     OnInit();
     mhReshape(G.windowWidth, G.windowHeight);
-    callResize(G.windowWidth, G.windowHeight);
+    callResize(G.windowWidth, G.windowHeight, G.fullscreen);
     mhDraw();
 }
 
@@ -2105,7 +2105,7 @@ void mhEventLoop(void)
             g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
             OnInit();
             mhReshape(event.resize.w, event.resize.h);
-            callResize(event.resize.w, event.resize.h);
+            callResize(event.resize.w, event.resize.h, G.fullscreen);
             mhDraw();
             break;
         case SDL_VIDEOEXPOSE:
