@@ -19,7 +19,7 @@ class ClockThread(Thread):
         while 1:
             sleep(1)
             self.clockText.setText(datetime.now().strftime("%H:%M:%S"))
-            self.clockText.app.scene3d.redraw()
+            self.clockText.app.redraw()
 
 print 'clock imported'
 

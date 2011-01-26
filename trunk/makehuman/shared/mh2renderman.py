@@ -626,7 +626,7 @@ class RMRScene:
         self.sceneFileName = os.path.join(self.ribsPath, "scene.rib")
 
         #Human in the scene
-        self.humanCharacter = RMRHuman(MHscene.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
+        self.humanCharacter = RMRHuman(app.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
         self.humanParameters = self.humanCharacter.getHumanParameters()
         self.humanCharacter.subObjectsInit()
         
@@ -985,12 +985,12 @@ class RMRScene:
         
         
             
-        print "DEBUG1", self.app.scene3d.selectedHuman.getRotation(), self.lastRotation
+        print "DEBUG1", self.app.selectedHuman.getRotation(), self.lastRotation
         
-        if (self.app.scene3d.selectedHuman.getRotation() != self.lastRotation) or ([self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ] != self.lastCameraPosition):
+        if (self.app.selectedHuman.getRotation() != self.lastRotation) or ([self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ] != self.lastCameraPosition):
             print "CONDICIO 1"
             recalculateSSS = 1            
-            self.lastRotation = self.app.scene3d.selectedHuman.getRotation()  
+            self.lastRotation = self.app.selectedHuman.getRotation()  
             
         if len(self.app.undoStack) > 0:  
             

@@ -148,8 +148,6 @@ extern "C"
         /**<        An int holding the current window height in pixels.                         */
         int windowWidth;               /**< \brief The current window width in pixels.                                         */
         /**<        An int holding the current window width in pixels.                          */
-        int modifiersKeyState;         /**< \brief The current modifier key state (e.g. shift, ctrl, alt etc.).                */
-        /**<        An int holding the current modifier key state (e.g. shift, ctrl, alt etc.). */
         unsigned char color_picked[3]; /**< \brief The 'color' of the currently selected object.                               */
         /**<        An array of three characters holding the Red, Green and Blue color
                     components (each with a value from 0 to 255) of the color of the currently
@@ -157,12 +155,6 @@ extern "C"
                     This is a 'false' color used as part of the technique for identifying
                     objects selected with the mouse.                                            */
         /**<        An array of ints holding the list of textures.                              */
-        double mouse3DX;/*mouse 3D scene coords*/
-        double mouse3DY;/*mouse 3D scene coords*/
-        double mouse3DZ;/*mouse 3D scene coords*/
-        double mouseGUIX;/*mouse 3D GUI coords*/
-        double mouseGUIY;/*mouse 3D GUI coords*/
-        double mouseGUIZ;/*mouse 3D GUI coords*/
         unsigned int millisecTimer; /*millisecond delay for SDL_AddTimer*/
 
         int pendingUpdate; /*1 if an update is already pending*/
@@ -170,6 +162,14 @@ extern "C"
         int loop; /*1 if we haven't quit yet*/
         int fullscreen; /*1 for fullscreen, 0 for windowed*/
         float clearColor[4]; /*color for background clear*/
+
+        PyObject *timerCallback;
+        PyObject *resizeCallback;
+        PyObject *mouseDownCallback;
+        PyObject *mouseUpCallback;
+        PyObject *mouseMovedCallback;
+        PyObject *keyDownCallback;
+        PyObject *keyUpCallback;
     } Global;
     extern Global G;
 
@@ -181,7 +181,7 @@ extern "C"
     void callStartFunct(void);
     void callKeyDown(int key, unsigned short character, int modifiers);
     void callKeyUp(int key, unsigned short character, int modifiers);
-    void callReloadTextures(void);
+    void callResize(int w, int h);
 
 // Scene methods
     void setClearColor(float r, float g, float b, float a);

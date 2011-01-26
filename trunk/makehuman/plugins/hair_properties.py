@@ -86,15 +86,15 @@ class HairPropertiesTaskView(gui3d.TaskView):
             
         @self.widthSlider.event
         def onChanging(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             if len(human.hairObj.verts)>0 : 
                hairWidthUpdate(human.scene, human.hairObj, widthFactor=self.widthSlider.getValue())
             #pass #Do something!
 
     def changeColor(self, color):
-        action = Action(self.app.scene3d.selectedHuman, self.app.scene3d.selectedHuman.hairColor, color, self.syncSliders)
+        action = Action(self.app.selectedHuman, self.app.selectedHuman.hairColor, color, self.syncSliders)
         self.app.do(action)
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
         human.hairObj.facesGroups[0].setColor(c)
 
@@ -108,12 +108,12 @@ class HairPropertiesTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         gui3d.TaskView.onShow(self, event)
-        hairColor = self.app.scene3d.selectedHuman.hairColor
+        hairColor = self.app.selectedHuman.hairColor
         self.widthSlider.setFocus()
         self.syncSliders()
 
     def syncSliders(self):
-        hairColor = self.app.scene3d.selectedHuman.hairColor
+        hairColor = self.app.selectedHuman.hairColor
         self.redSlider.setValue(hairColor[0])
         self.greenSlider.setValue(hairColor[1])
         self.blueSlider.setValue(hairColor[2])

@@ -85,25 +85,21 @@ static void initGlobals(void)
     G.clearColor[3] = 0.0;
     G.pendingUpdate = 0;
 
-    // Keyboard
-    G.modifiersKeyState = 0;
-
     // Timer
     G.millisecTimer = 10;
     G.pendingTimer = 0;
 
     // Events
     G.loop = 1;
-}
 
-/** \brief Get an integer representing the current modifier key settings.
- *
- *  This function returns the current modifier key settings as a Python integer value
- *  (e.g. Whether the Shift or Ctrl keys are currently depressed).
- */
-static PyObject* mh_getKeyModifiers(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("i", G.modifiersKeyState);
+    // Callbacks
+    G.timerCallback = NULL;
+    G.resizeCallback = NULL;
+    G.mouseDownCallback = NULL;
+    G.mouseUpCallback = NULL;
+    G.mouseMovedCallback = NULL;
+    G.keyDownCallback = NULL;
+    G.keyUpCallback = NULL;
 }
 
 static PyObject* mh_updatePickingBuffer(PyObject *self, PyObject *unused)
@@ -126,20 +122,11 @@ static PyObject* mh_getColorPicked(PyObject *self, PyObject *args)
  *  This function retrieves the x and y mouse position in screen
  *  coordinates returning two integer values to the Python code.
  */
-static PyObject* mh_getMousePos2D(PyObject *self, PyObject *args)
+static PyObject* mh_getMousePos(PyObject *self, PyObject *args)
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
     return Py_BuildValue("[i,i]", x, y);
-}
-
-/** \brief Get the current mouse x, y, z cursor position in the 3D GUI.
- *  This function retrieves the x, y and z mouse position in GUI
- *  coordinates returning three float values to the Python code.
- */
-static PyObject* mh_getMousePosGUI(PyObject *self, PyObject *args)
-{
-    return Py_BuildValue("[d,d,d]", G.mouseGUIX, G.mouseGUIY, G.mouseGUIZ);
 }
 
 /** \brief Get the current window (viewport) width and height in pixels.
@@ -348,6 +335,156 @@ static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
+static PyObject* mh_callAsync(PyObject *self, PyObject *callback)
+{
+    if (!PyCallable_Check(callback))
+    {
+      PyErr_SetString(PyExc_TypeError, "Callable expected");
+      return NULL;
+    }
+
+    Py_INCREF(callback);
+
+    {
+      SDL_Event event;
+
+      event.type = SDL_USEREVENT;
+      event.user.code = 1;
+      event.user.data1 = callback;
+      event.user.data2 = NULL;
+
+      SDL_PushEvent(&event);
+    }
+
+    return Py_BuildValue("");
+}
+
+static PyObject* mh_SetTimerCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.timerCallback)
+    Py_DECREF(G.timerCallback);
+
+  G.timerCallback = callback;
+
+  return Py_BuildValue("");
+}
+
+static PyObject* mh_SetResizeCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.resizeCallback)
+    Py_DECREF(G.resizeCallback);
+
+  G.resizeCallback = callback;
+
+  return Py_BuildValue("");
+}
+
+static PyObject* mh_SetMouseDownCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.mouseDownCallback)
+    Py_DECREF(G.mouseDownCallback);
+
+  G.mouseDownCallback = callback;
+
+  return Py_BuildValue("");
+}
+
+static PyObject* mh_SetMouseUpCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.mouseUpCallback)
+    Py_DECREF(G.mouseUpCallback);
+
+  G.mouseUpCallback = callback;
+
+  return Py_BuildValue("");
+}
+
+static PyObject* mh_SetMouseMovedCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.mouseMovedCallback)
+    Py_DECREF(G.mouseMovedCallback);
+
+  G.mouseMovedCallback = callback;
+
+  return Py_BuildValue("");
+}
+
+static PyObject* mh_SetKeyDownCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.keyDownCallback)
+    Py_DECREF(G.keyDownCallback);
+
+  G.keyDownCallback = callback;
+
+  return Py_BuildValue("");
+}
+
+static PyObject* mh_SetKeyUpCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.keyUpCallback)
+    Py_DECREF(G.keyUpCallback);
+
+  G.keyUpCallback = callback;
+
+  return Py_BuildValue("");
+}
+
 /** \brief Gets program specific path locations.
  *  MakeHuman uses pathes to export objects and to (re)store exports and screen grabs.
  *  Since the various locations depend from the system (Linux, Windows, Mac OS) the program is running
@@ -514,10 +651,8 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 static PyMethodDef EmbMethods[] =
 {
     {"setTimeTimer", mh_setTimeTimer, METH_VARARGS, ""},
-    {"getMousePosGUI", mh_getMousePosGUI, METH_VARARGS, ""},
     {"getWindowSize", mh_getWindowSize, METH_VARARGS, ""},
-    {"getMousePos2D", mh_getMousePos2D, METH_VARARGS, ""},
-    {"getKeyModifiers", mh_getKeyModifiers, METH_VARARGS, ""},
+    {"getMousePos", mh_getMousePos, METH_VARARGS, ""},
     {"updatePickingBuffer", mh_updatePickingBuffer, METH_NOARGS, ""},
     {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},
@@ -532,6 +667,14 @@ static PyMethodDef EmbMethods[] =
     {"startEventLoop", mh_startEventLoop, METH_VARARGS, ""},
     {"shutDown", mh_shutDown, METH_VARARGS, ""},
     {"getPath", mh_getPath, METH_O, ""},
+    {"callAsync", mh_callAsync, METH_O, ""},
+    {"setTimerCallback", mh_SetTimerCallback, METH_O, ""},
+    {"setResizeCallback", mh_SetResizeCallback, METH_O, ""},
+    {"setMouseDownCallback", mh_SetMouseDownCallback, METH_O, ""},
+    {"setMouseUpCallback", mh_SetMouseUpCallback, METH_O, ""},
+    {"setMouseMovedCallback", mh_SetMouseMovedCallback, METH_O, ""},
+    {"setKeyDownCallback", mh_SetKeyDownCallback, METH_O, ""},
+    {"setKeyUpCallback", mh_SetKeyUpCallback, METH_O, ""},
     {NULL, NULL, 0, NULL}
 };
 

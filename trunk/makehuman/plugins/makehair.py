@@ -19,10 +19,10 @@ class MakeHairTaskView(gui3d.TaskView):
         self.gravity = 1.5
         self.cP = 14
         self.length=5.0
-        scn = self.app.scene3d
-        if len(scn.selectedHuman.meshStored)==0: 
-            scn.selectedHuman.storeMesh()
-        self.octree = simpleoctree.SimpleOctree(scn.selectedHuman.meshStored,0.09)   
+        app = self.app
+        if len(app.selectedHuman.meshStored)==0: 
+            app.selectedHuman.storeMesh()
+        self.octree = simpleoctree.SimpleOctree(app.selectedHuman.meshStored,0.09)   
         #sliders
         gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=350))
         self.cPSlider = gui3d.Slider(self, position=[10, 115, 9.3], value=14,min=4,max=30,label="Control Points")
@@ -58,18 +58,18 @@ class MakeHairTaskView(gui3d.TaskView):
             #todo try catch when self.cPEntry has invalid values
             #showing my lambda skills..
             cPIndices = map(lambda x: int(x), self.cPEntry.text.split(","))
-            for curve in self.app.scene3d.selectedHuman.hairs.guides:
-                collision(self.octree,curve,scn.selectedHuman.meshData.verts,0.09,cPIndices,True)
-            self.app.scene3d.selectedHuman.hairs.reloadGuides()
+            for curve in self.app.selectedHuman.hairs.guides:
+                collision(self.octree,curve,app.selectedHuman.meshData.verts,0.09,cPIndices,True)
+            self.app.selectedHuman.hairs.reloadGuides()
         
         @self.createButton.event
         def onClicked(event):
             scn = self.app.scene3d
-            if scn.selectedHuman.hairObj:
-                scn.clear(scn.selectedHuman.hairObj)
+            if app.selectedHuman.hairObj:
+                scn.clear(app.selectedHuman.hairObj)
             obj = scn.newObj("hair")
-            position = scn.selectedHuman.getPosition()
-            rotation = scn.selectedHuman.getRotation()
+            position = app.selectedHuman.getPosition()
+            rotation = app.selectedHuman.getRotation()
             obj.x = position[0]
             obj.y = position[1]
             obj.z = position[2]
@@ -88,9 +88,9 @@ class MakeHairTaskView(gui3d.TaskView):
             obj.indexBuffer = []
             fg = obj.createFaceGroup("ribbons")
 
-            scn.selectedHuman.hairModelling = True
+            app.selectedHuman.hairModelling = True
             #TODO  Jose: clear any hair originally created/ loaded from libraries
-            mesh = scn.selectedHuman.mesh
+            mesh = app.selectedHuman.mesh
             verts = mesh.getVerticesAndFacesForGroups(["head-back-skull","head-upper-skull","l-head-temple",\
             "r-head-temple"])[0]
             scalpVerts = len(verts) #Collects all vertices that are part of the head where hair grows!
@@ -121,7 +121,7 @@ class MakeHairTaskView(gui3d.TaskView):
             fg.setColor([0,0,0,255]) #rgba
             obj.calcNormals()
             obj.shadeless = 1
-            scn.selectedHuman.hairObj = obj
+            app.selectedHuman.hairObj = obj
             obj.updateIndexBuffer()
             scn.update()
             

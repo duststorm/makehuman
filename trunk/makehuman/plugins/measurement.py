@@ -147,7 +147,7 @@ class MeasureTaskView(gui3d.TaskView):
             self.setModifierValue(value, IDName)
         else:
             self.setModifierValue(value, IDName)
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.applyAllTargets(self.app.progress)
 
             after = self.getTargetsAndValues(IDName)
@@ -186,7 +186,7 @@ class MeasureTaskView(gui3d.TaskView):
         @param targets: List of targets to get
         """
         modifiers = self.getModifiers(IDName)
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
         targetsAndValues = {}
         for modifier in modifiers:
@@ -215,7 +215,7 @@ class MeasureTaskView(gui3d.TaskView):
         if not modifiers:
             modifiers = []
             targets = self.buildListOfTargetPairs(IDName)
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             for pair in targets:
                 modifier = humanmodifier.Modifier(human, pair[0], pair[1])
                 modifiers.append(modifier)
@@ -230,7 +230,7 @@ class MeasureTaskView(gui3d.TaskView):
             return 0.0
             
     def getMeasure(self, measure):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         return self.ruler.getMeasure(human, measure)
 
     def onShow(self, event):
@@ -273,9 +273,9 @@ def load(app):
     @taskview.event
     def onMouseDown(event):        
         part = app.scene3d.getSelectedFacesGroup()
-        bodyZone = app.scene3d.selectedHuman.getPartNameForGroupName(part.name)
+        bodyZone = app.selectedHuman.getPartNameForGroupName(part.name)
         print bodyZone
-        if bodyZone in app.scene3d.selectedHuman.bodyZones:            
+        if bodyZone in app.selectedHuman.bodyZones:            
             if bodyZone == "neck":
                 taskview.hideAllSliders()
                 taskview.groupBoxes['neck'].show()

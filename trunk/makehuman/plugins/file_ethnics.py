@@ -51,7 +51,7 @@ class EthnicsTaskView(gui3d.TaskView):
         
     def loadEthnic(self, filename):
         
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
         human.load(os.path.join('data/models/ethnics', filename), self.app.progress)
         target = os.path.join('data/models/ethnics', filename.replace('.mhm', '.target'))
@@ -65,7 +65,6 @@ class EthnicsTaskView(gui3d.TaskView):
         self.app.categories['Files'].tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
 
         #self.app.switchCategory('Modelling')
-        #self.app.scene3d.redraw(1)
 
 def load(app):
     category = app.getCategory('Experiments')

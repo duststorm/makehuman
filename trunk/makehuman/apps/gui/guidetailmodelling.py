@@ -66,7 +66,7 @@ class DetailTool(events3d.EventHandler):
         self.selectedGroups = []
 
     def onMouseDown(self, event):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
     # Find the target name
 
@@ -135,7 +135,7 @@ class DetailTool(events3d.EventHandler):
             self.symmetryModifier.setValue(self.modifier.getValue())
 
     def onMouseUp(self, event):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
     # Recalculate
 
@@ -151,7 +151,7 @@ class DetailTool(events3d.EventHandler):
         self.app.did(humanmodifier.Action(human, self.before, after))
 
     def onMouseMoved(self, event):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
         groups = []
 
@@ -176,14 +176,14 @@ class DetailTool(events3d.EventHandler):
                 g.setColor([0, 255, 0, 255])
 
         self.selectedGroups = groups
-        self.app.scene3d.redraw()
+        self.app.redraw()
 
     def onMouseExited(self, event):
         for g in self.selectedGroups:
             g.setColor([255, 255, 255, 255])
 
         self.selectedGroups = []
-        self.app.scene3d.redraw()
+        self.app.redraw()
 
 
 class Detail3dTool(events3d.EventHandler):
@@ -217,7 +217,7 @@ class Detail3dTool(events3d.EventHandler):
 
     # TODO: top and botton view
 
-        rot = self.app.scene3d.selectedHuman.getRotation()
+        rot = self.app.selectedHuman.getRotation()
 
         xRot = rot[0] % 360
         yRot = rot[1] % 360
@@ -274,7 +274,7 @@ class Detail3dTool(events3d.EventHandler):
             event.dx = d
 
     def onMouseUp(self, event):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
     # Recalculate
 
@@ -299,7 +299,7 @@ class Detail3dTool(events3d.EventHandler):
         self.app.did(humanmodifier.Action(human, before, after))
 
     def onMouseMoved(self, event):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
         groups = []
 
@@ -329,14 +329,14 @@ class Detail3dTool(events3d.EventHandler):
                 g.setColor([0, 255, 0, 255])
 
         self.selectedGroups = groups
-        self.app.scene3d.redraw()
+        self.app.redraw()
 
     def onMouseExited(self, event):
         for g in self.selectedGroups:
             g.setColor([255, 255, 255, 255])
 
         self.selectedGroups = []
-        self.app.scene3d.redraw()
+        self.app.redraw()
 
 
 class DetailModelingTaskView(gui3d.TaskView):
@@ -357,7 +357,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.genitalsSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.genitals == None:
                     self.genitals = human.getGenitals()
                 human.updateGenitals(self.genitals, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -365,7 +365,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             
         @self.genitalsSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Genitals', value, self.syncSliders))
             self.genitals = None
 
@@ -376,7 +376,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.breastSizeSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.breastSize == None:
                     self.breastSize = human.getBreastSize()
                 human.updateBreastSize(self.breastSize, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -384,7 +384,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             
         @self.breastSizeSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'BreastSize', value, self.syncSliders))
             self.breastSize = None
 
@@ -395,7 +395,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.breastFirmnessSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.breastFirmness == None:
                     self.breastFirmness = human.getBreastFirmness()
                 human.updateBreastFirmness(self.breastFirmness, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -403,7 +403,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.breastFirmnessSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
             self.breastFirmness = None
             
@@ -416,7 +416,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.noseSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.nose == None:
                     self.nose = human.getNose()
                 human.updateNose(self.nose, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -424,7 +424,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.noseSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Nose', value, self.syncSliders))
             self.nose = None
             
@@ -435,7 +435,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.mouthSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.mouth == None:
                     self.mouth = human.getMouth()
                 human.updateMouth(self.mouth, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -443,7 +443,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.mouthSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Mouth', value, self.syncSliders))
             self.mouth = None
             
@@ -454,7 +454,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.eyesSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.eyes == None:
                     self.eyes = human.getEyes()
                 human.updateEyes(self.eyes, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -462,7 +462,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.eyesSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Eyes', value, self.syncSliders))
             self.eyes = None
 
@@ -473,7 +473,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.earsSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.ears == None:
                     self.ears = human.getEars()
                 human.updateEars(self.ears, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -481,7 +481,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.earsSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Ears', value, self.syncSliders))
             self.ears = None
             
@@ -492,7 +492,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.jawSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.jaw == None:
                     self.jaw = human.getJaw()
                 human.updateJaw(self.jaw, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -500,7 +500,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.jawSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Jaw', value, self.syncSliders))
             self.jaw = None
             
@@ -514,7 +514,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.headShapeSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.head == None:
                     self.head = human.getHead()
                 human.updateHead(self.head, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -522,7 +522,7 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.headShapeSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Head', value, self.syncSliders))
             self.head = None
             
@@ -533,7 +533,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.headAgeSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.headAge == None:
                     self.headAge = human.getHeadAge()
                 human.updateHeadAge(self.headAge, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -541,7 +541,7 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.headAgeSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'HeadAge', value, self.syncSliders))
             self.headAge = None
             
@@ -552,7 +552,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.faceAngleSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.faceAngle == None:
                     self.faceAngle = human.getFaceAngle()
                 human.updateFaceAngle(self.faceAngle, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -560,7 +560,7 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.faceAngleSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'FaceAngle', value, self.syncSliders))
             self.faceAngle = None
             
@@ -573,7 +573,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.pelvisToneSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.pelvisTone == None:
                     self.pelvisTone = human.getPelvisTone()
                 human.updatePelvisTone(self.pelvisTone, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -581,7 +581,7 @@ class DetailModelingTaskView(gui3d.TaskView):
                 
         @self.pelvisToneSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'PelvisTone', value, self.syncSliders))
             self.pelvisTone = None
             
@@ -592,7 +592,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.stomachSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.stomach == None:
                     self.stomach = human.getStomach()
                 human.updateStomach(self.stomach, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -600,7 +600,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         @self.stomachSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Stomach', value, self.syncSliders))
             self.stomach = None
             
@@ -611,7 +611,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         @self.buttocksSlider.event
         def onChanging(value):
             if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.scene3d.selectedHuman
+                human = self.app.selectedHuman
                 if self.buttocks == None:
                     self.buttocks = human.getButtocks()
                 human.updateButtocks(self.buttocks, value, self.app.settings.get('realtimeNormalUpdates', True))
@@ -619,7 +619,7 @@ class DetailModelingTaskView(gui3d.TaskView):
                 
         @self.buttocksSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(DetailAction(human, 'Buttocks', value, self.syncSliders))
             self.buttocks = None
             
@@ -673,18 +673,18 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.rightSymmetryButton.event
         def onClicked(event):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.applySymmetryRight()
 
         @self.leftSymmetryButton.event
         def onClicked(event):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.applySymmetryLeft()
 
         @self.symmetryButton.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.symmetryButton, event)
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
             self.parent.tasksByName['Micro modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
 
@@ -699,7 +699,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         gui3d.TaskView.onHide(self, event)
 
     def syncSliders(self):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         self.genitalsSlider.setValue(human.getGenitals())
         self.breastSizeSlider.setValue(human.getBreastSize())
         self.breastFirmnessSlider.setValue(human.getBreastFirmness())
@@ -748,18 +748,18 @@ class MicroModelingTaskView(gui3d.TaskView):
         
         @self.rightSymmetryButton.event
         def onClicked(event):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.applySymmetryRight()
 
         @self.leftSymmetryButton.event
         def onClicked(event):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.applySymmetryLeft()
 
         @self.symmetryButton.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.symmetryButton, event)
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
             self.parent.tasksByName['Detail modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
 

@@ -74,7 +74,7 @@ class EthnicMapButton(gui3d.RadioButton):
             t.start()
 
     def onMouseDown(self, event):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         if self.selected:
             faceGroupSel = self.app.scene3d.getSelectedFacesGroup()
             faceGroupName = faceGroupSel.name
@@ -100,7 +100,7 @@ class EthnicMapButton(gui3d.RadioButton):
         pass
 
     def syncEthnics(self):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         ethnics = human.targetsEthnicStack
 
     # Calculate the ethnic target value, and store it in dictionary
@@ -143,7 +143,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         
         @self.genderSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(MacroAction(human, 'Gender', value, self.syncSliders,False))
             self.syncStatus()
             if human.hairObj:
@@ -156,7 +156,7 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         @self.ageSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(MacroAction(human, 'Age', value, self.syncSliders,False))
             self.syncStatus()
             if human.hairObj:
@@ -168,19 +168,19 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         @self.muscleSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(MacroAction(human, 'Muscle', value, self.syncSliders))
             self.syncStatus()
 
         @self.weightSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             self.app.do(MacroAction(human, 'Weight', value, self.syncSliders))
             self.syncStatus()
 
         @self.heightSlider.event
         def onChange(value):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             before = {}
             before['data/targets/macrodetails/universal-stature-dwarf.target'] = human.getDetail('data/targets/macrodetails/universal-stature-dwarf.target')
             before['data/targets/macrodetails/universal-stature-giant.target'] = human.getDetail('data/targets/macrodetails/universal-stature-giant.target')
@@ -201,7 +201,7 @@ class MacroModelingTaskView(gui3d.TaskView):
             #self.app.categories["Library"].tasksByName["Hair"].adjustHairObj(human.hairObj, human.meshData)
             human.meshData.update()
             if human.hairObj : human.hairObj.update()
-            #self.app.scene3d.redraw(True)
+            #self.app.redraw()
 
 
     # Ethnic controls
@@ -248,7 +248,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.syncStatus()
 
     def syncSliders(self):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         self.genderSlider.setValue(human.getGender())
         self.ageSlider.setValue(human.getAge())
         self.muscleSlider.setValue(human.getMuscle())
@@ -264,7 +264,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         pass
 
     def syncStatus(self):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         status = ''
         if abs(human.getGender() - 0.5) < 0.01:
             gender = 'Gender: neutral, '

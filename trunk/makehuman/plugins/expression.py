@@ -43,19 +43,19 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         
 class ExpressionSlider(gui3d.Slider):
     def __init__(self, parent, y, label, detail):
-        human = parent.app.scene3d.selectedHuman
+        human = parent.app.selectedHuman
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = human.getDetail(detail), label=label)
         self.target = getTarget(human.meshData, detail)
         self.before = None
     
     def onChange(self, value):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         self.app.do(Action(human, self.target.name, self.before, value, self.update))
         self.before = None
         
     def onChanging(self, value):
         if self.app.settings.get('realtimeUpdates', True):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             if self.before is None:
                 self.before = human.getDetail(self.target.name)
             self.target.apply(human.meshData, -human.getDetail(self.target.name), False, False)
@@ -64,7 +64,7 @@ class ExpressionSlider(gui3d.Slider):
                 self.app.settings.get('realtimeNormalUpdates', True))
         
     def update(self):
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         self.setValue(human.getDetail(self.target.name))
 
 class ExpressionTaskView(gui3d.TaskView):
@@ -72,7 +72,7 @@ class ExpressionTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Expression')
 
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
         
         expressions = [
             ('smile1', ['smile', 'hopeful', 'innocent']),

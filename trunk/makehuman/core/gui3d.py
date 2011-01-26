@@ -413,16 +413,30 @@ class Application(events3d.EventHandler):
         self.focusGroup = None
         self.mouseDownObject = None
         self.enteredObject = None
+        
+        mh.setMouseDownCallback(self.mouseDown)
+        mh.setMouseUpCallback(self.mouseUp)
+        mh.setMouseMovedCallback(self.mouseMoved)
+        mh.setKeyDownCallback(self.keyDown)
+        mh.setKeyUpCallback(self.keyUp)
 
-        self.scene3d.startWindow()
+        mh.startWindow(0)
+        
+    def started(self):
+        self.callEvent('onStart', None)
 
-    def start(self):
-
-        self.scene3d.startEventLoop()
+    def run(self):
+        mh.callAsync(self.started)
+        mh.startEventLoop()
 
     def stop(self):
+        mh.shutDown()
         
-        self.scene3d.shutdown()
+    def redraw(self):
+        mh.redraw(1)
+        
+    def redrawNow(self):
+        mh.redraw(0)
 
     def isVisible(self):
         return True
@@ -505,9 +519,7 @@ class Application(events3d.EventHandler):
         else:
 
             # Build event
-
-            mousePos = self.scene3d.getMousePos2D()
-            event = events3d.MouseEvent(button, mousePos[0], mousePos[1])
+            event = events3d.MouseEvent(button, x, y)
 
             # Get picked object
 
@@ -534,9 +546,7 @@ class Application(events3d.EventHandler):
             return
 
         # Build event
-
-        mousePos = self.scene3d.getMousePos2D()
-        event = events3d.MouseEvent(button, mousePos[0], mousePos[1])
+        event = events3d.MouseEvent(button, x, y)
 
         # Get picked object
         
@@ -548,20 +558,15 @@ class Application(events3d.EventHandler):
             if self.mouseDownObject is object.object:
                 self.mouseDownObject.callEvent('onClicked', event)
 
-    def mouseMove(self, mouseState, x, y, xRel, yRel):
-
+    def mouseMoved(self, mouseState, x, y, xRel, yRel):
+        
         # Build event
-
-        mousePos = self.scene3d.getMousePos2D()
-        mouseDiff = self.scene3d.getMouseDiff()
-        event = events3d.MouseEvent(self.scene3d.mouseState, mousePos[0], mousePos[1], mouseDiff[0], mouseDiff[1])
+        event = events3d.MouseEvent(mouseState, x, y, xRel, yRel)
 
         # Get picked object
 
         picked = self.scene3d.getPickedObject()
         if not picked:
-
-        # self.scene3d.redraw()
 
             return
         group = object = picked[0]
@@ -570,7 +575,7 @@ class Application(events3d.EventHandler):
         event.object = object
         event.group = group
 
-        if self.scene3d.mouseState:
+        if mouseState:
             if self.mouseDownObject:
                 self.mouseDownObject.callEvent('onMouseDragged', event)
         else:
@@ -586,7 +591,6 @@ class Application(events3d.EventHandler):
 
         # Mouse wheel events, like key events are sent to the focus view
 
-        mousePos = self.scene3d.getMousePos2D()
         event = events3d.MouseWheelEvent(wheelDelta)
         if self.focusView:
             self.focusView.callEvent('onMouseWheel', event)
@@ -618,7 +622,7 @@ class Application(events3d.EventHandler):
                             child.setFocus()
                             break
                         index = index + 1 if index < len(self.focusView.parent.children) - 1 else 0
-                self.scene3d.redraw()
+                self.redraw()
                 return
         event = events3d.KeyEvent(key, character, modifiers)
         if self.focusView:
@@ -785,16 +789,10 @@ class Button(View):
         This is the constructor for the Button class. It takes the following parameters:
 
         - **parent**: *View*. The parent view.
-        - **mesh**: *String*. The button object.
-        - **texture**: *String*. The button texture.
-        - **selectedTexture**: *String*. The selected button texture.
-        - **focusedTexture**: *String*. The focused button texture.
         - **position**: *List*. The button position.
-        - **selected**: *bool*. The button selected state.
         - **label**: *String*. The button label.
-        - **width**: *Float*. The button width.
-        - **height**: *Float*. The button width.
-        - **fontSize**: *Float*. The button label font size.
+        - **selected**: *bool*. The button selected state.
+        - **style**: *Style*. The button style.
         """
         
         View.__init__(self, parent)
@@ -851,7 +849,7 @@ class Button(View):
     def onKeyDown(self, event):
         if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
             self.setSelected(True)
-            self.app.scene3d.redraw()
+            self.app.redraw()
         else:
             View.onKeyDown(self, event)
 
@@ -859,7 +857,7 @@ class Button(View):
         if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
             self.setSelected(False)
             self.callEvent('onClicked', event)
-            self.app.scene3d.redraw()
+            self.app.redraw()
 
     def setSelected(self, selected):
         if self.selected != selected:
@@ -913,14 +911,10 @@ class RadioButton(Button):
 
         - **parent**: *View*. The parent view.
         - **group**: *List*. The radio button group.
-        - **mesh**: *String*. The button object.
-        - **texture**: *String*. The button texture.
-        - **selectedTexture**: *String*. The selected button texture.
-        - **focusedTexture**: *String*. The focused button texture.
-        - **position**: *List*. The button position.
-        - **selected**: *bool*. The button selected state.
-        - **label**: *String*. The button label.
-        - **fontSize**: *Float*. The button label font size.
+        - **position**: *List*. The radio button position.
+        - **label**: *String*. The radio button label.
+        - **selected**: *bool*. The radio button selected state.
+        - **style**: *Style*. The radio button style.
         """
         
         Button.__init__(self, parent, position, label, selected, style)
@@ -965,15 +959,10 @@ class ToggleButton(Button):
         This is the constructor for the ToggleButton class. It takes the following parameters:
 
         - **parent**: *View*. The parent view.
-        - **group**: *List*. The radio button group.
-        - **mesh**: *String*. The button object.
-        - **texture**: *String*. The button texture.
-        - **selectedTexture**: *String*. The selected button texture.
-        - **focusedTexture**: *String*. The focused button texture.
-        - **position**: *List*. The button position.
-        - **selected**: *bool*. The button selected state.
-        - **label**: *String*. The button label.
-        - **fontSize**: *Float*. The button label font size.
+        - **position**: *List*. The toggle button position.
+        - **label**: *String*. The toggle button label.
+        - **selected**: *bool*. The toggle button selected state.
+        - **style**: *Style*. The toggle button style.
         """
 
         Button.__init__(self, parent, position, label, selected, style)
@@ -1010,6 +999,16 @@ CheckBoxStyle = Style(**{
 class CheckBox(ToggleButton):
     
     def __init__(self, parent, position, label=None, selected=False, style=CheckBoxStyle):
+        
+        """
+        This is the constructor for the CheckBox class. It takes the following parameters:
+
+        - **parent**: *View*. The parent view.
+        - **position**: *List*. The checkBox position.
+        - **label**: *String*. The checkBox label.
+        - **selected**: *bool*. The checkBox selected state.
+        - **style**: *Style*. The checkBox style.
+        """
         
         Button.__init__(self, parent, position, label, selected, style)
 
@@ -1063,7 +1062,7 @@ class ProgressBar(View):
 
         self.bar.mesh.setScale(progress, 1.0, 1.0)
         if redraw:
-            self.app.scene3d.redraw(0)
+            self.app.redrawNow()
 
 
 # TextView widget
@@ -1207,7 +1206,7 @@ class TextEdit(View):
             self.__addText(event.character)
 
         self.__updateTextObject()
-        self.app.scene3d.redraw()
+        self.app.redraw()
 
     def onFocus(self, event):
         if self.focusedTexture:
@@ -1249,6 +1248,7 @@ class FileEntryView(View):
 
         if event.key == events3d.SDLK_RETURN:
             self.onFileSelected(self.edit.getText())
+            self.app.redraw()
                 
     def onFocus(self, event):
         self.edit.setFocus()
@@ -1284,14 +1284,14 @@ class FileChooser(View):
         self.nextFileAnimation.append(animation3d.ScaleAction(self.currentFile.mesh, [1.5, 1.5, 1.5], [1.0, 1.0, 1.0]))
         self.nextFileAnimation.append(animation3d.PathAction(self.nextFile.mesh, [self.nextPos, self.currentPos]))
         self.nextFileAnimation.append(animation3d.ScaleAction(self.nextFile.mesh, [1.0, 1.0, 1.0], [1.5, 1.5, 1.5]))
-        self.nextFileAnimation.append(animation3d.UpdateAction(self.app.scene3d))
+        self.nextFileAnimation.append(animation3d.UpdateAction(self.app))
 
         self.previousFileAnimation = animation3d.Timeline(0.25)
         self.previousFileAnimation.append(animation3d.PathAction(self.previousFile.mesh, [self.previousPos, self.currentPos]))
         self.previousFileAnimation.append(animation3d.ScaleAction(self.previousFile.mesh, [1.0, 1.0, 1.0], [1.5, 1.5, 1.5]))
         self.previousFileAnimation.append(animation3d.PathAction(self.currentFile.mesh, [self.currentPos, self.nextPos]))
         self.previousFileAnimation.append(animation3d.ScaleAction(self.currentFile.mesh, [1.5, 1.5, 1.5], [1.0, 1.0, 1.0]))
-        self.previousFileAnimation.append(animation3d.UpdateAction(self.app.scene3d))
+        self.previousFileAnimation.append(animation3d.UpdateAction(self.app))
 
         @self.previousFile.event
         def onClicked(event):
@@ -1371,7 +1371,7 @@ class FileChooser(View):
               self.nextFile.clearTexture()
               self.nextFile.hide()
 
-        self.app.scene3d.redraw()
+        self.app.redraw()
 
     def onKeyDown(self, event):
         if event.modifiers & events3d.KMOD_CTRL:
@@ -1418,7 +1418,7 @@ class FileChooser(View):
         self.nextFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile + 1]))
         self.nextFile.show()
 
-        self.app.scene3d.redraw()
+        self.app.redraw()
 
     def goNext(self):
         if self.selectedFile + 1 == len(self.files):
@@ -1454,7 +1454,7 @@ class FileChooser(View):
             self.nextFile.clearTexture()
             self.nextFile.hide()
 
-        self.app.scene3d.redraw()
+        self.app.redraw()
         
 GroupBoxStyle = Style(**{
     'width':128,
@@ -1516,7 +1516,7 @@ class ShortcutEdit(View):
             
     def setShortcut(self, shortcut):
         self.label.setText(self.shortcutToLabel(shortcut[0], shortcut[1]))
-        self.app.scene3d.redraw()
+        self.app.redraw()
         
     def canFocus(self):
         return True
@@ -1535,7 +1535,7 @@ class ShortcutEdit(View):
         print event.key, event.character, event.modifiers
             
         self.label.setText(self.shortcutToLabel(event.modifiers, event.key))
-        self.app.scene3d.redraw()
+        self.app.redraw()
         
         if event.key not in [events3d.SDLK_RCTRL, events3d.SDLK_LCTRL, events3d.SDLK_RALT, events3d.SDLK_LALT]:
             m = 0

@@ -1158,17 +1158,6 @@ class Scene3D:
         self.objects = []
         self.faceGroupColorID = {}
         self.colorID = 0
-        self.sceneTimerCallback = None
-        self.keyboardEventsDict = {}
-        self.keyPressed = None
-        self.characterPressed = None
-        self.mouseState = 0
-        self.mouseX = 0
-        self.mouseY = 0
-        self.mouseXRel = 0
-        self.mouseYRel = 0
-
-        self.selectedHuman = None
 
     def __str__(self):
         """
@@ -1282,20 +1271,8 @@ class Scene3D:
 
         """
 
-        #a = time.time()
-
-        #nObjs = len(self.objects)
-
-        # self.colorID = 0  # reset the colors selection ID
-
-        # mh.world[:] = []
-
-        # Send all
-
         for obj in self.objects:
             self.attach(obj)
-
-        #print 'Regeneration done in %f' % (time.time() - a)
 
     def reloadTextures(self):
         print 'Reloading textures'
@@ -1304,88 +1281,6 @@ class Scene3D:
                 textureCache[path].loadImage(path)
             except RuntimeError, text:
                 print text
-
-    def setTimeTimer(self, millisecs):
-        """
-        This method calls the setTimeTimer method on the mh Python class to 
-        set the timer in the C code for the timer event.
-        
-        Parameters
-        ----------
-
-        millisecs:
-            *int* The number of milliseconds until the next timer event is triggered.
-
-        """
-
-        mh.setTimeTimer(millisecs)
-
-    def timerFunc(self):
-        """
-        This method calls the 'idle' callback function registered against
-        the scene3D object if such a callback function has been defined.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        if self.sceneTimerCallback:
-            self.sceneTimerCallback()
-            
-    def startFunc(self):
-
-        self.application.callEvent('onStart', None)
-
-    def getMousePos2D(self):
-        """
-        This method returns the x and y mouse position in screen 
-        coordinates as 2 integer values.
-        It calls the getMousePos2D function on the 'mh' module 
-        (a module created dynamically at run time by main.c) to retrieve the 
-        x and y coordinates of the mouse position from global variables updated 
-        before an event was passed up to the Python code. The mouse position is
-        returned as two integer values defining the screen coordinates measured 
-        from the top-left corner of the screen (the MakeHuman OpenGL viewport).
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        return [self.mouseX, self.mouseY]
-
-        # return mh.getMousePos2D()
-
-    def getMousePos3D(self):
-        """
-        This method returns the x, y, z mouse position in scene coordinates as 
-        3 float values.
-        It calls the getMousePos3D function on the 'mh' module 
-        (a module created dynamically at run time by main.c) to retrieve the 
-        x, y and z coordinates of the mouse position from global variables updated 
-        before an event was passed up to the Python code. The mouse position is
-        returned as three float values defining the scene coordinates measured 
-        from the OpenGL origin.
-
-        **Parameters:** This method has no parameters.
-        """
-
-        return mh.cameras[0].convertToWorld2D(mh.getMousePos2D())
-
-    def getMousePosGUI(self):
-        """
-        This method returns the x, y, z mouse position in GUI coordinates as 
-        3 float values.
-        It calls the getMousePosGUI function on the 'mh' module 
-        (a module created dynamically at run time by main.c) to retrieve the 
-        x, y and z coordinates of the mouse position from global variables updated 
-        before an event was passed up to the Python code. The mouse position is
-        returned as three float values defining the GUI coordinates measured 
-        from the OpenGL origin.
-
-        **Parameters:** This method has no parameters.
-        """
-
-        return mh.getMousePosGUI()
 
     def getWindowSize(self):
         """
@@ -1400,111 +1295,6 @@ class Scene3D:
         """
 
         return mh.getWindowSize()
-
-    def mouseButtonDown(self, button, x, y):
-        """
-        This method processes a 'mouseButtonDown' event for this Scene3D
-        object.
-        It passes the event to the application object.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        self.mouseX = x
-        self.mouseY = y
-
-        self.application.mouseDown(button, x, y)
-
-    def mouseButtonUp(self, button, x, y):
-        """
-        This method processes a 'mouseButtonUp' event for this Scene3D
-        object.
-        It passes the event to the application object.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        self.mouseX = x
-        self.mouseY = y
-
-        self.application.mouseUp(button, x, y)
-
-    def mouseMotion(self, mouseState, x, y, xRel, yRel):
-        """
-        This method processes a 'mouseMotion' event for this Scene3D
-        object. Depending on the state of the mouse buttons, it is
-        It passes the event to the application object.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        self.mouseState = mouseState
-        self.mouseX = x
-        self.mouseY = y
-        self.mouseXRel = xRel
-        self.mouseYRel = yRel
-
-        self.application.mouseMove(mouseState, x, y, xRel, yRel)
-
-    def keyDown(self, key, character, modifiers):
-        """
-        This method processes a 'keyDown' event for this Scene3D
-        object.
-        It passes the event to the application object.
-
-        Parameters
-        ----------
-
-        key:
-            *int* The key pressed.
-        character:
-            *string* A single character string containing the key pressed.
-        modifiers:
-            *int* The modifier flags.
-
-        """
-
-        # print("keyDown %d %s %d" % (key, character, modifiers))
-
-        self.keyPressed = key
-        self.characterPressed = character
-        self.application.keyDown(key, character, modifiers)
-
-    def keyUp(self, key, character, modifiers):
-        """
-        This method processes a 'keyUp' event for this Scene3D
-        object.
-        It passes the event to the application object.
-
-        Parameters
-        ----------
-
-        key:
-            *int* The key pressed.
-        character:
-            *string* A single character string containing the key pressed.
-        modifiers:
-            *int* The modifier flags.
-
-        """
-
-        # print("keyUp %d %s %d" % (key, character, modifiers))
-
-        self.application.keyUp(key, character, modifiers)
-
-    def shutdown(self):
-        """
-        This method processes a 'shutdown' event for this Scene3D
-        object by calling the C shutdown function.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        mh.shutDown()
 
     def getObject(self, name):
         """
@@ -1558,33 +1348,6 @@ class Scene3D:
             if obj.isSelected:
                 obj.isSelected = None
                 break
-
-    def startWindow(self, useIdle=0):
-        """
-        This method opens a Window with a graphical context and is part of the
-        application launch sequence.
-
-        Parameters
-        ----------
-
-        useIdle:
-            *int*. An indicator that determines whether idle time will be used 
-            (whether to use timer based events).
-
-        """
-
-        mh.startWindow(useIdle)
-
-    def startEventLoop(self):
-        """
-        This method starts the event loop is part of the
-        application launch sequence.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        mh.startEventLoop()
 
     def grabScreen(self, x, y, width, height, filename):
         """
@@ -1774,44 +1537,6 @@ class Scene3D:
             groupSelected = None
         return groupSelected
 
-    def getMouseDiff(self):
-        """
-        This method retrieves the difference between the last registered mouse
-        position and the current mouse position. This is used during events that
-        need to track mouse movements, such as scaling, moving and rotating the
-        camera. The mouse movement is returned as a list of 2 integer values
-        representing the X and Y displacements of the mouse in pixels.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        return [self.mouseXRel, self.mouseYRel]
-
-    def getKeyModifiers(self):
-        """
-        This method returns the state of modifiers keys (CTRL, ALT, SHIFT).
-        The returned value is:
-
-        - 0 = no modifier pressed
-        - 1 = left shift key
-        - 2 = right shift key
-        - 64 = left ctrl key
-        - 128 = right ctrl key
-        - 256 = left alt key
-        - 512 = right alt key
-        - 1024 = left meta key
-        - 2048 = right meta key
-        - 4096 = num key
-        - 8192 = caps key
-        - 16384 = mode key
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        return mh.getKeyModifiers()
-
     def getPickedObject(self):
         """
         This method determines whether a FaceGroup or a non-selectable zone has been
@@ -1869,23 +1594,7 @@ class Scene3D:
 
             pickedObj.isSelected = 1
             pickedObj.faceGroupSelected = pickedInfo[0]
-        self.redraw()
-
-    def redraw(self, async=1):
-        """
-        This method redraws the scene. This should be used wherever possible to avoid
-        unnecessary calls to the update method, as this method's performance is far better.
-        For example, this method should be called to show vertices that have been modified.
-
-        Parameters
-        ----------
-
-        name:
-            *async*. If 1, draws asynchronous, if 0 draws synchronous.
-        """
-
-        mh.redraw(async)
-
+        mh.redraw(1)
 
 # Draws a Quad
 # TODO: account for world2local and viceversa

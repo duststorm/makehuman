@@ -17,7 +17,7 @@ class RandomTaskView(gui3d.TaskView):
         
         @self.create.event
         def onClicked(event):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.resetMeshValues()
             
             if self.macro.selected:
@@ -35,7 +35,7 @@ class RandomTaskView(gui3d.TaskView):
             
         @self.modify.event
         def onClicked(event):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             
             if self.macro.selected:
                 human.setGender(human.getGender() + random.random() - 0.5)
@@ -94,7 +94,7 @@ class RandomTaskView(gui3d.TaskView):
         
     def loadEthnic(self, filename):
         
-        human = self.app.scene3d.selectedHuman
+        human = self.app.selectedHuman
 
         human.load(os.path.join('data/models/ethnics', filename), self.app.progress)
         human.setDetail(os.path.join('data/models/ethnics', filename.replace('.mhm', '.target')), 1.0)
@@ -106,7 +106,6 @@ class RandomTaskView(gui3d.TaskView):
         self.app.categories['Files'].tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
 
         #self.app.switchCategory('Modelling')
-        #self.app.scene3d.redraw(1)
 
 def load(app):
     category = app.getCategory('Experiments')

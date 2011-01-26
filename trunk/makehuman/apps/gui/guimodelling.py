@@ -61,13 +61,12 @@ class ModellingCategory(gui3d.Category):
         
         self.background = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
 
-        hairTexture = self.app.scene3d.selectedHuman.hairFile.replace('.hair', '.png')
+        hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
         self.currentHair = gui3d.Button(self, [600, 580, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
 
         @self.currentHair.event
         def onClicked(event):
             self.app.switchCategory('Library')
-            self.app.scene3d.redraw(1)
 
         self.backgroundImage = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, 1], visible=False)
         self.backgroundImageToggle = gui3d.ToggleButton(self, [15, 514, 9.1], 'Bkg',
@@ -84,7 +83,6 @@ class ModellingCategory(gui3d.Category):
             else:
                 self.app.switchCategory('Library')
                 self.app.switchTask('Background')
-            self.app.scene3d.redraw(1)
             
         self.anaglyphsButton = gui3d.ToggleButton(self, [51, 514, 9.1], '3D',
             style=gui3d.ButtonStyle._replace(width=32, height=16))
@@ -92,7 +90,7 @@ class ModellingCategory(gui3d.Category):
         @self.anaglyphsButton.event
         def onClicked(event):
             self.app.toggleStereo()
-            self.anaglyphsButton.selected = mh.cameras[0].stereoMode
+            self.anaglyphsButton.setSelected(mh.cameras[0].stereoMode != 0)
             
         self.wireButton = gui3d.ToggleButton(self, [87, 514, 9.1], 'Wire',
             style=gui3d.ButtonStyle._replace(width=32, height=16))
@@ -100,7 +98,7 @@ class ModellingCategory(gui3d.Category):
         @self.wireButton.event
         def onClicked(event):
             self.app.toggleSolid()
-            self.wireButton.selected = self.app.selectedHuman.mesh.solid
+            self.wireButton.setSelected(self.app.selectedHuman.mesh.solid == 0)
         
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)

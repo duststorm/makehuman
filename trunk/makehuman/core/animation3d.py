@@ -271,11 +271,11 @@ class ScaleAction(Action):
 
 class UpdateAction(Action):
 
-    def __init__(self, scene):
-        self.scene = scene
+    def __init__(self, app):
+        self.app = app
 
     def set(self, alpha):
-        self.scene.redraw(0)
+        self.app.redrawNow()
 
 
 class Timeline:

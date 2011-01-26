@@ -1025,9 +1025,6 @@ void mhMouseButtonDown(int b, int x, int y)
     SDL_WM_GrabInput(SDL_GRAB_ON);
 #endif
 
-    // Calculate 3d positions
-    mhGetPickedCoords(x,y);
-
     // Check which object/group was hit
     if (b != 4 && b != 5)
         mhGetPickedColor(x, y);
@@ -1068,10 +1065,6 @@ void mhMouseButtonUp(int b, int x, int y)
 #ifdef __WIN32__
     SDL_WM_GrabInput(SDL_GRAB_OFF);
 #endif
-    //SDL_WarpMouse(g_savedx, g_savedy);
-
-    // Calculate 3d positions
-    mhGetPickedCoords(x,y);
 
     // Check which object/group was hit
     if (b != 4 && b != 5)
@@ -1109,9 +1102,6 @@ void mhMouseButtonUp(int b, int x, int y)
  */
 void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
 {
-    // Calculate 3d positions
-    mhGetPickedCoords(x,y);
-
     // Check which object/group was hit
     if (!s)
         mhGetPickedColor(x, y);
@@ -1122,33 +1112,6 @@ void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
     // Update screen
     if (s)
         mhQueueUpdate();
-}
-
-/** \brief Retrieve the object coordinates for the specified window coordinates.
- *  \param x an int specifying the horizontal position in the image plane (in pixels).
- *  \param y an int specifying the vertical position in the image plane (in pixels).
- *
- *  This function retrieves the object coordinates corresponding to the
- *  window coordinates passed in as parameters.
- *
- */
-void mhGetPickedCoords(int x, int y)
-{
-    double modelview[16], projection[16];
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    /*Getting mouse 3D coords on the GUI plane, using a fixed z value.
-    Assuming we use a 3D cursor in scene, with coords (x,y,9.5).
-    Using glPerspective clip planes near = 0.1 and far = 100,
-    the z coord = 9.5 is normalized to 0.800801. So we use this fixed
-    precalculated value.
-    */
-    mhCameraPosition((Camera*)PyList_GetItem(G.cameras, 1), 0);/*Applying GUI matrix*/
-    glGetDoublev(GL_PROJECTION_MATRIX, projection);
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-    gluUnProject(x, viewport[3]-y, 0.800801f, modelview,
-                 projection, viewport, &G.mouseGUIX, &G.mouseGUIY, &G.mouseGUIZ);
 }
 
 static unsigned char *pickingBuffer = NULL;
@@ -1951,7 +1914,7 @@ void mhSetFullscreen(int fullscreen)
     g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
     OnInit();
     mhReshape(G.windowWidth, G.windowHeight);
-    callReloadTextures();
+    callResize(G.windowWidth, G.windowHeight);
     mhDraw();
 }
 
@@ -2046,17 +2009,6 @@ void mhCreateWindow(int useTimer)
     OnInit();
     mhReshape(G.windowWidth, G.windowHeight);
     mhDraw();
-
-    {
-      SDL_Event event;
-
-      event.type = SDL_USEREVENT;
-      event.user.code = 1;
-      event.user.data1 = NULL;
-      event.user.data2 = NULL;
-
-      SDL_PushEvent(&event);
-    }
 }
 
 
@@ -2108,11 +2060,9 @@ void mhEventLoop(void)
             }
             break;
         case SDL_KEYDOWN:
-            G.modifiersKeyState = event.key.keysym.mod;
             mhKeyDown(event.key.keysym.sym, event.key.keysym.unicode, event.key.keysym.mod);
             break;
         case SDL_KEYUP:
-            G.modifiersKeyState = event.key.keysym.mod;
             if (event.key.keysym.sym == SDLK_F11 || (event.key.keysym.sym == SDLK_RETURN && event.key.keysym.mod & KMOD_ALT))
                 mhSetFullscreen(!G.fullscreen); // Switch fullscreen
             else
@@ -2137,14 +2087,16 @@ void mhEventLoop(void)
             mhMouseButtonUp(event.button.button, event.button.x, event.button.y);
             break;
         case SDL_USEREVENT:
-            if (event.user.code == 0)
+            switch (event.user.code)
             {
+            case 0:
               callTimerFunct();
               G.pendingTimer = 0;
-            }
-            else if (event.user.code == 1)
-            {
-              callStartFunct();
+              break;
+            case 1:
+              PyObject_CallFunction((PyObject*)event.user.data1, "");
+              Py_DECREF((PyObject*)event.user.data1);
+              break;
             }
             break;
         case SDL_VIDEORESIZE:
@@ -2153,7 +2105,7 @@ void mhEventLoop(void)
             g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
             OnInit();
             mhReshape(event.resize.w, event.resize.h);
-            callReloadTextures();
+            callResize(event.resize.w, event.resize.h);
             mhDraw();
             break;
         case SDL_VIDEOEXPOSE:

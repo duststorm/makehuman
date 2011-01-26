@@ -572,31 +572,8 @@ int Object3D_setScale(Object3D *self, PyObject *value)
  */
 void callTimerFunct(void)
 {
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
-    if (!(v = PyObject_CallMethod(mainScene, "timerFunc", "")))
-        PyErr_Print();
-    else
-        Py_DECREF(v);
-}
-
-/** \brief Invokes the Python timer function.
- *
- *  This function invokes the Python startFunc function when the SDL
- *  module detects idle time between mouse and keyboard events.
- */
-void callStartFunct(void)
-{
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
-    if (!(v = PyObject_CallMethod(mainScene, "startFunc", "")))
-        PyErr_Print();
-    else
-        Py_DECREF(v);
+  if (G.timerCallback && !PyObject_CallFunction(G.timerCallback, ""))
+    PyErr_Print();
 }
 
 /** \brief Invokes the Python mouseButtonDown function.
@@ -609,14 +586,8 @@ void callStartFunct(void)
  */
 void callMouseButtonDown(int b, int x, int y)
 {
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
-    if (!(v = PyObject_CallMethod(mainScene, "mouseButtonDown", "iii", b, x, y)))
-        PyErr_Print();
-    else
-        Py_DECREF(v);
+  if (G.mouseDownCallback && !PyObject_CallFunction(G.mouseDownCallback, "iii", b, x, y))
+    PyErr_Print();
 }
 
 /** \brief Invokes the Python mouseButtonUp function.
@@ -629,14 +600,8 @@ void callMouseButtonDown(int b, int x, int y)
  */
 void callMouseButtonUp(int b, int x, int y)
 {
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
-    if (!(v = PyObject_CallMethod(mainScene, "mouseButtonUp", "iii", b, x, y)))
-        PyErr_Print();
-    else
-        Py_DECREF(v);
+  if (G.mouseUpCallback && !PyObject_CallFunction(G.mouseUpCallback, "iii", b, x, y))
+    PyErr_Print();
 }
 
 /** \brief Invokes the Python mouseMotion function.
@@ -653,14 +618,8 @@ void callMouseButtonUp(int b, int x, int y)
  */
 void callMouseMotion(int s, int x, int y, int xrel, int yrel)
 {
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
-    if (!(v = PyObject_CallMethod(mainScene, "mouseMotion", "iiiii", s, x, y, xrel, yrel)))
-        PyErr_Print();
-    else
-        Py_DECREF(v);
+  if (G.mouseMovedCallback && !PyObject_CallFunction(G.mouseMovedCallback, "iiiii", s, x, y, xrel, yrel))
+    PyErr_Print();
 }
 
 /** \brief Invokes the Python keyDown function.
@@ -672,46 +631,30 @@ void callMouseMotion(int s, int x, int y, int xrel, int yrel)
  */
 void callKeyDown(int key, unsigned short character, int modifiers)
 {
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
+    if (G.keyDownCallback &&
 #ifdef __WIN32__
-    if (!(v = PyObject_CallMethod(mainScene, "keyDown", "iu#i", key, &character, 1, modifiers)))
+    !PyObject_CallFunction(G.keyDownCallback, "iu#i", key, &character, 1, modifiers))
 #else
-    if (!(v = PyObject_CallMethod(mainScene, "keyDown", "ici", key, key, modifiers)))
+    !PyObject_CallFunction(G.keyDownCallback, "ici", key, key, modifiers))
 #endif
-        PyErr_Print();
-    else
-        Py_DECREF(v);
+    PyErr_Print();
 }
 
 void callKeyUp(int key, unsigned short character, int modifiers)
 {
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
+  if (G.keyUpCallback &&
 #ifdef __WIN32__
-    if (!(v = PyObject_CallMethod(mainScene, "keyUp", "iu#i", key, &character, 1, modifiers)))
+    !PyObject_CallFunction(G.keyUpCallback, "iu#i", key, &character, 1, modifiers))
 #else
-    if (!(v = PyObject_CallMethod(mainScene, "keyUp", "ici", key, key, modifiers)))
+    !PyObject_CallFunction(G.keyUpCallback, "ici", key, key, modifiers))
 #endif
-        PyErr_Print();
-    else
-        Py_DECREF(v);
+    PyErr_Print();
 }
 
-void callReloadTextures(void)
+void callResize(int w, int h)
 {
-    PyObject *main_module = PyImport_AddModule("__main__");
-    PyObject *global_dict = PyModule_GetDict(main_module);
-    PyObject *mainScene = PyDict_GetItemString(global_dict, "mainScene");
-    PyObject *v;
-    if (!(v = PyObject_CallMethod(mainScene, "reloadTextures", "")))
-        PyErr_Print();
-    else
-        Py_DECREF(v);
+  if (G.resizeCallback && !PyObject_CallFunction(G.resizeCallback, "ii", w, h))
+    PyErr_Print();
 }
 
 void setClearColor(float r, float g, float b, float a)

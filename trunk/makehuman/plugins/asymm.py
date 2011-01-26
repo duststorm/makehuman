@@ -53,7 +53,7 @@ class AsymmTaskView(gui3d.TaskView):
                 self.asymmTargets.append(os.path.join(self.asymmDataPath, f))
 
         #The human mesh
-        self.human = self.app.scene3d.selectedHuman
+        self.human = self.app.selectedHuman
 
         #Random factor from Slider
         self.randomVal = 0.5

@@ -25,7 +25,7 @@ class SettingsTaskView(gui3d.TaskView):
         @self.shaderNo.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderNo, event)
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.mesh.setShader(0)
             
         @self.shaderPhong.event
@@ -42,8 +42,8 @@ class SettingsTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderSkin, event)
             self.setShader("data/shaders/glsl/skin_vertex_shader.txt", "data/shaders/glsl/skin_fragment_shader.txt")
-            self.app.scene3d.selectedHuman.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
-            self.app.scene3d.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/female_young.tif", 0))
+            self.app.selectedHuman.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
+            self.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/female_young.tif", 0))
                 
         @self.realtimeUpdates.event
         def onClicked(event):
@@ -56,7 +56,7 @@ class SettingsTaskView(gui3d.TaskView):
             self.app.settings['realtimeNormalUpdates'] = self.realtimeNormalUpdates.selected
                 
     def setShader(self, vertex, fragment):
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             try:
                 human.vertex_shader = mh.createVertexShader(open(vertex).read())
                 human.fragment_shader = mh.createFragmentShader(open(fragment).read())

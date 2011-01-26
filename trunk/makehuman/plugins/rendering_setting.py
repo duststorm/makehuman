@@ -21,7 +21,7 @@ class RenderingSettingTaskView(gui3d.TaskView):
         self.randomHair= gui3d.Slider(self, position=[10, 400, 9.3], value=0.04, min=0.0, max=0.5, label = "Randomness: 0.04")
 
 
-        self.human = self.app.scene3d.selectedHuman
+        self.human = self.app.selectedHuman
 
         @self.clumpRadius.event
         def onChanging(value):

@@ -70,11 +70,10 @@ class SaveTaskView(gui3d.TaskView):
 
             # Save the model
 
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
             human.save(os.path.join(modelPath, filename + '.mhm'), tags)
 
             self.app.switchCategory('Modelling')
-            self.app.scene3d.redraw(1)
 
     def onShow(self, event):
 
@@ -82,29 +81,29 @@ class SaveTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         self.fileentry.setFocus()
-        self.pan = self.app.scene3d.selectedHuman.getPosition()
+        self.pan = self.app.selectedHuman.getPosition()
         self.eyeX = mh.cameras[0].eyeX
         self.eyeY = mh.cameras[0].eyeY
         self.eyeZ = mh.cameras[0].eyeZ
         self.focusX = mh.cameras[0].focusX
         self.focusY = mh.cameras[0].focusY
         self.focusZ = mh.cameras[0].focusZ
-        self.rotation = self.app.scene3d.selectedHuman.getRotation()
-        self.app.scene3d.selectedHuman.setPosition([0, -1, 0])
+        self.rotation = self.app.selectedHuman.getRotation()
+        self.app.selectedHuman.setPosition([0, -1, 0])
         self.app.setGlobalCamera();
         mh.cameras[0].eyeZ = 70
-        self.app.scene3d.selectedHuman.setRotation([0.0, 0.0, 0.0])
+        self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
 
     def onHide(self, event):
         gui3d.TaskView.onHide(self, event)
-        self.app.scene3d.selectedHuman.setPosition(self.pan)
+        self.app.selectedHuman.setPosition(self.pan)
         mh.cameras[0].eyeX = self.eyeX
         mh.cameras[0].eyeY = self.eyeY
         mh.cameras[0].eyeZ = self.eyeZ
         mh.cameras[0].focusX = self.focusX
         mh.cameras[0].focusY = self.focusY
         mh.cameras[0].focusZ = self.focusZ
-        self.app.scene3d.selectedHuman.setRotation(self.rotation)
+        self.app.selectedHuman.setRotation(self.rotation)
 
 
 class LoadTaskView(gui3d.TaskView):
@@ -117,7 +116,7 @@ class LoadTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
 
-            human = self.app.scene3d.selectedHuman
+            human = self.app.selectedHuman
 
             human.load(os.path.join(modelPath, filename), self.app.progress)
 
@@ -128,22 +127,21 @@ class LoadTaskView(gui3d.TaskView):
             self.parent.tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
 
             self.app.switchCategory('Modelling')
-            self.app.scene3d.redraw(1)
 
     def onShow(self, event):
 
         # When the task gets shown, set the focus to the file chooser
 
-        self.app.scene3d.selectedHuman.hide()
+        self.app.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
         self.filechooser.setFocus()
 
         # HACK: otherwise the toolbar background disappears for some weird reason
 
-        self.app.scene3d.redraw(0)
+        self.app.redraw()
 
     def onHide(self, event):
-        self.app.scene3d.selectedHuman.show()
+        self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
 
@@ -217,23 +215,23 @@ class ExportTaskView(gui3d.TaskView):
                 os.makedirs(exportPath)
 
             if self.wavefrontObj.selected:
-                mh2obj.exportObj(self.app.scene3d.selectedHuman.meshData,
+                mh2obj.exportObj(self.app.selectedHuman.meshData,
                     os.path.join(exportPath, filename + ".obj"),
                     'data/3dobjs/base.obj',
                     self.exportGroups.selected,
                     None if self.exportDiamonds.selected else (lambda fg: not 'joint' in fg))
-                mh2proxy.exportProxyObj(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename))
+                mh2proxy.exportProxyObj(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))
                 
                 if self.exportSkeleton.selected:
-                    mh2bvh.exportSkeleton(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".bvh"))
+                    mh2bvh.exportSkeleton(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".bvh"))
                     
-                if len(filename)> 0 and self.app.scene3d.selectedHuman.hairObj and len(self.app.scene3d.selectedHuman.hairObj.verts) > 0:
+                if len(filename)> 0 and self.app.selectedHuman.hairObj and len(self.app.selectedHuman.hairObj.verts) > 0:
                     if self.hairMesh.selected:
-                        mh2obj.exportObj(self.app.scene3d.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
+                        mh2obj.exportObj(self.app.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
                     else:
-                        hairsClass = self.app.scene3d.selectedHuman.hairs
+                        hairsClass = self.app.selectedHuman.hairs
                         #hairsClass = self.app.categories["Library"].tasksByName["Hair"]
-                        #hair.adjustHair(self.app.scene3d.selectedHuman, hairsClass)
+                        #hair.adjustHair(self.app.selectedHuman, hairsClass)
                         file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
                         mh2obj.exportAsCurves(file, hairsClass.guides)
                         file.close()
@@ -243,16 +241,15 @@ class ExportTaskView(gui3d.TaskView):
                     copyfile('data/textures/texture.png', texturePath)
                   
             elif self.mhx.selected:
-                mh2mhx.exportMhx(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
+                mh2mhx.exportMhx(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
             elif self.collada.selected:
-                mh2collada.exportCollada(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename))
+                mh2collada.exportCollada(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))
             elif self.md5.selected:
-                mh2md5.exportMd5(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
+                mh2md5.exportMd5(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
             elif self.stl.selected:
-                mh2stl.exportStlBinary(self.app.scene3d.selectedHuman.meshData, os.path.join(exportPath, filename + ".stl"))
+                mh2stl.exportStlBinary(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".stl"))
 
             self.app.switchCategory('Modelling')
-            self.app.scene3d.redraw(1)
             
     def updateGui(self):
         if self.wavefrontObj.selected:
@@ -271,29 +268,29 @@ class ExportTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         self.fileentry.setFocus()
-        self.pan = self.app.scene3d.selectedHuman.getPosition()
+        self.pan = self.app.selectedHuman.getPosition()
         self.eyeX = mh.cameras[0].eyeX
         self.eyeY = mh.cameras[0].eyeY
         self.eyeZ = mh.cameras[0].eyeZ
         self.focusX = mh.cameras[0].focusX
         self.focusY = mh.cameras[0].focusY
         self.focusZ = mh.cameras[0].focusZ
-        self.rotation = self.app.scene3d.selectedHuman.getRotation()
-        self.app.scene3d.selectedHuman.setPosition([0, -1, 0])
+        self.rotation = self.app.selectedHuman.getRotation()
+        self.app.selectedHuman.setPosition([0, -1, 0])
         self.app.setGlobalCamera();
         mh.cameras[0].eyeZ = 70
-        self.app.scene3d.selectedHuman.setRotation([0.0, 0.0, 0.0])
+        self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
 
     def onHide(self, event):
         gui3d.TaskView.onHide(self, event)
-        self.app.scene3d.selectedHuman.setPosition(self.pan)
+        self.app.selectedHuman.setPosition(self.pan)
         mh.cameras[0].eyeX = self.eyeX
         mh.cameras[0].eyeY = self.eyeY
         mh.cameras[0].eyeZ = self.eyeZ
         mh.cameras[0].focusX = self.focusX
         mh.cameras[0].focusY = self.focusY
         mh.cameras[0].focusZ = self.focusZ
-        self.app.scene3d.selectedHuman.setRotation(self.rotation)
+        self.app.selectedHuman.setRotation(self.rotation)
 
 
 class FilesCategory(gui3d.Category):

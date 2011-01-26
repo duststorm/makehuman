@@ -39,26 +39,20 @@ class HumanTextureTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             print 'Loading %s' % filename
-            self.app.scene3d.selectedHuman.setTexture('data/textures/' + filename)
+            self.app.selectedHuman.setTexture('data/textures/' + filename)
             
             self.app.categories['Modelling'].backgroundImageToggle.setSelected(True)
             self.app.switchCategory('Modelling')
-            self.app.scene3d.redraw(1)
 
     def onShow(self, event):
 
-    # When the task gets shown, set the focus to the file chooser
-
-        self.app.scene3d.selectedHuman.hide()
+        # When the task gets shown, set the focus to the file chooser
         gui3d.TaskView.onShow(self, event)
+        self.app.selectedHuman.hide()
         self.filechooser.setFocus()
 
-    # HACK: otherwise the toolbar background disappears for some weird reason
-
-        self.app.scene3d.redraw(0)
-
     def onHide(self, event):
-        self.app.scene3d.selectedHuman.show()
+        self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
 

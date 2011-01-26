@@ -56,7 +56,7 @@ class HairTaskView(gui3d.TaskView):
       #.hair files contain metadata of hair used by the makehair utility
       filename = path.splitext(filename)[0]
       print("Loading %s" %(filename))
-      human = self.app.scene3d.selectedHuman
+      human = self.app.selectedHuman
       if human.hairObj: human.scene.clear(human.hairObj)
 
       human.hairObj = human.hairs.loadHair(path="./data/hairs/"+filename, update=update)
@@ -68,7 +68,7 @@ class HairTaskView(gui3d.TaskView):
 
   def onShow(self, event):
     # When the task gets shown, set the focus to the file chooser
-    self.app.scene3d.selectedHuman.hide()
+    self.app.selectedHuman.hide()
     if self.default:
       self.default = False
       self.filechooser.selectedFile = self.filechooser.files.index("default.hair")
@@ -77,7 +77,7 @@ class HairTaskView(gui3d.TaskView):
     self.filechooser.setFocus()
 
   def onHide(self, event):
-    self.app.scene3d.selectedHuman.show()
+    self.app.selectedHuman.show()
     gui3d.TaskView.onHide(self, event)
 
 
