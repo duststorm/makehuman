@@ -41,9 +41,9 @@ class AsymmTaskView(gui3d.TaskView):
         self.asymmTempleSlider = AssymSlider(self, 10, y, "temple", "Temple asymmetry");y+=40
         self.asymmTopSlider = AssymSlider(self, 10, y, "top", "Top asymmetry");y+=40 + 8
         y = 80
-        gui3d.GroupBox(self, [650, y, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=120));y+=25
-        self.asymmTrunkSlider = AssymSlider(self, 650, y, "trunk", "Trunk asymmetry");y+=40
-        self.asymmBreastSlider = AssymSlider(self, 650, y, "breast", "Breast asymmetry")
+        self.rightBox = gui3d.GroupBox(self, [650, y, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=120));y+=25
+        self.asymmTrunkSlider = AssymSlider(self.rightBox, 650, y, "trunk", "Trunk asymmetry");y+=40
+        self.asymmBreastSlider = AssymSlider(self.rightBox, 650, y, "breast", "Breast asymmetry")
 
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"
@@ -168,6 +168,10 @@ class AsymmTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.asymmBrowSlider.setFocus()
         self.syncSliders()
+        
+    def onResized(self, event):
+        
+        self.rightBox.setPosition([event[0] - 150, self.rightBox.getPosition()[1], 9.0])
             
     def syncSliders(self):
         self.asymmBrowSlider.setValue(self.getSliderValue('brown'))

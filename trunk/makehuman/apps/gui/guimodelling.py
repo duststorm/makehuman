@@ -104,3 +104,5 @@ class ModellingCategory(gui3d.Category):
         guidetailmodelling.DetailModelingTaskView(self)
         guidetailmodelling.MicroModelingTaskView(self)
 
+    def onResized(self, event):
+        self.currentHair.setPosition([event[0]-200, event[1]-20, 9.2])

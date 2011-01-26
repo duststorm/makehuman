@@ -150,10 +150,10 @@ class MHApplication(gui3d.Application):
 
         self.progressBar.setProgress(0.1)
 
-        gui3d.Object(self, "data/3dobjs/upperbar.obj", self.getThemeResource("images", "upperbar.png"), [0, 0, 9])
-        gui3d.Object(self, "data/3dobjs/backgroundbox.obj", position = [0, 0, -89.99])
-        gui3d.Object(self, "data/3dobjs/lowerbar.obj", self.getThemeResource("images", "lowerbar.png"), [0, 32, 9])
-        gui3d.Object(self, "data/3dobjs/lowerbar2.obj", self.getThemeResource("images", "lowerbar.png"), [0, 580, 9])
+        self.upperbar = gui3d.Object(self, gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "upperbar.png")), position=[0, 0, 9])
+        self.background = gui3d.Object(self, gui3d.RectangleMesh(800, 600, self.getThemeResource("images", "background.png")), position = [0, 0, -89.99])
+        self.lowerbar = gui3d.Object(self, gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")), position=[0, 32, 9])
+        self.statusbar = gui3d.Object(self, gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")), position=[0, 580, 9])
         
         mh.callAsync(self.loadHuman)
         
@@ -390,7 +390,24 @@ class MHApplication(gui3d.Application):
             
         if (modifiers, key) in self.shortcuts:
             self.shortcuts[(modifiers, key)]()
+            
+    def onResized(self, event):
 
+        self.upperbar.mesh.resize(event[0], 32)
+        self.background.mesh.resize(event[0], event[1])
+        self.lowerbar.mesh.resize(event[0], 32)
+        self.statusbar.mesh.resize(event[0], 32)
+        self.statusbar.setPosition((0.0, event[1]-20, 9))
+        
+        self.undoButton.setPosition([event[0]-150, event[1]-92, 9.1])
+        self.redoButton.setPosition([event[0]-106, event[1]-92, 9.1])
+        self.resetButton.setPosition([event[0]-62, event[1]-92, 9.1])
+        
+        self.globalButton.setPosition([event[0]-150, event[1]-70, 9.1])
+        self.faceButton.setPosition([event[0]-150, event[1]-45, 9.1])
+        
+        self.progressBar.setPosition([event[0]-150, event[1]-15, 9.85])
+        
     # Undo-redo
     def do(self, action):
         if action.do():

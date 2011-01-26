@@ -505,9 +505,9 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.jaw = None
             
         y = 80
-        gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=150));y+=35
+        self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=150));y+=35
         
-        self.headShapeSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0,min=0.0,max=1.0,label="Shape");y+=40
+        self.headShapeSlider = gui3d.Slider(self.headBox, position=[650, y, 9.2], value=0.0,min=0.0,max=1.0,label="Shape");y+=40
 
         self.head = None
 
@@ -526,7 +526,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Head', value, self.syncSliders))
             self.head = None
             
-        self.headAgeSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0,min=-1.0,max=1.0,label="Age");y+=40
+        self.headAgeSlider = gui3d.Slider(self.headBox, position=[650, y, 9.2], value=0.0,min=-1.0,max=1.0,label="Age");y+=40
             
         self.headAge = None
 
@@ -545,7 +545,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'HeadAge', value, self.syncSliders))
             self.headAge = None
             
-        self.faceAngleSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0,min=-1.0,max=1.0,label="Face angle");y+=40
+        self.faceAngleSlider = gui3d.Slider(self.headBox, position=[650, y, 9.2], value=0.0,min=-1.0,max=1.0,label="Face angle");y+=40
             
         self.faceAngle = None
 
@@ -564,9 +564,9 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'FaceAngle', value, self.syncSliders))
             self.faceAngle = None
             
-        gui3d.GroupBox(self, [650, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=150));y+=35
+        self.pelvisBox = gui3d.GroupBox(self, [650, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=150));y+=35
         
-        self.pelvisToneSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone");y+=40
+        self.pelvisToneSlider = gui3d.Slider(self.pelvisBox, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone");y+=40
 
         self.pelvisTone = None
         
@@ -585,7 +585,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'PelvisTone', value, self.syncSliders))
             self.pelvisTone = None
             
-        self.stomachSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label ="Stomach");y+=40
+        self.stomachSlider = gui3d.Slider(self.pelvisBox, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label ="Stomach");y+=40
         
         self.stomach = None
         
@@ -604,7 +604,7 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Stomach', value, self.syncSliders))
             self.stomach = None
             
-        self.buttocksSlider = gui3d.Slider(self, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label = "Buttocks");y+=40
+        self.buttocksSlider = gui3d.Slider(self.pelvisBox, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label = "Buttocks");y+=40
 
         self.buttocks = None
         
@@ -623,37 +623,14 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.do(DetailAction(human, 'Buttocks', value, self.syncSliders))
             self.buttocks = None
             
-        gui3d.GroupBox(self, [650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=100));y+=35
+        self.modifiersBox = gui3d.GroupBox(self, [650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=100));y+=35
 
         self.detailButtonGroup = []
-        
-        '''
-        self.muscleDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                                    'button_muscle.png'), selectedTexture=self.app.getThemeResource('images', 'button_muscle_on.png'), position=[673,
-                                                    373, 9.2], selected=True)
-        self.weightDetailButton = gui3d.RadioButton(self, self.detailButtonGroup, mesh='data/3dobjs/button_standard.obj', texture=self.app.getThemeResource('images',
-                                                    'button_weight.png'), selectedTexture=self.app.getThemeResource('images', 'button_weight_on.png'), position=[708,
-                                                    373, 9.2])
-        '''
 
         self.tool = Detail3dTool(self.app, False, 'translation')
-        
-        '''
-        @self.muscleDetailButton.event
-        def onClicked(event):
-            self.tool = DetailTool(self.app, False, '_flaccid', '_muscle')
-            self.app.tool = self.tool
-            gui3d.RadioButton.onClicked(self.muscleDetailButton, event)
 
-        @self.weightDetailButton.event
-        def onClicked(event):
-            self.tool = DetailTool(self.app, False, '_underweight', '_overweight')
-            self.app.tool = self.tool
-            gui3d.RadioButton.onClicked(self.weightDetailButton, event)
-        '''
-
-        self.translationButton = gui3d.RadioButton(self, self.detailButtonGroup, [660, y, 9.2], 'Move', True, gui3d.ButtonStyle._replace(width=40, height=16))
-        self.scaleButton = gui3d.RadioButton(self, self.detailButtonGroup, [708, y, 9.2], label='Scale', style=gui3d.ButtonStyle._replace(width=40, height=16));y+=20
+        self.translationButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, [660, y, 9.2], 'Move', True, gui3d.ButtonStyle._replace(width=40, height=16))
+        self.scaleButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, [708, y, 9.2], label='Scale', style=gui3d.ButtonStyle._replace(width=40, height=16));y+=20
 
         @self.translationButton.event
         def onClicked(event):
@@ -667,9 +644,9 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
-        self.rightSymmetryButton = gui3d.Button(self, [660, y, 9.2], 'Sym<', style=gui3d.ButtonStyle._replace(width=40, height=16))
-        self.leftSymmetryButton = gui3d.Button(self, [708, y, 9.2], 'Sym>', style=gui3d.ButtonStyle._replace(width=40, height=16));y+=20
-        self.symmetryButton = gui3d.ToggleButton(self, [660, y, 9.2], 'Sym', style=gui3d.ButtonStyle._replace(width=40, height=16))
+        self.rightSymmetryButton = gui3d.Button(self.modifiersBox, [660, y, 9.2], 'Sym<', style=gui3d.ButtonStyle._replace(width=40, height=16))
+        self.leftSymmetryButton = gui3d.Button(self.modifiersBox, [708, y, 9.2], 'Sym>', style=gui3d.ButtonStyle._replace(width=40, height=16));y+=20
+        self.symmetryButton = gui3d.ToggleButton(self.modifiersBox, [660, y, 9.2], 'Sym', style=gui3d.ButtonStyle._replace(width=40, height=16))
 
         @self.rightSymmetryButton.event
         def onClicked(event):
@@ -697,6 +674,11 @@ class DetailModelingTaskView(gui3d.TaskView):
     def onHide(self, event):
         self.app.tool = None
         gui3d.TaskView.onHide(self, event)
+        
+    def onResized(self, event):
+        self.headBox.setPosition([event[0] - 150, self.headBox.getPosition()[1], 9.0])
+        self.pelvisBox.setPosition([event[0] - 150, self.pelvisBox.getPosition()[1], 9.0])
+        self.modifiersBox.setPosition([event[0] - 150, self.modifiersBox.getPosition()[1], 9.0])
 
     def syncSliders(self):
         human = self.app.selectedHuman

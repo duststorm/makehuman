@@ -34,21 +34,25 @@ class ShortcutsTaskView(gui3d.TaskView):
         gui3d.TextView(self, [18,y + 5, 9.2], "Exit");AppShortcutEdit(self, [68,y, 9.2], self.app.stop);y+=25
         
         y = 80
-        gui3d.GroupBox(self, [650, y, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=380));y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Turn left");AppShortcutEdit(self, [708,y, 9.2], self.app.rotateLeft);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Turn up");AppShortcutEdit(self, [708,y, 9.2], self.app.rotateUp);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Turn down");AppShortcutEdit(self, [708,y, 9.2], self.app.rotateDown);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Turn right");AppShortcutEdit(self, [708,y, 9.2], self.app.rotateRight);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Pan up");AppShortcutEdit(self, [708,y, 9.2], self.app.panUp);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Pan down");AppShortcutEdit(self, [708,y, 9.2], self.app.panDown);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Pan right");AppShortcutEdit(self, [708,y, 9.2], self.app.panRight);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Pan left");AppShortcutEdit(self, [708,y, 9.2], self.app.panLeft);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Zoom in");AppShortcutEdit(self, [708,y, 9.2], self.app.zoomIn);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Zoom out");AppShortcutEdit(self, [708,y, 9.2], self.app.zoomOut);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Front view");AppShortcutEdit(self, [708,y, 9.2], self.app.frontView);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Top view");AppShortcutEdit(self, [708,y, 9.2], self.app.topView);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Side view");AppShortcutEdit(self, [708,y, 9.2], self.app.sideView);y+=25
-        gui3d.TextView(self, [658,y + 5, 9.2], "Reset view");AppShortcutEdit(self, [708,y, 9.2], self.app.resetView);y+=25
+        self.cameraBox = gui3d.GroupBox(self, [650, y, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=380));y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Turn left");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.rotateLeft);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Turn up");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.rotateUp);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Turn down");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.rotateDown);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Turn right");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.rotateRight);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Pan up");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.panUp);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Pan down");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.panDown);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Pan right");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.panRight);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Pan left");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.panLeft);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Zoom in");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.zoomIn);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Zoom out");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.zoomOut);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Front view");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.frontView);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Top view");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.topView);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Side view");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.sideView);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Reset view");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.resetView);y+=25
+        
+    def onResized(self, event):
+        
+        self.cameraBox.setPosition([event[0] - 150, self.cameraBox.getPosition()[1], 9.0])
 
 def load(app):
     category = app.getCategory('Settings')

@@ -92,11 +92,11 @@ class MeasureTaskView(gui3d.TaskView):
         modes = [] 
                
         y = 80
-        gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=80))
+        self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=80))
         y += 25
-        metric = gui3d.RadioButton(self, modes, [658, y, 9.1], 'Metric', True)
+        metric = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Metric', True)
         y += 22
-        imperial = gui3d.RadioButton(self, modes, [658, y, 9.1], 'Imperial')
+        imperial = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Imperial')
         
         @metric.event
         def onClicked(event):
@@ -241,6 +241,10 @@ class MeasureTaskView(gui3d.TaskView):
 
         #Update the measures when the measure mode is activated
         self.updateMeasures()
+        
+    def onResized(self, event):
+        
+        self.unitsBox.setPosition([event[0] - 150, self.unitsBox.getPosition()[1], 9.0])
         
     def hideAllSliders(self):
         for group in self.groupBoxes.itervalues():

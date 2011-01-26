@@ -643,6 +643,18 @@ class Application(events3d.EventHandler):
         if self.fullscreen != fullscreen:
             self.scene3d.reloadTextures()
         self.fullscreen = fullscreen
+        
+        event = (width, height, fullscreen)
+        
+        self.callEvent('onResized', event)
+        
+        for category in self.categories.itervalues():
+            
+            category.callEvent('onResized', event)
+            
+            for task in category.tasks:
+                
+                task.callEvent('onResized', event)
             
     def getCategory(self, name, style=CategoryTabStyle):
         try:
@@ -690,19 +702,28 @@ class Slider(View):
         self.background = Object(self, 'data/3dobjs/slider_background.obj',
             texture=(backgroundTexture or self.app.getThemeResource('images', 'slider_generic.png')), position=position)
         
-        #mesh = Create9SliceMesh(16, 16, self.sliderTexture, [2,2,2,2])
+        #mesh = NineSliceMesh(16, 16, self.sliderTexture, [2,2,2,2])
         #self.slider = Object(self, mesh, position=[position[0], position[1] + 20, position[2] + 0.01])
         self.slider = Object(self, 'data/3dobjs/slider_cursor.obj',
             texture=self.sliderTexture, position=[position[0], position[1] + 20, position[2] + 0.01])
         if isinstance(label, str):
             self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]+0.2], fontSize = fontSize)
             
-            
         self.sliderMinX = position[0] + 17
         self.sliderMaxX = position[0] + 111
         self.min = min
         self.max = max
         self.setValue(value)
+    
+    def getPosition(self):
+        return self.background.getPosition()
+        
+    def setPosition(self, position):
+        self.background.setPosition(position)
+        self.sliderMinX = position[0] + 17
+        self.sliderMaxX = position[0] + 111
+        self.setValue(self.getValue())
+        self.label.setPosition([position[0]+10,position[1]-2,position[2]+0.2])
 
     def setValue(self, value):
         self.__value = min(self.max, max(self.min, value))
@@ -819,6 +840,8 @@ class Button(View):
         height = style.height
         fontSize = style.fontSize
         border = style.border
+        
+        self.style = style
             
         if style.mesh:
             self.button = Object(self, style.mesh, texture=t, position=position)
@@ -827,12 +850,20 @@ class Button(View):
                 #TODO text should be in the middle of button, calculate this from text length
                 self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-7,position[2]+0.001], fontSize = fontSize)
         else:
-            mesh = Create9SliceMesh(width, height, t, border)
+            mesh = NineSliceMesh(width, height, t, border)
             self.button = Object(self, mesh, position=position)
             if isinstance(label, str):
                 self.label = TextObject(self, text = label, position = [position[0] + border[0] + 3,position[1]+height/2-6,position[2]+0.001], fontSize = fontSize)
             
         self.selected = selected
+        
+    def getPosition(self):
+        return self.button.getPosition()
+    
+    def setPosition(self, position):
+        self.button.setPosition(position)
+        if getattr(self, 'label'):
+            self.label.setPosition([position[0] + self.style.border[0] + 3,position[1]+self.style.height/2-6,position[2]+0.001])
 
     def setTexture(self, texture):
         self.texture = texture
@@ -1053,6 +1084,10 @@ class ProgressBar(View):
         
     def canFocus(self):
         return False
+        
+    def setPosition(self, position):
+        self.background.setPosition(position)
+        self.bar.setPosition([position[0], position[1], position[2] + 0.05])
 
     def setProgress(self, progress, redraw=1):
         """
@@ -1089,6 +1124,12 @@ class TextView(View):
             
     def canFocus(self):
         return False
+        
+    def getPosition(self):
+        return self.textObject.getPosition()
+        
+    def setPosition(self, position):
+        self.textObject.setPosition(position)
 
     def setText(self, text):
         self.textObject.setText(text)
@@ -1111,7 +1152,7 @@ class TextEdit(View):
         self.focusedTexture = focusedTexture or self.app.getThemeResource('images', 'texedit_on.png')
 
         if (width!=None) and (height!=None):
-            mesh = Create9SliceMesh(width, height, self.texture, border)
+            mesh = NineSliceMesh(width, height, self.texture, border)
             self.background = Object(self, mesh, position=position)
         else:
             self.background = Object(self, mesh=mesh, texture=self.texture, position=position)
@@ -1495,14 +1536,33 @@ class GroupBox(View):
         
         texture = self.app.getThemeResource('images', style.normal)
         
-        mesh = Create9SliceMesh(style.width, style.height, texture, style.border)
+        self.style = style
+        
+        mesh = NineSliceMesh(style.width, style.height, texture, style.border)
         self.box = Object(self, mesh, None, position)
         
         if isinstance(label, str):
             self.label = TextObject(self, text = label,
                 position = [position[0]+style.border[0],position[1]+style.border[1]/2-6,position[2]+0.001],
                 fontSize = style.fontSize)
-            
+    
+    def getPosition(self):
+        return self.box.getPosition()
+    
+    def setPosition(self, position):
+        
+        dx, dy, dz = self.getPosition()
+        dx = position[0] - dx
+        dy = position[1] - dy
+        dz = position[2] - dz
+        
+        self.box.setPosition(position)
+        self.label.setPosition([position[0]+self.style.border[0],position[1]+self.style.border[1]/2-6,position[2]+0.001])
+        
+        for child in self.children:
+            x, y, z = child.getPosition()
+            child.setPosition([x+dx,y+dy,z+dz])
+        
     def canFocus(self):
         return False
         
@@ -1516,10 +1576,17 @@ class ShortcutEdit(View):
         self.texture = self.app.getThemeResource('images', 'button_tab3_on.png')
         self.focusedTexture = self.app.getThemeResource('images', 'button_tab3_focused.png')
         
-        mesh = Create9SliceMesh(64, 22, self.texture, [7,7,7,7])
+        mesh = NineSliceMesh(64, 22, self.texture, [7,7,7,7])
         self.background = Object(self, mesh, position=position)
         self.label = TextObject(self, text=self.shortcutToLabel(shortcut[0], shortcut[1]),
             position = [position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001])
+            
+    def getPosition(self):
+        return self.background.getPosition()
+    
+    def setPosition(self, position):
+        self.background.setPosition(position)
+        self.label.setPosition([position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001])
             
     def setShortcut(self, shortcut):
         self.label.setText(self.shortcutToLabel(shortcut[0], shortcut[1]))
@@ -1616,58 +1683,120 @@ class ShortcutEdit(View):
         events3d.SDLK_LALT:'Alt'
     }
 
-def Create9SliceMesh(width, height, texture, border):
+class NineSliceMesh(module3d.Object3D):
     
-    """
-    Creates a 9 slice mesh. It is a mesh with fixed size borders and a resizeable center.
-    This makes sure the borders of a group box are not stretched.
+    def __init__(self, width, height, texture, border):
     
-    - **width**: *Float*. The width of the mesh.
-    - **height**: *Float*. The height of the mesh.
-    - **texture**: *String*. The texture.
-    - **border**: *List*. The left, top, right, bottom border.
-    """
-    
-    t = module3d.getTexture(texture)
-    
-    # Make sure fractions are calculated correctly
-    textureWidth = float(t.width)
-    textureHeight = float(t.height)
+        """
+        Creates a 9 slice mesh. It is a mesh with fixed size borders and a resizeable center.
+        This makes sure the borders of a group box are not stretched.
         
-    outer=[[0, 0], [width, height]]
-    inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
+        - **width**: *Float*. The width of the mesh.
+        - **height**: *Float*. The height of the mesh.
+        - **texture**: *String*. The texture.
+        - **border**: *List*. The left, top, right, bottom border.
+        """
         
-    mesh = module3d.Object3D('9slice_' + texture + '_' + str(border))
-    mesh.uvValues = []
-    mesh.indexBuffer = []
-    
-    # create group
-    fg = mesh.createFaceGroup('9slice')
-    
-    xc = [outer[0][0], inner[0][0], inner[1][0], outer[1][0]]
-    yc = [outer[0][1], inner[0][1], inner[1][1], outer[1][1]]
-    xuv = [0.0, border[0] / textureWidth, (textureWidth - border[2]) / textureWidth, 1.0]
-    yuv = [1.0, 1.0 - border[1] / textureHeight, 1.0 - (textureHeight - border[3]) / textureHeight, 0.0]
-    
-    # The 16 vertices
-    v = []
-    for y in yc:
-        for x in xc:  
-            v.append(mesh.createVertex([x, y, 0.0]))
-    
-    # The 16 uv values
-    uv = []
-    for y in yuv:
-        for x in xuv:  
-            uv.append([x, y])
-    
-    # The 18 faces (9 quads)
-    for y in xrange(3):
-        for x in xrange(3):
-            o = x + y * 4
-            fg.createFace(v[o+4], v[o+5], v[o+1], v[o], uv=(uv[o+4], uv[o+5], uv[o+1], uv[o]))
+        module3d.Object3D.__init__(self, '9slice_' + texture + '_' + str(border))
+        
+        t = module3d.getTexture(texture)
+        
+        # Make sure fractions are calculated correctly
+        textureWidth = float(t.width)
+        textureHeight = float(t.height)
             
-    mesh.texture = texture
-    mesh.updateIndexBuffer()
+        outer=[[0, 0], [width, height]]
+        inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
+            
+        self.uvValues = []
+        self.indexBuffer = []
+        
+        # create group
+        fg = self.createFaceGroup('9slice')
+        
+        xc = [outer[0][0], inner[0][0], inner[1][0], outer[1][0]]
+        yc = [outer[0][1], inner[0][1], inner[1][1], outer[1][1]]
+        xuv = [0.0, border[0] / textureWidth, (textureWidth - border[2]) / textureWidth, 1.0]
+        yuv = [1.0, 1.0 - border[1] / textureHeight, 1.0 - (textureHeight - border[3]) / textureHeight, 0.0]
+        
+        # The 16 vertices
+        v = []
+        for y in yc:
+            for x in xc:  
+                v.append(self.createVertex([x, y, 0.0]))
+        
+        # The 16 uv values
+        uv = []
+        for y in yuv:
+            for x in xuv:  
+                uv.append([x, y])
+        
+        # The 18 faces (9 quads)
+        for y in xrange(3):
+            for x in xrange(3):
+                o = x + y * 4
+                fg.createFace(v[o+4], v[o+5], v[o+1], v[o], uv=(uv[o+4], uv[o+5], uv[o+1], uv[o]))
+                
+        self.texture = texture
+        self.updateIndexBuffer()
     
-    return mesh
+    def resize(self, width, height):
+        
+        outer=[[0, 0], [width, height]]
+        inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
+        
+        xc = [outer[0][0], inner[0][0], inner[1][0], outer[1][0]]
+        yc = [outer[0][1], inner[0][1], inner[1][1], outer[1][1]]
+        
+        i = 0
+        for y in yc:
+            for x in xc:  
+                self.verts[i].co = [x, y, 0.0]
+                i += 1
+        
+        self.update()
+    
+class RectangleMesh(module3d.Object3D):
+            
+    def __init__(self, width, height, texture):
+        
+        """
+        This is the constructor for the RectangleMesh class. It takes the following parameters:
+        
+        - **width**: *Float*. The width of the mesh.
+        - **height**: *Float*. The height of the mesh.
+        - **texture**: *String*. The texture.
+        """
+        
+        module3d.Object3D.__init__(self, 'rectangle_' + texture)
+        
+        self.uvValues = []
+        self.indexBuffer = []
+        
+        # create group
+        fg = self.createFaceGroup('rectangle')
+        
+        # The 4 vertices
+        v = []
+        v.append(self.createVertex([0.0, 0.0, 0.0]))
+        v.append(self.createVertex([width, 0.0, 0.0]))
+        v.append(self.createVertex([width, height, 0.0]))
+        v.append(self.createVertex([0.0, height, 0.0]))
+        
+        # The 4 uv values
+        uv = ([0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0])
+        
+        # The face
+        fg.createFace(v[0], v[1], v[2], v[3], uv=uv)
+                
+        self.texture = texture
+        self.updateIndexBuffer()
+        
+    def resize(self, width, height):
+        
+        self.verts[1].co[0] = width
+        self.verts[2].co[0] = width
+        self.verts[2].co[1] = height
+        self.verts[3].co[1] = height
+        self.update()
+        

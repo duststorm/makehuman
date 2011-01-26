@@ -287,4 +287,5 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.syncStatus()
         gui3d.TaskView.onShow(self, event)
 
-
+    def onResized(self, event):
+        self.status.setPosition([10, event[1]-15, 9.1])

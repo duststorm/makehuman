@@ -26,20 +26,20 @@ class EthnicsTaskView(gui3d.TaskView):
         
         self.genderGroup = []
         y = 80
-        gui3d.GroupBox(self, [650, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=100));y+=25
-        self.female = gui3d.RadioButton(self, self.genderGroup, [658,y, 9.2], "Female", True, gui3d.ButtonStyle);y+=25
-        self.male = gui3d.RadioButton(self, self.genderGroup, [658,y, 9.2], "Male", style = gui3d.ButtonStyle);y+=25
+        self.genderBox = gui3d.GroupBox(self, [650, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=100));y+=25
+        self.female = gui3d.RadioButton(self.genderBox, self.genderGroup, [658,y, 9.2], "Female", True, gui3d.ButtonStyle);y+=25
+        self.male = gui3d.RadioButton(self.genderBox, self.genderGroup, [658,y, 9.2], "Male", style = gui3d.ButtonStyle);y+=25
         y+=35
         
         self.ageGroup = []
-        gui3d.GroupBox(self, [650, y, 9.0], 'Age', gui3d.GroupBoxStyle._replace(height=120));y+=25
-        self.child = gui3d.RadioButton(self, self.ageGroup, [658,y, 9.2], "Child", True, gui3d.ButtonStyle);y+=25
-        self.young = gui3d.RadioButton(self, self.ageGroup, [658,y, 9.2], "Young", style = gui3d.ButtonStyle);y+=25
-        self.old = gui3d.RadioButton(self, self.ageGroup, [658,y, 9.2], "Old", style = gui3d.ButtonStyle);y+=25
+        self.ageBox = gui3d.GroupBox(self, [650, y, 9.0], 'Age', gui3d.GroupBoxStyle._replace(height=120));y+=25
+        self.child = gui3d.RadioButton(self.ageBox, self.ageGroup, [658,y, 9.2], "Child", True, gui3d.ButtonStyle);y+=25
+        self.young = gui3d.RadioButton(self.ageBox, self.ageGroup, [658,y, 9.2], "Young", style = gui3d.ButtonStyle);y+=25
+        self.old = gui3d.RadioButton(self.ageBox, self.ageGroup, [658,y, 9.2], "Old", style = gui3d.ButtonStyle);y+=25
         y+=35
         
-        gui3d.GroupBox(self, [650, y, 9.0], 'Load', gui3d.GroupBoxStyle._replace(height=120));y+=25
-        self.load = gui3d.Button(self, [658,y, 9.2], "Load");y+=25
+        self.loadBox = gui3d.GroupBox(self, [650, y, 9.0], 'Load', gui3d.GroupBoxStyle._replace(height=120));y+=25
+        self.load = gui3d.Button(self.loadBox, [658,y, 9.2], "Load");y+=25
         
         @self.load.event
         def onClicked(event):
@@ -65,6 +65,12 @@ class EthnicsTaskView(gui3d.TaskView):
         self.app.categories['Files'].tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
 
         #self.app.switchCategory('Modelling')
+        
+    def onResized(self, event):
+        
+        self.genderBox.setPosition([event[0] - 150, self.genderBox.getPosition()[1], 9.0])
+        self.ageBox.setPosition([event[0] - 150, self.ageBox.getPosition()[1], 9.0])
+        self.loadBox.setPosition([event[0] - 150, self.loadBox.getPosition()[1], 9.0])
 
 def load(app):
     category = app.getCategory('Experiments')

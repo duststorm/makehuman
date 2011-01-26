@@ -107,41 +107,40 @@ class Target:
         fileDescriptor.close()
         
     def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
-        
-        if morphFactor == 0:
-            return
-            
-        #print 'Applying %s with %f on %d verts' % (self.name, morphFactor, len(self.verts) if self.verts else 0)
-
+          
         if self.verts:
             
-            if faceGroupToUpdateName:
-
-                # if a facegroup is provided, apply it ONLY to the verts used
-                # by the specified facegroup.
+            if morphFactor or calcNormals or update:
             
-                faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
-                verticesToUpdate = set()
-                facesToRecalculate = list(faceGroupToUpdate.faces)
-                for f in facesToRecalculate:
-                    for v in f.verts:
-                        verticesToUpdate.add(v)
-                        
-            else:
+                if faceGroupToUpdateName:
 
-                # if a vertgroup is not provided, all verts affected by
-                # the targets will be modified
+                    # if a facegroup is provided, apply it ONLY to the verts used
+                    # by the specified facegroup.
+                
+                    faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
+                    verticesToUpdate = set()
+                    facesToRecalculate = list(faceGroupToUpdate.faces)
+                    for f in facesToRecalculate:
+                        for v in f.verts:
+                            verticesToUpdate.add(v)
+                            
+                else:
 
-                facesToRecalculate = [obj.faces[i] for i in self.faces]
-                verticesToUpdate = [obj.verts[i] for i in self.verts]
+                    # if a vertgroup is not provided, all verts affected by
+                    # the targets will be modified
 
-            # Adding the translation vector
+                    facesToRecalculate = [obj.faces[i] for i in self.faces]
+                    verticesToUpdate = [obj.verts[i] for i in self.verts]
 
-            for v in verticesToUpdate:
-                targetVect = self.data[v.idx]
-                v.co[0] += targetVect[0] * morphFactor * scale[0]
-                v.co[1] += targetVect[1] * morphFactor * scale[1]
-                v.co[2] += targetVect[2] * morphFactor * scale[2]
+            if morphFactor:
+                
+                # Adding the translation vector
+
+                for v in verticesToUpdate:
+                    targetVect = self.data[v.idx]
+                    v.co[0] += targetVect[0] * morphFactor * scale[0]
+                    v.co[1] += targetVect[1] * morphFactor * scale[1]
+                    v.co[2] += targetVect[2] * morphFactor * scale[2]
 
             if calcNormals:
                 obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
@@ -149,6 +148,8 @@ class Target:
                 obj.update(verticesToUpdate)
 
             return True
+            
+        return False
 
 
 def getTarget(obj, targetPath):

@@ -1445,7 +1445,7 @@ void mhCameraPosition(Camera *camera, int eye)
         if (camera->projection)
             gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
         else
-            glOrtho(0.0, G.windowWidth * 600.0 / G.windowHeight, 600, 0.0, camera->nearPlane, camera->farPlane);
+            glOrtho(0.0, G.windowWidth, G.windowHeight, 0.0, camera->nearPlane, camera->farPlane);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -2094,7 +2094,8 @@ void mhEventLoop(void)
               G.pendingTimer = 0;
               break;
             case 1:
-              PyObject_CallFunction((PyObject*)event.user.data1, "");
+              if (!PyObject_CallFunction((PyObject*)event.user.data1, ""))
+                PyErr_Print();
               Py_DECREF((PyObject*)event.user.data1);
               break;
             }

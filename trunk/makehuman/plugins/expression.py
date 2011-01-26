@@ -38,7 +38,7 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         
     def onClicked(self, event):
         gui3d.RadioButton.onClicked(self, event)
-        self.parent.hideAllBoxes()
+        self.parent.parent.hideAllBoxes()
         self.groupBox.show()
         
 class ExpressionSlider(gui3d.Slider):
@@ -97,7 +97,7 @@ class ExpressionTaskView(gui3d.TaskView):
         self.groupBoxes = []
         self.radioButtons = []
         
-        gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=360))
+        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=360))
         y += 25
         
         for name, subnames in expressions:
@@ -113,7 +113,7 @@ class ExpressionTaskView(gui3d.TaskView):
                 yy += 35
             
             # Create radiobutton
-            radio = GroupBoxRadioButton(self, self.radioButtons, y, name.capitalize(), box, selected=len(self.radioButtons) == 0)
+            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, y, name.capitalize(), box, selected=len(self.radioButtons) == 0)
             y += 22
 
         self.hideAllBoxes()
@@ -122,6 +122,10 @@ class ExpressionTaskView(gui3d.TaskView):
     def hideAllBoxes(self):
         for box in self.groupBoxes:
             box.hide()
+            
+    def onResized(self, event):
+        
+        self.categoryBox.setPosition([event[0] - 150, self.categoryBox.getPosition()[1], 9.0])
 
 category = None
 taskview = None
