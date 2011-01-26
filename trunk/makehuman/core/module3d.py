@@ -585,8 +585,6 @@ class Object3D:
     - **self.texture**: *string* The path of a TGA file on disk containing the object texture.
     - **self.shader**: *int* The shader.
     - **self.shaderParameters**: *dictionary* The shader parameters.
-    - **self.isSelected**: *int flag* A flag to indicate whether this object is currently selected.
-    - **self.faceGroupSelected**: *string* The name of actually selected face group.
     - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
     - **self.isSubdivided**: *int flag* A flag to indicate whether this object is subdivided or not.
     - **self.indexBuffer**: *faces list* The list of faces as indices to the vertexbuffer.
@@ -635,8 +633,6 @@ class Object3D:
 
         # self.colors = []
 
-        self.isSelected = None
-        self.faceGroupSelected = None
         self.shadeless = 0
         self.solid = 1
         self.isSubdivided = None
@@ -1317,38 +1313,6 @@ class Scene3D:
 
         # print "Obj %s not found"%(name)
 
-    def getSelectedObject(self):
-        """
-        This method searches the list of 3D objects contained within the scene and returns
-        the currently selected object (the first object with the **isSelected** flag set) or
-        None if no object is selected.
-        This method assumes that only one object is currently selected.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        objToGet = None
-        for obj in self.objects:
-            if obj.isSelected:
-                objToGet = obj
-                break
-        return objToGet
-
-    def deselectAll(self):
-        """
-        This method resets all **isSelected** attributes, for
-        all objects in the scene.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        for obj in self.objects:
-            if obj.isSelected:
-                obj.isSelected = None
-                break
-
     def grabScreen(self, x, y, width, height, filename):
         """
         This method calls the grabScreen method on the 'mh' class which invokes the 
@@ -1555,46 +1519,6 @@ class Scene3D:
         else:
             print 'not a clickable zone'
             return None
-
-    def selectObject(self):
-        """
-        This method first deselects any objects in the scene that are currently
-        selected, then, if an object was selected by the current operation, it
-        marks that object as selected.
-
-        **Parameters:** None.
-
-        """
-
-        # NOTE: This function supposes that we have only one object
-        # selected at a time
-
-        global scene
-
-        # get actual selected obj
-
-        objPicked = self.getSelectedObject()
-
-        # restore his original color (no selected)
-        # and then deselect all obj in the scene
-
-        if objPicked:
-
-            # objPicked.applyDefaultColor()
-
-            self.deselectAll()
-
-        # Now get the picked obj to select it
-
-        pickedInfo = self.getPickedObject()
-        if pickedInfo:
-            pickedObj = pickedInfo[1]
-
-            # pickedObj.applySelectionColor()
-
-            pickedObj.isSelected = 1
-            pickedObj.faceGroupSelected = pickedInfo[0]
-        mh.redraw(1)
 
 # Draws a Quad
 # TODO: account for world2local and viceversa
