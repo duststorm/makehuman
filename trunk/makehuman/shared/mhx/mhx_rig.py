@@ -110,14 +110,16 @@ C_TG_POSE = 0x3000
 C_CHILDOF = C_OW_POSE+C_TG_WORLD
 C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
 
-rootChildOfConstraints = [
+Master = 'MasterFloor'
+rootChildOfConstraints = []
+'''
 		('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
 ]
 
-Master = 'MasterFloor'
 Master = None
+'''
 
 #
 #	newSetupJoints (obj, joints, headTails):
@@ -1579,11 +1581,12 @@ def writeAllDrivers(fp):
 	#writeEnumDrivers(fp, rig_panel_25.EnumDrivers)
 
 	writePropDrivers(fp,
-		rig_body_25.BodyPropDrivers +
+		#rig_body_25.BodyPropDrivers +
 		rig_arm_25.ArmPropDrivers +
 		rig_finger_25.FingerPropDrivers +
-		rig_leg_25.LegPropDrivers +
-		rig_face_25.FacePropDrivers)
+		rig_leg_25.LegPropDrivers
+		#rig_face_25.FacePropDrivers
+	)
 	return
 
 def writeAllProperties(fp):
