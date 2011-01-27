@@ -466,6 +466,9 @@ def initInterface(scn):
 	if scn:
 		scn['MhxSyncAutoKeyframe'] = False
 		scn['MhxBodyLanguage'] = True
+
+	defineEnumButtons('Gaze', ['Gaze'], ['Head', 'World'])
+	defineEnumButtons('Master', ['Root', 'HandIK_L', 'HandIK_R', 'LegIK_L', 'LegIK_R'], ['Floor', 'Hips', 'Neck'])
 	return
 
 # Define viseme buttons
@@ -785,6 +788,36 @@ class OBJECT_OT_SetAllFingersOnButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	setEnum(name, cnslist):
+#	defineEnumButtons(name, bones, enums):
+#
+
+def setEnum(name, cnslist):
+	global theRig
+	pb = theRig.pose.bones[name]
+	for (cnsName, inf) in cnslist:
+		pb.constraints[cnsName].influence = inf
+	return	
+
+def defineEnumButtons(name, bones, enums):
+	for enum in enums:
+		elist = []
+		for enum1 in enums1:
+			elist.append( ('%s' % enum1, (enum==enum1)*1) )
+		expr = (
+'class OBJECT_OT_Set%s%sButton(bpy.types.Operator):\n' % (name, enum) +
+'	bl_idname = "OBJECT_OT_Set%s%sButton"\n' % (name, enum) +
+'	bl_label = "%s"\n' % enum +
+'	def execute(self, context):\n' +
+'		for bone in %s:\n' % bones +
+'			setEnum(name, %s)\n' % elist +
+'		return{"FINISHED"}	\n'
+		)
+		print(expr)
+		exec(expr)
+	return
+
+#
 #	class MhxDriversPanel(bpy.types.Panel):
 #
 
@@ -823,6 +856,18 @@ class MhxDriversPanel(bpy.types.Panel):
 			row = layout.row()
 			row.operator("object.SetAllFingersOffButton")
 			row.operator("object.SetAllFingersOnButton")
+
+			layout.label("Gaze")
+			row = layout.row()
+			row.operator("object.SetGazeHeadButton")
+			row.operator("object.SetGazeWorldButton")
+
+			layout.label("Master")
+			row = layout.row()
+			row.operator("object.SetMasterFloorButton")
+			row.operator("object.SetMasterHipsButton")
+			row.operator("object.SetMasterNeckButton")
+
 
 
 #

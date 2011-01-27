@@ -2,8 +2,6 @@
 
 NoScale False ;
 
-Armature Human Human   Normal 
-
   *** rig-bones
 
   use_deform_envelopes False ;
@@ -19,12 +17,15 @@ Armature Human Human   Normal
   use_mirror_x False ;
 end Armature
 
-Object Human ARMATURE Human
+*** prop-defs
+
+*** human-object Rig
   layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
   show_x_ray True ;
   # draw_type 'WIRE' ;
   Property MhxScale theScale ;
+  *** rig-properties
 end Object
 
 

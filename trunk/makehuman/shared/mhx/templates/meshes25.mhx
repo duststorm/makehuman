@@ -1,8 +1,6 @@
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh HumanMesh HumanMesh
-  Verts
   *** Verts
   end Verts
 
@@ -14837,7 +14835,7 @@ Mesh HumanMesh HumanMesh
     *** VertexGroup
 end Mesh
 
-Object HumanMesh MESH HumanMesh
+*** human-object Mesh
   layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   #if toggle&T_Cage
     Modifier MeshDeform MESH_DEFORM
@@ -14848,7 +14846,7 @@ Object HumanMesh MESH HumanMesh
     end Modifier
     Modifier Armature ARMATURE
       invert_vertex_group False ;
-      object Refer Object Human ;
+      *** refer-human object
       use_bone_envelopes False ;
       use_deform_preserve_volume False ;
       use_multi_modifier True ;
@@ -14857,13 +14855,13 @@ Object HumanMesh MESH HumanMesh
     end Modifier
   #else
     Modifier Armature ARMATURE
-      object Refer Object Human ;
+      *** refer-human object
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
   #endif
   color Array 1.0 1.0 1.0 1.0  ;
-  parent Refer Object Human ;
+  *** refer-human parent
   parent_type 'OBJECT' ;
   select True ;
   lock_location Array 1 1 1 ; 

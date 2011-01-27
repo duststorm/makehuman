@@ -22,7 +22,7 @@ Version 1.0.4
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 0, 4),
+    'version': (1, 1, 0),
     'blender': (2, 5, 6),
     'api': 34326,
     'location': "File > Import",
@@ -41,8 +41,8 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 0
-SUB_VERSION = 4
+MINOR_VERSION = 1
+SUB_VERSION = 0
 BLENDER_VERSION = (2, 56, 0)
 
 #
@@ -343,10 +343,6 @@ def readMhxFile(filePath, scale):
             nErrors += 1
             #raise NameError(msg)
 
-    print("Postprocess")
-    postProcess()
-    print("HideLayers")
-    hideLayers()
     time2 = time.clock()
     print("toggle = %x" % toggle)
     msg = "File %s loaded in %g s" % (fileName, time2-time1)
@@ -374,7 +370,7 @@ def getObject(name, var, glbals, lcals):
 
 def checkMhxVersion(major, minor):
     global warnedVersion
-    if  major != MAJOR_VERSION or minor != MINOR_VERSION:
+    if  major != MAJOR_VERSION or (major == MAJOR_VERSION and minor > MINOR_VERSION):
         if warnedVersion:
             return
         else:
@@ -457,8 +453,15 @@ def parse(tokens):
             data = parseWorld(val, sub)
         elif key == "Scene":
             data = parseScene(val, sub)
+        elif key == "DefineProperty":
+            parseDefineProperty(val, sub)
         elif key == "Process":
             parseProcess(val, sub)
+        elif key == "PostProcess":
+            postProcess(val)
+            hideLayers(val)
+        elif key == "CorrectRig":
+            correctRig(val)
         elif key == 'AnimationData':
             try:
                 ob = loadedData['Object'][val[0]]
@@ -484,7 +487,7 @@ def parse(tokens):
                 raise NameError("ShapeKeys object %s does not exist" % val[0])
             if ob:
                 bpy.context.scene.objects.active = ob
-                parseShapeKeys(ob, ob.data, val, sub)
+                parseShapeKeys(ob, ob.data, val, sub)        
         else:
             data = parseDefaultType(key, val, sub)                
 
@@ -1944,14 +1947,55 @@ def parseRenderSettings(render, args, tokens):
     return
 
 #
-#    postProcess()
+#    parseDefineProperty(args, tokens):
 #
 
-def postProcess():
+def parseDefineProperty(args, tokens):
+    expr = "bpy.types.Object.%s = %sProperty" % (args[0], args[1])
+    c = '('
+    for option in args[2:]:
+        expr += "%s %s" % (c, option)
+        c = ','
+    expr += ')'
+    #print(expr)
+    exec(expr)
+    #print("Done")
+    return
+
+#
+#    correctRig(args):
+#
+
+def correctRig(args):
     if not toggle & T_MHX:
         return
+    human = args[0]
+    print("CorrectRig %s" % human)    
     try:
-        ob = loadedData['Object']['HumanMesh']
+        ob = loadedData['Object'][human]
+    except:
+        return
+    bpy.context.scene.objects.active = ob
+    bpy.ops.object.mode_set(mode='POSE')
+    for pb in ob.pose.bones:
+        for cns in pb.constraints:
+            if cns.type == 'CHILD_OF':
+                print("Correct %s %s" % (pb, cns))
+                bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
+    return
+        
+
+#
+#    postProcess(args)
+#
+
+def postProcess(args):
+    if not toggle & T_MHX:
+        return
+    human = args[0]
+    print("Postprocess %s" % human)    
+    try:
+        ob = loadedData['Object'][human]
     except:
         ob = None
     if toggle & T_Diamond == 0 and ob:
@@ -1966,7 +2010,7 @@ def postProcess():
 
             rig = bpy.context.scene.objects.active
             print("Rigged", rig, bpy.context.object)
-            ob = loadedData['Object']['HumanMesh']
+            ob = loadedData['Object'][human]
             mod = ob.modifiers[0]
             print(ob, mod, mod.object)
             mod.object = rig
@@ -2141,7 +2185,7 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
             expr = "%s['%s'] = %s" % (var, args[0], args[1])
         except:
             expr = None
-        # print("Property", expr)
+        #print("Property", expr)
         if expr:
             exec(expr, glbals, lcals)
         return
@@ -2356,7 +2400,7 @@ def invalid(condition):
     
 #
 #    clearScene(context):
-#    hideLayers():
+#    hideLayers(args):
 #
     
 def clearScene():
@@ -2377,7 +2421,8 @@ def clearScene():
     #print(scn.objects)
     return scn
 
-def hideLayers():
+def hideLayers(args):
+    print("HideLayers")
     scn = bpy.context.scene
     for n in range(len(scn.layers)):
         if n < 8:

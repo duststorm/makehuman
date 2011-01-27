@@ -458,6 +458,33 @@ LegFKIKDrivers = [
 ]
 
 #
+#	LegProperties
+#	LegPropDrivers
+#
+
+LegProperties = [
+	('LegFkIk_L', 'Enum', ['FK', 'IK'], ['name="Left_Leg_FK/IK"', 'description=""'] ),
+	('LegFkIk_R', 'Enum', ['FK', 'IK'], ['name="Right_Leg_FK/IK"', 'description=""'] ),
+]
+
+LegPropDrivers = [
+	('UpLeg1_L', 'LegFkIk_L', 'Enum', ['FK', 'IK']),
+	('UpLeg3_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_L', 'LegFkIk_L', 'Enum', ['StretchFK', 'StretchIK']),
+	('Foot_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
+	('Toe_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
+
+	('UpLeg1_R', 'LegFkIk_R', 'Enum', ['FK', 'IK']),
+	('UpLeg3_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_R', 'LegFkIk_R', 'Enum', ['StretchFK', 'StretchIK']),
+	('Foot_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
+	('Toe_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
+]
+
+
+#
 #	LegDeformDrivers
 #	Bone : (constraint, driver, rotdiff, keypoints)
 #
@@ -497,6 +524,8 @@ LegDeformDrivers = [
 
 LegShapeDrivers = {
 }
+
+
 #
 #	LegProcess
 #	(bone, axis, angle)

@@ -1,8 +1,5 @@
-Process Human
-
-  *** rig-process
-
-end Process
+# --------------- Process ----------------------------- # 
+*** rig-process
 
 # --------------- Shapekeys ----------------------------- # 
 
@@ -11,15 +8,14 @@ end Process
 
 # --------------- Actions ----------------------------- # 
 
-Pose Human
-end Pose
 *** rig-actions
 *** rig-poses
 *** rig-drivers
+*** rig-correct
 
-#if False
-MaterialAnimationData HumanMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0
-  *** material-drivers
-end MaterialAnimationData
-#endif
+*** material-drivers
 
+# ---------------- Groups -------------------------------- # 
+
+*** group
+ 

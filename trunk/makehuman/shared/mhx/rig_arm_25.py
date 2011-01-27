@@ -561,6 +561,31 @@ ArmFKIKDrivers = [
 ]
 
 #
+#	ArmProperties
+#	ArmPropDrivers
+#
+
+ArmProperties = [
+	('ArmFkIk_L', 'Enum', ['FK', 'IK'], ['name="Left_Arm_FK/IK"', 'description=""'] ),
+	('ArmFkIk_R', 'Enum', ['FK', 'IK'], ['name="Right_Arm_FK/IK"', 'description=""'] ),
+]
+
+ArmPropDrivers = [
+	('UpArm1_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
+	('UpArm3_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
+	('LoArm1_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
+	('LoArm3_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
+	('Hand_L', 'ArmFkIk_L', 'Enum', ['RotFK', 'RotIK']),
+
+	('UpArm1_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
+	('UpArm3_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
+	('LoArm1_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
+	('LoArm3_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
+	('Hand_R', 'ArmFkIk_R', 'Enum', ['RotFK', 'RotIK']),
+]
+
+
+#
 #	ArmDeformDrivers
 #	(Bone, constraint, driver, rotdiff, keypoints)
 #
@@ -586,6 +611,7 @@ ArmShapeDrivers = {}
 	'BicepFlex_R' : ( 'LoArm1_R', 'BendLoArmForward_R',  [(0,1), (90*D,0)] ),
 }
 '''
+
 #
 #	ArmProcess
 #	(bone, axis, angle)

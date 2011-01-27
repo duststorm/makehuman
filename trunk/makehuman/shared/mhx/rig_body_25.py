@@ -183,6 +183,25 @@ def BodyWritePoses(fp):
 	return
 
 #
+#	BodyProperties
+#	BodyPropDrivers
+#
+
+MasterProps = ["Floor","Hips","Neck"]
+
+BodyProperties = [
+	('MhxMaster', 'Enum', MasterProps, ['name="Master"', 'description=""'] ),
+]
+
+BodyPropDrivers = [
+	('Root', 'MhxMaster', 'Enum', MasterProps),
+	('HandIK_L', 'MhxMaster', 'Enum', MasterProps),
+	('HandIK_R', 'MhxMaster', 'Enum', MasterProps),
+	('LegIK_L', 'MhxMaster', 'Enum', MasterProps),
+	('LegIK_R', 'MhxMaster', 'Enum', MasterProps),
+]
+
+#
 #	BodyShapeDrivers
 #	Shape : (driver, channel, coeff)
 #
