@@ -42,7 +42,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         #SLIDERS
         #############
         
-        self.widthSlider = gui3d.Slider(self, position=[10, y, 9.3], value=1.0, min=0.3,max=30.0, label = "Hair width");y+=40
+        self.widthSlider = gui3d.Slider(self, [10, y, 9.3], value=1.0, min=0.3,max=30.0, label = "Hair width");y+=40
         
         self.redSlider = gui3d.Slider(self, [10, y, 9.01], style=gui3d.SliderStyle._replace(normal='slider_red.png'));y+=40
 
@@ -51,7 +51,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSlider = gui3d.Slider(self, [10, y, 9.03], style=gui3d.SliderStyle._replace(normal='slider_blue.png'));y+=50
 
         mesh = gui3d.RectangleMesh(32, 32)
-        self.colorPreview = gui3d.Object(self, mesh, position=[18, y, 9.04])
+        self.colorPreview = gui3d.Object(self, [18, y, 9.04], mesh)
         
         self.redSliderLabel = gui3d.TextView(self, [60, y, 9.04], 'Red: 0');y+=16        
         self.greenSliderLabel = gui3d.TextView(self, [60, y, 9.4], 'Green: 0');y+=16        

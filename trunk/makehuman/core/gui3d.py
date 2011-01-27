@@ -43,32 +43,32 @@ Style = namedtuple('Style', 'width height mesh normal selected focused fontSize 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
 
-    def __init__(self, view, mesh, texture=None, position=[0, 0, 9], width=None, height=None,camera=1, shadeless=1, visible=True):
+    def __init__(self, view, position, mesh, texture=None, visible=True):
         self.app = view.app
         self.view = view
         if isinstance(mesh, str):
             self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
-            if (width!=None) and (height!=None): #we assume automatically that the unit_square is the mesh
-                self.mesh.setScale(width, height, 1.0)
             self.meshName = mesh
         else: # It's of type module3d.Object3D
             self.mesh=mesh
             self.app.scene3d.objects.append(mesh)
             self.meshName = mesh.name
             self.mesh.setLoc(position[0], position[1], position[2])
-        self.texture = texture
+        
         # TL: added this to avoid crash on startup
         if not self.mesh:
             return
+            
+        view.objects.append(self)
+        
         if texture:
             self.mesh.setTexture(texture)
-        view.objects.append(self)
-        self.mesh.setCameraProjection(camera)
+        
         if view.isVisible() and visible:
             self.mesh.setVisibility(1)
         else:
             self.mesh.setVisibility(0)
-        self.mesh.setShadeless(shadeless)
+   
         self.visible = visible
         self.mesh.object = self
         self.__bbox = None
@@ -162,9 +162,11 @@ class Object(events3d.EventHandler):
 class TextObject(Object):
     def __init__(self, view, position, text = '', fontFamily = defaultFontFamily, fontSize = defaultFontSize):
         self.font = view.app.getFont(fontFamily)
-        mesh = font3d.createMesh(self.font, text);
-        mesh.setScale(fontSize, fontSize, fontSize)
-        Object.__init__(self, view, mesh, None, position)
+        self.mesh = font3d.createMesh(self.font, text);
+        self.mesh.setCameraProjection(1)
+        self.mesh.setShadeless(1)
+        self.mesh.setScale(fontSize, fontSize, fontSize)
+        Object.__init__(self, view, position, self.mesh)
         self.text = text
         self.fontSize = fontSize
         
@@ -174,6 +176,8 @@ class TextObject(Object):
         self.text = text
         self.app.scene3d.clear(self.mesh)
         self.mesh = font3d.createMesh(self.font, text, self.mesh);
+        self.mesh.setCameraProjection(1)
+        self.mesh.setShadeless(1)
         self.app.scene3d.update()
         
     def getText(self):
@@ -515,9 +519,9 @@ class Application(events3d.EventHandler):
 
     def onMouseDownCallback(self, button, x, y):
         if button == 4:
-            self.mouseWheel(1)
+            self.onMouseWheelCallback(1)
         elif button == 5:
-            self.mouseWheel(-1)
+            self.onMouseWheelCallback(-1)
         else:
 
             # Build event
@@ -724,10 +728,10 @@ class Slider(View):
         self.focusedThumbTexture = self.app.getThemeResource('images', thumbStyle.focused)
         
         mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
-        self.background = Object(self, mesh, position=position)
+        self.background = Object(self, position, mesh)
         
         mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
-        self.thumb = Object(self, mesh, position=[position[0], position[1]+16, position[2] + 0.01])
+        self.thumb = Object(self, [position[0], position[1]+16, position[2] + 0.01], mesh)
             
         if isinstance(label, str):
             self.label = TextObject(self, [position[0]+10,position[1]-2,position[2]+0.2], label, fontSize = style.fontSize)
@@ -859,7 +863,7 @@ class Button(View):
         self.selectedTexture = self.app.getThemeResource('images', style.selected) if style.selected else None
         self.focusedTexture = self.app.getThemeResource('images', style.focused) if style.focused else None
         
-        if selected:
+        if selected and self.selectedTexture:
             t = self.selectedTexture
         else:
             t = self.texture
@@ -872,14 +876,17 @@ class Button(View):
         self.style = style
             
         if style.mesh:
-            self.button = Object(self, style.mesh, texture=t, position=position)
+            self.button = Object(self, position, style.mesh, texture=t)
             if isinstance(label, str):
                 #assumes button obj origin is upper left corner
                 #TODO text should be in the middle of button, calculate this from text length
                 self.label = TextObject(self, [position[0]+5,position[1]-7,position[2]+0.001], label, fontSize = fontSize)
         else:
-            mesh = NineSliceMesh(width, height, t, border)
-            self.button = Object(self, mesh, position=position)
+            if border:
+                mesh = NineSliceMesh(width, height, t, border)
+            else:
+                mesh = RectangleMesh(width, height, t)
+            self.button = Object(self, position, mesh)
             if isinstance(label, str):
                 self.label = TextObject(self, [position[0] + border[0] + 3,position[1]+height/2-6,position[2]+0.001], label, fontSize = fontSize)
             
@@ -1094,6 +1101,28 @@ class CheckBox(ToggleButton):
         
         Button.__init__(self, parent, position, label, selected, style)
 
+ProgressBarStyle = Style(**{
+    'width':128,
+    'height':4,
+    'mesh':None,
+    'normal':'progressbar_background.png',
+    'selected':None,
+    'focused':None,
+    'fontSize':defaultFontSize,
+    'border':None
+    })
+    
+ProgressBarBarStyle = Style(**{
+    'width':128,
+    'height':4,
+    'mesh':None,
+    'normal':'progressbar.png',
+    'selected':None,
+    'focused':None,
+    'fontSize':defaultFontSize,
+    'border':None
+    })
+
 class ProgressBar(View):
 
     """
@@ -1101,29 +1130,27 @@ class ProgressBar(View):
     lengthy operation.
     """
 
-    def __init__(self, parent, backgroundMesh='data/3dobjs/progressbar_background.obj', backgroundTexture=None,
-        backgroundPosition=[650, 585, 9.85],
-        barMesh='data/3dobjs/progressbar.obj', barTexture=None, barPosition=[650, 585, 9.9], visible=True):
+    def __init__(self, parent, position, style=ProgressBarStyle, barStyle=ProgressBarBarStyle, visible=True):
     
         """
         This is the constructor for the ProgressBar class. It takes the following parameters:
 
-        - **parent**: *View*. The parent view.
-        - **backgroundMesh**: *String*. The background object.
-        - **backgroundTexture**: *String*. The background texture.
-        - **backgroundPosition**: *List*. The background position.
-        - **barMesh**: *String*. The bar object.
-        - **barTexture**: *String*. The bar texture.
-        - **barPosition**: *List*. The bar position.
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position.
+        @type position: C{list}
+        @param style: The style.
+        @type style: L{Style}
+        @param barStyle: The bar style.
+        @type barStyle: L{Style}
         """
 
         View.__init__(self, parent, visible)
         
-        backgroundTexture = backgroundTexture or self.app.getThemeResource("images", "progressbar_background.png")
-        barTexture = barTexture or self.app.getThemeResource("images", "progressbar.png")
-      
-        self.background = Object(self, backgroundMesh, texture=backgroundTexture, position=backgroundPosition)
-        self.bar = Object(self, barMesh, texture=barTexture, position=barPosition)
+        mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
+        self.background = Object(self, position, mesh)
+        mesh = RectangleMesh(barStyle.width, barStyle.height, self.app.getThemeResource('images', barStyle.normal))
+        self.bar = Object(self, position, mesh)
         self.bar.mesh.setScale(0.0, 1.0, 1.0)
         
     def canFocus(self):
@@ -1178,7 +1205,16 @@ class TextView(View):
 
 
 # TextEdit widget
-
+TextEditStyle = Style(**{
+    'width':400,
+    'height':20,
+    'mesh':None,
+    'normal':'texedit_off.png',
+    'selected':None,
+    'focused':'texedit_on.png',
+    'fontSize':defaultFontSize,
+    'border':[2, 2, 2, 2]
+    })
 
 class TextEdit(View):
     
@@ -1186,20 +1222,16 @@ class TextEdit(View):
     A TextEdit widget. This widget can be used to let the user enter some text.
     """
 
-    def __init__(self, parent, mesh='data/3dobjs/backgroundedit.obj', text='', texture=None, position=[0, 0, 9],
-        focusedTexture=None, width=None, height=None, fontSize = defaultFontSize, border = [2, 2, 2, 2]):
+    def __init__(self, parent, position, text='', style=TextEditStyle):
         View.__init__(self, parent)
         
-        self.texture = texture or self.app.getThemeResource('images', 'texedit_off.png')
-        self.focusedTexture = focusedTexture or self.app.getThemeResource('images', 'texedit_on.png')
+        self.texture = self.app.getThemeResource('images', 'texedit_off.png')
+        self.focusedTexture = self.app.getThemeResource('images', 'texedit_on.png')
 
-        if (width!=None) and (height!=None):
-            mesh = NineSliceMesh(width, height, self.texture, border)
-            self.background = Object(self, mesh, position=position)
-        else:
-            self.background = Object(self, mesh=mesh, texture=self.texture, position=position)
+        mesh = NineSliceMesh(style.width, style.height, self.texture, style.border)
+        self.background = Object(self, position, mesh)
             
-        self.textObject = TextObject(self, [position[0] + 10.0, position[1] + 4.0, position[2] + 0.1], fontSize = fontSize)
+        self.textObject = TextObject(self, [position[0] + 10.0, position[1] + 4.0, position[2] + 0.1], fontSize = style.fontSize)
 
         self.text = text
         self.__position = len(self.text)
@@ -1323,7 +1355,7 @@ class FileEntryView(View):
     def __init__(self, parent):
         View.__init__(self, parent)
 
-        self.edit = TextEdit(self, width=400, height=20, position=[200, 90, 9.5])
+        self.edit = TextEdit(self, [200, 90, 9.5])
         self.bConfirm = Button(self, [610, 90, 9.1], 'Save', style=ButtonStyle._replace(width=40, height=20))
 
         @self.bConfirm.event
@@ -1356,13 +1388,13 @@ class FileChooser(View):
     def __init__(self, parent, path, extension, previewExtension='bmp'):
         View.__init__(self, parent)
 
-        self.currentPos = [400, 300, 0]
-        self.nextPos = [550, 250, 0]
-        self.previousPos = [250, 250, 0]
-        self.currentFile = Object(self, mesh='data/3dobjs/file.obj', position=self.currentPos, visible=False)
-        self.nextFile = Object(self, mesh='data/3dobjs/nextfile.obj', position=self.nextPos, visible=False)
-        self.previousFile = Object(self, mesh='data/3dobjs/previousfile.obj', position=self.previousPos, visible=False)
-        self.filename = TextObject(self, [330, 390, 0])
+        self.currentPos = [800 / 2 - 50 * 1.5, 250, 0]
+        self.nextPos = [800 - 800 / 4 - 50, 200, 0]
+        self.previousPos = [800 / 4 - 50, 200, 0]
+        self.currentFile = Object(self, self.currentPos, RectangleMesh(100, 100), visible=False)
+        self.nextFile = Object(self, self.nextPos, RectangleMesh(100, 100), visible=False)
+        self.previousFile = Object(self, self.previousPos, RectangleMesh(100, 100), visible=False)
+        self.filename = TextObject(self, [self.currentPos[0], self.currentPos[1] + 100 * 1.5 + 10, 0])
         self.path = path
         self.extension = extension
         self.previewExtension = previewExtension
@@ -1585,7 +1617,7 @@ class GroupBox(View):
         self.style = style
         
         mesh = NineSliceMesh(style.width, style.height, texture, style.border)
-        self.box = Object(self, mesh, None, position)
+        self.box = Object(self, position, mesh)
         
         if isinstance(label, str):
             self.label = TextObject(self,
@@ -1641,7 +1673,7 @@ class ShortcutEdit(View):
         self.focusedTexture = self.app.getThemeResource('images', 'button_tab3_focused.png')
         
         mesh = NineSliceMesh(64, 22, self.texture, [7,7,7,7])
-        self.background = Object(self, mesh, position=position)
+        self.background = Object(self, position, mesh)
         self.label = TextObject(self,
             [position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001],
             self.shortcutToLabel(shortcut[0], shortcut[1]))
@@ -1811,6 +1843,8 @@ class NineSliceMesh(module3d.Object3D):
                 fg.createFace(v[o+4], v[o+5], v[o+1], v[o], uv=(uv[o+4], uv[o+5], uv[o+1], uv[o]))
                 
         self.texture = texture
+        self.setCameraProjection(1)
+        self.setShadeless(1)
         self.updateIndexBuffer()
     
     def resize(self, width, height):
@@ -1867,6 +1901,8 @@ class RectangleMesh(module3d.Object3D):
         fg.createFace(v[0], v[1], v[2], v[3], uv=uv)
                 
         self.texture = texture
+        self.setCameraProjection(1)
+        self.setShadeless(1)
         self.updateIndexBuffer()
         
     def resize(self, width, height):

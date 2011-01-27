@@ -41,7 +41,9 @@ class Human(gui3d.Object):
 
     def __init__(self, globalScene, objFilePath, hairObj=None):
 
-        gui3d.Object.__init__(self, globalScene.application, objFilePath, position=[0, 0, 0], camera=0, shadeless=0, visible=True)
+        gui3d.Object.__init__(self, globalScene.application, [0, 0, 0], objFilePath, visible=True)
+        self.mesh.setCameraProjection(0)
+        self.mesh.setShadeless(0) 
         self.meshData = self.mesh
 
         # Uncomment the following 4 lines to use a shader

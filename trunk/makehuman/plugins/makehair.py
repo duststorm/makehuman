@@ -25,11 +25,11 @@ class MakeHairTaskView(gui3d.TaskView):
         self.octree = simpleoctree.SimpleOctree(app.selectedHuman.meshStored,0.09)   
         #sliders
         gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=350))
-        self.cPSlider = gui3d.Slider(self, position=[10, 115, 9.3], value=14,min=4,max=30,label="Control Points")
-        self.lengthSlider = gui3d.Slider(self, position=[10, 155, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length")
-        self.numberSlider = gui3d.Slider(self, position=[10, 205, 9.3], value=25,min=1,max=260,label="Strands Number")
-        self.gravitySlider = gui3d.Slider(self, position=[10, 245, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
-        self.cPEntry = gui3d.TextEdit(self, width=112, height=20, text="9,12", position=[18, 285, 9.3])
+        self.cPSlider = gui3d.Slider(self, [10, 115, 9.3], value=14,min=4,max=30,label="Control Points")
+        self.lengthSlider = gui3d.Slider(self, [10, 155, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length")
+        self.numberSlider = gui3d.Slider(self, [10, 205, 9.3], value=25,min=1,max=260,label="Strands Number")
+        self.gravitySlider = gui3d.Slider(self, [10, 245, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
+        self.cPEntry = gui3d.TextEdit(self, [18, 285, 9.3], "9,12", gui3d.TextEditStyle._replace(width=112))
         
         @self.cPSlider.event
         def onChange(value):

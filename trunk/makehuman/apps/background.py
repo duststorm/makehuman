@@ -46,7 +46,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
             bg = self.app.categories['Modelling'].backgroundImage
             bg.mesh.setTexture('backgrounds/' + filename)
-            group = bg.mesh.getFaceGroup('default-dummy-group')
+            group = bg.mesh.getFaceGroup('rectangle')
             group.setColor([255, 255, 255, 100])
             if self.texture.width > self.texture.height:
                 bg.setScale(1.0, float(self.texture.height) / float(self.texture.width))

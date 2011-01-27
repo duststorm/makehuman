@@ -141,8 +141,9 @@ class MHApplication(gui3d.Application):
         }
         
         # Display the initial splash screen and the progress bar during startup
-        self.splash = gui3d.Object(self, "data/3dobjs/splash.obj", self.getThemeResource("images", "splash.png"), position = [0, 0, 9.8])
-        self.progressBar = gui3d.ProgressBar(self)
+        mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
+        self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
+        self.progressBar = gui3d.ProgressBar(self, [650, 585, 9.8])
         self.scene3d.update()
         self.redrawNow()
 
@@ -150,10 +151,10 @@ class MHApplication(gui3d.Application):
 
         self.progressBar.setProgress(0.1)
 
-        self.upperbar = gui3d.Object(self, gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "upperbar.png")), position=[0, 0, 9])
-        self.background = gui3d.Object(self, gui3d.RectangleMesh(800, 600, self.getThemeResource("images", "background.png")), position = [0, 0, -89.99])
-        self.lowerbar = gui3d.Object(self, gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")), position=[0, 32, 9])
-        self.statusbar = gui3d.Object(self, gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")), position=[0, 580, 9])
+        self.upperbar = gui3d.Object(self, [0, 0, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "upperbar.png")))
+        self.background = gui3d.Object(self, [0, 0, -89.99], gui3d.RectangleMesh(800, 600, self.getThemeResource("images", "background.png")))
+        self.lowerbar = gui3d.Object(self, [0, 32, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
+        self.statusbar = gui3d.Object(self, [0, 580, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
         
         mh.callAsync(self.loadHuman)
         
@@ -568,7 +569,7 @@ class MHApplication(gui3d.Application):
             color = [  0,   0,   0, 255]
             self.categories["Modelling"].anaglyphsButton.setSelected(True)
         else:
-            color = [100, 100, 100, 255]
+            color = [255, 255, 255, 255]
             self.categories["Modelling"].anaglyphsButton.setSelected(False)
         for g in background.mesh.facesGroups:
             g.setColor(color)

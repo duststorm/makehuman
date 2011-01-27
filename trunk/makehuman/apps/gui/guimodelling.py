@@ -42,9 +42,9 @@ import guidetailmodelling
 import os
 
 HairButtonStyle = gui3d.Style(**{
-    'width':None,
-    'height':None,
-    'mesh':'data/3dobjs/button_standard_little.obj',
+    'width':32,
+    'height':32,
+    'mesh':None,
     'normal':None,
     'selected':None,
     'focused':None,
@@ -59,16 +59,18 @@ class ModellingCategory(gui3d.Category):
         
         gui3d.GroupBox(self, [10, 472, 9.0], 'View settings')
         
-        self.background = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, -89.98])
+        mesh = gui3d.RectangleMesh(420, 420, self.app.getThemeResource("images", 'lowerbar.png'))
+        self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
 
         hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
-        self.currentHair = gui3d.Button(self, [600, 580, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
+        self.currentHair = gui3d.Button(self, [584, 564, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
 
         @self.currentHair.event
         def onClicked(event):
             self.app.switchCategory('Library')
 
-        self.backgroundImage = gui3d.Object(self, 'data/3dobjs/background.obj', position=[400, 300, 1], visible=False)
+        mesh = gui3d.RectangleMesh(420, 420)
+        self.backgroundImage = gui3d.Object(self, [190, 90, 1], mesh, visible=False)
         self.backgroundImageToggle = gui3d.ToggleButton(self, [15, 514, 9.1], 'Bkg',
             style=gui3d.ButtonStyle._replace(width=32, height=16))
 
