@@ -58,6 +58,9 @@ class ModellingCategory(gui3d.Category):
         gui3d.Category.__init__(self, parent, 'Modelling')
         
         gui3d.GroupBox(self, [10, 472, 9.0], 'View settings')
+        
+        mesh = gui3d.RectangleMesh(420, 420, self.app.getThemeResource("images", 'background.png'))
+        self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
 
         hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
         self.currentHair = gui3d.Button(self, [800-216, 600-36, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
@@ -105,4 +108,5 @@ class ModellingCategory(gui3d.Category):
 
     def onResized(self, event):
         self.currentHair.setPosition([event[0]-216, event[1]-36, 9.2])
+        self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
         self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
