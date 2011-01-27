@@ -63,7 +63,7 @@ class ModellingCategory(gui3d.Category):
         self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
 
         hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
-        self.currentHair = gui3d.Button(self, [584, 564, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
+        self.currentHair = gui3d.Button(self, [800-216, 600-36, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
 
         @self.currentHair.event
         def onClicked(event):
@@ -107,4 +107,6 @@ class ModellingCategory(gui3d.Category):
         guidetailmodelling.MicroModelingTaskView(self)
 
     def onResized(self, event):
-        self.currentHair.setPosition([event[0]-200, event[1]-20, 9.2])
+        self.currentHair.setPosition([event[0]-216, event[1]-36, 9.2])
+        self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
+        self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)

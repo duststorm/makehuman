@@ -143,7 +143,7 @@ class MHApplication(gui3d.Application):
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
         self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
-        self.progressBar = gui3d.ProgressBar(self, [650, 585, 9.8])
+        self.progressBar = gui3d.ProgressBar(self, [800-150, 600-15, 9.85])
         self.scene3d.update()
         self.redrawNow()
 

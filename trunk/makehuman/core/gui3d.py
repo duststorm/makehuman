@@ -1150,7 +1150,7 @@ class ProgressBar(View):
         mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
         self.background = Object(self, position, mesh)
         mesh = RectangleMesh(barStyle.width, barStyle.height, self.app.getThemeResource('images', barStyle.normal))
-        self.bar = Object(self, position, mesh)
+        self.bar = Object(self, [position[0], position[1], position[2]+0.05], mesh)
         self.bar.mesh.setScale(0.0, 1.0, 1.0)
         
     def canFocus(self):
@@ -1160,7 +1160,7 @@ class ProgressBar(View):
         self.background.setPosition(position)
         self.bar.setPosition([position[0], position[1], position[2] + 0.05])
 
-    def setProgress(self, progress, redraw=1):
+    def setProgress(self, progress, redraw=True):
         """
     This method updates the progress and optionally updates the screen
 
