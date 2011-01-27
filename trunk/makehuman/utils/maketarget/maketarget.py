@@ -7,7 +7,7 @@ Project Name:                **MakeHuman**
 Product Home Page:           http://www.makehuman.org/
 Authors:                     Manuel Bastioni
 Copyright(c):                MakeHuman Team 2001-2010
-Licensing:                   GPL3 
+Licensing:                   GPL3
 ===========================  ===============================================================
 
 The MakeHuman application uses predefined morph target files to distort
@@ -69,14 +69,14 @@ loadedTraslTarget = ""
 loadedRotTarget = ""
 loadedPoseTarget = ""
 targetBuffer = [] #Loaded target Data
-message = "" 
+message = ""
 
 targetVertexList = None
 targetVertexLookup = None
 targetBasePath = None
 
 regularise = maketargetlib.RegularisationTool(basePath)
-  
+
 #--------SOME BLENDER SPECIFICS SHORTCUTS------------
 
 def startEditing():
@@ -95,7 +95,7 @@ def redrawAll():
 def getVertices(n=0,name = None, copy = True):
     if name:
         obj = Blender.Object.Get(name).getData(mesh=True)
-    else:    
+    else:
         obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     if copy:
         vertices = [[v.co[0],v.co[1],v.co[2]] for v in obj.verts]
@@ -112,7 +112,7 @@ def getVertGroups(n=0, name = None):
     vertGroups = {}
     if name:
         obj = Blender.Object.Get(name).getData(mesh=True)
-    else:    
+    else:
         obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     vertGroupNames = obj.getVertGroupNames()
     for n in vertGroupNames:
@@ -123,13 +123,13 @@ def getSelectedVertices(n=0, name = None):
     selectedVertices = []
     if name:
         obj = Blender.Object.Get(name).getData(mesh=True)
-    else:    
+    else:
         obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     for i,v in enumerate(obj.verts):
         if v.sel == 1:
             selectedVertices.append(i)
     return selectedVertices
-    
+
 def selectVert(vertsToSelect, n=0, name = None):
     if name:
         obj = Blender.Object.Get(name).getData(mesh=True)
@@ -143,18 +143,18 @@ def selectVert(vertsToSelect, n=0, name = None):
 def updateVertices(vertices, n=0, name = None):
     if name:
         obj = Blender.Object.Get(name).getData(mesh=True)
-    else:    
-        obj = Blender.Object.GetSelected()[n].getData(mesh=True)    
+    else:
+        obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     for i,v in enumerate(vertices):
         obj.verts[i].co[0], obj.verts[i].co[1],obj.verts[i].co[2] = v[0],v[1],v[2]
     obj.update()
     obj.calcNormals()
-    
+
 def colorVertices(vertColors, n=0):
     obj = Blender.Object.GetSelected()[n].getData(mesh=True)
     obj.vertexColors = True
     for f in obj.faces:
-        for i, v in enumerate(f):            
+        for i, v in enumerate(f):
             col = f.col[i]
             col2 = vertColors[v.index]
             print col2
@@ -163,30 +163,30 @@ def colorVertices(vertColors, n=0):
             col.b = col2[2]
     obj.update()
     obj.calcNormals()
-    
+
 def createMesh(verts, faces, name):
     """
     Create mesh on the Blender scene
     """
-    scn = bpy.data.scenes.active 
+    scn = bpy.data.scenes.active
     mesh = bpy.data.meshes.new(name)
     mesh.verts.extend(verts)
     mesh.faces.extend(faces)
     ob = scn.objects.new(mesh, name)
     return ob
-    
+
 def applyTransforms():
     objs = Blender.Object.Get()
-    for obj in objs:            
+    for obj in objs:
         if type(obj.getData(mesh=True)) == Types.MeshType:
             mesh = obj.getData(mesh=True)
-            m = obj.getMatrix()           
+            m = obj.getMatrix()
             obj.setLocation(0,0,0)
             obj.setSize(1,1,1)
             obj.setEuler(0,0,0)
-            mesh.transform(m)      # Convert verts to world space            
+            mesh.transform(m)      # Convert verts to world space
             mesh.update()
-        
+
 def render(path = "//myRenderdir/", imageName = "001.tga"):
     scn = Scene.GetCurrent()
     context = scn.getRenderingContext()
@@ -196,18 +196,18 @@ def render(path = "//myRenderdir/", imageName = "001.tga"):
     context.renderPath = path
     context.sizePreset(Render.PC)
 
-    context.imageType = Render.TARGA   
+    context.imageType = Render.TARGA
     context.render()
     context.saveRenderedImage(imageName)
     Render.CloseRenderWindow()
 
 
 
-    
+
 #-------MAKETARGET CALLBACKS----------------------
 
 def buildScan2Mesh(path):
-    global message    
+    global message
     main_dir = os.path.dirname(path)
     target_dir = os.path.join(main_dir,"target_db_scan2mesh")
     if not os.path.isdir(target_dir):
@@ -219,7 +219,7 @@ def buildScan2Mesh(path):
     head_mask = os.path.join(main_dir,"base_mask.obj")
     prefix = os.path.join(main_dir,"fitdata")
     maketargetlib.scan2meshBuild(target_dir, head_mesh ,head_mask,prefix)
-    
+
 def fitScan2Mesh(path):
     global message, regulFactor,fitVert1
     print "Fitting using a regul = %f"%(regulFactor.val)
@@ -238,19 +238,19 @@ def fitScan2Mesh(path):
         message = "Error: head_vertices.dat not found!"
         print message
 
-    
+
 def saveScanMask(path):
     mainDir = os.path.dirname(path)
-    scanMask = Blender.Object.Get("scan_mask") 
-    scanMaskPath = os.path.join(mainDir,"scan_mask.obj")   
-    bExporter = blender2obj.Blender2obj(scanMask,1)    
+    scanMask = Blender.Object.Get("scan_mask")
+    scanMaskPath = os.path.join(mainDir,"scan_mask.obj")
+    bExporter = blender2obj.Blender2obj(scanMask,1)
     bExporter.write(scanMaskPath,1)
-    
+
 def saveBaseMask(path):
     mainDir = os.path.dirname(path)
-    baseMask = Blender.Object.Get("base_mask") 
-    baseMaskPath = os.path.join(mainDir,"base_mask.obj")   
-    bExporter = blender2obj.Blender2obj(baseMask,1)    
+    baseMask = Blender.Object.Get("base_mask")
+    baseMaskPath = os.path.join(mainDir,"base_mask.obj")
+    bExporter = blender2obj.Blender2obj(baseMask,1)
     bExporter.write(baseMaskPath,1)
 
 def saveBaseMesh(path):
@@ -259,13 +259,13 @@ def saveBaseMesh(path):
     baseMaskPath = os.path.join(mainDir,"base_mesh.obj")
     bExporter = blender2obj.Blender2obj(baseMask,1)
     bExporter.write(baseMaskPath,1)
-    
+
 def saveScanMesh(path):
     mainDir = os.path.dirname(path)
     scanMesh = Blender.Object.Get("scan_mesh")
-    scanMeshPath = os.path.join(mainDir,"scan_mesh.obj")   
-    bExporter = blender2obj.Blender2obj(scanMesh,1)    
-    bExporter.write(scanMeshPath,1)    
+    scanMeshPath = os.path.join(mainDir,"scan_mesh.obj")
+    bExporter = blender2obj.Blender2obj(scanMesh,1)
+    bExporter.write(scanMeshPath,1)
 
 
 def buildSVDdb(path):
@@ -280,7 +280,7 @@ def buildRegulariseDb(path):
 
 
 def loadFitTarget(path):
-    
+
     mainDir = os.path.dirname(path)
     tPath = os.path.join(mainDir,"result.target")
     loadTarget(tPath)
@@ -297,11 +297,11 @@ def scan2mh(path):
     loadSelVertsBase(path)
     adapt(path)
     loadedTraslTarget = objToCOnvertPath
-    
+
 
 def loadTarget(path):
-    global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode    
-    startEditing()    
+    global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget,poseMode
+    startEditing()
     if os.path.splitext(path)[1] == ".rot":
         loadedRotTarget = path
         loadedTraslTarget = ""
@@ -318,9 +318,9 @@ def loadTarget(path):
         loadedPoseTarget = path
         loadedTraslTarget = ""
         loadedRotTarget = ""
-        poseMode = True    
+        poseMode = True
     endEditing()
-  
+
 def applyTarget(mFactor, n=0, meshName = None):
     global loadedTraslTarget,rotationMode,loadedRotTarget,loadedPoseTarget
     startEditing()
@@ -329,28 +329,28 @@ def applyTarget(mFactor, n=0, meshName = None):
         maketargetlib.loadRotTarget(vertices,loadedRotTarget,mFactor)
     if not rotationMode.val and not poseMode:
         maketargetlib.loadTraslTarget(vertices,loadedTraslTarget,mFactor)
-    if not rotationMode.val and poseMode:        
+    if not rotationMode.val and poseMode:
         maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor)
     if rotationMode.val and poseMode:
-        maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor,onlyRot = True)        
+        maketargetlib.loadPoseFromFile(vertices,loadedPoseTarget,mFactor,onlyRot = True)
     updateVertices(vertices, n, name = meshName)
     endEditing()
-    
+
 
 def applyPosesFromLibrary(path, n=0, meshName = None, onlyRot = False):
-    
+
     mainDir = os.path.dirname(path)
     poseFiles = os.listdir(mainDir)
     homedir = os.path.expanduser('~')
 
     saveDir = os.path.join(homedir, "poseLibBlender")
     if not os.path.isdir(saveDir):
-        os.mkdir(saveDir)    
-    
+        os.mkdir(saveDir)
+
     for poseFile in poseFiles:
 
         blendFile = os.path.join(saveDir,poseFile+".blend")
-        
+
         startEditing()
         vertices = getVertices(n, name = meshName)
         pPath = os.path.join(mainDir,poseFile)
@@ -388,37 +388,37 @@ def scanReg(scan):
     #put scan on the left of base
     matrixT = TranslationMatrix(Vector(-3, 7, 0))
     ob.setMatrix(matrixT)
-    endEditing()   
-        
-def saveTarget(path):    
-    global saveOnlySelectedVerts,basePath, message     
-    verticesTosave = []    
+    endEditing()
+
+def saveTarget(path):
+    global saveOnlySelectedVerts,basePath, message
+    verticesTosave = []
     vertices = getVertices()
     if saveOnlySelectedVerts.val:
         verticesTosave = getSelectedVertices()
     else:
         verticesTosave = xrange(len(vertices))
-    if os.path.splitext(path)[1] == ".rot":        
+    if os.path.splitext(path)[1] == ".rot":
         maketargetlib.saveRotTargets(vertices, path, basePath,getSelectedVertices())
     else:
         maketargetlib.saveTraslTarget(vertices, path, basePath, verticesTosave)
     message = "Saved in %s"%(path)
     redrawAll()
 
-def seekGroup():    
-    vertSelect = getSelectedVertices()   
+def seekGroup():
+    vertSelect = getSelectedVertices()
     vertices = getVertices()
-    vertGroups  = getVertGroups()    
+    vertGroups  = getVertGroups()
     maketargetlib.seekGroupName(vertices, vertSelect, vertGroups)
 
-def saveGroups(path):    
+def saveGroups(path):
     vertGroups  = getVertGroups().keys()
-    vertGroups.sort()   
+    vertGroups.sort()
     maketargetlib.saveGroups(vertGroups, path, "joint")
-    
+
 def reset():
     global basePath
-    startEditing()    
+    startEditing()
     vertices = getVertices()
     maketargetlib.resetMesh(vertices, basePath)
     updateVertices(vertices)
@@ -430,12 +430,12 @@ def regulariseMesh():
     regularise.projectTarget(vertices)
     updateVertices(vertices)
     endEditing()
-    
+
 def symm(rightMirror, n=0):
     global pairsPath, centersPath
-    startEditing() 
+    startEditing()
     vertices = getVertices(n)
-    maketargetlib.symmetrise(vertices, pairsPath, centersPath, rightMirror)    
+    maketargetlib.symmetrise(vertices, pairsPath, centersPath, rightMirror)
     updateVertices(vertices)
     endEditing()
 
@@ -448,17 +448,46 @@ def processingTargetsSimple(path,mFactor):
     """
     Load and then save all targets in a dir
     """
-    reset()
+    #reset()
     targetDir = os.path.dirname(path)
     targetsList = os.listdir(targetDir)
+
     for targetName in targetsList:
-        targetPath = os.path.join(targetDir,targetName)           
+        blendFile = os.path.join(targetDir,targetName+".blend")
+        targetPath = os.path.join(targetDir,targetName)
         if os.path.isfile(targetPath):
             print "Processing %s"%(targetName)
             loadTarget(targetPath)
             applyTarget(mFactor)
             #it should do something here
+            #saveTarget(targetPath)
+            Blender.Save(blendFile)
+            applyTarget(-mFactor)
+            #reset()
+
+def processingTargetsSimple2(path,mFactor):
+    """
+    Load and then save all targets in a dir
+    """
+    #reset()
+    targetDir = os.path.dirname(path)
+    targetsList = os.listdir(targetDir)
+    targetToSubtract = "C:/Users/124578/Documents/mhsrc/data/targets/macrodetails/neutral-female-old.target"
+
+    for targetName in targetsList:
+        blendFile = os.path.join(targetDir,targetName+".blend")
+        targetPath = os.path.join(targetDir,targetName)
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetName)
+            loadTarget(targetPath)
+            applyTarget(mFactor)
+
+            loadTarget(targetToSubtract)
+            applyTarget(-1)
+            #it should do something here
             saveTarget(targetPath)
+            #Blender.Save(blendFile)
+            #applyTarget(-mFactor)
             reset()
 
 
@@ -467,9 +496,9 @@ def processingTargetsRender(path,mFactor):
     This function is used to render all targets in a dir
     """
 
-    targetDir = os.path.dirname(path)    
+    targetDir = os.path.dirname(path)
     targetsList = os.listdir(targetDir)
-    for targetName in targetsList:        
+    for targetName in targetsList:
         targetPath = os.path.join(targetDir,targetName)
         if os.path.isfile(targetPath):
             loadTarget(targetPath)
@@ -486,27 +515,27 @@ def processingTargetsSymm(path,mFactor):
     """
     targetDir = os.path.dirname(path)
     targetsList = os.listdir(targetDir)
-    for targetName in targetsList:       
+    for targetName in targetsList:
         targetPath = os.path.join(targetDir,targetName)
         targetNameNoExt = os.path.splitext(targetName)[0]
         targetPathSym = os.path.join(targetDir,targetNameNoExt+"-symm.target")
         if os.path.isfile(targetPath):
             print "Processing %s"%(targetName)
-            loadTarget(targetPath)            
-            applyTarget(mFactor)    
+            loadTarget(targetPath)
+            applyTarget(mFactor)
             symm(1,0)
             #applyTarget(-mFactor)
             saveTarget(targetPath)
             reset()
-                             
-                
 
-def processingTargets(path, processingType=2):
+
+
+def processingTargets(path, processingType=3):
     global morphFactor
     startEditing()
     if processingType == 1:
         processingTargetsRender(path,morphFactor.val)
-    if processingType == 2:       
+    if processingType == 2:
         processingTargetsSymm(path,morphFactor.val)
     if processingType == 3:
         processingTargetsSimple(path,morphFactor.val)
@@ -514,7 +543,7 @@ def processingTargets(path, processingType=2):
 
 
 
-    
+
 def adapt(path):
     global fitVert2
     mainDir = os.path.dirname(path)
@@ -533,7 +562,7 @@ def align():
     startEditing()
     maskBaseVerts = getVertices(name="base_mask")
     maskScanVerts = getVertices(name="scan_mask")
-    
+
     if len(maskBaseVerts) != len(maskScanVerts):
         message = "Error: Masks with different number of vertices: %d vs %d"%(len(maskBaseVerts),len(maskScanVerts))
         return
@@ -541,11 +570,11 @@ def align():
     maketargetlib.alignScan(maskBaseVerts, maskScanVerts, scanVerts)
     updateVertices(scanVerts,name="scan_mesh")
     #updateVertices(maskScanVerts,name="scan_mask")
-    endEditing()  
-    
-def saveSelVerts(path, n= 0):    
+    endEditing()
+
+def saveSelVerts(path, n= 0):
     maketargetlib.saveIndexSelectedVerts(getSelectedVertices(n), path)
-    
+
 def loadSelVerts(path):
     startEditing()
     selVerts = maketargetlib.loadVertsIndex(path)
@@ -557,10 +586,10 @@ def loadSelVertsBase(path):
     mainDir = os.path.dirname(path)
     path = os.path.join(mainDir, "verts_to_fit.verts")#TODO: no hardcoded!
     startEditing()
-    selVerts = maketargetlib.loadVertsIndex(path)    
+    selVerts = maketargetlib.loadVertsIndex(path)
     selectVert(selVerts, name = "Base")
     endEditing()
-    
+
 def analyseTarget(n=0):
     global targetBuffer
     vertices = getVertices(n)
@@ -693,8 +722,8 @@ def event(event, value):
         Window.FileSelector (processingTargetsSymm, "Save Target")
     elif event == Draw.DKEY:
         pass
-        
-    elif event == Draw.EKEY:        
+
+    elif event == Draw.EKEY:
         align()
     elif event == Draw.FKEY:
         Window.FileSelector (generateTargetsDB, "Generate DB from")
@@ -736,7 +765,7 @@ def event(event, value):
         GUIswitch += 1
     elif event == Draw.PAGEUPKEY and not value and GUIswitch > 1:
         GUIswitch -= 1
-    
+
     Draw.Draw()
 
 
