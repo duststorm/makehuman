@@ -160,7 +160,7 @@ class Object(events3d.EventHandler):
 
 
 class TextObject(Object):
-    def __init__(self, view, fontFamily = defaultFontFamily, text = '', position=[0, 0, 9], fontSize = defaultFontSize):
+    def __init__(self, view, position, text = '', fontFamily = defaultFontFamily, fontSize = defaultFontSize):
         self.font = view.app.getFont(fontFamily)
         mesh = font3d.createMesh(self.font, text);
         mesh.setScale(fontSize, fontSize, fontSize)
@@ -665,7 +665,27 @@ class Application(events3d.EventHandler):
 # Widgets
 
 # Slider widget
-
+SliderStyle = Style(**{
+    'width':128,
+    'height':32,
+    'mesh':None,
+    'normal':'slider_generic.png',
+    'selected':None,
+    'focused':None,
+    'fontSize':defaultFontSize,
+    'border':None
+    })
+    
+SliderThumbStyle = Style(**{
+    'width':16,
+    'height':16,
+    'mesh':None,
+    'normal':'slider.png',
+    'selected':None,
+    'focused':'slider_focused.png',
+    'fontSize':defaultFontSize,
+    'border':None
+    })
 
 class Slider(View):
     
@@ -676,41 +696,44 @@ class Slider(View):
     current value as parameter.
     """
 
-    def __init__(self, parent, backgroundTexture=None, sliderTexture=None, focusedSliderTexture=None,\
-        position=[0, 0, 15], value=0.0, min=0.0, max=1.0, label=None, fontSize = defaultFontSize):
-            
+    def __init__(self, parent, position, value=0.0, min=0.0, max=1.0, label=None,
+        style=SliderStyle, thumbStyle=SliderThumbStyle):
+        
         """
-        This is the constructor for the Button class. It takes the following parameters:
+        This is the constructor for the Button class.
 
-        - **parent**: *View*. The parent view.
-        - **backgroundTexture**: *String*. The slider background texture.
-        - **sliderTexture**: *String*. The slider texture.
-        - **focusedSliderTexture**: *String*. The focused slider texture.
-        - **position**: *List*. The slider position.
-        - **value**: *Float or Int*. The original value.
-        - **min**: *Float or Int*. The minimum value.
-        - **max**: *Float or Int*. The maximum value.
-        - **label**: *String*. The slider label.
-        - **fontSize**: *Float*. The slider label font size.
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position.
+        @type position: C{list}
+        @param value: The original value.
+        @type value: C{int} or C{float}
+        @param min: The minimum value.
+        @type min: C{int} or C{float}
+        @param max: The maximum value.
+        @type max: C{int} or C{float}
+        @param label: The label.
+        @type label: C{str}
+        @param style: The style.
+        @type style: L{Style}
         """
         
         View.__init__(self, parent)
         
-        self.sliderTexture = sliderTexture or self.app.getThemeResource('images', 'slider.png')
-        self.focusedSliderTexture = focusedSliderTexture or self.app.getThemeResource('images', 'slider_focused.png')
+        self.thumbTexture = self.app.getThemeResource('images', thumbStyle.normal)
+        self.focusedThumbTexture = self.app.getThemeResource('images', thumbStyle.focused)
         
-        self.background = Object(self, 'data/3dobjs/slider_background.obj',
-            texture=(backgroundTexture or self.app.getThemeResource('images', 'slider_generic.png')), position=position)
+        mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
+        self.background = Object(self, mesh, position=position)
         
-        #mesh = NineSliceMesh(16, 16, self.sliderTexture, [2,2,2,2])
-        #self.slider = Object(self, mesh, position=[position[0], position[1] + 20, position[2] + 0.01])
-        self.slider = Object(self, 'data/3dobjs/slider_cursor.obj',
-            texture=self.sliderTexture, position=[position[0], position[1] + 20, position[2] + 0.01])
-        if isinstance(label, str):
-            self.label = TextObject(self, text = label, position = [position[0]+10,position[1]-2,position[2]+0.2], fontSize = fontSize)
+        mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
+        self.thumb = Object(self, mesh, position=[position[0], position[1]+16, position[2] + 0.01])
             
-        self.sliderMinX = position[0] + 17
-        self.sliderMaxX = position[0] + 111
+        if isinstance(label, str):
+            self.label = TextObject(self, [position[0]+10,position[1]-2,position[2]+0.2], label, fontSize = style.fontSize)
+            
+        self.thumbMinX = position[0] + 8
+        self.thumbMaxX = position[0] + style.width - 16 - 8
         self.min = min
         self.max = max
         self.setValue(value)
@@ -720,29 +743,29 @@ class Slider(View):
         
     def setPosition(self, position):
         self.background.setPosition(position)
-        self.sliderMinX = position[0] + 17
-        self.sliderMaxX = position[0] + 111
+        self.thumbMinX = position[0] + 17
+        self.thumbMaxX = position[0] + 111
         self.setValue(self.getValue())
         self.label.setPosition([position[0]+10,position[1]-2,position[2]+0.2])
 
     def setValue(self, value):
         self.__value = min(self.max, max(self.min, value))
-        sliderPos = self.slider.getPosition()
+        thumbPos = self.thumb.getPosition()
         #for values that are integer we need a float denominator
         value = (self.__value - self.min) / float(self.max - self.min)
-        sliderPos[0] = value * (self.sliderMaxX - self.sliderMinX) + self.sliderMinX
-        self.slider.setPosition(sliderPos)
+        thumbPos[0] = value * (self.thumbMaxX - self.thumbMinX) + self.thumbMinX
+        self.thumb.setPosition(thumbPos)
 
     def getValue(self):
         return self.__value
 
     def onMouseDragged(self, event):
-        sliderPos = self.slider.getPosition()
-        screenPos = mh.cameras[1].convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
+        thumbPos = self.thumb.getPosition()
+        screenPos = mh.cameras[1].convertToScreen(thumbPos[0], thumbPos[1], thumbPos[2])
         worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
-        sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
-        self.slider.setPosition(sliderPos)
-        value = (sliderPos[0] - self.sliderMinX) / float(self.sliderMaxX - self.sliderMinX)
+        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0]))
+        self.thumb.setPosition(thumbPos)
+        value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
         self.__value = value * (self.max - self.min) + self.min
         if isinstance(self.min, int):
             self.__value = int(self.__value)
@@ -750,12 +773,12 @@ class Slider(View):
         self.callEvent('onChanging', self.__value)
 
     def onMouseUp(self, event):
-        sliderPos = self.slider.getPosition()
-        screenPos = mh.cameras[1].convertToScreen(sliderPos[0], sliderPos[1], sliderPos[2])
+        thumbPos = self.thumb.getPosition()
+        screenPos = mh.cameras[1].convertToScreen(thumbPos[0], thumbPos[1], thumbPos[2])
         worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
-        sliderPos[0] = min(self.sliderMaxX, max(self.sliderMinX, worldPos[0]))
-        self.slider.setPosition(sliderPos)
-        value = (sliderPos[0] - self.sliderMinX) / float(self.sliderMaxX - self.sliderMinX)
+        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0]))
+        self.thumb.setPosition(thumbPos)
+        value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
         self.__value = value * (self.max - self.min) + self.min
         if isinstance(self.min, int):
             self.__value = int(self.__value)
@@ -783,12 +806,12 @@ class Slider(View):
                 self.callEvent('onChange', self.__value)
 
     def onFocus(self, event):
-        if self.focusedSliderTexture:
-            self.slider.setTexture(self.focusedSliderTexture)
+        if self.focusedThumbTexture:
+            self.thumb.setTexture(self.focusedThumbTexture)
 
     def onBlur(self, event):
-        if self.focusedSliderTexture:
-            self.slider.setTexture(self.sliderTexture)
+        if self.focusedThumbTexture:
+            self.thumb.setTexture(self.thumbTexture)
 
 
 # Button widget
@@ -814,13 +837,18 @@ class Button(View):
     def __init__(self, parent, position, label=None, selected=False, style=ButtonStyle):
         
         """
-        This is the constructor for the Button class. It takes the following parameters:
+        This is the constructor for the Button class.
 
-        - **parent**: *View*. The parent view.
-        - **position**: *List*. The button position.
-        - **label**: *String*. The button label.
-        - **selected**: *bool*. The button selected state.
-        - **style**: *Style*. The button style.
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position.
+        @type position: C{list}
+        @param label: The label.
+        @type label: C{str}
+        @param selected: The selected state.
+        @type selected: C{Boolean} 
+        @param style: The style.
+        @type style: L{Style}
         """
         
         View.__init__(self, parent)
@@ -848,12 +876,12 @@ class Button(View):
             if isinstance(label, str):
                 #assumes button obj origin is upper left corner
                 #TODO text should be in the middle of button, calculate this from text length
-                self.label = TextObject(self, text = label, position = [position[0]+5,position[1]-7,position[2]+0.001], fontSize = fontSize)
+                self.label = TextObject(self, [position[0]+5,position[1]-7,position[2]+0.001], label, fontSize = fontSize)
         else:
             mesh = NineSliceMesh(width, height, t, border)
             self.button = Object(self, mesh, position=position)
             if isinstance(label, str):
-                self.label = TextObject(self, text = label, position = [position[0] + border[0] + 3,position[1]+height/2-6,position[2]+0.001], fontSize = fontSize)
+                self.label = TextObject(self, [position[0] + border[0] + 3,position[1]+height/2-6,position[2]+0.001], label, fontSize = fontSize)
             
         self.selected = selected
         
@@ -945,14 +973,20 @@ class RadioButton(Button):
     def __init__(self, parent, group, position, label=None, selected=False, style=RadioButtonStyle):
             
         """
-        This is the constructor for the RadioButton class. It takes the following parameters:
+        This is the constructor for the RadioButton class.
 
-        - **parent**: *View*. The parent view.
-        - **group**: *List*. The radio button group.
-        - **position**: *List*. The radio button position.
-        - **label**: *String*. The radio button label.
-        - **selected**: *bool*. The radio button selected state.
-        - **style**: *Style*. The radio button style.
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param group: The group.
+        @type group: C{list}
+        @param position: The position.
+        @type position: C{list}
+        @param label: The label.
+        @type label: C{str}
+        @param selected: The selected state.
+        @type selected: C{Boolean} 
+        @param style: The style.
+        @type style: L{Style}
         """
         
         Button.__init__(self, parent, position, label, selected, style)
@@ -994,13 +1028,18 @@ class ToggleButton(Button):
     def __init__(self, parent, position, label=None, selected=False, style=ButtonStyle):
             
         """
-        This is the constructor for the ToggleButton class. It takes the following parameters:
+        This is the constructor for the ToggleButton class.
 
-        - **parent**: *View*. The parent view.
-        - **position**: *List*. The toggle button position.
-        - **label**: *String*. The toggle button label.
-        - **selected**: *bool*. The toggle button selected state.
-        - **style**: *Style*. The toggle button style.
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position.
+        @type position: C{list}
+        @param label: The label.
+        @type label: C{str}
+        @param selected: The selected state.
+        @type selected: C{Boolean} 
+        @param style: The style.
+        @type style: L{Style}
         """
 
         Button.__init__(self, parent, position, label, selected, style)
@@ -1039,13 +1078,18 @@ class CheckBox(ToggleButton):
     def __init__(self, parent, position, label=None, selected=False, style=CheckBoxStyle):
         
         """
-        This is the constructor for the CheckBox class. It takes the following parameters:
+        This is the constructor for the CheckBox class.
 
-        - **parent**: *View*. The parent view.
-        - **position**: *List*. The checkBox position.
-        - **label**: *String*. The checkBox label.
-        - **selected**: *bool*. The checkBox selected state.
-        - **style**: *Style*. The checkBox style.
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position.
+        @type position: C{list}
+        @param label: The label.
+        @type label: C{str}
+        @param selected: The selected state.
+        @type selected: C{Boolean} 
+        @param style: The style.
+        @type style: L{Style}
         """
         
         Button.__init__(self, parent, position, label, selected, style)
@@ -1118,9 +1162,7 @@ class TextView(View):
 
     def __init__(self, parent, position=[0, 0, 9], label = '', fontSize = defaultFontSize):
         View.__init__(self, parent)
-        self.textObject = TextObject(self, position=position, fontSize = fontSize)
-        if label:
-            self.setText(label)
+        self.textObject = TextObject(self, position, label, fontSize = fontSize)
             
     def canFocus(self):
         return False
@@ -1157,7 +1199,7 @@ class TextEdit(View):
         else:
             self.background = Object(self, mesh=mesh, texture=self.texture, position=position)
             
-        self.textObject = TextObject(self, position=[position[0] + 10.0, position[1] + 4.0, position[2] + 0.1], fontSize = fontSize)
+        self.textObject = TextObject(self, [position[0] + 10.0, position[1] + 4.0, position[2] + 0.1], fontSize = fontSize)
 
         self.text = text
         self.__position = len(self.text)
@@ -1320,7 +1362,7 @@ class FileChooser(View):
         self.currentFile = Object(self, mesh='data/3dobjs/file.obj', position=self.currentPos, visible=False)
         self.nextFile = Object(self, mesh='data/3dobjs/nextfile.obj', position=self.nextPos, visible=False)
         self.previousFile = Object(self, mesh='data/3dobjs/previousfile.obj', position=self.previousPos, visible=False)
-        self.filename = TextObject(self, position = [330, 390, 0])
+        self.filename = TextObject(self, [330, 390, 0])
         self.path = path
         self.extension = extension
         self.previewExtension = previewExtension
@@ -1524,12 +1566,16 @@ class GroupBox(View):
     def __init__(self, parent, position=[0, 0, 9], label=None, style=GroupBoxStyle):
         
         """
-        This is the constructor for the Button class. It takes the following parameters:
+        This is the constructor for the GroupBox class.
 
-        - **parent**: *View*. The parent view.
-        - **position**: *List*. The box position.
-        - **label**: *String*. The box label.
-        - **style**: *Style*. The box style.
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position, a list of 4 C{int} or C{float} elements.
+        @type position: C{list}
+        @param label: The label.
+        @type label: C{str}
+        @param style: The style.
+        @type style: L{Style}
         """
         
         View.__init__(self, parent)
@@ -1542,8 +1588,9 @@ class GroupBox(View):
         self.box = Object(self, mesh, None, position)
         
         if isinstance(label, str):
-            self.label = TextObject(self, text = label,
-                position = [position[0]+style.border[0],position[1]+style.border[1]/2-6,position[2]+0.001],
+            self.label = TextObject(self,
+                [position[0]+style.border[0],position[1]+style.border[1]/2-6,position[2]+0.001],
+                label,
                 fontSize = style.fontSize)
     
     def getPosition(self):
@@ -1570,7 +1617,24 @@ class GroupBox(View):
         pass
         
 class ShortcutEdit(View):
+    
+    """
+    An edit control for entering shortcuts.
+    """
+    
     def __init__(self, parent, position, shortcut):
+        
+        """
+        This is the constructor for the ShortcutEdit class.
+
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position, a list of 4 C{int} or C{float} elements.
+        @type position: C{list}
+        @param shortcut: The position, a C{tuple} of modifiers and a key.
+        @type shortcut: C{tuple}
+        """
+        
         View.__init__(self, parent)
         
         self.texture = self.app.getThemeResource('images', 'button_tab3_on.png')
@@ -1578,8 +1642,9 @@ class ShortcutEdit(View):
         
         mesh = NineSliceMesh(64, 22, self.texture, [7,7,7,7])
         self.background = Object(self, mesh, position=position)
-        self.label = TextObject(self, text=self.shortcutToLabel(shortcut[0], shortcut[1]),
-            position = [position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001])
+        self.label = TextObject(self,
+            [position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001],
+            self.shortcutToLabel(shortcut[0], shortcut[1]))
             
     def getPosition(self):
         return self.background.getPosition()
@@ -1685,16 +1750,24 @@ class ShortcutEdit(View):
 
 class NineSliceMesh(module3d.Object3D):
     
+    """
+    A 9 slice mesh. It is a mesh with fixed size borders and a resizeable center.
+    This makes sure the borders of a group box are not stretched.
+    """
+    
     def __init__(self, width, height, texture, border):
     
         """
-        Creates a 9 slice mesh. It is a mesh with fixed size borders and a resizeable center.
-        This makes sure the borders of a group box are not stretched.
-        
-        - **width**: *Float*. The width of the mesh.
-        - **height**: *Float*. The height of the mesh.
-        - **texture**: *String*. The texture.
-        - **border**: *List*. The left, top, right, bottom border.
+        This is the constructor for the NineSliceMesh class.
+
+        @param width: The width.
+        @type width: C{int} or C{float}
+        @param height: The height.
+        @type height: C{int} or C{float}
+        @param texture: The texture.
+        @type texture: C{str}
+        @param border: The border, a list of 4 C{int} or C{float} elements.
+        @type border: C{list}
         """
         
         module3d.Object3D.__init__(self, '9slice_' + texture + '_' + str(border))
@@ -1758,17 +1831,21 @@ class NineSliceMesh(module3d.Object3D):
     
 class RectangleMesh(module3d.Object3D):
             
-    def __init__(self, width, height, texture):
+    def __init__(self, width, height, texture=None):
+        
         
         """
-        This is the constructor for the RectangleMesh class. It takes the following parameters:
-        
-        - **width**: *Float*. The width of the mesh.
-        - **height**: *Float*. The height of the mesh.
-        - **texture**: *String*. The texture.
+        This is the constructor for the RectangleMesh class.
+
+        @param width: The width.
+        @type width: C{int} or C{float}
+        @param height: The height.
+        @type height: C{int} or C{float}
+        @param texture: The texture.
+        @type texture: C{str}
         """
         
-        module3d.Object3D.__init__(self, 'rectangle_' + texture)
+        module3d.Object3D.__init__(self, 'rectangle_%s' % texture)
         
         self.uvValues = []
         self.indexBuffer = []
@@ -1784,7 +1861,7 @@ class RectangleMesh(module3d.Object3D):
         v.append(self.createVertex([0.0, height, 0.0]))
         
         # The 4 uv values
-        uv = ([0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0])
+        uv = ([0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0])
         
         # The face
         fg.createFace(v[0], v[1], v[2], v[3], uv=uv)

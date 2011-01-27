@@ -256,17 +256,14 @@ class MacroModelingTaskView(gui3d.TaskView):
         modifier = humanmodifier.Modifier(human, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         self.heightSlider.setValue(0.5 + modifier.getValue() / 2.0)
 
-    def syncEthnics(self):
-        #self.asiaButton.syncEthnics()
-        #self.europeButton.syncEthnics()
-        #self.africaButton.syncEthnics()
-        #self.americaButton.syncEthnics()
-        pass
-
     def syncStatus(self):
         human = self.app.selectedHuman
         status = ''
-        if abs(human.getGender() - 0.5) < 0.01:
+        if human.getGender() == 0.0:
+            gender = 'Gender: female, '
+        elif human.getGender() == 1.0:
+            gender = 'Gender: male, '
+        elif abs(human.getGender() - 0.5) < 0.01:
             gender = 'Gender: neutral, '
         else:
             gender = 'Gender: %.2f%% female, %.2f%% male, ' % ((1.0 - human.getGender()) * 100, human.getGender() * 100)
@@ -283,7 +280,6 @@ class MacroModelingTaskView(gui3d.TaskView):
     def onShow(self, event):
         self.genderSlider.setFocus()
         self.syncSliders()
-        self.syncEthnics()
         self.syncStatus()
         gui3d.TaskView.onShow(self, event)
 
