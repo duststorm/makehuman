@@ -724,6 +724,9 @@ class Slider(View):
         
         View.__init__(self, parent)
         
+        self.style = style
+        self.thumbStyle = thumbStyle
+        
         self.thumbTexture = self.app.getThemeResource('images', thumbStyle.normal)
         self.focusedThumbTexture = self.app.getThemeResource('images', thumbStyle.focused)
         
@@ -736,8 +739,8 @@ class Slider(View):
         if isinstance(label, str):
             self.label = TextObject(self, [position[0]+10,position[1]-2,position[2]+0.2], label, fontSize = style.fontSize)
             
-        self.thumbMinX = position[0] + 8
-        self.thumbMaxX = position[0] + style.width - 16 - 8
+        self.thumbMinX = position[0] + thumbStyle.width / 2
+        self.thumbMaxX = position[0] + style.width - thumbStyle.width - thumbStyle.width / 2
         self.min = min
         self.max = max
         self.setValue(value)
@@ -747,8 +750,8 @@ class Slider(View):
         
     def setPosition(self, position):
         self.background.setPosition(position)
-        self.thumbMinX = position[0] + 17
-        self.thumbMaxX = position[0] + 111
+        self.thumbMinX = position[0] + self.thumbStyle.width / 2
+        self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width - self.thumbStyle.width / 2
         self.setValue(self.getValue())
         self.label.setPosition([position[0]+10,position[1]-2,position[2]+0.2])
 
@@ -767,7 +770,7 @@ class Slider(View):
         thumbPos = self.thumb.getPosition()
         screenPos = mh.cameras[1].convertToScreen(thumbPos[0], thumbPos[1], thumbPos[2])
         worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
-        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0]))
+        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0] - self.thumbStyle.width / 2))
         self.thumb.setPosition(thumbPos)
         value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
         self.__value = value * (self.max - self.min) + self.min
@@ -780,7 +783,7 @@ class Slider(View):
         thumbPos = self.thumb.getPosition()
         screenPos = mh.cameras[1].convertToScreen(thumbPos[0], thumbPos[1], thumbPos[2])
         worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
-        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0]))
+        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0] - self.thumbStyle.width / 2))
         self.thumb.setPosition(thumbPos)
         value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
         self.__value = value * (self.max - self.min) + self.min
@@ -1213,7 +1216,7 @@ TextEditStyle = Style(**{
     'selected':None,
     'focused':'texedit_on.png',
     'fontSize':defaultFontSize,
-    'border':[2, 2, 2, 2]
+    'border':[4, 4, 4, 4]
     })
 
 class TextEdit(View):

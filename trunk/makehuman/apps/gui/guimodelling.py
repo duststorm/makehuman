@@ -109,4 +109,4 @@ class ModellingCategory(gui3d.Category):
     def onResized(self, event):
         self.currentHair.setPosition([event[0]-216, event[1]-36, 9.2])
         self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
-        self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
+        self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[0] - 190 * 2)
