@@ -566,22 +566,22 @@ ArmFKIKDrivers = [
 #
 
 ArmProperties = [
-	('ArmFkIk_L', 'Enum', ['FK', 'IK'], ['name="Left_Arm_FK/IK"', 'description=""'] ),
-	('ArmFkIk_R', 'Enum', ['FK', 'IK'], ['name="Right_Arm_FK/IK"', 'description=""'] ),
+	('Left_arm', 'Enum', ['FK', 'IK'], ['name="Left_Arm_FK/IK"', 'description=""'] ),
+	('Right_arm', 'Enum', ['FK', 'IK'], ['name="Right_Arm_FK/IK"', 'description=""'] ),
 ]
 
 ArmPropDrivers = [
-	('UpArm1_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
-	('UpArm3_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
-	('LoArm1_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
-	('LoArm3_L', 'ArmFkIk_L', 'Enum', ['FK', 'IK']),
-	('Hand_L', 'ArmFkIk_L', 'Enum', ['RotFK', 'RotIK']),
+	('UpArm1_L', 'Left_arm', 'Enum', ['FK', 'IK']),
+	('UpArm3_L', 'Left_arm', 'Enum', ['FK', 'IK']),
+	('LoArm1_L', 'Left_arm', 'Enum', ['FK', 'IK']),
+	('LoArm3_L', 'Left_arm', 'Enum', ['FK', 'IK']),
+	('Hand_L', 'Left_arm', 'Enum', ['RotFK', 'RotIK']),
 
-	('UpArm1_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
-	('UpArm3_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
-	('LoArm1_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
-	('LoArm3_R', 'ArmFkIk_R', 'Enum', ['FK', 'IK']),
-	('Hand_R', 'ArmFkIk_R', 'Enum', ['RotFK', 'RotIK']),
+	('UpArm1_R', 'Right_arm', 'Enum', ['FK', 'IK']),
+	('UpArm3_R', 'Right_arm', 'Enum', ['FK', 'IK']),
+	('LoArm1_R', 'Right_arm', 'Enum', ['FK', 'IK']),
+	('LoArm3_R', 'Right_arm', 'Enum', ['FK', 'IK']),
+	('Hand_R', 'Right_arm', 'Enum', ['RotFK', 'RotIK']),
 ]
 
 

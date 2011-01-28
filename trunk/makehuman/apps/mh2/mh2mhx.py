@@ -66,7 +66,7 @@ def exportMhx(obj, filename):
 			mh2proxy.safePrint("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
 	
 	if '25' in theConfig.mhxversion:
-		theHuman = os.path.basename(name).capitalize()
+		theHuman = os.path.basename(name).capitalize().replace(' ','_')
 		time1 = time.clock()
 		filename = name+"-25"+ext
 		try:

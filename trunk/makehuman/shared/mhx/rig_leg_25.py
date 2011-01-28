@@ -463,24 +463,24 @@ LegFKIKDrivers = [
 #
 
 LegProperties = [
-	('LegFkIk_L', 'Enum', ['FK', 'IK'], ['name="Left_Leg_FK/IK"', 'description=""'] ),
-	('LegFkIk_R', 'Enum', ['FK', 'IK'], ['name="Right_Leg_FK/IK"', 'description=""'] ),
+	('Left_leg', 'Enum', ['FK', 'IK'], ['name="Left_Leg_FK/IK"', 'description=""'] ),
+	('Right_leg', 'Enum', ['FK', 'IK'], ['name="Right_Leg_FK/IK"', 'description=""'] ),
 ]
 
 LegPropDrivers = [
-	('UpLeg1_L', 'LegFkIk_L', 'Enum', ['FK', 'IK']),
-	('UpLeg3_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_L', 'LegFkIk_L', 'Enum', ['StretchFK', 'StretchIK']),
-	('Foot_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
-	('Toe_L', 'LegFkIk_L', 'Enum', ['RotFK', 'RotIK']),
+	('UpLeg1_L', 'Left_leg', 'Enum', ['FK', 'IK']),
+	('UpLeg3_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_L', 'Left_leg', 'Enum', ['StretchFK', 'StretchIK']),
+	('Foot_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
+	('Toe_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
 
-	('UpLeg1_R', 'LegFkIk_R', 'Enum', ['FK', 'IK']),
-	('UpLeg3_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_R', 'LegFkIk_R', 'Enum', ['StretchFK', 'StretchIK']),
-	('Foot_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
-	('Toe_R', 'LegFkIk_R', 'Enum', ['RotFK', 'RotIK']),
+	('UpLeg1_R', 'Right_leg', 'Enum', ['FK', 'IK']),
+	('UpLeg3_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
+	('LoLeg_R', 'Right_leg', 'Enum', ['StretchFK', 'StretchIK']),
+	('Foot_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
+	('Toe_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
 ]
 
 

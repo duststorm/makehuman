@@ -190,15 +190,15 @@ def BodyWritePoses(fp):
 MasterProps = ["Floor","Hips","Neck"]
 
 BodyProperties = [
-	('MhxMaster', 'Enum', MasterProps, ['name="Master"', 'description=""'] ),
+	('Root_parent', 'Enum', MasterProps, ['name="Master"', 'description=""'] ),
 ]
 
 BodyPropDrivers = [
-	('Root', 'MhxMaster', 'Enum', MasterProps),
-	('HandIK_L', 'MhxMaster', 'Enum', MasterProps),
-	('HandIK_R', 'MhxMaster', 'Enum', MasterProps),
-	('LegIK_L', 'MhxMaster', 'Enum', MasterProps),
-	('LegIK_R', 'MhxMaster', 'Enum', MasterProps),
+	('Root', 'Root_parent', 'Enum', MasterProps),
+	('HandIK_L', 'Root_parent', 'Enum', MasterProps),
+	('HandIK_R', 'Root_parent', 'Enum', MasterProps),
+	('LegIK_L', 'Root_parent', 'Enum', MasterProps),
+	('LegIK_R', 'Root_parent', 'Enum', MasterProps),
 ]
 
 #

@@ -116,11 +116,11 @@ def FaceWriteDrivers(fp):
 GazeProps = ['Head','World']
 
 FaceProperties = [
-	('MhxGaze', 'Enum', GazeProps, ['name="Gaze"', 'description=""'] ),
+	('Gaze_parent', 'Enum', GazeProps, ['name="Gaze"', 'description=""'] ),
 ]
 
 FacePropDrivers = [
-	('Gaze', 'MhxGaze', 'Enum', GazeProps),
+	('Gaze', 'Gaze_parent', 'Enum', GazeProps),
 ]
 
 
