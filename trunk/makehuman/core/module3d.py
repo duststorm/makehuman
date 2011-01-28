@@ -800,6 +800,9 @@ class Object3D:
 
         self.texture = path
         
+        if not path:
+            self.clearTexture()
+        
         texture = getTexture(path)
         
         if texture:
