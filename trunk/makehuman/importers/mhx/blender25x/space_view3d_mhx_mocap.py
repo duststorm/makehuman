@@ -2281,9 +2281,9 @@ class Bvh2MhxPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scn = context.scene
-		layout.operator("object.InitInterfaceButton")
-		layout.operator("object.SaveDefaultsButton")
-		layout.operator("object.CopyAnglesFKIKButton")
+		layout.operator("view3d.mhx_init_interface")
+		layout.operator("view3d.mhx_save_defaults")
+		layout.operator("view3d.mhx_copy_angles_fk_ik")
 
 		layout.label('Load')
 		layout.prop(scn, "MhxBvhScale")
@@ -2295,48 +2295,48 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout.prop(scn, "MhxRot90Anim")
 		layout.prop(scn, "MhxDoSimplify")
 		layout.prop(scn, "MhxApplyFixes")
-		layout.operator("object.LoadBvhButton")
-		layout.operator("object.RetargetMhxButton")
+		layout.operator("view3d.mhx_load_bvh")
+		layout.operator("view3d.mhx_retarget_mhx")
 		layout.separator()
-		layout.operator("object.LoadRetargetSimplifyButton")
+		layout.operator("view3d.mhx_load_retarget_simplify")
 
 		layout.label('Toggle')
-		layout.operator("object.TogglePoleTargetsButton")
-		layout.operator("object.ToggleIKLimitsButton")
-		layout.operator("object.ToggleLimitConstraintsButton")
+		layout.operator("view3d.mhx_toggle_pole_targets")
+		layout.operator("view3d.mhx_toggle_ik_limits")
+		layout.operator("view3d.mhx_toggle_ik_constraints")
 
 		layout.label('Plant')
 		row = layout.row()
 		row.prop(scn, "MhxPlantLoc")
 		row.prop(scn, "MhxPlantRot")
 		layout.prop(scn, "MhxPlantCurrent")
-		layout.operator("object.PlantButton")
+		layout.operator("view3d.mhx_plant")
 
 		layout.label('Simplify')
 		layout.prop(scn, "MhxErrorLoc")
 		layout.prop(scn, "MhxErrorRot")
-		layout.operator("object.SimplifyFCurvesButton")
+		layout.operator("view3d.mhx_simplify_fcurves")
 
 		layout.label('Batch conversion')
 		layout.prop(scn, "MhxDirectory")
 		layout.prop(scn, "MhxPrefix")
-		layout.operator("object.BatchButton")
+		layout.operator("view3d.mhx_batch")
 
 		layout.label('Manage actions')
 		listAllActions(context)
 		setAction()
 		layout.prop_menu_enum(scn, "MhxActions")
-		layout.operator("object.SelectButton")
+		layout.operator("view3d.mhx_select")
 		layout.prop(scn, "MhxReallyDelete")
-		layout.operator("object.DeleteButton")
+		layout.operator("view3d.mhx_delete")
 		return
 
 #
-#	class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_LoadBvhButton"
+class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_load_bvh"
 	bl_label = "Load BVH file (.bvh)"
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the OBJ file", maxlen=1024, default="")
 
@@ -2352,11 +2352,11 @@ class OBJECT_OT_LoadBvhButton(bpy.types.Operator):
 		return {'RUNNING_MODAL'}	
 
 #
-#	class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_RetargetMhxButton"
+class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_retarget_mhx"
 	bl_label = "Retarget selected to MHX"
 
 	def execute(self, context):
@@ -2369,11 +2369,11 @@ class OBJECT_OT_RetargetMhxButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_SimplifyFCurvesButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_SimplifyFCurvesButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SimplifyFCurvesButton"
+class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_simplify_fcurves"
 	bl_label = "Simplify FCurves"
 
 	def execute(self, context):
@@ -2382,11 +2382,11 @@ class OBJECT_OT_SimplifyFCurvesButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SilenceConstraintsButton"
+class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_silence_constraints"
 	bl_label = "Silence constraints"
 
 	def execute(self, context):
@@ -2396,11 +2396,11 @@ class OBJECT_OT_SilenceConstraintsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_TogglePoleTargetsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_TogglePoleTargetsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_TogglePoleTargetsButton"
+class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_toggle_pole_targets"
 	bl_label = "Toggle pole targets"
 
 	def execute(self, context):
@@ -2410,11 +2410,11 @@ class OBJECT_OT_TogglePoleTargetsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_ToggleIKLimitsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_ToggleIKLimitsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ToggleIKLimitsButton"
+class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_toggle_ik_limits"
 	bl_label = "Toggle IK limits"
 
 	def execute(self, context):
@@ -2424,11 +2424,11 @@ class OBJECT_OT_ToggleIKLimitsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_ToggleLimitConstraintsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_ToggleLimitConstraintsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ToggleLimitConstraintsButton"
+class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_toggle_limit_constraints"
 	bl_label = "Toggle Limit constraints"
 
 	def execute(self, context):
@@ -2438,11 +2438,11 @@ class OBJECT_OT_ToggleLimitConstraintsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_InitInterfaceButton"
+class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_init_interface"
 	bl_label = "Initialize"
 
 	def execute(self, context):
@@ -2452,11 +2452,11 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_SaveDefaultsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_SaveDefaultsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SaveDefaultsButton"
+class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_save_defaults"
 	bl_label = "Save defaults"
 
 	def execute(self, context):
@@ -2464,11 +2464,11 @@ class OBJECT_OT_SaveDefaultsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_PlantButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxPlantButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_PlantButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_PlantButton"
+class VIEW3D_OT_MhxPlantButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_plant"
 	bl_label = "Plant"
 
 	def execute(self, context):
@@ -2478,11 +2478,11 @@ class OBJECT_OT_PlantButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_CopyAnglesFKIKButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxCopyAnglesFKIKButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_CopyAnglesFKIKButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_CopyAnglesFKIKButton"
+class VIEW3D_OT_MhxCopyAnglesFKIKButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_copy_angles_fk_ik"
 	bl_label = "Angles FK --> IK"
 
 	def execute(self, context):
@@ -2493,7 +2493,7 @@ class OBJECT_OT_CopyAnglesFKIKButton(bpy.types.Operator):
 
 #
 #	loadRetargetSimplify(context, filepath):
-#	class OBJECT_OT_LoadRetargetSimplify(bpy.types.Operator):
+#	class VIEW3D_OT_MhxLoadRetargetSimplify(bpy.types.Operator):
 #
 
 def loadRetargetSimplify(context, filepath):
@@ -2509,8 +2509,8 @@ def loadRetargetSimplify(context, filepath):
 	print("%s finished in %.3f s" % (filepath, time2-time1))
 	return
 
-class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_LoadRetargetSimplifyButton"
+class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_load_retarget_simplify"
 	bl_label = "Load, retarget, simplify"
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
@@ -2526,7 +2526,7 @@ class OBJECT_OT_LoadRetargetSimplifyButton(bpy.types.Operator):
 
 #
 #	readDirectory(directory, prefix):
-#	class OBJECT_OT_BatchButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
 #
 
 def readDirectory(directory, prefix):
@@ -2540,8 +2540,8 @@ def readDirectory(directory, prefix):
 			paths.append("%s/%s" % (realdir, fileName))
 	return paths
 
-class OBJECT_OT_BatchButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_BatchButton"
+class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_batch"
 	bl_label = "Batch run"
 
 	def execute(self, context):
@@ -2560,8 +2560,8 @@ class OBJECT_OT_BatchButton(bpy.types.Operator):
 #
 #	listAllActions(context):
 #	findAction(name):
-#	OBJECT_OT_SelectButton(bpy.types.Operator):
-#	class OBJECT_OT_DeleteButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSelectButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
 #
 
 def listAllActions(context):
@@ -2588,8 +2588,8 @@ def findAction(name):
 			return n
 	raise NameError("Unrecognized action %s" % name)
 
-class OBJECT_OT_SelectButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SelectButton"
+class VIEW3D_OT_MhxSelectButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_select"
 	bl_label = "Select action"
 
 	@classmethod
@@ -2611,8 +2611,8 @@ class OBJECT_OT_SelectButton(bpy.types.Operator):
 
 		return{'FINISHED'}	
 
-class OBJECT_OT_DeleteButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_DeleteButton"
+class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_delete"
 	bl_label = "Delete action"
 
 	@classmethod

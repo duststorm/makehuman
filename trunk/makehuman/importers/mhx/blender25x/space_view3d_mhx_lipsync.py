@@ -467,8 +467,8 @@ def initInterface(scn):
 		scn['MhxSyncAutoKeyframe'] = False
 		scn['MhxBodyLanguage'] = True
 
-	defineEnumButtons('Gaze', ['Gaze'], ['Head', 'World'])
-	defineEnumButtons('Master', ['Root', 'HandIK_L', 'HandIK_R', 'LegIK_L', 'LegIK_R'], ['Floor', 'Hips', 'Neck'])
+	#defineEnumButtons('Gaze', ['Gaze'], ['Head', 'World'])
+	#defineEnumButtons('Master', ['Root', 'HandIK_L', 'HandIK_R', 'LegIK_L', 'LegIK_R'], ['Floor', 'Hips', 'Neck'])
 	return
 
 # Define viseme buttons
@@ -477,8 +477,8 @@ def defineVisemeButtons():
 	visemes = bodyLanguageVisemes
 	for vis in visemes.keys():
 		expr = (
-"class OBJECT_OT_%sButton(bpy.types.Operator):\n" % vis+
-"	bl_idname = 'OBJECT_OT_%sButton'\n" % vis+
+"class VIEW3D_OT_Mhx%sButton(bpy.types.Operator):\n" % vis +
+"	bl_idname = 'view3d.mhx_%s'\n" % vis.lower() +
 "	bl_label = '%s'\n" % vis +	
 "	def invoke(self, context, event):\n" +
 "		global bpy, mathutils\n" +
@@ -490,12 +490,13 @@ def defineVisemeButtons():
 	return
 
 #
-#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_InitInterfaceButton"
+class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_init_interface"
 	bl_label = "Initialize"
+	bl_options = {'REGISTER'}
 
 	def execute(self, context):
 		import bpy
@@ -504,11 +505,11 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 # 
-#	class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_LoadMohoButton"
+class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_load_moho"
 	bl_label = "Moho (.dat)"
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
@@ -523,11 +524,11 @@ class OBJECT_OT_LoadMohoButton(bpy.types.Operator):
 		return {'RUNNING_MODAL'}	
 
 #
-#	class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxLoadMagpieButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_LoadMagpieButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_LoadMagpieButton"
+class VIEW3D_OT_MhxLoadMagpieButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_load_magpie"
 	bl_label = "Magpie (.mag)"
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
@@ -554,11 +555,11 @@ def rigHasExpressions(rig):
 	return ('Pguilty' in rig.pose.bones.keys())
 
 #
-#	class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ResetExpressionsButton"
+class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_reset_expressions"
 	bl_label = "Reset expressions"
 
 	def execute(self, context):
@@ -574,11 +575,11 @@ class OBJECT_OT_ResetExpressionsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_ResetBoneExpressionsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxResetBoneExpressionsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_ResetBoneExpressionsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ResetBoneExpressionsButton"
+class VIEW3D_OT_MhxResetBoneExpressionsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_reset_bone_expressions"
 	bl_label = "Reset expressions"
 
 	def execute(self, context):
@@ -597,7 +598,7 @@ class OBJECT_OT_ResetBoneExpressionsButton(bpy.types.Operator):
 #
 #	createDrivers(context):	
 #
-#	class OBJECT_OT_CreateDriversButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxCreateDriversButton(bpy.types.Operator):
 #
 
 def createDrivers(context):		
@@ -655,8 +656,8 @@ def createDriver(name, keys):
 
 	return
 	
-class OBJECT_OT_CreateDriversButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_CreateDriversButton"
+class VIEW3D_OT_MhxCreateDriversButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_create_drivers"
 	bl_label = "Create drivers"
 
 	def execute(self, context):
@@ -666,7 +667,7 @@ class OBJECT_OT_CreateDriversButton(bpy.types.Operator):
 
 #
 #	removeDrivers(context):		
-#	class OBJECT_OT_RemoveDriversButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxRemoveDriversButton(bpy.types.Operator):
 #
 
 def removeDrivers(context):		
@@ -690,8 +691,8 @@ def removeDrivers(context):
 				pass
 	return
 
-class OBJECT_OT_RemoveDriversButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_RemoveDriversButton"
+class VIEW3D_OT_MhxRemoveDriversButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_remove_drivers"
 	bl_label = "Remove drivers"
 
 	def execute(self, context):
@@ -728,8 +729,8 @@ def setGlobals(context):
 		
 #
 #	setAllFKIK(value):
-#	class OBJECT_OT_SetAllFKButton(bpy.types.Operator):
-#	class OBJECT_OT_SetAllIKButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSetAllFKButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSetAllIKButton(bpy.types.Operator):
 #
 
 def setAllFKIK(value):
@@ -740,16 +741,16 @@ def setAllFKIK(value):
 			pbones[name+suffix].location[0] = value
 	return
 
-class OBJECT_OT_SetAllFKButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SetAllFKButton"
+class VIEW3D_OT_MhxSetAllFKButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_set_all_fk"
 	bl_label = "All FK"
 
 	def execute(self, context):
 		setAllFKIK(0.0)
 		return{'FINISHED'}	
 
-class OBJECT_OT_SetAllIKButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SetAllIKButton"
+class VIEW3D_OT_MhxSetAllIKButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_set_all_ik"
 	bl_label = "All IK"
 
 	def execute(self, context):
@@ -759,8 +760,8 @@ class OBJECT_OT_SetAllIKButton(bpy.types.Operator):
 
 #
 #	setAllFingers(value):
-#	class OBJECT_OT_SetAllFingersOffButton(bpy.types.Operator):
-#	class OBJECT_OT_SetAllFingersOnButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSetAllFingersOffButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSetAllFingersOnButton(bpy.types.Operator):
 #
 
 def setAllFingers(value):
@@ -771,16 +772,16 @@ def setAllFingers(value):
 			pbones['PFinger-%d%s' % (n, suffix)].location[0] = value
 	return
 
-class OBJECT_OT_SetAllFingersOffButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SetAllFingersOffButton"
+class VIEW3D_OT_MhxSetAllFingersOffButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_set_all_fingers_off"
 	bl_label = "All off"
 
 	def execute(self, context):
 		setAllFingers(0.0)
 		return{'FINISHED'}	
 
-class OBJECT_OT_SetAllFingersOnButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SetAllFingersOnButton"
+class VIEW3D_OT_MhxSetAllFingersOnButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_set_all_fingers_on"
 	bl_label = "All on"
 
 	def execute(self, context):
@@ -791,7 +792,7 @@ class OBJECT_OT_SetAllFingersOnButton(bpy.types.Operator):
 #	setEnum(name, cnslist):
 #	defineEnumButtons(name, bones, enums):
 #
-
+"""
 def setEnum(name, cnslist):
 	global theRig
 	pb = theRig.pose.bones[name]
@@ -805,8 +806,8 @@ def defineEnumButtons(name, bones, enums):
 		for enum1 in enums1:
 			elist.append( ('%s' % enum1, (enum==enum1)*1) )
 		expr = (
-'class OBJECT_OT_Set%s%sButton(bpy.types.Operator):\n' % (name, enum) +
-'	bl_idname = "OBJECT_OT_Set%s%sButton"\n' % (name, enum) +
+'class VIEW3D_OT_MhxSet%s%sButton(bpy.types.Operator):\n' % (name, enum) +
+'	bl_idname = "view3d.mhx_set_%s_%s"\n' % (name.lower(), enum.lower()) +
 '	bl_label = "%s"\n' % enum +
 '	def execute(self, context):\n' +
 '		for bone in %s:\n' % bones +
@@ -816,7 +817,7 @@ def defineEnumButtons(name, bones, enums):
 		print(expr)
 		exec(expr)
 	return
-
+"""
 #
 #	class MhxDriversPanel(bpy.types.Panel):
 #
@@ -828,24 +829,23 @@ class MhxDriversPanel(bpy.types.Panel):
 	
 	@classmethod
 	def poll(cls, context):
-		return context.object
+		return None
 
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("object.InitInterfaceButton")
-		
+		layout.operator("view3d.mhx_init_interface")
+		"""		
 		if theRig:
 			pbones = theRig.pose.bones
-			
 			layout.label("Arm and leg FK/IK")
 			layout.prop(pbones['PArmIK_L'], 'location', index=0, text='Arm IK Left')
 			layout.prop(pbones['PArmIK_R'], 'location', index=0, text='Arm IK Right')
 			layout.prop(pbones['PLegIK_L'], 'location', index=0, text='Leg IK Left')
 			layout.prop(pbones['PLegIK_R'], 'location', index=0, text='Leg IK Right')
 			row = layout.row()
-			row.operator("object.SetAllFKButton")
-			row.operator("object.SetAllIKButton")
+			row.operator("view3d.mhx_set_all_fk")
+			row.operator("view3d.mhx_set_all_ik")
 
 			layout.label("Finger control")
 			fingers = ['Thumb', 'Index', 'Long', 'Ring', 'Pinky']
@@ -854,21 +854,21 @@ class MhxDriversPanel(bpy.types.Panel):
 				row.prop(pbones['PFinger-%d_L' % n], 'location', index=0, text='L '+fingers[n-1])
 				row.prop(pbones['PFinger-%d_R' % n], 'location', index=0, text='R '+fingers[n-1])
 			row = layout.row()
-			row.operator("object.SetAllFingersOffButton")
-			row.operator("object.SetAllFingersOnButton")
+			row.operator("view3d.mhx_set_all_fingers_off")
+			row.operator("view3d.mhx_set_all_fingers_on")
 
 			layout.label("Gaze")
 			row = layout.row()
-			row.operator("object.SetGazeHeadButton")
-			row.operator("object.SetGazeWorldButton")
+			row.operator("view3d.mhx_set_gaze_head")
+			row.operator("view3d.mhx_set_gaze_world")
 
 			layout.label("Master")
 			row = layout.row()
-			row.operator("object.SetMasterFloorButton")
-			row.operator("object.SetMasterHipsButton")
-			row.operator("object.SetMasterNeckButton")
+			row.operator("view3d.mhx_set_master_floor")
+			row.operator("view3d.mhx_set_master_hips")
+			row.operator("view3d.mhx_set_master_neck")
 
-
+		"""
 
 #
 #	class MhxLipsyncPanel(bpy.types.Panel):
@@ -886,7 +886,7 @@ class MhxLipsyncPanel(bpy.types.Panel):
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("object.InitInterfaceButton")
+		layout.operator("view3d.mhx_init_interface")
 		
 		if theRig:
 			layout.separator()
@@ -894,33 +894,33 @@ class MhxLipsyncPanel(bpy.types.Panel):
 			layout.prop(context.scene, 'MhxBodyLanguage')
 			layout.label(text="Visemes")
 			row = layout.row()
-			row.operator("object.RestButton")
-			row.operator("object.EtcButton")
-			row.operator("object.AHButton")
+			row.operator("view3d.mhx_rest")
+			row.operator("view3d.mhx_etc")
+			row.operator("view3d.mhx_ah")
 			row = layout.row()
-			row.operator("object.MBPButton")
-			row.operator("object.OOButton")
-			row.operator("object.OButton")
+			row.operator("view3d.mhx_mbp")
+			row.operator("view3d.mhx_oo")
+			row.operator("view3d.mhx_o")
 			row = layout.row()
-			row.operator("object.RButton")
-			row.operator("object.FVButton")
-			row.operator("object.SButton")
+			row.operator("view3d.mhx_r")
+			row.operator("view3d.mhx_fv")
+			row.operator("view3d.mhx_s")
 			row = layout.row()
-			row.operator("object.SHButton")
-			row.operator("object.EEButton")
-			row.operator("object.EHButton")
+			row.operator("view3d.mhx_sh")
+			row.operator("view3d.mhx_ee")
+			row.operator("view3d.mhx_eh")
 			row = layout.row()
-			row.operator("object.THButton")
-			row.operator("object.LButton")
-			row.operator("object.GButton")
+			row.operator("view3d.mhx_th")
+			row.operator("view3d.mhx_l")
+			row.operator("view3d.mhx_g")
 			layout.separator()
 			row = layout.row()
-			row.operator("object.BlinkButton")
-			row.operator("object.UnBlinkButton")
+			row.operator("view3d.mhx_blink")
+			row.operator("view3d.mhx_unblink")
 			layout.label(text="Load file")
 			row = layout.row()
-			row.operator("object.LoadMohoButton")
-			row.operator("object.LoadMagpieButton")
+			row.operator("view3d.mhx_load_moho")
+			row.operator("view3d.mhx_load_magpie")
 
 #
 #	class MhxExpressionsPanel(bpy.types.Panel):
@@ -938,13 +938,13 @@ class MhxExpressionsPanel(bpy.types.Panel):
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("object.InitInterfaceButton")
+		layout.operator("view3d.mhx_init_interface")
 		
 		if theRig and rigHasExpressions(theRig):
 			layout.separator()
 			layout.label(text="Expressions (driven)")
-			layout.operator("object.ResetBoneExpressionsButton")
-			layout.operator("object.RemoveDriversButton")
+			layout.operator("view3d.mhx_reset_bone_expressions")
+			layout.operator("view3d.mhx_remove_drivers")
 			layout.separator()
 			pbones = theRig.pose.bones
 			for name in Expressions:
@@ -957,8 +957,8 @@ class MhxExpressionsPanel(bpy.types.Panel):
 		elif theMesh and meshHasExpressions(theMesh):	
 			layout.separator()
 			layout.label(text="Expressions")
-			layout.operator("object.ResetExpressionsButton")
-			layout.operator("object.CreateDriversButton")
+			layout.operator("view3d.mhx_reset_expressions")
+			layout.operator("view3d.mhx_create_drivers")
 			layout.separator()
 			keys = theMesh.data.shape_keys
 			if keys:

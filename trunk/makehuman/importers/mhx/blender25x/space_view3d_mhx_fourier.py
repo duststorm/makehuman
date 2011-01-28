@@ -321,7 +321,7 @@ def printList(arr):
 
 #
 #	makeTestCurve(context)
-#	class OBJECT_OT_MakeTestCurve(bpy.types.Operator):
+#	class VIEW3D_OT_MhxMakeTestCurve(bpy.types.Operator):
 #
 
 def makeTestCurve(context):
@@ -345,8 +345,8 @@ def makeTestCurve(context):
 	setInterpolation(rig)
 	return
 
-class OBJECT_OT_MakeTestCurveButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_MakeTestCurveButton"
+class VIEW3D_OT_MhxMakeTestCurveButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_make_test_curve"
 	bl_label = "Make test curve"
 
 	def execute(self, context):
@@ -372,7 +372,7 @@ def setInterpolation(rig):
 
 #
 #	toggleIkConstraints(rig):
-#	class OBJECT_OT_ToggleIkConstraintsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxToggleIkConstraintsButton(bpy.types.Operator):
 #
 
 def toggleIkConstraints(rig):
@@ -394,8 +394,8 @@ def toggleIkConstraints(rig):
 		return 'NOT FOUND'
 	return res
 
-class OBJECT_OT_ToggleIkConstraintsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ToggleIkConstraintsButton"
+class VIEW3D_OT_MhxToggleIkConstraintsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_toggle_ik_constraints"
 	bl_label = "Toggle IK constraints"
 
 	def execute(self, context):
@@ -404,11 +404,11 @@ class OBJECT_OT_ToggleIkConstraintsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_FourierButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxFourierButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_FourierButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_FourierButton"
+class VIEW3D_OT_MhxFourierButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_fourier"
 	bl_label = "Fourier"
 
 	def execute(self, context):
@@ -435,20 +435,20 @@ class Bvh2MhxFourierPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scn = context.scene
-		layout.operator("object.InitInterfaceButton")
-		#layout.operator("object.MakeTestCurveButton")
-		layout.operator("object.ToggleIkConstraintsButton")
+		layout.operator("view3d.mhx_init_interface")
+		#layout.operator("view3d.mhx_make_test_curve")
+		layout.operator("view3d.mhx_toggle_ik_constraints")
 		layout.separator()
 		layout.prop(scn, "MhxRemoveRoot")
 		layout.prop(scn, "MhxRemoveZOnly")
 		layout.prop(scn, "MhxFourierLevels")
 		layout.prop(scn, "MhxFourierTerms")
-		layout.operator("object.FourierButton")
+		layout.operator("view3d.mhx_fourier")
 
 		return
 
 #
-#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
 #
 
 def initInterface(context):
@@ -484,8 +484,8 @@ def initInterface(context):
 		min = 1, max = 12,
 		default=4)
 
-class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_InitInterfaceButton"
+class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_init_interface"
 	bl_label = "Initialize"
 
 	def execute(self, context):

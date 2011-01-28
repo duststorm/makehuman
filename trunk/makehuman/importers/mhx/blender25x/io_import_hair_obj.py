@@ -460,16 +460,16 @@ class MhxHairPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scn = context.scene
-		#layout.operator("object.ReverseStrandsButton")
-		layout.operator("object.ReverseCurveButton")
-		layout.operator("object.MakeHairFromCurvesButton")
+		#layout.operator("view3d.mhx_reverse_strands")
+		layout.operator("view3d.mhx_reverse_curve")
+		layout.operator("view3d.mhx_make_hair_from_curves")
 
 #
-#	class OBJECT_OT_ReverseStrandsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxReverseStrandsButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_ReverseStrandsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ReverseStrandsButton"
+class VIEW3D_OT_MhxReverseStrandsButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_reverse_strands"
 	bl_label = "Reverse strands"
 
 	@classmethod
@@ -482,11 +482,11 @@ class OBJECT_OT_ReverseStrandsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_ReverseCurveButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxReverseCurveButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_ReverseCurveButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ReverseCurveButton"
+class VIEW3D_OT_MhxReverseCurveButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_reverse_curve"
 	bl_label = "Reverse curve"
 
 	@classmethod
@@ -499,11 +499,11 @@ class OBJECT_OT_ReverseCurveButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class OBJECT_OT_MakeHairFromCurvesButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxMakeHairFromCurvesButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_MakeHairFromCurvesButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_MakeHairFromCurvesButton"
+class VIEW3D_OT_MhxMakeHairFromCurvesButton(bpy.types.Operator):
+	bl_idname = "view3d.mhx_make_hair_from_curves"
 	bl_label = "Make hair from curves"
 
 	@classmethod
