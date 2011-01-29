@@ -247,7 +247,7 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=No
 
     """
 
-    if morphFactor == 0:
+    if not (morphFactor or update):
         return
 
     target = getTarget(obj, targetPath)

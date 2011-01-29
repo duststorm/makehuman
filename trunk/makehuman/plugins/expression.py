@@ -3,29 +3,29 @@
 # We need this for gui controls
 
 import gui3d
-from algos3d import getTarget
+import humanmodifier
 
 print 'Expression imported'
 
 class Action:
 
-    def __init__(self, human, detail, before, after, postAction=None):
+    def __init__(self, human, modifier, before, after, postAction=None):
         self.name = 'Change expression'
         self.human = human
-        self.detail = detail
+        self.modifier = modifier
         self.before = before
         self.after = after
         self.postAction = postAction
 
     def do(self):
-        self.human.setDetail(self.detail, self.after)
+        self.modifier.setValue(self.human, self.after)
         self.human.applyAllTargets()
         if self.postAction:
             self.postAction()
         return True
 
     def undo(self):
-        self.human.setDetail(self.detail, self.before)
+        self.modifier.setValue(self.human, self.before)
         self.human.applyAllTargets()
         if self.postAction:
             self.postAction()
@@ -42,30 +42,28 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.show()
         
 class ExpressionSlider(gui3d.Slider):
-    def __init__(self, parent, y, label, detail):
+    def __init__(self, parent, y, label, template):
         human = parent.app.selectedHuman
-        gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = human.getDetail(detail), label=label)
-        self.target = getTarget(human.meshData, detail)
+        self.modifier = humanmodifier.AgeModifier(template)
+        gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = self.modifier.getValue(human), label=label)
         self.before = None
     
     def onChange(self, value):
         human = self.app.selectedHuman
-        self.app.do(Action(human, self.target.name, self.before, value, self.update))
+        self.app.do(Action(human, self.modifier, self.before, value, self.update))
         self.before = None
         
     def onChanging(self, value):
         if self.app.settings.get('realtimeUpdates', True):
             human = self.app.selectedHuman
             if self.before is None:
-                self.before = human.getDetail(self.target.name)
-            self.target.apply(human.meshData, -human.getDetail(self.target.name), False, False)
-            human.setDetail(self.target.name, value)
-            self.target.apply(human.meshData, value, True,
-                self.app.settings.get('realtimeNormalUpdates', True))
+                self.before = self.modifier.getValue(human)
+            
+            self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
         
     def update(self):
         human = self.app.selectedHuman
-        self.setValue(human.getDetail(self.target.name))
+        self.setValue(self.modifier.getValue(human))
 
 class ExpressionTaskView(gui3d.TaskView):
 
@@ -96,6 +94,7 @@ class ExpressionTaskView(gui3d.TaskView):
         
         self.groupBoxes = []
         self.radioButtons = []
+        self.sliders = []
         
         self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=360))
         y += 25
@@ -109,7 +108,8 @@ class ExpressionTaskView(gui3d.TaskView):
             yy = 80 + 35
             
             for subname in subnames:
-                slider = ExpressionSlider(box, yy, subname.capitalize(), 'data/targets/expression/female_young/neutral_female_young_%s.target' % subname)
+                slider = ExpressionSlider(box, yy, subname.capitalize(), 'data/targets/expression/female_${age}/neutral_female_${age}_%s.target' % subname)
+                self.sliders.append(slider)
                 yy += 35
             
             # Create radiobutton
@@ -120,12 +120,23 @@ class ExpressionTaskView(gui3d.TaskView):
         self.groupBoxes[0].show()
         
     def hideAllBoxes(self):
+        
         for box in self.groupBoxes:
+            
             box.hide()
             
     def onResized(self, event):
         
         self.categoryBox.setPosition([event[0] - 150, self.categoryBox.getPosition()[1], 9.0])
+        
+    def onHumanChanged(self, event):
+        
+        human = event
+        
+        for slider in self.sliders:
+            value = slider.modifier.getValue(human)
+            if value:
+                slider.modifier.setValue(human, value)
 
 category = None
 taskview = None

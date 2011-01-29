@@ -287,6 +287,7 @@ class Human(gui3d.Object):
 
         gender = min(max(gender, 0.0), 1.0)
         self._setGenderVals(gender)
+        self.callEvent('onChanged', self)
 
     def getGender(self):
         return self.maleVal
@@ -312,6 +313,7 @@ class Human(gui3d.Object):
 
         age = min(max(age, 0.0), 1.0)
         self._setAgeVals(-1 + 2 * age)
+        self.callEvent('onChanged', self)
 
     def getAge(self):
         if self.oldVal:
@@ -348,6 +350,7 @@ class Human(gui3d.Object):
 
         weight = min(max(weight, 0.0), 1.0)
         self._setWeightVals(-1 + 2 * weight)
+        self.callEvent('onChanged', self)
 
     def getWeight(self):
         if self.overweightVal:
@@ -383,6 +386,7 @@ class Human(gui3d.Object):
 
         muscle = min(max(muscle, 0.0), 1.0)
         self._setMuscleVals(-1 + 2 * muscle)
+        self.callEvent('onChanged', self)
 
     def getMuscle(self):
         if self.muscleVal:

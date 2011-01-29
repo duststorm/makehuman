@@ -220,6 +220,15 @@ class MHApplication(gui3d.Application):
             self.tool.callEvent("onMouseExited", event)
           else:
             self.currentTask.callEvent("onMouseExited", event)
+            
+        @self.selectedHuman.event
+        def onChanged(event):
+            
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onHumanChanged', event)
 
         # Set up categories and tasks
         
