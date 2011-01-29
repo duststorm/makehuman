@@ -525,13 +525,13 @@ def ArmWritePoses(fp):
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)])
 		])
 
-	addPoseBone(fp, 'ElbowIK_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'ElbowIK_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), RmodLoArm, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'ONSURFACE']),
 		])
 
-	addPoseBone(fp, 'WristIK_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'WristIK_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), RmodHand, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'INSIDE']),
@@ -557,13 +557,13 @@ def ArmWritePoses(fp):
 		('LimitRot', C_OW_LOCAL, 0, ['LimitRot', limLoArm_R, (True, True, True)])
 		])
 
-	addPoseBone(fp, 'ElbowIK_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'ElbowIK_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), RmodLoArm, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'ONSURFACE']),
 		])
 
-	addPoseBone(fp, 'WristIK_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+	addPoseBone(fp, 'WristIK_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), RmodHand, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'INSIDE']),
