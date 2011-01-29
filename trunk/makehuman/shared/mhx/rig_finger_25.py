@@ -248,13 +248,13 @@ def defineFingerPropDrivers():
 		for fnum in range(1,6):
 			for lnum in range(1,4):
 				if (lnum != 1 or fnum != 1):
-					FingerPropDrivers.append( ('Finger-%d-%d%s' % (fnum,lnum,suffix), '%s_finger_control' % (side), 'Bool', ['Rot'] )),
+					FingerPropDrivers.append( ('Finger-%d-%d%s' % (fnum,lnum,suffix), '%s_finger_control' % (side), D_BOOL, ['Rot'] )),
 
 	return
 
 FingerProperties = [
-	('Left_finger_control', 'Bool', True, ['name="Fingers_L"', 'description=""']),
-	('Right_finger_control', 'Bool', True, ['name="Fingers_R"', 'description=""']),
+	('Left_finger_control', D_BOOL, True, ['name="Controlled_fingers"', 'description=""']),
+	('Right_finger_control', D_BOOL, True, ['name="Controlled_fingers"', 'description=""']),
 ]
 defineFingerPropDrivers()
 

@@ -23,7 +23,7 @@ from bpy.props import *
 
 #
 #	printVertNums(context):
-#	class OBJECT_OT_PrintVnumsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
 #
  
 def printVertNums(context):
@@ -34,8 +34,8 @@ def printVertNums(context):
 			print(v.index)
 	print("End")
 
-class OBJECT_OT_PrintVnumsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_PrintVnumsButton"
+class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_print_vnums"
 	bl_label = "Print vnums"
 
 	def execute(self, context):
@@ -45,7 +45,7 @@ class OBJECT_OT_PrintVnumsButton(bpy.types.Operator):
 
 #
 #	selectQuads():
-#	class OBJECT_OT_SelectQuadsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSelectQuadsButton(bpy.types.Operator):
 #
 
 def selectQuads(context):
@@ -57,8 +57,8 @@ def selectQuads(context):
 			f.select = False
 	return
 
-class OBJECT_OT_SelectQuadsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SelectQuadsButton"
+class VIEW3D_OT_MhxSelectQuadsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_select_quads"
 	bl_label = "Select quads"
 
 	def execute(self, context):
@@ -69,7 +69,7 @@ class OBJECT_OT_SelectQuadsButton(bpy.types.Operator):
 
 #
 #	removeVertexGroups(context):
-#	class OBJECT_OT_RemoveVertexGroupsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
 #
 
 def removeVertexGroups(context):
@@ -78,8 +78,8 @@ def removeVertexGroups(context):
 	bpy.ops.object.vertex_group_remove(all=True)
 	return
 
-class OBJECT_OT_RemoveVertexGroupsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_RemoveVertexGroupsButton"
+class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_remove_vertex_groups"
 	bl_label = "Unvertex all"
 
 	def execute(self, context):
@@ -89,7 +89,7 @@ class OBJECT_OT_RemoveVertexGroupsButton(bpy.types.Operator):
 
 #
 #	unVertexDiamonds(context):
-#	class OBJECT_OT_UnvertexDiamondsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxUnvertexDiamondsButton(bpy.types.Operator):
 #
 
 def unVertexDiamonds(context):
@@ -108,8 +108,8 @@ def unVertexDiamonds(context):
 	bpy.ops.object.mode_set(mode='OBJECT')
 	return
 
-class OBJECT_OT_UnvertexDiamondsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_UnvertexDiamondsButton"
+class VIEW3D_OT_MhxUnvertexDiamondsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_unvertex_diamonds"
 	bl_label = "Unvertex diamonds"
 
 	def execute(self, context):
@@ -149,8 +149,8 @@ def pairWeight(context):
 					ob.remove_from_group(grp, v.index)
 	return
 
-class OBJECT_OT_PairWeightButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_PairWeightButton"
+class VIEW3D_OT_MhxPairWeightButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_pair_weight"
 	bl_label = "Weight pair"
 
 	def execute(self, context):
@@ -161,7 +161,7 @@ class OBJECT_OT_PairWeightButton(bpy.types.Operator):
 #
 #	symmetrizeWeights(context):
 #	rightVerts(factor, me):
-#	class OBJECT_OT_SymmetrizeWeightsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSymmetrizeWeightsButton(bpy.types.Operator):
 #
 
 Epsilon = 1e-3
@@ -225,7 +225,7 @@ def symmetrizeWeights(context):
 			except:
 				pass
 			#print("  ", name, grp, rgrp)
-			ob.vertex_groups.assign([rv.index], rgrp, grp.weight, 'REPLACE')
+			rgrp.add([rv.index], grp.weight, 'REPLACE')
 	return len(rverts)
 
 def rightVerts(factor, me):
@@ -245,8 +245,8 @@ def rightVerts(factor, me):
 				threshold += 1000
 	return rverts
 
-class OBJECT_OT_SymmetrizeWeightsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SymmetrizeWeightsButton"
+class VIEW3D_OT_MhxSymmetrizeWeightsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_symmetrize_weights"
 	bl_label = "Symmetrize weights"
 
 	def execute(self, context):
@@ -257,7 +257,7 @@ class OBJECT_OT_SymmetrizeWeightsButton(bpy.types.Operator):
 
 #
 #	symmetrizeShapes(context):
-#	class OBJECT_OT_SymmetrizeShapesButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxSymmetrizeShapesButton(bpy.types.Operator):
 #
 
 def symmetrizeShapes(context):
@@ -288,8 +288,8 @@ def symmetrizeShapes(context):
 
 	return len(rverts)
 
-class OBJECT_OT_SymmetrizeShapesButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_SymmetrizeShapesButton"
+class VIEW3D_OT_MhxSymmetrizeShapesButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_symmetrize_shapes"
 	bl_label = "Symmetrize shapes"
 
 	def execute(self, context):
@@ -300,7 +300,7 @@ class OBJECT_OT_SymmetrizeShapesButton(bpy.types.Operator):
 
 #
 #	shapekeyFromObject(ob, targ):
-#	class OBJECT_OT_ShapeKeysFromObjectsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxShapeKeysFromObjectsButton(bpy.types.Operator):
 #
 
 def shapekeyFromObject(ob, targ):
@@ -323,8 +323,8 @@ def shapekeyFromObject(ob, targ):
 	print("Shape %s created" % skey)
 	return	
 
-class OBJECT_OT_ShapeKeysFromObjectsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ShapeKeysFromObjectsButton"
+class VIEW3D_OT_MhxShapeKeysFromObjectsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_shapekeys_from_objects"
 	bl_label = "Shapes from objects"
 
 	def execute(self, context):
@@ -338,7 +338,7 @@ class OBJECT_OT_ShapeKeysFromObjectsButton(bpy.types.Operator):
 
 #
 #	recoverDiamonds(context):
-#	class OBJECT_OT_RecoverDiamondsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxRecoverDiamondsButton(bpy.types.Operator):
 #
 
 def recoverDiamonds(context):
@@ -375,8 +375,8 @@ def recoverDiamonds(context):
 	return
 	
 
-class OBJECT_OT_RecoverDiamondsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_RecoverDiamondsButton"
+class VIEW3D_OT_MhxRecoverDiamondsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_recover_diamonds"
 	bl_label = "Recover diamonds"
 
 	def execute(self, context):
@@ -385,7 +385,7 @@ class OBJECT_OT_RecoverDiamondsButton(bpy.types.Operator):
 
 #
 #	exportVertexGroups(filePath)
-#	class OBJECT_OT_ExportVertexGroupsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxExportVertexGroupsButton(bpy.types.Operator):
 #
 
 def exportVertexGroups(context):
@@ -402,15 +402,12 @@ def exportVertexGroups(context):
 				if grp.group == index and grp.weight > 0.005:
 					weights.append((v.index, grp.weight))
 
-		if len(weights) > 0:
-			fp.write("\n# weights %s\n" % vg.name)
-			for (vn,w) in weights:
-				fp.write("  %d %.3g\n" % (vn, w))
+		exportList(context, weights, vg.name, fp)
 	fp.close()
 	return
 
-class OBJECT_OT_ExportVertexGroupsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ExportVertexGroupsButton"
+class VIEW3D_OT_MhxExportVertexGroupsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_export_vertex_groups"
 	bl_label = "Export vertex groups"
 
 	def execute(self, context):
@@ -420,7 +417,7 @@ class OBJECT_OT_ExportVertexGroupsButton(bpy.types.Operator):
 #
 #	exportSumGroups(context):
 #	exportListAsVertexGroup(weights, name, fp):
-#	class OBJECT_OT_ExportSumGroupsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxExportSumGroupsButton(bpy.types.Operator):
 #
 
 def exportSumGroups(context):
@@ -444,22 +441,29 @@ def exportSumGroups(context):
 								w = 0
 							weights[v.index] = grp.weight + w
 				# ob.vertex_groups.remove(vg)
-			exportListAsVertexGroup(weights.items(), name+'3'+suffix, fp)
+			exportList(context, weights.items(), name+'3'+suffix, fp)
 	fp.close()
 	return
 
-def exportListAsVertexGroup(weights, name, fp):
+def exportList(context, weights, name, fp):
 	#if len(weights) == 0:
 	#	return
-	fp.write("\n  VertexGroup %s\n" % name)
-	for (vn,w) in weights:
-		if w > 0.005:
-			fp.write("    wv %d %.3g ;\n" % (vn, w))
-	fp.write("  end VertexGroup %s\n" % name)
+	if context.scene['MhxExportAsWeightFile']:
+		if len(weights) > 0:
+			fp.write("\n# weights %s\n" % vg.name)
+			for (vn,w) in weights:
+				if w > 0.005:
+					fp.write("  %d %.3g\n" % (vn, w))
+	else:
+		fp.write("\n  VertexGroup %s\n" % name)
+		for (vn,w) in weights:
+			if w > 0.005:
+				fp.write("    wv %d %.3g ;\n" % (vn, w))
+		fp.write("  end VertexGroup %s\n" % name)
 	return
 
-class OBJECT_OT_ExportSumGroupsButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_ExportSumGroupsButton"
+class VIEW3D_OT_MhxExportSumGroupsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_export_sum_groups"
 	bl_label = "Export sum groups"
 
 	def execute(self, context):
@@ -468,7 +472,7 @@ class OBJECT_OT_ExportSumGroupsButton(bpy.types.Operator):
 
 #
 #	initInterface(context):
-#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
 #
 
 def initInterface(context):
@@ -491,6 +495,10 @@ def initInterface(context):
 		name="Left -> right", 
 		default=True)
 
+	bpy.types.Scene.MhxExportAsWeightFile = BoolProperty(
+		name="Export as weight file", 
+		default=False)
+
 	bpy.types.Scene.MhxVertexGroupFile = StringProperty(
 		name="Vertex group file", 
 		maxlen=100,
@@ -503,12 +511,13 @@ def initInterface(context):
 		scn['MhxBone1'] = 'Bone1'
 		scn['MhxBone2'] = 'Bone2'
 		scn['MhxLeft2Right'] = True
+		scn['MhxExportAsWeightFile'] = False
 		scn['MhxVertexGroupFile'] = '~/vgroups.txt'
 
 	return
 
-class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_InitInterfaceButton"
+class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_init_interface"
 	bl_label = "Initialize"
 
 	def execute(self, context):
@@ -532,30 +541,31 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		layout = self.layout
-		layout.operator("object.PrintVnumsButton")
-		layout.operator("object.SelectQuadsButton")
-		layout.operator("object.RemoveVertexGroupsButton")
-		layout.operator("object.UnvertexDiamondsButton")
-		layout.operator("object.RecoverDiamondsButton")
+		layout.operator("mhx.weight_print_vnums")
+		layout.operator("mhx.weight_select_quads")
+		layout.operator("mhx.weight_remove_vertex_groups")
+		layout.operator("mhx.weight_unvertex_diamonds")
+		layout.operator("mhx.weight_recover_diamonds")
 
 		layout.separator()
 		layout.prop(context.scene, 'MhxLeft2Right')
-		layout.operator("object.SymmetrizeWeightsButton")	
-		layout.operator("object.SymmetrizeShapesButton")	
+		layout.operator("mhx.weight_symmetrize_weights")	
+		layout.operator("mhx.weight_symmetrize_shapes")	
 
 		layout.separator()
 		layout.prop(context.scene, 'MhxVertexGroupFile')
-		layout.operator("object.ExportVertexGroupsButton")	
-		layout.operator("object.ExportSumGroupsButton")	
+		layout.prop(context.scene, 'MhxExportAsWeightFile')
+		layout.operator("mhx.weight_export_vertex_groups")	
+		layout.operator("mhx.weight_export_sum_groups")	
 
 		layout.separator()
-		layout.operator("object.ShapeKeysFromObjectsButton")	
+		layout.operator("mhx.weight_shapekeys_from_objects")	
 
 		layout.label('Weight pair')
 		layout.prop(context.scene, 'MhxWeight')
 		layout.prop(context.scene, 'MhxBone1')
 		layout.prop(context.scene, 'MhxBone2')
-		layout.operator("object.PairWeightButton")
+		layout.operator("mhx.weight_pair_weight")
 
 #
 #	Init and register

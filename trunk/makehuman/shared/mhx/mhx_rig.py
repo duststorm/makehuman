@@ -85,6 +85,14 @@ P_HID = 0x0020
 P_ROTMODE = 0x0f00
 P_QUAT = 0x0000
 P_XYZ = 0x0100
+P_XZY = 0x0200
+P_YXZ = 0x0300
+P_YZX = 0x0400
+P_ZXY = 0x0500
+P_ZYX = 0x0600
+def rotationMode(flags):
+	modes = ['QUATERNION', 'XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX']
+	return modes[(flags&P_ROTMODE) >> 8]
 
 
 
@@ -109,6 +117,8 @@ C_TG_POSE = 0x3000
 
 C_CHILDOF = C_OW_POSE+C_TG_WORLD
 C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
+
+# Fix for ChildOf bug
 
 Master = 'MasterFloor'
 rootChildOfConstraints = []
@@ -219,6 +229,7 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	restr = boolString(flags & F_RES)
 	wire = boolString(flags & F_WIR)
 	scale = boolString(flags & F_NOSCALE == 0)
+	scale = "False"
 	lloc = boolString(flags & F_GLOC == 0)
 	lock = boolString(flags & F_LOCK)
 	hide = boolString(flags & F_HID)
@@ -314,7 +325,7 @@ def writeBoneGroups(fp):
 #
 #	addIkHandle(fp, bone, customShape, limit):
 #	addSingleIk(fp, bone, lockRot, target, limit):
-#	addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
+#	addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags, constraints):
 #	addDeformYBone(fp, bone, ikBone, fkBone, cflags, pflags):
 #	addCSlider(fp, bone, mx):
 #	addYSlider(fp, bone, mx):
@@ -347,12 +358,12 @@ def addDeformYBone(fp, bone, ikBone, fkBone, cflags, pflags):
 		('CopyScale', 0, 0, ['StretchIK', ikBone, (0,1,0), False]),
 		('CopyScale', 0, 1, ['StretchFK', fkBone, (0,1,0), False]),
 		]		
-	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, constraints)
+	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), pflags, constraints)
 	return
 
-def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
+def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags, constraints):
 	space = cflags & (C_OW_MASK + C_TG_MASK)
-	constraints = [
+	constraints += [
 		('CopyRot', space, 0, ['RotIK', ikBone, ikRot, (0,0,0), False]),
 		('CopyRot', space, 1, ['RotFK', fkBone, fkRot, (0,0,0), False])
 		]
@@ -362,17 +373,17 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags):
 		('CopyScale', 0, 1, ['StretchFK', fkBone, (0,1,0), False]),
 		]		
 	(fX,fY,fZ) = fkRot
-	addPoseBone(fp, bone, None, None, (1,1,1), (1-fX,1-fY,1-fZ), (0,0,0), (1,1,1), 0, constraints)
+	addPoseBone(fp, bone, None, None, (1,1,1), (1-fX,1-fY,1-fZ), (0,0,0), (1,1,1), pflags, constraints)
 	return
 
 def addDeformIK(fp, bone, target, pole):
 	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, 1, ['IK', target, 1, pole, (True, False,True)])])
 
-def addDeformIK2(fp, bone, iktar, fktar, ikpole, fkpole):
-	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, 1, ['IK', iktar, 1, ikpole, (True, False,True)]),
-		 ('IK', 0, 1, ['FK', fktar, 1, fkpole, (True, False,True)])])
+def addDeformIK2(fp, bone, iktar, fktar, ikpole, fkpole, pflags, constraints):
+	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), pflags, constraints +
+		[('IK', 0, 1, ['RotIK', iktar, 1, ikpole, (True, False,True)]),
+		 ('IK', 0, 1, ['RotFK', fktar, 1, fkpole, (True, False,True)])])
 
 def addStretchBone(fp, bone, target, parent):
 	addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
@@ -468,7 +479,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 		elif typ == 'LimitRot':
 			addLimitRotConstraint(fp, switch, cflags, inf, data)
 			(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
-			(usex,usey,usez) = data[2]			
+			#(usex,usey,usez) = data[2]			
 		elif typ == 'LimitLoc':
 			addLimitLocConstraint(fp, switch, cflags, inf, data)
 		elif typ == 'LimitScale':
@@ -510,9 +521,8 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 	if customShape:
 		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
 
-	rotMode = flags & P_ROTMODE
-	if rotMode == P_XYZ:
-		fp.write("  rotation_mode 'XYZ' ;\n")
+	rotMode = rotationMode(flags)
+	fp.write("  rotation_mode '%s' ;\n" % rotMode)
 
 	fp.write(
 "    use_ik_linear_control %s ; \n" % ikLin +
@@ -1027,6 +1037,7 @@ def addLimitDistConstraint(fp, switch, flags, inf, data):
 	global Mhx25
 	name = data[0]
 	subtar = data[1]
+	typ = data[2]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	if Mhx25:
@@ -1036,7 +1047,7 @@ def addLimitDistConstraint(fp, switch, flags, inf, data):
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
-"      limit_mode 'LIMITDIST_INSIDE' ;\n" +
+"      limit_mode 'LIMITDIST_%s' ;\n" % typ +
 "      owner_space '%s' ;\n" % ownsp +
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
@@ -1221,9 +1232,18 @@ def writeEnumDrivers(fp, drivers):
 #	writePropDrivers(fp, drivers):
 #
 
+# Property types
+D_ENUM = 1
+D_INT = 2
+D_FLOAT = 3
+D_BOOL = 4
+D_BOOLINV = 5
+D_MULTIVAR = 6
+
+
 def defineProperties(fp, props):
 	for (prop, typ, values, options) in props:
-		if typ == 'Enum':
+		if typ == D_ENUM:
 			#fp.write("DefineProperty %s Int min=1 max=%d ;\n" % (prop, len(values)))
 			#continue
 			fp.write("DefineProperty %s Enum " % prop)
@@ -1232,8 +1252,14 @@ def defineProperties(fp, props):
 				fp.write("%s('%s','%s','%s')" % (c,val,val,val))
 				c = ','
 			fp.write("]")
+		elif typ == D_FLOAT:
+			fp.write("DefineProperty %s Float" % (prop))
+		elif typ == D_INT:
+			fp.write("DefineProperty %s Int" % (prop))
+		elif typ == D_BOOL:
+			fp.write("DefineProperty %s Bool" % (prop))
 		else:
-			fp.write("DefineProperty %s %s" % (prop, typ))
+			raise NameError("Unknown property type %d", typ)
 		for option in options:
 			fp.write(" %s" % option)
 		fp.write(" ;\n")
@@ -1241,7 +1267,7 @@ def defineProperties(fp, props):
 
 def writeProperties(fp, props):
 	for (prop, typ, values, options) in props:
-		if typ == 'Enum':
+		if typ == D_ENUM:
 			#val = values[0]
 			#fp.write("  Property %s '%s' ;\n" % (prop, val))
 			fp.write("  Property %s 0 ;\n" % (prop))
@@ -1252,14 +1278,24 @@ def writeProperties(fp, props):
 
 def writePropDrivers(fp, drivers):
 	for (bone, prop, typ, constraints) in drivers:
-		drvVars = [("x", 'SINGLE_PROP', [(mh2mhx.theHuman, prop)])]
-		for n, cns in enumerate(constraints):
-			if typ == 'Enum':
-				expr = '(x==%d)' % n
-				#expr = '(x=="%s")*1' % cns
-			elif typ == 'Bool':
-				expr = 'x'
-			writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), -1, (0,1), drvVars)
+		for cns in constraints:
+			if typ == D_MULTIVAR:
+				n = 1
+				drvVars = []
+				for prop1 in prop:
+					drvVars.append( ("x%d" % n, 'SINGLE_PROP', [(mh2mhx.theHuman, prop1)]) )
+					n += 1
+				(cns1,expr) = cns
+				writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), -1, (0,1), drvVars)
+			else:
+				drvVars = [("x", 'SINGLE_PROP', [(mh2mhx.theHuman, prop)])]
+				if typ == D_ENUM:
+					(cns1,expr) = cns
+					writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), -1, (0,1), drvVars)
+				elif typ == D_BOOLINV:
+					writeDriver(fp, True, 'AVERAGE', "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), -1, (1,-1), drvVars)
+				else:
+					writeDriver(fp, True, 'AVERAGE', "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), -1, (0,1), drvVars)
 
 #
 #	writeTextureDrivers(fp, drivers):

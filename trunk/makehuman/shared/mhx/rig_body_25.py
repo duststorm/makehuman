@@ -151,7 +151,7 @@ def BodyWritePoses(fp):
 
 	# Stomach
 	addPoseBone(fp,  'StomachTarget', 'MHCube01', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
-		[('LimitDist', 0, 1, ['LimitDist', 'Spine1', 'Rib'])])
+		[('LimitDist', 0, 1, ['LimitDist', 'Spine1', 'INSIDE'])])
 
 	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
 		[('StretchTo', 0, 1, ['Stretch', 'StomachTarget', 0]),
@@ -187,18 +187,20 @@ def BodyWritePoses(fp):
 #	BodyPropDrivers
 #
 
-MasterProps = ["Floor","Hips","Neck"]
-
 BodyProperties = [
-	('Root_parent', 'Enum', MasterProps, ['name="Master"', 'description=""'] ),
+	('Root_parent', D_ENUM, ["Floor","Hips","Neck"], ['name="Master"', 'description=""'] ),
 ]
 
+MasterDrivers = [('Floor', 'x==0'), ('Hips', 'x==1'), ('Neck', 'x==2')]
+
 BodyPropDrivers = [
-	('Root', 'Root_parent', 'Enum', MasterProps),
-	('HandIK_L', 'Root_parent', 'Enum', MasterProps),
-	('HandIK_R', 'Root_parent', 'Enum', MasterProps),
-	('LegIK_L', 'Root_parent', 'Enum', MasterProps),
-	('LegIK_R', 'Root_parent', 'Enum', MasterProps),
+	('Root', 'Root_parent', D_ENUM, MasterDrivers),
+	('ElbowIK_L', 'Root_parent', D_ENUM, MasterDrivers),
+	('ElbowIK_R', 'Root_parent', D_ENUM, MasterDrivers),
+	('WristIK_L', 'Root_parent', D_ENUM, MasterDrivers),
+	('WristIK_R', 'Root_parent', D_ENUM, MasterDrivers),
+	('LegIK_L', 'Root_parent', D_ENUM, MasterDrivers),
+	('LegIK_R', 'Root_parent', D_ENUM, MasterDrivers),
 ]
 
 #

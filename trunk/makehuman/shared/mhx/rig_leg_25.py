@@ -278,36 +278,36 @@ limRevToe_R = (-10*D,45*D, 0,0, 0,0)
 
 def LegWritePoses(fp):
 	# Deform 
-	addDeformIK2(fp, 'UpLeg1_L', 'LoLegIK_L', 'LoLegFK_L', None, None),
+	addDeformIK2(fp, 'UpLeg1_L', 'LoLegIK_L', 'LoLegFK_L', None, None, 0, []),
 
 	addPoseBone(fp, 'UpLeg2_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addDeformLimb(fp, 'UpLeg3_L', 'UpLegIK_L', (0,1,0), 'UpLegFK_L', (0,1,0), C_LOCAL, 0)
+	addDeformLimb(fp, 'UpLeg3_L', 'UpLegIK_L', (0,1,0), 'UpLegFK_L', (0,1,0), C_LOCAL, 0, [])
 
-	addDeformLimb(fp, 'LoLeg_L', 'LoLegIK_L', (1,1,1), 'LoLegFK_L', (1,1,1), 0, P_STRETCH)
+	addDeformLimb(fp, 'LoLeg_L', 'LoLegIK_L', (1,1,1), 'LoLegFK_L', (1,1,1), 0, P_STRETCH, [])
 
 	addPoseBone(fp, 'LoLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
 		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_L', (1,0,1), (0,0,0), False])])
 
-	addDeformLimb(fp, 'Foot_L', 'FootIK_L', (1,1,1), 'FootFK_L', (1,1,1), 0, 0)
+	addDeformLimb(fp, 'Foot_L', 'FootIK_L', (1,1,1), 'FootFK_L', (1,1,1), 0, 0, [])
 
-	addDeformLimb(fp, 'Toe_L', 'ToeIK_L', (1,1,1), 'ToeFK_L', (1,1,1), 0, 0)
+	addDeformLimb(fp, 'Toe_L', 'ToeIK_L', (1,1,1), 'ToeFK_L', (1,1,1), 0, 0, [])
 
 
-	addDeformIK2(fp, 'UpLeg1_R', 'LoLegIK_R', 'LoLegFK_R', None, None),
+	addDeformIK2(fp, 'UpLeg1_R', 'LoLegIK_R', 'LoLegFK_R', None, None, 0, []),
 
 	addPoseBone(fp, 'UpLeg2_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-	addDeformLimb(fp, 'UpLeg3_R', 'UpLegIK_R', (0,1,0), 'UpLegFK_R', (0,1,0), C_LOCAL, 0)
+	addDeformLimb(fp, 'UpLeg3_R', 'UpLegIK_R', (0,1,0), 'UpLegFK_R', (0,1,0), C_LOCAL, 0, [])
 
-	addDeformLimb(fp, 'LoLeg_R', 'LoLegIK_R', (1,1,1), 'LoLegFK_R', (1,1,1), 0, P_STRETCH)
+	addDeformLimb(fp, 'LoLeg_R', 'LoLegIK_R', (1,1,1), 'LoLegFK_R', (1,1,1), 0, P_STRETCH, [])
 
 	addPoseBone(fp, 'LoLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
 		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_R', (1,0,1), (0,0,0), False])])
 
-	addDeformLimb(fp, 'Foot_R', 'FootIK_R', (1,1,1), 'FootFK_R', (1,1,1), 0, 0)
+	addDeformLimb(fp, 'Foot_R', 'FootIK_R', (1,1,1), 'FootFK_R', (1,1,1), 0, 0, [])
 
-	addDeformLimb(fp, 'Toe_R', 'ToeIK_R', (1,1,1), 'ToeFK_R', (1,1,1), 0, 0)
+	addDeformLimb(fp, 'Toe_R', 'ToeIK_R', (1,1,1), 'ToeFK_R', (1,1,1), 0, 0, [])
 
 	# Hip deform
 
@@ -379,12 +379,12 @@ def LegWritePoses(fp):
 	addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, 'fNoStretch', ['Hip_L', 'Hip_L'])])
+		('LimitDist', 0, 1, ['DistHip', 'Hip_L', 'INSIDE'])])
 
 	addPoseBone(fp, 'LegIK_R', 'MHFootCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, 'fNoStretch', ['Hip_R', 'Hip_R'])])
+		('LimitDist', 0, 1, ['DistHip', 'Hip_R', 'INSIDE'])])
 
 	deltaKnee = -2.5*D
 
@@ -402,6 +402,7 @@ def LegWritePoses(fp):
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_L, (1,1,1)])])
 
 	addPoseBone(fp, 'FootRevIK_R', 'MHRevFoot', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0,
+
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_R, (1,1,1)])])
 
 	addPoseBone(fp, 'ToeRevIK_L', 'MHRevToe', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
@@ -463,24 +464,27 @@ LegFKIKDrivers = [
 #
 
 LegProperties = [
-	('Left_leg', 'Enum', ['FK', 'IK'], ['name="Left_Leg_FK/IK"', 'description=""'] ),
-	('Right_leg', 'Enum', ['FK', 'IK'], ['name="Right_Leg_FK/IK"', 'description=""'] ),
+	('Left_leg', D_ENUM, ['Leg_FK', 'Leg_IK'], ['name="Left_Leg_FK/IK"', 'description=""'] ),
+	('Right_leg', D_ENUM, ['Leg_FK', 'Leg_IK'], ['name="Right_Leg_FK/IK"', 'description=""'] ),
 ]
 
-LegPropDrivers = [
-	('UpLeg1_L', 'Left_leg', 'Enum', ['FK', 'IK']),
-	('UpLeg3_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_L', 'Left_leg', 'Enum', ['StretchFK', 'StretchIK']),
-	('Foot_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
-	('Toe_L', 'Left_leg', 'Enum', ['RotFK', 'RotIK']),
+LegRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
+LegStretchDrivers = [('StretchFK','x==0'), ('StretchIK','x>=1')]
 
-	('UpLeg1_R', 'Right_leg', 'Enum', ['FK', 'IK']),
-	('UpLeg3_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
-	('LoLeg_R', 'Right_leg', 'Enum', ['StretchFK', 'StretchIK']),
-	('Foot_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
-	('Toe_R', 'Right_leg', 'Enum', ['RotFK', 'RotIK']),
+LegPropDrivers = [
+	('UpLeg1_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('UpLeg3_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_L', 'Left_leg', D_ENUM, LegStretchDrivers),
+	('Foot_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('Toe_L', 'Left_leg', D_ENUM, LegRotDrivers),
+
+	('UpLeg1_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('UpLeg3_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_R', 'Right_leg', D_ENUM, LegStretchDrivers),
+	('Foot_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('Toe_R', 'Right_leg', D_ENUM, LegRotDrivers),
 ]
 
 
