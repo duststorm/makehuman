@@ -44,7 +44,7 @@ class GroupBoxRadioButton(gui3d.RadioButton):
 class ExpressionSlider(gui3d.Slider):
     def __init__(self, parent, y, label, template):
         human = parent.app.selectedHuman
-        self.modifier = humanmodifier.AgeModifier(template)
+        self.modifier = humanmodifier.GenderAgeModifier(template)
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = self.modifier.getValue(human), label=label)
         self.before = None
     
@@ -108,7 +108,7 @@ class ExpressionTaskView(gui3d.TaskView):
             yy = 80 + 25
             
             for subname in subnames:
-                slider = ExpressionSlider(box, yy, subname.capitalize(), 'data/targets/expression/female_${age}/neutral_female_${age}_%s.target' % subname)
+                slider = ExpressionSlider(box, yy, subname.capitalize(), 'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
                 self.sliders.append(slider)
                 yy += 36
             
