@@ -1222,6 +1222,7 @@ def addCurve(fp, cuname, hooks):
 
 	n = 1
 	for hook in hooks[1:]:
+		continue
 		fp.write(
 "  Modifier %s HOOK\n" % hook +
 "    bpyops object.mode_set(mode='EDIT') ;\n" +
