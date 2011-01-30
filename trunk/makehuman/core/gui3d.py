@@ -1355,11 +1355,11 @@ class FileEntryView(View):
     A FileEntryView widget. This widget can be used to let the user enter a filename.
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, buttonLabel):
         View.__init__(self, parent)
 
         self.edit = TextEdit(self, [200, 90, 9.5])
-        self.bConfirm = Button(self, [610, 90, 9.1], 'Save', style=ButtonStyle._replace(width=40, height=20))
+        self.bConfirm = Button(self, [610, 90, 9.1], buttonLabel, style=ButtonStyle._replace(width=40, height=20))
 
         @self.bConfirm.event
         def onClicked(event):

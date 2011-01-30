@@ -51,7 +51,7 @@ class SaveTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Save')
-        self.fileentry = gui3d.FileEntryView(self)
+        self.fileentry = gui3d.FileEntryView(self, 'Save')
 
         @self.fileentry.event
         def onFileSelected(filename):
@@ -149,23 +149,25 @@ class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Export')
-        self.fileentry = gui3d.FileEntryView(self)
+        self.fileentry = gui3d.FileEntryView(self, 'Export')
 
         self.exportBodyGroup = []
         self.exportHairGroup = []
         
         # Formats
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=150));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+22*5+8));y+=25
         self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], "Wavefront obj", True, gui3d.ButtonStyle);y+=22
         self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange", style=gui3d.ButtonStyle);y+=22
         self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada", style=gui3d.ButtonStyle);y+=22
         self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="MD5", style=gui3d.ButtonStyle);y+=22
         self.stl = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="STL", style=gui3d.ButtonStyle);y+=22
+        y+=16
             
         # OBJ options
-        y = 240
-        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=150));y+=25
+        yy = y
+        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+22*6+8));y+=25
+        self.exportEyebrows = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Eyebrows", True);y+=22
         self.exportDiamonds = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Diamonds", False);y+=22
         self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=22
         self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=22
@@ -173,8 +175,8 @@ class ExportTaskView(gui3d.TaskView):
         self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as curves");y+=22
         
         # MHX options
-        y = 240
-        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=150));y+=25
+        y = yy
+        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+22*5+8));y+=25
         self.version24 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.4", True);y+=22
         self.version25 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.5", True);y+=22
         self.exportExpressions = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Expressions", True);y+=22
@@ -215,11 +217,19 @@ class ExportTaskView(gui3d.TaskView):
                 os.makedirs(exportPath)
 
             if self.wavefrontObj.selected:
+                if self.exportEyebrows.selected and self.exportDiamonds.selected:
+                    filter = None
+                elif self.exportEyebrows.selected:
+                    filter = lambda fg: not 'joint' in fg
+                elif self.exportDiamonds.selected:
+                    filter = lambda fg: not 'eyebrown' in fg
+                else:
+                    filter = lambda fg: not ('joint' in fg or 'eyebrown' in fg)
                 mh2obj.exportObj(self.app.selectedHuman.meshData,
                     os.path.join(exportPath, filename + ".obj"),
                     'data/3dobjs/base.obj',
                     self.exportGroups.selected,
-                    None if self.exportDiamonds.selected else (lambda fg: not 'joint' in fg))
+                    filter)
                 mh2proxy.exportProxyObj(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))
                 
                 if self.exportSkeleton.selected:
