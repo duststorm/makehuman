@@ -1105,29 +1105,25 @@ def addChildOfConstraint(fp, switch, flags, inf, data):
 #
 #	addSplineIkConstraint(fp, switch, flags, inf, data):
 #
+#"      joint_bindings Array 1.0 0.741504311562 0.483008384705 0.253476023674 -5.96046447754e-08  ;\n" +
+
 def addSplineIkConstraint(fp, switch, flags, inf, data):
-	global Mhx25
+	global Mhx25, rigHead, rigTail
 	# return
 	name = data[0]
-	subtar = data[1]
-	(locx, locy, locz) = data[2]
-	(rotx, roty, rotz) = data[3]
-	(scalex, scaley, scalez) = data[4]
+	target = data[1]
+	count = data[2]
 	(ownsp, targsp, active, expanded) = constraintFlags(flags)
 
 	fp.write(
-"    Constraint %s SPLINE_IK\n" % name +
+"    Constraint %s SPLINE_IK %s\n" % (name, switch) +
+"      target Refer Object %s ;\n" % target +
 "      active %s ;\n" % active +
-"      chain_count 1 ;\n" +
-"      error_location 0 ;\n" +
-"      error_rotation 0 ;\n" +
+"      chain_count %d ;\n" % count +
 "      influence %s ;\n" % inf +
-"      is_proxy_local False ;\n" +
-"      is_valid False ;\n" +
-"      joint_bindings ['bpy_prop_array'] <bpy_float[0], SplineIKConstraint.joint_bindings> \n" +
 "      owner_space '%s' ;\n" % ownsp +
-"      show_expanded %s ;\n" % targsp +
-"      target_space '%s' ;\n" % tarsp +
+"      show_expanded %s ;\n" % expanded +
+"      target_space '%s' ;\n" % targsp +
 "      use_chain_offset False ;\n" +
 "      use_curve_radius True ;\n" +
 "      use_even_divisions False ;\n" +
@@ -1135,6 +1131,7 @@ def addSplineIkConstraint(fp, switch, flags, inf, data):
 "      xz_scale_mode 'NONE' ;\n" +
 "    end Constraint\n")
 	return
+
 
 #
 #	constraintFlags(flags):
@@ -1163,6 +1160,93 @@ def constraintFlags(flags):
 	active = boolString(flags & C_ACT == 0)
 	expanded = boolString(flags & C_EXP)
 	return (ownsp, targsp, active, expanded)
+
+
+#
+#	addCurve(fp, cuname, hooks):
+#
+
+def addCurve(fp, cuname, hooks):
+	global rigHead
+	count = len(hooks)-1
+	name = "%s%s" % (mh2mhx.theHuman, cuname)
+
+	fp.write("\n" +
+"Curve %s %s\n" % (name,name) +
+"  bevel_depth 0 ;\n" +
+"  bevel_resolution 0 ;\n" +
+"  dimensions '3D' ;\n" +
+"  offset 0 ;\n" +
+"  path_duration 100 ;\n" +
+"  render_resolution_u 0 ;\n" +
+"  render_resolution_v 0 ;\n" +
+"  resolution_u 12 ;\n" +
+"  resolution_v 12 ;\n" +
+"  show_handles True ;\n" +
+"  twist_mode 'MINIMUM' ;\n" +
+"  twist_smooth 0 ;\n" +
+"  use_fill_back True ;\n" +
+"  use_fill_deform True ;\n" +
+"  use_fill_front True ;\n" +
+"  use_path True ;\n" +
+"  use_path_follow False ;\n" +
+"  use_radius True ;\n" +
+"  use_stretch False ;\n" +
+"  use_time_offset False ;\n" +
+"  use_uv_as_generated False ;\n" +
+"  Spline NURBS %d 1\n" % count +
+"    order_u 3 ;\n" +
+"    order_v 0 ;\n")
+
+	for hook in hooks:
+		pt = rigHead[hook]
+		fp.write("    pt (%.4f,%.4f,%4f,1) ;\n" % (pt[0], -pt[2], pt[1]))
+
+	fp.write(
+"    radius_interpolation 'LINEAR' ;\n" +
+"    resolution_u 12 ;\n" +
+"    resolution_v 12 ;\n" +
+"    tilt_interpolation 'LINEAR' ;\n" +
+"    use_bezier_u True ;\n" +
+"    use_bezier_v True ;\n" +
+"    use_cyclic_u False ;\n" +
+"    use_cyclic_v False ;\n" +
+"    use_endpoint_u False ;\n" +
+"    use_endpoint_v False ;\n" +
+"    use_smooth True ;\n" +
+"  end Spline\n" +
+"end Curve\n" +
+"\n" +
+"Object %s CURVE %s\n" % (name,name) +
+"  layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;\n")
+
+	n = 1
+	for hook in hooks[1:]:
+		fp.write(
+"  Modifier %s HOOK\n" % hook +
+"    bpyops object.mode_set(mode='EDIT') ;\n" +
+"    falloff 0 ;\n" +
+"    force 1 ;\n" +
+"    object Refer Object %s ;\n" % mh2mhx.theHuman+
+"    show_expanded False ;\n" +
+"    subtarget '%s' ;\n" % hook +
+"    use_apply_on_spline True ;\n" +
+"    bpyops object.hook_reset(modifier='%s') ;\n" % hook +
+#"    bpyops object.hook_select(modifier='%s') ;\n" % hook +
+"    CurveSelectNth %d ;\n" % n +
+"    bpyops object.hook_assign(modifier='%s') ;\n" % hook +
+"    bpyops object.mode_set(mode='OBJECT') ;\n" +
+"  end Modifier\n")
+		n += 1
+
+	fp.write(
+#"  parent Refer Object %s ;\n" % mh2mhx.theHuman +
+"  location (0,0,0) ;\n" +
+"  parent_type 'OBJECT' ;\n" +
+"  rotation_mode 'XYZ' ;\n" +
+"  track_axis 'POS_Y' ;\n" +
+"  up_axis 'Z' ;\n" +
+"end Object\n")
 
 #
 #	writeAction(fp, cond, name, action, lr, ikfk):
@@ -1584,6 +1668,10 @@ def writeAllArmatures(fp):
 		rig_panel_25.PanelArmature, True)
 	return
 
+def writeAllCurves(fp):
+	rig_body_25.BodyWriteCurves(fp)
+	return 
+
 def writeAllPoses(fp):
 	writeBoneGroups(fp)
 	rig_body_25.BodyWritePoses(fp)
@@ -1617,7 +1705,7 @@ def writeAllDrivers(fp):
 	#writeEnumDrivers(fp, rig_panel_25.EnumDrivers)
 
 	writePropDrivers(fp,
-		#rig_body_25.BodyPropDrivers +
+		rig_body_25.BodyPropDrivers +
 		rig_arm_25.ArmPropDrivers +
 		rig_finger_25.FingerPropDrivers +
 		rig_leg_25.LegPropDrivers

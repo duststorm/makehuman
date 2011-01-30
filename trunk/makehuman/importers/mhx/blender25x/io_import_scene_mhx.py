@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.0.4
+Version 1.2.0
 
 """
 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 1, 0),
+    'version': (1, 2, 0),
     'blender': (2, 5, 6),
     'api': 34326,
     'location': "File > Import",
@@ -41,7 +41,7 @@ Access from the File > Import menu.
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 1
+MINOR_VERSION = 2
 SUB_VERSION = 0
 BLENDER_VERSION = (2, 56, 0)
 
@@ -399,7 +399,7 @@ def parse(tokens):
     global MHX249, ifResult, theScale, defaultScale, One
     
     for (key, val, sub) in tokens:    
-        # print("Parse %s" % key)
+        print("Parse %s" % key)
         data = None
         if key == 'MHX':
             checkMhxVersion(int(val[0]), int(val[1]))
@@ -671,14 +671,16 @@ def parseKeyFramePoint(pt, args, tokens):
 def parseAnimationData(rna, args, tokens):
     if not eval(args[1]):
         return
+    print("Parse Animation data")
     if rna.animation_data == None:    
         rna.animation_data_create()
     adata = rna.animation_data
     for (key, val, sub) in tokens:
         if key == 'FCurve':
-            fcu = parseAnimDataFCurve(adata, rna, val, sub)
+            fcu = parseAnimDataFCurve(adata, rna, val, sub)            
         else:
             defaultKey(key, val, sub, 'adata', [], globals(), locals())
+    print(adata)
     return adata
 
 def parseAnimDataFCurve(adata, rna, args, tokens):
@@ -686,7 +688,6 @@ def parseAnimDataFCurve(adata, rna, args, tokens):
         return
     dataPath = args[0]
     index = int(args[1])
-    # print("parseAnimDataFCurve", adata, dataPath, index)
     n = 1
     for (key, val, sub) in tokens:
         if key == 'Driver':
@@ -715,7 +716,7 @@ def parseDriver(adata, dataPath, index, rna, args, tokens):
         expr = "rna." + words[0] + ']'
         pwords = words[1].split('"')
         prop = pwords[1]
-        # print("prop", expr, prop)
+        #print("prop", expr, prop)
         bone = eval(expr)
         return None
     else:
@@ -729,7 +730,9 @@ def parseDriver(adata, dataPath, index, rna, args, tokens):
     #print("expr", rna, expr)
     fcu = eval(expr)
     drv = fcu.driver
+    #print("   Driver type", drv, args[0])
     drv.type = args[0]
+    #print("   ->", drv.type)
     for (key, val, sub) in tokens:
         if key == 'DriverVariable':
             var = parseDriverVariable(drv, rna, val, sub)
@@ -740,9 +743,10 @@ def parseDriver(adata, dataPath, index, rna, args, tokens):
 def parseDriverVariable(drv, rna, args, tokens):
     var = drv.variables.new()
     var.name = args[0]
+    #print("   Var type", var, args[1])
     var.type = args[1]
+    #print("   ->", var.type)
     nTarget = 0
-    # print("var", var, var.name, var.type)
     for (key, val, sub) in tokens:
         if key == 'Target':
             parseDriverTarget(var, nTarget, rna, val, sub)
@@ -767,7 +771,10 @@ def parseFModifier(fcu, args, tokens):
 """
 def parseDriverTarget(var, nTarget, rna, args, tokens):
     targ = var.targets[nTarget]
-    targ.id = loadedData['Object'][args[0]]
+    ob = loadedData['Object'][args[0]]
+    #print("    targ id", targ, ob)
+    targ.id = ob
+    #print("    ->", targ.id)
     for (key, val, sub) in tokens:
         defaultKey(key, val, sub, 'targ', [], globals(), locals())
     return targ
@@ -1118,7 +1125,16 @@ def parseModifier(ob, args, tokens):
         return None
     mod = ob.modifiers.new(name, typ)
     for (key, val, sub) in tokens:
-        defaultKey(key, val, sub, 'mod', [], globals(), locals())
+        if key == 'CurveSelectNth':
+            n = int(val[0])
+            spline = ob.data.splines[0]
+            for pt in spline.points:
+                pt.select = False
+            pt = spline.points[n]
+            print(n, pt, pt.co)
+            pt.select = True
+        else:            
+            defaultKey(key, val, sub, 'mod', [], globals(), locals())
     return mod
 
 #
@@ -1248,9 +1264,7 @@ def parseMesh (args, tokens):
     for (key, val, sub) in tokens:
         if key == 'Faces':
             parseFaces2(sub, me)
-
-    for n,mat in enumerate(list(me.materials)):
-        print(n, mat)
+    print(me)
     return me
 
 #
@@ -1415,6 +1429,7 @@ def parseShapeKeys(ob, me, args, tokens):
             if me.shape_keys:
                 parseAnimationData(me.shape_keys, val, sub)
     ob.active_shape_key_index = 0
+    print("Shapekeys parsed")
     return
 
 
@@ -1688,7 +1703,6 @@ def parseConstraint(constraints, args, tokens):
     #cns = pb.constraints[-1]
 
     cns.name = args[0]
-    #print("cns", cns.name)
     for (key,val,sub) in tokens:
         if key == 'invert':
             parseArray(cns, ["invert_x", "invert_y", "invert_z"], val)
@@ -1786,6 +1800,7 @@ def parseBezier(bez, args, tokens):
 def parsePoint(pt, args, tokens):
     pt.co = eval(args[0])
     pt.co = theScale*pt.co
+    print(" pt", pt.co)
     return
 
 #
@@ -1980,7 +1995,6 @@ def correctRig(args):
     for pb in ob.pose.bones:
         for cns in pb.constraints:
             if cns.type == 'CHILD_OF':
-                print("Correct %s %s" % (pb, cns))
                 bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
     return
         
@@ -2188,6 +2202,12 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
         #print("Property", expr)
         if expr:
             exec(expr, glbals, lcals)
+        return
+
+    if ext == 'bpyops':
+        expr = "bpy.ops.%s" % args[0]
+        print(expr)
+        exec(expr)
         return
         
     nvar = "%s.%s" % (var, ext)
@@ -2413,7 +2433,7 @@ def clearScene():
         return scn
 
     for ob in scn.objects:
-        if ob.type == "MESH" or ob.type == "ARMATURE" or ob.type == 'EMPTY':
+        if ob.type in ["MESH", "ARMATURE", 'EMPTY', 'CURVE']:
             scn.objects.active = ob
             bpy.ops.object.mode_set(mode='OBJECT')
             scn.objects.unlink(ob)

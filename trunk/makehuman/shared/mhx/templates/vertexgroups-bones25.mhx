@@ -9078,7 +9078,7 @@
     wv 10371 0.226 ;
   end VertexGroup Hips
 
-  VertexGroup Spine1
+  VertexGroup DefSpine1
     wv 2113 0.717 ;
     wv 2114 0.352 ;
     wv 2115 0.37 ;
@@ -9379,9 +9379,9 @@
     wv 10997 0.144 ;
     wv 10998 0.31 ;
     wv 10999 0.769 ;
-  end VertexGroup Spine1
+  end VertexGroup DefSpine1
 
-  VertexGroup Spine2
+  VertexGroup DefSpine2
     wv 2113 0.117 ;
     wv 2114 0.051 ;
     wv 2115 0.056 ;
@@ -9811,9 +9811,9 @@
     wv 11020 0.009 ;
     wv 11022 0.012 ;
     wv 11023 0.006 ;
-  end VertexGroup Spine2
+  end VertexGroup DefSpine2
 
-  VertexGroup Spine3
+  VertexGroup DefSpine3
     wv 2582 0.446 ;
     wv 2583 0.602 ;
     wv 2584 0.63 ;
@@ -10291,7 +10291,7 @@
     wv 11067 0.663 ;
     wv 11068 0.562 ;
     wv 11069 0.691 ;
-  end VertexGroup Spine3
+  end VertexGroup DefSpine3
 
   VertexGroup Hand_L
     wv 2559 0.21 ;

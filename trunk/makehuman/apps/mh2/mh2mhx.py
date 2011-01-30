@@ -26,7 +26,7 @@ TO DO
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 1
+MINOR_VERSION = 2
 splitLeftRight = True
 BODY_LANGUAGE = True
 theHuman = 'Human'
@@ -410,6 +410,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 "  Objects\n" +
 "#if toggle&T_Armature\n" +
 "    ob %s ;\n" % theHuman +
+"    ob %sSpineCurve ;\n" % theHuman +
 "#endif\n" +
 "#if toggle&T_Mesh\n" +
 "    ob %sMesh ;\n" % theHuman +
@@ -453,6 +454,8 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 "      offset %.4f ;\n" % offset +
 "      use_keep_above_surface True ;\n" +
 "    end Modifier\n")
+			elif words[1] == 'curves':
+				mhx_rig.writeAllCurves(fp)
 			elif words[1] == 'material-drivers':
 				if 0 and BODY_LANGUAGE:
 					fp.write("MaterialAnimationData %sMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0\n" % theHuman)
