@@ -737,7 +737,7 @@ class Slider(View):
         self.thumb = Object(self, [position[0], position[1]+16, position[2] + 0.01], mesh)
             
         if isinstance(label, str):
-            self.label = TextObject(self, [position[0]+10,position[1]-2,position[2]+0.2], label, fontSize = style.fontSize)
+            self.label = TextObject(self, [position[0]+10,position[1]+8-6,position[2]+0.2], label, fontSize = style.fontSize)
             
         self.thumbMinX = position[0] + thumbStyle.width / 2
         self.thumbMaxX = position[0] + style.width - thumbStyle.width - thumbStyle.width / 2

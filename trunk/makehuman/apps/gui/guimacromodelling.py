@@ -129,7 +129,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.status = gui3d.TextView(self, [10, 585, 9.1])
 
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=256));y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=25+40*5+8));y+=25
        
         # Macro sliders
 
