@@ -24,12 +24,13 @@ class MakeHairTaskView(gui3d.TaskView):
             app.selectedHuman.storeMesh()
         self.octree = simpleoctree.SimpleOctree(app.selectedHuman.meshStored,0.09)   
         #sliders
-        gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=350))
-        self.cPSlider = gui3d.Slider(self, [10, 115, 9.3], value=14,min=4,max=30,label="Control Points")
-        self.lengthSlider = gui3d.Slider(self, [10, 155, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length")
-        self.numberSlider = gui3d.Slider(self, [10, 205, 9.3], value=25,min=1,max=260,label="Strands Number")
-        self.gravitySlider = gui3d.Slider(self, [10, 245, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor")
-        self.cPEntry = gui3d.TextEdit(self, [18, 285, 9.3], "9,12", gui3d.TextEditStyle._replace(width=112))
+        y=80
+        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*4+24*4+6));y+=25
+        self.cPSlider = gui3d.Slider(self, [10, y, 9.3], value=14,min=4,max=30,label="Control Points");y+=36
+        self.lengthSlider = gui3d.Slider(self, [10, y, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length");y+=36
+        self.numberSlider = gui3d.Slider(self, [10, y, 9.3], value=25,min=1,max=260,label="Strands Number");y+=36
+        self.gravitySlider = gui3d.Slider(self, [10, y, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor");y+=36
+        self.cPEntry = gui3d.TextEdit(self, [18, y, 9.3], "9,12", gui3d.TextEditStyle._replace(width=112));y+=24
         
         @self.cPSlider.event
         def onChange(value):
@@ -48,10 +49,10 @@ class MakeHairTaskView(gui3d.TaskView):
             self.gravity = value;
 
         #buttons
-        self.collisionButton = gui3d.Button(self, [18, 325, 9.3], "Avoid Collision")
+        self.collisionButton = gui3d.Button(self, [18, y, 9.3], "Avoid Collision");y+=24
         
-        self.createButton = gui3d.Button(self, [18, 355, 9.3], "Create Hair")
-        self.deleteButton = gui3d.Button(self, [18, 385, 9.3], "Delete Hair")
+        self.createButton = gui3d.Button(self, [18, y, 9.3], "Create Hair");y+=24
+        self.deleteButton = gui3d.Button(self, [18, y, 9.3], "Delete Hair");y+=24
         
         @self.collisionButton.event
         def onClicked(event):

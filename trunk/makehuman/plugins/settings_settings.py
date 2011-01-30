@@ -10,17 +10,18 @@ class SettingsTaskView(gui3d.TaskView):
 
         self.shaderGroup = []
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Shader', gui3d.GroupBoxStyle._replace(height=140));y+=35
-        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup, [18,y, 9.2], "No shader", True);y+=25
-        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Phong shader");y+=25
-        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Toon shader");y+=25
-        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Skin shader");y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Shader', gui3d.GroupBoxStyle._replace(height=25+24*4+6));y+=25
+        self.shaderNo = gui3d.RadioButton(self,self.shaderGroup, [18,y, 9.2], "No shader", True);y+=24
+        self.shaderPhong = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Phong shader");y+=24
+        self.shaderToon = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Toon shader");y+=24
+        self.shaderSkin = gui3d.RadioButton(self,self.shaderGroup, [18,y,9.2], "Skin shader");y+=24
+        y+=16
         
-        gui3d.GroupBox(self, [10, y, 9.0], 'Slider behavior', gui3d.GroupBoxStyle._replace(height=128));y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Slider behavior', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
         self.realtimeUpdates = gui3d.CheckBox(self, [18,y, 9.2], "Update real-time",
-            self.app.settings.get('realtimeUpdates', True));y+=25
+            self.app.settings.get('realtimeUpdates', True));y+=24
         self.realtimeNormalUpdates = gui3d.CheckBox(self, [18,y,9.2], "Update normals",
-            self.app.settings.get('realtimeNormalUpdates', True));y+=25
+            self.app.settings.get('realtimeNormalUpdates', True));y+=24
         
         @self.shaderNo.event
         def onClicked(event):

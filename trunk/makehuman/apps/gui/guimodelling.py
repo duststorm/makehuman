@@ -57,8 +57,6 @@ class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
         gui3d.Category.__init__(self, parent, 'Modelling')
         
-        gui3d.GroupBox(self, [10, 472, 9.0], 'View settings')
-        
         mesh = gui3d.RectangleMesh(420, 420, self.app.getThemeResource("images", 'background.png'))
         self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
 
@@ -71,8 +69,19 @@ class ModellingCategory(gui3d.Category):
 
         mesh = gui3d.RectangleMesh(420, 420)
         self.backgroundImage = gui3d.Object(self, [190, 90, 1], mesh, visible=False)
-        self.backgroundImageToggle = gui3d.ToggleButton(self, [15, 514, 9.1], 'Bkg',
-            style=gui3d.ButtonStyle._replace(width=32, height=16))
+        
+        y = 600-90
+        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24+6));y+=25
+        
+        modifierStyle = gui3d.ButtonStyle._replace(width=(112-8)/3.0, height=20)
+        
+        x = 18
+        self.backgroundImageToggle = gui3d.ToggleButton(self.viewBox, [x, y, 9.1], 'Bkg',
+            style=modifierStyle);x+=modifierStyle.width+4
+        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], '3D',
+            style=modifierStyle);x+=modifierStyle.width+4
+        self.wireButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Wire',
+            style=modifierStyle)
 
         @self.backgroundImageToggle.event
         def onClicked(event):
@@ -85,17 +94,11 @@ class ModellingCategory(gui3d.Category):
             else:
                 self.app.switchCategory('Library')
                 self.app.switchTask('Background')
-            
-        self.anaglyphsButton = gui3d.ToggleButton(self, [51, 514, 9.1], '3D',
-            style=gui3d.ButtonStyle._replace(width=32, height=16))
 
         @self.anaglyphsButton.event
         def onClicked(event):
             self.app.toggleStereo()
             self.anaglyphsButton.setSelected(mh.cameras[0].stereoMode != 0)
-            
-        self.wireButton = gui3d.ToggleButton(self, [87, 514, 9.1], 'Wire',
-            style=gui3d.ButtonStyle._replace(width=32, height=16))
             
         @self.wireButton.event
         def onClicked(event):
@@ -110,3 +113,4 @@ class ModellingCategory(gui3d.Category):
         self.currentHair.setPosition([event[0]-216, event[1]-36, 9.2])
         self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
         self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[0] - 190 * 2)
+        self.viewBox.setPosition([10, event[1]-90, 9.0])

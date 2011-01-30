@@ -27,18 +27,20 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder.keyRot1 = [-135,-67,0,45]
         self.shoulder.keyRot2 = [-115,-90,-67,-45,-22,0,22,45,67,90]
 
-        gui3d.GroupBox(self, [10, 80, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=256))
+        y = 80
+        gui3d.GroupBox(self, [10, y, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
 
-        self.shoulderXslider = gui3d.Slider(self, position=[10, 115, 9.3], value = 0.0, min = -85, max = 80, label = "RotX: 0")
-        self.shoulderYslider = gui3d.Slider(self, position=[10, 155, 9.3], value = 0.0, min = -140, max = 50, label = "RotY: 0")
-        self.shoulderZslider = gui3d.Slider(self, position=[10, 195, 9.3], value = 0.0, min = -120, max = 90, label = "RotZ: 0")
+        self.shoulderXslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -85, max = 80, label = "RotX: 0");y+=36
+        self.shoulderYslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -140, max = 50, label = "RotY: 0");y+=36
+        self.shoulderZslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -120, max = 90, label = "RotZ: 0");y+=36
+        y+=4
 
         self.savePoseFiles = 0
 
-        self.resetPoseButton = gui3d.Button(self, [18, 235, 9.5], "Reset")
-        self.testPoseButton = gui3d.Button(self, [18, 265, 9.5], "Test")
+        self.resetPoseButton = gui3d.Button(self, [18, y, 9.5], "Reset");y+=24
+        self.testPoseButton = gui3d.Button(self, [18, y, 9.5], "Test");y+=24
         
-        self.savePoseToggle = gui3d.CheckBox(self, [18, 295, 9.5], "SavePose")
+        self.savePoseToggle = gui3d.CheckBox(self, [18, y, 9.5], "SavePose");y+=24
 
         @self.savePoseToggle.event
         def onClicked(event):

@@ -156,33 +156,33 @@ class ExportTaskView(gui3d.TaskView):
         
         # Formats
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+22*5+8));y+=25
-        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], "Wavefront obj", True, gui3d.ButtonStyle);y+=22
-        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange", style=gui3d.ButtonStyle);y+=22
-        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada", style=gui3d.ButtonStyle);y+=22
-        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="MD5", style=gui3d.ButtonStyle);y+=22
-        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="STL", style=gui3d.ButtonStyle);y+=22
+        gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
+        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], "Wavefront obj", True, gui3d.ButtonStyle);y+=24
+        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange", style=gui3d.ButtonStyle);y+=24
+        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada", style=gui3d.ButtonStyle);y+=24
+        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="MD5", style=gui3d.ButtonStyle);y+=24
+        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="STL", style=gui3d.ButtonStyle);y+=24
         y+=16
             
         # OBJ options
         yy = y
-        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+22*6+8));y+=25
-        self.exportEyebrows = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Eyebrows", True);y+=22
-        self.exportDiamonds = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Diamonds", False);y+=22
-        self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=22
-        self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=22
-        self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as mesh", selected=True);y+=22
-        self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as curves");y+=22
+        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*6+6));y+=25
+        self.exportEyebrows = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Eyebrows", True);y+=24
+        self.exportDiamonds = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Diamonds", False);y+=24
+        self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=24
+        self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=24
+        self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as mesh", selected=True);y+=24
+        self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as curves");y+=24
         
         # MHX options
         y = yy
-        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+22*5+8));y+=25
-        self.version24 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.4", True);y+=22
-        self.version25 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.5", True);y+=22
-        self.exportExpressions = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Expressions", True);y+=22
+        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
+        self.version24 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.4", True);y+=24
+        self.version25 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.5", True);y+=24
+        self.exportExpressions = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Expressions", True);y+=24
         rigs = []
-        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use mhx rig", True);y+=22
-        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use game rig");y+=22
+        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use mhx rig", True);y+=24
+        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use game rig");y+=24
         self.mhxOptions.hide()
         
         @self.wavefrontObj.event

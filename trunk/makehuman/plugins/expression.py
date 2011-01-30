@@ -96,25 +96,25 @@ class ExpressionTaskView(gui3d.TaskView):
         self.radioButtons = []
         self.sliders = []
         
-        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=360))
+        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=25+24*len(expressions)+6))
         y += 25
         
         for name, subnames in expressions:
             # Create box
-            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=320))
+            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=25+36*len(subnames)+6))
             self.groupBoxes.append(box)
             
             # Create sliders
-            yy = 80 + 35
+            yy = 80 + 25
             
             for subname in subnames:
                 slider = ExpressionSlider(box, yy, subname.capitalize(), 'data/targets/expression/female_${age}/neutral_female_${age}_%s.target' % subname)
                 self.sliders.append(slider)
-                yy += 35
+                yy += 36
             
             # Create radiobutton
             radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, y, name.capitalize(), box, selected=len(self.radioButtons) == 0)
-            y += 22
+            y += 24
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()

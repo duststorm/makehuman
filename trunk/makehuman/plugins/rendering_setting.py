@@ -9,17 +9,18 @@ class RenderingSettingTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Rendering Setting', label='Settings')
 
         #Rendering resolution
-        gui3d.GroupBox(self, [10, 80, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=128))
-        self.widthSize= gui3d.Slider(self, position=[10, 115, 9.1], value=800, min=10, max=5000, label = "Width: 800")
-        self.heightSize= gui3d.Slider(self, position=[10, 155, 9.1], value=600, min=10, max=5000, label = "Height: 600")
+        y=80
+        gui3d.GroupBox(self, [10, y, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
+        self.widthSize= gui3d.Slider(self, position=[10, y, 9.1], value=800, min=10, max=5000, label = "Width: 800");y+=36
+        self.heightSize= gui3d.Slider(self, position=[10, y, 9.1], value=600, min=10, max=5000, label = "Height: 600");y+=36
+        y+=16
 
         #Hair data
-        gui3d.GroupBox(self, [10, 215, 9.0], 'Hair', gui3d.GroupBoxStyle._replace(height=256))
-        self.clumpRadius = gui3d.Slider(self, position=[10, 250, 9.3], value=0.09, min=0.05,max=0.5, label = "Clump radius: 0.09")
-        self.clumpChildren= gui3d.Slider(self, position=[10, 300, 9.3], value=0, min=0, max=150, label = "Clump children: 0")
-        self.multiStrand= gui3d.Slider(self, position=[10, 350, 9.3], value=0, min=0, max=150, label = "Multistrand children: 0")
-        self.randomHair= gui3d.Slider(self, position=[10, 400, 9.3], value=0.04, min=0.0, max=0.5, label = "Randomness: 0.04")
-
+        gui3d.GroupBox(self, [10, y, 9.0], 'Hair', gui3d.GroupBoxStyle._replace(height=25+36*4+6));y+=25
+        self.clumpRadius = gui3d.Slider(self, position=[10, y, 9.3], value=0.09, min=0.05,max=0.5, label = "Clump radius: 0.09");y+=36
+        self.clumpChildren= gui3d.Slider(self, position=[10, y, 9.3], value=0, min=0, max=150, label = "Clump children: 0");y+=36
+        self.multiStrand= gui3d.Slider(self, position=[10, y, 9.3], value=0, min=0, max=150, label = "Multistrand children: 0");y+=36
+        self.randomHair= gui3d.Slider(self, position=[10, y, 9.3], value=0.04, min=0.0, max=0.5, label = "Randomness: 0.04");y+=36
 
         self.human = self.app.selectedHuman
 

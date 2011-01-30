@@ -36,26 +36,28 @@ class HairPropertiesTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Hair')
         
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Hair properties', gui3d.GroupBoxStyle._replace(height=276));y+=35
+        gui3d.GroupBox(self, [10, y, 9.0], 'Hair properties', gui3d.GroupBoxStyle._replace(height=25+36*4+38+6));y+=25
 
         #############
         #SLIDERS
         #############
         
-        self.widthSlider = gui3d.Slider(self, [10, y, 9.3], value=1.0, min=0.3,max=30.0, label = "Hair width");y+=40
+        self.widthSlider = gui3d.Slider(self, [10, y, 9.3], value=1.0, min=0.3,max=30.0, label = "Hair width");y+=36
         
-        self.redSlider = gui3d.Slider(self, [10, y, 9.01], style=gui3d.SliderStyle._replace(normal='slider_red.png'));y+=40
+        self.redSlider = gui3d.Slider(self, [10, y, 9.01], label='Red: 0',
+            style=gui3d.SliderStyle._replace(normal='slider_red.png'),
+            thumbStyle=gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
-        self.greenSlider = gui3d.Slider(self, [10, y, 9.02], style=gui3d.SliderStyle._replace(normal='slider_green.png'));y+=40
+        self.greenSlider = gui3d.Slider(self, [10, y, 9.02], label='Green: 0',
+            style=gui3d.SliderStyle._replace(normal='slider_green.png'),
+            thumbStyle=gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
-        self.blueSlider = gui3d.Slider(self, [10, y, 9.03], style=gui3d.SliderStyle._replace(normal='slider_blue.png'));y+=50
+        self.blueSlider = gui3d.Slider(self, [10, y, 9.03], label='Blue: 0',
+            style=gui3d.SliderStyle._replace(normal='slider_blue.png'),
+            thumbStyle=gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
-        mesh = gui3d.RectangleMesh(32, 32)
-        self.colorPreview = gui3d.Object(self, [18, y, 9.04], mesh)
-        
-        self.redSliderLabel = gui3d.TextView(self, [60, y, 9.04], 'Red: 0');y+=16        
-        self.greenSliderLabel = gui3d.TextView(self, [60, y, 9.4], 'Green: 0');y+=16        
-        self.blueSliderLabel = gui3d.TextView(self, [60, y, 9.4], 'Blue: 0');y+=16
+        mesh = gui3d.RectangleMesh(112, 32)
+        self.colorPreview = gui3d.Object(self, [18, y+2, 9.04], mesh)
                     
         @self.redSlider.event
         def onChanging(value):
@@ -100,9 +102,9 @@ class HairPropertiesTaskView(gui3d.TaskView):
         c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
         for g in self.colorPreview.mesh.facesGroups:
             g.setColor(c)
-        self.redSliderLabel.setText('Red:%i' % c[0])
-        self.greenSliderLabel.setText('Green:%i' % c[1])
-        self.blueSliderLabel.setText('Blue:%i' % c[2])
+        self.redSlider.label.setText('Red:%i' % c[0])
+        self.greenSlider.label.setText('Green:%i' % c[1])
+        self.blueSlider.label.setText('Blue:%i' % c[2])
 
     def onShow(self, event):
         gui3d.TaskView.onShow(self, event)

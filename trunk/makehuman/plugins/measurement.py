@@ -78,24 +78,24 @@ class MeasureTaskView(gui3d.TaskView):
 
         for name, subnames in measurements:
             # Create box
-            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=320))
+            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=25+36*len(subnames)+6))
             self.groupBoxes[name] = box
             
             # Create sliders
-            yy = 80 + 35
+            yy = 80 + 25
             
             for subname in subnames:
                 slider = MeasureSlider(box, yy, sliderLabel[subname], subname)
                 self.sliders.append(slider)
-                yy += 35
+                yy += 36
                 
         modes = [] 
                
         y = 80
-        self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=80))
+        self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=25+24*2+6))
         y += 25
         metric = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Metric', True)
-        y += 22
+        y += 24
         imperial = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Imperial')
         
         @metric.event
