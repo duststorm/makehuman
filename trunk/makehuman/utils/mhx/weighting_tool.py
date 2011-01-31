@@ -44,6 +44,28 @@ class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	printFaceNums(context):
+#	class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
+#
+ 
+def printFaceNums(context):
+	ob = context.object
+	print("Faces in ", ob)
+	for f in ob.data.faces:
+		if f.select:
+			print(f.index)
+	print("End")
+
+class VIEW3D_OT_MhxPrintFnumsButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_print_fnums"
+	bl_label = "Print fnums"
+
+	def execute(self, context):
+		import bpy
+		printFaceNums(context)
+		return{'FINISHED'}	
+
+#
 #	selectQuads():
 #	class VIEW3D_OT_MhxSelectQuadsButton(bpy.types.Operator):
 #
@@ -542,6 +564,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		layout.operator("mhx.weight_print_vnums")
+		layout.operator("mhx.weight_print_fnums")
 		layout.operator("mhx.weight_select_quads")
 		layout.operator("mhx.weight_remove_vertex_groups")
 		layout.operator("mhx.weight_unvertex_diamonds")

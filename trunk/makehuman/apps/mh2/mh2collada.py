@@ -371,6 +371,13 @@ class CStuff:
 
 def filterMesh(mesh1):
 	(verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
+	
+	badFace1 = 8620
+	badFace2 = 8736
+	badVert = 7410
+	badUvVert = 10967
+	newFace = [7404,7406,7411,2819]
+	newUvFace = [8919,8918,10966,12814]
 
 	killVerts = {}
 	killUvs = {}
@@ -379,6 +386,9 @@ def filterMesh(mesh1):
 			for v in f:
 				killVerts[v[0]] = True
 				killUvs[v[1]] = True
+				
+	killVerts[badVert] = True
+	killUvs[badUvVert] = True
 
 	n = 0
 	nv = {}
@@ -410,8 +420,8 @@ def filterMesh(mesh1):
 			n += 1	
 
 	faces2 = []
-	for f in faces1:
-		if len(f) == 4:
+	for fn,f in enumerate(faces1):
+		if (len(f) == 4) and (fn not in [badFace1, badFace2]):
 			f2 = []
 			for c in f:
 				v2 = nv[c[0]]
@@ -419,6 +429,13 @@ def filterMesh(mesh1):
 				f2.append([v2, uv2])
 			faces2.append(f2)
 
+	f2 = []		
+	for n in range(4):
+		v2 = nv[newFace[n]]
+		uv2 = nuv[newUvFace[n]]
+		f2.append([v2, uv2])
+	faces2.append(f2)
+		
 	weights2 = {}
 	for (b, wts1) in weights1.items():
 		wts2 = []
