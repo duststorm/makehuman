@@ -45,18 +45,18 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.widthSlider = gui3d.Slider(self, [10, y, 9.3], value=1.0, min=0.3,max=30.0, label = "Hair width");y+=36
         
         self.redSlider = gui3d.Slider(self, [10, y, 9.01], label='Red: 0',
-            style=gui3d.SliderStyle._replace(normal='slider_red.png'),
+            style=gui3d.SliderStyle._replace(normal='color_slider_background.png'),
             thumbStyle=gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
         self.greenSlider = gui3d.Slider(self, [10, y, 9.02], label='Green: 0',
-            style=gui3d.SliderStyle._replace(normal='slider_green.png'),
+            style=gui3d.SliderStyle._replace(normal='color_slider_background.png'),
             thumbStyle=gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
         self.blueSlider = gui3d.Slider(self, [10, y, 9.03], label='Blue: 0',
-            style=gui3d.SliderStyle._replace(normal='slider_blue.png'),
+            style=gui3d.SliderStyle._replace(normal='color_slider_background.png'),
             thumbStyle=gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
-        mesh = gui3d.RectangleMesh(112, 32)
+        mesh = gui3d.NineSliceMesh(112, 32, self.app.getThemeResource('images', 'color_preview.png'), [4,4,4,4])
         self.colorPreview = gui3d.Object(self, [18, y+2, 9.04], mesh)
                     
         @self.redSlider.event
@@ -91,6 +91,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
             #pass #Do something!
 
     def changeColor(self, color):
+        
         action = Action(self.app.selectedHuman, self.app.selectedHuman.hairColor, color, self.syncSliders)
         self.app.do(action)
         human = self.app.selectedHuman
@@ -99,12 +100,42 @@ class HairPropertiesTaskView(gui3d.TaskView):
             human.hairObj.facesGroups[0].setColor(c)
 
     def setColor(self, color):
-        c = [int(color[0] * 255), int(color[1] * 255), int(color[2] * 255), 255]
+        
+        red, green, blue = int(color[0] * 255), int(color[1] * 255), int(color[2] * 255)
+        
         for g in self.colorPreview.mesh.facesGroups:
-            g.setColor(c)
-        self.redSlider.label.setText('Red:%i' % c[0])
-        self.greenSlider.label.setText('Green:%i' % c[1])
-        self.blueSlider.label.setText('Blue:%i' % c[2])
+            g.setColor([red, green, blue, 255])
+            
+        f = self.redSlider.background.mesh.faces[0]
+        f.color = [
+            [0, green, blue, 255],
+            [255, green, blue, 255],
+            [255, green, blue, 255],
+            [0, green, blue, 255]
+        ]
+        f.updateColors()
+        
+        f = self.greenSlider.background.mesh.faces[0]
+        f.color = [
+            [red, 0, blue, 255],
+            [red, 255, blue, 255],
+            [red, 255, blue, 255],
+            [red, 0, blue, 255]
+        ]
+        f.updateColors()
+        
+        f = self.blueSlider.background.mesh.faces[0]
+        f.color = [
+            [red, green, 0, 255],
+            [red, green, 255, 255],
+            [red, green, 255, 255],
+            [red, green, 0, 255]
+        ]
+        f.updateColors()
+        
+        self.redSlider.label.setText('Red:%i' % red)
+        self.greenSlider.label.setText('Green:%i' % green)
+        self.blueSlider.label.setText('Blue:%i' % blue)
 
     def onShow(self, event):
         gui3d.TaskView.onShow(self, event)

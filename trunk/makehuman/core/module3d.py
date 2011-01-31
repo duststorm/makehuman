@@ -297,7 +297,7 @@ class Vert:
                 self.object.object3d.setNormCoord(i, self.no)
 
         if updateCol:
-            if colorIndexToUpdate == None:
+            if colorIndexToUpdate is None:
                 for i in self.indicesInFullVertArray:
                     self.object.object3d.setColorComponent(i, self.color)
             else:
@@ -464,8 +464,7 @@ class Face:
 
         for (i, v) in enumerate(self.verts):
             v.color = self.color[i]
-            for index in v.indicesInFullVertArray:
-                v.update(0, 0, 1)
+            v.update(0, 0, 1)
 
     def __str__(self):
         """
