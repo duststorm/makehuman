@@ -12,26 +12,62 @@ import humanmodifier
 import events3d
 import aljabr
 
+class Action:
+
+    def __init__(self, human, modifier, before, after, postAction=None):
+        self.name = 'Change measure'
+        self.human = human
+        self.modifier = modifier
+        self.before = before
+        self.after = after
+        self.postAction = postAction
+
+    def do(self):
+        self.modifier.setValue(self.after)
+        self.human.applyAllTargets()
+        if self.postAction:
+            self.postAction()
+        return True
+
+    def undo(self):
+        self.modifier.setValue(self.before)
+        self.human.applyAllTargets()
+        if self.postAction:
+            self.postAction()
+        return True
+
 class MeasureSlider(gui3d.Slider):
-    def __init__(self, parent, y, template, measure):
+    def __init__(self, parent, y, template, measure, modifier):
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value=0.0, min=-1.0, max=1.0,
             label=template + parent.parent.getMeasure(measure))
+        self.before = None
         self.template = template
         self.measure = measure
+        self.modifier = modifier
         
     def onChange(self, value):
-        self.parent.parent.changeValue(self.measure, value)
-        self.parent.parent.updateMeasures()
+        human = self.app.selectedHuman
+        self.app.do(Action(human, self.modifier, self.before, value, self.update))
+        self.before = None
+        self.parent.parent.syncSliderLabels()
 
     def onChanging(self, value):
-        self.parent.parent.changeValue(self.measure, value, True)
-        self.update()
+        human = self.app.selectedHuman
+        if self.before is None:
+            self.before = self.modifier.getValue()
+                
+        if self.app.settings.get('realtimeUpdates', True):
+            self.modifier.setValue(value, True)
+        self.updateLabel()
+        
+    def updateLabel(self):
+        human = self.app.selectedHuman
+        self.label.setText(self.template + self.parent.parent.getMeasure(self.measure)) 
         
     def update(self):
+        human = self.app.selectedHuman
+        self.setValue(self.modifier.getValue())
         self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
-        
-    def sync(self):
-        self.setValue(self.parent.parent.getSliderValue(self.measure))
 
 class MeasureTaskView(gui3d.TaskView):
 
@@ -75,6 +111,11 @@ class MeasureTaskView(gui3d.TaskView):
         
         self.groupBoxes = {}
         self.sliders = []
+        
+        self.modifiers = {}
+        
+        measureDataPath = "data/targets/measure/"
+        human = self.app.selectedHuman
 
         for name, subnames in measurements:
             # Create box
@@ -85,7 +126,11 @@ class MeasureTaskView(gui3d.TaskView):
             yy = 80 + 25
             
             for subname in subnames:
-                slider = MeasureSlider(box, yy, sliderLabel[subname], subname)
+                modifier = humanmodifier.Modifier(human,
+                    os.path.join(measureDataPath, "measure-%s-decrease.target" % subname),
+                    os.path.join(measureDataPath, "measure-%s-increase.target" % subname))
+                self.modifiers[subname] = modifier
+                slider = MeasureSlider(box, yy, sliderLabel[subname], subname, modifier)
                 self.sliders.append(slider)
                 yy += 36
                 
@@ -102,134 +147,19 @@ class MeasureTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.RadioButton.onClicked(metric, event)
             self.ruler.setMode('metric')
-            self.updateMeasures()
+            self.syncSliderLabels()
             
         @imperial.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(imperial, event)
             self.ruler.setMode('imperial')
-            self.updateMeasures()
-
-        #Get a list with all targes (complete with path) used in measureData library
-        self.measureDataPath = "data/targets/measure/"
-        self.measureTargets = []
-        for f in os.listdir(self.measureDataPath):
-            if os.path.isfile(os.path.join(self.measureDataPath, f)):
-                self.measureTargets.append(os.path.join(self.measureDataPath, f))
-
-        # Modifiers
-        self.modifiers = {}
-        for IDName in ["neckcirc", "neckheight","upperarm","upperarmlenght", "lowerarmlenght", "wrist", "frontchest", "bust", "underbust","waist", "napetowaist", "waisttohip",
-                        "shoulder", "upperlegheight", "lowerlegheight", "calf", "ankle", "thighcirc", "hips"]:
-            self.getModifiers(IDName)
+            self.syncSliderLabels()
 
         # Undo memory
         self.before = None
-
-    def updateMeasures(self):
-        
-        for slider in self.sliders:
-            slider.update()
-
-    def changeValue(self, IDName, value, realtime=False):
-        """
-        This function applies the targets, and informs the undo system about the changes.
-        @return: None
-        @type  IDName: String
-        @param IDName: Name of the body part to asymmetrise
-        @type  value: Float
-        @param value: The amount of asymmetry
-        """
-        if realtime:
-            if not self.before:
-                self.before = self.getTargetsAndValues(IDName)
-
-            self.setModifierValue(value, IDName)
-        else:
-            self.setModifierValue(value, IDName)
-            human = self.app.selectedHuman
-            human.applyAllTargets(self.app.progress)
-
-            after = self.getTargetsAndValues(IDName)
-
-            self.app.did(humanmodifier.Action(human, self.before, after, self.syncSliders))
-
-            self.before = None
-
-    def buildListOfTargetPairs(self, name):
-        """
-        This function scans all targets and builds a list of lists:
-        [[target1-left,target1-right],...,[targetN-left,targetN-right]]
-        @return: List of lists
-        @type  name: String
-        @param targets: Name of the body part to asymmetrise
-        """
-        pairs = []
-        fName1 = "measure-"+name+"-decrease.target"
-        fName2 = "measure-"+name+"-increase.target"
-
-        file1 = os.path.join(self.measureDataPath, fName1)
-        file2 = os.path.join(self.measureDataPath, fName2)
-
-        pair = (file1,file2)
-        pairs.append(pair)
-        return pairs
-
-
-    def getTargetsAndValues(self, IDName):
-        """
-        This function returns a dictionary with "targetPath:val" items, getting them
-        from the human details stack.
-        It's used to get both "before" and "after" dictionaries.
-        @return: Dictionary
-        @type  targets: List
-        @param targets: List of targets to get
-        """
-        modifiers = self.getModifiers(IDName)
-        human = self.app.selectedHuman
-
-        targetsAndValues = {}
-        for modifier in modifiers:
-            targetsAndValues[modifier.left] = human.getDetail(modifier.left)
-            targetsAndValues[modifier.right] = human.getDetail(modifier.right)
-        return targetsAndValues
-
-    def setModifierValue(self, value, IDName):
-            """
-            This function loads all asymmetry targets for the specified part of body
-            (for example brown, eyes, etc..) and returns a dictionary with
-            the applied targets, used as "after" parameter in undo system
-            @return: Dictionary
-            @type  value: Float
-            @param value: The amount of asymmetry
-            @type  IDName: String
-            @param IDName: The name of part to asymmetrize.
-            """
-            modifiers = self.getModifiers(IDName)
-
-            for modifier in modifiers:
-                modifier.setValue(value)
-
-    def getModifiers(self, IDName):
-        modifiers = self.modifiers.get(IDName, None)
-        if not modifiers:
-            modifiers = []
-            targets = self.buildListOfTargetPairs(IDName)
-            human = self.app.selectedHuman
-            for pair in targets:
-                modifier = humanmodifier.Modifier(human, pair[0], pair[1])
-                modifiers.append(modifier)
-            self.modifiers[IDName] = modifiers
-        return modifiers
-
-    def getSliderValue(self, IDName):
-        modifiers = self.modifiers[IDName]
-        if modifiers:
-            return modifiers[0].getValue()
-        else:
-            return 0.0
             
     def getMeasure(self, measure):
+        
         human = self.app.selectedHuman
         return self.ruler.getMeasure(human, measure)
 
@@ -238,9 +168,6 @@ class MeasureTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.groupBoxes['torso'].children[0].setFocus()
         self.syncSliders()
-
-        #Update the measures when the measure mode is activated
-        self.updateMeasures()
         
     def onResized(self, event):
         
@@ -253,17 +180,25 @@ class MeasureTaskView(gui3d.TaskView):
     def syncSliders(self):
         
         for slider in self.sliders:
-            slider.sync()
-
-    def onKeyDown(self, event):
-
-        # Undo redo
-        if event.key == events3d.SDLK_y:
-            self.app.redo()
-        elif event.key == events3d.SDLK_z:
-            self.app.undo()
-
-        gui3d.TaskView.onKeyDown(self, event)
+            slider.update()
+            
+    def syncSliderLabels(self):
+        
+        for slider in self.sliders:
+            slider.updateLabel()
+        
+    def loadHandler(self, human, values):
+        
+        modifier = self.modifiers.get(values[0], None)
+        if modifier:
+            modifier.setValue(float(values[1]))
+       
+    def saveHandler(self, human, file):
+        
+        for name, modifier in self.modifiers.iteritems():
+            value = modifier.getValue()
+            if value:
+                file.write('measure %s %f\n' % (name, value))
 
 def load(app):
     """
@@ -271,6 +206,9 @@ def load(app):
     """
     category = app.getCategory('Advanced')
     taskview = MeasureTaskView(category)
+    
+    app.addLoadHandler('measure', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
     
     print 'Asymm loaded'
 

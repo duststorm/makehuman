@@ -1882,8 +1882,6 @@ class Human(gui3d.Object):
                     self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
                     self.targetsDetailStack['data/targets/details/' + lineData[1] + '.target'] = float(lineData[2])
-                elif lineData[0] == 'measure':
-                    self.targetsDetailStack['data/targets/measure/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] == 'microdetail':
                     self.targetsDetailStack['data/targets/microdetails/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] in self.app.loadHandlers:
@@ -1933,8 +1931,6 @@ class Human(gui3d.Object):
                 f.write('microdetail %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
             elif '/asym' in t:
                f.write('asymmetry %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
-            elif '/measure' in t:
-               f.write('measure %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
                
         for handler in self.app.saveHandlers:
             handler(self, f)

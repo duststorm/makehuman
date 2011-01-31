@@ -43,25 +43,29 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         
 class ExpressionSlider(gui3d.Slider):
     def __init__(self, parent, y, label, modifier):
+        
         human = parent.app.selectedHuman
         self.modifier = modifier
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = self.modifier.getValue(human), label=label)
         self.before = None
     
     def onChange(self, value):
+        
         human = self.app.selectedHuman
         self.app.do(Action(human, self.modifier, self.before, value, self.update))
         self.before = None
         
     def onChanging(self, value):
-        if self.app.settings.get('realtimeUpdates', True):
-            human = self.app.selectedHuman
-            if self.before is None:
-                self.before = self.modifier.getValue(human)
+        
+        human = self.app.selectedHuman
+        if self.before is None:
+            self.before = self.modifier.getValue(human)
             
+        if self.app.settings.get('realtimeUpdates', True):    
             self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
         
     def update(self):
+        
         human = self.app.selectedHuman
         self.setValue(self.modifier.getValue(human))
 
