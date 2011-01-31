@@ -31,6 +31,17 @@ from os import path
 from random import random
 from simpleoctree import SimpleOctree
 
+HairButtonStyle = gui3d.Style(**{
+    'width':32,
+    'height':32,
+    'mesh':None,
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontSize':gui3d.defaultFontSize,
+    'border':None
+    })
+
 class HairTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, "Hair")
@@ -49,6 +60,14 @@ class HairTaskView(gui3d.TaskView):
         self.interpolationRadius = 0.09
         self.clumpInterpolationNumber = 0
         #self.app.categories["Rendering"].hairsClass = self
+        
+        hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
+        self.currentHair = gui3d.Button(self.app.categories['Modelling'], [800-216, 600-36, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
+
+        @self.currentHair.event
+        def onClicked(event):
+            self.app.switchCategory('Library')
+            self.app.switchTask("Hair")
 
         @self.filechooser.event
         def onFileSelected(filename, update=1):
@@ -65,7 +84,7 @@ class HairTaskView(gui3d.TaskView):
             self.app.switchCategory("Modelling")
             human.setHairFile(path.join('data/hairs', filename + ".obj"))
             hairTexture = human.hairFile.replace('.obj', '.png')
-            self.app.categories["Modelling"].currentHair.setTexture(hairTexture)
+            self.currentHair.setTexture(hairTexture)
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
@@ -80,6 +99,9 @@ class HairTaskView(gui3d.TaskView):
     def onHide(self, event):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
+    
+    def onResized(self, event):
+        self.currentHair.setPosition([event[0]-216, event[1]-36, 9.2])
 
     def onHumanChanged(self, event):
         print 'onHumanChanged'
@@ -95,3 +117,21 @@ class HairTaskView(gui3d.TaskView):
             self.human.hairObj.update()
             self.app.redraw()
         self.human = None
+
+# This method is called when the plugin is loaded into makehuman
+# The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
+
+
+def load(app):
+    category = app.getCategory('Library')
+    taskview = HairTaskView(category)
+
+    print 'Hair chooser loaded'
+
+# This method is called when the plugin is unloaded from makehuman
+# At the moment this is not used, but in the future it will remove the added GUI elements
+
+
+def unload(app):
+    print 'Hair chooser unloaded'
+

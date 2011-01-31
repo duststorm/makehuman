@@ -220,7 +220,7 @@ class Vert:
         self.idx = idx
         self.color = [255, 255, 255, 255]
 
-    def update(self, updateNor=1, updateCoo=1, updateCol=None, colorIndexToUpdate=None):
+    def update(self, updateNor=True, updateCoo=True, updateCol=False):
         """
         This method updates the coordinates, normal and/or color of a vertex in the C
         OpenGL world, based upon the values currently held in the Python Vert class.
@@ -295,13 +295,9 @@ class Vert:
         if updateNor:
             for i in self.indicesInFullVertArray:
                 self.object.object3d.setNormCoord(i, self.no)
-
         if updateCol:
-            if colorIndexToUpdate is None:
-                for i in self.indicesInFullVertArray:
-                    self.object.object3d.setColorComponent(i, self.color)
-            else:
-                self.object.object3d.setColorComponent(colorIndexToUpdate, self.color)
+            for i in self.indicesInFullVertArray:
+                self.object.object3d.setColorComponent(i, self.color)
 
     def calcNorm(self):
         """

@@ -79,7 +79,7 @@ from os.path import join, basename, splitext
 import mh
 import gui3d, events3d, font3d
 import mh2obj, mh2bvh, mh2mhx
-import human, hair_chooser, background, human_texture
+import human, background
 import guimodelling, guifiles#, guirender
 from aljabr import centroid
 import algos3d
@@ -236,9 +236,7 @@ class MHApplication(gui3d.Application):
         guifiles.FilesCategory(self)
       
         library = gui3d.Category(self, "Library")
-        hair_chooser.HairTaskView(library)
         background.BackgroundTaskView(library)
-        human_texture.HumanTextureTaskView(library)
         
         mh.callAsync(self.loadPlugins)
         

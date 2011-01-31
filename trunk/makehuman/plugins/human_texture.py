@@ -55,4 +55,20 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
+# This method is called when the plugin is loaded into makehuman
+# The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
+
+
+def load(app):
+    category = app.getCategory('Library')
+    taskview = HumanTextureTaskView(category)
+
+    print 'Texture chooser loaded'
+
+# This method is called when the plugin is unloaded from makehuman
+# At the moment this is not used, but in the future it will remove the added GUI elements
+
+
+def unload(app):
+    print 'Texture chooser unloaded'
 

@@ -60,13 +60,6 @@ class ModellingCategory(gui3d.Category):
         mesh = gui3d.RectangleMesh(420, 420, self.app.getThemeResource("images", 'background.png'))
         self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
 
-        hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
-        self.currentHair = gui3d.Button(self, [800-216, 600-36, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
-
-        @self.currentHair.event
-        def onClicked(event):
-            self.app.switchCategory('Library')
-
         mesh = gui3d.RectangleMesh(420, 420)
         self.backgroundImage = gui3d.Object(self, [190, 90, 1], mesh, visible=False)
         
@@ -110,7 +103,6 @@ class ModellingCategory(gui3d.Category):
         guidetailmodelling.MicroModelingTaskView(self)
 
     def onResized(self, event):
-        self.currentHair.setPosition([event[0]-216, event[1]-36, 9.2])
         self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
         self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[0] - 190 * 2)
         self.viewBox.setPosition([10, event[1]-90, 9.0])
