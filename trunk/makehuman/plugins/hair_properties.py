@@ -3,6 +3,7 @@
 # We need this for gui controls
 
 import gui3d, hair, font3d
+from aljabr import vdist, vmul, vnorm, vsub, vadd
 
 print 'hair properties imported'
 
@@ -86,7 +87,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         @self.widthSlider.event
         def onChanging(value):
             human = self.app.selectedHuman
-            if human.hairObj and len(human.hairObj.verts)>0 : 
+            if human.hairObj and len(human.hairObj.verts) > 0: 
                hairWidthUpdate(human.scene, human.hairObj, widthFactor=self.widthSlider.getValue())
             #pass #Do something!
 
@@ -159,7 +160,6 @@ def load(app):
 
 def unload(app):
     print 'hair properties unloaded'
-
 
 #obj = hair object
 def hairWidthUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal and vertex index of object remains the same!
