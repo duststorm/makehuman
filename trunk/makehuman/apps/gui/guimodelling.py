@@ -41,17 +41,6 @@ import guimacromodelling
 import guidetailmodelling
 import os
 
-HairButtonStyle = gui3d.Style(**{
-    'width':32,
-    'height':32,
-    'mesh':None,
-    'normal':None,
-    'selected':None,
-    'focused':None,
-    'fontSize':gui3d.defaultFontSize,
-    'border':None
-    })
-
 class ModellingCategory(gui3d.Category):
 
     def __init__(self, parent):
