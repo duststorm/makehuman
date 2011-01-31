@@ -42,9 +42,9 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.show()
         
 class ExpressionSlider(gui3d.Slider):
-    def __init__(self, parent, y, label, template):
+    def __init__(self, parent, y, label, modifier):
         human = parent.app.selectedHuman
-        self.modifier = humanmodifier.GenderAgeModifier(template)
+        self.modifier = modifier
         gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = self.modifier.getValue(human), label=label)
         self.before = None
     
@@ -96,6 +96,8 @@ class ExpressionTaskView(gui3d.TaskView):
         self.radioButtons = []
         self.sliders = []
         
+        self.modifiers = {}
+        
         self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=25+24*len(expressions)+6))
         y += 25
         
@@ -108,7 +110,10 @@ class ExpressionTaskView(gui3d.TaskView):
             yy = 80 + 25
             
             for subname in subnames:
-                slider = ExpressionSlider(box, yy, subname.capitalize(), 'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
+                
+                modifier = humanmodifier.GenderAgeModifier('data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
+                self.modifiers[subname] = modifier
+                slider = ExpressionSlider(box, yy, subname.capitalize(), modifier)
                 self.sliders.append(slider)
                 yy += 36
             
@@ -124,6 +129,12 @@ class ExpressionTaskView(gui3d.TaskView):
         for box in self.groupBoxes:
             
             box.hide()
+    
+    def onShow(self, event):
+
+        gui3d.TaskView.onShow(self, event)
+        for slider in self.sliders:
+            slider.update()
             
     def onResized(self, event):
         
@@ -137,6 +148,19 @@ class ExpressionTaskView(gui3d.TaskView):
             value = slider.modifier.getValue(human)
             if value:
                 slider.modifier.setValue(human, value)
+                
+    def loadHandler(self, human, values):
+        
+        modifier = self.modifiers.get(values[0], None)
+        if modifier:
+            modifier.setValue(human, float(values[1]))
+       
+    def saveHandler(self, human, file):
+        
+        for name, modifier in self.modifiers.iteritems():
+            value = modifier.getValue(human)
+            if value:
+                file.write('expression %s %f\n' % (name, value))
 
 category = None
 taskview = None
@@ -148,6 +172,9 @@ taskview = None
 def load(app):
     category = app.getCategory('Advanced')
     taskview = ExpressionTaskView(category)
+    
+    app.addLoadHandler('expression', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
 
     print 'Expression loaded'
 
@@ -157,5 +184,3 @@ def load(app):
 
 def unload(app):
     print 'Expression unloaded'
-
-

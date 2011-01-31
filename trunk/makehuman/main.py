@@ -140,6 +140,9 @@ class MHApplication(gui3d.Application):
             (0, events3d.SDLK_PERIOD): self.resetView
         }
         
+        self.loadHandlers = {}
+        self.saveHandlers = []
+        
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
         self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
@@ -534,6 +537,16 @@ class MHApplication(gui3d.Application):
         for shortcut, m in self.shortcuts.iteritems():
             if m == method:
                 return shortcut
+                
+    # Load handlers
+    
+    def addLoadHandler(self, keyword, handler):
+        self.loadHandlers[keyword] = handler
+        
+    # Save handlers
+    
+    def addSaveHandler(self, handler):
+        self.saveHandlers.append(handler)
     
     # Shortcut methods
     

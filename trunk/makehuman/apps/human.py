@@ -1886,6 +1886,8 @@ class Human(gui3d.Object):
                     self.targetsDetailStack['data/targets/measure/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] == 'microdetail':
                     self.targetsDetailStack['data/targets/microdetails/' + lineData[1] + '.target'] = float(lineData[2])
+                elif lineData[0] in self.app.loadHandlers:
+                    self.app.loadHandlers[lineData[0]](self, lineData[1:])
 
         f.close()
 
@@ -1933,8 +1935,9 @@ class Human(gui3d.Object):
                f.write('asymmetry %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
             elif '/measure' in t:
                f.write('measure %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
-            else:
-                print('Error, %s was not saved' % t)
+               
+        for handler in self.app.saveHandlers:
+            handler(self, f)
+               
         f.close()
-
 
