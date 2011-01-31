@@ -42,7 +42,7 @@ class Action:
     def do(self):
         for (target, value) in self.after.iteritems():
             self.human.setDetail(target, value)
-        self.human.applyAllTargets(update=self.update)
+        self.human.applyAllTargets(self.human.app.progress, update=self.update)
         if self.postAction:
             self.postAction()
 
@@ -61,7 +61,7 @@ class Modifier:
         self.left = left
         self.right = right
 
-    def setValue(self, value,update=1):
+    def setValue(self, value, update=1):
         value = max(-1.0, min(1.0, value))
 
     # print(self.left + " " + str(value))

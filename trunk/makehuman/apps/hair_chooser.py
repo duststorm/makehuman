@@ -32,52 +32,66 @@ from random import random
 from simpleoctree import SimpleOctree
 
 class HairTaskView(gui3d.TaskView):
-  def __init__(self, category):
-    gui3d.TaskView.__init__(self, category, "Hair")
-    self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
-    self.default = True
-    self.saveAsCurves = True
-    self.path = None
-    self.guides = []
-    self.widthFactor = 1.0
-    self.oHeadCentroid = [0.0, 7.436, 0.03]
-    self.oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
-    self.hairDiameterMultiStrand = 0.006
-    self.tipColor = [0.518, 0.325, 0.125]
-    self.rootColor = [0.109, 0.037, 0.007]
-    self.interpolationRadius = 0.09
-    self.clumpInterpolationNumber = 0
-    #self.app.categories["Rendering"].hairsClass = self
+    def __init__(self, category):
+        gui3d.TaskView.__init__(self, category, "Hair")
+        self.human = None
+        self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
+        self.default = True
+        self.saveAsCurves = True
+        self.path = None
+        self.guides = []
+        self.widthFactor = 1.0
+        self.oHeadCentroid = [0.0, 7.436, 0.03]
+        self.oHeadBoundingBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
+        self.hairDiameterMultiStrand = 0.006
+        self.tipColor = [0.518, 0.325, 0.125]
+        self.rootColor = [0.109, 0.037, 0.007]
+        self.interpolationRadius = 0.09
+        self.clumpInterpolationNumber = 0
+        #self.app.categories["Rendering"].hairsClass = self
 
-    @self.filechooser.event
-    def onFileSelected(filename,update=1):
-      #hair files comes in pair, .obj and .hair.
-      #.obj files contain geometric detail of the hair (can be edited by any 3rd party modelling software that opens wavefront .obj)
-      #.hair files contain metadata of hair used by the makehair utility
-      filename = path.splitext(filename)[0]
-      print("Loading %s" %(filename))
-      human = self.app.selectedHuman
-      if human.hairObj: human.scene.clear(human.hairObj)
+        @self.filechooser.event
+        def onFileSelected(filename, update=1):
+            #hair files comes in pair, .obj and .hair.
+            #.obj files contain geometric detail of the hair (can be edited by any 3rd party modelling software that opens wavefront .obj)
+            #.hair files contain metadata of hair used by the makehair utility
+            filename = path.splitext(filename)[0]
+            print("Loading %s" %(filename))
+            human = self.app.selectedHuman
+            if human.hairObj: human.scene.clear(human.hairObj)
 
-      human.hairObj = human.hairs.loadHair(path="./data/hairs/"+filename, update=update)
-      
-      self.app.switchCategory("Modelling")
-      human.setHairFile(path.join('data/hairs', filename + ".obj"))
-      hairTexture = human.hairFile.replace('.obj', '.png')
-      self.app.categories["Modelling"].currentHair.setTexture(hairTexture)
+            human.hairObj = human.hairs.loadHair(path="./data/hairs/"+filename, update=update)
 
-  def onShow(self, event):
-    # When the task gets shown, set the focus to the file chooser
-    self.app.selectedHuman.hide()
-    if self.default:
-      self.default = False
-      self.filechooser.selectedFile = self.filechooser.files.index("default.hair")
-      self.filechooser.onShow(event)
-    gui3d.TaskView.onShow(self, event)
-    self.filechooser.setFocus()
+            self.app.switchCategory("Modelling")
+            human.setHairFile(path.join('data/hairs', filename + ".obj"))
+            hairTexture = human.hairFile.replace('.obj', '.png')
+            self.app.categories["Modelling"].currentHair.setTexture(hairTexture)
 
-  def onHide(self, event):
-    self.app.selectedHuman.show()
-    gui3d.TaskView.onHide(self, event)
+    def onShow(self, event):
+        # When the task gets shown, set the focus to the file chooser
+        self.app.selectedHuman.hide()
+        if self.default:
+          self.default = False
+          self.filechooser.selectedFile = self.filechooser.files.index("default.hair")
+          self.filechooser.onShow(event)
+        gui3d.TaskView.onShow(self, event)
+        self.filechooser.setFocus()
 
+    def onHide(self, event):
+        self.app.selectedHuman.show()
+        gui3d.TaskView.onHide(self, event)
 
+    def onHumanChanged(self, event):
+        print 'onHumanChanged'
+        human = event
+        if human.hairObj:
+            self.human = human
+            mh.callAsync(self.updateHair)
+
+    def updateHair(self):
+        if self.human and self.human.hairObj:
+            if self.filechooser.files:
+                self.filechooser.onFileSelected(self.filechooser.files[self.filechooser.selectedFile], update=1)
+            self.human.hairObj.update()
+            self.app.redraw()
+        self.human = None

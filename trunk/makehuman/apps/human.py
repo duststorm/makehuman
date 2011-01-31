@@ -407,6 +407,19 @@ class Human(gui3d.Object):
                 return
             self.flaccidVal = -amount
             self.muscleVal = 0
+            
+    def setHeight(self, height):
+        modifier = humanmodifier.Modifier(self,
+            'data/targets/macrodetails/universal-stature-dwarf.target',
+            'data/targets/macrodetails/universal-stature-giant.target')
+        modifier.setValue(height, 0)
+        self.callEvent('onChanged', self)
+        
+    def getHeight(self):
+        modifier = humanmodifier.Modifier(self,
+            'data/targets/macrodetails/universal-stature-dwarf.target',
+            'data/targets/macrodetails/universal-stature-giant.target')
+        return modifier.getValue()
 
     def setGenitals(self, value):
         """

@@ -150,7 +150,6 @@ class HairPropertiesTaskView(gui3d.TaskView):
         self.blueSlider.setValue(hairColor[2])
         self.setColor(hairColor)
 
-
 category = None
 taskview = None
 
