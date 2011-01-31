@@ -21,15 +21,8 @@ TO DO
 """
 
 #import zipfile
-import gui3d, events3d, guifiles, mh, os
-from mh2obj import *
-from module3d import drawQuad
-from animation3d import ThreeDQBspline
-from aljabr import *
-from math import radians
+import gui3d, mh, os
 from os import path
-from random import random
-from simpleoctree import SimpleOctree
 
 HairButtonStyle = gui3d.Style(**{
     'width':32,

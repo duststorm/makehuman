@@ -182,7 +182,7 @@ class Vert:
     - **self.color**: *float list*. A list of 4 floats [r,g,b,a] used as the vertex color (including an alpha channel).
     """
 
-    def __init__(self, co=[0, 0, 0], idx=0, object=None, sfidx=[]):
+    def __init__(self, co=[0, 0, 0], idx=0, object=None):
         """
         This is the constructor method for the Vert class. It initializes the
         vert attributes.
@@ -206,9 +206,6 @@ class Vert:
 
         object:
             *Object3d*. The Object3D object that uses this vertex. Default is None.
-
-        sfidx:
-            *int list*. A list of indices of faces that share this vertex. Default is empty.
 
         """
 
@@ -947,7 +944,7 @@ class Object3D:
         except AttributeError, text:
             pass
 
-    def update(self, verticesToUpdate=None, updateN=1):
+    def update(self, verticesToUpdate=None, updateN=True):
         """
         This method is used to call the update methods on each of a list of vertices that form part of this object.
 
@@ -1517,45 +1514,4 @@ class Scene3D:
         else:
             print 'not a clickable zone'
             return None
-
-# Draws a Quad
-# TODO: account for world2local and viceversa
-
-
-def drawQuad(scn, verts, name='quad', position=[0.0, 0.0, 0.0]):
-    obj = scn.newObj(name)
-    obj.x = position[0]
-    obj.y = position[1]
-    obj.z = position[2]
-    obj.rx = 0.0
-    obj.ry = 0.0
-    obj.rz = 0.0
-    obj.sx = 1.0
-    obj.sy = 1.0
-    obj.sz = 1.0
-    obj.visibility = 1
-    obj.shadeless = 0
-    obj.pickable = 0
-    obj.solid = 1
-    obj.cameraMode = 0
-
-  # obj.uvValues = []
-
-    obj.indexBuffer = []
-    fg = obj.createFaceGroup('faces')
-
-  # create vertices
-
-    v1 = obj.createVertex([verts[0][0], verts[0][1], verts[0][2]])
-    v2 = obj.createVertex([verts[1][0], verts[1][1], verts[1][2]])
-    v3 = obj.createVertex([verts[2][0], verts[2][1], verts[2][2]])
-    v4 = obj.createVertex([verts[3][0], verts[3][1], verts[3][2]])
-
-  # create faces
-
-    f1 = fg.createFace(v1, v4, v3, v2)
-
-    obj.updateIndexBuffer()
-    scn.update()
-
-
+            

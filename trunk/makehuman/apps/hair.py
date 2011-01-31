@@ -23,7 +23,6 @@ TO DO
 #import zipfile
 import gui3d, events3d, guifiles, mh, os
 from mh2obj import *
-from module3d import drawQuad
 from animation3d import ThreeDQBspline
 from aljabr import *
 from math import radians
