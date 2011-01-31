@@ -77,12 +77,12 @@ class Font:
 
     def getAbsoluteCoordsForChar(self, char):
         charRecord = self.charMap[ord(char)]
-        x1 = float(charRecord['xoffset'])
-        y1 = float(charRecord['yoffset'])
-        x2 = float(charRecord['xoffset'] + charRecord['width'])
-        y2 = float(charRecord['yoffset'] + charRecord['height'])
-        advance = float(charRecord['xadvance'])
-        return [x1, y1, x2, y2, advance]
+        x1 = charRecord['xoffset']
+        y1 = charRecord['yoffset']
+        x2 = charRecord['xoffset'] + charRecord['width']
+        y2 = charRecord['yoffset'] + charRecord['height']
+        advance = charRecord['xadvance']
+        return (x1, y1, x2, y2, advance)
 
     def getRelativeSizesForChar(self, char):
         charRecord = self.charMap[ord(char)]
@@ -91,7 +91,7 @@ class Font:
         x2 = float(charRecord['xoffset'] + charRecord['width']) / float(self.width)
         y2 = float(charRecord['yoffset'] + charRecord['height']) / float(self.height)
         advance = float(charRecord['xadvance']) / float(self.width)
-        return [x1, y1, x2, y2, advance]
+        return (x1, y1, x2, y2, advance)
 
     def getTextureCoordinatesForChar(self, char):
         charRecord = self.charMap[ord(char)]
@@ -99,16 +99,16 @@ class Font:
         v1 = 1.0 - float(charRecord['y']) / float(self.height)
         u2 = float(charRecord['x'] + charRecord['width']) / float(self.width)
         v2 = 1.0 - float(charRecord['y'] + charRecord['height']) / float(self.height)
-        return [u1, v1, u2, v2]
+        return (u1, v1, u2, v2)
 
     # Returns the width of the string
     def stringWidth(self, text):
-        width = 0.0
+        width = 0
         previous = -1
 
         for char in text:
             co = self.getAbsoluteCoordsForChar(char)
-            kerning = self.kerning.get((previous, char), 0.0)
+            kerning = self.kerning.get((previous, char), 0)
             previous = ord(char)
             width += co[4] + kerning
             
@@ -125,19 +125,19 @@ def createMesh(font, text, object = None):
     fg = object.createFaceGroup('text')
 
     index = 0
-    xoffset = 0.0
-    yoffset = 0.0
-    zoffset = 0.0
+    xoffset = 0
+    yoffset = 0
+    zoffset = 0
     previous = -1
 
     for char in text:
         if char == '\n':
-            xoffset = 0.0
+            xoffset = 0
             yoffset += font.lineHeight
         else:
             co = font.getAbsoluteCoordsForChar(char)
             uv = font.getTextureCoordinatesForChar(char)
-            kerning = font.kerning.get((previous, char), 0.0)
+            kerning = font.kerning.get((previous, char), 0)
             previous = ord(char)
             
             xoffset += kerning
@@ -164,10 +164,4 @@ def createMesh(font, text, object = None):
     object.updateIndexBuffer()
 
     return object
-    #scene.update()
 
-
-# font = Font("../data/fonts/arial.fnt")
-# print(font.getAbsoluteCoordsForChar('a'))
-# print(font.getRelativeSizesForChar('a'))
-# print(font.getTextureCoordinatesForChar('a'))
