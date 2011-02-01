@@ -22,6 +22,15 @@ class SettingsTaskView(gui3d.TaskView):
             self.app.settings.get('realtimeUpdates', True));y+=24
         self.realtimeNormalUpdates = gui3d.CheckBox(self, [18,y,9.2], "Update normals",
             self.app.settings.get('realtimeNormalUpdates', True));y+=24
+        y+=16
+            
+        gui3d.GroupBox(self, [10, y, 9.0], 'Mouse behavior', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
+        self.normal = gui3d.Slider(self, [10,y, 9.2],
+            self.app.settings.get('lowspeed', 1), 1, 10,
+            "Normal: %d" % self.app.settings.get('lowspeed', 1));y+=36
+        self.shift = gui3d.Slider(self, [10,y,9.2],
+            self.app.settings.get('highspeed', 5), 1, 10,
+            "Shift: %d" % self.app.settings.get('highspeed', 5));y+=36
         
         @self.shaderNo.event
         def onClicked(event):
@@ -55,6 +64,24 @@ class SettingsTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.realtimeNormalUpdates, event)
             self.app.settings['realtimeNormalUpdates'] = self.realtimeNormalUpdates.selected
+            
+        @self.normal.event
+        def onChange(value):
+            self.normal.label.setText("Normal: %d" % value)
+            self.app.settings['lowspeed'] = value
+            
+        @self.normal.event
+        def onChanging(value):
+            self.normal.label.setText("Normal: %d" % value)
+            
+        @self.shift.event
+        def onChange(value):
+            self.shift.label.setText("Shift: %d" % value)
+            self.app.settings['highspeed'] = value
+            
+        @self.shift.event
+        def onChanging(value):
+            self.shift.label.setText("Shift: %d" % value)
                 
     def setShader(self, vertex, fragment):
             human = self.app.selectedHuman

@@ -143,8 +143,6 @@ class MHApplication(gui3d.Application):
         self.loadHandlers = {}
         self.saveHandlers = []
         
-        self.speedup = 5
-        
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
         self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
@@ -352,7 +350,7 @@ class MHApplication(gui3d.Application):
             middleButtonDown = event.button & 2
             rightButtonDown = event.button & 4
             
-            speed = self.speedup if mh.getKeyModifiers() & events3d.KMOD_SHIFT else 1
+            speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
 
             if leftButtonDown and rightButtonDown or middleButtonDown:
                 mh.cameras[0].eyeZ += 0.05 * event.dy * speed
@@ -686,12 +684,12 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def zoomOut(self):
-        speed = self.speedup if mh.getKeyModifiers() & events3d.KMOD_SHIFT else 1
+        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
         mh.cameras[0].eyeZ += 0.65 * speed
         self.redraw()
         
     def zoomIn(self):
-        speed = self.speedup if mh.getKeyModifiers() & events3d.KMOD_SHIFT else 1
+        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
         mh.cameras[0].eyeZ -= 0.65 * speed
         self.redraw()
         
