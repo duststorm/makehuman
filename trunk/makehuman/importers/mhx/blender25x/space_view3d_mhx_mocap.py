@@ -1983,10 +1983,12 @@ def togglePoleTargets(trgRig):
 		hide = False
 		poletar = trgRig
 		res = 'ON'
+		trgRig.MhxTogglePoleTargets = True
 	else:
 		hide = True
 		poletar = None
 		res = 'OFF'
+		trgRig.MhxTogglePoleTargets = False
 	for suffix in ['_L', '_R']:
 		for name in ['ElbowPTIK', 'ElbowLinkPTIK', 'ElbowPTFK', 'KneePTIK', 'KneeLinkPTIK', 'KneePTFK']:
 			bones[name+suffix].hide = hide
@@ -1999,9 +2001,11 @@ def toggleIKLimits(trgRig):
 	if pbones['UpLegIK_L'].use_ik_limit_x:
 		use = False
 		res = 'OFF'
+		trgRig.MhxToggleIkLimits = False
 	else:
 		use = True
 		res = 'ON'
+		trgRig.MhxToggleIkLimits = True
 	for suffix in ['_L', '_R']:
 		for name in ['UpArmIK', 'LoArmIK', 'UpLegIK', 'LoLegIK']:
 			pb = pbones[name+suffix]
@@ -2013,6 +2017,7 @@ def toggleIKLimits(trgRig):
 def toggleLimitConstraints(trgRig):
 	pbones = trgRig.pose.bones
 	first = True
+	trgRig.MhxToggleLimitConstraints = False
 	for pb in pbones:
 		if onUserLayer(pb.bone.layers):
 			for cns in pb.constraints:
@@ -2028,6 +2033,7 @@ def toggleLimitConstraints(trgRig):
 						else:
 							inf = 1.0
 							res = 'ON'
+							trgRig.MhxToggleLimitConstraints = True
 					cns.influence = inf
 	if first:
 		return 'NOT FOUND'
@@ -2202,6 +2208,11 @@ def initInterface(context):
 		print("Warning - no scene - scene properties not set")
 
 	bpy.types.Object.MhxArmature = StringProperty()
+	
+	bpy.types.Object.MhxTogglePoleTargets = BoolProperty(default=True)
+	bpy.types.Object.MhxToggleIkLimits = BoolProperty(default=False)
+	bpy.types.Object.MhxToggleLimitConstraints = BoolProperty(default=True)
+
 
 	'''
 	for mhx in theFkBoneList:
@@ -2316,6 +2327,8 @@ class Bvh2MhxPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		scn = context.scene
+		ob = context.object
+				
 		layout.operator("mhx.mocap_init_interface")
 		layout.operator("mhx.mocap_save_defaults")
 		layout.operator("mhx.mocap_copy_angles_fk_ik")
@@ -2336,9 +2349,15 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		layout.operator("mhx.mocap_load_retarget_simplify")
 
 		layout.label('Toggle')
-		layout.operator("mhx.mocap_toggle_pole_targets")
-		layout.operator("mhx.mocap_toggle_ik_limits")
-		layout.operator("mhx.mocap_toggle_limit_constraints")
+		row = layout.row()
+		row.operator("mhx.mocap_toggle_pole_targets")
+		row.prop(ob, "MhxTogglePoleTargets")
+		row = layout.row()
+		row.operator("mhx.mocap_toggle_ik_limits")
+		row.prop(ob, "MhxToggleIkLimits")
+		row = layout.row()
+		row.operator("mhx.mocap_toggle_limit_constraints")
+		row.prop(ob, "MhxToggleLimitConstraints")
 
 		layout.label('Plant')
 		row = layout.row()
