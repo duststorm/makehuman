@@ -87,7 +87,7 @@ class DetailTool(events3d.EventHandler):
             print 'No targets available'
             return
 
-        self.modifier = humanmodifier.Modifier(human, leftTarget, rightTarget)
+        self.modifier = humanmodifier.Modifier(leftTarget, rightTarget)
 
     # Save the state
 
@@ -107,7 +107,7 @@ class DetailTool(events3d.EventHandler):
                 else:
                     leftSymmetryTarget = '%s%s%s.target' % (folder, symmetryPart, self.left)
                     rightSymmetryTarget = '%s%s%s.target' % (folder, symmetryPart, self.right)
-                self.symmetryModifier = humanmodifier.Modifier(human, leftSymmetryTarget, rightSymmetryTarget)
+                self.symmetryModifier = humanmodifier.Modifier(leftSymmetryTarget, rightSymmetryTarget)
 
         # Save the state
 
@@ -117,8 +117,10 @@ class DetailTool(events3d.EventHandler):
     def onMouseDragged(self, event):
         if not self.modifier:
             print 'No modifier available'
+            
+        human = self.app.selectedHuman
 
-    # check which vector we need to check
+        # check which vector we need to check
 
         if abs(event.dx) > abs(event.dy):
             d = event.dx
@@ -130,9 +132,9 @@ class DetailTool(events3d.EventHandler):
 
         value = d / 20.0
 
-        self.modifier.setValue(self.modifier.getValue() + value)
+        self.modifier.updateValue(human, self.modifier.getValue(human) + value)
         if self.symmetryModifier:
-            self.symmetryModifier.setValue(self.modifier.getValue())
+            self.symmetryModifier.updateValue(human, self.modifier.getValue(human))
 
     def onMouseUp(self, event):
         human = self.app.selectedHuman

@@ -18,10 +18,10 @@ class AssymSlider(gui3d.Slider):
         self.bodypart = bodypart
         
     def onChange(self, value):
-        self.parent.changeValue(self.bodypart, value)
+        self.parent.parent.changeValue(self.bodypart, value)
         
     def onChanging(self, value):
-        self.parent.changeValue(self.bodypart, value, True)
+        self.parent.parent.changeValue(self.bodypart, value, True)
 
 class AsymmTaskView(gui3d.TaskView):
 
@@ -30,16 +30,16 @@ class AsymmTaskView(gui3d.TaskView):
 
         #Sliders
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*9+6));y+=25
-        self.asymmBrowSlider = AssymSlider(self, 10, y, "brown", "Brow asymmetry");y+=36
-        self.asymmCheekSlider = AssymSlider(self, 10, y, "cheek", "Cheek asymmetry");y+=36
-        self.asymmEarsSlider = AssymSlider(self, 10, y,  "ear", "Ears asymmetry");y+=36
-        self.asymmEyeSlider = AssymSlider(self, 10, y, "eye", "Eye asymmetry");y+=36
-        self.asymmJawSlider = AssymSlider(self, 10, y, "jaw", "Jaw asymmetry");y+=36
-        self.asymmMouthSlider = AssymSlider(self, 10, y, "mouth", "Mouth asymmetry");y+=36
-        self.asymmNoseSlider = AssymSlider(self, 10, y, "nose", "Nose asymmetry");y+=36
-        self.asymmTempleSlider = AssymSlider(self, 10, y, "temple", "Temple asymmetry");y+=36
-        self.asymmTopSlider = AssymSlider(self, 10, y, "top", "Top asymmetry");y+=36 + 16
+        self.leftBox = gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*9+6));y+=25
+        self.asymmBrowSlider = AssymSlider(self.leftBox, 10, y, "brown", "Brow asymmetry");y+=36
+        self.asymmCheekSlider = AssymSlider(self.leftBox, 10, y, "cheek", "Cheek asymmetry");y+=36
+        self.asymmEarsSlider = AssymSlider(self.leftBox, 10, y,  "ear", "Ears asymmetry");y+=36
+        self.asymmEyeSlider = AssymSlider(self.leftBox, 10, y, "eye", "Eye asymmetry");y+=36
+        self.asymmJawSlider = AssymSlider(self.leftBox, 10, y, "jaw", "Jaw asymmetry");y+=36
+        self.asymmMouthSlider = AssymSlider(self.leftBox, 10, y, "mouth", "Mouth asymmetry");y+=36
+        self.asymmNoseSlider = AssymSlider(self.leftBox, 10, y, "nose", "Nose asymmetry");y+=36
+        self.asymmTempleSlider = AssymSlider(self.leftBox, 10, y, "temple", "Temple asymmetry");y+=36
+        self.asymmTopSlider = AssymSlider(self.leftBox, 10, y, "top", "Top asymmetry");y+=36 + 16
         y = 80
         self.rightBox = gui3d.GroupBox(self, [650, y, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
         self.asymmTrunkSlider = AssymSlider(self.rightBox, 650, y, "trunk", "Trunk asymmetry");y+=36
@@ -79,9 +79,9 @@ class AsymmTaskView(gui3d.TaskView):
             if not self.before:
                 self.before = self.getTargetsAndValues(bodyPartName)
                 
-            self.calcAsymm(value,bodyPartName)
+            self.calcAsymm(value,bodyPartName, realtime)
         else:
-            self.calcAsymm(value,bodyPartName)
+            self.calcAsymm(value,bodyPartName, realtime)
             self.human.applyAllTargets(self.human.app.progress)
             
             after = self.getTargetsAndValues(bodyPartName)
@@ -129,7 +129,7 @@ class AsymmTaskView(gui3d.TaskView):
             targetsAndValues[modifier.right] = self.human.getDetail(modifier.right)
         return targetsAndValues
 
-    def calcAsymm(self, value, bodypart):
+    def calcAsymm(self, value, bodypart, realtime=False):
             """
             This function load all asymmetry targets for the specified part of body
             (for example brown, eyes, etc..) and return a dictionary with
@@ -141,9 +141,13 @@ class AsymmTaskView(gui3d.TaskView):
             @param bodypart: The name of part to asymmetrize.
             """
             modifiers = self.getModifiers(bodypart)
+            human = self.app.selectedHuman
            
-            for modifier in modifiers:                
-                modifier.setValue(value)
+            for modifier in modifiers:
+                if realtime:
+                    modifier.updateValue(human, value)
+                else:
+                    modifier.setValue(human, value)
                 
     def getModifiers(self, bodypart):
         modifiers = self.modifiers.get(bodypart, None)
@@ -151,7 +155,7 @@ class AsymmTaskView(gui3d.TaskView):
             modifiers = []
             targets = self.buildListOfTargetPairs(bodypart)
             for pair in targets:
-                modifier = humanmodifier.Modifier(self.human, pair[0], pair[1])
+                modifier = humanmodifier.Modifier(pair[0], pair[1])
                 modifiers.append(modifier)
             self.modifiers[bodypart] = modifiers
         return modifiers
@@ -159,7 +163,8 @@ class AsymmTaskView(gui3d.TaskView):
     def getSliderValue(self, bodypart):
         modifiers = self.modifiers[bodypart]
         if modifiers:
-            return modifiers[0].getValue()
+            human = self.app.selectedHuman
+            return modifiers[0].getValue(human)
         else:
             return 0.0
             
@@ -202,7 +207,8 @@ def load(app):
     """
     category = app.getCategory('Advanced')
     taskview = AsymmTaskView(category)
-    print 'Asymm loaded'
+    
+    print 'Asymmetry loaded'
 
 def unload(app):
     pass

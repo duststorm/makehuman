@@ -271,7 +271,7 @@ class Human(gui3d.Object):
             sob = self.scene.getObject(self.meshData.name + '.sub')
             sob.setVisibility(1)
             self.meshData.setVisibility(0)
-        self.scene.redraw()
+        self.app.redraw()
 
     def setGender(self, gender):
         """
@@ -409,17 +409,17 @@ class Human(gui3d.Object):
             self.muscleVal = 0
             
     def setHeight(self, height):
-        modifier = humanmodifier.Modifier(self,
+        modifier = humanmodifier.Modifier(
             'data/targets/macrodetails/universal-stature-dwarf.target',
             'data/targets/macrodetails/universal-stature-giant.target')
-        modifier.setValue(height, 0)
+        modifier.setValue(self, height, 0)
         self.callEvent('onChanged', self)
         
     def getHeight(self):
-        modifier = humanmodifier.Modifier(self,
+        modifier = humanmodifier.Modifier(
             'data/targets/macrodetails/universal-stature-dwarf.target',
             'data/targets/macrodetails/universal-stature-giant.target')
-        return modifier.getValue()
+        return modifier.getValue(self)
 
     def setGenitals(self, value):
         """
@@ -1770,7 +1770,7 @@ class Human(gui3d.Object):
                 algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
 
-        self.scene.redraw()
+        self.app.redraw()
 
     def rotateLimb(self, targetPath, morphFactor):
         targetPath1 = targetPath+".target"

@@ -56,48 +56,68 @@ class Action:
 
 class Modifier:
 
-    def __init__(self, human, left, right):
-        self.human = human
+    def __init__(self, left, right):
+        
         self.left = left
         self.right = right
+        self.verts = None
+        self.faces = None
 
-    def setValue(self, value, update=1):
+    def setValue(self, human, value, update=1):
+        
         value = max(-1.0, min(1.0, value))
 
-    # print(self.left + " " + str(value))
+        left = -value if value < 0.0 else 0.0
+        right = value if value > 0.0 else 0.0
+        
+        human.setDetail(self.left, left)
+        human.setDetail(self.right, right)
 
-        if not value:
-            if self.human.getDetail(self.left):
-                algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, update, 0)
-            self.human.setDetail(self.left, None)
-            if self.human.getDetail(self.right):
-                algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, update, 0)
-            self.human.setDetail(self.right, None)
-        elif value < 0.0:
-            algos3d.loadTranslationTarget(self.human.meshData, self.left, -value - self.human.getDetail(self.left), None, update, 0)
-            self.human.setDetail(self.left, -value)
-            if self.human.getDetail(self.right):
-                algos3d.loadTranslationTarget(self.human.meshData, self.right, -self.human.getDetail(self.right), None, update, 0)
-            self.human.setDetail(self.right, None)
-        else:
-            if self.human.getDetail(self.left):
-                algos3d.loadTranslationTarget(self.human.meshData, self.left, -self.human.getDetail(self.left), None, update, 0)
-            self.human.setDetail(self.left, None)
-            algos3d.loadTranslationTarget(self.human.meshData, self.right, value - self.human.getDetail(self.right), None, update, 0)
-            self.human.setDetail(self.right, value)
-
-    def getValue(self):
-        value = self.human.getDetail(self.left)
+    def getValue(self, human):
+        
+        value = human.getDetail(self.left)
         if value:
             return -value
-        value = self.human.getDetail(self.right)
+        value = human.getDetail(self.right)
         if value:
             return value
         else:
             return 0.0
             
-    def __str__(self):
-        return "%s: %f\n%s: %f" % (self.left, self.human.getDetail(self.left), self.right, self.human.getDetail(self.right))
+    def updateValue(self, human, value, updateNormals=1):
+        
+        # Collect vertex and face indices if we didn't yet
+        if not (self.verts or self.faces):
+            # Collect verts
+            self.verts = []
+            for target in (self.left, self.right):
+                t = algos3d.getTarget(human.mesh, target)
+                self.verts.extend(t.verts)
+            self.verts = list(set(self.verts))
+            
+            # collect faces
+            self.faces = []
+            for vindex in self.verts:
+                self.faces += [face.idx for face in human.mesh.verts[vindex].sharedFaces]
+            self.faces = list(set(self.faces))
+        
+        # Remove old targets
+        algos3d.loadTranslationTarget(human.meshData, self.left, -human.getDetail(self.left), None, 0, 0)
+        algos3d.loadTranslationTarget(human.meshData, self.right, -human.getDetail(self.right), None, 0, 0)
+        
+        # Update detail state
+        self.setValue(human, value)
+        
+        # Add new targets
+        algos3d.loadTranslationTarget(human.meshData, self.left, human.getDetail(self.left), None, 0, 0)
+        algos3d.loadTranslationTarget(human.meshData, self.right, human.getDetail(self.right), None, 0, 0)
+            
+        # Update vertices
+        faces = [human.mesh.faces[i] for i in self.faces]
+        vertices = [human.mesh.verts[i] for i in self.verts]
+        if updateNormals:
+            human.mesh.calcNormals(1, 1, vertices, faces)
+        human.mesh.update(vertices)
 
 class GenericModifier:
 
@@ -108,7 +128,7 @@ class GenericModifier:
         self.verts = None
         self.faces = None
         
-    def setValue(self, human, value, update=1):
+    def setValue(self, human, value):
     
         value = max(0.0, min(1.0, value))
         

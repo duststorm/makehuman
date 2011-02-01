@@ -23,14 +23,14 @@ class Action:
         self.postAction = postAction
 
     def do(self):
-        self.modifier.setValue(self.after)
+        self.modifier.setValue(self.human, self.after)
         self.human.applyAllTargets()
         if self.postAction:
             self.postAction()
         return True
 
     def undo(self):
-        self.modifier.setValue(self.before)
+        self.modifier.setValue(self.human, self.before)
         self.human.applyAllTargets()
         if self.postAction:
             self.postAction()
@@ -54,10 +54,10 @@ class MeasureSlider(gui3d.Slider):
     def onChanging(self, value):
         human = self.app.selectedHuman
         if self.before is None:
-            self.before = self.modifier.getValue()
+            self.before = self.modifier.getValue(human)
                 
         if self.app.settings.get('realtimeUpdates', True):
-            self.modifier.setValue(value, True)
+            self.modifier.updateValue(human, value, True)
         self.updateLabel()
         
     def updateLabel(self):
@@ -66,7 +66,7 @@ class MeasureSlider(gui3d.Slider):
         
     def update(self):
         human = self.app.selectedHuman
-        self.setValue(self.modifier.getValue())
+        self.setValue(self.modifier.getValue(human))
         self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
 
 class MeasureTaskView(gui3d.TaskView):
@@ -126,7 +126,7 @@ class MeasureTaskView(gui3d.TaskView):
             yy = 80 + 25
             
             for subname in subnames:
-                modifier = humanmodifier.Modifier(human,
+                modifier = humanmodifier.Modifier(
                     os.path.join(measureDataPath, "measure-%s-decrease.target" % subname),
                     os.path.join(measureDataPath, "measure-%s-increase.target" % subname))
                 self.modifiers[subname] = modifier
@@ -191,12 +191,12 @@ class MeasureTaskView(gui3d.TaskView):
         
         modifier = self.modifiers.get(values[0], None)
         if modifier:
-            modifier.setValue(float(values[1]))
+            modifier.setValue(human, float(values[1]))
        
     def saveHandler(self, human, file):
         
         for name, modifier in self.modifiers.iteritems():
-            value = modifier.getValue()
+            value = modifier.getValue(human)
             if value:
                 file.write('measure %s %f\n' % (name, value))
 
@@ -210,7 +210,7 @@ def load(app):
     app.addLoadHandler('measure', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
     
-    print 'Asymm loaded'
+    print 'Measurement loaded'
 
     @taskview.event
     def onMouseDown(event):        
