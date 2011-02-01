@@ -34,17 +34,36 @@ class BackgroundTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Background')
-        self.filechooser = gui3d.FileChooser(self, 'backgrounds', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
         self.texture = mh.Texture()
+        
+        mesh = gui3d.RectangleMesh(420, 420)
+        self.backgroundImage = gui3d.Object(self.app.categories['Modelling'], [190, 90, 1], mesh, visible=False)
+        
+        modifierStyle = gui3d.ButtonStyle._replace(width=(112-8)/3.0, height=20)
+        
+        self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, [18, 600-90+25, 9.1], 'Bkg',
+            style=modifierStyle);
+            
+        @self.backgroundImageToggle.event
+        def onClicked(event):
+            if self.backgroundImage.isVisible():
+                self.backgroundImage.hide()
+                self.backgroundImageToggle.setSelected(False)
+            elif self.backgroundImage.hasTexture():
+                self.backgroundImage.show()
+                self.backgroundImageToggle.setSelected(True)
+            else:
+                self.app.switchCategory('Library')
+                self.app.switchTask('Background')
+                
+        self.filechooser = gui3d.FileChooser(self, 'backgrounds', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
 
         @self.filechooser.event
         def onFileSelected(filename):
             print 'Loading %s' % filename
             self.texture.loadImage('backgrounds/' + filename)
 
-      # self.app.categories["Modelling"].tasksByName["Macro modelling"].backgroundImageChooser.setTexture("backgrounds/" + filename)
-
-            bg = self.app.categories['Modelling'].backgroundImage
+            bg = self.backgroundImage
             bg.mesh.setTexture('backgrounds/' + filename)
             group = bg.mesh.getFaceGroup('rectangle')
             group.setColor([255, 255, 255, 100])
@@ -54,7 +73,7 @@ class BackgroundTaskView(gui3d.TaskView):
                 bg.setScale(float(self.texture.width) / float(self.texture.height), 1.0)
             bg.mesh.setPickable(0)
             bg.show()
-            self.app.categories['Modelling'].backgroundImageToggle.setSelected(True)
+            self.backgroundImageToggle.setSelected(True)
             self.app.switchCategory('Modelling')
             self.app.redraw()
 
@@ -69,4 +88,22 @@ class BackgroundTaskView(gui3d.TaskView):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
+    def onResized(self, event):
+        self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[0] - 190 * 2)
 
+# This method is called when the plugin is loaded into makehuman
+# The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
+
+
+def load(app):
+    category = app.getCategory('Library')
+    taskview = BackgroundTaskView(category)
+
+    print 'Background chooser loaded'
+
+# This method is called when the plugin is unloaded from makehuman
+# At the moment this is not used, but in the future it will remove the added GUI elements
+
+
+def unload(app):
+    print 'Hair chooser unloaded'

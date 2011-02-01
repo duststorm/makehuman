@@ -48,9 +48,6 @@ class ModellingCategory(gui3d.Category):
         
         mesh = gui3d.RectangleMesh(420, 420, self.app.getThemeResource("images", 'background.png'))
         self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
-
-        mesh = gui3d.RectangleMesh(420, 420)
-        self.backgroundImage = gui3d.Object(self, [190, 90, 1], mesh, visible=False)
         
         y = 600-90
         self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24+6));y+=25
@@ -58,24 +55,11 @@ class ModellingCategory(gui3d.Category):
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-8)/3.0, height=20)
         
         x = 18
-        self.backgroundImageToggle = gui3d.ToggleButton(self.viewBox, [x, y, 9.1], 'Bkg',
-            style=modifierStyle);x+=modifierStyle.width+4
+        x+=modifierStyle.width+4
         self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], '3D',
             style=modifierStyle);x+=modifierStyle.width+4
         self.wireButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Wire',
             style=modifierStyle)
-
-        @self.backgroundImageToggle.event
-        def onClicked(event):
-            if self.backgroundImage.isVisible():
-                self.backgroundImage.hide()
-                self.backgroundImageToggle.setSelected(False)
-            elif self.backgroundImage.hasTexture():
-                self.backgroundImage.show()
-                self.backgroundImageToggle.setSelected(True)
-            else:
-                self.app.switchCategory('Library')
-                self.app.switchTask('Background')
 
         @self.anaglyphsButton.event
         def onClicked(event):
@@ -93,5 +77,4 @@ class ModellingCategory(gui3d.Category):
 
     def onResized(self, event):
         self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
-        self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[0] - 190 * 2)
         self.viewBox.setPosition([10, event[1]-90, 9.0])

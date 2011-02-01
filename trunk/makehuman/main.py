@@ -79,7 +79,7 @@ from os.path import join, basename, splitext
 import mh
 import gui3d, events3d, font3d
 import mh2obj, mh2bvh, mh2mhx
-import human, background
+import human
 import guimodelling, guifiles#, guirender
 from aljabr import centroid
 import algos3d
@@ -239,9 +239,6 @@ class MHApplication(gui3d.Application):
         
         guimodelling.ModellingCategory(self)
         guifiles.FilesCategory(self)
-      
-        library = gui3d.Category(self, "Library")
-        background.BackgroundTaskView(library)
         
         mh.callAsync(self.loadPlugins)
         
