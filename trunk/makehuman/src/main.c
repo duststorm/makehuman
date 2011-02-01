@@ -113,7 +113,7 @@ static PyObject* mh_updatePickingBuffer(PyObject *self, PyObject *unused)
  *  This function returns the color that has been picked as a Python list of 3 integers,
  *  each between 0 and 255, representing an RGB value.
  */
-static PyObject* mh_getColorPicked(PyObject *self, PyObject *args)
+static PyObject* mh_getColorPicked(PyObject *self, PyObject *unused)
 {
     return Py_BuildValue("[i,i,i]", G.color_picked[0], G.color_picked[1], G.color_picked[2]);
 }
@@ -122,18 +122,28 @@ static PyObject* mh_getColorPicked(PyObject *self, PyObject *args)
  *  This function retrieves the x and y mouse position in screen
  *  coordinates returning two integer values to the Python code.
  */
-static PyObject* mh_getMousePos(PyObject *self, PyObject *args)
+static PyObject* mh_getMousePos(PyObject *self, PyObject *unused)
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
     return Py_BuildValue("[i,i]", x, y);
 }
 
+/** \brief Get an integer representing the current modifier key settings.
+ *
+ *  This function returns the current modifier key settings as a Python integer value
+ *  (e.g. Whether the Shift or Ctrl keys are currently depressed).
+ */
+static PyObject* mh_getKeyModifiers(PyObject *self, PyObject *unused)
+{
+    return Py_BuildValue("i", SDL_GetModState());
+}
+
 /** \brief Get the current window (viewport) width and height in pixels.
  *  This function retrieves the current width and height of the drawable area
  *  within the MakeHuman window in pixels (the viewport size).
  */
-static PyObject* mh_getWindowSize(PyObject *self, PyObject *args)
+static PyObject* mh_getWindowSize(PyObject *self, PyObject *unused)
 {
     return Py_BuildValue("i,i", G.windowWidth, G.windowHeight);
 }
@@ -164,14 +174,9 @@ static PyObject* mh_startWindow(PyObject *self, PyObject *args)
  *  application.
  *  It returns a null value.
  */
-static PyObject* mh_startEventLoop(PyObject *self, PyObject *args)
+static PyObject* mh_startEventLoop(PyObject *self, PyObject *unused)
 {
-    if (!PyArg_ParseTuple(args, ""))
-        return NULL;
-    else
-    {
-        mhEventLoop();
-    }
+    mhEventLoop();
     return Py_BuildValue("");
 }
 
@@ -182,7 +187,7 @@ static PyObject* mh_startEventLoop(PyObject *self, PyObject *args)
  *  controls the GUI environment.
  *  It returns a null value.
  */
-static PyObject* mh_shutDown(PyObject *self, PyObject *args)
+static PyObject* mh_shutDown(PyObject *self, PyObject *unused)
 {
     mhShutDown();
     return Py_BuildValue("");
@@ -651,10 +656,11 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 static PyMethodDef EmbMethods[] =
 {
     {"setTimeTimer", mh_setTimeTimer, METH_VARARGS, ""},
-    {"getWindowSize", mh_getWindowSize, METH_VARARGS, ""},
-    {"getMousePos", mh_getMousePos, METH_VARARGS, ""},
+    {"getWindowSize", mh_getWindowSize, METH_NOARGS, ""},
+    {"getMousePos", mh_getMousePos, METH_NOARGS, ""},
+    {"getKeyModifiers", mh_getKeyModifiers, METH_NOARGS, ""},
     {"updatePickingBuffer", mh_updatePickingBuffer, METH_NOARGS, ""},
-    {"getColorPicked", mh_getColorPicked, METH_VARARGS, ""},
+    {"getColorPicked", mh_getColorPicked, METH_NOARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
@@ -664,8 +670,8 @@ static PyMethodDef EmbMethods[] =
     {"createShader", mh_CreateShader, METH_VARARGS, ""},
     {"grabScreen", mh_GrabScreen, METH_VARARGS, ""},
     {"startWindow", mh_startWindow, METH_VARARGS, ""},
-    {"startEventLoop", mh_startEventLoop, METH_VARARGS, ""},
-    {"shutDown", mh_shutDown, METH_VARARGS, ""},
+    {"startEventLoop", mh_startEventLoop, METH_NOARGS, ""},
+    {"shutDown", mh_shutDown, METH_NOARGS, ""},
     {"getPath", mh_getPath, METH_O, ""},
     {"callAsync", mh_callAsync, METH_O, ""},
     {"setTimerCallback", mh_SetTimerCallback, METH_O, ""},

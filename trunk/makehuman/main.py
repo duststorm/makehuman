@@ -143,6 +143,8 @@ class MHApplication(gui3d.Application):
         self.loadHandlers = {}
         self.saveHandlers = []
         
+        self.speedup = 5
+        
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
         self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
@@ -352,21 +354,23 @@ class MHApplication(gui3d.Application):
             leftButtonDown = event.button & 1
             middleButtonDown = event.button & 2
             rightButtonDown = event.button & 4
+            
+            speed = self.speedup if mh.getKeyModifiers() & events3d.KMOD_SHIFT else 1
 
             if leftButtonDown and rightButtonDown or middleButtonDown:
-                mh.cameras[0].eyeZ += 0.05 * event.dy
+                mh.cameras[0].eyeZ += 0.05 * event.dy * speed
             elif leftButtonDown:
                 human = self.selectedHuman
                 rot = human.getRotation()
-                rot[0] += 0.5 * event.dy
-                rot[1] += 0.5 * event.dx
+                rot[0] += 0.5 * event.dy * speed
+                rot[1] += 0.5 * event.dx * speed
                 human.setRotation(rot)
             elif rightButtonDown:
                 human = self.selectedHuman
                 trans = human.getPosition()
                 trans = self.modelCamera.convertToScreen(trans[0], trans[1], trans[2])
-                trans[0] += event.dx
-                trans[1] += event.dy
+                trans[0] += event.dx * speed
+                trans[1] += event.dy * speed
                 trans = self.modelCamera.convertToWorld3D(trans[0], trans[1], trans[2])
                 human.setPosition(trans)
 
@@ -685,11 +689,13 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def zoomOut(self):
-        mh.cameras[0].eyeZ += 0.65
+        speed = self.speedup if mh.getKeyModifiers() & events3d.KMOD_SHIFT else 1
+        mh.cameras[0].eyeZ += 0.65 * speed
         self.redraw()
         
     def zoomIn(self):
-        mh.cameras[0].eyeZ -= 0.65
+        speed = self.speedup if mh.getKeyModifiers() & events3d.KMOD_SHIFT else 1
+        mh.cameras[0].eyeZ -= 0.65 * speed
         self.redraw()
         
     def topView(self):
