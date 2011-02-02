@@ -452,7 +452,7 @@ class Application(events3d.EventHandler):
 
     def setFocus(self, view=None):
 
-        print ('setFocus', view)
+        #print ('setFocus', view)
 
         if self.focusView == view:
             return
@@ -1706,7 +1706,7 @@ class ShortcutEdit(View):
         
     def onKeyDown(self, event):
         
-        print event.key, event.character, event.modifiers
+        #print event.key, event.character, event.modifiers
             
         self.label.setText(self.shortcutToLabel(event.modifiers, event.key))
         self.app.redraw()

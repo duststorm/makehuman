@@ -49,7 +49,7 @@ from math import atan2, pi, sqrt
 
 # Create an instance of the Hairgenerator class with a global context.
 
-def povrayExport(obj, app):
+def povrayExport(obj, app, settings):
     """
   This function exports data in a format that can be used to reconstruct the humanoid 
   object in POV-Ray. It supports a range of options that can be specified in the Python 
@@ -79,13 +79,16 @@ def povrayExport(obj, app):
 
     reload(mh2povray_ini)
     path = mh2povray_ini.outputpath
+    
+    format = mh2povray_ini.format if settings['source'] == 'ini' else settings['format']
+    action = mh2povray_ini.action if settings['source'] == 'ini' else settings['action']
 
   # The ini format option defines whether a simple mesh2 object is to be generated
   # or the more flexible but slower array and macro combo is to be generated.
 
-    if mh2povray_ini.format == 'array':
+    if format == 'array':
         povrayExportArray(obj, camera, resolution, path)
-    if mh2povray_ini.format == 'mesh2':
+    if format == 'mesh2':
         povrayExportMesh2(obj, camera, resolution, path)
 
     outputDirectory = os.path.dirname(path)
@@ -100,7 +103,7 @@ def povrayExport(obj, app):
   # The ini action option defines whether or not to attempt to render the file once
   # it's been written.
 
-    if mh2povray_ini.action == 'render':
+    if action == 'render':
         if mh2povray_ini.renderscenefile == '':
             outputSceneFile = path.replace('.inc', '.pov')
             baseName = os.path.basename(outputSceneFile)
@@ -200,6 +203,14 @@ def povrayExportArray(obj, camera, resolution, path):
   # Declare POV_Ray variables containing the current makehuman camera.
 
     povrayCameraData(camera, resolution, outputFileDescriptor)
+    
+    outputFileDescriptor.write('#declare MakeHuman_TranslateX      = %s;\n' % -obj.x)
+    outputFileDescriptor.write('#declare MakeHuman_TranslateY      = %s;\n' % obj.y)
+    outputFileDescriptor.write('#declare MakeHuman_TranslateZ      = %s;\n\n' % obj.z)
+    
+    outputFileDescriptor.write('#declare MakeHuman_RotateX         = %s;\n' % obj.rx)
+    outputFileDescriptor.write('#declare MakeHuman_RotateY         = %s;\n' % -obj.ry)
+    outputFileDescriptor.write('#declare MakeHuman_RotateZ         = %s;\n\n' % obj.rz)
 
   # Calculate some useful values and add them to the output as POV-Ray variable
   # declarations so they can be readily accessed from a POV-Ray scene file.
@@ -230,11 +241,10 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # UV Vectors - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % (len(obj.faces) * 3))
-    for f in obj.faces:
-        outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[0]][0], obj.uvValues[f.uv[0]][1]))
-        outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[1]][0], obj.uvValues[f.uv[1]][1]))
-        outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[2]][0], obj.uvValues[f.uv[2]][1]))
+    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % len(obj.uvValues))
+    for uv in obj.uvValues:
+        
+        outputFileDescriptor.write('<%s,%s>' % (uv[0], uv[1]))
 
     # outputFileDescriptor.write("\n")
 
@@ -245,9 +255,10 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # Faces - Write a POV-Ray array of arrays to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_FaceArray = array[%s][3] {\n  ' % len(faces))
+    outputFileDescriptor.write('#declare MakeHuman_FaceArray = array[%s][3] {\n  ' % (len(faces) * 2))
     for f in faces:
         outputFileDescriptor.write('{%s,%s,%s}' % (f.verts[0].idx, f.verts[1].idx, f.verts[2].idx))
+        outputFileDescriptor.write('{%s,%s,%s}' % (f.verts[2].idx, f.verts[3].idx, f.verts[0].idx))
     outputFileDescriptor.write('''
 }
 
@@ -279,9 +290,10 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # UV Indices for each face - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVIndexArray = array[%s][3] {\n  ' % len(faces))
+    outputFileDescriptor.write('#declare MakeHuman_UVIndexArray = array[%s][3] {\n  ' % (len(faces) * 2))
     for f in faces:
-        outputFileDescriptor.write('{%s,%s,%s}' % (f.idx * 3, f.idx * 3 + 1, f.idx * 3 + 2))
+        outputFileDescriptor.write('{%s,%s,%s}' % (f.uv[0], f.uv[1], f.uv[2]))
+        outputFileDescriptor.write('{%s,%s,%s}' % (f.uv[2], f.uv[3], f.uv[0]))
     outputFileDescriptor.write('''
 }
 
@@ -296,19 +308,19 @@ def povrayExportArray(obj, camera, resolution, path):
       # Compare the components of each vertex to find the min and max values for this faceGroup
 
             if f.group.name in faceGroupExtents:
-                maxX = max([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0], faceGroupExtents[f.group.name][3]])
-                maxY = max([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1], faceGroupExtents[f.group.name][4]])
-                maxZ = max([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2], faceGroupExtents[f.group.name][5]])
-                minX = min([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0], faceGroupExtents[f.group.name][0]])
-                minY = min([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1], faceGroupExtents[f.group.name][1]])
-                minZ = min([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2], faceGroupExtents[f.group.name][2]])
+                maxX = max([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0], f.verts[3].co[0], faceGroupExtents[f.group.name][3]])
+                maxY = max([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1], f.verts[3].co[1], faceGroupExtents[f.group.name][4]])
+                maxZ = max([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2], f.verts[3].co[2], faceGroupExtents[f.group.name][5]])
+                minX = min([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0], f.verts[3].co[0], faceGroupExtents[f.group.name][0]])
+                minY = min([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1], f.verts[3].co[1], faceGroupExtents[f.group.name][1]])
+                minZ = min([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2], f.verts[3].co[2], faceGroupExtents[f.group.name][2]])
             else:
-                maxX = max([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0]])
-                maxY = max([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1]])
-                maxZ = max([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2]])
-                minX = min([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0]])
-                minY = min([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1]])
-                minZ = min([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2]])
+                maxX = max([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0], f.verts[3].co[0]])
+                maxY = max([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1], f.verts[3].co[1]])
+                maxZ = max([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2], f.verts[3].co[2]])
+                minX = min([f.verts[0].co[0], f.verts[1].co[0], f.verts[2].co[0], f.verts[3].co[0]])
+                minY = min([f.verts[0].co[1], f.verts[1].co[1], f.verts[2].co[1], f.verts[3].co[1]])
+                minZ = min([f.verts[0].co[2], f.verts[1].co[2], f.verts[2].co[2], f.verts[3].co[2]])
             faceGroupExtents[f.group.name] = [minX, minY, minZ, maxX, maxY, maxZ]
 
   # Write out the centre position of each joint

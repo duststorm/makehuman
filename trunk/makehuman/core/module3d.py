@@ -1299,12 +1299,10 @@ class Scene3D:
             *string*. The name of the object to retrieve.
         """
 
-        objToGet = None
         for obj in self.objects:
             if obj.name == name:
-                objToGet = obj
-                break
-        return objToGet
+                return obj
+        return None
 
         # print "Obj %s not found"%(name)
 

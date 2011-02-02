@@ -55,7 +55,7 @@ renderscenefile = ''  # Use "" to render the default scene file.
 # A number of typical examples are provided.
 # Don't use the backslash character in the path.
 
-povray_path = 'C:/Users/Chris/AppData/Roaming/POV-Ray/v3.7/bin/pvengine-sse2.exe'  # MultiProcessor Version
+povray_path = 'C:/Program Files/POV-Ray for Windows v3.62/bin/pvengine-sse2.exe'  # MultiProcessor Version
 
 # povray_path  = "C:/Users/Chris/AppData/Roaming/POV-Ray/v3.7/bin/pvengine.exe"     # Single Processor Version
 # povray_path  = "C:/POV-Ray for Windows v3.6/bin/pvengine.exe"                     # Typical POV-Ray 3.6
