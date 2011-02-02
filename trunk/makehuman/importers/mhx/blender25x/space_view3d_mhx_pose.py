@@ -20,13 +20,13 @@ Version 0.3
 """
 
 bl_info = {
-	'name': 'MakeHuman lipsync',
+	'name': 'MakeHuman pose tool',
 	'author': 'Thomas Larsson',
-	'version': '0.5',
+	'version': '0.6',
 	'blender': (2, 5, 6),
 	"api": 34076,
-	"location": "View3D > UI panel > MHX Mocap",
-	"description": "Lipsync for the MHX rig",
+	"location": "View3D > UI panel > MHX Lipsync, MHX Expressions, MHX Pose",
+	"description": "Lipsync, expression, pose tool for the MHX rig",
 	"warning": "",
 	"category": "3D View"}
 
@@ -811,19 +811,19 @@ ParentPropDrivers = [
 
 #	Body
 BodyProperties = [
-	('SpineIk', D_BOOL, False, 'name="Spine IK"'),
+	('SpineIK', D_BOOL, False, 'name="Spine IK"'),
 ]
 
 BodyPropDrivers = [
-	('DefSpine3', 'SpineIk', D_BOOL, ['SplineIK']),
-	('DefSpine1', 'SpineIk', D_BOOLINV, ['Rot']),
-	('DefSpine2', 'SpineIk', D_BOOLINV, ['Rot']),
-	('DefSpine3', 'SpineIk', D_BOOLINV, ['Rot']),
+	('DefSpine3', 'SpineIK', D_BOOL, ['SplineIK']),
+	('DefSpine1', 'SpineIK', D_BOOLINV, ['Rot']),
+	('DefSpine2', 'SpineIK', D_BOOLINV, ['Rot']),
+	('DefSpine3', 'SpineIK', D_BOOLINV, ['Rot']),
 ]
 
 #	Arm
 
-ArmStates = ['WholeArmFk', 'WholeArmIk', 'Locked_elbow, forearm FK', 'Locked elbow, forearm IK']
+ArmStates = ['Arm FK', 'Arm IK', 'Elbow FK', 'Elbow IK']
 ArmProperties = [
 	('LeftArmState', D_ENUM, ArmStates, 'name="Left arm state", description=""' ),
 	('RightArmState', D_ENUM, ArmStates, 'name="Right arm state", description=""' ),
@@ -883,8 +883,8 @@ ArmPropDrivers = [
 #	Leg
 
 LegProperties = [
-	('LeftLeg', D_ENUM, ['Leg_FK', 'Leg_IK'], 'name="Left leg FK/IK", description=""' ),
-	('RightLeg', D_ENUM, ['Leg_FK', 'Leg_IK'], 'name="Right leg FK/IK", description=""' ),
+	('LeftLeg', D_ENUM, ['Leg FK', 'Leg IK'], 'name="Left leg FK/IK", description=""' ),
+	('RightLeg', D_ENUM, ['Leg FK', 'Leg IK'], 'name="Right leg FK/IK", description=""' ),
 ]
 
 LegRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
@@ -931,8 +931,6 @@ defineFingerPropDrivers()
 
 OtherProperties = BodyProperties + ArmProperties + FingerProperties + LegProperties
 OtherPropDrivers = BodyPropDrivers + ArmPropDrivers + FingerPropDrivers + LegPropDrivers
-theRig = bpy.context.object
-theOldProp = {}
 
 def defineProperties():
 	for (prop, typ, value, options) in ParentProperties + OtherProperties:
@@ -945,13 +943,20 @@ def defineProperties():
 		else:
 			expr += 'default=%s, ' % value
 		expr += '%s)' % options
-		#print(expr)
+		print(expr)
 		exec(expr)
-		return
+	return
 
+defineProperties()
 
 def redefinePropDrivers():
 	global theRig
+
+	try:
+		theRig.pose.bones
+	except:
+		return
+
 	for pb in theRig.pose.bones:
 		for cns in pb.constraints:
 			try:
@@ -1002,22 +1007,28 @@ def addPropDriver(cns, prop, expr):
 		targ.id = theRig
 		targ.data_path = prop
 
+	return				
+
+#
+#	initOldProps():
+#	setInverse(context):
+#
+
+def initOldProps():
+	global theOldProp
+	theOldProp = {}
+	for (prop, typ, value, options) in ParentProperties:
+		theOldProp[prop] = 0
 	return
 
-redefinePropDrivers()					
-
-#
-#
-#
-
-
 def setInverse(context):
-	global theRig, theParents
-
+	global theRig, theOldProp
+	amt = theRig.data
 	for (bone, prop, typ, drivers) in ParentPropDrivers:
+		print("old", theOldProp[prop])
+		print("new", theRig[prop])
 		if theRig[prop] == theOldProp[prop]:
 			continue
-		theOldProp[prop] = the
 		pb = theRig.pose.bones[bone]
 		for drvdata in drivers:
 			if typ == D_ENUM or typ == D_MULTIVAR:
@@ -1025,8 +1036,14 @@ def setInverse(context):
 			else:
 				cnsName = drvdata
 			cns = pb.constraints[cnsName]
+			if cns.type == 'CHILD_OF':
+				amt.bones.active = pb.bone
+				print("Set inverse", pb.name, amt.bones.active, cns.name)
+				bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
 		
-
+	for (prop, typ, value, options) in ParentProperties:
+		theOldProp[prop] = theRig[prop]
+	return
 					
 class VIEW3D_OT_MhxSetInverseButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_set_inverse"
@@ -1091,6 +1108,8 @@ def initInterface(scn):
 		scn['MhxBodyLanguage'] = True
 
 	defineProperties()
+	redefinePropDrivers()	
+	initOldProps()
 	return
 
 #
