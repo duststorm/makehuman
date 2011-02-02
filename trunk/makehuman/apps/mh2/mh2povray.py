@@ -457,6 +457,14 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # Declare POV_Ray variables containing the current makehuman camera.
 
     povrayCameraData(camera, resolution, outputFileDescriptor)
+    
+    outputFileDescriptor.write('#declare MakeHuman_TranslateX      = %s;\n' % -obj.x)
+    outputFileDescriptor.write('#declare MakeHuman_TranslateY      = %s;\n' % obj.y)
+    outputFileDescriptor.write('#declare MakeHuman_TranslateZ      = %s;\n\n' % obj.z)
+    
+    outputFileDescriptor.write('#declare MakeHuman_RotateX         = %s;\n' % obj.rx)
+    outputFileDescriptor.write('#declare MakeHuman_RotateY         = %s;\n' % -obj.ry)
+    outputFileDescriptor.write('#declare MakeHuman_RotateZ         = %s;\n\n' % obj.rz)
 
   # Calculate some useful values and add them to the output as POV-Ray variable
   # declarations so they can be readily accessed from a POV-Ray scene file.

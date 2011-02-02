@@ -600,7 +600,7 @@ class Application(events3d.EventHandler):
         event = events3d.MouseWheelEvent(wheelDelta)
         if self.focusView:
             self.focusView.callEvent('onMouseWheel', event)
-        else:
+        elif self.currentTask:
             self.currentTask.callEvent('onMouseWheel', event)
 
     def onKeyDownCallback(self, key, character, modifiers):

@@ -4,8 +4,10 @@
 // OpenGL reports its camera data, translating before rotating, which further 
 // moves the camera. The x-axis is also reversed to the standard POV-Ray settings.
 #declare MakeHuman_Camera = camera {
+  perspective
   location <MakeHuman_EyeX, MakeHuman_EyeY, MakeHuman_EyeZ>
   look_at <MakeHuman_FocusX, MakeHuman_FocusY, MakeHuman_FocusZ>
+  angle 30
 }
 
 // Create a standard light definition based on MakeHuman settings.
