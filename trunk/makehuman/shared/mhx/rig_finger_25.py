@@ -236,27 +236,4 @@ def FingerWritePoses(fp):
 	return	
 
 
-#
-#	FingerProperties
-#	FingerPropDrivers
-#
-
-def defineFingerPropDrivers():
-	global FingerPropDrivers
-	FingerPropDrivers = []
-	for (suffix, side) in [('_L', 'Left'), ('_R', 'Right')]:
-		for fnum in range(1,6):
-			for lnum in range(1,4):
-				if (lnum != 1 or fnum != 1):
-					FingerPropDrivers.append( ('Finger-%d-%d%s' % (fnum,lnum,suffix), '%s_finger_control' % (side), D_BOOL, ['Rot'] )),
-
-	return
-
-FingerProperties = [
-	('Left_finger_control', D_BOOL, True, ['name="Controlled_fingers"', 'description=""']),
-	('Right_finger_control', D_BOOL, True, ['name="Controlled_fingers"', 'description=""']),
-]
-defineFingerPropDrivers()
-
-
 

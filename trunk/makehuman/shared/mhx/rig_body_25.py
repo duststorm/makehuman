@@ -216,35 +216,6 @@ def BodyWriteCurves(fp):
 	return
 
 #
-#	BodyProperties
-#	BodyPropDrivers
-#
-
-BodyProperties = [
-	('Root_parent', D_ENUM, ["Floor","Hips","Neck"], ['name="Master"', 'description=""'] ),
-	('Spine_IK', D_BOOL, False, ['name="Spine_IK"']),
-]
-
-MasterDrivers = [('Floor', 'x==0'), ('Hips', 'x==1'), ('Neck', 'x==2')]
-
-BodyPropDrivers = [
-	('DefSpine3', 'Spine_IK', D_BOOL, ['SplineIK']),
-	('DefSpine1', 'Spine_IK', D_BOOLINV, ['Rot']),
-	('DefSpine2', 'Spine_IK', D_BOOLINV, ['Rot']),
-	('DefSpine3', 'Spine_IK', D_BOOLINV, ['Rot']),
-]
-
-"""
-	('Root', 'Root_parent', D_ENUM, MasterDrivers),
-	('ElbowIK_L', 'Root_parent', D_ENUM, MasterDrivers),
-	('ElbowIK_R', 'Root_parent', D_ENUM, MasterDrivers),
-	('WristIK_L', 'Root_parent', D_ENUM, MasterDrivers),
-	('WristIK_R', 'Root_parent', D_ENUM, MasterDrivers),
-	('LegIK_L', 'Root_parent', D_ENUM, MasterDrivers),
-	('LegIK_R', 'Root_parent', D_ENUM, MasterDrivers),
-]
-"""
-#
 #	BodyShapeDrivers
 #	Shape : (driver, channel, coeff)
 #

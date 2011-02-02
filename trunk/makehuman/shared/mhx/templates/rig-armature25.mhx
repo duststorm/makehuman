@@ -17,15 +17,12 @@ NoScale False ;
   use_mirror_x False ;
 end Armature
 
-*** prop-defs
-
 *** human-object Rig
   layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
   show_x_ray True ;
   # draw_type 'WIRE' ;
   Property MhxScale theScale ;
-  *** rig-properties
 end Object
 
 *** curves

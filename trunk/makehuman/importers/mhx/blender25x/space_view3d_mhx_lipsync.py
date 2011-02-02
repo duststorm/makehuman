@@ -446,6 +446,248 @@ def setInterpolation(rig):
 		fcu.extrapolation = 'CONSTANT'
 	return
 	
+
+###################################################################################	
+#
+#	Property drivers
+#
+
+# Property types
+D_ENUM = 1
+D_INT = 2
+D_FLOAT = 3
+D_BOOL = 4
+D_BOOLINV = 5
+D_MULTIVAR = 6
+
+PropTypeName = ['', 'Enum', 'Int', 'Float', 'Bool', 'Bool', '']
+
+#	Parenting
+ParentProperties = [
+	('Root_parent', D_ENUM, ["Floor","Hips","Neck"], ['name="Master"', 'description=""'] ),
+	('Gaze_parent', D_ENUM, ['Head','World'], ['name="Gaze"', 'description=""'] ),
+]
+
+MasterDrivers = [('Floor', 'x==0'), ('Hips', 'x==1'), ('Neck', 'x==2')]
+
+ParentPropDrivers = [
+	('Root', 'Root_parent', D_ENUM, MasterDrivers),
+	('ElbowIK_L', 'Root_parent', D_ENUM, MasterDrivers),
+	('ElbowIK_R', 'Root_parent', D_ENUM, MasterDrivers),
+	('WristIK_L', 'Root_parent', D_ENUM, MasterDrivers),
+	('WristIK_R', 'Root_parent', D_ENUM, MasterDrivers),
+	('LegIK_L', 'Root_parent', D_ENUM, MasterDrivers),
+	('LegIK_R', 'Root_parent', D_ENUM, MasterDrivers),
+
+	('Gaze', 'Gaze_parent', D_ENUM, [('Head', 'x==0'), ('World', 'x==1')]),
+]
+
+#	Body
+BodyProperties = [
+	('Spine_IK', D_BOOL, False, ['name="Spine_IK"']),
+]
+
+BodyPropDrivers = [
+	('DefSpine3', 'Spine_IK', D_BOOL, ['SplineIK']),
+	('DefSpine1', 'Spine_IK', D_BOOLINV, ['Rot']),
+	('DefSpine2', 'Spine_IK', D_BOOLINV, ['Rot']),
+	('DefSpine3', 'Spine_IK', D_BOOLINV, ['Rot']),
+]
+
+#	Arm
+
+ArmStates = ['Whole_arm_FK', 'Whole_arm_IK', 'Locked_elbow,_forearm_FK', 'Locked_elbow,_forearm_IK']
+ArmProperties = [
+	('Left_arm_state', D_ENUM, ArmStates, ['name="Left_arm_state"', 'description=""'] ),
+	('Right_arm_state', D_ENUM, ArmStates, ['name="Right_arm_state"', 'description=""'] ),
+	('Left_arm_stretch', D_BOOL, False, ['name="Left_arm_stretch"', 'description=""'] ),
+	('Right_arm_stretch', D_BOOL, False, ['name="Right_arm_stretch"', 'description=""'] ),
+	('Left_hand_follows_wrist', D_BOOL, True, ['name="Left_hand_follows_wrist"', 'description=""'] ),
+	('Right_hand_follows_wrist', D_BOOL, True, ['name="Right_hand_follows_wrist"', 'description=""'] ),
+]
+
+ArmRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
+UpArmScaleDrivers = [('ScaleIK', '((x1)and(x2==1))or(x2>=2)')]
+
+ArmPropDrivers = [
+	('UpArm1_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
+	('UpArm2_L',  ['Left_arm_stretch', 'Left_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
+	('UpArm3_L',  ['Left_arm_stretch', 'Left_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
+	('UpArm3_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
+	('LoArm1_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
+	('LoArm2_L', 'Left_arm_state', D_ENUM, [('ScaleIK', '(x==1)or(x==3)')]),
+	('LoArm3_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
+	('Hand_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
+
+	('UpArm1_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
+	('UpArm2_R',  ['Right_arm_stretch', 'Right_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
+	('UpArm3_R',  ['Right_arm_stretch', 'Right_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
+	('UpArm3_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
+	('LoArm1_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
+	('LoArm2_R', 'Right_arm_state', D_ENUM, [('ScaleIK', '(x==1)or(x==3)')]),
+	('LoArm3_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
+	('Hand_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
+
+	('UpArmIK_L', 'Left_arm_state', D_ENUM, [('ElbowIK', 'x>=2')]),
+	('LoArmIK_L', 'Left_arm_state', D_ENUM, [('ArmIK', 'x==1'), ('WristIK', 'x==3')]),
+	('HandIK_L', 'Left_arm_state', D_ENUM, [('WristLoc', '(x==1)or(x==3)')]),
+
+	('UpArmIK_R', 'Right_arm_state', D_ENUM, [('ElbowIK', 'x>=2')]),
+	('LoArmIK_R', 'Right_arm_state', D_ENUM, [('ArmIK', 'x==1'), ('WristIK', 'x==3')]),
+	('HandIK_R', 'Right_arm_state', D_ENUM, [('WristLoc', '(x==1)or(x==3)')]),
+
+	('ElbowIK_L', 'Left_arm_stretch', D_BOOLINV, ['DistShoulder']),
+	('WristIK_L',  ['Left_arm_stretch', 'Left_arm_state'], D_MULTIVAR, 
+		[('DistElbow', '(not(x1))and(x2>=2)'),
+		 ('DistShoulder', '(not(x1))and(x2==1)')]),
+
+	('ElbowIK_R', 'Right_arm_stretch', D_BOOLINV, ['DistShoulder']),
+	('WristIK_R',  ['Right_arm_stretch', 'Right_arm_state'], D_MULTIVAR, 
+		[('DistElbow', '(not(x1))and(x2>=2)'),
+		 ('DistShoulder', '(not(x1))and(x2==1)')]),
+
+	('HandIK_L',  ['Left_arm_follows_wrist', 'Left_arm_state'], D_MULTIVAR, 
+		[('WristRot', '(x1)and(x2!=3)')]),
+	('HandIK_R',  ['Right_arm_follows_wrist', 'Right_arm_state'], D_MULTIVAR, 
+		[('WristRot', '(x1)and(x2!=3)')]),
+
+]
+
+#	Leg
+
+LegProperties = [
+	('Left_leg', D_ENUM, ['Leg_FK', 'Leg_IK'], ['name="Left_Leg_FK/IK"', 'description=""'] ),
+	('Right_leg', D_ENUM, ['Leg_FK', 'Leg_IK'], ['name="Right_Leg_FK/IK"', 'description=""'] ),
+]
+
+LegRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
+LegStretchDrivers = [('StretchFK','x==0'), ('StretchIK','x>=1')]
+
+LegPropDrivers = [
+	('UpLeg1_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('UpLeg3_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_L', 'Left_leg', D_ENUM, LegStretchDrivers),
+	('Foot_L', 'Left_leg', D_ENUM, LegRotDrivers),
+	('Toe_L', 'Left_leg', D_ENUM, LegRotDrivers),
+
+	('UpLeg1_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('UpLeg3_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('LoLeg_R', 'Right_leg', D_ENUM, LegStretchDrivers),
+	('Foot_R', 'Right_leg', D_ENUM, LegRotDrivers),
+	('Toe_R', 'Right_leg', D_ENUM, LegRotDrivers),
+]
+
+#	Finger
+
+def defineFingerPropDrivers():
+	global FingerPropDrivers
+	FingerPropDrivers = []
+	for (suffix, side) in [('_L', 'Left'), ('_R', 'Right')]:
+		for fnum in range(1,6):
+			for lnum in range(1,4):
+				if (lnum != 1 or fnum != 1):
+					FingerPropDrivers.append( ('Finger-%d-%d%s' % (fnum,lnum,suffix), '%s_finger_control' % (side), D_BOOL, ['Rot'] )),
+
+	return
+
+FingerProperties = [
+	('Left_finger_control', D_BOOL, True, ['name="Controlled_fingers"', 'description=""']),
+	('Right_finger_control', D_BOOL, True, ['name="Controlled_fingers"', 'description=""']),
+]
+defineFingerPropDrivers()
+
+#
+#	redefinePropDrivers():
+#
+
+OtherProperties = BodyProperties + ArmProperties + FingerProperties + LegProperties + FaceProperties
+OtherPropDrivers = BodyPropDrivers + ArmPropDrivers + FingerPropDrivers + LegPropDrivers + FacePropDrivers
+theRig = bpy.context.object
+theOldProp = {}
+
+def redefinePropDrivers():
+	global theRig
+	for pb in theRig.pose.bones:
+		for cns in pb.constraints:
+			try:
+				cns.driver_remove('influence', -1)
+			except:
+				pass
+	
+	for (bone, prop, typ, drivers) in ParentPropDrivers+OtherPropDrivers:
+		pb = theRig.pose.bones[bone]
+		for drvdata in drivers:
+			if typ == D_ENUM or typ == D_MULTIVAR:
+				(cnsName,expr) = drvdata
+			else:
+				cnsName = drvdata
+				expr = None
+			for n,cns in enumerate(pb.constraints):
+				if cns.name == cnsName:
+					print(pb.name, cns.name, prop, expr, n)
+					addDriver(cns, prop, expr, n)
+	return
+
+def addDriver(cns, prop, expr, n):
+	global theRig
+	fcu = cns.driver_add('influence', -1)
+	drv = fcu.driver
+	if expr:
+		drv.type = 'SCRIPTED'
+		drv.expression = '(x==%s)' % n
+	else:
+		drv.type = 'AVERAGE'
+	drv.show_debug_info = True
+
+	var = drv.variables.new()
+	var.name = 'x'
+	var.type = 'SINGLE_PROP'
+
+	targ = var.targets[0]
+	targ.id = theRig
+	if type(prop) == str:
+		targ.data_path = prop
+	else:
+		for p in prop:
+			targ.data_path = p
+	return
+
+redefinePropDrivers()					
+
+#
+#
+#
+
+
+def setInverse(context):
+	global theRig, theParents
+
+	for (bone, prop, typ, drivers) in ParentPropDrivers:
+		if theRig[prop] == theOldProp[prop]:
+			continue
+		theOldProp[prop] = the
+		pb = theRig.pose.bones[bone]
+		for drvdata in drivers:
+			if typ == D_ENUM or typ == D_MULTIVAR:
+				(cnsName,expr) = drvdata
+			else:
+				cnsName = drvdata
+			cns = pb.constraints[cnsName]
+		
+
+					
+class VIEW3D_OT_MhxSetInverseButton(bpy.types.Operator):
+	bl_idname = "mhx.lips_set_inverse"
+	bl_label = "Set inverse"
+
+	def execute(self, context):
+		setInverse(context)
+		return{'FINISHED'}	
+				
+
+
 ###################################################################################	
 #	User interface
 #
@@ -467,6 +709,8 @@ def initInterface(scn):
 		scn['MhxSyncAutoKeyframe'] = False
 		scn['MhxBodyLanguage'] = True
 
+	defineProperties(ParentProperties + OtherProperties)
+
 	#defineEnumButtons('Gaze', ['Gaze'], ['Head', 'World'])
 	#defineEnumButtons('Master', ['Root', 'HandIK_L', 'HandIK_R', 'LegIK_L', 'LegIK_R'], ['Floor', 'Hips', 'Neck'])
 	return
@@ -478,7 +722,7 @@ def defineVisemeButtons():
 	for vis in visemes.keys():
 		expr = (
 "class VIEW3D_OT_Mhx%sButton(bpy.types.Operator):\n" % vis +
-"	bl_idname = 'view3d.mhx_%s'\n" % vis.lower() +
+"	bl_idname = 'mhx.lips_%s'\n" % vis.lower() +
 "	bl_label = '%s'\n" % vis +	
 "	def invoke(self, context, event):\n" +
 "		global bpy, mathutils\n" +
@@ -494,7 +738,7 @@ def defineVisemeButtons():
 #
 
 class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_init_interface"
+	bl_idname = "mhx.lips_init_interface"
 	bl_label = "Initialize"
 	bl_options = {'REGISTER'}
 
@@ -509,7 +753,7 @@ class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_load_moho"
+	bl_idname = "mhx.lips_load_moho"
 	bl_label = "Moho (.dat)"
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
@@ -528,7 +772,7 @@ class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_MhxLoadMagpieButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_load_magpie"
+	bl_idname = "mhx.lips_load_magpie"
 	bl_label = "Magpie (.mag)"
 	filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
 	startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
@@ -559,7 +803,7 @@ def rigHasExpressions(rig):
 #
 
 class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_reset_expressions"
+	bl_idname = "mhx.lips_reset_expressions"
 	bl_label = "Reset expressions"
 
 	def execute(self, context):
@@ -579,7 +823,7 @@ class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_MhxResetBoneExpressionsButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_reset_bone_expressions"
+	bl_idname = "mhx.lips_reset_bone_expressions"
 	bl_label = "Reset expressions"
 
 	def execute(self, context):
@@ -657,7 +901,7 @@ def createDriver(name, keys):
 	return
 	
 class VIEW3D_OT_MhxCreateDriversButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_create_drivers"
+	bl_idname = "mhx.lips_create_drivers"
 	bl_label = "Create drivers"
 
 	def execute(self, context):
@@ -692,7 +936,7 @@ def removeDrivers(context):
 	return
 
 class VIEW3D_OT_MhxRemoveDriversButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_remove_drivers"
+	bl_idname = "mhx.lips_remove_drivers"
 	bl_label = "Remove drivers"
 
 	def execute(self, context):
@@ -742,7 +986,7 @@ def setAllFKIK(value):
 	return
 
 class VIEW3D_OT_MhxSetAllFKButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_set_all_fk"
+	bl_idname = "mhx.lips_set_all_fk"
 	bl_label = "All FK"
 
 	def execute(self, context):
@@ -750,7 +994,7 @@ class VIEW3D_OT_MhxSetAllFKButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 class VIEW3D_OT_MhxSetAllIKButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_set_all_ik"
+	bl_idname = "mhx.lips_set_all_ik"
 	bl_label = "All IK"
 
 	def execute(self, context):
@@ -773,7 +1017,7 @@ def setAllFingers(value):
 	return
 
 class VIEW3D_OT_MhxSetAllFingersOffButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_set_all_fingers_off"
+	bl_idname = "mhx.lips_set_all_fingers_off"
 	bl_label = "All off"
 
 	def execute(self, context):
@@ -781,43 +1025,13 @@ class VIEW3D_OT_MhxSetAllFingersOffButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 class VIEW3D_OT_MhxSetAllFingersOnButton(bpy.types.Operator):
-	bl_idname = "view3d.mhx_set_all_fingers_on"
+	bl_idname = "mhx.lips_set_all_fingers_on"
 	bl_label = "All on"
 
 	def execute(self, context):
 		setAllFingers(0.7)
 		return{'FINISHED'}	
 
-#
-#	setEnum(name, cnslist):
-#	defineEnumButtons(name, bones, enums):
-#
-"""
-def setEnum(name, cnslist):
-	global theRig
-	pb = theRig.pose.bones[name]
-	for (cnsName, inf) in cnslist:
-		pb.constraints[cnsName].influence = inf
-	return	
-
-def defineEnumButtons(name, bones, enums):
-	for enum in enums:
-		elist = []
-		for enum1 in enums1:
-			elist.append( ('%s' % enum1, (enum==enum1)*1) )
-		expr = (
-'class VIEW3D_OT_MhxSet%s%sButton(bpy.types.Operator):\n' % (name, enum) +
-'	bl_idname = "view3d.mhx_set_%s_%s"\n' % (name.lower(), enum.lower()) +
-'	bl_label = "%s"\n' % enum +
-'	def execute(self, context):\n' +
-'		for bone in %s:\n' % bones +
-'			setEnum(name, %s)\n' % elist +
-'		return{"FINISHED"}	\n'
-		)
-		print(expr)
-		exec(expr)
-	return
-"""
 #
 #	class MhxDriversPanel(bpy.types.Panel):
 #
@@ -829,46 +1043,23 @@ class MhxDriversPanel(bpy.types.Panel):
 	
 	@classmethod
 	def poll(cls, context):
-		return None
+		return context.object
 
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("view3d.mhx_init_interface")
-		"""		
+		layout.operator("mhx.lips_init_interface")
 		if theRig:
 			pbones = theRig.pose.bones
-			layout.label("Arm and leg FK/IK")
-			layout.prop(pbones['PArmIK_L'], 'location', index=0, text='Arm IK Left')
-			layout.prop(pbones['PArmIK_R'], 'location', index=0, text='Arm IK Right')
-			layout.prop(pbones['PLegIK_L'], 'location', index=0, text='Leg IK Left')
-			layout.prop(pbones['PLegIK_R'], 'location', index=0, text='Leg IK Right')
-			row = layout.row()
-			row.operator("view3d.mhx_set_all_fk")
-			row.operator("view3d.mhx_set_all_ik")
-
-			layout.label("Finger control")
-			fingers = ['Thumb', 'Index', 'Long', 'Ring', 'Pinky']
-			for n in range(1,6):				
-				row = layout.row()
-				row.prop(pbones['PFinger-%d_L' % n], 'location', index=0, text='L '+fingers[n-1])
-				row.prop(pbones['PFinger-%d_R' % n], 'location', index=0, text='R '+fingers[n-1])
-			row = layout.row()
-			row.operator("view3d.mhx_set_all_fingers_off")
-			row.operator("view3d.mhx_set_all_fingers_on")
-
-			layout.label("Gaze")
-			row = layout.row()
-			row.operator("view3d.mhx_set_gaze_head")
-			row.operator("view3d.mhx_set_gaze_world")
-
-			layout.label("Master")
-			row = layout.row()
-			row.operator("view3d.mhx_set_master_floor")
-			row.operator("view3d.mhx_set_master_hips")
-			row.operator("view3d.mhx_set_master_neck")
-
-		"""
+			for (prop, typ, values, options) in ParentProperties:
+				layout.label(prop)
+				layout.prop(theRig, prop, text=prop, expand=True)
+			layout.operator('mhx.lips_set_inverse')
+			layout.separator()
+			for (prop, typ, values, options) in OtherProperties:
+				if typ == D_ENUM:
+					layout.label(prop)
+				layout.prop(theRig, prop, text=prop, expand=True)
 
 #
 #	class MhxLipsyncPanel(bpy.types.Panel):
@@ -886,7 +1077,7 @@ class MhxLipsyncPanel(bpy.types.Panel):
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("view3d.mhx_init_interface")
+		layout.operator("mhx.lips_init_interface")
 		
 		if theRig:
 			layout.separator()
@@ -894,33 +1085,33 @@ class MhxLipsyncPanel(bpy.types.Panel):
 			layout.prop(context.scene, 'MhxBodyLanguage')
 			layout.label(text="Visemes")
 			row = layout.row()
-			row.operator("view3d.mhx_rest")
-			row.operator("view3d.mhx_etc")
-			row.operator("view3d.mhx_ah")
+			row.operator("mhx.lips_rest")
+			row.operator("mhx.lips_etc")
+			row.operator("mhx.lips_ah")
 			row = layout.row()
-			row.operator("view3d.mhx_mbp")
-			row.operator("view3d.mhx_oo")
-			row.operator("view3d.mhx_o")
+			row.operator("mhx.lips_mbp")
+			row.operator("mhx.lips_oo")
+			row.operator("mhx.lips_o")
 			row = layout.row()
-			row.operator("view3d.mhx_r")
-			row.operator("view3d.mhx_fv")
-			row.operator("view3d.mhx_s")
+			row.operator("mhx.lips_r")
+			row.operator("mhx.lips_fv")
+			row.operator("mhx.lips_s")
 			row = layout.row()
-			row.operator("view3d.mhx_sh")
-			row.operator("view3d.mhx_ee")
-			row.operator("view3d.mhx_eh")
+			row.operator("mhx.lips_sh")
+			row.operator("mhx.lips_ee")
+			row.operator("mhx.lips_eh")
 			row = layout.row()
-			row.operator("view3d.mhx_th")
-			row.operator("view3d.mhx_l")
-			row.operator("view3d.mhx_g")
+			row.operator("mhx.lips_th")
+			row.operator("mhx.lips_l")
+			row.operator("mhx.lips_g")
 			layout.separator()
 			row = layout.row()
-			row.operator("view3d.mhx_blink")
-			row.operator("view3d.mhx_unblink")
+			row.operator("mhx.lips_blink")
+			row.operator("mhx.lips_unblink")
 			layout.label(text="Load file")
 			row = layout.row()
-			row.operator("view3d.mhx_load_moho")
-			row.operator("view3d.mhx_load_magpie")
+			row.operator("mhx.lips_load_moho")
+			row.operator("mhx.lips_load_magpie")
 
 #
 #	class MhxExpressionsPanel(bpy.types.Panel):
@@ -938,13 +1129,13 @@ class MhxExpressionsPanel(bpy.types.Panel):
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("view3d.mhx_init_interface")
+		layout.operator("mhx.lips_init_interface")
 		
 		if theRig and rigHasExpressions(theRig):
 			layout.separator()
 			layout.label(text="Expressions (driven)")
-			layout.operator("view3d.mhx_reset_bone_expressions")
-			layout.operator("view3d.mhx_remove_drivers")
+			layout.operator("mhx.lips_reset_bone_expressions")
+			layout.operator("mhx.lips_remove_drivers")
 			layout.separator()
 			pbones = theRig.pose.bones
 			for name in Expressions:
@@ -957,8 +1148,8 @@ class MhxExpressionsPanel(bpy.types.Panel):
 		elif theMesh and meshHasExpressions(theMesh):	
 			layout.separator()
 			layout.label(text="Expressions")
-			layout.operator("view3d.mhx_reset_expressions")
-			layout.operator("view3d.mhx_create_drivers")
+			layout.operator("mhx.lips_reset_expressions")
+			layout.operator("mhx.lips_create_drivers")
 			layout.separator()
 			keys = theMesh.data.shape_keys
 			if keys:

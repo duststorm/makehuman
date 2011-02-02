@@ -238,7 +238,9 @@ def getArmatureFromMhx(obj):
 		rig_finger_25.FingerHeadsTails +
 		rig_leg_25.LegHeadsTails +
 		rig_toe_25.ToeHeadsTails +
-		rig_face_25.FaceHeadsTails)
+		rig_face_25.FaceHeadsTails,
+
+		False)
 		
 	hier = []
 	armature = rig_body_25.BodyArmature + rig_arm_25.ArmArmature + rig_finger_25.FingerArmature + rig_leg_25.LegArmature + rig_toe_25.ToeArmature + rig_face_25.FaceArmature

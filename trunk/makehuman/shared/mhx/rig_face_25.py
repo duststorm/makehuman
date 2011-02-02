@@ -49,7 +49,7 @@ FaceArmature = [
 	('LoLid_R',		0.0, 'Head', F_DEF, L_DEF, NoBB),
 	('UpLid_L',		-0.279253, 'Head', F_DEF, L_DEF, NoBB),
 	('LoLid_L',		0.0, 'Head', F_DEF, L_DEF, NoBB),
-	('Gaze',		pi, 'Head', F_WIR, L_HEAD, NoBB),
+	('Gaze',		pi, None, F_WIR, L_HEAD, NoBB),
 	('Gaze_R',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),
 	('Gaze_L',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),
 ]
@@ -76,10 +76,10 @@ def FaceWritePoses(fp):
 
 	addPoseBone(fp, 'LoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	#	[('ChildOf', C_CHILDOF, 1, ['Head', 'Head', (1,1,1), (1,1,1), (1,1,1)]),
-	#	 ('ChildOf', C_CHILDOF, 0, ['World', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
-	#	])
+	addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('ChildOf', C_CHILDOF, 1, ['Head', 'Head', (1,1,1), (1,1,1), (1,1,1)]),
+		 ('ChildOf', C_CHILDOF, 0, ['World', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
+		])
 
 	addPoseBone(fp, 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
@@ -106,19 +106,5 @@ def FaceWriteDrivers(fp):
 		 [("var", 'TRANSFORMS', [(mh2mhx.theHuman, driver, 'LOC_Z', C_LOC)])]) )
 	writeDrivers(fp, True, drivers)
 	return
-
-
-#
-#	FaceProperties
-#	FacePropDrivers
-#
-
-FaceProperties = [
-	('Gaze_parent', D_ENUM, ['Head','World'], ['name="Gaze"', 'description=""'] ),
-]
-
-FacePropDrivers = [
-	('Gaze', 'Gaze_parent', D_ENUM, [('Head', 'x==0'), ('World', 'x==1')]),
-]
 
 

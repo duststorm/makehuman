@@ -461,24 +461,24 @@ def ArmWritePoses(fp):
 	addDeformLimb(fp, 'Hand_L', 'HandIK_L', (1,1,1), 'HandFK_L', (1,1,1), 0, RmodHand, [])
 
 
-	#addDeformLimb(fp, 'UpArm1_R', 'UpArmIK_R', (1,0,1), 'UpArmFK_R', (1,0,1), C_LOCAL, RmodUpArm, [])
-	addDeformIK2(fp, 'UpArm1_R', 'LoArmIK_R', 'LoArmFK_R', None, None, RmodUpArm, []),
+	addDeformLimb(fp, 'UpArm1_R', 'UpArmIK_R', (1,0,1), 'UpArmFK_R', (1,0,1), C_LOCAL, RmodUpArm, [])
+	#addDeformIK2(fp, 'UpArm1_R', 'LoArmIK_R', 'LoArmFK_R', None, None, RmodUpArm, []),
 
 	addPoseBone(fp, 'UpArm2_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodUpArm,
 		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'UpArmIK_R', (1,1,1), False])])
 
-	#addDeformLimb(fp, 'UpArm3_R', 'UpArmIK_R', (0,1,0), 'UpArmFK_R', (0,1,0), C_LOCAL, RmodUpArm, [])
-	addDeformIK2(fp, 'UpArm3_R', 'LoArmIK_R', 'LoArmFK_R', (90*D, 'UpArmPTIK_R'), (90*D, 'UpArmPTFK_R'), RmodUpArm, 
+	addDeformLimb(fp, 'UpArm3_R', 'UpArmIK_R', (0,1,0), 'UpArmFK_R', (0,1,0), C_LOCAL, RmodUpArm, 
+	#addDeformIK2(fp, 'UpArm3_R', 'LoArmIK_R', 'LoArmFK_R', (90*D, 'UpArmPTIK_R'), (90*D, 'UpArmPTFK_R'), RmodUpArm, 
 		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'UpArmIK_R', (1,1,1), False])])
 
-	#addDeformLimb(fp, 'LoArm1_R', 'LoArmIK_R', (1,0,1), 'LoArmFK_R', (1,0,1), C_LOCAL, RmodLoArm, [])
-	addDeformIK2(fp, 'LoArm1_R', 'HandIK_R', 'HandFK_R', None, None, RmodLoArm, []),
+	addDeformLimb(fp, 'LoArm1_R', 'LoArmIK_R', (1,0,1), 'LoArmFK_R', (1,0,1), C_LOCAL, RmodLoArm, [])
+	#addDeformIK2(fp, 'LoArm1_R', 'HandIK_R', 'HandFK_R', None, None, RmodLoArm, []),
 
 	addPoseBone(fp, 'LoArm2_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodLoArm, 
 		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'LoArmIK_R', (1,1,1), False])])
 
-	#addDeformLimb(fp, 'LoArm3_R', 'LoArmIK_R', (0,1,0), 'LoArmFK_R', (0,1,0), C_LOCAL, RmodLoArm, [])
-	addDeformIK2(fp, 'LoArm3_R', 'HandIK_R', 'HandFK_R', (90*D, 'LoArmPTIK_R'), (90*D, 'LoArmPTFK_R'), RmodLoArm, []),
+	addDeformLimb(fp, 'LoArm3_R', 'LoArmIK_R', (0,1,0), 'LoArmFK_R', (0,1,0), C_LOCAL, RmodLoArm, [])
+	#addDeformIK2(fp, 'LoArm3_R', 'HandIK_R', 'HandFK_R', (90*D, 'LoArmPTIK_R'), (90*D, 'LoArmPTFK_R'), RmodLoArm, []),
 
 	addPoseBone(fp, 'LoArmFan_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), RmodLoArm,
 		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm1_R', (1,1,1), (0,0,0), False])])
@@ -603,84 +603,23 @@ def ArmWriteActions(fp):
 #
 
 ArmFKIKDrivers = [
-	("UpArm1_L", True, ["FK"], ["IK"], "PArmIK_L", "LOC_X", 1.0),
-	("UpArm3_L", True, ["FK"], ["IK"], "PArmIK_L", "LOC_X", 1.0),
+	("UpArm1_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
+	("UpArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 	#("UpArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
-	("LoArm1_L", True, ["FK"], ["IK"], "PArmIK_L", "LOC_X", 1.0),
-	("LoArm3_L", True, ["FK"], ["IK"], "PArmIK_L", "LOC_X", 1.0),
+	("LoArm1_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
+	("LoArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 	#("LoArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 	("Hand_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 
-	("UpArm1_R", True, ["FK"], ["IK"], "PArmIK_R", "LOC_X", 1.0),
-	("UpArm3_R", True, ["FK"], ["IK"], "PArmIK_R", "LOC_X", 1.0),
+	("UpArm1_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
+	("UpArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 	#("UpArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
-	("LoArm1_R", True, ["FK"], ["IK"], "PArmIK_R", "LOC_X", 1.0),
-	("LoArm3_R", True, ["FK"], ["IK"], "PArmIK_R", "LOC_X", 1.0),
+	("LoArm1_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
+	("LoArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 	#("LoArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 	("Hand_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 ]
 
-#
-#	ArmProperties
-#	ArmPropDrivers
-#
-
-ArmStates = ['Whole_arm_FK', 'Whole_arm_IK', 'Locked_elbow,_forearm_FK', 'Locked_elbow,_forearm_IK']
-ArmProperties = [
-	('Left_arm_state', D_ENUM, ArmStates, ['name="Left_arm_state"', 'description=""'] ),
-	('Right_arm_state', D_ENUM, ArmStates, ['name="Right_arm_state"', 'description=""'] ),
-	('Left_arm_stretch', D_BOOL, False, ['name="Left_arm_stretch"', 'description=""'] ),
-	('Right_arm_stretch', D_BOOL, False, ['name="Right_arm_stretch"', 'description=""'] ),
-	('Left_hand_follows_wrist', D_BOOL, True, ['name="Left_hand_follows_wrist"', 'description=""'] ),
-	('Right_hand_follows_wrist', D_BOOL, True, ['name="Right_hand_follows_wrist"', 'description=""'] ),
-]
-
-ArmRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
-UpArmScaleDrivers = [('ScaleIK', '((x1)and(x2==1))or(x2>=2)')]
-
-ArmPropDrivers = [
-	('UpArm1_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
-	('UpArm2_L',  ['Left_arm_stretch', 'Left_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_L',  ['Left_arm_stretch', 'Left_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
-	('LoArm1_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
-	('LoArm2_L', 'Left_arm_state', D_ENUM, [('ScaleIK', '(x==1)or(x==3)')]),
-	('LoArm3_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
-	('Hand_L', 'Left_arm_state', D_ENUM, ArmRotDrivers),
-
-	('UpArm1_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
-	('UpArm2_R',  ['Right_arm_stretch', 'Right_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_R',  ['Right_arm_stretch', 'Right_arm_state'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
-	('LoArm1_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
-	('LoArm2_R', 'Right_arm_state', D_ENUM, [('ScaleIK', '(x==1)or(x==3)')]),
-	('LoArm3_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
-	('Hand_R', 'Right_arm_state', D_ENUM, ArmRotDrivers),
-
-	('UpArmIK_L', 'Left_arm_state', D_ENUM, [('ElbowIK', 'x>=2')]),
-	('LoArmIK_L', 'Left_arm_state', D_ENUM, [('ArmIK', 'x==1'), ('WristIK', 'x==3')]),
-	('HandIK_L', 'Left_arm_state', D_ENUM, [('WristLoc', '(x==1)or(x==3)')]),
-
-	('UpArmIK_R', 'Right_arm_state', D_ENUM, [('ElbowIK', 'x>=2')]),
-	('LoArmIK_R', 'Right_arm_state', D_ENUM, [('ArmIK', 'x==1'), ('WristIK', 'x==3')]),
-	('HandIK_R', 'Right_arm_state', D_ENUM, [('WristLoc', '(x==1)or(x==3)')]),
-
-	('ElbowIK_L', 'Left_arm_stretch', D_BOOLINV, ['DistShoulder']),
-	('WristIK_L',  ['Left_arm_stretch', 'Left_arm_state'], D_MULTIVAR, 
-		[('DistElbow', '(not(x1))and(x2>=2)'),
-		 ('DistShoulder', '(not(x1))and(x2==1)')]),
-
-	('ElbowIK_R', 'Right_arm_stretch', D_BOOLINV, ['DistShoulder']),
-	('WristIK_R',  ['Right_arm_stretch', 'Right_arm_state'], D_MULTIVAR, 
-		[('DistElbow', '(not(x1))and(x2>=2)'),
-		 ('DistShoulder', '(not(x1))and(x2==1)')]),
-
-	('HandIK_L',  ['Left_arm_follows_wrist', 'Left_arm_state'], D_MULTIVAR, 
-		[('WristRot', '(x1)and(x2!=3)')]),
-	('HandIK_R',  ['Right_arm_follows_wrist', 'Right_arm_state'], D_MULTIVAR, 
-		[('WristRot', '(x1)and(x2!=3)')]),
-
-]
 
 
 #
@@ -709,36 +648,5 @@ ArmShapeDrivers = {}
 	'BicepFlex_R' : ( 'LoArm1_R', 'BendLoArmForward_R',  [(0,1), (90*D,0)] ),
 }
 '''
-
-#
-#	ArmProcess
-#	(bone, axis, angle)
-#
-
-ArmProcess = [
-	("LoArm3_L", "Z", -20*D),
-	("LoArm3_R", "Z", 20*D),
-	("LoArm1_L", "Z", -20*D),
-	("LoArm1_R", "Z", 20*D),
-]	
-
-ArmSnaps = [
-	("LoArmFK_L", "LoArm3_L", 'Both'),
-	("LoArmIK_L", "LoArm3_L", 'Both'),
-	("HandFK_L", "Hand_L", 'Both'),
-	("HandIK_L", "Hand_L", 'Both'),
-
-	("LoArmFK_R", "LoArm3_R", 'Both'),
-	("LoArmIK_R", "LoArm3_R", 'Both'),
-	("HandFK_R", "Hand_R", 'Both'),
-	("HandIK_R", "Hand_R", 'Both'),
-]
-
-ArmParents = [
-]
-
-ArmSelects = []
-
-ArmRolls = []
 
 

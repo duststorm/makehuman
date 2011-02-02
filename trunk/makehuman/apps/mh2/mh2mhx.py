@@ -280,10 +280,6 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 			#	fp.write("end Process\n")
 			elif words[1] == 'rig-correct':
 				fp.write("CorrectRig %s ;\n" % theHuman)
-			elif words[1] == 'rig-properties':
-				mhx_rig.writeAllProperties(fp)
-			elif words[1] == 'prop-defs':
-				mhx_rig.defineAllProperties(fp)
 			elif words[1] == 'ProxyRigStart':
 				proxy = mh2proxy.readProxyFile(obj, proxyStuff)
 				proxyData[proxy.name] = proxy
@@ -343,12 +339,18 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 			elif words[1] == 'ProxyVerts':
 				for bary in proxy.realVerts:
 					(x,y,z) = mh2proxy.proxyCoord(bary)
-					fp.write("v %.6g %.6g %.6g ;\n" % (x, -z, y))
+					ox = mhx_rig.Origin[0]
+					oy = mhx_rig.Origin[1]
+					oz = mhx_rig.Origin[2]
+					fp.write("v %.6g %.6g %.6g ;\n" % (x-ox, -z+oz, y-oy))
 			elif words[1] == 'Verts':
 				proxy = None
 				fp.write("Mesh %sMesh %sMesh\n  Verts\n" % (theHuman, theHuman))
+				ox = mhx_rig.Origin[0]
+				oy = mhx_rig.Origin[1]
+				oz = mhx_rig.Origin[2]
 				for v in obj.verts:
-					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], -v.co[2], v.co[1]))
+					fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0]-ox, -v.co[2]+oz, v.co[1]-oy))
 			elif words[1] == 'ProxyFaces':
 				for (f,g) in proxy.faces:
 					fp.write("    f")
@@ -960,7 +962,7 @@ def oldExportArmature24(obj, fp):
 #	newExportArmature4(obj, fp):
 #
 def newExportArmature24(obj, fp):
-	mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, classic_bones.ClassicHeadsTails)
+	mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, classic_bones.ClassicHeadsTails, False)
 
 	fp.write(
 "\n#if useArmature\n" +

@@ -282,7 +282,7 @@ RmodToe = P_YZX
 
 def LegWritePoses(fp):
 	# Deform 
-	addDeformIK2(fp, 'UpLeg1_L', 'LoLegIK_L', 'LoLegFK_L', None, None, RmodUpLeg, []),
+	addDeformLimb(fp, 'UpLeg1_L', 'UpLegIK_L', (1,0,1), 'UpLegFK_L', (1,0,1), C_LOCAL, RmodUpLeg, [])
 
 	addPoseBone(fp, 'UpLeg2_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodUpLeg, [])
 
@@ -298,7 +298,7 @@ def LegWritePoses(fp):
 	addDeformLimb(fp, 'Toe_L', 'ToeIK_L', (1,1,1), 'ToeFK_L', (1,1,1), 0, RmodToe, [])
 
 
-	addDeformIK2(fp, 'UpLeg1_R', 'LoLegIK_R', 'LoLegFK_R', None, None, RmodUpLeg, []),
+	addDeformLimb(fp, 'UpLeg1_R', 'UpLegIK_R', (1,0,1), 'UpLegFK_R', (1,0,1), C_LOCAL, RmodUpLeg, [])
 
 	addPoseBone(fp, 'UpLeg2_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodUpLeg, [])
 
@@ -449,48 +449,18 @@ def LegWritePoses(fp):
 #
 
 LegFKIKDrivers = [
-	("UpLeg1_L", True, ["FK"], ["IK"], "PLegIK_L", "LOC_X", 1.0),
+	("UpLeg1_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X", 1.0),
 	("UpLeg3_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X", 1.0),
 	("LoLeg_L", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_L", "LOC_X", 1.0),
 	("Foot_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X", 1.0),
 	("Toe_L", True, ["RotFK"], ["RotIK"], "PLegIK_L", "LOC_X", 1.0),
 	
-	("UpLeg1_R", True, ["FK"], ["IK"], "PLegIK_R", "LOC_X", 1.0),
+	("UpLeg1_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X", 1.0),
 	("UpLeg3_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X", 1.0),
 	("LoLeg_R", True, ["RotFK", "StretchFK"], ["RotIK", "StretchIK"], "PLegIK_R", "LOC_X", 1.0),
 	("Foot_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X", 1.0),
 	("Toe_R", True, ["RotFK"], ["RotIK"], "PLegIK_R", "LOC_X", 1.0),
 ]
-
-#
-#	LegProperties
-#	LegPropDrivers
-#
-
-LegProperties = [
-	('Left_leg', D_ENUM, ['Leg_FK', 'Leg_IK'], ['name="Left_Leg_FK/IK"', 'description=""'] ),
-	('Right_leg', D_ENUM, ['Leg_FK', 'Leg_IK'], ['name="Right_Leg_FK/IK"', 'description=""'] ),
-]
-
-LegRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
-LegStretchDrivers = [('StretchFK','x==0'), ('StretchIK','x>=1')]
-
-LegPropDrivers = [
-	('UpLeg1_L', 'Left_leg', D_ENUM, LegRotDrivers),
-	('UpLeg3_L', 'Left_leg', D_ENUM, LegRotDrivers),
-	('LoLeg_L', 'Left_leg', D_ENUM, LegRotDrivers),
-	('LoLeg_L', 'Left_leg', D_ENUM, LegStretchDrivers),
-	('Foot_L', 'Left_leg', D_ENUM, LegRotDrivers),
-	('Toe_L', 'Left_leg', D_ENUM, LegRotDrivers),
-
-	('UpLeg1_R', 'Right_leg', D_ENUM, LegRotDrivers),
-	('UpLeg3_R', 'Right_leg', D_ENUM, LegRotDrivers),
-	('LoLeg_R', 'Right_leg', D_ENUM, LegRotDrivers),
-	('LoLeg_R', 'Right_leg', D_ENUM, LegStretchDrivers),
-	('Foot_R', 'Right_leg', D_ENUM, LegRotDrivers),
-	('Toe_R', 'Right_leg', D_ENUM, LegRotDrivers),
-]
-
 
 #
 #	LegDeformDrivers
@@ -534,63 +504,5 @@ LegShapeDrivers = {
 }
 
 
-#
-#	LegProcess
-#	(bone, axis, angle)
-#
-
-LegProcess = [
-	("UpLeg3_L", "X", 0.2),
-	("LoLeg_L", "X", -0.4),
-	("Foot_L", "X", 0.2),
-
-	("UpLeg3_R", "X", 0.2),
-	("LoLeg_R", "X", -0.4),
-	("Foot_R", "X", 0.2),
-]	
-
-LegSnaps = [
-	("UpLegFK_L", "UpLeg3_L", 'Both'),
-	("UpLegIK_L", "UpLeg3_L", 'Both'),
-	("LoLegFK_L", "LoLeg_L", 'Both'),
-	("LoLegIK_L", "LoLeg_L", 'Both'),
-	("FootFK_L", "Foot_L", 'Both'),
-	("FootIK_L", "Foot_L", 'Both'),
-	("FootRevIK_L", "Foot_L", 'Inv'),
-	("ToeFK_L", "Toe_L", 'Both'),
-	("ToeIK_L", "Toe_L", 'Both'),
-	("ToeRevIK_L", "Toe_L", 'Inv'),
-
-	("UpLegFK_R", "UpLeg3_R", 'Both'),
-	("UpLegIK_R", "UpLeg3_R", 'Both'),
-	("LoLegFK_R", "LoLeg_R", 'Both'),
-	("LoLegIK_R", "LoLeg_R", 'Both'),
-	("FootFK_R", "Foot_R", 'Both'),
-	("FootIK_R", "Foot_R", 'Both'),
-	("FootRevIK_R", "Foot_R", 'Inv'),
-	("ToeFK_R", "Toe_R", 'Both'),
-	("ToeIK_R", "Toe_R", 'Both'),
-	("ToeRevIK_R", "Toe_R", 'Inv'),
-]
-
-
-LegParents = [
-	('AnkleIK_L', 'LoLeg_L'),
-	('LegIK_L', 'Foot_L'),
-	('AnkleIK_R', 'LoLeg_R'),
-	('LegIK_R', 'Foot_R'),
-]
-
-LegSelects = [
-	'Foot_L', 'Toe_L', 'FootFK_L', 'ToeFK_L', 'FootIK_L', 'ToeIK_L', 'FootRevIK_L', 'ToeRevIK_L', 'LegIK_L', 
-	'Foot_R', 'Toe_R', 'FootFK_R', 'ToeFK_R', 'FootIK_R', 'ToeIK_R', 'FootRevIK_R', 'ToeRevIK_R', 'LegIK_R', 
-]	
-
-LegRolls = [
-	('LegIK_L', -0.23),
-	('LegIK_R', 0.23),
-	('FootRevIK_L', pi),
-	('FootRevIK_R', pi),
-]
 
 

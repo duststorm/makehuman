@@ -120,22 +120,21 @@ C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
 
 # Fix for ChildOf bug
 
-Master = 'MasterFloor'
-rootChildOfConstraints = []
-'''
+#Master = 'MasterFloor'
+rootChildOfConstraints = [
 		('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
 		('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
 ]
 
 Master = None
-'''
+Origin = [0,0,0]
 
 #
-#	newSetupJoints (obj, joints, headTails):
+#	newSetupJoints (obj, joints, headTails, moveOrigin):
 #
-def newSetupJoints (obj, joints, headTails):
-	global rigHead, rigTail, locations
+def newSetupJoints (obj, joints, headTails, moveOrigin):
+	global rigHead, rigTail, locations, Origin
 	locations = {}
 	for (key, typ, data) in joints:
 		if typ == 'j':
@@ -179,6 +178,11 @@ def newSetupJoints (obj, joints, headTails):
 			locations[key] = vadd(locations[joint], offs)
 		else:
 			raise NameError("Unknown %s" % typ)
+
+	if moveOrigin:
+		Origin = locations['floor']
+		for key in locations.keys():
+			locations[key] = aljabr.vsub(locations[key], Origin)
 
 	rigHead = {}
 	rigTail = {}
@@ -379,12 +383,12 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags, constr
 def addDeformIK(fp, bone, target, pole):
 	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
 		[('IK', 0, 1, ['IK', target, 1, pole, (True, False,True)])])
-
+'''
 def addDeformIK2(fp, bone, iktar, fktar, ikpole, fkpole, pflags, constraints):
 	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), pflags, constraints +
 		[('IK', 0, 1, ['RotIK', iktar, 1, ikpole, (True, False,True)]),
 		 ('IK', 0, 1, ['RotFK', fktar, 1, fkpole, (True, False,True)])])
-
+'''
 def addStretchBone(fp, bone, target, parent):
 	addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
 		[('StretchTo', 0, 1, ['Stretch', target, 0]),
@@ -1635,6 +1639,7 @@ def setupCircles(fp):
 #	writeAllArmatures(fp)	
 #	writeAllPoses(fp)	
 #	writeAllActions(fp)	
+#	writeAllDrivers(fp)	
 #
 import rig_joints_25, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 
@@ -1655,7 +1660,9 @@ def setupRig(obj):
 		rig_leg_25.LegHeadsTails +
 		#rig_toe_25.ToeHeadsTails +
 		rig_face_25.FaceHeadsTails +
-		rig_panel_25.PanelHeadsTails)
+		rig_panel_25.PanelHeadsTails,
+
+		True)
 	return
 	
 def writeAllArmatures(fp):
@@ -1690,94 +1697,16 @@ def writeAllActions(fp):
 	#rig_finger_25.FingerWriteActions(fp)
 	return
 
-#
-#	writeAllDrivers(fp)	
-#	writeAllProperties(fp):
-#	defineAllProperties(fp):
-#
-
 def writeAllDrivers(fp):
-	#writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
-	#writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
+	writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
+	writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
 	writeDeformDrivers(fp, rig_arm_25.ArmDeformDrivers)
 	writeDeformDrivers(fp, rig_leg_25.LegDeformDrivers)
-	#rig_panel_25.FingerWriteDrivers(fp)
+	rig_panel_25.FingerWriteDrivers(fp)
 	rig_face_25.FaceWriteDrivers(fp)
 	#writeEnumDrivers(fp, rig_panel_25.EnumDrivers)
 
-	writePropDrivers(fp,
-		rig_body_25.BodyPropDrivers +
-		rig_arm_25.ArmPropDrivers +
-		rig_finger_25.FingerPropDrivers +
-		rig_leg_25.LegPropDrivers
-		#rig_face_25.FacePropDrivers
-	)
 	return
-
-def writeAllProperties(fp):
-	writeProperties(fp,
-		rig_body_25.BodyProperties +
-		rig_arm_25.ArmProperties +
-		rig_finger_25.FingerProperties +
-		rig_leg_25.LegProperties +
-		rig_face_25.FaceProperties)
-	return
-
-def defineAllProperties(fp):
-	defineProperties(fp,
-		rig_body_25.BodyProperties +
-		rig_arm_25.ArmProperties +
-		rig_finger_25.FingerProperties +
-		rig_leg_25.LegProperties +
-		rig_face_25.FaceProperties)
-	return
-
-#
-#	writeAllProcesses(fp):
-#
-
-def writeAllProcesses(fp):
-	return
-	
-	fp.write("  EditMode ;\n")
-	parents = rig_arm_25.ArmParents + rig_leg_25.LegParents
-	for (bone, parent) in parents:
-		fp.write("  Reparent %s %s ;\n" % (bone, parent))
-
-	fp.write("  PoseMode ;\n")
-	processes = rig_arm_25.ArmProcess + rig_leg_25.LegProcess
-	for (bone, axis, angle) in processes:
-		fp.write("  Bend %s %s %.6g ;\n" % (bone, axis, angle))
-	fp.write("  EditMode ;\n")
-	fp.write("  ObjectMode ;\n")
-
-	fp.write("  Apply ;\n")
-
-	fp.write("  EditMode ;\n")
-	snaps = rig_arm_25.ArmSnaps + rig_leg_25.LegSnaps
-	for (bone, target, rev) in snaps:
-		fp.write("  Snap %s %s %s ;\n" % (bone, target, rev))
-
-	fp.write("  ObjectMode ;\n")
-	fp.write("  EditMode ;\n")
-	rolls = rig_arm_25.ArmRolls + rig_leg_25.LegRolls
-	for (bone, roll) in rolls:
-		fp.write("  Roll %s %.4f ;\n" % (bone, roll))
-	
-	fp.write("  ObjectMode ;\n")
-
-	return
-
-def reapplyArmature(fp, name):
-	fp.write("\n" +
-"  Object %s  \n" % name +
-"    Modifier Armature ARMATURE \n" +
-"      show_expanded True ; \n" +
-"      object Refer Object %s ; \n" % mh2mhx.theHuman +
-"      use_bone_envelopes False ; \n" +
-"      use_vertex_groups True ; \n" +
-"    end Modifier \n" +
-"  end Object\n")
 
 
 

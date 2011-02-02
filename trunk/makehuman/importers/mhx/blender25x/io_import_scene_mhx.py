@@ -15,16 +15,16 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.2.0
+Version 1.2.1
 
 """
 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 2, 0),
+    'version': (1, 2, 1),
     'blender': (2, 5, 6),
-    'api': 34326,
+    'api': 34595,
     'location': "File > Import",
     'description': 'Import files in the MakeHuman eXchange format (.mhx)',
     'warning': '',
@@ -42,7 +42,7 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 2
-SUB_VERSION = 0
+SUB_VERSION = 1
 BLENDER_VERSION = (2, 56, 0)
 
 #
@@ -727,7 +727,7 @@ def parseDriver(adata, dataPath, index, rna, args, tokens):
             expr += "." + words[n]
         expr += ".driver_add('%s', index)" % channel
     
-    #print("expr", rna, expr)
+    print("expr", rna, expr)
     fcu = eval(expr)
     drv = fcu.driver
     #print("   Driver type", drv, args[0])
@@ -1645,23 +1645,21 @@ def parsePoseBone(pbones, ob, args, tokens):
     name = args[0]
     pb = pbones[name]
     amt = ob.data
-
-    # Make posebone active - don't know how to do this in pose mode
-    bpy.ops.object.mode_set(mode='OBJECT')
-    amt.bones.active = amt.bones[name]
-    bpy.ops.object.mode_set(mode='POSE')
+    amt.bones.active = pb.bone 
 
     for (key, val, sub) in tokens:
         if key == 'Constraint':
             cns = parseConstraint(pb.constraints, val, sub)
         elif key == 'bpyops':
-            bpy.ops.object.mode_set(mode='OBJECT')
-            amt.bones.active = amt.bones[name]
-            ob.constraints.active = cns            
+            amt.bones.active = pb.bone 
+            #bpy.ops.object.mode_set(mode='OBJECT')
+            #amt.bones.active = amt.bones[name]
+            #ob.constraints.active = cns            
             expr = "bpy.ops.%s" % val[0]
-            # print(expr)
+            print("\npb", pb.name, "cns", cns.name)
+            print(expr)
             exec(expr)
-            bpy.ops.object.mode_set(mode='POSE')
+            #bpy.ops.object.mode_set(mode='POSE')
         elif key == 'ik_dof':
             parseArray(pb, ["ik_dof_x", "ik_dof_y", "ik_dof_z"], val)
         elif key == 'ik_limit':
@@ -1992,9 +1990,11 @@ def correctRig(args):
         return
     bpy.context.scene.objects.active = ob
     bpy.ops.object.mode_set(mode='POSE')
+    amt = ob.data
     for pb in ob.pose.bones:
         for cns in pb.constraints:
             if cns.type == 'CHILD_OF':
+                amt.bones.active = pb.bone
                 bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
     return
         
