@@ -1845,9 +1845,9 @@ class Human(gui3d.Object):
                 elif lineData[0] == 'weight':
                     self.setWeight(float(lineData[1]))
                 elif lineData[0] == 'height':
-                    modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target',
+                    modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
                                                       'data/targets/macrodetails/universal-stature-giant.target')
-                    modifier.setValue(float(lineData[1]), 0)
+                    modifier.setValue(self, float(lineData[1]), 0)
                 elif lineData[0] == 'genitals':
                     self.setGenitals(float(lineData[1]))
                 elif lineData[0] == 'breastSize':
@@ -1918,8 +1918,8 @@ class Human(gui3d.Object):
         f.write('pelvisTone %f\n' % self.getPelvisTone())
         f.write('buttocks %f\n' % self.getButtocks())
 
-        modifier = humanmodifier.Modifier(self, 'data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
-        f.write('height %f\n' % modifier.getValue())
+        modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
+        f.write('height %f\n' % modifier.getValue(self))
 
         for (target, value) in self.targetsEthnicStack.iteritems():
             f.write('ethnic %s %f\n' % (target, value))
