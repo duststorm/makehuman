@@ -75,7 +75,7 @@ def povrayExport(obj, app):
   # application for the changes to take effect.
   
     camera = app.modelCamera
-    resolution = app.scene3d.getWindowSize()
+    resolution = (app.settings.get('rendering_width', 800), app.settings.get('rendering_height', 600))
 
     reload(mh2povray_ini)
     path = mh2povray_ini.outputpath

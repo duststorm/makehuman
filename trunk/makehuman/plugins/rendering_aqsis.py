@@ -40,12 +40,6 @@ class AqsisTaskView(gui3d.TaskView):
         
         #Buttons
         self.renderButton = gui3d.Button(self, [18, y, 9.02], 'Render');y+=24
-
-        @self.renderButton.event
-        def onClicked(event):            
-            self.sceneToRender.render()
-
-        
             
         @self.shadingRateSlider.event
         def onChanging(value):
@@ -61,6 +55,10 @@ class AqsisTaskView(gui3d.TaskView):
         def onChanging(value):
             self.skinOilSlider.label.setText("Skin Oil: "+str(round(value,3)))
             self.app.settings['rendering_aqsis_oil'] = value
+            
+        @self.renderButton.event
+        def onClicked(event):            
+            self.sceneToRender.render()
     
     def onShow(self, event):
         self.renderButton.setFocus()
