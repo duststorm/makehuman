@@ -3,18 +3,15 @@
 // the horizontal POV-Ray camera angle. We also need to account for the way 
 // OpenGL reports its camera data, translating before rotating, which further 
 // moves the camera. The x-axis is also reversed to the standard POV-Ray settings.
-#declare MakeHuman_CameraAngle = 2*atan2d((MakeHuman_ImageWidth/MakeHuman_ImageHeight)*tand(MakeHuman_CameraFOV/2),1);
 #declare MakeHuman_Camera = camera {
-  location 0 look_at -z
-  angle MakeHuman_CameraAngle
-  translate <MakeHuman_CameraX, -MakeHuman_CameraY, MakeHuman_CameraZ>
-  rotate <-MakeHuman_CameraXRot, MakeHuman_CameraYRot, 0>
+  location <MakeHuman_EyeX, MakeHuman_EyeY, MakeHuman_EyeZ>
+  look_at <MakeHuman_FocusX, MakeHuman_FocusY, MakeHuman_FocusZ>
 }
 
 // Create a standard light definition based on MakeHuman settings.
 #declare MakeHuman_LightSource = light_source {<10,10,40>, rgb 1
-  translate < MakeHuman_CameraX, -MakeHuman_CameraY, MakeHuman_CameraZ>
-  rotate <-MakeHuman_CameraXRot,  MakeHuman_CameraYRot, 0>
+  translate < MakeHuman_LightX, -MakeHuman_LightY, MakeHuman_LightZ>
+  rotate <0, 0, 0>
 }
 
 // Assign default values.

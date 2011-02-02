@@ -600,18 +600,17 @@ def povrayCameraData(camera, resolution, outputFileDescriptor):
   outputFileDescriptor:
       *file descriptor*. The file to which the camera settings need to be written. 
   """
-    
-    #vx = camera.focusX - camera.eyeX;
-    #vy = camera.focusY - camera.eyeY;
-    #vz = camera.focusZ - camera.eyeZ;
 
     outputFileDescriptor.write('// MakeHuman Camera and Viewport Settings. \n')
-    outputFileDescriptor.write('#declare MakeHuman_CameraX     = %s;\n' % camera.eyeX)
-    outputFileDescriptor.write('#declare MakeHuman_CameraY     = %s;\n' % camera.eyeY) # might be -camera.eyeY
-    outputFileDescriptor.write('#declare MakeHuman_CameraZ     = %s;\n' % camera.eyeZ)
-    outputFileDescriptor.write('#declare MakeHuman_CameraXRot  = %s;\n' % 0.0)#(atan2(vx, vz) * 180 / pi))
-    outputFileDescriptor.write('#declare MakeHuman_CameraYRot  = %s;\n' % 0.0)#(atan2(vy, sqrt(vx*vx+vz*vz)) * 180 / pi))
-    outputFileDescriptor.write('#declare MakeHuman_CameraFOV   = %s;\n' % camera.fovAngle)
+    outputFileDescriptor.write('#declare MakeHuman_LightX      = %s;\n' % camera.eyeX)
+    outputFileDescriptor.write('#declare MakeHuman_LightY      = %s;\n' % camera.eyeY)
+    outputFileDescriptor.write('#declare MakeHuman_LightZ      = %s;\n' % camera.eyeZ)
+    outputFileDescriptor.write('#declare MakeHuman_EyeX        = %s;\n' % camera.eyeX)
+    outputFileDescriptor.write('#declare MakeHuman_EyeY        = %s;\n' % camera.eyeY)
+    outputFileDescriptor.write('#declare MakeHuman_EyeZ        = %s;\n' % camera.eyeZ)
+    outputFileDescriptor.write('#declare MakeHuman_FocusX      = %s;\n' % camera.focusX)
+    outputFileDescriptor.write('#declare MakeHuman_FocusY      = %s;\n' % camera.focusY)
+    outputFileDescriptor.write('#declare MakeHuman_FocusZ      = %s;\n' % camera.focusZ)
     outputFileDescriptor.write('#declare MakeHuman_ImageHeight = %s;\n' % resolution[1])
     outputFileDescriptor.write('#declare MakeHuman_ImageWidth  = %s;\n' % resolution[0])
     outputFileDescriptor.write('''
