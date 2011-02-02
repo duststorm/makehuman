@@ -495,11 +495,11 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # UV Vectors - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % (len(obj.faces) * 3))
-    for f in obj.faces:
-        outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[0]][0], obj.uvValues[f.uv[0]][1]))
-        outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[1]][0], obj.uvValues[f.uv[1]][1]))
-        outputFileDescriptor.write('<%s,%s>' % (obj.uvValues[f.uv[2]][0], obj.uvValues[f.uv[2]][1]))
+    outputFileDescriptor.write('    %s\n  ' % len(obj.uvValues))
+    for uv in obj.uvValues:
+        
+        outputFileDescriptor.write('<%s,%s>' % (uv[0], uv[1]))
+        
     outputFileDescriptor.write('''
   }
 
@@ -508,9 +508,10 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # Faces - Write a POV-Ray array of arrays to the output stream
 
     outputFileDescriptor.write('  face_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(faces))
+    outputFileDescriptor.write('    %s\n  ' % (len(faces) * 2))
     for f in faces:
         outputFileDescriptor.write('<%s,%s,%s>' % (f.verts[0].idx, f.verts[1].idx, f.verts[2].idx))
+        outputFileDescriptor.write('<%s,%s,%s>' % (f.verts[2].idx, f.verts[3].idx, f.verts[0].idx))
     outputFileDescriptor.write('''
   }
 
@@ -519,9 +520,10 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # UV Indices for each face - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(faces))
+    outputFileDescriptor.write('    %s\n  ' % (len(faces) * 2))
     for f in faces:
-        outputFileDescriptor.write('<%s,%s,%s>' % (f.idx * 3, f.idx * 3 + 1, f.idx * 3 + 2))
+        outputFileDescriptor.write('<%s,%s,%s>' % (f.uv[0], f.uv[1], f.uv[2]))
+        outputFileDescriptor.write('<%s,%s,%s>' % (f.uv[2], f.uv[3], f.uv[0]))
     outputFileDescriptor.write('''
   }
 ''')
@@ -598,16 +600,17 @@ def povrayCameraData(camera, resolution, outputFileDescriptor):
   outputFileDescriptor:
       *file descriptor*. The file to which the camera settings need to be written. 
   """
-    vx = camera.focusX - camera.eyeX;
-    vy = camera.focusY - camera.eyeY;
-    vz = camera.focusZ - camera.eyeZ;
+    
+    #vx = camera.focusX - camera.eyeX;
+    #vy = camera.focusY - camera.eyeY;
+    #vz = camera.focusZ - camera.eyeZ;
 
     outputFileDescriptor.write('// MakeHuman Camera and Viewport Settings. \n')
     outputFileDescriptor.write('#declare MakeHuman_CameraX     = %s;\n' % camera.eyeX)
     outputFileDescriptor.write('#declare MakeHuman_CameraY     = %s;\n' % camera.eyeY) # might be -camera.eyeY
     outputFileDescriptor.write('#declare MakeHuman_CameraZ     = %s;\n' % camera.eyeZ)
-    outputFileDescriptor.write('#declare MakeHuman_CameraXRot  = %s;\n' % (atan2(vx, vz) * 180 / pi))
-    outputFileDescriptor.write('#declare MakeHuman_CameraYRot  = %s;\n' % (atan2(vy, sqrt(vx*vx+vz*vz)) * 180 / pi))
+    outputFileDescriptor.write('#declare MakeHuman_CameraXRot  = %s;\n' % 0.0)#(atan2(vx, vz) * 180 / pi))
+    outputFileDescriptor.write('#declare MakeHuman_CameraYRot  = %s;\n' % 0.0)#(atan2(vy, sqrt(vx*vx+vz*vz)) * 180 / pi))
     outputFileDescriptor.write('#declare MakeHuman_CameraFOV   = %s;\n' % camera.fovAngle)
     outputFileDescriptor.write('#declare MakeHuman_ImageHeight = %s;\n' % resolution[1])
     outputFileDescriptor.write('#declare MakeHuman_ImageWidth  = %s;\n' % resolution[0])
