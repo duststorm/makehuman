@@ -71,10 +71,27 @@ class EthnicsTaskView(gui3d.TaskView):
         self.genderBox.setPosition([event[0] - 150, self.genderBox.getPosition()[1], 9.0])
         self.ageBox.setPosition([event[0] - 150, self.ageBox.getPosition()[1], 9.0])
         self.loadBox.setPosition([event[0] - 150, self.loadBox.getPosition()[1], 9.0])
+        
+    def loadHandler(self, human, values):
+        
+        target = '%s.target' % os.path.join('data/models/ethnics', values[0])
+        print target
+        human.setDetail(target, float(values[1]))
+       
+    def saveHandler(self, human, file):
+        
+        for name, value in human.targetsDetailStack.iteritems():
+            if 'ethnics' in name:
+                target = os.path.basename(name).replace('.target', '')
+                file.write('ethnic %s %f\n' % (target, value))
 
 def load(app):
     category = app.getCategory('Experiments')
     taskview = EthnicsTaskView(category)
+    
+    app.addLoadHandler('ethnic', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
+    
     print 'Ethnics imported'
 
 def unload(app):

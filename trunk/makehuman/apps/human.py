@@ -1012,7 +1012,7 @@ class Human(gui3d.Object):
 
         for (k, v) in detailTargets.iteritems():
             if v != 0.0:
-                print 'APP: %s, VAL: %f' % (k, v)
+                #print 'APP: %s, VAL: %f' % (k, v)
                 algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
     def updateNose(self, previous, next, recalcNormals = True, update = True):
@@ -1508,7 +1508,8 @@ class Human(gui3d.Object):
 
         for (k, v) in macroTargets.iteritems():
             if v != 0.0:
-                print 'APP: %s, VAL: %f' % (k, v)
+                pass
+                #print 'APP: %s, VAL: %f' % (k, v)
             algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
 
         detailTargets = {}
@@ -1878,8 +1879,6 @@ class Human(gui3d.Object):
                     self.setButtocks(float(lineData[1]))
                 elif lineData[0] == 'asymmetry':
                     self.targetsDetailStack['data/targets/asym/' + lineData[1] + '.target'] = float(lineData[2])
-                elif lineData[0] == 'ethnic':
-                    self.targetsEthnicStack[lineData[1]] = float(lineData[2])
                 elif lineData[0] == 'detail':
                     self.targetsDetailStack['data/targets/details/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] == 'microdetail':
@@ -1920,9 +1919,6 @@ class Human(gui3d.Object):
 
         modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         f.write('height %f\n' % modifier.getValue(self))
-
-        for (target, value) in self.targetsEthnicStack.iteritems():
-            f.write('ethnic %s %f\n' % (target, value))
 
         for t in self.targetsDetailStack.keys():
             if '/details' in t:
