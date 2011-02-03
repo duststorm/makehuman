@@ -303,6 +303,9 @@ ArmDeformArmature = [
 	('ShoulderAim_R',		0.0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
 	('Scapula_R',			0.0, 'ShoulderAim_R', F_DEF, L_DEF, NoBB),
 
+	('ArmLoc_L',			0.0, 'Shoulder_L', 0, L_HELP, NoBB),
+	('ArmLoc_R',			0.0, 'Shoulder_R', 0, L_HELP, NoBB),
+
 	# Arm deform
 	('UpArm1_L',		upArmRoll, 'ArmLoc_L', F_DEF, L_DEF, NoBB),
 	('UpArm2_L',		upArmRoll, 'UpArm1_L', F_DEF+F_CON, L_MAIN,(1,1,5) ),
@@ -528,7 +531,7 @@ def ArmDeformPoses(fp):
 	
 	addPoseBone(fp, 'ShoulderUp_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	
-	addDeformIK(fp, 'ShoulderAim_L', 'SternumTarget', (90*D, 'ShoulderUp_L'))
+	addDeformIK(fp, 'ShoulderAim_L', 'SternumTarget', (-90*D, 'ShoulderUp_L'))
 	
 	addPoseBone(fp, 'Scapula_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	
@@ -538,7 +541,7 @@ def ArmDeformPoses(fp):
 	
 	addPoseBone(fp, 'ShoulderUp_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	
-	addDeformIK(fp, 'ShoulderAim_R', 'SternumTarget', (90*D, 'ShoulderUp_L'))
+	addDeformIK(fp, 'ShoulderAim_R', 'SternumTarget', (-90*D, 'ShoulderUp_L'))
 	
 	addPoseBone(fp, 'Scapula_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	
