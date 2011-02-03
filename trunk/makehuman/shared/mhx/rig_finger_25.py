@@ -93,9 +93,13 @@ FingerHeadsTails = [
 
 '''
 
+#
+#	FingerControlArmature
+#
+
 ThumbRoll = 90*D
 
-FingerArmature = [
+FingerControlArmature = [
 	# Deform
 	('Finger-1-1_L',		ThumbRoll, 'Hand_L', F_DEF, L_HANDFK+L_HANDIK, NoBB),
 	('Finger-1-2_L',		ThumbRoll, 'Finger-1-1_L', F_DEF, L_HANDFK, NoBB),
@@ -144,6 +148,44 @@ FingerArmature = [
 ]
 
 #
+#	FingerDeformArmature
+#
+
+FingerDeformArmature = [
+	('Finger-1-1_L',		ThumbRoll, 'Hand_L', F_DEF, L_HANDFK+L_HANDIK, NoBB),
+	('Finger-1-2_L',		ThumbRoll, 'Finger-1-1_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-1-3_L',		ThumbRoll, 'Finger-1-2_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-2-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-2-2_L',		0.0, 'Finger-2-1_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-2-3_L',		0.0, 'Finger-2-2_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-3-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-3-2_L',		0.0, 'Finger-3-1_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-3-3_L',		0.0, 'Finger-3-2_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-4-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-4-2_L',		0.0, 'Finger-4-1_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-4-3_L',		0.0, 'Finger-4-2_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-5-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-5-2_L',		0.0, 'Finger-5-1_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-5-3_L',		0.0, 'Finger-5-2_L', F_DEF, L_HANDFK, NoBB),
+
+	('Finger-1-1_R',		-ThumbRoll, 'Hand_R', F_DEF, L_HANDFK+L_HANDIK, NoBB),
+	('Finger-1-2_R',		-ThumbRoll, 'Finger-1-1_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-1-3_R',		-ThumbRoll, 'Finger-1-2_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-2-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-2-2_R',		0.0, 'Finger-2-1_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-2-3_R',		0.0, 'Finger-2-2_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-3-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-3-2_R',		0.0, 'Finger-3-1_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-3-3_R',		0.0, 'Finger-3-2_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-4-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-4-2_R',		0.0, 'Finger-4-1_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-4-3_R',		0.0, 'Finger-4-2_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-5-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-5-2_R',		0.0, 'Finger-5-1_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-5-3_R',		0.0, 'Finger-5-2_R', F_DEF, L_HANDFK, NoBB),
+]
+
+#
 #	defineFingerConstraints():
 #
 
@@ -160,13 +202,13 @@ def defineFingerConstraints():
 					if lnum == 1:
 						cnss = []
 					else:
-						cnss = [ ('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['Rot', finger, (1,0,0), (0,0,0), True]) ]
+						cnss = [ ('CopyRot', C_LOCAL, 1, ['Rot', finger, (1,0,0), (0,0,0), True]) ]
 					cnss.append( limitRotThumb )
 				else:
 					if lnum == 1:
-						cnss = [ ('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['Rot', finger, (1,0,1), (0,0,0), True]) ]
+						cnss = [ ('CopyRot', C_LOCAL, 1, ['Rot', finger, (1,0,1), (0,0,0), True]) ]
 					else:
-						cnss = [ ('CopyRot', C_OW_LOCAL+C_TG_LOCAL, 1, ['Rot', finger, (1,0,0), (0,0,0), True]) ]
+						cnss = [ ('CopyRot', C_LOCAL, 1, ['Rot', finger, (1,0,0), (0,0,0), True]) ]
 					cnss.append( limitRotFingers )
 				fconstraints["%d-%d%s" % (fnum, lnum, suffix)] = cnss
 	return fconstraints
@@ -174,66 +216,39 @@ def defineFingerConstraints():
 fconstraints = defineFingerConstraints()	
 
 #
-#	FingerWritePoses(fp):
+#	FingerControlPoses(fp):
 #
 
 customShape = 'MHCircle05'
 customShape = None
 		
-def FingerWritePoses(fp):
-	addPoseBone(fp, 'Finger-1-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["1-1_L"])
-	addPoseBone(fp, 'Finger-1-2_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, fconstraints["1-2_L"])
-	addPoseBone(fp, 'Finger-1-3_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["1-3_L"])
-
-	addPoseBone(fp, 'Finger-1-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["1-1_R"])
-	addPoseBone(fp, 'Finger-1-2_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (0,0,1), 0, fconstraints["1-2_R"])
-	addPoseBone(fp, 'Finger-1-3_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["1-3_R"])
-
-	addPoseBone(fp, 'Finger-2-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["2-1_L"])
-	addPoseBone(fp, 'Finger-2-2_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-2_L"])
-	addPoseBone(fp, 'Finger-2-3_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-3_L"])
-
-	addPoseBone(fp, 'Finger-2-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["2-1_R"])
-	addPoseBone(fp, 'Finger-2-2_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-2_R"])
-	addPoseBone(fp, 'Finger-2-3_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["2-3_R"])
-
-	addPoseBone(fp, 'Finger-3-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["3-1_L"])
-	addPoseBone(fp, 'Finger-3-2_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-2_L"])
-	addPoseBone(fp, 'Finger-3-3_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-3_L"])
-
-	addPoseBone(fp, 'Finger-3-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["3-1_R"])
-	addPoseBone(fp, 'Finger-3-2_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-2_R"])
-	addPoseBone(fp, 'Finger-3-3_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["3-3_R"])
-
-	addPoseBone(fp, 'Finger-4-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["4-1_L"])
-	addPoseBone(fp, 'Finger-4-2_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-2_L"])
-	addPoseBone(fp, 'Finger-4-3_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-3_L"])
-
-	addPoseBone(fp, 'Finger-4-1_R', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["4-1_R"])
-	addPoseBone(fp, 'Finger-4-2_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-2_R"])
-	addPoseBone(fp, 'Finger-4-3_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["4-3_R"])
-
-	addPoseBone(fp, 'Finger-5-1_L', customShape, None, (1,1,1), (0,1,0), (1,1,1), (1,0,1), 0, fconstraints["5-1_L"])
-	addPoseBone(fp, 'Finger-5-2_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-2_L"])
-	addPoseBone(fp, 'Finger-5-3_L', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-3_L"])
-
-	addPoseBone(fp, 'Finger-5-1_R', customShape, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, fconstraints["5-1_R"])
-	addPoseBone(fp, 'Finger-5-2_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-2_R"])
-	addPoseBone(fp, 'Finger-5-3_R', customShape, None, (1,1,1), (0,1,1), (1,1,1), (0,0,1), 0, fconstraints["5-3_R"])
-	
-	# Control fingers
-	addPoseBone(fp, 'Finger-1_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotThumb])
-	addPoseBone(fp, 'Finger-2_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
-	addPoseBone(fp, 'Finger-3_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
-	addPoseBone(fp, 'Finger-4_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
-	addPoseBone(fp, 'Finger-5_L', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
-	
-	addPoseBone(fp, 'Finger-1_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotThumb])
-	addPoseBone(fp, 'Finger-2_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
-	addPoseBone(fp, 'Finger-3_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
-	addPoseBone(fp, 'Finger-4_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
-	addPoseBone(fp, 'Finger-5_R', 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [limitRotFingers])
+def FingerControlPoses(fp):
+	for suffix in ['_L', '_R']:
+		for fnum in range(1,6):
+			fing = 'Finger-%d%s' % (fnum, suffix)
+			if fnum == 1:
+				lim = limitRotThumb
+			else:
+				lim = limitRotFingers
+			addPoseBone(fp, fing, 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [lim])
+			
+			for lnum in range(1,4):
+				if (fnum == 1 and lnum <= 2) or (fnum >= 2 and lnum == 1):
+					rot = (0,1,0)
+					ik = (1,0,1)
+				else:
+					rot = (0,1,1)
+					ik = (0,0,1)				
+				fing = 'Finger-%d-%d%s' % (fnum, lnum, suffix)
+				addPoseBone(fp, fing, customShape, None, (1,1,1), rot, (1,1,1), ik, 0, 
+					fconstraints["%d-%d%s" % (fnum, lnum, suffix)])				
 	return	
 
-
+def FingerDeformPoses(fp):
+	for suffix in ['_L', '_R']:
+		for fnum in range(1,6):
+			for lnum in range(1,4):
+				fing = 'Finger-%d-%d%s' % (fnum, lnum, suffix)
+				copyDeform(fp, fing, 0, U_LOC+U_ROT)
+	return
 

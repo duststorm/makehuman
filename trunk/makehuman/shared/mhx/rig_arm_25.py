@@ -136,18 +136,22 @@ ArmHeadsTails = [
 	('ElbowBendTrg_R',		'l-elbow-tail', ('l-elbow-tail', yunit)),
 
 	# Deform
+	('UpArm_L',				'r-shoulder', 'r-elbow'),
 	('UpArm1_L',			'r-shoulder', 'r-uparm1'),
 	('UpArm2_L',			'r-uparm1', 'r-uparm2'),
 	('UpArm3_L',			'r-uparm2', 'r-elbow'),
+	('LoArm_L',				'r-elbow', 'r-hand'),
 	('LoArm1_L',			'r-elbow', 'r-loarm1'),
 	('LoArm2_L',			'r-loarm1', 'r-loarm2'),
 	('LoArm3_L',			'r-loarm2', 'r-hand'),
 	('LoArmFan_L',			'r-elbow', 'r-loarm-fan'),
 	('Hand_L',				'r-hand', 'hand_L_tail'),
 
+	('UpArm_R',				'l-shoulder', 'l-elbow'),
 	('UpArm1_R',			'l-shoulder', 'l-uparm1'),
 	('UpArm2_R',			'l-uparm1', 'l-uparm2'),
 	('UpArm3_R',			'l-uparm2', 'l-elbow'),
+	('LoArm_R',				'l-elbow', 'l-hand'),
 	('LoArm1_R',			'l-elbow', 'l-loarm1'),
 	('LoArm2_R',			'l-loarm1', 'l-loarm2'),
 	('LoArm3_R',			'l-loarm2', 'l-hand'),
@@ -215,84 +219,33 @@ handRoll = 0.0
 L_SHOULDER = L_ARMFK+L_ARMIK+L_SPINE
 
 '''
-	('Clavicle_L',			0.0, 'DefSpine3', F_DEF, L_DEF, NoBB),
-	('Trapezeus-1_L',		0.0, 'DefSpine2', F_DEF, L_DEF, NoBB),
-	('Trapezeus-2_L',		0.0, 'DefSpine2', F_DEF, L_DEF, NoBB),
+	('Clavicle_L',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('Trapezeus-1_L',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
+	('Trapezeus-2_L',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
 
-	('Clavicle_R',			0.0, 'DefSpine3', F_DEF, L_DEF, NoBB),
-	('Trapezeus-1_R',		0.0, 'DefSpine2', F_DEF, L_DEF, NoBB),
-	('Trapezeus-2_R',		0.0, 'DefSpine2', F_DEF, L_DEF, NoBB),
+	('Clavicle_R',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('Trapezeus-1_R',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
+	('Trapezeus-2_R',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
 '''
 
-ArmArmature = [
-	('Sternum',				0.0, 'DefSpine3', 0, L_HELP, NoBB),
+ArmControlArmature = [
+	('Sternum',				0.0, 'Spine3', 0, L_HELP, NoBB),
 	('SternumTarget',		0.0, 'Sternum', 0, L_HELP, NoBB),
 
 	# Shoulder
 	('Shoulder_L',			0.0, 'Sternum', F_WIR+F_DEF, L_SHOULDER+L_DEF, NoBB),
-	('ShoulderPivot_L',		0.0, 'Sternum', 0, L_HELP, NoBB),
-	('ShoulderUp_L',		0.0, 'ShoulderPivot_L', 0, L_HELP, NoBB),
-	('ShoulderAim_L',		0.0, 'ShoulderPivot_L', 0, L_HELP, NoBB),
-	('Scapula_L',			0.0, 'ShoulderAim_L', F_DEF, L_DEF, NoBB),
-
 	('Shoulder_R',			0.0, 'Sternum', F_WIR+F_DEF, L_SHOULDER+L_DEF, NoBB),
-	('ShoulderPivot_R',		0.0, 'Sternum', 0, L_HELP, NoBB),
-	('ShoulderUp_R',		0.0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
-	('ShoulderAim_R',		0.0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
-	('Scapula_R',			0.0, 'ShoulderAim_R', F_DEF, L_DEF, NoBB),
 
 	('ArmLoc_L',			0.0, 'Shoulder_L', 0, L_HELP, NoBB),
 	('ArmLoc_R',			0.0, 'Shoulder_R', 0, L_HELP, NoBB),
 
-	# Arm deform
-	('UpArm1_L',		upArmRoll, 'ArmLoc_L', F_DEF, L_DEF, NoBB),
-	('UpArm2_L',		upArmRoll, 'UpArm1_L', F_DEF+F_CON, L_DEF,(1,1,5) ),
-	('UpArm3_L',		upArmRoll, 'UpArm2_L', F_DEF+F_CON, L_DEF, NoBB),
-	('LoArm1_L',		loArmRoll, 'UpArm3_L', F_DEF, L_DEF, NoBB),
-	('LoArm2_L',		loArmRoll, 'LoArm1_L', F_DEF+F_CON, L_DEF, (1,1,5) ),
-	('LoArm3_L',		loArmRoll, 'LoArm2_L', F_DEF+F_CON, L_DEF, NoBB),
-	('LoArmFan_L',		loArmRoll, 'UpArm3_L', F_DEF, L_DEF, NoBB),
-	('Hand_L',			handRoll, 'LoArm3_L', F_DEF, L_DEF, NoBB),
-
-	('UpArm1_R',		upArmRoll, 'ArmLoc_R', F_DEF, L_DEF, NoBB),
-	('UpArm2_R',		upArmRoll, 'UpArm1_R', F_DEF+F_CON, L_DEF,(1,1,5) ),
-	('UpArm3_R',		upArmRoll, 'UpArm2_R', F_DEF+F_CON, L_DEF, NoBB),
-	('LoArm1_R',		loArmRoll, 'UpArm3_R', F_DEF, L_DEF, NoBB),
-	('LoArm2_R',		loArmRoll, 'LoArm1_R', F_DEF+F_CON, L_DEF, (1,1,5) ),
-	('LoArm3_R',		loArmRoll, 'LoArm2_R', F_DEF+F_CON, L_DEF, NoBB),
-	('LoArmFan_R',		loArmRoll, 'UpArm3_R', F_DEF, L_DEF, NoBB),
-	('Hand_R',			handRoll, 'LoArm3_R', F_DEF, L_DEF, NoBB),
-
-	# Shoulder deform
-	('Pectoralis_L',		0.0, 'DefSpine2', F_DEF, L_DEF, NoBB),
-	('PectoralisTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
-	('LatDorsi_L',			0.0, 'DefSpine1', F_DEF, L_DEF, NoBB),
-	('LatDorsiTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
-	('Deltoid_L',			0.0, 'DefSpine3', F_DEF, L_DEF, NoBB),
-	('DeltoidTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
-
-	('Pectoralis_R',		0.0, 'DefSpine2', F_DEF, L_DEF, NoBB),
-	('PectoralisTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
-	('LatDorsi_R',			0.0, 'DefSpine1', F_DEF, L_DEF, NoBB),
-	('LatDorsiTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
-	('Deltoid_R',			0.0, 'DefSpine3', F_DEF, L_DEF, NoBB),
-	('DeltoidTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
-
-	# Elbow deform
-	('ElbowBend_L',			0.0, 'UpArm3_L', F_DEF, L_DEF, NoBB),
-	('ElbowBendTrg_L',		0.0, 'LoArm1_L', 0, L_HELP, NoBB),
-	('ElbowBend_R',			0.0, 'UpArm3_R', F_DEF, L_DEF, NoBB),
-	('ElbowBendTrg_R',		0.0, 'LoArm1_R', 0, L_HELP, NoBB),
-
-	# Rotation diffs
-	('BendArmDown_L',		90*D, 'Shoulder_L', 0, L_HELP, NoBB),
-	('BendArmDown_R',		-90*D, 'Shoulder_R', 0, L_HELP, NoBB),
-	('BendArmUp_L',			-90*D, 'Shoulder_L', 0, L_HELP, NoBB),
-	('BendArmUp_R',			90*D, 'Shoulder_R', 0, L_HELP, NoBB),
-	('BendShoulderUp_L',	-90*D, 'DefSpine3', 0, L_HELP, NoBB),
-	('BendShoulderUp_R',	90*D, 'DefSpine3', 0, L_HELP, NoBB),
-	('BendLoArmForward_L',	0, 'UpArm3_L', 0, L_HELP, NoBB),
-	('BendLoArmForward_R',	0, 'UpArm3_R', 0, L_HELP, NoBB),
+	# Deform
+	('UpArm_L'	,		upArmRoll, 'ArmLoc_L', 0, L_DEF, NoBB),
+	('LoArm_L'	,		loArmRoll, 'UpArm_L', 0, L_DEF, NoBB),
+	('Hand_L',			handRoll, 'LoArm_L', F_CON, L_DEF, NoBB),
+	('UpArm_R'	,		-upArmRoll, 'ArmLoc_R', 0, L_DEF, NoBB),
+	('LoArm_R'	,		-loArmRoll, 'UpArm_R', 0, L_DEF, NoBB),
+	('Hand_R',			-handRoll, 'LoArm_R', F_CON, L_DEF, NoBB),
 
 	# FK
 	('UpArmFK_L',		upArmRoll, 'ArmLoc_L', F_WIR, L_ARMFK, NoBB),
@@ -334,6 +287,74 @@ ArmArmature = [
 	('ElbowPTFK_R',		0.0, 'UpArmFK_R', 0, L_HELP, NoBB),
 ]
 
+ArmDeformArmature = [
+	('Sternum',				0.0, 'Spine3', 0, L_HELP, NoBB),
+
+	# Shoulder
+	('Shoulder_L',			0.0, 'Sternum', F_WIR+F_DEF, L_SHOULDER+L_DEF, NoBB),
+	('ShoulderPivot_L',		0.0, 'Sternum', 0, L_HELP, NoBB),
+	('ShoulderUp_L',		0.0, 'ShoulderPivot_L', 0, L_HELP, NoBB),
+	('ShoulderAim_L',		0.0, 'ShoulderPivot_L', 0, L_HELP, NoBB),
+	('Scapula_L',			0.0, 'ShoulderAim_L', F_DEF, L_DEF, NoBB),
+
+	('Shoulder_R',			0.0, 'Sternum', F_WIR+F_DEF, L_SHOULDER+L_DEF, NoBB),
+	('ShoulderPivot_R',		0.0, 'Sternum', 0, L_HELP, NoBB),
+	('ShoulderUp_R',		0.0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
+	('ShoulderAim_R',		0.0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
+	('Scapula_R',			0.0, 'ShoulderAim_R', F_DEF, L_DEF, NoBB),
+
+	# Arm deform
+	('UpArm1_L',		upArmRoll, 'ArmLoc_L', F_DEF, L_DEF, NoBB),
+	('UpArm2_L',		upArmRoll, 'UpArm1_L', F_DEF+F_CON, L_DEF,(1,1,5) ),
+	('UpArm3_L',		upArmRoll, 'UpArm2_L', F_DEF+F_CON, L_DEF, NoBB),
+	('LoArm1_L',		loArmRoll, 'UpArm3_L', F_DEF, L_DEF, NoBB),
+	('LoArm2_L',		loArmRoll, 'LoArm1_L', F_DEF+F_CON, L_DEF, (1,1,5) ),
+	('LoArm3_L',		loArmRoll, 'LoArm2_L', F_DEF+F_CON, L_DEF, NoBB),
+	('LoArmFan_L',		loArmRoll, 'UpArm3_L', F_DEF, L_DEF, NoBB),
+	('Hand_L',			handRoll, 'LoArm3_L', F_DEF, L_DEF, NoBB),
+
+	('UpArm1_R',		upArmRoll, 'ArmLoc_R', F_DEF, L_DEF, NoBB),
+	('UpArm2_R',		upArmRoll, 'UpArm1_R', F_DEF+F_CON, L_DEF,(1,1,5) ),
+	('UpArm3_R',		upArmRoll, 'UpArm2_R', F_DEF+F_CON, L_DEF, NoBB),
+	('LoArm1_R',		loArmRoll, 'UpArm3_R', F_DEF, L_DEF, NoBB),
+	('LoArm2_R',		loArmRoll, 'LoArm1_R', F_DEF+F_CON, L_DEF, (1,1,5) ),
+	('LoArm3_R',		loArmRoll, 'LoArm2_R', F_DEF+F_CON, L_DEF, NoBB),
+	('LoArmFan_R',		loArmRoll, 'UpArm3_R', F_DEF, L_DEF, NoBB),
+	('Hand_R',			handRoll, 'LoArm3_R', F_DEF, L_DEF, NoBB),
+]
+"""
+	# Rotation diffs
+	('BendArmDown_L',		90*D, 'Shoulder_L', 0, L_HELP, NoBB),
+	('BendArmDown_R',		-90*D, 'Shoulder_R', 0, L_HELP, NoBB),
+	('BendArmUp_L',			-90*D, 'Shoulder_L', 0, L_HELP, NoBB),
+	('BendArmUp_R',			90*D, 'Shoulder_R', 0, L_HELP, NoBB),
+	('BendShoulderUp_L',	-90*D, 'Spine3', 0, L_HELP, NoBB),
+	('BendShoulderUp_R',	90*D, 'Spine3', 0, L_HELP, NoBB),
+	('BendLoArmForward_L',	0, 'UpArm3_L', 0, L_HELP, NoBB),
+	('BendLoArmForward_R',	0, 'UpArm3_R', 0, L_HELP, NoBB),
+
+	# Shoulder deform
+	('Pectoralis_L',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
+	('PectoralisTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
+	('LatDorsi_L',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
+	('LatDorsiTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
+	('Deltoid_L',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('DeltoidTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
+
+	('Pectoralis_R',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
+	('PectoralisTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
+	('LatDorsi_R',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
+	('LatDorsiTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
+	('Deltoid_R',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('DeltoidTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
+
+	# Elbow deform
+	('ElbowBend_L',			0.0, 'UpArm3_L', F_DEF, L_DEF, NoBB),
+	('ElbowBendTrg_L',		0.0, 'LoArm1_L', 0, L_HELP, NoBB),
+	('ElbowBend_R',			0.0, 'UpArm3_R', F_DEF, L_DEF, NoBB),
+	('ElbowBendTrg_R',		0.0, 'LoArm1_R', 0, L_HELP, NoBB),
+]
+"""
 #
 #
 #
@@ -354,7 +375,11 @@ RmodUpArm = P_YZX
 RmodLoArm = P_YXZ
 RmodHand = P_ZYX
 
-def ArmWritePoses(fp):
+#
+#	ArmControlPoses(fp):
+#
+
+def ArmControlPoses(fp):
 	addPoseBone(fp, 'Sternum', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'SternumTarget', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
@@ -364,126 +389,24 @@ def ArmWritePoses(fp):
 	addPoseBone(fp, 'Shoulder_L', 'MHEndCube01', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)])])
 
-	addPoseBone(fp, 'ShoulderPivot_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'Shoulder_L', (1,1,1), (0,0,0), False])])
-
-	addPoseBone(fp, 'ShoulderUp_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-	addDeformIK(fp, 'ShoulderAim_L', 'SternumTarget', (90*D, 'ShoulderUp_L'))
-
-	addPoseBone(fp, 'Scapula_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-
 	addPoseBone(fp, 'Shoulder_R', 'MHEndCube01', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
 
-	addPoseBone(fp, 'ShoulderPivot_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'Shoulder_R', (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, 'ShoulderUp_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	# Deform
+	addDeformLimb(fp, 'UpArm_L', 'UpArmIK_L', (1,1,1), 'UpArmFK_L', (1,1,1), 0, RmodUpArm, [])
 
-	addDeformIK(fp, 'ShoulderAim_R', 'SternumTarget', (90*D, 'ShoulderUp_L'))
-
-	addPoseBone(fp, 'Scapula_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-
-	'''
-	addPoseBone(fp, 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_L', 1])])
-
-	addPoseBone(fp, 'Trapezeus-1_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_L', 1])])
-
-	addPoseBone(fp, 'Trapezeus-2_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'LatDorsiTrg_L', 0])])
-
-	addPoseBone(fp, 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_R', 1])])
-
-	addPoseBone(fp, 'Trapezeus-1_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_R', 1])])
-
-	addPoseBone(fp, 'Trapezeus-2_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'LatDorsiTrg_R', 0])])
-	'''
-
-
-	# Shoulder deform
-	addPoseBone(fp, 'Pectoralis_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'PectoralisTrg_L', 0])])
-
-	addPoseBone(fp, 'LatDorsi_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'LatDorsiTrg_L', 0])])
-
-	addPoseBone(fp, 'Deltoid_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Up', 'DeltoidTrg_L', 0])])
-
-	addPoseBone(fp, 'ElbowBend_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'ElbowBendTrg_L', 0])])
-
-
-	addPoseBone(fp, 'Pectoralis_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'PectoralisTrg_R', 0])])
-
-	addPoseBone(fp, 'LatDorsi_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'LatDorsiTrg_R', 0])])
-
-	addPoseBone(fp, 'Deltoid_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Up', 'DeltoidTrg_R', 0])])
-
-	addPoseBone(fp, 'ElbowBend_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
-		[('StretchTo', 0, 1, ['Stretch', 'ElbowBendTrg_R', 0])])
-
-
-	# Arm deform
-	addDeformLimb(fp, 'UpArm1_L', 'UpArmIK_L', (1,0,1), 'UpArmFK_L', (1,0,1), C_LOCAL, RmodUpArm, [])
-	#addDeformIK2(fp, 'UpArm1_L', 'LoArmIK_L', 'LoArmFK_L', None, None, RmodUpArm, [])
-
-	addPoseBone(fp, 'UpArm2_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodUpArm, 
-		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'UpArmIK_L', (1,1,1), False])])
-
-	addDeformLimb(fp, 'UpArm3_L', 'UpArmIK_L', (0,1,0), 'UpArmFK_L', (0,1,0), C_LOCAL, RmodUpArm, 
-	#addDeformIK2(fp, 'UpArm3_L', 'LoArmIK_L', 'LoArmFK_L', (90*D, 'UpArmPTIK_L'), (90*D, 'UpArmPTFK_L'), RmodUpArm, 
-		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'UpArmIK_L', (1,1,1), False])])
-
-	addDeformLimb(fp, 'LoArm1_L', 'LoArmIK_L', (1,0,1), 'LoArmFK_L', (1,0,1), C_LOCAL, RmodLoArm, [])
-	#addDeformIK2(fp, 'LoArm1_L', 'HandIK_L', 'HandFK_L', None, None, RmodLoArm, [])
-
-	addPoseBone(fp, 'LoArm2_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodLoArm,
-		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'LoArmIK_L', (1,1,1), False])])
-
-	addDeformLimb(fp, 'LoArm3_L', 'LoArmIK_L', (0,1,0), 'LoArmFK_L', (0,1,0), C_LOCAL, RmodLoArm, [])
-	#addDeformIK2(fp, 'LoArm3_L', 'HandIK_L', 'HandFK_L', (90*D, 'LoArmPTIK_L'), (90*D, 'LoArmPTFK_L'), [])
-
-	addPoseBone(fp, 'LoArmFan_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), RmodLoArm,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm1_L', (1,1,1), (0,0,0), False])])
+	addDeformLimb(fp, 'LoArm_L', 'LoArmIK_L', (1,1,1), 'LoArmFK_L', (1,1,1), 0, RmodLoArm, [])
 
 	addDeformLimb(fp, 'Hand_L', 'HandIK_L', (1,1,1), 'HandFK_L', (1,1,1), 0, RmodHand, [])
 
 
-	addDeformLimb(fp, 'UpArm1_R', 'UpArmIK_R', (1,0,1), 'UpArmFK_R', (1,0,1), C_LOCAL, RmodUpArm, [])
-	#addDeformIK2(fp, 'UpArm1_R', 'LoArmIK_R', 'LoArmFK_R', None, None, RmodUpArm, []),
+	addDeformLimb(fp, 'UpArm_R', 'UpArmIK_R', (1,1,1), 'UpArmFK_R', (1,1,1), 0, RmodUpArm, [])
 
-	addPoseBone(fp, 'UpArm2_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodUpArm,
-		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'UpArmIK_R', (1,1,1), False])])
-
-	addDeformLimb(fp, 'UpArm3_R', 'UpArmIK_R', (0,1,0), 'UpArmFK_R', (0,1,0), C_LOCAL, RmodUpArm, 
-	#addDeformIK2(fp, 'UpArm3_R', 'LoArmIK_R', 'LoArmFK_R', (90*D, 'UpArmPTIK_R'), (90*D, 'UpArmPTFK_R'), RmodUpArm, 
-		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'UpArmIK_R', (1,1,1), False])])
-
-	addDeformLimb(fp, 'LoArm1_R', 'LoArmIK_R', (1,0,1), 'LoArmFK_R', (1,0,1), C_LOCAL, RmodLoArm, [])
-	#addDeformIK2(fp, 'LoArm1_R', 'HandIK_R', 'HandFK_R', None, None, RmodLoArm, []),
-
-	addPoseBone(fp, 'LoArm2_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodLoArm, 
-		[('CopyScale', C_LOCAL, 0, ['ScaleIK', 'LoArmIK_R', (1,1,1), False])])
-
-	addDeformLimb(fp, 'LoArm3_R', 'LoArmIK_R', (0,1,0), 'LoArmFK_R', (0,1,0), C_LOCAL, RmodLoArm, [])
-	#addDeformIK2(fp, 'LoArm3_R', 'HandIK_R', 'HandFK_R', (90*D, 'LoArmPTIK_R'), (90*D, 'LoArmPTFK_R'), RmodLoArm, []),
-
-	addPoseBone(fp, 'LoArmFan_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), RmodLoArm,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm1_R', (1,1,1), (0,0,0), False])])
+	addDeformLimb(fp, 'LoArm_R', 'LoArmIK_R', (1,1,1), 'LoArmFK_R', (1,1,1), 0, RmodLoArm, [])
 
 	addDeformLimb(fp, 'Hand_R', 'HandIK_R', (1,1,1), 'HandFK_R', (1,1,1), 0, RmodHand, [])
+
 
 
 	# FK
@@ -591,6 +514,122 @@ def ArmWritePoses(fp):
 	return
 	
 #
+#	ArmDeformPoses(fp):
+#
+
+def ArmDeformPoses(fp):
+	copyDeform(fp, 'Sternum', 0, U_LOC+U_ROT)
+	copyDeform(fp, 'Shoulder_L', 0, U_LOC+U_ROT)
+	copyDeform(fp, 'Shoulder_R', 0, U_LOC+U_ROT)
+	
+	# Shoulder	
+	addPoseBone(fp, 'ShoulderPivot_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'Shoulder_L', (1,1,1), (0,0,0), False])])
+	
+	addPoseBone(fp, 'ShoulderUp_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	
+	addDeformIK(fp, 'ShoulderAim_L', 'SternumTarget', (90*D, 'ShoulderUp_L'))
+	
+	addPoseBone(fp, 'Scapula_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	
+	
+	addPoseBone(fp, 'ShoulderPivot_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'Shoulder_R', (1,1,1), (0,0,0), False])])
+	
+	addPoseBone(fp, 'ShoulderUp_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	
+	addDeformIK(fp, 'ShoulderAim_R', 'SternumTarget', (90*D, 'ShoulderUp_L'))
+	
+	addPoseBone(fp, 'Scapula_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+	
+	
+	'''
+	addPoseBone(fp, 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_L', 1])])
+	
+	addPoseBone(fp, 'Trapezeus-1_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_L', 1])])
+	
+	addPoseBone(fp, 'Trapezeus-2_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'LatDorsiTrg_L', 0])])
+	
+	addPoseBone(fp, 'Clavicle_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_R', 1])])
+	
+	addPoseBone(fp, 'Trapezeus-1_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'Shoulder_R', 1])])
+	
+	addPoseBone(fp, 'Trapezeus-2_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', 0, 1, ['Stretch', 'LatDorsiTrg_R', 0])])
+	
+	
+	# Shoulder deform
+	addPoseBone(fp, 'Pectoralis_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'PectoralisTrg_L', 0])])
+	
+	addPoseBone(fp, 'LatDorsi_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'LatDorsiTrg_L', 0])])
+	
+	addPoseBone(fp, 'Deltoid_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Up', 'DeltoidTrg_L', 0])])
+	
+	addPoseBone(fp, 'ElbowBend_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'ElbowBendTrg_L', 0])])
+	
+	
+	addPoseBone(fp, 'Pectoralis_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'PectoralisTrg_R', 0])])
+	
+	addPoseBone(fp, 'LatDorsi_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'LatDorsiTrg_R', 0])])
+	
+	addPoseBone(fp, 'Deltoid_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Up', 'DeltoidTrg_R', 0])])
+	
+	addPoseBone(fp, 'ElbowBend_R', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'ElbowBendTrg_R', 0])])
+	'''
+	
+	
+	# Arm deform
+	copyDeformPartial(fp, 'UpArm1_L', 'UpArm_L', (1,0,1), RmodUpArm, U_LOC+U_ROT+U_SCALE)
+	
+	copyDeformPartial(fp, 'UpArm2_L', 'UpArm_L', (1,1,1), RmodUpArm, U_SCALE)
+		
+	copyDeformPartial(fp, 'UpArm3_L', 'UpArm_L', (0,1,0), RmodUpArm, U_ROT+U_SCALE)
+
+	copyDeformPartial(fp, 'LoArm1_L', 'LoArm_L', (1,0,1), RmodLoArm, U_LOC+U_ROT+U_SCALE)
+	
+	copyDeformPartial(fp, 'LoArm2_L', 'LoArm_L', (1,1,1), RmodLoArm, U_SCALE)
+		
+	copyDeformPartial(fp, 'LoArm3_L', 'LoArm_L', (0,1,0), RmodLoArm, U_ROT+U_SCALE)
+		
+	addPoseBone(fp, 'LoArmFan_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), RmodLoArm,
+		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm_L', (1,1,1), (0,0,0), False])])
+	
+	copyDeform(fp, 'Hand_L', RmodHand, U_LOC+U_ROT)
+
+
+	copyDeformPartial(fp, 'UpArm1_R', 'UpArm_R', (1,0,1), RmodUpArm, U_LOC+U_ROT+U_SCALE)
+	
+	copyDeformPartial(fp, 'UpArm2_R', 'UpArm_R', (1,1,1), RmodUpArm, U_SCALE)
+		
+	copyDeformPartial(fp, 'UpArm3_R', 'UpArm_R', (0,1,0), RmodUpArm, U_ROT+U_SCALE)
+
+	copyDeformPartial(fp, 'LoArm1_R', 'LoArm_R', (1,0,1), RmodLoArm, U_LOC+U_ROT+U_SCALE)
+	
+	copyDeformPartial(fp, 'LoArm2_R', 'LoArm_R', (1,1,1), RmodLoArm, U_SCALE)
+		
+	copyDeformPartial(fp, 'LoArm3_R', 'LoArm_R', (0,1,0), RmodLoArm, U_ROT+U_SCALE)
+		
+	addPoseBone(fp, 'LoArmFan_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), RmodLoArm,
+		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm_R', (1,1,1), (0,0,0), False])])
+	
+	copyDeform(fp, 'Hand_R', RmodHand, U_LOC+U_ROT)
+
+	return
+	
+#
 #	ArmWriteActions(fp)
 #
 
@@ -603,20 +642,12 @@ def ArmWriteActions(fp):
 #
 
 ArmFKIKDrivers = [
-	("UpArm1_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
-	("UpArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
-	#("UpArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
-	("LoArm1_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
-	("LoArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
-	#("LoArm3_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
+	("UpArm_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
+	("LoArm_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 	("Hand_L", True, ["RotFK"], ["RotIK"], "PArmIK_L", "LOC_X", 1.0),
 
-	("UpArm1_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
-	("UpArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
-	#("UpArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
-	("LoArm1_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
-	("LoArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
-	#("LoArm3_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
+	("UpArm_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
+	("LoArm_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 	("Hand_R", True, ["RotFK"], ["RotIK"], "PArmIK_R", "LOC_X", 1.0),
 ]
 

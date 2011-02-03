@@ -230,41 +230,62 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 			#	(x, y) = mhxbones.boneRoll[bone]
 			#	fp.write("    roll %.6g ;\n" % (y))
 			elif words[1] == 'refer-human':
-				fp.write("    %s Refer Object %s ;\n" % (words[2], theHuman))
-			elif words[1] == 'rig-bones':
-				fp.write("Armature %s %s   Normal \n" % (theHuman, theHuman))
-				if rig == 'mhx':
-					mhx_rig.writeAllArmatures(fp)
+				if words[3] == 'ControlRig':
+					fp.write("    %s Refer Object %s ;\n" % (words[2], theHuman))
+				elif words[3] == 'DeformRig':
+					fp.write("    %s Refer Object %sDeformRig ;\n" % (words[2], theHuman))
 				else:
-					mh2proxy.writeRigBones(fp, rig.bones)
+					raise NameError("refer-human: %s" % line)
+			elif words[1] == 'rig-bones':
+				if words[2] == 'ControlRig':
+					fp.write("Armature %s %s   Normal \n" % (theHuman, theHuman))
+					if rig == 'mhx':
+						mhx_rig.writeControlArmature(fp)
+					else:
+						mh2proxy.writeRigBones(fp, rig.bones)
+				elif words[2] == 'DeformRig':
+					fp.write("Armature %sDeformRig %sDeformRig   Normal \n" % (theHuman, theHuman))
+					if rig == 'mhx':
+						mhx_rig.writeDeformArmature(fp)
+				else:
+					raise NameError("rig-bones: %s" % line)
 			elif words[1] == 'human-object':
 				if words[2] == 'Mesh':
 					fp.write("Object %sMesh MESH %sMesh\n"  % (theHuman, theHuman))
-				else:
+				elif words[2] == 'ControlRig':
 					fp.write("Object %s ARMATURE %s\n"  % (theHuman, theHuman))
-			elif words[1] == 'rig-poses':
-				if rig == 'mhx':
-					fp.write("Pose %s\n" % theHuman)
-					mhx_rig.writeAllPoses(fp)
-					fp.write(
-"  ik_solver 'LEGACY' ;\n" +
-"end Pose\n")
 				else:
-					mh2proxy.writeRigPose(fp, rig.name, rig.bones)
+					fp.write("Object %sDeformRig ARMATURE %sDeformRig\n"  % (theHuman, theHuman))
+			elif words[1] == 'rig-poses':
+				if words[2] == 'ControlRig':
+					if rig == 'mhx':
+						fp.write("Pose %s\n" % theHuman)
+						mhx_rig.writeControlPoses(fp)
+						fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
+					else:
+						mh2proxy.writeRigPose(fp, rig.name, rig.bones)
+				elif words[2] == 'DeformRig':
+					if rig == 'mhx':
+						fp.write("Pose %sDeformRig\n" % theHuman)
+						mhx_rig.writeDeformPoses(fp)
+						fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
 			elif words[1] == 'rig-actions':
 				if rig == 'mhx':
 					fp.write("Pose %s\nend Pose\n" % theHuman)
 					mhx_rig.writeAllActions(fp)
 			elif words[1] == 'rig-drivers':
 				if rig == 'mhx':
-					fp.write("AnimationData %s True\n" % theHuman)
-					mhx_rig.writeAllDrivers(fp)
-					fp.write(
-"  action_blend_type 'REPLACE' ;\n" +
-"  action_extrapolation 'HOLD' ;\n" +
-"  action_influence 1 ;\n" +
-"  use_nla True ;\n" +
-"end AnimationData\n")
+					if words[2] == 'ControlRig':
+						fp.write("AnimationData %s True\n" % theHuman)
+						mhx_rig.writeControlDrivers(fp)
+						rigDriversEnd(fp)
+					elif words[2] == 'DeformRig':
+						fp.write("AnimationData %sDeformRig True\n" % theHuman)
+						mhx_rig.writeDeformDrivers(fp)
+						rigDriversEnd(fp)
+					else:
+						raise NameError("rig-drivers: %s" % line)
+
 			elif words[1] == 'rig-process':
 				pass
 			#	fp.write("Process %s\n" % theHuman)
@@ -412,7 +433,8 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 "  Objects\n" +
 "#if toggle&T_Armature\n" +
 "    ob %s ;\n" % theHuman +
-"    ob %sSpineCurve ;\n" % theHuman +
+"    ob %sDeformRig ;\n" % theHuman +
+#"    ob %sSpineCurve ;\n" % theHuman +
 "#endif\n" +
 "#if toggle&T_Mesh\n" +
 "    ob %sMesh ;\n" % theHuman +
@@ -477,6 +499,18 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 	tmpl.close()
 
 	return
+
+#
+#	rigDriversEnd(fp):										
+#
+
+def rigDriversEnd(fp):										
+	fp.write(
+"  action_blend_type 'REPLACE' ;\n" +
+"  action_extrapolation 'HOLD' ;\n" +
+"  action_influence 1 ;\n" +
+"  use_nla True ;\n" +
+"end AnimationData\n")
 
 #
 #	groupProxy(typ, fp, proxyData):

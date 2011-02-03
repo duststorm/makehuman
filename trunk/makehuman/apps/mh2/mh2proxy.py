@@ -357,12 +357,15 @@ def writeProxyArmature(fp, obj, proxy):
 	return
 
 def writeRigBones(fp, bones):
+	ox = mhx_rig.Origin[0]
+	oy = mhx_rig.Origin[1]
+	oz = mhx_rig.Origin[2]
 	for (bone, head, tail, roll, parent, options) in bones:
 		fp.write("\n  Bone %s True\n" % bone)
 		(x, y, z) = head
-		fp.write("    head  %.4f %.4f %.4f  ;\n" % (x,-z,y))
+		fp.write("    head  %.4f %.4f %.4f  ;\n" % (x-ox,-z+oz,y-oy))
 		(x, y, z) = tail
-		fp.write("    tail %.4f %.4f %.4f  ;\n" % (x,-z,y))
+		fp.write("    tail %.4f %.4f %.4f  ;\n" % (x-ox,-z+oy,y-oy))
 		if parent and parent != '-':
 			fp.write("    parent Refer Bone %s ;\n" % parent)
 		fp.write(

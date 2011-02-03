@@ -95,7 +95,7 @@ PanelHeadsTails = [
 ]
 
 
-PanelArmature = [
+PanelControlArmature = [
 	('PFace',		pi, Master, F_WIR, L_PANEL, NoBB),
 	('PFaceDisp',	pi, 'PFace', F_WIR+F_RES, L_PANEL, NoBB),
 	('PBrow_R',		pi, 'PFace', 0, L_PANEL, NoBB),
@@ -139,7 +139,7 @@ PanelArmature = [
 ]
 
 #
-#	PanelWritePoses(fp):
+#	PanelControlPoses(fp):
 #
 
 #MX = 0.25
@@ -151,7 +151,7 @@ neg = ('0', '-4.0')
 
 FMX = 0.7
 
-def PanelWritePoses(fp):
+def PanelControlPoses(fp):
 	addPoseBone(fp, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
 		#[('ChildOf', C_CHILDOF, 1, ['Body', 'Root', (1,1,1), (1,1,1), (1,1,1)]) ])
 

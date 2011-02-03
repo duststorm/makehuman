@@ -5,12 +5,15 @@
 
 # --------------- Actions ----------------------------- # 
 
-*** rig-actions
-*** rig-poses
-*** rig-drivers
+# *** rig-actions
+*** rig-poses ControlRig
+*** rig-drivers ControlRig
 *** rig-correct
 
-*** material-drivers
+*** rig-poses DeformRig
+*** rig-drivers DeformRig
+
+# *** material-drivers
 
 # ---------------- Groups -------------------------------- # 
 
