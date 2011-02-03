@@ -68,13 +68,14 @@ class Texture(mh.Texture):
         mh.Texture.__init__(self)
         self.modified = None
         
-def getTexture(path):
+def getTexture(path, cache=None):
 
     texture = None
+    cache = cache or textureCache
     
-    if path in textureCache:
+    if path in cache:
         
-        texture = textureCache[path]
+        texture = cache[path]
         
         if os.stat(path).st_mtime != texture.modified:
             
@@ -96,7 +97,7 @@ def getTexture(path):
             print text
         else:
             texture.modified = os.stat(path).st_mtime
-            textureCache[path] = texture
+            cache[path] = texture
             
     return texture
 
@@ -779,7 +780,7 @@ class Object3D:
         except IndexError, text:
             pass
 
-    def setTexture(self, path):
+    def setTexture(self, path, cache=None):
         """
         This method is used to specify the path of a TGA file on disk containing the object texture.
 
@@ -789,13 +790,13 @@ class Object3D:
         path:
             *string* The path of a texture TGA file.
         """
-
+        
         self.texture = path
         
         if not path:
             self.clearTexture()
         
-        texture = getTexture(path)
+        texture = getTexture(path, cache)
         
         if texture:
             try:

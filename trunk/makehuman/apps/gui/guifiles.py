@@ -144,6 +144,8 @@ class LoadTaskView(gui3d.TaskView):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
+    def onResized(self, event):
+        self.filechooser.onResized(event)
 
 class ExportTaskView(gui3d.TaskView):
 

@@ -90,6 +90,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
     def onResized(self, event):
         self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[0] - 190 * 2)
+        self.filechooser.onResized(event)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

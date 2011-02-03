@@ -443,6 +443,9 @@ class Application(events3d.EventHandler):
         
     def redrawNow(self):
         mh.redraw(0)
+        
+    def getWindowSize(self):
+        return mh.getWindowSize()
 
     def isVisible(self):
         return True
@@ -1380,9 +1383,91 @@ class FileEntryView(View):
 
 
 # FileChooser widget
-
+class FileChooserRectangle(Object):
+    
+    def __init__(self, parent, position, texture, file):
+        
+        mesh = RectangleMesh(128, 128, texture)
+        Object.__init__(self, parent, position, mesh)
+        
+        self.file = file
+        
+    def onClicked(self, event):
+        self.view.callEvent('onFileSelected', self.file)
 
 class FileChooser(View):
+    
+    def __init__(self, parent, path, extension, previewExtension='bmp'):
+        View.__init__(self, parent)
+        
+        self.path = path
+        self.extension = extension
+        self.previewExtension = previewExtension
+        self.files = []
+        
+    def getPreview(self, filename):
+        
+        preview = filename
+        if self.previewExtension:
+            preview = filename.replace(os.path.splitext(filename)[-1], '.' + self.previewExtension)
+        return preview
+        
+    def onShow(self, event):
+        
+        if not self.files:
+        
+            if isinstance(self.extension, str):
+                for f in os.listdir(self.path):
+                    if f.endswith('.' + self.extension):
+                        self.files.append(f)
+            elif isinstance(self.extension, list):
+                for f in os.listdir(self.path):
+                    for ext in self.extension:
+                        if f.endswith('.' + ext):
+                            self.files.append(f)
+            
+            width, height = self.app.getWindowSize()
+            
+            x = 10
+            y = 80
+            for file in self.files:
+                
+                if x > width - 140 - 10:
+                    x = 10
+                    y += 150
+                    
+                FileChooserRectangle(self, [x, y, 9], os.path.join(self.path, self.getPreview(file)), file)
+                if isinstance(self.extension, str):
+                    file = file.replace(os.path.splitext(file)[-1], '')
+                TextObject(self, [x, y + 134, 9.5], file)
+                
+                x += 140
+                
+            self.app.scene3d.update()
+            
+    def onResized(self, event):
+        
+        print 'onResized'
+        
+        width, height, _ = event
+        
+        x = 10
+        y = 80
+        for index, object in enumerate(self.objects):
+            
+            if x > width - 140 - 10:
+                x = 10
+                y += 150
+                
+            print 'setPosition'
+            
+            if index & 1:
+                object.setPosition([x, y + 134, 9])
+                x += 140
+            else:
+                object.setPosition([x, y, 9])
+               
+class FileChooser2(View):
     
     """
     A FileEntryView widget. This widget can be used to let the user choose an existing file.
