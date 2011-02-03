@@ -1667,13 +1667,13 @@ def setupCylinder(fp, name, r, h, offs, mat):
 	z = h + dz
 	for n in range(6):
 		a = n*pi/3
-		x = rx*cos(a) + dx
+		x = -rx*cos(a) + dx
 		y = ry*sin(a) + dy
 		fp.write("    v %.3f %.3f %.3f ;\n" % (x,z,y))
 	z = dz
 	for n in range(6):
 		a = n*pi/3
-		x = rx*cos(a) + dx
+		x = -rx*cos(a) + dx
 		y = ry*sin(a) + dy
 		fp.write("    v %.3f %.3f %.3f ;\n" % (x,z,y))
 	fp.write(
