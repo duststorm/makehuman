@@ -49,12 +49,12 @@ FaceControlArmature = [
 ]
 
 FaceDeformArmature = [
-	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
-	('TongueBase',	0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
-	('TongueMid',	0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
-	('TongueTip',	0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
-	('Eye_R',		0.0, 'Head', F_DEF, L_DEF, NoBB),
-	('Eye_L',		0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('Jaw',			0.0, 'Head', F_DEF, L_MAIN, NoBB),
+	('TongueBase',	0.0, 'Jaw', F_DEF, L_MAIN, NoBB),
+	('TongueMid',	0.0, 'TongueBase', F_DEF, L_MAIN, NoBB),
+	('TongueTip',	0.0, 'TongueMid', F_DEF, L_MAIN, NoBB),
+	('Eye_R',		0.0, 'Head', F_DEF, L_MAIN, NoBB),
+	('Eye_L',		0.0, 'Head', F_DEF, L_MAIN, NoBB),
 	('UpLid_R',		0.279253, 'Head', F_DEF, L_DEF, NoBB),
 	('LoLid_R',		0.0, 'Head', F_DEF, L_DEF, NoBB),
 	('UpLid_L',		-0.279253, 'Head', F_DEF, L_DEF, NoBB),
@@ -91,10 +91,10 @@ def FaceControlPoses(fp):
 #
 
 def FaceDeformPoses(fp):
-	copyDeform(fp, 'Jaw', 0, U_LOC+U_ROT)
-	copyDeform(fp, 'TongueBase', 0, U_LOC+U_ROT+U_SCALE)
-	copyDeform(fp, 'TongueMid', 0, U_LOC+U_ROT+U_SCALE)
-	copyDeform(fp, 'TongueTip', 0, U_LOC+U_ROT+U_SCALE)
+	copyDeform(fp, 'Jaw', 0, U_LOC+U_ROT, 'MHDefJaw')
+	copyDeform(fp, 'TongueBase', 0, U_LOC+U_ROT+U_SCALE, 'MHDefTongue')
+	copyDeform(fp, 'TongueMid', 0, U_LOC+U_ROT+U_SCALE, 'MHDefTongue')
+	copyDeform(fp, 'TongueTip', 0, U_LOC+U_ROT+U_SCALE, 'MHDefTongue')
 
 	addPoseBone(fp, 'UpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 

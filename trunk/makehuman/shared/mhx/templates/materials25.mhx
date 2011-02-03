@@ -576,4 +576,23 @@ Material Invisio
   offset_z 0 ;
 end Material
 
+Material Pink 
+  diffuse_color Array 0.8 0.521 0.364  ;
+end Material
+
+Material Green
+  diffuse_color Array 0.2 0.8 0.2  ;
+end Material
+
+Material Blue
+  diffuse_color Array 0.2 0.2 0.8  ;
+end Material
+
+Material Red
+  diffuse_color Array 0.8 0.2 0.2  ;
+end Material
+
+Material White
+  diffuse_color Array 0.8 0.8 0.8  ;
+end Material
 

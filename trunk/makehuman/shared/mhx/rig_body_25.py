@@ -114,19 +114,22 @@ BodyControlArmature = [
 ]
 
 BodyDeformArmature = [
-	('Hips',			0.0, 'Root', F_DEF+F_WIR, L_DEF, NoBB),
-	('Spine1',			0.0, 'Root', F_DEF, L_DEF, (0,1,3) ),
-	('Spine2',			0.0, 'Spine1', F_DEF+F_CON, L_DEF, (1,1,3) ),
-	('Spine3',			0.0, 'Spine2', F_DEF+F_CON, L_DEF, (1,1,3) ),
+	('Hips',			0.0, 'Root', F_DEF, L_MAIN, NoBB),
+	('Hip_L',			0.0, 'Hips', 0, L_HELP, NoBB),
+	('Hip_R',			0.0, 'Hips', 0, L_HELP, NoBB),
 
-	('Neck',			0.0, 'Spine3', F_DEF+F_CON+F_WIR, L_SPINE+L_HEAD+L_DEF, (1,1,3) ),
-	('Head',			0.0, 'Neck', F_DEF+F_WIR, L_SPINE+L_HEAD+L_DEF, NoBB),
+	('Spine1',			0.0, 'Root', F_DEF, L_MAIN, (0,1,3) ),
+	('Spine2',			0.0, 'Spine1', F_DEF+F_CON, L_MAIN, (1,1,3) ),
+	('Spine3',			0.0, 'Spine2', F_DEF+F_CON, L_MAIN, (1,1,3) ),
 
-	('Rib',				0.0, 'Spine3', F_DEF, L_DEF, NoBB),
-	('Breast_L',		-45*D, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
-	('Breast_R',		45*D, 'Rib', F_DEF, L_TORSO+L_DEF, NoBB),
-	('StomachUp',		0.0, 'Rib', F_DEF, L_DEF, NoBB),
-	('StomachLo',		0.0, 'Hips', F_DEF, L_DEF, NoBB),
+	('Neck',			0.0, 'Spine3', F_DEF+F_CON, L_MAIN, (1,1,3) ),
+	('Head',			0.0, 'Neck', F_DEF, L_MAIN, NoBB),
+
+	('Rib',				0.0, 'Spine3', F_DEF, L_MAIN, NoBB),
+	('Breast_L',		-45*D, 'Rib', F_DEF, L_DEF, NoBB),
+	('Breast_R',		45*D, 'Rib', F_DEF, L_DEF, NoBB),
+	('StomachUp',		0.0, 'Rib', F_DEF, L_MAIN, NoBB),
+	('StomachLo',		0.0, 'Hips', F_DEF, L_MAIN, NoBB),
 
 	('Penis',			0.0, 'Hips', F_DEF, L_DEF, (1,5,1) ),
 	('Scrotum',			0.0, 'Hips', F_DEF, L_DEF, NoBB),
@@ -162,7 +165,7 @@ def BodyControlPoses(fp):
 	addPoseBone(fp,  'Spine2', 'MHCircle10', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
  		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-90*D,70*D, -20*D,20*D, -50*D,50*D), (1,1,1)])])
 
-	addPoseBone(fp,  'Spine3', 'MHChest', 'Spine', (0,0,0), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
+	addPoseBone(fp,  'Spine3', 'MHChest', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH,
  		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-20*D,20*D, 0,0, -20*D,20*D), (1,1,1)]) ])
 
 	# Neck and head
@@ -192,30 +195,33 @@ def BodyControlPoses(fp):
 	return
 
 def BodyDeformPoses(fp):
-	copyDeform(fp,'Hips', 0, U_LOC+U_ROT)
-	copyDeform(fp,'Spine1', 0, U_LOC+U_ROT)
-	copyDeform(fp,'Spine2', 0, U_LOC+U_ROT)
-	copyDeform(fp,'Spine3', 0, U_LOC+U_ROT)
+	copyDeform(fp,'Hips', 0, U_LOC+U_ROT, 'MHDefHips')
+	#copyDeform(fp,'Hip_L', 0, U_LOC+U_ROT, None)
+	#copyDeform(fp,'Hip_R', 0, U_LOC+U_ROT, None)
 
-	copyDeform(fp,'Neck', 0, U_LOC+U_ROT)
-	copyDeform(fp,'Head', 0, U_LOC+U_ROT)
+	copyDeform(fp,'Spine1', 0, U_LOC+U_ROT, 'MHDefSpine1')
+	copyDeform(fp,'Spine2', 0, U_LOC+U_ROT, 'MHDefSpine2')
+	copyDeform(fp,'Spine3', 0, U_LOC+U_ROT, 'MHDefChest')
 
-	copyDeform(fp,'Rib', 0, U_LOC+U_ROT)
-	copyDeform(fp,'Breast_L', 0, U_LOC+U_ROT)
-	copyDeform(fp,'Breast_R', 0, U_LOC+U_ROT)
+	copyDeform(fp,'Neck', 0, U_LOC+U_ROT, 'MHDefNeck')
+	copyDeform(fp,'Head', 0, U_LOC+U_ROT, 'MHDefHead')
 
-	addPoseBone(fp,  'StomachLo', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
+	copyDeform(fp,'Rib', 0, U_LOC+U_ROT, 'MHDefRib')
+	copyDeform(fp,'Breast_L', 0, U_LOC+U_ROT, None)
+	copyDeform(fp,'Breast_R', 0, U_LOC+U_ROT, None)
+
+	addPoseBone(fp,  'StomachLo', 'MHDefStomach', None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
 		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'StomachTarget', 0]),
 		 ('CopyScale', C_DEFRIG+C_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
 		])
 
-	addPoseBone(fp,  'StomachUp', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp,  'StomachUp', 'MHDefRib', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
 		[('StretchTo', C_DEFRIG, 1, ['Stretch', 'StomachTarget', 0]),
 		 ('CopyScale', C_DEFRIG+C_LOCAL, 1, ['CopyScale', 'StomachTarget', (1,0,1), False]),
 		])
 
-	copyDeform(fp,'Penis', 0, U_LOC+U_ROT)
-	copyDeform(fp,'Scrotum', 0, U_LOC+U_ROT)
+	copyDeform(fp,'Penis', 0, U_LOC+U_ROT, None)
+	copyDeform(fp,'Scrotum', 0, U_LOC+U_ROT, None)
 	return
 
 #

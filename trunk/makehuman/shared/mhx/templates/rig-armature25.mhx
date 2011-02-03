@@ -30,14 +30,14 @@ end Object
   show_axes False ;
   show_names False ;
   draw_type 'BBONE' ;
-  layers Array 0 0 0 0 0 0 0 0  0 0 0 0 0 0 0 1  0 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0  ;
+  layers Array 1 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0  0 0 0 0 0 0 0 0  ;
   layers_protected Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
   use_mirror_x False ;
 end Armature
 
 *** human-object DeformRig
-  layers Array 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+  layers Array 0 0 0 0 0 0 0 0 0 0  0 1 0 0 0 0 0 0 0 0  ;
   up_axis 'Z' ;
   show_x_ray True ;
   # draw_type 'WIRE' ;

@@ -152,37 +152,37 @@ FingerControlArmature = [
 #
 
 FingerDeformArmature = [
-	('Finger-1-1_L',		ThumbRoll, 'Hand_L', F_DEF, L_HANDFK+L_HANDIK, NoBB),
-	('Finger-1-2_L',		ThumbRoll, 'Finger-1-1_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-1-3_L',		ThumbRoll, 'Finger-1-2_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-2-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-2-2_L',		0.0, 'Finger-2-1_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-2-3_L',		0.0, 'Finger-2-2_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-3-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-3-2_L',		0.0, 'Finger-3-1_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-3-3_L',		0.0, 'Finger-3-2_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-4-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-4-2_L',		0.0, 'Finger-4-1_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-4-3_L',		0.0, 'Finger-4-2_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-5-1_L',		0.0, 'Hand_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-5-2_L',		0.0, 'Finger-5-1_L', F_DEF, L_HANDFK, NoBB),
-	('Finger-5-3_L',		0.0, 'Finger-5-2_L', F_DEF, L_HANDFK, NoBB),
+	('Finger-1-1_L',		ThumbRoll, 'Hand_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-1-2_L',		ThumbRoll, 'Finger-1-1_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-1-3_L',		ThumbRoll, 'Finger-1-2_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-2-1_L',		0.0, 'Hand_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-2-2_L',		0.0, 'Finger-2-1_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-2-3_L',		0.0, 'Finger-2-2_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-3-1_L',		0.0, 'Hand_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-3-2_L',		0.0, 'Finger-3-1_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-3-3_L',		0.0, 'Finger-3-2_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-4-1_L',		0.0, 'Hand_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-4-2_L',		0.0, 'Finger-4-1_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-4-3_L',		0.0, 'Finger-4-2_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-5-1_L',		0.0, 'Hand_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-5-2_L',		0.0, 'Finger-5-1_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-5-3_L',		0.0, 'Finger-5-2_L', F_DEF, L_MAIN+L_HANDFK, NoBB),
 
-	('Finger-1-1_R',		-ThumbRoll, 'Hand_R', F_DEF, L_HANDFK+L_HANDIK, NoBB),
-	('Finger-1-2_R',		-ThumbRoll, 'Finger-1-1_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-1-3_R',		-ThumbRoll, 'Finger-1-2_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-2-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-2-2_R',		0.0, 'Finger-2-1_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-2-3_R',		0.0, 'Finger-2-2_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-3-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-3-2_R',		0.0, 'Finger-3-1_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-3-3_R',		0.0, 'Finger-3-2_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-4-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-4-2_R',		0.0, 'Finger-4-1_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-4-3_R',		0.0, 'Finger-4-2_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-5-1_R',		0.0, 'Hand_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-5-2_R',		0.0, 'Finger-5-1_R', F_DEF, L_HANDFK, NoBB),
-	('Finger-5-3_R',		0.0, 'Finger-5-2_R', F_DEF, L_HANDFK, NoBB),
+	('Finger-1-1_R',		-ThumbRoll, 'Hand_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-1-2_R',		-ThumbRoll, 'Finger-1-1_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-1-3_R',		-ThumbRoll, 'Finger-1-2_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-2-1_R',		0.0, 'Hand_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-2-2_R',		0.0, 'Finger-2-1_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-2-3_R',		0.0, 'Finger-2-2_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-3-1_R',		0.0, 'Hand_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-3-2_R',		0.0, 'Finger-3-1_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-3-3_R',		0.0, 'Finger-3-2_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-4-1_R',		0.0, 'Hand_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-4-2_R',		0.0, 'Finger-4-1_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-4-3_R',		0.0, 'Finger-4-2_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-5-1_R',		0.0, 'Hand_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-5-2_R',		0.0, 'Finger-5-1_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
+	('Finger-5-3_R',		0.0, 'Finger-5-2_R', F_DEF, L_MAIN+L_HANDFK, NoBB),
 ]
 
 #
@@ -249,6 +249,6 @@ def FingerDeformPoses(fp):
 		for fnum in range(1,6):
 			for lnum in range(1,4):
 				fing = 'Finger-%d-%d%s' % (fnum, lnum, suffix)
-				copyDeform(fp, fing, 0, U_LOC+U_ROT)
+				copyDeform(fp, fing, 0, U_LOC+U_ROT, 'MHDefFinger')
 	return
 

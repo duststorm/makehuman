@@ -505,9 +505,9 @@ def parseDefaultType(typ, args, tokens):
     name = args[0]
     data = None
     expr = "bpy.data.%s.new('%s')" % (Plural[typ], name)
-    print(expr)
+    # print(expr)
     data = eval(expr)
-    print("  ok", data)
+    # print("  ok", data)
 
     bpyType = typ.capitalize()
     print(bpyType, name, data)
@@ -2200,7 +2200,7 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 
     if ext == 'bpyops':
         expr = "bpy.ops.%s" % args[0]
-        print(expr)
+        # print(expr)
         exec(expr)
         return
         

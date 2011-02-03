@@ -356,7 +356,7 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 				if proxy.rig:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
 				else:
-					fp.write("      object Refer Object %s ;\n" % theHuman)
+					fp.write("      object Refer Object %sDeformRig ;\n" % theHuman)
 			elif words[1] == 'ProxyVerts':
 				for bary in proxy.realVerts:
 					(x,y,z) = mh2proxy.proxyCoord(bary)

@@ -421,10 +421,12 @@ U_LOC = 1
 U_ROT = 2
 U_SCALE = 4
 
-def copyDeformPartial(fp, dbone, cbone, channels, flags, copy):
+def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape):
 	fp.write("\n  Posebone %s %s \n" % (dbone, True))
 	rotMode = rotationMode(flags)
 	fp.write("  rotation_mode '%s' ;\n" % rotMode)
+	if customShape:
+		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
 	if copy & U_LOC:
 		addCopyLocConstraint(fp, '', 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), False])
 	if copy & U_ROT:
@@ -434,8 +436,8 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy):
 	fp.write("  end Posebone\n")
 	return
 
-def copyDeform(fp, bone, flags, copy):
-	copyDeformPartial(fp, bone, bone, (1,1,1), flags, copy)
+def copyDeform(fp, bone, flags, copy, customShape):
+	copyDeformPartial(fp, bone, bone, (1,1,1), flags, copy, customShape)
 
 #
 #	addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik_dof, flags, constraints):
@@ -1131,8 +1133,8 @@ def addChildOfConstraint(fp, rig, flags, inf, data):
 "      use_scale_x %s ;\n" % scalex +
 "      use_scale_y %s ;\n" % scaley +
 "      use_scale_z %s ;\n" % scalez +
-"    end Constraint\n" +
-"    bpyops constraint.childof_set_inverse(constraint='%s',owner='BONE') ;\n" % name)
+"    end Constraint\n")
+#"    bpyops constraint.childof_set_inverse(constraint='%s',owner='BONE') ;\n" % name
 	return
 
 #
@@ -1649,6 +1651,56 @@ def setupCube(fp, name, r, offs):
 "  parent Refer Object CustomShapes ;\n" +
 "end Object\n")
 
+def setupCylinder(fp, name, r, h, offs, mat):
+	try:
+		(rx,ry) = r
+	except:
+		(rx,ry) = (r,r)
+	try:
+		(dx,dy,dz) = offs
+	except:
+		(dx,dy,dz) = (0,offs,0)
+
+	fp.write(
+"Mesh %s %s \n" % (name, name) +
+"  Verts\n")
+	z = h + dz
+	for n in range(6):
+		a = n*pi/3
+		x = rx*cos(a) + dx
+		y = ry*sin(a) + dy
+		fp.write("    v %.3f %.3f %.3f ;\n" % (x,z,y))
+	z = dz
+	for n in range(6):
+		a = n*pi/3
+		x = rx*cos(a) + dx
+		y = ry*sin(a) + dy
+		fp.write("    v %.3f %.3f %.3f ;\n" % (x,z,y))
+	fp.write(
+"  end Verts\n" +
+"  Faces\n" +
+"    f 0 6 7 1 ;\n" +
+"    f 1 7 8 2 ;\n" +
+"    f 2 8 9 3 ;\n" +
+"    f 3 9 10 4 ;\n" +
+"    f 4 10 11 5 ;\n" +
+"    f 6 0 5 11 ;\n" +
+"    f 8 11 10 9 ;\n" +
+"    f 6 11 8 7 ;\n" +
+"    f 0 1 2 3 ;\n" +
+"    f 5 0 3 4 ;\n" +
+"    ftall 0 1 ;\n" +
+"  end Faces\n" +
+"  Material %s ;\n" % mat +
+"end Mesh\n" +
+"Object %s MESH %s\n" % (name, name) +
+"  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
+"  parent Refer Object CustomShapes ;\n" +
+#"  Modifier Subsurf SUBSURF\n" +
+#"  end Modifier\n" +
+"end Object\n")
+
+
 def setupCircles(fp):
 	setupCircle(fp, "MHCircle01", 0.1)
 	setupCircle(fp, "MHCircle025", 0.25)
@@ -1662,6 +1714,28 @@ def setupCircles(fp):
 	setupCube(fp, "MHEndCube01", 0.1, 1)
 	setupCube(fp, "MHChest", (0.7,0.25,0.5), (0,0.5,0.35))
 	setupCube(fp, "MHRoot", (1.25,0.5,1.0), 1)
+
+	setupCylinder(fp, 'MHDefArm', 0.16, 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefUpArm2', 0.4, 1, 0, 'Green')
+	setupCylinder(fp, 'MHDefUpArm3', 0.3, 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefHand', (0.5, 0.25), 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefFinger', 0.3, 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefHead', (0.8,0.8), 1.6, (0,0.4,-0.3), 'Pink')
+	setupCylinder(fp, 'MHDefNeck', 0.4, 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefJaw', (0.5, 0.2), 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefChest', (1.0,0.55), 1, (0,0.25,-0.2), 'Green')
+	setupCylinder(fp, 'MHDefSpine2', (1.0,0.8), 1, (0,0.25,0), 'Green')
+	setupCylinder(fp, 'MHDefSpine1', (1.2,0.9), 1, (0,0.25,0), 'Green')
+	setupCylinder(fp, 'MHDefRib', (0.8,0.2), 1, (0,0.1,0), 'Green')
+	setupCylinder(fp, 'MHDefStomach', (0.8,0.2), 1, (0,-0.1,0), 'Green')
+	setupCylinder(fp, 'MHDefHips', (1.6,1.3), 1.6, (0,0,-0.5), 'Blue')
+	setupCylinder(fp, 'MHDefShoulder', 0.2, 1, 0, 'Green')
+	setupCylinder(fp, 'MHDefLeg', 0.12, 1, 0, 'Blue')
+	setupCylinder(fp, 'MHDefUpLeg2', (0.4,0.5), 1, 0, 'Blue')
+	setupCylinder(fp, 'MHDefUpLeg3', 0.32, 1, 0, 'Blue')
+	setupCylinder(fp, 'MHDefFoot', (0.45, 0.2), 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefToe', (0.8, 0.3), 1, 0, 'Pink')
+	setupCylinder(fp, 'MHDefTongue', (1.0,0.3), 1, 0, 'Red')
 	return
 
 #
@@ -1748,11 +1822,11 @@ def writeAllActions(fp):
 
 def writeControlDrivers(fp):
 	writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
+	writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
 	#rig_panel_25.FingerControlDrivers(fp)
 	return
 
 def writeDeformDrivers(fp):
-	writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
 	writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers)
 	writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers)
 	rig_face_25.FaceDeformDrivers(fp)
