@@ -124,6 +124,7 @@ BodyControlArmature = [
 ]
 
 BodyDeformArmature = [
+	('Root',			0.0, None, F_WIR, L_MAIN+L_SPINE, NoBB),
 	('Hips',			0.0, 'Root', F_DEF, L_MAIN, NoBB),
 	('Hip_L',			0.0, 'Hips', 0, L_HELP, NoBB),
 	('Hip_R',			0.0, 'Hips', 0, L_HELP, NoBB),
@@ -213,6 +214,7 @@ def BodyControlPoses(fp):
 	return
 
 def BodyDeformPoses(fp):
+	copyDeform(fp,'Root', 0, U_LOC+U_ROT, None)
 	copyDeform(fp,'Hips', 0, U_LOC+U_ROT, 'MHDefHips')
 	#copyDeform(fp,'Hip_L', 0, U_LOC+U_ROT, None)
 	#copyDeform(fp,'Hip_R', 0, U_LOC+U_ROT, None)
