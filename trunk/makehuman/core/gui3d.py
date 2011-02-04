@@ -1425,6 +1425,8 @@ class FileChooser(View):
                     for ext in self.extension:
                         if f.endswith('.' + ext):
                             self.files.append(f)
+                            
+            self.files.sort()
             
             width, height = self.app.getWindowSize()
             
