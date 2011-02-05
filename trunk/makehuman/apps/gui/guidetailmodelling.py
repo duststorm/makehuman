@@ -28,30 +28,198 @@ import events3d
 import gui3d
 import algos3d
 import humanmodifier
+from operator import mul
+from string import Template
+import re
+import math
+import os
 
+class RangeDetailModifier(humanmodifier.GenderAgeRangeModifier):
+    
+    def __init__(self, template, parameterName, parameterRange, always=True):
+    
+        humanmodifier.GenderAgeRangeModifier.__init__(self, template, parameterName, parameterRange, always)
+        
+    def getValue(self, human):
+        
+        return getattr(human, self.parameterName)
+        
+    def setValue(self, human, value):
+        
+        setattr(human, self.parameterName, value)
+        humanmodifier.GenderAgeRangeModifier.setValue(self, human, value)
+        
+class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
+    
+    def __init__(self, template, parameterName, left, right, always=True):
+    
+        humanmodifier.GenderAgeAsymmetricModifier.__init__(self, template, parameterName, left, right, always)
+        
+    def getValue(self, human):
+        
+        return getattr(human, self.parameterName)
+        
+    def setValue(self, human, value):
+        
+        setattr(human, self.parameterName, value)
+        humanmodifier.GenderAgeAsymmetricModifier.setValue(self, human, value)
+        
+class GenitalsModifier(AsymmetricDetailModifier):
+    # This needs a custom modifier because female and male are not used as gender factor
+    
+    def __init__(self):
+    
+        AsymmetricDetailModifier.__init__(self, 'data/targets/details/genitals_${genitals}_${age}.target', 'genitals', 'female', 'male', False)
+        
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
+        targets = [(Template(target[0]).safe_substitute({self.parameterName:value}), target[1] + [value]) for target in targets for value in [self.left, self.right]]
 
-class DetailAction:
+        return targets
+        
+class StomachModifier(AsymmetricDetailModifier):
+    # This needs a custom modifier because tone and weight also need to be included
+    
+    def __init__(self):
+    
+        AsymmetricDetailModifier.__init__(self, 'data/targets/details/${gender}-${age}-${tone}-${weight}-stomach${stomach}.target', 'stomach', '1', '2', False)
+        
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
+        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
+        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
+        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
+        targets = [(Template(target[0]).safe_substitute({self.parameterName:value}), target[1] + [value]) for target in targets for value in [self.left, self.right]]
 
-    def __init__(self, human, method, value, postAction):
-        self.name = method
-        self.human = human
-        self.method = method
-        self.before = getattr(self.human, 'get' + self.method)()
-        self.after = value
-        self.postAction = postAction
+        # Cleanup multiple hyphens and remove a possible hyphen before a dot.
+        doubleHyphen = re.compile(r'-+')
+        hyphenDot = re.compile(r'-\.')
+        
+        targets = [(re.sub(hyphenDot, '.', re.sub(doubleHyphen, '-', target[0])), target[1]) for target in targets]
+        
+        return targets
+        
+    def getFactors(self, human, value):
+        
+        factors = {
+            'female': human.femaleVal,
+            'male': human.maleVal,
+            'child': human.childVal,
+            'young': human.youngVal,
+            'old': human.oldVal,
+            'flaccid':human.flaccidVal,
+            'muscle':human.muscleVal,
+            'averageTone':1.0 - (human.flaccidVal + human.muscleVal),
+            'light':human.underweightVal,
+            'heavy':human.overweightVal,
+            'averageWeight':1.0 - (human.underweightVal + human.overweightVal),
+            self.left: -min(value, 0.0),
+            self.right: max(0.0, value)
+        }
+        
+        return factors
+        
+class BreastsModifier(humanmodifier.GenericModifier):
+    # This needs a custom modifier because it has two extra dimensions
+    
+    def __init__(self):
+    
+        self.breastSizes = ['breastSize%d' % size for size in xrange(1, 9)]
+        humanmodifier.GenericModifier.__init__(self,
+            'data/targets/details/female-${age}-${tone}-${weight}-cup${breastSize}-firmness${breastFirmness}.target')
+            
+    def setValue(self, human, value):
+    
+        value = self.clampValue(value)
+        factors = self.getFactors(human, value)
+        
+        for target in self.targets:
+            human.setDetail(target[0], human.femaleVal * reduce(mul, [factors[factor] for factor in target[1]]))
+        
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
+        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
+        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
+        targets = [(Template(target[0]).safe_substitute(breastFirmness=value), target[1] + ['breastFirmness%d' % value]) for target in targets for value in xrange(0, 2)]
+        targets = [(Template(target[0]).safe_substitute(breastSize=value), target[1] + ['breastSize%d' % value]) for target in targets for value in xrange(1, 9)]
 
-    def do(self):
-        getattr(self.human, 'set' + self.method)(self.after)
-        self.human.applyAllTargets(self.human.app.progress)
-        self.postAction()
-        return True
+        # Cleanup multiple hyphens and remove a possible hyphen before a dot.
+        doubleHyphen = re.compile(r'-+')
+        hyphenDot = re.compile(r'-\.')
+        
+        targets = [(re.sub(hyphenDot, '.', re.sub(doubleHyphen, '-', target[0])), target[1]) for target in targets]
+        
+        return targets
+        
+    def getFactors(self, human, value):
+        
+        factors = {
+            'child': human.childVal,
+            'young': human.youngVal,
+            'old': human.oldVal,
+            'flaccid':human.flaccidVal,
+            'muscle':human.muscleVal,
+            'averageTone':1.0 - (human.flaccidVal + human.muscleVal),
+            'light':human.underweightVal,
+            'heavy':human.overweightVal,
+            'averageWeight':1.0 - (human.underweightVal + human.overweightVal),
+            'breastFirmness0': 1.0 - human.breastFirmness,
+            'breastFirmness1': human.breastFirmness
+        }
+        
+        for factor in self.breastSizes:
+            factors[factor] = 0.0
+        
+        v = human.breastSize * (len(self.breastSizes) - 1)
+        index = int(math.floor(v))
+        v = v - index
+        factors[self.breastSizes[index]] = 1.0 - v
+        if index+1 < len(self.breastSizes):
+            factors[self.breastSizes[index+1]] = v
+        
+        return factors
 
-    def undo(self):
-        getattr(self.human, 'set' + self.method)(self.before)
-        self.human.applyAllTargets(self.human.app.progress)
-        self.postAction()
-        return True
-
+class BreastSizeModifier(BreastsModifier):
+    
+    def __init__(self):
+        
+        BreastsModifier.__init__(self)
+        
+    def getValue(self, human):
+        
+        return human.breastSize
+        
+    def setValue(self, human, value):
+        
+        human.breastSize = value
+        BreastsModifier.setValue(self, human, value)
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+        
+class BreastFirmnessModifier(BreastsModifier):
+    
+    def __init__(self):
+        
+        BreastsModifier.__init__(self)
+    
+    def getValue(self, human):
+        
+        return human.breastFirmness
+        
+    def setValue(self, human, value):
+        
+        human.breastFirmness = value
+        BreastsModifier.setValue(self, human, value)
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
 
 class DetailTool(events3d.EventHandler):
 
@@ -340,285 +508,122 @@ class Detail3dTool(events3d.EventHandler):
         self.selectedGroups = []
         self.app.redraw()
 
+class DetailAction:
+
+    def __init__(self, human, modifier, before, after, postAction):
+        self.name = 'Detail'
+        self.human = human
+        self.modifier = modifier
+        self.before = before
+        self.after = after
+        self.postAction = postAction
+
+    def do(self):
+        self.modifier.setValue(self.human, self.after)
+        self.human.applyAllTargets(self.human.app.progress)
+        self.postAction()
+        return True
+
+    def undo(self):
+        self.modifier.setValue(self.human, self.before)
+        self.human.applyAllTargets(self.human.app.progress)
+        self.postAction()
+        return True
+
+class DetailSlider(gui3d.Slider):
+    
+    def __init__(self, parent, x, y, value, min, max, label, modifier):
+        
+        gui3d.Slider.__init__(self, parent, [x, y, 9.1], value, min, max, label)
+        self.modifier = modifier
+        self.value = None
+        
+    def onChanging(self, value):
+        
+        if self.app.settings.get('realtimeUpdates', True):
+            human = self.app.selectedHuman
+            if self.value is None:
+                self.value = self.modifier.getValue(human)
+            self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
+            
+    def onChange(self, value):
+        
+        human = self.app.selectedHuman
+        self.app.do(DetailAction(human, self.modifier, self.value, value, self.update))
+        self.value = None
+        
+    def update(self):
+        
+        human = self.app.selectedHuman
+        self.setValue(self.modifier.getValue(human))
 
 class DetailModelingTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Detail modelling', label='Details')
         self.tool = None
-
-        # details tool panel background
+        
+        self.modifiers = {}
+        
+        self.modifiers['genitals'] = GenitalsModifier()
+        
+        self.modifiers['breastSize'] = BreastSizeModifier()
+        self.modifiers['breastFirmness'] = BreastFirmnessModifier()
+        
+        self.modifiers['nose'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-nose${nose}.target', 'nose', xrange(1, 13), False)
+        self.modifiers['mouth'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-mouth${mouth}.target', 'mouth', xrange(1, 14), False)
+        self.modifiers['eyes'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-eye${eyes}.target', 'eyes', xrange(1, 31), False)
+        self.modifiers['ears'] = RangeDetailModifier('data/targets/details/${gender}-${age}-ears${ears}.target', 'ears', xrange(1, 9), False)
+        self.modifiers['jaw'] = RangeDetailModifier('data/targets/details/${gender}-${age}-jaw${jaw}.target', 'jaw', xrange(1, 8), False)
+        
+        self.modifiers['head'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-head${head}.target', 'head', xrange(1, 9), False)
+        self.modifiers['headAge'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-head-age${headAge}.target', 'headAge', '1', '2', False)
+        self.modifiers['faceAngle'] = humanmodifier.Modifier('data/targets/details/facial-angle1.target', 'data/targets/details/facial-angle2.target')
+        
+        self.modifiers['pelvisTone'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-pelvis-tone${pelvisTone}.target', 'pelvisTone', '1', '2', False)
+        self.modifiers['buttocks'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-nates${buttocks}.target', 'buttocks', '1', '2', False)
+        self.modifiers['stomach'] = StomachModifier()
+        
+        self.app.addLoadHandler('detail', self.loadHandler)
+        self.app.addLoadHandler('microdetail', self.loadHandler)
+        for modifier in self.modifiers:
+            self.app.addLoadHandler(modifier, self.loadHandler)
+        self.app.addSaveHandler(self.saveHandler)
+        
+        self.sliders = []
         
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
-        self.genitalsSlider = gui3d.Slider(self, position=[10, y, 9.3], value=0.0, min=-1.0, max=1.0, label="Genitalia");y+=36
-        self.breastSizeSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.5, min=0.0, max=1.0,label = "Breast");y+=36
-        self.breastFirmnessSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.5, min=0.0, max=1.0, label ="Breast firmness");y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals']));y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.5, 0.0, 1.0, "Breast", self.modifiers['breastSize']));y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness']));y+=36
         y+=16
-        
-        self.genitals = None
-        
-        @self.genitalsSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.genitals == None:
-                    self.genitals = human.getGenitals()
-                human.updateGenitals(self.genitals, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.genitals = min(max(value, -1.0), 1.0)
-            
-        @self.genitalsSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Genitals', value, self.syncSliders))
-            self.genitals = None
-
-        self.breastSize = None
-        
-        @self.breastSizeSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.breastSize == None:
-                    self.breastSize = human.getBreastSize()
-                human.updateBreastSize(self.breastSize, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.breastSize = min(1.0, max(0.0, value))
-            
-        @self.breastSizeSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'BreastSize', value, self.syncSliders))
-            self.breastSize = None
-
-        self.breastFirmness = None
-        
-        @self.breastFirmnessSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.breastFirmness == None:
-                    self.breastFirmness = human.getBreastFirmness()
-                human.updateBreastFirmness(self.breastFirmness, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.breastFirmness = min(1.0, max(0.0, value))
-        
-        @self.breastFirmnessSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'BreastFirmness', value, self.syncSliders))
-            self.breastFirmness = None
             
         gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*5+6));y+=25
 
-        self.noseSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.0, min=0.0, max=1.0, label = "Nose shape");y+=36
-        self.mouthSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.0, min=0.0, max=1.0, label = "Mouth shape");y+=36
-        self.eyesSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.0, min=0.0, max=1.0, label = "Eyes shape");y+=36
-        self.earsSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.0, min=0.0, max=1.0, label = "Ears shape");y+=36
-        self.jawSlider = gui3d.Slider(self, position=[10, y, 9.2], value=0.0, min=0.0, max=1.0, label = "Jaw shape");y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Nose shape", self.modifiers['nose']));y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Mouth shape", self.modifiers['mouth']));y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Eyes shape", self.modifiers['eyes']));y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Ears shape", self.modifiers['ears']));y+=36
+        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Jaw shape", self.modifiers['jaw']));y+=36
         y+=16
-
-        self.nose = None
-        
-        @self.noseSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.nose == None:
-                    self.nose = human.getNose()
-                human.updateNose(self.nose, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.nose = min(1.0, max(0.0, value))
-        
-        @self.noseSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Nose', value, self.syncSliders))
-            self.nose = None
-            
-        self.mouth = None
-        
-        @self.mouthSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.mouth == None:
-                    self.mouth = human.getMouth()
-                human.updateMouth(self.mouth, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.mouth = min(1.0, max(0.0, value))
-        
-        @self.mouthSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Mouth', value, self.syncSliders))
-            self.mouth = None
-            
-        self.eyes = None
-        
-        @self.eyesSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.eyes == None:
-                    self.eyes = human.getEyes()
-                human.updateEyes(self.eyes, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.eyes = min(1.0, max(0.0, value))
-        
-        @self.eyesSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Eyes', value, self.syncSliders))
-            self.eyes = None
-
-        self.ears = None
-        
-        @self.earsSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.ears == None:
-                    self.ears = human.getEars()
-                human.updateEars(self.ears, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.ears = min(1.0, max(0.0, value))
-        
-        @self.earsSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Ears', value, self.syncSliders))
-            self.ears = None  
-        
-        self.jaw = None
-        
-        @self.jawSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.jaw == None:
-                    self.jaw = human.getJaw()
-                human.updateJaw(self.jaw, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.jaw = min(1.0, max(0.0, value))
-        
-        @self.jawSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Jaw', value, self.syncSliders))
-            self.jaw = None
             
         y = 80
         self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
-        self.headShapeSlider = gui3d.Slider(self.headBox, position=[650, y, 9.2], value=0.0,min=0.0,max=1.0,label="Shape");y+=36
-        self.headAgeSlider = gui3d.Slider(self.headBox, position=[650, y, 9.2], value=0.0,min=-1.0,max=1.0,label="Age");y+=36
-        self.faceAngleSlider = gui3d.Slider(self.headBox, position=[650, y, 9.2], value=0.0,min=-1.0,max=1.0,label="Face angle");y+=36
+        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, 0.0, 1.0, "Shape", self.modifiers['head']));y+=36
+        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Age", self.modifiers['headAge']));y+=36
+        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Face angle", self.modifiers['faceAngle']));y+=36
         y+=16
-        
-        self.head = None
-
-        @self.headShapeSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.head == None:
-                    self.head = human.getHead()
-                human.updateHead(self.head, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.head = min(1.0, max(0.0, value))
-
-        @self.headShapeSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Head', value, self.syncSliders))
-            self.head = None
-            
-        self.headAge = None
-
-        @self.headAgeSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.headAge == None:
-                    self.headAge = human.getHeadAge()
-                human.updateHeadAge(self.headAge, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.headAge = min(1.0, max(-1.0, value))
-
-        @self.headAgeSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'HeadAge', value, self.syncSliders))
-            self.headAge = None
-               
-        self.faceAngle = None
-
-        @self.faceAngleSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.faceAngle == None:
-                    self.faceAngle = human.getFaceAngle()
-                human.updateFaceAngle(self.faceAngle, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.faceAngle = min(1.0, max(-1.0, value))
-
-        @self.faceAngleSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'FaceAngle', value, self.syncSliders))
-            self.faceAngle = None
             
         self.pelvisBox = gui3d.GroupBox(self, [650, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
-        self.pelvisToneSlider = gui3d.Slider(self.pelvisBox, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label = "Pelvis tone");y+=36
-        self.stomachSlider = gui3d.Slider(self.pelvisBox, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label ="Stomach");y+=36
-        self.buttocksSlider = gui3d.Slider(self.pelvisBox, position=[650, y, 9.2], value=0.0, min=-1.0, max=1.0, label = "Buttocks");y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Stomach", self.modifiers['buttocks']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['stomach']));y+=36
         y+=16
-        
-        self.pelvisTone = None
-        
-        @self.pelvisToneSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.pelvisTone == None:
-                    self.pelvisTone = human.getPelvisTone()
-                human.updatePelvisTone(self.pelvisTone, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.pelvisTone = min(1.0, max(-1.0, value))
-                
-        @self.pelvisToneSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'PelvisTone', value, self.syncSliders))
-            self.pelvisTone = None
-            
-        self.stomach = None
-        
-        @self.stomachSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.stomach == None:
-                    self.stomach = human.getStomach()
-                human.updateStomach(self.stomach, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.stomach = min(1.0, max(-1.0, value))
-        
-        @self.stomachSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Stomach', value, self.syncSliders))
-            self.stomach = None
-            
-        self.buttocks = None
-        
-        @self.buttocksSlider.event
-        def onChanging(value):
-            if self.app.settings.get('realtimeUpdates', True):
-                human = self.app.selectedHuman
-                if self.buttocks == None:
-                    self.buttocks = human.getButtocks()
-                human.updateButtocks(self.buttocks, value, self.app.settings.get('realtimeNormalUpdates', True))
-                self.buttocks = min(1.0, max(-1.0, value))
-                
-        @self.buttocksSlider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(DetailAction(human, 'Buttocks', value, self.syncSliders))
-            self.buttocks = None
-            
+
         self.modifiersBox = gui3d.GroupBox(self, [650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
         
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
@@ -665,7 +670,7 @@ class DetailModelingTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         self.app.tool = self.tool
-        self.genitalsSlider.setFocus()
+        self.sliders[0].setFocus()
         self.syncSliders()
         gui3d.TaskView.onShow(self, event)
 
@@ -679,21 +684,39 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.modifiersBox.setPosition([event[0] - 150, self.modifiersBox.getPosition()[1], 9.0])
 
     def syncSliders(self):
-        human = self.app.selectedHuman
-        self.genitalsSlider.setValue(human.getGenitals())
-        self.breastSizeSlider.setValue(human.getBreastSize())
-        self.breastFirmnessSlider.setValue(human.getBreastFirmness())
-        self.stomachSlider.setValue(human.getStomach())
-        self.noseSlider.setValue(human.getNose())
-        self.mouthSlider.setValue(human.getMouth())
-        self.eyesSlider.setValue(human.getEyes())
-        self.earsSlider.setValue(human.getEars())
-        self.headShapeSlider.setValue(human.getHead())
-        self.headAgeSlider.setValue(human.getHeadAge())
-        self.faceAngleSlider.setValue(human.getFaceAngle())
-        self.jawSlider.setValue(human.getJaw())
-        self.pelvisToneSlider.setValue(human.getPelvisTone())
-        self.buttocksSlider.setValue(human.getButtocks())
+
+        for slider in self.sliders:
+            slider.update()
+        
+    def onHumanChanged(self, event):
+        
+        human = event
+        
+        for modifier in self.modifiers.itervalues():
+            modifier.setValue(human, modifier.getValue(human))
+        
+    def loadHandler(self, human, values):
+        
+        if values[0] == 'detail':
+            human.setDetail('data/targets/details/' + values[1] + '.target', float(values[2]))
+        elif values[0] == 'microdetail':
+            human.setDetail('data/targets/microdetails/' + values[1] + '.target', float(values[2]))
+        else:
+            modifier = self.modifiers.get(values[0], None)
+            if modifier:
+                modifier.setValue(human, float(values[1]))
+       
+    def saveHandler(self, human, file):
+        
+        for t in human.targetsDetailStack.keys():
+            if '/details' in t and ('trans' in t or 'scale' in t):
+                file.write('detail %s %f\n' % (os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
+            elif '/microdetails' in t:
+                file.write('microdetail %s %f\n' % (os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
+                
+        for name, modifier in self.modifiers.iteritems():
+            value = modifier.getValue(human)
+            file.write('%s %f\n' % (name, value))
 
 class MicroModelingTaskView(gui3d.TaskView):
 

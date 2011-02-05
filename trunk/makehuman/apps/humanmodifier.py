@@ -28,6 +28,7 @@ __docformat__ = 'restructuredtext'
 import algos3d
 from string import Template
 from operator import mul
+import math
 
 class Action:
 
@@ -124,15 +125,14 @@ class GenericModifier:
     def __init__(self, template):
         
         self.template = template
-        self.targets = self.expandTemplate()
+        self.targets = self.expandTemplate([(self.template, [])])
         self.verts = None
         self.faces = None
         
     def setValue(self, human, value):
     
-        value = max(0.0, min(1.0, value))
-        
-        factors = self.getFactors(human)
+        value = self.clampValue(value)
+        factors = self.getFactors(human, value)
         
         for target in self.targets:
             human.setDetail(target[0], value * reduce(mul, [factors[factor] for factor in target[1]]))
@@ -183,23 +183,25 @@ class AgeModifier(GenericModifier):
         GenericModifier.__init__(self, template)
         
     # overrides
-    def expandTemplate(self):
+    def expandTemplate(self, targets):
         
         # Build target list of (targetname, [factors])
-        targets = [(self.template, [])]
         targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
 
         return targets
     
-    def getFactors(self, human):
+    def getFactors(self, human, value):
         
         factors = {
             'child': human.childVal,
             'young': human.youngVal,
-            'old': human.oldVal,
+            'old': human.oldVal
         }
         
         return factors
+    
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
 
 class GenderAgeModifier(GenericModifier):
 
@@ -208,16 +210,53 @@ class GenderAgeModifier(GenericModifier):
         GenericModifier.__init__(self, template)
         
     # overrides
-    def expandTemplate(self):
+    def expandTemplate(self, targets):
         
         # Build target list of (targetname, [factors])
-        targets = [(self.template, [])]
         targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
         targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
 
         return targets
     
-    def getFactors(self, human):
+    def getFactors(self, human, value):
+        
+        factors = {
+            'female': human.femaleVal,
+            'male': human.maleVal,
+            'child': human.childVal,
+            'young': human.youngVal,
+            'old': human.oldVal
+        }
+        
+        return factors
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+        
+class GenderAgeMuscleWeightModifier(GenericModifier):
+
+    def __init__(self, template):
+        
+        GenericModifier.__init__(self, template)
+        
+    # overrides
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
+        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
+        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
+        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
+
+        # Cleanup multiple hyphens and remove a possible hyphen before a dot.
+        doubleHyphen = compile(r'-+')
+        hyphenDot = compile(r'-\.')
+        
+        targets = [(sub(hyphenDot, '.', sub(doubleHyphen, '-', target[0])), target[1]) for target in targets]
+
+        return targets
+    
+    def getFactors(self, human, value):
         
         factors = {
             'female': human.femaleVal,
@@ -225,48 +264,118 @@ class GenderAgeModifier(GenericModifier):
             'child': human.childVal,
             'young': human.youngVal,
             'old': human.oldVal,
+            'flaccid':human.flaccidVal,
+            'muscle':human.self.muscleVal,
+            'averageTone':1.0 - (human.flaccidVal + human.self.muscleVal),
+            'light':human.self.underweightVal,
+            'heavy':human.self.overweightVal,
+            'averageWeight':1.0 - (human.underweightVal + human.self.overweightVal)
         }
         
         return factors
         
-    class GenderAgeMuscleWeightModifier(GenericModifier):
-
-        def __init__(self, template):
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
             
-            GenericModifier.__init__(self, template)
-            
-        # overrides
-        def expandTemplate(self):
-            
-            # Build target list of (targetname, [factors])
-            targets = [(self.template, [])]
-            targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
-            targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
-            targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
-            targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
-
-            # Cleanup multiple hyphens and remove a possible hyphen before a dot.
-            doubleHyphen = compile(r'-+')
-            hyphenDot = compile(r'-\.')
-            
-            targets = [(sub(hyphenDot, '.', sub(doubleHyphen, '-', target[0])), target[1]) for target in targets]
-
-            return targets
+class GenderAgeRangeModifier(GenderAgeModifier):
+    
+    def __init__(self, template, parameterName, parameterRange, always=True):
         
-        def getFactors(self, human):
+        self.parameterName = parameterName
+        self.parameterRange = parameterRange
+        self.always = always
+        GenderAgeModifier.__init__(self, template)
+        
+    # overrides
+    def expandTemplate(self, targets):
+        
+        targets = GenderAgeModifier.expandTemplate(self, targets)
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute({self.parameterName:str(value)}), target[1] + [str(value)]) for target in targets for value in self.parameterRange]
+
+        return targets
+        
+    def getFactors(self, human, value):
+        
+        factors = GenderAgeModifier.getFactors(self, human, value)
+        
+        for factor in self.parameterRange:
+            factors[str(factor)] = 0.0
+        
+        if self.always:
             
-            factors = {
-                'female': human.femaleVal,
-                'male': human.maleVal,
-                'child': human.childVal,
-                'young': human.youngVal,
-                'old': human.oldVal,
-                'flaccid':human.flaccidVal,
-                'muscle':human.self.muscleVal,
-                'averageTone':1.0 - (human.flaccidVal + human.self.muscleVal),
-                'light':human.self.underweightVal,
-                'heavy':human.self.overweightVal,
-                'averageWeight':1.0 - (human.underweightVal + human.self.overweightVal),
-            }
+            # always
+            # a   b    c    d
+            # 0   1    2    3
+            # 0.0 0.33 0.66 1.0
             
-            return factors
+            v = value * (len(self.parameterRange) - 1)
+            index = int(math.floor(v))
+            v = v - index
+            factors[str(self.parameterRange[index])] = 1.0 - v
+            if index+1 < len(self.parameterRange):
+                factors[str(self.parameterRange[index+1])] = v
+        else:
+            
+            # not always
+            #     a    b    c    d
+            #     0    1    2    3
+            # 0.0 0.25 0.50 0.75 1.0
+            # 0   1    2    3    4
+        
+            v = value * len(self.parameterRange)
+            index = int(math.floor(v))
+            v = v - index
+            if index > 0:
+                factors[str(self.parameterRange[index - 1])] = 1.0 - v
+            if index < len(self.parameterRange):
+                factors[str(self.parameterRange[index])] = v
+        
+        return factors
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+        
+class GenderAgeAsymmetricModifier(GenderAgeModifier):
+    
+    def __init__(self, template, parameterName, left, right, always=True):
+        
+        self.parameterName = parameterName
+        self.left = left
+        self.right = right
+        self.always = always
+        GenderAgeModifier.__init__(self, template)
+        
+    # overrides
+    def setValue(self, human, value):
+    
+        value = self.clampValue(value)
+        factors = self.getFactors(human, value)
+        
+        for target in self.targets:
+            human.setDetail(target[0], reduce(mul, [factors[factor] for factor in target[1]]))
+            #print target[0], human.getDetail(target[0])
+            
+    def expandTemplate(self, targets):
+        
+        targets = GenderAgeModifier.expandTemplate(self, targets)
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute({self.parameterName:value}), target[1] + [value]) for target in targets for value in [self.left, self.right]]
+
+        return targets
+        
+    def getFactors(self, human, value):
+        
+        factors = GenderAgeModifier.getFactors(self, human, value)
+        
+        factors.update({
+            self.left: -min(value, 0.0),
+            self.right: max(0.0, value)
+        })
+        
+        return factors
+    
+    def clampValue(self, value):
+        return max(-1.0, min(1.0, value))

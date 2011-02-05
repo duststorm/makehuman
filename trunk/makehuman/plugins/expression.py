@@ -155,9 +155,9 @@ class ExpressionTaskView(gui3d.TaskView):
                 
     def loadHandler(self, human, values):
         
-        modifier = self.modifiers.get(values[0], None)
+        modifier = self.modifiers.get(values[1], None)
         if modifier:
-            modifier.setValue(human, float(values[1]))
+            modifier.setValue(human, float(values[2]))
        
     def saveHandler(self, human, file):
         

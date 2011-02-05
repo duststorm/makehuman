@@ -74,9 +74,9 @@ class EthnicsTaskView(gui3d.TaskView):
         
     def loadHandler(self, human, values):
         
-        target = '%s.target' % os.path.join('data/models/ethnics', values[0])
+        target = '%s.target' % os.path.join('data/models/ethnics', values[1])
         print target
-        human.setDetail(target, float(values[1]))
+        human.setDetail(target, float(values[2]))
        
     def saveHandler(self, human, file):
         
