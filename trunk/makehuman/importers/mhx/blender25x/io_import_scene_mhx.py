@@ -1118,6 +1118,7 @@ def setObjectAndData(args, typ):
 #    parseModifier(ob, args, tokens):
 #
 
+
 def parseModifier(ob, args, tokens):
     name = args[0]
     typ = args[1]
@@ -1125,17 +1126,25 @@ def parseModifier(ob, args, tokens):
         return None
     mod = ob.modifiers.new(name, typ)
     for (key, val, sub) in tokens:
-        if key == 'CurveSelectNth':
-            n = int(val[0])
-            spline = ob.data.splines[0]
-            for pt in spline.points:
-                pt.select = False
-            pt = spline.points[n]
-            print(n, pt, pt.co)
-            pt.select = True
+        if key == 'HookAssignNth':
+            if val[0] == 'CURVE':
+                hookAssignNth(mod, int(val[1]), ob.data.splines[0].points)
+            else:
+                hookAssignNth(mod, int(val[1]), ob.data.vertices)
         else:            
             defaultKey(key, val, sub, 'mod', [], globals(), locals())
     return mod
+
+def hookAssignNth(mod, n, points):
+    bpy.ops.object.mode_set(mode='EDIT')
+    for pt in points:
+        pt.select = False
+    points[n].select = True
+    bpy.ops.object.hook_reset(modifier=mod.name)
+    bpy.ops.object.hook_select(modifier=mod.name)
+    bpy.ops.object.hook_assign(modifier=mod.name)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return
 
 #
 #    parseParticleSystem(ob, args, tokens):

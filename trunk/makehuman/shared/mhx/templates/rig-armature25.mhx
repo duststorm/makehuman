@@ -25,6 +25,8 @@ end Armature
   Property MhxScale theScale ;
 end Object
 
+*** curves
+
   *** rig-bones DeformRig
 
   show_axes False ;
@@ -44,6 +46,4 @@ end Armature
   Property MhxScale theScale ;
 end Object
 
-
-*** curves
 

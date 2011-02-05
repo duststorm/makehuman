@@ -779,6 +779,10 @@ class MhxExpressionsPanel(bpy.types.Panel):
 #
 ###################################################################################	
 
+# 
+
+RNA_PROPS = False
+
 # Property types
 D_ENUM = 1
 D_INT = 2
@@ -795,190 +799,210 @@ ParentProperties = [
 	('GazeParent', D_ENUM, ['Head','World'], 'name="Gaze", description=""' ),
 ]
 
-MasterDrivers = [('Floor', 'x==0'), ('Hips', 'x==1'), ('Neck', 'x==2')]
-
-ParentPropDrivers = [
-	('Root', 'RootParent', D_ENUM, MasterDrivers),
-	('ElbowIK_L', 'RootParent', D_ENUM, MasterDrivers),
-	('ElbowIK_R', 'RootParent', D_ENUM, MasterDrivers),
-	('WristIK_L', 'RootParent', D_ENUM, MasterDrivers),
-	('WristIK_R', 'RootParent', D_ENUM, MasterDrivers),
-	('LegIK_L', 'RootParent', D_ENUM, MasterDrivers),
-	('LegIK_R', 'RootParent', D_ENUM, MasterDrivers),
-
-	('Gaze', 'GazeParent', D_ENUM, [('Head', 'x==0'), ('World', 'x==1')]),
+MasterDrivers = [
+	('Floor', ['RootParent'], 'x1==0'),
+	('Hips', ['RootParent'], 'x1==1'),
+	('Neck', ['RootParent'], 'x1==2')
 ]
 
-#	Body
-BodyProperties = [
-	('SpineIK', D_BOOL, False, 'name="Spine IK"'),
+ParentConstraintDrivers = {
+	'Root' :		MasterDrivers,
+	'Elbow_L' :		MasterDrivers,
+	'Elbow_R' :		MasterDrivers,
+	'Wrist_L' :		MasterDrivers,
+	'Wrist_R' :		MasterDrivers,
+	'Leg_L' :		MasterDrivers,
+	'Leg_R' :		MasterDrivers,
+
+	'Gaze' : 	[
+		('Head', ['GazeParent'], 'x1==0') ,
+		('World', ['GazeParent'], 'x1==1') 
+	]
+}
+
+#	Left - right
+
+LeftRightProperties = [
+	('ArmFkIk', D_FLOAT, 0.0, 'name=" arm FK/IK", description=""' ),
+	('ArmHinge', D_FLOAT, 0.0, 'name=" arm hinge", description=""' ),
+	('ElbowPlant', D_FLOAT, 0.0, 'name=" elbow plant", description=""' ),
+	('ForearmFkIk', D_FLOAT, 0.0, 'name=" forearm FK/IK", description=""' ),
+	('ArmStretch', D_FLOAT, 0.0, 'name=" arm stretch", description=""' ),
+	('HandFollowsWrist', D_FLOAT, 0.0, 'name=" hand follows wrist", description=""' ),
+
+	('LegFkIk', D_FLOAT, 0.0, 'name=" leg FK/IK", description=""' ),
+
+	('FingerControl', D_BOOL, True, 'name="Controlled fingers", description=""'),
 ]
 
-BodyPropDrivers = [
-	('DefSpine3', 'SpineIK', D_BOOL, ['SplineIK']),
-	('DefSpine1', 'SpineIK', D_BOOLINV, ['Rot']),
-	('DefSpine2', 'SpineIK', D_BOOLINV, ['Rot']),
-	('DefSpine3', 'SpineIK', D_BOOLINV, ['Rot']),
-]
+LeftRightConstraintDrivers = {
+	'UpArm' : [
+		('Elbow', ['ArmFkIk', 'ElbowPlant', 'ArmStretch'], 'max(x1*x2, x3)')
+	],
 
-#	Arm
+	'Elbow' : [
+		('DistShoulder', ['ArmStretch'], '(1-x1)'),
+	],
 
-ArmStates = ['Arm FK', 'Arm IK', 'Elbow FK', 'Elbow IK']
-ArmProperties = [
-	('LeftArmState', D_ENUM, ArmStates, 'name="Left arm state", description=""' ),
-	('RightArmState', D_ENUM, ArmStates, 'name="Right arm state", description=""' ),
-	('LeftArmStretch', D_BOOL, False, 'name="Left arm stretch", description=""' ),
-	('RightArmStretch', D_BOOL, False, 'name="Right arm stretch", description=""' ),
-	('LeftHandFollowsWrist', D_BOOL, True, 'name="Left hand follows wrist", description=""' ),
-	('RightHandFollowsWrist', D_BOOL, True, 'name="Right hand follows wrist", description=""' ),
-]
+	'LoArm' : [
+		('ArmIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*(1-x2)*(1-x3)*(1-x4)'),
+		('Wrist', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*x3*(1-x4) + x4'),
+	],
 
-ArmRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
-UpArmScaleDrivers = [('ScaleIK', '((x1) and (x2==1)) or (x2>=2)')]
+	'Wrist' : [
+		('DistShoulder', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], '(1-x1)*(1-x2)*(1-x3)'),
+		('DistElbow', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*(1-x3)'),
+	],
 
-ArmPropDrivers = [
-	('UpArm1_L', 'LeftArmState', D_ENUM, ArmRotDrivers),
-	('UpArm2_L',  ['LeftArmStretch', 'LeftArmState'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_L',  ['LeftArmStretch', 'LeftArmState'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_L', 'LeftArmState', D_ENUM, ArmRotDrivers),
-	('LoArm1_L', 'LeftArmState', D_ENUM, ArmRotDrivers),
-	('LoArm2_L', 'LeftArmState', D_ENUM, [('ScaleIK', '(x==1) or (x==3)')]),
-	('LoArm3_L', 'LeftArmState', D_ENUM, ArmRotDrivers),
-	('Hand_L', 'LeftArmState', D_ENUM, ArmRotDrivers),
+	'Hand' : [
+		('FreeIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk'], '(1-x1)*(1-x2)*(1-x3)'),
+		('WristLoc', ['ArmFkIk', 'ForearmFkIk'], '(1-(1-x1)*(1-x2))'),
+		('WristRot', ['ArmFkIk', 'ForearmFkIk', 'HandFollowsWrist'], '(1-(1-x1)*(1-x2))*x3'),
+	],
 
-	('UpArm1_R', 'RightArmState', D_ENUM, ArmRotDrivers),
-	('UpArm2_R',  ['RightArmStretch', 'RightArmState'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_R',  ['RightArmStretch', 'RightArmState'], D_MULTIVAR, UpArmScaleDrivers),
-	('UpArm3_R', 'RightArmState', D_ENUM, ArmRotDrivers),
-	('LoArm1_R', 'RightArmState', D_ENUM, ArmRotDrivers),
-	('LoArm2_R', 'RightArmState', D_ENUM, [('ScaleIK', '(x==1) or (x==3)')]),
-	('LoArm3_R', 'RightArmState', D_ENUM, ArmRotDrivers),
-	('Hand_R', 'RightArmState', D_ENUM, ArmRotDrivers),
+	'ArmLoc': [
+		('Shoulder', ['ArmHinge'], '1-x1'),
+		('Root', ['ArmHinge'], 'x1'),
+	],
 
-	('UpArmIK_L', 'LeftArmState', D_ENUM, [('ElbowIK', 'x>=2')]),
-	('LoArmIK_L', 'LeftArmState', D_ENUM, [('ArmIK', 'x==1'), ('WristIK', 'x==3')]),
-	('HandIK_L', 'LeftArmState', D_ENUM, [('WristLoc', '(x==1) or (x==3)')]),
+	'LoLeg' : [
+		('LegIK', ['LegFkIk'], 'x1'),
+	],
 
-	('UpArmIK_R', 'RightArmState', D_ENUM, [('ElbowIK', 'x>=2')]),
-	('LoArmIK_R', 'RightArmState', D_ENUM, [('ArmIK', 'x==1'), ('WristIK', 'x==3')]),
-	('HandIK_R', 'RightArmState', D_ENUM, [('WristLoc', '(x==1) or (x==3)')]),
+	'Foot' : [
+		('RevRot', ['LegFkIk'], 'x1'),
+		('RevIK', ['LegFkIk'], 'x1'),
+		('FreeIK', ['LegFkIk'], '1-x1'),
+	],
 
-	('ElbowIK_L', 'LeftArmStretch', D_BOOLINV, ['DistShoulder']),
-	('WristIK_L',  ['LeftArmStretch', 'LeftArmState'], D_MULTIVAR, 
-		[('DistElbow', '(not(x1)) and (x2>=2)'),
-		 ('DistShoulder', '(not(x1)) and (x2==1)')]),
-
-	('ElbowIK_R', 'RightArmStretch', D_BOOLINV, ['DistShoulder']),
-	('WristIK_R',  ['RightArmStretch', 'RightArmState'], D_MULTIVAR, 
-		[('DistElbow', '(not(x1)) and (x2>=2)'),
-		 ('DistShoulder', '(not(x1)) and (x2==1)')]),
-
-	('HandIK_L',  ['LeftHandFollowsWrist', 'LeftArmState'], D_MULTIVAR, 
-		[('WristRot', '(x1) and (x2!=2)')]),
-	('HandIK_R',  ['RightHandFollowsWrist', 'RightArmState'], D_MULTIVAR, 
-		[('WristRot', '(x1) and (x2!=2)')]),
-
-]
-
-#	Leg
-
-LegProperties = [
-	('LeftLeg', D_ENUM, ['Leg FK', 'Leg IK'], 'name="Left leg FK/IK", description=""' ),
-	('RightLeg', D_ENUM, ['Leg FK', 'Leg IK'], 'name="Right leg FK/IK", description=""' ),
-]
-
-LegRotDrivers = [('RotFK','x==0'), ('RotIK','x>=1')]
-LegStretchDrivers = [('StretchFK','x==0'), ('StretchIK','x>=1')]
-
-LegPropDrivers = [
-	('UpLeg1_L', 'LeftLeg', D_ENUM, LegRotDrivers),
-	('UpLeg3_L', 'LeftLeg', D_ENUM, LegRotDrivers),
-	('LoLeg_L', 'LeftLeg', D_ENUM, LegRotDrivers),
-	('LoLeg_L', 'LeftLeg', D_ENUM, LegStretchDrivers),
-	('Foot_L', 'LeftLeg', D_ENUM, LegRotDrivers),
-	('Toe_L', 'LeftLeg', D_ENUM, LegRotDrivers),
-
-	('UpLeg1_R', 'RightLeg', D_ENUM, LegRotDrivers),
-	('UpLeg3_R', 'RightLeg', D_ENUM, LegRotDrivers),
-	('LoLeg_R', 'RightLeg', D_ENUM, LegRotDrivers),
-	('LoLeg_R', 'RightLeg', D_ENUM, LegStretchDrivers),
-	('Foot_R', 'RightLeg', D_ENUM, LegRotDrivers),
-	('Toe_R', 'RightLeg', D_ENUM, LegRotDrivers),
-]
+	'Toe' : [
+		('RevIK', ['LegFkIk'], 'x1'),
+	],
+}
 
 #	Finger
 
 def defineFingerPropDrivers():
-	global FingerPropDrivers
-	FingerPropDrivers = []
-	for (suffix, side) in [('_L', 'Left'), ('_R', 'Right')]:
-		for fnum in range(1,6):
-			for lnum in range(1,4):
-				if (lnum != 1 or fnum != 1):
-					FingerPropDrivers.append( ('Finger-%d-%d%s' % (fnum,lnum,suffix), '%sFingerControl' % (side), D_BOOL, ['Rot'] )),
+	global LeftRightConstraintDrivers
+	for fnum in range(1,6):
+		for lnum in range(1,4):
+			if (lnum != 1 or fnum != 1):
+				finger = 'Finger-%d-%d' % (fnum,lnum)
+				LeftRightConstraintDrivers[finger] = [('Rot', ['FingerControl'], 'x1')]
 
 	return
 
-FingerProperties = [
-	('LeftFingerControl', D_BOOL, True, 'name="Controlled fingers", description=""'),
-	('RightFingerControl', D_BOOL, True, 'name="Controlled fingers", description=""'),
-]
 defineFingerPropDrivers()
+
+#
+#	defineProperties():
+#
+
+def defineProperties():
+	if not RNA_PROPS:
+		return
+	for (prop, typ, value, options) in LeftRightProperties:
+		defineProperty('Left'+prop, typ, value, options)
+		defineProperty('Right'+prop, typ, value, options)
+	for (prop, typ, value, options) in ParentProperties:
+		defineProperty(prop, typ, value, options)
+	return
+
+def defineRnaProperty(prop, typ, value, options):
+	expr = 'bpy.types.Object.%s = %sProperty(' % (prop, PropTypeName[typ])
+	if typ == D_ENUM:
+		items = []
+		for val in value:
+			items.append( (val,val,val) )
+		expr += 'items=%s, ' % items
+	else:
+		expr += 'default=%s, ' % value
+	if typ == D_FLOAT:
+		expr += '%s, min = 0.0, max = 1.0)' % options
+	else:
+		expr += '%s)' % options
+	print(expr)
+	exec(expr)
+	return
+
+#
+#	resetProperties()
+#	class VIEW3D_OT_MhxResetPropertiesButton(bpy.types.Operator):
+#
+
+def resetProperties():
+	for (prop, typ, value, options) in LeftRightProperties:
+		resetProperty('Left'+prop, typ, value, options)
+		resetProperty('Right'+prop, typ, value, options)
+	for (prop, typ, value, options) in ParentProperties:
+		resetProperty(prop, typ, value, options)
+	return
+
+def resetProperty(prop, typ, value, options):
+	global theRig
+	if RNA_PROPS:
+		expr = "theRig.%s = 0" % prop
+		exec(expr)
+	elif typ == D_FLOAT:
+		theRig[prop] = 0.0
+		theRig["_RNA_UI"] = {prop: {"min":0.0, "max":1.0}}
+	elif typ == D_INT:
+		theRig[prop] = 0
+	elif typ == D_BOOL:
+		theRig[prop] = False
+	elif typ == D_ENUM:
+		theRig[prop] = 0
+
+	print(theRig[prop], theRig["_RNA_UI"])
+
+class VIEW3D_OT_MhxResetPropertiesButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_reset_properties"
+	bl_label = "Reset properties"
+	bl_options = {'REGISTER'}
+
+	def execute(self, context):
+		resetProperties()
+		print("Properties reset")
+		return{'FINISHED'}	
+
 
 #
 #	redefinePropDrivers():
 #
 
-OtherProperties = BodyProperties + ArmProperties + FingerProperties + LegProperties
-OtherPropDrivers = BodyPropDrivers + ArmPropDrivers + FingerPropDrivers + LegPropDrivers
-
-def defineProperties():
-	for (prop, typ, value, options) in ParentProperties + OtherProperties:
-		expr = 'bpy.types.Object.%s = %sProperty(' % (prop, PropTypeName[typ])
-		if typ == D_ENUM:
-			items = []
-			for val in value:
-				items.append( (val,val,val) )
-			expr += 'items=%s, ' % items
-		else:
-			expr += 'default=%s, ' % value
-		expr += '%s)' % options
-		print(expr)
-		exec(expr)
-	return
-
-defineProperties()
-
 def redefinePropDrivers():
 	global theRig
-
 	try:
 		theRig.pose.bones
 	except:
 		return
-
+	# Remove old drivers
 	for pb in theRig.pose.bones:
 		for cns in pb.constraints:
 			try:
 				cns.driver_remove('influence', -1)
 			except:
 				pass
-	
-	for (bone, prop, typ, drivers) in ParentPropDrivers+OtherPropDrivers:
-		pb = theRig.pose.bones[bone]
-		for drvdata in drivers:
-			if typ == D_ENUM or typ == D_MULTIVAR:
-				(cnsName,expr) = drvdata
-			else:
-				cnsName = drvdata
-				expr = None
-			for cns in pb.constraints:
-				if cns.name == cnsName:
-					print(pb.name, cns.name, prop, expr)
-					addPropDriver(cns, prop, expr)
+	defineProperties()
+
+	# Create new drivers
+	for (bone, drivers) in LeftRightConstraintDrivers.items():
+		defineDriver(bone+'_L', drivers, 'Left')
+		defineDriver(bone+'_R', drivers, 'Right')
+	for (bone, drivers) in ParentConstraintDrivers.items():
+		defineDriver(bone, drivers, '')
 	return
 
-def addPropDriver(cns, prop, expr):
+def defineDriver(bone, drivers, prefix):
+	pb = theRig.pose.bones[bone]
+	for (cnsName, props, expr) in drivers:
+		for cns in pb.constraints:
+			if cns.name == cnsName:
+				print(pb.name, cns.name, props, expr)
+				addPropDriver(cns, props, expr, prefix)
+	return
+
+def addPropDriver(cns, props, expr, prefix):
 	global theRig
 	fcu = cns.driver_add('influence', -1)
 	drv = fcu.driver
@@ -989,37 +1013,50 @@ def addPropDriver(cns, prop, expr):
 		drv.type = 'AVERAGE'
 	drv.show_debug_info = True
 
-	if type(prop) == list:
-		for n,p in enumerate(prop):
-			var = drv.variables.new()
-			var.name = 'x%d' % (n+1)
-			var.type = 'SINGLE_PROP'
-
-			targ = var.targets[0]
-			targ.id = theRig
-			targ.data_path = p
-	else:
+	for n,prop in enumerate(props):
 		var = drv.variables.new()
-		var.name = 'x'
+		var.name = 'x%d' % (n+1)
 		var.type = 'SINGLE_PROP'
 
 		targ = var.targets[0]
 		targ.id = theRig
-		targ.data_path = prop
-
+		if RNA_PROPS:
+			targ.data_path = prefix+prop
+		else:
+			targ.data_path = '["%s"]' % (prefix+prop)
 	return				
 
 #
-#	initOldProps():
-#	setInverse(context):
+#	initCharacter():
+#	class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
 #
 
-def initOldProps():
-	global theOldProp
+
+def initCharacter():
+	global theRig, theOldProp
+	print("initing")
+	defineProperties()
+	redefinePropDrivers()	
+	resetProperties()
+	theRig['MhxRigInited'] = True
+
 	theOldProp = {}
 	for (prop, typ, value, options) in ParentProperties:
 		theOldProp[prop] = 0
-	return
+
+class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_init_character"
+	bl_label = "Initialize character"
+	bl_options = {'REGISTER'}
+
+	def execute(self, context):
+		initCharacter()
+		print("Character initialized")
+		return{'FINISHED'}	
+
+#
+#	setInverse(context):
+#
 
 def setInverse(context):
 	global theRig, theOldProp
@@ -1069,18 +1106,48 @@ class MhxDriversPanel(bpy.types.Panel):
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("mhx.pose_init_interface")
 		if theRig:
+			try:
+				inited = theRig['MhxRigInited']
+			except:
+				inited = False
+
+			if not inited:
+				layout.operator("mhx.pose_init_character", text='Initialize character')
+				return
+
+			layout.operator("mhx.pose_init_character", text='Reinitialize character')
+			layout.operator("mhx.pose_reset_properties")
 			pbones = theRig.pose.bones
+			'''
 			for (prop, typ, values, options) in ParentProperties:
 				layout.label(prop)
-				layout.prop(theRig, prop, text=prop, expand=True)
+					if RNA_PROPS:
+						layout.prop(theRig, lprop, text=lprop, expand=True)
+					else:
+						layout.prop(theRig, '["%s"]' % lprop, text=lprop, expand=True)
 			layout.operator('mhx.pose_set_inverse')
 			layout.separator()
-			for (prop, typ, values, options) in OtherProperties:
+			'''
+
+			col = layout.column()
+			self.drawSide('Left', col)
+			self.drawSide('Right', col)
+			return
+
+	def drawSide(self, prefix, layout):
+		layout.label(prefix)
+		for (prop, typ, values, options) in LeftRightProperties:
+				lprop = prefix+prop
+				#print(lprop, typ, values, options)
 				if typ == D_ENUM:
 					layout.label(prop)
-				layout.prop(theRig, prop, text=prop, expand=True)
+				if RNA_PROPS:
+					layout.prop(theRig, lprop, text=prop, expand=True)
+				else:
+					layout.prop(theRig, '["%s"]' % lprop, text=prop, expand=True)
+		return
+
 
 
 ###################################################################################	
@@ -1107,9 +1174,6 @@ def initInterface(scn):
 		scn['MhxSyncAutoKeyframe'] = False
 		scn['MhxBodyLanguage'] = True
 
-	defineProperties()
-	redefinePropDrivers()	
-	initOldProps()
 	return
 
 #

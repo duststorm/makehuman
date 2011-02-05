@@ -32,6 +32,7 @@ ybis = [0,2,0]
 
 unlimited = (-pi,pi, -pi,pi, -pi,pi)
 NoBB = (1,1,1)
+NoBB = None
 bbMarg = 0.05
 
 #
@@ -39,7 +40,7 @@ bbMarg = 0.05
 #
 
 L_MAIN = 	0x0001
-L_SPINE =	0x0002
+L_SPINEFK =	0x0002
 L_ARMIK =	0x0004
 L_ARMFK =	0x0008
 L_LEGIK =	0x0010
@@ -53,8 +54,7 @@ L_TOE =		0x0200
 L_HEAD =	0x0400
 L_PALM =	0x0800
 
-L_HLPIK	=	0x1000
-L_HLPFK	=	0x2000
+L_SPINEIK =	0x1000
 L_HELP	=	0x4000
 L_DEF =		0x8000
 
@@ -68,11 +68,13 @@ F_DEF = 0x0002
 F_RES = 0x0004
 #F_RES = 0
 F_WIR = 0x0008
-F_NOSCALE = 0x0010
 F_GLOC = 0x0020
 F_LOCK = 0x0040
 F_HID = 0x0080
 F_NOCYC = 0x0100
+
+F_NOROT = 0x0400
+F_NOSCALE = 0x0800
 
 
 P_LKROT4 = 0x0001
@@ -234,13 +236,10 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	deform = boolString(flags & F_DEF)
 	restr = boolString(flags & F_RES)
 	wire = boolString(flags & F_WIR)
-	scale = boolString(flags & F_NOSCALE == 0)
-	scale = "False"
 	lloc = boolString(flags & F_GLOC == 0)
 	lock = boolString(flags & F_LOCK)
 	hide = boolString(flags & F_HID)
 	cyc = boolString(flags & F_NOCYC == 0)
-	(bin, bout, bseg) = bbone
 
 	fp.write("\n  Bone %s %s\n" % (bone, cond))
 	(x, y, z) = rigHead[bone]
@@ -251,15 +250,23 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 		fp.write("    parent Refer Bone %s ; \n" % (parent))
 	fp.write(
 "    roll %.6g ; \n" % (roll)+
-"    bbone_in %d ; \n" % (bin) +
-"    bbone_out %d ; \n" % (bout) +
-"    bbone_segments %d ; \n" % (bseg) +
 "    use_connect %s ; \n" % (conn) +
 "    use_deform %s ; \n" % (deform)+
 "    hide %s ; \n" % hide +
-"    show_wire %s ; \n" % (wire) +
-"    use_inherit_scale %s ; \n" % (scale) +
-"    layers Array ")
+"    show_wire %s ; \n" % (wire))
+
+	if bbone:
+		(bin, bout, bseg) = bbone
+		fp.write(
+"    bbone_in %d ; \n" % (bin) +
+"    bbone_out %d ; \n" % (bout) +
+"    bbone_segments %d ; \n" % (bseg))
+
+	if flags & F_NOROT:
+		fp.write("    use_inherit_rotation False ; \n")
+	if True or (flags & F_NOSCALE):
+		fp.write("    use_inherit_scale False ; \n")
+	fp.write("    layers Array ")
 
 	bit = 1
 	for n in range(32):
@@ -432,7 +439,7 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape):
 	if copy & U_ROT:
 		addCopyRotConstraint(fp, '', C_LOCAL, 1, ['Rot', cbone, channels, (0,0,0), False])
 	if copy & U_SCALE:
-		addCopyScaleConstraint(fp, '', C_LOCAL, 1, ['Scale', cbone, (1,1,1), False])
+		addCopyScaleConstraint(fp, '', 0, 1, ['Scale', cbone, (1,1,1), False])
 	fp.write("  end Posebone\n")
 	return
 
@@ -1198,6 +1205,73 @@ def constraintFlags(flags):
 
 
 #
+#	addHookEmpty(fp, name, hook):
+#	addMeshCurve(fp, cuname, hooks):
+#
+
+def addHookEmpty(fp, hook):
+	fp.write("Object %s%s EMPTY None\n" % (mh2mhx.theHuman, hook))
+	(x,y,z) = rigHead[hook]
+	fp.write(
+"    location (%.4f,%.4f,%.4f) ;\n" % (x,-z,y) +
+"  parent Refer Object %s ;\n" % mh2mhx.theHuman +
+"end Object\n")
+	return
+
+def addMeshCurve(fp, cuname, hooks):
+	global rigHead
+
+	addHookEmpty(fp, hooks[0])
+	addHookEmpty(fp, hooks[-1])
+
+	name = mh2mhx.theHuman + cuname
+
+	fp.write("Mesh %s %s\n  Verts\n" % (name, name))
+	for hook in hooks:
+		(x,y,z) = rigHead[hook]
+		fp.write("    v %.4f %.4f %.4f ;\n" % (x,-z,y))
+		#mh2mhx.writeVertexLoc(fp, x, y, z)
+
+	fp.write('  end Verts\n  Edges\n')
+
+	npoints = len(hooks)
+	for n in range(npoints-1):
+		fp.write('    e %d %d ;\n' % (n, n+1))
+	fp.write(
+"  end Edges\n")
+
+	for n in range(npoints):
+		fp.write(
+"  VertexGroup V%d\n" % n +
+"    wv %d 1 ;\n" % n +
+"  end VertexGroup\n")
+
+	fp.write(
+"end Mesh\n" +
+"\n" +
+"Object %s MESH %s\n" % (name, name) +
+"  layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;\n")
+
+	addHookModifier(fp, hooks, 0)
+	addHookModifier(fp, hooks, npoints-1)
+
+	fp.write(
+"  parent Refer Object %s ;\n" % mh2mhx.theHuman +
+"end Object")
+
+def addHookModifier(fp, hooks, index):
+	hook = hooks[index]
+	fp.write(
+"  Modifier %s HOOK\n" % hook +
+"    falloff 0 ;\n" +
+"    force 1 ;\n" +
+"    object Refer Object %s%s ;\n" % (mh2mhx.theHuman, hook)+
+"    show_expanded False ;\n" +
+"    use_apply_on_spline True ;\n" +
+"    HookAssignNth MESH %d ;\n" % index +
+"  end Modifier\n")
+
+#
 #	addCurve(fp, cuname, hooks):
 #
 
@@ -1791,6 +1865,8 @@ def writeDeformArmature(fp):
 	return
 
 def writeAllCurves(fp):
+	for (cuname, hooks) in rig_body_25.BodyCurves:
+		addMeshCurve(fp, cuname, hooks)
 	return 
 
 def writeControlPoses(fp):
