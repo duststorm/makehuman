@@ -136,7 +136,7 @@ stopStaringVisemes = ({
 		('PTongue', (0,-0.6))], 
 
 	'Blink' : [('PUpLid', (0,1.0)), ('PLoLid', (0,-1.0))], 
-	'UnBlink' : [('PUpLid', (0,0)), ('PLoLid', (0,0))], 
+	'Unblink' : [('PUpLid', (0,0)), ('PLoLid', (0,0))], 
 })
 
 bodyLanguageVisemes = ({
@@ -247,8 +247,16 @@ bodyLanguageVisemes = ({
 		('PTongue', (-1.0,0))], 
 
 	'Blink' : [('PUpLid', (0,1.0)), ('PLoLid', (0,-1.0))], 
-	'UnBlink' : [('PUpLid', (0,0)), ('PLoLid', (0,0))], 
+	'Unblink' : [('PUpLid', (0,0)), ('PLoLid', (0,0))], 
 })
+
+VisemeList = [
+	('Rest', 'Etc', 'AH'),
+	('MBP', 'OO', 'O'),
+	('R', 'FV', 'S'),
+	('SH', 'EE', 'EH'),
+	('TH', 'L', 'G')
+]
 
 #
 #	mohoVisemes
@@ -283,9 +291,11 @@ magpieVisemes = dict({
 #
 #	setViseme(context, vis, setKey, frame):
 #	setBoneLocation(context, pbone, loc, mirror, setKey, frame):
+#	class VIEW3D_OT_MhxVisemeButton(bpy.types.Operator):
 #
 
 def getVisemeSet(context):
+	return bodyLanguageVisemes
 	if context.scene['MhxBodyLanguage'] == True:
 		return bodyLanguageVisemes
 	else:
@@ -317,10 +327,22 @@ def setBoneLocation(context, pb, scale, loc, mirror, setKey, frame):
 	if mirror:
 		loc[0] = -loc[0]
 	pb.location = loc*scale*0.2
-	if setKey or context.scene['MhxSyncAutoKeyframe']:
+
+	if setKey or context.tool_settings.use_keyframe_insert_auto:
 		for n in range(3):
 			pb.keyframe_insert('location', index=n, frame=frame, group=pb.name)
 	return
+
+class VIEW3D_OT_MhxVisemeButton(bpy.types.Operator):
+	bl_idname = 'mhx.pose_viseme'
+	bl_label = 'Viseme'
+	viseme = bpy.props.StringProperty()
+
+	def invoke(self, context, event):
+		setViseme(context, self.viseme, False, context.scene.frame_current)
+		return{'FINISHED'}
+
+
 
 #
 #	openFile(context, filepath):
@@ -381,24 +403,6 @@ def setInterpolation(rig):
 		fcu.extrapolation = 'CONSTANT'
 	return
 	
-# Define viseme buttons
-
-def defineVisemeButtons():
-	visemes = bodyLanguageVisemes
-	for vis in visemes.keys():
-		expr = (
-"class VIEW3D_OT_Mhx%sButton(bpy.types.Operator):\n" % vis +
-"	bl_idname = 'mhx.pose_%s'\n" % vis.lower() +
-"	bl_label = '%s'\n" % vis +	
-"	def invoke(self, context, event):\n" +
-"		global bpy, mathutils\n" +
-"		setViseme(context, '%s', False, context.scene.frame_current)\n" % vis +
-"		return{'FINISHED'}\n"
-		)
-		# print(expr)
-		exec(expr, globals(), locals())
-	return
-
 # 
 #	class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
 #
@@ -452,38 +456,18 @@ class MhxLipsyncPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		setGlobals(context)
-		layout = self.layout
-		layout.operator("mhx.pose_init_interface")
-		
 		if theRig:
-			layout.separator()
-			layout.prop(context.scene, 'MhxSyncAutoKeyframe')
-			layout.prop(context.scene, 'MhxBodyLanguage')
+			layout = self.layout		
 			layout.label(text="Visemes")
-			row = layout.row()
-			row.operator("mhx.pose_rest")
-			row.operator("mhx.pose_etc")
-			row.operator("mhx.pose_ah")
-			row = layout.row()
-			row.operator("mhx.pose_mbp")
-			row.operator("mhx.pose_oo")
-			row.operator("mhx.pose_o")
-			row = layout.row()
-			row.operator("mhx.pose_r")
-			row.operator("mhx.pose_fv")
-			row.operator("mhx.pose_s")
-			row = layout.row()
-			row.operator("mhx.pose_sh")
-			row.operator("mhx.pose_ee")
-			row.operator("mhx.pose_eh")
-			row = layout.row()
-			row.operator("mhx.pose_th")
-			row.operator("mhx.pose_l")
-			row.operator("mhx.pose_g")
+			for (vis1, vis2, vis3) in VisemeList:
+				row = layout.row()
+				row.operator("mhx.pose_viseme", text=vis1).viseme = vis1
+				row.operator("mhx.pose_viseme", text=vis2).viseme = vis2
+				row.operator("mhx.pose_viseme", text=vis3).viseme = vis3
 			layout.separator()
 			row = layout.row()
-			row.operator("mhx.pose_blink")
-			row.operator("mhx.pose_unblink")
+			row.operator("mhx.pose_viseme", text="Blink").viseme = 'Blink'
+			row.operator("mhx.pose_viseme", text="Unblink").viseme = 'Unblink'
 			layout.label(text="Load file")
 			row = layout.row()
 			row.operator("mhx.pose_load_moho")
@@ -741,7 +725,6 @@ class MhxExpressionsPanel(bpy.types.Panel):
 	def draw(self, context):
 		setGlobals(context)
 		layout = self.layout
-		layout.operator("mhx.pose_init_interface")
 		
 		if theRig and rigHasExpressions(theRig):
 			layout.separator()
@@ -1026,6 +1009,25 @@ def addPropDriver(cns, props, expr, prefix):
 			targ.data_path = '["%s"]' % (prefix+prop)
 	return				
 
+class VIEW3D_OT_MhxTogglePropButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_toggle_prop"
+	bl_label = "Toggle"
+	bl_options = {'REGISTER'}
+	strprop = bpy.props.StringProperty()
+
+	def execute(self, context):
+		prop = self.strprop
+		print(prop)
+		if theRig[prop] < 0.5:
+			theRig[prop] = 1.0
+		else:
+			theRig[prop] = 0.0
+		if context.tool_settings.use_keyframe_insert_auto:
+			scn = context.scene
+			theRig.keyframe_insert('["%s"]' % prop, index=-1, frame=scn.frame_current)
+		return{'FINISHED'}	
+
+
 #
 #	initCharacter():
 #	class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
@@ -1105,8 +1107,8 @@ class MhxDriversPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		setGlobals(context)
-		layout = self.layout
 		if theRig:
+			layout = self.layout
 			try:
 				inited = theRig['MhxRigInited']
 			except:
@@ -1130,24 +1132,74 @@ class MhxDriversPanel(bpy.types.Panel):
 			layout.separator()
 			'''
 
-			col = layout.column()
-			self.drawSide('Left', col)
-			self.drawSide('Right', col)
-			return
-
-	def drawSide(self, prefix, layout):
-		layout.label(prefix)
-		for (prop, typ, values, options) in LeftRightProperties:
-				lprop = prefix+prop
-				#print(lprop, typ, values, options)
-				if typ == D_ENUM:
-					layout.label(prop)
-				if RNA_PROPS:
-					layout.prop(theRig, lprop, text=prop, expand=True)
-				else:
-					layout.prop(theRig, '["%s"]' % lprop, text=prop, expand=True)
+			for prefix in ['Left', 'Right']:
+				layout.label(prefix)
+				for (prop, typ, values, options) in LeftRightProperties:
+						lprop = prefix+prop
+						#print(lprop, typ, values, options)
+						if typ == D_ENUM:
+							layout.label(prop)
+						row = layout.split(0.75)
+						if RNA_PROPS:
+							row.prop(theRig, lprop, text=prop, expand=True)
+						else:
+							row.prop(theRig, '["%s"]' % lprop, text=prop, expand=True)
+						row.operator("mhx.pose_toggle_prop").strprop = lprop
 		return
 
+###################################################################################	
+#
+#	Layers panel
+#
+###################################################################################	
+
+MhxLayers = [
+	(( 0,	'Root', 'MhxRoot'),
+	 ( 1,	'FK Spine', 'MhxFKSpine')),
+	(( 8,	'Face', 'MhxFace'),
+	 (10,	'Head', 'MhxHead')),
+	('Left', 'Right'),
+	(( 2,	'IK Arm', 'MhxIKArm'),
+	 (18,	'IK Arm', 'MhxIKArm')),
+	(( 3,	'FK Arm', 'MhxFKArm'),
+	 (19,	'FK Arm', 'MhxFKArm')),
+	(( 4,	'IK Leg', 'MhxIKLeg'),
+	 (20,	'IK Leg', 'MhxIKLeg')),
+	(( 5,	'FK Leg', 'MhxFKLeg'),
+	 (21,	'FK Leg', 'MhxFKLeg')),
+	(( 6,	'Fingers', 'MhxFingers'),
+	 (22,	'Fingers', 'MhxFingers')),
+	(( 7,	'Links', 'MhxLinks'),
+	 (23,	'Links', 'MhxLinks')),
+]
+
+#
+#	class MhxLayersPanel(bpy.types.Panel):
+#
+
+class MhxLayersPanel(bpy.types.Panel):
+	bl_label = "MHX Layers"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	@classmethod
+	def poll(cls, context):
+		return context.object
+
+	def draw(self, context):
+		setGlobals(context)
+		if theRig:
+			layout = self.layout
+			amt = theRig.data
+			for (left,right) in MhxLayers:
+				row = layout.row()
+				if type(left) == str:
+					row.label(left)
+					row.label(right)
+				else:
+					for (n, name, prop) in [left,right]:
+						row.prop(amt, "layers", index=n, toggle=True, text=name)
+		return
 
 
 ###################################################################################	
@@ -1160,18 +1212,12 @@ class MhxDriversPanel(bpy.types.Panel):
 #
 
 def initInterface(scn):
-	bpy.types.Scene.MhxSyncAutoKeyframe = BoolProperty(
-		name="Auto keyframe", 
-		description="Auto keyframe",
-		default=False)
-
 	bpy.types.Scene.MhxBodyLanguage = BoolProperty(
 		name="Body Language", 
 		description="Use Body Language shapekey set",
 		default=True)		
 
 	if scn:
-		scn['MhxSyncAutoKeyframe'] = False
 		scn['MhxBodyLanguage'] = True
 
 	return
@@ -1285,7 +1331,6 @@ class VIEW3D_OT_MhxSetAllFingersOnButton(bpy.types.Operator):
 #
 
 initInterface(bpy.context.scene)
-defineVisemeButtons()
 
 def register():
 	pass

@@ -140,29 +140,29 @@ footCtrlRoll = 0.0
 
 LegControlArmature = [
 	# Leg
-	('UpLeg_L',			upLegRoll, 'Hips', F_WIR, L_LEGFK, NoBB),
-	('LoLeg_L',			loLegRoll, 'UpLeg_L', F_WIR, L_LEGFK, NoBB),
-	('Foot_L',			footRoll, 'LoLeg_L', F_WIR+F_CON, L_LEGFK, NoBB),
-	('Toe_L',			toeRoll, 'Foot_L', F_WIR, L_LEGFK, NoBB),
-	('Leg_L',			footCtrlRoll, Master, F_WIR, L_LEGIK, NoBB),
-	('ToeRev_L',		0, 'Leg_L', F_WIR, L_LEGIK, NoBB),
-	('FootRev_L',		0, 'ToeRev_L', F_WIR, L_LEGIK, NoBB),
+	('UpLeg_L',			upLegRoll, 'Hips', F_WIR, L_LLEGFK, NoBB),
+	('LoLeg_L',			loLegRoll, 'UpLeg_L', F_WIR, L_LLEGFK, NoBB),
+	('Foot_L',			footRoll, 'LoLeg_L', F_WIR+F_CON, L_LLEGFK, NoBB),
+	('Toe_L',			toeRoll, 'Foot_L', F_WIR, L_LLEGFK, NoBB),
+	('Leg_L',			footCtrlRoll, Master, F_WIR, L_LLEGIK, NoBB),
+	('ToeRev_L',		0, 'Leg_L', F_WIR, L_LLEGIK, NoBB),
+	('FootRev_L',		0, 'ToeRev_L', F_WIR, L_LLEGIK, NoBB),
 	('Ankle_L',			0, 'FootRev_L', 0, L_HELP, NoBB),
 
-	('UpLeg_R',			-upLegRoll, 'Hips', F_WIR, L_LEGFK, NoBB),
-	('LoLeg_R',			-loLegRoll, 'UpLeg_R', F_WIR, L_LEGFK, NoBB),
-	('Foot_R',			-footRoll, 'LoLeg_R', F_WIR+F_CON, L_LEGFK, NoBB),
-	('Toe_R',			-toeRoll, 'Foot_R', F_WIR, L_LEGFK, NoBB),
-	('Leg_R',			-footCtrlRoll, Master, F_WIR, L_LEGIK, NoBB),
-	('ToeRev_R',		0, 'Leg_R', F_WIR, L_LEGIK, NoBB),
-	('FootRev_R',		0, 'ToeRev_R', F_WIR, L_LEGIK, NoBB),
+	('UpLeg_R',			-upLegRoll, 'Hips', F_WIR, L_RLEGFK, NoBB),
+	('LoLeg_R',			-loLegRoll, 'UpLeg_R', F_WIR, L_RLEGFK, NoBB),
+	('Foot_R',			-footRoll, 'LoLeg_R', F_WIR+F_CON, L_RLEGFK, NoBB),
+	('Toe_R',			-toeRoll, 'Foot_R', F_WIR, L_RLEGFK, NoBB),
+	('Leg_R',			-footCtrlRoll, Master, F_WIR, L_RLEGIK, NoBB),
+	('ToeRev_R',		0, 'Leg_R', F_WIR, L_RLEGIK, NoBB),
+	('FootRev_R',		0, 'ToeRev_R', F_WIR, L_RLEGIK, NoBB),
 	('Ankle_R',			0, 'FootRev_R', 0, L_HELP, NoBB),
 
 	# Pole target
-	('KneePT_L',		0.0, 'Hips', F_WIR, L_LEGIK, NoBB),
-	('KneePT_R',		0.0, 'Hips', F_WIR, L_LEGIK, NoBB),
-	('KneeLinkPT_L',	0.0, 'UpLeg_L', F_RES, L_LEGIK, NoBB),
-	('KneeLinkPT_R',	0.0, 'UpLeg_R', F_RES, L_LEGIK, NoBB),
+	('KneePT_L',		0.0, 'Hips', F_WIR, L_LLEGIK, NoBB),
+	('KneePT_R',		0.0, 'Hips', F_WIR, L_RLEGIK, NoBB),
+	('KneeLinkPT_L',	0.0, 'UpLeg_L', F_RES, L_LLEGIK, NoBB),
+	('KneeLinkPT_R',	0.0, 'UpLeg_R', F_RES, L_RLEGIK, NoBB),
 ]
 
 #
