@@ -63,22 +63,7 @@ class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
         
         setattr(human, self.parameterName, value)
         humanmodifier.GenderAgeAsymmetricModifier.setValue(self, human, value)
-        
-class GenitalsModifier(AsymmetricDetailModifier):
-    # This needs a custom modifier because female and male are not used as gender factor
-    
-    def __init__(self):
-    
-        AsymmetricDetailModifier.__init__(self, 'data/targets/details/genitals_${genitals}_${age}.target', 'genitals', 'female', 'male', False)
-        
-    def expandTemplate(self, targets):
-        
-        # Build target list of (targetname, [factors])
-        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
-        targets = [(Template(target[0]).safe_substitute({self.parameterName:value}), target[1] + [value]) for target in targets for value in [self.left, self.right]]
 
-        return targets
-        
 class StomachModifier(AsymmetricDetailModifier):
     # This needs a custom modifier because tone and weight also need to be included
     
@@ -565,7 +550,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.modifiers['genitals'] = GenitalsModifier()
+        self.modifiers['genitals'] = AsymmetricDetailModifier('data/targets/details/genitals_${gender}_${genitals}_${age}.target', 'genitals', 'feminine', 'masculine', False)
         
         self.modifiers['breastSize'] = BreastSizeModifier()
         self.modifiers['breastFirmness'] = BreastFirmnessModifier()
