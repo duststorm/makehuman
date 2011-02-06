@@ -1128,18 +1128,28 @@ def parseModifier(ob, args, tokens):
     for (key, val, sub) in tokens:
         if key == 'HookAssignNth':
             if val[0] == 'CURVE':
-                hookAssignNth(mod, int(val[1]), ob.data.splines[0].points)
+                hookAssignNth(mod, int(val[1]), True, ob.data.splines[0].points)
+            elif val[0] == 'LATTICE':
+                hookAssignNth(mod, int(val[1]), False, ob.data.points)
+            elif val[0] == 'MESH':
+                hookAssignNth(mod, int(val[1]), True, ob.data.vertices)
             else:
-                hookAssignNth(mod, int(val[1]), ob.data.vertices)
+                raise NameError("Unknown hook %s" % val)
         else:            
             defaultKey(key, val, sub, 'mod', [], globals(), locals())
     return mod
 
-def hookAssignNth(mod, n, points):
+def hookAssignNth(mod, n, select, points):
+    if select:
+        for pt in points:
+            pt.select = False
+        points[n].select = True
+        sel = []
+        for pt in points:
+            sel.append(pt.select)
+        #print(mod, sel, n, points)
+
     bpy.ops.object.mode_set(mode='EDIT')
-    for pt in points:
-        pt.select = False
-    points[n].select = True
     bpy.ops.object.hook_reset(modifier=mod.name)
     bpy.ops.object.hook_select(modifier=mod.name)
     bpy.ops.object.hook_assign(modifier=mod.name)
@@ -1826,18 +1836,10 @@ def parseLatticePoints(args, tokens, points):
     n = 0
     for (key, val, sub) in tokens:
         if key == 'pt':
-            v = points[n].co
-            (x,y,z) = eval(val[0])
-            v.x = theScale*x
-            v.y = theScale*y
-            v.z = theScale*z
-
-            v = points[n].deformed_co
-            (x,y,z) = eval(val[1])
-            v.x = theScale*x
-            v.y = theScale*y
-            v.z = theScale*z
-
+            v = points[n].co_deform
+            v.x = theScale*float(val[0])
+            v.y = theScale*float(val[1])
+            v.z = theScale*float(val[2])
             n += 1
     return
 
@@ -1996,7 +1998,7 @@ def correctRig(args):
     amt = ob.data
     for pb in ob.pose.bones:
         for cns in pb.constraints:
-            if cns.type == 'CHILD_OF':
+            if cns.type == 'CHILD_OF' and cns.influence > 0.5:
                 amt.bones.active = pb.bone
                 bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
     return
@@ -2436,7 +2438,7 @@ def clearScene():
         return scn
 
     for ob in scn.objects:
-        if ob.type in ["MESH", "ARMATURE", 'EMPTY', 'CURVE']:
+        if ob.type in ["MESH", "ARMATURE", 'EMPTY', 'CURVE', 'LATTICE']:
             scn.objects.active = ob
             bpy.ops.object.mode_set(mode='OBJECT')
             scn.objects.unlink(ob)

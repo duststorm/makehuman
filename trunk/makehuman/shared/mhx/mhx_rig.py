@@ -21,7 +21,7 @@ Limit angles from http://hippydrome.com/
 
 """
 
-import aljabr, mhxbones, mh2mhx, math
+import aljabr, mhxbones, mh2mhx, math, mhx_spine
 from aljabr import *
 
 pi = 3.14159
@@ -92,11 +92,10 @@ P_YXZ = 0x0300
 P_YZX = 0x0400
 P_ZXY = 0x0500
 P_ZYX = 0x0600
+
 def rotationMode(flags):
 	modes = ['QUATERNION', 'XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX']
 	return modes[(flags&P_ROTMODE) >> 8]
-
-
 
 C_ACT = 0x0004
 C_EXP = 0x0008
@@ -1205,160 +1204,6 @@ def constraintFlags(flags):
 
 
 #
-#	addHookEmpty(fp, name, hook):
-#	addMeshCurve(fp, cuname, hooks):
-#
-
-def addHookEmpty(fp, hook):
-	fp.write("Object %s%s EMPTY None\n" % (mh2mhx.theHuman, hook))
-	(x,y,z) = rigHead[hook]
-	fp.write(
-"    location (%.4f,%.4f,%.4f) ;\n" % (x,-z,y) +
-"  parent Refer Object %s ;\n" % mh2mhx.theHuman +
-"end Object\n")
-	return
-
-def addMeshCurve(fp, cuname, hooks):
-	global rigHead
-
-	addHookEmpty(fp, hooks[0])
-	addHookEmpty(fp, hooks[-1])
-
-	name = mh2mhx.theHuman + cuname
-
-	fp.write("Mesh %s %s\n  Verts\n" % (name, name))
-	for hook in hooks:
-		(x,y,z) = rigHead[hook]
-		fp.write("    v %.4f %.4f %.4f ;\n" % (x,-z,y))
-		#mh2mhx.writeVertexLoc(fp, x, y, z)
-
-	fp.write('  end Verts\n  Edges\n')
-
-	npoints = len(hooks)
-	for n in range(npoints-1):
-		fp.write('    e %d %d ;\n' % (n, n+1))
-	fp.write(
-"  end Edges\n")
-
-	for n in range(npoints):
-		fp.write(
-"  VertexGroup V%d\n" % n +
-"    wv %d 1 ;\n" % n +
-"  end VertexGroup\n")
-
-	fp.write(
-"end Mesh\n" +
-"\n" +
-"Object %s MESH %s\n" % (name, name) +
-"  layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;\n")
-
-	addHookModifier(fp, hooks, 0)
-	addHookModifier(fp, hooks, npoints-1)
-
-	fp.write(
-"  parent Refer Object %s ;\n" % mh2mhx.theHuman +
-"end Object")
-
-def addHookModifier(fp, hooks, index):
-	hook = hooks[index]
-	fp.write(
-"  Modifier %s HOOK\n" % hook +
-"    falloff 0 ;\n" +
-"    force 1 ;\n" +
-"    object Refer Object %s%s ;\n" % (mh2mhx.theHuman, hook)+
-"    show_expanded False ;\n" +
-"    use_apply_on_spline True ;\n" +
-"    HookAssignNth MESH %d ;\n" % index +
-"  end Modifier\n")
-
-#
-#	addCurve(fp, cuname, hooks):
-#
-
-def addCurve(fp, cuname, hooks):
-	global rigHead
-	count = len(hooks)-1
-	name = "%s%s" % (mh2mhx.theHuman, cuname)
-
-	fp.write("\n" +
-"Curve %s %s\n" % (name,name) +
-"  bevel_depth 0 ;\n" +
-"  bevel_resolution 0 ;\n" +
-"  dimensions '3D' ;\n" +
-"  offset 0 ;\n" +
-"  path_duration 100 ;\n" +
-"  render_resolution_u 0 ;\n" +
-"  render_resolution_v 0 ;\n" +
-"  resolution_u 12 ;\n" +
-"  resolution_v 12 ;\n" +
-"  show_handles True ;\n" +
-"  twist_mode 'MINIMUM' ;\n" +
-"  twist_smooth 0 ;\n" +
-"  use_fill_back True ;\n" +
-"  use_fill_deform True ;\n" +
-"  use_fill_front True ;\n" +
-"  use_path True ;\n" +
-"  use_path_follow False ;\n" +
-"  use_radius True ;\n" +
-"  use_stretch False ;\n" +
-"  use_time_offset False ;\n" +
-"  use_uv_as_generated False ;\n" +
-"  Spline NURBS %d 1\n" % count +
-"    order_u 3 ;\n" +
-"    order_v 0 ;\n")
-
-	for hook in hooks:
-		pt = rigHead[hook]
-		fp.write("    pt (%.4f,%.4f,%4f,1) ;\n" % (pt[0], -pt[2], pt[1]))
-
-	fp.write(
-"    radius_interpolation 'LINEAR' ;\n" +
-"    resolution_u 12 ;\n" +
-"    resolution_v 12 ;\n" +
-"    tilt_interpolation 'LINEAR' ;\n" +
-"    use_bezier_u True ;\n" +
-"    use_bezier_v True ;\n" +
-"    use_cyclic_u False ;\n" +
-"    use_cyclic_v False ;\n" +
-"    use_endpoint_u False ;\n" +
-"    use_endpoint_v False ;\n" +
-"    use_smooth True ;\n" +
-"  end Spline\n" +
-"end Curve\n" +
-"\n" +
-"Object %s CURVE %s\n" % (name,name) +
-"  layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;\n")
-
-	n = 1
-	for hook in hooks[1:]:
-		continue
-		fp.write(
-"  Modifier %s HOOK\n" % hook +
-"    bpyops object.mode_set(mode='EDIT') ;\n" +
-"    falloff 0 ;\n" +
-"    force 1 ;\n" +
-"    object Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig)+
-"    show_expanded False ;\n" +
-"    subtarget '%s' ;\n" % hook +
-"    use_apply_on_spline True ;\n" +
-"    bpyops object.hook_reset(modifier='%s') ;\n" % hook +
-#"    bpyops object.hook_select(modifier='%s') ;\n" % hook +
-"    CurveSelectNth %d ;\n" % n +
-"    bpyops object.hook_assign(modifier='%s') ;\n" % hook +
-"    bpyops object.mode_set(mode='OBJECT') ;\n" +
-"  end Modifier\n")
-		n += 1
-
-	fp.write(
-#"  parent Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
-"  location (0,0,0) ;\n" +
-"  parent_type 'OBJECT' ;\n" +
-"  rotation_mode 'XYZ' ;\n" +
-"  track_axis 'POS_Y' ;\n" +
-"  up_axis 'Z' ;\n" +
-"end Object\n")
-
-#
 #	writeAction(fp, cond, name, action, lr, ikfk):
 #	writeFCurves(fp, name, (x01, y01, z01, w01), (x21, y21, z21, w21)):
 #
@@ -1692,7 +1537,7 @@ def setupCircle(fp, name, r):
 "end Object\n")
 	return
 
-def setupCube(fp, name, r, offs):
+def setupCubeMesh(fp, name, r, offs):
 	try:
 		(rx,ry,rz) = r
 	except:
@@ -1719,7 +1564,12 @@ def setupCube(fp, name, r, offs):
 "    f 1 0 4 5 ;\n" +
 "    f 2 3 7 6 ;\n" +
 "  end Faces\n" +
-"end Mesh\n" +
+"end Mesh\n")
+	return
+
+def setupCube(fp, name, r, offs):
+	setupCubeMesh(fp, name, r, offs)
+	fp.write(
 "Object %s MESH %s\n" % (name, name) +
 "  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
 "  parent Refer Object CustomShapes ;\n" +
@@ -1865,8 +1715,8 @@ def writeDeformArmature(fp):
 	return
 
 def writeAllCurves(fp):
-	for (cuname, hooks) in rig_body_25.BodyCurves:
-		addMeshCurve(fp, cuname, hooks)
+	for (name, hooks) in rig_body_25.BodySpines:
+		mhx_spine.addSpine(fp, name, hooks)
 	return 
 
 def writeControlPoses(fp):

@@ -365,7 +365,7 @@ def writeRigBones(fp, bones):
 		(x, y, z) = head
 		fp.write("    head  %.4f %.4f %.4f  ;\n" % (x-ox,-z+oz,y-oy))
 		(x, y, z) = tail
-		fp.write("    tail %.4f %.4f %.4f  ;\n" % (x-ox,-z+oy,y-oy))
+		fp.write("    tail %.4f %.4f %.4f  ;\n" % (x-ox,-z+oz,y-oy))
 		if parent and parent != '-':
 			fp.write("    parent Refer Bone %s ;\n" % parent)
 		fp.write(

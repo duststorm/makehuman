@@ -69,7 +69,7 @@ M_Tool	= 0x40
 M_Anim	= 0x80
 
 M_Nodes = 0x0100
-M_MHX	= 0x200
+M_Sel	= 0x200
 M_Shape	= 0x400
 M_VGroup = 0x800
 M_Part = 0x1000
@@ -77,7 +77,7 @@ M_MHPart = 0x2000
 M_UnselShape = 0x4000
 M_Rigify = 0x8000
 
-M_All = ~(M_MHX)
+M_All = 0
 
 expMsk = 0
 theRig = ""
@@ -235,23 +235,23 @@ PropertyTypes = {
 
 MinBlockLevel = {
 	
-	'Object' : M_Geo+M_MHX,
-	'Mesh' : M_Geo+M_MHX,
-	'MeshTextureFaceLayer' : M_Geo+M_MHX,
-	'MeshColorLayer' : M_Geo+M_MHX,
-	'ShapeKey' : M_Geo+M_MHX,
-	'VertexGroup' : M_Geo+M_MHX,
-	'Armature' : M_Geo+M_MHX,
-	'Pose' : M_Geo+M_MHX,
-	'PoseBone' : M_Geo+M_MHX,
-	'Material' : M_Mat+M_MHX,
-	'Texture' : M_Mat+M_MHX,
-	'Image' : M_Mat+M_MHX,
-	'Group' : M_Geo+M_MHX,
-	'NodeGroup' : M_Geo+M_MHX,
-	'Particle' : M_Geo+M_MHX,
-	'ParticleSystem' : M_Geo+M_MHX,
-	'Action' : M_Anim+M_MHX, 
+	'Object' : M_Geo,
+	'Mesh' : M_Geo,
+	'MeshTextureFaceLayer' : M_Geo,
+	'MeshColorLayer' : M_Geo,
+	'ShapeKey' : M_Geo,
+	'VertexGroup' : M_Geo,
+	'Armature' : M_Geo,
+	'Pose' : M_Geo,
+	'PoseBone' : M_Geo,
+	'Material' : M_Mat,
+	'Texture' : M_Mat,
+	'Image' : M_Mat,
+	'Group' : M_Geo,
+	'NodeGroup' : M_Geo,
+	'Particle' : M_Geo,
+	'ParticleSystem' : M_Geo,
+	'Action' : M_Anim, 
 	'Camera' : M_Scn, 
 	'Lamp' : M_Scn, 
 	'Scene' : M_Scn,
@@ -264,8 +264,8 @@ MinBlockLevel = {
 	'MaterialHalo' : M_Scn, 
 	'MaterialPhysics' : M_Game, 
 	'MaterialRaytraceTransparency' : M_Scn, 
-	'MaterialStrand' : M_Mat+M_MHX, 
-	'MaterialVolume' : M_Mat+M_MHX, 
+	'MaterialStrand' : M_Mat, 
+	'MaterialVolume' : M_Mat, 
 	'AnimViz' : M_Anim, 
 	'AnimVizOnionSkinning' : M_Anim, 
 	'AnimVizMotionPaths' : M_Anim, 
@@ -719,30 +719,6 @@ def exportAction(act, fp):
 	exported = {}
 	for fcu in act.fcurves:
 		exportFCurve(fcu, exported, "  ", fp)
-	if expMsk & M_MHX:
-		explist = []
-		for (bone, lists) in exported.items():
-			explist.append((bone,lists))
-		explist.sort()
-		for (bone, lists) in explist:
-			(tlist,blist) = lists
-			print(bone,blist)
-			c0 = '\n\t\t['
-			fp.write("\t('%s', " % bone)
-			k = blist[0]
-			for m in range(len(k)):
-				fp.write(c0)
-				c1 = '(%2d, ' % tlist[m]
-				for n in range(len(blist)):
-					x = blist[n][m]
-					if abs(x) < 1e-4:
-						x = 0
-					fp.write("%s%.4g" % (c1,x))
-					c1 = ', '
-				fp.write(")")
-				c0 = ',\n\t\t '
-			fp.write(" ]),\n")
-		return
 	writeDir(act, ['fcurves', 'groups'], "  ", fp)
 	fp.write("end Action\n\n")
 	return
@@ -751,29 +727,6 @@ def exportFCurve(fcu, exported, pad, fp):
 	dataPath = fcu.data_path.replace(' ', '_')
 	words = dataPath.split('"')
 	#print("Fcurve", dataPath, words)
-
-	if expMsk & M_MHX:
-		if words[2] != '].rotation_quaternion':
-			return
-		bone = words[1]
-		try:
-			(tlist,blist) = exported[bone]
-			first = False
-		except:
-			tlist = []
-			blist = []
-			exported[bone] = (tlist,blist)
-			first = True
-
-		if first:
-			for kpt in fcu.keyframe_points:
-				tlist.append(kpt.co[0])
-
-		pts = []
-		blist.append(pts)
-		for kpt in fcu.keyframe_points:
-			pts.append(kpt.co[1])
-		return 
 
 	fp.write("%sFCurve %s %d\n"  % (pad, dataPath, fcu.array_index))
 	if fcu.driver:
@@ -942,11 +895,7 @@ def exportImage(img, fp):
 	if imgName == 'Render_Result':
 		return
 	fp.write("Image %s\n" % imgName)
-	if expMsk & M_MHX:
-		(path, name) = os.path.split(img.filepath)
-		fp.write("  *** Filename %s ;\n" % (name))
-	else:
-		fp.write("  Filename %s ;\n" % (img.filepath))
+	fp.write("  Filename %s ;\n" % (img.filepath))
 	# writeDir(img, [], "  ", fp)
 	fp.write("end Image\n\n")
 
@@ -1094,13 +1043,7 @@ def exportObject(ob, fp):
 		exportConstraint(cns, fp)
 
 	for psys in ob.particle_systems:
-		if expMsk & M_MHX:
-			fp.write("*** ParticleSystem\n")
-			fp1 = mhxOpen(M_Part, hairFile)
-			exportParticleSystem(psys, "  ", fp1)
-			mhxClose(fp1)
-		else:
-			exportParticleSystem(psys, "  ", fp)
+		exportParticleSystem(psys, "  ", fp)
 
 	exportAnimationData(ob.animation_data, fp)
 	exportDefault("FieldSettings", ob.field, [], [], [], [], '  ', fp)
@@ -1132,20 +1075,13 @@ def exportParticleSystem(psys, pad, fp):
 
 def exportParticleSettings(settings, psys, pad, fp):
 	fp.write("%ssettings Struct ParticleSettings %s \n" % (pad, settings.name.replace(' ','_')))
-	if expMsk & (M_MHX+M_MHPart) == M_MHX+M_MHPart:
-		fp.write("%s  *** ParticleSettings\n" % pad)
 	prio = ['amount', 'hair_step', 'rendered_child_nbr', 'child_radius', 'child_random_size']
 	writePrio(settings, prio, pad+"  ", fp)
-	if expMsk & M_MHX:
-		fp.write("%s  *** EndIgnore\n" % pad)
 	writeDir(settings, prio, pad+"  ", fp)
 	fp.write("%send Struct\n" % pad)
 
 def exportParticles(particles, nmax, pad, fp):
-	if expMsk & (M_MHX+M_MHPart) == M_MHX+M_MHPart:
-		fp.write("%s  *** Particles\n" % pad)
-	else:
-		fp.write("%sParticles\n" % pad)
+	fp.write("%sParticles\n" % pad)
 	n = 0
 	prio = ['location']
 	for par in particles:
@@ -1158,8 +1094,6 @@ def exportParticles(particles, nmax, pad, fp):
 			writePrio(par, prio, pad+"    ", fp)
 			fp.write("%s  end Particle\n" % pad)
 			n += 1
-	if expMsk & M_MHX:
-		fp.write("%s  *** EndIgnore\n" % pad)
 	writeDir(particles[0], prio+['hair'], pad+"  ", fp)
 	fp.write("%send Particles\n" % pad)
 
@@ -1179,25 +1113,19 @@ def exportMesh(ob, fp):
 
 	if me.vertices:
 		fp.write("  Verts\n")
-		if expMsk & M_MHX and obName == "Human":
-			fp.write("  *** Verts\n")
-		else:
-			for v in me.vertices:
-				fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
+		for v in me.vertices:
+			fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
 		v = me.vertices[0]
 		#writeDir(v, ['co', 'index', 'normal'], "      ", fp)
 		fp.write("  end Verts\n")
 
 	if me.faces:
 		fp.write("  Faces\n")
-		if expMsk & M_MHX and obName == "Human":
-			fp.write("  *** Faces\n")
-		else:
-			for f in me.faces:
-				fp.write("    f ")
-				for v in f.vertices:
-					fp.write("%d " % v)
-				fp.write(";\n")
+		for f in me.faces:
+			fp.write("    f ")
+			for v in f.vertices:
+				fp.write("%d " % v)
+			fp.write(";\n")
 		if len(me.materials) <= 1:
 			f = me.faces[0]
 			fp.write("    ftall %d %d ;\n" % (f.material_index, f.use_smooth))
@@ -1217,13 +1145,12 @@ def exportMesh(ob, fp):
 		uvtexName = uvtex.name.replace(' ','_')
 		fp.write("  MeshTextureFaceLayer %s\n" % uvtexName)
 		fp.write("    Data \n")
-		if expMsk & M_MHX and obName == "Human":
-			fp.write("  *** TexVerts\n")
-		else:
-			for data in uvtex.data.values():
-				v = data.uv_raw
-				fp.write("      vt %.6g %.6g %.6g %.6g %.6g %.6g %.6g %.6g ;\n" % (v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
-			writeDir(uvtex.data[0], ['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "      ", fp)
+		for data in uvtex.data.values():
+			v = data.uv_raw
+			fp.write("      vt %.6g %.6g %.6g %.6g %.6g %.6g %.6g %.6g ;\n" % 
+				(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
+		writeDir(uvtex.data[0], 
+			['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "      ", fp)
 		fp.write("    end Data\n")
 		writeDir(uvtex, ['data'], "    ", fp)
 		createdLocal['MeshTextureFaceLayer'].append(uvtexName)
@@ -1255,31 +1182,7 @@ def exportMesh(ob, fp):
 		if mat:
 			fp.write("  Material %s ;\n" % mat.name.replace(" ", "_"))
 	
-	if expMsk & M_MHX and obName == "Human":
-		fp.write("    *** VertexGroup\n")
-		fp1 = mhxOpen(M_VGroup, "vertexgroups25.mhx")
-		exportVertexGroups(ob, me, 'All', fp1)
-		mhxClose(fp1)
-		'''
-		fp1 = mhxOpen(M_VGroup, "vertexgroups-common25.mhx")
-		exportVertexGroups(ob, me, 'Common', fp1)
-		mhxClose(fp1)
-		fp1 = mhxOpen(M_VGroup, "vertexgroups-face25.mhx")
-		exportVertexGroups(ob, me, 'Face', fp1)
-		mhxClose(fp1)
-		fp1 = mhxOpen(M_VGroup, "vertexgroups-toes25.mhx")
-		(toeLeft, toeRight) = exportVertexGroups(ob, me, 'Toe', fp1)
-		mhxClose(fp1)
-		fp1 = mhxOpen(M_VGroup, "vertexgroups-foot25.mhx")
-		dumpVertexGroup(toeLeft, "Toe_L", fp1)
-		dumpVertexGroup(toeRight, "Toe_R", fp1)
-		mhxClose(fp1)
-		fp1 = mhxOpen(M_VGroup, "vertexgroups-%s25.mhx" % theRig)
-		exportVertexGroups(ob, me, 'Rig', fp1)
-		mhxClose(fp1)
-		'''
-	else:
-		exportVertexGroups(ob, me, 'All', fp)
+	exportVertexGroups(ob, me, 'All', fp)
 
 	if me.shape_keys:
 		global FacialKey, BodyKey
@@ -1590,21 +1493,14 @@ def writeBone(bone, fp):
 
 def exportBone(fp, bone):
 	flags = 0
-	if expMsk & M_MHX:
-		fp.write("  *** Bone %s \n" % (bone.name.replace(' ','_')))
-		fp.write("    *** head ;\n")
-		fp.write("    *** tail ;\n")
-		#fp.write("    *** roll ;\n")
-	else:
-		writeBone(bone, fp)
+	writeBone(bone, fp)
 
 	if bone.parent:
 		fp.write("    parent Refer Bone %s ;\n" % (bone.parent.name.replace(' ','_')))
 
 	exclude = ['head', 'tail', 'parent', 'head_local', 'tail_local', 'matrix_local', 'children']
-	if True or expMsk & M_MHX:
-		exclude += ['matrix',  'envelope_distance', 'envelope_weight', 'head_radius', 'tail_radius',
-			'selected', 'selected_head', 'selected_tail']
+	exclude += ['matrix',  'envelope_distance', 'envelope_weight', 'head_radius', 'tail_radius',
+		'selected', 'selected_head', 'selected_tail']
 	writeDir(bone, exclude, "    ", fp)
 
 	fp.write("  end Bone\n\n")
@@ -1635,9 +1531,8 @@ def exportPoseBone(fp, pb):
 		'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',
 		'custom_shape_transform', 'original_length', 'bone_group_index', 
 		'parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
-	if True or expMsk & M_MHX:
-		exclude += ['channel_matrix', 'matrix', 'rotation_axis_angle', 'rotation_euler', 'rotation_mode',
-			'rotation_quaternion', 'scale', 'selected']
+	exclude += ['channel_matrix', 'matrix', 'rotation_axis_angle', 'rotation_euler', 'rotation_mode',
+		'rotation_quaternion', 'scale', 'selected']
 	writeDir(pb, exclude, "    ", fp)	
 	fp.write("  end Posebone\n")
 	return
@@ -1685,8 +1580,7 @@ def exportConstraint(cns, fp):
 		'head_tail',
 		'pos_lock_x', 'pos_lock_y', 'pos_lock_z', 'rot_lock_x', 'rot_lock_y', 'rot_lock_z', 
 		'disabled', 'lin_error', 'rot_error', 'target', 'type']
-	if expMsk & M_MHX:
-		exclude += ['distance']
+	exclude += ['distance']
 	writeDir(cns, exclude, "      ", fp)	
 	fp.write("    end Constraint\n")
 	return
@@ -1808,7 +1702,7 @@ def exportLattice(ob, fp):
 	fp.write("  Points\n")
 	for pt in lat.points:
 		x = pt.co
-		y = pt.deformed_co
+		y = pt.co_deform
 		fp.write("    pt (%.6g,%.6g,%.6g) (%.6g,%.6g,%.6g) ;\n" % (x[0], x[1], x[2], y[0], y[1], y[2]))
 	fp.write("  end Points\n")
 	fp.write("end Lattice\n")
@@ -1837,6 +1731,11 @@ def exportGroup(grp, fp):
 #	writeTools(fp):
 #	writeScenes(fp):
 #
+
+def selectStatus(ob):
+	if expMsk & M_Sel:
+		return ob.select
+	return True
 
 def writeHeader(fp):
 	fp.write(
@@ -1880,7 +1779,7 @@ def writeArmatures(fp):
 	if bpy.data.objects:		
 		fp.write("\n# --------------- Armatures ----------------------------- # \n \n")
 		for ob in bpy.data.objects:
-			if ob.type == 'ARMATURE':
+			if ob.type == 'ARMATURE' and selectStatus(ob):
 				initLocalData()
 				exportObject(ob, fp)
 	return
@@ -1888,7 +1787,7 @@ def writeArmatures(fp):
 def writeMeshes(fp):
 	if bpy.data.objects:		
 		for ob in bpy.data.objects:
-			if ob.type != 'ARMATURE' and ob.name != 'Human':
+			if ob.type != 'ARMATURE' and selectStatus(ob):
 				initLocalData()
 				exportObject(ob, fp)
 	if bpy.data.groups:
@@ -1949,7 +1848,6 @@ def writeScenes(fp):
 
 #
 #	writeMhxFile(fileName):
-#	writeMhxTemplates():
 #
 
 def writeMhxFile(fileName, msk):
@@ -1977,28 +1875,6 @@ def writeMhxFile(fileName, msk):
 	if expMsk & M_Scn:
 		writeScenes(fp)
 	mhxClose(fp)
-	return
-
-def writeMhxTemplates(msk):
-	global expMsk
-	expMsk = msk
-
-	fp = mhxOpen(M_Mat, "materials25.mhx")
-	writeHeader(fp)
-	writeMaterials(fp)
-	mhxClose(fp)
-	
-	if expMsk & M_Geo:
-		fp = mhxOpen(M_Geo, "meshes25.mhx")
-		writeHumanMesh(fp)
-		mhxClose(fp)
-
-	if expMsk & M_Amt:
-		fp = mhxOpen(M_Amt, "armatures-%s25.mhx" % theRig)
-		writeMeshes(fp)
-		writeArmatures(fp)
-		writeAnimations(fp)
-		mhxClose(fp)
 	return
 
 #
@@ -2044,7 +1920,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-	mhx = BoolProperty(name="MHX", description="Include materials", default=mask&M_MHX)
+	sel = BoolProperty(name="Selected only", description="Only selected objects", default=mask&M_Sel)
 	#xall = BoolProperty(name="Everything", description="Include everything", default=mask&M_All)
 	mat = BoolProperty(name="Materials", description="Include materials", default=mask&M_Mat)
 	geo = BoolProperty(name="Geometry", description="Include geometry", default=mask&M_Geo)
@@ -2057,7 +1933,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 
 	def execute(self, context):
 		global toggle
-		O_MHX = M_MHX if self.properties.mhx else 0
+		O_Sel = M_Sel if self.properties.sel else 0
 		#O_All = M_All if self.properties.xall else 0
 		O_Mat = M_Mat if self.properties.mat else 0
 		O_Geo = M_Geo if self.properties.geo else 0
@@ -2068,7 +1944,7 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 		O_VGroup = M_VGroup if self.properties.vgroup else 0
 		O_Obj = M_Obj if self.properties.obj else 0
 
-		mask = O_MHX | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_UnselShape | O_VGroup | O_Obj
+		mask = O_Sel | O_Mat | O_Geo | O_Amt | O_Anim | O_Shape | O_UnselShape | O_VGroup | O_Obj
 		
 		writeMhxFile(self.properties.filepath, mask)
 		return {'FINISHED'}
@@ -2104,7 +1980,5 @@ theRig = "classic"
 writeMhxFile('/home/thomas/myblends/test.mhx', M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape+M_Obj+M_Nodes+M_Scn)
 #writeMhxFile('/home/thomas/myblends/test.mhx', M_All)
 #writeMhxFile('/home/thomas/myblends/sintel/simple2.mhx', M_Amt+M_Anim)
-#writeMhxTemplates(M_MHX+M_Mat+M_Geo+M_Amt+M_VGroup+M_Anim+M_Shape)
-#writeMhxTemplates(M_Geo+M_Mat+M_MHX+M_Amt+M_VGroup+M_Rigify)
 """
 

@@ -2,8 +2,9 @@
 #	Body bone definitions 
 #
 
-import mhx_rig
+import mhx_rig, mhx_spine
 from mhx_rig import *
+from mhx_spine import spineDeform
 
 BodyJoints = [
 	('root-tail',			'o', ('spine3', [0,-1,0])),
@@ -61,7 +62,7 @@ BodyHeadsTails = [
 	('MasterHips',			'pelvis', ('pelvis', zunit)),
 	('MasterNeck',			'neck', ('neck', zunit)),
 
-	('Root',				'spine3', 'root-tail'),
+	('Root',				'root-tail', 'spine3'),
 	('BendRoot',			'spine3', ('spine3', yunit)),
 	('Hips',				'pelvis', 'hips-tail'),
 	('Hip_L',				'spine3', 'r-upper-leg'),
@@ -226,9 +227,14 @@ def BodyDeformPoses(fp):
 	#copyDeform(fp,'Hip_L', 0, U_LOC+U_ROT, None)
 	#copyDeform(fp,'Hip_R', 0, U_LOC+U_ROT, None)
 
-	copyDeform(fp,'Spine1', 0, U_LOC+U_ROT, 'MHDefSpine1')
-	copyDeform(fp,'Spine2', 0, U_LOC+U_ROT, 'MHDefSpine2')
-	copyDeform(fp,'Spine3', 0, U_LOC+U_ROT, 'MHDefChest')
+	#copyDeform(fp,'Spine1', 0, U_LOC+U_ROT, 'MHDefSpine1')
+	#copyDeform(fp,'Spine2', 0, U_LOC+U_ROT, 'MHDefSpine2')
+	#copyDeform(fp,'Spine3', 0, U_LOC+U_ROT, 'MHDefChest')
+
+	spineDeform(fp, 'Spine1', 'Spine', 0, 0, 0, 'MHDefSpine1')
+	spineDeform(fp, 'Spine2', 'Spine', 0, 1, 0, 'MHDefSpine2')
+	spineDeform(fp, 'Spine3', 'Spine', 0, 2, 3, 'MHDefChest')
+
 	copyDeform(fp,'Shoulders', 0, U_LOC+U_ROT, None)
 	copyDeform(fp,'Neck', 0, U_LOC+U_ROT, 'MHDefNeck')
 	copyDeform(fp,'Head', 0, U_LOC+U_ROT, 'MHDefHead')
@@ -269,8 +275,8 @@ BodyShapeKeyScale = {
 	'BicepFlex'			: ('r-uparm-front', 'r-uparm-back', 0.93219),
 }
 
-BodyCurves = [
-	('SpineCurve', ['Spine1', 'Spine2', 'Spine3', 'Shoulders'])
+BodySpines = [
+	('Spine', ['Root', 'Spine1', 'Spine2', 'Spine3', 'Shoulders'])
 ]
 
 

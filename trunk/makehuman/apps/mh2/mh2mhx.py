@@ -358,15 +358,21 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 				else:
 					fp.write("      object Refer Object %sDeformRig ;\n" % theHuman)
 			elif words[1] == 'ProxyVerts':
+				ox = mhx_rig.Origin[0]
+				oy = mhx_rig.Origin[1]
+				oz = mhx_rig.Origin[2]
 				for bary in proxy.realVerts:
 					(x,y,z) = mh2proxy.proxyCoord(bary)
-					writeVertexLoc(fp, 'v', x, y, z)
+					fp.write("  v %.4f %.4f %.4f ;\n" % (x-ox, -z+oz, y-oy))
 
 			elif words[1] == 'Verts':
 				proxy = None
 				fp.write("Mesh %sMesh %sMesh\n  Verts\n" % (theHuman, theHuman))
+				ox = mhx_rig.Origin[0]
+				oy = mhx_rig.Origin[1]
+				oz = mhx_rig.Origin[2]
 				for v in obj.verts:
-					writeVertexLoc(fp, 'v', v.co[0], v.co[1], v.co[2])
+					fp.write("  v %.4f %.4f %.4f ;\n" % (v.co[0]-ox, -v.co[2]+oz, v.co[1]-oy))
 			elif words[1] == 'ProxyFaces':
 				for (f,g) in proxy.faces:
 					fp.write("    f")
@@ -493,17 +499,6 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 	print("    %s copied" % tmplName)
 	tmpl.close()
 
-	return
-
-#
-#	writeVertexLoc(fp, string, x, y, z):
-#
-
-def writeVertexLoc(fp, string, x, y, z):
-	ox = mhx_rig.Origin[0]
-	oy = mhx_rig.Origin[1]
-	oz = mhx_rig.Origin[2]
-	fp.write("  %s %.4f %.4f %.4f ;\n" % (string, x-ox, -z+oz, y-oy))
 	return
 
 #
