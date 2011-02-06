@@ -2,7 +2,7 @@ import Blender, sys
 from Blender import Scene, Curve, Object, Group
 
 def exportAsCurves(file, guides, groups=None):
-    DEG_ORDER_U = 3
+    DEG_ORDER_U = 2 #formerly 3
     # use negative indices
     for j in xrange(0,len(guides)):
       guide=guides[j]
