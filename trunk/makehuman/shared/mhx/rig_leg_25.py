@@ -327,36 +327,36 @@ def LegControlPoses(fp):
 
 def LegDeformPoses(fp):
 	# Deform 
-	copyDeformPartial(fp, 'UpLeg1_L', 'UpLeg_L', (1,0,1), RmodUpLeg, U_LOC+U_ROT+U_SCALE, None)
+	copyDeformPartial(fp, 'UpLeg1_L', 'UpLeg_L', (1,0,1), RmodUpLeg, U_LOC+U_ROT+U_SCALE, None, [])
 	
-	copyDeformPartial(fp, 'UpLeg2_L', 'UpLeg_L', (1,1,1), RmodUpLeg, U_SCALE, 'MHDefUpLeg2')
+	copyDeformPartial(fp, 'UpLeg2_L', 'UpLeg_L', (1,1,1), RmodUpLeg, U_SCALE, 'MHDefUpLeg2', [])
 		
-	copyDeformPartial(fp, 'UpLeg3_L', 'UpLeg_L', (0,1,0), RmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3')
+	copyDeformPartial(fp, 'UpLeg3_L', 'UpLeg_L', (0,1,0), RmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3', [])
 
-	copyDeform(fp, 'LoLeg_L', RmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg')
+	copyDeform(fp, 'LoLeg_L', RmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
 
 	addPoseBone(fp, 'LoLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), RmodLoLeg,
 		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_L', (1,0,1), (0,0,0), False])])
 
-	copyDeform(fp, 'Foot_L', RmodFoot, U_LOC+U_ROT, 'MHDefFoot')
+	copyDeform(fp, 'Foot_L', RmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
 
-	copyDeform(fp, 'Toe_L', RmodToe, U_LOC+U_ROT, 'MHDefToe')
+	copyDeform(fp, 'Toe_L', RmodToe, U_LOC+U_ROT, 'MHDefToe', [])
 
 
-	copyDeformPartial(fp, 'UpLeg1_R', 'UpLeg_R', (1,0,1), RmodUpLeg, U_LOC+U_ROT+U_SCALE, None)
+	copyDeformPartial(fp, 'UpLeg1_R', 'UpLeg_R', (1,0,1), RmodUpLeg, U_LOC+U_ROT+U_SCALE, None, [])
 	
-	copyDeformPartial(fp, 'UpLeg2_R', 'UpLeg_R', (1,1,1), RmodUpLeg, U_SCALE, 'MHDefUpLeg2')
+	copyDeformPartial(fp, 'UpLeg2_R', 'UpLeg_R', (1,1,1), RmodUpLeg, U_SCALE, 'MHDefUpLeg2', [])
 		
-	copyDeformPartial(fp, 'UpLeg3_R', 'UpLeg_R', (0,1,0), RmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3')
+	copyDeformPartial(fp, 'UpLeg3_R', 'UpLeg_R', (0,1,0), RmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3', [])
 
-	copyDeform(fp, 'LoLeg_R', RmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg')
+	copyDeform(fp, 'LoLeg_R', RmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
 
 	addPoseBone(fp, 'LoLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), RmodLoLeg,
 		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_R', (1,0,1), (0,0,0), False])])
 
-	copyDeform(fp, 'Foot_R', RmodFoot, U_LOC+U_ROT, 'MHDefFoot')
+	copyDeform(fp, 'Foot_R', RmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
 
-	copyDeform(fp, 'Toe_R', RmodToe, U_LOC+U_ROT, 'MHDefToe')
+	copyDeform(fp, 'Toe_R', RmodToe, U_LOC+U_ROT, 'MHDefToe', [])
 
 
 	# Hip deform

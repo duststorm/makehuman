@@ -68,7 +68,7 @@ F_DEF = 0x0002
 F_RES = 0x0004
 #F_RES = 0
 F_WIR = 0x0008
-F_GLOC = 0x0020
+F_NOLOC = 0x0020
 F_LOCK = 0x0040
 F_HID = 0x0080
 F_NOCYC = 0x0100
@@ -235,7 +235,7 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	deform = boolString(flags & F_DEF)
 	restr = boolString(flags & F_RES)
 	wire = boolString(flags & F_WIR)
-	lloc = boolString(flags & F_GLOC == 0)
+	lloc = boolString(flags & F_NOLOC == 0)
 	lock = boolString(flags & F_LOCK)
 	hide = boolString(flags & F_HID)
 	cyc = boolString(flags & F_NOCYC == 0)
@@ -276,8 +276,8 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 		bit = bit << 1
 
 #"    use_cyclic_offset %s ; \n" % cyc +
-#"    use_local_location %s ; \n" % lloc +
 	fp.write(" ; \n" +
+"    use_local_location %s ; \n" % lloc +
 "    lock %s ; \n" % lock +
 "    use_envelope_multiply False ; \n"+
 "    hide_select %s ; \n" % (restr) +
@@ -427,7 +427,7 @@ U_LOC = 1
 U_ROT = 2
 U_SCALE = 4
 
-def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape):
+def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, constraints):
 	fp.write("\n  Posebone %s %s \n" % (dbone, True))
 	rotMode = rotationMode(flags)
 	fp.write("  rotation_mode '%s' ;\n" % rotMode)
@@ -439,11 +439,12 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape):
 		addCopyRotConstraint(fp, '', C_LOCAL, 1, ['Rot', cbone, channels, (0,0,0), False])
 	if copy & U_SCALE:
 		addCopyScaleConstraint(fp, '', 0, 1, ['Scale', cbone, (1,1,1), False])
+	addConstraints(fp, dbone, constraints, 0, 0)
 	fp.write("  end Posebone\n")
 	return
 
-def copyDeform(fp, bone, flags, copy, customShape):
-	copyDeformPartial(fp, bone, bone, (1,1,1), flags, copy, customShape)
+def copyDeform(fp, bone, flags, copy, customShape, constraints):
+	copyDeformPartial(fp, bone, bone, (1,1,1), flags, copy, customShape, constraints)
 
 #
 #	addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik_dof, flags, constraints):
@@ -495,6 +496,60 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 	(xmin, ymin, zmin) = (-pi, -pi, -pi)
 	(xmax, ymax, zmax) = (pi, pi, pi)
 
+	addConstraints(fp, bone, constraints, lockLoc, lockRot)
+
+	if not Mhx25:
+		fp.write("\tend posebone\n")
+		return
+	
+	fp.write(
+"    lock_ik_x %d ;\n" % ikLockX +
+"    lock_ik_y %d ;\n" % ikLockY +
+"    lock_ik_z %d ;\n" % ikLockZ +
+"    use_ik_limit_x %d ;\n" % usex +
+"    use_ik_limit_y %d ;\n" % usey +
+"    use_ik_limit_z %d ;\n" % usez +
+"    ik_stiffness Array 0.0 0.0 0.0  ; \n")
+	fp.write(
+"    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
+"    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
+
+	if customShape:
+		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
+
+	rotMode = rotationMode(flags)
+	fp.write("  rotation_mode '%s' ;\n" % rotMode)
+
+	fp.write(
+"    use_ik_linear_control %s ; \n" % ikLin +
+"    ik_linear_weight 0 ; \n"+
+"    use_ik_rotation_control %s ; \n" % ikRot +
+"    ik_rotation_weight 0 ; \n" +
+"    hide %s ; \n" % hide)
+	
+	if flags & P_STRETCH:
+		fp.write(
+"#if toggle&T_STRETCH\n" +
+"    ik_stretch 0.1 ; \n" +
+"#endif\n")
+	else:
+		fp.write("    ik_stretch 0 ; \n")
+
+	fp.write(
+"    location Array %.3f %.3f %.3f ; \n" % (locX, locY, locZ) +
+"    lock_location Array %d %d %d ;\n"  % (lockLocX, lockLocY, lockLocZ)+
+"    lock_rotation Array %d %d %d ;\n"  % (lockRotX, lockRotY, lockRotZ)+
+"    lock_rotation_w %s ; \n" % lkRotW +
+"    lock_rotations_4d %s ; \n" % lkRot4 +
+"    lock_scale Array %d %d %d  ; \n" % (lockScaleX, lockScaleY, lockScaleZ)+
+"  end Posebone \n")
+	return	
+
+#
+#	addConstraints(fp, bone, constraints, lockLoc, lockRot)
+#
+
+def addConstraints(fp, bone, constraints, lockLoc, lockRot):
 	for (label, cflags, inf, data) in constraints:
 		if type(label) == str:
 			typ = label
@@ -542,53 +597,6 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 			print(label)
 			print(typ)
 			raise NameError("Unknown constraint type %s" % typ)
-
-	if not Mhx25:
-		fp.write("\tend posebone\n")
-		return
-	
-	fp.write(
-"    lock_ik_x %d ;\n" % ikLockX +
-"    lock_ik_y %d ;\n" % ikLockY +
-"    lock_ik_z %d ;\n" % ikLockZ +
-"    use_ik_limit_x %d ;\n" % usex +
-"    use_ik_limit_y %d ;\n" % usey +
-"    use_ik_limit_z %d ;\n" % usez +
-"    ik_stiffness Array 0.0 0.0 0.0  ; \n")
-	fp.write(
-"    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
-"    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
-
-	if customShape:
-		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
-
-	rotMode = rotationMode(flags)
-	fp.write("  rotation_mode '%s' ;\n" % rotMode)
-
-	fp.write(
-"    use_ik_linear_control %s ; \n" % ikLin +
-"    ik_linear_weight 0 ; \n"+
-"    use_ik_rotation_control %s ; \n" % ikRot +
-"    ik_rotation_weight 0 ; \n" +
-"    hide %s ; \n" % hide)
-	
-	if flags & P_STRETCH:
-		fp.write(
-"#if toggle&T_STRETCH\n" +
-"    ik_stretch 0.1 ; \n" +
-"#endif\n")
-	else:
-		fp.write("    ik_stretch 0 ; \n")
-
-	fp.write(
-"    location Array %.3f %.3f %.3f ; \n" % (locX, locY, locZ) +
-"    lock_location Array %d %d %d ;\n"  % (lockLocX, lockLocY, lockLocZ)+
-"    lock_rotation Array %d %d %d ;\n"  % (lockRotX, lockRotY, lockRotZ)+
-"    lock_rotation_w %s ; \n" % lkRotW +
-"    lock_rotations_4d %s ; \n" % lkRot4 +
-"    lock_scale Array %d %d %d  ; \n" % (lockScaleX, lockScaleY, lockScaleZ)+
-"  end Posebone \n")
-	return
 
 #
 #	addIkConstraint(fp, rig, flags, inf, data, lockLoc, lockRot)
@@ -1140,7 +1148,7 @@ def addChildOfConstraint(fp, rig, flags, inf, data):
 "      use_scale_y %s ;\n" % scaley +
 "      use_scale_z %s ;\n" % scalez +
 "    end Constraint\n")
-#"    bpyops constraint.childof_set_inverse(constraint='%s',owner='BONE') ;\n" % name
+#"    bpyops constraint.childof_set_inverse(constraint='%s',owner='BONE') ;\n" % name)
 	return
 
 #
@@ -1747,8 +1755,8 @@ def writeAllActions(fp):
 	return
 
 def writeControlDrivers(fp):
-	writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
-	writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
+	#writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
+	#writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
 	#rig_panel_25.FingerControlDrivers(fp)
 	return
 

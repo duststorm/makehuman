@@ -249,6 +249,6 @@ def FingerDeformPoses(fp):
 		for fnum in range(1,6):
 			for lnum in range(1,4):
 				fing = 'Finger-%d-%d%s' % (fnum, lnum, suffix)
-				copyDeform(fp, fing, 0, U_LOC+U_ROT, 'MHDefFinger')
+				copyDeform(fp, fing, 0, U_LOC+U_ROT, 'MHDefFinger', [])
 	return
 

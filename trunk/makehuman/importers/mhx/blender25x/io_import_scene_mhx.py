@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.2.1
+Version 1.2.2
 
 """
 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 2, 1),
+    'version': (1, 2, 2),
     'blender': (2, 5, 6),
     'api': 34595,
     'location': "File > Import",
@@ -42,7 +42,7 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 2
-SUB_VERSION = 1
+SUB_VERSION = 2
 BLENDER_VERSION = (2, 56, 0)
 
 #
@@ -101,7 +101,7 @@ T_Proxy = 0x400
 T_Cage = 0x800
 
 T_Rigify = 0x1000
-T_Preset = 0x2000
+T_Opcns = 0x2000
 T_Symm = 0x4000
 T_MHX = 0x8000
 
@@ -1057,7 +1057,7 @@ def parseObject(args, tokens):
         if key == 'Modifier':
             parseModifier(ob, val, sub)
         elif key == 'Constraint':
-            parseConstraint(ob.constraints, val, sub)
+            parseConstraint(ob.constraints, None, val, sub)
         elif key == 'AnimationData':
             parseAnimationData(ob, val, sub)
         elif key == 'ParticleSystem':
@@ -1668,10 +1668,12 @@ def parsePoseBone(pbones, ob, args, tokens):
 
     for (key, val, sub) in tokens:
         if key == 'Constraint':
-            cns = parseConstraint(pb.constraints, val, sub)
+            amt.bones.active = pb.bone 
+            cns = parseConstraint(pb.constraints, pb, val, sub)
         elif key == 'bpyops':
             amt.bones.active = pb.bone 
             expr = "bpy.ops.%s" % val[0]
+            print(expr)
             exec(expr)
         elif key == 'ik_dof':
             parseArray(pb, ["ik_dof_x", "ik_dof_y", "ik_dof_z"], val)
@@ -1703,15 +1705,28 @@ def parseArray(data, exts, args):
     return
         
 #
-#    parseConstraint(constraints, args, tokens)
+#    parseConstraint(constraints, pb, args, tokens)
 #
 
-def parseConstraint(constraints, args, tokens):
+def parseConstraint(constraints, pb, args, tokens):
     if invalid(args[2]):
         return None
-    cns = constraints.new(args[1])
-    #bpy.ops.pose.constraint_add(type=args[1])
-    #cns = pb.constraints[-1]
+    if (toggle&T_Opcns and pb):
+        print("Active")
+        aob = bpy.context.object
+        print("ob", aob)
+        aamt = aob.data
+        print("amt", aamt)
+        apose = aob.pose
+        print("pose", apose)
+        abone = aamt.bones.active
+        print("bone", abone)
+        print('Num cns before', len(list(constraints)))
+        bpy.ops.pose.constraint_add(type=args[1])
+        cns = constraints.active
+        print('and after', pb, cns, len(list(constraints)))
+    else:
+        cns = constraints.new(args[1])
 
     cns.name = args[0]
     for (key,val,sub) in tokens:
@@ -1998,9 +2013,14 @@ def correctRig(args):
     amt = ob.data
     for pb in ob.pose.bones:
         for cns in pb.constraints:
-            if cns.type == 'CHILD_OF' and cns.influence > 0.5:
+            if cns.type == 'CHILD_OF':
                 amt.bones.active = pb.bone
+                inf = cns.influence
+                cns.influence = 1
+                print("Childof %s %s %s %.2f" % (amt.name, pb.name, cns.name, inf))
+                bpy.ops.constraint.childof_clear_inverse(constraint=cns.name, owner='BONE')
                 bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
+                cns.influence = inf
     return
         
 
@@ -2211,7 +2231,7 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 
     if ext == 'bpyops':
         expr = "bpy.ops.%s" % args[0]
-        # print(expr)
+        print(expr)
         exec(expr)
         return
         
@@ -2490,6 +2510,7 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
     symm = BoolProperty(name="Symmetric shapes", description="Keep shapekeys symmetric", default=toggle&T_Symm)
     diamond = BoolProperty(name="Diamonds", description="Keep joint diamonds", default=toggle&T_Diamond)
     bend = BoolProperty(name="Bend joints", description="Bend joints for better IK", default=toggle&T_Bend)
+    opcns = BoolProperty(name="Operator constraints", description="Only for Aligorith", default=toggle&T_Opcns)
         
     def execute(self, context):
         global toggle
@@ -2506,8 +2527,9 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
         O_Symm = T_Symm if self.properties.symm else 0
         O_Diamond = T_Diamond if self.properties.diamond else 0
         O_Bend = T_Bend if self.properties.bend else 0
+        O_Opcns = T_Opcns if self.properties.opcns else 0
         toggle = ( O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | O_Cage | 
-                O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | O_Clothes | T_MHX )
+                O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | O_Clothes | O_Opcns | T_MHX )
 
         print("Load", self.properties.filepath)
         readMhxFile(self.properties.filepath, self.properties.scale)
