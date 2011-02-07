@@ -259,9 +259,11 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	fp.write(
 "    roll %.6g ; \n" % (roll)+
 "    use_connect %s ; \n" % (conn) +
-"    use_deform %s ; \n" % (deform)+
-"    hide %s ; \n" % hide +
+"    use_deform %s ; \n" % (deform) +
 "    show_wire %s ; \n" % (wire))
+
+	if 0 and (flags & F_HID):
+		fp.write("    hide %s ; \n" % hide)
 
 	if bbone:
 		(bin, bout, bseg) = bbone

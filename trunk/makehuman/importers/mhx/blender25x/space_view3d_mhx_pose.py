@@ -1000,16 +1000,15 @@ class VIEW3D_OT_MhxTogglePropButton(bpy.types.Operator):
 
 
 def initCharacter():
-	global theRig, theOldProp
+	global theRig
 	# print("Initializing")
 	defineProperties()
 	redefinePropDrivers()	
 	resetProperties()
 	theRig['MhxRigInited'] = True
 
-	theOldProp = {}
 	for (prop, typ, value, options) in ParentProperties:
-		theOldProp[prop] = 0
+		theRig['Old'+prop] = theRig[prop]
 	return
 
 class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
@@ -1027,28 +1026,31 @@ class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
 #
 
 def setInverse(context):
-	global theRig, theOldProp
+	global theRig
 	amt = theRig.data
-	for (bone, prop, typ, drivers) in ParentPropDrivers:
-		print("old", theOldProp[prop])
-		print("new", theRig[prop])
-		if theRig[prop] == theOldProp[prop]:
-			continue
-		pb = theRig.pose.bones[bone]
-		for drvdata in drivers:
-			if typ == D_ENUM or typ == D_MULTIVAR:
-				(cnsName,expr) = drvdata
-			else:
-				cnsName = drvdata
+	pbones = theRig.pose.bones
+	for (bone, drivers) in ParentConstraintDrivers.items():
+		pb = pbones[bone]
+		for (cnsName, props, expr) in drivers:
+			print(cnsName, expr)
 			cns = pb.constraints[cnsName]
-			if cns.type == 'CHILD_OF':
+			print(cns)
+			if cns.type == 'CHILD_OF' and changedProp(props):
 				amt.bones.active = pb.bone
 				print("Set inverse", pb.name, amt.bones.active, cns.name)
 				bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
-		
 	for (prop, typ, value, options) in ParentProperties:
-		theOldProp[prop] = theRig[prop]
+		theRig['Old'+prop] = theRig[prop]
 	return
+
+def changedProp(props):
+	global theRig
+	for prop in props:
+		print("old", theRig['Old'+prop])
+		print("new", theRig[prop])
+		if theRig[prop] != theRig['Old'+prop]:
+			return True
+	return False
 					
 class VIEW3D_OT_MhxSetInverseButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_set_inverse"
@@ -1087,16 +1089,12 @@ class MhxDriversPanel(bpy.types.Panel):
 			layout.operator("mhx.pose_init_character", text='Reinitialize character')
 			layout.operator("mhx.pose_reset_properties")
 			pbones = theRig.pose.bones
-			'''
+			
+			layout.separator()
 			for (prop, typ, values, options) in ParentProperties:
-				layout.label(prop)
-					if RNA_PROPS:
-						layout.prop(theRig, lprop, text=lprop, expand=True)
-					else:
-						layout.prop(theRig, '["%s"]' % lprop, text=lprop, expand=True)
+				layout.prop(theRig, '["%s"]' % prop, text=prop, expand=True)
 			layout.operator('mhx.pose_set_inverse')
 			layout.separator()
-			'''
 
 			for prefix in ['Left', 'Right']:
 				layout.label(prefix)
