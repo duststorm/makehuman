@@ -166,9 +166,6 @@ class ExpressionTaskView(gui3d.TaskView):
             if value:
                 file.write('expression %s %f\n' % (name, value))
 
-category = None
-taskview = None
-
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 
