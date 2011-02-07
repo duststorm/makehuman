@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.2.2
+Version 1.2.34
 
 """
 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 2, 2),
+    'version': (1, 2, 4),
     'blender': (2, 5, 6),
     'api': 34595,
     'location': "File > Import",
@@ -42,7 +42,7 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 2
-SUB_VERSION = 2
+SUB_VERSION = 4
 BLENDER_VERSION = (2, 56, 0)
 
 #
@@ -103,7 +103,7 @@ T_Cage = 0x800
 T_Rigify = 0x1000
 T_Opcns = 0x2000
 T_Symm = 0x4000
-T_MHX = 0x8000
+T_StableVersion = 0x8000
 
 toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape + T_Proxy + T_Clothes
 
@@ -697,7 +697,10 @@ def parseAnimDataFCurve(adata, rna, args, tokens):
         elif key == 'FModifier':
             parseFModifier(fcu, val, sub)
         elif key == 'kp':
-            pt = fcu.keyframe_points.insert(n, 0)
+            if toggle & T_StableVersion:
+                pt = fcu.keyframe_points.add(n, 0)
+            else:
+                pt = fcu.keyframe_points.insert(n, 0)
             pt.interpolation = 'LINEAR'
             pt = parseKeyFramePoint(pt, val, sub)
             n += 1
@@ -1421,9 +1424,14 @@ def parseVertexGroup(ob, me, args, tokens):
     if (toggle & T_Armature) or (grpName in ['Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'Middle', 'Right', 'Scalp']):
         group = ob.vertex_groups.new(grpName)
         loadedData['VertexGroup'][grpName] = group
-        for (key, val, sub) in tokens:
-            if key == 'wv':
-                group.add( [int(val[0])], float(val[1]), 'REPLACE' )
+        if toggle & T_StableVersion:
+            for (key, val, sub) in tokens:
+                if key == 'wv':
+                    ob.vertex_groups.assign([int(val[0])], group, float(val[1]), 'REPLACE')
+        else:
+            for (key, val, sub) in tokens:
+                if key == 'wv':
+                    group.add( [int(val[0])], float(val[1]), 'REPLACE' )
     return
 
 
@@ -2000,8 +2008,6 @@ def parseDefineProperty(args, tokens):
 #
 
 def correctRig(args):
-    if not toggle & T_MHX:
-        return
     human = args[0]
     print("CorrectRig %s" % human)    
     try:
@@ -2029,8 +2035,6 @@ def correctRig(args):
 #
 
 def postProcess(args):
-    if not toggle & T_MHX:
-        return
     human = args[0]
     print("Postprocess %s" % human)    
     try:
@@ -2477,11 +2481,69 @@ def hideLayers(args):
     return
 
 #
+#    readDefaults():
+#    writeDefaults():
+#
+
+ConfigFile = '~/mhx_import.cfg'
+
+def readDefaults():
+    global toggle, theScale
+    path = os.path.realpath(os.path.expanduser(ConfigFile))
+    try:
+        fp = open(path, 'rU')
+        print('Storing defaults')
+    except:
+        print('Cannot open "%s" for reading' % path)
+        return
+    for line in fp: 
+        words = line.split()
+        if len(words) >= 2:
+            try:
+                toggle = int(words[0],16)
+                theScale = float(words[1])
+            except:
+                print('Configuration file "%s" is corrupt' % path)                
+    fp.close()
+    return
+
+def writeDefaults():
+    global toggle, theScale
+    path = os.path.realpath(os.path.expanduser(ConfigFile))
+    try:
+        fp = open(path, 'w')
+        print('Storing defaults')
+    except:
+        print('Cannot open "%s" for writing' % path)
+        return
+    fp.write("%x %f" % (toggle, theScale))
+    fp.close()
+    return
+
+#
 #    User interface
 #
 
 DEBUG= False
 from bpy.props import *
+
+MhxBoolProps = [
+    ("enforce", "Enforce version", "Only accept MHX files of correct version", T_EnforceVersion),
+    ("mesh", "Mesh", "Use main mesh", T_Mesh),
+    ("proxy", "Proxies", "Use proxies", T_Proxy),
+    ("armature", "Armature", "Use armature", T_Armature),
+    ("replace", "Replace scene", "Replace scene", T_Replace),
+    ("cage", "Cage", "Load mesh deform cage", T_Cage),
+    ("clothes", "Clothes", "Include clothes", T_Clothes),
+    ("stretch", "Stretchy limbs", "Stretchy limbs", T_Stretch),
+    ("face", "Face shapes", "Include facial shapekeys", T_Face),
+    ("shape", "Body shapes", "Include body shapekeys", T_Shape),
+    ("symm", "Symmetric shapes", "Keep shapekeys symmetric", T_Symm),
+    ("diamond", "Diamonds", "Keep joint diamonds", T_Diamond),
+    ("bend", "Bend joints", "Bend joints for better IK", T_Bend),
+    ("opcns", "Operator constraints", "Only for Aligorith", T_Opcns),
+    ("stabver", "Stable Blender 2.56a", "Use latest stable Blender version (2.56a),", T_StableVersion),
+]
 
 class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
     '''Import from MHX file format (.mhx)'''
@@ -2494,48 +2556,34 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
     filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
     scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
-
-
-
-    enforce = BoolProperty(name="Enforce version", description="Only accept MHX files of correct version", default=toggle&T_EnforceVersion)
-    mesh = BoolProperty(name="Mesh", description="Use main mesh", default=toggle&T_Mesh)
-    proxy = BoolProperty(name="Proxies", description="Use proxies", default=toggle&T_Proxy)
-    armature = BoolProperty(name="Armature", description="Use armature", default=toggle&T_Armature)
-    replace = BoolProperty(name="Replace scene", description="Replace scene", default=toggle&T_Replace)
-    cage = BoolProperty(name="Cage", description="Load mesh deform cage", default=toggle&T_Cage)
-    clothes = BoolProperty(name="Clothes", description="Include clothes", default=toggle&T_Clothes)
-    stretch = BoolProperty(name="Stretchy limbs", description="Stretchy limbs", default=toggle&T_Stretch)
-    face = BoolProperty(name="Face shapes", description="Include facial shapekeys", default=toggle&T_Face)
-    shape = BoolProperty(name="Body shapes", description="Include body shapekeys", default=toggle&T_Shape)
-    symm = BoolProperty(name="Symmetric shapes", description="Keep shapekeys symmetric", default=toggle&T_Symm)
-    diamond = BoolProperty(name="Diamonds", description="Keep joint diamonds", default=toggle&T_Diamond)
-    bend = BoolProperty(name="Bend joints", description="Bend joints for better IK", default=toggle&T_Bend)
-    opcns = BoolProperty(name="Operator constraints", description="Only for Aligorith", default=toggle&T_Opcns)
+    for (prop, name, desc, flag) in MhxBoolProps:
+        expr = '%s = BoolProperty(name="%s", description="%s", default=toggle&%s)' % (prop, name, desc, flag)
+        print(expr)
+        exec(expr)
         
     def execute(self, context):
-        global toggle
-        O_EnforceVersion = T_EnforceVersion if self.properties.enforce else 0
-        O_Mesh = T_Mesh if self.properties.mesh else 0
-        O_Proxy = T_Proxy if self.properties.proxy else 0
-        O_Armature = T_Armature if self.properties.armature else 0
-        O_Replace = T_Replace if self.properties.replace else 0
-        O_Cage = T_Cage if self.properties.cage else 0
-        O_Clothes = T_Clothes if self.properties.clothes else 0
-        O_Stretch = T_Stretch if self.properties.stretch else 0
-        O_Face = T_Face if self.properties.face else 0
-        O_Shape = T_Shape if self.properties.shape else 0
-        O_Symm = T_Symm if self.properties.symm else 0
-        O_Diamond = T_Diamond if self.properties.diamond else 0
-        O_Bend = T_Bend if self.properties.bend else 0
-        O_Opcns = T_Opcns if self.properties.opcns else 0
-        toggle = ( O_EnforceVersion | O_Mesh | O_Proxy | O_Armature | O_Replace | O_Stretch | O_Cage | 
-                O_Face | O_Shape | O_Symm | O_Diamond | O_Bend | O_Clothes | O_Opcns | T_MHX )
+        global toggle, theScale, MhxBoolProps
+        toggle = 0
+        for (prop, name, desc, flag) in MhxBoolProps:
+            expr = '(%s if self.properties.%s else 0)' % (flag, prop)
+            print(expr, eval(expr))
+            toggle |=  eval(expr)
+        theScale = self.properties.scale
 
-        print("Load", self.properties.filepath)
-        readMhxFile(self.properties.filepath, self.properties.scale)
+        print("Load", self.properties.filepath, toggle, theScale)
+        readMhxFile(self.properties.filepath, theScale)
+        writeDefaults()
         return {'FINISHED'}
 
     def invoke(self, context, event):
+        global toggle, theScale, MhxBoolProps
+        readDefaults()
+        print("Default", toggle, theScale)
+        self.properties.scale = theScale
+        for (prop, name, desc, flag) in MhxBoolProps:
+            expr = 'self.properties.%s = toggle&%s' % (prop, flag)
+            print(expr)
+            exec(expr)
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
