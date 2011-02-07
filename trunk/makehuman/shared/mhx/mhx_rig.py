@@ -1764,8 +1764,8 @@ def writeAllActions(fp):
 	return
 
 def writeControlDrivers(fp):
-	#writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
-	#writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
+	writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
+	writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
 	#rig_panel_25.FingerControlDrivers(fp)
 	return
 
