@@ -295,11 +295,16 @@ magpieVisemes = dict({
 #
 
 def getVisemeSet(context):
-	return bodyLanguageVisemes
-	if context.scene['MhxBodyLanguage'] == True:
+	try:
+		visset = theRig['MhxVisemeSet']
+	except:
+		return bodyLanguageVisemes
+	if visset == 'StopStaring':
+		return stopStaringVisemes
+	elif visset == 'BodyLanguage':
 		return bodyLanguageVisemes
 	else:
-		return stopStaringVisemes
+		raise NameError("Unknown viseme set %s" % visset)
 
 def setViseme(context, vis, setKey, frame):
 	global theRig
@@ -387,22 +392,6 @@ def readMagpie(context, filepath, offs):
 	print("Magpie file %s loaded" % filepath)
 	return
 
-#
-#	setInterpolation(rig):
-#
-
-def setInterpolation(rig):
-	if not rig.animation_data:
-		return
-	act = rig.animation_data.action
-	if not act:
-		return
-	for fcu in act.fcurves:
-		for pt in fcu.keyframe_points:
-			pt.interpolation = 'LINEAR'
-		fcu.extrapolation = 'CONSTANT'
-	return
-	
 # 
 #	class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
 #
@@ -561,7 +550,11 @@ def meshHasExpressions(mesh):
 	return ('guilty' in mesh.data.shape_keys.keys.keys())
 
 def rigHasExpressions(rig):
-	return ('Pguilty' in rig.pose.bones.keys())
+	try:
+		rig['guilty']
+		return True
+	except:
+		return False
 
 #
 #	class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
@@ -584,23 +577,20 @@ class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	class VIEW3D_OT_MhxResetBoneExpressionsButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxResetRigExpressionsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxResetBoneExpressionsButton(bpy.types.Operator):
-	bl_idname = "mhx.pose_reset_bone_expressions"
+class VIEW3D_OT_MhxResetRigExpressionsButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_reset_rig_expressions"
 	bl_label = "Reset expressions"
 
 	def execute(self, context):
 		global theRig
-		pbones = theRig.pose.bones
-		if pbones:
-			for name in Expressions:
-				try:
-					pb = pbones['P%s' % name]
-					pb.location[1] = 0.0
-				except:
-					pass
+		for name in Expressions:
+			try:
+				theRig[name] = 0.0
+			except:
+				pass
 		print("Expressions reset")
 		return{'FINISHED'}
 		
@@ -611,29 +601,17 @@ class VIEW3D_OT_MhxResetBoneExpressionsButton(bpy.types.Operator):
 #
 
 def createExpressionDrivers(context):		
-	global theMesh, theRig
+	global theMesh
 	keys = theMesh.data.shape_keys
 	if keys:
-		context.scene.objects.active = theRig
-		bpy.ops.object.mode_set(mode = 'EDIT')
-		ebones = theRig.data.edit_bones		
-		pface = ebones['PFace']
-		layers = 32*[False]
-		layers[31] = True
-		
 		for name in Expressions:
-			eb = ebones.new("P%s" % name)
-			eb.head = pface.head
-			eb.tail = pface.tail
-			eb.parent = pface
-			eb.layers = layers
-
-		bpy.ops.object.mode_set(mode = 'POSE')
-		for name in Expressions:			
 			try:
-				createExpressionDriver(name, keys)
+				theRig[name] = keys.keys[name].value
+				exists = True
 			except:
-				pass
+				exists = False
+			if exists:
+				createExpressionDriver(name, keys)
 	return
 				
 def createExpressionDriver(name, keys):
@@ -646,22 +624,12 @@ def createExpressionDriver(name, keys):
 	drv.show_debug_info = True
 
 	var = drv.variables.new()
-	var.name = 'x'
-	var.type = 'TRANSFORMS'
-	
+	var.name = name
+	var.type = 'SINGLE_PROP'
+
 	trg = var.targets[0]
 	trg.id = theRig
-	trg.transform_type = 'LOC_Y'
-	trg.bone_target = 'P%s' % name
-	trg.use_local_space_transform = True
-	
-	#fmod = fcu.modifiers.new('GENERATOR')
-	fmod = fcu.modifiers[0]
-	fmod.coefficients = (0, 1.0)
-	fmod.show_expanded = True
-	fmod.mode = 'POLYNOMIAL'
-	fmod.mute = False
-	fmod.poly_order = 1
+	trg.data_path = '["%s"]' % name
 
 	return
 	
@@ -684,15 +652,12 @@ def removeExpressionDrivers(context):
 	keys = theMesh.data.shape_keys
 	if keys:
 		context.scene.objects.active = theRig
-		bpy.ops.object.mode_set(mode = 'EDIT')
-		ebones = theRig.data.edit_bones				
-		for name in Expressions:
+		for name in Expressions:			
 			try:
-				ebones.remove(ebones["P%s" % name])
+				del(theRig[name])
+				print("Removed prop", name)
 			except:
 				pass
-		bpy.ops.object.mode_set(mode = 'POSE')
-		for name in Expressions:			
 			try:
 				keys.keys[name].driver_remove('value')
 				print("Removed driver %s" % name)
@@ -729,14 +694,13 @@ class MhxExpressionsPanel(bpy.types.Panel):
 		if theRig and rigHasExpressions(theRig):
 			layout.separator()
 			layout.label(text="Expressions (driven)")
-			layout.operator("mhx.pose_reset_bone_expressions")
-			layout.operator("mhx.pose_remove_drivers")
+			layout.operator("mhx.pose_reset_rig_expressions")
+			if theMesh:
+				layout.operator("mhx.pose_remove_drivers")
 			layout.separator()
-			pbones = theRig.pose.bones
 			for name in Expressions:
 				try:
-					pb = pbones['P%s' % name]
-					layout.prop(pb, 'location', index=1, text=name)
+					layout.prop(theRig, '["%s"]' % name, index=-1, text=name)
 				except:
 					pass
 		
@@ -824,7 +788,7 @@ LeftRightConstraintDrivers = {
 	],
 
 	'Elbow' : [
-		('DistShoulder', ['ArmStretch'], '(1-x1)'),
+		('DistShoulder', ['ArmStretch'], '0'),
 	],
 
 	'LoArm' : [
@@ -936,7 +900,8 @@ def resetProperty(prop, typ, value, options):
 	elif typ == D_ENUM:
 		theRig[prop] = 0
 
-	print(theRig[prop], theRig["_RNA_UI"])
+	#print(theRig[prop], theRig["_RNA_UI"])
+	return
 
 class VIEW3D_OT_MhxResetPropertiesButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_reset_properties"
@@ -981,7 +946,7 @@ def defineDriver(bone, drivers, prefix):
 	for (cnsName, props, expr) in drivers:
 		for cns in pb.constraints:
 			if cns.name == cnsName:
-				print(pb.name, cns.name, props, expr)
+				# print(pb.name, cns.name, props, expr)
 				addPropDriver(cns, props, expr, prefix)
 	return
 
@@ -1036,7 +1001,7 @@ class VIEW3D_OT_MhxTogglePropButton(bpy.types.Operator):
 
 def initCharacter():
 	global theRig, theOldProp
-	print("initing")
+	# print("Initializing")
 	defineProperties()
 	redefinePropDrivers()	
 	resetProperties()
@@ -1045,6 +1010,7 @@ def initCharacter():
 	theOldProp = {}
 	for (prop, typ, value, options) in ParentProperties:
 		theOldProp[prop] = 0
+	return
 
 class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_init_character"
@@ -1143,7 +1109,7 @@ class MhxDriversPanel(bpy.types.Panel):
 						if RNA_PROPS:
 							row.prop(theRig, lprop, text=prop, expand=True)
 						else:
-							row.prop(theRig, '["%s"]' % lprop, text=prop, expand=True)
+							row.prop(theRig, '["%s"]' % lprop, text=prop, toggle=True, expand=True)
 						row.operator("mhx.pose_toggle_prop").strprop = lprop
 		return
 
@@ -1204,133 +1170,80 @@ class MhxLayersPanel(bpy.types.Panel):
 
 ###################################################################################	
 #
-#	Init and common functions
+#	Common functions
 #
 ###################################################################################	
-#
-#	initInterface()
-#
-
-def initInterface(scn):
-	bpy.types.Scene.MhxBodyLanguage = BoolProperty(
-		name="Body Language", 
-		description="Use Body Language shapekey set",
-		default=True)		
-
-	if scn:
-		scn['MhxBodyLanguage'] = True
-
-	return
 
 #
-#	class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
-	bl_idname = "mhx.pose_init_interface"
-	bl_label = "Initialize"
-	bl_options = {'REGISTER'}
-
-	def execute(self, context):
-		import bpy
-		initInterface(context.scene)
-		print("Interface initialized")
-		return{'FINISHED'}	
-
-#
+#	hasMeshChild(rig):
+#	isMhxRig(ob):	
 #	setGlobals(context):
 #
 
+def hasMeshChild(rig):
+	global theMesh
+	for child in rig.children:
+		if (child.type == 'MESH') and meshHasExpressions(child):
+			theMesh = child
+			return True
+	return False
+
+def isMhxRig(ob):	
+	if not (ob and ob.type == 'ARMATURE'):
+		return False
+	try:
+		ob.data.bones['PArmIK_L']
+		return True
+	except:
+		return False
+
 def setGlobals(context):
 	global theRig, theMesh, theScale	
-	if context.object.type == 'ARMATURE':
+	theMesh = None
+	theRig = None
+	if isMhxRig(context.object):
 		theRig = context.object
-		theMesh = None
-		for child in theRig.children:
-			if (child.type == 'MESH' and meshHasExpressions(child)):
-				theMesh = child
-				break
+		if not hasMeshChild(theRig):
+			for child in theRig.children:
+				if (child.type == 'ARMATURE') and hasMeshChild(child):
+					break
 	elif context.object.type == 'MESH':
 		if meshHasExpressions(context.object):
 			theMesh = context.object
-			theRig = theMesh.parent
+			parent = theMesh.parent
+			if isMhxRig(parent):
+				theRig = parent
+			elif parent:
+				grandParent = parent.parent
+				if isMhxRig(grandParent):
+					theRig = grandParent
 		else:
 			return
 	else:
 		return
 
-	try:
-		theRig.data.bones['PArmIK_L']
-	except:
-		theRig = None	
-		
 #
-#	setAllFKIK(value):
-#	class VIEW3D_OT_MhxSetAllFKButton(bpy.types.Operator):
-#	class VIEW3D_OT_MhxSetAllIKButton(bpy.types.Operator):
+#	setInterpolation(rig):
 #
 
-def setAllFKIK(value):
-	global theRig
-	pbones = theRig.pose.bones
-	for name in ['PArmIK', 'PLegIK']:
-		for suffix in ['_L', '_R']:
-			pbones[name+suffix].location[0] = value
+def setInterpolation(rig):
+	if not rig.animation_data:
+		return
+	act = rig.animation_data.action
+	if not act:
+		return
+	for fcu in act.fcurves:
+		for pt in fcu.keyframe_points:
+			pt.interpolation = 'LINEAR'
+		fcu.extrapolation = 'CONSTANT'
 	return
+	
 
-class VIEW3D_OT_MhxSetAllFKButton(bpy.types.Operator):
-	bl_idname = "mhx.pose_set_all_fk"
-	bl_label = "All FK"
-
-	def execute(self, context):
-		setAllFKIK(0.0)
-		return{'FINISHED'}	
-
-class VIEW3D_OT_MhxSetAllIKButton(bpy.types.Operator):
-	bl_idname = "mhx.pose_set_all_ik"
-	bl_label = "All IK"
-
-	def execute(self, context):
-		setAllFKIK(1.0)
-		return{'FINISHED'}	
-
-
-#
-#	setAllFingers(value):
-#	class VIEW3D_OT_MhxSetAllFingersOffButton(bpy.types.Operator):
-#	class VIEW3D_OT_MhxSetAllFingersOnButton(bpy.types.Operator):
-#
-
-def setAllFingers(value):
-	global theRig
-	pbones = theRig.pose.bones
-	for n in range(1,6):
-		for suffix in ['_L', '_R']:
-			pbones['PFinger-%d%s' % (n, suffix)].location[0] = value
-	return
-
-class VIEW3D_OT_MhxSetAllFingersOffButton(bpy.types.Operator):
-	bl_idname = "mhx.pose_set_all_fingers_off"
-	bl_label = "All off"
-
-	def execute(self, context):
-		setAllFingers(0.0)
-		return{'FINISHED'}	
-
-class VIEW3D_OT_MhxSetAllFingersOnButton(bpy.types.Operator):
-	bl_idname = "mhx.pose_set_all_fingers_on"
-	bl_label = "All on"
-
-	def execute(self, context):
-		setAllFingers(0.7)
-		return{'FINISHED'}	
-
-
+###################################################################################	
 #
 #	initialize and register
 #
-
-initInterface(bpy.context.scene)
+###################################################################################	
 
 def register():
 	pass

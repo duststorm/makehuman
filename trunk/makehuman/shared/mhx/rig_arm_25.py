@@ -216,18 +216,19 @@ ArmControlArmature = [
 	('Shoulder_L',			0.0, 'Sternum', F_WIR+F_DEF, L_LSHOULDER+L_DEF, NoBB),
 	('Shoulder_R',			0.0, 'Sternum', F_WIR+F_DEF, L_RSHOULDER+L_DEF, NoBB),
 	('ShoulderEnd_L',		0.0, 'Shoulder_L', 0, L_HELP, NoBB),
+
 	('ShoulderEnd_R',		0.0, 'Shoulder_R', 0, L_HELP, NoBB),
 	('ArmLoc_L',			0.0, 'ShoulderEnd_L', F_NOROT, L_HELP, NoBB),
 	('ArmLoc_R',			0.0, 'ShoulderEnd_R', F_NOROT, L_HELP, NoBB),
 
 	# Arm
 	('UpArm_L',			upArmRoll, 'ArmLoc_L', F_WIR, L_LARMFK, NoBB),
-	('Elbow_L',			0, Master, F_WIR, L_LARMIK, NoBB),
+	('Elbow_L',			0, Master, F_WIR, L_LARMFK+L_LARMIK, NoBB),
 	('LoArm_L',			loArmRoll, 'UpArm_L', F_WIR, L_LARMFK, NoBB),
 	('Wrist_L',			handRoll, Master, F_WIR, L_LARMIK, NoBB),
 	('Hand_L',			handRoll, 'LoArm_L', F_CON+F_WIR, L_LARMFK+L_LARMIK, NoBB),
 	('UpArm_R',			-upArmRoll, 'ArmLoc_R', F_WIR, L_RARMFK, NoBB),
-	('Elbow_R',			0, Master, F_WIR, L_RARMIK, NoBB),
+	('Elbow_R',			0, Master, F_WIR, L_RARMFK+L_RARMIK, NoBB),
 	('LoArm_R',			-loArmRoll, 'UpArm_R', F_WIR, L_RARMFK, NoBB),
 	('Wrist_R',			handRoll, Master, F_WIR, L_RARMIK, NoBB),
 	('Hand_R',			-handRoll, 'LoArm_R', F_CON+F_WIR, L_RARMFK+L_RARMIK, NoBB),

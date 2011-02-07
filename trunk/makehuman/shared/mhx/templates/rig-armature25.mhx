@@ -23,6 +23,8 @@ end Armature
   show_x_ray True ;
   # draw_type 'WIRE' ;
   Property MhxScale theScale ;
+  Property MhxRig 'Control' ;
+  Property MhxVisemeSet 'BodyLanguage' ;
 end Object
 
 *** curves
@@ -43,8 +45,10 @@ end Armature
   *** refer-human parent ControlRig
   up_axis 'Z' ;
   show_x_ray True ;
+  # hide True ;
   # draw_type 'WIRE' ;
   Property MhxScale theScale ;
+  Property MhxRig 'Deform' ;
 end Object
 
 
