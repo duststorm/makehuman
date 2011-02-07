@@ -605,8 +605,8 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.pelvisBox = gui3d.GroupBox(self, [650, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
         self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone']));y+=36
-        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Stomach", self.modifiers['buttocks']));y+=36
-        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['stomach']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks']));y+=36
         y+=16
 
         self.modifiersBox = gui3d.GroupBox(self, [650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
