@@ -112,7 +112,7 @@ def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True, groupF
     f.close()
     
 def exportAsCurves(file, guides):
-    DEG_ORDER_U = 3
+    DEG_ORDER_U = 2 #formerly 3, but blender adds 1 to teh degree
     # use negative indices
     for guide in guides:
       N = len(guide)
