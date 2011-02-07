@@ -1393,6 +1393,7 @@ class FileChooserRectangle(Object):
         self.file = file
         
     def onClicked(self, event):
+        self.view.selection = self.file
         self.view.callEvent('onFileSelected', self.file)
 
 class FileChooser(View):
@@ -1404,6 +1405,7 @@ class FileChooser(View):
         self.extension = extension
         self.previewExtension = previewExtension
         self.files = []
+        self.selection = ''
         
     def getPreview(self, filename):
         

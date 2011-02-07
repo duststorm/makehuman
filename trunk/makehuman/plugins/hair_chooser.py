@@ -107,7 +107,7 @@ class HairTaskView(gui3d.TaskView):
     def updateHair(self):
         if self.human and self.human.hairObj:
             if self.filechooser.files:
-                self.filechooser.onFileSelected(self.filechooser.files[self.filechooser.selectedFile], update=1)
+                self.filechooser.onFileSelected(self.filechooser.selection, update=1)
             self.human.hairObj.update()
             self.app.redraw()
         self.human = None
