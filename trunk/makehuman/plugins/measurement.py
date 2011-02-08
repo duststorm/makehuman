@@ -162,7 +162,7 @@ class MeasureTaskView(gui3d.TaskView):
         self.uk = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'UK: ');y += 22
         y+=16
             
-    def getMeasure(self, measure, units=True):
+    def getMeasure(self, measure):
         
         human = self.app.selectedHuman
         measure = self.ruler.getMeasure(human, measure, self.mode)

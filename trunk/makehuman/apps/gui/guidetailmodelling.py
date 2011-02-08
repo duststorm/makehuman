@@ -675,7 +675,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
     def onHumanChanged(self, event):
         
-        human = event
+        human = event.human
         
         for modifier in self.modifiers.itervalues():
             modifier.setValue(human, modifier.getValue(human))

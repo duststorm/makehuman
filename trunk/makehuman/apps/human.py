@@ -35,6 +35,16 @@ import mh
 import humanmodifier
 import math
 import hair
+import events3d
+
+class HumanEvent(events3d.Event):
+
+    def __init__(self, human, change):
+        self.human = human
+        self.change = change
+
+    def __repr__(self):
+        return 'event: %s, %s' % (self.human, self.change)
 
 class Human(gui3d.Object):
 
@@ -229,7 +239,7 @@ class Human(gui3d.Object):
 
         gender = min(max(gender, 0.0), 1.0)
         self._setGenderVals(gender)
-        self.callEvent('onChanged', self)
+        self.callEvent('onChanged', HumanEvent(self, 'gender'))
 
     def getGender(self):
         return self.maleVal
@@ -255,7 +265,7 @@ class Human(gui3d.Object):
 
         age = min(max(age, 0.0), 1.0)
         self._setAgeVals(-1 + 2 * age)
-        self.callEvent('onChanged', self)
+        self.callEvent('onChanged', HumanEvent(self, 'age'))
 
     def getAge(self):
         if self.oldVal:
@@ -292,7 +302,7 @@ class Human(gui3d.Object):
 
         weight = min(max(weight, 0.0), 1.0)
         self._setWeightVals(-1 + 2 * weight)
-        self.callEvent('onChanged', self)
+        self.callEvent('onChanged', HumanEvent(self, 'weight'))
 
     def getWeight(self):
         if self.overweightVal:
@@ -328,7 +338,7 @@ class Human(gui3d.Object):
 
         muscle = min(max(muscle, 0.0), 1.0)
         self._setMuscleVals(-1 + 2 * muscle)
-        self.callEvent('onChanged', self)
+        self.callEvent('onChanged', HumanEvent(self, 'muscle'))
 
     def getMuscle(self):
         if self.muscleVal:
@@ -355,7 +365,7 @@ class Human(gui3d.Object):
             'data/targets/macrodetails/universal-stature-dwarf.target',
             'data/targets/macrodetails/universal-stature-giant.target')
         modifier.setValue(self, height, 0)
-        self.callEvent('onChanged', self)
+        self.callEvent('onChanged', HumanEvent(self, 'height'))
         
     def getHeight(self):
         modifier = humanmodifier.Modifier(
@@ -641,6 +651,8 @@ class Human(gui3d.Object):
         self.buttocks = 0.0
 
         self.targetsDetailStack = {}
+        
+        self.callEvent('onChanged', HumanEvent(self, 'reset'))
 
     def load(self, filename, progressCallback=None):
         self.resetMeshValues()

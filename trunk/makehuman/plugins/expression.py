@@ -146,7 +146,7 @@ class ExpressionTaskView(gui3d.TaskView):
         
     def onHumanChanged(self, event):
         
-        human = event
+        human = event.human
         
         for slider in self.sliders:
             value = slider.modifier.getValue(human)

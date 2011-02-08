@@ -99,7 +99,9 @@ class HairTaskView(gui3d.TaskView):
 
     def onHumanChanged(self, event):
         print 'onHumanChanged'
-        human = event
+        human = event.human
+        if event.change == 'reset':
+            self.filechooser.selection = 'default.hair'
         if human.hairObj:
             self.human = human
             mh.callAsync(self.updateHair)

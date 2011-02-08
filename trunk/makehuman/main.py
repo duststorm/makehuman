@@ -309,9 +309,6 @@ class MHApplication(gui3d.Application):
             human = self.selectedHuman
             human.resetMeshValues()
             human.applyAllTargets(self.progress)
-            self.app.categories['Modelling'].tasksByName['Macro modelling'].syncSliders()
-            self.app.categories['Modelling'].tasksByName['Macro modelling'].syncStatus()
-            self.app.categories['Modelling'].tasksByName['Detail modelling'].syncSliders()
           
         self.globalButton = gui3d.Button(self, [650, 530, 9.2], "Global cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
         self.faceButton = gui3d.Button(self, [650, 555, 9.2], "Face cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
