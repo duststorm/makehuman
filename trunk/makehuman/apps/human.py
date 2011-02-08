@@ -108,68 +108,8 @@ class Human(gui3d.Object):
         self.bodyZones = ['l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
-        # NOTE: the "universal" targets work as addition with all other targets,
-        # while the ethnic targets are absolute.
-
-        targetFolder = 'data/targets/macrodetails'
-
-        self.targetFemaleFlaccidHeavyChild = '%s/universal-female-child-flaccid-heavy.target' % targetFolder
-        self.targetFemaleFlaccidHeavyYoung = '%s/universal-female-young-flaccid-heavy.target' % targetFolder
-        self.targetFemaleFlaccidHeavyOld = '%s/universal-female-old-flaccid-heavy.target' % targetFolder
-        self.targetMaleFlaccidHeavyChild = '%s/universal-male-child-flaccid-heavy.target' % targetFolder
-        self.targetMaleFlaccidHeavyYoung = '%s/universal-male-young-flaccid-heavy.target' % targetFolder
-        self.targetMaleFlaccidHeavyOld = '%s/universal-male-old-flaccid-heavy.target' % targetFolder
-
-        self.targetFemaleFlaccidLightChild = '%s/universal-female-child-flaccid-light.target' % targetFolder
-        self.targetFemaleFlaccidLightYoung = '%s/universal-female-young-flaccid-light.target' % targetFolder
-        self.targetFemaleFlaccidLightOld = '%s/universal-female-old-flaccid-light.target' % targetFolder
-        self.targetMaleFlaccidLightChild = '%s/universal-male-child-flaccid-light.target' % targetFolder
-        self.targetMaleFlaccidLightYoung = '%s/universal-male-young-flaccid-light.target' % targetFolder
-        self.targetMaleFlaccidLightOld = '%s/universal-male-old-flaccid-light.target' % targetFolder
-
-        self.targetFemaleMuscleHeavyChild = '%s/universal-female-child-muscle-heavy.target' % targetFolder
-        self.targetFemaleMuscleHeavyYoung = '%s/universal-female-young-muscle-heavy.target' % targetFolder
-        self.targetFemaleMuscleHeavyOld = '%s/universal-female-old-muscle-heavy.target' % targetFolder
-        self.targetMaleMuscleHeavyChild = '%s/universal-male-child-muscle-heavy.target' % targetFolder
-        self.targetMaleMuscleHeavyYoung = '%s/universal-male-young-muscle-heavy.target' % targetFolder
-        self.targetMaleMuscleHeavyOld = '%s/universal-male-old-muscle-heavy.target' % targetFolder
-
-        self.targetFemaleMuscleLightChild = '%s/universal-female-child-muscle-light.target' % targetFolder
-        self.targetFemaleMuscleLightYoung = '%s/universal-female-young-muscle-light.target' % targetFolder
-        self.targetFemaleMuscleLightOld = '%s/universal-female-old-muscle-light.target' % targetFolder
-        self.targetMaleMuscleLightChild = '%s/universal-male-child-muscle-light.target' % targetFolder
-        self.targetMaleMuscleLightYoung = '%s/universal-male-young-muscle-light.target' % targetFolder
-        self.targetMaleMuscleLightOld = '%s/universal-male-old-muscle-light.target' % targetFolder
-
-        self.targetFemaleFlaccidChild = '%s/universal-female-child-flaccid.target' % targetFolder
-        self.targetFemaleFlaccidYoung = '%s/universal-female-young-flaccid.target' % targetFolder
-        self.targetFemaleFlaccidOld = '%s/universal-female-old-flaccid.target' % targetFolder
-        self.targetMaleFlaccidChild = '%s/universal-male-child-flaccid.target' % targetFolder
-        self.targetMaleFlaccidYoung = '%s/universal-male-young-flaccid.target' % targetFolder
-        self.targetMaleFlaccidOld = '%s/universal-male-old-flaccid.target' % targetFolder
-
-        self.targetFemaleMuscleChild = '%s/universal-female-child-muscle.target' % targetFolder
-        self.targetFemaleMuscleYoung = '%s/universal-female-young-muscle.target' % targetFolder
-        self.targetFemaleMuscleOld = '%s/universal-female-old-muscle.target' % targetFolder
-        self.targetMaleMuscleChild = '%s/universal-male-child-muscle.target' % targetFolder
-        self.targetMaleMuscleYoung = '%s/universal-male-young-muscle.target' % targetFolder
-        self.targetMaleMuscleOld = '%s/universal-male-old-muscle.target' % targetFolder
-
-        self.targetFemaleHeavyChild = '%s/universal-female-child-heavy.target' % targetFolder
-        self.targetFemaleHeavyYoung = '%s/universal-female-young-heavy.target' % targetFolder
-        self.targetFemaleHeavyOld = '%s/universal-female-old-heavy.target' % targetFolder
-        self.targetMaleHeavyChild = '%s/universal-male-child-heavy.target' % targetFolder
-        self.targetMaleHeavyYoung = '%s/universal-male-young-heavy.target' % targetFolder
-        self.targetMaleHeavyOld = '%s/universal-male-old-heavy.target' % targetFolder
-
-        self.targetFemaleLightChild = '%s/universal-female-child-light.target' % targetFolder
-        self.targetFemaleLightYoung = '%s/universal-female-young-light.target' % targetFolder
-        self.targetFemaleLightOld = '%s/universal-female-old-light.target' % targetFolder
-        self.targetMaleLightChild = '%s/universal-male-child-light.target' % targetFolder
-        self.targetMaleLightYoung = '%s/universal-male-young-light.target' % targetFolder
-        self.targetMaleLightOld = '%s/universal-male-old-light.target' % targetFolder
-
-        targetFolder = 'data/targets/details'
+        self.muscleWeightModifier = humanmodifier.GenderAgeMuscleWeightModifier('data/targets/macrodetails/universal-${gender}-${age}-${tone}-${weight}.target')
+        self.baseModifier = humanmodifier.GenderAgeModifier('data/targets/macrodetails/neutral-${gender}-${age}.target')
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -408,6 +348,9 @@ class Human(gui3d.Object):
         **Parameters:** None.
 
         """
+        
+        self.muscleWeightModifier.setValue(self, 1.0)
+        self.baseModifier.setValue(self, 1.0)
 
         targetName = None
         algos3d.resetObj(self.meshData)
@@ -417,111 +360,13 @@ class Human(gui3d.Object):
         progressVal = 0.0
         progressIncr = 0.3 / (len(self.targetsDetailStack) + 1)
 
-        # As first thing, we apply all micro details
-
         for (k, v) in self.targetsDetailStack.iteritems():
             algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
             progressVal += progressIncr
             if progressCallback:
                 progressCallback(progressVal)
-        a = time.time()
-
-        # Now we apply all macro targets
-
-        macroTargets = {}
-
-        averageWeightVal = 1 - (self.underweightVal + self.overweightVal)
-        averageToneVal = 1 - (self.muscleVal + self.flaccidVal)
-
-        macroTargets[self.targetFemaleFlaccidHeavyChild] = ((self.flaccidVal * self.overweightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleFlaccidHeavyYoung] = ((self.flaccidVal * self.overweightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleFlaccidHeavyOld] = ((self.flaccidVal * self.overweightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleFlaccidHeavyChild] = ((self.flaccidVal * self.overweightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleFlaccidHeavyYoung] = ((self.flaccidVal * self.overweightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleFlaccidHeavyOld] = ((self.flaccidVal * self.overweightVal) * self.oldVal) * self.maleVal
-
-        macroTargets[self.targetFemaleFlaccidLightChild] = ((self.flaccidVal * self.underweightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleFlaccidLightYoung] = ((self.flaccidVal * self.underweightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleFlaccidLightOld] = ((self.flaccidVal * self.underweightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleFlaccidLightChild] = ((self.flaccidVal * self.underweightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleFlaccidLightYoung] = ((self.flaccidVal * self.underweightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleFlaccidLightOld] = ((self.flaccidVal * self.underweightVal) * self.oldVal) * self.maleVal
-
-        macroTargets[self.targetFemaleMuscleHeavyChild] = ((self.muscleVal * self.overweightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleMuscleHeavyYoung] = ((self.muscleVal * self.overweightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleMuscleHeavyOld] = ((self.muscleVal * self.overweightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleMuscleHeavyChild] = ((self.muscleVal * self.overweightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleMuscleHeavyYoung] = ((self.muscleVal * self.overweightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleMuscleHeavyOld] = ((self.muscleVal * self.overweightVal) * self.oldVal) * self.maleVal
-
-        macroTargets[self.targetFemaleMuscleLightChild] = ((self.muscleVal * self.underweightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleMuscleLightYoung] = ((self.muscleVal * self.underweightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleMuscleLightOld] = ((self.muscleVal * self.underweightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleMuscleLightChild] = ((self.muscleVal * self.underweightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleMuscleLightYoung] = ((self.muscleVal * self.underweightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleMuscleLightOld] = ((self.muscleVal * self.underweightVal) * self.oldVal) * self.maleVal
-
-        macroTargets[self.targetFemaleFlaccidChild] = ((self.flaccidVal * averageWeightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleFlaccidYoung] = ((self.flaccidVal * averageWeightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleFlaccidOld] = ((self.flaccidVal * averageWeightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleFlaccidChild] = ((self.flaccidVal * averageWeightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleFlaccidYoung] = ((self.flaccidVal * averageWeightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleFlaccidOld] = ((self.flaccidVal * averageWeightVal) * self.oldVal) * self.maleVal
-
-        macroTargets[self.targetFemaleMuscleChild] = ((self.muscleVal * averageWeightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleMuscleYoung] = ((self.muscleVal * averageWeightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleMuscleOld] = ((self.muscleVal * averageWeightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleMuscleChild] = ((self.muscleVal * averageWeightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleMuscleYoung] = ((self.muscleVal * averageWeightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleMuscleOld] = ((self.muscleVal * averageWeightVal) * self.oldVal) * self.maleVal
-
-        macroTargets[self.targetFemaleHeavyChild] = ((averageToneVal * self.overweightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleHeavyYoung] = ((averageToneVal * self.overweightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleHeavyOld] = ((averageToneVal * self.overweightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleHeavyChild] = ((averageToneVal * self.overweightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleHeavyYoung] = ((averageToneVal * self.overweightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleHeavyOld] = ((averageToneVal * self.overweightVal) * self.oldVal) * self.maleVal
-
-        macroTargets[self.targetFemaleLightChild] = ((averageToneVal * self.underweightVal) * self.childVal) * self.femaleVal
-        macroTargets[self.targetFemaleLightYoung] = ((averageToneVal * self.underweightVal) * self.youngVal) * self.femaleVal
-        macroTargets[self.targetFemaleLightOld] = ((averageToneVal * self.underweightVal) * self.oldVal) * self.femaleVal
-        macroTargets[self.targetMaleLightChild] = ((averageToneVal * self.underweightVal) * self.childVal) * self.maleVal
-        macroTargets[self.targetMaleLightYoung] = ((averageToneVal * self.underweightVal) * self.youngVal) * self.maleVal
-        macroTargets[self.targetMaleLightOld] = ((averageToneVal * self.underweightVal) * self.oldVal) * self.maleVal
-
-        for (k, v) in macroTargets.iteritems():
-            if v != 0.0:
-                pass
-                #print 'APP: %s, VAL: %f' % (k, v)
-            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-
-        detailTargets = {}
-        
-        targetFemaleChild = 'data/targets/macrodetails/neutral-female-child.target'
-        targetMaleChild = 'data/targets/macrodetails/neutral-male-child.target'
-        targetFemaleOld = 'data/targets/macrodetails/neutral-female-old.target'
-        targetMaleOld = 'data/targets/macrodetails/neutral-male-old.target'
-        targetFemaleYoung = 'data/targets/macrodetails/neutral-female-young.target'
-        targetMaleYoung = 'data/targets/macrodetails/neutral-male-young.target'
-
-        ethnicTargets = {}
-        ethnicTargets[targetFemaleChild] = (self.femaleVal * self.childVal)
-        ethnicTargets[targetMaleChild] = (self.maleVal * self.childVal)
-        ethnicTargets[targetFemaleOld] = (self.femaleVal * self.oldVal)
-        ethnicTargets[targetMaleOld] = (self.maleVal * self.oldVal)
-        ethnicTargets[targetFemaleYoung] = (self.femaleVal * self.youngVal)
-        ethnicTargets[targetMaleYoung] = (self.maleVal * self.youngVal)
-        
-        progressIncr = 0.3 / (len(ethnicTargets) + 1)
-        for (k, v) in ethnicTargets.iteritems():
-            progressVal = progressVal + progressIncr
-            if progressCallback:
-                progressCallback(progressVal)
-            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
-
 
         # Update all verts
-
         self.meshData.calcNormals(1, 1)
         if update: self.meshData.update()
         if progressCallback:

@@ -119,6 +119,12 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.syncSliders()
         self.syncStatus()
         gui3d.TaskView.onShow(self, event)
+        
+    def onHumanChanged(self, event):
+            
+        if self.isVisible():
+            self.syncSliders()
+            self.syncStatus()
 
     def onResized(self, event):
         self.status.setPosition([10, event[1]-15, 9.1])

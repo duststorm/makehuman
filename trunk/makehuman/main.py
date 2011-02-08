@@ -330,6 +330,7 @@ class MHApplication(gui3d.Application):
                 
     def loadFinish(self):
         
+        self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
         self.selectedHuman.applyAllTargets(self.app.progress)
         self.scene3d.update()
         self.splash.hide()

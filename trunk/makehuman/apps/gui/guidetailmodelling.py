@@ -679,6 +679,9 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         for modifier in self.modifiers.itervalues():
             modifier.setValue(human, modifier.getValue(human))
+            
+        if self.isVisible():
+            self.syncSliders()
         
     def loadHandler(self, human, values):
         
