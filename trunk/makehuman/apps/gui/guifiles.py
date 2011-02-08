@@ -253,7 +253,8 @@ class ExportTaskView(gui3d.TaskView):
                     copyfile('data/textures/texture.png', texturePath)
                   
             elif self.mhx.selected:
-                mh2mhx.exportMhx(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".mhx"))
+                # TL 2011.02.08: exportMhx uses the human instead of his meshData
+                mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"))
             elif self.collada.selected:
                 mh2collada.exportCollada(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))
             elif self.md5.selected:

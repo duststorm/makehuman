@@ -1123,9 +1123,11 @@ class MhxDriversPanel(bpy.types.Panel):
 
 MhxLayers = [
 	(( 0,	'Root', 'MhxRoot'),
-	 ( 1,	'FK Spine', 'MhxFKSpine')),
-	(( 8,	'Face', 'MhxFace'),
+	 ( 8,	'Face', 'MhxFace')),
+	(( 9,	'Varia', 'MhxVaria'),
 	 (10,	'Head', 'MhxHead')),
+	(( 1,	'FK Spine', 'MhxFKSpine'),
+	 ( 17,	'IK Spine', 'MhxIKSpine')),
 	('Left', 'Right'),
 	(( 2,	'IK Arm', 'MhxIKArm'),
 	 (18,	'IK Arm', 'MhxIKArm')),

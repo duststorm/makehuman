@@ -41,10 +41,10 @@ import mh2proxy, mhxbones, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_bo
 import read_expression, read_rig
 
 #
-#	exportMhx(obj, filename):
+#	exportMhx(human, filename):
 #
 
-def exportMhx(obj, filename):	
+def exportMhx(human, filename):	
 	global theConfig, theHuman
 	theConfig = mh2proxy.proxyConfig()
 	(name, ext) = os.path.splitext(filename)
@@ -60,7 +60,7 @@ def exportMhx(obj, filename):
 			mh2proxy.safePrint("Unable to open file for writing", filename)
 			fp = 0
 		if fp:
-			exportMhx_24(obj, fp)
+			exportMhx_24(human.meshData, fp)
 			fp.close()
 			time2 = time.clock()
 			mh2proxy.safePrint("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
@@ -76,7 +76,7 @@ def exportMhx(obj, filename):
 			mh2proxy.safePrint("Unable to open file for writing", filename)
 			fp = 0
 		if fp:
-			exportMhx_25(obj, fp)
+			exportMhx_25(human, fp)
 			fp.close()
 			time2 = time.clock()
 			mh2proxy.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), filename)
@@ -125,10 +125,10 @@ def exportRawMhx(obj, fp):
 	return
 
 #
-#	exportMhx_25(obj, fp):
+#	exportMhx_25(human, fp):
 #
 
-def exportMhx_25(obj, fp):
+def exportMhx_25(human, fp):
 	fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -137,6 +137,7 @@ def exportMhx_25(obj, fp):
 "  error 'This file can only be read with Blender 2.5' ;\n" +
 "#endif\n")
 
+	obj = human.meshData
 	mhx_rig.setupRig(obj)
 
 	fp.write(
@@ -148,61 +149,62 @@ def exportMhx_25(obj, fp):
 	if theConfig.useRig == 'mhx':
 		rig = theConfig.useRig
 		fp.write("#if toggle&T_Armature\n")
-		copyFile25(obj, "shared/mhx/templates/custom-shapes25.mhx", rig, fp, None, [])	
+		copyFile25(human, "shared/mhx/templates/custom-shapes25.mhx", rig, fp, None, [])	
 		mhx_rig.setupCircles(fp)
-		copyFile25(obj, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
+		copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
 		fp.write("#endif\n")
 	elif theConfig.useRig == 'game':
 		rig = mh2proxy.CProxy('Rig', 0)
 		rig.name = theHuman
 		(locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/game.rig', obj)
 		fp.write("#if toggle&T_Armature\n")
-		copyFile25(obj, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
+		copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
 		fp.write("#endif\n")
 	else:
 		raise NameError("Unknown base rig %s" % rig)
 		
 	fp.write("\nNoScale False ;\n\n")
 
-	copyFile25(obj, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
+	copyFile25(human, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])	
 
 	proxyData = {}
-	proxyCopy('Cage', obj, rig, theConfig.proxyList, proxyData, fp)
+	proxyCopy('Cage', human, rig, theConfig.proxyList, proxyData, fp)
 
 	if theConfig.mainmesh:
 		fp.write("#if toggle&T_Mesh\n")
-		copyFile25(obj, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
+		copyFile25(human, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)	
 		fp.write("#endif\n")
 
-	proxyCopy('Proxy', obj, rig, theConfig.proxyList, proxyData, fp)
-	proxyCopy('Clothes', obj, rig, theConfig.proxyList, proxyData, fp)
+	proxyCopy('Proxy', human, rig, theConfig.proxyList, proxyData, fp)
+	proxyCopy('Clothes', human, rig, theConfig.proxyList, proxyData, fp)
 
 	fp.write("#if toggle&T_Armature\n")
-	copyFile25(obj, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData)	
+	copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData)	
 	fp.write("#endif\n")
 	return
 
 #
-#	proxyCopy(name, obj, rig, proxyList, proxyData, fp)
+#	proxyCopy(name, human, rig, proxyList, proxyData, fp)
 #
 
-def proxyCopy(name, obj, rig, proxyList, proxyData, fp):
+def proxyCopy(name, human, rig, proxyList, proxyData, fp):
 	for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
 		if useMhx and typ == name:
 			fp.write("#if toggle&T_%s\n" % typ)
-			copyFile25(obj, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyStuff, proxyData)	
+			copyFile25(human, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyStuff, proxyData)	
 			fp.write("#endif\n")
 		
 #
-#	copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
+#	copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 #
 
-def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
+def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 	tmpl = open(tmplName)
 	if tmpl == None:
 		print("*** Cannot open "+tmplName)
 		return
 
+	obj = human.meshData
 	bone = None
 	proxy = None
 	faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
@@ -449,11 +451,11 @@ def copyFile25(obj, tmplName, rig, fp, proxyStuff, proxyData):
 "end Group\n")
 			elif words[1] == 'mesh-shapeKey':
 				pass
-				writeShapeKeys(fp, rig, "%sMesh" % theHuman, None)
+				writeShapeKeys(fp, human, rig, "%sMesh" % theHuman, None)
 			elif words[1] == 'proxy-shapeKey':
-				proxyShapes('Cage', rig, proxyData, fp)
-				proxyShapes('Proxy', rig, proxyData, fp)
-				proxyShapes('Clothes', rig, proxyData, fp)
+				proxyShapes('Cage', human, rig, proxyData, fp)
+				proxyShapes('Proxy', human, rig, proxyData, fp)
+				proxyShapes('Clothes', human, rig, proxyData, fp)
 			elif words[1] == 'mesh-animationData':
 				if rig == 'mhx':
 					writeAnimationData(fp, "%sMesh" % theHuman, None)
@@ -714,10 +716,10 @@ def printProxyShape(fp, shapes):
 	return
 
 #
-#	writeShapeKeys(fp, rig, name, proxy):
+#	writeShapeKeys(fp, human, rig, name, proxy):
 #
 
-def writeShapeKeys(fp, rig, name, proxy):
+def writeShapeKeys(fp, human, rig, name, proxy):
 	fp.write(
 "#if toggle&(T_Face+T_Shape)\n" +
 "ShapeKeys %s\n" % name +
@@ -735,11 +737,12 @@ def writeShapeKeys(fp, rig, name, proxy):
 
 	if not proxy:
 		if theConfig.expressions:
-			exprList = read_expression.readExpressions()
+			exprList = read_expression.readExpressions(human)
 			fp.write("#if toggle&T_Face\n")		
 			for (name, verts) in exprList:
 				fp.write("ShapeKey %s Sym True\n" % name)
-				for (v, dx, dy, dz) in verts:
+				for (v, r) in verts.items():
+					(dx, dy, dz) = r
 					fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
 				fp.write("end ShapeKey\n")
 			fp.write("#endif\n")
@@ -781,14 +784,14 @@ def writeShapeKeys(fp, rig, name, proxy):
 	return	
 
 #
-#	proxyShapes(typ, rig, proxyData, fp):
+#	proxyShapes(typ, human, rig, proxyData, fp):
 #
 
-def proxyShapes(typ, rig, proxyData, fp):
+def proxyShapes(typ, human, rig, proxyData, fp):
 	fp.write("#if toggle&T_%s\n" % typ)
 	for proxy in proxyData.values():
 		if proxy.name and proxy.type == typ and not proxy.rig:
-			writeShapeKeys(fp, rig, proxy.name+"Mesh", proxy)
+			writeShapeKeys(fp, human, rig, proxy.name+"Mesh", proxy)
 	fp.write("#endif\n")
 		
 
