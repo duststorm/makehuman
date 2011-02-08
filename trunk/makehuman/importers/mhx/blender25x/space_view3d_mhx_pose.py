@@ -547,7 +547,11 @@ Expressions = [
 #
 	
 def meshHasExpressions(mesh):
-	return ('guilty' in mesh.data.shape_keys.keys.keys())
+	try:
+		mesh.data.shape_keys.keys['guilty']
+		return True
+	except:
+		return False
 
 def rigHasExpressions(rig):
 	try:
@@ -1187,8 +1191,6 @@ def hasMeshChild(rig):
 	return False
 
 def isMhxRig(ob):	
-	if not (ob and ob.type == 'ARMATURE'):
-		return False
 	try:
 		ob.data.bones['PArmIK_L']
 		return True
