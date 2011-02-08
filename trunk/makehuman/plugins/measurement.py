@@ -74,6 +74,7 @@ class MeasureTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Measure')
 
+        self.mode = 'metric'
         self.ruler = Ruler()
 
         measurements = [
@@ -137,31 +138,38 @@ class MeasureTaskView(gui3d.TaskView):
         modes = [] 
                
         y = 80
-        self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=25+24*2+6))
-        y += 25
-        metric = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Metric', True)
-        y += 24
-        imperial = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Imperial')
+        self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y += 25
+        metric = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Metric', True);y += 24
+        imperial = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Imperial');y += 24
+        y+=16
         
         @metric.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(metric, event)
-            self.ruler.setMode('metric')
+            self.mode = 'metric'
             self.syncSliderLabels()
             
         @imperial.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(imperial, event)
-            self.ruler.setMode('imperial')
+            self.mode = 'imperial'
             self.syncSliderLabels()
-
-        # Undo memory
-        self.before = None
             
-    def getMeasure(self, measure):
+        self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
+        self.eu = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'EU: ');y += 22
+        self.jp = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'JP: ');y += 22
+        self.us = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'US: ');y += 22
+        self.uk = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'UK: ');y += 22
+        y+=16
+            
+    def getMeasure(self, measure, units=True):
         
         human = self.app.selectedHuman
-        return self.ruler.getMeasure(human, measure)
+        measure = self.ruler.getMeasure(human, measure, self.mode)
+        if self.mode == 'metric':
+            return '%.1f cm' % measure
+        else:
+            return '%.1f in' % measure
 
     def onShow(self, event):
 
@@ -182,10 +190,46 @@ class MeasureTaskView(gui3d.TaskView):
         for slider in self.sliders:
             slider.update()
             
+        self.syncBraSizes()
+            
     def syncSliderLabels(self):
         
         for slider in self.sliders:
             slider.updateLabel()
+            
+        self.syncBraSizes()
+         
+    def syncBraSizes(self):
+        
+        human = self.app.selectedHuman
+        
+        bust = self.ruler.getMeasure(human, 'bust', 'metric')
+        underbust = self.ruler.getMeasure(human, 'underbust', 'metric')
+        
+        eucups = ['AA', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+        
+        mod = int(underbust)%5
+        band = underbust - mod if mod < 2.5 else underbust - mod + 5
+        cup = max(0, int(round(((bust - underbust - 10) / 2))))
+        self.eu.setText('EU: %d%s' % (band, eucups[cup]))
+        
+        jpcups = ['AAA', 'AA', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+        
+        mod = int(underbust)%5
+        band = underbust - mod if mod < 2.5 else underbust - mod + 5
+        cup = max(0, int(round(((bust - underbust - 5) / 2.5))))
+        self.jp.setText('JP: %d%s' % (band, jpcups[cup]))
+        
+        uscups = ['AA', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+           
+        band = underbust * 0.393700787
+        band = band + 5 if int(band)%2 else band + 4
+        cup = max(0, int(round((bust - underbust - 10) / 2)))
+        self.us.setText('US: %d%s' % (band, uscups[cup]))
+
+        ukcups = ['AA', 'A', 'B', 'C', 'D', 'DD', 'E', 'F', 'FF', 'G', 'GG', 'H']
+        
+        self.uk.setText('UK: %d%s' % (band, ukcups[cup]))
         
     def loadHandler(self, human, values):
         
@@ -254,7 +298,7 @@ class Ruler:
   This class contains ...
   """
 
-    def __init__(self, mode='metric'):
+    def __init__(self):
 
     # these are tables of vertex indices for each body measurement of interest
 
@@ -282,23 +326,18 @@ class Ruler:
         self.Measures['lowerarmlenght'] = [9696,9945]
         self.Measures['hips'] = [7298,2936,3527,2939,2940,3816,3817,3821,4487,3822,3823,3913,3915,4506,5688,4505,4504,4503,6858,6862,6861,6860,
                                             6785,6859,7094,7096,7188,7189,6878,7190,7194,7195,7294,7295,7247,7300]
-                                            
-        self.mode = mode #'imperial'
-        
-    def setMode(self, mode):
-        self.mode = mode
 
-    def getMeasure(self, human, measurementname):
+    def getMeasure(self, human, measurementname, mode):
         measure = 0
         vindex1 = self.Measures[measurementname][0]
         for vindex2 in self.Measures[measurementname]:
             measure += aljabr.vdist(human.mesh.verts[vindex1].co, human.mesh.verts[vindex2].co)
             vindex1 = vindex2
             
-        if self.mode == 'metric':
-            return '%.1f cm' % (10.0 * measure)
+        if mode == 'metric':
+            return 10.0 * measure
         else:
-            return '%.1f in' % (10.0 * measure * 0.393700787)
+            return 10.0 * measure * 0.393700787
 
 
 
