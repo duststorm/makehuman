@@ -178,6 +178,13 @@ class ExportTaskView(gui3d.TaskView):
         
         # MHX options
         y = yy
+        self.mhxOptionsSource = gui3d.GroupBox(self, [10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
+        source = []
+        self.mhxConfig = gui3d.RadioButton(self.mhxOptionsSource, source, [18, y, 9.2], "Use config options", True);y+=24
+        self.mhxGui = gui3d.RadioButton(self.mhxOptionsSource, source, [18, y, 9.2], "Use gui options");y+=24
+        self.mhxOptionsSource.hide()
+        y+=16
+        
         self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
         self.version24 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.4", True);y+=24
         self.version25 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.5", True);y+=24
@@ -186,6 +193,30 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use mhx rig", True);y+=24
         self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use game rig");y+=24
         self.mhxOptions.hide()
+        
+        @self.mhxConfig.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(self.mhxConfig, event)
+            self.mhxOptions.hide()
+            
+        @self.mhxGui.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(self.mhxGui, event)
+            self.mhxOptions.show()
+            
+        @self.version24.event
+        def onClicked(event):
+            if self.version24.selected and self.version25.selected:
+                self.version24.setSelected(False)
+            else:
+                self.version24.setSelected(True)
+                
+        @self.version25.event
+        def onClicked(event):
+            if self.version25.selected and self.version24.selected:
+                self.version25.setSelected(False)
+            else:
+                self.version25.setSelected(True)
         
         @self.wavefrontObj.event
         def onClicked(event):
@@ -253,8 +284,19 @@ class ExportTaskView(gui3d.TaskView):
                     copyfile('data/textures/texture.png', texturePath)
                   
             elif self.mhx.selected:
+                if self.mhxConfig.selected:
+                    options = None
+                else:
+                    mhxversion = []
+                    if self.version24.selected: mhxversion.append('24')
+                    if self.version25.selected: mhxversion.append('25')
+                    options = {
+                        'mhxversion':mhxversion,
+                        'expressions':self.exportExpressions.selected,
+                        'useRig':'mhx' if self.mhxRig.selected else 'game'
+                    }
                 # TL 2011.02.08: exportMhx uses the human instead of his meshData
-                mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"))
+                mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
                 mh2collada.exportCollada(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))
             elif self.md5.selected:
@@ -271,8 +313,11 @@ class ExportTaskView(gui3d.TaskView):
             self.objOptions.hide()
             
         if self.mhx.selected:
-            self.mhxOptions.show()
+            self.mhxOptionsSource.show()
+            if self.mhxGui.selected:
+                self.mhxOptions.show()
         else:
+            self.mhxOptionsSource.hide()
             self.mhxOptions.hide()
 
     def onShow(self, event):

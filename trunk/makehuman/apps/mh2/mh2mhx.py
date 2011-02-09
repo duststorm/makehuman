@@ -44,7 +44,7 @@ import read_expression, read_rig
 #	exportMhx(human, filename):
 #
 
-def exportMhx(human, filename):	
+def exportMhx(human, filename, options=None):	
 	global theConfig, theHuman
 	theConfig = mh2proxy.proxyConfig()
 	(name, ext) = os.path.splitext(filename)
