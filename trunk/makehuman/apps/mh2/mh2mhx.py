@@ -254,7 +254,11 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 					raise NameError("rig-bones: %s" % line)
 			elif words[1] == 'human-object':
 				if words[2] == 'Mesh':
-					fp.write("Object %sMesh MESH %sMesh\n"  % (theHuman, theHuman))
+					fp.write(
+"Object %sMesh MESH %sMesh\n"  % (theHuman, theHuman) +
+"  Property MhxOffsetX %.4f ;\n" % mhx_rig.Origin[0] +
+"  Property MhxOffsetY %.4f ;\n" % mhx_rig.Origin[1] +
+"  Property MhxOffsetZ %.4f ;\n" % mhx_rig.Origin[2])
 				elif words[2] == 'ControlRig':
 					fp.write("Object %s ARMATURE %s\n"  % (theHuman, theHuman))
 				else:
@@ -428,8 +432,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 						fp.write("#if toggle&T_Cage\n")
 						copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)	
 						fp.write("#endif\n")
-			elif words[1] == 'human-mesh':
-				fp.write("Object %sMesh MESH %sMesh\n" % (theHuman, theHuman))
 			elif words[1] == 'group':
 				fp.write(
 "PostProcess %sMesh %s 0000001f 00080000 00fc0fff 0000c000 ;\n" % (theHuman, theHuman) + 

@@ -21,7 +21,7 @@ Hair importer for Blender.2.5
 bl_info = {
 	'name': 'Import MakeHuman hair (.obj)',
 	'author': 'Thomas Larsson',
-	'version': '0.7',
+	'version': '0.5',
 	'blender': (2, 5, 6),
 	'api': 33590,
 	'location': 'File > Import',
@@ -60,11 +60,19 @@ end
 """
 
 #
-#	importHair(filename, scale, invert, useCurves):
+#	importHair(context, filename, scale, invert, useCurves):
 #
 
-def importHair(filename, scale, invert, useCurves):
-	(name, guides) = readHairFile(filename, scale)
+def importHair(context, filename, scale, invert, useCurves):
+	try:
+		ob = context.object
+		dx = ob['MhxOffsetX']
+		dy = ob['MhxOffsetY']
+		dz = ob['MhxOffsetZ']
+	except:
+		(dx,dy,dz) = (0,0,0)
+
+	(name, guides) = readHairFile(filename, scale, (dx,dy,dz))
 	if invert:
 		for guide in guides:
 			guide.reverse()
@@ -114,11 +122,11 @@ def writeHairFile(fileName, scale):
 	return
 
 #
-#	readHairFile(fileName, scale):
+#	readHairFile(fileName, scale, offset):
 #	Read obj file with hair strands as curves
 #
 
-def readHairFile(fileName, scale):
+def readHairFile(fileName, scale, offset):
 	(name, ext) = os.path.splitext(os.path.basename(fileName))
 	filePath = os.path.realpath(os.path.expanduser(fileName))
 	print( "Reading hair " + filePath )
@@ -126,6 +134,7 @@ def readHairFile(fileName, scale):
 	guide = []
 	guides = []
 	lineNo = 0
+	(dx,dy,dz) = offset
 
 	for line in fp: 
 		words= line.split()
@@ -134,7 +143,7 @@ def readHairFile(fileName, scale):
 			pass
 		elif words[0] == 'v':
 			(x,y,z) = (float(words[1]), float(words[2]), float(words[3]))
-			guide.append(scale*Vector((x,-z,y)))
+			guide.append(scale*Vector((x-dx,-z+dz,y-dy)))
 		elif words[0] == 'end':
 			guides.append(guide)
 			guide = []
@@ -441,7 +450,7 @@ class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 	
 	def execute(self, context):
 		p = self.properties
-		importHair(p.filepath, p.scale, p.invert, p.useCurves)
+		importHair(context, p.filepath, p.scale, p.invert, p.useCurves)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
