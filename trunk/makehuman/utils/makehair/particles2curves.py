@@ -32,6 +32,6 @@ scn= Scene.GetCurrent()
 obj = scn.objects.active
 parts = obj.getParticleSystems()
 hairs = parts[0].getLoc()
-file = open("C:\Projects\makehuman\data\hairs\footballer.obj", 'w')
-exportAsCurves(file,hairs,10000)
+file = open("C:\Temp\hair.obj", 'w')
+exportAsCurves(file,hairs,300)
 file.close()
