@@ -125,9 +125,9 @@ class CProxyConfig:
 	def __init__(self):
 		self.mainmesh = ['obj', 'mhx', 'dae']
 		self.useRig = 'mhx'
-		self.mhxversion = [24, 25]
+		self.mhxversion = ['24', '25']
 		self.proxyList = []
-		self.expressions = []
+		self.expressions = ['mhx']
 		self.faceshapes = ['mhx']
 		self.bodyshapes = ['mhx']
 
@@ -139,8 +139,13 @@ def proxyConfig():
 	useObj = True
 	useDae = True
 	fp = proxyFilePtr('proxy.cfg')
+
 	if not fp: 
+		for name in ['sweater', 'jeans']:
+			proxyFile = os.path.expanduser("./data/templates/%s.mhclo" % name)
+			cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 4)))
 		return cfg
+
 	for line in fp:
 		words = line.split()
 		if len(words) == 0 or words[0][0] == '#':

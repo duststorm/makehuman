@@ -150,6 +150,7 @@ def exportMhx_25(human, fp):
 		rig = theConfig.useRig
 		fp.write("#if toggle&T_Armature\n")
 		copyFile25(human, "shared/mhx/templates/custom-shapes25.mhx", rig, fp, None, [])	
+		copyFile25(human, "shared/mhx/templates/gizmos25.mhx", rig, fp, None, [])	
 		mhx_rig.setupCircles(fp)
 		copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
 		fp.write("#endif\n")
@@ -431,7 +432,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 				fp.write("Object %sMesh MESH %sMesh\n" % (theHuman, theHuman))
 			elif words[1] == 'group':
 				fp.write(
-"PostProcess %sMesh ;\n" % theHuman + 
+"PostProcess %sMesh %s 0000001f 00080000 00fc0fff 0000c000 ;\n" % (theHuman, theHuman) + 
 "Group %s\n"  % theHuman +
 "  Objects\n" +
 "#if toggle&T_Armature\n" +

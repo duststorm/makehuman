@@ -15,14 +15,14 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.2.34
+Version 1.2.5
 
 """
 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 2, 4),
+    'version': (1, 2, 5),
     'blender': (2, 5, 6),
     'api': 34595,
     'location': "File > Import",
@@ -42,7 +42,7 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 2
-SUB_VERSION = 4
+SUB_VERSION = 5
 BLENDER_VERSION = (2, 56, 0)
 
 #
@@ -103,9 +103,18 @@ T_Cage = 0x800
 T_Rigify = 0x1000
 T_Opcns = 0x2000
 T_Symm = 0x4000
-T_StableVersion = 0x8000
 
 toggle = T_EnforceVersion + T_Replace + T_Mesh + T_Armature + T_Face + T_Shape + T_Proxy + T_Clothes
+
+#
+#    Blender versions
+#
+
+BLENDER_GRAPHICALL = 0
+BLENDER_256a = 1
+
+BlenderVersions = ['Graphicall', 'Blender256a']
+theBlenderVersion = BLENDER_GRAPHICALL
 
 #
 #    setFlagsAndFloats(rigFlags):
@@ -240,16 +249,15 @@ def checkBlenderVersion():
     return
 
 #
-#    readMhxFile(filePath, scale):
+#    readMhxFile(filePath):
 #
 
-def readMhxFile(filePath, scale):
+def readMhxFile(filePath):
     global todo, nErrors, theScale, defaultScale, One, toggle
 
-    checkBlenderVersion()    
+    #checkBlenderVersion()    
     
-    theScale = scale
-    defaultScale = scale
+    defaultScale = theScale
     One = 1.0/theScale
 
     fileName = os.path.expanduser(filePath)
@@ -684,6 +692,7 @@ def parseAnimationData(rna, args, tokens):
     return adata
 
 def parseAnimDataFCurve(adata, rna, args, tokens):
+    global theBlenderVersion
     if invalid(args[2]):
         return
     dataPath = args[0]
@@ -697,7 +706,7 @@ def parseAnimDataFCurve(adata, rna, args, tokens):
         elif key == 'FModifier':
             parseFModifier(fcu, val, sub)
         elif key == 'kp':
-            if toggle & T_StableVersion:
+            if theBlenderVersion >= BLENDER_256a:
                 pt = fcu.keyframe_points.add(n, 0)
             else:
                 pt = fcu.keyframe_points.insert(n, 0)
@@ -1410,7 +1419,7 @@ def parseVertColorData(args, tokens, data):
 #
 
 def parseVertexGroup(ob, me, args, tokens):
-    global toggle
+    global toggle, theBlenderVersion
     if verbosity > 2:
         print( "Parsing vertgroup %s" % args )
     grpName = args[0]
@@ -1424,7 +1433,7 @@ def parseVertexGroup(ob, me, args, tokens):
     if (toggle & T_Armature) or (grpName in ['Eye_L', 'Eye_R', 'Gums', 'Head', 'Jaw', 'Left', 'Middle', 'Right', 'Scalp']):
         group = ob.vertex_groups.new(grpName)
         loadedData['VertexGroup'][grpName] = group
-        if toggle & T_StableVersion:
+        if theBlenderVersion >= BLENDER_256a:
             for (key, val, sub) in tokens:
                 if key == 'wv':
                     ob.vertex_groups.assign([int(val[0])], group, float(val[1]), 'REPLACE')
@@ -2017,16 +2026,23 @@ def correctRig(args):
     bpy.context.scene.objects.active = ob
     bpy.ops.object.mode_set(mode='POSE')
     amt = ob.data
+    cnslist = []
     for pb in ob.pose.bones:
         for cns in pb.constraints:
             if cns.type == 'CHILD_OF':
-                amt.bones.active = pb.bone
-                inf = cns.influence
-                cns.influence = 1
-                print("Childof %s %s %s %.2f" % (amt.name, pb.name, cns.name, inf))
-                bpy.ops.constraint.childof_clear_inverse(constraint=cns.name, owner='BONE')
-                bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
-                cns.influence = inf
+                cnslist.append((pb, cns, cns.influence))
+                cns.influence = 0
+
+    for (pb, cns, inf) in cnslist:
+        amt.bones.active = pb.bone
+        cns.influence = 1
+        print("Childof %s %s %s %.2f" % (amt.name, pb.name, cns.name, inf))
+        bpy.ops.constraint.childof_clear_inverse(constraint=cns.name, owner='BONE')
+        bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
+        cns.influence = 0
+
+    for (pb, cns, inf) in cnslist:
+        cns.influence = inf
     return
         
 
@@ -2449,7 +2465,6 @@ def invalid(condition):
     
 #
 #    clearScene(context):
-#    hideLayers(args):
 #
     
 def clearScene():
@@ -2464,21 +2479,68 @@ def clearScene():
     for ob in scn.objects:
         if ob.type in ["MESH", "ARMATURE", 'EMPTY', 'CURVE', 'LATTICE']:
             scn.objects.active = ob
-            bpy.ops.object.mode_set(mode='OBJECT')
+            try:
+                bpy.ops.object.mode_set(mode='OBJECT')
+            except:
+                pass
             scn.objects.unlink(ob)
             del ob
     #print(scn.objects)
     return scn
 
+#
+#    hideLayers(args):
+#    args = sceneLayers sceneHideLayers boneLayers boneHideLayers or nothing
+#
+
 def hideLayers(args):
-    print("HideLayers")
+    if len(args) > 1:
+        sceneLayers = int(args[2], 16)
+        sceneHideLayers = int(args[3], 16)
+        boneLayers = int(args[4], 16)
+        boneHideLayers = int(args[5], 16)
+    else:
+        sceneLayers = 0x00ff
+        sceneHideLayers = 0
+        boneLayers = 0
+        boneHideLayers = 0
+
     scn = bpy.context.scene
-    for n in range(len(scn.layers)):
-        if n < 8:
-            scn.layers[n] = True
-        else:
-            scn.layers[n] = False
+    mask = 1
+    hidelayers = []
+    for n in range(20):
+        scn.layers[n] = True if sceneLayers & mask else False
+        if sceneHideLayers & mask:
+            hidelayers.append(n)
+        mask = mask << 1
+
+    for ob in scn.objects:
+        for n in hidelayers:
+            if ob.layers[n]:
+                ob.hide = True
+
+    if boneLayers:    
+        human = args[1]
+        try:
+            ob = loadedData['Object'][human]
+        except:
+            return
+
+        mask = 1
+        hidelayers = []
+        for n in range(32):
+            ob.data.layers[n] = True if boneLayers & mask else False
+            if boneHideLayers & mask:
+                hidelayers.append(n)
+            mask = mask << 1
+
+        for b in ob.data.bones:
+            for n in hidelayers:
+                if b.layers[n]:
+                    b.hide = True
+
     return
+    
 
 #
 #    readDefaults():
@@ -2487,8 +2549,9 @@ def hideLayers(args):
 
 ConfigFile = '~/mhx_import.cfg'
 
+
 def readDefaults():
-    global toggle, theScale
+    global toggle, theScale, theBlenderVersion, BlenderVersions
     path = os.path.realpath(os.path.expanduser(ConfigFile))
     try:
         fp = open(path, 'rU')
@@ -2496,19 +2559,21 @@ def readDefaults():
     except:
         print('Cannot open "%s" for reading' % path)
         return
+    bver = ''
     for line in fp: 
         words = line.split()
-        if len(words) >= 2:
+        if len(words) >= 3:
             try:
                 toggle = int(words[0],16)
                 theScale = float(words[1])
+                theBlenderVersion = BlenderVersions.index(words[2])
             except:
                 print('Configuration file "%s" is corrupt' % path)                
     fp.close()
     return
 
 def writeDefaults():
-    global toggle, theScale
+    global toggle, theScale, theBlenderVersion, BlenderVersions
     path = os.path.realpath(os.path.expanduser(ConfigFile))
     try:
         fp = open(path, 'w')
@@ -2516,7 +2581,7 @@ def writeDefaults():
     except:
         print('Cannot open "%s" for writing' % path)
         return
-    fp.write("%x %f" % (toggle, theScale))
+    fp.write("%x %f %s" % (toggle, theScale, BlenderVersions[theBlenderVersion]))
     fp.close()
     return
 
@@ -2526,6 +2591,8 @@ def writeDefaults():
 
 DEBUG= False
 from bpy.props import *
+from io_utils import ImportHelper
+
 
 MhxBoolProps = [
     ("enforce", "Enforce version", "Only accept MHX files of correct version", T_EnforceVersion),
@@ -2541,11 +2608,10 @@ MhxBoolProps = [
     ("symm", "Symmetric shapes", "Keep shapekeys symmetric", T_Symm),
     ("diamond", "Diamonds", "Keep joint diamonds", T_Diamond),
     ("bend", "Bend joints", "Bend joints for better IK", T_Bend),
-    ("opcns", "Operator constraints", "Only for Aligorith", T_Opcns),
-    ("stabver", "Stable Blender 2.56a", "Use latest stable Blender version (2.56a),", T_StableVersion),
+    #("opcns", "Operator constraints", "Only for Aligorith", T_Opcns),
 ]
 
-class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
+class IMPORT_OT_makehuman_mhx(bpy.types.Operator, ImportHelper):
     '''Import from MHX file format (.mhx)'''
     bl_idname = "import_scene.makehuman_mhx"
     bl_description = 'Import from MHX file format (.mhx)'
@@ -2553,36 +2619,41 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator):
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
 
+    scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
+    enums = []
+    for enum in BlenderVersions:
+        enums.append((enum,enum,enum))
+    bver = EnumProperty(name="Blender version", items=enums, default = BlenderVersions[0])
+
+    filename_ext = ".mhx"
+    filter_glob = StringProperty(default="*.mhx", options={'HIDDEN'})
     filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
 
-    scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
     for (prop, name, desc, flag) in MhxBoolProps:
         expr = '%s = BoolProperty(name="%s", description="%s", default=toggle&%s)' % (prop, name, desc, flag)
-        print(expr)
         exec(expr)
         
     def execute(self, context):
-        global toggle, theScale, MhxBoolProps
+        global toggle, theScale, MhxBoolProps, theBlenderVersion, BlenderVersions
         toggle = 0
         for (prop, name, desc, flag) in MhxBoolProps:
             expr = '(%s if self.properties.%s else 0)' % (flag, prop)
-            print(expr, eval(expr))
             toggle |=  eval(expr)
+        print("execute flags %x" % toggle)
         theScale = self.properties.scale
+        theBlenderVersion = BlenderVersions.index(self.properties.bver)
 
-        print("Load", self.properties.filepath, toggle, theScale)
-        readMhxFile(self.properties.filepath, theScale)
+        readMhxFile(self.properties.filepath)
         writeDefaults()
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        global toggle, theScale, MhxBoolProps
+        global toggle, theScale, MhxBoolProps, theBlenderVersion, BlenderVersions
         readDefaults()
-        print("Default", toggle, theScale)
         self.properties.scale = theScale
+        self.properties.bver = BlenderVersions[theBlenderVersion]
         for (prop, name, desc, flag) in MhxBoolProps:
             expr = 'self.properties.%s = toggle&%s' % (prop, flag)
-            print(expr)
             exec(expr)
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}

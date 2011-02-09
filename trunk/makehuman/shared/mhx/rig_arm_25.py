@@ -217,6 +217,7 @@ ArmControlArmature = [
 	('Shoulder_R',			0.0, 'Sternum', F_WIR+F_DEF, L_RSHOULDER+L_DEF, NoBB),
 	('ShoulderEnd_L',		0.0, 'Shoulder_L', 0, L_HELP, NoBB),
 
+
 	('ShoulderEnd_R',		0.0, 'Shoulder_R', 0, L_HELP, NoBB),
 	('ArmLoc_L',			0.0, 'ShoulderEnd_L', F_NOROT, L_HELP, NoBB),
 	('ArmLoc_R',			0.0, 'ShoulderEnd_R', F_NOROT, L_HELP, NoBB),
@@ -247,7 +248,7 @@ ArmControlArmature = [
 ]
 
 ArmDeformArmature = [
-	('Sternum',				0.0, 'Shoulders', 0, L_HELP, NoBB),
+	('Sternum',				0.0, 'Spine3', 0, L_HELP, NoBB),
 
 	# Shoulder
 	('Shoulder_L',			0.0, 'Sternum', F_DEF, L_LSHOULDER+L_MAIN, NoBB),

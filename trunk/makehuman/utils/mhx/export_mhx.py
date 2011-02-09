@@ -440,7 +440,7 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
 	if typ == int:
 		fp.write("%s%s %d ;\n" % (pad, ext, arg))
 	elif typ == float:
-		fp.write("%s%s %.6g ;\n" % (pad, ext, arg))
+		fp.write("%s%s %.3f ;\n" % (pad, ext, arg))
 	elif typ == bool:
 		fp.write("%s%s %s ;\n" % (pad, ext, arg))
 	elif typ == str:
@@ -456,13 +456,13 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
 		c = '('
 		fp.write("%s%s " % (pad, ext))
 		for elt in arg:
-			fp.write("%s%.6g" % (c,elt))
+			fp.write("%s%.3f" % (c,elt))
 			c = ','
 		fp.write(") ;\n")
 	elif typ == mathutils.Euler:
-		fp.write("%s%s (%.6g,%.6g,%.6g) ;\n" % (pad, ext, arg[0], arg[1], arg[2]))
+		fp.write("%s%s (%.3f,%.3f,%.3f) ;\n" % (pad, ext, arg[0], arg[1], arg[2]))
 	elif typ == mathutils.Quaternion:
-		fp.write("%s%s (%.6g,%.6g,%.6g,%.6g) ;\n" % (pad, ext, arg[0], arg[1], arg[2], arg[3]))
+		fp.write("%s%s (%.3f,%.3f,%.3f,%.3f) ;\n" % (pad, ext, arg[0], arg[1], arg[2], arg[3]))
 	elif typ == mathutils.Matrix:
 		fp.write("%s%s Matrix\n" % (pad, ext))
 		n = len(arg)
@@ -796,9 +796,9 @@ def exportChannel(chnl, pad, fp):
 	fp.write("%send Channels\n\n" % pad)
 
 def exportKeyFramePoint(kpt, pad, fp):
-	#fp.write("%skp %.6g %.6f %.6f %.6f %.6f %.6f ;\n" % 
+	#fp.write("%skp %.3f %.6f %.6f %.6f %.6f %.6f ;\n" % 
 	#	(pad, kpt.co[0], kpt.co[1], kpt.handle1[0], kpt.handle1[1], kpt.handle2[0], kpt.handle2[1]))
-	fp.write("%skp %.6g %.6f ;\n" % (pad, kpt.co[0], kpt.co[1]))
+	fp.write("%skp %.3f %.6f ;\n" % (pad, kpt.co[0], kpt.co[1]))
 
 def writeTuple(list, fp):
 	c = '('
@@ -907,7 +907,7 @@ def exportRamp(ramp, name, fp):
 
 	for elt in ramp.elements:
 		col = elt.color
-		fp.write("    Element (%.6g,%.6g,%.6g,%.6g) %.6g ;\n" % (col[0], col[1], col[2], col[3], elt.position))
+		fp.write("    Element (%.3f,%.3f,%.3f,%.3f) %.3f ;\n" % (col[0], col[1], col[2], col[3], elt.position))
 	writeDir(ramp, ['elements'], "    ", fp)
 	fp.write("  end Ramp\n")
 
@@ -1090,7 +1090,7 @@ def exportParticles(particles, nmax, pad, fp):
 			for h in par.hair:
 				fp.write("%s    h " % pad)
 				writeTuple(h.location, fp)
-				fp.write(" %d %.6g ;\n" % (h.time, h.weight))
+				fp.write(" %d %.3f ;\n" % (h.time, h.weight))
 			writePrio(par, prio, pad+"    ", fp)
 			fp.write("%s  end Particle\n" % pad)
 			n += 1
@@ -1114,7 +1114,7 @@ def exportMesh(ob, fp):
 	if me.vertices:
 		fp.write("  Verts\n")
 		for v in me.vertices:
-			fp.write("    v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
+			fp.write("    v %.3f %.3f %.3f ;\n" %(v.co[0], v.co[1], v.co[2]))
 		v = me.vertices[0]
 		#writeDir(v, ['co', 'index', 'normal'], "      ", fp)
 		fp.write("  end Verts\n")
@@ -1147,7 +1147,7 @@ def exportMesh(ob, fp):
 		fp.write("    Data \n")
 		for data in uvtex.data.values():
 			v = data.uv_raw
-			fp.write("      vt %.6g %.6g %.6g %.6g %.6g %.6g %.6g %.6g ;\n" % 
+			fp.write("      vt %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f ;\n" % 
 				(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
 		writeDir(uvtex.data[0], 
 			['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "      ", fp)
@@ -1175,7 +1175,7 @@ def exportMesh(ob, fp):
 
 	"""
 	for v in me.sticky:
-		fp.write("  sticky %.6g %.6g\n" % (v.co[0], v.co[1]))
+		fp.write("  sticky %.3f %.3f\n" % (v.co[0], v.co[1]))
 	"""	
 
 	for mat in me.materials:
@@ -1275,7 +1275,7 @@ def addToeWeight(toeDict, v, w):
 def dumpVertexGroup(toeDict, vgName, fp):
 	fp.write("  VertexGroup %s\n" % (vgName))
 	for (v,w) in toeDict.items():
-		fp.write("    wv %d %.6g ;\n" % (v,w))
+		fp.write("    wv %d %.3f ;\n" % (v,w))
 	fp.write("  end VertexGroup\n")
 	
 
@@ -1485,9 +1485,9 @@ def exportArmature(ob, fp):
 def writeBone(bone, fp):
 	fp.write("  Bone %s True\n" % (bone.name.replace(' ','_')))
 	x = bone.head
-	fp.write("    head %.6g %.6g %.6g ; \n" % (x[0], x[1], x[2]))
+	fp.write("    head %.3f %.3f %.3f ; \n" % (x[0], x[1], x[2]))
 	x = bone.tail
-	fp.write("    tail %.6g %.6g %.6g ; \n" % (x[0], x[1], x[2]))
+	fp.write("    tail %.3f %.3f %.3f ; \n" % (x[0], x[1], x[2]))
 	writePrio(bone, ['roll'], "    ", fp)
 	return
 
@@ -1703,7 +1703,7 @@ def exportLattice(ob, fp):
 	for pt in lat.points:
 		x = pt.co
 		y = pt.co_deform
-		fp.write("    pt (%.6g,%.6g,%.6g) (%.6g,%.6g,%.6g) ;\n" % (x[0], x[1], x[2], y[0], y[1], y[2]))
+		fp.write("    pt (%.3f,%.3f,%.3f) (%.3f,%.3f,%.3f) ;\n" % (x[0], x[1], x[2], y[0], y[1], y[2]))
 	fp.write("  end Points\n")
 	fp.write("end Lattice\n")
 

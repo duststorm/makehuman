@@ -445,9 +445,12 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, cons
 	if customShape:
 		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
 	if copy & U_LOC:
-		addCopyLocConstraint(fp, '', C_LOCAL, 1, ['Loc', cbone, (1,1,1), (0,0,0), False])
+		addCopyLocConstraint(fp, '', 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), False])
 	if copy & U_ROT:
-		addCopyRotConstraint(fp, '', C_LOCAL, 1, ['Rot', cbone, channels, (0,0,0), False])
+		if channels == (1,1,1):
+			addCopyRotConstraint(fp, '', 0, 1, ['Rot', cbone, channels, (0,0,0), False])
+		else:
+			addCopyRotConstraint(fp, '', C_LOCAL, 1, ['Rot', cbone, channels, (0,0,0), False])
 	if copy & U_SCALE:
 		addCopyScaleConstraint(fp, '', 0, 1, ['Scale', cbone, (1,1,1), False])
 	addConstraints(fp, dbone, constraints, 0, 0)
