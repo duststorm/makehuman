@@ -49,6 +49,11 @@ class ShortcutsTaskView(gui3d.TaskView):
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Top view");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.topView);y+=25
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Side view");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.sideView);y+=25
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Reset view");AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.resetView);y+=25
+    
+    def onHide(self, event):
+
+        gui3d.TaskView.onHide(self, event)
+        self.app.saveSettings()
         
     def onResized(self, event):
         

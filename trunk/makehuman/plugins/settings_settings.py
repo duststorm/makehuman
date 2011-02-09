@@ -92,6 +92,11 @@ class SettingsTaskView(gui3d.TaskView):
                 human.mesh.setShader(human.shader_program)
             except Exception, e:
                 print "No shader support: " + str(e)
+                
+    def onHide(self, event):
+
+        gui3d.TaskView.onHide(self, event)
+        self.app.saveSettings()
 
 def load(app):
     category = app.getCategory('Settings')

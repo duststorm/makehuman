@@ -105,7 +105,14 @@ class MHApplication(gui3d.Application):
         
         self.fonts = {}
         
-        self.settings = {}
+        self.settings = {
+            'realtimeUpdates': True,
+            'realtimeNormalUpdates': True,
+            'shader': None,
+            'lowspeed': 1,
+            'highspeed': 5
+        }
+        
         self.shortcuts = {
             # Actions
             (events3d.KMOD_CTRL, events3d.SDLK_z): self.undo,
@@ -139,6 +146,8 @@ class MHApplication(gui3d.Application):
             (0, events3d.SDLK_3): self.topView,
             (0, events3d.SDLK_PERIOD): self.resetView
         }
+        
+        self.loadSettings()
         
         self.loadHandlers = {}
         self.saveHandlers = []
@@ -445,6 +454,30 @@ class MHApplication(gui3d.Application):
             action.do()
             self.undoStack.append(action)
             self.redraw()
+            
+    # Settings
+            
+    def loadSettings(self):
+        if os.path.isfile("settings.ini"):
+            f = open("settings.ini", 'r')
+            settings = eval(f.read())
+            self.settings.update(settings)
+        
+        if os.path.isfile("shortcuts.ini"):
+            self.shortcuts = {}
+            f = open("shortcuts.ini", 'r')
+            for line in f:
+                modifier, key, method = line.split(' ')
+                #print modifier, key, method[0:-1]
+                self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
+        
+    def saveSettings(self):
+        f = open("settings.ini", 'w')
+        f.write(repr(self.settings))
+        
+        f = open("shortcuts.ini", 'w')
+        for shortcut, method in self.shortcuts.iteritems():
+            f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
 
     # Themes
     def setTheme(self, theme):
