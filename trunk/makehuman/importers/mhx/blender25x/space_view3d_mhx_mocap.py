@@ -152,6 +152,14 @@ Epsilon = 1e-5
 
 def readBvhFile(context, filepath, scn):
 	global theTarget
+	try:
+		scn['MhxBvhScale']
+		inited = True
+	except:
+		inited = False
+	if not inited:
+		initInterface(context)
+	
 	scale = scn['MhxBvhScale']
 	startFrame = scn['MhxStartFrame']
 	endFrame = scn['MhxEndFrame']
@@ -1228,6 +1236,7 @@ def rescaleRig(scn, trgRig, srcRig, action):
 	srcScale = srcRig.data.bones['UpLeg_L'].length
 	scale = trgScale/srcScale
 	print("Rescale %s with factor %f" % (scn.objects.active, scale))
+	scn['MhxBvhScale'] = scale
 	
 	bpy.ops.object.mode_set(mode='EDIT')
 	ebones = srcRig.data.edit_bones
