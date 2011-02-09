@@ -1414,6 +1414,54 @@ class FileChooser(View):
             preview = filename.replace(os.path.splitext(filename)[-1], '.' + self.previewExtension)
         return preview
         
+    def refresh(self):
+        
+        if self.files:
+            self.files = []
+        if self.objects:
+            for object in self.objects:
+                self.app.scene3d.detach(object.mesh)
+            self.objects = []
+            
+        if isinstance(self.extension, str):
+            for f in os.listdir(self.path):
+                if f.endswith('.' + self.extension):
+                    self.files.append(f)
+        elif isinstance(self.extension, list):
+            for f in os.listdir(self.path):
+                for ext in self.extension:
+                    if f.endswith('.' + ext):
+                        self.files.append(f)
+                        
+        self.files.sort()
+        
+        width, height = self.app.getWindowSize()
+        
+        x = 10
+        y = 80
+        for file in self.files:
+            
+            if x > width - 140 - 10:
+                x = 10
+                y += 150
+                
+            FileChooserRectangle(self, [x, y, 9], os.path.join(self.path, self.getPreview(file)), file)
+            if isinstance(self.extension, str):
+                file = file.replace(os.path.splitext(file)[-1], '')
+            TextObject(self, [x, y + 134, 9.5], file)
+            
+            x += 140
+            
+        self.app.scene3d.update()
+        self.app.redraw()
+            
+    def onKeyDown(self, event):
+
+        if event.key == events3d.SDLK_F5:
+            self.refresh()
+        else:
+            View.onKeyDown(self, event)
+        
     def onShow(self, event):
         
         if not self.files:
