@@ -549,19 +549,20 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.tool = None
         
         self.modifiers = {}
+        self.oldModifiers = {}
         
         self.modifiers['genitals'] = AsymmetricDetailModifier('data/targets/details/genitals_${gender}_${genitals}_${age}.target', 'genitals', 'feminine', 'masculine', False)
         
         self.modifiers['breastSize'] = BreastSizeModifier()
         self.modifiers['breastFirmness'] = BreastFirmnessModifier()
         
-        self.modifiers['nose'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-nose${nose}.target', 'nose', xrange(1, 13), False)
-        self.modifiers['mouth'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-mouth${mouth}.target', 'mouth', xrange(1, 14), False)
-        self.modifiers['eyes'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-eye${eyes}.target', 'eyes', xrange(1, 31), False)
-        self.modifiers['ears'] = RangeDetailModifier('data/targets/details/${gender}-${age}-ears${ears}.target', 'ears', xrange(1, 9), False)
-        self.modifiers['jaw'] = RangeDetailModifier('data/targets/details/${gender}-${age}-jaw${jaw}.target', 'jaw', xrange(1, 8), False)
+        self.oldModifiers['nose'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-nose${nose}.target', 'nose', xrange(1, 13), False)
+        self.oldModifiers['mouth'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-mouth${mouth}.target', 'mouth', xrange(1, 14), False)
+        self.oldModifiers['eyes'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-eye${eyes}.target', 'eyes', xrange(1, 31), False)
+        self.oldModifiers['ears'] = RangeDetailModifier('data/targets/details/${gender}-${age}-ears${ears}.target', 'ears', xrange(1, 9), False)
+        self.oldModifiers['jaw'] = RangeDetailModifier('data/targets/details/${gender}-${age}-jaw${jaw}.target', 'jaw', xrange(1, 8), False)
         
-        self.modifiers['head'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-head${head}.target', 'head', xrange(1, 9), False)
+        self.oldModifiers['head'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-head${head}.target', 'head', xrange(1, 9), False)
         self.modifiers['headAge'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-head-age${headAge}.target', 'headAge', '1', '2', False)
         self.modifiers['faceAngle'] = humanmodifier.Modifier('data/targets/details/facial-angle1.target', 'data/targets/details/facial-angle2.target')
         
@@ -585,19 +586,19 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.sliders.append(DetailSlider(self, 10, y, 0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness']));y+=36
         y+=16
             
-        gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*5+6));y+=25
+        #gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*5+6));y+=25
 
-        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Nose shape", self.modifiers['nose']));y+=36
-        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Mouth shape", self.modifiers['mouth']));y+=36
-        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Eyes shape", self.modifiers['eyes']));y+=36
-        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Ears shape", self.modifiers['ears']));y+=36
-        self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Jaw shape", self.modifiers['jaw']));y+=36
-        y+=16
+        #self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Nose shape", self.modifiers['nose']));y+=36
+        #self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Mouth shape", self.modifiers['mouth']));y+=36
+        #self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Eyes shape", self.modifiers['eyes']));y+=36
+        #self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Ears shape", self.modifiers['ears']));y+=36
+        #self.sliders.append(DetailSlider(self, 10, y, 0.0, 0.0, 1.0, "Jaw shape", self.modifiers['jaw']));y+=36
+        #y+=16
             
         y = 80
-        self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
+        self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
         
-        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, 0.0, 1.0, "Shape", self.modifiers['head']));y+=36
+        #self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, 0.0, 1.0, "Shape", self.modifiers['head']));y+=36
         self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Age", self.modifiers['headAge']));y+=36
         self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Face angle", self.modifiers['faceAngle']));y+=36
         y+=16
@@ -693,6 +694,10 @@ class DetailModelingTaskView(gui3d.TaskView):
             modifier = self.modifiers.get(values[0], None)
             if modifier:
                 modifier.setValue(human, float(values[1]))
+            else:
+                modifier = self.oldModifiers.get(values[0], None)
+                if modifier:
+                    modifier.setValue(human, float(values[1]))
        
     def saveHandler(self, human, file):
         
