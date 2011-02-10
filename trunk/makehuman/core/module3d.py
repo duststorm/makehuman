@@ -533,6 +533,11 @@ class FaceGroup:
             for uvpair in uv:
                 self.parent.uvValues.append(uvpair)
             f.uv = [index, index + 1, index + 2, index + 3]
+            
+        v0.sharedFaces.append(f)
+        v1.sharedFaces.append(f)
+        v2.sharedFaces.append(f)
+        v3.sharedFaces.append(f)
 
         return f
 
@@ -611,9 +616,6 @@ class Object3D:
         self.sx = 1
         self.sy = 1
         self.sz = 1
-        self.r = 155
-        self.g = 155
-        self.b = 155
         self.verts = []
         self.faces = []
         self.facesGroups = []

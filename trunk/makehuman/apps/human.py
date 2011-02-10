@@ -28,7 +28,7 @@ __docformat__ = 'restructuredtext'
 import algos3d
 import gui3d
 import time
-import subdivision
+import catmull_clark_subdivision as subdivision
 import files3d
 import os
 import mh
