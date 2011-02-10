@@ -574,6 +574,8 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.app.addLoadHandler('microdetail', self.loadHandler)
         for modifier in self.modifiers:
             self.app.addLoadHandler(modifier, self.loadHandler)
+        for modifier in self.oldModifiers:
+            self.app.addLoadHandler(modifier, self.loadHandler)
         self.app.addSaveHandler(self.saveHandler)
         
         self.sliders = []
