@@ -3,7 +3,7 @@ from Blender import Scene, Curve, Object, Particle
 from random import randrange  
 
 def exportAsCurves(file, guides, number):
-    DEG_ORDER_U = 3
+    DEG_ORDER_U = 2 # formerly 3
     # use negative indices
     M = min(len(guides),number)
     for j in xrange(0,M):
