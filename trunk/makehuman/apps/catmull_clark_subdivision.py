@@ -30,7 +30,7 @@ from animation3d import lerpVector
 def createOriginalVert(object, v):
     
     o = object.createVertex(v.co[:])
-    o.data = [v, [], set()]
+    o.data = [v, [], set()] # original, faceVerts, edgeVerts
     
     return o
     
@@ -42,10 +42,14 @@ def updateOriginalVert(v):
     
     if not v.data[1] or not v.data[2]:
         return
-    faceVertAvg = centroid([fv.co for fv in v.data[1]])
-    edgeVertAvg = centroid([ev.co for ev in v.data[2]])
-    n = len(v.data[1])
-    v.co = vmul(vadd(vadd(faceVertAvg, vmul(edgeVertAvg, 2.0)), vmul(v.data[0].co[:], n - 3.0)), 1.0/n)
+        
+    if len(v.data[1]) == len(v.data[2]): # Inner vertex
+        faceVertAvg = centroid([fv.co for fv in v.data[1]])
+        edgeVertAvg = centroid([ev.co for ev in v.data[2]])
+        n = len(v.data[1])
+        v.co = vmul(vadd(vadd(faceVertAvg, vmul(edgeVertAvg, 2.0)), vmul(v.data[0].co, n - 3.0)), 1.0/n)
+    else: # Outer vertex
+        v.co = centroid([ev.co for ev in v.data[2] if len(ev.data) == 3]+[v.data[0].co])
 
 def createFaceVert(object, f):
     
