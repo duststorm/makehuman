@@ -6,7 +6,7 @@ Utility function for creating a morph target (part of the development functional
 Project Name:                **MakeHuman**
 Product Home Page:           http://www.makehuman.org/
 Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2010
+Copyright(c):                MakeHuman Team 2001-2011
 Licensing:                   GPL3
 ===========================  ===============================================================
 

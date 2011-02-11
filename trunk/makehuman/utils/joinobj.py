@@ -7,7 +7,7 @@ Project Name:                **MakeHuman**
 Module File Location:        utils/joinobj.py
 Product Home Page:           http://www.makehuman.org/
 Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2010
+Copyright(c):                MakeHuman Team 2001-2011
 Licensing:                   GPL3 (see also: http://sites.google.com/site/makehumandocs/licensing)
 Coding Standards:            See http://sites.google.com/site/makehumandocs/developers-guide#TOC-Coding-Style
 ===========================  ==================================================================
