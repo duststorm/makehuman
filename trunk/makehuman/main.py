@@ -642,7 +642,7 @@ class MHApplication(gui3d.Application):
         exportPath = mh.getPath('exports')
         if not os.path.exists(exportPath):
             os.makedirs(exportPath)
-        mh2obj.exportObj(self.selectedHuman.meshData, exportPath + '/quick_export.obj', 'data/3dobjs/base.obj')
+        mh2obj.exportObj(self.selectedHuman.meshData, exportPath + '/quick_export.obj')
         mh2bvh.exportSkeleton(self.selectedHuman.meshData, exportPath + '/quick_export.bvh')
         mh2mhx.exportMhx(self.selectedHuman.meshData, exportPath + '/quick_export.mhx')
         

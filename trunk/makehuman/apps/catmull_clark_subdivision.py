@@ -41,7 +41,7 @@ def initOriginalVert(v):
     
 def updateOriginalVert(v):
     
-    if not v.data[1] or not v.data[2]:
+    if not v.data[1] or not v.data[2]: # Joint vertex
         return
         
     if len(v.data[1]) == len(v.data[2]): # Inner vertex
@@ -62,7 +62,7 @@ def createFaceVert(object, f):
     
 def updateFaceVert(fv):
     
-    fv.co = centroid([v.co for v in fv.data.verts])
+    fv.co = vavg3d4(fv.data.verts[0].co, fv.data.verts[1].co, fv.data.verts[2].co, fv.data.verts[3].co)
 
 def createEdgeVert(object, edgeVerts, v1, v2, c):
     
@@ -178,6 +178,17 @@ def createSubdivisionObject(scene, object):
     subdivisionObject.texture = object.texture
 
     return subdivisionObject
+    
+def updateSubdivisionObject(object):
+    
+    for v in object.originalVerts:
+        initOriginalVert(v)
+    for v in object.faceVerts:
+        updateFaceVert(v)
+    for v in object.edgeVerts:
+        updateEdgeVert(v)
+    for v in object.originalVerts:
+        updateOriginalVert(v)
 
 def subdivide(object, scene):
 
@@ -185,8 +196,12 @@ def subdivide(object, scene):
     subdivisionObject = scene.getObject(object.name + '.sub')
     if subdivisionObject:
         print 'Sub data present'
-        updateSubdivisionObject(object, subdivisionObject)
+        updateSubdivisionObject(subdivisionObject)
         print 'time for subdivision: %s' % (time.time() - t)
+        t = time.time()
+        subdivisionObject.calcNormals()
+        print 'time for normals: %s' % (time.time() - t)
+        subdivisionObject.update()
     else:
         print 'Calculating sub data'
         subdivisionObject = createSubdivisionObject(scene, object)

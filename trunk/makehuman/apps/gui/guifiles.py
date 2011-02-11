@@ -253,14 +253,13 @@ class ExportTaskView(gui3d.TaskView):
                 if self.exportEyebrows.selected and self.exportDiamonds.selected:
                     filter = None
                 elif self.exportEyebrows.selected:
-                    filter = lambda fg: not 'joint' in fg
+                    filter = lambda fg: not 'joint' in fg.name
                 elif self.exportDiamonds.selected:
-                    filter = lambda fg: not 'eyebrown' in fg
+                    filter = lambda fg: not 'eyebrown' in fg.name
                 else:
-                    filter = lambda fg: not ('joint' in fg or 'eyebrown' in fg)
-                mh2obj.exportObj(self.app.selectedHuman.meshData,
+                    filter = lambda fg: not ('joint' in fg.name or 'eyebrown' in fg.name)
+                mh2obj.exportObj(self.app.selectedHuman.mesh,
                     os.path.join(exportPath, filename + ".obj"),
-                    'data/3dobjs/base.obj',
                     self.exportGroups.selected,
                     filter)
                 mh2proxy.exportProxyObj(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))

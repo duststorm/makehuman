@@ -33,7 +33,7 @@ __docformat__ = 'restructuredtext'
 import files3d
 from os.path import basename
 
-def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True, groupFilter=None):
+def exportObj(obj, filename, exportGroups = True, groupFilter=None):
     """
     This function exports a mesh object in Wavefront obj format. It is assumed that obj will have at least vertices and
     faces (exception handling for vertices/faces must be done outside this method).
@@ -67,34 +67,18 @@ def exportObj(obj, filename, originalQuadsFile=None, exportGroups = True, groupF
     f.write('usemtl basic\n')
     f.write('s off\n')
       
-    if originalQuadsFile:
-      faces = files3d.loadFacesIndices(originalQuadsFile, True)
-      fg = ''
-      for fc in faces:
-         if isinstance(fc, str):
-            fg = fc
-            if exportGroups and (not groupFilter or groupFilter(fg)):
-                f.write('g %s\n' % fc)
-         elif not groupFilter or groupFilter(fg):
-            f.write('f')
-            for v in fc:
-                if (obj.uvValues == None): f.write(' %i//%i ' % (v[0] + 1, v[1] + 1))
-                else: f.write(' %i/%i/%i ' % (v[0] + 1, v[1] + 1, v[0] + 1))
-            f.write('\n')
-    else:
-        for fg in obj.facesGroups:
-            if not groupFilter or groupFilter(fg):
-                if exportGroups:
-                    f.write('g %s\n' % fg.name)
-                for face in fg.faces:
-                    f.write('f')
-                    #print "face.verts : " , face.verts
-                    for v in face.verts:
-                        if (obj.uvValues == None):
-                            f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-                        else:
-                            f.write(' %i/%i/%i ' % (v.idx + 1, v.idx + 1, v.idx + 1))
-                    f.write('\n')
+    for fg in obj.facesGroups:
+        if not groupFilter or groupFilter(fg):
+            if exportGroups:
+                f.write('g %s\n' % fg.name)
+            for face in fg.faces:
+                f.write('f')
+                for i, v in enumerate(face.verts):
+                    if (obj.uvValues == None):
+                        f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+                    else:
+                        f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
+                f.write('\n')
     f.close()
 
     # Write material file
