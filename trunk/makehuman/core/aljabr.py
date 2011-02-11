@@ -175,7 +175,16 @@ def centroid(vertsList):
         print 'Warning: no verts to calc centroid'
         return 0
     return [centrX, centrY, centrZ]
-
+    
+def centroid3d(verts3d):
+    x, y, z = zip(*verts3d)
+    n = len(verts2d)
+    return [sum(x)/n, sum(y)/n, sum(z)/n]
+    
+def centroid2d(verts2d):
+    x, y = zip(*verts2d)
+    n = len(verts2d)
+    return [sum(x)/n, sum(y)/n]
 
 def vadd(*vlist):
     """

@@ -24,7 +24,7 @@ Mesh Subdivision Plugin.
 __docformat__ = 'restructuredtext'
 
 import time
-from aljabr import centroid, vadd, vmul
+from aljabr import centroid, vadd, vmul, centroid2d
 from animation3d import lerpVector
 
 def createOriginalVert(object, v):
@@ -104,7 +104,7 @@ def createSubdivisionObject(scene, object):
     subdivisionObject.pickable = object.pickable
     subdivisionObject.cameraMode = object.cameraMode
     subdivisionObject.solid = object.solid
-    subdivisionObject.uvValues = None#object.uvValues[:]
+    subdivisionObject.uvValues = []
     subdivisionObject.indexBuffer = []
     
     fg = subdivisionObject.createFaceGroup('subdivision')
@@ -151,10 +151,21 @@ def createSubdivisionObject(scene, object):
         v3.data[2].add(e2)
         v3.data[2].add(e3)
         
-        fg.createFace(v0, e0, c, e3)
-        fg.createFace(e0, v1, e1, c)
-        fg.createFace(e3, c, e2, v3)
-        fg.createFace(c, e1, v2, e2)
+        uv0 = object.uvValues[f.uv[0]]
+        uv1 = object.uvValues[f.uv[1]]
+        uv2 = object.uvValues[f.uv[2]]
+        uv3 = object.uvValues[f.uv[3]]
+        
+        uvc = centroid2d([uv0, uv1, uv2, uv3])
+        uve0 = centroid2d([uv0, uv1])
+        uve1 = centroid2d([uv1, uv2])
+        uve2 = centroid2d([uv2, uv3])
+        uve3 = centroid2d([uv3, uv0])
+        
+        fg.createFace(v0, e0, c, e3, [uv0, uve0, uvc, uve3])
+        fg.createFace(e0, v1, e1, c, [uve0, uv1, uve1, uvc])
+        fg.createFace(e3, c, e2, v3, [uve3, uvc, uve2, uv3])
+        fg.createFace(c, e1, v2, e2, [uvc, uve1, uv2, uve2])
     
     for v in subdivisionObject.edgeVerts:
         updateEdgeVert(v)
@@ -164,7 +175,7 @@ def createSubdivisionObject(scene, object):
     subdivisionObject.updateIndexBuffer()
     subdivisionObject.object = object.object
     subdivisionObject.object.mesh = subdivisionObject
-    #subdivisionObject.texture = object.texture
+    subdivisionObject.texture = object.texture
 
     return subdivisionObject
 
