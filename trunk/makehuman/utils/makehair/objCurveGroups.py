@@ -29,7 +29,7 @@ def exportAsCurves(file, guides, groups=None):
 
 scn= Scene.GetCurrent()
 guides=[]
-file = open("C:\output.obj", 'w')
+file = open("C:/temp/temp.obj", 'w')
 
 #Getting groups from blender then unlinking them because I dont know how to get groupnames of an object
 grps = Group.Get()
@@ -41,21 +41,29 @@ for grp in grps:
         groups.append(grp.name)
         guide=[]
         mesh = obj.getData()
-        for cp in mesh[0]:
-            guide.append([cp[0],cp[1],cp[2]])
-        guides.append(guide)
-        scn.objects.unlink(obj)
+        try:
+          for cp in mesh[0]:
+              guide.append([cp[0],cp[1],cp[2]])
+          guides.append(guide)
+          scn.objects.unlink(obj)
+        except:
+          pass
 Blender.Redraw()
 exportAsCurves(file, guides, groups)
 
 #get the rest of non-grouped objects
 guides=[]
+file = open("C:/temp/temp2.obj", 'w')
 for object in scn.objects.selected:
     guide=[]
     mesh = object.getData()
-    for cp in mesh[0]:
-        guide.append([cp[0],cp[1],cp[2]])
-    guides.append(guide)
-    
+    try:
+      for cp in mesh[0]:
+          guide.append([cp[0],cp[1],cp[2]])
+      guides.append(guide)
+      scn.objects.unlink(object)
+    except:
+      pass
+      
 exportAsCurves(file, guides)
 file.close()
