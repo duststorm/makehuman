@@ -39,10 +39,10 @@ FaceHeadsTails = [
 
 
 FaceControlArmature = [
-	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
-	('TongueBase',	0.0, 'Jaw', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
-	('TongueMid',	0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
-	('TongueTip',	0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD+L_DEF, NoBB),
+	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_HEAD, NoBB),
+	('TongueBase',	0.0, 'Jaw', F_DEF+F_WIR, L_HEAD, NoBB),
+	('TongueMid',	0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD, NoBB),
+	('TongueTip',	0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD, NoBB),
 	('Gaze',		pi, None, F_WIR, L_HEAD, NoBB),
 	('Gaze_R',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),
 	('Gaze_L',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),

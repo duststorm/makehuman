@@ -35,17 +35,15 @@ SPINE = S_BONE
 def addSpine(fp, name, hooks):
 	if SPINE == S_BONE:
 		return
-
-	addHookEmpty(fp, hooks[1])
-	addHookEmpty(fp, hooks[-1])
-	for n in range(1, len(hooks)):
-		addHookCube(fp, hooks[n], hooks[n-1])
-
-	if SPINE == S_CURVE:
+	elif SPINE == S_CURVE:
 		addCurve(fp, name, hooks)
 	elif SPINE == S_MESHCURVE:
-		addLattice(fp, name, hooks)
-		addMeshCurve(fp, name, hooks)
+		addHookEmpty(fp, hooks[1])
+		addHookEmpty(fp, hooks[-1])
+		for n in range(1, len(hooks)):
+			addHookCube(fp, hooks[n], hooks[n-1])
+			addLattice(fp, name, hooks)
+			addMeshCurve(fp, name, hooks)
 
 	return 
 
@@ -62,6 +60,7 @@ def addHookCube(fp, name, parent):
 "  parent Refer Object %s ;\n" % mh2mhx.theHuman +
 "  parent_bone \"%s\" ;\n" % parent +
 "  parent_type 'BONE' ;\n" +
+"  show_x_ray True ;\n" +
 "end Object\n")
 
 #
@@ -167,12 +166,22 @@ def addLatticeModifier(fp, latname, vgroup):
 "    end Modifier\n")
 	return
 
+#
+#	addHookModifier(fp, hook, suffix, index, typ):
+#
+
 def addHookModifier(fp, hook, suffix, index, typ):
 	fp.write(
 "  Modifier %s HOOK\n" % hook +
 "    falloff 0 ;\n" +
-"    force 1 ;\n" +
-"    object Refer Object %s%s%s ;\n" % (mh2mhx.theHuman, hook, suffix)+
+"    force 1 ;\n")
+	if suffix:
+		fp.write("    object Refer Object %s%s%s ;\n" % (mh2mhx.theHuman, hook, suffix))
+	else:
+		fp.write(
+"    object Refer Object %s ;\n" % mh2mhx.theHuman +
+"    subtarget '%s' ;\n" % hook)
+	fp.write(
 "    show_expanded False ;\n" +
 "    use_apply_on_spline False ;\n" +
 "    HookAssignNth %s %d ;\n" % (typ, index) +
@@ -184,8 +193,10 @@ def addHookModifier(fp, hook, suffix, index, typ):
 #
 
 def addCurve(fp, name, hooks):
-	count = len(hooks)-1
 	cuname = "%s%sCurve" % (mh2mhx.theHuman, name)
+	npoints = len(hooks)
+	count = npoints-1
+	order = 3
 
 	fp.write("\n" +
 "Curve %s %s\n" % (cuname,cuname) +
@@ -211,18 +222,31 @@ def addCurve(fp, name, hooks):
 "  use_time_offset False ;\n" +
 "  use_uv_as_generated False ;\n" +
 "  Spline NURBS %d 1\n" % count +
-"    order_u 3 ;\n" +
+"    order_u %d ;\n" % order +
 "    order_v 0 ;\n")
 
-	for hook in hooks[1:]:
-		pt = mhx_rig.rigHead[hook]
-		fp.write("    pt (%.4f,%.4f,%4f,1) ;\n" % (pt[0], -pt[2], pt[1]))
+	for hook in hooks:
+		pt =  mhx_rig.rigHead[hook]
+		fp.write("    pt (%.4f,%.4f,%4f,1) ;\n" % (pt[0], -pt[2], pt[1]) )
+	'''
+	p0 = mhx_rig.rigHead[hooks[0]]
+	pn = mhx_rig.rigHead[hooks[-1]]
+	h = aljabr.vsub(pn, p0)
+	fac = 1.0/(npoints-1)
+	dh = [h[0]*fac, h[1]*fac, h[2]*fac]
+	pt = p0
+	print(p0, pn, h, dh)
+	for n in range(npoints):
+		print(pt)
+		fp.write("    pt (%.4f,%.4f,%4f,1) ;\n" % (pt[0], -pt[2], pt[1]) )
+		pt = aljabr.vadd(pt, dh)
+	'''
 
 	fp.write(
-"    radius_interpolation 'LINEAR' ;\n" +
+"    radius_interpolation 'BSPLINE' ;\n" +
 "    resolution_u 12 ;\n" +
 "    resolution_v 12 ;\n" +
-"    tilt_interpolation 'LINEAR' ;\n" +
+"    tilt_interpolation 'BSPLINE' ;\n" +
 "    use_bezier_u True ;\n" +
 "    use_bezier_v True ;\n" +
 "    use_cyclic_u False ;\n" +
@@ -236,11 +260,12 @@ def addCurve(fp, name, hooks):
 "Object %s CURVE %s\n" % (cuname,cuname) +
 "  layers Array 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;\n")
 
-	for n in range(len(hooks)-1):
-		addHookModifier(fp, hooks[n+1], 'Cube', n, 'CURVE')
+	for n,hook in enumerate(hooks):
+		addHookModifier(fp, hook, None, n, 'CURVE')
 
 	fp.write(
 "  parent Refer Object %s ;\n" % mh2mhx.theHuman +
+"  show_x_ray True ;\n" +
 "end Object\n")
 
 #

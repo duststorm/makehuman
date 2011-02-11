@@ -246,7 +246,6 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 	wire = boolString(flags & F_WIR)
 	lloc = boolString(flags & F_NOLOC == 0)
 	lock = boolString(flags & F_LOCK)
-	hide = boolString(flags & F_HID)
 	cyc = boolString(flags & F_NOCYC == 0)
 
 	fp.write("\n  Bone %s %s\n" % (bone, cond))
@@ -262,8 +261,8 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 "    use_deform %s ; \n" % (deform) +
 "    show_wire %s ; \n" % (wire))
 
-	if 0 and (flags & F_HID):
-		fp.write("    hide %s ; \n" % hide)
+	if 1 and (flags & F_HID):
+		fp.write("    hide True ; \n")
 
 	if bbone:
 		(bin, bout, bseg) = bbone

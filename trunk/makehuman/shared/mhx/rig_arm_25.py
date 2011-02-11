@@ -195,29 +195,27 @@ upArmRoll = 0.0
 loArmRoll = 0.0
 handRoll = 0.0
 
-L_LSHOULDER = L_LARMFK+L_LARMIK+L_SPINEFK
-L_RSHOULDER = L_RARMFK+L_RARMIK+L_SPINEFK
+L_LSHOULDER = L_LARMFK+L_LARMIK+L_SPINEFK+L_SPINEIK
+L_RSHOULDER = L_RARMFK+L_RARMIK+L_SPINEFK+L_SPINEIK
 
 '''
-	('Clavicle_L',			0.0, 'Shoulders', F_DEF, L_DEF, NoBB),
+	('Clavicle_L',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
 	('Trapezeus-1_L',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
 	('Trapezeus-2_L',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
 
-	('Clavicle_R',			0.0, 'Shoulders', F_DEF, L_DEF, NoBB),
+	('Clavicle_R',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
 	('Trapezeus-1_R',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
 	('Trapezeus-2_R',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
 '''
 
 ArmControlArmature = [
-	('Sternum',				0.0, 'Shoulders', 0, L_HELP, NoBB),
+	('Sternum',				0.0, 'Spine3', 0, L_HELP, NoBB),
 	('SternumTarget',		0.0, 'Sternum', 0, L_HELP, NoBB),
 
 	# Shoulder
-	('Shoulder_L',			0.0, 'Sternum', F_WIR+F_DEF, L_LSHOULDER+L_DEF, NoBB),
-	('Shoulder_R',			0.0, 'Sternum', F_WIR+F_DEF, L_RSHOULDER+L_DEF, NoBB),
+	('Shoulder_L',			0.0, 'Sternum', F_WIR+F_DEF, L_LSHOULDER, NoBB),
+	('Shoulder_R',			0.0, 'Sternum', F_WIR+F_DEF, L_RSHOULDER, NoBB),
 	('ShoulderEnd_L',		0.0, 'Shoulder_L', 0, L_HELP, NoBB),
-
-
 	('ShoulderEnd_R',		0.0, 'Shoulder_R', 0, L_HELP, NoBB),
 	('ArmLoc_L',			0.0, 'ShoulderEnd_L', F_NOROT, L_HELP, NoBB),
 	('ArmLoc_R',			0.0, 'ShoulderEnd_R', F_NOROT, L_HELP, NoBB),
@@ -291,8 +289,8 @@ ArmDeformArmature = [
 	('BendArmDown_R',		-90*D, 'Shoulder_R', 0, L_HELP, NoBB),
 	('BendArmUp_L',			-90*D, 'Shoulder_L', 0, L_HELP, NoBB),
 	('BendArmUp_R',			90*D, 'Shoulder_R', 0, L_HELP, NoBB),
-	('BendShoulderUp_L',	-90*D, 'Shoulders', 0, L_HELP, NoBB),
-	('BendShoulderUp_R',	90*D, 'Shoulders', 0, L_HELP, NoBB),
+	('BendShoulderUp_L',	-90*D, 'Spine3', 0, L_HELP, NoBB),
+	('BendShoulderUp_R',	90*D, 'Spine3', 0, L_HELP, NoBB),
 	('BendLoArmForward_L',	0, 'UpArm3_L', 0, L_HELP, NoBB),
 	('BendLoArmForward_R',	0, 'UpArm3_R', 0, L_HELP, NoBB),
 
@@ -301,14 +299,14 @@ ArmDeformArmature = [
 	('PectoralisTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
 	('LatDorsi_L',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
 	('LatDorsiTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
-	('Deltoid_L',			0.0, 'Shoulders', F_DEF, L_DEF, NoBB),
+	('Deltoid_L',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
 	('DeltoidTrg_L',		0.0, 'UpArm1_L', 0, L_HELP, NoBB),
 
 	('Pectoralis_R',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
 	('PectoralisTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
 	('LatDorsi_R',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
 	('LatDorsiTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
-	('Deltoid_R',			0.0, 'Shoulders', F_DEF, L_DEF, NoBB),
+	('Deltoid_R',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
 	('DeltoidTrg_R',		0.0, 'UpArm1_R', 0, L_HELP, NoBB),
 
 	# Elbow deform

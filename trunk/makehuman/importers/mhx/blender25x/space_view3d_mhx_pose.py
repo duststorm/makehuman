@@ -771,17 +771,31 @@ ParentConstraintDrivers = {
 	]
 }
 
+#
+#
+#
+
+FloatProperties = [
+	('SpineIK', D_FLOAT, 0.0, 'name="Spine FK/IK", description=""' ),
+]
+
+FloatConstraintDrivers = {
+	'Spine1' : [ ('Rot', ['SpineIK'], '0.4*x1')],
+	'Spine2' : [ ('Rot', ['SpineIK'], '0.4*x1')],
+	'Spine3' : [ ('Rot', ['SpineIK'], '0.2*x1')],
+}
+
 #	Left - right
 
 LeftRightProperties = [
-	('ArmFkIk', D_FLOAT, 0.0, 'name=" arm FK/IK", description=""' ),
-	('ArmHinge', D_FLOAT, 0.0, 'name=" arm hinge", description=""' ),
-	('ElbowPlant', D_FLOAT, 0.0, 'name=" elbow plant", description=""' ),
-	('ForearmFkIk', D_FLOAT, 0.0, 'name=" forearm FK/IK", description=""' ),
-	('ArmStretch', D_FLOAT, 0.0, 'name=" arm stretch", description=""' ),
-	('HandFollowsWrist', D_FLOAT, 0.0, 'name=" hand follows wrist", description=""' ),
+	('ArmFkIk', D_FLOAT, 0.0, 'name="Arm FK/IK", description=""' ),
+	('ArmHinge', D_FLOAT, 0.0, 'name="Arm hinge", description=""' ),
+	('ElbowPlant', D_FLOAT, 0.0, 'name="Elbow plant", description=""' ),
+	('ForearmFkIk', D_FLOAT, 0.0, 'name="Forearm FK/IK", description=""' ),
+	('ArmStretch', D_FLOAT, 0.0, 'name="Arm stretch", description=""' ),
+	('HandFollowsWrist', D_FLOAT, 0.0, 'name="Hand follows wrist", description=""' ),
 
-	('LegFkIk', D_FLOAT, 0.0, 'name=" leg FK/IK", description=""' ),
+	('LegFkIk', D_FLOAT, 0.0, 'name="Leg FK/IK", description=""' ),
 
 	('FingerControl', D_BOOL, True, 'name="Controlled fingers", description=""'),
 ]
@@ -855,7 +869,7 @@ def defineProperties():
 	for (prop, typ, value, options) in LeftRightProperties:
 		defineProperty('Left'+prop, typ, value, options)
 		defineProperty('Right'+prop, typ, value, options)
-	for (prop, typ, value, options) in ParentProperties:
+	for (prop, typ, value, options) in ParentProperties+FloatProperties:
 		defineProperty(prop, typ, value, options)
 	return
 
@@ -885,7 +899,7 @@ def resetProperties():
 	for (prop, typ, value, options) in LeftRightProperties:
 		resetProperty('Left'+prop, typ, value, options)
 		resetProperty('Right'+prop, typ, value, options)
-	for (prop, typ, value, options) in ParentProperties:
+	for (prop, typ, value, options) in ParentProperties + FloatProperties:
 		resetProperty(prop, typ, value, options)
 	return
 
@@ -942,6 +956,8 @@ def redefinePropDrivers():
 		defineDriver(bone+'_L', drivers, 'Left')
 		defineDriver(bone+'_R', drivers, 'Right')
 	for (bone, drivers) in ParentConstraintDrivers.items():
+		defineDriver(bone, drivers, '')
+	for (bone, drivers) in FloatConstraintDrivers.items():
 		defineDriver(bone, drivers, '')
 	return
 
@@ -1098,7 +1114,10 @@ class MhxDriversPanel(bpy.types.Panel):
 			for (prop, typ, values, options) in ParentProperties:
 				layout.prop(theRig, '["%s"]' % prop, text=prop, expand=True)
 			layout.operator('mhx.pose_set_inverse')
+
 			layout.separator()
+			for (prop, typ, values, options) in FloatProperties:
+				layout.prop(theRig, '["%s"]' % prop, text=prop, expand=True)
 
 			for prefix in ['Left', 'Right']:
 				layout.label(prefix)
