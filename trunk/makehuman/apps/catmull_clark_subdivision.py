@@ -82,7 +82,7 @@ def createEdgeVert(object, edgeVerts, v1, v2, c):
 def updateEdgeVert(ev):
 
     if len(ev.data) > 3: # Inner edge
-        ev.co = vavg3d4(ev.data[0].co, ev.data[1].co, ev.data[1].co, ev.data[2].co)
+        ev.co = vavg3d4(ev.data[0].co, ev.data[1].co, ev.data[2].co, ev.data[3].co)
     else: # Outer edge
         ev.co = vavg3d(ev.data[0].co, ev.data[1].co)
 
