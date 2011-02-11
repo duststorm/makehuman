@@ -24,7 +24,8 @@ Mesh Subdivision Plugin.
 __docformat__ = 'restructuredtext'
 
 import time
-from aljabr import centroid, vadd, vmul, centroid2d
+from aljabr import centroid
+from fastmath import vmul3d, vadd3d, vavg2d, vavg2d4, vavg3d, vavg3d4
 from animation3d import lerpVector
 
 def createOriginalVert(object, v):
@@ -47,13 +48,13 @@ def updateOriginalVert(v):
         faceVertAvg = centroid([fv.co for fv in v.data[1]])
         edgeVertAvg = centroid([ev.co for ev in v.data[2]])
         n = len(v.data[1])
-        v.co = vmul(vadd(vadd(faceVertAvg, vmul(edgeVertAvg, 2.0)), vmul(v.data[0].co, n - 3.0)), 1.0/n)
+        v.co = vmul3d(vadd3d(vadd3d(faceVertAvg, vmul3d(edgeVertAvg, 2.0)), vmul3d(v.data[0].co, n - 3.0)), 1.0/n)
     else: # Outer vertex
         v.co = centroid([ev.co for ev in v.data[2] if len(ev.data) == 3]+[v.data[0].co])
 
 def createFaceVert(object, f):
     
-    v = object.createVertex(centroid([v.co for v in f.verts]))
+    v = object.createVertex(vavg3d4(f.verts[0].co, f.verts[1].co, f.verts[2].co, f.verts[3].co))
     object.faceVerts.append(v)
     v.data = f
     
@@ -79,11 +80,11 @@ def createEdgeVert(object, edgeVerts, v1, v2, c):
     return v
     
 def updateEdgeVert(ev):
-    
+
     if len(ev.data) > 3: # Inner edge
-        ev.co = centroid([v.co for v in ev.data])
+        ev.co = vavg3d4(ev.data[0].co, ev.data[1].co, ev.data[1].co, ev.data[2].co)
     else: # Outer edge
-        ev.co = centroid([v.co for v in ev.data[:2]])
+        ev.co = vavg3d(ev.data[0].co, ev.data[1].co)
 
 def createSubdivisionObject(scene, object):
     
@@ -156,11 +157,11 @@ def createSubdivisionObject(scene, object):
         uv2 = object.uvValues[f.uv[2]]
         uv3 = object.uvValues[f.uv[3]]
         
-        uvc = centroid2d([uv0, uv1, uv2, uv3])
-        uve0 = centroid2d([uv0, uv1])
-        uve1 = centroid2d([uv1, uv2])
-        uve2 = centroid2d([uv2, uv3])
-        uve3 = centroid2d([uv3, uv0])
+        uvc = vavg2d4(uv0, uv1, uv2, uv3)
+        uve0 = vavg2d(uv0, uv1)
+        uve1 = vavg2d(uv1, uv2)
+        uve2 = vavg2d(uv2, uv3)
+        uve3 = vavg2d(uv3, uv0)
         
         fg.createFace(v0, e0, c, e3, [uv0, uve0, uvc, uve3])
         fg.createFace(e0, v1, e1, c, [uve0, uv1, uve1, uvc])
@@ -174,7 +175,6 @@ def createSubdivisionObject(scene, object):
     
     subdivisionObject.updateIndexBuffer()
     subdivisionObject.object = object.object
-    subdivisionObject.object.mesh = subdivisionObject
     subdivisionObject.texture = object.texture
 
     return subdivisionObject
@@ -191,6 +191,8 @@ def subdivide(object, scene):
         print 'Calculating sub data'
         subdivisionObject = createSubdivisionObject(scene, object)
         print 'time for subdivision: %s' % (time.time() - t)
+        t = time.time()
         subdivisionObject.calcNormals()
+        print 'time for normals: %s' % (time.time() - t)
         scene.update()
     

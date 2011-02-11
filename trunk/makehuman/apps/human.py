@@ -155,12 +155,14 @@ class Human(gui3d.Object):
         if self.meshData.isSubdivided:
             self.meshData.isSubdivided = None
             sob = self.scene.getObject(self.meshData.name + '.sub')
+            self.mesh = self.meshData
             sob.setVisibility(0)
             self.meshData.setVisibility(1)
         else:
             self.meshData.isSubdivided = 1
             subdivision.subdivide(self.meshData, self.scene)
             sob = self.scene.getObject(self.meshData.name + '.sub')
+            self.mesh = sob
             sob.setVisibility(1)
             self.meshData.setVisibility(0)
         self.app.redraw()

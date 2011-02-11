@@ -48,6 +48,7 @@ import aljabr
 import time
 from types import *
 import os
+from fastmath import vnorm3d
 
 textureCache = {}
 
@@ -330,7 +331,7 @@ class Vert:
             no[0] += f.no[0]
             no[1] += f.no[1]
             no[2] += f.no[2]
-        self.no = aljabr.vnorm(no)
+        self.no = vnorm3d(no)
 
     def vertsShared(self):
         """

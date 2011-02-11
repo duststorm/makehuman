@@ -742,7 +742,7 @@ class MHApplication(gui3d.Application):
         self.redraw()
     
 application = MHApplication()
-application.run()
+#application.run()
 
-#import cProfile
-#cProfile.run('application.run()')
+import cProfile
+cProfile.run('application.run()')

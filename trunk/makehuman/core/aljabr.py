@@ -105,8 +105,8 @@ def vnorm(vect):
     # Dividing each element by the length will result in a
     # unit normal vector.
     ret = array('d')
-    for i in xrange(len(vect)):
-        ret.append(vect[i]/length)
+    for x in vect:
+        ret.append(x/length)
     return ret
 
 
@@ -175,16 +175,6 @@ def centroid(vertsList):
         print 'Warning: no verts to calc centroid'
         return 0
     return [centrX, centrY, centrZ]
-    
-def centroid3d(verts3d):
-    x, y, z = zip(*verts3d)
-    n = len(verts2d)
-    return [sum(x)/n, sum(y)/n, sum(z)/n]
-    
-def centroid2d(verts2d):
-    x, y = zip(*verts2d)
-    n = len(verts2d)
-    return [sum(x)/n, sum(y)/n]
 
 def vadd(*vlist):
     """
@@ -216,8 +206,8 @@ def vmul(vect, s):
     @param vect: the vector to be multiplied with the scalar value
     """
     ret=array('d')
-    for i in xrange(len(vect)):
-        ret.append(vect[i]*s)
+    for x in vect:
+        ret.append(x*s)
     return ret
 
 def mulmatvec3x3(m, vect):
