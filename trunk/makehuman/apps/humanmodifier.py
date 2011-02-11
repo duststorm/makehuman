@@ -93,14 +93,14 @@ class Modifier:
             # Collect verts
             self.verts = []
             for target in (self.left, self.right):
-                t = algos3d.getTarget(human.mesh, target)
+                t = algos3d.getTarget(human.meshData, target)
                 self.verts.extend(t.verts)
             self.verts = list(set(self.verts))
             
             # collect faces
             self.faces = []
             for vindex in self.verts:
-                self.faces += [face.idx for face in human.mesh.verts[vindex].sharedFaces]
+                self.faces += [face.idx for face in human.meshData.verts[vindex].sharedFaces]
             self.faces = list(set(self.faces))
         
         # Remove old targets
@@ -115,11 +115,11 @@ class Modifier:
         algos3d.loadTranslationTarget(human.meshData, self.right, human.getDetail(self.right), None, 0, 0)
             
         # Update vertices
-        faces = [human.mesh.faces[i] for i in self.faces]
-        vertices = [human.mesh.verts[i] for i in self.verts]
+        faces = [human.meshData.faces[i] for i in self.faces]
+        vertices = [human.meshData.verts[i] for i in self.verts]
         if updateNormals:
-            human.mesh.calcNormals(1, 1, vertices, faces)
-        human.mesh.update(vertices)
+            human.meshData.calcNormals(1, 1, vertices, faces)
+        human.meshData.update(vertices)
 
 class GenericModifier:
 
@@ -149,14 +149,14 @@ class GenericModifier:
             # Collect verts
             self.verts = []
             for target in self.targets:
-                t = algos3d.getTarget(human.mesh, target[0])
+                t = algos3d.getTarget(human.meshData, target[0])
                 self.verts.extend(t.verts)
             self.verts = list(set(self.verts))
             
             # collect faces
             self.faces = []
             for vindex in self.verts:
-                self.faces += [face.idx for face in human.mesh.verts[vindex].sharedFaces]
+                self.faces += [face.idx for face in human.meshData.verts[vindex].sharedFaces]
             self.faces = list(set(self.faces))
         
         # Remove old targets
@@ -171,11 +171,11 @@ class GenericModifier:
             algos3d.loadTranslationTarget(human.meshData, target[0], human.getDetail(target[0]), None, 0, 0)
             
         # Update vertices
-        faces = [human.mesh.faces[i] for i in self.faces]
-        vertices = [human.mesh.verts[i] for i in self.verts]
+        faces = [human.meshData.faces[i] for i in self.faces]
+        vertices = [human.meshData.verts[i] for i in self.verts]
         if updateNormals:
-            human.mesh.calcNormals(1, 1, vertices, faces)
-        human.mesh.update(vertices)
+            human.meshData.calcNormals(1, 1, vertices, faces)
+        human.meshData.update(vertices)
 
 class AgeModifier(GenericModifier):
 

@@ -373,6 +373,11 @@ class Human(gui3d.Object):
         if update: self.meshData.update()
         if progressCallback:
             progressCallback(1.0)
+            
+        if self.meshData.isSubdivided and self.mesh != self.meshData:
+            subdivision.updateSubdivisionObject(self.mesh)
+            self.mesh.calcNormals()
+            self.mesh.update()
 
     def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:

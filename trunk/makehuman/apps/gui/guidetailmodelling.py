@@ -314,7 +314,7 @@ class DetailTool(events3d.EventHandler):
             groups.append(event.group)
         else:
             part = human.getPartNameForGroupName(event.group.name)
-            for g in human.mesh.facesGroups:
+            for g in human.meshData.facesGroups:
                 if part in g.name:
                     groups.append(g)
                     if human.symmetryModeEnabled:
@@ -467,7 +467,7 @@ class Detail3dTool(events3d.EventHandler):
                     groups.append(sg)
         else:
             part = human.getPartNameForGroupName(event.group.name)
-            for g in human.mesh.facesGroups:
+            for g in human.meshData.facesGroups:
                 if part in g.name:
                     groups.append(g)
                     if human.symmetryModeEnabled:
