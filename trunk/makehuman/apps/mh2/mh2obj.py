@@ -55,14 +55,14 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
     f.write('mtllib ' + basename(filename) + '.mtl\n')
 
     for v in obj.verts:
-        f.write('v %f %f %f\n' % (v.co[0], v.co[1], v.co[2]))
+        f.write('v %f %f %f\n' % tuple(v.co))
 
     if not (obj.uvValues==None):
       for uv in obj.uvValues:
-          f.write('vt %f %f\n' % (uv[0], uv[1]))
+          f.write('vt %f %f\n' % tuple(uv))
 
     for v in obj.verts:
-        f.write('vn %f %f %f\n' % (v.no[0], v.no[1], v.no[2]))
+        f.write('vn %f %f %f\n' % tuple(v.no))
 
     f.write('usemtl basic\n')
     f.write('s off\n')
