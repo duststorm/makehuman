@@ -156,6 +156,10 @@ class Human(gui3d.Object):
             self.meshData.isSubdivided = None
             sob = self.scene.getObject(self.meshData.name + '.sub')
             self.mesh = self.meshData
+            self.mesh.calcNormals()
+            self.mesh.update()
+            self.setPosition([sob.x, sob.y, sob.z])
+            self.setRotation([sob.rx, sob.ry, sob.rz])
             sob.setVisibility(0)
             self.meshData.setVisibility(1)
         else:
@@ -163,6 +167,8 @@ class Human(gui3d.Object):
             subdivision.subdivide(self.meshData, self.scene)
             sob = self.scene.getObject(self.meshData.name + '.sub')
             self.mesh = sob
+            self.setPosition([self.meshData.x, self.meshData.y, self.meshData.z])
+            self.setRotation([self.meshData.rx, self.meshData.ry, self.meshData.rz])
             sob.setVisibility(1)
             self.meshData.setVisibility(0)
         self.app.redraw()
@@ -360,7 +366,7 @@ class Human(gui3d.Object):
         if progressCallback:
             progressCallback(0.0)
         progressVal = 0.0
-        progressIncr = 0.3 / (len(self.targetsDetailStack) + 1)
+        progressIncr = 0.5 / (len(self.targetsDetailStack) + 1)
 
         for (k, v) in self.targetsDetailStack.iteritems():
             algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
@@ -369,15 +375,23 @@ class Human(gui3d.Object):
                 progressCallback(progressVal)
 
         # Update all verts
-        self.meshData.calcNormals(1, 1)
-        if update: self.meshData.update()
-        if progressCallback:
-            progressCallback(1.0)
-            
         if self.meshData.isSubdivided and self.mesh != self.meshData:
             subdivision.updateSubdivisionObject(self.mesh)
+            if progressCallback:
+                progressCallback(0.7)
             self.mesh.calcNormals()
+            if progressCallback:
+                progressCallback(0.8)
             self.mesh.update()
+        else:
+            self.meshData.calcNormals(1, 1)
+            if progressCallback:
+                progressCallback(0.8)
+            if update:
+                self.meshData.update()
+                
+        if progressCallback:
+            progressCallback(1.0)
 
     def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:
