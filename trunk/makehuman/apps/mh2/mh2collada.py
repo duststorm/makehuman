@@ -464,7 +464,7 @@ def filterMesh(mesh1):
 
 def exportDae(obj, fp):
 	global theStuff
-	cfg = mh2proxy.proxyConfig()
+	cfg = mh2proxy.proxyConfig(None)
 	amt = getArmatureFromRigFile('data/templates/game.rig', obj)
 	#rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
 	rawTargets = []

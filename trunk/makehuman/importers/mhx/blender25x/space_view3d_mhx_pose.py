@@ -22,9 +22,9 @@ Version 0.3
 bl_info = {
 	'name': 'MakeHuman pose tool',
 	'author': 'Thomas Larsson',
-	'version': '0.6',
+	'version': '0.7',
 	'blender': (2, 5, 6),
-	"api": 34076,
+	"api": 34786,
 	"location": "View3D > UI panel > MHX Lipsync, MHX Expressions, MHX Pose",
 	"description": "Lipsync, expression, pose tool for the MHX rig",
 	"warning": "",
@@ -1267,9 +1267,11 @@ def setInterpolation(rig):
 ###################################################################################	
 
 def register():
+	bpy.utils.register_module(__name__)
 	pass
 
 def unregister():
+	bpy.utils.unregister_module(__name__)
 	pass
 
 if __name__ == "__main__":

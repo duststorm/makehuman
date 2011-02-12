@@ -19,9 +19,9 @@
 bl_info = {
 	"name": "MHX Fourier",
 	"author": "Thomas Larsson",
-	"version": "0.2",
-	"blender": (2, 6, 0),
-	"api": 34076,
+	"version": "0.3",
+	"blender": (2, 5, 6),
+	"api": 34786,
 	"location": "View3D > Properties > MHX Fourier",
 	"description": "Fourier tool",
 	"warning": "",
@@ -34,7 +34,7 @@ Access from UI panel (N-key) when rig is active.
 """
 
 MAJOR_VERSION = 0
-MINOR_VERSION = 2
+MINOR_VERSION = 3
 BLENDER_VERSION = (2, 56, 0)
 DEBUG = True
 
@@ -501,9 +501,11 @@ initInterface(bpy.context)
 #
 
 def register():
+    bpy.utils.register_module(__name__)
 	pass
 
 def unregister():
+    bpy.utils.unregister_module(__name__)
 	pass
 
 if __name__ == "__main__":

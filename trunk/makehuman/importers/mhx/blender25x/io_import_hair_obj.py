@@ -21,9 +21,9 @@ Hair importer for Blender.2.5
 bl_info = {
 	'name': 'Import MakeHuman hair (.obj)',
 	'author': 'Thomas Larsson',
-	'version': '0.5',
+	'version': '0.6',
 	'blender': (2, 5, 6),
-	'api': 33590,
+	'api': 34786,
 	'location': 'File > Import',
 	'description': 'Import MakeHuman hair file (.obj)',
 	'url': 'http://www.makehuman.org',
@@ -429,12 +429,14 @@ def makeHairFromCurve(ob, cuOb):
 
 DEBUG= False
 from bpy.props import *
+from io_utils import ImportHelper
+
 
 #
-#	class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
+#	class ImportMhHairObj(bpy.types.Operator):
 #
 
-class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
+class ImportMhHairObj(bpy.types.Operator, ImportHelper):
 	"""Import MakeHuman hair from OBJ curves file (.obj)"""
 	bl_idname = "import_hair.makehuman_obj"
 	bl_description = 'Import MakeHuman hair from OBJ curves file (.obj)'
@@ -442,6 +444,8 @@ class IMPORT_OT_makehuman_hair_obj(bpy.types.Operator):
 	bl_space_type = "PROPERTIES"
 	bl_region_type = "WINDOW"
 
+	filename_ext = ".obj"
+	filter_glob = StringProperty(default="hair_*.obj", options={'HIDDEN'})
 	filepath = StringProperty(name="File Path", description="File path used for importing the .obj file", maxlen= 1024, default= "")
 
 	scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default=1.0)
@@ -532,12 +536,14 @@ class VIEW3D_OT_MhxMakeHairFromCurvesButton(bpy.types.Operator):
 #
 
 def menu_func(self, context):
-	self.layout.operator(IMPORT_OT_makehuman_hair_obj.bl_idname, text="MakeHuman hair (.obj)...")
+	self.layout.operator(ImportMhHairObj.bl_idname, text="MakeHuman hair (.obj)...")
 
 def register():
+	bpy.utils.register_module(__name__)
 	bpy.types.INFO_MT_file_import.append(menu_func)
  
 def unregister():
+	bpy.utils.register_module(__name__)
 	bpy.types.INFO_MT_file_import.remove(menu_func)
 
 if __name__ == "__main__":

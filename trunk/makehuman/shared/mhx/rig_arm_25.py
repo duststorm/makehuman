@@ -116,6 +116,9 @@ ArmHeadsTails = [
 	('ArmLoc_L',			'r-shoulder', ('r-shoulder', yunit)),
 	('ArmLoc_R',			'l-shoulder', ('l-shoulder', yunit)),
 
+	('ShoulderTwist_L',		'r-shoulder-aim', 'r-uparm1'),
+	('ShoulderTwist_R',		'l-shoulder-aim', 'l-uparm1'),
+
 	# Shoulder deform
 	('Pectoralis_L',		'r-pectoralis', 'r-uparm-front'),
 	('PectoralisTrg_L',		'r-uparm-front', ('r-uparm-front', yunit)),
@@ -264,6 +267,9 @@ ArmDeformArmature = [
 	('ArmLoc_L',			0.0, 'Shoulder_L', F_NOROT, L_HELP, NoBB),
 	('ArmLoc_R',			0.0, 'Shoulder_R', F_NOROT, L_HELP, NoBB),
 
+	('ShoulderTwist_L',		0.0, 'ShoulderAim_L', 0, L_DEF, NoBB),
+	('ShoulderTwist_R',		0.0, 'ShoulderAim_R', 0, L_DEF, NoBB),
+
 	# Arm deform
 	('UpArm1_L',		upArmRoll, 'ArmLoc_L', F_DEF, L_DEF, NoBB),
 	('UpArm2_L',		upArmRoll, 'UpArm1_L', F_DEF+F_CON, L_MAIN,(1,1,5) ),
@@ -320,8 +326,8 @@ ArmDeformArmature = [
 #
 #
 
-limShoulder_L = (-16*D,40*D, -40*D,40*D,  -17*D,45*D)
-limShoulder_R = (-16*D,40*D,  -40*D,40*D,  -17*40*D,45*D)
+limShoulder_L = (-16*D,40*D, -40*D,40*D,  -45*D,17*D)
+limShoulder_R = (-16*D,40*D,  -40*D,40*D,  -17*D,45*D)
 
 limUpArm_L = (-90*D,90*D, -100*D,45*D, -90*D,90*D)
 limUpArm_R = (-90*D,90*D, -45*D,100*D, -90*D,90*D)
@@ -332,9 +338,13 @@ limLoArm_R = (-90*D,90*D, -45*D,180*D, 0,135*D)
 limHand_L = (-90*D,70*D, 0,0, -20*D,20*D)
 limHand_R = (-90*D,70*D, 0,0, -20*D,20*D)
 
-RmodUpArm = P_YZX
+RmodUpArm = P_YXZ
 RmodLoArm = P_YXZ
-RmodHand = P_ZYX
+RmodHand = P_YXZ
+
+#RmodUpArm = P_XZY
+#RmodLoArm = P_XZY
+#RmodHand = P_XYZ
 
 #
 #	ArmControlPoses(fp):
@@ -346,10 +356,10 @@ def ArmControlPoses(fp):
 	addPoseBone(fp, 'SternumTarget', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	# Shoulder
-	addPoseBone(fp, 'Shoulder_L', 'MHEndCube01', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_L', 'MHEndCube01', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodUpArm,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)])])
 
-	addPoseBone(fp, 'Shoulder_R', 'MHEndCube01', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+	addPoseBone(fp, 'Shoulder_R', 'MHEndCube01', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), RmodUpArm,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
 
 	addPoseBone(fp, 'ArmLoc_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
@@ -447,8 +457,8 @@ def ArmControlPoses(fp):
 
 def ArmDeformPoses(fp):
 	copyDeform(fp, 'Sternum', 0, U_LOC+U_ROT, None, [])
-	copyDeform(fp, 'Shoulder_L', 0, U_LOC+U_ROT, 'MHDefShoulder', [])
-	copyDeform(fp, 'Shoulder_R', 0, U_LOC+U_ROT, 'MHDefShoulder', [])
+	copyDeform(fp, 'Shoulder_L', RmodUpArm, U_LOC+U_ROT, 'MHDefShoulder', [])
+	copyDeform(fp, 'Shoulder_R', RmodUpArm, U_LOC+U_ROT, 'MHDefShoulder', [])
 	copyDeform(fp, 'ArmLoc_L', 0, U_ROT, None, [])
 	copyDeform(fp, 'ArmLoc_R', 0, U_ROT, None, [])
 	
@@ -471,7 +481,15 @@ def ArmDeformPoses(fp):
 	addDeformIK(fp, 'ShoulderAim_R', 'SternumTarget', (-90*D, 'ShoulderUp_L'))
 	
 	addPoseBone(fp, 'Scapula_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	
+
+
+	addPoseBone(fp, 'ShoulderTwist_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), RmodUpArm,
+		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'UpArm_L', (1,1,1), (0,0,0), False]),
+		 ('StretchTo', C_DEFRIG, 1, ['Stretch', 'UpArm2_L', 0])])
+
+	addPoseBone(fp, 'ShoulderTwist_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), RmodUpArm,
+		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'UpArm_R', (1,1,1), (0,0,0), False]),
+		 ('StretchTo', C_DEFRIG, 1, ['Stretch', 'UpArm2_R', 0])])	
 	
 	'''
 	addPoseBone(fp, 'Clavicle_L', None, None, (1,1,1), (0,1,0), (1,1,1), (1,1,1), 0, 
@@ -522,11 +540,13 @@ def ArmDeformPoses(fp):
 	
 	
 	# Arm deform
-	copyDeformPartial(fp, 'UpArm1_L', 'UpArm_L', (1,0,1), RmodUpArm, U_LOC+U_ROT+U_SCALE, None, [])
+	copyDeformPartial(fp, 'UpArm1_L', 'UpArm_L', (1,0,1), RmodUpArm, U_LOC+U_ROT+U_SCALE, None, 
+		[('CopyRot', C_LOCAL, 0.5, ['RotY', 'UpArm_L', (0,1,0), (0,0,0), False])])
 	
 	copyDeformPartial(fp, 'UpArm2_L', 'UpArm_L', (1,1,1), RmodUpArm, U_SCALE, 'MHDefUpArm2', [])
 		
-	copyDeformPartial(fp, 'UpArm3_L', 'UpArm_L', (0,1,0), RmodUpArm, U_ROT+U_SCALE, 'MHDefUpArm3', [])
+	copyDeformPartial(fp, 'UpArm3_L', 'UpArm_L', (1,1,1), RmodUpArm, U_SCALE, 'MHDefUpArm3',
+		[('CopyRot', C_LOCAL, 0.5, ['RotY', 'UpArm_L', (0,1,0), (0,0,0), False])])
 
 	copyDeformPartial(fp, 'LoArm1_L', 'LoArm_L', (1,0,1), RmodLoArm, U_LOC+U_ROT+U_SCALE, None, [])
 	
@@ -540,11 +560,13 @@ def ArmDeformPoses(fp):
 	copyDeform(fp, 'Hand_L', RmodHand, U_LOC+U_ROT, 'MHDefHand', [])
 
 
-	copyDeformPartial(fp, 'UpArm1_R', 'UpArm_R', (1,0,1), RmodUpArm, U_LOC+U_ROT+U_SCALE, None, [])
+	copyDeformPartial(fp, 'UpArm1_R', 'UpArm_R', (1,0,1), RmodUpArm, U_LOC+U_ROT+U_SCALE, None, 
+		[('CopyRot', C_LOCAL, 0.5, ['RotY', 'UpArm_R', (0,1,0), (0,0,0), False])])
 	
 	copyDeformPartial(fp, 'UpArm2_R', 'UpArm_R', (1,1,1), RmodUpArm, U_SCALE, 'MHDefUpArm2', [])
 		
-	copyDeformPartial(fp, 'UpArm3_R', 'UpArm_R', (0,1,0), RmodUpArm, U_ROT+U_SCALE, 'MHDefUpArm3', [])
+	copyDeformPartial(fp, 'UpArm3_R', 'UpArm_R', (1,1,1), RmodUpArm, U_SCALE, 'MHDefUpArm3',
+		[('CopyRot', C_LOCAL, 0.5, ['RotY', 'UpArm_R', (0,1,0), (0,0,0), False])])
 
 	copyDeformPartial(fp, 'LoArm1_R', 'LoArm_R', (1,0,1), RmodLoArm, U_LOC+U_ROT+U_SCALE, None, [])
 	

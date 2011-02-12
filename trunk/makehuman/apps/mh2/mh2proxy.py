@@ -127,18 +127,28 @@ class CProxyConfig:
 		self.useRig = 'mhx'
 		self.mhxversion = ['24', '25']
 		self.proxyList = []
-		self.expressions = ['mhx']
-		self.faceshapes = ['mhx']
-		self.bodyshapes = ['mhx']
+		self.expressions = True
+		self.faceshapes = True
+		self.bodyshapes = True
 
-def proxyConfig():
+#[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
+#[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
+
+def proxyConfig(options):
 	cfg = CProxyConfig()
 	typ = 'Proxy'
 	layer = 2
 	useMhx = True
 	useObj = True
 	useDae = True
-	fp = proxyFilePtr('proxy.cfg')
+
+	if options:
+		cfg.mhxversion = options['mhxversion']
+		cfg.expressions = options['expressions']
+		cfg.useRig = options['useRig']
+		fp = 0
+	else:	
+		fp = proxyFilePtr('proxy.cfg')
 
 	if not fp: 
 		for name in ['sweater', 'jeans']:
@@ -152,9 +162,14 @@ def proxyConfig():
 			pass
 		elif words[0] == '@':
 			key = words[1].lower()
-			if key in ['mainmesh', 'mhxversion', 'expressions', 'faceshapes', 'bodyshapes']:
+			if key in ['mainmesh', 'mhxversion']:
 				try:
 					exec("cfg.%s = words[2:]" % key)
+				except:
+					pass
+			elif key in ['expressions', 'faceshapes', 'bodyshapes']:
+				try:
+					exec("cfg.%s = %s" % (key, words[2]))
 				except:
 					pass
 			elif key == 'rig':

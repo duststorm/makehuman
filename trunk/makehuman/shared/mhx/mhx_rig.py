@@ -440,7 +440,13 @@ U_SCALE = 4
 def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, constraints):
 	fp.write("\n  Posebone %s %s \n" % (dbone, True))
 	rotMode = rotationMode(flags)
-	fp.write("  rotation_mode '%s' ;\n" % rotMode)
+	fp.write(
+"  rotation_mode '%s' ;\n" % rotMode +
+"    lock_location Array 1 1 1 ;\n" +
+"    lock_rotation Array 1 1 1 ;\n" +
+"    lock_rotation_w True ;\n" + 
+"    lock_rotations_4d True ;\n" +
+"    lock_scale Array 1 1 1  ; \n")
 	if customShape:
 		fp.write("    custom_shape Refer Object %s ; \n" % customShape)
 	if copy & U_LOC:
@@ -551,7 +557,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 	fp.write(
 "    location Array %.3f %.3f %.3f ; \n" % (locX, locY, locZ) +
 "    lock_location Array %d %d %d ;\n"  % (lockLocX, lockLocY, lockLocZ)+
-"    lock_rotation Array %d %d %d ;\n"  % (lockRotX, lockRotY, lockRotZ)+
+"    lock_rotation Array %d %d %d ;\n"  % (lockRotX, lockRotY, lockRotZ) +
 "    lock_rotation_w %s ; \n" % lkRotW +
 "    lock_rotations_4d %s ; \n" % lkRot4 +
 "    lock_scale Array %d %d %d  ; \n" % (lockScaleX, lockScaleY, lockScaleZ)+

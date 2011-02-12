@@ -41,14 +41,14 @@ import mh2proxy, mhxbones, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_bo
 import read_expression, read_rig
 
 #
-#	exportMhx(human, filename):
+#	exportMhx(human, filename, options=None):
 #
 
 def exportMhx(human, filename, options=None):	
 	global theConfig, theHuman
-	theConfig = mh2proxy.proxyConfig()
+	theConfig = mh2proxy.proxyConfig(options)
 	(name, ext) = os.path.splitext(filename)
-	
+
 	if '24' in theConfig.mhxversion:
 		theHuman = 'Human'
 		time1 = time.clock()

@@ -15,16 +15,16 @@
 
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.2.5
+Version 1.2.6
 
 """
 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 2, 5),
+    'version': (1, 2, 6),
     'blender': (2, 5, 6),
-    'api': 34595,
+    'api': 34786,
     'location': "File > Import",
     'description': 'Import files in the MakeHuman eXchange format (.mhx)',
     'warning': '',
@@ -42,7 +42,7 @@ Access from the File > Import menu.
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 2
-SUB_VERSION = 5
+SUB_VERSION = 6
 BLENDER_VERSION = (2, 56, 0)
 
 #
@@ -2611,7 +2611,7 @@ MhxBoolProps = [
     #("opcns", "Operator constraints", "Only for Aligorith", T_Opcns),
 ]
 
-class IMPORT_OT_makehuman_mhx(bpy.types.Operator, ImportHelper):
+class ImportMhx(bpy.types.Operator, ImportHelper):
     '''Import from MHX file format (.mhx)'''
     bl_idname = "import_scene.makehuman_mhx"
     bl_description = 'Import from MHX file format (.mhx)'
@@ -2659,12 +2659,14 @@ class IMPORT_OT_makehuman_mhx(bpy.types.Operator, ImportHelper):
         return {'RUNNING_MODAL'}
 
 def menu_func(self, context):
-    self.layout.operator(IMPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+    self.layout.operator(ImportMhx.bl_idname, text="MakeHuman (.mhx)...")
 
 def register():
+    bpy.utils.register_module(__name__)
     bpy.types.INFO_MT_file_import.append(menu_func)
 
 def unregister():
+    bpy.utils.unregister_module(__name__)
     bpy.types.INFO_MT_file_import.remove(menu_func)
 
 if __name__ == "__main__":

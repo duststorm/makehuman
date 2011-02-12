@@ -44,6 +44,29 @@ class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	selectVertNum8m(context):
+#	class VIEW3D_OT_MhxSelectVnumButton(bpy.types.Operator):
+#
+ 
+def selectVertNum(context):
+	n = context.scene.MhxVertNum
+	ob = context.object
+	bpy.ops.object.mode_set(mode='OBJECT')
+	for v in ob.data.vertices:
+		v.select = False
+	v = ob.data.vertices[n]
+	v.select = True
+	bpy.ops.object.mode_set(mode='EDIT')
+
+class VIEW3D_OT_MhxSelectVnumButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_select_vnum"
+	bl_label = "Select vnum"
+
+	def execute(self, context):
+		selectVertNum(context)
+		return{'FINISHED'}	
+
+#
 #	printFaceNums(context):
 #	class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
 #
@@ -247,7 +270,10 @@ def symmetrizeWeights(context):
 			except:
 				pass
 			#print("  ", name, grp, rgrp)
-			rgrp.add([rv.index], grp.weight, 'REPLACE')
+			if rgrp:
+				rgrp.add([rv.index], grp.weight, 'REPLACE')
+			else:
+				raise NameError("No rgrp for %s %s %s" % (list(v.groups), grp, grp.group))
 	return len(rverts)
 
 def rightVerts(factor, me):
@@ -480,7 +506,7 @@ def exportList(context, weights, name, fp):
 		fp.write("\n  VertexGroup %s\n" % name)
 		for (vn,w) in weights:
 			if w > 0.005:
-				fp.write("    wv %d %.3g ;\n" % (vn, w))
+				fp.write("	wv %d %.3g ;\n" % (vn, w))
 		fp.write("  end VertexGroup %s\n" % name)
 	return
 
@@ -498,6 +524,10 @@ class VIEW3D_OT_MhxExportSumGroupsButton(bpy.types.Operator):
 #
 
 def initInterface(context):
+	bpy.types.Scene.MhxVertNum = IntProperty(
+		name="Vert number", 
+		description="Vertex number to select")
+
 	bpy.types.Scene.MhxWeight = FloatProperty(
 		name="Weight", 
 		description="Weight of bone1, 1-weight of bone2", 
@@ -571,6 +601,10 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 		layout.operator("mhx.weight_recover_diamonds")
 
 		layout.separator()
+		layout.prop(context.scene, 'MhxVertNum')
+		layout.operator("mhx.weight_select_vnum")
+
+		layout.separator()
 		layout.prop(context.scene, 'MhxLeft2Right')
 		layout.operator("mhx.weight_symmetrize_weights")	
 		layout.operator("mhx.weight_symmetrize_shapes")	
@@ -597,9 +631,11 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 initInterface(bpy.context)
 
 def register():
+	bpy.utils.register_module(__name__)
 	pass
 
 def unregister():
+	bpy.utils.unregister_module(__name__)
 	pass
 
 if __name__ == "__main__":

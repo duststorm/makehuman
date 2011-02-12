@@ -19,9 +19,9 @@
 bl_info = {
 	"name": "MHX Mocap",
 	"author": "Thomas Larsson",
-	"version": "0.5",
-	"blender": (2, 5, 5),
-	"api": 33590,
+	"version": "0.6",
+	"blender": (2, 5, 6),
+	"api": 34786,
 	"location": "View3D > Properties > MHX Mocap",
 	"description": "Mocap tool for MHX rig",
 	"warning": "",
@@ -129,8 +129,11 @@ class CNode:
 			tails += child.build(amt, self.head, eb)
 		n = len(self.children)
 		eb.tail = tails/n
-		self.matrix = eb.matrix.rotation_part()
-		self.inverse = self.matrix.copy().invert()
+		#self.matrix = eb.matrix.rotation_part()
+		(loc, rot, scale) = eb.matrix.decompose()
+		self.matrix = rot.to_matrix()
+		self.inverse = self.matrix.copy()
+		self.inverse.invert()		
 		if zero:
 			return eb.tail
 		else:		
@@ -540,8 +543,8 @@ MocapDataArmature = {
 	'righthip' : 'UpLeg_R',
 	'rightknee' : 'LoLeg_R',
 	'rightankle' : 'Foot_R',
-	'chest' : 'Spine2',
-	'chest2' : 'Spine3',
+	'chest' : 'Spine1',
+	'chest2' : 'Spine2',
 	'cs_bvh' : 'Spine3',
 	'leftcollar' : 'Shoulder_L',
 	'leftshoulder' : 'UpArm_L',
@@ -949,6 +952,7 @@ def guessTargetArmature(trgRig):
 		theTarget = T_Rorkimaru
 		name = "Rorkimaru"
 	else:
+		print("Bones", bones)
 		raise NameError("Did not recognize target armature")
 	setupTargetArmature()
 	return
@@ -1002,8 +1006,11 @@ class CEditBone():
 			self.use_connect = bone.use_connect
 		else:
 			self.use_connect = False
-		self.matrix = bone.matrix.copy().rotation_part()
-		self.inverse = self.matrix.copy().invert()
+		#self.matrix = bone.matrix.copy().rotation_part()
+		(loc, rot, scale) = bone.matrix.decompose()
+		self.matrix = rot.to_matrix()
+		self.inverse = self.matrix.copy()
+		self.inverse.invert()
 
 	def __repr__(self):
 		return ("%s p %s\n  h %s\n  t %s\n" % (self.name, self.parent, self.head, self.tail))
@@ -1333,10 +1340,14 @@ def createAnimData(name, animations, bones, isTarget):
 	else:
 		anim.offsetRest = Vector((0,0,0))	
 
-	anim.matrixRest = b.matrix_local.rotation_part()
-	anim.inverseRest = anim.matrixRest.copy().invert()
+	#anim.matrixRest = b.matrix_local.rotation_part()
+	(loc, rot, scale) = b.matrix_local.decompose()
+	anim.matrixRest = rot.to_matrix()
+	anim.inverseRest = anim.matrixRest.copy()
+	anim.inverseRest.invert()
 	anim.matrixRel = b.matrix.copy()
-	anim.inverseRel = anim.matrixRel.copy().invert()
+	anim.inverseRel = anim.matrixRel.copy()
+	anim.inverseRel.invert()
 	return
 
 #
@@ -1405,14 +1416,15 @@ def insertAnimChild(name, animations, nFrames, rots):
 		par = anim.parent
 	animPar = animations[par]
 	anim.nFrames = nFrames
-	quat = Quaternion().identity()
+	quat = Quaternion()
+	quat.identity()
 	for frame in range(anim.nFrames):
 		parmat = animPar.matrices[frame]
 		if rots:
 			try:
 				quat = Quaternion(rots[frame])
 			except:
-				quat = Euler(rots[frame]).to_quat()
+				quat = Euler(rots[frame]).to_quaternion()
 		anim.quats[frame] = quat
 		locmat = anim.matrixRest * quat.to_matrix() * anim.inverseRest
 		matrix = parmat * locmat
@@ -1473,7 +1485,7 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes):
 def setRotation(pb, rot, frame, group):
 	if pb.rotation_mode == 'QUATERNION':
 		try:
-			quat = rot.to_quat()
+			quat = rot.to_quaternion()
 		except:
 			quat = rot
 		pb.rotation_quaternion = quat
@@ -1538,7 +1550,7 @@ def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg):
 		mat90 = animSrc.matrices[frame]
 		animTrg.matrices[frame] = mat90
 		matMhx = animTrg.inverseRest * mat90 * animTrg.matrixRest
-		rot = matMhx.to_quat()
+		rot = matMhx.to_quaternion()
 		rots.append(rot)
 		setRotation(pb, rot, frame, name)
 	return rots
@@ -1560,7 +1572,7 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix):
 			matMhx = fixMat * mat90
 		else:
 			matMhx = mat90
-		rot0 = matMhx.to_quat()
+		rot0 = matMhx.to_quaternion()
 		if exchange == 'XZ':
 			rot = rot0.copy()
 			rot.z = rot0.x
@@ -1579,9 +1591,11 @@ def insertReverseRotationKeyFrames(name, pb, anim, animIK, animPar):
 	rots = []
 	animIK.nFrames = anim.nFrames
 	for frame in range(anim.nFrames):
-		mat = animPar.matrices[frame].copy().invert() * anim.matrices[frame]
+		inv = animPar.matrices[frame].copy()
+		inv.invert()
+		mat = inv * anim.matrices[frame]
 		matIK = animIK.inverseRest * mat * animIK.matrixRest
-		rot = matIK.to_quat()
+		rot = matIK.to_quaternion()
 		rots.append(rot)
 		setRotation(pb, rot, frame, name)
 	return rots
@@ -2622,9 +2636,11 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
 initInterface(bpy.context)
 
 def register():
+	bpy.utils.register_module(__name__)
 	pass
 
 def unregister():
+	bpy.utils.unregister_module(__name__)
 	pass
 
 if __name__ == "__main__":
