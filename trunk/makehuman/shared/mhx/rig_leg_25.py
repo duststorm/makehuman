@@ -245,26 +245,37 @@ limRevFoot_R = (-20*D,60*D, 0,0, 0,0)
 limRevToe_L = (-10*D,45*D, 0,0, 0,0)
 limRevToe_R = (-10*D,45*D, 0,0, 0,0)
 
-RmodUpLeg = P_YZX
-RmodLoLeg = P_YZX
-RmodFoot = P_YZX
-RmodToe = P_YZX
+#
+#	Rotation modes
+#	Dmod = Deform rig mode
+#	Cmod = Control rig mode
+#
+
+DmodUpLeg = P_YZX
+DmodLoLeg = P_YZX
+DmodFoot = P_YZX
+DmodToe = P_YZX
+
+CmodUpLeg = 0
+CmodLoLeg = 0
+CmodFoot = 0
+CmodToe = 0
 
 def LegControlPoses(fp):
-	addPoseBone(fp, 'UpLeg_L', 'MHCircle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+RmodUpLeg,
+	addPoseBone(fp, 'UpLeg_L', 'MHCircle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+CmodUpLeg,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_L, (1,1,1)])])
 
-	addPoseBone(fp, 'UpLeg_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+RmodUpLeg,
+	addPoseBone(fp, 'UpLeg_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+CmodUpLeg,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_R, (1,1,1)])])
 
 	deltaKnee = -2.5*D
 
-	addPoseBone(fp, 'LoLeg_L', 'MHCircle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+RmodLoLeg,
+	addPoseBone(fp, 'LoLeg_L', 'MHCircle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+CmodLoLeg,
 		[('IK', 0, 0, ['LegIK', 'Ankle_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,1)]),
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (1,1,1)])
 		])
 
-	addPoseBone(fp, 'LoLeg_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+RmodLoLeg,
+	addPoseBone(fp, 'LoLeg_R', 'MHCircle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), P_STRETCH+CmodLoLeg,
 		[('IK', 0, 0, ['LegIK', 'Ankle_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,1)]),
 		('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,1,1)])
 		])
@@ -279,32 +290,32 @@ def LegControlPoses(fp):
 		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hips', (1,1,1), (1,1,1), (1,1,1)]),
 		('LimitDist', 0, 1, ['DistHip', 'Hips', 'INSIDE'])])
 
-	addPoseBone(fp, 'FootRev_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), RmodFoot, 
+	addPoseBone(fp, 'FootRev_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_L, (1,1,1)])])
 
-	addPoseBone(fp, 'FootRev_R', 'MHRevFoot', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), RmodFoot,
+	addPoseBone(fp, 'FootRev_R', 'MHRevFoot', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodFoot,
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_R, (1,1,1)])])
 
-	addPoseBone(fp, 'ToeRev_L', 'MHRevToe', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), RmodToe, 
+	addPoseBone(fp, 'ToeRev_L', 'MHRevToe', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_L, (1,1,1)])])
 
-	addPoseBone(fp, 'ToeRev_R', 'MHRevToe', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), RmodToe, 
+	addPoseBone(fp, 'ToeRev_R', 'MHRevToe', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_R, (1,1,1)])])
 	
-	addPoseBone(fp, 'Foot_L', 'MHFoot', 'FK_L', (0,0,0), (0,1,1), (1,1,1), (1,1,1), RmodFoot, 
+	addPoseBone(fp, 'Foot_L', 'MHFoot', 'FK_L', (0,0,0), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
 		[('IK', 0, 0, ['RevIK', 'FootRev_L', 1, None, (1,0,1)]),
 		 ('CopyRot', C_LOCAL, 0, ['RevRot', 'FootRev_L', (0,1,0), (0,0,0), True]),
 		 ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)])])
 
-	addPoseBone(fp, 'Foot_R', 'MHFoot', 'FK_R', (0,0,0), (0,1,1), (1,1,1), (1,1,1), RmodFoot, 
+	addPoseBone(fp, 'Foot_R', 'MHFoot', 'FK_R', (0,0,0), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
 		[('IK', 0, 0, ['RevIK', 'FootRev_R', 1, None, (1,0,1)]),
 		 ('CopyRot', C_LOCAL, 0, ['RevRot', 'FootRev_R', (0,1,0), (0,0,0), True]),
 		 ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)])])
 
-	addPoseBone(fp, 'Toe_L', 'MHToe_L', 'FK_L', (1,1,1), (0,1,1), (1,1,0), (1,1,1), RmodToe, 
+	addPoseBone(fp, 'Toe_L', 'MHToe_L', 'FK_L', (1,1,1), (0,1,1), (1,1,0), (1,1,1), CmodToe, 
 		[('IK', 0, 0, ['RevIK', 'ToeRev_L', 1, None, (1,0,1)])])
 
-	addPoseBone(fp, 'Toe_R', 'MHToe_R', 'FK_R', (1,1,1), (0,1,1), (1,1,0), (1,1,1), RmodToe, 
+	addPoseBone(fp, 'Toe_R', 'MHToe_R', 'FK_R', (1,1,1), (0,1,1), (1,1,0), (1,1,1), CmodToe, 
 		[('IK', 0, 0, ['RevIK', 'ToeRev_R', 1, None, (1,0,1)])])
 	
 	# Pole target
@@ -327,36 +338,36 @@ def LegControlPoses(fp):
 
 def LegDeformPoses(fp):
 	# Deform 
-	copyDeformPartial(fp, 'UpLeg1_L', 'UpLeg_L', (1,0,1), RmodUpLeg, U_LOC+U_ROT+U_SCALE, None, [])
+	copyDeformPartial(fp, 'UpLeg1_L', 'UpLeg_L', (1,0,1), DmodUpLeg, U_LOC+U_ROT+U_SCALE, None, [])
 	
-	copyDeformPartial(fp, 'UpLeg2_L', 'UpLeg_L', (1,1,1), RmodUpLeg, U_SCALE, 'MHDefUpLeg2', [])
+	copyDeformPartial(fp, 'UpLeg2_L', 'UpLeg_L', (1,1,1), DmodUpLeg, U_SCALE, 'MHDefUpLeg2', [])
 		
-	copyDeformPartial(fp, 'UpLeg3_L', 'UpLeg_L', (0,1,0), RmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3', [])
+	copyDeformPartial(fp, 'UpLeg3_L', 'UpLeg_L', (0,1,0), DmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3', [])
 
-	copyDeform(fp, 'LoLeg_L', RmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
+	copyDeform(fp, 'LoLeg_L', DmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
 
-	addPoseBone(fp, 'LoLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), RmodLoLeg,
+	addPoseBone(fp, 'LoLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), DmodLoLeg,
 		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_L', (1,0,1), (0,0,0), False])])
 
-	copyDeform(fp, 'Foot_L', RmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
+	copyDeform(fp, 'Foot_L', DmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
 
-	copyDeform(fp, 'Toe_L', RmodToe, U_LOC+U_ROT, 'MHDefToe', [])
+	copyDeform(fp, 'Toe_L', DmodToe, U_LOC+U_ROT, 'MHDefToe', [])
 
 
-	copyDeformPartial(fp, 'UpLeg1_R', 'UpLeg_R', (1,0,1), RmodUpLeg, U_LOC+U_ROT+U_SCALE, None, [])
+	copyDeformPartial(fp, 'UpLeg1_R', 'UpLeg_R', (1,0,1), DmodUpLeg, U_LOC+U_ROT+U_SCALE, None, [])
 	
-	copyDeformPartial(fp, 'UpLeg2_R', 'UpLeg_R', (1,1,1), RmodUpLeg, U_SCALE, 'MHDefUpLeg2', [])
+	copyDeformPartial(fp, 'UpLeg2_R', 'UpLeg_R', (1,1,1), DmodUpLeg, U_SCALE, 'MHDefUpLeg2', [])
 		
-	copyDeformPartial(fp, 'UpLeg3_R', 'UpLeg_R', (0,1,0), RmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3', [])
+	copyDeformPartial(fp, 'UpLeg3_R', 'UpLeg_R', (0,1,0), DmodUpLeg, U_ROT+U_SCALE, 'MHDefUpLeg3', [])
 
-	copyDeform(fp, 'LoLeg_R', RmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
+	copyDeform(fp, 'LoLeg_R', DmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
 
-	addPoseBone(fp, 'LoLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), RmodLoLeg,
+	addPoseBone(fp, 'LoLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), DmodLoLeg,
 		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_R', (1,0,1), (0,0,0), False])])
 
-	copyDeform(fp, 'Foot_R', RmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
+	copyDeform(fp, 'Foot_R', DmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
 
-	copyDeform(fp, 'Toe_R', RmodToe, U_LOC+U_ROT, 'MHDefToe', [])
+	copyDeform(fp, 'Toe_R', DmodToe, U_LOC+U_ROT, 'MHDefToe', [])
 
 
 	# Hip deform
