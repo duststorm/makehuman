@@ -50,7 +50,8 @@ for grp in grps:
           pass
 Blender.Redraw()
 exportAsCurves(file, guides, groups)
-
+"""
+#this is supposed to be for ungrouped guides, use at your own risk
 #get the rest of non-grouped objects
 guides=[]
 file = open("C:/temp/temp2.obj", 'w')
@@ -67,3 +68,4 @@ for object in scn.objects.selected:
       
 exportAsCurves(file, guides)
 file.close()
+"""
