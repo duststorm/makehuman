@@ -33,12 +33,25 @@ import mh
 import os
 import font3d
 
-from collections import namedtuple
-
 defaultFontSize = 1.0
 defaultFontFamily = 'arial'
 
-Style = namedtuple('Style', 'width height mesh normal selected focused fontSize border')
+class Style:
+    def __init__(self, width = None, height = None, mesh = None, normal = None, selected = None, focused = None, fontSize = None, border = None):
+        self.width = width
+        self.height = height
+        self.mesh = mesh
+        self.normal = normal
+        self.selected = selected
+        self.focused = focused
+        self.fontSize = fontSize
+        self.border = border
+        
+    def _replace(self, **kwds):
+        style = {'width':self.width, 'height':self.height, 'mesh':self.mesh, 'normal':self.normal, 'selected':self.selected,
+                'focused':self.focused, 'fontSize':self.fontSize, 'border':self.border}
+        style.update(kwds)
+        return Style(**style)
 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
