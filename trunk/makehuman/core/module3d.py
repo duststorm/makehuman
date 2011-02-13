@@ -585,7 +585,6 @@ class Object3D:
     - **self.shader**: *int* The shader.
     - **self.shaderParameters**: *dictionary* The shader parameters.
     - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
-    - **self.isSubdivided**: *int flag* A flag to indicate whether this object is subdivided or not.
     - **self.indexBuffer**: *faces list* The list of faces as indices to the vertexbuffer.
     - **self.vertexBufferSize**: *int* size in vertices of the vertexbuffer.
     - **self.uvValues**: *uv list* The list of uv values referenced to by the faces.
@@ -631,7 +630,6 @@ class Object3D:
 
         self.shadeless = 0
         self.solid = 1
-        self.isSubdivided = None
         self.indexBuffer = []
         self.vertexBufferSize = None
         self.uvValues = None

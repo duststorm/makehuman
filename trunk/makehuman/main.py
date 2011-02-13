@@ -655,7 +655,7 @@ class MHApplication(gui3d.Application):
         
     def subdivide(self):
         print 'subdividing'
-        self.selectedHuman.subdivide()
+        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided())
         
     # Camera navigation
     def rotateDown(self):

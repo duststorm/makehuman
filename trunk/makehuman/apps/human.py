@@ -28,7 +28,7 @@ __docformat__ = 'restructuredtext'
 import algos3d
 import gui3d
 import time
-import catmull_clark_subdivision as subdivision
+from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 import files3d
 import os
 import mh
@@ -110,6 +110,8 @@ class Human(gui3d.Object):
 
         self.muscleWeightModifier = humanmodifier.GenderAgeMuscleWeightModifier('data/targets/macrodetails/universal-${gender}-${age}-${tone}-${weight}.target')
         self.baseModifier = humanmodifier.GenderAgeModifier('data/targets/macrodetails/neutral-${gender}-${age}.target')
+        
+        self.__subdivisionMesh = None
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -130,19 +132,46 @@ class Human(gui3d.Object):
 
     def setPosition(self, position):
         gui3d.Object.setPosition(self, position)
-        if self.hairObj: self.hairObj.setLoc(position[0], position[1], position[2])
+        if self.hairObj:
+            self.hairObj.setLoc(position[0], position[1], position[2])
+        if self.isSubdivided():
+            self.meshData.setLoc(position[0], position[1], position[2])
+        elif self.__subdivisionMesh:
+            self.__subdivisionMesh.setLoc(position[0], position[1], position[2])
 
     def setRotation(self, rotation):
         gui3d.Object.setRotation(self, rotation)
-        if self.hairObj: self.hairObj.setRot(rotation[0], rotation[1], rotation[2])
+        if self.hairObj:
+            self.hairObj.setRot(rotation[0], rotation[1], rotation[2])
+        if self.isSubdivided():
+            self.meshData.setRot(rotation[0], rotation[1], rotation[2])
+        elif self.__subdivisionMesh:
+            self.__subdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
 
     def setTexture(self, texturePath):
         self.meshData.setTexture(texturePath)
+        if self.__subdivisionMesh:
+            self.__subdivisionMesh.setTexture(texturePath)
 
     def setVisibility(self, flag):
-        self.meshData.setVisibility(flag)
+        
+        self.mesh.setVisibility(flag)
+        
+    def getSubdivisionMesh(self):
+        
+        if not self.__subdivisionMesh:
+            print 'creating subdiv'
+            self.__subdivisionMesh = createSubdivisionObject(self.scene, self.meshData)
+        else:
+            updateSubdivisionObject(self.__subdivisionMesh)
+            
+        return self.__subdivisionMesh
 
-    def subdivide(self):
+    def isSubdivided(self):
+
+        return self.mesh == self.__subdivisionMesh
+            
+    def setSubdivided(self, flag):
         """
         This method toggles between displaying the standard mesh and a
         subdivided mesh. The subdivided mesh contains 4 times the number of
@@ -152,25 +181,19 @@ class Human(gui3d.Object):
 
         """
 
-        if self.meshData.isSubdivided:
-            self.meshData.isSubdivided = None
-            sob = self.scene.getObject(self.meshData.name + '.sub')
-            self.mesh = self.meshData
-            self.mesh.calcNormals()
-            self.mesh.update()
-            self.setPosition([sob.x, sob.y, sob.z])
-            self.setRotation([sob.rx, sob.ry, sob.rz])
-            sob.setVisibility(0)
-            self.meshData.setVisibility(1)
-        else:
-            self.meshData.isSubdivided = 1
-            subdivision.subdivide(self.meshData, self.scene)
-            sob = self.scene.getObject(self.meshData.name + '.sub')
-            self.mesh = sob
-            self.setPosition([self.meshData.x, self.meshData.y, self.meshData.z])
-            self.setRotation([self.meshData.rx, self.meshData.ry, self.meshData.rz])
-            sob.setVisibility(1)
+        if flag == self.isSubdivided():
+            print 'nothing to do'
+            return
+            
+        if flag:
+            print 'getting subdiv'
+            self.mesh = self.getSubdivisionMesh()
             self.meshData.setVisibility(0)
+            self.mesh.setVisibility(1)
+        else:
+            self.mesh = self.meshData
+            self.__subdivisionMesh.setVisibility(0)
+            self.mesh.setVisibility(1)
         self.app.redraw()
 
     def setGender(self, gender):
@@ -375,8 +398,8 @@ class Human(gui3d.Object):
                 progressCallback(progressVal)
 
         # Update all verts
-        if self.meshData.isSubdivided and self.mesh != self.meshData:
-            subdivision.updateSubdivisionObject(self.mesh)
+        if self.isSubdivided():
+            updateSubdivisionObject(self.__subdivisionMesh)
             if progressCallback:
                 progressCallback(0.7)
             self.mesh.calcNormals()
