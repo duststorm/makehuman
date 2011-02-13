@@ -242,13 +242,13 @@ class DetailTool(events3d.EventHandler):
 
         self.modifier = humanmodifier.Modifier(leftTarget, rightTarget)
 
-    # Save the state
+        # Save the state
 
         self.before = {}
         self.before[leftTarget] = human.getDetail(leftTarget)
         self.before[rightTarget] = human.getDetail(rightTarget)
 
-    # Add symmetry targets if needed
+        # Add symmetry targets if needed
 
         self.symmetryModifier = None
         if human.symmetryModeEnabled:
@@ -262,10 +262,14 @@ class DetailTool(events3d.EventHandler):
                     rightSymmetryTarget = '%s%s%s.target' % (folder, symmetryPart, self.right)
                 self.symmetryModifier = humanmodifier.Modifier(leftSymmetryTarget, rightSymmetryTarget)
 
-        # Save the state
-
+                # Save the state
+                
                 self.before[leftSymmetryTarget] = human.getDetail(leftSymmetryTarget)
                 self.before[rightSymmetryTarget] = human.getDetail(rightSymmetryTarget)
+                
+        if human.isSubdivided():
+            human.meshData.setVisibility(1)
+            human.getSubdivisionMesh(False).setVisibility(0)
 
     def onMouseDragged(self, event):
         if not self.modifier:
@@ -292,18 +296,22 @@ class DetailTool(events3d.EventHandler):
     def onMouseUp(self, event):
         human = self.app.selectedHuman
 
-    # Recalculate
+        # Recalculate
 
         human.applyAllTargets(self.app.progress)
+        
+        if human.isSubdivided():
+            human.meshData.setVisibility(0)
+            human.getSubdivisionMesh(False).setVisibility(1)
 
-    # Build undo item
+        # Build undo item
 
         after = {}
 
         for target in self.before.iterkeys():
             after[target] = human.getDetail(target)
 
-        self.app.did(humanmodifier.Action(human, self.before, after))
+        self.app.did(humanmodifier.DetailAction(human, self.before, after))
 
     def onMouseMoved(self, event):
         human = self.app.selectedHuman
@@ -434,6 +442,10 @@ class Detail3dTool(events3d.EventHandler):
     # Recalculate
 
         human.applyAllTargets(self.app.progress)
+        
+        if human.isSubdivided():
+            human.meshData.setVisibility(0)
+            human.getSubdivisionMesh(False).setVisibility(1)
 
     # Add undo item
 
@@ -451,7 +463,7 @@ class Detail3dTool(events3d.EventHandler):
         for target in before.iterkeys():
             after[target] = human.getDetail(target)
 
-        self.app.did(humanmodifier.Action(human, before, after))
+        self.app.did(humanmodifier.DetailAction(human, before, after))
 
     def onMouseMoved(self, event):
         human = self.app.selectedHuman
@@ -493,54 +505,11 @@ class Detail3dTool(events3d.EventHandler):
         self.selectedGroups = []
         self.app.redraw()
 
-class DetailAction:
-
-    def __init__(self, human, modifier, before, after, postAction):
-        self.name = 'Detail'
-        self.human = human
-        self.modifier = modifier
-        self.before = before
-        self.after = after
-        self.postAction = postAction
-
-    def do(self):
-        self.modifier.setValue(self.human, self.after)
-        self.human.applyAllTargets(self.human.app.progress)
-        self.postAction()
-        return True
-
-    def undo(self):
-        self.modifier.setValue(self.human, self.before)
-        self.human.applyAllTargets(self.human.app.progress)
-        self.postAction()
-        return True
-
-class DetailSlider(gui3d.Slider):
+class DetailSlider(humanmodifier.ModifierSlider):
     
     def __init__(self, parent, x, y, value, min, max, label, modifier):
         
-        gui3d.Slider.__init__(self, parent, [x, y, 9.1], value, min, max, label)
-        self.modifier = modifier
-        self.value = None
-        
-    def onChanging(self, value):
-        
-        if self.app.settings.get('realtimeUpdates', True):
-            human = self.app.selectedHuman
-            if self.value is None:
-                self.value = self.modifier.getValue(human)
-            self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
-            
-    def onChange(self, value):
-        
-        human = self.app.selectedHuman
-        self.app.do(DetailAction(human, self.modifier, self.value, value, self.update))
-        self.value = None
-        
-    def update(self):
-        
-        human = self.app.selectedHuman
-        self.setValue(self.modifier.getValue(human))
+        humanmodifier.ModifierSlider.__init__(self, parent, [x, y, 9.1], value, min, max, label, modifier=modifier)
 
 class DetailModelingTaskView(gui3d.TaskView):
 

@@ -12,62 +12,28 @@ import humanmodifier
 import events3d
 import aljabr
 
-class Action:
-
-    def __init__(self, human, modifier, before, after, postAction=None):
-        self.name = 'Change measure'
-        self.human = human
-        self.modifier = modifier
-        self.before = before
-        self.after = after
-        self.postAction = postAction
-
-    def do(self):
-        self.modifier.setValue(self.human, self.after)
-        self.human.applyAllTargets()
-        if self.postAction:
-            self.postAction()
-        return True
-
-    def undo(self):
-        self.modifier.setValue(self.human, self.before)
-        self.human.applyAllTargets()
-        if self.postAction:
-            self.postAction()
-        return True
-
-class MeasureSlider(gui3d.Slider):
+class MeasureSlider(humanmodifier.ModifierSlider):
     def __init__(self, parent, y, template, measure, modifier):
-        gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value=0.0, min=-1.0, max=1.0,
-            label=template + parent.parent.getMeasure(measure))
-        self.before = None
+        
+        humanmodifier.ModifierSlider.__init__(self, parent, [10, y, 9.1], value=0.0, min=-1.0, max=1.0,
+            label=template + parent.parent.getMeasure(measure), modifier=modifier)
         self.template = template
         self.measure = measure
-        self.modifier = modifier
         
-    def onChange(self, value):
-        human = self.app.selectedHuman
-        self.app.do(Action(human, self.modifier, self.before, value, self.update))
-        self.before = None
-        self.parent.parent.syncSliderLabels()
-
     def onChanging(self, value):
-        human = self.app.selectedHuman
-        if self.before is None:
-            self.before = self.modifier.getValue(human)
-                
-        if self.app.settings.get('realtimeUpdates', True):
-            self.modifier.updateValue(human, value, True)
+        humanmodifier.ModifierSlider.onChanging(self, value)
         self.updateLabel()
         
+    def onChange(self, value):
+        humanmodifier.ModifierSlider.onChange(self, value)
+        self.parent.parent.syncSliderLabels()
+        
     def updateLabel(self):
-        human = self.app.selectedHuman
-        self.label.setText(self.template + self.parent.parent.getMeasure(self.measure)) 
+        self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
         
     def update(self):
-        human = self.app.selectedHuman
-        self.setValue(self.modifier.getValue(human))
-        self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
+        humanmodifier.ModifierSlider.update(self)
+        self.updateLabel()
 
 class MeasureTaskView(gui3d.TaskView):
 
@@ -331,7 +297,7 @@ class Ruler:
         measure = 0
         vindex1 = self.Measures[measurementname][0]
         for vindex2 in self.Measures[measurementname]:
-            measure += aljabr.vdist(human.mesh.verts[vindex1].co, human.mesh.verts[vindex2].co)
+            measure += aljabr.vdist(human.meshData.verts[vindex1].co, human.meshData.verts[vindex2].co)
             vindex1 = vindex2
             
         if mode == 'metric':

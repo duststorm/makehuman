@@ -157,12 +157,12 @@ class Human(gui3d.Object):
         
         self.mesh.setVisibility(flag)
         
-    def getSubdivisionMesh(self, progressCallback=None):
+    def getSubdivisionMesh(self, update=True, progressCallback=None):
         
         if not self.__subdivisionMesh:
             print 'creating subdiv'
             self.__subdivisionMesh = createSubdivisionObject(self.scene, self.meshData, progressCallback)
-        else:
+        elif update:
             updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
             
         return self.__subdivisionMesh
@@ -171,7 +171,7 @@ class Human(gui3d.Object):
 
         return self.mesh == self.__subdivisionMesh
             
-    def setSubdivided(self, flag, progressCallback=None):
+    def setSubdivided(self, flag, update=True, progressCallback=None):
         """
         This method toggles between displaying the standard mesh and a
         subdivided mesh. The subdivided mesh contains 4 times the number of
@@ -182,16 +182,17 @@ class Human(gui3d.Object):
         """
 
         if flag == self.isSubdivided():
-            print 'nothing to do'
             return
             
         if flag:
-            print 'getting subdiv'
-            self.mesh = self.getSubdivisionMesh(progressCallback)
+            self.mesh = self.getSubdivisionMesh(update, progressCallback)
             self.meshData.setVisibility(0)
             self.mesh.setVisibility(1)
         else:
             self.mesh = self.meshData
+            if update:
+                self.mesh.calcNormals()
+                self.mesh.update()
             self.__subdivisionMesh.setVisibility(0)
             self.mesh.setVisibility(1)
         self.app.redraw()
@@ -492,6 +493,9 @@ class Human(gui3d.Object):
 
                 algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
+                
+        if self.isSubdivided():
+            self.getSubdivisionMesh()
 
         self.app.redraw()
 
@@ -543,7 +547,7 @@ class Human(gui3d.Object):
         
         self.callEvent('onChanged', HumanEvent(self, 'reset'))
 
-    def load(self, filename, progressCallback=None):
+    def load(self, filename, update=True, progressCallback=None):
         self.resetMeshValues()
 
         f = open(filename, 'r')
@@ -576,7 +580,8 @@ class Human(gui3d.Object):
 
         f.close()
 
-        self.applyAllTargets(progressCallback)
+        if update:
+            self.applyAllTargets(progressCallback)
 
     def save(self, filename, tags):
         f = open(filename, 'w')

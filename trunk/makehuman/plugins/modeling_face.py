@@ -7,30 +7,6 @@ import humanmodifier
 
 print 'Face imported'
 
-class Action:
-
-    def __init__(self, human, modifier, before, after, postAction=None):
-        self.name = 'Change expression'
-        self.human = human
-        self.modifier = modifier
-        self.before = before
-        self.after = after
-        self.postAction = postAction
-
-    def do(self):
-        self.modifier.setValue(self.human, self.after)
-        self.human.applyAllTargets()
-        if self.postAction:
-            self.postAction()
-        return True
-
-    def undo(self):
-        self.modifier.setValue(self.human, self.before)
-        self.human.applyAllTargets()
-        if self.postAction:
-            self.postAction()
-        return True
-
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, parent, group, y, label, groupBox, selected=False):
         gui3d.RadioButton.__init__(self, parent, group, [658, y, 9.1], label, selected, style=gui3d.ButtonStyle)
@@ -41,33 +17,10 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.parent.parent.hideAllBoxes()
         self.groupBox.show()
         
-class FaceSlider(gui3d.Slider):
+class FaceSlider(humanmodifier.ModifierSlider):
     def __init__(self, parent, y, label, modifier):
         
-        human = parent.app.selectedHuman
-        self.modifier = modifier
-        gui3d.Slider.__init__(self, parent, position=[10, y, 9.1], value = self.modifier.getValue(human), label=label)
-        self.before = None
-    
-    def onChange(self, value):
-        
-        human = self.app.selectedHuman
-        self.app.do(Action(human, self.modifier, self.before, value, self.update))
-        self.before = None
-        
-    def onChanging(self, value):
-        
-        human = self.app.selectedHuman
-        if self.before is None:
-            self.before = self.modifier.getValue(human)
-            
-        if self.app.settings.get('realtimeUpdates', True):    
-            self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
-        
-    def update(self):
-        
-        human = self.app.selectedHuman
-        self.setValue(self.modifier.getValue(human))
+        humanmodifier.ModifierSlider.__init__(self, parent, [10, y, 9.1], label=label, modifier=modifier)
 
 class FaceTaskView(gui3d.TaskView):
 

@@ -635,7 +635,7 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def toggleSubdivision(self):
-        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), self.app.progress)
+        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), True, self.app.progress)
         
     def saveTarget(self):
         human = self.selectedHuman

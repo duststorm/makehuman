@@ -26,12 +26,13 @@ TO DO
 __docformat__ = 'restructuredtext'
 
 import algos3d
+from gui3d import Slider, SliderStyle, SliderThumbStyle
 from string import Template
 from operator import mul
 import math
 import re
 
-class Action:
+class DetailAction:
 
     def __init__(self, human, before, after, postAction=None,update=True):
         self.name = 'Change detail'
@@ -55,6 +56,61 @@ class Action:
         if self.postAction:
             self.postAction()
 
+class ModifierAction:
+
+    def __init__(self, human, modifier, before, after, postAction):
+        self.name = 'Change modifier'
+        self.human = human
+        self.modifier = modifier
+        self.before = before
+        self.after = after
+        self.postAction = postAction
+
+    def do(self):
+        self.modifier.setValue(self.human, self.after)
+        self.human.applyAllTargets(self.human.app.progress)
+        self.postAction()
+        return True
+
+    def undo(self):
+        self.modifier.setValue(self.human, self.before)
+        self.human.applyAllTargets(self.human.app.progress)
+        self.postAction()
+        return True
+        
+class ModifierSlider(Slider):
+    
+    def __init__(self, parent, position, value=0.0, min=0.0, max=1.0, label=None,
+        style=SliderStyle, thumbStyle=SliderThumbStyle, modifier=None):
+        
+        Slider.__init__(self, parent, position, value, min, max, label)
+        self.modifier = modifier
+        self.value = None
+        
+    def onChanging(self, value):
+        
+        if self.app.settings.get('realtimeUpdates', True):
+            human = self.app.selectedHuman
+            if self.value is None:
+                self.value = self.modifier.getValue(human)
+                if human.isSubdivided():
+                    human.meshData.setVisibility(1)
+                    human.getSubdivisionMesh(False).setVisibility(0)
+            self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
+            
+    def onChange(self, value):
+        
+        human = self.app.selectedHuman
+        self.app.do(ModifierAction(human, self.modifier, self.value, value, self.update))
+        if human.isSubdivided():
+            human.meshData.setVisibility(0)
+            human.getSubdivisionMesh(False).setVisibility(1)
+        self.value = None
+        
+    def update(self):
+        
+        human = self.app.selectedHuman
+        self.setValue(self.modifier.getValue(human))
 
 class Modifier:
 

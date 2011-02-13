@@ -118,7 +118,7 @@ class LoadTaskView(gui3d.TaskView):
 
             human = self.app.selectedHuman
 
-            human.load(os.path.join(modelPath, filename), self.app.progress)
+            human.load(os.path.join(modelPath, filename), True, self.app.progress)
 
             del self.app.undoStack[:]
             del self.app.redoStack[:]

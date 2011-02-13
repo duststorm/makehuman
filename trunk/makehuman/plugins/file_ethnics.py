@@ -4,6 +4,7 @@
 
 import gui3d, mh, os
 from algos3d import getTarget
+
 class EthnicsTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -53,10 +54,10 @@ class EthnicsTaskView(gui3d.TaskView):
         
         human = self.app.selectedHuman
 
-        human.load(os.path.join('data/models/ethnics', filename), self.app.progress)
+        human.load(os.path.join('data/models/ethnics', filename), False, self.app.progress)
         target = os.path.join('data/models/ethnics', filename.replace('.mhm', '.target'))
         human.setDetail(target, 1.0)
-        getTarget(human.meshData, target).apply(human.meshData, 1.0, True, True)
+        human.applyAllTargets(self.app.progress)
 
         del self.app.undoStack[:]
         del self.app.redoStack[:]
