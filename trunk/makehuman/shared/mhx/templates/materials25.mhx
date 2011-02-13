@@ -70,7 +70,7 @@ end Texture
 
 # --------------- Materials ----------------------------- # 
 
-Material SSS_skinshader 
+Material Skin
   MTex 0 diffuse UV COLOR
     texture Refer Texture diffuse ;
     use_map_color_diffuse True ;
@@ -272,7 +272,7 @@ Material SSS_skinshader
   specular_toon_size 0.5 ;
   specular_toon_smooth 0.1 ;
   use_tangent_shading False ;
-  use_raytrace False ;
+  use_raytrace True ;
   translucency 0 ;
   use_transparency True ;
   transparency_method 'Z_TRANSPARENCY' ;
@@ -284,7 +284,7 @@ Material SSS_skinshader
   offset_z 0 ;
 end Material
 
-Material Skin_no_SSS
+Material Mouth
   MTex 0 diffuse UV COLOR
     texture Refer Texture diffuse ;
     use_map_density True ;
@@ -296,37 +296,12 @@ Material Skin_no_SSS
     blend_type 'MIX' ;
     color Array 1.0 0.0 1.0  ;
     emission_color_factor 0.945272 ;
-    default_value 1 ;
-    density_factor 1 ;
     diffuse_color_factor 0.945272 ;
-    diffuse_factor 1 ;
-    displacement_factor 0.2 ;
-    emission_factor 1 ;
-    emit_factor 1 ;
-    hardness_factor 1 ;
-    invert False ;
-    mapping 'FLAT' ;
-    mapping_x 'X' ;
-    mapping_y 'Y' ;
-    mapping_z 'Z' ;
     mirror_factor 0.945272 ;
     normal_factor 0.5 ;
-    normal_map_space 'TANGENT' ;
-    raymir_factor 1 ;
     reflection_color_factor 0.945272 ;
-    reflection_factor 1 ;
-    scale (1,1,1) ;
-    scattering_factor 1 ;
     specular_color_factor 0.945272 ;
-    specular_factor 1 ;
-    translucency_factor 1 ;
     transmission_color_factor 0.945272 ;
-    use True ;
-    use_from_dupli False ;
-    use_from_original False ;
-    use_rgb_to_intensity False ;
-    use_stencil False ;
-    warp_factor 0 ;
   end MTex
 
   MTex 1 specularity UV SPECULAR_COLOR
@@ -336,42 +311,89 @@ Material Skin_no_SSS
     use_map_specular True ;
     use_map_color_spec True ;
     use_map_color_reflection True ;
-    alpha_factor 1 ;
-    ambient_factor 1 ;
     blend_type 'ADD' ;
     color Array 1.0 0.0 1.0  ;
-    emission_color_factor 1 ;
     default_value 0.15 ;
-    density_factor 1 ;
-    diffuse_color_factor 1 ;
-    diffuse_factor 1 ;
-    displacement_factor 0.2 ;
-    emission_factor 1 ;
-    emit_factor 1 ;
-    hardness_factor 1 ;
-    invert False ;
-    mapping 'FLAT' ;
-    mapping_x 'X' ;
-    mapping_y 'Y' ;
-    mapping_z 'Z' ;
-    mirror_factor 1 ;
+  end MTex
+
+  diffuse_color Array 1.0 1.0 1.0  ;
+  diffuse_shader 'LAMBERT' ;
+  diffuse_intensity 0.93 ;
+  specular_color Array 1.0 1.0 1.0  ;
+  specular_shader 'PHONG' ;
+  specular_intensity 0.32973 ;
+  active_texture Refer Texture diffuse ;
+  active_texture_index 0 ;
+  alpha 0 ;
+  ambient 1 ;
+  darkness 1 ;
+  diffuse_fresnel 0.1 ;
+  diffuse_fresnel_factor 1 ;
+  diffuse_ramp_blend 'ADD' ;
+  emit 0 ;
+  invert_z False ;
+  mirror_color Array 1.0 1.0 1.0  ;
+  offset_z 0 ;
+  preview_render_type 'FLAT' ;
+  roughness 0.5 ;
+  shadow_buffer_bias 0 ;
+  shadow_cast_alpha 1 ;
+  shadow_ray_bias 0 ;
+  specular_alpha 1 ;
+  specular_hardness 369 ;
+  specular_ior 4 ;
+  specular_ramp_blend 'MIX' ;
+  specular_ramp_factor 1 ;
+  specular_ramp_input 'SHADER' ;
+  specular_slope 0.1 ;
+  specular_toon_size 0.5 ;
+  specular_toon_smooth 0.1 ;
+  translucency 0 ;
+  transparency_method 'Z_TRANSPARENCY' ;
+  use_cast_approximate True ;
+  use_cast_buffer_shadows True ;
+  use_cast_shadows_only False ;
+  use_cubic False ;
+  use_face_texture True ;
+  use_face_texture_alpha False ;
+  use_nodes False ;
+  use_ray_shadow_bias True ;
+  use_raytrace True ;
+  use_shadows True ;
+  use_transparency True ;
+  use_transparent_shadows False ;
+end Material
+
+Material Eye
+  MTex 0 diffuse UV COLOR
+    texture Refer Texture diffuse ;
+    use_map_density True ;
+    use_map_color_emission True ;
+    use_map_color_diffuse True ;
+    use_map_alpha True ;
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
+    emission_color_factor 0.945272 ;
+    diffuse_color_factor 0.945272 ;
+    mirror_factor 0.945272 ;
     normal_factor 0.5 ;
-    normal_map_space 'TANGENT' ;
-    raymir_factor 1 ;
-    reflection_color_factor 1 ;
-    reflection_factor 1 ;
-    scale (1,1,1) ;
-    scattering_factor 1 ;
-    specular_color_factor 1 ;
-    specular_factor 1 ;
-    translucency_factor 1 ;
-    transmission_color_factor 1 ;
-    use True ;
-    use_from_dupli False ;
-    use_from_original False ;
-    use_rgb_to_intensity False ;
-    use_stencil False ;
-    warp_factor 0 ;
+    reflection_color_factor 0.945272 ;
+    specular_color_factor 0.945272 ;
+    transmission_color_factor 0.945272 ;
+  end MTex
+
+  MTex 1 specularity UV SPECULAR_COLOR
+    texture Refer Texture specularity ;
+    use_map_color_diffuse False ;
+    use_map_reflect True ;
+    use_map_specular True ;
+    use_map_color_spec True ;
+    use_map_color_reflection True ;
+    blend_type 'ADD' ;
+    color Array 1.0 0.0 1.0  ;
+    default_value 0.15 ;
   end MTex
 
   diffuse_color Array 1.0 1.0 1.0  ;
@@ -408,35 +430,101 @@ Material Skin_no_SSS
   specular_ramp_factor 1 ;
   specular_ramp_input 'SHADER' ;
   specular_slope 0.1 ;
-  specular_toon_size 0.5 ;
-  specular_toon_smooth 0.1 ;
   translucency 0 ;
   transparency_method 'Z_TRANSPARENCY' ;
-  use_cast_approximate True ;
-  use_cast_buffer_shadows True ;
+  use_cast_buffer_shadows False ;
   use_cast_shadows_only False ;
   use_cubic False ;
   use_face_texture True ;
   use_face_texture_alpha False ;
-  use_fake_user False ;
-  use_full_oversampling False ;
-  use_light_group_exclusive False ;
-  use_mist True ;
-  use_nodes False ;
-  use_object_color False ;
-  use_only_shadow False ;
-  use_ray_shadow_bias True ;
-  use_raytrace False ;
-  use_shadeless False ;
-  use_shadows True ;
+  use_ray_shadow_bias False ;
+  use_raytrace True ;
+  use_shadows False ;
   use_sky False ;
   use_tangent_shading False ;
-  use_textures Array 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
   use_transparency True ;
   use_transparent_shadows False ;
-  use_vertex_color_light False ;
-  use_vertex_color_paint False ;
 end Material
+
+Material Brows
+  MTex 0 diffuse UV COLOR
+    texture Refer Texture diffuse ;
+    use_map_density True ;
+    use_map_color_emission True ;
+    use_map_color_diffuse True ;
+    use_map_alpha True ;
+    alpha_factor 1 ;
+    ambient_factor 1 ;
+    blend_type 'MIX' ;
+    color Array 1.0 0.0 1.0  ;
+    emission_color_factor 0.945272 ;
+    diffuse_color_factor 0.945272 ;
+    mirror_factor 0.945272 ;
+    normal_factor 0.5 ;
+    reflection_color_factor 0.945272 ;
+    specular_color_factor 0.945272 ;
+    transmission_color_factor 0.945272 ;
+  end MTex
+
+  MTex 1 specularity UV SPECULAR_COLOR
+    texture Refer Texture specularity ;
+    use_map_color_diffuse False ;
+    use_map_reflect True ;
+    use_map_specular True ;
+    use_map_color_spec True ;
+    use_map_color_reflection True ;
+    blend_type 'ADD' ;
+    color Array 1.0 0.0 1.0  ;
+    default_value 0.15 ;
+  end MTex
+
+  diffuse_color Array 1.0 1.0 1.0  ;
+  diffuse_shader 'LAMBERT' ;
+  diffuse_intensity 0.93 ;
+  specular_color Array 1.0 1.0 1.0  ;
+  specular_shader 'PHONG' ;
+  specular_intensity 0.32973 ;
+  active_texture Refer Texture diffuse ;
+  active_texture_index 0 ;
+  alpha 0 ;
+  ambient 1 ;
+  darkness 1 ;
+  diffuse_fresnel 0.1 ;
+  diffuse_fresnel_factor 1 ;
+  diffuse_ramp_blend 'ADD' ;
+  diffuse_ramp_factor 0.3 ;
+  diffuse_ramp_input 'SHADER' ;
+  emit 0 ;
+  invert_z False ;
+  mirror_color Array 1.0 1.0 1.0  ;
+  offset_z 0 ;
+  preview_render_type 'FLAT' ;
+  roughness 0.5 ;
+  shadow_buffer_bias 0 ;
+  shadow_cast_alpha 1 ;
+  shadow_ray_bias 0 ;
+  specular_alpha 0 ;
+  specular_hardness 369 ;
+  specular_ior 4 ;
+  specular_ramp_blend 'MIX' ;
+  specular_ramp_factor 1 ;
+  specular_ramp_input 'SHADER' ;
+  specular_slope 0.1 ;
+  translucency 0 ;
+  transparency_method 'Z_TRANSPARENCY' ;
+  use_cast_approximate False ;
+  use_cast_buffer_shadows False ;
+  use_cast_shadows_only False ;
+  use_cubic False ;
+  use_face_texture True ;
+  use_face_texture_alpha False ;
+  use_ray_shadow_bias False ;
+  use_raytrace False ;
+  use_shadows False ;
+  use_transparency True ;
+  use_transparent_shadows False ;
+end Material
+
 
 Material Hair 
   diffuse_color Array 0.04 0.04 0.04  ;
@@ -562,6 +650,7 @@ Material Invisio
   specular_toon_size 0.5 ;
   specular_toon_smooth 0.1 ;
   use_tangent_shading False ;
+  use_shadows False ;
   use_raytrace False ;
   translucency 0 ;
   use_transparency True ;

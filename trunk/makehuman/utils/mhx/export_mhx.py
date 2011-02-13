@@ -1,15 +1,15 @@
 """ 
-**Project Name:**      MakeHuman
+**Project Name:**	  MakeHuman
 
 **Product Home Page:** http://www.makehuman.org/
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+**Code Home Page:**	http://code.google.com/p/makehuman/
 
-**Authors:**           Thomas Larsson
+**Authors:**		   Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**	  MakeHuman Team 2001-2009
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+**Licensing:**		 GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
@@ -785,7 +785,7 @@ def exportActionGroup(grp, fp):
 	fp.write("%sGroup %s \n" % (pad,grp.name.replace(' ', '_')))
 	for chnl in grp.channels:
 		exportChannel(chnl, pad+"  ", fp)
-	writeDir(grp, ['channels'], "      ", fp)
+	writeDir(grp, ['channels'], "	  ", fp)
 	fp.write("%send Group\n\n" % pad)
 
 def exportChannel(chnl, pad, fp):
@@ -871,9 +871,9 @@ def exportMTex(index, mtex, use, fp):
 			print("Mapto", ext, mapto)
 			
 	fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coords, mapto))
-	writePrio(mtex, ['texture']+prio, "    ", fp)
+	writePrio(mtex, ['texture']+prio, "	", fp)
 	print("MTEX", texname,  list(MapToTypes.keys()) )
-	writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coords', 'offset'], "    ", fp)
+	writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coords', 'offset'], "	", fp)
 	print("DONE MTEX", texname)
 	fp.write("  end MTex\n\n")
 	return
@@ -907,8 +907,8 @@ def exportRamp(ramp, name, fp):
 
 	for elt in ramp.elements:
 		col = elt.color
-		fp.write("    Element (%.3f,%.3f,%.3f,%.3f) %.3f ;\n" % (col[0], col[1], col[2], col[3], elt.position))
-	writeDir(ramp, ['elements'], "    ", fp)
+		fp.write("	Element (%.3f,%.3f,%.3f,%.3f) %.3f ;\n" % (col[0], col[1], col[2], col[3], elt.position))
+	writeDir(ramp, ['elements'], "	", fp)
 	fp.write("  end Ramp\n")
 
 #
@@ -944,16 +944,16 @@ def exportScene(scn, fp):
 
 def exportToolSettings(tset, fp):
 	fp.write("  ToolSettings\n")
-	exportDefault("ImagePaint", tset.image_paint, [], [], [], [], '    ', fp)
-	exportDefault("Sculpt", tset.sculpt, [], [], [], [], '    ', fp)
-	exportDefault("VertexPaint", tset.vertex_paint, [], [], [], [], '    ', fp)
-	exportDefault("WeightPaint", tset.weight_paint, [], [], [], [], '    ', fp)
-	writeDir(tset, ['image_paint', 'sculpt', 'vertex_paint', 'weight_paint'], '    ', fp)
+	exportDefault("ImagePaint", tset.image_paint, [], [], [], [], '	', fp)
+	exportDefault("Sculpt", tset.sculpt, [], [], [], [], '	', fp)
+	exportDefault("VertexPaint", tset.vertex_paint, [], [], [], [], '	', fp)
+	exportDefault("WeightPaint", tset.weight_paint, [], [], [], [], '	', fp)
+	writeDir(tset, ['image_paint', 'sculpt', 'vertex_paint', 'weight_paint'], '	', fp)
 	fp.write("  end ToolSettings\n")
 
 def exportGameData(gdata, fp):
 	fp.write("  GameData\n")
-	writeDir(gdata, [], "    ", fp)
+	writeDir(gdata, [], "	", fp)
 	fp.write("  end GameData\n")
 
 
@@ -975,27 +975,27 @@ def exportNodeTree(tree, fp):
 	return
 
 def exportNode(node, fp):
-	fp.write("    Node %s\n" % node.name.replace(' ', '_'))
+	fp.write("	Node %s\n" % node.name.replace(' ', '_'))
 	loc = node.location
-	fp.write("      location (%.3f, %3.f) ;\n" % (loc[0], loc[1]))
-	fp.write("      Inputs\n")
+	fp.write("	  location (%.3f, %3.f) ;\n" % (loc[0], loc[1]))
+	fp.write("	  Inputs\n")
 	for inp in node.inputs:
 		exportNodeSocket(inp, fp)
-	fp.write("      end Inputs\n")
-	fp.write("      Outputs\n")
+	fp.write("	  end Inputs\n")
+	fp.write("	  Outputs\n")
 	for outp in node.outputs:
 		exportNodeSocket(outp, fp)
-	fp.write("      end Outputs\n")
-	fp.write("    end Node\n")
+	fp.write("	  end Outputs\n")
+	fp.write("	end Node\n")
 	return
 
 def exportNodeSocket(socket, fp):
 	print(dir(socket.rna_type))
-	fp.write("        Socket %s %s\n" % (socket.name.replace(' ', '_'), socket.rna_type.name.replace(' ', '_')))
-	writeDir(socket, [], "          ", fp)
-	#fp.write("          default_value %s ; \n" %socket.default_value)
-	#fp.write("          rna_type %s ; \n" %socket.rna_type)
-	fp.write("        end Socket\n")
+	fp.write("		Socket %s %s\n" % (socket.name.replace(' ', '_'), socket.rna_type.name.replace(' ', '_')))
+	writeDir(socket, [], "		  ", fp)
+	#fp.write("		  default_value %s ; \n" %socket.default_value)
+	#fp.write("		  rna_type %s ; \n" %socket.rna_type)
+	fp.write("		end Socket\n")
 	return
 	
 
@@ -1088,10 +1088,10 @@ def exportParticles(particles, nmax, pad, fp):
 		if n < nmax:
 			fp.write("%s  Particle \n" % pad)
 			for h in par.hair:
-				fp.write("%s    h " % pad)
+				fp.write("%s	h " % pad)
 				writeTuple(h.location, fp)
 				fp.write(" %d %.3f ;\n" % (h.time, h.weight))
-			writePrio(par, prio, pad+"    ", fp)
+			writePrio(par, prio, pad+"	", fp)
 			fp.write("%s  end Particle\n" % pad)
 			n += 1
 	writeDir(particles[0], prio+['hair'], pad+"  ", fp)
@@ -1114,45 +1114,45 @@ def exportMesh(ob, fp):
 	if me.vertices:
 		fp.write("  Verts\n")
 		for v in me.vertices:
-			fp.write("    v %.3f %.3f %.3f ;\n" %(v.co[0], v.co[1], v.co[2]))
+			fp.write("	v %.3f %.3f %.3f ;\n" %(v.co[0], v.co[1], v.co[2]))
 		v = me.vertices[0]
-		#writeDir(v, ['co', 'index', 'normal'], "      ", fp)
+		#writeDir(v, ['co', 'index', 'normal'], "	  ", fp)
 		fp.write("  end Verts\n")
 
 	if me.faces:
 		fp.write("  Faces\n")
 		for f in me.faces:
-			fp.write("    f ")
+			fp.write("	f ")
 			for v in f.vertices:
 				fp.write("%d " % v)
 			fp.write(";\n")
 		if len(me.materials) <= 1:
 			f = me.faces[0]
-			fp.write("    ftall %d %d ;\n" % (f.material_index, f.use_smooth))
+			fp.write("	ftall %d %d ;\n" % (f.material_index, f.use_smooth))
 		else:
 			for f in me.faces:
-				fp.write("    ft %d %d ;\n" % (f.material_index, f.use_smooth))
+				fp.write("	ft %d %d ;\n" % (f.material_index, f.use_smooth))
 		fp.write("  end Faces\n")
 	elif me.edges:
 		fp.write("  Edges\n")
 		for e in me.edges:
-			fp.write("    e %d %d ;\n" % (e.vertices[0], e.vertices[1]))
+			fp.write("	e %d %d ;\n" % (e.vertices[0], e.vertices[1]))
 		e = me.edges[0]
-		writeDir(e, ['vertices'], "      ", fp)
+		writeDir(e, ['vertices'], "	  ", fp)
 		fp.write("  end Edges\n")
 
 	for uvtex in me.uv_textures:
 		uvtexName = uvtex.name.replace(' ','_')
 		fp.write("  MeshTextureFaceLayer %s\n" % uvtexName)
-		fp.write("    Data \n")
+		fp.write("	Data \n")
 		for data in uvtex.data.values():
 			v = data.uv_raw
-			fp.write("      vt %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f ;\n" % 
+			fp.write("	  vt %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f ;\n" % 
 				(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]))
 		writeDir(uvtex.data[0], 
-			['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "      ", fp)
-		fp.write("    end Data\n")
-		writeDir(uvtex, ['data'], "    ", fp)
+			['uv1', 'uv2', 'uv3', 'uv4', 'uv', 'uv_raw', 'uv_pinned', 'uv_selected'], "	  ", fp)
+		fp.write("	end Data\n")
+		writeDir(uvtex, ['data'], "	", fp)
 		createdLocal['MeshTextureFaceLayer'].append(uvtexName)
 		fp.write("  end MeshTextureFaceLayer\n")
 		
@@ -1160,16 +1160,16 @@ def exportMesh(ob, fp):
 		vcolName = vcol.name.replace(' ','_')
 		fp.write("  MeshColorLayer %s\n" % vcolName)
 		if Optimize < 2:
-			fp.write("    Data \n")
+			fp.write("	Data \n")
 			for data in vcol.data.values():
-				fp.write("      cv ")
+				fp.write("	  cv ")
 				writeTuple(data.color1, fp)
 				writeTuple(data.color2, fp)
 				writeTuple(data.color3, fp)
 				writeTuple(data.color4, fp)
 				fp.write(" ;\n")
-			fp.write("    end Data\n")
-		writeDir(vcol, ['data'], "    ", fp)
+			fp.write("	end Data\n")
+		writeDir(vcol, ['data'], "	", fp)
 		createdLocal['MeshColorLayer'].append(vcolName)
 		fp.write("  end MeshColorLayer\n")
 
@@ -1254,7 +1254,7 @@ def exportVertexGroups(ob, me, typ, fp):
 			for v in me.vertices:
 				for grp in v.groups:
 					if grp.group == index and grp.weight > 0.005:
-						fp.write("    wv %d %.3f ;\n" % (v.index, grp.weight))
+						fp.write("	wv %d %.3f ;\n" % (v.index, grp.weight))
 						if doToe:
 							addToeWeight(toeDict, v.index, grp.weight)
 							
@@ -1275,7 +1275,7 @@ def addToeWeight(toeDict, v, w):
 def dumpVertexGroup(toeDict, vgName, fp):
 	fp.write("  VertexGroup %s\n" % (vgName))
 	for (v,w) in toeDict.items():
-		fp.write("    wv %d %.3f ;\n" % (v,w))
+		fp.write("	wv %d %.3f ;\n" % (v,w))
 	fp.write("  end VertexGroup\n")
 	
 
@@ -1379,7 +1379,7 @@ def exportShapeKeys(ob, keyList, toggle, fp):
 				exportShapeKey(skeyName, me.vertices, lr, skey, toggle, -1, slidermin, slidermax, fp)
 		else:
 			fp.write("  ShapeKey %s %s %s\n" % (skeyName, "Sym", toggle))
-			writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
+			writeDir(skey, ['data', 'relative_key', 'frame'], "	", fp)
 			fp.write("  end ShapeKey\n")
 
 	if skeys.animation_data:		 
@@ -1390,9 +1390,9 @@ def exportShapeKeys(ob, keyList, toggle, fp):
 def exportShapeKey(skeyName, verts, lr, skey, toggle, vgroup, slidermin, slidermax, fp):
 	print(skeyName)
 	fp.write("  ShapeKey %s %s %s\n" % (skeyName, lr, toggle))
-	#writeDir(skey, ['data', 'relative_key', 'frame'], "    ", fp)
-	fp.write("    slider_min %s ;\n" % slidermin)
-	fp.write("    slider_max %s ;\n" % slidermax)
+	#writeDir(skey, ['data', 'relative_key', 'frame'], "	", fp)
+	fp.write("	slider_min %s ;\n" % slidermin)
+	fp.write("	slider_max %s ;\n" % slidermax)
 	for (n,pt) in enumerate(skey.data):
 		vert = verts[n]
 		if (expMsk & M_UnselShape or vert.select):
@@ -1404,7 +1404,7 @@ def exportShapeKey(skeyName, verts, lr, skey, toggle, vgroup, slidermin, sliderm
 						w = grp.weight
 				dv *= w
 			if dv.length > Epsilon:
-				fp.write("    sv %d %.4f %.4f %.4f ;\n" %(n, dv[0], dv[1], dv[2]))
+				fp.write("	sv %d %.4f %.4f %.4f ;\n" %(n, dv[0], dv[1], dv[2]))
 	fp.write("  end ShapeKey\n")
 	print(skey)
 	createdLocal['ShapeKey'].append(skeyName)
@@ -1485,10 +1485,10 @@ def exportArmature(ob, fp):
 def writeBone(bone, fp):
 	fp.write("  Bone %s True\n" % (bone.name.replace(' ','_')))
 	x = bone.head
-	fp.write("    head %.3f %.3f %.3f ; \n" % (x[0], x[1], x[2]))
+	fp.write("	head %.3f %.3f %.3f ; \n" % (x[0], x[1], x[2]))
 	x = bone.tail
-	fp.write("    tail %.3f %.3f %.3f ; \n" % (x[0], x[1], x[2]))
-	writePrio(bone, ['roll'], "    ", fp)
+	fp.write("	tail %.3f %.3f %.3f ; \n" % (x[0], x[1], x[2]))
+	writePrio(bone, ['roll'], "	", fp)
 	return
 
 def exportBone(fp, bone):
@@ -1496,12 +1496,12 @@ def exportBone(fp, bone):
 	writeBone(bone, fp)
 
 	if bone.parent:
-		fp.write("    parent Refer Bone %s ;\n" % (bone.parent.name.replace(' ','_')))
+		fp.write("	parent Refer Bone %s ;\n" % (bone.parent.name.replace(' ','_')))
 
 	exclude = ['head', 'tail', 'parent', 'head_local', 'tail_local', 'matrix_local', 'children']
 	exclude += ['matrix',  'envelope_distance', 'envelope_weight', 'head_radius', 'tail_radius',
 		'selected', 'selected_head', 'selected_tail']
-	writeDir(bone, exclude, "    ", fp)
+	writeDir(bone, exclude, "	", fp)
 
 	fp.write("  end Bone\n\n")
 	if bone.children:
@@ -1519,11 +1519,11 @@ def exportPoseBone(fp, pb):
 	fp.write("\n  Posebone %s True\n" % (pb.name.replace(' ', '_')))
 	for cns in pb.constraints:
 		exportConstraint(cns, fp)
-	writeArray('lock_ik', [pb.lock_ik_x, pb.lock_ik_y, pb.lock_ik_z], "    ", 1, fp)
-	writeArray('use_ik_limit', [pb.use_ik_limit_x, pb.use_ik_limit_y, pb.use_ik_limit_z], "    ", 1, fp)
-	writeArray('ik_max', [pb.ik_max_x, pb.ik_max_y, pb.ik_max_z], "    ", 1, fp)
-	writeArray('ik_min', [pb.ik_min_x, pb.ik_min_y, pb.ik_min_z], "    ", 1, fp)
-	writeArray('ik_stiffness', [pb.ik_stiffness_x, pb.ik_stiffness_y, pb.ik_stiffness_z], "    ", 1, fp)
+	writeArray('lock_ik', [pb.lock_ik_x, pb.lock_ik_y, pb.lock_ik_z], "	", 1, fp)
+	writeArray('use_ik_limit', [pb.use_ik_limit_x, pb.use_ik_limit_y, pb.use_ik_limit_z], "	", 1, fp)
+	writeArray('ik_max', [pb.ik_max_x, pb.ik_max_y, pb.ik_max_z], "	", 1, fp)
+	writeArray('ik_min', [pb.ik_min_x, pb.ik_min_y, pb.ik_min_z], "	", 1, fp)
+	writeArray('ik_stiffness', [pb.ik_stiffness_x, pb.ik_stiffness_y, pb.ik_stiffness_z], "	", 1, fp)
 	exclude = ['constraints', 'lock_ik_x', 'lock_ik_y', 'lock_ik_z', 
 		'use_ik_limit_x', 'use_ik_limit_y', 'use_ik_limit_z', 
 		'ik_max_x', 'ik_max_y', 'ik_max_z', 
@@ -1533,7 +1533,7 @@ def exportPoseBone(fp, pb):
 		'parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
 	exclude += ['channel_matrix', 'matrix', 'rotation_axis_angle', 'rotation_euler', 'rotation_mode',
 		'rotation_quaternion', 'scale', 'selected']
-	writeDir(pb, exclude, "    ", fp)	
+	writeDir(pb, exclude, "	", fp)	
 	fp.write("  end Posebone\n")
 	return
 
@@ -1541,9 +1541,9 @@ def exportPoseBone(fp, pb):
 def exportBoneGroup(fp, bg):
 	global createdLocal
 	name = bg.name.replace(' ', '_')
-	fp.write("    BoneGroup %s\n" % (name))
-	writeDir(bg, [], "      ", fp)	
-	fp.write("    end BoneGroup\n")
+	fp.write("	BoneGroup %s\n" % (name))
+	writeDir(bg, [], "	  ", fp)	
+	fp.write("	end BoneGroup\n")
 	createdLocal['BoneGroup'].append(name)
 	return
 
@@ -1556,23 +1556,23 @@ def exportConstraint(cns, fp):
 		name = cns.name.replace(' ', '_')
 	except:
 		return
-	fp.write("    Constraint %s %s\n" % (name, cns.type))
-	writePrio(cns, ['target'], "      ", fp)
+	fp.write("	Constraint %s %s\n" % (name, cns.type))
+	writePrio(cns, ['target'], "	  ", fp)
 
 	try:
-		writeArray('invert', [cns.invert_x, cns.invert_y, cns.invert_z], "      ", 2, fp)
+		writeArray('invert', [cns.invert_x, cns.invert_y, cns.invert_z], "	  ", 2, fp)
 	except:
 		pass
 	try:
-		writeArray('use', [cns.use_x, cns.use_y, cns.use_z], "      ", 2, fp)
+		writeArray('use', [cns.use_x, cns.use_y, cns.use_z], "	  ", 2, fp)
 	except:
 		pass
 	try:
-		writeArray('pos_lock', [cns.pos_lock_x, cns.pos_lock_y, cns.pos_lock_z], "      ", 2, fp)
+		writeArray('pos_lock', [cns.pos_lock_x, cns.pos_lock_y, cns.pos_lock_z], "	  ", 2, fp)
 	except:
 		pass
 	try:
-		writeArray('rot_lock', [cns.rot_lock_x, cns.rot_lock_y, cns.rot_lock_z], "      ", 2, fp)
+		writeArray('rot_lock', [cns.rot_lock_x, cns.rot_lock_y, cns.rot_lock_z], "	  ", 2, fp)
 	except:
 		pass
 
@@ -1581,8 +1581,8 @@ def exportConstraint(cns, fp):
 		'pos_lock_x', 'pos_lock_y', 'pos_lock_z', 'rot_lock_x', 'rot_lock_y', 'rot_lock_z', 
 		'disabled', 'lin_error', 'rot_error', 'target', 'type']
 	exclude += ['distance']
-	writeDir(cns, exclude, "      ", fp)	
-	fp.write("    end Constraint\n")
+	writeDir(cns, exclude, "	  ", fp)	
+	fp.write("	end Constraint\n")
 	return
 
 #
@@ -1591,9 +1591,9 @@ def exportConstraint(cns, fp):
 
 def exportModifier(mod, fp):
 	name = mod.name.replace(' ', '_')
-	fp.write("    Modifier %s %s\n" % (name, mod.type))
-	writeDir(mod, [], "      ", fp)	
-	fp.write("    end Modifier\n")
+	fp.write("	Modifier %s %s\n" % (name, mod.type))
+	writeDir(mod, [], "	  ", fp)	
+	fp.write("	end Modifier\n")
 	return
 
 #
@@ -1622,8 +1622,8 @@ def exportLamp(ob, fp):
 
 def exportFalloffCurve(focu, fp):
 	fp.write("  FalloffCurve\n")
-	writeDir(focu, ['curves'], "    ", fp)
-	exportDefault('CurveMap', focu.curves, [], [], [], [('CurveMapPoint', focu.curves.points)], '    ', fp)
+	writeDir(focu, ['curves'], "	", fp)
+	exportDefault('CurveMap', focu.curves, [], [], [], [('CurveMapPoint', focu.curves.points)], '	', fp)
 	fp.write("  end FalloffCurve\n")
 
 #
@@ -1675,7 +1675,7 @@ def exportSurface(ob, fp):
 
 def exportSpline(spline, pad, fp):
 	fp.write("%sSpline %s %d %d\n" % (pad, spline.type, spline.point_count_u, spline.point_count_v))
-	writeDir(spline, ['bezier_points', 'character_index', 'points', 'point_count_u', 'point_count_v'], "    ", fp)
+	writeDir(spline, ['bezier_points', 'character_index', 'points', 'point_count_u', 'point_count_v'], "	", fp)
 	for bz in spline.bezier_points:
 		fp.write("%s  bz " % pad)
 		writeTuple(bz.co, fp)
@@ -1703,7 +1703,7 @@ def exportLattice(ob, fp):
 	for pt in lat.points:
 		x = pt.co
 		y = pt.co_deform
-		fp.write("    pt (%.3f,%.3f,%.3f) (%.3f,%.3f,%.3f) ;\n" % (x[0], x[1], x[2], y[0], y[1], y[2]))
+		fp.write("	pt (%.3f,%.3f,%.3f) (%.3f,%.3f,%.3f) ;\n" % (x[0], x[1], x[2], y[0], y[1], y[2]))
 	fp.write("  end Points\n")
 	fp.write("end Lattice\n")
 
@@ -1716,7 +1716,7 @@ def exportGroup(grp, fp):
 	fp.write("Group %s\n" % (name))
 	fp.write("  Objects\n")
 	for ob in grp.objects:
-		fp.write("    ob %s ;\n" % ob.name.replace(' ','_'))
+		fp.write("	ob %s ;\n" % ob.name.replace(' ','_'))
 	fp.write("  end Objects\n")
 	writeDir(grp, ['objects'], "  ", fp)
 	fp.write("end Group\n")
@@ -1907,10 +1907,11 @@ def mhxClose(fp):
 
 DEBUG= False
 from bpy.props import *
+from io_utils import ImportHelper
 
 mask = M_Geo+M_VGroup+M_Shape
 
-class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
+class ExportMhx(bpy.types.Operator, ImportHelper):
 	'''Export to MHX file format (.mhx)'''
 	bl_idname = "export.makehuman_mhx"
 	bl_description = 'Export to MHX file format (.mhx)'
@@ -1918,7 +1919,9 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 	bl_space_type = "PROPERTIES"
 	bl_region_type = "WINDOW"
 
-	filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
+	filename_ext = ".mhx"
+	filter_glob = StringProperty(default="*.mhx", options={'HIDDEN'})
+	filepath = StringProperty(name="File Path", description="File path for the exported MHX file", maxlen= 1024, default= "")
 
 	sel = BoolProperty(name="Selected only", description="Only selected objects", default=mask&M_Sel)
 	#xall = BoolProperty(name="Everything", description="Include everything", default=mask&M_All)
@@ -1953,14 +1956,15 @@ class EXPORT_OT_makehuman_mhx(bpy.types.Operator):
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
 
+def menu_func(self, context):
+	self.layout.operator(ExportMhx.bl_idname, text="MakeHuman (.mhx)...")
+
 def register():
-	bpy.types.register(EXPORT_OT_makehuman_mhx)
-	menu_func = lambda self, context: self.layout.operator(EXPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+	bpy.utils.register_module(__name__)
 	bpy.types.INFO_MT_file_export.append(menu_func)
  
 def unregister():
-	bpy.types.unregister(EXPORT_OT_makehuman_mhx)
-	menu_func = lambda self, context: self.layout.operator(EXPORT_OT_makehuman_mhx.bl_idname, text="MakeHuman (.mhx)...")
+	bpy.utils.register_module(__name__)
 	bpy.types.INFO_MT_file_export.remove(menu_func)
 
 if __name__ == "__main__":
