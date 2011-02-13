@@ -128,7 +128,7 @@ class MHApplication(gui3d.Application):
             (events3d.KMOD_CTRL, events3d.SDLK_f): self.toggleSolid,
             (events3d.KMOD_ALT, events3d.SDLK_t): self.saveTarget,
             (events3d.KMOD_ALT, events3d.SDLK_e): self.quickExport,
-            (events3d.KMOD_ALT, events3d.SDLK_s): self.subdivide,
+            (events3d.KMOD_ALT, events3d.SDLK_s): self.toggleSubdivision,
             (events3d.KMOD_ALT, events3d.SDLK_g): self.grabScreen,
             # Camera navigation
             (0, events3d.SDLK_2): self.rotateDown,
@@ -469,7 +469,8 @@ class MHApplication(gui3d.Application):
             for line in f:
                 modifier, key, method = line.split(' ')
                 #print modifier, key, method[0:-1]
-                self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
+                if hasattr(self, method[0:-1]):
+                    self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
         
     def saveSettings(self):
         f = open("settings.ini", 'w')
@@ -633,6 +634,9 @@ class MHApplication(gui3d.Application):
             self.selectedHuman.mesh.setSolid(1)
         self.redraw()
         
+    def toggleSubdivision(self):
+        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), self.app.progress)
+        
     def saveTarget(self):
         human = self.selectedHuman
         algos3d.saveTranslationTarget(human.meshData, "full_target.target")
@@ -652,10 +656,6 @@ class MHApplication(gui3d.Application):
             os.makedirs(grabPath)
         # TODO: use bbox to choose grab region
         self.scene3d.grabScreen(180, 80, 440, 440, os.path.join(grabPath, 'grab.bmp'))
-        
-    def subdivide(self):
-        print 'subdividing'
-        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided())
         
     # Camera navigation
     def rotateDown(self):

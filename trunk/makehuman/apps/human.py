@@ -157,13 +157,13 @@ class Human(gui3d.Object):
         
         self.mesh.setVisibility(flag)
         
-    def getSubdivisionMesh(self):
+    def getSubdivisionMesh(self, progressCallback=None):
         
         if not self.__subdivisionMesh:
             print 'creating subdiv'
-            self.__subdivisionMesh = createSubdivisionObject(self.scene, self.meshData)
+            self.__subdivisionMesh = createSubdivisionObject(self.scene, self.meshData, progressCallback)
         else:
-            updateSubdivisionObject(self.__subdivisionMesh)
+            updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
             
         return self.__subdivisionMesh
 
@@ -171,7 +171,7 @@ class Human(gui3d.Object):
 
         return self.mesh == self.__subdivisionMesh
             
-    def setSubdivided(self, flag):
+    def setSubdivided(self, flag, progressCallback=None):
         """
         This method toggles between displaying the standard mesh and a
         subdivided mesh. The subdivided mesh contains 4 times the number of
@@ -187,7 +187,7 @@ class Human(gui3d.Object):
             
         if flag:
             print 'getting subdiv'
-            self.mesh = self.getSubdivisionMesh()
+            self.mesh = self.getSubdivisionMesh(progressCallback)
             self.meshData.setVisibility(0)
             self.mesh.setVisibility(1)
         else:

@@ -49,16 +49,21 @@ class ModellingCategory(gui3d.Category):
         mesh = gui3d.RectangleMesh(420, 420, self.app.getThemeResource("images", 'background.png'))
         self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
         
-        y = 600-90
-        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24+6));y+=25
+        y = 600-110
+        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
         
-        modifierStyle = gui3d.ButtonStyle._replace(width=(112-8)/3.0, height=20)
+        modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2.0, height=20)
         
         x = 18
         x+=modifierStyle.width+4
-        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], '3D',
+        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Anaglyphs',
             style=modifierStyle);x+=modifierStyle.width+4
-        self.wireButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Wire',
+        y += 24
+        x = 18
+        self.wireButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Wireframe',
+            style=modifierStyle)
+        x+=modifierStyle.width+4
+        self.subdivisionButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Smooth',
             style=modifierStyle)
 
         @self.anaglyphsButton.event
@@ -70,6 +75,11 @@ class ModellingCategory(gui3d.Category):
         def onClicked(event):
             self.app.toggleSolid()
             self.wireButton.setSelected(self.app.selectedHuman.mesh.solid == 0)
+            
+        @self.subdivisionButton.event
+        def onClicked(event):
+            self.app.toggleSubdivision()
+            self.subdivisionButton.setSelected(self.app.selectedHuman.isSubdivided())
         
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)
@@ -77,4 +87,4 @@ class ModellingCategory(gui3d.Category):
 
     def onResized(self, event):
         self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
-        self.viewBox.setPosition([10, event[1]-90, 9.0])
+        self.viewBox.setPosition([10, event[1]-110, 9.0])

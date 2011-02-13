@@ -39,9 +39,9 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh = gui3d.RectangleMesh(420, 420)
         self.backgroundImage = gui3d.Object(self.app.categories['Modelling'], [190, 90, 1], mesh, visible=False)
         
-        modifierStyle = gui3d.ButtonStyle._replace(width=(112-8)/3.0, height=20)
+        modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2.0, height=20)
         
-        self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, [18, 600-90+25, 9.1], 'Bkg',
+        self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, [18, 600-110+25, 9.1], 'Background',
             style=modifierStyle);
             
         @self.backgroundImageToggle.event

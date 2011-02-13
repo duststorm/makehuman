@@ -85,7 +85,7 @@ def updateEdgeVert(ev):
     else: # Outer edge
         ev.co = vavg3d(ev.data[0].co, ev.data[1].co)
 
-def createSubdivisionObject(scene, object):
+def createSubdivisionObject(scene, object, progressCallback=None):
     
     name = object.name + '.sub'
     
@@ -112,6 +112,12 @@ def createSubdivisionObject(scene, object):
     subdivisionObject.edgeVerts = []
         
     edgeVerts = {}
+    
+    if progressCallback:progressCallback(0.0)
+    
+    progress = 0.0
+    groups = 0
+    progressIncr = 0.5 / (len(object.facesGroups) / 10)
     
     # Create faces
     # v0  e0  v1
@@ -168,31 +174,51 @@ def createSubdivisionObject(scene, object):
             fg.createFace(e0, v1, e1, c, [uve0, uv1, uve1, uvc])
             fg.createFace(e3, c, e2, v3, [uve3, uvc, uve2, uv3])
             fg.createFace(c, e1, v2, e2, [uvc, uve1, uv2, uve2])
+            
+        if progressCallback:
+            groups += 1
+            if not groups % 10:
+                progress += progressIncr
+                progressCallback(progress)
     
     for v in subdivisionObject.edgeVerts:
         updateEdgeVert(v)
+        
+    if progressCallback:progressCallback(0.6)
+    
     for v in subdivisionObject.originalVerts:
         updateOriginalVert(v)
+        
+    if progressCallback:progressCallback(0.7)
     
     subdivisionObject.updateIndexBuffer()
     subdivisionObject.object = object.object
     subdivisionObject.texture = object.texture
     
-    subdivisionObject.calcNormals()
-    scene.update()
+    if progressCallback:progressCallback(0.8)  
+    subdivisionObject.calcNormals() 
+    if progressCallback:progressCallback(0.9)
+    scene.update() 
+    if progressCallback:progressCallback(1.0)
 
     return subdivisionObject
     
-def updateSubdivisionObject(object):
+def updateSubdivisionObject(object, progressCallback=None):
     
+    if progressCallback:progressCallback(0.0)
     for v in object.originalVerts:
         initOriginalVert(v)
+    if progressCallback:progressCallback(0.1)
     for v in object.faceVerts:
         updateFaceVert(v)
+    if progressCallback:progressCallback(0.2)
     for v in object.edgeVerts:
         updateEdgeVert(v)
+    if progressCallback:progressCallback(0.4)
     for v in object.originalVerts:
         updateOriginalVert(v)
-
+    if progressCallback:progressCallback(0.6)
     object.calcNormals()
+    if progressCallback:progressCallback(0.8)
     object.update()
+    if progressCallback:progressCallback(1.0)
