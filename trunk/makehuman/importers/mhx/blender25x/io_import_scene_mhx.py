@@ -1,29 +1,48 @@
-""" 
-**Project Name:**      MakeHuman
+# ##### BEGIN GPL LICENSE BLOCK #####
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# ##### END GPL LICENSE BLOCK #####
 
-**Product Home Page:** http://www.makehuman.org/
+# <pep8 compliant>
 
-**Code Home Page:**    http://code.google.com/p/makehuman/
+# Project Name:        MakeHuman
+# Product Home Page:   http://www.makehuman.org/
+# Code Home Page:      http://code.google.com/p/makehuman/
+# Authors:             Thomas Larsson
+# Script copyright (C) MakeHuman Team 2001-2011
+# Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
-**Authors:**           Thomas Larsson
-
-**Copyright(c):**      MakeHuman Team 2001-2011
-
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
-
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
-
+"""
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.2.6
+Version 1.2.7
 
+This script should be distributed with Blender.
+If not, place it in the .blender/scripts/addons dir
+Activate the script in the "Add-Ons" tab (user preferences).
+Access from the File > Import menu.
+
+Alternatively, run the script in the script editor (Alt-P), and access from the File > Import menu
 """
 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 2, 6),
-    'blender': (2, 5, 6),
+    'version': (1, 2, 7),
+    'blender': (2, 5, 7),
     'api': 34786,
     'location': "File > Import",
     'description': 'Import files in the MakeHuman eXchange format (.mhx)',
@@ -34,15 +53,9 @@ bl_info = {
         'func=detail&aid=21872',
     'category': 'Import-Export'}
 
-"""
-Place this file in the .blender/scripts/addons dir
-You have to activated the script in the "Add-Ons" tab (user preferences).
-Access from the File > Import menu.
-"""
-
 MAJOR_VERSION = 1
 MINOR_VERSION = 2
-SUB_VERSION = 6
+SUB_VERSION = 7
 BLENDER_VERSION = (2, 56, 0)
 
 #

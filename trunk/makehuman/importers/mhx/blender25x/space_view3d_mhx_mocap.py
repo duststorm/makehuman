@@ -16,6 +16,27 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+# <pep8 compliant>
+
+# Project Name:        MakeHuman
+# Product Home Page:   http://www.makehuman.org/
+# Code Home Page:      http://code.google.com/p/makehuman/
+# Authors:             Thomas Larsson
+# Script copyright (C) MakeHuman Team 2001-2011
+# Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
+
+"""
+Abstract
+Tool for loading bvh files onto the MHX rig in Blender 2.5x
+Version 0.6
+
+Place the script in the .blender/scripts/addons dir
+Activate the script in the "Add-Ons" tab (user preferences).
+Access from UI panel (N-key) when MHX rig is active.
+
+Alternatively, run the script in the script editor (Alt-P), and access from UI panel.
+"""
+
 bl_info = {
 	"name": "MHX Mocap",
 	"author": "Thomas Larsson",
@@ -28,9 +49,6 @@ bl_info = {
 	"category": "3D View"}
 
 """
-Run from text window. 
-Access from UI panel (N-key) when MHX rig is active.
-
 Properties:
 Scale:	
 	for BVH import. Choose scale so that the vertical distance between hands and feet
@@ -62,10 +80,6 @@ Batch run:
 	Load all bvh files in the given directory, whose name start with the
 	given prefix, and create actions (with simplified FCurves) for the active MHX rig.
 """
-
-MAJOR_VERSION = 0
-MINOR_VERSION = 3
-BLENDER_VERSION = (2, 56, 0)
 
 import bpy, os, mathutils, math, time
 from mathutils import *

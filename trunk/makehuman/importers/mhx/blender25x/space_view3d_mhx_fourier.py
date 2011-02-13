@@ -16,6 +16,27 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+# <pep8 compliant>
+
+# Project Name:		MakeHuman
+# Product Home Page:   http://www.makehuman.org/
+# Code Home Page:	  http://code.google.com/p/makehuman/
+# Authors:			 Thomas Larsson
+# Script copyright (C) MakeHuman Team 2001-2011
+# Coding Standards:	See http://sites.google.com/site/makehumandocs/developers-guide
+
+"""
+Abstract
+Tool for making animations loop seamlessly
+Version 0.3
+
+Place the script in the .blender/scripts/addons dir
+Activate the script in the "Add-Ons" tab (user preferences).
+Access from the File > Import menu.
+
+Alternatively, run the script in the script editor (Alt-P), and access from the File > Import menu
+"""
+
 bl_info = {
 	"name": "MHX Fourier",
 	"author": "Thomas Larsson",
@@ -33,9 +54,6 @@ Access from UI panel (N-key) when rig is active.
 
 """
 
-MAJOR_VERSION = 0
-MINOR_VERSION = 3
-BLENDER_VERSION = (2, 56, 0)
 DEBUG = True
 
 import bpy, cmath, math, mathutils
@@ -44,18 +62,18 @@ from bpy.props import *
 #
 #	ditfft2(f, N, z):
 #
-#	Y_0,...,N?1 ? ditfft2(X, N, s):             DFT of (X0, Xs, X2s, ..., X(N-1)s):
-#    if N = 1 then
-#        Y_0 ? X_0                                      trivial size-1 DFT base case
-#    else
-#        Y_0,...,N/2?1 ? ditfft2(X, N/2, 2s)             DFT of (X_0, X_2s, X_4s, ...)
-#        Y_N/2,...,N?1 ? ditfft2(X+s, N/2, 2s)           DFT of (X_s, X_s+2s, X_s+4s, ...)
-#        for k = 0 to N/2?1                           combine DFTs of two halves into full DFT:
-#            t ? Y_k
-#            Y_k ? t + exp(?2?i k/N) * Y_k+N/2
-#            Y_k+N/2 ? t ? exp(?2?i k/N) * Y_k+N/2
-#        endfor
-#    endif
+#	Y_0,...,N?1 ? ditfft2(X, N, s):			 DFT of (X0, Xs, X2s, ..., X(N-1)s):
+#	if N = 1 then
+#		Y_0 ? X_0									  trivial size-1 DFT base case
+#	else
+#		Y_0,...,N/2?1 ? ditfft2(X, N/2, 2s)			 DFT of (X_0, X_2s, X_4s, ...)
+#		Y_N/2,...,N?1 ? ditfft2(X+s, N/2, 2s)		   DFT of (X_s, X_s+2s, X_s+4s, ...)
+#		for k = 0 to N/2?1						   combine DFTs of two halves into full DFT:
+#			t ? Y_k
+#			Y_k ? t + exp(?2?i k/N) * Y_k+N/2
+#			Y_k+N/2 ? t ? exp(?2?i k/N) * Y_k+N/2
+#		endfor
+#	endif
 	
 def ditfft2(f, N, z):
 	if N == 1:
@@ -100,7 +118,7 @@ def fourierFCurves(context):
 	
 	for fcu in act.fcurves:
 		f0 = fcu.evaluate(t0)
-		fcu.keyframe_points.add(frame=tn+1, value=f0)
+		fcu.keyframe_points.insert(frame=tn+1, value=f0)
 
 	setInterpolation(rig)
 	return
@@ -178,8 +196,10 @@ def addAnimation(fcu, animations, bones):
 		first = True		
 	if first:
 		b = bones[name]	
-		anim.matrix = b.matrix_local.rotation_part()
-		anim.inverse = anim.matrix.copy().invert()
+		(loc,rot,scale) = b.matrix_local.decompose()
+		anim.matrix = rot.to_matrix()
+		anim.inverse = anim.matrix.copy()
+		anim.inverse.invert()
 		anim.head = b.head_local.copy()
 	anim.fcurves[index] = fcu
 	return
@@ -213,9 +233,15 @@ def addRoot(anim, factor, rootGlobals, scn, t0, t1):
 		for index in range(3):
 			if (index == 2 or not scn.MhxRemoveZOnly):
 				pts = anim.fcurves[index].keyframe_points
+				vec0 = anim.locals[t0]
+				vec1 = anim.locals[t1]
 				for pt in pts:
 					t = int(pt.co[0])
-					if (t >= t0) and (t <= t1):
+					if t < t0:
+						pt.co[1] = vec0[index]
+					elif t > t1:
+						pt.co[1] = vec1[index]
+					else:
 						vec = anim.locals[t]
 						pt.co[1] = vec[index]
 		
@@ -249,7 +275,7 @@ def fourierFCurve(fcu, act, scn, t0, tn):
 	fn = fcu.evaluate(tn)
 	df = (fn-f0)/(N-1)
 	df = 0
-	fcu.keyframe_points.add(frame=tn+1, value=f0)	
+	fcu.keyframe_points.insert(frame=tn+1, value=f0)	
 	
 	f = []
 	for i in range(N):
@@ -279,7 +305,7 @@ def fourierFCurve(fcu, act, scn, t0, tn):
 	for ti in range(t0, tn+2):
 		yi = evalFourier(fhat, kmax, e)/N
 		e *= z
-		nfcu.keyframe_points.add(frame=ti, value=yi)
+		nfcu.keyframe_points.insert(frame=ti, value=yi)
 	return
 
 #
@@ -501,11 +527,11 @@ initInterface(bpy.context)
 #
 
 def register():
-    bpy.utils.register_module(__name__)
+	bpy.utils.register_module(__name__)
 	pass
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
+	bpy.utils.unregister_module(__name__)
 	pass
 
 if __name__ == "__main__":

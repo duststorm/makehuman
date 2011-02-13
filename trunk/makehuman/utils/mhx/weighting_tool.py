@@ -272,8 +272,9 @@ def symmetrizeWeights(context):
 			#print("  ", name, grp, rgrp)
 			if rgrp:
 				rgrp.add([rv.index], grp.weight, 'REPLACE')
-			else:
-				raise NameError("No rgrp for %s %s %s" % (list(v.groups), grp, grp.group))
+			else:				
+				gn = grp.group
+				print("*** No rgrp for %s %s %s" % (grp, gn, ob.vertex_groups[gn]))
 	return len(rverts)
 
 def rightVerts(factor, me):
