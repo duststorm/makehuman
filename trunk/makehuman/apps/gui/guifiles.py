@@ -168,11 +168,12 @@ class ExportTaskView(gui3d.TaskView):
             
         # OBJ options
         yy = y
-        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*6+6));y+=25
+        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6));y+=25
         self.exportEyebrows = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Eyebrows", True);y+=24
         self.exportDiamonds = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Diamonds", False);y+=24
         self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=24
         self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=24
+        self.exportSmooth = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Subdivide", False);y+=24
         self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as mesh", selected=True);y+=24
         self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as curves");y+=24
         
@@ -258,7 +259,10 @@ class ExportTaskView(gui3d.TaskView):
                     filter = lambda fg: not 'eyebrown' in fg.name
                 else:
                     filter = lambda fg: not ('joint' in fg.name or 'eyebrown' in fg.name)
-                mh2obj.exportObj(self.app.selectedHuman.mesh,
+                    
+                mesh = self.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else self.app.selectedHuman.meshData
+                
+                mh2obj.exportObj(mesh,
                     os.path.join(exportPath, filename + ".obj"),
                     self.exportGroups.selected,
                     filter)
@@ -337,6 +341,7 @@ class ExportTaskView(gui3d.TaskView):
         self.app.setGlobalCamera();
         mh.cameras[0].eyeZ = 70
         self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
+        self.exportSmooth.setSelected(self.app.selectedHuman.isSubdivided())
 
     def onHide(self, event):
         gui3d.TaskView.onHide(self, event)
