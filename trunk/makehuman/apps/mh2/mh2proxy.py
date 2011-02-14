@@ -134,7 +134,7 @@ class CProxyConfig:
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
 
-def proxyConfig(options):
+def proxyConfig(options=None):
 	cfg = CProxyConfig()
 	typ = 'Proxy'
 	layer = 2
@@ -658,7 +658,7 @@ def fixProxyShape(shape):
 #
 
 def exportProxyObj(obj, name):
-	cfg = proxyConfig(None)
+	cfg = proxyConfig()
 	for (typ, useObj, useMhx, useDae, proxyStuff) in cfg.proxyList:
 		if useObj:
 			proxy = readProxyFile(obj, proxyStuff)
