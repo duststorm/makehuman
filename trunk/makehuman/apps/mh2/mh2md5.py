@@ -35,6 +35,7 @@ __docformat__ = 'restructuredtext'
 import module3d
 import aljabr
 from math import acos
+from os.path import basename
 
 class Joint:
 
@@ -367,7 +368,7 @@ def exportMd5(obj, filename):
     writeJoint(f, skeletonRoot)
     f.write('}\n\n')
     f.write('mesh {\n')
-    f.write('\tshader "%s"\n' % (obj.texture or "")) # TODO: create the shader file
+    f.write('\tshader "%s"\n' % (basename(obj.texture).replace('.tif', '.png'))) # TODO: create the shader file
     f.write('\n\tnumverts %d\n' % (len(obj.verts)))
     for vert in obj.verts:
         if obj.uvValues:
@@ -376,11 +377,12 @@ def exportMd5(obj, filename):
         else:
             u, v = 0, 0
         # vert [vertIndex] ( [texU] [texV] ) [weightIndex] [weightElem]
-        f.write('\tvert %d ( %f %f ) %d %d\n' % (vert.idx, u, v, vert.idx, 1))
-    f.write('\n\tnumtris %d\n' % (len(obj.faces)))
+        f.write('\tvert %d ( %f %f ) %d %d\n' % (vert.idx, u, 1.0-v, vert.idx, 1))
+    f.write('\n\tnumtris %d\n' % (len(obj.faces) * 2))
     for face in obj.faces:
         # tri [triIndex] [vertIndex1] [vertIndex2] [vertIndex3]
-        f.write('\ttri %d %d %d %d\n' % (face.idx, face.verts[2].idx, face.verts[1].idx, face.verts[0].idx))
+        f.write('\ttri %d %d %d %d\n' % (face.idx*2, face.verts[2].idx, face.verts[1].idx, face.verts[0].idx))
+        f.write('\ttri %d %d %d %d\n' % (face.idx*2+1, face.verts[0].idx, face.verts[3].idx, face.verts[2].idx))
     f.write('\n\tnumweights %d\n' % (len(obj.verts)))
     for vert in obj.verts:
         # TODO: We attach all vertices to the root with weight 1.0, this should become
