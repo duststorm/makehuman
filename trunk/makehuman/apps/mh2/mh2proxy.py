@@ -658,7 +658,7 @@ def fixProxyShape(shape):
 #
 
 def exportProxyObj(obj, name):
-	cfg = proxyConfig()
+	cfg = proxyConfig(None)
 	for (typ, useObj, useMhx, useDae, proxyStuff) in cfg.proxyList:
 		if useObj:
 			proxy = readProxyFile(obj, proxyStuff)
