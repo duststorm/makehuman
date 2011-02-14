@@ -2049,7 +2049,7 @@ def correctRig(args):
     for (pb, cns, inf) in cnslist:
         amt.bones.active = pb.bone
         cns.influence = 1
-        print("Childof %s %s %s %.2f" % (amt.name, pb.name, cns.name, inf))
+        #print("Childof %s %s %s %.2f" % (amt.name, pb.name, cns.name, inf))
         bpy.ops.constraint.childof_clear_inverse(constraint=cns.name, owner='BONE')
         bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
         cns.influence = 0
