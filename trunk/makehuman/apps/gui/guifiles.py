@@ -195,6 +195,15 @@ class ExportTaskView(gui3d.TaskView):
         self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use game rig");y+=24
         self.mhxOptions.hide()
         
+        # STL options
+        y = yy
+        self.stlOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
+        stlOptions = []
+        self.stlAscii = gui3d.RadioButton(self.stlOptions, stlOptions, [18, y, 9.2], "Ascii", selected=True);y+=24
+        self.stlBinary = gui3d.RadioButton(self.stlOptions, stlOptions, [18, y, 9.2], "Binary");y+=24
+        self.stlSmooth = gui3d.CheckBox(self.stlOptions, [18, y, 9.2], "Subdivide", False);y+=24
+        self.stlOptions.hide()
+        
         @self.mhxConfig.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.mhxConfig, event)
@@ -305,7 +314,11 @@ class ExportTaskView(gui3d.TaskView):
             elif self.md5.selected:
                 mh2md5.exportMd5(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
             elif self.stl.selected:
-                mh2stl.exportStlBinary(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".stl"))
+                mesh = self.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else self.app.selectedHuman.meshData
+                if self.stlAscii.selected:
+                    mh2stl.exportStlAscii(mesh, os.path.join(exportPath, filename + ".stl"))
+                else:
+                    mh2stl.exportStlBinary(mesh, os.path.join(exportPath, filename + ".stl"))
 
             self.app.switchCategory('Modelling')
             
@@ -322,6 +335,11 @@ class ExportTaskView(gui3d.TaskView):
         else:
             self.mhxOptionsSource.hide()
             self.mhxOptions.hide()
+            
+        if self.stl.selected:
+            self.stlOptions.show()
+        else:
+            self.stlOptions.hide()
 
     def onShow(self, event):
 
@@ -342,6 +360,7 @@ class ExportTaskView(gui3d.TaskView):
         mh.cameras[0].eyeZ = 70
         self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
         self.exportSmooth.setSelected(self.app.selectedHuman.isSubdivided())
+        self.stlSmooth.setSelected(self.app.selectedHuman.isSubdivided())
 
     def onHide(self, event):
         gui3d.TaskView.onHide(self, event)

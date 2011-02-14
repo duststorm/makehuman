@@ -61,6 +61,14 @@ def exportStlAscii(obj, filename, exportJoints = False):
         f.write('\t\tvertex %f %f %f\n' % (face.verts[2].co[0], face.verts[2].co[1], face.verts[2].co[2]))
         f.write('\tendloop\n')
         f.write('\tendfacet\n')
+        
+        f.write('facet normal %f %f %f\n' % (face.no[0], face.no[1], face.no[2]))
+        f.write('\touter loop\n')
+        f.write('\t\tvertex %f %f %f\n' % (face.verts[2].co[0], face.verts[2].co[1], face.verts[2].co[2]))
+        f.write('\t\tvertex %f %f %f\n' % (face.verts[3].co[0], face.verts[3].co[1], face.verts[3].co[2]))
+        f.write('\t\tvertex %f %f %f\n' % (face.verts[0].co[0], face.verts[0].co[1], face.verts[0].co[2]))
+        f.write('\tendloop\n')
+        f.write('\tendfacet\n')
     f.write('endsolid human\n')
     
 def exportStlBinary(obj, filename, exportJoints = False):
@@ -87,6 +95,13 @@ def exportStlBinary(obj, filename, exportJoints = False):
         f.write(struct.pack('<fff', face.verts[0].co[0], face.verts[0].co[1], face.verts[0].co[2]))
         f.write(struct.pack('<fff', face.verts[1].co[0], face.verts[1].co[1], face.verts[1].co[2]))
         f.write(struct.pack('<fff', face.verts[2].co[0], face.verts[2].co[1], face.verts[2].co[2]))
+        f.write(struct.pack('<H', 0))
+        count += 1
+        
+        f.write(struct.pack('<fff', face.no[0], face.no[1], face.no[2]))
+        f.write(struct.pack('<fff', face.verts[2].co[0], face.verts[2].co[1], face.verts[2].co[2]))
+        f.write(struct.pack('<fff', face.verts[3].co[0], face.verts[3].co[1], face.verts[3].co[2]))
+        f.write(struct.pack('<fff', face.verts[0].co[0], face.verts[0].co[1], face.verts[0].co[2]))
         f.write(struct.pack('<H', 0))
         count += 1
     f.seek(80)
