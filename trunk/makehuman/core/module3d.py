@@ -530,10 +530,7 @@ class FaceGroup:
         self.parent.faces.append(f)
 
         if uv:
-            index = len(self.parent.uvValues)
-            for uvpair in uv:
-                self.parent.uvValues.append(uvpair)
-            f.uv = [index, index + 1, index + 2, index + 3]
+            f.uv = [self.parent.addUv(uv[0]), self.parent.addUv(uv[1]), self.parent.addUv(uv[2]), self.parent.addUv(uv[3])]
             
         v0.sharedFaces.append(f)
         v1.sharedFaces.append(f)
@@ -632,7 +629,9 @@ class Object3D:
         self.solid = 1
         self.indexBuffer = []
         self.vertexBufferSize = None
+        
         self.uvValues = None
+        self.uvMap = {}
 
     def updateIndexBuffer(self):
         # Build the lists of vertex indices and UV-indices for this face group.
@@ -676,6 +675,16 @@ class Object3D:
         v = Vert(co, len(self.verts), self)
         self.verts.append(v)
         return v
+        
+    def addUv(self, uv):
+        key = tuple(uv)
+        try:
+            return self.uvMap[key]
+        except:
+            index = len(self.uvValues)
+            self.uvMap[key] = index
+            self.uvValues.append(uv)
+            return index
 
     def setLoc(self, locx, locy, locz):
         """
@@ -1171,6 +1180,7 @@ class Scene3D:
             del obj.indexBuffer[:]
         if obj.uvValues:
             del obj.uvValues[:]
+        obj.uvMap.clear()
         del obj.faces[:]
         del obj.verts[:]
         del obj.facesGroups[:]

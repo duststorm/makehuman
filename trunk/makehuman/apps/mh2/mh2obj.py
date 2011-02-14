@@ -58,8 +58,8 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
         f.write('v %f %f %f\n' % tuple(v.co))
 
     if not (obj.uvValues==None):
-      for uv in obj.uvValues:
-          f.write('vt %f %f\n' % tuple(uv))
+        for uv in obj.uvValues:
+            f.write('vt %f %f\n' % tuple(uv))
 
     for v in obj.verts:
         f.write('vn %f %f %f\n' % tuple(v.no))
