@@ -302,8 +302,8 @@ class GenderAgeMuscleWeightModifier(GenericModifier):
         # Build target list of (targetname, [factors])
         targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
         targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
-        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value]) for target in targets for value in ['flaccid', 'muscle']]
-        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value]) for target in targets for value in ['light', 'heavy']]
+        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
+        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
 
         # Cleanup multiple hyphens and remove a possible hyphen before a dot.
         doubleHyphen = re.compile(r'-+')
@@ -326,8 +326,10 @@ class GenderAgeMuscleWeightModifier(GenericModifier):
             'old': human.oldVal,
             'flaccid':human.flaccidVal,
             'muscle':human.muscleVal,
+            'averageTone':1.0 - (human.flaccidVal + human.muscleVal),
             'light':human.underweightVal,
             'heavy':human.overweightVal,
+            'averageWeight':1.0 - (human.underweightVal + human.overweightVal)
         }
         
         return factors
