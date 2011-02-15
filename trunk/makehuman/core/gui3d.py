@@ -116,6 +116,9 @@ class Object(events3d.EventHandler):
             self.mesh.setTexture(texture)
         else:
             self.mesh.clearTexture()
+            
+    def getTexture(self):
+        return self.mesh.texture
 
     def clearTexture(self):
         self.mesh.clearTexture()

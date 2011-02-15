@@ -28,7 +28,28 @@ __docformat__ = 'restructuredtext'
 import gui3d
 import events3d
 import mh
+import os
 
+class Action:
+
+    def __init__(self, human, before, after, postAction=None):
+        self.name = 'Change texture'
+        self.human = human
+        self.before = before
+        self.after = after
+        self.postAction = postAction
+
+    def do(self):
+        self.human.setTexture(self.after)
+        if self.postAction:
+            self.postAction()
+        return True
+
+    def undo(self):
+        self.human.setTexture(self.before)
+        if self.postAction:
+            self.postAction()
+        return True
 
 class HumanTextureTaskView(gui3d.TaskView):
 
@@ -39,7 +60,11 @@ class HumanTextureTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             print 'Loading %s' % filename
-            self.app.selectedHuman.setTexture('data/textures/' + filename)
+            
+            self.app.do(Action(self.app.selectedHuman,
+                self.app.selectedHuman.getTexture(),
+                os.path.join('data/textures', filename),
+                self.app.redraw))
             
             self.app.switchCategory('Modelling')
 

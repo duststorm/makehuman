@@ -48,6 +48,7 @@ class DetailAction:
         self.human.applyAllTargets(self.human.app.progress, update=self.update)
         if self.postAction:
             self.postAction()
+        return True
 
     def undo(self):
         for (target, value) in self.before.iteritems():
@@ -55,6 +56,7 @@ class DetailAction:
         self.human.applyAllTargets()
         if self.postAction:
             self.postAction()
+        return True
 
 class ModifierAction:
 
