@@ -1053,7 +1053,7 @@ class RenderThread(Thread):
         n = 0
         for filename in self.filenames:
             
-            print "Rendering: %s"%(filename)
+            #print "Rendering: %s"%(filename)
             print "Percentage: %f"%(n*(100/len(self.filenames)))
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
