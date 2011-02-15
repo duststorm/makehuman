@@ -46,6 +46,7 @@ import mh2md5
 import mh2stl
 import hair
 from shutil import copyfile
+from os.path import basename
 
 class SaveTaskView(gui3d.TaskView):
 
@@ -291,9 +292,9 @@ class ExportTaskView(gui3d.TaskView):
                         mh2obj.exportAsCurves(file, hairsClass.guides)
                         file.close()
                         
-                texturePath = os.path.join(exportPath, 'texture.png')
+                texturePath = os.path.join(exportPath, basename(mesh.texture))
                 if not os.path.isfile(texturePath):
-                    copyfile('data/textures/texture.png', texturePath)
+                    copyfile(mesh.texture, texturePath)
                   
             elif self.mhx.selected:
                 if self.mhxConfig.selected:

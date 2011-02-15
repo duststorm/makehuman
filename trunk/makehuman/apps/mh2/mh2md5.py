@@ -368,7 +368,7 @@ def exportMd5(obj, filename):
     writeJoint(f, skeletonRoot)
     f.write('}\n\n')
     f.write('mesh {\n')
-    f.write('\tshader "%s"\n' % (basename(obj.texture).replace('.tif', '.png'))) # TODO: create the shader file
+    f.write('\tshader "%s"\n' % (basename(obj.texture))) # TODO: create the shader file
     f.write('\n\tnumverts %d\n' % (len(obj.verts)))
     for vert in obj.verts:
         if obj.uvValues:

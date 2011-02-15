@@ -92,7 +92,7 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
     f.write('Ks 0.33 0.33 0.52\n')
     f.write('illum 5\n')
     f.write('Ns 50.0\n')
-    if not (obj.texture==None): f.write('map_Kd %s\n' % basename(obj.texture).replace('.tif', '.png'))
+    if not (obj.texture==None): f.write('map_Kd %s\n' % basename(obj.texture))
     f.close()
     
 def exportAsCurves(file, guides):
