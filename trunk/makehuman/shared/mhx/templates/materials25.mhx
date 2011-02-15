@@ -409,11 +409,6 @@ Material Eye
   darkness 1 ;
   diffuse_fresnel 0.1 ;
   diffuse_fresnel_factor 1 ;
-  diffuse_ramp_blend 'ADD' ;
-  diffuse_ramp_factor 0.3 ;
-  diffuse_ramp_input 'SHADER' ;
-  diffuse_toon_size 1 ;
-  diffuse_toon_smooth 0.1 ;
   emit 0 ;
   invert_z False ;
   mirror_color Array 1.0 1.0 1.0  ;
@@ -423,7 +418,7 @@ Material Eye
   shadow_buffer_bias 0 ;
   shadow_cast_alpha 1 ;
   shadow_ray_bias 0 ;
-  specular_alpha 1 ;
+  specular_alpha 0 ;
   specular_hardness 369 ;
   specular_ior 4 ;
   specular_ramp_blend 'MIX' ;
@@ -438,8 +433,8 @@ Material Eye
   use_face_texture True ;
   use_face_texture_alpha False ;
   use_ray_shadow_bias False ;
-  use_raytrace True ;
-  use_shadows False ;
+  use_raytrace False ;
+  use_shadows True ;
   use_sky False ;
   use_tangent_shading False ;
   use_transparency True ;
@@ -489,11 +484,6 @@ Material Brows
   alpha 0 ;
   ambient 1 ;
   darkness 1 ;
-  diffuse_fresnel 0.1 ;
-  diffuse_fresnel_factor 1 ;
-  diffuse_ramp_blend 'ADD' ;
-  diffuse_ramp_factor 0.3 ;
-  diffuse_ramp_input 'SHADER' ;
   emit 0 ;
   invert_z False ;
   mirror_color Array 1.0 1.0 1.0  ;
@@ -520,7 +510,7 @@ Material Brows
   use_face_texture_alpha False ;
   use_ray_shadow_bias False ;
   use_raytrace False ;
-  use_shadows False ;
+  use_shadows True ;
   use_transparency True ;
   use_transparent_shadows False ;
 end Material
