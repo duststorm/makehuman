@@ -458,14 +458,14 @@ class MHApplication(gui3d.Application):
     # Settings
             
     def loadSettings(self):
-        if os.path.isfile("settings.ini"):
-            f = open("settings.ini", 'r')
+        if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
+            f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
             settings = eval(f.read())
             self.settings.update(settings)
         
-        if os.path.isfile("shortcuts.ini"):
+        if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
             self.shortcuts = {}
-            f = open("shortcuts.ini", 'r')
+            f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'r')
             for line in f:
                 modifier, key, method = line.split(' ')
                 #print modifier, key, method[0:-1]
@@ -473,10 +473,10 @@ class MHApplication(gui3d.Application):
                     self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
         
     def saveSettings(self):
-        f = open("settings.ini", 'w')
+        f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
         f.write(repr(self.settings))
         
-        f = open("shortcuts.ini", 'w')
+        f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'w')
         for shortcut, method in self.shortcuts.iteritems():
             f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
 

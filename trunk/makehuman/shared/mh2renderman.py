@@ -611,7 +611,7 @@ class RMRScene:
         self.firstTimeRendering = True
 
         #resources paths
-        self.renderPath = mh.getPath('render')
+        self.renderPath = os.path.join(mh.getPath('render'), 'renderman_output')
         self.ribsPath = os.path.join(self.renderPath, 'ribFiles')
         self.usrShaderPath = os.path.join(self.ribsPath, 'shaders')
         self.usrTexturePath = os.path.join(self.ribsPath, 'textures')

@@ -551,7 +551,11 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #endif // __APPLE__
     const char *typeStr;
 
-    if (!PyString_Check(type))
+    if (PyString_Check(type))
+        typeStr = PyString_AsString(type);
+    else if (PyObject_Not(type))
+        typeStr = "";
+    else
     {
         PyErr_SetString(PyExc_TypeError, "String expected");
         return NULL;
@@ -588,7 +592,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 
         if (FAILED(hr))
         {
-            PyErr_SetString(PyExc_TypeError, "SHGetFolderPathW failed");
+            PyErr_SetFromWindowsErr(0);
             return NULL;
         }
 
@@ -606,7 +610,16 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         }
         else if (0 == strcmp(typeStr, "render"))
         {
-            wcscat(path, L"\\makehuman\\renderman_output\\");
+            wcscat(path, L"\\makehuman\\render\\");
+        }
+        else if (0 == strcmp(typeStr, ""))
+        {
+            wcscat(path, L"\\makehuman\\");
+        }
+        else
+        {
+          PyErr_Format(PyExc_ValueError, "Unknown value %s for getPath()!", typeStr);
+          return NULL;
         }
     }
 #else
@@ -631,13 +644,22 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         }
         else if (0 == strcmp(typeStr, "render"))
         {
-            strcat(path, "/makehuman/renderman_output/");
+            strcat(path, "/makehuman/render/");
+        }
+        else if (0 == strcmp(typeStr, ""))
+        {
+            strcat(path, "/makehuman/");
+        }
+        else
+        {
+            PyErr_Format(PyExc_ValueError, "Unknown property %s for getPath()!", typeStr);
+            return NULL;
         }
     }
 #endif
     if (NULL == path)
     {
-        PyErr_Format(PyExc_ValueError, "Unknown property %s for getPath()!", typeStr);
+        PyErr_Format(PyExc_ValueError, "Unknown value %s for getPath()!", typeStr);
         return NULL;
     }
 #ifdef __WIN32__
