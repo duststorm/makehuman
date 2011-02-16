@@ -566,23 +566,23 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
 #ifdef __APPLE__
     if (0 == strcmp(typeStr, "exports"))
     {
-        path = getExportPath();
+        path = osx_getExportPath();
     }
     else if (0 == strcmp(typeStr, "models"))
     {
-        path = getModelPath();
+        path = osx_getModelPath();
     }
     else if (0 == strcmp(typeStr, "grab"))
     {
-        path = getGrabPath();
+        path = osx_getGrabPath();
     }
     else if (0 == strcmp(typeStr, "render"))
     {
-        path = getRenderPath();
+        path = osx_getRenderPath();
     }
     else if (0 == strcmp(typeStr, ""))
     {
-        path = getDocumentsPath();
+        path = osx_getDocumentsPath();
     }
     else
     {
@@ -762,11 +762,11 @@ int main(int argc, char *argv[])
         strcpy(str, "execfile(\"main.py\")");
     }
 #ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
-    int rc = adjustWorkingDir(argv[0]);
+    int rc = osx_adjustWorkingDir(argv[0]);
     assert(0 == rc);
 
     /* Adjust the environment vars for the external renderer */
-    rc = adjustRenderEnvironment();
+    rc = osx_adjustRenderEnvironment();
     assert(0 == rc);
 #endif
 

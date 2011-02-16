@@ -34,7 +34,7 @@
 #include "OSXTools.h"
 
 // Adjust the working dir in order to relocate to the application resources directory.
-int adjustWorkingDir(const char* inAppAbsPath)
+int osx_adjustWorkingDir(const char* inAppAbsPath)
 {
     /* Redirect the current working dir into the applications package resource directory because
      * the dirs 'data', '3dobjs' mh_core' and 'mh_plugins' are located there. 
@@ -113,7 +113,7 @@ static int setEnvVar(const std::string& inEnvVarName, const std::string& inValue
     return (0 == rc) ? 0 : -1;
 }
 
-int adjustRenderEnvironment()
+int osx_adjustRenderEnvironment()
 {
     std::string path;
     int rc = getEnvVar("PATH", &path);

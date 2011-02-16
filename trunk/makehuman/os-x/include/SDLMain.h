@@ -10,11 +10,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    const char* getExportPath();
-    const char* getModelPath();
-    const char* getGrabPath();
-    const char* getRenderPath();
-    const char* getDocumentsPath();
+    const char* osx_getExportPath();
+    const char* osx_getModelPath();
+    const char* osx_getGrabPath();
+    const char* osx_getRenderPath();
+    const char* osx_getDocumentsPath();
 #ifdef __cplusplus
 }
 #endif

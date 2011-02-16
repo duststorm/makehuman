@@ -19,31 +19,31 @@ static std::string sGrabPath;
 static std::string sRenderPath;
 static std::string sDocumentsPath;
 
-const char* getExportPath()
+const char* osx_getExportPath()
 {
     sExportPath = [[GeneralPreferences exportPath] UTF8String];
     return sExportPath.c_str();
 }
 
-const char* getModelPath()
+const char* osx_getModelPath()
 {
     sModelPath = [[GeneralPreferences modelPath] UTF8String];
     return sModelPath.c_str();
 }
 
-const char* getGrabPath()
+const char* osx_getGrabPath()
 {
     sGrabPath = [[GeneralPreferences grabPath] UTF8String];
     return sGrabPath.c_str();
 }
 
-const char* getRenderPath()
+const char* osx_getRenderPath()
 {
     sRenderPath = [[GeneralPreferences renderPath] UTF8String];
     return sRenderPath.c_str();
 }
 
-const char* getDocumentsPath()
+const char* osx_getDocumentsPath()
 {
     sDocumentsPath = [[GeneralPreferences documentsPath] UTF8String];
     return sDocumentsPath.c_str();

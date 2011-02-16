@@ -41,7 +41,7 @@ extern "C"
       *
       * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
       */
-    int adjustWorkingDir(const char* inAppAbsPath);
+    int osx_adjustWorkingDir(const char* inAppAbsPath);
 
     /** Gets the path location for Exports. This is usually set by the User Preferences and points to
      * ${USER}/Documents/MakeHuman/exports/ per default.
@@ -50,48 +50,48 @@ extern "C"
      *
      * \return The path to which all exports should be placed to.
      *
-     * \see getDocumentsPath()
-     * \see getModelPath()
-     * \see getGrabPath()
-     * \see getRenderPath()
+     * \see osx_getDocumentsPath()
+     * \see osx_getModelPath()
+     * \see osx_getGrabPath()
+     * \see osx_getRenderPath()
      */
-    const char* getExportPath();
+    const char* osx_getExportPath();
 
     /** Gets the path location for Models. This is usually set by the User Preferences and points to
      * ${USER}/Documents/MakeHuman/models/ per default.
      *
      * \return The path to which all exports should be placed to.
      *
-     * \see getDocumentsPath()
-     * \see getExportPath()
-     * \see getGrabPath()
-     * \see getRenderPath()
+     * \see osx_getDocumentsPath()
+     * \see osx_getExportPath()
+     * \see osx_getGrabPath()
+     * \see osx_getRenderPath()
      */
-    const char* getModelPath();
+    const char* osx_getModelPath();
 
     /** Gets the path location for Screenshots (grabs). This is usually set by the User Preferences and points to
      * ${USER}/Desktop/ per default.
      *
      * \return The path to which all exports should be placed to.
      *
-     * \see getDocumentsPath()
-     * \see getExportPath()
-     * \see getModelPath()
-     * \see getRenderPath()
+     * \see osx_getDocumentsPath()
+     * \see osx_getExportPath()
+     * \see osx_getModelPath()
+     * \see osx_getRenderPath()
      */
-    const char* getGrabPath();
+    const char* osx_getGrabPath();
 
     /** Gets the path location for Renderman ouput. This is usually set by the User Preferences and points to
      * ${USER}/Documents/MakeHuman/renderman per default.
      *
      * \return The path to which all exports should be placed to.
      *
-     * \see getDocumentsPath()
-     * \see getExportPath()
-     * \see getModelPath()
-     * \see getGrabPath()
+     * \see osx_getDocumentsPath()
+     * \see osx_getExportPath()
+     * \see osx_getModelPath()
+     * \see osx_getGrabPath()
      */
-    const char* getRenderPath();
+    const char* osx_getRenderPath();
     
     /** Adjusts the environment in order to work with all supported Ray Tracers.
       *
@@ -99,19 +99,19 @@ extern "C"
       *
       * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
       */
-    int adjustRenderEnvironment();
+    int osx_adjustRenderEnvironment();
 
     /** Gets the path location for MH Documents. This is usually set by the User Preferences and points to
      * ${USER}/Documents/MakeHuman per default.
      *
      * \return The path to which all user documents for makehuman should be placed to.
      *
-     * \see getExportPath()
-     * \see getModelPath()
-     * \see getGrabPath()
-     * \see getRenderPath()
+     * \see osx_getExportPath()
+     * \see osx_getModelPath()
+     * \see osx_getGrabPath()
+     * \see osx_getRenderPath()
      */
-    const char* getDocumentsPath();
+    const char* osx_getDocumentsPath();
 #ifdef __cplusplus
 }
 #endif // #ifdef __cplusplus
