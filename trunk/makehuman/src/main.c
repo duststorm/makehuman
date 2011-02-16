@@ -580,6 +580,15 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     {
         path = getRenderPath();
     }
+    else if (0 == strcmp(typeStr, ""))
+    {
+        path = getDocumentsPath();
+    }
+    else
+    {
+        PyErr_Format(PyExc_ValueError, "Unknown value %s for getPath()!", typeStr);
+        return NULL;
+    }
 #elif __WIN32__  /* default as "exports/" at the current dir for Linux and Windows */
     {
         HRESULT hr;
