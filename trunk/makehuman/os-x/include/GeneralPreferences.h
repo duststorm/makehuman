@@ -17,6 +17,7 @@
     IBOutlet NSPopUpButton *mExportsPathsPUB;
     IBOutlet NSPopUpButton *mGrabPathPUB;
     IBOutlet NSPopUpButton *mRenderPathPUB;
+    IBOutlet NSPopUpButton *mDocumentsPathPUB;
 
 @private
     NSImage *mFolderIcon;
@@ -28,10 +29,12 @@
 -(IBAction)actionSelectExportPath:(id)inSender;
 -(IBAction)actionSelectGrabPath:(id)inSender;
 -(IBAction)actionSelectRenderPath:(id)inSender;
+-(IBAction)actionSelectDocumentsPath:(id)inSender;
 
 +(NSString*)exportPath;
 +(NSString*)modelPath;
 +(NSString*)grabPath;
 +(NSString*)renderPath;
++(NSString*)documentsPath;
 
 @end

@@ -17,6 +17,7 @@ static std::string sModelPath;
 static std::string sExportPath;
 static std::string sGrabPath;
 static std::string sRenderPath;
+static std::string sDocumentsPath;
 
 const char* getExportPath()
 {
@@ -40,6 +41,12 @@ const char* getRenderPath()
 {
     sRenderPath = [[GeneralPreferences renderPath] UTF8String];
     return sRenderPath.c_str();
+}
+
+const char* getDocumentsPath()
+{
+    sDocumentsPath = [[GeneralPreferences documentsPath] UTF8String];
+    return sDocumentsPath.c_str();
 }
 
 #ifndef MAKEHUMAN_AS_MODULE

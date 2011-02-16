@@ -44,38 +44,41 @@ extern "C"
     int adjustWorkingDir(const char* inAppAbsPath);
 
     /** Gets the path location for Exports. This is usually set by the User Preferences and points to
-      * ${USER}/Documents/MakeHuman/exports/ per default.
-      *
-      * \param inAppAbsPath the location to the Applications executeable (inclusive path). This is commonly argv[0] of main().
-      *
-      * \return The path to which all exports should be placed to.
-      *
-      * \see getModelPath()
-      * \see getGrabPath()
-      * \see getRenderPath()
-      */
+     * ${USER}/Documents/MakeHuman/exports/ per default.
+     *
+     * \param inAppAbsPath the location to the Applications executeable (inclusive path). This is commonly argv[0] of main().
+     *
+     * \return The path to which all exports should be placed to.
+     *
+     * \see getDocumentsPath()
+     * \see getModelPath()
+     * \see getGrabPath()
+     * \see getRenderPath()
+     */
     const char* getExportPath();
 
     /** Gets the path location for Models. This is usually set by the User Preferences and points to
-      * ${USER}/Documents/MakeHuman/models/ per default.
-      *
-      * \return The path to which all exports should be placed to.
-      *
-      * \see getExportPath()
-      * \see getGrabPath()
-      * \see getRenderPath()
-      */
+     * ${USER}/Documents/MakeHuman/models/ per default.
+     *
+     * \return The path to which all exports should be placed to.
+     *
+     * \see getDocumentsPath()
+     * \see getExportPath()
+     * \see getGrabPath()
+     * \see getRenderPath()
+     */
     const char* getModelPath();
 
     /** Gets the path location for Screenshots (grabs). This is usually set by the User Preferences and points to
-      * ${USER}/Desktop/ per default.
-      *
-      * \return The path to which all exports should be placed to.
-      *
-      * \see getExportPath()
-      * \see getModelPath()
-      * \see getRenderPath()
-      */
+     * ${USER}/Desktop/ per default.
+     *
+     * \return The path to which all exports should be placed to.
+     *
+     * \see getDocumentsPath()
+     * \see getExportPath()
+     * \see getModelPath()
+     * \see getRenderPath()
+     */
     const char* getGrabPath();
 
     /** Gets the path location for Renderman ouput. This is usually set by the User Preferences and points to
@@ -83,6 +86,7 @@ extern "C"
      *
      * \return The path to which all exports should be placed to.
      *
+     * \see getDocumentsPath()
      * \see getExportPath()
      * \see getModelPath()
      * \see getGrabPath()
@@ -96,6 +100,18 @@ extern "C"
       * \author Hans-Peter Dusel <hdusel@tangerine-soft.de>
       */
     int adjustRenderEnvironment();
+
+    /** Gets the path location for MH Documents. This is usually set by the User Preferences and points to
+     * ${USER}/Documents/MakeHuman per default.
+     *
+     * \return The path to which all user documents for makehuman should be placed to.
+     *
+     * \see getExportPath()
+     * \see getModelPath()
+     * \see getGrabPath()
+     * \see getRenderPath()
+     */
+    const char* getDocumentsPath();
 #ifdef __cplusplus
 }
 #endif // #ifdef __cplusplus

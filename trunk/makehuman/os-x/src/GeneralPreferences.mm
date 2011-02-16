@@ -12,6 +12,7 @@ const NSString *kUserDefaultsKeyExportPath = @"MHExportPath";
 const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
 const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
 const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
+const NSString *kUserDefaultsKeyDocumentsPath = @"MHDocumentsPath";
 
 @interface GeneralPreferences (Private)
 +(void)createPathIfNotExists:(NSString*)inPath;
@@ -21,16 +22,19 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
 -(void)updateExportPath:(NSString*)inPath;
 -(void)updateGrabPath:(NSString*)inPath;
 -(void)updateRenderPath:(NSString*)inPath;
+-(void)updateDocumentsPath:(NSString*)inPath;
 
 -(void)setModelPath:(NSString*)inPath;
 -(void)setExportPath:(NSString*)inPath;
 -(void)setGrabPath:(NSString*)inPath;
 -(void)setRenderPath:(NSString*)inPath;
+-(void)setDocumentsPath:(NSString*)inPath;
 
 +(NSString*)defaultModelPath;
 +(NSString*)defaultExportPath;
 +(NSString*)defaultGrabPath;
 +(NSString*)defaultRenderPath;
++(NSString*)defaultDocumentsPath;
 @end // @interface GeneralPreferences (Private)
 
 @implementation GeneralPreferences
@@ -47,6 +51,7 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
     [self setExportPath:[GeneralPreferences exportPath]];
     [self setGrabPath:  [GeneralPreferences grabPath]];
     [self setRenderPath:[GeneralPreferences renderPath]];
+    [self setDocumentsPath:[GeneralPreferences documentsPath]];
 }
 
 -(IBAction)actionResetPaths:(id)inSender
@@ -55,6 +60,7 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
     [self setExportPath:[GeneralPreferences defaultExportPath]];
     [self setGrabPath:  [GeneralPreferences defaultGrabPath]];
     [self setRenderPath:[GeneralPreferences defaultRenderPath]];
+    [self setDocumentsPath:[GeneralPreferences defaultDocumentsPath]];
 }
 
 -(IBAction)actionSelectModelPath:(NSPopUpButton*)inSender
@@ -136,7 +142,28 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
         if (NSOKButton == rc)
         {
             NSString *selectedPath = [[directorySelectPanel filenames] objectAtIndex:0];
-            [self setGrabPath:selectedPath];
+            [self setRenderPath:selectedPath];
+        }
+    }
+}
+
+-(IBAction)actionSelectDocumentsPath:(id)inSender
+{
+    if (1 == [inSender indexOfSelectedItem])
+    {
+        NSOpenPanel *directorySelectPanel = [NSOpenPanel openPanel];
+        [directorySelectPanel setCanChooseFiles:NO]; // Just directories may be selected
+        [directorySelectPanel setCanChooseDirectories:YES]; // Just directories may be selected
+        [directorySelectPanel setCanCreateDirectories:YES];
+        
+        NSInteger rc = [directorySelectPanel runModalForDirectory:[GeneralPreferences documentsPath] file:nil types:nil];
+        
+        [inSender selectItemAtIndex:0];
+        
+        if (NSOKButton == rc)
+        {
+            NSString *selectedPath = [[directorySelectPanel filenames] objectAtIndex:0];
+            [self setDocumentsPath:selectedPath];
         }
     }
 }
@@ -198,6 +225,19 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
     return s;
 }
 
++(NSString*)documentsPath
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    
+    NSString *s = [ud stringForKey:kUserDefaultsKeyDocumentsPath];
+    if (s == nil)
+    {
+        s = [GeneralPreferences defaultDocumentsPath];
+    }
+    [GeneralPreferences createPathIfNotExists:s];
+    return s;
+}
+
 @end // @implementation GeneralPreferences
 
 
@@ -249,6 +289,15 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
     [ud synchronize];
 }
 
+-(void)setDocumentsPath:(NSString*)inPath
+{
+    [self updateFileSelectPopUpButton:mDocumentsPathPUB fromPath:inPath];
+    
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:inPath forKey:kUserDefaultsKeyDocumentsPath];
+    [ud synchronize];
+}
+
 -(void)updateModelPath:(NSString*)inPath
 {
     [self updateFileSelectPopUpButton:mModelsPathsPUB fromPath:inPath];
@@ -267,6 +316,11 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
 -(void)updateRenderPath:(NSString*)inPath
 {
     [self updateFileSelectPopUpButton:mRenderPathPUB fromPath:inPath];
+}
+
+-(void)updateDocumentsPath:(NSString*)inPath
+{
+    [self updateFileSelectPopUpButton:mDocumentsPathPUB fromPath:inPath];
 }
 
 -(void)updateFileSelectPopUpButton:(NSPopUpButton*)inButton fromPath:(NSString*)inPath
@@ -308,6 +362,11 @@ const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
 +(NSString*)defaultRenderPath
 {
     return [NSString stringWithFormat:@"%@/Documents/MakeHuman/renderman",  NSHomeDirectory()];
+}
+
++(NSString*)defaultDocumentsPath
+{
+    return [NSString stringWithFormat:@"%@/Documents/MakeHuman",  NSHomeDirectory()];
 }
 
 @end // @implementation GeneralPreferences (Private)

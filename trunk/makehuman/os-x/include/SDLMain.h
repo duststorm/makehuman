@@ -14,6 +14,7 @@ extern "C" {
     const char* getModelPath();
     const char* getGrabPath();
     const char* getRenderPath();
+    const char* getDocumentsPath();
 #ifdef __cplusplus
 }
 #endif
