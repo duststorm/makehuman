@@ -458,7 +458,7 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, cons
 			addCopyRotConstraint(fp, '', C_LOCAL, 1, ['Rot', cbone, channels, (0,0,0), False])
 	if copy & U_SCALE:
 		addCopyScaleConstraint(fp, '', 0, 1, ['Scale', cbone, (1,1,1), False])
-	addConstraints(fp, dbone, constraints, 0, 0)
+	addConstraints(fp, dbone, constraints, (1,1,1), (1,1,1))
 	fp.write("  end Posebone\n")
 	return
 
