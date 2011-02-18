@@ -122,10 +122,10 @@ class MeasureTaskView(gui3d.TaskView):
             self.syncSliderLabels()
             
         self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
-        self.eu = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'EU: ');y += 22
-        self.jp = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'JP: ');y += 22
-        self.us = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'US: ');y += 22
-        self.uk = gui3d.TextView(self.unitsBox, [658, y, 9.1], 'UK: ');y += 22
+        self.eu = gui3d.TextView(self.braBox, [658, y, 9.1], 'EU: ');y += 22
+        self.jp = gui3d.TextView(self.braBox, [658, y, 9.1], 'JP: ');y += 22
+        self.us = gui3d.TextView(self.braBox, [658, y, 9.1], 'US: ');y += 22
+        self.uk = gui3d.TextView(self.braBox, [658, y, 9.1], 'UK: ');y += 22
         y+=16
             
     def getMeasure(self, measure):
@@ -146,6 +146,7 @@ class MeasureTaskView(gui3d.TaskView):
     def onResized(self, event):
         
         self.unitsBox.setPosition([event[0] - 150, self.unitsBox.getPosition()[1], 9.0])
+        self.braBox.setPosition([event[0] - 150, self.braBox.getPosition()[1], 9.0])
         
     def hideAllSliders(self):
         for group in self.groupBoxes.itervalues():
