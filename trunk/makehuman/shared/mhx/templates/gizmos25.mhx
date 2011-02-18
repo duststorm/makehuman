@@ -50,6 +50,7 @@ Object GZM_Circle_FK_Hip MESH GZM_Circle_FK_Hip
     end Modifier
   hide False ;
   hide_select False ;
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -129,6 +130,7 @@ Object GZM_Ball MESH GZM_Ball
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -187,6 +189,7 @@ Object GZM_IKBall MESH GZM_IKBall
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -235,6 +238,7 @@ Object GZM_Eyes MESH GZM_Eyes
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -285,6 +289,7 @@ Object GZM_CircleSpine MESH GZM_CircleSpine
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -335,6 +340,7 @@ Object GZM_CircleChest MESH GZM_CircleChest
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -385,6 +391,7 @@ Object GZM_CircleHips MESH GZM_CircleHips
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 # ----------------------------- MESH --------------------- # 
@@ -505,6 +512,7 @@ Object GZM_IK_Hips MESH GZM_IK_Hips
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 
@@ -626,6 +634,7 @@ Object GZM_IK_Shoulder MESH GZM_IK_Shoulder
     Modifier Subsurf SUBSURF
       levels 2 ;
     end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 
 Mesh GZM_Root GZM_Root 
@@ -729,5 +738,213 @@ Object GZM_Root MESH GZM_Root
     Modifier Subsurf SUBSURF
       levels 1 ;
     end Modifier
+  parent Refer Object CustomShapes ;
+end Object
+
+# ----------------------------- MESH --------------------- # 
+
+Mesh GZM_Circle01 GZM_Circle01 
+  Verts
+	v 0.070 0.5 -0.070 ;
+	v 0.099 0.5 0.000 ;
+	v 0.070 0.5 0.070 ;
+	v 0.000 0.5 0.099 ;
+	v -0.070 0.5 0.070 ;
+	v -0.099 0.5 0.000 ;
+	v -0.070 0.5 -0.070 ;
+	v 0.000 0.5 -0.099 ;
+	v 0.000 0.5 0.112 ;
+	v 0.012 0.5 0.099 ;
+	v -0.012 0.5 0.099 ;
+	v 0.012 0.5 0.099 ;
+	v -0.012 0.5 0.099 ;
+	v 0.000 0.5 0.112 ;
+	v 0.000 0.5 0.112 ;
+	v 0.012 0.5 0.099 ;
+	v -0.012 0.5 0.099 ;
+  end Verts
+  Edges
+	e 0 1 ;
+	e 1 2 ;
+	e 2 3 ;
+	e 3 4 ;
+	e 4 5 ;
+	e 5 6 ;
+	e 6 7 ;
+	e 0 7 ;
+	e 9 11 ;
+	e 10 12 ;
+	e 8 13 ;
+	e 8 14 ;
+	e 11 14 ;
+	e 9 15 ;
+	e 12 15 ;
+	e 10 16 ;
+	e 13 16 ;
+  end Edges
+end Mesh
+
+Object GZM_Circle01 MESH GZM_Circle01
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+	Modifier Subsurf SUBSURF
+	  levels 2 ;
+	end Modifier
+  parent Refer Object CustomShapes ;
+end Object
+
+
+# ----------------------------- MESH --------------------- # 
+
+Mesh GZM_Circle025 GZM_Circle025 
+  Verts
+	v 0.178 0.5 -0.178 ;
+	v 0.252 0.5 0.000 ;
+	v 0.178 0.5 0.179 ;
+	v 0.000 0.5 0.252 ;
+	v -0.178 0.5 0.179 ;
+	v -0.252 0.5 0.000 ;
+	v -0.178 0.5 -0.178 ;
+	v 0.000 0.5 -0.252 ;
+	v 0.000 0.5 0.284 ;
+	v 0.032 0.5 0.252 ;
+	v -0.032 0.5 0.252 ;
+	v 0.032 0.5 0.252 ;
+	v -0.032 0.5 0.252 ;
+	v 0.000 0.5 0.284 ;
+	v 0.000 0.5 0.284 ;
+	v 0.032 0.5 0.252 ;
+	v -0.032 0.5 0.252 ;
+  end Verts
+  Edges
+	e 0 1 ;
+	e 1 2 ;
+	e 2 3 ;
+	e 3 4 ;
+	e 4 5 ;
+	e 5 6 ;
+	e 6 7 ;
+	e 0 7 ;
+	e 9 11 ;
+	e 10 12 ;
+	e 8 13 ;
+	e 8 14 ;
+	e 11 14 ;
+	e 9 15 ;
+	e 12 15 ;
+	e 10 16 ;
+	e 13 16 ;
+  end Edges
+end Mesh
+
+Object GZM_Circle025 MESH GZM_Circle025
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+	Modifier Subsurf SUBSURF
+	  levels 2 ;
+	end Modifier
+  parent Refer Object CustomShapes ;
+end Object
+
+
+# ----------------------------- MESH --------------------- # 
+
+Mesh GZM_Circle05 GZM_Circle05 
+  Verts
+	v 0.369 0.5 -0.368 ;
+	v 0.521 0.5 0.000 ;
+	v 0.369 0.5 0.369 ;
+	v 0.000 0.5 0.522 ;
+	v -0.369 0.5 0.369 ;
+	v -0.521 0.5 0.000 ;
+	v -0.369 0.5 -0.368 ;
+	v 0.000 0.5 -0.521 ;
+	v 0.000 0.5 0.587 ;
+	v 0.065 0.5 0.522 ;
+	v -0.065 0.5 0.522 ;
+	v 0.065 0.5 0.522 ;
+	v -0.065 0.5 0.522 ;
+	v 0.000 0.5 0.587 ;
+	v 0.000 0.5 0.587 ;
+	v 0.065 0.5 0.522 ;
+	v -0.065 0.5 0.522 ;
+  end Verts
+  Edges
+	e 0 1 ;
+	e 1 2 ;
+	e 2 3 ;
+	e 3 4 ;
+	e 4 5 ;
+	e 5 6 ;
+	e 6 7 ;
+	e 0 7 ;
+	e 9 11 ;
+	e 10 12 ;
+	e 8 13 ;
+	e 8 14 ;
+	e 11 14 ;
+	e 9 15 ;
+	e 12 15 ;
+	e 10 16 ;
+	e 13 16 ;
+  end Edges
+end Mesh
+
+Object GZM_Circle05 MESH GZM_Circle05
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+	Modifier Subsurf SUBSURF
+	  levels 2 ;
+	end Modifier
+  parent Refer Object CustomShapes ;
+end Object
+
+
+# ----------------------------- MESH --------------------- # 
+
+Mesh GZM_Circle10 GZM_Circle10 
+  Verts
+	v 0.707 0.5 -0.705 ;
+	v 1.000 0.5 0.001 ;
+	v 0.707 0.5 0.708 ;
+	v 0.000 0.5 1.001 ;
+	v -0.707 0.5 0.708 ;
+	v -1.000 0.5 0.001 ;
+	v -0.707 0.5 -0.705 ;
+	v 0.000 0.5 -0.999 ;
+	v 0.000 0.5 1.126 ;
+	v 0.125 0.5 1.001 ;
+	v -0.125 0.5 1.001 ;
+	v 0.125 0.5 1.001 ;
+	v -0.125 0.5 1.001 ;
+	v 0.000 0.5 1.126 ;
+	v 0.000 0.5 1.126 ;
+	v 0.125 0.5 1.001 ;
+	v -0.125 0.5 1.001 ;
+  end Verts
+  Edges
+	e 0 1 ;
+	e 1 2 ;
+	e 2 3 ;
+	e 3 4 ;
+	e 4 5 ;
+	e 5 6 ;
+	e 6 7 ;
+	e 0 7 ;
+	e 9 11 ;
+	e 10 12 ;
+	e 8 13 ;
+	e 8 14 ;
+	e 11 14 ;
+	e 9 15 ;
+	e 12 15 ;
+	e 10 16 ;
+	e 13 16 ;
+  end Edges
+end Mesh
+
+Object GZM_Circle10 MESH GZM_Circle10
+  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
+	Modifier Subsurf SUBSURF
+	  levels 2 ;
+	end Modifier
+  parent Refer Object CustomShapes ;
 end Object
 

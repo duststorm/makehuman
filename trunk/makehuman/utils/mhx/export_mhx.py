@@ -82,6 +82,8 @@ M_All = 0
 expMsk = 0
 theRig = ""
 
+Quick = True
+
 #
 #	RegisteredBlocks: ( local, refer, creator )
 #
@@ -1039,6 +1041,10 @@ def exportObject(ob, fp):
 	for mod in ob.modifiers:
 		exportModifier(mod, fp)
 
+	if Quick:
+		fp.write("end Object\n\n")
+		return 
+		
 	for cns in ob.constraints:
 		exportConstraint(cns, fp)
 
@@ -1138,8 +1144,12 @@ def exportMesh(ob, fp):
 		for e in me.edges:
 			fp.write("	e %d %d ;\n" % (e.vertices[0], e.vertices[1]))
 		e = me.edges[0]
-		writeDir(e, ['vertices'], "	  ", fp)
+		#writeDir(e, ['vertices'], "	  ", fp)
 		fp.write("  end Edges\n")
+
+	if Quick:
+		fp.write("end Mesh\n")
+		return # exportMesh
 
 	for uvtex in me.uv_textures:
 		uvtexName = uvtex.name.replace(' ','_')
@@ -1968,10 +1978,6 @@ def unregister():
 	bpy.types.INFO_MT_file_export.remove(menu_func)
 
 if __name__ == "__main__":
-	try:
-		unregister()
-	except:
-		pass
 	register()
 
 #

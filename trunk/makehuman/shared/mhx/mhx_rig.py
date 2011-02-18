@@ -511,11 +511,10 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 		index = boneGroupIndex(boneGroup)
 		fp.write("    bone_group Refer BoneGroup %s ;\n" % boneGroup)
 
-	(usex,usey,usez) = (0,0,0)
-	(xmin, ymin, zmin) = (-pi, -pi, -pi)
-	(xmax, ymax, zmax) = (pi, pi, pi)
-
-	addConstraints(fp, bone, constraints, lockLoc, lockRot)
+	(uses, mins, maxs) = addConstraints(fp, bone, constraints, lockLoc, lockRot)
+	(usex,usey,usez) = uses
+	(xmin, ymin, zmin) = mins
+	(xmax, ymax, zmax) = maxs
 
 	if not Mhx25:
 		fp.write("\tend posebone\n")
@@ -569,6 +568,10 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 #
 
 def addConstraints(fp, bone, constraints, lockLoc, lockRot):
+	uses = (0,0,0)
+	mins = (-pi, -pi, -pi)
+	maxs = (pi, pi, pi)
+
 	for (label, cflags, inf, data) in constraints:
 		if type(label) == str:
 			typ = label
@@ -595,7 +598,9 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
 		elif typ == 'LimitRot':
 			addLimitRotConstraint(fp, rig, cflags, inf, data)
 			(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
-			#(usex,usey,usez) = data[2]			
+			mins = (xmin, ymin, zmin)
+			maxs = (xmax, ymax, zmax)
+			uses = data[2]			
 		elif typ == 'LimitLoc':
 			addLimitLocConstraint(fp, rig, cflags, inf, data)
 		elif typ == 'LimitScale':
@@ -616,6 +621,7 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
 			print(label)
 			print(typ)
 			raise NameError("Unknown constraint type %s" % typ)
+	return (uses, mins, maxs)
 
 #
 #	addIkConstraint(fp, rig, flags, inf, data, lockLoc, lockRot)
@@ -1390,20 +1396,19 @@ def writeShapeDrivers(fp, drivers, proxy):
 	return
 
 #
-#	writeMuscleDrivers(fp, drivers):
+#	writeMuscleDrivers(fp, drivers, rig):
 # 	("LegForward_L", "StretchTo", expr, [("f", "UpLegDwn_L", "BendLegForward_L")], [(0,1), (deg30,1), (deg45,0)])
 #
 
-def writeMuscleDrivers(fp, drivers):
+def writeMuscleDrivers(fp, drivers, rig):
 	for (bone, cnsName, expr, targs, keypoints)  in drivers:
 		drvVars = []
 		if expr:
 			drvdata = ('SCRIPTED', expr)
 		else:
 			drvdata = 'MIN'
-		defrig = "%sDeformRig" % mh2mhx.theHuman
 		for (var, targ1, targ2) in targs:
-			drvVars.append( (var, 'ROTATION_DIFF', [(defrig, targ1, C_LOC), (defrig, targ2, C_LOC)]) )
+			drvVars.append( (var, 'ROTATION_DIFF', [(rig, targ1, C_LOC), (rig, targ2, C_LOC)]) )
 		writeDriver(fp, True, drvdata, "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, keypoints, drvVars)
 	return
 
@@ -1780,8 +1785,8 @@ def writeControlDrivers(fp):
 	return
 
 def writeDeformDrivers(fp):
-	writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers)
-	writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers)
+	writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
+	writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman+"DeformRig")
 	rig_face_25.FaceDeformDrivers(fp)
 	return
 
