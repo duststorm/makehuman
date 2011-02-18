@@ -45,6 +45,7 @@ import shutil
 import subprocess
 import mh2povray_ini
 import random
+import mh
 from math import atan2, pi, sqrt
 
 # Create an instance of the Hairgenerator class with a global context.
@@ -78,7 +79,7 @@ def povrayExport(obj, app, settings):
     resolution = (app.settings.get('rendering_width', 800), app.settings.get('rendering_height', 600))
 
     reload(mh2povray_ini)
-    path = mh2povray_ini.outputpath
+    path = os.path.join(mh.getPath('render'), mh2povray_ini.outputpath)
     
     format = mh2povray_ini.format if settings['source'] == 'ini' else settings['format']
     action = mh2povray_ini.action if settings['source'] == 'ini' else settings['action']
