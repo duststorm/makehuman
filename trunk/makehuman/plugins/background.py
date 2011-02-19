@@ -129,33 +129,38 @@ class settingsTaskView(gui3d.TaskView) :
         #############    
         self.zoomSlider = gui3d.Slider(self, position=[10, 150, 9], value=2500, min=0.0,max=5000, label = "Zoom background")
         self.panXSlider = gui3d.Slider(self, position=[10, 200, 9], value=250, min=0.0,max=500, label = "Pan X background")
-        self.panYSlider = gui3d.Slider(self, position=[10, 250, 9], value=250, min=0.0,max=500, label = "Pan X background")
+        self.panYSlider = gui3d.Slider(self, position=[10, 250, 9], value=250, min=0.0,max=500, label = "Pan Y background")
         
         @self.zoomSlider.event
         def onChanging(value):
-            self.changeZoom([value, self.zoomSlider.getValue()])
+            self.changeZoom(value)
         @self.zoomSlider.event
         def onChange(value):
-            self.changeZoom([value, self.zoomSlider.getValue()])
+            self.changeZoom(value)
         
         @self.panXSlider.event
         def onChanging(value):
-            self.changePanX([value, self.panXSlider.getValue()])
+            self.changePanX(value)
         @self.panXSlider.event
         def onChange(value):
-            self.changePanX([value, self.panXSlider.getValue()])
+            self.changePanX(value)
         
         @self.panYSlider.event
         def onChanging(value):
-            self.changePanY([value, self.panYSlider.getValue()])
+            self.changePanY(value)
         @self.panYSlider.event
         def onChange(value):
-            self.changePanY([value, self.panYSlider.getValue()])
+            self.changePanY(value)
+            
+        @self.backgroundImage.event
+        def onMouseDragged(event):
+            self.backgroundImage.setPosition([event.x, event.y, 1.0])
             
     def changeZoom(self, zoom):
         
         #bg = self.app.categories['Library'].tasksByName['Background'].backgroundImage
-        self.backgroundImage.mesh.resize(zoom[0] , zoom[0])
+        self.backgroundImage.mesh.resize(zoom, zoom)
+        self.backgroundImage.mesh.setPickable(1)
         self.app.redraw()
         '''if bg.hasTexture():
             bg = self.app.categories['Modelling'].tasksByName['Macro modelling'].backgroundImage
@@ -171,11 +176,11 @@ class settingsTaskView(gui3d.TaskView) :
     def changePanX(self,panX):
         
         #bg = self.app.categories['Library'].tasksByName['Background'].backgroundImage
-        self.backgroundImage.setPosition([panX[1], 10, 9.0])
+        self.backgroundImage.setPosition([panX, self.backgroundImage.getPosition()[1], 1.0])
         self.app.redraw()
         
     def changePanY(self,panY):
         
         #bg = self.app.categories['Library'].tasksByName['Background'].backgroundImage
-        self.backgroundImage.setPosition([10, panY[1], 9.0])
+        self.backgroundImage.setPosition([self.backgroundImage.getPosition()[0], panY, 1.0])
         self.app.redraw()
