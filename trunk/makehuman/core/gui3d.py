@@ -2033,5 +2033,4 @@ class RectangleMesh(module3d.Object3D):
         self.verts[2].co[0] = width
         self.verts[2].co[1] = height
         self.verts[3].co[1] = height
-        self.update()
-        
+        self.update()     

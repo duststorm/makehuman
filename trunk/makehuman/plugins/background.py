@@ -117,26 +117,25 @@ class settingsTaskView(gui3d.TaskView) :
     def __init__(self, category, taskview):
         
         self.backgroundImage = taskview.backgroundImage
+        self.texture = taskview.texture
                                 
         gui3d.TaskView.__init__(self, category, 'Settings', label='settings')
         
         y = 80
         
+        self.lastPos = [0, 0]
+        
         self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=50+36*4+6));y+=50
         
-        #############
-        #SLIDERS
-        #############    
-        self.zoomSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=2500, min=0.0,max=5000, label = "Zoom background")
+        # sliders
+        self.zoomSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=1, min=0.0,max=4, label = "Zoom background")
         y+=36
-        self.panXSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=250, min=0.0,max=500, label = "Pan X background")
+        self.panXSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=self.backgroundImage.getPosition()[0], min=0.0,max=500, label = "Pan X background")
         y+=36
-        self.panYSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=250, min=0.0,max=500, label = "Pan Y background")
+        self.panYSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=self.backgroundImage.getPosition()[1], min=0.0,max=500, label = "Pan Y background")
         y+=40
         
-        #############
-        #RADIO BUTTON
-        #############
+        # toggle button
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
         self.pickableButton = gui3d.ToggleButton(self.backgroundBox, [20, y, 9.2], 'Drag', style=modifierStyle)
         
@@ -162,8 +161,13 @@ class settingsTaskView(gui3d.TaskView) :
             self.changePanY(value)
             
         @self.backgroundImage.event
+        def onMouseDown(event):
+            self.lastPos=[event.x, event.y]
+            
+        @self.backgroundImage.event
         def onMouseDragged(event):
-            self.backgroundImage.setPosition([event.x-self.backgroundImage.getPosition()[0], event.y-self.backgroundImage.getPosition()[1], 1.0])
+            self.backgroundImage.setPosition([self.backgroundImage.getPosition()[0]+event.x-self.lastPos[0], self.backgroundImage.getPosition()[1]+event.y-self.lastPos[1], 1.0])
+            self.lastPos = [event.x, event.y]            
         
         @self.pickableButton.event
         def onClicked(event):
@@ -171,7 +175,13 @@ class settingsTaskView(gui3d.TaskView) :
             self.backgroundImage.mesh.setPickable(self.pickableButton.selected)
             
     def changeZoom(self, zoom):
-        self.backgroundImage.mesh.resize(zoom, zoom)
+        #self.backgroundImage.mesh.resize(self.backgroundImage.mesh.getSize()[0]*zoom/100 +self.backgroundImage.mesh.getSize()[0], self.backgroundImage.mesh.getSize()[1]*zoom/100 +self.backgroundImage.mesh.getSize()[1])
+        #texture = self.backgroundImage.getTexture()
+        if self.texture.width > self.texture.height:
+            self.backgroundImage.setScale(zoom, float(self.texture.height) / float(self.texture.width)*zoom)
+        else:
+            self.backgroundImage.setScale(float(self.texture.height) / float(self.texture.width)*zoom, zoom)
+        #print self.backgroundImage.mesh.getSize(), ' bbox : ', self.backgroundImage.getBBox()
         self.app.redraw()
             
     def changePanX(self,panX):
