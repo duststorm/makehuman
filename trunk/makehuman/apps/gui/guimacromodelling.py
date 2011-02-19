@@ -45,6 +45,9 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.muscleSlider = gui3d.Slider(self, position=[10, y, 9.02], value=0.5, label = "Tone");y+=36
         self.weightSlider = gui3d.Slider(self, position=[10, y, 9.03], value=0.5, label = "Weight");y+=36
         self.heightSlider = gui3d.Slider(self, position=[10, y, 9.04], value=0.0, min=-1.0, max=1.0, label = "Height");y+=36
+        
+        # Macro Radial Widget
+        #self.radialWidget = gui3d.Radial(self, position=[10, 400, 9.01], value=0.5, label = "Radial")
 
         #hair update only necessary for : gender, age , height
         
