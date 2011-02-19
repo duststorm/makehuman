@@ -40,7 +40,6 @@ import gui3d
 import guimacromodelling
 import guidetailmodelling
 import os
-import background
 
 class ModellingCategory(gui3d.Category):
 
