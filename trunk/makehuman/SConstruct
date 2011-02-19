@@ -30,11 +30,11 @@ if not env.GetOption('clean'):
 env=conf.Finish()
 
 # Build application
-env.Program("makehuman", Glob("src/*.c"))
+env.Program("makehuman", ["core.c", "glmodule.c", "main.c"])
 
 # Build module
 moduleEnv = env.Clone(CPPDEFINES = "MAKEHUMAN_AS_MODULE", SHLIBPREFIX = "")
 if platform.system() == "Windows":
     moduleEnv["SHLIBSUFFIX"] = ".pyd"
-moduleEnv.LoadableModule("mh", Glob("src/*.c"))
+moduleEnv.LoadableModule("mh", ["core.c", "glmodule.c", "main.c"])
 
