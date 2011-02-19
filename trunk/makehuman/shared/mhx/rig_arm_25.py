@@ -346,15 +346,15 @@ ArmDeformArmature = [
 	('Hand_R',			handRoll, 'LoArm3_R', F_DEF, L_MAIN, NoBB),
 
 	# Shoulder deform
-	('ArmPit_L',			0.0, 'Spine2', F_DEF, L_DEF, NoBB),
-	('Pectoralis_L',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
-	('Trapezeus_L',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
+	('ArmPit_L',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('Pectoralis_L',		0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('Trapezeus_L',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
 	#('LatDorsi_L',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
 	('Deltoid_L',			0.0, 'Shoulder_L', F_DEF, L_DEF, NoBB),
 
-	('ArmPit_R',			0.0, 'Spine2', F_DEF, L_DEF, NoBB),
-	('Pectoralis_R',		0.0, 'Spine2', F_DEF, L_DEF, NoBB),
-	('Trapezeus_R',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
+	('ArmPit_R',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('Pectoralis_R',		0.0, 'Spine3', F_DEF, L_DEF, NoBB),
+	('Trapezeus_R',			0.0, 'Spine3', F_DEF, L_DEF, NoBB),
 	#('LatDorsi_R',			0.0, 'Spine1', F_DEF, L_DEF, NoBB),
 	('Deltoid_R',			0.0, 'Shoulder_R', F_DEF, L_DEF, NoBB),
 
@@ -538,7 +538,7 @@ def ArmDeformPoses(fp):
 	
 	# Shoulder	
 	addPoseBone(fp, 'ShoulderPivot_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'Shoulder_L', (1,1,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Rot', 'Shoulder_L', (1,1,1), (0,0,0), False])])
 	
 	addPoseBone(fp, 'ShoulderUp_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	
@@ -548,7 +548,7 @@ def ArmDeformPoses(fp):
 	
 	
 	addPoseBone(fp, 'ShoulderPivot_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'Shoulder_R', (1,1,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Rot', 'Shoulder_R', (1,1,1), (0,0,0), False])])
 	
 	addPoseBone(fp, 'ShoulderUp_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 	
@@ -558,11 +558,11 @@ def ArmDeformPoses(fp):
 
 
 	addPoseBone(fp, 'ShoulderTwist_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), DmodUpArm,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'UpArm_L', (1,1,1), (0,0,0), False]),
+		[('CopyRot', 0, 0.5, ['Rot', 'UpArm_L', (1,1,1), (0,0,0), False]),
 		 ('StretchTo', C_DEFRIG, 1, ['Stretch', 'UpArm2_L', 0])])
 
 	addPoseBone(fp, 'ShoulderTwist_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), DmodUpArm,
-		[('CopyRot', C_LOCAL, 0.5, ['Rot', 'UpArm_R', (1,1,1), (0,0,0), False]),
+		[('CopyRot', 0, 0.5, ['Rot', 'UpArm_R', (1,1,1), (0,0,0), False]),
 		 ('StretchTo', C_DEFRIG, 1, ['Stretch', 'UpArm2_R', 0])])	
 	
 
