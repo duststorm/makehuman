@@ -63,6 +63,8 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
   PyObject *_m, *_n, *_result;
   double *m, *n, *result; 
   int i,j,k, index, resultLen;
+  double alpha = 1;
+  double beta = 0;
 
   if (!PyArg_ParseTuple(args, "OOiii", &_m, &_n, &i, &j, &k))
     return NULL;
@@ -84,7 +86,8 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
   result = malloc(resultLen*sizeof(double));
     
   //convert to python list
-  if (!dgemm_("N", "B", i, k, j, 1, m, i, n, j, 0, result, i))
+
+  if (!dgemm_("N", "B", &i, &k, &j, &alpha, m, &i, n, &j, &beta, result, &i))
   {
     for (index = 0; index< resultLen; index++)
     {
@@ -144,3 +147,9 @@ static PyMethodDef EmbMethods[] =
     //{"mvmul", mh_dgemv, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
+
+PyMODINIT_FUNC
+initlinalg(void)
+{
+    (void) Py_InitModule("linalg", EmbMethods);
+}
