@@ -1777,7 +1777,7 @@ def writeControlDrivers(fp):
 
 def writeDeformDrivers(fp):
 	writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
-	writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman+"DeformRig")
+	writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman)
 	rig_face_25.FaceDeformDrivers(fp)
 	return
 
