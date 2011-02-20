@@ -125,7 +125,7 @@ class settingsTaskView(gui3d.TaskView) :
         
         self.lastPos = [0, 0]
         
-        self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=50+36*4+6));y+=50
+        self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6));y+=25
         
         # sliders
         self.zoomSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=1, min=0.0,max=4, label = "Zoom background")
@@ -133,7 +133,7 @@ class settingsTaskView(gui3d.TaskView) :
         self.panXSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=self.backgroundImage.getPosition()[0], min=0.0,max=500, label = "Pan X background")
         y+=36
         self.panYSlider = gui3d.Slider(self.backgroundBox, position=[10, y, 9.2], value=self.backgroundImage.getPosition()[1], min=0.0,max=500, label = "Pan Y background")
-        y+=40
+        y+=36
         
         # toggle button
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
