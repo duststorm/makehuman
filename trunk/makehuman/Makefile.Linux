@@ -1,4 +1,4 @@
-CSRCS = $(wildcard src/*.c)
+CSRCS = src/core.c src/glmodule.c src/main.c
 
 DEPS = $(addsuffix .d,$(basename $(CSRCS) $(CCSRCS) ))
 OBJS = $(addsuffix .o,$(basename $(CSRCS) $(CCSRCS) ))
