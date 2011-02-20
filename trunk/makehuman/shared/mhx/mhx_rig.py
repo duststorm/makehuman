@@ -398,15 +398,6 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags, constr
 	addPoseBone(fp, bone, None, None, (1,1,1), (1-fX,1-fY,1-fZ), (0,0,0), (1,1,1), pflags, constraints)
 	return
 
-def addDeformIK(fp, bone, target, pole):
-	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
-		[('IK', 0, 1, ['IK', target, 1, pole, (True, False,True)])])
-'''
-def addDeformIK2(fp, bone, iktar, fktar, ikpole, fkpole, pflags, constraints):
-	addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), pflags, constraints +
-		[('IK', 0, 1, ['RotIK', iktar, 1, ikpole, (True, False,True)]),
-		 ('IK', 0, 1, ['RotFK', fktar, 1, fkpole, (True, False,True)])])
-'''
 def addStretchBone(fp, bone, target, parent):
 	addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
 		[('StretchTo', 0, 1, ['Stretch', target, 0]),
@@ -452,7 +443,10 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, cons
 	if copy & U_LOC:
 		addCopyLocConstraint(fp, '', 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), False])
 	if copy & U_ROT:
-		addCopyRotConstraint(fp, '', 0, 1, ['Rot', cbone, channels, (0,0,0), False])
+		if flags == (1,1,1):
+			addCopyRotConstraint(fp, '', 0, 1, ['Rot', cbone, channels, (0,0,0), False])
+		else:
+			addCopyRotConstraint(fp, '', C_LOCAL, 1, ['Rot', cbone, channels, (0,0,0), False])
 	if copy & U_SCALE:
 		addCopyScaleConstraint(fp, '', 0, 1, ['Scale', cbone, (1,1,1), False])
 	addConstraints(fp, dbone, constraints, (1,1,1), (1,1,1))

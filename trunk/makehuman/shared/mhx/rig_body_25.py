@@ -121,13 +121,13 @@ BodyControlArmature = [
 	('Spine1',			0.0, 'Root', F_WIR, L_SPINEFK, NoBB),
 	('Spine2',			0.0, 'Spine1', F_WIR, L_SPINEFK, NoBB),
 	('Spine3',			0.0, 'Spine2', F_WIR, L_SPINEFK, NoBB),
-	('Spine4',			0.0, 'Spine3', F_WIR, L_HELP, NoBB),
+	#('Spine4',			0.0, 'Spine3', F_WIR, L_HELP, NoBB),
 
 	('Shoulders',		0.0, 'Root', F_WIR, L_SPINEIK, NoBB),
 	('SpineBender',		0.0, 'Root', 0, L_HELP, NoBB),
 
-	('LowerNeck',		0.0, 'Spine3', F_WIR, L_HELP, NoBB),
-	('Neck',			0.0, 'LowerNeck', F_WIR, L_SPINEIK+L_SPINEFK+L_HEAD, NoBB),
+	#('LowerNeck',		0.0, 'Spine3', F_WIR, L_HELP, NoBB),
+	('Neck',			0.0, 'Spine3', F_WIR, L_SPINEIK+L_SPINEFK+L_HEAD, NoBB),
 	('Head',			0.0, 'Neck', F_WIR, L_SPINEIK+L_SPINEFK+L_HEAD, NoBB),
 
 	('Rib',				0.0, 'Spine3', F_DEF, L_DEF, NoBB),
@@ -146,10 +146,10 @@ BodyDeformArmature = [
 	('Spine1',			0.0, 'Root', F_DEF+F_CON, L_MAIN, (1,1,3) ),
 	('Spine2',			0.0, 'Spine1', F_DEF+F_CON, L_MAIN, (1,1,3) ),
 	('Spine3',			0.0, 'Spine2', F_DEF+F_CON, L_MAIN, (1,1,3) ),
-	('Spine4',			0.0, 'Spine3', F_CON, L_HELP, NoBB),
+	#('Spine4',			0.0, 'Spine3', F_CON, L_HELP, NoBB),
 
-	('LowerNeck',		0.0, 'Spine3', F_WIR, L_HELP, NoBB),
-	('Neck',			0.0, 'LowerNeck', F_DEF+F_CON, L_MAIN, (1,1,3) ),
+	#('LowerNeck',		0.0, 'Spine3', F_WIR, L_HELP, NoBB),
+	('Neck',			0.0, 'Spine3', F_DEF+F_CON, L_MAIN, (1,1,3) ),
 	('Head',			0.0, 'Neck', F_DEF+F_CON, L_MAIN, NoBB),
 
 	('Rib',				0.0, 'Spine3', F_DEF, L_MAIN, NoBB),
@@ -203,7 +203,7 @@ def BodyControlPoses(fp):
 		 ('CopyRot', C_LOCAL, 0, ['Rot', 'SpineBender', (1,1,1), (0,0,0), False]),
 	])
 
-	addPoseBone(fp,  'Spine4', None, 'Spine', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	#addPoseBone(fp,  'Spine4', None, 'Spine', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	# Spine IK
 	addPoseBone(fp,  'Shoulders', 'GZM_IK_Shoulder', 'Spine', (0,0,0), (1,0,1), (1,1,1), (1,1,1), 0,
@@ -216,7 +216,7 @@ def BodyControlPoses(fp):
 	])
 
 	# Neck and head
-	addPoseBone(fp,  'LowerNeck', None, 'Spine', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	#addPoseBone(fp,  'LowerNeck', None, 'Spine', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp,  'Neck', 'MHNeck', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
  		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-60*D,40*D, -45*D,45*D, -60*D,60*D), (1,1,1)])])
@@ -250,9 +250,9 @@ def BodyDeformPoses(fp):
 	copyDeform(fp,'Spine1', 0, U_LOC+U_ROT, 'MHDefSpine1', [])
 	copyDeform(fp,'Spine2', 0, U_ROT, 'MHDefSpine2', [])
 	copyDeform(fp,'Spine3', 0, U_ROT, 'MHDefChest', [])
-	copyDeform(fp,'Spine4', 0, U_ROT, None, [])
+	#copyDeform(fp,'Spine4', 0, U_ROT, None, [])
 
-	copyDeform(fp,'LowerNeck', 0, U_LOC+U_ROT, None, [])
+	#copyDeform(fp,'LowerNeck', 0, U_LOC+U_ROT, None, [])
 	copyDeform(fp,'Neck', 0, U_ROT, 'MHDefNeck', [])
 	copyDeform(fp,'Head', 0, U_ROT, 'MHDefHead', [])
 
