@@ -72,6 +72,10 @@ LegJoints = [
 ]
 
 LegHeadsTails = [
+	# Hip. Apparently necessary for good mocap
+	('Hip_L',			'spine3', 'r-upper-leg'),
+	('Hip_R',			'spine3', 'l-upper-leg'),
+
 	# Deform 
 	('UpLeg_L',			'r-upper-leg', 'r-knee'),
 	('UpLeg1_L',		'r-upper-leg', 'r-upleg1'),
@@ -142,8 +146,6 @@ LegHeadsTails = [
 	('KneePT_R',			'l-knee-pt', ('l-knee-pt', offs)),
 	('KneeLinkPT_L',		'r-knee', 'r-knee-pt'),
 	('KneeLinkPT_R',		'l-knee', 'l-knee-pt'),
-	('KneePTFK_L',			'r-knee-pt', ('r-knee-pt', offs)),
-	('KneePTFK_R',			'l-knee-pt', ('l-knee-pt', offs)),
 ]
 
 #
@@ -159,6 +161,7 @@ footCtrlRoll = 0.0
 
 LegControlArmature = [
 	# Leg
+	#('Hip_L',			0, 'Hips', 0, L_HELP, NoBB),
 	('UpLeg_L',			upLegRoll, 'Hips', F_WIR, L_LLEGFK, NoBB),
 	('LoLeg_L',			loLegRoll, 'UpLeg_L', F_WIR, L_LLEGFK, NoBB),
 	('Foot_L',			footRoll, 'LoLeg_L', F_WIR+F_CON, L_LLEGFK, NoBB),
@@ -169,6 +172,7 @@ LegControlArmature = [
 	('Ankle_L',			0, 'FootRev_L', 0, L_HELP, NoBB),
 	('LegFK_L',			footCtrlRoll, 'Toe_L', 0, L_HELP, NoBB),
 
+	#('Hip_R',			0, 'Hips', 0, L_HELP, NoBB),
 	('UpLeg_R',			-upLegRoll, 'Hips', F_WIR, L_RLEGFK, NoBB),
 	('LoLeg_R',			-loLegRoll, 'UpLeg_R', F_WIR, L_RLEGFK, NoBB),
 	('Foot_R',			-footRoll, 'LoLeg_R', F_WIR+F_CON, L_RLEGFK, NoBB),
@@ -192,7 +196,8 @@ LegControlArmature = [
 
 LegDeformArmature = [
 	# Deform
-	('UpLeg1_L',		upLegRoll, 'Hips', F_DEF, L_DEF, NoBB),
+	#('Hip_L',			0, 'Hips', 0, L_MAIN, NoBB),
+	('UpLeg1_L',		upLegRoll, 'Hips', F_DEF, L_MAIN, NoBB),
 	('UpLeg2_L',		upLegRoll, 'UpLeg1_L', F_DEF+F_CON, L_MAIN,(0,0,5) ),
 	('UpLeg3_L',		upLegRoll, 'UpLeg2_L', F_DEF+F_CON, L_MAIN, NoBB),
 	('LoLeg_L',			loLegRoll, 'UpLeg3_L', F_DEF, L_MAIN, NoBB),
@@ -200,7 +205,8 @@ LegDeformArmature = [
 	('Foot_L',			footRoll, 'LoLeg_L', F_DEF+F_CON, L_MAIN, NoBB),
 	('Toe_L',			toeRoll, 'Foot_L', F_DEF, L_MAIN, NoBB),
 
-	('UpLeg1_R',		upLegRoll, 'Hips', F_DEF, L_DEF, NoBB),
+	#('Hip_R',			0, 'Hips', 0, L_MAIN, NoBB),
+	('UpLeg1_R',		upLegRoll, 'Hips', F_DEF, L_MAIN, NoBB),
 	('UpLeg2_R',		upLegRoll, 'UpLeg1_R', F_DEF+F_CON, L_MAIN,(0,0,5) ),
 	('UpLeg3_R',		upLegRoll, 'UpLeg2_R', F_DEF+F_CON, L_MAIN, NoBB),
 	('LoLeg_R',			-loLegRoll, 'UpLeg3_R', F_DEF, L_MAIN, NoBB),
@@ -372,7 +378,7 @@ def LegDeformPoses(fp):
 	copyDeform(fp, 'LoLeg_L', DmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
 
 	addPoseBone(fp, 'LoLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), DmodLoLeg,
-		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_L', (1,0,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Rot', 'LoLeg_L', (1,1,1), (0,0,0), False])])
 
 	copyDeform(fp, 'Foot_L', DmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
 
@@ -388,7 +394,7 @@ def LegDeformPoses(fp):
 	copyDeform(fp, 'LoLeg_R', DmodLoLeg, U_LOC+U_ROT+U_SCALE, 'MHDefLeg', [])
 
 	addPoseBone(fp, 'LoLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), DmodLoLeg,
-		[('CopyRot', C_LOCAL, 0, ['Rot', 'LoLeg_R', (1,0,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Rot', 'LoLeg_R', (1,1,1), (0,0,0), False])])
 
 	copyDeform(fp, 'Foot_R', DmodFoot, U_LOC+U_ROT, 'MHDefFoot', [])
 

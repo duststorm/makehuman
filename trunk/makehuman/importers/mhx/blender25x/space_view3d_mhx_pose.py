@@ -771,8 +771,8 @@ ParentConstraintDrivers = {
 	'Elbow_R' :		MasterDrivers,
 	'Wrist_L' :		MasterDrivers,
 	'Wrist_R' :		MasterDrivers,
-	'Leg_L' :		MasterDrivers,
-	'Leg_R' :		MasterDrivers,
+	'LegIK_L' :		MasterDrivers,
+	'LegIK_R' :		MasterDrivers,
 
 	'Gaze' : 	[
 		('Head', ['GazeParent'], 'x1==0') ,

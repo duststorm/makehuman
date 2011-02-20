@@ -83,8 +83,6 @@ BodyHeadsTails = [
 	('Root',				'root-tail', 'spine3'),
 	('BendRoot',			'spine3', ('spine3', yunit)),
 	('Hips',				'spine3', 'root-tail'),
-	#('Hip_L',				'spine3', 'r-upper-leg'),
-	#('Hip_R',				'spine3', 'l-upper-leg'),
 
 	('Pelvis',				'pelvis', 'spine3'),
 	('Spine1',				'spine3', 'spine2'),
@@ -119,8 +117,6 @@ BodyControlArmature = [
 	('Root',			0.0, Master, F_WIR, L_MAIN+L_SPINEFK+L_SPINEIK, NoBB),
 	('BendRoot',		0.0, 'Root', 0, L_HELP, NoBB),
 	('Hips',			0.0, 'Root', F_WIR, L_SPINEFK+L_SPINEIK, NoBB),
-	#('Hip_L',			0.0, 'Hips', 0, L_HELP, NoBB),
-	#('Hip_R',			0.0, 'Hips', 0, L_HELP, NoBB),
 
 	('Spine1',			0.0, 'Root', F_WIR, L_SPINEFK, NoBB),
 	('Spine2',			0.0, 'Spine1', F_WIR, L_SPINEFK, NoBB),
@@ -146,8 +142,6 @@ BodyControlArmature = [
 BodyDeformArmature = [
 	('Root',			0.0, None, F_WIR, L_MAIN+L_SPINEFK, NoBB),
 	('Hips',			0.0, 'Root', F_DEF, L_MAIN, NoBB),
-	#('Hip_L',			0.0, 'Hips', 0, L_HELP, NoBB),
-	#('Hip_R',			0.0, 'Hips', 0, L_HELP, NoBB),
 
 	('Spine1',			0.0, 'Root', F_DEF+F_CON, L_MAIN, (1,1,3) ),
 	('Spine2',			0.0, 'Spine1', F_DEF+F_CON, L_MAIN, (1,1,3) ),

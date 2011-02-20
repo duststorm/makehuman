@@ -18,12 +18,12 @@
 
 # <pep8 compliant>
 
-# Project Name:        MakeHuman
+# Project Name:		MakeHuman
 # Product Home Page:   http://www.makehuman.org/
-# Code Home Page:      http://code.google.com/p/makehuman/
-# Authors:             Thomas Larsson
+# Code Home Page:	  http://code.google.com/p/makehuman/
+# Authors:			 Thomas Larsson
 # Script copyright (C) MakeHuman Team 2001-2011
-# Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
+# Coding Standards:	See http://sites.google.com/site/makehumandocs/developers-guide
 
 """
 Abstract
@@ -84,6 +84,7 @@ Batch run:
 import bpy, os, mathutils, math, time
 from mathutils import *
 from bpy.props import *
+from io_utils import ImportHelper
 
 ###################################################################################
 #	BVH importer. 
@@ -515,7 +516,7 @@ Xx1Armature = {
 	'right toe' : 'Toe_R',
 }
 
-BlugArmature = {
+HDMArmature = {
 	'hip' : 'Root',
 	'lhipjoint' : 'Hip_L',
 	'lfemur' : 'UpLeg_L',
@@ -536,14 +537,14 @@ BlugArmature = {
 	'lclavicle' : 'Shoulder_L',
 	'lhumerus' : 'UpArm_L',
 	'lradius' : 'LoArm_L',
-	'lwrist' : 'Wrist_L',
+	'lwrist' : 'Hand0_L',
 	'lhand' : 'Hand_L',
 	'lfingers' : None,
 	'lthumb' : 'Finger1_L',
 	'rclavicle' : 'Shoulder_R',
 	'rhumerus' : 'UpArm_R',
 	'rradius' : 'LoArm_R',
-	'rwrist' : 'Wrist_R',
+	'rwrist' : 'Hand0_R',
 	'rhand' : 'Hand_R',
 	'rfingers' : None,
 	'rthumb' : 'Finger1_R',
@@ -679,7 +680,7 @@ theArmatures = {
 	'MB' : MBArmature, 
 	'OSU' : OsuArmature,
 	'XX1' : Xx1Armature,
-	'Blug' : BlugArmature,
+	'HDM' : HDMArmature,
 	'3dsMax' : MaxArmature,
 	'McpD' : MocapDataArmature,
 	'Daz' : DazArmature,
@@ -692,6 +693,15 @@ MBFixes = {
 	'LoLeg_R' : ( Matrix.Rotation(0.2, 3, 'Y'), None),
 	'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), None),
 	'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), None),
+	#'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), None),
+	#'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), None),
+}
+
+HDMFixes = {
+	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), None),
+	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), None),
+	'LoLeg_L' : ( Matrix.Rotation(-0.4, 3, 'Y'), None),
+	'LoLeg_R' : ( Matrix.Rotation(0.4, 3, 'Y'), None),
 	'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), None),
 	'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), None),
 }
@@ -703,10 +713,10 @@ XX1Fixes = {}
 MaxFixes = {
 	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), None),
 	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), None),
-	'LoLeg_L' : ( Matrix.Rotation(-0.2, 3, 'Y'), None),
-	'LoLeg_R' : ( Matrix.Rotation(0.2, 3, 'Y'), None),
-	'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), None),
-	'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), None),
+	'LoLeg_L' : ( Matrix.Rotation(-0.3, 3, 'Y'), None),
+	'LoLeg_R' : ( Matrix.Rotation(0.3, 3, 'Y'), None),
+	#'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), None),
+	#'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), None),
 
 	'UpArm_L' :  (Matrix.Rotation(1.57, 3, 'Z'), 'XZ'),
 	'LoArm_L' :  (None, 'XZ'),
@@ -733,7 +743,7 @@ FixesList = {
 	'MB'  : MBFixes,
 	'OSU' : OsuFixes,
 	'XX1' : XX1Fixes,
-	'Blug' : MBFixes,
+	'HDM' : HDMFixes,
 	'3dsMax': MaxFixes,
 	'McpD': McpdFixes,
 	'Daz' : DazFixes,
@@ -748,67 +758,53 @@ FixesList = {
 
 MhxFkBoneList = [
 	'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'Shoulders', 'LowerNeck', 'Neck', 'Head', 'Sternum',
-	'Shoulder_L', 'ShoulderEnd_L', 'ArmLoc_L', 'UpArm_L', 'LoArm_L', 'Wrist_L', 'Hand_L', 'ElbowPT_L',
-	'Shoulder_R', 'ShoulderEnd_R', 'ArmLoc_R', 'UpArm_R', 'LoArm_R', 'Wrist_R', 'Hand_R', 'ElbowPT_R',
-	'Hip_L', 'LegLoc_L', 'UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L',
-	'Hip_R', 'LegLoc_R', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R',
-	'Leg_L', 'Ankle_L', 'KneePT_L',
-	'Leg_R', 'Ankle_R', 'KneePT_R',
+	'Shoulder_L', 'ShoulderEnd_L', 'ArmLoc_L', 'UpArm_L', 'LoArm_L', 'Hand0_L', 'Hand_L',
+	'Shoulder_R', 'ShoulderEnd_R', 'ArmLoc_R', 'UpArm_R', 'LoArm_R', 'Hand0_R', 'Hand_R',
+	'Hip_L', 'LegLoc_L', 'UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'LegFK_L',
+	'Hip_R', 'LegLoc_R', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R', 'LegFK_R',
 ]
 
 F_Rev = 1
 F_LR = 2
 
-MhxIkArmature = {
-	'UpArmIK' : ('UpArm', F_LR, 'Shoulder'),
-	'LoArmIK' : ('LoArm', F_LR, 'UpArmIK'),
-	'ElbowIK' : ('LoArm', 0, None),
-	'HandIK' : ('Hand', F_LR, 'LoArmIK'),
-	'WristIK' : ('Hand', 0, None),
-	'ElbowPTIK' : ('ElbowPT', 0, None),
+#
+#	theIkParent
+#	bone : (realParent, fakeParent, copyRot, reverse)
+#
 
-	'UpLegIK' : ('UpLeg', 0, 'Hip'),
-	'LoLegIK' : ('LoLeg', F_LR, 'UpLegIK'),
-	#'FootIK' : ('Foot', 0, None),
-	#'ToeIK' : ('Toe', F_LR, 'FootIK'),
+MhxIkParents = {
+	'Elbow_L' : (None, 'UpArm_L', None, False),
+	'ElbowPT_L' : ('Shoulder_L', 'UpArm_L', None, False),
+	'Wrist_L' : (None, 'LoArm_L', 'Hand_L', False),
+	'LegIK_L' : (None, 'Toe_L', 'LegFK_L', False),
+	'KneePT_L' : ('Hips', 'UpLeg_L', None, False),
+	'ToeRev_L' : ('LegIK_L', 'Foot_L', 'Toe_L', True),
+	'FootRev_L' : ('ToeRev_L', 'LoLeg_L', 'Foot_L', True),
+	'Ankle_L' : ('FootRev_L', 'LoLeg_L', None, False),
 
-	'LegIK' : ('Leg', 0, None),
-	'ToeRevIK' : ('Toe', F_LR+F_Rev, 'LegIK'),
-	'FootRevIK' : ('Foot', F_LR+F_Rev, 'ToeRevIK'),
-	'AnkleIK' : ('Ankle', F_LR, 'FootRevIK'),
-	'KneePTIK' : ('KneePT', 0, None),
+	'Elbow_R' : (None, 'UpArm_R', None, False),
+	'ElbowPT_R' : ('Shoulder_R', 'UpArm_R', None, False),
+	'Wrist_R' : (None, 'LoArm_R', 'Hand_R', False),
+	'LegIK_R' : (None, 'Toe_R', 'LegFK_R', False),
+	'KneePT_R' : ('Hips', 'UpLeg_R', None, False),
+	'ToeRev_R' : ('LegIK_R', 'Foot_R', 'Toe_R', True),
+	'FootRev_R' : ('ToeRev_R', 'LoLeg_R', 'Foot_R', True),
+	'Ankle_R' : ('FootRev_R', 'LoLeg_R', None, False),
 }
 
-theIkParent = {
-	'Elbow_L' : 'UpArm_L',
-	'ElbowPT_L' : 'UpArm_L',
-	'Wrist_L' : 'LoArm_L',
-	'Ankle_L' : 'LoLeg_L',
-	'Leg_L' : 'LoLeg_L',
-	'FootRev_L' : 'LoLeg_L',
-	'ToeRev_L' : 'Foot_L',
+MhxIkBoneList = [
+	'Elbow_L', 'ElbowPT_L', 'Wrist_L',
+	'LegIK_L', 'KneePT_L', # 'ToeRev_L', 'FootRev_L', 'Ankle_L',
 
-	'Elbow_R' : 'UpArm_R',
-	'ElbowPT_R' : 'UpArm_R',
-	'Wrist_R' : 'LoArm_R',
-	'Ankle_R' : 'LoLeg_R',
-	'Leg_R' : 'LoLeg_R',
-	'FootRev_R' : 'LoLeg_R',
-	'ToeRev_R' : 'Foot_R',
-}
+	'Elbow_R', 'ElbowPT_R', 'Wrist_R',
+	'LegIK_R', 'KneePT_L', # 'ToeRev_R', 'FootRev_R', 'Ankle_R',
+]
+
+
 
 MhxGlobalBoneList = [
 	'Root', 
 ]
-'''
-	'UpArm_L', 'LoArm_L', 'Hand_L',
-	'UpArm_R', 'LoArm_R', 'Hand_R',
-	'UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L',
-	'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R',
-	'Leg_L', 'Ankle_L',
-	'Leg_R', 'Ankle_R',
-]
-'''
 
 ###################################################################################
 #
@@ -954,7 +950,7 @@ def getParentName(b):
 #
 
 def guessTargetArmature(trgRig):
-	global theTarget
+	global theTarget, theFkBoneList, theIkBoneList, theGlobalBoneList, theIkParents, theSrcBone, theTrgBone
 	bones = trgRig.data.bones.keys()
 	if 'KneePT_L' in bones:
 		theTarget = T_MHX
@@ -968,20 +964,14 @@ def guessTargetArmature(trgRig):
 	else:
 		print("Bones", bones)
 		raise NameError("Did not recognize target armature")
-	setupTargetArmature()
-	return
 
-def testTargetRig(bones, rigBones):
-	for (b, mb) in rigBones:
-		if b not in bones:
-			return False
-	return True
+	print("Target armature %s" % theTarget)
 
-def setupTargetArmature():
-	global theFkBoneList, theGlobalBoneList, theSrcBone, theTrgBone
 	if theTarget == T_MHX:
 		theFkBoneList = MhxFkBoneList
+		theIkBoneList = MhxIkBoneList
 		theGlobalBoneList = MhxGlobalBoneList
+		theIkParents = MhxIkParents
 	else:
 		theFkBoneList = []
 		theGlobalBoneList = []
@@ -998,6 +988,13 @@ def setupTargetArmature():
 			if src in MhxGlobalBoneList:
 				theGlobalBoneList.append(trg)
 	return
+
+
+def testTargetRig(bones, rigBones):
+	for (b, mb) in rigBones:
+		if b not in bones:
+			return False
+	return True
 
 #	end supported target armatures
 ###################################################################################
@@ -1175,10 +1172,7 @@ def copyAnglesIK(context):
 	insertAnimation(context, trgRig, trgAnimations, theFkBoneList)
 	onoff = toggleLimitConstraints(trgRig)
 	setLimitConstraints(trgRig, 0.0)
-	if theTarget == T_MHX:
-		poseTrgIkBonesMHX(context, trgRig, trgAnimations)
-	elif theTarget == T_Game or theTarget == T_Rorkimaru:
-		poseTrgIkBonesGame(context, trgRig, trgAnimations)
+	poseTrgIkBones(context, trgRig, trgAnimations)
 	setInterpolation(trgRig)
 	if onoff == 'OFF':
 		setLimitConstraints(trgRig, 1.0)
@@ -1289,11 +1283,8 @@ class CAnimData():
 		self.offsetRest = None
 		self.matrixRest = None
 		self.inverseRest = None
-		self.matrixRel = None
-		self.inverseRel = None
 
 		self.heads = {}
-		self.tails = {}
 		self.quats = {}
 		self.matrices = {}
 		self.name = name
@@ -1318,7 +1309,7 @@ def createSourceAnimation(context, rig):
 def createTargetAnimation(context, rig):
 	context.scene.objects.active = rig
 	animations = {}
-	for name in theFkBoneList:
+	for name in theFkBoneList+theIkBoneList:
 		createAnimData(name, animations, rig.data.bones, True)
 	return animations
 
@@ -1347,6 +1338,7 @@ def createAnimData(name, animations, bones, isTarget):
 		except:
 			animPar = None
 	else:
+
 		animPar = None
 
 	if animPar:
@@ -1354,14 +1346,10 @@ def createAnimData(name, animations, bones, isTarget):
 	else:
 		anim.offsetRest = Vector((0,0,0))	
 
-	#anim.matrixRest = b.matrix_local.rotation_part()
 	(loc, rot, scale) = b.matrix_local.decompose()
 	anim.matrixRest = rot.to_matrix()
 	anim.inverseRest = anim.matrixRest.copy()
 	anim.inverseRest.invert()
-	anim.matrixRel = b.matrix.copy()
-	anim.inverseRel = anim.matrixRel.copy()
-	anim.inverseRel.invert()
 	return
 
 #
@@ -1403,7 +1391,6 @@ def insertAnimRoot(root, animations, nFrames, locs, rots):
 		matrix = anim.matrixRest * quat.to_matrix() * anim.inverseRest
 		anim.matrices[frame] = matrix
 		anim.heads[frame] =  Vector(locs[frame]) * anim.matrixRest + anim.headRest
-		anim.tails[frame] = anim.heads[frame] + anim.vecRest * matrix
 	return
 
 def insertAnimChildLoc(nameIK, name, animations, locs):
@@ -1417,17 +1404,13 @@ def insertAnimChildLoc(nameIK, name, animations, locs):
 	return
 
 def insertAnimChild(name, animations, nFrames, rots):
-	global theIkParent
 	try:
 		anim = animations[name]
 	except:
 		return None
 	if nFrames < 0:
 		nFrames = len(rots)
-	try:
-		par = theIkParent[anim.name]
-	except:
-		par = anim.parent
+	par = anim.parent
 	animPar = animations[par]
 	anim.nFrames = nFrames
 	quat = Quaternion()
@@ -1444,7 +1427,6 @@ def insertAnimChild(name, animations, nFrames, rots):
 		matrix = parmat * locmat
 		anim.matrices[frame] = matrix
 		anim.heads[frame] = animPar.heads[frame] + anim.offsetRest*parmat
-		anim.tails[frame] = anim.heads[frame] + anim.vecRest*matrix
 	return anim
 			
 #
@@ -1483,12 +1465,6 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes):
 				insertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg)
 
 	insertAnimation(context, trgRig, trgAnimations, theFkBoneList)
-	if theTarget == T_MHX:
-		for suffix in ['_L', '_R']:
-			for name in ['ElbowPT', 'KneePT']:
-				name = name+''+suffix
-				insertAnimChild(name, trgAnimations, animSrc.nFrames, None)
-
 	setInterpolation(trgRig)
 	return
 
@@ -1519,7 +1495,6 @@ def setRotation(pb, rot, frame, group):
 #	insertLocationKeyFrames(name, pb, animSrc, animTrg):
 #	insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg):
 #	insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg):
-#	insertReverseRotationKeyFrames(name, pb, anim, animIK, animPar):
 #
 
 def insertLocationKeyFrames(name, pb, animSrc, animTrg):
@@ -1601,68 +1576,115 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix):
 		setRotation(pb, rot, frame, name)
 	return
 
-def insertReverseRotationKeyFrames(name, pb, anim, animIK, animPar):
-	rots = []
-	animIK.nFrames = anim.nFrames
-	for frame in range(anim.nFrames):
-		inv = animPar.matrices[frame].copy()
-		inv.invert()
-		mat = inv * anim.matrices[frame]
-		matIK = animIK.inverseRest * mat * animIK.matrixRest
-		rot = matIK.to_quaternion()
-		rots.append(rot)
-		setRotation(pb, rot, frame, name)
-	return rots
-
 #
 #	poseTrgIkBones(context, trgRig, trgAnimations)
 #
 
-def poseTrgIkBonesMHX(context, trgRig, trgAnimations):
+def poseTrgIkBones(context, trgRig, trgAnimations):
 	bpy.ops.object.mode_set(mode='POSE')
 	pbones = trgRig.pose.bones
-	for suffix in ['_L', '_R']:
-		for (ikname, fkname) in [('Wrist', 'Hand'), ('Elbow', 'LoArm'), ('Leg', 'Foot')]:
-			nameIK = ikname+suffix
-			name = fkname+suffix
-			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
-			anim = trgAnimations[name]
-			animIK = trgAnimations[nameIK]
-			locs = insertLocationKeyFrames(nameIK, pbones[nameIK], anim, animIK)
-			rots = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],anim, animIK)
-			insertAnimRoot(nameIK, trgAnimations, -1, locs, rots)
-		'''
-		for name in ['ElbowPT', 'KneePT']:
-			nameIK = name+'IK'+suffix
-			name = name+''+suffix
-			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
-			insertIKLocationKeyFrames(nameIK, name, pbones[nameIK], trgAnimations)
-		'''
-		for name in ['Toe', 'Foot']:
-			nameIK = name+'Rev'+suffix
-			name = name+''+suffix
-			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
-			anim = trgAnimations[name]
-			animIK = trgAnimations[nameIK]
-			rots = insertReverseRotationKeyFrames(nameIK, pbones[nameIK], anim, animIK, trgAnimations[animIK.parent])
-			insertAnimChild(nameIK, trgAnimations, -1, rots)
+
+	for name in theIkBoneList:		
+		(realPar, fakePar, copyrot, reverse) = theIkParents[name]
+		pb = pbones[name]
+		pb.bone.select = True
+		if copyrot:
+			animCopy = trgAnimations[copyrot]
+		else:
+			animCopy = None
+		#print(name, pb, realPar, fakePar)
+		if reverse:
+			insertReverseIkKeyFrames(name, pb, trgAnimations[name],  trgAnimations[realPar], animCopy)
+		elif realPar:
+			insertParentedIkKeyFrames(name, pb, trgAnimations[name],  trgAnimations[realPar], trgAnimations[fakePar], animCopy)
+		else:
+			insertRootIkKeyFrames(name, pb, trgAnimations[name], trgAnimations[fakePar], animCopy)
+	return
+	
+#
+#	insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
+#
+
+def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
+	offsetFake = anim.headRest - animFake.headRest
+	offsetReal = anim.headRest - animReal.headRest
+	for frame in range(animFake.nFrames):		
+		locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
+		headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
+		offset = locAbs - headAbs
+		mat = animReal.matrices[frame] * anim.matrixRest
+		inv = mat.copy()
+		inv.invert()
+		loc = offset*inv
+		pb.location = loc
+		anim.heads[frame] = locAbs
+		for n in range(3):
+			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
+
+		if animCopy:
+			mat = mat * animCopy.inverseRest * animCopy.matrices[frame]
+		anim.matrices[frame] = mat
+		matMhx = anim.inverseRest * mat * anim.matrixRest
+		rot = matMhx.to_quaternion()
+		setRotation(pb, rot, frame, name)
 	return
 
-def poseTrgIkBonesGame(context, trgRig, trgAnimations):
-	bpy.ops.object.mode_set(mode='POSE')
-	pbones = trgRig.pose.bones
-	for suffix in ['_L', '_R']:
-		for (namefk, nameik) in [('Hand', 'Wrist'), ('Foot', 'Ankle')]:
-			nameIK = nameik+suffix
-			name = namefk+suffix
-			createAnimData(nameIK, trgAnimations, trgRig.data.bones, True)		
-			anim = trgAnimations[name]
-			animIK = trgAnimations[nameIK]
-			locs = insertLocationKeyFrames(nameIK, pbones[nameIK], anim, animIK)
-			#rots = insertGlobalRotationKeyFrames(nameIK, pbones[nameIK],anim, animIK)
-			#insertAnimRoot(nameIK, trgAnimations, -1, locs, rots)
+#
+#	insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
+#
+	
+def vecString(vec):
+	return "%.3f %.3f %.3f" % (vec[0], vec[1], vec[2])
+
+def insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
+	offsetCopy = anim.headRest - animCopy.headRest
+	offsetReal = anim.headRest - animReal.headRest
+	rotX = Matrix.Rotation(math.pi, 3, 'X')
+	#print("*** %s %s %s" % (name, vecString(animCopy.headRest), vecString(offsetCopy)))
+	for frame in range(animCopy.nFrames):		
+		locAbs = animCopy.heads[frame] + offsetCopy*animCopy.matrices[frame]
+		headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
+		offset = locAbs - headAbs
+		mat = animReal.matrices[frame] * anim.matrixRest
+		inv = mat.copy()
+		inv.invert()
+		loc = offset*inv
+		pb.location = loc
+		anim.heads[frame] = locAbs
+		for n in range(3):
+			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
+
+		mat = mat * animCopy.inverseRest * animCopy.matrices[frame]
+		anim.matrices[frame] = mat
+		matMhx = rotX * anim.inverseRest * mat * anim.matrixRest * rotX
+		rot = matMhx.to_quaternion()
+		setRotation(pb, rot, frame, name)
 	return
 
+#
+#	insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
+#
+
+def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
+	locs = []
+	offsetFake = anim.headRest - animFake.headRest
+	for frame in range(animFake.nFrames):		
+		locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
+		offset = locAbs - anim.headRest
+		loc = offset * anim.inverseRest
+		pb.location = loc
+		anim.heads[frame] = locAbs
+		for n in range(3):
+			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
+
+		mat = anim.matrixRest
+		if animCopy:
+			mat = mat * animCopy.inverseRest * animCopy.matrices[frame] 
+		anim.matrices[frame] = mat
+		matMhx = anim.inverseRest * mat * anim.matrixRest
+		rot = matMhx.to_quaternion()
+		setRotation(pb, rot, frame, name)
+	return
 
 
 #
@@ -1686,10 +1708,7 @@ def retargetMhxRig(context, srcRig, trgRig):
 	else:
 		fixes = None
 	poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes)
-	if theTarget == T_MHX:
-		poseTrgIkBonesMHX(context, trgRig, trgAnimations)
-	elif theTarget == T_Game or theTarget == T_Rorkimaru:
-		poseTrgIkBonesGame(context, trgRig, trgAnimations)
+	poseTrgIkBones(context, trgRig, trgAnimations)
 	setInterpolation(trgRig)
 	if onoff == 'OFF':
 		setLimitConstraints(trgRig, 1.0)
@@ -2336,13 +2355,16 @@ class Bvh2MhxPanel(bpy.types.Panel):
 		return
 
 #
-#	class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator):
+#	class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
 #
 
 class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator):
 	bl_idname = "mhx.mocap_load_bvh"
 	bl_label = "Load BVH file (.bvh)"
-	filepath = StringProperty(name="File Path", description="Filepath used for importing the OBJ file", maxlen=1024, default="")
+
+	filename_ext = ".bvh"
+	filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+	filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
 	def execute(self, context):
 		import bpy, os
@@ -2448,6 +2470,7 @@ class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
 	bl_idname = "mhx.mocap_init_interface"
 	bl_label = "Initialize"
 
+
 	def execute(self, context):
 		import bpy
 		initInterface(context)
@@ -2512,9 +2535,12 @@ def loadRetargetSimplify(context, filepath):
 	print("%s finished in %.3f s" % (filepath, time2-time1))
 	return
 
-class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator):
+class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
 	bl_idname = "mhx.mocap_load_retarget_simplify"
 	bl_label = "Load, retarget, simplify"
+
+	filename_ext = ".bvh"
+	filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
 	def execute(self, context):
