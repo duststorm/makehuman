@@ -2034,3 +2034,65 @@ class RectangleMesh(module3d.Object3D):
         self.verts[2].co[1] = height
         self.verts[3].co[1] = height
         self.update()     
+        
+
+# Radial widget
+RadialStyle = Style(**{
+    'width':185,
+    'height':160,
+    'mesh':None,
+    'normal':'radial_graph.png',
+    'border':[2, 2, 2, 2]
+    })
+
+class Radial(View):
+    
+    def __init__(self, parent, position, style=RadialStyle):
+        
+        """
+        This is the constructor for the Radial class.
+
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position.
+        @type position: C{list}
+        @param label: The label.
+        @type label: C{str}
+        @param selected: The selected state.
+        @type selected: C{Boolean} 
+        @param style: The style.
+        @type style: L{Style}
+        """
+        
+        View.__init__(self, parent)
+        
+        self.texture = self.app.getThemeResource('images', style.normal)
+        
+        '''if selected and self.selectedTexture:
+            t = self.selectedTexture
+        else:
+            t = self.texture'''
+        
+        t = self.texture
+        
+        width = style.width
+        height = style.height
+        border = style.border
+        
+        self.style = style
+        
+        if border:
+            mesh = NineSliceMesh(width, height, t, border)
+        else:
+            mesh = RectangleMesh(width, height, t)
+        self.radial = Object(self, position, mesh)
+        
+    def getPosition(self):
+        return self.radial.getPosition()
+    
+    def setPosition(self, position):
+        self.radial.setPosition(position)
+
+    def setTexture(self, texture):
+        self.texture = texture
+        self.radial.setTexture(texture)
