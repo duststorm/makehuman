@@ -1931,6 +1931,11 @@ class NineSliceMesh(module3d.Object3D):
         # Make sure fractions are calculated correctly
         textureWidth = float(t.width)
         textureHeight = float(t.height)
+        
+        # Make up some dimesnions when the texture is missing
+        if not textureWidth or not textureHeight:
+            textureWidth = border[0] + border[2] + 1
+            textureHeight = border[1] + border[3] + 1
             
         outer=[[0, 0], [width, height]]
         inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
