@@ -17,13 +17,14 @@ class EthnicsTaskView(gui3d.TaskView):
         y+=16
         
         self.subEthnicGroup = []
-        gui3d.GroupBox(self, [10, y, 9.0], 'Sub ethnic', gui3d.GroupBoxStyle._replace(height=25+24*6+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Sub ethnic', gui3d.GroupBoxStyle._replace(height=25+24*7+6));y+=25
         self.aethiopid = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Aethiopid", True, gui3d.ButtonStyle);y+=24
         self.center = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Center", style = gui3d.ButtonStyle);y+=24
         self.khoisan = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Khoisan", style = gui3d.ButtonStyle);y+=24
         self.nilotid = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Nilotid", style = gui3d.ButtonStyle);y+=24
         self.pigmy = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Pigmy", style = gui3d.ButtonStyle);y+=24
         self.sudanid = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Sudanid", style = gui3d.ButtonStyle);y+=24
+        self.bantu = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Bantu", style = gui3d.ButtonStyle);y+=24
         
         self.genderGroup = []
         y = 80
