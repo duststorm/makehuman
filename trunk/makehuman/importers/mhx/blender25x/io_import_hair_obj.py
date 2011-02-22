@@ -560,10 +560,6 @@ def unregister():
 	bpy.types.INFO_MT_file_import.remove(menu_func)
 
 if __name__ == "__main__":
-	try:
-		unregister()
-	except:
-		pass
 	register()
 
 #

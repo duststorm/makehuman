@@ -105,10 +105,14 @@ F_CON = 0x01
 #	proxyFilePtr(name):
 #
 
+import mh
+
 def proxyFilePtr(name):
-	for path in ['~/makehuman/', '/', './']:
-		path1 = os.path.expanduser(path+name)
-		filename = os.path.realpath(path1)
+	expo = os.path.normpath(mh.getPath('exports'))
+	# os.path.split does not seem to work
+	head = expo[:-7]
+	for path in [head, './']:
+		filename = os.path.realpath( os.path.join(path, name) )
 		try:
 			fp = open(filename, "r")
 			safePrint("    Using config file", filename )
@@ -154,6 +158,9 @@ def proxyConfig(options=None):
 		for name in ['sweater', 'jeans']:
 			proxyFile = os.path.expanduser("./data/templates/%s.mhclo" % name)
 			cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 4)))
+		for name in ['Rorkimaru', 'ascottk']:
+			proxyFile = os.path.expanduser("./data/templates/%s.proxy" % name)
+			cfg.proxyList.append(('Proxy', True, True, True, (proxyFile, 'Proxy', 3)))
 		return cfg
 
 	for line in fp:
