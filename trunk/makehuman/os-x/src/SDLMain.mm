@@ -400,6 +400,39 @@ static void CustomApplicationMain (int argc, char **argv)
     licenseWindowVisible = false; // The licensing panel should not be visible at launch time
 #endif
 
+#ifdef CHECK_PYTHON_VERSION
+    /* Perform a version check of the installed Python interpreter.
+     * If it is older than 3.x The User will be notified to update it.
+     */
+    const char* kPythonVersionNumber = Py_GetVersion();
+    int major, minor, sub;
+    sscanf(kPythonVersionNumber, "%d.%d.%d", &major, &minor, &sub);
+
+    if ((major <= 3) && (minor < 0))
+    {
+        NSString *messageString = [NSString stringWithFormat:
+                                   @"Please update to Python 3.x as soon as possible!\n\n"
+                                    "You are currently using Python V%d.%d.%d",major, minor, sub];
+        
+        const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message", messageString, @"Start it anyway!", @"Visit Python Website...", @"Download the Python installer...");
+        switch(rc)
+        {
+            case NSAlertDefaultReturn :
+                break;
+                
+            case NSAlertAlternateReturn :
+                [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.python.org/download"]];
+                break;
+
+            case NSAlertOtherReturn :
+                [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.3.dmg"]];
+                break;
+        }
+        printf("rc is %d\n", rc);
+            //        printf("Please update to Python 3.x as soon as possible!\n");
+    }
+#endif // #ifdef CHECK_PYTHON_VERSION
+    
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
     status = SDL_main (gArgc, gArgv);
