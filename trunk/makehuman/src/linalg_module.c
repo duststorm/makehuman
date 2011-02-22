@@ -3,9 +3,22 @@
 #undef min
 #undef max
 #include <dgemm.h>
-#include <dgemv.h>
+#include <dgesvd.h>
 
 //includes lapack...
+static void double2PyObj(double* d, PyObject *_result, int i, int j)
+{
+    int index;
+    int resultLen =  i*j;
+    _result = PyList_New(resultLen);
+    for (index = 0; index < resultLen; index++)
+    {
+      PyObject *item; 
+      item = Py_BuildValue("d", d[index]);
+      PyList_SetItem(_result, index, item);
+    }
+}
+
 //note that the returned double should be freed
 static double* PyObj2DoublePtr(PyObject *dP, int seqlen)
 {
@@ -62,7 +75,9 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
 {
   PyObject *_m, *_n, *_result;
   double *m, *n, *result; 
-  int i,j,k, index, resultLen;
+  int i,j,k, index;
+  //int resultLen = i*k;
+  //double result[resultLen]; 
   double alpha = 1;
   double beta = 0;
 
@@ -78,24 +93,11 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
   n = PyObj2DoublePtr(_n, j*k);
   if (n==NULL)
     return NULL;
-  
-  // do something with m and n
-  resultLen = i*k;
-  _result = PyList_New(resultLen);
-  // need to be freed in the end
-  result = malloc(resultLen*sizeof(double));
-    
+      
   //convert to python list
-
+  result = malloc(i*k*sizeof(double));
   if (!dgemm_("N", "B", &i, &k, &j, &alpha, m, &i, n, &j, &beta, result, &i))
-  {
-    for (index = 0; index< resultLen; index++)
-    {
-      PyObject *item; 
-      item = Py_BuildValue("d", result[index]);
-      PyList_SetItem(_result, index, item);
-    }
-  }
+      double2PyObj(result, _result, i, k);
   
   free(result);
   free(n);
@@ -104,42 +106,41 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
   return _result;
 }
 
-/*
+//svd:  m = u*s*vt (vt is the transposed matrix of v)
 static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
 {
-  PyObject *_m;
-  int i,j;
+  PyObject *_m, *_u, *_s, *_vt;
+  double *m, *s, *u, *vt, *work; //s = singular values of m sorted by s(i)>s(i+1) 
+  int i,j,k, index;
+  int lwork = -1;
+  int info = 0;
+  
   if (!PyArg_ParseTuple(args, "Oii", &_m, &i, &j))
     return NULL;
   
   // need to be freed in the end
-  double *m = PyObj2DoublePtr(_m, i*j);
+  m = PyObj2DoublePtr(_m, i*j);
   if (m==NULL)
     return NULL;
+  
+  // do something with m
     
-  // do something with m and n
-  int resultLen = i*k;
-  PyObject *_result = PyList_New(resultLen);
-  double result = malloc(resultLen*sizeof(double));
-  int check = dgemm("N", "B", i, k, j, 1, m, i, n, j, 0, result, i);
-    
-  //convert to python list
-  if (check != 0)
+  //free in the end
+  u = malloc(i*i*sizeof(double));
+  s = malloc(i*j*sizeof(double));
+  vt = malloc(j*j*sizeof(double));
+
+  if (!dgesvd_("A", "A", &i, &j, m, &i, s, u, &i, vt, &j, work, &lwork, &info))
   {
-    for (int index = 0; index< resultLen; index++)
-    {
-      PyObject *item = Py_BuildValue("d", result[index]);
-      PyList_SetItem(_result, index, item)
-    }
+    double2PyObj(u, _u, i, i);
+    double2PyObj(vt, _vt, j, j);
+    double2PyObj(s, _s, i, j);
   }
   
-  //@todo: free m, n and result
-  free(m);
-  free(result);
-  // return flat matrix list
-  return _result;
+  free(vt); free(s); free(u); free(m);
+
+  return Py_BuildValue("[O,O,O]", _u, _s, _vt);
 }
-*/
 
 static PyMethodDef EmbMethods[] =
 {
