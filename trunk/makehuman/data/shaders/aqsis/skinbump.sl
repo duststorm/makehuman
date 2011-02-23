@@ -11,7 +11,8 @@ displacement skinbump
 	
 	if (bumpTexture != "")
 	{
-	    hump =  float texture (bumpTexture);			
+	    hump =  float texture (bumpTexture)-0.5;
+        //printf ("%f\n",hump);			
 	}
 	
 	hump = hump* bumpVal;	
