@@ -159,7 +159,7 @@ def exportMhx_25(human, fp):
 		rig.name = theHuman
 		(locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/game.rig', obj)
 		fp.write("#if toggle&T_Armature\n")
-		copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
+		copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, [])	
 		fp.write("#endif\n")
 	else:
 		raise NameError("Unknown base rig %s" % rig)
@@ -233,7 +233,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 			#	(x, y) = mhxbones.boneRoll[bone]
 			#	fp.write("    roll %.6g ;\n" % (y))
 			elif words[1] == 'refer-human':
-				if words[3] == 'ControlRig':
+				if words[3] == 'ControlRig' or theConfig.useRig == 'game':
 					fp.write("    %s Refer Object %s ;\n" % (words[2], theHuman))
 				elif words[3] == 'DeformRig':
 					fp.write("    %s Refer Object %sDeformRig ;\n" % (words[2], theHuman))
@@ -362,6 +362,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 			elif words[1] == 'ProxyReferRig':
 				if proxy.rig:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
+				elif theConfig.useRig == 'game':
+					fp.write("      object Refer Object %s ;\n" % theHuman)
 				else:
 					fp.write("      object Refer Object %sDeformRig ;\n" % theHuman)
 			elif words[1] == 'ProxyVerts':
@@ -527,6 +529,8 @@ def groupProxy(typ, fp, proxyData):
 	for proxy in proxyData.values():
 		if proxy.type == typ:
 			fp.write("    ob %sMesh ;\n" % proxy.name)
+			if proxy.rig:
+				fp.write("    ob %s ;\n" % proxy.name)
 	fp.write("#endif\n")
 	return
 

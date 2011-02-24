@@ -147,6 +147,7 @@ def proxyConfig(options=None):
 	useDae = True
 
 	if options:
+		print(options)
 		cfg.mhxversion = options['mhxversion']
 		cfg.expressions = options['expressions']
 		cfg.useRig = options['useRig']
