@@ -570,9 +570,6 @@ class Object3D:
     - **self.sx**: *float* The x scale component of the size of this object within the coordinate space of the scene.
     - **self.sy**: *float* The y scale component of the size of this object within the coordinate space of the scene.
     - **self.sz**: *float* The z scale component of the size of this object within the coordinate space of the scene.
-    - **self.r**: *int* The Red channel component of the color ID of this object.
-    - **self.g**: *int* The Green channel component of the color ID of this object.
-    - **self.b**: *int* The Blue channel component of the color ID of this object.
     - **self.verts**: *verts list* The list of vertices that go to make up this object.
     - **self.faces**: *faces list* The list of faces that go to make up this object.
     - **self.facesGroups**: *facesGroups list* The list of FaceGroups that go to make up this object.
@@ -1128,15 +1125,6 @@ class Scene3D:
     - **self.faceGroupColorID**: *Dictionary of colors IDs* A dictionary of the color IDs used for
       selection (see MakeHuman Selectors, above).
     - **self.colorID**: *float list* A progressive color ID.
-    - **self.sceneTimerCallback**: *function* Event handling function. Initially None.
-    - **self.keyboardEventsDict**: *array* Dictionary of keyboard events. Initially empty.
-    - **self.keyPressed**: *function* Event handling function. Initially None.
-    - **self.characterPressed**: *function* Event handling function. Initially None.
-    - **self.mouseState**: *int* The current state of the mouse. Initially 0.
-    - **self.mouseX**: *int* Mouse position X value. Initially 0.
-    - **self.mouseY**: *int* Mouse position Y value. Initially 0.
-    - **self.mouseXRel**: *int* Mouse released position X value. Initially 0.
-    - **self.mouseYRel**: *int* Mouse released position Y value. Initially 0.
     
     The attributes *self.colorID* and *self.faceGroupColorID*
     support a technique called *Selection Using Unique Color IDs* to make each
