@@ -542,8 +542,12 @@ def parseLocalIpo(args, tokens, owner, ipoType):
 def parseIcu(ipo, args, tokens):
 	global todo
 	name = args[0]
-	icu = ipo.addCurve(name)
-	_icu[name] = icu
+	try:
+		icu = ipo.addCurve(name)
+		_icu[name] = icu
+	except:
+		print "Cannot add Ipo-curve %s" % name
+		return
 
 	for (key, val, sub) in tokens:
 		if key == 'bz2':

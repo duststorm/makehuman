@@ -94,7 +94,7 @@ MagpieVisemes = dict({\
 })
 
 def setViseme(vis):
-	amtOb = Object.Get('HumanRig')
+	amtOb = Object.Get('Human')
 	amtOb.sel = True
 	pose = amtOb.getPose()
 	pbones = pose.bones
@@ -105,7 +105,7 @@ def setViseme(vis):
 	Window.PoseMode(0)
 	Window.PoseMode(1)
 
-	meshOb = Object.Get('Human')
+	meshOb = Object.Get('HumanMesh')
 	meshOb.sel = True
 	Window.EditMode(1)
 	Window.EditMode(0)

@@ -841,7 +841,7 @@ def copyMeshFile249(obj, tmpl, fp):
 				mainMesh = False
 				fp.write("#if useProxy\n")
 				for (typ, useObj, useMhx, useDae, proxyStuff) in theConfig.proxyList:
-					if useObj:
+					if useMhx:
 						exportProxy24(obj, proxyStuff, fp)
 				fp.write("#endif\n")
 			elif words[1] == 'mesh' and mainMesh:

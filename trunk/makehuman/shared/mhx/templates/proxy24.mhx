@@ -15,10 +15,10 @@ object HumanProxy Mesh HumanProxy
     row 0.000000 0.000000 1.000000 0.000000 ;
     row 0.000000 0.000000 0.000000 1.000000 ;
   end matrix
-  parent HumanRig 0 None ;
+  parent Human 0 None ;
   modifier ARMATURE
     RENDER     hex 1 ;
-    OBJECT     obj HumanRig ;
+    OBJECT     obj Human ;
     ENVELOPES     hex 1 ;
     EDITMODE     hex 1 ;
     REALTIME     hex 1 ;
