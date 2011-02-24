@@ -88,7 +88,7 @@ class EthnicsTaskView(gui3d.TaskView):
                 file.write('ethnic %s %f\n' % (target, value))
 
 def load(app):
-    category = app.getCategory('Experiments')
+    category = app.getCategory('Files')
     taskview = EthnicsTaskView(category)
     
     app.addLoadHandler('ethnic', taskview.loadHandler)
