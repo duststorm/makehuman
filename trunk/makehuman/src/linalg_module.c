@@ -7,7 +7,7 @@
 #include <dgesvd.h>
 
 //includes lapack...
-static PyObject *double2PyObj(double* d, int i, int j)
+PyObject *double2PyObj(double* d, int i, int j)
 {
     int index;
     int resultLen =  i*j;
@@ -30,7 +30,7 @@ static PyObject *double2PyObj(double* d, int i, int j)
 }
 
 //note that the returned double should be freed
-static double* PyObj2DoublePtr(PyObject *dSeq, int seqlen)
+double* PyObj2DoublePtr(PyObject *dSeq, int seqlen)
 {
     //PyObject* dSeq;
     double *dC;
