@@ -16,8 +16,8 @@ static PyObject *double2PyObj(double* d, int i, int j)
       return NULL;
     for (index = 0; index < resultLen; index++)
     {
-      PyObject *item; 
-      item = Py_BuildValue("d", d[index]);
+      
+      PyObject *item = PyFloat_FromDouble(d[index]);
       if (!item)
       {
         Py_DECREF(_result);
@@ -25,6 +25,8 @@ static PyObject *double2PyObj(double* d, int i, int j)
       }
       PyList_SET_ITEM(_result, index, item);
     }
+
+    return _result;
 }
 
 //note that the returned double should be freed
@@ -79,14 +81,12 @@ static double* PyObj2DoublePtr(PyObject *dSeq, int seqlen)
 static PyObject* mh_dgemm(PyObject *self, PyObject *args)
 {
 
-  PyObject *_m, *_n;
+  PyObject *_m, *_n, *_result;
   double *m, *n, *result; 
   int i,j,k, index;
-  //int resultLen = i*k;
-  //double result[resultLen]; 
-  PyObject *_result = NULL;
   double alpha = 1;
   double beta = 0;
+  char a[] = "N";
 
   if (!PyArg_ParseTuple(args, "OOiii", &_m, &_n, &i, &j, &k))
     return NULL;
@@ -100,42 +100,16 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
   if (n==NULL)
     return NULL;
       
-  //convert to python list
-  /*
   result = (double*)malloc(i*k*sizeof(double));
-  dgemm_('N', 'N', &i, &k, &j, &alpha, m, &i, n, &j, &beta, result, &i);
-  {
-      _result = double2PyObj(result, i, k);
-       free(result);
-       free(n);
-       free(m);
-       return _result;
-  }
-  //free(result);
-  //free(n);
-  //free(m);
+  dgemm_(a, a, (long*)&i, (long*)&k, (long*)&j, &alpha, m, (long*)&i, n, (long*)&j, &beta, result, (long*)&i);
 
-  else
+  if (!result)
   {
-    int i2;
-    PyObject *lst = PyList_New(4);
-    if (!lst)
-        return NULL;
-    for (i2 = 0; i2 < 4; i2++) 
-    {
-        PyObject *num = PyFloat_FromDouble(1.0);
-        if (!num) 
-        {
-            Py_DECREF(lst);
-            return NULL;
-        }
-        PyList_SET_ITEM(lst, i2, num);   // reference to num stolen
-    }
-    return lst;   
+    free(result);
+    return double2PyObj(m, i, j);
   }
-*/
-  return double2PyObj(m, i, j);
-  //return _m;
+  else
+    return double2PyObj(result, j, k);
 }
 
 //svd:  m = u*s*vt (vt is the transposed matrix of v)
