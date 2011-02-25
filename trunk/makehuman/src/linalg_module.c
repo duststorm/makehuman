@@ -86,7 +86,7 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
   int i,j,k, index;
   double alpha = 1;
   double beta = 0;
-  char a[] = "N";
+  char a[] = "T"; //Transpose because blas is column-major and mh is row-major
 
   if (!PyArg_ParseTuple(args, "OOiii", &_m, &_n, &i, &j, &k))
     return NULL;
@@ -102,14 +102,11 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
       
   result = (double*)malloc(i*k*sizeof(double));
   dgemm_(a, a, (long*)&i, (long*)&k, (long*)&j, &alpha, m, (long*)&i, n, (long*)&j, &beta, result, (long*)&i);
+  _result = double2PyObj(result, j, k);
+  
+  free(result); free(n); free(m);
 
-  if (!result)
-  {
-    free(result);
-    return double2PyObj(m, i, j);
-  }
-  else
-    return double2PyObj(result, j, k);
+  return _result;
 }
 
 //svd:  m = u*s*vt (vt is the transposed matrix of v)
