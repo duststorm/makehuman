@@ -289,6 +289,18 @@ class MHApplication(gui3d.Application):
     def loadGui(self):
         
         self.progressBar.setProgress(0.9)
+        
+        category = gui3d.Category(self, "Report bug", style=gui3d.CategoryButtonStyle)
+        # Report bug button
+        @category.button.event
+        def onClicked(event):
+          webbrowser.open('http://code.google.com/p/makehuman/issues/entry');
+          
+        category = gui3d.Category(self, "Req feature", style=gui3d.CategoryButtonStyle)
+        # Request feature button
+        @category.button.event
+        def onClicked(event):
+          webbrowser.open('http://code.google.com/p/makehuman/issues/entry?template=Request%20feature');
 
         category = gui3d.Category(self, "Help", style=gui3d.CategoryButtonStyle)
         # Help button
