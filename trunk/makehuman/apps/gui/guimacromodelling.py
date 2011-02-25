@@ -117,8 +117,11 @@ class MacroModelingTaskView(gui3d.TaskView):
         status += 'Age: %d, ' % age
         status += 'Muscle: %.2f%%, ' % (human.getMuscle() * 100.0)
         status += 'Weight: %.2f%%, ' % (50 + (150 - 50) * human.getWeight())
-        height = max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
-        status += 'Height: %.2fcm' % (height*10)
+        height = 10 * max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
+        if self.app.settings['units'] == 'metric':
+            status += 'Height: %.2fcm' % height
+        else:
+            status += 'Height: %.2fin' % (height * 0.393700787)
         self.status.setText(status)
 
     def onShow(self, event):

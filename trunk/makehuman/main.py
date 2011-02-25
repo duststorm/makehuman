@@ -110,7 +110,8 @@ class MHApplication(gui3d.Application):
             'realtimeNormalUpdates': True,
             'shader': None,
             'lowspeed': 1,
-            'highspeed': 5
+            'highspeed': 5,
+            'units':'metric'
         }
         
         self.shortcuts = {

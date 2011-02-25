@@ -40,7 +40,6 @@ class MeasureTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Measure')
 
-        self.mode = 'metric'
         self.ruler = Ruler()
 
         measurements = [
@@ -100,27 +99,8 @@ class MeasureTaskView(gui3d.TaskView):
                 slider = MeasureSlider(box, yy, sliderLabel[subname], subname, modifier)
                 self.sliders.append(slider)
                 yy += 36
-                
-        modes = [] 
                
         y = 80
-        self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y += 25
-        metric = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Metric', True);y += 24
-        imperial = gui3d.RadioButton(self.unitsBox, modes, [658, y, 9.1], 'Imperial');y += 24
-        y+=16
-        
-        @metric.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(metric, event)
-            self.mode = 'metric'
-            self.syncSliderLabels()
-            
-        @imperial.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(imperial, event)
-            self.mode = 'imperial'
-            self.syncSliderLabels()
-            
         self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
         self.eu = gui3d.TextView(self.braBox, [658, y, 9.1], 'EU: ');y += 22
         self.jp = gui3d.TextView(self.braBox, [658, y, 9.1], 'JP: ');y += 22
@@ -131,8 +111,8 @@ class MeasureTaskView(gui3d.TaskView):
     def getMeasure(self, measure):
         
         human = self.app.selectedHuman
-        measure = self.ruler.getMeasure(human, measure, self.mode)
-        if self.mode == 'metric':
+        measure = self.ruler.getMeasure(human, measure, self.app.settings['units'])
+        if self.app.settings['units'] == 'metric':
             return '%.1f cm' % measure
         else:
             return '%.1f in' % measure

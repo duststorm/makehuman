@@ -31,6 +31,14 @@ class SettingsTaskView(gui3d.TaskView):
         self.shift = gui3d.Slider(self, [10,y,9.2],
             self.app.settings.get('highspeed', 5), 1, 10,
             "Shift: %d" % self.app.settings.get('highspeed', 5));y+=36
+        y+=16
+            
+        modes = [] 
+               
+        self.unitsBox = gui3d.GroupBox(self, [10, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y += 25
+        metric = gui3d.RadioButton(self.unitsBox, modes, [18, y, 9.1], 'Metric', self.app.settings.get('units', 'metric') == 'metric');y += 24
+        imperial = gui3d.RadioButton(self.unitsBox, modes, [18, y, 9.1], 'Imperial', self.app.settings.get('units', 'metric') == 'imperial');y += 24
+        y+=16
         
         @self.shaderNo.event
         def onClicked(event):
@@ -82,6 +90,16 @@ class SettingsTaskView(gui3d.TaskView):
         @self.shift.event
         def onChanging(value):
             self.shift.label.setText("Shift: %d" % value)
+            
+        @metric.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(metric, event)
+            self.app.settings['units'] = 'metric'
+            
+        @imperial.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(imperial, event)
+            self.app.settings['units'] = 'imperial'
                 
     def setShader(self, vertex, fragment):
             human = self.app.selectedHuman
