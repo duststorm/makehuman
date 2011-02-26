@@ -990,6 +990,7 @@ def guessTargetArmature(trgRig):
 	else:
 		theFkBoneList = []
 		theGlobalBoneList = []
+
 		theTrgBone = {}
 		theSrcBone = {}
 		if theTarget == T_Rorkimaru:
@@ -1928,8 +1929,8 @@ def plantFCurves(fcurves, first, last, useCrnt, values):
 			ave = sum/nterms
 		for kp in dellist:
 			kp.co[1] = ave
-		kpts.add(first, ave, fast=True)
-		kpts.add(last, ave, fast=False)
+		kpts.insert(first, ave, options='FAST')
+		kpts.insert(last, ave)
 	return
 
 #
@@ -2567,6 +2568,7 @@ class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
 
 	def execute(self, context):
 		import bpy, os, mathutils
+
 		loadRetargetSimplify(context, self.properties.filepath)
 		return{'FINISHED'}	
 
