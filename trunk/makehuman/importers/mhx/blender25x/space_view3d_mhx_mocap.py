@@ -866,20 +866,35 @@ GameBones = [
 	('LoArm_R',		'LoArm_R'),
 	('Hand_R',		'Hand_R'),
 
-	('Hip_L',		'Hip_L'),
+	#('Hip_L',		'Hip_L'),
 	('UpLeg_L',		'UpLeg_L'),
 	('LoLeg_L',		'LoLeg_L'),
 	('Foot_L',		'Foot_L'),
 	('Toe_L',		'Toe_L'),
 
-	('Hip_R',		'Hip_R'),
+	#('Hip_R',		'Hip_R'),
 	('UpLeg_R',		'UpLeg_R'),
 	('LoLeg_R',		'LoLeg_R'),
 	('Foot_R',		'Foot_R'),
 	('Toe_R',		'Toe_R'),
 ]
 
-GameIkBones = [ 'Wrist_L', 'Wrist_R', 'Ankle_L', 'Ankle_R' ]
+GameIkParents = {
+	'Wrist_L' : (None, 'LoArm_L', 'Hand_L', False),
+	'Ankle_L' : (None, 'LoLeg_L', None, False),
+	'Wrist_R' : (None, 'LoArm_R', 'Hand_R', False),
+	'Ankle_R' : (None, 'LoLeg_R', None, False),
+}
+
+GameIkBoneList = [ 'Wrist_L', 'Wrist_R', 'Ankle_L', 'Ankle_R' ]
+
+
+#	bone : (realParent, fakeParent, copyRot, reverse)
+
+
+#
+#
+#
 
 GameParents = {
 	'MasterFloor' :	None,
@@ -965,7 +980,7 @@ def guessTargetArmature(trgRig):
 		print("Bones", bones)
 		raise NameError("Did not recognize target armature")
 
-	print("Target armature %s" % theTarget)
+	print("Target armature %s" % name)
 
 	if theTarget == T_MHX:
 		theFkBoneList = MhxFkBoneList
@@ -979,8 +994,14 @@ def guessTargetArmature(trgRig):
 		theSrcBone = {}
 		if theTarget == T_Rorkimaru:
 			bones = RorkimaruBones
+			theIkBoneList = GameIkBoneList
+			theIkParents = GameIkParents
 		elif theTarget == T_Game:
 			bones = GameBones
+			theIkBoneList = GameIkBoneList
+			theIkParents = GameIkParents
+		else:
+			raise NameError("Unknown target %s" % theTarget)
 		for (trg,src) in bones:
 			theFkBoneList.append(trg)
 			theSrcBone[trg] = src
@@ -993,6 +1014,7 @@ def guessTargetArmature(trgRig):
 def testTargetRig(bones, rigBones):
 	for (b, mb) in rigBones:
 		if b not in bones:
+			print("Fail", b, mb)
 			return False
 	return True
 
