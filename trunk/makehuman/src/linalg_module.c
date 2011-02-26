@@ -1,8 +1,6 @@
-#include <Python.h>
-//#include <linalg_module.h>
 #undef min
 #undef max
-#include <stdio.h>
+#include <Python.h>
 #include <dgemm.h>
 #include <dgesvd.h>
 
@@ -83,7 +81,7 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
 
   PyObject *_m, *_n, *_result;
   double *m, *n, *result; 
-  int i,j,k, index;
+  int i,j,k;
   double alpha = 1;
   double beta = 0;
   char a[] = "T"; //Transpose because blas is column-major and mh is row-major
@@ -114,9 +112,10 @@ static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
 {
   PyObject *_m, *_u, *_s, *_vt;
   double *m, *s, *u, *vt, *work; //s = singular values of m sorted by s(i)>s(i+1) 
-  int i,j,k, index;
-  int lwork = -1;
-  int info = 0;
+  int i,j;
+  long lwork = -1;
+  long info = 0;
+  char a[] = "A";
   
   if (!PyArg_ParseTuple(args, "Oii", &_m, &i, &j))
     return NULL;
@@ -132,15 +131,15 @@ static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
   u = (double*)malloc(i*i*sizeof(double));
   s = (double*)malloc(i*j*sizeof(double));
   vt = (double*)malloc(j*j*sizeof(double));
+  work = (double*)malloc(sizeof(double));
 
-  if (!dgesvd_("A", "A", &i, &j, m, &i, s, u, &i, vt, &j, work, &lwork, &info))
-  {
-    _u = double2PyObj(u, i, i);
-    _vt = double2PyObj(vt, j, j);
-    _s = double2PyObj(s, i, j);
-  }
+  dgesvd_(a, a, (long*)&i, (long*)&j, m, (long*)&i, s, u, (long*)&i, vt, (long*)&j, work, &lwork, &info);
+  _u = double2PyObj(u, i, i);
+  _vt = double2PyObj(vt, j, j);
+  _s = double2PyObj(s, i, j);
+ 
   
-  free(vt); free(s); free(u); free(m);
+  free(work); free(vt); free(s); free(u); free(m);
 
   return Py_BuildValue("[O,O,O]", _u, _s, _vt);
 }
@@ -148,7 +147,7 @@ static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
 static PyMethodDef EmbMethods[] =
 {
     {"mmmul", mh_dgemm, METH_VARARGS, ""},
-    //{"mvmul", mh_dgemv, METH_VARARGS, ""},
+    {"svd", mh_dgesvd, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
