@@ -85,6 +85,7 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
   double alpha = 1;
   double beta = 0;
   char a[] = "T"; //Transpose because blas is column-major and mh is row-major
+  char b[] = "T"; //be careful when using lapack and blas methods even if the parameters have the same value they should be sent with different pointers
 
   if (!PyArg_ParseTuple(args, "OOiii", &_m, &_n, &i, &j, &k))
     return NULL;
@@ -99,7 +100,7 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
     return NULL;
       
   result = (double*)malloc(i*k*sizeof(double));
-  dgemm_(a, a, (long*)&i, (long*)&k, (long*)&j, &alpha, m, (long*)&i, n, (long*)&j, &beta, result, (long*)&i);
+  dgemm_(a, b, (long*)&i, (long*)&k, (long*)&j, &alpha, m, (long*)&i, n, (long*)&j, &beta, result, (long*)&i);
   _result = double2PyObj(result, j, k);
   
   free(result); free(n); free(m);
@@ -115,7 +116,8 @@ static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
   int i,j;
   long lwork = -1;
   long info = 0;
-  char a[] = "A";
+  char a[] = "A"; //returns all the rows of U and V (full svd)
+  char b[] = "A"; //be careful when using lapack and blas methods even if the parameters have the same value they should be sent with different pointers
   
   if (!PyArg_ParseTuple(args, "Oii", &_m, &i, &j))
     return NULL;
@@ -128,12 +130,14 @@ static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
   // do something with m
     
   //free in the end
+  dims = min(i,j);
   u = (double*)malloc(i*i*sizeof(double));
-  s = (double*)malloc(i*j*sizeof(double));
+  s = (double*)malloc(dims*sizeof(double));
   vt = (double*)malloc(j*j*sizeof(double));
-  work = (double*)malloc(sizeof(double));
+  lwork = 5*(i+j);
+  work = (double*)malloc(lwork*sizeof(double));
 
-  dgesvd_(a, a, (long*)&i, (long*)&j, m, (long*)&i, s, u, (long*)&i, vt, (long*)&j, work, &lwork, &info);
+  dgesvd_(a, b, (long*)&i, (long*)&j, m, (long*)&i, s, u, (long*)&i, vt, (long*)&j, work, &lwork, &info);
   _u = double2PyObj(u, i, i);
   _vt = double2PyObj(vt, j, j);
   _s = double2PyObj(s, i, j);
