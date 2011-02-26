@@ -125,7 +125,6 @@ class MeasureTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         
-        self.unitsBox.setPosition([event[0] - 150, self.unitsBox.getPosition()[1], 9.0])
         self.braBox.setPosition([event[0] - 150, self.braBox.getPosition()[1], 9.0])
         
     def hideAllSliders(self):
