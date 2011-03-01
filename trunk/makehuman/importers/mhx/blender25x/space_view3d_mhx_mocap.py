@@ -82,6 +82,7 @@ Batch run:
 """
 
 import bpy, os, mathutils, math, time
+from math import sin, cos
 from mathutils import *
 from bpy.props import *
 from io_utils import ImportHelper
@@ -966,10 +967,10 @@ def getParentName(b):
 #
 
 def guessTargetArmature(trgRig):
-	global theTarget, theFkBoneList, theIkBoneList, theGlobalBoneList, theIkParents, theSrcBone, theTrgBone, theParents, theFixes
+	global theTarget, theFkBoneList, theIkBoneList, theGlobalBoneList, theIkParents, theSrcBone, theTrgBone, theParents, theRolls
 	bones = trgRig.data.bones.keys()
 	try:
-		custom = (trgRig['MhxCustomRig'] == 'ASSOCIATED')
+		custom = trgRig['MhxCustomRig']
 	except:
 		custom = False
 	if custom:
@@ -990,7 +991,7 @@ def guessTargetArmature(trgRig):
 
 	print("Target armature %s" % name)
 	theParents = {}
-	theFixes = {}
+	theRolls = {}
 
 	if theTarget == T_MHX:
 		theFkBoneList = MhxFkBoneList
@@ -1004,11 +1005,9 @@ def guessTargetArmature(trgRig):
 		theTrgBone = {}
 		theSrcBone = {}
 		if theTarget == T_Custom:
-			bones = CustomBones[trgRig.name]
+			(bones, theParents, theRolls) = makeAssoc(trgRig)
 			theIkBoneList = []
 			theIkParents = []
-			theParents = CustomParents[trgRig.name]
-			theFixes = CustomFixes[trgRig.name]
 		elif theTarget == T_Rorkimaru:
 			bones = RorkimaruBones
 			theIkBoneList = GameIkBoneList
@@ -1486,7 +1485,7 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes):
 	insertLocationKeyFrames(nameTrg, pbones[nameTrg], srcAnimations[nameSrc], trgAnimations[nameTrg])
 	for nameTrg in theFkBoneList:
 		nameSrc = getSrcBone(nameTrg)
-		(flipX, flipZ) = boneFlips(nameTrg)
+		roll = boneRolls(nameTrg)
 		try:
 			pb = pbones[nameTrg]
 			animSrc = srcAnimations[nameSrc]
@@ -1497,37 +1496,30 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes):
 		if not success:
 			pass
 		elif nameTrg in theGlobalBoneList:
-			insertGlobalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, flipX, flipZ)
+			insertGlobalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, roll)
 		else:
 			try:
 				fix = fixes[nameSrc]
 			except:
 				fix = None
 			if fix:
-				fixAndInsertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, fix, flipX, flipZ)
+				fixAndInsertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, fix, roll)
 			else:
-				insertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, flipX, flipZ)
+				insertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, roll)
 
 	insertAnimation(context, trgRig, trgAnimations, theFkBoneList)
 	setInterpolation(trgRig)
 	return
 
 #
-#	boneFlips(name):
+#	boneRolls(name):
 #
 
-def boneFlips(name):
+def boneRolls(name):
 	try:
-		fixes = theFixes[name]
+		return theRolls[name]
 	except:
-		return (False, False)
-	flipX = False
-	flipZ = False
-	if '-X' in fixes:
-		flipX = True
-	if '-Z' in fixes:
-		flipZ = True
-	return (flipX, flipZ)
+		return None
 
 #
 #	setRotation(pb, mat, frame, group):
@@ -1554,7 +1546,7 @@ def setRotation(pb, rot, frame, group):
 
 #
 #	insertLocationKeyFrames(name, pb, animSrc, animTrg):
-#	insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, flipX, flipZ):
+#	insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, roll):
 #
 
 def insertLocationKeyFrames(name, pb, animSrc, animTrg):
@@ -1592,7 +1584,7 @@ def insertIKLocationKeyFrames(nameIK, name, pb, animations):
 	return
 
 
-def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, flipX, flipZ):
+def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, roll):
 	rots = []
 	animTrg.nFrames = animSrc.nFrames
 	for frame in range(animSrc.nFrames):
@@ -1600,27 +1592,21 @@ def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, flipX, flipZ):
 		animTrg.matrices[frame] = mat90
 		matMhx = animTrg.inverseRest * mat90 * animTrg.matrixRest
 		rot = matMhx.to_quaternion()
-		if flipX:
-			rot.x = -rot.x
-		if flipZ:
-			rot.z = -rot.z
+		rollRot(rot, roll)
 		rots.append(rot)
 		setRotation(pb, rot, frame, name)
 	return rots
 
-def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg, flipX, flipZ):
+def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg, roll):
 	animTrg.nFrames = animSrc.nFrames
 	for frame in range(animSrc.nFrames):
 		rot = animSrc.quats[frame]
-		if flipX:
-			rot.x = -rot.x
-		if flipZ:
-			rot.z = -rot.z
+		rollRot(rot, roll)
 		animTrg.quats[frame] = rot
 		setRotation(pb, rot, frame, name)
 	return
 
-def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix, flipX, flipZ):
+def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix, roll):
 	(fixMat, exchange) = fix
 	animTrg.nFrames = animSrc.nFrames
 	for frame in range(animSrc.nFrames):
@@ -1640,12 +1626,22 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix, flipX, f
 			rot.x = rot0.z
 		else:
 			rot = rot0
-		if flipX:
-			rot.x = -rot.x
-		if flipZ:
-			rot.z = -rot.z
+		rollRot(rot, roll)
 		animTrg.quats[frame] = rot
 		setRotation(pb, rot, frame, name)
+	return
+
+#
+#	rollRot(rot, roll):
+#
+
+def rollRot(rot, roll):
+	if not roll:
+		return
+	x = rot.x
+	z = rot.z
+	rot.x = x*cos(roll) - z*sin(roll)
+	rot.z = x*sin(roll) + z*cos(roll)
 	return
 
 #
@@ -2259,6 +2255,7 @@ def initInterface(context):
 			attr=mhx, 
 			name=mhx, 
 			description="Bvh bone corresponding to %s" % mhx, 
+
 			default = ''
 		)
 		bvh = getBvh(mhx)
@@ -2751,12 +2748,9 @@ MhxBoneNames = [
 	('Toe_R',		'R toes'),
 ]
 
-CustomBones = {}
-CustomParents = {}
-CustomFixes = {}
-
 #
-#
+#	initCharacter(rig):
+#	class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
 #
 
 def initCharacter(rig):
@@ -2765,8 +2759,7 @@ def initCharacter(rig):
 			continue
 		(mhx, text) = bn
 		rig[mhx] = mhx
-		rig['X_'+mhx] = False
-		rig['Z_'+mhx] = False
+		rig['R_'+mhx] = 0
 	rig['MhxCustomRig'] = 'INITED'
 	return
 	
@@ -2780,9 +2773,15 @@ class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
 		print("Character initialized")
 		return{'FINISHED'}	
 
+#
+#	makeAssoc(rig):
+#	assocValue(name, assoc):
+#	realBone(bone, rig, n):
+#	class VIEW3D_OT_MhxMakeAssocButton(bpy.types.Operator):
+#
+
 def makeAssoc(rig):
-	global CustomBones, CustomParents, CustomFixes
-	assoc = []
+	boneAssoc = []
 	for bn in MhxBoneNames:
 		if not bn:
 			continue
@@ -2795,39 +2794,57 @@ def makeAssoc(rig):
 			except:
 				exists = False
 			if exists:
-				assoc.append((bone, mhx))
+				boneAssoc.append((bone, mhx))
 			else:
 				raise NameError("Bone %s does not exist in armature %s" % (bone, rig.name))
-	CustomBones[rig.name] = assoc
-	print(CustomBones[rig.name])
-	rig['MhxCustomRig'] = 'ASSOCIATED'
 
 	parAssoc = {}
-	for (bname, mhx) in assoc:
+	for (bname, mhx) in boneAssoc:
 		bone = rig.data.bones[bname] 
 		par = realBone(bone.parent, rig, 0)
-		while par and not assocValue(par.name, assoc):
+		while par and not assocValue(par.name, boneAssoc):
 			par = realBone(par.parent, rig, 0)
 		if par:
 			parAssoc[bname] = par.name
 		else:
 			parAssoc[bname] = None
-	CustomParents[rig.name] = parAssoc
 
-	fixes = {}
-	for (bname, mhx) in assoc:
-		fixes[bname] = []
-		if (rig['X_'+mhx]):
-			fixes[bname].append('-X')
-		if (rig['Z_'+mhx]):
-			fixes[bname].append('-Z')
-	CustomFixes[rig.name] = fixes
+	rolls = {}
+	try:
+		bpy.ops.object.mode_set(mode='EDIT')	
+		(bname, mhx) = boneAssoc[0]
+		rig.data.edit_bones[bname]
+		edit = True
+	except:
+		edit = False
+	if edit:
+		for (bname, mhx) in boneAssoc:
+			eb = rig.data.edit_bones[bname]
+			rolls[bname] = eb.roll
+			"""
+			if eb.roll > 135*D or eb.roll < -135*D:
+				rolls[bname] = 2
+			elif eb.roll > 45*D:
+				rolls[bname] = 1
+			elif eb.roll < -45*D:
+				rolls[bname] = -1
+			else:
+				rolls[bname] = 0	
+			"""
+			rig['R_'+mhx] = rolls[bname]
+		bpy.ops.object.mode_set(mode='POSE')	
+	else:
+		for (bname, mhx) in boneAssoc:
+			try:
+				rolls[bname] = rig['R_'+mhx]
+			except:
+				raise NameError("Associations must be made in rig source file")
 
 	print("Associations:")	
-	print("         Bone :     Mhx bone       Parent   Fixes")
-	for (bname, mhx) in assoc:
-		print("  %12s : %12s %12s  %s" % (bname, mhx, parAssoc[bname], fixes[bname]))
-	return True
+	print("          Bone :     Mhx bone       Parent  Roll")
+	for (bname, mhx) in boneAssoc:
+		print("  %12s : %12s %12s %5d" % (bname, mhx, parAssoc[bname], rolls[bname]/Deg2Rad))
+	return (boneAssoc, parAssoc, rolls)
 	
 def assocValue(name, assoc):
 	for (key, value) in assoc:
@@ -2845,14 +2862,14 @@ def realBone(bone, rig, n):
 	for cns in pb.constraints:
 		if (cns.type == 'COPY_ROTATION' and 
 			cns.influence > 0.6 and
-			# cns.use_x and cns.use_y and cns.use_z and
+			cns.use_x and cns.use_z and
 			cns.target == rig):
 			rb = rig.data.bones[cns.subtarget]
 			return realBone(rb, rig, n+1)
 	return bone
 
 class VIEW3D_OT_MhxMakeAssocButton(bpy.types.Operator):
-	bl_idname = "mhx.mocap_make_associations"
+	bl_idname = "mhx.mocap_make_assoc"
 	bl_label = "Make associations"
 	bl_options = {'REGISTER'}
 
@@ -2876,9 +2893,9 @@ def saveCustomBones(context, path):
 		(mhx, text) = bn
 		bone = rig[mhx]
 		if bone == '':
-			fp.write("%s %s %d %d\n" % (mhx, '-', 0, 0))
+			fp.write("%s %s\n" % (mhx, '-'))
 		else:
-			fp.write("%s %s %d %d\n" % (mhx, bone, rig['X_'+mhx], rig['Z_'+mhx]))
+			fp.write("%s %s\n" % (mhx, bone))
 	fp.close()
 	return
 		
@@ -2890,16 +2907,12 @@ def loadCustomBones(context, path):
 		try:
 			mhx = words[0]
 			bone = words[1]
-			x = int(words[2])
-			z = int(words[3])
 		except:
 			mhx = None
 		if mhx:
 			if bone == '-':
 				bone = ''
 			rig[mhx] = bone
-			rig['X_'+mhx] = x
-			rig['Z_'+mhx] = z
 	fp.close()
 	return
 		
@@ -2945,8 +2958,6 @@ class MhxCustomBonesPanel(bpy.types.Panel):
 		except:
 			inited = False
 
-		layout.label("Experimental definition of armature for MH mocap tool")
-		layout.label("Do not use for native MH rigs (MHX, game, Rorkimaru)")
 		if not inited:
 			layout.operator("mhx.mocap_init_character", text='Initialize character')
 			return
@@ -2954,14 +2965,11 @@ class MhxCustomBonesPanel(bpy.types.Panel):
 		layout.operator("mhx.mocap_init_character", text='Reinitialize character')		
 		layout.operator("mhx.mocap_load_save_custom_bones", text='Load custom bones').loadSave = 'load'		
 		layout.operator("mhx.mocap_load_save_custom_bones", text='Save custom bones').loadSave = 'save'		
-		layout.operator("mhx.mocap_make_associations")
+		layout.operator("mhx.mocap_make_assoc")		
 		for bn in MhxBoneNames:
 			if bn:
-				row = layout.split(0.75)
 				(mhx, text) = bn
-				row.prop(rig, '["%s"]' % mhx, text=text)
-				row.prop(rig, '["X_%s"]' % mhx, toggle=True, text='X')
-				row.prop(rig, '["Z_%s"]' % mhx, text='')
+				layout.prop(rig, '["%s"]' % mhx, text=text)
 			else:
 				layout.separator()
 		return
