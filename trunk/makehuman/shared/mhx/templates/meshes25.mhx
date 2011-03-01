@@ -14839,7 +14839,7 @@ end Mesh
 
 *** human-object Mesh
   layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
-  #if toggle&T_Cage
+  *** toggleCage
     Modifier MeshDeform MESH_DEFORM
       invert_vertex_group False ;
       object Refer Object CageMesh ;

@@ -54,6 +54,7 @@ end Mesh
 
 *** ProxyObject
 *** ProxyLayers
+   *** toggleCage
     Modifier MeshDeform MESH_DEFORM
       invert_vertex_group False ;
       object Refer Object CageMesh ;

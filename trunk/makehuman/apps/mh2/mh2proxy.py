@@ -134,6 +134,7 @@ class CProxyConfig:
 		self.expressions = True
 		self.faceshapes = True
 		self.bodyshapes = True
+		self.cage = False
 
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
@@ -200,7 +201,17 @@ def proxyConfig(options=None):
 					useDae = eval(words[2])
 				except:
 					pass
-			elif key in ['proxy', 'cage', 'clothes']:
+			elif key == 'proxy':
+				typ = 'Proxy'
+				typ = key.capitalize()
+				layer = int(words[2])
+			elif key == 'cage':
+				typ = 'Cage'
+				typ = key.capitalize()
+				cfg.cage = True
+				layer = int(words[2])
+			elif key == 'clothes':
+				typ = 'Clothes'
 				typ = key.capitalize()
 				layer = int(words[2])
 			else:

@@ -355,10 +355,11 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 					else:
 						fp.write("0 ")
 				fp.write(";\n")
-				if proxy.cage:
-					fp.write("  #if False\n")
-				else:
+			elif words[1] == 'toggleCage':
+				if theConfig.cage and not (proxy and proxy.cage):
 					fp.write("  #if toggle&T_Cage\n")
+				else:
+					fp.write("  #if False\n")
 			elif words[1] == 'ProxyReferRig':
 				if proxy.rig:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
@@ -430,7 +431,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 							weights = rig.weights
 						mh2proxy.writeRigWeights(fp, weights)
 					copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)	
-					if not (proxy and proxy.cage):
+					if theConfig.cage and not (proxy and proxy.cage):
 						fp.write("#if toggle&T_Cage\n")
 						copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)	
 						fp.write("#endif\n")
