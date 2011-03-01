@@ -43,6 +43,7 @@
 
 #include "core.h"
 #include "glmodule.h"
+#include "arraybuffer.h"
 #ifdef __APPLE__
 #include "OSXTools.h"
 #endif // __APPLE__
@@ -742,6 +743,8 @@ PyMODINIT_FUNC initmh()
     RegisterObject3D(module);
     RegisterCamera(module);
     RegisterTexture(module);
+    RegisterArrayBuffer(module);
+    RegisterTypedArrayViews(module);
     PyModule_AddObject(module, "world", G.world);
     PyModule_AddObject(module, "cameras", G.cameras);
 }
@@ -788,6 +791,8 @@ int main(int argc, char *argv[])
     RegisterObject3D(module);
     RegisterCamera(module);
     RegisterTexture(module);
+    RegisterArrayBuffer(module);
+    RegisterTypedArrayViews(module);
     PyModule_AddObject(module, "world", G.world);
     PyModule_AddObject(module, "cameras", G.cameras);
 
