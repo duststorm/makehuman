@@ -24,8 +24,10 @@ if not env.GetOption('clean'):
             env.Append(CPPPATH = ['c:/python' + pyver + '/include', 'c:/sdl/include', 'c:/glew/include/GL'])
             env.Append(LIBPATH = ['c:/python' + pyver + '/libs', 'c:/sdl/lib', 'c:/glew/lib'])
         else:
-            env.Append(CPPPATH = ['c:/python' + pyver + '/include', 'c:/mingw/include'])
-            env.Append(LIBPATH = ['c:/python' + pyver + '/libs', 'c:/mingw/lib'])
+            mingwinc = 'c:/mingw/include'
+            mingwlib = 'c:/mingw/lib'
+            env.Append(CPPPATH = ['c:/python' + pyver + '/include', mingwinc, mingwinc + '/SDL'])
+            env.Append(LIBPATH = ['c:/python' + pyver + '/libs', mingwlib, mingwlib + '/SDL'])
             
     # Check for libs and headers
     if conf.CheckLib('m'):
@@ -53,6 +55,8 @@ if not env.GetOption('clean'):
         if 'msvc' in env['TOOLS']:
             env.Append(CFLAGS='/O2 /GL /D "_UNICODE" /D "UNICODE" /FD /EHsc /MD')
             env.Append(LINKFLAGS='/OPT:REF /OPT:ICF /LTCG /MACHINE:X86 /NODEFAULTLIB:libcmt.lib /SUBSYSTEM:CONSOLE')
+        else:
+            env.Append(LINKFLAGS='-mconsole')
     else:
         env.Append(LIBS = ['GL','GLU'])
 env=conf.Finish()
