@@ -24,8 +24,8 @@ if not env.GetOption('clean'):
             env.Append(CPPPATH = ['c:/python' + pyver + '/include', 'c:/sdl/include', 'c:/glew/include/GL'])
             env.Append(LIBPATH = ['c:/python' + pyver + '/libs', 'c:/sdl/lib', 'c:/glew/lib'])
         else:
-            env.Append(CPPPATH = ['c:/mingw/include'])
-            env.Append(LIBPATH = ['c:/mingw/lib'])
+            env.Append(CPPPATH = ['c:/python' + pyver + '/include', 'c:/mingw/include'])
+            env.Append(LIBPATH = ['c:/python' + pyver + '/libs', 'c:/mingw/lib'])
             
     # Check for libs and headers
     if conf.CheckLib('m'):
