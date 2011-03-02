@@ -11,17 +11,23 @@ env = Environment(CPPPATH=[
         'include',
         '/usr/include/python' + pyver,
         '/usr/include/GL',
-        '/usr/include/SDL',
-        'c:/python' + pyver + '/include',
-        'c:/sdl/include',
-        'c:/glew/include/GL'],
-    LIBPATH=[
-        'c:/python' + pyver + '/libs',
-        'c:/sdl/lib',
-        'c:/glew/lib'],
+        '/usr/include/SDL'],
+    LIBPATH=[],
     LIBS = [], CCFLAGS = '-O2')
-conf = Configure(env)  
+conf = Configure(env)
+
 if not env.GetOption('clean'):
+    
+    # Append to CPPPATH and LIBPATH if on windows
+    if platform.system() == "Windows":
+        if 'msvc' in env['TOOLS']:
+            env.Append(CPPPATH = ['c:/python' + pyver + '/include', 'c:/sdl/include', 'c:/glew/include/GL'])
+            env.Append(LIBPATH = ['c:/python' + pyver + '/libs', 'c:/sdl/lib', 'c:/glew/lib'])
+        else:
+            env.Append(CPPPATH = ['c:/mingw/include'])
+            env.Append(LIBPATH = ['c:/mingw/lib'])
+            
+    # Check for libs and headers
     if conf.CheckLib('m'):
         env.Append(LIBS = ['m']);
     if not (conf.CheckLib('python' + pyver, 'Py_Initialize') and conf.CheckHeader('Python.h')):
@@ -40,6 +46,8 @@ if not env.GetOption('clean'):
     if not (conf.CheckLib('GLEW') or conf.CheckLib('glew32', 'glewInit')):
         print "The GLEW must be installed"
         exit(1)
+        
+    # Add additional libs and set flags
     if platform.system() == "Windows":
         env.Append(LIBS = ['opengl32','glu32','shell32','kernel32','user32'])
         if 'msvc' in env['TOOLS']:
