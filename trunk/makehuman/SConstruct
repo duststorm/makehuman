@@ -24,25 +24,19 @@ conf = Configure(env)
 if not env.GetOption('clean'):
     if conf.CheckLib('m'):
         env.Append(LIBS = ['m']);
-    if not (conf.CheckLibWithHeader('python' + pyver, 'Python.h', 'c')):
+    if not (conf.CheckLib('python' + pyver, 'Py_Initialize') and conf.CheckHeader('Python.h')):
         print "The Python " + pyver + " development libraries must be installed"
         exit(1)
-    else:
-        env.Append(LIBS = ['python' + pyver])
     if platform.system() != "Windows":
         if not (conf.CheckLib('X11')):
             print "The X11 development libraries must be installed"
             exit(1)
-        else:
-            env.Append(LIBS = ['X11'])
     if not (conf.CheckLib('SDL', 'SDL_Init') and conf.CheckHeader('SDL.h')):
         print "The SDL development libraries must be installed"
         exit(1)
     else:
         if platform.system() == "Windows":
-            env.Append(LIBS = ['SDLmain', 'SDL'])
-        else:
-            env.Append(LIBS = ['SDL'])
+            env.Append(LIBS = ['SDLmain'])
     if not (conf.CheckLib('GLEW') or conf.CheckLib('glew32', 'glewInit')):
         print "The GLEW must be installed"
         exit(1)
