@@ -1459,6 +1459,7 @@ def insertAnimChild(name, animations, nFrames, rots):
 	anim.nFrames = nFrames
 	quat = Quaternion()
 	quat.identity()
+	print(name, par)
 	for frame in range(anim.nFrames):
 		parmat = animPar.matrices[frame]
 		if rots:
@@ -1631,6 +1632,7 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix, roll):
 		animTrg.quats[frame] = rot
 		setRotation(pb, rot, frame, name)
 	return
+
 
 #
 #	rollRot(rot, roll):
@@ -2837,6 +2839,10 @@ def assocBones(rig, names, xtraAssoc):
 				rolls[bname] = rig['R_'+mhx]
 			except:
 				raise NameError("Associations must be made in rig source file")
+
+	pb = rig.pose.bones[rig['Root']]
+	pb.lock_location = (False,False,False)
+
 	return (boneAssoc, parAssoc, rolls)
 
 #
@@ -2902,10 +2908,10 @@ def realBone(bone, rig, n):
 		return bone
 	pb = rig.pose.bones[bone.name]
 	for cns in pb.constraints:
-		if (cns.type == 'COPY_ROTATION' and 
-			cns.influence > 0.6 and
-			cns.use_x and cns.use_z and
-			cns.target == rig):
+		if (((cns.type == 'COPY_ROTATION' and cns.use_x and cns.use_z) or
+			 (cns.type == 'COPY_TRANSFORMS')) and
+			(cns.influence > 0.6) and
+			(cns.target == rig)):
 			rb = rig.data.bones[cns.subtarget]
 			return realBone(rb, rig, n+1)
 	return bone
@@ -2917,6 +2923,28 @@ class VIEW3D_OT_MhxMakeAssocButton(bpy.types.Operator):
 
 	def execute(self, context):
 		makeAssoc(context.object)
+		print("Associations made")
+		return{'FINISHED'}	
+
+#
+#
+#
+
+def unrollAll(context):
+	bpy.ops.object.mode_set(mode='EDIT')
+	ebones = context.object.data.edit_bones
+	for eb in ebones:
+		eb.roll = 0
+	bpy.ops.object.mode_set(mode='POSE')
+	return
+
+class VIEW3D_OT_MhxUnrollAllButton(bpy.types.Operator):
+	bl_idname = "mhx.mocap_unroll_all"
+	bl_label = "Unroll all"
+	bl_options = {'REGISTER'}
+
+	def execute(self, context):
+		unrollAll(context)
 		print("Associations made")
 		return{'FINISHED'}	
 
@@ -3008,6 +3036,7 @@ class MhxCustomBonesPanel(bpy.types.Panel):
 		layout.operator("mhx.mocap_load_save_custom_bones", text='Load custom bones').loadSave = 'load'		
 		layout.operator("mhx.mocap_load_save_custom_bones", text='Save custom bones').loadSave = 'save'		
 		layout.operator("mhx.mocap_make_assoc")		
+		layout.operator("mhx.mocap_unroll_all")		
 		layout.label("FK bones")
 		for bn in CustomBoneNames:
 			if bn:
