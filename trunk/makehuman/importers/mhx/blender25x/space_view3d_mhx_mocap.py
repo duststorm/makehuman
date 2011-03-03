@@ -1005,9 +1005,11 @@ def guessTargetArmature(trgRig):
 		theTrgBone = {}
 		theSrcBone = {}
 		if theTarget == T_Custom:
-			(bones, theParents, theRolls) = makeAssoc(trgRig)
-			theIkBoneList = []
-			theIkParents = []
+			(bones, theParents, theRolls, theIkBoneList, theIkParents) = makeAssoc(trgRig)
+			print("IK bones")
+			print(theIkBoneList)
+			print("IK parents")
+			print(theIkParents.items())
 		elif theTarget == T_Rorkimaru:
 			bones = RorkimaruBones
 			theIkBoneList = GameIkBoneList
@@ -1592,7 +1594,6 @@ def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, roll):
 		animTrg.matrices[frame] = mat90
 		matMhx = animTrg.inverseRest * mat90 * animTrg.matrixRest
 		rot = matMhx.to_quaternion()
-		rollRot(rot, roll)
 		rots.append(rot)
 		setRotation(pb, rot, frame, name)
 	return rots
@@ -2578,6 +2579,7 @@ class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
 	bl_idname = "mhx.mocap_load_retarget_simplify"
 	bl_label = "Load, retarget, simplify"
 
+
 	filename_ext = ".bvh"
 	filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
 	filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
@@ -2713,39 +2715,48 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
 
 		return{'FINISHED'}	
 
+###############################################################################
 #
+#	Custom armatures
 #
-#
+###############################################################################
 
-MhxBoneNames = [
-	('Root',		'Root bone'),
-	('Spine1',		'Lower spine'),
-	('Spine2',		'Middle spine'),
-	('Spine3',		'Upper spine'),
-	('Neck',		'Neck'),
-	('Head',		'Head'),
+CustomBoneNames = [
+	('Root',		'Root bone', None),
+	('Spine1',		'Lower spine', None),
+	('Spine2',		'Middle spine', None),
+	('Spine3',		'Upper spine', None),
+	('Neck',		'Neck', None),
+	('Head',		'Head', None),
 	None,
-	('Shoulder_L',	'L shoulder'),
-	('UpArm_L',		'L upper arm'),
-	('LoArm_L',		'L forearm'),
-	('Hand_L',		'L hand'),
+	('Shoulder_L',	'L shoulder', None),
+	('UpArm_L',		'L upper arm', None),
+	('LoArm_L',		'L forearm', None),
+	('Hand_L',		'L hand', None),
 	None,
-	('Shoulder_R',	'R shoulder'),
-	('UpArm_R',		'R upper arm'),
-	('LoArm_R',		'R forearm'),
-	('Hand_R',		'R hand'),
+	('Shoulder_R',	'R shoulder', None),
+	('UpArm_R',		'R upper arm', None),
+	('LoArm_R',		'R forearm', None),
+	('Hand_R',		'R hand', None),
 	None,
-	('Hips',		'Hips'),
+	('Hips',		'Hips', None),
 	None,
-	('UpLeg_L',		'L thigh'),
-	('LoLeg_L',		'L shin'),
-	('Foot_L',		'L foot'),
-	('Toe_L',		'L toes'),
+	('UpLeg_L',		'L thigh', None),
+	('LoLeg_L',		'L shin', None),
+	('Foot_L',		'L foot', None),
+	('Toe_L',		'L toes', None),
 	None,
-	('UpLeg_R',		'R thigh'),
-	('LoLeg_R',		'R shin'),
-	('Foot_R',		'R foot'),
-	('Toe_R',		'R toes'),
+	('UpLeg_R',		'R thigh', None),
+	('LoLeg_R',		'R shin', None),
+	('Foot_R',		'R foot', None),
+	('Toe_R',		'R toes', None),
+]
+
+CustomIkBoneNames = [ 
+	('Wrist_L', 	'L wrist', 'LoArm_L'),
+	('Wrist_R', 	'R wrist', 'LoArm_R'),
+	('Ankle_L', 	'L ankle', 'LoLeg_L'),
+	('Ankle_R',		'R ankle', 'LoLeg_R')
 ]
 
 #
@@ -2754,10 +2765,10 @@ MhxBoneNames = [
 #
 
 def initCharacter(rig):
-	for bn in MhxBoneNames:
+	for bn in CustomBoneNames+CustomIkBoneNames:
 		if not bn:
 			continue
-		(mhx, text) = bn
+		(mhx, text, fakePar) = bn
 		rig[mhx] = mhx
 		rig['R_'+mhx] = 0
 	rig['MhxCustomRig'] = 'INITED'
@@ -2774,18 +2785,15 @@ class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	makeAssoc(rig):
-#	assocValue(name, assoc):
-#	realBone(bone, rig, n):
-#	class VIEW3D_OT_MhxMakeAssocButton(bpy.types.Operator):
+#	assocBones(rig, names, xtraAssoc):
 #
 
-def makeAssoc(rig):
+def assocBones(rig, names, xtraAssoc):
 	boneAssoc = []
-	for bn in MhxBoneNames:
+	for bn in names:
 		if not bn:
 			continue
-		(mhx, text) = bn
+		(mhx, text, fakePar) = bn
 		bone = rig[mhx]
 		if bone != '':
 			try:
@@ -2802,7 +2810,7 @@ def makeAssoc(rig):
 	for (bname, mhx) in boneAssoc:
 		bone = rig.data.bones[bname] 
 		par = realBone(bone.parent, rig, 0)
-		while par and not assocValue(par.name, boneAssoc):
+		while par and not assocValue(par.name, boneAssoc+xtraAssoc):
 			par = realBone(par.parent, rig, 0)
 		if par:
 			parAssoc[bname] = par.name
@@ -2821,16 +2829,6 @@ def makeAssoc(rig):
 		for (bname, mhx) in boneAssoc:
 			eb = rig.data.edit_bones[bname]
 			rolls[bname] = eb.roll
-			"""
-			if eb.roll > 135*D or eb.roll < -135*D:
-				rolls[bname] = 2
-			elif eb.roll > 45*D:
-				rolls[bname] = 1
-			elif eb.roll < -45*D:
-				rolls[bname] = -1
-			else:
-				rolls[bname] = 0	
-			"""
 			rig['R_'+mhx] = rolls[bname]
 		bpy.ops.object.mode_set(mode='POSE')	
 	else:
@@ -2839,18 +2837,62 @@ def makeAssoc(rig):
 				rolls[bname] = rig['R_'+mhx]
 			except:
 				raise NameError("Associations must be made in rig source file")
+	return (boneAssoc, parAssoc, rolls)
+
+#
+#	findFakeParent(mhx, boneAssoc):
+#
+
+def findFakeParent(mhx, boneAssoc):
+	for (mhx1, text, fakemhx) in CustomIkBoneNames:
+		if mhx == mhx1:
+			for (parname, parmhx) in boneAssoc:
+				if parmhx == fakemhx:
+					return parname
+	raise NameError("Did not find fake parent %s" % mhx)
+
+#
+#	makeAssoc(rig):
+#
+
+def makeAssoc(rig):
+	(boneAssoc, parAssoc, rolls) = assocBones(rig, CustomBoneNames, [])
+	(ikBoneAssoc, ikParAssoc, ikRolls) = assocBones(rig, CustomIkBoneNames, boneAssoc)
+
+	ikBones = []
+	ikParents = {}
+	for (bone, mhx) in ikBoneAssoc:
+		ikBones.append(bone)
+		fakePar = findFakeParent(mhx, boneAssoc)
+		# bone : (realParent, fakeParent, copyRot, reverse)
+		par = ikParAssoc[bone]
+		ikParents[bone] = (par, fakePar, False, False)
+		parAssoc[bone] = par
 
 	print("Associations:")	
 	print("          Bone :     Mhx bone       Parent  Roll")
 	for (bname, mhx) in boneAssoc:
 		print("  %12s : %12s %12s %5d" % (bname, mhx, parAssoc[bname], rolls[bname]/Deg2Rad))
-	return (boneAssoc, parAssoc, rolls)
+	print("IK bones:")
+	print("          Bone :     Mhx bone  Real parent  Fake parent")
+	for (bname, mhx) in ikBoneAssoc:
+		(par, fakePar, copyRot, reverse) = ikParents[bname]
+		print("  %12s : %12s %12s %12s" % (bname, mhx, par, fakePar))
+	return (boneAssoc, parAssoc, rolls, ikBones, ikParents)
+
+#
+#	assocValue(name, assoc):
+#
 	
 def assocValue(name, assoc):
 	for (key, value) in assoc:
 		if key == name:
 			return value
 	return None
+
+#
+#	realBone(bone, rig, n):
+#
 
 def realBone(bone, rig, n):
 	if not bone:
@@ -2887,10 +2929,10 @@ class VIEW3D_OT_MhxMakeAssocButton(bpy.types.Operator):
 def saveCustomBones(context, path):
 	rig = context.object
 	fp = open(path, "w")
-	for bn in MhxBoneNames:
+	for bn in CustomBoneNames+CustomIkBoneNames:
 		if not bn:
 			continue
-		(mhx, text) = bn
+		(mhx, text, fakePar) = bn
 		bone = rig[mhx]
 		if bone == '':
 			fp.write("%s %s\n" % (mhx, '-'))
@@ -2966,12 +3008,16 @@ class MhxCustomBonesPanel(bpy.types.Panel):
 		layout.operator("mhx.mocap_load_save_custom_bones", text='Load custom bones').loadSave = 'load'		
 		layout.operator("mhx.mocap_load_save_custom_bones", text='Save custom bones').loadSave = 'save'		
 		layout.operator("mhx.mocap_make_assoc")		
-		for bn in MhxBoneNames:
+		layout.label("FK bones")
+		for bn in CustomBoneNames:
 			if bn:
-				(mhx, text) = bn
+				(mhx, text, fakePar) = bn
 				layout.prop(rig, '["%s"]' % mhx, text=text)
 			else:
 				layout.separator()
+		layout.label("IK bones")
+		for (mhx, text, fakePar) in CustomIkBoneNames:
+			layout.prop(rig, '["%s"]' % mhx, text=text)
 		return
 
 #
