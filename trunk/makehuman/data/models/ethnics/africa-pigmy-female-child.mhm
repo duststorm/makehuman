@@ -63,3 +63,4 @@ microdetail l-nose-nostril-trans-down 0.050000
 detail r-upperleg-scale-horiz-decr 0.950000
 detail l-upperarm-scale-vert-decr 0.500000
 detail jaw-scale-depth-incr 0.250000
+skinTexture texture_african.tif

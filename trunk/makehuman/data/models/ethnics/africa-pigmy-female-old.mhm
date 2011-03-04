@@ -63,3 +63,4 @@ detail torso-scale-vert-incr 0.100000
 microdetail l-nose-nostril-trans-down 0.050000
 detail r-upperleg-scale-horiz-decr 0.950000
 detail r-upperarm-scale-vert-incr 0.350000
+skinTexture texture_african.tif

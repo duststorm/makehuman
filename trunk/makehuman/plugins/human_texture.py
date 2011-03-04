@@ -86,10 +86,11 @@ class HumanTextureTaskView(gui3d.TaskView):
             self.app.switchCategory('Library')
             self.app.switchTask("Human texture")
             
+        self.app.addLoadHandler('skinTexture', self.loadHandler)
+            
     def syncTexture(self):
         
         self.currentTexture.setTexture(self.app.selectedHuman.getTexture())
-        self.app.redraw()
 
     def onShow(self, event):
 
@@ -105,6 +106,21 @@ class HumanTextureTaskView(gui3d.TaskView):
     def onResized(self, event):
         self.filechooser.onResized(event)
         self.currentTexture.setPosition([event[0]-252, event[1]-36, 9.2])
+        
+    def onHumanChanged(self, event):
+
+        if event.change == 'reset':
+            self.syncTexture()
+        
+    def loadHandler(self, human, values):
+        
+        if values[0] == 'skinTexture':
+            human.setTexture(os.path.join('data/textures', values[1]))
+            self.syncTexture()
+       
+    def saveHandler(self, human, file):
+        
+        file.write('skinTexture %s\n' % os.path.basename(human.getTexture()))
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

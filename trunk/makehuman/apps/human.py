@@ -52,7 +52,7 @@ class Human(gui3d.Object):
 
         gui3d.Object.__init__(self, globalScene.application, [0, 0, 0], objFilePath, visible=True)
         self.mesh.setCameraProjection(0)
-        self.mesh.setShadeless(0) 
+        self.mesh.setShadeless(0)
         self.meshData = self.mesh
 
         self.scene = globalScene
@@ -112,6 +112,8 @@ class Human(gui3d.Object):
         self.baseModifier = humanmodifier.GenderAgeModifier('data/targets/macrodetails/neutral-${gender}-${age}.target')
         
         self.__subdivisionMesh = None
+        
+        self.setTexture("data/textures/texture.png")
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -544,6 +546,8 @@ class Human(gui3d.Object):
         self.buttocks = 0.0
 
         self.targetsDetailStack = {}
+        
+        self.setTexture("data/textures/texture.png")
         
         self.callEvent('onChanged', HumanEvent(self, 'reset'))
 

@@ -62,3 +62,4 @@ microdetail nose-sellion-scale-depth-decr 0.750000
 detail hip-scale-vert-incr 1.000000
 detail hip-trans-down 0.800000
 detail r-upperleg-scale-horiz-decr 0.700000
+skinTexture texture_african.tif

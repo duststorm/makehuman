@@ -98,7 +98,7 @@ class HairTaskView(gui3d.TaskView):
         self.filechooser.onResized(event)
 
     def onHumanChanged(self, event):
-        print 'onHumanChanged'
+        
         human = event.human
         if event.change == 'reset':
             self.filechooser.selection = 'default.hair'
