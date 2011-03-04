@@ -1369,13 +1369,13 @@ void OnInit(void)
     /*Lights and materials*/
     const float lightPos[] = { -10.99f, 20.0f, 20.0f, 1.0f};  /* Light Position */
     const float ambientLight[] = { 0.0f, 0.0f, 0.0f, 1.0f};   /* Ambient Light Values */
-    const float diffuseLight[] = { .5f, .5f, .5f, 1.0f};      /* Diffuse Light Values */
-    const float specular[] = {0.5f, .5f, .5f, .5f};           /* Specular Light Values */
-    const float MatAmb[] = {0.11f, 0.06f, 0.11f, 1.0f};       /* Material - Ambient Values */
-    const float MatDif[] = {0.7f, 0.6f, 0.6f, 1.0f};          /* Material - Diffuse Values */
-    const float MatSpc[] = {0.33f, 0.33f, 0.52f, 1.0f};       /* Material - Specular Values */
-    const float MatShn[] = {50.0f};                           /* Material - Shininess */
-    //const float MatEms[] = {0.1f, 0.05f, 0.0f, 1.0f};         /* Material - emission Values */
+    const float diffuseLight[] = { 1.0f, 1.0f, 1.0f, 1.0f};   /* Diffuse Light Values */
+    const float specularLight[] = {1.0f, 1.0f, 1.0f, 1.0f};   /* Specular Light Values */
+    const float MatAmb[] = {0.11f, 0.11f, 0.11f, 1.0f};       /* Material - Ambient Values */
+    const float MatDif[] = {1.0f, 1.0f, 1.0f, 1.0f};          /* Material - Diffuse Values */
+    const float MatSpc[] = {0.2f, 0.2f, 0.2f, 1.0f};          /* Material - Specular Values */
+    const float MatShn[] = {10.0f};                           /* Material - Shininess */
+    //const float MatEms[] = {0.1f, 0.05f, 0.0f, 1.0f};       /* Material - emission Values */
 
     glewInit();
 
@@ -1387,10 +1387,9 @@ void OnInit(void)
     glEnable(GL_LIGHTING);                                    /* Enable lighting */
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR); // If we enable this, we have stronger specular highlights
-    glMaterialfv(GL_FRONT, GL_SHININESS, MatShn);             /* Set Material Shininess */
     glMaterialfv(GL_FRONT, GL_AMBIENT, MatAmb);               /* Set Material Ambience */
     glMaterialfv(GL_FRONT, GL_DIFFUSE, MatDif);               /* Set Material Diffuse */
     glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpc);              /* Set Material Specular */
