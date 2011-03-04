@@ -51,11 +51,25 @@ class Action:
             self.postAction()
         return True
 
+HumanTextureButtonStyle = gui3d.Style(**{
+    'width':32,
+    'height':32,
+    'mesh':None,
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontSize':gui3d.defaultFontSize,
+    'border':None
+    })
+
 class HumanTextureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Texture')
         self.filechooser = gui3d.FileChooser(self, 'data/textures', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
+        
+        self.currentTexture = gui3d.Button(self.app.categories['Modelling'], [800-252, 600-36, 9.2],
+            style=HumanTextureButtonStyle._replace(normal=self.app.selectedHuman.getTexture()))
 
         @self.filechooser.event
         def onFileSelected(filename):
@@ -63,10 +77,19 @@ class HumanTextureTaskView(gui3d.TaskView):
             
             self.app.do(Action(self.app.selectedHuman,
                 self.app.selectedHuman.getTexture(),
-                os.path.join('data/textures', filename),
-                self.app.redraw))
+                os.path.join('data/textures', filename), self.syncTexture))
             
             self.app.switchCategory('Modelling')
+            
+        @self.currentTexture.event
+        def onClicked(event):
+            self.app.switchCategory('Library')
+            self.app.switchTask("Human texture")
+            
+    def syncTexture(self):
+        
+        self.currentTexture.setTexture(self.app.selectedHuman.getTexture())
+        self.app.redraw()
 
     def onShow(self, event):
 
@@ -81,6 +104,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         self.filechooser.onResized(event)
+        self.currentTexture.setPosition([event[0]-252, event[1]-36, 9.2])
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
