@@ -101,6 +101,12 @@ class MeasureTaskView(gui3d.TaskView):
                 yy += 36
                
         y = 80
+        self.statsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Statistics', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
+        self.height = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Height: ');y += 22
+        self.chest = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Chest: ');y += 22
+        self.waist = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Waist: ');y += 22
+        self.hips = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Hips: ');y += 22
+        y+=16
         self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
         self.eu = gui3d.TextView(self.braBox, [658, y, 9.1], 'EU: ');y += 22
         self.jp = gui3d.TextView(self.braBox, [658, y, 9.1], 'JP: ');y += 22
@@ -125,6 +131,7 @@ class MeasureTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         
+        self.statsBox.setPosition([event[0] - 150, self.braBox.getPosition()[1], 9.0])
         self.braBox.setPosition([event[0] - 150, self.braBox.getPosition()[1], 9.0])
         
     def hideAllSliders(self):
@@ -135,7 +142,8 @@ class MeasureTaskView(gui3d.TaskView):
         
         for slider in self.sliders:
             slider.update()
-            
+           
+        self.syncStatistics()
         self.syncBraSizes()
             
     def syncSliderLabels(self):
@@ -143,8 +151,24 @@ class MeasureTaskView(gui3d.TaskView):
         for slider in self.sliders:
             slider.updateLabel()
             
+        self.syncStatistics()
         self.syncBraSizes()
-         
+    
+    def syncStatistics(self):
+        
+        human = self.app.selectedHuman
+        
+        height = 10 * max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
+        if self.app.settings['units'] == 'metric':
+            height = '%.2f cm' % height
+        else:
+            height = '%.2f in' % (height * 0.393700787)
+        
+        self.height.setText('Height: %s' % height)
+        self.chest.setText('Chest: %s' % self.getMeasure('bust'))
+        self.waist.setText('Waist: %s' % self.getMeasure('waist'))
+        self.hips.setText('Hips: %s' % self.getMeasure('hips'))
+        
     def syncBraSizes(self):
         
         human = self.app.selectedHuman
