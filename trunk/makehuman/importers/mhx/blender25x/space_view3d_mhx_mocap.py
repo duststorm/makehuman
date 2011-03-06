@@ -551,7 +551,7 @@ HDMArmature = {
 	'rthumb' : 'Finger1_R',
 }
 
-MocapDataArmature = {
+EyesArmature = {
 	'hips' : 'Root',
 	'lefthip' : 'UpLeg_L',
 	'leftknee' : 'LoLeg_L',
@@ -683,28 +683,28 @@ theArmatures = {
 	'XX1' : Xx1Armature,
 	'HDM' : HDMArmature,
 	'3dsMax' : MaxArmature,
-	'McpD' : MocapDataArmature,
+	'Eyes' : EyesArmature,
 	'Daz' : DazArmature,
 }
 
 MBFixes = {
-	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), None),
-	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), None),
-	'LoLeg_L' : ( Matrix.Rotation(-0.2, 3, 'Y'), None),
-	'LoLeg_R' : ( Matrix.Rotation(0.2, 3, 'Y'), None),
-	'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), None),
-	'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), None),
-	#'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), None),
-	#'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), None),
+	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
+	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), 0),
+	'LoLeg_L' : ( Matrix.Rotation(-0.2, 3, 'Y'), 0),
+	'LoLeg_R' : ( Matrix.Rotation(0.2, 3, 'Y'), 0),
+	'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), 0),
+	'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), 0),
+	#'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
+	#'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
 }
 
 HDMFixes = {
-	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), None),
-	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), None),
-	'LoLeg_L' : ( Matrix.Rotation(-0.4, 3, 'Y'), None),
-	'LoLeg_R' : ( Matrix.Rotation(0.4, 3, 'Y'), None),
-	'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), None),
-	'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), None),
+	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
+	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), 0),
+	'LoLeg_L' : ( Matrix.Rotation(-0.4, 3, 'Y'), 0),
+	'LoLeg_R' : ( Matrix.Rotation(0.4, 3, 'Y'), 0),
+	'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
+	'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
 }
 
 OsuFixes = {}
@@ -712,30 +712,30 @@ OsuFixes = {}
 XX1Fixes = {}
 
 MaxFixes = {
-	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), None),
-	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), None),
-	'LoLeg_L' : ( Matrix.Rotation(-0.3, 3, 'Y'), None),
-	'LoLeg_R' : ( Matrix.Rotation(0.3, 3, 'Y'), None),
-	#'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), None),
-	#'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), None),
+	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
+	'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), 0),
+	'LoLeg_L' : ( Matrix.Rotation(-0.3, 3, 'Y'), 0),
+	'LoLeg_R' : ( Matrix.Rotation(0.3, 3, 'Y'), 0),
+	#'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), 0),
+	#'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), 0),
 
-	'UpArm_L' :  (Matrix.Rotation(1.57, 3, 'Z'), 'XZ'),
-	'LoArm_L' :  (None, 'XZ'),
-	'Hand_L'  :  (None, 'XZ'),
-	'UpArm_R' :  (Matrix.Rotation(-1.57, 3, 'Z'), 'ZX'),
-	'LoArm_R' :  (None, 'ZX'),
-	'Hand_R'  :  (None, 'ZX'),
+	'UpArm_L' :  (Matrix.Rotation(1.57, 3, 'Z'), 1.57),
+	'LoArm_L' :  (None, 1.57),
+	'Hand_L'  :  (None, 1.57),
+	'UpArm_R' :  (Matrix.Rotation(-1.57, 3, 'Z'), -1.57),
+	'LoArm_R' :  (None, -1.57),
+	'Hand_R'  :  (None, -1.57),
 }
 
-McpdFixes = {
-	'Head2' : (Matrix.Rotation(0.2, 3, 'X'), None),
-	'Spine2' : (Matrix.Rotation(0.3, 3, 'X'), None),
-	'UpArm_L' :  (Matrix.Rotation(1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), 'XZ'),
-	'LoArm_L' :  (None, 'XZ'),
-	'Hand_L' :  (None, 'XZ'),
-	'UpArm_R' :  (Matrix.Rotation(-1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), 'ZX'),
-	'LoArm_R' :  (None, 'ZX'),
-	'Hand_R' :  (None, 'ZX'),
+EyesFixes = {
+	'Head2' : (Matrix.Rotation(0.2, 3, 'X'), 0),
+	'Spine2' : (Matrix.Rotation(0.3, 3, 'X'), 0),
+	'UpArm_L' :  (Matrix.Rotation(1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), 1.57),
+	'LoArm_L' :  (None, 1.57),
+	'Hand_L' :  (None, 1.57),
+	'UpArm_R' :  (Matrix.Rotation(-1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), -1.57),
+	'LoArm_R' :  (None, -1.57),
+	'Hand_R' :  (None, -1.57),
 }
 
 DazFixes = {}
@@ -746,7 +746,7 @@ FixesList = {
 	'XX1' : XX1Fixes,
 	'HDM' : HDMFixes,
 	'3dsMax': MaxFixes,
-	'McpD': McpdFixes,
+	'Eyes': EyesFixes,
 	'Daz' : DazFixes,
 }
 
@@ -798,7 +798,7 @@ MhxIkBoneList = [
 	'LegIK_L', 'KneePT_L', # 'ToeRev_L', 'FootRev_L', 'Ankle_L',
 
 	'Elbow_R', 'ElbowPT_R', 'Wrist_R',
-	'LegIK_R', 'KneePT_L', # 'ToeRev_R', 'FootRev_R', 'Ankle_R',
+	'LegIK_R', 'KneePT_R', # 'ToeRev_R', 'FootRev_R', 'Ankle_R',
 ]
 
 
@@ -970,7 +970,7 @@ def guessTargetArmature(trgRig):
 	global theTarget, theFkBoneList, theIkBoneList, theGlobalBoneList, theIkParents, theSrcBone, theTrgBone, theParents, theRolls
 	bones = trgRig.data.bones.keys()
 	try:
-		custom = trgRig['MhxCustomRig']
+		custom = trgRig['MhxTargetRig']
 	except:
 		custom = False
 	if custom:
@@ -1005,11 +1005,7 @@ def guessTargetArmature(trgRig):
 		theTrgBone = {}
 		theSrcBone = {}
 		if theTarget == T_Custom:
-			(bones, theParents, theRolls, theIkBoneList, theIkParents) = makeAssoc(trgRig)
-			print("IK bones")
-			print(theIkBoneList)
-			print("IK parents")
-			print(theIkParents.items())
+			(bones, theParents, theRolls, theIkBoneList, theIkParents) = makeTargetAssoc(trgRig)
 		elif theTarget == T_Rorkimaru:
 			bones = RorkimaruBones
 			theIkBoneList = GameIkBoneList
@@ -1455,11 +1451,11 @@ def insertAnimChild(name, animations, nFrames, rots):
 	if nFrames < 0:
 		nFrames = len(rots)
 	par = anim.parent
+	#print("iAC", name, par)
 	animPar = animations[par]
 	anim.nFrames = nFrames
 	quat = Quaternion()
 	quat.identity()
-	print(name, par)
 	for frame in range(anim.nFrames):
 		parmat = animPar.matrices[frame]
 		if rots:
@@ -1609,7 +1605,7 @@ def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg, roll):
 	return
 
 def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix, roll):
-	(fixMat, exchange) = fix
+	(fixMat, srcRoll) = fix
 	animTrg.nFrames = animSrc.nFrames
 	for frame in range(animSrc.nFrames):
 		mat90 = animSrc.quats[frame].to_matrix()
@@ -1617,21 +1613,13 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, fix, roll):
 			matMhx = fixMat * mat90
 		else:
 			matMhx = mat90
-		rot0 = matMhx.to_quaternion()
-		if exchange == 'XZ':
-			rot = rot0.copy()
-			rot.z = rot0.x
-			rot.x = -rot0.z
-		elif exchange == 'ZX':
-			rot = rot0.copy()
-			rot.z = -rot0.x
-			rot.x = rot0.z
-		else:
-			rot = rot0
+		rot = matMhx.to_quaternion()
+		rollRot(rot, srcRoll)
 		rollRot(rot, roll)
 		animTrg.quats[frame] = rot
 		setRotation(pb, rot, frame, name)
 	return
+
 
 
 #
@@ -1656,14 +1644,14 @@ def poseTrgIkBones(context, trgRig, trgAnimations):
 	pbones = trgRig.pose.bones
 
 	for name in theIkBoneList:		
-		(realPar, fakePar, copyrot, reverse) = theIkParents[name]
+		(realPar, fakePar, copyRot, reverse) = theIkParents[name]
 		pb = pbones[name]
 		pb.bone.select = True
-		if copyrot:
-			animCopy = trgAnimations[copyrot]
+		if copyRot:
+			animCopy = trgAnimations[copyRot]
 		else:
 			animCopy = None
-		if reverse:
+		if reverse:	
 			insertReverseIkKeyFrames(name, pb, trgAnimations[name],  trgAnimations[realPar], animCopy)
 		elif realPar:
 			insertParentedIkKeyFrames(name, pb, trgAnimations[name],  trgAnimations[realPar], trgAnimations[fakePar], animCopy)
@@ -1681,12 +1669,16 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
 	for frame in range(animFake.nFrames):		
 		locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
 		headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
+		#debugPrintVecVec(locAbs, headAbs)
 		offset = locAbs - headAbs
 		mat = animReal.matrices[frame] * anim.matrixRest
-		inv = mat.copy()
-		inv.invert()
-		loc = offset*inv
-		pb.location = loc
+		if pb.bone.use_local_location:
+			inv = mat.copy()
+			inv.invert()
+			loc = offset*inv
+			pb.location = loc
+		else:
+			pb.location = offset
 		anim.heads[frame] = locAbs
 		for n in range(3):
 			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
@@ -1716,10 +1708,13 @@ def insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
 		headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
 		offset = locAbs - headAbs
 		mat = animReal.matrices[frame] * anim.matrixRest
-		inv = mat.copy()
-		inv.invert()
-		loc = offset*inv
-		pb.location = loc
+		if pb.bone.use_local_location:
+			inv = mat.copy()
+			inv.invert()
+			loc = offset*inv
+			pb.location = loc
+		else:
+			pb.location = offset
 		anim.heads[frame] = locAbs
 		for n in range(3):
 			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
@@ -1741,8 +1736,11 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
 	for frame in range(animFake.nFrames):		
 		locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
 		offset = locAbs - anim.headRest
-		loc = offset * anim.inverseRest
-		pb.location = loc
+		if pb.bone.use_local_location:
+			loc = offset * anim.inverseRest
+			pb.location = loc
+		else:
+			pb.location = offset
 		anim.heads[frame] = locAbs
 		for n in range(3):
 			pb.keyframe_insert('location', index=n, frame=frame, group=name)	
@@ -1777,8 +1775,10 @@ def retargetMhxRig(context, srcRig, trgRig):
 		fixes = FixesList[srcRig['MhxArmature']]
 	else:
 		fixes = None
+	#debugOpen()
 	poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, fixes)
 	poseTrgIkBones(context, trgRig, trgAnimations)
+	#debugClose()
 	setInterpolation(trgRig)
 	if onoff == 'OFF':
 		setLimitConstraints(trgRig, 1.0)
@@ -2027,7 +2027,7 @@ def togglePoleTargets(trgRig):
 		res = 'OFF'
 		trgRig.MhxTogglePoleTargets = False
 	for suffix in ['_L', '_R']:
-		for name in ['ElbowPT', 'ElbowLinkPT', 'ElbowPT', 'KneePT', 'KneeLinkPT', 'KneePT']:
+		for name in ['ElbowPT', 'ElbowLinkPT', 'Elbow', 'KneePT', 'KneeLinkPT', 'Knee']:
 			bones[name+suffix].hide = hide
 		cns = pbones['LoArm'+suffix].constraints['ArmIK']
 		cns = pbones['LoLeg'+suffix].constraints['LegIK']
@@ -2719,83 +2719,98 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
 
 ###############################################################################
 #
-#	Custom armatures
+#	Target armatures
 #
 ###############################################################################
 
-CustomBoneNames = [
-	('Root',		'Root bone', None),
-	('Spine1',		'Lower spine', None),
-	('Spine2',		'Middle spine', None),
-	('Spine3',		'Upper spine', None),
-	('Neck',		'Neck', None),
-	('Head',		'Head', None),
+#	(mhx bone, text)
+
+TargetBoneNames = [
+	('Root',		'Root bone'),
+	('Spine1',		'Lower spine'),
+	('Spine2',		'Middle spine'),
+	('Spine3',		'Upper spine'),
+	('Neck',		'Neck'),
+	('Head',		'Head'),
 	None,
-	('Shoulder_L',	'L shoulder', None),
-	('UpArm_L',		'L upper arm', None),
-	('LoArm_L',		'L forearm', None),
-	('Hand_L',		'L hand', None),
+	('Shoulder_L',	'L shoulder'),
+	('UpArm_L',		'L upper arm'),
+	('LoArm_L',		'L forearm'),
+	('Hand_L',		'L hand'),
 	None,
-	('Shoulder_R',	'R shoulder', None),
-	('UpArm_R',		'R upper arm', None),
-	('LoArm_R',		'R forearm', None),
-	('Hand_R',		'R hand', None),
+	('Shoulder_R',	'R shoulder'),
+	('UpArm_R',		'R upper arm'),
+	('LoArm_R',		'R forearm'),
+	('Hand_R',		'R hand'),
 	None,
-	('Hips',		'Hips', None),
+	('Hips',		'Hips'),
 	None,
-	('UpLeg_L',		'L thigh', None),
-	('LoLeg_L',		'L shin', None),
-	('Foot_L',		'L foot', None),
-	('Toe_L',		'L toes', None),
+	('UpLeg_L',		'L thigh'),
+	('LoLeg_L',		'L shin'),
+	('Foot_L',		'L foot'),
+	('Toe_L',		'L toes'),
 	None,
-	('UpLeg_R',		'R thigh', None),
-	('LoLeg_R',		'R shin', None),
-	('Foot_R',		'R foot', None),
-	('Toe_R',		'R toes', None),
+	('UpLeg_R',		'R thigh'),
+	('LoLeg_R',		'R shin'),
+	('Foot_R',		'R foot'),
+	('Toe_R',		'R toes'),
 ]
 
-CustomIkBoneNames = [ 
-	('Wrist_L', 	'L wrist', 'LoArm_L'),
-	('Wrist_R', 	'R wrist', 'LoArm_R'),
-	('Ankle_L', 	'L ankle', 'LoLeg_L'),
-	('Ankle_R',		'R ankle', 'LoLeg_R')
+#	(mhx bone, text, fakeparent, copyRot)
+
+TargetIkBoneNames = [ 
+	('Wrist_L', 	'L wrist', 'LoArm_L', 'Hand_L'),
+	('ElbowPT_L', 	'L elbow', 'UpArm_L', None),
+	('Ankle_L', 	'L ankle', 'LoLeg_L', 'Foot_L'),
+	('KneePT_L', 	'L knee', 'UpLeg_L', None),
+
+	('Wrist_R', 	'R wrist', 'LoArm_R', 'Hand_R'),
+	('ElbowPT_R', 	'R elbow', 'UpArm_R', None),
+	('Ankle_R',		'R ankle', 'LoLeg_R', 'Foot_R'),
+	('KneePT_R', 	'R knee', 'UpLeg_R', None),
 ]
 
 #
-#	initCharacter(rig):
-#	class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
+#	initTargetCharacter(rig):
+#	class VIEW3D_OT_MhxInitTargetCharacterButton(bpy.types.Operator):
 #
 
-def initCharacter(rig):
-	for bn in CustomBoneNames+CustomIkBoneNames:
+def initTargetCharacter(rig):
+	for bn in TargetBoneNames+TargetIkBoneNames:
 		if not bn:
 			continue
-		(mhx, text, fakePar) = bn
+		try:
+			(mhx, text) = bn
+		except:
+			(mhx, text, fakepar, copyrot) = bn
 		rig[mhx] = mhx
 		rig['R_'+mhx] = 0
-	rig['MhxCustomRig'] = 'INITED'
+	rig['MhxTargetRig'] = 'INITED'
 	return
 	
-class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
-	bl_idname = "mhx.mocap_init_character"
-	bl_label = "Initialize character"
+class VIEW3D_OT_MhxInitTargetCharacterButton(bpy.types.Operator):
+	bl_idname = "mhx.mocap_init_target_character"
+	bl_label = "Initialize target character"
 	bl_options = {'REGISTER'}
 
 	def execute(self, context):
-		initCharacter(context.object)
-		print("Character initialized")
+		initTargetCharacter(context.object)
+		print("Target character initialized")
 		return{'FINISHED'}	
 
 #
-#	assocBones(rig, names, xtraAssoc):
+#	assocTargetBones(rig, names, xtraAssoc):
 #
 
-def assocBones(rig, names, xtraAssoc):
+def assocTargetBones(rig, names, xtraAssoc):
 	boneAssoc = []
 	for bn in names:
 		if not bn:
 			continue
-		(mhx, text, fakePar) = bn
+		try:
+			(mhx, text) = bn
+		except:
+			(mhx, text, fakePar, copyRot) = bn
 		bone = rig[mhx]
 		if bone != '':
 			try:
@@ -2809,11 +2824,12 @@ def assocBones(rig, names, xtraAssoc):
 				raise NameError("Bone %s does not exist in armature %s" % (bone, rig.name))
 
 	parAssoc = {}
+	assoc = boneAssoc+xtraAssoc
 	for (bname, mhx) in boneAssoc:
 		bone = rig.data.bones[bname] 
-		par = realBone(bone.parent, rig, 0)
-		while par and not assocValue(par.name, boneAssoc+xtraAssoc):
-			par = realBone(par.parent, rig, 0)
+		(par, stop) = realBone(bone.parent, rig, 0, assoc)
+		while not stop:
+			(par, stop) = realBone(par.parent, rig, 0, assoc)
 		if par:
 			parAssoc[bname] = par.name
 		else:
@@ -2850,44 +2866,45 @@ def assocBones(rig, names, xtraAssoc):
 #
 
 def findFakeParent(mhx, boneAssoc):
-	for (mhx1, text, fakemhx) in CustomIkBoneNames:
+	for (mhx1, text, fakeMhx, copyMhx) in TargetIkBoneNames:
 		if mhx == mhx1:
-			for (parname, parmhx) in boneAssoc:
-				if parmhx == fakemhx:
-					return parname
+			fakePar = assocKey(fakeMhx, boneAssoc)
+			copyRot = assocKey(copyMhx, boneAssoc)
+			return (fakePar, copyRot)
 	raise NameError("Did not find fake parent %s" % mhx)
 
 #
-#	makeAssoc(rig):
+#	makeTargetAssoc(rig):
 #
 
-def makeAssoc(rig):
-	(boneAssoc, parAssoc, rolls) = assocBones(rig, CustomBoneNames, [])
-	(ikBoneAssoc, ikParAssoc, ikRolls) = assocBones(rig, CustomIkBoneNames, boneAssoc)
+def makeTargetAssoc(rig):
+	(boneAssoc, parAssoc, rolls) = assocTargetBones(rig, TargetBoneNames, [])
+	(ikBoneAssoc, ikParAssoc, ikRolls) = assocTargetBones(rig, TargetIkBoneNames, boneAssoc)
 
 	ikBones = []
 	ikParents = {}
 	for (bone, mhx) in ikBoneAssoc:
 		ikBones.append(bone)
-		fakePar = findFakeParent(mhx, boneAssoc)
+		(fakePar, copyRot) = findFakeParent(mhx, boneAssoc)
 		# bone : (realParent, fakeParent, copyRot, reverse)
 		par = ikParAssoc[bone]
-		ikParents[bone] = (par, fakePar, False, False)
+		ikParents[bone] = (par, fakePar, copyRot, False)
 		parAssoc[bone] = par
 
 	print("Associations:")	
-	print("          Bone :     Mhx bone       Parent  Roll")
+	print("            Bone :       Mhx bone         Parent  Roll")
 	for (bname, mhx) in boneAssoc:
-		print("  %12s : %12s %12s %5d" % (bname, mhx, parAssoc[bname], rolls[bname]/Deg2Rad))
+		print("  %14s : %14s %14s %5d" % (bname, mhx, parAssoc[bname], rolls[bname]/Deg2Rad))
 	print("IK bones:")
-	print("          Bone :     Mhx bone  Real parent  Fake parent")
+	print("            Bone :       Mhx bone    Real parent    Fake parent       Copy rot")
 	for (bname, mhx) in ikBoneAssoc:
 		(par, fakePar, copyRot, reverse) = ikParents[bname]
-		print("  %12s : %12s %12s %12s" % (bname, mhx, par, fakePar))
+		print("  %14s : %14s %14s %14s %14s" % (bname, mhx, par, fakePar, copyRot))
 	return (boneAssoc, parAssoc, rolls, ikBones, ikParents)
 
 #
 #	assocValue(name, assoc):
+#	assocKey(name, assoc):
 #
 	
 def assocValue(name, assoc):
@@ -2896,16 +2913,25 @@ def assocValue(name, assoc):
 			return value
 	return None
 
+def assocKey(name, assoc):
+	for (key, value) in assoc:
+		if value == name:
+			return key
+	return None
+
 #
-#	realBone(bone, rig, n):
+#	realBone(bone, rig, n, assoc):
 #
 
-def realBone(bone, rig, n):
+def realBone(bone, rig, n, assoc):
 	if not bone:
-		return None
+		return (None, True)
+	if assocValue(bone.name, assoc):
+		return (bone, True)
 	if n > 5:
 		print("Real bone overflow:", bone)
-		return bone
+		return (bone, True)
+
 	pb = rig.pose.bones[bone.name]
 	for cns in pb.constraints:
 		if (((cns.type == 'COPY_ROTATION' and cns.use_x and cns.use_z) or
@@ -2913,16 +2939,16 @@ def realBone(bone, rig, n):
 			(cns.influence > 0.6) and
 			(cns.target == rig)):
 			rb = rig.data.bones[cns.subtarget]
-			return realBone(rb, rig, n+1)
-	return bone
+			return realBone(rb, rig, n+1, assoc)
+	return (bone, False)
 
-class VIEW3D_OT_MhxMakeAssocButton(bpy.types.Operator):
+class VIEW3D_OT_MhxMakeTargetAssocButton(bpy.types.Operator):
 	bl_idname = "mhx.mocap_make_assoc"
-	bl_label = "Make associations"
+	bl_label = "Make target associations"
 	bl_options = {'REGISTER'}
 
 	def execute(self, context):
-		makeAssoc(context.object)
+		makeTargetAssoc(context.object)
 		print("Associations made")
 		return{'FINISHED'}	
 
@@ -2949,18 +2975,21 @@ class VIEW3D_OT_MhxUnrollAllButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
-#	saveCustomBones(context, path):
-#	loadCustomBones(context, path):
-#	class VIEW3D_OT_MhxLoadSaveCustomBonesButton(bpy.types.Operator, ImportHelper):
+#	saveTargetBones(context, path):
+#	loadTargetBones(context, path):
+#	class VIEW3D_OT_MhxLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
 #
 
-def saveCustomBones(context, path):
+def saveTargetBones(context, path):
 	rig = context.object
 	fp = open(path, "w")
-	for bn in CustomBoneNames+CustomIkBoneNames:
+	for bn in TargetBoneNames+TargetIkBoneNames:
 		if not bn:
 			continue
-		(mhx, text, fakePar) = bn
+		try:
+			(mhx, text) = bn
+		except:
+			(mhx, text, fakepar, copyrot) = bn
 		bone = rig[mhx]
 		if bone == '':
 			fp.write("%s %s\n" % (mhx, '-'))
@@ -2969,7 +2998,7 @@ def saveCustomBones(context, path):
 	fp.close()
 	return
 		
-def loadCustomBones(context, path):
+def loadTargetBones(context, path):
 	rig = context.object
 	fp = open(path, "rU")
 	for line in fp:
@@ -2986,9 +3015,9 @@ def loadCustomBones(context, path):
 	fp.close()
 	return
 		
-class VIEW3D_OT_MhxLoadSaveCustomBonesButton(bpy.types.Operator, ImportHelper):
-	bl_idname = "mhx.mocap_load_save_custom_bones"
-	bl_label = "Custom bones"
+class VIEW3D_OT_MhxLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
+	bl_idname = "mhx.mocap_load_save_target_bones"
+	bl_label = "Target bones"
 
 	loadSave = bpy.props.StringProperty()
 	filename_ext = ".txt"
@@ -2997,9 +3026,9 @@ class VIEW3D_OT_MhxLoadSaveCustomBonesButton(bpy.types.Operator, ImportHelper):
 
 	def execute(self, context):
 		if self.loadSave == 'save':
-			saveCustomBones(context, self.properties.filepath)
+			saveTargetBones(context, self.properties.filepath)
 		else:
-			loadCustomBones(context, self.properties.filepath)
+			loadTargetBones(context, self.properties.filepath)
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
@@ -3007,11 +3036,11 @@ class VIEW3D_OT_MhxLoadSaveCustomBonesButton(bpy.types.Operator, ImportHelper):
 		return {'RUNNING_MODAL'}	
 
 #		
-#	class MhxCustomBonesPanel(bpy.types.Panel):
+#	class MhxTargetBonesPanel(bpy.types.Panel):
 #
 
-class MhxCustomBonesPanel(bpy.types.Panel):
-	bl_label = "Custom armature"
+class MhxTargetBonesPanel(bpy.types.Panel):
+	bl_label = "Target armature"
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
 	
@@ -3023,32 +3052,57 @@ class MhxCustomBonesPanel(bpy.types.Panel):
 		layout = self.layout
 		rig = context.object
 		try:
-			rig['MhxCustomRig']
+			rig['MhxTargetRig']
 			inited = True
 		except:
 			inited = False
 
 		if not inited:
-			layout.operator("mhx.mocap_init_character", text='Initialize character')
+			layout.operator("mhx.mocap_init_target_character", text='Initialize target character')
 			return
 
-		layout.operator("mhx.mocap_init_character", text='Reinitialize character')		
-		layout.operator("mhx.mocap_load_save_custom_bones", text='Load custom bones').loadSave = 'load'		
-		layout.operator("mhx.mocap_load_save_custom_bones", text='Save custom bones').loadSave = 'save'		
+		layout.operator("mhx.mocap_init_target_character", text='Reinitialize target character')		
+		layout.operator("mhx.mocap_load_save_target_bones", text='Load target bones').loadSave = 'load'		
+		layout.operator("mhx.mocap_load_save_target_bones", text='Save target bones').loadSave = 'save'		
 		layout.operator("mhx.mocap_make_assoc")		
 		layout.operator("mhx.mocap_unroll_all")		
 		layout.label("FK bones")
-		for bn in CustomBoneNames:
+		for bn in TargetBoneNames:
 			if bn:
-				(mhx, text, fakePar) = bn
+				(mhx, text) = bn
 				layout.prop(rig, '["%s"]' % mhx, text=text)
 			else:
 				layout.separator()
 		layout.label("IK bones")
-		for (mhx, text, fakePar) in CustomIkBoneNames:
+		for (mhx, text, fakePar, copyRot) in TargetIkBoneNames:
 			layout.prop(rig, '["%s"]' % mhx, text=text)
 		return
 
+#
+#	Debugging
+#
+"""
+def debugOpen():
+	global theDbgFp
+	theDbgFp = open("/home/thomas/myblends/debug.txt", "w")
+
+def debugClose():
+	global theDbgFp
+	theDbgFp.close()
+
+def debugPrint(string):
+	global theDbgFp
+	theDbgFp.write("%s\n" % string)
+
+def debugPrintVec(vec):
+	global theDbgFp
+	theDbgFp.write("(%.3f %.3f %.3f)\n" % (vec[0], vec[1], vec[2]))
+
+def debugPrintVecVec(vec1, vec2):
+	global theDbgFp
+	theDbgFp.write("(%.3f %.3f %.3f) (%.3f %.3f %.3f)\n" %
+		(vec1[0], vec1[1], vec1[2], vec2[0], vec2[1], vec2[2]))
+"""
 #
 #	init and register
 #
