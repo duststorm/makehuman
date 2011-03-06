@@ -103,7 +103,8 @@ class ModifierSlider(Slider):
     def onChange(self, value):
         
         human = self.app.selectedHuman
-        self.app.do(ModifierAction(human, self.modifier, self.value, value, self.update))
+        if self.value != value:
+            self.app.do(ModifierAction(human, self.modifier, self.value, value, self.update))
         if human.isSubdivided():
             human.meshData.setVisibility(0)
             human.getSubdivisionMesh(False).setVisibility(1)
