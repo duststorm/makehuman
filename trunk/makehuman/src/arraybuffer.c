@@ -154,6 +154,8 @@ typedef struct _ArrayBufferViewType
 
 } ArrayBufferViewType;
 
+#define ABV_TYPE(o) ((ArrayBufferViewType*)Py_TYPE(o))
+
 // ArrayBufferView as sequence
 Py_ssize_t ArrayBufferView_length(ArrayBufferView *self)
 {
@@ -162,7 +164,7 @@ Py_ssize_t ArrayBufferView_length(ArrayBufferView *self)
 
 PyObject *ArrayBufferView_item(ArrayBufferView *self, Py_ssize_t i)
 {
-  ArrayBufferViewType *type = (ArrayBufferViewType*)self->ob_type;
+  ArrayBufferViewType *type = ABV_TYPE(self);
   char *data = (char*)self->buffer->data + self->byteOffset + i * type->BYTES_PER_ELEMENT;
 
   if (i >= self->length)
@@ -174,9 +176,33 @@ PyObject *ArrayBufferView_item(ArrayBufferView *self, Py_ssize_t i)
   return (*type->c2py)(data);
 }
 
+PyObject *ArrayBufferView_slice(ArrayBufferView *self, Py_ssize_t i1, Py_ssize_t i2)
+{
+  ArrayBufferViewType *type = ABV_TYPE(self);
+  ArrayBufferView *slice = (ArrayBufferView*)PyObject_New(ArrayBufferView, (PyTypeObject*)type);
+
+  if (i1 < 0)
+    i1 = 0;
+  else if (i1 > self->length)
+    i1 = self->length;
+  
+  if (i2 < i1)
+    i2 = i1;
+  else if (i2 > self->length)
+    i2 = self->length;
+
+  slice->buffer = self->buffer;
+  Py_INCREF(slice->buffer);
+  slice->length = i2 - i1;
+  slice->byteOffset = self->byteOffset + i1 * type->BYTES_PER_ELEMENT;
+  slice->byteLength = (i2 - i1) * type->BYTES_PER_ELEMENT;
+
+  return (PyObject*)slice;
+}
+
 int ArrayBufferView_ass_item(ArrayBufferView *self, Py_ssize_t i, PyObject *value)
 {
-  ArrayBufferViewType *type = (ArrayBufferViewType*)self->ob_type;
+  ArrayBufferViewType *type = ABV_TYPE(self);
   char *data = (char*)self->buffer->data + self->byteOffset + i * type->BYTES_PER_ELEMENT;
 
   if (i >= self->length)
@@ -189,21 +215,74 @@ int ArrayBufferView_ass_item(ArrayBufferView *self, Py_ssize_t i, PyObject *valu
   return 0;
 }
 
+int ArrayBufferView_ass_slice(ArrayBufferView *self, Py_ssize_t i1, Py_ssize_t i2, PyObject *v)
+{
+  ArrayBufferViewType *type = ABV_TYPE(self);
+  char *data = (char*)self->buffer->data + self->byteOffset + i1 * type->BYTES_PER_ELEMENT;
+
+  if (i1 < 0)
+    i1 = 0;
+  else if (i1 > self->length)
+    i1 = self->length;
+
+  if (i2 < i1)
+    i2 = i1;
+  else if (i2 > self->length)
+    i2 = self->length;
+
+  if (Py_TYPE(v) == Py_TYPE(self))
+  {
+    ArrayBufferView *other = (ArrayBufferView*)v;
+
+    if (other->length != i2 - i1)
+    {
+      PyErr_Format(PyExc_RuntimeError, "object and slice size mismatch");
+      return -1;
+    }
+
+    memcpy(data, (char*)other->buffer->data + other->byteOffset, other->byteLength);
+  }
+  else if (PySequence_Check(v))
+  {
+    int size = (int)PySequence_Size(v);
+    int i;
+
+    if (size != i2 - i1)
+    {
+      PyErr_Format(PyExc_RuntimeError, "object and slice size mismatch");
+      return -1;
+    }
+
+    for (i = 0; i < i2 - i1; i++)
+    {
+      type->py2c(data, PySequence_ITEM(v, i));
+      data += type->BYTES_PER_ELEMENT;
+    }
+  }
+  else
+  {
+    PyErr_Format(PyExc_RuntimeError, "cannot assign object to slice");
+    return -1;
+  }
+
+  return 0;
+}
+
 void ArrayBufferView_dealloc(ArrayBufferView *self);
 PyObject *ArrayBufferView_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int ArrayBufferView_init(ArrayBufferView *self, PyObject *args, PyObject *kwds);
 
 static PySequenceMethods ArrayBufferView_as_sequence = {
-  (lenfunc)ArrayBufferView_length,            // sq_length
-  0,                                          // sq_concat
-  0,                                          // sq_repeat
-  (ssizeargfunc)ArrayBufferView_item,         // sq_item
-  0,                                          // sq_slice
-  (ssizeobjargproc)ArrayBufferView_ass_item,  // sq_ass_item
-  0,                                          // sq_ass_slice
-  0,                                          // sq_contains
-  0,                                          // sq_inplace_concat
-  0,                                          // sq_inplace_repeat
+  (lenfunc)ArrayBufferView_length,                // sq_length
+  0,                                              // sq_concat
+  0,                                              // sq_repeat
+  (ssizeargfunc)ArrayBufferView_item,             // sq_item
+  (ssizessizeargfunc)ArrayBufferView_slice,       // sq_slice
+  (ssizeobjargproc)ArrayBufferView_ass_item,      // sq_ass_item
+  (ssizessizeobjargproc)ArrayBufferView_ass_slice,// sq_ass_slice
+  0,                                              // sq_contains
+  0,                                              // sq_inplace_concat
+  0,                                              // sq_inplace_repeat
 };
 
 // ArrayBufferView attributes directly accessed by Python
@@ -218,7 +297,7 @@ static PyMemberDef ArrayBufferView_members[] =
 
 PyObject *ArrayBufferView_BYTES_PER_ELEMENT(ArrayBufferView *self, void *closure)
 {
-  return PyInt_FromLong(((ArrayBufferViewType*)self->ob_type)->BYTES_PER_ELEMENT);
+  return PyInt_FromLong(((ArrayBufferViewType*)Py_TYPE(self))->BYTES_PER_ELEMENT);
 }
 
 // ArrayBufferView attributes indirectly accessed by Python
@@ -269,14 +348,14 @@ int ArrayBufferView_init(ArrayBufferView *self, PyObject *args, PyObject *kwds)
   {
       int length = PyInt_AsLong(firstObject);
       self->buffer = PyObject_New(ArrayBuffer, &ArrayBufferType);
-      self->buffer->byteLength = length * ((ArrayBufferViewType*)self->ob_type)->BYTES_PER_ELEMENT;
+      self->buffer->byteLength = length * ABV_TYPE(self)->BYTES_PER_ELEMENT;
       self->buffer->data = malloc(self->buffer->byteLength);
       memset(self->buffer->data, 0, self->buffer->byteLength);
       self->byteLength = self->buffer->byteLength;
       self->length = length;
   }
   // ArrayBufferView(arrayBufferView)
-  else if (firstObject->ob_type == self->ob_type)
+  else if (Py_TYPE(firstObject) == Py_TYPE(self))
   {
       ArrayBufferView *other = (ArrayBufferView*)firstObject;
       self->buffer = other->buffer;
@@ -294,14 +373,14 @@ int ArrayBufferView_init(ArrayBufferView *self, PyObject *args, PyObject *kwds)
           byteLength = self->buffer->byteLength - byteOffset;
       self->byteOffset = byteOffset;
       self->byteLength = byteLength;
-      self->length = byteLength / ((ArrayBufferViewType*)self->ob_type)->BYTES_PER_ELEMENT;
+      self->length = byteLength / ABV_TYPE(self)->BYTES_PER_ELEMENT;
   }
   // ArrayBufferView(list)
   else if (PySequence_Check(firstObject))
   {
       int size = (int)PySequence_Size(firstObject);
       int i;
-      ArrayBufferViewType *type = (ArrayBufferViewType*)self->ob_type;
+      ArrayBufferViewType *type = ABV_TYPE(self);
 
       self->buffer = PyObject_New(ArrayBuffer, &ArrayBufferType);
       self->buffer->byteLength = size * type->BYTES_PER_ELEMENT;
