@@ -554,13 +554,12 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.sliders.append(DetailSlider(self, 10, y, 0.5, 0.0, 1.0, "Breast", self.modifiers['breastSize']));y+=36
         self.sliders.append(DetailSlider(self, 10, y, 0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness']));y+=36
         y+=16
-            
-        y = 80    
-        self.pelvisBox = gui3d.GroupBox(self, [650, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
+              
+        self.pelvisBox = gui3d.GroupBox(self, [10, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
-        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone']));y+=36
-        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach']));y+=36
-        self.sliders.append(DetailSlider(self.pelvisBox, 650, y, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 10, y, 0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 10, y, 0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 10, y, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks']));y+=36
         y+=16
 
         self.modifiersBox = gui3d.GroupBox(self, [650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
@@ -618,8 +617,6 @@ class DetailModelingTaskView(gui3d.TaskView):
         gui3d.TaskView.onHide(self, event)
         
     def onResized(self, event):
-        self.headBox.setPosition([event[0] - 150, self.headBox.getPosition()[1], 9.0])
-        self.pelvisBox.setPosition([event[0] - 150, self.pelvisBox.getPosition()[1], 9.0])
         self.modifiersBox.setPosition([event[0] - 150, self.modifiersBox.getPosition()[1], 9.0])
 
     def syncSliders(self):
