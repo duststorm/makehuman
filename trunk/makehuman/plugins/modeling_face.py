@@ -21,6 +21,27 @@ class FaceSlider(humanmodifier.ModifierSlider):
     def __init__(self, parent, y, label, modifier):
         
         humanmodifier.ModifierSlider.__init__(self, parent, [10, y, 9.1], label=label, modifier=modifier)
+        
+class DetailSlider(humanmodifier.ModifierSlider):
+    
+    def __init__(self, parent, x, y, value, min, max, label, modifier):
+        
+        humanmodifier.ModifierSlider.__init__(self, parent, [x, y, 9.1], value, min, max, label, modifier=modifier)
+        
+class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
+    
+    def __init__(self, template, parameterName, left, right, always=True):
+    
+        humanmodifier.GenderAgeAsymmetricModifier.__init__(self, template, parameterName, left, right, always)
+        
+    def getValue(self, human):
+        
+        return getattr(human, self.parameterName)
+        
+    def setValue(self, human, value):
+        
+        setattr(human, self.parameterName, value)
+        humanmodifier.GenderAgeAsymmetricModifier.setValue(self, human, value)
 
 class FaceTaskView(gui3d.TaskView):
 
@@ -76,9 +97,19 @@ class FaceTaskView(gui3d.TaskView):
                 slider = FaceSlider(box, yy, '%s %d' % (name.capitalize(), index + 1), modifier)
                 self.sliders.append(slider)
                 yy += 36
+                
+        y += 16
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()
+        
+        self.headAgeModifier = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-head-age${headAge}.target', 'headAge', '1', '2', False)
+        self.faceAngleModifier = humanmodifier.Modifier('data/targets/details/facial-angle1.target', 'data/targets/details/facial-angle2.target')
+
+        self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
+        
+        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Age", self.headAgeModifier));y+=36
+        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Face angle", self.faceAngleModifier));y+=36
         
     def hideAllBoxes(self):
         
@@ -110,9 +141,14 @@ class FaceTaskView(gui3d.TaskView):
                 
     def loadHandler(self, human, values):
         
-        modifier = self.modifiers.get(values[1], None)
-        if modifier:
-            modifier.setValue(human, float(values[2]))
+        if values[0] == 'face':
+            modifier = self.modifiers.get(values[1], None)
+            if modifier:
+                modifier.setValue(human, float(values[2]))
+        elif values[0] == 'headAge':
+            self.headAgeModifier.setValue(human, float(values[1]))
+        elif values[0] == 'faceAngle':
+            self.faceAngleModifier.setValue(human, float(values[1]))
        
     def saveHandler(self, human, file):
         
@@ -120,12 +156,17 @@ class FaceTaskView(gui3d.TaskView):
             value = modifier.getValue(human)
             if value:
                 file.write('face %s %f\n' % (name, value))
+        
+        file.write('headAge %f\n' % self.headAgeModifier.getValue(human))
+        file.write('faceAngle %f\n' % self.faceAngleModifier.getValue(human))
 
 def load(app):
     category = app.getCategory('Modelling')
     taskview = FaceTaskView(category)
     
     app.addLoadHandler('face', taskview.loadHandler)
+    app.addLoadHandler('headAge', taskview.loadHandler)
+    app.addLoadHandler('faceAngle', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
 
     print 'Face loaded'

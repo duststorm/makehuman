@@ -559,7 +559,7 @@ class Human(gui3d.Object):
         for data in f.readlines():
             lineData = data.split()
 
-            if len(lineData) > 0:
+            if len(lineData) > 0 and not lineData[0] == '#':
                 if lineData[0] == 'version':
                     print 'Version ' + lineData[1]
                 elif lineData[0] == 'tags':
@@ -581,6 +581,8 @@ class Human(gui3d.Object):
                     self.targetsDetailStack['data/targets/asym/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] in self.app.loadHandlers:
                     self.app.loadHandlers[lineData[0]](self, lineData)
+                else:
+                    print('Could not load %s' % lineData)
 
         f.close()
 
