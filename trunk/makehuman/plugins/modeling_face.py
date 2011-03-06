@@ -46,22 +46,22 @@ class FaceTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=25+24*sum([(len(templates[1])/12 + (len(templates[1])%12>0)) for templates in features])+6))
+        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=25+24*sum([(len(templates[1])/10 + (len(templates[1])%10>0)) for templates in features])+6))
         y += 25
         
         for name, templates in features:
             
             for index, template in enumerate(templates):
                 
-                if index % 12 == 0:
+                if index % 10 == 0:
                     
-                    if len(templates) <= 12:
+                    if len(templates) <= 10:
                         title = name.capitalize()
                     else:
-                        title = '%s %d' % (name.capitalize(), index / 12 + 1)
+                        title = '%s %d' % (name.capitalize(), index / 10 + 1)
                         
                     # Create box
-                    box = gui3d.GroupBox(self, [10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(height=25+36*min(len(templates)-index, 12)+6))
+                    box = gui3d.GroupBox(self, [10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(height=25+36*min(len(templates)-index, 10)+6))
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
@@ -89,6 +89,9 @@ class FaceTaskView(gui3d.TaskView):
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
+        
+        self.app.setFaceCamera()
+        
         for slider in self.sliders:
             slider.update()
             
@@ -119,7 +122,7 @@ class FaceTaskView(gui3d.TaskView):
                 file.write('face %s %f\n' % (name, value))
 
 def load(app):
-    category = app.getCategory('Experiments')
+    category = app.getCategory('Modelling')
     taskview = FaceTaskView(category)
     
     app.addLoadHandler('face', taskview.loadHandler)
