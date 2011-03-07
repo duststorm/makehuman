@@ -37,6 +37,10 @@
 #include <structmember.h>
 #endif
 
+#ifndef Py_TYPE
+#define Py_TYPE(ob)		(((PyObject*)(ob))->ob_type)
+#endif
+
 #include "arraybuffer.h"
 
 // ArrayBuffer attributes directly accessed by Python
