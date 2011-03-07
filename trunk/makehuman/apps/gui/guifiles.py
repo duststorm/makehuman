@@ -161,10 +161,10 @@ class ExportTaskView(gui3d.TaskView):
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
         self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], "Wavefront obj", True, gui3d.ButtonStyle);y+=24
-        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange", style=gui3d.ButtonStyle);y+=24
-        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada", style=gui3d.ButtonStyle);y+=24
+        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange (mhx)", style=gui3d.ButtonStyle);y+=24
+        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada (dae)", style=gui3d.ButtonStyle);y+=24
         self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="MD5", style=gui3d.ButtonStyle);y+=24
-        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="STL", style=gui3d.ButtonStyle);y+=24
+        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Stereolithography (stl)", style=gui3d.ButtonStyle);y+=24
         y+=16
             
         # OBJ options
