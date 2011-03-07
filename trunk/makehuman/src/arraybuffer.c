@@ -427,7 +427,7 @@ void RegisterTypedArrayView(PyObject *module, TypedArrayViewInfo *info)
   if (PyType_Ready((PyTypeObject*)type) < 0)
     return;
 
-  Py_INCREF(type);
+  Py_INCREF(&type->type);
   PyModule_AddObject(module, info->name, (PyObject*)type);
 }
 
