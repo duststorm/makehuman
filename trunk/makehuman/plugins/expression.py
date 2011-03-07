@@ -124,7 +124,7 @@ class ExpressionTaskView(gui3d.TaskView):
 
 
 def load(app):
-    category = app.getCategory('Advanced')
+    category = app.getCategory('Posing')
     taskview = ExpressionTaskView(category)
     
     app.addLoadHandler('expression', taskview.loadHandler)
