@@ -46,6 +46,9 @@ class Joint:
         self.direction = [0.0, 0.0, 0.0, 0.0]   # Global rotation in the scene
         self.rotation = [0.0, 0.0, 0.0, 0.0]    # Rotation relative to the parent joint
         self.index = 0
+        
+        for child in children:
+            child.parent = self
 
 class Skeleton:
     

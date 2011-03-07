@@ -364,7 +364,9 @@ class MHApplication(gui3d.Application):
         mh.callAsync(self.loadBackground)
         
     def onMouseDragged(self, event):
+        
         if self.selectedHuman.isVisible():
+            
             leftButtonDown = event.button & 1
             middleButtonDown = event.button & 2
             rightButtonDown = event.button & 4
@@ -389,7 +391,9 @@ class MHApplication(gui3d.Application):
                 human.setPosition(trans)
 
     def onMouseWheel(self, event):
+        
         if self.selectedHuman.isVisible():
+            
             if event.wheelDelta > 0:
                 self.zoomOut()
             else:

@@ -579,6 +579,11 @@ def newton_raphson(f, f_diff, value, start, iterations=4, epsilon = 1e-4):
         counter += 1
         return x
 
+def quaternionVectorTransform(q, v):
+    return [q[3]*q[3]*v[0] + 2*q[1]*q[3]*v[2] - 2*q[2]*q[3]*v[1] + q[0]*q[0]*v[0] + 2*q[1]*q[0]*v[1] + 2*q[2]*q[0]*v[2] - q[2]*q[2]*v[0] - q[1]*q[1]*v[0],
+            2*q[0]*q[1]*v[0] + q[1]*q[1]*v[1] + 2*q[2]*q[1]*v[2] + 2*q[3]*q[2]*v[0] - q[2]*q[2]*v[1] + q[3]*q[3]*v[1] - 2*q[0]*q[3]*v[2] - q[0]*q[0]*v[1],
+            2*q[0]*q[2]*v[0] + 2*q[1]*q[2]*v[1] + q[2]*q[2]*v[2] - 2*q[3]*q[1]*v[0] - q[1]*q[1]*v[2] + 2*q[3]*q[0]*v[1] - q[0]*q[0]*v[2] + q[3]*q[3]*v[2]]
+
 def axisAngleToQuaternion(axis, angle):
     s = sin(angle/2.0)
     qx = axis[0] * s
