@@ -51,11 +51,13 @@ from os.path import basename
 class SaveTaskView(gui3d.TaskView):
 
     def __init__(self, category):
+        
         gui3d.TaskView.__init__(self, category, 'Save')
         self.fileentry = gui3d.FileEntryView(self, 'Save')
 
         @self.fileentry.event
         def onFileSelected(filename):
+            
             modelPath = mh.getPath('models')
             if not os.path.exists(modelPath):
                 os.makedirs(modelPath)
@@ -96,6 +98,7 @@ class SaveTaskView(gui3d.TaskView):
         self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
 
     def onHide(self, event):
+        
         gui3d.TaskView.onHide(self, event)
         self.app.selectedHuman.setPosition(self.pan)
         mh.cameras[0].eyeX = self.eyeX
@@ -106,10 +109,10 @@ class SaveTaskView(gui3d.TaskView):
         mh.cameras[0].focusZ = self.focusZ
         self.app.selectedHuman.setRotation(self.rotation)
 
-
 class LoadTaskView(gui3d.TaskView):
 
     def __init__(self, category):
+        
         modelPath = mh.getPath('models')
         gui3d.TaskView.__init__(self, category, 'Load', )
         self.filechooser = gui3d.FileChooser(self, modelPath, 'mhm')
@@ -142,15 +145,18 @@ class LoadTaskView(gui3d.TaskView):
         self.app.redraw()
 
     def onHide(self, event):
+        
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
     def onResized(self, event):
+        
         self.filechooser.onResized(event)
 
 class ExportTaskView(gui3d.TaskView):
 
     def __init__(self, category):
+        
         gui3d.TaskView.__init__(self, category, 'Export')
         self.fileentry = gui3d.FileEntryView(self, 'Export')
 
@@ -207,16 +213,19 @@ class ExportTaskView(gui3d.TaskView):
         
         @self.mhxConfig.event
         def onClicked(event):
+            
             gui3d.RadioButton.onClicked(self.mhxConfig, event)
             self.mhxOptions.hide()
             
         @self.mhxGui.event
         def onClicked(event):
+            
             gui3d.RadioButton.onClicked(self.mhxGui, event)
             self.mhxOptions.show()
             
         @self.version24.event
         def onClicked(event):
+            
             if self.version24.selected and self.version25.selected:
                 self.version24.setSelected(False)
             else:
@@ -224,6 +233,7 @@ class ExportTaskView(gui3d.TaskView):
                 
         @self.version25.event
         def onClicked(event):
+            
             if self.version25.selected and self.version24.selected:
                 self.version25.setSelected(False)
             else:
@@ -231,31 +241,37 @@ class ExportTaskView(gui3d.TaskView):
         
         @self.wavefrontObj.event
         def onClicked(event):
+            
             gui3d.RadioButton.onClicked(self.wavefrontObj, event)
             self.updateGui()
             
         @self.mhx.event
         def onClicked(event):
+            
             gui3d.RadioButton.onClicked(self.mhx, event)
             self.updateGui()
         
         @self.collada.event
         def onClicked(event):
+            
             gui3d.RadioButton.onClicked(self.collada, event)
             self.updateGui()
         
         @self.md5.event
         def onClicked(event):
+            
             gui3d.RadioButton.onClicked(self.md5, event)
             self.updateGui()
         
         @self.stl.event
         def onClicked(event):
+            
             gui3d.RadioButton.onClicked(self.stl, event)
             self.updateGui()
         
         @self.fileentry.event
         def onFileSelected(filename):
+            
             exportPath = mh.getPath('exports')
             if not os.path.exists(exportPath):
                 os.makedirs(exportPath)
@@ -324,6 +340,7 @@ class ExportTaskView(gui3d.TaskView):
             self.app.switchCategory('Modelling')
             
     def updateGui(self):
+        
         if self.wavefrontObj.selected:
             self.objOptions.show()
         else:
@@ -344,40 +361,48 @@ class ExportTaskView(gui3d.TaskView):
 
     def onShow(self, event):
 
-    # When the task gets shown, set the focus to the file entry
-
         gui3d.TaskView.onShow(self, event)
+        
         self.fileentry.setFocus()
-        self.pan = self.app.selectedHuman.getPosition()
-        self.eyeX = mh.cameras[0].eyeX
-        self.eyeY = mh.cameras[0].eyeY
-        self.eyeZ = mh.cameras[0].eyeZ
-        self.focusX = mh.cameras[0].focusX
-        self.focusY = mh.cameras[0].focusY
-        self.focusZ = mh.cameras[0].focusZ
-        self.rotation = self.app.selectedHuman.getRotation()
-        self.app.selectedHuman.setPosition([0, -1, 0])
+
+        human = self.app.selectedHuman
+        camera = mh.cameras[0]
+        
+        self.pan = human.getPosition()
+        self.eyeX = camera.eyeX
+        self.eyeY = camera.eyeY
+        self.eyeZ = camera.eyeZ
+        self.focusX = camera.focusX
+        self.focusY = camera.focusY
+        self.focusZ = camera.focusZ
+        self.rotation = human.getRotation()
+        human.setPosition([0, -1, 0])
         self.app.setGlobalCamera();
-        mh.cameras[0].eyeZ = 70
-        self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
-        self.exportSmooth.setSelected(self.app.selectedHuman.isSubdivided())
-        self.stlSmooth.setSelected(self.app.selectedHuman.isSubdivided())
+        camera.eyeZ = 70
+        human.setRotation([0.0, 0.0, 0.0])
+        self.exportSmooth.setSelected(human.isSubdivided())
+        self.stlSmooth.setSelected(human.isSubdivided())
 
     def onHide(self, event):
+        
         gui3d.TaskView.onHide(self, event)
-        self.app.selectedHuman.setPosition(self.pan)
-        mh.cameras[0].eyeX = self.eyeX
-        mh.cameras[0].eyeY = self.eyeY
-        mh.cameras[0].eyeZ = self.eyeZ
-        mh.cameras[0].focusX = self.focusX
-        mh.cameras[0].focusY = self.focusY
-        mh.cameras[0].focusZ = self.focusZ
-        self.app.selectedHuman.setRotation(self.rotation)
-
+        
+        human = self.app.selectedHuman
+        camera = mh.cameras[0]
+        
+        human.setPosition(self.pan)
+        camera.eyeX = self.eyeX
+        camera.eyeY = self.eyeY
+        camera.eyeZ = self.eyeZ
+        camera.focusX = self.focusX
+        camera.focusY = self.focusY
+        camera.focusZ = self.focusZ
+        human.setRotation(self.rotation)
 
 class FilesCategory(gui3d.Category):
 
     def __init__(self, parent):
+        
         gui3d.Category.__init__(self, parent, 'Files')
 
         SaveTaskView(self)

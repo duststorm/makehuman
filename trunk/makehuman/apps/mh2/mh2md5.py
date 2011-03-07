@@ -10,7 +10,7 @@ Export to id Software's MD5 format.
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Manuel Bastioni
+**Authors:**           Marc Flerackers
 
 **Copyright(c):**      MakeHuman Team 2001-2011
 
@@ -33,47 +33,8 @@ Requires:
 __docformat__ = 'restructuredtext'
 
 import module3d
-import aljabr
-from math import acos
 from os.path import basename
-
-class Joint:
-
-    """
-  This class contains a simple constructor method for a data structure used to support 
-  the skeleton export functions. 
-  A hierarchical nested list of these objects is defined to hold the joint positions and
-  the relationship between joints. 
-  """
-
-    def __init__(self, name, children):
-        self.name = name
-        self.parent = None
-        self.children = children
-        self.position = [0.0, 0.0, 0.0]         # Global position in the scene
-        self.offset = [0.0, 0.0, 0.0]           # Position Relative to the parent joint
-        self.direction = [0.0, 0.0, 0.0, 0.0]   # Global rotation in the scene
-        self.rotation = [0.0, 0.0, 0.0, 0.0]    # Rotation relative to the parent joint
-        self.index = 0
-
-skeletonRoot = Joint('joint-pelvis', [Joint('joint-spine3', [Joint('joint-spine2', [Joint('joint-spine1', [Joint('joint-neck', [Joint('joint-head', [Joint('joint-mouth',
-                     []), Joint('joint-l-eye', []), Joint('joint-r-eye', [])])]), Joint('joint-r-clavicle', [Joint('joint-r-shoulder', [Joint('joint-r-elbow',
-                     [Joint('joint-r-hand', [Joint('joint-r-finger-1-1', [Joint('joint-r-finger-1-2', [Joint('joint-r-finger-1-3', [])])]), Joint('joint-r-finger-2-1',
-                     [Joint('joint-r-finger-2-2', [Joint('joint-r-finger-2-3', [])])]), Joint('joint-r-finger-3-1', [Joint('joint-r-finger-3-2',
-                     [Joint('joint-r-finger-3-3', [])])]), Joint('joint-r-finger-4-1', [Joint('joint-r-finger-4-2', [Joint('joint-r-finger-4-3', [])])]),
-                     Joint('joint-r-finger-5-1', [Joint('joint-r-finger-5-2', [Joint('joint-r-finger-5-3', [])])])])])])]), Joint('joint-l-clavicle',
-                     [Joint('joint-l-shoulder', [Joint('joint-l-elbow', [Joint('joint-l-hand', [Joint('joint-l-finger-1-1', [Joint('joint-l-finger-1-2',
-                     [Joint('joint-l-finger-1-3', [])])]), Joint('joint-l-finger-2-1', [Joint('joint-l-finger-2-2', [Joint('joint-l-finger-2-3', [])])]),
-                     Joint('joint-l-finger-3-1', [Joint('joint-l-finger-3-2', [Joint('joint-l-finger-3-3', [])])]), Joint('joint-l-finger-4-1',
-                     [Joint('joint-l-finger-4-2', [Joint('joint-l-finger-4-3', [])])]), Joint('joint-l-finger-5-1', [Joint('joint-l-finger-5-2',
-                     [Joint('joint-l-finger-5-3', [])])])])])])])])])]), Joint('joint-r-upper-leg', [Joint('joint-r-knee', [Joint('joint-r-ankle',
-                     [Joint('joint-r-toe-1-1', [Joint('joint-r-toe-1-2', [])]), Joint('joint-r-toe-2-1', [Joint('joint-r-toe-2-2', [Joint('joint-r-toe-2-3', [])])]),
-                     Joint('joint-r-toe-3-1', [Joint('joint-r-toe-3-2', [Joint('joint-r-toe-3-3', [])])]), Joint('joint-r-toe-4-1', [Joint('joint-r-toe-4-2',
-                     [Joint('joint-r-toe-4-3', [])])]), Joint('joint-r-toe-5-1', [Joint('joint-r-toe-5-2', [Joint('joint-r-toe-5-3', [])])])])])]),
-                     Joint('joint-l-upper-leg', [Joint('joint-l-knee', [Joint('joint-l-ankle', [Joint('joint-l-toe-1-1', [Joint('joint-l-toe-1-2', [])]),
-                     Joint('joint-l-toe-2-1', [Joint('joint-l-toe-2-2', [Joint('joint-l-toe-2-3', [])])]), Joint('joint-l-toe-3-1', [Joint('joint-l-toe-3-2',
-                     [Joint('joint-l-toe-3-3', [])])]), Joint('joint-l-toe-4-1', [Joint('joint-l-toe-4-2', [Joint('joint-l-toe-4-3', [])])]), Joint('joint-l-toe-5-1',
-                     [Joint('joint-l-toe-5-2', [Joint('joint-l-toe-5-3', [])])])])])])])
+from skeleton import Skeleton
 
 groupWeights = (
     ('head-back-skull', 'joint-head', 1.0),
@@ -356,16 +317,17 @@ def exportMd5(obj, filename):
       *string*.  The filename of the file to export the object to.
     """
 
-    joints = calcJointOffsets(obj, skeletonRoot)
+    skeleton = Skeleton()
+    skeleton.update(obj)
 
     f = open(filename, 'w')
     f.write('MD5Version 10\n')
     f.write('commandline ""\n\n')
-    f.write('numJoints %d\n' % (joints+1)) # Amount of joints + the hardcoded origin below
+    f.write('numJoints %d\n' % (skeleton.joints+1)) # Amount of joints + the hardcoded origin below
     f.write('numMeshes %d\n\n' % (1)) # TODO: 2 in case of hair
     f.write('joints {\n')
     f.write('\t"%s" %d ( %f %f %f ) ( %f %f %f )\n' % ('origin', -1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
-    writeJoint(f, skeletonRoot)
+    writeJoint(f, skeleton.root)
     f.write('}\n\n')
     f.write('mesh {\n')
     f.write('\tshader "%s"\n' % (basename(obj.texture))) # TODO: create the shader file
@@ -392,7 +354,6 @@ def exportMd5(obj, filename):
     f.write('}\n\n')
     f.close()
 
-
 def writeJoint(f, joint):
     """
   This function writes out information describing one joint in MD5 format. 
@@ -418,56 +379,3 @@ def writeJoint(f, joint):
 
     for joint in joint.children:
         writeJoint(f, joint)
-
-def calcJointOffsets(obj, joint, index = 0, parent=None):
-    """
-    This function calculates the position and offset for a joint and calls itself for 
-    each 'child' joint in the hierarchical joint structure. It returns the amount of joints
-    visited.
-    
-    Parameters
-    ----------
-    
-    obj:     
-      *Object3D*.  The object whose information is to be used for the calculation.
-    joint:     
-      *Joint Object*.  The joint object to be processed by this function call.
-    parent:     
-      *Joint Object*.  The parent joint object or 'None' if not specified.
-    """
-    
-    # Store parent
-    joint.parent = parent
-
-    # Calculate position
-    g = obj.getFaceGroup(joint.name)
-    verts = []
-    for f in g.faces:
-        for v in f.verts:
-            verts.append(v.co)
-    joint.position = aljabr.centroid(verts)
-    joint.position[1], joint.position[2] = -joint.position[2], joint.position[1]
-
-    # Calculate offset
-    if parent:
-        joint.offset = aljabr.vsub(joint.position, parent.position)
-        
-    # Calculate direction
-    direction = aljabr.vnorm(joint.offset)
-    axis = aljabr.vnorm(aljabr.vcross([0.0, 0.0, 1.0], direction))
-    angle = acos(aljabr.vdot([0.0, 0.0, 1.0], direction))
-    joint.direction = aljabr.axisAngleToQuaternion(axis, angle)
-    
-    # Calculate rotation
-    if parent:
-        pass
-        
-    # Calculate index
-    index += 1
-    joint.index = index
-
-    # Calculate child offsets
-    for child in joint.children:
-        index = calcJointOffsets(obj, child, index, joint)
-
-    return index
