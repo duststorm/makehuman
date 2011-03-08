@@ -78,9 +78,25 @@ class Skeleton:
             
     def update(self, mesh):
         
-        self.calcJointOffsets(mesh, self.root)
+        self.__calcJointOffsets(mesh, self.root)
+        
+    def getJoint(self, name):
+        
+        return __getJoint(self, root, name)
+            
+    def __getJoint(self, joint, name):
+        
+        if joint.name == name:
+            return joint
+            
+        for child in joint.children:
+            j = self.__getJoint(child, name)
+            if j:
+                return j
+                
+        return None
 
-    def calcJointOffsets(self, mesh, joint, parent=None):
+    def __calcJointOffsets(self, mesh, joint, parent=None):
         """
         This function calculates the position and offset for a joint and calls itself for 
         each 'child' joint in the hierarchical joint structure. 
@@ -130,5 +146,5 @@ class Skeleton:
 
         # Calculate child offsets
         for child in joint.children:
-            self.calcJointOffsets(mesh, child, joint)
+            self.__calcJointOffsets(mesh, child, joint)
 
