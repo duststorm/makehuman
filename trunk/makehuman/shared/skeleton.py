@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, centroid, vcross, vdot, vnorm, axisAngleToQuaternion
+from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion
 from math import acos
 
 class Joint:
@@ -116,7 +116,11 @@ class Skeleton:
         
         # Calculate rotation
         if parent:
-            pass
+            v1 = vmul(vnorm(parent.offset), -1.0)
+            v2 = vnorm(joint.offset)
+            axis = vnorm(vcross(v1, v2))
+            angle = acos(vdot(v1, v2))
+            joint.rotation = axisAngleToQuaternion(axis, angle)   
             
         # Update counters and set index
         joint.index = self.joints

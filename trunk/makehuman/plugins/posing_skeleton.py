@@ -42,8 +42,11 @@ class SkeletonView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         
-        self.app.selectedHuman.hide()
+        human = self.app.selectedHuman
+        
+        human.hide()
         self.getSkeleton().show()
+        self.__updateSkeletonMesh(human)
         
     def onHide(self, event):
 
@@ -63,7 +66,7 @@ class SkeletonView(gui3d.TaskView):
             self.app.scene3d.update()
             
         else:
-               
+            
             self.__skeletonObject.setPosition(human.getPosition())
         
         self.__skeletonObject.setRotation(human.getRotation())
@@ -94,6 +97,27 @@ class SkeletonView(gui3d.TaskView):
         
         for child in joint.children:
             self.__buildBoneMesh(child)
+            
+    def __updateSkeletonMesh(self, human):
+        
+        self.__skeleton.update(human.meshData)
+            
+        index = 0
+        self.__updateBoneMesh(self.__skeleton.root, index)
+        
+        self.__skeletonMesh.calcNormals()
+        self.__skeletonMesh.update()
+        
+    def __updateBoneMesh(self, joint, index):
+        
+        if joint.parent:
+            self.__updatePrism(self.__skeletonMesh, joint.parent.position, joint.position, index)
+            index += 6
+        
+        for child in joint.children:
+            index = self.__updateBoneMesh(child, index)
+            
+        return index
             
     def __addPrism(self, mesh, o=[0.0, 0.0, 0.0], e=[0.0, 1.0, 0.0], name='prism'):
             
@@ -159,6 +183,33 @@ class SkeletonView(gui3d.TaskView):
         fg.createFace(v[5], v[1], v[2], v[6]) # right
         fg.createFace(v[0], v[1], v[5], v[4]) # top
         fg.createFace(v[7], v[6], v[2], v[3]) # bottom
+        
+    def __updatePrism(self, mesh, o, e, index):
+            
+        dir = aljabr.vsub(e, o) # direction vector from o to e
+        len = aljabr.vlen(dir) # distance from o to e
+        scale = len * 0.1 # the thickness is 10% of the length
+        i = aljabr.vadd(o, aljabr.vmul(dir, 0.25)) # the thickest part is 25% from o
+        n = aljabr.vmul(dir, 1.0 / len) # the normalized direction
+        q = aljabr.axisAngleToQuaternion(n, pi / 2.0) # a quaternion to rotate the point p1 to obtain the other points
+        p1 = aljabr.randomPointFromNormal(n) # a random point in the plane defined by 0,0,0 and n
+        p1 = aljabr.vmul(aljabr.vnorm(p1), scale) # the point scaled to the thickness
+        p2 = aljabr.quaternionVectorTransform(q, p1) # the other points
+        p3 = aljabr.quaternionVectorTransform(q, p2)
+        p4 = aljabr.quaternionVectorTransform(q, p3)
+        
+        p1 = aljabr.vadd(i, p1) # translate by i since we were working in the origin
+        p2 = aljabr.vadd(i, p2)
+        p3 = aljabr.vadd(i, p3)
+        p4 = aljabr.vadd(i, p4)
+
+        # The 6 vertices
+        mesh.verts[index].co = o
+        mesh.verts[index+1].co = p1
+        mesh.verts[index+2].co = p2
+        mesh.verts[index+3].co = p3
+        mesh.verts[index+4].co = p4
+        mesh.verts[index+5].co = e
         
     def onMouseDragged(self, event):
         
