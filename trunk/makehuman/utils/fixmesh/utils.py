@@ -41,7 +41,7 @@ def cleanGroup(g):
 def findSelected():
 	Window.EditMode(0)
 	me = Mesh.Get("Human")
-	print "Selected"
+  print "Selected"
 	for v in me.verts:
 		if v.sel:
 			print v.index
