@@ -38,7 +38,7 @@ class PoseTaskView(gui3d.TaskView):
 
         @self.testPoseButton.event
         def onClicked(event):
-            self.test(self.shoulder)
+            self.test()
 
         @self.resetPoseButton.event
         def onClicked(event):
@@ -84,8 +84,15 @@ class PoseTaskView(gui3d.TaskView):
         self.app.selectedHuman.meshData.update()
         gui3d.TaskView.onHide(self, event)
 
-    def test(self, limb):
-        self.app.redraw()
+    def test(self):
+        #get the group name involving the right arm
+        rArmNames = []
+        for group in self.human.meshData.facesGroups:
+          if (group.name.startwith("r-hand") or group.name.startwith("r-upperarm") or \
+          group.name.startwith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
+            rArmNames.append(group.name)
+
+        verts = human.meshData.getVerticesAndFacesForGroups(rArmNames)[0]
 
 
     def reset(self, limbToTest):
