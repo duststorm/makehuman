@@ -4,12 +4,9 @@ import os.path
 # We need this for gui controls
 
 import gui3d
-import mh
-import os
-import algos3d
-import aljabr
 import math
 import poseengine
+from aljabr import axisAngleToQuaternion, quaternionVectorTransform, degree2rad, vadd
 from skeleton import Skeleton
 print 'Pose2 plugin imported'
 
@@ -23,6 +20,7 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
         self.shoulder.oBoundingBox = [[0.0, 8.1955895],[3.674790375, 6.1586085],[-1.120018, 1.192948875]]
         self.human = None
+        self.skeleton = Skeleton()
                 
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
@@ -92,8 +90,18 @@ class PoseTaskView(gui3d.TaskView):
           if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
           group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
             rArmNames.append(group.name)
-
         verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(rArmNames)[0]
+        #get the position of the right shoulder joint
+        j = self.skeleton.getJoint("joint-r-shoulder").position
+          
+        #rotate by 45 degrees around ehm.. y-axis?
+        for v in verts:
+          q = axisAngleToQuaternion(vadd(j,[0,1,0]), 45*degree2rad)
+          v.co = quaternionVectorTransform(q,v.co)
+          print v.co
+        self.app.selectedHuman.meshData.update()
+        self.app.selectedHuman.scene.update()
+        self.app.redraw()
 
 
     def reset(self, limbToTest):

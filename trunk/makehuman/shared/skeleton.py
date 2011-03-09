@@ -85,7 +85,7 @@ class Skeleton:
         
     def getJoint(self, name):
         
-        return __getJoint(self, root, name)
+        return self.__getJoint(self.root, name)
             
     def __getJoint(self, joint, name):
         

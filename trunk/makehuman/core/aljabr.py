@@ -30,11 +30,12 @@ The name is a tribute to I{"Al-jabr wa'l muqabalah"} the most important paper of
 The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}.
 """
 
-from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow
+from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow, pi
 from random import random
 from array import array
 
 machine_epsilon = 1.0e-16
+degree2rad = pi/180
 
 def vsub(u, v):
     """
