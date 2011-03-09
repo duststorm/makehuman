@@ -11,7 +11,7 @@ import aljabr
 import math
 import poseengine
 from skeleton import Skeleton
-print 'Pose plugin imported'
+print 'Pose2 plugin imported'
 
 
 class PoseTaskView(gui3d.TaskView):
@@ -19,6 +19,7 @@ class PoseTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Pose2')      
 
+        self.engine = poseengine.Poseengine(self.app.selectedHuman)   
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
         self.shoulder.oBoundingBox = [[0.0, 8.1955895],[3.674790375, 6.1586085],[-1.120018, 1.192948875]]
         self.human = self.app.selectedHuman
