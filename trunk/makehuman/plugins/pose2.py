@@ -22,7 +22,7 @@ class PoseTaskView(gui3d.TaskView):
         self.engine = poseengine.Poseengine(self.app.selectedHuman)   
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
         self.shoulder.oBoundingBox = [[0.0, 8.1955895],[3.674790375, 6.1586085],[-1.120018, 1.192948875]]
-        self.human = self.app.selectedHuman
+        self.human = None
                 
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
@@ -88,12 +88,12 @@ class PoseTaskView(gui3d.TaskView):
     def test(self):
         #get the group name involving the right arm
         rArmNames = []
-        for group in self.human.meshData.facesGroups:
-          if (group.name.startwith("r-hand") or group.name.startwith("r-upperarm") or \
-          group.name.startwith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
+        for group in self.app.selectedHuman.meshData.facesGroups:
+          if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
+          group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
             rArmNames.append(group.name)
 
-        verts = human.meshData.getVerticesAndFacesForGroups(rArmNames)[0]
+        verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(rArmNames)[0]
 
 
     def reset(self, limbToTest):
