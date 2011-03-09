@@ -156,7 +156,7 @@ class CNode:
 			return eb.head
 
 #
-#	readBvhFile(context, filepath, scn):
+#	readBvhFile(context, filepath, scn, scan):
 #	Custom importer
 #
 
@@ -169,7 +169,7 @@ Frames = 3
 Deg2Rad = math.pi/180
 Epsilon = 1e-5
 
-def readBvhFile(context, filepath, scn):
+def readBvhFile(context, filepath, scn, scan):
 	global theTarget
 	try:
 		scn['MhxBvhScale']
@@ -195,7 +195,6 @@ def readBvhFile(context, filepath, scn):
 	trgRig = context.object
 	bpy.ops.object.mode_set(mode='POSE')
 	trgPbones = trgRig.pose.bones
-	guessTargetArmature(trgRig)
 
 	time1 = time.clock()
 	level = 0
@@ -216,6 +215,9 @@ def readBvhFile(context, filepath, scn):
 		elif key == 'MOTION':
 			if level != 0:
 				raise NameError("Tokenizer out of kilter %d" % level)	
+			if scan:
+				return root
+			guessTargetArmature(trgRig)
 			amt = bpy.data.armatures.new("BvhAmt")
 			rig = bpy.data.objects.new("BvhRig", amt)
 			scn.objects.link(rig)
@@ -1265,7 +1267,7 @@ def setArmature(rig):
 
 def importAndRename(context, filepath):
 	trgRig = context.object
-	rig = readBvhFile(context, filepath, context.scene)
+	rig = readBvhFile(context, filepath, context.scene, False)
 	(rig00, bones00, action) =  renameBvhRig(rig, filepath)
 	guessSrcArmature(rig00)
 	renameBones(bones00, rig00, action)
@@ -2716,6 +2718,100 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
 				print("Cannot delete. %s has %d users." % (act, act.users))
 
 		return{'FINISHED'}	
+
+###############################################################################
+#
+#	Source armatures
+#
+###############################################################################
+
+theSourceProps = []
+
+def makeSourceBoneList(scn, root):
+	global TargetBoneNames
+	enums = [('None','None','None')]
+	for bn in TargetBoneNames:
+		if not bn:
+			continue
+		(mhx, text) = bn
+		enum = (mhx, text, mhx)
+		enums.append(enum)
+	props = []
+	makeSourceNode(scn, root, enums, props)
+	for prop in props:
+		name = prop[2:].lower()
+		mhx = guessSourceBone(name)
+		scn[prop] = 0
+		n = 0
+		for (mhx1, text1, mhx2) in enums:
+			if mhx == mhx1: 
+				scn[prop] = n
+				break
+			n += 1
+	return props
+
+def makeSourceNode(scn, node, enums, props):
+	if not node.children:
+		return
+	expr = 'bpy.types.Scene.S_%s = EnumProperty(items = enums, name = "%s")' % (node.name, node.name)
+	exec(expr)
+	props.append('S_'+node.name)
+	for child in node.children:
+		makeSourceNode(scn, child, enums, props)
+	return
+
+def guessSourceBone(name):
+	for amt in theArmatures.values():
+		for (bone, mhx) in amt.items():
+			if bone == name:
+				return mhx
+	return ''
+
+class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
+	bl_idname = "mhx.mocap_scan_bvh"
+	bl_label = "Scan bvh file"
+	bl_options = {'REGISTER'}
+
+	filename_ext = ".bvh"
+	filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+	filepath = StringProperty(name="File Path", maxlen=1024, default="")
+
+	def execute(self, context):
+		global theSourceProps
+		root = readBvhFile(context, self.filepath, context.scene, True)
+		theSourceProps = makeSourceBoneList(context.scene, root)
+		return{'FINISHED'}	
+
+	def invoke(self, context, event):
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}	
+
+
+#		
+#	class MhxSourceBonesPanel(bpy.types.Panel):
+#
+
+class MhxSourceBonesPanel(bpy.types.Panel):
+	bl_label = "Source armature"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	
+	@classmethod
+	def poll(cls, context):
+		return (context.object and context.object.type == 'ARMATURE')
+
+	def draw(self, context):
+		global theSourceProps
+		layout = self.layout
+		scn = context.scene
+		rig = context.object
+		if theSourceProps:
+			layout.operator("mhx.mocap_scan_bvh", text="Rescan bvh file")	
+		else:
+			layout.operator("mhx.mocap_scan_bvh", text="Scan bvh file")	
+		for prop in theSourceProps:
+			layout.prop_menu_enum(scn, prop)
+
 
 ###############################################################################
 #
