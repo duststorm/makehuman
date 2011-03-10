@@ -96,11 +96,13 @@ class PoseTaskView(gui3d.TaskView):
           
         #rotate by 45 degrees around ehm.. y-axis?
         for v in verts:
-          q = axisAngleToQuaternion(vadd(j,[0,1,0]), 45*degree2rad)
+          q = axisAngleToQuaternion(vadd(j,[0,1,0]), 25*degree2rad)
           v.co = quaternionVectorTransform(q,v.co)
           print v.co
         self.app.selectedHuman.meshData.calcNormals()
         self.app.selectedHuman.meshData.update()
+        #todo: use clavicle and elbow joint and convex weighting system (no physics yet)
+
 
     def reset(self, limbToTest):
         limbToTest.angle = [0,0,0]        
