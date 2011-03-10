@@ -30,9 +30,9 @@ The name is a tribute to I{"Al-jabr wa'l muqabalah"} the most important paper of
 The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}.
 """
 
-from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow, pi
+from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow, pi, exp
 from random import random
-from array import array
+#from array import array
 
 machine_epsilon = 1.0e-16
 degree2rad = pi/180
@@ -48,7 +48,8 @@ def vsub(u, v):
     @type  v: float iterable
     @param v: the minuend
     """
-    ret=array('d')
+    #ret=array('d')
+    ret = []
     for i in xrange(len(u)):
         ret.append(u[i]-v[i])
     return ret
@@ -101,11 +102,12 @@ def vnorm(vect):
     # value for vectors whose length may be calculated too close to zero.
 
     if length == 0.0:
-        return len(vect)*array('d',[0.0])
+        return len(vect)*[0.0] #*array('d',[0.0])
 
     # Dividing each element by the length will result in a
     # unit normal vector.
-    ret = array('d')
+    #ret = array('d')
+    ret = []
     for x in vect:
         ret.append(x/length)
     return ret
@@ -187,7 +189,7 @@ def vadd(*vlist):
     @type  vlist: a sequence of list of integers of doubles
     @param vlist: the sequence without paranthesis, that determines all the vectors to be added together. See above for usage.
     """
-    returnValue=array('d')
+    returnValue=[] #array('d')
     for i in xrange(len(vlist[0])):
         a=0
         for j in xrange(len(vlist)):
@@ -206,7 +208,7 @@ def vmul(vect, s):
     @type  vect: double or integer iterable
     @param vect: the vector to be multiplied with the scalar value
     """
-    ret=array('d')
+    ret=[] #array('d')
     for x in vect:
         ret.append(x*s)
     return ret
@@ -844,6 +846,6 @@ def reverseBump(x, width=1.0):
     @param width:  radius of the bump (reversed)
     """
     if (x < width):
-      return (width - math.exp(-1.0/(width*width - x*x) + 1.0))
+      return (1.0 - exp(-width*width/(width*width - x*x) + 1.0))
     else:
       return 1.0

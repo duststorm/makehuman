@@ -6,7 +6,7 @@ import os.path
 import gui3d
 import math
 import poseengine
-from aljabr import axisAngleToQuaternion, quaternionVectorTransform, degree2rad, vadd, vsub
+from aljabr import * #axisAngleToQuaternion, quaternionVectorTransform, degree2rad, vadd, vsub, vdist
 from skeleton import Skeleton
 print 'Pose2 plugin imported'
 
@@ -94,17 +94,30 @@ class PoseTaskView(gui3d.TaskView):
         self.skeleton.update(self.app.selectedHuman.meshData)
         #get the position of the right shoulder joint
         j = self.skeleton.getJoint("joint-r-shoulder").position
+        clavicle = self.skeleton.getJoint("joint-r-clavicle").position
           
         #rotate by 45 degrees around ehm.. y-axis?
         q = axisAngleToQuaternion([0,1,0], 25*degree2rad)
         for v in verts:
-          v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j)), j)
-
+          #try to naive clavicle corrections
+          dist = vdist(v.co,clavicle)
+          if  dist > 1.6:
+            #assuming clavicle joint did not rotate
+            v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j)), j)
+          else:
+             #compute new quaternion by reverse bump for weight distribution, assuming shoulder joint does not translate
+             scalar = reverseBump(dist, 1.6)
+             print scalar
+             newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
+             newq = vnorm(newq)
+             v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j)), j)
+            
         self.app.selectedHuman.meshData.calcNormals()
-        self.app.selectedHuman.meshData.update()
+        self.app.selectedHuman.meshData.update()       
+        
         #todo: use clavicle and elbow joint and convex weighting system (no physics yet)
         # clavicle joint must be at a constant position
-
+        #sphere diameter for effect : 0.6
 
     def reset(self, limbToTest):
         limbToTest.angle = [0,0,0]        
@@ -141,3 +154,19 @@ def load(app):
 def unload(app):
     print 'pose unloaded'
 
+"""
+joints[0] is the root of the joint linkage
+given a positon v in the mesh, compute the weight of the vertex with respect to the joint
+len(widths) = len(joints)
+len(dist) = len(joints)
+len(dist[i]) = 2*len(joints)-1 for all i = 1,..., len(joints)
+"""
+def calculateShoulderWeights(v, joints):
+  #compute maximal distance between joints
+  dist = 0
+  for j in xrange(0,len(joints)-1):
+    dist = dist + vdist(joints[i].position, joints[i+1].position)
+  
+  #compute nearest distance to joint
+  
+  
