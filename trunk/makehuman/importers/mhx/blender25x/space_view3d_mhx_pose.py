@@ -688,6 +688,67 @@ class VIEW3D_OT_MhxRemoveExpressionDriversButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	class VIEW3D_OT_MhxKeyExpressionButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxKeyExpressionsButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_key_expressions"
+	bl_label = "Key"
+	keyall = bpy.props.BoolProperty()
+
+	def execute(self, context):
+		global theMesh
+		keys = theMesh.data.shape_keys
+		if keys:
+			keylist = findActiveFcurves(keys.animation_data)
+			frame = context.scene.frame_current
+			for name in Expressions:
+				try:
+					shape = keys.keys[name]
+				except:
+					shape = None
+				if shape and (self.keyall or (name in keylist)):
+					shape.keyframe_insert("value", index=-1, frame=frame)
+		return{'FINISHED'}	
+
+def findActiveFcurves(adata):			
+	if adata:
+		action = adata.action
+	else:
+		return []
+	if action:
+		keylist = []
+		for fcu in action.fcurves:
+			words = fcu.data_path.split('"')
+			keylist.append(words[1])
+		return keylist
+	return []
+	
+#
+#	class VIEW3D_OT_MhxKeyExpressionButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxKeyDriversButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_key_drivers"
+	bl_label = "Key"
+	keyall = bpy.props.BoolProperty()
+
+	def execute(self, context):
+		global theRig
+		frame = context.scene.frame_current
+		keylist = findActiveFcurves(theRig.animation_data)
+		print(keylist)
+		for name in Expressions:
+			try:
+				oldvalue = theRig[name]
+				success = True
+			except:
+				success = False
+			if success and (self.keyall or (name in keylist)):
+				theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame)
+		return{'FINISHED'}	
+
+#
 #	class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
 #
 
@@ -707,13 +768,11 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
 					shape = keys.keys[name]
 				except:
 					shape = None
-				print(shape, name)
-				if shape and context.tool_settings.use_keyframe_insert_auto:
+				if shape:
 					oldvalue = shape.value
-					if abs(value-oldvalue) > 0.01:
-						if not False:
-							shape.keyframe_insert("value", index=-1, frame=frame-1)
-						shape.value = value
+					shape.value = value
+					if (context.tool_settings.use_keyframe_insert_auto and 
+						((value > 0.01) or (abs(value-oldvalue) > 0.01))):
 						shape.keyframe_insert("value", index=-1, frame=frame)
 		return{'FINISHED'}	
 
@@ -721,7 +780,7 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
 #	class VIEW3D_OT_MhxPinDriverButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxPinExpressionDriverButton(bpy.types.Operator):
+class VIEW3D_OT_MhxPinDriverButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_pin_driver"
 	bl_label = "Pin"
 	driver = bpy.props.StringProperty()
@@ -737,11 +796,11 @@ class VIEW3D_OT_MhxPinExpressionDriverButton(bpy.types.Operator):
 			except:
 				success = False
 
-			if success and context.tool_settings.use_keyframe_insert_auto:
-				if abs(value-oldvalue) > 0.01:
-					if not False:
-						theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame-1)
-					theRig[name] = value
+			if success:
+				theRig[name] = value
+				context.scene.update()
+				if (context.tool_settings.use_keyframe_insert_auto and
+					((value > 0.01) or (abs(value-oldvalue) > 0.01))):
 					theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame)
 		return{'FINISHED'}	
 
@@ -768,6 +827,9 @@ class MhxExpressionsPanel(bpy.types.Panel):
 			layout.operator("mhx.pose_reset_rig_expressions")
 			if theMesh:
 				layout.operator("mhx.pose_remove_drivers")
+			row = layout.row()
+			row.operator("mhx.pose_key_drivers", text="Key active").keyall = False
+			row.operator("mhx.pose_key_drivers", text="Key all").keyall = True
 			layout.separator()
 			for name in Expressions:
 				try:
@@ -784,6 +846,9 @@ class MhxExpressionsPanel(bpy.types.Panel):
 			layout.label(text="Expressions")
 			layout.operator("mhx.pose_reset_expressions")
 			layout.operator("mhx.pose_create_drivers")
+			row = layout.row()
+			row.operator("mhx.pose_key_expressions", text="Key active").keyall = False
+			row.operator("mhx.pose_key_expressions", text="Key all").keyall = True
 			layout.separator()
 			keys = theMesh.data.shape_keys
 			if keys:
