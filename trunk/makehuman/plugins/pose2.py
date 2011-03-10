@@ -94,16 +94,16 @@ class PoseTaskView(gui3d.TaskView):
         self.skeleton.update(self.app.selectedHuman.meshData)
         #get the position of the right shoulder joint
         j = self.skeleton.getJoint("joint-r-shoulder").position
-        print j
           
         #rotate by 45 degrees around ehm.. y-axis?
         q = axisAngleToQuaternion([0,1,0], 25*degree2rad)
         for v in verts:
           v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j)), j)
-          print v.co
+
         self.app.selectedHuman.meshData.calcNormals()
         self.app.selectedHuman.meshData.update()
         #todo: use clavicle and elbow joint and convex weighting system (no physics yet)
+        # clavicle joint must be at a constant position
 
 
     def reset(self, limbToTest):
