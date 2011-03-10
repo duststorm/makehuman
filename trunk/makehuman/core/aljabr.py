@@ -830,3 +830,20 @@ def _mmul(M,N,rowsM,colsM,colsN):
                 a=a+M[n+k]*N[k*colsM+j]
             P.append(a)
     return P
+
+def reverseBump(x, width=1.0):
+    """
+    This is the bump function upside down (see U<Wikipedia - Bump Function>{http://en.wikipedia.org/wiki/Bump_function}). Height is always 1, if we 
+    need higher bump we just scale it
+
+    @rtype:    double
+    @return:   the upside down of a bump function scaled 
+    @type  x:  double
+    @param x:  the value of the function at x (>= 0)
+    @type  width:  double
+    @param width:  radius of the bump (reversed)
+    """
+    if (x < width):
+      return (width - math.exp(-1.0/(width*width - x*x) + 1.0))
+    else:
+      return 1.0
