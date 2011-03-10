@@ -1543,17 +1543,14 @@ def parseArmature (args, tokens):
     ob = createObject('ARMATURE', obname, amt, amtname)    
 
     linkObject(ob, amt)
-    print("Linked", ob, amt)
-    print("Active", bpy.context.object)
+    print("Linked")
+
     bpy.ops.object.mode_set(mode='OBJECT')
-    print("ob-mode")
     bpy.ops.object.mode_set(mode='EDIT')
-    print("edit-mode")
 
     heads = {}
     tails = {}
     for (key, val, sub) in tokens:
-        print(key,val)
         if key == 'Bone':
             bname = val[0]
             if not invalid(val[1]):

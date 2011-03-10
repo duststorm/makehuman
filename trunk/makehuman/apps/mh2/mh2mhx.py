@@ -154,10 +154,10 @@ def exportMhx_25(human, fp):
 		mhx_rig.setupCircles(fp)
 		copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])	
 		fp.write("#endif\n")
-	elif theConfig.useRig == 'game':
+	elif theConfig.useRig in ['game', 'rigify']:
 		rig = mh2proxy.CProxy('Rig', 0)
 		rig.name = theHuman
-		(locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/game.rig', obj)
+		(locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/%s.rig' % theConfig.useRig, obj)
 		fp.write("#if toggle&T_Armature\n")
 		copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, [])	
 		fp.write("#endif\n")
@@ -233,7 +233,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 			#	(x, y) = mhxbones.boneRoll[bone]
 			#	fp.write("    roll %.6g ;\n" % (y))
 			elif words[1] == 'refer-human':
-				if words[3] == 'ControlRig' or theConfig.useRig == 'game':
+				if words[3] == 'ControlRig' or theConfig.useRig != 'mhx':
 					fp.write("    %s Refer Object %s ;\n" % (words[2], theHuman))
 				elif words[3] == 'DeformRig':
 					fp.write("    %s Refer Object %sDeformRig ;\n" % (words[2], theHuman))

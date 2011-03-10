@@ -108,9 +108,7 @@ F_CON = 0x01
 import mh
 
 def proxyFilePtr(name):
-	expo = os.path.normpath(mh.getPath('exports'))
-	# os.path.split does not seem to work
-	head = expo[:-7]
+	head = os.path.normpath(mh.getPath(''))
 	for path in [head, './']:
 		filename = os.path.realpath( os.path.join(path, name) )
 		try:
