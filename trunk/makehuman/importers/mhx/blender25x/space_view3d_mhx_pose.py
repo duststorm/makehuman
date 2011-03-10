@@ -700,12 +700,21 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
 		global theMesh
 		keys = theMesh.data.shape_keys
 		if keys:
+			frame = context.scene.frame_current
 			for name in Expressions:
 				value = 1.0 if name == self.expression else 0.0
 				try:
-					keys.keys[name].value = value
+					shape = keys.keys[name]
 				except:
-					pass
+					shape = None
+				print(shape, name)
+				if shape and context.tool_settings.use_keyframe_insert_auto:
+					oldvalue = shape.value
+					if abs(value-oldvalue) > 0.01:
+						if not False:
+							shape.keyframe_insert("value", index=-1, frame=frame-1)
+						shape.value = value
+						shape.keyframe_insert("value", index=-1, frame=frame)
 		return{'FINISHED'}	
 
 #
@@ -719,12 +728,21 @@ class VIEW3D_OT_MhxPinExpressionDriverButton(bpy.types.Operator):
 
 	def execute(self, context):
 		global theRig
+		frame = context.scene.frame_current
 		for name in Expressions:
 			value = 1.0 if name == self.driver else 0.0
 			try:
-				theRig[name] = value
+				oldvalue = theRig[name]
+				success = True
 			except:
-				pass
+				success = False
+
+			if success and context.tool_settings.use_keyframe_insert_auto:
+				if abs(value-oldvalue) > 0.01:
+					if not False:
+						theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame-1)
+					theRig[name] = value
+					theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame)
 		return{'FINISHED'}	
 
 #
@@ -1330,6 +1348,7 @@ def register():
 def unregister():
 	bpy.utils.unregister_module(__name__)
 	pass
+
 
 if __name__ == "__main__":
 	register()
