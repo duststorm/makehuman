@@ -21,7 +21,7 @@
 // little disruption to the surface normals.  
 #ifndef (MakeHuman_Texture)
   #declare MakeHuman_Texture = texture {
-    pigment {uv_mapping
+    pigment {
       image_map {
         tiff "texture.tif"
       }

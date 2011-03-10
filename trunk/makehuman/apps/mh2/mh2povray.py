@@ -551,6 +551,9 @@ def povrayExportMesh2(obj, camera, resolution, path):
 
   # Mesh2 Object - Write the end squiggly bracket for the mesh2 object declaration
 
+    outputFileDescriptor.write('''
+  uv_mapping
+''')
     outputFileDescriptor.write('''}
 
 ''')

@@ -152,7 +152,6 @@
     MakeHuman_Mesh(-0.003)
     texture {
       pigment {
-        uv_mapping
         image_map {
           tga "texture.tga"
         }
