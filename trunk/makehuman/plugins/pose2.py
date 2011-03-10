@@ -6,7 +6,7 @@ import os.path
 import gui3d
 import math
 import poseengine
-from aljabr import axisAngleToQuaternion, quaternionVectorTransform, degree2rad, vadd
+from aljabr import axisAngleToQuaternion, quaternionVectorTransform, degree2rad, vadd, vsub
 from skeleton import Skeleton
 print 'Pose2 plugin imported'
 
@@ -91,13 +91,15 @@ class PoseTaskView(gui3d.TaskView):
           group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
             rArmNames.append(group.name)
         verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(rArmNames)[0]
+        self.skeleton.update(self.app.selectedHuman.meshData)
         #get the position of the right shoulder joint
         j = self.skeleton.getJoint("joint-r-shoulder").position
+        print j
           
         #rotate by 45 degrees around ehm.. y-axis?
+        q = axisAngleToQuaternion([0,1,0], 25*degree2rad)
         for v in verts:
-          q = axisAngleToQuaternion(vadd(j,[0,1,0]), 25*degree2rad)
-          v.co = quaternionVectorTransform(q,v.co)
+          v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j)), j)
           print v.co
         self.app.selectedHuman.meshData.calcNormals()
         self.app.selectedHuman.meshData.update()
