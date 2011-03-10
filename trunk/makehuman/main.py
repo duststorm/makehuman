@@ -71,8 +71,6 @@ sys.path=sys.path + recursiveDirNames("./apps")
 sys.path.append("./core")
 sys.path=sys.path + recursiveDirNames("./core")
 
-import subprocess
-import webbrowser
 import glob, imp
 from os.path import join, basename, splitext
 
@@ -288,24 +286,6 @@ class MHApplication(gui3d.Application):
     def loadGui(self):
         
         self.progressBar.setProgress(0.9)
-        
-        category = gui3d.Category(self, "Report bug", style=gui3d.CategoryButtonStyle)
-        # Report bug button
-        @category.button.event
-        def onClicked(event):
-          webbrowser.open('http://code.google.com/p/makehuman/issues/entry');
-          
-        category = gui3d.Category(self, "Req feature", style=gui3d.CategoryButtonStyle)
-        # Request feature button
-        @category.button.event
-        def onClicked(event):
-          webbrowser.open('http://code.google.com/p/makehuman/issues/entry?template=Request%20feature');
-
-        category = gui3d.Category(self, "Help", style=gui3d.CategoryButtonStyle)
-        # Help button
-        @category.button.event
-        def onClicked(event):
-          webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
           
         # Exit button
         category = gui3d.Category(self, "Exit", style=gui3d.CategoryButtonStyle)
@@ -621,7 +601,7 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def goToHelp(self):
-        webbrowser.open(os.getcwd()+"/docs/MH_Users_Guide.pdf");
+        self.switchCategory("Help")
           
     def toggleStereo(self):
         stereoMode = mh.cameras[0].stereoMode
