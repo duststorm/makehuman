@@ -26,7 +26,7 @@ class AssymSlider(gui3d.Slider):
 class AsymmTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Asymm')
+        gui3d.TaskView.__init__(self, category, 'Asymmetry')
 
         #Sliders
         y = 80
