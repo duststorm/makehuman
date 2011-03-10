@@ -688,6 +688,46 @@ class VIEW3D_OT_MhxRemoveExpressionDriversButton(bpy.types.Operator):
 		return{'FINISHED'}	
 
 #
+#	class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_pin_expression"
+	bl_label = "Pin"
+	expression = bpy.props.StringProperty()
+
+	def execute(self, context):
+		global theMesh
+		keys = theMesh.data.shape_keys
+		if keys:
+			for name in Expressions:
+				value = 1.0 if name == self.expression else 0.0
+				try:
+					keys.keys[name].value = value
+				except:
+					pass
+		return{'FINISHED'}	
+
+#
+#	class VIEW3D_OT_MhxPinDriverButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxPinExpressionDriverButton(bpy.types.Operator):
+	bl_idname = "mhx.pose_pin_driver"
+	bl_label = "Pin"
+	driver = bpy.props.StringProperty()
+
+	def execute(self, context):
+		global theRig
+		for name in Expressions:
+			value = 1.0 if name == self.driver else 0.0
+			try:
+				theRig[name] = value
+			except:
+				pass
+		return{'FINISHED'}	
+
+#
 #	class MhxExpressionsPanel(bpy.types.Panel):
 #
 
@@ -713,9 +753,13 @@ class MhxExpressionsPanel(bpy.types.Panel):
 			layout.separator()
 			for name in Expressions:
 				try:
-					layout.prop(theRig, '["%s"]' % name, index=-1, text=name)
+					prop = theRig[name]
 				except:
-					pass
+					prop = -10
+				if prop > -5:
+					row = layout.split(0.75)
+					row.prop(theRig, '["%s"]' % name, index=-1, text=name)
+					row.operator("mhx.pose_pin_driver").driver = name
 		
 		elif theMesh and meshHasExpressions(theMesh):	
 			layout.separator()
@@ -728,9 +772,12 @@ class MhxExpressionsPanel(bpy.types.Panel):
 				for name in Expressions:
 					try:
 						datum = keys.keys[name]
-						layout.prop(datum, 'value', text=name)
 					except:
-						pass
+						datum = None
+					if datum:
+						row = layout.split(0.75)
+						row.prop(datum, 'value', text=name)
+						row.operator("mhx.pose_pin_expression").expression = name
 		return
 
 ###################################################################################	
@@ -1002,6 +1049,7 @@ def addPropDriver(cns, props, expr, prefix):
 		else:
 			targ.data_path = '["%s"]' % (prefix+prop)
 	return				
+
 
 class VIEW3D_OT_MhxTogglePropButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_toggle_prop"
