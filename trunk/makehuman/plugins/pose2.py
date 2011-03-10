@@ -97,20 +97,20 @@ class PoseTaskView(gui3d.TaskView):
         clavicle = self.skeleton.getJoint("joint-r-clavicle").position
           
         #rotate by 45 degrees around ehm.. y-axis?
-        q = axisAngleToQuaternion([0,1,0], 25*degree2rad)
+        q = axisAngleToQuaternion([0,1,0], 20*degree2rad)
         for v in verts:
           #try to naive clavicle corrections
           dist = vdist(v.co,clavicle)
-          if  dist > 1.6:
+          if  dist > 1.8:
             #assuming clavicle joint did not rotate
             v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j)), j)
-          else:
+          #else:
              #compute new quaternion by reverse bump for weight distribution, assuming shoulder joint does not translate
-             scalar = reverseBump(dist, 1.6)
-             print scalar
-             newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
-             newq = vnorm(newq)
-             v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j)), j)
+             #scalar = reverseBump(dist, 1.8)
+             #print scalar
+             #newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
+             #newq = vnorm(newq)
+             #v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j)), j)
             
         self.app.selectedHuman.meshData.calcNormals()
         self.app.selectedHuman.meshData.update()       
