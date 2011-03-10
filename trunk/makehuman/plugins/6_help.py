@@ -8,6 +8,7 @@ import webbrowser
 class HelpTaskView(gui3d.TaskView):
 
     def __init__(self, category):
+        
         gui3d.TaskView.__init__(self, category, 'Help')
 
         y = 80

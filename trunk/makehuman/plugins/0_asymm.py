@@ -205,7 +205,7 @@ def load(app):
     """
     Plugin load function, needed by design.
     """
-    category = app.getCategory('Advanced')
+    category = app.getCategory('Modelling')
     taskview = AsymmTaskView(category)
     
     print 'Asymmetry loaded'

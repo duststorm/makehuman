@@ -255,6 +255,7 @@ class MHApplication(gui3d.Application):
         self.modules = {}
         
         self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
+        self.pluginsToLoad.sort()
         self.pluginsToLoad.reverse()
         
         mh.callAsync(self.loadNextPlugin)

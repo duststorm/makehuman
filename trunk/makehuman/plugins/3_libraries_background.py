@@ -119,7 +119,7 @@ class settingsTaskView(gui3d.TaskView) :
         self.backgroundImage = taskview.backgroundImage
         self.texture = taskview.texture
                                 
-        gui3d.TaskView.__init__(self, category, 'Settings', label='settings')
+        gui3d.TaskView.__init__(self, category, 'Background')
         
         y = 80
         
