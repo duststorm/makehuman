@@ -591,9 +591,13 @@ class Application(events3d.EventHandler):
         # Get picked object
 
         picked = self.scene3d.getPickedObject()
+        
         if not picked:
-
+            if self.enteredObject:
+                self.enteredObject.callEvent('onMouseExited', event)
+                self.enteredObject = None
             return
+            
         group = object = picked[0]
         object = picked[1]
 
@@ -611,6 +615,10 @@ class Application(events3d.EventHandler):
                     self.enteredObject = object.object
                     self.enteredObject.callEvent('onMouseEntered', event)
                 object.object.callEvent('onMouseMoved', event)
+            else:
+                if self.enteredObject:
+                    self.enteredObject.callEvent('onMouseExited', event)
+                self.enteredObject = None
 
     def onMouseWheelCallback(self, wheelDelta):
 

@@ -34,9 +34,13 @@ class SkeletonView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Skeleton')
         
+        self.status = gui3d.TextView(self, [10, 585, 9.1])
+        
         self.__skeleton = Skeleton()
         self.__skeletonMesh = None
         self.__skeletonObject = None
+        
+        self.bone = None
             
     def onShow(self, event):
 
@@ -230,6 +234,38 @@ class SkeletonView(gui3d.TaskView):
             
         self.app.selectedHuman.hide()
         self.getSkeleton().show()
+        
+    def onMouseEntered(self, event):
+        
+        gui3d.TaskView.onMouseEntered(self, event)
+        
+        self.bone = event.group
+        self.bone.setColor([0, 255, 0, 255])
+        self.status.setText(event.group.name)
+        self.app.redraw()
+
+    def onMouseExited(self, event):
+        
+        gui3d.TaskView.onMouseExited(self, event)
+        
+        self.bone.setColor([255, 255, 255, 255])
+        self.status.setText('')
+        self.app.redraw()
+        
+    def onMouseMoved(self, event):
+        
+        gui3d.TaskView.onMouseMoved(self, event)
+        
+        if self.bone != event.group:
+            self.bone.setColor([255, 255, 255, 255])
+            self.bone = event.group
+            self.bone.setColor([0, 255, 0, 255])
+            self.status.setText(event.group.name)
+        self.app.redraw()
+        
+    def onResized(self, event):
+        
+        self.status.setPosition([10, event[1]-15, 9.1])
 
 def load(app):
     
