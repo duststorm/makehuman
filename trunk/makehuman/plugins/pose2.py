@@ -99,10 +99,8 @@ class PoseTaskView(gui3d.TaskView):
           q = axisAngleToQuaternion(vadd(j,[0,1,0]), 45*degree2rad)
           v.co = quaternionVectorTransform(q,v.co)
           print v.co
+        self.app.selectedHuman.meshData.calcNormals()
         self.app.selectedHuman.meshData.update()
-        self.app.selectedHuman.scene.update()
-        self.app.redraw()
-
 
     def reset(self, limbToTest):
         limbToTest.angle = [0,0,0]        
