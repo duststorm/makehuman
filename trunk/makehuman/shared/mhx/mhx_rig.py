@@ -588,7 +588,7 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
 			(xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
 			mins = (xmin, ymin, zmin)
 			maxs = (xmax, ymax, zmax)
-			uses = data[2]			
+			#uses = data[2]			
 		elif typ == 'LimitLoc':
 			addLimitLocConstraint(fp, rig, cflags, inf, data)
 		elif typ == 'LimitScale':

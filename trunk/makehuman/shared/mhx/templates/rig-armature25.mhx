@@ -15,6 +15,7 @@ NoScale False ;
   layers_protected Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
   use_mirror_x False ;
+  RecalcRoll ['Foot_L','Toe_L','Foot_R','Toe_R'] ;
 end Armature
 
 *** human-object ControlRig
@@ -39,6 +40,7 @@ end Object
   layers_protected Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
   use_mirror_x False ;
+  RecalcRoll ['Foot_L','Toe_L','Foot_R','Toe_R'] ;
 end Armature
 
 *** human-object DeformRig

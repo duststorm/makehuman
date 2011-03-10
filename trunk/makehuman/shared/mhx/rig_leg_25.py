@@ -359,20 +359,20 @@ def LegControlPoses(fp):
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_R, (1,1,1)])])
 	
 	addPoseBone(fp, 'Foot_L', 'MHFoot', 'FK_L', (0,0,0), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
-		[('IK', 0, 0, ['RevIK', 'FootRev_L', 1, (-90*D, 'FootPT_L'), (1,0,1)]),
+		[('IK', 0, 0, ['RevIK', 'FootRev_L', 1, (90*D, 'FootPT_L'), (1,0,1)]),
 		 #('CopyRot', C_LOCAL, 0, ['RevRot', 'FootRev_L', (0,1,0), (0,0,0), True]),
 		 ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)])])
 
 	addPoseBone(fp, 'Foot_R', 'MHFoot', 'FK_R', (0,0,0), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
-		[('IK', 0, 0, ['RevIK', 'FootRev_R', 1, (-90*D, 'FootPT_R'), (1,0,1)]),
+		[('IK', 0, 0, ['RevIK', 'FootRev_R', 1, (90*D, 'FootPT_R'), (1,0,1)]),
 		 #('CopyRot', C_LOCAL, 0, ['RevRot', 'FootRev_R', (0,1,0), (0,0,0), True]),
 		 ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)])])
 
 	addPoseBone(fp, 'Toe_L', 'MHToe_L', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
-		[('IK', 0, 0, ['RevIK', 'ToeRev_L', 1, (-90*D, 'ToePT_L'), (1,0,1)])])
+		[('IK', 0, 0, ['RevIK', 'ToeRev_L', 1, (90*D, 'ToePT_L'), (1,0,1)])])
 
 	addPoseBone(fp, 'Toe_R', 'MHToe_R', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
-		[('IK', 0, 0, ['RevIK', 'ToeRev_R', 1, (-90*D, 'ToePT_R'), (1,0,1)])])
+		[('IK', 0, 0, ['RevIK', 'ToeRev_R', 1, (90*D, 'ToePT_R'), (1,0,1)])])
 	
 	addPoseBone(fp, 'LegFK_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
