@@ -649,8 +649,16 @@ def quaternionToMatrix(q):
     m[2][2] = float(q[3]*q[3]-q[0]*q[0]-q[1]*q[1]+q[2]*q[2])
 
     return m
-    
+
 def quaternionLerp(q1, q2, alpha):
+    
+    return vnorm([q1[0] + alpha * (q2[0] - q1[0]),
+                  q1[1] + alpha * (q2[1] - q1[1]),
+                  q1[2] + alpha * (q2[2] - q1[2]),
+                  q1[3] + alpha * (q2[3] - q1[3])])
+
+'''    
+def quaternionSlerp2(q1, q2, alpha):
     
     dot = vdot(q1, q2)
     
@@ -670,6 +678,7 @@ def quaternionLerp(q1, q2, alpha):
                q2[3] - alpha * q1[3]])
 
     return vadd(vmul(q1, cos(theta)), vmul(q, sin(theta)))
+'''
             
 def quaternionSlerp(q1, q2, alpha):
         
