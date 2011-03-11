@@ -649,6 +649,51 @@ def quaternionToMatrix(q):
     m[2][2] = float(q[3]*q[3]-q[0]*q[0]-q[1]*q[1]+q[2]*q[2])
 
     return m
+    
+def quaternionLerp(q1, q2, alpha):
+    
+    dot = vdot(q1, q2)
+    
+    if dot > 0.1:
+        return vnorm([q1[0] + alpha * (q2[0] - q1[0]),
+                      q1[1] + alpha * (q2[1] - q1[1]),
+                      q1[2] + alpha * (q2[2] - q1[2]),
+                      q1[3] + alpha * (q2[3] - q1[3])])
+                      
+    dot = max(-1.0, min(dot, 1.0))
+    theta0 = acos(dot)
+    theta = theta0 * alpha
+
+    q = vnorm([q2[0] - alpha * q1[0],
+               q2[1] - alpha * q1[1],
+               q2[2] - alpha * q1[2],
+               q2[3] - alpha * q1[3]])
+
+    return vadd(vmul(q1, cos(theta)), vmul(q, sin(theta)))
+            
+def quaternionSlerp(q1, q2, alpha):
+        
+    cosHalfTheta = q1[3] * q2[3] + q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2]
+    
+    if abs(cosHalfTheta) >= 1.0:
+        return q1
+
+    halfTheta = acos(cosHalfTheta)
+    sinHalfTheta = sqrt(1.0 - cosHalfTheta * cosHalfTheta)
+
+    if abs(sinHalfTheta) < 0.001:
+        return [q1[0] * 0.5 + q2[0] * 0.5,
+                q1[1] * 0.5 + q2[1] * 0.5,
+                q1[2] * 0.5 + q2[2] * 0.5,
+                q1[3] * 0.5 + q2[3] * 0.5]
+
+    ratioA = sin((1 - t) * halfTheta) / sinHalfTheta;
+    ratioB = sin(t * halfTheta) / sinHalfTheta; 
+
+    return [q1[0] * ratioA + q2[0] * ratioB,
+            q1[1] * ratioA + q2[1] * ratioB,
+            q1[2] * ratioA + q2[2] * ratioB,
+            q1[3] * ratioA + q2[3] * ratioB]
 
 def vectorsToRotMatrix(v1,v2):
     """
