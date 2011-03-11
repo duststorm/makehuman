@@ -594,6 +594,13 @@ def axisAngleToQuaternion(axis, angle):
     qz = axis[2] * s
     qw = cos(angle/2.0)
     return (qx, qy, qz, qw)
+    
+def quaternionTranslationToDual(q, t):
+    return [q,
+            [0.5 * ( t[0] * q[3] + t[1] * q[2] - t[2] * q[1]),
+             0.5 * (-t[0] * q[2] + t[1] * q[3] + t[2] * q[0]),
+             0.5 * ( t[0] * q[1] - t[1] * q[0] + t[2] * q[3]),
+            -0.5 * ( t[0] * q[0] + t[1] * q[1] + t[2] * q[2])]]
 
 #Note: Quaternions have to of normalized form
 # Quaternions are of the form (x,y,z,w)
