@@ -1784,5 +1784,72 @@ def writeDeformDrivers(fp):
 	return
 
 
+#
+#	Bending
+#
+
+BendBones = [
+	('LoArm_L', 'Z', -15),
+	('UpLeg_L', 'X', -10),
+	('LoLeg_L', 'X', 20),
+	('Foot_L', 'X', 10),
+	
+	('LoArm_R', 'Z', 15),
+	('UpLeg_R', 'X', -10),
+	('LoLeg_R', 'X', 20),
+	('Foot_R', 'X', 10),
+]
+
+Reparents = [
+	('Ankle_L', 'LoLeg_L'),
+	('LegIK_L', 'Toe_L'),
+	('KneePT_L', 'UpLeg_L'),
+	('KneeLinkPT_L', 'UpLeg_L'),
+
+	('Ankle_R', 'LoLeg_R'),
+	('LegIK_R', 'Toe_R'),
+	('KneePT_R', 'UpLeg_R'),
+	('KneeLinkPT_R', 'UpLeg_R'),
+]
+
+Snaps = [
+	('Wrist_L', 'Hand_L', 'Both'),	
+	('FootRev_L', 'Foot_L', 'Inv'),
+	('ToeRev_L', 'Toe_L', 'Inv'),
+
+	('Wrist_R', 'Hand_R', 'Both'),	
+	('FootRev_R', 'Foot_R', 'Inv'),
+	('ToeRev_R', 'Toe_R', 'Inv'),
+]
+
+def writeAllProcesses(fp):
+	fp.write("  EditMode ;\n")
+	for (bone, fakepar) in Reparents:
+		fp.write("  Reparent %s %s ;\n" % (bone, fakepar))
+	fp.write("  PoseMode ;\n")
+	for (bone, axis, angle) in BendBones:
+		fp.write("  Bend %s %s %.3f ;\n" % (bone, axis, angle*D))
+	fp.write("  Apply ;\n")
+	fp.write("  EditMode ;\n")
+	for (rev, bone, mode) in Snaps:
+		fp.write("  Snap %s %s %s ;\n" % (rev, bone, mode))
+	return
+
+def reapplyArmature(fp, ob):
+	fp.write(
+"  Object %s\n" % ob +
+"    Modifier Armature ARMATURE\n" +
+"      object Refer Object %sDeformRig ;\n" % mh2mhx.theHuman +
+"      use_bone_envelopes False ;\n" +
+"      use_vertex_groups True ;\n" +
+"    end Modifier\n" +
+"  end Object\n")
+	return
+
+
+
+
+
+
 
 
