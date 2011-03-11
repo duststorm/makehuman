@@ -601,6 +601,36 @@ def quaternionTranslationToDual(q, t):
              0.5 * (-t[0] * q[2] + t[1] * q[3] + t[2] * q[0]),
              0.5 * ( t[0] * q[1] - t[1] * q[0] + t[2] * q[3]),
             -0.5 * ( t[0] * q[0] + t[1] * q[1] + t[2] * q[2])]]
+            
+def dualToMatrix(d):
+    # Since the rotation part is a unit quaternion, we don't need to divide I think
+    #length = vdot(d[0], d[0])
+    x, y, z, w = d[0]
+    t1, t2, t3, t0 = d[1]
+    m = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+        
+    m[0][0] = w*w + x*x - y*y - z*z
+    m[1][0] = 2.0*x*y - 2.0*w*z
+    m[2][0] = 2.0*x*z + 2.0*w*y
+    m[0][1] = 2.0*x*y + 2.0*w*z
+    m[1][1] = w*w + y*y - x*x - z*z
+    m[2][1] = 2.0*y*z - 2.0*w*x
+    m[0][2] = 2.0*x*z - 2.0*w*y
+    m[1][2] = 2.0*y*z + 2.0*w*x
+    m[2][2] = w*w + z*z - x*x - y*y
+    
+    m[3][0] = -2.0*t0*x + 2.0*t1*w - 2.0*t2*z + 2.0*t3*y
+    m[3][1] = -2.0*t0*y + 2.0*t1*z + 2.0*t2*w - 2.0*t3*x
+    m[3][2] = -2.0*t0*z - 2.0*t1*y + 2.0*t2*x + 2.0*t3*w
+    
+    m[0][3] = 0.0
+    m[1][3] = 0.0
+    m[2][3] = 0.0
+    m[3][3] = 1.0
+    
+    #mdiv(m, length)
+    
+    return m
 
 #Note: Quaternions have to of normalized form
 # Quaternions are of the form (x,y,z,w)
