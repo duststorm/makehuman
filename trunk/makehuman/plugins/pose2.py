@@ -20,7 +20,7 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
         self.shoulder.oBoundingBox = [[0.0, 8.1955895],[3.674790375, 6.1586085],[-1.120018, 1.192948875]]
         self.human = None
-        self.skeleton = Skeleton()
+        self.skeleton = Skeleton(self.app.selectedHuman.meshData)
                 
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
@@ -85,25 +85,28 @@ class PoseTaskView(gui3d.TaskView):
 
     def test(self):
         #get the group name involving the right arm
+        """
         rArmNames = []
         for group in self.app.selectedHuman.meshData.facesGroups:
           if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
           group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
             rArmNames.append(group.name)
         verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(rArmNames)[0]
+        """
         self.skeleton.update(self.app.selectedHuman.meshData)
         #get the position of the right shoulder joint
-        j = self.skeleton.getJoint("joint-r-shoulder").position
+        j = self.skeleton.getJoint("joint-r-shoulder")
+        verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(j.bindedVGroups)[0]
         clavicle = self.skeleton.getJoint("joint-r-clavicle").position
           
-        #rotate by 45 degrees around ehm.. y-axis?
+        #maximum rotation of shoulder joint about y-axis without clavicle joint rotation is 20
         q = axisAngleToQuaternion([0,1,0], 20*degree2rad)
         for v in verts:
           #try to naive clavicle corrections
           dist = vdist(v.co,clavicle)
           if  dist > 1.8:
             #assuming clavicle joint did not rotate
-            v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j)), j)
+            v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position)
           #else:
              #compute new quaternion by reverse bump for weight distribution, assuming shoulder joint does not translate
              #scalar = reverseBump(dist, 1.8)

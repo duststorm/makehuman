@@ -48,6 +48,7 @@ class Joint:
         self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         # xyz limits
         self.limits = [[-180,180],[-180,180],[-180,180]]
+        self.bindedVGroups = []
         self.index = 0
         
         for child in children:
@@ -55,7 +56,7 @@ class Joint:
 
 class Skeleton:
     
-    def __init__(self):
+    def __init__(self, humanMesh=None):
         
         self.root = Joint('joint-pelvis', [Joint('joint-spine3', [Joint('joint-spine2', [Joint('joint-spine1', [Joint('joint-neck', [Joint('joint-head', [Joint('joint-mouth',
             []), Joint('joint-l-eye', []), Joint('joint-r-eye', [])])]), Joint('joint-r-clavicle', [Joint('joint-r-shoulder', [Joint('joint-r-elbow',
@@ -75,7 +76,14 @@ class Skeleton:
             Joint('joint-l-toe-2-1', [Joint('joint-l-toe-2-2', [Joint('joint-l-toe-2-3', [])])]), Joint('joint-l-toe-3-1', [Joint('joint-l-toe-3-2',
             [Joint('joint-l-toe-3-3', [])])]), Joint('joint-l-toe-4-1', [Joint('joint-l-toe-4-2', [Joint('joint-l-toe-4-3', [])])]), Joint('joint-l-toe-5-1',
             [Joint('joint-l-toe-5-2', [Joint('joint-l-toe-5-3', [])])])])])])])
-            
+        
+        if (humanMesh):
+          #right shoulder joint:
+          j = self.__getJoint(self.root, "joint-r-shoulder")
+          j.bindedVGroups = [group.name for group in humanMesh.facesGroups \
+          if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
+            group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1))]
+        
         self.joints = 0
         self.endEffectors = 0
             
