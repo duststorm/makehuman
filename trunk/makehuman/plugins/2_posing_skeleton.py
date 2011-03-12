@@ -370,7 +370,7 @@ def load(app):
     category = app.getCategory('Posing')
     taskview = SkeletonView(category)
     
-    bvhImporter('Example1.bvh')
+    #bvhImporter('Example1.bvh')
     
     print 'Skeleton loaded'
 
