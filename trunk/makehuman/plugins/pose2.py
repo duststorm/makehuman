@@ -20,7 +20,7 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
         self.shoulder.oBoundingBox = [[0.0, 8.1955895],[3.674790375, 6.1586085],[-1.120018, 1.192948875]]
         self.human = None
-        self.skeleton = Skeleton(self.app.selectedHuman.meshData)
+        self.skeleton = Skeleton()
                 
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
@@ -88,7 +88,12 @@ class PoseTaskView(gui3d.TaskView):
         self.skeleton.update(self.app.selectedHuman.meshData)
         #get the position of the right shoulder joint
         j = self.skeleton.getJoint("joint-r-shoulder")
-        verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(j.bindedVGroups)[0]
+        bindedVGroups = []
+        for group in self.app.selectedHuman.meshData.facesGroups:
+          if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
+          group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
+            bindedVGroups.append(group.name)
+        verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(bindedVGroups)[0]
         clavicle = self.skeleton.getJoint("joint-r-clavicle").position
         angle = 90
         #maximum rotation of shoulder joint about y-axis without clavicle joint rotation is 20

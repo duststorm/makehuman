@@ -49,6 +49,7 @@ class Joint:
         # xyz limits
         self.limits = [[-180,180],[-180,180],[-180,180]]
         self.bindedVGroups = []
+        self.bindedVects = []
         self.index = 0
         
         for child in children:
@@ -56,33 +57,42 @@ class Joint:
 
 class Skeleton:
     
-    def __init__(self, humanMesh=None):
+    def __init__(self):
         
-        self.root = Joint('joint-pelvis', [Joint('joint-spine3', [Joint('joint-spine2', [Joint('joint-spine1', [Joint('joint-neck', [Joint('joint-head', [Joint('joint-mouth',
-            []), Joint('joint-l-eye', []), Joint('joint-r-eye', [])])]), Joint('joint-r-clavicle', [Joint('joint-r-shoulder', [Joint('joint-r-elbow',
+        self.root = Joint('joint-pelvis', [Joint('joint-spine4', [Joint('joint-spine3', [Joint('joint-spine2', [Joint('joint-spine1', [Joint('joint-neck', [Joint('joint-head', [Joint('joint-mouth',
+            []), Joint('joint-l-eye', []), Joint('joint-r-eye', [])])]), Joint('joint-r-clavicle', [Joint('joint-r-scapula', [Joint('joint-r-shoulder', [Joint('joint-r-elbow',
             [Joint('joint-r-hand', [Joint('joint-r-finger-1-1', [Joint('joint-r-finger-1-2', [Joint('joint-r-finger-1-3', [])])]), Joint('joint-r-finger-2-1',
             [Joint('joint-r-finger-2-2', [Joint('joint-r-finger-2-3', [])])]), Joint('joint-r-finger-3-1', [Joint('joint-r-finger-3-2',
             [Joint('joint-r-finger-3-3', [])])]), Joint('joint-r-finger-4-1', [Joint('joint-r-finger-4-2', [Joint('joint-r-finger-4-3', [])])]),
-            Joint('joint-r-finger-5-1', [Joint('joint-r-finger-5-2', [Joint('joint-r-finger-5-3', [])])])])])])]), Joint('joint-l-clavicle',
+            Joint('joint-r-finger-5-1', [Joint('joint-r-finger-5-2', [Joint('joint-r-finger-5-3', [])])])])])])])]), 
+            Joint('joint-l-clavicle', [Joint('joint-l-scapula',
             [Joint('joint-l-shoulder', [Joint('joint-l-elbow', [Joint('joint-l-hand', [Joint('joint-l-finger-1-1', [Joint('joint-l-finger-1-2',
             [Joint('joint-l-finger-1-3', [])])]), Joint('joint-l-finger-2-1', [Joint('joint-l-finger-2-2', [Joint('joint-l-finger-2-3', [])])]),
             Joint('joint-l-finger-3-1', [Joint('joint-l-finger-3-2', [Joint('joint-l-finger-3-3', [])])]), Joint('joint-l-finger-4-1',
             [Joint('joint-l-finger-4-2', [Joint('joint-l-finger-4-3', [])])]), Joint('joint-l-finger-5-1', [Joint('joint-l-finger-5-2',
-            [Joint('joint-l-finger-5-3', [])])])])])])])])])]), Joint('joint-r-upper-leg', [Joint('joint-r-knee', [Joint('joint-r-ankle',
+            [Joint('joint-l-finger-5-3', [])])])])])])])])
+            ])])]), 
+            Joint('joint-r-upper-leg', [Joint('joint-r-knee', [Joint('joint-r-ankle',
             [Joint('joint-r-toe-1-1', [Joint('joint-r-toe-1-2', [])]), Joint('joint-r-toe-2-1', [Joint('joint-r-toe-2-2', [Joint('joint-r-toe-2-3', [])])]),
             Joint('joint-r-toe-3-1', [Joint('joint-r-toe-3-2', [Joint('joint-r-toe-3-3', [])])]), Joint('joint-r-toe-4-1', [Joint('joint-r-toe-4-2',
             [Joint('joint-r-toe-4-3', [])])]), Joint('joint-r-toe-5-1', [Joint('joint-r-toe-5-2', [Joint('joint-r-toe-5-3', [])])])])])]),
             Joint('joint-l-upper-leg', [Joint('joint-l-knee', [Joint('joint-l-ankle', [Joint('joint-l-toe-1-1', [Joint('joint-l-toe-1-2', [])]),
             Joint('joint-l-toe-2-1', [Joint('joint-l-toe-2-2', [Joint('joint-l-toe-2-3', [])])]), Joint('joint-l-toe-3-1', [Joint('joint-l-toe-3-2',
             [Joint('joint-l-toe-3-3', [])])]), Joint('joint-l-toe-4-1', [Joint('joint-l-toe-4-2', [Joint('joint-l-toe-4-3', [])])]), Joint('joint-l-toe-5-1',
-            [Joint('joint-l-toe-5-2', [Joint('joint-l-toe-5-3', [])])])])])])])
+            [Joint('joint-l-toe-5-2', [Joint('joint-l-toe-5-3', [])])])])])])])])
         
-        if (humanMesh):
-          #right shoulder joint:
-          j = self.__getJoint(self.root, "joint-r-shoulder")
-          j.bindedVGroups = [group.name for group in humanMesh.facesGroups \
-          if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
-            group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1))]
+        #if (humanMesh):
+        file = open("data/joint-bindings.txt")
+        while (1): #don't you love it when infinite loops break the proggie
+          line = file.readline()
+          line = line.rstrip()
+          #print "joint-"+line
+          if not line: break 
+          j = self.__getJoint(self.root, "joint-"+line)
+          line = file.readline()
+          line = line.split()
+          for vert in line:
+            j.bindedVects.append(int(vert))
         
         self.joints = 0
         self.endEffectors = 0
