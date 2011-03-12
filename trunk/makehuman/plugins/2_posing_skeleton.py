@@ -26,8 +26,116 @@ import os.path
 import gui3d
 import module3d
 import aljabr
-from skeleton import Skeleton
+from skeleton import Skeleton, Joint
 from math import pi
+
+class bvhJoint:
+    
+    def __init__(self, name):
+        
+        self.name = name
+        self.offset = None
+        self.channels = None
+        self.parent = None
+        self.children = []
+        self.frames = []
+
+class bvhImporter:
+    
+    def __init__(self, filename):
+        
+        self.file = open(filename, 'r')
+            
+        self.expectKeyword('HIERARCHY')
+            
+        items = self.expectKeyword('ROOT')
+        
+        root = bvhJoint(items[1])
+        
+        self.readJoint(root)
+            
+        # Read motion
+        
+        self.expectKeyword('MOTION')
+        
+        items = self.expectKeyword('Frames:')
+        frames = int(items[1])
+        items = self.expectKeyword('Frame') # Time:
+        frameTime = float(items[2])
+        
+        data = []
+        
+        while 1:
+            
+            line = self.file.readline()
+            
+            if not line:
+                break
+                
+            items = line.split()
+            
+            data += [float(item) for item in items]
+            
+        for i in range(frames):
+            
+            data = self.getChannelData(root, data)
+                
+    def readJoint(self, joint):
+        
+        self.expectKeyword('{')
+
+        items = self.expectKeyword('OFFSET')
+        joint.offset = [float(x) for x in items[1:]]
+        
+        items = self.expectKeyword('CHANNELS')
+        joint.channels = items[1:]
+        
+        # Read child joints
+        while 1:
+            line = self.file.readline()
+            items = line.split()
+            
+            if items[0] == 'JOINT':
+                
+                child = bvhJoint(items[1])
+                joint.children.append(child)
+                child.parent = joint
+                self.readJoint(child)
+                
+            elif items[0] == 'End': # Site
+                
+                self.expectKeyword('{')
+                self.expectKeyword('OFFSET')
+                self.expectKeyword('}')
+                
+            elif items[0] == '}':
+                
+                break
+                
+            else:
+                
+                raise RuntimeError('Expected %s found %s' % ('JOINT, End Site or }', items[0]))
+                    
+    def expectKeyword(self, keyword):
+        
+        line = self.file.readline()
+        items = line.split()
+        
+        if items[0] != keyword:
+            raise RuntimeError('Expected %s found %s' % (keyword, items[0]))
+                
+        return items
+        
+    def getChannelData(self, joint, data):
+        
+        channels = len(joint.channels)
+        joint.frames.append(data[0:channels])
+        data = data[channels:]
+        
+        for child in joint.children:
+            data = self.getChannelData(child, data)
+        
+        return data
 
 class SkeletonView(gui3d.TaskView):
 
@@ -271,6 +379,8 @@ def load(app):
     
     category = app.getCategory('Posing')
     taskview = SkeletonView(category)
+    
+    #bvhImporter('Example1.bvh')
     
     print 'Skeleton loaded'
 
