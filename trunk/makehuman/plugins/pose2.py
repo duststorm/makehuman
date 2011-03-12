@@ -82,17 +82,37 @@ class PoseTaskView(gui3d.TaskView):
         self.app.selectedHuman.restoreMesh()
         self.app.selectedHuman.meshData.update()
         gui3d.TaskView.onHide(self, event)
-
+        
     def test(self):
         #get the group name involving the right arm
-        """
-        rArmNames = []
-        for group in self.app.selectedHuman.meshData.facesGroups:
-          if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
-          group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
-            rArmNames.append(group.name)
-        verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(rArmNames)[0]
-        """
+        self.skeleton.update(self.app.selectedHuman.meshData)
+        #get the position of the right shoulder joint
+        j = self.skeleton.getJoint("joint-r-shoulder")
+        verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(j.bindedVGroups)[0]
+        clavicle = self.skeleton.getJoint("joint-r-clavicle").position
+          
+        #maximum rotation of shoulder joint about y-axis without clavicle joint rotation is 20
+        q = axisAngleToQuaternion([0,1,0], -45*degree2rad)
+        for v in verts:
+          #try to naive clavicle corrections
+          dist = vdist(v.co,clavicle)
+          if  dist > 1.8:
+            #assuming clavicle joint did not rotate
+            v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position)
+          else:
+             #is the vertex on the flexing skin?
+             scalar = bump(dist, 1.8)
+             #print scalar
+             newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
+             newq = vnorm(newq)
+             v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j.position)), j.position)
+            
+        self.app.selectedHuman.meshData.calcNormals()
+        self.app.selectedHuman.meshData.update()       
+
+
+    def rShoulder(self):
+        #get the group name involving the right arm
         self.skeleton.update(self.app.selectedHuman.meshData)
         #get the position of the right shoulder joint
         j = self.skeleton.getJoint("joint-r-shoulder")
@@ -118,10 +138,6 @@ class PoseTaskView(gui3d.TaskView):
         self.app.selectedHuman.meshData.calcNormals()
         self.app.selectedHuman.meshData.update()       
         
-        #todo: use clavicle and elbow joint and convex weighting system (no physics yet)
-        # clavicle joint must be at a constant position
-        #sphere diameter for effect : 0.6
-
     def reset(self, limbToTest):
         limbToTest.angle = [0,0,0]        
         self.shoulderXslider.label.setText('RotX: 0')
