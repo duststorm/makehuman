@@ -62,22 +62,12 @@ class bvhImporter:
         frames = int(items[1])
         items = self.expectKeyword('Frame') # Time:
         frameTime = float(items[2])
-        
-        data = []
-        
-        while 1:
-            
-            line = self.file.readline()
-            
-            if not line:
-                break
-                
-            items = line.split()
-            
-            data += [float(item) for item in items]
             
         for i in range(frames):
             
+            line = self.file.readline()
+            items = line.split()
+            data = [float(item) for item in items]
             data = self.getChannelData(root, data)
                 
     def readJoint(self, joint):
@@ -380,7 +370,7 @@ def load(app):
     category = app.getCategory('Posing')
     taskview = SkeletonView(category)
     
-    #bvhImporter('Example1.bvh')
+    bvhImporter('Example1.bvh')
     
     print 'Skeleton loaded'
 
