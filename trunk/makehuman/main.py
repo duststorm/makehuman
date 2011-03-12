@@ -277,6 +277,8 @@ class MHApplication(gui3d.Application):
             except Exception, e:
                 print('Could not load %s' % name)
                 print e
+                import traceback
+                traceback.print_stack()
                 
             mh.callAsync(self.loadNextPlugin)
             
