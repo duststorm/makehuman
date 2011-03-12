@@ -56,15 +56,15 @@ class VIEW3D_OT_ResetExpressionsButton(bpy.types.Operator):
 class VIEW3D_OT_KeyExpressionsButton(bpy.types.Operator):
 	bl_idname = "shapepin.key_expressions"
 	bl_label = "Key"
-	keyAll = bpy.props.BoolProperty()
 
 	def execute(self, context):
 		keys = context.object.data.shape_keys
+		keyAll = context.scene.keyAll
 		if keys:
 			keylist = findActiveFcurves(keys.animation_data)
 			frame = context.scene.frame_current
 			for (name, shape) in keys.keys.items():
-				if (self.keyAll or (name in keylist)):
+				if (keyAll or (name in keylist)):
 					shape.keyframe_insert("value", index=-1, frame=frame)
 		return{'FINISHED'}	
 
@@ -121,9 +121,7 @@ class ExpressionsPanel(bpy.types.Panel):
 		layout.label(text="Expressions")
 		layout.operator("shapepin.reset_expressions")
 		layout.prop(context.scene, "keyAll")
-		#row = layout.row()
-		#row.operator("shapepin.key_expressions", text="Key active").keyAll = False
-		#row.operator("shapepin.key_expressions", text="Key all").keyAll = True
+		layout.operator("shapepin.key_expressions")
 		layout.separator()
 		keys = context.object.data.shape_keys
 		if keys:

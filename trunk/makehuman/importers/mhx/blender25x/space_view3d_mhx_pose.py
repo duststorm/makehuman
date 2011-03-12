@@ -693,12 +693,12 @@ class VIEW3D_OT_MhxRemoveExpressionDriversButton(bpy.types.Operator):
 
 class VIEW3D_OT_MhxKeyExpressionsButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_key_expressions"
-	bl_label = "Key"
-	keyall = bpy.props.BoolProperty()
+	bl_label = "Key expressions"
 
 	def execute(self, context):
 		global theMesh
 		keys = theMesh.data.shape_keys
+		keyAll = context.scene.MhxKeyAll
 		if keys:
 			keylist = findActiveFcurves(keys.animation_data)
 			frame = context.scene.frame_current
@@ -707,7 +707,7 @@ class VIEW3D_OT_MhxKeyExpressionsButton(bpy.types.Operator):
 					shape = keys.keys[name]
 				except:
 					shape = None
-				if shape and (self.keyall or (name in keylist)):
+				if shape and (keyAll or (name in keylist)):
 					shape.keyframe_insert("value", index=-1, frame=frame)
 		return{'FINISHED'}	
 
@@ -730,21 +730,21 @@ def findActiveFcurves(adata):
 
 class VIEW3D_OT_MhxKeyDriversButton(bpy.types.Operator):
 	bl_idname = "mhx.pose_key_drivers"
-	bl_label = "Key"
+	bl_label = "Key drivers"
 	keyall = bpy.props.BoolProperty()
 
 	def execute(self, context):
 		global theRig
 		frame = context.scene.frame_current
+		keyAll = context.scene.MhxKeyAll
 		keylist = findActiveFcurves(theRig.animation_data)
-		print(keylist)
 		for name in Expressions:
 			try:
 				oldvalue = theRig[name]
 				success = True
 			except:
 				success = False
-			if success and (self.keyall or (name in keylist)):
+			if success and (keyAll or (name in keylist)):
 				theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame)
 		return{'FINISHED'}	
 
@@ -760,6 +760,7 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
 	def execute(self, context):
 		global theMesh
 		keys = theMesh.data.shape_keys
+		keyAll = context.scene.MhxKeyAll
 		if keys:
 			frame = context.scene.frame_current
 			for name in Expressions:
@@ -772,7 +773,7 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
 					oldvalue = shape.value
 					shape.value = value
 					if (context.tool_settings.use_keyframe_insert_auto and 
-						((value > 0.01) or (abs(value-oldvalue) > 0.01))):
+						(keyAll or (value > 0.01) or (abs(value-oldvalue) > 0.01))):
 						shape.keyframe_insert("value", index=-1, frame=frame)
 		return{'FINISHED'}	
 
@@ -788,6 +789,7 @@ class VIEW3D_OT_MhxPinDriverButton(bpy.types.Operator):
 	def execute(self, context):
 		global theRig
 		frame = context.scene.frame_current
+		keyAll = context.scene.MhxKeyAll
 		for name in Expressions:
 			value = 1.0 if name == self.driver else 0.0
 			try:
@@ -800,7 +802,7 @@ class VIEW3D_OT_MhxPinDriverButton(bpy.types.Operator):
 				theRig[name] = value
 				context.scene.update()
 				if (context.tool_settings.use_keyframe_insert_auto and
-					((value > 0.01) or (abs(value-oldvalue) > 0.01))):
+					(keyAll or (value > 0.01) or (abs(value-oldvalue) > 0.01))):
 					theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame)
 		return{'FINISHED'}	
 
@@ -827,9 +829,8 @@ class MhxExpressionsPanel(bpy.types.Panel):
 			layout.operator("mhx.pose_reset_rig_expressions")
 			if theMesh:
 				layout.operator("mhx.pose_remove_drivers")
-			row = layout.row()
-			row.operator("mhx.pose_key_drivers", text="Key active").keyall = False
-			row.operator("mhx.pose_key_drivers", text="Key all").keyall = True
+			layout.prop(context.scene, "MhxKeyAll")
+			layout.operator("mhx.pose_key_drivers")
 			layout.separator()
 			for name in Expressions:
 				try:
@@ -846,9 +847,8 @@ class MhxExpressionsPanel(bpy.types.Panel):
 			layout.label(text="Expressions")
 			layout.operator("mhx.pose_reset_expressions")
 			layout.operator("mhx.pose_create_drivers")
-			row = layout.row()
-			row.operator("mhx.pose_key_expressions", text="Key active").keyall = False
-			row.operator("mhx.pose_key_expressions", text="Key all").keyall = True
+			layout.prop(context.scene, "MhxKeyAll")
+			layout.operator("mhx.pose_key_expressions")
 			layout.separator()
 			keys = theMesh.data.shape_keys
 			if keys:
@@ -1406,7 +1406,14 @@ def setInterpolation(rig):
 #
 ###################################################################################	
 
+def init():
+	bpy.types.Scene.MhxKeyAll = BoolProperty(
+	name="Key all",
+	description="Set keys for all shapes",
+	default=False)
+
 def register():
+	init()
 	bpy.utils.register_module(__name__)
 	pass
 
