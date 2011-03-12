@@ -874,7 +874,20 @@ def bump(x, width=1.0):
       return exp(-width*width/(width*width - x*x) + 1.0)
     else:
       return 0.0
-    
+      
+def sign(x):
+    """
+    The sign function
+
+    @rtype:    integer
+    @return:   the sign of x
+    @type  x:  double or integer
+    @param x:  any arbitrary real number
+    """
+    if (x<0): return -1
+    elif (x>0): return 1
+    else: return 0
+
 # u and m must be float 0<=m<=1
 # returns : sn,cn,dn,phi
 #TODO : Add reference: Louis V. King; Hofsommer; Salzer (after reading it yourself :P)

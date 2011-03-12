@@ -90,18 +90,28 @@ class PoseTaskView(gui3d.TaskView):
         j = self.skeleton.getJoint("joint-r-shoulder")
         verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(j.bindedVGroups)[0]
         clavicle = self.skeleton.getJoint("joint-r-clavicle").position
-          
+        angle = 90
         #maximum rotation of shoulder joint about y-axis without clavicle joint rotation is 20
-        q = axisAngleToQuaternion([0,1,0], -45*degree2rad)
+        q = axisAngleToQuaternion([0,1,0], -angle*degree2rad)
+        #NOTE and todo: We need to use unmodified T-shaped base mesh when doing this operation
         for v in verts:
-          #try to naive clavicle corrections
-          dist = vdist(v.co,clavicle)
-          if  dist > 1.8:
-            #assuming clavicle joint did not rotate
-            v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position)
-          else:
+          #clavicle corrections
+          distClavicle = vdist(v.co,clavicle)
+          dist = vdist(v.co, j.position)
+          tempv = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position)
+          
+          #try rectangular boundary instead of spherical
+          if (v.co[0] - j.position[0]> -0.05):
+            v.co = tempv
+          #todo conveyor belt formula at a certain position
+          else: #the vertex is in the clavicle area!
              #is the vertex on the flexing skin?
-             scalar = bump(dist, 1.8)
+             #if ((angle < 0) and (v.co[2]> j.position[2])) or ((angle > 0) and (v.co[2]<= j.position[2])) :
+             #scalar = 1 - bump(dist, 1.8)
+             scalar = bump(distClavicle, 1.6)
+             #else: #vertex must be on the compressed skin
+              #scalar = bump(dist, 1.8)
+              #scalar = 1 - bump(dist, 1.8)
              #print scalar
              newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
              newq = vnorm(newq)
