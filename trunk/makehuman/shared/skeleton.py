@@ -48,9 +48,9 @@ class Joint:
         self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         # xyz limits
         self.limits = [[-180,180],[-180,180],[-180,180]]
-        self.bindedVGroups = []
         self.bindedVects = []
         self.index = 0
+        self.radius = 0
         
         for child in children:
             child.parent = self

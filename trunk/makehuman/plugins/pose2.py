@@ -85,6 +85,21 @@ class PoseTaskView(gui3d.TaskView):
         
     def test(self):
         #get the group name involving the right arm
+        human = self.app.selectedHuman.meshData
+        self.skeleton.update(human)
+        #get the position of the right shoulder joint
+        j = self.skeleton.getJoint("joint-r-shoulder")
+        #get binded mesh to j and children
+        angle = -90
+        axis = [0,1,0]
+        q = axisAngleToQuaternion(axis, angle*degree2rad)
+        deform(j, q , j.position, human.verts) 
+        human.calcNormals()
+        human.update()          
+        
+        
+    def Oldtest(self):
+        #get the group name involving the right arm
         self.skeleton.update(self.app.selectedHuman.meshData)
         #get the position of the right shoulder joint
         j = self.skeleton.getJoint("joint-r-shoulder")
@@ -93,65 +108,32 @@ class PoseTaskView(gui3d.TaskView):
           if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
           group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
             bindedVGroups.append(group.name)
+        bindedVGroups.append("r-torso-back-scapula")
         verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(bindedVGroups)[0]
         clavicle = self.skeleton.getJoint("joint-r-clavicle").position
-        angle = 90
+        angle = -20
         #maximum rotation of shoulder joint about y-axis without clavicle joint rotation is 20
         q = axisAngleToQuaternion([0,1,0], -angle*degree2rad)
         #NOTE and todo: We need to use unmodified T-shaped base mesh when doing this operation
+        j.radius = 0.4
+        rotatedDist = angle*degree2rad*j.radius
         for v in verts:
-          #clavicle corrections
-          distClavicle = vdist(v.co,clavicle)
-          dist = vdist(v.co, j.position)
-          tempv = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position)
+          distClavicle = vdist(v.co,clavicle) #distance to clavicle
+          dist = vdist(v.co, j.position) #distance to joint of interest
+          dx = (dist*dist) - (j.radius*j.radius) #this can be negative if vertex is at the fingers, so qe dont do sqrt
+          tempv = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position) #supposing transformed vertex
           
-          #try rectangular boundary instead of spherical
-          if (v.co[0] - j.position[0]> -0.05):
+          if (v.co[0] - j.position[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
             v.co = tempv
-          #todo conveyor belt formula at a certain position
-          else: #the vertex is in the clavicle area!
-             #is the vertex on the flexing skin?
-             #if ((angle < 0) and (v.co[2]> j.position[2])) or ((angle > 0) and (v.co[2]<= j.position[2])) :
-             #scalar = 1 - bump(dist, 1.8)
-             scalar = bump(distClavicle, 1.6)
-             #else: #vertex must be on the compressed skin
-              #scalar = bump(dist, 1.8)
-              #scalar = 1 - bump(dist, 1.8)
-             #print scalar
-             newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
-             newq = vnorm(newq)
-             v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j.position)), j.position)
-            
-        self.app.selectedHuman.meshData.calcNormals()
-        self.app.selectedHuman.meshData.update()       
-
-
-    def rShoulder(self):
-        #get the group name involving the right arm
-        self.skeleton.update(self.app.selectedHuman.meshData)
-        #get the position of the right shoulder joint
-        j = self.skeleton.getJoint("joint-r-shoulder")
-        verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(j.bindedVGroups)[0]
-        clavicle = self.skeleton.getJoint("joint-r-clavicle").position
-          
-        #maximum rotation of shoulder joint about y-axis without clavicle joint rotation is 20
-        q = axisAngleToQuaternion([0,1,0], 20*degree2rad)
-        for v in verts:
-          #try to naive clavicle corrections
-          dist = vdist(v.co,clavicle)
-          if  dist > 1.8:
-            #assuming clavicle joint did not rotate
-            v.co = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position)
-          #else:
-             #compute new quaternion by reverse bump for weight distribution, assuming shoulder joint does not translate
-             #scalar = reverseBump(dist, 1.8)
-             #print scalar
+          #else: #the vertex is in the clavicle area!
+             #scalar = bump(distClavicle, 1.6)
              #newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
              #newq = vnorm(newq)
-             #v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j)), j)
+             #v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j.position)), j.position)
             
         self.app.selectedHuman.meshData.calcNormals()
-        self.app.selectedHuman.meshData.update()       
+        self.app.selectedHuman.meshData.update()        
+
         
     def reset(self, limbToTest):
         limbToTest.angle = [0,0,0]        
@@ -195,12 +177,12 @@ len(widths) = len(joints)
 len(dist) = len(joints)
 len(dist[i]) = 2*len(joints)-1 for all i = 1,..., len(joints)
 """
-def calculateShoulderWeights(v, joints):
-  #compute maximal distance between joints
-  dist = 0
-  for j in xrange(0,len(joints)-1):
-    dist = dist + vdist(joints[i].position, joints[i+1].position)
-  
-  #compute nearest distance to joint
-  
-  
+
+    
+def deform(j, q, center, verts):
+    for i in j.bindedVects:          
+      v = verts[i]
+      if (v.co[0] - center[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
+        v.co = vadd(quaternionVectorTransform(q,vsub(v.co, center)), center)
+    for child in j.children:
+      deform(child, q, center, verts)
