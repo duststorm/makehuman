@@ -96,7 +96,6 @@ LegHeadsTails = [
 	('LegFK_L',			'r-heel', 'r-foot-2'),
 	('ToeRev_L',		'r-foot-2', 'r-foot-1'),
 	('FootRev_L',		'r-foot-1', 'r-ankle'),
-	('Ankle_L',			'r-ankle', 'r-ankle-tip'),
 
 	('UpLeg_R',			'l-upper-leg', 'l-knee'),
 	('UpLeg1_R',		'l-upper-leg', 'l-upleg1'),
@@ -111,7 +110,6 @@ LegHeadsTails = [
 	('LegFK_R',			'l-heel', 'l-foot-2'),
 	('ToeRev_R',		'l-foot-2', 'l-foot-1'),
 	('FootRev_R',		'l-foot-1', 'l-ankle'),
-	('Ankle_R',			'l-ankle', 'l-ankle-tip'),
 
 	# Rotation diffs
 	('BendLegForward_L',	'r-upper-leg', ('r-upper-leg', (0,0,1))),
@@ -189,7 +187,7 @@ LegControlArmature = [
 	('ToeRev_L',		0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
 	('FootRev_L',		0, 'ToeRev_L', F_WIR, L_LLEGIK, NoBB),
 	('Ankle_L',			0, 'FootRev_L', 0, L_HELP, NoBB),
-	('LegFK_L',			footCtrlRoll, 'Toe_L', 0, L_HELP, NoBB),
+	('LegFK_L',			footCtrlRoll, 'LoLeg_L', 0, L_HELP, NoBB),
 
 	#('Hip_R',			0, 'Hips', 0, L_HELP, NoBB),
 	('UpLeg_R',			-upLegRoll, 'Hips', F_WIR, L_RLEGFK, NoBB),
@@ -200,7 +198,7 @@ LegControlArmature = [
 	('ToeRev_R',		0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
 	('FootRev_R',		0, 'ToeRev_R', F_WIR, L_RLEGIK, NoBB),
 	('Ankle_R',			0, 'FootRev_R', 0, L_HELP, NoBB),
-	('LegFK_R',			footCtrlRoll, 'Toe_R', 0, L_HELP, NoBB),	
+	('LegFK_R',			footCtrlRoll, 'LoLeg_R', 0, L_HELP, NoBB),	
 
 	# Pole targets
 	('LegTrg_L',		0.0, 'Hips', 0, L_HELP, NoBB),
@@ -377,8 +375,10 @@ def LegControlPoses(fp):
 	addPoseBone(fp, 'Toe_R', 'MHToe_R', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
 		[('IK', 0, 0, ['RevIK', 'ToeRev_R', 1, (90*D, 'ToePT_R'), (1,0,1)])])
 	
-	addPoseBone(fp, 'LegFK_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Ankle_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'Ankle_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
+	addPoseBone(fp, 'LegFK_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 	addPoseBone(fp, 'LegFK_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
 
@@ -407,6 +407,7 @@ def LegControlPoses(fp):
 	addPoseBone(fp, 'UpLegRot_R', 'GZM_Circle10', 'IK_R', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
 		 [('IK', 0, 1, ['LegIK', 'LoLeg_R', 1, None, (True, False,True)])])
 	return
+
 
 #
 #	LegDeformPoses(fp):

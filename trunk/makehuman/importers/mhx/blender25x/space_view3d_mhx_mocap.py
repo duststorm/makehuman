@@ -171,7 +171,7 @@ Epsilon = 1e-5
 
 def readBvhFile(context, filepath, scn, scan):
 	global theTarget
-	ensureInited(scn)
+	ensureInited(context)
 	scale = scn['MhxBvhScale']
 	startFrame = scn['MhxStartFrame']
 	endFrame = scn['MhxEndFrame']
@@ -995,6 +995,13 @@ def guessTargetArmature(trgRig):
 		theIkBoneList = MhxIkBoneList
 		theGlobalBoneList = MhxGlobalBoneList
 		theIkParents = MhxIkParents
+		for bone in trgRig.data.bones:
+			try:
+				roll = bone['Roll']
+			except:
+				roll = 0
+			if abs(roll) > 0.1:
+				theTargetRolls[bone.name] = roll
 	else:
 		theFkBoneList = []
 		theGlobalBoneList = []
@@ -1319,6 +1326,7 @@ class CAnimData():
 		self.headRest = None
 		self.vecRest = None
 		self.tailRest = None
+		self.roll = 0
 		self.offsetRest = None
 		self.matrixRest = None
 		self.inverseRest = None
@@ -1362,6 +1370,10 @@ def createAnimData(name, animations, bones, isTarget):
 	anim.headRest = b.head_local.copy()
 	anim.tailRest = b.tail_local.copy()
 	anim.vecRest = anim.tailRest - anim.headRest
+	try:
+		anim.roll = b['Roll']
+	except:
+		anim.roll = 0
 
 	if isTarget and theTarget == T_Custom:
 		anim.parent = theParents[name]
@@ -1677,6 +1689,10 @@ def poseTrgIkBones(context, trgRig, trgAnimations):
 def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
 	offsetFake = anim.headRest - animFake.headRest
 	offsetReal = anim.headRest - animReal.headRest
+	if animCopy:
+		roll = anim.roll - animCopy.roll
+	else:
+		roll = 0
 	for frame in range(animFake.nFrames):		
 		locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
 		headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
@@ -1699,6 +1715,7 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
 		anim.matrices[frame] = mat
 		matMhx = anim.inverseRest * mat * anim.matrixRest
 		rot = matMhx.to_quaternion()
+		#rollRot(rot, roll)
 		setRotation(pb, rot, frame, name)
 	return
 
@@ -1744,6 +1761,10 @@ def insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
 def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
 	locs = []
 	offsetFake = anim.headRest - animFake.headRest
+	if animCopy:
+		roll = anim.roll - animCopy.roll
+	else:
+		roll = 0
 	for frame in range(animFake.nFrames):		
 		locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
 		offset = locAbs - anim.headRest
@@ -1762,6 +1783,7 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
 		anim.matrices[frame] = mat
 		matMhx = anim.inverseRest * mat * anim.matrixRest
 		rot = matMhx.to_quaternion()
+		#rollRot(rot, roll)
 		setRotation(pb, rot, frame, name)
 	return
 
@@ -1823,7 +1845,8 @@ def deleteRig(context, rig00, action, prefix):
 #
 
 def simplifyFCurves(context, rig):
-	if not context.scene.MhxDoSimplify:
+	scn = context.scene
+	if not scn.MhxDoSimplify:
 		return
 	try:
 		act = rig.animation_data.action
@@ -1833,8 +1856,8 @@ def simplifyFCurves(context, rig):
 		print("No FCurves to simplify")
 		return
 
-	maxErrLoc = context.scene.MhxErrorLoc
-	maxErrRot = context.scene.MhxErrorRot * math.pi/180
+	maxErrLoc = scn.MhxErrorLoc * scn.MhxBvhScale
+	maxErrRot = scn.MhxErrorRot * math.pi/180
 	for fcu in act.fcurves:
 		simplifyFCurve(fcu, act, maxErrLoc, maxErrRot)
 	setInterpolation(rig)
@@ -2039,7 +2062,10 @@ def togglePoleTargets(trgRig):
 		trgRig.MhxTogglePoleTargets = False
 	for suffix in ['_L', '_R']:
 		for name in ['ElbowPT', 'ElbowLinkPT', 'Elbow', 'KneePT', 'KneeLinkPT', 'Knee']:
-			bones[name+suffix].hide = hide
+			try:
+				bones[name+suffix].hide = hide
+			except:
+				pass
 		cns = pbones['LoArm'+suffix].constraints['ArmIK']
 		cns = pbones['LoLeg'+suffix].constraints['LegIK']
 		cns.pole_target = poletar
@@ -2281,12 +2307,12 @@ def initInterface(context):
 	return
 
 #
-#	ensureInited(scn):
+#	ensureInited(context):
 #
 
-def ensureInited(scn):
+def ensureInited(context):
 	try:
-		scn['MhxBvhScale']
+		context.scene['MhxBvhScale']
 		inited = True
 	except:
 		inited = False
@@ -2972,7 +2998,6 @@ def initTargetCharacter(rig):
 		except:
 			(mhx, text, fakepar, copyrot) = bn
 		rig[mhx] = mhx
-		rig['R_'+mhx] = 0
 	rig['MhxTargetRig'] = True
 	rig['MhxArmBentDown'] = 0.0
 	rig['MhxLegBentOut'] = 0.0
@@ -3047,12 +3072,15 @@ def assocTargetBones(rig, names, xtraAssoc):
 		for (bname, mhx) in boneAssoc:
 			eb = rig.data.edit_bones[bname]
 			rolls[bname] = eb.roll
-			rig['R_'+mhx] = rolls[bname]
 		bpy.ops.object.mode_set(mode='POSE')	
+		for (bname, mhx) in boneAssoc:
+			bone = rig.data.bones[bname]
+			bone['Roll'] = rolls[bname]
 	else:
 		for (bname, mhx) in boneAssoc:
+			bone = rig.data.bones[bname]
 			try:
-				rolls[bname] = rig['R_'+mhx]
+				rolls[bname] = bone['Roll']
 			except:
 				raise NameError("Associations must be made in rig source file")
 
