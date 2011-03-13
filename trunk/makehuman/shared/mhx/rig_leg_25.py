@@ -26,6 +26,9 @@ offs = [0,0.6,0]
 prcLegTrg = 0.2
 
 LegJoints = [
+	('r-knee',				'f', ('r-knee-raw', 'r-upper-leg', 'r-ankle', [0,0,0.1])),
+	('l-knee',				'f', ('l-knee-raw', 'l-upper-leg', 'l-ankle', [0,0,0.1])),
+
 	('r-upleg1',			'l', ((1-bbMarg, 'r-upper-leg'), (bbMarg, 'r-knee'))),
 	('r-upleg2',			'l', ((0.5, 'r-upper-leg'), (0.5, 'r-knee'))),
 

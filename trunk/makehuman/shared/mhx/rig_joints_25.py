@@ -34,13 +34,13 @@ DeformJoints = [
 
 	# Legs
 	('r-upper-leg',			'j', 'r-upper-leg'),
-	('r-knee',			'j', 'r-knee'),
+	('r-knee-raw',			'j', 'r-knee'),
 	('r-ankle',			'j', 'r-ankle'),
 	('r-foot-1',			'j', 'r-foot-1'),
 	('r-foot-2',			'j', 'r-foot-2'),
 
 	('l-upper-leg',			'j', 'l-upper-leg'),
-	('l-knee',			'j', 'l-knee'),
+	('l-knee-raw',			'j', 'l-knee'),
 	('l-ankle',			'j', 'l-ankle'),
 	('l-foot-1',			'j', 'l-foot-1'),
 	('l-foot-2',			'j', 'l-foot-2'),
@@ -49,13 +49,13 @@ DeformJoints = [
 	('r-clavicle',			'j', 'r-clavicle'),
 	('r-shoulder',			'j', 'r-shoulder'),
 	('r-scapula',			'j', 'r-scapula'),
-	('r-elbow',			'j', 'r-elbow'),
+	('r-elbow-raw',			'j', 'r-elbow'),
 	('r-hand',			'j', 'r-hand'),
 
 	('l-clavicle',			'j', 'l-clavicle'),
 	('l-shoulder',			'j', 'l-shoulder'),
 	('l-scapula',			'j', 'l-scapula'),
-	('l-elbow',			'j', 'l-elbow'),
+	('l-elbow-raw',			'j', 'l-elbow'),
 	('l-hand',			'j', 'l-hand'),
 
 	# Fingers

@@ -158,6 +158,20 @@ def newSetupJoints (obj, joints, headTails, moveOrigin):
 			locations[key] = obj.verts[v].co
 		elif typ == 'x':
 			locations[key] = [float(data[0]), float(data[2]), -float(data[1])]
+		elif typ == 'f':
+			(raw, head, tail, offs) = data
+			rloc = locations[raw]
+			hloc = locations[head]
+			tloc = locations[tail]
+			#print(raw, rloc)
+			vec = aljabr.vsub(tloc, hloc)
+			vec2 = aljabr.vdot(vec, vec)
+			vraw = aljabr.vsub(rloc, hloc)
+			x = aljabr.vdot(vec, vraw) / vec2
+			rvec = aljabr.vmul(vec, x)
+			nloc = aljabr.vadd(hloc, rvec, offs)
+			#print(key, nloc)
+			locations[key] = nloc
 
 	for (key, typ, data) in joints:
 		if typ == 'j':
@@ -172,6 +186,8 @@ def newSetupJoints (obj, joints, headTails, moveOrigin):
 		elif typ == 'v':
 			pass
 		elif typ == 'x':
+			pass
+		elif typ == 'f':
 			pass
 		elif typ == 'X':
 			r = locations[data[0]]

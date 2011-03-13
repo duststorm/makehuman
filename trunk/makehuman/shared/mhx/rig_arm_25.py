@@ -25,6 +25,9 @@ from mhx_rig import *
 prcArmTrg	= 0.35
 
 ArmJoints = [
+	('r-elbow',				'f', ('r-elbow-raw', 'r-shoulder', 'r-hand', [0,0,-0.1])),
+	('l-elbow',				'f', ('l-elbow-raw', 'l-shoulder', 'l-hand', [0,0,-0.1])),
+
 	('hand_L_tail',			'j', 'r-finger-3-1'),
 	('hand_R_tail',			'j', 'l-finger-3-1'),
 
@@ -427,6 +430,7 @@ def ArmControlPoses(fp):
 		 ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 
 	addPoseBone(fp, 'ArmLoc_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+
 		[('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
 		 ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 
