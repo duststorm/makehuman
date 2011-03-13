@@ -41,6 +41,19 @@ class BvhView(gui3d.TaskView):
         self.__skeletonObject = None
         
         self.bone = None
+        
+        y = 80
+        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*1+6));y+=25
+
+        self.frameSlider = gui3d.Slider(self, position=[10, y, 9.3], value = 0, min = 0, max = self.__skeleton.frames, label = "Frame: -1");y+=36
+            
+        @self.frameSlider.event
+        def onChanging(value):
+            self.frameSlider.label.setText('Frame: %d' % value)
+            
+        @self.frameSlider.event
+        def onChange(value):
+            self.frameSlider.label.setText('Frame: %d' % value)
             
     def onShow(self, event):
 
