@@ -26,17 +26,17 @@ import os.path
 import gui3d
 import module3d
 import aljabr
-from skeleton import Skeleton
+from bvh_importer import bvhSkeleton
 from math import pi
 
-class SkeletonView(gui3d.TaskView):
+class BvhView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Skeleton')
+        gui3d.TaskView.__init__(self, category, 'BVH Player')
         
         self.status = gui3d.TextView(self, [10, 585, 9.1])
         
-        self.__skeleton = Skeleton()
+        self.__skeleton = bvhSkeleton('Example1.bvh')
         self.__skeletonMesh = None
         self.__skeletonObject = None
         
@@ -46,11 +46,8 @@ class SkeletonView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         
-        human = self.app.selectedHuman
-        
-        human.hide()
+        self.app.selectedHuman.hide()
         self.getSkeleton().show()
-        self.__updateSkeletonMesh(human)
         
     def onHide(self, event):
 
@@ -65,7 +62,7 @@ class SkeletonView(gui3d.TaskView):
         
         if not self.__skeletonObject:
             
-            self.__buildSkeletonMesh(human)
+            self.__buildSkeletonMesh()
             self.__skeletonObject = gui3d.Object(self, human.getPosition(), self.__skeletonMesh)
             self.app.scene3d.update()
             
@@ -77,9 +74,8 @@ class SkeletonView(gui3d.TaskView):
         
         return self.__skeletonObject
         
-    def __buildSkeletonMesh(self, human):
+    def __buildSkeletonMesh(self):
            
-        self.__skeleton.update(human.meshData)
         self.__skeletonMesh = module3d.Object3D('skeleton')
         
         self.__skeletonMesh.uvValues = []
@@ -102,17 +98,17 @@ class SkeletonView(gui3d.TaskView):
         for child in joint.children:
             self.__buildBoneMesh(child)
             
-    def __updateSkeletonMesh(self, human):
+    def __updateSkeletonMesh(self, frame):
         
         self.__skeleton.update(human.meshData)
             
         index = 0
-        self.__updateBoneMesh(self.__skeleton.root, index)
+        self.__updateBoneMesh(frame, self.__skeleton.root, index)
         
         self.__skeletonMesh.calcNormals()
         self.__skeletonMesh.update()
         
-    def __updateBoneMesh(self, joint, index):
+    def __updateBoneMesh(self, frame, joint, index):
         
         if joint.parent:
             self.__updatePrism(self.__skeletonMesh, joint.parent.position, joint.position, index)
@@ -270,9 +266,9 @@ class SkeletonView(gui3d.TaskView):
 def load(app):
     
     category = app.getCategory('Posing')
-    taskview = SkeletonView(category)
+    taskview = BvhView(category)
     
-    print 'Skeleton loaded'
+    print 'BVH Player loaded'
 
 def unload(app):
     pass
