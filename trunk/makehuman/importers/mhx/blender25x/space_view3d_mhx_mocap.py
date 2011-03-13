@@ -1513,7 +1513,8 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes):
 			success = False
 		if not success:
 			pass
-		elif nameTrg in theGlobalBoneList:
+		elif (nameTrg in theGlobalBoneList) or (not pb.bone.use_inherit_rotation):
+			print("global", pb)
 			insertGlobalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, trgRoll, trgFix)
 		else:
 			try:
