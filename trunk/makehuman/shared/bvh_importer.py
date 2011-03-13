@@ -55,11 +55,11 @@ class bvhSkeleton:
         self.expectKeyword('MOTION')
         
         items = self.expectKeyword('Frames:')
-        frames = int(items[1])
+        self.frames = int(items[1])
         items = self.expectKeyword('Frame') # Time:
-        frameTime = float(items[2])
+        self.frameTime = float(items[2])
             
-        for i in range(frames):
+        for i in range(self.frames):
             
             line = self.file.readline()
             items = line.split()
@@ -95,8 +95,17 @@ class bvhSkeleton:
                 
             elif items[0] == 'End': # Site
                 
+                child = bvhJoint('End effector')
+                joint.children.append(child)
+                child.channels = []
+                child.parent = joint
+                
                 self.expectKeyword('{')
-                self.expectKeyword('OFFSET')
+                
+                items = self.expectKeyword('OFFSET')
+                child.offset = [float(x) for x in items[1:]]
+                child.position = vadd(joint.position, child.offset)
+                
                 self.expectKeyword('}')
                 
             elif items[0] == '}':
