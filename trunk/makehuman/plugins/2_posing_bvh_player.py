@@ -54,6 +54,8 @@ class BvhView(gui3d.TaskView):
         @self.frameSlider.event
         def onChange(value):
             self.frameSlider.label.setText('Frame: %d' % value)
+            if value:
+                self.__updateSkeletonMesh(value-1)
             
     def onShow(self, event):
 
@@ -113,15 +115,15 @@ class BvhView(gui3d.TaskView):
             
     def __updateSkeletonMesh(self, frame):
         
-        self.__skeleton.update(human.meshData)
+        self.__skeleton.updateFrame(frame)
             
         index = 0
-        self.__updateBoneMesh(frame, self.__skeleton.root, index)
+        self.__updateBoneMesh(self.__skeleton.root, index)
         
         self.__skeletonMesh.calcNormals()
         self.__skeletonMesh.update()
         
-    def __updateBoneMesh(self, frame, joint, index):
+    def __updateBoneMesh(self, joint, index):
         
         if joint.parent:
             self.__updatePrism(self.__skeletonMesh, joint.parent.position, joint.position, index)

@@ -352,6 +352,11 @@ def mmul(m1, m2):
             m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15],
             m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15]]
 
+def mtransform(m, v):         
+    return[m[0]*v[0] + m[1]*v[1] + m[2]*v[2]  + m[3],
+           m[4]*v[0] + m[5]*v[1] + m[6]*v[2]  + m[7],
+           m[8]*v[0] + m[9]*v[1] + m[10]*v[2] + m[11]]
+
 def flatten(M):
     """
     For readability it is easier to write matrices as list of list of doubles. In most cases we do this. But for speed and efficiency,
