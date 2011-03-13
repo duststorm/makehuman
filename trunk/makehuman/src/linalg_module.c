@@ -1,8 +1,15 @@
 #undef min
 #undef max
 #include <Python.h>
-#include <dgemm.h>
-#include <dgesvd.h>
+
+#ifdef __APPLE__ /* On OS X use cblas for matrix funcs... */
+#	include <Accelerate/Accelerate.h>
+#	define min(a,b) (((a) < (b)) ? (a) : (b))
+#	define max(a,b) (((a) > (b)) ? (a) : (b))
+#else
+#	include <dgemm.h>
+#	include <dgesvd.h>
+#endif
 
 //includes lapack...
 PyObject *double2PyObj(double* d, int i, int j)
@@ -111,6 +118,9 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
 //svd:  m = u*s*vt (vt is the transposed matrix of v)
 static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
 {
+#if __APPLE__
+  int dims;
+#endif	
   PyObject *_m, *_u, *_s, *_vt;
   double *m, *s, *u, *vt, *work; //s = singular values of m sorted by s(i)>s(i+1) 
   int i,j;
