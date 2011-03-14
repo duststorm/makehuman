@@ -52,7 +52,6 @@ def vsub(u, v):
     @type  v: float iterable
     @param v: the minuend
     """
-    #ret=array('d')
     ret = []
     for i in xrange(len(u)):
         ret.append(u[i]-v[i])
@@ -68,7 +67,7 @@ def vadd(*vlist):
     @type  vlist: a sequence of list of integers of doubles
     @param vlist: the sequence without paranthesis, that determines all the vectors to be added together. See above for usage.
     """
-    returnValue=[] #array('d')
+    returnValue=[]
     for i in xrange(len(vlist[0])):
         a=0
         for j in xrange(len(vlist)):
@@ -87,7 +86,7 @@ def vmul(vect, s):
     @type  vect: double or integer iterable
     @param vect: the vector to be multiplied with the scalar value
     """
-    ret=[] #array('d')
+    ret=[]
     for x in vect:
         ret.append(x*s)
     return ret
@@ -140,7 +139,7 @@ def vnorm(vect):
     # value for vectors whose length may be calculated too close to zero.
 
     if length == 0.0:
-        return len(vect)*[0.0] #*array('d',[0.0])
+        return len(vect)*[0.0]
 
     # Dividing each element by the length will result in a
     # unit normal vector.
@@ -334,51 +333,23 @@ def makeScale(x, y, z):
             0.0, y,   0.0, 0.0,
             0.0, 0.0, z,   0.0,
             0.0, 0.0, 0.0, 1.0]
-            
-# multiplication of flat transformation matrices
-def Tmmul(M,N):
-    """
-    This is the naive matrix multiplication. There are faster matrix multiplication algorithms (like those by
-    U{Strassen <http://en.wikipedia.org/wiki/Strassen_algorithm>} or
-    U{Coppersmith-Winograd <http://en.wikipedia.org/wiki/Coppersmith-Winograd_algorithm>}. But fast algorithms will make our
-    code uneccessarily long and complicated and for small sized matrix (in 3D programming most matrix
-    operation are limited to 3x3 matrices) the performance improvement is insignifcant.
 
-    @rtype:    array of doubles
-    @return:   a flat mxp matrix reprenting the product of M and N
-    @type  M:  array of doubles
-    @param M:  flat mxn matrix (row-major), that is supposed to be the left-multiplier
-    """
-    P=[0.0]*16
-    for i in xrange(3):
-        n=i*4
-        for j in xrange(4):
-            a=0
-            for k in xrange(4):
-                a=a+M[n+k]*N[k*4+j]
-            P.append(a)
-    P[15] = 1.0
-    return P
-            
 #our matrices and their operation should be based on row-major matrices -_-
 def mmul(m1, m2):
     
-    return [m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2]  + m1[12] * m2[3],
-            m1[1] * m2[0]  + m1[5] * m2[1]  + m1[9]  * m2[2]  + m1[13] * m2[3],
-            m1[2] * m2[0]  + m1[6] * m2[1]  + m1[10] * m2[2]  + m1[14] * m2[3],
-            m1[3] * m2[0]  + m1[7] * m2[1]  + m1[11] * m2[2]  + m1[15] * m2[3],
-            m1[0] * m2[4]  + m1[4] * m2[5]  + m1[8]  * m2[6]  + m1[12] * m2[7],
-            m1[1] * m2[4]  + m1[5] * m2[5]  + m1[9]  * m2[6]  + m1[13] * m2[7],
-            m1[2] * m2[4]  + m1[6] * m2[5]  + m1[10] * m2[6]  + m1[14] * m2[7],
-            m1[3] * m2[4]  + m1[7] * m2[5]  + m1[11] * m2[6]  + m1[15] * m2[7],
-            m1[0] * m2[8]  + m1[4] * m2[9]  + m1[8]  * m2[10] + m1[12] * m2[11],
-            m1[1] * m2[8]  + m1[5] * m2[9]  + m1[9]  * m2[10] + m1[13] * m2[11],
-            m1[2] * m2[8]  + m1[6] * m2[9]  + m1[10] * m2[10] + m1[14] * m2[11],
-            m1[3] * m2[8]  + m1[7] * m2[9]  + m1[11] * m2[10] + m1[15] * m2[11],
-            m1[0] * m2[12] + m1[4] * m2[13] + m1[8]  * m2[14] + m1[12] * m2[15],
-            m1[1] * m2[12] + m1[5] * m2[13] + m1[9]  * m2[14] + m1[13] * m2[15],
-            m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15],
-            m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15]]
+    return [m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2] ,
+            m1[1] * m2[0]  + m1[5] * m2[1]  + m1[9]  * m2[2] ,
+            m1[2] * m2[0]  + m1[6] * m2[1]  + m1[10] * m2[2] ,
+            m1[3] * m2[0]  + m1[7] * m2[1]  + m1[11] * m2[2]  + m2[3],
+            m1[0] * m2[4]  + m1[4] * m2[5]  + m1[8]  * m2[6],
+            m1[1] * m2[4]  + m1[5] * m2[5]  + m1[9]  * m2[6],
+            m1[2] * m2[4]  + m1[6] * m2[5]  + m1[10] * m2[6],
+            m1[3] * m2[4]  + m1[7] * m2[5]  + m1[11] * m2[6]  + m2[7],
+            m1[0] * m2[8]  + m1[4] * m2[9]  + m1[8]  * m2[10],
+            m1[1] * m2[8]  + m1[5] * m2[9]  + m1[9]  * m2[10],
+            m1[2] * m2[8]  + m1[6] * m2[9]  + m1[10] * m2[10],
+            m1[3] * m2[8]  + m1[7] * m2[9]  + m1[11] * m2[10] + m2[11],
+            0.0, 0.0, 0.0, 1.0]
 
 def mtransform(m, v):         
     return[m[0]*v[0] + m[1]*v[1] + m[2]*v[2]  + m[3],
@@ -390,14 +361,14 @@ def flatten(M):
     For readability it is easier to write matrices as list of list of doubles. In most cases we do this. But for speed and efficiency,
     we it is best to have these matrices as an (flattened matrix) array. This function converts a list of list into an array.
     """
-    N=array('f')
+    N=array('d')
     for i in xrange(len(M)):
         for j in xrange(len(M[0])):
             N.append(M[i][j])
     return N
 
 def _unFlatten(M,rows,cols):
-    N=[]
+    N=array('d')
     for i in xrange(rows):
         row = []
         n=i*cols
