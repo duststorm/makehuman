@@ -335,6 +335,31 @@ def makeScale(x, y, z):
             0.0, 0.0, z,   0.0,
             0.0, 0.0, 0.0, 1.0]
             
+# multiplication of flat transformation matrices
+def Tmmul(M,N):
+    """
+    This is the naive matrix multiplication. There are faster matrix multiplication algorithms (like those by
+    U{Strassen <http://en.wikipedia.org/wiki/Strassen_algorithm>} or
+    U{Coppersmith-Winograd <http://en.wikipedia.org/wiki/Coppersmith-Winograd_algorithm>}. But fast algorithms will make our
+    code uneccessarily long and complicated and for small sized matrix (in 3D programming most matrix
+    operation are limited to 3x3 matrices) the performance improvement is insignifcant.
+
+    @rtype:    array of doubles
+    @return:   a flat mxp matrix reprenting the product of M and N
+    @type  M:  array of doubles
+    @param M:  flat mxn matrix (row-major), that is supposed to be the left-multiplier
+    """
+    P=[0.0]*16
+    for i in xrange(3):
+        n=i*4
+        for j in xrange(4):
+            a=0
+            for k in xrange(4):
+                a=a+M[n+k]*N[k*4+j]
+            P.append(a)
+    P[15] = 1.0
+    return P
+            
 #our matrices and their operation should be based on row-major matrices -_-
 def mmul(m1, m2):
     
@@ -490,7 +515,7 @@ def _QR(M,n):
     #v is not zero because the matrix is singular
     #jocapsco: Todo .. finish this...
 
-def _mmul(M,N,rowsM,colsM,colsN):
+def mmul(M,N,rowsM,colsM,colsN):
     """
     This is the naive matrix multiplication. There are faster matrix multiplication algorithms (like those by
     U{Strassen <http://en.wikipedia.org/wiki/Strassen_algorithm>} or
