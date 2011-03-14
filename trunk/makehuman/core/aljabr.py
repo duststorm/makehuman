@@ -335,7 +335,7 @@ def makeScale(x, y, z):
             0.0, 0.0, 0.0, 1.0]
 
 #our matrices and their operation should be based on row-major matrices -_-
-def multiplyMatrix(m1, m2):
+def mmul(m1, m2):
     
     return [m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2] ,
             m1[1] * m2[0]  + m1[5] * m2[1]  + m1[9]  * m2[2] ,
@@ -486,7 +486,7 @@ def _QR(M,n):
     #v is not zero because the matrix is singular
     #jocapsco: Todo .. finish this...
 
-def mmul(M,N,rowsM,colsM,colsN):
+def _mmul(M,N,rowsM,colsM,colsN):
     """
     This is the naive matrix multiplication. There are faster matrix multiplication algorithms (like those by
     U{Strassen <http://en.wikipedia.org/wiki/Strassen_algorithm>} or

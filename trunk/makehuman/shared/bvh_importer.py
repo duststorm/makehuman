@@ -22,7 +22,7 @@ Abstract
 BVH importer
 """
 
-from aljabr import vadd, makeUnit, makeTranslation, makeRotation, multiplyMatrix, mtransform, degree2rad, makeScale
+from aljabr import vadd, makeUnit, makeTranslation, makeRotation, mmul, mtransform, degree2rad, makeScale
 
 class bvhJoint:
     
@@ -48,29 +48,29 @@ class bvhJoint:
             self.transform = makeScale(0.25, 0.25, 0.25)
             
         m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
-        self.transform = multiplyMatrix(m, self.transform)
+        self.transform = mmul(m, self.transform)
             
         index = 0
         
         for index, channel in enumerate(self.channels):
             if channel == 'Xposition':
                 m = makeTranslation(self.frames[frame][index], 0.0, 0.0)
-                self.transform = multiplyMatrix(m, self.transform)
+                self.transform = mmul(m, self.transform)
             elif channel == 'Yposition':
                 m = makeTranslation(0.0, self.frames[frame][index], 0.0)
-                self.transform = multiplyMatrix(m, self.transform)
+                self.transform = mmul(m, self.transform)
             elif channel == 'Zposition':
                 m = makeTranslation(0.0, 0.0, self.frames[frame][index])
-                self.transform = multiplyMatrix(m, self.transform)
+                self.transform = mmul(m, self.transform)
             if channel == 'Xrotation':
                 m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
-                self.transform = multiplyMatrix(m, self.transform)
+                self.transform = mmul(m, self.transform)
             elif channel == 'Yrotation':
                 m = makeRotation([0.0, 1.0, 0.0], self.frames[frame][index] * degree2rad)
-                self.transform = multiplyMatrix(m, self.transform)
+                self.transform = mmul(m, self.transform)
             elif channel == 'Zrotation':
                 m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index] * degree2rad)
-                self.transform = multiplyMatrix(m, self.transform)
+                self.transform = mmul(m, self.transform)
             
         self.position = mtransform(self.transform, [0.0, 0.0, 0.0])
             
