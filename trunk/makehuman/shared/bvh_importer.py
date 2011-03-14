@@ -48,7 +48,7 @@ class bvhJoint:
             self.transform = makeUnit()
             
         m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
-        self.transform = mmul(self.transform, m)
+        self.transform = mmul(m, self.transform)
             
         index = 0
         
@@ -66,13 +66,13 @@ class bvhJoint:
             '''
             if channel == 'Xrotation':
                 m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
-                self.transform = mmul(self.transform, m)
+                self.transform = mmul(m, self.transform)
             elif channel == 'Yrotation':
                 m = makeRotation([0.0, 1.0, 0.0], self.frames[frame][index] * degree2rad)
-                self.transform = mmul(self.transform, m)
+                self.transform = mmul(m, self.transform)
             elif channel == 'Zrotation':
                 m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index] * degree2rad)
-                self.transform = mmul(self.transform, m)
+                self.transform = mmul(m, self.transform)
             
         self.position = mtransform(self.transform, [0.0, 0.0, 0.0])
         
