@@ -335,6 +335,7 @@ def makeScale(x, y, z):
             0.0, 0.0, z,   0.0,
             0.0, 0.0, 0.0, 1.0]
             
+#our matrices and their operation should be based on row-major matrices -_-
 def mmul(m1, m2):
     
     return [m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2]  + m1[12] * m2[3],
