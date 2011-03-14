@@ -22,7 +22,7 @@ Abstract
 BVH importer
 """
 
-from aljabr import vadd, makeUnit, makeRotation, mmul, mtransform
+from aljabr import vadd, makeUnit, makeTranslation, makeRotation, mmul, mtransform, degree2rad
 
 class bvhJoint:
     
@@ -35,51 +35,48 @@ class bvhJoint:
         self.parent = None
         self.children = []
         self.frames = []
-        self.localTransform = makeUnit()
-        self.globalTransform = makeUnit()
+        self.transform = makeUnit()
         
     def calcTransform(self, frame):
         
-        self.localTransform = makeUnit()
-        
-        self.localTransform[3] = self.offset[0]
-        self.localTransform[7] = self.offset[1]
-        self.localTransform[11] = self.offset[2]
-        
-        index = 0
-        
-        for channel in self.channels:
-            
-            if channel == 'Xposition':
-                self.localTransform[3] += self.frames[frame][index]
-            elif channel == 'Yposition':
-                self.localTransform[7] += self.frames[frame][index]
-            elif channel == 'Zposition':
-                self.localTransform[11] += self.frames[frame][index]
-            elif channel == 'Xrotation':
-                m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index])
-                self.localTransform = mmul(self.localTransform, m)
-            elif channel == 'Yrotation':
-                m = makeRotation([0.0, 1.0, 0.0], self.frames[frame][index])
-                self.localTransform = mmul(self.localTransform, m)
-            elif channel == 'Zrotation':
-                m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index])
-                self.localTransform = mmul(self.localTransform, m)
-                
-            index += 1
-            
         if self.parent:
             
-            self.globalTransform = mmul(self.parent.globalTransform, self.localTransform)
+            self.transform = self.parent.transform[:]
             
         else:
             
-            self.globalTransform = self.localTransform[:]
+            self.transform = makeUnit()
             
-        self.position = mtransform(self.globalTransform, [0.0, 0.0, 0.0])
+        m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
+        self.transform = mmul(self.transform, m)
+            
+        index = 0
         
-        print self.localTransform
-        print self.globalTransform
+        for index, channel in enumerate(self.channels):
+            '''
+            if channel == 'Xposition':
+                m = makeTranslation(self.frames[frame][index], 0.0, 0.0)
+                self.transform = mmul(self.transform, m)
+            elif channel == 'Yposition':
+                m = makeTranslation(0.0, self.frames[frame][index], 0.0)
+                self.transform = mmul(self.transform, m)
+            elif channel == 'Zposition':
+                m = makeTranslation(0.0, 0.0, self.frames[frame][index])
+                self.transform = mmul(self.transform, m)
+            '''
+            if channel == 'Xrotation':
+                m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
+                self.transform = mmul(self.transform, m)
+            elif channel == 'Yrotation':
+                m = makeRotation([0.0, 1.0, 0.0], self.frames[frame][index] * degree2rad)
+                self.transform = mmul(self.transform, m)
+            elif channel == 'Zrotation':
+                m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index] * degree2rad)
+                self.transform = mmul(self.transform, m)
+            
+        self.position = mtransform(self.transform, [0.0, 0.0, 0.0])
+        
+        print self.transform
         print self.position
             
         for child in self.children:

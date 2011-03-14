@@ -140,7 +140,7 @@ class BvhView(gui3d.TaskView):
 
         dir = aljabr.vsub(e, o) # direction vector from o to e
         len = aljabr.vlen(dir) # distance from o to e
-        scale = len * 0.05 # the thickness is 10% of the length
+        scale = 0.5 # the thickness is 10% of the length
         i = aljabr.vadd(o, aljabr.vmul(dir, 0.25)) # the thickest part is 25% from o
         n = aljabr.vmul(dir, 1.0 / len) # the normalized direction
         q = aljabr.axisAngleToQuaternion(n, pi / 2.0) # a quaternion to rotate the point p1 to obtain the other points
@@ -203,7 +203,7 @@ class BvhView(gui3d.TaskView):
             
         dir = aljabr.vsub(e, o) # direction vector from o to e
         len = aljabr.vlen(dir) # distance from o to e
-        scale = len * 0.1 # the thickness is 10% of the length
+        scale = 0.5 # the thickness is 10% of the length
         i = aljabr.vadd(o, aljabr.vmul(dir, 0.25)) # the thickest part is 25% from o
         n = aljabr.vmul(dir, 1.0 / len) # the normalized direction
         q = aljabr.axisAngleToQuaternion(n, pi / 2.0) # a quaternion to rotate the point p1 to obtain the other points
