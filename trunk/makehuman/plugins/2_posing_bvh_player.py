@@ -36,7 +36,7 @@ class BvhView(gui3d.TaskView):
         
         self.status = gui3d.TextView(self, [10, 585, 9.1])
         
-        self.__skeleton = bvhSkeleton('data/bvhs/example1.bvh')
+        self.__skeleton = bvhSkeleton('data/bvhs/10_01.bvh')
         self.__skeletonMesh = None
         self.__skeletonObject = None
         
@@ -50,6 +50,8 @@ class BvhView(gui3d.TaskView):
         @self.frameSlider.event
         def onChanging(value):
             self.frameSlider.label.setText('Frame: %d' % value)
+            if value:
+                self.__updateSkeletonMesh(value-1)
             
         @self.frameSlider.event
         def onChange(value):

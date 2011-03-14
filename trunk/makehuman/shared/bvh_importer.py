@@ -73,9 +73,6 @@ class bvhJoint:
                 self.transform = multiplyMatrix(m, self.transform)
             
         self.position = mtransform(self.transform, [0.0, 0.0, 0.0])
-        
-        print self.transform
-        print self.position
             
         for child in self.children:
             
