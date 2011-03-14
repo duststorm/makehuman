@@ -106,7 +106,6 @@ class BvhView(gui3d.TaskView):
         
     def __buildBoneMesh(self, joint):
          
-        #self.__addCube(self.__skeletonMesh, joint.position, aljabr.vlen(joint.offset) / 10.0, joint.name.replace('joint', 'bone'))
         if joint.parent:
             self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, joint.name.replace('joint', 'bone'))
         

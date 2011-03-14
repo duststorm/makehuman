@@ -133,8 +133,10 @@ class Object(events3d.EventHandler):
         else:
             self.mesh.setVisibility(0)
 
-    def setScale(self, scale, scaleY=None):
-        if scaleY:
+    def setScale(self, scale, scaleY=None, scaleZ=None):
+        if scaleZ:
+            self.mesh.setScale(scale, scaleY, scaleZ)
+        elif scaleY:
             self.mesh.setScale(scale, scaleY, 1)
         else:
             self.mesh.setScale(scale, scale, 1)
