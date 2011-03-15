@@ -970,7 +970,7 @@ class Object3D:
         for v in verticesToUpdate:
             v.update(updateNor=updateN)
             
-        print "updated %d vertices" % len(verticesToUpdate)
+        #print "updated %d vertices" % len(verticesToUpdate)
 
     def applySelectionColor(self):
         """
