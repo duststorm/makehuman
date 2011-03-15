@@ -90,7 +90,7 @@ class PoseTaskView(gui3d.TaskView):
         #get the position of the right shoulder joint
         j = self.skeleton.getJoint("joint-r-shoulder")
         #get binded mesh to j and children
-        angle = -90
+        angle = 20
         axis = [0,1,0]
         q = axisAngleToQuaternion(axis, angle*degree2rad)
         deform(j, q , j.position, human.verts) 
