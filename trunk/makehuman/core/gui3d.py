@@ -1254,7 +1254,7 @@ class TextEdit(View):
     A TextEdit widget. This widget can be used to let the user enter some text.
     """
 
-    def __init__(self, parent, position, text='', style=TextEditStyle):
+    def __init__(self, parent, position, text='', style=TextEditStyle, validator = None):
         View.__init__(self, parent)
         
         self.texture = self.app.getThemeResource('images', 'texedit_off.png')
@@ -1268,6 +1268,7 @@ class TextEdit(View):
         self.text = text
         self.__position = len(self.text)
         self.__cursor = False
+        self.__validator = validator
         
         self.__updateTextObject()
     
@@ -1295,16 +1296,20 @@ class TextEdit(View):
     
     def __addText(self, text):
         self.__hideCursor()
-        self.text = self.text[:self.__position] + text + self.text[self.__position:]
-        self.__position += len(text)
+        newText = self.text[:self.__position] + text + self.text[self.__position:]
+        if self.validateText(newText):
+            self.text = newText
+            self.__position += len(text)
         self.__showCursor()
     
     def __delText(self, size = 1):
         self.__hideCursor()
         if self.__position > 0:
             size = min(size, self.__position)
-            self.text = self.text[:self.__position-size] + self.text[self.__position:]
-            self.__position -= size
+            newText = self.text[:self.__position-size] + self.text[self.__position:]
+            if self.validateText(newText):
+                self.text = newText
+                self.__position -= size
         self.__showCursor()
 
     def __updateTextObject(self):
@@ -1360,6 +1365,7 @@ class TextEdit(View):
             self.__addText(event.character)
 
         self.__updateTextObject()
+        self.callEvent('onChange', self.getText())
         self.app.redraw()
 
     def onFocus(self, event):
@@ -1374,6 +1380,24 @@ class TextEdit(View):
             self.__hideCursor()
             self.__updateTextObject()
 
+    def validateText(self, text):
+        
+        if self.__validator:
+            return self.__validator(text)
+        else:
+            return True
+            
+    def setValidator(self, validator):
+        
+        self.__validator = validator
+
+def intValidator(text):
+    
+    return text.isdigit()
+    
+def floatValidator(text):
+    
+    return text.replace('.', '').isdigit() and text.count('.') <= 1
 
 # FileEntryView widget
 

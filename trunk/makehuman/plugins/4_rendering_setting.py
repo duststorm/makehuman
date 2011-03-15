@@ -10,13 +10,13 @@ class RenderingSettingTaskView(gui3d.TaskView):
 
         #Rendering resolution
         y=80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
         rendering_width = self.app.settings.get('rendering_width', 800)
-        self.widthSize= gui3d.Slider(self, position=[10, y, 9.1], value=rendering_width, min=10, max=5000,
-            label = "Width: %d"%rendering_width);y+=36
+        self.width= gui3d.TextEdit(self, [18, y, 9.3], str(rendering_width), gui3d.TextEditStyle._replace(width=112),
+            gui3d.intValidator);y+=24
         rendering_height = self.app.settings.get('rendering_height', 600)
-        self.heightSize= gui3d.Slider(self, position=[10, y, 9.1], value=rendering_height, min=10, max=5000,
-            label = "Height: %d"%rendering_height);y+=36
+        self.height= gui3d.TextEdit(self, [18, y, 9.3], str(rendering_height), gui3d.TextEditStyle._replace(width=112),
+            gui3d.intValidator);y+=24
         y+=16
         
         human = self.app.selectedHuman
@@ -64,15 +64,13 @@ class RenderingSettingTaskView(gui3d.TaskView):
             human.hairs.randomness = self.randomHair.getValue()
             self.app.settings['hair.randomness'] = human.hairs.randomness
 
-        @self.widthSize.event
-        def onChanging(value):
-            self.widthSize.label.setText("Width: %d"%self.widthSize.getValue())
-            self.app.settings['rendering_width'] = self.widthSize.getValue()
+        @self.width.event
+        def onChange(value):
+            self.app.settings['rendering_width'] = int(value)
 
-        @self.heightSize.event
-        def onChanging(value):
-            self.heightSize.label.setText("Height: %d"%self.heightSize.getValue())
-            self.app.settings['rendering_height'] = self.heightSize.getValue()
+        @self.height.event
+        def onChange(value):
+            self.app.settings['rendering_height'] = int(value)
 
     def onHide(self, event):
 
