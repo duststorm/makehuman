@@ -444,7 +444,7 @@ class Application(events3d.EventHandler):
         mh.setKeyUpCallback(self.onKeyUpCallback)
         mh.setResizeCallback(self.onResizedCallback)
 
-        mh.startWindow(0)
+        mh.startWindow(1)
         
     def started(self):
         self.callEvent('onStart', None)

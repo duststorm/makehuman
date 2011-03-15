@@ -565,17 +565,6 @@ int Object3D_setScale(Object3D *self, PyObject *value)
     return 0;
 }
 
-/** \brief Invokes the Python timer function.
- *
- *  This function invokes the Python idleFunc function when the SDL
- *  module detects idle time between mouse and keyboard events.
- */
-void callTimerFunct(void)
-{
-  if (G.timerCallback && !PyObject_CallFunction(G.timerCallback, ""))
-    PyErr_Print();
-}
-
 /** \brief Invokes the Python mouseButtonDown function.
  *  \param b an int indicating which button this event relates to.
  *  \param x an int specifying the horizontal mouse pointer position in the GUI window (in pixels).

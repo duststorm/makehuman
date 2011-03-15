@@ -86,15 +86,10 @@ static void initGlobals(void)
     G.clearColor[3] = 0.0;
     G.pendingUpdate = 0;
 
-    // Timer
-    G.millisecTimer = 10;
-    G.pendingTimer = 0;
-
     // Events
     G.loop = 1;
 
     // Callbacks
-    G.timerCallback = NULL;
     G.resizeCallback = NULL;
     G.mouseDownCallback = NULL;
     G.mouseUpCallback = NULL;
@@ -324,21 +319,45 @@ static PyObject* mh_GrabScreen(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
-/** \brief Set millisec attribute for timer func.
+/** \brief Adds a timer which will call a callback after the specified number of milliseconds has elapsed.
  *
- *  This function passes the delay function to the SDL timer
- *  It returns a null value.
+ *  This function adds a timer which will call a callback after the specified number of milliseconds has elapsed.
+ *  It returns a timer id.
  */
-static PyObject* mh_setTimeTimer(PyObject *self, PyObject *args)
+
+static PyObject* mh_addTimer(PyObject *self, PyObject *args)
 {
     int milliseconds;
-    if (!PyArg_ParseTuple(args, "i", &milliseconds))
+    PyObject *callback;
+    SDL_TimerID id;
+
+    if (!PyArg_ParseTuple(args, "iO", &milliseconds, &callback))
         return NULL;
-    else
+
+    if (!PyCallable_Check(callback))
     {
-        G.millisecTimer = milliseconds;
+      PyErr_SetString(PyExc_TypeError, "Callable expected");
+      return NULL;
     }
-    return Py_BuildValue("");
+
+    Py_INCREF(callback);
+
+    id = SDL_AddTimer(milliseconds, mhTimerFunc, callback);
+
+    return Py_BuildValue("i", id);
+}
+
+static PyObject* mh_removeTimer(PyObject *self, PyObject *args)
+{
+  SDL_TimerID id;
+
+  if (!PyArg_ParseTuple(args, "i", &id))
+    return NULL;
+
+  // TODO DECREF(callback)
+
+  SDL_RemoveTimer(id);
+  return Py_BuildValue("");
 }
 
 static PyObject* mh_callAsync(PyObject *self, PyObject *callback)
@@ -363,24 +382,6 @@ static PyObject* mh_callAsync(PyObject *self, PyObject *callback)
     }
 
     return Py_BuildValue("");
-}
-
-static PyObject* mh_SetTimerCallback(PyObject *self, PyObject *callback)
-{
-  if (!PyCallable_Check(callback))
-  {
-    PyErr_SetString(PyExc_TypeError, "Callable expected");
-    return NULL;
-  }
-
-  Py_INCREF(callback);
-
-  if (G.timerCallback)
-    Py_DECREF(G.timerCallback);
-
-  G.timerCallback = callback;
-
-  return Py_BuildValue("");
 }
 
 static PyObject* mh_SetResizeCallback(PyObject *self, PyObject *callback)
@@ -687,7 +688,8 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
  */
 static PyMethodDef EmbMethods[] =
 {
-    {"setTimeTimer", mh_setTimeTimer, METH_VARARGS, ""},
+    {"addTimer", mh_addTimer, METH_VARARGS, ""},
+    {"removeTimer", mh_removeTimer, METH_VARARGS, ""},
     {"getWindowSize", mh_getWindowSize, METH_NOARGS, ""},
     {"getMousePos", mh_getMousePos, METH_NOARGS, ""},
     {"getKeyModifiers", mh_getKeyModifiers, METH_NOARGS, ""},
@@ -706,7 +708,6 @@ static PyMethodDef EmbMethods[] =
     {"shutDown", mh_shutDown, METH_NOARGS, ""},
     {"getPath", mh_getPath, METH_O, ""},
     {"callAsync", mh_callAsync, METH_O, ""},
-    {"setTimerCallback", mh_SetTimerCallback, METH_O, ""},
     {"setResizeCallback", mh_SetResizeCallback, METH_O, ""},
     {"setMouseDownCallback", mh_SetMouseDownCallback, METH_O, ""},
     {"setMouseUpCallback", mh_SetMouseUpCallback, METH_O, ""},

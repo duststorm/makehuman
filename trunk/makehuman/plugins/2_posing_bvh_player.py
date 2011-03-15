@@ -28,6 +28,7 @@ import module3d
 import aljabr
 from bvh_importer import bvhSkeleton
 from math import pi
+import mh
 
 class BvhView(gui3d.TaskView):
 
@@ -43,9 +44,10 @@ class BvhView(gui3d.TaskView):
         self.bone = None
         
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*1+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*1+24*1+6));y+=25
 
         self.frameSlider = gui3d.Slider(self, position=[10, y, 9.3], value = 0, min = 0, max = self.__skeleton.frames, label = "Frame: 0");y+=36
+        self.playPause = gui3d.Button(self, [18, y, 9.3], "Play");y+=24
             
         @self.frameSlider.event
         def onChanging(value):
@@ -58,6 +60,26 @@ class BvhView(gui3d.TaskView):
             self.frameSlider.label.setText('Frame: %d' % value)
             if value:
                 self.__updateSkeletonMesh(value-1)
+                
+        @self.playPause.event
+        def onClicked(value):
+            if self.playPause.label.getText() == 'Play':
+                self.playPause.label.setText('Pause')
+                self.timer = mh.addTimer(int(self.__skeleton.frameTime * 1000), self.onFrameChanged)
+            else:
+                self.playPause.label.setText('Play')
+                mh.removeTimer(self.timer)
+                
+    def onFrameChanged(self):
+        
+        frame = self.frameSlider.getValue() + 1
+        
+        if frame == self.frameSlider.max:
+            frame = 1
+            
+        self.frameSlider.setValue(frame)
+        self.__updateSkeletonMesh(frame-1)
+        self.app.redraw()
             
     def onShow(self, event):
 
@@ -109,7 +131,7 @@ class BvhView(gui3d.TaskView):
     def __buildBoneMesh(self, joint):
          
         if joint.parent:
-            self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, joint.name.replace('joint', 'bone'))
+            self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, 'bone-' + joint.name)
         
         for child in joint.children:
             self.__buildBoneMesh(child)
@@ -251,24 +273,26 @@ class BvhView(gui3d.TaskView):
         
         gui3d.TaskView.onMouseEntered(self, event)
         
-        self.bone = event.group
-        self.bone.setColor([0, 255, 0, 255])
-        self.status.setText(event.group.name)
+        if 'bone' in event.group.name:
+            self.bone = event.group
+            self.bone.setColor([0, 255, 0, 255])
+            self.status.setText(event.group.name)
         self.app.redraw()
 
     def onMouseExited(self, event):
         
         gui3d.TaskView.onMouseExited(self, event)
         
-        self.bone.setColor([255, 255, 255, 255])
-        self.status.setText('')
+        if self.bone:
+            self.bone.setColor([255, 255, 255, 255])
+            self.status.setText('')
         self.app.redraw()
         
     def onMouseMoved(self, event):
         
         gui3d.TaskView.onMouseMoved(self, event)
         
-        if self.bone != event.group:
+        if 'bone' in event.group.name and self.bone != event.group:
             self.bone.setColor([255, 255, 255, 255])
             self.bone = event.group
             self.bone.setColor([0, 255, 0, 255])

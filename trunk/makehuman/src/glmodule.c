@@ -974,26 +974,19 @@ void mhKeyUp(int key, unsigned short character, int modifiers)
  *  returning control to the event loop.
  *
  */
-unsigned int mhTimerFunc(unsigned int interval, void* param)
+unsigned int mhTimerFunc(unsigned int interval, void *param)
 {
     SDL_Event event;
 
-    if (G.pendingTimer)
-    {
-        return G.millisecTimer;
-    }
-
-    G.pendingTimer = 1;
-
     event.type = SDL_USEREVENT;
     event.user.code = 0;
-    event.user.data1 = NULL;
+    event.user.data1 = param;
     event.user.data2 = NULL;
 
     SDL_PushEvent(&event);
 
-    /*reset the timer to recall the function again, after G.millisecTimer msec*/
-    return G.millisecTimer;
+    /*reset the timer to recall the function again, after interval milliseconds*/
+    return interval;
 }
 
 /** \brief Pass a mouse button down event up to Python.
@@ -2002,7 +1995,6 @@ void mhCreateWindow(int useTimer)
     if (useTimer == 1)
     {
         SDL_InitSubSystem(SDL_INIT_TIMER);
-        SDL_AddTimer(G.millisecTimer, mhTimerFunc, NULL);
     }
 
     OnInit();
@@ -2089,8 +2081,8 @@ void mhEventLoop(void)
             switch (event.user.code)
             {
             case 0:
-              callTimerFunct();
-              G.pendingTimer = 0;
+              if (!PyObject_CallFunction((PyObject*)event.user.data1, ""))
+                  PyErr_Print();
               break;
             case 1:
               if (!PyObject_CallFunction((PyObject*)event.user.data1, ""))
