@@ -449,10 +449,10 @@ MBArmature = {
 }
 
 #
-#	Xx1Armature
+#	MegaArmature
 #
 
-Xx1Armature = {
+MegaArmature = {
 	'hip' : 'Root', 
 	'abdomen' : 'Spine1',
 	'chest' : 'Spine3',
@@ -675,12 +675,14 @@ DazArmature = {
 theArmatures = {
 	'MB' : MBArmature, 
 	'OSU' : OsuArmature,
-	'XX1' : Xx1Armature,
+	'Mega' : MegaArmature,
 	'HDM' : HDMArmature,
 	'3dsMax' : MaxArmature,
 	'Eyes' : EyesArmature,
 	'Daz' : DazArmature,
 }
+
+theArmatureList = [ 'OSU', 'MB', 'Mega', 'HDM', 'Eyes', 'Daz', '3dsMax' ]
 
 MBFixes = {
 	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
@@ -704,7 +706,7 @@ HDMFixes = {
 
 OsuFixes = {}
 
-XX1Fixes = {}
+MegaFixes = {}
 
 MaxFixes = {
 	'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
@@ -738,7 +740,7 @@ DazFixes = {}
 theFixesList = {
 	'MB'  : MBFixes,
 	'OSU' : OsuFixes,
-	'XX1' : XX1Fixes,
+	'Mega' : MegaFixes,
 	'HDM' : HDMFixes,
 	'3dsMax': MaxFixes,
 	'Eyes': EyesFixes,
@@ -1077,7 +1079,11 @@ def renameBones(bones00, rig00, action):
 	setbones = []
 	for bone00 in bones00:
 		name00 = bone00.name
-		name90 = theArmature[name00.lower()]
+		lname = name00.lower()
+		try:
+			name90 = theArmature[lname]
+		except:
+			name90 = theArmature[lname.replace(' ','_')]
 		eb = ebones[name00]
 		if name90:
 			eb.name = name90
@@ -1230,7 +1236,8 @@ def guessSrcArmature(rig):
 	bestMisses = 1000
 	misses = {}
 	bones = rig.data.bones
-	for (name, amt) in theArmatures.items():
+	for name in theArmatureList:
+		amt = theArmatures[name]
 		nMisses = 0
 		for bone in bones:
 			try:
@@ -2776,7 +2783,13 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
 
 theSourceProps = []
 
-def makeSourceBoneList(scn, root):
+#
+#	defaultEnums():
+#	setSourceProp(scn, prop, mhx, enums):
+#	makeSourceBoneList(scn, root):
+#
+
+def defaultEnums():
 	global TargetBoneNames
 	enums = [('None','None','None')]
 	for bn in TargetBoneNames:
@@ -2785,36 +2798,65 @@ def makeSourceBoneList(scn, root):
 		(mhx, text) = bn
 		enum = (mhx, text, mhx)
 		enums.append(enum)
+	return enums
+
+def setSourceProp(scn, prop, mhx, enums):
+	scn[prop] = 0
+	n = 0
+	for (mhx1, text1, mhx2) in enums:
+		if mhx == mhx1: 
+			scn[prop] = n
+			return
+		n += 1
+	return
+
+def makeSourceBoneList(scn, root):
+	enums = defaultEnums()
 	props = []
-	makeSourceNode(scn, root, enums, props)
+	makeSourceNodes(scn, root, enums, props)
 	for prop in props:
 		name = prop[2:].lower()
 		mhx = guessSourceBone(name)
-		scn[prop] = 0
-		n = 0
-		for (mhx1, text1, mhx2) in enums:
-			if mhx == mhx1: 
-				scn[prop] = n
-				break
-			n += 1
+		setSourceProp(scn, prop, mhx, enums)
 	return (props, enums)
 
-def makeSourceNode(scn, node, enums, props):
+#
+#	makeSourceNodes(scn, node, enums, props):
+#	defineSourceProp(name, enums):
+#
+
+def makeSourceNodes(scn, node, enums, props):
 	if not node.children:
 		return
-	expr = 'bpy.types.Scene.S_%s = EnumProperty(items = enums, name = "%s")' % (node.name, node.name)
-	exec(expr)
-	props.append('S_'+node.name)
+	prop = defineSourceProp(node.name, enums)
+	props.append(prop)
 	for child in node.children:
-		makeSourceNode(scn, child, enums, props)
+		makeSourceNodes(scn, child, enums, props)
 	return
 
+def defineSourceProp(name, enums):
+	qname = name.replace(' ','_')
+	expr = 'bpy.types.Scene.S_%s = EnumProperty(items = enums, name = "%s")' % (qname, name)
+	exec(expr)
+	return 'S_'+qname
+
+#
+#	guessSourceBone(name):
+#
+
 def guessSourceBone(name):
-	for amt in theArmatures.values():
-		for (bone, mhx) in amt.items():
-			if bone == name:
-				return mhx
+	for amtname in theArmatureList:
+		amt = theArmatures[amtname]
+		try:
+			mhx = amt[name]
+			return mhx
+		except:
+			pass
 	return ''
+
+#
+#	useCustomSrcRig(context):
+#
 
 def useCustomSrcRig(context):
 	if theSourceProps:
@@ -2824,6 +2866,10 @@ def useCustomSrcRig(context):
 			guess = True
 		return not guess
 	return False
+
+#
+#	buildSrcArmature(context, rig):
+#
 
 def buildSrcArmature(context, rig):
 	amt = {}
@@ -2843,29 +2889,56 @@ def buildSrcArmature(context, rig):
 		if user:
 			raise NameError("Source bones %s and %s both assigned to %s" % (user, name, mhx1))
 		used[mhx1] = name
-	fixes = createCustomFixes(scn['MhxSrcLegBentOut'], scn['MhxSrcArmBentDown'])
+	fixes = createCustomFixes(scn['MhxSrcLegBentOut'], scn['MhxSrcLegRoll'], scn['MhxSrcArmBentDown'], scn['MhxSrcArmRoll'])
 	return (amt, "MySource", fixes)
 
-def createCustomFixes(bendLeg, bendArm):
+#
+#	createCustomFixes(bendLeg, rollLeg, bendArm, rollArm):
+#
+
+def createCustomFixes(bendLeg, rollLeg, bendArm, rollArm):
 	fixMats = {}
-	if bendLeg > 4:		
+	eps = 4
+	if abs(bendLeg) > eps or abs(rollLeg) > eps:		
 		bendLeg *= Deg2Rad
-		fixMats['UpLeg_L'] = (Matrix.Rotation(-bendLeg, 3, 'Z'), 0)
-		fixMats['UpLeg_R'] = (Matrix.Rotation(bendLeg, 3, 'Z'), 0)
-	if bendArm > 4:		
-		if bendArm > 55:
-			roll = 90*Deg2Rad
-		else:
-			roll = 0
+		fixMats['UpLeg_L'] = (Matrix.Rotation(-bendLeg, 3, 'Z'), rollLeg*Deg2Rad)
+		fixMats['UpLeg_R'] = (Matrix.Rotation(bendLeg, 3, 'Z'), -rollLeg*Deg2Rad)
+		if abs(rollLeg) > eps:
+			rollLeg *= Deg2Rad
+			fixMats['LoLeg_L'] = (None, rollLeg)
+			fixMats['LoLeg_R'] = (None, -rollLeg)
+		
+	if abs(bendArm) > eps or abs(rollArm) > eps:		
 		bendArm *= Deg2Rad
-		fixMats['UpArm_L'] = (Matrix.Rotation(bendArm, 3, 'Z'), roll)
-		fixMats['UpArm_R'] = (Matrix.Rotation(-bendArm, 3, 'Z'), -roll)
-		if roll:
-			fixMats['LoArm_L'] = (None, roll)
-			fixMats['Hand_L'] = (None, roll)
-			fixMats['LoArm_R'] = (None, -roll)
-			fixMats['Hand_R'] = (None, -roll)		
+		fixMats['UpArm_L'] = (Matrix.Rotation(bendArm, 3, 'Z'), rollArm*Deg2Rad)
+		fixMats['UpArm_R'] = (Matrix.Rotation(-bendArm, 3, 'Z'), -rollArm*Deg2Rad)
+		if abs(rollArm) > eps:
+			rollArm *= Deg2Rad
+			fixMats['LoArm_L'] = (None, rollArm)
+			fixMats['Hand_L'] = (None, rollArm)
+			fixMats['LoArm_R'] = (None, -rollArm)
+			fixMats['Hand_R'] = (None, -rollArm)		
 	return fixMats
+
+#
+#	ensureSourceInited(context):
+#
+
+def ensureSourceInited(context):
+	scn = context.scene
+	try:
+		scn.MhxGuessSrcRig
+		return
+	except:
+		pass
+	expr = 'bpy.types.Scene.MhxGuessSrcRig = BoolProperty(name = "Guess source rig")'
+	exec(expr)	
+	scn.MhxGuessSrcRig = False
+	return
+
+#
+#	class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
+#
 
 class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
 	bl_idname = "mhx.mocap_scan_bvh"
@@ -2882,22 +2955,83 @@ class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
 		root = readBvhFile(context, self.filepath, scn, True)
 		(theSourceProps, theSourceEnums) = makeSourceBoneList(scn, root)
 		scn['MhxSrcArmBentDown'] = 0.0
+		scn['MhxSrcArmRoll'] = 0.0
 		scn['MhxSrcLegBentOut'] = 0.0
-		try:
-			scn.MhxGuessSrcRig
-			defined = True
-		except:
-			defined = False
-		if not defined:
-			expr = 'bpy.types.Scene.MhxGuessSrcRig = BoolProperty(name = "Guess source rig")'
-			exec(expr)	
-			scn.MhxGuessSrcRig = False
+		scn['MhxSrcLegRoll'] = 0.0
+		ensureSourceInited(context)
 		return{'FINISHED'}	
 
 	def invoke(self, context, event):
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}	
 
+#
+#	saveSourceBones(context, path):
+#	loadSourceBones(context, path):
+#	class VIEW3D_OT_MhxLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
+#
+
+def saveSourceBones(context, path):
+	global theSourceProps, theSourceEnums
+	scn = context.scene
+	fp = open(path, "w")
+	fp.write("Settings\n")
+	for prop in ['MhxSrcArmBentDown','MhxSrcArmRoll','MhxSrcLegBentOut','MhxSrcLegRoll']:
+		fp.write("%s %s\n" % (prop, scn[prop]))
+	fp.write("Bones\n")
+	for prop in theSourceProps:
+		(mhx1, text, mhx2) = theSourceEnums[scn[prop]]
+		fp.write("%s %s\n" % (prop, mhx1))
+	fp.close()
+	return
+		
+def loadSourceBones(context, path):
+	global theSourceProps, theSourceEnums
+	scn = context.scene
+	theSourceEnums = defaultEnums()
+	theSourceProps = []
+	fp = open(path, "rU")
+	status = 0
+	for line in fp:
+		words = line.split()
+		if len(words) == 1:
+			status = words[0]
+		elif status == 'Settings':
+			prop = words[0]
+			value = float(words[1])
+			scn[prop] = value
+		elif status == 'Bones':
+			prop = words[0]
+			theSourceProps.append(prop)
+			mhx = words[1]
+			setSourceProp(scn, prop, mhx, theSourceEnums)
+			print(prop, scn[prop], mhx)
+	fp.close()
+	
+	for prop in theSourceProps:
+		defineSourceProp(prop[2:], theSourceEnums)
+	return
+		
+class VIEW3D_OT_MhxLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
+	bl_idname = "mhx.mocap_load_save_source_bones"
+	bl_label = "Load/save source bones"
+
+	loadSave = bpy.props.StringProperty()
+	filename_ext = ".txt"
+	#filter_glob = StringProperty(default="*.txt", options={'HIDDEN'})
+	filepath = StringProperty(name="File Path", maxlen=1024, default="")
+
+	def execute(self, context):
+		ensureSourceInited(context)
+		if self.loadSave == 'save':
+			saveSourceBones(context, self.properties.filepath)
+		else:
+			loadSourceBones(context, self.properties.filepath)
+		return{'FINISHED'}	
+
+	def invoke(self, context, event):
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}	
 
 #		
 #	class MhxSourceBonesPanel(bpy.types.Panel):
@@ -2921,10 +3055,20 @@ class MhxSourceBonesPanel(bpy.types.Panel):
 			layout.operator("mhx.mocap_scan_bvh", text="Rescan bvh file")	
 		else:
 			layout.operator("mhx.mocap_scan_bvh", text="Scan bvh file")	
+		layout.operator("mhx.mocap_load_save_source_bones", text='Load source bones').loadSave = 'load'		
+		layout.operator("mhx.mocap_load_save_source_bones", text='Save source bones').loadSave = 'save'		
+		if not theSourceProps:
 			return
+		layout.separator()
 		layout.prop(scn, 'MhxGuessSrcRig')
-		layout.prop(scn, '["MhxSrcArmBentDown"]', text='Arm bent down')
-		layout.prop(scn, '["MhxSrcLegBentOut"]', text='Leg bent out')
+		layout.label("Arms")
+		row = layout.row()
+		row.prop(scn, '["MhxSrcArmBentDown"]', text='Down')
+		row.prop(scn, '["MhxSrcArmRoll"]', text='Roll')
+		layout.label("Legs")
+		row = layout.row()
+		row.prop(scn, '["MhxSrcLegBentOut"]', text='Out')
+		row.prop(scn, '["MhxSrcLegRoll"]', text='Roll')
 		for prop in theSourceProps:
 			layout.prop_menu_enum(scn, prop)
 
@@ -3088,6 +3232,7 @@ def assocTargetBones(rig, names, xtraAssoc):
 	pb = rig.pose.bones[rig['Root']]
 	pb.lock_location = (False,False,False)
 
+
 	return (boneAssoc, parAssoc, rolls)
 
 #
@@ -3120,7 +3265,7 @@ def makeTargetAssoc(rig):
 		ikParents[bone] = (par, fakePar, copyRot, False)
 		parAssoc[bone] = par
 
-	fixMats = createCustomFixes(rig['MhxLegBentOut'], rig['MhxArmBentDown'])
+	fixMats = createCustomFixes(rig['MhxLegBentOut'], 0, rig['MhxArmBentDown'], 0)
 
 	print("Associations:")	
 	print("            Bone :       Mhx bone         Parent  Roll")
@@ -3249,11 +3394,11 @@ def loadTargetBones(context, path):
 		
 class VIEW3D_OT_MhxLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
 	bl_idname = "mhx.mocap_load_save_target_bones"
-	bl_label = "Target bones"
+	bl_label = "Load/save target bones"
 
 	loadSave = bpy.props.StringProperty()
 	filename_ext = ".txt"
-	filter_glob = StringProperty(default="*.txt", options={'HIDDEN'})
+	#filter_glob = StringProperty(default="*.txt", options={'HIDDEN'})
 	filepath = StringProperty(name="File Path", maxlen=1024, default="")
 
 	def execute(self, context):
@@ -3298,8 +3443,8 @@ class MhxTargetBonesPanel(bpy.types.Panel):
 		layout.operator("mhx.mocap_load_save_target_bones", text='Save target bones').loadSave = 'save'		
 		layout.operator("mhx.mocap_make_assoc")		
 		layout.operator("mhx.mocap_unroll_all")		
-		layout.prop(rig, '["MhxArmBentDown"]', text='Arm bent down')
-		layout.prop(rig, '["MhxLegBentOut"]', text='Leg bent out')
+		#layout.prop(rig, '["MhxArmBentDown"]', text='Arm bent down')
+		#layout.prop(rig, '["MhxLegBentOut"]', text='Leg bent out')
 
 		layout.label("FK bones")
 		for bn in TargetBoneNames:
