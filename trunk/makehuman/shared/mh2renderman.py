@@ -233,7 +233,7 @@ class RMNObject:
 
     def writeRibCode(self, ribPath ):
 
-
+        print "ribPath = ", ribPath
         facesUVvalues = self.meshData.uvValues #TODO usa direttamente self.
 
         ribObjFile = file(ribPath, 'w')
@@ -312,6 +312,11 @@ class RMRHuman(RMNObject):
         
         self.eyeBallMat = RMRMaterial("eyeball")        
         self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
+        
+        self.hairMat = RMRMaterial("skinbump")
+        self.hairMat.type = "Displacement"
+        self.hairMat.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
+        self.hairMat.parameters.append(MaterialParameter("float", "bumpVal", 0.001))
         
     def getHumanParameters(self):       
 
@@ -393,6 +398,7 @@ class RMRHuman(RMNObject):
         teethGr = set()
         allGr = set()
         nailsGr = set()
+        hairGr = set()
         toSubtract = set()
         for f in self.meshData.facesGroups:
             if 'joint' not in f.name:
@@ -401,6 +407,8 @@ class RMRHuman(RMNObject):
                 teethGr.add(f.name)
             if 'nail' in f.name:
                 nailsGr.add(f.name)
+            if 'hairscalp' in f.name:
+                hairGr.add(f.name)
 
         self.teeth = RMNObject(name = "teeth")
         self.teeth.groupsDict = self.groupsDict
@@ -415,9 +423,16 @@ class RMRHuman(RMNObject):
         self.nails.facesGroup = nailsGr
         self.nails.material = self.skinMat
         self.nails.joinGroupIndices()
+        
+        self.hairScalp = RMNObject(name = "hairscalp")
+        self.hairScalp.groupsDict = self.groupsDict
+        self.hairScalp.meshData = self.meshData
+        self.hairScalp.facesGroup = hairGr
+        self.hairScalp.material = self.hairMat
+        self.hairScalp.joinGroupIndices()
 
         for s in [self.rEyeBall,self.lEyeBall,self.rCornea,\
-            self.lCornea,self.teeth,self.nails]:
+            self.lCornea,self.teeth,self.nails,self.hairScalp]:
             toSubtract = toSubtract.union(s.facesGroup)
 
         self.skin = RMNObject(name = "skin")
@@ -430,7 +445,7 @@ class RMRHuman(RMNObject):
 
         #parts to render with different material
         self.subObjects = [self.skin,self.rEyeBall,self.lEyeBall,
-                        self.rCornea,self.lCornea,self.nails]
+                        self.rCornea,self.lCornea,self.nails,self.hairScalp]
 
     def getSubObject(self, name):
         for subOb in self.subObjects:
