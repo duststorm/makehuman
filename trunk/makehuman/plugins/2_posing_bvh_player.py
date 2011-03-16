@@ -130,7 +130,7 @@ class BvhView(gui3d.TaskView):
     def __buildBoneMesh(self, joint):
          
         if joint.parent:
-            self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, 'bone-' + joint.name)
+            joint.p = self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, 'bone-' + joint.name)
         
         for child in joint.children:
             self.__buildBoneMesh(child)
@@ -148,7 +148,7 @@ class BvhView(gui3d.TaskView):
     def __updateBoneMesh(self, joint, index):
         
         if joint.parent:
-            self.__updatePrism(self.__skeletonMesh, joint.parent.position, joint.position, index)
+            self.__updatePrism(self.__skeletonMesh, joint.parent.position, joint.position, index, joint.p)
             index += 6
         
         for child in joint.children:
@@ -166,7 +166,7 @@ class BvhView(gui3d.TaskView):
         i = aljabr.vadd(o, aljabr.vmul(dir, 0.25)) # the thickest part is 25% from o
         n = aljabr.vmul(dir, 1.0 / len) # the normalized direction
         q = aljabr.axisAngleToQuaternion(n, pi / 2.0) # a quaternion to rotate the point p1 to obtain the other points
-        p1 = aljabr.randomPointFromNormal(n) # a random point in the plane defined by 0,0,0 and n
+        p = p1 = aljabr.randomPointFromNormal(n) # a random point in the plane defined by 0,0,0 and n
         p1 = aljabr.vmul(aljabr.vnorm(p1), scale) # the point scaled to the thickness
         p2 = aljabr.quaternionVectorTransform(q, p1) # the other points
         p3 = aljabr.quaternionVectorTransform(q, p2)
@@ -197,6 +197,8 @@ class BvhView(gui3d.TaskView):
         fg.createFace(v[5], v[1], v[2], v[5])
         fg.createFace(v[5], v[2], v[3], v[5])
         fg.createFace(v[5], v[3], v[4], v[5])
+        
+        return p
             
     def __addCube(self, mesh, position=[0.0, 0.0, 0.0], scale=1.0, name='cube'):
             
@@ -221,7 +223,7 @@ class BvhView(gui3d.TaskView):
         fg.createFace(v[0], v[1], v[5], v[4]) # top
         fg.createFace(v[7], v[6], v[2], v[3]) # bottom
         
-    def __updatePrism(self, mesh, o, e, index):
+    def __updatePrism(self, mesh, o, e, index, p):
             
         dir = aljabr.vsub(e, o) # direction vector from o to e
         len = aljabr.vlen(dir) # distance from o to e
@@ -229,7 +231,7 @@ class BvhView(gui3d.TaskView):
         i = aljabr.vadd(o, aljabr.vmul(dir, 0.25)) # the thickest part is 25% from o
         n = aljabr.vmul(dir, 1.0 / len) # the normalized direction
         q = aljabr.axisAngleToQuaternion(n, pi / 2.0) # a quaternion to rotate the point p1 to obtain the other points
-        p1 = aljabr.randomPointFromNormal(n) # a random point in the plane defined by 0,0,0 and n
+        p1 = p # a random point in the plane defined by 0,0,0 and n
         p1 = aljabr.vmul(aljabr.vnorm(p1), scale) # the point scaled to the thickness
         p2 = aljabr.quaternionVectorTransform(q, p1) # the other points
         p3 = aljabr.quaternionVectorTransform(q, p2)
