@@ -12,7 +12,8 @@ surface skin2(
             float Kd = 3;
             float Ks = 0.001;             		
             float Ka = 1;
-            float melanin = 1;	            	
+            float melanin = 1;
+            float Ksss = 0;	            	
 			  ) 
    {	
    
@@ -46,8 +47,6 @@ surface skin2(
 	color final_skin_color = skin_color;
 	color ssslight= 0;
     
-    //SSS balance
-    float sssVal = 0;
 	
 	//RAMP COLORS
 	float angle_ramp = (max(0,(1-( Vf.Nn))))/4;//POSSIBILE PARAMETRO QUI.
@@ -66,8 +65,7 @@ surface skin2(
         Oi = float texture (colortexture[3], "fill", 1);  
         
     if (ssstexture != ""){
-	    ssslight= color texture (ssstexture)*3;
-        sssVal = 0.5;
+	    ssslight= color texture (ssstexture)*3;        
         }
 	
 
@@ -124,7 +122,7 @@ surface skin2(
     final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),0.8)* dark_side2 * 0.01;	
 
     Ci = final_skin_color * (1/(melanin+1))*f3;
-    Ci = mix(Ci,ssslight,sssVal);
+    Ci = mix(Ci,ssslight,Ksss);
     
     Ci = Ci + specularity * sweat * specular(Nn,-normalize(I),0.1);
 	
