@@ -767,7 +767,7 @@
 	wv 14653 1 ;
   end VertexGroup Eye_R
 
-  VertexGroup Head
+  VertexGroup DfmHead
 	wv 455 1 ;
 	wv 456 1 ;
 	wv 457 1 ;
@@ -4976,7 +4976,7 @@
 	wv 15079 0.523 ;
 	wv 15080 0.829 ;
 	wv 15081 0.595 ;
-  end VertexGroup Head
+  end VertexGroup DfmHead
 
   VertexGroup Jaw
 	wv 381 0.444 ;
@@ -7309,9 +7309,9 @@
 	wv 12206 1 ;
 	wv 12567 0.097 ;
 	wv 12726 0.048 ;
-  end VertexGroup Jaw
+  end VertexGroup DfmJaw
 
-  VertexGroup LoLid_L
+  VertexGroup DfmLoLid_L
 	wv 2263 0.672 ;
 	wv 2264 0.903 ;
 	wv 2266 0.608 ;
@@ -7511,9 +7511,9 @@
 	wv 14865 0.369 ;
 	wv 14866 0.365 ;
 	wv 14867 0.569 ;
-  end VertexGroup LoLid_L
+  end VertexGroup DfmLoLid_L
 
-  VertexGroup LoLid_R
+  VertexGroup DfmLoLid_R
 	wv 12412 0.34 ;
 	wv 12413 0.449 ;
 	wv 12414 0.521 ;
@@ -7713,9 +7713,9 @@
 	wv 14961 0.402 ;
 	wv 14962 0.703 ;
 	wv 14963 0.367 ;
-  end VertexGroup LoLid_R
+  end VertexGroup DfmLoLid_R
 
-  VertexGroup UpLid_L
+  VertexGroup DfmUpLid_L
 	wv 2331 0.766 ;
 	wv 2406 0.091 ;
 	wv 2407 0.171 ;
@@ -7920,9 +7920,9 @@
 	wv 14769 1 ;
 	wv 14770 0.925 ;
 	wv 14771 1 ;
-  end VertexGroup UpLid_L
+  end VertexGroup DfmUpLid_L
 
-  VertexGroup UpLid_R
+  VertexGroup DfmUpLid_R
 	wv 12464 0.429 ;
 	wv 12465 0.949 ;
 	wv 12466 0.501 ;
@@ -8127,9 +8127,9 @@
 	wv 15079 0.477 ;
 	wv 15080 0.171 ;
 	wv 15081 0.405 ;
-  end VertexGroup UpLid_R
+  end VertexGroup DfmUpLid_R
 
-  VertexGroup Neck
+  VertexGroup DfmNeck
 	wv 2482 0.05 ;
 	wv 2483 0.064 ;
 	wv 2484 0.094 ;
@@ -8364,7 +8364,7 @@
 	wv 10820 0.271 ;
 	wv 10823 0.009 ;
 	wv 10824 0.017 ;
-  end VertexGroup Neck
+  end VertexGroup DfmNeck
 
   VertexGroup TongueBase
 	wv 381 0.556 ;
@@ -8563,7 +8563,7 @@
 	wv 8090 1 ;
   end VertexGroup TongueTip
 
-  VertexGroup Hips
+  VertexGroup DfmHips
 	wv 2113 0.138 ;
 	wv 2114 0.597 ;
 	wv 2115 0.574 ;
@@ -9136,9 +9136,9 @@
 	wv 10772 0.028 ;
 	wv 10773 0.0672 ;
 	wv 10999 0.0163 ;
-  end VertexGroup Hips
+  end VertexGroup DfmHips
 
-  VertexGroup Spine1
+  VertexGroup DfmSpine1
 	wv 2113 0.7 ;
 	wv 2114 0.352 ;
 	wv 2115 0.37 ;
@@ -9391,9 +9391,9 @@
 	wv 10997 0.144 ;
 	wv 10998 0.31 ;
 	wv 10999 0.711 ;
-  end VertexGroup Spine1
+  end VertexGroup DfmSpine1
 
-  VertexGroup Spine2
+  VertexGroup DfmSpine2
 	wv 2113 0.168 ;
 	wv 2114 0.051 ;
 	wv 2115 0.056 ;
@@ -9823,9 +9823,9 @@
 	wv 11020 0.009 ;
 	wv 11022 0.012 ;
 	wv 11023 0.006 ;
-  end VertexGroup Spine2
+  end VertexGroup DfmSpine2
 
-  VertexGroup Spine3
+  VertexGroup DfmSpine3
 	wv 2582 0.446 ;
 	wv 2583 0.602 ;
 	wv 2584 0.63 ;
@@ -10303,9 +10303,9 @@
 	wv 11067 0.663 ;
 	wv 11068 0.562 ;
 	wv 11069 0.691 ;
-  end VertexGroup Spine3
+  end VertexGroup DfmSpine3
 
-  VertexGroup Hand_L
+  VertexGroup DfmHand_L
 	wv 2559 0.21 ;
 	wv 2560 0.24 ;
 	wv 2561 1 ;
@@ -10718,7 +10718,7 @@
 	wv 6485 0.519 ;
 	wv 6486 0.588 ;
 	wv 6487 0.5 ;
-  end VertexGroup Hand_L
+  end VertexGroup DfmHand_L
 
   VertexGroup Finger-1-1_L
 	wv 2555 1 ;
@@ -11968,7 +11968,7 @@
 	wv 6476 0.5 ;
   end VertexGroup Finger-5-3_L
 
-  VertexGroup Hand_R
+  VertexGroup DfmHand_R
 	wv 9081 0.5 ;
 	wv 9082 0.588 ;
 	wv 9083 0.519 ;
@@ -12381,7 +12381,7 @@
 	wv 11047 1 ;
 	wv 11048 0.24 ;
 	wv 11049 0.21 ;
-  end VertexGroup Hand_R
+  end VertexGroup DfmHand_R
 
   VertexGroup Finger-1-1_R
 	wv 9249 0.036 ;
@@ -13631,7 +13631,7 @@
 	wv 9236 1 ;
   end VertexGroup Finger-5-3_R
 
-  VertexGroup LoLeg_L
+  VertexGroup DfmLoLeg_L
 	wv 3793 0.112 ;
 	wv 3799 0.0101 ;
 	wv 3800 0.0435 ;
@@ -13870,9 +13870,9 @@
 	wv 12353 0.518 ;
 	wv 12370 0.038 ;
 	wv 12371 0.086 ;
-  end VertexGroup LoLeg_L
+  end VertexGroup DfmLoLeg_L
 
-  VertexGroup Knee_L
+  VertexGroup DfmKnee_L
 	wv 3844 0.245 ;
 	wv 3845 0.328 ;
 	wv 3846 0.128 ;
@@ -13906,9 +13906,9 @@
 	wv 5702 0.507 ;
 	wv 5703 0.231 ;
 	wv 5704 0.276 ;
-  end VertexGroup Knee_L
+  end VertexGroup DfmKnee_L
 
-  VertexGroup LoLegFan_L
+  VertexGroup DfmLoLegFan_L
 	wv 3793 0.14 ;
 	wv 3799 0.0689 ;
 	wv 3800 0.083 ;
@@ -13980,9 +13980,9 @@
 	wv 4493 0.009 ;
 	wv 4494 0.021 ;
 	wv 5722 0.022 ;
-  end VertexGroup LoLegFan_L
+  end VertexGroup DfmLoLegFan_L
 
-  VertexGroup Foot_L
+  VertexGroup DfmFoot_L
 	wv 3990 1 ;
 	wv 3991 1 ;
 	wv 3992 1 ;
@@ -14558,9 +14558,9 @@
 	wv 12405 0.48 ;
 	wv 12406 0.177 ;
 	wv 12407 0.025 ;
-  end VertexGroup Foot_L
+  end VertexGroup DfmFoot_L
 
-  VertexGroup Toe_L
+  VertexGroup DfmToe_L
 	wv 4700 0.267 ;
 	wv 4701 0.316 ;
 	wv 4702 0.195 ;
@@ -15289,9 +15289,9 @@
 	wv 12405 0.52 ;
 	wv 12406 0.823 ;
 	wv 12407 0.975 ;
-  end VertexGroup Toe_L
+  end VertexGroup DfmToe_L
 
-  VertexGroup LoLeg_R
+  VertexGroup DfmLoLeg_R
 	wv 6763 1 ;
 	wv 6764 1 ;
 	wv 6765 0.0454 ;
@@ -15530,9 +15530,9 @@
 	wv 13991 0.472 ;
 	wv 13992 0.158 ;
 	wv 13993 0.448 ;
-  end VertexGroup LoLeg_R
+  end VertexGroup DfmLoLeg_R
 
-  VertexGroup Knee_R
+  VertexGroup DfmKnee_R
 	wv 6778 0.276 ;
 	wv 6779 0.231 ;
 	wv 6780 0.507 ;
@@ -15566,9 +15566,9 @@
 	wv 7163 0.128 ;
 	wv 7164 0.328 ;
 	wv 7165 0.245 ;
-  end VertexGroup Knee_R
+  end VertexGroup DfmKnee_R
 
-  VertexGroup LoLegFan_R
+  VertexGroup DfmLoLegFan_R
 	wv 6765 0.022 ;
 	wv 6871 0.021 ;
 	wv 6872 0.009 ;
@@ -15640,9 +15640,9 @@
 	wv 7211 0.083 ;
 	wv 7212 0.0689 ;
 	wv 7218 0.14 ;
-  end VertexGroup LoLegFan_R
+  end VertexGroup DfmLoLegFan_R
 
-  VertexGroup Foot_R
+  VertexGroup DfmFoot_R
 	wv 6766 0.129 ;
 	wv 6767 0.032 ;
 	wv 6784 0.054 ;
@@ -16218,9 +16218,9 @@
 	wv 14011 1 ;
 	wv 14012 1 ;
 	wv 14013 1 ;
-  end VertexGroup Foot_R
+  end VertexGroup DfmFoot_R
 
-  VertexGroup Toe_R
+  VertexGroup DfmToe_R
 	wv 13109 0.975 ;
 	wv 13110 0.823 ;
 	wv 13111 0.52 ;
@@ -16949,9 +16949,9 @@
 	wv 13957 0.195 ;
 	wv 13958 0.316 ;
 	wv 13959 0.267 ;
-  end VertexGroup Toe_R
+  end VertexGroup DfmToe_R
 
-  VertexGroup Rib
+  VertexGroup DfmRib
 	wv 2543 0.652 ;
 	wv 2544 0.651 ;
 	wv 2545 0.615 ;
@@ -17908,9 +17908,9 @@
 	wv 11064 0.651 ;
 	wv 11065 0.652 ;
 	wv 11070 0.968 ;
-  end VertexGroup Rib
+  end VertexGroup DfmRib
 
-  VertexGroup Stomach
+  VertexGroup DfmStomach
 	wv 2611 0.0105 ;
 	wv 2880 0.714 ;
 	wv 2881 0.705 ;
@@ -18246,7 +18246,7 @@
 	wv 10773 0.884 ;
 	wv 10775 0.392 ;
 	wv 10999 0.0105 ;
-  end VertexGroup Stomach
+  end VertexGroup DfmStomach
 
   VertexGroup Penis
 	wv 2804 1 ;
@@ -18473,9 +18473,9 @@
 	wv 6585 0.51 ;
 	wv 7297 0.018 ;
 	wv 7359 0.006 ;
-  end VertexGroup LegForward_L
+  end VertexGroup DfmLegForward_L
 
-  VertexGroup LegBack_L
+  VertexGroup DfmLegBack_L
 	wv 2116 0.236 ;
 	wv 2119 0.242 ;
 	wv 2954 0.016 ;
@@ -18544,9 +18544,9 @@
 	wv 5683 0.826 ;
 	wv 5684 0.764 ;
 	wv 5688 0.736 ;
-  end VertexGroup LegBack_L
+  end VertexGroup DfmLegBack_L
 
-  VertexGroup LegOut_L
+  VertexGroup DfmLegOut_L
 	wv 2790 0.014 ;
 	wv 2927 0.054 ;
 	wv 2930 0.038 ;
@@ -18592,9 +18592,9 @@
 	wv 6583 0.15 ;
 	wv 6584 0.187 ;
 	wv 6585 0.136 ;
-  end VertexGroup LegOut_L
+  end VertexGroup DfmLegOut_L
 
-  VertexGroup LegForward_R
+  VertexGroup DfmLegForward_R
 	wv 6724 0.51 ;
 	wv 6725 0.537 ;
 	wv 6726 0.552 ;
@@ -18659,9 +18659,9 @@
 	wv 7309 0.247 ;
 	wv 7359 0.006 ;
 	wv 7451 0.038 ;
-  end VertexGroup LegForward_R
+  end VertexGroup DfmLegForward_R
 
-  VertexGroup LegBack_R
+  VertexGroup DfmLegBack_R
 	wv 6785 0.736 ;
 	wv 6789 0.764 ;
 	wv 6790 0.826 ;
@@ -18730,9 +18730,9 @@
 	wv 7286 0.016 ;
 	wv 7482 0.242 ;
 	wv 7485 0.236 ;
-  end VertexGroup LegBack_R
+  end VertexGroup DfmLegBack_R
 
-  VertexGroup LegOut_R
+  VertexGroup DfmLegOut_R
 	wv 6724 0.136 ;
 	wv 6725 0.187 ;
 	wv 6726 0.15 ;
@@ -18778,7 +18778,7 @@
 	wv 7306 0.038 ;
 	wv 7309 0.054 ;
 	wv 7450 0.014 ;
-  end VertexGroup LegOut_R
+  end VertexGroup DfmLegOut_R
 
   VertexGroup Breast_L
 	wv 2543 0.348 ;
@@ -19185,7 +19185,7 @@
 	wv 11065 0.348 ;
   end VertexGroup Breast_R
 
-  VertexGroup Shoulder_L
+  VertexGroup DfmShoulder_L
 	wv 2850 0.122 ;
 	wv 2853 0.0213 ;
 	wv 2854 0.0878 ;
@@ -19336,9 +19336,9 @@
 	wv 10613 0.0112 ;
 	wv 10669 0.0109 ;
 	wv 10780 0.0089 ;
-  end VertexGroup Shoulder_L
+  end VertexGroup DfmShoulder_L
 
-  VertexGroup Shoulder_R
+  VertexGroup DfmShoulder_R
 	wv 2925 0.0089 ;
 	wv 3071 0.0109 ;
 	wv 3133 0.0112 ;
@@ -19489,9 +19489,9 @@
 	wv 10820 0.0878 ;
 	wv 10821 0.0213 ;
 	wv 10824 0.122 ;
-  end VertexGroup Shoulder_R
+  end VertexGroup DfmShoulder_R
 
-  VertexGroup Scapula_L
+  VertexGroup DfmScapula_L
 	wv 2582 0.709 ;
 	wv 2583 0.404 ;
 	wv 2584 0.37 ;
@@ -19690,9 +19690,9 @@
 	wv 11016 0.04 ;
 	wv 11017 0.065 ;
 	wv 11066 0.01 ;
-  end VertexGroup Scapula_L
+  end VertexGroup DfmScapula_L
 
-  VertexGroup Scapula_R
+  VertexGroup DfmScapula_R
 	wv 2591 0.065 ;
 	wv 2592 0.04 ;
 	wv 2593 0.03 ;
@@ -19891,9 +19891,9 @@
 	wv 11067 0.282 ;
 	wv 11068 0.454 ;
 	wv 11069 0.308 ;
-  end VertexGroup Scapula_R
+  end VertexGroup DfmScapula_R
 
-  VertexGroup UpArm1_L
+  VertexGroup DfmUpArm1_L
 	wv 2602 0.115 ;
 	wv 2603 0.223 ;
 	wv 2604 0.227 ;
@@ -20038,9 +20038,9 @@
 	wv 5880 0.185 ;
 	wv 5909 0.00799 ;
 	wv 5965 0.283 ;
-  end VertexGroup UpArm1_L
+  end VertexGroup DfmUpArm1_L
 
-  VertexGroup UpArm2_L
+  VertexGroup DfmUpArm2_L
 	wv 2604 0.00639 ;
 	wv 2605 0.178 ;
 	wv 2606 0.109 ;
@@ -20248,9 +20248,9 @@
 	wv 10377 0.0152 ;
 	wv 10789 0.0578 ;
 	wv 10790 0.0181 ;
-  end VertexGroup UpArm2_L
+  end VertexGroup DfmUpArm2_L
 
-  VertexGroup UpArm3_L
+  VertexGroup DfmUpArm3_L
 	wv 2979 0.961 ;
 	wv 2980 0.996 ;
 	wv 2981 1 ;
@@ -20385,9 +20385,9 @@
 	wv 5910 0.81 ;
 	wv 5911 0.682 ;
 	wv 5912 0.163 ;
-  end VertexGroup UpArm3_L
+  end VertexGroup DfmUpArm3_L
 
-  VertexGroup LoArm1_L
+  VertexGroup DfmLoArm1_L
 	wv 3043 0.0104 ;
 	wv 3051 0.0205 ;
 	wv 3052 0.123 ;
@@ -20455,9 +20455,9 @@
 	wv 5910 0.19 ;
 	wv 5911 0.318 ;
 	wv 5912 0.412 ;
-  end VertexGroup LoArm1_L
+  end VertexGroup DfmLoArm1_L
 
-  VertexGroup LoArm2_L
+  VertexGroup DfmLoArm2_L
 	wv 3174 0.513 ;
 	wv 3175 0.508 ;
 	wv 3176 0.449 ;
@@ -20574,9 +20574,9 @@
 	wv 5961 0.0115 ;
 	wv 5963 0.517 ;
 	wv 5964 0.518 ;
-  end VertexGroup LoArm2_L
+  end VertexGroup DfmLoArm2_L
 
-  VertexGroup LoArm3_L
+  VertexGroup DfmLoArm3_L
 	wv 3174 0.487 ;
 	wv 3175 0.492 ;
 	wv 3176 0.551 ;
@@ -20642,9 +20642,9 @@
 	wv 5962 0.639 ;
 	wv 5963 0.483 ;
 	wv 5964 0.482 ;
-  end VertexGroup LoArm3_L
+  end VertexGroup DfmLoArm3_L
 
-  VertexGroup UpArm1_R
+  VertexGroup DfmUpArm1_R
 	wv 9603 0.283 ;
 	wv 9659 0.00799 ;
 	wv 9661 0.185 ;
@@ -20789,9 +20789,9 @@
 	wv 11006 0.227 ;
 	wv 11007 0.223 ;
 	wv 11008 0.115 ;
-  end VertexGroup UpArm1_R
+  end VertexGroup DfmUpArm1_R
 
-  VertexGroup UpArm2_R
+  VertexGroup DfmUpArm2_R
 	wv 2911 0.0181 ;
 	wv 2912 0.0578 ;
 	wv 3376 0.0152 ;
@@ -20999,9 +20999,9 @@
 	wv 11004 0.109 ;
 	wv 11005 0.178 ;
 	wv 11006 0.00639 ;
-  end VertexGroup UpArm2_R
+  end VertexGroup DfmUpArm2_R
 
-  VertexGroup UpArm3_R
+  VertexGroup DfmUpArm3_R
 	wv 9656 0.163 ;
 	wv 9657 0.682 ;
 	wv 9658 0.81 ;
@@ -21136,9 +21136,9 @@
 	wv 10745 1 ;
 	wv 10746 0.996 ;
 	wv 10747 0.961 ;
-  end VertexGroup UpArm3_R
+  end VertexGroup DfmUpArm3_R
 
-  VertexGroup LoArm2_R
+  VertexGroup DfmLoArm2_R
 	wv 9604 0.518 ;
 	wv 9605 0.517 ;
 	wv 9607 0.0115 ;
@@ -21255,9 +21255,9 @@
 	wv 10572 0.449 ;
 	wv 10573 0.508 ;
 	wv 10574 0.513 ;
-  end VertexGroup LoArm2_R
+  end VertexGroup DfmLoArm2_R
 
-  VertexGroup LoArm3_R
+  VertexGroup DfmLoArm3_R
 	wv 9604 0.482 ;
 	wv 9605 0.483 ;
 	wv 9606 0.639 ;
@@ -21323,9 +21323,9 @@
 	wv 10572 0.551 ;
 	wv 10573 0.492 ;
 	wv 10574 0.487 ;
-  end VertexGroup LoArm3_R
+  end VertexGroup DfmLoArm3_R
 
-  VertexGroup UpLeg2_L
+  VertexGroup DfmUpLeg2_L
 	wv 2789 0.018 ;
 	wv 2934 0.012 ;
 	wv 2937 0.038 ;
@@ -21481,9 +21481,9 @@
 	wv 7121 0.008 ;
 	wv 7236 0.006 ;
 	wv 7359 0.006 ;
-  end VertexGroup UpLeg2_L
+  end VertexGroup DfmUpLeg2_L
 
-  VertexGroup UpLeg2_R
+  VertexGroup DfmUpLeg2_R
 	wv 3888 0.008 ;
 	wv 6724 0.108 ;
 	wv 6725 0.105 ;
@@ -21637,9 +21637,9 @@
 	wv 7299 0.038 ;
 	wv 7302 0.012 ;
 	wv 7451 0.018 ;
-  end VertexGroup UpLeg2_R
+  end VertexGroup DfmUpLeg2_R
 
-  VertexGroup UpLeg3_L
+  VertexGroup DfmUpLeg3_L
 	wv 3780 0.658 ;
 	wv 3781 0.266 ;
 	wv 3782 0.00625 ;
@@ -21817,9 +21817,9 @@
 	wv 6499 1 ;
 	wv 6581 0.996 ;
 	wv 6582 0.995 ;
-  end VertexGroup UpLeg3_L
+  end VertexGroup DfmUpLeg3_L
 
-  VertexGroup UpLeg3_R
+  VertexGroup DfmUpLeg3_R
 	wv 6727 0.995 ;
 	wv 6728 0.996 ;
 	wv 6761 1 ;
@@ -21997,9 +21997,9 @@
 	wv 7229 0.00625 ;
 	wv 7230 0.266 ;
 	wv 7231 0.658 ;
-  end VertexGroup UpLeg3_R
+  end VertexGroup DfmUpLeg3_R
 
-  VertexGroup ElbowBend_L
+  VertexGroup DfmElbowBend_L
 	wv 2981 0.012 ;
 	wv 2983 0.194 ;
 	wv 2987 0.276 ;
@@ -22040,9 +22040,9 @@
 	wv 4570 0.029 ;
 	wv 5910 0.063 ;
 	wv 5911 0.098 ;
-  end VertexGroup ElbowBend_L
+  end VertexGroup DfmElbowBend_L
 
-  VertexGroup ElbowBend_R
+  VertexGroup DfmElbowBend_R
 	wv 9657 0.098 ;
 	wv 9658 0.063 ;
 	wv 9903 0.029 ;
@@ -22083,9 +22083,9 @@
 	wv 10739 0.276 ;
 	wv 10743 0.194 ;
 	wv 10745 0.012 ;
-  end VertexGroup ElbowBend_R
+  end VertexGroup DfmElbowBend_R
 
-  VertexGroup LoArmFan_L
+  VertexGroup DfmLoArmFan_L
 	wv 4526 0.02 ;
 	wv 4527 0.022 ;
 	wv 4528 0.032 ;
@@ -22121,9 +22121,9 @@
 	wv 5911 0.071 ;
 	wv 5912 0.088 ;
 	wv 5913 0.015 ;
-  end VertexGroup LoArmFan_L
+  end VertexGroup DfmLoArmFan_L
 
-  VertexGroup LoArmFan_R
+  VertexGroup DfmLoArmFan_R
 	wv 9655 0.015 ;
 	wv 9656 0.088 ;
 	wv 9657 0.071 ;
@@ -22159,9 +22159,9 @@
 	wv 9945 0.032 ;
 	wv 9946 0.022 ;
 	wv 9947 0.02 ;
-  end VertexGroup LoArmFan_R
+  end VertexGroup DfmLoArmFan_R
 
-  VertexGroup ShoulderTwist_L
+  VertexGroup DfmShoulderTwist_L
 	wv 2599 0.0938 ;
 	wv 2600 0.1 ;
 	wv 2601 0.382 ;
@@ -22351,9 +22351,9 @@
 	wv 5881 0.0356 ;
 	wv 5909 0.644 ;
 	wv 5965 0.711 ;
-  end VertexGroup ShoulderTwist_L
+  end VertexGroup DfmShoulderTwist_L
 
-  VertexGroup ShoulderTwist_R
+  VertexGroup DfmShoulderTwist_R
 	wv 9603 0.711 ;
 	wv 9659 0.644 ;
 	wv 9660 0.0356 ;
@@ -22543,9 +22543,9 @@
 	wv 11009 0.382 ;
 	wv 11010 0.1 ;
 	wv 11011 0.0938 ;
-  end VertexGroup ShoulderTwist_R
+  end VertexGroup DfmShoulderTwist_R
 
-  VertexGroup ArmPit_L
+  VertexGroup DfmArmPit_L
 	wv 2252 0.00976 ;
 	wv 2603 0.0273 ;
 	wv 2616 0.00722 ;
@@ -22635,9 +22635,9 @@
 	wv 4680 0.0783 ;
 	wv 5965 0.54 ;
 	wv 8148 0.0104 ;
-  end VertexGroup ArmPit_L
+  end VertexGroup DfmArmPit_L
 
-  VertexGroup ArmPit_R
+  VertexGroup DfmArmPit_R
 	wv 8155 0.0104 ;
 	wv 8985 0.00976 ;
 	wv 9603 0.54 ;
@@ -22727,9 +22727,9 @@
 	wv 10993 0.167 ;
 	wv 10994 0.00722 ;
 	wv 11007 0.0273 ;
-  end VertexGroup ArmPit_R
+  end VertexGroup DfmArmPit_R
 
-  VertexGroup Pectoralis_L
+  VertexGroup DfmPectoralis_L
 	wv 2637 0.0226 ;
 	wv 2638 0.00965 ;
 	wv 2646 0.038 ;
@@ -22850,9 +22850,9 @@
 	wv 5876 0.0194 ;
 	wv 5909 0.00787 ;
 	wv 5965 0.388 ;
-  end VertexGroup Pectoralis_L
+  end VertexGroup DfmPectoralis_L
 
-  VertexGroup Pectoralis_R
+  VertexGroup DfmPectoralis_R
 	wv 9603 0.388 ;
 	wv 9659 0.00787 ;
 	wv 9665 0.0194 ;
@@ -22973,9 +22973,9 @@
 	wv 10964 0.038 ;
 	wv 10972 0.00965 ;
 	wv 10973 0.0226 ;
-  end VertexGroup Pectoralis_R
+  end VertexGroup DfmPectoralis_R
 
-  VertexGroup Deltoid_L
+  VertexGroup DfmDeltoid_L
 	wv 2599 0.107 ;
 	wv 2602 0.171 ;
 	wv 2603 0.762 ;
@@ -23093,9 +23093,9 @@
 	wv 5880 0.556 ;
 	wv 5881 0.309 ;
 	wv 5909 0.493 ;
-  end VertexGroup Deltoid_L
+  end VertexGroup DfmDeltoid_L
 
-  VertexGroup Deltoid_R
+  VertexGroup DfmDeltoid_R
 	wv 9659 0.493 ;
 	wv 9660 0.309 ;
 	wv 9661 0.556 ;
@@ -23213,9 +23213,9 @@
 	wv 11007 0.762 ;
 	wv 11008 0.171 ;
 	wv 11011 0.107 ;
-  end VertexGroup Deltoid_R
+  end VertexGroup DfmDeltoid_R
 
-  VertexGroup Trapezeus_L
+  VertexGroup DfmTrapezeus_L
 	wv 2582 0.113 ;
 	wv 2593 0.00656 ;
 	wv 2598 0.0441 ;
@@ -23319,9 +23319,9 @@
 	wv 13945 0.023 ;
 	wv 13948 0.0292 ;
 	wv 13990 0.0206 ;
-  end VertexGroup Trapezeus_L
+  end VertexGroup DfmTrapezeus_L
 
-  VertexGroup Trapezeus_R
+  VertexGroup DfmTrapezeus_R
 	wv 4033 0.0175 ;
 	wv 4034 0.00557 ;
 	wv 4074 0.0206 ;
@@ -23425,5 +23425,5 @@
 	wv 12340 0.00576 ;
 	wv 12341 0.0106 ;
 	wv 12342 0.00651 ;
-  end VertexGroup Trapezeus_R
+  end VertexGroup DfmTrapezeus_R
 

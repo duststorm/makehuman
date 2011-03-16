@@ -66,6 +66,7 @@ L_PALM =	0x0800
 
 L_HELP	=	0x4000
 L_DEF =		0x8000
+L_DMAIN = 	0x80000000
 
 #
 #	Flags
@@ -466,8 +467,8 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, cons
 	fp.write("  end Posebone\n")
 	return
 
-def copyDeform(fp, bone, flags, copy, customShape, constraints):
-	copyDeformPartial(fp, bone, bone, (1,1,1), flags, copy, customShape, constraints)
+def copyDeform(fp, dbone, cbone, flags, copy, customShape, constraints):
+	copyDeformPartial(fp, dbone, cbone, (1,1,1), flags, copy, customShape, constraints)
 
 #
 #	addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik_dof, flags, constraints):
@@ -582,10 +583,10 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
 		else:
 			raise NameError("Switch in", bone)
 
-		if cflags & C_DEFRIG:
-			rig = 'DeformRig'
-		else:
-			rig = ''
+		#if cflags & C_DEFRIG:
+		#	rig = 'DeformRig'
+		#else:
+		rig = ''
 
 		if typ == 'IK':
 			addIkConstraint(fp, rig, cflags, inf, data, lockLoc, lockRot)
@@ -1679,28 +1680,6 @@ def setupCircles(fp):
 	setupCube(fp, "MHEndCube01", 0.1, 1)
 	setupCube(fp, "MHChest", (0.7,0.25,0.5), (0,0.5,0.35))
 	setupCube(fp, "MHRoot", (1.25,0.5,1.0), 1)
-
-	setupCylinder(fp, 'MHDefArm', 0.16, 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefUpArm2', 0.4, 1, 0, 'Green')
-	setupCylinder(fp, 'MHDefUpArm3', 0.3, 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefHand', (0.5, 0.25), 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefFinger', 0.3, 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefHead', (0.8,0.8), 1.6, (0,0.4,-0.3), 'Pink')
-	setupCylinder(fp, 'MHDefNeck', 0.4, 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefJaw', (0.5, 0.2), 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefChest', (1.0,0.55), 1, (0,0.25,-0.2), 'Green')
-	setupCylinder(fp, 'MHDefSpine2', (1.0,0.8), 1, (0,0.25,0), 'Green')
-	setupCylinder(fp, 'MHDefSpine1', (1.2,0.9), 1, (0,0.25,0), 'Green')
-	setupCylinder(fp, 'MHDefRib', (0.8,0.2), 1, (0,0.1,0), 'Green')
-	setupCylinder(fp, 'MHDefStomach', (0.8,0.2), 1, (0,-0.1,0), 'Green')
-	setupCylinder(fp, 'MHDefHips', (1.6,1.3), 1.6, (0,0,-0.5), 'Blue')
-	setupCylinder(fp, 'MHDefShoulder', 0.2, 1, 0, 'Green')
-	setupCylinder(fp, 'MHDefLeg', 0.12, 1, 0, 'Blue')
-	setupCylinder(fp, 'MHDefUpLeg2', (0.4,0.5), 1, 0, 'Blue')
-	setupCylinder(fp, 'MHDefUpLeg3', 0.32, 1, 0, 'Blue')
-	setupCylinder(fp, 'MHDefFoot', (0.45, 0.2), 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefToe', (0.8, 0.3), 1, 0, 'Pink')
-	setupCylinder(fp, 'MHDefTongue', (1.0,0.3), 1, 0, 'Red')
 	return
 
 #
@@ -1736,23 +1715,16 @@ def setupRig(obj):
 	
 def writeControlArmature(fp):
 	writeArmature(fp, 
-		rig_body_25.BodyControlArmature +
-		rig_arm_25.ArmControlArmature +
-		rig_finger_25.FingerControlArmature +
-		rig_leg_25.LegControlArmature +
-		#rig_toe_25.ToeControlArmature +
-		rig_face_25.FaceControlArmature +
-		rig_panel_25.PanelControlArmature, True)
+		rig_body_25.BodyArmature +
+		rig_arm_25.ArmArmature +
+		rig_finger_25.FingerArmature +
+		rig_leg_25.LegArmature +
+		#rig_toe_25.ToeArmature +
+		rig_face_25.FaceArmature +
+		rig_panel_25.PanelArmature, True)
 	return
 
 def writeDeformArmature(fp):
-	writeArmature(fp,
-		rig_body_25.BodyDeformArmature +
-		rig_arm_25.ArmDeformArmature +
-		rig_finger_25.FingerDeformArmature +
-		rig_leg_25.LegDeformArmature +
-		#rig_toe_25.ToeDeformArmature +
-		rig_face_25.FaceDeformArmature, True)
 	return
 
 def writeAllCurves(fp):
@@ -1773,12 +1745,13 @@ def writeControlPoses(fp):
 	return
 
 def writeDeformPoses(fp):
-	rig_body_25.BodyDeformPoses(fp)
-	rig_arm_25.ArmDeformPoses(fp)
+	return
+	#rig_body_25.BodyDeformPoses(fp)
+	#rig_arm_25.ArmDeformPoses(fp)
 	rig_finger_25.FingerDeformPoses(fp)
-	rig_leg_25.LegDeformPoses(fp)
+	#rig_leg_25.LegDeformPoses(fp)
 	#rig_toe_25.ToeDeformPoses(fp)
-	rig_face_25.FaceDeformPoses(fp)
+	#rig_face_25.FaceDeformPoses(fp)
 	return
 	
 def writeAllActions(fp):
@@ -1855,7 +1828,7 @@ def reapplyArmature(fp, ob):
 	fp.write(
 "  Object %s\n" % ob +
 "    Modifier Armature ARMATURE\n" +
-"      object Refer Object %sDeformRig ;\n" % mh2mhx.theHuman +
+"      object Refer Object %s ;\n" % mh2mhx.theHuman +
 "      use_bone_envelopes False ;\n" +
 "      use_vertex_groups True ;\n" +
 "    end Modifier\n" +

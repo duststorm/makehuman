@@ -14848,7 +14848,7 @@ end Mesh
     end Modifier
     Modifier Armature ARMATURE
       invert_vertex_group False ;
-      *** refer-human object DeformRig
+      *** refer-human object ControlRig
       use_bone_envelopes False ;
       use_deform_preserve_volume False ;
       use_multi_modifier True ;
@@ -14857,13 +14857,13 @@ end Mesh
     end Modifier
   #else
     Modifier Armature ARMATURE
-      *** refer-human object DeformRig
+      *** refer-human object ControlRig
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
   #endif
   color Array 1.0 1.0 1.0 1.0  ;
-  *** refer-human parent DeformRig
+  *** refer-human parent ControlRig
   parent_type 'OBJECT' ;
   select True ;
   lock_location Array 1 1 1 ; 

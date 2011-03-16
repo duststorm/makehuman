@@ -363,7 +363,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 			elif words[1] == 'ProxyReferRig':
 				if proxy.rig:
 					fp.write("      object Refer Object %s ;\n" % proxy.name)
-				elif theConfig.useRig == 'game':
+				elif True or theConfig.useRig == 'game':
 					fp.write("      object Refer Object %s ;\n" % theHuman)
 				else:
 					fp.write("      object Refer Object %sDeformRig ;\n" % theHuman)
@@ -442,7 +442,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 "  Objects\n" +
 "#if toggle&T_Armature\n" +
 "    ob %s ;\n" % theHuman +
-"    ob %sDeformRig ;\n" % theHuman +
+#"    ob %sDeformRig ;\n" % theHuman +
 #"    ob %sSpineCurve ;\n" % theHuman +
 "#endif\n" +
 "#if toggle&T_Mesh\n" +

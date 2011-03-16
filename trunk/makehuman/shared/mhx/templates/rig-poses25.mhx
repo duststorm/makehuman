@@ -10,9 +10,6 @@
 *** rig-drivers ControlRig
 *** rig-correct
 
-*** rig-poses DeformRig
-*** rig-drivers DeformRig
-
 # *** material-drivers
 
 # ---------------- Groups -------------------------------- # 

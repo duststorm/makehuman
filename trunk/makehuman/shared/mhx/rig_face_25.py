@@ -23,59 +23,52 @@ import mhx_rig, mh2mhx
 from mhx_rig import *
 
 FaceJoints = [
-	('head-end',			'l', ((2.0, 'head'), (-1.0, 'neck'))),
+	('head-end',		'l', ((2.0, 'head'), (-1.0, 'neck'))),
 	('r-mouth',			'v', 2490),
 	('l-mouth',			'v', 8907),
 
-	('mid-eyes',			'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
+	('mid-eyes',		'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
 	('gaze',			'o', ('mid-eyes', [0.0, 0.0, 5.2])),
-	('gaze-target',			'o', ('mid-eyes', [0.0, 0.0, 4.2])),
+	('gaze-target',		'o', ('mid-eyes', [0.0, 0.0, 4.2])),
 	('l-gaze',			'o', ('l-eye', [0.0, 0.0, 5.0])),
-	('l-gaze-target',		'o', ('l-eye', [0.0, 0.0, 4.5])),
+	('l-gaze-target',	'o', ('l-eye', [0.0, 0.0, 4.5])),
 	('r-gaze',			'o', ('r-eye', [0.0, 0.0, 5.0])),
-	('r-gaze-target',		'o', ('r-eye', [0.0, 0.0, 4.5])),
+	('r-gaze-target',	'o', ('r-eye', [0.0, 0.0, 4.5])),
 ]
 
 FaceHeadsTails = [
-	('Jaw',				'mouth', 'jaw'),
+	('Jaw',					'mouth', 'jaw'),
 	('TongueBase',			'tongue-1', 'tongue-2'),
 	('TongueMid',			'tongue-2', 'tongue-3'),
 	('TongueTip',			'tongue-3', 'tongue-4'),
 
-	('Eye_R',			'l-eye', 'l-eye-target'),
-	('UpLid_R',			'l-eye', 'l-upperlid'),
-	('LoLid_R',			'l-eye', 'l-lowerlid'),
-	('Eye_L',			'r-eye', 'r-eye-target'),
-	('UpLid_L',			'r-eye', 'r-upperlid'),
-	('LoLid_L',			'r-eye', 'r-lowerlid'),
+	('Eye_R',				'l-eye', 'l-eye-target'),
+	('DfmUpLid_R',			'l-eye', 'l-upperlid'),
+	('DfmLoLid_R',			'l-eye', 'l-lowerlid'),
+	('Eye_L',				'r-eye', 'r-eye-target'),
+	('DfmUpLid_L',			'r-eye', 'r-upperlid'),
+	('DfmLoLid_L',			'r-eye', 'r-lowerlid'),
 
-	('Gaze',			'gaze', 'gaze-target'),
-	('Gaze_R',			'l-gaze', 'l-gaze-target'),
-	('Gaze_L',			'r-gaze', 'r-gaze-target'),
+	('Gaze',				'gaze', 'gaze-target'),
+	('Gaze_R',				'l-gaze', 'l-gaze-target'),
+	('Gaze_L',				'r-gaze', 'r-gaze-target'),
 ]
 
 
-FaceControlArmature = [
-	('Jaw',			0.0, 'Head', F_DEF+F_WIR, L_HEAD, NoBB),
-	('TongueBase',	0.0, 'Jaw', F_DEF+F_WIR, L_HEAD, NoBB),
-	('TongueMid',	0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD, NoBB),
-	('TongueTip',	0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD, NoBB),
-	('Gaze',		pi, None, F_WIR, L_HEAD, NoBB),
-	('Gaze_R',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),
-	('Gaze_L',		pi, 'Gaze', F_WIR, L_HEAD, NoBB),
-]
-
-FaceDeformArmature = [
-	('Jaw',			0.0, 'Head', F_DEF, L_MAIN, NoBB),
-	('TongueBase',	0.0, 'Jaw', F_DEF, L_MAIN, NoBB),
-	('TongueMid',	0.0, 'TongueBase', F_DEF, L_MAIN, NoBB),
-	('TongueTip',	0.0, 'TongueMid', F_DEF, L_MAIN, NoBB),
-	('Eye_R',		0.0, 'Head', F_DEF, L_MAIN, NoBB),
-	('Eye_L',		0.0, 'Head', F_DEF, L_MAIN, NoBB),
-	('UpLid_R',		0.279253, 'Head', F_DEF, L_DEF, NoBB),
-	('LoLid_R',		0.0, 'Head', F_DEF, L_DEF, NoBB),
-	('UpLid_L',		-0.279253, 'Head', F_DEF, L_DEF, NoBB),
-	('LoLid_L',		0.0, 'Head', F_DEF, L_DEF, NoBB),
+FaceArmature = [
+	('Jaw',				0.0, 'Head', F_DEF+F_WIR, L_DMAIN, NoBB),
+	('TongueBase',		0.0, 'Jaw', F_DEF+F_WIR, L_DMAIN, NoBB),
+	('TongueMid',		0.0, 'TongueBase', F_DEF+F_WIR, L_DMAIN, NoBB),
+	('TongueTip',		0.0, 'TongueMid', F_DEF+F_WIR, L_DMAIN, NoBB),
+	('Gaze',			pi, None, F_WIR, L_HEAD, NoBB),
+	('Gaze_R',			pi, 'Gaze', F_WIR, L_HEAD, NoBB),
+	('Gaze_L',			pi, 'Gaze', F_WIR, L_HEAD, NoBB),
+	('Eye_R',			0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('Eye_L',			0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('DfmUpLid_R',		0.279253, 'Head', F_DEF, L_DEF, NoBB),
+	('DfmLoLid_R',		0.0, 'Head', F_DEF, L_DEF, NoBB),
+	('DfmUpLid_L',		-0.279253, 'Head', F_DEF, L_DEF, NoBB),
+	('DfmLoLid_L',		0.0, 'Head', F_DEF, L_DEF, NoBB),
 ]
 
 
@@ -101,25 +94,14 @@ def FaceControlPoses(fp):
 	addPoseBone(fp, 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'Gaze_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-	return
 
-#
-#	FaceDeformPoses(fp):
-#
+	addPoseBone(fp, 'DfmUpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-def FaceDeformPoses(fp):
-	copyDeform(fp, 'Jaw', 0, U_LOC+U_ROT, 'MHDefJaw', [])
-	copyDeform(fp, 'TongueBase', 0, U_LOC+U_ROT+U_SCALE, 'MHDefTongue', [])
-	copyDeform(fp, 'TongueMid', 0, U_LOC+U_ROT+U_SCALE, 'MHDefTongue', [])
-	copyDeform(fp, 'TongueTip', 0, U_LOC+U_ROT+U_SCALE, 'MHDefTongue', [])
+	addPoseBone(fp, 'DfmLoLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'UpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'DfmUpLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-	addPoseBone(fp, 'LoLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'UpLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
-
-	addPoseBone(fp, 'LoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
+	addPoseBone(fp, 'DfmLoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
 	addPoseBone(fp, 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
 		[('IK', 0, 1, ['IK', 'Gaze_R', 1, None, (True, False,False), 1.0])])
@@ -134,10 +116,10 @@ def FaceDeformPoses(fp):
 
 def FaceDeformDrivers(fp):
 	lidBones = [
-	('UpLid_L', 'PUpLid_L', (0, 40*D)),
-	('LoLid_L', 'PLoLid_L', (0, 20*D)),
-	('UpLid_R', 'PUpLid_R', (0, 40*D)),
-	('LoLid_R', 'PLoLid_R', (0, 20*D)),
+	('DfmUpLid_L', 'PUpLid_L', (0, 40*D)),
+	('DfmLoLid_L', 'PLoLid_L', (0, 20*D)),
+	('DfmUpLid_R', 'PUpLid_R', (0, 40*D)),
+	('DfmLoLid_R', 'PLoLid_R', (0, 20*D)),
 	]
 
 	drivers = []
