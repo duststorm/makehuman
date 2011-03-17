@@ -448,8 +448,12 @@ def dualToMatrix(d):
 
 #Note: Quaternions have to of normalized form
 # Quaternions are of the form (x,y,z,w)
-def quaternionToMatrix(q):
-    m = [[0,0,0],[0,0,0],[0,0,0]]  # will be a 3x3 euler rotation matrix
+# returns flat matrx
+def quaternion2Matrix(q):
+    m = [ 1.0, 0.0, 0.0, 0.0
+          0.0, 1.0, 0.0, 0.0
+          0.0, 0.0, 1.0, 0.0
+          0.0, 0.0, 0.0, 1.0]  # will be a 3x3 euler rotation matrix
     m[0][0] = float(q[3]*q[3] + q[0]*q[0] - q[1]*q[1] - q[2]*q[2])
     m[0][1] = 2.0*(q[0]*q[1]-q[3]*q[2])
     m[0][2] = 2.0*(q[0]*q[2]+q[3]*q[1])
@@ -461,7 +465,6 @@ def quaternionToMatrix(q):
     m[2][0] = 2.0*(q[2]*q[0]-q[3]*q[1])
     m[2][1] = 2.0*(q[2]*q[1]+q[3]*q[0])
     m[2][2] = float(q[3]*q[3]-q[0]*q[0]-q[1]*q[1]+q[2]*q[2])
-
     return m
 
 def quaternionLerp(q1, q2, alpha):
