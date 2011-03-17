@@ -180,7 +180,7 @@ def manipulate(joint, transform, verts):
     #using world
     m = mmul(transform , world2Joint)
     vect = transformV(m, v.co) 
-    #since things are passed by deep copy
+    #since things wee passed by deep copy
     v.co[0] = vect[0]
     v.co[1] = vect[1]
     v.co[2] = vect[2]

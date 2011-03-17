@@ -189,178 +189,6 @@ def vcross(vect1, vect2):
 Matrix Operations
 """
 
-def mulmatvec3x3(m, vect):
-    """
-    This function returns a 3D vector which consists of the 3D input
-    vector multiplied by a 3x3 matrix.
-
-    Parameters
-    ----------
-
-    m:
-        *float list*. List of list. The 3x3 matrix.
-
-    vect:
-        *float list*. The vector - in the format[x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-    """
-
-
-    r = [0.0, 0.0, 0.0]
-    r[0] = vect[0] * m[0][0] + vect[1] * m[1][0] + vect[2] * m[2][0]
-    r[1] = vect[0] * m[0][1] + vect[1] * m[1][1] + vect[2] * m[2][1]
-    r[2] = vect[0] * m[0][2] + vect[1] * m[1][2] + vect[2] * m[2][2]
-    return r
-
-
-def makeRotEulerMtx3D(rx, ry, rz):
-    """
-    This function returns a 3x3 euler rotation matrix based on the 3 angles
-    rx, ry and rz.
-
-    Parameters
-    ----------
-
-    rx:
-        *float*. The angle of rotation (in radians) around the x-axis
-
-    ry:
-        *float*. The angle of rotation (in radians) around the y-axis
-
-    rz:
-        *float*. The angle of rotation (in radians) around the z-axis
-    """
-
-    SRX = sin(rx)
-    SRY = sin(ry)
-    SRZ = sin(rz)
-    CRX = cos(rx)
-    CRY = cos(ry)
-    CRZ = cos(rz)
-
-    return [[CRY * CRZ, CRY * SRZ, -SRY], [(CRZ * SRX) * SRY - CRX * SRZ, CRX * CRZ + (SRX * SRY) * SRZ, CRY * SRX], [SRX * SRZ + (CRX * CRZ) * SRY, (CRX * SRY) * SRZ
-             - CRZ * SRX, CRX * CRY]]
-
-def transformV(m, vect):
-    """
-    trensforms a vector (1x3) with a homogenous 4(3)x4 flat row-major matrix
-    """
-    r = [0.0, 0.0, 0.0]
-    r[0] = vect[0]*m[0] + vect[1]*m[1] + vect[2]*m[2] + m[3]
-    r[1] = vect[0]*m[4] + vect[1]*m[5] + vect[2]*m[6] + m[7]
-    r[2] = vect[0]*m[8] + vect[1]*m[9] + vect[2]*m[10] + m[11]
-    return r
-
-def makeTransform(Rxyz, Txyz):
-    """
-    makes a flat 4x4 homogenous transform matrix (row-major). Using xyz rotations and position
-    """
-   
-    sx = sin(Rxyz[0])
-    sy = sin(Rxyz[1])
-    sz = sin(Rxyz[2])
-    cx = cos(Rxyz[0])
-    cy = cos(Rxyz[1])
-    cz = cos(Rxyz[2])
-
-    return [cy*cz           , cy*sz           , -sy  , Txyz[0], 
-            cz*sx*sy - cy*sz, cy*cz + sx*sy*sz, cy*sx, Txyz[1],
-            sx*sz + cy*cz*sy, cy*sy*sz - cz*sx, cy*cy, Txyz[2],
-            0.0             , 0.0             , 0.0  , 1.0]
-
-
-def makeRotEulerMtx2D(theta, rotAxe):
-    """
-    This function returns a 3x3 euler matrix that rotates a point on
-    a plane perpendicular to a specified rotational axis.
-
-    Parameters
-    ----------
-
-    theta:
-        *float*. The angle of rotation (in radians).
-
-    rotAxe:
-        *string*. The axis of rotation, which can be \"X\", \"Y\" or \"Z\".
-    """
-
-    if rotAxe == 'X':
-        Rmtx = makeRotEulerMtx3D(theta, 0, 0)
-    elif rotAxe == 'Y':
-        Rmtx = makeRotEulerMtx3D(0, theta, 0)
-    elif rotAxe == 'Z':
-        Rmtx = makeRotEulerMtx3D(0, 0, theta)
-    return Rmtx
-
-
-def makeRotMatrix(angle, axis):
-    """
-    This function returns a 3x3 transformation matrix that represents a
-    rotation through the specified angle around the specified axis.
-    This matrix is presented in Graphics Gems (Glassner, Academic Press, 1990),
-    and discussed here: http://www.gamedev.net/reference/programming/features/whyquats/
-
-    Parameters
-    ----------
-
-    angle:
-        *float*. The angle of rotation (rad) around the specified axis
-
-    axis:
-        *float list*. A 3d vector [x,y,z] defining the axis of rotation
-        (this should already be normalized to avoid strange results).
-    """
-
-    a = angle
-    x = axis[0]
-    y = axis[1]
-    z = axis[2]
-    t = 1 - cos(a)
-    c = cos(a)
-    s = sin(a)
-    M11 = (t * x) * x + c
-    M12 = (t * x) * y + s * z
-    M13 = (t * x) * z - s * y
-    M21 = (t * x) * y - s * z
-    M22 = (t * y) * y + c
-    M23 = (t * y) * z + s * x
-    M31 = (t * x) * z + s * y
-    M32 = (t * y) * z - s * x
-    M33 = (t * z) * z + c
-    return [[M11, M12, M13], [M21, M22, M23], [M31, M32, M33]]
-    
-def makeUnit():
-    
-    return [1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0]
-    
-def makeTranslation(x, y, z):
-    
-    return [1.0, 0.0, 0.0, x,
-            0.0, 1.0, 0.0, y,
-            0.0, 0.0, 1.0, z,
-            0.0, 0.0, 0.0, 1.0]
-    
-def makeRotation(axis, angle):
-
-    c = cos(angle)
-    s = sin(angle)
-    t = 1 - c
-    x, y, z = axis
-    return [x*x * t + c,   y*x * t - z*s, x*z * t + y*s, 0.0,
-            x*y * t + z*s, y*y * t + c,   y*z * t - x*s, 0.0,
-            x*z * t - y*s, y*z * t + x*s, z*z * t + c,   0.0,
-            0.0,           0.0,           0.0,           1.0]
-            
-def makeScale(x, y, z):
-    
-    return [x,   0.0, 0.0, 0.0,
-            0.0, y,   0.0, 0.0,
-            0.0, 0.0, z,   0.0,
-            0.0, 0.0, 0.0, 1.0]
-
 def mmul(m2, m1):
     
     return [m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2] ,
@@ -376,11 +204,6 @@ def mmul(m2, m1):
             m1[2] * m2[8]  + m1[6] * m2[9]  + m1[10] * m2[10],
             m1[3] * m2[8]  + m1[7] * m2[9]  + m1[11] * m2[10] + m2[11],
             0.0, 0.0, 0.0, 1.0]
-
-def mtransform(m, v):         
-    return[m[0]*v[0] + m[1]*v[1] + m[2]*v[2]  + m[3],
-           m[4]*v[0] + m[5]*v[1] + m[6]*v[2]  + m[7],
-           m[8]*v[0] + m[9]*v[1] + m[10]*v[2] + m[11]]
 
 def flatten(M):
     """
@@ -673,6 +496,182 @@ def quaternionSlerp(q1, q2, alpha):
 """
 Geometric Operations
 """
+
+def mulmatvec3x3(m, vect):
+    """
+    This function returns a 3D vector which consists of the 3D input
+    vector multiplied by a 3x3 matrix.
+
+    Parameters
+    ----------
+
+    m:
+        *float list*. List of list. The 3x3 matrix.
+
+    vect:
+        *float list*. The vector - in the format[x,y,z]
+        (or [x,y,z,0] for affine transformations in an homogeneous space).
+    """
+
+
+    r = [0.0, 0.0, 0.0]
+    r[0] = vect[0] * m[0][0] + vect[1] * m[1][0] + vect[2] * m[2][0]
+    r[1] = vect[0] * m[0][1] + vect[1] * m[1][1] + vect[2] * m[2][1]
+    r[2] = vect[0] * m[0][2] + vect[1] * m[1][2] + vect[2] * m[2][2]
+    return r
+
+
+def makeRotEulerMtx3D(rx, ry, rz):
+    """
+    This function returns a 3x3 euler rotation matrix based on the 3 angles
+    rx, ry and rz.
+
+    Parameters
+    ----------
+
+    rx:
+        *float*. The angle of rotation (in radians) around the x-axis
+
+    ry:
+        *float*. The angle of rotation (in radians) around the y-axis
+
+    rz:
+        *float*. The angle of rotation (in radians) around the z-axis
+    """
+
+    SRX = sin(rx)
+    SRY = sin(ry)
+    SRZ = sin(rz)
+    CRX = cos(rx)
+    CRY = cos(ry)
+    CRZ = cos(rz)
+
+    return [[CRY * CRZ, CRY * SRZ, -SRY], [(CRZ * SRX) * SRY - CRX * SRZ, CRX * CRZ + (SRX * SRY) * SRZ, CRY * SRX], [SRX * SRZ + (CRX * CRZ) * SRY, (CRX * SRY) * SRZ
+             - CRZ * SRX, CRX * CRY]]
+
+def makeTransform(Rxyz, Txyz):
+    """
+    makes a flat 4x4 homogenous transform matrix (row-major). Using xyz rotations and position
+    """
+   
+    sx = sin(Rxyz[0])
+    sy = sin(Rxyz[1])
+    sz = sin(Rxyz[2])
+    cx = cos(Rxyz[0])
+    cy = cos(Rxyz[1])
+    cz = cos(Rxyz[2])
+
+    return [cy*cz           , cy*sz           , -sy  , Txyz[0], 
+            cz*sx*sy - cy*sz, cy*cz + sx*sy*sz, cy*sx, Txyz[1],
+            sx*sz + cy*cz*sy, cy*sy*sz - cz*sx, cy*cy, Txyz[2],
+            0.0             , 0.0             , 0.0  , 1.0]
+
+
+def makeRotEulerMtx2D(theta, rotAxe):
+    """
+    This function returns a 3x3 euler matrix that rotates a point on
+    a plane perpendicular to a specified rotational axis.
+
+    Parameters
+    ----------
+
+    theta:
+        *float*. The angle of rotation (in radians).
+
+    rotAxe:
+        *string*. The axis of rotation, which can be \"X\", \"Y\" or \"Z\".
+    """
+
+    if rotAxe == 'X':
+        Rmtx = makeRotEulerMtx3D(theta, 0, 0)
+    elif rotAxe == 'Y':
+        Rmtx = makeRotEulerMtx3D(0, theta, 0)
+    elif rotAxe == 'Z':
+        Rmtx = makeRotEulerMtx3D(0, 0, theta)
+    return Rmtx
+
+
+def makeRotMatrix(angle, axis):
+    """
+    This function returns a 3x3 transformation matrix that represents a
+    rotation through the specified angle around the specified axis.
+    This matrix is presented in Graphics Gems (Glassner, Academic Press, 1990),
+    and discussed here: http://www.gamedev.net/reference/programming/features/whyquats/
+
+    Parameters
+    ----------
+
+    angle:
+        *float*. The angle of rotation (rad) around the specified axis
+
+    axis:
+        *float list*. A 3d vector [x,y,z] defining the axis of rotation
+        (this should already be normalized to avoid strange results).
+    """
+
+    a = angle
+    x = axis[0]
+    y = axis[1]
+    z = axis[2]
+    t = 1 - cos(a)
+    c = cos(a)
+    s = sin(a)
+    M11 = (t * x) * x + c
+    M12 = (t * x) * y + s * z
+    M13 = (t * x) * z - s * y
+    M21 = (t * x) * y - s * z
+    M22 = (t * y) * y + c
+    M23 = (t * y) * z + s * x
+    M31 = (t * x) * z + s * y
+    M32 = (t * y) * z - s * x
+    M33 = (t * z) * z + c
+    return [[M11, M12, M13], [M21, M22, M23], [M31, M32, M33]]
+    
+def makeUnit():
+    
+    return [1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0]
+    
+def makeTranslation(x, y, z):
+    
+    return [1.0, 0.0, 0.0, x,
+            0.0, 1.0, 0.0, y,
+            0.0, 0.0, 1.0, z,
+            0.0, 0.0, 0.0, 1.0]
+    
+def makeRotation(axis, angle):
+
+    c = cos(angle)
+    s = sin(angle)
+    t = 1 - c
+    x, y, z = axis
+    return [x*x * t + c,   y*x * t - z*s, x*z * t + y*s, 0.0,
+            x*y * t + z*s, y*y * t + c,   y*z * t - x*s, 0.0,
+            x*z * t - y*s, y*z * t + x*s, z*z * t + c,   0.0,
+            0.0,           0.0,           0.0,           1.0]
+            
+def makeScale(x, y, z):
+    
+    return [x,   0.0, 0.0, 0.0,
+            0.0, y,   0.0, 0.0,
+            0.0, 0.0, z,   0.0,
+            0.0, 0.0, 0.0, 1.0]
+
+def mtransform(m, v):         
+    return[m[0]*v[0] + m[1]*v[1] + m[2]*v[2]  + m[3],
+           m[4]*v[0] + m[5]*v[1] + m[6]*v[2]  + m[7],
+           m[8]*v[0] + m[9]*v[1] + m[10]*v[2] + m[11]]
+
+
+# a fast way to inverse a homogenous 4x4 flat row-major transformation matix
+# we use the fact that rotations are orthogonal (note: there shouldnt be scaling in the matrix)
+def invTransform(m):
+    return [m[0], m[4], m[8], -m[3],
+            m[1], m[5], m[9], -m[7],
+            m[2], m[6], m[10],-m[11],
+            0.0, 0.0, 0.0, 1.0]
  
 def centroid(vertsList):
     """
