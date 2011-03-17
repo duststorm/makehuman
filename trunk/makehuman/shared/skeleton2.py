@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform
+from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, matrix2euler
 from math import acos
 
 class Joint:
@@ -45,8 +45,8 @@ class Joint:
         #self.position = [0.0, 0.0, 0.0]         # Global position in the scene
         #self.direction = [0.0, 0.0, 0.0, 0.0]   # Global rotation in the scene        
         
-        # rpy values : xyz rotation
         self.offset = [0.0,0.0,0.0]   # position relative to parent joint
+        #rotation follows bvh format : zxy  (static)
         self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         self.position = [0.0, 0.0, 0.0]           # Global Position
         
@@ -175,28 +175,30 @@ class Skeleton:
         # Calculate child offsets
         for child in joint.children:
             self.__calcJointOffsets(mesh, child, joint)
+            
+def getWorldMatrix(joint): 
+  m = euler2matrix(joint.rotation,"szxy")
+  m[3], m[7], m[11] = joint.position[0], joint.position[1], joint.position[2]
+  while (joint.parent) 
+    m = getWorldMatrix(self,joint.parent)*m
+  return m
 
 #starting mesh vertices should be the undeformed T-position, transform is with respect to joint coordinates
 # but human mesh vertices are written in world coordinate
-def manipulate(joint, transform, verts):
-  #transform with respect to parent joint
-  #m = invTransform(makeTransform(joint.rotation, joint.position))
+def manipulate(joint, transform, verts, transf2world=None):
+  if not trans2world:
+    #starts from root so we have to transform the joint
+    m = makeTransform(joint.rotation, joint.position))
+    m = mmul(m,transform)
+    trans2world = mmul(getWorldMatrix(joint),transform)
+    #our joints uses zxy static rotation
+    joint.rotation = matrix2rotation(m, "szxy")
+    joint.position = [m[3],m[7],m[11]]
 
   for i in joint.bindedVects:     
-    #using world
-    m = mmul(transform , world2Joint)
-    vect = mtransform(m,verts[i].co)
-    #since things were passed by deep copy
-    v.co = vect
-    
-    #todo tran sform the verts using root coordinates
-  for child in joint.children:
-    #move to child coordinates and do the necessary transformations
-    world2child = makeTransform(child.rotation, child.position) 
-    transformChild = mmul(transform, world2child)
-    # transformChild = trasnsfom * child transform (wrt root) inversed 
-    #transformChild = 
-    pass
+    verts[i].co = mtransform(transf2world,verts[i].co)
 
-def moveBind(j, rotation , center, verts):
-  pass
+  for child in joint.children:
+    manipulate(joint, None, verts, transf2world)
+
+  

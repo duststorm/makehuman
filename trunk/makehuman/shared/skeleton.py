@@ -45,7 +45,7 @@ class Joint:
         self.position = [0.0, 0.0, 0.0]         # Global position in the scene
         self.offset = [0.0, 0.0, 0.0]           # Position Relative to the parent joint
         self.direction = [0.0, 0.0, 0.0, 0.0]   # Global rotation in the scene        
-        # rpy values : xyz rotation
+        # 
         self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         # xyz limits
         self.limits = [[-180,180],[-180,180],[-180,180]]

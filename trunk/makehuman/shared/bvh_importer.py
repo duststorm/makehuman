@@ -37,6 +37,7 @@ class bvhJoint:
         self.frames = []
         self.transform = makeUnit()
         
+    #Note: BVH rotation is a static ZXY , thus use szxy in matrix2euler
     def calcTransform(self, frame):
         
         if self.parent:

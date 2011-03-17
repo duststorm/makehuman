@@ -32,10 +32,37 @@ The paper was so important that Al-jabr is the root of modern word I{algebra} an
 
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow, pi, exp
 from random import random
-#from array import array
 
 machine_epsilon = 1.0e-16
 degree2rad = pi/180.0
+
+"""
+A triple of Euler angles can be applied/interpreted in 24 ways, which can
+be specified using a 4 character string or encoded 4-tuple:
+
+  *Axes 4-string*: e.g. 'sxyz' or 'ryxy'
+
+  - first character : rotations are applied to 's'tatic or 'r'otating frame
+  - remaining characters : successive rotation axis 'x', 'y', or 'z'
+
+  *Axes 4-tuple*: e.g. (0, 0, 0, 0) or (1, 1, 1, 1)
+
+  - inner axis: code of axis ('x':0, 'y':1, 'z':2) of rightmost matrix.
+  - parity : even (0) if inner axis 'x' is followed by 'y', 'y' is followed
+    by 'z', or 'z' is followed by 'x'. Otherwise odd (1).
+  - repetition : first and last axis are same (1) or different (0).
+  - frame : rotations are applied to static (0) or rotating (1) frame.
+"""
+_NEXT_AXIS = [1, 2, 0, 1]
+_AXES2TUPLE = {
+    'sxyz': (0, 0, 0, 0), 'sxyx': (0, 0, 1, 0), 'sxzy': (0, 1, 0, 0),
+    'sxzx': (0, 1, 1, 0), 'syzx': (1, 0, 0, 0), 'syzy': (1, 0, 1, 0),
+    'syxz': (1, 1, 0, 0), 'syxy': (1, 1, 1, 0), 'szxy': (2, 0, 0, 0),
+    'szxz': (2, 0, 1, 0), 'szyx': (2, 1, 0, 0), 'szyz': (2, 1, 1, 0),
+    'rzyx': (0, 0, 0, 1), 'rxyx': (0, 0, 1, 1), 'ryzx': (0, 1, 0, 1),
+    'rxzx': (0, 1, 1, 1), 'rxzy': (1, 0, 0, 1), 'ryzy': (1, 0, 1, 1),
+    'rzxy': (1, 1, 0, 1), 'ryxy': (1, 1, 1, 1), 'ryxz': (2, 0, 0, 1),
+    'rzxz': (2, 0, 1, 1), 'rxyz': (2, 1, 0, 1), 'rzyz': (2, 1, 1, 1)}
 
 """
 Vector Operations
@@ -672,6 +699,96 @@ def invTransform(m):
             m[1], m[5], m[9], -m[7],
             m[2], m[6], m[10],-m[11],
             0.0, 0.0, 0.0, 1.0]
+
+# uses flat row-major 4x4 transformation matrices. Returned angles are in radians            
+def matrix2euler(m, axes='sxyz'):
+    """
+    see: U{http://www.lfd.uci.edu/~gohlke/code/transformations.py.html}
+    """
+    _NEXT_AXIS = [1, 2, 0, 1]
+    firstaxis, parity, repetition, frame = _AXES2TUPLE[axes.lower()]
+    i = firstaxis
+    j = _NEXT_AXIS[i+parity]
+    k = _NEXT_AXIS[i-parity+1]
+
+    if repetition:
+        sy = sqrt(m[i+4*j]*m[i + 4*j] + m[i+4*k]*m[i+4*k])
+        if sy > machine_epsilon:
+            ax = atan2( m[i+4*j],  m[i+4*k])
+            ay = atan2( sy,        m[i+4*i])
+            az = atan2( m[j+4*i], -m[k+4*i])
+        else:
+            ax = math.atan2(-m[j+4*k],  m[j+4*j])
+            ay = math.atan2( sy,        m[i+4*i])
+            az = 0.0
+    else:
+        cy = math.sqrt(m[i+4*i]*m[i+4*i] + m[j+4*i]*m[j+4*i])
+        if cy > machine_epsilon:
+            ax = math.atan2( m[k+4*j],  m[k+4*k])
+            ay = math.atan2(-m[k+4*i],  cy)
+            az = math.atan2( m[j+4*i],  m[i+4*i])
+        else:
+            ax = math.atan2(-m[j+4*k],  m[j+4*j])
+            ay = math.atan2(-m[k+4*i],  cy)
+            az = 0.0
+            
+    if parity:
+        ax, ay, az = -ax, -ay, -az
+    if frame:
+        ax, az = az, ax
+    return [ax, ay, az]
+
+#angles are radians!
+def euler2matrix(rotation, axes='sxyz'):
+    """
+    Return homogeneous rotation matrix from Euler angles and axis sequence.
+    see: U{http://www.lfd.uci.edu/~gohlke/code/transformations.py.html}
+    """
+    ai, aj, ak = rotation[0], rotation[1], rotation[2]
+    firstaxis, parity, repetition, frame = _AXES2TUPLE[axes]
+    i = firstaxis
+    j = _NEXT_AXIS[i+parity]
+    k = _NEXT_AXIS[i-parity+1]
+
+    if frame:
+        ai, ak = ak, ai
+    if parity:
+        ai, aj, ak = -ai, -aj, -ak
+
+    si, sj, sk = sin(ai), sin(aj), sin(ak)
+    ci, cj, ck = cos(ai), cos(aj), cos(ak)
+    cc, cs = ci*ck, ci*sk
+    sc, ss = si*ck, si*sk
+
+    m = makeUnit()
+    if repetition:
+        m[i+4*i] = cj
+        m[i+4*j] = sj*si
+        m[i+4*k] = sj*ci
+        m[j+4*i] = sj*sk
+        m[j+4*j] = -cj*ss+cc
+        m[j+4*k] = -cj*cs-sc
+        m[k+4*i] = -sj*ck
+        m[k+4*j] = cj*sc+cs
+        m[k+4*k] = cj*cc-ss
+    else:
+        m[i+4*i] = cj*ck
+        m[i+4*j] = sj*sc-cs
+        m[i+4*k] = sj*cc+ss
+        m[j+4*i] = cj*sk
+        m[j+4*j] = sj*ss+cc
+        m[j+4*k] = sj*cs-sc
+        m[k+4*i] = -sj
+        m[k+4*j] = cj*si
+        m[k+4*k] = cj*ci
+    return m
+  
+#converts a matrix (flat, homogenous row-major transformation)  to rotation, position
+# where rotation is  an euler xyz rotation and position is the position in the form [x,y,z]
+def makeXYZPos(m):
+  position = [m[3], m[7], m[11]]
+  #xyzRot = 
+  pass
  
 def centroid(vertsList):
     """
