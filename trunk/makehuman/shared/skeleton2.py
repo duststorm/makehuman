@@ -199,6 +199,6 @@ def manipulate(joint, transform, verts, transf2world=None):
     verts[i].co = mtransform(transf2world,verts[i].co)
 
   for child in joint.children:
-    manipulate(joint, None, verts, transf2world)
+    manipulate(child, None, verts, transf2world)
 
   
