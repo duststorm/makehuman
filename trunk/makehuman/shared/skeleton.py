@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion
+from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform
 from math import acos
 
 class Joint:
@@ -34,7 +34,8 @@ class Joint:
   This class contains a simple constructor method for a data structure used to support 
   the BVH export functions. 
   A hierarchical nested list of these objects is defined to hold the joint positions and
-  the relationship between joints. 
+  the relationship between joints.
+  Note: One child can have ONLY ONE Parent. But one Parent can have many children (normality condition)
   """
 
     def __init__(self, name, children):
@@ -169,3 +170,29 @@ class Skeleton:
         for child in joint.children:
             self.__calcJointOffsets(mesh, child, joint)
 
+#starting mesh vertices should be the undeformed T-position, transform is with respect to joint coordinates
+# but human mesh vertices are written in world coordinate
+def manipulate(joint, transform, verts):
+  #getting world transformation
+  world2Joint = makeTransform(joint.rotation, joint.position)
+  for i in joint.bindedVects:     
+    v = verts[i]
+    #using world
+    m = mmul(transform , world2Joint)
+    vect = transformV(m, v.co) 
+    #since things are passed by deep copy
+    v.co[0] = vect[0]
+    v.co[1] = vect[1]
+    v.co[2] = vect[2]
+    
+    #todo tran sform the verts using root coordinates
+  for child in joint.children:
+    #move to child coordinates and do the necessary transformations
+    world2child = makeTransform(child.rotation, child.position) 
+    transformChild = mmul(transform, world2child)
+    # transformChild = trasnsfom * child transform (wrt root) inversed 
+    #transformChild = 
+    pass
+
+def moveBind(j, rotation , center, verts):
+  pass

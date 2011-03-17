@@ -241,6 +241,33 @@ def makeRotEulerMtx3D(rx, ry, rz):
     return [[CRY * CRZ, CRY * SRZ, -SRY], [(CRZ * SRX) * SRY - CRX * SRZ, CRX * CRZ + (SRX * SRY) * SRZ, CRY * SRX], [SRX * SRZ + (CRX * CRZ) * SRY, (CRX * SRY) * SRZ
              - CRZ * SRX, CRX * CRY]]
 
+def transformV(m, vect):
+    """
+    trensforms a vector (1x3) with a homogenous 4(3)x4 flat row-major matrix
+    """
+    r = [0.0, 0.0, 0.0]
+    r[0] = vect[0]*m[0] + vect[1]*m[1] + vect[2]*m[2] + m[3]
+    r[1] = vect[0]*m[4] + vect[1]*m[5] + vect[2]*m[6] + m[7]
+    r[2] = vect[0]*m[8] + vect[1]*m[9] + vect[2]*m[10] + m[11]
+    return r
+
+def makeTransform(Rxyz, Txyz):
+    """
+    makes a flat 4x4 homogenous transform matrix (row-major). Using xyz rotations and position
+    """
+   
+    sx = sin(Rxyz[0])
+    sy = sin(Rxyz[1])
+    sz = sin(Rxyz[2])
+    cx = cos(Rxyz[0])
+    cy = cos(Rxyz[1])
+    cz = cos(Rxyz[2])
+
+    return [cy*cz           , cy*sz           , -sy  , Txyz[0], 
+            cz*sx*sy - cy*sz, cy*cz + sx*sy*sz, cy*sx, Txyz[1],
+            sx*sz + cy*cz*sy, cy*sy*sz - cz*sx, cy*cy, Txyz[2],
+            0.0             , 0.0             , 0.0  , 1.0]
+
 
 def makeRotEulerMtx2D(theta, rotAxe):
     """
@@ -334,8 +361,7 @@ def makeScale(x, y, z):
             0.0, 0.0, z,   0.0,
             0.0, 0.0, 0.0, 1.0]
 
-#our matrices and their operation should be based on row-major matrices -_-
-def mmul(m1, m2):
+def mmul(m2, m1):
     
     return [m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2] ,
             m1[1] * m2[0]  + m1[5] * m2[1]  + m1[9]  * m2[2] ,
