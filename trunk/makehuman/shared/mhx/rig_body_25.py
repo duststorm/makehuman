@@ -139,9 +139,6 @@ BodyArmature = [
 	('Breast_R',		45*D, 'DfmRib', F_DEF, L_DEF, NoBB),
 	('Breathe',			0.0, 'DfmRib', F_WIR, L_TORSO, NoBB),
 
-	('Penis',			0.0, 'Hips', 0, L_TORSO, (1,5,1) ),
-	('Scrotum',			0.0, 'Hips', 0, L_TORSO, NoBB),
-
 	('Penis',			0.0, 'Hips', F_DEF, L_DEF, (1,5,1) ),
 	('Scrotum',			0.0, 'Hips', F_DEF, L_DEF, NoBB),
 ]
