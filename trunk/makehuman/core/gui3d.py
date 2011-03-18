@@ -1457,6 +1457,18 @@ class FileChooser(View):
         self.files = []
         self.selection = ''
         
+    def __nextPos(self):
+        
+        if self.x > self.width - 140 - 10:
+            self.x = 10
+            self.y += 150
+            
+        pos = (self.x, self.y)
+        
+        self.x += 140
+        
+        return pos
+        
     def getPreview(self, filename):
         
         preview = filename
@@ -1486,22 +1498,18 @@ class FileChooser(View):
                         
         self.files.sort()
         
-        width, height = self.app.getWindowSize()
+        self.width, self.height = self.app.getWindowSize()
         
-        x = 10
-        y = 80
+        self.x = 10
+        self.y = 80
         for file in self.files:
             
-            if x > width - 140 - 10:
-                x = 10
-                y += 150
+            x, y = self.__nextPos()
                 
             FileChooserRectangle(self, [x, y, 9], os.path.join(self.path, self.getPreview(file)), file)
             if isinstance(self.extension, str):
                 file = file.replace(os.path.splitext(file)[-1], '')
             TextObject(self, [x, y + 134, 9.5], file)
-            
-            x += 140
             
         self.app.scene3d.update()
         self.app.redraw()
@@ -1519,19 +1527,16 @@ class FileChooser(View):
             
     def onResized(self, event):
         
-        width, height, _ = event
+        self.width, self.height, _ = event
         
-        x = 10
-        y = 80
+        self.x = 10
+        self.y = 80
+        x, y = self.__nextPos()
         for index, object in enumerate(self.objects):
-            
-            if x > width - 140 - 10:
-                x = 10
-                y += 150
             
             if index & 1:
                 object.setPosition([x, y + 134, 9])
-                x += 140
+                x, y = self.__nextPos()
             else:
                 object.setPosition([x, y, 9])
                
