@@ -45,7 +45,6 @@ class bvhJoint:
             self.transform = self.parent.transform[:]
             
         else:
-            
             self.transform = makeScale(0.25, 0.25, 0.25)
             
         m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
@@ -56,15 +55,14 @@ class bvhJoint:
             index = 0
             
             for index, channel in enumerate(self.channels):
+                #we scale things by 0.25
                 if channel == 'Xposition':
-                    m = makeTranslation(self.frames[frame][index], 0.0, 0.0)
-                    self.transform = mmul(self.transform, m)
+                    self.transform[3] = self.transform[3] + 0.25*self.frames[frame][index]
                 elif channel == 'Yposition':
-                    m = makeTranslation(0.0, self.frames[frame][index], 0.0)
-                    self.transform = mmul(self.transform, m)
+                    self.transform[7] = self.transform[7] + 0.25*self.frames[frame][index]
                 elif channel == 'Zposition':
-                    m = makeTranslation(0.0, 0.0, self.frames[frame][index])
-                    self.transform = mmul(self.transform, m)
+                    self.transform[11] = self.transform[11] + 0.25*self.frames[frame][index]
+                
                 if channel == 'Xrotation':
                     m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
                     self.transform = mmul(self.transform, m)
@@ -75,7 +73,7 @@ class bvhJoint:
                     m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index] * degree2rad)
                     self.transform = mmul(self.transform, m)
             
-        self.position = mtransform(self.transform, [0.0, 0.0, 0.0])
+        self.position = [self.transform[3], self.transform[7], self.transform[11]]
             
         for child in self.children:
             
