@@ -41,15 +41,15 @@ class BvhView(gui3d.TaskView):
         self.__skeleton.updateFrame(-1)
         self.__skeletonMesh = None
         self.__skeletonObject = None
-        
         self.bone = None
         
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*1+24*1+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*1+6));y+=25
 
         self.frameSlider = gui3d.Slider(self, position=[10, y, 9.3], value = 0, min = 0, max = self.__skeleton.frames, label = "Frame: 0");y+=36
         self.playPause = gui3d.Button(self, [18, y, 9.3], "Play");y+=24
-            
+        self.showHuman = gui3d.ToggleButton(self, [18,y,9.1],"Show Human"); y+=24
+        
         @self.frameSlider.event
         def onChanging(value):
             self.frameSlider.label.setText('Frame: %d' % value)
@@ -68,6 +68,17 @@ class BvhView(gui3d.TaskView):
             else:
                 self.playPause.label.setText('Play')
                 mh.removeTimer(self.timer)
+                
+        @self.showHuman.event
+        def onClicked(event):
+          self.showHuman.setSelected(not self.showHuman.selected)
+          if self.showHuman.selected:
+            self.app.selectedHuman.show()
+            self.getSkeleton().hide()
+          else:
+            self.app.selectedHuman.hide()
+            self.getSkeleton().show()
+
                 
     def onFrameChanged(self):
         
@@ -90,7 +101,6 @@ class BvhView(gui3d.TaskView):
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
-        
         self.app.selectedHuman.show()
         self.getSkeleton().hide()
         
@@ -260,22 +270,30 @@ class BvhView(gui3d.TaskView):
         mesh.verts[index+5].co = e
         
     def onMouseDragged(self, event):
-        
-        self.app.selectedHuman.show()
-        self.getSkeleton().hide()
-        
-        gui3d.TaskView.onMouseDragged(self, event)
-            
+      
+      self.app.selectedHuman.show()
+      self.getSkeleton().hide()
+      
+      gui3d.TaskView.onMouseDragged(self, event)
+      if self.showHuman.selected:
+        pass
+      else:
         self.app.selectedHuman.hide()
         self.getSkeleton().show()
         
     def onMouseWheel(self, event):
-        
+      
+      if self.showHuman.selected:
+        pass
+      else:
         self.app.selectedHuman.show()
         self.getSkeleton().hide()
-        
-        gui3d.TaskView.onMouseWheel(self, event)
-            
+      
+      gui3d.TaskView.onMouseWheel(self, event)
+      
+      if self.showHuman.selected:
+        pass
+      else:
         self.app.selectedHuman.hide()
         self.getSkeleton().show()
         
