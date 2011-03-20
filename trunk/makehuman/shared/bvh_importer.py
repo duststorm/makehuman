@@ -43,7 +43,7 @@ class bvhJoint(Joint):
     if frame >= 0 and frame < len(self.frames):
       index = 0
       
-      Rxyz = [0.0, 0.0, 0.0]
+      Ryxz = [0.0, 0.0, 0.0]
       Txyz = [0.0, 0.0, 0.0]
       for index, channel in enumerate(self.channels):
               if channel == 'Xposition':
@@ -54,12 +54,12 @@ class bvhJoint(Joint):
                   Txyz[2] = scale*self.frames[frame][index]
               
               if channel == 'Xrotation':
-                  Rxyz[1] = self.frames[frame][index] * degree2rad
+                  Ryxz[1] = self.frames[frame][index] * degree2rad
               elif channel == 'Yrotation':
-                  Rxyz[0] = self.frames[frame][index] * degree2rad
+                  Ryxz[0] = self.frames[frame][index] * degree2rad
               elif channel == 'Zrotation':
-                  Rxyz[2] = self.frames[frame][index] * degree2rad                 
-      m = euler2matrix(Rxyz, "syxz")
+                  Ryxz[2] = self.frames[frame][index] * degree2rad                 
+      m = euler2matrix(Ryxz, "syxz")
       m[3], m[7], m[11] = Txyz[0], Txyz[1], Txyz[2] 
       self.transform = mmul(self.transform, m) # parent post multiply with transformations
 
