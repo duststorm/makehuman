@@ -179,9 +179,7 @@ def exportMhx_25(human, fp):
 	proxyCopy('Proxy', human, rig, theConfig.proxyList, proxyData, fp)
 	proxyCopy('Clothes', human, rig, theConfig.proxyList, proxyData, fp)
 
-	fp.write("#if toggle&T_Armature\n")
 	copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData)	
-	fp.write("#endif\n")
 	return
 
 #
@@ -341,10 +339,12 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 
 			elif words[1] == 'ProxyObject':
 				fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
+				fp.write("#if toggle&T_Armature\n")
 				if proxy.rig:
 					fp.write("  parent Refer Object %s ;\n" % proxy.name)
 				else:
 					fp.write("  parent Refer Object %s ;\n" % theHuman)
+				fp.write("#endif\n")
 				if proxy.wire:
 					fp.write("  draw_type 'WIRE' ;\n")
 			elif words[1] == 'ProxyLayers':
@@ -419,6 +419,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 				if proxy and proxy.weights:
 					mh2proxy.writeRigWeights(fp, proxy.weights)
 				else:
+					fp.write("#if toggle&T_Armature\n")
 					if rig == 'mhx':
 						copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)
 						#copyVertGroups("shared/mhx/templates/vertexgroups-hand25.mhx", fp, proxy)
@@ -428,8 +429,9 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 						if proxy:
 							weights = mh2proxy.getProxyWeights(rig.weights, proxy)
 						else:
-							weights = rig.weights
+							weights = rig.weights					
 						mh2proxy.writeRigWeights(fp, weights)
+					fp.write("#endif\n")
 					copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)	
 					if theConfig.cage and not (proxy and proxy.cage):
 						fp.write("#if toggle&T_Cage\n")
@@ -459,9 +461,13 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 				pass
 				writeShapeKeys(fp, human, rig, "%sMesh" % theHuman, None)
 			elif words[1] == 'proxy-shapeKey':
+				fp.write("#if toggle&T_Cage\n")
 				proxyShapes('Cage', human, rig, proxyData, fp)
+				fp.write("#endif\n#if toggle&T_Proxy\n")
 				proxyShapes('Proxy', human, rig, proxyData, fp)
+				fp.write("#endif\n#if toggle&T_Clothes\n")
 				proxyShapes('Clothes', human, rig, proxyData, fp)
+				fp.write("#endif\n")
 			elif words[1] == 'mesh-animationData':
 				if rig == 'mhx':
 					writeAnimationData(fp, "%sMesh" % theHuman, None)

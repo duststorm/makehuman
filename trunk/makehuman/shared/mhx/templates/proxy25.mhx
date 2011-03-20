@@ -1,5 +1,6 @@
 NoScale False ;
 
+#if toggle&T_Armature
 *** ProxyRigStart
   use_deform_envelopes False ;
   use_deform_vertex_groups True ;
@@ -32,6 +33,7 @@ end Armature
 end Object
 
 *** ProxyPose
+#endif
 
 #endif
 
@@ -54,6 +56,7 @@ end Mesh
 
 *** ProxyObject
 *** ProxyLayers
+#if toggle&T_Armature
    *** toggleCage
     Modifier MeshDeform MESH_DEFORM
       invert_vertex_group False ;
@@ -78,9 +81,10 @@ end Mesh
     end Modifier
   #endif
 *** ProxyModifiers
+  parent_type 'OBJECT' ;
+#endif
   color Array 1.0 1.0 1.0 1.0  ;
   show_name True ;
-  parent_type 'OBJECT' ;
   select True ;
   lock_location Array 1 1 1 ; 
   lock_rotation Array 1 1 1 ;

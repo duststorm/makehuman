@@ -206,7 +206,6 @@ def proxyConfig(options=None):
 			elif key == 'cage':
 				typ = 'Cage'
 				typ = key.capitalize()
-				cfg.cage = True
 				layer = int(words[2])
 			elif key == 'clothes':
 				typ = 'Clothes'
@@ -216,6 +215,8 @@ def proxyConfig(options=None):
 				raise NameError('Unrecognized command %s in proxy.cfg' % words[1])
 		else:
 			proxyFile = os.path.expanduser(words[0])
+			if typ == 'Cage':
+				cfg.cage = True
 			cfg.proxyList.append((typ, useObj, useMhx, useDae, (proxyFile, typ, layer)))
 	fp.close()
 	print "Proxy configuration: Use %s" % cfg.mainmesh

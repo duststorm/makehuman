@@ -14839,6 +14839,7 @@ end Mesh
 
 *** human-object Mesh
   layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+#if toggle&T_Armature
   *** toggleCage
     Modifier MeshDeform MESH_DEFORM
       invert_vertex_group False ;
@@ -14862,9 +14863,10 @@ end Mesh
       use_vertex_groups True ;
     end Modifier
   #endif
-  color Array 1.0 1.0 1.0 1.0  ;
   *** refer-human parent ControlRig
   parent_type 'OBJECT' ;
+#endif
+  color Array 1.0 1.0 1.0 1.0  ;
   select True ;
   lock_location Array 1 1 1 ; 
   lock_rotation Array 1 1 1 ;
@@ -14873,7 +14875,9 @@ end Mesh
   Property MhxMesh True ;
 end Object
 
+#if toggle&T_Armature
 *** rig-process
+#endif
 
 
 
