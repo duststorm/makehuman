@@ -22,62 +22,68 @@ Abstract
 BVH importer
 """
 
-from aljabr import vadd, makeUnit, makeTranslation, makeRotation, mmul, mtransform, degree2rad, makeScale
+from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform
+from skeleton import Joint
 
-class bvhJoint:
+class bvhJoint(Joint):
+  def __init__(self, name):
+    Joint.__init__(self,name, [])
+    self.channels = None
+    self.frames = []
+  
+  def updateFrame(self, frame, scale=0.25):
+    if self.parent:
+        self.transform = self.parent.transform[:]
+    else:
+        self.transform = makeUnit() #makeScale(scale)
     
-    def __init__(self, name):
+    m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
+    self.transform = mmul(self.transform, m) #parent postmultiply with offset
+    
+    if frame >= 0 and frame < len(self.frames):
+      index = 0
+      for index, channel in enumerate(self.channels):
+      #we scale things by 0.25
+        if channel == 'Xposition':
+            self.transform[3] = self.transform[3] + scale*self.frames[frame][index]
+        elif channel == 'Yposition':
+            self.transform[7] = self.transform[7] + scale*self.frames[frame][index]
+        elif channel == 'Zposition':
+            self.transform[11] = self.transform[11] + scale*self.frames[frame][index]
         
-        self.name = name
-        self.offset = None
-        self.position = None
-        self.channels = None
-        self.parent = None
-        self.children = []
-        self.frames = []
-        self.transform = makeUnit()
-        
-    #Note: BVH rotation is a static ZXY , thus use szxy in matrix2euler
-    def calcTransform(self, frame, scale=0.25):
-        
-        if self.parent:
-            
-            self.transform = self.parent.transform[:]
-            
-        else:
-            self.transform = makeScale(scale)
-            
-        m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
-        self.transform = mmul(self.transform, m)
-        
-        if frame >= 0 and frame < len(self.frames):
-            
-            index = 0
-            
-            for index, channel in enumerate(self.channels):
-                #we scale things by 0.25
-                if channel == 'Xposition':
-                    self.transform[3] = self.transform[3] + scale*self.frames[frame][index]
-                elif channel == 'Yposition':
-                    self.transform[7] = self.transform[7] + scale*self.frames[frame][index]
-                elif channel == 'Zposition':
-                    self.transform[11] = self.transform[11] + scale*self.frames[frame][index]
-                
-                if channel == 'Xrotation':
-                    m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
-                    self.transform = mmul(self.transform, m)
-                elif channel == 'Yrotation':
-                    m = makeRotation([0.0, 1.0, 0.0], self.frames[frame][index] * degree2rad)
-                    self.transform = mmul(self.transform, m)
-                elif channel == 'Zrotation':
-                    m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index] * degree2rad)
-                    self.transform = mmul(self.transform, m)
-            
-        self.position = [self.transform[3], self.transform[7], self.transform[11]]
-            
-        for child in self.children:
-            
-            child.calcTransform(frame)
+        if channel == 'Xrotation':
+            m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
+            self.transform = mmul(self.transform, m)
+        elif channel == 'Yrotation':
+            m = makeRotation([0.0, 1.0, 0.0], self.frames[frame][index] * degree2rad)
+            self.transform = mmul(self.transform, m)
+        elif channel == 'Zrotation':
+            m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index] * degree2rad)
+            self.transform = mmul(self.transform, m)
+      """
+      Rxyz = [0.0, 0.0, 0.0]
+      Txyz = [0.0, 0.0, 0.0]
+      for index, channel in enumerate(self.channels):
+              if channel == 'Xposition':
+                  Txyz[0] = scale*self.frames[frame][index]
+              elif channel == 'Yposition':
+                  Txyz[1] = scale*self.frames[frame][index]
+              elif channel == 'Zposition':
+                  Txyz[2] = scale*self.frames[frame][index]
+              
+              if channel == 'Xrotation':
+                  Rxyz[0] = self.frames[frame][index] * degree2rad
+              elif channel == 'Yrotation':
+                  Rxyz[1] = self.frames[frame][index] * degree2rad
+              elif channel == 'Zrotation':
+                  Rxyz[2] = self.frames[frame][index] * degree2rad
+                  
+      m = makeTransform(Rxyz, Txyz)
+      self.transform = mmul(self.transform, m) # parent post multiply with transformations
+      """
+    
+    for child in self.children:
+        child.updateFrame(frame)
 
 class bvhSkeleton:
     
@@ -103,18 +109,17 @@ class bvhSkeleton:
         self.frameTime = float(items[2])
             
         for i in range(self.frames):
-            
             line = self.file.readline()
             items = line.split()
             data = [float(item) for item in items]
             data = self.__getChannelData(self.root, data)
                 
-    def __readJoint(self, joint):
+    def __readJoint(self, joint, scale=0.25):
         
         self.__expectKeyword('{')
 
         items = self.__expectKeyword('OFFSET')
-        joint.offset = [float(x) for x in items[1:]]
+        joint.offset = [scale*float(x) for x in items[1:]]
         
         if joint.parent:
             joint.position = vadd(joint.parent.position, joint.offset)
@@ -149,7 +154,7 @@ class bvhSkeleton:
                 self.__expectKeyword('{')
                 
                 items = self.__expectKeyword('OFFSET')
-                child.offset = [float(x) for x in items[1:]]
+                child.offset = [scale*float(x) for x in items[1:]]
                 child.position = vadd(joint.position, child.offset)
                 
                 self.__expectKeyword('}')
@@ -183,6 +188,5 @@ class bvhSkeleton:
         
         return data
         
-    def updateFrame(self, frame):
-        
-        self.root.calcTransform(frame)
+    def updateFrame(self, frame, scale = 0.25):
+        self.root.updateFrame(frame)

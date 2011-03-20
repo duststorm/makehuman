@@ -97,7 +97,11 @@ class SkeletonView(gui3d.TaskView):
          
         #self.__addCube(self.__skeletonMesh, joint.position, aljabr.vlen(joint.offset) / 10.0, joint.name.replace('joint', 'bone'))
         if joint.parent:
-            self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, joint.name.replace('joint', 'bone'))
+            position = [joint.transform[3],joint.transform[7],joint.transform[11]]
+            parentPosition = [joint.parent.transform[3],
+                              joint.parent.transform[7],
+                              joint.parent.transform[11]]
+            self.__addPrism(self.__skeletonMesh, position, parentPosition, joint.name.replace('joint', 'bone'))
         
         for child in joint.children:
             self.__buildBoneMesh(child)

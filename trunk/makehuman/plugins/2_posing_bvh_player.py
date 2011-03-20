@@ -130,7 +130,12 @@ class BvhView(gui3d.TaskView):
     def __buildBoneMesh(self, joint):
          
         if joint.parent:
-            joint.p = self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, 'bone-' + joint.name)
+            position = [joint.transform[3],joint.transform[7],joint.transform[11]]
+            parentPosition = [joint.parent.transform[3],
+                              joint.parent.transform[7],
+                              joint.parent.transform[11]]
+            joint.p = self.__addPrism(self.__skeletonMesh, parentPosition, position, 'bone-' + joint.name)
+            #joint.p = self.__addPrism(self.__skeletonMesh, joint.parent.position, joint.position, 'bone-' + joint.name)
         
         for child in joint.children:
             self.__buildBoneMesh(child)
@@ -146,10 +151,14 @@ class BvhView(gui3d.TaskView):
         self.__skeletonMesh.update()
         
     def __updateBoneMesh(self, joint, index):
-        
+
         if joint.parent:
-            self.__updatePrism(self.__skeletonMesh, joint.parent.position, joint.position, index, joint.p)
-            index += 6
+          position = [joint.transform[3],joint.transform[7],joint.transform[11]]
+          parentPosition = [joint.parent.transform[3],
+                            joint.parent.transform[7],
+                            joint.parent.transform[11]]
+          self.__updatePrism(self.__skeletonMesh, parentPosition, position, index, joint.p)
+          index += 6
         
         for child in joint.children:
             index = self.__updateBoneMesh(child, index)

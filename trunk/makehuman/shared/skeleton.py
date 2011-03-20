@@ -42,12 +42,12 @@ class Joint:
         self.name = name
         self.parent = None
         self.children = children
-        self.position = [0.0, 0.0, 0.0]         # Global position in the scene
         self.offset = [0.0, 0.0, 0.0]           # Position Relative to the parent joint
         self.direction = [0.0, 0.0, 0.0, 0.0]   # Global rotation in the scene        
         # 
-        self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
+        #self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         # xyz limits
+        self.transform = None
         self.limits = [[-180,180],[-180,180],[-180,180]]
         self.bindedVects = []
         self.index = 0
@@ -55,48 +55,59 @@ class Joint:
         
         for child in children:
             child.parent = self
+    """    
+    def calcTransform(self, transform, scale=1.0):
+      if self.parent:
+          self.transform = self.parent.transform[:]
+      else:
+          self.transform = makeScale(scale)
+          
+      m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
+      self.transform = mmul(self.transform, m)
+      self.transform = mmul(self.transform, transform)
+          
+      for child in self.children:
+          child.calcTransform(transform)
+    """
 
 class Skeleton:
     
-    def __init__(self):
-        
-        self.root = Joint('joint-pelvis', [Joint('joint-spine4', [Joint('joint-spine3', [Joint('joint-spine2', [Joint('joint-spine1', [Joint('joint-neck', [Joint('joint-head', [Joint('joint-mouth',
-            []), Joint('joint-l-eye', []), Joint('joint-r-eye', [])])]), Joint('joint-r-clavicle', [Joint('joint-r-scapula', [Joint('joint-r-shoulder', [Joint('joint-r-elbow',
-            [Joint('joint-r-hand', [Joint('joint-r-finger-1-1', [Joint('joint-r-finger-1-2', [Joint('joint-r-finger-1-3', [])])]), Joint('joint-r-finger-2-1',
-            [Joint('joint-r-finger-2-2', [Joint('joint-r-finger-2-3', [])])]), Joint('joint-r-finger-3-1', [Joint('joint-r-finger-3-2',
-            [Joint('joint-r-finger-3-3', [])])]), Joint('joint-r-finger-4-1', [Joint('joint-r-finger-4-2', [Joint('joint-r-finger-4-3', [])])]),
-            Joint('joint-r-finger-5-1', [Joint('joint-r-finger-5-2', [Joint('joint-r-finger-5-3', [])])])])])])])]), 
-            Joint('joint-l-clavicle', [Joint('joint-l-scapula',
-            [Joint('joint-l-shoulder', [Joint('joint-l-elbow', [Joint('joint-l-hand', [Joint('joint-l-finger-1-1', [Joint('joint-l-finger-1-2',
-            [Joint('joint-l-finger-1-3', [])])]), Joint('joint-l-finger-2-1', [Joint('joint-l-finger-2-2', [Joint('joint-l-finger-2-3', [])])]),
-            Joint('joint-l-finger-3-1', [Joint('joint-l-finger-3-2', [Joint('joint-l-finger-3-3', [])])]), Joint('joint-l-finger-4-1',
-            [Joint('joint-l-finger-4-2', [Joint('joint-l-finger-4-3', [])])]), Joint('joint-l-finger-5-1', [Joint('joint-l-finger-5-2',
-            [Joint('joint-l-finger-5-3', [])])])])])])])])
-            ])])]), 
-            Joint('joint-r-upper-leg', [Joint('joint-r-knee', [Joint('joint-r-ankle',
-            [Joint('joint-r-toe-1-1', [Joint('joint-r-toe-1-2', [])]), Joint('joint-r-toe-2-1', [Joint('joint-r-toe-2-2', [Joint('joint-r-toe-2-3', [])])]),
-            Joint('joint-r-toe-3-1', [Joint('joint-r-toe-3-2', [Joint('joint-r-toe-3-3', [])])]), Joint('joint-r-toe-4-1', [Joint('joint-r-toe-4-2',
-            [Joint('joint-r-toe-4-3', [])])]), Joint('joint-r-toe-5-1', [Joint('joint-r-toe-5-2', [Joint('joint-r-toe-5-3', [])])])])])]),
-            Joint('joint-l-upper-leg', [Joint('joint-l-knee', [Joint('joint-l-ankle', [Joint('joint-l-toe-1-1', [Joint('joint-l-toe-1-2', [])]),
-            Joint('joint-l-toe-2-1', [Joint('joint-l-toe-2-2', [Joint('joint-l-toe-2-3', [])])]), Joint('joint-l-toe-3-1', [Joint('joint-l-toe-3-2',
-            [Joint('joint-l-toe-3-3', [])])]), Joint('joint-l-toe-4-1', [Joint('joint-l-toe-4-2', [Joint('joint-l-toe-4-3', [])])]), Joint('joint-l-toe-5-1',
-            [Joint('joint-l-toe-5-2', [Joint('joint-l-toe-5-3', [])])])])])])])])
-        
-        #if (humanMesh):
-        file = open("data/joint-bindings.txt")
-        while (1): #don't you love it when infinite loops break the proggie
-          line = file.readline()
-          line = line.rstrip()
-          #print "joint-"+line
-          if not line: break 
-          j = self.__getJoint(self.root, "joint-"+line)
-          line = file.readline()
-          line = line.split()
-          for vert in line:
-            j.bindedVects.append(int(vert))
-        
-        self.joints = 0
-        self.endEffectors = 0
+    def __init__(self):        
+      self.root = Joint('joint-pelvis', [Joint('joint-spine4', [Joint('joint-spine3', [Joint('joint-spine2', [Joint('joint-spine1', [Joint('joint-neck', [Joint('joint-head', [Joint('joint-mouth',
+          []), Joint('joint-l-eye', []), Joint('joint-r-eye', [])])]), Joint('joint-r-clavicle', [Joint('joint-r-scapula', [Joint('joint-r-shoulder', [Joint('joint-r-elbow',
+          [Joint('joint-r-hand', [Joint('joint-r-finger-1-1', [Joint('joint-r-finger-1-2', [Joint('joint-r-finger-1-3', [])])]), Joint('joint-r-finger-2-1',
+          [Joint('joint-r-finger-2-2', [Joint('joint-r-finger-2-3', [])])]), Joint('joint-r-finger-3-1', [Joint('joint-r-finger-3-2',
+          [Joint('joint-r-finger-3-3', [])])]), Joint('joint-r-finger-4-1', [Joint('joint-r-finger-4-2', [Joint('joint-r-finger-4-3', [])])]),
+          Joint('joint-r-finger-5-1', [Joint('joint-r-finger-5-2', [Joint('joint-r-finger-5-3', [])])])])])])])]), 
+          Joint('joint-l-clavicle', [Joint('joint-l-scapula',
+          [Joint('joint-l-shoulder', [Joint('joint-l-elbow', [Joint('joint-l-hand', [Joint('joint-l-finger-1-1', [Joint('joint-l-finger-1-2',
+          [Joint('joint-l-finger-1-3', [])])]), Joint('joint-l-finger-2-1', [Joint('joint-l-finger-2-2', [Joint('joint-l-finger-2-3', [])])]),
+          Joint('joint-l-finger-3-1', [Joint('joint-l-finger-3-2', [Joint('joint-l-finger-3-3', [])])]), Joint('joint-l-finger-4-1',
+          [Joint('joint-l-finger-4-2', [Joint('joint-l-finger-4-3', [])])]), Joint('joint-l-finger-5-1', [Joint('joint-l-finger-5-2',
+          [Joint('joint-l-finger-5-3', [])])])])])])])])
+          ])])]), 
+          Joint('joint-r-upper-leg', [Joint('joint-r-knee', [Joint('joint-r-ankle',
+          [Joint('joint-r-toe-1-1', [Joint('joint-r-toe-1-2', [])]), Joint('joint-r-toe-2-1', [Joint('joint-r-toe-2-2', [Joint('joint-r-toe-2-3', [])])]),
+          Joint('joint-r-toe-3-1', [Joint('joint-r-toe-3-2', [Joint('joint-r-toe-3-3', [])])]), Joint('joint-r-toe-4-1', [Joint('joint-r-toe-4-2',
+          [Joint('joint-r-toe-4-3', [])])]), Joint('joint-r-toe-5-1', [Joint('joint-r-toe-5-2', [Joint('joint-r-toe-5-3', [])])])])])]),
+          Joint('joint-l-upper-leg', [Joint('joint-l-knee', [Joint('joint-l-ankle', [Joint('joint-l-toe-1-1', [Joint('joint-l-toe-1-2', [])]),
+          Joint('joint-l-toe-2-1', [Joint('joint-l-toe-2-2', [Joint('joint-l-toe-2-3', [])])]), Joint('joint-l-toe-3-1', [Joint('joint-l-toe-3-2',
+          [Joint('joint-l-toe-3-3', [])])]), Joint('joint-l-toe-4-1', [Joint('joint-l-toe-4-2', [Joint('joint-l-toe-4-3', [])])]), Joint('joint-l-toe-5-1',
+          [Joint('joint-l-toe-5-2', [Joint('joint-l-toe-5-3', [])])])])])])])])
+      
+      file = open("data/joint-bindings.txt")
+      while (1): 
+        line = file.readline()
+        line = line.rstrip()
+        if not line: break 
+        j = self.__getJoint(self.root, "joint-"+line)
+        line = file.readline()
+        line = line.split()
+        for vert in line:
+          j.bindedVects.append(int(vert))
+      
+      self.joints = 0
+      self.endEffectors = 0
             
     def update(self, mesh):
         

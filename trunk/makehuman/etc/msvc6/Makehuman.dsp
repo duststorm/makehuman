@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /vmg /GX /O2 /I "D:\Program Files\Python25\include" /I "E:\MY PROJECTS\EXTLIB\SDL\INCLUDE" /I "E:\MY PROJECTS\MAKEHUMAN\INCLUDE" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "UNICODE" /YX /FD /c
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
 # ADD RSC /l 0x809 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -50,8 +50,8 @@ BSC32=bscmake.exe
 # SUBTRACT BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 SDLmain.lib SDL.lib glu32.lib opengl32.lib msvcrt.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib python25.lib /nologo /subsystem:console /machine:I386 /nodefaultlib:"libcd.lib" /nodefaultlib:"libc.lib"
-# SUBTRACT LINK32 /pdb:none /nodefaultlib
+# ADD LINK32 SDLmain.lib SDL.lib glu32.lib opengl32.lib msvcrt.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib python25.lib /nologo /subsystem:console /machine:I386 /nodefaultlib:"libcd.lib" /nodefaultlib:"libc.lib" /nodefaultlib:"libcmt.lib" /libpath:"E:\MY PROJECTS\EXTLIB\SDL\LIB" /libpath:"D:\PROGRAM FILES\PYTHON25\LIBS" /opt:ref
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "Makehuman - Win32 Debug"
 
@@ -88,6 +88,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\..\src\arraybuffer.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\src\core.c
 # End Source File
 # Begin Source File
@@ -102,6 +106,10 @@ SOURCE=..\..\src\main.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=..\..\include\arraybuffer.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\include\core.h
