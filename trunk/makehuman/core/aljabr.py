@@ -681,7 +681,8 @@ def makeRotation(axis, angle):
             x*y * t + z*s, y*y * t + c,   y*z * t - x*s, 0.0,
             x*z * t - y*s, y*z * t + x*s, z*z * t + c,   0.0,
             0.0,           0.0,           0.0,           1.0]
-            
+
+"""
 def makeScale(x, y, z):
     
     return [x,   0.0, 0.0, 0.0,
@@ -689,6 +690,17 @@ def makeScale(x, y, z):
             0.0, 0.0, z,   0.0,
             0.0, 0.0, 0.0, 1.0]
 
+"""
+
+def makeScale(scale):    
+    if type(scale) is float:
+      scale = [scale,scale,scale]
+    
+    return [scale[0],   0.0, 0.0, 0.0,
+            0.0, scale[1],   0.0, 0.0,
+            0.0, 0.0, scale[2],   0.0,
+            0.0, 0.0, 0.0, 1.0]
+            
 def mtransform(m, v):         
     return[m[0]*v[0] + m[1]*v[1] + m[2]*v[2]  + m[3],
            m[4]*v[0] + m[5]*v[1] + m[6]*v[2]  + m[7],

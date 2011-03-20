@@ -38,14 +38,14 @@ class bvhJoint:
         self.transform = makeUnit()
         
     #Note: BVH rotation is a static ZXY , thus use szxy in matrix2euler
-    def calcTransform(self, frame):
+    def calcTransform(self, frame, scale=0.25):
         
         if self.parent:
             
             self.transform = self.parent.transform[:]
             
         else:
-            self.transform = makeScale(0.25, 0.25, 0.25)
+            self.transform = makeScale(scale)
             
         m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
         self.transform = mmul(self.transform, m)
@@ -57,11 +57,11 @@ class bvhJoint:
             for index, channel in enumerate(self.channels):
                 #we scale things by 0.25
                 if channel == 'Xposition':
-                    self.transform[3] = self.transform[3] + 0.25*self.frames[frame][index]
+                    self.transform[3] = self.transform[3] + scale*self.frames[frame][index]
                 elif channel == 'Yposition':
-                    self.transform[7] = self.transform[7] + 0.25*self.frames[frame][index]
+                    self.transform[7] = self.transform[7] + scale*self.frames[frame][index]
                 elif channel == 'Zposition':
-                    self.transform[11] = self.transform[11] + 0.25*self.frames[frame][index]
+                    self.transform[11] = self.transform[11] + scale*self.frames[frame][index]
                 
                 if channel == 'Xrotation':
                     m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
