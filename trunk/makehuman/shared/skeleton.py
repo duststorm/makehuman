@@ -110,7 +110,6 @@ class Skeleton:
       self.endEffectors = 0
             
     def update(self, mesh):
-        
         self.__calcJointOffsets(mesh, self.root)
         
     def getJoint(self, name):

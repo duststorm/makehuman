@@ -54,11 +54,16 @@ class BvhView(gui3d.TaskView):
         def onChanging(value):
             self.frameSlider.label.setText('Frame: %d' % value)
             self.__updateSkeletonMesh(value-1)
+            self.__updateHumanMesh(self.__skeleton.root)
+            self.app.selectedHuman.meshData.calcNormals()
+            self.app.selectedHuman.meshData.update()
             
         @self.frameSlider.event
         def onChange(value):
             self.frameSlider.label.setText('Frame: %d' % value)
             self.__updateSkeletonMesh(value-1)
+            #self.app.selectedHuman.meshData.calcNormals()
+            #self.app.selectedHuman.human.update()
                 
         @self.playPause.event
         def onClicked(value):
@@ -159,7 +164,17 @@ class BvhView(gui3d.TaskView):
         
         self.__skeletonMesh.calcNormals()
         self.__skeletonMesh.update()
-        
+
+    def __updateHumanMesh(self, joint, verts=None):
+      if not verts:
+        verts = self.app.selectedHuman.meshData.verts
+      for i in joint.bindedVects:
+        verts[i].co = mtransform(joint.transform, verts[i].co)
+      for child in joint.children:
+        self.__updateHumanMesh(child,verts)
+      #note: don't do skeleton update
+      
+      
     def __updateBoneMesh(self, joint, index):
 
         if joint.parent:
