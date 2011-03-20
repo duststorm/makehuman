@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform
+from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit
 from math import acos
 
 class Joint:
@@ -47,7 +47,7 @@ class Joint:
         # 
         #self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         # xyz limits
-        self.transform = None
+        self.transform = makeUnit()
         self.limits = [[-180,180],[-180,180],[-180,180]]
         self.bindedVects = []
         self.index = 0
@@ -151,7 +151,8 @@ class Skeleton:
         for f in g.faces:
             for v in f.verts:
                 verts.append(v.co)
-        joint.position = centroid(verts)
+        position = centroid(verts)
+        joint.transform[3], joint.transform[7], joint.transform[11] = position[0], position[1], position[2] 
 
         # Calculate offset
         if parent:

@@ -22,7 +22,7 @@ Abstract
 BVH importer
 """
 
-from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform
+from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform, euler2matrix
 from skeleton import Joint
 
 class bvhJoint(Joint):
@@ -42,25 +42,7 @@ class bvhJoint(Joint):
     
     if frame >= 0 and frame < len(self.frames):
       index = 0
-      for index, channel in enumerate(self.channels):
-      #we scale things by 0.25
-        if channel == 'Xposition':
-            self.transform[3] = self.transform[3] + scale*self.frames[frame][index]
-        elif channel == 'Yposition':
-            self.transform[7] = self.transform[7] + scale*self.frames[frame][index]
-        elif channel == 'Zposition':
-            self.transform[11] = self.transform[11] + scale*self.frames[frame][index]
-        
-        if channel == 'Xrotation':
-            m = makeRotation([1.0, 0.0, 0.0], self.frames[frame][index] * degree2rad)
-            self.transform = mmul(self.transform, m)
-        elif channel == 'Yrotation':
-            m = makeRotation([0.0, 1.0, 0.0], self.frames[frame][index] * degree2rad)
-            self.transform = mmul(self.transform, m)
-        elif channel == 'Zrotation':
-            m = makeRotation([0.0, 0.0, 1.0], self.frames[frame][index] * degree2rad)
-            self.transform = mmul(self.transform, m)
-      """
+      
       Rxyz = [0.0, 0.0, 0.0]
       Txyz = [0.0, 0.0, 0.0]
       for index, channel in enumerate(self.channels):
@@ -72,15 +54,15 @@ class bvhJoint(Joint):
                   Txyz[2] = scale*self.frames[frame][index]
               
               if channel == 'Xrotation':
-                  Rxyz[0] = self.frames[frame][index] * degree2rad
-              elif channel == 'Yrotation':
                   Rxyz[1] = self.frames[frame][index] * degree2rad
+              elif channel == 'Yrotation':
+                  Rxyz[0] = self.frames[frame][index] * degree2rad
               elif channel == 'Zrotation':
-                  Rxyz[2] = self.frames[frame][index] * degree2rad
-                  
-      m = makeTransform(Rxyz, Txyz)
+                  Rxyz[2] = self.frames[frame][index] * degree2rad                 
+      m = euler2matrix(Rxyz, "syxz")
+      m[3], m[7], m[11] = Txyz[0], Txyz[1], Txyz[2] 
       self.transform = mmul(self.transform, m) # parent post multiply with transformations
-      """
+
     
     for child in self.children:
         child.updateFrame(frame)

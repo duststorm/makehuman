@@ -294,7 +294,8 @@ def _transpose(M,rows=0,cols=0):
     @type  M:  iterable of doubles or integers
     @param M:  the input flat matrix (row-major) that we want to transpose
     """
-    ret = array('d')
+    #ret = array('d')
+    ret = []
     for i in xrange(cols):
         for j in xrange(rows):
             ret.append(M[i+j*rows])
@@ -592,8 +593,8 @@ def makeTransform(Rxyz, Txyz):
     cz = cos(Rxyz[2])
 
     return [cy*cz           , cy*sz           , -sy  , Txyz[0], 
-            cz*sx*sy - cy*sz, cy*cz + sx*sy*sz, cy*sx, Txyz[1],
-            sx*sz + cy*cz*sy, cy*sy*sz - cz*sx, cy*cy, Txyz[2],
+            cz*sx*sy - cx*sz, cx*cz + sx*sy*sz, cy*sx, Txyz[1],
+            sx*sz + cx*cz*sy, cx*sy*sz - cz*sx, cx*cy, Txyz[2],
             0.0             , 0.0             , 0.0  , 1.0]
 
 
@@ -777,25 +778,25 @@ def euler2matrix(rotation, axes='sxyz'):
 
     m = makeUnit()
     if repetition:
-        m[i+4*i] = cj
-        m[i+4*j] = sj*si
-        m[i+4*k] = sj*ci
-        m[j+4*i] = sj*sk
-        m[j+4*j] = -cj*ss+cc
-        m[j+4*k] = -cj*cs-sc
-        m[k+4*i] = -sj*ck
-        m[k+4*j] = cj*sc+cs
-        m[k+4*k] = cj*cc-ss
+        m[4*i+i] = cj
+        m[4*i+j] = sj*si
+        m[4*i+k] = sj*ci
+        m[4*j+i] = sj*sk
+        m[4*j+j] = -cj*ss+cc
+        m[4*j+k] = -cj*cs-sc
+        m[4*k+i] = -sj*ck
+        m[4*k+j] = cj*sc+cs
+        m[4*k+k] = cj*cc-ss
     else:
-        m[i+4*i] = cj*ck
-        m[i+4*j] = sj*sc-cs
-        m[i+4*k] = sj*cc+ss
-        m[j+4*i] = cj*sk
-        m[j+4*j] = sj*ss+cc
-        m[j+4*k] = sj*cs-sc
-        m[k+4*i] = -sj
-        m[k+4*j] = cj*si
-        m[k+4*k] = cj*ci
+        m[4*i+i] = cj*ck
+        m[4*i+j] = sj*sc-cs
+        m[4*i+k] = sj*cc+ss
+        m[4*j+i] = cj*sk
+        m[4*j+j] = sj*ss+cc
+        m[4*j+k] = sj*cs-sc
+        m[4*k+i] = -sj
+        m[4*k+j] = cj*si
+        m[4*k+k] = cj*ci
     return m
   
 #converts a matrix (flat, homogenous row-major transformation)  to rotation, position
