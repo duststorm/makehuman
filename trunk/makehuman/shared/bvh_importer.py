@@ -25,35 +25,12 @@ BVH importer
 from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform, euler2matrix, vmul
 from skeleton import Joint
 
-bvhToMhMapping = {
-    'Hips':'joint-pelvis',
-    'LeftHip':'joint-l-upper-leg',
-    'RightHip':'joint-r-upper-leg',
-    'LeftKnee':'joint-l-knee',
-    'RightKnee':'joint-r-knee',
-    'LeftAnkle':'joint-l-ankle',
-    'RightAnkle':'joint-r-ankle',
-    'Chest':'joint-spine1',
-    'CS_BVH':'joint-spine2',
-    'LeftCollar':'joint-l-clavicle',
-    'RightCollar':'joint-r-clavicle',
-    'LeftShoulder':'joint-l-shoulder',
-    'RightShoulder':'joint-r-shoulder',
-    'LeftElbow':'joint-l-elbow',
-    'RightElbow':'joint-r-elbow',
-    'LeftWrist':'joint-l-hand',
-    'RightWrist':'joint-r-hand',
-    'Neck':'joint-neck',
-    'Head':'joint-head'
-}
-
-mhToBvhMapping = dict([(value, key) for key, value in bvhToMhMapping.iteritems()])
-
 class bvhJoint(Joint):
   def __init__(self, name):
     Joint.__init__(self,name, [])
     self.channels = None
     self.frames = []
+    self.rotation = [0.0, 0.0, 0.0]
   
   def updateFrame(self, frame, scale=0.25):
       
@@ -61,15 +38,9 @@ class bvhJoint(Joint):
         self.transform = self.parent.transform[:]
     else:
         self.transform = makeUnit() #makeScale(scale)
-        
-    self.humanTransform = self.transform[:]
     
     m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
     self.transform = mmul(self.transform, m) #parent postmultiply with offset
-    
-    rotationCenter = [self.transform[3], self.transform[7], self.transform[11]]
-    m = makeTranslation(*vmul(rotationCenter, -1)) # TODO: these need to be human skeleton offsets
-    self.humanTransform = mmul(self.humanTransform, m)
     
     if frame >= 0 and frame < len(self.frames):
         index = 0
@@ -89,14 +60,11 @@ class bvhJoint(Joint):
             elif channel == 'Yrotation':
                 Ryxz[0] = self.frames[frame][index] * degree2rad
             elif channel == 'Zrotation':
-                Ryxz[2] = self.frames[frame][index] * degree2rad                 
+                Ryxz[2] = self.frames[frame][index] * degree2rad
+        self.rotation = Ryxz[:]
         m = euler2matrix(Ryxz, "syxz")
         m[3], m[7], m[11] = Txyz[0], Txyz[1], Txyz[2] 
         self.transform = mmul(self.transform, m) # parent post multiply with transformations
-        self.humanTransform = mmul(self.humanTransform, m)
-      
-    m = makeTranslation(*rotationCenter) # TODO: these need to be human skeleton offsets
-    self.humanTransform = mmul(self.humanTransform, m)
     
     for child in self.children:
         child.updateFrame(frame)
@@ -129,21 +97,6 @@ class bvhSkeleton:
             items = line.split()
             data = [float(item) for item in items]
             data = self.__getChannelData(self.root, data)
-            
-        file = open("data/joint-bindings.txt")
-        while (1): 
-            line = file.readline()
-            line = line.rstrip()
-            if not line: break
-            name = "joint-"+line
-            j = self.getJoint(mhToBvhMapping.get(name, ''))
-            line = file.readline()
-            line = line.split()
-            if j:
-                for vert in line:
-                    j.bindedVects.append(int(vert))
-            else:
-                print '%s not found' % name
                 
     def getJoint(self, name):
         

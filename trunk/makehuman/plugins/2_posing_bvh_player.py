@@ -27,8 +27,33 @@ import gui3d
 import module3d
 import aljabr
 from bvh_importer import bvhSkeleton
+from skeleton import Skeleton
 from math import pi
 import mh
+
+bvhToMhMapping = {
+    'Hips':'joint-pelvis',
+    'LeftHip':'joint-l-upper-leg',
+    'RightHip':'joint-r-upper-leg',
+    'LeftKnee':'joint-l-knee',
+    'RightKnee':'joint-r-knee',
+    'LeftAnkle':'joint-l-ankle',
+    'RightAnkle':'joint-r-ankle',
+    'Chest':'joint-spine1',
+    'CS_BVH':'joint-spine2',
+    'LeftCollar':'joint-l-clavicle',
+    'RightCollar':'joint-r-clavicle',
+    'LeftShoulder':'joint-l-shoulder',
+    'RightShoulder':'joint-r-shoulder',
+    'LeftElbow':'joint-l-elbow',
+    'RightElbow':'joint-r-elbow',
+    'LeftWrist':'joint-l-hand',
+    'RightWrist':'joint-r-hand',
+    'Neck':'joint-neck',
+    'Head':'joint-head'
+}
+
+mhToBvhMapping = dict([(value, key) for key, value in bvhToMhMapping.iteritems()])
 
 class BvhView(gui3d.TaskView):
 
@@ -43,6 +68,8 @@ class BvhView(gui3d.TaskView):
         self.__skeletonObject = None
         self.bone = None
         
+        self.__humanSkeleton = Skeleton()
+        
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*1+6));y+=25
 
@@ -54,7 +81,7 @@ class BvhView(gui3d.TaskView):
         def onChanging(value):
             self.frameSlider.label.setText('Frame: %d' % value)
             self.__updateSkeletonMesh(value-1)
-            self.__updateHumanMesh(self.__skeleton.root)
+            self.__updateHumanMesh(self.__humanSkeleton.root)
             self.app.selectedHuman.meshData.calcNormals()
             self.app.selectedHuman.meshData.update()
             
@@ -62,7 +89,7 @@ class BvhView(gui3d.TaskView):
         def onChange(value):
             self.frameSlider.label.setText('Frame: %d' % value)
             self.__updateSkeletonMesh(value-1)
-            self.__updateHumanMesh(self.__skeleton.root)
+            self.__updateHumanMesh(self.__humanSkeleton.root)
             self.app.selectedHuman.meshData.calcNormals()
             self.app.selectedHuman.meshData.update()
                 
@@ -169,6 +196,15 @@ class BvhView(gui3d.TaskView):
 
     def __updateHumanMesh(self, joint, src=None, dst=None):
         
+        # copy angles
+        bvhName = mhToBvhMapping.get(joint.name, '')
+        if bvhName:
+            bvhJoint = self.__skeleton.getJoint(bvhName)
+            joint.rotation = bvhJoint.rotation[:]
+        else:
+            joint.rotation = [0.0, 0.0, 0.0]
+        joint.calcTransform()
+                
         if not src:
             src = self.app.selectedHuman.meshStored
             
@@ -176,7 +212,7 @@ class BvhView(gui3d.TaskView):
             dst = self.app.selectedHuman.meshData.verts
             
         for i in joint.bindedVects:
-            dst[i].co = aljabr.mtransform(joint.humanTransform, src[i])
+            dst[i].co = aljabr.mtransform(joint.transform, src[i])
         
         for child in joint.children:
             self.__updateHumanMesh(child, src, dst)
