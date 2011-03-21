@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit, makeTranslation, mmul, euler2matrix, mtransform
+from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit, makeTranslation, mmul, euler2matrix, mtransform, invTransform
 from math import acos
 
 class Joint:
@@ -43,14 +43,15 @@ class Joint:
         self.parent = None
         self.children = children
         self.position = [0.0, 0.0, 0.0]
+        self.translation = [0.0, 0.0, 0.0]
         self.rotation = [0.0, 0.0, 0.0]
         self.offset = [0.0, 0.0, 0.0]           # Position Relative to the parent joint
         self.direction = [0.0, 0.0, 0.0, 0.0]   # Global rotation in the scene        
         # 
         #self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         # xyz limits
+        self.inverseTransform = makeUnit()
         self.transform = makeUnit()
-        self.rotationTransform = makeUnit()
         self.limits = [[-180,180],[-180,180],[-180,180]]
         self.bindedVects = []
         self.index = 0
@@ -58,48 +59,35 @@ class Joint:
         
         for child in children:
             child.parent = self
-    """    
-    def calcTransform(self, transform, scale=1.0):
-      if self.parent:
-          self.transform = self.parent.transform[:]
-      else:
-          self.transform = makeScale(scale)
-          
-      m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
-      self.transform = mmul(self.transform, m)
-      self.transform = mmul(self.transform, transform)
-          
-      for child in self.children:
-          child.calcTransform(transform)
-    """
+    
+    def calcInverseTransform(self):
+      
+        if self.parent:
+            self.inverseTransform = self.parent.inverseTransform[:]
+        else:
+            self.inverseTransform = makeUnit()
+            
+        m = makeTranslation(*self.offset)
+        self.inverseTransform = mmul(self.inverseTransform, m)
+        
+        for child in self.children:
+            child.calcInverseTransform()
+                
+        self.inverseTransform = invTransform(self.inverseTransform)
     
     def calcTransform(self, recursive=True):
       
         if self.parent:
             self.transform = self.parent.transform[:]
-            self.rotationTransform = self.parent.rotationTransform[:]
         else:
             self.transform = makeUnit()
-            self.rotationTransform = makeUnit()
             
-        # Calc complete transform
         m = makeTranslation(*self.offset)
         self.transform = mmul(self.transform, m)
+        #m = makeTranslation(*self.translation)
+        #self.transform = mmul(self.transform, m)
         m = euler2matrix(self.rotation, "syxz")
         self.transform = mmul(self.transform, m)
-        
-        # Calc rotation transform
-        
-        rotationOrigin = mtransform(self.transform, [0.0, 1.042996875, 0.082753249999999987])
-        
-        m = makeTranslation(*vmul(rotationOrigin, -1.0))
-        self.rotationTransform = mmul(self.rotationTransform, m)
-       
-        m = euler2matrix(self.rotation, "syxz")
-        self.rotationTransform = mmul(self.rotationTransform, m)
-        
-        m = makeTranslation(*rotationOrigin)
-        self.rotationTransform = mmul(self.rotationTransform, m)
         
         if recursive:
             for child in self.children:
@@ -152,7 +140,7 @@ class Skeleton:
     def update(self, mesh):
         
         self.__calcJointOffsets(mesh, self.root)
-        print self.root.position
+        self.root.calcInverseTransform()
         
     def getJoint(self, name):
         

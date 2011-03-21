@@ -206,8 +206,10 @@ class BvhView(gui3d.TaskView):
         if bvhName:
             bvhJoint = self.__skeleton.getJoint(bvhName)
             joint.rotation = bvhJoint.rotation[:]
+            joint.translation = bvhJoint.translation[:]
         else:
             joint.rotation = [0.0, 0.0, 0.0]
+            joint.translation = [0.0, 0.0, 0.0]
         joint.calcTransform(False)
                 
         if not src:
@@ -217,7 +219,7 @@ class BvhView(gui3d.TaskView):
             dst = self.app.selectedHuman.meshData.verts
             
         for i in joint.bindedVects:
-            dst[i].co = aljabr.mtransform(joint.rotationTransform, src[i])
+            dst[i].co = aljabr.mtransform(joint.transform, aljabr.mtransform(joint.inverseTransform, src[i]))
         
         for child in joint.children:
             self.__updateHumanMesh(child, src, dst)
