@@ -62,8 +62,9 @@ class BvhView(gui3d.TaskView):
         def onChange(value):
             self.frameSlider.label.setText('Frame: %d' % value)
             self.__updateSkeletonMesh(value-1)
-            #self.app.selectedHuman.meshData.calcNormals()
-            #self.app.selectedHuman.human.update()
+            self.__updateHumanMesh(self.__skeleton.root)
+            self.app.selectedHuman.meshData.calcNormals()
+            self.app.selectedHuman.meshData.update()
                 
         @self.playPause.event
         def onClicked(value):
