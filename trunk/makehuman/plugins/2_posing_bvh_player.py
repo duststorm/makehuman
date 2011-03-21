@@ -69,7 +69,6 @@ class BvhView(gui3d.TaskView):
         self.bone = None
         
         self.__humanSkeleton = Skeleton()
-        self.__humanSkeleton.update(self.app.selectedHuman.meshData)
         
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*1+6));y+=25
@@ -131,11 +130,18 @@ class BvhView(gui3d.TaskView):
         self.app.selectedHuman.hide()
         self.getSkeleton().show()
         
+        self.app.selectedHuman.storeMesh()
+        self.__humanSkeleton.update(self.app.selectedHuman.meshData)
+        
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
         self.app.selectedHuman.show()
         self.getSkeleton().hide()
+        
+        self.app.selectedHuman.restoreMesh()
+        self.app.selectedHuman.meshData.calcNormals()
+        self.app.selectedHuman.meshData.update()
         
     def getSkeleton(self):
         
