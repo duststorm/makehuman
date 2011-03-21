@@ -176,7 +176,7 @@ class BvhView(gui3d.TaskView):
             dst = self.app.selectedHuman.meshData.verts
             
         for i in joint.bindedVects:
-            dst[i].co = aljabr.mtransform(joint.transform, src[i])
+            dst[i].co = aljabr.mtransform(joint.humanTransform, src[i])
         
         for child in joint.children:
             self.__updateHumanMesh(child, src, dst)
@@ -186,12 +186,12 @@ class BvhView(gui3d.TaskView):
     def __updateBoneMesh(self, joint, index):
 
         if joint.parent:
-          position = [joint.transform[3],joint.transform[7],joint.transform[11]]
-          parentPosition = [joint.parent.transform[3],
-                            joint.parent.transform[7],
-                            joint.parent.transform[11]]
-          self.__updatePrism(self.__skeletonMesh, parentPosition, position, index, joint.p)
-          index += 6
+            position = [joint.transform[3],joint.transform[7],joint.transform[11]]
+            parentPosition = [joint.parent.transform[3],
+                              joint.parent.transform[7],
+                              joint.parent.transform[11]]
+            self.__updatePrism(self.__skeletonMesh, parentPosition, position, index, joint.p)
+            index += 6
         
         for child in joint.children:
             index = self.__updateBoneMesh(child, index)

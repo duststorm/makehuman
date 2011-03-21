@@ -22,7 +22,7 @@ Abstract
 BVH importer
 """
 
-from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform, euler2matrix
+from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform, euler2matrix, vmul
 from skeleton import Joint
 
 bvhToMhMapping = {
@@ -56,37 +56,47 @@ class bvhJoint(Joint):
     self.frames = []
   
   def updateFrame(self, frame, scale=0.25):
+      
     if self.parent:
         self.transform = self.parent.transform[:]
     else:
         self.transform = makeUnit() #makeScale(scale)
+        
+    self.humanTransform = self.transform[:]
     
     m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
     self.transform = mmul(self.transform, m) #parent postmultiply with offset
     
+    rotationCenter = [self.transform[3], self.transform[7], self.transform[11]]
+    m = makeTranslation(*vmul(rotationCenter, -1)) # TODO: these need to be human skeleton offsets
+    self.humanTransform = mmul(self.humanTransform, m)
+    
     if frame >= 0 and frame < len(self.frames):
-      index = 0
+        index = 0
       
-      Ryxz = [0.0, 0.0, 0.0]
-      Txyz = [0.0, 0.0, 0.0]
-      for index, channel in enumerate(self.channels):
-              if channel == 'Xposition':
-                  Txyz[0] = scale*self.frames[frame][index]
-              elif channel == 'Yposition':
-                  Txyz[1] = scale*self.frames[frame][index]
-              elif channel == 'Zposition':
-                  Txyz[2] = scale*self.frames[frame][index]
+        Ryxz = [0.0, 0.0, 0.0]
+        Txyz = [0.0, 0.0, 0.0]
+        for index, channel in enumerate(self.channels):
+            if channel == 'Xposition':
+                Txyz[0] = scale*self.frames[frame][index]
+            elif channel == 'Yposition':
+                Txyz[1] = scale*self.frames[frame][index]
+            elif channel == 'Zposition':
+                Txyz[2] = scale*self.frames[frame][index]
               
-              if channel == 'Xrotation':
-                  Ryxz[1] = self.frames[frame][index] * degree2rad
-              elif channel == 'Yrotation':
-                  Ryxz[0] = self.frames[frame][index] * degree2rad
-              elif channel == 'Zrotation':
-                  Ryxz[2] = self.frames[frame][index] * degree2rad                 
-      m = euler2matrix(Ryxz, "syxz")
-      m[3], m[7], m[11] = Txyz[0], Txyz[1], Txyz[2] 
-      self.transform = mmul(self.transform, m) # parent post multiply with transformations
-
+            if channel == 'Xrotation':
+                Ryxz[1] = self.frames[frame][index] * degree2rad
+            elif channel == 'Yrotation':
+                Ryxz[0] = self.frames[frame][index] * degree2rad
+            elif channel == 'Zrotation':
+                Ryxz[2] = self.frames[frame][index] * degree2rad                 
+        m = euler2matrix(Ryxz, "syxz")
+        m[3], m[7], m[11] = Txyz[0], Txyz[1], Txyz[2] 
+        self.transform = mmul(self.transform, m) # parent post multiply with transformations
+        self.humanTransform = mmul(self.humanTransform, m)
+      
+    m = makeTranslation(*rotationCenter) # TODO: these need to be human skeleton offsets
+    self.humanTransform = mmul(self.humanTransform, m)
     
     for child in self.children:
         child.updateFrame(frame)
