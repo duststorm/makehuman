@@ -396,6 +396,12 @@ def _mmul(M,N,rowsM,colsM,colsN):
 """
 Quaternions
 """
+# Quaternions are of the form (x,y,z,w)
+def qmul(q1, q2):
+  return [q1[1]*q2[2] - q1[2]*q2[1] + q1[0]*q2[3] + q2[0]*q1[3], 
+          q1[2]*q2[0] - q2[2]*q1[0] + q1[1]*q2[3] + q2[1]*q1[3], 
+          q1[0]*q2[1] - q2[0]*q1[1] + q1[2]*q2[3] + q2[2]*q1[3], 
+          q1[3]*q2[3] - q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2]] 
 
 def quaternionVectorTransform(q, v):
     return [q[3]*q[3]*v[0] + 2*q[1]*q[3]*v[2] - 2*q[2]*q[3]*v[1] + q[0]*q[0]*v[0] + 2*q[1]*q[0]*v[1] + 2*q[2]*q[0]*v[2] - q[2]*q[2]*v[0] - q[1]*q[1]*v[0],
@@ -416,7 +422,8 @@ def quaternionTranslationToDual(q, t):
              0.5 * (-t[0] * q[2] + t[1] * q[3] + t[2] * q[0]),
              0.5 * ( t[0] * q[1] - t[1] * q[0] + t[2] * q[3]),
             -0.5 * ( t[0] * q[0] + t[1] * q[1] + t[2] * q[2])]]
-            
+
+# todo: correct to row-major and test validity
 def dualToMatrix(d):
     # Since the rotation part is a unit quaternion, we don't need to divide I think
     #length = vdot(d[0], d[0])
