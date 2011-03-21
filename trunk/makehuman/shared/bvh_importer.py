@@ -25,6 +25,30 @@ BVH importer
 from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform, euler2matrix
 from skeleton import Joint
 
+bvhToMhMapping = {
+    'Hips':'joint-pelvis',
+    'LeftHip':'joint-l-upper-leg',
+    'RightHip':'joint-r-upper-leg',
+    'LeftKnee':'joint-l-knee',
+    'RightKnee':'joint-r-knee',
+    'LeftAnkle':'joint-l-ankle',
+    'RightAnkle':'joint-r-ankle',
+    'Chest':'joint-spine1',
+    'CS_BVH':'joint-spine2',
+    'LeftCollar':'joint-l-clavicle',
+    'RightCollar':'joint-r-clavicle',
+    'LeftShoulder':'joint-l-shoulder',
+    'RightShoulder':'joint-r-shoulder',
+    'LeftElbow':'joint-l-elbow',
+    'RightElbow':'joint-r-elbow',
+    'LeftWrist':'joint-l-hand',
+    'RightWrist':'joint-r-hand',
+    'Neck':'joint-neck',
+    'Head':'joint-head'
+}
+
+mhToBvhMapping = dict([(value, key) for key, value in bvhToMhMapping.iteritems()])
+
 class bvhJoint(Joint):
   def __init__(self, name):
     Joint.__init__(self,name, [])
@@ -95,6 +119,37 @@ class bvhSkeleton:
             items = line.split()
             data = [float(item) for item in items]
             data = self.__getChannelData(self.root, data)
+            
+        file = open("data/joint-bindings.txt")
+        while (1): 
+            line = file.readline()
+            line = line.rstrip()
+            if not line: break
+            name = "joint-"+line
+            j = self.getJoint(mhToBvhMapping.get(name, ''))
+            line = file.readline()
+            line = line.split()
+            if j:
+                for vert in line:
+                    j.bindedVects.append(int(vert))
+            else:
+                print '%s not found' % name
+                
+    def getJoint(self, name):
+        
+        return self.__getJoint(self.root, name)
+        
+    def __getJoint(self, joint, name):
+        
+        if joint.name == name:
+            return joint
+            
+        for child in joint.children:
+            j = self.__getJoint(child, name)
+            if j:
+                return j
+                
+        return None
                 
     def __readJoint(self, joint, scale=0.25):
         

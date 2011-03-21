@@ -169,7 +169,7 @@ class BvhView(gui3d.TaskView):
       if not verts:
         verts = self.app.selectedHuman.meshData.verts
       for i in joint.bindedVects:
-        verts[i].co = mtransform(joint.transform, verts[i].co)
+        verts[i].co = aljabr.mtransform(joint.transform, verts[i].co)
       for child in joint.children:
         self.__updateHumanMesh(child,verts)
       #note: don't do skeleton update

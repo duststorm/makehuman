@@ -100,7 +100,7 @@ class Skeleton:
         line = file.readline()
         line = line.rstrip()
         if not line: break 
-        j = self.__getJoint(self.root, "joint-"+line)
+        j = self.getJoint("joint-"+line)
         line = file.readline()
         line = line.split()
         for vert in line:
