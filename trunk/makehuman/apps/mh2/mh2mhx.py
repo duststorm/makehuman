@@ -282,7 +282,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 				if rig == 'mhx':
 					if words[2] == 'ControlRig':
 						fp.write("AnimationData %s True\n" % theHuman)
-						mhx_rig.writeControlDrivers(fp)
+						mhx_rig.writeAllDrivers(fp)
 						rigDriversEnd(fp)
 					elif words[2] == 'DeformRig':
 						fp.write("AnimationData %sDeformRig True\n" % theHuman)

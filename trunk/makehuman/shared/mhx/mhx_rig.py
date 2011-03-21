@@ -1761,13 +1761,10 @@ def writeAllActions(fp):
 	#rig_finger_25.FingerWriteActions(fp)
 	return
 
-def writeControlDrivers(fp):
+def writeAllDrivers(fp):
 	writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
 	writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
 	#rig_panel_25.FingerControlDrivers(fp)
-	return
-
-def writeDeformDrivers(fp):
 	writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
 	writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman)
 	rig_face_25.FaceDeformDrivers(fp)

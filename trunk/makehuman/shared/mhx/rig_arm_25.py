@@ -282,13 +282,13 @@ ArmArmature = [
 
 	#
 	('ArmTrg_L',		0.0, 'ArmLoc_L', 0, L_HELP, NoBB),
-	('UpArmRot_L',		0.0, 'ArmLoc_L', F_WIR, L_LARMFK+L_LARMIK, NoBB),
+	('UpArmRot_L',		0.0, 'ArmLoc_L', 0, L_DEF, NoBB),
 	('UpArm1PT_L',		0.0, 'UpArmRot_L', 0, L_HELP, NoBB),
 	('UpArm2PT_L',		0.0, 'UpArm_L', 0, L_HELP, NoBB),
 	('LoArmPT_L',		0.0, 'LoArm_L', 0, L_HELP, NoBB),
 
 	('ArmTrg_R',		0.0, 'ArmLoc_R', 0, L_HELP, NoBB),
-	('UpArmRot_R',		0.0, 'ArmLoc_R', F_WIR, L_RARMFK+L_RARMIK, NoBB),
+	('UpArmRot_R',		0.0, 'ArmLoc_R', 0, L_DEF, NoBB),
 	('UpArm1PT_R',		0.0, 'UpArmRot_R', 0, L_HELP, NoBB),
 	('UpArm2PT_R',		0.0, 'UpArm_R', 0, L_HELP, NoBB),
 	('LoArmPT_R',		0.0, 'LoArm_R', 0, L_HELP, NoBB),
@@ -507,9 +507,10 @@ def ArmControlPoses(fp):
 	addPoseBone(fp, 'ArmTrg_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
 		 [('IK', 0, 1, ['ArmIK', 'LoArm_L', 1, None, (True, False,True)])])
 
-	addPoseBone(fp, 'UpArmRot_L', 'GZM_Circle10', 'IK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
-		 [('IK', 0, 1, ['ArmIK', 'LoArm_L', 1, None, (True, False,True)])])
-
+	addPoseBone(fp, 'UpArmRot_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, 1, ['ArmIK', 'LoArm_L', 1, None, (True, False,True)]),
+		 ('CopyRot', C_LOCAL, 0.45, ['Rot', 'UpArm_L', (0,1,0), (0,0,0), False])
+		])
 
 	addPoseBone(fp, 'ElbowPT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
@@ -519,8 +520,10 @@ def ArmControlPoses(fp):
 	addPoseBone(fp, 'ArmTrg_R', None, 'FK_R', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
 		 [('IK', 0, 1, ['ArmIK', 'LoArm_R', 1, None, (True, False,True)])])
 
-	addPoseBone(fp, 'UpArmRot_R', 'GZM_Circle10', 'IK_R', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
-		 [('IK', 0, 1, ['ArmIK', 'LoArm_R', 1, None, (True, False,True)])])
+	addPoseBone(fp, 'UpArmRot_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, 
+		[('IK', 0, 1, ['ArmIK', 'LoArm_R', 1, None, (True, False,True)]),
+		 ('CopyRot', C_LOCAL, 0.45, ['Rot', 'UpArm_R', (0,1,0), (0,0,0), False])
+		])
 
 	# Deform poses
 
@@ -680,25 +683,25 @@ ArmFKIKDrivers = [
 #
 
 ArmDeformDrivers = [
-	("Deltoid_L", "Up", "min(u,2.7-d)", 
+	("DfmDeltoid_L", "Up", "min(u,2.7-d)", 
 		[("u", "ArmTrg_L", "BendArmUp_L"), ("d", "ArmTrg_L", "BendArmDown_L")], 
 		[(0,1), (40*D,1), (90*D,0)]),
 
-	("Pectoralis_L", "Forward", "f", 
+	("DfmPectoralis_L", "Forward", "f", 
 		 [("f", "ArmTrg_L", "BendArmForward_L")], [(0,1), (70*D,1), (90*D,1)]),
 
-	("Trapezeus_L", "Back", "b", 
+	("DfmTrapezeus_L", "Back", "b", 
 		 [("b", "ArmTrg_L", "BendArmBack_L")], [(0,1), (50*D,1), (90*D,0.5)]),
 
 
-	("Deltoid_R", "Up", "min(u,2.7-d)", 
+	("DfmDeltoid_R", "Up", "min(u,2.7-d)", 
 		[("u", "ArmTrg_R", "BendArmUp_R"), ("d", "ArmTrg_R", "BendArmDown_R")], 
 		[(0,1), (40*D,1), (90*D,0)]),
 
-	("Pectoralis_R", "Forward", "f", 
+	("DfmPectoralis_R", "Forward", "f", 
 		 [("f", "ArmTrg_R", "BendArmForward_R")], [(0,1), (70*D,1), (90*D,1)]),
 
-	("Trapezeus_R", "Back", "b", 
+	("DfmTrapezeus_R", "Back", "b", 
 		 [("b", "ArmTrg_R", "BendArmBack_R")], [(0,1), (50*D,1), (90*D,0.5)]),
 
 ]
