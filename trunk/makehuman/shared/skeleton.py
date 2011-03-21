@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit, makeTranslation, mmul, euler2matrix
+from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit, makeTranslation, mmul, euler2matrix, mtransform
 from math import acos
 
 class Joint:
@@ -50,6 +50,7 @@ class Joint:
         #self.rotation = [0.0, 0.0, 0.0]    # Rotation relative to the parent joint - axis of rotation is relative to parent
         # xyz limits
         self.transform = makeUnit()
+        self.rotationTransform = makeUnit()
         self.limits = [[-180,180],[-180,180],[-180,180]]
         self.bindedVects = []
         self.index = 0
@@ -72,24 +73,37 @@ class Joint:
           child.calcTransform(transform)
     """
     
-    def calcTransform(self):
+    def calcTransform(self, recursive=True):
       
         if self.parent:
             self.transform = self.parent.transform[:]
+            self.rotationTransform = self.parent.rotationTransform[:]
         else:
             self.transform = makeUnit()
-        
-        m = makeTranslation(-self.offset[0], -self.offset[1], -self.offset[2])
+            self.rotationTransform = makeUnit()
+            
+        # Calc complete transform
+        m = makeTranslation(*self.offset)
         self.transform = mmul(self.transform, m)
-       
         m = euler2matrix(self.rotation, "syxz")
         self.transform = mmul(self.transform, m)
         
-        m = makeTranslation(self.offset[0], self.offset[1], self.offset[2])
-        self.transform = mmul(self.transform, m)
+        # Calc rotation transform
         
-        for child in self.children:
-            child.calcTransform()
+        rotationOrigin = mtransform(self.transform, [0.0, 1.042996875, 0.082753249999999987])
+        
+        m = makeTranslation(*vmul(rotationOrigin, -1.0))
+        self.rotationTransform = mmul(self.rotationTransform, m)
+       
+        m = euler2matrix(self.rotation, "syxz")
+        self.rotationTransform = mmul(self.rotationTransform, m)
+        
+        m = makeTranslation(*rotationOrigin)
+        self.rotationTransform = mmul(self.rotationTransform, m)
+        
+        if recursive:
+            for child in self.children:
+                child.calcTransform(recursive)
 
 class Skeleton:
     
@@ -138,6 +152,7 @@ class Skeleton:
     def update(self, mesh):
         
         self.__calcJointOffsets(mesh, self.root)
+        print self.root.position
         
     def getJoint(self, name):
         

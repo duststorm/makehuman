@@ -69,6 +69,7 @@ class BvhView(gui3d.TaskView):
         self.bone = None
         
         self.__humanSkeleton = Skeleton()
+        self.__humanSkeleton.update(self.app.selectedHuman.meshData)
         
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*1+6));y+=25
@@ -111,8 +112,6 @@ class BvhView(gui3d.TaskView):
             else:
                 self.app.selectedHuman.hide()
                 self.getSkeleton().show()
-                
-        self.app.selectedHuman.storeMesh()
                 
     def onFrameChanged(self):
         
@@ -203,7 +202,7 @@ class BvhView(gui3d.TaskView):
             joint.rotation = bvhJoint.rotation[:]
         else:
             joint.rotation = [0.0, 0.0, 0.0]
-        joint.calcTransform()
+        joint.calcTransform(False)
                 
         if not src:
             src = self.app.selectedHuman.meshStored
@@ -212,7 +211,7 @@ class BvhView(gui3d.TaskView):
             dst = self.app.selectedHuman.meshData.verts
             
         for i in joint.bindedVects:
-            dst[i].co = aljabr.mtransform(joint.transform, src[i])
+            dst[i].co = aljabr.mtransform(joint.rotationTransform, src[i])
         
         for child in joint.children:
             self.__updateHumanMesh(child, src, dst)
