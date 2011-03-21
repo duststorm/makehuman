@@ -77,14 +77,15 @@ class BvhView(gui3d.TaskView):
                 
         @self.showHuman.event
         def onClicked(event):
-          self.showHuman.setSelected(not self.showHuman.selected)
-          if self.showHuman.selected:
-            self.app.selectedHuman.show()
-            self.getSkeleton().hide()
-          else:
-            self.app.selectedHuman.hide()
-            self.getSkeleton().show()
-
+            self.showHuman.setSelected(not self.showHuman.selected)
+            if self.showHuman.selected:
+                self.app.selectedHuman.show()
+                self.getSkeleton().hide()
+            else:
+                self.app.selectedHuman.hide()
+                self.getSkeleton().show()
+                
+        self.app.selectedHuman.storeMesh()
                 
     def onFrameChanged(self):
         
@@ -166,15 +167,21 @@ class BvhView(gui3d.TaskView):
         self.__skeletonMesh.calcNormals()
         self.__skeletonMesh.update()
 
-    def __updateHumanMesh(self, joint, verts=None):
-      if not verts:
-        verts = self.app.selectedHuman.meshData.verts
-      for i in joint.bindedVects:
-        verts[i].co = aljabr.mtransform(joint.transform, verts[i].co)
-      for child in joint.children:
-        self.__updateHumanMesh(child,verts)
+    def __updateHumanMesh(self, joint, src=None, dst=None):
+        
+        if not src:
+            src = self.app.selectedHuman.meshStored
+            
+        if not dst:
+            dst = self.app.selectedHuman.meshData.verts
+            
+        for i in joint.bindedVects:
+            dst[i].co = aljabr.mtransform(joint.transform, src[i])
+        
+        for child in joint.children:
+            self.__updateHumanMesh(child, src, dst)
+        
       #note: don't do skeleton update
-      
       
     def __updateBoneMesh(self, joint, index):
 
