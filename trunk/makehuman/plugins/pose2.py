@@ -87,11 +87,13 @@ class PoseTaskView(gui3d.TaskView):
         #get the group name involving the right arm
         human = self.app.selectedHuman.meshData
         self.skeleton.update(human)
-        #get the position of the right shoulder joint
-        j = self.skeleton.getJoint("joint-r-shoulder")
-        #get binded mesh to j and children
+        
+        #for shoulder
+        #j = self.skeleton.getJoint("joint-r-shoulder")
+        
+        j = self.skeleton.getJoint("joint-head")
         angle = 20
-        axis = [0,1,0]
+        axis = [1,0,0]
         q = axisAngleToQuaternion(axis, angle*degree2rad)
         deform(j, q , j.position, human.verts) 
         human.calcNormals()
@@ -182,7 +184,8 @@ len(dist[i]) = 2*len(joints)-1 for all i = 1,..., len(joints)
 def deform(j, q, center, verts):
     for i in j.bindedVects:          
       v = verts[i]
-      if (v.co[0] - center[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
-        v.co = vadd(quaternionVectorTransform(q,vsub(v.co, center)), center)
+      # commented for arm
+      #if (v.co[0] - center[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
+      v.co = vadd(quaternionVectorTransform(q,vsub(v.co, center)), center)
     for child in j.children:
       deform(child, q, center, verts)
