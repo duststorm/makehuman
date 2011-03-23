@@ -714,9 +714,14 @@ def mtransform(m, v):
 # a fast way to inverse a homogenous 4x4 flat row-major transformation matix
 # we use the fact that rotations are orthogonal (note: there shouldnt be scaling in the matrix)
 def invTransform(m):
-    return [m[0], m[4], m[8], -m[3],
-            m[1], m[5], m[9], -m[7],
-            m[2], m[6], m[10],-m[11],
+    rinv =   [m[0], m[4], m[8], 0,
+              m[1], m[5], m[9], 0,
+              m[2], m[6], m[10],0,
+              0.0, 0.0, 0.0, 1.0]
+    t =  mtransform(rinv, [-m[3],-m[7],-m[11]])
+    return [m[0], m[4], m[8], t[0],
+            m[1], m[5], m[9], t[1],
+            m[2], m[6], m[10],t[2],
             0.0, 0.0, 0.0, 1.0]
 
 # uses flat row-major 4x4 transformation matrices. Returned angles are in radians            
