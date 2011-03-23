@@ -678,6 +678,12 @@ def makeTranslation(x, y, z):
             0.0, 1.0, 0.0, y,
             0.0, 0.0, 1.0, z,
             0.0, 0.0, 0.0, 1.0]
+            
+def getTranslation(m):
+  """
+   get the translation vector of a homogeneous 4x4 row-major transformation matrix
+  """
+  return [m[3], m[7], m[11]]
     
 def makeRotation(axis, angle):
 
@@ -689,16 +695,6 @@ def makeRotation(axis, angle):
             x*y * t + z*s, y*y * t + c,   y*z * t - x*s, 0.0,
             x*z * t - y*s, y*z * t + x*s, z*z * t + c,   0.0,
             0.0,           0.0,           0.0,           1.0]
-
-"""
-def makeScale(x, y, z):
-    
-    return [x,   0.0, 0.0, 0.0,
-            0.0, y,   0.0, 0.0,
-            0.0, 0.0, z,   0.0,
-            0.0, 0.0, 0.0, 1.0]
-
-"""
 
 def makeScale(scale):    
     if type(scale) is float:
