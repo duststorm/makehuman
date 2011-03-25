@@ -84,18 +84,8 @@ class Joint:
             
         m = makeTranslation(*self.offset)
         self.transform = mmul(self.transform, m)
-        #m = makeTranslation(*self.translation)
-        #self.transform = mmul(self.transform, m)
         
-        rotation = self.rotation[:]
-        
-        # Static rest position fixes
-        #if (self.name == 'joint-r-shoulder'):
-        #    rotation[2] -= 90.0 * degree2rad
-        #elif (self.name == 'joint-l-shoulder'):
-        #    rotation[2] += 90.0 * degree2rad
-        
-        m = euler2matrix(rotation, "syxz")
+        m = euler2matrix(self.rotation, "syxz")
         self.transform = mmul(self.transform, m)
         
         if recursive:

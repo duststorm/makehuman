@@ -33,7 +33,7 @@ class bvhJoint(Joint):
     self.rotation = [0.0, 0.0, 0.0]
     self.translation = [0.0, 0.0, 0.0]
   
-  def updateFrame(self, frame, scale=0.25):
+  def updateFrame(self, frame, scale=0.10):
       
     if self.parent:
         self.transform = self.parent.transform[:]

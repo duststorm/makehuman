@@ -31,6 +31,7 @@ from skeleton import Skeleton
 from math import pi
 import mh
 
+'''
 bvhToMhMapping = {
     'Hips':'joint-pelvis',
     'LeftHip':'joint-r-upper-leg',
@@ -52,6 +53,53 @@ bvhToMhMapping = {
     'Neck':'joint-neck',
     'Head':'joint-head'
 }
+'''
+
+bvhToMhMapping = {
+    'hip':'joint-pelvis',
+    'abdomen':'joint-spine-2',
+    'chest':'joint-spine-1',
+    'neck':'joint-neck',
+    'head':'joint-head',
+    'leftEye':'joint-l-eye',
+    'rightEye':'joint-r-eye',
+    'rCollar':'joint-r-scapula',
+    'rShldr':'joint-r-shoulder',
+    'rForeArm':'joint-r-elbow',
+    'rHand':'joint-r-hand',
+    'rThumb1':'joint-r-finger-1-1',
+    'rThumb2':'joint-r-finger-1-2',
+    'rIndex1':'joint-r-finger-2-1',
+    'rIndex2':'joint-r-finger-2-2',
+    'rMid1':'joint-r-finger-3-1',
+    'rMid2':'joint-r-finger-3-2',
+    'rRing1':'joint-r-finger-4-1',
+    'rRing2':'joint-r-finger-4-2',
+    'rPinky1':'joint-r-finger-5-1',
+    'rPinky2':'joint-r-finger-5-2',
+    'lCollar':'joint-l-scapula',
+    'lShldr':'joint-l-shoulder',
+    'lForeArm':'joint-l-elbow',
+    'lHand':'joint-l-hand',
+    'lThumb1':'joint-l-finger-1-1',
+    'lThumb2':'joint-l-finger-1-2',
+    'lIndex1':'joint-l-finger-2-1',
+    'lIndex2':'joint-l-finger-2-2',
+    'lMid1':'joint-l-finger-3-1',
+    'lMid2':'joint-l-finger-3-2',
+    'lRing1':'joint-l-finger-4-1',
+    'lRing2':'joint-l-finger-4-2',
+    'lPinky1':'joint-l-finger-5-1',
+    'lPinky2':'joint-l-finger-5-2',
+    #'rButtock':'joint-r-upper-leg',
+    'rThigh':'joint-r-upper-leg',
+    'rShin':'joint-r-knee',
+    'rFoot':'joint-r-ankle',
+    #'lButtock':'joint-l-upper-leg',
+    'lThigh':'joint-l-upper-leg',
+    'lShin':'joint-l-knee',
+    'lFoot':'joint-l-ankle'
+}
 
 mhToBvhMapping = dict([(value, key) for key, value in bvhToMhMapping.iteritems()])
 
@@ -62,7 +110,7 @@ class BvhView(gui3d.TaskView):
         
         self.status = gui3d.TextView(self, [10, 585, 9.1])
         
-        self.__skeleton = bvhSkeleton('data/bvhs/10_01.bvh')
+        self.__skeleton = bvhSkeleton('data/bvhs/02_02.bvh')
         self.__skeleton.updateFrame(-1)
         self.__skeletonMesh = None
         self.__skeletonObject = None
@@ -97,7 +145,7 @@ class BvhView(gui3d.TaskView):
         def onClicked(value):
             if self.playPause.label.getText() == 'Play':
                 self.playPause.label.setText('Pause')
-                self.timer = mh.addTimer(int(self.__skeleton.frameTime * 1000), self.onFrameChanged)
+                self.timer = mh.addTimer(int(self.__skeleton.frameTime * 1000 * 2), self.onFrameChanged)
             else:
                 self.playPause.label.setText('Play')
                 mh.removeTimer(self.timer)
