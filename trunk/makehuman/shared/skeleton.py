@@ -198,6 +198,8 @@ class Skeleton:
         # Calculate offset
         if parent:
             joint.offset = vsub(joint.position, parent.position)
+        else:
+            joint.offset = joint.position[:]
             
         # Calculate direction
         direction = vnorm(joint.offset)
