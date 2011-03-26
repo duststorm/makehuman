@@ -828,9 +828,15 @@ class Slider(View):
         if event.key == events3d.SDLK_HOME:
             newValue = self.min
         elif event.key == events3d.SDLK_LEFT:
-            newValue -= (self.max - self.min) / 10.0
+            if isinstance(self.min, int):
+                newValue -= 1
+            else:
+                newValue -= (self.max - self.min) / 10.0
         elif event.key == events3d.SDLK_RIGHT:
-            newValue += (self.max - self.min) / 10.0
+            if isinstance(self.min, int):
+                newValue += 1
+            else:
+                newValue += (self.max - self.min) / 10.0
         elif event.key == events3d.SDLK_END:
             newValue = self.max
         else:
