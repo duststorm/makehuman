@@ -530,7 +530,7 @@ def quaternionSlerp(q1, q2, alpha):
             q1[3] * ratioA + q2[3] * ratioB]
 
 # Axis is normalized, angle is in radians
-def axisAngleToEuler(axis, angle):
+def axisAngleToEuler(x, y, z, angle):
 
     s = sin(angle)
     c = cos(angle)
