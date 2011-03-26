@@ -110,7 +110,7 @@ class BvhView(gui3d.TaskView):
         
         self.status = gui3d.TextView(self, [10, 585, 9.1])
         
-        self.__skeleton = bvhSkeleton('data/bvhs/02_02.bvh')
+        self.__skeleton = bvhSkeleton('data/bvhs/03_03.bvh')
         self.__skeleton.updateFrame(-1)
         self.__skeletonMesh = None
         self.__skeletonObject = None
