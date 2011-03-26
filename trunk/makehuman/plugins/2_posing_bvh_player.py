@@ -63,7 +63,7 @@ bvhToMhMapping = {
     'head':'joint-head',
     'leftEye':'joint-r-eye',
     'rightEye':'joint-l-eye',
-    'rCollar':'joint-l-scapula',
+    'rCollar':'joint-l-clavicle',
     'rShldr':'joint-l-shoulder',
     'rForeArm':'joint-l-elbow',
     'rHand':'joint-l-hand',
@@ -77,7 +77,7 @@ bvhToMhMapping = {
     'rRing2':'joint-l-finger-4-2',
     'rPinky1':'joint-l-finger-5-1',
     'rPinky2':'joint-l-finger-5-2',
-    'lCollar':'joint-r-scapula',
+    'lCollar':'joint-r-clavicle',
     'lShldr':'joint-r-shoulder',
     'lForeArm':'joint-r-elbow',
     'lHand':'joint-r-hand',
@@ -259,7 +259,9 @@ class BvhView(gui3d.TaskView):
             joint.rotation = [0.0, 0.0, 0.0]
             joint.translation = [0.0, 0.0, 0.0]
         joint.calcTransform(False)
-                
+        
+        if (bvhName == "head"): print joint.rotation
+        
         if not src:
             src = self.app.selectedHuman.meshStored
             
