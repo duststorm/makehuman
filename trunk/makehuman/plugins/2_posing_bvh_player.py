@@ -254,10 +254,10 @@ class BvhView(gui3d.TaskView):
         if bvhName:
             bvhJoint = self.__skeleton.getJoint(bvhName)
             joint.rotation = bvhJoint.rotation[:]
-            joint.translation = bvhJoint.translation[:]
+            #joint.translation = bvhJoint.translation[:]
         else:
             joint.rotation = [0.0, 0.0, 0.0]
-            joint.translation = [0.0, 0.0, 0.0]
+            #joint.translation = [0.0, 0.0, 0.0]
         joint.calcTransform(False)
         
         if not src:

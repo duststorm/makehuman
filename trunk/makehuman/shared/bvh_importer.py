@@ -30,9 +30,7 @@ class bvhJoint(Joint):
     Joint.__init__(self,name, [])
     self.channels = None
     self.frames = []
-    self.rotation = [0.0, 0.0, 0.0]
-    self.translation = [0.0, 0.0, 0.0]
-  
+
   def updateFrame(self, frame, scale=0.10):
       
     if self.parent:
@@ -62,7 +60,7 @@ class bvhJoint(Joint):
                 Ryxz[0] = self.frames[frame][index] * degree2rad
             elif channel == 'Zrotation':
                 Ryxz[2] = self.frames[frame][index] * degree2rad
-        self.translation = Txyz[:]
+        #self.translation = Txyz[:]
         self.rotation = Ryxz[:]
         m = euler2matrix(Ryxz, "syxz")
         m[3], m[7], m[11] = Txyz[0], Txyz[1], Txyz[2] 
