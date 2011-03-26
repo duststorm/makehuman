@@ -260,8 +260,6 @@ class BvhView(gui3d.TaskView):
             joint.translation = [0.0, 0.0, 0.0]
         joint.calcTransform(False)
         
-        if (bvhName == "head"): print joint.rotation
-        
         if not src:
             src = self.app.selectedHuman.meshStored
             
