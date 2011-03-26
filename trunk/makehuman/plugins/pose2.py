@@ -94,8 +94,10 @@ class PoseTaskView(gui3d.TaskView):
         j = self.skeleton.getJoint("joint-head")
         angle = 20
         axis = [1,0,0]
-        q = axisAngleToQuaternion(axis, angle*degree2rad)
-        deform(j, q , j.position, human.verts) 
+        #q = axisAngleToQuaternion(axis, angle*degree2rad)
+        Ryxz = [-4.48*degree2rad,	-1.24*degree2rad,	-7.02*degree2rad]
+        #deform(j, q , j.position, human.verts) 
+        deform2(j, Ryxz , j.position, human.verts) 
         human.calcNormals()
         human.update()          
         
@@ -189,3 +191,13 @@ def deform(j, q, center, verts):
       v.co = vadd(quaternionVectorTransform(q,vsub(v.co, center)), center)
     for child in j.children:
       deform(child, q, center, verts)
+
+def deform2(j, Ryxz, center, verts):
+    m = euler2matrix(Ryxz, "syxz")
+    for i in j.bindedVects:          
+      v = verts[i]
+      # commented for arm
+      #if (v.co[0] - center[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
+      v.co = vadd(mtransform(m,vsub(v.co, center)), center)
+    for child in j.children:
+      deform(child, Ryxz, center, verts)
