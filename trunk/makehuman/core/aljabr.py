@@ -529,7 +529,31 @@ def quaternionSlerp(q1, q2, alpha):
             q1[2] * ratioA + q2[2] * ratioB,
             q1[3] * ratioA + q2[3] * ratioB]
 
+# Axis is normalized, angle is in radians
+def axisAngleToEuler(axis, angle):
 
+    s = sin(angle)
+    c = cos(angle)
+    t = 1-c
+
+    if (x*y*t + z*s) > 0.998:
+        
+        heading = 2.0 * atan2(x*sin(angle/2.0), cos(angle/2.0))
+        attitude = pi/2.0
+        bank = 0.0
+        return heading, attitude, bank
+
+    if (x*y*t + z*s) < -0.998:
+        
+        heading = -2.0*atan2(x*sin(angle/2.0),cos(angle/2.0))
+        attitude = -pi/2.0
+        bank = 0.0
+        return heading, attitude, bank
+        
+    heading = atan2(y * s- x * z * t , 1.0 - (y*y+ z*z ) * t)
+    attitude = asin(x * y * t + z * s)
+    bank = atan2(x * s - y * z * t , 1.0 - (x*x + z*z) * t)
+    return heading, attitude, bank
 
 """
 Geometric Operations
