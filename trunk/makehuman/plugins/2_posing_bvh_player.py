@@ -145,7 +145,7 @@ class BvhView(gui3d.TaskView):
         def onClicked(value):
             if self.playPause.label.getText() == 'Play':
                 self.playPause.label.setText('Pause')
-                self.timer = mh.addTimer(int(self.__skeleton.frameTime * 1000 * 2), self.onFrameChanged)
+                self.timer = mh.addTimer(max(30, int(self.__skeleton.frameTime * 1000)), self.onFrameChanged)
             else:
                 self.playPause.label.setText('Play')
                 mh.removeTimer(self.timer)
