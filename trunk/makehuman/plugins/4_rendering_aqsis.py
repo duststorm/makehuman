@@ -17,17 +17,7 @@ class AqsisTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Aqsis')
 
-        self.sceneToRender = mh2renderman.RMRScene(self.app)
-        #Create aqsis shaders
-        subprocess.Popen('aqsl data/shaders/aqsis/skin2.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'skin2.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/hair.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'hair.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/envlight.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'envlight.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/skinbump.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'skinbump.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/scatteringtexture.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'scatteringtexture.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/bakelightmap.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'bakelightmap.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/eyeball.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'eyeball.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/cornea.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'cornea.slx'), shell=True)
-        subprocess.Popen('aqsl data/shaders/aqsis/mixer.sl -o "%s"' % os.path.join(self.sceneToRender.usrShaderPath, 'mixer.slx'), shell=True)
+        self.sceneToRender = None
 
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*1+6));y+=25
@@ -57,10 +47,30 @@ class AqsisTaskView(gui3d.TaskView):
             self.app.settings['rendering_aqsis_oil'] = value
             
         @self.renderButton.event
-        def onClicked(event):            
+        def onClicked(event):
+            
+            if not self.sceneToRender:
+                self.sceneToRender = mh2renderman.RMRScene(self.app)
+            self.buildShaders()
             self.sceneToRender.render()
+            
+    def buildShaders(self):
+        
+        shaders = ['skin2', 'hair', 'envlight', 'skinbump', 'scatteringtexture', 'bakelightmap', 'eyeball', 'cornea', 'mixer']
+        
+        for shader in shaders:
+            self.buildShader(shader)
+        
+    def buildShader(self, shader):
+        
+        srcPath = os.path.join('data/shaders/aqsis', shader + '.sl')
+        dstPath = os.path.join(self.sceneToRender.usrShaderPath, shader + '.slx')
+        
+        if not os.path.exists(dstPath) or os.stat(srcPath).st_mtime > os.stat(dstPath).st_mtime:
+            subprocess.Popen('aqsl %s -o "%s"' % (srcPath, dstPath), shell=True)
     
     def onShow(self, event):
+        
         self.renderButton.setFocus()
         gui3d.TaskView.onShow(self, event)
 
