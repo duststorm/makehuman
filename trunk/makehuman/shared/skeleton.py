@@ -43,12 +43,10 @@ class Joint:
         self.parent = None
         self.children = children
         self.position = [0.0, 0.0, 0.0]
-        #self.translation = [0.0, 0.0, 0.0]
         #euler rotation. order is plugin dependent
         self.rotation = [0.0, 0.0, 0.0]
         self.offset = [0.0, 0.0, 0.0]           # Position Relative to the parent joint
-        #self.direction = [0.0, 0.0, 0.0, 0.0]   
-        self.inverseTransform = makeUnit()
+        #self.inverseTransform = makeUnit()
         self.transform = makeUnit()
         #limits same order as rotation
         self.limits = [[-180,180],[-180,180],[-180,180]]
@@ -59,6 +57,7 @@ class Joint:
         for child in children:
             child.parent = self
     
+    """
     def calcInverseTransform(self):
       
         if self.parent:
@@ -73,6 +72,7 @@ class Joint:
             child.calcInverseTransform()
                 
         self.inverseTransform = invTransform(self.inverseTransform)
+    """
     
     def calcTransform(self, recursive=True):
       
@@ -138,7 +138,7 @@ class Skeleton:
     def update(self, mesh):
         
         self.__calcJointOffsets(mesh, self.root)
-        self.root.calcInverseTransform()
+        #self.root.calcInverseTransform()
         
     def getJoint(self, name):
         
