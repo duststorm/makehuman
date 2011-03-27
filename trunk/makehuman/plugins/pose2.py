@@ -52,9 +52,9 @@ class PoseTaskView(gui3d.TaskView):
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
 
-        self.Xslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -85, max = 80, label = "RotX: 0");y+=36
-        self.Yslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -140, max = 50, label = "RotY: 0");y+=36
-        self.Zslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -120, max = 90, label = "RotZ: 0");y+=36
+        self.Xslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotX: 0");y+=36
+        self.Yslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotY: 0");y+=36
+        self.Zslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotZ: 0");y+=36
         y+=4
 
         self.resetPoseButton = gui3d.Button(self, [18, y, 9.5], "Reset");y+=24
@@ -74,8 +74,9 @@ class PoseTaskView(gui3d.TaskView):
         def onChange(value):
             self.Xslider.label.setText('RotX: %d' % value)
             if self.joint:
-                self.joint.rotation[0] = value*degree2rad
-                self.rotateJoint(self.joint, self.joint.position)
+                rotation = [value - self.joint.rotation[0], 0.0, 0.0]
+                self.joint.rotation[0] = value
+                self.rotateJoint(self.joint, self.joint.position, rotation)
                 self.app.selectedHuman.meshData.calcNormals()
                 self.app.selectedHuman.meshData.update()
             
@@ -87,8 +88,9 @@ class PoseTaskView(gui3d.TaskView):
         def onChange(value):
             self.Yslider.label.setText('RotY: %d' % value)
             if self.joint:
-                self.joint.rotation[1] = value*degree2rad
-                self.rotateJoint(self.joint, self.joint.position)
+                rotation = [0.0, value - self.joint.rotation[1], 0.0]
+                self.joint.rotation[1] = value
+                self.rotateJoint(self.joint, self.joint.position, rotation)
                 self.app.selectedHuman.meshData.calcNormals()
                 self.app.selectedHuman.meshData.update()
             
@@ -100,8 +102,9 @@ class PoseTaskView(gui3d.TaskView):
         def onChange(value):
             self.Zslider.label.setText('RotZ: %d' % value)
             if self.joint:
-                self.joint.rotation[2] = value*degree2rad
-                self.rotateJoint(self.joint, self.joint.position)
+                rotation = [0.0, 0.0, value - self.joint.rotation[2]]
+                self.joint.rotation[2] = value
+                self.rotateJoint(self.joint, self.joint.position,rotation)
                 self.app.selectedHuman.meshData.calcNormals()
                 self.app.selectedHuman.meshData.update()
             
@@ -136,6 +139,12 @@ class PoseTaskView(gui3d.TaskView):
             self.jointSelected = False
         else:
             self.joint = self.skeleton.getJoint(zonesToJointsMapping.get(self.zone))
+            self.Xslider.setValue(self.joint.rotation[0])
+            self.Xslider.label.setText('RotX: %d' % self.joint.rotation[0])
+            self.Yslider.setValue(self.joint.rotation[1])
+            self.Yslider.label.setText('RotY: %d' % self.joint.rotation[1])
+            self.Zslider.setValue(self.joint.rotation[2])
+            self.Zslider.label.setText('RotZ: %d' % self.joint.rotation[2])
             self.jointSelected = True
 
 
@@ -174,18 +183,18 @@ class PoseTaskView(gui3d.TaskView):
                 return k
         return None
     
-    def rotateJoint(self, joint, center, transform=None):                
+    def rotateJoint(self, joint, center, rotation, transform=None):                
         #src = self.app.selectedHuman.meshStored
         dst = self.app.selectedHuman.meshData.verts
         if not transform:
-            transform = euler2matrix(joint.rotation, "sxyz")
+            transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
         else:
             joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
 
         for i in joint.bindedVects:
             dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
         for child in joint.children:
-            self.rotateJoint(child, center, transform)
+            self.rotateJoint(child, center, rotation, transform)
     
     def reset(self, limbToTest):
         self.Xslider.label.setText('RotX: 0')
