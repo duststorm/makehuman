@@ -1403,7 +1403,7 @@ def writeShapeDrivers(fp, drivers, proxy):
 			drvVars = []
 			(targ, channel, coeff) = vlist
 			drvVars.append( (targ, 'TRANSFORMS', [(mh2mhx.theHuman, targ, channel, C_LOC)]) )
-			writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "keys[\"%s\"].value" % (shape), -1, coeff, drvVars)
+			writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
 	return
 
 #
@@ -1435,7 +1435,7 @@ def writeRotDiffDrivers(fp, drivers, proxy):
 			drvVars = [(targ2, 'ROTATION_DIFF', [
 			(mh2mhx.theHuman, targ1, C_LOC),
 			(mh2mhx.theHuman, targ2, C_LOC)] )]
-			writeDriver(fp, True, 'MIN', "", "keys[\"%s\"].value" % (shape), -1, keypoints, drvVars)
+			writeDriver(fp, True, 'MIN', "", "key_blocks[\"%s\"].value" % (shape), -1, keypoints, drvVars)
 	return
 
 #
