@@ -11,16 +11,42 @@ from skeleton import Skeleton
 print 'Pose2 plugin imported'
 
 
+jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck', #'torso', 
+'r-torso-clavicle', 'l-torso-clavicle', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand', 'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot')
+
+zonesToJointsMapping = {
+    'pelvis':'joint-pelvis',
+    'hip':'joint-spine-2',
+     #'torso':'joint-spine-1',
+    'neck':'joint-neck',
+    'head':'joint-head',
+    'r-eye':'joint-r-eye',
+    'l-eye':'joint-l-eye',
+    'l-torso-clavicle':'joint-l-clavicle',
+    'l-upperarm':'joint-l-shoulder',
+    'l-lowerarm':'joint-l-elbow',
+    'l-hand':'joint-l-hand',
+    'r-torso-clavicle':'joint-r-clavicle',
+    'r-upperarm':'joint-r-shoulder',
+    'r-lowerarm':'joint-r-elbow',
+    'r-hand':'joint-r-hand',
+    'l-upperleg':'joint-l-upper-leg',
+    'l-lowerleg':'joint-l-knee',
+    'l-foot':'joint-l-ankle',
+    'r-upperleg':'joint-r-upper-leg',
+    'r-lowerleg':'joint-r-knee',
+    'r-foot':'joint-r-ankle'
+}
+
 class PoseTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Pose2')      
 
         self.human = None
+        self.jointSelected = False
         self.skeleton = Skeleton()
         self.selectedGroups = []
-        self.jointZones = ['l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'r-torso-clavicle', 'l-torso-clavicle', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand', 'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 
-        'l-foot', 'r-foot']
                 
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
@@ -71,31 +97,34 @@ class PoseTaskView(gui3d.TaskView):
             self.Zslider.label.setText('RotZ: %d' % value)
             
     def onMouseMoved(self, event):
-        human = self.app.selectedHuman
-        groups = []
-        part = self.getJointZones(event.group.name)
+        if not (self.jointSelected):
+          human = self.app.selectedHuman
+          groups = []
+          part = self.getJointZones(event.group.name)
 
-        if part:
-            for g in human.mesh.facesGroups:
-                if part in g.name:
-                    groups.append(g)
-                    """
-                    if human.symmetryModeEnabled:
-                        sg = human.getSymmetryGroup(g)
-                        if sg:
-                            groups.append(sg)
-                    """
+          if part:
+              for g in human.mesh.facesGroups:
+                  if part in g.name:
+                      groups.append(g)
 
-            for g in self.selectedGroups:
-                if g not in groups:
-                    g.setColor([255, 255, 255, 255])
+              for g in self.selectedGroups:
+                  if g not in groups:
+                      g.setColor([255, 255, 255, 255])
 
-            for g in groups:
-                if g not in self.selectedGroups:
-                    g.setColor([0, 169, 184, 255])
-                  
-            self.selectedGroups = groups
-            self.app.redraw()
+              for g in groups:
+                  if g not in self.selectedGroups:
+                      g.setColor([0, 169, 184, 255])
+                    
+              self.selectedGroups = groups
+              self.app.redraw()
+    
+    def onMouseUp(self, event):
+        if self.jointSelected: 
+            self.jointSelected = False
+        else:
+            self.jointSelected = True
+
+
     
     def onShow(self, event):
         self.app.selectedHuman.storeMesh()
@@ -125,7 +154,7 @@ class PoseTaskView(gui3d.TaskView):
         human.update()
         
     def getJointZones(self, groupName):
-        for k in self.jointZones:
+        for k in jointZones:
             if k in groupName:
                 return k
         return None
