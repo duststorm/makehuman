@@ -1848,10 +1848,10 @@ def deleteRig(context, rig00, action, prefix):
     return
 
 #
-#    simplifyFCurves(context, rig, selection):
+#    simplifyFCurves(context, rig, useVisible, useMarkers):
 #
 
-def simplifyFCurves(context, rig, selection):
+def simplifyFCurves(context, rig, useVisible, useMarkers):
     scn = context.scene
     if not scn.MhxDoSimplify:
         return
@@ -1863,20 +1863,22 @@ def simplifyFCurves(context, rig, selection):
         print("No action to simplify")
         return
 
-    (minTime, maxTime) = ('All', 0)
-    if selection == 'All':
-        fcurves = act.fcurves
-    else:
+    if useVisible:
         fcurves = []
         for fcu in act.fcurves:
             if not fcu.hide:
                 fcurves.append(fcu)
-                print(fcu.data_path, fcu.array_index)
-        if selection == 'Markers':
-            (minTime, maxTime) = getMarkedTime(scn)        
-            if minTime == None:    
-                print("Need two selected markers")
-                return
+                #print(fcu.data_path, fcu.array_index)
+    else:
+        fcurves = act.fcurves
+
+    if useMarkers:
+        (minTime, maxTime) = getMarkedTime(scn)        
+        if minTime == None:    
+            print("Need two selected markers")
+            return
+    else:
+        (minTime, maxTime) = ('All', 0)
 
     for fcu in fcurves:
         simplifyFCurve(fcu, act, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
@@ -1913,7 +1915,7 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
             t = pt.co[0]
             if t < minTime:
                 before.append(pt.co)
-            elif t <= maxTime:
+            elif t > maxTime:
                 after.append(pt.co)
             else:
                 points.append(pt)
@@ -1927,7 +1929,6 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
         keeps += new
         keeps.sort()
         new = iterateFCurves(points, keeps, maxErr)
-
     newVerts = before
     for n in keeps:
         newVerts.append(points[n].co)
@@ -1945,7 +1946,8 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
         except:
             dt = 0.5
         if abs(dt) > 1e-5:
-            print(path, co, dt)
+            pass
+            # print(path, co, dt)
         else:
             nfcu.keyframe_points.insert(frame=co[0], value=co[1])
 
@@ -2250,6 +2252,16 @@ def initInterface(context):
         description="Simplify FCurves",
         default=True)
 
+    bpy.types.Scene.MhxSimplifyVisible = BoolProperty(
+        name="Only visible", 
+        description="Simplify only visible F-curves",
+        default=False)
+
+    bpy.types.Scene.MhxSimplifyMarkers = BoolProperty(
+        name="Only between markers", 
+        description="Simplify only between markers",
+        default=False)
+
     bpy.types.Scene.MhxApplyFixes = BoolProperty(
         name="Apply found fixes", 
         description="Apply found fixes",
@@ -2293,7 +2305,6 @@ def initInterface(context):
         description="Delete button deletes action permanently",
         default=False)
 
-
     bpy.types.Scene.MhxPrefix = StringProperty(
         name="Prefix", 
         description="Prefix", 
@@ -2312,6 +2323,8 @@ def initInterface(context):
         scn['MhxDefaultSS'] = True
         scn['MhxRot90Anim'] = True
         scn['MhxDoSimplify'] = True
+        scn['MhxSimplifyVisible'] = False
+        scn['MhxSimplifyMarkers'] = False
         scn['MhxApplyFixes'] = True
 
         scn['MhxPlantLoc'] = True
@@ -2323,7 +2336,6 @@ def initInterface(context):
         scn['MhxDirectory'] = "~/makehuman/bvh/Female1_bvh"
         scn['MhxReallyDelete'] = False
         listAllActions(context)
-        setAction()
     else:
         print("Warning - no scene - scene properties not set")
 
@@ -2439,6 +2451,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
         layout.operator("mhx.mocap_save_defaults")
         layout.operator("mhx.mocap_copy_angles_fk_ik")
 
+        layout.separator()
         layout.label('Load')
         layout.prop(scn, "MhxBvhScale")
         layout.prop(scn, "MhxAutoScale")
@@ -2454,6 +2467,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
         layout.separator()
         layout.operator("mhx.mocap_load_retarget_simplify")
 
+        layout.separator()
         layout.label('Toggle')
         row = layout.row()
         row.operator("mhx.mocap_toggle_pole_targets")
@@ -2465,6 +2479,7 @@ class Bvh2MhxPanel(bpy.types.Panel):
         row.operator("mhx.mocap_toggle_limit_constraints")
         row.prop(ob, "MhxToggleLimitConstraints")
 
+        layout.separator()
         layout.label('Plant')
         row = layout.row()
         row.prop(scn, "MhxPlantLoc")
@@ -2472,23 +2487,24 @@ class Bvh2MhxPanel(bpy.types.Panel):
         layout.prop(scn, "MhxPlantCurrent")
         layout.operator("mhx.mocap_plant")
 
+        layout.separator()
         layout.label('Simplify')
         layout.prop(scn, "MhxErrorLoc")
         layout.prop(scn, "MhxErrorRot")
-        layout.operator("mhx.mocap_simplify_fcurves", text="Simplify all").selection="All"
-        layout.operator("mhx.mocap_simplify_fcurves", text="Visible F-curves").selection="Visible"
-        layout.operator("mhx.mocap_simplify_fcurves", text="Between markers").selection="Markers"
+        layout.prop(scn, "MhxSimplifyVisible")
+        layout.prop(scn, "MhxSimplifyMarkers")
+        layout.operator("mhx.mocap_simplify_fcurves")
 
+        layout.separator()
         layout.label('Batch conversion')
         layout.prop(scn, "MhxDirectory")
         layout.prop(scn, "MhxPrefix")
         layout.operator("mhx.mocap_batch")
 
+        layout.separator()
         layout.label('Manage actions')
-        listAllActions(context)
-        setAction()
         layout.prop_menu_enum(scn, "MhxActions")
-        layout.operator("mhx.mocap_select")
+        layout.operator("mhx.mocap_update_action_list")
         layout.prop(scn, "MhxReallyDelete")
         layout.operator("mhx.mocap_delete")
         return
@@ -2524,7 +2540,6 @@ class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
     bl_label = "Retarget selected to MHX"
 
     def execute(self, context):
-        import bpy, mathutils
         trgRig = context.object
         guessTargetArmature(trgRig)
         for srcRig in context.selected_objects:
@@ -2539,11 +2554,10 @@ class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
 class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
     bl_idname = "mhx.mocap_simplify_fcurves"
     bl_label = "Simplify FCurves"
-    selection = bpy.props.StringProperty()
 
     def execute(self, context):
-        import bpy, mathutils
-        simplifyFCurves(context, context.object, self.selection)
+        scn = context.scene
+        simplifyFCurves(context, context.object, scn.MhxSimplifyVisible, scn.MhxSimplifyMarkers)
         return{'FINISHED'}    
 
 #
@@ -2555,7 +2569,6 @@ class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
     bl_label = "Silence constraints"
 
     def execute(self, context):
-        import bpy, mathutils
         silenceConstraints(context.object)
         print("Constraints silenced")
         return{'FINISHED'}    
@@ -2669,7 +2682,7 @@ def loadRetargetSimplify(context, filepath):
     (srcRig, action) = importAndRename(context, filepath)
     retargetMhxRig(context, srcRig, trgRig)
     if context.scene['MhxDoSimplify']:
-        simplifyFCurves(context, trgRig, 'All')
+        simplifyFCurves(context, trgRig, False, False)
     deleteRig(context, srcRig, action, 'Y_')
     time2 = time.clock()
     print("%s finished in %.3f s" % (filepath, time2-time1))
@@ -2736,19 +2749,14 @@ class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
 
 def listAllActions(context):
     global theActions
-    actions = [] 
+    theActions = [] 
     for act in bpy.data.actions:
         name = act.name
-        actions.append((name, name, name))
-    theActions = actions
-    return
-
-def setAction():
-    global theActions
+        theActions.append((name, name, name))
     bpy.types.Scene.MhxActions = EnumProperty(
         items = theActions,
         name = "Actions")
-    return theActions
+    return
 
 def findAction(name):
     global theActions
@@ -2758,27 +2766,16 @@ def findAction(name):
             return n
     raise NameError("Unrecognized action %s" % name)
 
-class VIEW3D_OT_MhxSelectButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_select"
-    bl_label = "Select action"
+class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_update_action_list"
+    bl_label = "Update action list"
 
     @classmethod
     def poll(cls, context):
         return context.object
 
     def execute(self, context):
-        import bpy
-        global theActions
-        name = context.scene.MhxActions        
-        print('Select action', name)    
-        try:
-            act = bpy.data.actions[name]
-        except:
-            act = None
-        ob = context.object
-        if act and ob.animation_data:
-            ob.animation_data.action = act
-
+        listAllActions(context)
         return{'FINISHED'}    
 
 class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
@@ -2790,8 +2787,8 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
         return context.scene.MhxReallyDelete
 
     def execute(self, context):
-        import bpy
         global theActions
+        listAllActions(context)
         scn = context.scene
         name = scn.MhxActions        
         print('Delete action', name)    
@@ -2808,7 +2805,6 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
                 bpy.data.actions.remove(act)
                 print('Action', act, 'deleted')
                 listAllActions(context)
-                setAction()
                 #del act
             else:
                 print("Cannot delete. %s has %d users." % (act, act.users))
