@@ -175,13 +175,15 @@ class PoseTaskView(gui3d.TaskView):
         return None
     
     def rotateJoint(self, joint, center, transform=None):                
-        src = self.app.selectedHuman.meshStored
+        #src = self.app.selectedHuman.meshStored
         dst = self.app.selectedHuman.meshData.verts
         if not transform:
             transform = euler2matrix(joint.rotation, "sxyz")
+        else:
+            joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
 
         for i in joint.bindedVects:
-            dst[i].co = vadd(mtransform(transform, vsub(src[i], center)),center)
+            dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
         for child in joint.children:
             self.rotateJoint(child, center, transform)
     
