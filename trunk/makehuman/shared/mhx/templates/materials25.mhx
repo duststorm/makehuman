@@ -434,11 +434,11 @@ Material Eye
   use_face_texture_alpha False ;
   use_ray_shadow_bias False ;
   use_raytrace False ;
-  use_shadows True ;
+  use_shadows False ;
   use_sky False ;
   use_tangent_shading False ;
   use_transparency True ;
-  use_transparent_shadows False ;
+  use_transparent_shadows True ;
 end Material
 
 Material Brows
