@@ -43,7 +43,7 @@ bl_info = {
     'api': 35774,
     'location': 'File > Import',
     'description': 'Import MakeHuman hair file (.obj)',
-    'url': 'http://www.makehuman.org',
+    'wiki_url': 'http://sites.google.com/site/makehumandocs/blender-export-and-mhx/hair',
     'category': 'Import-Export'}
 
 import bpy

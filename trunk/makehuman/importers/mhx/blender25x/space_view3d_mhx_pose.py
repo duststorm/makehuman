@@ -44,6 +44,7 @@ bl_info = {
     "location": "View3D > UI panel > MHX Lipsync, MHX Expressions, MHX Pose",
     "description": "Lipsync, expression, pose tool for the MHX rig",
     "warning": "",
+    'wiki_url': 'http://sites.google.com/site/makehumandocs/blender-export-and-mhx/pose-tool',
     "category": "3D View"}
 
 import bpy, os, mathutils

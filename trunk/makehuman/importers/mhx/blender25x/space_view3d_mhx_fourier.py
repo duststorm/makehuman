@@ -44,6 +44,7 @@ bl_info = {
     "location": "View3D > Properties > MHX Fourier",
     "description": "Fourier tool",
     "warning": "",
+    'wiki_url': 'http://sites.google.com/site/makehumandocs/blender-export-and-mhx',
     "category": "3D View"}
 
 """

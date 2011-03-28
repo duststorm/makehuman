@@ -26,7 +26,7 @@ TO DO
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 3
+MINOR_VERSION = 4
 splitLeftRight = True
 BODY_LANGUAGE = True
 theHuman = 'Human'
