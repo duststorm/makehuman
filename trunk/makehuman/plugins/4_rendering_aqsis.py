@@ -23,9 +23,9 @@ class AqsisTaskView(gui3d.TaskView):
         gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*1+6));y+=25
                                               
         #Sliders                            
-        self.shadingRateSlider= gui3d.Slider(self, position=[10, y, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: 2.00");y+=36
-        self.samplesSlider= gui3d.Slider(self, position=[10, y, 9.01], value=2, min=1.0, max=10, label = "Samples: 2.00");y+=36
-        self.skinOilSlider= gui3d.Slider(self, position=[10, y, 9.02], value=0.3, min=0.0, max=10, label = "Skin Oil: 0.3");y+=36
+        self.shadingRateSlider= gui3d.Slider(self, position=[10, y, 9.3], value=2, min=0.1, max=10, label = "ShadingRate: %.2f");y+=36
+        self.samplesSlider= gui3d.Slider(self, position=[10, y, 9.01], value=2, min=1.0, max=10, label = "Samples: %.2f");y+=36
+        self.skinOilSlider= gui3d.Slider(self, position=[10, y, 9.02], value=0.3, min=0.0, max=10, label = "Skin Oil: %.2f");y+=36
         y+=4
         
         #Buttons
@@ -33,17 +33,14 @@ class AqsisTaskView(gui3d.TaskView):
             
         @self.shadingRateSlider.event
         def onChanging(value):
-            self.shadingRateSlider.label.setText("ShadingRate: "+str(round(value,3)))
             self.app.settings['rendering_aqsis_shadingrate'] = value #Using global dictionary in app for global settings
             
         @self.samplesSlider.event
         def onChanging(value):
-            self.samplesSlider.label.setText("Samples: "+str(round(value,3)))
             self.app.settings['rendering_aqsis_samples'] = value
             
         @self.skinOilSlider.event
         def onChanging(value):
-            self.skinOilSlider.label.setText("Skin Oil: "+str(round(value,3)))
             self.app.settings['rendering_aqsis_oil'] = value
             
         @self.renderButton.event

@@ -34,9 +34,9 @@ class PoseTaskView(gui3d.TaskView):
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
 
-        self.shoulderXslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -85, max = 80, label = "RotX: 0");y+=36
-        self.shoulderYslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -140, max = 50, label = "RotY: 0");y+=36
-        self.shoulderZslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -120, max = 90, label = "RotZ: 0");y+=36
+        self.shoulderXslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -85, max = 80, label = "RotX: %d");y+=36
+        self.shoulderYslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -140, max = 50, label = "RotY: %d");y+=36
+        self.shoulderZslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -120, max = 90, label = "RotZ: %d");y+=36
         y+=4
 
         self.savePoseFiles = 0
@@ -66,31 +66,28 @@ class PoseTaskView(gui3d.TaskView):
         def onChange(value):            
             self.shoulder.angle[0] = value
             self.shoulder.applyPose()
-            self.shoulderXslider.label.setText('RotX: %d' % value)
             
         @self.shoulderXslider.event
-        def onChanging(value):            
-            self.shoulderXslider.label.setText('RotX: %d' % value)
+        def onChanging(value):
+            pass
             
         @self.shoulderYslider.event
         def onChange(value):            
             self.shoulder.angle[1] = value 
             self.shoulder.applyPose()
-            self.shoulderYslider.label.setText('RotY: %d' % value)
             
         @self.shoulderYslider.event
         def onChanging(value):            
-            self.shoulderYslider.label.setText('RotY: %d' % value)
+            pass
 
         @self.shoulderZslider.event
         def onChange(value):
             self.shoulder.angle[2] = value 
             self.shoulder.applyPose()
-            self.shoulderZslider.label.setText('RotZ: %d' % value)
             
         @self.shoulderZslider.event
         def onChanging(value):            
-            self.shoulderZslider.label.setText('RotZ: %d' % value)
+            pass
             
     def onShow(self, event):
         self.app.selectedHuman.storeMesh()
@@ -117,9 +114,6 @@ class PoseTaskView(gui3d.TaskView):
                 savePath = os.path.join(poseDir,tName)
                 print "saved in %s"%(savePath)
 
-            self.shoulderXslider.label.setText('RotX: %d'%(angle[0]))
-            self.shoulderYslider.label.setText('RotY: %d'%(angle[1]))
-            self.shoulderZslider.label.setText('RotZ: %d'%(angle[2]))
             self.shoulderXslider.setValue(angle[0])
             self.shoulderYslider.setValue(angle[1])
             self.shoulderYslider.setValue(angle[2])
@@ -130,9 +124,6 @@ class PoseTaskView(gui3d.TaskView):
 
     def reset(self, limbToTest):
         limbToTest.angle = [0,0,0]        
-        self.shoulderXslider.label.setText('RotX: 0')
-        self.shoulderYslider.label.setText('RotY: 0')
-        self.shoulderZslider.label.setText('RotZ: 0')
         self.shoulderXslider.setValue(0.0)
         self.shoulderYslider.setValue(0.0)
         self.shoulderZslider.setValue(0.0)

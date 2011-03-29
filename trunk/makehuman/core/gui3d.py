@@ -767,6 +767,10 @@ class Slider(View):
             
         if isinstance(label, str):
             self.label = TextObject(self, [position[0]+10,position[1]+8-6,position[2]+0.2], label, fontSize = style.fontSize)
+            if '%' in label:
+                self.labelFormat = label
+            else:
+                self.labelFormat = None
             
         self.thumbMinX = position[0] + thumbStyle.width / 2
         self.thumbMaxX = position[0] + style.width - thumbStyle.width - thumbStyle.width / 2
@@ -791,6 +795,9 @@ class Slider(View):
         value = (self.__value - self.min) / float(self.max - self.min)
         thumbPos[0] = value * (self.thumbMaxX - self.thumbMinX) + self.thumbMinX
         self.thumb.setPosition(thumbPos)
+        
+        if self.labelFormat:
+            self.label.setText(self.labelFormat % self.__value)
 
     def getValue(self):
         return self.__value
@@ -805,6 +812,9 @@ class Slider(View):
         self.__value = value * (self.max - self.min) + self.min
         if isinstance(self.min, int):
             self.__value = int(self.__value)
+            
+        if self.labelFormat:
+            self.label.setText(self.labelFormat % self.__value)
 
         self.callEvent('onChanging', self.__value)
 
@@ -818,6 +828,9 @@ class Slider(View):
         self.__value = value * (self.max - self.min) + self.min
         if isinstance(self.min, int):
             self.__value = int(self.__value)
+            
+        if self.labelFormat:
+            self.label.setText(self.labelFormat % self.__value)
 
         self.callEvent('onChange', self.__value)
 

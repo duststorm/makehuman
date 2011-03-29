@@ -26,10 +26,10 @@ class MakeHairTaskView(gui3d.TaskView):
         #sliders
         y=80
         gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*4+24*4+6));y+=25
-        self.cPSlider = gui3d.Slider(self, [10, y, 9.3], value=14,min=4,max=30,label="Control Points");y+=36
-        self.lengthSlider = gui3d.Slider(self, [10, y, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length");y+=36
-        self.numberSlider = gui3d.Slider(self, [10, y, 9.3], value=25,min=1,max=260,label="Strands Number");y+=36
-        self.gravitySlider = gui3d.Slider(self, [10, y, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor");y+=36
+        self.cPSlider = gui3d.Slider(self, [10, y, 9.3], value=14,min=4,max=30,label="Control Points: %d");y+=36
+        self.lengthSlider = gui3d.Slider(self, [10, y, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length: %.2f");y+=36
+        self.numberSlider = gui3d.Slider(self, [10, y, 9.3], value=25,min=1,max=260,label="Strands Number: %d");y+=36
+        self.gravitySlider = gui3d.Slider(self, [10, y, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor: %.2f");y+=36
         self.cPEntry = gui3d.TextEdit(self, [18, y, 9.3], "9,12", gui3d.TextEditStyle._replace(width=112), gui3d.floatValidator);y+=24
         
         @self.cPSlider.event

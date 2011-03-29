@@ -25,42 +25,38 @@ class RenderingSettingTaskView(gui3d.TaskView):
         gui3d.GroupBox(self, [10, y, 9.0], 'Hair', gui3d.GroupBoxStyle._replace(height=25+36*4+6));y+=25
         human.hairs.interpolationRadius = self.app.settings.get('hair.interpolationRadius',  human.hairs.interpolationRadius)
         self.clumpRadius = gui3d.Slider(self, position=[10, y, 9.3], value=human.hairs.interpolationRadius, min=0.05,max=0.5,
-            label = "Clump radius: %.4f"%human.hairs.interpolationRadius);y+=36
+            label = "Clump radius: %.4f");y+=36
         human.hairs.clumpInterpolationNumber = self.app.settings.get('hair.clumpInterpolationNumber', human.hairs.clumpInterpolationNumber)
         self.clumpChildren= gui3d.Slider(self, position=[10, y, 9.3], value=human.hairs.clumpInterpolationNumber, min=0, max=150,
-            label = "Clump children: %d"%human.hairs.clumpInterpolationNumber);y+=36
+            label = "Clump children: %d");y+=36
         human.hairs.multiStrandNumber = self.app.settings.get('hair.multiStrandNumber',  human.hairs.multiStrandNumber)
         self.multiStrand= gui3d.Slider(self, position=[10, y, 9.3], value=human.hairs.multiStrandNumber, min=0, max=150,
-            label = "Multistrand children: %d"%human.hairs.multiStrandNumber);y+=36
+            label = "Multistrand children: %d");y+=36
         human.hairs.randomness = self.app.settings.get('hair.randomness',  human.hairs.randomness)
         self.randomHair= gui3d.Slider(self, position=[10, y, 9.3], value=human.hairs.randomness, min=0.0, max=0.5,
-            label = "Randomness: %.4f"%human.hairs.randomness);y+=36
+            label = "Randomness: %.4f");y+=36
 
         @self.clumpRadius.event
         def onChanging(value):
             human = self.app.selectedHuman
-            self.clumpRadius.label.setText("Clump radius: %.4f"%self.clumpRadius.getValue())
             human.hairs.interpolationRadius = self.clumpRadius.getValue()
             self.app.settings['hair.interpolationRadius'] = human.hairs.interpolationRadius
 
         @self.clumpChildren.event
         def onChanging(value):
             human = self.app.selectedHuman
-            self.clumpChildren.label.setText("Clump children: %d"%self.clumpChildren.getValue())
             human.hairs.clumpInterpolationNumber = self.clumpChildren.getValue()
             self.app.settings['hair.clumpInterpolationNumber'] = human.hairs.clumpInterpolationNumber
             
         @self.multiStrand.event
         def onChanging(value):
             human = self.app.selectedHuman
-            self.multiStrand.label.setText("Multistrand children: %d"%self.multiStrand.getValue())
             human.hairs.multiStrandNumber = self.multiStrand.getValue()
             self.app.settings['hair.multiStrandNumber'] = human.hairs.multiStrandNumber
         
         @self.randomHair.event
         def onChanging(value):
             human = self.app.selectedHuman
-            self.randomHair.label.setText("Randomness: %.4f"%self.randomHair.getValue())
             human.hairs.randomness = self.randomHair.getValue()
             self.app.settings['hair.randomness'] = human.hairs.randomness
 

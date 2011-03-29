@@ -27,10 +27,10 @@ class SettingsTaskView(gui3d.TaskView):
         gui3d.GroupBox(self, [10, y, 9.0], 'Mouse behavior', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
         self.normal = gui3d.Slider(self, [10,y, 9.2],
             self.app.settings.get('lowspeed', 1), 1, 10,
-            "Normal: %d" % self.app.settings.get('lowspeed', 1));y+=36
+            "Normal: %d");y+=36
         self.shift = gui3d.Slider(self, [10,y,9.2],
             self.app.settings.get('highspeed', 5), 1, 10,
-            "Shift: %d" % self.app.settings.get('highspeed', 5));y+=36
+            "Shift: %d");y+=36
         y+=16
             
         modes = [] 
@@ -75,21 +75,11 @@ class SettingsTaskView(gui3d.TaskView):
             
         @self.normal.event
         def onChange(value):
-            self.normal.label.setText("Normal: %d" % value)
             self.app.settings['lowspeed'] = value
-            
-        @self.normal.event
-        def onChanging(value):
-            self.normal.label.setText("Normal: %d" % value)
             
         @self.shift.event
         def onChange(value):
-            self.shift.label.setText("Shift: %d" % value)
             self.app.settings['highspeed'] = value
-            
-        @self.shift.event
-        def onChanging(value):
-            self.shift.label.setText("Shift: %d" % value)
             
         @metric.event
         def onClicked(event):

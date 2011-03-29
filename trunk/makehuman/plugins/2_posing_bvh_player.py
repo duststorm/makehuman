@@ -121,13 +121,12 @@ class BvhView(gui3d.TaskView):
         y = 80
         gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*1+6));y+=25
 
-        self.frameSlider = gui3d.Slider(self, position=[10, y, 9.3], value = 0, min = 0, max = self.__skeleton.frames, label = "Frame: 0");y+=36
+        self.frameSlider = gui3d.Slider(self, position=[10, y, 9.3], value = 0, min = 0, max = self.__skeleton.frames, label = 'Frame: %d');y+=36
         self.playPause = gui3d.Button(self, [18, y, 9.3], "Play");y+=24
         self.showHuman = gui3d.ToggleButton(self, [18,y,9.1],"Show Human"); y+=24
         
         @self.frameSlider.event
         def onChanging(value):
-            self.frameSlider.label.setText('Frame: %d' % value)
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
             self.app.selectedHuman.meshData.calcNormals()
@@ -135,7 +134,6 @@ class BvhView(gui3d.TaskView):
             
         @self.frameSlider.event
         def onChange(value):
-            self.frameSlider.label.setText('Frame: %d' % value)
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
             self.app.selectedHuman.meshData.calcNormals()
