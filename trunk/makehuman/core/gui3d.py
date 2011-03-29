@@ -1399,11 +1399,11 @@ class TextEdit(View):
 
 def intValidator(text):
     
-    return text.isdigit()
+    return not text or text.isdigit()
     
 def floatValidator(text):
     
-    return text.replace('.', '').isdigit() and text.count('.') <= 1
+    return not text or (text.replace('.', '').isdigit() and text.count('.') <= 1)
 
 # FileEntryView widget
 

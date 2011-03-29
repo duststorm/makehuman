@@ -66,11 +66,11 @@ class RenderingSettingTaskView(gui3d.TaskView):
 
         @self.width.event
         def onChange(value):
-            self.app.settings['rendering_width'] = int(value)
+            self.app.settings['rendering_width'] = 0 if not value else int(value)
 
         @self.height.event
         def onChange(value):
-            self.app.settings['rendering_height'] = int(value)
+            self.app.settings['rendering_height'] = 0 if not value else int(value)
 
     def onHide(self, event):
 
