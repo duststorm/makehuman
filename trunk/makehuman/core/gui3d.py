@@ -769,14 +769,80 @@ class Slider(View):
             self.label = TextObject(self, [position[0]+10,position[1]+8-6,position[2]+0.2], label, fontSize = style.fontSize)
             if '%' in label:
                 self.labelFormat = label
+                self.edit = TextEdit(self, [position[0]+8, position[1], position[2]+0.3], '',
+                    TextEditStyle._replace(width=self.style.width-16),
+                    intValidator if isinstance(min, int) else floatValidator)
+                self.edit.hide()
+                
+                @self.edit.event
+                def onBlur(event):
+                    
+                    if self.edit.getText():
+                        oldValue = self.__value
+                        self.setValue(self.edit.getText())
+                        if oldValue != self.__value:
+                            self.callEvent('onChange', self.__value)
+
+                    TextEdit.onBlur(self.edit, event)
+                    self.edit.hide()
+                    
+                @self.edit.event
+                def onKeyDown(event):
+                    
+                    if event.modifiers & events3d.KMOD_CTRL:
+                        TextEdit.onKeyDown(self.edit, event)
+                        return
+
+                    if event.key == events3d.SDLK_RETURN:
+                        self.setFocus()
+                        self.app.redraw()
+                    else:
+                        TextEdit.onKeyDown(self.edit, event)
             else:
                 self.labelFormat = None
+        else:
+            self.label = None
             
         self.thumbMinX = position[0] + thumbStyle.width / 2
         self.thumbMaxX = position[0] + style.width - thumbStyle.width - thumbStyle.width / 2
         self.min = min
         self.max = max
         self.setValue(value)
+        
+        self.sliding = False
+        
+    def __setValue(self, value):
+        
+        # Convert if needed
+        if isinstance(self.min, int):
+            value = int(value)
+        else:
+            value = float(value)
+            
+        # Clip
+        self.__value = min(self.max, max(self.min, value))
+            
+        # Update label if needed
+        if self.labelFormat:
+            self.label.setText(self.labelFormat % self.__value)
+        
+    def __setValueFromCursor(self, x, y):
+        
+        thumbPos = self.thumb.getPosition()
+        screenPos = mh.cameras[1].convertToScreen(*thumbPos)
+        worldPos = mh.cameras[1].convertToWorld3D(x, y, screenPos[2])
+        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0] - self.thumbStyle.width / 2))
+        self.thumb.setPosition(thumbPos)
+        value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
+        self.__setValue(value * (self.max - self.min) + self.min)
+        
+    def __updateThumb(self):
+        
+        thumbPos = self.thumb.getPosition()
+        #for values that are integer we need a float denominator
+        value = (self.__value - self.min) / float(self.max - self.min)
+        thumbPos[0] = value * (self.thumbMaxX - self.thumbMinX) + self.thumbMinX
+        self.thumb.setPosition(thumbPos)
     
     def getPosition(self):
         return self.background.getPosition()
@@ -786,32 +852,33 @@ class Slider(View):
         self.thumbMinX = position[0] + self.thumbStyle.width / 2
         self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width - self.thumbStyle.width / 2
         self.setValue(self.getValue())
-        self.label.setPosition([position[0]+10,position[1]-2,position[2]+0.2])
+        if self.label:
+            self.label.setPosition([position[0]+10,position[1]-2,position[2]+0.2])
+        if self.labelFormat:
+            self.edit.setPosition([position[0]+8, position[1], position[2]+0.3])
 
     def setValue(self, value):
-        self.__value = min(self.max, max(self.min, value))
-        thumbPos = self.thumb.getPosition()
-        #for values that are integer we need a float denominator
-        value = (self.__value - self.min) / float(self.max - self.min)
-        thumbPos[0] = value * (self.thumbMaxX - self.thumbMinX) + self.thumbMinX
-        self.thumb.setPosition(thumbPos)
         
-        if self.labelFormat:
-            self.label.setText(self.labelFormat % self.__value)
+        self.__setValue(value)
+        self.__updateThumb()
 
     def getValue(self):
         return self.__value
+        
+    def onMouseDown(self, event):
+        
+        thumbPos = self.thumb.getPosition()
+        screenPos = mh.cameras[1].convertToScreen(*thumbPos)
+        
+        if event.y > screenPos[1]:
+            self.sliding = True
 
     def onMouseDragged(self, event):
-        thumbPos = self.thumb.getPosition()
-        screenPos = mh.cameras[1].convertToScreen(thumbPos[0], thumbPos[1], thumbPos[2])
-        worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
-        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0] - self.thumbStyle.width / 2))
-        self.thumb.setPosition(thumbPos)
-        value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
-        self.__value = value * (self.max - self.min) + self.min
-        if isinstance(self.min, int):
-            self.__value = int(self.__value)
+        
+        if not self.sliding:
+            return
+            
+        self.__setValueFromCursor(event.x, event.y)
             
         if self.labelFormat:
             self.label.setText(self.labelFormat % self.__value)
@@ -819,22 +886,26 @@ class Slider(View):
         self.callEvent('onChanging', self.__value)
 
     def onMouseUp(self, event):
-        thumbPos = self.thumb.getPosition()
-        screenPos = mh.cameras[1].convertToScreen(thumbPos[0], thumbPos[1], thumbPos[2])
-        worldPos = mh.cameras[1].convertToWorld3D(event.x, event.y, screenPos[2])
-        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0] - self.thumbStyle.width / 2))
-        self.thumb.setPosition(thumbPos)
-        value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
-        self.__value = value * (self.max - self.min) + self.min
-        if isinstance(self.min, int):
-            self.__value = int(self.__value)
+        
+        if self.sliding:
             
-        if self.labelFormat:
-            self.label.setText(self.labelFormat % self.__value)
+            self.__setValueFromCursor(event.x, event.y)
+                
+            if self.labelFormat:
+                self.label.setText(self.labelFormat % self.__value)
+                
+            self.sliding = False
 
-        self.callEvent('onChange', self.__value)
+            self.callEvent('onChange', self.__value)
+            
+        elif self.labelFormat:
+            
+            self.edit.setText(str(self.__value))
+            self.edit.show()
+            self.edit.setFocus()
 
     def onKeyDown(self, event):
+        
         oldValue = self.__value
         newValue = self.__value
 
@@ -856,18 +927,24 @@ class Slider(View):
             View.onKeyDown(self, event)
 
         if oldValue != newValue:
+            
             self.setValue(newValue)
+            
             if oldValue != self.__value:
+                
                 self.callEvent('onChange', self.__value)
 
     def onFocus(self, event):
+        
         if self.focusedThumbTexture:
+            
             self.thumb.setTexture(self.focusedThumbTexture)
 
     def onBlur(self, event):
+        
         if self.focusedThumbTexture:
+            
             self.thumb.setTexture(self.thumbTexture)
-
 
 # Button widget
 ButtonStyle = Style(**{
@@ -1357,18 +1434,16 @@ class TextEdit(View):
         pass
 
     def onKeyDown(self, event):
+        
         if event.modifiers & events3d.KMOD_CTRL:
             View.onKeyDown(self, event)
             return
-
-        # print event #only for DEBUG
 
         if event.key == events3d.SDLK_BACKSPACE:
             self.__delText()
         elif event.key == events3d.SDLK_RETURN:
             if len(self.text):
                 View.onKeyDown(self, event)
-
             return
         elif event.key == events3d.SDLK_RIGHT:
             if self.__position<len(self.text)-1:
@@ -1412,7 +1487,7 @@ class TextEdit(View):
 
 def intValidator(text):
     
-    return not text or text.isdigit()
+    return not text or text.isdigit() or (text[0] == '-' and (len(text) == 1 or text[1:].isdigit()))
     
 def floatValidator(text):
     
