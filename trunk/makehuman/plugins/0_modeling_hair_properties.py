@@ -2,70 +2,19 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
+import colorsys
 import gui3d, hair, font3d
 from aljabr import vdist, vmul, vnorm, vsub, vadd
 
-print 'hair properties imported'
-
-# r, g, b between 0 and 255
 def rgbToHsl(r, g, b):
+    h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
+    return [int(h * 359.0), int(s * 100.0), int(l * 100.0)]
     
-    r /= 255.0
-    g /= 255.0
-    b /= 255.0
-    
-    M = max([r, g, b])
-    m = min([r, g, b])
-    
-    c = M - m
-    
-    if M == m:
-        h = 0
-    elif M == r:
-        h = (60 * ((g - b) / c) + 360) % 360
-    elif M == g:
-        h = 60 * ((b - r) / c) + 120
-    else:
-        h = 60 * ((r - g) / c) + 240
-    
-    l = (M + m) / 2.0
-    
-    if M == m:
-        s = 0
-    elif l <= 0.5:
-        s = c / (2.0 * l)
-    else:
-        s = c / (2.0 - 2.0 * l)
-    
-    return map(round, [h, s * 100, l * 100])
-    
-# h between 0 and 359, s and l between 0 and 100
 def hslToRgb(h, s, l):
-    
-    h /= 60.0
-    s /= 100.0
-    l /= 100.0
-    
-    c = (1.0 - abs(2.0 * l - 1.0)) * s
-    
-    x = c * (1.0 - abs(h % 2.0 - 1.0))
-    
-    if h < 1.0:
-        rgb = [c, x, 0.0]
-    elif h < 2.0:
-        rgb = [x, c, 0.0]
-    elif h < 3.0:
-        rgb = [0.0, c, x]
-    elif h < 4.0:
-        rgb = [0.0, x, c]
-    elif h < 5.0:
-        rgb = [x, 0.0, c]
-    else:
-        rgb = [c, 0.0, x]
-        
-    m = l - c * 0.5
-    
-    return [int((c + m)*255) for c in rgb]
+    r, g, b = colorsys.hls_to_rgb(h / 359.0, l / 100.0, s / 100.0)
+    return [int(r * 255.0), int(g * 255.0), int(b * 255.0)]
+
+print 'hair properties imported'
 
 class Action:
 
