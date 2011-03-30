@@ -5,11 +5,13 @@ import os.path
 
 import gui3d
 import math
-#import poseengine
-from aljabr import * #axisAngleToQuaternion, quaternionVectorTransform, degree2rad, vadd, vsub, vdist
+from aljabr import * #todo: import the necessities only
 from skeleton import Skeleton
+from mh2obj import exportObj
+from mh import getPath
 print 'Pose2 plugin imported'
 
+exportPath = getPath('exports')
 
 jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck', #'torso', 
 'r-torso-clavicle', 'l-torso-clavicle', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand', 'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot')
@@ -41,7 +43,7 @@ zonesToJointsMapping = {
 class PoseTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Pose2')      
+        gui3d.TaskView.__init__(self, category, 'Pose')      
 
         self.jointSelected = False
         self.zone = ""
@@ -58,13 +60,13 @@ class PoseTaskView(gui3d.TaskView):
         y+=4
 
         self.resetPoseButton = gui3d.Button(self, [18, y, 9.5], "Reset");y+=24
-        self.testPoseButton = gui3d.Button(self, [18, y, 9.5], "Test");y+=24
+        self.savePoseButton = gui3d.Button(self, [18, y, 9.5], "Save");y+=24
         
-        self.savePoseToggle = gui3d.CheckBox(self, [18, y, 9.5], "SavePose");y+=24
+        #self.savePoseToggle = gui3d.CheckBox(self, [18, y, 9.5], "SavePose");y+=24
 
-        @self.testPoseButton.event
+        @self.savePoseButton.event
         def onClicked(event):
-            self.test()
+            exportObj(self.app.selectedHuman.meshData, os.path.join(exportPath, "posed.obj"))
 
         @self.resetPoseButton.event
         def onClicked(event):
@@ -110,7 +112,7 @@ class PoseTaskView(gui3d.TaskView):
             pass
             
     def onMouseMoved(self, event):
-        if not (self.jointSelected):
+        if not (self.joint): #(self.jointSelected):
           human = self.app.selectedHuman
           groups = []
           self.zone = self.getJointZones(event.group.name)
@@ -132,16 +134,15 @@ class PoseTaskView(gui3d.TaskView):
               self.app.redraw()
     
     def onMouseUp(self, event):
-        if self.jointSelected: 
-            self.jointSelected = False
+        if self.joint: 
+            #self.jointSelected = False
+            self.joint = None
         else:
             self.joint = self.skeleton.getJoint(zonesToJointsMapping.get(self.zone))
             self.Xslider.setValue(self.joint.rotation[0])
             self.Yslider.setValue(self.joint.rotation[1])
             self.Zslider.setValue(self.joint.rotation[2])
-            self.jointSelected = True
-
-
+            #self.jointSelected = True
     
     def onShow(self, event):
         self.app.selectedHuman.storeMesh()
@@ -152,24 +153,6 @@ class PoseTaskView(gui3d.TaskView):
         self.app.selectedHuman.restoreMesh()
         self.app.selectedHuman.meshData.update()
         gui3d.TaskView.onHide(self, event)
-        
-    def test(self):
-        #get the group name involving the right arm
-        human = self.app.selectedHuman.meshData
-        self.skeleton.update(human)
-        
-        #for shoulder
-        #j = self.skeleton.getJoint("joint-r-shoulder")
-        
-        j = self.skeleton.getJoint("joint-head")
-        angle = 20
-        axis = [1,0,0]
-        #q = axisAngleToQuaternion(axis, angle*degree2rad)
-        Ryxz = [-4.48*degree2rad,	-1.24*degree2rad,	-7.02*degree2rad]
-        #deform(j, q , j.position, human.verts) 
-        deform2(j, Ryxz , j.position, human.verts) 
-        human.calcNormals()
-        human.update()
         
     def getJointZones(self, groupName):
         for k in jointZones:
@@ -205,7 +188,7 @@ taskview = None
 
 
 def load(app):
-    category = app.getCategory('Experiments')
+    category = app.getCategory('Posing')
     taskview = PoseTaskView(category)
     print 'pose loaded'
             
@@ -286,3 +269,21 @@ def deform2(j, Ryxz, center, verts):
       v.co = vadd(mtransform(m,vsub(v.co, center)), center)
     for child in j.children:
       deform(child, Ryxz, center, verts)
+
+def test(self):
+    #get the group name involving the right arm
+    human = self.app.selectedHuman.meshData
+    self.skeleton.update(human)
+    
+    #for shoulder
+    #j = self.skeleton.getJoint("joint-r-shoulder")
+    
+    j = self.skeleton.getJoint("joint-head")
+    angle = 20
+    axis = [1,0,0]
+    #q = axisAngleToQuaternion(axis, angle*degree2rad)
+    Ryxz = [-4.48*degree2rad,	-1.24*degree2rad,	-7.02*degree2rad]
+    #deform(j, q , j.position, human.verts) 
+    deform2(j, Ryxz , j.position, human.verts) 
+    human.calcNormals()
+    human.update()
