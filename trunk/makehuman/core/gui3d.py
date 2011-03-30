@@ -1491,7 +1491,7 @@ def intValidator(text):
     
 def floatValidator(text):
     
-    return not text or (text.replace('.', '').isdigit() and text.count('.') <= 1)
+    return not text or (text.replace('.', '').isdigit() and text.count('.') <= 1) or (text[0] == '-' and (len(text) == 1 or text[1:].replace('.', '').isdigit()) and text.count('.') <= 1) # Negative sign and optionally digits with optionally 1 decimal point
 
 # FileEntryView widget
 
