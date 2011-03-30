@@ -770,7 +770,7 @@ class Slider(View):
             if '%' in label:
                 self.labelFormat = label
                 self.edit = TextEdit(self, [position[0]+8, position[1], position[2]+0.3], '',
-                    TextEditStyle._replace(width=self.style.width-16),
+                    TextEditStyle._replace(width=self.style.width-16, height=16),
                     intValidator if isinstance(min, int) else floatValidator)
                 self.edit.hide()
                 
@@ -1359,7 +1359,7 @@ class TextEdit(View):
         mesh = NineSliceMesh(style.width, style.height, self.texture, style.border)
         self.background = Object(self, position, mesh)
             
-        self.textObject = TextObject(self, [position[0] + 10.0, position[1] + 4.0, position[2] + 0.1], fontSize = style.fontSize)
+        self.textObject = TextObject(self, [position[0] + 10.0, position[1] + style.height / 2 - 6, position[2] + 0.1], fontSize = style.fontSize)
 
         self.text = text
         self.__position = len(self.text)
