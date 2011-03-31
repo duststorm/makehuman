@@ -94,7 +94,7 @@ class HairTaskView(gui3d.TaskView):
         gui3d.TaskView.onHide(self, event)
     
     def onResized(self, event):
-        self.currentHair.setPosition([event[0]-216, event[1]-36, 9.2])
+        self.currentHair.setPosition([event.width-216, event.height-36, 9.2])
         self.filechooser.onResized(event)
 
     def onHumanChanged(self, event):

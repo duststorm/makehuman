@@ -70,9 +70,9 @@ class EthnicsTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         
-        self.genderBox.setPosition([event[0] - 150, self.genderBox.getPosition()[1], 9.0])
-        self.ageBox.setPosition([event[0] - 150, self.ageBox.getPosition()[1], 9.0])
-        self.loadBox.setPosition([event[0] - 150, self.loadBox.getPosition()[1], 9.0])
+        self.genderBox.setPosition([event.width - 150, self.genderBox.getPosition()[1], 9.0])
+        self.ageBox.setPosition([event.width - 150, self.ageBox.getPosition()[1], 9.0])
+        self.loadBox.setPosition([event.width - 150, self.loadBox.getPosition()[1], 9.0])
         
     def loadHandler(self, human, values):
         

@@ -436,6 +436,8 @@ class Application(events3d.EventHandler):
         self.mouseDownObject = None
         self.enteredObject = None
         self.fullscreen = False
+        self.width = 800
+        self.height = 600
         
         mh.setMouseDownCallback(self.onMouseDownCallback)
         mh.setMouseUpCallback(self.onMouseUpCallback)
@@ -677,7 +679,10 @@ class Application(events3d.EventHandler):
             self.scene3d.reloadTextures()
         self.fullscreen = fullscreen
         
-        event = (width, height, fullscreen)
+        event = events3d.ResizeEvent(width, height, fullscreen, width - self.width, height - self.height)
+        
+        self.width = width
+        self.height = height
         
         self.callEvent('onResized', event)
         
@@ -1621,7 +1626,7 @@ class FileChooser(View):
             
     def onResized(self, event):
         
-        self.width, self.height, _ = event
+        self.width, self.height = event.width, event.height
         
         self.x = 10
         self.y = 80

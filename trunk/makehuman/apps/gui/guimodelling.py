@@ -86,8 +86,8 @@ class ModellingCategory(gui3d.Category):
         guidetailmodelling.MicroModelingTaskView(self)
 
     def onResized(self, event):
-        self.background.mesh.resize(event[0] - 190 * 2, event[1] - 90 * 2)
-        self.viewBox.setPosition([10, event[1]-110, 9.0])
+        self.background.mesh.resize(event.width - 190 * 2, event.height - 90 * 2)
+        self.viewBox.setPosition([10, event.height-110, 9.0])
 
 
 

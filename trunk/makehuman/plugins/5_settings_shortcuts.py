@@ -57,7 +57,7 @@ class ShortcutsTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         
-        self.cameraBox.setPosition([event[0] - 150, self.cameraBox.getPosition()[1], 9.0])
+        self.cameraBox.setPosition([event.width - 150, self.cameraBox.getPosition()[1], 9.0])
 
 def load(app):
     category = app.getCategory('Settings')

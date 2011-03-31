@@ -137,5 +137,5 @@ class MacroModelingTaskView(gui3d.TaskView):
             self.syncStatus()
 
     def onResized(self, event):
-        self.status.setPosition([10, event[1]-15, 9.1])
-        self.radialBox.setPosition([event[0] - 200, self.radialBox.getPosition()[1], 9.0])
+        self.status.setPosition([10, event.height-15, 9.1])
+        self.radialBox.setPosition([event.width - 200, self.radialBox.getPosition()[1], 9.0])

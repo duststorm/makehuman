@@ -47,7 +47,7 @@ class MouseEvent(Event):
         self.dy = dy
 
     def __repr__(self):
-        return 'event: %s, %s, %s, %s, %s' % (self.button, self.x, self.y, self.dx, self.dy)
+        return 'MouseEvent(%d, %d, %d, %d, %d)' % (self.button, self.x, self.y, self.dx, self.dy)
 
 
 class MouseWheelEvent(Event):
@@ -56,7 +56,7 @@ class MouseWheelEvent(Event):
         self.wheelDelta = wheelDelta
 
     def __repr__(self):
-        return 'event: %s' % self.wheelDelta
+        return 'MouseWheelEvent(%d)' % self.wheelDelta
 
 
 class KeyEvent(Event):
@@ -67,7 +67,7 @@ class KeyEvent(Event):
         self.modifiers = modifiers
 
     def __repr__(self):
-        return 'event: %d, %s, %d' % (self.key, self.character, self.modifiers)
+        return 'KeyEvent(%d, %s, %d)' % (self.key, self.character, self.modifiers)
 
 
 class FocusEvent(Event):
@@ -77,8 +77,21 @@ class FocusEvent(Event):
         self.focused = focused
 
     def __repr__(self):
-        return 'event: %s, %s' % self.character
+        return 'FocusEvent(%s, %s)' % self.character
 
+
+class ResizeEvent(Event):
+
+    def __init__(self, width, height, fullscreen, dx, dy):
+        self.width = width
+        self.height = height
+        self.fullscreen = fullscreen
+        self.dx = dx
+        self.dy = dy
+
+    def __repr__(self):
+        return 'ResizeEvent(%d, %d, %s, %d, %d)' % (self.width, self.height, self.fullscreen, self.dx, self.dy)
+        
 
 class EventHandler:
 

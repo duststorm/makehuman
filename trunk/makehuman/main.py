@@ -410,20 +410,20 @@ class MHApplication(gui3d.Application):
             
     def onResized(self, event):
 
-        self.upperbar.mesh.resize(event[0], 32)
-        self.background.mesh.resize(event[0], event[1])
-        self.lowerbar.mesh.resize(event[0], 32)
-        self.statusbar.mesh.resize(event[0], 32)
-        self.statusbar.setPosition((0.0, event[1]-20, 9))
+        self.upperbar.mesh.resize(event.width, 32)
+        self.background.mesh.resize(event.width, event.height)
+        self.lowerbar.mesh.resize(event.width, 32)
+        self.statusbar.mesh.resize(event.width, 32)
+        self.statusbar.setPosition((0.0, event.height-20, 9))
         
-        self.undoButton.setPosition([event[0]-150, event[1]-92, 9.1])
-        self.redoButton.setPosition([event[0]-106, event[1]-92, 9.1])
-        self.resetButton.setPosition([event[0]-62, event[1]-92, 9.1])
+        self.undoButton.setPosition([event.width-150, event.height-92, 9.1])
+        self.redoButton.setPosition([event.width-106, event.height-92, 9.1])
+        self.resetButton.setPosition([event.width-62, event.height-92, 9.1])
         
-        self.globalButton.setPosition([event[0]-150, event[1]-70, 9.1])
-        self.faceButton.setPosition([event[0]-150, event[1]-45, 9.1])
+        self.globalButton.setPosition([event.width-150, event.height-70, 9.1])
+        self.faceButton.setPosition([event.width-150, event.height-45, 9.1])
         
-        self.progressBar.setPosition([event[0]-150, event[1]-15, 9.85])
+        self.progressBar.setPosition([event.width-150, event.height-15, 9.85])
         
     # Undo-redo
     def do(self, action):

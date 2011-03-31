@@ -128,8 +128,8 @@ class FaceTaskView(gui3d.TaskView):
             
     def onResized(self, event):
         
-        self.categoryBox.setPosition([event[0] - 150, self.categoryBox.getPosition()[1], 9.0])
-        self.headBox.setPosition([event[0] - 150, self.headBox.getPosition()[1], 9.0])
+        self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
+        self.headBox.setPosition([event.width - 150, self.headBox.getPosition()[1], 9.0])
         
     def onHumanChanged(self, event):
         

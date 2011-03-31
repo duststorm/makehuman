@@ -88,10 +88,6 @@ class BackgroundTaskView(gui3d.TaskView):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
-    def onResized(self, event):
-        self.backgroundImage.mesh.resize(event[0] - 190 * 2, event[0] - 190 * 2)
-        self.filechooser.onResized(event)
-
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 
@@ -184,10 +180,20 @@ class settingsTaskView(gui3d.TaskView) :
         #print self.backgroundImage.mesh.getSize(), ' bbox : ', self.backgroundImage.getBBox()
         self.app.redraw()
             
-    def changePanX(self,panX):
-        self.backgroundImage.setPosition([panX, self.backgroundImage.getPosition()[1], 1.0])
+    def changePanX(self, panX):
+        x, y, z = self.backgroundImage.getPosition()
+        self.backgroundImage.setPosition([panX, y, z])
         self.app.redraw()
         
-    def changePanY(self,panY):
-        self.backgroundImage.setPosition([self.backgroundImage.getPosition()[0], panY, 1.0])
+    def changePanY(self, panY):
+        x, y, z = self.backgroundImage.getPosition()
+        self.backgroundImage.setPosition([x, panY, z])
         self.app.redraw()
+
+    def onResized(self, event):
+        x, y, z = self.backgroundImage.getPosition()
+        scale = (float(event.height) / float(event.height - event.dy))
+        print event
+        print scale
+        print x, y, x * scale, y * scale
+        self.backgroundImage.setPosition([x * scale, y * scale, z])

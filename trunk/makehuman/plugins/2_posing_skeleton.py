@@ -269,7 +269,7 @@ class SkeletonView(gui3d.TaskView):
         
     def onResized(self, event):
         
-        self.status.setPosition([10, event[1]-15, 9.1])
+        self.status.setPosition([10, event.height-15, 9.1])
 
 def load(app):
     
