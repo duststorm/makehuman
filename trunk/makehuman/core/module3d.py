@@ -218,6 +218,18 @@ class Vert:
         self.indicesInFullVertArray = []
         self.idx = idx
         self.color = [255, 255, 255, 255]
+    
+    def setCoordinates(self, co):
+        self.co = co
+        self.update(False, True, False)
+        
+    def setNormal(self, no):
+        self.no = no
+        self.update(True, False, False)
+    
+    def setColor(self, color):
+        self.color = self.color[i]
+        self.update(False, False, True)
 
     def update(self, updateNor=True, updateCoo=True, updateCol=False):
         """
@@ -429,8 +441,8 @@ class Face:
         self.group = None
 
     def setColor(self, color):
-        f.color = [color, color, color, color]
-        f.updateColors()
+        self.color = [color, color, color, color]
+        self.updateColors()
 
     def calcNormal(self):
         """
@@ -541,9 +553,7 @@ class FaceGroup:
 
     def setColor(self, color):
         for f in self.faces:
-            f.color = [color, color, color, color]
-            f.updateColors()
-
+            f.setColor(color)
 
 class Object3D:
 
