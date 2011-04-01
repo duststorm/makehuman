@@ -1,0 +1,31 @@
+﻿// ===========================================================================================================
+// == MakeHuman
+// ===========================================================================================================
+"FileMHUsersGuide"  = "docs/MH_Users_Guide.pdf";
+"FileMHQuickStart"  = "docs/MH_Quick_Start.pdf";
+"FileDevelMHProto"  = "docs/mhproto_cdoc/index.html";
+
+"URLMHHome"         = "http://www.makehuman.org";
+"URLMHForum"        = "http://www.makehuman.org/forum/index.php";
+"URLMHDocuments"    = "http://sites.google.com/site/makehumandocs/Home";
+"URLMHArtists"      = "http://sites.google.com/site/makehumanartists/system/pages/matureConfirm?path=http%3A%2F%2Fsites.google.com%2Fsite%2Fmakehumanartists%2FHome";
+"URLMHUpdate"       = "http://code.google.com/p/makehuman/downloads/list";
+
+// ===========================================================================================================
+// == AQSIS
+// ===========================================================================================================
+"URLAqsisHome"      = "http://www.aqsis.org/";
+"URLAqsisWiki"      = "http://wiki.aqsis.org/";
+
+// ===========================================================================================================
+// == Pixie
+// ===========================================================================================================
+"URLPixieHome"      = "http://www.renderpixie.com/";
+"URLPixieWiki"      = "http://www.renderpixie.com/pixiewiki/Main_Page";
+"URLPixieInstall"   = "http://www.renderpixie.com/pixiewiki/FAQ/Installing_On_OSX";
+
+// ===========================================================================================================
+// == 3Delight
+// ===========================================================================================================
+"URL3DelightHome"   = "http://www.3delight.com";
+"URL3DelightWiki"   = "http://www.3delight.com/en/modules/dokuwiki/doku.php";

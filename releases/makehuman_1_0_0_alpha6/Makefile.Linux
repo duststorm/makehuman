@@ -1,0 +1,49 @@
+CSRCS = src/core.c src/glmodule.c src/arraybuffer.c src/main.c
+
+DEPS = $(addsuffix .d,$(basename $(CSRCS) $(CCSRCS) ))
+OBJS = $(addsuffix .o,$(basename $(CSRCS) $(CCSRCS) ))
+
+CCOPTS = -Wall -O0 -g
+
+PYTHONVER     = 2.6
+EXTRAFMWKS    = -lX11 -lGL -lGLU -lSDL -lGLEW
+EXTRALIBS     = -lpython$(PYTHONVER)
+EXTRADEFINES  =
+INCLUDEPATH   = -I/usr/include/SDL/ -I/usr/include/python$(PYTHONVER)/ -I/usr/X11R6/include -I./include
+
+EXE = makehuman
+
+	
+%.o : %.c
+	@echo "compiling C file $< to $@ ..."
+	@gcc -c -MMD $(CCOPTS) $(INCLUDEPATH) $< -o $@
+
+%.o : %.cpp
+	@echo "compiling C file $< to $@ ..."
+	@g++ -c -MMD $(CCOPTS) $(INCLUDEPATH) $< -o $@
+
+%.o : %.m
+	@echo "compiling ObjC file $< to $@ ..."
+	@gcc -c -MMD $(CCOPTS) $(INCLUDEPATH) $< -o $@
+
+%.o : %.mm
+	@echo "compiling ObjC++ file $< to $@ ..."
+	@g++ -c -MMD $(CCOPTS) $(INCLUDEPATH) $< -o $@
+
+$(EXE) : $(OBJS)	
+	@echo "linking as $@ ."
+	@g++ $(EXTRALIBS) $(EXTRAFMWKS) $(OBJS) -o $@
+
+# ---------------------------------------------------------------------
+# Cleanup unused stuff
+# ---------------------------------------------------------------------
+clean:
+	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak *%% *~ makehuman
+	find apps -name "*.pyc" -exec "rm" "-f" {} ";"
+	find utils -name "*.pyc" -exec "rm" "-f" {} ";"
+	find core -name "*.pyc" -exec "rm" "-f" {} ";"
+
+# ---------------------------------------------------------------------
+# Include dependencies if exists
+# ---------------------------------------------------------------------
+-include $(DEPS)
