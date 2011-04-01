@@ -87,6 +87,7 @@ class HumanTextureTaskView(gui3d.TaskView):
             self.app.switchTask("Human texture")
             
         self.app.addLoadHandler('skinTexture', self.loadHandler)
+        self.app.addSaveHandler(self.saveHandler)
             
     def syncTexture(self):
         
