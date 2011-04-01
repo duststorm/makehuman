@@ -13,13 +13,14 @@ print 'Pose2 plugin imported'
 
 exportPath = getPath('exports')
 
-jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck', #'torso', 
-'r-torso-clavicle', 'l-torso-clavicle', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand', 'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot')
+#torso comes after clavicle because of getJointZones :P
+jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck',  
+'r-torso-clavicle', 'l-torso-clavicle', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand', 'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot')
 
 zonesToJointsMapping = {
     'pelvis':'joint-pelvis',
-    'hip':'joint-spine-2',
-     #'torso':'joint-spine-1',
+    'hip':'joint-spine2',
+    'torso':'joint-spine1',
     'neck':'joint-neck',
     'head':'joint-head',
     'r-eye':'joint-r-eye',
@@ -119,8 +120,11 @@ class PoseTaskView(gui3d.TaskView):
 
           if self.zone:
               for g in human.mesh.facesGroups:
-                  if self.zone in g.name:
-                      groups.append(g)
+                  if self.zone != "torso":
+                    if self.zone in g.name:
+                        groups.append(g)
+                  elif (self.zone in g.name) and not g.name.endswith("clavicle"):
+                    groups.append(g)
 
               for g in self.selectedGroups:
                   if g not in groups:
@@ -157,7 +161,7 @@ class PoseTaskView(gui3d.TaskView):
     def getJointZones(self, groupName):
         for k in jointZones:
             if k in groupName:
-                return k
+              return k
         return None
     
     def rotateJoint(self, joint, center, rotation, transform=None):                
