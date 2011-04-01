@@ -129,14 +129,12 @@ class BvhView(gui3d.TaskView):
         def onChanging(value):
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
-            self.app.selectedHuman.meshData.calcNormals()
             self.app.selectedHuman.meshData.update()
             
         @self.frameSlider.event
         def onChange(value):
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
-            self.app.selectedHuman.meshData.calcNormals()
             self.app.selectedHuman.meshData.update()
                 
         @self.playPause.event
@@ -263,9 +261,12 @@ class BvhView(gui3d.TaskView):
         if not dst:
             dst = self.app.selectedHuman.meshData.verts
             
+        nsrc = self.app.selectedHuman.meshStoredNormals
+            
         for i in joint.bindedVects:
             #dst[i].co = aljabr.mtransform(joint.transform, aljabr.mtransform(joint.inverseTransform, src[i]))
             dst[i].co = aljabr.mtransform(joint.transform, aljabr.vsub(src[i], joint.position))
+            dst[i].no = aljabr.mtransform(joint.normalTransform, nsrc[i])
         
         for child in joint.children:
             self.__updateHumanMesh(child, src, dst)

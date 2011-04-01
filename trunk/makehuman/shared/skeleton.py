@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit, makeTranslation, mmul, euler2matrix, mtransform, invTransform, degree2rad
+from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit, makeTranslation, mmul, euler2matrix, mtransform, invTransform, degree2rad, _transpose
 from math import acos
 
 class Joint:
@@ -48,6 +48,7 @@ class Joint:
         self.offset = [0.0, 0.0, 0.0]           # Position Relative to the parent joint
         #self.inverseTransform = makeUnit()
         self.transform = makeUnit()
+        self.normalTransform = makeUnit()
         #limits same order as rotation
         self.limits = [[-180,180],[-180,180],[-180,180]]
         self.bindedVects = []
@@ -86,6 +87,8 @@ class Joint:
         
         m = euler2matrix(self.rotation, "syxz")
         self.transform = mmul(self.transform, m)
+        
+        self.normalTransform = _transpose(invTransform(self.transform), 4, 4)
         
         if recursive:
             for child in self.children:
