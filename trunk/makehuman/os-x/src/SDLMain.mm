@@ -19,6 +19,22 @@ static std::string sGrabPath;
 static std::string sRenderPath;
 static std::string sDocumentsPath;
 
+/** Checks if the system is runnin on SnowLeopard (and abov) or below.
+ * \return rue if the system is SnowLeopard (OS X 10.6.x) or above, false
+ * if it below (e.g. Leopard or Lion...)
+ */
+static bool isRunningOnSnowLeopardAndAbove()
+{
+    SInt32 major, minor;
+    
+    if ((0 == ::Gestalt(gestaltSystemVersionMajor, &major)) &&
+        (0 == ::Gestalt(gestaltSystemVersionMinor, &minor)))
+        {
+            return (major >= 10 && minor >= 6);
+        }
+        return false;
+}
+
 const char* osx_getExportPath()
 {
     sExportPath = [[GeneralPreferences exportPath] UTF8String];
@@ -400,21 +416,28 @@ static void CustomApplicationMain (int argc, char **argv)
     licenseWindowVisible = false; // The licensing panel should not be visible at launch time
 #endif
 
+//#define CHECK_PYTHON_VERSION
 #ifdef CHECK_PYTHON_VERSION
     /* Perform a version check of the installed Python interpreter.
      * If it is older than 3.x The User will be notified to update it.
      */
     const char* kPythonVersionNumber = Py_GetVersion();
     int major, minor, sub;
-    sscanf(kPythonVersionNumber, "%d.%d.%d", &major, &minor, &sub);
+    const int rc(::sscanf(kPythonVersionNumber, "%d.%d.%d", &major, &minor, &sub));
 
-    if ((major <= 3) && (minor < 0))
+    if ((rc == 3) && !((major >= 3) && (minor >= 2)))
     {
         NSString *messageString = [NSString stringWithFormat:
                                    @"Please update to Python 3.x as soon as possible!\n\n"
-                                    "You are currently using Python V%d.%d.%d",major, minor, sub];
+                                    "Makehuman will use some extended Functionality of Python 3.x in the near future.\n\n"
+                                    "You are currently using Python V%d.%d.%d\n\n"
+                                    "So please update the Python on your machine as soon as possible!",major, minor, sub];
         
-        const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message", messageString, @"Start it anyway!", @"Visit Python Website...", @"Download the Python installer...");
+        const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message", 
+                                                          messageString, 
+                                                          @"Start it anyway!", 
+                                                          @"Visit the Python Website...", 
+                                                          @"Download the Python installer...");
         switch(rc)
         {
             case NSAlertDefaultReturn :
@@ -425,7 +448,10 @@ static void CustomApplicationMain (int argc, char **argv)
                 break;
 
             case NSAlertOtherReturn :
-                [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.3.dmg"]];
+                [[NSWorkspace sharedWorkspace] 
+                    openURL:[NSURL URLWithString:isRunningOnSnowLeopardAndAbove() ? 
+                                            @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.6.dmg" :
+                                            @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.3.dmg"]];
                 break;
         }
         printf("rc is %d\n", rc);
