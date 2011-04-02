@@ -15,7 +15,8 @@ exportPath = getPath('exports')
 
 #torso comes after clavicle because of getJointZones :P
 jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck',  
-'r-torso-clavicle', 'l-torso-clavicle', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand', 'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot')
+'r-torso-clavicle', 'l-torso-clavicle', 'torso', 'hip', 'pelvis', 
+'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand', 'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot')
 
 zonesToJointsMapping = {
     'pelvis':'joint-pelvis',
@@ -53,7 +54,7 @@ class PoseTaskView(gui3d.TaskView):
         self.joint = None
                 
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*4+6));y+=25
 
         self.Xslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d");y+=36
         self.Yslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d");y+=36
@@ -62,9 +63,12 @@ class PoseTaskView(gui3d.TaskView):
 
         self.resetPoseButton = gui3d.Button(self, [18, y, 9.5], "Reset");y+=24
         self.savePoseButton = gui3d.Button(self, [18, y, 9.5], "Save");y+=24
-        
-        #self.savePoseToggle = gui3d.CheckBox(self, [18, y, 9.5], "SavePose");y+=24
+        self.testButton = gui3d.Button(self, [18, y, 9.5], "Test");y+=24
 
+        @self.testButton.event
+        def onClicked(event):
+            self.skinTest()
+        
         @self.savePoseButton.event
         def onClicked(event):
             exportObj(self.app.selectedHuman.meshData, os.path.join(exportPath, "posed.obj"))
@@ -177,6 +181,35 @@ class PoseTaskView(gui3d.TaskView):
         for child in joint.children:
             self.rotateJoint(child, center, rotation, transform)
     
+    def skinTest(self):
+        #rotating the shoulders in z desu..
+        theta = -45
+        rotation = [0.0, 0.0, theta]
+        joint = self.skeleton.getJoint('joint-r-shoulder')
+        dst = self.app.selectedHuman.meshData.verts
+        center = joint.position
+        transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
+        joint.radius = 0.6
+        l = math.fabs(theta*degree2rad*joint.radius)
+        
+        for i in joint.bindedVects:
+            v= dst[i].co
+            #skinning upper part of shoulder, shape should be like a sphere 
+            if math.fabs(v[0]-center[0]) < l and v[1] > center[1]:
+              print "Geronimo"
+              theta = (v[0] - center[0])/joint.radius #in radians
+              x = center[0] + joint.radius * math.sin(theta)
+              y = center[1] + joint.radius * math.cos(theta)
+              z = v[2]
+              dst[i].co = [x,y,z]
+            else:
+              dst[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+        for child in joint.children:
+            self.rotateJoint(child, joint.position, rotation, transform)
+        
+        self.app.selectedHuman.meshData.calcNormals()
+        self.app.selectedHuman.meshData.update()
+    
     def reset(self, limbToTest):
         self.Xslider.setValue(0.0)
         self.Yslider.setValue(0.0)
@@ -217,77 +250,3 @@ len(widths) = len(joints)
 len(dist) = len(joints)
 len(dist[i]) = 2*len(joints)-1 for all i = 1,..., len(joints)
 """
-
-def Oldtest(self):
-    #get the group name involving the right arm
-    self.skeleton.update(self.app.selectedHuman.meshData)
-    #get the position of the right shoulder joint
-    j = self.skeleton.getJoint("joint-r-shoulder")
-    bindedVGroups = []
-    for group in self.app.selectedHuman.meshData.facesGroups:
-      if (group.name.startswith("r-hand") or group.name.startswith("r-upperarm") or \
-      group.name.startswith("r-lowerarm") or (group.name.startswith("r-") and group.name.find("-shoulder") > -1)):
-        bindedVGroups.append(group.name)
-    bindedVGroups.append("r-torso-back-scapula")
-    verts = self.app.selectedHuman.meshData.getVerticesAndFacesForGroups(bindedVGroups)[0]
-    clavicle = self.skeleton.getJoint("joint-r-clavicle").position
-    angle = -20
-    #maximum rotation of shoulder joint about y-axis without clavicle joint rotation is 20
-    q = axisAngleToQuaternion([0,1,0], -angle*degree2rad)
-    #NOTE and todo: We need to use unmodified T-shaped base mesh when doing this operation
-    j.radius = 0.4
-    rotatedDist = angle*degree2rad*j.radius
-    for v in verts:
-      distClavicle = vdist(v.co,clavicle) #distance to clavicle
-      dist = vdist(v.co, j.position) #distance to joint of interest
-      dx = (dist*dist) - (j.radius*j.radius) #this can be negative if vertex is at the fingers, so qe dont do sqrt
-      tempv = vadd(quaternionVectorTransform(q,vsub(v.co, j.position)), j.position) #supposing transformed vertex
-      
-      if (v.co[0] - j.position[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
-        v.co = tempv
-      #else: #the vertex is in the clavicle area!
-         #scalar = bump(distClavicle, 1.6)
-         #newq = vadd(vmul(q,scalar), vmul([0,0,0,1],1-scalar))
-         #newq = vnorm(newq)
-         #v.co = vadd(quaternionVectorTransform(newq,vsub(v.co, j.position)), j.position)
-        
-    self.app.selectedHuman.meshData.calcNormals()
-    self.app.selectedHuman.meshData.update()        
-
-    
-def deform(j, q, center, verts):
-    for i in j.bindedVects:          
-      v = verts[i]
-      # commented for arm
-      #if (v.co[0] - center[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
-      v.co = vadd(quaternionVectorTransform(q,vsub(v.co, center)), center)
-    for child in j.children:
-      deform(child, q, center, verts)
-
-def deform2(j, Ryxz, center, verts):
-    m = euler2matrix(Ryxz, "syxz")
-    for i in j.bindedVects:          
-      v = verts[i]
-      # commented for arm
-      #if (v.co[0] - center[0]> -0.1): #is vertex at the right side (arm) of joint of interest?
-      v.co = vadd(mtransform(m,vsub(v.co, center)), center)
-    for child in j.children:
-      deform(child, Ryxz, center, verts)
-
-def test(self):
-    #get the group name involving the right arm
-    human = self.app.selectedHuman.meshData
-    self.skeleton.update(human)
-    
-    #for shoulder
-    #j = self.skeleton.getJoint("joint-r-shoulder")
-    
-    j = self.skeleton.getJoint("joint-head")
-    angle = 20
-    axis = [1,0,0]
-    #q = axisAngleToQuaternion(axis, angle*degree2rad)
-    Ryxz = [-4.48*degree2rad,	-1.24*degree2rad,	-7.02*degree2rad]
-    #deform(j, q , j.position, human.verts) 
-    deform2(j, Ryxz , j.position, human.verts) 
-    human.calcNormals()
-    human.update()
