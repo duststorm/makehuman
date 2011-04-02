@@ -19,141 +19,141 @@
 # <pep8 compliant>
 
 bl_info = {
-	'name': 'Shapekey pinning',
-	'author': 'Thomas Larsson',
-	'version': '0.1',
-	'blender': (2, 5, 6),
-	"api": 34786,
-	"location": "View3D > UI panel > Shapekey pinning",
-	"description": "Shapekey pinning",
-	"warning": "",
-	"category": "3D View"}
+    'name': 'Shapekey pinning',
+    'author': 'Thomas Larsson',
+    'version': '0.1',
+    'blender': (2, 5, 6),
+    "api": 34786,
+    "location": "View3D > UI panel > Shapekey pinning",
+    "description": "Shapekey pinning",
+    "warning": "",
+    "category": "3D View"}
 
 import bpy, os, mathutils
 from mathutils import *
 from bpy.props import *
 
 
-#	class VIEW3D_OT_ResetExpressionsButton(bpy.types.Operator):
+#    class VIEW3D_OT_ResetExpressionsButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_ResetExpressionsButton(bpy.types.Operator):
-	bl_idname = "shapepin.reset_expressions"
-	bl_label = "Reset expressions"
+    bl_idname = "shapepin.reset_expressions"
+    bl_label = "Reset expressions"
 
-	def execute(self, context):
-		keys = context.object.data.shape_keys
-		if keys:
-			for shape in keys.keys:
-				shape.value = 0.0
-		return{'FINISHED'}	
+    def execute(self, context):
+        keys = context.object.data.shape_keys
+        if keys:
+            for block in keys.key_blocks:
+                block.value = 0.0
+        return{'FINISHED'}    
 
 
 #
-#	class VIEW3D_OT_KeyExpressionButton(bpy.types.Operator):
+#    class VIEW3D_OT_KeyExpressionButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_KeyExpressionsButton(bpy.types.Operator):
-	bl_idname = "shapepin.key_expressions"
-	bl_label = "Key"
+    bl_idname = "shapepin.key_expressions"
+    bl_label = "Key"
 
-	def execute(self, context):
-		keys = context.object.data.shape_keys
-		keyAll = context.scene.keyAll
-		if keys:
-			keylist = findActiveFcurves(keys.animation_data)
-			frame = context.scene.frame_current
-			for (name, shape) in keys.keys.items():
-				if (keyAll or (name in keylist)):
-					shape.keyframe_insert("value", index=-1, frame=frame)
-		return{'FINISHED'}	
+    def execute(self, context):
+        keys = context.object.data.shape_keys
+        keyAll = context.scene.keyAll
+        if keys:
+            keylist = findActiveFcurves(keys.animation_data)
+            frame = context.scene.frame_current
+            for block in keys.key_blocks:
+                if (keyAll or (block.name in keylist)):
+                    block.keyframe_insert("value", index=-1, frame=frame)
+        return{'FINISHED'}    
 
-def findActiveFcurves(adata):			
-	if adata:
-		action = adata.action
-	else:
-		return []
-	if action:
-		keylist = []
-		for fcu in action.fcurves:
-			words = fcu.data_path.split('"')
-			keylist.append(words[1])
-		return keylist
-	return []
+def findActiveFcurves(adata):            
+    if adata:
+        action = adata.action
+    else:
+        return []
+    if action:
+        keylist = []
+        for fcu in action.fcurves:
+            words = fcu.data_path.split('"')
+            keylist.append(words[1])
+        return keylist
+    return []
 
 #
-#	class VIEW3D_OT_PinExpressionButton(bpy.types.Operator):
+#    class VIEW3D_OT_PinExpressionButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_PinExpressionButton(bpy.types.Operator):
-	bl_idname = "shapepin.pin_expression"
-	bl_label = "Pin"
-	expression = bpy.props.StringProperty()
+    bl_idname = "shapepin.pin_expression"
+    bl_label = "Pin"
+    expression = bpy.props.StringProperty()
 
-	def execute(self, context):
-		keys = context.object.data.shape_keys
-		keyAll = context.scene.keyAll
-		if keys:
-			frame = context.scene.frame_current
-			for (name,shape) in keys.keys.items():
-				oldvalue = shape.value
-				shape.value = 1.0 if name == self.expression else 0.0
-				if (context.tool_settings.use_keyframe_insert_auto and 
-					(keyAll or (shape.value > 0.01) or (abs(shape.value-oldvalue) > 0.01))):
-					shape.keyframe_insert("value", index=-1, frame=frame)
-		return{'FINISHED'}	
+    def execute(self, context):
+        keys = context.object.data.shape_keys
+        keyAll = context.scene.keyAll
+        if keys:
+            frame = context.scene.frame_current
+            for block in keys.key_blocks:  
+                oldvalue = block.value
+                block.value = 1.0 if block.name == self.expression else 0.0
+                if (context.tool_settings.use_keyframe_insert_auto and 
+                    (keyAll or (block.value > 0.01) or (abs(block.value-oldvalue) > 0.01))):
+                    block.keyframe_insert("value", index=-1, frame=frame)
+        return{'FINISHED'}    
 
 #
-#	class ExpressionsPanel(bpy.types.Panel):
+#    class ExpressionsPanel(bpy.types.Panel):
 #
 
 class ExpressionsPanel(bpy.types.Panel):
-	bl_label = "Pin shapekeys"
-	bl_space_type = "VIEW_3D"
-	bl_region_type = "UI"
-	
-	@classmethod
-	def poll(cls, context):
-		return context.object and (context.object.type == 'MESH')
+    bl_label = "Pin shapekeys"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        return context.object and (context.object.type == 'MESH')
 
-	def draw(self, context):
-		layout = self.layout
-		layout.label(text="Expressions")
-		layout.operator("shapepin.reset_expressions")
-		layout.prop(context.scene, "keyAll")
-		layout.operator("shapepin.key_expressions")
-		layout.separator()
-		keys = context.object.data.shape_keys
-		if keys:
-			for (name, shape) in keys.keys.items():
-				row = layout.split(0.75)
-				row.prop(shape, 'value', text=name)
-				row.operator("shapepin.pin_expression", text="Pin").expression = name
-		return
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text="Expressions")
+        layout.operator("shapepin.reset_expressions")
+        layout.prop(context.scene, "keyAll")
+        layout.operator("shapepin.key_expressions")
+        layout.separator()
+        keys = context.object.data.shape_keys
+        if keys:
+            for block in keys.key_blocks:
+                row = layout.split(0.75)
+                row.prop(block, 'value', text=block.name)
+                row.operator("shapepin.pin_expression", text="Pin").expression = block.name
+        return
 
-###################################################################################	
+###################################################################################    
 #
-#	initialize and register
+#    initialize and register
 #
-###################################################################################	
+###################################################################################    
 
 def init():
-	bpy.types.Scene.keyAll = BoolProperty(
-	name="Key all",
-	description="Set keys for all shapes",
-	default=False)
+    bpy.types.Scene.keyAll = BoolProperty(
+    name="Key all",
+    description="Set keys for all shapes",
+    default=False)
 
 def register():
-	init()
-	bpy.utils.register_module(__name__)
-	pass
+    init()
+    bpy.utils.register_module(__name__)
+    pass
 
 def unregister():
-	bpy.utils.unregister_module(__name__)
-	pass
+    bpy.utils.unregister_module(__name__)
+    pass
 
 
 if __name__ == "__main__":
-	register()
+    register()
 
-	
+    
