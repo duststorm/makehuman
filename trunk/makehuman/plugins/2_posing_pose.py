@@ -194,14 +194,17 @@ class PoseTaskView(gui3d.TaskView):
         
         for i in joint.bindedVects:
             v= dst[i].co
+            d = math.fabs(v[0]-center[0])
             #skinning upper part of shoulder, shape should be like a sphere 
-            if math.fabs(v[0]-center[0]) < l and v[1] > center[1]:
-              print "Geronimo"
-              theta = (v[0] - center[0])/joint.radius #in radians
-              x = center[0] + joint.radius * math.sin(theta)
-              y = center[1] + joint.radius * math.cos(theta)
-              z = v[2]
-              dst[i].co = [x,y,z]
+            if d < l and v[1] > center[1]:
+              #print "Geronimo"
+              #theta = math.fabs(v[0] - center[0])/joint.radius #in radians
+              theta2 = theta*(1-bump(d, l))
+              t = euler2matrix([0,0,theta2*degree2rad], "sxyz")
+              #x = center[0] + joint.radius * math.sin(theta)
+              #y = center[1] + joint.radius * math.cos(theta)
+              #z = v[2]
+              dst[i].co = vadd(mtransform(t, vsub(v, center)),center)
             else:
               dst[i].co = vadd(mtransform(transform, vsub(v, center)),center)
         for child in joint.children:
