@@ -19,6 +19,9 @@ release:
 debug: 
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug build
 
+nightlybuild: 
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration NightlyBuild build
+
 module: mh.so mhproto_doc
 
 mhproto_doc:
