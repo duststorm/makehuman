@@ -692,6 +692,10 @@ class Object3D:
             self.uvMap[key] = index
             self.uvValues.append(uv)
             return index
+            
+    def setColor(self, color):
+        for g in self.facesGroups:
+            g.setColor(color)
 
     def setLoc(self, locx, locy, locz):
         """
