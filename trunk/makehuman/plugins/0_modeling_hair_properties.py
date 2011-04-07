@@ -53,15 +53,15 @@ class HairPropertiesTaskView(gui3d.TaskView):
         
         self.widthSlider = gui3d.Slider(self, [10, y, 9.3], 1.0, 0.3, 30.0, "Hair width: %.2f");y+=36
         
-        self.redSlider = gui3d.Slider(self, [10, y, 9.01], 0, 0, 255, 'Red: 0',
+        self.redSlider = gui3d.Slider(self, [10, y, 9.01], 0, 0, 255, 'Red: %d',
             gui3d.SliderStyle._replace(normal='color_slider_background.png'),
             gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
-        self.greenSlider = gui3d.Slider(self, [10, y, 9.02], 0, 0, 255, 'Green: 0',
+        self.greenSlider = gui3d.Slider(self, [10, y, 9.02], 0, 0, 255, 'Green: %d',
             gui3d.SliderStyle._replace(normal='color_slider_background.png'),
             gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
 
-        self.blueSlider = gui3d.Slider(self, [10, y, 9.03], 0, 0, 255, 'Blue: 0',
+        self.blueSlider = gui3d.Slider(self, [10, y, 9.03], 0, 0, 255, 'Blue: %d',
             gui3d.SliderStyle._replace(normal='color_slider_background.png'),
             gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
         
@@ -141,8 +141,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         
         red, green, blue = color
         
-        for g in self.colorPreview.mesh.facesGroups:
-            g.setColor([red, green, blue, 255])
+        self.colorPreview.mesh.setColor([red, green, blue, 255])
             
         f = self.redSlider.background.mesh.faces[0]
         f.color = [
