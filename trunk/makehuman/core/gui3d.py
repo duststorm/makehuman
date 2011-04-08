@@ -176,16 +176,20 @@ class Object(events3d.EventHandler):
     def onKeyUp(self, event):
         self.view.callEvent('onKeyDown', event)
 
+AlignLeft = 0
+AlignCenter = 1
+AlignRight = 2
 
 class TextObject(Object):
-    def __init__(self, view, position, text = '', wrapWidth=0, fontFamily = defaultFontFamily, fontSize = defaultFontSize):
+    def __init__(self, view, position, text = '', wrapWidth=0, alignment=AlignLeft, fontFamily = defaultFontFamily, fontSize = defaultFontSize):
         
         self.text = text
         self.wrapWidth = wrapWidth
+        self.alignment = alignment
         self.font = view.app.getFont(fontFamily)
         self.fontSize = fontSize
         
-        self.mesh = font3d.createMesh(self.font, font3d.wrapText(self.font, text, wrapWidth) if wrapWidth else text);
+        self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment);
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         self.mesh.setScale(fontSize, fontSize, fontSize)
@@ -198,12 +202,9 @@ class TextObject(Object):
             return
             
         self.text = text
-            
-        if self.wrapWidth:
-            text = font3d.wrapText(self.font, text, self.wrapWidth)
         
         self.app.scene3d.clear(self.mesh)
-        self.mesh = font3d.createMesh(self.font, text, self.mesh);
+        self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment);
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         self.app.scene3d.update()
@@ -1330,10 +1331,11 @@ class TextView(View):
     A TextView widget. This widget can be used as a label. The text is not editable by the user.
     """
 
-    def __init__(self, parent, position=[0, 0, 9], label = '', wrapWidth=0, fontSize = defaultFontSize):
+    def __init__(self, parent, position=[0, 0, 9], label = '', wrapWidth=0, alignment=AlignLeft,
+        fontFamily=defaultFontFamily, fontSize=defaultFontSize):
         
         View.__init__(self, parent)
-        self.textObject = TextObject(self, position, label, wrapWidth, fontSize = fontSize)
+        self.textObject = TextObject(self, position, label, wrapWidth, alignment, fontFamily, fontSize)
             
     def canFocus(self):
         return False

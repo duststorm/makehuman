@@ -141,10 +141,17 @@ def wrapText(font, text, width):
     wrappedText += line
             
     return wrappedText
+    
+AlignLeft = 0
+AlignCenter = 1
+AlignRight = 2
             
 #returns font as object3d with 1 visibility
-def createMesh(font, text, object = None):
+def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft):
 
+    if wrapWidth:
+        text = wrapText(font, text, wrapWidth)
+        
     object = object or module3d.Object3D(text)
     object.uvValues = object.uvValues or []
     object.indexBuffer = object.indexBuffer or []
@@ -160,7 +167,15 @@ def createMesh(font, text, object = None):
 
     for line in text.splitlines():
         
-        xoffset = 0
+        if alignment == AlignLeft:
+            xoffset = 0
+        elif alignment == AlignCenter:
+            xoffset = (wrapWidth - font.stringWidth(line)) / 2
+        elif alignment == AlignRight:
+            xoffset = (wrapWidth - font.stringWidth(line))
+            
+        print line, xoffset
+        
         zoffset = 0
         
         for char in line:
