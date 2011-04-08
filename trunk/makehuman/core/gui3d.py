@@ -1067,7 +1067,7 @@ class Button(View):
     def setPosition(self, position):
         self.button.setPosition(position)
         if getattr(self, 'label'):
-            self.label.setPosition([position[0] + self.style.border[0] + 3,position[1]+self.style.height/2-6,position[2]+0.001])
+            self.label.setPosition([position[0] + self.style.border[0],position[1]+self.style.height/2-6,position[2]+0.001])
 
     def setTexture(self, texture):
         self.texture = texture

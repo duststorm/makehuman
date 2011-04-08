@@ -54,7 +54,7 @@ class PoseTaskView(gui3d.TaskView):
         self.joint = None
                 
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*4+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
 
         self.Xslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d");y+=36
         self.Yslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d");y+=36

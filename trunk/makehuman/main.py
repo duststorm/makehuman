@@ -436,6 +436,11 @@ class MHApplication(gui3d.Application):
         
         self.progressBar.setPosition([event.width-150, event.height-15, 9.85])
         
+        self.dialog.blocker.mesh.resize(event.width, event.height)
+        self.dialog.box.setPosition([event.width/2-100, event.height/2-50, 9.8])
+        self.dialog.text.setPosition([event.width/2-100+10, event.height/2-50+25, 9.81])
+        self.dialog.button.setPosition([event.width/2+100-60-10, event.height/2+50-20-10, 9.81])
+        
     # Undo-redo
     def do(self, action):
         if action.do():
