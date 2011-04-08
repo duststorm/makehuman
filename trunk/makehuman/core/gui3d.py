@@ -178,20 +178,30 @@ class Object(events3d.EventHandler):
 
 
 class TextObject(Object):
-    def __init__(self, view, position, text = '', fontFamily = defaultFontFamily, fontSize = defaultFontSize):
+    def __init__(self, view, position, text = '', wrapWidth=0, fontFamily = defaultFontFamily, fontSize = defaultFontSize):
+        
+        self.text = text
+        self.wrapWidth = wrapWidth
         self.font = view.app.getFont(fontFamily)
-        self.mesh = font3d.createMesh(self.font, text);
+        self.fontSize = fontSize
+        
+        self.mesh = font3d.createMesh(self.font, font3d.wrapText(self.font, text, wrapWidth) if wrapWidth else text);
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         self.mesh.setScale(fontSize, fontSize, fontSize)
+        
         Object.__init__(self, view, position, self.mesh)
-        self.text = text
-        self.fontSize = fontSize
         
     def setText(self, text):
+        
         if self.text == text:
             return
+            
         self.text = text
+            
+        if self.wrapWidth:
+            text = font3d.wrapText(self.font, text, self.wrapWidth)
+        
         self.app.scene3d.clear(self.mesh)
         self.mesh = font3d.createMesh(self.font, text, self.mesh);
         self.mesh.setCameraProjection(1)
@@ -199,8 +209,8 @@ class TextObject(Object):
         self.app.scene3d.update()
         
     def getText(self):
-        return self.text
         
+        return self.text
 
 # Generic view
 
@@ -1320,9 +1330,10 @@ class TextView(View):
     A TextView widget. This widget can be used as a label. The text is not editable by the user.
     """
 
-    def __init__(self, parent, position=[0, 0, 9], label = '', fontSize = defaultFontSize):
+    def __init__(self, parent, position=[0, 0, 9], label = '', wrapWidth=0, fontSize = defaultFontSize):
+        
         View.__init__(self, parent)
-        self.textObject = TextObject(self, position, label, fontSize = fontSize)
+        self.textObject = TextObject(self, position, label, wrapWidth, fontSize = fontSize)
             
     def canFocus(self):
         return False

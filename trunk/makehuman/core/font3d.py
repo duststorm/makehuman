@@ -113,7 +113,35 @@ class Font:
             width += co[4] + kerning
             
         return width
-
+        
+def wrapText(font, text, width):
+    
+    wrappedText = ''
+    line = ''
+    space = 0
+    
+    for char in text:
+        # A space, just note the position
+        if char == ' ':
+            line += char
+            space = len(line)
+        # A linebreak, add and reset line
+        elif char == '\n':
+            wrappedText += line + '\n'
+            line = ''
+            space = 0
+        # Line will get too long, break at last space
+        elif font.stringWidth(line + char) > width:
+            wrappedText += line[:space] + '\n'
+            line = line[space:] + char
+        # Just add the caharacter to the line
+        else:
+            line += char
+            
+    wrappedText += line
+            
+    return wrappedText
+            
 #returns font as object3d with 1 visibility
 def createMesh(font, text, object = None):
 
@@ -130,11 +158,13 @@ def createMesh(font, text, object = None):
     zoffset = 0
     previous = -1
 
-    for char in text:
-        if char == '\n':
-            xoffset = 0
-            yoffset += font.lineHeight
-        else:
+    for line in text.splitlines():
+        
+        xoffset = 0
+        zoffset = 0
+        
+        for char in line:
+
             co = font.getAbsoluteCoordsForChar(char)
             uv = font.getTextureCoordinatesForChar(char)
             kerning = font.kerning.get((previous, char), 0)
@@ -150,7 +180,7 @@ def createMesh(font, text, object = None):
             v4 = object.createVertex([xoffset + co[0], yoffset + co[3], zoffset])
 
             xoffset += co[4]
-            zoffset += 0.001
+            zoffset += 0.0001
 
             uv1 = [uv[0], uv[1]]
             uv2 = [uv[2], uv[1]]
@@ -159,6 +189,8 @@ def createMesh(font, text, object = None):
 
             # create faces
             fg.createFace(v1, v4, v3, v2, uv=(uv1, uv4, uv3, uv2))
+            
+        yoffset += font.lineHeight
 
     object.texture = font.file
     object.updateIndexBuffer()

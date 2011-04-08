@@ -340,7 +340,7 @@ class MHApplication(gui3d.Application):
         self.dialog = gui3d.View(self)
         self.dialog.blocker = gui3d.Object(self.dialog, [0, 0, 9.7], gui3d.RectangleMesh(800, 600))
         self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 50, 9.8], 'Warning', gui3d.GroupBoxStyle._replace(width=200, height=100))
-        self.dialog.text = gui3d.TextView(self.dialog, [800 / 2 - 100 + 10, 600 / 2 - 50 + 25, 9.81], 'This is an alpha release, which means that\nthere are still bugs present and features\nmissing. Use at your own risk.')
+        self.dialog.text = gui3d.TextView(self.dialog, [800 / 2 - 100 + 10, 600 / 2 - 50 + 25, 9.81], 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.', 200)
         self.dialog.button = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10, 600 / 2 + 50 - 20 - 10, 9.81], 'OK', style=gui3d.ButtonStyle._replace(width=60))
         self.scene3d.update()
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
@@ -519,6 +519,7 @@ class MHApplication(gui3d.Application):
     def getFont(self, fontFamily):
         if fontFamily not in self.fonts:
             self.fonts[fontFamily] = font3d.Font("data/fonts/%s.fnt" % fontFamily)
+            
         return self.fonts[fontFamily]
 
     # Global progress bar
