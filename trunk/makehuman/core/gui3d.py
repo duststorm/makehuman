@@ -37,19 +37,25 @@ defaultFontSize = 1.0
 defaultFontFamily = 'arial'
 
 class Style:
-    def __init__(self, width = None, height = None, mesh = None, normal = None, selected = None, focused = None, fontSize = None, border = None):
+    def __init__(self, width=None, height=None, mesh=None, normal=None, selected=None, focused=None, fontFamily=None, fontSize=None,
+        textAlign=None, border=None):
+            
         self.width = width
         self.height = height
         self.mesh = mesh
         self.normal = normal
         self.selected = selected
         self.focused = focused
+        self.fontFamily = fontFamily
         self.fontSize = fontSize
+        self.textAlign = textAlign
         self.border = border
         
     def _replace(self, **kwds):
+        
         style = {'width':self.width, 'height':self.height, 'mesh':self.mesh, 'normal':self.normal, 'selected':self.selected,
-                'focused':self.focused, 'fontSize':self.fontSize, 'border':self.border}
+                'focused':self.focused, 'fontFamily':self.fontFamily, 'fontSize':self.fontSize, 'textAlign':self.textAlign, 'border':self.border}
+                
         style.update(kwds)
         return Style(**style)
 
@@ -57,12 +63,17 @@ class Style:
 class Object(events3d.EventHandler):
 
     def __init__(self, view, position, mesh, texture=None, visible=True):
+        
         self.app = view.app
         self.view = view
+        
         if isinstance(mesh, str):
+            
             self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
             self.meshName = mesh
+            
         else: # It's of type module3d.Object3D
+        
             self.mesh=mesh
             self.app.scene3d.objects.append(mesh)
             self.meshName = mesh.name
@@ -332,7 +343,9 @@ TaskTabStyle = Style(**{
     'normal':'button_tab2.png',
     'selected':'button_tab2_on.png',
     'focused':'button_tab2_focused.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignCenter,
     'border':[7,7,7,7]
     })
 
@@ -379,7 +392,9 @@ CategoryTabStyle = Style(**{
     'normal':'button_tab.png',
     'selected':'button_tab_on.png',
     'focused':'button_tab_focused.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignCenter, 
     'border':[7,7,7,7]
     })
     
@@ -390,7 +405,9 @@ CategoryButtonStyle = Style(**{
     'normal':'button_tab3.png',
     'selected':'button_tab3_on.png',
     'focused':'button_tab3_focused.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignCenter, 
     'border':[7,7,7,7]
     })
 
@@ -721,7 +738,9 @@ SliderStyle = Style(**{
     'normal':'slider_generic.png',
     'selected':None,
     'focused':None,
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignLeft, 
     'border':None
     })
     
@@ -732,7 +751,9 @@ SliderThumbStyle = Style(**{
     'normal':'slider.png',
     'selected':None,
     'focused':'slider_focused.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignLeft, 
     'border':None
     })
 
@@ -970,7 +991,9 @@ ButtonStyle = Style(**{
     'normal':'button_unselected.png',
     'selected':'button_selected.png',
     'focused':'button_focused.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignCenter,
     'border':[2, 2, 2, 2]
     })
 
@@ -1015,6 +1038,7 @@ class Button(View):
         width = style.width
         height = style.height
         fontSize = style.fontSize
+        textAlign = style.textAlign
         border = style.border
         
         self.style = style
@@ -1032,7 +1056,8 @@ class Button(View):
                 mesh = RectangleMesh(width, height, t)
             self.button = Object(self, position, mesh)
             if isinstance(label, str):
-                self.label = TextObject(self, [position[0] + border[0] + 3,position[1]+height/2-6,position[2]+0.001], label, fontSize = fontSize)
+                wrapWidth = (width - border[0] - border[2] if border else width) if textAlign else 0
+                self.label = TextObject(self, [position[0] + border[0],position[1]+height/2-6,position[2]+0.001], label, wrapWidth, textAlign, fontSize = fontSize)
             
         self.selected = selected
         
@@ -1108,7 +1133,9 @@ RadioButtonStyle = Style(**{
     'normal':'radio_off.png',
     'selected':'radio_on.png',
     'focused':'radio_focus.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
     'border':[19, 19, 4, 1]
     })
 
@@ -1220,7 +1247,9 @@ CheckBoxStyle = Style(**{
     'normal':'check_off.png',
     'selected':'check_on.png',
     'focused':'check_focus.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
     'border':[18, 18, 4, 2]
     })
             
@@ -1358,7 +1387,9 @@ TextEditStyle = Style(**{
     'normal':'texedit_off.png',
     'selected':None,
     'focused':'texedit_on.png',
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
     'border':[4, 4, 4, 4]
     })
 
@@ -1858,7 +1889,9 @@ GroupBoxStyle = Style(**{
     'normal':'group_box.png',
     'selected':None,
     'focused':None,
+    'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
     'border':[8, 24, 8, 8]
     }) 
         

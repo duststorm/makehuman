@@ -131,7 +131,7 @@ def wrapText(font, text, width):
             line = ''
             space = 0
         # Line will get too long, break at last space
-        elif font.stringWidth(line + char) > width:
+        elif space and font.stringWidth(line + char) > width:
             wrappedText += line[:space] + '\n'
             line = line[space:] + char
         # Just add the caharacter to the line
@@ -170,11 +170,9 @@ def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft):
         if alignment == AlignLeft:
             xoffset = 0
         elif alignment == AlignCenter:
-            xoffset = (wrapWidth - font.stringWidth(line)) / 2
+            xoffset = int(wrapWidth - font.stringWidth(line)) / 2
         elif alignment == AlignRight:
             xoffset = (wrapWidth - font.stringWidth(line))
-            
-        print line, xoffset
         
         zoffset = 0
         
