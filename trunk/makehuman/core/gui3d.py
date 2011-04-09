@@ -1078,6 +1078,10 @@ class Button(View):
             return self.label.getText()
         else:
             return ''
+            
+    def setLabel(self, text):
+        if self.label:
+            self.label.setText(text)
 
     def onMouseDown(self, event):
         self.setSelected(True)

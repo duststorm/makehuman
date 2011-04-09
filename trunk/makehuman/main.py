@@ -122,7 +122,7 @@ class MHApplication(gui3d.Application):
             (events3d.KMOD_CTRL, events3d.SDLK_e): self.goToExport,
             (events3d.KMOD_CTRL, events3d.SDLK_r): self.goToRendering,
             (events3d.KMOD_CTRL, events3d.SDLK_h): self.goToHelp,
-            (events3d.KMOD_CTRL, events3d.SDLK_q): self.stop,
+            (events3d.KMOD_CTRL, events3d.SDLK_q): self.promptAndExit,
             (events3d.KMOD_CTRL, events3d.SDLK_w): self.toggleStereo,
             (events3d.KMOD_CTRL, events3d.SDLK_f): self.toggleSolid,
             (events3d.KMOD_ALT, events3d.SDLK_t): self.saveTarget,
@@ -295,7 +295,7 @@ class MHApplication(gui3d.Application):
         category = gui3d.Category(self, "Exit", style=gui3d.CategoryButtonStyle)
         @category.button.event
         def onClicked(event):
-          self.stop()
+            self.promptAndExit()
           
         self.undoButton = gui3d.Button(self, [650, 508, 9.1], "Undo", style=gui3d.ButtonStyle._replace(width=40, height=16))
         self.redoButton = gui3d.Button(self, [694, 508, 9.1], "Redo", style=gui3d.ButtonStyle._replace(width=40, height=16))
@@ -341,13 +341,25 @@ class MHApplication(gui3d.Application):
         self.dialog.blocker = gui3d.Object(self.dialog, [0, 0, 9.7], gui3d.RectangleMesh(800, 600))
         self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 50, 9.8], 'Warning', gui3d.GroupBoxStyle._replace(width=200, height=100))
         self.dialog.text = gui3d.TextView(self.dialog, [800 / 2 - 100 + 10, 600 / 2 - 50 + 25, 9.81], 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.', 180)
-        self.dialog.button = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10, 600 / 2 + 50 - 20 - 10, 9.81], 'OK', style=gui3d.ButtonStyle._replace(width=60))
+        self.dialog.button1 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10 - 60 - 5, 600 / 2 + 50 - 20 - 10, 9.81], '', style=gui3d.ButtonStyle._replace(width=60))
+        self.dialog.button1.hide()
+        self.dialog.button2 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10, 600 / 2 + 50 - 20 - 10, 9.81], 'OK', style=gui3d.ButtonStyle._replace(width=60))
+        self.dialog.button1Action = None
+        self.dialog.button2Action = None
         self.scene3d.update()
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
         
-        @self.dialog.button.event
+        @self.dialog.button1.event
         def onClicked(event):
+            if self.dialog.button1Action:
+                self.dialog.button1Action()
+            self.dialog.hide()
+            
+        @self.dialog.button2.event
+        def onClicked(event):
+            if self.dialog.button2Action:
+                self.dialog.button2Action()
             self.dialog.hide()
         
         mh.updatePickingBuffer();
@@ -439,7 +451,8 @@ class MHApplication(gui3d.Application):
         self.dialog.blocker.mesh.resize(event.width, event.height)
         self.dialog.box.setPosition([event.width/2-100, event.height/2-50, 9.8])
         self.dialog.text.setPosition([event.width/2-100+10, event.height/2-50+25, 9.81])
-        self.dialog.button.setPosition([event.width/2+100-60-10, event.height/2+50-20-10, 9.81])
+        self.dialog.button1.setPosition([event.width/2+100-60-10, event.height/2+50-20-10, 9.81])
+        self.dialog.button2.setPosition([event.width/2+100-60-10-60-5, event.height/2+50-20-10, 9.81])
         
     # Undo-redo
     def do(self, action):
@@ -536,11 +549,21 @@ class MHApplication(gui3d.Application):
             self.progressBar.hide()
     
     # Global dialog
-    def prompt(self, title, text):
+    def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None):
         
         self.dialog.box.label.setText(title)
         self.dialog.text.setText(text)
+        if button1Label and button2Label:
+            self.dialog.button1.show()
+            self.dialog.button1.setLabel(button1Label)
+            self.dialog.button2.setLabel(button2Label)
+        else:
+            self.dialog.button1.hide()
+            self.dialog.button2.setLabel(button1Label or button2Label)
+        self.dialog.button1Action = button1Action
+        self.dialog.button2Action = button2Action
         self.dialog.show()
+        self.redraw()
       
     # Camera's
     def setGlobalCamera(self):
@@ -764,6 +787,12 @@ class MHApplication(gui3d.Application):
         self.selectedHuman.setPosition([0.0, 0.0, 0.0])
         mh.cameras[0].eyeZ = 60.0
         self.redraw()
+        
+    def promptAndExit(self):
+        if self.undoStack:
+            self.prompt('Exit', 'You have unsaved changes. Are you sure you want to exit the application?', 'Yes', 'No', self.stop)
+        else:
+            self.stop()
     
 application = MHApplication()
 application.run()
