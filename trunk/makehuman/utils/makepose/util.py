@@ -1,10 +1,13 @@
 from Blender import Object, Window, Draw, BGL
 from Blender.BGL import *
 
+obj = None
+
 def getSelectedVertices():
+    global obj
     selectedVertices = []
-    ob = Object.GetSelected()[0].getData()
-    for v in ob.verts:
+    obj = Object.GetSelected()[0].getData()
+    for v in obj.verts:
         if (v.sel):
             selectedVertices.append(v.index)
     return selectedVertices
@@ -48,6 +51,32 @@ def saveSelVerts(path):
         fileDescriptor.write("%d\n"%(v))
     fileDescriptor.close()
 
+def saveWtsOfSelVerts(path):
+    """
+    This function saves the indices of selected verts
+
+    Parameters
+    ----------
+
+    filePath:
+        *string*. A string containing the operating system path to the
+        file to be written.
+
+    """
+    global obj
+    try:
+        fileDescriptor = open(path, "w")
+    except:
+        print "Unable to open %s"%(path)
+        return  None
+    selectVerts = getSelectedVertices()
+    for index in selectVerts:
+        wtPairs = obj.getVertexInfluences(index)
+        if len(wtPairs) > 0:
+          fileDescriptor.write("%d %f\n"%(index,wtPairs[0][1]))
+        else: fileDescriptor.write("%d %d\n"%(index,0.0))
+    fileDescriptor.close()
+    
 def loadSelVerts(path):
     """
     This function load the indices of selected verts
@@ -92,6 +121,8 @@ def event(event, value):
         Window.FileSelector (saveSelVerts, "Save index of selected vertices")
     elif event == Draw.LKEY:
         Window.FileSelector (loadSelVerts, "Load index of verts to select")
+    elif event == Draw.WKEY:
+        Window.FileSelector (saveWtsOfSelVerts, "Save weight and index of selected vertices")
     Draw.Draw()
 
 def buttonEvents(event):
