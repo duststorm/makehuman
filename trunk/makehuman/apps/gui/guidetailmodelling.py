@@ -354,6 +354,7 @@ class Detail3dTool(events3d.EventHandler):
     def __init__(self, app, micro, type):
         self.app = app
         self.micro = micro
+        self.type = type
         if type == 'scale':
             self.x = DetailTool(app, micro, '-scale-horiz-decr', '-scale-horiz-incr')
             self.y = DetailTool(app, micro, '-scale-vert-decr', '-scale-vert-incr')
@@ -588,6 +589,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.rightSymmetryButton = gui3d.Button(self.modifiersBox, [658, y, 9.2], 'Sym<', style=modifierStyle)
         self.leftSymmetryButton = gui3d.Button(self.modifiersBox, [658+modifierStyle.width+4, y, 9.2], 'Sym>', style=modifierStyle);y+=24
         self.symmetryButton = gui3d.ToggleButton(self.modifiersBox, [658, y, 9.2], 'Sym', style=modifierStyle)
+        self.microButton = gui3d.ToggleButton(self.modifiersBox, [658+modifierStyle.width+4, y, 9.2], 'Micro', style=modifierStyle)
 
         @self.rightSymmetryButton.event
         def onClicked(event):
@@ -605,6 +607,12 @@ class DetailModelingTaskView(gui3d.TaskView):
             human = self.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
             self.parent.tasksByName['Micro modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
+            
+        @self.microButton.event
+        def onClicked(event):
+            gui3d.ToggleButton.onClicked(self.microButton, event)
+            self.tool = Detail3dTool(self.app, self.microButton.selected, self.tool.type)
+            self.app.tool = self.tool
 
     def onShow(self, event):
         self.app.tool = self.tool
@@ -660,65 +668,3 @@ class DetailModelingTaskView(gui3d.TaskView):
         for name, modifier in self.modifiers.iteritems():
             value = modifier.getValue(human)
             file.write('%s %f\n' % (name, value))
-
-class MicroModelingTaskView(gui3d.TaskView):
-
-    def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Micro modelling', label='Micro')
-        self.tool = None
-        
-        y=80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
-        
-        modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
-
-        self.microButtonGroup = []
-
-        self.translationButton = gui3d.RadioButton(self, self.microButtonGroup, [18, y, 9.2], 'Move', True, style=modifierStyle)
-        self.scaleButton = gui3d.RadioButton(self, self.microButtonGroup, [18+modifierStyle.width+4, y, 9.2], label='Scale', style=modifierStyle);y+=24
-
-        self.tool = Detail3dTool(self.app, True, 'translation')
-
-        @self.translationButton.event
-        def onClicked(event):
-            self.tool = Detail3dTool(self.app, True, 'translation')
-            self.app.tool = self.tool
-            gui3d.RadioButton.onClicked(self.translationButton, event)
-
-        @self.scaleButton.event
-        def onClicked(event):
-            self.tool = Detail3dTool(self.app, True, 'scale')
-            self.app.tool = self.tool
-            gui3d.RadioButton.onClicked(self.scaleButton, event)
-            
-        self.rightSymmetryButton = gui3d.Button(self, [18, y, 9.2], 'Sym<', style=modifierStyle)
-        self.leftSymmetryButton = gui3d.Button(self, [18+modifierStyle.width+4, y, 9.2], 'Sym>', style=modifierStyle);y+=24
-        self.symmetryButton = gui3d.ToggleButton(self, [18, y, 9.2], 'Sym', style=modifierStyle)
-        
-        @self.rightSymmetryButton.event
-        def onClicked(event):
-            human = self.app.selectedHuman
-            human.applySymmetryRight()
-
-        @self.leftSymmetryButton.event
-        def onClicked(event):
-            human = self.app.selectedHuman
-            human.applySymmetryLeft()
-
-        @self.symmetryButton.event
-        def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.symmetryButton, event)
-            human = self.app.selectedHuman
-            human.symmetryModeEnabled = self.symmetryButton.selected
-            self.parent.tasksByName['Detail modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
-
-    def onShow(self, event):
-        self.app.tool = self.tool
-        self.translationButton.setFocus()
-        gui3d.TaskView.onShow(self, event)
-
-    def onHide(self, event):
-        self.app.tool = None
-        gui3d.TaskView.onHide(self, event)
-
-

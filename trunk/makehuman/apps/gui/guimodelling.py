@@ -83,7 +83,7 @@ class ModellingCategory(gui3d.Category):
         
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)
-        guidetailmodelling.MicroModelingTaskView(self)
+
 
     def onResized(self, event):
         self.background.mesh.resize(event.width - 190 * 2, event.height - 90 * 2)
