@@ -563,6 +563,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.sliders.append(DetailSlider(self.pelvisBox, 10, y, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks']));y+=36
         y+=16
 
+        y = 80
         self.modifiersBox = gui3d.GroupBox(self, [650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
         
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
