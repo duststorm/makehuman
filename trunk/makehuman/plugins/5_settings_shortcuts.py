@@ -31,7 +31,7 @@ class ShortcutsTaskView(gui3d.TaskView):
         gui3d.TextView(self, [18,y + 5, 9.2], "Export", 47, 2);AppShortcutEdit(self, [68,y, 9.2], self.app.goToExport);y+=25
         gui3d.TextView(self, [18,y + 5, 9.2], "Rendering", 47, 2);AppShortcutEdit(self, [68,y, 9.2], self.app.goToRendering);y+=25
         gui3d.TextView(self, [18,y + 5, 9.2], "Help", 47, 2);AppShortcutEdit(self, [68,y, 9.2], self.app.goToHelp);y+=25
-        gui3d.TextView(self, [18,y + 5, 9.2], "Exit", 47, 2);AppShortcutEdit(self, [68,y, 9.2], self.app.stop);y+=25
+        gui3d.TextView(self, [18,y + 5, 9.2], "Exit", 47, 2);AppShortcutEdit(self, [68,y, 9.2], self.app.promptAndExit);y+=25
         
         y = 80
         self.cameraBox = gui3d.GroupBox(self, [650, y, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=380));y+=25
