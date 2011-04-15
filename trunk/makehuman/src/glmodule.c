@@ -1373,7 +1373,7 @@ void OnInit(void)
     glewInit();
 
     glEnable(GL_DEPTH_TEST);                                  /* Hidden surface removal */
-    //glEnable(GL_CULL_FACE);                                   /* Inside face removal */
+    glEnable(GL_CULL_FACE);                                   /* Inside face removal */
     //glEnable(GL_ALPHA_TEST);
     //glAlphaFunc(GL_GREATER, 0.0f);
     glDisable(GL_DITHER);

@@ -48,14 +48,13 @@ class HumanEvent(events3d.Event):
 
 class Human(gui3d.Object):
 
-    def __init__(self, globalScene, objFilePath, hairObj=None):
+    def __init__(self, view, mesh, hairObj=None):
 
-        gui3d.Object.__init__(self, globalScene.application, [0, 0, 0], objFilePath, visible=True)
+        gui3d.Object.__init__(self, view, [0, 0, 0], mesh, visible=True)
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh
 
-        self.scene = globalScene
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
         self.targetsDetailStack = {}  # All details targets applied, with their values
@@ -120,15 +119,15 @@ class Human(gui3d.Object):
 
     def show(self):
         self.visible = True
-        if self.hairObj: self.hairObj.show()
+        if self.hairObj:
+            self.hairObj.show()
         self.setVisibility(True)
 
     def hide(self):
 
-      # print("hiding ", self.meshName)
-
         self.visible = False
-        if self.hairObj: self.hairObj.hide()
+        if self.hairObj:
+            self.hairObj.hide()
         self.setVisibility(False)
 
     # Overriding setPosition and setRotation to account for both hair and base object

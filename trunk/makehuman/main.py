@@ -177,7 +177,7 @@ class MHApplication(gui3d.Application):
         self.progressBar.setProgress(0.2)
         #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
         #self.scene3d.clear(hairObj) 
-        self.selectedHuman = human.Human(self.scene3d, "data/3dobjs/base.obj")
+        self.selectedHuman = human.Human(self, "data/3dobjs/base.obj")
         
         mh.callAsync(self.loadMainGui)
         

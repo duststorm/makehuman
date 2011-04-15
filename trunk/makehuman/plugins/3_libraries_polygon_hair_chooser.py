@@ -39,9 +39,11 @@ class HairTaskView(gui3d.TaskView):
             human = self.app.selectedHuman
             
             if human.hairObj:
-                human.scene.clear(human.hairObj.mesh)
+                self.app.scene3d.clear(human.hairObj.mesh)
 
-            human.hairObj = gui3d.Object(human.view, human.getPosition(), obj, png)
+            human.hairObj = gui3d.Object(self.app, human.getPosition(), obj, png)
+            human.hairObj.mesh.setCameraProjection(0)
+            self.app.scene3d.update()
             
             self.app.switchCategory('Modelling')
 

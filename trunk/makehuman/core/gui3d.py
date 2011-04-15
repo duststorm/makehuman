@@ -152,7 +152,7 @@ class Object(events3d.EventHandler):
         else:
             self.mesh.setScale(scale, scale, 1)
             
-    def getBBox():
+    def getBBox(self):
         if not self.__bbox:
             self.__bbox = self.mesh.calcBBox()
         return self.__bbox
@@ -2210,10 +2210,10 @@ class RectangleMesh(module3d.Object3D):
         v.append(self.createVertex([0.0, height, 0.0]))
         
         # The 4 uv values
-        uv = ([0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0])
+        uv = ([0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0])
         
         # The face
-        fg.createFace(v[0], v[1], v[2], v[3], uv=uv)
+        fg.createFace(v[3], v[2], v[1], v[0], uv=uv)
                 
         self.texture = texture
         self.setCameraProjection(1)
