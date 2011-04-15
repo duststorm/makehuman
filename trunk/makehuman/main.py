@@ -140,9 +140,12 @@ class MHApplication(gui3d.Application):
             (0, events3d.SDLK_LEFT): self.panLeft,
             (0, events3d.SDLK_PLUS): self.zoomIn,
             (0, events3d.SDLK_MINUS): self.zoomOut,
-            (0, events3d.SDLK_7): self.sideView,
             (0, events3d.SDLK_1): self.frontView,
-            (0, events3d.SDLK_3): self.topView,
+            (0, events3d.SDLK_3): self.rightView,
+            (0, events3d.SDLK_7): self.topView,
+            (events3d.KMOD_CTRL, events3d.SDLK_1): self.backView,
+            (events3d.KMOD_CTRL, events3d.SDLK_3): self.leftView,
+            (events3d.KMOD_CTRL, events3d.SDLK_7): self.bottomView,
             (0, events3d.SDLK_PERIOD): self.resetView
         }
         
@@ -771,16 +774,28 @@ class MHApplication(gui3d.Application):
         mh.cameras[0].eyeZ -= 0.65 * speed
         self.redraw()
         
-    def topView(self):
-        self.selectedHuman.setRotation([90.0, 0.0, 0.0])
-        self.redraw()
-        
     def frontView(self):
         self.selectedHuman.setRotation([0.0, 0.0, 0.0])
         self.redraw()
         
-    def sideView(self):
+    def rightView(self):
+        self.selectedHuman.setRotation([0.0, -90.0, 0.0])
+        self.redraw()
+        
+    def topView(self):
+        self.selectedHuman.setRotation([90.0, 0.0, 0.0])
+        self.redraw()
+        
+    def backView(self):
+        self.selectedHuman.setRotation([0.0, 180.0, 0.0])
+        self.redraw()
+        
+    def leftView(self):
         self.selectedHuman.setRotation([0.0, 90.0, 0.0])
+        self.redraw()
+        
+    def bottomView(self):
+        self.selectedHuman.setRotation([-90.0, 0.0, 0.0])
         self.redraw()
         
     def resetView(self):

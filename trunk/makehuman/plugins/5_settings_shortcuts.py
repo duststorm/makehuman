@@ -46,8 +46,11 @@ class ShortcutsTaskView(gui3d.TaskView):
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Zoom in", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.zoomIn);y+=25
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Zoom out", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.zoomOut);y+=25
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Front view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.frontView);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Right view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.rightView);y+=25
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Top view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.topView);y+=25
-        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Side view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.sideView);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Back view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.backView);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Left view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.leftView);y+=25
+        gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Bottom view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.bottomView);y+=25
         gui3d.TextView(self.cameraBox, [658,y + 5, 9.2], "Reset view", 47, 2);AppShortcutEdit(self.cameraBox, [708,y, 9.2], self.app.resetView);y+=25
     
     def onHide(self, event):
