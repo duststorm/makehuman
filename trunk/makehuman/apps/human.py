@@ -120,7 +120,7 @@ class Human(gui3d.Object):
 
     def show(self):
         self.visible = True
-        if self.hairObj: self.hairObj.setVisibility(1)
+        if self.hairObj: self.hairObj.show()
         self.setVisibility(True)
 
     def hide(self):
@@ -128,7 +128,7 @@ class Human(gui3d.Object):
       # print("hiding ", self.meshName)
 
         self.visible = False
-        if self.hairObj: self.hairObj.setVisibility(0)
+        if self.hairObj: self.hairObj.hide()
         self.setVisibility(False)
 
     # Overriding setPosition and setRotation to account for both hair and base object
@@ -136,7 +136,7 @@ class Human(gui3d.Object):
     def setPosition(self, position):
         gui3d.Object.setPosition(self, position)
         if self.hairObj:
-            self.hairObj.setLoc(position[0], position[1], position[2])
+            self.hairObj.setPosition(position)
         if self.isSubdivided():
             self.meshData.setLoc(position[0], position[1], position[2])
         elif self.__subdivisionMesh:
@@ -145,7 +145,7 @@ class Human(gui3d.Object):
     def setRotation(self, rotation):
         gui3d.Object.setRotation(self, rotation)
         if self.hairObj:
-            self.hairObj.setRot(rotation[0], rotation[1], rotation[2])
+            self.hairObj.setRotation(rotation)
         if self.isSubdivided():
             self.meshData.setRot(rotation[0], rotation[1], rotation[2])
         elif self.__subdivisionMesh:
