@@ -62,6 +62,7 @@ static PyMemberDef Object3D_members[] =
     {"cameraMode", T_INT, offsetof(Object3D, inMovableCamera), 0, "Whether this object uses the Movable or Fixed camera mode."},
     {"pickable", T_INT, offsetof(Object3D, isPickable), 0, "Whether this object can be picked."},
     {"solid", T_INT, offsetof(Object3D, isSolid), 0, "Whether this object is solid or wireframe."},
+    {"transparentQuads", T_INT, offsetof(Object3D, nTransparentQuads), 0, "How many of the faces are transparent, transparent faces are always at the end."},
     {NULL}  /* Sentinel */
 };
 
@@ -213,6 +214,7 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->colors2 = NULL;
 
         self->nQuads = 0;
+        self->nTransparentQuads = 0;
         self->nVerts = 0;
         self->nNorms = 0;
         self->nColors = 0;
@@ -563,6 +565,115 @@ int Object3D_setScale(Object3D *self, PyObject *value)
     self->sz = PyFloat_AsDouble(PySequence_GetItem(value, 2));
 
     return 0;
+}
+
+static int distanceSort(const void *a, const void *b)
+{
+    float d1 = ((SortStruct*)a)->distance;
+    float d2 = ((SortStruct*)b)->distance;
+
+    if (d1 < d2)
+        return 1;
+    else if (d1 > d2)
+        return -1;
+    else
+        return 0;
+}
+
+void Object3D_sortFaces(Object3D *self)
+{
+    Camera *camera = (Camera*)PyList_GET_ITEM(G.cameras, 0);
+
+    float cx = camera->eyeX, cy = camera->eyeY, cz = camera->eyeZ;
+    float tx, ty, tz;
+    float alpha, s, c;
+    float x, y, z;
+    int *quads = self->quads + self->nQuads - self->nTransparentQuads;
+    float *verts;
+    int i;
+    int n;
+
+    // Rotate camera position according to object position
+    // This is less costly that transforming all points
+    cx -= self->x;
+    cy -= self->y;
+    cz -= self->z;
+
+    // Rotate X
+    alpha = self->rx * 3.141592653589793238462643 / 180.0;
+    c = cosf(alpha);
+    s = sinf(alpha);
+    tx = cx;
+    ty = cy*c - cz*s;
+    tz = cy*s + cz*c;
+
+    // Rotate Y
+    alpha = self->ry * 3.141592653589793238462643 / 180.0;
+    c = cosf(alpha);
+    s = sinf(alpha);
+    cx = tz*s + tx*c;
+    cy = ty;
+    cz = tz*c - tx*s;
+
+    // Rotate Z
+    alpha = self->rz * 3.141592653589793238462643 / 180.0;
+    c = cosf(alpha);
+    s = sinf(alpha);
+    tx = cx*c - cy*s;
+    ty = cx*s + cy*c;
+    tz = cz;
+
+    cx = tx + self->x;
+    cy = ty + self->y;
+    cz = tz + self->z;
+
+    // Resize sorting data if needed
+    if (G.nSortData < self->nTransparentQuads)
+    {
+        G.nSortData = self->nTransparentQuads;
+        G.sortData = realloc(G.sortData, G.nSortData * sizeof(SortStruct));
+    }
+
+    // Prepare sorting data
+    for (i = 0; i < self->nTransparentQuads; i++)
+    {
+        // Calculate center
+        x = y = z = 0.0;
+
+        for (n = 0; n < 4; n++)
+        {
+            G.sortData[i].indices[n] = *quads;
+            verts = &self->verts[*quads * 3];
+            x += *verts++;
+            y += *verts++;
+            z += *verts++;
+            quads++;
+        }
+
+        x /= 4.0;
+        y /= 4.0;
+        z /= 4.0;
+
+        // Calculate distance
+        x -= cx;
+        y -= cy;
+        z -= cz;
+
+        G.sortData[i].distance = sqrtf(x*x+y*y+z*z);
+    }
+
+    // Sort
+    qsort(G.sortData, G.nSortData, sizeof(SortStruct), distanceSort);
+
+    // Copy to buffer
+    quads = self->quads + self->nQuads - self->nTransparentQuads;
+    for (i = 0; i < self->nTransparentQuads; i++)
+    {
+        for (n = 0; n < 4; n++)
+        {
+            *quads++ = G.sortData[i].indices[n];
+        }
+    }
 }
 
 /** \brief Invokes the Python mouseButtonDown function.

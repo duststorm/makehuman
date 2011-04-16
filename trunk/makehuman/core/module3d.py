@@ -634,6 +634,7 @@ class Object3D:
 
         self.shadeless = 0
         self.solid = 1
+        self.transparentQuads = 0
         self.indexBuffer = []
         self.vertexBufferSize = None
         
@@ -890,6 +891,13 @@ class Object3D:
         self.solid = solid
         try:
             self.object3d.solid = self.solid
+        except AttributeError, text:
+            pass
+            
+    def setTransparentQuads(self, transparentQuads):
+        self.transparentQuads = transparentQuads
+        try:
+            self.object3d.transparentQuads = self.transparentQuads
         except AttributeError, text:
             pass
 
@@ -1255,6 +1263,7 @@ class Scene3D:
         obj.object3d.shadeless = obj.shadeless
         obj.object3d.pickable = obj.pickable
         obj.object3d.solid = obj.solid
+        obj.object3d.transparentQuads = obj.transparentQuads
         obj.object3d.cameraMode = obj.cameraMode
 
         # TODO add all obj attributes

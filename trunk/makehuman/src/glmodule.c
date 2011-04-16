@@ -70,30 +70,6 @@ static void *g_sdlImageHandle = NULL;
 static PFN_IMG_LOAD IMG_Load = NULL;
 #endif
 
-typedef struct
-{
-    PyObject_HEAD
-
-    float fovAngle;
-    float nearPlane;
-    float farPlane;
-
-    int projection;
-
-    int stereoMode;
-    float eyeSeparation;
-
-    float eyeX;
-    float eyeY;
-    float eyeZ;
-    float focusX;
-    float focusY;
-    float focusZ;
-    float upX;
-    float upY;
-    float upZ;
-} Camera;
-
 void mhCameraPosition(Camera *camera, int eye);
 
 // Camera attributes directly accessed by Python
@@ -1373,7 +1349,7 @@ void OnInit(void)
     glewInit();
 
     glEnable(GL_DEPTH_TEST);                                  /* Hidden surface removal */
-    glEnable(GL_CULL_FACE);                                   /* Inside face removal */
+    //glEnable(GL_CULL_FACE);                                   /* Inside face removal */
     //glEnable(GL_ALPHA_TEST);
     //glAlphaFunc(GL_GREATER, 0.0f);
     glDisable(GL_DITHER);
@@ -1563,6 +1539,9 @@ void mhDrawMeshes(int pickMode, int cameraType)
                     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
                     glBindTexture(GL_TEXTURE_2D, obj->texture);
                     glTexCoordPointer(2, GL_FLOAT, 0, obj->UVs);
+                    
+                    if (obj->nTransparentQuads)
+                      Object3D_sortFaces(obj);
                 }
 
                 /*Fill the array pointers with object mesh data*/

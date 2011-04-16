@@ -72,8 +72,11 @@ extern "C"
         int nVerts;                 /**< \brief The number of vertices in this object.                                      */
         /**<        An int holding the number of vertices in this object.                       */
         int nQuads;                 /**< \brief The number of faces in this object.                                         */
-        /**<        An int holding the number of triangular faces in this object.
-                    MakeHuman only supports triangular faces.                                   */
+        /**<        An int holding the number of faces in this object.
+                    MakeHuman only supports quadrilateral faces.                                */
+        int nTransparentQuads;      /**< \brief The number of transparent faces in this object.                             */
+        /**<        An int holding the number of transparent faces in this object.
+                    MakeHuman only supports quadrilateral faces.                                */
         int nNorms;                 /**< \brief The number of surface normals in this object.                               */
         /**<        An int holding the number of surface normals defined for this object.       */
         int nColors;                /**< \brief The number of colors used in this object.                                   */
@@ -136,6 +139,36 @@ extern "C"
     PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
     int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds);
 
+    typedef struct
+    {
+      PyObject_HEAD
+
+        float fovAngle;
+      float nearPlane;
+      float farPlane;
+
+      int projection;
+
+      int stereoMode;
+      float eyeSeparation;
+
+      float eyeX;
+      float eyeY;
+      float eyeZ;
+      float focusX;
+      float focusY;
+      float focusZ;
+      float upX;
+      float upY;
+      float upZ;
+    } Camera;
+
+    typedef struct
+    {
+        int indices[4];
+        float distance;
+    } SortStruct;
+
     /** \brief A struct consolidating all global variables.
                A global struct - all globals must be here.
      */
@@ -170,6 +203,9 @@ extern "C"
         PyObject *mouseMovedCallback;
         PyObject *keyDownCallback;
         PyObject *keyUpCallback;
+
+        SortStruct *sortData;
+        int nSortData;
     } Global;
     extern Global G;
 
@@ -187,6 +223,7 @@ extern "C"
     void setClearColor(float r, float g, float b, float a);
 
 // Helper functions
+    void Object3D_sortFaces(Object3D *self);
     float *makeFloatArray(int n);
     unsigned char *makeUCharArray(int n);
     int *makeIntArray(int n);

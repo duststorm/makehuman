@@ -96,6 +96,10 @@ static void initGlobals(void)
     G.mouseMovedCallback = NULL;
     G.keyDownCallback = NULL;
     G.keyUpCallback = NULL;
+
+    // Sort buffer
+    G.sortData = NULL;
+    G.nSortData = 0;
 }
 
 static PyObject* mh_updatePickingBuffer(PyObject *self, PyObject *unused)

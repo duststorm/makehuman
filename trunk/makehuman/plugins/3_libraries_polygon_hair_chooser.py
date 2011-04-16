@@ -43,6 +43,7 @@ class HairTaskView(gui3d.TaskView):
 
             human.hairObj = gui3d.Object(self.app, human.getPosition(), obj, png)
             human.hairObj.mesh.setCameraProjection(0)
+            human.hairObj.mesh.setTransparentQuads(len(human.hairObj.mesh.faces))
             self.app.scene3d.update()
             
             self.app.switchCategory('Modelling')
