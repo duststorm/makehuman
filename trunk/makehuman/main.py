@@ -169,6 +169,7 @@ class MHApplication(gui3d.Application):
         self.background = gui3d.Object(self, [0, 0, -89.99], gui3d.RectangleMesh(800, 600, self.getThemeResource("images", "background.png")))
         self.lowerbar = gui3d.Object(self, [0, 32, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
         self.statusbar = gui3d.Object(self, [0, 580, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
+        mh.setClearColor(0.5, 0.5, 0.5, 1.0)
         
         mh.callAsync(self.loadHuman)
         
