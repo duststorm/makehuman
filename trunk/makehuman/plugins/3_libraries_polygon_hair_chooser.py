@@ -48,8 +48,8 @@ class HairTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Polygon hair')
         self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png')
         
-        self.prevHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
-        self.prevHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
+        self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
+        self.oHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
 
         @self.filechooser.event
         def onFileSelected(filename):
@@ -67,6 +67,7 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj = gui3d.Object(self.app, human.getPosition(), obj, png)
             human.hairObj.mesh.setCameraProjection(0)
             human.hairObj.mesh.setTransparentQuads(len(human.hairObj.mesh.faces))
+            human.hairObj.mesh.originalVerts = [v.co[:] for v in human.hairObj.mesh.verts]
             self.app.scene3d.update()
             self.adaptHairToHuman(human)
             
@@ -81,17 +82,14 @@ class HairTaskView(gui3d.TaskView):
             headBBox = calculateBBox(headVertices)
             
             headCentroid = in2pts(headBBox[0], headBBox[1], 0.5)
-            delta = vsub(headCentroid, self.prevHeadCentroid)
+            delta = vsub(headCentroid, self.oHeadCentroid)
             
-            sx = (headBBox[1][0]-headBBox[0][0])/float(self.prevHeadBBox[1][0]-self.prevHeadBBox[0][0])
-            sy = (headBBox[1][1]-headBBox[0][1])/float(self.prevHeadBBox[1][1]-self.prevHeadBBox[0][1])
-            sz = (headBBox[1][2]-headBBox[0][2])/float(self.prevHeadBBox[1][2]-self.prevHeadBBox[0][2])
+            sx = (headBBox[1][0]-headBBox[0][0])/float(self.oHeadBBox[1][0]-self.oHeadBBox[0][0])
+            sy = (headBBox[1][1]-headBBox[0][1])/float(self.oHeadBBox[1][1]-self.oHeadBBox[0][1])
+            sz = (headBBox[1][2]-headBBox[0][2])/float(self.oHeadBBox[1][2]-self.oHeadBBox[0][2])
             
-            self.prevHeadCentroid = headCentroid
-            self.prevHeadBBox = headBBox
-            
-            for v in human.hairObj.mesh.verts:
-                co = vsub(v.co, headCentroid)
+            for i, v in enumerate(human.hairObj.mesh.verts):
+                co = vsub(human.hairObj.mesh.originalVerts[i], headCentroid)
                 co[0] *= sx
                 co[1] *= sy
                 co[2] *= sz
