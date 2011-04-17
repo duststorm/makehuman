@@ -592,6 +592,7 @@ void Object3D_sortFaces(Object3D *self)
     float *verts;
     int i;
     int n;
+    float distance;
 
     // Rotate camera position according to object position
     // This is less costly that transforming all points
@@ -637,6 +638,7 @@ void Object3D_sortFaces(Object3D *self)
     // Prepare sorting data
     for (i = 0; i < self->nTransparentQuads; i++)
     {
+#if 0
         // Calculate center
         x = y = z = 0.0;
 
@@ -654,12 +656,30 @@ void Object3D_sortFaces(Object3D *self)
         y /= 4.0;
         z /= 4.0;
 
-        // Calculate distance
+        // Calculate distance from center
         x -= cx;
         y -= cy;
         z -= cz;
 
-        G.sortData[i].distance = sqrtf(x*x+y*y+z*z);
+        distance = =x*x+y*y+z*z;
+#else
+        // Calculate distance of closest vertex
+        distance = FLT_MAX;
+
+        for (n = 0; n < 4; n++)
+        {
+          G.sortData[i].indices[n] = *quads;
+          verts = &self->verts[*quads * 3];
+          x = *verts++ - cx;
+          y = *verts++ - cy;
+          z = *verts++ - cz;
+          quads++;
+
+          distance = min(distance, x*x+y*y+z*z);
+        }
+#endif
+
+        G.sortData[i].distance = distance;
     }
 
     // Sort
