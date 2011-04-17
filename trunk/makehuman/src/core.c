@@ -596,7 +596,7 @@ void Object3D_sortFaces(Object3D *self)
     float *verts;
     int i;
     int n;
-    float distance;
+    float distance, d;
 
     // Rotate camera position according to object position
     // This is less costly that transforming all points
@@ -679,7 +679,10 @@ void Object3D_sortFaces(Object3D *self)
           z = *verts++ - cz;
           quads++;
 
-          distance = min(distance, x*x+y*y+z*z);
+          d = x*x+y*y+z*z;
+
+          if (d < distance)
+            distance = d;
         }
 #endif
 
