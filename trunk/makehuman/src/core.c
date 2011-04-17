@@ -600,7 +600,7 @@ void Object3D_sortFaces(Object3D *self)
     cz -= self->z;
 
     // Rotate X
-    alpha = self->rx * 3.141592653589793238462643 / 180.0;
+    alpha = -self->rx * 3.141592653589793238462643 / 180.0;
     c = cosf(alpha);
     s = sinf(alpha);
     tx = cx;
@@ -608,7 +608,7 @@ void Object3D_sortFaces(Object3D *self)
     tz = cy*s + cz*c;
 
     // Rotate Y
-    alpha = self->ry * 3.141592653589793238462643 / 180.0;
+    alpha = -self->ry * 3.141592653589793238462643 / 180.0;
     c = cosf(alpha);
     s = sinf(alpha);
     cx = tz*s + tx*c;
@@ -616,7 +616,7 @@ void Object3D_sortFaces(Object3D *self)
     cz = tz*c - tx*s;
 
     // Rotate Z
-    alpha = self->rz * 3.141592653589793238462643 / 180.0;
+    alpha = -self->rz * 3.141592653589793238462643 / 180.0;
     c = cosf(alpha);
     s = sinf(alpha);
     tx = cx*c - cy*s;
