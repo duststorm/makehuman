@@ -40,6 +40,10 @@
 #include <structmember.h>
 #endif
 
+#ifndef FLT_MAX
+#include <float.h>
+#endif
+
 #include "core.h"
 #include "SDL_thread.h"
 
