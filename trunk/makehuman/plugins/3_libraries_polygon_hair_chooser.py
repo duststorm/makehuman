@@ -44,9 +44,17 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj = gui3d.Object(self.app, human.getPosition(), obj, png)
             human.hairObj.mesh.setCameraProjection(0)
             human.hairObj.mesh.setTransparentQuads(len(human.hairObj.mesh.faces))
+            self.adaptHairToHuman(human)
             self.app.scene3d.update()
             
             self.app.switchCategory('Modelling')
+            
+    def adaptHairToHuman(self, human):
+        
+        if human.hairObj:
+            for v in human.hairObj.mesh.verts:
+                v.co[2] -= 0.577
+            #human.hairObj.mesh.update() Uncomment once we have a decent hair adaption
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
@@ -57,6 +65,14 @@ class HairTaskView(gui3d.TaskView):
     def onHide(self, event):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
+        
+    def onHumanChanged(self, event):
+        
+        human = event.human
+        if event.change == 'reset':
+            if human.hairObj:
+                self.app.scene3d.clear(human.hairObj.mesh)
+        self.adaptHairToHuman(human)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
