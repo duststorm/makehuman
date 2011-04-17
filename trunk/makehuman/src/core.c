@@ -663,7 +663,7 @@ void Object3D_sortFaces(Object3D *self)
     }
 
     // Sort
-    qsort(G.sortData, G.nSortData, sizeof(SortStruct), distanceSort);
+    qsort(G.sortData, self->nTransparentQuads, sizeof(SortStruct), distanceSort);
 
     // Copy to buffer
     quads = self->quads + self->nQuads - self->nTransparentQuads;
