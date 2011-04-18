@@ -62,7 +62,8 @@ class HairTaskView(gui3d.TaskView):
             human = self.app.selectedHuman
             
             if human.hairObj:
-                self.app.scene3d.clear(human.hairObj.mesh)
+                self.app.scene3d.delete(human.hairObj.mesh)
+                human.hairObj = None
 
             human.hairObj = gui3d.Object(self.app, human.getPosition(), obj, png)
             human.hairObj.mesh.setCameraProjection(0)
@@ -111,7 +112,8 @@ class HairTaskView(gui3d.TaskView):
         human = event.human
         if event.change == 'reset':
             if human.hairObj:
-                self.app.scene3d.clear(human.hairObj.mesh)
+                self.app.scene3d.delete(human.hairObj.mesh)
+                human.hairObj = None
         def updateClosure():
             self.adaptHairToHuman(human)
         mh.callAsync(updateClosure)

@@ -557,6 +557,7 @@ class Human(gui3d.Object):
         self.callEvent('onChanged', HumanEvent(self, 'reset'))
 
     def load(self, filename, update=True, progressCallback=None):
+        
         self.resetMeshValues()
 
         f = open(filename, 'r')
@@ -595,6 +596,7 @@ class Human(gui3d.Object):
             self.applyAllTargets(progressCallback)
 
     def save(self, filename, tags):
+        
         f = open(filename, 'w')
         f.write('# Written by makehuman 1.0.0 alpha 6\n')
         f.write('version 1.0.0\n')
