@@ -66,7 +66,6 @@ static PyMemberDef Object3D_members[] =
     {"cameraMode", T_INT, offsetof(Object3D, inMovableCamera), 0, "Whether this object uses the Movable or Fixed camera mode."},
     {"pickable", T_INT, offsetof(Object3D, isPickable), 0, "Whether this object can be picked."},
     {"solid", T_INT, offsetof(Object3D, isSolid), 0, "Whether this object is solid or wireframe."},
-    {"transparentQuads", T_INT, offsetof(Object3D, nTransparentQuads), 0, "How many of the faces are transparent, transparent faces are always at the end."},
     {NULL}  /* Sentinel */
 };
 
@@ -98,6 +97,7 @@ static PyGetSetDef Object3D_getset[] =
     {"translation", (getter)Object3D_getTranslation, (setter)Object3D_setTranslation, "The translation of the object as a 3 component vector.", NULL},
     {"rotation", (getter)Object3D_getRotation, (setter)Object3D_setRotation, "The rotation of the object as a 3 component vector.", NULL},
     {"scale", (getter)Object3D_getScale, (setter)Object3D_setScale, "The scale of the object as a 3 component vector.", NULL},
+    {"transparentQuads", (getter)Object3D_getTransparentQuads, (setter)Object3D_setTransparentQuads, "How many of the faces are transparent, transparent faces are always at the end.", NULL},
     {NULL}
 };
 
@@ -569,6 +569,32 @@ int Object3D_setScale(Object3D *self, PyObject *value)
     self->sz = PyFloat_AsDouble(PySequence_GetItem(value, 2));
 
     return 0;
+}
+
+PyObject *Object3D_getTransparentQuads(Object3D *self, void *closure)
+{
+  return Py_BuildValue("i", self->nTransparentQuads);
+}
+
+int Object3D_setTransparentQuads(Object3D *self, PyObject *value)
+{
+  int transparentQuads = PyInt_AsLong(value);
+
+  if (transparentQuads < 0)
+  {
+    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i", transparentQuads);
+    return -1;
+  }
+
+  if (transparentQuads > self->nQuads)
+  {
+    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i while there are only %i quads", transparentQuads, self->nQuads);
+    return -1;
+  }
+
+  self->nTransparentQuads = transparentQuads;
+
+  return 0;
 }
 
 static int distanceSort(const void *a, const void *b)

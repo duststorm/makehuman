@@ -128,6 +128,8 @@ extern "C"
     int Object3D_setRotation(Object3D *self, PyObject *value);
     PyObject *Object3D_getScale(Object3D *self, void *closure);
     int Object3D_setScale(Object3D *self, PyObject *value);
+    PyObject *Object3D_getTransparentQuads(Object3D *self, void *closure);
+    int Object3D_setTransparentQuads(Object3D *self, PyObject *value);
 
 // Object3D attributes indirectly accessed by Python
     PyObject *Object3D_getShaderParameters(Object3D *self, void *closure);
