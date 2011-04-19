@@ -1740,6 +1740,12 @@ void mhDrawMeshes(int pickMode, int cameraType)
                   glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
                   glDisable(GL_POLYGON_OFFSET_FILL);
                 }
+                else if (obj->nTransparentQuads)
+                {
+                  glDepthMask(GL_FALSE);
+                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
+                  glDepthMask(GL_TRUE);
+                }
                 else
                   glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
 

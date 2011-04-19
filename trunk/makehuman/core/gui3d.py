@@ -579,24 +579,25 @@ class Application(events3d.EventHandler):
             event = events3d.MouseEvent(button, x, y)
 
             # Get picked object
-
             pickedObject = self.scene3d.getPickedObject()
-            if not pickedObject: return
-            object = self.scene3d.getPickedObject()[1]
+            if pickedObject:
+                object = pickedObject[1].object
+            else:
+                object = self
                
             # If we have an object
             # Try to give its view focus
-   
-            self.focusObject = object.object
-            self.focusObject.view.setFocus()
+            if object != self:
+                self.focusObject = object
+                self.focusObject.view.setFocus()
    
             # It is the object which will receive the following mouse messages
    
-            self.mouseDownObject = object.object
+            self.mouseDownObject = object
    
             # Send event to the object
    
-            object.object.callEvent('onMouseDown', event)
+            object.callEvent('onMouseDown', event)
 
     def onMouseUpCallback(self, button, x, y):
         if button == 4 or button == 5:
@@ -606,13 +607,15 @@ class Application(events3d.EventHandler):
         event = events3d.MouseEvent(button, x, y)
 
         # Get picked object
-        
         pickedObject = self.scene3d.getPickedObject()
-        if not pickedObject: return
-        object = pickedObject[1]
+        if pickedObject:
+            object = pickedObject[1].object
+        else:
+            object = self
+                
         if self.mouseDownObject:
             self.mouseDownObject.callEvent('onMouseUp', event)
-            if self.mouseDownObject is object.object:
+            if self.mouseDownObject is object:
                 self.mouseDownObject.callEvent('onClicked', event)
 
     def onMouseMovedCallback(self, mouseState, x, y, xRel, yRel):
@@ -624,14 +627,12 @@ class Application(events3d.EventHandler):
 
         picked = self.scene3d.getPickedObject()
         
-        if not picked:
-            if self.enteredObject:
-                self.enteredObject.callEvent('onMouseExited', event)
-                self.enteredObject = None
-            return
-            
-        group = object = picked[0]
-        object = picked[1]
+        if picked:
+            group = picked[0]
+            object = picked[1].object or self
+        else:
+            group = None
+            object = self
 
         event.object = object
         event.group = group
@@ -640,17 +641,12 @@ class Application(events3d.EventHandler):
             if self.mouseDownObject:
                 self.mouseDownObject.callEvent('onMouseDragged', event)
         else:
-            if object and object.object:
-                if self.enteredObject != object.object:
-                    if self.enteredObject:
-                        self.enteredObject.callEvent('onMouseExited', event)
-                    self.enteredObject = object.object
-                    self.enteredObject.callEvent('onMouseEntered', event)
-                object.object.callEvent('onMouseMoved', event)
-            else:
+            if self.enteredObject != object:
                 if self.enteredObject:
                     self.enteredObject.callEvent('onMouseExited', event)
-                self.enteredObject = None
+                self.enteredObject = object
+                self.enteredObject.callEvent('onMouseEntered', event)
+            object.callEvent('onMouseMoved', event)
 
     def onMouseWheelCallback(self, wheelDelta):
 

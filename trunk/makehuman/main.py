@@ -166,7 +166,6 @@ class MHApplication(gui3d.Application):
         self.progressBar.setProgress(0.1)
 
         self.upperbar = gui3d.Object(self, [0, 0, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "upperbar.png")))
-        self.background = gui3d.Object(self, [0, 0, -89.99], gui3d.RectangleMesh(800, 600, self.getThemeResource("images", "background.png")))
         self.lowerbar = gui3d.Object(self, [0, 32, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
         self.statusbar = gui3d.Object(self, [0, 580, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
         mh.setClearColor(0.5, 0.5, 0.5, 1.0)
@@ -666,23 +665,25 @@ class MHApplication(gui3d.Application):
         mh.cameras[0].stereoMode = stereoMode
 
         # We need a black background for stereo
-        background = self.categories["Modelling"].background
         if stereoMode:
-            color = [  0,   0,   0, 255]
+            mh.setClearColor(0.0, 0.0, 0.0, 1.0)
             self.categories["Modelling"].anaglyphsButton.setSelected(True)
         else:
-            color = [255, 255, 255, 255]
+            mh.setClearColor(0.5, 0.5, 0.5, 1.0)
             self.categories["Modelling"].anaglyphsButton.setSelected(False)
-        for g in background.mesh.facesGroups:
-            g.setColor(color)
 
         self.redraw()
         
     def toggleSolid(self):
-        if self.selectedHuman.mesh.solid:
-            self.selectedHuman.mesh.setSolid(0)
+        human = self.selectedHuman
+        if human.mesh.solid:
+            human.mesh.setSolid(0)
+            if human.hairObj:
+                human.hairObj.mesh.setSolid(0)
         else:
-            self.selectedHuman.mesh.setSolid(1)
+            human.mesh.setSolid(1)
+            if human.hairObj:
+                human.hairObj.mesh.setSolid(1)
         self.redraw()
         
     def toggleSubdivision(self):

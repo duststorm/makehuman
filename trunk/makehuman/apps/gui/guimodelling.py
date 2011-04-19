@@ -45,10 +45,7 @@ class ModellingCategory(gui3d.Category):
 
     def __init__(self, parent):
         gui3d.Category.__init__(self, parent, 'Modelling')
-        
-        mesh = gui3d.RectangleMesh(420, 420, self.app.getThemeResource("images", 'background.png'))
-        self.background = gui3d.Object(self, [190, 90, -89.98], mesh)
-        
+              
         y = 600-110
         self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
         
