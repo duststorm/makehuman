@@ -83,7 +83,6 @@ class ModellingCategory(gui3d.Category):
 
 
     def onResized(self, event):
-        self.background.mesh.resize(event.width - 190 * 2, event.height - 90 * 2)
         self.viewBox.setPosition([10, event.height-110, 9.0])
 
 

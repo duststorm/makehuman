@@ -437,7 +437,6 @@ class MHApplication(gui3d.Application):
     def onResized(self, event):
 
         self.upperbar.mesh.resize(event.width, 32)
-        self.background.mesh.resize(event.width, event.height)
         self.lowerbar.mesh.resize(event.width, 32)
         self.statusbar.mesh.resize(event.width, 32)
         self.statusbar.setPosition((0.0, event.height-20, 9))
