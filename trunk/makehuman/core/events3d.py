@@ -114,6 +114,13 @@ class EventHandler:
     def event(self, eventMethod):
         self.attachEvent(eventMethod.__name__, eventMethod)
 
+SDL_BUTTON_LEFT = 1
+SDL_BUTTON_MIDDLE = 2
+SDL_BUTTON_RIGHT = 3
+
+SDL_BUTTON_LEFT_MASK = 1
+SDL_BUTTON_MIDDLE_MASK = 2
+SDL_BUTTON_RIGHT_MASK = 4
 
 SDLK_BACKSPACE = 8
 SDLK_TAB = 9

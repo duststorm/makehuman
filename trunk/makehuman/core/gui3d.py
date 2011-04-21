@@ -2085,6 +2085,73 @@ class ShortcutEdit(View):
         events3d.SDLK_RALT:'Alt',
         events3d.SDLK_LALT:'Alt'
     }
+    
+class MouseActionEdit(ShortcutEdit):
+    
+    """
+    An edit control for entering mouse actions.
+    """
+    
+    def __init__(self, parent, position, shortcut):
+        
+        """
+        This is the constructor for the MouseActionEdit class.
+
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param position: The position, a list of 4 C{int} or C{float} elements.
+        @type position: C{list}
+        @param shortcut: The position, a C{tuple} of modifiers and a key.
+        @type shortcut: C{tuple}
+        """
+        
+        ShortcutEdit.__init__(self, parent, position, shortcut)
+        
+    def onMouseDragged(self, event):
+        
+        modifiers = mh.getKeyModifiers()
+            
+        self.label.setText(self.shortcutToLabel(modifiers, event.button))
+        self.app.redraw()
+        
+        m = 0
+    
+        if modifiers & events3d.KMOD_CTRL:
+            m |= events3d.KMOD_CTRL
+            
+        if modifiers & events3d.KMOD_ALT:
+            m |= events3d.KMOD_ALT
+            
+        self.callEvent('onChanged', (m, event.button))
+            
+    def onKeyDown(self, event):
+        
+        View.onKeyDown(self, event)
+        
+    def shortcutToLabel(self, modifiers, button):
+        
+        label = ''
+        
+        if modifiers & events3d.KMOD_CTRL:
+            label += 'Ctl-'
+            
+        if modifiers & events3d.KMOD_ALT:
+            label += 'Alt-'
+            
+        buttons = []
+        if button & events3d.SDL_BUTTON_LEFT_MASK:
+            buttons.append('Left')
+        if button & events3d.SDL_BUTTON_MIDDLE_MASK:
+            buttons.append('Middle')
+        if button & events3d.SDL_BUTTON_RIGHT_MASK:
+            buttons.append('Right')
+            
+        label += '-'.join(buttons)
+            
+        return label
+        
+    def onChanged(self, shortcut):
+        pass
 
 class NineSliceMesh(module3d.Object3D):
     

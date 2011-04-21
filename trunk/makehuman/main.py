@@ -109,7 +109,8 @@ class MHApplication(gui3d.Application):
             'shader': None,
             'lowspeed': 1,
             'highspeed': 5,
-            'units':'metric'
+            'units':'metric',
+            'invertMouseWheel':False
         }
         
         self.shortcuts = {
@@ -147,6 +148,12 @@ class MHApplication(gui3d.Application):
             (events3d.KMOD_CTRL, events3d.SDLK_3): self.leftView,
             (events3d.KMOD_CTRL, events3d.SDLK_7): self.bottomView,
             (0, events3d.SDLK_PERIOD): self.resetView
+        }
+        
+        self.mouseActions = {
+            (0, events3d.SDL_BUTTON_RIGHT_MASK): self.mouseTranslate,
+            (0, events3d.SDL_BUTTON_LEFT_MASK): self.mouseRotate,
+            (0, events3d.SDL_BUTTON_MIDDLE_MASK): self.mouseZoom
         }
         
         self.loadSettings()
@@ -377,34 +384,28 @@ class MHApplication(gui3d.Application):
         
         if self.selectedHuman.isVisible():
             
-            leftButtonDown = event.button & 1
-            middleButtonDown = event.button & 2
-            rightButtonDown = event.button & 4
+            # Normalize modifiers
+            event_modifiers = mh.getKeyModifiers()
+            modifiers = 0
+            if (event_modifiers & events3d.KMOD_CTRL) and (event_modifiers & events3d.KMOD_ALT):
+                modifiers = events3d.KMOD_CTRL | events3d.KMOD_ALT
+            elif event_modifiers & events3d.KMOD_CTRL:
+                modifiers = events3d.KMOD_CTRL
+            elif event_modifiers & events3d.KMOD_ALT:
+                modifiers = events3d.KMOD_ALT
             
-            speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
-
-            if leftButtonDown and rightButtonDown or middleButtonDown:
-                mh.cameras[0].eyeZ += 0.05 * event.dy * speed
-            elif leftButtonDown:
-                human = self.selectedHuman
-                rot = human.getRotation()
-                rot[0] += 0.5 * event.dy * speed
-                rot[1] += 0.5 * event.dx * speed
-                human.setRotation(rot)
-            elif rightButtonDown:
-                human = self.selectedHuman
-                trans = human.getPosition()
-                trans = self.modelCamera.convertToScreen(trans[0], trans[1], trans[2])
-                trans[0] += event.dx * speed
-                trans[1] += event.dy * speed
-                trans = self.modelCamera.convertToWorld3D(trans[0], trans[1], trans[2])
-                human.setPosition(trans)
+            if (modifiers, event.button) in self.mouseActions:
+                self.mouseActions[(modifiers, event.button)](event)
 
     def onMouseWheel(self, event):
         
         if self.selectedHuman.isVisible():
             
-            if event.wheelDelta > 0:
+            zoomOut = event.wheelDelta > 0
+            if self.app.settings.get('invertMouseWheel', False):
+                zoomOut = not zoomOut
+            
+            if zoomOut:
                 self.zoomOut()
             else:
                 self.zoomIn()
@@ -501,8 +502,16 @@ class MHApplication(gui3d.Application):
                 modifier, key, method = line.split(' ')
                 #print modifier, key, method[0:-1]
                 if hasattr(self, method[0:-1]):
-                    self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
-        
+                    self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])       
+ 
+        if os.path.isfile(os.path.join(mh.getPath(''), "mouse.ini")):
+            self.mouseActions = {}
+            f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'r')
+            for line in f:
+                modifier, button, method = line.split(' ')
+                #print modifier, button, method[0:-1]
+                if hasattr(self, method[0:-1]):
+                    self.mouseActions[(int(modifier), int(button))] = getattr(self, method[0:-1])
     def saveSettings(self):
         f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
         f.write(repr(self.settings))
@@ -510,6 +519,10 @@ class MHApplication(gui3d.Application):
         f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'w')
         for shortcut, method in self.shortcuts.iteritems():
             f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
+            
+        f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'w')
+        for mouseAction, method in self.mouseActions.iteritems():
+            f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
 
     # Themes
     def setTheme(self, theme):
@@ -607,8 +620,8 @@ class MHApplication(gui3d.Application):
                 
         self.shortcuts[shortcut] = method
         
-        for shortcut, m in self.shortcuts.iteritems():
-            print shortcut, m
+        #for shortcut, m in self.shortcuts.iteritems():
+        #    print shortcut, m
         
         return True
         
@@ -617,6 +630,34 @@ class MHApplication(gui3d.Application):
         for shortcut, m in self.shortcuts.iteritems():
             if m == method:
                 return shortcut
+                
+    # Mouse actions
+    def setMouseAction(self, modifier, key, method):
+        
+        mouseAction = (modifier, key)
+        
+        if mouseAction in self.mouseActions:
+            print 'Shortcut is in use'
+            return False
+            
+        # Remove old entry
+        for s, m in self.mouseActions.iteritems():
+            if m == method:
+                del self.mouseActions[s]
+                break
+                
+        self.mouseActions[mouseAction] = method
+        
+        #for mouseAction, m in self.mouseActions.iteritems():
+        #    print mouseAction, m
+        
+        return True
+        
+    def getMouseAction(self, method):
+        
+        for mouseAction, m in self.mouseActions.iteritems():
+            if m == method:
+                return mouseAction
                 
     # Load handlers
     
@@ -803,6 +844,38 @@ class MHApplication(gui3d.Application):
         self.selectedHuman.setPosition([0.0, 0.0, 0.0])
         mh.cameras[0].eyeZ = 60.0
         self.redraw()
+        
+    # Mouse actions    
+    def mouseTranslate(self, event):
+            
+        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        
+        human = self.selectedHuman
+        trans = human.getPosition()
+        trans = self.modelCamera.convertToScreen(trans[0], trans[1], trans[2])
+        trans[0] += event.dx * speed
+        trans[1] += event.dy * speed
+        trans = self.modelCamera.convertToWorld3D(trans[0], trans[1], trans[2])
+        human.setPosition(trans)
+
+    def mouseRotate(self, event):
+        
+        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        
+        human = self.selectedHuman
+        rot = human.getRotation()
+        rot[0] += 0.5 * event.dy * speed
+        rot[1] += 0.5 * event.dx * speed
+        human.setRotation(rot)
+        
+    def mouseZoom(self, event):
+    
+        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        
+        if self.app.settings.get('invertMouseWheel', False):
+            speed *= -1
+        
+        mh.cameras[0].eyeZ -= 0.05 * event.dy * speed
         
     def promptAndExit(self):
         if self.undoStack:
