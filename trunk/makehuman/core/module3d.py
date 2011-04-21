@@ -1518,8 +1518,8 @@ class Scene3D:
         except:
 
             # print groupSelected.name
-
-            print 'Color %s (%s) not found' % (IDkey, picked)
+            #this print should only come on while debugging color picking
+            #print 'Color %s (%s) not found' % (IDkey, picked)
             groupSelected = None
         return groupSelected
 
@@ -1539,6 +1539,7 @@ class Scene3D:
             objPicked = facegroupPicked.parent
             return (facegroupPicked, objPicked)
         else:
-            print 'not a clickable zone'
+            #this print should only be made while debugging picking
+            #print 'not a clickable zone'
             return None
             
