@@ -156,6 +156,8 @@ class MHApplication(gui3d.Application):
             (0, events3d.SDL_BUTTON_MIDDLE_MASK): self.mouseZoom
         }
         
+        self.helpIds = []
+        
         self.loadSettings()
         
         self.loadHandlers = {}
@@ -349,13 +351,17 @@ class MHApplication(gui3d.Application):
         self.selectedHuman.applyAllTargets(self.app.progress)
         self.dialog = gui3d.View(self)
         self.dialog.blocker = gui3d.Object(self.dialog, [0, 0, 9.7], gui3d.RectangleMesh(800, 600))
-        self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 50, 9.8], 'Warning', gui3d.GroupBoxStyle._replace(width=200, height=100))
-        self.dialog.text = gui3d.TextView(self.dialog, [800 / 2 - 100 + 10, 600 / 2 - 50 + 25, 9.81], 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.', 180)
-        self.dialog.button1 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10 - 60 - 5, 600 / 2 + 50 - 20 - 10, 9.81], '', style=gui3d.ButtonStyle._replace(width=60))
-        self.dialog.button1.hide()
-        self.dialog.button2 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10, 600 / 2 + 50 - 20 - 10, 9.81], 'OK', style=gui3d.ButtonStyle._replace(width=60))
+        self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150))
+        self.dialog.text = gui3d.TextView(self.dialog, [800 / 2 - 100 + 10, 600 / 2 - 75 + 25, 9.81], '', 180)
+        self.dialog.check = gui3d.CheckBox(self.dialog, [800 / 2 - 100 +10, 600 / 2 + 75 - 20 - 10 - 24, 9.81], "Don't show this again")
+        self.dialog.button1 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10 - 60 - 5, 600 / 2 + 75 - 20 - 10, 9.81], '', style=gui3d.ButtonStyle._replace(width=60))
+        self.dialog.button2 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10, 600 / 2 + 75 - 20 - 10, 9.81], '', style=gui3d.ButtonStyle._replace(width=60))
         self.dialog.button1Action = None
         self.dialog.button2Action = None
+        self.dialog.helpId = None
+        self.dialog.hide()
+        self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
+            'OK', helpId='alphaWarning')
         self.scene3d.update()
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
@@ -370,6 +376,8 @@ class MHApplication(gui3d.Application):
         def onClicked(event):
             if self.dialog.button2Action:
                 self.dialog.button2Action()
+            if self.dialog.helpId and self.dialog.check.selected:
+                self.helpIds.append(self.dialog.helpId)
             self.dialog.hide()
         
         mh.updatePickingBuffer();
@@ -499,6 +507,13 @@ class MHApplication(gui3d.Application):
                 #print modifier, button, method[0:-1]
                 if hasattr(self, method[0:-1]):
                     self.mouseActions[(int(modifier), int(button))] = getattr(self, method[0:-1])
+        
+        if os.path.isfile(os.path.join(mh.getPath(''), "help.ini")):
+            self.helpIds = []
+            f = open(os.path.join(mh.getPath(''), "help.ini"), 'r')
+            for line in f:
+                self.helpIds.append(line[0:-1])
+        
     def saveSettings(self):
         f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
         f.write(repr(self.settings))
@@ -510,6 +525,10 @@ class MHApplication(gui3d.Application):
         f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'w')
         for mouseAction, method in self.mouseActions.iteritems():
             f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
+            
+        f = open(os.path.join(mh.getPath(''), "help.ini"), 'w')
+        for helpId in self.helpIds:
+            f.write('%s\n' % helpId)
 
     # Themes
     def setTheme(self, theme):
@@ -551,8 +570,11 @@ class MHApplication(gui3d.Application):
             self.progressBar.hide()
     
     # Global dialog
-    def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None):
+    def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):
         
+        if helpId in self.helpIds:
+            return
+        print self.helpIds
         self.dialog.box.label.setText(title)
         self.dialog.text.setText(text)
         if button1Label and button2Label:
@@ -564,6 +586,11 @@ class MHApplication(gui3d.Application):
             self.dialog.button2.setLabel(button1Label or button2Label)
         self.dialog.button1Action = button1Action
         self.dialog.button2Action = button2Action
+        self.dialog.helpId = helpId
+        if helpId:
+            self.dialog.check.show()
+        else:
+            self.dialog.check.hide()
         self.dialog.show()
         self.redraw()
       
@@ -866,8 +893,10 @@ class MHApplication(gui3d.Application):
         
     def promptAndExit(self):
         if self.undoStack:
+            self.saveSettings()
             self.prompt('Exit', 'You have unsaved changes. Are you sure you want to exit the application?', 'Yes', 'No', self.stop)
         else:
+            self.saveSettings()
             self.stop()
     
 application = MHApplication()

@@ -53,6 +53,12 @@ class ShortcutsTaskView(gui3d.TaskView):
         gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Help", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.goToHelp);y+=25
         gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Exit", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.promptAndExit);y+=25
     
+    def onShow(self, event):
+        
+        gui3d.TaskView.onShow(self, event)
+        self.app.prompt('Info', 'Click on a shortcut box and press the keys of the shortcut which you would like to assign to the given action.',
+            'OK', helpId='shortcutHelp')
+    
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
