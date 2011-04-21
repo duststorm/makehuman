@@ -1096,6 +1096,23 @@ def convexQuadrilateralArea(v1,v2,v3,v4):
     return 0.5*sqrt(p*p*q*q - pq*pq)
     #return sqrt(4*p*p*q*q - pow((b*b+d*d-a*a-c*c),2))/4
 
+        
+def calcBBox(verts):
+    bbox =  [verts[0].co[:],verts[0].co[:]]
+    for v in verts:
+        if v.co[0] < bbox[0][0]: #minX
+            bbox[0][0] = v.co[0]
+        if v.co[0] > bbox[1][0]: #maxX
+            bbox[1][0] = v.co[0]
+        if v.co[1] < bbox[0][1]: #minY
+            bbox[0][1] = v.co[1]
+        if v.co[1] > bbox[1][1]: #maxY
+            bbox[1][1] = v.co[1]
+        if v.co[2] < bbox[0][2]: #minZ
+            bbox[0][2] = v.co[2]
+        if v.co[2] > bbox[1][2]: #maxX
+            bbox[1][2] = v.co[2]
+    return bbox
 
 """
 Various Functions
@@ -1218,4 +1235,3 @@ def newton_raphson(f, f_diff, value, start, iterations=4, epsilon = 1e-4):
         x = x - (float(f(x)-value) / f_diff(x))
         counter += 1
         return x
-        

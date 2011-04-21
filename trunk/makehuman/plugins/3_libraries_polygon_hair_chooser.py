@@ -22,24 +22,7 @@ TO DO
 
 import gui3d, mh, os
 from os import path
-from aljabr import in2pts, vadd, vsub
-
-def calculateBBox(verts):
-    bbox =  [verts[0].co[:],verts[0].co[:]]
-    for v in verts:
-        if v.co[0] < bbox[0][0]: #minX
-            bbox[0][0] = v.co[0]
-        if v.co[0] > bbox[1][0]: #maxX
-            bbox[1][0] = v.co[0]
-        if v.co[1] < bbox[0][1]: #minY
-            bbox[0][1] = v.co[1]
-        if v.co[1] > bbox[1][1]: #maxY
-            bbox[1][1] = v.co[1]
-        if v.co[2] < bbox[0][2]: #minZ
-            bbox[0][2] = v.co[2]
-        if v.co[2] > bbox[1][2]: #maxX
-            bbox[1][2] = v.co[2]
-    return bbox
+from aljabr import in2pts, vadd, vsub, calcBBox
 
 class HairTaskView(gui3d.TaskView):
     
@@ -82,7 +65,7 @@ class HairTaskView(gui3d.TaskView):
             
             headNames = [group.name for group in human.meshData.facesGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
             headVertices = human.meshData.getVerticesAndFacesForGroups(headNames)[0]
-            headBBox = calculateBBox(headVertices)
+            headBBox = calcBBox(headVertices)
             
             headCentroid = in2pts(headBBox[0], headBBox[1], 0.5)
             delta = vsub(headCentroid, self.oHeadCentroid)

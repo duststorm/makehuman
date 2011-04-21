@@ -67,7 +67,7 @@ class PoseTaskView(gui3d.TaskView):
 
         @self.testButton.event
         def onClicked(event):
-            self.skinTest()
+            self.mvcTest()
         
         @self.savePoseButton.event
         def onClicked(event):
@@ -168,6 +168,13 @@ class PoseTaskView(gui3d.TaskView):
               return k
         return None
     
+    def mvcTest(self):
+        #get r-shoulder cage
+        
+        #compute mvc for each vertex in the bindings of r-shoulder
+        #use mvc algorithm to deform the vertices
+        pass
+    
     def rotateJoint(self, joint, center, rotation, transform=None):                
         #src = self.app.selectedHuman.meshStored
         dst = self.app.selectedHuman.meshData.verts
@@ -181,37 +188,7 @@ class PoseTaskView(gui3d.TaskView):
         for child in joint.children:
             self.rotateJoint(child, center, rotation, transform)
     
-    def skinTest(self):
-        #rotating the shoulders in z desu..
-        theta = -45
-        rotation = [0.0, 0.0, theta]
-        joint = self.skeleton.getJoint('joint-r-shoulder')
-        dst = self.app.selectedHuman.meshData.verts
-        center = joint.position
-        transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
-        joint.radius = 0.6
-        l = math.fabs(theta*degree2rad*joint.radius)
-        
-        for i in joint.bindedVects:
-            v= dst[i].co
-            d = math.fabs(v[0]-center[0])
-            #skinning upper part of shoulder, shape should be like a sphere 
-            if d < l and v[1] > center[1]:
-              #print "Geronimo"
-              #theta = math.fabs(v[0] - center[0])/joint.radius #in radians
-              theta2 = theta*(1-bump(d, l))
-              t = euler2matrix([0,0,theta2*degree2rad], "sxyz")
-              #x = center[0] + joint.radius * math.sin(theta)
-              #y = center[1] + joint.radius * math.cos(theta)
-              #z = v[2]
-              dst[i].co = vadd(mtransform(t, vsub(v, center)),center)
-            else:
-              dst[i].co = vadd(mtransform(transform, vsub(v, center)),center)
-        for child in joint.children:
-            self.rotateJoint(child, joint.position, rotation, transform)
-        
-        self.app.selectedHuman.meshData.calcNormals()
-        self.app.selectedHuman.meshData.update()
+
     
     def reset(self, limbToTest):
         self.Xslider.setValue(0.0)
@@ -253,3 +230,35 @@ len(widths) = len(joints)
 len(dist) = len(joints)
 len(dist[i]) = 2*len(joints)-1 for all i = 1,..., len(joints)
 """
+
+def skinTest(self):
+    #rotating the shoulders in z desu..
+    theta = -45
+    rotation = [0.0, 0.0, theta]
+    joint = self.skeleton.getJoint('joint-r-shoulder')
+    dst = self.app.selectedHuman.meshData.verts
+    center = joint.position
+    transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
+    joint.radius = 0.6
+    l = math.fabs(theta*degree2rad*joint.radius)
+    
+    for i in joint.bindedVects:
+        v= dst[i].co
+        d = math.fabs(v[0]-center[0])
+        #skinning upper part of shoulder, shape should be like a sphere 
+        if d < l and v[1] > center[1]:
+          #print "Geronimo"
+          #theta = math.fabs(v[0] - center[0])/joint.radius #in radians
+          theta2 = theta*(1-bump(d, l))
+          t = euler2matrix([0,0,theta2*degree2rad], "sxyz")
+          #x = center[0] + joint.radius * math.sin(theta)
+          #y = center[1] + joint.radius * math.cos(theta)
+          #z = v[2]
+          dst[i].co = vadd(mtransform(t, vsub(v, center)),center)
+        else:
+          dst[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+    for child in joint.children:
+        self.rotateJoint(child, joint.position, rotation, transform)
+    
+    self.app.selectedHuman.meshData.calcNormals()
+    self.app.selectedHuman.meshData.update()
