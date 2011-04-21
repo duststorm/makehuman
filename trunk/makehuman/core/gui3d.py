@@ -2109,20 +2109,12 @@ class MouseActionEdit(ShortcutEdit):
         
     def onMouseDragged(self, event):
         
-        modifiers = mh.getKeyModifiers()
+        modifiers = mh.getKeyModifiers() & (events3d.KMOD_CTRL | events3d.KMOD_ALT | events3d.KMOD_SHIFT)
             
         self.label.setText(self.shortcutToLabel(modifiers, event.button))
         self.app.redraw()
-        
-        m = 0
-    
-        if modifiers & events3d.KMOD_CTRL:
-            m |= events3d.KMOD_CTRL
             
-        if modifiers & events3d.KMOD_ALT:
-            m |= events3d.KMOD_ALT
-            
-        self.callEvent('onChanged', (m, event.button))
+        self.callEvent('onChanged', (modifiers, event.button))
             
     def onKeyDown(self, event):
         
@@ -2137,6 +2129,9 @@ class MouseActionEdit(ShortcutEdit):
             
         if modifiers & events3d.KMOD_ALT:
             label += 'Alt-'
+            
+        if modifiers & events3d.KMOD_SHIFT:
+            label += 'Shift-'
             
         buttons = []
         if button & events3d.SDL_BUTTON_LEFT_MASK:

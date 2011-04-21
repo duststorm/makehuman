@@ -385,14 +385,7 @@ class MHApplication(gui3d.Application):
         if self.selectedHuman.isVisible():
             
             # Normalize modifiers
-            event_modifiers = mh.getKeyModifiers()
-            modifiers = 0
-            if (event_modifiers & events3d.KMOD_CTRL) and (event_modifiers & events3d.KMOD_ALT):
-                modifiers = events3d.KMOD_CTRL | events3d.KMOD_ALT
-            elif event_modifiers & events3d.KMOD_CTRL:
-                modifiers = events3d.KMOD_CTRL
-            elif event_modifiers & events3d.KMOD_ALT:
-                modifiers = events3d.KMOD_ALT
+            modifiers = mh.getKeyModifiers() & (events3d.KMOD_CTRL | events3d.KMOD_ALT | events3d.KMOD_SHIFT)
             
             if (modifiers, event.button) in self.mouseActions:
                 self.mouseActions[(modifiers, event.button)](event)
@@ -413,13 +406,7 @@ class MHApplication(gui3d.Application):
     def onKeyDown(self, event):
         
         # Normalize modifiers
-        modifiers = 0
-        if (event.modifiers & events3d.KMOD_CTRL) and (event.modifiers & events3d.KMOD_ALT):
-            modifiers = events3d.KMOD_CTRL | events3d.KMOD_ALT
-        elif event.modifiers & events3d.KMOD_CTRL:
-            modifiers = events3d.KMOD_CTRL
-        elif event.modifiers & events3d.KMOD_ALT:
-            modifiers = events3d.KMOD_ALT
+        modifiers = event.modifiers & (events3d.KMOD_CTRL | events3d.KMOD_ALT)
             
         # Normalize key
         key = event.key
