@@ -78,10 +78,11 @@ class BackgroundTaskView(gui3d.TaskView):
             self.app.redraw()
 
     def onShow(self, event):
-
-        # When the task gets shown, set the focus to the file chooser
+        
         gui3d.TaskView.onShow(self, event)
         self.app.selectedHuman.hide()
+        self.app.prompt('Info', 'Images which are placed in your personal makehuman backgrounds folder will show up here. Usually your personal makehuman folder is in My Documents on windows and in your home folder on linux.',
+            'OK', helpId='backgroundHelp')
         self.filechooser.setFocus()
 
     def onHide(self, event):

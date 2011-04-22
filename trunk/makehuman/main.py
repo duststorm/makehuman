@@ -623,7 +623,7 @@ class MHApplication(gui3d.Application):
         shortcut = (modifier, key)
         
         if shortcut in self.shortcuts:
-            print 'Shortcut is in use'
+            self.prompt('Warning', 'This combination is already in use. Change the combination for the action which has reserved this shortcut', 'OK', helpId='shortcutWarning')
             return False
             
         # Remove old entry
@@ -651,7 +651,7 @@ class MHApplication(gui3d.Application):
         mouseAction = (modifier, key)
         
         if mouseAction in self.mouseActions:
-            print 'Shortcut is in use'
+            self.prompt('Warning', 'This combination is already in use. Change the combination for the action which has reserved this mouse action', 'OK', helpId='mouseActionWarning')
             return False
             
         # Remove old entry
