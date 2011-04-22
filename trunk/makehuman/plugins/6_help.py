@@ -12,10 +12,11 @@ class HelpTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Help')
 
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Support options', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Support options', gui3d.GroupBoxStyle._replace(height=25+24*4+6));y+=25
         self.manualButton = gui3d.Button(self, [18, y, 9.5], "Manual");y+=24
         self.reportBugButton = gui3d.Button(self, [18, y, 9.5], "Report bug");y+=24
         self.requestFeatureButton = gui3d.Button(self, [18, y, 9.5], "Request feature");y+=24
+        self.donateButton = gui3d.Button(self, [18, y, 9.5], "Donate");y+=24
         
         @self.manualButton.event
         def onClicked(event):
@@ -28,6 +29,10 @@ class HelpTaskView(gui3d.TaskView):
         @self.requestFeatureButton.event
         def onClicked(event):
             webbrowser.open('http://code.google.com/p/makehuman/issues/entry?template=Request%20feature');
+            
+        @self.donateButton.event
+        def onClicked(event):
+            webbrowser.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=34KYQRLBE2K3N');
 
 def load(app):
     category = app.getCategory('Help')
