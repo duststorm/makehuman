@@ -9,12 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="423.79297"
-   height="398.34344"
+   width="426.79001"
+   height="403.34"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="cube2tet.svg">
+   sodipodi:docname="cube2tetrahedrons.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -62,7 +62,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="cube"
-     transform="translate(-199.87951,-117.90607)">
+     transform="translate(-199.87951,-112.90949)">
     <g
        id="g2996"
        style="stroke:#000000">
