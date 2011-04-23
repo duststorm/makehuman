@@ -58,6 +58,14 @@ class Joint:
         for child in children:
             child.parent = self
     
+    @property
+    def direction(self):
+        
+        direction = vnorm(self.offset)
+        axis = vnorm(vcross([0.0, 0.0, 1.0], direction))
+        angle = acos(vdot([0.0, 0.0, 1.0], direction))
+        return axisAngleToQuaternion(axis, angle)
+    
     """
     def calcInverseTransform(self):
       
