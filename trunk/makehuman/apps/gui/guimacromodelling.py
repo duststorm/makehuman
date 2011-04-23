@@ -48,8 +48,9 @@ class MacroModelingTaskView(gui3d.TaskView):
         
         # Macro Radial Widget
         y = 80
-        self.radialBox = gui3d.GroupBox(self, [600, y, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(height=25+160+6, width=185+10));y+=25
-        self.radialWidget = gui3d.Radial(self.radialBox, position=[605, y, 9.2])
+        #todo commented radial out until the radial_png is commited
+        #self.radialBox = gui3d.GroupBox(self, [600, y, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(height=25+160+6, width=185+10));y+=25
+        #self.radialWidget = gui3d.Radial(self.radialBox, position=[605, y, 9.2])
 
         #hair update only necessary for : gender, age , height
         
@@ -138,4 +139,5 @@ class MacroModelingTaskView(gui3d.TaskView):
 
     def onResized(self, event):
         self.status.setPosition([10, event.height-15, 9.1])
-        self.radialBox.setPosition([event.width - 200, self.radialBox.getPosition()[1], 9.0])
+        #todo commented radial out until radial_graph.png is commited
+        #self.radialBox.setPosition([event.width - 200, self.radialBox.getPosition()[1], 9.0])
