@@ -170,10 +170,14 @@ class PoseTaskView(gui3d.TaskView):
     
     def mvcTest(self):
         #get r-shoulder cage
-        
-        #compute mvc for each vertex in the bindings of r-shoulder
+        testJoint = self.skeleton.getJoint('joint-r-shoulder')
+        bbox = calcBBox(self.app.selectedHuman.meshData.verts,  testJoint.bindedVects)
+        #compute mvc weights for each vertex in the bindings of r-shoulder
+        #1. extract the triangular face from bbox for each vertex
+        #2. compute mvc weights using the triangle formula
+ 
+        #rotate bbox
         #use mvc algorithm to deform the vertices
-        pass
     
     def rotateJoint(self, joint, center, rotation, transform=None):                
         #src = self.app.selectedHuman.meshStored
@@ -219,6 +223,103 @@ def load(app):
 
 def unload(app):
     print 'pose unloaded'
+
+#needed for making mvc or harmonic coord. cage
+def box2Tetrahedrons(box):
+    """
+    Subdivides a cuboid into 4 tetrahedrons as shown here:
+    U{http://download.tuxfamily.org/makehuman/tutorials/tetrahedron-cube.png}
+    subdivision is done with front view of cube having a slice from upper left to lower right corner. Views are with respect to right-hand
+    coordinate system
+    
+    @rtype: list of list of 4 vertices
+    @return: a list containing four tetrahedrons whose union is the cuboid. The order of this list is as follows: front left, front right, back 
+    right, back left.
+    @type  box: list of two vertices
+    @param box: two vertices representing minimum and maximum corners of the cuboid
+    """
+    tetrahedrons = [[],[],[],[]]
+    #we traverse 2 diagonals and then the last corner of the tetrahedron whose all angles are 90 degrees
+    #traversal is counterclockwise and always starts from the upper corners of the box
+    
+    #front left
+    tet = tetrahedrons[0]
+    for i in xrange(0,4):
+      tet.append(box[0][:])
+    #front upper left corner
+    tet[0][2] = box[1][2]
+    #back lower left corner
+    tet[1][1] = box[1][1]
+    #front lower right corner
+    tet[2][0] = box[1][0]
+    #front lower left corner is ok
+    
+    #front right
+    tet = tetrahedrons[1]
+    #front upper left corner
+    tet[0] = terahedrons[0][0][:]
+    #front lower right corner    
+    tet[1] = terahedrons[0][2][:]
+    #back upper right corner
+    tet[2] = box[1][:]
+    #front upper right corner    
+    tet[3] = box[1][:]
+    tet[3][1] = box[0][1]
+    
+    #back right
+    tet = tetrahedrons[2]
+    tet[0] = box[1][:]
+    tet[1] = terahedrons[0][1][:]
+    tet[2] = terahedrons[0][2][:]
+    tet[3] = box[1][:]
+    tet[3][2] = box[0][2]
+    
+    #back left
+    tet = tetrahedrons[3]
+    tet[0] = tetrahedrons[2][0][:]
+    tet[1] = tetrahedrons[0][0][:]
+    tet[2] = tetrahedrons[0][1][:]
+    tet[2] = box[1][:]
+    tet[2][0] = box[0][0]
+    
+    return tetrahedrons
+
+"""
+def getTetrahedron(box, v):
+    #x-z plane front view:
+    corner = [0.0, 0.0, 0.0]
+    point1 = box[0][:]
+    point2 = box[1][:]
+    point2[2] = point1[2]
+    #left or right?
+    v2 = vsub(v,point1)
+    v3 = vsub(point2, point)
+    
+    #y-z plane determines the tetrahedron
+    if v2[1]*v3[0] > v3[1]*v2[0] #its left
+    
+    else # its right
+    
+    corner = [0.0, 0.0, 0.0]
+    xyz = [0.0,0.0,0.0]
+    
+    for i in xrange(0,3):
+      if v[i] < box[0][i] + (box[0][i] + box[1][i])/2: 
+        corner[i] =  box[0][i]
+        xyz[i] = box[0][i]
+      else: 
+        corner[i] = box[1][i]
+        xyz[i] = box[1][i]
+    
+    xyz[2] = corner[2]
+    triangle = [None, None, corner]
+    triangle[0] = xyz[:]
+    triangle[0][0] = corner[0]
+    triangle[0] = xyz[:]
+    triangle[1][1] = corner[1]
+    
+    return triangle
+"""
 
     
 """
