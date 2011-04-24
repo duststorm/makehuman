@@ -172,6 +172,7 @@ class PoseTaskView(gui3d.TaskView):
         #get r-shoulder cage
         testJoint = self.skeleton.getJoint('joint-r-shoulder')
         bbox = calcBBox(self.app.selectedHuman.meshData.verts,  testJoint.bindedVects)
+        print box2Tetrahedrons(bbox)
         #compute mvc weights for each vertex in the bindings of r-shoulder
         #1. extract the triangular face from bbox for each vertex
         #2. compute mvc weights using the triangle formula
@@ -255,32 +256,32 @@ def box2Tetrahedrons(box):
     #front lower left corner is ok
     
     #front right
-    tet = tetrahedrons[1]
+    tet1 = tetrahedrons[1]
     #front upper left corner
-    tet[0] = terahedrons[0][0][:]
+    tet1.append(tetrahedrons[0][0][:])
     #front lower right corner    
-    tet[1] = terahedrons[0][2][:]
+    tet1.append(tetrahedrons[0][2][:])
     #back upper right corner
-    tet[2] = box[1][:]
+    tet1.append(box[1][:])
     #front upper right corner    
-    tet[3] = box[1][:]
-    tet[3][1] = box[0][1]
+    tet1.append(box[1][:])
+    tet1[3][1] = box[0][1]
     
     #back right
-    tet = tetrahedrons[2]
-    tet[0] = box[1][:]
-    tet[1] = terahedrons[0][1][:]
-    tet[2] = terahedrons[0][2][:]
-    tet[3] = box[1][:]
-    tet[3][2] = box[0][2]
+    tet2 = tetrahedrons[2]
+    tet2.append(box[1][:])
+    tet2.append(tetrahedrons[0][1][:])
+    tet2.append(tetrahedrons[0][2][:])
+    tet2.append(box[1][:])
+    tet2[3][2] = box[0][2]
     
     #back left
-    tet = tetrahedrons[3]
-    tet[0] = tetrahedrons[2][0][:]
-    tet[1] = tetrahedrons[0][0][:]
-    tet[2] = tetrahedrons[0][1][:]
-    tet[2] = box[1][:]
-    tet[2][0] = box[0][0]
+    tet3 = tetrahedrons[3]
+    tet3.append(tetrahedrons[2][0][:])
+    tet3.append(tetrahedrons[0][0][:])
+    tet3.append(tetrahedrons[0][1][:])
+    tet3.append(box[1][:])
+    tet3[2][0] = box[0][0]
     
     return tetrahedrons
 
