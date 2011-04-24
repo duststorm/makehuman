@@ -14876,7 +14876,7 @@ end Mesh
 end Object
 
 #if toggle&T_Armature
-*** rig-process
+# *** rig-process
 #endif
 
 
