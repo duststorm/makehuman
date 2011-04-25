@@ -44,7 +44,6 @@ import mh2proxy
 import mh2collada
 import mh2md5
 import mh2stl
-import hair
 from shutil import copyfile
 from os.path import basename
 
@@ -181,8 +180,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=24
         self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=24
         self.exportSmooth = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Subdivide", False);y+=24
-        self.hairMesh = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as mesh", selected=True);y+=24
-        self.hairCurves = gui3d.RadioButton(self.objOptions, self.exportHairGroup, [18, y, 9.2], "Hair as curves");y+=24
+        self.exportHair = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Hair as mesh", selected=True);y+=24
         
         # MHX options
         y = yy
@@ -297,16 +295,11 @@ class ExportTaskView(gui3d.TaskView):
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".bvh"))
                     
-                if len(filename)> 0 and self.app.selectedHuman.hairObj and len(self.app.selectedHuman.hairObj.verts) > 0:
-                    if self.hairMesh.selected:
-                        mh2obj.exportObj(self.app.selectedHuman.hairObj, os.path.join(exportPath, "hair_" + filename+".obj"))
-                    else:
-                        hairsClass = self.app.selectedHuman.hairs
-                        #hairsClass = self.app.categories["Library"].tasksByName["Hair"]
-                        #hair.adjustHair(self.app.selectedHuman, hairsClass)
-                        file = open(os.path.join(exportPath, "hair_" + filename + ".obj"), 'w')
-                        mh2obj.exportAsCurves(file, hairsClass.guides)
-                        file.close()
+                if len(filename)> 0 and self.app.selectedHuman.hairObj and self.app.selectedHuman.hairObj.mesh and self.app.selectedHuman.hairObj.mesh.verts and self.exportHair.selected:
+                    mh2obj.exportObj(self.app.selectedHuman.hairObj.mesh, os.path.join(exportPath, "hair_" + filename+".obj"))
+                    texturePath = os.path.join(exportPath, basename(self.app.selectedHuman.hairObj.mesh.texture))
+                    if not os.path.isfile(texturePath):
+                        copyfile(self.app.selectedHuman.hairObj.mesh.texture, texturePath)
                         
                 texturePath = os.path.join(exportPath, basename(mesh.texture))
                 if not os.path.isfile(texturePath):
