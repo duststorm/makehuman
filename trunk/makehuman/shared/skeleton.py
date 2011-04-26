@@ -128,17 +128,18 @@ class Skeleton:
             [Joint('joint-l-toe-3-3', [])])]), Joint('joint-l-toe-4-1', [Joint('joint-l-toe-4-2', [Joint('joint-l-toe-4-3', [])])]), Joint('joint-l-toe-5-1',
             [Joint('joint-l-toe-5-2', [Joint('joint-l-toe-5-3', [])])])])])])])])
       
-        file = open("data/joint-bindings.txt")
+        f = open("data/joint-bindings.txt")
         while (1): 
-            line = file.readline()
+            line = f.readline()
             line = line.rstrip()
             if not line: break 
             j = self.getJoint("joint-"+line)
-            line = file.readline()
+            line = f.readline()
             line = line.split()
             for vert in line:
                 j.bindedVects.append(int(vert))
-      
+        f.close()
+        
         self.joints = 0
         self.endEffectors = 0
         
