@@ -170,9 +170,35 @@ class PoseTaskView(gui3d.TaskView):
     
     def mvcTest(self):
         #get r-shoulder cage
-        testJoint = self.skeleton.getJoint('joint-r-shoulder')
-        bbox = calcBBox(self.app.selectedHuman.meshData.verts,  testJoint.bindedVects)
-        print box2Tetrahedrons(bbox)
+        #testJoint = self.skeleton.getJoint('joint-r-shoulder')
+        
+        #get bindings for r-shoulder-joint
+        f = open("utils/makepose/r-shoulder-joint.txt")
+        jointVerts = [];
+        while (1): 
+            line = f.readline()
+            if not line: break 
+            jointVerts.append(int(line));
+        f.close()      
+        
+        #get bindings for r-shoulder-link
+        f = open("utils/makepose/r-shoulder-link.txt")
+        linkVerts = [];
+        while (1): 
+            line = f.readline()
+            if not line: break 
+            linkVerts.append(int(line));
+        f.close()
+
+        #compute bounding box
+        #get bindings for r-shoulder-link
+        #compute bounding box
+        
+        #recompute bounding box z and y values so they will be connected by 4 vertices in between them
+        #convert to tetrahedrons
+        
+        #bbox = calcBBox(self.app.selectedHuman.meshData.verts,  testJoint.bindedVects)
+        #print box2Tetrahedrons(bbox)
         #compute mvc weights for each vertex in the bindings of r-shoulder
         #1. extract the triangular face from bbox for each vertex
         #2. compute mvc weights using the triangle formula
