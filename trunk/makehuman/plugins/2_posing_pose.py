@@ -330,56 +330,46 @@ def box2Tetrahedrons(box):
     tet3.append(tetrahedrons[0][0][:])
     tet3.append(tetrahedrons[0][1][:])
     tet3.append(box[1][:])
-    tet3[2][0] = box[0][0]
+    tet3[3][0] = box[0][0]
     
     return tetrahedrons
 
-"""
-def getTetrahedron(box, v):
-    #x-z plane front view:
-    corner = [0.0, 0.0, 0.0]
-    point1 = box[0][:]
-    point2 = box[1][:]
-    point2[2] = point1[2]
-    #left or right?
-    v2 = vsub(v,point1)
-    v3 = vsub(point2, point)
+def findTetrahedron(tets, v):
+    """
+    Given 4 tetrahedrons generated from a box (see box2Tetrahedrons) and given a point v that resides in the box. Find
+    the (unique) tetrahedron in which v resides.
     
-    #y-z plane determines the tetrahedron
-    if v2[1]*v3[0] > v3[1]*v2[0] #its left
+    @rtype: list of 4 vertices
+    @return: a list of 4 vertices making up a tetrahedron in which v is inside of.
+    @type  tets: list of list of 4 vertices
+    @param tets:  a list containing four tetrahedrons whose union is a cuboid. The order of this list is as follows: front left, front right, 
+    back right, back left.
+    @type  v: list of floats
+    @param v: a vertex inside a one of the tetrahedrons in tets
+    """
+    indices = [0,1,2,3]
+    #front pass (x-z plane)
+    #subtract with min vertex of box
+    diffv = vsub(v, tets[1][1])
+    diffBox = vsub(tets[1][0],test[1][1])
+    #check tangents
+    if fabs(diffv[1]*diffBox[0]) > fabs(diffv[1]*diffBox[0]):
+      #point lies about the front face diagonal (see tetrahedron image in box2Tetrahedrons link)
+      indices.remove(0) #remove the below tetrahedron
+    else: indices.remove(1)
     
-    else # its right
-    
-    corner = [0.0, 0.0, 0.0]
-    xyz = [0.0,0.0,0.0]
-    
-    for i in xrange(0,3):
-      if v[i] < box[0][i] + (box[0][i] + box[1][i])/2: 
-        corner[i] =  box[0][i]
-        xyz[i] = box[0][i]
-      else: 
-        corner[i] = box[1][i]
-        xyz[i] = box[1][i]
-    
-    xyz[2] = corner[2]
-    triangle = [None, None, corner]
-    triangle[0] = xyz[:]
-    triangle[0][0] = corner[0]
-    triangle[0] = xyz[:]
-    triangle[1][1] = corner[1]
-    
-    return triangle
-"""
+    #left side pass (y-z plane)
+    diffv = vsub(v, tets[0][1])
+    diffBox = vsub(tets[1][0],test[1][1])
+    #check tangents
+    if fabs(diffv[1]*diffBox[0]) > fabs(diffv[1]*diffBox[0]): indices.remove(0)
+    else: indices.remove(1)
 
     
+    pass
+    
 """
-TEST STUFFS
-
-joints[0] is the root of the joint linkage
-given a positon v in the mesh, compute the weight of the vertex with respect to the joint
-len(widths) = len(joints)
-len(dist) = len(joints)
-len(dist[i]) = 2*len(joints)-1 for all i = 1,..., len(joints)
+EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
 
 def skinTest(self):
