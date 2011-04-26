@@ -348,26 +348,24 @@ def findTetrahedron(tets, v):
     @param v: a vertex inside a one of the tetrahedrons in tets
     """
     indices = [0,1,2,3]
+    
     #front pass (x-z plane)
-    #subtract with min vertex of box
     diffv = vsub(v, tets[1][1])
     diffBox = vsub(tets[1][0],test[1][1])
     #check tangents
-    if fabs(diffv[1]*diffBox[0]) > fabs(diffv[1]*diffBox[0]):
+    if fabs(diffv[1]*diffBox[0]) > fabs(diffv[0]*diffBox[1]):
       #point lies about the front face diagonal (see tetrahedron image in box2Tetrahedrons link)
       indices.remove(0) #remove the below tetrahedron
     else: indices.remove(1)
     
-    #left side pass (y-z plane)
-    diffv = vsub(v, tets[0][1])
-    diffBox = vsub(tets[1][0],test[1][1])
-    #check tangents
-    if fabs(diffv[1]*diffBox[0]) > fabs(diffv[1]*diffBox[0]): indices.remove(0)
-    else: indices.remove(1)
-
+    #back pass
+    diffv = vsub(v, tets[2][1])
+    diffBox = vsub(tets[2][0],test[2][1])
+    if fabs(diffv[1]*diffBox[0]) > fabs(diffv[0]*diffBox[1]):
+      indices.remove(2)
+    else: indices.remove(3)
     
-    pass
-    
+    #unfinished
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
