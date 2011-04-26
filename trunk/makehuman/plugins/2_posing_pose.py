@@ -339,8 +339,8 @@ def findTetrahedron(tets, v):
     Given 4 tetrahedrons generated from a box (see box2Tetrahedrons) and given a point v that resides in the box. Find
     the (unique) tetrahedron in which v resides.
     
-    @rtype: list of 4 vertices
-    @return: a list of 4 vertices making up a tetrahedron in which v is inside of.
+    @rtype: integer
+    @return: the index of tets representing the tetrahedron that contains v
     @type  tets: list of list of 4 vertices
     @param tets:  a list containing four tetrahedrons whose union is a cuboid. The order of this list is as follows: front left, front right, 
     back right, back left.
@@ -354,18 +354,35 @@ def findTetrahedron(tets, v):
     diffBox = vsub(tets[1][0],test[1][1])
     #check tangents
     if fabs(diffv[1]*diffBox[0]) > fabs(diffv[0]*diffBox[1]):
-      #point lies about the front face diagonal (see tetrahedron image in box2Tetrahedrons link)
-      indices.remove(0) #remove the below tetrahedron
+        #point lies about the front face diagonal (see tetrahedron image in box2Tetrahedrons link)
+        indices.remove(0) #remove the below tetrahedron
     else: indices.remove(1)
     
     #back pass
     diffv = vsub(v, tets[2][1])
     diffBox = vsub(tets[2][0],test[2][1])
-    if fabs(diffv[1]*diffBox[0]) > fabs(diffv[0]*diffBox[1]):
-      indices.remove(2)
+    if fabs(diffv[2]*diffBox[0]) > fabs(diffv[0]*diffBox[2]): #x,z tangent
+        indices.remove(2)
     else: indices.remove(3)
     
-    #unfinished
+    #check if we need a top/below pass or a side pass
+    if (indices[1] - indices[0])== 2:
+        #we need top/below pass, x-y plane
+        i,j,k = 1-indices[0],2,indices[0]
+        diffv = vsub(v,tets[k][i])
+        diffBox = vsub(test[k][j],tets[k][i])
+        if fabs(diffv[1]*diffBox[0]) > fabs(diffv[0]*diffBox[1]): #x,y tangent
+          indices.remove(indices[0])
+        else: indices.remove(indices[1])
+    else:
+        #we need a side pass, y-z plane
+        i,j,k = indices[0],1+indices[0],indices[0]
+        diffv = vsub(v,tets[k][i])
+        diffBox = vsub(test[k][j],tets[k][i])
+        if fabs(diffv[2]*diffBox[1]) > fabs(diffv[1]*diffBox[2]): #y,z tangent
+          indices.remove(2*indices[0])
+        else: indices.remove(indices[1]-indices[0])
+    return indices[0]
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
