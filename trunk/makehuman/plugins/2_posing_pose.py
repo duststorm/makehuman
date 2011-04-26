@@ -189,12 +189,35 @@ class PoseTaskView(gui3d.TaskView):
             if not line: break 
             linkVerts.append(int(line));
         f.close()
-
+        
         #compute bounding box
-        #get bindings for r-shoulder-link
-        #compute bounding box
+        bboxj = calcBBox(self.app.selectedHuman.meshData.verts,  jointVerts)
+        bboxl = calcBBox(self.app.selectedHuman.meshData.verts,  linkVerts)   
         
         #recompute bounding box z and y values so they will be connected by 4 vertices in between them
+        minY = min(bboxj[0][1], bboxl[0][1])
+        maxY = max(bboxj[1][1], bboxl[1][1])
+        minZ = min(bboxj[0][2], bboxl[0][2])
+        maxZ = max(bboxj[1][2], bboxl[1][2])
+        x = (bboxj[1][0] + bboxl[0][0]) /2
+        
+        #z-y plane
+        #y
+        bboxj[0][1] = minY - 0.01 # 1cm offset
+        bboxl[0][1] = minY - 0.01 # 1cm offset
+        bboxj[1][1] = maxY + 0.01 # 1cm offset
+        bboxl[1][1] = maxY + 0.01 # 1cm offset
+        
+        #z
+        bboxj[0][2] = minZ - 0.01 # 1cm offset
+        bboxl[0][2] = minZ - 0.01 # 1cm offset
+        bboxj[1][2] = maxZ + 0.01 # 1cm offset
+        bboxl[1][2] = maxZ + 0.01 # 1cm offset
+        
+        #x that connects
+        bboxj[1][0] = x
+        bboxl[0][0] = x
+        
         #convert to tetrahedrons
         
         #bbox = calcBBox(self.app.selectedHuman.meshData.verts,  testJoint.bindedVects)
