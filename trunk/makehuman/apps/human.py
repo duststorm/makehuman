@@ -163,7 +163,7 @@ class Human(gui3d.Object):
         
         if not self.__subdivisionMesh:
             print 'creating subdiv'
-            self.__subdivisionMesh = createSubdivisionObject(self.scene, self.meshData, progressCallback)
+            self.__subdivisionMesh = createSubdivisionObject(self.app.scene3d, self.meshData, progressCallback)
         elif update:
             updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
             
