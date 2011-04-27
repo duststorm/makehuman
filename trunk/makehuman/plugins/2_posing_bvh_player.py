@@ -321,14 +321,14 @@ class BvhView(gui3d.TaskView):
                                             #               5
         
         # The 8 faces
-        fg.createFace(v[0], v[1], v[4], v[0])
-        fg.createFace(v[0], v[4], v[3], v[0])
-        fg.createFace(v[0], v[3], v[2], v[0])
-        fg.createFace(v[0], v[2], v[1], v[0])
-        fg.createFace(v[5], v[4], v[1], v[5])
-        fg.createFace(v[5], v[1], v[2], v[5])
-        fg.createFace(v[5], v[2], v[3], v[5])
-        fg.createFace(v[5], v[3], v[4], v[5])
+        fg.createFace((v[0], v[1], v[4], v[0]))
+        fg.createFace((v[0], v[4], v[3], v[0]))
+        fg.createFace((v[0], v[3], v[2], v[0]))
+        fg.createFace((v[0], v[2], v[1], v[0]))
+        fg.createFace((v[5], v[4], v[1], v[5]))
+        fg.createFace((v[5], v[1], v[2], v[5]))
+        fg.createFace((v[5], v[2], v[3], v[5]))
+        fg.createFace((v[5], v[3], v[4], v[5]))
         
         return p
             
@@ -348,12 +348,12 @@ class BvhView(gui3d.TaskView):
         v.append(mesh.createVertex(aljabr.vadd(position, [-scale, scale, scale])))   # 7       |7---------6|
         
         # The 6 faces
-        fg.createFace(v[4], v[5], v[6], v[7]) # front
-        fg.createFace(v[1], v[0], v[3], v[2]) # back
-        fg.createFace(v[0], v[4], v[7], v[3]) # left
-        fg.createFace(v[5], v[1], v[2], v[6]) # right
-        fg.createFace(v[0], v[1], v[5], v[4]) # top
-        fg.createFace(v[7], v[6], v[2], v[3]) # bottom
+        fg.createFace((v[4], v[5], v[6], v[7])) # front
+        fg.createFace((v[1], v[0], v[3], v[2])) # back
+        fg.createFace((v[0], v[4], v[7], v[3])) # left
+        fg.createFace((v[5], v[1], v[2], v[6])) # right
+        fg.createFace((v[0], v[1], v[5], v[4])) # top
+        fg.createFace((v[7], v[6], v[2], v[3])) # bottom
         
     def __updatePrism(self, mesh, o, e, index, p):
             

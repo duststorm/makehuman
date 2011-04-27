@@ -81,7 +81,7 @@ def isFile(path):
         return None
 
 
-def dataTo3Dobject(obj, data, addSharedFaces=1):
+def dataTo3Dobject(obj, data):
     """
     This function creates a 3D object based upon a standardised input data stream.
     The object created is held in memory in the standard internal MakeHuman data format.
@@ -127,15 +127,14 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
         group = faceGroups[groupName]
         groupVerts = {}
 
-        fg = module3d.FaceGroup(groupName)  # create group with name groupName
-        obj.addFaceGroup(fg)  # add group to object
+        fg = obj.createFaceGroup(groupName)  # create group with name groupName
         for face in group:  # for each face in the group [co_index1, co_index2, co_index3, co_index4]
             v0 = obj.verts[face[0]]  # look up vertices, these are in the same order as in the file
             v1 = obj.verts[face[1]]
             v2 = obj.verts[face[2]]
             v3 = obj.verts[face[3]]
             
-            f = fg.createFace(v0, v1, v2, v3)
+            f = fg.createFace((v0, v1, v2, v3))
 
             if len(uvFaceData) > 0:  # look up uv, if existing, these are in the same order as in the file
                 uvIndices = uvFaceData[fIndex]
@@ -143,14 +142,6 @@ def dataTo3Dobject(obj, data, addSharedFaces=1):
 
             f.idx = fIndex
             fIndex += 1
-
-    if addSharedFaces:
-        for v in obj.verts:
-            for i in vertsSharedFaces[v.idx]:
-
-                # print i, len(obj.faces), obj.name, vertsSharedFaces[v.idx]
-
-                v.sharedFaces.append(obj.faces[i])
 
     #print 'time to build mesh: ', time.time() - time1
 
@@ -302,7 +293,7 @@ def saveWavefrontObj(ob, path):
     for v in ob.verts:
         fileDescriptor.write('vt %f %f\n' % (v.uv[0], v.uv[1]))
 
-    for g in ob.facesGroups:
+    for g in ob.faceGroups:
         fileDescriptor.write('g %s\n' % g.name)
         for f in g.faces:
             fileDescriptor.write('f ')

@@ -112,7 +112,7 @@ class Hairs:
         obj.indexBuffer = []
         fg = obj.createFaceGroup("ribbons")
 
-        headNames = [group.name for group in self.human.meshData.facesGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
+        headNames = [group.name for group in self.human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
         headVertices = self.human.meshData.getVerticesAndFacesForGroups(headNames)[0]
 
         headBB=calculateBoundingBox(headVertices)
@@ -276,7 +276,7 @@ class Hairs:
 def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
     headNormal = [0.0,1.0,0.0]
     headCentroid = [0.0,7.8,0.4]
-    fg = obj.facesGroups[0]
+    fg = obj.faceGroups[0]
     cPs = [curve[0]]
     for i in xrange(2,len(curve)): #piecewise continuous polynomial
         d=vdist(curve[i],curve[i-1])+vdist(curve[i-1],curve[i-2])
@@ -333,7 +333,7 @@ def loadStrands(obj,curve,widthFactor=1.0,res=0.04):
         #end of please...
 
         #shallow copies used
-        fg.createFace(w1, w4, w3, w2)
+        fg.createFace((w1, w4, w3, w2))
         fg.faces[len(fg.faces) -1].uv= [w1.idx,w4.idx,w3.idx,w2.idx]
         vtemp1=w4
         vtemp2=w3

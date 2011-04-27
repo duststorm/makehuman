@@ -201,7 +201,7 @@ def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft):
             uv4 = [uv[0], uv[3]]
 
             # create faces
-            fg.createFace(v1, v4, v3, v2, uv=(uv1, uv4, uv3, uv2))
+            fg.createFace((v1, v4, v3, v2), (uv1, uv4, uv3, uv2))
             
         yoffset += font.lineHeight
 

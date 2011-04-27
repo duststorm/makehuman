@@ -67,7 +67,7 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
     f.write('usemtl basic\n')
     f.write('s off\n')
       
-    for fg in obj.facesGroups:
+    for fg in obj.faceGroups:
         if not groupFilter or groupFilter(fg):
             if exportGroups:
                 f.write('g %s\n' % fg.name)

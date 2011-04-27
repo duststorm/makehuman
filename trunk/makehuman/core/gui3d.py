@@ -2213,7 +2213,7 @@ class NineSliceMesh(module3d.Object3D):
         for y in xrange(3):
             for x in xrange(3):
                 o = x + y * 4
-                fg.createFace(v[o+4], v[o+5], v[o+1], v[o], uv=(uv[o+4], uv[o+5], uv[o+1], uv[o]))
+                fg.createFace((v[o+4], v[o+5], v[o+1], v[o]), (uv[o+4], uv[o+5], uv[o+1], uv[o]))
                 
         self.texture = texture
         self.setCameraProjection(1)
@@ -2271,7 +2271,7 @@ class RectangleMesh(module3d.Object3D):
         uv = ([0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0])
         
         # The face
-        fg.createFace(v[3], v[2], v[1], v[0], uv=uv)
+        fg.createFace((v[3], v[2], v[1], v[0]), uv)
                 
         self.texture = texture
         self.setCameraProjection(1)

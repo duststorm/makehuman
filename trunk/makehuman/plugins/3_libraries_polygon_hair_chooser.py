@@ -63,7 +63,7 @@ class HairTaskView(gui3d.TaskView):
 
         if human.hairObj:
             
-            headNames = [group.name for group in human.meshData.facesGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
+            headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
             headVertices = human.meshData.getVerticesAndFacesForGroups(headNames)[0]
             headBBox = calcBBox(headVertices)
             

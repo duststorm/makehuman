@@ -228,7 +228,7 @@ class Vert:
         self.update(True, False, False)
     
     def setColor(self, color):
-        self.color = self.color[i]
+        self.color = color
         self.update(False, False, True)
 
     def update(self, updateNor=True, updateCoo=True, updateCol=False):
@@ -379,7 +379,7 @@ class Vert:
 class Face:
 
     """
-    A face object. In MakeHuman, all face objects are quads.
+    A face object.
 
     Basic usage
     ------------
@@ -410,7 +410,7 @@ class Face:
       holding the index to the UV coordinates in the objects' uvValues list for the uv-mapping of textures to this face.
     """
 
-    def __init__(self, v0, v1, v2, v3):
+    def __init__(self, *verts):
         """
         This is the constructor method for the Face class.
         It initializes all face attributes.
@@ -433,7 +433,7 @@ class Face:
         """
 
         self.no = [0.0, 0.0, 0.0]
-        self.verts = [v0, v1, v2, v3]
+        self.verts = verts[:]
         self.uv = None
         self.color = None
         self.colorID = [0, 0, 0]
@@ -441,7 +441,7 @@ class Face:
         self.group = None
 
     def setColor(self, color):
-        self.color = [color, color, color, color]
+        self.color = [color for v in self.verts]
         self.updateColors()
 
     def calcNormal(self):
@@ -454,10 +454,13 @@ class Face:
 
         """
 
-        vt1 = self.verts[0].co
-        vt2 = self.verts[1].co
-        vt3 = self.verts[2].co
-        self.no = aljabr.planeNorm(vt1, vt2, vt3)
+        if len(self.verts) > 2:
+            vt1 = self.verts[0].co
+            vt2 = self.verts[1].co
+            vt3 = self.verts[2].co
+            self.no = aljabr.planeNorm(vt1, vt2, vt3)
+        else:
+            self.no = [0.0, 0.0, 1.0]
 
     def updateColors(self):
         """
@@ -483,7 +486,7 @@ class Face:
 
         """
 
-        return 'face %i: verts: %i, %i, %i' % (self.idx, self.verts[0].idx, self.verts[1].idx, self.verts[2].idx)
+        return 'face %i: verts: %s' % (self.idx, [v.idx for v in self.verts])
 
 
 class FaceGroup:
@@ -519,7 +522,7 @@ class FaceGroup:
         """
 
         self.name = name
-        self.faces = []
+        self.__faces = []
         self.parent = None
         self.elementIndex = 0
         self.elementCount = 0
@@ -534,25 +537,33 @@ class FaceGroup:
         """
 
         return 'facegroup %s' % self.name
+        
+    @property
+    def faces(self):
+        return iter(self.__faces)
 
-    def createFace(self, v0, v1, v2, v3, uv=None):
-        f = Face(v0, v1, v2, v3)
+    def createFace(self, verts, uvs=None):
+        
+        if len(verts) != self.parent.vertsPerPrimitive:
+            raise RuntimeError('The amount of vertices does not match the amount of vertices per primitive of the object')
+        
+        f = Face(*verts)
         f.group = self
-        self.faces.append(f)
+        self.__faces.append(f)
         self.parent.faces.append(f)
 
-        if uv:
-            f.uv = [self.parent.addUv(uv[0]), self.parent.addUv(uv[1]), self.parent.addUv(uv[2]), self.parent.addUv(uv[3])]
+        if uvs:
+            if len(verts) != len(uvs):
+                raise RuntimeError('The amount of uv coordinates does not match the amount of vertices')
+            f.uv = [self.parent.addUv(uv) for uv in uvs]
             
-        v0.sharedFaces.append(f)
-        v1.sharedFaces.append(f)
-        v2.sharedFaces.append(f)
-        v3.sharedFaces.append(f)
+        for v in verts:
+            v.sharedFaces.append(f)
 
         return f
 
     def setColor(self, color):
-        for f in self.faces:
+        for f in self.__faces:
             f.setColor(color)
 
 class Object3D:
@@ -582,7 +593,7 @@ class Object3D:
     - **self.sz**: *float* The z scale component of the size of this object within the coordinate space of the scene.
     - **self.verts**: *verts list* The list of vertices that go to make up this object.
     - **self.faces**: *faces list* The list of faces that go to make up this object.
-    - **self.facesGroups**: *facesGroups list* The list of FaceGroups that go to make up this object.
+    - **self.faceGroups**: *faceGroups list* The list of FaceGroups that go to make up this object.
     - **self.cameraMode**: *int flag* A flag to indicate which of the two available perspective camera projections, fixed or movable, is to be used to draw this object.
     - **self.visibility**: *int flag* A flag to indicate whether or not this object is visible.
     - **self.texture**: *string* The path of a TGA file on disk containing the object texture.
@@ -596,7 +607,7 @@ class Object3D:
 
     """
 
-    def __init__(self, objName):
+    def __init__(self, objName, vertsPerPrimitive=4):
         """
         This is the constructor method for the Object3D class.
         It initializes all object attributes.
@@ -622,7 +633,7 @@ class Object3D:
         self.sz = 1
         self.verts = []
         self.faces = []
-        self.facesGroups = []
+        self.__faceGroups = []
         self.cameraMode = 1
         self.visibility = 1
         self.pickable = 1
@@ -635,12 +646,31 @@ class Object3D:
         self.shadeless = 0
         self.solid = 1
         self.transparentPrimitives = 0
-        self.vertsPerPrimitive = 4
+        self.vertsPerPrimitive = vertsPerPrimitive
         self.indexBuffer = []
         self.vertexBufferSize = None
         
         self.uvValues = None
         self.uvMap = {}
+        
+    @property
+    def faceGroups(self):
+        return iter(self.__faceGroups)
+        
+    @property
+    def faceGroupCount(self):
+        return len(self.__faceGroups)
+        
+    def clear(self):
+        
+        if self.indexBuffer:
+            del self.indexBuffer[:]
+        if self.uvValues:
+            del self.uvValues[:]
+        self.uvMap.clear()
+        del self.faces[:]
+        del self.verts[:]
+        del self.__faceGroups[:]
 
     def updateIndexBuffer(self):
         # Build the lists of vertex indices and UV-indices for this face group.
@@ -652,7 +682,7 @@ class Object3D:
         # meet the eyeball) we therefore create duplicate vertices.
         del self.indexBuffer[:]
         fullArrayIndex = 0
-        for g in self.facesGroups:
+        for g in self.__faceGroups:
           if 'joint' in g.name:
             continue
           g.elementIndex = fullArrayIndex  # first index in opengl array
@@ -677,7 +707,7 @@ class Object3D:
     def createFaceGroup(self, name):
         fg = FaceGroup(name)
         fg.parent = self
-        self.facesGroups.append(fg)
+        self.__faceGroups.append(fg)
         return fg
 
     def createVertex(self, co):
@@ -696,7 +726,7 @@ class Object3D:
             return index
             
     def setColor(self, color):
-        for g in self.facesGroups:
+        for g in self.__faceGroups:
             g.setColor(color)
 
     def setLoc(self, locx, locy, locz):
@@ -909,20 +939,6 @@ class Object3D:
         except AttributeError, text:
             pass
 
-    def addFaceGroup(self, fg):
-        """
-        This method adds a FaceGroup to this object.
-
-        Parameters
-        ----------
-
-        fg:
-            *faceGroups list* The FaceGroup to add.
-        """
-
-        fg.parent = self
-        self.facesGroups.append(fg)
-
     def getFaceGroup(self, name):
         """
         This method searches the list of FaceGroups held for this object, and
@@ -936,7 +952,7 @@ class Object3D:
             *string*  The name of the FaceGroup to retrieve.
         """
 
-        for fg in self.facesGroups:
+        for fg in self.__faceGroups:
             if fg.name == name:
                 return fg
         return None
@@ -1195,14 +1211,7 @@ class Scene3D:
         if obj.object3d:
             mh.world.remove(obj.object3d)
             obj.object3d = None
-        if obj.indexBuffer:
-            del obj.indexBuffer[:]
-        if obj.uvValues:
-            del obj.uvValues[:]
-        obj.uvMap.clear()
-        del obj.faces[:]
-        del obj.verts[:]
-        del obj.facesGroups[:]
+        obj.clear()
         
     def delete(self, obj):
         
@@ -1229,7 +1238,7 @@ class Scene3D:
         obj.object3d = mh.Object3D(obj.vertexBufferSize, obj.indexBuffer)
         mh.world.append(obj.object3d)
 
-        for g in obj.facesGroups:
+        for g in obj.faceGroups:
             if 'joint' in g.name:
                 continue
             groupVerts = set()
@@ -1425,7 +1434,7 @@ class Scene3D:
         newObj.verts = obj.verts
         newObj.faces = obj.faces
 
-        for fg in obj.facesGroups:
+        for fg in obj.__faceGroups:
             newFg = FaceGroup(name + fg.name)
             newFg.faces = fg.faces
             newObj.addFaceGroup(newFg)
@@ -1488,7 +1497,7 @@ class Scene3D:
         # print "DEBUG COLOR AND GROUPS, obj", obj.name
         # print "---------------------------"
 
-        for g in obj.facesGroups:
+        for g in obj.faceGroups:
             self.colorID += 1
 
             # 555 to 24-bit rgb

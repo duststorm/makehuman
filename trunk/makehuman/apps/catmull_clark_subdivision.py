@@ -117,7 +117,7 @@ def createSubdivisionObject(scene, object, progressCallback=None):
     
     progress = 0.0
     groups = 0
-    progressIncr = 0.5 / (len(object.facesGroups) / 10)
+    progressIncr = 0.5 / (object.faceGroupCount / 10)
     
     # Create faces
     # v0  e0  v1
@@ -125,7 +125,7 @@ def createSubdivisionObject(scene, object, progressCallback=None):
     # e3  c   e1
     #
     # v3  e2  v2
-    for g in object.facesGroups:
+    for g in object.faceGroups:
         
         fg = subdivisionObject.createFaceGroup(g.name)
             
@@ -170,10 +170,10 @@ def createSubdivisionObject(scene, object, progressCallback=None):
             uve2 = vavg2d(uv2, uv3)
             uve3 = vavg2d(uv3, uv0)
             
-            fg.createFace(v0, e0, c, e3, [uv0, uve0, uvc, uve3])
-            fg.createFace(e0, v1, e1, c, [uve0, uv1, uve1, uvc])
-            fg.createFace(e3, c, e2, v3, [uve3, uvc, uve2, uv3])
-            fg.createFace(c, e1, v2, e2, [uvc, uve1, uv2, uve2])
+            fg.createFace((v0, e0, c, e3), (uv0, uve0, uvc, uve3))
+            fg.createFace((e0, v1, e1, c), (uve0, uv1, uve1, uvc))
+            fg.createFace((e3, c, e2, v3), (uve3, uvc, uve2, uv3))
+            fg.createFace((c, e1, v2, e2), (uvc, uve1, uv2, uve2))
             
         if progressCallback:
             groups += 1

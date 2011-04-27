@@ -658,7 +658,7 @@ def colorizeVerts(obj, color, targetPath=None, faceGroupName=None):
         fileDescriptor.close()
     elif faceGroupName:
         found = False
-        for faceGroup in obj.facesGroups:
+        for faceGroup in obj.faceGroups:
             if faceGroup.name == faceGroupName:
                 found = True
                 for f in faceGroup.faces:
@@ -666,7 +666,7 @@ def colorizeVerts(obj, color, targetPath=None, faceGroupName=None):
                     f.updateColors()
         if not found:
             print 'Warning, face group %s not found in %s possible values are' % (faceGroupName, obj.name)
-            for faceGroup in obj.facesGroups:
+            for faceGroup in obj.faceGroups:
                 print faceGroup.name
     else:
         for v in obj.verts:
