@@ -577,13 +577,13 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.translationButton.event
         def onClicked(event):
-            self.tool = Detail3dTool(self.app, False, 'translation')
+            self.tool = Detail3dTool(self.app, self.microButton.selected, 'translation')
             self.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.translationButton, event)
 
         @self.scaleButton.event
         def onClicked(event):
-            self.tool = Detail3dTool(self.app, False, 'scale')
+            self.tool = Detail3dTool(self.app, self.microButton.selected, 'scale')
             self.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
