@@ -634,7 +634,8 @@ class Object3D:
 
         self.shadeless = 0
         self.solid = 1
-        self.transparentQuads = 0
+        self.transparentPrimitives = 0
+        self.vertsPerPrimitive = 4
         self.indexBuffer = []
         self.vertexBufferSize = None
         
@@ -894,10 +895,17 @@ class Object3D:
         except AttributeError, text:
             pass
             
-    def setTransparentQuads(self, transparentQuads):
-        self.transparentQuads = transparentQuads
+    def setTransparentPrimitives(self, transparentPrimitives):
+        self.transparentPrimitives = transparentPrimitives
         try:
-            self.object3d.transparentQuads = self.transparentQuads
+            self.object3d.transparentPrimitives = self.transparentPrimitives
+        except AttributeError, text:
+            pass
+            
+    def setVertsPerPrimitive(self, vertsPerPrimitive):
+        self.vertsPerPrimitive = vertsPerPrimitive
+        try:
+            self.object3d.vertsPerPrimitive = self.vertsPerPrimitive
         except AttributeError, text:
             pass
 
@@ -1269,7 +1277,8 @@ class Scene3D:
         obj.object3d.shadeless = obj.shadeless
         obj.object3d.pickable = obj.pickable
         obj.object3d.solid = obj.solid
-        obj.object3d.transparentQuads = obj.transparentQuads
+        obj.object3d.transparentPrimitives = obj.transparentPrimitives
+        obj.object3d.vertsPerPrimitive = obj.vertsPerPrimitive
         obj.object3d.cameraMode = obj.cameraMode
 
         # TODO add all obj attributes

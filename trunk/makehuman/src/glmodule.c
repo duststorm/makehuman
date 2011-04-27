@@ -64,6 +64,8 @@ static int g_windowWidth = 800;
 static int g_windowHeight = 600;
 static SDL_Surface *g_screen = NULL;
 
+unsigned int g_primitiveMap[] = { GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS };
+
 #ifndef __APPLE__
 typedef SDL_Surface *(*PFN_IMG_LOAD)(const char *);
 static void *g_sdlImageHandle = NULL;
@@ -1540,7 +1542,7 @@ void mhDrawMeshes(int pickMode, int cameraType)
                     glBindTexture(GL_TEXTURE_2D, obj->texture);
                     glTexCoordPointer(2, GL_FLOAT, 0, obj->UVs);
                     
-                    if (obj->nTransparentQuads)
+                    if (obj->nTransparentPrimitives)
                       Object3D_sortFaces(obj);
                 }
 
@@ -1732,25 +1734,25 @@ void mhDrawMeshes(int pickMode, int cameraType)
                   glDisableClientState(GL_COLOR_ARRAY);
                   glColor3f(0.0f, 0.0f, 0.0f);
                   glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
-                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
+                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
                   glEnableClientState(GL_COLOR_ARRAY);
                   glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
                   glEnable(GL_POLYGON_OFFSET_FILL);
                   glPolygonOffset(1.0, 1.0);
-                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
+                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
                   glDisable(GL_POLYGON_OFFSET_FILL);
                 }
-                else if (obj->nTransparentQuads)
+                else if (obj->nTransparentPrimitives)
                 {
                   glDepthMask(GL_FALSE);
                   glEnable(GL_ALPHA_TEST);
                   glAlphaFunc(GL_GREATER, 0.0f);
-                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
+                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
                   glDisable(GL_ALPHA_TEST);
                   glDepthMask(GL_TRUE);
                 }
                 else
-                  glDrawElements(GL_QUADS, obj->nQuads * 4, GL_UNSIGNED_INT, obj->quads);
+                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && obj->shader && obj->isSolid)

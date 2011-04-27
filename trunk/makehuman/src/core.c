@@ -97,7 +97,8 @@ static PyGetSetDef Object3D_getset[] =
     {"translation", (getter)Object3D_getTranslation, (setter)Object3D_setTranslation, "The translation of the object as a 3 component vector.", NULL},
     {"rotation", (getter)Object3D_getRotation, (setter)Object3D_setRotation, "The rotation of the object as a 3 component vector.", NULL},
     {"scale", (getter)Object3D_getScale, (setter)Object3D_setScale, "The scale of the object as a 3 component vector.", NULL},
-    {"transparentQuads", (getter)Object3D_getTransparentQuads, (setter)Object3D_setTransparentQuads, "How many of the faces are transparent, transparent faces are always at the end.", NULL},
+    {"transparentPrimitives", (getter)Object3D_getTransparentPrimitives, (setter)Object3D_setTransparentPrimitives, "How many of the primitives are transparent, transparent primitives are always at the end.", NULL},
+    {"vertsPerPrimitive", (getter)Object3D_getVertsPerPrimitive, (setter)Object3D_setVertsPerPrimitive, "How many vertices each primitive has.", NULL},
     {NULL}
 };
 
@@ -167,7 +168,7 @@ void RegisterObject3D(PyObject *module)
 void Object3D_dealloc(Object3D *self)
 {
     // Free our data
-    free(self->quads);
+    free(self->primitives);
     free(self->verts);
     free(self->norms);
     free(self->UVs);
@@ -194,6 +195,7 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->shadeless = 0;
         self->texture = 0;
         self->shader = 0;
+        self->vertsPerPrimitive = 4;
         self->shaderParameters = NULL;
         self->isVisible = 1;
         self->inMovableCamera = 1;
@@ -210,15 +212,15 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->sy = 1.0;
         self->sz = 1.0;
 
-        self->quads = NULL;
+        self->primitives = NULL;
         self->verts = NULL;
         self->norms = NULL;
         self->UVs = NULL;
         self->colors = NULL;
         self->colors2 = NULL;
 
-        self->nQuads = 0;
-        self->nTransparentQuads = 0;
+        self->nPrimitives = 0;
+        self->nTransparentPrimitives = 0;
         self->nVerts = 0;
         self->nNorms = 0;
         self->nColors = 0;
@@ -236,14 +238,13 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 {
-    int numVerts, numQuads;
+    int numVerts, numPrimitives;
     PyObject *indexBuffer;
 
     if (!PyArg_ParseTuple(args, "iO", &numVerts, &indexBuffer) || !PyList_Check(indexBuffer))
         return -1;
 
-    // Faces are quads
-    numQuads = (int)PyList_Size(indexBuffer) / 4;
+    numPrimitives = (int)PyList_Size(indexBuffer) / self->vertsPerPrimitive;
 
     // Allocate arrays
     self->verts = makeFloatArray(numVerts * 3);
@@ -254,9 +255,9 @@ int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 
     self->nVerts = numVerts;
 
-    self->quads = makeIntArray(numQuads * 4);
+    self->primitives = makeIntArray(numPrimitives * self->vertsPerPrimitive);
     self->nNorms = numVerts * 3;
-    self->nQuads = numQuads;
+    self->nPrimitives = numPrimitives;
     self->nColors = numVerts * 3;
     self->nColors2 = numVerts * 4;
 
@@ -268,7 +269,7 @@ int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 
         for (item = PyIter_Next(iterator); item; item = PyIter_Next(iterator))
         {
-            self->quads[index++] = PyInt_AsLong(item);
+            self->primitives[index++] = PyInt_AsLong(item);
             Py_DECREF(item);
         }
 
@@ -571,28 +572,48 @@ int Object3D_setScale(Object3D *self, PyObject *value)
     return 0;
 }
 
-PyObject *Object3D_getTransparentQuads(Object3D *self, void *closure)
+PyObject * Object3D_getTransparentPrimitives( Object3D *self, void *closure)
 {
-  return Py_BuildValue("i", self->nTransparentQuads);
+  return Py_BuildValue("i", self->nTransparentPrimitives);
 }
 
-int Object3D_setTransparentQuads(Object3D *self, PyObject *value)
+int Object3D_setTransparentPrimitives( Object3D *self, PyObject *value)
 {
-  int transparentQuads = PyInt_AsLong(value);
+  int transparentPrimitives = PyInt_AsLong(value);
 
-  if (transparentQuads < 0)
+  if (transparentPrimitives < 0)
   {
-    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i", transparentQuads);
+    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i", transparentPrimitives);
     return -1;
   }
 
-  if (transparentQuads > self->nQuads)
+  if (transparentPrimitives > self->nPrimitives)
   {
-    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i while there are only %i quads", transparentQuads, self->nQuads);
+    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i while there are only %i quads", transparentPrimitives, self->nPrimitives);
     return -1;
   }
 
-  self->nTransparentQuads = transparentQuads;
+  self->nTransparentPrimitives = transparentPrimitives;
+
+  return 0;
+}
+
+PyObject * Object3D_getVertsPerPrimitive( Object3D *self, void *closure)
+{
+  return Py_BuildValue("i", self->vertsPerPrimitive);
+}
+
+int Object3D_setVertsPerPrimitive( Object3D *self, PyObject *value)
+{
+  int vertsPerPrimitive = PyInt_AsLong(value);
+
+  if (vertsPerPrimitive < 1 || vertsPerPrimitive > 4)
+  {
+    PyErr_Format(PyExc_RuntimeError, "Trying to set vertsPerPrimitive to %i while only values between 1 and 4 inclusive are allowed", vertsPerPrimitive);
+    return -1;
+  }
+
+  self->vertsPerPrimitive = vertsPerPrimitive;
 
   return 0;
 }
@@ -618,7 +639,7 @@ void Object3D_sortFaces(Object3D *self)
     float tx, ty, tz;
     float alpha, s, c;
     float x, y, z;
-    int *quads = self->quads + self->nQuads - self->nTransparentQuads;
+    int *indices = self->primitives + self->nPrimitives - self->nTransparentPrimitives;
     float *verts;
     int i;
     int n;
@@ -659,14 +680,14 @@ void Object3D_sortFaces(Object3D *self)
     cz = tz + self->z;
 
     // Resize sorting data if needed
-    if (G.nSortData < self->nTransparentQuads)
+    if (G.nSortData < self->nTransparentPrimitives)
     {
-        G.nSortData = self->nTransparentQuads;
+        G.nSortData = self->nTransparentPrimitives;
         G.sortData = realloc(G.sortData, G.nSortData * sizeof(SortStruct));
     }
 
     // Prepare sorting data
-    for (i = 0; i < self->nTransparentQuads; i++)
+    for (i = 0; i < self->nTransparentPrimitives; i++)
     {
 #if 0
         // Calculate center
@@ -698,12 +719,12 @@ void Object3D_sortFaces(Object3D *self)
 
         for (n = 0; n < 4; n++)
         {
-          G.sortData[i].indices[n] = *quads;
-          verts = &self->verts[*quads * 3];
+          G.sortData[i].indices[n] = *indices;
+          verts = &self->verts[*indices * 3];
           x = *verts++ - cx;
           y = *verts++ - cy;
           z = *verts++ - cz;
-          quads++;
+          indices++;
 
           d = x*x+y*y+z*z;
 
@@ -716,15 +737,15 @@ void Object3D_sortFaces(Object3D *self)
     }
 
     // Sort
-    qsort(G.sortData, self->nTransparentQuads, sizeof(SortStruct), distanceSort);
+    qsort(G.sortData, self->nTransparentPrimitives, sizeof(SortStruct), distanceSort);
 
     // Copy to buffer
-    quads = self->quads + self->nQuads - self->nTransparentQuads;
-    for (i = 0; i < self->nTransparentQuads; i++)
+    indices = self->primitives + self->nPrimitives - self->nTransparentPrimitives;
+    for (i = 0; i < self->nTransparentPrimitives; i++)
     {
         for (n = 0; n < 4; n++)
         {
-            *quads++ = G.sortData[i].indices[n];
+            *indices++ = G.sortData[i].indices[n];
         }
     }
 }

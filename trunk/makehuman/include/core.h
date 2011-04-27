@@ -54,6 +54,7 @@ extern "C"
         int shadeless;              /**< \brief Whether this object is affected by scene lights or not.                     */
         unsigned int texture;       /**< \brief A texture id or 0 if this object doesn't have a texture.                    */
         unsigned int shader;        /**< \brief A shader id or 0 if this object doesn't have a shader.                      */
+        unsigned int vertsPerPrimitive;/**< \brief an integer between 1 and 4 inclusive.                                      */
         PyObject *shaderParameters; /**< \brief A dictionary containing the shader parameters, read only.                   */
         int isVisible;              /**< \brief Whether this object is currently visible or not.                            */
         /**<        An int defining whether this object is currently visible or not.            */
@@ -71,12 +72,10 @@ extern "C"
         /**<        Array of 3 floats defining the object size (x, y and z scale).              */
         int nVerts;                 /**< \brief The number of vertices in this object.                                      */
         /**<        An int holding the number of vertices in this object.                       */
-        int nQuads;                 /**< \brief The number of faces in this object.                                         */
-        /**<        An int holding the number of faces in this object.
-                    MakeHuman only supports quadrilateral faces.                                */
-        int nTransparentQuads;      /**< \brief The number of transparent faces in this object.                             */
-        /**<        An int holding the number of transparent faces in this object.
-                    MakeHuman only supports quadrilateral faces.                                */
+        int nPrimitives;              /**< \brief The number of primitives in this object.                                      */
+        /**<        An int holding the number of primitives in this object.                       */
+        int nTransparentPrimitives;   /**< \brief The number of transparent primitives in this object.                          */
+        /**<        An int holding the number of transparent primitives in this object.           */
         int nNorms;                 /**< \brief The number of surface normals in this object.                               */
         /**<        An int holding the number of surface normals defined for this object.       */
         int nColors;                /**< \brief The number of colors used in this object.                                   */
@@ -84,8 +83,8 @@ extern "C"
         int nColors2;               /**< \brief The number of colors used in this object.                                   */
         /**<        An int holding the number of colors used in this object.
                 <b>EDITORIAL NOTE: One of these may be for 'false' colors. Find out which.</b>  */
-        int *quads;                 /**< \brief The indices of faces in this object.                                        */
-        /**<        Three ints for each triangular face in this object.                         */
+        int *primitives;              /**< \brief The indices of elements in this object.                                     */
+        /**<        Three integers for each triangular face in this object.                     */
         float *verts;               /**< \brief Pointer to the start of the list of vertex coordinates.                     */
         /**<        A pointer to an array of floats containing the list of vertex coordinates
                     for each of the vertices defined for this object.
@@ -128,8 +127,10 @@ extern "C"
     int Object3D_setRotation(Object3D *self, PyObject *value);
     PyObject *Object3D_getScale(Object3D *self, void *closure);
     int Object3D_setScale(Object3D *self, PyObject *value);
-    PyObject *Object3D_getTransparentQuads(Object3D *self, void *closure);
-    int Object3D_setTransparentQuads(Object3D *self, PyObject *value);
+    PyObject *Object3D_getTransparentPrimitives(Object3D *self, void *closure);
+    int Object3D_setTransparentPrimitives(Object3D *self, PyObject *value);
+    PyObject * Object3D_getVertsPerPrimitive( Object3D *self, void *closure);
+    int Object3D_setVertsPerPrimitive( Object3D *self, PyObject *value);
 
 // Object3D attributes indirectly accessed by Python
     PyObject *Object3D_getShaderParameters(Object3D *self, void *closure);
