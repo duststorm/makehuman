@@ -30,6 +30,7 @@ from bvh_importer import bvhSkeleton
 from skeleton import Skeleton
 from math import pi
 import mh
+import mh2obj
 
 '''
 bvhToMhMapping = {
@@ -119,11 +120,12 @@ class BvhView(gui3d.TaskView):
         self.__humanSkeleton = Skeleton()
         
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*1+6));y+=25
+        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*2+6));y+=25
 
         self.frameSlider = gui3d.Slider(self, position=[10, y, 9.3], value = 0, min = 0, max = self.__skeleton.frames, label = 'Frame: %d');y+=36
         self.playPause = gui3d.Button(self, [18, y, 9.3], "Play");y+=24
-        self.showHuman = gui3d.ToggleButton(self, [18,y,9.1],"Show Human"); y+=24
+        self.showHuman = gui3d.ToggleButton(self, [18,y,9.1],"Show human"); y+=24
+        self.exportFrame = gui3d.Button(self, [18,y,9.1],"Export frame"); y+=24
         
         @self.frameSlider.event
         def onChanging(value):
@@ -156,6 +158,10 @@ class BvhView(gui3d.TaskView):
                 self.app.selectedHuman.hide()
                 self.getSkeleton().show()
                 
+        @self.exportFrame.event
+        def onClicked(event):
+            self.exportCurrentFrame()
+                
     def onFrameChanged(self):
         
         frame = self.frameSlider.getValue() + 1
@@ -166,6 +172,14 @@ class BvhView(gui3d.TaskView):
         self.frameSlider.setValue(frame)
         self.__updateSkeletonMesh(frame-1)
         self.app.redraw()
+        
+    def exportCurrentFrame(self):
+        
+        exportPath = mh.getPath('exports')
+        if not os.path.exists(exportPath):
+            os.makedirs(exportPath)
+             
+        mh2obj.exportObj(self.app.selectedHuman.meshData, os.path.join(exportPath, 'bvh_frame_%d.obj' % self.frameSlider.getValue()))
             
     def onShow(self, event):
 
