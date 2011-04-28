@@ -275,6 +275,7 @@ class ExportTaskView(gui3d.TaskView):
                 os.makedirs(exportPath)
 
             if self.wavefrontObj.selected:
+                
                 if self.exportEyebrows.selected and self.exportDiamonds.selected:
                     filter = None
                 elif self.exportEyebrows.selected:
@@ -284,22 +285,25 @@ class ExportTaskView(gui3d.TaskView):
                 else:
                     filter = lambda fg: not ('joint' in fg.name or 'eyebrown' in fg.name)
                     
-                mesh = self.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else self.app.selectedHuman.meshData
+                human = self.app.selectedHuman
+                    
+                mesh = human.getSubdivisionMesh() if self.exportSmooth.selected else human.getSeedMesh()
                 
                 mh2obj.exportObj(mesh,
                     os.path.join(exportPath, filename + ".obj"),
                     self.exportGroups.selected,
                     filter)
-                mh2proxy.exportProxyObj(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))
+                mh2proxy.exportProxyObj(human.meshData, os.path.join(exportPath, filename))
                 
                 if self.exportSkeleton.selected:
-                    mh2bvh.exportSkeleton(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".bvh"))
+                    mh2bvh.exportSkeleton(human.meshData, os.path.join(exportPath, filename + ".bvh"))
                     
-                if len(filename)> 0 and self.app.selectedHuman.hairObj and self.app.selectedHuman.hairObj.mesh and self.app.selectedHuman.hairObj.mesh.verts and self.exportHair.selected:
-                    mh2obj.exportObj(self.app.selectedHuman.hairObj.mesh, os.path.join(exportPath, "hair_" + filename+".obj"))
-                    texturePath = os.path.join(exportPath, basename(self.app.selectedHuman.hairObj.mesh.texture))
+                if self.exportHair.selected and human.hairObj and human.hairObj.mesh and human.hairObj.mesh.verts:
+                    mesh = human.hairObj.getSubdivisionMesh() if self.exportSmooth.selected else human.hairObj.getSeedMesh()
+                    mh2obj.exportObj(mesh, os.path.join(exportPath, "hair_" + filename+".obj"))
+                    texturePath = os.path.join(exportPath, basename(mesh.texture))
                     if not os.path.isfile(texturePath):
-                        copyfile(self.app.selectedHuman.hairObj.mesh.texture, texturePath)
+                        copyfile(mesh.texture, texturePath)
                         
                 texturePath = os.path.join(exportPath, basename(mesh.texture))
                 if not os.path.isfile(texturePath):
