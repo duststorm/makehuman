@@ -23,8 +23,6 @@ TODO
 
 """
 
-__docformat__ = 'restructuredtext'
-
 import events3d
 import files3d
 import animation3d
