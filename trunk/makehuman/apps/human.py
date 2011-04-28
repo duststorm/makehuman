@@ -127,7 +127,7 @@ class Human(gui3d.Object):
             self.hairObj.hide()
         self.setVisibility(False)
 
-    # Overriding setPosition and setRotation to account for both hair and base object
+    # Overriding methods to account for both hair and base object
 
     def setPosition(self, position):
         gui3d.Object.setPosition(self, position)
@@ -138,6 +138,11 @@ class Human(gui3d.Object):
         gui3d.Object.setRotation(self, rotation)
         if self.hairObj:
             self.hairObj.setRotation(rotation)
+            
+    def setSolid(self, *args, **kwargs):
+        gui3d.Object.setSolid(self, *args, **kwargs)
+        if self.hairObj:
+            self.hairObj.setSolid(*args, **kwargs)
             
     def setSubdivided(self, *args, **kwargs):
         gui3d.Object.setSubdivided(self, *args, **kwargs)

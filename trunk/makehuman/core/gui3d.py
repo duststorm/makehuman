@@ -160,16 +160,25 @@ class Object(events3d.EventHandler):
                 self.__subdivisionMesh.clearTexture()
             
     def getTexture(self):
-        return self.mesh.texture
+        return self.__seedMesh.texture
 
     def clearTexture(self):
-        self.mesh.clearTexture()
-
+        self.__seedMesh.clearTexture()
+        if self.__subdivisionMesh:
+            self.__subdivisionMesh.clearTexture()
+            
     def hasTexture(self):
-        return self.mesh.hasTexture()
+        return self.__seedMesh.hasTexture()
+        
+    def setSolid(self, solid):
+        self.__seedMesh.setSolid(solid)
+        if self.__subdivisionMesh:
+            self.__subdivisionMesh.setSolid(solid)
+            
+    def isSolid(self):
+        return self.__seedMesh.solid
         
     def getSeedMesh(self):
-        
         return self.__seedMesh
             
     def getSubdivisionMesh(self, update=True, progressCallback=None):
@@ -201,7 +210,6 @@ class Object(events3d.EventHandler):
                 self.mesh.update()
             self.__subdivisionMesh.setVisibility(0)
             self.mesh.setVisibility(1)
-        self.app.redraw()
             
     def getBBox(self):
         if not self.__bbox:

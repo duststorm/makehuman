@@ -729,19 +729,12 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def toggleSolid(self):
-        human = self.selectedHuman
-        if human.mesh.solid:
-            human.mesh.setSolid(0)
-            if human.hairObj:
-                human.hairObj.mesh.setSolid(0)
-        else:
-            human.mesh.setSolid(1)
-            if human.hairObj:
-                human.hairObj.mesh.setSolid(1)
+        self.selectedHuman.setSolid(not self.selectedHuman.isSolid())
         self.redraw()
         
     def toggleSubdivision(self):
         self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), True, self.app.progress)
+        self.redraw()
         
     def saveTarget(self):
         human = self.selectedHuman
