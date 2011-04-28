@@ -28,7 +28,6 @@ __docformat__ = 'restructuredtext'
 import algos3d
 import gui3d
 import time
-from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 import files3d
 import os
 import mh
@@ -111,8 +110,6 @@ class Human(gui3d.Object):
         self.muscleWeightModifier = humanmodifier.GenderAgeMuscleWeightModifier('data/targets/macrodetails/universal-${gender}-${age}-${tone}-${weight}.target')
         self.baseModifier = humanmodifier.GenderAgeModifier('data/targets/macrodetails/neutral-${gender}-${age}.target')
         
-        self.__subdivisionMesh = None
-        
         self.setTexture("data/textures/texture.png")
 
     # Overriding hide and show to account for both human base and the hairs!
@@ -136,68 +133,16 @@ class Human(gui3d.Object):
         gui3d.Object.setPosition(self, position)
         if self.hairObj:
             self.hairObj.setPosition(position)
-        if self.isSubdivided():
-            self.meshData.setLoc(position[0], position[1], position[2])
-        elif self.__subdivisionMesh:
-            self.__subdivisionMesh.setLoc(position[0], position[1], position[2])
 
     def setRotation(self, rotation):
         gui3d.Object.setRotation(self, rotation)
         if self.hairObj:
             self.hairObj.setRotation(rotation)
-        if self.isSubdivided():
-            self.meshData.setRot(rotation[0], rotation[1], rotation[2])
-        elif self.__subdivisionMesh:
-            self.__subdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
-
-    def setTexture(self, texturePath):
-        self.meshData.setTexture(texturePath)
-        if self.__subdivisionMesh:
-            self.__subdivisionMesh.setTexture(texturePath)
-
-    def setVisibility(self, flag):
-        
-        self.mesh.setVisibility(flag)
-        
-    def getSubdivisionMesh(self, update=True, progressCallback=None):
-        
-        if not self.__subdivisionMesh:
-            print 'creating subdiv'
-            self.__subdivisionMesh = createSubdivisionObject(self.app.scene3d, self.meshData, progressCallback)
-        elif update:
-            updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
             
-        return self.__subdivisionMesh
-
-    def isSubdivided(self):
-
-        return self.mesh == self.__subdivisionMesh
-            
-    def setSubdivided(self, flag, update=True, progressCallback=None):
-        """
-        This method toggles between displaying the standard mesh and a
-        subdivided mesh. The subdivided mesh contains 4 times the number of
-        faces as the standard mesh.
-
-        **Parameters:** None.
-
-        """
-
-        if flag == self.isSubdivided():
-            return
-            
-        if flag:
-            self.mesh = self.getSubdivisionMesh(update, progressCallback)
-            self.meshData.setVisibility(0)
-            self.mesh.setVisibility(1)
-        else:
-            self.mesh = self.meshData
-            if update:
-                self.mesh.calcNormals()
-                self.mesh.update()
-            self.__subdivisionMesh.setVisibility(0)
-            self.mesh.setVisibility(1)
-        self.app.redraw()
+    def setSubdivided(self, *args, **kwargs):
+        gui3d.Object.setSubdivided(self, *args, **kwargs)
+        if self.hairObj:
+            self.hairObj.setSubdivided(*args, **kwargs)
 
     def setGender(self, gender):
         """
@@ -402,7 +347,7 @@ class Human(gui3d.Object):
 
         # Update all verts
         if self.isSubdivided():
-            updateSubdivisionObject(self.__subdivisionMesh)
+            self.getSubdivisionMesh()
             if progressCallback:
                 progressCallback(0.7)
             self.mesh.calcNormals()

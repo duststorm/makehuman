@@ -104,6 +104,7 @@ def createSubdivisionObject(scene, object, progressCallback=None):
     subdivisionObject.pickable = object.pickable
     subdivisionObject.cameraMode = object.cameraMode
     subdivisionObject.solid = object.solid
+    subdivisionObject.transparentPrimitives = object.transparentPrimitives * 4
     subdivisionObject.uvValues = []
     subdivisionObject.indexBuffer = []
     
@@ -117,7 +118,7 @@ def createSubdivisionObject(scene, object, progressCallback=None):
     
     progress = 0.0
     groups = 0
-    progressIncr = 0.5 / (object.faceGroupCount / 10)
+    progressIncr = 0.5 / max(1, object.faceGroupCount / 10)
     
     # Create faces
     # v0  e0  v1

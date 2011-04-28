@@ -53,9 +53,10 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj.mesh.setCameraProjection(0)
             human.hairObj.mesh.setSolid(human.mesh.solid)
             human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
-            human.hairObj.mesh.originalVerts = [v.co[:] for v in human.hairObj.mesh.verts]
+            human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
             self.app.scene3d.update()
             self.adaptHairToHuman(human)
+            human.hairObj.setSubdivided(human.isSubdivided())
             
             self.app.switchCategory('Modelling')
             
@@ -74,13 +75,16 @@ class HairTaskView(gui3d.TaskView):
             sy = (headBBox[1][1]-headBBox[0][1])/float(self.oHeadBBox[1][1]-self.oHeadBBox[0][1])
             sz = (headBBox[1][2]-headBBox[0][2])/float(self.oHeadBBox[1][2]-self.oHeadBBox[0][2])
             
-            for i, v in enumerate(human.hairObj.mesh.verts):
-                co = vsub(human.hairObj.mesh.originalVerts[i], headCentroid)
+            mesh = human.hairObj.getSeedMesh()
+            for i, v in enumerate(mesh.verts):
+                co = vsub(mesh.originalHairVerts[i], headCentroid)
                 co[0] *= sx
                 co[1] *= sy
                 co[2] *= sz
                 v.co = vadd(vadd(co, headCentroid), delta)
-            human.hairObj.mesh.update()
+            mesh.update()
+            if human.hairObj.isSubdivided():
+                human.hairObj.getSubdivisionMesh()
         
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser

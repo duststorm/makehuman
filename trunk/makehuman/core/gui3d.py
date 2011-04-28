@@ -30,6 +30,7 @@ import module3d
 import mh
 import os
 import font3d
+from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 
 defaultFontSize = 1.0
 defaultFontFamily = 'arial'
@@ -93,6 +94,9 @@ class Object(events3d.EventHandler):
    
         self.visible = visible
         self.mesh.object = self
+        
+        self.__seedMesh = self.mesh
+        self.__subdivisionMesh = None
         self.__bbox = None
 
     def show(self):
@@ -107,24 +111,53 @@ class Object(events3d.EventHandler):
 
     def isVisible(self):
         return self.visible
+        
+    def setVisibility(self, visibility):
+
+        if self.view.isVisible() and self.visible and visibility:
+            self.mesh.setVisibility(1)
+        else:
+            self.mesh.setVisibility(0)
 
     def getPosition(self):
         return [self.mesh.x, self.mesh.y, self.mesh.z]
 
     def setPosition(self, position):
-        self.mesh.setLoc(position[0], position[1], position[2])
+        self.__seedMesh.setLoc(position[0], position[1], position[2])
+        if self.__subdivisionMesh:
+            self.__subdivisionMesh.setLoc(position[0], position[1], position[2])
 
     def getRotation(self):
         return [self.mesh.rx, self.mesh.ry, self.mesh.rz]
 
     def setRotation(self, rotation):
-        self.mesh.setRot(rotation[0], rotation[1], rotation[2])
+        self.__seedMesh.setRot(rotation[0], rotation[1], rotation[2])
+        if self.__subdivisionMesh:
+            self.__subdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
+            
+    def setScale(self, scale, scaleY=None, scaleZ=None):
+        if scaleZ:
+            self.__seedMesh.setScale(scale, scaleY, scaleZ)
+            if self.__subdivisionMesh:
+                self.__subdivisionMesh.setScale(scale, scaleY, scaleZ)
+        elif scaleY:
+            self.__seedMesh.setScale(scale, scaleY, 1)
+            if self.__subdivisionMesh:
+                self.__subdivisionMesh.setScale(scale, scaleY, 1)
+        else:
+            self.__seedMesh.setScale(scale, scale, 1)
+            if self.__subdivisionMesh:
+                self.__subdivisionMesh.setScale(scale, scale, 1)
 
     def setTexture(self, texture):
         if texture:
-            self.mesh.setTexture(texture)
+            self.__seedMesh.setTexture(texture)
+            if self.__subdivisionMesh:
+                self.__subdivisionMesh.setTexture(texture)
         else:
-            self.mesh.clearTexture()
+            self.__seedMesh.clearTexture()
+            if self.__subdivisionMesh:
+                self.__subdivisionMesh.clearTexture()
             
     def getTexture(self):
         return self.mesh.texture
@@ -134,21 +167,41 @@ class Object(events3d.EventHandler):
 
     def hasTexture(self):
         return self.mesh.hasTexture()
+        
+    def getSeedMesh(self):
+        
+        return self.__seedMesh
+            
+    def getSubdivisionMesh(self, update=True, progressCallback=None):
+        
+        if not self.__subdivisionMesh:
+            self.__subdivisionMesh = createSubdivisionObject(self.app.scene3d, self.mesh, progressCallback)
+        elif update:
+            updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
+            
+        return self.__subdivisionMesh
 
-    def setVisibility(self, visibility):
+    def isSubdivided(self):
 
-        if self.view.isVisible() and self.visible and visibility:
+        return self.mesh == self.__subdivisionMesh
+            
+    def setSubdivided(self, flag, update=True, progressCallback=None):
+
+        if flag == self.isSubdivided():
+            return
+            
+        if flag:
+            self.mesh = self.getSubdivisionMesh(update, progressCallback)
+            self.__seedMesh.setVisibility(0)
             self.mesh.setVisibility(1)
         else:
-            self.mesh.setVisibility(0)
-
-    def setScale(self, scale, scaleY=None, scaleZ=None):
-        if scaleZ:
-            self.mesh.setScale(scale, scaleY, scaleZ)
-        elif scaleY:
-            self.mesh.setScale(scale, scaleY, 1)
-        else:
-            self.mesh.setScale(scale, scale, 1)
+            self.mesh = self.__seedMesh
+            if update:
+                self.mesh.calcNormals()
+                self.mesh.update()
+            self.__subdivisionMesh.setVisibility(0)
+            self.mesh.setVisibility(1)
+        self.app.redraw()
             
     def getBBox(self):
         if not self.__bbox:

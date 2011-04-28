@@ -574,7 +574,7 @@ class MHApplication(gui3d.Application):
         
         if helpId in self.helpIds:
             return
-        print self.helpIds
+        #print self.helpIds
         self.dialog.box.label.setText(title)
         self.dialog.text.setText(text)
         if button1Label and button2Label:
