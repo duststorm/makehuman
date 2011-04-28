@@ -415,6 +415,11 @@ class MHApplication(gui3d.Application):
         
         # Normalize modifiers
         modifiers = event.modifiers & (events3d.KMOD_CTRL | events3d.KMOD_ALT)
+        
+        if modifiers & events3d.KMOD_CTRL:
+            modifiers |= events3d.KMOD_CTRL
+        if modifiers & events3d.KMOD_ALT:
+            modifiers |= events3d.KMOD_ALT
             
         # Normalize key
         key = event.key
