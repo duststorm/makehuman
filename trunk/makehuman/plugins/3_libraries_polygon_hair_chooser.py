@@ -28,7 +28,7 @@ class HairTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
-        gui3d.TaskView.__init__(self, category, 'Polygon hair')
+        gui3d.TaskView.__init__(self, category, 'Poly hair')
         self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png')
         
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
