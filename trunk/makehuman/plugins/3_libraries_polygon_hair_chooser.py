@@ -24,12 +24,26 @@ import gui3d, mh, os
 from os import path
 from aljabr import in2pts, vadd, vsub, calcBBox
 
+HairButtonStyle = gui3d.Style(**{
+    'width':32,
+    'height':32,
+    'mesh':None,
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontSize':gui3d.defaultFontSize,
+    'border':None
+})
+
 class HairTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
-        gui3d.TaskView.__init__(self, category, 'Poly hair')
+        gui3d.TaskView.__init__(self, category, 'Hair')
         self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png')
+        
+        self.hairButton = gui3d.Button(self.app.categories['Modelling'], [800-216, 600-36, 9.2],
+            style=HairButtonStyle._replace(normal='data/hairstyles/clear.png'))
         
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
         self.oHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
@@ -58,7 +72,14 @@ class HairTaskView(gui3d.TaskView):
             self.adaptHairToHuman(human)
             human.hairObj.setSubdivided(human.isSubdivided())
             
+            self.hairButton.setTexture(obj.replace('.obj', '.png'))
+            
             self.app.switchCategory('Modelling')
+            
+        @self.hairButton.event
+        def onClicked(event):
+            self.app.switchCategory('Library')
+            self.app.switchTask("Hair")
             
     def adaptHairToHuman(self, human):
 
