@@ -40,7 +40,7 @@ class HairTaskView(gui3d.TaskView):
             filename
             
             obj = os.path.join('data/hairstyles', filename)
-            png = obj.replace('.obj', '.png')
+            png = obj.replace('.obj', '_texture.png')
             
             human = self.app.selectedHuman
             
