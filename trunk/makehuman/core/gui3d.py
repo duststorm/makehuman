@@ -825,7 +825,7 @@ class Slider(View):
         style=SliderStyle, thumbStyle=SliderThumbStyle):
         
         """
-        This is the constructor for the Button class.
+        This is the constructor for the Slider class.
 
         @param parent: The parent view.
         @type parent: L{View}

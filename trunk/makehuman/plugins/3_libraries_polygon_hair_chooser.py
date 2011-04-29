@@ -117,6 +117,10 @@ class HairTaskView(gui3d.TaskView):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
+    def onResized(self, event):
+        self.hairButton.setPosition([event.width-216, event.height-36, 9.2])
+        self.filechooser.onResized(event)
+        
     def onHumanChanged(self, event):
         
         human = event.human

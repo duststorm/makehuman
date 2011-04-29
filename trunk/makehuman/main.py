@@ -362,9 +362,12 @@ class MHApplication(gui3d.Application):
         self.dialog.hide()
         self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
             'OK', helpId='alphaWarning')
+        self.progressBar.blocker = gui3d.Object(self.progressBar, [0, 0, 9.7], gui3d.RectangleMesh(800, 600), visible=False)
         self.scene3d.update()
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
+        self.progressBar.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
+        self.progressBar.blocker.show()
         
         @self.dialog.button1.event
         def onClicked(event):
@@ -452,10 +455,13 @@ class MHApplication(gui3d.Application):
         self.progressBar.setPosition([event.width-150, event.height-15, 9.85])
         
         self.dialog.blocker.mesh.resize(event.width, event.height)
-        self.dialog.box.setPosition([event.width/2-100, event.height/2-50, 9.8])
-        self.dialog.text.setPosition([event.width/2-100+10, event.height/2-50+25, 9.81])
-        self.dialog.button1.setPosition([event.width/2+100-60-10, event.height/2+50-20-10, 9.81])
-        self.dialog.button2.setPosition([event.width/2+100-60-10-60-5, event.height/2+50-20-10, 9.81])
+        self.dialog.box.setPosition([event.width/2-100, event.height/2-75, 9.8])
+        self.dialog.text.setPosition([event.width/2-100+10, event.height/2-75+25, 9.81])
+        self.dialog.check.setPosition([event.width/2-100 +10, event.height/2+75-20-10-24, 9.81])
+        self.dialog.button1.setPosition([event.width/2+100-60-10-60-5, event.height/2 +75-20-10, 9.81])
+        self.dialog.button2.setPosition([event.width/2+100-60-10, event.height/2 +75-20-10, 9.81])
+        
+        self.progressBar.blocker.mesh.resize(event.width, event.height)
         
     # Undo-redo
     def do(self, action):
