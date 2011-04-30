@@ -8,8 +8,11 @@
 #	define min(a,b) (((a) < (b)) ? (a) : (b))
 #	define max(a,b) (((a) > (b)) ? (a) : (b))
 #else
-#	include <dgemm.h>
-#	include <dgesvd.h>
+
+#include <dgemm.h>
+#include <dgesvd.h>
+#include <dgetrf.h>
+
 #endif
 
 //includes lapack...
@@ -157,10 +160,37 @@ static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
   return Py_BuildValue("[O,O,O]", _u, _s, _vt);
 }
 
+//lu factorization : A= P*L*U
+static PyObject* mh_dgetrf(PyObject *self, PyObject *args)
+{
+  PyObject *_a, *_result;
+  double *a;
+  int i,j;
+  long info = 0;
+  int dims = 0;
+  
+  if (!PyArg_ParseTuple(args, "Oii", &_a, &i, &j))
+    return NULL;
+  
+  // need to be freed in the end
+  a = PyObj2DoublePtr(_a, i*j);
+  if (a==NULL)
+    return NULL;
+  
+  dims = min(i,j);
+  dgetrf_((long*)&i, (long*)&j, a, (long*)&i, (long*)&dims, &info);
+  _result = double2PyObj(a, i, j);
+ 
+  free(a);
+  
+  return Py_BuildValue("O", _result);
+}
+
 static PyMethodDef EmbMethods[] =
 {
     {"mmmul", mh_dgemm, METH_VARARGS, ""},
     {"svd", mh_dgesvd, METH_VARARGS, ""},
+    {"lu", mh_dgetrf, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
