@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "Makehuman"=".\Makehuman.dsp" - Package Owner=<4>
+Project: "Makehuman"=".\makehuman.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -15,19 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "linalg2"=".\linalg2\linalg2.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "test"=".\test\test.dsp" - Package Owner=<4>
+Project: "linalg_module"=".\linalg_module\linalg_module.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
