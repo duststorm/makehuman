@@ -9,6 +9,7 @@ from aljabr import * #todo: import the necessities only
 from skeleton import Skeleton
 from mh2obj import exportObj
 from mh import getPath
+from linalg import *
 print 'Pose2 plugin imported'
 
 exportPath = getPath('exports')
@@ -123,7 +124,7 @@ class PoseTaskView(gui3d.TaskView):
           self.zone = self.getJointZones(event.group.name)
 
           if self.zone:
-              for g in human.mesh.facesGroups:
+              for g in human.mesh.faceGroups:
                   if self.zone != "torso":
                     if self.zone in g.name:
                         groups.append(g)

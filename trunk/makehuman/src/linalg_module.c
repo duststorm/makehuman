@@ -1,8 +1,7 @@
-#undef min
+#include <Python.h>
+
 #undef min
 #undef max
-
-#include <Python.h>
 
 #ifdef __APPLE__ /* On OS X use cblas for matrix funcs... */
 #	include <Accelerate/Accelerate.h>
@@ -254,7 +253,7 @@ static PyMethodDef EmbMethods[] =
 };
 
 PyMODINIT_FUNC
-initlinalg(void)
+initlinalg_module(void)
 {
-    (void) Py_InitModule("linalg", EmbMethods);
+    (void) Py_InitModule("linalg_module", EmbMethods);
 }
