@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LINALG_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "D:\Program Files\Python25\include" /I "E:\MY PROJECTS\EXTLIB\lapack\INCLUDE" /I "E:\MY PROJECTS\EXTLIB\blas\INCLUDE" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LINALG_EXPORTS" /FR"\Build/" /Fp"\Build\linalg_module.pch" /YX /Fo"\Build" /Fd"\Build" /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "C:\Python26\include" /I "E:\MY PROJECTS\EXTLIB\lapack\INCLUDE" /I "E:\MY PROJECTS\EXTLIB\blas\INCLUDE" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LINALG_EXPORTS" /FR"\Build/" /Fp"\Build\linalg_module.pch" /YX /Fo"\Build" /Fd"\Build" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /win32
 # SUBTRACT MTL /mktyplib203
@@ -54,7 +54,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 python25.lib blas_win32_MT.lib lapack_win32_MT.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /nodefaultlib:"libcd.lib" /nodefaultlib:"libc.lib" /out:"D:\Program Files\Python25\DLLs\linalg_module.pyd" /libpath:"D:\PROGRAM FILES\PYTHON25\LIBS" /libpath:"E:\My Projects\extlib\blas\bin" /libpath:"E:\My Projects\extlib\lapack\bin"
+# ADD LINK32 python26.lib blas_win32_MT.lib lapack_win32_MT.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /nodefaultlib:"libcd.lib" /nodefaultlib:"libc.lib" /out:"C:\Python26\DLLs\linalg_module.pyd" /libpath:"C:\Python26\libs" /libpath:"E:\My Projects\extlib\blas\bin" /libpath:"E:\My Projects\extlib\lapack\bin"
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "linalg_module - Win32 Debug"
 
