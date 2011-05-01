@@ -1,4 +1,5 @@
 #undef min
+#undef min
 #undef max
 
 #include <Python.h>
@@ -12,6 +13,7 @@
 #include <dgemm.h>
 #include <dgesvd.h>
 #include <dgetrf.h>
+#include <dgesvx.h>
 
 #endif
 
@@ -122,7 +124,7 @@ static PyObject* mh_dgemm(PyObject *self, PyObject *args)
 //svd:  m = u*s*vt (vt is the transposed matrix of v)
 static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
 {
-  int dims;
+  int dim;
   PyObject *_m, *_u, *_s, *_vt;
   double *m, *s, *u, *vt, *work; //s = singular values of m sorted by s(i)>s(i+1) 
   int i,j;
@@ -142,9 +144,9 @@ static PyObject* mh_dgesvd(PyObject *self, PyObject *args)
   // do something with m
     
   //free in the end
-  dims = min(i,j);
+  dim = min(i,j);
   u = (double*)malloc(i*i*sizeof(double));
-  s = (double*)malloc(dims*sizeof(double));
+  s = (double*)malloc(dim*sizeof(double));
   vt = (double*)malloc(j*j*sizeof(double));
   lwork = 5*(i+j);
   work = (double*)malloc(lwork*sizeof(double));
@@ -167,7 +169,7 @@ static PyObject* mh_dgetrf(PyObject *self, PyObject *args)
   double *a;
   int i,j;
   long info = 0;
-  int dims = 0;
+  int dim = 0;
   
   if (!PyArg_ParseTuple(args, "Oii", &_a, &i, &j))
     return NULL;
@@ -177,8 +179,8 @@ static PyObject* mh_dgetrf(PyObject *self, PyObject *args)
   if (a==NULL)
     return NULL;
   
-  dims = min(i,j);
-  dgetrf_((long*)&i, (long*)&j, a, (long*)&i, (long*)&dims, &info);
+  dim = min(i,j);
+  dgetrf_((long*)&i, (long*)&j, a, (long*)&i, (long*)&dim, &info);
   _result = double2PyObj(a, i, j);
  
   free(a);
@@ -186,11 +188,68 @@ static PyObject* mh_dgetrf(PyObject *self, PyObject *args)
   return Py_BuildValue("O", _result);
 }
 
+// solving system of linear equations
+// Reference: http://www.netlib.org/lapack/double/dgesvx.f
+static PyObject* mh_dgesvx(PyObject *self, PyObject *args)
+{
+  PyObject *_a, *_b, *_x;
+  double *a, *b, *af, *r, *c, *x, *ferr, *berr, *work; //s = singular  values of m sorted by s(i)>s(i+1) 
+  long *p;
+  long *iwork;
+  int i;
+  double rcond;
+  int rhs = 1;
+  long info = 0;
+  char fact[] = "E"; //matrix will be equilibrated then factored
+  char trans[] = "T"; //be careful when using lapack and blas methods even if the parameters have the same value they should be sent with different pointers
+  char equed[] = "B";
+  
+  if (!PyArg_ParseTuple(args, "OOi", &_a, &_b, &i))
+    return NULL;
+  
+  // need to be freed in the end
+  a = PyObj2DoublePtr(_a, i*i);
+  if (a==NULL)
+    return NULL;
+  b = PyObj2DoublePtr(_b, i);
+  if (b==NULL)
+    return NULL;
+   
+  //outputs:
+  //af = 0;
+  af = (double*)malloc(i*i*sizeof(double));
+  //r = 0;
+  r = (double*)malloc(i*sizeof(double));
+  //c = 0;
+  c = (double*)malloc(i*sizeof(double));
+  //x = 0;
+  x = (double*)malloc(i*sizeof(double));
+  //ferr = 0;
+  ferr = (double*)malloc(sizeof(double));
+  //berr = 0;
+  berr = (double*)malloc(sizeof(double));
+  //work = 0;
+  work = (double*)malloc(4*i*sizeof(double));
+  //p = 0;
+  p = (long*)malloc(i*sizeof(long));
+  iwork = (long*)malloc(i*sizeof(long));
+
+  dgesvx_(fact, trans, (long*)&i, (long*)&rhs, a, (long*)&i, af, (long*)&i, p, equed, r, c, b, (long*)&i, x, (long*)&i, (double*)&rcond, ferr, berr, work, iwork, &info);
+  
+  _x = double2PyObj(x, 1, i);
+  
+  free(iwork); free(p); free(work); free(berr); free(ferr); free(x); free(c);
+  free(r); free(af); free(b); free(a);
+
+  return Py_BuildValue("O", _x);
+}
+
 static PyMethodDef EmbMethods[] =
 {
     {"mmmul", mh_dgemm, METH_VARARGS, ""},
     {"svd", mh_dgesvd, METH_VARARGS, ""},
     {"lu", mh_dgetrf, METH_VARARGS, ""},
+    {"svx", mh_dgesvx, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
