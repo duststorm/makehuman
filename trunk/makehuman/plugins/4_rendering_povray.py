@@ -20,20 +20,19 @@ class PovrayTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Povray')
 
-        y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6));y+=25
+        optionsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6))
         
         #Buttons
         source=[]
-        self.iniButton = gui3d.RadioButton(self, source, [18, y, 9.02], 'Use ini settings');y+=24
-        self.guiButton = gui3d.RadioButton(self, source, [18, y, 9.02], 'Use gui settings', selected = True);y+=24
+        self.iniButton = gui3d.RadioButton(optionsBox, source, 'Use ini settings')
+        self.guiButton = gui3d.RadioButton(optionsBox, source, 'Use gui settings', selected = True)
         format=[]
-        self.arrayButton = gui3d.RadioButton(self, format, [18, y, 9.02], 'Array format');y+=24
-        self.mesh2Button = gui3d.RadioButton(self, format, [18, y, 9.02], 'Mesh2 format', selected = True);y+=24
+        self.arrayButton = gui3d.RadioButton(optionsBox, format, 'Array format')
+        self.mesh2Button = gui3d.RadioButton(optionsBox, format, 'Mesh2 format', selected = True)
         action=[]
-        self.exportButton = gui3d.RadioButton(self, action, [18, y, 9.02], 'Export only', selected = True);y+=24
-        self.exportandrenderButton = gui3d.RadioButton(self, action, [18, y, 9.02], 'Export and render');y+=24
-        self.renderButton = gui3d.Button(self, [18, y, 9.02], 'Render');y+=24
+        self.exportButton = gui3d.RadioButton(optionsBox, action , 'Export only', selected = True)
+        self.exportandrenderButton = gui3d.RadioButton(optionsBox, action , 'Export and render')
+        self.renderButton = gui3d.Button(optionsBox, 'Render')
 
         @self.renderButton.event
         def onClicked(event):            

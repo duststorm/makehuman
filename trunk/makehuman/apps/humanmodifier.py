@@ -82,10 +82,10 @@ class ModifierAction:
         
 class ModifierSlider(Slider):
     
-    def __init__(self, parent, position, value=0.0, min=0.0, max=1.0, label=None,
+    def __init__(self, parent, value=0.0, min=0.0, max=1.0, label=None,
         style=SliderStyle, thumbStyle=SliderThumbStyle, modifier=None):
         
-        Slider.__init__(self, parent, position, value, min, max, label)
+        Slider.__init__(self, parent, value, min, max, label)
         self.modifier = modifier
         self.value = None
         

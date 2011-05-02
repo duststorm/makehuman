@@ -5,53 +5,54 @@
 import gui3d, events3d
     
 class AppShortcutEdit(gui3d.ShortcutEdit):
-    def __init__(self, parent, position, method):
-        gui3d.ShortcutEdit.__init__(self, parent, position, parent.app.getShortcut(method))
+    def __init__(self, parent, method):
+        gui3d.ShortcutEdit.__init__(self, parent, parent.app.getShortcut(method))
         self.method = method
 
     def onChanged(self, shortcut):
         if not self.app.setShortcut(shortcut[0], shortcut[1], self.method):
             self.setShortcut(self.app.getShortcut(self.method))
 
+ShortcutLabelStyle = gui3d.TextViewStyle._replace(width=50)
+
 class ShortcutsTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Shortcuts')
         
-        y = 80
-        self.cameraBox = gui3d.GroupBox(self, [10, y, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=25+25*17+6));y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Turn left", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.rotateLeft);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Turn up", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.rotateUp);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Turn down", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.rotateDown);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Turn right", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.rotateRight);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Pan up", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.panUp);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Pan down", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.panDown);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Pan right", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.panRight);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Pan left", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.panLeft);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Zoom in", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.zoomIn);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Zoom out", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.zoomOut);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Front view", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.frontView);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Right view", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.rightView);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Top view", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.topView);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Back view", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.backView);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Left view", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.leftView);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Bottom view", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.bottomView);y+=25
-        gui3d.TextView(self.cameraBox, [18,y + 5, 9.2], "Reset view", 47, 2);AppShortcutEdit(self.cameraBox, [68,y, 9.2], self.app.resetView);y+=25
+        self.cameraBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=25+25*17+6))
+        gui3d.TextView(self.cameraBox, "Turn left", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.rotateLeft)
+        gui3d.TextView(self.cameraBox, "Turn up", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.rotateUp)
+        gui3d.TextView(self.cameraBox, "Turn down", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.rotateDown)
+        gui3d.TextView(self.cameraBox, "Turn right", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.rotateRight)
+        gui3d.TextView(self.cameraBox, "Pan up", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.panUp)
+        gui3d.TextView(self.cameraBox, "Pan down", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.panDown)
+        gui3d.TextView(self.cameraBox, "Pan right", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.panRight)
+        gui3d.TextView(self.cameraBox, "Pan left", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.panLeft)
+        gui3d.TextView(self.cameraBox, "Zoom in", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.zoomIn)
+        gui3d.TextView(self.cameraBox, "Zoom out", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.zoomOut)
+        gui3d.TextView(self.cameraBox, "Front view", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.frontView)
+        gui3d.TextView(self.cameraBox, "Right view", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.rightView)
+        gui3d.TextView(self.cameraBox, "Top view", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.topView)
+        gui3d.TextView(self.cameraBox, "Back view", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.backView)
+        gui3d.TextView(self.cameraBox, "Left view", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.leftView)
+        gui3d.TextView(self.cameraBox, "Bottom view", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.bottomView)
+        gui3d.TextView(self.cameraBox, "Reset view", style=ShortcutLabelStyle);AppShortcutEdit(self.cameraBox, self.app.resetView)
 
         y = 80
         self.actionBox = gui3d.GroupBox(self, [650, y, 9.0], 'Actions', gui3d.GroupBoxStyle._replace(height=25+25*2+6));y+=25
-        gui3d.TextView(self.actionBox, [658,y + 5, 9.2], "Undo", 47, 2);AppShortcutEdit(self.actionBox, [708,y, 9.2], self.app.undo);y+=25
-        gui3d.TextView(self.actionBox, [658,y + 5, 9.2], "Redo", 47, 2);AppShortcutEdit(self.actionBox, [708,y, 9.2], self.app.redo);y+=25
+        gui3d.TextView(self.actionBox, "Undo", style=ShortcutLabelStyle);AppShortcutEdit(self.actionBox, self.app.undo);y+=25
+        gui3d.TextView(self.actionBox, "Redo", style=ShortcutLabelStyle);AppShortcutEdit(self.actionBox, self.app.redo);y+=25
         y+= 10
         
         self.navigationBox = gui3d.GroupBox(self, [650, y, 9.0], 'Navigation', gui3d.GroupBoxStyle._replace(height=25+25*7+6));y+=25
-        gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Modelling", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.goToModelling);y+=25
-        gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Save", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.goToSave);y+=25
-        gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Load", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.goToLoad);y+=25
-        gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Export", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.goToExport);y+=25
-        gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Rendering", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.goToRendering);y+=25
-        gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Help", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.goToHelp);y+=25
-        gui3d.TextView(self.navigationBox, [658,y + 5, 9.2], "Exit", 47, 2);AppShortcutEdit(self.navigationBox, [708,y, 9.2], self.app.promptAndExit);y+=25
+        gui3d.TextView(self.navigationBox, "Modelling", style=ShortcutLabelStyle);AppShortcutEdit(self.navigationBox, self.app.goToModelling);y+=25
+        gui3d.TextView(self.navigationBox, "Save", style=ShortcutLabelStyle);AppShortcutEdit(self.navigationBox, self.app.goToSave);y+=25
+        gui3d.TextView(self.navigationBox, "Load", style=ShortcutLabelStyle);AppShortcutEdit(self.navigationBox, self.app.goToLoad);y+=25
+        gui3d.TextView(self.navigationBox, "Export", style=ShortcutLabelStyle);AppShortcutEdit(self.navigationBox, self.app.goToExport);y+=25
+        gui3d.TextView(self.navigationBox, "Rendering", style=ShortcutLabelStyle);AppShortcutEdit(self.navigationBox, self.app.goToRendering);y+=25
+        gui3d.TextView(self.navigationBox, "Help", style=ShortcutLabelStyle);AppShortcutEdit(self.navigationBox, self.app.goToHelp);y+=25
+        gui3d.TextView(self.navigationBox, "Exit", style=ShortcutLabelStyle);AppShortcutEdit(self.navigationBox, self.app.promptAndExit);y+=25
     
     def onShow(self, event):
         

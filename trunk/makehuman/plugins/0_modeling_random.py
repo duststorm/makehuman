@@ -8,12 +8,11 @@ class RandomTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Random')
         
-        y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Tools', gui3d.GroupBoxStyle._replace(height=25+24*4+6));y+=25
-        self.macro = gui3d.CheckBox(self, [18, y, 9.2], "Macro", True);y+=24
-        self.height = gui3d.CheckBox(self, [18, y, 9.2], "Height");y+=24
-        self.create = gui3d.Button(self, [18, y, 9.2], "Create new");y+=24
-        self.modify = gui3d.Button(self, [18, y, 9.2], "Modify current");y+=24
+        toolbox = gui3d.GroupBox(self, [10, 80, 9.0], 'Tools', gui3d.GroupBoxStyle._replace(height=25+24*4+6))
+        self.macro = gui3d.CheckBox(toolbox, "Macro", True)
+        self.height = gui3d.CheckBox(toolbox, "Height")
+        self.create = gui3d.Button(toolbox, "Create new")
+        self.modify = gui3d.Button(toolbox, "Modify current")
         
         @self.create.event
         def onClicked(event):

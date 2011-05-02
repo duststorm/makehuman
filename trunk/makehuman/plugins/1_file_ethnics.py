@@ -12,36 +12,36 @@ class EthnicsTaskView(gui3d.TaskView):
 
         self.ethnicGroup = []
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Ethnic', gui3d.GroupBoxStyle._replace(height=25+24*1+6));y+=25
-        self.africa = gui3d.RadioButton(self,self.ethnicGroup, [18,y, 9.2], "Africa", True, gui3d.ButtonStyle);y+=24
+        ethnicBox = gui3d.GroupBox(self, [10, y, 9.0], 'Ethnic', gui3d.GroupBoxStyle._replace(height=25+24*1+6));y+=25
+        self.africa = gui3d.RadioButton(ethnicBox, self.ethnicGroup, "Africa", True, gui3d.ButtonStyle);y+=24
         y+=16
         
         self.subEthnicGroup = []
-        gui3d.GroupBox(self, [10, y, 9.0], 'Sub ethnic', gui3d.GroupBoxStyle._replace(height=25+24*7+6));y+=25
-        self.aethiopid = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Aethiopid", True, gui3d.ButtonStyle);y+=24
-        self.center = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Center", style = gui3d.ButtonStyle);y+=24
-        self.khoisan = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Khoisan", style = gui3d.ButtonStyle);y+=24
-        self.nilotid = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Nilotid", style = gui3d.ButtonStyle);y+=24
-        self.pigmy = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Pigmy", style = gui3d.ButtonStyle);y+=24
-        self.sudanid = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Sudanid", style = gui3d.ButtonStyle);y+=24
-        self.bantu = gui3d.RadioButton(self, self.subEthnicGroup, [18,y, 9.2], "Bantu", style = gui3d.ButtonStyle);y+=24
+        subEthnicBox = gui3d.GroupBox(self, [10, y, 9.0], 'Sub ethnic', gui3d.GroupBoxStyle._replace(height=25+24*7+6));y+=25
+        self.aethiopid = gui3d.RadioButton(subEthnicBox, self.subEthnicGroup, "Aethiopid", True, gui3d.ButtonStyle);y+=24
+        self.center = gui3d.RadioButton(subEthnicBox, self.subEthnicGroup, "Center", style = gui3d.ButtonStyle);y+=24
+        self.khoisan = gui3d.RadioButton(subEthnicBox, self.subEthnicGroup, "Khoisan", style = gui3d.ButtonStyle);y+=24
+        self.nilotid = gui3d.RadioButton(subEthnicBox, self.subEthnicGroup, "Nilotid", style = gui3d.ButtonStyle);y+=24
+        self.pigmy = gui3d.RadioButton(subEthnicBox, self.subEthnicGroup, "Pigmy", style = gui3d.ButtonStyle);y+=24
+        self.sudanid = gui3d.RadioButton(subEthnicBox, self.subEthnicGroup, "Sudanid", style = gui3d.ButtonStyle);y+=24
+        self.bantu = gui3d.RadioButton(subEthnicBox, self.subEthnicGroup, "Bantu", style = gui3d.ButtonStyle);y+=24
         
         self.genderGroup = []
         y = 80
         self.genderBox = gui3d.GroupBox(self, [650, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
-        self.female = gui3d.RadioButton(self.genderBox, self.genderGroup, [658,y, 9.2], "Female", True, gui3d.ButtonStyle);y+=24
-        self.male = gui3d.RadioButton(self.genderBox, self.genderGroup, [658,y, 9.2], "Male", style = gui3d.ButtonStyle);y+=24
+        self.female = gui3d.RadioButton(self.genderBox, self.genderGroup, "Female", True, gui3d.ButtonStyle);y+=24
+        self.male = gui3d.RadioButton(self.genderBox, self.genderGroup, "Male", style = gui3d.ButtonStyle);y+=24
         y+=16
         
         self.ageGroup = []
         self.ageBox = gui3d.GroupBox(self, [650, y, 9.0], 'Age', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
-        self.child = gui3d.RadioButton(self.ageBox, self.ageGroup, [658,y, 9.2], "Child", True, gui3d.ButtonStyle);y+=24
-        self.young = gui3d.RadioButton(self.ageBox, self.ageGroup, [658,y, 9.2], "Young", style = gui3d.ButtonStyle);y+=24
-        self.old = gui3d.RadioButton(self.ageBox, self.ageGroup, [658,y, 9.2], "Old", style = gui3d.ButtonStyle);y+=24
+        self.child = gui3d.RadioButton(self.ageBox, self.ageGroup, "Child", True, gui3d.ButtonStyle);y+=24
+        self.young = gui3d.RadioButton(self.ageBox, self.ageGroup, "Young", style = gui3d.ButtonStyle);y+=24
+        self.old = gui3d.RadioButton(self.ageBox, self.ageGroup, "Old", style = gui3d.ButtonStyle);y+=24
         y+=16
         
         self.loadBox = gui3d.GroupBox(self, [650, y, 9.0], 'Load', gui3d.GroupBoxStyle._replace(height=25+24*1+6));y+=25
-        self.load = gui3d.Button(self.loadBox, [658,y, 9.2], "Load");y+=24
+        self.load = gui3d.Button(self.loadBox, "Load");y+=24
         
         @self.load.event
         def onClicked(event):

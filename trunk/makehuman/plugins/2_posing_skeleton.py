@@ -34,7 +34,7 @@ class SkeletonView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Skeleton')
         
-        self.status = gui3d.TextView(self, [10, 585, 9.1])
+        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1))
         
         self.__skeleton = Skeleton()
         self.__skeletonMesh = None

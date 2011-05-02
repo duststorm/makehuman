@@ -8,8 +8,8 @@ import humanmodifier
 print 'Expression imported'
 
 class GroupBoxRadioButton(gui3d.RadioButton):
-    def __init__(self, parent, group, y, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, parent, group, [658, y, 9.1], label, selected, style=gui3d.ButtonStyle)
+    def __init__(self, parent, group, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, parent, group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):
@@ -18,9 +18,9 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.show()
         
 class ExpressionSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, y, label, modifier):
+    def __init__(self, parent, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, [10, y, 9.1], label=label, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, parent, label=label, modifier=modifier)
 
 class ExpressionTaskView(gui3d.TaskView):
 
@@ -46,8 +46,6 @@ class ExpressionTaskView(gui3d.TaskView):
             ('anger2', ['skeptical', 'vindictive', 'pout', 'furious', 'grumpy']),
             ('anger3', ['arrogant', 'sneering', 'haughty', 'disgusted'])
             ]
-
-        y = 80
         
         self.groupBoxes = []
         self.radioButtons = []
@@ -55,8 +53,7 @@ class ExpressionTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=25+24*len(expressions)+6))
-        y += 25
+        self.categoryBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=25+24*len(expressions)+6))
         
         for name, subnames in expressions:
             # Create box
@@ -64,19 +61,15 @@ class ExpressionTaskView(gui3d.TaskView):
             self.groupBoxes.append(box)
             
             # Create sliders
-            yy = 80 + 25
-            
             for subname in subnames:
                 
                 modifier = humanmodifier.GenderAgeModifier('data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
                 self.modifiers[subname] = modifier
-                slider = ExpressionSlider(box, yy, subname.capitalize(), modifier)
+                slider = ExpressionSlider(box, subname.capitalize(), modifier)
                 self.sliders.append(slider)
-                yy += 36
             
             # Create radiobutton
-            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, y, name.capitalize(), box, selected=len(self.radioButtons) == 0)
-            y += 24
+            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0)
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()

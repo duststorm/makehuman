@@ -166,7 +166,7 @@ class MHApplication(gui3d.Application):
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
         self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
-        self.progressBar = gui3d.ProgressBar(self, [800-150, 600-15, 9.85])
+        self.progressBar = gui3d.ProgressBar(self, style=gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85))
         self.scene3d.update()
         self.redrawNow()
 
@@ -309,9 +309,12 @@ class MHApplication(gui3d.Application):
         def onClicked(event):
             self.promptAndExit()
           
-        self.undoButton = gui3d.Button(self, [650, 508, 9.1], "Undo", style=gui3d.ButtonStyle._replace(width=40, height=16))
-        self.redoButton = gui3d.Button(self, [694, 508, 9.1], "Redo", style=gui3d.ButtonStyle._replace(width=40, height=16))
-        self.resetButton = gui3d.Button(self, [738, 508, 9.1], "Reset", style=gui3d.ButtonStyle._replace(width=40, height=16))
+        self.undoButton = gui3d.Button(self, "Undo",
+            style=gui3d.ButtonStyle._replace(width=40, height=16, left=650, top=508, zIndex=9.1))
+        self.redoButton = gui3d.Button(self, "Redo",
+            style=gui3d.ButtonStyle._replace(width=40, height=16, left=694, top=508, zIndex=9.1))
+        self.resetButton = gui3d.Button(self, "Reset",
+            style=gui3d.ButtonStyle._replace(width=40, height=16, left=738, top=508, zIndex=9.1))
                                         
         @self.undoButton.event
         def onClicked(event):
@@ -327,8 +330,10 @@ class MHApplication(gui3d.Application):
             human.resetMeshValues()
             human.applyAllTargets(self.progress)
           
-        self.globalButton = gui3d.Button(self, [650, 530, 9.2], "Global cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
-        self.faceButton = gui3d.Button(self, [650, 555, 9.2], "Face cam", style=gui3d.ButtonStyle._replace(width=128, height=20))
+        self.globalButton = gui3d.Button(self, "Global cam",
+            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=530, zIndex=9.1))
+        self.faceButton = gui3d.Button(self, "Face cam",
+            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1))
         
         @self.globalButton.event
         def onClicked(event):
@@ -352,10 +357,10 @@ class MHApplication(gui3d.Application):
         self.dialog = gui3d.View(self)
         self.dialog.blocker = gui3d.Object(self.dialog, [0, 0, 9.7], gui3d.RectangleMesh(800, 600))
         self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150))
-        self.dialog.text = gui3d.TextView(self.dialog, [800 / 2 - 100 + 10, 600 / 2 - 75 + 25, 9.81], '', 180)
-        self.dialog.check = gui3d.CheckBox(self.dialog, [800 / 2 - 100 +10, 600 / 2 + 75 - 20 - 10 - 24, 9.81], "Don't show this again")
-        self.dialog.button1 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10 - 60 - 5, 600 / 2 + 75 - 20 - 10, 9.81], '', style=gui3d.ButtonStyle._replace(width=60))
-        self.dialog.button2 = gui3d.Button(self.dialog, [800 / 2 + 100 - 60 - 10, 600 / 2 + 75 - 20 - 10, 9.81], '', style=gui3d.ButtonStyle._replace(width=60))
+        self.dialog.text = gui3d.TextView(self.dialog, '', style=gui3d.TextViewStyle._replace(left=800 / 2 - 100 + 10, top=600 / 2 - 75 + 25, zIndex=9.81))
+        self.dialog.check = gui3d.CheckBox(self.dialog, "Don't show this again", style=gui3d.CheckBoxStyle._replace(left=800 / 2 - 100 +10, top=600 / 2 + 75 - 20 - 10 - 24, zIndex=9.81))
+        self.dialog.button1 = gui3d.Button(self.dialog, '', style=gui3d.ButtonStyle._replace(width=60, left=800 / 2 + 100 - 60 - 10 - 60 - 5, top=600 / 2 + 75 - 20 - 10, zIndex=9.81))
+        self.dialog.button2 = gui3d.Button(self.dialog, '', style=gui3d.ButtonStyle._replace(width=60, left=800 / 2 + 100 - 60 - 10, top=600 / 2 + 75 - 20 - 10, zIndex=9.81))
         self.dialog.button1Action = None
         self.dialog.button2Action = None
         self.dialog.helpId = None

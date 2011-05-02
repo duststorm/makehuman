@@ -27,6 +27,9 @@ from aljabr import in2pts, vadd, vsub, calcBBox
 HairButtonStyle = gui3d.Style(**{
     'width':32,
     'height':32,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':None,
     'selected':None,
@@ -42,8 +45,8 @@ class HairTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Hair')
         self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png')
         
-        self.hairButton = gui3d.Button(self.app.categories['Modelling'], [800-216, 600-36, 9.2],
-            style=HairButtonStyle._replace(normal='data/hairstyles/clear.png'))
+        self.hairButton = gui3d.Button(self.app.categories['Modelling'],
+            style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png'))
         
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
         self.oHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]

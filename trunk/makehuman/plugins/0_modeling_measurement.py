@@ -13,9 +13,9 @@ import events3d
 import aljabr
 
 class MeasureSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, y, template, measure, modifier):
+    def __init__(self, parent, template, measure, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, [10, y, 9.1], value=0.0, min=-1.0, max=1.0,
+        humanmodifier.ModifierSlider.__init__(self, parent, value=0.0, min=-1.0, max=1.0,
             label=template + parent.parent.getMeasure(measure), modifier=modifier)
         self.template = template
         self.measure = measure
@@ -89,29 +89,26 @@ class MeasureTaskView(gui3d.TaskView):
             self.groupBoxes[name] = box
             
             # Create sliders
-            yy = 80 + 25
-            
             for subname in subnames:
                 modifier = humanmodifier.Modifier(
                     os.path.join(measureDataPath, "measure-%s-decrease.target" % subname),
                     os.path.join(measureDataPath, "measure-%s-increase.target" % subname))
                 self.modifiers[subname] = modifier
-                slider = MeasureSlider(box, yy, sliderLabel[subname], subname, modifier)
+                slider = MeasureSlider(box, sliderLabel[subname], subname, modifier)
                 self.sliders.append(slider)
-                yy += 36
                
         y = 80
         self.statsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Statistics', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
-        self.height = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Height: ');y += 22
-        self.chest = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Chest: ');y += 22
-        self.waist = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Waist: ');y += 22
-        self.hips = gui3d.TextView(self.statsBox, [658, y, 9.1], 'Hips: ');y += 22
+        self.height = gui3d.TextView(self.statsBox, 'Height: ');y += 22
+        self.chest = gui3d.TextView(self.statsBox, 'Chest: ');y += 22
+        self.waist = gui3d.TextView(self.statsBox, 'Waist: ');y += 22
+        self.hips = gui3d.TextView(self.statsBox, 'Hips: ');y += 22
         y+=16
         self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
-        self.eu = gui3d.TextView(self.braBox, [658, y, 9.1], 'EU: ');y += 22
-        self.jp = gui3d.TextView(self.braBox, [658, y, 9.1], 'JP: ');y += 22
-        self.us = gui3d.TextView(self.braBox, [658, y, 9.1], 'US: ');y += 22
-        self.uk = gui3d.TextView(self.braBox, [658, y, 9.1], 'UK: ');y += 22
+        self.eu = gui3d.TextView(self.braBox, 'EU: ');y += 22
+        self.jp = gui3d.TextView(self.braBox, 'JP: ');y += 22
+        self.us = gui3d.TextView(self.braBox, 'US: ');y += 22
+        self.uk = gui3d.TextView(self.braBox, 'UK: ');y += 22
         y+=16
             
     def getMeasure(self, measure):
@@ -131,7 +128,7 @@ class MeasureTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         
-        self.statsBox.setPosition([event.width - 150, self.braBox.getPosition()[1], 9.0])
+        self.statsBox.setPosition([event.width - 150, self.statsBox.getPosition()[1], 9.0])
         self.braBox.setPosition([event.width - 150, self.braBox.getPosition()[1], 9.0])
         
     def hideAllSliders(self):

@@ -13,8 +13,8 @@ import events3d
 
 class AssymSlider(gui3d.Slider):
     
-    def __init__(self, parent, x, y, bodypart, label):
-        gui3d.Slider.__init__(self, parent, position=[x, y, 9.3], value=0.0, min=-1.0, max=1.0, label=label)
+    def __init__(self, parent, bodypart, label):
+        gui3d.Slider.__init__(self, parent, value=0.0, min=-1.0, max=1.0, label=label)
         self.bodypart = bodypart
         
     def onChange(self, value):
@@ -29,21 +29,20 @@ class AsymmTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Asymmetry')
 
         #Sliders
-        y = 80
-        self.leftBox = gui3d.GroupBox(self, [10, y, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*9+6));y+=25
-        self.asymmBrowSlider = AssymSlider(self.leftBox, 10, y, "brown", "Brow asymmetry");y+=36
-        self.asymmCheekSlider = AssymSlider(self.leftBox, 10, y, "cheek", "Cheek asymmetry");y+=36
-        self.asymmEarsSlider = AssymSlider(self.leftBox, 10, y,  "ear", "Ears asymmetry");y+=36
-        self.asymmEyeSlider = AssymSlider(self.leftBox, 10, y, "eye", "Eye asymmetry");y+=36
-        self.asymmJawSlider = AssymSlider(self.leftBox, 10, y, "jaw", "Jaw asymmetry");y+=36
-        self.asymmMouthSlider = AssymSlider(self.leftBox, 10, y, "mouth", "Mouth asymmetry");y+=36
-        self.asymmNoseSlider = AssymSlider(self.leftBox, 10, y, "nose", "Nose asymmetry");y+=36
-        self.asymmTempleSlider = AssymSlider(self.leftBox, 10, y, "temple", "Temple asymmetry");y+=36
-        self.asymmTopSlider = AssymSlider(self.leftBox, 10, y, "top", "Top asymmetry");y+=36 + 16
-        y = 80
-        self.rightBox = gui3d.GroupBox(self, [650, y, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
-        self.asymmTrunkSlider = AssymSlider(self.rightBox, 650, y, "trunk", "Trunk asymmetry");y+=36
-        self.asymmBreastSlider = AssymSlider(self.rightBox, 650, y, "breast", "Breast asymmetry")
+        self.leftBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*9+6))
+        self.asymmBrowSlider = AssymSlider(self.leftBox, "brown", "Brow asymmetry")
+        self.asymmCheekSlider = AssymSlider(self.leftBox, "cheek", "Cheek asymmetry")
+        self.asymmEarsSlider = AssymSlider(self.leftBox, "ear", "Ears asymmetry")
+        self.asymmEyeSlider = AssymSlider(self.leftBox, "eye", "Eye asymmetry")
+        self.asymmJawSlider = AssymSlider(self.leftBox, "jaw", "Jaw asymmetry")
+        self.asymmMouthSlider = AssymSlider(self.leftBox, "mouth", "Mouth asymmetry")
+        self.asymmNoseSlider = AssymSlider(self.leftBox, "nose", "Nose asymmetry")
+        self.asymmTempleSlider = AssymSlider(self.leftBox, "temple", "Temple asymmetry")
+        self.asymmTopSlider = AssymSlider(self.leftBox, "top", "Top asymmetry")
+
+        self.rightBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=25+36*2+6))
+        self.asymmTrunkSlider = AssymSlider(self.rightBox, "trunk", "Trunk asymmetry")
+        self.asymmBreastSlider = AssymSlider(self.rightBox, "breast", "Breast asymmetry")
 
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"

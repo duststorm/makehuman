@@ -8,8 +8,8 @@ import humanmodifier
 print 'Face imported'
 
 class GroupBoxRadioButton(gui3d.RadioButton):
-    def __init__(self, parent, group, y, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, parent, group, [658, y, 9.1], label, selected, style=gui3d.ButtonStyle)
+    def __init__(self, parent, group, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, parent, group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):
@@ -18,15 +18,15 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.show()
         
 class FaceSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, y, label, modifier):
+    def __init__(self, parent, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, [10, y, 9.1], label=label, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, parent, label=label, modifier=modifier)
         
 class DetailSlider(humanmodifier.ModifierSlider):
     
-    def __init__(self, parent, x, y, value, min, max, label, modifier):
+    def __init__(self, parent, value, min, max, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, [x, y, 9.1], value, min, max, label, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, parent, value, min, max, label, modifier=modifier)
         
 class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
     
@@ -86,17 +86,14 @@ class FaceTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
-                    radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, y, title, box, selected=len(self.radioButtons) == 0)
+                    radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, title, box, selected=len(self.radioButtons) == 0)
                     y += 24
-                    
-                    yy = 80 + 25
             
                 # Create sliders
                 modifier = humanmodifier.GenderAgeModifier(template)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
-                slider = FaceSlider(box, yy, '%s %d' % (name.capitalize(), index + 1), modifier)
+                slider = FaceSlider(box, '%s %d' % (name.capitalize(), index + 1), modifier)
                 self.sliders.append(slider)
-                yy += 36
                 
         y += 16
 
@@ -106,10 +103,9 @@ class FaceTaskView(gui3d.TaskView):
         self.headAgeModifier = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-head-age${headAge}.target', 'headAge', '1', '2', False)
         self.faceAngleModifier = humanmodifier.Modifier('data/targets/details/facial-angle1.target', 'data/targets/details/facial-angle2.target')
 
-        self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
-        
-        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Age", self.headAgeModifier));y+=36
-        self.sliders.append(DetailSlider(self.headBox, 650, y, 0.0, -1.0, 1.0, "Face angle", self.faceAngleModifier));y+=36
+        self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=25+36*2+6))
+        self.sliders.append(DetailSlider(self.headBox, 0.0, -1.0, 1.0, "Age", self.headAgeModifier))
+        self.sliders.append(DetailSlider(self.headBox, 0.0, -1.0, 1.0, "Face angle", self.faceAngleModifier))
         
     def hideAllBoxes(self):
         

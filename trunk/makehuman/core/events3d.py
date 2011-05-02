@@ -100,7 +100,7 @@ class EventHandler:
 
     def callEvent(self, eventType, event):
 
-    # print("Sending", eventType, "to", self)
+        #print("Sending %s to %s" % (eventType, self))
 
         if hasattr(self, eventType):
             getattr(self, eventType)(event)

@@ -11,12 +11,11 @@ class HelpTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Help')
 
-        y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Support options', gui3d.GroupBoxStyle._replace(height=25+24*4+6));y+=25
-        self.manualButton = gui3d.Button(self, [18, y, 9.5], "Manual");y+=24
-        self.reportBugButton = gui3d.Button(self, [18, y, 9.5], "Report bug");y+=24
-        self.requestFeatureButton = gui3d.Button(self, [18, y, 9.5], "Request feature");y+=24
-        self.donateButton = gui3d.Button(self, [18, y, 9.5], "Donate");y+=24
+        optionsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Support options', gui3d.GroupBoxStyle._replace(height=25+24*4+6))
+        self.manualButton = gui3d.Button(optionsBox, "Manual")
+        self.reportBugButton = gui3d.Button(optionsBox, "Report bug")
+        self.requestFeatureButton = gui3d.Button(optionsBox, "Request feature")
+        self.donateButton = gui3d.Button(optionsBox, "Donate")
         
         @self.manualButton.event
         def onClicked(event):

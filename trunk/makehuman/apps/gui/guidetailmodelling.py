@@ -508,9 +508,9 @@ class Detail3dTool(events3d.EventHandler):
 
 class DetailSlider(humanmodifier.ModifierSlider):
     
-    def __init__(self, parent, x, y, value, min, max, label, modifier):
+    def __init__(self, parent, value, min, max, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, [x, y, 9.1], value, min, max, label, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, parent, value, min, max, label, modifier=modifier)
 
 class DetailModelingTaskView(gui3d.TaskView):
 
@@ -549,18 +549,18 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.sliders = []
         
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
+        genderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
-        self.sliders.append(DetailSlider(self, 10, y, 0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals']));y+=36
-        self.sliders.append(DetailSlider(self, 10, y, 0.5, 0.0, 1.0, "Breast", self.modifiers['breastSize']));y+=36
-        self.sliders.append(DetailSlider(self, 10, y, 0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness']));y+=36
+        self.sliders.append(DetailSlider(genderBox, 0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals']));y+=36
+        self.sliders.append(DetailSlider(genderBox, 0.5, 0.0, 1.0, "Breast", self.modifiers['breastSize']));y+=36
+        self.sliders.append(DetailSlider(genderBox, 0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness']));y+=36
         y+=16
               
         self.pelvisBox = gui3d.GroupBox(self, [10, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
-        self.sliders.append(DetailSlider(self.pelvisBox, 10, y, 0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone']));y+=36
-        self.sliders.append(DetailSlider(self.pelvisBox, 10, y, 0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach']));y+=36
-        self.sliders.append(DetailSlider(self.pelvisBox, 10, y, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach']));y+=36
+        self.sliders.append(DetailSlider(self.pelvisBox, 0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks']));y+=36
         y+=16
 
         y = 80
@@ -572,8 +572,8 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         self.tool = Detail3dTool(self.app, False, 'translation')
 
-        self.translationButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, [658, y, 9.2], 'Move', True, modifierStyle)
-        self.scaleButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, [658+modifierStyle.width+4, y, 9.2], label='Scale', style=modifierStyle);y+=24
+        self.translationButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, 'Move', True, modifierStyle)
+        self.scaleButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, label='Scale', style=modifierStyle);y+=24
 
         @self.translationButton.event
         def onClicked(event):
@@ -587,10 +587,10 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
-        self.rightSymmetryButton = gui3d.Button(self.modifiersBox, [658, y, 9.2], 'Sym<', style=modifierStyle)
-        self.leftSymmetryButton = gui3d.Button(self.modifiersBox, [658+modifierStyle.width+4, y, 9.2], 'Sym>', style=modifierStyle);y+=24
-        self.symmetryButton = gui3d.ToggleButton(self.modifiersBox, [658, y, 9.2], 'Sym', style=modifierStyle)
-        self.microButton = gui3d.ToggleButton(self.modifiersBox, [658+modifierStyle.width+4, y, 9.2], 'Micro', style=modifierStyle)
+        self.rightSymmetryButton = gui3d.Button(self.modifiersBox, 'Sym<', style=modifierStyle)
+        self.leftSymmetryButton = gui3d.Button(self.modifiersBox, 'Sym>', style=modifierStyle);y+=24
+        self.symmetryButton = gui3d.ToggleButton(self.modifiersBox, 'Sym', style=modifierStyle)
+        self.microButton = gui3d.ToggleButton(self.modifiersBox, 'Micro', style=modifierStyle)
 
         @self.rightSymmetryButton.event
         def onClicked(event):

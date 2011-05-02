@@ -47,21 +47,13 @@ class ModellingCategory(gui3d.Category):
         gui3d.Category.__init__(self, parent, 'Modelling')
               
         y = 600-110
-        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
+        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24*2+6))
         
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2.0, height=20)
         
-        x = 18
-        x+=modifierStyle.width+4
-        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Anaglyphs',
-            style=modifierStyle);x+=modifierStyle.width+4
-        y += 24
-        x = 18
-        self.wireButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Wireframe',
-            style=modifierStyle)
-        x+=modifierStyle.width+4
-        self.subdivisionButton = gui3d.ToggleButton(self.viewBox, [round(x), y, 9.1], 'Smooth',
-            style=modifierStyle)
+        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, 'Anaglyphs', style=modifierStyle)
+        self.wireButton = gui3d.ToggleButton(self.viewBox, 'Wireframe', style=modifierStyle)
+        self.subdivisionButton = gui3d.ToggleButton(self.viewBox, 'Smooth', style=modifierStyle)
 
         @self.anaglyphsButton.event
         def onClicked(event):

@@ -54,17 +54,15 @@ class PoseTaskView(gui3d.TaskView):
         self.selectedGroups = []
         self.joint = None
                 
-        y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6));y+=25
+        self.box = gui3d.GroupBox(self, [10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6))
 
-        self.Xslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d");y+=36
-        self.Yslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d");y+=36
-        self.Zslider = gui3d.Slider(self, position=[10, y, 9.3], value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d");y+=36
-        y+=4
+        self.Xslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d")
+        self.Yslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d")
+        self.Zslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d")
 
-        self.resetPoseButton = gui3d.Button(self, [18, y, 9.5], "Reset");y+=24
-        self.savePoseButton = gui3d.Button(self, [18, y, 9.5], "Save");y+=24
-        self.testButton = gui3d.Button(self, [18, y, 9.5], "Test");y+=24
+        self.resetPoseButton = gui3d.Button(self.box, "Reset")
+        self.savePoseButton = gui3d.Button(self.box, "Save")
+        self.testButton = gui3d.Button(self.box, "Test")
 
         @self.testButton.event
         def onClicked(event):
@@ -76,7 +74,7 @@ class PoseTaskView(gui3d.TaskView):
 
         @self.resetPoseButton.event
         def onClicked(event):
-            self.reset(self.shoulder)
+            self.reset()
 
         @self.Xslider.event
         def onChange(value):
@@ -243,9 +241,7 @@ class PoseTaskView(gui3d.TaskView):
         for child in joint.children:
             self.rotateJoint(child, center, rotation, transform)
     
-
-    
-    def reset(self, limbToTest):
+    def reset(self):
         self.Xslider.setValue(0.0)
         self.Yslider.setValue(0.0)
         self.Zslider.setValue(0.0)

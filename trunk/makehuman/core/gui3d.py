@@ -36,11 +36,15 @@ defaultFontSize = 1.0
 defaultFontFamily = 'arial'
 
 class Style:
-    def __init__(self, width=None, height=None, mesh=None, normal=None, selected=None, focused=None, fontFamily=None, fontSize=None,
-        textAlign=None, border=None):
+    def __init__(self, width=None, height=None, left=None, top=None, zIndex=None,
+        mesh=None, normal=None, selected=None, focused=None, fontFamily=None, fontSize=None,
+        textAlign=None, border=None, padding=None, margin=None):
             
         self.width = width
         self.height = height
+        self.left=left
+        self.top=top
+        self.zIndex=zIndex
         self.mesh = mesh
         self.normal = normal
         self.selected = selected
@@ -49,11 +53,15 @@ class Style:
         self.fontSize = fontSize
         self.textAlign = textAlign
         self.border = border
+        self.padding = padding
+        self.margin = margin
         
     def _replace(self, **kwds):
         
-        style = {'width':self.width, 'height':self.height, 'mesh':self.mesh, 'normal':self.normal, 'selected':self.selected,
-                'focused':self.focused, 'fontFamily':self.fontFamily, 'fontSize':self.fontSize, 'textAlign':self.textAlign, 'border':self.border}
+        style = {'width':self.width, 'height':self.height, 'left':self.left, 'top':self.top, 'zIndex':self.zIndex,
+                'mesh':self.mesh, 'normal':self.normal, 'selected':self.selected, 'focused':self.focused,
+                'fontFamily':self.fontFamily, 'fontSize':self.fontSize, 'textAlign':self.textAlign,
+                'border':self.border, 'padding':self.padding, 'margin':self.margin}
                 
         style.update(kwds)
         return Style(**style)
@@ -274,7 +282,7 @@ class TextObject(Object):
         self.text = text
         
         self.app.scene3d.clear(self.mesh)
-        self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment);
+        self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment)
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         self.app.scene3d.update()
@@ -283,20 +291,104 @@ class TextObject(Object):
         
         return self.text
 
-# Generic view
+# Base layout
 
+class Layout:
+    
+    def __init__(self, view):
+        
+        self.view = view
+        
+    def onChildAdded(self, child):
+        
+        pass
+        
+    def rebuild(self):
+        
+        pass
+
+# Horizontal or vertical box layout
+        
+class BoxLayout(Layout):
+    
+    def __init__(self, view):
+        
+        Layout.__init__(self, view)
+        self.nextPosition = None
+        self.spaceAvailable = None
+        self.rowHeight = 0
+
+    def onChildAdded(self, child, init=True):
+
+        childWidth = child.style.width + (child.style.margin[0] + child.style.margin[2] if child.style.margin else 0)
+        childHeight = child.style.height + (child.style.margin[1] + child.style.margin[3] if child.style.margin else 0)
+        
+        if not self.nextPosition or childWidth > self.spaceAvailable:
+            
+            if not self.nextPosition:
+                #self.nextPosition = [self.view.style.left, self.view.style.top, self.view.style.zIndex]
+                self.nextPosition = self.view.getPosition()
+                self.nextPosition[0] += self.view.style.padding[0] if self.view.style.padding else 0
+                self.nextPosition[1] += self.view.style.padding[1] if self.view.style.padding else 0
+                self.nextPosition[2] += 0.1
+            else:
+                self.nextPosition[0] = self.view.getPosition()[0] + (self.view.style.padding[0] if self.view.style.padding else 0)
+                self.nextPosition[1] += self.rowHeight
+                
+            self.spaceAvailable = self.view.style.width - (self.view.style.padding[0] + self.view.style.padding[2] if self.view.style.padding else 0)
+            self.rowHeight = 0
+            
+        self.spaceAvailable -= childWidth
+
+        # Add left margin
+        self.nextPosition[0] += (child.style.margin[0] if child.style.margin else 0)
+            
+        # Make copy because the top margin is only for the child
+        position = self.nextPosition[:]
+        
+        # Add top margin
+        position[1] += (child.style.margin[1] if child.style.margin else 0)
+        
+        # Add child
+        if init:
+            child.style.left, child.style.top, child.style.zIndex = position
+        else:
+            child.setPosition(position)
+            
+        # In case not all children have the same height
+        self.rowHeight = max(self.rowHeight, childHeight)
+        
+        # Add widht and right margin
+        self.nextPosition[0] += child.style.width + (child.style.margin[2] if child.style.margin else 0)
+        
+    def rebuild(self):
+        
+        self.nextPosition = None
+        
+        for child in self.view.children:
+            self.onChildAdded(child)
+
+# Generic view
 
 class View(events3d.EventHandler):
 
-    def __init__(self, parent=None, visible=True):
+    def __init__(self, parent=None, style=None, layout=None, visible=True):
+        
+        if not parent:
+            raise RuntimeError('A view needs a parent')
+                
         self.app = parent.app
         self.parent = parent
         self.children = []
         self.objects = []
+        self.style = style
+        self.layout = layout
         self.__visible = visible
         self.__totalVisibility = parent.isVisible() and visible
 
         parent.children.append(self)
+        if self.parent.layout:
+            self.parent.layout.onChildAdded(self)
         
     def show(self):
         self.__visible = True
@@ -398,6 +490,9 @@ class View(events3d.EventHandler):
 TaskTabStyle = Style(**{
     'width':64,
     'height':26,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'button_tab2.png',
     'selected':'button_tab2_on.png',
@@ -410,17 +505,18 @@ TaskTabStyle = Style(**{
 
 class TaskView(View):
 
-    def __init__(self, category, name, label = None, style=TaskTabStyle):
-        View.__init__(self, parent=category, visible=False)
+    def __init__(self, category, name, label=None, style=TaskTabStyle):
+        View.__init__(self, category, None, None, False)
         self.name = name
         self.focusWidget = None
 
         # The button is attached to the parent, as it stays visible when the task is hidden
 
-        self.button = ToggleButton(self.parent, [2 + len(self.parent.tasks) * 66, 38.0, 9.2], (label or name), style=style)
+        self.button = ToggleButton(self.parent, (label or name),
+            style=style._replace(left=2 + len(self.parent.tasks) * 66, top=38.0, zIndex=9.2))
 
         if name in category.tasksByName:
-            raise KeyError('The task with this name already exists', name)
+            raise KeyError('A task with this name already exists', name)
 
         category.tasks.append(self)
         category.tasksByName[self.name] = self
@@ -447,6 +543,9 @@ class TaskView(View):
 CategoryTabStyle = Style(**{
     'width':64,
     'height':26,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'button_tab.png',
     'selected':'button_tab_on.png',
@@ -460,6 +559,9 @@ CategoryTabStyle = Style(**{
 CategoryButtonStyle = Style(**{
     'width':64,
     'height':22,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'button_tab3.png',
     'selected':'button_tab3_on.png',
@@ -473,17 +575,18 @@ CategoryButtonStyle = Style(**{
 class Category(View):
 
     def __init__(self, parent, name, label = None, style=CategoryTabStyle):
-        View.__init__(self, parent, visible = False)
+        View.__init__(self, parent, style, None, False)
         self.name = name
         self.tasks = []
         self.tasksByName = {}
 
         # The button is attached to the parent, as it stays visible when the category is hidden
 
-        self.button = ToggleButton(self.parent, [2 + len(self.app.categories) * 66, 6.0, 9.6], (label or name), style = style)
+        self.button = ToggleButton(self.parent, (label or name),
+            style=style._replace(left=2 + len(self.app.categories) * 66, top=6.0, zIndex=9.6))
 
         if name in parent.categories:
-            raise KeyError('The category with this name already exists', name)
+            raise KeyError('A category with this name already exists', name)
 
         parent.categories[name] = self
 
@@ -514,6 +617,7 @@ class Application(events3d.EventHandler):
         self.app = self
         self.children = []
         self.objects = []
+        self.layout = None
         self.categories = {}
         self.currentCategory = None
         self.currentTask = None
@@ -787,8 +891,11 @@ class Application(events3d.EventHandler):
 
 # Slider widget
 SliderStyle = Style(**{
-    'width':128,
+    'width':112,
     'height':32,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'slider_generic.png',
     'selected':None,
@@ -796,12 +903,16 @@ SliderStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft, 
-    'border':None
+    'border':None,
+    'margin':[2,2,2,2]
     })
     
 SliderThumbStyle = Style(**{
     'width':16,
     'height':16,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'slider.png',
     'selected':None,
@@ -821,7 +932,7 @@ class Slider(View):
     current value as parameter.
     """
 
-    def __init__(self, parent, position, value=0.0, min=0.0, max=1.0, label=None,
+    def __init__(self, parent, value=0.0, min=0.0, max=1.0, label=None,
         style=SliderStyle, thumbStyle=SliderThumbStyle):
         
         """
@@ -829,8 +940,6 @@ class Slider(View):
 
         @param parent: The parent view.
         @type parent: L{View}
-        @param position: The position.
-        @type position: C{list}
         @param value: The original value.
         @type value: C{int} or C{float}
         @param min: The minimum value.
@@ -843,26 +952,26 @@ class Slider(View):
         @type style: L{Style}
         """
         
-        View.__init__(self, parent)
+        View.__init__(self, parent, style)
         
-        self.style = style
         self.thumbStyle = thumbStyle
         
         self.thumbTexture = self.app.getThemeResource('images', thumbStyle.normal)
         self.focusedThumbTexture = self.app.getThemeResource('images', thumbStyle.focused)
         
         mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
-        self.background = Object(self, position, mesh)
+        self.background = Object(self, [style.left, style.top, style.zIndex], mesh)
         
         mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
-        self.thumb = Object(self, [position[0], position[1]+16, position[2] + 0.01], mesh)
+        self.thumb = Object(self, [style.left, style.top + 16, style.zIndex + 0.01], mesh)
             
         if isinstance(label, str):
-            self.label = TextObject(self, [position[0]+10,position[1]+8-6,position[2]+0.2], label, fontSize = style.fontSize)
+            self.label = TextObject(self, [style.left + 10, style.top + 8 - 6, style.zIndex + 0.2], label, fontSize = style.fontSize)
             if '%' in label:
                 self.labelFormat = label
-                self.edit = TextEdit(self, [position[0]+8, position[1], position[2]+0.3], '',
-                    TextEditStyle._replace(width=self.style.width-16, height=16),
+                self.edit = TextEdit(self, '',
+                    TextEditStyle._replace(width=self.style.width-16, height=16,
+                    left=style.left + 8, top=style.top, zIndex=style.zIndex + 0.3),
                     intValidator if isinstance(min, int) else floatValidator)
                 self.edit.hide()
                 
@@ -895,8 +1004,8 @@ class Slider(View):
         else:
             self.label = None
             
-        self.thumbMinX = position[0] + thumbStyle.width / 2
-        self.thumbMaxX = position[0] + style.width - thumbStyle.width - thumbStyle.width / 2
+        self.thumbMinX = style.left
+        self.thumbMaxX = style.left + style.width - thumbStyle.width
         self.min = min
         self.max = max
         self.setValue(value)
@@ -1042,6 +1151,9 @@ class Slider(View):
 ButtonStyle = Style(**{
     'width':112,
     'height':20,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'button_unselected.png',
     'selected':'button_selected.png',
@@ -1049,7 +1161,8 @@ ButtonStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
-    'border':[2, 2, 2, 2]
+    'border':[2, 2, 2, 2],
+    'margin':[2, 2, 2, 2]
     })
 
 class Button(View):
@@ -1060,15 +1173,13 @@ class Button(View):
     over the widget.
     """
 
-    def __init__(self, parent, position, label=None, selected=False, style=ButtonStyle):
+    def __init__(self, parent, label=None, selected=False, style=ButtonStyle):
         
         """
         This is the constructor for the Button class.
 
         @param parent: The parent view.
         @type parent: L{View}
-        @param position: The position.
-        @type position: C{list}
         @param label: The label.
         @type label: C{str}
         @param selected: The selected state.
@@ -1077,7 +1188,7 @@ class Button(View):
         @type style: L{Style}
         """
         
-        View.__init__(self, parent)
+        View.__init__(self, parent, style)
         
         self.label = None
         
@@ -1099,20 +1210,20 @@ class Button(View):
         self.style = style
             
         if style.mesh:
-            self.button = Object(self, position, style.mesh, texture=t)
+            self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], style.mesh, texture=t)
             if isinstance(label, str):
                 #assumes button obj origin is upper left corner
                 #TODO text should be in the middle of button, calculate this from text length
-                self.label = TextObject(self, [position[0]+5,position[1]-7,position[2]+0.001], label, fontSize = fontSize)
+                self.label = TextObject(self, [self.style.left + 5, self.style.top - 7, self.style.zIndex + 0.001], label, fontSize = fontSize)
         else:
             if border:
                 mesh = NineSliceMesh(width, height, t, border)
             else:
                 mesh = RectangleMesh(width, height, t)
-            self.button = Object(self, position, mesh)
+            self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
             if isinstance(label, str):
                 wrapWidth = (width - border[0] - border[2] if border else width) if textAlign else 0
-                self.label = TextObject(self, [position[0] + border[0],position[1]+height/2-6,position[2]+0.001], label, wrapWidth, textAlign, fontSize = fontSize)
+                self.label = TextObject(self, [self.style.left + border[0], self.style.top + height/2-6, self.style.zIndex + 0.001], label, wrapWidth, textAlign, fontSize = fontSize)
             
         self.selected = selected
         
@@ -1188,6 +1299,9 @@ class Button(View):
 RadioButtonStyle = Style(**{
     'width':112,
     'height':20,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'radio_off.png',
     'selected':'radio_on.png',
@@ -1195,7 +1309,8 @@ RadioButtonStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
-    'border':[19, 19, 4, 1]
+    'border':[19, 19, 4, 1],
+    'margin':[2, 2, 2, 2]
     })
 
 class RadioButton(Button):
@@ -1207,7 +1322,7 @@ class RadioButton(Button):
     is determined in an action by checking each radio button's selected property.
     """
     
-    def __init__(self, parent, group, position, label=None, selected=False, style=RadioButtonStyle):
+    def __init__(self, parent, group, label=None, selected=False, style=RadioButtonStyle):
             
         """
         This is the constructor for the RadioButton class.
@@ -1216,8 +1331,6 @@ class RadioButton(Button):
         @type parent: L{View}
         @param group: The group.
         @type group: C{list}
-        @param position: The position.
-        @type position: C{list}
         @param label: The label.
         @type label: C{str}
         @param selected: The selected state.
@@ -1226,7 +1339,7 @@ class RadioButton(Button):
         @type style: L{Style}
         """
         
-        Button.__init__(self, parent, position, label, selected, style)
+        Button.__init__(self, parent, label, selected, style)
         self.group = group
         self.group.append(self)
 
@@ -1262,15 +1375,13 @@ class ToggleButton(Button):
     is determined in an action by checking the toggle button's selected property.
     """
 
-    def __init__(self, parent, position, label=None, selected=False, style=ButtonStyle):
+    def __init__(self, parent, label=None, selected=False, style=ButtonStyle):
             
         """
         This is the constructor for the ToggleButton class.
 
         @param parent: The parent view.
         @type parent: L{View}
-        @param position: The position.
-        @type position: C{list}
         @param label: The label.
         @type label: C{str}
         @param selected: The selected state.
@@ -1279,7 +1390,7 @@ class ToggleButton(Button):
         @type style: L{Style}
         """
 
-        Button.__init__(self, parent, position, label, selected, style)
+        Button.__init__(self, parent, label, selected, style)
 
     def onClicked(self, event):
         if self.selected:
@@ -1302,6 +1413,9 @@ class ToggleButton(Button):
 CheckBoxStyle = Style(**{
     'width':112,
     'height':20,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'check_off.png',
     'selected':'check_on.png',
@@ -1309,20 +1423,19 @@ CheckBoxStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
-    'border':[18, 18, 4, 2]
+    'border':[18, 18, 4, 2],
+    'margin':[2, 2, 2, 2]
     })
             
 class CheckBox(ToggleButton):
     
-    def __init__(self, parent, position, label=None, selected=False, style=CheckBoxStyle):
+    def __init__(self, parent, label=None, selected=False, style=CheckBoxStyle):
         
         """
         This is the constructor for the CheckBox class.
 
         @param parent: The parent view.
         @type parent: L{View}
-        @param position: The position.
-        @type position: C{list}
         @param label: The label.
         @type label: C{str}
         @param selected: The selected state.
@@ -1331,11 +1444,14 @@ class CheckBox(ToggleButton):
         @type style: L{Style}
         """
         
-        Button.__init__(self, parent, position, label, selected, style)
+        Button.__init__(self, parent, label, selected, style)
 
 ProgressBarStyle = Style(**{
     'width':128,
     'height':4,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'progressbar_background.png',
     'selected':None,
@@ -1347,6 +1463,9 @@ ProgressBarStyle = Style(**{
 ProgressBarBarStyle = Style(**{
     'width':128,
     'height':4,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'progressbar.png',
     'selected':None,
@@ -1362,7 +1481,7 @@ class ProgressBar(View):
     lengthy operation.
     """
 
-    def __init__(self, parent, position, style=ProgressBarStyle, barStyle=ProgressBarBarStyle, visible=True):
+    def __init__(self, parent, style=ProgressBarStyle, barStyle=ProgressBarBarStyle, visible=True):
     
         """
         This is the constructor for the ProgressBar class. It takes the following parameters:
@@ -1377,12 +1496,12 @@ class ProgressBar(View):
         @type barStyle: L{Style}
         """
 
-        View.__init__(self, parent, visible)
+        View.__init__(self, parent, style, None, visible)
         
         mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
-        self.background = Object(self, position, mesh)
+        self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         mesh = RectangleMesh(barStyle.width, barStyle.height, self.app.getThemeResource('images', barStyle.normal))
-        self.bar = Object(self, [position[0], position[1], position[2]+0.05], mesh)
+        self.bar = Object(self, [self.style.left, self.style.top, self.style.zIndex+0.05], mesh)
         self.bar.mesh.setScale(0.0, 1.0, 1.0)
         
     def canFocus(self):
@@ -1411,7 +1530,21 @@ class ProgressBar(View):
 
 
 # TextView widget
-
+TextViewStyle = Style(**{
+    'width':128,
+    'height':20,
+    'left':0,
+    'top':0,
+    'zIndex':0,
+    'mesh':None,
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontFamily':defaultFontFamily,
+    'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
+    'border':None
+    })
 
 class TextView(View):
     
@@ -1419,11 +1552,11 @@ class TextView(View):
     A TextView widget. This widget can be used as a label. The text is not editable by the user.
     """
 
-    def __init__(self, parent, position=[0, 0, 9], label = '', wrapWidth=0, alignment=AlignLeft,
-        fontFamily=defaultFontFamily, fontSize=defaultFontSize):
+    def __init__(self, parent, label = '', style=TextViewStyle):
         
-        View.__init__(self, parent)
-        self.textObject = TextObject(self, position, label, wrapWidth, alignment, fontFamily, fontSize)
+        View.__init__(self, parent, style)
+        self.textObject = TextObject(self, [self.style.left, self.style.top, self.style.zIndex], label,
+            style.width, style.textAlign, style.fontFamily, style.fontSize)
             
     def canFocus(self):
         return False
@@ -1442,6 +1575,9 @@ class TextView(View):
 TextEditStyle = Style(**{
     'width':400,
     'height':20,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'texedit_off.png',
     'selected':None,
@@ -1449,7 +1585,8 @@ TextEditStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
-    'border':[4, 4, 4, 4]
+    'border':[4, 4, 4, 4],
+    'margin':[2,2,2,2]
     })
 
 class TextEdit(View):
@@ -1458,16 +1595,17 @@ class TextEdit(View):
     A TextEdit widget. This widget can be used to let the user enter some text.
     """
 
-    def __init__(self, parent, position, text='', style=TextEditStyle, validator = None):
-        View.__init__(self, parent)
+    def __init__(self, parent, text='', style=TextEditStyle, validator = None):
+        
+        View.__init__(self, parent, style)
         
         self.texture = self.app.getThemeResource('images', 'texedit_off.png')
         self.focusedTexture = self.app.getThemeResource('images', 'texedit_on.png')
 
         mesh = NineSliceMesh(style.width, style.height, self.texture, style.border)
-        self.background = Object(self, position, mesh)
+        self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
             
-        self.textObject = TextObject(self, [position[0] + 10.0, position[1] + style.height / 2 - 6, position[2] + 0.1], fontSize = style.fontSize)
+        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + style.height / 2 - 6, self.style.zIndex + 0.1], fontSize = style.fontSize)
 
         self.text = text
         self.__position = len(self.text)
@@ -1613,8 +1751,8 @@ class FileEntryView(View):
     def __init__(self, parent, buttonLabel):
         View.__init__(self, parent)
 
-        self.edit = TextEdit(self, [200, 90, 9.5])
-        self.bConfirm = Button(self, [610, 90, 9.1], buttonLabel, style=ButtonStyle._replace(width=40, height=20))
+        self.edit = TextEdit(self, style=TextEditStyle._replace(left=200, top=90, zIndex=9.5))
+        self.bConfirm = Button(self, buttonLabel, style=ButtonStyle._replace(width=40, height=20, left=610, top=90, zIndex=9.1))
 
         @self.bConfirm.event
         def onClicked(event):
@@ -1944,6 +2082,9 @@ class FileChooser2(View):
 GroupBoxStyle = Style(**{
     'width':128,
     'height':64,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'group_box.png',
     'selected':None,
@@ -1951,7 +2092,9 @@ GroupBoxStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
-    'border':[8, 24, 8, 8]
+    'border':[8, 24, 8, 8],
+    'padding':[6, 24, 6, 6],
+    'margin':[8, 8, 8, 8]
     }) 
         
 class GroupBox(View):
@@ -1975,12 +2118,9 @@ class GroupBox(View):
         @type style: L{Style}
         """
         
-        View.__init__(self, parent)
+        View.__init__(self, parent, style, BoxLayout(self))
         
         texture = self.app.getThemeResource('images', style.normal)
-        
-        self.style = style
-        
         mesh = NineSliceMesh(style.width, style.height, texture, style.border)
         self.box = Object(self, position, mesh)
         
@@ -2012,14 +2152,31 @@ class GroupBox(View):
         
     def onMouseDragged(self, event):
         pass
-        
+
+ShortcutEditStyle = Style(**{
+    'width':64,
+    'height':22,
+    'left':0,
+    'top':0,
+    'zIndex':0,
+    'mesh':None,
+    'normal':'button_tab3_on.png',
+    'selected':None,
+    'focused':'button_tab3_focused.png',
+    'fontFamily':defaultFontFamily,
+    'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
+    'border':[7,7,7,7],
+    'margin':[0, 1, 2, 2]
+    }) 
+
 class ShortcutEdit(View):
     
     """
     An edit control for entering shortcuts.
     """
     
-    def __init__(self, parent, position, shortcut):
+    def __init__(self, parent, shortcut, style=ShortcutEditStyle):
         
         """
         This is the constructor for the ShortcutEdit class.
@@ -2032,15 +2189,15 @@ class ShortcutEdit(View):
         @type shortcut: C{tuple}
         """
         
-        View.__init__(self, parent)
+        View.__init__(self, parent, style)
         
-        self.texture = self.app.getThemeResource('images', 'button_tab3_on.png')
-        self.focusedTexture = self.app.getThemeResource('images', 'button_tab3_focused.png')
+        self.texture = self.app.getThemeResource('images', self.style.normal)
+        self.focusedTexture = self.app.getThemeResource('images', self.style.focused)
         
-        mesh = NineSliceMesh(64, 22, self.texture, [7,7,7,7])
-        self.background = Object(self, position, mesh)
+        mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
+        self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         self.label = TextObject(self,
-            [position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001],
+            [self.style.left + 7 + 3, self.style.top+22/2-6, self.style.zIndex+0.001],
             self.shortcutToLabel(shortcut[0], shortcut[1]))
             
     def getPosition(self):
@@ -2151,7 +2308,7 @@ class MouseActionEdit(ShortcutEdit):
     An edit control for entering mouse actions.
     """
     
-    def __init__(self, parent, position, shortcut):
+    def __init__(self, parent, shortcut):
         
         """
         This is the constructor for the MouseActionEdit class.
@@ -2164,7 +2321,7 @@ class MouseActionEdit(ShortcutEdit):
         @type shortcut: C{tuple}
         """
         
-        ShortcutEdit.__init__(self, parent, position, shortcut)
+        ShortcutEdit.__init__(self, parent, shortcut)
         
     def onMouseDragged(self, event):
         
@@ -2350,6 +2507,9 @@ class RectangleMesh(module3d.Object3D):
 RadialStyle = Style(**{
     'width':185,
     'height':160,
+    'left':0,
+    'top':0,
+    'zIndex':0,
     'mesh':None,
     'normal':'radial_graph.png',
     'border':[2, 2, 2, 2]

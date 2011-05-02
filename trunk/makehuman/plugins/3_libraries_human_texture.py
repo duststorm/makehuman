@@ -68,8 +68,8 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Texture')
         self.filechooser = gui3d.FileChooser(self, 'data/textures', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
         
-        self.currentTexture = gui3d.Button(self.app.categories['Modelling'], [800-252, 600-36, 9.2],
-            style=HumanTextureButtonStyle._replace(normal=self.app.selectedHuman.getTexture()))
+        self.currentTexture = gui3d.Button(self.app.categories['Modelling'],
+            style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=self.app.selectedHuman.getTexture()))
 
         @self.filechooser.event
         def onFileSelected(filename):

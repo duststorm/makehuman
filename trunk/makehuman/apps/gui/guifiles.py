@@ -164,49 +164,49 @@ class ExportTaskView(gui3d.TaskView):
         
         # Formats
         y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
-        self.wavefrontObj = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], "Wavefront obj", True, gui3d.ButtonStyle);y+=24
-        self.mhx = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Blender exchange (mhx)", style=gui3d.ButtonStyle);y+=24
-        self.collada = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Collada (dae)", style=gui3d.ButtonStyle);y+=24
-        self.md5 = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="MD5", style=gui3d.ButtonStyle);y+=24
-        self.stl = gui3d.RadioButton(self, self.exportBodyGroup, [18, y, 9.2], label="Stereolithography (stl)", style=gui3d.ButtonStyle);y+=24
+        self.formatBox = gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
+        self.wavefrontObj = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, "Wavefront obj", True, gui3d.ButtonStyle);y+=24
+        self.mhx = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="Blender exchange (mhx)", style=gui3d.ButtonStyle);y+=24
+        self.collada = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="Collada (dae)", style=gui3d.ButtonStyle);y+=24
+        self.md5 = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="MD5", style=gui3d.ButtonStyle);y+=24
+        self.stl = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="Stereolithography (stl)", style=gui3d.ButtonStyle);y+=24
         y+=16
             
         # OBJ options
         yy = y
-        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6));y+=25
-        self.exportEyebrows = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Eyebrows", True);y+=24
-        self.exportDiamonds = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Diamonds", False);y+=24
-        self.exportSkeleton = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Skeleton", True);y+=24
-        self.exportGroups = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Groups", True);y+=24
-        self.exportSmooth = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Subdivide", False);y+=24
-        self.exportHair = gui3d.CheckBox(self.objOptions, [18, y, 9.2], "Hair as mesh", selected=True);y+=24
+        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*6+6));y+=25
+        self.exportEyebrows = gui3d.CheckBox(self.objOptions, "Eyebrows", True);y+=24
+        self.exportDiamonds = gui3d.CheckBox(self.objOptions, "Diamonds", False);y+=24
+        self.exportSkeleton = gui3d.CheckBox(self.objOptions, "Skeleton", True);y+=24
+        self.exportGroups = gui3d.CheckBox(self.objOptions, "Groups", True);y+=24
+        self.exportSmooth = gui3d.CheckBox(self.objOptions, "Subdivide", False);y+=24
+        self.exportHair = gui3d.CheckBox(self.objOptions, "Hair as mesh", selected=True);y+=24
         
         # MHX options
         y = yy
         self.mhxOptionsSource = gui3d.GroupBox(self, [10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
         source = []
-        self.mhxConfig = gui3d.RadioButton(self.mhxOptionsSource, source, [18, y, 9.2], "Use config options", True);y+=24
-        self.mhxGui = gui3d.RadioButton(self.mhxOptionsSource, source, [18, y, 9.2], "Use gui options");y+=24
+        self.mhxConfig = gui3d.RadioButton(self.mhxOptionsSource, source, "Use config options", True);y+=24
+        self.mhxGui = gui3d.RadioButton(self.mhxOptionsSource, source, "Use gui options");y+=24
         self.mhxOptionsSource.hide()
         y+=16
         
         self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
-        self.version24 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.4", True);y+=24
-        self.version25 = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Version 2.5", True);y+=24
-        self.exportExpressions = gui3d.CheckBox(self.mhxOptions, [18, y, 9.2], "Expressions", True);y+=24
+        self.version24 = gui3d.CheckBox(self.mhxOptions, "Version 2.4", True);y+=24
+        self.version25 = gui3d.CheckBox(self.mhxOptions, "Version 2.5", True);y+=24
+        self.exportExpressions = gui3d.CheckBox(self.mhxOptions, "Expressions", True);y+=24
         rigs = []
-        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use mhx rig", True);y+=24
-        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, [18, y, 9.2], "Use game rig");y+=24
+        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use mhx rig", True);y+=24
+        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use game rig");y+=24
         self.mhxOptions.hide()
         
         # STL options
         y = yy
         self.stlOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
         stlOptions = []
-        self.stlAscii = gui3d.RadioButton(self.stlOptions, stlOptions, [18, y, 9.2], "Ascii", selected=True);y+=24
-        self.stlBinary = gui3d.RadioButton(self.stlOptions, stlOptions, [18, y, 9.2], "Binary");y+=24
-        self.stlSmooth = gui3d.CheckBox(self.stlOptions, [18, y, 9.2], "Subdivide", False);y+=24
+        self.stlAscii = gui3d.RadioButton(self.stlOptions, stlOptions,  "Ascii", selected=True);y+=24
+        self.stlBinary = gui3d.RadioButton(self.stlOptions, stlOptions, "Binary");y+=24
+        self.stlSmooth = gui3d.CheckBox(self.stlOptions, "Subdivide", False);y+=24
         self.stlOptions.hide()
         
         @self.mhxConfig.event
