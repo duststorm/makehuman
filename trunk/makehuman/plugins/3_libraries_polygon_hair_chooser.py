@@ -21,6 +21,7 @@ TO DO
 """
 
 import gui3d, mh, os
+import files3d
 from os import path
 from aljabr import in2pts, vadd, vsub, calcBBox
 
@@ -65,7 +66,9 @@ class HairTaskView(gui3d.TaskView):
                 self.app.scene3d.delete(human.hairObj.mesh)
                 human.hairObj = None
 
-            human.hairObj = gui3d.Object(self.app, human.getPosition(), obj, png)
+            mesh = files3d.loadMesh(self.app.scene3d, obj)
+            mesh.setTexture(png)
+            human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
             human.hairObj.setRotation(human.getRotation())
             human.hairObj.mesh.setCameraProjection(0)
             human.hairObj.mesh.setSolid(human.mesh.solid)

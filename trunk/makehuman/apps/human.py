@@ -49,7 +49,8 @@ class Human(gui3d.Object):
 
     def __init__(self, view, mesh, hairObj=None):
 
-        gui3d.Object.__init__(self, view, [0, 0, 0], mesh, visible=True)
+        mesh = files3d.loadMesh(view.app.scene3d, mesh)
+        gui3d.Object.__init__(self, view, [0, 0, 0], mesh, True)
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh

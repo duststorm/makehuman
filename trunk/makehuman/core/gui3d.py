@@ -69,31 +69,16 @@ class Style:
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
 
-    def __init__(self, view, position, mesh, texture=None, visible=True):
+    def __init__(self, view, position, mesh, visible=True):
         
         self.app = view.app
         self.view = view
-        
-        if isinstance(mesh, str):
-            
-            self.mesh = files3d.loadMesh(self.app.scene3d, mesh, position[0], position[1], position[2])
-            self.meshName = mesh
-            
-        else: # It's of type module3d.Object3D
-        
-            self.mesh=mesh
-            self.app.scene3d.objects.append(mesh)
-            self.meshName = mesh.name
-            self.mesh.setLoc(position[0], position[1], position[2])
-        
-        # TL: added this to avoid crash on startup
-        if not self.mesh:
-            return
+        self.mesh=mesh
+        self.app.scene3d.objects.append(mesh)
+        self.meshName = mesh.name
+        self.mesh.setLoc(position[0], position[1], position[2])
             
         view.objects.append(self)
-        
-        if texture:
-            self.mesh.setTexture(texture)
         
         if view.isVisible() and visible:
             self.mesh.setVisibility(1)
