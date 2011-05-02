@@ -169,13 +169,17 @@ class MHApplication(gui3d.Application):
         self.progressBar = gui3d.ProgressBar(self, style=gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85))
         self.scene3d.update()
         self.redrawNow()
+        
+        self.tabs = gui3d.TabView(self)
+        
+        @self.tabs.event
+        def onTabSelected(tab):
+            self.switchCategory(tab.name)
 
     def loadBackground(self):
 
         self.progressBar.setProgress(0.1)
 
-        self.upperbar = gui3d.Object(self, [0, 0, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "upperbar.png")))
-        self.lowerbar = gui3d.Object(self, [0, 32, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
         self.statusbar = gui3d.Object(self, [0, 580, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
         mh.setClearColor(0.5, 0.5, 0.5, 1.0)
         
@@ -304,8 +308,8 @@ class MHApplication(gui3d.Application):
         self.progressBar.setProgress(0.9)
           
         # Exit button
-        category = gui3d.Category(self, "Exit", style=gui3d.CategoryButtonStyle)
-        @category.button.event
+        category = gui3d.Category(self, "Exit", tabStyle=gui3d.CategoryButtonStyle)
+        @category.tab.event
         def onClicked(event):
             self.promptAndExit()
           
@@ -445,8 +449,7 @@ class MHApplication(gui3d.Application):
             
     def onResized(self, event):
 
-        self.upperbar.mesh.resize(event.width, 32)
-        self.lowerbar.mesh.resize(event.width, 32)
+        self.tabs.box.mesh.resize(event.width, 32)
         self.statusbar.mesh.resize(event.width, 32)
         self.statusbar.setPosition((0.0, event.height-20, 9))
         

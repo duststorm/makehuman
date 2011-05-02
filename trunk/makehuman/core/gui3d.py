@@ -500,7 +500,8 @@ TaskTabStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
-    'border':[7,7,7,7]
+    'border':[7,7,7,7],
+    'margin':[0,0,2,0]
     })
 
 class TaskView(View):
@@ -510,32 +511,26 @@ class TaskView(View):
         self.name = name
         self.focusWidget = None
 
-        # The button is attached to the parent, as it stays visible when the task is hidden
-
-        self.button = ToggleButton(self.parent, (label or name),
-            style=style._replace(left=2 + len(self.parent.tasks) * 66, top=38.0, zIndex=9.2))
-
         if name in category.tasksByName:
             raise KeyError('A task with this name already exists', name)
 
         category.tasks.append(self)
         category.tasksByName[self.name] = self
 
-        @self.button.event
-        def onClicked(event):
-            self.app.switchTask(self.name)
+        self.tab = category.tabs.addTab(label or name)
+        self.tab.name = self.name
             
     def canFocus(self):
         return False
 
     def onShow(self, event):
 
-        self.button.setSelected(True)
+        self.tab.setSelected(True)
         self.show()
 
     def onHide(self, event):
 
-        self.button.setSelected(False)
+        self.tab.setSelected(False)
         self.hide()
 
 
@@ -553,7 +548,8 @@ CategoryTabStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter, 
-    'border':[7,7,7,7]
+    'border':[7,7,7,7],
+    'margin':[0,0,2,0]
     })
     
 CategoryButtonStyle = Style(**{
@@ -574,37 +570,40 @@ CategoryButtonStyle = Style(**{
 
 class Category(View):
 
-    def __init__(self, parent, name, label = None, style=CategoryTabStyle):
-        View.__init__(self, parent, style, None, False)
+    def __init__(self, parent, name, label = None, tabStyle=CategoryTabStyle):
+        
+        View.__init__(self, parent, None, None, False)
+        
         self.name = name
         self.tasks = []
         self.tasksByName = {}
-
-        # The button is attached to the parent, as it stays visible when the category is hidden
-
-        self.button = ToggleButton(self.parent, (label or name),
-            style=style._replace(left=2 + len(self.app.categories) * 66, top=6.0, zIndex=9.6))
 
         if name in parent.categories:
             raise KeyError('A category with this name already exists', name)
 
         parent.categories[name] = self
-
-        @self.button.event
-        def onClicked(event):
-            self.app.switchCategory(self.name)
+        self.tab = parent.tabs.addTab(label or name, style=tabStyle)
+        self.tab.name = self.name
+        
+        self.tabs = TabView(self, style=TabViewStyle._replace(top=32, normal="lowerbar.png"), tabStyle=TaskTabStyle)
+        
+        @self.tabs.event
+        def onTabSelected(tab):
+            self.app.switchTask(tab.name)
             
     def canFocus(self):
         return False
 
     def onShow(self, event):
-        self.button.setSelected(True)
+        self.tab.setSelected(True)
         self.show()
 
     def onHide(self, event):
-        self.button.setSelected(False)
+        self.tab.setSelected(False)
         self.hide()
-
+    
+    def onResized(self, event):
+        self.tabs.box.mesh.resize(event.width, 32)
 
 # The application, a wrapper around Scene3D
 
@@ -888,6 +887,98 @@ class Application(events3d.EventHandler):
             return Category(self, name, None, style)
 
 # Widgets
+
+# Tab widget
+TabViewStyle = Style(**{
+    'width':800,
+    'height':32,
+    'left':0,
+    'top':0,
+    'zIndex':0,
+    'mesh':None,
+    'normal':'upperbar.png',
+    'selected':None,
+    'focused':None,
+    'fontFamily':defaultFontFamily,
+    'fontSize':defaultFontSize,
+    'textAlign':AlignLeft, 
+    'border':None,
+    'padding':[2,6,0,0]
+})
+
+TabViewTabStyle = Style(**{
+    'width':64,
+    'height':26,
+    'left':0,
+    'top':0,
+    'zIndex':0,
+    'mesh':None,
+    'normal':'button_tab.png',
+    'selected':'button_tab_on.png',
+    'focused':'button_tab_focused.png',
+    'fontFamily':defaultFontFamily,
+    'fontSize':defaultFontSize,
+    'textAlign':AlignCenter, 
+    'border':[7,7,7,7],
+    'margin':[0, 0, 2, 0]
+    })
+
+class TabView(View):
+    
+    """
+    A tab widget. This widget can be used to switch between widgets.
+    """
+
+    def __init__(self, parent, style=TabViewStyle, tabStyle=TabViewTabStyle):
+        
+        """
+        This is the constructor for the TabView class.
+
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param style: The style.
+        @type style: L{Style}
+        @param tabStyle: The tabStyle.
+        @type tabStyle: L{Style}
+        """
+        
+        View.__init__(self, parent, style, BoxLayout(self))
+        
+        self.box = Object(self, [self.style.left, self.style.top, self.style.zIndex],
+            RectangleMesh(self.style.width, self.style.height,
+            self.app.getThemeResource("images", self.style.normal)))
+            
+        self.tabStyle = tabStyle
+    
+    def getPosition(self):
+        return [self.style.left, self.style.top, self.style.zIndex]
+    
+    def setPosition(self, position):
+        
+        self.box.setPosition(position)
+        
+        for child in self.children:
+            x, y, z = child.getPosition()
+            child.setPosition([x+dx,y+dy,z+dz])
+        
+    def canFocus(self):
+        return False
+        
+    def onMouseDragged(self, event):
+        pass
+        
+    def onTabSelected(self, tab):
+        pass
+        
+    def addTab(self, label='', style=None):
+        
+        tab = ToggleButton(self, label, style=style or self.tabStyle)
+
+        @tab.event
+        def onClicked(event):
+            self.callEvent('onTabSelected', tab)
+            
+        return tab
 
 # Slider widget
 SliderStyle = Style(**{
