@@ -361,10 +361,10 @@ class MHApplication(gui3d.Application):
         self.dialog = gui3d.View(self)
         self.dialog.blocker = gui3d.Object(self.dialog, [0, 0, 9.7], gui3d.RectangleMesh(800, 600))
         self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150))
-        self.dialog.text = gui3d.TextView(self.dialog, '', style=gui3d.TextViewStyle._replace(left=800 / 2 - 100 + 10, top=600 / 2 - 75 + 25, zIndex=9.81))
-        self.dialog.check = gui3d.CheckBox(self.dialog, "Don't show this again", style=gui3d.CheckBoxStyle._replace(left=800 / 2 - 100 +10, top=600 / 2 + 75 - 20 - 10 - 24, zIndex=9.81))
-        self.dialog.button1 = gui3d.Button(self.dialog, '', style=gui3d.ButtonStyle._replace(width=60, left=800 / 2 + 100 - 60 - 10 - 60 - 5, top=600 / 2 + 75 - 20 - 10, zIndex=9.81))
-        self.dialog.button2 = gui3d.Button(self.dialog, '', style=gui3d.ButtonStyle._replace(width=60, left=800 / 2 + 100 - 60 - 10, top=600 / 2 + 75 - 20 - 10, zIndex=9.81))
+        self.dialog.text = gui3d.TextView(self.dialog.box, '', style=gui3d.TextViewStyle._replace(width=180))
+        self.dialog.check = gui3d.CheckBox(self.dialog.box, "Don't show this again", style=gui3d.CheckBoxStyle._replace(width=180, margin=[2, 4, 2, 2]))
+        self.dialog.button1 = gui3d.Button(self.dialog.box, '', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2]))
+        self.dialog.button2 = gui3d.Button(self.dialog.box, '', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2]))
         self.dialog.button1Action = None
         self.dialog.button2Action = None
         self.dialog.helpId = None
@@ -464,10 +464,7 @@ class MHApplication(gui3d.Application):
         
         self.dialog.blocker.mesh.resize(event.width, event.height)
         self.dialog.box.setPosition([event.width/2-100, event.height/2-75, 9.8])
-        self.dialog.text.setPosition([event.width/2-100+10, event.height/2-75+25, 9.81])
-        self.dialog.check.setPosition([event.width/2-100 +10, event.height/2+75-20-10-24, 9.81])
-        self.dialog.button1.setPosition([event.width/2+100-60-10-60-5, event.height/2 +75-20-10, 9.81])
-        self.dialog.button2.setPosition([event.width/2+100-60-10, event.height/2 +75-20-10, 9.81])
+        self.dialog.box.layout.rebuild()
         
         self.progressBar.blocker.mesh.resize(event.width, event.height)
         

@@ -13,7 +13,7 @@ class AppMouseActionEdit(gui3d.MouseActionEdit):
         if not self.app.setMouseAction(shortcut[0], shortcut[1], self.method):
             self.setShortcut(self.app.getMouseAction(self.method))
 
-MouseActionLabelStyle = gui3d.TextViewStyle._replace(width=50)
+MouseActionLabelStyle = gui3d.TextViewStyle._replace(width=48)
 
 class MouseActionsTaskView(gui3d.TaskView):
 

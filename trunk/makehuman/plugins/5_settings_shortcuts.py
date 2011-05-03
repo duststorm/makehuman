@@ -13,7 +13,7 @@ class AppShortcutEdit(gui3d.ShortcutEdit):
         if not self.app.setShortcut(shortcut[0], shortcut[1], self.method):
             self.setShortcut(self.app.getShortcut(self.method))
 
-ShortcutLabelStyle = gui3d.TextViewStyle._replace(width=50)
+ShortcutLabelStyle = gui3d.TextViewStyle._replace(width=48)
 
 class ShortcutsTaskView(gui3d.TaskView):
 

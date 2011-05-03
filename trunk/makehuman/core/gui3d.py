@@ -71,12 +71,16 @@ class Object(events3d.EventHandler):
 
     def __init__(self, view, position, mesh, visible=True):
         
+        if hasattr(mesh, 'object') and mesh.object:
+            raise RuntimeException('This mesh is already attached to an object')
+                
         self.app = view.app
         self.view = view
         self.mesh=mesh
-        self.app.scene3d.objects.append(mesh)
+        if mesh not in self.app.scene3d.objects:
+            self.app.scene3d.objects.append(mesh)
         self.meshName = mesh.name
-        self.mesh.setLoc(position[0], position[1], position[2])
+        self.mesh.setLoc(*position)
             
         view.objects.append(self)
         
@@ -90,7 +94,6 @@ class Object(events3d.EventHandler):
         
         self.__seedMesh = self.mesh
         self.__subdivisionMesh = None
-        self.__bbox = None
 
     def show(self):
         
@@ -205,9 +208,19 @@ class Object(events3d.EventHandler):
             self.mesh.setVisibility(1)
             
     def getBBox(self):
-        if not self.__bbox:
-            self.__bbox = self.mesh.calcBBox()
-        return self.__bbox
+        return self.mesh.calcBBox()
+        
+    def getWidth(self):
+        bbox = self.getBBox()
+        return bbox[1][0] - bbox[0][0]
+        
+    def getHeight(self):
+        bbox = self.getBBox()
+        return bbox[1][1] - bbox[0][1]
+        
+    def getDepth(self):
+        bbox = self.getBBox()
+        return bbox[1][2] - bbox[0][2]
 
     def onMouseDown(self, event):
         self.view.callEvent('onMouseDown', event)
@@ -315,7 +328,7 @@ class BoxLayout(Layout):
                 self.nextPosition = self.view.getPosition()
                 self.nextPosition[0] += self.view.style.padding[0] if self.view.style.padding else 0
                 self.nextPosition[1] += self.view.style.padding[1] if self.view.style.padding else 0
-                self.nextPosition[2] += 0.1
+                self.nextPosition[2] += 0.01
             else:
                 self.nextPosition[0] = self.view.getPosition()[0] + (self.view.style.padding[0] if self.view.style.padding else 0)
                 self.nextPosition[1] += self.rowHeight
@@ -347,11 +360,17 @@ class BoxLayout(Layout):
         self.nextPosition[0] += child.style.width + (child.style.margin[2] if child.style.margin else 0)
         
     def rebuild(self):
-        
+
         self.nextPosition = None
         
         for child in self.view.children:
-            self.onChildAdded(child)
+            if child.isShown():
+                self.onChildAdded(child, False)
+                
+    @property
+    def height(self):
+        
+        return self.nextPosition[1] - self.view.getPosition()[1] + self.rowHeight + (self.view.style.padding[3] if self.view.style.padding else 0)
 
 # Generic view
 
@@ -382,6 +401,9 @@ class View(events3d.EventHandler):
     def hide(self):
         self.__visible = False
         self.__updateVisibility()
+        
+    def isShown(self):
+        return self.__visible
 
     def isVisible(self):
         return self.__totalVisibility
@@ -1042,12 +1064,12 @@ class Slider(View):
         self.thumb = Object(self, [style.left, style.top + 16, style.zIndex + 0.01], mesh)
             
         if isinstance(label, str):
-            self.label = TextObject(self, [style.left + 10, style.top + 8 - 6, style.zIndex + 0.2], label, fontSize = style.fontSize)
+            self.label = TextObject(self, [style.left, style.top + 8 - 6, style.zIndex + 0.2], label, fontSize = style.fontSize)
             if '%' in label:
                 self.labelFormat = label
                 self.edit = TextEdit(self, '',
-                    TextEditStyle._replace(width=self.style.width-16, height=16,
-                    left=style.left + 8, top=style.top, zIndex=style.zIndex + 0.3),
+                    TextEditStyle._replace(width=self.style.width, height=16,
+                    left=style.left, top=style.top, zIndex=style.zIndex + 0.3),
                     intValidator if isinstance(min, int) else floatValidator)
                 self.edit.hide()
                 
@@ -1126,13 +1148,13 @@ class Slider(View):
         
     def setPosition(self, position):
         self.background.setPosition(position)
-        self.thumbMinX = position[0] + self.thumbStyle.width / 2
-        self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width - self.thumbStyle.width / 2
+        self.thumbMinX = position[0]
+        self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width
         self.setValue(self.getValue())
         if self.label:
-            self.label.setPosition([position[0]+10,position[1]-2,position[2]+0.2])
+            self.label.setPosition([position[0],position[1]-2,position[2]+0.2])
         if self.labelFormat:
-            self.edit.setPosition([position[0]+8, position[1], position[2]+0.3])
+            self.edit.setPosition([position[0], position[1], position[2]+0.3])
 
     def setValue(self, value):
         
@@ -1619,7 +1641,8 @@ TextViewStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
-    'border':None
+    'border':None,
+    'margin':[2,2,2,2]
     })
 
 class TextView(View):
@@ -1631,8 +1654,10 @@ class TextView(View):
     def __init__(self, parent, label = '', style=TextViewStyle):
         
         View.__init__(self, parent, style)
+        
         self.textObject = TextObject(self, [self.style.left, self.style.top, self.style.zIndex], label,
             style.width, style.textAlign, style.fontFamily, style.fontSize)
+        self.style.height = self.textObject.getHeight()
             
     def canFocus(self):
         return False
@@ -1645,7 +1670,7 @@ class TextView(View):
 
     def setText(self, text):
         self.textObject.setText(text)
-
+        self.style.height = self.textObject.getHeight()
 
 # TextEdit widget
 TextEditStyle = Style(**{
@@ -1678,10 +1703,10 @@ class TextEdit(View):
         self.texture = self.app.getThemeResource('images', 'texedit_off.png')
         self.focusedTexture = self.app.getThemeResource('images', 'texedit_on.png')
 
-        mesh = NineSliceMesh(style.width, style.height, self.texture, style.border)
+        mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
         self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
             
-        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + style.height / 2 - 6, self.style.zIndex + 0.1], fontSize = style.fontSize)
+        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + self.style.height / 2 - 6, self.style.zIndex + 0.1], fontSize = self.style.fontSize)
 
         self.text = text
         self.__position = len(self.text)
@@ -1751,6 +1776,11 @@ class TextEdit(View):
         text = self.text
         self.__showCursor()
         return text
+        
+    def setPosition(self, position):
+        
+        self.background.setPosition(position)
+        self.textObject.setPosition([position[0] + 10.0, position[1] + self.style.height / 2 - 6, position[2] + 0.1])
         
     def onMouseDragged(self, event):
         pass
@@ -1849,23 +1879,68 @@ class FileEntryView(View):
 
 
 # FileChooser widget
-class FileChooserRectangle(Object):
+FileChooserRectangleStyle = Style(**{
+    'width':128,
+    'height':128,
+    'left':0,
+    'top':0,
+    'zIndex':0,
+    'mesh':None,
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontFamily':defaultFontFamily,
+    'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
+    'margin':[6,6,6,6]
+    })
+
+class FileChooserRectangle(View):
     
-    def __init__(self, parent, position, texture, file):
+    def __init__(self, parent, file, label, style=FileChooserRectangleStyle):
         
-        mesh = RectangleMesh(128, 128, texture)
-        Object.__init__(self, parent, position, mesh)
+        View.__init__(self, parent, style)
+        
+        # Preview
+        mesh = RectangleMesh(self.style.width, self.style.height, self.style.normal)
+        self.preview = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        
+        # Label
+        self.label = TextObject(self, [self.style.left, self.style.top + self.style.height, self.style.zIndex], file)
         
         self.file = file
         
+    def setPosition(self, position):
+        
+        self.preview.setPosition(position)
+        self.label.setPosition([position[0], position[1] + self.style.height, position[2]])
+        
     def onClicked(self, event):
-        self.view.selection = self.file
-        self.view.callEvent('onFileSelected', self.file)
+        
+        self.parent.selection = self.file
+        self.parent.callEvent('onFileSelected', self.file)
+
+FileChooserStyle = Style(**{
+    'width':800,
+    'height':600,
+    'left':0,
+    'top':0,
+    'zIndex':0,
+    'mesh':None,
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontFamily':defaultFontFamily,
+    'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
+    'padding':[4,4,4,4]
+    })
 
 class FileChooser(View):
     
-    def __init__(self, parent, path, extension, previewExtension='bmp'):
-        View.__init__(self, parent)
+    def __init__(self, parent, path, extension, previewExtension='bmp', style=FileChooserStyle):
+        
+        View.__init__(self, parent, style, BoxLayout(self))
         
         self.path = path
         self.extension = extension
@@ -1873,17 +1948,8 @@ class FileChooser(View):
         self.files = []
         self.selection = ''
         
-    def __nextPos(self):
-        
-        if self.x > self.width - 140 - 10:
-            self.x = 10
-            self.y += 150
-            
-        pos = (self.x, self.y)
-        
-        self.x += 140
-        
-        return pos
+    def getPosition(self):
+        return [0, 64, 9]
         
     def getPreview(self, filename):
         
@@ -1896,12 +1962,13 @@ class FileChooser(View):
         
         if self.files:
             self.files = []
-        if self.objects:
-            for object in self.objects:
-                self.app.scene3d.detach(object.mesh)
-                self.app.scene3d.objects.remove(object.mesh)
-            self.objects = []
-            
+        if self.children:
+            for child in self.children:
+                self.app.scene3d.delete(child.preview.mesh)
+                self.app.scene3d.delete(child.label.mesh)
+            self.children = []
+            self.layout.rebuild()
+        
         if isinstance(self.extension, str):
             for f in os.listdir(self.path):
                 if f.endswith('.' + self.extension):
@@ -1914,18 +1981,13 @@ class FileChooser(View):
                         
         self.files.sort()
         
-        self.width, self.height = self.app.getWindowSize()
-        
-        self.x = 10
-        self.y = 80
         for file in self.files:
             
-            x, y = self.__nextPos()
-                
-            FileChooserRectangle(self, [x, y, 9], os.path.join(self.path, self.getPreview(file)), file)
+            label = None
             if isinstance(self.extension, str):
-                file = file.replace(os.path.splitext(file)[-1], '')
-            TextObject(self, [x, y + 134, 9.5], file)
+                label = file.replace(os.path.splitext(file)[-1], '')
+            FileChooserRectangle(self, file, label or file,
+                FileChooserRectangleStyle._replace(normal=os.path.join(self.path, self.getPreview(file))))
             
         self.app.scene3d.update()
         self.app.redraw()
@@ -1942,19 +2004,9 @@ class FileChooser(View):
         self.refresh()
             
     def onResized(self, event):
-        
-        self.width, self.height = event.width, event.height
-        
-        self.x = 10
-        self.y = 80
-        x, y = self.__nextPos()
-        for index, object in enumerate(self.objects):
-            
-            if index & 1:
-                object.setPosition([x, y + 134, 9])
-                x, y = self.__nextPos()
-            else:
-                object.setPosition([x, y, 9])
+
+        self.style.width, self.style.height = event.width, event.height
+        self.layout.rebuild()
                
 class FileChooser2(View):
     
@@ -2169,7 +2221,7 @@ GroupBoxStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':[8, 24, 8, 8],
-    'padding':[6, 24, 6, 6],
+    'padding':[6, 24, 6, 8],
     'margin':[8, 8, 8, 8]
     }) 
         
@@ -2197,14 +2249,14 @@ class GroupBox(View):
         View.__init__(self, parent, style, BoxLayout(self))
         
         texture = self.app.getThemeResource('images', style.normal)
-        mesh = NineSliceMesh(style.width, style.height, texture, style.border)
+        mesh = NineSliceMesh(self.style.width, self.style.height, texture, self.style.border)
         self.box = Object(self, position, mesh)
         
         if isinstance(label, str):
             self.label = TextObject(self,
-                [position[0]+style.border[0],position[1]+style.border[1]/2-6,position[2]+0.001],
+                [position[0]+self.style.border[0],position[1]+self.style.border[1]/2-6,position[2]+0.001],
                 label,
-                fontSize = style.fontSize)
+                fontSize = self.style.fontSize)
     
     def getPosition(self):
         return self.box.getPosition()
@@ -2226,6 +2278,12 @@ class GroupBox(View):
     def canFocus(self):
         return False
         
+    def onShow(self, event):
+        
+        if self.layout:
+            self.layout.rebuild()
+            self.box.mesh.resize(self.style.width, self.layout.height)
+        
     def onMouseDragged(self, event):
         pass
 
@@ -2243,7 +2301,7 @@ ShortcutEditStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':[7,7,7,7],
-    'margin':[0, 1, 2, 2]
+    'margin':[0, 1, 0, 2]
     }) 
 
 class ShortcutEdit(View):
@@ -2507,6 +2565,7 @@ class NineSliceMesh(module3d.Object3D):
                 o = x + y * 4
                 fg.createFace((v[o+4], v[o+5], v[o+1], v[o]), (uv[o+4], uv[o+5], uv[o+1], uv[o]))
                 
+        self.border = border
         self.texture = texture
         self.setCameraProjection(1)
         self.setShadeless(1)
@@ -2515,7 +2574,7 @@ class NineSliceMesh(module3d.Object3D):
     def resize(self, width, height):
         
         outer=[[0, 0], [width, height]]
-        inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
+        inner=[[self.border[0], self.border[1]], [width - self.border[2], height - self.border[3]]]
         
         xc = [outer[0][0], inner[0][0], inner[1][0], outer[1][0]]
         yc = [outer[0][1], inner[0][1], inner[1][1], outer[1][1]]
