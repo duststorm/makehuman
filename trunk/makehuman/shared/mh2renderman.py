@@ -218,7 +218,7 @@ class RMNObject:
             self.facesIndices = files3d.loadFacesIndices(self.wavefrontPath, True)
             self.facesUVvalues = obj.uvValues
 
-            #create a dictionary for all facesgroups
+            #create a dictionary for all faceGroups
             currentGroup = "Empty"
             indices = []
             for faceIdx in self.facesIndices:
@@ -400,7 +400,7 @@ class RMRHuman(RMNObject):
         nailsGr = set()
         hairGr = set()
         toSubtract = set()
-        for f in self.meshData.facesGroups:
+        for f in self.meshData.faceGroups:
             if 'joint' not in f.name:
                 allGr.add(f.name)
             if 'teeth' in f.name:
