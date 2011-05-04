@@ -168,8 +168,10 @@ class PoseTaskView(gui3d.TaskView):
         return None
     
     def mvcTest(self):
-        #get r-shoulder cage
-        #testJoint = self.skeleton.getJoint('joint-r-shoulder')
+        
+        angle = 45*degree2rad
+        joint = self.skeleton.getJoint('joint-r-shoulder')
+        center = joint.position
         
         #get bindings for r-shoulder-joint
         f = open("utils/makepose/r-shoulder-joint.txt")
@@ -220,7 +222,8 @@ class PoseTaskView(gui3d.TaskView):
         #convert to tetrahedrons
         
         #bbox = calcBBox(self.app.selectedHuman.meshData.verts,  testJoint.bindedVects)
-        #print box2Tetrahedrons(bbox)
+        tets =  box2Tetrahedrons(bboxj)
+        tets2 = deformTets(tets, center, angle) #temorarily rotate about z axis 
         #compute mvc weights for each vertex in the bindings of r-shoulder
         #1. extract the triangular face from bbox for each vertex
         #2. compute mvc weights using the triangle formula
@@ -270,6 +273,17 @@ def load(app):
 
 def unload(app):
     print 'pose unloaded'
+    
+#rotate one side of tets
+def deformTets(tets, center, angle):
+    tets2 = []
+    #deep copy tets to tets2
+    for tet in tets:
+      tets.append([])
+      for vert in tet:
+        tets[len(tets)-1].append(vert[:])
+    #rotates accordingly
+    return None
 
 #needed for making mvc or harmonic coord. cage
 def box2Tetrahedrons(box):
@@ -380,6 +394,7 @@ def findTetrahedron(tets, v):
           indices.remove(2*indices[0])
         else: indices.remove(indices[1]-indices[0])
     return indices[0]
+    
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
