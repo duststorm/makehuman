@@ -403,7 +403,7 @@ def computeWeights(v,tets):
     A = [0]*16
     for rows in xrange(0,3):
         for cols in xrange(0,4):
-          A[rows*4 + cols] = tets[cols][rows]
+          A[rows*4 + cols] = tets[i][cols][rows]
     w = linsolve(A,y)
     return i,w
     
