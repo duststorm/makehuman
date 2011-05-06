@@ -88,6 +88,9 @@ class BackgroundTaskView(gui3d.TaskView):
     def onHide(self, event):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
+        
+    def onResized(self, event):
+        self.filechooser.onResized(event)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

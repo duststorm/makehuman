@@ -1101,6 +1101,7 @@ class Slider(View):
                 self.labelFormat = None
         else:
             self.label = None
+            self.labelFormat = None
             
         self.thumbMinX = style.left
         self.thumbMaxX = style.left + style.width - thumbStyle.width
@@ -1139,7 +1140,10 @@ class Slider(View):
         
         thumbPos = self.thumb.getPosition()
         #for values that are integer we need a float denominator
-        value = (self.__value - self.min) / float(self.max - self.min)
+        if self.max - self.min:
+            value = (self.__value - self.min) / float(self.max - self.min)
+        else:
+            value = 0
         thumbPos[0] = value * (self.thumbMaxX - self.thumbMinX) + self.thumbMinX
         self.thumb.setPosition(thumbPos)
     
@@ -1147,7 +1151,9 @@ class Slider(View):
         return self.background.getPosition()
         
     def setPosition(self, position):
+        print position
         self.background.setPosition(position)
+        self.thumb.setPosition([position[0], position[1] + 16, position[2] + 0.01])
         self.thumbMinX = position[0]
         self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width
         self.setValue(self.getValue())
@@ -1163,6 +1169,14 @@ class Slider(View):
 
     def getValue(self):
         return self.__value
+        
+    def setMin(self, value):
+        self.min = value
+        setValue(self.__value)
+        
+    def setMax(self, value):
+        self.max = value
+        self.setValue(self.__value)
         
     def onMouseDown(self, event):
         
@@ -1915,6 +1929,10 @@ class FileChooserRectangle(View):
         self.preview.setPosition(position)
         self.label.setPosition([position[0], position[1] + self.style.height, position[2]])
         
+    def getPosition(self):
+        
+        return self.preview.getPosition()
+        
     def onClicked(self, event):
         
         self.parent.selection = self.file
@@ -1933,23 +1951,30 @@ FileChooserStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
-    'padding':[4,4,4,4]
+    'padding':[4,68,4,36]
     })
 
 class FileChooser(View):
     
     def __init__(self, parent, path, extension, previewExtension='bmp', style=FileChooserStyle):
         
-        View.__init__(self, parent, style, BoxLayout(self))
+        View.__init__(self, parent, style, None)
         
         self.path = path
         self.extension = extension
         self.previewExtension = previewExtension
+        self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=585-20, zIndex=9.1))
+        self.layout = BoxLayout(self)
         self.files = []
         self.selection = ''
+        self.childY = {}
+        
+        @self.slider.event
+        def onChange(value):
+            self.scrollTo(value)
         
     def getPosition(self):
-        return [0, 64, 9]
+        return [0, 0, 0]
         
     def getPreview(self, filename):
         
@@ -1962,12 +1987,20 @@ class FileChooser(View):
         
         if self.files:
             self.files = []
-        if self.children:
+        if len(self.children) > 1:
+            self.slider.setValue(0)
             for child in self.children:
+                if isinstance(child, Slider):
+                    continue
                 self.app.scene3d.delete(child.preview.mesh)
                 self.app.scene3d.delete(child.label.mesh)
-            self.children = []
+            self.children = self.children[:1]
+            sliderIsShown = self.slider.isShown()
+            if sliderIsShown:
+                self.slider.hide()
             self.layout.rebuild()
+            if sliderIsShown:
+                self.slider.show()
         
         if isinstance(self.extension, str):
             for f in os.listdir(self.path):
@@ -1988,17 +2021,86 @@ class FileChooser(View):
                 label = file.replace(os.path.splitext(file)[-1], '')
             FileChooserRectangle(self, file, label or file,
                 FileChooserRectangleStyle._replace(normal=os.path.join(self.path, self.getPreview(file))))
+                
+        self.__updateScrollBar()
             
         self.app.scene3d.update()
         self.app.redraw()
+        
+    def scrollTo(self, value):
+        
+        lastChild = self.children[-1]
+        childHeight = lastChild.style.height + lastChild.style.margin[1] + lastChild.style.margin[3]
+        scrollheight = childHeight * value + self.style.padding[1]
+        for child in self.children:
+            if isinstance(child, Slider):
+                continue
+            if self.childY[child] < scrollheight:
+                child.hide()
+            else:
+                child.show()
+
+        self.slider.hide()
+        self.layout.rebuild()
+        self.slider.show()
+        
+    def __updateScrollBar(self):
+        
+        if len(self.children) > 1:
+            
+            self.slider.hide()
+        
+            for child in self.children:
+                if isinstance(child, Slider):
+                    continue
+                child.show()
+            self.layout.rebuild()
+            
+            self.slider.show()
+            
+            self.childY = {}
+            
+            for child in self.children:
+                self.childY[child] = child.getPosition()[1]
+            
+            lastChild = self.children[-1]
+            childHeight = lastChild.style.height + lastChild.style.margin[1] + lastChild.style.margin[3]
+            childrenHeight = lastChild.getPosition()[1] + childHeight
+            availableHeight = self.style.height - self.style.padding[3]
+            overflow = childrenHeight - availableHeight
+            
+            if overflow > 0:
+                self.slider.setMax(int(overflow / childHeight) + 1)
+            else:
+                self.slider.setMax(0)
+
+            self.slider.setValue(0)
+            self.scrollTo(0)
             
     def onKeyDown(self, event):
 
         if event.key == events3d.SDLK_F5:
             self.refresh()
+        elif event.key == events3d.SDLK_UP:
+            self.slider.setValue(self.slider.getValue()-1)
+            self.scrollTo(self.slider.getValue())
+            self.app.redraw()
+        elif event.key == events3d.SDLK_DOWN:
+            self.slider.setValue(self.slider.getValue()+1)
+            self.scrollTo(self.slider.getValue())
+            self.app.redraw()
         else:
             View.onKeyDown(self, event)
+            
+    def onMouseWheel(self, event):
         
+        if event.wheelDelta > 0:
+            self.slider.setValue(self.slider.getValue()-1)
+            self.scrollTo(self.slider.getValue())
+        else:
+            self.slider.setValue(self.slider.getValue()+1)
+            self.scrollTo(self.slider.getValue())
+
     def onShow(self, event):
 
         self.refresh()
@@ -2006,7 +2108,8 @@ class FileChooser(View):
     def onResized(self, event):
 
         self.style.width, self.style.height = event.width, event.height
-        self.layout.rebuild()
+        self.__updateScrollBar()
+        self.slider.setPosition([10, event.height-35, 9.1])
                
 class FileChooser2(View):
     
