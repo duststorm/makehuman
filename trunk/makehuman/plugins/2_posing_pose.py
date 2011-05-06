@@ -283,7 +283,7 @@ def deformTets(tets, center, angle):
     for tet in tets2:
         for v in tet:
             if v[0] > center[0]:
-                v = vadd(mtransform(makeRotation([0.0,0.0,1.0], vsub(v, center))),center)
+                v = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
     return tets2
 
 #needed for making mvc or harmonic coord. cage
@@ -363,7 +363,7 @@ def findTetrahedron(tets, v):
     
     #front pass (x-z plane)
     diffv = vsub(v, tets[1][1])
-    diffBox = vsub(tets[1][0],test[1][1])
+    diffBox = vsub(tets[1][0],tets[1][1])
     #check tangents
     if fabs(diffv[1]*diffBox[0]) > fabs(diffv[0]*diffBox[1]):
         #point lies about the front face diagonal (see tetrahedron image in box2Tetrahedrons link)
@@ -372,7 +372,7 @@ def findTetrahedron(tets, v):
     
     #back pass
     diffv = vsub(v, tets[2][1])
-    diffBox = vsub(tets[2][0],test[2][1])
+    diffBox = vsub(tets[2][0],tets[2][1])
     if fabs(diffv[2]*diffBox[0]) > fabs(diffv[0]*diffBox[2]): #x,z tangent
         indices.remove(2)
     else: indices.remove(3)
@@ -382,7 +382,7 @@ def findTetrahedron(tets, v):
         #we need top/below pass, x-y plane
         i,j,k = 1-indices[0],2,indices[0]
         diffv = vsub(v,tets[k][i])
-        diffBox = vsub(test[k][j],tets[k][i])
+        diffBox = vsub(tets[k][j],tets[k][i])
         if fabs(diffv[1]*diffBox[0]) > fabs(diffv[0]*diffBox[1]): #x,y tangent
           indices.remove(indices[0])
         else: indices.remove(indices[1])
@@ -390,7 +390,7 @@ def findTetrahedron(tets, v):
         #we need a side pass, y-z plane
         i,j,k = indices[0],1+indices[0],indices[0]
         diffv = vsub(v,tets[k][i])
-        diffBox = vsub(test[k][j],tets[k][i])
+        diffBox = vsub(tets[k][j],tets[k][i])
         if fabs(diffv[2]*diffBox[1]) > fabs(diffv[1]*diffBox[2]): #y,z tangent
           indices.remove(2*indices[0])
         else: indices.remove(indices[1]-indices[0])
