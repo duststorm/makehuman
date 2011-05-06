@@ -24,10 +24,10 @@ Abstract
 This module uses LAPACK and BLAS methods imported to linalg_module
 """
 
-from linalg_module import *
+import linalg_module
 
 def linsolve(A,b):
     """
     Given a system of linear equations defined by the formula Ax = b for some square matrix A, we solve x
     """
-    return svx(A,b, len(b))
+    return linalg_module.svx(A,b, len(b))

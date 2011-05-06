@@ -10,6 +10,7 @@ from skeleton import Skeleton
 from mh2obj import exportObj
 from mh import getPath
 from linalg import *
+from copy import deepcopy
 print 'Pose2 plugin imported'
 
 exportPath = getPath('exports')
@@ -219,12 +220,12 @@ class PoseTaskView(gui3d.TaskView):
         bboxj[1][0] = x
         bboxl[0][0] = x
         
-        #convert to tetrahedrons
-        
-        #bbox = calcBBox(self.app.selectedHuman.meshData.verts,  testJoint.bindedVects)
         tets =  box2Tetrahedrons(bboxj)
-        tets2 = deformTets(tets, center, angle) #temorarily rotate about z axis 
+        tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
+        
         #compute mvc weights for each vertex in the bindings of r-shoulder
+        for v in jointVerts:
+          i,w = computeWeights(v,tets)
         #1. extract the triangular face from bbox for each vertex
         #2. compute mvc weights using the triangle formula
  
@@ -274,16 +275,14 @@ def load(app):
 def unload(app):
     print 'pose unloaded'
     
-#rotate one side of tets
+#rotate one side of tets along z-axis
 def deformTets(tets, center, angle):
-    tets2 = []
-    #deep copy tets to tets2
-    for tet in tets:
-      tets.append([])
-      for vert in tet:
-        tets[len(tets)-1].append(vert[:])
-    #rotates accordingly
-    return None
+    tets2 = deepcopy(tets)
+    for tet in tets2:
+        for v in tet:
+            if v[0] > center[0]:
+                v = vadd(mtransform(makeRotation([0.0,0.0,1.0], vsub(v, center))),center)
+    return tets2
 
 #needed for making mvc or harmonic coord. cage
 def box2Tetrahedrons(box):
@@ -394,6 +393,19 @@ def findTetrahedron(tets, v):
           indices.remove(2*indices[0])
         else: indices.remove(indices[1]-indices[0])
     return indices[0]
+    
+    
+def computeWeights(v,tets):
+    i = findTetrahedron(tets,v)
+    # w1vt1 + w2vt2 + w3vt3 + w4vt4 = v
+    #w1 + w2 + w3 + w4 = 1
+    y = [v[0], v[1], v[2], 1]
+    A = [0]*16
+    for rows in xrange(0,3):
+        for cols in xrange(0,4):
+          A[rows*4 + cols] = tets[cols][rows]
+    w = linsolve(A,y)
+    return i,w
     
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
