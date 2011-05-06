@@ -40,6 +40,14 @@ class SettingsTaskView(gui3d.TaskView):
         imperial = gui3d.RadioButton(unitBox, modes, 'Imperial', self.app.settings.get('units', 'metric') == 'imperial');y += 24
         y+=16
         
+        fonts = []
+        
+        unitBox = self.unitsBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Font', gui3d.GroupBoxStyle._replace())
+        arial = gui3d.RadioButton(unitBox, fonts, 'Arial', self.app.settings.get('font', 'arial') == 'arial', style=gui3d.RadioButtonStyle._replace(fontFamily='arial'))
+        courier = gui3d.RadioButton(unitBox, fonts, 'Courier', self.app.settings.get('font', 'arial') == 'courier', style=gui3d.RadioButtonStyle._replace(fontFamily='courier'))
+        ubuntu = gui3d.RadioButton(unitBox, fonts, 'Ubuntu', self.app.settings.get('font', 'arial') == 'ubuntu', style=gui3d.RadioButtonStyle._replace(fontFamily='ubuntu'))
+        verdana = gui3d.RadioButton(unitBox, fonts, 'Verdana', self.app.settings.get('font', 'arial') == 'verdana', style=gui3d.RadioButtonStyle._replace(fontFamily='verdana'))
+        
         @self.shaderNo.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderNo, event)
@@ -90,6 +98,34 @@ class SettingsTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.RadioButton.onClicked(imperial, event)
             self.app.settings['units'] = 'imperial'
+            
+        @arial.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(arial, event)
+            self.app.settings['font'] = 'arial'
+            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
+                'OK', helpId='fontHelp')
+            
+        @courier.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(courier, event)
+            self.app.settings['font'] = 'courier'
+            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
+                'OK', helpId='fontHelp')
+            
+        @ubuntu.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(ubuntu, event)
+            self.app.settings['font'] = 'ubuntu'
+            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
+                'OK', helpId='fontHelp')
+            
+        @verdana.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(verdana, event)
+            self.app.settings['font'] = 'verdana'
+            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
+                'OK', helpId='fontHelp')
                 
     def setShader(self, vertex, fragment):
             human = self.app.selectedHuman

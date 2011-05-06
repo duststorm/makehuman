@@ -110,7 +110,8 @@ class MHApplication(gui3d.Application):
             'lowspeed': 1,
             'highspeed': 5,
             'units':'metric',
-            'invertMouseWheel':False
+            'invertMouseWheel':False,
+            'font':'arial'
         }
         
         self.shortcuts = {
@@ -505,6 +506,7 @@ class MHApplication(gui3d.Application):
             f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
             settings = eval(f.read())
             self.settings.update(settings)
+            f.close()
         
         if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
             self.shortcuts = {}
@@ -513,7 +515,8 @@ class MHApplication(gui3d.Application):
                 modifier, key, method = line.split(' ')
                 #print modifier, key, method[0:-1]
                 if hasattr(self, method[0:-1]):
-                    self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])       
+                    self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
+            f.close()
  
         if os.path.isfile(os.path.join(mh.getPath(''), "mouse.ini")):
             self.mouseActions = {}
@@ -523,28 +526,34 @@ class MHApplication(gui3d.Application):
                 #print modifier, button, method[0:-1]
                 if hasattr(self, method[0:-1]):
                     self.mouseActions[(int(modifier), int(button))] = getattr(self, method[0:-1])
+            f.close()
         
         if os.path.isfile(os.path.join(mh.getPath(''), "help.ini")):
             self.helpIds = []
             f = open(os.path.join(mh.getPath(''), "help.ini"), 'r')
             for line in f:
                 self.helpIds.append(line[0:-1])
+            f.close()
         
     def saveSettings(self):
         f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
         f.write(repr(self.settings))
+        f.close()
         
         f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'w')
         for shortcut, method in self.shortcuts.iteritems():
             f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
+        f.close()
             
         f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'w')
         for mouseAction, method in self.mouseActions.iteritems():
             f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
+        f.close()
             
         f = open(os.path.join(mh.getPath(''), "help.ini"), 'w')
         for helpId in self.helpIds:
             f.write('%s\n' % helpId)
+        f.close()
 
     # Themes
     def setTheme(self, theme):

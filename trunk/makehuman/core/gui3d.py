@@ -32,8 +32,14 @@ import os
 import font3d
 from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 
-defaultFontSize = 1.0
+defaultFontSize = 12
 defaultFontFamily = 'arial'
+
+if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
+    f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
+    settings = eval(f.read())
+    defaultFontFamily = settings.get('font', defaultFontFamily)
+    f.close()
 
 class Style:
     def __init__(self, width=None, height=None, left=None, top=None, zIndex=None,
@@ -268,7 +274,6 @@ class TextObject(Object):
         self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment);
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
-        self.mesh.setScale(fontSize, fontSize, fontSize)
         
         Object.__init__(self, view, position, self.mesh)
         
@@ -1151,7 +1156,6 @@ class Slider(View):
         return self.background.getPosition()
         
     def setPosition(self, position):
-        print position
         self.background.setPosition(position)
         self.thumb.setPosition([position[0], position[1] + 16, position[2] + 0.01])
         self.thumbMinX = position[0]
@@ -1315,7 +1319,6 @@ class Button(View):
             
         width = style.width
         height = style.height
-        fontSize = style.fontSize
         textAlign = style.textAlign
         border = style.border
         
@@ -1326,7 +1329,8 @@ class Button(View):
             if isinstance(label, str):
                 #assumes button obj origin is upper left corner
                 #TODO text should be in the middle of button, calculate this from text length
-                self.label = TextObject(self, [self.style.left + 5, self.style.top - 7, self.style.zIndex + 0.001], label, fontSize = fontSize)
+                self.label = TextObject(self, [self.style.left + 5, self.style.top - 7, self.style.zIndex + 0.001], label,
+                    fontSize = style.fontSize, fontFamily = style.fontFamily)
         else:
             if border:
                 mesh = NineSliceMesh(width, height, t, border)
@@ -1335,7 +1339,8 @@ class Button(View):
             self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
             if isinstance(label, str):
                 wrapWidth = (width - border[0] - border[2] if border else width) if textAlign else 0
-                self.label = TextObject(self, [self.style.left + border[0], self.style.top + height/2-6, self.style.zIndex + 0.001], label, wrapWidth, textAlign, fontSize = fontSize)
+                self.label = TextObject(self, [self.style.left + border[0], self.style.top + height/2-6, self.style.zIndex + 0.001],
+                    label, wrapWidth, textAlign, fontSize = style.fontSize, fontFamily = style.fontFamily)
             
         self.selected = selected
         
@@ -1964,7 +1969,7 @@ class FileChooser(View):
         self.extension = extension
         self.previewExtension = previewExtension
         self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=585-20, zIndex=9.1))
-        self.layout = BoxLayout(self)
+        self.layout = BoxLayout(self) # We set the layout here so that it doesn't influence the placement of the 
         self.files = []
         self.selection = ''
         self.childY = {}

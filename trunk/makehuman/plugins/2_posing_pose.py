@@ -49,7 +49,6 @@ class PoseTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Pose')      
 
-        self.jointSelected = False
         self.zone = ""
         self.skeleton = Skeleton()
         self.selectedGroups = []
@@ -117,40 +116,39 @@ class PoseTaskView(gui3d.TaskView):
             pass
             
     def onMouseMoved(self, event):
-        if not (self.joint): #(self.jointSelected):
-          human = self.app.selectedHuman
-          groups = []
-          self.zone = self.getJointZones(event.group.name)
+        if not self.joint:
+            human = self.app.selectedHuman
+            groups = []
+            self.zone = self.getJointZones(event.group.name)
 
-          if self.zone:
-              for g in human.mesh.faceGroups:
-                  if self.zone != "torso":
-                    if self.zone in g.name:
+            if self.zone:
+                for g in human.mesh.faceGroups:
+                    if self.zone != "torso":
+                        if self.zone in g.name:
+                            groups.append(g)
+                    elif (self.zone in g.name) and not g.name.endswith("clavicle"):
                         groups.append(g)
-                  elif (self.zone in g.name) and not g.name.endswith("clavicle"):
-                    groups.append(g)
 
-              for g in self.selectedGroups:
-                  if g not in groups:
-                      g.setColor([255, 255, 255, 255])
+                for g in self.selectedGroups:
+                    if g not in groups:
+                        g.setColor([255, 255, 255, 255])
 
-              for g in groups:
-                  if g not in self.selectedGroups:
-                      g.setColor([0, 169, 184, 255])
+                for g in groups:
+                    if g not in self.selectedGroups:
+                        g.setColor([0, 169, 184, 255])
                     
-              self.selectedGroups = groups
-              self.app.redraw()
+                self.selectedGroups = groups
+                self.app.redraw()
     
     def onMouseUp(self, event):
         if self.joint: 
-            #self.jointSelected = False
             self.joint = None
         else:
             self.joint = self.skeleton.getJoint(zonesToJointsMapping.get(self.zone))
-            self.Xslider.setValue(self.joint.rotation[0])
-            self.Yslider.setValue(self.joint.rotation[1])
-            self.Zslider.setValue(self.joint.rotation[2])
-            #self.jointSelected = True
+            if self.joint:
+                self.Xslider.setValue(self.joint.rotation[0])
+                self.Yslider.setValue(self.joint.rotation[1])
+                self.Zslider.setValue(self.joint.rotation[2])
     
     def onShow(self, event):
         self.app.selectedHuman.storeMesh()
@@ -165,7 +163,7 @@ class PoseTaskView(gui3d.TaskView):
     def getJointZones(self, groupName):
         for k in jointZones:
             if k in groupName:
-              return k
+                return k
         return None
     
     def mvcTest(self):
