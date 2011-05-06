@@ -11,6 +11,8 @@ from mh2obj import exportObj
 from mh import getPath
 from linalg import *
 from copy import deepcopy
+import module3d
+
 print 'Pose2 plugin imported'
 
 exportPath = getPath('exports')
@@ -221,19 +223,27 @@ class PoseTaskView(gui3d.TaskView):
         
         tets =  box2Tetrahedrons(bboxj)
         tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
+        #print "tets: ", tets
+        #print "tets2: ", tets2
         
         #compute mvc weights for each vertex in the bindings of r-shoulder
         for index in jointVerts:
-          v = verts[index].co
-          i,w = computeWeights(v,tets)
+          i,w = computeWeights(verts[index].co,tets)
+          #print v
+          #testv = [0,0,0]
+          #for j in xrange(0,4):
+          #  testv = vadd(vmul(tets[i][j],w[j]), testv)
+          #print testv
+          #break
+          #print w
+          v = [0.0,0.0,0.0]
           for j in xrange(0,4):
             v = vadd(vmul(tets2[i][j],w[j]), v)
-        #1. extract the triangular face from bbox for each vertex
-        #2. compute mvc weights using the triangle formula
- 
-        #rotate bbox
-        #use mvc algorithm to deform the vertices
-    
+          verts[index].co = v[:]
+        
+        self.app.selectedHuman.meshData.calcNormals()
+        self.app.selectedHuman.meshData.update()
+     
     def rotateJoint(self, joint, center, rotation, transform=None):                
         #src = self.app.selectedHuman.meshStored
         dst = self.app.selectedHuman.meshData.verts
@@ -283,7 +293,10 @@ def deformTets(tets, center, angle):
     for tet in tets2:
         for v in tet:
             if v[0] > center[0]:
-                v = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
+                print "transforming..."
+                v[:] = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
+                print v
+                print tets2
     return tets2
 
 #needed for making mvc or harmonic coord. cage
@@ -409,6 +422,39 @@ def computeWeights(v,tets):
           else: A[rows*4 + cols] = 1.0
     w = linsolve(A,y)
     return i,w
+    
+def wireCube(mesh, position=[0.0, 0.0, 0.0], scale=1.0, name='cube'):
+        
+    fg = mesh.createFaceGroup(name)
+
+    # The 8 vertices
+    v = []
+    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, -scale, -scale]))) # 0         /0-----1\
+    v.append(mesh.createVertex(aljabr.vadd(position, [scale, -scale, -scale])))  # 1        / |     | \
+    v.append(mesh.createVertex(aljabr.vadd(position, [scale, scale, -scale])))   # 2       |4---------5|
+    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, scale, -scale])))  # 3       |  |     |  |
+    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, -scale, scale])))  # 4       |  3-----2  |  
+    v.append(mesh.createVertex(aljabr.vadd(position, [scale, -scale, scale])))   # 5       | /       \ |
+    v.append(mesh.createVertex(aljabr.vadd(position, [scale, scale, scale])))    # 6       |/         \|
+    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, scale, scale])))   # 7       |7---------6|
+    
+    # The 12 "faces"
+    fg.createFace((v[4], v[5])) # front
+    fg.createFace((v[5], v[6])) # front
+    fg.createFace((v[6], v[7])) # front
+    fg.createFace((v[7], v[4])) # front
+    fg.createFace((v[1], v[0])) # back
+    fg.createFace((v[0], v[3])) # back
+    fg.createFace((v[3], v[2])) # back
+    fg.createFace((v[2], v[1])) # back
+    fg.createFace((v[0], v[4], v[7], v[3])) # left
+    fg.createFace((v[0], v[4], v[7], v[3])) # left
+    fg.createFace((v[0], v[4], v[7], v[3])) # left
+    fg.createFace((v[0], v[4], v[7], v[3])) # left
+    fg.createFace((v[5], v[1], v[2], v[6])) # right
+    fg.createFace((v[0], v[1], v[5], v[4])) # top
+    fg.createFace((v[7], v[6], v[2], v[3])) # bottom
+    
     
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
