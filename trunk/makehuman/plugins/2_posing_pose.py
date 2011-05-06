@@ -171,6 +171,7 @@ class PoseTaskView(gui3d.TaskView):
         angle = 45*degree2rad
         joint = self.skeleton.getJoint('joint-r-shoulder')
         center = joint.position
+        verts = self.app.selectedHuman.meshData.verts
         
         #get bindings for r-shoulder-joint
         f = open("utils/makepose/r-shoulder-joint.txt")
@@ -191,8 +192,8 @@ class PoseTaskView(gui3d.TaskView):
         f.close()
         
         #compute bounding box
-        bboxj = calcBBox(self.app.selectedHuman.meshData.verts,  jointVerts)
-        bboxl = calcBBox(self.app.selectedHuman.meshData.verts,  linkVerts)   
+        bboxj = calcBBox(verts,  jointVerts)
+        bboxl = calcBBox(verts,  linkVerts)   
         
         #recompute bounding box z and y values so they will be connected by 4 vertices in between them
         minY = min(bboxj[0][1], bboxl[0][1])
@@ -222,8 +223,11 @@ class PoseTaskView(gui3d.TaskView):
         tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
         
         #compute mvc weights for each vertex in the bindings of r-shoulder
-        for v in jointVerts:
+        for index in jointVerts:
+          v = verts[index].co
           i,w = computeWeights(v,tets)
+          for j in xrange(0,4):
+            v = vadd(vmul(tets2[i][j],w[j]), v)
         #1. extract the triangular face from bbox for each vertex
         #2. compute mvc weights using the triangle formula
  
@@ -397,11 +401,12 @@ def computeWeights(v,tets):
     i = findTetrahedron(tets,v)
     # w1vt1 + w2vt2 + w3vt3 + w4vt4 = v
     #w1 + w2 + w3 + w4 = 1
-    y = [v[0], v[1], v[2], 1]
+    y = [v[0], v[1], v[2], 1.0]
     A = [0]*16
-    for rows in xrange(0,3):
+    for rows in xrange(0,4):
         for cols in xrange(0,4):
-          A[rows*4 + cols] = tets[i][cols][rows]
+          if rows < 3: A[rows*4 + cols] = tets[i][cols][rows]
+          else: A[rows*4 + cols] = 1.0
     w = linsolve(A,y)
     return i,w
     
