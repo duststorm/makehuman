@@ -51,7 +51,6 @@ class Style:
         self.left=left
         self.top=top
         self.zIndex=zIndex
-        self.mesh = mesh
         self.normal = normal
         self.selected = selected
         self.focused = focused
@@ -65,7 +64,7 @@ class Style:
     def _replace(self, **kwds):
         
         style = {'width':self.width, 'height':self.height, 'left':self.left, 'top':self.top, 'zIndex':self.zIndex,
-                'mesh':self.mesh, 'normal':self.normal, 'selected':self.selected, 'focused':self.focused,
+                'normal':self.normal, 'selected':self.selected, 'focused':self.focused,
                 'fontFamily':self.fontFamily, 'fontSize':self.fontSize, 'textAlign':self.textAlign,
                 'border':self.border, 'padding':self.padding, 'margin':self.margin}
                 
@@ -505,7 +504,6 @@ TaskTabStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'button_tab2.png',
     'selected':'button_tab2_on.png',
     'focused':'button_tab2_focused.png',
@@ -553,7 +551,6 @@ CategoryTabStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'button_tab.png',
     'selected':'button_tab_on.png',
     'focused':'button_tab_focused.png',
@@ -570,7 +567,6 @@ CategoryButtonStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'button_tab3.png',
     'selected':'button_tab3_on.png',
     'focused':'button_tab3_focused.png',
@@ -907,7 +903,6 @@ TabViewStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'upperbar.png',
     'selected':None,
     'focused':None,
@@ -924,7 +919,6 @@ TabViewTabStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'button_tab.png',
     'selected':'button_tab_on.png',
     'focused':'button_tab_focused.png',
@@ -999,7 +993,6 @@ SliderStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'slider_generic.png',
     'selected':None,
     'focused':None,
@@ -1016,7 +1009,6 @@ SliderThumbStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'slider.png',
     'selected':None,
     'focused':'slider_focused.png',
@@ -1270,7 +1262,6 @@ ButtonStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'button_unselected.png',
     'selected':'button_selected.png',
     'focused':'button_focused.png',
@@ -1324,23 +1315,15 @@ class Button(View):
         
         self.style = style
             
-        if style.mesh:
-            self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], style.mesh, texture=t)
-            if isinstance(label, str):
-                #assumes button obj origin is upper left corner
-                #TODO text should be in the middle of button, calculate this from text length
-                self.label = TextObject(self, [self.style.left + 5, self.style.top - 7, self.style.zIndex + 0.001], label,
-                    fontSize = style.fontSize, fontFamily = style.fontFamily)
+        if border:
+            mesh = NineSliceMesh(width, height, t, border)
         else:
-            if border:
-                mesh = NineSliceMesh(width, height, t, border)
-            else:
-                mesh = RectangleMesh(width, height, t)
-            self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
-            if isinstance(label, str):
-                wrapWidth = (width - border[0] - border[2] if border else width) if textAlign else 0
-                self.label = TextObject(self, [self.style.left + border[0], self.style.top + height/2-6, self.style.zIndex + 0.001],
-                    label, wrapWidth, textAlign, fontSize = style.fontSize, fontFamily = style.fontFamily)
+            mesh = RectangleMesh(width, height, t)
+        self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        if isinstance(label, str):
+            wrapWidth = (width - border[0] - border[2] if border else width) if textAlign else 0
+            self.label = TextObject(self, [self.style.left + border[0], self.style.top + height/2-6, self.style.zIndex + 0.001],
+                label, wrapWidth, textAlign, fontSize = style.fontSize, fontFamily = style.fontFamily)
             
         self.selected = selected
         
@@ -1419,7 +1402,6 @@ RadioButtonStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'radio_off.png',
     'selected':'radio_on.png',
     'focused':'radio_focus.png',
@@ -1533,7 +1515,6 @@ CheckBoxStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'check_off.png',
     'selected':'check_on.png',
     'focused':'check_focus.png',
@@ -1569,7 +1550,6 @@ ProgressBarStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'progressbar_background.png',
     'selected':None,
     'focused':None,
@@ -1583,7 +1563,6 @@ ProgressBarBarStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'progressbar.png',
     'selected':None,
     'focused':None,
@@ -1653,7 +1632,6 @@ TextViewStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':None,
     'selected':None,
     'focused':None,
@@ -1698,7 +1676,6 @@ TextEditStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'texedit_off.png',
     'selected':None,
     'focused':'texedit_on.png',
@@ -1904,7 +1881,6 @@ FileChooserRectangleStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':None,
     'selected':None,
     'focused':None,
@@ -1949,7 +1925,6 @@ FileChooserStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':None,
     'selected':None,
     'focused':None,
@@ -2321,7 +2296,6 @@ GroupBoxStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'group_box.png',
     'selected':None,
     'focused':None,
@@ -2401,7 +2375,6 @@ ShortcutEditStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'button_tab3_on.png',
     'selected':None,
     'focused':'button_tab3_focused.png',
@@ -2753,7 +2726,6 @@ RadialStyle = Style(**{
     'left':0,
     'top':0,
     'zIndex':0,
-    'mesh':None,
     'normal':'radial_graph.png',
     'border':[2, 2, 2, 2]
     })
