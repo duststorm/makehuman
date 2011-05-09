@@ -274,7 +274,7 @@ class TextObject(Object):
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         
-        Object.__init__(self, view, position, self.mesh)
+        Object.__init__(self, view, [int(position[0]), int(position[1]), position[2]], self.mesh)
         
     def setText(self, text):
         
@@ -292,6 +292,9 @@ class TextObject(Object):
     def getText(self):
         
         return self.text
+        
+    def setPosition(self, position):
+        Object.setPosition(self, [int(position[0]), int(position[1]), position[2]])
 
 # Base layout
 
@@ -1058,10 +1061,11 @@ class Slider(View):
         self.background = Object(self, [style.left, style.top, style.zIndex], mesh)
         
         mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
-        self.thumb = Object(self, [style.left, style.top + 16, style.zIndex + 0.01], mesh)
+        self.thumb = Object(self, [style.left, style.top + style.height / 2, style.zIndex + 0.01], mesh)
             
         if isinstance(label, str):
-            self.label = TextObject(self, [style.left, style.top + 8 - 6, style.zIndex + 0.2], label, fontSize = style.fontSize)
+            font = self.app.getFont(style.fontFamily)
+            self.label = TextObject(self, [style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], label, fontSize = style.fontSize)
             if '%' in label:
                 self.labelFormat = label
                 self.edit = TextEdit(self, '',
@@ -1269,7 +1273,8 @@ ButtonStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
     'border':[2, 2, 2, 2],
-    'margin':[2, 2, 2, 2]
+    'margin':[2, 2, 2, 2],
+    'padding':[2, 2, 2, 2]
     })
 
 class Button(View):
@@ -1310,19 +1315,18 @@ class Button(View):
             
         width = style.width
         height = style.height
-        textAlign = style.textAlign
-        border = style.border
-        
-        self.style = style
             
-        if border:
-            mesh = NineSliceMesh(width, height, t, border)
+        if style.border:
+            mesh = NineSliceMesh(width, height, t, style.border)
         else:
             mesh = RectangleMesh(width, height, t)
         self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         if isinstance(label, str):
-            wrapWidth = (width - border[0] - border[2] if border else width) if textAlign else 0
-            self.label = TextObject(self, [self.style.left + border[0], self.style.top + height/2-6, self.style.zIndex + 0.001],
+            textAlign = style.textAlign
+            font = self.app.getFont(style.fontFamily)
+            wrapWidth = (width - style.padding[0] - style.padding[2] if style.padding else width) if textAlign else 0
+            self.label = TextObject(self, [self.style.left + (self.style.padding[0] if self.style.padding else 0), 
+                self.style.top + height/2.0-font.lineHeight/2.0, self.style.zIndex + 0.001],
                 label, wrapWidth, textAlign, fontSize = style.fontSize, fontFamily = style.fontFamily)
             
         self.selected = selected
@@ -1333,7 +1337,9 @@ class Button(View):
     def setPosition(self, position):
         self.button.setPosition(position)
         if getattr(self, 'label'):
-            self.label.setPosition([position[0] + self.style.border[0],position[1]+self.style.height/2-6,position[2]+0.001])
+            font = self.app.getFont(self.style.fontFamily)
+            self.label.setPosition([position[0] + (self.style.padding[0] if self.style.padding else 0), 
+                position[1] + self.style.height/2.0-font.lineHeight/2.0, position[2] + 0.001])
 
     def setTexture(self, texture):
         self.texture = texture
@@ -1409,7 +1415,8 @@ RadioButtonStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':[19, 19, 4, 1],
-    'margin':[2, 2, 2, 2]
+    'margin':[2, 2, 2, 2],
+    'padding':[22, 0, 0, 0]
     })
 
 class RadioButton(Button):
@@ -1522,7 +1529,8 @@ CheckBoxStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':[18, 18, 4, 2],
-    'margin':[2, 2, 2, 2]
+    'margin':[2, 2, 2, 2],
+    'padding':[22, 0, 0, 0]
     })
             
 class CheckBox(ToggleButton):
@@ -2334,9 +2342,11 @@ class GroupBox(View):
         mesh = NineSliceMesh(self.style.width, self.style.height, texture, self.style.border)
         self.box = Object(self, position, mesh)
         
+        font = self.app.getFont(self.style.fontFamily)
+        
         if isinstance(label, str):
             self.label = TextObject(self,
-                [position[0]+self.style.border[0],position[1]+self.style.border[1]/2-6,position[2]+0.001],
+                [position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2,position[2]+0.001],
                 label,
                 fontSize = self.style.fontSize)
     

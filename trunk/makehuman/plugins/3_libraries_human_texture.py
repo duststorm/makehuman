@@ -58,6 +58,7 @@ HumanTextureButtonStyle = gui3d.Style(**{
     'normal':None,
     'selected':None,
     'focused':None,
+    'fontFamily':gui3d.defaultFontFamily,
     'fontSize':gui3d.defaultFontSize,
     'border':None
     })
