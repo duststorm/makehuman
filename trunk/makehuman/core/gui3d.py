@@ -2737,12 +2737,13 @@ RadialStyle = Style(**{
     'top':0,
     'zIndex':0,
     'normal':'radial_graph.png',
-    'border':[2, 2, 2, 2]
+    'border':[2, 2, 2, 2],
+    'margin':[2, 0, 2, 0]
     })
 
 class Radial(View):
     
-    def __init__(self, parent, position, style=RadialStyle):
+    def __init__(self, parent, style=RadialStyle):
         
         """
         This is the constructor for the Radial class.
@@ -2759,9 +2760,9 @@ class Radial(View):
         @type style: L{Style}
         """
         
-        View.__init__(self, parent)
+        View.__init__(self, parent, style)
         
-        self.texture = self.app.getThemeResource('images', style.normal)
+        self.texture = self.app.getThemeResource('images', self.style.normal)
         
         '''if selected and self.selectedTexture:
             t = self.selectedTexture
@@ -2770,17 +2771,16 @@ class Radial(View):
         
         t = self.texture
         
-        width = style.width
-        height = style.height
-        border = style.border
-        
-        self.style = style
+        width = self.style.width
+        height = self.style.height
+        border = self.style.border
         
         if border:
             mesh = NineSliceMesh(width, height, t, border)
         else:
             mesh = RectangleMesh(width, height, t)
-        self.radial = Object(self, position, mesh)
+            
+        self.radial = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         
     def getPosition(self):
         return self.radial.getPosition()

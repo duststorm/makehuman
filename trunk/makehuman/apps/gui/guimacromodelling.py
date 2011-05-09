@@ -45,11 +45,8 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.weightSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Weight")
         self.heightSlider = gui3d.Slider(self.macroBox, value=0.0, min=-1.0, max=1.0, label = "Height")
         
-        # Macro Radial Widget
-        y = 80
-        #todo commented radial out until the radial_png is commited
-        #self.radialBox = gui3d.GroupBox(self, [600, y, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(height=25+160+6, width=185+10));y+=25
-        #self.radialWidget = gui3d.Radial(self.radialBox, position=[605, y, 9.2])
+        self.radialBox = gui3d.GroupBox(self, [590, 80, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(width=185+15))
+        self.radialWidget = gui3d.Radial(self.radialBox)
 
         #hair update only necessary for : gender, age , height
         
