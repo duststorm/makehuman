@@ -2342,9 +2342,8 @@ class GroupBox(View):
         mesh = NineSliceMesh(self.style.width, self.style.height, texture, self.style.border)
         self.box = Object(self, position, mesh)
         
-        font = self.app.getFont(self.style.fontFamily)
-        
         if isinstance(label, str):
+            font = self.app.getFont(self.style.fontFamily)
             self.label = TextObject(self,
                 [position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2,position[2]+0.001],
                 label,
@@ -2421,8 +2420,9 @@ class ShortcutEdit(View):
         
         mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
         self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        font = self.app.getFont(self.style.fontFamily)
         self.label = TextObject(self,
-            [self.style.left + 7 + 3, self.style.top+22/2-6, self.style.zIndex+0.001],
+            [self.style.left + 7 + 3, self.style.top+self.style.height/2.0-font.lineHeight/2.0, self.style.zIndex+0.001],
             self.shortcutToLabel(shortcut[0], shortcut[1]))
             
     def getPosition(self):
@@ -2430,7 +2430,8 @@ class ShortcutEdit(View):
     
     def setPosition(self, position):
         self.background.setPosition(position)
-        self.label.setPosition([position[0] + 7 + 3,position[1]+22/2-6,position[2]+0.001])
+        font = self.app.getFont(self.style.fontFamily)
+        self.label.setPosition([position[0] + 7 + 3, position[1]+self.style.height/2.0-font.lineHeight/2.0, position[2]+0.001])
             
     def setShortcut(self, shortcut):
         self.label.setText(self.shortcutToLabel(shortcut[0], shortcut[1]))
