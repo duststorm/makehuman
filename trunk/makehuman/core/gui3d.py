@@ -1647,7 +1647,7 @@ TextViewStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':None,
-    'margin':[2,2,2,2]
+    'margin':[2,2,2,8]
     })
 
 class TextView(View):
