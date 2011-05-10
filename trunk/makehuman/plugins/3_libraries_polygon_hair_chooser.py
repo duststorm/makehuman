@@ -56,31 +56,7 @@ class HairTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             
-            filename
-            
-            obj = os.path.join('data/hairstyles', filename)
-            png = obj.replace('.obj', '_texture.png')
-            
-            human = self.app.selectedHuman
-            
-            if human.hairObj:
-                self.app.scene3d.delete(human.hairObj.mesh)
-                human.hairObj = None
-
-            mesh = files3d.loadMesh(self.app.scene3d, obj)
-            mesh.setTexture(png)
-            
-            human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
-            human.hairObj.setRotation(human.getRotation())
-            human.hairObj.mesh.setCameraProjection(0)
-            human.hairObj.mesh.setSolid(human.mesh.solid)
-            human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
-            human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
-            self.app.scene3d.update()
-            self.adaptHairToHuman(human)
-            human.hairObj.setSubdivided(human.isSubdivided())
-            
-            self.hairButton.setTexture(obj.replace('.obj', '.png'))
+            self.setHair(self.app.selectedHuman, filename)
             
             self.app.switchCategory('Modelling')
             
@@ -88,7 +64,31 @@ class HairTaskView(gui3d.TaskView):
         def onClicked(event):
             self.app.switchCategory('Library')
             self.app.switchTask("Hair")
-            
+
+    def setHair(self, human, filename):
+
+		obj = os.path.join('data/hairstyles', filename)
+		png = obj.replace('.obj', '_texture.png')
+		
+		if human.hairObj:
+			self.app.scene3d.delete(human.hairObj.mesh)
+			human.hairObj = None
+
+		mesh = files3d.loadMesh(self.app.scene3d, obj)
+		mesh.setTexture(png)
+		
+		human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
+		human.hairObj.setRotation(human.getRotation())
+		human.hairObj.mesh.setCameraProjection(0)
+		human.hairObj.mesh.setSolid(human.mesh.solid)
+		human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
+		human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
+		self.app.scene3d.update()
+		self.adaptHairToHuman(human)
+		human.hairObj.setSubdivided(human.isSubdivided())
+		
+		self.hairButton.setTexture(obj.replace('.obj', '.png'))
+
     def adaptHairToHuman(self, human):
 
         if human.hairObj:
@@ -136,9 +136,19 @@ class HairTaskView(gui3d.TaskView):
             if human.hairObj:
                 self.app.scene3d.delete(human.hairObj.mesh)
                 human.hairObj = None
+            self.hairButton.setTexture('data/hairstyles/clear.png')
         def updateClosure():
             self.adaptHairToHuman(human)
         mh.callAsync(updateClosure)
+
+    def loadHandler(self, human, values):
+        
+        self.setHair(human, values[1])
+        
+    def saveHandler(self, human, file):
+        
+        if human.hairObj:
+            file.write('hair %s\n' % human.hairObj.mesh.name)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
@@ -147,6 +157,9 @@ class HairTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Library')
     taskview = HairTaskView(category)
+
+    app.addLoadHandler('hair', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
