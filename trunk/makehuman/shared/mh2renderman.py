@@ -424,15 +424,15 @@ class RMRHuman(RMNObject):
         self.nails.material = self.skinMat
         self.nails.joinGroupIndices()
         
-        self.hairScalp = RMNObject(name = "hairscalp")
-        self.hairScalp.groupsDict = self.groupsDict
-        self.hairScalp.meshData = self.meshData
-        self.hairScalp.facesGroup = hairGr
-        self.hairScalp.material = self.hairMat
-        self.hairScalp.joinGroupIndices()
+        #self.hairScalp = RMNObject(name = "hairscalp")
+        #self.hairScalp.groupsDict = self.groupsDict
+        #self.hairScalp.meshData = self.meshData
+        #self.hairScalp.facesGroup = hairGr
+        #self.hairScalp.material = self.hairMat
+        #self.hairScalp.joinGroupIndices()
 
         for s in [self.rEyeBall,self.lEyeBall,self.rCornea,\
-            self.lCornea,self.teeth,self.nails,self.hairScalp]:
+            self.lCornea,self.teeth,self.nails]:
             toSubtract = toSubtract.union(s.facesGroup)
 
         self.skin = RMNObject(name = "skin")
@@ -445,7 +445,7 @@ class RMRHuman(RMNObject):
 
         #parts to render with different material
         self.subObjects = [self.skin,self.rEyeBall,self.lEyeBall,
-                        self.rCornea,self.lCornea,self.nails,self.hairScalp]
+                        self.rCornea,self.lCornea,self.nails]
 
     def getSubObject(self, name):
         for subOb in self.subObjects:
