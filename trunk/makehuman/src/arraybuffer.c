@@ -171,7 +171,7 @@ PyObject *ArrayBufferView_item(ArrayBufferView *self, Py_ssize_t i)
   ArrayBufferViewType *type = ABV_TYPE(self);
   char *data = (char*)self->buffer->data + self->byteOffset + i * type->BYTES_PER_ELEMENT;
 
-  if (i >= self->length)
+  if (i >= (Py_ssize_t)self->length)
   {
       PyErr_Format(PyExc_IndexError, "element index out of range");
       return NULL;
@@ -187,19 +187,19 @@ PyObject *ArrayBufferView_slice(ArrayBufferView *self, Py_ssize_t i1, Py_ssize_t
 
   if (i1 < 0)
     i1 = 0;
-  else if (i1 > self->length)
+  else if (i1 > (Py_ssize_t)self->length)
     i1 = self->length;
   
   if (i2 < i1)
     i2 = i1;
-  else if (i2 > self->length)
+  else if (i2 > (Py_ssize_t)self->length)
     i2 = self->length;
 
   slice->buffer = self->buffer;
   Py_INCREF(slice->buffer);
-  slice->length = i2 - i1;
+  slice->length = (unsigned int)(i2 - i1);
   slice->byteOffset = self->byteOffset + i1 * type->BYTES_PER_ELEMENT;
-  slice->byteLength = (i2 - i1) * type->BYTES_PER_ELEMENT;
+  slice->byteLength = (unsigned int)(i2 - i1) * type->BYTES_PER_ELEMENT;
 
   return (PyObject*)slice;
 }
@@ -209,7 +209,7 @@ int ArrayBufferView_ass_item(ArrayBufferView *self, Py_ssize_t i, PyObject *valu
   ArrayBufferViewType *type = ABV_TYPE(self);
   char *data = (char*)self->buffer->data + self->byteOffset + i * type->BYTES_PER_ELEMENT;
 
-  if (i >= self->length)
+  if (i >= (Py_ssize_t)self->length)
   {
     PyErr_Format(PyExc_IndexError, "element index out of range");
     return -1;
@@ -226,12 +226,12 @@ int ArrayBufferView_ass_slice(ArrayBufferView *self, Py_ssize_t i1, Py_ssize_t i
 
   if (i1 < 0)
     i1 = 0;
-  else if (i1 > self->length)
+  else if (i1 > (Py_ssize_t)self->length)
     i1 = self->length;
 
   if (i2 < i1)
     i2 = i1;
-  else if (i2 > self->length)
+  else if (i2 > (Py_ssize_t)self->length)
     i2 = self->length;
 
   if (Py_TYPE(v) == Py_TYPE(self))

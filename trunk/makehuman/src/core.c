@@ -72,20 +72,25 @@ static PyMemberDef Object3D_members[] =
 // Object3D Methods
 static PyMethodDef Object3D_methods[] =
 {
-    {"setVertCoord", (PyCFunction)Object3D_setVertCoo, METH_VARARGS,
+    {
+        "setVertCoord", (PyCFunction)Object3D_setVertCoo, METH_VARARGS,
         ""
     },
-    {"setNormCoord", (PyCFunction)Object3D_setNormCoo, METH_VARARGS,
-     ""
+    {
+        "setNormCoord", (PyCFunction)Object3D_setNormCoo, METH_VARARGS,
+        ""
     },
-    {"setUVCoord", (PyCFunction)Object3D_setUVCoo, METH_VARARGS,
-     ""
+    {
+        "setUVCoord", (PyCFunction)Object3D_setUVCoo, METH_VARARGS,
+        ""
     },
-    {"setColorIDComponent", (PyCFunction)Object3D_setColorIDComponent, METH_VARARGS,
-     ""
+    {
+        "setColorIDComponent", (PyCFunction)Object3D_setColorIDComponent, METH_VARARGS,
+        ""
     },
-    {"setColorComponent", (PyCFunction)Object3D_setColorComponent, METH_VARARGS,
-     ""
+    {
+        "setColorComponent", (PyCFunction)Object3D_setColorComponent, METH_VARARGS,
+        ""
     },
     {NULL}  /* Sentinel */
 };
@@ -497,9 +502,9 @@ int Object3D_setTranslation(Object3D *self, PyObject *value)
         return -1;
     }
 
-    self->x = PyFloat_AsDouble(PySequence_GetItem(value, 0));
-    self->y = PyFloat_AsDouble(PySequence_GetItem(value, 1));
-    self->z = PyFloat_AsDouble(PySequence_GetItem(value, 2));
+    self->x = (float)PyFloat_AsDouble(PySequence_GetItem(value, 0));
+    self->y = (float)PyFloat_AsDouble(PySequence_GetItem(value, 1));
+    self->z = (float)PyFloat_AsDouble(PySequence_GetItem(value, 2));
 
     return 0;
 }
@@ -531,9 +536,9 @@ int Object3D_setRotation(Object3D *self, PyObject *value)
         return -1;
     }
 
-    self->rx = PyFloat_AsDouble(PySequence_GetItem(value, 0));
-    self->ry = PyFloat_AsDouble(PySequence_GetItem(value, 1));
-    self->rz = PyFloat_AsDouble(PySequence_GetItem(value, 2));
+    self->rx = (float)PyFloat_AsDouble(PySequence_GetItem(value, 0));
+    self->ry = (float)PyFloat_AsDouble(PySequence_GetItem(value, 1));
+    self->rz = (float)PyFloat_AsDouble(PySequence_GetItem(value, 2));
 
     return 0;
 }
@@ -565,57 +570,57 @@ int Object3D_setScale(Object3D *self, PyObject *value)
         return -1;
     }
 
-    self->sx = PyFloat_AsDouble(PySequence_GetItem(value, 0));
-    self->sy = PyFloat_AsDouble(PySequence_GetItem(value, 1));
-    self->sz = PyFloat_AsDouble(PySequence_GetItem(value, 2));
+    self->sx = (float)PyFloat_AsDouble(PySequence_GetItem(value, 0));
+    self->sy = (float)PyFloat_AsDouble(PySequence_GetItem(value, 1));
+    self->sz = (float)PyFloat_AsDouble(PySequence_GetItem(value, 2));
 
     return 0;
 }
 
 PyObject * Object3D_getTransparentPrimitives( Object3D *self, void *closure)
 {
-  return Py_BuildValue("i", self->nTransparentPrimitives);
+    return Py_BuildValue("i", self->nTransparentPrimitives);
 }
 
 int Object3D_setTransparentPrimitives( Object3D *self, PyObject *value)
 {
-  int transparentPrimitives = PyInt_AsLong(value);
+    int transparentPrimitives = PyInt_AsLong(value);
 
-  if (transparentPrimitives < 0)
-  {
-    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i", transparentPrimitives);
-    return -1;
-  }
+    if (transparentPrimitives < 0)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i", transparentPrimitives);
+        return -1;
+    }
 
-  if (transparentPrimitives > self->nPrimitives)
-  {
-    PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i while there are only %i quads", transparentPrimitives, self->nPrimitives);
-    return -1;
-  }
+    if (transparentPrimitives > self->nPrimitives)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Trying to set transparentQuads to %i while there are only %i quads", transparentPrimitives, self->nPrimitives);
+        return -1;
+    }
 
-  self->nTransparentPrimitives = transparentPrimitives;
+    self->nTransparentPrimitives = transparentPrimitives;
 
-  return 0;
+    return 0;
 }
 
 PyObject * Object3D_getVertsPerPrimitive( Object3D *self, void *closure)
 {
-  return Py_BuildValue("i", self->vertsPerPrimitive);
+    return Py_BuildValue("i", self->vertsPerPrimitive);
 }
 
 int Object3D_setVertsPerPrimitive( Object3D *self, PyObject *value)
 {
-  int vertsPerPrimitive = PyInt_AsLong(value);
+    int vertsPerPrimitive = PyInt_AsLong(value);
 
-  if (vertsPerPrimitive < 1 || vertsPerPrimitive > 4)
-  {
-    PyErr_Format(PyExc_RuntimeError, "Trying to set vertsPerPrimitive to %i while only values between 1 and 4 inclusive are allowed", vertsPerPrimitive);
-    return -1;
-  }
+    if (vertsPerPrimitive < 1 || vertsPerPrimitive > 4)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Trying to set vertsPerPrimitive to %i while only values between 1 and 4 inclusive are allowed", vertsPerPrimitive);
+        return -1;
+    }
 
-  self->vertsPerPrimitive = vertsPerPrimitive;
+    self->vertsPerPrimitive = vertsPerPrimitive;
 
-  return 0;
+    return 0;
 }
 
 static int distanceSort(const void *a, const void *b)
@@ -652,7 +657,7 @@ void Object3D_sortFaces(Object3D *self)
     cz -= self->z;
 
     // Rotate X
-    alpha = -self->rx * 3.141592653589793238462643 / 180.0;
+    alpha = (float)(-self->rx * 3.141592653589793238462643 / 180.0);
     c = cosf(alpha);
     s = sinf(alpha);
     tx = cx;
@@ -660,7 +665,7 @@ void Object3D_sortFaces(Object3D *self)
     tz = cy*s + cz*c;
 
     // Rotate Y
-    alpha = -self->ry * 3.141592653589793238462643 / 180.0;
+    alpha = (float)(-self->ry * 3.141592653589793238462643 / 180.0);
     c = cosf(alpha);
     s = sinf(alpha);
     cx = tz*s + tx*c;
@@ -668,7 +673,7 @@ void Object3D_sortFaces(Object3D *self)
     cz = tz*c - tx*s;
 
     // Rotate Z
-    alpha = -self->rz * 3.141592653589793238462643 / 180.0;
+    alpha = (float)(-self->rz * 3.141592653589793238462643 / 180.0);
     c = cosf(alpha);
     s = sinf(alpha);
     tx = cx*c - cy*s;
@@ -719,17 +724,17 @@ void Object3D_sortFaces(Object3D *self)
 
         for (n = 0; n < 4; n++)
         {
-          G.sortData[i].indices[n] = *indices;
-          verts = &self->verts[*indices * 3];
-          x = *verts++ - cx;
-          y = *verts++ - cy;
-          z = *verts++ - cz;
-          indices++;
+            G.sortData[i].indices[n] = *indices;
+            verts = &self->verts[*indices * 3];
+            x = *verts++ - cx;
+            y = *verts++ - cy;
+            z = *verts++ - cz;
+            indices++;
 
-          d = x*x+y*y+z*z;
+            d = x*x+y*y+z*z;
 
-          if (d < distance)
-            distance = d;
+            if (d < distance)
+                distance = d;
         }
 #endif
 
@@ -760,8 +765,8 @@ void Object3D_sortFaces(Object3D *self)
  */
 void callMouseButtonDown(int b, int x, int y)
 {
-  if (G.mouseDownCallback && !PyObject_CallFunction(G.mouseDownCallback, "iii", b, x, y))
-    PyErr_Print();
+    if (G.mouseDownCallback && !PyObject_CallFunction(G.mouseDownCallback, "iii", b, x, y))
+        PyErr_Print();
 }
 
 /** \brief Invokes the Python mouseButtonUp function.
@@ -774,8 +779,8 @@ void callMouseButtonDown(int b, int x, int y)
  */
 void callMouseButtonUp(int b, int x, int y)
 {
-  if (G.mouseUpCallback && !PyObject_CallFunction(G.mouseUpCallback, "iii", b, x, y))
-    PyErr_Print();
+    if (G.mouseUpCallback && !PyObject_CallFunction(G.mouseUpCallback, "iii", b, x, y))
+        PyErr_Print();
 }
 
 /** \brief Invokes the Python mouseMotion function.
@@ -792,8 +797,8 @@ void callMouseButtonUp(int b, int x, int y)
  */
 void callMouseMotion(int s, int x, int y, int xrel, int yrel)
 {
-  if (G.mouseMovedCallback && !PyObject_CallFunction(G.mouseMovedCallback, "iiiii", s, x, y, xrel, yrel))
-    PyErr_Print();
+    if (G.mouseMovedCallback && !PyObject_CallFunction(G.mouseMovedCallback, "iiiii", s, x, y, xrel, yrel))
+        PyErr_Print();
 }
 
 /** \brief Invokes the Python keyDown function.
@@ -807,28 +812,28 @@ void callKeyDown(int key, unsigned short character, int modifiers)
 {
     if (G.keyDownCallback &&
 #ifdef __WIN32__
-    !PyObject_CallFunction(G.keyDownCallback, "iu#i", key, &character, 1, modifiers))
+            !PyObject_CallFunction(G.keyDownCallback, "iu#i", key, &character, 1, modifiers))
 #else
-    !PyObject_CallFunction(G.keyDownCallback, "ici", key, key, modifiers))
+            !PyObject_CallFunction(G.keyDownCallback, "ici", key, key, modifiers))
 #endif
-    PyErr_Print();
+        PyErr_Print();
 }
 
 void callKeyUp(int key, unsigned short character, int modifiers)
 {
-  if (G.keyUpCallback &&
+    if (G.keyUpCallback &&
 #ifdef __WIN32__
-    !PyObject_CallFunction(G.keyUpCallback, "iu#i", key, &character, 1, modifiers))
+            !PyObject_CallFunction(G.keyUpCallback, "iu#i", key, &character, 1, modifiers))
 #else
-    !PyObject_CallFunction(G.keyUpCallback, "ici", key, key, modifiers))
+            !PyObject_CallFunction(G.keyUpCallback, "ici", key, key, modifiers))
 #endif
-    PyErr_Print();
+        PyErr_Print();
 }
 
 void callResize(int w, int h, int fullscreen)
 {
-  if (G.resizeCallback && !PyObject_CallFunction(G.resizeCallback, "iii", w, h, fullscreen))
-    PyErr_Print();
+    if (G.resizeCallback && !PyObject_CallFunction(G.resizeCallback, "iii", w, h, fullscreen))
+        PyErr_Print();
 }
 
 void setClearColor(float r, float g, float b, float a)

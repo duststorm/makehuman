@@ -134,8 +134,6 @@ extern "C"
 
 // Object3D attributes indirectly accessed by Python
     PyObject *Object3D_getShaderParameters(Object3D *self, void *closure);
-    PyObject *Object3D_getText(Object3D *self, void *closure);
-    int Object3D_setText(Object3D *self, PyObject *value, void *closure);
 
 // Object3D object methods
     void Object3D_dealloc(Object3D *self);
@@ -144,26 +142,26 @@ extern "C"
 
     typedef struct
     {
-      PyObject_HEAD
+        PyObject_HEAD
 
         float fovAngle;
-      float nearPlane;
-      float farPlane;
+        float nearPlane;
+        float farPlane;
 
-      int projection;
+        int projection;
 
-      int stereoMode;
-      float eyeSeparation;
+        int stereoMode;
+        float eyeSeparation;
 
-      float eyeX;
-      float eyeY;
-      float eyeZ;
-      float focusX;
-      float focusY;
-      float focusZ;
-      float upX;
-      float upY;
-      float upZ;
+        float eyeX;
+        float eyeY;
+        float eyeZ;
+        float focusX;
+        float focusY;
+        float focusZ;
+        float upX;
+        float upY;
+        float upZ;
     } Camera;
 
     typedef struct

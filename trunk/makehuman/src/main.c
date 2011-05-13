@@ -52,11 +52,11 @@
 
 OSVERSIONINFO winVersion(void)
 {
-   OSVERSIONINFO osvi;
-   ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-   osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-   GetVersionEx(&osvi);
-   return osvi;
+    OSVERSIONINFO osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osvi);
+    return osvi;
 }
 #endif // __WIN32__
 
@@ -301,23 +301,23 @@ static PyObject* mh_GrabScreen(PyObject *self, PyObject *args)
 
     if (PyString_Check(path))
     {
-      if (!mhGrabScreen(x, y, width, height, PyString_AsString(path)))
-        return NULL;
+        if (!mhGrabScreen(x, y, width, height, PyString_AsString(path)))
+            return NULL;
     }
     else if (PyUnicode_Check(path))
     {
-      path = PyUnicode_AsUTF8String(path);
-      if (!mhGrabScreen(x, y, width, height, PyString_AsString(path)))
-      {
+        path = PyUnicode_AsUTF8String(path);
+        if (!mhGrabScreen(x, y, width, height, PyString_AsString(path)))
+        {
+            Py_DECREF(path);
+            return NULL;
+        }
         Py_DECREF(path);
-        return NULL;
-      }
-      Py_DECREF(path);
     }
     else
     {
-      PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
-      return NULL;
+        PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
+        return NULL;
     }
 
     return Py_BuildValue("");
@@ -340,8 +340,8 @@ static PyObject* mh_addTimer(PyObject *self, PyObject *args)
 
     if (!PyCallable_Check(callback))
     {
-      PyErr_SetString(PyExc_TypeError, "Callable expected");
-      return NULL;
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
     }
 
     Py_INCREF(callback);
@@ -353,36 +353,36 @@ static PyObject* mh_addTimer(PyObject *self, PyObject *args)
 
 static PyObject* mh_removeTimer(PyObject *self, PyObject *args)
 {
-  SDL_TimerID id;
+    SDL_TimerID id;
 
-  if (!PyArg_ParseTuple(args, "i", &id))
-    return NULL;
+    if (!PyArg_ParseTuple(args, "i", &id))
+        return NULL;
 
-  // TODO DECREF(callback)
+    // TODO DECREF(callback)
 
-  SDL_RemoveTimer(id);
-  return Py_BuildValue("");
+    SDL_RemoveTimer(id);
+    return Py_BuildValue("");
 }
 
 static PyObject* mh_callAsync(PyObject *self, PyObject *callback)
 {
     if (!PyCallable_Check(callback))
     {
-      PyErr_SetString(PyExc_TypeError, "Callable expected");
-      return NULL;
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
     }
 
     Py_INCREF(callback);
 
     {
-      SDL_Event event;
+        SDL_Event event;
 
-      event.type = SDL_USEREVENT;
-      event.user.code = 1;
-      event.user.data1 = callback;
-      event.user.data2 = NULL;
+        event.type = SDL_USEREVENT;
+        event.user.code = 1;
+        event.user.data1 = callback;
+        event.user.data2 = NULL;
 
-      SDL_PushEvent(&event);
+        SDL_PushEvent(&event);
     }
 
     return Py_BuildValue("");
@@ -390,110 +390,110 @@ static PyObject* mh_callAsync(PyObject *self, PyObject *callback)
 
 static PyObject* mh_SetResizeCallback(PyObject *self, PyObject *callback)
 {
-  if (!PyCallable_Check(callback))
-  {
-    PyErr_SetString(PyExc_TypeError, "Callable expected");
-    return NULL;
-  }
+    if (!PyCallable_Check(callback))
+    {
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
+    }
 
-  Py_INCREF(callback);
+    Py_INCREF(callback);
 
-  if (G.resizeCallback)
-    Py_DECREF(G.resizeCallback);
+    if (G.resizeCallback)
+        Py_DECREF(G.resizeCallback);
 
-  G.resizeCallback = callback;
+    G.resizeCallback = callback;
 
-  return Py_BuildValue("");
+    return Py_BuildValue("");
 }
 
 static PyObject* mh_SetMouseDownCallback(PyObject *self, PyObject *callback)
 {
-  if (!PyCallable_Check(callback))
-  {
-    PyErr_SetString(PyExc_TypeError, "Callable expected");
-    return NULL;
-  }
+    if (!PyCallable_Check(callback))
+    {
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
+    }
 
-  Py_INCREF(callback);
+    Py_INCREF(callback);
 
-  if (G.mouseDownCallback)
-    Py_DECREF(G.mouseDownCallback);
+    if (G.mouseDownCallback)
+        Py_DECREF(G.mouseDownCallback);
 
-  G.mouseDownCallback = callback;
+    G.mouseDownCallback = callback;
 
-  return Py_BuildValue("");
+    return Py_BuildValue("");
 }
 
 static PyObject* mh_SetMouseUpCallback(PyObject *self, PyObject *callback)
 {
-  if (!PyCallable_Check(callback))
-  {
-    PyErr_SetString(PyExc_TypeError, "Callable expected");
-    return NULL;
-  }
+    if (!PyCallable_Check(callback))
+    {
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
+    }
 
-  Py_INCREF(callback);
+    Py_INCREF(callback);
 
-  if (G.mouseUpCallback)
-    Py_DECREF(G.mouseUpCallback);
+    if (G.mouseUpCallback)
+        Py_DECREF(G.mouseUpCallback);
 
-  G.mouseUpCallback = callback;
+    G.mouseUpCallback = callback;
 
-  return Py_BuildValue("");
+    return Py_BuildValue("");
 }
 
 static PyObject* mh_SetMouseMovedCallback(PyObject *self, PyObject *callback)
 {
-  if (!PyCallable_Check(callback))
-  {
-    PyErr_SetString(PyExc_TypeError, "Callable expected");
-    return NULL;
-  }
+    if (!PyCallable_Check(callback))
+    {
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
+    }
 
-  Py_INCREF(callback);
+    Py_INCREF(callback);
 
-  if (G.mouseMovedCallback)
-    Py_DECREF(G.mouseMovedCallback);
+    if (G.mouseMovedCallback)
+        Py_DECREF(G.mouseMovedCallback);
 
-  G.mouseMovedCallback = callback;
+    G.mouseMovedCallback = callback;
 
-  return Py_BuildValue("");
+    return Py_BuildValue("");
 }
 
 static PyObject* mh_SetKeyDownCallback(PyObject *self, PyObject *callback)
 {
-  if (!PyCallable_Check(callback))
-  {
-    PyErr_SetString(PyExc_TypeError, "Callable expected");
-    return NULL;
-  }
+    if (!PyCallable_Check(callback))
+    {
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
+    }
 
-  Py_INCREF(callback);
+    Py_INCREF(callback);
 
-  if (G.keyDownCallback)
-    Py_DECREF(G.keyDownCallback);
+    if (G.keyDownCallback)
+        Py_DECREF(G.keyDownCallback);
 
-  G.keyDownCallback = callback;
+    G.keyDownCallback = callback;
 
-  return Py_BuildValue("");
+    return Py_BuildValue("");
 }
 
 static PyObject* mh_SetKeyUpCallback(PyObject *self, PyObject *callback)
 {
-  if (!PyCallable_Check(callback))
-  {
-    PyErr_SetString(PyExc_TypeError, "Callable expected");
-    return NULL;
-  }
+    if (!PyCallable_Check(callback))
+    {
+        PyErr_SetString(PyExc_TypeError, "Callable expected");
+        return NULL;
+    }
 
-  Py_INCREF(callback);
+    Py_INCREF(callback);
 
-  if (G.keyUpCallback)
-    Py_DECREF(G.keyUpCallback);
+    if (G.keyUpCallback)
+        Py_DECREF(G.keyUpCallback);
 
-  G.keyUpCallback = callback;
+    G.keyUpCallback = callback;
 
-  return Py_BuildValue("");
+    return Py_BuildValue("");
 }
 
 /** \brief Gets program specific path locations.
@@ -599,7 +599,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     {
         HRESULT hr;
 
-#ifdef CSIDL_MYDOCUMENTS       
+#ifdef CSIDL_MYDOCUMENTS
         hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, 0, path);
 #else
         hr = SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, path);
@@ -633,8 +633,8 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
         }
         else
         {
-          PyErr_Format(PyExc_ValueError, "Unknown value %s for getPath()!", typeStr);
-          return NULL;
+            PyErr_Format(PyExc_ValueError, "Unknown value %s for getPath()!", typeStr);
+            return NULL;
         }
     }
 #else

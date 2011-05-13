@@ -94,6 +94,7 @@ def getTexture(path, cache=None):
         try:
             texture = Texture()
             texture.loadImage(path)
+            #texture.loadSubImage('data/themes/default/images/slider_focused.png', 0, 0)
         except RuntimeError, text:
             print text
         else:

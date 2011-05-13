@@ -63,19 +63,6 @@ class Human(gui3d.Object):
         self.enableUVInterpolation = 0
         self.targetUVBuffer = {}
 
-        self.detailTargetX1a = None
-        self.detailTargetX2a = None
-        self.detailTargetY1a = None
-        self.detailTargetY2a = None
-        self.detailTargetZ1a = None
-        self.detailTargetZ2a = None
-        self.detailTargetX1b = None
-        self.detailTargetX2b = None
-        self.detailTargetY1b = None
-        self.detailTargetY2b = None
-        self.detailTargetZ1b = None
-        self.detailTargetZ2b = None
-
         self.meshStored = []
         self.meshStoredNormals = []
         self.hairs = hair.Hairs(self)

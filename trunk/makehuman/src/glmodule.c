@@ -102,14 +102,17 @@ PyObject *Camera_convertToWorld3D(Camera *camera, PyObject *args);
 // Camera Methods
 static PyMethodDef Camera_methods[] =
 {
-    {"convertToScreen", (PyCFunction)Camera_convertToScreen, METH_VARARGS,
+    {
+        "convertToScreen", (PyCFunction)Camera_convertToScreen, METH_VARARGS,
         "Converts world coordinates to screen coordinates."
     },
-    {"convertToWorld2D", (PyCFunction)Camera_convertToWorld2D, METH_VARARGS,
-     "Converts 2D screen coordinates to world coordinates."
+    {
+        "convertToWorld2D", (PyCFunction)Camera_convertToWorld2D, METH_VARARGS,
+        "Converts 2D screen coordinates to world coordinates."
     },
-    {"convertToWorld3D", (PyCFunction)Camera_convertToWorld3D, METH_VARARGS,
-     "Converts 3D screen coordinates to world coordinates."
+    {
+        "convertToWorld3D", (PyCFunction)Camera_convertToWorld3D, METH_VARARGS,
+        "Converts 3D screen coordinates to world coordinates."
     },
     {NULL}  /* Sentinel */
 };
@@ -245,12 +248,18 @@ static PyMemberDef Texture_members[] =
 };
 
 static PyObject *Texture_loadImage(Texture *texture, PyObject *path);
+static PyObject *Texture_loadSubImage(Texture *texture, PyObject *args);
 
 // Texture Methods
 static PyMethodDef Texture_methods[] =
 {
-    {"loadImage", (PyCFunction)Texture_loadImage, METH_O,
+    {
+        "loadImage", (PyCFunction)Texture_loadImage, METH_O,
         "Loads the specified image from file"
+    },
+    {
+        "loadSubImage", (PyCFunction)Texture_loadSubImage, METH_VARARGS,
+        "Loads the specified image from file at the specified coordinates"
     },
     {NULL}  /* Sentinel */
 };
@@ -397,6 +406,38 @@ static PyObject *Texture_loadImage(Texture *texture, PyObject *path)
     return Py_BuildValue("");
 }
 
+static PyObject *Texture_loadSubImage(Texture *texture, PyObject *args)
+{
+  PyObject *path;
+  int x, y;
+
+  if (!PyArg_ParseTuple(args, "Oii", &path, &x, &y))
+    return NULL;
+
+  if (PyString_Check(path))
+  {
+    if (!mhLoadSubTexture(PyString_AsString(path), texture->textureId, x, y))
+      return NULL;
+  }
+  else if (PyUnicode_Check(path))
+  {
+    path = PyUnicode_AsUTF8String(path);
+    if (!mhLoadSubTexture(PyString_AsString(path), texture->textureId, x, y))
+    {
+      Py_DECREF(path);
+      return NULL;
+    }
+    Py_DECREF(path);
+  }
+  else
+  {
+    PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
+    return NULL;
+  }
+
+  return Py_BuildValue("");
+}
+
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 /** \brief Perform a byte swapping of a long value by reversing all bytes
  *         (e.g. 0x12345678 becomes 0x78563412).
@@ -408,13 +449,13 @@ static uint32_t swapLong(uint32_t inValue)
 {
 #ifdef __GNUC__
 #   if defined(__ppc__)
-        register uint32_t word;
-        __asm__("lwbrx %0,%2,%1" : "=r" (word) : "r" (&inValue), "b" (0));
-        return word;
+    register uint32_t word;
+    __asm__("lwbrx %0,%2,%1" : "=r" (word) : "r" (&inValue), "b" (0));
+    return word;
 #   elif defined(__x86__) || defined(__i386__) || defined (__x86_64__)
-        register uint32_t word;
-        __asm__("bswap %0" : "=r" (word) : "0" (inValue));
-        return word;
+    register uint32_t word;
+    __asm__("bswap %0" : "=r" (word) : "0" (inValue));
+    return word;
 #   endif
 #endif
     return (((inValue      ) & 0xff) << 24) |
@@ -447,7 +488,7 @@ static int longCopyEndianSafe(uint32_t *destPtr, const uint32_t *srcPtr, size_t 
         *(destPtr++) = swapLong(*(srcPtr++));
     }
 #endif
-    return inLongs;
+    return (int)inLongs;
 }
 
 /** \brief Flip an SDL surface from top to bottom.
@@ -489,21 +530,9 @@ static void mhFlipSurface(SDL_Surface *surface)
     }
 }
 
-/** \brief Load a texture from a file and bind it into the textures array.
- *  \param fname a character string pointer to a string containing a file system path to a texture file.
- *  \param texture an int specifying the existing texture id to use or 0 to create a new texture.
- *
- *  This function loads a texture from a texture file and binds it into the OpenGL textures array.
- */
-GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
+SDL_Surface *mhLoadImage(const char *fname)
 {
-    int internalFormat, format;
     SDL_Surface *surface;
-
-    //printf("Loading texture '%s'\n", fname);
-
-    if (!texture)
-        glGenTextures(1, &texture);
 
 #ifndef __APPLE__ // OS X utilizes the SDL_image framework for image loading!
     if (!g_sdlImageHandle)
@@ -537,6 +566,28 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         return 0;
     }
 
+    return surface;
+}
+
+/** \brief Load a texture from a file and bind it into the textures array.
+ *  \param fname a character string pointer to a string containing a file system path to a texture file.
+ *  \param texture an int specifying the existing texture id to use or 0 to create a new texture.
+ *
+ *  This function loads a texture from a texture file and binds it into the OpenGL textures array.
+ */
+GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
+{
+    SDL_Surface *surface;
+    int internalFormat, format;
+
+    if (!texture)
+        glGenTextures(1, &texture);
+
+    surface = mhLoadImage(fname);
+
+    if (!surface)
+        return 0;
+
     switch (surface->format->BytesPerPixel)
     {
     case 1:
@@ -561,7 +612,6 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         SDL_FreeSurface(surface);
         PyErr_Format(PyExc_RuntimeError, "Could not load %s, unsupported pixel format", fname);
         return 0;
-
     }
 
     // For some reason we need to flip the surface vertically
@@ -583,7 +633,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
 
-// hdusel: Just a test for Mac OS X in order to prevent that the fonts look so ugly (blurry) on the Mac port. 
+// hdusel: Just a test for Mac OS X in order to prevent that the fonts look so ugly (blurry) on the Mac port.
 // So try to permit MIPMAP Interpolation for fonts.
 #if defined(__APPLE__)
         const int isFont = (strstr(fname, "/fonts/") != NULL);
@@ -592,23 +642,23 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         }
-        else 
+        else
         {
-    #if defined(__ppc__)
+#if defined(__ppc__)
             // On PowerPC Macs just don't use mipmapping
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    #else
+#else
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    #endif
+#endif
         }
 #else
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 #endif
         gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
-//        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
+        //glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
@@ -622,6 +672,67 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
     return texture;
 }
 
+GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y)
+{
+    SDL_Surface *surface;
+    int internalFormat, format;
+
+    if (!texture)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Texture is empty, cannot load a sub texture into it");
+        return 0;
+    }
+
+    surface = mhLoadImage(fname);
+
+    if (!surface)
+        return 0;
+
+    switch (surface->format->BytesPerPixel)
+    {
+    case 1:
+        internalFormat = GL_ALPHA8;
+        format = GL_ALPHA;
+        break;
+    case 3:
+        internalFormat = 3;
+        if (surface->format->Rshift) // If there is a shift on the red value, we need to tell that red and blue are switched
+            format = GL_BGR;
+        else
+            format = GL_RGB;
+        break;
+    case 4:
+        internalFormat = 4;
+        if (surface->format->Rshift) // If there is a shift on the red value, we need to tell that red and blue are switched
+            format = GL_BGRA;
+        else
+            format = GL_RGBA;
+        break;
+    default:
+        SDL_FreeSurface(surface);
+        PyErr_Format(PyExc_RuntimeError, "Could not load %s, unsupported pixel format", fname);
+        return 0;
+    }
+
+    // For some reason we need to flip the surface vertically
+    mhFlipSurface(surface);
+
+    if (surface->h == 1)
+    {
+        glBindTexture(GL_TEXTURE_1D, texture);
+        glTexSubImage1D(GL_TEXTURE_1D, 0, x, surface->w, format, GL_UNSIGNED_BYTE, surface->pixels);
+    }
+    else
+    {
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
+    }
+
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
 GLuint mhCreateVertexShader(const char *source)
 {
     GLuint v;
@@ -629,72 +740,72 @@ GLuint mhCreateVertexShader(const char *source)
 
     if (GLEW_VERSION_2_0)
     {
-      v = glCreateShader(GL_VERTEX_SHADER);
+        v = glCreateShader(GL_VERTEX_SHADER);
 
-      glShaderSource(v, 1, &source, NULL);
+        glShaderSource(v, 1, &source, NULL);
 
-      glCompileShader(v);
-      glGetShaderiv(v, GL_COMPILE_STATUS, &status);
-      if (status != GL_TRUE)
-      {
-          GLsizei logLength;
+        glCompileShader(v);
+        glGetShaderiv(v, GL_COMPILE_STATUS, &status);
+        if (status != GL_TRUE)
+        {
+            GLsizei logLength;
 
-          glGetShaderiv(v, GL_INFO_LOG_LENGTH, &logLength);
+            glGetShaderiv(v, GL_INFO_LOG_LENGTH, &logLength);
 
-          if (logLength > 0)
-          {
-              char *log;
-              GLsizei charsWritten;
+            if (logLength > 0)
+            {
+                char *log;
+                GLsizei charsWritten;
 
-              log = (char*)malloc(logLength);
-              glGetShaderInfoLog(v, logLength, &charsWritten, log);
-              PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
-              free(log);
-          }
-          else
-              PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
+                log = (char*)malloc(logLength);
+                glGetShaderInfoLog(v, logLength, &charsWritten, log);
+                PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
+                free(log);
+            }
+            else
+                PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
 
-          return 0;
-      }
+            return 0;
+        }
 
-      return v;
+        return v;
     }
     else if (GLEW_ARB_shader_objects)
     {
-      v = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
+        v = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
 
-      glShaderSourceARB(v, 1, &source, NULL);
+        glShaderSourceARB(v, 1, &source, NULL);
 
-      glCompileShaderARB(v);
-      glGetObjectParameterivARB(v, GL_OBJECT_COMPILE_STATUS_ARB, &status);
-      if (status != GL_TRUE)
-      {
-        GLsizei logLength;
-
-        glGetObjectParameterivARB(v, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
-
-        if (logLength > 0)
+        glCompileShaderARB(v);
+        glGetObjectParameterivARB(v, GL_OBJECT_COMPILE_STATUS_ARB, &status);
+        if (status != GL_TRUE)
         {
-          char *log;
-          GLsizei charsWritten;
+            GLsizei logLength;
 
-          log = (char*)malloc(logLength);
-          glGetInfoLogARB(v, logLength, &charsWritten, log);
-          PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
-          free(log);
+            glGetObjectParameterivARB(v, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
+
+            if (logLength > 0)
+            {
+                char *log;
+                GLsizei charsWritten;
+
+                log = (char*)malloc(logLength);
+                glGetInfoLogARB(v, logLength, &charsWritten, log);
+                PyErr_Format(PyExc_RuntimeError, "Error compiling vertex shader: %s", log);
+                free(log);
+            }
+            else
+                PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
+
+            return 0;
         }
-        else
-          PyErr_SetString(PyExc_RuntimeError, "Error compiling vertex shader");
 
-        return 0;
-      }
-
-      return v;
+        return v;
     }
     else
     {
-      PyErr_SetString(PyExc_RuntimeError, "No shader support detected");
-      return 0;
+        PyErr_SetString(PyExc_RuntimeError, "No shader support detected");
+        return 0;
     }
 }
 
@@ -702,75 +813,75 @@ GLuint mhCreateFragmentShader(const char *source)
 {
     GLuint f;
     GLint status;
-    
+
     if (GLEW_VERSION_2_0)
     {
-      f = glCreateShader(GL_FRAGMENT_SHADER);
+        f = glCreateShader(GL_FRAGMENT_SHADER);
 
-      glShaderSource(f, 1, &source, NULL);
+        glShaderSource(f, 1, &source, NULL);
 
-      glCompileShader(f);
-      glGetShaderiv(f, GL_COMPILE_STATUS, &status);
-      if (status != GL_TRUE)
-      {
-        GLsizei logLength;
-
-        glGetShaderiv(f, GL_INFO_LOG_LENGTH, &logLength);
-
-        if (logLength > 0)
+        glCompileShader(f);
+        glGetShaderiv(f, GL_COMPILE_STATUS, &status);
+        if (status != GL_TRUE)
         {
-          char *log;
-          GLsizei charsWritten;
+            GLsizei logLength;
 
-          log = (char*)malloc(logLength);
-          glGetShaderInfoLog(f, logLength, &charsWritten, log);
-          PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
-          free(log);
+            glGetShaderiv(f, GL_INFO_LOG_LENGTH, &logLength);
+
+            if (logLength > 0)
+            {
+                char *log;
+                GLsizei charsWritten;
+
+                log = (char*)malloc(logLength);
+                glGetShaderInfoLog(f, logLength, &charsWritten, log);
+                PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
+                free(log);
+            }
+            else
+                PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
+
+            return 0;
         }
-        else
-          PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
 
-        return 0;
-      }
-
-      return f;
+        return f;
     }
     else if (GLEW_ARB_shader_objects)
     {
-      f = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+        f = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 
-      glShaderSourceARB(f, 1, &source, NULL);
+        glShaderSourceARB(f, 1, &source, NULL);
 
-      glCompileShaderARB(f);
-      glGetObjectParameterivARB(f, GL_OBJECT_COMPILE_STATUS_ARB, &status);
-      if (status != GL_TRUE)
-      {
-        GLsizei logLength;
-
-        glGetObjectParameterivARB(f, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
-
-        if (logLength > 0)
+        glCompileShaderARB(f);
+        glGetObjectParameterivARB(f, GL_OBJECT_COMPILE_STATUS_ARB, &status);
+        if (status != GL_TRUE)
         {
-          char *log;
-          GLsizei charsWritten;
+            GLsizei logLength;
 
-          log = (char*)malloc(logLength);
-          glGetInfoLogARB(f, logLength, &charsWritten, log);
-          PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
-          free(log);
+            glGetObjectParameterivARB(f, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
+
+            if (logLength > 0)
+            {
+                char *log;
+                GLsizei charsWritten;
+
+                log = (char*)malloc(logLength);
+                glGetInfoLogARB(f, logLength, &charsWritten, log);
+                PyErr_Format(PyExc_RuntimeError, "Error compiling fragment shader: %s", log);
+                free(log);
+            }
+            else
+                PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
+
+            return 0;
         }
-        else
-          PyErr_SetString(PyExc_RuntimeError, "Error compiling fragment shader");
 
-        return 0;
-      }
-
-      return f;
+        return f;
     }
     else
     {
-      PyErr_SetString(PyExc_RuntimeError, "No shader support detected");
-      return 0;
+        PyErr_SetString(PyExc_RuntimeError, "No shader support detected");
+        return 0;
     }
 }
 
@@ -778,72 +889,72 @@ GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader)
 {
     GLuint p;
     GLint status;
-    
+
     if (GLEW_VERSION_2_0)
     {
-      p = glCreateProgram();
+        p = glCreateProgram();
 
-      glAttachShader(p, vertexShader);
-      glAttachShader(p, fragmentShader);
+        glAttachShader(p, vertexShader);
+        glAttachShader(p, fragmentShader);
 
-      glLinkProgram(p);
-      glGetProgramiv(p, GL_LINK_STATUS, &status);
-      if (status != GL_TRUE)
-      {
-        GLsizei logLength;
-
-        glGetProgramiv(p, GL_INFO_LOG_LENGTH, &logLength);
-
-        if (logLength > 0)
+        glLinkProgram(p);
+        glGetProgramiv(p, GL_LINK_STATUS, &status);
+        if (status != GL_TRUE)
         {
-          char *log;
-          GLsizei charsWritten;
+            GLsizei logLength;
 
-          log = (char*)malloc(logLength);
-          glGetProgramInfoLog(p, logLength, &charsWritten, log);
-          PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
-          free(log);
+            glGetProgramiv(p, GL_INFO_LOG_LENGTH, &logLength);
+
+            if (logLength > 0)
+            {
+                char *log;
+                GLsizei charsWritten;
+
+                log = (char*)malloc(logLength);
+                glGetProgramInfoLog(p, logLength, &charsWritten, log);
+                PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
+                free(log);
+            }
+            else
+                PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
+
+            return 0;
         }
-        else
-          PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
 
-        return 0;
-      }
-
-      return p;
+        return p;
     }
     else if (GLEW_ARB_shader_objects)
     {
-      p = glCreateProgramObjectARB();
+        p = glCreateProgramObjectARB();
 
-      glAttachObjectARB(p, vertexShader);
-      glAttachObjectARB(p, fragmentShader);
+        glAttachObjectARB(p, vertexShader);
+        glAttachObjectARB(p, fragmentShader);
 
-      glLinkProgramARB(p);
-      glGetObjectParameterivARB(p, GL_OBJECT_LINK_STATUS_ARB , &status);
-      if (status != GL_TRUE)
-      {
-        GLsizei logLength;
-
-        glGetObjectParameterivARB(p, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
-
-        if (logLength > 0)
+        glLinkProgramARB(p);
+        glGetObjectParameterivARB(p, GL_OBJECT_LINK_STATUS_ARB , &status);
+        if (status != GL_TRUE)
         {
-          char *log;
-          GLsizei charsWritten;
+            GLsizei logLength;
 
-          log = (char*)malloc(logLength);
-          glGetInfoLogARB(p, logLength, &charsWritten, log);
-          PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
-          free(log);
+            glGetObjectParameterivARB(p, GL_OBJECT_INFO_LOG_LENGTH_ARB, &logLength);
+
+            if (logLength > 0)
+            {
+                char *log;
+                GLsizei charsWritten;
+
+                log = (char*)malloc(logLength);
+                glGetInfoLogARB(p, logLength, &charsWritten, log);
+                PyErr_Format(PyExc_RuntimeError, "Error linking shader: %s", log);
+                free(log);
+            }
+            else
+                PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
+
+            return 0;
         }
-        else
-          PyErr_SetString(PyExc_RuntimeError, "Error linking shader");
 
-        return 0;
-      }
-
-      return p;
+        return p;
     }
     else
     {
@@ -1435,12 +1546,12 @@ void mhCameraPosition(Camera *camera, int eye)
 
         if (eye == 1)
             gluLookAt(camera->eyeX - 0.5 * camera->eyeSeparation, camera->eyeY, camera->eyeZ, // Eye
-                  camera->focusX, camera->focusY, camera->focusZ,                             // Focus
-                  camera->upX, camera->upY, camera->upZ);                                     // Up
+                      camera->focusX, camera->focusY, camera->focusZ,                             // Focus
+                      camera->upX, camera->upY, camera->upZ);                                     // Up
         else if (eye == 2)
             gluLookAt(camera->eyeX + 0.5 * camera->eyeSeparation, camera->eyeY, camera->eyeZ, // Eye
-                  camera->focusX, camera->focusY, camera->focusZ,                             // Focus
-                  camera->upX, camera->upY, camera->upZ);                                     // Up
+                      camera->focusX, camera->focusY, camera->focusZ,                             // Focus
+                      camera->upX, camera->upY, camera->upZ);                                     // Up
 
         break;
     }
@@ -1541,9 +1652,9 @@ void mhDrawMeshes(int pickMode, int cameraType)
                     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
                     glBindTexture(GL_TEXTURE_2D, obj->texture);
                     glTexCoordPointer(2, GL_FLOAT, 0, obj->UVs);
-                    
+
                     if (obj->nTransparentPrimitives)
-                      Object3D_sortFaces(obj);
+                        Object3D_sortFaces(obj);
                 }
 
                 /*Fill the array pointers with object mesh data*/
@@ -1571,196 +1682,196 @@ void mhDrawMeshes(int pickMode, int cameraType)
                 // Enable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && obj->shader && obj->isSolid)
                 {
-                  if (GLEW_VERSION_2_0)
-                  {
-                  
-                    glUseProgram(obj->shader);
-
-                    // This should be optimized, since we only need to do it when it's changed
-                    // Validation should also only be done when it is set
-                    if (obj->shaderParameters)
+                    if (GLEW_VERSION_2_0)
                     {
-                        GLint parameterCount = 0;
-                        int index;
-                        int currentTextureSampler = 1;
 
-                        glGetProgramiv(obj->shader, GL_ACTIVE_UNIFORMS, &parameterCount);
+                        glUseProgram(obj->shader);
 
-                        for (index = 0; index < parameterCount; index++)
+                        // This should be optimized, since we only need to do it when it's changed
+                        // Validation should also only be done when it is set
+                        if (obj->shaderParameters)
                         {
-                            GLsizei length;
-                            GLint size;
-                            GLenum type;
-                            GLchar name[32];
-                            PyObject *value;
+                            GLint parameterCount = 0;
+                            int index;
+                            int currentTextureSampler = 1;
 
-                            glGetActiveUniform(obj->shader, index, sizeof(name), &length, &size, &type, name);
+                            glGetProgramiv(obj->shader, GL_ACTIVE_UNIFORMS, &parameterCount);
 
-                            value = PyDict_GetItemString(obj->shaderParameters, name);
-
-                            if (value)
+                            for (index = 0; index < parameterCount; index++)
                             {
-                                switch (type)
+                                GLsizei length;
+                                GLint size;
+                                GLenum type;
+                                GLchar name[32];
+                                PyObject *value;
+
+                                glGetActiveUniform(obj->shader, index, sizeof(name), &length, &size, &type, name);
+
+                                value = PyDict_GetItemString(obj->shaderParameters, name);
+
+                                if (value)
                                 {
-                                case GL_FLOAT:
-                                {
-                                    glUniform1f(index, PyFloat_AsDouble(value));
-                                    break;
-                                }
-                                case GL_FLOAT_VEC2:
-                                {
-                                    if (!PyList_Check(value) || PyList_Size(value) != 2)
+                                    switch (type)
+                                    {
+                                    case GL_FLOAT:
+                                    {
+                                        glUniform1f(index, (float)PyFloat_AsDouble(value));
                                         break;
-                                    glUniform2f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)));
-                                    break;
-                                }
-                                case GL_FLOAT_VEC3:
-                                {
-                                    if (!PyList_Check(value) || PyList_Size(value) != 3)
+                                    }
+                                    case GL_FLOAT_VEC2:
+                                    {
+                                        if (!PyList_Check(value) || PyList_Size(value) != 2)
+                                            break;
+                                        glUniform2f(index, (float)PyFloat_AsDouble(PyList_GetItem(value, 0)), (float)PyFloat_AsDouble(PyList_GetItem(value, 1)));
                                         break;
-                                    glUniform3f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
-                                                PyFloat_AsDouble(PyList_GetItem(value, 2)));
-                                    break;
-                                }
-                                case GL_FLOAT_VEC4:
-                                {
-                                    if (!PyList_Check(value) || PyList_Size(value) != 4)
+                                    }
+                                    case GL_FLOAT_VEC3:
+                                    {
+                                        if (!PyList_Check(value) || PyList_Size(value) != 3)
+                                            break;
+                                        glUniform3f(index, (float)PyFloat_AsDouble(PyList_GetItem(value, 0)), (float)PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                                    (float)PyFloat_AsDouble(PyList_GetItem(value, 2)));
                                         break;
-                                    glUniform4f(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
-                                                PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
-                                    break;
-                                }
-                                case GL_SAMPLER_1D:
-                                {
-                                    glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
-                                    glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
-                                    glUniform1i(index, currentTextureSampler++);
-                                    break;
-                                }
-                                case GL_SAMPLER_2D:
-                                {
-                                    glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
-                                    glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
-                                    glUniform1i(index, currentTextureSampler++);
-                                    break;
-                                }
+                                    }
+                                    case GL_FLOAT_VEC4:
+                                    {
+                                        if (!PyList_Check(value) || PyList_Size(value) != 4)
+                                            break;
+                                        glUniform4f(index, (float)PyFloat_AsDouble(PyList_GetItem(value, 0)), (float)PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                                    (float)PyFloat_AsDouble(PyList_GetItem(value, 2)), (float)PyFloat_AsDouble(PyList_GetItem(value, 3)));
+                                        break;
+                                    }
+                                    case GL_SAMPLER_1D:
+                                    {
+                                        glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                                        glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
+                                        glUniform1i(index, currentTextureSampler++);
+                                        break;
+                                    }
+                                    case GL_SAMPLER_2D:
+                                    {
+                                        glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                                        glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
+                                        glUniform1i(index, currentTextureSampler++);
+                                        break;
+                                    }
+                                    }
                                 }
                             }
                         }
                     }
-                  }
-                  else if (GLEW_ARB_shader_objects)
-                  {
-                    glUseProgramObjectARB(obj->shader);
-
-                    // This should be optimized, since we only need to do it when it's changed
-                    // Validation should also only be done when it is set
-                    if (obj->shaderParameters)
+                    else if (GLEW_ARB_shader_objects)
                     {
-                      GLint parameterCount = 0;
-                      int index;
-                      int currentTextureSampler = 1;
+                        glUseProgramObjectARB(obj->shader);
 
-                      glGetObjectParameterivARB(obj->shader, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &parameterCount);
-
-                      for (index = 0; index < parameterCount; index++)
-                      {
-                        GLsizei length;
-                        GLint size;
-                        GLenum type;
-                        GLchar name[32];
-                        PyObject *value;
-
-                        glGetActiveUniformARB(obj->shader, index, sizeof(name), &length, &size, &type, name);
-
-                        value = PyDict_GetItemString(obj->shaderParameters, name);
-
-                        if (value)
+                        // This should be optimized, since we only need to do it when it's changed
+                        // Validation should also only be done when it is set
+                        if (obj->shaderParameters)
                         {
-                          switch (type)
-                          {
-                          case GL_FLOAT:
+                            GLint parameterCount = 0;
+                            int index;
+                            int currentTextureSampler = 1;
+
+                            glGetObjectParameterivARB(obj->shader, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &parameterCount);
+
+                            for (index = 0; index < parameterCount; index++)
                             {
-                              glUniform1fARB(index, PyFloat_AsDouble(value));
-                              break;
+                                GLsizei length;
+                                GLint size;
+                                GLenum type;
+                                GLchar name[32];
+                                PyObject *value;
+
+                                glGetActiveUniformARB(obj->shader, index, sizeof(name), &length, &size, &type, name);
+
+                                value = PyDict_GetItemString(obj->shaderParameters, name);
+
+                                if (value)
+                                {
+                                    switch (type)
+                                    {
+                                    case GL_FLOAT:
+                                    {
+                                        glUniform1fARB(index, (float)PyFloat_AsDouble(value));
+                                        break;
+                                    }
+                                    case GL_FLOAT_VEC2:
+                                    {
+                                        if (!PyList_Check(value) || PyList_Size(value) != 2)
+                                            break;
+                                        glUniform2fARB(index, (float)PyFloat_AsDouble(PyList_GetItem(value, 0)), (float)PyFloat_AsDouble(PyList_GetItem(value, 1)));
+                                        break;
+                                    }
+                                    case GL_FLOAT_VEC3:
+                                    {
+                                        if (!PyList_Check(value) || PyList_Size(value) != 3)
+                                            break;
+                                        glUniform3fARB(index, (float)PyFloat_AsDouble(PyList_GetItem(value, 0)), (float)PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                                       (float)PyFloat_AsDouble(PyList_GetItem(value, 2)));
+                                        break;
+                                    }
+                                    case GL_FLOAT_VEC4:
+                                    {
+                                        if (!PyList_Check(value) || PyList_Size(value) != 4)
+                                            break;
+                                        glUniform4fARB(index, (float)PyFloat_AsDouble(PyList_GetItem(value, 0)), (float)PyFloat_AsDouble(PyList_GetItem(value, 1)),
+                                                       (float)PyFloat_AsDouble(PyList_GetItem(value, 2)), (float)PyFloat_AsDouble(PyList_GetItem(value, 3)));
+                                        break;
+                                    }
+                                    case GL_SAMPLER_1D:
+                                    {
+                                        glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                                        glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
+                                        glUniform1iARB(index, currentTextureSampler++);
+                                        break;
+                                    }
+                                    case GL_SAMPLER_2D:
+                                    {
+                                        glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
+                                        glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
+                                        glUniform1iARB(index, currentTextureSampler++);
+                                        break;
+                                    }
+                                    }
+                                }
                             }
-                          case GL_FLOAT_VEC2:
-                            {
-                              if (!PyList_Check(value) || PyList_Size(value) != 2)
-                                break;
-                              glUniform2fARB(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)));
-                              break;
-                            }
-                          case GL_FLOAT_VEC3:
-                            {
-                              if (!PyList_Check(value) || PyList_Size(value) != 3)
-                                break;
-                              glUniform3fARB(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
-                                PyFloat_AsDouble(PyList_GetItem(value, 2)));
-                              break;
-                            }
-                          case GL_FLOAT_VEC4:
-                            {
-                              if (!PyList_Check(value) || PyList_Size(value) != 4)
-                                break;
-                              glUniform4fARB(index, PyFloat_AsDouble(PyList_GetItem(value, 0)), PyFloat_AsDouble(PyList_GetItem(value, 1)),
-                                PyFloat_AsDouble(PyList_GetItem(value, 2)), PyFloat_AsDouble(PyList_GetItem(value, 3)));
-                              break;
-                            }
-                          case GL_SAMPLER_1D:
-                            {
-                              glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
-                              glBindTexture(GL_TEXTURE_1D, PyInt_AsLong(value));
-                              glUniform1iARB(index, currentTextureSampler++);
-                              break;
-                            }
-                          case GL_SAMPLER_2D:
-                            {
-                              glActiveTexture(GL_TEXTURE0 + currentTextureSampler);
-                              glBindTexture(GL_TEXTURE_2D, PyInt_AsLong(value));
-                              glUniform1iARB(index, currentTextureSampler++);
-                              break;
-                            }
-                          }
                         }
-                      }
                     }
-                  }
                 }
 
                 /*draw the mesh*/
                 if (!obj->isSolid && !pickMode)
                 {
-                  glDisableClientState(GL_COLOR_ARRAY);
-                  glColor3f(0.0f, 0.0f, 0.0f);
-                  glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
-                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
-                  glEnableClientState(GL_COLOR_ARRAY);
-                  glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
-                  glEnable(GL_POLYGON_OFFSET_FILL);
-                  glPolygonOffset(1.0, 1.0);
-                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
-                  glDisable(GL_POLYGON_OFFSET_FILL);
+                    glDisableClientState(GL_COLOR_ARRAY);
+                    glColor3f(0.0f, 0.0f, 0.0f);
+                    glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
+                    glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
+                    glEnableClientState(GL_COLOR_ARRAY);
+                    glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
+                    glEnable(GL_POLYGON_OFFSET_FILL);
+                    glPolygonOffset(1.0, 1.0);
+                    glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
+                    glDisable(GL_POLYGON_OFFSET_FILL);
                 }
                 else if (obj->nTransparentPrimitives)
                 {
-                  glDepthMask(GL_FALSE);
-                  glEnable(GL_ALPHA_TEST);
-                  glAlphaFunc(GL_GREATER, 0.0f);
-                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
-                  glDisable(GL_ALPHA_TEST);
-                  glDepthMask(GL_TRUE);
+                    glDepthMask(GL_FALSE);
+                    glEnable(GL_ALPHA_TEST);
+                    glAlphaFunc(GL_GREATER, 0.0f);
+                    glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
+                    glDisable(GL_ALPHA_TEST);
+                    glDepthMask(GL_TRUE);
                 }
                 else
-                  glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
+                    glDrawElements(g_primitiveMap[obj->vertsPerPrimitive-1], obj->nPrimitives * obj->vertsPerPrimitive, GL_UNSIGNED_INT, obj->primitives);
 
                 // Disable the shader if the driver supports it and there is a shader assigned
                 if (!pickMode && obj->shader && obj->isSolid)
                 {
                     if (GLEW_VERSION_2_0)
-                      glUseProgram(0);
+                        glUseProgram(0);
                     else if (GLEW_ARB_shader_objects)
-                      glUseProgramObjectARB(0);
+                        glUseProgramObjectARB(0);
                     glActiveTexture(GL_TEXTURE0);
                 }
 
@@ -2050,7 +2161,7 @@ void mhEventLoop(void)
                 mhKeyUp(event.key.keysym.sym, event.key.keysym.unicode, event.key.keysym.mod);
             break;
         case SDL_MOUSEMOTION:
-	{
+        {
 #if defined(WIN32) || defined(__APPLE__)
             mhMouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
 #else
@@ -2060,7 +2171,7 @@ void mhEventLoop(void)
                 mhMouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
 #endif
             break;
-	}
+        }
         case SDL_MOUSEBUTTONDOWN:
             mhMouseButtonDown(event.button.button, event.button.x, event.button.y);
             break;
@@ -2071,14 +2182,14 @@ void mhEventLoop(void)
             switch (event.user.code)
             {
             case 0:
-              if (!PyObject_CallFunction((PyObject*)event.user.data1, ""))
-                  PyErr_Print();
-              break;
+                if (!PyObject_CallFunction((PyObject*)event.user.data1, ""))
+                    PyErr_Print();
+                break;
             case 1:
-              if (!PyObject_CallFunction((PyObject*)event.user.data1, ""))
-                PyErr_Print();
-              Py_DECREF((PyObject*)event.user.data1);
-              break;
+                if (!PyObject_CallFunction((PyObject*)event.user.data1, ""))
+                    PyErr_Print();
+                Py_DECREF((PyObject*)event.user.data1);
+                break;
             }
             break;
         case SDL_VIDEORESIZE:
