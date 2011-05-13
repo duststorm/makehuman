@@ -51,7 +51,7 @@ class AqsisTaskView(gui3d.TaskView):
             
     def buildShaders(self):
         
-        shaders = ['skin2', 'hair', 'envlight', 'skinbump', 'scatteringtexture', 'bakelightmap', 'eyeball', 'cornea', 'mixer']
+        shaders = ['skin2', 'hair', 'envlight', 'skinbump', 'scatteringtexture', 'bakelightmap', 'eyeball', 'cornea', 'mixer', 'teeth']
         
         for shader in shaders:
             self.buildShader(shader)

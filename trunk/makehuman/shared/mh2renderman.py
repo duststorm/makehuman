@@ -309,7 +309,9 @@ class RMRHuman(RMNObject):
         self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
         self.skinBump.parameters.append(MaterialParameter("float", "bumpVal", 0.001))
         
-        self.corneaMat = RMRMaterial("cornea")        
+        self.corneaMat = RMRMaterial("cornea")  
+        self.teethMat = RMRMaterial("teeth")  
+        self.teethMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))     
         
         self.eyeBallMat = RMRMaterial("eyeball")        
         self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
@@ -415,7 +417,7 @@ class RMRHuman(RMNObject):
         self.teeth.groupsDict = self.groupsDict
         self.teeth.meshData = self.meshData
         self.teeth.facesGroup = teethGr
-        self.teeth.material = self.skinMat
+        self.teeth.material = self.teethMat
         self.teeth.joinGroupIndices()
 
         self.nails = RMNObject(name = "nails")
@@ -446,7 +448,7 @@ class RMRHuman(RMNObject):
 
         #parts to render with different material
         self.subObjects = [self.skin,self.rEyeBall,self.lEyeBall,
-                        self.rCornea,self.lCornea,self.nails]
+                        self.rCornea,self.lCornea,self.nails,self.teeth]
 
     def getSubObject(self, name):
         for subOb in self.subObjects:
