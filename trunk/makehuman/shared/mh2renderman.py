@@ -34,7 +34,7 @@ import aljabr
 import files3d
 import subprocess
 import random
-import hair
+#import hair
 import time
 import math
 
@@ -280,28 +280,29 @@ class RMRHuman(RMNObject):
         RMNObject.__init__(self, name, obj)
         self.subObjects = []
         self.human = human
-        self.hairFileName = name + "_hairs.rib"
+        #self.hairFileName = name + "_hairs.rib"
 
         #hairs
-        self.hairsClass = human.hairs
-        self.hairFilePath = os.path.join(ribRepository, self.hairFileName)
+        #self.hairsClass = human.hairs
+        #self.hairFilePath = os.path.join(ribRepository, self.hairFileName)
 
         #materials  TODO: remove the hardcoded texture names.
         self.skinMat = RMRMaterial("skin2")
         self.skinMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
         self.skinMat.parameters.append(MaterialParameter("string", "spectexture", "texture_ref.texture"))
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
+        self.skinMat.parameters.append(MaterialParameter("float", "Ksss", 0.4)) #TODO: using a texture
         self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lightmap.texture"))
-        self.skinMat.parameters.append(MaterialParameter("string", "aotexture", "occlmap.texture"))
+        #self.skinMat.parameters.append(MaterialParameter("string", "aotexture", "occlmap.texture"))
 
         #self.skinMat.parameters.append(MaterialParameter("float", "Value", 2.0))
 
-        self.hairMat = RMRMaterial("hair")
-        self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5))
-        self.hairMat.parameters.append(MaterialParameter("float", "Ks", 5))
-        self.hairMat.parameters.append(MaterialParameter("float", "roughness", 0.08))
-        self.hairMat.parameters.append(MaterialParameter("color", "rootcolor", self.human.hairColor))
-        self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))
+        #self.hairMat = RMRMaterial("hair")
+        #self.hairMat.parameters.append(MaterialParameter("float", "Kd", .5))
+        #self.hairMat.parameters.append(MaterialParameter("float", "Ks", 5))
+        #self.hairMat.parameters.append(MaterialParameter("float", "roughness", 0.08))
+        #self.hairMat.parameters.append(MaterialParameter("color", "rootcolor", self.human.hairColor))
+        #self.hairMat.parameters.append(MaterialParameter("color", "tipcolor", self.human.hairColor))
 
         self.skinBump = RMRMaterial("skinbump")
         self.skinBump.type = "Displacement"
@@ -313,10 +314,10 @@ class RMRHuman(RMNObject):
         self.eyeBallMat = RMRMaterial("eyeball")        
         self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
         
-        self.hairMat = RMRMaterial("skinbump")
-        self.hairMat.type = "Displacement"
-        self.hairMat.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
-        self.hairMat.parameters.append(MaterialParameter("float", "bumpVal", 0.001))
+        #self.hairMat = RMRMaterial("skinbump")
+        #self.hairMat.type = "Displacement"
+        #self.hairMat.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
+        #self.hairMat.parameters.append(MaterialParameter("float", "bumpVal", 0.001))
         
     def getHumanParameters(self):       
 
@@ -398,7 +399,7 @@ class RMRHuman(RMNObject):
         teethGr = set()
         allGr = set()
         nailsGr = set()
-        hairGr = set()
+        #hairGr = set()
         toSubtract = set()
         for f in self.meshData.faceGroups:
             if 'joint' not in f.name:
@@ -407,8 +408,8 @@ class RMRHuman(RMNObject):
                 teethGr.add(f.name)
             if 'nail' in f.name:
                 nailsGr.add(f.name)
-            if 'hairscalp' in f.name:
-                hairGr.add(f.name)
+            #if 'hairscalp' in f.name:
+                #hairGr.add(f.name)
 
         self.teeth = RMNObject(name = "teeth")
         self.teeth.groupsDict = self.groupsDict
@@ -456,51 +457,51 @@ class RMRHuman(RMNObject):
         return (self.human.getPosition()[0], self.human.getPosition()[1],\
                 self.human.getRotation()[0], self.human.getRotation()[1])
 
-    def adjustHairStyle(self):
-        hair.adjustHair(self.human, self.hairsClass)
+    #def adjustHairStyle(self):
+        #hair.adjustHair(self.human, self.hairsClass)
 
-    def writeHairsInclusion(self, ribfile):
-        archivePath = self.hairFilePath.replace('\\', '/')
-        ribfile.write('\t\tReadArchive "%s"\n'%(archivePath))
+    #def writeHairsInclusion(self, ribfile):
+        #archivePath = self.hairFilePath.replace('\\', '/')
+        #ribfile.write('\t\tReadArchive "%s"\n'%(archivePath))
 
-    def writeHairsCurve(self):
+    #def writeHairsCurve(self):
 
 
-        # Write the full hairstyle
+        ## Write the full hairstyle
 
-        totalNumberOfHairs = 0
-        self.hairsClass.humanVerts = self.human.meshData.verts
-        hairs = self.hairsClass.generateHairToRender()
-        print 'Writing hairs'
+        #totalNumberOfHairs = 0
+        #self.hairsClass.humanVerts = self.human.meshData.verts
+        #hairs = self.hairsClass.generateHairToRender()
+        #print 'Writing hairs'
 
-        hairFile = open(self.hairFilePath, 'w')
+        #hairFile = open(self.hairFilePath, 'w')
 
-        hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
-        for strands in hairs:
+        #hairFile.write('\t\tBasis "b-spline" 1 "b-spline" 1\n')
+        #for strands in hairs:
 
-            hDiameter = self.hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
-            totalNumberOfHairs += 1
-            hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(strands))
+            #hDiameter = self.hairsClass.hairDiameterMultiStrand * random.uniform(0.5, 1)
+            #totalNumberOfHairs += 1
+            #hairFile.write('Curves "cubic" [%i] "nonperiodic" "P" ['% len(strands))
 
-            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
-            hairFile.write('%s %s %s ' % (strands[0][0], strands[0][1], -strands[0][2]))  # z * -1 blender  to renderman coords
+            ##renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
+            #hairFile.write('%s %s %s ' % (strands[0][0], strands[0][1], -strands[0][2]))  # z * -1 blender  to renderman coords
 
-            for cP in strands:
-                hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
+            #for cP in strands:
+                #hairFile.write('%s %s %s ' % (cP[0], cP[1], -cP[2]))  # z * -1 blender  to renderman coords
 
-            #renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
-            hairFile.write('%s %s %s ' % (strands[len(strands)-1][0], strands[len(strands)-1][1],\
-            -strands[len(strands)-1][2]))  # z * -1 blender  to renderman coords
+            ##renderman engine understand cubic spline not connected to endpoints, whilest makehuman and blender hair particle connect endpoints
+            #hairFile.write('%s %s %s ' % (strands[len(strands)-1][0], strands[len(strands)-1][1],\
+            #-strands[len(strands)-1][2]))  # z * -1 blender  to renderman coords
 
-            #if random.randint(0, 3) >= 1:
-            #    hairFile.write(']\n"N" [')
-            #    for cP in strands:
-            #            hairFile.write('0 1 0 ')  # arbitrary normals
-            hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
+            ##if random.randint(0, 3) >= 1:
+            ##    hairFile.write(']\n"N" [')
+            ##    for cP in strands:
+            ##            hairFile.write('0 1 0 ')  # arbitrary normals
+            #hairFile.write(']  "constantwidth" [%s]\n' % hDiameter)
 
-        hairFile.close()
-        print 'Totals hairs written: ', totalNumberOfHairs
-        #print 'Number of tufts', len(hairs)
+        #hairFile.close()
+        #print 'Totals hairs written: ', totalNumberOfHairs
+        ##print 'Number of tufts', len(hairs)
 
 
     def __str__(self):
@@ -730,7 +731,7 @@ class RMRScene:
 
         """
         #Init and write rib code for hairs        
-        self.humanCharacter.writeHairsCurve()
+        #self.humanCharacter.writeHairsCurve()
         
         #Get global subobjs parameteres.
         self.humanCharacter.skinMat.setParameter("sweat", self.app.settings.get('rendering_aqsis_oil', 0.3))
@@ -760,8 +761,9 @@ class RMRScene:
             if shadowMode:
                 ribfile.write('\tSurface "null"\n')
             else:
-                self.humanCharacter.hairMat.writeRibCode(ribfile)
-            self.humanCharacter.writeHairsInclusion(ribfile)
+                pass
+                #self.humanCharacter.hairMat.writeRibCode(ribfile)
+            #self.humanCharacter.writeHairsInclusion(ribfile)
             ribfile.write('\tAttributeEnd\n')
         else:
             print "Writing bake world"
@@ -995,53 +997,53 @@ class RMRScene:
         self.loadLighting(self.lightsFolderPath, "default.lights")    
         self.writeTextureFile() #TODO move in the init
         
-        recalculateAll = 0
+        #recalculateAll = 0
         recalculateSSS = 0
         
         
             
-        print "DEBUG1", self.app.selectedHuman.getRotation(), self.lastRotation
+        #print "DEBUG1", self.app.selectedHuman.getRotation(), self.lastRotation
         
-        if (self.app.selectedHuman.getRotation() != self.lastRotation) or ([self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ] != self.lastCameraPosition):
-            print "CONDICIO 1"
-            recalculateSSS = 1            
-            self.lastRotation = self.app.selectedHuman.getRotation()  
+        #if (self.app.selectedHuman.getRotation() != self.lastRotation) or ([self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ] != self.lastCameraPosition):
+            #print "CONDICIO 1"
+            #recalculateSSS = 1            
+            #self.lastRotation = self.app.selectedHuman.getRotation()  
             
-        if len(self.app.undoStack) > 0:  
+        #if len(self.app.undoStack) > 0:  
             
-            print "DEBUG2", self.app.undoStack[-1], self.lastUndoItem
-            if self.app.undoStack[-1] != self.lastUndoItem:  
-                print "CONDICIO 2"
-                self.lastUndoItem = self.app.undoStack[-1]
-                recalculateAll = 1
-        else:            
-            if recalculateSSS == 0:
-                recalculateAll = 1
-                print "CONDICIO 3"
+            #print "DEBUG2", self.app.undoStack[-1], self.lastUndoItem
+            #if self.app.undoStack[-1] != self.lastUndoItem:  
+                #print "CONDICIO 2"
+                #self.lastUndoItem = self.app.undoStack[-1]
+                #recalculateAll = 1
+        #else:            
+            #if recalculateSSS == 0:
+                #recalculateAll = 1
+                #print "CONDICIO 3"
                 
-        if self.firstTimeRendering == True:
-            recalculateAll = 1
-            self.firstTimeRendering = False
-            print "CONDICIO 4"
+        #if self.firstTimeRendering == True:
+            #recalculateAll = 1
+            #self.firstTimeRendering = False
+            #print "CONDICIO 4"
             
-            
+        recalculateAll = 1    
         if  recalculateAll == 1:
             print "RECALCULATING ALL"
-            self.writeWorldFile(self.worldFileName+"shad.rib", shadowMode = 1)               
-            self.writeShadowFile()
-            filesTorender.append(self.shadowFileName)        
-            self.writeAOFile()            
-            filesTorender.append(self.ambientOcclusionFileName) 
+            #self.writeWorldFile(self.worldFileName+"shad.rib", shadowMode = 1)               
+            #self.writeShadowFile()
+            #filesTorender.append(self.shadowFileName)        
+            #self.writeAOFile()            
+            #filesTorender.append(self.ambientOcclusionFileName) 
             self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
             self.writeSkinBakeFile()
             filesTorender.append(self.bakeFilename)           
             
             
-        if (recalculateSSS == 1) and (recalculateAll == 0):
-            print "RECALCULATING SSS"
-            self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
-            self.writeSkinBakeFile()
-            filesTorender.append(self.bakeFilename)
+        #if (recalculateSSS == 1) and (recalculateAll == 0):
+            #print "RECALCULATING SSS"
+            #self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
+            #self.writeSkinBakeFile()
+            #filesTorender.append(self.bakeFilename)
         
         
         self.writeWorldFile(self.worldFileName)

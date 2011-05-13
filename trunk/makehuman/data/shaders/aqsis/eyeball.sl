@@ -7,7 +7,7 @@
 
 surface
 eyeball ( float Ks = 3;
-          float Kd = 3;
+          float Kd = 2.5;
           float Ka = 0.1;
           string colortexture = "";  
           float roughness = .02;
