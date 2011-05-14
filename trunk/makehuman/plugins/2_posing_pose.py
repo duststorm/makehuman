@@ -195,8 +195,17 @@ class PoseTaskView(gui3d.TaskView):
         
         #compute bounding box
         bboxj = calcBBox(verts,  jointVerts)
-        bboxl = calcBBox(verts,  linkVerts)   
         
+        #adding offset
+        bboxj[0][0]= bboxj[0][0] - 0.01
+        bboxj[1][0]= bboxj[1][0] + 0.01
+        bboxj[0][1]= bboxj[0][1] - 0.01
+        bboxj[1][1]= bboxj[1][1] + 0.01
+        bboxj[0][2]= bboxj[0][2] - 0.01
+        bboxj[1][2]= bboxj[1][2] + 0.01
+        #bboxl = calcBBox(verts,  linkVerts)   
+        
+        """
         #recompute bounding box z and y values so they will be connected by 4 vertices in between them
         minY = min(bboxj[0][1], bboxl[0][1])
         maxY = max(bboxj[1][1], bboxl[1][1])
@@ -219,21 +228,37 @@ class PoseTaskView(gui3d.TaskView):
         
         #x that connects
         bboxj[1][0] = x
-        bboxl[0][0] = x
+        bboxl[0][0] = x        
+        """
+        
+        #print bboxj
+        #return 
         
         tets =  box2Tetrahedrons(bboxj)
         tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
         
         #compute mvc weights for each vertex in the bindings of r-shoulder
+        stop = False
         for index in jointVerts:
           i,w = computeWeights(verts[index].co,tets)
+          """
+          for ww in w:
+           if ww < 0:
+            print w
+            print verts[index].co
+            print i
+            print tets
+            stop = True
+          if stop: break
+          """
+              
           #print v
           #testv = [0,0,0]
           #for j in xrange(0,4):
           #  testv = vadd(vmul(tets[i][j],w[j]), testv)
           #print testv
           #break
-          print w
+          #print w
           v = [0.0,0.0,0.0]
           for j in xrange(0,4):
             v = vadd(vmul(tets2[i][j],w[j]), v)
@@ -407,17 +432,29 @@ def findTetrahedron(tets, v):
     
     
 def computeWeights(v,tets):
-    i = findTetrahedron(tets,v)
+    #i = findTetrahedron(tets,v)
     # w1vt1 + w2vt2 + w3vt3 + w4vt4 = v
     #w1 + w2 + w3 + w4 = 1
     y = [v[0], v[1], v[2], 1.0]
     A = [0]*16
-    for rows in xrange(0,4):
-        for cols in xrange(0,4):
-          if rows < 3: A[rows*4 + cols] = tets[i][cols][rows]
-          else: A[rows*4 + cols] = 1.0
-    w = linsolve(A,y)
-    return i,w
+    j = 0
+    solutions = []
+    for i in xrange(0,4):
+      for rows in xrange(0,4):
+          for cols in xrange(0,4):
+            if rows < 3: A[rows*4 + cols] = tets[i][cols][rows]
+            else: A[rows*4 + cols] = 1.0
+      w = linsolve(A,y)
+      solutions.append(w)
+      found = True
+      for ww in w:
+        if (ww < 0) or (ww > 1): 
+          found = False
+          break
+      if (found == True):
+        j = i
+        break
+    return j,solutions[j]
     
 def wireCube(mesh, position=[0.0, 0.0, 0.0], scale=1.0, name='cube'):
         
