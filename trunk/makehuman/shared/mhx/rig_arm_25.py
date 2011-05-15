@@ -25,26 +25,31 @@ from mhx_rig import *
 prcArmTrg	= 0.35
 
 ArmJoints = [
-	('r-elbow',				'f', ('r-elbow-raw', 'r-shoulder', 'r-hand', [0,0,-0.1])),
-	('l-elbow',				'f', ('l-elbow-raw', 'l-shoulder', 'l-hand', [0,0,-0.1])),
+    ('r-shoulder-in',       'v', 14160),
+    ('l-shoulder-in',       'v', 14382),
+    ('r-uparm0',            'l', ((2.0, 'r-shoulder-in'), (-1.0, 'r-shoulder'))),
+    ('l-uparm0',            'l', ((2.0, 'l-shoulder-in'), (-1.0, 'l-shoulder'))),
+    
+	('r-elbow',				'f', ('r-elbow-raw', 'r-uparm0', 'r-hand', [0,0,-0.1])),
+	('l-elbow',				'f', ('l-elbow-raw', 'l-uparm0', 'l-hand', [0,0,-0.1])),
 
 	('hand_L_tail',			'j', 'r-finger-3-1'),
 	('hand_R_tail',			'j', 'l-finger-3-1'),
 
-	('r-uparm1',			'l', ((1-bbMarg, 'r-shoulder'), (bbMarg, 'r-elbow'))),
-	('r-uparm2',			'l', ((0.5, 'r-shoulder'), (0.5, 'r-elbow'))),
+	('r-uparm1',			'l', ((1-bbMarg, 'r-uparm0'), (bbMarg, 'r-elbow'))),
+	('r-uparm2',			'l', ((0.5, 'r-uparm0'), (0.5, 'r-elbow'))),
 	('r-loarm1',			'l', ((1-bbMarg, 'r-elbow'), (bbMarg, 'r-hand'))),
 	('r-loarm2',			'l', ((bbMarg, 'r-elbow'), (1-bbMarg, 'r-hand'))),
 
-	('l-uparm1',			'l', ((1-bbMarg, 'l-shoulder'), (bbMarg, 'l-elbow'))),
-	('l-uparm2',			'l', ((0.5, 'l-shoulder'), (0.5, 'l-elbow'))),
+	('l-uparm1',			'l', ((1-bbMarg, 'l-uparm0'), (bbMarg, 'l-elbow'))),
+	('l-uparm2',			'l', ((0.5, 'l-uparm0'), (0.5, 'l-elbow'))),
 	('l-loarm1',			'l', ((1-bbMarg, 'l-elbow'), (bbMarg, 'l-hand'))),
 	('l-loarm2',			'l', ((bbMarg, 'l-elbow'), (1-bbMarg, 'l-hand'))),
 
-	('r-armtrg',			'l', ((1-prcArmTrg, 'r-shoulder'), (prcArmTrg, 'r-elbow'))),
-	('l-armtrg',			'l', ((1-prcArmTrg, 'l-shoulder'), (prcArmTrg, 'l-elbow'))),
-	('r-uparmrot',			'l', ((1-prcArmTrg/2, 'r-shoulder'), (prcArmTrg/2, 'r-elbow'))),
-	('l-uparmrot',			'l', ((1-prcArmTrg/2, 'l-shoulder'), (prcArmTrg/2, 'l-elbow'))),
+	('r-armtrg',			'l', ((1-prcArmTrg, 'r-uparm0'), (prcArmTrg, 'r-elbow'))),
+	('l-armtrg',			'l', ((1-prcArmTrg, 'l-uparm0'), (prcArmTrg, 'l-elbow'))),
+	('r-uparmrot',			'l', ((1-prcArmTrg/2, 'r-uparm0'), (prcArmTrg/2, 'r-elbow'))),
+	('l-uparmrot',			'l', ((1-prcArmTrg/2, 'l-uparm0'), (prcArmTrg/2, 'l-elbow'))),
 
 	('r-uparm-front',		'v', 3440),
 	('r-uparm-back',		'v', 3438),
@@ -87,8 +92,8 @@ ArmJoints = [
 
 	('r-shoulder-top',		'v', 2862),
 	('l-shoulder-top',		'v', 10812),
-	('r-shoulder-tail',		'l', ((0.5, 'r-shoulder-top'), (0.5, 'r-shoulder'))),
-	('l-shoulder-tail',		'l', ((0.5, 'l-shoulder-top'), (0.5, 'l-shoulder'))),
+	('r-shoulder-tail',		'l', ((0.5, 'r-shoulder-top'), (0.5, 'r-uparm0'))),
+	('l-shoulder-tail',		'l', ((0.5, 'l-shoulder-top'), (0.5, 'l-uparm0'))),
 
 	('sternum-tail',		'v', 7279),
 	('sternum-head',		'l', ((0.5, 'neck'), (0.5, 'sternum-tail'))),
@@ -111,13 +116,13 @@ ArmJoints = [
 
 '''
 	#('Shoulder_L',			'r-clavicle', 'r-scapula'),
-	#('ShoulderScapula_L',	'r-shoulder', 'r-scapula'),
+	#('ShoulderScapula_L',	'r-uparm0', 'r-scapula'),
 	#('Clavicle_L',			'r-shoulder-head', 'r-shoulder-tail'),
 	#('Trapezeus-1_L',		'r-trapezeus-1', 'r-scapula'),
 
 	('Shoulder_R',			'l-shoulder-head', 'l-scapula'),
 	#('Shoulder_R',			'l-clavicle', 'l-scapula'),
-	#('ShoulderScapula_R',	'l-shoulder', 'l-scapula'),
+	#('ShoulderScapula_R',	'l-uparm0', 'l-scapula'),
 	('Clavicle_R',			'l-clavicle', 'l-scapula'),
 	('Trapezeus-1_R',		'l-trapezeus-1', 'l-scapula'),
 	('Trapezeus-2_R',		'l-trapezeus-2', 'l-uparm-back'),
@@ -142,23 +147,23 @@ ArmHeadsTails = [
 	('DfmShoulder_R',		'l-clavicle', 'l-shoulder-tail'),
 	('DfmScapula_R',		'l-scapula-head', 'l-scapula-tail'),
 
-	('ShoulderEnd_L',		'r-shoulder', ('r-shoulder', yunit)),
-	('ShoulderEnd_R',		'l-shoulder', ('l-shoulder', yunit)),
-	('ArmLoc_L',			'r-shoulder', ('r-shoulder', yunit)),
-	('ArmLoc_R',			'l-shoulder', ('l-shoulder', yunit)),
+	('ShoulderEnd_L',		'r-uparm0', ('r-uparm0', yunit)),
+	('ShoulderEnd_R',		'l-uparm0', ('l-uparm0', yunit)),
+	('ArmLoc_L',			'r-uparm0', ('r-uparm0', yunit)),
+	('ArmLoc_R',			'l-uparm0', ('l-uparm0', yunit)),
 
 	('DfmShoulderTwist_L',	'r-shoulder-aim', 'r-uparm1'),
 	('DfmShoulderTwist_R',	'l-shoulder-aim', 'l-uparm1'),
 
 	# Shoulder deform
-	('ArmTrg_L',			'r-shoulder', 'r-armtrg'),
+	('ArmTrg_L',			'r-uparm0', 'r-armtrg'),
 	('DfmArmPit_L',			'r-armpit', 'r-armtrg'),
 	('DfmPectoralis_L',		'r-pectoralis', 'r-armtrg'),
 	('DfmTrapezeus_L',		'r-trapezeus-2', 'r-armtrg'),
 	#('DfmLatDorsi_L',		'r-latdorsi', 'r-armtrg'),
 	('DfmDeltoid_L',		'r-deltoid', 'r-armtrg'),
 
-	('ArmTrg_R',			'l-shoulder', 'l-armtrg'),
+	('ArmTrg_R',			'l-uparm0', 'l-armtrg'),
 	('DfmArmPit_R',			'l-armpit', 'l-armtrg'),
 	('DfmPectoralis_R',		'l-pectoralis', 'l-armtrg'),
 	('DfmTrapezeus_R',		'l-trapezeus-2', 'l-armtrg'),
@@ -172,8 +177,8 @@ ArmHeadsTails = [
 	('ElbowBendTrg_R',		'l-elbow-tail', ('l-elbow-tail', yunit)),
 
 	# Deform
-	('UpArm_L',				'r-shoulder', 'r-elbow'),
-	('DfmUpArm1_L',			'r-shoulder', 'r-uparm1'),
+	('UpArm_L',				'r-uparm0', 'r-elbow'),
+	('DfmUpArm1_L',			'r-uparm0', 'r-uparm1'),
 	('DfmUpArm2_L',			'r-uparm1', 'r-uparm2'),
 	('DfmUpArm3_L',			'r-uparm2', 'r-elbow'),
 	('Elbow_L',				'r-elbow', ('r-elbow',yunit)),
@@ -186,8 +191,8 @@ ArmHeadsTails = [
 	('Hand_L',				'r-hand', 'hand_L_tail'),
 	('DfmHand_L',			'r-hand', 'hand_L_tail'),
 
-	('UpArm_R',				'l-shoulder', 'l-elbow'),
-	('DfmUpArm1_R',			'l-shoulder', 'l-uparm1'),
+	('UpArm_R',				'l-uparm0', 'l-elbow'),
+	('DfmUpArm1_R',			'l-uparm0', 'l-uparm1'),
 	('DfmUpArm2_R',			'l-uparm1', 'l-uparm2'),
 	('DfmUpArm3_R',			'l-uparm2', 'l-elbow'),
 	('Elbow_R',				'l-elbow', ('l-elbow',yunit)),
@@ -201,14 +206,14 @@ ArmHeadsTails = [
 	('DfmHand_R',			'l-hand', 'hand_R_tail'),
 
 	# Rotation diffs
-	('BendArmDown_L',		'r-shoulder', ('r-shoulder', (0,-1,0))),
-	('BendArmDown_R',		'l-shoulder', ('l-shoulder', (0,-1,0))),
-	('BendArmUp_L',			'r-shoulder', ('r-shoulder', (0,1,0))),
-	('BendArmUp_R',			'l-shoulder', ('l-shoulder', (0,1,0))),
-	('BendArmForward_L',	'r-shoulder', ('r-shoulder', (0,0,1))),
-	('BendArmForward_R',	'l-shoulder', ('l-shoulder', (0,0,1))),
-	('BendArmBack_L',		'r-shoulder', ('r-shoulder', (0,0,-1))),
-	('BendArmBack_R',		'l-shoulder', ('l-shoulder', (0,0,-1))),
+	('BendArmDown_L',		'r-uparm0', ('r-uparm0', (0,-1,0))),
+	('BendArmDown_R',		'l-uparm0', ('l-uparm0', (0,-1,0))),
+	('BendArmUp_L',			'r-uparm0', ('r-uparm0', (0,1,0))),
+	('BendArmUp_R',			'l-uparm0', ('l-uparm0', (0,1,0))),
+	('BendArmForward_L',	'r-uparm0', ('r-uparm0', (0,0,1))),
+	('BendArmForward_R',	'l-uparm0', ('l-uparm0', (0,0,1))),
+	('BendArmBack_L',		'r-uparm0', ('r-uparm0', (0,0,-1))),
+	('BendArmBack_R',		'l-uparm0', ('l-uparm0', (0,0,-1))),
 
 	('BendShoulderUp_L',	'r-shoulder-head', ('r-shoulder-head', (0,1,0))),
 	('BendShoulderUp_R',	'l-shoulder-head', ('l-shoulder-head', (0,1,0))),
@@ -217,13 +222,13 @@ ArmHeadsTails = [
 
 	# Pole Targets
 
-	('UpArmRot_L',			'r-shoulder', 'r-uparmrot'),
+	('UpArmRot_L',			'r-uparm0', 'r-uparmrot'),
 	('UpArmDir_L',			'r-uparm1', ('r-uparm1', yunit)),
 	('UpArm1PT_L',			('r-uparm1', yunit), ('r-uparm1', ybis)),
 	('UpArm2PT_L',			('r-uparm2', yunit), ('r-uparm2', ybis)),
 	('LoArmPT_L',			('r-loarm2', yunit), ('r-loarm2', ybis)),
 
-	('UpArmRot_R',			'l-shoulder', 'l-uparmrot'),
+	('UpArmRot_R',			'l-uparm0', 'l-uparmrot'),
 	('UpArmDir_R',			'l-uparm1', ('l-uparm1', yunit)),
 	('UpArm1PT_R',			('l-uparm1', yunit), ('l-uparm1', ybis)),
 	('UpArm2PT_R',			('l-uparm2', yunit), ('l-uparm2', ybis)),
