@@ -105,11 +105,10 @@ def dataTo3Dobject(obj, data):
         return None
 
     verts = data[0]  # vertex index -> coords [x, y, z]
-    vertsSharedFaces = data[1]  # vertex index -> faceindices
-    uvValues = data[2]  # uv index -> uv [u, v]
-    faceGroups = data[3]  # group name -> faces [co_index1, co_index2, co_index3]
-    faceGroupsNames = data[4]  # group names
-    uvFaceData = data[5]  # face index -> uv face [uv_index1, uv_index2, uv_index3]
+    uvValues = data[1]  # uv index -> uv [u, v]
+    faceGroups = data[2]  # group name -> faces [co_index1, co_index2, co_index3]
+    faceGroupsNames = data[3]  # group names
+    uvFaceData = data[4]  # face index -> uv face [uv_index1, uv_index2, uv_index3]
 
     # print "DEBUG FACEGROUP",faceGroupsNames
 
@@ -175,7 +174,6 @@ def wavefrontToData(path):
     faceGroups[currentFaceGroup] = []
 
     verts = []
-    vertsSharedFaces = []
     faceIndex = 0
     uvValues = []
     uvFaceData = []
@@ -201,9 +199,6 @@ def wavefrontToData(path):
                 verts.append(vData)
                 vertsUV.append([0, 0])
 
-                # For each vert, append an empty list to vertsSharedFaces
-
-                vertsSharedFaces.append([])
             elif lineData[0] == 'vt':
 
                 # We just take the full list of uv values as-is
@@ -236,17 +231,10 @@ def wavefrontToData(path):
                 # Split quads in trigs
 
                 if len(vIndices) == 4:
-                    vertsSharedFaces[vIndices[0]].append(faceIndex)
-                    vertsSharedFaces[vIndices[1]].append(faceIndex)
-                    vertsSharedFaces[vIndices[2]].append(faceIndex)
-                    vertsSharedFaces[vIndices[3]].append(faceIndex)
                     faceGroups[currentFaceGroup].append(vIndices)
                     faceIndex += 1
                 elif len(vIndices) == 3:
 
-                    vertsSharedFaces[vIndices[0]].append(faceIndex)
-                    vertsSharedFaces[vIndices[1]].append(faceIndex)
-                    vertsSharedFaces[vIndices[2]].append(faceIndex)
                     faceGroups[currentFaceGroup].append([vIndices[0], vIndices[1], vIndices[2], vIndices[0]])
                     faceIndex += 1
                 else:
@@ -257,7 +245,7 @@ def wavefrontToData(path):
         faceGroupsNames.append('default-dummy-group')
 
     #print 'loading wavefront %s in %f sec' % (path, time.time() - t1)
-    return [verts, vertsSharedFaces, uvValues, faceGroups, faceGroupsNames, uvFaceData]
+    return [verts, uvValues, faceGroups, faceGroupsNames, uvFaceData]
 
 
 def saveWavefrontObj(ob, path):
