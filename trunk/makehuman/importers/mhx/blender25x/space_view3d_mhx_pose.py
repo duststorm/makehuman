@@ -614,8 +614,9 @@ class VIEW3D_OT_MhxResetRigExpressionsButton(bpy.types.Operator):
 #
 
 def createExpressionDrivers(context):        
-    global theMesh
+    global theMesh, theRig
     skeys = theMesh.data.shape_keys
+    context.scene.objects.active = theRig
     if skeys:
         for name in Expressions:
             try:
@@ -624,6 +625,9 @@ def createExpressionDrivers(context):
             except:
                 exists = False
             if exists:
+                theRig[name].min = 0.0
+                theRig[name].max = 1.0
+                bpy.ops.wm.properties_edit(data_path="object", property=name, min=0, max=1)
                 createExpressionDriver(name, skeys)
     return
                 
@@ -1154,17 +1158,18 @@ class VIEW3D_OT_MhxTogglePropButton(bpy.types.Operator):
 
 
 #
-#    initCharacter():
+#    initCharacter(doReset):
 #    class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
 #
 
 
-def initCharacter():
+def initCharacter(doReset):
     global theRig
     # print("Initializing")
     defineProperties()
-    redefinePropDrivers()    
-    resetProperties()
+    redefinePropDrivers()
+    if doReset:    
+        resetProperties()
     theRig['MhxRigInited'] = True
 
     for (prop, typ, value, options) in ParentProperties:
@@ -1175,9 +1180,10 @@ class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
     bl_idname = "mhx.pose_init_character"
     bl_label = "Initialize character"
     bl_options = {'REGISTER'}
+    doReset = BoolProperty()
 
     def execute(self, context):
-        initCharacter()
+        initCharacter(self.doReset)
         print("Character initialized")
         return{'FINISHED'}    
 
@@ -1243,10 +1249,10 @@ class MhxDriversPanel(bpy.types.Panel):
                 inited = False
 
             if not inited:
-                layout.operator("mhx.pose_init_character", text='Initialize character')
+                layout.operator("mhx.pose_init_character", text='Initialize character').doReset = True
                 return
 
-            layout.operator("mhx.pose_init_character", text='Reinitialize character')
+            layout.operator("mhx.pose_init_character", text='Reinitialize character').doReset = False
             layout.operator("mhx.pose_reset_properties")
             pbones = theRig.pose.bones
             

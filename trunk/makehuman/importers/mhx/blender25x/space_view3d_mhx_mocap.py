@@ -2312,6 +2312,10 @@ def initInterface(context):
         maxlen=1024,
         default='')
 
+    bpy.types.Scene.MhxActions = EnumProperty(
+        items = [],
+        name = "Actions")
+
     scn = context.scene
     if scn:
         scn['MhxPlantCurrent'] = True
