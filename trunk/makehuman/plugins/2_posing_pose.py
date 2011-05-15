@@ -12,6 +12,7 @@ from mh import getPath
 from linalg import *
 from copy import deepcopy
 import module3d
+from pose_test import *
 
 print 'Pose2 plugin imported'
 
@@ -170,6 +171,11 @@ class PoseTaskView(gui3d.TaskView):
     
     def mvcTest(self):
         
+        v = [1.7225409999999997, 5.2094214999999986, 0.094422500000000006]
+        tets = [[[1.3561949999999998, 4.5287560000000004, 0.31737949999999998], [1.3561949999999998, 5.988215499999999, -1.1008855], [1.9484319999999999, 4.5287560000000004, -1.1008855], [1.3561949999999998, 4.5287560000000004, -1.1008855]], [[1.3561949999999998, 4.5287560000000004, 0.31737949999999998], [1.9484319999999999, 4.5287560000000004, -1.1008855], [1.9484319999999999, 5.988215499999999, 0.31737949999999998], [1.9484319999999999, 4.5287560000000004, 0.31737949999999998]], [[1.9484319999999999, 5.988215499999999, 0.31737949999999998], [1.3561949999999998, 5.988215499999999, -1.1008855], [1.9484319999999999, 4.5287560000000004, -1.1008855], [1.9484319999999999, 5.988215499999999, -1.1008855]], [[1.9484319999999999, 5.988215499999999, 0.31737949999999998], [1.3561949999999998, 4.5287560000000004, 0.31737949999999998], [1.3561949999999998, 5.988215499999999, -1.1008855], [1.3561949999999998, 5.988215499999999, 0.31737949999999998]]]
+        print computeWeights2(v,tets)
+        return
+        
         angle = 45*degree2rad
         joint = self.skeleton.getJoint('joint-r-shoulder')
         center = joint.position
@@ -241,7 +247,7 @@ class PoseTaskView(gui3d.TaskView):
         stop = False
         for index in jointVerts:
           i,w = computeWeights(verts[index].co,tets)
-          """
+          
           for ww in w:
            if ww < 0:
             print w
@@ -250,7 +256,7 @@ class PoseTaskView(gui3d.TaskView):
             print tets
             stop = True
           if stop: break
-          """
+          
               
           #print v
           #testv = [0,0,0]
@@ -430,7 +436,22 @@ def findTetrahedron(tets, v):
         else: indices.remove(3-k)
     return indices[0]
     
-    
+def computeWeights2(v,tets):
+    y = [v[0], v[1], v[2]]
+    A = [0]*9
+    j = 0
+    solutions = []
+    for i in xrange(0,3):
+      tet = tets[i]
+      z = vsub(y, tet[0])
+      for rows in xrange(1,4):
+          v2 = vsub(tet[rows], tet[0])
+          for cols in xrange(0,3):
+            A[(rows-1)*3 + cols] = v2[cols]
+      w = linsolve(A,z)
+      solutions.append(w)
+    return solutions
+
 def computeWeights(v,tets):
     #i = findTetrahedron(tets,v)
     # w1vt1 + w2vt2 + w3vt3 + w4vt4 = v
