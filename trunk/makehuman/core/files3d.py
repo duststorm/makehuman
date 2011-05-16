@@ -56,157 +56,68 @@ import time
 import module3d
 import os
 import algos3d
-
-
-def isFile(path):
-    """
-    This function tests whether the specified path points to a file on the file system.
-    If the file exists it returns a 1. Otherwise it returns 0.
-
-    Parameters
-    ----------
     
-    path:
-        *string*. The file system path to the file to be checked.
-    
+def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
     """
-
-    # because os module is not in standard python dll
-
-    try:
-        fileDescriptor = open(path, 'r')
-        fileDescriptor.close()
-        return 1
-    except:
-        return None
-
-
-def dataTo3Dobject(obj, data):
-    """
-    This function creates a 3D object based upon a standardised input data stream.
-    The object created is held in memory in the standard internal MakeHuman data format.
+    This function loads the specified mesh objects into internal MakeHuman data structures,
+    and return it.
     
-    Parameters
-    ----------
-    
-    obj:
-        *3D object*. The object to create.
+    Parameters:
+    -----------
+   
+    path:     
+      *String*.  The file system path to the file containing the object to load.
 
-    data:
-        *list of various data*. The data to be used to fill the object.
+    locX:
+      *float* X location of loaded obj, default = 0
 
-    addSharedFaces:
-        *int flag*. Whether or not to perform the 'shared faces' analysis (1=Yes, 0=No).
-        
+    locY:
+      *float* Y location of loaded obj, default = 0
+
+    locZ:
+      *float* Z location of loaded obj, default = 0
     """
+    
+    name = os.path.basename(path)
+    obj = scene.newObj(name)
 
-    time1 = time.time()
-    if not data:
-        return None
+    obj.path = path
+    obj.x = locX
+    obj.y = locY
+    obj.z = locZ
 
-    verts = data[0]  # vertex index -> coords [x, y, z]
-    uvValues = data[1]  # uv index -> uv [u, v]
-    faceGroups = data[2]  # group name -> faces [co_index1, co_index2, co_index3]
-    faceGroupsNames = data[3]  # group names
-    uvFaceData = data[4]  # face index -> uv face [uv_index1, uv_index2, uv_index3]
-
-    # print "DEBUG FACEGROUP",faceGroupsNames
-
-    for (i, v) in enumerate(verts):
-        v = module3d.Vert(v, i, obj)
-        obj.verts.append(v)
-
-    gIndex = 0
+    fg = None
     fIndex = 0
-    fullArrayIndex = 0
-
-    obj.uvValues = uvValues
-
-    for groupName in faceGroupsNames:
-        group = faceGroups[groupName]
-        groupVerts = {}
-
-        fg = obj.createFaceGroup(groupName)  # create group with name groupName
-        for face in group:  # for each face in the group [co_index1, co_index2, co_index3, co_index4]
-            v0 = obj.verts[face[0]]  # look up vertices, these are in the same order as in the file
-            v1 = obj.verts[face[1]]
-            v2 = obj.verts[face[2]]
-            v3 = obj.verts[face[3]]
-            
-            f = fg.createFace((v0, v1, v2, v3))
-
-            if len(uvFaceData) > 0:  # look up uv, if existing, these are in the same order as in the file
-                uvIndices = uvFaceData[fIndex]
-                f.uv = uvIndices[:]
-
-            f.idx = fIndex
-            fIndex += 1
-
-    #print 'time to build mesh: ', time.time() - time1
-
-    obj.calcNormals()
-    obj.updateIndexBuffer()
-
-def wavefrontToData(path):
-    """
-    This function reads a file containing data in WaveFront format and loads it
-    into a standardised intermediate data structure.
-
-    Note: This function converts all polygonal faces into triangles.
-
-    Developers note: Need to be modified in order to load sparse face groups data.
-
-    Parameters
-    ----------
-    
-    path:
-        *string*. The file system path to the file to be imported.
-
-    """
-
-    t1 = time.time()
-
-    vertsUV = []
-    faceGroupsNames = []
-
-    faceGroups = {}
-    currentFaceGroup = 'default-dummy-group'
-    faceGroups[currentFaceGroup] = []
-
-    verts = []
-    faceIndex = 0
-    uvValues = []
-    uvFaceData = []
 
     try:
-        ObjFile = open(path)
+        objFile = open(path)
     except:
         print 'Warning: obj file not found: ', path
-        return None
+        return False
+        
+    obj.uvValues = []
 
-    for objData in ObjFile.readlines():
+    for objData in objFile.readlines():
 
         lineData = objData.split()
         if len(lineData) > 0:
             if lineData[0] == 'g':
-                name = lineData[1]
-                currentFaceGroup = name
-                faceGroups[currentFaceGroup] = []
-                faceGroupsNames.append(currentFaceGroup)
+                
+                fg =  obj.createFaceGroup(lineData[1])
+                
             elif lineData[0] == 'v':
 
-                vData = [float(lineData[1]), float(lineData[2]), float(lineData[3])]
-                verts.append(vData)
-                vertsUV.append([0, 0])
+                obj.createVertex([float(lineData[1]), float(lineData[2]), float(lineData[3])])
 
             elif lineData[0] == 'vt':
 
-                # We just take the full list of uv values as-is
-
-                uvValues.append([float(lineData[1]), float(lineData[2])])
+                obj.uvValues.append([float(lineData[1]), float(lineData[2])])
+                
             elif lineData[0] == 'f':
-
-                faceIndices = []
+                
+                if not fg:
+                    currentFaceGroup =  obj.createFaceGroup('default-dummy-group')
+                    
                 uvIndices = []
                 vIndices = []
                 for faceData in lineData[1:]:
@@ -215,142 +126,34 @@ def wavefrontToData(path):
                     vIndices.append(vIdx)
 
                     # If there are other data (uv, normals, etc)
-
                     if len(vInfo) > 1 and vInfo[1] != '':
                         uvIndex = int(vInfo[1]) - 1  # -1 because obj is 1 based list
                         uvIndices.append(uvIndex)
+                
+                if len(vIndices) == 3:
+                    vIndices.append(vIndices[0])
+                f = fg.createFace([obj.verts[i] for i in vIndices])
+                    
+                if len(uvIndices) > 0:  # look up uv, if existing, these are in the same order as in the file
+                    if len(uvIndices) == 3:
+                        uvIndices.append(uvIndices[0])
+                    f.uv = uvIndices[:]
 
-                # Four sided polygons need to be split into triangles in exactly the same
-                # sequence as is done for verts coords.
+                f.idx = fIndex
+                fIndex += 1
+                
+    obj.calcNormals()
+    obj.updateIndexBuffer()
 
-                if len(uvIndices) == 4:
-                    uvFaceData.append([uvIndices[0], uvIndices[1], uvIndices[2], uvIndices[3]])
-                elif len(uvIndices) == 3:
-                    uvFaceData.append([uvIndices[0], uvIndices[1], uvIndices[2], uvIndices[0]])
+    objFile.close()
 
-                # Split quads in trigs
-
-                if len(vIndices) == 4:
-                    faceGroups[currentFaceGroup].append(vIndices)
-                    faceIndex += 1
-                elif len(vIndices) == 3:
-
-                    faceGroups[currentFaceGroup].append([vIndices[0], vIndices[1], vIndices[2], vIndices[0]])
-                    faceIndex += 1
-                else:
-                    print 'Warning, malformed faces in %s' % path
-
-    ObjFile.close()
-    if len(faceGroupsNames) == 0:
-        faceGroupsNames.append('default-dummy-group')
-
-    #print 'loading wavefront %s in %f sec' % (path, time.time() - t1)
-    return [verts, uvValues, faceGroups, faceGroupsNames, uvFaceData]
-
-
-def saveWavefrontObj(ob, path):
-    """
-    This function reads the vertex and face information (including face groups)
-    from an object in memory and writes a file in WaveFront format. 
-    The internal MakeHuman data structures are used to construct a WaveFront file. 
+    if loadColors:
+        colorPath = path + '.colors'
+        algos3d.loadVertsColors(obj, colorPath, None)
+        
+    return obj
     
-    Parameters
-    ----------
-    
-    ob:
-        *3D object*. The object from which to read vertex and face information.
-    
-    path:
-        *string*. The file system path to the file to be written.
-
-    """
-
-    print 'Saving wavefront obj...verts n.', len(ob.verts)
-    t1 = time.time()
-    try:
-        fileDescriptor = open(path, 'w')
-    except:
-        print 'Impossible to save %s' % path
-
-    fileDescriptor.write('#Exported from MakeHuman\n')
-    fileDescriptor.write('#http://www.makehuman.org\n')
-
-    for v in ob.verts:
-        fileDescriptor.write('v %f %f %f\n' % (v.co[0], v.co[1], v.co[2]))
-
-    for v in ob.verts:
-        fileDescriptor.write('vt %f %f\n' % (v.uv[0], v.uv[1]))
-
-    for g in ob.faceGroups:
-        fileDescriptor.write('g %s\n' % g.name)
-        for f in g.faces:
-            fileDescriptor.write('f ')
-            for v in f.verts:
-
-                # +1 because wavefront obj is "1 based" list
-
-                fileDescriptor.write('%i/%i ' % (v.idx + 1, v.idx + 1))
-            fileDescriptor.write('\n')
-    fileDescriptor.close()
-    print 'Wavefront obj exported in %s sec.' % (time.time() - t1)
-
-
-def wavefrontToData_simple(path):
-    """
-    This function serves as a template upon which other importers should be 
-    based. Other importers should also follow the same naming convention
-    (e.g. 3dsToData, lightwaveToData, etc.). See the wavefrontToData function 
-    above for a worked example.
-    
-    This function reads a file containing data in WaveFront format and loads it
-    into a standardised intermediate data structure.
-    Note: This function converts all polygonal faces into triangles.
-
-    Parameters
-    ----------
-    
-    path:
-        *string*. The file system path to the file to be imported.
-    """
-
-    verts = []
-    vertsSharedFaces = []
-    fg = []
-    vertsUV = []
-    t1 = time.time()
-    try:
-        ObjFile = open(path)
-    except:
-        print 'Warning: obj file not found'
-
-    objData = ObjFile.readline()
-    while objData:
-        lineData = objData.split()
-        if len(lineData) > 0:
-
-            if lineData[0] == 'v':
-                vData = [float(lineData[1]), float(lineData[2]), float(lineData[3])]
-                verts.append(vData)
-                vertsUV.append([0, 0])
-                vertsSharedFaces.append([])
-            elif lineData[0] == 'f':
-
-                uvIndices = []
-                vIndices = []
-                for faceData in lineData[1:]:
-                    vInfo = faceData.split('/')
-                    vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
-                    vIndices.append(vIdx)
-                fg.append(vIndices)
-
-        objData = ObjFile.readline()
-    ObjFile.close()
-    #print 'loading wavefront in s.', time.time() - t1
-    return [verts, vertsSharedFaces, vertsUV, [fg], ['dummy']]
-
-
-originalVertexCoordinates = None
-
+originalVertexCoordinates = []
 
 def loadVertsCoo(path):
     """
@@ -485,45 +288,4 @@ def loadUV(path):
             uvValues.append([float(dataList[1]), float(dataList[2])])
     fileDescriptor.close()
     return uvValues
-
-
-def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
-    """
-    This function loads the specified mesh objects into internal MakeHuman data structures,
-    and return it.
-    
-    Parameters:
-    -----------
-   
-    path:     
-      *String*.  The file system path to the file containing the object to load.
-
-    locX:
-      *float* X location of loaded obj, default = 0
-
-    locY:
-      *float* Y location of loaded obj, default = 0
-
-    locZ:
-      *float* Z location of loaded obj, default = 0
-    """
-
-    data = wavefrontToData(path)
-
-    if data is None:
-        return
-
-    objName = os.path.basename(path)
-    ob = scene.newObj(objName)
-
-    ob.path = path
-    ob.x = locX
-    ob.y = locY
-    ob.z = locZ
-    dataTo3Dobject(ob, data)
-    if loadColors:
-        colorPath = path + '.colors'
-        algos3d.loadVertsColors(ob, colorPath, None)
-    return ob
-
 
