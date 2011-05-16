@@ -22,8 +22,6 @@ Abstract
 TODO
 """
 
-__docformat__ = 'restructuredtext'
-
 import events3d
 import gui3d
 import algos3d

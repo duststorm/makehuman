@@ -50,9 +50,6 @@ The dataTo3Dobject() function can then be used to convert it into an object that
 is visible to the user through the GUI.
 """
 
-__docformat__ = 'restructuredtext'
-
-import time
 import module3d
 import os
 import algos3d

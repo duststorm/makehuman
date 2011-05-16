@@ -23,8 +23,6 @@ TO DO
 
 """
 
-__docformat__ = 'restructuredtext'
-
 import algos3d
 import gui3d
 import time

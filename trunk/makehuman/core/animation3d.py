@@ -32,8 +32,6 @@ To know more about the interpolation methods used, see the following references:
   http://www.tinaja.com/glib/cubemath.pdf
 """
 
-__docformat__ = 'restructuredtext'
-
 import time
 import math
 
