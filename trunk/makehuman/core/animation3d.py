@@ -308,4 +308,10 @@ class Timeline:
         for action in self.actions:
             action.set(1.0)
 
-
+def animate(app, seconds, actions):
+    
+    tl = Timeline(seconds)
+    for action in actions:
+        tl.append(action)
+    tl.append(UpdateAction(app))
+    tl.start()
