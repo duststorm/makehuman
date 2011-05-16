@@ -265,7 +265,19 @@ class ScaleAction(Action):
     def set(self, alpha):
         value = lerpVector(self.startScale, self.endScale, alpha)
         self.obj.setScale(value[0], value[1], value[2])
+        
 
+class CameraAction(Action):
+
+    def __init__(self, cam, startParams, endParams):
+        
+        self.cam = cam
+        self.startParams = startParams
+        self.endParams = endParams
+
+    def set(self, alpha):
+        value = lerpVector(self.startParams, self.endParams, alpha)
+        self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ = value
 
 class UpdateAction(Action):
 
@@ -279,7 +291,7 @@ class UpdateAction(Action):
 class Timeline:
 
     def __init__(self, seconds):
-        self.length = seconds
+        self.length = float(seconds)
         self.actions = []
 
     def append(self, action):
