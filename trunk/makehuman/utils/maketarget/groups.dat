@@ -1,0 +1,390 @@
+head-back-skull skin
+head-brow skin
+head-tongue skin
+head-upper-skull skin
+hip-navel skin
+inner-mouth skin
+jaw-chin skin
+jaw-lower-chin skin
+joint-head
+joint-head2
+joint-jaw
+joint-l-ankle
+joint-l-clavicle
+joint-l-elbow
+joint-l-eye
+joint-l-eye-target
+joint-l-finger-1-1
+joint-l-finger-1-2
+joint-l-finger-1-3
+joint-l-finger-1-4
+joint-l-finger-2-1
+joint-l-finger-2-2
+joint-l-finger-2-3
+joint-l-finger-2-4
+joint-l-finger-3-1
+joint-l-finger-3-2
+joint-l-finger-3-3
+joint-l-finger-3-4
+joint-l-finger-4-1
+joint-l-finger-4-2
+joint-l-finger-4-3
+joint-l-finger-4-4
+joint-l-finger-5-1
+joint-l-finger-5-2
+joint-l-finger-5-3
+joint-l-finger-5-4
+joint-l-foot-1
+joint-l-foot-2
+joint-l-hand
+joint-l-hand-2
+joint-l-hand-3
+joint-l-knee
+joint-l-lowerlid
+joint-l-scapula
+joint-l-shoulder
+joint-l-toe-1-1
+joint-l-toe-1-2
+joint-l-toe-1-3
+joint-l-toe-2-1
+joint-l-toe-2-2
+joint-l-toe-2-3
+joint-l-toe-2-4
+joint-l-toe-3-1
+joint-l-toe-3-2
+joint-l-toe-3-3
+joint-l-toe-3-4
+joint-l-toe-4-1
+joint-l-toe-4-2
+joint-l-toe-4-3
+joint-l-toe-4-4
+joint-l-toe-5-1
+joint-l-toe-5-2
+joint-l-toe-5-3
+joint-l-toe-5-4
+joint-l-upper-leg
+joint-l-upperlid
+joint-mouth
+joint-neck
+joint-pelvis
+joint-r-ankle
+joint-r-clavicle
+joint-r-elbow
+joint-r-eye
+joint-r-eye-target
+joint-r-finger-1-1
+joint-r-finger-1-2
+joint-r-finger-1-3
+joint-r-finger-1-4
+joint-r-finger-2-1
+joint-r-finger-2-2
+joint-r-finger-2-3
+joint-r-finger-2-4
+joint-r-finger-3-1
+joint-r-finger-3-2
+joint-r-finger-3-3
+joint-r-finger-3-4
+joint-r-finger-4-1
+joint-r-finger-4-2
+joint-r-finger-4-3
+joint-r-finger-4-4
+joint-r-finger-5-1
+joint-r-finger-5-2
+joint-r-finger-5-3
+joint-r-finger-5-4
+joint-r-foot-1
+joint-r-foot-2
+joint-r-hand
+joint-r-hand-2
+joint-r-hand-3
+joint-r-knee
+joint-r-lowerlid
+joint-r-scapula
+joint-r-shoulder
+joint-r-toe-1-1
+joint-r-toe-1-2
+joint-r-toe-1-3
+joint-r-toe-2-1
+joint-r-toe-2-2
+joint-r-toe-2-3
+joint-r-toe-2-4
+joint-r-toe-3-1
+joint-r-toe-3-2
+joint-r-toe-3-3
+joint-r-toe-3-4
+joint-r-toe-4-1
+joint-r-toe-4-2
+joint-r-toe-4-3
+joint-r-toe-4-4
+joint-r-toe-5-1
+joint-r-toe-5-2
+joint-r-toe-5-3
+joint-r-toe-5-4
+joint-r-upper-leg
+joint-r-upperlid
+joint-spine1
+joint-spine2
+joint-spine3
+joint-spine4
+joint-tongue-1
+joint-tongue-2
+joint-tongue-3
+joint-tongue-4
+l-ear-helix skin
+l-ear-inner skin
+l-ear-lobe skin
+l-ear-tubercle skin
+l-eye-ball eye
+l-eye-inner-brow-ridge skin
+l-eye-lower-inner-lid skin
+l-eye-lower-middle-lid skin
+l-eye-lower-middle-orbital skin
+l-eye-lower-outer-lid skin
+l-eye-lower-outer-orbital skin
+l-eye-middle-brow-ridge skin
+l-eye-outer-brow-ridge skin
+l-eye-upper-inner-lid skin
+l-eye-upper-inner-orbital skin
+l-eye-upper-middle-lid skin
+l-eye-upper-middle-orbital skin
+l-eye-upper-outer-lid skin
+l-eye-upper-outer-orbital skin
+l-foot-ankle skin
+l-foot-core skin
+l-foot-heel skin
+l-foot-nail1 nail
+l-foot-nail2 nail
+l-foot-nail3 nail
+l-foot-nail4 nail
+l-foot-nail5 nail
+l-foot-toe-1-1 skin
+l-foot-toe-1-2 skin
+l-foot-toe-2-1 skin
+l-foot-toe-2-2 skin
+l-foot-toe-2-3 skin
+l-foot-toe-3-1 skin
+l-foot-toe-3-2 skin
+l-foot-toe-3-3 skin
+l-foot-toe-4-1 skin
+l-foot-toe-4-2 skin
+l-foot-toe-4-3 skin
+l-foot-toe-5-1 skin
+l-foot-toe-5-2 skin
+l-foot-toe-5-3 skin
+l-hand-finger-1-1 skin
+l-hand-finger-1-2 skin
+l-hand-finger-1-3 skin
+l-hand-finger-2-1 skin
+l-hand-finger-2-2 skin
+l-hand-finger-2-3 skin
+l-hand-finger-3-1 skin
+l-hand-finger-3-2 skin
+l-hand-finger-3-3 skin
+l-hand-finger-4-1 skin
+l-hand-finger-4-2 skin
+l-hand-finger-4-3 skin
+l-hand-finger-5-1 skin
+l-hand-finger-5-2 skin
+l-hand-finger-5-3 skin
+l-hand-nail1 nail
+l-hand-nail2 nail
+l-hand-nail3 nail
+l-hand-nail4 nail
+l-hand-nail5 nail
+l-hand-palm skin
+l-head-cheek skin
+l-head-cheek-arc skin
+l-head-lower-inner-orbital skin
+l-head-maxilla skin
+l-head-outer-chin skin
+l-head-temple skin
+l-head-zygoma skin
+l-hip skin
+l-hip-lower-abdomen skin
+l-hip-middle-abdomen skin
+l-hip-upper-abdomen skin
+l-jaw skin
+l-lowerarm skin
+l-lowerleg skin
+l-lowerleg-calf skin
+l-mouth-lower skin
+l-mouth-lower-lip skin
+l-mouth-upper-lip skin
+l-nose-nostril skin
+l-pelvis-gluteus skin
+l-teeth-low-cent-incisor teeth
+l-teeth-low-cuspid teeth
+l-teeth-low-first-bicuspid teeth
+l-teeth-low-first-molar teeth
+l-teeth-low-lat-incisor teeth
+l-teeth-low-sec-bicuspid teeth
+l-teeth-low-sec-molar teeth
+l-teeth-low-third-molar teeth
+l-teeth-up-cent-incisor teeth
+l-teeth-up-cuspid teeth
+l-teeth-up-first-bicuspid teeth
+l-teeth-up-first-molar teeth
+l-teeth-up-lat-incisor teeth
+l-teeth-up-sec-bicuspid teeth
+l-teeth-up-sec-molar teeth
+l-teeth-up-third-molar teeth
+l-torso-axilla skin
+l-torso-back-scapula skin
+l-torso-back-shoulder skin
+l-torso-clavicle skin
+l-torso-front-shoulder skin
+l-torso-inner-pectoralis skin
+l-torso-lower-back skin
+l-torso-lower-pectoralis skin
+l-torso-middle-pectoralis skin
+l-torso-nipple skin
+l-torso-outer-pectoralis skin
+l-torso-ribs skin
+l-torso-trapezius skin
+l-torso-upper-middle-back skin
+l-torso-upper-pectoralis skin
+l-torso-upper-shoulder skin
+l-upperarm-biceps skin
+l-upperarm-triceps skin
+l-upperleg-frontal-thigh skin
+l-upperleg-knee skin
+l-upperleg-thigh-back skin
+mouth-lower-middle-lip skin
+mouth-upper-middle-lip skin
+neck skin
+neck-adam-apple skin
+neck-upper skin
+nose-bridge skin
+nose-glabella skin
+nose-philtrum skin
+nose-sellion skin
+nose-tip skin
+pelvis-genital-area skin
+r-ear-helix skin
+r-ear-inner skin
+r-ear-lobe skin
+r-ear-tubercle skin
+r-eye-ball eye
+r-eye-inner-brow-ridge skin
+r-eye-lower-inner-lid skin
+r-eye-lower-middle-lid skin
+r-eye-lower-middle-orbital skin
+r-eye-lower-outer-lid skin
+r-eye-lower-outer-orbital skin
+r-eye-middle-brow-ridge skin
+r-eye-outer-brow-ridge skin
+r-eye-upper-inner-lid skin
+r-eye-upper-inner-orbital skin
+r-eye-upper-middle-lid skin
+r-eye-upper-middle-orbital skin
+r-eye-upper-outer-lid skin
+r-eye-upper-outer-orbital skin
+r-foot-ankle skin
+r-foot-core skin
+r-foot-heel skin
+r-foot-nail1 nail
+r-foot-nail2 nail
+r-foot-nail3 nail
+r-foot-nail4 nail
+r-foot-nail5 nail
+r-foot-toe-1-1 skin
+r-foot-toe-1-2 skin
+r-foot-toe-2-1 skin
+r-foot-toe-2-2 skin
+r-foot-toe-2-3 skin
+r-foot-toe-3-1 skin
+r-foot-toe-3-2 skin
+r-foot-toe-3-3 skin
+r-foot-toe-4-1 skin
+r-foot-toe-4-2 skin
+r-foot-toe-4-3 skin
+r-foot-toe-5-1 skin
+r-foot-toe-5-2 skin
+r-foot-toe-5-3 skin
+r-hand-finger-1-1 skin
+r-hand-finger-1-2 skin
+r-hand-finger-1-3 skin
+r-hand-finger-2-1 skin
+r-hand-finger-2-2 skin
+r-hand-finger-2-3 skin
+r-hand-finger-3-1 skin
+r-hand-finger-3-2 skin
+r-hand-finger-3-3 skin
+r-hand-finger-4-1 skin
+r-hand-finger-4-2 skin
+r-hand-finger-4-3 skin
+r-hand-finger-5-1 skin
+r-hand-finger-5-2 skin
+r-hand-finger-5-3 skin
+r-hand-nail1 nail
+r-hand-nail2 nail
+r-hand-nail3 nail
+r-hand-nail4 nail
+r-hand-nail5 nail
+r-hand-palm skin
+r-head-cheek skin
+r-head-cheek-arc skin
+r-head-lower-inner-orbital skin
+r-head-maxilla skin
+r-head-outer-chin skin
+r-head-temple skin
+r-head-zygoma skin
+r-hip skin
+r-hip-lower-abdomen skin
+r-hip-middle-abdomen skin
+r-hip-upper-abdomen skin
+r-jaw skin
+r-lowerarm skin
+r-lowerleg skin
+r-lowerleg-calf skin
+r-mouth-lower skin
+r-mouth-lower-lip skin
+r-mouth-upper-lip skin
+r-nose-nostril skin
+r-pelvis-gluteus skin
+r-teeth-low-cent-incisor teeth
+r-teeth-low-cuspid teeth
+r-teeth-low-first-bicuspid teeth
+r-teeth-low-first-molar teeth
+r-teeth-low-lat-incisor teeth
+r-teeth-low-sec-bicuspid teeth
+r-teeth-low-sec-molar teeth
+r-teeth-low-third-molar teeth
+r-teeth-up-cent-incisor teeth
+r-teeth-up-cuspid teeth
+r-teeth-up-first-bicuspid teeth
+r-teeth-up-first-molar teeth
+r-teeth-up-lat-incisor teeth
+r-teeth-up-sec-bicuspid teeth
+r-teeth-up-sec-molar teeth
+r-teeth-up-third-molar teeth
+r-torso-axilla skin
+r-torso-back-scapula skin
+r-torso-back-shoulder skin
+r-torso-clavicle skin
+r-torso-front-shoulder skin
+r-torso-inner-pectoralis skin
+r-torso-lower-back skin
+r-torso-lower-pectoralis skin
+r-torso-middle-pectoralis skin
+r-torso-nipple skin
+r-torso-outer-pectoralis skin
+r-torso-ribs skin
+r-torso-trapezius skin
+r-torso-upper-middle-back skin
+r-torso-upper-pectoralis skin
+r-torso-upper-shoulder skin
+r-upperarm-biceps skin
+r-upperarm-triceps skin
+r-upperleg-frontal-thigh skin
+r-upperleg-knee skin
+r-upperleg-thigh-back skin
+torso-spine skin
+r-eye-cornea cornea
+l-eye-lower-lash skin
+l-eye-upper-lash skin
+l-eye-eyebrown skin
+l-eye-cornea cornea
+r-eye-upper-lash skin
+r-eye-eyebrown skin
+r-eye-lower-lash skin
