@@ -75,7 +75,7 @@ import glob, imp
 from os.path import join, basename, splitext
 
 import mh
-import gui3d, events3d, font3d
+import gui3d, events3d, font3d, animation3d
 import mh2obj, mh2bvh, mh2mhx
 import human
 import guimodelling, guifiles#, guirender
@@ -621,26 +621,27 @@ class MHApplication(gui3d.Application):
       
     # Camera's
     def setGlobalCamera(self):
-        self.modelCamera.eyeX = 0
-        self.modelCamera.eyeY = 0
-        self.modelCamera.eyeZ = 60
-        self.modelCamera.focusX = 0
-        self.modelCamera.focusY = 0
-        self.modelCamera.focusZ = 0
-  
+        
+        tl = animation3d.Timeline(0.20)
+        cam = self.modelCamera
+        tl.append(animation3d.CameraAction(self.modelCamera, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ], [0,0,60,0,0,0]))
+        tl.append(animation3d.UpdateAction(self))
+        tl.start()
+
     def setFaceCamera(self):
         human = self.selectedHuman
         headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name)]
         self.headVertices, self.headFaces = human.meshData.getVerticesAndFacesForGroups(headNames)
         center = centroid([v.co for v in self.headVertices])
-        self.modelCamera.eyeX = center[0]
-        self.modelCamera.eyeY = center[1]
-        self.modelCamera.eyeZ = 10
-        self.modelCamera.focusX = center[0]
-        self.modelCamera.focusY = center[1]
-        self.modelCamera.focusZ = 0
-        human.setPosition([0.0, 0.0, 0.0])
-        human.setRotation([0.0, 0.0, 0.0])
+        
+        tl = animation3d.Timeline(0.20)
+        cam = self.modelCamera
+        tl.append(animation3d.CameraAction(self.modelCamera, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ],
+            [center[0],center[1],10,center[0],center[1],0]))
+        tl.append(animation3d.PathAction(human.mesh, [human.getPosition(), [0.0, 0.0, 0.0]]))
+        tl.append(animation3d.RotateAction(human.mesh, human.getRotation(), [0.0, 0.0, 0.0]))
+        tl.append(animation3d.UpdateAction(self))
+        tl.start()
         
     # Shortcuts
     def setShortcut(self, modifier, key, method):
