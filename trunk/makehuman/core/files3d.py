@@ -113,7 +113,7 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
             elif command == 'f':
                 
                 if not fg:
-                    currentFaceGroup =  obj.createFaceGroup('default-dummy-group')
+                    fg =  obj.createFaceGroup('default-dummy-group')
                     
                 uvIndices = []
                 vIndices = []
