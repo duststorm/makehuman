@@ -84,6 +84,7 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
     obj.z = locZ
 
     fg = None
+    mtl = ''
     fIndex = 0
 
     try:
@@ -98,19 +99,18 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
 
         lineData = objData.split()
         if len(lineData) > 0:
-            if lineData[0] == 'g':
+            
+            command = lineData[0]
                 
-                fg =  obj.createFaceGroup(lineData[1])
-                
-            elif lineData[0] == 'v':
+            if command == 'v':
 
                 obj.createVertex([float(lineData[1]), float(lineData[2]), float(lineData[3])])
 
-            elif lineData[0] == 'vt':
+            elif command == 'vt':
 
                 obj.uvValues.append([float(lineData[1]), float(lineData[2])])
                 
-            elif lineData[0] == 'f':
+            elif command == 'f':
                 
                 if not fg:
                     currentFaceGroup =  obj.createFaceGroup('default-dummy-group')
@@ -137,7 +137,20 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
                     f.uv = uvIndices[:]
 
                 f.idx = fIndex
+                f.mtl = mtl
                 fIndex += 1
+                        
+            elif command == 'g':
+                
+                fg =  obj.createFaceGroup(lineData[1])
+                
+            elif command == 'usemtl':
+            
+                mtl = lineData[1]
+                
+            elif command == 'o':
+                
+                obj.name = lineData[1]
                 
     obj.calcNormals()
     obj.updateIndexBuffer()
