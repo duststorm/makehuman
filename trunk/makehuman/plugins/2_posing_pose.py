@@ -12,7 +12,6 @@ from mh import getPath
 from linalg import *
 from copy import deepcopy
 import module3d
-from pose_test import *
 
 print 'Pose2 plugin imported'
 
@@ -170,12 +169,7 @@ class PoseTaskView(gui3d.TaskView):
         return None
     
     def mvcTest(self):
-        
-        v = [1.7225409999999997, 5.2094214999999986, 0.094422500000000006]
-        tets = [[[1.3561949999999998, 4.5287560000000004, 0.31737949999999998], [1.3561949999999998, 5.988215499999999, -1.1008855], [1.9484319999999999, 4.5287560000000004, -1.1008855], [1.3561949999999998, 4.5287560000000004, -1.1008855]], [[1.3561949999999998, 4.5287560000000004, 0.31737949999999998], [1.9484319999999999, 4.5287560000000004, -1.1008855], [1.9484319999999999, 5.988215499999999, 0.31737949999999998], [1.9484319999999999, 4.5287560000000004, 0.31737949999999998]], [[1.9484319999999999, 5.988215499999999, 0.31737949999999998], [1.3561949999999998, 5.988215499999999, -1.1008855], [1.9484319999999999, 4.5287560000000004, -1.1008855], [1.9484319999999999, 5.988215499999999, -1.1008855]], [[1.9484319999999999, 5.988215499999999, 0.31737949999999998], [1.3561949999999998, 4.5287560000000004, 0.31737949999999998], [1.3561949999999998, 5.988215499999999, -1.1008855], [1.3561949999999998, 5.988215499999999, 0.31737949999999998]]]
-        print computeWeights2(v,tets)
-        return
-        
+                
         angle = 45*degree2rad
         joint = self.skeleton.getJoint('joint-r-shoulder')
         center = joint.position
@@ -208,39 +202,34 @@ class PoseTaskView(gui3d.TaskView):
         bboxj[0][1]= bboxj[0][1] - 0.01
         bboxj[1][1]= bboxj[1][1] + 0.01
         bboxj[0][2]= bboxj[0][2] - 0.01
-        bboxj[1][2]= bboxj[1][2] + 0.01
-        #bboxl = calcBBox(verts,  linkVerts)   
-        
-        """
-        #recompute bounding box z and y values so they will be connected by 4 vertices in between them
-        minY = min(bboxj[0][1], bboxl[0][1])
-        maxY = max(bboxj[1][1], bboxl[1][1])
-        minZ = min(bboxj[0][2], bboxl[0][2])
-        maxZ = max(bboxj[1][2], bboxl[1][2])
-        x = (bboxj[1][0] + bboxl[0][0]) /2
-        
-        #z-y plane
-        #y
-        bboxj[0][1] = minY - 0.01 # 1cm offset
-        bboxl[0][1] = minY - 0.01 # 1cm offset
-        bboxj[1][1] = maxY + 0.01 # 1cm offset
-        bboxl[1][1] = maxY + 0.01 # 1cm offset
-        
-        #z
-        bboxj[0][2] = minZ - 0.01 # 1cm offset
-        bboxl[0][2] = minZ - 0.01 # 1cm offset
-        bboxj[1][2] = maxZ + 0.01 # 1cm offset
-        bboxl[1][2] = maxZ + 0.01 # 1cm offset
-        
-        #x that connects
-        bboxj[1][0] = x
-        bboxl[0][0] = x        
-        """
+        bboxj[1][2]= bboxj[1][2] + 0.01  
         
         #print bboxj
         #return 
         
         tets =  box2Tetrahedrons(bboxj)
+        print tets
+        #testing with jointverts weight computation
+        valid = True
+        for index in jointVerts:
+          solutions = computeWeights2(verts[index].co, tets)
+          if not validWeight(solutions):
+            print solutions
+            print verts[index].co
+            for j in xrange(0,4):
+              w = solutions[j]
+              tet = tets[j]
+              temp = 1
+              v = [0]*3
+              for i in xrange(1,4):
+                temp = temp - w[i-1]
+                v = vadd(v, vmul(tet[i],w[i-1]))
+              v = vadd(v, vmul(tet[0],temp))
+              print v
+            break
+        return
+        #end of test jointverts weight computation
+        
         tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
         
         #compute mvc weights for each vertex in the bindings of r-shoulder
@@ -315,6 +304,11 @@ def load(app):
 
 def unload(app):
     print 'pose unloaded'
+
+
+"""
+What follows are test methods...
+"""
     
 #rotate one side of tets along z-axis
 def deformTets(tets, center, angle):
@@ -441,13 +435,13 @@ def computeWeights2(v,tets):
     A = [0]*9
     j = 0
     solutions = []
-    for i in xrange(0,3):
+    for i in xrange(0,4):
       tet = tets[i]
       z = vsub(y, tet[0])
-      for rows in xrange(1,4):
-          v2 = vsub(tet[rows], tet[0])
-          for cols in xrange(0,3):
-            A[(rows-1)*3 + cols] = v2[cols]
+      for cols in xrange(0,3):
+          v2 = vsub(tet[cols+1], tet[0])
+          for rows in xrange(0,3):
+            A[rows*3 + cols] = v2[rows]
       w = linsolve(A,z)
       solutions.append(w)
     return solutions
@@ -477,38 +471,21 @@ def computeWeights(v,tets):
         break
     return j,solutions[j]
     
-def wireCube(mesh, position=[0.0, 0.0, 0.0], scale=1.0, name='cube'):
-        
-    fg = mesh.createFaceGroup(name)
-
-    # The 8 vertices
-    v = []
-    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, -scale, -scale]))) # 0         /0-----1\
-    v.append(mesh.createVertex(aljabr.vadd(position, [scale, -scale, -scale])))  # 1        / |     | \
-    v.append(mesh.createVertex(aljabr.vadd(position, [scale, scale, -scale])))   # 2       |4---------5|
-    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, scale, -scale])))  # 3       |  |     |  |
-    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, -scale, scale])))  # 4       |  3-----2  |  
-    v.append(mesh.createVertex(aljabr.vadd(position, [scale, -scale, scale])))   # 5       | /       \ |
-    v.append(mesh.createVertex(aljabr.vadd(position, [scale, scale, scale])))    # 6       |/         \|
-    v.append(mesh.createVertex(aljabr.vadd(position, [-scale, scale, scale])))   # 7       |7---------6|
-    
-    # The 12 "faces"
-    fg.createFace((v[4], v[5])) # front
-    fg.createFace((v[5], v[6])) # front
-    fg.createFace((v[6], v[7])) # front
-    fg.createFace((v[7], v[4])) # front
-    fg.createFace((v[1], v[0])) # back
-    fg.createFace((v[0], v[3])) # back
-    fg.createFace((v[3], v[2])) # back
-    fg.createFace((v[2], v[1])) # back
-    fg.createFace((v[0], v[4], v[7], v[3])) # left
-    fg.createFace((v[0], v[4], v[7], v[3])) # left
-    fg.createFace((v[0], v[4], v[7], v[3])) # left
-    fg.createFace((v[0], v[4], v[7], v[3])) # left
-    fg.createFace((v[5], v[1], v[2], v[6])) # right
-    fg.createFace((v[0], v[1], v[5], v[4])) # top
-    fg.createFace((v[7], v[6], v[2], v[3])) # bottom
-    
+# checks if one of the solutions have valid weights (>0 and sum <= 1)
+def validWeight(solutions):
+  out = False
+  for w in solutions:
+    temp = 0
+    for ww in w:
+      temp = temp + ww
+      if (ww < 0):
+        temp = -1
+        break
+    if (temp < 0): continue
+    elif (temp <= 1):
+      out = True
+      break
+  return out
     
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
