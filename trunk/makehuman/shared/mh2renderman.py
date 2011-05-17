@@ -198,8 +198,7 @@ class RMRLight:
 
 class RMNObject:
 
-    def __init__(self, name, obj):
-
+    def __init__(self, name, obj, mtl=None):
         self.groupsDict = {}
         self.facesGroup = None
         self.material = None
@@ -213,12 +212,15 @@ class RMNObject:
 
         if obj:
             self.meshData = obj
-            self.name = obj.name
+            #self.name = obj.name
             self.wavefrontPath = os.path.join('data','3dobjs',obj.name)
             #self.facesIndices = files3d.loadFacesIndices(self.wavefrontPath, True)
             
-            self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces]
-            print "LEN FACEINDICES", len(self.facesIndices)
+            if mtl is not None:
+                self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces if face.mtl == mtl]
+            else:
+                self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces]
+            print("LEN FACEINDICES %s, %i" % (name, len(self.facesIndices)))
             #for idx in self.facesIndices:
             #    print len(idx)
             self.facesUVvalues = obj.uvValues
@@ -252,7 +254,7 @@ class RMNObject:
         if not self.facesIndices: raise RuntimeError(self.name)
 
         for faceIdx in self.facesIndices:
-            ribObjFile.write('%i ' % len(faceIdx))
+            ribObjFile.write('%i ' % (3 if faceIdx[0] == faceIdx[-1] else 4))
         ribObjFile.write('] ')
 
         ribObjFile.write('[')
@@ -384,28 +386,28 @@ class RMRHuman(RMNObject):
     def subObjectsInit(self):
 
         #SubObjects
-        self.rEyeBall = RMNObject("right_eye_ball", self.meshData)
+        self.rEyeBall = RMNObject("right_eye_ball", self.meshData, 'eye')
         self.rEyeBall.groupsDict = self.groupsDict
         self.rEyeBall.meshData = self.meshData
         self.rEyeBall.facesGroup = set(['r-eye-ball'])
         self.rEyeBall.material = self.eyeBallMat
         self.rEyeBall.joinGroupIndices()
 
-        self.lEyeBall = RMNObject("left_eye_ball", self.meshData)
+        self.lEyeBall = RMNObject("left_eye_ball", self.meshData, 'eye')
         self.lEyeBall.groupsDict = self.groupsDict
         self.lEyeBall.meshData = self.meshData
         self.lEyeBall.facesGroup = set(['l-eye-ball'])
         self.lEyeBall.material = self.eyeBallMat
         self.lEyeBall.joinGroupIndices()
 
-        self.rCornea = RMNObject("right_cornea", self.meshData)
+        self.rCornea = RMNObject("right_cornea", self.meshData, 'cornea')
         self.rCornea.groupsDict = self.groupsDict
         self.rCornea.meshData = self.meshData
         self.rCornea.facesGroup = set(['r-eye-cornea'])
         self.rCornea.material = self.corneaMat
         self.rCornea.joinGroupIndices()
 
-        self.lCornea = RMNObject("left_cornea", self.meshData)
+        self.lCornea = RMNObject("left_cornea", self.meshData, 'cornea')
         self.lCornea.groupsDict = self.groupsDict
         self.lCornea.meshData = self.meshData
         self.lCornea.facesGroup = set(['l-eye-cornea'])
@@ -427,14 +429,14 @@ class RMRHuman(RMNObject):
             #if 'hairscalp' in f.name:
                 #hairGr.add(f.name)
 
-        self.teeth = RMNObject("teeth", self.meshData)
+        self.teeth = RMNObject("teeth", self.meshData, 'teeth')
         self.teeth.groupsDict = self.groupsDict
         self.teeth.meshData = self.meshData
         self.teeth.facesGroup = teethGr
         self.teeth.material = self.teethMat
         self.teeth.joinGroupIndices()
 
-        self.nails = RMNObject("nails", self.meshData)
+        self.nails = RMNObject("nails", self.meshData, 'nail')
         self.nails.groupsDict = self.groupsDict
         self.nails.meshData = self.meshData
         self.nails.facesGroup = nailsGr
@@ -452,7 +454,7 @@ class RMRHuman(RMNObject):
             self.lCornea,self.teeth,self.nails]:
             toSubtract = toSubtract.union(s.facesGroup)
 
-        self.skin = RMNObject("skin", self.meshData)
+        self.skin = RMNObject("skin", self.meshData, 'skin')
         self.skin.groupsDict = self.groupsDict
         self.skin.meshData = self.meshData
         self.skin.facesGroup = allGr.difference(toSubtract)
