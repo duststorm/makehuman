@@ -215,7 +215,22 @@ class RMNObject:
             self.meshData = obj
             self.name = obj.name
             self.wavefrontPath = os.path.join('data','3dobjs',obj.name)
-            self.facesIndices = files3d.loadFacesIndices(self.wavefrontPath, True)
+            #self.facesIndices = files3d.loadFacesIndices(self.wavefrontPath, True)
+            
+            from collections import defaultdict
+            counts = defaultdict(int)
+            for face in obj.faces:
+                counts[face.mtl] += 1
+            print "COUNTS: ", counts
+            
+            
+            
+            
+            matID = "teeth"
+            self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces if face.mtl == matID]
+            print "LEN FACEINDICES", len(self.facesIndices)
+            for idx in self.facesIndices:
+                print len(idx)
             self.facesUVvalues = obj.uvValues
 
             #create a dictionary for all faceGroups
@@ -240,6 +255,12 @@ class RMNObject:
         ribObjFile.write('Declare "st" "facevarying float[2]"\n')
         ribObjFile.write('Declare "Cs" "facevarying color"\n')
         ribObjFile.write('SubdivisionMesh "catmull-clark" [')
+        
+        print "*****************"
+        print "ARGH", len(self.facesIndices)
+        for idx in self.facesIndices:
+            print "DEBUG ",  len(idx)
+                
         for faceIdx in self.facesIndices:
             ribObjFile.write('%i ' % len(faceIdx))
         ribObjFile.write('] ')
@@ -268,9 +289,10 @@ class RMNObject:
         ribObjFile.close()
 
     def joinGroupIndices(self):
-        for g in self.facesGroup:
-            gIndices = self.groupsDict[g]
-            self.facesIndices.extend(gIndices)
+        pass
+        #for g in self.facesGroup:
+            #gIndices = self.groupsDict[g]
+            #self.facesIndices.extend(gIndices)
 
 
 class RMRHuman(RMNObject):
