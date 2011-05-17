@@ -198,7 +198,7 @@ class RMRLight:
 
 class RMNObject:
 
-    def __init__(self, name, obj = None):
+    def __init__(self, name, obj):
 
         self.groupsDict = {}
         self.facesGroup = None
@@ -217,16 +217,6 @@ class RMNObject:
             self.wavefrontPath = os.path.join('data','3dobjs',obj.name)
             #self.facesIndices = files3d.loadFacesIndices(self.wavefrontPath, True)
             
-            from collections import defaultdict
-            counts = defaultdict(int)
-            for face in obj.faces:
-                counts[face.mtl] += 1
-            print "COUNTS: ", counts
-            
-            
-            
-            
-            matID = "teeth"
             self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces]
             print "LEN FACEINDICES", len(self.facesIndices)
             #for idx in self.facesIndices:
@@ -246,7 +236,7 @@ class RMNObject:
                 self.groupsDict[currentGroup]=indices #add latest group
                 
         else:
-            print 'no object given for %s' % name
+            raise RuntimeError('no object given for %s' % name)
 
 
     def writeRibCode(self, ribPath ):
@@ -258,12 +248,9 @@ class RMNObject:
         ribObjFile.write('Declare "st" "facevarying float[2]"\n')
         ribObjFile.write('Declare "Cs" "facevarying color"\n')
         ribObjFile.write('SubdivisionMesh "catmull-clark" [')
-        
-        print "*****************"
-        print "ARGH", len(self.facesIndices)
-        #for idx in self.facesIndices:
-        #    print "DEBUG ",  len(idx)
-                
+             
+        if not self.facesIndices: raise RuntimeError(self.name)
+
         for faceIdx in self.facesIndices:
             ribObjFile.write('%i ' % len(faceIdx))
         ribObjFile.write('] ')
@@ -271,9 +258,9 @@ class RMNObject:
         ribObjFile.write('[')
         for faceIdx in self.facesIndices:
             faceIdx.reverse()
-            if len(faceIdx) == 3:
+            if faceIdx[0] == faceIdx[-1]:
                 ribObjFile.write('%i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0]))
-            if len(faceIdx) == 4:
+            else:
                 ribObjFile.write('%i %i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0], faceIdx[3][0]))
         ribObjFile.write(']')
 
@@ -284,6 +271,8 @@ class RMNObject:
 
         ribObjFile.write('\n"st" [')
         for faceIdx in self.facesIndices:
+            if faceIdx[0] == faceIdx[-1]:
+                faceIdx = faceIdx[:-1]
             for idx in faceIdx:
                 uvIdx = idx[1]
                 uvValue = facesUVvalues[uvIdx]
@@ -438,14 +427,14 @@ class RMRHuman(RMNObject):
             #if 'hairscalp' in f.name:
                 #hairGr.add(f.name)
 
-        self.teeth = RMNObject(name = "teeth")
+        self.teeth = RMNObject("teeth", self.meshData)
         self.teeth.groupsDict = self.groupsDict
         self.teeth.meshData = self.meshData
         self.teeth.facesGroup = teethGr
         self.teeth.material = self.teethMat
         self.teeth.joinGroupIndices()
 
-        self.nails = RMNObject(name = "nails")
+        self.nails = RMNObject("nails", self.meshData)
         self.nails.groupsDict = self.groupsDict
         self.nails.meshData = self.meshData
         self.nails.facesGroup = nailsGr
@@ -463,7 +452,7 @@ class RMRHuman(RMNObject):
             self.lCornea,self.teeth,self.nails]:
             toSubtract = toSubtract.union(s.facesGroup)
 
-        self.skin = RMNObject(name = "skin")
+        self.skin = RMNObject("skin", self.meshData)
         self.skin.groupsDict = self.groupsDict
         self.skin.meshData = self.meshData
         self.skin.facesGroup = allGr.difference(toSubtract)
