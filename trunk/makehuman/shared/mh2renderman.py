@@ -227,23 +227,26 @@ class RMNObject:
             
             
             matID = "teeth"
-            self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces if face.mtl == matID]
+            self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces]
             print "LEN FACEINDICES", len(self.facesIndices)
-            for idx in self.facesIndices:
-                print len(idx)
+            #for idx in self.facesIndices:
+            #    print len(idx)
             self.facesUVvalues = obj.uvValues
 
             #create a dictionary for all faceGroups
             currentGroup = "Empty"
             indices = []
             for faceIdx in self.facesIndices:
-                if type(faceIdx) == type("abc"):
+                if isinstance(faceIdx, str):
                     self.groupsDict[currentGroup]=indices
                     indices = []
                     currentGroup = faceIdx
                 else:
                     indices.append(faceIdx)
                 self.groupsDict[currentGroup]=indices #add latest group
+                
+        else:
+            print 'no object given for %s' % name
 
 
     def writeRibCode(self, ribPath ):
@@ -392,28 +395,28 @@ class RMRHuman(RMNObject):
     def subObjectsInit(self):
 
         #SubObjects
-        self.rEyeBall = RMNObject(name = "right_eye_ball")
+        self.rEyeBall = RMNObject("right_eye_ball", self.meshData)
         self.rEyeBall.groupsDict = self.groupsDict
         self.rEyeBall.meshData = self.meshData
         self.rEyeBall.facesGroup = set(['r-eye-ball'])
         self.rEyeBall.material = self.eyeBallMat
         self.rEyeBall.joinGroupIndices()
 
-        self.lEyeBall = RMNObject(name = "left_eye_ball")
+        self.lEyeBall = RMNObject("left_eye_ball", self.meshData)
         self.lEyeBall.groupsDict = self.groupsDict
         self.lEyeBall.meshData = self.meshData
         self.lEyeBall.facesGroup = set(['l-eye-ball'])
         self.lEyeBall.material = self.eyeBallMat
         self.lEyeBall.joinGroupIndices()
 
-        self.rCornea = RMNObject(name = "right_cornea")
+        self.rCornea = RMNObject("right_cornea", self.meshData)
         self.rCornea.groupsDict = self.groupsDict
         self.rCornea.meshData = self.meshData
         self.rCornea.facesGroup = set(['r-eye-cornea'])
         self.rCornea.material = self.corneaMat
         self.rCornea.joinGroupIndices()
 
-        self.lCornea = RMNObject(name = "left_cornea")
+        self.lCornea = RMNObject("left_cornea", self.meshData)
         self.lCornea.groupsDict = self.groupsDict
         self.lCornea.meshData = self.meshData
         self.lCornea.facesGroup = set(['l-eye-cornea'])
