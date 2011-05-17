@@ -217,9 +217,9 @@ class RMNObject:
             #self.facesIndices = files3d.loadFacesIndices(self.wavefrontPath, True)
             
             if mtl is not None:
-                self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces if face.mtl == mtl]
+                self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in obj.faces if face.mtl == mtl]
             else:
-                self.facesIndices = [[[vert.idx,face.uv[index]] for index, vert in enumerate(face.verts)] for face in obj.faces]
+                self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in obj.faces]
             print("LEN FACEINDICES %s, %i" % (name, len(self.facesIndices)))
             #for idx in self.facesIndices:
             #    print len(idx)
