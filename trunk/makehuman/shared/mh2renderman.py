@@ -261,8 +261,8 @@ class RMNObject:
         
         print "*****************"
         print "ARGH", len(self.facesIndices)
-        for idx in self.facesIndices:
-            print "DEBUG ",  len(idx)
+        #for idx in self.facesIndices:
+        #    print "DEBUG ",  len(idx)
                 
         for faceIdx in self.facesIndices:
             ribObjFile.write('%i ' % len(faceIdx))
