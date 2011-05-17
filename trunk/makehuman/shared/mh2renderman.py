@@ -273,9 +273,8 @@ class RMNObject:
 
         ribObjFile.write('\n"st" [')
         for faceIdx in self.facesIndices:
-            if faceIdx[0] == faceIdx[-1]:
-                faceIdx = faceIdx[:-1]
-            for idx in faceIdx:
+            face = faceIdx[:-1] if faceIdx[0] == faceIdx[-1] else faceIdx
+            for idx in face:
                 uvIdx = idx[1]
                 uvValue = facesUVvalues[uvIdx]
                 ribObjFile.write('%s %s ' % (uvValue[0], 1 - uvValue[1]))
