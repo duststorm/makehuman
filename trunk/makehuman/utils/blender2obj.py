@@ -12,7 +12,7 @@ B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
 B{Authors:}           Manuel Bastioni
 
-B{Copyright(c):}      MakeHuman Team 2001-2011
+B{Copyright(c):}      MakeHuman Team 2001-2010
 
 B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
@@ -33,13 +33,13 @@ import os
 
 class SortedSet:
     """
-    I use this enhanced version of the list, that use a set to be
+    I use this enhanced version of the list, that use a set to 
     avoid double entries.
     """
     def __init__(self):
         self.checkElements = set()
         self.elements = []
-        self.indices = {}
+        self.indices = {}        
 
     def add(self, element):
         if element not in self.checkElements:
@@ -112,6 +112,7 @@ class Blender2obj:
         self.xNames = ("lash","eyebrown","cornea")
         self.toSave = set()
         self.specialGroups = set()
+        self.materialByGroups = {}
 
         if len(self.mesh.faces) > 0:
             print "Exporting: faces"
@@ -184,6 +185,10 @@ class Blender2obj:
         for vt in self.UV.elements:
             fileDescriptor.write("vt %f %f\n" % (vt[0],vt[1]))
         for g in self.groupNames:
+            try:
+                fileDescriptor.write("usemtl %s\n" % (self.materialByGroups[g]))
+            except:
+                pass
             fileDescriptor.write("g %s\n" % (g))
             for e in self.vertGroups[g]:
                 fileDescriptor.write("f ")
@@ -215,10 +220,29 @@ class Blender2obj:
                 for v in e.verts:
                     v.sel = 1
         print "Exported in %s sec"%(time.time()-a)
+        
+    def writeGroup(self,path):
+        """
+        Little utility to save name groups
+        """
+        
+        fileDescriptor = open(path, "w")        
+        for g in self.groupNames:
+            fileDescriptor.write("%s\n" % (g))
+        fileDescriptor.close()
+        
+    def loadMaterial(self, path):
+        fileDescriptor = open(path) 
+        for data in fileDescriptor:
+            dataList = data.split() 
+            if len(dataList) > 1:      
+                self.materialByGroups[dataList[0]] = dataList[1]
 
 #Autotest is called as main
 if __name__ == '__main__':
     activeObjs = Blender.Object.GetSelected()
     activeObj = activeObjs[0]
     bExporter = Blender2obj(activeObj,None)
-    bExporter.write("testing_base.obj")
+    bExporter.loadMaterial("groups.dat")
+    bExporter.write("base-rib.obj")
+    #bExporter.writeGroup("groups.dat")
