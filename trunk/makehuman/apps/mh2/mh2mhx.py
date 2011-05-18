@@ -206,7 +206,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
     obj = human.meshData
     bone = None
     proxy = None
-    faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
+    faces = loadFacesIndices(obj, "data/3dobjs/base.obj")
     ignoreLine = False
     for line in tmpl:
         words= line.split()
@@ -384,8 +384,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'Faces':
                 for f in faces:
                     fp.write("    f")
-                    for v in f:
-                        fp.write(" %d" % v[0])
+                    for v in f.verts:
+                        fp.write(" %d" % v.idx)
                     fp.write(" ;\n")
             elif words[1] == 'FTTriangles':
                 for (fn,f) in enumerate(faces):
@@ -401,8 +401,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'TexVerts':
                 for f in faces:
                     fp.write("    vt")
-                    for v in f:
-                        uv = obj.uvValues[v[1]]
+                    for vt in f.uv:
+                        uv = obj.uvValues[vt]
                         fp.write(" %.6g %.6g" %(uv[0], uv[1]))
                     fp.write(" ;\n")
             elif words[1] == 'VertexGroup':
@@ -926,7 +926,7 @@ def copyMeshFile249(obj, tmpl, fp):
 
 def exportProxy24(obj, proxyStuff, fp):
     proxy = mh2proxy.readProxyFile(obj, proxyStuff)
-    faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
+    faces = loadFacesIndices(obj, "data/3dobjs/base.obj")
     tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
     for line in tmpl:
         words= line.split()
@@ -990,12 +990,25 @@ def exportRawData(obj, fp):
         
     for uv in obj.uvValues:
         fp.write("vt %.6g %.6g ;\n" %(uv[0], uv[1]))
-    faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
+    faces = loadFacesIndices(obj, "data/3dobjs/base.obj")
     for f in faces:
         fp.write("f")
-        for v in f:
-            fp.write(" %i/%i " %(v[0], v[1]))
+        for i,v in enumerate(f.verts):
+            fp.write(" %i/%i " %(v.idx, f.uv[i]))
         fp.write(";\n")
+
+#
+#   loadFacesIndices(obj, fname):
+#
+
+def loadFacesIndices(obj, fname):
+    # return files3d.loadFacesIndices(fname)
+    faces = []
+    for fg in obj.faceGroups:
+        for f in fg.faces:
+            faces.append(f)
+    return faces
+
 #
 #    exportArmature(obj, fp):
 #

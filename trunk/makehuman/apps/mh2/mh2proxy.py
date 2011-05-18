@@ -593,7 +593,7 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
         for v in obj.verts:
             verts.append(v.co)
             vnormals.append(v.no)
-        faces = files3d.loadFacesIndices("data/3dobjs/base.obj")
+        faces = mh2mhx.loadFacesIndices(obj, "data/3dobjs/base.obj")
         return (verts, vnormals, obj.uvValues, faces, rawWeights, rawShapes)
 
 #
