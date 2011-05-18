@@ -265,38 +265,37 @@ class RMRHuman(RMNObject):
 
         RMNObject.__init__(self, name, obj)
         self.subObjects = []
-        self.human = human
+        self.human = human        
         
-        print "TEXTURE: ", human.getTexture()
 
-        #materials  TODO: remove the hardcoded texture names.
+    
+    def materialInit(self):
+        self.basetexture =  os.path.splitext(os.path.basename(self.human.getTexture()))[0]
+        print "BASETEXTURE",  self.basetexture
+        
         self.skinMat = RMRMaterial("skin2")
-        self.skinMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
-        self.skinMat.parameters.append(MaterialParameter("string", "spectexture", "texture_ref.texture"))
+        self.skinMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif" ))
+        self.skinMat.parameters.append(MaterialParameter("string", "spectexture", self.basetexture+"_ref.tif"))
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
         self.skinMat.parameters.append(MaterialParameter("float", "Ksss", 0.4)) #TODO: using a texture
         self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lightmap.texture"))
 
         self.skinBump = RMRMaterial("skinbump")
         self.skinBump.type = "Displacement"
-        self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", "texture_bump.texture"))
+        self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", self.basetexture+"_bump.tif"))
         self.skinBump.parameters.append(MaterialParameter("float", "bumpVal", 0.001))
 
         self.corneaMat = RMRMaterial("cornea")
 
         self.teethMat = RMRMaterial("teeth")
-        self.teethMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
+        self.teethMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif"))
 
         self.eyeBallMat = RMRMaterial("eyeball")
-        self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", "texture.texture"))
-
-
+        self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif"))
 
 
     def subObjectsInit(self):
-        
         self.subObjects = []
-
         self.rEyeBall = RMNObject("right_eye_ball", self.meshData, 'eye')
         self.rEyeBall.material = self.eyeBallMat
         self.subObjects.append(self.rEyeBall)
@@ -340,22 +339,22 @@ class RMRHuman(RMNObject):
         return "Human Character"
 
 
-class RMRTexture:
+#class RMRTexture:
 
-    def __init__(self, picturename, appTexturePath, usrTexturePath):
+    #def __init__(self, picturename, appTexturePath, usrTexturePath):
 
-        self.picturename = os.path.join(appTexturePath, picturename).replace('\\', '/')
-        self.texturename = os.path.join(usrTexturePath,os.path.splitext(picturename)[0]+".texture").replace('\\', '/')
-        self.swrap = "periodic"
-        self.twrap = "periodic"
-        self.filterfunc = "box"
-        self.swidth = 1
-        self.twidth = 1
+        #self.picturename = os.path.join(appTexturePath, picturename).replace('\\', '/')
+        #self.texturename = os.path.join(usrTexturePath,os.path.splitext(picturename)[0]+".texture").replace('\\', '/')
+        #self.swrap = "periodic"
+        #self.twrap = "periodic"
+        #self.filterfunc = "box"
+        #self.swidth = 1
+        #self.twidth = 1
 
-    def writeRibCode(self, ribfile):
-        ribfile.write('MakeTexture "%s" "%s" "%s" "%s" "%s" %d %d\n' %\
-                        (self.picturename,self.texturename,self.swrap,self.twrap,\
-                        self.filterfunc,self.swidth,self.twidth))
+    #def writeRibCode(self, ribfile):
+        #ribfile.write('MakeTexture "%s" "%s" "%s" "%s" "%s" %d %d\n' %\
+                        #(self.picturename,self.texturename,self.swrap,self.twrap,\
+                        #self.filterfunc,self.swidth,self.twidth))
 
 
 class RMRHeader:
@@ -390,19 +389,26 @@ class RMRHeader:
         self.pixelFilter = None
         self.shadingInterpolation = None
 
+
     def setCameraPosition(self, camX,camY,camZ):
         self.cameraX = camX
         self.cameraY = camY
         self.cameraZ = camZ
 
-    def setSearchShaderPath(self, usrShaderPath):
-        self.searchShaderPath = "%s:&"%(usrShaderPath.replace('\\', '/'))
+    def setSearchShaderPath(self, shaderPaths):
+        for p in shaderPaths:
+            self.searchShaderPath += p + ":"
+        self.searchShaderPath = "%s:&"%(self.searchShaderPath.replace('\\', '/'))
 
-    def setSearchTexturePath(self, usrTexturePath):
-        self.searchTexturePath = "%s:&"%(usrTexturePath.replace('\\', '/'))
+    def setSearchTexturePath(self, texturePaths):
+        for p in texturePaths:
+            self.searchTexturePath += p + ":"
+        self.searchTexturePath = "%s:&"%(self.searchTexturePath.replace('\\', '/'))
 
-    def setSearchArchivePath(self, usrArchivePath):
-        self.searchArchivePath = "%s:&"%(usrArchivePath.replace('\\', '/'))
+    def setSearchArchivePath(self, archivePaths):
+        for p in archivePaths:
+            self.searchArchivePath += p + ":"
+        self.searchArchivePath = "%s:&"%(self.searchArchivePath.replace('\\', '/'))
 
     def writeRibCode(self, ribfile):
         #Write headers
@@ -450,8 +456,6 @@ class RMRScene:
 
         #rendering properties
         self.camera = camera
-
-
         self.app = app
         self.lastUndoItem = None
         self.lastRotation = [0,0,0]
@@ -468,24 +472,24 @@ class RMRScene:
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')
-        self.texturesFileName = os.path.join(self.ribsPath, "texture.rib")
+        #self.texturesFileName = os.path.join(self.ribsPath, "texture.rib")
 
         #mainscenefile
         self.sceneFileName = os.path.join(self.ribsPath, "scene.rib")
 
         #Human in the scene
         self.humanCharacter = RMRHuman(app.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
+        self.humanCharacter.materialInit()
         self.humanCharacter.subObjectsInit()
 
         #Rendering options
-        self.calcAmbientOcclusion = False
         self.calcShadow = False
         self.calcSSS = False
 
         #Shadow path
         self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
-        #SSS path
+        #SSS path        
         self.bakeFilename = os.path.join(self.ribsPath,"skinbake.rib").replace('\\', '/')
         self.lightmapFileName = os.path.join(self.ribsPath,"lightmap.rib").replace('\\', '/')
         self.bakeTMPTexture = os.path.join(self.usrTexturePath,"bake.bake").replace('\\', '/')
@@ -506,11 +510,11 @@ class RMRScene:
         if not os.path.isdir(self.usrShaderPath):
             os.makedirs(self.usrShaderPath)
 
-        #textures used in the scene
-        self.textures = []
-        self.textures.append(RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath))
-        self.textures.append(RMRTexture("texture_ref.tif", self.appTexturePath, self.usrTexturePath))
-        self.textures.append(RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath))
+        ##textures used in the scene
+        #self.textures = []
+        #self.textures.append(RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath))
+        #self.textures.append(RMRTexture("texture_ref.tif", self.appTexturePath, self.usrTexturePath))
+        #self.textures.append(RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath))
 
 
 
@@ -556,6 +560,7 @@ class RMRScene:
 
         #Get global subobjs parameteres.
         self.humanCharacter.skinMat.setParameter("sweat", self.app.settings.get('rendering_aqsis_oil', 0.3))
+        self.humanCharacter.materialInit()
         self.humanCharacter.subObjectsInit()
 
         if len(self.humanCharacter.subObjects) < 1:
@@ -589,24 +594,13 @@ class RMRScene:
         else:
             print "Writing bake world"
             ribfile.write('\tAttributeBegin\n')
-            ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, os.path.join(self.usrTexturePath,"texture.texture").replace('\\', '/')))
+            ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, os.path.join(self.appTexturePath,self.humanCharacter.basetexture+".tif").replace('\\', '/')))
             ribPath = os.path.join(self.ribsPath, 'skin.rib')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
 
         ribfile.close()
 
-
-    def writeTextureFile(self):
-        """
-        """
-
-
-        ribfile = file(self.texturesFileName, 'w')
-
-        #Write rib code for textures
-        for t in self.textures:
-            t.writeRibCode(ribfile)
 
 
     def writeSceneFile(self):
@@ -626,8 +620,8 @@ class RMRScene:
         ribSceneHeader.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
-        ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
-        ribSceneHeader.setSearchTexturePath(self.usrTexturePath)
+        ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
         ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
         ribSceneHeader.displayType = "file"
@@ -680,8 +674,8 @@ class RMRScene:
         ribSceneHeader.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
-        ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
-        ribSceneHeader.setSearchTexturePath(self.usrTexturePath)
+        ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
 
         #Write rib header
@@ -705,8 +699,8 @@ class RMRScene:
         ribSceneHeader = RMRHeader()
         ribSceneHeader.sizeFormat = [1024,1024]
         ribSceneHeader.setCameraPosition(0,0,0.02)
-        ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
-        ribSceneHeader.setSearchTexturePath(self.usrTexturePath)
+        ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
         ribSceneHeader.shadingInterpolation = "smooth"
         ribSceneHeader.projection = "orthographic"
         ribSceneHeader.displayType = "file"
@@ -739,8 +733,8 @@ class RMRScene:
         ribSceneHeader.sizeFormat = [1024,1024]
         ribSceneHeader.pixelSamples = [1,1]
         ribSceneHeader.shadingRate = 2
-        ribSceneHeader.setSearchShaderPath(self.usrShaderPath)
-        ribSceneHeader.setSearchTexturePath(self.usrTexturePath)
+        ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
         ribSceneHeader.bucketSize = [32,32]
         ribSceneHeader.eyesplits = 10
         ribSceneHeader.depthfilter = "midpoint"
@@ -767,9 +761,9 @@ class RMRScene:
 
     def render(self):
 
-        filesTorender = [self.texturesFileName]
+        filesTorender = []
         self.loadLighting(self.lightsFolderPath, "default.lights")
-        self.writeTextureFile() #TODO move in the init
+        #self.writeTextureFile() #TODO move in the init
 
         #recalculateAll = 0
         recalculateSSS = 0
