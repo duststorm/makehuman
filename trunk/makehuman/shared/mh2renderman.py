@@ -196,7 +196,7 @@ class RMRLight:
         self.shadowTranslate(ribfile, -self.position[0], -self.position[1], -self.position[2])
 
 
-class RMNObject:
+class RMRObject:
 
     def __init__(self, name, meshData, mtl=None):
         self.groupsDict = {}
@@ -259,19 +259,21 @@ class RMNObject:
 
 
 
-class RMRHuman(RMNObject):
+class RMRHuman(RMRObject):
 
     def __init__(self, human, name, obj, ribRepository):
 
-        RMNObject.__init__(self, name, obj)
+        RMRObject.__init__(self, name, obj)
         self.subObjects = []
-        self.human = human        
-        
-
-    
+        self.human = human      
+            
     def materialInit(self):
         self.basetexture =  os.path.splitext(os.path.basename(self.human.getTexture()))[0]
+        self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
         print "BASETEXTURE",  self.basetexture
+        print "HAIRTEXTURE",  self.hairtexture
+        
+        
         
         self.skinMat = RMRMaterial("skin2")
         self.skinMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif" ))
@@ -292,38 +294,47 @@ class RMRHuman(RMNObject):
 
         self.eyeBallMat = RMRMaterial("eyeball")
         self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif"))
+        
+        self.hairMat = RMRMaterial("hairpoly")
+        self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".tif"))
 
 
     def subObjectsInit(self):
         self.subObjects = []
-        self.rEyeBall = RMNObject("right_eye_ball", self.meshData, 'eye')
+        self.rEyeBall = RMRObject("right_eye_ball", self.meshData, 'eye')
         self.rEyeBall.material = self.eyeBallMat
         self.subObjects.append(self.rEyeBall)
 
-        self.lEyeBall = RMNObject("left_eye_ball", self.meshData, 'eye')
+        self.lEyeBall = RMRObject("left_eye_ball", self.meshData, 'eye')
         self.lEyeBall.material = self.eyeBallMat
         self.subObjects.append(self.lEyeBall)
 
-        self.rCornea = RMNObject("right_cornea", self.meshData, 'cornea')
+        self.rCornea = RMRObject("right_cornea", self.meshData, 'cornea')
         self.rCornea.material = self.corneaMat
         self.subObjects.append(self.rCornea)
 
-        self.lCornea = RMNObject("left_cornea", self.meshData, 'cornea')
+        self.lCornea = RMRObject("left_cornea", self.meshData, 'cornea')
         self.lCornea.material = self.corneaMat
         self.subObjects.append(self.lCornea)
 
-        self.teeth = RMNObject("teeth", self.meshData, 'teeth')
+        self.teeth = RMRObject("teeth", self.meshData, 'teeth')
         self.teeth.material = self.teethMat
         self.subObjects.append(self.teeth)
 
-        self.nails = RMNObject("nails", self.meshData, 'nail')
+        self.nails = RMRObject("nails", self.meshData, 'nail')
         self.nails.material = self.skinMat
         self.subObjects.append(self.nails)
 
-        self.skin = RMNObject("skin", self.meshData, 'skin')
+        self.skin = RMRObject("skin", self.meshData, 'skin')
         self.skin.material = self.skinMat
         self.skin.materialBump = self.skinBump
         self.subObjects.append(self.skin)
+        
+        if self.human.hairObj != None:
+            self.hair = RMRObject("hair", self.human.hairObj.mesh)
+            self.hair.material = self.hairMat            
+            self.subObjects.append(self.hair)
+        
 
     def getSubObject(self, name):
         for subOb in self.subObjects:
@@ -337,24 +348,6 @@ class RMRHuman(RMNObject):
 
     def __str__(self):
         return "Human Character"
-
-
-#class RMRTexture:
-
-    #def __init__(self, picturename, appTexturePath, usrTexturePath):
-
-        #self.picturename = os.path.join(appTexturePath, picturename).replace('\\', '/')
-        #self.texturename = os.path.join(usrTexturePath,os.path.splitext(picturename)[0]+".texture").replace('\\', '/')
-        #self.swrap = "periodic"
-        #self.twrap = "periodic"
-        #self.filterfunc = "box"
-        #self.swidth = 1
-        #self.twidth = 1
-
-    #def writeRibCode(self, ribfile):
-        #ribfile.write('MakeTexture "%s" "%s" "%s" "%s" "%s" %d %d\n' %\
-                        #(self.picturename,self.texturename,self.swrap,self.twrap,\
-                        #self.filterfunc,self.swidth,self.twidth))
 
 
 class RMRHeader:
@@ -472,6 +465,8 @@ class RMRScene:
         self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')
+        self.hairTexturePath = os.path.join(self.applicationPath, 'data', 'hairstyles')
+        
         #self.texturesFileName = os.path.join(self.ribsPath, "texture.rib")
 
         #mainscenefile
@@ -481,7 +476,7 @@ class RMRScene:
         self.humanCharacter = RMRHuman(app.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
         self.humanCharacter.materialInit()
         self.humanCharacter.subObjectsInit()
-
+        
         #Rendering options
         self.calcShadow = False
         self.calcSSS = False
@@ -509,12 +504,6 @@ class RMRScene:
             os.makedirs(self.usrTexturePath)
         if not os.path.isdir(self.usrShaderPath):
             os.makedirs(self.usrShaderPath)
-
-        ##textures used in the scene
-        #self.textures = []
-        #self.textures.append(RMRTexture("texture.tif", self.appTexturePath, self.usrTexturePath))
-        #self.textures.append(RMRTexture("texture_ref.tif", self.appTexturePath, self.usrTexturePath))
-        #self.textures.append(RMRTexture("texture_bump.tif", self.appTexturePath, self.usrTexturePath))
 
 
 
@@ -555,8 +544,6 @@ class RMRScene:
         """
 
         """
-        #Init and write rib code for hairs
-        #self.humanCharacter.writeHairsCurve()
 
         #Get global subobjs parameteres.
         self.humanCharacter.skinMat.setParameter("sweat", self.app.settings.get('rendering_aqsis_oil', 0.3))
@@ -586,10 +573,6 @@ class RMRScene:
             ribfile.write('\tAttributeBegin\n')
             if shadowMode:
                 ribfile.write('\tSurface "null"\n')
-            else:
-                pass
-                #self.humanCharacter.hairMat.writeRibCode(ribfile)
-            #self.humanCharacter.writeHairsInclusion(ribfile)
             ribfile.write('\tAttributeEnd\n')
         else:
             print "Writing bake world"
@@ -621,7 +604,7 @@ class RMRScene:
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
         ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
         ribSceneHeader.displayType = "file"
@@ -675,7 +658,7 @@ class RMRScene:
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
 
         #Write rib header
@@ -700,7 +683,7 @@ class RMRScene:
         ribSceneHeader.sizeFormat = [1024,1024]
         ribSceneHeader.setCameraPosition(0,0,0.02)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
         ribSceneHeader.shadingInterpolation = "smooth"
         ribSceneHeader.projection = "orthographic"
         ribSceneHeader.displayType = "file"
@@ -709,8 +692,6 @@ class RMRScene:
 
         #Write rib header
         ribSceneHeader.writeRibCode(ribfile)
-
-
         ribfile.write('WorldBegin\n')
         ribfile.write('Color [ 1 1 1 ]\n')
         ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))
@@ -718,7 +699,6 @@ class RMRScene:
         ribfile.write('Polygon "P" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]"st" [ 0 1  1 1  1 0  0 0  ]\n')
         ribfile.write('WorldEnd\n')
         ribfile.write('FrameEnd\n')
-
         ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.lightmapTMPTexture, self.lightmapTexture))
 
 
@@ -734,7 +714,7 @@ class RMRScene:
         ribSceneHeader.pixelSamples = [1,1]
         ribSceneHeader.shadingRate = 2
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
         ribSceneHeader.bucketSize = [32,32]
         ribSceneHeader.eyesplits = 10
         ribSceneHeader.depthfilter = "midpoint"
