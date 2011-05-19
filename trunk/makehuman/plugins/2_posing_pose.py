@@ -208,8 +208,9 @@ class PoseTaskView(gui3d.TaskView):
         #return 
         
         tets =  box2Tetrahedrons(bboxj)
-        print tets
+        #print tets
         #testing with jointverts weight computation
+        """
         valid = True
         for index in jointVerts:
           solutions = computeWeights2(verts[index].co, tets)
@@ -228,6 +229,7 @@ class PoseTaskView(gui3d.TaskView):
               print v
             break
         return
+        """
         #end of test jointverts weight computation
         
         tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
@@ -236,25 +238,8 @@ class PoseTaskView(gui3d.TaskView):
         stop = False
         for index in jointVerts:
           i,w = computeWeights(verts[index].co,tets)
-          
-          for ww in w:
-           if ww < 0:
-            print w
-            print verts[index].co
-            print i
-            print tets
-            stop = True
-          if stop: break
-          
-              
-          #print v
-          #testv = [0,0,0]
-          #for j in xrange(0,4):
-          #  testv = vadd(vmul(tets[i][j],w[j]), testv)
-          #print testv
-          #break
-          #print w
           v = [0.0,0.0,0.0]
+          #print w
           for j in xrange(0,4):
             v = vadd(vmul(tets2[i][j],w[j]), v)
           verts[index].co = v[:]
@@ -302,7 +287,7 @@ def load(app):
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
-def unload(app):
+def unload(app):  
     print 'pose unloaded'
 
 
@@ -333,8 +318,8 @@ def box2Tetrahedrons(box):
     @type  box: list of two vertices
     @param box: two vertices representing minimum and maximum corners of the cuboid
     """
-    tetrahedrons = [[],[],[],[]]
-    #we traverse 2 diagonals and then the last corner of the tetrahedron whose all angles are 90 degrees
+    tetrahedrons = [[],[],[],[],[]]
+    #for the first 4 tetrahedrons we traverse 2 diagonals and then the last corner of the tetrahedron whose all angles are 90 degrees
     #traversal is counterclockwise and always starts from the upper corners of the box
     
     #front left
@@ -377,6 +362,12 @@ def box2Tetrahedrons(box):
     tet3.append(box[1][:])
     tet3[3][0] = box[0][0]
     
+    #one last tetrahedron lies in the middle of the box
+    tet4 = tetrahedrons[4]
+    tet4.append(box[1][:])
+    tet4.append(tetrahedrons[0][1][:])
+    tet4.append(tetrahedrons[0][0][:])
+    tet4.append(tetrahedrons[0][2][:])
     return tetrahedrons
 
 def findTetrahedron(tets, v):
@@ -430,22 +421,27 @@ def findTetrahedron(tets, v):
         else: indices.remove(3-k)
     return indices[0]
     
-def computeWeights2(v,tets):
-    y = [v[0], v[1], v[2]]
-    A = [0]*9
-    j = 0
-    solutions = []
-    for i in xrange(0,4):
-      tet = tets[i]
-      z = vsub(y, tet[0])
-      for cols in xrange(0,3):
-          v2 = vsub(tet[cols+1], tet[0])
-          for rows in xrange(0,3):
-            A[rows*3 + cols] = v2[rows]
-      w = linsolve(A,z)
-      solutions.append(w)
-    return solutions
+def computeWeights(v,tets):
+  y = [v[0], v[1], v[2]]
+  A = [0]*9
+  j = 0
+  
+  #solutions = []
+  for i in xrange(0,5):
+    tet = tets[i]
+    z = vsub(y, tet[0])
+    for cols in xrange(0,3):
+        v2 = vsub(tet[cols+1], tet[0])
+        for rows in xrange(0,3):
+          A[rows*3 + cols] = v2[rows]
+    w = linsolve(A,z)
+    if validWeight(w): 
+      w =[1-w[0]-w[1]-w[2],w[0], w[1],w[2]]
+      return i,w
+  
+  return None,None
 
+"""
 def computeWeights(v,tets):
     #i = findTetrahedron(tets,v)
     # w1vt1 + w2vt2 + w3vt3 + w4vt4 = v
@@ -470,8 +466,19 @@ def computeWeights(v,tets):
         j = i
         break
     return j,solutions[j]
-    
+ """
+ 
 # checks if one of the solutions have valid weights (>0 and sum <= 1)
+def validWeight(weight):
+  temp = 0.0
+  for w in weight:
+    if (w < 0.0):
+      return False
+    temp = temp + w
+  if (temp < 0.0) or (1 - temp < 0): return False
+  else: return True
+
+"""
 def validWeight(solutions):
   out = False
   for w in solutions:
@@ -486,39 +493,40 @@ def validWeight(solutions):
       out = True
       break
   return out
+"""
     
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
 
 def skinTest(self):
-    #rotating the shoulders in z desu..
-    theta = -45
-    rotation = [0.0, 0.0, theta]
-    joint = self.skeleton.getJoint('joint-r-shoulder')
-    dst = self.app.selectedHuman.meshData.verts
-    center = joint.position
-    transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
-    joint.radius = 0.6
-    l = math.fabs(theta*degree2rad*joint.radius)
-    
-    for i in joint.bindedVects:
-        v= dst[i].co
-        d = math.fabs(v[0]-center[0])
-        #skinning upper part of shoulder, shape should be like a sphere 
-        if d < l and v[1] > center[1]:
-          #print "Geronimo"
-          #theta = math.fabs(v[0] - center[0])/joint.radius #in radians
-          theta2 = theta*(1-bump(d, l))
-          t = euler2matrix([0,0,theta2*degree2rad], "sxyz")
-          #x = center[0] + joint.radius * math.sin(theta)
-          #y = center[1] + joint.radius * math.cos(theta)
-          #z = v[2]
-          dst[i].co = vadd(mtransform(t, vsub(v, center)),center)
-        else:
-          dst[i].co = vadd(mtransform(transform, vsub(v, center)),center)
-    for child in joint.children:
-        self.rotateJoint(child, joint.position, rotation, transform)
-    
-    self.app.selectedHuman.meshData.calcNormals()
-    self.app.selectedHuman.meshData.update()
+  #rotating the shoulders in z desu..
+  theta = -45
+  rotation = [0.0, 0.0, theta]
+  joint = self.skeleton.getJoint('joint-r-shoulder')
+  dst = self.app.selectedHuman.meshData.verts
+  center = joint.position
+  transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
+  joint.radius = 0.6
+  l = math.fabs(theta*degree2rad*joint.radius)
+
+  for i in joint.bindedVects:
+    v= dst[i].co
+    d = math.fabs(v[0]-center[0])
+    #skinning upper part of shoulder, shape should be like a sphere 
+    if d < l and v[1] > center[1]:
+      #print "Geronimo"
+      #theta = math.fabs(v[0] - center[0])/joint.radius #in radians
+      theta2 = theta*(1-bump(d, l))
+      t = euler2matrix([0,0,theta2*degree2rad], "sxyz")
+      #x = center[0] + joint.radius * math.sin(theta)
+      #y = center[1] + joint.radius * math.cos(theta)
+      #z = v[2]
+      dst[i].co = vadd(mtransform(t, vsub(v, center)),center)
+    else:
+      dst[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+  for child in joint.children:
+    self.rotateJoint(child, joint.position, rotation, transform)
+
+  self.app.selectedHuman.meshData.calcNormals()
+  self.app.selectedHuman.meshData.update()
