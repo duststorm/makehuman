@@ -5,9 +5,7 @@ surface hairpoly(
             string colortexture = "";             
             float Kd = 1;
             float Ks = 1;             		
-            float Ka = 1; 
-            color specularcolor = 1; 
-            float roughness = .1;       	
+            float Ka = 1;      	
 			  ) 
    {	  
     
@@ -20,8 +18,7 @@ surface hairpoly(
         Oi = float texture (colortexture[3], "fill", 1);  
         
    
-    Ci = Oi * (Ct * Cs * (Ka*ambient() + Kd*diffuse(Nf)) +
-		specularcolor * Ks*specular(Nf,-normalize(I),roughness));
+    Ci = Oi * (Ct * Cs * (Ka*ambient() + Kd*diffuse(Nf)));
 
 
 
