@@ -68,14 +68,14 @@ class HairTaskView(gui3d.TaskView):
     def setHair(self, human, filename):
 
 		obj = os.path.join('data/hairstyles', filename)
-		png = obj.replace('.obj', '_texture.png')
+		tif = obj.replace('.obj', '_texture.tif')
 		
 		if human.hairObj:
 			self.app.scene3d.delete(human.hairObj.mesh)
 			human.hairObj = None
 
 		mesh = files3d.loadMesh(self.app.scene3d, obj)
-		mesh.setTexture(png)
+		mesh.setTexture(tif)
 		
 		human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
 		human.hairObj.setRotation(human.getRotation())
