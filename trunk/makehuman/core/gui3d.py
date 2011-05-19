@@ -41,34 +41,38 @@ if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
     defaultFontFamily = settings.get('font', defaultFontFamily)
     f.close()
 
-class Style:
-    def __init__(self, width=None, height=None, left=None, top=None, zIndex=None,
-        mesh=None, normal=None, selected=None, focused=None, fontFamily=None, fontSize=None,
-        textAlign=None, border=None, padding=None, margin=None):
+class Style(object):
+    def __init__(self, **kwds):
             
-        self.width = width
-        self.height = height
-        self.left=left
-        self.top=top
-        self.zIndex=zIndex
-        self.normal = normal
-        self.selected = selected
-        self.focused = focused
-        self.fontFamily = fontFamily
-        self.fontSize = fontSize
-        self.textAlign = textAlign
-        self.border = border
-        self.padding = padding
-        self.margin = margin
+        self.__parent = kwds.pop('parent', None)
+        self.__params = dict(kwds)
+        
+    def __getattribute__(self, name):
+        
+        if name.startswith('_'):
+            return object.__getattribute__(self, name)
+            
+        try:
+            return self.__params[name]
+        except:
+            if self.__parent:
+                return getattr(self.__parent, name)
+            else:
+                raise RuntimeError(name)
+                return None
+            
+    def __setattr__(self, name, value):
+        
+        if name.startswith('_'):
+            return object.__setattr__(self, name, value)
+            
+        self.__params[name] = value
         
     def _replace(self, **kwds):
         
-        style = {'width':self.width, 'height':self.height, 'left':self.left, 'top':self.top, 'zIndex':self.zIndex,
-                'normal':self.normal, 'selected':self.selected, 'focused':self.focused,
-                'fontFamily':self.fontFamily, 'fontSize':self.fontSize, 'textAlign':self.textAlign,
-                'border':self.border, 'padding':self.padding, 'margin':self.margin}
-                
+        style = self.__params.copy()
         style.update(kwds)
+        style['parent'] = self.__parent
         return Style(**style)
 
 # Wrapper around Object3D
@@ -380,6 +384,22 @@ class BoxLayout(Layout):
         return self.nextPosition[1] - self.view.getPosition()[1] + self.rowHeight + (self.view.style.padding[3] if self.view.style.padding else 0)
 
 # Generic view
+ViewStyle = Style(**{
+    'width':0,
+    'height':0,
+    'left':0,
+    'top':0,
+    'zIndex':0,
+    'normal':None,
+    'selected':None,
+    'focused':None,
+    'fontFamily':defaultFontFamily,
+    'fontSize':defaultFontSize,
+    'textAlign':AlignLeft,
+    'border':[0,0,0,0],
+    'margin':[0,0,0,0],
+    'padding':[0,0,0,0]
+    })
 
 class View(events3d.EventHandler):
 
@@ -392,7 +412,7 @@ class View(events3d.EventHandler):
         self.parent = parent
         self.children = []
         self.objects = []
-        self.style = style
+        self.style = Style(parent=(style if style else ViewStyle))
         self.layout = layout
         self.__visible = visible
         self.__totalVisibility = parent.isVisible() and visible
@@ -514,6 +534,7 @@ TaskTabStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
     'border':[7,7,7,7],
+    'padding':[0,0,0,0],
     'margin':[0,0,2,0]
     })
 
@@ -561,7 +582,8 @@ CategoryTabStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
-    'margin':[0,0,2,0]
+    'margin':[0,0,2,0],
+    'padding':[0,0,0,0]
     })
     
 CategoryButtonStyle = Style(**{
@@ -576,7 +598,9 @@ CategoryButtonStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter, 
-    'border':[7,7,7,7]
+    'border':[7,7,7,7],
+    'margin':[0,0,0,0],
+    'padding':[0,0,0,0]
     })
 
 class Category(View):
@@ -901,35 +925,23 @@ class Application(events3d.EventHandler):
 
 # Tab widget
 TabViewStyle = Style(**{
+    'parent':ViewStyle,
     'width':800,
     'height':32,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'upperbar.png',
-    'selected':None,
-    'focused':None,
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft, 
-    'border':None,
-    'padding':[2,6,0,0]
+    'padding':[2,6,0,0],
 })
 
 TabViewTabStyle = Style(**{
+    'parent':ViewStyle,
     'width':64,
     'height':26,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'button_tab.png',
     'selected':'button_tab_on.png',
     'focused':'button_tab_focused.png',
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
-    'margin':[0, 0, 2, 0]
+    'margin':[0,0,2,0]
     })
 
 class TabView(View):
@@ -991,34 +1003,19 @@ class TabView(View):
 
 # Slider widget
 SliderStyle = Style(**{
+    'parent':ViewStyle,
     'width':112,
     'height':32,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'slider_generic.png',
-    'selected':None,
-    'focused':None,
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft, 
-    'border':None,
     'margin':[2,2,2,2]
     })
     
 SliderThumbStyle = Style(**{
+    'parent':ViewStyle,
     'width':16,
     'height':16,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'slider.png',
-    'selected':None,
     'focused':'slider_focused.png',
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft, 
-    'border':None
     })
 
 class Slider(View):
@@ -1261,16 +1258,12 @@ class Slider(View):
 
 # Button widget
 ButtonStyle = Style(**{
+    'parent':ViewStyle,
     'width':112,
     'height':20,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'button_unselected.png',
     'selected':'button_selected.png',
     'focused':'button_focused.png',
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
     'border':[2, 2, 2, 2],
     'margin':[2, 2, 2, 2],
@@ -1304,30 +1297,30 @@ class Button(View):
         
         self.label = None
         
-        self.texture = self.app.getThemeResource('images', style.normal)
-        self.selectedTexture = self.app.getThemeResource('images', style.selected) if style.selected else None
-        self.focusedTexture = self.app.getThemeResource('images', style.focused) if style.focused else None
+        self.texture = self.app.getThemeResource('images', self.style.normal)
+        self.selectedTexture = self.app.getThemeResource('images', style.selected) if self.style.selected else None
+        self.focusedTexture = self.app.getThemeResource('images', style.focused) if self.style.focused else None
         
         if selected and self.selectedTexture:
             t = self.selectedTexture
         else:
             t = self.texture
             
-        width = style.width
-        height = style.height
+        width = self.style.width
+        height = self.style.height
             
-        if style.border:
-            mesh = NineSliceMesh(width, height, t, style.border)
+        if self.style.border:
+            mesh = NineSliceMesh(width, height, t, self.style.border)
         else:
             mesh = RectangleMesh(width, height, t)
         self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         if isinstance(label, str):
-            textAlign = style.textAlign
-            font = self.app.getFont(style.fontFamily)
-            wrapWidth = (width - style.padding[0] - style.padding[2] if style.padding else width) if textAlign else 0
+            textAlign = self.style.textAlign
+            font = self.app.getFont(self.style.fontFamily)
+            wrapWidth = (width - self.style.padding[0] - self.style.padding[2] if self.style.padding else width) if textAlign else 0
             self.label = TextObject(self, [self.style.left + (self.style.padding[0] if self.style.padding else 0), 
                 self.style.top + height/2.0-font.lineHeight/2.0, self.style.zIndex + 0.001],
-                label, wrapWidth, textAlign, fontSize = style.fontSize, fontFamily = style.fontFamily)
+                label, wrapWidth, textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
             
         self.selected = selected
         
@@ -1403,19 +1396,12 @@ class Button(View):
 
 # RadioButton widget
 RadioButtonStyle = Style(**{
-    'width':112,
-    'height':20,
-    'left':0,
-    'top':0,
-    'zIndex':0,
+    'parent':ButtonStyle,
     'normal':'radio_off.png',
     'selected':'radio_on.png',
     'focused':'radio_focus.png',
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':[19, 19, 4, 1],
-    'margin':[2, 2, 2, 2],
     'padding':[22, 0, 0, 0]
     })
 
@@ -1517,19 +1503,12 @@ class ToggleButton(Button):
             self.button.setTexture(self.texture)
 
 CheckBoxStyle = Style(**{
-    'width':112,
-    'height':20,
-    'left':0,
-    'top':0,
-    'zIndex':0,
+    'parent':ButtonStyle,
     'normal':'check_off.png',
     'selected':'check_on.png',
     'focused':'check_focus.png',
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':[18, 18, 4, 2],
-    'margin':[2, 2, 2, 2],
     'padding':[22, 0, 0, 0]
     })
             
@@ -1553,29 +1532,17 @@ class CheckBox(ToggleButton):
         Button.__init__(self, parent, label, selected, style)
 
 ProgressBarStyle = Style(**{
+    'parent':ViewStyle,
     'width':128,
     'height':4,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'progressbar_background.png',
-    'selected':None,
-    'focused':None,
-    'fontSize':defaultFontSize,
-    'border':None
     })
     
 ProgressBarBarStyle = Style(**{
+    'parent':ViewStyle,
     'width':128,
     'height':4,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'progressbar.png',
-    'selected':None,
-    'focused':None,
-    'fontSize':defaultFontSize,
-    'border':None
     })
 
 class ProgressBar(View):
@@ -1635,18 +1602,9 @@ class ProgressBar(View):
 
 # TextView widget
 TextViewStyle = Style(**{
+    'parent':ViewStyle,
     'width':128,
     'height':20,
-    'left':0,
-    'top':0,
-    'zIndex':0,
-    'normal':None,
-    'selected':None,
-    'focused':None,
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft,
-    'border':None,
     'margin':[2,2,2,8]
     })
 
@@ -1679,17 +1637,11 @@ class TextView(View):
 
 # TextEdit widget
 TextEditStyle = Style(**{
+    'parent':ViewStyle,
     'width':400,
     'height':20,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'texedit_off.png',
-    'selected':None,
     'focused':'texedit_on.png',
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft,
     'border':[4, 4, 4, 4],
     'margin':[2,2,2,2]
     })
@@ -1884,17 +1836,9 @@ class FileEntryView(View):
 
 # FileChooser widget
 FileChooserRectangleStyle = Style(**{
+    'parent':ViewStyle,
     'width':128,
     'height':128,
-    'left':0,
-    'top':0,
-    'zIndex':0,
-    'normal':None,
-    'selected':None,
-    'focused':None,
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft,
     'margin':[6,6,6,6]
     })
 
@@ -1928,17 +1872,9 @@ class FileChooserRectangle(View):
         self.parent.callEvent('onFileSelected', self.file)
 
 FileChooserStyle = Style(**{
+    'parent':ViewStyle,
     'width':800,
     'height':600,
-    'left':0,
-    'top':0,
-    'zIndex':0,
-    'normal':None,
-    'selected':None,
-    'focused':None,
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft,
     'padding':[4,68,4,36]
     })
 
@@ -2299,17 +2235,10 @@ class FileChooser2(View):
         self.app.redraw()
         
 GroupBoxStyle = Style(**{
+    'parent':ViewStyle,
     'width':128,
     'height':64,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'group_box.png',
-    'selected':None,
-    'focused':None,
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft,
     'border':[8, 24, 8, 8],
     'padding':[6, 24, 6, 8],
     'margin':[8, 8, 8, 8]
@@ -2379,17 +2308,11 @@ class GroupBox(View):
         pass
 
 ShortcutEditStyle = Style(**{
+    'parent':ViewStyle,
     'width':64,
     'height':22,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'button_tab3_on.png',
-    'selected':None,
     'focused':'button_tab3_focused.png',
-    'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
-    'textAlign':AlignLeft,
     'border':[7,7,7,7],
     'margin':[0, 1, 0, 2]
     }) 
@@ -2732,11 +2655,9 @@ class RectangleMesh(module3d.Object3D):
 
 # Radial widget
 RadialStyle = Style(**{
+    'parent':ViewStyle,
     'width':185,
     'height':160,
-    'left':0,
-    'top':0,
-    'zIndex':0,
     'normal':'radial_graph.png',
     'border':[2, 2, 2, 2],
     'margin':[2, 0, 2, 0]
