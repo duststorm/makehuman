@@ -31,7 +31,7 @@ splitLeftRight = True
 BODY_LANGUAGE = True
 theHuman = 'Human'
 
-import module3d, aljabr, mh, files3d, mh2bvh, os
+import module3d, aljabr, mh, mh2bvh, os
 
 import sys, time
 mhxPath = os.path.realpath('./shared/mhx')
@@ -206,7 +206,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
     obj = human.meshData
     bone = None
     proxy = None
-    faces = loadFacesIndices(obj, "data/3dobjs/base.obj")
+    faces = loadFacesIndices(obj)
     ignoreLine = False
     for line in tmpl:
         words= line.split()
@@ -384,8 +384,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'Faces':
                 for f in faces:
                     fp.write("    f")
-                    for v in f.verts:
-                        fp.write(" %d" % v.idx)
+                    for v in f:
+                        fp.write(" %d" % v[0])
                     fp.write(" ;\n")
             elif words[1] == 'FTTriangles':
                 for (fn,f) in enumerate(faces):
@@ -401,8 +401,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'TexVerts':
                 for f in faces:
                     fp.write("    vt")
-                    for vt in f.uv:
-                        uv = obj.uvValues[vt]
+                    for v in f:
+                        uv = obj.uvValues[v[1]]
                         fp.write(" %.6g %.6g" %(uv[0], uv[1]))
                     fp.write(" ;\n")
             elif words[1] == 'VertexGroup':
@@ -926,7 +926,7 @@ def copyMeshFile249(obj, tmpl, fp):
 
 def exportProxy24(obj, proxyStuff, fp):
     proxy = mh2proxy.readProxyFile(obj, proxyStuff)
-    faces = loadFacesIndices(obj, "data/3dobjs/base.obj")
+    faces = loadFacesIndices(obj)
     tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
     for line in tmpl:
         words= line.split()
@@ -990,24 +990,58 @@ def exportRawData(obj, fp):
         
     for uv in obj.uvValues:
         fp.write("vt %.6g %.6g ;\n" %(uv[0], uv[1]))
-    faces = loadFacesIndices(obj, "data/3dobjs/base.obj")
+    faces = loadFacesIndices(obj)
     for f in faces:
         fp.write("f")
-        for i,v in enumerate(f.verts):
-            fp.write(" %i/%i " %(v.idx, f.uv[i]))
+        #print(f)
+        for v in f:
+            fp.write(" %i/%i " %(v[0], v[1]))
         fp.write(";\n")
 
 #
-#   loadFacesIndices(obj, fname):
+#   loadFacesIndices(obj):
+#   Copied old loadFacesIndices from files3d.
 #
 
-def loadFacesIndices(obj, fname):
-    # return files3d.loadFacesIndices(fname)
+def loadFacesIndices(obj):
+    path = "data/3dobjs/base.obj"
+    try:
+        fileDescriptor = open(path)
+    except:
+        print 'Error opening %s file' % path
+        return
+    vertsIdxs = []
+    for data in fileDescriptor:
+        dataList = data.split()
+        if dataList[0] == 'f':
+            vIndices = []
+            for faceData in dataList[1:]:
+                vInfo = faceData.split('/')
+                vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
+                if len(vInfo) > 1 and vInfo[1] != '':
+                    uvIdx = int(vInfo[1]) - 1  # -1 because obj is 1 based list
+                    vIndices.append([vIdx, uvIdx])
+                else:
+                    vIndices.append([vIdx, 0])
+            vertsIdxs.append(vIndices)
+    fileDescriptor.close()
+    return vertsIdxs
+
+"""
+#
+#   Can not use the face info in obj.faceGroups, because diamonds are not there
+#
+def loadFacesIndices(obj):
     faces = []
+    print(list(obj.faceGroups))
     for fg in obj.faceGroups:
         for f in fg.faces:
-            faces.append(f)
+            face = []
+            for i,v in enumerate(f.verts):   
+                face.append((v.idx, f.uv[i]))
+            faces.append(face)
     return faces
+"""
 
 #
 #    exportArmature(obj, fp):
