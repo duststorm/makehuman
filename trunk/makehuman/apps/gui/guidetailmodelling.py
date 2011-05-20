@@ -113,7 +113,7 @@ class BreastsModifier(humanmodifier.GenericModifier):
     
         self.breastSizes = ['breastSize%d' % size for size in xrange(1, 9)]
         humanmodifier.GenericModifier.__init__(self,
-            'data/targets/details/female-${age}-${tone}-${weight}-cup${breastSize}-firmness${breastFirmness}.target')
+            'data/targets/breast/female-${age}-${tone}-${weight}-cup${breastSize}-firmness${breastFirmness}.target')
             
     def setValue(self, human, value):
     
@@ -523,6 +523,8 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         self.modifiers['breastSize'] = BreastSizeModifier()
         self.modifiers['breastFirmness'] = BreastFirmnessModifier()
+        self.modifiers['breastPosition'] = humanmodifier.Modifier('data/targets/breast/breast-down.target',
+            'data/targets/breast/breast-up.target')
         
         self.oldModifiers['nose'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-nose${nose}.target', 'nose', xrange(1, 13), False)
         self.oldModifiers['mouth'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-mouth${mouth}.target', 'mouth', xrange(1, 14), False)
@@ -552,6 +554,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.sliders.append(DetailSlider(genderBox, 0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals']));y+=36
         self.sliders.append(DetailSlider(genderBox, 0.5, 0.0, 1.0, "Breast", self.modifiers['breastSize']));y+=36
         self.sliders.append(DetailSlider(genderBox, 0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness']));y+=36
+        self.sliders.append(humanmodifier.ModifierSlider(genderBox, 0.0, -1.0, 1.0, "Breast position", modifier=self.modifiers['breastPosition']));y+=36
         y+=16
               
         self.pelvisBox = gui3d.GroupBox(self, [10, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
