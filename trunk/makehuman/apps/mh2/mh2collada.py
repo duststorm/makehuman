@@ -370,15 +370,19 @@ class CStuff:
 #
 
 def filterMesh(mesh1):
-    return mesh1
     (verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
     
     badFace1 = 8603
-    badFace2 = 8729
+    badFace2 = 8629
     badVert = 7410
-    badUvVert = 10967
+    badUvVert = 10758
     newFace = [7404,7406,7411,2819]
-    newUvFace = [8919,8918,10966,12814]
+    newUvFace = [10757,12791,5360,10756]
+
+    #[[2819, 10756], [7404, 10757], [7410, 10758], [7411, 5360]]
+    #[[7406, 12791], [7411, 5360], [7410, 10758], [7404, 10757]]
+    #print(faces1[badFace1])
+    #print(faces1[badFace2])
 
     killVerts = {}
     killUvs = {}
