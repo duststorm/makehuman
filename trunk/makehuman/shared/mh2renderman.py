@@ -269,7 +269,8 @@ class RMRHuman(RMRObject):
             
     def materialInit(self):
         self.basetexture =  os.path.splitext(os.path.basename(self.human.getTexture()))[0]
-        self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
+        if self.human.hairObj != None:
+            self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
         print "BASETEXTURE",  self.basetexture
         print "HAIRTEXTURE",  self.hairtexture
         
