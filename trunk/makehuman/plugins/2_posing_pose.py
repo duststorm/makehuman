@@ -244,8 +244,21 @@ class PoseTaskView(gui3d.TaskView):
             v = vadd(vmul(tets2[i][j],w[j]), v)
           verts[index].co = v[:]
         
+        #self.app.selectedHuman.meshData.calcNormals()
+        #self.app.selectedHuman.meshData.update()
+
+        rotation = [0.0,0.0, angle]
+        transform = euler2matrix(rotation, "sxyz")
+        for i in joint.bindedVects:
+          v= verts[i].co
+          if i in jointVerts: continue
+          verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+        for child in joint.children:
+          self.rotateJoint(child, joint.position, rotation, transform)
+          
         self.app.selectedHuman.meshData.calcNormals()
         self.app.selectedHuman.meshData.update()
+
      
     def rotateJoint(self, joint, center, rotation, transform=None):                
         #src = self.app.selectedHuman.meshStored
