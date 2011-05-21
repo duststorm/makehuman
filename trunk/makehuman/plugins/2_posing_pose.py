@@ -194,6 +194,7 @@ class PoseTaskView(gui3d.TaskView):
         f.close()
         
         #compute bounding box
+        
         bboxj = calcBBox(verts,  jointVerts)
         
         #adding offset
@@ -208,34 +209,10 @@ class PoseTaskView(gui3d.TaskView):
         #return 
         
         tets =  box2Tetrahedrons(bboxj)
-        #print tets
-        #testing with jointverts weight computation
-        """
-        valid = True
-        for index in jointVerts:
-          solutions = computeWeights2(verts[index].co, tets)
-          if not validWeight(solutions):
-            print solutions
-            print verts[index].co
-            for j in xrange(0,4):
-              w = solutions[j]
-              tet = tets[j]
-              temp = 1
-              v = [0]*3
-              for i in xrange(1,4):
-                temp = temp - w[i-1]
-                v = vadd(v, vmul(tet[i],w[i-1]))
-              v = vadd(v, vmul(tet[0],temp))
-              print v
-            break
-        return
-        """
-        #end of test jointverts weight computation
-        
         tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
         
         #compute mvc weights for each vertex in the bindings of r-shoulder
-        stop = False
+        """
         for index in jointVerts:
           i,w = computeWeights(verts[index].co,tets)
           v = [0.0,0.0,0.0]
@@ -246,13 +223,22 @@ class PoseTaskView(gui3d.TaskView):
         
         #self.app.selectedHuman.meshData.calcNormals()
         #self.app.selectedHuman.meshData.update()
-
+        """
+        
         rotation = [0.0,0.0, angle]
         transform = euler2matrix(rotation, "sxyz")
         for i in joint.bindedVects:
-          v= verts[i].co
-          if i in jointVerts: continue
-          verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+          if i in jointVerts:
+            tet_i,w = computeWeights(verts[i].co,tets)
+            v = [0.0,0.0,0.0]
+            #print w
+            for j in xrange(0,4):
+              v = vadd(vmul(tets2[tet_i][j],w[j]), v)
+            verts[i].co = v[:]
+          else :
+            v= verts[i].co
+            verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+        
         for child in joint.children:
           self.rotateJoint(child, joint.position, rotation, transform)
           
