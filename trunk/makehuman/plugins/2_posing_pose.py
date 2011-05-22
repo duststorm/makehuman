@@ -170,80 +170,87 @@ class PoseTaskView(gui3d.TaskView):
     
     def mvcTest(self):
                 
-        angle = 45*degree2rad
-        joint = self.skeleton.getJoint('joint-r-shoulder')
-        center = joint.position
-        verts = self.app.selectedHuman.meshData.verts
-        
-        #get bindings for r-shoulder-joint
-        f = open("utils/makepose/r-shoulder-joint.txt")
-        jointVerts = [];
-        while (1): 
-            line = f.readline()
-            if not line: break 
-            jointVerts.append(int(line));
-        f.close()      
-        
-        #get bindings for r-shoulder-link
-        f = open("utils/makepose/r-shoulder-link.txt")
-        linkVerts = [];
-        while (1): 
-            line = f.readline()
-            if not line: break 
-            linkVerts.append(int(line));
-        f.close()
-        
-        #compute bounding box
-        
-        bboxj = calcBBox(verts,  jointVerts)
-        
-        #adding offset
-        bboxj[0][0]= bboxj[0][0] - 0.01
-        bboxj[1][0]= bboxj[1][0] + 0.01
-        bboxj[0][1]= bboxj[0][1] - 0.01
-        bboxj[1][1]= bboxj[1][1] + 0.01
-        bboxj[0][2]= bboxj[0][2] - 0.01
-        bboxj[1][2]= bboxj[1][2] + 0.01  
-        
-        #print bboxj
-        #return 
-        
-        tets =  box2Tetrahedrons(bboxj)
-        tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
-        
-        #compute mvc weights for each vertex in the bindings of r-shoulder
-        """
-        for index in jointVerts:
-          i,w = computeWeights(verts[index].co,tets)
+      angle = -90*degree2rad
+      joint = self.skeleton.getJoint('joint-r-shoulder')
+      center = joint.position
+      verts = self.app.selectedHuman.meshData.verts
+      
+      #get bindings for r-shoulder-joint
+      f = open("utils/makepose/r-shoulder-joint.txt")
+      jointVerts = [];
+      while (1): 
+        line = f.readline()
+        if not line: break 
+        jointVerts.append(int(line));
+      f.close()      
+      
+      #get bindings for r-shoulder-link
+      f = open("utils/makepose/r-shoulder-link.txt")
+      linkVerts = [];
+      while (1): 
+        line = f.readline()
+        if not line: break 
+        linkVerts.append(int(line));
+      f.close()
+      
+      #compute bounding box
+      
+      bboxj = calcBBox(verts,  jointVerts)
+      
+      #adding offset
+      bboxj[0][0]= bboxj[0][0] - 0.01
+      bboxj[1][0]= bboxj[1][0] + 0.01
+      bboxj[0][1]= bboxj[0][1] - 0.01
+      bboxj[1][1]= bboxj[1][1] + 0.01
+      bboxj[0][2]= bboxj[0][2] - 0.01
+      bboxj[1][2]= bboxj[1][2] + 0.01  
+      
+      #print bboxj
+      #return 
+      
+      tets =  box2Tetrahedrons(bboxj)
+      tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
+      
+      #compute mvc weights for each vertex in the bindings of r-shoulder
+      """
+      for index in jointVerts:
+        i,w = computeWeights(verts[index].co,tets)
+        v = [0.0,0.0,0.0]
+        #print w
+        for j in xrange(0,4):
+          v = vadd(vmul(tets2[i][j],w[j]), v)
+        verts[index].co = v[:]
+      
+      #self.app.selectedHuman.meshData.calcNormals()
+      #self.app.selectedHuman.meshData.update()
+      """
+      
+      rotation = [0.0,0.0, angle]
+      transform = euler2matrix(rotation, "sxyz")
+      for i in joint.bindedVects:
+        if verts[i].co[0] < bboxj[1][0]:
+          #tet_i,w = computeWeights(verts[i].co,tets)
+          weights = computeAllWeights(verts[i].co,tets)
           v = [0.0,0.0,0.0]
           #print w
-          for j in xrange(0,4):
-            v = vadd(vmul(tets2[i][j],w[j]), v)
-          verts[index].co = v[:]
-        
-        #self.app.selectedHuman.meshData.calcNormals()
-        #self.app.selectedHuman.meshData.update()
-        """
-        
-        rotation = [0.0,0.0, angle]
-        transform = euler2matrix(rotation, "sxyz")
-        for i in joint.bindedVects:
-          if i in jointVerts:
-            tet_i,w = computeWeights(verts[i].co,tets)
-            v = [0.0,0.0,0.0]
-            #print w
+          for tet_i in xrange(0,5):
             for j in xrange(0,4):
-              v = vadd(vmul(tets2[tet_i][j],w[j]), v)
-            verts[i].co = v[:]
-          else :
-            v= verts[i].co
-            verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+              v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
+          verts[i].co = vmul(v, 0.2)
+          """
+          for j in xrange(0,4):
+            v = vadd(vmul(tets2[tet_i][j],w[j]), v)
+          verts[i].co = v[:]
+          """
+        else :
+          v= verts[i].co
+          verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+      
+      for child in joint.children:
+        self.rotateJoint(child, joint.position, rotation, transform)
         
-        for child in joint.children:
-          self.rotateJoint(child, joint.position, rotation, transform)
-          
-        self.app.selectedHuman.meshData.calcNormals()
-        self.app.selectedHuman.meshData.update()
+      self.app.selectedHuman.meshData.calcNormals()
+      self.app.selectedHuman.meshData.update()
 
      
     def rotateJoint(self, joint, center, rotation, transform=None):                
@@ -440,6 +447,26 @@ def computeWeights(v,tets):
   
   return None,None
 
+def computeAllWeights(v,tets):
+  y = [v[0], v[1], v[2]]
+  A = [0]*9
+  j = 0
+  
+  allWeights = []
+  #solutions = []
+  for i in xrange(0,5):
+    tet = tets[i]
+    z = vsub(y, tet[0])
+    for cols in xrange(0,3):
+        v2 = vsub(tet[cols+1], tet[0])
+        for rows in xrange(0,3):
+          A[rows*3 + cols] = v2[rows]
+    w = linsolve(A,z) 
+    allWeights.append([1-w[0]-w[1]-w[2],w[0], w[1],w[2]])
+  
+  return allWeights
+
+  
 """
 def computeWeights(v,tets):
     #i = findTetrahedron(tets,v)
