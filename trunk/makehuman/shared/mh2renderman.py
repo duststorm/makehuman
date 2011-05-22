@@ -271,6 +271,8 @@ class RMRHuman(RMRObject):
         self.basetexture =  os.path.splitext(os.path.basename(self.human.getTexture()))[0]
         if self.human.hairObj != None:
             self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
+            self.hairMat = RMRMaterial("hairpoly")
+            self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".tif"))
             print "HAIRTEXTURE",  self.hairtexture
         print "BASETEXTURE",  self.basetexture
         
@@ -297,8 +299,7 @@ class RMRHuman(RMRObject):
         self.eyeBallMat = RMRMaterial("eyeball")
         self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif"))
         
-        self.hairMat = RMRMaterial("hairpoly")
-        self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".tif"))
+        
 
 
     def subObjectsInit(self):
