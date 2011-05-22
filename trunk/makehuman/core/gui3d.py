@@ -405,6 +405,19 @@ class View(events3d.EventHandler):
 
     def __init__(self, parent=None, style=None, layout=None, visible=True):
         
+        """
+        This is the constructor for the View class.
+
+        @param parent: The parent view.
+        @type parent: L{View}
+        @param style: The style.
+        @type style: L{Style}
+        @param layout: The layout.
+        @type layout: L{Layout}
+        @param visible: The visibility state.
+        @type visible: C{Boolean} 
+        """
+        
         if not parent:
             raise RuntimeError('A view needs a parent')
                 
@@ -959,7 +972,7 @@ class TabView(View):
         @type parent: L{View}
         @param style: The style.
         @type style: L{Style}
-        @param tabStyle: The tabStyle.
+        @param tabStyle: The tab style.
         @type tabStyle: L{Style}
         """
         
@@ -1045,6 +1058,8 @@ class Slider(View):
         @type label: C{str}
         @param style: The style.
         @type style: L{Style}
+        @param thumbStyle: The thumb style.
+        @type thumbStyle: L{Style}
         """
         
         View.__init__(self, parent, style)
