@@ -135,5 +135,4 @@ class MacroModelingTaskView(gui3d.TaskView):
 
     def onResized(self, event):
         self.status.setPosition([10, event.height-15, 9.1])
-        #todo commented radial out until radial_graph.png is commited
-        #self.radialBox.setPosition([event.width - 200, self.radialBox.getPosition()[1], 9.0])
+        self.radialBox.setPosition([event.width - 210, self.radialBox.getPosition()[1], 9.0])
