@@ -271,8 +271,9 @@ class RMRHuman(RMRObject):
         self.basetexture =  os.path.splitext(os.path.basename(self.human.getTexture()))[0]
         if self.human.hairObj != None:
             self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
+            print "HAIRTEXTURE",  self.hairtexture
         print "BASETEXTURE",  self.basetexture
-        print "HAIRTEXTURE",  self.hairtexture
+        
         
         
         
