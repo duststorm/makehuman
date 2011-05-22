@@ -227,6 +227,9 @@ class PoseTaskView(gui3d.TaskView):
       
       rotation = [0.0,0.0, angle]
       transform = euler2matrix(rotation, "sxyz")
+      
+      #todo take a norm on the diff between old vertex and skinned vertex if the norm is less than some epsilon dont do changes
+      # this avoid excessive wrinkles when the rotations are not extreme
       for i in joint.bindedVects:
         if verts[i].co[0] < bboxj[1][0]:
           #tet_i,w = computeWeights(verts[i].co,tets)
