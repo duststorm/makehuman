@@ -33,7 +33,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1))
+        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(width=800-20, left=10, top=585, zIndex=9.1))
 
         self.macroBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=25+36*5+6))\
        
@@ -119,7 +119,7 @@ class MacroModelingTaskView(gui3d.TaskView):
             status += 'Height: %.2f cm' % height
         else:
             status += 'Height: %.2f in' % (height * 0.393700787)
-        #self.status.setText(status)
+        self.status.setText(status)
 
     def onShow(self, event):
         self.genderSlider.setFocus()
