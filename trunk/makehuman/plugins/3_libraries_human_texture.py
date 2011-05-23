@@ -66,8 +66,8 @@ HumanTextureButtonStyle = gui3d.Style(**{
 class HumanTextureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Human texture', label='Texture')
-        self.filechooser = gui3d.FileChooser(self, 'data/textures', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
+        gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
+        self.filechooser = gui3d.FileChooser(self, 'data/skins', 'tif', 'png')
         
         self.currentTexture = gui3d.Button(self.app.categories['Modelling'],
             style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=self.app.selectedHuman.getTexture()))
@@ -78,7 +78,7 @@ class HumanTextureTaskView(gui3d.TaskView):
             
             self.app.do(Action(self.app.selectedHuman,
                 self.app.selectedHuman.getTexture(),
-                os.path.join('data/textures', filename), self.syncTexture))
+                os.path.join('data/skins', filename), self.syncTexture))
             
             self.app.switchCategory('Modelling')
             
@@ -92,7 +92,7 @@ class HumanTextureTaskView(gui3d.TaskView):
             
     def syncTexture(self):
         
-        self.currentTexture.setTexture(self.app.selectedHuman.getTexture())
+        self.currentTexture.setTexture(self.app.selectedHuman.getTexture().replace('tif', 'png'))
 
     def onShow(self, event):
 
@@ -117,7 +117,7 @@ class HumanTextureTaskView(gui3d.TaskView):
     def loadHandler(self, human, values):
         
         if values[0] == 'skinTexture':
-            human.setTexture(os.path.join('data/textures', values[1]))
+            human.setTexture(os.path.join('data/skins', values[1]))
             self.syncTexture()
        
     def saveHandler(self, human, file):
