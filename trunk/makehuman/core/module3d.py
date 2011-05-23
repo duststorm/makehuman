@@ -550,6 +550,7 @@ class FaceGroup:
         
         f = Face(*verts)
         f.group = self
+        f.idx = len(self.parent.faces)
         self.__faces.append(f)
         self.parent.faces.append(f)
 

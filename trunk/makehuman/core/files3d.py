@@ -85,7 +85,6 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
 
     fg = None
     mtl = ''
-    fIndex = 0
 
     try:
         objFile = open(path)
@@ -95,7 +94,7 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
         
     obj.uvValues = []
 
-    for objData in objFile.readlines():
+    for objData in objFile:
 
         lineData = objData.split()
         if len(lineData) > 0:
@@ -136,9 +135,7 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
                         uvIndices.append(uvIndices[0])
                     f.uv = uvIndices[:]
 
-                f.idx = fIndex
                 f.mtl = mtl
-                fIndex += 1
                         
             elif command == 'g':
                 
