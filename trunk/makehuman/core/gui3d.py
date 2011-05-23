@@ -1895,7 +1895,7 @@ FileChooserStyle = Style(**{
 
 class FileChooser(View):
     
-    def __init__(self, parent, path, extension, previewExtension='bmp', style=FileChooserStyle):
+    def __init__(self, parent, path, extension, previewExtension='bmp', notFoundImage=None, style=FileChooserStyle):
         
         View.__init__(self, parent, style, None)
         
@@ -1907,6 +1907,7 @@ class FileChooser(View):
         self.files = []
         self.selection = ''
         self.childY = {}
+        self.notFoundImage = notFoundImage
         
         @self.slider.event
         def onChange(value):
@@ -1918,8 +1919,15 @@ class FileChooser(View):
     def getPreview(self, filename):
         
         preview = filename
+        
         if self.previewExtension:
-            preview = filename.replace(os.path.splitext(filename)[-1], '.' + self.previewExtension)
+            preview = os.path.join(self.path, filename.replace(os.path.splitext(filename)[-1], '.' + self.previewExtension))
+        else:
+            preview = os.path.join(self.path, filename)
+            
+        if not os.path.exists(preview) and self.notFoundImage:
+            preview = os.path.join(self.path, self.notFoundImage)
+            
         return preview
         
     def refresh(self):
@@ -1958,8 +1966,7 @@ class FileChooser(View):
             label = None
             if isinstance(self.extension, str):
                 label = file.replace(os.path.splitext(file)[-1], '')
-            FileChooserRectangle(self, file, label or file,
-                FileChooserRectangleStyle._replace(normal=os.path.join(self.path, self.getPreview(file))))
+            FileChooserRectangle(self, file, label or file, FileChooserRectangleStyle._replace(normal=self.getPreview(file)))
                 
         self.__updateScrollBar()
             

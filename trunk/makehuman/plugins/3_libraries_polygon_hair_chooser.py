@@ -45,7 +45,7 @@ class HairTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Hair')
-        self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png')
+        self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png', 'notfound.png')
         
         self.hairButton = gui3d.Button(self.app.categories['Modelling'],
             style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png'))
