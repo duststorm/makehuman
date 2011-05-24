@@ -469,6 +469,7 @@ class RMRScene:
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')
         self.hairTexturePath = os.path.join(self.applicationPath, 'data', 'hairstyles')
+        self.skinTexturePath = os.path.join(self.applicationPath, 'data', 'skins')
         
         #self.texturesFileName = os.path.join(self.ribsPath, "texture.rib")
 
@@ -580,7 +581,7 @@ class RMRScene:
         else:
             print "Writing bake world"
             ribfile.write('\tAttributeBegin\n')
-            ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, os.path.join(self.appTexturePath,self.humanCharacter.basetexture+".tif").replace('\\', '/')))
+            ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, self.humanCharacter.basetexture+".tif"))
             ribPath = os.path.join(self.ribsPath, 'skin.rib')
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
@@ -607,7 +608,7 @@ class RMRScene:
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
         ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
         ribSceneHeader.displayType = "file"
@@ -661,7 +662,7 @@ class RMRScene:
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
 
         #Write rib header
@@ -686,7 +687,7 @@ class RMRScene:
         ribSceneHeader.sizeFormat = [1024,1024]
         ribSceneHeader.setCameraPosition(0,0,0.02)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
         ribSceneHeader.shadingInterpolation = "smooth"
         ribSceneHeader.projection = "orthographic"
         ribSceneHeader.displayType = "file"
@@ -717,7 +718,7 @@ class RMRScene:
         ribSceneHeader.pixelSamples = [1,1]
         ribSceneHeader.shadingRate = 2
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
         ribSceneHeader.bucketSize = [32,32]
         ribSceneHeader.eyesplits = 10
         ribSceneHeader.depthfilter = "midpoint"
