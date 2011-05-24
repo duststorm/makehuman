@@ -304,21 +304,13 @@ class RMRHuman(RMRObject):
 
     def subObjectsInit(self):
         self.subObjects = []
-        self.rEyeBall = RMRObject("right_eye_ball", self.meshData, 'eye')
-        self.rEyeBall.material = self.eyeBallMat
-        self.subObjects.append(self.rEyeBall)
+        self.eyeBall = RMRObject("eye_balls", self.meshData, 'eye')
+        self.eyeBall.material = self.eyeBallMat
+        self.subObjects.append(self.eyeBall)
 
-        self.lEyeBall = RMRObject("left_eye_ball", self.meshData, 'eye')
-        self.lEyeBall.material = self.eyeBallMat
-        self.subObjects.append(self.lEyeBall)
-
-        self.rCornea = RMRObject("right_cornea", self.meshData, 'cornea')
-        self.rCornea.material = self.corneaMat
-        self.subObjects.append(self.rCornea)
-
-        self.lCornea = RMRObject("left_cornea", self.meshData, 'cornea')
-        self.lCornea.material = self.corneaMat
-        self.subObjects.append(self.lCornea)
+        self.cornea = RMRObject("cornea", self.meshData, 'cornea')
+        self.cornea.material = self.corneaMat
+        self.subObjects.append(self.cornea)
 
         self.teeth = RMRObject("teeth", self.meshData, 'teeth')
         self.teeth.material = self.teethMat
