@@ -6,8 +6,8 @@
 
 
 surface
-cornea ( float Ks = 3;
-         float roughness = .02;
+cornea ( float Ks = 1.8;
+         float roughness = .035;
 	     color specularcolor = 1;
          color opacity = 0.01;
      )
