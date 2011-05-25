@@ -107,7 +107,9 @@ class HumanTextureTaskView(gui3d.TaskView):
         if success:
             f = open(os.path.join('data/skins', 'media.ini'), 'r')
             for filename in f:
-                success, code = cache.download(os.path.join('http://www.makehuman.org/download/skins/', filename))
+                url = os.path.join('http://www.makehuman.org/download/skins/', filename.split()[0])
+                print('downloading %s' % url)
+                success, code = cache.download(url)
             f.close()
         else:
             self.app.prompt('Error', 'Failed to get the list of skins at the makehuman media repository, error %d.' % code, 'OK')
