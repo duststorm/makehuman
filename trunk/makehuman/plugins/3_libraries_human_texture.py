@@ -102,17 +102,9 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.app.selectedHuman.hide()
         self.filechooser.setFocus()
         
-        cache = download.DownloadCache('data/skins')
-        success, code = cache.download('http://www.makehuman.org/download/skins/media.ini')
-        if success:
-            f = open(os.path.join('data/skins', 'media.ini'), 'r')
-            for filename in f:
-                url = os.path.join('http://www.makehuman.org/download/skins/', filename.split()[0])
-                print('downloading %s' % url)
-                success, code = cache.download(url)
-            f.close()
-        else:
-            self.app.prompt('Error', 'Failed to get the list of skins at the makehuman media repository, error %d.' % code, 'OK')
+        if not len([filename for filename in os.listdir('data/skins') if filename.endswith('tif')]):
+            
+            self.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
 
     def onHide(self, event):
         self.app.selectedHuman.show()
@@ -136,6 +128,20 @@ class HumanTextureTaskView(gui3d.TaskView):
     def saveHandler(self, human, file):
         
         file.write('skinTexture %s\n' % os.path.basename(human.getTexture()))
+        
+    def syncMedia(self):
+        
+        cache = download.DownloadCache('data/skins')
+        success, code = cache.download('http://www.makehuman.org/download/skins/media.ini')
+        if success:
+            f = open(os.path.join('data/skins', 'media.ini'), 'r')
+            for filename in f:
+                url = os.path.join('http://www.makehuman.org/download/skins/', filename.split()[0])
+                print('downloading %s' % url)
+                success, code = cache.download(url)
+            f.close()
+        else:
+            self.app.prompt('Error', 'Failed to get the list of skins at the makehuman media repository, error %d.' % code, 'OK')
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
