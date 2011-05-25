@@ -29,6 +29,7 @@ import gui3d
 import events3d
 import mh
 import os
+import download
 
 class Action:
 
@@ -100,6 +101,16 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.app.selectedHuman.hide()
         self.filechooser.setFocus()
+        
+        cache = download.DownloadCache('data/skins')
+        success, code = cache.download('http://www.makehuman.org/download/skins/media.ini')
+        if success:
+            f = open(os.path.join('data/skins', 'media.ini'), 'r')
+            for filename in f:
+                success, code = cache.download(os.path.join('http://www.makehuman.org/download/skins/', filename))
+            f.close()
+        else:
+            self.app.prompt('Error', 'Failed to get the list of skins at the makehuman media repository, error %d.' % code, 'OK')
 
     def onHide(self, event):
         self.app.selectedHuman.show()
