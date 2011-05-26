@@ -303,6 +303,18 @@ class MHApplication(gui3d.Application):
         else:
             
             mh.callAsync(self.loadGui)
+            
+    def unloadPlugins(self):
+        
+        for name, module in self.modules.iteritems():
+            try:
+                module.unload(self)
+            except Exception, e:
+                import traceback
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+                print('Could not unload %s' % name)
+                print e
                 
     def loadGui(self):
         
@@ -400,6 +412,11 @@ class MHApplication(gui3d.Application):
     def onStart(self, event):
         
         mh.callAsync(self.loadBackground)
+        
+    def onStop(self, event):
+        
+        self.saveSettings()
+        self.unloadPlugins()
         
     def onMouseDragged(self, event):
         
@@ -912,10 +929,8 @@ class MHApplication(gui3d.Application):
         
     def promptAndExit(self):
         if self.undoStack:
-            self.saveSettings()
             self.prompt('Exit', 'You have unsaved changes. Are you sure you want to exit the application?', 'Yes', 'No', self.stop)
         else:
-            self.saveSettings()
             self.stop()
     
 application = MHApplication()

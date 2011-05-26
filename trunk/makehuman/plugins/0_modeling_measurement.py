@@ -258,6 +258,9 @@ def load(app):
                 
     taskview.hideAllSliders()
     taskview.groupBoxes['torso'].show()
+    
+def unload(app):
+    print 'Measurement unloaded'
 
 class Ruler:
 

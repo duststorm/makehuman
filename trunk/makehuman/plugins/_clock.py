@@ -14,10 +14,11 @@ class ClockThread(Thread):
     
         Thread.__init__(self)
         self.method = method
+        self.running = True
     
     def run(self):
 
-        while 1:
+        while self.running:
             sleep(1)
             callAsync(self.method)
 
@@ -29,13 +30,15 @@ print 'clock imported'
 clockThread = None
 
 def load(app):
+    
     clockText = TextObject(app, position=[740, 10, 9.2])
     clockText.setText(datetime.now().strftime("%H:%M:%S"))
     
     def updateClock():
         clockText.setText(datetime.now().strftime("%H:%M:%S"))
         clockText.app.redraw()
-            
+          
+    global clockThread
     clockThread = ClockThread(updateClock)
     clockThread.start()
 
@@ -45,6 +48,11 @@ def load(app):
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 def unload(app):
+    
+    global clockThread
+    clockThread.running = False
+    clockThread.join()
+        
     print 'clock unloaded'
 
 

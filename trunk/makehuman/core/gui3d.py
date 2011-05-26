@@ -694,6 +694,7 @@ class Application(events3d.EventHandler):
         mh.startEventLoop()
 
     def stop(self):
+        self.callEvent('onStop', None)
         mh.shutDown()
         
     def redraw(self):
