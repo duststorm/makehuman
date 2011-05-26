@@ -329,7 +329,7 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 #    writeBoneGroups(fp):
 #
 
-import external_rig
+#import external_rig
 
 if UseExternalRig:
     BoneGroups = external_rig.getBoneGroups()
