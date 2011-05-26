@@ -448,7 +448,7 @@ def ArmControlPoses(fp):
 	addPoseBone(fp, 'Elbow_L', 'MHCube025', 'FK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), CmodLoArm, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'ONSURFACE']),
+		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_ONSURFACE']),
 		])
 
 	addPoseBone(fp, 'LoArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodLoArm,
@@ -460,8 +460,8 @@ def ArmControlPoses(fp):
 	addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
-		 ('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'INSIDE']),
-		 ('LimitDist', 0, 0, ['DistElbow', 'Elbow_L', 'ONSURFACE']),
+		 ('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_INSIDE']),
+		 ('LimitDist', 0, 0, ['DistElbow', 'Elbow_L', 'LIMITDIST_ONSURFACE']),
 		])
 
 	addPoseBone(fp, 'Hand_L', 'MHHand', 'FK_L', (0,0,0), (0,1,0), (1,1,1), (1,1,1), CmodHand,
@@ -480,7 +480,7 @@ def ArmControlPoses(fp):
 	addPoseBone(fp, 'Elbow_R', 'MHCube025', 'FK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), CmodLoArm, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'ONSURFACE']),
+		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_ONSURFACE']),
 		])
 
 	addPoseBone(fp, 'LoArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodLoArm,
@@ -492,8 +492,8 @@ def ArmControlPoses(fp):
 	addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'INSIDE']),
-		('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'ONSURFACE']),
+		('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_INSIDE']),
+		('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),
 		])
 
 	addPoseBone(fp, 'Hand_R', 'MHHand', 'FK_R', (0,0,0), (0,1,0), (1,1,1), (1,1,1), CmodHand,

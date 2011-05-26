@@ -23,8 +23,8 @@ Version 1.0
 bl_addon_info = {
 	'name': 'Export MakeHuman (.mhx)',
 	'author': 'Thomas Larsson',
-	'version': '1.0',
-	'blender': (2, 5, 5),
+	'version': '1.4',
+	'blender': (2, 5, 7),
 	'api': 33590,
 	'location': 'File > Export',
 	'description': 'Export files in the MakeHuman eXchange format (.mhx)',
@@ -38,8 +38,8 @@ Access from the File > Export menu.
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 0
-
+MINOR_VERSION = 4
+SUB_VERSION = 0
 
 import bpy
 import mathutils
@@ -1432,43 +1432,18 @@ def exportArmature(ob, fp):
 	obName = ob.name.replace(' ','_')
 	
 	if verbosity > 0:
-		print( "Saving amt "+amtName )
+		print( "Saving amt "+amtName +"!!!" )
 
 	bpy.context.scene.objects.active = ob
 	fp.write("Armature %s %s " % (amtName, obName))
-
-	'''
-	typ = None
-	ntypes = 0
-	pbones = ob.pose.bones.values()
-	for pb in pbones:
-		try:
-			typ = pb['type']
-			ntypes += 1
-		except:
-			pass
-	if ntypes > 1: 
-		typ = "human"
-
-
-	if typ and expMsk & M_Rigify:
-		bpy.ops.object.mode_set(mode='EDIT')
-		bones = amt.edit_bones.values()
-		fp.write("  Rigify \n")
-		fp.write("  MetaRig %s ;\n" %typ)
-		for bone in bones:
-			writeBone(bone, fp)
-			fp.write("  end Bone\n\n")
-		fp.write("end Armature\n")
-		bpy.ops.object.mode_set(mode='OBJECT')
-		return
-	'''
 
 	bpy.ops.object.mode_set(mode='EDIT')
 	bones = amt.edit_bones.values()
 	fp.write("  Normal \n")
 	
+	print(obName, amt.edit_bones.keys(), amt.edit_bones.values(), bones, bpy.context.object)
 	for b in bones:
+		print("  ", obName, b.name, b.parent)
 		if b.parent == None:
 			exportBone(fp, b)
 			fp.write("\n")
@@ -1479,18 +1454,8 @@ def exportArmature(ob, fp):
 	writePrio(amt, prio, "  ", fp)
 	writeDir(amt, prio+['animation_data', 'edit_bones', 'bones'], "  ", fp)
 	fp.write("end Armature\n")
-
-	bpy.ops.object.mode_set(mode='POSE')
-	fp.write("\nPose %s True \n" % (obName))	
-	createdLocal['BoneGroup'] = []
-	for bg in ob.pose.bone_groups.values():
-		exportBoneGroup(fp, bg)
-	for pb in ob.pose.bones.values():
-		exportPoseBone(fp, pb)
-	writeDir(ob.pose, ['bones', 'bone_groups'], "  ", fp)
-	fp.write("end Pose\n")
-	bpy.ops.object.mode_set(mode='OBJECT')
 	return # exportArmature
+
 
 def writeBone(bone, fp):
 	fp.write("  Bone %s True\n" % (bone.name.replace(' ','_')))
@@ -1521,26 +1486,49 @@ def exportBone(fp, bone):
 
 #
 #
+#	exportPose(ob, fp):
 #	exportBoneGroup(bg, fp):
 #	exportPoseBone(fp, pb):
 #
+
+def exportPose(ob, fp):
+	global createdLocal
+	obName = ob.name.replace(' ','_')
+	
+	if verbosity > 0:
+		print( "Saving pose "+obName )
+
+	bpy.context.scene.objects.active = ob
+	bpy.ops.object.mode_set(mode='POSE')
+	fp.write("\nPose %s True \n" % (obName))	
+	createdLocal['BoneGroup'] = []
+	for bg in ob.pose.bone_groups.values():
+		exportBoneGroup(fp, bg)
+	for pb in ob.pose.bones.values():
+		exportPoseBone(fp, pb)
+	writeDir(ob.pose, ['bones', 'bone_groups'], "  ", fp)
+	fp.write("end Pose\n")
+	bpy.ops.object.mode_set(mode='OBJECT')
+	return # exportPose
 
 def exportPoseBone(fp, pb):
 	fp.write("\n  Posebone %s True\n" % (pb.name.replace(' ', '_')))
 	for cns in pb.constraints:
 		exportConstraint(cns, fp)
-	writeArray('lock_ik', [pb.lock_ik_x, pb.lock_ik_y, pb.lock_ik_z], "	", 1, fp)
-	writeArray('use_ik_limit', [pb.use_ik_limit_x, pb.use_ik_limit_y, pb.use_ik_limit_z], "	", 1, fp)
+	#writeArray('lock_ik', [pb.lock_ik_x, pb.lock_ik_y, pb.lock_ik_z], "	", 1, fp)
+	#writeArray('use_ik_limit', [pb.use_ik_limit_x, pb.use_ik_limit_y, pb.use_ik_limit_z], "	", 1, fp)
 	writeArray('ik_max', [pb.ik_max_x, pb.ik_max_y, pb.ik_max_z], "	", 1, fp)
 	writeArray('ik_min', [pb.ik_min_x, pb.ik_min_y, pb.ik_min_z], "	", 1, fp)
 	writeArray('ik_stiffness', [pb.ik_stiffness_x, pb.ik_stiffness_y, pb.ik_stiffness_z], "	", 1, fp)
-	exclude = ['constraints', 'lock_ik_x', 'lock_ik_y', 'lock_ik_z', 
-		'use_ik_limit_x', 'use_ik_limit_y', 'use_ik_limit_z', 
+	exclude = ['constraints', 
+		#'lock_ik_x', 'lock_ik_y', 'lock_ik_z', 
+		#'use_ik_limit_x', 'use_ik_limit_y', 'use_ik_limit_z', 
 		'ik_max_x', 'ik_max_y', 'ik_max_z', 
 		'ik_min_x', 'ik_min_y', 'ik_min_z', 
 		'ik_stiffness_x', 'ik_stiffness_y', 'ik_stiffness_z',
 		'custom_shape_transform', 'original_length', 'bone_group_index', 
-		'parent', 'children', 'bone', 'child', 'head', 'tail', 'has_ik']
+		'matrix_basis', 'matrix_channel',
+		'parent', 'children', 'bone', 'child', 'head', 'tail', 'is_in_ik_chain']
 	exclude += ['channel_matrix', 'matrix', 'rotation_axis_angle', 'rotation_euler', 'rotation_mode',
 		'rotation_quaternion', 'scale', 'selected']
 	writeDir(pb, exclude, "	", fp)	
@@ -1566,7 +1554,7 @@ def exportConstraint(cns, fp):
 		name = cns.name.replace(' ', '_')
 	except:
 		return
-	fp.write("	Constraint %s %s\n" % (name, cns.type))
+	fp.write("	Constraint %s %s True\n" % (name, cns.type))
 	writePrio(cns, ['target'], "	  ", fp)
 
 	try:
@@ -1589,6 +1577,7 @@ def exportConstraint(cns, fp):
 	exclude = ['invert_x', 'invert_y', 'invert_z', 'use_x', 'use_y', 'use_z',
 		'head_tail',
 		'pos_lock_x', 'pos_lock_y', 'pos_lock_z', 'rot_lock_x', 'rot_lock_y', 'rot_lock_z', 
+		'error_location', 'error_rotation', 'is_valid',
 		'disabled', 'lin_error', 'rot_error', 'target', 'type']
 	exclude += ['distance']
 	writeDir(cns, exclude, "	  ", fp)	
@@ -1602,7 +1591,7 @@ def exportConstraint(cns, fp):
 def exportModifier(mod, fp):
 	name = mod.name.replace(' ', '_')
 	fp.write("	Modifier %s %s\n" % (name, mod.type))
-	writeDir(mod, [], "	  ", fp)	
+	writeDir(mod, ['is_bound', 'is_external', 'total_levels'], "	  ", fp)	
 	fp.write("	end Modifier\n")
 	return
 
@@ -1750,10 +1739,10 @@ def selectStatus(ob):
 def writeHeader(fp):
 	fp.write(
 "# Blender 2.5 exported MHX \n" +
-"MHX %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION) +
-"if Blender24\n" +
+"MHX %d %d %d ;\n" % (MAJOR_VERSION, MINOR_VERSION, SUB_VERSION) +
+"#if Blender24\n" +
 "  error 'This file can only be read with Blender 2.5' ;\n" +
-"end if\n")
+"#endif\n")
 	return
 
 def writeMaterials(fp):
@@ -1792,6 +1781,15 @@ def writeArmatures(fp):
 			if ob.type == 'ARMATURE' and selectStatus(ob):
 				initLocalData()
 				exportObject(ob, fp)
+	return
+
+def writePoses(fp):
+	if bpy.data.objects:		
+		fp.write("\n# --------------- Pose ----------------------------- # \n \n")
+		for ob in bpy.data.objects:
+			if ob.type == 'ARMATURE' and selectStatus(ob):
+				initLocalData()
+				exportPose(ob, fp)
 	return
 
 def writeMeshes(fp):
@@ -1880,6 +1878,8 @@ def writeMhxFile(fileName, msk):
 	if expMsk & M_Geo:
 		writeHumanMesh(fp)
 		writeMeshes(fp)
+	if expMsk & M_Amt:
+		writePoses(fp)
 	if expMsk & M_Tool:
 		writeTools(fp)
 	if expMsk & M_Scn:

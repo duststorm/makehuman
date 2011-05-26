@@ -185,7 +185,7 @@ def BodyControlPoses(fp):
     # Spine IK
     addPoseBone(fp,  'Shoulders', 'GZM_IK_Shoulder', 'Spine', (0,0,0), (1,0,1), (1,1,1), (1,1,1), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]),
-         ('LimitDist', 0, 1, ['LimitDist', 'Root', 'INSIDE'])])
+         ('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_INSIDE'])])
 
     addPoseBone(fp,  'SpineBender', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
          [('IK', 0, 1, ['SpineIK', 'Shoulders', 1, None, (True, False,True)]),

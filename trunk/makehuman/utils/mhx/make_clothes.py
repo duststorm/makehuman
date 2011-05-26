@@ -1,15 +1,15 @@
 """ 
-**Project Name:**	  MakeHuman
+**Project Name:**      MakeHuman
 
 **Product Home Page:** http://www.makehuman.org/
 
-**Code Home Page:**	http://code.google.com/p/makehuman/
+**Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**		   Thomas Larsson
+**Authors:**           Thomas Larsson
 
-**Copyright(c):**	  MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2011
 
-**Licensing:**		 GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
 **Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
@@ -105,403 +105,458 @@ mListLength = 2
 
 
 #
-#	printMverts(stuff, mverts):
+#    printMverts(stuff, mverts):
 #
 
 def printMverts(stuff, mverts):
-	for n in range(mListLength):
-		(v,dist) = mverts[n]
-		if v:
-			print(stuff, v.index, dist)
+    for n in range(mListLength):
+        (v,dist) = mverts[n]
+        if v:
+            print(stuff, v.index, dist)
 
 #
-#	selectVert(context, vn, ob):
+#    selectVert(context, vn, ob):
 #
 
 def selectVert(context, vn, ob):
-	context.scene.objects.active = ob
-	bpy.ops.object.mode_set(mode='EDIT')
-	bpy.ops.mesh.select_all(action='DESELECT')
-	bpy.ops.object.mode_set(mode='OBJECT')
-	ob.data.vertices[vn].select = True
-	return	
+    context.scene.objects.active = ob
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    ob.data.vertices[vn].select = True
+    return    
 
 #
-#	findClothes(context, bob, pob, log):
+#    findClothes(context, bob, pob, log):
 #
 
 def findClothes(context, bob, pob, log):
-	base = bob.data
-	proxy = pob.data
-	
-	bestVerts = []
-	for pv in proxy.vertices:
-		try:
-			pindex = pv.groups[0].group
-		except:
-			pindex = -1
-		if pindex < 0:
-			vn = pv.index
-			selectVert(context, vn, pob)
-			raise NameError("Clothes vert %d not member of any group" % vn)
+    base = bob.data
+    proxy = pob.data
+    
+    bestVerts = []
+    for pv in proxy.vertices:
+        try:
+            pindex = pv.groups[0].group
+        except:
+            pindex = -1
+        if pindex < 0:
+            vn = pv.index
+            selectVert(context, vn, pob)
+            raise NameError("Clothes vert %d not member of any group" % vn)
 
-		name = pob.vertex_groups[pindex].name
-		bindex = None
-		for bvg in bob.vertex_groups:
-			if bvg.name == name:
-				bindex = bvg.index
-		if bindex == None:
-			raise NameError("Did not find vertex group %s in base mesh" % name)
+        name = pob.vertex_groups[pindex].name
+        bindex = None
+        for bvg in bob.vertex_groups:
+            if bvg.name == name:
+                bindex = bvg.index
+        if bindex == None:
+            raise NameError("Did not find vertex group %s in base mesh" % name)
 
-		mverts = []
-		for n in range(mListLength):
-			mverts.append((None, 1e6))
+        mverts = []
+        for n in range(mListLength):
+            mverts.append((None, 1e6))
 
-		for bv in base.vertices:
-			for grp in bv.groups:
-				if grp.group == bindex:
-					vec = pv.co - bv.co
-					n = 0
-					for (mv,mdist) in mverts:
-						if vec.length < mdist:
-							for k in range(n+1, mListLength):
-								j = mListLength-k+n
-								mverts[j] = mverts[j-1]
-							mverts[n] = (bv, vec.length)
-							#print(bv.index)
-							#printMverts(bv.index, mverts)
-							break
-						n += 1
+        for bv in base.vertices:
+            for grp in bv.groups:
+                if grp.group == bindex:
+                    vec = pv.co - bv.co
+                    n = 0
+                    for (mv,mdist) in mverts:
+                        if vec.length < mdist:
+                            for k in range(n+1, mListLength):
+                                j = mListLength-k+n
+                                mverts[j] = mverts[j-1]
+                            mverts[n] = (bv, vec.length)
+                            #print(bv.index)
+                            #printMverts(bv.index, mverts)
+                            break
+                        n += 1
 
-		(mv, mindist) = mverts[0]
-		if mv:
-			print(pv.index, mv.index, mindist, name, pindex, bindex)
-			log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
-			#printMverts("  ", mverts)
-		else:
-			raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, name, pindex, bindex))
-		if mindist > 5:
-			raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
+        (mv, mindist) = mverts[0]
+        if mv:
+            print(pv.index, mv.index, mindist, name, pindex, bindex)
+            log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
+            #printMverts("  ", mverts)
+        else:
+            raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, name, pindex, bindex))
+        if mindist > 5:
+            raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
 
-		bestVerts.append((pv, mverts, []))
+        bestVerts.append((pv, mverts, []))
 
-	print("Setting up face table")
-	vfaces = {}
-	for f in base.faces:
-		for v in f.vertices:
-			try:
-				vfaces[v].append(f)
-			except:
-				vfaces[v] = [f]
-	
-	print("Finding weights")
-	for (pv, mverts, fcs) in bestVerts:
-		print(pv.index)
-		for (bv,mdist) in mverts:
-			if bv:
-				for f in vfaces[bv.index]:
-					verts = []
-					for v in f.vertices:
-						verts.append(base.vertices[v].co)
-					wts = cornerWeights(pv, verts, pob)
-					fcs.append((f.vertices, wts))
+    print("Setting up face table")
+    vfaces = {}
+    for f in base.faces:
+        for v in f.vertices:
+            try:
+                vfaces[v].append(f)
+            except:
+                vfaces[v] = [f]
+    
+    print("Finding weights")
+    for (pv, mverts, fcs) in bestVerts:
+        print(pv.index)
+        for (bv,mdist) in mverts:
+            if bv:
+                for f in vfaces[bv.index]:
+                    verts = []
+                    for v in f.vertices:
+                        verts.append(base.vertices[v].co)
+                    wts = cornerWeights(pv, verts, pob)
+                    fcs.append((f.vertices, wts))
 
-	print("Finding best weights")
-	alwaysOutside = context.scene['MakeClothesOutside']
-	bestFaces = []
-	for (pv, mverts, fcs) in bestVerts:
-		#print(pv.index)
-		minmax = -1e6
-		for (fverts, wts) in fcs:
-			w = minWeight(wts)
-			if w > minmax:
-				minmax = w
-				bWts = wts
-				bVerts = fverts
-		if minmax < threshold:
-			(mv, mdist) = mverts[0]
-			bVerts = [mv.index,0,1]
-			bWts = [1,0,0]
+    print("Finding best weights")
+    alwaysOutside = context.scene['MakeClothesOutside']
+    bestFaces = []
+    for (pv, mverts, fcs) in bestVerts:
+        #print(pv.index)
+        minmax = -1e6
+        for (fverts, wts) in fcs:
+            w = minWeight(wts)
+            if w > minmax:
+                minmax = w
+                bWts = wts
+                bVerts = fverts
+        if minmax < threshold:
+            (mv, mdist) = mverts[0]
+            bVerts = [mv.index,0,1]
+            bWts = [1,0,0]
+        addBestFace(pv, base, bVerts, bWts, bestFaces)
+    print("Done")
+    return bestFaces
 
-		v0 = base.vertices[bVerts[0]]
-		v1 = base.vertices[bVerts[1]]
-		v2 = base.vertices[bVerts[2]]
 
-		est = bWts[0]*v0.co + bWts[1]*v1.co + bWts[2]*v2.co
-		norm = bWts[0]*v0.normal + bWts[1]*v1.normal + bWts[2]*v2.normal
-		diff = pv.co - est
-		proj = diff.dot(norm)
-		if proj < 0 and alwaysOutside:
-			proj = -proj
-		bestFaces.append((pv, bVerts, bWts, proj))	
-				
-	print("Done")
-	return bestFaces
+def addBestFace(pv, base, bVerts, bWts, bestFaces):
+    v0 = base.vertices[bVerts[0]]
+    v1 = base.vertices[bVerts[1]]
+    v2 = base.vertices[bVerts[2]]
+
+    est = bWts[0]*v0.co + bWts[1]*v1.co + bWts[2]*v2.co
+    norm = bWts[0]*v0.normal + bWts[1]*v1.normal + bWts[2]*v2.normal
+    diff = pv.co - est
+    proj = diff.dot(norm)
+    if proj < 0 and alwaysOutside:
+        proj = -proj
+    bestFaces.append((pv, bVerts, bWts, proj))    
+    return                
 
 #
-#	minWeight(wts)
+#    minWeight(wts)
 #
 
 def minWeight(wts):
-	best = 1e6
-	for w in wts:
-		if w < best:
-			best = w
-	return best
+    best = 1e6
+    for w in wts:
+        if w < best:
+            best = w
+    return best
 
 #
-#	cornerWeights(pv, verts, pob):
+#    cornerWeights(pv, verts, pob):
 #
-#	px = w0*x0 + w1*x1 + w2*x2
-#	py = w0*y0 + w1*y1 + w2*y2
-#	pz = w0*z0 + w1*z1 + w2*z2
+#    px = w0*x0 + w1*x1 + w2*x2
+#    py = w0*y0 + w1*y1 + w2*y2
+#    pz = w0*z0 + w1*z1 + w2*z2
 #
-#	w2 = 1-w0-w1
+#    w2 = 1-w0-w1
 #
-#	w0*(x0-x2) + w1*(x1-x2) = px-x2
-#	w0*(y0-y2) + w1*(y1-y2) = py-y2
+#    w0*(x0-x2) + w1*(x1-x2) = px-x2
+#    w0*(y0-y2) + w1*(y1-y2) = py-y2
 #
-#	a00*w0 + a01*w1 = b0
-#	a10*w0 + a11*w1 = b1
+#    a00*w0 + a01*w1 = b0
+#    a10*w0 + a11*w1 = b1
 #
-#	det = a00*a11 - a01*a10
+#    det = a00*a11 - a01*a10
 #
-#	det*w0 = a11*b0 - a01*b1
-#	det*w1 = -a10*b0 + a00*b1
+#    det*w0 = a11*b0 - a01*b1
+#    det*w1 = -a10*b0 + a00*b1
 #
 
 def cornerWeights(pv, verts, pob):
-	r0 = verts[0]
-	r1 = verts[1]
-	r2 = verts[2]
+    r0 = verts[0]
+    r1 = verts[1]
+    r2 = verts[2]
 
-	u01 = r1-r0
-	u02 = r2-r0
-	n = u01.cross(u02)
-	n.normalize()
+    u01 = r1-r0
+    u02 = r2-r0
+    n = u01.cross(u02)
+    n.normalize()
 
-	u = pv.co-r0
-	r = r0 + u - n*u.dot(n)
+    u = pv.co-r0
+    r = r0 + u - n*u.dot(n)
 
-	'''
-	print(list(pv))
-	print(" r  ", list(r))
-	print(" r0 ", list(r0))
-	print(" r1 ", list(r1))
-	print(" r2 ", list(r2))
-	print(" n  ", list(n))
-	'''
+    '''
+    print(list(pv))
+    print(" r  ", list(r))
+    print(" r0 ", list(r0))
+    print(" r1 ", list(r1))
+    print(" r2 ", list(r2))
+    print(" n  ", list(n))
+    '''
 
-	a00 = r0[0]-r2[0]
-	a01 = r1[0]-r2[0]
-	a10 = r0[1]-r2[1]
-	a11 = r1[1]-r2[1]
-	b0 = r[0]-r2[0]
-	b1 = r[1]-r2[1]
-	
-	det = a00*a11 - a01*a10
-	if abs(det) < 1e-20:
-		print("Clothes vert %d mapped to degenerate triangle (det = %g) with corners" % (pv.index, det))
-		print("r0", r0[0], r0[1], r0[2])
-		print("r1", r1[0], r1[1], r1[2])
-		print("r2", r2[0], r2[1], r2[2])
-		highlight(pv, pob)
-		raise NameError("Singular matrix in cornerWeights")
+    a00 = r0[0]-r2[0]
+    a01 = r1[0]-r2[0]
+    a10 = r0[1]-r2[1]
+    a11 = r1[1]-r2[1]
+    b0 = r[0]-r2[0]
+    b1 = r[1]-r2[1]
+    
+    det = a00*a11 - a01*a10
+    if abs(det) < 1e-20:
+        print("Clothes vert %d mapped to degenerate triangle (det = %g) with corners" % (pv.index, det))
+        print("r0", r0[0], r0[1], r0[2])
+        print("r1", r1[0], r1[1], r1[2])
+        print("r2", r2[0], r2[1], r2[2])
+        highlight(pv, pob)
+        raise NameError("Singular matrix in cornerWeights")
 
-	w0 = (a11*b0 - a01*b1)/det
-	w1 = (-a10*b0 + a00*b1)/det
-	
-	return (w0, w1, 1-w0-w1)
+    w0 = (a11*b0 - a01*b1)/det
+    w1 = (-a10*b0 + a00*b1)/det
+    
+    return (w0, w1, 1-w0-w1)
 
 #
-#	highlight(pv, ob):
+#    highlight(pv, ob):
 #
 
 def highlight(pv, ob):
-	me = ob.data
-	for v in me.vertices:
-		v.select = False
-	pv.select = True
-	return
-	
+    me = ob.data
+    for v in me.vertices:
+        v.select = False
+    pv.select = True
+    return
+    
 #
-#	proxyFilePtr(name):
+#    proxyFilePtr(name):
 #
 
 def proxyFilePtr(name):
-	for path in ['~/makehuman/', '/']:
-		path1 = os.path.expanduser(path+name)
-		fileName = os.path.realpath(path1)
-		try:
-			fp = open(fileName, "r")
-			print("Using header file %s" % fileName)
-			return fp
-		except:
-			print("No file %s" % fileName)
-	return None
+    for path in ['~/makehuman/', '/']:
+        path1 = os.path.expanduser(path+name)
+        fileName = os.path.realpath(path1)
+        try:
+            fp = open(fileName, "r")
+            print("Using header file %s" % fileName)
+            return fp
+        except:
+            print("No file %s" % fileName)
+    return None
 
 #
-#	printClothes(path, pob, data):	
+#    printClothes(path, pob, data):    
 #
-		
+        
 def printClothes(path, pob, data):
-	file = os.path.expanduser(path)
-	fp= open(file, "w")
+    file = os.path.expanduser(path)
+    fp= open(file, "w")
 
-	infp = proxyFilePtr('proxy_header.txt')
-	if infp:
-		for line in infp:
-			fp.write('# '+line)
-	else:
-		fp.write(
+    infp = proxyFilePtr('proxy_header.txt')
+    if infp:
+        for line in infp:
+            fp.write('# '+line)
+    else:
+        fp.write(
 "# author Unknown\n" +
 "# license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)\n" +
 "# homepage http://www.makehuman.org/\n")
 
-	fp.write("# name %s\n" % pob.name)
-	me = pob.data
+    fp.write("# name %s\n" % pob.name)
+    me = pob.data
 
-	if me.materials:
-		mat = me.materials[0]
-		fp.write("# material %s\n" % mat.name)
-		writeColor(fp, 'diffuse_color', mat.diffuse_color)
-		fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
-		fp.write('diffuse_intensity %.4f\n' % mat.diffuse_intensity)
-		writeColor(fp, 'specular_color', mat.specular_color)
-		fp.write('specular_shader %s\n' % mat.specular_shader)
-		fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
+    if me.materials:
+        mat = me.materials[0]
+        fp.write("# material %s\n" % mat.name)
+        writeColor(fp, 'diffuse_color', mat.diffuse_color)
+        fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
+        fp.write('diffuse_intensity %.4f\n' % mat.diffuse_intensity)
+        writeColor(fp, 'specular_color', mat.specular_color)
+        fp.write('specular_shader %s\n' % mat.specular_shader)
+        fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
 
-	fp.write("# verts\n")
-	for (pv, verts, wts, proj) in data:
-		#print(pv.index,verts,wts)
-		fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
-			verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
+    fp.write("# verts\n")
+    for (pv, verts, wts, proj) in data:
+        #print(pv.index,verts,wts)
+        fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
+            verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
 
-	fp.write("# obj_data\n")
-	if me.uv_textures:
-		uvtex = me.uv_textures[0]
-		#fp.write("# texverts\n")
-		fn = 0
-		for uvdata in uvtex.data.values():
-			uv = uvdata.uv_raw
-			f = me.faces[fn]
-			for n in range(len(f.vertices)):
-				fp.write("vt %.4f %.4f\n" % (uv[2*n], uv[2*n+1]))
+    fp.write("# obj_data\n")
+    if me.uv_textures:
+        uvtex = me.uv_textures[0]
+        #fp.write("# texverts\n")
+        fn = 0
+        for uvdata in uvtex.data.values():
+            uv = uvdata.uv_raw
+            f = me.faces[fn]
+            for n in range(len(f.vertices)):
+                fp.write("vt %.4f %.4f\n" % (uv[2*n], uv[2*n+1]))
 
-	#fp.write("# faces\n")
+    #fp.write("# faces\n")
 
-	if me.uv_textures:
-		n = 1
-		for f in me.faces:
-			fp.write("f ")
-			for v in f.vertices:
-				fp.write("%d/%d " % (v+1, n))
-				n += 1
-			fp.write("\n")
-	else:
-		for f in me.faces:
-			fp.write("f ")
-			for v in f.vertices:
-				fp.write("%d " % (v+1))
-			fp.write("\n")
+    if me.uv_textures:
+        n = 1
+        for f in me.faces:
+            fp.write("f ")
+            for v in f.vertices:
+                fp.write("%d/%d " % (v+1, n))
+                n += 1
+            fp.write("\n")
+    else:
+        for f in me.faces:
+            fp.write("f ")
+            for v in f.vertices:
+                fp.write("%d " % (v+1))
+            fp.write("\n")
 
-	fp.write('\n')
-	fp.close()
-	return
+    fp.write('\n')
+    fp.close()
+    return
 
 def writeColor(fp, string, color):
-	fp.write("%s %.4f %.4f %.4f\n" % (string, color[0], color[1], color[2]))
+    fp.write("%s %.4f %.4f %.4f\n" % (string, color[0], color[1], color[2]))
 
 #
-#	makeClothes(context):
+#    makeClothes(context):
 #
 
 def makeClothes(context):
-	bob = context.object
-	for pob in context.selected_objects:
-		if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
-			outpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
-			outfile = os.path.realpath(os.path.expanduser(outpath))
-			print("Creating clothes file %s" % outfile)
-			logpath = '%s/clothes.log' % context.scene['MakeClothesDirectory']
-			logfile = os.path.realpath(os.path.expanduser(logpath))
-			log = open(logfile, "w")
-			data = findClothes(context, bob, pob, log)
-			log.close()
-			printClothes(outpath, pob, data)
-			print("%s done" % outpath)
-		
-
-###################################################################################	
-#	User interface
+    bob = context.object
+    for pob in context.selected_objects:
+        if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
+            outpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
+            outfile = os.path.realpath(os.path.expanduser(outpath))
+            print("Creating clothes file %s" % outfile)
+            logpath = '%s/clothes.log' % context.scene['MakeClothesDirectory']
+            logfile = os.path.realpath(os.path.expanduser(logpath))
+            log = open(logfile, "w")
+            data = findClothes(context, bob, pob, log)
+            log.close()
+            printClothes(outpath, pob, data)
+            print("%s done" % outpath)
+        
 #
-#	initInterface()
+#
+#
+
+def offsetClothes(context)
+    inpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
+    infile = os.path.realpath(os.path.expanduser(outpath))
+    outpath = '%s/%s_1.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
+    outfile = os.path.realpath(os.path.expanduser(outpath))
+    print("Modifying clothes file %s => %s" % (infile, outfile))
+    infp = open(infile, "r")
+    outfp = open(outfile, "w")
+
+    status = False
+    for line in infp:
+        words = line.split()
+        if words[0] == "#":
+            status = (words[1] == "verts")
+            outfp.write(line)
+            pv = 0
+        elif status:
+            # 4715  5698  5726 0.00000 1.00000 -0.00000 0.00921
+            verts = [int(words[0]), int(words[1]), int(words[2])]
+            wts = [float(words[3]), float(words[4]), float(words[5])]
+
+            addBestFace(pv, base, verts, wts, bestFaces)            
+            outfp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
+                verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
+        else:
+            outfp.write(line)
+    infp.close()
+    outfp.close()
+    print("Clothes file modified %s => %s" % (infile, outfile))
+    return
+
+
+###################################################################################    
+#    User interface
+#
+#    initInterface()
 #
 
 from bpy.props import *
 
 def initInterface(scn):
-	bpy.types.Scene.MakeClothesDirectory = StringProperty(
-		name="Directory", 
-		description="Directory", 
-		maxlen=1024)
-	scn['MakeClothesDirectory'] = "~/makehuman"
+    bpy.types.Scene.MakeClothesDirectory = StringProperty(
+        name="Directory", 
+        description="Directory", 
+        maxlen=1024)
+    scn['MakeClothesDirectory'] = "~/makehuman"
 
-	bpy.types.Scene.MakeClothesOutside = BoolProperty(
-		name="Always outside", 
-		description="Invert projection if negative")
-	scn['MakeClothesOutside'] = True
+    bpy.types.Scene.MakeClothesOutside = BoolProperty(
+        name="Always outside", 
+        description="Invert projection if negative")
+    scn['MakeClothesOutside'] = True
 
-	return
-
-initInterface(bpy.context.scene)
+    return
 
 #
-#	class MakeClothesPanel(bpy.types.Panel):
+#    class MakeClothesPanel(bpy.types.Panel):
 #
 
 class MakeClothesPanel(bpy.types.Panel):
-	bl_label = "Make clothes"
-	bl_space_type = "VIEW_3D"
-	bl_region_type = "UI"
-	
-	@classmethod
-	def poll(cls, context):
-		return (context.object and context.object.type == 'MESH')
+    bl_label = "Make clothes"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        return (context.object and context.object.type == 'MESH')
 
-	def draw(self, context):
-		layout = self.layout
-		layout.operator("object.InitInterfaceButton")
-		layout.prop(context.scene, "MakeClothesDirectory")
-		layout.prop(context.scene, "MakeClothesOutside")
-		layout.operator("object.MakeClothesButton")
-		return
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("mhclo.init_interface")
+        layout.prop(context.scene, "MakeClothesDirectory")
+        layout.prop(context.scene, "MakeClothesOutside")
+        layout.operator("mhclo.make_clothes")
+        return
 
 #
-#	class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
+#    class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 #
 
 class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_InitInterfaceButton"
-	bl_label = "Initialize"
+    bl_idname = "mhclo.init_interface"
+    bl_label = "Initialize"
 
-	def execute(self, context):
-		import bpy
-		initInterface(context.scene)
-		print("Interface initialized")
-		return{'FINISHED'}	
+    def execute(self, context):
+        import bpy
+        initInterface(context.scene)
+        print("Interface initialized")
+        return{'FINISHED'}    
 
 #
-#	class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
+#    class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
 #
 
 class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
-	bl_idname = "OBJECT_OT_MakeClothesButton"
-	bl_label = "Make clothes"
+    bl_idname = "mhclo.make_clothes"
+    bl_label = "Make clothes"
 
-	def execute(self, context):
-		import bpy, mathutils
-		makeClothes(context)
-		return{'FINISHED'}	
+    def execute(self, context):
+        import bpy, mathutils
+        makeClothes(context)
+        return{'FINISHED'}    
+
+
+#
+#    Init and register
+#
+
+initInterface(bpy.context.scene)
+
+def register():
+    bpy.utils.register_module(__name__)
+    pass
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+    pass
+
+if __name__ == "__main__":
+    register()
+
 
 

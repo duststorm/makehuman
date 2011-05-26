@@ -35,6 +35,9 @@ NoBB = (1,1,1)
 NoBB = None
 bbMarg = 0.05
 
+UseExternalRig = False
+
+
 #
 #    Bone layers
 #
@@ -326,14 +329,19 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 #    writeBoneGroups(fp):
 #
 
-BoneGroups = [
-    ('Master', 'THEME13'),
-    ('Spine', 'THEME05'),
-    ('FK_L', 'THEME09'),
-    ('FK_R', 'THEME02'),
-    ('IK_L', 'THEME03'),
-    ('IK_R', 'THEME04'),
-]
+import external_rig
+
+if UseExternalRig:
+    BoneGroups = external_rig.getBoneGroups()
+else:
+    BoneGroups = [
+        ('Master', 'THEME13'),
+        ('Spine', 'THEME05'),
+        ('FK_L', 'THEME09'),
+        ('FK_R', 'THEME02'),
+        ('IK_L', 'THEME03'),
+        ('IK_R', 'THEME04'),
+    ]
 
 def boneGroupIndex(grp):
     index = 1
@@ -604,16 +612,22 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
             addLimitScaleConstraint(fp, rig, cflags, inf, data)
         elif typ == 'Transform':
             addTransformConstraint(fp, rig, cflags, inf, data)
+        elif typ == 'LockedTrack':
+            addLockedTrackConstraint(fp, rig, cflags, inf, data)
         elif typ == 'DampedTrack':
             addDampedTrackConstraint(fp, rig, cflags, inf, data)
         elif typ == 'StretchTo':
             addStretchToConstraint(fp, rig, cflags, inf, data)
+        elif typ == 'TrackTo':
+            addTrackToConstraint(fp, rig, cflags, inf, data)
         elif typ == 'LimitDist':
             addLimitDistConstraint(fp, rig, cflags, inf, data)
         elif typ == 'ChildOf':
             addChildOfConstraint(fp, rig, cflags, inf, data)
         elif typ == 'SplineIK':
             addSplineIkConstraint(fp, rig, cflags, inf, data)
+        elif typ == 'Floor':
+            addFloorConstraint(fp, rig, cflags, inf, data)
         else:
             print(label)
             print(typ)
@@ -843,7 +857,6 @@ def addCopyTransConstraint(fp, rig, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
-    inf = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
     
     fp.write(
@@ -1058,6 +1071,31 @@ def addDampedTrackConstraint(fp, rig, flags, inf, data):
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
+"      track_axis '%s' ;\n" % track + 
+"    end Constraint\n")
+    return
+
+
+#
+#    addLockedTrackConstraint(fp, rig, flags, inf, data):
+#
+def addLockedTrackConstraint(fp, rig, flags, inf, data):
+    global Mhx25
+    name = data[0]
+    subtar = data[1]
+    track = data[2]
+    (ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+    fp.write(
+"    Constraint %s LOCKED_TRACK True\n" % name +
+"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      active %s ;\n" % active +
+"      show_expanded %s ;\n" % expanded +
+"      influence %s ;\n" % inf +
+"      owner_space '%s' ;\n" % ownsp+
+"      is_proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp+
 "      track '%s' ;\n" % track + 
 "    end Constraint\n")
     return
@@ -1107,6 +1145,35 @@ def addStretchToConstraint(fp, rig, flags, inf, data):
     return
 
 #
+#    addTrackToConstraint(fp, rig, flags, inf, data):
+#
+def addTrackToConstraint(fp, rig, flags, inf, data):
+    name = data[0]
+    subtar = data[1]
+    head_tail = data[2]
+    track_axis = data[3]
+    up_axis = data[4]
+    use_target_z = data[5]
+    (ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+    fp.write(
+"    Constraint %s TRACK_TO True\n" % name +
+"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      active %s ;\n" % active +
+"      show_expanded %s ;\n" % expanded +
+"      head_tail %s ;\n" % head_tail +
+"      influence %s ;\n" % inf +
+"      track_axis '%s' ;\n" % track_axis +
+"      up_axis '%s' ;\n" % up_axis +
+"      owner_space '%s' ;\n" % ownsp+
+"      is_proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp+
+"      use_target_z %s ;\n" % use_target_z +
+"    end Constraint\n")
+    return
+
+#
 #    addLimitDistConstraint(fp, rig, flags, inf, data):
 #
 def addLimitDistConstraint(fp, rig, flags, inf, data):
@@ -1123,7 +1190,7 @@ def addLimitDistConstraint(fp, rig, flags, inf, data):
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
-"      limit_mode 'LIMITDIST_%s' ;\n" % typ +
+"      limit_mode '%s' ;\n" % typ +
 "      owner_space '%s' ;\n" % ownsp +
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
@@ -1205,6 +1272,36 @@ def addSplineIkConstraint(fp, rig, flags, inf, data):
 "      use_even_divisions False ;\n" +
 "      use_y_stretch True ;\n" +
 "      xz_scale_mode 'NONE' ;\n" +
+"    end Constraint\n")
+    return
+
+#
+#    addFloorConstraint(fp, rig, flags, inf, data):
+#
+
+def addFloorConstraint(fp, rig, flags, inf, data):
+    name = data[0]
+    subtar = data[1]
+    floor_location = data[2]
+    offset = data[3]
+    use_rotation = data[4]
+    use_sticky = data[5]
+    (ownsp, targsp, active, expanded) = constraintFlags(flags)
+
+    fp.write(
+"    Constraint %s FLOOR True\n" % name +
+"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      active %s ;\n" % active +
+"      show_expanded %s ;\n" % expanded +
+"      influence %s ;\n" % inf +
+"      floor_location '%s' ;\n" % floor_location +
+"      offset %.4f ;\n" % offset +
+"      owner_space '%s' ;\n" % ownsp+
+"      is_proxy_local False ;\n" +
+"      subtarget '%s' ;\n" % subtar +
+"      target_space '%s' ;\n" % targsp+
+"      use_rotation %s ;\n" % use_rotation +
+"      use_sticky %s ;\n" % use_sticky +
 "    end Constraint\n")
     return
 
@@ -1681,9 +1778,14 @@ def setupCircles(fp):
 #    writeAllActions(fp)    
 #    writeAllDrivers(fp)    
 #
+
 import rig_joints_25, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 
 def setupRig(obj):
+    if UseExternalRig:
+        newSetupJoints(obj, external_rig.Joints, external_rig.HeadsTails, False)
+        return
+    
     newSetupJoints(obj, 
         rig_joints_25.DeformJoints +
         rig_body_25.BodyJoints +
@@ -1706,6 +1808,10 @@ def setupRig(obj):
     return
     
 def writeControlArmature(fp):
+    if UseExternalRig:
+        writeArmature(fp, external_rig.Armature, True)
+        return
+        
     writeArmature(fp, 
         rig_body_25.BodyArmature +
         rig_arm_25.ArmArmature +
@@ -1725,6 +1831,10 @@ def writeAllCurves(fp):
     return 
 
 def writeControlPoses(fp):
+    if UseExternalRig:
+        external_rig.WritePoses(fp)
+        return
+        
     writeBoneGroups(fp)
     
     rig_body_25.BodyControlPoses(fp)
@@ -1753,6 +1863,11 @@ def writeAllActions(fp):
     return
 
 def writeAllDrivers(fp):
+    if UseExternalRig:
+        return
+        writeDrivers(fp, True, external_rig.Drivers)
+        return
+
     writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
     writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
     #rig_panel_25.FingerControlDrivers(fp)

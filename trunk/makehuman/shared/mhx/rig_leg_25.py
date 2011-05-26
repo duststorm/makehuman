@@ -338,12 +338,12 @@ def LegControlPoses(fp):
 	addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hips', (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, 1, ['DistHip', 'Hips', 'INSIDE'])])
+		('LimitDist', 0, 1, ['DistHip', 'Hips', 'LIMITDIST_INSIDE'])])
 
 	addPoseBone(fp, 'LegIK_R', 'MHFootCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
 		mhx_rig.rootChildOfConstraints + [
 		('ChildOf', C_CHILDOF, 0, ['Hip', 'Hips', (1,1,1), (1,1,1), (1,1,1)]),
-		('LimitDist', 0, 1, ['DistHip', 'Hips', 'INSIDE'])])
+		('LimitDist', 0, 1, ['DistHip', 'Hips', 'LIMITDIST_INSIDE'])])
 
 	addPoseBone(fp, 'FootRev_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
 		[('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_L, (1,1,1)])])
