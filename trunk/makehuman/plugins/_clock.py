@@ -6,20 +6,20 @@ from gui3d import TextObject
 from datetime import datetime
 from threading import Thread
 from time import sleep
+from mh import callAsync
 
 class ClockThread(Thread):
 
-    def __init__(self, clockText):
+    def __init__(self, method):
     
         Thread.__init__(self)
-        self.clockText = clockText
+        self.method = method
     
     def run(self):
 
         while 1:
             sleep(1)
-            self.clockText.setText(datetime.now().strftime("%H:%M:%S"))
-            self.clockText.app.redraw()
+            callAsync(self.method)
 
 print 'clock imported'
 
@@ -31,7 +31,12 @@ clockThread = None
 def load(app):
     clockText = TextObject(app, position=[740, 10, 9.2])
     clockText.setText(datetime.now().strftime("%H:%M:%S"))
-    clockThread = ClockThread(clockText)
+    
+    def updateClock():
+        clockText.setText(datetime.now().strftime("%H:%M:%S"))
+        clockText.app.redraw()
+            
+    clockThread = ClockThread(updateClock)
     clockThread.start()
 
     print 'clock loaded'
