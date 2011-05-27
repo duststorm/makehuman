@@ -771,26 +771,16 @@ class RenderThread(Thread):
         n = 0
         for filename in self.filenames:
 
-            #print "Rendering: %s"%(filename)
-            print "Percentage: %f"%(n*(100/len(self.filenames)))
-
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 
-            #self.app.progress(0.0)
-            #self.app.scene3d.redraw()
+            mh.callAsync(lambda:self.app.progress(0.0))
 
             for line in renderProc.stdout:
               if line.startswith("progress"):
                 progress = line.split()
-                #self.app.progress(float(progress[2])/100.0)
-                #self.app.scene3d.redraw()
-                #print progress
+                mh.callAsync(lambda:self.app.progress(float(progress[2])/100.0))
 
-            #self.app.progress(1.0)
-            #self.app.scene3d.redraw()
+            mh.callAsync(lambda:self.app.progress(1.0))
+            mh.callAsync(lambda:self.app.scene3d.redraw())
             n = n+1
-
-
-
-
