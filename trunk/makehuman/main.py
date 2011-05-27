@@ -168,6 +168,7 @@ class MHApplication(gui3d.Application):
         mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
         self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
         self.progressBar = gui3d.ProgressBar(self, style=gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85))
+        self.progressBar.text = gui3d.TextView(self.progressBar, style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight))
         self.scene3d.update()
         self.redrawNow()
         
@@ -604,8 +605,10 @@ class MHApplication(gui3d.Application):
         return self.fonts[fontFamily]
 
     # Global progress bar
-    def progress(self, value):
+    def progress(self, value, text=None):
         self.progressBar.setProgress(value)
+        if text is not None:
+            self.progressBar.text.setText(text)
         if value <= 0:
             self.progressBar.show()
         elif value >= 1.0:

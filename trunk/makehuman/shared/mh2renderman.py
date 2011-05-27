@@ -748,11 +748,11 @@ class RMRScene:
         if  recalculateAll == 1:
             self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
             self.writeSkinBakeFile()
-            filesTorender.append(self.bakeFilename)
+            filesTorender.append((self.bakeFilename, 'Calculating SSS'))
 
         self.writeWorldFile(self.worldFileName)
         self.writeSceneFile()
-        filesTorender.append(self.sceneFileName)
+        filesTorender.append((self.sceneFileName, 'Rendering scene'))
 
         renderThread = RenderThread(self.app, filesTorender)
         renderThread.start()
@@ -769,12 +769,12 @@ class RenderThread(Thread):
 
     def run(self):
         n = 0
-        for filename in self.filenames:
+        for filename, status in self.filenames:
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 
-            mh.callAsync(lambda:self.app.progress(0.0))
+            mh.callAsync(lambda:self.app.progress(0.0, status))
 
             for line in renderProc.stdout:
               if line.startswith("progress"):
