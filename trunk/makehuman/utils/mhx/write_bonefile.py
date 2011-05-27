@@ -36,13 +36,30 @@ BoneLayers = [
 #
 
 def writeBones(character, fp):
-    ob = bpy.context.object
-    amt = ob.data
+    amt = None
+    me = None
+    for ob in bpy.context.scene.objects:
+        if ob.select:
+            if ob.type == 'ARMATURE':
+                if amt:
+                    raise NameError("Two armatures selected")
+                rig = ob
+                amt = rig.data
+            elif ob.type == 'MESH':
+                if me:
+                    raise NameError("Two meshes selected")
+                me = ob.data
+    if amt and me:
+        print("Using %s and %s" % (amt, me))
+    else:
+        raise NameError("Must select one mesh and one armature")
+    bpy.context.scene.objects.active = rig
 
     bpy.ops.object.mode_set(mode='EDIT')
     bones = amt.edit_bones.values()
 
     # List name of deform bones, to modify vertexgroup names
+    """
     fp.write("%sDeform = {\n" % character)
     for b in bones:
         (bType, bName) = extractName(b)
@@ -50,6 +67,7 @@ def writeBones(character, fp):
         if bType == 'DEF':
             fp.write("\t'%s':%s'%s',\n" % (bName, pad, b.name.replace(' ','_')))
     fp.write("}\n\n")
+    """
     
     # List symbolic joint locations
     joints = {}
@@ -57,8 +75,8 @@ def writeBones(character, fp):
     for b in bones:
         (bType, bName) = extractName(b)
         pad = doPad(len(bName), 6)
-        writeJoint(fp, bName+"_head", b.head, pad, joints)
-        writeJoint(fp, bName+"_tail", b.tail, pad, joints)
+        writeJoint(fp, bName+"_head", b.head, pad, joints, me)
+        writeJoint(fp, bName+"_tail", b.tail, pad, joints, me)
     fp.write("]\n\n")
 
     # List symbolic names for heads and tails
@@ -152,7 +170,7 @@ def writeBones(character, fp):
     # Posebones
     #
     bpy.ops.object.mode_set(mode='POSE')
-    pbones = ob.pose.bones.values()
+    pbones = rig.pose.bones.values()
     fp.write(
 "def %sWritePoses(fp):\n" % character +
 "\tglobal boneGroups\n" +
@@ -160,12 +178,12 @@ def writeBones(character, fp):
 
     # addPoseBone(fp, bone, customShape, boneGroup, pb.lockLoc, pb.lockRot, pb.lockScale, flags, constraints)
     for pb in pbones:
-        fp.write("\taddPoseBone(fp, '%s', " % pb.name.replace(' ','_'))
-        if 0 and pb.custom_shape:
+        fp.write("\tmhx_rig.addPoseBone(fp, '%s', " % pb.name.replace(' ','_'))
+        if pb.custom_shape:
             fp.write("'%s', " % pb.custom_shape.name.replace(' ','_'))
         else:
             fp.write("None, ")
-        if 0 and pb.bone_group:
+        if pb.bone_group:
             fp.write("'%s', " % pb.bone_group.name.replace(' ','_'))
         else:
             fp.write("None, ")
@@ -200,16 +218,27 @@ def writeBones(character, fp):
         else:
             fp.write(", [])\n\n")
     fp.write("\treturn\n")
+    
+    #
+    #   Properties
+    #
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    fp.write("\n%sObjectProps = [" % character)
+    print_props(fp, rig)
+    fp.write("\n]\n\n%sArmatureProps = [" % character)
+    print_props(fp, amt)
+    fp.write("]\n\n")
 
     #
     #   Animation data
     #
     
     bpy.ops.object.mode_set(mode='OBJECT')
-    if ob.animation_data == None:
+    if rig.animation_data == None:
         return
-    fp.write("\n%sDrivers = [\n" % character)
-    for fcu in ob.animation_data.drivers:
+    fp.write("\ndef get%sDrivers():\n\thuman = mh2mhx.theHuman\n\treturn [\n" % character)
+    for fcu in rig.animation_data.drivers:
         try:
             drv = fcu.driver
         except:
@@ -219,6 +248,7 @@ def writeBones(character, fp):
         typ = ("unk", len(words))
         if len(words) == 3:
             typ = words[2].split('.')[1]
+            index = fcu.array_index
             if typ == 'rotation_euler':
                 typ = 'ROTE'
             elif typ == 'rotation_quaternion':
@@ -227,6 +257,7 @@ def writeBones(character, fp):
                 typ = 'LOC'
             name = None
         elif len(words) == 5:
+            index = -1
             if words[4] == ']':
                 typ = "PROP"
                 name = words[3]
@@ -235,11 +266,28 @@ def writeBones(character, fp):
                 name = words[3]
             
         fp.write("  ('%s', '%s', " % (bone, typ))
+        if drv.type == 'SCRIPTED':
+            fp.write('("SCRIPTED","%s")' % drv.expression)
+        else:
+            fp.write("'%s', " % drv.type)
         if name:
             fp.write("'%s', " % name.replace(' ','_'))
         else:
             fp.write("None, ")
-        fp.write("%d, '%s', [" % (fcu.array_index, drv.expression))
+
+        fp.write("%d, " % index)        
+
+        try:
+            mod = fcu.modifiers[0]
+        except:
+            mod = None
+        if mod:
+            a0 = mod.coefficients[0]
+            a1 = mod.coefficients[1]
+            fp.write("(%.3g,%.3g), [" % (a0, a1))        
+        else:
+            fp.write("None, [")
+        
         for var in drv.variables:
             fp.write("\n\t\t('%s', '%s', [" % (var.name, var.type))
             for targ in var.targets:
@@ -247,7 +295,17 @@ def writeBones(character, fp):
                     flags = 'C_LOCAL'
                 else:
                     flags = '0'
-                fp.write("('%s', '%s', '%s', %s) " % (targ.data_path, targ.bone_target, targ.transform_type, flags))
+                if var.type == 'TRANSFORMS':
+                    fp.write("('%s', human, '%s', '%s', %s) " % 
+                        (targ.id_type, targ.bone_target, targ.transform_type, flags))
+                elif var.type == 'ROTATION_DIFF':
+                    fp.write("('%s', human, '%s', %s) " % 
+                        (targ.id_type, targ.bone_target, flags))
+                elif var.type == 'SINGLE_PROP':
+                    fp.write("('%s', human, '%s') " % 
+                        (targ.id_type, targ.data_path))
+                else:
+                    raise NameError("Illegal driver var type %s" % var.type)                    
             fp.write("]),")
         fp.write("]),\n")
     fp.write("]\n\n")
@@ -255,8 +313,22 @@ def writeBones(character, fp):
     return
 
 #
+#   print_props(fp, rna):
+#
+
+def print_props(fp, rna):
+    for (key,value) in rna.items():
+        if type(value) == float:
+            fp.write("\n\t('%s', %.3f)," % (key,value))
+        elif type(value) == int:
+            fp.write("\n\t('%s', %d)," % (key,value))
+        elif type(value) == str:
+            fp.write("\n\t('%s', '\"%s\"')," % (key,value))
+    return
+
+#
 #   findJoint(jName, x, joints):
-#   writeJoint(fp, jName, loc, joints):
+#   writeJoint(fp, jName, loc, joints, me):
 #
 
 def findJoint(jName, x, joints):
@@ -272,14 +344,26 @@ def findJoint(jName, x, joints):
             return (jy, y)
     return None
 
-def writeJoint(fp, jName, loc, pad, joints):
+def writeJoint(fp, jName, loc, pad, joints, me):
     found = findJoint(jName, loc, joints)
     if found:
         joints[jName] = found
     else:
-        fp.write("\t('%s',%s'x', [%.6f, %.6f, %.6f]),\n" % (jName, pad, loc[0], loc[1], loc[2]))
+        #fp.write("\t('%s',%s'x', [%.6f, %.6f, %.6f]),\n" % (jName, pad, loc[0], loc[1], loc[2]))
         joints[jName] = (jName, loc)
+        v = closestVert(loc, me)
+        offs = loc - v.co
+        fp.write("\t('%s',%s'vo', [%d, %.6f, %.6f, %.6f]),\n" % (jName, pad, v.index, offs[0], offs[1], offs[2]))
     return
+    
+def closestVert(loc, me):
+    mindist = 1e6
+    for v in me.vertices:
+        offs = loc - v.co
+        if offs.length < mindist:
+            best = v
+            mindist = offs.length
+    return best
 
 #
 #

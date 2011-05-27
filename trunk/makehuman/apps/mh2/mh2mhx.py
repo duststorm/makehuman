@@ -149,8 +149,8 @@ def exportMhx_25(human, fp):
     if theConfig.useRig == 'mhx':
         rig = theConfig.useRig
         fp.write("#if toggle&T_Armature\n")
-        copyFile25(human, "shared/mhx/templates/custom-shapes25.mhx", rig, fp, None, [])    
-        copyFile25(human, "shared/mhx/templates/gizmos25.mhx", rig, fp, None, [])    
+        for fname in mhx_rig.GizmoFiles:
+        	copyFile25(human, fname, rig, fp, None, [])    
         mhx_rig.setupCircles(fp)
         copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])    
         fp.write("#endif\n")
@@ -306,6 +306,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                 fp.write("end Process\n")
             elif words[1] == 'rig-correct':
                 fp.write("CorrectRig %s ;\n" % theHuman)
+            elif words[1] == 'recalc-roll':
+            	fp.write("  RecalcRoll %s ;\n" % mhx_rig.RecalcRoll)
             elif words[1] == 'ProxyRigStart':
                 proxy = mh2proxy.readProxyFile(obj, proxyStuff)
                 proxyData[proxy.name] = proxy
@@ -485,6 +487,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 "    end Modifier\n")
             elif words[1] == 'curves':
                 mhx_rig.writeAllCurves(fp)
+            elif words[1] == 'properties':
+                mhx_rig.writeAllProperties(fp, words[2])
             elif words[1] == 'material-drivers':
                 if 0 and BODY_LANGUAGE:
                     fp.write("MaterialAnimationData %sMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0\n" % theHuman)
@@ -769,8 +773,10 @@ def writeShapeKeys(fp, human, rig, name, proxy):
 
     if (not proxy or proxy.type == 'Proxy'):
         if theConfig.faceshapes:
-            fp.write("#if toggle&T_Face\n")        
-            if BODY_LANGUAGE:
+            fp.write("#if toggle&T_Face\n")  
+            if mhx_rig.UseExternalRig:
+                pass      
+            elif BODY_LANGUAGE:
                 copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)    
             else:
                 copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)    
@@ -793,7 +799,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
         fp.write("#endif\n")
 
-    if rig != 'mhx':
+    if rig != 'mhx' or mhx_rig.UseExternalRig:
         fp.write(
 "end ShapeKeys\n" +
 "#endif\n")

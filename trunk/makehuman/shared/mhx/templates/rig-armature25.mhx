@@ -12,11 +12,12 @@ NoScale False ;
   show_names False ;
   draw_type 'STICK' ;
   layers Array 1 1 1 1 1 1 1 1  1 1 1 1 1 1 0 0  0 1 1 1 1 1 1 1  0 0 0 1 0 0 0 1  ;
-  RecalcRoll ['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R'] ;
+  *** recalc-roll
   layers Array 1 1 1 1 1 1 1 1  1 1 1 1 1 1 0 0  0 1 1 1 1 1 1 1  0 0 0 1 0 0 0 0  ;
   layers_protected Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
   pose_position 'POSE' ;
   use_mirror_x False ;
+  *** properties Armature
 end Armature
 
 *** human-object ControlRig
@@ -27,6 +28,7 @@ end Armature
   Property MhxScale theScale ;
   Property MhxRig 'Control' ;
   Property MhxVisemeSet 'BodyLanguage' ;
+  *** properties Object
 end Object
 
 *** curves

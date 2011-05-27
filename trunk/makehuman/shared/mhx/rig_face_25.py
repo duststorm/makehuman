@@ -124,8 +124,8 @@ def FaceDeformDrivers(fp):
 
 	drivers = []
 	for (driven, driver, coeff) in lidBones:
-		drivers.append(	(driven, 'ROTQ', None, 1, coeff,
-		 [("var", 'TRANSFORMS', [(mh2mhx.theHuman, driver, 'LOC_Z', C_LOC)])]) )
+		drivers.append(	(driven, 'ROTQ', 'AVERAGE', None, 1, coeff,
+		 [("var", 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, driver, 'LOC_Z', C_LOC)])]) )
 	writeDrivers(fp, True, drivers)
 	return
 

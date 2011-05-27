@@ -164,6 +164,10 @@ def newSetupJoints (obj, joints, headTails, moveOrigin):
             locations[key] = obj.verts[v].co
         elif typ == 'x':
             locations[key] = [float(data[0]), float(data[2]), -float(data[1])]
+        elif typ == 'vo':
+            v = int(data[0])
+            loc = obj.verts[v].co
+            locations[key] = [loc[0]+float(data[1]), loc[1]+float(data[3]), loc[2]-float(data[2])]
         elif typ == 'f':
             (raw, head, tail, offs) = data
             rloc = locations[raw]
@@ -326,13 +330,18 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
     return
 
 #
-#    writeBoneGroups(fp):
+#    Interface to external rigs.
+#   Continues in external_rig.py
 #
 
-#import external_rig
+import external_rig
 
 if UseExternalRig:
-    BoneGroups = external_rig.getBoneGroups()
+    BoneGroups = external_rig.BoneGroups
+    RecalcRoll = external_rig.RecalcRoll
+    GizmoFiles = external_rig.GizmoFiles
+    ObjectProps = external_rig.ObjectProps
+    ArmatureProps = external_rig.ArmatureProps
 else:
     BoneGroups = [
         ('Master', 'THEME13'),
@@ -342,6 +351,14 @@ else:
         ('IK_L', 'THEME03'),
         ('IK_R', 'THEME04'),
     ]
+    RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
+    GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", "./shared/mhx/templates/gizmos25.mhx"]
+    ObjectProps = []
+    ArmatureProps = []
+
+#
+#    writeBoneGroups(fp):
+#
 
 def boneGroupIndex(grp):
     index = 1
@@ -1083,7 +1100,7 @@ def addLockedTrackConstraint(fp, rig, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
-    track = data[2]
+    trackAxis = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
 
     fp.write(
@@ -1096,7 +1113,7 @@ def addLockedTrackConstraint(fp, rig, flags, inf, data):
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
-"      track '%s' ;\n" % track + 
+"      track_axis '%s' ;\n" % trackAxis + 
 "    end Constraint\n")
     return
 
@@ -1381,7 +1398,7 @@ def writeFCurves(fp, name, quats):
 
 def writeFkIkSwitch(fp, drivers):
     for (bone, cond, cnsFK, cnsIK, targ, channel, mx) in drivers:
-        cnsData = ("ik", 'TRANSFORMS', [(mh2mhx.theHuman, targ, channel, C_LOC)])
+        cnsData = ("ik", 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)])
         for cnsName in cnsFK:
             writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (mx,-mx), [cnsData])
         for cnsName in cnsIK:
@@ -1393,7 +1410,7 @@ def writeFkIkSwitch(fp, drivers):
 
 def writeEnumDrivers(fp, drivers):
     for (bone, cns, targ, channel) in drivers:
-        drvVars = [("x", 'TRANSFORMS', [(mh2mhx.theHuman, targ, channel, C_LOC)])]
+        drvVars = [("x", 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)])]
         for n, cnsName in enumerate(cns):
             expr = '(x>%.1f)*(x<%.1f)' % (n-0.5, n+0.5)
             writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), drvVars)
@@ -1454,12 +1471,12 @@ def writePropDrivers(fp, drivers):
                 n = 1
                 drvVars = []
                 for prop1 in prop:
-                    drvVars.append( ("x%d" % n, 'SINGLE_PROP', [(mh2mhx.theHuman, prop1)]) )
+                    drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, prop1)]) )
                     n += 1
                 (cns1,expr) = cns
                 writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), -1, (0,1), drvVars)
             else:
-                drvVars = [("x", 'SINGLE_PROP', [(mh2mhx.theHuman, prop)])]
+                drvVars = [("x", 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, prop)])]
                 if typ == D_ENUM:
                     (cns1,expr) = cns
                     writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), -1, (0,1), drvVars)
@@ -1476,7 +1493,7 @@ def writeTextureDrivers(fp, drivers):
     for (tex, vlist) in drivers.items():
         drvVars = []
         (texnum, targ, channel, coeff) = vlist
-        drvVars.append( (targ, 'TRANSFORMS', [(mh2mhx.theHuman, targ, channel, C_LOC)]) )
+        drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)]) )
         writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
     return
 
@@ -1490,7 +1507,7 @@ def writeShapeDrivers(fp, drivers, proxy):
         if mh2mhx.useThisShape(shape, proxy):
             drvVars = []
             (targ, channel, coeff) = vlist
-            drvVars.append( (targ, 'TRANSFORMS', [(mh2mhx.theHuman, targ, channel, C_LOC)]) )
+            drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)]) )
             writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
     return
 
@@ -1507,7 +1524,7 @@ def writeMuscleDrivers(fp, drivers, rig):
         else:
             drvdata = 'MIN'
         for (var, targ1, targ2) in targs:
-            drvVars.append( (var, 'ROTATION_DIFF', [(rig, targ1, C_LOC), (rig, targ2, C_LOC)]) )
+            drvVars.append( (var, 'ROTATION_DIFF', [('OBJECT', rig, targ1, C_LOC), ('OBJECT', rig, targ2, C_LOC)]) )
         writeDriver(fp, True, drvdata, "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, keypoints, drvVars)
     return
 
@@ -1521,8 +1538,8 @@ def writeRotDiffDrivers(fp, drivers, proxy):
         if mh2mhx.useThisShape(shape, proxy):
             (targ1, targ2, keypoints) = vlist
             drvVars = [(targ2, 'ROTATION_DIFF', [
-            (mh2mhx.theHuman, targ1, C_LOC),
-            (mh2mhx.theHuman, targ2, C_LOC)] )]
+            ('OBJECT', mh2mhx.theHuman, targ1, C_LOC),
+            ('OBJECT', mh2mhx.theHuman, targ2, C_LOC)] )]
             writeDriver(fp, True, 'MIN', "", "key_blocks[\"%s\"].value" % (shape), -1, keypoints, drvVars)
     return
 
@@ -1532,17 +1549,17 @@ def writeRotDiffDrivers(fp, drivers, proxy):
 
 def writeDrivers(fp, cond, drivers):
     for drv in drivers:
-        (bone, typ, name, index, coeffs, variables) = drv
+        (bone, typ, drvdata, name, index, coeffs, variables) = drv
         if typ == 'INFL':
-            writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
+            writeDriver(fp, cond, drvdata, "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, name), index, coeffs, variables)
         elif typ == 'ROTE':
-            writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
+            writeDriver(fp, cond, drvdata, "", "pose.bones[\"%s\"].rotation_euler" % bone, index, coeffs, variables)
         elif typ == 'ROTQ':
-            writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
+            writeDriver(fp, cond, drvdata, "", "pose.bones[\"%s\"].rotation_quaternion" % bone, index, coeffs, variables)
         elif typ == 'LOC':
-            writeDriver(fp, cond, 'AVERAGE', "*theScale", "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
+            writeDriver(fp, cond, drvdata, "*theScale", "pose.bones[\"%s\"].location" % bone, index, coeffs, variables)
         elif typ == 'SCALE':
-            writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
+            writeDriver(fp, cond, drvdata, "", "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
         else:
             print drv
             raise NameError("Unknown driver type %s" % typ)
@@ -1572,12 +1589,12 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 
         if typ == 'TRANSFORMS':
             useMod = True
-            for (targ, boneTarg, ttype, flags) in targets:
+            for (idtype, targ, boneTarg, ttype, flags) in targets:
                 if ttype[0:3] == 'LOC':
                     useLoc = True
                 local = boolString(flags & C_LOC)
                 fp.write(
-"          Target %s OBJECT\n" % targ +
+"          Target %s %s\n" % (targ, idtype) +
 "            transform_type '%s' ;\n" % ttype +
 "            bone_target '%s' ;\n" % boneTarg +
 "            use_local_space_transform %s ;\n" % local +
@@ -1585,19 +1602,19 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 
         elif typ == 'ROTATION_DIFF':
             useKeypoints = True
-            for (targ, boneTarg, flags) in targets:
+            for (idtype, targ, boneTarg, flags) in targets:
                 fp.write(
-"          Target %s OBJECT\n" % targ +
+"          Target %s %s\n" % (targ, idtype) +
 "            bone_target '%s' ;\n" % boneTarg +
 "            use_local_space_transform False ; \n" +
 "          end Target\n")
 
         elif typ == 'SINGLE_PROP':
             useMod = True
-            for (targ, boneTarg) in targets:
+            for (idtype, targ, datapath) in targets:
                 fp.write(
-"          Target %s OBJECT\n" % targ +
-"            data_path '%s' ;\n" % boneTarg +
+"          Target %s %s\n" % (targ, idtype) +
+"            data_path '%s' ;\n" % datapath +
 "          end Target\n")
 
         else:
@@ -1831,12 +1848,11 @@ def writeAllCurves(fp):
     return 
 
 def writeControlPoses(fp):
-    if UseExternalRig:
-        external_rig.WritePoses(fp)
-        return
-        
     writeBoneGroups(fp)
-    
+    if UseExternalRig:
+        external_rig.writePoses(fp)
+        return
+            
     rig_body_25.BodyControlPoses(fp)
     rig_arm_25.ArmControlPoses(fp)
     rig_finger_25.FingerControlPoses(fp)
@@ -1864,8 +1880,8 @@ def writeAllActions(fp):
 
 def writeAllDrivers(fp):
     if UseExternalRig:
-        return
-        writeDrivers(fp, True, external_rig.Drivers)
+        drivers = external_rig.getDrivers()
+        writeDrivers(fp, True, drivers)
         return
 
     writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
@@ -1876,6 +1892,14 @@ def writeAllDrivers(fp):
     rig_face_25.FaceDeformDrivers(fp)
     return
 
+def writeAllProperties(fp, typ):
+    if typ == 'Object':
+        props = ObjectProps
+    elif typ == 'Armature':
+        props = ArmatureProps
+    for (key, val) in props:
+        fp.write("  Property %s %s ;\n" % (key, val))
+    return
 
 #
 #    Bending
