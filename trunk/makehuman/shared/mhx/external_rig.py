@@ -21,8 +21,8 @@ Interface to external rig
 
 import mhx_rig
 
-ExternalRig = "Zepam"
-#ExternalRig = None
+#ExternalRig = "Zepam"
+ExternalRig = None
 
 if ExternalRig == "Zepam":
     import zepam_rig
