@@ -782,5 +782,6 @@ class RenderThread(Thread):
                 mh.callAsync(lambda:self.app.progress(float(progress[2])/100.0))
 
             mh.callAsync(lambda:self.app.progress(1.0))
-            mh.callAsync(lambda:self.app.scene3d.redraw())
             n = n+1
+            
+        mh.callAsync(lambda:self.app.redraw())
