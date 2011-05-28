@@ -606,13 +606,13 @@ class MHApplication(gui3d.Application):
 
     # Global progress bar
     def progress(self, value, text=None):
-        self.progressBar.setProgress(value)
         if text is not None:
             self.progressBar.text.setText(text)
         if value <= 0:
             self.progressBar.show()
         elif value >= 1.0:
             self.progressBar.hide()
+        self.progressBar.setProgress(value)
     
     # Global dialog
     def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):

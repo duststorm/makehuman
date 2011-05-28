@@ -768,7 +768,7 @@ class RenderThread(Thread):
         self.filenames = filenames
 
     def run(self):
-        n = 0
+
         for filename, status in self.filenames:
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
@@ -782,6 +782,3 @@ class RenderThread(Thread):
                 mh.callAsync(lambda:self.app.progress(float(progress[2])/100.0))
 
             mh.callAsync(lambda:self.app.progress(1.0))
-            n = n+1
-            
-        mh.callAsync(lambda:self.app.redraw())

@@ -69,7 +69,7 @@ class HumanTextureTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
         self.filechooser = gui3d.FileChooser(self, 'data/skins', 'tif', 'png')
-        
+        self.mediaSync = None
         self.currentTexture = gui3d.Button(self.app.categories['Modelling'],
             style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=self.app.selectedHuman.getTexture()))
 
@@ -102,8 +102,8 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.app.selectedHuman.hide()
         self.filechooser.setFocus()
         
-        if not len([filename for filename in os.listdir('data/skins') if filename.endswith('tif')]):
-            
+        #if not len([filename for filename in os.listdir('data/skins') if filename.endswith('tif')]):
+        if True:    
             self.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
 
     def onHide(self, event):
@@ -131,18 +131,15 @@ class HumanTextureTaskView(gui3d.TaskView):
         
     def syncMedia(self):
         
-        cache = download.DownloadCache('data/skins')
-        success, code = cache.download('http://www.makehuman.org/download/skins/media.ini')
-        if success:
-            f = open(os.path.join('data/skins', 'media.ini'), 'r')
-            for filename in f:
-                url = os.path.join('http://www.makehuman.org/download/skins/', filename.split()[0])
-                print('downloading %s' % url)
-                success, code = cache.download(url)
-            f.close()
-        else:
-            self.app.prompt('Error', 'Failed to get the list of skins at the makehuman media repository, error %d.' % code, 'OK')
-
+        if self.mediaSync:
+            return
+        self.mediaSync = download.MediaSync(self.app, 'data/skins', 'http://www.makehuman.org/download/skins/', self.syncMediaFinished)
+        self.mediaSync.start()
+        
+    def syncMediaFinished(self):
+        
+        self.mediaSync = None
+        
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 

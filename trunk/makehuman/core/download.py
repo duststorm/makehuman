@@ -1,5 +1,40 @@
 import os
 import urllib2
+import mh
+from threading import Thread
+
+class MediaSync(Thread):
+    
+    def __init__(self, app, path, url, callback=None):
+        
+        Thread.__init__(self)
+        self.app = app
+        self.path = path
+        self.url = url
+        self.callback = callback
+        
+    def run(self):
+        
+        cache = DownloadCache(self.path)
+        mh.callAsync(lambda:self.app.progress(0.0, 'Downloading media list'))
+        success, code = cache.download(os.path.join(self.url, 'media.ini'))
+        if success:
+            f = open(os.path.join(self.path, 'media.ini'), 'r')
+            filenames = f.readlines()
+            n = float(len(filenames))
+            for index, filename in enumerate(filenames):
+                filename = filename.split()[0]
+                mh.callAsync(lambda:self.app.progress(index/n, 'Downloading %s' % filename))
+                url = os.path.join(self.url, filename)
+                success, code = cache.download(url)
+            f.close()
+            mh.callAsync(lambda:self.app.progress(1.0))
+        else:
+            mh.callAsync(lambda:self.app.progress(1.0))
+            mh.callAsync(lambda:self.app.prompt('Error', 'Failed to sync media from %s, error %d.' % (self.path, code), 'OK'))
+            
+        if self.callback:
+             mh.callAsync(self.callback)
 
 class DownloadCache():
 
