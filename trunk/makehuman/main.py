@@ -522,7 +522,7 @@ class MHApplication(gui3d.Application):
     def loadSettings(self):
         if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
             f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
-            settings = eval(f.read())
+            settings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
             self.settings.update(settings)
             f.close()
         

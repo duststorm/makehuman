@@ -54,7 +54,7 @@ class DownloadCache():
         cachePath = os.path.join(self.path, 'cache.ini')
         if os.path.exists(cachePath):
             f = open(cachePath, 'r')
-            self.cache = eval(f.read())
+            self.cache = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
             f.close()
         else:
             self.cache = {}
