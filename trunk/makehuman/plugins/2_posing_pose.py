@@ -238,7 +238,8 @@ class PoseTaskView(gui3d.TaskView):
     dst = self.app.selectedHuman.meshData.verts
     if not transform:
       transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
-      tets2 = deformTets(self.tets, center, transform)
+      transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
+      tets2 = deformTets(self.tets, center, transform2)
     elif rotation:
       joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
 
