@@ -208,25 +208,11 @@ class PoseTaskView(gui3d.TaskView):
       #print bboxj
       #return 
       
-      tets =  box2Tetrahedrons(bboxj)
-      tets2 = deformTets(tets, center, angle) #temporarily rotate about z axis 
-      
-      #compute mvc weights for each vertex in the bindings of r-shoulder
-      """
-      for index in jointVerts:
-        i,w = computeWeights(verts[index].co,tets)
-        v = [0.0,0.0,0.0]
-        #print w
-        for j in xrange(0,4):
-          v = vadd(vmul(tets2[i][j],w[j]), v)
-        verts[index].co = v[:]
-      
-      #self.app.selectedHuman.meshData.calcNormals()
-      #self.app.selectedHuman.meshData.update()
-      """
-      
-      rotation = [0.0,0.0, angle]
+      rotation = [0.0,angle, 0.0]
       transform = euler2matrix(rotation, "sxyz")
+      
+      tets =  box2Tetrahedrons(bboxj)
+      tets2 = deformTets(tets, center, transform)
       
       #todo take a norm on the diff between old vertex and skinned vertex if the norm is less than some epsilon dont do changes
       # this avoid excessive wrinkles when the rotations are not extreme
@@ -305,12 +291,13 @@ What follows are test methods...
 """
     
 #rotate one side of tets along z-axis
-def deformTets(tets, center, angle):
+def deformTets(tets, center, transform):
     tets2 = deepcopy(tets)
     for tet in tets2:
         for v in tet:
             if v[0] > center[0]:
-                v[:] = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
+                v[:] = vadd(mtransform(transform, vsub(v, center)),center)
+                #v[:] = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
     return tets2
 
 #needed for making mvc or harmonic coord. cage
