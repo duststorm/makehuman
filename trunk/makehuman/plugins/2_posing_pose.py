@@ -64,7 +64,7 @@ class PoseTaskView(gui3d.TaskView):
 
     self.resetPoseButton = gui3d.Button(self.box, "Reset")
     self.savePoseButton = gui3d.Button(self.box, "Save")
-    self.testButton = gui3d.Button(self.box, "Test")
+    #self.testButton = gui3d.Button(self.box, "Test")
     
     #get bindings for r-shoulder-joint
     f = open("utils/makepose/r-shoulder-joint.txt")
@@ -87,9 +87,9 @@ class PoseTaskView(gui3d.TaskView):
     bboxj[1][2]= bboxj[1][2] + 0.01  
     self.tets =  box2Tetrahedrons(bboxj)
 
-    @self.testButton.event
-    def onClicked(event):
-        self.mvcTest()
+    #@self.testButton.event
+    #def onClicked(event):
+    #    self.mvcTest()
     
     @self.savePoseButton.event
     def onClicked(event):
@@ -188,50 +188,6 @@ class PoseTaskView(gui3d.TaskView):
           if k in groupName:
               return k
       return None
-  
-  def mvcTest(self):
-              
-    angle = -90*degree2rad
-    joint = self.skeleton.getJoint('joint-r-shoulder')
-    center = joint.position
-    verts = self.app.selectedHuman.meshData.verts
-    
-    
-    #print bboxj
-    #return 
-    
-    rotation = [0.0,angle, 0.0]
-    transform = euler2matrix(rotation, "sxyz")
-    
-    tets2 = deformTets(self.tets, center, transform)
-    
-    #todo take a norm on the diff between old vertex and skinned vertex if the norm is less than some epsilon dont do changes
-    # this avoid excessive wrinkles when the rotations are not extreme
-    for i in joint.bindedVects:
-      if verts[i].co[0] < self.tets[0][2][0]:
-        #tet_i,w = computeWeights(verts[i].co,tets)
-        weights = computeAllWeights(verts[i].co,self.tets)
-        v = [0.0,0.0,0.0]
-        #print w
-        for tet_i in xrange(0,5):
-          for j in xrange(0,4):
-            v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
-        verts[i].co = vmul(v, 0.2)
-        """
-        for j in xrange(0,4):
-          v = vadd(vmul(tets2[tet_i][j],w[j]), v)
-        verts[i].co = v[:]
-        """
-      else :
-        v= verts[i].co
-        verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
-    
-    for child in joint.children:
-      self.rotateJoint(child, joint.position, rotation, transform)
-      
-    self.app.selectedHuman.meshData.calcNormals()
-    self.app.selectedHuman.meshData.update()
-
    
   def rotateJoint(self, joint, center, rotation, transform=None):                
     src = self.app.selectedHuman.meshStored
@@ -282,10 +238,9 @@ class PoseTaskView(gui3d.TaskView):
 category = None
 taskview = None
 
+
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
-
-
 def load(app):
     category = app.getCategory('Posing')
     taskview = PoseTaskView(category)
@@ -301,11 +256,6 @@ def load(app):
 
 def unload(app):  
     print 'pose unloaded'
-
-
-"""
-What follows are test methods...
-"""
     
 #rotate one side of tets along z-axis
 def deformTets(tets, center, transform):
@@ -457,7 +407,6 @@ def computeWeights(v,tets):
 def computeAllWeights(v,tets):
   y = [v[0], v[1], v[2]]
   A = [0]*9
-  j = 0
   
   allWeights = []
   #solutions = []
@@ -472,34 +421,6 @@ def computeAllWeights(v,tets):
     allWeights.append([1-w[0]-w[1]-w[2],w[0], w[1],w[2]])
   
   return allWeights
-
-  
-"""
-def computeWeights(v,tets):
-    #i = findTetrahedron(tets,v)
-    # w1vt1 + w2vt2 + w3vt3 + w4vt4 = v
-    #w1 + w2 + w3 + w4 = 1
-    y = [v[0], v[1], v[2], 1.0]
-    A = [0]*16
-    j = 0
-    solutions = []
-    for i in xrange(0,4):
-      for rows in xrange(0,4):
-          for cols in xrange(0,4):
-            if rows < 3: A[rows*4 + cols] = tets[i][cols][rows]
-            else: A[rows*4 + cols] = 1.0
-      w = linsolve(A,y)
-      solutions.append(w)
-      found = True
-      for ww in w:
-        if (ww < 0) or (ww > 1): 
-          found = False
-          break
-      if (found == True):
-        j = i
-        break
-    return j,solutions[j]
- """
  
 # checks if one of the solutions have valid weights (>0 and sum <= 1)
 def validWeight(weight):
@@ -510,56 +431,50 @@ def validWeight(weight):
     temp = temp + w
   if (temp < 0.0) or (1 - temp < 0): return False
   else: return True
-
-"""
-def validWeight(solutions):
-  out = False
-  for w in solutions:
-    temp = 0
-    for ww in w:
-      temp = temp + ww
-      if (ww < 0):
-        temp = -1
-        break
-    if (temp < 0): continue
-    elif (temp <= 1):
-      out = True
-      break
-  return out
-"""
     
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
 
-def skinTest(self):
-  #rotating the shoulders in z desu..
-  theta = -45
-  rotation = [0.0, 0.0, theta]
+def mvcTest(self):
+            
+  angle = -90*degree2rad
   joint = self.skeleton.getJoint('joint-r-shoulder')
-  dst = self.app.selectedHuman.meshData.verts
   center = joint.position
-  transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
-  joint.radius = 0.6
-  l = math.fabs(theta*degree2rad*joint.radius)
-
+  verts = self.app.selectedHuman.meshData.verts
+  
+  
+  #print bboxj
+  #return 
+  
+  rotation = [0.0,angle, 0.0]
+  transform = euler2matrix(rotation, "sxyz")
+  
+  tets2 = deformTets(self.tets, center, transform)
+  
+  #todo take a norm on the diff between old vertex and skinned vertex if the norm is less than some epsilon dont do changes
+  # this avoid excessive wrinkles when the rotations are not extreme
   for i in joint.bindedVects:
-    v= dst[i].co
-    d = math.fabs(v[0]-center[0])
-    #skinning upper part of shoulder, shape should be like a sphere 
-    if d < l and v[1] > center[1]:
-      #print "Geronimo"
-      #theta = math.fabs(v[0] - center[0])/joint.radius #in radians
-      theta2 = theta*(1-bump(d, l))
-      t = euler2matrix([0,0,theta2*degree2rad], "sxyz")
-      #x = center[0] + joint.radius * math.sin(theta)
-      #y = center[1] + joint.radius * math.cos(theta)
-      #z = v[2]
-      dst[i].co = vadd(mtransform(t, vsub(v, center)),center)
-    else:
-      dst[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+    if verts[i].co[0] < self.tets[0][2][0]:
+      #tet_i,w = computeWeights(verts[i].co,tets)
+      weights = computeAllWeights(verts[i].co,self.tets)
+      v = [0.0,0.0,0.0]
+      #print w
+      for tet_i in xrange(0,5):
+        for j in xrange(0,4):
+          v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
+      verts[i].co = vmul(v, 0.2)
+      """
+      for j in xrange(0,4):
+        v = vadd(vmul(tets2[tet_i][j],w[j]), v)
+      verts[i].co = v[:]
+      """
+    else :
+      v= verts[i].co
+      verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+  
   for child in joint.children:
     self.rotateJoint(child, joint.position, rotation, transform)
-
+    
   self.app.selectedHuman.meshData.calcNormals()
   self.app.selectedHuman.meshData.update()
