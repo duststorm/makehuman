@@ -539,6 +539,10 @@ class FaceGroup:
 
         return 'facegroup %s' % self.name
         
+    def clear(self):
+        
+        del self.__faces[:]
+        
     @property
     def faces(self):
         return iter(self.__faces)
@@ -664,14 +668,26 @@ class Object3D:
         return len(self.__faceGroups)
         
     def clear(self):
-        
+
         if self.indexBuffer:
             del self.indexBuffer[:]
         if self.uvValues:
             del self.uvValues[:]
         self.uvMap.clear()
-        del self.faces[:]
+        # Remove verts
+        for v in self.verts:
+            del v.object
+            del v.sharedFaces[:]
         del self.verts[:]
+        # Remove faces
+        for f in self.faces:
+            del f.verts
+            del f.group
+        del self.faces[:]
+        # Remove face groups
+        for fg in self.__faceGroups:
+            del fg.parent
+            fg.clear()
         del self.__faceGroups[:]
 
     def updateIndexBuffer(self):
@@ -1014,7 +1030,7 @@ class Object3D:
 
         if verticesToUpdate == None:
             verticesToUpdate = self.verts
-
+        
         for v in verticesToUpdate:
             v.update(updateNor=updateN)
             
@@ -1216,6 +1232,7 @@ class Scene3D:
         
         if obj.object3d:
             mh.world.remove(obj.object3d)
+            del obj.object3d
             obj.object3d = None
         obj.clear()
         
@@ -1300,6 +1317,7 @@ class Scene3D:
 
     def detach(self, obj):
         mh.world.remove(obj.object3d)
+        del obj.object3d
         obj.object3d = None
 
     def update(self):
