@@ -247,7 +247,7 @@ class PoseTaskView(gui3d.TaskView):
         dst = self.app.selectedHuman.meshData.verts
         if not transform:
             transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
-        else:
+        elif rotation:
             joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
 
         for i in joint.bindedVects:
@@ -259,6 +259,15 @@ class PoseTaskView(gui3d.TaskView):
         self.Xslider.setValue(0.0)
         self.Yslider.setValue(0.0)
         self.Zslider.setValue(0.0)
+        if self.joint:
+          rotation = [-self.joint.rotation[2],-self.joint.rotation[1],-self.joint.rotation[0]]
+          self.joint.rotation = [0.0,0.0,0.0]
+          transform = euler2matrix(vmul(rotation,degree2rad), "szyx")
+          #self.joint.rotation = [0.0,0.0,0.0]
+          self.rotateJoint(self.joint, self.joint.position,None, transform)
+          self.app.selectedHuman.meshData.calcNormals()
+          self.app.selectedHuman.meshData.update()
+          
         self.app.redraw()
         
 
