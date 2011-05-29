@@ -111,7 +111,7 @@ class BreastsModifier(humanmodifier.GenericModifier):
     
     def __init__(self):
     
-        self.breastSizes = ['breastSize%d' % size for size in xrange(1, 9)]
+        self.breastSizes = ['breastSize%d' % size for size in xrange(1, 3)]
         humanmodifier.GenericModifier.__init__(self,
             'data/targets/breast/female-${age}-${tone}-${weight}-cup${breastSize}-firmness${breastFirmness}.target')
             
@@ -130,7 +130,7 @@ class BreastsModifier(humanmodifier.GenericModifier):
         targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
         targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
         targets = [(Template(target[0]).safe_substitute(breastFirmness=value), target[1] + ['breastFirmness%d' % value]) for target in targets for value in xrange(0, 2)]
-        targets = [(Template(target[0]).safe_substitute(breastSize=value), target[1] + ['breastSize%d' % value]) for target in targets for value in xrange(1, 9)]
+        targets = [(Template(target[0]).safe_substitute(breastSize=value), target[1] + ['breastSize%d' % value]) for target in targets for value in xrange(1, 3)]
 
         # Cleanup multiple hyphens and remove a possible hyphen before a dot.
         doubleHyphen = re.compile(r'-+')
