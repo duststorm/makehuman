@@ -48,227 +48,234 @@ zonesToJointsMapping = {
 
 class PoseTaskView(gui3d.TaskView):
 
-    def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Pose')      
+  def __init__(self, category):
+    gui3d.TaskView.__init__(self, category, 'Pose')      
 
-        self.zone = ""
-        self.skeleton = Skeleton()
-        self.selectedGroups = []
-        self.joint = None
-                
-        self.box = gui3d.GroupBox(self, [10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6))
+    self.zone = ""
+    self.skeleton = Skeleton()
+    self.selectedGroups = []
+    self.joint = None
+            
+    self.box = gui3d.GroupBox(self, [10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6))
 
-        self.Xslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d")
-        self.Yslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d")
-        self.Zslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d")
+    self.Xslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d")
+    self.Yslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d")
+    self.Zslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d")
 
-        self.resetPoseButton = gui3d.Button(self.box, "Reset")
-        self.savePoseButton = gui3d.Button(self.box, "Save")
-        self.testButton = gui3d.Button(self.box, "Test")
+    self.resetPoseButton = gui3d.Button(self.box, "Reset")
+    self.savePoseButton = gui3d.Button(self.box, "Save")
+    self.testButton = gui3d.Button(self.box, "Test")
+    
+    #get bindings for r-shoulder-joint
+    f = open("utils/makepose/r-shoulder-joint.txt")
+    jointVerts = [];
+    while (1): 
+      line = f.readline()
+      if not line: break 
+      jointVerts.append(int(line));
+    f.close()           
+    
+    #compute bounding box
+    bboxj = calcBBox(self.app.selectedHuman.meshData.verts,  jointVerts)
+    
+    #adding offset
+    bboxj[0][0]= bboxj[0][0] - 0.01
+    bboxj[1][0]= bboxj[1][0] + 0.01
+    bboxj[0][1]= bboxj[0][1] - 0.01
+    bboxj[1][1]= bboxj[1][1] + 0.01
+    bboxj[0][2]= bboxj[0][2] - 0.01
+    bboxj[1][2]= bboxj[1][2] + 0.01  
+    self.tets =  box2Tetrahedrons(bboxj)
 
-        @self.testButton.event
-        def onClicked(event):
-            self.mvcTest()
+    @self.testButton.event
+    def onClicked(event):
+        self.mvcTest()
+    
+    @self.savePoseButton.event
+    def onClicked(event):
+        exportObj(self.app.selectedHuman.meshData, os.path.join(exportPath, "posed.obj"))
+
+    @self.resetPoseButton.event
+    def onClicked(event):
+        self.reset()
+
+    @self.Xslider.event
+    def onChange(value):
+        if self.joint:
+            rotation = [value - self.joint.rotation[0], 0.0, 0.0]
+            self.joint.rotation[0] = value
+            self.rotateJoint(self.joint, self.joint.position, rotation)
+            self.app.selectedHuman.meshData.calcNormals()
+            self.app.selectedHuman.meshData.update()
         
-        @self.savePoseButton.event
-        def onClicked(event):
-            exportObj(self.app.selectedHuman.meshData, os.path.join(exportPath, "posed.obj"))
-
-        @self.resetPoseButton.event
-        def onClicked(event):
-            self.reset()
-
-        @self.Xslider.event
-        def onChange(value):
-            if self.joint:
-                rotation = [value - self.joint.rotation[0], 0.0, 0.0]
-                self.joint.rotation[0] = value
-                self.rotateJoint(self.joint, self.joint.position, rotation)
-                self.app.selectedHuman.meshData.calcNormals()
-                self.app.selectedHuman.meshData.update()
-            
-        @self.Xslider.event
-        def onChanging(value):
-            pass
-            
-        @self.Yslider.event
-        def onChange(value):
-            if self.joint:
-                rotation = [0.0, value - self.joint.rotation[1], 0.0]
-                self.joint.rotation[1] = value
-                self.rotateJoint(self.joint, self.joint.position, rotation)
-                self.app.selectedHuman.meshData.calcNormals()
-                self.app.selectedHuman.meshData.update()
-            
-        @self.Yslider.event
-        def onChanging(value):
-            pass
-
-        @self.Zslider.event
-        def onChange(value):
-            if self.joint:
-                rotation = [0.0, 0.0, value - self.joint.rotation[2]]
-                self.joint.rotation[2] = value
-                self.rotateJoint(self.joint, self.joint.position,rotation)
-                self.app.selectedHuman.meshData.calcNormals()
-                self.app.selectedHuman.meshData.update()
-            
-        @self.Zslider.event
-        def onChanging(value):
-            pass
-            
-    def onMouseMoved(self, event):
-        if not self.joint:
-            human = self.app.selectedHuman
-            groups = []
-            self.zone = self.getJointZones(event.group.name)
-
-            if self.zone:
-                for g in human.mesh.faceGroups:
-                    if self.zone != "torso":
-                        if self.zone in g.name:
-                            groups.append(g)
-                    elif (self.zone in g.name) and not g.name.endswith("clavicle"):
-                        groups.append(g)
-
-                for g in self.selectedGroups:
-                    if g not in groups:
-                        g.setColor([255, 255, 255, 255])
-
-                for g in groups:
-                    if g not in self.selectedGroups:
-                        g.setColor([0, 169, 184, 255])
-                    
-                self.selectedGroups = groups
-                self.app.redraw()
-    
-    def onMouseUp(self, event):
-        if self.joint: 
-            self.joint = None
-        else:
-            self.joint = self.skeleton.getJoint(zonesToJointsMapping.get(self.zone))
-            if self.joint:
-                self.Xslider.setValue(self.joint.rotation[0])
-                self.Yslider.setValue(self.joint.rotation[1])
-                self.Zslider.setValue(self.joint.rotation[2])
-    
-    def onShow(self, event):
-        self.app.selectedHuman.storeMesh()
-        self.skeleton.update(self.app.selectedHuman.meshData)
-        gui3d.TaskView.onShow(self, event)
-
-    def onHide(self, event):
-        self.app.selectedHuman.restoreMesh()
-        self.app.selectedHuman.meshData.update()
-        gui3d.TaskView.onHide(self, event)
+    @self.Xslider.event
+    def onChanging(value):
+        pass
         
-    def getJointZones(self, groupName):
-        for k in jointZones:
-            if k in groupName:
-                return k
-        return None
+    @self.Yslider.event
+    def onChange(value):
+        if self.joint:
+            rotation = [0.0, value - self.joint.rotation[1], 0.0]
+            self.joint.rotation[1] = value
+            self.rotateJoint(self.joint, self.joint.position, rotation)
+            self.app.selectedHuman.meshData.calcNormals()
+            self.app.selectedHuman.meshData.update()
+        
+    @self.Yslider.event
+    def onChanging(value):
+        pass
+
+    @self.Zslider.event
+    def onChange(value):
+        if self.joint:
+            rotation = [0.0, 0.0, value - self.joint.rotation[2]]
+            self.joint.rotation[2] = value
+            self.rotateJoint(self.joint, self.joint.position,rotation)
+            self.app.selectedHuman.meshData.calcNormals()
+            self.app.selectedHuman.meshData.update()
+        
+    @self.Zslider.event
+    def onChanging(value):
+        pass
+          
+  def onMouseMoved(self, event):
+    if not self.joint:
+      human = self.app.selectedHuman
+      groups = []
+      self.zone = self.getJointZones(event.group.name)
+
+      if self.zone:
+        for g in human.mesh.faceGroups:
+          if self.zone != "torso":
+            if self.zone in g.name:
+              groups.append(g)
+          elif (self.zone in g.name) and not g.name.endswith("clavicle"):
+            groups.append(g)
+
+        for g in self.selectedGroups:
+          if g not in groups:
+            g.setColor([255, 255, 255, 255])
+
+        for g in groups:
+          if g not in self.selectedGroups:
+            g.setColor([0, 169, 184, 255])
+            
+        self.selectedGroups = groups
+        self.app.redraw()
+  
+  def onMouseUp(self, event):
+      if self.joint: 
+          self.joint = None
+      else:
+          self.joint = self.skeleton.getJoint(zonesToJointsMapping.get(self.zone))
+          if self.joint:
+              self.Xslider.setValue(self.joint.rotation[0])
+              self.Yslider.setValue(self.joint.rotation[1])
+              self.Zslider.setValue(self.joint.rotation[2])
+  
+  def onShow(self, event):
+      self.app.selectedHuman.storeMesh()
+      self.skeleton.update(self.app.selectedHuman.meshData)
+      gui3d.TaskView.onShow(self, event)
+
+  def onHide(self, event):
+      self.app.selectedHuman.restoreMesh()
+      self.app.selectedHuman.meshData.update()
+      gui3d.TaskView.onHide(self, event)
+      
+  def getJointZones(self, groupName):
+      for k in jointZones:
+          if k in groupName:
+              return k
+      return None
+  
+  def mvcTest(self):
+              
+    angle = -90*degree2rad
+    joint = self.skeleton.getJoint('joint-r-shoulder')
+    center = joint.position
+    verts = self.app.selectedHuman.meshData.verts
     
-    def mvcTest(self):
-                
-      angle = -90*degree2rad
-      joint = self.skeleton.getJoint('joint-r-shoulder')
-      center = joint.position
-      verts = self.app.selectedHuman.meshData.verts
+    
+    #print bboxj
+    #return 
+    
+    rotation = [0.0,angle, 0.0]
+    transform = euler2matrix(rotation, "sxyz")
+    
+    tets2 = deformTets(self.tets, center, transform)
+    
+    #todo take a norm on the diff between old vertex and skinned vertex if the norm is less than some epsilon dont do changes
+    # this avoid excessive wrinkles when the rotations are not extreme
+    for i in joint.bindedVects:
+      if verts[i].co[0] < self.tets[0][2][0]:
+        #tet_i,w = computeWeights(verts[i].co,tets)
+        weights = computeAllWeights(verts[i].co,self.tets)
+        v = [0.0,0.0,0.0]
+        #print w
+        for tet_i in xrange(0,5):
+          for j in xrange(0,4):
+            v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
+        verts[i].co = vmul(v, 0.2)
+        """
+        for j in xrange(0,4):
+          v = vadd(vmul(tets2[tet_i][j],w[j]), v)
+        verts[i].co = v[:]
+        """
+      else :
+        v= verts[i].co
+        verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
+    
+    for child in joint.children:
+      self.rotateJoint(child, joint.position, rotation, transform)
       
-      #get bindings for r-shoulder-joint
-      f = open("utils/makepose/r-shoulder-joint.txt")
-      jointVerts = [];
-      while (1): 
-        line = f.readline()
-        if not line: break 
-        jointVerts.append(int(line));
-      f.close()      
-      
-      #get bindings for r-shoulder-link
-      f = open("utils/makepose/r-shoulder-link.txt")
-      linkVerts = [];
-      while (1): 
-        line = f.readline()
-        if not line: break 
-        linkVerts.append(int(line));
-      f.close()
-      
-      #compute bounding box
-      
-      bboxj = calcBBox(verts,  jointVerts)
-      
-      #adding offset
-      bboxj[0][0]= bboxj[0][0] - 0.01
-      bboxj[1][0]= bboxj[1][0] + 0.01
-      bboxj[0][1]= bboxj[0][1] - 0.01
-      bboxj[1][1]= bboxj[1][1] + 0.01
-      bboxj[0][2]= bboxj[0][2] - 0.01
-      bboxj[1][2]= bboxj[1][2] + 0.01  
-      
-      #print bboxj
-      #return 
-      
-      rotation = [0.0,angle, 0.0]
-      transform = euler2matrix(rotation, "sxyz")
-      
-      tets =  box2Tetrahedrons(bboxj)
-      tets2 = deformTets(tets, center, transform)
-      
-      #todo take a norm on the diff between old vertex and skinned vertex if the norm is less than some epsilon dont do changes
-      # this avoid excessive wrinkles when the rotations are not extreme
-      for i in joint.bindedVects:
-        if verts[i].co[0] < bboxj[1][0]:
-          #tet_i,w = computeWeights(verts[i].co,tets)
-          weights = computeAllWeights(verts[i].co,tets)
+    self.app.selectedHuman.meshData.calcNormals()
+    self.app.selectedHuman.meshData.update()
+
+   
+  def rotateJoint(self, joint, center, rotation, transform=None):                
+    src = self.app.selectedHuman.meshStored
+    dst = self.app.selectedHuman.meshData.verts
+    if not transform:
+      transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
+      tets2 = deformTets(self.tets, center, transform)
+    elif rotation:
+      joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
+
+    for i in joint.bindedVects:
+      #if shoulderjoint cage do the skinning transformation...
+      if (joint == self.joint) and joint.name == 'joint-r-shoulder':
+        if src[i][0] < self.tets[0][2][0]:
+          weights = computeAllWeights(src[i],self.tets)
           v = [0.0,0.0,0.0]
-          #print w
           for tet_i in xrange(0,5):
             for j in xrange(0,4):
               v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
-          verts[i].co = vmul(v, 0.2)
-          """
-          for j in xrange(0,4):
-            v = vadd(vmul(tets2[tet_i][j],w[j]), v)
-          verts[i].co = v[:]
-          """
+          #average of 5 tetrahedrons
+          dst[i].co = vmul(v, 0.2)
         else :
-          v= verts[i].co
-          verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
-      
-      for child in joint.children:
-        self.rotateJoint(child, joint.position, rotation, transform)
-        
-      self.app.selectedHuman.meshData.calcNormals()
-      self.app.selectedHuman.meshData.update()
-
-     
-    def rotateJoint(self, joint, center, rotation, transform=None):                
-        #src = self.app.selectedHuman.meshStored
-        dst = self.app.selectedHuman.meshData.verts
-        if not transform:
-            transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
-        elif rotation:
-            joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
-
-        for i in joint.bindedVects:
-            dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
-        for child in joint.children:
-            self.rotateJoint(child, center, rotation, transform)
-    
-    def reset(self):
-        self.Xslider.setValue(0.0)
-        self.Yslider.setValue(0.0)
-        self.Zslider.setValue(0.0)
-        if self.joint:
-          rotation = [-self.joint.rotation[2],-self.joint.rotation[1],-self.joint.rotation[0]]
-          self.joint.rotation = [0.0,0.0,0.0]
-          transform = euler2matrix(vmul(rotation,degree2rad), "szyx")
-          #self.joint.rotation = [0.0,0.0,0.0]
-          self.rotateJoint(self.joint, self.joint.position,None, transform)
-          self.app.selectedHuman.meshData.calcNormals()
-          self.app.selectedHuman.meshData.update()
+          dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
           
-        self.app.redraw()
+      else:
+        dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
+    
+    for child in joint.children:
+      self.rotateJoint(child, center, rotation, transform)
+  
+  def reset(self):
+      self.Xslider.setValue(0.0)
+      self.Yslider.setValue(0.0)
+      self.Zslider.setValue(0.0)
+      if self.joint:
+        rotation = [-self.joint.rotation[2],-self.joint.rotation[1],-self.joint.rotation[0]]
+        self.joint.rotation = [0.0,0.0,0.0]
+        transform = euler2matrix(vmul(rotation,degree2rad), "szyx")
+        #self.joint.rotation = [0.0,0.0,0.0]
+        self.rotateJoint(self.joint, self.joint.position,None, transform)
+        self.app.selectedHuman.meshData.calcNormals()
+        self.app.selectedHuman.meshData.update()
+        
+      self.app.redraw()
         
 
 category = None
