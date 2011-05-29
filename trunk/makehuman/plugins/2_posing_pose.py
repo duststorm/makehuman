@@ -61,7 +61,9 @@ class PoseTaskView(gui3d.TaskView):
     self.Xslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d")
     self.Yslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d")
     self.Zslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d")
-
+    
+    self.skin = gui3d.CheckBox(self.box, "Skin", False)
+    
     self.resetPoseButton = gui3d.Button(self.box, "Reset")
     self.savePoseButton = gui3d.Button(self.box, "Save")
     #self.testButton = gui3d.Button(self.box, "Test")
@@ -201,7 +203,7 @@ class PoseTaskView(gui3d.TaskView):
 
     for i in joint.bindedVects:
       #if shoulderjoint cage do the skinning transformation...
-      if (joint == self.joint) and joint.name == 'joint-r-shoulder':
+      if (joint == self.joint) and (joint.name == 'joint-r-shoulder') and self.skin.selected:
         if src[i][0] < self.tets[0][2][0]:
           weights = computeAllWeights(src[i],self.tets)
           v = [0.0,0.0,0.0]
