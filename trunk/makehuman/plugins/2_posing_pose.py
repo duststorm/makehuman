@@ -109,11 +109,7 @@ class PoseTaskView(gui3d.TaskView):
             self.rotateJoint(self.joint, self.joint.position, rotation)
             self.app.selectedHuman.meshData.calcNormals()
             self.app.selectedHuman.meshData.update()
-        
-    @self.Xslider.event
-    def onChanging(value):
-        pass
-        
+                
     @self.Yslider.event
     def onChange(value):
         if self.joint:
@@ -123,10 +119,6 @@ class PoseTaskView(gui3d.TaskView):
             self.app.selectedHuman.meshData.calcNormals()
             self.app.selectedHuman.meshData.update()
         
-    @self.Yslider.event
-    def onChanging(value):
-        pass
-
     @self.Zslider.event
     def onChange(value):
         if self.joint:
@@ -135,11 +127,7 @@ class PoseTaskView(gui3d.TaskView):
             self.rotateJoint(self.joint, self.joint.position,rotation)
             self.app.selectedHuman.meshData.calcNormals()
             self.app.selectedHuman.meshData.update()
-        
-    @self.Zslider.event
-    def onChanging(value):
-        pass
-          
+                  
   def onMouseMoved(self, event):
     if not self.joint:
       human = self.app.selectedHuman
@@ -196,10 +184,13 @@ class PoseTaskView(gui3d.TaskView):
     dst = self.app.selectedHuman.meshData.verts
     if not transform:
       transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
-      transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
-      tets2 = deformTets(self.tets, center, transform2)
+      #transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
     elif rotation:
       joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
+      
+    if (joint == self.joint) and self.skin.selected:
+      transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
+      tets2 = deformTets(self.tets, center, transform2)
 
     for i in joint.bindedVects:
       #if shoulderjoint cage do the skinning transformation...
