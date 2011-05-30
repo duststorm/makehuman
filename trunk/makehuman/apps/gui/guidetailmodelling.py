@@ -153,9 +153,11 @@ class BreastsModifier(humanmodifier.GenericModifier):
             'heavy':human.overweightVal,
             'averageWeight':1.0 - (human.underweightVal + human.overweightVal),
             'breastFirmness0': 1.0 - human.breastFirmness,
-            'breastFirmness1': human.breastFirmness
+            'breastFirmness1': human.breastFirmness,
+            'breastSize1': -min(human.breastSize, 0.0),
+            'breastSize2': max(0.0, human.breastSize)
         }
-        
+        '''
         for factor in self.breastSizes:
             factors[factor] = 0.0
         
@@ -165,7 +167,7 @@ class BreastsModifier(humanmodifier.GenericModifier):
         factors[self.breastSizes[index]] = 1.0 - v
         if index+1 < len(self.breastSizes):
             factors[self.breastSizes[index+1]] = v
-        
+        '''
         return factors
 
 class BreastSizeModifier(BreastsModifier):
@@ -552,7 +554,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         genderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=25+36*3+6));y+=25
         
         self.sliders.append(DetailSlider(genderBox, 0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals']));y+=36
-        self.sliders.append(DetailSlider(genderBox, 0.5, 0.0, 1.0, "Breast", self.modifiers['breastSize']));y+=36
+        self.sliders.append(DetailSlider(genderBox, 0.0, -1.0, 1.0, "Breast", self.modifiers['breastSize']));y+=36
         self.sliders.append(DetailSlider(genderBox, 0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness']));y+=36
         self.sliders.append(humanmodifier.ModifierSlider(genderBox, 0.0, -1.0, 1.0, "Breast position", modifier=self.modifiers['breastPosition']));y+=36
         y+=16

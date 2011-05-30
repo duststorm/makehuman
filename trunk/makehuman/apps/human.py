@@ -77,7 +77,7 @@ class Human(gui3d.Object):
         self.overweightVal = 0.0
         self.underweightVal = 0.0
         self.genitals = 0.0
-        self.breastSize = 0.5
+        self.breastSize = 0.0
         self.breastFirmness = 0.5
         self.nose = 0.0
         self.mouth = 0.0
@@ -472,7 +472,7 @@ class Human(gui3d.Object):
         self.overweightVal = 0.0
         self.underweightVal = 0.0
         self.genitals = 0.0
-        self.breastSize = 0.5
+        self.breastSize = 0.0
         self.breastFirmness = 0.5
         self.stomach = 0.0
         self.nose = 0.0
