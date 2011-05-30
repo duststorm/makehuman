@@ -85,7 +85,21 @@ directory, but MH will first look for this files in the ~/makehuman/
 and C:/ folders. In this way you can keep your own private version of
 proxy.cfg. The syntax is described in the beginning of the file.
 
+------
+Making clothes with offset.
+
+Make a copy of the clothe and shrinkwrap it to the base mesh. 
+
+Make a clothes file for the shrinked copy as above.
+
+Select offset clothes, then shift select the shrinked copy to make it active.
+
+Press Make offset button.
+
+A new .mhclo file is created for the offset clothes in the specified directory.
+
 """
+
 bl_addon_info = {
     "name": "Make clothes to MakeHuman",
     "author": "Thomas Larsson",
@@ -222,24 +236,21 @@ def findClothes(context, bob, pob, log):
             (mv, mdist) = mverts[0]
             bVerts = [mv.index,0,1]
             bWts = [1,0,0]
-        addBestFace(pv, base, bVerts, bWts, bestFaces)
+
+        v0 = base.vertices[bVerts[0]]
+        v1 = base.vertices[bVerts[1]]
+        v2 = base.vertices[bVerts[2]]
+    
+        est = bWts[0]*v0.co + bWts[1]*v1.co + bWts[2]*v2.co
+        norm = bWts[0]*v0.normal + bWts[1]*v1.normal + bWts[2]*v2.normal
+        diff = pv.co - est
+        proj = diff.dot(norm)
+        if proj < 0 and alwaysOutside:
+            proj = -proj
+        bestFaces.append((pv, bVerts, bWts, proj))    
+
     print("Done")
     return bestFaces
-
-
-def addBestFace(pv, base, bVerts, bWts, bestFaces):
-    v0 = base.vertices[bVerts[0]]
-    v1 = base.vertices[bVerts[1]]
-    v2 = base.vertices[bVerts[2]]
-
-    est = bWts[0]*v0.co + bWts[1]*v1.co + bWts[2]*v2.co
-    norm = bWts[0]*v0.normal + bWts[1]*v1.normal + bWts[2]*v2.normal
-    diff = pv.co - est
-    proj = diff.dot(norm)
-    if proj < 0 and alwaysOutside:
-        proj = -proj
-    bestFaces.append((pv, bVerts, bWts, proj))    
-    return                
 
 #
 #    minWeight(wts)
@@ -435,38 +446,86 @@ def makeClothes(context):
             print("%s done" % outpath)
         
 #
-#
+#   offsetClothes(context):
+#   offsetCloth(bob, pob, context):
 #
 
-def offsetClothes(context)
-    inpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
-    infile = os.path.realpath(os.path.expanduser(outpath))
-    outpath = '%s/%s_1.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
+def offsetClothes(context):
+    bob = context.object
+    for pob in context.selected_objects:
+        if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
+            offsetCloth(bob, pob, context)
+    return
+
+def offsetCloth(bob, pob, context):
+    bverts = bob.data.vertices
+    pverts = pob.data.vertices    
+    print("Offset %s to %s" % (bob.name, pob.name))
+
+    inpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], bob.name.lower())
+    infile = os.path.realpath(os.path.expanduser(inpath))
+    outpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
     outfile = os.path.realpath(os.path.expanduser(outpath))
     print("Modifying clothes file %s => %s" % (infile, outfile))
     infp = open(infile, "r")
     outfp = open(outfile, "w")
 
     status = False
+    alwaysOutside = context.scene['MakeClothesOutside']
+    useVgroups = context.scene['MakeClothesVertexGroups']
+
     for line in infp:
         words = line.split()
-        if words[0] == "#":
-            status = (words[1] == "verts")
+        if len(words) < 1:
             outfp.write(line)
-            pv = 0
+        elif words[0] == "#":    
+            if len(words) < 2:
+                status = False
+            elif words[1] == "verts":
+                status = True
+            elif words[1] == "obj_data" and useVgroups:
+                infp.close()
+                writeFacesAndWeights(pob, outfp)                
+                outfp.close()
+                print("Clothes file modified %s => %s" % (infile, outfile))
+                return
+            outfp.write(line)
+            vn = 0
         elif status:
             # 4715  5698  5726 0.00000 1.00000 -0.00000 0.00921
             verts = [int(words[0]), int(words[1]), int(words[2])]
             wts = [float(words[3]), float(words[4]), float(words[5])]
-
-            addBestFace(pv, base, verts, wts, bestFaces)            
+            bv = bverts[vn]
+            pv = pverts[vn]
+            diff = pv.co - bv.co
+            proj = diff.dot(bv.normal)
+            if proj < 0 and alwaysOutside:
+                proj = -proj
             outfp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
                 verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
+            # print(vn, bv.co, pv.co)
+            vn += 1
         else:
             outfp.write(line)
+
     infp.close()
     outfp.close()
     print("Clothes file modified %s => %s" % (infile, outfile))
+    return
+
+def writeFacesAndWeights(pob, fp):
+    fp.write("# faces\n")
+    for f in pob.data.faces:
+        for v in f.vertices:
+            fp.write(" %d" % (v+1))
+        fp.write("\n")
+
+    for vg in pob.vertex_groups:
+        fp.write("# weights %s\n" % vg.name)
+        for v in pob.data.vertices:
+            for g in v.groups:
+                if g.group == vg.index and g.weight > 1e-4:
+                    fp.write(" %d %.4g \n" % (v.index, g.weight))
     return
 
 
@@ -490,6 +549,11 @@ def initInterface(scn):
         description="Invert projection if negative")
     scn['MakeClothesOutside'] = True
 
+    bpy.types.Scene.MakeClothesVertexGroups = BoolProperty(
+        name="Save vertex groups", 
+        description="Save vertex groups but not texverts")
+    scn['MakeClothesVertexGroups'] = True
+
     return
 
 #
@@ -510,7 +574,9 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.init_interface")
         layout.prop(context.scene, "MakeClothesDirectory")
         layout.prop(context.scene, "MakeClothesOutside")
+        layout.prop(context.scene, "MakeClothesVertexGroups")
         layout.operator("mhclo.make_clothes")
+        layout.operator("mhclo.offset_clothes")
         return
 
 #
@@ -540,6 +606,18 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
         makeClothes(context)
         return{'FINISHED'}    
 
+#
+#    class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
+    bl_idname = "mhclo.offset_clothes"
+    bl_label = "Offset clothes"
+
+    def execute(self, context):
+        import bpy, mathutils
+        offsetClothes(context)
+        return{'FINISHED'}    
 
 #
 #    Init and register

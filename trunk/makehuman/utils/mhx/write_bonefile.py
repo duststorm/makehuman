@@ -22,7 +22,8 @@ Utility for making rig creation files
 #   Utility for creating MakeHuman bone definitions.
 #
 
-import bpy
+import bpy, os
+from bpy.props import *
 
 BoneLayers = [
     'L_FK', 'L_TORSO', 'L_ARMIK', 'L_ARMFK',
@@ -32,10 +33,10 @@ BoneLayers = [
 ]
 
 #
-#   writeBones(character, fp):
+#   writeBones(character, scale, fp):
 #
 
-def writeBones(character, fp):
+def writeBones(character, scale, fp):
     amt = None
     me = None
     for ob in bpy.context.scene.objects:
@@ -190,7 +191,7 @@ def writeBones(character, fp):
         fp.write("(%d,%d,%d), " % (pb.lock_location[0], pb.lock_location[1], pb.lock_location[2]))
         fp.write("(%d,%d,%d), " % (pb.lock_rotation[0], pb.lock_rotation[1], pb.lock_rotation[2]))
         fp.write("(%d,%d,%d), " % (pb.lock_scale[0], pb.lock_scale[1], pb.lock_scale[2]))
-        fp.write("(%d,%d,%d), " % (pb.lock_ik_x, pb.lock_ik_y, pb.lock_ik_z))
+        fp.write("(%d,%d,%d), " % (not pb.lock_ik_x, not pb.lock_ik_y, not pb.lock_ik_z))
 
         # Flags
         flags = ""
@@ -212,7 +213,7 @@ def writeBones(character, fp):
             c = ",\n\t\t["
             for cns in pb.constraints:
                 fp.write(c)
-                writeConstraint(fp, cns)
+                writeConstraint(fp, cns, scale)
                 c = ",\n\t\t "
             fp.write("])\n\n")
         else:
@@ -225,9 +226,9 @@ def writeBones(character, fp):
 
     bpy.ops.object.mode_set(mode='OBJECT')
     fp.write("\n%sObjectProps = [" % character)
-    print_props(fp, rig)
-    fp.write("\n]\n\n%sArmatureProps = [" % character)
     print_props(fp, amt)
+    fp.write("\n]\n\n%sArmatureProps = [" % character)
+    print_props(fp, rig)
     fp.write("]\n\n")
 
     #
@@ -378,7 +379,7 @@ def addToSpace(cns, cond, flag):
     else:
         return ""
 
-def writeConstraint(fp, cns):
+def writeConstraint(fp, cns, scale):
     typ = cns.type
     name = cns.name.replace(' ','_')
     inf = cns.influence
@@ -404,11 +405,12 @@ def writeConstraint(fp, cns):
         fp.write("('Action', %s, %.2g, ['%s', '%s', '%s', '%s', %s, (%.3g, %.3g)])" % 
             (space, inf, name, cns.action.name.replace(' ','_'), cns.subtarget,
             cns.transform_channel, (cns.start_frame, cns.end_frame), cns.minimum, cns.maximum))
+            
     elif typ == 'COPY_LOCATION':
         fp.write("('CopyLoc', %s, %.2g, ['%s', '%s', " % 
         (space, inf, name, cns.subtarget))
         fp.write("(%d,%d,%d), " % (cns.use_x, cns.use_y, cns.use_z))
-        fp.write("(%d,%d,%d), %s])" % (cns.invert_x, cns.invert_y, cns.invert_z, cns.use_offset))
+        fp.write("(%d,%d,%d), %.3g, %s])" % (cns.invert_x, cns.invert_y, cns.invert_z, cns.head_tail, cns.use_offset))
 
     elif typ == 'COPY_ROTATION':
         fp.write("('CopyRot', %s, %.2g, ['%s', '%s', " % (space, inf, name, cns.subtarget))
@@ -420,7 +422,7 @@ def writeConstraint(fp, cns):
         fp.write("(%d,%d,%d), %s])" % (cns.use_x, cns.use_y, cns.use_z, cns.use_offset))
 
     elif typ == 'COPY_TRANSFORMS':
-        fp.write("('CopyTrans', %s, %.2g, ['%s', '%s'])" % (space, inf, name, cns.subtarget))
+        fp.write("('CopyTrans', %s, %.2g, ['%s', '%s', %.3g])" % (space, inf, name, cns.subtarget, cns.head_tail))
 
     elif typ == 'LIMIT_ROTATION':
         fp.write("('LimitRot', %s, %.2g, ['%s', " % (space, inf, name))
@@ -461,15 +463,14 @@ def writeConstraint(fp, cns):
 
     elif typ == 'TRANSFORM':
         fp.write("('Transform', %s, %.2g, \n" % (space, inf))
-        fp.write("\t\t\t['%s', '%s', '%s', (%.3g,%.3g,%.3g), (%.3g,%.3g,%.3g), ('%s','%s','%s'),\n"  % (
-            name, cns.subtarget.replace(' ','_'), cns.map_from,
-            cns.from_min_x, cns.from_min_y, cns.from_min_z,
-            cns.from_max_x, cns.from_max_y, cns.from_max_z,
-            cns.map_to_x_from, cns.map_to_y_from, cns.map_to_x_from))
-        fp.write("\t\t\t'%s', (%.3g,%.3g,%.3g), (%.3g,%.3g,%.3g)])" % (cns.map_to,
-            cns.to_min_x, cns.to_min_y, cns.to_min_z,
-            cns.to_max_x, cns.to_max_y, cns.to_max_z))
-            
+        fp.write("\t\t\t['%s', '%s', '%s', "% (name, cns.subtarget.replace(' ','_'), cns.map_from))
+        transformWrite(fp, scale, cns.map_from, cns.from_min_x, cns.from_min_y, cns.from_min_z)
+        transformWrite(fp, scale, cns.map_from, cns.from_max_x, cns.from_max_y, cns.from_max_z)
+        fp.write("('%s','%s','%s'),\n\t\t\t'%s', " % (cns.map_to_x_from, cns.map_to_y_from, cns.map_to_x_from, cns.map_to))
+        transformWrite(fp, scale, cns.map_to, cns.to_min_x, cns.to_min_y, cns.to_min_z)
+        transformWrite(fp, scale, cns.map_to, cns.to_max_x, cns.to_max_y, cns.to_max_z)
+        fp.write("])")
+        
     elif typ == 'LOCKED_TRACK':
         fp.write("('LockedTrack', %s, %.2g, ['%s', '%s','%s'])" % (space, inf, name, cns.subtarget, cns.track_axis))
             
@@ -482,7 +483,13 @@ def writeConstraint(fp, cns):
 
     return
         
-
+def transformWrite(fp, scale, channel, x, y, z):
+    print("  * ",channel, scale)
+    if channel == 'LOCATION':
+        fp.write("(%.3g,%.3g,%.3g), " % (scale*x, scale*y, scale*z))
+    else:
+        fp.write("(%.3g,%.3g,%.3g), " % (x,y,z))
+    return
 
 def extractName(b):
     boneType = b.name[:3]
@@ -504,11 +511,20 @@ def doPad(m, n):
     else:
         return '\t\t\t\t'
 
+###################################################################
+#
+#   User interface
+#
 
+#
+#   writeBoneFile(character, scale, fname):
+#    class OBJECT_OT_WriteBoneFile(bpy.types.Operator):
+#
 
-def writeBoneFile(character, fname):
-    print("Bone file %s for character %s" % (fname, character))
-    fp = open(fname, "w")
+def writeBoneFile(character, scale, fname):
+    fpath = os.path.realpath(os.path.expanduser(fname))
+    print("Bone file %s for character %s" % (fpath, character))
+    fp = open(fpath, "w")
     fp.write(
 "#\n" +
 "#  Bone definitions for %s rig\n" % character +
@@ -516,13 +532,157 @@ def writeBoneFile(character, fname):
 "import mhx_rig\n" + 
 "from mhx_rig import *\n")
 
-    writeBones(character, fp)
+    writeBones(character, scale, fp)
     fp.close()
-    print("Bone file %s written" % fname)
+    print("Bone file %s written" % fpath)
     return
 
-#writeBoneFile("Sintel", "/home/thomas/myblends/sintel/sintel_bones-raw.py")
-#writeBoneFile("Blenrig", "/home/svn/mh/makehuman/shared/mhx/blenrig_bones_raw.py")
-writeBoneFile("Zepam", "/home/thomas/svn/mh/shared/mhx/zepam_rig.py")
+class OBJECT_OT_WriteBoneFile(bpy.types.Operator):
+    bl_idname = "wbf.write_bone_file"
+    bl_label = "Write bonefile"
+
+    def execute(self, context):
+        scale = context.scene['BoneFileScale']
+        name = context.object.name
+        writeBoneFile(name, scale, "%s/%s_rig.py" % (context.scene['BoneFileDir'], name.lower()))
+        return{'FINISHED'}    
+
+#
+#   writeWeightFile(ob, src, fname):
+#   class OBJECT_OT_WriteWeightFiles(bpy.types.Operator):
+#
+
+def writeWeightFile(ob, src, fname):
+    fpath = os.path.realpath(os.path.expanduser(fname))
+    print("Weight file %s for character %s" % (fpath, ob))
+    fp = open(fpath, "w")
+
+    minheight = 1e6
+    maxheight = -1e6
+    for sv in src.data.vertices:
+        z = sv.co[2]
+        if z < minheight:
+            minheight = z
+        if z > maxheight:
+            maxheight = z
+
+    splices = {}
+    fac = 20/(maxheight - minheight)
+    for sv in src.data.vertices:
+        z = int(fac*(sv.co[2] - minheight))
+        try:
+            splices[z].append(sv)
+        except:
+            splices[z] = [sv]
+
+    table = {}
+    for v in ob.data.vertices:
+        zv = int(fac*(v.co[2] - minheight))
+        mindist = 1e6
+        for z in [zv-1,z,zv+1]:
+            try:
+                splice = splices[z]
+            except:
+                splice = []
+            for sv in splice:
+                offs = v.co - sv.co
+                if offs.length < mindist:
+                    best = sv
+                    mindist = offs.length
+        table[v.index] = best
+        print(v.index, best.index)
+
+    """
+    for f in ob.data.faces:
+        if len(f.vertices) == 3:
+            for v in f.vertices:
+                table[v] = None
+    """
+
+    for vg in src.vertex_groups:
+        name = vg.name.replace(' ','_')
+        print(name)
+        fp.write("  VertexGroup %s\n" % name)
+        for v in ob.data.vertices:
+            sv = table[v.index]
+            if sv:
+                for g in sv.groups:
+                    if g.group == vg.index and g.weight > 1e-4:
+                        fp.write("    vw %d %.4g ;\n" % (v.index, g.weight))
+        fp.write("  end VertexGroup\n")
+
+    fp.close()
+    print("Weight file %s written" % fpath)
+    return
+
+class OBJECT_OT_WriteWeightFiles(bpy.types.Operator):
+    bl_idname = "wbf.write_weight_files"
+    bl_label = "Write weight files"
+
+    def execute(self, context):
+        scn = context.scene
+        dir = context.scene['BoneFileDir']
+        src = context.object
+        for ob in context.scene.objects:
+            if ob.select and ob.type == 'MESH' and ob != src:
+                writeWeightFile(ob, src, "%s/templates/%s_weights.mhx" % (dir, ob.name.lower()))
+        return{'FINISHED'}    
+
+
+#
+#   class WriteBoneFilePanel(bpy.types.Panel):
+#
+
+class WriteBoneFilePanel(bpy.types.Panel):
+    bl_label = "Write bonefile"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        return (context.object and 
+            (context.object.type == 'ARMATURE' or context.object.type == 'MESH'))
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(context.scene, "BoneFileScale")
+        layout.prop(context.scene, "BoneFileDir")
+        layout.operator("wbf.write_bone_file")
+        layout.operator("wbf.write_weight_files")
+        return
+
+#
+#    Init and register
+#
+
+def initInterface(scn):
+    bpy.types.Scene.BoneFileDir = StringProperty(
+        name="Directory", 
+        maxlen=1024)
+    scn['BoneFileDir'] = "~/svn/mh/shared/mhx"
+
+    bpy.types.Scene.BoneFileScale = FloatProperty(name="Scale")
+    scn['BoneFileScale'] = 10.0
+    return
+
+initInterface(bpy.context.scene)
+
+def register():
+    bpy.utils.register_module(__name__)
+    pass
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+    pass
+
+if __name__ == "__main__":
+    register()
+
+
+#writeBoneFile("Sintel", 10, "/home/thomas/myblends/sintel/sintel_bones-raw.py")
+#writeBoneFile("Blenrig", 10, "/home/svn/mh/makehuman/shared/mhx/blenrig_bones_raw.py")
+#writeBoneFile("Zepam", 10, "/home/thomas/svn/mh/shared/mhx/zepam_rig.py")
+
+
 
 
