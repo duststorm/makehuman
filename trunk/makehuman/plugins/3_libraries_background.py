@@ -34,10 +34,12 @@ class BackgroundTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Background')
+        
         self.texture = mh.Texture()
         
         mesh = gui3d.RectangleMesh(420, 420)
         self.backgroundImage = gui3d.Object(self.app.categories['Modelling'], [190, 90, 1], mesh, visible=False)
+        self.opacity = 100
         
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2.0, height=20)
         
@@ -65,8 +67,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
             bg = self.backgroundImage
             bg.mesh.setTexture('backgrounds/' + filename)
-            group = bg.mesh.getFaceGroup('rectangle')
-            group.setColor([255, 255, 255, 100])
+            bg.mesh.setColor([255, 255, 255, self.opacity])
             if self.texture.width > self.texture.height:
                 bg.setScale(1.0, float(self.texture.height) / float(self.texture.width))
             else:
@@ -129,11 +130,9 @@ class settingsTaskView(gui3d.TaskView) :
         
         # sliders
         self.zoomSlider = gui3d.Slider(self.backgroundBox, value=1, min=0.0,max=4, label = "Zoom background")
-        y+=36
         self.panXSlider = gui3d.Slider(self.backgroundBox, value=self.backgroundImage.getPosition()[0], min=0.0,max=500, label = "Pan X background")
-        y+=36
         self.panYSlider = gui3d.Slider(self.backgroundBox, value=self.backgroundImage.getPosition()[1], min=0.0,max=500, label = "Pan Y background")
-        y+=36
+        self.OpacitySlider = gui3d.Slider(self.backgroundBox, value=taskview.opacity, min=0,max=255, label = "Opacity")
         
         # toggle button
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
@@ -160,10 +159,17 @@ class settingsTaskView(gui3d.TaskView) :
         def onChange(value):
             self.changePanY(value)
             
+        @self.OpacitySlider.event
+        def onChanging(value):
+            self.backgroundImage.mesh.setColor([255, 255, 255, value])
+        @self.OpacitySlider.event
+        def onChange(value):
+            taskview.opacity = value
+            self.backgroundImage.mesh.setColor([255, 255, 255, self.opacity])
+            
         @self.backgroundImage.event
         def onMouseDown(event):
             self.lastPos=[event.x, event.y]
-            
         @self.backgroundImage.event
         def onMouseDragged(event):
             self.backgroundImage.setPosition([self.backgroundImage.getPosition()[0]+event.x-self.lastPos[0], self.backgroundImage.getPosition()[1]+event.y-self.lastPos[1], 1.0])
