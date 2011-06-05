@@ -370,8 +370,8 @@ class MHApplication(gui3d.Application):
                 
     def loadFinish(self):
         
-        self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
         self.selectedHuman.applyAllTargets(self.app.progress)
+        self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
         self.dialog = gui3d.View(self)
         self.dialog.blocker = gui3d.Object(self.dialog, [0, 0, 9.7], gui3d.RectangleMesh(800, 600))
         self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150))
