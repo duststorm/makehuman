@@ -70,15 +70,16 @@ class PoseTaskView(gui3d.TaskView):
     
     #get bindings for r-shoulder-joint
     f = open("utils/makepose/r-shoulder-joint.txt")
-    jointVerts = [];
+    self.jointVerts = [];
     while (1): 
       line = f.readline()
       if not line: break 
-      jointVerts.append(int(line));
+      self.jointVerts.append(int(line));
     f.close()           
     
     #compute bounding box
-    bboxj = calcBBox(self.app.selectedHuman.meshData.verts,  jointVerts)
+    #cant do this! because mh human changes after the init -_-
+    bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
     
     #adding offset
     bboxj[0][0]= bboxj[0][0] - 0.01
@@ -89,9 +90,8 @@ class PoseTaskView(gui3d.TaskView):
     bboxj[1][2]= bboxj[1][2] + 0.01  
     self.tets =  box2Tetrahedrons(bboxj)
 
-    #@self.testButton.event
-    #def onClicked(event):
-    #    self.mvcTest()
+    #print "self.tets: ", self.tets
+    #print "bboxj: ", bboxj
     
     @self.savePoseButton.event
     def onClicked(event):
@@ -166,6 +166,32 @@ class PoseTaskView(gui3d.TaskView):
   def onShow(self, event):
       self.app.selectedHuman.storeMesh()
       self.skeleton.update(self.app.selectedHuman.meshData)
+      
+      #need to do it on the current human
+      f = open("utils/makepose/r-shoulder-joint.txt")
+      self.jointVerts = [];
+      while (1): 
+        line = f.readline()
+        if not line: break 
+        self.jointVerts.append(int(line));
+      f.close()           
+      
+      #compute bounding box
+      #cant do this! because mh human changes after the init -_-
+      bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
+      
+      #adding offset
+      bboxj[0][0]= bboxj[0][0] - 0.01
+      bboxj[1][0]= bboxj[1][0] + 0.01
+      bboxj[0][1]= bboxj[0][1] - 0.01
+      bboxj[1][1]= bboxj[1][1] + 0.01
+      bboxj[0][2]= bboxj[0][2] - 0.01
+      bboxj[1][2]= bboxj[1][2] + 0.01  
+      self.tets =  box2Tetrahedrons(bboxj)
+      
+      print "self.tets: ", self.tets
+      print "bboxj: ", bboxj
+      
       gui3d.TaskView.onShow(self, event)
 
   def onHide(self, event):
@@ -195,7 +221,9 @@ class PoseTaskView(gui3d.TaskView):
     for i in joint.bindedVects:
       #if shoulderjoint cage do the skinning transformation...
       if (joint == self.joint) and (joint.name == 'joint-r-shoulder') and self.skin.selected:
-        if src[i][0] < self.tets[0][2][0]:
+        if (src[i][0] < self.tets[0][2][0]) and (i in self.jointVerts):
+
+          #using all 5 tetrahedrons as controls
           weights = computeAllWeights(src[i],self.tets)
           v = [0.0,0.0,0.0]
           for tet_i in xrange(0,5):
@@ -203,6 +231,19 @@ class PoseTaskView(gui3d.TaskView):
               v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
           #average of 5 tetrahedrons
           dst[i].co = vmul(v, 0.2)
+          #end of using 5
+          
+          """
+          #using only one tetrahedron as control
+          j,w = computeWeights(src[i], self.tets)
+          if not j: print src[i]
+          v = [0.0,0.0,0.0]
+          for k in xrange(0,4):
+            v= vadd(vmul(tets2[j][k],w[k]),v)
+          dst[i].co = v[:]
+          #end of using 1
+          """
+          
         else :
           dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
           
@@ -391,10 +432,11 @@ def computeWeights(v,tets):
         for rows in xrange(0,3):
           A[rows*3 + cols] = v2[rows]
     w = linsolve(A,z)
+    
     if validWeight(w): 
       w =[1-w[0]-w[1]-w[2],w[0], w[1],w[2]]
       return i,w
-  
+
   return None,None
 
 def computeAllWeights(v,tets):
