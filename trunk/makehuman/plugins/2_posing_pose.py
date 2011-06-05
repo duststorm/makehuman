@@ -189,8 +189,8 @@ class PoseTaskView(gui3d.TaskView):
       bboxj[1][2]= bboxj[1][2] + 0.01  
       self.tets =  box2Tetrahedrons(bboxj)
       
-      print "self.tets: ", self.tets
-      print "bboxj: ", bboxj
+      #print "self.tets: ", self.tets
+      #print "bboxj: ", bboxj
       
       gui3d.TaskView.onShow(self, event)
 
