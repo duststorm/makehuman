@@ -76,6 +76,7 @@ class Human(gui3d.Object):
         self.muscleVal = 0.0
         self.overweightVal = 0.0
         self.underweightVal = 0.0
+        self.asianVal = 0.0
         self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
@@ -94,7 +95,7 @@ class Human(gui3d.Object):
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
 
         self.muscleWeightModifier = humanmodifier.GenderAgeMuscleWeightModifier('data/targets/macrodetails/universal-${gender}-${age}-${tone}-${weight}.target')
-        self.baseModifier = humanmodifier.GenderAgeModifier('data/targets/macrodetails/neutral-${gender}-${age}.target')
+        self.baseModifier = humanmodifier.GenderAgeEthnicModifier('data/targets/macrodetails/${ethnic}-${gender}-${age}.target')
         
         self.setTexture("data/textures/texture.png")
 
@@ -269,6 +270,16 @@ class Human(gui3d.Object):
                 return
             self.flaccidVal = -amount
             self.muscleVal = 0
+            
+    def setAsian(self, asian):
+
+        asian = min(max(asian, 0.0), 1.0)
+        self.asianVal = asian
+        self.callEvent('onChanged', HumanEvent(self, 'asian'))
+        
+    def getAsian(self):
+
+        return self.asianVal
             
     def setHeight(self, height):
         modifier = humanmodifier.Modifier(
@@ -471,6 +482,7 @@ class Human(gui3d.Object):
         self.muscleVal = 0.0
         self.overweightVal = 0.0
         self.underweightVal = 0.0
+        self.asianVal = 0.0
         self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
@@ -515,6 +527,8 @@ class Human(gui3d.Object):
                     self.setMuscle(float(lineData[1]))
                 elif lineData[0] == 'weight':
                     self.setWeight(float(lineData[1]))
+                elif lineData[0] == 'asian':
+                    self.setAsian(float(lineData[1]))
                 elif lineData[0] == 'height':
                     modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
                                                       'data/targets/macrodetails/universal-stature-giant.target')
@@ -541,6 +555,7 @@ class Human(gui3d.Object):
         f.write('age %f\n' % self.getAge())
         f.write('muscle %f\n' % self.getMuscle())
         f.write('weight %f\n' % self.getWeight())
+        f.write('asian %f\n' % self.getAsian())
 
         modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
         f.write('height %f\n' % modifier.getValue(self))

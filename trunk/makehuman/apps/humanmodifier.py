@@ -293,6 +293,39 @@ class GenderAgeModifier(GenericModifier):
     def clampValue(self, value):
         return max(0.0, min(1.0, value))
         
+class GenderAgeEthnicModifier(GenericModifier):
+
+    def __init__(self, template):
+        
+        GenericModifier.__init__(self, template)
+        
+    # overrides
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
+        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
+        targets = [(Template(target[0]).safe_substitute(ethnic=value), target[1] + [value]) for target in targets for value in ['neutral', 'asian']]
+
+        return targets
+    
+    def getFactors(self, human, value):
+        
+        factors = {
+            'female': human.femaleVal,
+            'male': human.maleVal,
+            'child': human.childVal,
+            'young': human.youngVal,
+            'old': human.oldVal,
+            'asian':human.asianVal,
+            'neutral':1.0 - human.asianVal
+        }
+        
+        return factors
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+        
 class GenderAgeMuscleWeightModifier(GenericModifier):
 
     def __init__(self, template):

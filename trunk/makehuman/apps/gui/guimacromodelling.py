@@ -44,6 +44,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.muscleSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Tone")
         self.weightSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Weight")
         self.heightSlider = gui3d.Slider(self.macroBox, value=0.0, min=-1.0, max=1.0, label = "Height")
+        self.asianSlider = gui3d.Slider(self.macroBox, value=0.0, min=0.0, max=1.0, label = "Asian")
         
         self.radialBox = gui3d.GroupBox(self, [590, 80, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(width=185+15))
         self.radialWidget = gui3d.Radial(self.radialBox)
@@ -84,6 +85,13 @@ class MacroModelingTaskView(gui3d.TaskView):
             self.syncStatus()
             human.meshData.update()
             
+        @self.asianSlider.event
+        def onChange(value):
+            human = self.app.selectedHuman
+            self.app.do(MacroAction(human, 'Asian', value, self.syncSliders, False))
+            self.syncStatus()
+            human.meshData.update()
+            
         self.syncSliders()
         self.syncStatus()
 
@@ -94,6 +102,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.muscleSlider.setValue(human.getMuscle())
         self.weightSlider.setValue(human.getWeight())
         self.heightSlider.setValue(human.getHeight())
+        self.asianSlider.setValue(human.getAsian())
 
     def syncStatus(self):
         human = self.app.selectedHuman
