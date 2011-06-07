@@ -204,6 +204,7 @@ extern "C"
         PyObject *mouseMovedCallback;
         PyObject *keyDownCallback;
         PyObject *keyUpCallback;
+        PyObject *quitCallback;
 
         SortStruct *sortData;
         int nSortData;
@@ -219,6 +220,7 @@ extern "C"
     void callKeyDown(int key, unsigned short character, int modifiers);
     void callKeyUp(int key, unsigned short character, int modifiers);
     void callResize(int w, int h, int fullscreen);
+    void callQuit();
 
 // Scene methods
     void setClearColor(float r, float g, float b, float a);

@@ -96,6 +96,7 @@ static void initGlobals(void)
     G.mouseMovedCallback = NULL;
     G.keyDownCallback = NULL;
     G.keyUpCallback = NULL;
+    G.quitCallback = NULL;
 
     // Sort buffer
     G.sortData = NULL;
@@ -496,6 +497,24 @@ static PyObject* mh_SetKeyUpCallback(PyObject *self, PyObject *callback)
     return Py_BuildValue("");
 }
 
+static PyObject* mh_SetQuitCallback(PyObject *self, PyObject *callback)
+{
+  if (!PyCallable_Check(callback))
+  {
+    PyErr_SetString(PyExc_TypeError, "Callable expected");
+    return NULL;
+  }
+
+  Py_INCREF(callback);
+
+  if (G.quitCallback)
+    Py_DECREF(G.quitCallback);
+
+  G.quitCallback = callback;
+
+  return Py_BuildValue("");
+}
+
 /** \brief Gets program specific path locations.
  *  MakeHuman uses pathes to export objects and to (re)store exports and screen grabs.
  *  Since the various locations depend from the system (Linux, Windows, Mac OS) the program is running
@@ -718,6 +737,7 @@ static PyMethodDef EmbMethods[] =
     {"setMouseMovedCallback", mh_SetMouseMovedCallback, METH_O, ""},
     {"setKeyDownCallback", mh_SetKeyDownCallback, METH_O, ""},
     {"setKeyUpCallback", mh_SetKeyUpCallback, METH_O, ""},
+    {"setQuitCallback", mh_SetQuitCallback, METH_O, ""},
     {NULL, NULL, 0, NULL}
 };
 

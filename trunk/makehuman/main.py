@@ -419,6 +419,11 @@ class MHApplication(gui3d.Application):
         self.saveSettings()
         self.unloadPlugins()
         
+        
+    def onQuit(self, event):
+        
+        self.promptAndExit()
+        
     def onMouseDragged(self, event):
         
         if self.selectedHuman.isVisible():

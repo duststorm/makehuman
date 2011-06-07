@@ -836,6 +836,12 @@ void callResize(int w, int h, int fullscreen)
         PyErr_Print();
 }
 
+void callQuit()
+{
+  if (G.quitCallback && !PyObject_CallFunction(G.quitCallback, ""))
+    PyErr_Print();
+}
+
 void setClearColor(float r, float g, float b, float a)
 {
     G.clearColor[0] = r;

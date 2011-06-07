@@ -1196,6 +1196,11 @@ void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
         mhQueueUpdate();
 }
 
+void mhQuit()
+{
+  callQuit();
+}
+
 static unsigned char *pickingBuffer = NULL;
 static int pickingBufferSize = 0;
 
@@ -2206,7 +2211,7 @@ void mhEventLoop(void)
             G.pendingUpdate = 0;
             break;
         case SDL_QUIT:
-            mhShutDown();
+            mhQuit();
             break;
         }
     }

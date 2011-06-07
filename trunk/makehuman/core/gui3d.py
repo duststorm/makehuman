@@ -683,6 +683,7 @@ class Application(events3d.EventHandler):
         mh.setKeyDownCallback(self.onKeyDownCallback)
         mh.setKeyUpCallback(self.onKeyUpCallback)
         mh.setResizeCallback(self.onResizedCallback)
+        mh.setQuitCallback(self.onQuitCallback)
 
         mh.startWindow(1)
         
@@ -928,6 +929,9 @@ class Application(events3d.EventHandler):
             for task in category.tasks:
                 
                 task.callEvent('onResized', event)
+                
+    def onQuitCallback(self):
+        self.callEvent('onQuit', None)
             
     def getCategory(self, name, style=CategoryTabStyle):
         try:
