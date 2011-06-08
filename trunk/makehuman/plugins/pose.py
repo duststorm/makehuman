@@ -4,11 +4,7 @@ import os.path
 # We need this for gui controls
 
 import gui3d
-import mh
 import os
-import algos3d
-import aljabr
-import math
 import poseengine
 print 'Pose plugin imported'
 

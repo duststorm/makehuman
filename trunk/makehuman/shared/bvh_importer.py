@@ -22,7 +22,7 @@ Abstract
 BVH importer
 """
 
-from aljabr import vadd, makeUnit, makeRotation, mtransform, degree2rad, makeScale, makeTranslation, mmul, makeTransform, euler2matrix, vmul
+from aljabr import vadd, makeUnit, degree2rad, makeTranslation, mmul, euler2matrix
 from skeleton import Joint
 
 class bvhJoint(Joint):

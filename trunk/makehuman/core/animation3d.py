@@ -134,7 +134,7 @@ def cubicBezierInterpolator(v0, v1, v2, v3, alpha):
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
 
-    return ((v3 - 3 * v2 + 3 * v1) - x0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v1 - 3 * v0) * alpha + v0
+    return ((v3 - 3 * v2 + 3 * v1) - v0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v1 - 3 * v0) * alpha + v0
 
 
 # Quadratic b-spline interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.

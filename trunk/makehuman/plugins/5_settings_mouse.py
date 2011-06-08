@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d, events3d
+import gui3d
     
 class AppMouseActionEdit(gui3d.MouseActionEdit):
     def __init__(self, parent, method):

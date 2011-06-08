@@ -24,12 +24,10 @@ TODO
 
 import events3d
 import gui3d
-import algos3d
 import humanmodifier
 from operator import mul
 from string import Template
 import re
-import math
 import os
 
 class RangeDetailModifier(humanmodifier.GenderAgeRangeModifier):

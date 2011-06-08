@@ -26,8 +26,6 @@ TO DO
 __docformat__ = 'restructuredtext'
 
 import gui3d
-import events3d
-import mh
 import os
 import download
 

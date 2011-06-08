@@ -24,7 +24,6 @@ TODO
 """
 
 import events3d
-import files3d
 import animation3d
 import module3d
 import mh
@@ -994,6 +993,11 @@ class TabView(View):
     
     def setPosition(self, position):
         
+        dx, dy, dz = self.getPosition()
+        dx = position[0] - dx
+        dy = position[1] - dy
+        dz = position[2] - dz
+        
         self.box.setPosition(position)
         
         for child in self.children:
@@ -1189,7 +1193,7 @@ class Slider(View):
         
     def setMin(self, value):
         self.min = value
-        setValue(self.__value)
+        self.setValue(self.__value)
         
     def setMax(self, value):
         self.max = value

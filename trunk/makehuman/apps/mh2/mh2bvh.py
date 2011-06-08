@@ -53,7 +53,6 @@ def exportSkeleton(obj, filename):
     skeleton.update(obj)
 
     # Write bvh file
-    joints = 0
 
     f = open(filename, 'w')
     f.write('HIERARCHY\n')

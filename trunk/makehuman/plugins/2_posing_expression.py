@@ -26,8 +26,6 @@ class ExpressionTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Expression')
-
-        human = self.app.selectedHuman
         
         expressions = [
             ('smile1', ['smile', 'hopeful', 'innocent']),

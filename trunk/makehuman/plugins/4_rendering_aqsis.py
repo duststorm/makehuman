@@ -3,7 +3,6 @@
 # We need this for gui controls
 
 import gui3d
-import mh
 import os
 import sys
 if 'nt' in sys.builtin_module_names:

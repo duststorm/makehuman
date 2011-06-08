@@ -23,7 +23,6 @@ Mesh Subdivision Plugin.
 
 __docformat__ = 'restructuredtext'
 
-import time
 from aljabr import centroid
 from fastmath import vmul3d, vadd3d, vavg2d, vavg2d4, vavg3d, vavg3d4
 

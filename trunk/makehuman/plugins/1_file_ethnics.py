@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d, mh, os
-from algos3d import getTarget
+import gui3d, os
 
 class EthnicsTaskView(gui3d.TaskView):
 

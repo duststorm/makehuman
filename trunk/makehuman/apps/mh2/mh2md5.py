@@ -32,7 +32,6 @@ Requires:
 
 __docformat__ = 'restructuredtext'
 
-import module3d
 from os.path import basename
 from skeleton import Skeleton
 

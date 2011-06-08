@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import gui3d, hair, mh
+import gui3d, hair
 from aljabr import *
 import random
 from math import sqrt, pow, log

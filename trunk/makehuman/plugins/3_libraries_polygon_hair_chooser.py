@@ -22,7 +22,6 @@ TO DO
 
 import gui3d, mh, os
 import files3d
-from os import path
 from aljabr import in2pts, vadd, vsub, calcBBox
 
 HairButtonStyle = gui3d.Style(**{

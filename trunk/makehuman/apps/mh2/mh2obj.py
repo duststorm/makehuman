@@ -30,7 +30,6 @@ Requires:
 
 __docformat__ = 'restructuredtext'
 
-import files3d
 from os.path import basename
 
 def exportObj(obj, filename, exportGroups = True, groupFilter=None):

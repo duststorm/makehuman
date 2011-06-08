@@ -1,9 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import gui3d, time
-import animation3d
-import humanmodifier
-import mh
+import gui3d
 
 class MacroAction:
 

@@ -35,11 +35,9 @@ main OpenGL/SDL/Application event handling loop.
 __docformat__ = 'restructuredtext'
 
 import mh
-import events3d
 import gui3d
 import guimacromodelling
 import guidetailmodelling
-import os
 
 class ModellingCategory(gui3d.Category):
 

@@ -32,8 +32,6 @@ Requires:
 
 __docformat__ = 'restructuredtext'
 
-import module3d
-import aljabr
 import struct
 
 def exportStlAscii(obj, filename, exportJoints = False):

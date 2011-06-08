@@ -25,12 +25,9 @@ TO DO
 
 import algos3d
 import gui3d
-import time
 import files3d
 import os
-import mh
 import humanmodifier
-import math
 import hair
 import events3d
 
@@ -333,7 +330,6 @@ class Human(gui3d.Object):
         self.muscleWeightModifier.setValue(self, 1.0)
         self.baseModifier.setValue(self, 1.0)
 
-        targetName = None
         algos3d.resetObj(self.meshData)
 
         if progressCallback:

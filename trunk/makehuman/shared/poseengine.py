@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d
-import mh
 import os
 import algos3d
 import aljabr
@@ -317,7 +315,7 @@ class Poseengine():
         try:
             fileDescriptor = open(os.path.join("data/targets/poseengine","group_hierarchy.dat"))
         except:
-            print "Unable to open hierarchy file %s",(filePath)
+            print "Unable to open hierarchy file %s",(os.path.join("data/targets/poseengine","group_hierarchy.dat"))
             return  None
         for line in fileDescriptor:
             l = line.strip()

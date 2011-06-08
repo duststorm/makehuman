@@ -46,7 +46,6 @@ import subprocess
 import mh2povray_ini
 import random
 import mh
-from math import atan2, pi, sqrt
 
 # Create an instance of the Hairgenerator class with a global context.
 

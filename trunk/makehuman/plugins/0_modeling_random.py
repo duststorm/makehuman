@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d, mh, os, random, humanmodifier
+import gui3d, random, humanmodifier
 class RandomTaskView(gui3d.TaskView):
 
     def __init__(self, category):

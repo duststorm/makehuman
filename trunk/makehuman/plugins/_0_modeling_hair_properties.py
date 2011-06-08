@@ -3,7 +3,7 @@
 # We need this for gui controls
 
 import colorsys
-import gui3d, hair, font3d
+import gui3d
 from aljabr import vdist, vmul, vnorm, vsub, vadd
 
 def rgbToHsl(r, g, b):

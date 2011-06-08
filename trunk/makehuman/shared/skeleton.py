@@ -25,7 +25,7 @@ This module implements a skeleton structure used in exporters and the skeleton v
 
 """
 
-from aljabr import vsub, vmul, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeTransform, makeUnit, makeTranslation, mmul, euler2matrix, mtransform, invTransform, degree2rad, _transpose
+from aljabr import vsub, centroid, vcross, vdot, vnorm, axisAngleToQuaternion, makeUnit, makeTranslation, mmul, euler2matrix, invTransform, _transpose
 from math import acos
 
 class Joint:

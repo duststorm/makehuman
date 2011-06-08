@@ -32,10 +32,7 @@ main OpenGL/SDL/Application event handling loop.
 """
 
 import mh
-import files3d
-import animation3d
 import gui3d
-import events3d
 import os
 import mh2obj
 import mh2bvh

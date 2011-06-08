@@ -31,9 +31,7 @@ The MakeHuman data structures are transposed into renderman objects.
 import mh
 import os
 import aljabr
-import files3d
 import subprocess
-import random
 #import hair
 import time
 import math
@@ -334,7 +332,7 @@ class RMRHuman(RMRObject):
     def getSubObject(self, name):
         for subOb in self.subObjects:
             if subOb.name == name:
-                return subObj
+                return subOb
 
     def getHumanPosition(self):
         return (self.human.getPosition()[0], self.human.getPosition()[1],\

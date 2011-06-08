@@ -188,7 +188,7 @@ def getTarget(obj, targetPath):
 
     try:
         target = targetBuffer[targetPath]
-    except KeyError, text:
+    except KeyError:
         pass
     else:
         return target
@@ -702,7 +702,6 @@ def loadVertsColors(obj, colorsPath, update=1, mode='new'):
        
     """
 
-    t1 = time.time()
     try:
         fileDescriptor = open(colorsPath)
     except:

@@ -5,9 +5,6 @@ import os.path
 
 import gui3d
 import os
-import random
-import algos3d
-import mh
 import humanmodifier
 import events3d
 

@@ -47,8 +47,6 @@ class FaceTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Face')
-
-        human = self.app.selectedHuman
         
         features = [
             ('eyes', ['data/targets/details/neutral_${gender}-${age}-eye%d.target' % i for i in xrange(1, 31)]),

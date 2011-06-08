@@ -5,11 +5,7 @@ import os.path
 
 import gui3d
 import os
-import random
-import algos3d
-import mh
 import humanmodifier
-import events3d
 import aljabr
 
 class MeasureSlider(humanmodifier.ModifierSlider):
@@ -81,7 +77,6 @@ class MeasureTaskView(gui3d.TaskView):
         self.modifiers = {}
         
         measureDataPath = "data/targets/measure/"
-        human = self.app.selectedHuman
 
         for name, subnames in measurements:
             # Create box

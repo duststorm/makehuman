@@ -3,7 +3,6 @@
 import sys
 if 'nt' in sys.builtin_module_names:
     sys.path.append('./pythonmodules')
-import subprocess
 
 # We need this for rendering
 

@@ -16,8 +16,6 @@ class RenderingSettingTaskView(gui3d.TaskView):
         rendering_height = self.app.settings.get('rendering_height', 600)
         self.height= gui3d.TextEdit(resBox, str(rendering_height), gui3d.TextEditStyle._replace(width=112),
             gui3d.intValidator)
-        
-        human = self.app.selectedHuman
 
         @self.width.event
         def onChange(value):

@@ -21,7 +21,7 @@ TO DO
 """
 
 #import zipfile
-import gui3d, mh, os
+import gui3d, mh
 from os import path
 
 HairButtonStyle = gui3d.Style(**{

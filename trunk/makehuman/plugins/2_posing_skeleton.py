@@ -22,7 +22,6 @@ Abstract
 Skeleton visualizer
 """
 
-import os.path
 import gui3d
 import module3d
 import aljabr
