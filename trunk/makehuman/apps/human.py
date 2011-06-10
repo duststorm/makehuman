@@ -74,6 +74,7 @@ class Human(gui3d.Object):
         self.overweightVal = 0.0
         self.underweightVal = 0.0
         self.asianVal = 0.0
+        self.africanVal = 0.0
         self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
@@ -267,6 +268,16 @@ class Human(gui3d.Object):
                 return
             self.flaccidVal = -amount
             self.muscleVal = 0
+            
+    def setAfrican(self, african):
+
+        african = min(max(african, 0.0), 1.0)
+        self.africanVal = african
+        self.callEvent('onChanged', HumanEvent(self, 'african'))
+        
+    def getAfrican(self):
+
+        return self.africanVal
             
     def setAsian(self, asian):
 
@@ -479,6 +490,7 @@ class Human(gui3d.Object):
         self.overweightVal = 0.0
         self.underweightVal = 0.0
         self.asianVal = 0.0
+        self.africanVal = 0.0
         self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
@@ -523,7 +535,9 @@ class Human(gui3d.Object):
                     self.setMuscle(float(lineData[1]))
                 elif lineData[0] == 'weight':
                     self.setWeight(float(lineData[1]))
-                elif lineData[0] == 'asian':
+                elif lineData[0] == 'african':
+                    self.setAfrican(float(lineData[1]))
+                elif lineData[0] == 'african':
                     self.setAsian(float(lineData[1]))
                 elif lineData[0] == 'height':
                     modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
@@ -551,6 +565,7 @@ class Human(gui3d.Object):
         f.write('age %f\n' % self.getAge())
         f.write('muscle %f\n' % self.getMuscle())
         f.write('weight %f\n' % self.getWeight())
+        f.write('african %f\n' % self.getAfrican())
         f.write('asian %f\n' % self.getAsian())
 
         modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')

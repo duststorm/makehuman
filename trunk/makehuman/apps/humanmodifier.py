@@ -305,11 +305,13 @@ class GenderAgeEthnicModifier(GenericModifier):
         # Build target list of (targetname, [factors])
         targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
         targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
-        targets = [(Template(target[0]).safe_substitute(ethnic=value), target[1] + [value]) for target in targets for value in ['neutral', 'asian']]
+        targets = [(Template(target[0]).safe_substitute(ethnic=value), target[1] + [value]) for target in targets for value in ['neutral', 'african', 'asian']]
 
         return targets
     
     def getFactors(self, human, value):
+        
+        ethnics = [val for val in [human.africanVal, human.asianVal] if val > 0.0]
         
         factors = {
             'female': human.femaleVal,
@@ -317,8 +319,9 @@ class GenderAgeEthnicModifier(GenericModifier):
             'child': human.childVal,
             'young': human.youngVal,
             'old': human.oldVal,
-            'asian':human.asianVal,
-            'neutral':1.0 - human.asianVal
+            'african':human.africanVal / len(ethnics) if ethnics else human.africanVal,
+            'asian':human.asianVal / len(ethnics) if ethnics else human.asianVal,
+            'neutral':(1.0 - sum(ethnics) / len(ethnics)) if ethnics else 1.0
         }
         
         return factors
