@@ -66,23 +66,6 @@ class Joint:
         angle = acos(vdot([0.0, 0.0, 1.0], direction))
         return axisAngleToQuaternion(axis, angle)
     
-    """
-    def calcInverseTransform(self):
-      
-        if self.parent:
-            self.inverseTransform = self.parent.inverseTransform[:]
-        else:
-            self.inverseTransform = makeUnit()
-            
-        m = makeTranslation(*self.offset)
-        self.inverseTransform = mmul(self.inverseTransform, m)
-        
-        for child in self.children:
-            child.calcInverseTransform()
-                
-        self.inverseTransform = invTransform(self.inverseTransform)
-    """
-    
     def calcTransform(self, recursive=True):
       
         if self.parent:
