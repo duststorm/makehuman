@@ -8,12 +8,12 @@ CFG=Makehuman - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "Makehuman.mak".
+!MESSAGE NMAKE /f "makehuman.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "Makehuman.mak" CFG="Makehuman - Win32 Debug"
+!MESSAGE NMAKE /f "makehuman.mak" CFG="Makehuman - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /vmg /GX /O2 /I "C:\Python26\include" /I "E:\MY PROJECTS\EXTLIB\SDL\INCLUDE" /I "E:\MY PROJECTS\MAKEHUMAN\INCLUDE" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "UNICODE" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /vmg /GX /O2 /I "E:\My Projects\extlib\glew-1.6.0\include" /I "C:\Python26\include" /I "E:\MY PROJECTS\EXTLIB\SDL\INCLUDE" /I "E:\MY PROJECTS\MAKEHUMAN\INCLUDE" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "UNICODE" /YX /FD /c
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
 # ADD RSC /l 0x809 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -50,7 +50,7 @@ BSC32=bscmake.exe
 # SUBTRACT BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 SDLmain.lib SDL.lib glu32.lib opengl32.lib msvcrt.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib python26.lib /nologo /subsystem:console /machine:I386 /nodefaultlib:"libcd.lib" /nodefaultlib:"libc.lib" /libpath:"E:\MY PROJECTS\EXTLIB\SDL\LIB" /libpath:"C:\Python26\libs"
+# ADD LINK32 glew32.lib SDLmain.lib SDL.lib glu32.lib opengl32.lib msvcrt.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib python26.lib /nologo /subsystem:console /machine:I386 /nodefaultlib:"libcd.lib" /nodefaultlib:"libc.lib" /libpath:"E:\My Projects\extlib\glew-1.6.0\lib" /libpath:"E:\MY PROJECTS\EXTLIB\SDL\LIB" /libpath:"C:\Python26\libs"
 # SUBTRACT LINK32 /pdb:none /nodefaultlib
 
 !ELSEIF  "$(CFG)" == "Makehuman - Win32 Debug"
