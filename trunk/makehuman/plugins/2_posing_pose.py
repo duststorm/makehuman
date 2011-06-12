@@ -180,6 +180,9 @@ class PoseTaskView(gui3d.TaskView):
       #cant do this! because mh human changes after the init -_-
       bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
       
+      #compute right shoulder joint position because we cannot rely on the diamond
+      self.skeleton.getJoint('joint-r-shoulder').position = vmul(vadd(bboxj[0],bboxj[1]),0.5)
+      
       #adding offset
       bboxj[0][0]= bboxj[0][0] - 0.01
       bboxj[1][0]= bboxj[1][0] + 0.01
@@ -214,40 +217,33 @@ class PoseTaskView(gui3d.TaskView):
     elif rotation:
       joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
       
-    if (joint == self.joint) and self.skin.selected:
+    if (joint == self.joint) and self.skin.selected and (joint.name == 'joint-r-shoulder'):
       transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
       tets2 = deformTets(self.tets, center, transform2)
+      for i in self.jointVerts:
+        #using all 5 tetrahedrons as controls
+        weights = computeAllWeights(src[i],self.tets)
+        v = [0.0,0.0,0.0]
+        for tet_i in xrange(0,5):
+          for j in xrange(0,4):
+            v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
+        #average of 5 tetrahedrons
+        dst[i].co = vmul(v, 0.2)
+        #end of using 5
+        
+        """
+        #using only one tetrahedron as control
+        j,w = computeWeights(src[i], self.tets)
+        if not j: print src[i]
+        v = [0.0,0.0,0.0]
+        for k in xrange(0,4):
+          v= vadd(vmul(tets2[j][k],w[k]),v)
+        dst[i].co = v[:]
+        #end of using 1
+        """
 
     for i in joint.bindedVects:
-      #if shoulderjoint cage do the skinning transformation...
-      if (joint == self.joint) and (joint.name == 'joint-r-shoulder') and self.skin.selected:
-        if (src[i][0] < self.tets[0][2][0]) and (i in self.jointVerts):
-
-          #using all 5 tetrahedrons as controls
-          weights = computeAllWeights(src[i],self.tets)
-          v = [0.0,0.0,0.0]
-          for tet_i in xrange(0,5):
-            for j in xrange(0,4):
-              v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
-          #average of 5 tetrahedrons
-          dst[i].co = vmul(v, 0.2)
-          #end of using 5
-          
-          """
-          #using only one tetrahedron as control
-          j,w = computeWeights(src[i], self.tets)
-          if not j: print src[i]
-          v = [0.0,0.0,0.0]
-          for k in xrange(0,4):
-            v= vadd(vmul(tets2[j][k],w[k]),v)
-          dst[i].co = v[:]
-          #end of using 1
-          """
-          
-        else :
-          dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
-          
-      else:
+      if (i not in self.jointVerts):
         dst[i].co = vadd(mtransform(transform, vsub(dst[i].co, center)),center)
     
     for child in joint.children:
