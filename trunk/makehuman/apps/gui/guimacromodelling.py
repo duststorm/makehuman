@@ -41,7 +41,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.muscleSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Tone")
         self.weightSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Weight")
         self.heightSlider = gui3d.Slider(self.macroBox, value=0.0, min=-1.0, max=1.0, label = "Height")
-        self.africanSlider = gui3d.Slider(self.macroBox, value=0.0, min=0.0, max=1.0, label = "African")
+        self.africanSlider = gui3d.Slider(self.macroBox, value=0.0, min=0.0, max=1.0, label = "Afro")
         self.asianSlider = gui3d.Slider(self.macroBox, value=0.0, min=0.0, max=1.0, label = "Asian")
         
         self.radialBox = gui3d.GroupBox(self, [590, 80, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(width=185+15))
