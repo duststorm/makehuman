@@ -2016,6 +2016,11 @@ void mhSetFullscreen(int fullscreen)
     mhDraw();
 }
 
+void mhSetCaption(const char *caption)
+{
+    SDL_WM_SetCaption(caption, caption);
+}
+
 /** \brief Create SDL window.
  *  \param useTimer an int controlling whether timer based processing is to be used (1=yes, 0=no).
  *

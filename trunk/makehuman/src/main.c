@@ -228,6 +228,15 @@ static PyObject* mh_setFullscreen(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
+static PyObject* mh_setCaption(PyObject *self, PyObject *args)
+{
+  char *caption;
+  if (!PyArg_ParseTuple(args, "s", &caption))
+    return NULL;
+  mhSetCaption(caption);
+  return Py_BuildValue("");
+}
+
 static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
 {
     float r, g, b, a;
@@ -720,6 +729,7 @@ static PyMethodDef EmbMethods[] =
     {"getColorPicked", mh_getColorPicked, METH_NOARGS, ""},
     {"redraw", mh_redraw, METH_VARARGS, ""},
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
+    {"setCaption", mh_setCaption, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
     {"loadTexture", mh_LoadTexture, METH_VARARGS, ""},
     {"createVertexShader", mh_CreateVertexShader, METH_VARARGS, ""},

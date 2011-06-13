@@ -82,6 +82,7 @@ extern "C"
     void mhShutDown(void);
     void mhQueueUpdate(void);
     void mhSetFullscreen(int fullscreen);
+    void mhSetCaption(const char *caption);
     void mhCreateWindow(int useTimer);
     void mhEventLoop(void);
     unsigned int mhTimerFunc(unsigned int interval, void* param);

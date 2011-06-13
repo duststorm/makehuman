@@ -347,6 +347,8 @@ class MHApplication(gui3d.Application):
             human = self.selectedHuman
             human.resetMeshValues()
             human.applyAllTargets(self.progress)
+            
+            mh.setCaption("MakeHuman - Untitled")
           
         self.globalButton = gui3d.Button(self, "Global cam",
             style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=530, zIndex=9.1))
@@ -391,6 +393,7 @@ class MHApplication(gui3d.Application):
         self.progressBar.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
         self.progressBar.blocker.show()
+        mh.setCaption("MakeHuman - Untitled")
         
         @self.dialog.button1.event
         def onClicked(event):

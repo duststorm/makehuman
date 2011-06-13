@@ -1912,7 +1912,7 @@ class FileChooser(View):
         self.extension = extension
         self.previewExtension = previewExtension
         self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=585-20, zIndex=9.1))
-        self.layout = BoxLayout(self) # We set the layout here so that it doesn't influence the placement of the 
+        self.layout = BoxLayout(self) # We set the layout here so that it doesn't influence the placement of the slider
         self.files = []
         self.selection = ''
         self.childY = {}
@@ -1958,6 +1958,7 @@ class FileChooser(View):
             if sliderIsShown:
                 self.slider.show()
         
+        # Filter
         if isinstance(self.extension, str):
             for f in os.listdir(self.path):
                 if f.endswith('.' + self.extension):
@@ -1967,9 +1968,11 @@ class FileChooser(View):
                 for ext in self.extension:
                     if f.endswith('.' + ext):
                         self.files.append(f)
-                        
+        
+        # Sort         
         self.files.sort()
         
+        # Create icons
         for file in self.files:
             
             label = None

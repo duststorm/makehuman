@@ -658,24 +658,24 @@ void Object3D_sortFaces(Object3D *self)
 
     // Rotate X
     alpha = (float)(-self->rx * 3.141592653589793238462643 / 180.0);
-    c = cos(alpha);
-    s = sin(alpha);
+    c = cosf(alpha);
+    s = sinf(alpha);
     tx = cx;
     ty = cy*c - cz*s;
     tz = cy*s + cz*c;
 
     // Rotate Y
     alpha = (float)(-self->ry * 3.141592653589793238462643 / 180.0);
-    c = cos(alpha);
-    s = sin(alpha);
+    c = cosf(alpha);
+    s = sinf(alpha);
     cx = tz*s + tx*c;
     cy = ty;
     cz = tz*c - tx*s;
 
     // Rotate Z
     alpha = (float)(-self->rz * 3.141592653589793238462643 / 180.0);
-    c = cos(alpha);
-    s = sin(alpha);
+    c = cosf(alpha);
+    s = sinf(alpha);
     tx = cx*c - cy*s;
     ty = cx*s + cy*c;
     tz = cz;
