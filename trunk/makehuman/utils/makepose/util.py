@@ -3,6 +3,13 @@ from Blender.BGL import *
 
 obj = None
 
+def selectVerts(vertsToSelect):
+    obj = Object.GetSelected()[0].getData(mesh=True)
+    for i in vertsToSelect:
+        obj.verts[i].sel = 1
+    obj.update()
+    obj.calcNormals()
+
 def getSelectedVertices():
     global obj
     selectedVertices = []
@@ -99,6 +106,7 @@ def loadSelVerts(path):
         i = int(vData.split()[0])
         selectedIndices.append(i)
     fileDescriptor.close()
+    selectVerts(selectedIndices)
     return selectedIndices
 
     
