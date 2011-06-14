@@ -1969,8 +1969,9 @@ class FileChooser(View):
         self.sortBox = GroupBox(self.slider, [10, 80, 9.0], 'Sort')
         sortgroup = []
         self.sort = sort
+        self.refreshButton = Button(self.sortBox, 'Refresh')
         for i, field in enumerate(self.sort.fields()):
-            self.sortName = FileSortRadioButton(self.sortBox, sortgroup, (i==0), field)
+            FileSortRadioButton(self.sortBox, sortgroup, (i==0), field)
         self.layout = BoxLayout(self) # We set the layout here so that it doesn't influence the placement of the slider
         self.files = []
         self.selection = ''
@@ -1978,6 +1979,10 @@ class FileChooser(View):
         self.notFoundImage = notFoundImage
         self.sortBy = self.sort.fields()[0]
         
+        @self.refreshButton.event
+        def onClicked(value):
+            self.refresh()
+            
         @self.slider.event
         def onChange(value):
             self.scrollTo(value)
