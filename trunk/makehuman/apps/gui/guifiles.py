@@ -106,6 +106,74 @@ class SaveTaskView(gui3d.TaskView):
         mh.cameras[0].focusY = self.focusY
         mh.cameras[0].focusZ = self.focusZ
         self.app.selectedHuman.setRotation(self.rotation)
+        
+class HumanFileSort(gui3d.FileSort):
+    
+    def __init__(self):
+        
+        gui3d.FileSort.__init__(self)
+        self.meta = {}
+    
+    def fields(self):
+        
+        return list(gui3d.FileSort.fields(self)) + ["gender", "age", "muscle", "weight"]
+        
+    def sortGender(self, path, filenames):
+        
+        self.updateMeta(path, filenames)
+        decorated = [(self.meta[filename]['gender'], i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for gender, i, filename in decorated]
+        
+    def sortAge(self, path, filenames):
+        
+        self.updateMeta(path, filenames)
+        decorated = [(self.meta[filename]['age'], i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for age, i, filename in decorated]
+
+    def sortMuscle(self, path, filenames):
+        
+        self.updateMeta(path, filenames)
+        decorated = [(self.meta[filename]['muscle'], i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for muscle, i, filename in decorated]
+       
+    def sortWeight(self, path, filenames):
+        
+        self.updateMeta(path, filenames)
+        decorated = [(self.meta[filename]['weight'], i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for weight, i, filename in decorated]
+        
+    def updateMeta(self, path, filenames):
+        
+        for filename in filenames:
+            
+            if filename in self.meta:
+                
+                if self.meta[filename]['modified'] < os.path.getmtime(os.path.join(path, filename)):
+                
+                    self.meta[filename] = self.getMeta(path, filename)
+                
+            else:
+                
+                self.meta[filename] = self.getMeta(path, filename)
+                
+    def getMeta(self, path, filename):
+        
+        meta = {}
+                
+        meta['modified'] = os.path.getmtime(os.path.join(path, filename))
+        f = open(os.path.join(path, filename))
+        for line in f:
+            lineData = line.split()
+            field = lineData[0]
+            if field in ["gender", "age", "muscle", "weight"]:
+                meta[field] = float(lineData[1])
+        f.close()
+        
+        return meta
 
 class LoadTaskView(gui3d.TaskView):
 
@@ -113,7 +181,7 @@ class LoadTaskView(gui3d.TaskView):
         
         modelPath = mh.getPath('models')
         gui3d.TaskView.__init__(self, category, 'Load', )
-        self.filechooser = gui3d.FileChooser(self, modelPath, 'mhm')
+        self.filechooser = gui3d.FileChooser(self, modelPath, 'mhm', sort=HumanFileSort())
 
         @self.filechooser.event
         def onFileSelected(filename):

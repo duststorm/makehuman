@@ -380,7 +380,10 @@ class BoxLayout(Layout):
     @property
     def height(self):
         
-        return self.nextPosition[1] - self.view.getPosition()[1] + self.rowHeight + (self.view.style.padding[3] if self.view.style.padding else 0)
+        if self.nextPosition:
+            return self.nextPosition[1] - self.view.getPosition()[1] + self.rowHeight + (self.view.style.padding[3] if self.view.style.padding else 0)
+        else:
+            return (self.view.style.padding[1] + self.view.style.padding[3]) if self.view.style.padding else 0
 
 # Generic view
 ViewStyle = Style(**{
@@ -1899,12 +1902,63 @@ FileChooserStyle = Style(**{
     'parent':ViewStyle,
     'width':800,
     'height':600,
-    'padding':[4,68,4,36]
+    'padding':[140,68,4,36]
     })
+    
+class FileSort():
+    
+    def __init__(self):
+        
+        pass
+        
+    def fields(self):
+        
+        return ("name", "created", "modified", "size")
+        
+    def sort(self, by, path, filenames):
+    
+        method = getattr(self, "sort%s" % by.capitalize())
+        return method(path, filenames)
+        
+    def sortName(self, path, filenames):
+        
+        return sorted(filenames)
+        
+    def sortModified(self, path, filenames):
+        
+        decorated = [(os.path.getmtime(os.path.join(path, filename)), i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for modified, i, filename in decorated]
+        
+    def sortCreated(self, path, filenames):
+        
+        decorated = [(os.path.getctime(os.path.join(path, filename)), i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for created, i, filename in decorated]
+    
+    def sortSize(self, path, filenames):
+        
+        decorated = [(os.path.getsize(os.path.join(path, filename)), i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for size, i, filename in decorated]
+
+class FileSortRadioButton(RadioButton):
+    
+    def __init__(self, parent, group, selected, field):
+        
+        RadioButton.__init__(self, parent, group, "By %s" % field, selected=selected)
+        self.field = field
+        
+    def onClicked(self, event):
+        
+        RadioButton.onClicked(self, event)
+        parent = self.parent.parent.parent
+        parent.sortBy = self.field
+        parent.refresh()
 
 class FileChooser(View):
     
-    def __init__(self, parent, path, extension, previewExtension='bmp', notFoundImage=None, style=FileChooserStyle):
+    def __init__(self, parent, path, extension, previewExtension='bmp', notFoundImage=None, sort=FileSort(), style=FileChooserStyle):
         
         View.__init__(self, parent, style, None)
         
@@ -1912,11 +1966,17 @@ class FileChooser(View):
         self.extension = extension
         self.previewExtension = previewExtension
         self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=585-20, zIndex=9.1))
+        self.sortBox = GroupBox(self.slider, [10, 80, 9.0], 'Sort')
+        sortgroup = []
+        self.sort = sort
+        for i, field in enumerate(self.sort.fields()):
+            self.sortName = FileSortRadioButton(self.sortBox, sortgroup, (i==0), field)
         self.layout = BoxLayout(self) # We set the layout here so that it doesn't influence the placement of the slider
         self.files = []
         self.selection = ''
         self.childY = {}
         self.notFoundImage = notFoundImage
+        self.sortBy = self.sort.fields()[0]
         
         @self.slider.event
         def onChange(value):
@@ -1946,7 +2006,7 @@ class FileChooser(View):
         if len(self.children) > 1:
             self.slider.setValue(0)
             for child in self.children:
-                if isinstance(child, Slider):
+                if isinstance(child, Slider) or isinstance(child, GroupBox):
                     continue
                 self.app.scene3d.delete(child.preview.mesh)
                 self.app.scene3d.delete(child.label.mesh)
@@ -1970,7 +2030,7 @@ class FileChooser(View):
                         self.files.append(f)
         
         # Sort         
-        self.files.sort()
+        self.files = self.sort.sort(self.sortBy, self.path, self.files)
         
         # Create icons
         for file in self.files:
