@@ -63,7 +63,7 @@ env=conf.Finish()
 
 # Build application
 VariantDir('program_build', 'src', duplicate=0)
-env.Program("makehuman", ["program_build/core.c", "program_build/glmodule.c", "program_build/arraybuffer.c", "program_build/main.c"])
+env.Program("makehuman", ["program_build/core.c", "program_build/glmodule.c", "program_build/arraybuffer.c", "program_build/main.c", env.RES('makehuman.rc')])
 
 # Build module
 VariantDir('module_build', 'src', duplicate=0)
