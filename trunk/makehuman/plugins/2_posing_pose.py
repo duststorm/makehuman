@@ -10,7 +10,9 @@ import math
 from aljabr import * #todo: import the necessities only
 from skeleton import Skeleton
 from mh2obj import exportObj
+print 'importing linalg'
 from linalg import *
+print 'imported linalg'
 from copy import deepcopy
 import module3d
 
