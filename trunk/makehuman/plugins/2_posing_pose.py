@@ -1,3 +1,5 @@
+print 'importing Pose2 plugin'
+
 import os.path
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
@@ -8,14 +10,9 @@ import math
 from aljabr import * #todo: import the necessities only
 from skeleton import Skeleton
 from mh2obj import exportObj
-from mh import getPath
 from linalg import *
 from copy import deepcopy
 import module3d
-
-print 'Pose2 plugin imported'
-
-exportPath = getPath('exports')
 
 #torso comes after clavicle because of getJointZones :P
 jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck',  
@@ -95,7 +92,7 @@ class PoseTaskView(gui3d.TaskView):
     
     @self.savePoseButton.event
     def onClicked(event):
-        exportObj(self.app.selectedHuman.meshData, os.path.join(exportPath, "posed.obj"))
+        exportObj(self.app.selectedHuman.meshData, os.path.join(getPath('exports'), "posed.obj"))
 
     @self.resetPoseButton.event
     def onClicked(event):
@@ -509,3 +506,5 @@ def mvcTest(self):
     
   self.app.selectedHuman.meshData.calcNormals()
   self.app.selectedHuman.meshData.update()
+  
+print 'Pose2 plugin imported'
