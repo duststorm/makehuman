@@ -69,28 +69,32 @@ class PoseTaskView(gui3d.TaskView):
     
     #get bindings for r-shoulder-joint
     f = open("utils/makepose/r-shoulder-joint.txt")
-    self.jointVerts = [];
+    self.jointVerts = []
     while (1): 
       line = f.readline()
       if not line: break 
       self.jointVerts.append(int(line));
     f.close()           
     
-    #compute bounding box
-    #cant do this! because mh human changes after the init -_-
-    bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
-    
-    #adding offset
-    bboxj[0][0]= bboxj[0][0] - 0.01
-    bboxj[1][0]= bboxj[1][0] + 0.01
-    bboxj[0][1]= bboxj[0][1] - 0.01
-    bboxj[1][1]= bboxj[1][1] + 0.01
-    bboxj[0][2]= bboxj[0][2] - 0.01
-    bboxj[1][2]= bboxj[1][2] + 0.01  
-    self.tets =  box2Tetrahedrons(bboxj)
+    self.tets = None
 
-    #print "self.tets: ", self.tets
-    #print "bboxj: ", bboxj
+    #get prejoint points to create cage from
+    f = open("utils/makepose/r-clavicle.txt")
+    self.preJointVerts = []
+    while (1): 
+      line = f.readline()
+      if not line: break 
+      self.preJointVerts.append(int(line));
+    f.close()
+    f = open("utils/makepose/r-scapula.txt") 
+    while (1): 
+      line = f.readline()
+      if not line: break 
+      self.preJointVerts.append(int(line));
+    f.close()
+    
+    self.preTets = None
+
     
     @self.savePoseButton.event
     def onClicked(event):
@@ -164,19 +168,10 @@ class PoseTaskView(gui3d.TaskView):
   
   def onShow(self, event):
       self.app.selectedHuman.storeMesh()
-      self.skeleton.update(self.app.selectedHuman.meshData)
-      
-      #need to do it on the current human
-      f = open("utils/makepose/r-shoulder-joint.txt")
-      self.jointVerts = [];
-      while (1): 
-        line = f.readline()
-        if not line: break 
-        self.jointVerts.append(int(line));
-      f.close()           
+      self.skeleton.update(self.app.selectedHuman.meshData)         
       
       #compute bounding box
-      #cant do this! because mh human changes after the init -_-
+      #must do this! because mh human changes after the init -_-
       bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
       
       #compute right shoulder joint position because we cannot rely on the diamond
@@ -191,8 +186,9 @@ class PoseTaskView(gui3d.TaskView):
       bboxj[1][2]= bboxj[1][2] + 0.01  
       self.tets =  box2Tetrahedrons(bboxj)
       
-      #print "self.tets: ", self.tets
-      #print "bboxj: ", bboxj
+      #computing prejoint bounding box
+      bboxpre = calcBBox(self.app.selectedHuman.meshData.verts, self.preJointVerts)
+      self.preTets =  box2Tetrahedrons(bboxpre)
       
       gui3d.TaskView.onShow(self, event)
 
