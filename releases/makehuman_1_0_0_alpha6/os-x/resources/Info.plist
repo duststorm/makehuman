@@ -8,8 +8,6 @@
 	<string>MakeHuman</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>10.6.0</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.makehuman</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -24,15 +22,17 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0.60</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.0</string>
 	<key>NSMainNibFile</key>
 	<string>SDLMain</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>dsa_pub.pem</string>
-	<key>SUFeedURL</key>
-	<string>http://tangerine-soft.de/rss/appcasts/makehuman/makehuman.xml</string>
 	<key>SUEnableSystemProfiling</key>
 	<false/>
+	<key>SUFeedURL</key>
+	<string>http://tangerine-soft.de/rss/appcasts/makehuman/makehuman.xml</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
 </dict>
 </plist>
