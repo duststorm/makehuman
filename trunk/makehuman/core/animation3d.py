@@ -240,7 +240,7 @@ class PathAction(Action):
             # Interpolate between current and next using the new alpha
 
             value = lerpVector(self.positions[key], self.positions[key + 1], a)
-        self.obj.setLoc(value[0], value[1], value[2])
+        self.obj.setPosition(value)
 
 
 class RotateAction(Action):
@@ -252,7 +252,7 @@ class RotateAction(Action):
 
     def set(self, alpha):
         value = lerpVector(self.startAngle, self.endAngle, alpha)
-        self.obj.setRot(value[0], value[1], value[2])
+        self.obj.setRotation(value)
 
 
 class ScaleAction(Action):
@@ -264,7 +264,7 @@ class ScaleAction(Action):
 
     def set(self, alpha):
         value = lerpVector(self.startScale, self.endScale, alpha)
-        self.obj.setScale(value[0], value[1], value[2])
+        self.obj.setScale(value)
         
 
 class CameraAction(Action):

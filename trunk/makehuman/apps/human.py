@@ -115,9 +115,10 @@ class Human(gui3d.Object):
     # Overriding methods to account for both hair and base object
 
     def setPosition(self, position):
+        dv = [x-y for x, y in zip(position, self.getPosition())]
         gui3d.Object.setPosition(self, position)
         if self.hairObj:
-            self.hairObj.setPosition(position)
+            self.hairObj.setPosition([x+y for x, y in zip(self.hairObj.getPosition(), dv)])
 
     def setRotation(self, rotation):
         gui3d.Object.setRotation(self, rotation)

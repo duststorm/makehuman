@@ -655,8 +655,8 @@ class MHApplication(gui3d.Application):
         tl = animation3d.Timeline(0.20)
         cam = self.modelCamera
         tl.append(animation3d.CameraAction(self.modelCamera, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ], [0,0,60,0,0,0]))
-        tl.append(animation3d.PathAction(human.mesh, [human.getPosition(), [0.0, 0.0, 0.0]]))
-        tl.append(animation3d.RotateAction(human.mesh, human.getRotation(), [0.0, 0.0, 0.0]))
+        tl.append(animation3d.PathAction(human, [human.getPosition(), [0.0, 0.0, 0.0]]))
+        tl.append(animation3d.RotateAction(human, human.getRotation(), [0.0, 0.0, 0.0]))
         tl.append(animation3d.UpdateAction(self))
         tl.start()
 
@@ -671,8 +671,8 @@ class MHApplication(gui3d.Application):
         cam = self.modelCamera
         tl.append(animation3d.CameraAction(self.modelCamera, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ],
             [center[0],center[1],10,center[0],center[1],0]))
-        tl.append(animation3d.PathAction(human.mesh, [human.getPosition(), [0.0, 0.0, 0.0]]))
-        tl.append(animation3d.RotateAction(human.mesh, human.getRotation(), [0.0, 0.0, 0.0]))
+        tl.append(animation3d.PathAction(human, [human.getPosition(), [0.0, 0.0, 0.0]]))
+        tl.append(animation3d.RotateAction(human, human.getRotation(), [0.0, 0.0, 0.0]))
         tl.append(animation3d.UpdateAction(self))
         tl.start()
         
