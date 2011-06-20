@@ -35,9 +35,6 @@ NoBB = (1,1,1)
 NoBB = None
 bbMarg = 0.05
 
-UseExternalRig = False
-
-
 #
 #    Bone layers
 #
@@ -334,14 +331,16 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 #   Continues in external_rig.py
 #
 
-import external_rig
+UseExternalRig = False
 
 if UseExternalRig:
+    import external_rig
     BoneGroups = external_rig.BoneGroups
     RecalcRoll = external_rig.RecalcRoll
     GizmoFiles = external_rig.GizmoFiles
     ObjectProps = external_rig.ObjectProps
     ArmatureProps = external_rig.ArmatureProps
+    VertexGroupFiles = external_rig.VertexGroupFiles
 else:
     BoneGroups = [
         ('Master', 'THEME13'),
@@ -352,7 +351,12 @@ else:
         ('IK_R', 'THEME04'),
     ]
     RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
-    GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", "./shared/mhx/templates/gizmos25.mhx"]
+    GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
+                  "./shared/mhx/templates/gizmos25.mhx"]
+    VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-bones25.mhx",
+                        #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
+                        "./shared/mhx/templates/vertexgroups-palm25.mhx"]
+
     ObjectProps = []
     ArmatureProps = []
 
@@ -475,7 +479,7 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, cons
     if customShape:
         fp.write("    custom_shape Refer Object %s ; \n" % customShape)
     if copy & U_LOC:
-        addCopyLocConstraint(fp, '', 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), False])
+        addCopyLocConstraint(fp, '', 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), 0, False])
     if copy & U_ROT:
         addCopyRotConstraint(fp, '', 0, 1, ['Rot', cbone, channels, (0,0,0), False])
     if copy & U_SCALE:
@@ -814,7 +818,8 @@ def addCopyLocConstraint(fp, rig, flags, inf, data):
     subtar = data[1]
     (useX, useY, useZ) = data[2]
     (invertX, invertY, invertZ) = data[3]
-    useOffs = data[4]
+    head_tail = data[4]
+    useOffs = data[5]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
 
     if Mhx25:
@@ -828,6 +833,7 @@ def addCopyLocConstraint(fp, rig, flags, inf, data):
 "      influence %s ; \n" % inf +
 "      owner_space '%s' ; \n" % ownsp +
 "      is_proxy_local False ; \n"+
+"      head_tail %.3f ;\n" % head_tail +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ; \n" % targsp+
 "      use_offset %s ; \n" % useOffs +
@@ -874,6 +880,7 @@ def addCopyTransConstraint(fp, rig, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
+    head_tail = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
     
     fp.write(
@@ -884,6 +891,7 @@ def addCopyTransConstraint(fp, rig, flags, inf, data):
 "      influence %s ;\n" % inf +
 "      owner_space '%s' ;\n" % ownsp +
 "      is_proxy_local False ;\n" +
+"      head_tail %.3f ;\n" % head_tail +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
 "    end Constraint\n")

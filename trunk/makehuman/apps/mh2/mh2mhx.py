@@ -413,10 +413,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                 else:
                     fp.write("#if toggle&T_Armature\n")
                     if rig == 'mhx':
-                        copyVertGroups("shared/mhx/templates/vertexgroups-bones25.mhx", fp, proxy)
-                        #copyVertGroups("shared/mhx/templates/vertexgroups-hand25.mhx", fp, proxy)
-                        copyVertGroups("shared/mhx/templates/vertexgroups-palm25.mhx", fp, proxy)
-                        #copyVertGroups("shared/mhx/templates/vertexgroups-extra25.mhx", fp, proxy)
+                        for file in mhx_rig.VertexGroupFiles:
+                            copyVertGroups(file, fp, proxy)
                     else:
                         if proxy:
                             weights = mh2proxy.getProxyWeights(rig.weights, proxy)
@@ -549,28 +547,34 @@ def writeProxyMaterial(fp, mat):
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
 "Texture %s IMAGE\n" % name +
-"  Image %s ;\n" % name +
-"end Texture\n")
+"  Image %s ;\n" % name)
+        writeProxyMaterialSettings(fp, mat.textureSettings)             
+        fp.write("end Texture\n")
 
-    col = mat.diffuse_color
-    spc = mat.specular_color
-    fp.write(
-"Material %s \n" % mat.name +
-"  diffuse_color Array %.4f %.4f %.4f ;\n" % (col[0], col[1], col[2]) +
-"  diffuse_shader '%s' ;\n" % mat.diffuse_shader +
-"  diffuse_intensity %.4f ;\n" % mat.diffuse_intensity +
-"  specular_color Array %.4f %.4f %.4f ;\n" % (spc[0], spc[1], spc[2]) +
-"  specular_shader '%s' ;\n" % mat.specular_shader +
-"  specular_intensity %.4f ;\n" % mat.specular_intensity)
+    fp.write("Material %s \n" % mat.name)
+    writeProxyMaterialSettings(fp, mat.settings)            
     if tex:
         fp.write(
 "  MTex 0 diffuse UV COLOR\n" +
-"    texture Refer Texture %s ;\n" % name +
-"  end MTex\n")
-    fp.write(
+"    texture Refer Texture %s ;\n" % name)
+        writeProxyMaterialSettings(fp, mat.mtexSettings)             
+        fp.write("  end MTex\n")
+    if mat.mtexSettings == []:
+        fp.write(
 "  use_shadows True ;\n" +
-"  use_transparent_shadows True ;\n" +
-"end Material\n\n")
+"  use_transparent_shadows True ;\n")
+    fp.write("end Material\n\n")
+
+def writeProxyMaterialSettings(fp, settings):
+    for (key, value) in settings:        
+        if type(value) == list:
+            fp.write("  %s Array %.4f %.4f %.4f ;\n" % (key, value[0], value[1], value[2]))
+        elif type(value) == float:
+            fp.write("  %s %.4f ;\n" % (key, value))
+        elif type(value) == int:
+            fp.write("  %s %d ;\n" % (key, value))
+        else:
+            fp.write("  %s '%s' ;\n" % (key, value))
 
 #
 #    copyVertGroups(tmplName, fp, proxy):

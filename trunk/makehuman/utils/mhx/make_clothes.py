@@ -355,10 +355,10 @@ def proxyFilePtr(name):
     return None
 
 #
-#    printClothes(path, pob, data):    
+#    printClothes(context, path, pob, data):    
 #
         
-def printClothes(path, pob, data):
+def printClothes(context, path, pob, data):
     file = os.path.expanduser(path)
     fp= open(file, "w")
 
@@ -375,7 +375,7 @@ def printClothes(path, pob, data):
     fp.write("# name %s\n" % pob.name)
     me = pob.data
 
-    if me.materials:
+    if me.materials and context.scene['MakeClothesMaterials']:
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
         writeColor(fp, 'diffuse_color', mat.diffuse_color)
@@ -442,7 +442,7 @@ def makeClothes(context):
             log = open(logfile, "w")
             data = findClothes(context, bob, pob, log)
             log.close()
-            printClothes(outpath, pob, data)
+            printClothes(context, outpath, pob, data)
             print("%s done" % outpath)
         
 #
@@ -544,6 +544,11 @@ def initInterface(scn):
         maxlen=1024)
     scn['MakeClothesDirectory'] = "~/makehuman"
 
+    bpy.types.Scene.MakeClothesMaterials = BoolProperty(
+        name="Materials", 
+        description="Use materials")
+    scn['MakeClothesMaterials'] = False
+
     bpy.types.Scene.MakeClothesOutside = BoolProperty(
         name="Always outside", 
         description="Invert projection if negative")
@@ -573,6 +578,7 @@ class MakeClothesPanel(bpy.types.Panel):
         layout = self.layout
         layout.operator("mhclo.init_interface")
         layout.prop(context.scene, "MakeClothesDirectory")
+        layout.prop(context.scene, "MakeClothesMaterials")
         layout.prop(context.scene, "MakeClothesOutside")
         layout.prop(context.scene, "MakeClothesVertexGroups")
         layout.operator("mhclo.make_clothes")

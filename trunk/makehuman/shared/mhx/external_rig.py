@@ -21,31 +21,32 @@ Interface to external rig
 
 import mhx_rig
 
-#ExternalRig = "Zepam"
+#ExternalRig = "Blenrig"
 ExternalRig = None
 
-if ExternalRig == "Zepam":
-    import zepam_rig
+if ExternalRig == "Blenrig":
+    import blenrig_rig
     
     BoneGroups = [('GEN', 'THEME13'),
-              ('IK', 'THEME05'),
-              ('FK', 'THEME09'),
-              ('FACIAL', 'THEME02')]
+                  ('IK', 'THEME05'),
+                  ('FK', 'THEME09'),
+                  ('FACIAL', 'THEME02')]
     RecalcRoll = []              
-    GizmoFiles = ["./shared/mhx/templates/zepam_gizmos.mhx"]
+    VertexGroupFiles = ["./shared/mhx/templates/blenrigmesh_weights.mhx"]
+    GizmoFiles = ["./shared/mhx/templates/blenrig_gizmos.mhx"]
         
-    Joints = zepam_rig.ZepamJoints
-    HeadsTails = zepam_rig.ZepamHeadsTails
-    Armature = zepam_rig.ZepamArmature
-    ObjectProps = zepam_rig.ZepamObjectProps
-    ArmatureProps = zepam_rig.ZepamArmatureProps
+    Joints = blenrig_rig.BlenrigJoints
+    HeadsTails = blenrig_rig.BlenrigHeadsTails
+    Armature = blenrig_rig.BlenrigArmature
+    ObjectProps = blenrig_rig.BlenrigObjectProps
+    ArmatureProps = blenrig_rig.BlenrigArmatureProps
     
     def writePoses(fp):
-        zepam_rig.ZepamWritePoses(fp)
+        blenrig_rig.BlenrigWritePoses(fp)
         return
 
     def getDrivers():
-        return zepam_rig.getZepamDrivers()
+        return blenrig_rig.getBlenrigDrivers()
 
 elif ExternalRig == None:
     pass

@@ -84,6 +84,12 @@ class CProxy:
 class CMaterial:
     def __init__(self, name):
         self.name = name
+        self.settings = []
+        self.texture = None
+        self.textureSettings = []
+        self.mtexSettings = []
+        return
+"""
         self.diffuse_color = None
         self.diffuse_intensity = None
         self.diffuse_shader = None
@@ -93,9 +99,8 @@ class CMaterial:
         self.translucency = 0.0
         self.ambient_color = None
         self.emit_color = None
-        self.texture = None
         return
-
+"""
 #
 #    Flags
 #
@@ -255,6 +260,7 @@ def readProxyFile(obj, proxyStuff):
     doMaterial = 3
     doTexVerts = 4
     doObjData = 5
+    doWeights = 6
 
     vn = 0
     for line in tmpl:
@@ -269,6 +275,12 @@ def readProxyFile(obj, proxyStuff):
                 status = doVerts
             elif words[1] == 'faces':
                 status = doFaces
+            elif words[1] == 'weights':
+                status = doWeights
+                if proxy.weights == None:
+                    proxy.weights = {}
+                weights = []
+                proxy.weights[words[2]] = weights
             elif words[1] == 'material':
                 status = doMaterial
                 proxy.material = CMaterial(words[2])
@@ -336,6 +348,10 @@ def readProxyFile(obj, proxyStuff):
             newTexVert(0, words, proxy)
         elif status == doMaterial:
             readMaterial(line, proxy.material)
+        elif status == doWeights:
+            v = int(words[0])
+            w = float(words[1])
+            weights.append((v,w))
 
     return proxy
 
@@ -346,26 +362,23 @@ def readProxyFile(obj, proxyStuff):
 def readMaterial(line, mat):
     words= line.split()
     key = words[0]
-    if key == 'diffuse_color':
-        mat.diffuse_color = (float(words[1]), float(words[2]), float(words[3]))
-    elif key == 'diffuse_shader':
-        mat.diffuse_shader = words[1]
-    elif key == 'diffuse_intensity':
-        mat.diffuse_intensity = float(words[1])
-    elif key == 'specular_color':
-        mat.specular_color = (float(words[1]), float(words[2]), float(words[3]))
-    elif key == 'specular_shader':
-        mat.specular_shader = words[1]
-    elif key == 'specular_intensity':
-        mat.specular_intensity = float(words[1])
-    elif key == 'translucency':
-        mat.translucency = float(words[1])
-    elif key == 'ambient_color':
-        mat.ambient_color =  (float(words[1]), float(words[2]), float(words[3]))
-    elif key == 'emit_color':
-        mat.emit_color =  (float(words[1]), float(words[2]), float(words[3]))
+    if key in ['diffuse_color', 'specular_color', 'ambient_color', 'emit_color']:
+        mat.settings.append( (key, [float(words[1]), float(words[2]), float(words[3])]) )
+    elif key in ['diffuse_shader', 'specular_shader']:
+        mat.settings.append( (key, words[1]) )
+    elif key in ['use_shadows', 'use_transparent_shadows', 'use_transparency']:
+        mat.settings.append( (key, int(words[1])) )
+    elif key in ['diffuse_intensity', 'specular_intensity', 'specular_hardness', 'translucency', 
+        'alpha', 'specular_alpha']:
+        mat.settings.append( (key, float(words[1])) )
     elif key == 'texture':
         mat.texture = words[1]
+    elif key in ['diffuse_color_factor', 'alpha_factor', 'translucency_factor']:
+        mat.mtexSettings.append( (key, float(words[1])) )
+    elif key in ['use_map_color_diffuse', 'use_map_alpha']:
+        mat.mtexSettings.append( (key, int(words[1])) )
+    elif key in ['use_alpha']:
+        mat.textureSettings.append( (key, int(words[1])) )
     else:
         raise NameError("Material %s?" % key)
 

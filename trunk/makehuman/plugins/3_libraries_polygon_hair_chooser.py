@@ -23,6 +23,8 @@ TO DO
 import gui3d, mh, os
 import files3d
 from aljabr import in2pts, vadd, vsub, calcBBox
+# TL: import mh2proxy for treating polygon hair as clothes
+import mh2proxy
 
 HairButtonStyle = gui3d.Style(**{
     'width':32,
@@ -92,24 +94,41 @@ class HairTaskView(gui3d.TaskView):
 
         if human.hairObj:
             
-            headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
-            headVertices = human.meshData.getVerticesAndFacesForGroups(headNames)[0]
-            headBBox = calcBBox(headVertices)
+            # TL: Treating hair as clothes.
+            # To create the mhclo file from obj, use utils/mhx/make_clothes.py in Blender 2.57
+            # Load obj file (single mesh, keep vert order, no groups) into Blender. Also load base.obj.
+            # Select all hair meshes, then shift-select base mesh, then press Make Clothes.
+            # Copy mhclo file into data/hairstyles folder.
+            if True:
+                hairName = human.hairObj.meshName.split('.')[0]
+                proxyFile = "data/hairstyles/%s.mhclo" % hairName
+                print("Loading clothes hair %s" % proxyFile)
+                proxy = mh2proxy.readProxyFile(human.meshData, (proxyFile, "Clothes", 0))
+                mesh = human.hairObj.getSeedMesh()
+                for i, v in enumerate(mesh.verts):
+                    (x,y,z) = mh2proxy.proxyCoord(proxy.realVerts[i])
+                    v.co = [x,y,z]
+                print("Hair loaded")
+            else:
+                headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
+                headVertices = human.meshData.getVerticesAndFacesForGroups(headNames)[0]
+                headBBox = calcBBox(headVertices)
             
-            headCentroid = in2pts(headBBox[0], headBBox[1], 0.5)
-            delta = vsub(headCentroid, self.oHeadCentroid)
+                headCentroid = in2pts(headBBox[0], headBBox[1], 0.5)
+                delta = vsub(headCentroid, self.oHeadCentroid)
             
-            sx = (headBBox[1][0]-headBBox[0][0])/float(self.oHeadBBox[1][0]-self.oHeadBBox[0][0])
-            sy = (headBBox[1][1]-headBBox[0][1])/float(self.oHeadBBox[1][1]-self.oHeadBBox[0][1])
-            sz = (headBBox[1][2]-headBBox[0][2])/float(self.oHeadBBox[1][2]-self.oHeadBBox[0][2])
+                sx = (headBBox[1][0]-headBBox[0][0])/float(self.oHeadBBox[1][0]-self.oHeadBBox[0][0])
+                sy = (headBBox[1][1]-headBBox[0][1])/float(self.oHeadBBox[1][1]-self.oHeadBBox[0][1])
+                sz = (headBBox[1][2]-headBBox[0][2])/float(self.oHeadBBox[1][2]-self.oHeadBBox[0][2])
             
-            mesh = human.hairObj.getSeedMesh()
-            for i, v in enumerate(mesh.verts):
-                co = vsub(mesh.originalHairVerts[i], headCentroid)
-                co[0] *= sx
-                co[1] *= sy
-                co[2] *= sz
-                v.co = vadd(vadd(co, headCentroid), delta)
+                mesh = human.hairObj.getSeedMesh()
+                for i, v in enumerate(mesh.verts):
+                    co = vsub(mesh.originalHairVerts[i], headCentroid)
+                    co[0] *= sx
+                    co[1] *= sy
+                    co[2] *= sz
+                    v.co = vadd(vadd(co, headCentroid), delta)
+
             mesh.update()
             if human.hairObj.isSubdivided():
                 human.hairObj.getSubdivisionMesh()
