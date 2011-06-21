@@ -515,12 +515,9 @@ static void CustomApplicationMain (int argc, char **argv)
 
 @end
 
-
-
 #ifdef main
 #  undef main
 #endif
-
 
 /* Main entry point to executable - should *not* be SDL_main! */
 int main (int argc, char **argv)
@@ -569,6 +566,7 @@ int isMainWindowActive()
     
     // The MainWindow is active only if the key window is the MainWindow 
     // (whose title is "MakeHuman").
-    return ([title compare:@"MakeHuman"] == NSOrderedSame);
+    const NSRange range([title rangeOfString:@"MakeHuman"]);
+    return range.location == 0 && range.length > 0;
 }
 

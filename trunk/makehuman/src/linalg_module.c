@@ -1,20 +1,32 @@
-#include <Python.h>
-
-#undef min
-#undef max
-
 #ifdef __APPLE__ /* On OS X use cblas for matrix funcs... */
+#   include <Python/Python.h>
 #	include <Accelerate/Accelerate.h>
-#	define min(a,b) (((a) < (b)) ? (a) : (b))
-#	define max(a,b) (((a) > (b)) ? (a) : (b))
-#else
 
-#include <dgemm.h>
-#include <dgesvd.h>
-#include <dgetrf.h>
-#include <dgesvx.h>
+#   include <sys/param.h> // For MIN, MAX
+#   ifndef min
+#       define min MIN
+#   endif
+#   ifndef max
+#       define max MAX
+#   endif
 
-#endif
+#else // ! __APPLE__
+
+#   include <Python.h>
+
+#   ifdef min
+#       undef min
+#   endif
+#   ifdef max
+#       undef max
+#   endif
+
+#   include <dgemm.h>
+#   include <dgesvd.h>
+#   include <dgetrf.h>
+#   include <dgesvx.h>
+
+#endif /* #ifdef __APPLE__ */
 
 //includes lapack...
 PyObject *double2PyObj(double* d, int i, int j)
@@ -216,20 +228,28 @@ static PyObject* mh_dgesvx(PyObject *self, PyObject *args)
    
   //outputs:
   //af = 0;
+
   af = (double*)malloc(i*i*sizeof(double));
   //r = 0;
   r = (double*)malloc(i*sizeof(double));
+
   //c = 0;
+
   c = (double*)malloc(i*sizeof(double));
   //x = 0;
+
   x = (double*)malloc(i*sizeof(double));
   //ferr = 0;
+
   ferr = (double*)malloc(sizeof(double));
   //berr = 0;
   berr = (double*)malloc(sizeof(double));
+
   //work = 0;
+
   work = (double*)malloc(4*i*sizeof(double));
   //p = 0;
+
   p = (long*)malloc(i*sizeof(long));
   iwork = (long*)malloc(i*sizeof(long));
 
@@ -237,8 +257,11 @@ static PyObject* mh_dgesvx(PyObject *self, PyObject *args)
   
   _x = double2PyObj(x, 1, i);
   
+
   free(iwork); free(p); free(work); free(berr); free(ferr); free(x); free(c);
+
   free(r); free(af); free(b); free(a);
+
 
   return Py_BuildValue("O", _x);
 }

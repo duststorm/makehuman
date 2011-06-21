@@ -448,15 +448,7 @@ static PyObject *Texture_loadSubImage(Texture *texture, PyObject *args)
 static uint32_t swapLong(uint32_t inValue)
 {
 #ifdef __GNUC__
-#   if defined(__ppc__)
-    register uint32_t word;
-    __asm__("lwbrx %0,%2,%1" : "=r" (word) : "r" (&inValue), "b" (0));
-    return word;
-#   elif defined(__x86__) || defined(__i386__) || defined (__x86_64__)
-    register uint32_t word;
-    __asm__("bswap %0" : "=r" (word) : "0" (inValue));
-    return word;
-#   endif
+    return __builtin_bswap32(inValue);
 #endif
     return (((inValue      ) & 0xff) << 24) |
            (((inValue >>  8) & 0xff) << 16) |
