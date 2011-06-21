@@ -222,6 +222,7 @@ def findClothes(context, bob, pob, log):
 
     print("Finding best weights")
     alwaysOutside = context.scene['MakeClothesOutside']
+    minOffset = context.scene['MakeClothesMinOffset']
     bestFaces = []
     for (pv, mverts, fcs) in bestVerts:
         #print(pv.index)
@@ -245,8 +246,8 @@ def findClothes(context, bob, pob, log):
         norm = bWts[0]*v0.normal + bWts[1]*v1.normal + bWts[2]*v2.normal
         diff = pv.co - est
         proj = diff.dot(norm)
-        if proj < 0 and alwaysOutside:
-            proj = -proj
+        if alwaysOutside and proj < minOffset:
+            proj = minOffset
         bestFaces.append((pv, bVerts, bWts, proj))    
 
     print("Done")
@@ -373,6 +374,25 @@ def printClothes(context, path, pob, data):
 "# homepage http://www.makehuman.org/\n")
 
     fp.write("# name %s\n" % pob.name)
+    if context.scene['MakeClothesHairMaterial']:
+        fp.write(
+"# material %s\n" % pob.name +
+"texture data/hairstyles/%s_texture.tif\n" % pob.name +
+"diffuse_intensity 0.8\n" +
+"specular_intensity 0.0\n" +
+"specular_hardness 1\n" +
+"use_shadows 1\n" +
+"use_transparent_shadows 1\n" +
+"use_raytrace 0\n" +
+"use_transparency 1\n" +
+"alpha 0.0\n" +
+"specular_alpha 0.0\n" +
+"use_map_color_diffuse 1\n" +
+"use_map_alpha 1\n" +
+"use_alpha 1\n" +
+"diffuse_color_factor 1.0\n" +
+"alpha_factor 1.0\n")
+
     me = pob.data
 
     if me.materials and context.scene['MakeClothesMaterials']:
@@ -470,9 +490,9 @@ def offsetCloth(bob, pob, context):
     infp = open(infile, "r")
     outfp = open(outfile, "w")
 
-    status = False
+    status = 0
     alwaysOutside = context.scene['MakeClothesOutside']
-    useVgroups = context.scene['MakeClothesVertexGroups']
+    minOffset = context.scene['MakeClothesMinOffset']
 
     for line in infp:
         words = line.split()
@@ -480,18 +500,27 @@ def offsetCloth(bob, pob, context):
             outfp.write(line)
         elif words[0] == "#":    
             if len(words) < 2:
-                status = False
+                status = 0
+                outfp.write(line)
             elif words[1] == "verts":
-                status = True
-            elif words[1] == "obj_data" and useVgroups:
-                infp.close()
-                writeFacesAndWeights(pob, outfp)                
-                outfp.close()
-                print("Clothes file modified %s => %s" % (infile, outfile))
-                return
-            outfp.write(line)
+                status = 1
+                outfp.write(line)
+            elif words[1] == "obj_data":
+                if context.scene['MakeClothesVertexGroups']:
+                    infp.close()
+                    writeFaces(pob, outfp) 
+                    writeVertexGroups(pob, outfp)
+                    outfp.close()
+                    print("Clothes file modified %s => %s" % (infile, outfile))
+                    return
+                outfp.write(line)
+                status = 0
+            elif words[1] == "name":
+                outfp.write("# name %s\n" % pob.name)
+            else:
+                outfp.write(line)
             vn = 0
-        elif status:
+        elif status == 1:
             # 4715  5698  5726 0.00000 1.00000 -0.00000 0.00921
             verts = [int(words[0]), int(words[1]), int(words[2])]
             wts = [float(words[3]), float(words[4]), float(words[5])]
@@ -499,8 +528,9 @@ def offsetCloth(bob, pob, context):
             pv = pverts[vn]
             diff = pv.co - bv.co
             proj = diff.dot(bv.normal)
-            if proj < 0 and alwaysOutside:
-                proj = -proj
+            print(diff, proj)
+            if alwaysOutside and proj < minOffset:
+                proj = minOffset
             outfp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
                 verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
             # print(vn, bv.co, pv.co)
@@ -513,13 +543,15 @@ def offsetCloth(bob, pob, context):
     print("Clothes file modified %s => %s" % (infile, outfile))
     return
 
-def writeFacesAndWeights(pob, fp):
+def writeFaces(pob, fp):
     fp.write("# faces\n")
     for f in pob.data.faces:
         for v in f.vertices:
             fp.write(" %d" % (v+1))
         fp.write("\n")
+    return
 
+def writeVertexGroups(pob, fp):
     for vg in pob.vertex_groups:
         fp.write("# weights %s\n" % vg.name)
         for v in pob.data.vertices:
@@ -549,10 +581,20 @@ def initInterface(scn):
         description="Use materials")
     scn['MakeClothesMaterials'] = False
 
+    bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
+        name="Hair material", 
+        description="Fill in hair material")
+    scn['MakeClothesHairMaterial'] = False
+
     bpy.types.Scene.MakeClothesOutside = BoolProperty(
         name="Always outside", 
         description="Invert projection if negative")
     scn['MakeClothesOutside'] = True
+
+    bpy.types.Scene.MakeClothesMinOffset = FloatProperty(
+        name="Min offset", 
+        description="Mininum offset from base mesh")
+    scn['MakeClothesMinOffset'] = 0.0
 
     bpy.types.Scene.MakeClothesVertexGroups = BoolProperty(
         name="Save vertex groups", 
@@ -579,7 +621,9 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.init_interface")
         layout.prop(context.scene, "MakeClothesDirectory")
         layout.prop(context.scene, "MakeClothesMaterials")
+        layout.prop(context.scene, "MakeClothesHairMaterial")
         layout.prop(context.scene, "MakeClothesOutside")
+        layout.prop(context.scene, "MakeClothesMinOffset")
         layout.prop(context.scene, "MakeClothesVertexGroups")
         layout.operator("mhclo.make_clothes")
         layout.operator("mhclo.offset_clothes")

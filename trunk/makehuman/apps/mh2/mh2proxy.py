@@ -366,7 +366,7 @@ def readMaterial(line, mat):
         mat.settings.append( (key, [float(words[1]), float(words[2]), float(words[3])]) )
     elif key in ['diffuse_shader', 'specular_shader']:
         mat.settings.append( (key, words[1]) )
-    elif key in ['use_shadows', 'use_transparent_shadows', 'use_transparency']:
+    elif key in ['use_shadows', 'use_transparent_shadows', 'use_transparency', 'use_raytrace']:
         mat.settings.append( (key, int(words[1])) )
     elif key in ['diffuse_intensity', 'specular_intensity', 'specular_hardness', 'translucency', 
         'alpha', 'specular_alpha']:
