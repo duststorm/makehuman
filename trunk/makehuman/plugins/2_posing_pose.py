@@ -188,6 +188,7 @@ class PoseTaskView(gui3d.TaskView):
       
       #computing prejoint bounding box
       bboxpre = calcBBox(self.app.selectedHuman.meshData.verts, self.preJointVerts)
+      bboxpre[1][0] = min(bboxpre[1][0], bboxj[0][0])
       self.preTets =  box2Tetrahedrons(bboxpre)
       
       gui3d.TaskView.onShow(self, event)
@@ -227,7 +228,7 @@ class PoseTaskView(gui3d.TaskView):
             v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
         for tet_i in xrange(0,5):
           for j in xrange(0,4):
-            v= vadd(vmul(self.preTets[tet_i][j],weights[tet_i][j]),v)
+            v= vadd(vmul(self.preTets[tet_i][j],weights[tet_i+5][j]),v)
         #average of 10 tetrahedrons
         dst[i].co = vmul(v, 0.1)
         
@@ -453,7 +454,7 @@ def computeAllWeights(v,tets):
   
   allWeights = []
   #solutions = []
-  for i in xrange(0,5):
+  for i in xrange(0,len(tets)):
     tet = tets[i]
     z = vsub(y, tet[0])
     for cols in xrange(0,3):
