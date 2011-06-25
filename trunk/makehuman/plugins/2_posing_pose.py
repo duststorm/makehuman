@@ -215,7 +215,23 @@ class PoseTaskView(gui3d.TaskView):
     if (joint == self.joint) and self.skin.selected and (joint.name == 'joint-r-shoulder'):
       transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
       tets2 = deformTets(self.tets, center, transform2)
+      preJointRot = [0.0,0.0,0.0]
+      
+      tets = self.tets + self.preTets
       for i in self.jointVerts:
+        #using all 10 tetrahedrons as controls
+        weights = computeAllWeights(src[i],tets)
+        v = [0.0,0.0,0.0]
+        for tet_i in xrange(0,5):
+          for j in xrange(0,4):
+            v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
+        for tet_i in xrange(0,5):
+          for j in xrange(0,4):
+            v= vadd(vmul(self.preTets[tet_i][j],weights[tet_i][j]),v)
+        #average of 10 tetrahedrons
+        dst[i].co = vmul(v, 0.1)
+        
+        """
         #using all 5 tetrahedrons as controls
         weights = computeAllWeights(src[i],self.tets)
         v = [0.0,0.0,0.0]
@@ -225,6 +241,7 @@ class PoseTaskView(gui3d.TaskView):
         #average of 5 tetrahedrons
         dst[i].co = vmul(v, 0.2)
         #end of using 5
+        """
         
         """
         #using only one tetrahedron as control
@@ -447,7 +464,7 @@ def computeAllWeights(v,tets):
     allWeights.append([1-w[0]-w[1]-w[2],w[0], w[1],w[2]])
   
   return allWeights
- 
+   
 # checks if one of the solutions have valid weights (>0 and sum <= 1)
 def validWeight(weight):
   temp = 0.0
