@@ -14,7 +14,7 @@ print 'importing linalg'
 from linalg import *
 print 'imported linalg'
 from copy import deepcopy
-import module3d
+import mh, module3d
 
 #torso comes after clavicle because of getJointZones :P
 jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck',  
@@ -98,7 +98,7 @@ class PoseTaskView(gui3d.TaskView):
     
     @self.savePoseButton.event
     def onClicked(event):
-        exportObj(self.app.selectedHuman.meshData, os.path.join(getPath('exports'), "posed.obj"))
+        exportObj(self.app.selectedHuman.meshData, os.path.join(mh.getPath('exports'), "posed.obj"))
 
     @self.resetPoseButton.event
     def onClicked(event):
@@ -219,7 +219,10 @@ class PoseTaskView(gui3d.TaskView):
       preJointRot = [0.0,0.0,0.0]
       
       tets = self.tets + self.preTets
-      for i in self.jointVerts:
+      
+      jointVerts = self.jointVerts + self.preJointVerts
+      for i in jointVerts:
+      #for i in self.jointVerts:
         #using all 10 tetrahedrons as controls
         weights = computeAllWeights(src[i],tets)
         v = [0.0,0.0,0.0]
