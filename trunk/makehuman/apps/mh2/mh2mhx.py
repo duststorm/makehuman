@@ -146,7 +146,7 @@ def exportMhx_25(human, fp):
 "  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
 "end Object\n\n")
 
-    if theConfig.useRig == 'mhx':
+    if theConfig.useRig in ['mhx', 'rigify', 'blenrig']:
         rig = theConfig.useRig
         fp.write("#if toggle&T_Armature\n")
         for fname in mhx_rig.GizmoFiles:
@@ -154,7 +154,7 @@ def exportMhx_25(human, fp):
         mhx_rig.setupCircles(fp)
         copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])    
         fp.write("#endif\n")
-    elif theConfig.useRig in ['game', 'rigify']:
+    elif theConfig.useRig in ['game']:
         rig = mh2proxy.CProxy('Rig', 0)
         rig.name = theHuman
         (locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/%s.rig' % theConfig.useRig, obj)
@@ -240,7 +240,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'rig-bones':
                 if words[2] == 'ControlRig':
                     fp.write("Armature %s %s   Normal \n" % (theHuman, theHuman))
-                    if rig == 'mhx':
+                    if type(rig) == str:
                         mhx_rig.writeControlArmature(fp)
                     else:
                         mh2proxy.writeRigBones(fp, rig.bones)
@@ -263,7 +263,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     fp.write("Object %sDeformRig ARMATURE %sDeformRig\n"  % (theHuman, theHuman))
             elif words[1] == 'rig-poses':
                 if words[2] == 'ControlRig':
-                    if rig == 'mhx':
+                    if type(rig) == str:
                         fp.write("Pose %s\n" % theHuman)
                         mhx_rig.writeControlPoses(fp)
                         fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
@@ -275,11 +275,11 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         mhx_rig.writeDeformPoses(fp)
                         fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
             elif words[1] == 'rig-actions':
-                if rig == 'mhx':
+                if type(rig) == str:
                     fp.write("Pose %s\nend Pose\n" % theHuman)
                     mhx_rig.writeAllActions(fp)
             elif words[1] == 'rig-drivers':
-                if rig == 'mhx':
+                if type(rig) == str:
                     if words[2] == 'ControlRig':
                         fp.write("AnimationData %s True\n" % theHuman)
                         mhx_rig.writeAllDrivers(fp)
@@ -412,7 +412,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     mh2proxy.writeRigWeights(fp, proxy.weights)
                 else:
                     fp.write("#if toggle&T_Armature\n")
-                    if rig == 'mhx':
+                    if type(rig) == str:
                         for file in mhx_rig.VertexGroupFiles:
                             copyVertGroups(file, fp, proxy)
                     else:
@@ -778,9 +778,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
     if (not proxy or proxy.type == 'Proxy'):
         if theConfig.faceshapes:
             fp.write("#if toggle&T_Face\n")  
-            if mhx_rig.UseExternalRig:
-                pass      
-            elif BODY_LANGUAGE:
+            if BODY_LANGUAGE:
                 copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)    
             else:
                 copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)    
@@ -803,7 +801,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
         fp.write("#endif\n")
 
-    if rig != 'mhx' or mhx_rig.UseExternalRig:
+    if rig != 'mhx':
         fp.write(
 "end ShapeKeys\n" +
 "#endif\n")

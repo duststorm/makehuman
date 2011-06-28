@@ -223,10 +223,10 @@ def symmetrizeWeights(context):
 	symmIndex = {}
 	for vgrp in ob.vertex_groups:
 		nameStripped = vgrp.name[:-2]
-		if vgrp.name[-2:] == '_L':
+		if vgrp.name[-2:] in ['_L', '.L', '_l', '.l']:
 			left[nameStripped] = vgrp
 			leftIndex[vgrp.index] = nameStripped
-		elif vgrp.name[-2:] == '_R':
+		elif vgrp.name[-2:] in ['_R', '.R', '_r', '.r']:
 			right[nameStripped] = vgrp
 			rightIndex[vgrp.index] = nameStripped
 		else:
@@ -302,6 +302,29 @@ class VIEW3D_OT_MhxSymmetrizeWeightsButton(bpy.types.Operator):
 		import bpy
 		n = symmetrizeWeights(context)
 		print("Weights symmetrized, %d vertices" % n)
+		return{'FINISHED'}	
+		
+#
+#	cleanRight(context):
+#	class VIEW3D_OT_MhxCleanRightButton(bpy.types.Operator):
+#
+
+def cleanRight(context):
+	ob = context.object
+	factor = 1
+	rverts = rightVerts(factor, ob.data)
+	for vgrp in ob.vertex_groups:
+		if vgrp.name[-2:] in ['_L', '.L', '_l', '.l']:
+			for (vn, rv) in rverts.items():
+				vgrp.remove([rv.index])
+	return
+
+class VIEW3D_OT_MhxCleanRightButton(bpy.types.Operator):
+	bl_idname = "mhx.weight_clean_right"
+	bl_label = "Clean right"
+
+	def execute(self, context):
+		cleanRight(context)
 		return{'FINISHED'}	
 
 #
@@ -608,6 +631,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 		layout.separator()
 		layout.prop(context.scene, 'MhxLeft2Right')
 		layout.operator("mhx.weight_symmetrize_weights")	
+		layout.operator("mhx.weight_clean_right")	
 		layout.operator("mhx.weight_symmetrize_shapes")	
 
 		layout.separator()

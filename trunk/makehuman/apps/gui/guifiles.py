@@ -262,13 +262,25 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxOptionsSource.hide()
         y+=16
         
-        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
+        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6));y+=25
         self.version24 = gui3d.CheckBox(self.mhxOptions, "Version 2.4", True);y+=24
         self.version25 = gui3d.CheckBox(self.mhxOptions, "Version 2.5", True);y+=24
         self.exportExpressions = gui3d.CheckBox(self.mhxOptions, "Expressions", True);y+=24
+        self.exportFaceShapes = gui3d.CheckBox(self.mhxOptions, "Face shapes", True);y+=24
+        self.exportBodyShapes = gui3d.CheckBox(self.mhxOptions, "Body shapes", False);y+=24
+        self.exportClothes = gui3d.CheckBox(self.mhxOptions, "Clothes", True);y+=24
+        self.exportCage = gui3d.CheckBox(self.mhxOptions, "Cage", False);y+=24
         rigs = []
         self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use mhx rig", True);y+=24
+        self.rigifyRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use rigify rig");y+=24
         self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use game rig");y+=24
+        proxies = []
+        self.proxyNoProxy = gui3d.RadioButton(self.mhxOptions, proxies, "No proxy");y+=24
+        self.proxyRorkimaru = gui3d.RadioButton(self.mhxOptions, proxies, "Rorkimaru proxy");y+=24
+        self.proxyAscottk = gui3d.RadioButton(self.mhxOptions, proxies, "Ascottk proxy");y+=24
+        self.proxyForsaken = gui3d.RadioButton(self.mhxOptions, proxies, "Forsaken proxy");y+=24
+
+
         self.mhxOptions.hide()
         
         # STL options
@@ -387,10 +399,29 @@ class ExportTaskView(gui3d.TaskView):
                     mhxversion = []
                     if self.version24.selected: mhxversion.append('24')
                     if self.version25.selected: mhxversion.append('25')
+                    if self.mhxRig.selected:
+                        rig = 'mhx'
+                    elif self.rigifyRig.selected:
+                        rig = 'rigify'
+                    elif self.gameRig.selected:
+                        rig = 'game'
+                    if self.proxyRorkimaru.selected:
+                        proxy = 'Rorkimaru'
+                    elif self.proxyAscottk.selected:
+                        proxy = 'ascottk'
+                    elif self.proxyForsaken.selected:
+                        proxy = 'forsaken'
+                    else:
+                        proxy = None
                     options = {
                         'mhxversion':mhxversion,
                         'expressions':self.exportExpressions.selected,
-                        'useRig':'mhx' if self.mhxRig.selected else 'game'
+                        'faceshapes':self.exportFaceShapes.selected,
+                        'bodyshapes':self.exportBodyShapes.selected,
+                        'clothes':self.exportClothes.selected,
+                        'cage':self.exportCage.selected,
+                        'useRig': rig,
+                        'useProxy': proxy
                     }
                 # TL 2011.02.08: exportMhx uses the human instead of his meshData
                 mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)

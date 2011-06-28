@@ -126,7 +126,7 @@ def proxyFilePtr(name):
     return None
     
 #
-#    proxyConfig():
+#    proxyConfig(options=None):
 #
 
 class CProxyConfig:
@@ -150,22 +150,30 @@ def proxyConfig(options=None):
     useMhx = True
     useObj = True
     useDae = True
+    useClothes = True
+    useProxy = 'Rorkimaru'
 
     if options:
         print(options)
         cfg.mhxversion = options['mhxversion']
         cfg.expressions = options['expressions']
+        cfg.faceshapes = options['faceshapes']
+        cfg.bodyshapes = options['bodyshapes']
+        cfg.cage = options['cage']
         cfg.useRig = options['useRig']
+        useClothes = options['clothes']
+        useProxy = options['useProxy']
         fp = 0
     else:    
         fp = proxyFilePtr('proxy.cfg')
 
     if not fp: 
-        for name in ['sweater', 'jeans']:
-            proxyFile = os.path.expanduser("./data/templates/%s.mhclo" % name)
-            cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 4)))
-        for name in ['Rorkimaru', 'ascottk']:
-            proxyFile = os.path.expanduser("./data/templates/%s.proxy" % name)
+        if useClothes:
+            for name in ['sweater', 'jeans']:
+                proxyFile = os.path.expanduser("./data/templates/%s.mhclo" % name)
+                cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 4)))
+        if useProxy:
+            proxyFile = os.path.expanduser("./data/templates/%s.proxy" % useProxy)
             cfg.proxyList.append(('Proxy', True, True, True, (proxyFile, 'Proxy', 3)))
         return cfg
 
@@ -362,7 +370,7 @@ def readProxyFile(obj, proxyStuff):
 def readMaterial(line, mat):
     words= line.split()
     key = words[0]
-    if key in ['diffuse_color', 'specular_color', 'ambient_color', 'emit_color']:
+    if key in ['diffuse_color', 'specular_color', 'ambient', 'emit']:
         mat.settings.append( (key, [float(words[1]), float(words[2]), float(words[3])]) )
     elif key in ['diffuse_shader', 'specular_shader']:
         mat.settings.append( (key, words[1]) )

@@ -23,7 +23,7 @@ Limit angles from http://hippydrome.com/
 
 import aljabr, mhxbones, mh2mhx, math, mhx_spine
 from aljabr import *
-
+        
 pi = 3.14159
 D = pi/180
 yunit = [0,1,0]
@@ -325,40 +325,6 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
     fp.write("    roll %.6g %.6g ; \n" % (roll, roll))
     fp.write("\tend bone\n")
     return
-
-#
-#    Interface to external rigs.
-#   Continues in external_rig.py
-#
-
-UseExternalRig = False
-
-if UseExternalRig:
-    import external_rig
-    BoneGroups = external_rig.BoneGroups
-    RecalcRoll = external_rig.RecalcRoll
-    GizmoFiles = external_rig.GizmoFiles
-    ObjectProps = external_rig.ObjectProps
-    ArmatureProps = external_rig.ArmatureProps
-    VertexGroupFiles = external_rig.VertexGroupFiles
-else:
-    BoneGroups = [
-        ('Master', 'THEME13'),
-        ('Spine', 'THEME05'),
-        ('FK_L', 'THEME09'),
-        ('FK_R', 'THEME02'),
-        ('IK_L', 'THEME03'),
-        ('IK_R', 'THEME04'),
-    ]
-    RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
-    GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
-                  "./shared/mhx/templates/gizmos25.mhx"]
-    VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-bones25.mhx",
-                        #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
-                        "./shared/mhx/templates/vertexgroups-palm25.mhx"]
-
-    ObjectProps = []
-    ArmatureProps = []
 
 #
 #    writeBoneGroups(fp):
@@ -1805,46 +1771,98 @@ def setupCircles(fp):
 #
 
 import rig_joints_25, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
+#import blenrig_rig        
+import rigify_rig
 
 def setupRig(obj):
-    if UseExternalRig:
-        newSetupJoints(obj, external_rig.Joints, external_rig.HeadsTails, False)
-        return
-    
-    newSetupJoints(obj, 
-        rig_joints_25.DeformJoints +
-        rig_body_25.BodyJoints +
-        rig_arm_25.ArmJoints +
-        rig_finger_25.FingerJoints +
-        rig_leg_25.LegJoints +
-        #rig_toe_25.ToeJoints +
-        rig_face_25.FaceJoints +
-        rig_panel_25.PanelJoints,
-        
-        rig_body_25.BodyHeadsTails +
-        rig_arm_25.ArmHeadsTails +
-        rig_finger_25.FingerHeadsTails +
-        rig_leg_25.LegHeadsTails +
-        #rig_toe_25.ToeHeadsTails +
-        rig_face_25.FaceHeadsTails +
-        rig_panel_25.PanelHeadsTails,
+    global BoneGroups, RecalcRoll, GizmoFiles, VertexGroupFiles, ObjectProps, ArmatureProps, Joints, HeadsTails, Armature
 
-        True)
+    if mh2mhx.theConfig.useRig in ['mhx', 'game']:
+        BoneGroups = [
+            ('Master', 'THEME13'),
+            ('Spine', 'THEME05'),
+            ('FK_L', 'THEME09'),
+            ('FK_R', 'THEME02'),
+            ('IK_L', 'THEME03'),
+            ('IK_R', 'THEME04'),
+        ]
+        RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
+        GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
+                      "./shared/mhx/templates/gizmos25.mhx"]
+        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-bones25.mhx",
+                            #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
+                            "./shared/mhx/templates/vertexgroups-palm25.mhx"]
+
+        ObjectProps = []
+        ArmatureProps = []
+
+        Joints = (
+            rig_joints_25.DeformJoints +
+            rig_body_25.BodyJoints +
+            rig_arm_25.ArmJoints +
+            rig_finger_25.FingerJoints +
+            rig_leg_25.LegJoints +
+            #rig_toe_25.ToeJoints +
+            rig_face_25.FaceJoints +
+            rig_panel_25.PanelJoints
+        )
+        
+        HeadsTails = (
+            rig_body_25.BodyHeadsTails +
+            rig_arm_25.ArmHeadsTails +
+            rig_finger_25.FingerHeadsTails +
+            rig_leg_25.LegHeadsTails +
+            #rig_toe_25.ToeHeadsTails +
+            rig_face_25.FaceHeadsTails +
+            rig_panel_25.PanelHeadsTails
+        )
+
+        Armature = (
+            rig_body_25.BodyArmature +
+            rig_arm_25.ArmArmature +
+            rig_finger_25.FingerArmature +
+            rig_leg_25.LegArmature +
+            #rig_toe_25.ToeArmature +
+            rig_face_25.FaceArmature +
+            rig_panel_25.PanelArmature
+        )
+
+
+    elif mh2mhx.theConfig.useRig == "blenrig":
+        BoneGroups = [('GEN', 'THEME13'),
+                      ('IK', 'THEME05'),
+                      ('FK', 'THEME09'),
+                      ('FACIAL', 'THEME02')]
+        RecalcRoll = []              
+        VertexGroupFiles = ["./shared/mhx/templates/blenrigmesh_weights.mhx"]
+        GizmoFiles = ["./shared/mhx/templates/blenrig_gizmos.mhx"]
+            
+        Joints = blenrig_rig.BlenrigJoints
+        HeadsTails = blenrig_rig.BlenrigHeadsTails
+        Armature = blenrig_rig.BlenrigArmature
+        ObjectProps = blenrig_rig.BlenrigObjectProps
+        ArmatureProps = blenrig_rig.BlenrigArmatureProps
+
+    elif mh2mhx.theConfig.useRig == "rigify":
+        BoneGroups = []
+        RecalcRoll = []              
+        VertexGroupFiles = ["./shared/mhx/templates/rigifymesh_weights.mhx"]
+        GizmoFiles = []
+            
+        Joints = rigify_rig.RigifyJoints
+        HeadsTails = rigify_rig.RigifyHeadsTails
+        Armature = rigify_rig.RigifyArmature
+        ObjectProps = rigify_rig.RigifyObjectProps
+        ArmatureProps = rigify_rig.RigifyArmatureProps
+
+    else:
+        raise NameError("Unknown rig %s" % mh2mhx.theConfig.useRig)
+
+    newSetupJoints(obj, Joints, HeadsTails, (mh2mhx.theConfig.useRig == 'mhx'))
     return
     
 def writeControlArmature(fp):
-    if UseExternalRig:
-        writeArmature(fp, external_rig.Armature, True)
-        return
-        
-    writeArmature(fp, 
-        rig_body_25.BodyArmature +
-        rig_arm_25.ArmArmature +
-        rig_finger_25.FingerArmature +
-        rig_leg_25.LegArmature +
-        #rig_toe_25.ToeArmature +
-        rig_face_25.FaceArmature +
-        rig_panel_25.PanelArmature, True)
+    writeArmature(fp, Armature, True)
     return
 
 def writeDeformArmature(fp):
@@ -1857,27 +1875,22 @@ def writeAllCurves(fp):
 
 def writeControlPoses(fp):
     writeBoneGroups(fp)
-    if UseExternalRig:
-        external_rig.writePoses(fp)
-        return
-            
-    rig_body_25.BodyControlPoses(fp)
-    rig_arm_25.ArmControlPoses(fp)
-    rig_finger_25.FingerControlPoses(fp)
-    rig_leg_25.LegControlPoses(fp)
-    #rig_toe_25.ToeControlPoses(fp)
-    rig_face_25.FaceControlPoses(fp)
-    rig_panel_25.PanelControlPoses(fp)
+    if mh2mhx.theConfig.useRig == 'mhx':            
+        rig_body_25.BodyControlPoses(fp)
+        rig_arm_25.ArmControlPoses(fp)
+        rig_finger_25.FingerControlPoses(fp)
+        rig_leg_25.LegControlPoses(fp)
+        #rig_toe_25.ToeControlPoses(fp)
+        rig_face_25.FaceControlPoses(fp)
+        rig_panel_25.PanelControlPoses(fp)
+    elif mh2mhx.theConfig.useRig == 'blenrig':
+        blenrig_rig.BlenrigWritePoses(fp)
+    elif mh2mhx.theConfig.useRig == 'rigify':
+        rigify_rig.RigifyWritePoses(fp)
+
     return
 
 def writeDeformPoses(fp):
-    return
-    #rig_body_25.BodyDeformPoses(fp)
-    #rig_arm_25.ArmDeformPoses(fp)
-    rig_finger_25.FingerDeformPoses(fp)
-    #rig_leg_25.LegDeformPoses(fp)
-    #rig_toe_25.ToeDeformPoses(fp)
-    #rig_face_25.FaceDeformPoses(fp)
     return
     
 def writeAllActions(fp):
@@ -1887,17 +1900,19 @@ def writeAllActions(fp):
     return
 
 def writeAllDrivers(fp):
-    if UseExternalRig:
-        drivers = external_rig.getDrivers()
+    if mh2mhx.theConfig.useRig == 'mhx':            
+        writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
+        writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
+        #rig_panel_25.FingerControlDrivers(fp)
+        writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
+        writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman)
+        rig_face_25.FaceDeformDrivers(fp)
+    elif mh2mhx.theConfig.useRig == 'blenrig':            
+        drivers = blenrig_rig.getBlenrigDrivers()
         writeDrivers(fp, True, drivers)
-        return
-
-    writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
-    writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
-    #rig_panel_25.FingerControlDrivers(fp)
-    writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
-    writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman)
-    rig_face_25.FaceDeformDrivers(fp)
+    elif mh2mhx.theConfig.useRig == 'rigify':            
+        drivers = []
+        writeDrivers(fp, True, drivers)
     return
 
 def writeAllProperties(fp, typ):
@@ -1970,11 +1985,6 @@ def reapplyArmature(fp, ob):
 "    end Modifier\n" +
 "  end Object\n")
     return
-
-
-
-
-
 
 
 

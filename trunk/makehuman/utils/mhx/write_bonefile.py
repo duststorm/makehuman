@@ -624,8 +624,8 @@ class OBJECT_OT_WriteWeightFiles(bpy.types.Operator):
         dir = context.scene['BoneFileDir']
         src = context.object
         for ob in context.scene.objects:
-            if ob.select and ob.type == 'MESH' and ob != src:
-                writeWeightFile(ob, src, "%s/templates/%s_weights.mhx" % (dir, ob.name.lower()))
+            if ob.select and ob.type == 'MESH' and ob != src:            	
+                writeWeightFile(ob, src, "%s/%s_weights.mhx" % (dir, ob.name.lower()))
         return{'FINISHED'}    
 
 

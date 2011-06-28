@@ -8,8 +8,6 @@ specular_color 0.5 0.5 0.5
 specular_shader COOKTORR
 specular_intensity 0.05
 translucency 0.00
-ambient_color 0.5 0.5 0.5
-emit_color 0.0 0.0 0.0
 # verts
  8057  8050  8049 0.53670 0.04714 0.41616
  8143  8100  8099 0.02330 0.02138 0.95532
