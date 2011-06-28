@@ -216,26 +216,55 @@ def symmetrizeWeights(context):
 	scn = context.scene
 
 	left = {}
+	left01 = {}
+	left02 = {}
 	leftIndex = {}
+	left01Index = {}
+	left02Index = {}
 	right = {}
+	right01 = {}
+	right02 = {}
 	rightIndex = {}
+	right01Index = {}
+	right02Index = {}
 	symm = {}
 	symmIndex = {}
 	for vgrp in ob.vertex_groups:
-		nameStripped = vgrp.name[:-2]
 		if vgrp.name[-2:] in ['_L', '.L', '_l', '.l']:
+			nameStripped = vgrp.name[:-2]
 			left[nameStripped] = vgrp
 			leftIndex[vgrp.index] = nameStripped
 		elif vgrp.name[-2:] in ['_R', '.R', '_r', '.r']:
+			nameStripped = vgrp.name[:-2]
 			right[nameStripped] = vgrp
 			rightIndex[vgrp.index] = nameStripped
+		elif vgrp.name[-5:] in ['.L.01', '.l.01']:
+			nameStripped = vgrp.name[:-5]
+			left01[nameStripped] = vgrp
+			left01Index[vgrp.index] = nameStripped
+		elif vgrp.name[-5:] in ['.R.01', '.r.01']:
+			nameStripped = vgrp.name[:-5]
+			right01[nameStripped] = vgrp
+			right01Index[vgrp.index] = nameStripped
+		elif vgrp.name[-5:] in ['.L.02', '.l.02']:
+			nameStripped = vgrp.name[:-5]
+			left02[nameStripped] = vgrp
+			left02Index[vgrp.index] = nameStripped
+		elif vgrp.name[-5:] in ['.R.02', '.r.02']:
+			nameStripped = vgrp.name[:-5]
+			right02[nameStripped] = vgrp
+			right02Index[vgrp.index] = nameStripped
 		else:
 			symm[vgrp.name] = vgrp
 			symmIndex[vgrp.index] = vgrp.name
 
-	print('Left', left.items())
-	print('Right', right.items())
-	print('Symm', symm.items())
+	printGroups('Left', left, leftIndex, ob.vertex_groups)
+	printGroups('Right', right, rightIndex, ob.vertex_groups)
+	printGroups('Left01', left01, left01Index, ob.vertex_groups)
+	printGroups('Right01', right01, right01Index, ob.vertex_groups)
+	printGroups('Left02', left02, left02Index, ob.vertex_groups)
+	printGroups('Right02', right02, right02Index, ob.vertex_groups)
+	printGroups('Symm', symm, symmIndex, ob.vertex_groups)
 
 	if scn['MhxLeft2Right']:
 		factor = 1
@@ -254,28 +283,30 @@ def symmetrizeWeights(context):
 			rgrp.weight = 0
 		for grp in v.groups:
 			rgrp = None
-			try:
-				name = leftIndex[grp.group]
-				rgrp = right[name]
-			except:
-				pass
-			try:
-				name = rightIndex[grp.group]
-				rgrp = left[name]
-			except:
-				pass
-			try:
-				name = symmIndex[grp.group]
-				rgrp = symm[name]
-			except:
-				pass
-			#print("  ", name, grp, rgrp)
+			for (indices, groups) in [
+				(leftIndex, right), (rightIndex, left),
+				(left01Index, right01), (right01Index, left01),
+				(left02Index, right02), (right02Index, left02),
+				(symmIndex, symm)
+				]:
+				try:
+					name = indices[grp.group]
+					rgrp = groups[name]
+				except:
+					pass
 			if rgrp:
+				#print("  ", name, grp, rgrp)
 				rgrp.add([rv.index], grp.weight, 'REPLACE')
 			else:				
 				gn = grp.group
 				print("*** No rgrp for %s %s %s" % (grp, gn, ob.vertex_groups[gn]))
 	return len(rverts)
+
+def printGroups(name, groups, indices, vgroups):
+	print(name)
+	for (nameStripped, grp) in groups.items():
+		print("  ", nameStripped, grp.name, indices[grp.index])
+	return
 
 def rightVerts(factor, me):
 	rverts = {}

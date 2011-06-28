@@ -1775,7 +1775,7 @@ import rig_joints_25, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_to
 import rigify_rig
 
 def setupRig(obj):
-    global BoneGroups, RecalcRoll, GizmoFiles, VertexGroupFiles, ObjectProps, ArmatureProps, Joints, HeadsTails, Armature
+    global BoneGroups, RecalcRoll, GizmoFiles, VertexGroupFiles, ObjectProps, ArmatureProps, Joints, HeadsTails, Armature, HeadName
 
     if mh2mhx.theConfig.useRig in ['mhx', 'game']:
         BoneGroups = [
@@ -1788,13 +1788,16 @@ def setupRig(obj):
         ]
         RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
         GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
+                      "./shared/mhx/templates/panel_gizmo25.mhx",
                       "./shared/mhx/templates/gizmos25.mhx"]
-        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-bones25.mhx",
+        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
+                            "./shared/mhx/templates/vertexgroups-bones25.mhx",
                             #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
 
         ObjectProps = []
         ArmatureProps = []
+        HeadName = 'Head'
 
         Joints = (
             rig_joints_25.DeformJoints +
@@ -1846,20 +1849,51 @@ def setupRig(obj):
     elif mh2mhx.theConfig.useRig == "rigify":
         BoneGroups = []
         RecalcRoll = []              
-        VertexGroupFiles = ["./shared/mhx/templates/rigifymesh_weights.mhx"]
-        GizmoFiles = []
+        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
+                            "./shared/mhx/templates/rigifymesh_weights.mhx"]
+        GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx"]
+        HeadName = 'head'
+        faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
-        Joints = rigify_rig.RigifyJoints
-        HeadsTails = rigify_rig.RigifyHeadsTails
-        Armature = rigify_rig.RigifyArmature
+        Joints = (
+            rig_joints_25.DeformJoints +
+            rig_body_25.BodyJoints +
+            rigify_rig.RigifyJoints +
+            rig_face_25.FaceJoints +
+            rig_panel_25.PanelJoints
+        )
+        
+        HeadsTails = (
+            rigify_rig.RigifyHeadsTails +
+            rig_face_25.FaceHeadsTails +
+            rig_panel_25.PanelHeadsTails
+        )
+
+        Armature = (
+            rigify_rig.RigifyArmature +
+            faceArmature +
+            rig_panel_25.PanelArmature
+        )
+            
         ObjectProps = rigify_rig.RigifyObjectProps
         ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:
         raise NameError("Unknown rig %s" % mh2mhx.theConfig.useRig)
 
-    newSetupJoints(obj, Joints, HeadsTails, (mh2mhx.theConfig.useRig == 'mhx'))
+    newSetupJoints(obj, Joints, HeadsTails, True)
     return
+    
+        
+def swapParentName(bones, old, new):
+    nbones = []
+    for bone in bones:
+        (name, roll, par, flags, level, bb) = bone
+        if par == old:
+            nbones.append( (name, roll, new, flags, level, bb) )
+        else:
+            nbones.append(bone)
+    return nbones
     
 def writeControlArmature(fp):
     writeArmature(fp, Armature, True)
@@ -1887,6 +1921,8 @@ def writeControlPoses(fp):
         blenrig_rig.BlenrigWritePoses(fp)
     elif mh2mhx.theConfig.useRig == 'rigify':
         rigify_rig.RigifyWritePoses(fp)
+        rig_face_25.FaceControlPoses(fp)
+        rig_panel_25.PanelControlPoses(fp)
 
     return
 
