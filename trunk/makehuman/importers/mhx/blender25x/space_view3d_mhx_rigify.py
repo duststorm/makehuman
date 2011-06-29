@@ -143,8 +143,8 @@ def rigifyMhx(context):
             for cns1 in pb1.constraints:
                 cns2 = copyConstraint(cns1, pb1, pb2, mhx, meta)    
                 if cns2.type == 'CHILD_OF':
-                    pass
-                    #bpy.ops.constraint.childof_set_inverse(constraint=cns2.name, owner='BONE')    
+                    meta.data.bones.active = pb2.bone
+                    bpy.ops.constraint.childof_set_inverse(constraint=cns2.name, owner='BONE')    
     
     # Create animation data
     if mhx.animation_data:
