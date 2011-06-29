@@ -801,7 +801,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
         fp.write("#endif\n")
 
-    if rig != 'mhx':
+    if 0 and rig != 'mhx':
         fp.write(
 "end ShapeKeys\n" +
 "#endif\n")

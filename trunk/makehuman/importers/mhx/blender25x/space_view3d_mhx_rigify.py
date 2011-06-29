@@ -64,7 +64,6 @@ def rigifyMhx(context):
     extras = {}
     bpy.ops.object.mode_set(mode='EDIT')
     for eb in mhx.data.edit_bones:
-        print(eb.name)
         heads[eb.name] = eb.head.copy()
         tails[eb.name] = eb.tail.copy()
         rolls[eb.name] = eb.roll
@@ -112,7 +111,6 @@ def rigifyMhx(context):
     meta.name = name+"Meta"
     amtMod.object = meta
 
-    print(parents.items())
     # Copy extra bones to meta rig
     bpy.ops.object.mode_set(mode='EDIT')
     for name in heads.keys():
@@ -133,16 +131,45 @@ def rigifyMhx(context):
             pb1 = mhx.pose.bones[name]
             pb2 = meta.pose.bones[name]
             pb2.custom_shape = pb1.custom_shape
+            pb2.lock_location = pb1.lock_location
+            pb2.lock_rotation = pb1.lock_rotation
+            pb2.lock_scale = pb1.lock_scale
             b1 = pb1.bone
             b2 = pb2.bone
             b2.use_deform = b1.use_deform
             b2.hide = b1.hide
+            b2.hide_select = b1.hide_select
             b2.show_wire = b1.show_wire
             for cns1 in pb1.constraints:
-                copyConstraint(cns1, pb1, pb2, mhx, meta)        
+                cns2 = copyConstraint(cns1, pb1, pb2, mhx, meta)    
+                if cns2.type == 'CHILD_OF':
+                    pass
+                    #bpy.ops.constraint.childof_set_inverse(constraint=cns2.name, owner='BONE')    
+    
+    # Create animation data
+    if mhx.animation_data:
+        for fcu in mhx.animation_data.drivers:
+            meta.animation_data.drivers.from_existing(src_driver=fcu)
+
+    fixDrivers(meta.animation_data, mhx, meta)
+    fixDrivers(mesh.data.shape_keys.animation_data, mhx, meta)
 
     scn.objects.unlink(mhx)
     print("Rigify rig complete")    
+    return
+
+#
+#   fixDrivers(adata, mhx, meta):
+#
+
+def fixDrivers(adata, mhx, meta):
+    if not adata:
+        return
+    for fcu in adata.drivers:
+        for var in fcu.driver.variables:
+            for targ in var.targets:
+                if targ.id == mhx:
+                    targ.id = meta
     return
 
 #
@@ -157,6 +184,13 @@ def copyConstraint(cns1, pb1, pb2, mhx, meta):
                 cns2.target = meta
             else:
                 cns2.target = cns1.target
+        elif prop == 'subtarget':
+            if cns1.subtarget == 'Head':
+                cns2.subtarget = 'DEF-head'
+            elif cns1.subtarget == 'MasterFloor':
+                cns2.subtarget = 'root'
+            else:
+                cns2.subtarget = cns1.subtarget
         elif prop[0] != '_':
             try:
                 expr = "cns2.%s = cns1.%s" % (prop, prop)
@@ -164,7 +198,7 @@ def copyConstraint(cns1, pb1, pb2, mhx, meta):
                 exec(expr)
             except:
                 pass
-    return
+    return cns2
 
 #
 #   class OBJECT_OT_RigifyMhxButton(bpy.types.Operator):

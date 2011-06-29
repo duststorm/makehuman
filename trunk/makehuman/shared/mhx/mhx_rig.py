@@ -1947,8 +1947,7 @@ def writeAllDrivers(fp):
         drivers = blenrig_rig.getBlenrigDrivers()
         writeDrivers(fp, True, drivers)
     elif mh2mhx.theConfig.useRig == 'rigify':            
-        drivers = []
-        writeDrivers(fp, True, drivers)
+        rig_face_25.FaceDeformDrivers(fp)
     return
 
 def writeAllProperties(fp, typ):
