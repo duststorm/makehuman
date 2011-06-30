@@ -109,6 +109,7 @@ def rigifyMhx(context):
     scn.objects.unlink(rigify)
     meta = context.object
     meta.name = name+"Meta"
+    meta.show_x_ray = True
     amtMod.object = meta
 
     # Copy extra bones to meta rig
@@ -137,9 +138,16 @@ def rigifyMhx(context):
             b1 = pb1.bone
             b2 = pb2.bone
             b2.use_deform = b1.use_deform
-            b2.hide = b1.hide
             b2.hide_select = b1.hide_select
             b2.show_wire = b1.show_wire
+            layers = 32*[False]
+            if b1.layers[8]:
+                layers[28] = True
+            else:
+                layers[29] = True
+            if b1.layers[10]:
+                layers[2] = True
+            b2.layers = layers
             for cns1 in pb1.constraints:
                 cns2 = copyConstraint(cns1, pb1, pb2, mhx, meta)    
                 if cns2.type == 'CHILD_OF':
