@@ -67,6 +67,7 @@ class HumanTextureTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
         self.filechooser = gui3d.FileChooser(self, 'data/skins', 'tif', 'png')
+        self.update = gui3d.Button(self.filechooser.sortBox, 'Check for updates')
         self.mediaSync = None
         self.currentTexture = gui3d.Button(self.app.categories['Modelling'],
             style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=self.app.selectedHuman.getTexture()))
@@ -85,6 +86,10 @@ class HumanTextureTaskView(gui3d.TaskView):
         def onClicked(event):
             self.app.switchCategory('Library')
             self.app.switchTask("Human texture")
+            
+        @self.update.event
+        def onClicked(event):
+            self.syncMedia()
             
         self.app.addLoadHandler('skinTexture', self.loadHandler)
         self.app.addSaveHandler(self.saveHandler)
