@@ -75,22 +75,25 @@ def rigifyMhx(context):
                 parents[eb.name] = par
         else:
             parents[eb.name] = None
-        extras[eb.name] = True
+        extras[eb.name] = not eb.layers[16]
     bpy.ops.object.mode_set(mode='OBJECT')
    
-    # Find corresponding mesh   
-    mesh = None
+    # Find corresponding meshes. Can be several (clothes etc.)   
+    meshes = []
     for ob in scn.objects:
         for mod in ob.modifiers:
             if (mod.type == 'ARMATURE' and mod.object == mhx):
-                mesh = ob
-                amtMod = mod
-    if not mesh:
+                meshes.append((ob, mod))
+    if meshes == []:
         raise NameError("Did not find matching mesh")
         
     # Rename Head vertex group    
-    vg = mesh.vertex_groups['DfmHead']
-    vg.name = 'DEF-head'
+    for (mesh, mod) in meshes:
+        try:
+            vg = mesh.vertex_groups['DfmHead']
+            vg.name = 'DEF-head'
+        except:
+            pass
 
     # Change rigify bone locations    
     scn.objects.active = None 
@@ -102,6 +105,42 @@ def rigifyMhx(context):
         eb.tail = tails[eb.name]
         extras[eb.name] = False
 
+    planes = [
+        ('UP-thumb.L', 'thumb.01.L', 'thumb.03.L', ['thumb.02.L']),
+        ('UP-index.L', 'finger_index.01.L', 'finger_index.03.L', ['finger_index.02.L']),
+        ('UP-middle.L', 'finger_middle.01.L', 'finger_middle.03.L', ['finger_middle.02.L']),
+        ('UP-ring.L', 'finger_ring.01.L', 'finger_ring.03.L', ['finger_ring.02.L']),
+        ('UP-pinky.L', 'finger_pinky.01.L', 'finger_pinky.03.L', ['finger_pinky.02.L']),
+        ('UP-thumb.R', 'thumb.01.R', 'thumb.03.R', ['thumb.02.R']),
+        ('UP-index.R', 'finger_index.01.R', 'finger_index.03.R', ['finger_index.02.R']),
+        ('UP-middle.R', 'finger_middle.01.R', 'finger_middle.03.R', ['finger_middle.02.R']),
+        ('UP-ring.R', 'finger_ring.01.R', 'finger_ring.03.R', ['finger_ring.02.R']),
+        ('UP-pinky.R', 'finger_pinky.01.R', 'finger_pinky.03.R', ['finger_pinky.02.R']),
+    ]
+
+    for (upbone, first, last, middles) in planes:
+        extras[upbone] = False
+    """
+        fb = rigify.data.edit_bones[first]
+        lb = rigify.data.edit_bones[last]
+        uhead = heads[upbone]
+        utail = tails[upbone]
+        tang = lb.tail - fb.head
+        tangent = tang/tang.length
+        up = (uhead+utail)/2 - fb.head
+        norm = up - tangent*tangent.dot(up)
+        normal = norm/norm.length
+        offVector = tangent.cross(normal)
+        vec = utail - uhead
+        minDist = vec.length * 0.1
+        lineate(fb.tail, fb.head, minDist, normal, offVector)
+        lineate(lb.head, fb.head, minDist, normal, offVector)
+        for bone in middles:
+            mb = rigify.data.edit_bones[bone]
+            lineate(mb.head, fb.head, minDist, normal, offVector)
+            lineate(mb.tail, fb.head, minDist, normal, offVector)
+    """
+
     bpy.ops.object.mode_set(mode='OBJECT')
 
     # Generate meta rig    
@@ -110,7 +149,8 @@ def rigifyMhx(context):
     meta = context.object
     meta.name = name+"Meta"
     meta.show_x_ray = True
-    amtMod.object = meta
+    for (mesh, mod) in meshes:
+        mod.object = meta
 
     # Copy extra bones to meta rig
     bpy.ops.object.mode_set(mode='EDIT')
@@ -160,10 +200,27 @@ def rigifyMhx(context):
             meta.animation_data.drivers.from_existing(src_driver=fcu)
 
     fixDrivers(meta.animation_data, mhx, meta)
-    fixDrivers(mesh.data.shape_keys.animation_data, mhx, meta)
+    for (mesh, mod) in meshes:
+        fixDrivers(mesh.data.shape_keys.animation_data, mhx, meta)
 
     scn.objects.unlink(mhx)
     print("Rigify rig complete")    
+    return
+
+#
+#   lineate(pt, start, minDist, normal, offVector):
+#
+
+def lineate(pt, start, minDist, normal, offVector):
+    diff = pt - start
+    print("D1", diff)
+    diff = diff - offVector*offVector.dot(diff) 
+    print("  ", diff)
+    dist = diff.dot(normal)
+    if dist < minDist:
+        diff += (minDist - dist)*normal
+    print("  ", diff)
+    pt = start + diff
     return
 
 #
@@ -185,6 +242,17 @@ def fixDrivers(adata, mhx, meta):
 #
 
 def copyConstraint(cns1, pb1, pb2, mhx, meta):
+    substitute = {
+        'Head' : 'DEF-head',
+        'MasterFloor' : 'root',
+        'upper_arm.L' : 'DEF-upper_arm.L.01',
+        'upper_arm.R' : 'DEF-upper_arm.R.01',
+        'thigh.L' : 'DEF-thigh.L.01',
+        'thigh.R' : 'DEF-thigh.R.01',
+        'shin.L' : 'DEF-shin.L.01',
+        'shin.R' : 'DEF-shin.R.01'
+    }
+
     cns2 = pb2.constraints.new(cns1.type)
     for prop in dir(cns1):
         if prop == 'target':
@@ -193,11 +261,9 @@ def copyConstraint(cns1, pb1, pb2, mhx, meta):
             else:
                 cns2.target = cns1.target
         elif prop == 'subtarget':
-            if cns1.subtarget == 'Head':
-                cns2.subtarget = 'DEF-head'
-            elif cns1.subtarget == 'MasterFloor':
-                cns2.subtarget = 'root'
-            else:
+            try:
+                cns2.subtarget = substitute[cns1.subtarget]
+            except:
                 cns2.subtarget = cns1.subtarget
         elif prop[0] != '_':
             try:
