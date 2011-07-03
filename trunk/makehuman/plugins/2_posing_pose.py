@@ -69,6 +69,7 @@ class PoseTaskView(gui3d.TaskView):
     
     #get bindings for r-shoulder-joint
     f = open("utils/makepose/r-shoulder-joint.txt")
+    #f = open("utils/makepose/test.txt")
     self.jointVerts = []
     while (1): 
       line = f.readline()
@@ -166,6 +167,7 @@ class PoseTaskView(gui3d.TaskView):
               self.Yslider.setValue(self.joint.rotation[1])
               self.Zslider.setValue(self.joint.rotation[2])
   
+  #todo: use a reference on human so we know if we need to compute this on every onShow
   def onShow(self, event):
       self.app.selectedHuman.storeMesh()
       self.skeleton.update(self.app.selectedHuman.meshData)         
@@ -177,18 +179,34 @@ class PoseTaskView(gui3d.TaskView):
       #compute right shoulder joint position because we cannot rely on the diamond
       self.skeleton.getJoint('joint-r-shoulder').position = vmul(vadd(bboxj[0],bboxj[1]),0.5)
       
+      #new technique!
+      #two cages between the joint instead of the joint in the middle of a single cage
+      #get bindings for r-shoulder-joint
+      f = open("utils/makepose/2cage-test.txt")
+      self.jointVerts = []
+      while (1): 
+        line = f.readline()
+        if not line: break 
+        self.jointVerts.append(int(line));
+      f.close()      
+      
+      #for the new test we dont add any offset yet
+      """
       #adding offset
       bboxj[0][0]= bboxj[0][0] - 0.01
       bboxj[1][0]= bboxj[1][0] + 0.01
       bboxj[0][1]= bboxj[0][1] - 0.01
       bboxj[1][1]= bboxj[1][1] + 0.01
       bboxj[0][2]= bboxj[0][2] - 0.01
-      bboxj[1][2]= bboxj[1][2] + 0.01  
+      bboxj[1][2]= bboxj[1][2] + 0.01
+      """
       self.tets =  box2Tetrahedrons(bboxj)
+      print "bboxj: ", bboxj
       
       #computing prejoint bounding box
       bboxpre = calcBBox(self.app.selectedHuman.meshData.verts, self.preJointVerts)
       bboxpre[1][0] = min(bboxpre[1][0], bboxj[0][0])
+      print "bboxpre: ", bboxpre
       self.preTets =  box2Tetrahedrons(bboxpre)
       
       gui3d.TaskView.onShow(self, event)
@@ -482,48 +500,3 @@ def validWeight(weight):
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
-
-def mvcTest(self):
-            
-  angle = -90*degree2rad
-  joint = self.skeleton.getJoint('joint-r-shoulder')
-  center = joint.position
-  verts = self.app.selectedHuman.meshData.verts
-  
-  
-  #print bboxj
-  #return 
-  
-  rotation = [0.0,angle, 0.0]
-  transform = euler2matrix(rotation, "sxyz")
-  
-  tets2 = deformTets(self.tets, center, transform)
-  
-  #todo take a norm on the diff between old vertex and skinned vertex if the norm is less than some epsilon dont do changes
-  # this avoid excessive wrinkles when the rotations are not extreme
-  for i in joint.bindedVects:
-    if verts[i].co[0] < self.tets[0][2][0]:
-      #tet_i,w = computeWeights(verts[i].co,tets)
-      weights = computeAllWeights(verts[i].co,self.tets)
-      v = [0.0,0.0,0.0]
-      #print w
-      for tet_i in xrange(0,5):
-        for j in xrange(0,4):
-          v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
-      verts[i].co = vmul(v, 0.2)
-      """
-      for j in xrange(0,4):
-        v = vadd(vmul(tets2[tet_i][j],w[j]), v)
-      verts[i].co = v[:]
-      """
-    else :
-      v= verts[i].co
-      verts[i].co = vadd(mtransform(transform, vsub(v, center)),center)
-  
-  for child in joint.children:
-    self.rotateJoint(child, joint.position, rotation, transform)
-    
-  self.app.selectedHuman.meshData.calcNormals()
-  self.app.selectedHuman.meshData.update()
-  
-print 'Pose2 plugin imported'
