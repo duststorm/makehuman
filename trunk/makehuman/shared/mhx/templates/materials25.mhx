@@ -255,7 +255,7 @@ Material Skin
   use_only_shadow False ;
   preview_render_type 'FLAT' ;
   use_ray_shadow_bias True ;
-  use_transparent_shadows False ;
+  use_transparent_shadows True ;
   roughness 0.5 ;
   use_shadeless False ;
   shadow_buffer_bias 0 ;
@@ -361,7 +361,7 @@ Material Mouth
   use_raytrace True ;
   use_shadows True ;
   use_transparency True ;
-  use_transparent_shadows False ;
+  use_transparent_shadows True ;
 end Material
 
 Material Eye
@@ -434,7 +434,7 @@ Material Eye
   use_face_texture_alpha False ;
   use_ray_shadow_bias False ;
   use_raytrace False ;
-  use_shadows False ;
+  use_shadows True ;
   use_sky False ;
   use_tangent_shading False ;
   use_transparency True ;
