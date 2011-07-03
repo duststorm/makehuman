@@ -84,7 +84,7 @@ import bpy, os, mathutils, math, time
 from math import sin, cos
 from mathutils import *
 from bpy.props import *
-from io_utils import ImportHelper
+from bpy_extras.io_utils import ImportHelper
 
 ###################################################################################
 #    BVH importer. 
@@ -3036,6 +3036,7 @@ def loadSourceBones(context, path):
     for line in fp:
         words = line.split()
         if len(words) == 1:
+
             status = words[0]
         elif status == 'Settings':
             prop = words[0]
