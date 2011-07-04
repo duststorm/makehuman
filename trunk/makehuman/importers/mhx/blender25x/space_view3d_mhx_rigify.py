@@ -31,7 +31,7 @@ Abstract
 bl_info = {
     "name": "MHX Rigify",
     "author": "Thomas Larsson",
-    "version": "0.1",
+    "version": "0.2",
     "blender": (2, 5, 8),
     "api": 37702,
     "location": "View3D > Properties > MHX Rigify",
@@ -63,15 +63,26 @@ def rigifyMhx(context):
     parents = {}
     extras = {}
     bpy.ops.object.mode_set(mode='EDIT')
+
+    newParents = {
+        'head' : 'DEF-head',
+        'ribs' : 'DEF-ribs',
+        'upper_arm.L' : 'DEF-upper_arm.L.02',
+        'thigh.L' : 'DEF-thigh.L.02',
+        'upper_arm.R' : 'DEF-upper_arm.R.02',
+        'thigh.R' : 'DEF-thigh.R.02',
+    }
+
     for eb in mhx.data.edit_bones:
         heads[eb.name] = eb.head.copy()
         tails[eb.name] = eb.tail.copy()
         rolls[eb.name] = eb.roll
-        if eb.parent:
+        if eb.parent:            
             par = eb.parent.name
-            if par == 'head':
-                parents[eb.name] = 'DEF-head'
-            else:
+            print(eb.name, par)
+            try:
+                parents[eb.name] = newParents[par]
+            except:
                 parents[eb.name] = par
         else:
             parents[eb.name] = None
@@ -103,9 +114,10 @@ def rigifyMhx(context):
     for eb in rigify.data.edit_bones:
         eb.head = heads[eb.name]
         eb.tail = tails[eb.name]
+        eb.roll = rolls[eb.name]
         extras[eb.name] = False
 
-    planes = [
+    fingerPlanes = [
         ('UP-thumb.L', 'thumb.01.L', 'thumb.03.L', ['thumb.02.L']),
         ('UP-index.L', 'finger_index.01.L', 'finger_index.03.L', ['finger_index.02.L']),
         ('UP-middle.L', 'finger_middle.01.L', 'finger_middle.03.L', ['finger_middle.02.L']),
@@ -118,28 +130,20 @@ def rigifyMhx(context):
         ('UP-pinky.R', 'finger_pinky.01.R', 'finger_pinky.03.R', ['finger_pinky.02.R']),
     ]
 
-    for (upbone, first, last, middles) in planes:
+    for (upbone, first, last, middles) in fingerPlanes:
         extras[upbone] = False
-    """
-        fb = rigify.data.edit_bones[first]
-        lb = rigify.data.edit_bones[last]
-        uhead = heads[upbone]
-        utail = tails[upbone]
-        tang = lb.tail - fb.head
-        tangent = tang/tang.length
-        up = (uhead+utail)/2 - fb.head
-        norm = up - tangent*tangent.dot(up)
-        normal = norm/norm.length
-        offVector = tangent.cross(normal)
-        vec = utail - uhead
-        minDist = vec.length * 0.1
-        lineate(fb.tail, fb.head, minDist, normal, offVector)
-        lineate(lb.head, fb.head, minDist, normal, offVector)
-        for bone in middles:
-            mb = rigify.data.edit_bones[bone]
-            lineate(mb.head, fb.head, minDist, normal, offVector)
-            lineate(mb.tail, fb.head, minDist, normal, offVector)
-    """
+        #lineateChain(upbone, first, last, middles, 0.01, rigify, heads, tails)
+
+    ikPlanes = [
+        ('UP-leg.L', 'thigh.L', 'shin.L'),
+        ('UP-arm.L', 'upper_arm.L', 'forearm.L'),
+        ('UP-leg.R', 'thigh.R', 'shin.R'),
+        ('UP-arm.R', 'upper_arm.R', 'forearm.R'),
+    ]
+
+    for (upbone, first, last) in ikPlanes:
+        extras[upbone] = False
+        lineateChain(upbone, first, last, [], 0.1, rigify, heads, tails)
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
@@ -208,20 +212,37 @@ def rigifyMhx(context):
     return
 
 #
+#   lineateChain(upbone, first, last, middles, minDist, rigify, heads, tails):
 #   lineate(pt, start, minDist, normal, offVector):
 #
 
+def lineateChain(upbone, first, last, middles, minDist, rigify, heads, tails):
+    fb = rigify.data.edit_bones[first]
+    lb = rigify.data.edit_bones[last]
+    uhead = heads[upbone]
+    utail = tails[upbone]
+    tang = lb.tail - fb.head
+    tangent = tang/tang.length
+    up = (uhead+utail)/2 - fb.head
+    norm = up - tangent*tangent.dot(up)
+    normal = norm/norm.length
+    offVector = tangent.cross(normal)
+    vec = utail - uhead
+    fb.tail = lineate(fb.tail, fb.head, minDist, normal, offVector)
+    lb.head = lineate(lb.head, fb.head, minDist, normal, offVector)
+    for bone in middles:
+        mb = rigify.data.edit_bones[bone]
+        mb.head = lineate(mb.head, fb.head, minDist, normal, offVector)
+        mb.tail = lineate(mb.tail, fb.head, minDist, normal, offVector)
+    return
+
 def lineate(pt, start, minDist, normal, offVector):
     diff = pt - start
-    print("D1", diff)
     diff = diff - offVector*offVector.dot(diff) 
-    print("  ", diff)
     dist = diff.dot(normal)
     if dist < minDist:
         diff += (minDist - dist)*normal
-    print("  ", diff)
-    pt = start + diff
-    return
+    return start + diff
 
 #
 #   fixDrivers(adata, mhx, meta):

@@ -50,9 +50,9 @@ RigifyJoints = [
 	('finger_pinky.03.L_tail',		'vo', [6467, 0.004090, 0.000360, -0.015600]),
 	('UP-pinky.L_head',			'vo', [6479, 0.002017, -0.001622, -0.000694]),
 	('UP-pinky.L_tail',			'vo', [6475, 0.000692, 0.001181, -0.004421]),
-	('elbow-fan.L_head',			'vo', [4520, 0.020313, -0.023945, 0.001909]),
-	('elbow-fan.L_tail',			'vo', [4561, 0.001582, -0.030124, 0.075691]),
-	('deltoid_target.L_tail',		'vo', [3029, 0.000891, -0.052622, 0.052010]),
+	('UP-arm.L_head',			'vo', [3012, -0.008317, -0.002296, 0.005117]),
+	('UP-arm.L_tail',			'vo', [4535, 0.002990, -0.005289, 0.003494]),
+	('deltoid_target.L_tail',		'vo', [3029, 0.000891, -0.052622, 0.013642]),
 	('shoulder.R_head',			'vo', [14291, 0.007516, -0.134283, 0.002300]),
 	('shoulder.R_tail',			'vo', [11005, 0.002720, -0.187990, -0.172400]),
 	('upper_arm.R_head',			'vo', [14380, -0.000270, -0.032300, 0.004300]),
@@ -93,9 +93,9 @@ RigifyJoints = [
 	('finger_pinky.03.R_tail',		'vo', [9101, -0.004090, 0.000360, -0.015600]),
 	('UP-pinky.R_head',			'vo', [9089, -0.002017, -0.001622, -0.000694]),
 	('UP-pinky.R_tail',			'vo', [9093, -0.000692, 0.001181, -0.004421]),
-	('elbow-fan.R_head',			'vo', [9953, -0.020313, -0.023945, 0.001909]),
-	('elbow-fan.R_tail',			'vo', [9912, -0.001582, -0.030124, 0.075691]),
-	('deltoid_target.R_tail',		'vo', [10697, -0.000891, -0.052622, 0.052010]),
+	('UP-arm.R_head',			'vo', [10714, 0.008317, -0.002296, 0.005117]),
+	('UP-arm.R_tail',			'vo', [9938, -0.002990, -0.005289, 0.003494]),
+	('deltoid_target.R_tail',		'vo', [10697, -0.000891, -0.052622, 0.013642]),
 	('pect1.L_head',			'vo', [3666, 0.116346, 0.051171, -0.061019]),
 	('pect1.R_head',			'vo', [10135, -0.116346, 0.051171, -0.061019]),
 	('pect2.L_head',			'vo', [2549, -0.042284, 0.049440, -0.066677]),
@@ -104,8 +104,8 @@ RigifyJoints = [
 	('lat.R_head',				'vo', [9993, -0.054409, -0.045201, 0.018841]),
 	('trap.L_head',				'vo', [2598, -0.079100, -0.017038, -0.048916]),
 	('trap.R_head',				'vo', [11068, 0.079100, -0.017038, -0.048916]),
-	('deltoid.L_head',			'vo', [2859, -0.006443, 0.000676, -0.004239]),
-	('deltoid.R_head',			'vo', [10815, 0.006443, 0.000676, -0.004239]),
+	('deltoid.L_head',			'vo', [5867, -0.021985, 0.021378, -0.039226]),
+	('deltoid.R_head',			'vo', [9674, 0.021985, 0.021378, -0.039226]),
 	('breast_head',				'vo', [7310, 0.000000, -0.020253, 0.002830]),
 	('breast_tail',				'vo', [7291, 0.000000, 0.013208, 0.056455]),
 	('stomach_tail',			'vo', [7297, 0.000000, 0.011680, 0.051711]),
@@ -118,8 +118,8 @@ RigifyJoints = [
 	('heel.L_tail',				'vo', [5734, -0.045989, 0.104040, -0.244742]),
 	('heel.02.L_head',			'vo', [5730, -0.227798, -0.066113, -0.257760]),
 	('heel.02.L_tail',			'vo', [12348, 0.085460, -0.028525, -0.228430]),
-	('knee-fan.L_head',			'vo', [3885, -0.041893, -0.017834, -0.019513]),
-	('knee-fan.L_tail',			'vo', [3868, 0.016866, 0.023178, 0.008047]),
+	('UP-leg.L_head',			'vo', [3793, 0.014076, 0.017775, -0.001229]),
+	('UP-leg.L_tail',			'vo', [3897, -0.011419, 0.002995, -0.000837]),
 	('thigh.R_head',			'vo', [14379, 0.006460, 0.002648, -0.073350]),
 	('thigh.R_tail',			'vo', [14373, -0.004907, -0.001670, -0.075590]),
 	('shin.R_tail',				'vo', [14362, 0.007347, -0.070220, -0.013970]),
@@ -128,8 +128,8 @@ RigifyJoints = [
 	('heel.R_tail',				'vo', [13328, 0.045989, 0.104040, -0.244742]),
 	('heel.02.R_head',			'vo', [13332, 0.227799, -0.066113, -0.257760]),
 	('heel.02.R_tail',			'vo', [13168, -0.085460, -0.028525, -0.228430]),
-	('knee-fan.R_head',			'vo', [7124, 0.041893, -0.017834, -0.019513]),
-	('knee-fan.R_tail',			'vo', [7141, -0.016866, 0.023178, 0.008047]),
+	('UP-leg.R_head',			'vo', [7218, -0.014076, 0.017775, -0.001229]),
+	('UP-leg.R_tail',			'vo', [7112, 0.011419, 0.002995, -0.000837]),
 	('penis_head',				'vo', [2791, -0.203300, 0.073516, 0.133896]),
 	('penis_tail',				'vo', [7411, 0.001300, 0.001352, -0.016244]),
 	('scrotum_head',			'vo', [7417, 0.001300, -0.011799, 0.057327]),
@@ -174,7 +174,8 @@ RigifyHeadsTails = [
 	('finger_pinky.02.L',		'finger_pinky.01.L_tail', 'finger_pinky.02.L_tail'),
 	('finger_pinky.03.L',		'finger_pinky.02.L_tail', 'finger_pinky.03.L_tail'),
 	('UP-pinky.L',			'UP-pinky.L_head', 'UP-pinky.L_tail'),
-	('DEF-elbow-fan.L',			'elbow-fan.L_head', 'elbow-fan.L_tail'),
+	('DEF-elbow-fan.L',			'upper_arm.L_tail', 'forearm.L_tail'),
+	('UP-arm.L',			'UP-arm.L_head', 'UP-arm.L_tail'),
 	('MCH-deltoid_target.L',		'upper_arm.L_head', 'deltoid_target.L_tail'),
 	('shoulder.R',			'shoulder.R_head', 'shoulder.R_tail'),
 	('upper_arm.R',			'upper_arm.R_head', 'upper_arm.R_tail'),
@@ -204,7 +205,8 @@ RigifyHeadsTails = [
 	('finger_pinky.02.R',		'finger_pinky.01.R_tail', 'finger_pinky.02.R_tail'),
 	('finger_pinky.03.R',		'finger_pinky.02.R_tail', 'finger_pinky.03.R_tail'),
 	('UP-pinky.R',			'UP-pinky.R_head', 'UP-pinky.R_tail'),
-	('DEF-elbow-fan.R',			'elbow-fan.R_head', 'elbow-fan.R_tail'),
+	('DEF-elbow-fan.R',			'upper_arm.R_tail', 'forearm.R_tail'),
+	('UP-arm.R',			'UP-arm.R_head', 'UP-arm.R_tail'),
 	('MCH-deltoid_target.R',		'upper_arm.R_head', 'deltoid_target.R_tail'),
 	('DEF-pect1.L',			'pect1.L_head', 'upper_arm.L_head'),
 	('DEF-pect1.R',			'pect1.R_head', 'upper_arm.R_head'),
@@ -225,14 +227,16 @@ RigifyHeadsTails = [
 	('toe.L',			'foot.L_tail', 'toe.L_tail'),
 	('heel.L',			'shin.L_tail', 'heel.L_tail'),
 	('heel.02.L',			'heel.02.L_head', 'heel.02.L_tail'),
-	('DEF-knee-fan.L',			'knee-fan.L_head', 'knee-fan.L_tail'),
+	('DEF-knee-fan.L',			'thigh.L_tail', 'shin.L_tail'),
+	('UP-leg.L',			'UP-leg.L_head', 'UP-leg.L_tail'),
 	('thigh.R',			'thigh.R_head', 'thigh.R_tail'),
 	('shin.R',			'thigh.R_tail', 'shin.R_tail'),
 	('foot.R',			'shin.R_tail', 'foot.R_tail'),
 	('toe.R',			'foot.R_tail', 'toe.R_tail'),
 	('heel.R',			'shin.R_tail', 'heel.R_tail'),
 	('heel.02.R',			'heel.02.R_head', 'heel.02.R_tail'),
-	('DEF-knee-fan.R',			'knee-fan.R_head', 'knee-fan.R_tail'),
+	('DEF-knee-fan.R',			'thigh.R_tail', 'shin.R_tail'),
+	('UP-leg.R',			'UP-leg.R_head', 'UP-leg.R_tail'),
 	('penis',			'penis_head', 'penis_tail'),
 	('scrotum',			'scrotum_head', 'scrotum_tail'),
 	('MCH-stomach_target',		'hips_tail', 'stomach_tail'),
@@ -250,7 +254,7 @@ RigifyArmature = [
 	('head',			0.0, 'neck', F_DEF+F_CON+F_NOSCALE, 0x4, (1,1,1) ),
 	('shoulder.L',			-0.0743, 'ribs', F_DEF+F_NOSCALE, 0x1, (1,1,1) ),
 	('upper_arm.L',			1.75, 'shoulder.L', F_DEF+F_NOSCALE, 0x40, (1,1,1) ),
-	('forearm.L',			1.54, 'upper_arm.L', F_DEF+F_CON+F_NOSCALE, 0x40, (1,1,1) ),
+	('forearm.L',			1.57, 'upper_arm.L', F_DEF+F_CON+F_NOSCALE, 0x40, (1,1,1) ),
 	('hand.L',			3, 'forearm.L', F_DEF+F_CON+F_NOSCALE, 0x40, (1,1,1) ),
 	('palm.01.L',			2.78, 'hand.L', F_DEF+F_NOSCALE, 0x10, (1,1,1) ),
 	('finger_index.01.L',		-2.94, 'palm.01.L', F_DEF+F_CON+F_NOSCALE, 0x10, (1,1,1) ),
@@ -276,11 +280,12 @@ RigifyArmature = [
 	('finger_pinky.02.L',		2.98, 'finger_pinky.01.L', F_DEF+F_CON+F_NOSCALE, 0x10, (1,1,1) ),
 	('finger_pinky.03.L',		2.98, 'finger_pinky.02.L', F_DEF+F_CON+F_NOSCALE, 0x10, (1,1,1) ),
 	('UP-pinky.L',			3.08, 'finger_pinky.01.L', F_NOSCALE, 0x10, (1,1,1) ),
-	('DEF-elbow-fan.L',		0.0689, 'upper_arm.L', F_DEF, 0x10000, (1,1,1) ),
-	('MCH-deltoid_target.L',	-0.275, 'shoulder.L', 0, 0x40, (1,1,1) ),
+	('DEF-elbow-fan.L',		1.57, 'upper_arm.L', F_DEF+F_CON, 0x40, (1,1,1) ),
+	('UP-arm.L',			0.027, 'upper_arm.L', 0, 0x100, (1,1,1) ),
+	('MCH-deltoid_target.L',	-0.277, 'shoulder.L', 0, 0x40, (1,1,1) ),
 	('shoulder.R',			0.0743, 'ribs', F_DEF+F_NOSCALE, 0x1, (1,1,1) ),
-	('upper_arm.R',			-1.75, 'shoulder.R', F_DEF+F_NOSCALE, 0x100, (1,1,1) ),
-	('forearm.R',			-1.54, 'upper_arm.R', F_DEF+F_CON+F_NOSCALE, 0x100, (1,1,1) ),
+	('upper_arm.R',			-1.75, 'shoulder.R', F_DEF+F_NOSCALE, 0x40, (1,1,1) ),
+	('forearm.R',			-1.57, 'upper_arm.R', F_DEF+F_CON+F_NOSCALE, 0x40, (1,1,1) ),
 	('hand.R',			-3, 'forearm.R', F_DEF+F_CON+F_NOSCALE, 0x100, (1,1,1) ),
 	('palm.01.R',			-2.78, 'hand.R', F_DEF+F_NOSCALE, 0x10, (1,1,1) ),
 	('finger_index.01.R',		2.94, 'palm.01.R', F_DEF+F_CON+F_NOSCALE, 0x10, (1,1,1) ),
@@ -306,8 +311,9 @@ RigifyArmature = [
 	('finger_pinky.02.R',		-2.98, 'finger_pinky.01.R', F_DEF+F_CON+F_NOSCALE, 0x10, (1,1,1) ),
 	('finger_pinky.03.R',		-2.98, 'finger_pinky.02.R', F_DEF+F_CON+F_NOSCALE, 0x10, (1,1,1) ),
 	('UP-pinky.R',			-3.08, 'finger_pinky.01.R', F_NOSCALE, 0x10, (1,1,1) ),
-	('DEF-elbow-fan.R',		-0.0689, 'upper_arm.R', F_DEF, 0x10000, (1,1,1) ),
-	('MCH-deltoid_target.R',	0.275, 'shoulder.R', 0, 0x40, (1,1,1) ),
+	('DEF-elbow-fan.R',		-1.57, 'upper_arm.R', F_DEF+F_CON, 0x40, (1,1,1) ),
+	('UP-arm.R',			-0.027, 'upper_arm.R', 0, 0x100, (1,1,1) ),
+	('MCH-deltoid_target.R',	0.277, 'shoulder.R', 0, 0x40, (1,1,1) ),
 	('DEF-pect1.L',			0.0, 'ribs', F_DEF, 0x1, (1,1,1) ),
 	('DEF-pect1.R',			0.0, 'ribs', F_DEF, 0x1, (1,1,1) ),
 	('DEF-pect2.L',			0.02, 'ribs', F_DEF, 0x1, (1,1,1) ),
@@ -316,8 +322,8 @@ RigifyArmature = [
 	('DEF-lat.R',			0.0554, 'ribs', F_DEF, 0x1, (1,1,1) ),
 	('DEF-trap.L',			0.0, 'ribs', F_DEF, 0x1, (1,1,1) ),
 	('DEF-trap.R',			0.0, 'ribs', F_DEF, 0x1, (1,1,1) ),
-	('DEF-deltoid.L',		-0.289, 'ribs', F_DEF, 0x1, (1,1,1) ),
-	('DEF-deltoid.R',		0.289, 'ribs', F_DEF, 0x1, (1,1,1) ),
+	('DEF-deltoid.L',		-0.102, 'ribs', F_DEF, 0x1, (1,1,1) ),
+	('DEF-deltoid.R',		0.102, 'ribs', F_DEF, 0x1, (1,1,1) ),
 	('DEF-breast',			0.0, 'ribs', F_DEF, 0x1, (1,1,1) ),
 	('DEF-stomach',			0.0, 'DEF-breast', F_DEF+F_CON+F_NOSCALE+F_NOROT, 0x1, (1,1,1) ),
 	('MCH-breast_target',		0.0, 'spine', F_CON, 0x1, (1,1,1) ),
@@ -327,14 +333,16 @@ RigifyArmature = [
 	('toe.L',			3.14, 'foot.L', F_DEF+F_CON+F_NOSCALE, 0x400, (1,1,1) ),
 	('heel.L',			3.14, 'shin.L', F_DEF+F_CON+F_NOSCALE, 0x400, (1,1,1) ),
 	('heel.02.L',			0.0, 'heel.L', F_DEF+F_NOSCALE, 0x400, (1,1,1) ),
-	('DEF-knee-fan.L',		0.032, 'thigh.L', F_DEF+F_NOSCALE, 0x10000, (1,1,1) ),
-	('thigh.R',			0.0, 'hips', F_DEF+F_NOSCALE, 0x1000, (1,1,1) ),
-	('shin.R',			-0.0574, 'thigh.R', F_DEF+F_CON+F_NOSCALE, 0x1000, (1,1,1) ),
-	('foot.R',			0.0, 'shin.R', F_DEF+F_CON+F_NOSCALE, 0x1000, (1,1,1) ),
-	('toe.R',			-3.14, 'foot.R', F_DEF+F_CON+F_NOSCALE, 0x1000, (1,1,1) ),
+	('DEF-knee-fan.L',		0.032, 'thigh.L', F_DEF+F_CON+F_NOSCALE, 0x1000, (1,1,1) ),
+	('UP-leg.L',			0.0, 'thigh.L', 0, 0x400, (1,1,1) ),
+	('thigh.R',			0.0, 'hips', F_DEF+F_NOSCALE, 0x400, (1,1,1) ),
+	('shin.R',			-0.0574, 'thigh.R', F_DEF+F_CON+F_NOSCALE, 0x400, (1,1,1) ),
+	('foot.R',			0.0, 'shin.R', F_DEF+F_CON+F_NOSCALE, 0x400, (1,1,1) ),
+	('toe.R',			-3.14, 'foot.R', F_DEF+F_CON+F_NOSCALE, 0x400, (1,1,1) ),
 	('heel.R',			-3.14, 'shin.R', F_DEF+F_CON+F_NOSCALE, 0x1000, (1,1,1) ),
 	('heel.02.R',			0.0, 'heel.R', F_DEF+F_NOSCALE, 0x1000, (1,1,1) ),
-	('DEF-knee-fan.R',		-0.032, 'thigh.R', F_DEF+F_NOSCALE, 0x10000, (1,1,1) ),
+	('DEF-knee-fan.R',		-0.032, 'thigh.R', F_DEF+F_CON+F_NOSCALE, 0x1000, (1,1,1) ),
+	('UP-leg.R',			0.0, 'thigh.R', 0, 0x1000, (1,1,1) ),
 	('penis',			-3.14, 'hips', F_DEF, 0x1, (1,1,1) ),
 	('scrotum',			-3.14, 'hips', F_DEF, 0x1, (1,1,1) ),
 	('MCH-stomach_target',		0.0, 'hips', F_CON, 0x1, (1,1,1) ),
@@ -415,7 +423,9 @@ def RigifyWritePoses(fp):
 	mhx_rig.addPoseBone(fp, 'UP-pinky.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'DEF-elbow-fan.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('CopyRot', 0+C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Copy_Rotation', 'forearm.L', (1,0,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'forearm.L', (1,1,1), (0,0,0), False])])
+
+	mhx_rig.addPoseBone(fp, 'UP-arm.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'MCH-deltoid_target.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
@@ -476,7 +486,9 @@ def RigifyWritePoses(fp):
 	mhx_rig.addPoseBone(fp, 'UP-pinky.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'DEF-elbow-fan.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('CopyRot', 0+C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Copy_Rotation', 'forearm.R', (1,0,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'forearm.R', (1,1,1), (0,0,0), False])])
+
+	mhx_rig.addPoseBone(fp, 'UP-arm.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'MCH-deltoid_target.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
@@ -529,7 +541,9 @@ def RigifyWritePoses(fp):
 	mhx_rig.addPoseBone(fp, 'heel.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'DEF-knee-fan.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('CopyRot', 0+C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Copy_Rotation', 'shin.L', (1,0,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'shin.L', (1,1,1), (0,0,0), False])])
+
+	mhx_rig.addPoseBone(fp, 'UP-leg.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'thigh.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
@@ -544,7 +558,9 @@ def RigifyWritePoses(fp):
 	mhx_rig.addPoseBone(fp, 'heel.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'DEF-knee-fan.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('CopyRot', 0+C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Copy_Rotation', 'shin.R', (1,0,1), (0,0,0), False])])
+		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'shin.R', (1,1,1), (0,0,0), False])])
+
+	mhx_rig.addPoseBone(fp, 'UP-leg.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'penis', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
