@@ -26,7 +26,7 @@ TO DO
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 4
+MINOR_VERSION = 5
 splitLeftRight = True
 BODY_LANGUAGE = True
 theHuman = 'Human'
@@ -179,7 +179,10 @@ def exportMhx_25(human, fp):
     proxyCopy('Proxy', human, rig, theConfig.proxyList, proxyData, fp)
     proxyCopy('Clothes', human, rig, theConfig.proxyList, proxyData, fp)
 
-    copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData)    
+    copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData) 
+
+    if theConfig.useRig == 'rigify':
+        fp.write("Rigify %s ;\n" % theHuman)
     return
 
 #

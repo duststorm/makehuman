@@ -43,10 +43,10 @@ bl_info = {
 import bpy
 
 #
-#   rigifyMhxRig(context):
+#   rigifyMhx(context, mhx):
 #
 
-def rigifyMhx(context):
+def rigifyMhx(context, mhx):
     print("Modifying MHX rig to Rigify")
     # Delete widgets
     scn = context.scene 
@@ -55,8 +55,8 @@ def rigifyMhx(context):
             scn.objects.unlink(ob)
 
     # Save mhx bone locations    
-    mhx = context.object
     name = mhx.name
+    mhx['MhxRigify'] = True
     heads = {}
     tails = {}
     rolls = {}
@@ -108,7 +108,15 @@ def rigifyMhx(context):
 
     # Change rigify bone locations    
     scn.objects.active = None 
-    bpy.ops.object.armature_human_advanced_add()
+    try:
+        bpy.ops.object.armature_human_advanced_add()
+        success = True
+    except:
+        success = False
+    if not success:
+        raise NameError("Unable to create advanced human. Make sure that the Rigify add-on is enabled. It is found under Rigging.")
+        return
+
     rigify = context.object
     bpy.ops.object.mode_set(mode='EDIT')
     for eb in rigify.data.edit_bones:
@@ -304,7 +312,7 @@ class OBJECT_OT_RigifyMhxButton(bpy.types.Operator):
     bl_label = "Rigify MHX rig"
 
     def execute(self, context):
-        rigifyMhx(context)
+        rigifyMhx(context, context.object)
         return{'FINISHED'}    
     
 #
@@ -318,8 +326,12 @@ class RigifyMhxPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return (context.object and 
-            (context.object.type == 'ARMATURE'))
+        if context.object:
+            try:
+                return context.object['MhxRigify']
+            except:
+                return False
+        return False
 
     def draw(self, context):
         layout = self.layout
