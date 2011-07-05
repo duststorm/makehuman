@@ -61,6 +61,7 @@ class ExpressionTaskView(gui3d.TaskView):
             ('eye-right', ['closure', 'droop', 'opened-up', 'slit', 'slit2', 'slit3']),
             ('mouth', ['compression', 'corner-puller', 'depression', 'depression-retraction', 'elevation', 'eversion', 'parling', 'part-later', 'protusion', 'pursing', 'retraction', 'upward-retraction']),
             ('nose', ['depression', 'left-dilatation', 'left-elevation', 'right-dilatation', 'right-elevation', 'compression']),
+            ('neck', ['platysma']),
             ]
         
         self.groupBoxes = []
