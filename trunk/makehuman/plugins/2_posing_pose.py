@@ -65,7 +65,7 @@ class PoseTaskView(gui3d.TaskView):
     
     self.resetPoseButton = gui3d.Button(self.box, "Reset")
     self.savePoseButton = gui3d.Button(self.box, "Save")
-    #self.testButton = gui3d.Button(self.box, "Test")
+    self.testButton = gui3d.Button(self.box, "Test")
     
     #get bindings for r-shoulder-joint
     f = open("utils/makepose/r-shoulder-joint.txt")
@@ -95,6 +95,10 @@ class PoseTaskView(gui3d.TaskView):
     f.close()
     
     self.preTets = None
+    
+    @self.testButton.event
+    def onClicked(event):
+        self.test()
 
     
     @self.savePoseButton.event
@@ -201,13 +205,13 @@ class PoseTaskView(gui3d.TaskView):
       bboxj[1][2]= bboxj[1][2] + 0.01
       """
       self.tets =  box2Tetrahedrons(bboxj)
-      print "bboxj: ", bboxj
+      #print "bboxj: ", bboxj
       
       #computing prejoint bounding box
       bboxpre = calcBBox(self.app.selectedHuman.meshData.verts, self.preJointVerts)
       bboxpre[1][0] = min(bboxpre[1][0], bboxj[0][0])
       print "bboxpre: ", bboxpre
-      self.preTets =  box2Tetrahedrons(bboxpre)
+      #self.preTets =  box2Tetrahedrons(bboxpre)
       
       gui3d.TaskView.onShow(self, event)
 
@@ -284,19 +288,22 @@ class PoseTaskView(gui3d.TaskView):
       self.rotateJoint(child, center, rotation, transform)
   
   def reset(self):
-      self.Xslider.setValue(0.0)
-      self.Yslider.setValue(0.0)
-      self.Zslider.setValue(0.0)
-      if self.joint:
-        rotation = [-self.joint.rotation[2],-self.joint.rotation[1],-self.joint.rotation[0]]
-        self.joint.rotation = [0.0,0.0,0.0]
-        transform = euler2matrix(vmul(rotation,degree2rad), "szyx")
-        #self.joint.rotation = [0.0,0.0,0.0]
-        self.rotateJoint(self.joint, self.joint.position,None, transform)
-        self.app.selectedHuman.meshData.calcNormals()
-        self.app.selectedHuman.meshData.update()
-        
-      self.app.redraw()
+    self.Xslider.setValue(0.0)
+    self.Yslider.setValue(0.0)
+    self.Zslider.setValue(0.0)
+    if self.joint:
+      rotation = [-self.joint.rotation[2],-self.joint.rotation[1],-self.joint.rotation[0]]
+      self.joint.rotation = [0.0,0.0,0.0]
+      transform = euler2matrix(vmul(rotation,degree2rad), "szyx")
+      #self.joint.rotation = [0.0,0.0,0.0]
+      self.rotateJoint(self.joint, self.joint.position,None, transform)
+      self.app.selectedHuman.meshData.calcNormals()
+      self.app.selectedHuman.meshData.update()
+      
+    self.app.redraw()
+      
+  def test(self):
+    pass
         
 
 category = None
