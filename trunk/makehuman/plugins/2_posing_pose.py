@@ -95,6 +95,8 @@ class PoseTaskView(gui3d.TaskView):
     f.close()
     
     self.preTets = None
+    self.tets1 = None
+    self.tets2 = None
     
     @self.testButton.event
     def onClicked(event):
@@ -181,7 +183,8 @@ class PoseTaskView(gui3d.TaskView):
       bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
       
       #compute right shoulder joint position because we cannot rely on the diamond
-      self.skeleton.getJoint('joint-r-shoulder').position = vmul(vadd(bboxj[0],bboxj[1]),0.5)
+      pos = vmul(vadd(bboxj[0],bboxj[1]),0.5)
+      self.skeleton.getJoint('joint-r-shoulder').position = pos
       
       #new technique!
       #two cages between the joint instead of the joint in the middle of a single cage
@@ -192,10 +195,11 @@ class PoseTaskView(gui3d.TaskView):
         line = f.readline()
         if not line: break 
         self.jointVerts.append(int(line));
-      f.close()      
-      
-      #for the new test we dont add any offset yet
+      f.close()
+
+      bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
       """
+      #for the new test we dont add any offset yet
       #adding offset
       bboxj[0][0]= bboxj[0][0] - 0.01
       bboxj[1][0]= bboxj[1][0] + 0.01
@@ -204,13 +208,20 @@ class PoseTaskView(gui3d.TaskView):
       bboxj[0][2]= bboxj[0][2] - 0.01
       bboxj[1][2]= bboxj[1][2] + 0.01
       """
-      self.tets =  box2Tetrahedrons(bboxj)
+
+      bboxj1 = [bboxj[0][:], bboxj[1][:]]
+      bboxj1[1][0] = pos[0]
+      self.tets1 =  box2Tetrahedrons(bboxj1)
+      bboxj2 = [bboxj[0][:], bboxj[1][:]]
+      bboxj2[0][0] = pos[0]
+      self.tets2 =  box2Tetrahedrons(bboxj2)
       #print "bboxj: ", bboxj
       
+      
       #computing prejoint bounding box
-      bboxpre = calcBBox(self.app.selectedHuman.meshData.verts, self.preJointVerts)
-      bboxpre[1][0] = min(bboxpre[1][0], bboxj[0][0])
-      print "bboxpre: ", bboxpre
+      #bboxpre = calcBBox(self.app.selectedHuman.meshData.verts, self.preJointVerts)
+      #bboxpre[1][0] = min(bboxpre[1][0], bboxj[0][0])
+      #print "bboxpre: ", bboxpre
       #self.preTets =  box2Tetrahedrons(bboxpre)
       
       gui3d.TaskView.onShow(self, event)
@@ -229,6 +240,7 @@ class PoseTaskView(gui3d.TaskView):
   def rotateJoint(self, joint, center, rotation, transform=None):                
     src = self.app.selectedHuman.meshStored
     dst = self.app.selectedHuman.meshData.verts
+    cage = None
     if not transform:
       transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
       #transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
@@ -236,25 +248,36 @@ class PoseTaskView(gui3d.TaskView):
       joint.position = vadd(mtransform(transform, vsub(joint.position, center)),center)
       
     if (joint == self.joint) and self.skin.selected and (joint.name == 'joint-r-shoulder'):
-      transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
-      tets2 = deformTets(self.tets, center, transform2)
-      preJointRot = [0.0,0.0,0.0]
+      #transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
+      #tets2 = deformTets(self.tets, center, transform2)
+      cages  = deform2Cages([self.tets1,self.tets2], center, self.joint.rotation, 0.8)
+      #preJointRot = [0.0,0.0,0.0]
       
-      tets = self.tets + self.preTets
+      #tets = self.tets + self.preTets
+      tets = self.tets1 + self.tets2
+      tets2 = cages[0] + cages[1]
+      print "tets2 length: ", len(tets2)
       
-      jointVerts = self.jointVerts + self.preJointVerts
-      for i in jointVerts:
-      #for i in self.jointVerts:
+      #jointVerts = self.jointVerts + self.preJointVerts
+      #for i in jointVerts:
+      for i in self.jointVerts:
         #using all 10 tetrahedrons as controls
         weights = computeAllWeights(src[i],tets)
         v = [0.0,0.0,0.0]
+        """
         for tet_i in xrange(0,5):
           for j in xrange(0,4):
             v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
         for tet_i in xrange(0,5):
           for j in xrange(0,4):
             v= vadd(vmul(self.preTets[tet_i][j],weights[tet_i+5][j]),v)
+        
         #average of 10 tetrahedrons
+        dst[i].co = vmul(v, 0.1)
+        """
+        for tet_i in xrange(0,10):
+          for j in xrange(0,4):
+            v= vadd(vmul(tets2[tet_i][j],weights[tet_i][j]),v)
         dst[i].co = vmul(v, 0.1)
         
         """
@@ -338,6 +361,24 @@ def deformTets(tets, center, transform):
                 #v[:] = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
     return tets2
 
+def deform2Cages(cages, center, angle, percent):
+    cages2 = deepcopy(cages)
+    transform = euler2matrix(vmul(angle,degree2rad*0.5*percent), "sxyz")
+    for tet in cages2[0]:
+        for v in tet:
+            if v[0] > center[0]:
+                v[:] = vadd(mtransform(transform, vsub(v, center)),center)
+                #v[:] = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
+    transform = euler2matrix(vmul(angle,degree2rad*percent), "sxyz")
+    
+    for tet in cages2[1]:
+        for v in tet:
+            if v[0] > center[0]+0.01:
+                v[:] = vadd(mtransform(transform, vsub(v, center)),center)
+                #v[:] = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
+    return cages2
+    
+    
 #needed for making mvc or harmonic coord. cage
 def box2Tetrahedrons(box):
     """
