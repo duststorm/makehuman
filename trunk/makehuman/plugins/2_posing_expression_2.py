@@ -59,7 +59,7 @@ class ExpressionTaskView(gui3d.TaskView):
             ('eyebrows-right', ['down', 'extern-up', 'inner-up', 'up']),
             ('eye-left', ['closure', 'droop', 'opened-up', 'slit', 'slit2', 'slit3']),
             ('eye-right', ['closure', 'droop', 'opened-up', 'slit', 'slit2', 'slit3']),
-            ('mouth', ['compression', 'corner-puller', 'depression', 'depression-retraction', 'elevation', 'eversion', 'parling', 'part-later', 'protusion', 'pursing', 'retraction', 'upward-retraction']),
+            ('mouth', ['compression', 'corner-puller', 'depression', 'depression-retraction', 'elevation', 'eversion', 'parling', 'part-later', 'protusion', 'pursing', 'retraction', 'upward-retraction', 'open']),
             ('nose', ['depression', 'left-dilatation', 'left-elevation', 'right-dilatation', 'right-elevation', 'compression']),
             ('neck', ['platysma']),
             ]
