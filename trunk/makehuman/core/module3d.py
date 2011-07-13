@@ -1585,3 +1585,8 @@ class Scene3D:
             #print 'not a clickable zone'
             return None
             
+def getFacesFromVerts(vertIndices):
+  F = set();
+  for index in vertIndices:
+    F = F.union(vertIndices.sharedFaces)
+  return F
