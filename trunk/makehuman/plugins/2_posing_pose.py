@@ -544,7 +544,13 @@ def validWeight(weight):
     temp = temp + w
   if (temp < 0.0) or (1 - temp < 0): return False
   else: return True
-    
+
+def computePseudoVol(faces):
+  result = 0;
+  for face in faces:
+    result = result + quadPrismPseudoVol(face.verts[0].co,face.verts[1].co,face.verts[2].co,face.verts[3].co)
+  return result
+
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
