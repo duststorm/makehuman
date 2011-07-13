@@ -71,6 +71,8 @@ class PoseTaskView(gui3d.TaskView):
     f = open("utils/makepose/r-shoulder-joint.txt")
     #f = open("utils/makepose/test.txt")
     self.jointVerts = []
+    self.bindedFaces = None
+    
     while (1): 
       line = f.readline()
       if not line: break 
@@ -93,6 +95,8 @@ class PoseTaskView(gui3d.TaskView):
       if not line: break 
       self.preJointVerts.append(int(line));
     f.close()
+    
+    #get faces of the verts... (for volume preservation)
     
     self.preTets = None
     self.tets1 = None
@@ -196,6 +200,8 @@ class PoseTaskView(gui3d.TaskView):
         if not line: break 
         self.jointVerts.append(int(line));
       f.close()
+      
+      self.bindedFaces = module3d.getFacesFromVerts(self.jointVerts,self.app.selectedHuman.meshData.verts)
 
       bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
       """
@@ -544,7 +550,7 @@ def validWeight(weight):
     temp = temp + w
   if (temp < 0.0) or (1 - temp < 0): return False
   else: return True
-
+  
 def computePseudoVol(faces):
   result = 0;
   for face in faces:
