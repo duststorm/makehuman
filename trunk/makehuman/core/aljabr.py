@@ -312,7 +312,8 @@ def _vmulv(u,v):
     @type  v:  double iterable
     @param v:  the vector multiplied whose adjoint is multiplied from right
     """
-    M=array('d')
+    #M=array('d')
+    M=[]
     for i in xrange(len(u)):
         for j in xrange(len(v)):
             M.append(u[i]*v[j])
@@ -382,7 +383,8 @@ def _mmul(M,N,rowsM,colsM,colsN):
     @type  colsN:  integer
     @param colsN:  number of columns of N
     """
-    P=array('d')
+    #P=array('d')
+    P=[]
     for i in xrange(rowsM):
         n=i*colsM
         for j in xrange(colsN):
@@ -1131,8 +1133,27 @@ def calcBBox(verts, indices=None):
                 bbox[1][2] = v.co[2]
         return bbox
 
+
+def quadPrismPseudoVol(p1,p2,p3,p4):
+  """
+  This function returns the unit "volume" for a prim with rectangular base (as described in http://www-ljk.imag.fr/membres/Stefanie.Hahmann/PUBLICATIONS/RHC09small.pdf)
+
+  @rtype:    double
+  @return:   the value of the unit "volume"
+  @type  pi:  list of doubles
+  @param pi:  coordinate values of the base of the rectangular prism
+  """
+  M = [4.0, 2.0, 2.0, 1.0, 2.0, 4.0, 1.0, 2.0, 2.0, 1.0, 4.0, 2.0, 1.0, 2.0, 2.0, 4.0]
+  M = vmul(M, 1.0/36)
+  z = [p1[0],p2[0],p3[0],p4[0]]
+  k = [(p2[0]-p1[0])*(p3[1]-p1[1]) - (p2[1]-p1[1])*(p3[0]-p1[0]),
+       (p2[0]-p1[0])*(p4[1]-p2[1]) - (p2[1]-p1[1])*(p4[0]-p2[0]),
+       (p4[0]-p3[0])*(p3[1]-p1[1]) - (p4[1]-p3[1])*(p3[0]-p1[0]),
+       (p4[0]-p3[0])*(p4[1]-p2[1]) - (p4[1]-p3[1])*(p4[0]-p2[0])]
+  return _vmulv(z,_mmul(M, k, 4,4,1))
+        
 """
-Various Functions
+### Various Functions
 """
     
 def bump(x, width=1.0):
