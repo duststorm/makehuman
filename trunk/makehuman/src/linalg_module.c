@@ -1,5 +1,6 @@
+#include <Python.h>
+
 #ifdef __APPLE__ /* On OS X use cblas for matrix funcs... */
-#   include <Python/Python.h>
 #	include <Accelerate/Accelerate.h>
 
 #   include <sys/param.h> // For MIN, MAX
@@ -11,8 +12,6 @@
 #   endif
 
 #else // ! __APPLE__
-
-#   include <Python.h>
 
 #   ifdef min
 #       undef min
