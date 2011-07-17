@@ -447,6 +447,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                 groupProxy('Proxy', fp, proxyData)
                 groupProxy('Clothes', fp, proxyData)
                 fp.write(
+"    ob CustomShapes ;\n" + 
 "  end Objects\n" +
 "  layers Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;\n" +
 "end Group\n")
