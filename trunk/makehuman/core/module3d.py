@@ -219,6 +219,7 @@ class Vert:
         self.indicesInFullVertArray = []
         self.idx = idx
         self.color = [255, 255, 255, 255]
+        self.weights = None
     
     def setCoordinates(self, co):
         self.co = co

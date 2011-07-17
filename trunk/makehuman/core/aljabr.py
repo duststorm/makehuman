@@ -1136,9 +1136,10 @@ def calcBBox(verts, indices=None):
 
 def quadPrismPseudoVol(p1,p2,p3,p4):
   """
-  This function returns the unit "volume" for a prim with rectangular base (as described in http://www-ljk.imag.fr/membres/Stefanie.Hahmann/PUBLICATIONS/RHC09small.pdf)
-
-  @rtype:    double
+  This function returns the unit "volume" for a prism with rectangular base, as described in  
+  U{http://www-ljk.imag.fr/membres/Stefanie.Hahmann/PUBLICATIONS/RHC09/}.
+  
+  
   @return:   the value of the unit "volume"
   @type  pi:  list of doubles
   @param pi:  coordinate values of the base of the rectangular prism

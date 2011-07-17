@@ -217,9 +217,11 @@ class PoseTaskView(gui3d.TaskView):
 
       bboxj1 = [bboxj[0][:], bboxj[1][:]]
       bboxj1[1][0] = pos[0]
+      #print "bboxj1", bboxj1
       self.tets1 =  box2Tetrahedrons(bboxj1)
       bboxj2 = [bboxj[0][:], bboxj[1][:]]
       bboxj2[0][0] = pos[0]
+      #print "bboxj2", bboxj2
       self.tets2 =  box2Tetrahedrons(bboxj2)
       #print "bboxj: ", bboxj
       
@@ -256,13 +258,12 @@ class PoseTaskView(gui3d.TaskView):
     if (joint == self.joint) and self.skin.selected and (joint.name == 'joint-r-shoulder'):
       #transform2 = euler2matrix(vmul(self.joint.rotation,degree2rad), "sxyz")
       #tets2 = deformTets(self.tets, center, transform2)
-      cages  = deform2Cages([self.tets1,self.tets2], center, self.joint.rotation, 0.8)
+      cages  = deform2Cages([self.tets1,self.tets2], center, self.joint.rotation, 0.5)
       #preJointRot = [0.0,0.0,0.0]
       
       #tets = self.tets + self.preTets
       tets = self.tets1 + self.tets2
       tets2 = cages[0] + cages[1]
-      print "tets2 length: ", len(tets2)
       
       #jointVerts = self.jointVerts + self.preJointVerts
       #for i in jointVerts:
@@ -367,7 +368,7 @@ def deformTets(tets, center, transform):
                 #v[:] = vadd(mtransform(makeRotation([0.0,0.0,1.0],angle), vsub(v, center)),center)
     return tets2
 
-def deform2Cages(cages, center, angle, percent):
+def deform2Cages(cages, center, angle, percent=1.0):
     cages2 = deepcopy(cages)
     transform = euler2matrix(vmul(angle,degree2rad*0.5*percent), "sxyz")
     for tet in cages2[0]:
@@ -551,11 +552,32 @@ def validWeight(weight):
   if (temp < 0.0) or (1 - temp < 0): return False
   else: return True
   
-def computePseudoVol(faces):
+def pseudoVol(faces):
+  """
+  Pseudo volume for a series of quad faces
+  """
   result = 0;
   for face in faces:
     result = result + quadPrismPseudoVol(face.verts[0].co,face.verts[1].co,face.verts[2].co,face.verts[3].co)
   return result
+  
+def quadPrismPseudoVolGradient(vertIndices, verts, weights):
+  """
+  See "Fast Volume-Preserving Free Form Deformation Using Multi-Level Optimization" by Hirota, Maheshwari and Lin. We however use quads
+  """
+  dVdP = [] # 1 x 3M (M=number of points in the mesh), it's dV/dP
+  for i in vertIndices:
+    temp_i = [0.0]*3
+    for face in verts[i].sharedFaces:
+      j = face.verts.index(i)
+      temp = vcross(vsub(verts[(j+1)%4].co,verts[j].co),vsub(verts[(j+2)%4].co,verts[j].co))
+      temp = vmul(temp,1/6)
+      temp_i = vadd(temp_i, temp)
+    dVdP.append(temp_i)
+
+  dPdX = [] # 3M x 3N (N=number of controlling vertices), it's dP/dX
+  #incomplete
+  # jose: todo
 
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
