@@ -126,7 +126,7 @@ def proxyFilePtr(name):
     return None
     
 #
-#    proxyConfig(options=None):
+#    proxyConfig(human, options=None):
 #
 
 class CProxyConfig:
@@ -143,7 +143,7 @@ class CProxyConfig:
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
 
-def proxyConfig(options=None):
+def proxyConfig(human, useHair, options=None):
     cfg = CProxyConfig()
     typ = 'Proxy'
     layer = 2
@@ -166,6 +166,11 @@ def proxyConfig(options=None):
         fp = 0
     else:    
         fp = proxyFilePtr('proxy.cfg')
+
+    if useHair and human.hairObj:
+        words = human.hairObj.meshName.split('.')
+        proxyFile = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0])
+        cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 1)))
 
     if not fp: 
         if useClothes:
@@ -695,12 +700,13 @@ def fixProxyShape(shape):
     return fixedShape
 
 #
-#    exportProxyObj(obj, filename):    
+#    exportProxyObj(human, filename):    
 #    exportProxyObj1(obj, filename, proxy):
 #
 
-def exportProxyObj(obj, name):
-    cfg = proxyConfig()
+def exportProxyObj(human, name):
+    cfg = proxyConfig(human, False)
+    obj = human.meshData
     for (typ, useObj, useMhx, useDae, proxyStuff) in cfg.proxyList:
         if useObj:
             proxy = readProxyFile(obj, proxyStuff)

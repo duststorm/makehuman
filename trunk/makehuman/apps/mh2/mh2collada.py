@@ -45,11 +45,10 @@ Delta = [0,0.01,0]
 Root = 'MasterFloor'
 
 #
-# ....exportCollada(obj, filename):
-#    exportCollada1(obj, filename, proxyData):
+# exportCollada(human, filename):
 #
 
-def exportCollada(obj, name):
+def exportCollada(human, name):
     filename = name+".dae"
     time1 = time.clock()
     try:
@@ -57,7 +56,7 @@ def exportCollada(obj, name):
         mh2proxy.safePrint("Writing Collada file", filename)
     except:
         mh2proxy.safePrint("Unable to open file for writing", filename)
-    exportDae(obj, fp)
+    exportDae(human, fp)
     fp.close()
     time2 = time.clock()
     mh2proxy.safePrint("Wrote Collada file in %g s:" % (time2-time1), filename)
@@ -372,18 +371,6 @@ class CStuff:
 def filterMesh(mesh1):
     (verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
     
-    badFace1 = 8603
-    badFace2 = 8629
-    badVert = 7410
-    badUvVert = 10758
-    newFace = [7404,7406,7411,2819]
-    newUvFace = [10757,12791,5360,10756]
-
-    #[[2819, 10756], [7404, 10757], [7410, 10758], [7411, 5360]]
-    #[[7406, 12791], [7411, 5360], [7410, 10758], [7404, 10757]]
-    #print(faces1[badFace1])
-    #print(faces1[badFace2])
-
     killVerts = {}
     killUvs = {}
     for f in faces1:
@@ -391,9 +378,20 @@ def filterMesh(mesh1):
             for v in f:
                 killVerts[v[0]] = True
                 killUvs[v[1]] = True
-                
-    killVerts[badVert] = True
-    killUvs[badUvVert] = True
+    
+    FixBadFaces = False
+    if FixBadFaces:            
+        badFace1 = 8603
+        badFace2 = 8629
+        badVert = 7410
+        badUvVert = 10758
+        newFace = [7404,7406,7411,2819]
+        newUvFace = [10757,12791,5360,10756]
+        killVerts[badVert] = True
+        killUvs[badUvVert] = True
+        badFaces = [badFace1, badFace2]
+    else:
+        badFaces = []
 
     n = 0
     nv = {}
@@ -426,7 +424,7 @@ def filterMesh(mesh1):
 
     faces2 = []
     for fn,f in enumerate(faces1):
-        if (len(f) == 4) and (fn not in [badFace1, badFace2]):
+        if (len(f) == 4) and (fn not in badFaces):
             f2 = []
             for c in f:
                 v2 = nv[c[0]]
@@ -434,12 +432,13 @@ def filterMesh(mesh1):
                 f2.append([v2, uv2])
             faces2.append(f2)
 
-    f2 = []        
-    for n in range(4):
-        v2 = nv[newFace[n]]
-        uv2 = nuv[newUvFace[n]]
-        f2.append([v2, uv2])
-    faces2.append(f2)
+    if FixBadFaces:
+        f2 = []        
+        for n in range(4):
+            v2 = nv[newFace[n]]
+            uv2 = nuv[newUvFace[n]]
+            f2.append([v2, uv2])
+        faces2.append(f2)
         
     weights2 = {}
     for (b, wts1) in weights1.items():
@@ -464,12 +463,13 @@ def filterMesh(mesh1):
     return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
 
 #
-#    exportDae(obj, fp):
+#    exportDae(human, fp):
 #
 
-def exportDae(obj, fp):
+def exportDae(human, fp):
     global theStuff
-    cfg = mh2proxy.proxyConfig(None)
+    cfg = mh2proxy.proxyConfig(human, True)
+    obj = human.meshData
     amt = getArmatureFromRigFile('data/templates/game.rig', obj)
     #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
     rawTargets = []
@@ -637,10 +637,19 @@ def writeEffects(obj, fp, stuff):
 '      <profile_COMMON>\n' +
 '        <technique sid="common">\n' +
 '          <lambert>\n')
-        writeColor(fp, 'diffuse', mat.diffuse_color, (0.8,0.8,0.8))
-        writeColor(fp, 'specular', mat.specular_color, (1,1,1))
-        writeColor(fp, 'emission', mat.emit_color, None)
-        writeColor(fp, 'ambient', mat.ambient_color, None)
+        BlenderDaeColor = {
+            'diffuse_color' : 'diffuse',
+            'specular_color' : 'specular',
+            'emit_color' : 'emission',
+            'ambient_color' : 'ambient'
+        }
+        for (key, value) in mat.settings:
+            try:
+                daeKey = BlenderDaeColor[key]
+            except:
+                daeKey = None
+            if daeKey:
+                writeColor(fp, daeKey, value, (0.8,0.8,0.8))
         fp.write(
 '          </lambert>\n' +
 '          <extra/>\n' +

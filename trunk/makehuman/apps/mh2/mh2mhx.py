@@ -46,7 +46,7 @@ import read_expression, read_rig
 
 def exportMhx(human, filename, options=None):    
     global theConfig, theHuman
-    theConfig = mh2proxy.proxyConfig(options)
+    theConfig = mh2proxy.proxyConfig(human, True, options)
     (name, ext) = os.path.splitext(filename)
 
     if '24' in theConfig.mhxversion:

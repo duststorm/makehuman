@@ -376,7 +376,7 @@ class ExportTaskView(gui3d.TaskView):
                     os.path.join(exportPath, filename + ".obj"),
                     self.exportGroups.selected,
                     filter)
-                mh2proxy.exportProxyObj(human.meshData, os.path.join(exportPath, filename))
+                mh2proxy.exportProxyObj(human, os.path.join(exportPath, filename))
                 
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(human.meshData, os.path.join(exportPath, filename + ".bvh"))
@@ -426,7 +426,7 @@ class ExportTaskView(gui3d.TaskView):
                 # TL 2011.02.08: exportMhx uses the human instead of his meshData
                 mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
-                mh2collada.exportCollada(self.app.selectedHuman.meshData, os.path.join(exportPath, filename))
+                mh2collada.exportCollada(self.app.selectedHuman, os.path.join(exportPath, filename))
             elif self.md5.selected:
                 mh2md5.exportMd5(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
             elif self.stl.selected:
