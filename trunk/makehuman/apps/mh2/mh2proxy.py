@@ -170,7 +170,7 @@ def proxyConfig(human, useHair, options=None):
     if useHair and human.hairObj:
         words = human.hairObj.meshName.split('.')
         proxyFile = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0])
-        cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 1)))
+        cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 0)))
 
     if not fp: 
         if useClothes:
