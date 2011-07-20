@@ -562,6 +562,9 @@ class MHApplication(gui3d.Application):
             f.close()
         
     def saveSettings(self):
+        if not os.path.exists(mh.getPath('')):
+            os.makedirs(mh.getPath(''))
+        
         f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
         f.write(repr(self.settings))
         f.close()
