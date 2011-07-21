@@ -227,3 +227,111 @@ def saveDefaults(context):
     fp.close()
     return
 
+########################################################################
+#
+#   class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
+#   class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_init_interface"
+    bl_label = "Initialize"
+
+    def execute(self, context):
+        from . import props
+        props.initInterface(context)
+        print("Interface initialized")
+        return{'FINISHED'}    
+
+
+class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_save_defaults"
+    bl_label = "Save defaults"
+
+    def execute(self, context):
+        props.saveDefaults(context)
+        return{'FINISHED'}    
+
+#
+#    class VIEW3D_OT_MhxCopyAnglesIKButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxCopyAnglesIKButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_copy_angles_fk_ik"
+    bl_label = "Angles  --> IK"
+
+    def execute(self, context):
+        copyAnglesIK(context)
+        print("Angles copied")
+        return{'FINISHED'}    
+
+
+#
+#    readDirectory(directory, prefix):
+#    class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
+#
+
+def readDirectory(directory, prefix):
+    realdir = os.path.realpath(os.path.expanduser(directory))
+    files = os.listdir(realdir)
+    n = len(prefix)
+    paths = []
+    for fileName in files:
+        (name, ext) = os.path.splitext(fileName)
+        if name[:n] == prefix and ext == '.bvh':
+            paths.append("%s/%s" % (realdir, fileName))
+    return paths
+
+class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_batch"
+    bl_label = "Batch run"
+
+    def execute(self, context):
+        paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
+        trgRig = context.object
+        for filepath in paths:
+            context.scene.objects.active = trgRig
+            loadRetargetSimplify(context, filepath)
+        return{'FINISHED'}    
+
+#
+#    class PropsPanel(bpy.types.Panel):
+#
+
+class PropsPanel(bpy.types.Panel):
+    bl_label = "Init"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        ob = context.object
+                
+        layout.operator("mhx.mocap_init_interface")
+        layout.operator("mhx.mocap_save_defaults")
+        layout.operator("mhx.mocap_copy_angles_fk_ik")
+
+        layout.separator()
+        layout.label('Batch conversion')
+        layout.prop(scn, "MhxDirectory")
+        layout.prop(scn, "MhxPrefix")
+        layout.operator("mhx.mocap_batch")
+        return
+
+def register():
+    bpy.utils.register_module(__name__)
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+
+if __name__ == "__main__":
+    register()
+
+
+

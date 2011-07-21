@@ -83,3 +83,67 @@ def deleteAction(context):
             print("Cannot delete. %s has %d users." % (act, act.users))
 
 
+########################################################################
+#
+#   class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_update_action_list"
+    bl_label = "Update action list"
+
+    @classmethod
+    def poll(cls, context):
+        return context.object
+
+    def execute(self, context):
+        listAllActions(context)
+        return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_delete"
+    bl_label = "Delete action"
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene.MhxReallyDelete
+
+    def execute(self, context):
+        deleteAction(context)
+        return{'FINISHED'}    
+
+#
+#   class ActionPanel(bpy.types.Panel):
+#
+
+class ActionPanel(bpy.types.Panel):
+    bl_label = "Manage action"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label('Manage actions')
+        layout.prop_menu_enum(context.scene, "MhxActions")
+        layout.operator("mhx.mocap_update_action_list")
+        layout.prop(context.scene, "MhxReallyDelete")
+        layout.operator("mhx.mocap_delete")
+
+def register():
+    bpy.utils.register_module(__name__)
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+
+if __name__ == "__main__":
+    register()
+

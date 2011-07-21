@@ -45,7 +45,7 @@ bl_info = {
     "description": "Mocap tool for MHX rig",
     "warning": "",
     'wiki_url': 'http://sites.google.com/site/makehumandocs/blender-export-and-mhx/mocap-tool',
-    "category": "3D View"}
+    "category": "Animation"}
 
 """
 Properties:
@@ -84,17 +84,18 @@ Batch run:
 if "bpy" in locals():
     print("Reloading Mocap tool")
     import imp
-    imp.reload(action)
     imp.reload(globvar)
     imp.reload(props)
     imp.reload(load)
-    imp.reload(plant)
     imp.reload(retarget)
-    imp.reload(simplify)
     imp.reload(source)
     imp.reload(target)
     imp.reload(toggle)
+    imp.reload(simplify)
+    imp.reload(plant)
     imp.reload(accad)
+    imp.reload(action)
+    imp.reload(sigproc)
     imp.reload(daz)
     imp.reload(eyes)
     imp.reload(hdm)
@@ -112,354 +113,17 @@ else:
 
     from . import globvar
     from . import props
-    from . import action
-    from . import simplify
-    from . import plant
     from . import load
+    from . import retarget
     from . import source
     from . import target
     from . import toggle
-    from . import retarget
+    from . import simplify
+    from . import plant
+    from . import action
+    from . import sigproc
     from . import accad, daz, eyes, hdm, max, mb, mega
     from . import rig_mhx, rig_rorkimaru, rig_game
-
-
-###################################################################################    
-#    User interface
-#
-#    getBvh(mhx)
-#
-
-def getBvh(mhx):
-    for (bvh, mhx1) in the.armature.items():
-        if mhx == mhx1:
-            return bvh
-    return None
-
-#
-#    class Bvh2MhxPanel(bpy.types.Panel):
-#
-
-class Bvh2MhxPanel(bpy.types.Panel):
-    bl_label = "Bvh to Mhx"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        ob = context.object
-                
-        layout.operator("mhx.mocap_init_interface")
-        layout.operator("mhx.mocap_save_defaults")
-        layout.operator("mhx.mocap_copy_angles_fk_ik")
-
-        layout.separator()
-        layout.label('Load')
-        layout.prop(scn, "MhxBvhScale")
-        layout.prop(scn, "MhxAutoScale")
-        layout.prop(scn, "MhxStartFrame")
-        layout.prop(scn, "MhxEndFrame")
-        layout.prop(scn, "MhxSubsample")
-        layout.prop(scn, "MhxDefaultSS")
-        layout.prop(scn, "MhxRot90Anim")
-        layout.prop(scn, "MhxDoSimplify")
-        layout.prop(scn, "MhxApplyFixes")
-        layout.operator("mhx.mocap_load_bvh")
-        layout.operator("mhx.mocap_retarget_mhx")
-        layout.separator()
-        layout.operator("mhx.mocap_load_retarget_simplify")
-
-        layout.separator()
-        layout.label('Toggle')
-        row = layout.row()
-        row.operator("mhx.mocap_toggle_pole_targets")
-        row.prop(ob, "MhxTogglePoleTargets")
-        row = layout.row()
-        row.operator("mhx.mocap_toggle_ik_limits")
-        row.prop(ob, "MhxToggleIkLimits")
-        row = layout.row()
-        row.operator("mhx.mocap_toggle_limit_constraints")
-        row.prop(ob, "MhxToggleLimitConstraints")
-
-        layout.separator()
-        layout.label('Plant')
-        row = layout.row()
-        row.prop(scn, "MhxPlantLoc")
-        row.prop(scn, "MhxPlantRot")
-        layout.prop(scn, "MhxPlantCurrent")
-        layout.operator("mhx.mocap_plant")
-
-        layout.separator()
-        layout.label('Simplify')
-        layout.prop(scn, "MhxErrorLoc")
-        layout.prop(scn, "MhxErrorRot")
-        layout.prop(scn, "MhxSimplifyVisible")
-        layout.prop(scn, "MhxSimplifyMarkers")
-        layout.operator("mhx.mocap_simplify_fcurves")
-
-        layout.separator()
-        layout.label('Batch conversion')
-        layout.prop(scn, "MhxDirectory")
-        layout.prop(scn, "MhxPrefix")
-        layout.operator("mhx.mocap_batch")
-
-        layout.separator()
-        layout.label('Manage actions')
-        layout.prop_menu_enum(scn, "MhxActions")
-        layout.operator("mhx.mocap_update_action_list")
-        layout.prop(scn, "MhxReallyDelete")
-        layout.operator("mhx.mocap_delete")
-        return
-
-########################################################################
-#
-#   props.py
-#
-#   class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
-#   class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
-#
-#
-#
-
-class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_init_interface"
-    bl_label = "Initialize"
-
-    def execute(self, context):
-        from . import props
-        props.initInterface(context)
-        print("Interface initialized")
-        return{'FINISHED'}    
-
-
-class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_save_defaults"
-    bl_label = "Save defaults"
-
-    def execute(self, context):
-        props.saveDefaults(context)
-        return{'FINISHED'}    
-
-#
-#    class VIEW3D_OT_MhxCopyAnglesIKButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxCopyAnglesIKButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_copy_angles_fk_ik"
-    bl_label = "Angles  --> IK"
-
-    def execute(self, context):
-        copyAnglesIK(context)
-        print("Angles copied")
-        return{'FINISHED'}    
-
-
-#
-#    readDirectory(directory, prefix):
-#    class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
-#
-
-def readDirectory(directory, prefix):
-    realdir = os.path.realpath(os.path.expanduser(directory))
-    files = os.listdir(realdir)
-    n = len(prefix)
-    paths = []
-    for fileName in files:
-        (name, ext) = os.path.splitext(fileName)
-        if name[:n] == prefix and ext == '.bvh':
-            paths.append("%s/%s" % (realdir, fileName))
-    return paths
-
-class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_batch"
-    bl_label = "Batch run"
-
-    def execute(self, context):
-        paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
-        trgRig = context.object
-        for filepath in paths:
-            context.scene.objects.active = trgRig
-            loadRetargetSimplify(context, filepath)
-        return{'FINISHED'}    
-
-
-########################################################################
-#
-#   load.py
-#
-#   class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
-#
-
-class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mhx.mocap_load_bvh"
-    bl_label = "Load BVH file (.bvh)"
-
-    filename_ext = ".bvh"
-    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
-    filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
-
-    def execute(self, context):
-        retarget.importAndRename(context, self.properties.filepath)
-        print("%s imported" % self.properties.filepath)
-        return{'FINISHED'}    
-
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}    
-
-
-########################################################################
-#
-#   retarget.py
-#
-#   class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
-#   class VIEW3D_OT_MhxLoadRetargetSimplify(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_retarget_mhx"
-    bl_label = "Retarget selected to MHX"
-
-    def execute(self, context):
-        trgRig = context.object
-        target.guessTargetArmature(trgRig)
-        for srcRig in context.selected_objects:
-            if srcRig != trgRig:
-                retarget.retargetMhxRig(context, srcRig, trgRig)
-        return{'FINISHED'}    
-
-class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mhx.mocap_load_retarget_simplify"
-    bl_label = "Load, retarget, simplify"
-
-    filename_ext = ".bvh"
-    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
-    filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
-
-    def execute(self, context):
-        retarget.loadRetargetSimplify(context, self.properties.filepath)
-        return{'FINISHED'}    
-
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}    
-
-########################################################################
-#
-#   simplify.py
-#
-#   class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_simplify_fcurves"
-    bl_label = "Simplify FCurves"
-
-    def execute(self, context):
-        scn = context.scene
-        simplify.simplifyFCurves(context, context.object, scn.MhxSimplifyVisible, scn.MhxSimplifyMarkers)
-        return{'FINISHED'}    
-
-########################################################################
-#
-#   toggle.py
-#
-#   class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
-#   class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
-#   class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
-#   class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_toggle_pole_targets"
-    bl_label = "Toggle pole targets"
-
-    def execute(self, context):
-        res = toggle.togglePoleTargets(context.object)
-        print("Pole targets toggled", res)
-        return{'FINISHED'}    
-
-class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_toggle_ik_limits"
-    bl_label = "Toggle IK limits"
-
-    def execute(self, context):
-        res = toggle.toggleIKLimits(context.object)
-        print("IK limits toggled", res)
-        return{'FINISHED'}    
-
-class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_toggle_limit_constraints"
-    bl_label = "Toggle Limit constraints"
-
-    def execute(self, context):
-        res = toggle.toggleLimitConstraints(context.object)
-        print("Limit constraints toggled", res)
-        return{'FINISHED'}    
-
-class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_silence_constraints"
-    bl_label = "Silence constraints"
-
-    def execute(self, context):
-        toggle.silenceConstraints(context.object)
-        print("Constraints silenced")
-        return{'FINISHED'}    
-
-########################################################################
-#
-#   plant.py
-#
-#   class VIEW3D_OT_MhxPlantButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxPlantButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_plant"
-    bl_label = "Plant"
-
-    def execute(self, context):
-        plant.plantKeys(context)
-        print("Keys planted")
-        return{'FINISHED'}    
-
-########################################################################
-#
-#   action.py
-#
-#   class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
-#   class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_update_action_list"
-    bl_label = "Update action list"
-
-    @classmethod
-    def poll(cls, context):
-        return context.object
-
-    def execute(self, context):
-        action.listAllActions(context)
-        return{'FINISHED'}    
-
-class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_delete"
-    bl_label = "Delete action"
-
-    @classmethod
-    def poll(cls, context):
-        return context.scene.MhxReallyDelete
-
-    def execute(self, context):
-        action.deleteAction(context)
-        return{'FINISHED'}    
-
 
 
 #
@@ -487,8 +151,9 @@ def debugPrintVecVec(vec1, vec2):
     theDbgFp.write("(%.3f %.3f %.3f) (%.3f %.3f %.3f)\n" %
         (vec1[0], vec1[1], vec1[2], vec2[0], vec2[1], vec2[2]))
 """
+
 #
-#    init and register
+#    init 
 #
 
 props.initInterface(bpy.context)
@@ -502,6 +167,4 @@ def unregister():
 if __name__ == "__main__":
     register()
 
-#readBvhFile(context, filepath, scale, startFrame, rot90, 1)
-#readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/Male1_bvh/Male1_A5_PickUpBox.bvh', 1.0, 1, False)
-#readBvhFile(bpy.context, '/home/thomas/makehuman/bvh/cmu/10/10_03.bvh', 1.0, 1, False)
+

@@ -142,6 +142,93 @@ def silenceConstraints(rig):
                 cns.influence = 0.0
     return
 
+########################################################################
+#
+#   class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
+#
 
+class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_toggle_pole_targets"
+    bl_label = "Toggle pole targets"
+
+    def execute(self, context):
+        res = togglePoleTargets(context.object)
+        print("Pole targets toggled", res)
+        return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_toggle_ik_limits"
+    bl_label = "Toggle IK limits"
+
+    def execute(self, context):
+        res = toggleIKLimits(context.object)
+        print("IK limits toggled", res)
+        return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_toggle_limit_constraints"
+    bl_label = "Toggle Limit constraints"
+
+    def execute(self, context):
+        res = toggleLimitConstraints(context.object)
+        print("Limit constraints toggled", res)
+        return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_silence_constraints"
+    bl_label = "Silence constraints"
+
+    def execute(self, context):
+        silenceConstraints(context.object)
+        print("Constraints silenced")
+        return{'FINISHED'}    
+
+#
+#   class ToggleConstraintPanel(bpy.types.Panel):
+#
+
+class ToggleConstraintPanel(bpy.types.Panel):
+    bl_label = "Toggle constraints"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        ob = context.object
+        row = layout.row()
+        row.operator("mhx.mocap_toggle_pole_targets")
+        row.prop(ob, "MhxTogglePoleTargets")
+        row = layout.row()
+        row.operator("mhx.mocap_toggle_ik_limits")
+        row.prop(ob, "MhxToggleIkLimits")
+        row = layout.row()
+        row.operator("mhx.mocap_toggle_limit_constraints")
+        row.prop(ob, "MhxToggleLimitConstraints")
+
+def register():
+    bpy.utils.register_module(__name__)
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+
+if __name__ == "__main__":
+    register()
 
 

@@ -34,13 +34,26 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
     scn = context.scene
     if not scn.MhxDoSimplify:
         return
+    (fcurves, minTime, maxTime) = getRigFCurves(rig, useVisible, useMarkers)
+    if not fcurves:
+        return
+
+    for fcu in fcurves:
+        simplifyFCurve(fcu, act, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
+    load.setInterpolation(rig)
+    print("Curves simplified")
+    return
+
+#
+#   getRigFCurves(rig, useVisible, useMarkers):
+#
+
+def getRigFCurves(rig, useVisible, useMarkers):
     try:
         act = rig.animation_data.action
     except:
-        act = None
-    if not act:
-        print("No action to simplify")
-        return
+        print("Rig %s has no associated action" % rig.name)
+        return (None, 0, 0)
 
     if useVisible:
         fcurves = []
@@ -55,15 +68,33 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
         (minTime, maxTime) = getMarkedTime(scn)        
         if minTime == None:    
             print("Need two selected markers")
-            return
+            return (None, 0, 0)
     else:
         (minTime, maxTime) = ('All', 0)
+    return (fcurves, minTime, maxTime)
 
-    for fcu in fcurves:
-        simplifyFCurve(fcu, act, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
-    load.setInterpolation(rig)
-    print("Curves simplified")
-    return
+#
+#   splitFCurvePoints(fcu, minTime, maxTime):
+#
+
+def splitFCurvePoints(fcu, minTime, maxTime):
+    if minTime == 'All':
+        points = fcu.keyframe_points
+        before = []
+        after = []
+    else:
+        points = []
+        before = []
+        after = []
+        for pt in fcu.keyframe_points:
+            t = pt.co[0]
+            if t < minTime:
+                before.append(pt.co)
+            elif t > maxTime:
+                after.append(pt.co)
+            else:
+                points.append(pt)
+    return (points, before, after)
 
 #
 #    simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
@@ -82,22 +113,7 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
     else:
         raise NameError("Unknown FCurve type %s" % words[-1])
 
-    if minTime == 'All':
-        points = fcu.keyframe_points
-        before = []
-        after = []
-    else:
-        points = []
-        before = []
-        after = []
-        for pt in fcu.keyframe_points:
-            t = pt.co[0]
-            if t < minTime:
-                before.append(pt.co)
-            elif t > maxTime:
-                after.append(pt.co)
-            else:
-                points.append(pt)
+    (points, before, after) = splitFCurvePoints(fcu, minTime, maxTime)
 
     nPoints = len(points)
     if nPoints <= 2:
@@ -172,5 +188,54 @@ def getMarkedTime(scn):
         return (markers[0], markers[-1])
     else:
         return (None, None)
+
+
+
+########################################################################
+#
+#   class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_simplify_fcurves"
+    bl_label = "Simplify FCurves"
+
+    def execute(self, context):
+        scn = context.scene
+        simplifyFCurves(context, context.object, scn.MhxSimplifyVisible, scn.MhxSimplifyMarkers)
+        return{'FINISHED'}    
+
+#
+#   class SimplifyPanel(bpy.types.Panel):
+#
+
+class SimplifyPanel(bpy.types.Panel):
+    bl_label = "Simplify"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        ob = context.object
+        layout.prop(scn, "MhxErrorLoc")
+        layout.prop(scn, "MhxErrorRot")
+        layout.prop(scn, "MhxSimplifyVisible")
+        layout.prop(scn, "MhxSimplifyMarkers")
+        layout.operator("mhx.mocap_simplify_fcurves")
+                
+def register():
+    bpy.utils.register_module(__name__)
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+
+if __name__ == "__main__":
+    register()
 
 

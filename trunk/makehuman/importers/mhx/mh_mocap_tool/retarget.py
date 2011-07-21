@@ -28,6 +28,8 @@
 import bpy, os, mathutils, math, time
 from math import sin, cos
 from mathutils import *
+from bpy_extras.io_utils import ImportHelper
+from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
 
 from . import props, source, target, rig_mhx, toggle, load, simplify
 from . import globvar as the
@@ -618,5 +620,106 @@ def loadRetargetSimplify(context, filepath):
     time2 = time.clock()
     print("%s finished in %.3f s" % (filepath, time2-time1))
     return
+
+
+########################################################################
+#
+#   class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
+#
+
+class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mhx.mocap_load_bvh"
+    bl_label = "Load BVH file (.bvh)"
+
+    filename_ext = ".bvh"
+    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+    filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
+
+    def execute(self, context):
+        importAndRename(context, self.properties.filepath)
+        print("%s imported" % self.properties.filepath)
+        return{'FINISHED'}    
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}    
+
+
+#
+#   class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_retarget_mhx"
+    bl_label = "Retarget selected to MHX"
+
+    def execute(self, context):
+        trgRig = context.object
+        target.guessTargetArmature(trgRig)
+        for srcRig in context.selected_objects:
+            if srcRig != trgRig:
+                retargetMhxRig(context, srcRig, trgRig)
+        return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_MhxLoadRetargetSimplify(bpy.types.Operator):
+#
+
+class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mhx.mocap_load_retarget_simplify"
+    bl_label = "Load, retarget, simplify"
+
+    filename_ext = ".bvh"
+    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+    filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
+
+    def execute(self, context):
+        loadRetargetSimplify(context, self.properties.filepath)
+        return{'FINISHED'}    
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}    
+
+#
+#   class RetargetPanel(bpy.types.Panel):
+#
+
+class RetargetPanel(bpy.types.Panel):
+    bl_label = "Retarget BVH"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        ob = context.object
+        layout.operator("mhx.mocap_load_bvh")
+        layout.operator("mhx.mocap_retarget_mhx")
+        layout.operator("mhx.mocap_load_retarget_simplify")
+        layout.separator()
+        layout.prop(scn, "MhxBvhScale")
+        layout.prop(scn, "MhxAutoScale")
+        layout.prop(scn, "MhxStartFrame")
+        layout.prop(scn, "MhxEndFrame")
+        layout.prop(scn, "MhxSubsample")
+        layout.prop(scn, "MhxDefaultSS")
+        layout.prop(scn, "MhxRot90Anim")
+        layout.prop(scn, "MhxDoSimplify")
+        layout.prop(scn, "MhxApplyFixes")
+
+def register():
+    bpy.utils.register_module(__name__)
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+
+if __name__ == "__main__":
+    register()
 
 
