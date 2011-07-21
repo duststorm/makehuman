@@ -44,9 +44,6 @@
 #include "core.h"
 #include "glmodule.h"
 #include "arraybuffer.h"
-#ifdef __APPLE__
-#include "OSXTools.h"
-#endif // __APPLE__
 #ifdef __WIN32__
 #include <shlobj.h>
 
@@ -799,14 +796,6 @@ int main(int argc, char *argv[])
     {
         strcpy(str, "execfile(\"main.py\")");
     }
-#ifdef __APPLE__ /* Since Mac OS uses app bundles all data reside in this resource bundle too. */
-    int rc = osx_adjustWorkingDir(argv[0]);
-    assert(0 == rc);
-
-    /* Adjust the environment vars for the external renderer */
-    rc = osx_adjustRenderEnvironment();
-    assert(0 == rc);
-#endif
 
     Py_SetProgramName(argv[0]);
     Py_Initialize();

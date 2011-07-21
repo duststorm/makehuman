@@ -539,6 +539,13 @@ int main (int argc, char **argv)
         gFinderLaunch = NO;
     }
 
+    int rc = osx_adjustWorkingDir(argv[0]);
+    assert(0 == rc);
+    
+    /* Adjust the environment vars for the external renderer */
+    rc = osx_adjustRenderEnvironment();
+    assert(0 == rc);
+
 #if SDL_USE_NIB_FILE
     [SDLApplication poseAsClass:[NSApplication class]];
 
