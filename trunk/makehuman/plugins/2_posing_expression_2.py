@@ -7,33 +7,6 @@ import humanmodifier
 
 print 'Expression 2 imported'
 
-class Modifier(humanmodifier.GenericModifier):
-
-    def __init__(self, template):
-        
-        humanmodifier.GenericModifier.__init__(self, template)
-        
-    # overrides
-    def setValue(self, human, value):
-    
-        value = self.clampValue(value)
-        
-        for target in self.targets:
-            human.setDetail(target[0], value)
-    
-    def expandTemplate(self, targets):
-        
-        return targets
-    
-    def getFactors(self, human, value):
-        
-        factors = {}
-        
-        return factors
-    
-    def clampValue(self, value):
-        return max(0.0, min(1.0, value))
-
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, parent, group, label, groupBox, selected=False):
         gui3d.RadioButton.__init__(self, parent, group, label, selected, style=gui3d.ButtonStyle)
@@ -81,7 +54,7 @@ class ExpressionTaskView(gui3d.TaskView):
             for subname in subnames:
                 
                 #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
-                modifier = Modifier('data/targets/expression/units/caucasian/male_young/%s-%s.target' % (name, subname))
+                modifier = humanmodifier.GenderModifier('data/targets/expression/units/caucasian/${gender}_young/%s-%s.target' % (name, subname))
                 self.modifiers[subname] = modifier
                 slider = ExpressionSlider(box, subname.capitalize(), modifier)
                 self.sliders.append(slider)

@@ -263,6 +263,32 @@ class AgeModifier(GenericModifier):
     def clampValue(self, value):
         return max(0.0, min(1.0, value))
 
+class GenderModifier(GenericModifier):
+
+    def __init__(self, template):
+
+        GenericModifier.__init__(self, template)
+        
+    # overrides
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
+
+        return targets
+    
+    def getFactors(self, human, value):
+        
+        factors = {
+            'female': human.femaleVal,
+            'male': human.maleVal
+        }
+        
+        return factors
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+
 class GenderAgeModifier(GenericModifier):
 
     def __init__(self, template):
