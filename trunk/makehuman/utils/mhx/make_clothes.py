@@ -114,8 +114,8 @@ bl_addon_info = {
 
 import bpy, os, mathutils
 
-threshold = -0.2
-mListLength = 2
+theThreshold = -0.2
+theListLength = 2
 
 
 #
@@ -123,7 +123,7 @@ mListLength = 2
 #
 
 def printMverts(stuff, mverts):
-    for n in range(mListLength):
+    for n in range(theListLength):
         (v,dist) = mverts[n]
         if v:
             print(stuff, v.index, dist)
@@ -168,7 +168,7 @@ def findClothes(context, bob, pob, log):
             raise NameError("Did not find vertex group %s in base mesh" % name)
 
         mverts = []
-        for n in range(mListLength):
+        for n in range(theListLength):
             mverts.append((None, 1e6))
 
         for bv in base.vertices:
@@ -178,8 +178,8 @@ def findClothes(context, bob, pob, log):
                     n = 0
                     for (mv,mdist) in mverts:
                         if vec.length < mdist:
-                            for k in range(n+1, mListLength):
-                                j = mListLength-k+n
+                            for k in range(n+1, theListLength):
+                                j = theListLength-k+n
                                 mverts[j] = mverts[j-1]
                             mverts[n] = (bv, vec.length)
                             #print(bv.index)
@@ -233,7 +233,7 @@ def findClothes(context, bob, pob, log):
                 minmax = w
                 bWts = wts
                 bVerts = fverts
-        if minmax < threshold:
+        if minmax < theThreshold:
             (mv, mdist) = mverts[0]
             bVerts = [mv.index,0,1]
             bWts = [1,0,0]
@@ -601,6 +601,17 @@ def initInterface(scn):
         description="Save vertex groups but not texverts")
     scn['MakeClothesVertexGroups'] = True
 
+    bpy.types.Scene.MakeClothesThreshold = FloatProperty(
+        name="Threshold", 
+        description="Minimal allowed value of normal-vector dot product",
+        min=-1.0, max=0.0)
+    scn['MakeClothesThreshold'] = theThreshold
+
+    bpy.types.Scene.MakeClothesListLength = IntProperty(
+        name="List length", 
+        description="Max number of verts considered")
+    scn['MakeClothesListLength'] = theListLength
+
     return
 
 #
@@ -624,8 +635,11 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(context.scene, "MakeClothesHairMaterial")
         layout.prop(context.scene, "MakeClothesOutside")
         layout.prop(context.scene, "MakeClothesMinOffset")
-        layout.prop(context.scene, "MakeClothesVertexGroups")
+        layout.prop(context.scene, "MakeClothesThreshold")
+        layout.prop(context.scene, "MakeClothesListLength")
         layout.operator("mhclo.make_clothes")
+        layout.separator()
+        layout.prop(context.scene, "MakeClothesVertexGroups")
         layout.operator("mhclo.offset_clothes")
         return
 
