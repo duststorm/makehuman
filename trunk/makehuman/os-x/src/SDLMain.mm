@@ -9,61 +9,7 @@
 #import "SDLMain.h"
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <unistd.h>
-#import "AppPreferences.h"
-#import "GeneralPreferences.h"
 #import <string>
-
-static std::string sModelPath;
-static std::string sExportPath;
-static std::string sGrabPath;
-static std::string sRenderPath;
-static std::string sDocumentsPath;
-
-/** Checks if the system is runnin on SnowLeopard (and abov) or below.
- * \return rue if the system is SnowLeopard (OS X 10.6.x) or above, false
- * if it below (e.g. Leopard or Lion...)
- */
-static bool isRunningOnSnowLeopardAndAbove()
-{
-    SInt32 major, minor;
-    
-    if ((0 == ::Gestalt(gestaltSystemVersionMajor, &major)) &&
-        (0 == ::Gestalt(gestaltSystemVersionMinor, &minor)))
-        {
-            return (major >= 10 && minor >= 6);
-        }
-        return false;
-}
-
-const char* osx_getExportPath()
-{
-    sExportPath = [[GeneralPreferences exportPath] UTF8String];
-    return sExportPath.c_str();
-}
-
-const char* osx_getModelPath()
-{
-    sModelPath = [[GeneralPreferences modelPath] UTF8String];
-    return sModelPath.c_str();
-}
-
-const char* osx_getGrabPath()
-{
-    sGrabPath = [[GeneralPreferences grabPath] UTF8String];
-    return sGrabPath.c_str();
-}
-
-const char* osx_getRenderPath()
-{
-    sRenderPath = [[GeneralPreferences renderPath] UTF8String];
-    return sRenderPath.c_str();
-}
-
-const char* osx_getDocumentsPath()
-{
-    sDocumentsPath = [[GeneralPreferences documentsPath] UTF8String];
-    return sDocumentsPath.c_str();
-}
 
 #ifndef MAKEHUMAN_AS_MODULE
 /* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
@@ -138,64 +84,6 @@ static NSString *getApplicationName(void)
 
 /* The main class of the application, the application's delegate */
 @implementation SDLMain
-
--(void)endSelector:(id)inSender
-{
-}
-
--(IBAction)showAbout:(id)inSender
-{
-    [mAboutPanel makeKeyAndOrderFront:self];
-}
-
--(IBAction)showAcknowledgments:(id)inSender
-{
-    [mAcknowlegmentPanel makeKeyAndOrderFront:self];
-}
-
--(IBAction)showLicensing:(id)inSender;
-{
-    [mLicensePanel makeKeyAndOrderFront:self];
-}
-
--(IBAction)showPreferences:(id)inSender
-{
-	[NSPreferences setDefaultPreferencesClass: [AppPreferences class]];
-	[[NSPreferences sharedPreferences] showPreferencesPanel];
-}
-
-+(void)openFile:(NSString*)fileName
-{
-    NSString *s = NSLocalizedStringFromTable(fileName, @"HelpLinks", @"");
-    [[NSWorkspace sharedWorkspace] openFile:s];
-}
-
-+(void)openURL:(NSString*)urlName
-{
-    NSString *s = NSLocalizedStringFromTable(urlName, @"HelpLinks", @"");
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:s]];
-}
-
--(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openFile:@"FileMHUsersGuide"];}
--(IBAction)helpFileMHQuickStart:(id)inSender        {[SDLMain openFile:@"FileMHQuickStart"];}
-
--(IBAction)helpFileMHDevelMHProto:(id)inSender      {[SDLMain openFile:@"FileDevelMHProto"];}
-
--(IBAction)helpURLMHVisitHome:(id)inSender          {[SDLMain openURL:@"URLMHHome"];}
--(IBAction)helpURLMHVisitForum:(id)inSender         {[SDLMain openURL:@"URLMHForum"];}
--(IBAction)helpURLMHDocuments:(id)inSender          {[SDLMain openURL:@"URLMHDocuments"];}
--(IBAction)helpURLMHArtists:(id)inSender            {[SDLMain openURL:@"URLMHArtists"];}
--(IBAction)helpURLMHSoftwareDownload:(id)inSender   {[SDLMain openURL:@"URLMHUpdate"];}
-
--(IBAction)helpURLAqsisHome:(id)inSender            {[SDLMain openURL:@"URLAqsisHome"];}
--(IBAction)helpURLAqsisWiki:(id)inSender            {[SDLMain openURL:@"URLAqsisWiki"];}
-
--(IBAction)helpURLPixieHome:(id)inSender            {[SDLMain openURL:@"URLPixieHome"];}
--(IBAction)helpURLPixieWiki:(id)inSender            {[SDLMain openURL:@"URLPixieWiki"];}
--(IBAction)helpURLPixieInstall:(id)inSender         {[SDLMain openURL:@"URLPixieInstall"];}
-
--(IBAction)helpURL3DelightHome:(id)inSender         {[SDLMain openURL:@"URL3DelightHome"];}
--(IBAction)helpURL3DelighWiki:(id)inSender          {[SDLMain openURL:@"URL3DelightWiki"];}
 
 /* Set the working directory to the .app's parent directory */
 - (void) setupWorkingDirectory:(BOOL)shouldChdir
@@ -418,45 +306,7 @@ static void CustomApplicationMain (int argc, char **argv)
 
 //#define CHECK_PYTHON_VERSION
 #ifdef CHECK_PYTHON_VERSION
-    /* Perform a version check of the installed Python interpreter.
-     * If it is older than 3.x The User will be notified to update it.
-     */
-    const char* kPythonVersionNumber = Py_GetVersion();
-    int major, minor, sub;
-    const int rc(::sscanf(kPythonVersionNumber, "%d.%d.%d", &major, &minor, &sub));
-
-    if ((rc == 3) && !((major >= 3) && (minor >= 2)))
-    {
-        NSString *messageString = [NSString stringWithFormat:
-                                   @"Please update to Python 3.x as soon as possible!\n\n"
-                                    "Makehuman will use some extended Functionality of Python 3.x in the near future.\n\n"
-                                    "You are currently using Python V%d.%d.%d\n\n"
-                                    "So please update the Python on your machine as soon as possible!",major, minor, sub];
-        
-        const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message", 
-                                                          messageString, 
-                                                          @"Start it anyway!", 
-                                                          @"Visit the Python Website...", 
-                                                          @"Download the Python installer...");
-        switch(rc)
-        {
-            case NSAlertDefaultReturn :
-                break;
-                
-            case NSAlertAlternateReturn :
-                [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.python.org/download"]];
-                break;
-
-            case NSAlertOtherReturn :
-                [[NSWorkspace sharedWorkspace] 
-                    openURL:[NSURL URLWithString:isRunningOnSnowLeopardAndAbove() ? 
-                                            @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.6.dmg" :
-                                            @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.3.dmg"]];
-                break;
-        }
-        printf("rc is %d\n", rc);
-            //        printf("Please update to Python 3.x as soon as possible!\n");
-    }
+    challengePythonUpdate();
 #endif // #ifdef CHECK_PYTHON_VERSION
     
     /* Hand off to main application code */
@@ -557,23 +407,3 @@ int main (int argc, char **argv)
 }
 
 #endif // #ifndef MAKEHUMAN_AS_MODULE
-
-extern "C" int isMainWindowActive();
-// Check weather the current focus window is the main window
-int isMainWindowActive()
-{
-    const NSWindow *keyWin  = [NSApp keyWindow];
-    
-    // is the key window valid?
-    if (keyWin == NULL)
-        return false; // No? then The main Window is not the active one.
-    
-    // Get the Key Windows title
-    const NSString *title = [keyWin title];
-    
-    // The MainWindow is active only if the key window is the MainWindow 
-    // (whose title is "MakeHuman").
-    const NSRange range([title rangeOfString:@"MakeHuman"]);
-    return range.location == 0 && range.length > 0;
-}
-

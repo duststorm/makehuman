@@ -44,8 +44,11 @@
 #include "core.h"
 #include "glmodule.h"
 #include "arraybuffer.h"
-#ifdef __WIN32__
-#include <shlobj.h>
+
+#if defined(__APPLE__)
+    #include "OSXTools.h"
+#elif defined(__WIN32__)
+    #include <shlobj.h>
 
 OSVERSIONINFO winVersion(void)
 {
@@ -568,18 +571,14 @@ static PyObject* mh_SetQuitCallback(PyObject *self, PyObject *callback)
 static PyObject* mh_getPath(PyObject *self, PyObject *type)
 {
 
-#ifdef __APPLE__
-    const char *path = NULL;
-#else
 #ifndef MAX_PATH
 #define MAX_PATH 1024
 #endif // MAX_PATH
 #ifdef __WIN32__
     WCHAR path[MAX_PATH];
 #else
-    char path[MAX_PATH]; // linux
+    char path[MAX_PATH]; // linux & OS X
 #endif // __WIN32__
-#endif // __APPLE__
     const char *typeStr;
 
     if (PyString_Check(type))
@@ -595,27 +594,7 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     typeStr = PyString_AsString(type);
 
 #ifdef __APPLE__
-    if (0 == strcmp(typeStr, "exports"))
-    {
-        path = osx_getExportPath();
-    }
-    else if (0 == strcmp(typeStr, "models"))
-    {
-        path = osx_getModelPath();
-    }
-    else if (0 == strcmp(typeStr, "grab"))
-    {
-        path = osx_getGrabPath();
-    }
-    else if (0 == strcmp(typeStr, "render"))
-    {
-        path = osx_getRenderPath();
-    }
-    else if (0 == strcmp(typeStr, ""))
-    {
-        path = osx_getDocumentsPath();
-    }
-    else
+    if ( getPathForTypedString(typeStr, path, sizeof(path)) < 0 )
     {
         PyErr_Format(PyExc_ValueError, "Unknown value %s for getPath()!", typeStr);
         return NULL;
