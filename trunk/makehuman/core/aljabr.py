@@ -293,12 +293,17 @@ def _transpose(M,rows=0,cols=0):
     @return:   a matrix that is the transpose of the input matrix (row-major)
     @type  M:  iterable of doubles or integers
     @param M:  the input flat matrix (row-major) that we want to transpose
+    @type  rows:  integer
+    @param rows:  number of rows that M has (as a row-major matrix)
+    @type  cols:  integer
+    @param colss: number of columns that M has (as a row-major matrix)
+
     """
     #ret = array('d')
     ret = []
     for i in xrange(cols):
-        for j in xrange(rows):
-            ret.append(M[i+j*rows])
+      for j in xrange(rows):
+        ret.append(M[i+j*cols])
     return ret
 
 def _vmulv(u,v):

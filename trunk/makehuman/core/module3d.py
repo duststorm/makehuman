@@ -1590,4 +1590,4 @@ def getFacesFromVerts(vertIndices, verts):
   #F = set();
   #for index in vertIndices:
   #  F = F.union(verts[index].sharedFaces)
-  return set([f for f in verts[i].sharedFaces for i in verIndices])
+  return set([f for i in vertIndices for f in verts[i].sharedFaces ])

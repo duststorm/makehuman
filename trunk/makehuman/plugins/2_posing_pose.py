@@ -566,6 +566,7 @@ def quadPrismPseudoVolGradient(vertIndices, verts, weights):
   See "Fast Volume-Preserving Free Form Deformation Using Multi-Level Optimization" by Hirota, Maheshwari and Lin. We however use quads
   """
   dVdP = [] # 1 x 3M (M=number of points in the mesh), it's dV/dP
+  dPdX = [] # 3M x N (N=number of controlling vertices), it's dP/dX
   for i in vertIndices:
     temp_i = [0.0]*3
     for face in verts[i].sharedFaces:
@@ -573,12 +574,16 @@ def quadPrismPseudoVolGradient(vertIndices, verts, weights):
       temp = vcross(vsub(verts[(j+1)%4].co,verts[j].co),vsub(verts[(j+2)%4].co,verts[j].co))
       temp = vmul(temp,1/6)
       temp_i = vadd(temp_i, temp)
-    dVdP.append(temp_i)
+    dVdP.extend(temp_i)
+    
+  #dPdX = [0.0]*len(dVdP)*len(verts[vertIndices[0]].weights)
 
-  dPdX = [] # 3M x 3N (N=number of controlling vertices), it's dP/dX
-  #incomplete
-  # jose: todo
-
+  #computing transposed dP/dX 
+  for i in vertIndices:
+    for w in verts[i].weights:
+      dPdX.extend(3*[w])
+  dPdX = _transpose(dPdX, len(verts[vertIndices[0]].weights), len(dVdP)) 
+  return _mmul(dVdP, dPdX, 1, len(dVdP), len(verts[vertIndices[0]].weights))
 """
 EVERYTHING BELOW ARE OLD TEST STUFFS!!
 """
