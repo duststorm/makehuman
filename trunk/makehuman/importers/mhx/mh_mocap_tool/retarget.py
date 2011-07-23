@@ -52,6 +52,7 @@ class CAnimData():
         self.matrixRest = None
         self.inverseRest = None
 
+        self.frames = {}
         self.heads = {}
         self.quats = {}
         self.matrices = {}
@@ -144,6 +145,7 @@ def makeVectorDict(ob, channels):
             fcuDict[name].append((fcu.array_index, fcu))
 
     vecDict = {}
+    timeDict = {}
     for name in fcuDict.keys():
         fcuDict[name].sort()        
         (index, fcu) = fcuDict[name][0]
@@ -151,6 +153,7 @@ def makeVectorDict(ob, channels):
         for (index, fcu) in fcuDict[name]:
             if len(fcu.keyframe_points) != m:
                 raise NameError("Not all F-Curves for %s have the same length" % name)
+
         vectors = []
         for kp in range(m):
             vectors.append([])
@@ -160,7 +163,13 @@ def makeVectorDict(ob, channels):
                 vectors[n].append(kp.co[1])
                 n += 1
         vecDict[name] = vectors
-    return vecDict
+
+        times = []
+        for kp in fcu.keyframe_points:
+            times.append(kp.co[0])
+        timeDict[name] = times                
+                    
+    return (timeDict, vecDict)
                 
 #
 #    insertAnimation(context, rig, animations, boneList):
@@ -171,15 +180,15 @@ def makeVectorDict(ob, channels):
 def insertAnimation(context, rig, animations, boneList):
     context.scene.objects.active = rig
     bpy.ops.object.mode_set(mode='POSE')
-    locs = makeVectorDict(rig, ['].location'])
-    rots = makeVectorDict(rig, ['].rotation_quaternion', '].rotation_euler'])
+    (times,locs) = makeVectorDict(rig, ['].location'])
+    (times,rots) = makeVectorDict(rig, ['].rotation_quaternion', '].rotation_euler'])
     try:
         root = 'Root'
         nFrames = len(locs[root])
     except:
         root = target.getTrgBone('Root')
         nFrames = len(locs[root])
-    insertAnimRoot(root, animations, nFrames, locs[root], rots[root])
+    insertAnimRoot(root, animations, nFrames, times[root], locs[root], rots[root])
     bones = rig.data.bones
     for nameSrc in boneList:
         try:
@@ -189,17 +198,22 @@ def insertAnimation(context, rig, animations, boneList):
             success = False
         if success:
             try:
+                time = times[nameSrc]
+            except:
+                time = None
+            try:                
                 rot = rots[nameSrc]
             except:
                 rot = None
-            insertAnimChild(nameSrc, animations, nFrames, rot)
+            insertAnimChild(nameSrc, animations, nFrames, time, rot)
 
-def insertAnimRoot(root, animations, nFrames, locs, rots):
+def insertAnimRoot(root, animations, nFrames, times, locs, rots):
     anim = animations[root]
     if nFrames < 0:
         nFrames = len(locs)
     anim.nFrames = nFrames
     for frame in range(anim.nFrames):
+        anim.frames[frame] = times[frame]
         quat = Quaternion(rots[frame])
         anim.quats[frame] = quat
         matrix = anim.matrixRest * quat.to_matrix() * anim.inverseRest
@@ -217,7 +231,7 @@ def insertAnimChildLoc(nameIK, name, animations, locs):
         animIK.heads[frame] = animPar.heads[frame] + anim.offsetRest * parmat
     return
 
-def insertAnimChild(name, animations, nFrames, rots):
+def insertAnimChild(name, animations, nFrames, times, rots):
     try:
         anim = animations[name]
     except:
@@ -243,6 +257,7 @@ def insertAnimChild(name, animations, nFrames, rots):
 
     for frame in range(anim.nFrames):
         if rots:
+            anim.frames[frame] = times[frame]
             try:
                 quat = Quaternion(rots[frame])
             except:
@@ -324,8 +339,9 @@ def insertLocationKeyFrames(name, pb, animSrc, animTrg):
         loc = loc0 * animTrg.inverseRest
         locs.append(loc)
         pb.location = loc
+        tframe = animSrc.frames[frame]
         for n in range(3):
-            pb.keyframe_insert('location', index=n, frame=frame, group=name)    
+            pb.keyframe_insert('location', index=n, frame=tframe, group=name)    
     return locs
 
 def insertIKLocationKeyFrames(nameIK, name, pb, animations):
@@ -347,8 +363,9 @@ def insertIKLocationKeyFrames(nameIK, name, pb, animations):
             offset = anim.heads[frame] - animIK.headRest
             loc = offset * animIK.inverseRest
         pb.location = loc
+        tframe = anim.frames[frame]
         for n in range(3):
-            pb.keyframe_insert('location', index=n, frame=frame, group=nameIK)    
+            pb.keyframe_insert('location', index=n, frame=tframe, group=nameIK)    
     return
 
 
@@ -361,7 +378,7 @@ def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, trgRoll, trgFix):
         matMhx = animTrg.inverseRest * mat90 * animTrg.matrixRest
         rot = matMhx.to_quaternion()
         rots.append(rot)
-        load.setRotation(pb, rot, frame, name)
+        load.setRotation(pb, rot, animSrc.frames[frame], name)
     return rots
 
 def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg, trgRoll):
@@ -370,7 +387,7 @@ def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg, trgRoll):
         rot = animSrc.quats[frame]
         rollRot(rot, trgRoll)
         animTrg.quats[frame] = rot
-        load.setRotation(pb, rot, frame, name)
+        load.setRotation(pb, rot, animSrc.frames[frame], name)
     return
 
 def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, srcFix, trgRoll, trgFix):
@@ -390,7 +407,7 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, srcFix, trgRo
         rollRot(rot, srcRoll)
         rollRot(rot, trgRoll)
         animTrg.quats[frame] = rot
-        load.setRotation(pb, rot, frame, name)
+        load.setRotation(pb, rot, animSrc.frames[frame], name)
     return
 
 
@@ -457,8 +474,9 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
         else:
             pb.location = offset
         anim.heads[frame] = locAbs
+        tframe = animFake.frames[frame]
         for n in range(3):
-            pb.keyframe_insert('location', index=n, frame=frame, group=name)    
+            pb.keyframe_insert('location', index=n, frame=tframe, group=name)    
 
         if animCopy:
             mat = mat * animCopy.inverseRest * animCopy.matrices[frame]
@@ -466,7 +484,7 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
         matMhx = anim.inverseRest * mat * anim.matrixRest
         rot = matMhx.to_quaternion()
         #rollRot(rot, roll)
-        load.setRotation(pb, rot, frame, name)
+        load.setRotation(pb, rot, animFake.frames[frame], name)
     return
 
 #
@@ -494,14 +512,15 @@ def insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
         else:
             pb.location = offset
         anim.heads[frame] = locAbs
+        tframe = animCopy.frames[frame]
         for n in range(3):
-            pb.keyframe_insert('location', index=n, frame=frame, group=name)    
+            pb.keyframe_insert('location', index=n, frame=tframe, group=name)    
 
         mat = mat * animCopy.inverseRest * animCopy.matrices[frame]
         anim.matrices[frame] = mat
         matMhx = rotX * anim.inverseRest * mat * anim.matrixRest * rotX
         rot = matMhx.to_quaternion()
-        load.setRotation(pb, rot, frame, name)
+        load.setRotation(pb, rot, animCopy.frames[frame], name)
     return
 
 #
@@ -524,8 +543,9 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
         else:
             pb.location = offset
         anim.heads[frame] = locAbs
+        tframe = animFake.frames[frame]
         for n in range(3):
-            pb.keyframe_insert('location', index=n, frame=frame, group=name)    
+            pb.keyframe_insert('location', index=n, frame=tframe, group=name)    
 
         mat = anim.matrixRest
         if animCopy:
@@ -534,7 +554,7 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
         matMhx = anim.inverseRest * mat * anim.matrixRest
         rot = matMhx.to_quaternion()
         #rollRot(rot, roll)
-        load.setRotation(pb, rot, frame, name)
+        load.setRotation(pb, rot, animFake.frames[frame], name)
     return
 
 
@@ -596,7 +616,8 @@ def deleteRig(context, rig00, action, prefix):
 
 def importAndRename(context, filepath):
     trgRig = context.object
-    rig = load.readBvhFile(context, filepath, context.scene, False)
+    scn = context.scene
+    rig = load.readBvhFile(context, filepath, scn, False)
     (srcRig, srcBones, action) =  load.renameBvhRig(rig, filepath)
     source.findSrcArmature(context, srcRig)
     load.renameBones(srcBones, srcRig, action)
@@ -614,8 +635,11 @@ def loadRetargetSimplify(context, filepath):
     trgRig = context.object
     (srcRig, action) = importAndRename(context, filepath)
     retargetMhxRig(context, srcRig, trgRig)
-    if context.scene['MhxDoSimplify']:
+    scn = context.scene
+    if scn['MhxDoSimplify']:
         simplify.simplifyFCurves(context, trgRig, False, False)
+    if scn['MhxRescale']:
+        simplify.rescaleFCurves(context, trgRig, scn.MhxRescaleFactor)
     deleteRig(context, srcRig, action, 'Y_')
     time2 = time.clock()
     print("%s finished in %.3f s" % (filepath, time2-time1))
@@ -636,7 +660,10 @@ class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
     filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
     def execute(self, context):
-        importAndRename(context, self.properties.filepath)
+        scn = context.scn
+        (srcRig, action) = importAndRename(context, self.properties.filepath)
+        if scn['MhxRescale']:
+            simplify.rescaleFCurves(context, srcRig, scn.MhxRescaleFactor)
         print("%s imported" % self.properties.filepath)
         return{'FINISHED'}    
 
@@ -707,8 +734,6 @@ class RetargetPanel(bpy.types.Panel):
         layout.prop(scn, "MhxAutoScale")
         layout.prop(scn, "MhxStartFrame")
         layout.prop(scn, "MhxEndFrame")
-        layout.prop(scn, "MhxSubsample")
-        layout.prop(scn, "MhxDefaultSS")
         layout.prop(scn, "MhxRot90Anim")
         layout.prop(scn, "MhxDoSimplify")
         layout.prop(scn, "MhxApplyFixes")

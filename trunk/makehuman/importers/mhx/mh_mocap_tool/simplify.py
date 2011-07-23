@@ -23,7 +23,8 @@
 # Script copyright (C) MakeHuman Team 2001-2011
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
-import bpy, math
+import bpy
+from math import pi
 from . import load
 
 #
@@ -39,7 +40,7 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
         return
 
     for fcu in fcurves:
-        simplifyFCurve(fcu, act, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
+        simplifyFCurve(fcu, rig.animation_data.action, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
     load.setInterpolation(rig)
     print("Curves simplified")
     return
@@ -107,9 +108,9 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
     if words[-1] == 'location':
         maxErr = maxErrLoc
     elif words[-1] == 'rotation_quaternion':
-        maxErr = maxErrRot * math.pi/180
+        maxErr = maxErrRot * pi/180
     elif words[-1] == 'rotation_euler':
-        maxErr = maxErrRot * math.pi/180
+        maxErr = maxErrRot * pi/180
     else:
         raise NameError("Unknown FCurve type %s" % words[-1])
 
@@ -190,6 +191,76 @@ def getMarkedTime(scn):
         return (None, None)
 
 
+#
+#
+#
+
+def rescaleFCurves(context, rig, factor):
+    (fcurves, minTime, maxTime) = getRigFCurves(rig, False, False)
+    if not fcurves:
+        return
+
+    for fcu in fcurves:
+        rescaleFCurve(fcu, factor)
+    print("Curves rescaled")
+    return
+    
+def rescaleFCurve(fcu, factor):
+    n = len(fcu.keyframe_points)
+    if n < 2:
+        return
+    (t0,v0) = fcu.keyframe_points[0].co
+    (tn,vn) = fcu.keyframe_points[n-1].co
+    words = fcu.data_path.split('.')
+    if 'rotation_euler' in words:
+        mode = 'rotation_euler'
+        upper = 0.8*pi
+        lower = -0.8*pi
+        diff = pi
+    elif 'rotation_quaternion' in words:
+        mode = 'rotation_quaternion'
+        upper = 0.8
+        lower = -0.8
+        diff = 2
+    else:
+        mode = 'other'
+        upper = 0
+        lower = 0    
+        diff = 0
+    #print(words[1], mode, upper, lower)
+    
+    tm = t0
+    vm = v0
+    inserts = []
+    for pk in fcu.keyframe_points:
+        (tk,vk) = pk.co
+        tn = factor*(tk-t0) + t0
+        if upper:
+            if (vk > upper) and (vm < lower):
+                inserts.append((tm, vm, tn, vk))
+            elif (vm > upper) and (vk < lower):
+                inserts.append((tm, vm, tn,vk))
+        pk.co = (tn,vk)
+        tm = tn
+        vm = vk
+    
+    for (tm,vm,tn,vn) in inserts:
+        tp = int((tm+tn)/2 - 0.1)
+        tq = tp + 1
+        vp = (vm+vn)/2
+        if vm > upper:
+            vp += diff/2
+            vq = vp - diff
+        elif vm < lower:
+            vp -= diff/2
+            vq = vp + diff
+        if tp > tm:
+            fcu.keyframe_points.insert(frame=tp, value=vp)
+        if tq < tn:
+            fcu.keyframe_points.insert(frame=tq, value=vq)
+    return
+
+
 
 ########################################################################
 #
@@ -203,6 +274,15 @@ class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
     def execute(self, context):
         scn = context.scene
         simplifyFCurves(context, context.object, scn.MhxSimplifyVisible, scn.MhxSimplifyMarkers)
+        return{'FINISHED'}    
+
+class VIEW3D_OT_MhxRescaleFCurvesButton(bpy.types.Operator):
+    bl_idname = "mhx.mocap_rescale_fcurves"
+    bl_label = "Rescale FCurves"
+
+    def execute(self, context):
+        scn = context.scene
+        rescaleFCurves(context, context.object, scn.MhxRescaleFactor)
         return{'FINISHED'}    
 
 #
@@ -222,12 +302,37 @@ class SimplifyPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scn = context.scene
-        ob = context.object
         layout.prop(scn, "MhxErrorLoc")
         layout.prop(scn, "MhxErrorRot")
         layout.prop(scn, "MhxSimplifyVisible")
         layout.prop(scn, "MhxSimplifyMarkers")
         layout.operator("mhx.mocap_simplify_fcurves")
+
+#
+#   class SubsamplePanel(bpy.types.Panel):
+#
+
+class SubsamplePanel(bpy.types.Panel):
+    bl_label = "Subsample and rescale"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        ob = context.object
+        layout.prop(scn, "MhxDefaultSS")
+        if not scn['MhxDefaultSS']:
+	        layout.prop(scn, "MhxSubsample")
+	        layout.prop(scn, "MhxSSFactor")
+	        layout.prop(scn, "MhxRescale")
+	        layout.prop(scn, "MhxRescaleFactor")
+	        layout.operator("mhx.mocap_rescale_fcurves")
                 
 def register():
     bpy.utils.register_module(__name__)

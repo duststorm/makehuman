@@ -52,10 +52,24 @@ def initInterface(context):
         description="Last frame for the animation",
         default=32000)
 
-    bpy.types.Scene.MhxSubsample = IntProperty(
-        name="Subsample", 
+    bpy.types.Scene.MhxSubsample = BoolProperty(
+        name="Subsample",
+        default=False)
+
+    bpy.types.Scene.MhxSSFactor = IntProperty(
+        name="Subsample factor", 
         description="Sample only every n:th frame",
-        default=1)
+        min=1, default=1)
+
+    bpy.types.Scene.MhxRescale = BoolProperty(
+        name="Rescale",
+        description="Rescale F-curves after loading",
+        default=False)
+
+    bpy.types.Scene.MhxRescaleFactor = IntProperty(
+        name="Rescale factor", 
+        description="Factor for rescaling time",
+        min=1, default=1)
 
     bpy.types.Scene.MhxDefaultSS = BoolProperty(
         name="Use default subsample",
@@ -142,8 +156,12 @@ def initInterface(context):
         scn['MhxAutoScale'] = True
         scn['MhxStartFrame'] = 1
         scn['MhxEndFrame'] = 32000
-        scn['MhxSubsample'] = 1
+
+        scn['MhxSubsample'] = True
+        scn['MhxSSFactor'] = 1
         scn['MhxDefaultSS'] = True
+        scn['MhxRescaleFactor'] = 1
+        scn['MhxRescale'] = False
         scn['MhxRot90Anim'] = True
         scn['MhxDoSimplify'] = True
         scn['MhxSimplifyVisible'] = False

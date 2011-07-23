@@ -121,7 +121,10 @@ def readBvhFile(context, filepath, scn, scan):
     startFrame = scn['MhxStartFrame']
     endFrame = scn['MhxEndFrame']
     rot90 = scn['MhxRot90Anim']
-    subsample = scn['MhxSubsample']
+    if (scn['MhxSubsample']):
+    	ssFactor = scn['MhxSSFactor']
+    else:
+    	ssFactor = 1
     defaultSS = scn['MhxDefaultSS']
     print(filepath)
     fileName = os.path.realpath(os.path.expanduser(filepath))
@@ -208,7 +211,7 @@ def readBvhFile(context, filepath, scn, scan):
                 frameTime = float(words[2])
                 frameFactor = int(1.0/(25*frameTime) + 0.49)
                 if defaultSS:
-                    subsample = frameFactor
+                    ssFactor = frameFactor
                 status = Frames
                 frame = 0
                 frameno = 1
@@ -225,7 +228,7 @@ def readBvhFile(context, filepath, scn, scan):
         elif status == Frames:
             if (frame >= startFrame and
                 frame <= endFrame and
-                frame % subsample == 0):
+                frame % ssFactor == 0):
                 addFrame(words, frameno, nodes, pbones, scale)
                 if frameno % 200 == 0:
                     print(frame)
