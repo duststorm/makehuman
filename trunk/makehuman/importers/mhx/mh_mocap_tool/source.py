@@ -324,7 +324,7 @@ class VIEW3D_OT_MhxLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
 #
 
 class MhxSourceBonesPanel(bpy.types.Panel):
-    bl_label = "Source armature"
+    bl_label = "Mocap: Source armature"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

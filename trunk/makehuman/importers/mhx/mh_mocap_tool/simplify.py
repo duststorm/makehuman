@@ -35,7 +35,7 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
     scn = context.scene
     if not scn.MhxDoSimplify:
         return
-    (fcurves, minTime, maxTime) = getRigFCurves(rig, useVisible, useMarkers)
+    (fcurves, minTime, maxTime) = getRigFCurves(rig, useVisible, useMarkers, scn)
     if not fcurves:
         return
 
@@ -46,10 +46,10 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
     return
 
 #
-#   getRigFCurves(rig, useVisible, useMarkers):
+#   getRigFCurves(rig, useVisible, useMarkers, scn):
 #
 
-def getRigFCurves(rig, useVisible, useMarkers):
+def getRigFCurves(rig, useVisible, useMarkers, scn):
     try:
         act = rig.animation_data.action
     except:
@@ -192,11 +192,11 @@ def getMarkedTime(scn):
 
 
 #
-#
+#   rescaleFCurves(context, rig, factor):
 #
 
 def rescaleFCurves(context, rig, factor):
-    (fcurves, minTime, maxTime) = getRigFCurves(rig, False, False)
+    (fcurves, minTime, maxTime) = getRigFCurves(rig, False, False, context.scene)
     if not fcurves:
         return
 
@@ -205,29 +205,18 @@ def rescaleFCurves(context, rig, factor):
     print("Curves rescaled")
     return
     
+#
+#   rescaleFCurve(fcu, factor):
+#
+
 def rescaleFCurve(fcu, factor):
     n = len(fcu.keyframe_points)
     if n < 2:
         return
     (t0,v0) = fcu.keyframe_points[0].co
     (tn,vn) = fcu.keyframe_points[n-1].co
-    words = fcu.data_path.split('.')
-    if 'rotation_euler' in words:
-        mode = 'rotation_euler'
-        upper = 0.8*pi
-        lower = -0.8*pi
-        diff = pi
-    elif 'rotation_quaternion' in words:
-        mode = 'rotation_quaternion'
-        upper = 0.8
-        lower = -0.8
-        diff = 2
-    else:
-        mode = 'other'
-        upper = 0
-        lower = 0    
-        diff = 0
-    #print(words[1], mode, upper, lower)
+    limitData = getFCurveLimits(fcu)
+    (mode, upper, lower, diff) = limitData
     
     tm = t0
     vm = v0
@@ -244,6 +233,37 @@ def rescaleFCurve(fcu, factor):
         tm = tn
         vm = vk
     
+    addFCurveInserts(fcu, inserts, limitData)
+    return
+
+#
+#   getFCurveLimits(fcu):
+#
+
+def getFCurveLimits(fcu):
+    words = fcu.data_path.split('.')
+    mode = words[-1]
+    if mode == 'rotation_euler':
+        upper = 0.8*pi
+        lower = -0.8*pi
+        diff = pi
+    elif mode == 'rotation_quaternion':
+        upper = 0.8
+        lower = -0.8
+        diff = 2
+    else:
+        upper = 0
+        lower = 0    
+        diff = 0
+    #print(words[1], mode, upper, lower)
+    return (mode, upper, lower, diff)
+
+#
+#   addFCurveInserts(fcu, inserts, limitData):
+#
+
+def addFCurveInserts(fcu, inserts, limitData):    
+    (mode, upper, lower, diff) = limitData
     for (tm,vm,tn,vn) in inserts:
         tp = int((tm+tn)/2 - 0.1)
         tq = tp + 1
@@ -258,8 +278,7 @@ def rescaleFCurve(fcu, factor):
             fcu.keyframe_points.insert(frame=tp, value=vp)
         if tq < tn:
             fcu.keyframe_points.insert(frame=tq, value=vq)
-    return
-
+    return            
 
 
 ########################################################################
@@ -290,7 +309,7 @@ class VIEW3D_OT_MhxRescaleFCurvesButton(bpy.types.Operator):
 #
 
 class SimplifyPanel(bpy.types.Panel):
-    bl_label = "Simplify"
+    bl_label = "Mocap: Simplify"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     
@@ -313,7 +332,7 @@ class SimplifyPanel(bpy.types.Panel):
 #
 
 class SubsamplePanel(bpy.types.Panel):
-    bl_label = "Subsample and rescale"
+    bl_label = "Mocap: Subsample and rescale"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     
@@ -328,11 +347,11 @@ class SubsamplePanel(bpy.types.Panel):
         ob = context.object
         layout.prop(scn, "MhxDefaultSS")
         if not scn['MhxDefaultSS']:
-	        layout.prop(scn, "MhxSubsample")
-	        layout.prop(scn, "MhxSSFactor")
-	        layout.prop(scn, "MhxRescale")
-	        layout.prop(scn, "MhxRescaleFactor")
-	        layout.operator("mhx.mocap_rescale_fcurves")
+            layout.prop(scn, "MhxSubsample")
+            layout.prop(scn, "MhxSSFactor")
+            layout.prop(scn, "MhxRescale")
+            layout.prop(scn, "MhxRescaleFactor")
+            layout.operator("mhx.mocap_rescale_fcurves")
                 
 def register():
     bpy.utils.register_module(__name__)

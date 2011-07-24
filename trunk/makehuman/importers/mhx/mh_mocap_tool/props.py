@@ -30,6 +30,9 @@ from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, 
 from . import action
 
 def initInterface(context):
+
+    # Load and retarget
+    
     bpy.types.Scene.MhxBvhScale = FloatProperty(
         name="Scale", 
         description="Scale the BVH by this value", 
@@ -52,6 +55,23 @@ def initInterface(context):
         description="Last frame for the animation",
         default=32000)
 
+    bpy.types.Scene.MhxRot90Anim = BoolProperty(
+        name="Rotate 90 deg", 
+        description="Rotate 90 degress so Z points up",
+        default=True)
+
+    bpy.types.Scene.MhxDoSimplify = BoolProperty(
+        name="Simplify FCurves", 
+        description="Simplify FCurves",
+        default=True)
+        
+    bpy.types.Scene.MhxApplyFixes = BoolProperty(
+        name="Apply found fixes", 
+        description="Apply found fixes",
+        default=True)
+
+    # Subsample and rescale
+    
     bpy.types.Scene.MhxSubsample = BoolProperty(
         name="Subsample",
         default=False)
@@ -75,15 +95,7 @@ def initInterface(context):
         name="Use default subsample",
         default=True)
 
-    bpy.types.Scene.MhxRot90Anim = BoolProperty(
-        name="Rotate 90 deg", 
-        description="Rotate 90 degress so Z points up",
-        default=True)
-
-    bpy.types.Scene.MhxDoSimplify = BoolProperty(
-        name="Simplify FCurves", 
-        description="Simplify FCurves",
-        default=True)
+    # Simplify
 
     bpy.types.Scene.MhxSimplifyVisible = BoolProperty(
         name="Only visible", 
@@ -95,11 +107,36 @@ def initInterface(context):
         description="Simplify only between markers",
         default=False)
 
-    bpy.types.Scene.MhxApplyFixes = BoolProperty(
-        name="Apply found fixes", 
-        description="Apply found fixes",
-        default=True)
+    bpy.types.Scene.MhxErrorLoc = FloatProperty(
+        name="Max loc error", 
+        description="Max error for location FCurves when doing simplification",
+        min=0.001,
+        default=0.01)
 
+    bpy.types.Scene.MhxErrorRot = FloatProperty(
+        name="Max rot error", 
+        description="Max error for rotation (degrees) FCurves when doing simplification",
+        min=0.001,
+        default=0.1)
+
+    # Loop
+    
+    bpy.types.Scene.MhxLoopBlendRange = IntProperty(
+        name="Blend range", 
+        min=1,
+        default=5)
+    
+    bpy.types.Scene.MhxLoopInPlace = BoolProperty(
+        name="Loop in place", 
+        description="Remove location F-curves",
+        default=False)
+
+    bpy.types.Scene.MhxLoopZInPlace = BoolProperty(
+        name="In place affects Z", 
+        default=False)
+
+    # Plant
+    
     bpy.types.Scene.MhxPlantCurrent = BoolProperty(
         name="Use current", 
         description="Plant at current",
@@ -115,28 +152,13 @@ def initInterface(context):
         description="Plant rotation keys",
         default=False)
 
-    bpy.types.Scene.MhxErrorLoc = FloatProperty(
-        name="Max loc error", 
-        description="Max error for location FCurves when doing simplification",
-        min=0.001,
-        default=0.01)
-
-    bpy.types.Scene.MhxErrorRot = FloatProperty(
-        name="Max rot error", 
-        description="Max error for rotation (degrees) FCurves when doing simplification",
-        min=0.001,
-        default=0.1)
-
+    # Props
+    
     bpy.types.Scene.MhxDirectory = StringProperty(
         name="Directory", 
         description="Directory", 
         maxlen=1024,
         default='')
-
-    bpy.types.Scene.MhxReallyDelete = BoolProperty(
-        name="Really delete action", 
-        description="Delete button deletes action permanently",
-        default=False)
 
     bpy.types.Scene.MhxPrefix = StringProperty(
         name="Prefix", 
@@ -144,37 +166,63 @@ def initInterface(context):
         maxlen=1024,
         default='')
 
+    # Manage actions
+    
+    bpy.types.Scene.MhxReallyDelete = BoolProperty(
+        name="Really delete action", 
+        description="Delete button deletes action permanently",
+        default=False)
+
     bpy.types.Scene.MhxActions = EnumProperty(
         items = [],
         name = "Actions")
 
     scn = context.scene
-    if scn:
-        scn['MhxPlantCurrent'] = True
-        scn['MhxPlantLoc'] = True
+    if scn:        
+        # Load and retarget
+        
         scn['MhxBvhScale'] = 0.65
         scn['MhxAutoScale'] = True
         scn['MhxStartFrame'] = 1
         scn['MhxEndFrame'] = 32000
+        scn['MhxRot90Anim'] = True
+        scn['MhxDoSimplify'] = True
 
+        # Subsample and rescale
+        
         scn['MhxSubsample'] = True
         scn['MhxSSFactor'] = 1
         scn['MhxDefaultSS'] = True
         scn['MhxRescaleFactor'] = 1
         scn['MhxRescale'] = False
-        scn['MhxRot90Anim'] = True
-        scn['MhxDoSimplify'] = True
+        
+        # Simplify
+        
         scn['MhxSimplifyVisible'] = False
         scn['MhxSimplifyMarkers'] = False
         scn['MhxApplyFixes'] = True
-
-        scn['MhxPlantLoc'] = True
-        scn['MhxPlantRot'] = False
         scn['MhxErrorLoc'] = 0.01
         scn['MhxErrorRot'] = 0.1
+        
+        # Loop
+    
+        scn['MhxLoopBlendRange'] = 5
+        scn['MhxLoopInPlace'] = False
+        scn['MhxLoopZInPlace'] = False
 
+        # Plant
+        
+        scn['MhxPlantCurrent'] = True
+        scn['MhxPlantLoc'] = True
+        scn['MhxPlantRot'] = False
+
+        # Props
+        
         scn['MhxPrefix'] = "Female1_A"
         scn['MhxDirectory'] = "~/makehuman/bvh/Female1_bvh"
+        
+        # Manage actions            
+        
         scn['MhxReallyDelete'] = False
         action.listAllActions(context)
     else:
@@ -226,7 +274,6 @@ def loadDefaults(context):
 
 #
 #    saveDefaults(context):
-#    class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
 #
 
 def saveDefaults(context):
@@ -244,6 +291,17 @@ def saveDefaults(context):
             fp.write("%s %s\n" % (key, value))
     fp.close()
     return
+    
+#
+#   getBone(rig, bone)
+#
+
+def getBone(rig, bone):
+    try:
+        return rig[bone]
+    except:
+        return bone
+            
 
 ########################################################################
 #
@@ -317,7 +375,7 @@ class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
 #
 
 class PropsPanel(bpy.types.Panel):
-    bl_label = "Init"
+    bl_label = "Mocap: Init"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

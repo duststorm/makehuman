@@ -122,7 +122,7 @@ class VIEW3D_OT_MhxPlantButton(bpy.types.Operator):
 #
 
 class PlantPanel(bpy.types.Panel):
-    bl_label = "Plant keys"
+    bl_label = "Mocap: Plant keys"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

@@ -200,7 +200,7 @@ class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
 #
 
 class ToggleConstraintPanel(bpy.types.Panel):
-    bl_label = "Toggle constraints"
+    bl_label = "Mocap: Toggle constraints"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

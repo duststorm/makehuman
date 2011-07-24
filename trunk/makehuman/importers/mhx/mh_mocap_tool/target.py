@@ -541,7 +541,7 @@ class VIEW3D_OT_MhxLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
 #
 
 class MhxTargetBonesPanel(bpy.types.Panel):
-    bl_label = "Target armature"
+    bl_label = "Mocap: Target armature"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

@@ -591,6 +591,26 @@ def retargetMhxRig(context, srcRig, trgRig):
     trgRig.animation_data.action.name = trgRig.name[:4] + srcRig.name[2:]
     print("Retargeted %s --> %s" % (srcRig, trgRig))
     return
+    
+#
+#    normalizeAnimation(rig):
+#
+
+def normalizeAnimation(rig):
+    if not rig.animation_data:
+        return
+    act = rig.animation_data.action
+    if not act:
+        return
+    active = {}
+    for fcu in act.fcurves:
+        for kp in fcu.keyframe_points:
+            active[kp.co[0]] = True
+    for fcu in act.fcurves:
+        for frame in active.keys():
+            value = fcu.evaluate(frame)
+            fcu.keyframe_points.insert(frame, value)
+    return        
 
 #
 #    deleteRig(context, rig00, action, prefix):
@@ -660,7 +680,7 @@ class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
     filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
     def execute(self, context):
-        scn = context.scn
+        scn = context.scene
         (srcRig, action) = importAndRename(context, self.properties.filepath)
         if scn['MhxRescale']:
             simplify.rescaleFCurves(context, srcRig, scn.MhxRescaleFactor)
@@ -685,6 +705,7 @@ class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
         target.guessTargetArmature(trgRig)
         for srcRig in context.selected_objects:
             if srcRig != trgRig:
+                normalizeAnimation(srcRig)
                 retargetMhxRig(context, srcRig, trgRig)
         return{'FINISHED'}    
 
@@ -713,7 +734,7 @@ class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
 #
 
 class RetargetPanel(bpy.types.Panel):
-    bl_label = "Retarget BVH"
+    bl_label = "Mocap: Load and retarget"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

@@ -121,7 +121,7 @@ class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
 #
 
 class ActionPanel(bpy.types.Panel):
-    bl_label = "Manage action"
+    bl_label = "Mocap: Manage action"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

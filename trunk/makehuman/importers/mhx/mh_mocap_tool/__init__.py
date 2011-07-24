@@ -92,6 +92,7 @@ if "bpy" in locals():
     imp.reload(target)
     imp.reload(toggle)
     imp.reload(simplify)
+    imp.reload(loop)
     imp.reload(plant)
     imp.reload(accad)
     imp.reload(action)
@@ -119,6 +120,7 @@ else:
     from . import target
     from . import toggle
     from . import simplify
+    from . import loop
     from . import plant
     from . import action
     from . import sigproc
