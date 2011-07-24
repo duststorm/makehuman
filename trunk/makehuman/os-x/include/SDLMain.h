@@ -7,18 +7,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-    const char* osx_getExportPath();
-    const char* osx_getModelPath();
-    const char* osx_getGrabPath();
-    const char* osx_getRenderPath();
-    const char* osx_getDocumentsPath();
-#ifdef __cplusplus
-}
-#endif
-
 @interface SDLMain : NSObject
 {
     bool licenseWindowVisible;
@@ -32,8 +20,11 @@ extern "C" {
 
 @property (assign) bool licenseWindowVisible;
 
+@end
+
+@interface SDLMain (MenuHandling)
+
 -(IBAction)helpFileMHUsersGuide:(id)inSender;
--(IBAction)helpFileMHQuickStart:(id)inSender;
 
 -(IBAction)helpFileMHDevelMHProto:(id)inSender;
 
@@ -59,4 +50,4 @@ extern "C" {
 -(IBAction)showPreferences:(id)inSender;
 -(IBAction)showLicensing:(id)inSender;
 
-@end
+@end // @interface SDLMain (MenuHandling)

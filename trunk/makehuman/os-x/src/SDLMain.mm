@@ -311,6 +311,14 @@ static void CustomApplicationMain (int argc, char **argv)
     
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
+    
+    status = osx_adjustWorkingDir(gArgv[0]);
+    assert(0 == status);
+    
+    /* Adjust the environment vars for the external renderer */
+    status = osx_adjustRenderEnvironment();
+    assert(0 == status);
+    
     status = SDL_main (gArgc, gArgv);
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -389,16 +397,7 @@ int main (int argc, char **argv)
         gFinderLaunch = NO;
     }
 
-    int rc = osx_adjustWorkingDir(argv[0]);
-    assert(0 == rc);
-    
-    /* Adjust the environment vars for the external renderer */
-    rc = osx_adjustRenderEnvironment();
-    assert(0 == rc);
-
 #if SDL_USE_NIB_FILE
-    [SDLApplication poseAsClass:[NSApplication class]];
-
     NSApplicationMain ((int)argc, (const char**)argv);
 #else
     CustomApplicationMain (argc, argv);

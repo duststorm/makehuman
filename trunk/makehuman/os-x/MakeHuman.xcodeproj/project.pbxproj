@@ -10,6 +10,7 @@
 		6806287A0FC136C9006C372E /* data in Resources */ = {isa = PBXBuildFile; fileRef = 68061C9B0FC136AB006C372E /* data */; };
 		680EA9CF11A432B000DDEFEB /* glew.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
 		680EAADA11A4394300DDEFEB /* glew.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
+		68225FAA13DC5C830021F48A /* TextureCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68225FA913DC5C830021F48A /* TextureCache.cpp */; };
 		683926C312A3DC1400008F37 /* AppIcon_nb.icns in Resources */ = {isa = PBXBuildFile; fileRef = 683926C212A3DC1400008F37 /* AppIcon_nb.icns */; };
 		6839A7AF10179EFF008AF603 /* HelpLinks.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6839A7AD10179EFF008AF603 /* HelpLinks.strings */; };
 		6850794613AE1C1E004C0164 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6850794513AE1C1E004C0164 /* Accelerate.framework */; };
@@ -37,13 +38,13 @@
 		68570292100322C400F9C649 /* glmodule.h in Headers */ = {isa = PBXBuildFile; fileRef = 685701301000EE8000F9C649 /* glmodule.h */; };
 		68570293100322CB00F9C649 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 6857012F1000EE8000F9C649 /* core.h */; };
 		6859C28110178958000E212C /* SDLMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6859C28010178958000E212C /* SDLMain.xib */; };
+		685A147613DB74AE00448578 /* SDLMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.mm */; };
 		6869C0DE10322A0400DF62C3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
 		6869C0DF10322A0400DF62C3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
 		6869C0E710322A4200DF62C3 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 6869C0DD10322A0400DF62C3 /* Sparkle.framework */; };
 		6869C0F910322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
 		6869C0FA10322D1100DF62C3 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 6869C0F810322D1100DF62C3 /* dsa_pub.pem */; };
 		686CEBB612A3D4F500F4324D /* Info_nb.plist in Resources */ = {isa = PBXBuildFile; fileRef = 686CEBB512A3D4F500F4324D /* Info_nb.plist */; };
-		687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */; };
 		687F122D132D3205003F3B2B /* arraybuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 687F122C132D3205003F3B2B /* arraybuffer.c */; };
 		687F122E132D3205003F3B2B /* arraybuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 687F122C132D3205003F3B2B /* arraybuffer.c */; };
 		687F122F132D3205003F3B2B /* arraybuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 687F122C132D3205003F3B2B /* arraybuffer.c */; };
@@ -65,7 +66,6 @@
 		68D349FA12098883008E9DD6 /* apps in Resources */ = {isa = PBXBuildFile; fileRef = 68D349CF12098883008E9DD6 /* apps */; };
 		68D34A0E120988C0008E9DD6 /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A01120988C0008E9DD6 /* plugins */; };
 		68D34A29120988D0008E9DD6 /* pythonmodules in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A0F120988D0008E9DD6 /* pythonmodules */; };
-		68D8631D0FA5D1810097F73F /* SDLMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68D8631C0FA5D1810097F73F /* SDLMain.mm */; };
 		68E53136118C2EAC0077AF3A /* arial_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68E53135118C2EAC0077AF3A /* arial_0_trans.png */; };
 		68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */; };
 		68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */; };
@@ -79,6 +79,7 @@
 		68E6C077103B1E2500BAA9F5 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68E6C076103B1E2500BAA9F5 /* SDL.framework */; };
 		68E6C07A103B1E3500BAA9F5 /* SDL.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 68E6C076103B1E2500BAA9F5 /* SDL.framework */; };
 		68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
+		68EF10D413D97A590000AAD3 /* OSXTools.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68EF10D313D97A590000AAD3 /* OSXTools.mm */; };
 		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -88,7 +89,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 6850794013AE1C06004C0164 /* linalg_module */;
+			remoteGlobalIDString = 6850794013AE1C06004C0164;
 			remoteInfo = linalg_module;
 		};
 /* End PBXContainerItemProxy section */
@@ -128,6 +129,8 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		68061C9B0FC136AB006C372E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
 		680EA9CE11A432B000DDEFEB /* glew.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = glew.framework; path = frameworks/glew.framework; sourceTree = "<group>"; };
+		68225FA813DC5C7C0021F48A /* TextureCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureCache.h; path = include/TextureCache.h; sourceTree = "<group>"; };
+		68225FA913DC5C830021F48A /* TextureCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCache.cpp; path = src/TextureCache.cpp; sourceTree = "<group>"; };
 		683926C212A3DC1400008F37 /* AppIcon_nb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon_nb.icns; path = resources/AppIcon_nb.icns; sourceTree = "<group>"; };
 		6839A7AE10179EFF008AF603 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = resources/English.lproj/HelpLinks.strings; sourceTree = "<group>"; };
 		684223F1127355DC007177E4 /* apps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = apps; path = ../apps; sourceTree = SOURCE_ROOT; };
@@ -150,7 +153,6 @@
 		686E5D340FA1AB4B005B137C /* pythonwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pythonwrapper; path = include/pythonwrapper; sourceTree = "<group>"; };
 		686E5D380FA1AB5F005B137C /* sdlwrapper */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sdlwrapper; path = include/sdlwrapper; sourceTree = "<group>"; };
 		686FD6FC0FC06DA4006C12DA /* main.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = main.py; path = ../main.py; sourceTree = SOURCE_ROOT; };
-		687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OSXTools.cpp; path = src/OSXTools.cpp; sourceTree = "<group>"; };
 		687236BC0FF7F8D30048ED40 /* OSXTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSXTools.h; path = include/OSXTools.h; sourceTree = "<group>"; };
 		687F122C132D3205003F3B2B /* arraybuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = arraybuffer.c; path = ../src/arraybuffer.c; sourceTree = SOURCE_ROOT; };
 		687F1240132D321A003F3B2B /* linalg_module.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = linalg_module.c; path = ../src/linalg_module.c; sourceTree = SOURCE_ROOT; };
@@ -193,6 +195,7 @@
 		68E6C076103B1E2500BAA9F5 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = frameworks/SDL.framework; sourceTree = "<group>"; };
 		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
 		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
+		68EF10D313D97A590000AAD3 /* OSXTools.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXTools.mm; path = src/OSXTools.mm; sourceTree = "<group>"; };
 		68F6D3F50E640E6A00D27961 /* AppIcon.psd */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppIcon.psd; path = resources/AppIcon.psd; sourceTree = "<group>"; };
 		68F6D3F60E640E6A00D27961 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = resources/AppIcon.icns; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MakeHuman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeHuman.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -258,9 +261,9 @@
 				687F1240132D321A003F3B2B /* linalg_module.c */,
 				687F1244132D3232003F3B2B /* arraybuffer.h */,
 				687F122C132D3205003F3B2B /* arraybuffer.c */,
+				6857012F1000EE8000F9C649 /* core.h */,
 				689F332A0E6193B000E37E9F /* core.c */,
 				689F332B0E6193B000E37E9F /* glmodule.c */,
-				6857012F1000EE8000F9C649 /* core.h */,
 				685701301000EE8000F9C649 /* glmodule.h */,
 			);
 			name = Main;
@@ -269,6 +272,8 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6850794513AE1C1E004C0164 /* Accelerate.framework */,
+				6850794B13AE1C2C004C0164 /* Python.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -314,8 +319,6 @@
 				68DFFDA40FC1F059009CA434 /* data */,
 				68C80AE10FE3E41D0090D1E5 /* utils */,
 				684E6D340FEE34E600941536 /* docs */,
-				6850794513AE1C1E004C0164 /* Accelerate.framework */,
-				6850794B13AE1C2C004C0164 /* Python.framework */,
 			);
 			name = MHPhoenix;
 			sourceTree = "<group>";
@@ -368,9 +371,11 @@
 			isa = PBXGroup;
 			children = (
 				68E6B9721038439B00BAA9F5 /* Preferences */,
+				68225FA813DC5C7C0021F48A /* TextureCache.h */,
+				68225FA913DC5C830021F48A /* TextureCache.cpp */,
 				685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */,
 				687236BC0FF7F8D30048ED40 /* OSXTools.h */,
-				687236BA0FF7F8BB0048ED40 /* OSXTools.cpp */,
+				68EF10D313D97A590000AAD3 /* OSXTools.mm */,
 				68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */,
 				68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */,
 				68D8631E0FA5D1880097F73F /* SDLMain.h */,
@@ -702,13 +707,14 @@
 				689F332E0E6193B000E37E9F /* core.c in Sources */,
 				689F332F0E6193B100E37E9F /* glmodule.c in Sources */,
 				689F33310E6193B100E37E9F /* main.c in Sources */,
-				68D8631D0FA5D1810097F73F /* SDLMain.mm in Sources */,
 				68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */,
-				687236BB0FF7F8BB0048ED40 /* OSXTools.cpp in Sources */,
 				68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */,
 				68E6B8E4103821B500BAA9F5 /* UpdatePreferences.mm in Sources */,
 				68E6BB1810395A6600BAA9F5 /* GeneralPreferences.mm in Sources */,
 				687F122D132D3205003F3B2B /* arraybuffer.c in Sources */,
+				68EF10D413D97A590000AAD3 /* OSXTools.mm in Sources */,
+				685A147613DB74AE00448578 /* SDLMain.mm in Sources */,
+				68225FAA13DC5C830021F48A /* TextureCache.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

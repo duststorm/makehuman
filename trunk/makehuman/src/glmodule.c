@@ -29,32 +29,29 @@
 
  */
 #ifdef _DEBUG
-#undef _DEBUG
-#include <Python.h>
-#define _DEBUG
+    #undef _DEBUG
+    #include <Python.h>
+    #define _DEBUG
 #else
-#include <Python.h>
+    #include <Python.h>
 #endif
-
-#include <assert.h>
-#include "glmodule.h"
-#include "core.h"
 
 #ifdef __WIN32__
-#include <windows.h>
-#include <SDL_syswm.h>
+    #include <windows.h>
+    #include <SDL_syswm.h>
 #elif __APPLE__
-#include "SDL_image/SDL_image.h"
+    #include "SDL_image.h"
+    #include "TextureCache.h"
 #else
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
+    #include <X11/Xlib.h>
+    #include <X11/Xutil.h>
+    #include <GL/glx.h>
 #endif
-#ifdef __APPLE__
-#include <Python/structmember.h>
-#else
+
+#include "glmodule.h"
+#include "core.h"
+#include <assert.h>
 #include <structmember.h>
-#endif
 
 static int g_savedx=0; /*saved x mouse position*/
 static int g_savedy=0; /*saved y mouse position*/
@@ -522,7 +519,7 @@ static void mhFlipSurface(SDL_Surface *surface)
     }
 }
 
-SDL_Surface *mhLoadImage(const char *fname)
+static SDL_Surface *mhLoadImage(const char *fname)
 {
     SDL_Surface *surface;
 
@@ -569,6 +566,9 @@ SDL_Surface *mhLoadImage(const char *fname)
  */
 GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 {
+#ifdef __APPLE__
+    return textureCacheLoadTexture(fname, texture, width, height);
+#else !__APPLE__
     SDL_Surface *surface;
     int internalFormat, format;
 
@@ -625,30 +625,9 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
 
-// hdusel: Just a test for Mac OS X in order to prevent that the fonts look so ugly (blurry) on the Mac port.
-// So try to permit MIPMAP Interpolation for fonts.
-#if defined(__APPLE__)
-        const int isFont = (strstr(fname, "/fonts/") != NULL);
-        if (isFont)
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        }
-        else
-        {
-#if defined(__ppc__)
-            // On PowerPC Macs just don't use mipmapping
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#else
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#endif
-        }
-#else
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#endif
+
         gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
         //glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -662,10 +641,14 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
     SDL_FreeSurface(surface);
 
     return texture;
+#endif // ! __APPLE__
 }
 
 GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y)
 {
+#ifdef __APPLE__
+    return textureCacheLoadSubTexture(fname, texture, x, y);
+#else
     SDL_Surface *surface;
     int internalFormat, format;
 
@@ -723,6 +706,7 @@ GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y)
     SDL_FreeSurface(surface);
 
     return texture;
+#endif // ! __APPLE__
 }
 
 GLuint mhCreateVertexShader(const char *source)
@@ -1188,7 +1172,7 @@ void mhMouseMotion(int s, int x, int y, int xrel, int yrel)
         mhQueueUpdate();
 }
 
-void mhQuit()
+static void mhQuit()
 {
   callQuit();
 }
@@ -2039,7 +2023,11 @@ void mhCreateWindow(int useTimer)
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+#if defined(SDL_GL_SWAP_CONTROL) /* SDL_GL_SWAP_CONTROL is deprecated in SDL 1.3! */
     SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1); // This fixes flickering in compiz
+#endif
+
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
@@ -2199,6 +2187,27 @@ void mhEventLoop(void)
             G.windowHeight = g_windowHeight = event.resize.h;
             g_screen = SDL_SetVideoMode(G.windowWidth, G.windowHeight, 24, SDL_OPENGL | (G.fullscreen ? SDL_FULLSCREEN : 0) | SDL_RESIZABLE);
             OnInit();
+
+/** hdusel: On some systems a SDL_SetVideoMode causes that the OpenGL context will be reinitialzed.
+ * (see http://forums.libsdl.org/viewtopic.php?t=5503&sid=bb2bd59aff7710bbb3dc3ecd5e9b79cf)
+ * This leads not only to loose the OpenGL Context which will be resumed by OnInit() but in
+ * a lost of all loaded textures also.
+ *
+ * OS X is concerned of this phenomen :-/ So we'll need to restore all loaded textures after
+ * SDL_SetVideoMode() has been called. The Restore of the textures needs some additional effort
+ * which is actually done in a texture cache which is relized as a C++ class within the os-x code
+ * folder. If any other platform has problems to restore its textures because of an OpenGL context
+ * loss caused of SDL_SetVideoMode() we should consider to move this Cache to the common code
+ * area.
+ *
+ * This issue fixes the ticket "Issue 118: Interface is not redrawn when the window is maximized on OSX"
+ * (http://code.google.com/p/makehuman/issues/detail?id=118).
+
+ */
+#ifdef __APPLE__
+            textureCacheRestoreTextures();
+#endif
+
             mhReshape(event.resize.w, event.resize.h);
             callResize(event.resize.w, event.resize.h, G.fullscreen);
             mhDraw();

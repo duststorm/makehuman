@@ -15,14 +15,14 @@
  *  along with this program; if not, write to the Free Software Foun-
  *  dation, Inc., 59 Temple Place, Suite 330, Boston,  MA  02111-1307
  *  USA
- *  
+ *
  *  File   : OSXTools.mm
  *  Project: MakeHuman <info@makehuman.org>, http://www.makehuman.org/
  *  App    : makehuman
  *  Author : Hans-Peter Dusel <hdusel@tangerine-soft.de>
  *
  *  For individual developers look into the AUTHORS file.
- *   
+ *
  */
 
 #include "OSXTools.h"
@@ -35,88 +35,86 @@
 #import "GeneralPreferences.h"
 #import "AppPreferences.h"
 
-static std::string sModelPath;
-static std::string sExportPath;
-static std::string sGrabPath;
-static std::string sRenderPath;
-static std::string sDocumentsPath;
+static bool getSystemVersion(SInt32 *major, SInt32 *minor)
+{
+    return ((0 == ::Gestalt(gestaltSystemVersionMajor, major)) &&
+            (0 == ::Gestalt(gestaltSystemVersionMinor, minor)));
+}
 
-/** Checks if the system is runnin on SnowLeopard (and abov) or below.
- * \return rue if the system is SnowLeopard (OS X 10.6.x) or above, false
- * if it below (e.g. Leopard or Lion...)
- */
-static bool isRunningOnSnowLeopardAndAbove()
+int isRunningOnLeopard()
 {
     SInt32 major, minor;
-    
-    if ((0 == ::Gestalt(gestaltSystemVersionMajor, &major)) &&
-        (0 == ::Gestalt(gestaltSystemVersionMinor, &minor)))
+
+    if ( !getSystemVersion(&major, &minor) )
     {
-        return (major >= 10 && minor >= 6);
+        return false;
     }
-    return false;
+    return (major == 10 && minor == 5) ? 1 : 0;
 }
 
-static const char* osx_getExportPath()
+int isRunningOnSnowLeopard()
 {
-    sExportPath = [[GeneralPreferences exportPath] UTF8String];
-    return sExportPath.c_str();
+    SInt32 major, minor;
+
+    if ( !getSystemVersion(&major, &minor) )
+    {
+        return false;
+    }
+    return (major == 10 && minor == 6) ? 1 : 0;
 }
 
-static const char* osx_getModelPath()
+int isRunningOnLion()
 {
-    sModelPath = [[GeneralPreferences modelPath] UTF8String];
-    return sModelPath.c_str();
+    SInt32 major, minor;
+
+    if ( !getSystemVersion(&major, &minor) )
+    {
+        return false; // no info available
+    }
+    return (major == 10 && minor == 7) ? 1 : 0;
 }
 
-static const char* osx_getGrabPath()
+int isRunningOnSnowLeopardAndAbove()
 {
-    sGrabPath = [[GeneralPreferences grabPath] UTF8String];
-    return sGrabPath.c_str();
-}
+    SInt32 major, minor;
 
-static const char* osx_getRenderPath()
-{
-    sRenderPath = [[GeneralPreferences renderPath] UTF8String];
-    return sRenderPath.c_str();
-}
-
-static const char* osx_getDocumentsPath()
-{
-    sDocumentsPath = [[GeneralPreferences documentsPath] UTF8String];
-    return sDocumentsPath.c_str();
+    if ( !getSystemVersion(&major, &minor) )
+    {
+        return false;
+    }
+    return (major == 10 && minor >= 6) ? 1 : 0;
 }
 
 const int getPathForTypedString(const char* inTypeStr, char * const storage, int sizeOfStorge)
 {
-    const char *foundPath = NULL;
-    
+    std::string pathStr;
+
     if (0 == strcmp(inTypeStr, "exports"))
     {
-        foundPath = osx_getExportPath();
+        pathStr = [[GeneralPreferences exportPath] UTF8String];
     }
     else if (0 == strcmp(inTypeStr, "models"))
     {
-        foundPath = osx_getModelPath();
+        pathStr = [[GeneralPreferences modelPath] UTF8String];
     }
     else if (0 == strcmp(inTypeStr, "grab"))
     {
-        foundPath = osx_getGrabPath();
+        pathStr = [[GeneralPreferences grabPath] UTF8String];
     }
     else if (0 == strcmp(inTypeStr, "render"))
     {
-        foundPath = osx_getRenderPath();
+        pathStr = [[GeneralPreferences renderPath] UTF8String];
     }
     else if (0 == strcmp(inTypeStr, ""))
     {
-        foundPath = osx_getDocumentsPath();
+        pathStr = [[GeneralPreferences documentsPath] UTF8String];
     }
-    else 
+    else
     {
         return -1; // not found!
     }
 
-    const size_t bytesNeedToStore(::strlen(foundPath) + 1);
+    const size_t bytesNeedToStore(pathStr.length() + 1);
     if ( NULL != storage )
     {
         if (bytesNeedToStore > sizeOfStorge)
@@ -124,7 +122,7 @@ const int getPathForTypedString(const char* inTypeStr, char * const storage, int
             return -2; // Found, but dest buffer is too small!
         }
     }
-    strcpy(storage, foundPath);
+    strcpy(storage, pathStr.c_str());
     return bytesNeedToStore; // success!
 }
 
@@ -132,15 +130,15 @@ const int getPathForTypedString(const char* inTypeStr, char * const storage, int
 int osx_adjustWorkingDir(const char* inAppAbsPath)
 {
     /* Redirect the current working dir into the applications package resource directory because
-     * the dirs 'data', '3dobjs' mh_core' and 'mh_plugins' are located there. 
+     * the dirs 'data', '3dobjs' mh_core' and 'mh_plugins' are located there.
      */
 
     // Get the apps exec location which is 'MHPhoenix.app/Contents/MacOS'
     char *tmp_currwd = dirname((char*)inAppAbsPath);
 
     /* Now this path is supposed to bechanged to the 'Resources' directory be appending
-     * '/../Resources/' which actually makes 'MakeHuman.app/Contents/MacOS/../Resources/' 
-     */ 
+     * '/../Resources/' which actually makes 'MakeHuman.app/Contents/MacOS/../Resources/'
+     */
     int len1 = strlen(tmp_currwd); // Remember the length of the canonical path for 'MakeHuman.app/Contents/MacOS'
     const char *appStr="/../Resources/"; // The recources are reside here.
     int len = len1 + strlen(appStr) + 1; // calcualte the absolute name of the path (including NUL byte)
@@ -154,7 +152,7 @@ int osx_adjustWorkingDir(const char* inAppAbsPath)
         strcpy(currwd, tmp_currwd);
         strcpy(&currwd[len1], appStr);
 
-        int rc = chdir(currwd); // And change the current working dir to this path
+        int rc = ::chdir(currwd); // And change the current working dir to this path
         assert(0 == rc);
         free(currwd);  // Release the memory again
         return 0; // indicate success
@@ -165,8 +163,8 @@ int osx_adjustWorkingDir(const char* inAppAbsPath)
 /** Gets the value of a particular Environment variable as a string.
   *
   * \param inEnvVarName The name of the Environment variable to get the value from.
-  * \param outValue     A pointer to a string which is supposed to be the target for the content 
-  *                     of the env var. This can be NULL if you just want to check if the given 
+  * \param outValue     A pointer to a string which is supposed to be the target for the content
+  *                     of the env var. This can be NULL if you just want to check if the given
   *                     environment variable existst.
   *
   * \return 0 for success, -1 for failure (if the requested env var does not exists).
@@ -182,7 +180,7 @@ static int getEnvVar(const std::string& inEnvVarName, std::string* outValue)
     {
         return -1; // indicate "error"
     }
-    
+
     if (NULL != outValue)
     {
         *outValue = envVar;
@@ -190,7 +188,7 @@ static int getEnvVar(const std::string& inEnvVarName, std::string* outValue)
     return 0; // success
 }
 
-/** Sets the value of a particular Environment variable as a string. 
+/** Sets the value of a particular Environment variable as a string.
   * The Env-Var is set disregard whether the given environment variable already exists.
   *
   * \param inEnvVarName The name of the Environment variable to set the value to.
@@ -213,8 +211,8 @@ int osx_adjustRenderEnvironment()
     std::string path;
     int rc = getEnvVar("PATH", &path);
     if (0 != rc)
-    {    
-        return -1; // error    
+    {
+        return -1; // error
     }
 
     // -----------------------------------------------------------------
@@ -224,7 +222,7 @@ int osx_adjustRenderEnvironment()
     rc = setEnvVar("AQSIS_DISPLAY_PATH", kPathAqsis + "Resources/lib/");
     if (0 != rc)
     {
-        return -1; // error    
+        return -1; // error
     }
 
     // -----------------------------------------------------------------
@@ -238,15 +236,15 @@ int osx_adjustRenderEnvironment()
     path.append(":" + kPath3Delight + "bin/");
     rc = setEnvVar("DELIGHT", kPath3Delight);
     if (0 != rc)
-    {    
-        return -1; // error    
+    {
+        return -1; // error
     }
 
 
     rc = setEnvVar("PATH", path.c_str());
     if (0 != rc)
-    {    
-        return -1; // error    
+    {
+        return -1; // error
     }
     return 0; // success
 }
@@ -255,15 +253,15 @@ int osx_adjustRenderEnvironment()
 int isMainWindowActive()
 {
     const NSWindow *keyWin  = [NSApp keyWindow];
-    
+
         // is the key window valid?
     if (keyWin == NULL)
         return false; // No? then The main Window is not the active one.
-    
+
         // Get the Key Windows title
     const NSString *title = [keyWin title];
-    
-        // The MainWindow is active only if the key window is the MainWindow 
+
+        // The MainWindow is active only if the key window is the MainWindow
         // (whose title is "MakeHuman").
     const NSRange range([title rangeOfString:@"MakeHuman"]);
     return range.location == 0 && range.length > 0;
@@ -277,7 +275,7 @@ void challengePythonUpdate()
     const char* kPythonVersionNumber = Py_GetVersion();
     int major, minor, sub;
     const int rc(::sscanf(kPythonVersionNumber, "%d.%d.%d", &major, &minor, &sub));
-    
+
     if ((rc == 3) && !((major >= 3) && (minor >= 2)))
     {
         NSString *messageString = [NSString stringWithFormat:
@@ -285,24 +283,24 @@ void challengePythonUpdate()
                                    "Makehuman will use some extended Functionality of Python 3.x in the near future.\n\n"
                                    "You are currently using Python V%d.%d.%d\n\n"
                                    "So please update the Python on your machine as soon as possible!",major, minor, sub];
-        
-        const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message", 
-                                                          messageString, 
-                                                          @"Start it anyway!", 
-                                                          @"Visit the Python Website...", 
+
+        const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message",
+                                                          messageString,
+                                                          @"Start it anyway!",
+                                                          @"Visit the Python Website...",
                                                           @"Download the Python installer...");
         switch(rc)
         {
             case NSAlertDefaultReturn :
                 break;
-                
+
             case NSAlertAlternateReturn :
                 [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.python.org/download"]];
                 break;
-                
+
             case NSAlertOtherReturn :
-                [[NSWorkspace sharedWorkspace] 
-                 openURL:[NSURL URLWithString:isRunningOnSnowLeopardAndAbove() ? 
+                [[NSWorkspace sharedWorkspace]
+                 openURL:[NSURL URLWithString:isRunningOnSnowLeopardAndAbove() ?
                           @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.6.dmg" :
                           @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.3.dmg"]];
                 break;
@@ -354,8 +352,7 @@ void challengePythonUpdate()
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:s]];
 }
 
--(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openFile:@"FileMHUsersGuide"];}
--(IBAction)helpFileMHQuickStart:(id)inSender        {[SDLMain openFile:@"FileMHQuickStart"];}
+-(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openURL:@"FileMHUsersGuide"];}
 
 -(IBAction)helpFileMHDevelMHProto:(id)inSender      {[SDLMain openFile:@"FileDevelMHProto"];}
 
