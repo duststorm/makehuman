@@ -36,6 +36,11 @@
     #include <Python.h>
 #endif
 
+#include "glmodule.h"
+#include "core.h"
+#include <assert.h>
+#include <structmember.h>
+
 #ifdef __WIN32__
     #include <windows.h>
     #include <SDL_syswm.h>
@@ -47,11 +52,6 @@
     #include <X11/Xutil.h>
     #include <GL/glx.h>
 #endif
-
-#include "glmodule.h"
-#include "core.h"
-#include <assert.h>
-#include <structmember.h>
 
 static int g_savedx=0; /*saved x mouse position*/
 static int g_savedy=0; /*saved y mouse position*/
@@ -568,7 +568,7 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 {
 #ifdef __APPLE__
     return textureCacheLoadTexture(fname, texture, width, height);
-#else !__APPLE__
+#else /* !__APPLE__ */
     SDL_Surface *surface;
     int internalFormat, format;
 
