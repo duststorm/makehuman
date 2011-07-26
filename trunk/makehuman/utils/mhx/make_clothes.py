@@ -147,6 +147,7 @@ def selectVert(context, vn, ob):
 def findClothes(context, bob, pob, log):
     base = bob.data
     proxy = pob.data
+    scn = context.scene
     
     bestVerts = []
     for pv in proxy.vertices:
@@ -221,8 +222,9 @@ def findClothes(context, bob, pob, log):
                     fcs.append((f.vertices, wts))
 
     print("Finding best weights")
-    alwaysOutside = context.scene['MakeClothesOutside']
-    minOffset = context.scene['MakeClothesMinOffset']
+    alwaysOutside = scn['MakeClothesOutside']
+    minOffset = scn['MakeClothesMinOffset']
+    useProjection = scn['MakeClothesUseProjection']
     bestFaces = []
     for (pv, mverts, fcs) in bestVerts:
         #print(pv.index)
@@ -245,10 +247,13 @@ def findClothes(context, bob, pob, log):
         est = bWts[0]*v0.co + bWts[1]*v1.co + bWts[2]*v2.co
         norm = bWts[0]*v0.normal + bWts[1]*v1.normal + bWts[2]*v2.normal
         diff = pv.co - est
-        proj = diff.dot(norm)
-        if alwaysOutside and proj < minOffset:
-            proj = minOffset
-        bestFaces.append((pv, bVerts, bWts, proj))    
+        if useProjection:
+            proj = diff.dot(norm)
+            if alwaysOutside and proj < minOffset:
+                proj = minOffset
+            bestFaces.append((pv, bVerts, bWts, proj))    
+        else:
+            bestFaces.append((pv, bVerts, bWts, diff))    
 
     print("Done")
     return bestFaces
@@ -356,11 +361,12 @@ def proxyFilePtr(name):
     return None
 
 #
-#    printClothes(context, path, pob, data):    
+#    printClothes(context, path, bob, pob, data):    
 #
         
-def printClothes(context, path, pob, data):
+def printClothes(context, path, bob, pob, data):
     file = os.path.expanduser(path)
+    scn = context.scene
     fp= open(file, "w")
 
     infp = proxyFilePtr('proxy_header.txt')
@@ -374,7 +380,7 @@ def printClothes(context, path, pob, data):
 "# homepage http://www.makehuman.org/\n")
 
     fp.write("# name %s\n" % pob.name)
-    if context.scene['MakeClothesHairMaterial']:
+    if scn['MakeClothesHairMaterial']:
         fp.write(
 "# material %s\n" % pob.name +
 "texture data/hairstyles/%s_texture.tif\n" % pob.name +
@@ -393,9 +399,13 @@ def printClothes(context, path, pob, data):
 "diffuse_color_factor 1.0\n" +
 "alpha_factor 1.0\n")
 
+    printScale(fp, bob, scn, 'x_scale', 0, 'MakeClothesX1', 'MakeClothesX2')
+    printScale(fp, bob, scn, 'z_scale', 1, 'MakeClothesY1', 'MakeClothesY2')
+    printScale(fp, bob, scn, 'y_scale', 2, 'MakeClothesZ1', 'MakeClothesZ2')
+
     me = pob.data
 
-    if me.materials and context.scene['MakeClothesMaterials']:
+    if me.materials and scn['MakeClothesMaterials']:
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
         writeColor(fp, 'diffuse_color', mat.diffuse_color)
@@ -405,11 +415,17 @@ def printClothes(context, path, pob, data):
         fp.write('specular_shader %s\n' % mat.specular_shader)
         fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
 
+    useProjection = scn['MakeClothesUseProjection']
+    fp.write("# use_projection %d\n" % useProjection)
     fp.write("# verts\n")
-    for (pv, verts, wts, proj) in data:
-        #print(pv.index,verts,wts)
-        fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
-            verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
+    if useProjection:
+        for (pv, verts, wts, proj) in data:
+            fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
+                verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
+    else:                
+        for (pv, verts, wts, diff) in data:
+            fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
+                verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
 
     fp.write("# obj_data\n")
     if me.uv_textures:
@@ -446,6 +462,16 @@ def printClothes(context, path, pob, data):
 def writeColor(fp, string, color):
     fp.write("%s %.4f %.4f %.4f\n" % (string, color[0], color[1], color[2]))
 
+def printScale(fp, bob, scn, name, index, prop1, prop2):
+    verts = bob.data.vertices
+    n1 = scn[prop1]
+    n2 = scn[prop2]
+    if n1 >=0 and n2 >= 0:
+        x1 = verts[n1].co[index]     
+        x2 = verts[n2].co[index]
+        fp.write("# %s %d %d %.4f\n" % (name, n1, n2, abs(x1-x2)))
+    return
+
 #
 #    makeClothes(context):
 #
@@ -462,7 +488,7 @@ def makeClothes(context):
             log = open(logfile, "w")
             data = findClothes(context, bob, pob, log)
             log.close()
-            printClothes(context, outpath, pob, data)
+            printClothes(context, outpath, bob, pob, data)
             print("%s done" % outpath)
         
 #
@@ -574,7 +600,7 @@ def initInterface(scn):
         name="Directory", 
         description="Directory", 
         maxlen=1024)
-    scn['MakeClothesDirectory'] = "~/makehuman"
+    scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/hairstyles"
 
     bpy.types.Scene.MakeClothesMaterials = BoolProperty(
         name="Materials", 
@@ -585,6 +611,11 @@ def initInterface(scn):
         name="Hair material", 
         description="Fill in hair material")
     scn['MakeClothesHairMaterial'] = False
+
+    bpy.types.Scene.MakeClothesUseProjection = BoolProperty(
+        name="Use projection", 
+        description="Vert normal to face")
+    scn['MakeClothesUseProjection'] = False
 
     bpy.types.Scene.MakeClothesOutside = BoolProperty(
         name="Always outside", 
@@ -612,6 +643,36 @@ def initInterface(scn):
         description="Max number of verts considered")
     scn['MakeClothesListLength'] = theListLength
 
+    bpy.types.Scene.MakeClothesX1 = IntProperty(
+        name="X1", 
+        description="First X vert for clothes rescaling")
+    scn['MakeClothesX1'] = 4302
+
+    bpy.types.Scene.MakeClothesX2 = IntProperty(
+        name="X2", 
+        description="Second X vert for clothes rescaling")
+    scn['MakeClothesX2'] = 8697
+
+    bpy.types.Scene.MakeClothesY1 = IntProperty(
+        name="Y1", 
+        description="First Y vert for clothes rescaling")
+    scn['MakeClothesY1'] = 8208
+
+    bpy.types.Scene.MakeClothesY2 = IntProperty(
+        name="Y2", 
+        description="Second Y vert for clothes rescaling")
+    scn['MakeClothesY2'] = 8220
+
+    bpy.types.Scene.MakeClothesZ1 = IntProperty(
+        name="Z1", 
+        description="First Z vert for clothes rescaling")
+    scn['MakeClothesZ1'] = 8289
+
+    bpy.types.Scene.MakeClothesZ2 = IntProperty(
+        name="Z2", 
+        description="Second Z vert for clothes rescaling")
+    scn['MakeClothesZ2'] = 8223
+
     return
 
 #
@@ -629,17 +690,26 @@ class MakeClothesPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        scn = context.scene
         layout.operator("mhclo.init_interface")
-        layout.prop(context.scene, "MakeClothesDirectory")
-        layout.prop(context.scene, "MakeClothesMaterials")
-        layout.prop(context.scene, "MakeClothesHairMaterial")
-        layout.prop(context.scene, "MakeClothesOutside")
-        layout.prop(context.scene, "MakeClothesMinOffset")
-        layout.prop(context.scene, "MakeClothesThreshold")
-        layout.prop(context.scene, "MakeClothesListLength")
+        layout.prop(scn, "MakeClothesDirectory")
+        layout.prop(scn, "MakeClothesMaterials")
+        layout.prop(scn, "MakeClothesHairMaterial")
+        layout.prop(scn, "MakeClothesUseProjection")
+        layout.prop(scn, "MakeClothesOutside")
+        layout.prop(scn, "MakeClothesMinOffset")
+        layout.prop(scn, "MakeClothesThreshold")
+        layout.prop(scn, "MakeClothesListLength")
         layout.operator("mhclo.make_clothes")
+        layout.label("Scaling verts")
+        layout.prop(scn, "MakeClothesX1")
+        layout.prop(scn, "MakeClothesX2")
+        layout.prop(scn, "MakeClothesY1")
+        layout.prop(scn, "MakeClothesY2")
+        layout.prop(scn, "MakeClothesZ1")
+        layout.prop(scn, "MakeClothesZ2")        
         layout.separator()
-        layout.prop(context.scene, "MakeClothesVertexGroups")
+        layout.prop(scn, "MakeClothesVertexGroups")
         layout.operator("mhclo.offset_clothes")
         return
 

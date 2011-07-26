@@ -267,6 +267,11 @@ def readProxyFile(obj, proxyStuff):
     proxy = CProxy(typ, layer)
     proxy.name = "MyProxy"
 
+    useProjection = True
+    xScale = 1.0
+    yScale = 1.0
+    zScale = 1.0
+    
     status = 0
     doVerts = 1
     doFaces = 2
@@ -309,6 +314,14 @@ def readProxyFile(obj, proxyStuff):
                 proxy.wire = True
             elif words[1] == 'cage':
                 proxy.cage = True
+            elif words[1] == 'x_scale':
+                xScale = getScale(words, verts, 0)
+            elif words[1] == 'y_scale':
+                yScale = getScale(words, verts, 1)
+            elif words[1] == 'z_scale':
+                zScale = getScale(words, verts, 2)                
+            elif words[1] == 'use_projection':
+                useProjection = int(words[2])
             elif words[1] == 'weightfile':
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'subsurf':
@@ -319,6 +332,8 @@ def readProxyFile(obj, proxyStuff):
                 proxy.modifiers.append( ['shrinkwrap', offset] )
             elif words[1] == 'shapekey':
                 proxy.shapekeys.append( words[2] )
+            else:
+                print("Ignored proxy keyword " + words[1])
         elif status == doObjData:
             if words[0] == 'vt':
                 newTexVert(1, words, proxy)
@@ -332,23 +347,27 @@ def readProxyFile(obj, proxyStuff):
             v2 = int(words[2])
             w0 = float(words[3])
             w1 = float(words[4])
-            w2 = float(words[5])
+            w2 = float(words[5])            
             try:
                 proj = float(words[6])
             except:
                 proj = 0
 
-            if proj:
+            if not proj:
+                (d0, d1, d2) = (0, 0, 0)
+            elif useProjection:
                 n0 = aljabr.vmul(verts[v0].no, w0)
                 n1 = aljabr.vmul(verts[v1].no, w1)
                 n2 = aljabr.vmul(verts[v2].no, w2)
                 norm = aljabr.vadd(n0, n1)
                 norm = aljabr.vadd(norm, n2)
-                d0 = proj*norm[0]
-                d1 = proj*norm[1]
-                d2 = proj*norm[2]
+                d0 = proj * norm[0] * xScale
+                d1 = proj * norm[1] * yScale
+                d2 = proj * norm[2] * zScale
             else:
-                (d0, d1, d2) = (0, 0, 0)
+                d0 = float(words[6]) * xScale
+                d1 = float(words[7]) * yScale
+                d2 = float(words[8]) * zScale
 
             proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2, d0, d1, d2))
             addProxyVert(v0, vn, w0, proxy)
@@ -367,6 +386,17 @@ def readProxyFile(obj, proxyStuff):
             weights.append((v,w))
 
     return proxy
+
+#
+#   getScale(words, verts, index):                
+#
+
+def getScale(words, verts, index):                
+    v1 = int(words[2])
+    v2 = int(words[3])
+    den = float(words[4])
+    num = abs(verts[v1].co[index] - verts[v2].co[index])
+    return num/den
 
 #
 #    readMaterial(line, mat):
