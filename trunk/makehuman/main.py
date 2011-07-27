@@ -83,6 +83,32 @@ from aljabr import centroid
 import algos3d
 #import font3d
 
+class PluginCheckBox(gui3d.CheckBox):
+
+    def __init__(self, parent, module):
+    
+        gui3d.CheckBox.__init__(self, parent, module, False if module in parent.app.settings['excludePlugins'] else True)
+        self.module = module
+        
+    def onClicked(self, event):
+        gui3d.CheckBox.onClicked(self, event)
+        if self.selected:
+            self.app.settings['excludePlugins'].remove(self.module)
+        else:
+            self.app.settings['excludePlugins'].append(self.module)
+            
+        self.app.saveSettings()
+
+class PluginsTaskView(gui3d.TaskView):
+
+    def __init__(self, category):
+        gui3d.TaskView.__init__(self, category, 'Plugins')
+
+        pluginsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Plugins')
+        
+        for module in self.app.modules:
+            check = PluginCheckBox(pluginsBox, module)
+        
 class MHApplication(gui3d.Application):
   
     def __init__(self):
@@ -111,7 +137,8 @@ class MHApplication(gui3d.Application):
             'highspeed': 5,
             'units':'metric',
             'invertMouseWheel':False,
-            'font':'arial'
+            'font':'arial',
+            'excludePlugins':[]
         }
         
         self.shortcuts = {
@@ -291,7 +318,8 @@ class MHApplication(gui3d.Application):
                 name, ext = splitext(basename(path))
                 module = imp.load_source(name, path)
                 self.modules[name] = module
-                module.load(self)
+                if name not in self.app.settings['excludePlugins']:
+                    module.load(self)
             except Exception, e:
                 import traceback
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -408,6 +436,8 @@ class MHApplication(gui3d.Application):
             if self.dialog.helpId and self.dialog.check.selected:
                 self.helpIds.append(self.dialog.helpId)
             self.dialog.hide()
+            
+        PluginsTaskView(self.app.getCategory('Settings'))
         
         mh.updatePickingBuffer();
         self.redraw()
