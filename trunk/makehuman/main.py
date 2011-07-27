@@ -316,10 +316,12 @@ class MHApplication(gui3d.Application):
             path = self.pluginsToLoad.pop()
             try:
                 name, ext = splitext(basename(path))
-                module = imp.load_source(name, path)
-                self.modules[name] = module
                 if name not in self.app.settings['excludePlugins']:
+                    module = imp.load_source(name, path)
+                    self.modules[name] = module
                     module.load(self)
+                else:
+                    self.modules[name] = None
             except Exception, e:
                 import traceback
                 exc_type, exc_value, exc_traceback = sys.exc_info()
