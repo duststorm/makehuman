@@ -70,7 +70,7 @@ class ExampleTaskView(gui3d.TaskView):
         # By default a slider goes from 0.0 to 1.0, and the initial position will be 0.0 unless specified
 
         # We want the slider to start from the middle
-        self.aSlider = gui3d.Slider(box, value=0.5, label='Slider')
+        self.aSlider = gui3d.Slider(box, value=0.5, label='Slider %.2f')
 
         self.aSliderLabel = gui3d.TextView(box, label='Value is 0.5')
 
@@ -81,13 +81,36 @@ class ExampleTaskView(gui3d.TaskView):
 
         # we also create a progressbar, which is updated as the slider moves
 
-        self.aProgressBar = gui3d.ProgressBar(box, style=gui3d.ProgressBarStyle._replace(width=112, margin=[2,2,2,2]))
+        self.aProgressBar = gui3d.ProgressBar(box, style=gui3d.ProgressBarStyle._replace(width=112, margin=[2,2,2,2]), barStyle=gui3d.ProgressBarBarStyle._replace(width=112, margin=[2,2,2,2]))
         self.aProgressBar.setProgress(0.5, 0)
         
         # A text edit
 
         self.aTextEdit = gui3d.TextEdit(box, text='Some text', style=gui3d.TextEditStyle._replace(width=112))
-
+        
+        self.meshSlider = gui3d.Slider(box, value=0.5, label='Mesh distort %0.2f')
+        
+        self.meshStored = False
+        @self.meshSlider.event
+        def onChanging(value):
+            human = self.app.selectedHuman
+            if self.meshStored:
+                human.restoreMesh()
+            else:
+                human.storeMesh()
+                self.meshStored = True
+            for v in human.mesh.verts:
+                v.co = [v.co[i] + v.no[i] * value for i in xrange(3)]
+            human.mesh.update()
+    
+        @self.meshSlider.event
+        def onChange(value):
+            human = self.app.selectedHuman
+            human.applyAllTargets()
+            self.meshStored = False
+            for v in human.mesh.verts:
+                v.co = [v.co[i] + v.no[i] * value for i in xrange(3)]
+            human.mesh.update()
 
 category = None
 taskview = None
