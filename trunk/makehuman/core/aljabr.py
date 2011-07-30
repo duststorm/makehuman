@@ -463,12 +463,10 @@ def dualToMatrix(d):
 
 #Note: Quaternions have to of normalized form
 # Quaternions are of the form (x,y,z,w)
-# returns flat matrx
 def quaternion2Matrix(q):
-    m = [ 1.0, 0.0, 0.0, 0.0,
-          0.0, 1.0, 0.0, 0.0,
-          0.0, 0.0, 1.0, 0.0,
-          0.0, 0.0, 0.0, 1.0]  # will be a 3x3 euler rotation matrix
+    m = [ [1.0, 0.0, 0.0],
+          [0.0, 1.0, 0.0],
+          [0.0, 0.0, 1.0]]  # will be a 3x3 euler rotation matrix
     m[0][0] = float(q[3]*q[3] + q[0]*q[0] - q[1]*q[1] - q[2]*q[2])
     m[0][1] = 2.0*(q[0]*q[1]-q[3]*q[2])
     m[0][2] = 2.0*(q[0]*q[2]+q[3]*q[1])
@@ -1060,7 +1058,7 @@ def vectorsToRotMatrix(v1,v2):
     normal = vnorm(normal)
     angle = acos(vdot(v1,v2)/(vlen(v1)*vlen(v2)))
     q = axisAngleToQuaternion(normal, angle)
-    return quaternionToMatrix(q)
+    return quaternion2Matrix(q)
 
 def randomPointFromNormal(v):
     """
