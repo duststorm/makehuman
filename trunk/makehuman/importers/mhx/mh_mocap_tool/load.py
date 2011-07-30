@@ -262,7 +262,7 @@ def addFrame(words, frame, nodes, pbones, scale):
                         vec[index] = sign*float(words[m])
                         m += 1
                     if first:
-                        pb.location = (scale * vec - node.head) * node.inverse
+                        pb.location = node.inverse * (scale * vec - node.head)
                         for n in range(3):
                             pb.keyframe_insert('location', index=n, frame=frame, group=name)
                     first = False

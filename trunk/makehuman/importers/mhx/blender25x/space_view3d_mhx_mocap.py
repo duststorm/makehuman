@@ -38,9 +38,9 @@ Alternatively, run the script in the script editor (Alt-P), and access from UI p
 bl_info = {
     "name": "MHX Mocap",
     "author": "Thomas Larsson",
-    "version": "0.7",
-    "blender": (2, 5, 6),
-    "api": 35774,
+    "version": "0.8",
+    "blender": (2, 5, 8),
+    "api": 38726,
     "location": "View3D > Properties > MHX Mocap",
     "description": "Mocap tool for MHX rig",
     "warning": "",
@@ -52,7 +52,7 @@ Properties:
 Scale:    
     for BVH import. Choose scale so that the vertical distance between hands and feet
     are the same for MHX and BVH rigs.
-    Good values are: CMU: 0.6, OSU: 0.1
+    Good values are: CMU: 0.6, Accad: 0.1
 Start frame:    
     for BVH import
 Rot90:    
@@ -313,7 +313,7 @@ def addFrame(words, frame, nodes, pbones, scale):
                         vec[index] = sign*float(words[m])
                         m += 1
                     if first:
-                        pb.location = (scale * vec - node.head) * node.inverse
+                        pb.location = node.inverse * (scale * vec - node.head)
                         for n in range(3):
                             pb.keyframe_insert('location', index=n, frame=frame, group=name)
                     first = False
@@ -673,7 +673,7 @@ DazArmature = {
 
 theArmatures = {
     'MB' : MBArmature, 
-    'OSU' : OsuArmature,
+    'Accad' : OsuArmature,
     'Mega' : MegaArmature,
     'HDM' : HDMArmature,
     '3dsMax' : MaxArmature,
@@ -681,7 +681,7 @@ theArmatures = {
     'Daz' : DazArmature,
 }
 
-theArmatureList = [ 'OSU', 'MB', 'Mega', 'HDM', 'Eyes', 'Daz', '3dsMax' ]
+theArmatureList = [ 'Accad', 'MB', 'Mega', 'HDM', 'Eyes', 'Daz', '3dsMax' ]
 
 MBFixes = {
     'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
@@ -738,7 +738,7 @@ DazFixes = {}
 
 theFixesList = {
     'MB'  : MBFixes,
-    'OSU' : OsuFixes,
+    'Accad' : OsuFixes,
     'Mega' : MegaFixes,
     'HDM' : HDMFixes,
     '3dsMax': MaxFixes,
@@ -1455,7 +1455,7 @@ def insertAnimRoot(root, animations, nFrames, locs, rots):
         anim.quats[frame] = quat
         matrix = anim.matrixRest * quat.to_matrix() * anim.inverseRest
         anim.matrices[frame] = matrix
-        anim.heads[frame] =  Vector(locs[frame]) * anim.matrixRest + anim.headRest
+        anim.heads[frame] =  anim.matrixRest * Vector(locs[frame]) + anim.headRest
     return
 
 def insertAnimChildLoc(nameIK, name, animations, locs):
@@ -1492,7 +1492,7 @@ def insertAnimChild(name, animations, nFrames, rots):
         locmat = anim.matrixRest * quat.to_matrix() * anim.inverseRest
         matrix = parmat * locmat
         anim.matrices[frame] = matrix
-        anim.heads[frame] = animPar.heads[frame] + anim.offsetRest*parmat
+        anim.heads[frame] = animPar.heads[frame] + parmat*anim.offsetRest
     return anim
             
 #
@@ -1579,7 +1579,7 @@ def insertLocationKeyFrames(name, pb, animSrc, animTrg):
     locs = []
     for frame in range(animSrc.nFrames):
         loc0 = animSrc.heads[frame] - animTrg.headRest
-        loc = loc0 * animTrg.inverseRest
+        loc = animTrg.inverseRest * loc0 
         locs.append(loc)
         pb.location = loc
         for n in range(3):
@@ -1597,7 +1597,7 @@ def insertIKLocationKeyFrames(nameIK, name, pb, animations):
     locs = []
     for frame in range(anim.nFrames):        
         if animPar:
-            loc0 = animPar.heads[frame] + animIK.offsetRest*animPar.matrices[frame]
+            loc0 = animPar.heads[frame] + animPar.matrices[frame]*animIK.offsetRest
             offset = anim.heads[frame] - loc0
             mat = animPar.matrices[frame] * animIK.matrixRest
             loc = offset*mat.invert()
@@ -1702,8 +1702,8 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
     else:
         roll = 0
     for frame in range(animFake.nFrames):        
-        locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
-        headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
+        locAbs = animFake.heads[frame] + animFake.matrices[frame]*offsetFake
+        headAbs = animReal.heads[frame] + animReal.matrices[frame]*offsetReal
         #debugPrintVecVec(locAbs, headAbs)
         offset = locAbs - headAbs
         mat = animReal.matrices[frame] * anim.matrixRest
@@ -1740,8 +1740,8 @@ def insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
     rotX = Matrix.Rotation(math.pi, 3, 'X')
     #print("*** %s %s %s" % (name, vecString(animCopy.headRest), vecString(offsetCopy)))
     for frame in range(animCopy.nFrames):        
-        locAbs = animCopy.heads[frame] + offsetCopy*animCopy.matrices[frame]
-        headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
+        locAbs = animCopy.heads[frame] + animCopy.matrices[frame]*offsetCopy
+        headAbs = animReal.heads[frame] + animReal.matrices[frame]*offsetReal
         offset = locAbs - headAbs
         mat = animReal.matrices[frame] * anim.matrixRest
         if pb.bone.use_local_location:
@@ -1774,7 +1774,7 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
     else:
         roll = 0
     for frame in range(animFake.nFrames):        
-        locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
+        locAbs = animFake.heads[frame] + animFake.matrices[frame]*offsetFake
         offset = locAbs - anim.headRest
         if pb.bone.use_local_location:
             loc = offset * anim.inverseRest

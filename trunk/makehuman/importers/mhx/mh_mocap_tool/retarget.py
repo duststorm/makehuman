@@ -218,7 +218,7 @@ def insertAnimRoot(root, animations, nFrames, times, locs, rots):
         anim.quats[frame] = quat
         matrix = anim.matrixRest * quat.to_matrix() * anim.inverseRest
         anim.matrices[frame] = matrix
-        anim.heads[frame] =  Vector(locs[frame]) * anim.matrixRest + anim.headRest
+        anim.heads[frame] =  anim.matrixRest * Vector(locs[frame])+ anim.headRest
     return
 
 def insertAnimChildLoc(nameIK, name, animations, locs):
@@ -267,7 +267,7 @@ def insertAnimChild(name, animations, nFrames, times, rots):
         parmat = animPar.matrices[frame]
         matrix = parmat * locmat
         anim.matrices[frame] = matrix
-        anim.heads[frame] = animPar.heads[frame] + anim.offsetRest*parmat
+        anim.heads[frame] = animPar.heads[frame] + parmat * anim.offsetRest
     return anim
             
 #
@@ -336,7 +336,7 @@ def insertLocationKeyFrames(name, pb, animSrc, animTrg):
     locs = []
     for frame in range(animSrc.nFrames):
         loc0 = animSrc.heads[frame] - animTrg.headRest
-        loc = loc0 * animTrg.inverseRest
+        loc = animTrg.inverseRest * loc0
         locs.append(loc)
         pb.location = loc
         tframe = animSrc.frames[frame]
@@ -355,13 +355,13 @@ def insertIKLocationKeyFrames(nameIK, name, pb, animations):
     locs = []
     for frame in range(anim.nFrames):        
         if animPar:
-            loc0 = animPar.heads[frame] + animIK.offsetRest*animPar.matrices[frame]
+            loc0 = animPar.heads[frame] + animPar.matrices[frame]*animIK.offsetRest
             offset = anim.heads[frame] - loc0
             mat = animPar.matrices[frame] * animIK.matrixRest
             loc = offset*mat.invert()
         else:
             offset = anim.heads[frame] - animIK.headRest
-            loc = offset * animIK.inverseRest
+            loc = animIK.inverseRest * offset
         pb.location = loc
         tframe = anim.frames[frame]
         for n in range(3):
@@ -461,15 +461,15 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
     else:
         roll = 0
     for frame in range(animFake.nFrames):        
-        locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
-        headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
+        locAbs = animFake.heads[frame] + animFake.matrices[frame] * offsetFake
+        headAbs = animReal.heads[frame] + animReal.matrices[frame] * offsetReal
         #debugPrintVecVec(locAbs, headAbs)
         offset = locAbs - headAbs
         mat = animReal.matrices[frame] * anim.matrixRest
         if pb.bone.use_local_location:
             inv = mat.copy()
             inv.invert()
-            loc = offset*inv
+            loc = inv*offset
             pb.location = loc
         else:
             pb.location = offset
@@ -500,8 +500,8 @@ def insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
     rotX = Matrix.Rotation(math.pi, 3, 'X')
     #print("*** %s %s %s" % (name, vecString(animCopy.headRest), vecString(offsetCopy)))
     for frame in range(animCopy.nFrames):        
-        locAbs = animCopy.heads[frame] + offsetCopy*animCopy.matrices[frame]
-        headAbs = animReal.heads[frame] + offsetReal*animReal.matrices[frame]
+        locAbs = animCopy.heads[frame] + animCopy.matrices[frame] * offsetCopy
+        headAbs = animReal.heads[frame] + animReal.matrices[frame] * offsetReal
         offset = locAbs - headAbs
         mat = animReal.matrices[frame] * anim.matrixRest
         if pb.bone.use_local_location:
@@ -535,10 +535,10 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
     else:
         roll = 0
     for frame in range(animFake.nFrames):        
-        locAbs = animFake.heads[frame] + offsetFake*animFake.matrices[frame]
+        locAbs = animFake.heads[frame] + animFake.matrices[frame] * offsetFake
         offset = locAbs - anim.headRest
         if pb.bone.use_local_location:
-            loc = offset * anim.inverseRest
+            loc = anim.inverseRest * offset
             pb.location = loc
         else:
             pb.location = offset
