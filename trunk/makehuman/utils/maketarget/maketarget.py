@@ -528,7 +528,20 @@ def processingTargetsSymm(path,mFactor):
             saveTarget(targetPath)
             reset()
 
+def loadVerticesFromFolder(path):
+    """
+    -
+    """
+    #reset()
+    targetDir = os.path.dirname(path)
+    targetsList = os.listdir(targetDir)
 
+    for targetName in targetsList:
+        blendFile = os.path.join(targetDir,targetName+".blend")
+        targetPath = os.path.join(targetDir,targetName)
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetName)
+            loadSelVerts(targetPath)
 
 def processingTargets(path, processingType=3):
     global morphFactor
@@ -596,7 +609,10 @@ def analyseTarget(n=0):
     vertColors = maketargetlib.analyzeTarget(vertices, targetBuffer, 1)
     colorVertices(vertColors, n=0)
 
-
+def colorVerticesFromFile(path):    
+    vertices = getVertices(0)
+    vertColors = maketargetlib.colorVerticesFromFile(vertices, path)
+    colorVertices(vertColors, n=0)
 
 
 
@@ -721,7 +737,8 @@ def event(event, value):
     elif event == Draw.CKEY:
         Window.FileSelector (processingTargetsSymm, "Save Target")
     elif event == Draw.DKEY:
-        pass
+        Window.FileSelector (colorVerticesFromFile, "Load color file")
+        
 
     elif event == Draw.EKEY:
         align()
@@ -760,7 +777,7 @@ def event(event, value):
     elif event == Draw.YKEY:
         Window.FileSelector (applyPosesFromLibrary, "Create poses to correct")
     elif event == Draw.KKEY:
-         pass
+        Window.FileSelector (loadVerticesFromFolder, "Load indices from")
     elif event == Draw.PAGEDOWNKEY and not value and GUIswitch < GUIswitchMax:
         GUIswitch += 1
     elif event == Draw.PAGEUPKEY and not value and GUIswitch > 1:

@@ -91,7 +91,24 @@ def analyzeTarget(vertices, targetBuffer, scale=0.5):
          vertColors[vect[0]] = [colorR,colorG,0]
     return vertColors
 
+def colorVerticesFromFile(vertices, path):
 
+    
+    vertColors = [[0,0,0] for x in vertices]    
+    try:
+        f = fileDescriptor = open(path)
+    except:
+        print "Error opening %s file"%(path)
+        return  
+    i = 0
+    for data in  f:
+        dataList = data.split() 
+        x =  int(255*(float(dataList[0])))    
+        co = [x,x,x]        
+        vertColors[i] = co
+        i += 1
+    
+    return vertColors
 
 def turn_around(vertices,axis,angle):
     """
@@ -183,23 +200,24 @@ def loadObj(path):
 
     while data:
         dataList = data.split()
-        if dataList[0] == "v":
-            co = [float(dataList[1]),\
-                    float(dataList[2]),\
-                    float(dataList[3])]
-            vertsCoo.append(co)
-        if dataList[0] == "vn":
-            co = [float(dataList[1]),\
-                    float(dataList[2]),\
-                    float(dataList[3])]
-            normal.append(co)
-        if dataList[0] == "f":
-            tmp = []
-            for faceData in dataList[1:]:    
-                vInfo = faceData.split('/')
-                vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
-                tmp.append(vIdx)
-            faces.append(tmp)
+        if len(dataList)>0:
+            if dataList[0] == "v":
+                co = [float(dataList[1]),\
+                        float(dataList[2]),\
+                        float(dataList[3])]
+                vertsCoo.append(co)
+            if dataList[0] == "vn":
+                co = [float(dataList[1]),\
+                        float(dataList[2]),\
+                        float(dataList[3])]
+                normal.append(co)
+            if dataList[0] == "f":
+                tmp = []
+                for faceData in dataList[1:]:    
+                    vInfo = faceData.split('/')
+                    vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
+                    tmp.append(vIdx)
+                faces.append(tmp)
         data = fileDescriptor.readline()
     fileDescriptor.close()
     return vertsCoo, faces, normal
