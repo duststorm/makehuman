@@ -69,7 +69,7 @@ def loopFCurves(context, rig):
 
 def offsetFCurve(fcu, rootLoc, scn):            
     mode = fcu.data_path.split('.')[-1]
-    if mode == 'location' and scn['MhxLoopInPlace']:
+    if mode == 'location' and scn['McpLoopInPlace']:
         root = rootLoc[fcu.array_index]
         for kp in fcu.keyframe_points:
             frame = kp.co[0]
@@ -81,7 +81,7 @@ def offsetFCurve(fcu, rootLoc, scn):
 #
 
 def loopFCurve(fcu, t0, tn, scn):
-    delta = scn['MhxLoopBlendRange']
+    delta = scn['McpLoopBlendRange']
     
     v0 = fcu.evaluate(t0)
     vn = fcu.evaluate(tn)
@@ -118,11 +118,11 @@ def loopFCurve(fcu, t0, tn, scn):
 
 ########################################################################
 #
-#   class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_loop_fcurves"
+class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_loop_fcurves"
     bl_label = "Loop F-curves"
 
     def execute(self, context):
@@ -147,11 +147,11 @@ class LoopPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         ob = context.object
-        layout.prop(scn, "MhxLoopBlendRange")
-        layout.prop(scn, "MhxLoopInPlace")
-        #if scn['MhxLoopInPlace']:
-        #    layout.prop(scn, "MhxLoopZInPlace")
-        layout.operator("mhx.mocap_loop_fcurves")
+        layout.prop(scn, "McpLoopBlendRange")
+        layout.prop(scn, "McpLoopInPlace")
+        #if scn['McpLoopInPlace']:
+        #    layout.prop(scn, "McpLoopZInPlace")
+        layout.operator("mcp.mocap_loop_fcurves")
                 
 def register():
     bpy.utils.register_module(__name__)

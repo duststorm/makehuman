@@ -75,7 +75,7 @@ def findSrcArmature(context, rig):
         the.fixesList[name] = fixes
     else:
         (the.armature, name) = guessSrcArmature(rig)
-    rig['MhxArmature'] = name
+    rig['McpArmature'] = name
     print("Using matching armature %s." % name)
     return
 
@@ -85,7 +85,7 @@ def findSrcArmature(context, rig):
 
 def setArmature(rig):
     try:
-        name = rig['MhxArmature']
+        name = rig['McpArmature']
     except:
         raise NameError("No armature set")
     the.armature = the.armatures[name]
@@ -177,7 +177,7 @@ def guessSourceBone(name):
 def useCustomSrcRig(context):
     if the.sourceProps:
         try:
-            guess = context.scene.MhxGuessSrcRig
+            guess = context.scene.McpGuessSrcRig
         except:
             guess = True
         return not guess
@@ -205,7 +205,7 @@ def buildSrcArmature(context, rig):
         if user:
             raise NameError("Source bones %s and %s both assigned to %s" % (user, name, mhx1))
         used[mhx1] = name
-    fixes = target.createCustomFixes(scn['MhxSrcLegBentOut'], scn['MhxSrcLegRoll'], scn['MhxSrcArmBentDown'], scn['MhxSrcArmRoll'])
+    fixes = target.createCustomFixes(scn['McpSrcLegBentOut'], scn['McpSrcLegRoll'], scn['McpSrcArmBentDown'], scn['McpSrcArmRoll'])
     return (amt, "MySource", fixes)
 
 #
@@ -215,21 +215,21 @@ def buildSrcArmature(context, rig):
 def ensureSourceInited(context):
     scn = context.scene
     try:
-        scn.MhxGuessSrcRig
+        scn.McpGuessSrcRig
         return
     except:
         pass
-    expr = 'bpy.types.Scene.MhxGuessSrcRig = BoolProperty(name = "Guess source rig")'
+    expr = 'bpy.types.Scene.McpGuessSrcRig = BoolProperty(name = "Guess source rig")'
     exec(expr)    
-    scn.MhxGuessSrcRig = False
+    scn.McpGuessSrcRig = False
     return
 
 #
-#    class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
+#    class VIEW3D_OT_McpScanBvhButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_scan_bvh"
+class VIEW3D_OT_McpScanBvhButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_scan_bvh"
     bl_label = "Scan bvh file"
     bl_options = {'REGISTER'}
 
@@ -241,10 +241,10 @@ class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
         scn = context.scene
         root = load.readBvhFile(context, self.filepath, scn, True)
         (the.sourceProps, the.sourceEnums) = makeSourceBoneList(scn, root)
-        scn['MhxSrcArmBentDown'] = 0.0
-        scn['MhxSrcArmRoll'] = 0.0
-        scn['MhxSrcLegBentOut'] = 0.0
-        scn['MhxSrcLegRoll'] = 0.0
+        scn['McpSrcArmBentDown'] = 0.0
+        scn['McpSrcArmRoll'] = 0.0
+        scn['McpSrcLegBentOut'] = 0.0
+        scn['McpSrcLegRoll'] = 0.0
         ensureSourceInited(context)
         return{'FINISHED'}    
 
@@ -255,14 +255,14 @@ class VIEW3D_OT_MhxScanBvhButton(bpy.types.Operator):
 #
 #    saveSourceBones(context, path):
 #    loadSourceBones(context, path):
-#    class VIEW3D_OT_MhxLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
+#    class VIEW3D_OT_McpLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
 #
 
 def saveSourceBones(context, path):
     scn = context.scene
     fp = open(path, "w")
     fp.write("Settings\n")
-    for prop in ['MhxSrcArmBentDown','MhxSrcArmRoll','MhxSrcLegBentOut','MhxSrcLegRoll']:
+    for prop in ['McpSrcArmBentDown','McpSrcArmRoll','McpSrcLegBentOut','McpSrcLegRoll']:
         fp.write("%s %s\n" % (prop, scn[prop]))
     fp.write("Bones\n")
     for prop in the.sourceProps:
@@ -298,8 +298,8 @@ def loadSourceBones(context, path):
         defineSourceProp(prop[2:], the.sourceEnums)
     return
         
-class VIEW3D_OT_MhxLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mhx.mocap_load_save_source_bones"
+class VIEW3D_OT_McpLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mcp.mocap_load_save_source_bones"
     bl_label = "Load/save source bones"
 
     loadSave = bpy.props.StringProperty()
@@ -337,23 +337,23 @@ class MhxSourceBonesPanel(bpy.types.Panel):
         scn = context.scene
         rig = context.object
         if the.sourceProps:
-            layout.operator("mhx.mocap_scan_bvh", text="Rescan bvh file")    
+            layout.operator("mcp.mocap_scan_bvh", text="Rescan bvh file")    
         else:
-            layout.operator("mhx.mocap_scan_bvh", text="Scan bvh file")    
-        layout.operator("mhx.mocap_load_save_source_bones", text='Load source bones').loadSave = 'load'        
-        layout.operator("mhx.mocap_load_save_source_bones", text='Save source bones').loadSave = 'save'        
+            layout.operator("mcp.mocap_scan_bvh", text="Scan bvh file")    
+        layout.operator("mcp.mocap_load_save_source_bones", text='Load source bones').loadSave = 'load'        
+        layout.operator("mcp.mocap_load_save_source_bones", text='Save source bones').loadSave = 'save'        
         if not the.sourceProps:
             return
         layout.separator()
-        layout.prop(scn, 'MhxGuessSrcRig')
+        layout.prop(scn, 'McpGuessSrcRig')
         layout.label("Arms")
         row = layout.row()
-        row.prop(scn, '["MhxSrcArmBentDown"]', text='Down')
-        row.prop(scn, '["MhxSrcArmRoll"]', text='Roll')
+        row.prop(scn, '["McpSrcArmBentDown"]', text='Down')
+        row.prop(scn, '["McpSrcArmRoll"]', text='Roll')
         layout.label("Legs")
         row = layout.row()
-        row.prop(scn, '["MhxSrcLegBentOut"]', text='Out')
-        row.prop(scn, '["MhxSrcLegRoll"]', text='Roll')
+        row.prop(scn, '["McpSrcLegBentOut"]', text='Out')
+        row.prop(scn, '["McpSrcLegRoll"]', text='Roll')
         for prop in the.sourceProps:
             layout.prop_menu_enum(scn, prop)
 

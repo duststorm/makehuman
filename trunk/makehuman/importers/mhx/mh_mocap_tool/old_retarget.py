@@ -574,8 +574,8 @@ def retargetMhxRig(context, srcRig, trgRig):
     insertAnimation(context, srcRig, srcAnimations, rig_mhx.FkBoneList)
     onoff = toggle.toggleLimitConstraints(trgRig)
     toggle.setLimitConstraints(trgRig, 0.0)
-    if scn['MhxApplyFixes']:
-        srcFixes = the.fixesList[srcRig['MhxArmature']]
+    if scn['McpApplyFixes']:
+        srcFixes = the.fixesList[srcRig['McpArmature']]
     else:
         srcFixes = None
     #debugOpen()
@@ -656,10 +656,10 @@ def loadRetargetSimplify(context, filepath):
     (srcRig, action) = importAndRename(context, filepath)
     retargetMhxRig(context, srcRig, trgRig)
     scn = context.scene
-    if scn['MhxDoSimplify']:
+    if scn['McpDoSimplify']:
         simplify.simplifyFCurves(context, trgRig, False, False)
-    if scn['MhxRescale']:
-        simplify.rescaleFCurves(context, trgRig, scn.MhxRescaleFactor)
+    if scn['McpRescale']:
+        simplify.rescaleFCurves(context, trgRig, scn.McpRescaleFactor)
     deleteRig(context, srcRig, action, 'Y_')
     time2 = time.clock()
     print("%s finished in %.3f s" % (filepath, time2-time1))
@@ -668,11 +668,11 @@ def loadRetargetSimplify(context, filepath):
 
 ########################################################################
 #
-#   class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
+#   class VIEW3D_OT_OldLoadBvhButton(bpy.types.Operator, ImportHelper):
 #
 
-class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mhx.mocap_load_bvh"
+class VIEW3D_OT_OldLoadBvhButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mcp.old_load_bvh"
     bl_label = "Load BVH file (.bvh)"
 
     filename_ext = ".bvh"
@@ -682,8 +682,8 @@ class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
     def execute(self, context):
         scn = context.scene
         (srcRig, action) = importAndRename(context, self.properties.filepath)
-        if scn['MhxRescale']:
-            simplify.rescaleFCurves(context, srcRig, scn.MhxRescaleFactor)
+        if scn['McpRescale']:
+            simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
         print("%s imported" % self.properties.filepath)
         return{'FINISHED'}    
 
@@ -693,11 +693,11 @@ class VIEW3D_OT_MhxLoadBvhButton(bpy.types.Operator, ImportHelper):
 
 
 #
-#   class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
+#   class VIEW3D_OT_OldRetargetMhxButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_retarget_mhx"
+class VIEW3D_OT_OldRetargetMhxButton(bpy.types.Operator):
+    bl_idname = "mcp.old_retarget_mhx"
     bl_label = "Retarget selected to MHX"
 
     def execute(self, context):
@@ -710,11 +710,11 @@ class VIEW3D_OT_MhxRetargetMhxButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   class VIEW3D_OT_MhxLoadRetargetSimplify(bpy.types.Operator):
+#   class VIEW3D_OT_OldLoadRetargetSimplify(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mhx.mocap_load_retarget_simplify"
+class VIEW3D_OT_OldLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mcp.old_load_retarget_simplify"
     bl_label = "Load, retarget, simplify"
 
     filename_ext = ".bvh"
@@ -730,11 +730,11 @@ class VIEW3D_OT_MhxLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
         return {'RUNNING_MODAL'}    
 
 #
-#   class RetargetPanel(bpy.types.Panel):
+#   class OldRetargetPanel(bpy.types.Panel):
 #
 
-class RetargetPanel(bpy.types.Panel):
-    bl_label = "Mocap: Load and retarget"
+class OldRetargetPanel(bpy.types.Panel):
+    bl_label = "Mocap: Old retarget"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     
@@ -747,17 +747,17 @@ class RetargetPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         ob = context.object
-        layout.operator("mhx.mocap_load_bvh")
-        layout.operator("mhx.mocap_retarget_mhx")
-        layout.operator("mhx.mocap_load_retarget_simplify")
+        layout.operator("mcp.old_load_bvh")
+        layout.operator("mcp.old_retarget_mhx")
+        layout.operator("mcp.old_load_retarget_simplify")
         layout.separator()
-        layout.prop(scn, "MhxBvhScale")
-        layout.prop(scn, "MhxAutoScale")
-        layout.prop(scn, "MhxStartFrame")
-        layout.prop(scn, "MhxEndFrame")
-        layout.prop(scn, "MhxRot90Anim")
-        layout.prop(scn, "MhxDoSimplify")
-        layout.prop(scn, "MhxApplyFixes")
+        layout.prop(scn, "McpBvhScale")
+        layout.prop(scn, "McpAutoScale")
+        layout.prop(scn, "McpStartFrame")
+        layout.prop(scn, "McpEndFrame")
+        layout.prop(scn, "McpRot90Anim")
+        layout.prop(scn, "McpDoSimplify")
+        layout.prop(scn, "McpApplyFixes")
 
 def register():
     bpy.utils.register_module(__name__)

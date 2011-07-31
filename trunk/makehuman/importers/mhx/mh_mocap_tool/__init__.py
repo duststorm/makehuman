@@ -87,7 +87,8 @@ if "bpy" in locals():
     imp.reload(globvar)
     imp.reload(props)
     imp.reload(load)
-    imp.reload(retarget)
+    imp.reload(old_retarget)
+    imp.reload(new_retarget)
     imp.reload(source)
     imp.reload(target)
     imp.reload(toggle)
@@ -115,7 +116,8 @@ else:
     from . import globvar
     from . import props
     from . import load
-    from . import retarget
+    from . import old_retarget
+    from . import new_retarget
     from . import source
     from . import target
     from . import toggle

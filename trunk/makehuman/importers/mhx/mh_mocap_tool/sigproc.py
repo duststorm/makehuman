@@ -177,7 +177,7 @@ def reconstructFCurves(context):
 #
 
 class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
-    bl_idname = "mhx.calc_filters"
+    bl_idname = "mcp.calc_filters"
     bl_label = "Calc filters"
 
     def execute(self, context):
@@ -190,7 +190,7 @@ class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_ReconstructFCurvesButton(bpy.types.Operator):
-    bl_idname = "mhx.reconstruct_fcurves"
+    bl_idname = "mcp.reconstruct_fcurves"
     bl_label = "Reconstruct F-curves"
 
     def execute(self, context):
@@ -215,13 +215,13 @@ class SigProcPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         ob = context.object
-        layout.operator("mhx.calc_filters")
+        layout.operator("mcp.calc_filters")
         try:
             fd = the.filterData[ob.name]
         except:
             fd = None
         if fd:
-            layout.operator("mhx.reconstruct_fcurves")
+            layout.operator("mcp.reconstruct_fcurves")
             for k in range(fd.fb-1):
                 layout.prop(ob, '["s_%d"]' % k)
 

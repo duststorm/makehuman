@@ -40,7 +40,7 @@ def listAllActions(context):
     for act in bpy.data.actions:
         name = act.name
         the.actions.append((name, name, name))
-    bpy.types.Scene.MhxActions = EnumProperty(
+    bpy.types.Scene.McpActions = EnumProperty(
         items = the.actions,
         name = "Actions")
     return
@@ -63,7 +63,7 @@ def findAction(name):
 def deleteAction(context):
     listAllActions(context)
     scn = context.scene
-    name = scn.MhxActions    
+    name = scn.McpActions    
     print('Delete action', name)    
     try:
         act = bpy.data.actions[name]
@@ -85,11 +85,11 @@ def deleteAction(context):
 
 ########################################################################
 #
-#   class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_update_action_list"
+class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_update_action_list"
     bl_label = "Update action list"
 
     @classmethod
@@ -101,16 +101,16 @@ class VIEW3D_OT_MhxUpdateActionListButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxDeleteButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_delete"
+class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_delete"
     bl_label = "Delete action"
 
     @classmethod
     def poll(cls, context):
-        return context.scene.MhxReallyDelete
+        return context.scene.McpReallyDelete
 
     def execute(self, context):
         deleteAction(context)
@@ -133,10 +133,10 @@ class ActionPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         layout.label('Manage actions')
-        layout.prop_menu_enum(context.scene, "MhxActions")
-        layout.operator("mhx.mocap_update_action_list")
-        layout.prop(context.scene, "MhxReallyDelete")
-        layout.operator("mhx.mocap_delete")
+        layout.prop_menu_enum(context.scene, "McpActions")
+        layout.operator("mcp.mocap_update_action_list")
+        layout.prop(context.scene, "McpReallyDelete")
+        layout.operator("mcp.mocap_delete")
 
 def register():
     bpy.utils.register_module(__name__)

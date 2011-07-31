@@ -33,87 +33,87 @@ def initInterface(context):
 
     # Load and retarget
     
-    bpy.types.Scene.MhxBvhScale = FloatProperty(
+    bpy.types.Scene.McpBvhScale = FloatProperty(
         name="Scale", 
         description="Scale the BVH by this value", 
         min=0.0001, max=1000000.0, 
         soft_min=0.001, soft_max=100.0,
         default=0.65)
 
-    bpy.types.Scene.MhxAutoScale = BoolProperty(
+    bpy.types.Scene.McpAutoScale = BoolProperty(
         name="Auto scale",
         description="Rescale skeleton to match target",
         default=True)
 
-    bpy.types.Scene.MhxStartFrame = IntProperty(
+    bpy.types.Scene.McpStartFrame = IntProperty(
         name="Start Frame", 
         description="Starting frame for the animation",
         default=1)
 
-    bpy.types.Scene.MhxEndFrame = IntProperty(
+    bpy.types.Scene.McpEndFrame = IntProperty(
         name="Last Frame", 
         description="Last frame for the animation",
         default=32000)
 
-    bpy.types.Scene.MhxRot90Anim = BoolProperty(
+    bpy.types.Scene.McpRot90Anim = BoolProperty(
         name="Rotate 90 deg", 
         description="Rotate 90 degress so Z points up",
         default=True)
 
-    bpy.types.Scene.MhxDoSimplify = BoolProperty(
+    bpy.types.Scene.McpDoSimplify = BoolProperty(
         name="Simplify FCurves", 
         description="Simplify FCurves",
         default=True)
         
-    bpy.types.Scene.MhxApplyFixes = BoolProperty(
+    bpy.types.Scene.McpApplyFixes = BoolProperty(
         name="Apply found fixes", 
         description="Apply found fixes",
         default=True)
 
     # Subsample and rescale
     
-    bpy.types.Scene.MhxSubsample = BoolProperty(
+    bpy.types.Scene.McpSubsample = BoolProperty(
         name="Subsample",
         default=False)
 
-    bpy.types.Scene.MhxSSFactor = IntProperty(
+    bpy.types.Scene.McpSSFactor = IntProperty(
         name="Subsample factor", 
         description="Sample only every n:th frame",
         min=1, default=1)
 
-    bpy.types.Scene.MhxRescale = BoolProperty(
+    bpy.types.Scene.McpRescale = BoolProperty(
         name="Rescale",
         description="Rescale F-curves after loading",
         default=False)
 
-    bpy.types.Scene.MhxRescaleFactor = IntProperty(
+    bpy.types.Scene.McpRescaleFactor = IntProperty(
         name="Rescale factor", 
         description="Factor for rescaling time",
         min=1, default=1)
 
-    bpy.types.Scene.MhxDefaultSS = BoolProperty(
+    bpy.types.Scene.McpDefaultSS = BoolProperty(
         name="Use default subsample",
         default=True)
 
     # Simplify
 
-    bpy.types.Scene.MhxSimplifyVisible = BoolProperty(
+    bpy.types.Scene.McpSimplifyVisible = BoolProperty(
         name="Only visible", 
         description="Simplify only visible F-curves",
         default=False)
 
-    bpy.types.Scene.MhxSimplifyMarkers = BoolProperty(
+    bpy.types.Scene.McpSimplifyMarkers = BoolProperty(
         name="Only between markers", 
         description="Simplify only between markers",
         default=False)
 
-    bpy.types.Scene.MhxErrorLoc = FloatProperty(
+    bpy.types.Scene.McpErrorLoc = FloatProperty(
         name="Max loc error", 
         description="Max error for location FCurves when doing simplification",
         min=0.001,
         default=0.01)
 
-    bpy.types.Scene.MhxErrorRot = FloatProperty(
+    bpy.types.Scene.McpErrorRot = FloatProperty(
         name="Max rot error", 
         description="Max error for rotation (degrees) FCurves when doing simplification",
         min=0.001,
@@ -121,46 +121,46 @@ def initInterface(context):
 
     # Loop
     
-    bpy.types.Scene.MhxLoopBlendRange = IntProperty(
+    bpy.types.Scene.McpLoopBlendRange = IntProperty(
         name="Blend range", 
         min=1,
         default=5)
     
-    bpy.types.Scene.MhxLoopInPlace = BoolProperty(
+    bpy.types.Scene.McpLoopInPlace = BoolProperty(
         name="Loop in place", 
         description="Remove location F-curves",
         default=False)
 
-    bpy.types.Scene.MhxLoopZInPlace = BoolProperty(
+    bpy.types.Scene.McpLoopZInPlace = BoolProperty(
         name="In place affects Z", 
         default=False)
 
     # Plant
     
-    bpy.types.Scene.MhxPlantCurrent = BoolProperty(
+    bpy.types.Scene.McpPlantCurrent = BoolProperty(
         name="Use current", 
         description="Plant at current",
         default=True)
 
-    bpy.types.Scene.MhxPlantLoc = BoolProperty(
+    bpy.types.Scene.McpPlantLoc = BoolProperty(
         name="Loc", 
         description="Plant location keys",
         default=True)
 
-    bpy.types.Scene.MhxPlantRot = BoolProperty(
+    bpy.types.Scene.McpPlantRot = BoolProperty(
         name="Rot", 
         description="Plant rotation keys",
         default=False)
 
     # Props
     
-    bpy.types.Scene.MhxDirectory = StringProperty(
+    bpy.types.Scene.McpDirectory = StringProperty(
         name="Directory", 
         description="Directory", 
         maxlen=1024,
         default='')
 
-    bpy.types.Scene.MhxPrefix = StringProperty(
+    bpy.types.Scene.McpPrefix = StringProperty(
         name="Prefix", 
         description="Prefix", 
         maxlen=1024,
@@ -168,12 +168,12 @@ def initInterface(context):
 
     # Manage actions
     
-    bpy.types.Scene.MhxReallyDelete = BoolProperty(
+    bpy.types.Scene.McpReallyDelete = BoolProperty(
         name="Really delete action", 
         description="Delete button deletes action permanently",
         default=False)
 
-    bpy.types.Scene.MhxActions = EnumProperty(
+    bpy.types.Scene.McpActions = EnumProperty(
         items = [],
         name = "Actions")
 
@@ -181,58 +181,58 @@ def initInterface(context):
     if scn:        
         # Load and retarget
         
-        scn['MhxBvhScale'] = 0.65
-        scn['MhxAutoScale'] = True
-        scn['MhxStartFrame'] = 1
-        scn['MhxEndFrame'] = 32000
-        scn['MhxRot90Anim'] = True
-        scn['MhxDoSimplify'] = True
+        scn['McpBvhScale'] = 0.65
+        scn['McpAutoScale'] = True
+        scn['McpStartFrame'] = 1
+        scn['McpEndFrame'] = 32000
+        scn['McpRot90Anim'] = True
+        scn['McpDoSimplify'] = True
 
         # Subsample and rescale
         
-        scn['MhxSubsample'] = True
-        scn['MhxSSFactor'] = 1
-        scn['MhxDefaultSS'] = True
-        scn['MhxRescaleFactor'] = 1
-        scn['MhxRescale'] = False
+        scn['McpSubsample'] = True
+        scn['McpSSFactor'] = 1
+        scn['McpDefaultSS'] = True
+        scn['McpRescaleFactor'] = 1
+        scn['McpRescale'] = False
         
         # Simplify
         
-        scn['MhxSimplifyVisible'] = False
-        scn['MhxSimplifyMarkers'] = False
-        scn['MhxApplyFixes'] = True
-        scn['MhxErrorLoc'] = 0.01
-        scn['MhxErrorRot'] = 0.1
+        scn['McpSimplifyVisible'] = False
+        scn['McpSimplifyMarkers'] = False
+        scn['McpApplyFixes'] = True
+        scn['McpErrorLoc'] = 0.01
+        scn['McpErrorRot'] = 0.1
         
         # Loop
     
-        scn['MhxLoopBlendRange'] = 5
-        scn['MhxLoopInPlace'] = False
-        scn['MhxLoopZInPlace'] = False
+        scn['McpLoopBlendRange'] = 5
+        scn['McpLoopInPlace'] = False
+        scn['McpLoopZInPlace'] = False
 
         # Plant
         
-        scn['MhxPlantCurrent'] = True
-        scn['MhxPlantLoc'] = True
-        scn['MhxPlantRot'] = False
+        scn['McpPlantCurrent'] = True
+        scn['McpPlantLoc'] = True
+        scn['McpPlantRot'] = False
 
         # Props
         
-        scn['MhxPrefix'] = "Female1_A"
-        scn['MhxDirectory'] = "~/makehuman/bvh/Female1_bvh"
+        scn['McpPrefix'] = "Female1_A"
+        scn['McpDirectory'] = "~/makehuman/bvh/Female1_bvh"
         
         # Manage actions            
         
-        scn['MhxReallyDelete'] = False
+        scn['McpReallyDelete'] = False
         action.listAllActions(context)
     else:
         print("Warning - no scene - scene properties not set")
 
-    bpy.types.Object.MhxArmature = StringProperty()
+    bpy.types.Object.McpArmature = StringProperty()
     
-    bpy.types.Object.MhxTogglePoleTargets = BoolProperty(default=True)
-    bpy.types.Object.MhxToggleIkLimits = BoolProperty(default=False)
-    bpy.types.Object.MhxToggleLimitConstraints = BoolProperty(default=True)
+    bpy.types.Object.McpTogglePoleTargets = BoolProperty(default=True)
+    bpy.types.Object.McpToggleIkLimits = BoolProperty(default=False)
+    bpy.types.Object.McpToggleLimitConstraints = BoolProperty(default=True)
 
 
 #
@@ -241,7 +241,7 @@ def initInterface(context):
 
 def ensureInited(context):
     try:
-        context.scene['MhxBvhScale']
+        context.scene['McpBvhScale']
         inited = True
     except:
         inited = False
@@ -287,7 +287,7 @@ def saveDefaults(context):
         print("Unable to open %s for writing" % filename)
         return
     for (key,value) in context.scene.items():
-        if key[:3] == 'Mhx':
+        if key[:3] == 'Mcp':
             fp.write("%s %s\n" % (key, value))
     fp.close()
     return
@@ -305,12 +305,12 @@ def getBone(rig, bone):
 
 ########################################################################
 #
-#   class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
-#   class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_init_interface"
+class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_init_interface"
     bl_label = "Initialize"
 
     def execute(self, context):
@@ -320,8 +320,8 @@ class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 
-class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_save_defaults"
+class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_save_defaults"
     bl_label = "Save defaults"
 
     def execute(self, context):
@@ -329,11 +329,11 @@ class VIEW3D_OT_MhxSaveDefaultsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#    class VIEW3D_OT_MhxCopyAnglesIKButton(bpy.types.Operator):
+#    class VIEW3D_OT_McpCopyAnglesIKButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxCopyAnglesIKButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_copy_angles_fk_ik"
+class VIEW3D_OT_McpCopyAnglesIKButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_copy_angles_fk_ik"
     bl_label = "Angles  --> IK"
 
     def execute(self, context):
@@ -344,7 +344,7 @@ class VIEW3D_OT_MhxCopyAnglesIKButton(bpy.types.Operator):
 
 #
 #    readDirectory(directory, prefix):
-#    class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
+#    class VIEW3D_OT_McpBatchButton(bpy.types.Operator):
 #
 
 def readDirectory(directory, prefix):
@@ -358,12 +358,12 @@ def readDirectory(directory, prefix):
             paths.append("%s/%s" % (realdir, fileName))
     return paths
 
-class VIEW3D_OT_MhxBatchButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_batch"
+class VIEW3D_OT_McpBatchButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_batch"
     bl_label = "Batch run"
 
     def execute(self, context):
-        paths = readDirectory(context.scene['MhxDirectory'], context.scene['MhxPrefix'])
+        paths = readDirectory(context.scene['McpDirectory'], context.scene['McpPrefix'])
         trgRig = context.object
         for filepath in paths:
             context.scene.objects.active = trgRig
@@ -389,15 +389,15 @@ class PropsPanel(bpy.types.Panel):
         scn = context.scene
         ob = context.object
                 
-        layout.operator("mhx.mocap_init_interface")
-        layout.operator("mhx.mocap_save_defaults")
-        layout.operator("mhx.mocap_copy_angles_fk_ik")
+        layout.operator("mcp.mocap_init_interface")
+        layout.operator("mcp.mocap_save_defaults")
+        layout.operator("mcp.mocap_copy_angles_fk_ik")
 
         layout.separator()
         layout.label('Batch conversion')
-        layout.prop(scn, "MhxDirectory")
-        layout.prop(scn, "MhxPrefix")
-        layout.operator("mhx.mocap_batch")
+        layout.prop(scn, "McpDirectory")
+        layout.prop(scn, "McpPrefix")
+        layout.operator("mcp.mocap_batch")
         return
 
 def register():

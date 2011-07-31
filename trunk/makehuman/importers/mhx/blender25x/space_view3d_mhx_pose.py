@@ -625,9 +625,9 @@ def createExpressionDrivers(context):
             except:
                 exists = False
             if exists:
-                theRig[name].min = 0.0
-                theRig[name].max = 1.0
-                bpy.ops.wm.properties_edit(data_path="object", property=name, min=0, max=1)
+                #theRig[name].min = 0.0
+                #theRig[name].max = 1.0
+                #bpy.ops.wm.properties_edit(data_path="object", property=name, min=0, max=1)
                 createExpressionDriver(name, skeys)
     return
                 

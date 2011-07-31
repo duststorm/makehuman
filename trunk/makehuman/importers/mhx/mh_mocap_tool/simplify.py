@@ -33,14 +33,14 @@ from . import load
 
 def simplifyFCurves(context, rig, useVisible, useMarkers):
     scn = context.scene
-    if not scn.MhxDoSimplify:
+    if not scn.McpDoSimplify:
         return
     (fcurves, minTime, maxTime) = getRigFCurves(rig, useVisible, useMarkers, scn)
     if not fcurves:
         return
 
     for fcu in fcurves:
-        simplifyFCurve(fcu, rig.animation_data.action, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
+        simplifyFCurve(fcu, rig.animation_data.action, scn.McpErrorLoc, scn.McpErrorRot, minTime, maxTime)
     load.setInterpolation(rig)
     print("Curves simplified")
     return
@@ -283,25 +283,25 @@ def addFCurveInserts(fcu, inserts, limitData):
 
 ########################################################################
 #
-#   class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxSimplifyFCurvesButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_simplify_fcurves"
+class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_simplify_fcurves"
     bl_label = "Simplify FCurves"
 
     def execute(self, context):
         scn = context.scene
-        simplifyFCurves(context, context.object, scn.MhxSimplifyVisible, scn.MhxSimplifyMarkers)
+        simplifyFCurves(context, context.object, scn.McpSimplifyVisible, scn.McpSimplifyMarkers)
         return{'FINISHED'}    
 
-class VIEW3D_OT_MhxRescaleFCurvesButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_rescale_fcurves"
+class VIEW3D_OT_McpRescaleFCurvesButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_rescale_fcurves"
     bl_label = "Rescale FCurves"
 
     def execute(self, context):
         scn = context.scene
-        rescaleFCurves(context, context.object, scn.MhxRescaleFactor)
+        rescaleFCurves(context, context.object, scn.McpRescaleFactor)
         return{'FINISHED'}    
 
 #
@@ -321,11 +321,11 @@ class SimplifyPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scn = context.scene
-        layout.prop(scn, "MhxErrorLoc")
-        layout.prop(scn, "MhxErrorRot")
-        layout.prop(scn, "MhxSimplifyVisible")
-        layout.prop(scn, "MhxSimplifyMarkers")
-        layout.operator("mhx.mocap_simplify_fcurves")
+        layout.prop(scn, "McpErrorLoc")
+        layout.prop(scn, "McpErrorRot")
+        layout.prop(scn, "McpSimplifyVisible")
+        layout.prop(scn, "McpSimplifyMarkers")
+        layout.operator("mcp.mocap_simplify_fcurves")
 
 #
 #   class SubsamplePanel(bpy.types.Panel):
@@ -345,13 +345,13 @@ class SubsamplePanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         ob = context.object
-        layout.prop(scn, "MhxDefaultSS")
-        if not scn['MhxDefaultSS']:
-            layout.prop(scn, "MhxSubsample")
-            layout.prop(scn, "MhxSSFactor")
-            layout.prop(scn, "MhxRescale")
-            layout.prop(scn, "MhxRescaleFactor")
-            layout.operator("mhx.mocap_rescale_fcurves")
+        layout.prop(scn, "McpDefaultSS")
+        if not scn['McpDefaultSS']:
+            layout.prop(scn, "McpSubsample")
+            layout.prop(scn, "McpSSFactor")
+            layout.prop(scn, "McpRescale")
+            layout.prop(scn, "McpRescaleFactor")
+            layout.operator("mcp.mocap_rescale_fcurves")
                 
 def register():
     bpy.utils.register_module(__name__)

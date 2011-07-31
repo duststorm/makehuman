@@ -67,10 +67,10 @@ def plantKeys(context):
         if fcu.data_path == rotPath:
             rots.append(fcu)
 
-    useCrnt = scn['MhxPlantCurrent']
-    if scn['MhxPlantLoc']:
+    useCrnt = scn['McpPlantCurrent']
+    if scn['McpPlantLoc']:
         plantFCurves(locs, first, last, useCrnt, pb.location)
-    if scn['MhxPlantRot']:
+    if scn['McpPlantRot']:
         plantFCurves(rots, first, last, useCrnt, pbRot)
     return
 
@@ -105,11 +105,11 @@ def plantFCurves(fcurves, first, last, useCrnt, values):
 
 ########################################################################
 #
-#   class VIEW3D_OT_MhxPlantButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpPlantButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxPlantButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_plant"
+class VIEW3D_OT_McpPlantButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_plant"
     bl_label = "Plant"
 
     def execute(self, context):
@@ -135,10 +135,10 @@ class PlantPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         row = layout.row()
-        row.prop(scn, "MhxPlantLoc")
-        row.prop(scn, "MhxPlantRot")
-        layout.prop(scn, "MhxPlantCurrent")
-        layout.operator("mhx.mocap_plant")
+        row.prop(scn, "McpPlantLoc")
+        row.prop(scn, "McpPlantRot")
+        layout.prop(scn, "McpPlantCurrent")
+        layout.operator("mcp.mocap_plant")
 
 def register():
     bpy.utils.register_module(__name__)

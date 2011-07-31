@@ -36,12 +36,12 @@ def togglePoleTargets(trgRig):
         hide = False
         poletar = trgRig
         res = 'ON'
-        trgRig.MhxTogglePoleTargets = True
+        trgRig.McpTogglePoleTargets = True
     else:
         hide = True
         poletar = None
         res = 'OFF'
-        trgRig.MhxTogglePoleTargets = False
+        trgRig.McpTogglePoleTargets = False
     for suffix in ['_L', '_R']:
         for name in ['ElbowPT', 'ElbowLinkPT', 'Elbow', 'KneePT', 'KneeLinkPT', 'Knee']:
             try:
@@ -62,11 +62,11 @@ def toggleIKLimits(trgRig):
     if pbones['UpLeg_L'].use_ik_limit_x:
         use = False
         res = 'OFF'
-        trgRig.MhxToggleIkLimits = False
+        trgRig.McpToggleIkLimits = False
     else:
         use = True
         res = 'ON'
-        trgRig.MhxToggleIkLimits = True
+        trgRig.McpToggleIkLimits = True
     for suffix in ['_L', '_R']:
         for name in ['UpArm', 'LoArm', 'UpLeg', 'LoLeg']:
             pb = pbones[name+suffix]
@@ -83,7 +83,7 @@ def toggleIKLimits(trgRig):
 def toggleLimitConstraints(trgRig):
     pbones = trgRig.pose.bones
     first = True
-    trgRig.MhxToggleLimitConstraints = False
+    trgRig.McpToggleLimitConstraints = False
     for pb in pbones:
         if onUserLayer(pb.bone.layers):
             for cns in pb.constraints:
@@ -99,7 +99,7 @@ def toggleLimitConstraints(trgRig):
                         else:
                             inf = 1.0
                             res = 'ON'
-                            trgRig.MhxToggleLimitConstraints = True
+                            trgRig.McpToggleLimitConstraints = True
                     cns.influence = inf
     if first:
         return 'NOT FOUND'
@@ -144,11 +144,11 @@ def silenceConstraints(rig):
 
 ########################################################################
 #
-#   class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpTogglePoleTargetsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_toggle_pole_targets"
+class VIEW3D_OT_McpTogglePoleTargetsButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_toggle_pole_targets"
     bl_label = "Toggle pole targets"
 
     def execute(self, context):
@@ -157,11 +157,11 @@ class VIEW3D_OT_MhxTogglePoleTargetsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpToggleIKLimitsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_toggle_ik_limits"
+class VIEW3D_OT_McpToggleIKLimitsButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_toggle_ik_limits"
     bl_label = "Toggle IK limits"
 
     def execute(self, context):
@@ -170,11 +170,11 @@ class VIEW3D_OT_MhxToggleIKLimitsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpToggleLimitConstraintsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_toggle_limit_constraints"
+class VIEW3D_OT_McpToggleLimitConstraintsButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_toggle_limit_constraints"
     bl_label = "Toggle Limit constraints"
 
     def execute(self, context):
@@ -183,11 +183,11 @@ class VIEW3D_OT_MhxToggleLimitConstraintsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpSilenceConstraintsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxSilenceConstraintsButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_silence_constraints"
+class VIEW3D_OT_McpSilenceConstraintsButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_silence_constraints"
     bl_label = "Silence constraints"
 
     def execute(self, context):
@@ -213,14 +213,14 @@ class ToggleConstraintPanel(bpy.types.Panel):
         layout = self.layout
         ob = context.object
         row = layout.row()
-        row.operator("mhx.mocap_toggle_pole_targets")
-        row.prop(ob, "MhxTogglePoleTargets")
+        row.operator("mcp.mocap_toggle_pole_targets")
+        row.prop(ob, "McpTogglePoleTargets")
         row = layout.row()
-        row.operator("mhx.mocap_toggle_ik_limits")
-        row.prop(ob, "MhxToggleIkLimits")
+        row.operator("mcp.mocap_toggle_ik_limits")
+        row.prop(ob, "McpToggleIkLimits")
         row = layout.row()
-        row.operator("mhx.mocap_toggle_limit_constraints")
-        row.prop(ob, "MhxToggleLimitConstraints")
+        row.operator("mcp.mocap_toggle_limit_constraints")
+        row.prop(ob, "McpToggleLimitConstraints")
 
 def register():
     bpy.utils.register_module(__name__)

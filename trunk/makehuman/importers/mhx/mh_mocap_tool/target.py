@@ -99,7 +99,7 @@ def getParentName(b):
 def guessTargetArmature(trgRig):
     bones = trgRig.data.bones.keys()
     try:
-        custom = trgRig['MhxTargetRig']
+        custom = trgRig['McpTargetRig']
     except:
         custom = False
     if custom:
@@ -142,7 +142,7 @@ def guessTargetArmature(trgRig):
         the.trgBone = {}
         the.srcBone = {}
         if the.target == T_Custom:
-            (bones, the.parents, the.targetRolls, the.targetMats, the.IkBoneList, the.IkParents) = makeTargetAssoc(trgRig)
+            (bones, ikBones, the.parents, the.targetRolls, the.targetMats, the.IkBoneList, the.IkParents) = makeTargetAssoc(trgRig)
         elif the.target == T_Rorkimaru:
             bones = rig_rorkimaru.Bones
             the.IkBoneList = rig_game.IkBoneList
@@ -226,8 +226,8 @@ TargetIkBoneNames = [
 
 #
 #    initTargetCharacter(rig):
-#    class VIEW3D_OT_MhxInitTargetCharacterButton(bpy.types.Operator):
-#    class VIEW3D_OT_MhxUnInitTargetCharacterButton(bpy.types.Operator):
+#    class VIEW3D_OT_McpInitTargetCharacterButton(bpy.types.Operator):
+#    class VIEW3D_OT_McpUnInitTargetCharacterButton(bpy.types.Operator):
 #
 
 def initTargetCharacter(rig):
@@ -239,13 +239,13 @@ def initTargetCharacter(rig):
         except:
             (mhx, text, fakepar, copyrot) = bn
         rig[mhx] = mhx
-    rig['MhxTargetRig'] = True
-    rig['MhxArmBentDown'] = 0.0
-    rig['MhxLegBentOut'] = 0.0
+    rig['McpTargetRig'] = True
+    rig['McpArmBentDown'] = 0.0
+    rig['McpLegBentOut'] = 0.0
     return
     
-class VIEW3D_OT_MhxInitTargetCharacterButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_init_target_character"
+class VIEW3D_OT_McpInitTargetCharacterButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_init_target_character"
     bl_label = "Initialize target character"
     bl_options = {'REGISTER'}
 
@@ -254,13 +254,13 @@ class VIEW3D_OT_MhxInitTargetCharacterButton(bpy.types.Operator):
         print("Target character initialized")
         return{'FINISHED'}    
 
-class VIEW3D_OT_MhxUnInitTargetCharacterButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_uninit_target_character"
+class VIEW3D_OT_McpUnInitTargetCharacterButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_uninit_target_character"
     bl_label = "Uninitialize"
     bl_options = {'REGISTER'}
 
     def execute(self, context):
-        context.object['MhxTargetRig'] = False
+        context.object['McpTargetRig'] = False
         print("Target character uninitialized")
         return{'FINISHED'}    
 
@@ -360,7 +360,7 @@ def makeTargetAssoc(rig):
         ikParents[bone] = (par, fakePar, copyRot, False)
         parAssoc[bone] = par
 
-    fixMats = createCustomFixes(rig['MhxLegBentOut'], 0, rig['MhxArmBentDown'], 0)
+    fixMats = createCustomFixes(rig['McpLegBentOut'], 0, rig['McpArmBentDown'], 0)
 
     print("Associations:")    
     print("            Bone :       Mhx bone         Parent  Roll")
@@ -372,7 +372,7 @@ def makeTargetAssoc(rig):
     for (bname, mhx) in ikBoneAssoc:
         (par, fakePar, copyRot, reverse) = ikParents[bname]
         print("  %14s : %14s %14s %14s %14s" % (bname, mhx, par, fakePar, copyRot))
-    return (boneAssoc, parAssoc, rolls, fixMats, ikBones, ikParents)
+    return (boneAssoc, ikBoneAssoc, parAssoc, rolls, fixMats, ikBones, ikParents)
 
 
 #
@@ -443,8 +443,8 @@ def realBone(bone, rig, n, assoc):
             return realBone(rb, rig, n+1, assoc)
     return (bone, False)
 
-class VIEW3D_OT_MhxMakeTargetAssocButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_make_assoc"
+class VIEW3D_OT_McpMakeTargetAssocButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_make_assoc"
     bl_label = "Make target associations"
     bl_options = {'REGISTER'}
 
@@ -465,8 +465,8 @@ def unrollAll(context):
     bpy.ops.object.mode_set(mode='POSE')
     return
 
-class VIEW3D_OT_MhxUnrollAllButton(bpy.types.Operator):
-    bl_idname = "mhx.mocap_unroll_all"
+class VIEW3D_OT_McpUnrollAllButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_unroll_all"
     bl_label = "Unroll all"
     bl_options = {'REGISTER'}
 
@@ -478,7 +478,7 @@ class VIEW3D_OT_MhxUnrollAllButton(bpy.types.Operator):
 #
 #    saveTargetBones(context, path):
 #    loadTargetBones(context, path):
-#    class VIEW3D_OT_MhxLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
+#    class VIEW3D_OT_McpLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
 #
 
 def saveTargetBones(context, path):
@@ -516,8 +516,8 @@ def loadTargetBones(context, path):
     fp.close()
     return
         
-class VIEW3D_OT_MhxLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mhx.mocap_load_save_target_bones"
+class VIEW3D_OT_McpLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mcp.mocap_load_save_target_bones"
     bl_label = "Load/save target bones"
 
     loadSave = bpy.props.StringProperty()
@@ -553,22 +553,22 @@ class MhxTargetBonesPanel(bpy.types.Panel):
         layout = self.layout
         rig = context.object
         try:
-            inited = rig['MhxTargetRig']
+            inited = rig['McpTargetRig']
         except:
             inited = False
 
         if not inited:
-            layout.operator("mhx.mocap_init_target_character", text='Initialize target character')
+            layout.operator("mcp.mocap_init_target_character", text='Initialize target character')
             return
 
-        layout.operator("mhx.mocap_init_target_character", text='Reinitialize target character')        
-        layout.operator("mhx.mocap_uninit_target_character")        
-        layout.operator("mhx.mocap_load_save_target_bones", text='Load target bones').loadSave = 'load'        
-        layout.operator("mhx.mocap_load_save_target_bones", text='Save target bones').loadSave = 'save'        
-        layout.operator("mhx.mocap_make_assoc")        
-        layout.operator("mhx.mocap_unroll_all")        
-        #layout.prop(rig, '["MhxArmBentDown"]', text='Arm bent down')
-        #layout.prop(rig, '["MhxLegBentOut"]', text='Leg bent out')
+        layout.operator("mcp.mocap_init_target_character", text='Reinitialize target character')        
+        layout.operator("mcp.mocap_uninit_target_character")        
+        layout.operator("mcp.mocap_load_save_target_bones", text='Load target bones').loadSave = 'load'        
+        layout.operator("mcp.mocap_load_save_target_bones", text='Save target bones').loadSave = 'save'        
+        layout.operator("mcp.mocap_make_assoc")        
+        layout.operator("mcp.mocap_unroll_all")        
+        #layout.prop(rig, '["McpArmBentDown"]', text='Arm bent down')
+        #layout.prop(rig, '["McpLegBentOut"]', text='Leg bent out')
 
         layout.label("FK bones")
         for bn in TargetBoneNames:

@@ -117,15 +117,15 @@ Epsilon = 1e-5
 
 def readBvhFile(context, filepath, scn, scan):
     props.ensureInited(context)
-    scale = scn['MhxBvhScale']
-    startFrame = scn['MhxStartFrame']
-    endFrame = scn['MhxEndFrame']
-    rot90 = scn['MhxRot90Anim']
-    if (scn['MhxSubsample']):
-    	ssFactor = scn['MhxSSFactor']
+    scale = scn['McpBvhScale']
+    startFrame = scn['McpStartFrame']
+    endFrame = scn['McpEndFrame']
+    rot90 = scn['McpRot90Anim']
+    if (scn['McpSubsample']):
+    	ssFactor = scn['McpSSFactor']
     else:
     	ssFactor = 1
-    defaultSS = scn['MhxDefaultSS']
+    defaultSS = scn['McpDefaultSS']
     print(filepath)
     fileName = os.path.realpath(os.path.expanduser(filepath))
     (shortName, ext) = os.path.splitext(fileName)
@@ -163,6 +163,8 @@ def readBvhFile(context, filepath, scn, scan):
             rig = bpy.data.objects.new("BvhRig", amt)
             scn.objects.link(rig)
             scn.objects.active = rig
+            scn.update()
+            bpy.ops.object.mode_set(mode='EDIT')
             bpy.ops.object.mode_set(mode='EDIT')
             root.build(amt, Vector((0,0,0)), None)
             #root.display('')
@@ -510,14 +512,14 @@ def copyAnglesIK(context):
 #
 
 def rescaleRig(scn, trgRig, srcRig, action):
-    if not scn['MhxAutoScale']:
+    if not scn['McpAutoScale']:
         return
     upleg = target.getTrgBone('UpLeg_L')
     trgScale = trgRig.data.bones[upleg].length
     srcScale = srcRig.data.bones['UpLeg_L'].length
     scale = trgScale/srcScale
     print("Rescale %s with factor %f" % (scn.objects.active, scale))
-    scn['MhxBvhScale'] = scale
+    scn['McpBvhScale'] = scale
     
     bpy.ops.object.mode_set(mode='EDIT')
     ebones = srcRig.data.edit_bones
