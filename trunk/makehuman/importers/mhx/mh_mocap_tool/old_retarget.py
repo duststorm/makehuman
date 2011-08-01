@@ -613,24 +613,6 @@ def normalizeAnimation(rig):
     return        
 
 #
-#    deleteRig(context, rig00, action, prefix):
-#
-
-def deleteRig(context, rig00, action, prefix):
-    context.scene.objects.unlink(rig00)
-    if rig00.users == 0:
-        bpy.data.objects.remove(rig00)
-        #del rig00
-    if bpy.data.actions:
-        for act in bpy.data.actions:
-            if act.name[0:2] == prefix:
-                act.use_fake_user = False
-                if act.users == 0:
-                    bpy.data.actions.remove(act)
-                    del act
-    return
-
-#
 #    loadRetargetSimplify(context, filepath):
 #
 
@@ -639,14 +621,14 @@ def loadRetargetSimplify(context, filepath):
     time1 = time.clock()
     scn = context.scene
     trgRig = context.object
-    rig = load.readBvhFile(context, filepath, scn, False)
-    (srcRig, action) = load.renameBvh(context, rig, trgRig)
+    srcRig = load.readBvhFile(context, filepath, scn, False)
+    load.renameAndRescaleBvh(context, srcRig, trgRig)
     retargetMhxRig(context, srcRig, trgRig)
     if scn['McpDoSimplify']:
         simplify.simplifyFCurves(context, trgRig, False, False)
     if scn['McpRescale']:
         simplify.rescaleFCurves(context, trgRig, scn.McpRescaleFactor)
-    deleteRig(context, srcRig, action, 'Y_')
+    load.deleteSourceRig(context, srcRig, 'Y_')
     time2 = time.clock()
     print("%s finished in %.3f s" % (filepath, time2-time1))
     return
@@ -661,7 +643,7 @@ class VIEW3D_OT_OldRetargetMhxButton(bpy.types.Operator):
 
     def execute(self, context):
         trgRig = context.object
-        target.guessTargetArmature(trgRig)
+        target.guessTargetArmature(trgRig, context.scene)
         for srcRig in context.selected_objects:
             if srcRig != trgRig:
                 normalizeAnimation(srcRig)

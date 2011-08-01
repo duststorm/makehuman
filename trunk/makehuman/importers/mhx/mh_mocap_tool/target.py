@@ -93,10 +93,10 @@ def getParentName(b):
         return b
 
 #
-#   guessTargetArmature(trgRig):
+#   guessTargetArmature(trgRig, scn):
 #
 
-def guessTargetArmature(trgRig):
+def guessTargetArmature(trgRig, scn):
     bones = trgRig.data.bones.keys()
     try:
         custom = trgRig['McpTargetRig']
@@ -142,7 +142,7 @@ def guessTargetArmature(trgRig):
         the.trgBone = {}
         the.srcBone = {}
         if the.target == T_Custom:
-            (bones, ikBones, the.parents, the.targetRolls, the.targetMats, the.IkBoneList, the.IkParents) = makeTargetAssoc(trgRig)
+            (bones, ikBones, the.parents, the.targetRolls, the.targetMats, the.IkBoneList, the.IkParents) = makeTargetAssoc(trgRig, scn)
         elif the.target == T_Rorkimaru:
             bones = rig_rorkimaru.Bones
             the.IkBoneList = rig_game.IkBoneList
@@ -265,7 +265,7 @@ class VIEW3D_OT_McpUnInitTargetCharacterButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#    assocTargetBones(rig, names, xtraAssoc):
+#    assocTargetBones(rig,, names, xtraAssoc):
 #
 
 def assocTargetBones(rig, names, xtraAssoc):
@@ -343,10 +343,11 @@ def findFakeParent(mhx, boneAssoc):
     raise NameError("Did not find fake parent %s" % mhx)
 
 #
-#    makeTargetAssoc(rig):
+#    makeTargetAssoc(rig, scn):
 #
 
-def makeTargetAssoc(rig):
+def makeTargetAssoc(rig, scn):
+    scn.objects.active = rig    
     (boneAssoc, parAssoc, rolls) = assocTargetBones(rig, TargetBoneNames, [])
     (ikBoneAssoc, ikParAssoc, ikRolls) = assocTargetBones(rig, TargetIkBoneNames, boneAssoc)
 
@@ -449,7 +450,7 @@ class VIEW3D_OT_McpMakeTargetAssocButton(bpy.types.Operator):
     bl_options = {'REGISTER'}
 
     def execute(self, context):
-        makeTargetAssoc(context.object)
+        makeTargetAssoc(context.object, context.scene)
         print("Associations made")
         return{'FINISHED'}    
 

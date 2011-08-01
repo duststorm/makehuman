@@ -488,6 +488,29 @@ def renameBvhRig(srcRig, filepath):
     action = srcRig.animation_data.action
     action.name = name
     return 
+    
+#
+#    deleteSourceRig(context, rig, prefix):
+#
+
+def deleteSourceRig(context, rig, prefix):
+    ob = context.object
+    scn = context.scene
+    scn.objects.active = rig
+    bpy.ops.object.mode_set(mode='OBJECT')
+    scn.objects.active = ob    
+    scn.objects.unlink(rig)
+    if rig.users == 0:
+        bpy.data.objects.remove(rig)
+    if bpy.data.actions:
+        for act in bpy.data.actions:
+            if act.name[0:2] == prefix:
+                act.use_fake_user = False
+                if act.users == 0:
+                    bpy.data.actions.remove(act)
+                    del act
+    return
+    
 
 #
 #    copyAnglesIK():
@@ -495,7 +518,7 @@ def renameBvhRig(srcRig, filepath):
 """
 def copyAnglesIK(context):
     trgRig = context.object
-    target.guessTargetArmature(trgRig)
+    target.guessTargetArmature(trgRig. context.scene)
     trgAnimations = createTargetAnimation(context, trgRig)
     insertAnimation(context, trgRig, trgAnimations, the.fkBoneList)
     onoff = toggleLimitConstraints(trgRig)
@@ -554,7 +577,7 @@ def renameAndRescaleBvh(context, srcRig, trgRig):
     scn.objects.active = srcRig
     scn.update()
     #(srcRig, srcBones, action) =  renameBvhRig(rig, filepath)
-    target.guessTargetArmature(trgRig)
+    target.guessTargetArmature(trgRig, scn)
     source.findSrcArmature(context, srcRig)
     renameBones(srcRig)
     setInterpolation(srcRig)
