@@ -28,9 +28,10 @@
 import bpy, os, mathutils, math, time
 from math import sin, cos
 from mathutils import *
+from bpy_extras.io_utils import ImportHelper
+from bpy.props import *
 
-from . import props
-from . import target
+from . import props, target, source
 from . import globvar as the
 
 ###################################################################################
@@ -122,11 +123,11 @@ def readBvhFile(context, filepath, scn, scan):
     endFrame = scn['McpEndFrame']
     rot90 = scn['McpRot90Anim']
     if (scn['McpSubsample']):
-    	ssFactor = scn['McpSSFactor']
+        ssFactor = scn['McpSSFactor']
     else:
-    	ssFactor = 1
+        ssFactor = 1
     defaultSS = scn['McpDefaultSS']
-    print(filepath)
+
     fileName = os.path.realpath(os.path.expanduser(filepath))
     (shortName, ext) = os.path.splitext(fileName)
     if ext.lower() != ".bvh":
@@ -158,7 +159,6 @@ def readBvhFile(context, filepath, scn, scan):
                 raise NameError("Tokenizer out of kilter %d" % level)    
             if scan:
                 return root
-            target.guessTargetArmature(trgRig)
             amt = bpy.data.armatures.new("BvhAmt")
             rig = bpy.data.objects.new("BvhRig", amt)
             scn.objects.link(rig)
@@ -240,7 +240,8 @@ def readBvhFile(context, filepath, scn, scan):
     fp.close()
     setInterpolation(rig)
     time2 = time.clock()
-    print("Bvh file loaded in %.3f s" % (time2-time1))
+    print("Bvh file %s loaded in %.3f s" % (filepath, time2-time1))
+    renameBvhRig(rig, filepath)
     return rig
 
 #
@@ -386,14 +387,20 @@ class CEditBone():
         return ("%s p %s\n  h %s\n  t %s\n" % (self.name, self.parent, self.head, self.tail))
 
 #
-#    renameBones(srcBones, srcRig, action):
+#    renameBones(srcRig):
 #
 
-def renameBones(srcBones, srcRig, action):
+def renameBones(srcRig):
+    srcBones = []
     trgBones = {}
+
     bpy.ops.object.mode_set(mode='EDIT')
     ebones = srcRig.data.edit_bones
+    for bone in ebones:
+        srcBones.append( CEditBone(bone) )
+    
     setbones = []
+    action = srcRig.animation_data.action
     for srcBone in srcBones:
         srcName = srcBone.name
         lname = srcName.lower()
@@ -411,6 +418,7 @@ def renameBones(srcBones, srcRig, action):
             setbones.append((eb, trgName))
         else:
             eb.name = '_' + srcName
+
     for (eb, name) in setbones:
         eb.name = name
     #createExtraBones(ebones, trgBones)
@@ -479,14 +487,7 @@ def renameBvhRig(srcRig, filepath):
     srcRig.name = name
     action = srcRig.animation_data.action
     action.name = name
-
-    srcBones = []
-    bpy.ops.object.mode_set(mode='EDIT')
-    for bone in srcRig.data.edit_bones:
-        srcBones.append( CEditBone(bone) )
-    bpy.ops.object.mode_set(mode='POSE')
-
-    return (srcRig, srcBones, action)
+    return 
 
 #
 #    copyAnglesIK():
@@ -508,10 +509,10 @@ def copyAnglesIK(context):
     return
 """    
 #
-#    rescaleRig(scn, trgRig, srcRig, action):
+#    rescaleRig(scn, trgRig, srcRig):
 #
 
-def rescaleRig(scn, trgRig, srcRig, action):
+def rescaleRig(scn, trgRig, srcRig):
     if not scn['McpAutoScale']:
         return
     upleg = target.getTrgBone('UpLeg_L')
@@ -528,6 +529,7 @@ def rescaleRig(scn, trgRig, srcRig, action):
         eb.head *= scale
         eb.tail *= scale
     bpy.ops.object.mode_set(mode='POSE')
+    action = srcRig.animation_data.action
     for fcu in action.fcurves:
         words = fcu.data_path.split('.')
         if words[-1] == 'location':
@@ -535,6 +537,76 @@ def rescaleRig(scn, trgRig, srcRig, action):
                 kp.co[1] *= scale
     return
 
+
+#
+#    renameAndRescaleBvh(context, srcRig, trgRig):
+#
+
+def renameAndRescaleBvh(context, srcRig, trgRig):
+    try:
+        if srcRig['McpRenamed']:
+            print("%s already renamed and rescaled." % srcRig.name)
+            return
+    except:
+        pass
+        
+    scn = context.scene
+    scn.objects.active = srcRig
+    scn.update()
+    #(srcRig, srcBones, action) =  renameBvhRig(rig, filepath)
+    target.guessTargetArmature(trgRig)
+    source.findSrcArmature(context, srcRig)
+    renameBones(srcRig)
+    setInterpolation(srcRig)
+    rescaleRig(context.scene, trgRig, srcRig)
+    srcRig['McpRenamed'] = True
+    return 
+
+########################################################################
+#
+#   class VIEW3D_OT_LoadBvhButton(bpy.types.Operator, ImportHelper):
+#
+
+class VIEW3D_OT_LoadBvhButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mcp.load_bvh"
+    bl_label = "Load BVH file (.bvh)"
+
+    filename_ext = ".bvh"
+    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+    filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
+
+    def execute(self, context):
+        readBvhFile(context, self.properties.filepath, context.scene, False)        
+        return{'FINISHED'}    
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}    
+
+#
+#   class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
+    bl_idname = "mcp.rename_bvh"
+    bl_label = "Rename and rescale BVH rig"
+
+    def execute(self, context):
+        scn = context.scene
+        srcRig = context.object
+        trgRig = None
+        for ob in scn.objects:
+            if ob.type == 'ARMATURE' and ob.select and ob != srcRig:
+                trgRig = ob
+                break
+        if not trgRig:
+            print("No target rig selected")
+            return
+        renameAndRescaleBvh(context, srcRig, trgRig)
+        if scn['McpRescale']:
+            simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
+        print("%s renamed" % srcRig.name)
+        return{'FINISHED'}    
 
 
 

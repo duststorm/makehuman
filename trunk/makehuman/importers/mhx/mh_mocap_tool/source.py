@@ -32,7 +32,6 @@ from bpy.props import *
 from bpy_extras.io_utils import ImportHelper
 
 from . import target
-from . import load
 from . import globvar as the
        
 #
@@ -103,7 +102,7 @@ the.sourceProps = []
 #
 #    defaultEnums():
 #    setSourceProp(scn, prop, mhx, enums):
-#    makeSourceBoneList(scn, root):
+#    makeSourceBoneList(scn, rig):
 #
 
 def defaultEnums():
@@ -126,10 +125,21 @@ def setSourceProp(scn, prop, mhx, enums):
         n += 1
     return
 
-def makeSourceBoneList(scn, root):
+def makeSourceBoneList(scn, rig):
+    root = None
+    for bone in rig.data.bones:
+        if bone.parent == None:
+            root = bone
+            break
+    if root:
+        print("Root bone %s", root)
+    else:        
+        print("Did not find root bone")
+        return
+            
     enums = defaultEnums()
     props = []
-    makeSourceNodes(scn, root, enums, props)
+    makeSourceBones(scn, root, enums, props)
     for prop in props:
         name = prop[2:].lower()
         mhx = guessSourceBone(name)
@@ -137,17 +147,15 @@ def makeSourceBoneList(scn, root):
     return (props, enums)
 
 #
-#    makeSourceNodes(scn, node, enums, props):
+#    makeSourceBones(scn, bone, enums, props):
 #    defineSourceProp(name, enums):
 #
 
-def makeSourceNodes(scn, node, enums, props):
-    if not node.children:
-        return
-    prop = defineSourceProp(node.name, enums)
+def makeSourceBones(scn, bone, enums, props):
+    prop = defineSourceProp(bone.name, enums)
     props.append(prop)
-    for child in node.children:
-        makeSourceNodes(scn, child, enums, props)
+    for child in bone.children:
+        makeSourceBones(scn, child, enums, props)
     return
 
 def defineSourceProp(name, enums):
@@ -225,32 +233,23 @@ def ensureSourceInited(context):
     return
 
 #
-#    class VIEW3D_OT_McpScanBvhButton(bpy.types.Operator):
+#    class VIEW3D_OT_McpScanRigButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_McpScanBvhButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_scan_bvh"
-    bl_label = "Scan bvh file"
+class VIEW3D_OT_McpScanRigButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_scan_rig"
+    bl_label = "Scan source rig"
     bl_options = {'REGISTER'}
-
-    filename_ext = ".bvh"
-    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
-    filepath = StringProperty(name="File Path", maxlen=1024, default="")
 
     def execute(self, context):
         scn = context.scene
-        root = load.readBvhFile(context, self.filepath, scn, True)
-        (the.sourceProps, the.sourceEnums) = makeSourceBoneList(scn, root)
+        (the.sourceProps, the.sourceEnums) = makeSourceBoneList(scn,  context.object)
         scn['McpSrcArmBentDown'] = 0.0
         scn['McpSrcArmRoll'] = 0.0
         scn['McpSrcLegBentOut'] = 0.0
         scn['McpSrcLegRoll'] = 0.0
         ensureSourceInited(context)
         return{'FINISHED'}    
-
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}    
 
 #
 #    saveSourceBones(context, path):
@@ -337,9 +336,9 @@ class MhxSourceBonesPanel(bpy.types.Panel):
         scn = context.scene
         rig = context.object
         if the.sourceProps:
-            layout.operator("mcp.mocap_scan_bvh", text="Rescan bvh file")    
+            layout.operator("mcp.mocap_scan_rig", text="Rescan source rig")    
         else:
-            layout.operator("mcp.mocap_scan_bvh", text="Scan bvh file")    
+            layout.operator("mcp.mocap_scan_rig", text="Scan source rig")    
         layout.operator("mcp.mocap_load_save_source_bones", text='Load source bones').loadSave = 'load'        
         layout.operator("mcp.mocap_load_save_source_bones", text='Save source bones').loadSave = 'save'        
         if not the.sourceProps:

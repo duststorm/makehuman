@@ -631,31 +631,17 @@ def deleteRig(context, rig00, action, prefix):
     return
 
 #
-#    importAndRename(context, filepath):
-#
-
-def importAndRename(context, filepath):
-    trgRig = context.object
-    scn = context.scene
-    rig = load.readBvhFile(context, filepath, scn, False)
-    (srcRig, srcBones, action) =  load.renameBvhRig(rig, filepath)
-    source.findSrcArmature(context, srcRig)
-    load.renameBones(srcBones, srcRig, action)
-    load.setInterpolation(srcRig)
-    load.rescaleRig(context.scene, trgRig, srcRig, action)
-    return (srcRig, action)
-
-#
 #    loadRetargetSimplify(context, filepath):
 #
 
 def loadRetargetSimplify(context, filepath):
     print("Load and retarget %s" % filepath)
     time1 = time.clock()
-    trgRig = context.object
-    (srcRig, action) = importAndRename(context, filepath)
-    retargetMhxRig(context, srcRig, trgRig)
     scn = context.scene
+    trgRig = context.object
+    rig = load.readBvhFile(context, filepath, scn, False)
+    (srcRig, action) = load.renameBvh(context, rig, trgRig)
+    retargetMhxRig(context, srcRig, trgRig)
     if scn['McpDoSimplify']:
         simplify.simplifyFCurves(context, trgRig, False, False)
     if scn['McpRescale']:
@@ -664,33 +650,6 @@ def loadRetargetSimplify(context, filepath):
     time2 = time.clock()
     print("%s finished in %.3f s" % (filepath, time2-time1))
     return
-
-
-########################################################################
-#
-#   class VIEW3D_OT_OldLoadBvhButton(bpy.types.Operator, ImportHelper):
-#
-
-class VIEW3D_OT_OldLoadBvhButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mcp.old_load_bvh"
-    bl_label = "Load BVH file (.bvh)"
-
-    filename_ext = ".bvh"
-    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
-    filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
-
-    def execute(self, context):
-        scn = context.scene
-        (srcRig, action) = importAndRename(context, self.properties.filepath)
-        if scn['McpRescale']:
-            simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
-        print("%s imported" % self.properties.filepath)
-        return{'FINISHED'}    
-
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}    
-
 
 #
 #   class VIEW3D_OT_OldRetargetMhxButton(bpy.types.Operator):
@@ -747,7 +706,8 @@ class OldRetargetPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         ob = context.object
-        layout.operator("mcp.old_load_bvh")
+        layout.operator("mcp.load_bvh")
+        layout.operator("mcp.rename_bvh")
         layout.operator("mcp.old_retarget_mhx")
         layout.operator("mcp.old_load_retarget_simplify")
         layout.separator()
