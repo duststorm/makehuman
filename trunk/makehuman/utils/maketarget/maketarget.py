@@ -30,12 +30,12 @@ __docformat__ = 'restructuredtext'
 
 import sys
 sys.path.append("./")
-makehuman_src = "../../"
-sys.path.append(os.path.join(makehuman_src, "/utils/maketarget/") )
-sys.path.append(os.path.join(makehuman_src, "/utils/svd_tools/fit/") )
-sys.path.append(os.path.join(makehuman_src, "/utils/") )
-sys.path.append(os.path.join(makehuman_src, "/core/") )
-sys.path.append(os.path.join(makehuman_src, "/utils/topology_translator/") )
+
+sys.path.append("../../../utils/maketarget/" )
+sys.path.append("../../../utils/svd_tools/fit/")
+sys.path.append("../../../utils/")
+sys.path.append("../../../core/")
+sys.path.append("../../../utils/topology_translator/")
 import os
 
 import Blender
@@ -63,7 +63,7 @@ saveOnlySelectedVerts = Draw.Create(0)
 rotationMode = Draw.Create(0)
 fitVert1 = Draw.Create("head_vertices.dat")
 fitVert2 = Draw.Create("verts_to_fit.verts")
-fitVert3 = Draw.Create("head_vertices.dat")
+fitVert3 = Draw.Create("head2_vertices.dat")
 poseMode = False
 loadedTraslTarget = ""
 loadedRotTarget = ""
@@ -527,6 +527,27 @@ def processingTargetsSymm(path,mFactor):
             #applyTarget(-mFactor)
             saveTarget(targetPath)
             reset()
+            
+def processingTargetsSaveSel(path):
+    """
+    This function is used to save the symmetric targets
+    """
+    global saveOnlySelectedVerts
+    saveOnlySelectedVerts.val = 1
+    targetDir = os.path.dirname(path)
+    targetsList = os.listdir(targetDir)
+    for targetName in targetsList:
+        targetPath = os.path.join(targetDir,targetName)
+        targetNameNoExt = os.path.splitext(targetName)[0]
+        targetPathSym = os.path.join(targetDir,targetNameNoExt+"-symm.target")
+        if os.path.isfile(targetPath):
+            print "Processing %s"%(targetName)
+            loadTarget(targetPath)
+            applyTarget(1)            
+            saveTarget(targetPath)
+            reset()
+            
+            
 
 def loadVerticesFromFolder(path):
     """
@@ -763,7 +784,7 @@ def event(event, value):
     elif event == Draw.QKEY:
         Window.FileSelector (applyPoseFromFolder, "Load pose from folder")
     elif event == Draw.RKEY:
-        alignPCA()
+        Window.FileSelector (processingTargetsSaveSel, "save only selected")
     elif event == Draw.SKEY:
         Window.FileSelector (processingTargets, "Process targets")
     elif event == Draw.TKEY:
@@ -842,6 +863,5 @@ def buttonEvents(event):
     Draw.Draw()
 
 Draw.Register(draw, event, buttonEvents)
-
 
 
