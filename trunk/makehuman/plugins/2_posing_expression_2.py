@@ -54,7 +54,7 @@ class ExpressionTaskView(gui3d.TaskView):
             for subname in subnames:
                 
                 #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
-                modifier = humanmodifier.GenderModifier('data/targets/expression/units/caucasian/${gender}_young/%s-%s.target' % (name, subname))
+                modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
                 self.modifiers[subname] = modifier
                 slider = ExpressionSlider(box, subname.capitalize(), modifier)
                 self.sliders.append(slider)

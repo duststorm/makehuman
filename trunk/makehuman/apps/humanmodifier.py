@@ -318,7 +318,39 @@ class GenderAgeModifier(GenericModifier):
         
     def clampValue(self, value):
         return max(0.0, min(1.0, value))
+      
+class GenderEthnicModifier(GenericModifier):
+
+    def __init__(self, template):
         
+        GenericModifier.__init__(self, template)
+        
+    # overrides
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
+        targets = [(Template(target[0]).safe_substitute(ethnic=value), target[1] + [value]) for target in targets for value in ['caucasian', 'african', 'asian']]
+
+        return targets
+    
+    def getFactors(self, human, value):
+        
+        ethnics = [val for val in [human.africanVal, human.asianVal] if val > 0.0]
+        
+        factors = {
+            'female': human.femaleVal,
+            'male': human.maleVal,
+            'african':human.africanVal / len(ethnics) if ethnics else human.africanVal,
+            'asian':human.asianVal / len(ethnics) if ethnics else human.asianVal,
+            'caucasian':(1.0 - sum(ethnics) / len(ethnics)) if ethnics else 1.0
+        }
+        
+        return factors
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+  
 class GenderAgeEthnicModifier(GenericModifier):
 
     def __init__(self, template):
@@ -348,6 +380,42 @@ class GenderAgeEthnicModifier(GenericModifier):
             'african':human.africanVal / len(ethnics) if ethnics else human.africanVal,
             'asian':human.asianVal / len(ethnics) if ethnics else human.asianVal,
             'neutral':(1.0 - sum(ethnics) / len(ethnics)) if ethnics else 1.0
+        }
+        
+        return factors
+        
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+        
+class GenderAgeEthnicModifier2(GenericModifier):
+
+    def __init__(self, template):
+        
+        GenericModifier.__init__(self, template)
+        
+    # overrides
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
+        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
+        targets = [(Template(target[0]).safe_substitute(ethnic=value), target[1] + [value]) for target in targets for value in ['caucasian', 'african', 'asian']]
+
+        return targets
+    
+    def getFactors(self, human, value):
+        
+        ethnics = [val for val in [human.africanVal, human.asianVal] if val > 0.0]
+        
+        factors = {
+            'female': human.femaleVal,
+            'male': human.maleVal,
+            'child': human.childVal,
+            'young': human.youngVal,
+            'old': human.oldVal,
+            'african':human.africanVal / len(ethnics) if ethnics else human.africanVal,
+            'asian':human.asianVal / len(ethnics) if ethnics else human.asianVal,
+            'caucasian':(1.0 - sum(ethnics) / len(ethnics)) if ethnics else 1.0
         }
         
         return factors

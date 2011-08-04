@@ -77,8 +77,8 @@ class Target:
 
         self.name = name
         self.data = [0, 0, 0] * len(obj.verts)
-        self.faces = None
-        self.verts = None
+        self.faces = []
+        self.verts = []
 
         try:
             fileDescriptor = open(name)
