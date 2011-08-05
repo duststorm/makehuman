@@ -538,7 +538,7 @@ class Human(gui3d.Object):
                     self.setWeight(float(lineData[1]))
                 elif lineData[0] == 'african':
                     self.setAfrican(float(lineData[1]))
-                elif lineData[0] == 'african':
+                elif lineData[0] == 'asian':
                     self.setAsian(float(lineData[1]))
                 elif lineData[0] == 'height':
                     modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
