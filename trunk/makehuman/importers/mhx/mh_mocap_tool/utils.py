@@ -25,7 +25,7 @@
 
 
 import bpy
-from math import sin, cos
+from math import sin, cos, atan, pi
 from mathutils import *
 
 
@@ -37,6 +37,33 @@ def invert(mat):
     inv = mat.copy()
     inv.invert()
     return inv
+    
+#
+#   printMat(mat)
+#
+
+def printMat(mat):
+    mc = " ["
+    for m in range(3):
+        s = mc
+        for n in range(3):
+            s += " %6.3f" % mat[m][n]
+        print(s+"]")
+    print(" ]")
+            
+#
+#   getRoll(bone):
+#
+
+def getRoll(bone):
+    mat = bone.matrix_local.to_3x3()
+    quat = mat.to_quaternion()
+    if abs(quat.w) < 1e-4:
+        roll = pi
+    else:
+        roll = 2*atan(quat.y/quat.w)
+    return roll
+    
 
 """
 #

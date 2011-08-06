@@ -26,12 +26,12 @@
 
 
 import bpy, os, mathutils, math, time
-from math import sin, cos
+from math import sin, cos, pi, atan
 from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 
-from . import rig_mhx, rig_game, rig_rorkimaru
+from . import utils, rig_mhx, rig_game, rig_rorkimaru
 from . import globvar as the
 
 Deg2Rad = math.pi/180
@@ -129,10 +129,13 @@ def guessTargetArmature(trgRig, scn):
         the.GlobalBoneList = rig_mhx.GlobalBoneList
         the.IkParents = rig_mhx.IkParents
         for bone in trgRig.data.bones:
+            """
             try:
                 roll = bone['Roll']
             except:
                 roll = 0
+            """
+            roll = utils.getRoll(bone)
             if abs(roll) > 0.1:
                 the.targetRolls[bone.name] = roll
     else:
@@ -302,6 +305,10 @@ def assocTargetBones(rig, names, xtraAssoc):
             parAssoc[bname] = None
 
     rolls = {}
+    for (bname, mhx) in boneAssoc:
+        rolls[bname] = utils.getRoll(rig.data.bones[bname])
+
+    """
     try:
         bpy.ops.object.mode_set(mode='EDIT')    
         (bname, mhx) = boneAssoc[0]
@@ -324,6 +331,7 @@ def assocTargetBones(rig, names, xtraAssoc):
                 rolls[bname] = bone['Roll']
             except:
                 raise NameError("Associations must be made in rig source file")
+    """
 
     pb = rig.pose.bones[rig['Root']]
     pb.lock_location = (False,False,False)
