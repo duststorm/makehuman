@@ -25,7 +25,7 @@
 
 
 import bpy
-from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
+from bpy.props import *
 
 from . import action
 
@@ -186,7 +186,7 @@ def initInterface(context):
         scn['McpStartFrame'] = 1
         scn['McpEndFrame'] = 32000
         scn['McpRot90Anim'] = True
-        scn['McpDoSimplify'] = True
+        scn['McpDoSimplify'] = False
 
         # Subsample and rescale
         
@@ -292,16 +292,6 @@ def saveDefaults(context):
     fp.close()
     return
     
-#
-#   getBone(rig, bone)
-#
-
-def getBone(rig, bone):
-    try:
-        return rig[bone]
-    except:
-        return bone
-            
 
 ########################################################################
 #

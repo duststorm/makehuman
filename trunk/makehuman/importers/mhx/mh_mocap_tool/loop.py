@@ -25,7 +25,7 @@
 
 import bpy
 from math import pi
-from . import load, simplify, props
+from . import utils, load, simplify, props
 
 #
 #   loopFCurves(context, rig):
@@ -38,43 +38,42 @@ def loopFCurves(context, rig):
         return
     act = rig.animation_data.action
 
-    root = props.getBone(rig, 'Root')
-    rootLoc = {}
+    hasLocation = {}
     for fcu in fcurves:
-        name = fcu.data_path.split('"')[1]
-        if name == root:
-            mode = fcu.data_path.split('.')[-1]
-            if mode == 'location':
-                rootLoc[fcu.array_index] = fcu    
-  
-    print(rootLoc.items())
-    
-    for fcu in fcurves:
-        name = fcu.data_path.split('"')[1]
-        if name != root:
-            offsetFCurve(fcu, rootLoc, scn)
+        (name, mode) = utils.fCurveIdentity(fcu)
+        if mode[0:8] == 'rotation':
             loopFCurve(fcu, minTime, maxTime, scn)
+        elif mode[0:8] == 'location':
+            hasLocation[name] = True
 
-    for fcu in fcurves:
-        name = fcu.data_path.split('"')[1]
-        if name == root:
-            offsetFCurve(fcu, rootLoc, scn)
-            loopFCurve(fcu, minTime, maxTime, scn)            
+    if scn['McpLoopInPlace']:
+        frames = utils.activeFrames(rig)
+        root = utils.getBone('Root', rig)    
+        
+        for frame in frames:
+            scn.frame_set(frame)
+            root.keyframe_insert("location", group=root.name)
+
+        for name in hasLocation.keys():
+            pb = rig.pose.bones[name]
+            if pb != root:
+                continue
+            restMat = pb.bone.matrix_local
+            if pb.parent:
+                restMat = utils.invert(pb.parent.bone.matrix_local) * restMat
+            restRot = restMat.to_3x3()
+            restInv = utils.invert(restRot)
+            for frame in frames:
+                scn.frame_set(frame)            
+                head = pb.head - root.head
+                if not scn['McpLoopZInPlace']:
+                    head[2] = pb.head[2]
+                pb.location = restInv * head
+                pb.keyframe_insert("location", group=pb.name)  
+                #print(pb.head)
+
     print("Curves looped")
     return
-
-#
-#   offsetFCurve(fcu, rootLoc, scn):            
-#
-
-def offsetFCurve(fcu, rootLoc, scn):            
-    mode = fcu.data_path.split('.')[-1]
-    if mode == 'location' and scn['McpLoopInPlace']:
-        root = rootLoc[fcu.array_index]
-        for kp in fcu.keyframe_points:
-            frame = kp.co[0]
-            kp.co[1] -= root.evaluate(frame)
-    return    
     
 #
 #   loopFCurve(fcu, minTime, maxTime, scn):
@@ -109,19 +108,60 @@ def loopFCurve(fcu, t0, tn, scn):
         vm = fcu.evaluate(tm)
         newpoints.append((tm, eps*vm + (1-eps)*v1))
         
-    print(fcu.data_path)        
     newpoints.sort()
-    #for (t,v) in newpoints: 
-        #fcu.keyframe_points.insert(frame=t, value=v)
+    for (t,v) in newpoints: 
+        fcu.keyframe_points.insert(frame=t, value=v)
     return
     
+    
+#
+#   shiftBoneFCurves(context):
+#
 
+def shiftBoneFCurves(context):
+    frame = context.scene.frame_current
+    rig = context.object
+    anim = rig.animation_data
+    if not anim:
+        return
+
+    orig = {
+        0: {},
+        1: {},
+        2: {},
+        3: {},
+    }
+    touched = {}
+    for fcu in anim.action.fcurves:
+        (name, mode) = utils.fCurveIdentity(fcu)
+        for pb in context.selected_pose_bones:
+            if (pb.name == name and 
+                mode in ["rotation_euler", "rotation_quaternion", "rotation_axis_angle"]):
+                kp = fcu.keyframe_points[frame]
+                orig[fcu.array_index][fcu.data_path] = kp.co[1]
+                touched[pb.name] = True
+
+    for name in touched.keys():
+        pb = rig.pose.bones[name]
+        utils.insertRotationKeyFrame(pb, frame)
+    
+    for fcu in anim.action.fcurves:
+        try:
+            dy = fcu.evaluate(frame) - orig[fcu.array_index][fcu.data_path]
+        except:
+            continue     
+        (name, mode) = utils.fCurveIdentity(fcu)
+        for kp in fcu.keyframe_points:
+            if kp.co[0] != frame:
+                kp.co[1] += dy
+    return        
+    
 ########################################################################
 #
-#   class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpLoopFCurvesButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
+class VIEW3D_OT_McpLoopFCurvesButton(bpy.types.Operator):
     bl_idname = "mcp.mocap_loop_fcurves"
     bl_label = "Loop F-curves"
 
@@ -130,11 +170,24 @@ class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#   class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
+    bl_idname = "mcp.mocap_shift_bone"
+    bl_label = "Shift bone F-curves"
+
+    def execute(self, context):
+        shiftBoneFCurves(context)
+        print("Bones shifted")
+        return{'FINISHED'}    
+
+#
 #   class LoopPanel(bpy.types.Panel):
 #
 
 class LoopPanel(bpy.types.Panel):
-    bl_label = "Mocap: Loop"
+    bl_label = "Mocap: Adjust"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     
@@ -149,9 +202,10 @@ class LoopPanel(bpy.types.Panel):
         ob = context.object
         layout.prop(scn, "McpLoopBlendRange")
         layout.prop(scn, "McpLoopInPlace")
-        #if scn['McpLoopInPlace']:
-        #    layout.prop(scn, "McpLoopZInPlace")
+        if scn['McpLoopInPlace']:
+            layout.prop(scn, "McpLoopZInPlace")
         layout.operator("mcp.mocap_loop_fcurves")
+        layout.operator("mcp.mocap_shift_bone")
                 
 def register():
     bpy.utils.register_module(__name__)

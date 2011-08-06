@@ -31,7 +31,7 @@ from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
 
-from . import props, source, target, rig_mhx, toggle, load, simplify
+from . import utils, props, source, target, rig_mhx, toggle, load, simplify
 from . import globvar as the
 
 ###################################################################################
@@ -314,7 +314,7 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes):
                 insertLocalRotationKeyFrames(nameTrg, pb, animSrc, animTrg, trgRoll)
 
     insertAnimation(context, trgRig, trgAnimations, the.fkBoneList)
-    load.setInterpolation(trgRig)
+    utils.setInterpolation(trgRig)
     return
 
 #
@@ -378,7 +378,7 @@ def insertGlobalRotationKeyFrames(name, pb, animSrc, animTrg, trgRoll, trgFix):
         matMhx = animTrg.inverseRest * mat90 * animTrg.matrixRest
         rot = matMhx.to_quaternion()
         rots.append(rot)
-        load.setRotation(pb, rot, animSrc.frames[frame], name)
+        utils.setRotation(pb, rot, animSrc.frames[frame], name)
     return rots
 
 def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg, trgRoll):
@@ -387,7 +387,7 @@ def insertLocalRotationKeyFrames(name, pb, animSrc, animTrg, trgRoll):
         rot = animSrc.quats[frame]
         rollRot(rot, trgRoll)
         animTrg.quats[frame] = rot
-        load.setRotation(pb, rot, animSrc.frames[frame], name)
+        utils.setRotation(pb, rot, animSrc.frames[frame], name)
     return
 
 def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, srcFix, trgRoll, trgFix):
@@ -407,7 +407,7 @@ def fixAndInsertLocalRotationKeyFrames(name, pb, animSrc, animTrg, srcFix, trgRo
         rollRot(rot, srcRoll)
         rollRot(rot, trgRoll)
         animTrg.quats[frame] = rot
-        load.setRotation(pb, rot, animSrc.frames[frame], name)
+        utils.setRotation(pb, rot, animSrc.frames[frame], name)
     return
 
 
@@ -484,7 +484,7 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
         matMhx = anim.inverseRest * mat * anim.matrixRest
         rot = matMhx.to_quaternion()
         #rollRot(rot, roll)
-        load.setRotation(pb, rot, animFake.frames[frame], name)
+        utils.setRotation(pb, rot, animFake.frames[frame], name)
     return
 
 #
@@ -520,7 +520,7 @@ def insertReverseIkKeyFrames(name, pb, anim, animReal, animCopy):
         anim.matrices[frame] = mat
         matMhx = rotX * anim.inverseRest * mat * anim.matrixRest * rotX
         rot = matMhx.to_quaternion()
-        load.setRotation(pb, rot, animCopy.frames[frame], name)
+        utils.setRotation(pb, rot, animCopy.frames[frame], name)
     return
 
 #
@@ -554,7 +554,7 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
         matMhx = anim.inverseRest * mat * anim.matrixRest
         rot = matMhx.to_quaternion()
         #rollRot(rot, roll)
-        load.setRotation(pb, rot, animFake.frames[frame], name)
+        utils.setRotation(pb, rot, animFake.frames[frame], name)
     return
 
 
@@ -582,7 +582,7 @@ def retargetMhxRig(context, srcRig, trgRig):
     poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes)
     poseTrgIkBones(context, trgRig, trgAnimations)
     #debugClose()
-    load.setInterpolation(trgRig)
+    utils.setInterpolation(trgRig)
     if onoff == 'OFF':
         toggle.setLimitConstraints(trgRig, 1.0)
     else:
@@ -620,8 +620,7 @@ def loadRetargetSimplify(context, filepath):
     print("Load and retarget %s" % filepath)
     time1 = time.clock()
     scn = context.scene
-    trgRig = context.object
-    srcRig = load.readBvhFile(context, filepath, scn, False)
+    (srcRig, trgRig) = load.readBvhFile(context, filepath, scn, False)
     load.renameAndRescaleBvh(context, srcRig, trgRig)
     retargetMhxRig(context, srcRig, trgRig)
     if scn['McpDoSimplify']:
@@ -688,18 +687,10 @@ class OldRetargetPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         ob = context.object
-        layout.operator("mcp.load_bvh")
-        layout.operator("mcp.rename_bvh")
-        layout.operator("mcp.old_retarget_mhx")
-        layout.operator("mcp.old_load_retarget_simplify")
-        layout.separator()
-        layout.prop(scn, "McpBvhScale")
-        layout.prop(scn, "McpAutoScale")
-        layout.prop(scn, "McpStartFrame")
-        layout.prop(scn, "McpEndFrame")
-        layout.prop(scn, "McpRot90Anim")
         layout.prop(scn, "McpDoSimplify")
         layout.prop(scn, "McpApplyFixes")
+        layout.operator("mcp.old_retarget_mhx")
+        layout.operator("mcp.old_load_retarget_simplify")
 
 def register():
     bpy.utils.register_module(__name__)

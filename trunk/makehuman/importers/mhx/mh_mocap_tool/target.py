@@ -116,7 +116,7 @@ def guessTargetArmature(trgRig, scn):
         name = "Rorkimaru"
     else:
         print("Bones", bones)
-        raise NameError("Did not recognize target armature")
+        raise NameError("Did not recognize target armature %s" % trgRig)
 
     print("Target armature %s" % name)
     the.parents = {}

@@ -24,6 +24,7 @@
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
 from mathutils import *
+from math import pi
 
 EyesArmature = {
     'hips' : 'Root',
@@ -51,11 +52,11 @@ EyesArmature = {
 EyesFixes = {
     'Head2' : (Matrix.Rotation(0.2, 3, 'X'), 0),
     'Spine2' : (Matrix.Rotation(0.3, 3, 'X'), 0),
-    'UpArm_L' :  (Matrix.Rotation(1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), 1.57),
-    'LoArm_L' :  (None, 1.57),
-    'Hand_L' :  (None, 1.57),
-    'UpArm_R' :  (Matrix.Rotation(-1.57, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), -1.57),
-    'LoArm_R' :  (None, -1.57),
-    'Hand_R' :  (None, -1.57),
+    'UpArm_L' :  (Matrix.Rotation(pi/2, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), pi/2),
+    #'LoArm_L' :  (None, pi/2),
+    #'Hand_L' :  (None, pi/2),
+    'UpArm_R' :  (Matrix.Rotation(-pi/2, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), -pi/2),
+    #'LoArm_R' :  (None, -pi/2),
+    #'Hand_R' :  (None, -pi/2),
 }
 

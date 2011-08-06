@@ -1795,7 +1795,7 @@ def setupRig(obj):
                             #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
 
-        ObjectProps = []
+        ObjectProps = [("MhxRigType", '"MHX"')]
         ArmatureProps = []
         HeadName = 'Head'
 
@@ -1843,7 +1843,7 @@ def setupRig(obj):
         Joints = blenrig_rig.BlenrigJoints
         HeadsTails = blenrig_rig.BlenrigHeadsTails
         Armature = blenrig_rig.BlenrigArmature
-        ObjectProps = blenrig_rig.BlenrigObjectProps
+        ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRigType", '"Blenrig"')]
         ArmatureProps = blenrig_rig.BlenrigArmatureProps
 
     elif mh2mhx.theConfig.useRig == "rigify":
@@ -1875,7 +1875,7 @@ def setupRig(obj):
             rig_panel_25.PanelArmature
         )
             
-        ObjectProps = rigify_rig.RigifyObjectProps
+        ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRigType", '"Rigify"')]
         ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:

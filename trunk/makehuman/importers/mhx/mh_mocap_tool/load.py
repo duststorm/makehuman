@@ -31,7 +31,7 @@ from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import *
 
-from . import props, target, source
+from . import utils, props, target, source
 from . import globvar as the
 
 ###################################################################################
@@ -238,11 +238,11 @@ def readBvhFile(context, filepath, scn, scan):
             frame += 1
 
     fp.close()
-    setInterpolation(rig)
+    utils.setInterpolation(rig)
     time2 = time.clock()
     print("Bvh file %s loaded in %.3f s" % (filepath, time2-time1))
     renameBvhRig(rig, filepath)
-    return rig
+    return (rig, trgRig)
 
 #
 #    addFrame(words, frame, nodes, pbones, scale):
@@ -276,7 +276,7 @@ def addFrame(words, frame, nodes, pbones, scale):
                         mats.append(Matrix.Rotation(angle, 3, axis))
                         m += 1
                     mat = node.inverse * mats[0] * mats[1] * mats[2] * node.matrix
-                    setRotation(pb, mat, frame, name)
+                    utils.setRotation(pb, mat, frame, name)
 
     return
 
@@ -319,44 +319,6 @@ def channelZup(word):
 ###################################################################################
 
 
-#
-#    setRotation(pb, mat, frame, group):
-#
-
-def setRotation(pb, rot, frame, group):
-    if pb.rotation_mode == 'QUATERNION':
-        try:
-            quat = rot.to_quaternion()
-        except:
-            quat = rot
-        pb.rotation_quaternion = quat
-        for n in range(4):
-            pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=group)
-    else:
-        try:
-            euler = rot.to_euler(pb.rotation_mode)
-        except:
-            euler = rot
-        pb.rotation_euler = euler
-        for n in range(3):
-            pb.keyframe_insert('rotation_euler', index=n, frame=frame, group=group)
-
-#
-#    setInterpolation(rig):
-#
-
-def setInterpolation(rig):
-    if not rig.animation_data:
-        return
-    act = rig.animation_data.action
-    if not act:
-        return
-    for fcu in act.fcurves:
-        for pt in fcu.keyframe_points:
-            pt.interpolation = 'LINEAR'
-        fcu.extrapolation = 'CONSTANT'
-    return
-
 ###################################################################################
 
 #            
@@ -387,14 +349,18 @@ class CEditBone():
         return ("%s p %s\n  h %s\n  t %s\n" % (self.name, self.parent, self.head, self.tail))
 
 #
-#    renameBones(srcRig):
+#    renameBones(srcRig, scn):
 #
 
-def renameBones(srcRig):
+def renameBones(srcRig, scn):
     srcBones = []
     trgBones = {}
 
+    scn.objects.active = srcRig
+    scn.update()
     bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.object.mode_set(mode='EDIT')
+    print("Ren", bpy.context.object, srcRig.mode)
     ebones = srcRig.data.edit_bones
     for bone in ebones:
         srcBones.append( CEditBone(bone) )
@@ -524,7 +490,7 @@ def copyAnglesIK(context):
     onoff = toggleLimitConstraints(trgRig)
     setLimitConstraints(trgRig, 0.0)
     poseTrgIkBones(context, trgRig, trgAnimations)
-    setInterpolation(trgRig)
+    utils.setInterpolation(trgRig)
     if onoff == 'OFF':
         setLimitConstraints(trgRig, 1.0)
     else:
@@ -579,8 +545,8 @@ def renameAndRescaleBvh(context, srcRig, trgRig):
     #(srcRig, srcBones, action) =  renameBvhRig(rig, filepath)
     target.guessTargetArmature(trgRig, scn)
     source.findSrcArmature(context, srcRig)
-    renameBones(srcRig)
-    setInterpolation(srcRig)
+    renameBones(srcRig, scn)
+    utils.setInterpolation(srcRig)
     rescaleRig(context.scene, trgRig, srcRig)
     srcRig['McpRenamed'] = True
     return 
@@ -631,5 +597,62 @@ class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
         print("%s renamed" % srcRig.name)
         return{'FINISHED'}    
 
+#
+#   class VIEW3D_OT_LoadAndRenameBvhButton(bpy.types.Operator, ImportHelper):
+#
+
+class VIEW3D_OT_LoadAndRenameBvhButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mcp.load_and_rename_bvh"
+    bl_label = "Load and rename BVH file (.bvh)"
+
+    filename_ext = ".bvh"
+    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+    filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
+
+    def execute(self, context):
+        (srcRig, trgRig) = readBvhFile(context, self.properties.filepath, context.scene, False)        
+        renameAndRescaleBvh(context, srcRig, trgRig)
+        if context.scene['McpRescale']:
+            simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
+        print("%s loaded and renamed" % srcRig.name)
+        return{'FINISHED'}    
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}    
 
 
+#
+#   class LoadPanel(bpy.types.Panel):
+#
+
+class LoadPanel(bpy.types.Panel):
+    bl_label = "Mocap: Load"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        layout.prop(scn, "McpBvhScale")
+        layout.prop(scn, "McpAutoScale")
+        layout.prop(scn, "McpStartFrame")
+        layout.prop(scn, "McpEndFrame")
+        layout.prop(scn, "McpRot90Anim")
+        layout.operator("mcp.load_bvh")
+        layout.operator("mcp.rename_bvh")
+        layout.operator("mcp.load_and_rename_bvh")
+
+def register():
+    bpy.utils.register_module(__name__)
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+
+if __name__ == "__main__":
+    register()

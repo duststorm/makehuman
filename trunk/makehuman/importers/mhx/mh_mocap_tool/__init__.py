@@ -84,6 +84,7 @@ Batch run:
 if "bpy" in locals():
     print("Reloading Mocap tool")
     import imp
+    imp.reload(utils)
     imp.reload(globvar)
     imp.reload(props)
     imp.reload(load)
@@ -111,8 +112,9 @@ else:
     print("Loading Mocap tool")
     import bpy, os
     from bpy_extras.io_utils import ImportHelper
-    from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
+    from bpy.props import *
 
+    from . import utils
     from . import globvar
     from . import props
     from . import load
