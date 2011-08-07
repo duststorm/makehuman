@@ -35,7 +35,10 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
     scn = context.scene
     if not scn.McpDoSimplify:
         return
-    (fcurves, minTime, maxTime) = getRigFCurves(rig, useVisible, useMarkers, scn)
+    act = utils.getAction(rig)
+    if not act:
+        return
+    (fcurves, minTime, maxTime) = getActionFCurves(act, useVisible, useMarkers, scn)
     if not fcurves:
         return
 
@@ -46,16 +49,10 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
     return
 
 #
-#   getRigFCurves(rig, useVisible, useMarkers, scn):
+#   getActionFCurves(act, useVisible, useMarkers, scn):
 #
 
-def getRigFCurves(rig, useVisible, useMarkers, scn):
-    try:
-        act = rig.animation_data.action
-    except:
-        print("Rig %s has no associated action" % rig.name)
-        return (None, 0, 0)
-
+def getActionFCurves(act, useVisible, useMarkers, scn):
     if useVisible:
         fcurves = []
         for fcu in act.fcurves:
@@ -196,11 +193,10 @@ def getMarkedTime(scn):
 #
 
 def rescaleFCurves(context, rig, factor):
-    (fcurves, minTime, maxTime) = getRigFCurves(rig, False, False, context.scene)
-    if not fcurves:
+    act = utils.getAction(context.object)
+    if not act:
         return
-
-    for fcu in fcurves:
+    for fcu in act.fcurves:
         rescaleFCurve(fcu, factor)
     print("Curves rescaled")
     return
@@ -287,7 +283,7 @@ def addFCurveInserts(fcu, inserts, limitData):
 #
 
 class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_simplify_fcurves"
+    bl_idname = "mcp.simplify_fcurves"
     bl_label = "Simplify FCurves"
 
     def execute(self, context):
@@ -296,7 +292,7 @@ class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 class VIEW3D_OT_McpRescaleFCurvesButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_rescale_fcurves"
+    bl_idname = "mcp.rescale_fcurves"
     bl_label = "Rescale FCurves"
 
     def execute(self, context):
@@ -325,7 +321,7 @@ class SimplifyPanel(bpy.types.Panel):
         layout.prop(scn, "McpErrorRot")
         layout.prop(scn, "McpSimplifyVisible")
         layout.prop(scn, "McpSimplifyMarkers")
-        layout.operator("mcp.mocap_simplify_fcurves")
+        layout.operator("mcp.simplify_fcurves")
 
 #
 #   class SubsamplePanel(bpy.types.Panel):
@@ -351,7 +347,7 @@ class SubsamplePanel(bpy.types.Panel):
             layout.prop(scn, "McpSSFactor")
             layout.prop(scn, "McpRescale")
             layout.prop(scn, "McpRescaleFactor")
-            layout.operator("mcp.mocap_rescale_fcurves")
+            layout.operator("mcp.rescale_fcurves")
                 
 def register():
     bpy.utils.register_module(__name__)

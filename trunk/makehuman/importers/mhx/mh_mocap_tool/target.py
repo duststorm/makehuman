@@ -248,7 +248,7 @@ def initTargetCharacter(rig):
     return
     
 class VIEW3D_OT_McpInitTargetCharacterButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_init_target_character"
+    bl_idname = "mcp.init_target_character"
     bl_label = "Initialize target character"
     bl_options = {'REGISTER'}
 
@@ -258,7 +258,7 @@ class VIEW3D_OT_McpInitTargetCharacterButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 class VIEW3D_OT_McpUnInitTargetCharacterButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_uninit_target_character"
+    bl_idname = "mcp.uninit_target_character"
     bl_label = "Uninitialize"
     bl_options = {'REGISTER'}
 
@@ -453,7 +453,7 @@ def realBone(bone, rig, n, assoc):
     return (bone, False)
 
 class VIEW3D_OT_McpMakeTargetAssocButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_make_assoc"
+    bl_idname = "mcp.make_assoc"
     bl_label = "Make target associations"
     bl_options = {'REGISTER'}
 
@@ -475,7 +475,7 @@ def unrollAll(context):
     return
 
 class VIEW3D_OT_McpUnrollAllButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_unroll_all"
+    bl_idname = "mcp.unroll_all"
     bl_label = "Unroll all"
     bl_options = {'REGISTER'}
 
@@ -526,7 +526,7 @@ def loadTargetBones(context, path):
     return
         
 class VIEW3D_OT_McpLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mcp.mocap_load_save_target_bones"
+    bl_idname = "mcp.load_save_target_bones"
     bl_label = "Load/save target bones"
 
     loadSave = bpy.props.StringProperty()
@@ -567,15 +567,15 @@ class MhxTargetBonesPanel(bpy.types.Panel):
             inited = False
 
         if not inited:
-            layout.operator("mcp.mocap_init_target_character", text='Initialize target character')
+            layout.operator("mcp.init_target_character", text='Initialize target character')
             return
 
-        layout.operator("mcp.mocap_init_target_character", text='Reinitialize target character')        
-        layout.operator("mcp.mocap_uninit_target_character")        
-        layout.operator("mcp.mocap_load_save_target_bones", text='Load target bones').loadSave = 'load'        
-        layout.operator("mcp.mocap_load_save_target_bones", text='Save target bones').loadSave = 'save'        
-        layout.operator("mcp.mocap_make_assoc")        
-        layout.operator("mcp.mocap_unroll_all")        
+        layout.operator("mcp.init_target_character", text='Reinitialize target character')        
+        layout.operator("mcp.uninit_target_character")        
+        layout.operator("mcp.load_save_target_bones", text='Load target bones').loadSave = 'load'        
+        layout.operator("mcp.load_save_target_bones", text='Save target bones').loadSave = 'save'        
+        layout.operator("mcp.make_assoc")        
+        layout.operator("mcp.unroll_all")        
         #layout.prop(rig, '["McpArmBentDown"]', text='Arm bent down')
         #layout.prop(rig, '["McpLegBentOut"]', text='Leg bent out')
 

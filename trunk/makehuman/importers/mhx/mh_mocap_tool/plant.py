@@ -109,7 +109,7 @@ def plantFCurves(fcurves, first, last, useCrnt, values):
 #
 
 class VIEW3D_OT_McpPlantButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_plant"
+    bl_idname = "mcp.plant"
     bl_label = "Plant"
 
     def execute(self, context):
@@ -138,7 +138,7 @@ class PlantPanel(bpy.types.Panel):
         row.prop(scn, "McpPlantLoc")
         row.prop(scn, "McpPlantRot")
         layout.prop(scn, "McpPlantCurrent")
-        layout.operator("mcp.mocap_plant")
+        layout.operator("mcp.plant")
 
 def register():
     bpy.utils.register_module(__name__)

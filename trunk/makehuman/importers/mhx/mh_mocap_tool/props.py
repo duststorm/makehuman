@@ -135,6 +135,11 @@ def initInterface(context):
         name="In place affects Z", 
         default=False)
 
+    bpy.types.Scene.McpRepeatNumber = IntProperty(
+        name="Repeat number", 
+        min=1,
+        default=1)
+
     # Plant
     
     bpy.types.Scene.McpPlantCurrent = BoolProperty(
@@ -209,6 +214,7 @@ def initInterface(context):
         scn['McpLoopBlendRange'] = 5
         scn['McpLoopInPlace'] = False
         scn['McpLoopZInPlace'] = False
+        scn['McpRepeatNumber'] = 1
 
         # Plant
         
@@ -300,7 +306,7 @@ def saveDefaults(context):
 #
 
 class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_init_interface"
+    bl_idname = "mcp.init_interface"
     bl_label = "Initialize"
 
     def execute(self, context):
@@ -311,7 +317,7 @@ class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
 
 
 class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_save_defaults"
+    bl_idname = "mcp.save_defaults"
     bl_label = "Save defaults"
 
     def execute(self, context):
@@ -323,7 +329,7 @@ class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_McpCopyAnglesIKButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_copy_angles_fk_ik"
+    bl_idname = "mcp.copy_angles_fk_ik"
     bl_label = "Angles  --> IK"
 
     def execute(self, context):
@@ -349,7 +355,7 @@ def readDirectory(directory, prefix):
     return paths
 
 class VIEW3D_OT_McpBatchButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_batch"
+    bl_idname = "mcp.batch"
     bl_label = "Batch run"
 
     def execute(self, context):
@@ -379,15 +385,15 @@ class PropsPanel(bpy.types.Panel):
         scn = context.scene
         ob = context.object
                 
-        layout.operator("mcp.mocap_init_interface")
-        layout.operator("mcp.mocap_save_defaults")
-        layout.operator("mcp.mocap_copy_angles_fk_ik")
+        layout.operator("mcp.init_interface")
+        layout.operator("mcp.save_defaults")
+        layout.operator("mcp.copy_angles_fk_ik")
 
         layout.separator()
         layout.label('Batch conversion')
         layout.prop(scn, "McpDirectory")
         layout.prop(scn, "McpPrefix")
-        layout.operator("mcp.mocap_batch")
+        layout.operator("mcp.batch")
         return
 
 def register():

@@ -237,7 +237,7 @@ def ensureSourceInited(context):
 #
 
 class VIEW3D_OT_McpScanRigButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_scan_rig"
+    bl_idname = "mcp.scan_rig"
     bl_label = "Scan source rig"
     bl_options = {'REGISTER'}
 
@@ -298,7 +298,7 @@ def loadSourceBones(context, path):
     return
         
 class VIEW3D_OT_McpLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mcp.mocap_load_save_source_bones"
+    bl_idname = "mcp.load_save_source_bones"
     bl_label = "Load/save source bones"
 
     loadSave = bpy.props.StringProperty()
@@ -336,11 +336,11 @@ class MhxSourceBonesPanel(bpy.types.Panel):
         scn = context.scene
         rig = context.object
         if the.sourceProps:
-            layout.operator("mcp.mocap_scan_rig", text="Rescan source rig")    
+            layout.operator("mcp.scan_rig", text="Rescan source rig")    
         else:
-            layout.operator("mcp.mocap_scan_rig", text="Scan source rig")    
-        layout.operator("mcp.mocap_load_save_source_bones", text='Load source bones').loadSave = 'load'        
-        layout.operator("mcp.mocap_load_save_source_bones", text='Save source bones').loadSave = 'save'        
+            layout.operator("mcp.scan_rig", text="Scan source rig")    
+        layout.operator("mcp.load_save_source_bones", text='Load source bones').loadSave = 'load'        
+        layout.operator("mcp.load_save_source_bones", text='Save source bones').loadSave = 'save'        
         if not the.sourceProps:
             return
         layout.separator()

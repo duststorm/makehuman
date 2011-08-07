@@ -148,7 +148,7 @@ def silenceConstraints(rig):
 #
 
 class VIEW3D_OT_McpTogglePoleTargetsButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_toggle_pole_targets"
+    bl_idname = "mcp.toggle_pole_targets"
     bl_label = "Toggle pole targets"
 
     def execute(self, context):
@@ -161,7 +161,7 @@ class VIEW3D_OT_McpTogglePoleTargetsButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_McpToggleIKLimitsButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_toggle_ik_limits"
+    bl_idname = "mcp.toggle_ik_limits"
     bl_label = "Toggle IK limits"
 
     def execute(self, context):
@@ -174,7 +174,7 @@ class VIEW3D_OT_McpToggleIKLimitsButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_McpToggleLimitConstraintsButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_toggle_limit_constraints"
+    bl_idname = "mcp.toggle_limit_constraints"
     bl_label = "Toggle Limit constraints"
 
     def execute(self, context):
@@ -187,7 +187,7 @@ class VIEW3D_OT_McpToggleLimitConstraintsButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_McpSilenceConstraintsButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_silence_constraints"
+    bl_idname = "mcp.silence_constraints"
     bl_label = "Silence constraints"
 
     def execute(self, context):
@@ -213,13 +213,13 @@ class ToggleConstraintPanel(bpy.types.Panel):
         layout = self.layout
         ob = context.object
         row = layout.row()
-        row.operator("mcp.mocap_toggle_pole_targets")
+        row.operator("mcp.toggle_pole_targets")
         row.prop(ob, "McpTogglePoleTargets")
         row = layout.row()
-        row.operator("mcp.mocap_toggle_ik_limits")
+        row.operator("mcp.toggle_ik_limits")
         row.prop(ob, "McpToggleIkLimits")
         row = layout.row()
-        row.operator("mcp.mocap_toggle_limit_constraints")
+        row.operator("mcp.toggle_limit_constraints")
         row.prop(ob, "McpToggleLimitConstraints")
 
 def register():

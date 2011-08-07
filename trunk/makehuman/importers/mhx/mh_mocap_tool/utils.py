@@ -64,18 +64,6 @@ def getRoll(bone):
         roll = 2*atan(quat.y/quat.w)
     return roll
     
-
-"""
-#
-#   getBone(rig, bone)
-#
-
-def getBone(rig, bone):
-    try:
-        return rig[bone]
-    except:
-        return bone
-""" 
 #
 #   getBone(name, rig):        
 #
@@ -96,6 +84,17 @@ def getBone(name, rig):
         print("Not yet")
     return None        
  
+#
+#   getAction(ob):
+#
+
+def getAction(ob):
+    try:
+        return ob.animation_data.action
+    except:
+        print("%s has no action" % ob)
+        return None
+        
 #
 #   activeFrames(ob):
 #
@@ -122,6 +121,29 @@ def fCurveIdentity(fcu):
     words = fcu.data_path.split('.')
     mode = words[-1]
     return (name, mode)
+
+#
+#   findFCurve(path, index, fcurves):
+#
+
+def findFCurve(path, index, fcurves):
+    for fcu in fcurves:
+        if (fcu.data_path == path and
+            fcu.array_index == index):
+            return fcu
+    return None            
+    
+#
+#   isRotation(mode):
+#   isLocation(mode):
+#
+
+def isRotation(mode):
+    return (mode[0:3] == 'rot')
+    
+def isLocation(mode):
+    return (mode[0:3] == 'loc')
+    
 
 #
 #    setRotation(pb, mat, frame, group):

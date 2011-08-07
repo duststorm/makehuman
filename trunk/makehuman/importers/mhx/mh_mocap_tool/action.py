@@ -89,7 +89,7 @@ def deleteAction(context):
 #
 
 class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_update_action_list"
+    bl_idname = "mcp.update_action_list"
     bl_label = "Update action list"
 
     @classmethod
@@ -105,7 +105,7 @@ class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
-    bl_idname = "mcp.mocap_delete"
+    bl_idname = "mcp.delete"
     bl_label = "Delete action"
 
     @classmethod
@@ -134,9 +134,9 @@ class ActionPanel(bpy.types.Panel):
         layout = self.layout
         layout.label('Manage actions')
         layout.prop_menu_enum(context.scene, "McpActions")
-        layout.operator("mcp.mocap_update_action_list")
+        layout.operator("mcp.update_action_list")
         layout.prop(context.scene, "McpReallyDelete")
-        layout.operator("mcp.mocap_delete")
+        layout.operator("mcp.delete")
 
 def register():
     bpy.utils.register_module(__name__)
