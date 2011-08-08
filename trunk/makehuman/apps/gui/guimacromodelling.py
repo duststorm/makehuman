@@ -107,6 +107,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.muscleSlider.setValue(human.getMuscle())
         self.weightSlider.setValue(human.getWeight())
         self.heightSlider.setValue(human.getHeight())
+        self.africanSlider.setValue(human.getAfrican())
         self.asianSlider.setValue(human.getAsian())
 
     def syncStatus(self):
