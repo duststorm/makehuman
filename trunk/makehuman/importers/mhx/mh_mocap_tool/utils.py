@@ -94,6 +94,17 @@ def getAction(ob):
     except:
         print("%s has no action" % ob)
         return None
+
+#
+#   deleteAction(act):    
+#
+
+def deleteAction(act):    
+    act.use_fake_user = False
+    if act.users == 0:
+        bpy.data.actions.remove(act)
+    else:
+        print("%s has %d users" % (act, act.users))
         
 #
 #   activeFrames(ob):

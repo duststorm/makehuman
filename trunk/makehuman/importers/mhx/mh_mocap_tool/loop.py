@@ -78,7 +78,7 @@ def loopFCurves(context):
                 #print(pb.head)
             for fcu in fcurves:
                 (name, mode) = utils.fCurveIdentity(fcu)
-                if (utils.isLocation(mode) and
+                if ( utils.isLocation(mode) and
                     (fcu.array_index != 2 or scn['McpLoopZInPlace'])):
                     loopFCurve(fcu, minTime, maxTime, scn)
 
@@ -106,13 +106,16 @@ def loopFCurve(fcu, t0, tn, scn):
         v1 = fcu.evaluate(t1)
         tm = tn+dt
         vm = fcu.evaluate(tm) - dt*dv
-        newpoints.append((t1, eps*v1 + (1-eps)*vm))
+        pt1 = (t1, (eps*vm + (1-eps)*v1))
         
         t1 = t0-dt
         v1 = fcu.evaluate(t1) + dt*dv
         tm = tn-dt
         vm = fcu.evaluate(tm)
-        newpoints.append((tm, eps*vm + (1-eps)*v1))
+        ptm = (tm, eps*v1 + (1-eps)*vm)
+        
+        #print("  ", pt1,ptm)
+        newpoints.extend([pt1,ptm])
         
     newpoints.sort()
     for (t,v) in newpoints: 
@@ -214,7 +217,7 @@ def shiftBoneFCurves(context):
         try:
             if utils.isRotation(mode):
                 dy = fcu.evaluate(frame) - origRot[fcu.array_index][fcu.data_path]
-            elif utils.isLocation(mode):
+            elif  utils.isLocation(mode):
                 dy = fcu.evaluate(frame) - origLoc[fcu.array_index][fcu.data_path]
         except:
             continue     
@@ -234,22 +237,30 @@ class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
 
     
 #
-#   storeAction(context, toProp, prefix):
-#   class VIEW3D_OT_McpStoreActionButton(bpy.types.Operator):
+#   startEdit(context):
+#   class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
 #
 
-def storeAction(context, toProp, prefix):
+def startEdit(context):
     rig = context.object
+    try:
+        if (rig['McpUndoAction'] or rig['McpActionName']):
+            print("Action already being edited. Undo or confirm edit first")
+            return
+    except:
+        pass
     act = utils.getAction(rig)
     if not act:
         return
     aname = act.name        
-    act.name = prefix+aname
-    act.use_fake_user = True
-    nact = context.blend_data.actions.new(aname)
+    act.name = '#'+aname
+    nact = bpy.data.actions.new(aname)
     rig.animation_data.action = nact
-    rig[toProp] = act.name
+    rig['McpUndoAction'] = act.name
     rig['McpActionName'] = aname
+
+    the.editLoc = quadDict()
+    the.editRot = quadDict()
 
     for fcu in act.fcurves:
         (name, mode) = utils.fCurveIdentity(fcu)
@@ -262,65 +273,54 @@ def storeAction(context, toProp, prefix):
     print("Action stored")
     return nact       
 
-class VIEW3D_OT_McpStoreActionButton(bpy.types.Operator):
-    bl_idname = "mcp.store_action"
-    bl_label = "Store action"
+class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
+    bl_idname = "mcp.start_edit"
+    bl_label = "Start edit"
 
     def execute(self, context):
-        storeAction(context, 'McpUndoAction', '#')
+        startEdit(context)
         return{'FINISHED'}    
 
 #
-#   undoAction(context, fromProp, toProp, prefix, handle):
-#   class VIEW3D_OT_McpUndoActionButton(bpy.types.Operator):
-#   class VIEW3D_OT_McpRedoActionButton(bpy.types.Operator):
+#   undoEdit(context):
+#   class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
 #
 
-def undoAction(context, fromProp, toProp, prefix, handle):
+def undoEdit(context):
     rig = context.object
     try:
-        name = rig[fromProp]
-        oact = context.blend_data.actions[name]
+        name = rig['McpUndoAction']
+        oact = bpy.data.actions[name]
     except:
         oact = None
     if not oact:
-        print("No action to %s" % handle)
+        print("No action to undo")
         return
-    act = utils.getAction(rig)
-    if act:
-        act.name = prefix+act.name
-    act.use_fake_user = True
-    rig[toProp] = act.name
-    rig[fromProp] = ""
+    rig['McpUndoAction'] = ""
+    the.editLoc = None
+    the.editRot = None
+    rig['McpActionName'] = ""
+    act = rig.animation_data.action
+    act.name = "#Delete"
     oact.name = rig['McpActionName'] 
-    rig.animation_data.action = oact        
-    print("Action changes %sne" % handle)
+    rig.animation_data.action = oact
+    utils.deleteAction(act)
+    print("Action changes undone")
     return
 
-class VIEW3D_OT_McpUndoActionButton(bpy.types.Operator):
-    bl_idname = "mcp.undo_action"
-    bl_label = "Undo action"
+class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
+    bl_idname = "mcp.undo_edit"
+    bl_label = "Undo edit"
 
     def execute(self, context):
-        undoAction(context, 'McpUndoAction', 'McpRedoAction', '#', 'undo')
-        return{'FINISHED'} 
-        
-class VIEW3D_OT_McpRedoActionButton(bpy.types.Operator):
-    bl_idname = "mcp.redo_action"
-    bl_label = "Redo action"
-
-    def execute(self, context):
-        undoAction(context, 'McpRedoAction', 'McpUndoAction', '%', 'redo')
+        undoEdit(context)
         return{'FINISHED'} 
         
 #
-#   displaceFCurves(context):
-#   setupCatmullRom(kpoints, modified): 
-#   evalCatmullRom(t, fcn):
-#   class VIEW3D_OT_McpDisplaceFCurvesButton(bpy.types.Operator):
+#   getActionPair(context):
 #
 
-def displaceFCurves(context):
+def getActionPair(context):
     rig = context.object
     try:
         name = rig['McpUndoAction']
@@ -329,44 +329,172 @@ def displaceFCurves(context):
         oact = None
     if not oact:
         print("No stored action")
-        return
+        return None
+    try:
+        the.editLoc
+        the.editRot
+    except:
+        the.editLoc = quadDict()
+        the.editRot = quadDict()
     act = utils.getAction(rig)
-    if not act:
-        return
-    nact = storeAction(context, 'McpRedoAction', '%')
+    if act:
+        return (act, oact)
+    else:
+        return None
 
-    nCurves = 0
-    for fcu in nact.fcurves:
+#
+#   confirmEdit(context):
+#   class VIEW3D_OT_McpConfirmEditButton(bpy.types.Operator):
+#
+
+def confirmEdit(context):
+    rig = context.object
+    pair = getActionPair(context)
+    if not pair:
+        return
+    (act, oact) = pair
+
+    for fcu in act.fcurves:
         ofcu = utils.findFCurve(fcu.data_path, fcu.array_index, oact.fcurves)
         if not ofcu:
             continue
         (name,mode) =  utils.fCurveIdentity(fcu)
-        print(name, mode)
-        print("  ", ofcu)
-        modified = []
-        first = True
-        for kp in fcu.keyframe_points:            
-            t = kp.co[0]
-            dy = kp.co[1] - ofcu.evaluate(t)
-            if abs(dy) > 1e-4 or first:
-                modified.append((t,dy))
-            first = False
+        if utils.isRotation(mode):
+            try:
+                edit = the.editRot[fcu.array_index][name]
+            except:
+                continue
+            displaceFCurve(fcu, ofcu, edit)
+        elif  utils.isLocation(mode):
+            try:
+                edit = the.editLoc[fcu.array_index][name]
+            except:
+                continue
+            displaceFCurve(fcu, ofcu, edit)
+
+    rig['McpUndoAction'] = ""
+    rig['McpActionName'] = ""
+    the.editLoc = None
+    the.editRot = None
+    utils.deleteAction(oact)
+    print("Action changed")
+    return                
+            
+class VIEW3D_OT_McpConfirmEditButton(bpy.types.Operator):
+    bl_idname = "mcp.confirm_edit"
+    bl_label = "Confirm edit"
+
+    def execute(self, context):
+        confirmEdit(context)
+        return{'FINISHED'} 
+
+#
+#   setEditDict(editDict, frame, name, channel, index):
+#   insertKey(context, useLoc, useRot):
+#   class VIEW3D_OT_McpInsertLocButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpInsertRotButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpInsertLocRotButton(bpy.types.Operator):
+#
+
+def setEditDict(editDict, frame, name, channel, n):
+    for index in range(n):        
+        try:
+            editDict[index][name]
+        except:
+            editDict[index][name] = {}
+        edit = editDict[index][name]
+        edit[frame] = channel[index]
+    return        
+
+def insertKey(context, useLoc, useRot):
+    rig = context.object
+    pair = getActionPair(context)
+    if not pair:
+        return
+    (act, oact) = pair
+    
+    pb = bpy.context.active_pose_bone
+    frame = context.scene.frame_current    
+    for pb in rig.pose.bones:
+        if not pb.bone.select:
+            continue
+        if useLoc:
+            setEditDict(the.editLoc, frame, pb.name, pb.location, 3)
+        if useRot:        
+            if pb.rotation_mode == 'QUATERNION':
+                setEditDict(the.editRot, frame, pb.name, pb.rotation_quaternion, 4)
+            else:
+                setEditDict(the.editRot, frame, pb.name, pb.rotation_euler, 3)
+        for fcu in act.fcurves:
+            ofcu = utils.findFCurve(fcu.data_path, fcu.array_index, oact.fcurves)
+            if not ofcu:
+                continue
+            (name,mode) =  utils.fCurveIdentity(fcu)
+            if name == pb.name:
+                if utils.isRotation(mode) and useRot:
+                    displaceFCurve(fcu, ofcu, the.editRot[fcu.array_index][name])
+                if  utils.isLocation(mode) and useLoc:
+                    displaceFCurve(fcu, ofcu, the.editLoc[fcu.array_index][name])
+    return                
+
+class VIEW3D_OT_McpInsertLocButton(bpy.types.Operator):
+    bl_idname = "mcp.insert_loc"
+    bl_label = "Loc"
+
+    def execute(self, context):
+        insertKey(context, True, False)
+        return{'FINISHED'} 
+        
+class VIEW3D_OT_McpInsertRotButton(bpy.types.Operator):
+    bl_idname = "mcp.insert_rot"
+    bl_label = "Rot"
+
+    def execute(self, context):
+        insertKey(context, False, True)
+        return{'FINISHED'} 
+        
+class VIEW3D_OT_McpInsertLocRotButton(bpy.types.Operator):
+    bl_idname = "mcp.insert_locrot"
+    bl_label = "LocRot"
+
+    def execute(self, context):
+        insertKey(context, True, True)
+        return{'FINISHED'} 
+        
+#
+#   displaceFCurve(fcu, ofcu, edits):       
+#   setupCatmullRom(kpoints, modified): 
+#   evalCatmullRom(t, fcn):
+#
+        
+def displaceFCurve(fcu, ofcu, edits):        
+    modified = []
+    editList = list(edits.items())
+    editList.sort()
+    for (t,y) in editList:
+        dy = y - ofcu.evaluate(t)
         modified.append((t,dy))
         
-        if len(modified) > 2:
-            nCurves += 1
-            fcn = setupCatmullRom(modified)            
-            for kp in fcu.keyframe_points:
-                t = int(kp.co[0])
-                y = ofcu.evaluate(t)
-                dy = evalCatmullRom(t, fcn)
-                #if utils.isLocation(mode):
-                #    print(" ", t, y, dy, y+dy)
-                kp.co[1] = y+dy
-    print("%d F-curves changed" % nCurves)
-    return                
+    if len(modified) >= 1:
+        kp = fcu.keyframe_points[0].co
+        t0 = int(kp[0])
+        (t1,y1) = modified[0]
+        kp = fcu.keyframe_points[-1].co
+        tn = int(kp[0])
+        (tn_1,yn_1) = modified[-1]
+        modified = [(t0, y1)] + modified
+        modified.append( (tn, yn_1) )
+        fcn = setupCatmullRom(modified)            
+        for kp in fcu.keyframe_points:
+            t = kp.co[0]
+            y = ofcu.evaluate(t)
+            dy = evalCatmullRom(t, fcn)
+            kp.co[1] = y+dy
+    return
+    
                         
 def setupCatmullRom(points): 
+    points.sort()
     n = len(points)-1
     fcn = []
     tension = 0.5
@@ -424,14 +552,6 @@ def evalCRInterval(t, t0, t1, tfac, params):
     x1 = 1-x
     f = x*x*(a*x + b*x1) + x1*x1*(c*x+d*x1)
     return f
-        
-class VIEW3D_OT_McpDisplaceFCurvesButton(bpy.types.Operator):
-    bl_idname = "mcp.displace_fcurves"
-    bl_label = "Displace F-curves"
-
-    def execute(self, context):
-        displaceFCurves(context)
-        return{'FINISHED'} 
 
 ########################################################################
 #
@@ -464,10 +584,13 @@ class AdjustPanel(bpy.types.Panel):
         layout.label("Shift")
         layout.operator("mcp.shift_bone")
         layout.label("Displace animation")
-        layout.operator("mcp.store_action")
-        layout.operator("mcp.undo_action")
-        layout.operator("mcp.redo_action")
-        layout.operator("mcp.displace_fcurves")
+        layout.operator("mcp.start_edit")
+        layout.operator("mcp.undo_edit")
+        row = layout.row()
+        row.operator("mcp.insert_loc")
+        row.operator("mcp.insert_rot")
+        row.operator("mcp.insert_locrot")
+        layout.operator("mcp.confirm_edit")
                 
 def register():
     bpy.utils.register_module(__name__)

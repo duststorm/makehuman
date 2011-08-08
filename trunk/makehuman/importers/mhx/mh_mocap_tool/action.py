@@ -27,12 +27,15 @@ import bpy
 from bpy.props import EnumProperty
 
 from . import globvar as the
+from . import utils
 
 #
-#    Select or delete action
+#   Select or delete action
 #   Delete button really deletes action. Handle with care.
 #
-#    listAllActions(context):
+#   listAllActions(context):
+#   findAction(name):
+#   class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
 #
 
 def listAllActions(context):
@@ -45,10 +48,6 @@ def listAllActions(context):
         name = "Actions")
     return
 
-#
-#    findAction(name):
-#
-
 def findAction(name):
     for n,action in enumerate(the.actions):
         (name1, name2, name3) = action        
@@ -56,8 +55,22 @@ def findAction(name):
             return n
     raise NameError("Unrecognized action %s" % name)
 
+
+class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
+    bl_idname = "mcp.update_action_list"
+    bl_label = "Update action list"
+
+    @classmethod
+    def poll(cls, context):
+        return context.object
+
+    def execute(self, context):
+        listAllActions(context)
+        return{'FINISHED'}    
+
 #
 #   deleteAction(context):
+#   class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
 #
 
 def deleteAction(context):
@@ -82,28 +95,6 @@ def deleteAction(context):
         else:
             print("Cannot delete. %s has %d users." % (act, act.users))
 
-
-########################################################################
-#
-#   class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
-    bl_idname = "mcp.update_action_list"
-    bl_label = "Update action list"
-
-    @classmethod
-    def poll(cls, context):
-        return context.object
-
-    def execute(self, context):
-        listAllActions(context)
-        return{'FINISHED'}    
-
-#
-#   class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
-#
-
 class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
     bl_idname = "mcp.delete"
     bl_label = "Delete action"
@@ -116,6 +107,26 @@ class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
         deleteAction(context)
         return{'FINISHED'}    
 
+#
+#   deleteHash():
+#   class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
+#
+
+def deleteHash():
+    for act in bpy.data.actions:
+        if act.name[0] == '#':
+            utils.deleteAction(act)
+    return 
+    
+class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
+    bl_idname = "mcp.delete_hash"
+    bl_label = "Delete hash actions"
+
+    def execute(self, context):
+        deleteHash()
+        return{'FINISHED'}    
+
+########################################################################
 #
 #   class ActionPanel(bpy.types.Panel):
 #
@@ -137,6 +148,7 @@ class ActionPanel(bpy.types.Panel):
         layout.operator("mcp.update_action_list")
         layout.prop(context.scene, "McpReallyDelete")
         layout.operator("mcp.delete")
+        layout.operator("mcp.delete_hash")
 
 def register():
     bpy.utils.register_module(__name__)
