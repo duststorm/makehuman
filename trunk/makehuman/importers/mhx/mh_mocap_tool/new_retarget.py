@@ -228,7 +228,9 @@ def retargetMhxRig(context, srcRig, trgRig):
         cns.influence = 0.0
 
     utils.setInterpolation(trgRig)
-    trgRig.animation_data.action.name = trgRig.name[:4] + srcRig.name[2:]
+    act = trgRig.animation_data.action
+    act.name = trgRig.name[:4] + srcRig.name[2:]
+    act.use_fake_user = True
     print("Retargeted %s --> %s" % (srcRig, trgRig))
     return
     

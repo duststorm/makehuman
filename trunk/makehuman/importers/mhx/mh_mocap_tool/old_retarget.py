@@ -588,7 +588,9 @@ def retargetMhxRig(context, srcRig, trgRig):
     else:
         toggle.setLimitConstraints(trgRig, 0.0)
 
-    trgRig.animation_data.action.name = trgRig.name[:4] + srcRig.name[2:]
+    act = trgRig.animation_data.action
+    act.name = trgRig.name[:4] + srcRig.name[2:]
+    act.use_fake_user = True
     print("Retargeted %s --> %s" % (srcRig, trgRig))
     return
     

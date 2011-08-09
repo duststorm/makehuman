@@ -39,13 +39,26 @@ from . import utils
 #
 
 def listAllActions(context):
-    the.actions = [] 
+    scn = context.scene
+    try:
+        doFilter = scn['McpFilterActions']
+        filter = context.object.name
+        if len(filter) > 4:
+            filter = filter[0:4]
+            flen = 4
+        else:
+            flen = len(filter)
+    except:
+        doFilter = False
+        
+    the.actions = []     
     for act in bpy.data.actions:
         name = act.name
-        the.actions.append((name, name, name))
+        if (not doFilter) or (name[0:flen] == filter):
+            the.actions.append((name, name, name))
     bpy.types.Scene.McpActions = EnumProperty(
         items = the.actions,
-        name = "Actions")
+        name = "Actions")  
     return
 
 def findAction(name):
@@ -73,10 +86,15 @@ class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
 #   class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
 #
 
+def selectedAction(scn):
+    n = scn['McpActions']
+    (name1, name2, name3) = the.actions[n]
+    return name1
+
 def deleteAction(context):
     listAllActions(context)
     scn = context.scene
-    name = scn.McpActions    
+    name = selectedAction(scn)
     print('Delete action', name)    
     try:
         act = bpy.data.actions[name]
@@ -126,6 +144,31 @@ class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
         deleteHash()
         return{'FINISHED'}    
 
+#
+#   setCurrentAction(context):
+#   class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
+#
+
+def setCurrentAction(context):
+    listAllActions(context)
+    name = selectedAction(context.scene)
+    try:
+        act = bpy.data.actions[name]
+    except:
+        print("Did not find action %s" % name)
+        return
+    context.object.animation_data.action = act
+    print("Action set to %s" % act)
+    return
+    
+class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
+    bl_idname = "mcp.set_current_action"
+    bl_label = "Set current action"
+
+    def execute(self, context):
+        setCurrentAction(context)
+        return{'FINISHED'}    
+
 ########################################################################
 #
 #   class ActionPanel(bpy.types.Panel):
@@ -142,11 +185,13 @@ class ActionPanel(bpy.types.Panel):
             return True
 
     def draw(self, context):
+        scn = context.scene
         layout = self.layout
-        layout.label('Manage actions')
         layout.prop_menu_enum(context.scene, "McpActions")
+        layout.prop(scn, 'McpFilterActions')
         layout.operator("mcp.update_action_list")
-        layout.prop(context.scene, "McpReallyDelete")
+        layout.operator("mcp.set_current_action")
+        layout.prop(scn, "McpReallyDelete")
         layout.operator("mcp.delete")
         layout.operator("mcp.delete_hash")
 

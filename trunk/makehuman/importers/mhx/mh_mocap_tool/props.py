@@ -126,6 +126,16 @@ def initInterface(context):
         min=1,
         default=5)
     
+    bpy.types.Scene.McpLoopLoc = BoolProperty(
+        name="Loc", 
+        description="Looping affects location",
+        default=True)
+
+    bpy.types.Scene.McpLoopRot = BoolProperty(
+        name="Rot", 
+        description="Looping affects rotation",
+        default=True)
+
     bpy.types.Scene.McpLoopInPlace = BoolProperty(
         name="Loop in place", 
         description="Remove location F-curves",
@@ -173,8 +183,13 @@ def initInterface(context):
 
     # Manage actions
     
+    bpy.types.Scene.McpFilterActions = BoolProperty(
+        name="Filter", 
+        description="Filter action names",
+        default=False)
+
     bpy.types.Scene.McpReallyDelete = BoolProperty(
-        name="Really delete action", 
+        name="Really delete", 
         description="Delete button deletes action permanently",
         default=False)
 
@@ -212,6 +227,8 @@ def initInterface(context):
         # Loop
     
         scn['McpLoopBlendRange'] = 5
+        scn['McpLoopLoc'] = True
+        scn['McpLoopRot'] = True
         scn['McpLoopInPlace'] = False
         scn['McpLoopZInPlace'] = False
         scn['McpRepeatNumber'] = 1
@@ -229,6 +246,7 @@ def initInterface(context):
         
         # Manage actions            
         
+        scn['McpFilterActions'] = False
         scn['McpReallyDelete'] = False
         action.listAllActions(context)
     else:

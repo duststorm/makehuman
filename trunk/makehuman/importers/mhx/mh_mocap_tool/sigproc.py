@@ -24,7 +24,7 @@
 
 import bpy
 from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
-from . import simplify, load
+from . import utils, simplify
 from . import globvar as the
 
 
@@ -48,7 +48,11 @@ the.filterData = {}
 
 def calcFilters(context):
     rig = context.object
-    (fcurves, minTime, maxTime) = simplify.getRigFCurves(rig, False, False)
+    scn = context.scene
+    act = utils.getAction(rig)
+    if not act:
+        return
+    (fcurves, minTime, maxTime) = simplify.getActionFCurves(act, False, False, scn)
     if not fcurves:
         return            
 
@@ -87,14 +91,13 @@ def calcFilters(context):
         Gk = {}
         for n in range(m):
             Gk[n] = fcu.evaluate(n + t0)
-        print(fcu.data_path)
         G = {}
         G[0] = Gk
         p = 1
         for k in range(fb):
             Gl = {}
-            if 2*p >= m-2*p:
-                print("Bug %d %d" % (m,p))
+            #if 2*p >= m-2*p:
+            #    print("Bug %d %d" % (m,p))
             for n in range(0,m):
                 np = n+p
                 n2p = n+2*p
@@ -124,23 +127,27 @@ def calcFilters(context):
         fd.Ls[key] = L
 
     for k in range(fb-1):
-        rig["s_%d" % k] = 1.0
+        prop = "s_%d" % k
+        rig[prop] = 1.0
     return
 
 #
-#   reconstructFCurves(context):
+#   reconstructAction(context):
 #
 
-def reconstructFCurves(context):
+def reconstructAction(context):
     rig = context.object
+    scn = context.scene
+    act = utils.getAction(rig)
+    if not act:
+        return
+    (fcurves, minTime, maxTime) = simplify.getActionFCurves(act, False, False, scn)
+
     fd = the.filterData[rig.name]
     s = {}
     for k in range(fd.fb-1):
         s[k] = rig["s_%d" % k]
-    print(fd.fb, fd.m)
 
-    (fcurves, minTime, maxTime) = simplify.getRigFCurves(rig, False, False)
-    act = rig.animation_data.action
     nact = bpy.data.actions.new(act.name)
     
     for fcu in fcurves:
@@ -151,7 +158,6 @@ def reconstructFCurves(context):
         G = fd.Gs[key]
         L = fd.Ls[key]
 
-        print(path)
         Gk = G[fd.fb]
         x = {}
         for n in range(fd.m):
@@ -167,7 +173,7 @@ def reconstructFCurves(context):
             nfcu.keyframe_points.insert(frame=n, value=x[n])
 
     rig.animation_data.action = nact
-    load.setInterpolation(rig)
+    utils.setInterpolation(rig)
     return
 
 
@@ -178,7 +184,7 @@ def reconstructFCurves(context):
 
 class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
     bl_idname = "mcp.calc_filters"
-    bl_label = "Calc filters"
+    bl_label = "Calculate filters"
 
     def execute(self, context):
         calcFilters(context)
@@ -186,15 +192,15 @@ class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   class VIEW3D_OT_ReconstructFCurvesButton(bpy.types.Operator):
+#   class VIEW3D_OT_ReconstructActionButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_ReconstructFCurvesButton(bpy.types.Operator):
-    bl_idname = "mcp.reconstruct_fcurves"
-    bl_label = "Reconstruct F-curves"
+class VIEW3D_OT_ReconstructActionButton(bpy.types.Operator):
+    bl_idname = "mcp.reconstruct_action"
+    bl_label = "Reconstruct action"
 
     def execute(self, context):
-        reconstructFCurves(context)
+        reconstructAction(context)
         print("F-curves reconstructed")
         return{'FINISHED'}    
 
@@ -221,9 +227,9 @@ class SigProcPanel(bpy.types.Panel):
         except:
             fd = None
         if fd:
-            layout.operator("mcp.reconstruct_fcurves")
             for k in range(fd.fb-1):
                 layout.prop(ob, '["s_%d"]' % k)
+            layout.operator("mcp.reconstruct_action")
 
 def register():
     bpy.utils.register_module(__name__)

@@ -45,12 +45,13 @@ def loopFCurves(context):
     hasLocation = {}
     for fcu in fcurves:
         (name, mode) = utils.fCurveIdentity(fcu)
-        if utils.isRotation(mode):
+        if utils.isRotation(mode) and scn['McpLoopRot']:
             loopFCurve(fcu, minTime, maxTime, scn)
-        elif utils.isLocation(mode):
-            hasLocation[name] = True
+        elif utils.isLocation(mode) and scn['McpLoopLoc']:
+            if scn['McpLoopInPlace']:
+                hasLocation[name] = True
 
-    if scn['McpLoopInPlace']:
+    if scn['McpLoopInPlace'] and scn['McpLoopLoc']:
         frames = utils.activeFrames(rig)
         root = utils.getBone('Root', rig)    
         
@@ -574,6 +575,9 @@ class AdjustPanel(bpy.types.Panel):
         ob = context.object
         layout.label("Loop animation")
         layout.prop(scn, "McpLoopBlendRange")
+        row = layout.row()
+        row.prop(scn, "McpLoopLoc")
+        row.prop(scn, "McpLoopRot")
         layout.prop(scn, "McpLoopInPlace")
         if scn['McpLoopInPlace']:
             layout.prop(scn, "McpLoopZInPlace")
