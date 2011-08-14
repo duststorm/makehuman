@@ -150,7 +150,7 @@ def exportMhx_25(human, fp):
         rig = theConfig.useRig
         fp.write("#if toggle&T_Armature\n")
         for fname in mhx_rig.GizmoFiles:
-        	copyFile25(human, fname, rig, fp, None, [])    
+            copyFile25(human, fname, rig, fp, None, [])    
         mhx_rig.setupCircles(fp)
         copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])    
         fp.write("#endif\n")
@@ -310,7 +310,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'rig-correct':
                 fp.write("CorrectRig %s ;\n" % theHuman)
             elif words[1] == 'recalc-roll':
-            	fp.write("  RecalcRoll %s ;\n" % mhx_rig.RecalcRoll)
+                fp.write("  RecalcRoll %s ;\n" % mhx_rig.RecalcRoll)
             elif words[1] == 'ProxyRigStart':
                 proxy = mh2proxy.readProxyFile(obj, proxyStuff)
                 proxyData[proxy.name] = proxy
@@ -322,6 +322,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     fp.write("#if False\n")
             elif words[1] == 'ProxyRigObject':
                 fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
+                if proxy.rig:
+                    fp.write("  Property MhxRigType '%s' ;\n" % proxy.name)
             elif words[1] == 'ProxyPose':
                 mh2proxy.writeRigPose(fp, proxy.name, proxy.bones)
             elif words[1] == 'ProxyMesh':

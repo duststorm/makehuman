@@ -25,5 +25,6 @@ end Armature
   Property MhxScale theScale ;
   Property MhxRig 'Control' ;
   Property MhxVisemeSet 'BodyLanguage' ;
+  Property MhxRigType 'Game' ;
 end Object
 

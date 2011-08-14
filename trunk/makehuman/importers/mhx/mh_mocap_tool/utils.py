@@ -73,13 +73,16 @@ def getBone(name, rig):
         return rig.pose.bones[rig[name]]
     except:
         pass
-    print(rig["MhxRigType"])
+    #print(rig["MhxRigType"])
     try:
         mhxRig = rig["MhxRigType"]
     except:
         return None    
-    if mhxRig == "MHX":
-        return rig.pose.bones[name]
+    if mhxRig in ["MHX", "Game", "Rorkimaru"]:
+        try:
+            return rig.pose.bones[name]
+        except:
+            return None
     elif mhxRig == "Rigify":
         print("Not yet")
     return None        

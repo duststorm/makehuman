@@ -24,9 +24,29 @@
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
 import bpy
-from math import pi
-from . import utils, load, simplify, props
+from math import pi, sqrt
+from mathutils import *
+from . import utils, load, simplify, props, rig_mhx
 from . import globvar as the
+
+#
+#   normalizeRotCurves(scn, rig, fcurves, frames)
+#
+
+        
+def normalizeRotCurves(scn, rig, fcurves, frames):        
+    hasQuat = {}
+    for fcu in fcurves:
+        (name, mode) = utils.fCurveIdentity(fcu)
+        if mode == 'rotation_quaternion':
+            hasQuat[name] = rig.pose.bones[name]
+
+    for frame in frames:
+        scn.frame_set(frame)
+        for (name, pb) in hasQuat.items():
+            pb.rotation_quaternion.normalize()
+            pb.keyframe_insert("rotation_quaternion", group=name)  
+    return            
 
 #
 #   loopFCurves(context):
@@ -41,6 +61,11 @@ def loopFCurves(context):
     if not act:
         return
     (fcurves, minTime, maxTime) = simplify.getActionFCurves(act, False, True, scn)
+    if not fcurves:
+        return
+
+    frames = utils.activeFrames(rig)
+    normalizeRotCurves(scn, rig, fcurves, frames)
 
     hasLocation = {}
     for fcu in fcurves:
@@ -48,43 +73,46 @@ def loopFCurves(context):
         if utils.isRotation(mode) and scn['McpLoopRot']:
             loopFCurve(fcu, minTime, maxTime, scn)
         elif utils.isLocation(mode) and scn['McpLoopLoc']:
-            if scn['McpLoopInPlace']:
-                hasLocation[name] = True
+            hasLocation[name] = True
 
-    if scn['McpLoopInPlace'] and scn['McpLoopLoc']:
-        frames = utils.activeFrames(rig)
-        root = utils.getBone('Root', rig)    
-        
-        for frame in frames:
-            scn.frame_set(frame)
-            root.keyframe_insert("location", group=root.name)
-
-        for name in hasLocation.keys():
-            pb = rig.pose.bones[name]
-            print(pb, root)
-            if pb != root:
-                continue
-            restMat = pb.bone.matrix_local
-            if pb.parent:
-                restMat = utils.invert(pb.parent.bone.matrix_local) * restMat
-            restRot = restMat.to_3x3()
-            restInv = utils.invert(restRot)
-            for frame in frames:
-                scn.frame_set(frame)            
-                head = pb.head - root.head
+    if scn['McpLoopLoc']:
+        if scn['McpLoopInPlace']:
+            for name in hasLocation.keys():
+                pb = rig.pose.bones[name]
+                print("Loc", pb.name, pb.parent)
+                scn.frame_set(minTime)
+                head0 = pb.head.copy()
+                scn.frame_set(maxTime)
+                head1 = pb.head.copy()
+                offs = (head1-head0)/(maxTime-minTime)
                 if not scn['McpLoopZInPlace']:
-                    head[2] = pb.head[2]
-                pb.location = restInv * head
-                pb.keyframe_insert("location", group=pb.name)  
-                #print(pb.head)
-            for fcu in fcurves:
-                (name, mode) = utils.fCurveIdentity(fcu)
-                if ( utils.isLocation(mode) and
-                    (fcu.array_index != 2 or scn['McpLoopZInPlace'])):
-                    loopFCurve(fcu, minTime, maxTime, scn)
+                    offs[2] = 0
 
-    print("Curves looped")
+                restMat = pb.bone.matrix_local.to_3x3()
+                restInv = utils.invert(restMat)
+                if pb.parent:
+                    parRest = pb.parent.bone.matrix_local.to_3x3()
+                    restInv = restInv * parRest
+
+                for frame in frames:
+                    scn.frame_set(frame)    
+                    head = pb.head.copy() - (frame-minTime)*offs
+                    diff = head - pb.bone.head_local
+                    if pb.parent:
+                        parMat = pb.parent.matrix.to_3x3()                        
+                        diff = utils.invert(parMat) * diff                        
+                    pb.location = restInv * diff                    
+                    pb.keyframe_insert("location", group=pb.name)  
+                # pb.matrix_basis = utils.invert(pb.bone.matrix_local) * par.bone.matrix_local * utils.invert(par.matrix) * pb.matrix
+
+        for fcu in fcurves:
+            (name, mode) = utils.fCurveIdentity(fcu)
+            if utils.isLocation(mode):
+                loopFCurve(fcu, minTime, maxTime, scn)
+    print("F-curves looped")                
     return
+    
+    
     
 def loopFCurve(fcu, t0, tn, scn):
     delta = scn['McpLoopBlendRange']
@@ -95,7 +123,7 @@ def loopFCurve(fcu, t0, tn, scn):
     fcu.keyframe_points.insert(frame=tn, value=vn)
     (mode, upper, lower, diff) = simplify.getFCurveLimits(fcu) 
     if mode == 'location': 
-        dv = (vn-v0)/(tn-t0)
+        dv = vn-v0        
     else:
         dv = 0.0
         
@@ -106,13 +134,21 @@ def loopFCurve(fcu, t0, tn, scn):
         t1 = t0+dt
         v1 = fcu.evaluate(t1)
         tm = tn+dt
-        vm = fcu.evaluate(tm) - dt*dv
+        vm = fcu.evaluate(tm) - dv
+        if (v1 > upper) and (vm < lower):
+            vm += diff
+        elif (v1 < lower) and (vm > upper):
+            vm -= diff
         pt1 = (t1, (eps*vm + (1-eps)*v1))
         
         t1 = t0-dt
-        v1 = fcu.evaluate(t1) + dt*dv
+        v1 = fcu.evaluate(t1) + dv
         tm = tn-dt
         vm = fcu.evaluate(tm)
+        if (v1 > upper) and (vm < lower):
+            v1 -= diff
+        elif (v1 < lower) and (vm > upper):
+            v1 += diff
         ptm = (tm, eps*v1 + (1-eps)*vm)
         
         #print("  ", pt1,ptm)
@@ -140,6 +176,8 @@ def repeatFCurves(context, nRepeats):
     if not act:
         return
     (fcurves, minTime, maxTime) = simplify.getActionFCurves(act, False, True, context.scene)
+    if not fcurves:
+        return
     dt0 = maxTime-minTime
     for fcu in fcurves:
         (name, mode) = utils.fCurveIdentity(fcu)
@@ -242,14 +280,18 @@ class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
 #   class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
 #
 
+def getUndoAction(rig):
+    try:
+        name = rig['McpUndoAction']
+        return bpy.data.actions[name]
+    except:
+        return None
+
 def startEdit(context):
     rig = context.object
-    try:
-        if (rig['McpUndoAction'] or rig['McpActionName']):
-            print("Action already being edited. Undo or confirm edit first")
-            return
-    except:
-        pass
+    if getUndoAction(rig):
+        print("Action already being edited. Undo or confirm edit first")
+        return
     act = utils.getAction(rig)
     if not act:
         return
@@ -271,7 +313,7 @@ def startEdit(context):
         for i in range(n):
             nfcu.keyframe_points[i].co = fcu.keyframe_points[i].co
     utils.setInterpolation(rig)        
-    print("Action stored")
+    print("Action editing started")
     return nact       
 
 class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
@@ -289,11 +331,7 @@ class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
 
 def undoEdit(context):
     rig = context.object
-    try:
-        name = rig['McpUndoAction']
-        oact = bpy.data.actions[name]
-    except:
-        oact = None
+    oact = getUndoAction(rig)
     if not oact:
         print("No action to undo")
         return
@@ -323,11 +361,7 @@ class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
 
 def getActionPair(context):
     rig = context.object
-    try:
-        name = rig['McpUndoAction']
-        oact = context.blend_data.actions[name]
-    except:
-        oact = None
+    oact = getUndoAction(rig)
     if not oact:
         print("No stored action")
         return None
@@ -504,6 +538,8 @@ def setupCatmullRom(points):
     (t0,y0) = points[0]
     (t1,y1) = points[1]
     (t2,y2) = points[2]
+    if t1-t0 < 0.5:
+        t0 = t1-1
     d = y0
     a = y1
     c = 3*d + tension*(y1-y0)
@@ -528,13 +564,14 @@ def setupCatmullRom(points):
     (t_1,y_1) = points[n-2]
     (t0,y0) = points[n-1]
     (t1,y1) = points[n]
-    if t1-t0 > 1e-4:
-        d = y0
-        a = y1
-        c = 3*d + tension*(y1-y_1)
-        b = 3*a - tension*(y1-y0)
-        tfac = 1.0/(t1-t0)
-        fcn.append((t0, t1, tfac, (a,b,c,d)))
+    if t1-t0 < 0.5:
+        t1 = t0+1
+    d = y0
+    a = y1
+    c = 3*d + tension*(y1-y_1)
+    b = 3*a - tension*(y1-y0)
+    tfac = 1.0/(t1-t0)
+    fcn.append((t0, t1, tfac, (a,b,c,d)))
 
     return fcn  
     

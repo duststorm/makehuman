@@ -66,7 +66,7 @@ def getActionFCurves(act, useVisible, useMarkers, scn):
         (minTime, maxTime) = getMarkedTime(scn)        
         if minTime == None:    
             print("Need two selected markers")
-            return (None, 0, 0)
+            return ([], 0, 0)
     else:
         (minTime, maxTime) = ('All', 0)
     return (fcurves, minTime, maxTime)
@@ -252,7 +252,7 @@ def getFCurveLimits(fcu):
         lower = 0    
         diff = 0
     #print(words[1], mode, upper, lower)
-    return (mode, upper, lower, diff)
+    return (mode, upper, lower, diff)   
 
 #
 #   addFCurveInserts(fcu, inserts, limitData):

@@ -151,7 +151,7 @@ def guessTargetArmature(trgRig, scn):
             the.IkBoneList = rig_game.IkBoneList
             the.IkParents = rig_game.IkParents
         elif the.target == T_Game:
-            bones = rig_gameBones
+            bones = rig_game.Bones
             the.IkBoneList = rig_game.IkBoneList
             the.IkParents = rig_game.IkParents
         else:

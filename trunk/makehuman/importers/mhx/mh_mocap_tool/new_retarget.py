@@ -126,7 +126,6 @@ def retargetMhxRig(context, srcRig, trgRig):
             srcRoll = 0
         trgRoll = rolls[trgName]
         trgData.roll = Matrix.Rotation(srcRoll-trgRoll, 4, 'Y')
-        trgData.rest_mat = trgData.rest_mat
         parName = None
         trgParent = None
         if trgBone.parent:  #trgBone.bone.use_inherit_rotation:
