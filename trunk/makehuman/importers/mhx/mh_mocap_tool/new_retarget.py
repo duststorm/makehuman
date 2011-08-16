@@ -265,7 +265,7 @@ def loadRetargetSimplify(context, filepath):
 
 class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
     bl_idname = "mcp.new_retarget_mhx"
-    bl_label = "Retarget selected to MHX"
+    bl_label = "Retarget selected to active"
 
     def execute(self, context):
         trgRig = context.object

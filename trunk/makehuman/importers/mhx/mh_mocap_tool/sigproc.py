@@ -209,7 +209,7 @@ class VIEW3D_OT_ReconstructActionButton(bpy.types.Operator):
 #
 
 class SigProcPanel(bpy.types.Panel):
-    bl_label = "Motion signal processing"
+    bl_label = "Multi-resolution filtering"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

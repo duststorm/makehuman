@@ -24,7 +24,7 @@
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
 
-import bpy
+import bpy, os
 from bpy.props import *
 
 from . import action
@@ -280,7 +280,7 @@ def ensureInited(context):
 def loadDefaults(context):
     if not context.scene:
         return
-    filename = os.path.realpath(os.path.expanduser("~/makehuman/mhx_defaults.txt"))
+    filename = os.path.realpath(os.path.expanduser("~/mh_mocap_defaults.txt"))
     try:
         fp = open(filename, "r")
     except:
@@ -294,6 +294,7 @@ def loadDefaults(context):
             val = words[1]
         context.scene[words[0]] = val
     fp.close()
+    print("Defaults loaded from %s" % filename)
     return
 
 #
@@ -303,7 +304,7 @@ def loadDefaults(context):
 def saveDefaults(context):
     if not context.scene:
         return
-    filename = os.path.realpath(os.path.expanduser("~/makehuman/mhx_defaults.txt"))
+    filename = os.path.realpath(os.path.expanduser("~/mh_mocap_defaults.txt"))
     try:
 
         fp = open(filename, "w")
@@ -314,6 +315,7 @@ def saveDefaults(context):
         if key[:3] == 'Mcp':
             fp.write("%s %s\n" % (key, value))
     fp.close()
+    print("Defaults saved to %s" % filename)
     return
     
 
@@ -321,6 +323,7 @@ def saveDefaults(context):
 #
 #   class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
 #   class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpLoadDefaultsButton(bpy.types.Operator):
 #
 
 class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
@@ -329,17 +332,24 @@ class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
 
     def execute(self, context):
         from . import props
-        props.initInterface(context)
+        initInterface(context)
         print("Interface initialized")
         return{'FINISHED'}    
-
 
 class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
     bl_idname = "mcp.save_defaults"
     bl_label = "Save defaults"
 
     def execute(self, context):
-        props.saveDefaults(context)
+        saveDefaults(context)
+        return{'FINISHED'}    
+
+class VIEW3D_OT_McpLoadDefaultsButton(bpy.types.Operator):
+    bl_idname = "mcp.load_defaults"
+    bl_label = "Load defaults"
+
+    def execute(self, context):
+        loadDefaults(context)
         return{'FINISHED'}    
 
 #
@@ -405,6 +415,8 @@ class PropsPanel(bpy.types.Panel):
                 
         layout.operator("mcp.init_interface")
         layout.operator("mcp.save_defaults")
+        layout.operator("mcp.load_defaults")
+        return
         layout.operator("mcp.copy_angles_fk_ik")
 
         layout.separator()
