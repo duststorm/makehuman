@@ -149,6 +149,26 @@ def initInterface(context):
         name="Repeat number", 
         min=1,
         default=1)
+        
+    bpy.types.Scene.McpFirstEndFrame = IntProperty(
+        name="First end frame",
+        default=1)
+        
+    bpy.types.Scene.McpSecondStartFrame = IntProperty(
+        name="Second start frame",
+        default=1)
+        
+    bpy.types.Scene.McpActionTarget = EnumProperty(
+        items = [('Second to new','Second to new','Second to new'),
+                 ('Extend second', 'Extend second', 'Extend second'),
+                 ('Stitch new', 'Stitch new', 'Stitch new')],
+        name = "Action target")
+
+    bpy.types.Scene.McpOutputActionName = StringProperty(
+        name="Output action name", 
+        maxlen=24,
+        default="")
+       
 
     # Plant
     
@@ -173,13 +193,13 @@ def initInterface(context):
         name="Directory", 
         description="Directory", 
         maxlen=1024,
-        default='')
+        default="")
 
     bpy.types.Scene.McpPrefix = StringProperty(
         name="Prefix", 
         description="Prefix", 
-        maxlen=1024,
-        default='')
+        maxlen=24,
+        default="")
 
     # Manage actions
     
@@ -197,57 +217,71 @@ def initInterface(context):
         items = [],
         name = "Actions")
 
+    bpy.types.Scene.McpFirstAction = EnumProperty(
+        items = [],
+        name = "First action")
+
+    bpy.types.Scene.McpSecondAction = EnumProperty(
+        items = [],
+        name = "Second action")
+
     scn = context.scene
-    if scn:        
+    if 0 and scn:        
         # Load and retarget
         
-        scn['McpBvhScale'] = 0.65
-        scn['McpAutoScale'] = True
-        scn['McpStartFrame'] = 1
-        scn['McpEndFrame'] = 32000
-        scn['McpRot90Anim'] = True
-        scn['McpDoSimplify'] = False
+        scn["McpBvhScale"] = 0.65
+        scn["McpAutoScale"] = True
+        scn["McpStartFrame"] = 1
+        scn["McpEndFrame"] = 32000
+        scn["McpRot90Anim"] = True
+        scn["McpDoSimplify"] = False
 
         # Subsample and rescale
         
-        scn['McpSubsample'] = True
-        scn['McpSSFactor'] = 1
-        scn['McpDefaultSS'] = True
-        scn['McpRescaleFactor'] = 1
-        scn['McpRescale'] = False
+        scn["McpSubsample"] = True
+        scn["McpSSFactor"] = 1
+        scn["McpDefaultSS"] = True
+        scn["McpRescaleFactor"] = 1
+        scn["McpRescale"] = False
         
         # Simplify
         
-        scn['McpSimplifyVisible'] = False
-        scn['McpSimplifyMarkers'] = False
-        scn['McpApplyFixes'] = True
-        scn['McpErrorLoc'] = 0.01
-        scn['McpErrorRot'] = 0.1
+        scn["McpSimplifyVisible"] = False
+        scn["McpSimplifyMarkers"] = False
+        scn["McpApplyFixes"] = True
+        scn["McpErrorLoc"] = 0.01
+        scn["McpErrorRot"] = 0.1
         
         # Loop
     
-        scn['McpLoopBlendRange'] = 5
-        scn['McpLoopLoc'] = True
-        scn['McpLoopRot'] = True
-        scn['McpLoopInPlace'] = False
-        scn['McpLoopZInPlace'] = False
-        scn['McpRepeatNumber'] = 1
-
+        scn["McpLoopBlendRange"] = 5
+        scn["McpLoopLoc"] = True
+        scn["McpLoopRot"] = True
+        scn["McpLoopInPlace"] = False
+        scn["McpLoopZInPlace"] = False
+        scn["McpRepeatNumber"] = 1
+        scn["McpFirstEndFrame"] = 1
+        scn["McpSecondStartFrame"] = 1
+        scn["McpFirstAction"] = 0
+        scn["McpSecondAction"] = 0
+        scn["McpUseNewOutputAction"] = False
+        scn["McpOutputActionName"] = ""
+    
         # Plant
         
-        scn['McpPlantCurrent'] = True
-        scn['McpPlantLoc'] = True
-        scn['McpPlantRot'] = False
+        scn["McpPlantCurrent"] = True
+        scn["McpPlantLoc"] = True
+        scn["McpPlantRot"] = False
 
         # Props
         
-        scn['McpPrefix'] = "Female1_A"
-        scn['McpDirectory'] = "~/makehuman/bvh/Female1_bvh"
+        scn["McpPrefix"] = "Female1_A"
+        scn["McpDirectory"] = "~/makehuman/bvh/Female1_bvh"
         
         # Manage actions            
         
-        scn['McpFilterActions'] = False
-        scn['McpReallyDelete'] = False
+        scn["McpFilterActions"] = False
+        scn["McpReallyDelete"] = False
         action.listAllActions(context)
     else:
         print("Warning - no scene - scene properties not set")
@@ -265,7 +299,7 @@ def initInterface(context):
 
 def ensureInited(context):
     try:
-        context.scene['McpBvhScale']
+        context.scene["McpBvhScale"]
         inited = True
     except:
         inited = False
@@ -312,7 +346,7 @@ def saveDefaults(context):
         print("Unable to open %s for writing" % filename)
         return
     for (key,value) in context.scene.items():
-        if key[:3] == 'Mcp':
+        if key[:3] == "Mcp":
             fp.write("%s %s\n" % (key, value))
     fp.close()
     print("Defaults saved to %s" % filename)
@@ -331,10 +365,9 @@ class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
     bl_label = "Initialize"
 
     def execute(self, context):
-        from . import props
         initInterface(context)
         print("Interface initialized")
-        return{'FINISHED'}    
+        return{"FINISHED"}    
 
 class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
     bl_idname = "mcp.save_defaults"
@@ -342,7 +375,7 @@ class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
 
     def execute(self, context):
         saveDefaults(context)
-        return{'FINISHED'}    
+        return{"FINISHED"}    
 
 class VIEW3D_OT_McpLoadDefaultsButton(bpy.types.Operator):
     bl_idname = "mcp.load_defaults"
@@ -350,7 +383,7 @@ class VIEW3D_OT_McpLoadDefaultsButton(bpy.types.Operator):
 
     def execute(self, context):
         loadDefaults(context)
-        return{'FINISHED'}    
+        return{"FINISHED"}    
 
 #
 #    class VIEW3D_OT_McpCopyAnglesIKButton(bpy.types.Operator):
@@ -363,7 +396,7 @@ class VIEW3D_OT_McpCopyAnglesIKButton(bpy.types.Operator):
     def execute(self, context):
         copyAnglesIK(context)
         print("Angles copied")
-        return{'FINISHED'}    
+        return{"FINISHED"}    
 
 
 #
@@ -378,7 +411,7 @@ def readDirectory(directory, prefix):
     paths = []
     for fileName in files:
         (name, ext) = os.path.splitext(fileName)
-        if name[:n] == prefix and ext == '.bvh':
+        if name[:n] == prefix and ext == ".bvh":
             paths.append("%s/%s" % (realdir, fileName))
     return paths
 
@@ -387,12 +420,12 @@ class VIEW3D_OT_McpBatchButton(bpy.types.Operator):
     bl_label = "Batch run"
 
     def execute(self, context):
-        paths = readDirectory(context.scene['McpDirectory'], context.scene['McpPrefix'])
+        paths = readDirectory(context.scene["McpDirectory"], context.scene["McpPrefix"])
         trgRig = context.object
         for filepath in paths:
             context.scene.objects.active = trgRig
             loadRetargetSimplify(context, filepath)
-        return{'FINISHED'}    
+        return{"FINISHED"}    
 
 #
 #    class PropsPanel(bpy.types.Panel):
@@ -405,14 +438,13 @@ class PropsPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
+        if context.object and context.object.type == "ARMATURE":
             return True
 
     def draw(self, context):
         layout = self.layout
         scn = context.scene
         ob = context.object
-                
         layout.operator("mcp.init_interface")
         layout.operator("mcp.save_defaults")
         layout.operator("mcp.load_defaults")
@@ -420,7 +452,7 @@ class PropsPanel(bpy.types.Panel):
         layout.operator("mcp.copy_angles_fk_ik")
 
         layout.separator()
-        layout.label('Batch conversion')
+        layout.label("Batch conversion")
         layout.prop(scn, "McpDirectory")
         layout.prop(scn, "McpPrefix")
         layout.operator("mcp.batch")

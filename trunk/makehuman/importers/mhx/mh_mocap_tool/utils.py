@@ -50,7 +50,20 @@ def printMat(mat):
             s += " %6.3f" % mat[m][n]
         print(s+"]")
     print(" ]")
-            
+ 
+#
+#  quadDict():
+#
+
+def quadDict():
+    return {
+        0: {},
+        1: {},
+        2: {},
+        3: {},
+    }
+    
+ 
 #
 #   getRoll(bone):
 #
@@ -108,6 +121,18 @@ def deleteAction(act):
         bpy.data.actions.remove(act)
     else:
         print("%s has %d users" % (act, act.users))
+        
+#
+#   copyAction(act1, name):
+#
+
+def copyAction(act1, name):
+    act2 = bpy.data.actions.new(name)
+    for fcu1 in act1.fcurves:
+        fcu2 = act2.fcurves.new(fcu1.data_path, fcu1.array_index)
+        for kp1 in fcu1.keyframe_points:
+            fcu2.keyframe_points.insert(kp1.co[0], kp1.co[1], options={'FAST'})
+    return act2            
         
 #
 #   activeFrames(ob):

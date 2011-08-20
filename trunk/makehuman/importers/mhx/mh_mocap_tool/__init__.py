@@ -94,10 +94,11 @@ if "bpy" in locals():
     imp.reload(target)
     imp.reload(toggle)
     imp.reload(simplify)
+    imp.reload(action)
     imp.reload(loop)
+    imp.reload(edit)
     imp.reload(plant)
     imp.reload(accad)
-    imp.reload(action)
     imp.reload(sigproc)
     imp.reload(daz)
     imp.reload(eyes)
@@ -124,9 +125,10 @@ else:
     from . import target
     from . import toggle
     from . import simplify
-    from . import loop
-    from . import plant
     from . import action
+    from . import loop
+    from . import edit
+    from . import plant
     from . import sigproc
     from . import accad, daz, eyes, hdm, max, mb, mega
     from . import rig_mhx, rig_rorkimaru, rig_game

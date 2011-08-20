@@ -24,7 +24,7 @@
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
 import bpy
-from bpy.props import EnumProperty
+from bpy.props import EnumProperty, StringProperty
 
 from . import globvar as the
 from . import utils
@@ -59,6 +59,12 @@ def listAllActions(context):
     bpy.types.Scene.McpActions = EnumProperty(
         items = the.actions,
         name = "Actions")  
+    bpy.types.Scene.McpFirstAction = EnumProperty(
+        items = the.actions,
+        name = "First action")  
+    bpy.types.Scene.McpSecondAction = EnumProperty(
+        items = the.actions,
+        name = "Second action")  
     return
 
 def findAction(name):
@@ -86,32 +92,35 @@ class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
 #   class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
 #
 
-def selectedAction(scn):
-    n = scn['McpActions']
-    (name1, name2, name3) = the.actions[n]
-    return name1
+def selectedAction(n):
+    try:
+        (name1, name2, name3) = the.actions[n]
+    except:
+        return None
+    try:
+        return bpy.data.actions[name1]
+    except:
+        print("Did not find action %s" % name1)
+        return None
 
 def deleteAction(context):
     listAllActions(context)
     scn = context.scene
-    name = selectedAction(scn)
-    print('Delete action', name)    
-    try:
-        act = bpy.data.actions[name]
-    except:
-        act = None
-    if act:
-        act.use_fake_user = False
-        if act.users == 0:
-            print("Deleting", act)
-            n = findAction(name)
-            the.actions.pop(n)
-            bpy.data.actions.remove(act)
-            print('Action', act, 'deleted')
-            listAllActions(context)
-            #del act
-        else:
-            print("Cannot delete. %s has %d users." % (act, act.users))
+    act = selectedAction(scn['McpActions'])
+    if not act:
+        return
+    print('Delete action', act)    
+    act.use_fake_user = False
+    if act.users == 0:
+        print("Deleting", act)
+        n = findAction(act.name)
+        the.actions.pop(n)
+        bpy.data.actions.remove(act)
+        print('Action', act, 'deleted')
+        listAllActions(context)
+        #del act
+    else:
+        print("Cannot delete. %s has %d users." % (act, act.users))
 
 class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
     bl_idname = "mcp.delete"
@@ -145,17 +154,14 @@ class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   setCurrentAction(context):
+#   setCurrentAction(context, prop):
 #   class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
 #
 
-def setCurrentAction(context):
+def setCurrentAction(context, prop):
     listAllActions(context)
-    name = selectedAction(context.scene)
-    try:
-        act = bpy.data.actions[name]
-    except:
-        print("Did not find action %s" % name)
+    act = selectedAction(context.scene[prop])
+    if not act:
         return
     context.object.animation_data.action = act
     print("Action set to %s" % act)
@@ -164,9 +170,10 @@ def setCurrentAction(context):
 class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
     bl_idname = "mcp.set_current_action"
     bl_label = "Set current action"
+    prop = StringProperty()
 
     def execute(self, context):
-        setCurrentAction(context)
+        setCurrentAction(context, self.prop)
         return{'FINISHED'}    
 
 ########################################################################
@@ -190,7 +197,7 @@ class ActionPanel(bpy.types.Panel):
         layout.prop_menu_enum(context.scene, "McpActions")
         layout.prop(scn, 'McpFilterActions')
         layout.operator("mcp.update_action_list")
-        layout.operator("mcp.set_current_action")
+        layout.operator("mcp.set_current_action").prop = 'McpActions'
         layout.prop(scn, "McpReallyDelete")
         layout.operator("mcp.delete")
         layout.operator("mcp.delete_hash")
