@@ -45,10 +45,14 @@ Delta = [0,0.01,0]
 Root = 'MasterFloor'
 
 #
-# exportCollada(human, filename):
+# exportCollada(human, filename, options=None):
 #
 
-def exportCollada(human, name):
+def exportCollada(human, name, options=None):
+    if options:
+        useRig = options["useRig"]
+    else:
+        useRig = "game"
     filename = name+".dae"
     time1 = time.clock()
     try:
@@ -56,7 +60,7 @@ def exportCollada(human, name):
         mh2proxy.safePrint("Writing Collada file", filename)
     except:
         mh2proxy.safePrint("Unable to open file for writing", filename)
-    exportDae(human, fp)
+    exportDae(human, fp, useRig)
     fp.close()
     time2 = time.clock()
     mh2proxy.safePrint("Wrote Collada file in %g s:" % (time2-time1), filename)
@@ -463,14 +467,22 @@ def filterMesh(mesh1):
     return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
 
 #
-#    exportDae(human, fp):
+#    exportDae(human, fp, useRig):
 #
 
-def exportDae(human, fp):
-    global theStuff
+def exportDae(human, fp, useRig):
+    global theStuff, Root
     cfg = mh2proxy.proxyConfig(human, True)
     obj = human.meshData
-    amt = getArmatureFromRigFile('data/templates/game.rig', obj)
+    if useRig == "game":
+        amt = getArmatureFromRigFile('data/templates/game.rig', obj)
+        Root = 'MasterFloor'
+    elif useRig == "daz":
+        amt = getArmatureFromRigFile('data/templates/daz.rig', obj)
+        Root = "hip"
+    elif useRig == "mb":
+        amt = getArmatureFromRigFile('data/templates/mb.rig', obj)
+        Root = "hips"
     #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
     rawTargets = []
 

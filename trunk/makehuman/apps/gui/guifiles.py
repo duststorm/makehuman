@@ -280,9 +280,16 @@ class ExportTaskView(gui3d.TaskView):
         self.proxyAscottk = gui3d.RadioButton(self.mhxOptions, proxies, "Ascottk proxy");y+=24
         self.proxyForsaken = gui3d.RadioButton(self.mhxOptions, proxies, "Forsaken proxy");y+=24
 
-
         self.mhxOptions.hide()
         
+        # Collada options
+        y = yy
+        self.colladaOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
+        rigs = []
+        self.gameDae = gui3d.RadioButton(self.colladaOptions, rigs, "Default rig", True);y+=24
+        self.dazDae = gui3d.RadioButton(self.colladaOptions, rigs, "Poser/DAZ rig");y+=24
+        #self.mbDae = gui3d.RadioButton(self.colladaOptions, rigs, "Motionbuilder rig");y+=24
+
         # STL options
         y = yy
         self.stlOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
@@ -426,7 +433,16 @@ class ExportTaskView(gui3d.TaskView):
                 # TL 2011.02.08: exportMhx uses the human instead of his meshData
                 mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
-                mh2collada.exportCollada(self.app.selectedHuman, os.path.join(exportPath, filename))
+                if self.gameDae.selected:
+                    rig = 'game'
+                elif self.dazDae.selected:
+                    rig = 'daz'
+                #elif self.mbDae.selected:
+                #    rig = 'mb'                    
+                options = {
+                    "useRig": rig
+                }
+                mh2collada.exportCollada(self.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:
                 mh2md5.exportMd5(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
             elif self.stl.selected:
