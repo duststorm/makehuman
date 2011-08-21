@@ -226,7 +226,7 @@ def initInterface(context):
         name = "Second action")
 
     scn = context.scene
-    if 0 and scn:        
+    if scn:        
         # Load and retarget
         
         scn["McpBvhScale"] = 0.65
@@ -283,6 +283,7 @@ def initInterface(context):
         scn["McpFilterActions"] = False
         scn["McpReallyDelete"] = False
         action.listAllActions(context)
+        print("Default scene properties set")
     else:
         print("Warning - no scene - scene properties not set")
 

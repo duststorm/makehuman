@@ -98,8 +98,20 @@ def getBone(name, rig):
             return None
     elif mhxRig == "Rigify":
         print("Not yet")
-    return None        
+    return None     
+    
+#
+#   ikBoneList(rig):
+#
  
+def ikBoneList(rig):
+    list = []
+    for name in ['Root', 'Wrist_L', 'Wrist_R', 'LegIK_L', 'LegIK_R']:
+        bone = getBone(name, rig)
+        if bone:
+            list.append(bone)
+    return list
+    
 #
 #   getAction(ob):
 #

@@ -65,6 +65,7 @@ def listAllActions(context):
     bpy.types.Scene.McpSecondAction = EnumProperty(
         items = the.actions,
         name = "Second action")  
+    print("Actions declared")
     return
 
 def findAction(name):

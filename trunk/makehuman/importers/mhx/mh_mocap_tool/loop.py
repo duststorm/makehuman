@@ -72,14 +72,10 @@ def loopFCurves(context):
         (name, mode) = utils.fCurveIdentity(fcu)
         if utils.isRotation(mode) and scn['McpLoopRot']:
             loopFCurve(fcu, minTime, maxTime, scn)
-        elif utils.isLocation(mode) and scn['McpLoopLoc']:
-            hasLocation[name] = True
 
     if scn['McpLoopLoc']:
         if scn['McpLoopInPlace']:
-            for name in hasLocation.keys():
-                pb = rig.pose.bones[name]
-                print("Loc", pb.name, pb.parent)
+            for pb in utils.ikBoneList(rig):
                 scn.frame_set(minTime)
                 head0 = pb.head.copy()
                 scn.frame_set(maxTime)
@@ -87,20 +83,21 @@ def loopFCurves(context):
                 offs = (head1-head0)/(maxTime-minTime)
                 if not scn['McpLoopZInPlace']:
                     offs[2] = 0
+                print("Loc", pb.name, offs)
 
                 restMat = pb.bone.matrix_local.to_3x3()
                 restInv = utils.invert(restMat)
-                if pb.parent:
-                    parRest = pb.parent.bone.matrix_local.to_3x3()
-                    restInv = restInv * parRest
+                #if pb.parent:
+                #    parRest = pb.parent.bone.matrix_local.to_3x3()
+                #    restInv = restInv * parRest
 
                 for frame in frames:
                     scn.frame_set(frame)    
                     head = pb.head.copy() - (frame-minTime)*offs
                     diff = head - pb.bone.head_local
-                    if pb.parent:
-                        parMat = pb.parent.matrix.to_3x3()                        
-                        diff = utils.invert(parMat) * diff                        
+                    #if pb.parent:
+                    #    parMat = pb.parent.matrix.to_3x3()                        
+                    #    diff = utils.invert(parMat) * diff                        
                     pb.location = restInv * diff                    
                     pb.keyframe_insert("location", group=pb.name)  
                 # pb.matrix_basis = utils.invert(pb.bone.matrix_local) * par.bone.matrix_local * utils.invert(par.matrix) * pb.matrix

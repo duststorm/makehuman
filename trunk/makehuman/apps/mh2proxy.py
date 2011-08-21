@@ -730,15 +730,22 @@ def fixProxyShape(shape):
     return fixedShape
 
 #
-#    exportProxyObj(human, filename):    
+#    exportProxyObj(human, filename, proxyName):    
 #    exportProxyObj1(obj, filename, proxy):
 #
 
-def exportProxyObj(human, name):
-    cfg = proxyConfig(human, False)
+def exportProxyObj(human, name, proxyName):
     obj = human.meshData
+    if proxyName:
+        proxyFile = "./data/templates/%s.proxy" % proxyName.lower()
+        proxy = readProxyFile(obj, (proxyFile, 'Proxy', 3))
+        if proxy.name:
+            filename = "%s_%s.obj" % (name.lower(), proxy.name)
+            exportProxyObj1(obj, filename, proxy)
+    
+    cfg = proxyConfig(human, False)
     for (typ, useObj, useMhx, useDae, proxyStuff) in cfg.proxyList:
-        if useObj:
+        if useObj and typ != 'Proxy':
             proxy = readProxyFile(obj, proxyStuff)
             if proxy.name:
                 filename = "%s_%s.obj" % (name.lower(), proxy.name)
