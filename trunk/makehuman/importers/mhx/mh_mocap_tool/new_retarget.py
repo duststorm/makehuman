@@ -232,7 +232,77 @@ def retargetMhxRig(context, srcRig, trgRig):
     act.use_fake_user = True
     print("Retargeted %s --> %s" % (srcRig, trgRig))
     return
+
+#
+#   poseTrgIkBones(context, trgRig, nFrames):
+#
+
+def poseTrgIkBones(context, trgRig, nFrames):
+    bpy.ops.object.mode_set(mode='POSE')
+    pbones = trgRig.pose.bones
+    for (ikname, fkname) in [
+        ("Wrist_L", "Hand_L"), ("Wrist_R", "Hand_R"),
+        ("LegIK_L", "LegFK_L"), ("LegIK_R", "LegFK_R")
+        ]:
+        copyMatrix(ikname, fkname, None, trgRig, context, nFrames, False, True)
+    for (ikname, parname, fkname) in [
+        ("ElbowPT_L", "Shoulder_L", "ElbowPTFK_L"), ("ElbowPT_R", "Shoulder_R", "ElbowPTFK_R"),
+        ("KneePT_L", "LegIK_L", "KneePTFK_L"), ("KneePT_R", "LegIK_R", "KneePTFK_R")
+        ]:
+        pass
+        copyMatrix(ikname, fkname, parname, trgRig, context, nFrames, False, True)
+    for (ikname, parname, fkname) in [
+        ("ToeRev_L", "LegIK_L", "Toe_L"), ("ToeRev_L", "LegIK_L", "Toe_L"),
+        ("FootRev_L", "ToeRev_L", "Foot_L"), ("FootRev_L", "ToeRev_L", "Foot_L")
+        ]:
+        copyMatrix(ikname, fkname, parname, trgRig, context, nFrames, True, False)
+
+
+#
+#   copyMatrix(ikname, fkname, parname, rig, context, nFrames, revert, hasLoc):
+#
+
+def copyMatrix(ikname, fkname, parname, rig, context, nFrames, revert, hasLoc):
+    ikpb = rig.pose.bones[ikname]
+    fkpb = rig.pose.bones[fkname]
+    print(ikpb)
+    print(fkpb)
+    restInv = fkpb.bone.matrix_local.inverted()
+    if parname:
+        ppb = rig.pose.bones[parname]
+        print(ppb)
+        restInv = restInv * ppb.bone.matrix_local.copy()
+    else:
+        ppb = None
+    print("")        
+    if ikpb.rotation_mode == 'QUATERNION':
+        rotmode = "rotation_quaternion"
+    else:
+        rotmode = "rotation_euler"
+        
+    for frame in range(nFrames):
+        context.scene.frame_set(frame)
+        if revert:
+            fkMat = revertMatrix(fkpb)
+        else:
+            fkMat = fkpb.matrix
+        if ppb:
+            parInv = ppb.matrix.inverted()        
+            ikpb.matrix_basis = restInv * parInv * fkMat
+        else:
+            ikpb.matrix_basis = restInv * fkMat
+        if hasLoc:
+            ikpb.keyframe_insert("location", frame=frame, group=ikpb.name)
+        ikpb.keyframe_insert(rotmode, frame=frame, group=ikpb.name)
+    return
     
+def revertMatrix(pb):
+    mat = pb.matrix.copy()
+    for i in range(3):
+        mat[3][i] = pb.tail[i]
+        for j in range(3):
+            mat[i][j] = pb.matrix[j][i]
+    return mat            
 
 #
 #    loadRetargetSimplify(context, filepath):

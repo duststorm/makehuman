@@ -31,7 +31,7 @@ from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
 
-from . import utils, props, source, target, rig_mhx, toggle, load, simplify
+from . import utils, props, source, target, rig_mhx, toggle, load, simplify, new_retarget
 from . import globvar as the
 
 ###################################################################################
@@ -124,8 +124,7 @@ def createAnimData(name, animations, bones, isTarget):
 
     (loc, rot, scale) = b.matrix_local.decompose()
     anim.matrixRest = rot.to_matrix()
-    anim.inverseRest = anim.matrixRest.copy()
-    anim.inverseRest.invert()
+    anim.inverseRest = anim.matrixRest.inverted()
     return
 
 #
@@ -315,7 +314,7 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes):
 
     insertAnimation(context, trgRig, trgAnimations, the.fkBoneList)
     utils.setInterpolation(trgRig)
-    return
+    return nFrames
 
 #
 #    safeGet(name, struct):
@@ -424,6 +423,7 @@ def rollRot(rot, roll):
     rot.x = x*cos(roll) - z*sin(roll)
     rot.z = x*sin(roll) + z*cos(roll)
     return
+
 
 #
 #    poseTrgIkBones(context, trgRig, trgAnimations)
@@ -557,7 +557,6 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
         utils.setRotation(pb, rot, animFake.frames[frame], name)
     return
 
-
 #
 #    retargetMhxRig(context, srcRig, trgRig):
 #
@@ -579,8 +578,9 @@ def retargetMhxRig(context, srcRig, trgRig):
     else:
         srcFixes = None
     #debugOpen()
-    poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes)
+    nFrames = poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes)
     poseTrgIkBones(context, trgRig, trgAnimations)
+    #new_retarget.poseTrgIkBones(context, trgRig, nFrames)
     #debugClose()
     utils.setInterpolation(trgRig)
     if onoff == 'OFF':

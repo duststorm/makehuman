@@ -236,6 +236,8 @@ ArmHeadsTails = [
 
 	('ElbowPT_L',			'r-elbow-pt', ('r-elbow-pt', yunit)),
 	('ElbowPT_R',			'l-elbow-pt', ('l-elbow-pt', yunit)),
+	('ElbowPTFK_L',			'r-elbow-pt', ('r-elbow-pt', yunit)),
+	('ElbowPTFK_R',			'l-elbow-pt', ('l-elbow-pt', yunit)),
 	('ElbowLinkPT_L',		'r-elbow', 'r-elbow-pt'),
 	('ElbowLinkPT_R',		'l-elbow', 'l-elbow-pt'),
 ]
@@ -275,12 +277,12 @@ ArmArmature = [
 
 	# Arm
 	('UpArm_L',			upArmRoll, 'ArmLoc_L', F_WIR, L_LARMFK, NoBB),
-	('Elbow_L',			0, Master, F_WIR, L_LARMFK+L_LARMIK, NoBB),
+	('Elbow_L',			0, Master, F_WIR, L_LARMFK, NoBB),
 	('LoArm_L',			loArmRoll, 'UpArm_L', F_WIR, L_LARMFK, NoBB),
 	('Wrist_L',			handRoll, Master, F_WIR, L_LARMIK, NoBB),
 	('Hand_L',			handRoll, 'LoArm_L', F_CON+F_WIR, L_LARMFK+L_LARMIK, NoBB),
 	('UpArm_R',			-upArmRoll, 'ArmLoc_R', F_WIR, L_RARMFK, NoBB),
-	('Elbow_R',			0, Master, F_WIR, L_RARMFK+L_RARMIK, NoBB),
+	('Elbow_R',			0, Master, F_WIR, L_RARMFK, NoBB),
 	('LoArm_R',			-loArmRoll, 'UpArm_R', F_WIR, L_RARMFK, NoBB),
 	('Wrist_R',			handRoll, Master, F_WIR, L_RARMIK, NoBB),
 	('Hand_R',			-handRoll, 'LoArm_R', F_CON+F_WIR, L_RARMFK+L_RARMIK, NoBB),
@@ -301,6 +303,8 @@ ArmArmature = [
 	# Pole target
 	('ElbowPT_L',		0.0, 'Shoulder_L', F_WIR, L_LARMIK, NoBB),
 	('ElbowPT_R',		0.0, 'Shoulder_R', F_WIR, L_RARMIK, NoBB),
+	('ElbowPTFK_L',		0.0, 'UpArm_L', 0, L_HELP, NoBB),
+	('ElbowPTFK_R',		0.0, 'UpArm_R', 0, L_HELP, NoBB),
 	('ElbowLinkPT_L',	0.0, 'UpArm_L', F_RES, L_LARMIK, NoBB),
 	('ElbowLinkPT_R',	0.0, 'UpArm_R', F_RES, L_RARMIK, NoBB),
 

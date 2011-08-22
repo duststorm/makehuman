@@ -62,8 +62,11 @@ L_PANEL    =    0x0100
 L_TORSO =    0x0200
 L_TOE =        0x0200
 L_HEAD =    0x0400
+
 L_LPALM =    0x0800
+L_LEXTRA =   0x1000
 L_RPALM =    0x08000000
+L_REXTRA =   0x10000000
 
 L_HELP    =    0x4000
 L_DEF =        0x8000
