@@ -28,6 +28,7 @@ __docformat__ = 'restructuredtext'
 import gui3d
 import os
 import download
+import mh
 
 class Action:
 
@@ -66,7 +67,8 @@ class HumanTextureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
-        self.filechooser = gui3d.FileChooser(self, 'data/skins', 'tif', 'png')
+        os.makedirs(os.path.join(mh.getPath(''), 'data', 'skins'))
+        self.filechooser = gui3d.FileChooser(self, os.path.join(mh.getPath(''), 'data', 'skins'), 'tif', 'png')
         self.update = gui3d.Button(self.filechooser.sortBox, 'Check for updates')
         self.mediaSync = None
         self.currentTexture = gui3d.Button(self.app.categories['Modelling'],
@@ -78,7 +80,7 @@ class HumanTextureTaskView(gui3d.TaskView):
             
             self.app.do(Action(self.app.selectedHuman,
                 self.app.selectedHuman.getTexture(),
-                os.path.join('data/skins', filename), self.syncTexture))
+                os.path.join(mh.getPath(''), 'data', 'skins', filename), self.syncTexture))
             
             self.app.switchCategory('Modelling')
             
@@ -105,7 +107,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.app.selectedHuman.hide()
         self.filechooser.setFocus()
         
-        if not len([filename for filename in os.listdir('data/skins') if filename.endswith('tif')]):    
+        if not len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.endswith('tif')]):    
             self.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
 
     def onHide(self, event):
@@ -124,7 +126,7 @@ class HumanTextureTaskView(gui3d.TaskView):
     def loadHandler(self, human, values):
         
         if values[0] == 'skinTexture':
-            human.setTexture(os.path.join('data/skins', values[1]))
+            human.setTexture(os.path.join(os.path.join(mh.getPath(''), 'data', 'skins', values[1])))
             self.syncTexture()
        
     def saveHandler(self, human, file):
@@ -135,7 +137,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         
         if self.mediaSync:
             return
-        self.mediaSync = download.MediaSync(self.app, 'data/skins', 'http://www.makehuman.org/download/skins/', self.syncMediaFinished)
+        self.mediaSync = download.MediaSync(self.app, os.path.join(mh.getPath(''), 'data', 'skins'), 'http://www.makehuman.org/download/skins/', self.syncMediaFinished)
         self.mediaSync.start()
         
     def syncMediaFinished(self):
