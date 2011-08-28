@@ -219,12 +219,70 @@ int osx_adjustRenderEnvironment()
     // Adjust Aqsis
     const std::string kPathAqsis    = "/Applications/Aqsis.app/Contents/";
     path.append(":" + kPathAqsis + "Resources/bin/");
-    rc = setEnvVar("AQSIS_DISPLAY_PATH", kPathAqsis + "Resources/lib/");
+
+    
+    // AQSISHOME: Aqsis base path
+    rc = setEnvVar("AQSISHOME", kPathAqsis + "..");
+    assert( 0 == rc );
     if (0 != rc)
     {
+        fprintf(stderr, "*** Error @ %s line %d: could not set AQSISHOME!\n", 
+                __PRETTY_FUNCTION__, __LINE__);
         return -1; // error
     }
 
+#if 0
+    // AQSIS_DISPLAY_PATH: Display devices
+    rc = setEnvVar("AQSIS_DISPLAY_PATH", kPathAqsis + "Resources/lib/");
+    assert( 0 == rc );
+    if (0 != rc)
+    {
+        fprintf(stderr, "*** Error @ %s line %d: could not set AQSIS_DISPLAY_PATH!\n", 
+                __PRETTY_FUNCTION__, __LINE__);
+        return -1; // error
+    }
+
+    // AQSIS_ARCHIVE_PATH: These paths are used for locating RIB archives.
+    rc = setEnvVar("AQSIS_ARCHIVE_PATH", kPathAqsis + "");
+    assert( 0 == rc );
+    if (0 != rc)
+    {
+        fprintf(stderr, "*** Error @ %s line %d: could not set AQSIS_ARCHIVE_PATH!\n", 
+                __PRETTY_FUNCTION__, __LINE__);
+        return -1; // error
+    }
+    
+    // AQSIS_PROCEDURAL_PATH: Procedurals (see RiProcedural())
+    rc = setEnvVar("AQSIS_PROCEDURAL_PATH", kPathAqsis + "");
+    assert( 0 == rc );
+    if (0 != rc)
+    {
+        fprintf(stderr, "*** Error @ %s line %d: could not set AQSIS_PROCEDURAL_PATH!\n", 
+                __PRETTY_FUNCTION__, __LINE__);
+        return -1; // error
+    }
+
+    // AQSIS_SHADER_PATH: Shaders and DSOs
+    rc = setEnvVar("AQSIS_SHADERS_PATH", kPathAqsis + "Resources/share/aqsis/shaders/light/");
+    assert( 0 == rc );
+    if (0 != rc)
+    {
+        fprintf(stderr, "*** Error @ %s line %d: could not set AQSIS_SHADER_PATH!\n", 
+                __PRETTY_FUNCTION__, __LINE__);
+        return -1; // error
+    }
+
+    // AQSIS_TEXTURE_PATH: Texture images     
+    rc = setEnvVar("AQSIS_TEXTURE_PATH", kPathAqsis + "");
+    assert( 0 == rc );
+    if (0 != rc)
+    {
+        fprintf(stderr, "*** Error @ %s line %d: could not set AQSIS_TEXTURE_PATH!\n", 
+                __PRETTY_FUNCTION__, __LINE__);
+        return -1; // error
+    }
+#endif // #if 0    
+    
     // -----------------------------------------------------------------
     // Adjust Pixie
     const std::string kPathPixie    = "/Library/Pixie/";
