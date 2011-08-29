@@ -93,7 +93,8 @@ WARN_LOGFILE           = /dev/null
 INPUT                  = ../src/main.c \
                          ../src/glmodule.c \
                          ../src/core.c \
-                         ../src/gltexture.c
+                         ../src/arraybuffer.c \
+                         ../src/linalg_module.c                        
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.h                         

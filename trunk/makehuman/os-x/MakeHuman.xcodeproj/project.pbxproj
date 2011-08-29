@@ -131,7 +131,7 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		68061C9B0FC136AB006C372E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
-		680EA9CE11A432B000DDEFEB /* glew.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = glew.framework; path = frameworks/glew.framework; sourceTree = "<group>"; };
+		680EA9CE11A432B000DDEFEB /* glew.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = glew.framework; path = frameworks/glew.framework; sourceTree = SOURCE_ROOT; };
 		68225FA813DC5C7C0021F48A /* TextureCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureCache.h; path = include/TextureCache.h; sourceTree = "<group>"; };
 		68225FA913DC5C830021F48A /* TextureCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCache.cpp; path = src/TextureCache.cpp; sourceTree = "<group>"; };
 		683926C212A3DC1400008F37 /* AppIcon_nb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon_nb.icns; path = resources/AppIcon_nb.icns; sourceTree = "<group>"; };
@@ -149,7 +149,7 @@
 		6857022810031DA200F9C649 /* MakeHumanFramework-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MakeHumanFramework-Info.plist"; sourceTree = "<group>"; };
 		6859C28010178958000E212C /* SDLMain.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SDLMain.xib; path = resources/English.lproj/SDLMain.xib; sourceTree = "<group>"; };
 		685D0DED0FA1E13E0065AFB5 /* MakeHuman_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MakeHuman_Prefix.pch; path = include/MakeHuman_Prefix.pch; sourceTree = "<group>"; };
-		6869C0DD10322A0400DF62C3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = frameworks/Sparkle.framework; sourceTree = "<group>"; };
+		6869C0DD10322A0400DF62C3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = frameworks/Sparkle.framework; sourceTree = SOURCE_ROOT; };
 		6869C0F810322D1100DF62C3 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = resources/dsa_pub.pem; sourceTree = "<group>"; };
 		6869C127103305C500DF62C3 /* About.pages */ = {isa = PBXFileReference; lastKnownFileType = file; name = About.pages; path = resources/About.pages; sourceTree = "<group>"; };
 		686CEBB512A3D4F500F4324D /* Info_nb.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info_nb.plist; path = resources/Info_nb.plist; sourceTree = "<group>"; };
@@ -160,7 +160,7 @@
 		687F122C132D3205003F3B2B /* arraybuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = arraybuffer.c; path = ../src/arraybuffer.c; sourceTree = SOURCE_ROOT; };
 		687F1240132D321A003F3B2B /* linalg_module.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = linalg_module.c; path = ../src/linalg_module.c; sourceTree = SOURCE_ROOT; };
 		687F1244132D3232003F3B2B /* arraybuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = arraybuffer.h; path = ../include/arraybuffer.h; sourceTree = SOURCE_ROOT; };
-		6894C4E10FA188D000A52097 /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = /Library/Frameworks/SDL_image.framework; sourceTree = "<absolute>"; };
+		6894C4E10FA188D000A52097 /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = frameworks/SDL_image.framework; sourceTree = SOURCE_ROOT; };
 		689F331A0E6192CB00E37E9F /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
 		689F331D0E6192CB00E37E9F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = Info.plist; path = resources/Info.plist; sourceTree = "<group>"; };
 		689F332A0E6193B000E37E9F /* core.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = core.c; path = ../src/core.c; sourceTree = "<group>"; };
@@ -195,7 +195,7 @@
 		68E6BB1B10395B2C00BAA9F5 /* GeneralPreferences.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GeneralPreferences.tiff; path = resources/icons/GeneralPreferences.tiff; sourceTree = "<group>"; };
 		68E6BB461039619700BAA9F5 /* GeneralPreferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = GeneralPreferences.xib; path = resources/GeneralPreferences.xib; sourceTree = "<group>"; };
 		68E6BBBB1039732800BAA9F5 /* folder.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = folder.tiff; path = resources/icons/folder.tiff; sourceTree = "<group>"; };
-		68E6C076103B1E2500BAA9F5 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = frameworks/SDL.framework; sourceTree = "<group>"; };
+		68E6C076103B1E2500BAA9F5 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = frameworks/SDL.framework; sourceTree = SOURCE_ROOT; };
 		68EA2BAC0FC836D50052A87E /* NSFont_OpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSFont_OpenGL.h; path = include/NSFont_OpenGL.h; sourceTree = "<group>"; };
 		68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSFont_OpenGL.m; path = src/NSFont_OpenGL.m; sourceTree = "<group>"; };
 		68EF10D313D97A590000AAD3 /* OSXTools.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXTools.mm; path = src/OSXTools.mm; sourceTree = "<group>"; };
