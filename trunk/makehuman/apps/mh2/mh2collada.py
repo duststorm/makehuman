@@ -31,6 +31,7 @@ import mh
 import files3d
 import mh2bvh
 import os, time
+import shutil
 import mh2proxy, mh2mhx
 import mhx_rig, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 from mhx_rig import *
@@ -49,10 +50,15 @@ Root = 'MasterFloor'
 #
 
 def exportCollada(human, name, options=None):
+    global useRotate90, useCopyImages
     if options:
         useRig = options["useRig"]
+        useRotate90 = options["rotate90"]
+        useCopyImages = options["copyImages"]
     else:
         useRig = "game"
+        useRotate90 = False
+        useCopyImages = False
     filename = name+".dae"
     time1 = time.clock()
     try:
@@ -91,6 +97,17 @@ def flatten(hier, bones):
         bones.append(bone)
         flatten(children, bones)
     return
+
+#
+#
+#
+
+def printLoc(fp, loc):
+    global useRotate90
+    if useRotate90:
+        fp.write("%.4f %.4f %.4f " % (loc[0], -loc[2], loc[1]))
+    else:
+        fp.write("%.4f %.4f %.4f " % (loc[0], loc[1], loc[2]))
 
 #
 #    boneOK(flags, bone, parent):
@@ -177,30 +194,16 @@ def fixTwistWeights(fp, weights):
     return
                 
 #
-#    writeBones(fp, bones, orig, extra, pad, stuff):
 #    writeBone(fp, bone, orig, extra, pad, stuff):
 #
 
-def writeBones(fp, bones, orig, extra, pad, stuff):
-    for bone in bones:
-        writeBone(fp, bone, orig, extra, pad, stuff)
-    return
-    
 def writeBone(fp, bone, orig, extra, pad, stuff):
     (name, children) = bone
     head = stuff.rigHead[name]
     vec = aljabr.vsub(head, orig)
     printNode(fp, name, vec, extra, pad)
-    if children:
-        writeBones(fp, children, head, '', pad+'  ', stuff)    
-    '''
-    else:
-        tail = stuff.rigTail[name]
-        #vec = aljabr.vsub(tail, head)
-        vec = Delta
-        printNode(fp, name+"_end", vec, '', pad+'  ')
-        fp.write('\n%s        </node>' % pad)
-    '''
+    for child in children:
+        writeBone(fp, child, head, '', pad+'  ', stuff)    
     fp.write('\n%s      </node>' % pad)
     return
     
@@ -215,7 +218,9 @@ def printNode(fp, name, vec, extra, pad):
         idStr = ''
     fp.write('\n'+
 '%s      <node %s %s type="JOINT" %s>\n' % (pad, extra, nameStr, idStr) +
-'%s        <translate sid="translate"> %.4f %.4f %.4f </translate>\n' % (pad, vec[0], -vec[2], vec[1]) +
+'%s        <translate sid="translate"> ' % pad)
+    printLoc(fp, vec)
+    fp.write('</translate>\n' +
 '%s        <rotate sid="rotateZ">0 0 1 0.0</rotate>\n' % pad +
 '%s        <rotate sid="rotateY">0 1 0 0.0</rotate>\n' % pad +
 '%s        <rotate sid="rotateX">1 0 0 0.0</rotate>\n' % pad +
@@ -471,7 +476,7 @@ def filterMesh(mesh1):
 #
 
 def exportDae(human, fp, useRig):
-    global theStuff, Root
+    global theStuff, Root, useRotate90
     cfg = mh2proxy.proxyConfig(human, True)
     obj = human.meshData
     if useRig == "game":
@@ -501,9 +506,13 @@ def exportDae(human, fp, useRig):
 
     if theStuff.verts == None:
         raise NameError("No rig found. Neither main mesh nor rigged proxy enabled")
-
+        
     date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
-
+    if useRotate90:
+        upaxis = 'Z_UP'
+    else:
+        upaxis = 'Y_UP'
+        
     fp.write('<?xml version="1.0" encoding="utf-8"?>\n' +
 '<COLLADA version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">\n' +
 '  <asset>\n' +
@@ -513,7 +522,7 @@ def exportDae(human, fp, useRig):
 '    <created>%s</created>\n' % date +
 '    <modified>%s</modified>\n' % date +
 '    <unit meter="0.1" name="decimeter"/>\n' +
-'    <up_axis>Z_UP</up_axis>\n' +
+'    <up_axis>%s</up_axis>\n' % upaxis+
 '  </asset>\n' +
 '  <library_images>\n')
 
@@ -551,12 +560,15 @@ def exportDae(human, fp, useRig):
     fp.write(
 '  </library_geometries>\n\n' +
 '  <library_visual_scenes>\n' +
-'    <visual_scene id="Scene" name="Scene">\n')
-    writeBones(fp, theStuff.rigHier, [0,0,0], 'layer="L1"', '', theStuff)
+'    <visual_scene id="Scene" name="Scene">\n' +
+'      <node id="Scene_root">\n')
+    for root in theStuff.rigHier:
+        writeBone(fp, root, [0,0,0], 'layer="L1"', '  ', theStuff)
     for stuff in stuffs:
         writeNode(obj, fp, stuff)
 
     fp.write(
+'      </node>\n' +    
 '    </visual_scene>\n' +
 '  </library_visual_scenes>\n' +
 '  <scene>\n' +
@@ -609,17 +621,25 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 #
 
 def writeImages(obj, fp, stuff):
+    global useCopyImages
     if stuff.type:
         return
-    dd = '~/makehuman'
-    dd = 'data/textures'
-    texdir = os.path.realpath(os.path.expanduser(dd))
-    fp.write(
-'    <image id="texture_tif">\n' +
-'      <init_from>%s</init_from>\n' % ("%s/texture.tif" % texdir) +
-'    </image>\n' +
-'    <image id="texture_ref_tif">\n' +
-'      <init_from>%s</init_from>\n' % ("%s/texture_ref.tif" % texdir) +
+    for fname in ["texture", "texture_ref"]:
+        srcfile = os.path.realpath(os.path.expanduser("data/textures/%s.tif" % fname))
+        print("Image %s" % srcfile)
+        if useCopyImages:    
+            destdir = mh.getPath('exports')
+            #destdir = "/Users/Thomas/Documents"
+            destfile = os.path.realpath(os.path.expanduser("%s/%s.tif" % (destdir,fname)))
+            texfile = "./%s.tif" % (fname)
+            shutil.copy2(srcfile, destfile)
+            print("  copied to export directory")
+        else:
+            texfile = srcfile
+            
+        fp.write(
+'    <image id="%s_tif" name="%s_tif">\n' % (fname, fname) +
+'      <init_from>"%s"</init_from>\n' % texfile +
 '    </image>\n')
     return
 
@@ -752,10 +772,10 @@ def writeMaterials(obj, fp, stuff):
     return
 
 #
-#    writeController(obj, fp, stuff):
+#   setStuffSkinWeights(stuff):
 #
 
-def writeController(obj, fp, stuff):
+def setStuffSkinWeights(stuff):
     stuff.vertexWeights = {}
     for (vn,v) in enumerate(stuff.verts):
         stuff.vertexWeights[vn] = []
@@ -771,7 +791,14 @@ def writeController(obj, fp, stuff):
             stuff.vertexWeights[int(vn)].append((bn,wn))
             wn += 1
         stuff.skinWeights.extend(wts)
+    return
+    
+#
+#    writeController(obj, fp, stuff):
+#
 
+def writeController(obj, fp, stuff):
+    setStuffSkinWeights(stuff)
     nVerts = len(stuff.verts)
     nUvVerts = len(stuff.uvValues)
     nNormals = nVerts
@@ -826,9 +853,14 @@ def writeController(obj, fp, stuff):
     mat = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
     for b in stuff.bones:
         vec = stuff.rigHead[b]
-        mat[0][3] = -vec[0]
-        mat[1][3] = vec[2]
-        mat[2][3] = -vec[1]
+        if useRotate90:
+            mat[0][3] = -vec[0]
+            mat[1][3] = vec[2]
+            mat[2][3] = -vec[1]
+        else:            
+            mat[0][3] = -vec[0]
+            mat[1][3] = -vec[1]
+            mat[2][3] = -vec[2]
         fp.write('\n            ')
         for i in range(4):
             for j in range(4):
@@ -927,7 +959,6 @@ def writeGeometry(obj, fp, stuff):
     nVerts = len(stuff.verts)
     nUvVerts = len(stuff.uvValues)
     nNormals = nVerts
-    nFaces = len(stuff.faces)
     nWeights = len(stuff.skinWeights)
     nBones = len(stuff.bones)
     nTargets = len(stuff.targets)
@@ -941,7 +972,7 @@ def writeGeometry(obj, fp, stuff):
 
 
     for v in stuff.verts:
-        fp.write('%.6g %.6g %.6g ' % (v[0], -v[2], v[1]))
+        printLoc(fp, v)
 
     fp.write('\n' +
 '          </float_array>\n' +
@@ -958,7 +989,7 @@ def writeGeometry(obj, fp, stuff):
 '          ')
 
     for no in stuff.vnormals:
-        fp.write('%.6g %.6g %.6g ' % (no[0], -no[2], no[1]))
+        printLoc(fp, no)
 
     fp.write('\n' +
 '          </float_array>\n' +
@@ -990,26 +1021,13 @@ def writeGeometry(obj, fp, stuff):
 '        </source>\n' +
 '        <vertices id="%s-Vertex">\n' % stuff.name +
 '          <input semantic="POSITION" source="#%s-Position"/>\n' % stuff.name +
-'        </vertices>\n' +
-'        <polygons count="%d">\n' % nFaces +
-'          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % stuff.name +
-'          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % stuff.name +
-'          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % stuff.name)
+'        </vertices>\n')
 
-    for fc in stuff.faces:
-        fp.write('          <p>')
-        for vs in fc:
-            v = vs[0]
-            uv = vs[1]
-            if v > nVerts:
-                raise NameError("v %d > %d" % (v, nVerts))
-            if uv > nUvVerts:
-                raise NameError("uv %d > %d" % (uv, nUvVerts))            
-            fp.write("%d %d %d " % (v, v, uv))
-        fp.write('</p>\n')
+    checkFaces(stuff, nVerts, nUvVerts)
+    #writePolygons(fp, stuff)
+    writePolylist(fp, stuff)
     
-    fp.write('\n' +
-'        </polygons>\n' +
+    fp.write(
 '      </mesh>\n' +
 '    </geometry>\n')
 
@@ -1028,7 +1046,7 @@ def writeGeometry(obj, fp, stuff):
                 loc = vadd(v, offs)
             except:
                 loc = v
-            fp.write("%.4f %.4f %.4f " % (loc[0], -loc[2], loc[1]))
+            printLoc(fp, loc)
 
         fp.write('\n'+
 '         </float_array>\n' +
@@ -1044,19 +1062,84 @@ def writeGeometry(obj, fp, stuff):
 '   </geometry>\n')
     """
     return
+    
+#
+#   writePolygons(fp, stuff):
+#   writePolylist(fp, stuff):
+#
 
+def writePolygons(fp, stuff):
+    fp.write(        
+'        <polygons count="%d">\n' % len(stuff.faces) +
+'          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % stuff.name +
+'          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % stuff.name +
+'          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % stuff.name)
+
+    for fc in stuff.faces:
+        fp.write('          <p>')
+        for vs in fc:
+            v = vs[0]
+            uv = vs[1]
+            fp.write("%d %d %d " % (v, v, uv))
+        fp.write('</p>\n')
+    
+    fp.write('\n' +
+'        </polygons>\n')
+    return
+
+def writePolylist(fp, stuff):
+    fp.write(        
+'        <polylist count="%d">\n' % len(stuff.faces) +
+'          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % stuff.name +
+'          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % stuff.name +
+'          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % stuff.name +
+'          <vcount>')
+
+    for fc in stuff.faces:
+        fp.write('%d ' % len(fc))
+
+    fp.write('\n' +
+'          </vcount>\n'
+'          <p>')
+
+    for fc in stuff.faces:
+        for vs in fc:
+            v = vs[0]
+            uv = vs[1]
+            fp.write("%d %d %d " % (v, v, uv))
+
+    fp.write(
+'          </p>\n' +
+'        </polylist>\n')
+    return
+
+#
+#   checkFaces(stuff, nVerts, nUvVerts):
+#
+
+def checkFaces(stuff, nVerts, nUvVerts):
+    for fc in stuff.faces:
+        for vs in fc:
+            v = vs[0]
+            uv = vs[1]
+            if v > nVerts:
+                raise NameError("v %d > %d" % (v, nVerts))
+            if uv > nUvVerts:
+                raise NameError("uv %d > %d" % (uv, nUvVerts))            
+    return 
+    
 #
 #    writeNode(obj, fp, stuff):
 #
 
 def writeNode(obj, fp, stuff):    
     fp.write('\n' +
-'      <node layer="L1" id="%sObject" name="%s">\n' % (stuff.name,stuff.name) +
+'      <node id="%sObject" name="%s">\n' % (stuff.name,stuff.name) +
 '        <translate sid="translate">0 0 0</translate>\n' +
 '        <rotate sid="rotateZ">0 0 1 0</rotate>\n' +
 '        <rotate sid="rotateY">0 1 0 0</rotate>\n' +
 '        <rotate sid="rotateX">1 0 0 0</rotate>\n' +
-'        <scale sid="scale">1 1 1</scale>\n' +
+#'        <scale sid="scale">1 1 1</scale>\n' +
 '        <instance_controller url="#%s-skin">\n' % stuff.name +
 '          <skeleton>#%s</skeleton>\n' % Root)
 

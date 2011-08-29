@@ -302,7 +302,9 @@ class ExportTaskView(gui3d.TaskView):
         
         # Collada options
         y = yy
-        self.colladaOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*6+6));y+=25
+        self.colladaOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6));y+=25
+        self.colladaRot90 = gui3d.CheckBox(self.colladaOptions, "Rotate 90", False);y+=24
+        self.colladaCopyImages = gui3d.CheckBox(self.colladaOptions, "Copy images", False);y+=24
         rigs = []
         self.gameDae = gui3d.RadioButton(self.colladaOptions, rigs, "Default rig", True);y+=24
         self.dazDae = gui3d.RadioButton(self.colladaOptions, rigs, "Poser/DAZ rig");y+=24
@@ -454,6 +456,8 @@ class ExportTaskView(gui3d.TaskView):
                 #    rig = 'mb'                    
                 options = {
                     "useRig": rig,
+                    "rotate90" : self.colladaRot90.selected,
+                    "copyImages" : self.colladaCopyImages.selected,
                     "proxy" : self.colladaProxy.getName()
                 }
                 mh2collada.exportCollada(self.app.selectedHuman, os.path.join(exportPath, filename), options)
