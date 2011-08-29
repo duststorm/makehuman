@@ -50,15 +50,17 @@ Root = 'MasterFloor'
 #
 
 def exportCollada(human, name, options=None):
-    global useRotate90, useCopyImages
+    global useRotate90, useCopyImages, useProxy, useRig
     if options:
         useRig = options["useRig"]
         useRotate90 = options["rotate90"]
         useCopyImages = options["copyImages"]
+        useProxy = options["proxy"]
     else:
         useRig = "game"
         useRotate90 = False
         useCopyImages = False
+        useProxy = None
     filename = name+".dae"
     time1 = time.clock()
     try:
@@ -66,7 +68,7 @@ def exportCollada(human, name, options=None):
         mh2proxy.safePrint("Writing Collada file", filename)
     except:
         mh2proxy.safePrint("Unable to open file for writing", filename)
-    exportDae(human, fp, useRig)
+    exportDae(human, fp)
     fp.close()
     time2 = time.clock()
     mh2proxy.safePrint("Wrote Collada file in %g s:" % (time2-time1), filename)
@@ -472,11 +474,11 @@ def filterMesh(mesh1):
     return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
 
 #
-#    exportDae(human, fp, useRig):
+#    exportDae(human, fp):
 #
 
-def exportDae(human, fp, useRig):
-    global theStuff, Root, useRotate90
+def exportDae(human, fp):
+    global theStuff, Root, useRotate90, useProxy, useRig
     cfg = mh2proxy.proxyConfig(human, True)
     obj = human.meshData
     if useRig == "game":
@@ -495,13 +497,17 @@ def exportDae(human, fp, useRig):
     stuff = CStuff('Human', None)
     stuff.setBones(amt)
     theStuff = stuff
-    if 'Dae' in cfg.mainmesh:
+    if useProxy:
+        proxyFile = "data/templates/%s.proxy" % useProxy.lower()
+        print("Using %s" % proxyFile)
+        proxyStuff = (proxyFile, 'Proxy', 0)
+        proxyList = [('Proxy', False, False, True, proxyStuff)]
+        setupProxies('Proxy', obj, stuffs, amt, rawTargets, proxyList)
+    else:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
         mesh2 = filterMesh(mesh1)
         stuff.setMesh(mesh2)
         stuffs.append(stuff)
-
-    setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
     setupProxies('Clothes', obj, stuffs, amt, rawTargets, cfg.proxyList)
 
     if theStuff.verts == None:
@@ -565,7 +571,7 @@ def exportDae(human, fp, useRig):
     for root in theStuff.rigHier:
         writeBone(fp, root, [0,0,0], 'layer="L1"', '  ', theStuff)
     for stuff in stuffs:
-        writeNode(obj, fp, stuff)
+        writeNode(obj, fp, "        ", stuff)
 
     fp.write(
 '      </node>\n' +    
@@ -588,6 +594,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
             proxy = mh2proxy.readProxyFile(obj, proxyStuff)
             if proxy.name:
                 stuff = CStuff(proxy.name, proxy)
+                print(proxy.name, proxy.rig, proxy.weightfile)
                 if proxy.rig:
                     (proxyFile, typ, layer) = proxyStuff
                     amtProxy = getArmatureFromRigFile(proxy.rig, obj)
@@ -600,13 +607,19 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
                 elif proxy.weightfile:
                     (rigname, filename) = proxy.weightfile
                     if theStuff and rigname == theStuff.name:
+                        print("copy")
                         stuff.copyBones(theStuff)
                     else:
+                        print("amt")
                         stuff.setBones(amt)
                 else:
+                    print("amt2")
                     stuff.setBones(amt)
                     #theStuff.verts = True
                 if stuff:
+                    print("Stuff", stuff.name, theStuff.name)
+                    if typ == 'Proxy':
+                        theStuff = stuff
                     if theStuff:
                         stuffname = theStuff.name
                     else:
@@ -668,7 +681,7 @@ def writeEffects(obj, fp, stuff):
 '    <effect id="%s-effect">\n' % mat.name +
 '      <profile_COMMON>\n' +
 '        <technique sid="common">\n' +
-'          <lambert>\n')
+'          <phong>\n')
         BlenderDaeColor = {
             'diffuse_color' : 'diffuse',
             'specular_color' : 'specular',
@@ -683,7 +696,7 @@ def writeEffects(obj, fp, stuff):
             if daeKey:
                 writeColor(fp, daeKey, value, (0.8,0.8,0.8))
         fp.write(
-'          </lambert>\n' +
+'          </phong>\n' +
 '          <extra/>\n' +
 '        </technique>\n' +
 '        <extra>\n' +
@@ -1129,19 +1142,19 @@ def checkFaces(stuff, nVerts, nUvVerts):
     return 
     
 #
-#    writeNode(obj, fp, stuff):
+#    writeNode(obj, fp, pad, stuff):
 #
 
-def writeNode(obj, fp, stuff):    
+def writeNode(obj, fp, pad, stuff):    
     fp.write('\n' +
-'      <node id="%sObject" name="%s">\n' % (stuff.name,stuff.name) +
-'        <translate sid="translate">0 0 0</translate>\n' +
-'        <rotate sid="rotateZ">0 0 1 0</rotate>\n' +
-'        <rotate sid="rotateY">0 1 0 0</rotate>\n' +
-'        <rotate sid="rotateX">1 0 0 0</rotate>\n' +
-#'        <scale sid="scale">1 1 1</scale>\n' +
-'        <instance_controller url="#%s-skin">\n' % stuff.name +
-'          <skeleton>#%s</skeleton>\n' % Root)
+'%s<node id="%sObject" name="%s">\n' % (pad, stuff.name,stuff.name) +
+'%s  <translate sid="translate">0 0 0</translate>\n' % pad +
+'%s  <rotate sid="rotateZ">0 0 1 0</rotate>\n' % pad +
+'%s  <rotate sid="rotateY">0 1 0 0</rotate>\n' % pad +
+'%s  <rotate sid="rotateX">1 0 0 0</rotate>\n' % pad+
+#'%s  <scale sid="scale">1 1 1</scale>\n' % pad+
+'%s  <instance_controller url="#%s-skin">\n' % (pad, stuff.name) +
+'%s    <skeleton>#%s</skeleton>\n' % (pad, Root))
 
     if stuff.type == None:
         matname = 'SSS_skinshader'
@@ -1152,17 +1165,17 @@ def writeNode(obj, fp, stuff):
 
     if matname:
         fp.write(
-'          <bind_material>\n' +
-'            <technique_common>\n' +
-'              <instance_material symbol="%s" target="#%s">\n' % (matname, matname) +
-'                <bind_vertex_input semantic="UVTex" input_semantic="TEXCOORD" input_set="0"/>\n' +
-'              </instance_material>\n' +
-'            </technique_common>\n' +
-'          </bind_material>\n')
+'%s    <bind_material>\n' % pad +
+'%s      <technique_common>\n' % pad +
+'%s        <instance_material symbol="%s" target="#%s">\n' % (pad, matname, matname) +
+'%s          <bind_vertex_input semantic="UVTex" input_semantic="TEXCOORD" input_set="0"/>\n' % pad +
+'%s        </instance_material>\n' % pad +
+'%s      </technique_common>\n' % pad +
+'%s    </bind_material>\n' % pad)
 
     fp.write(
-'        </instance_controller>\n' +
-'      </node>\n')
+'%s  </instance_controller>\n' % pad +
+'%s</node>\n' % pad)
     return
 
 #
