@@ -215,6 +215,7 @@ def readBvhFile(context, filepath, scn, scan):
             scn.objects.link(rig)
             scn.objects.active = rig
             bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.object.mode_set(mode='EDIT')
             root.build(amt, Vector((0,0,0)), None)
             #root.display('')
             bpy.ops.object.mode_set(mode='OBJECT')
