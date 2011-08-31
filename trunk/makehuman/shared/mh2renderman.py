@@ -459,7 +459,7 @@ class RMRScene:
         self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
         self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')
         self.hairTexturePath = os.path.join(self.applicationPath, 'data', 'hairstyles')
-        self.skinTexturePath = os.path.join(self.applicationPath, 'data', 'skins')
+        self.skinTexturePath = os.path.join(mh.getPath(''), 'data', 'skins')
         
         #self.texturesFileName = os.path.join(self.ribsPath, "texture.rib")
 
