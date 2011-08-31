@@ -1001,6 +1001,7 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				INFOPLIST_FILE = resources/Info_NB.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = MakeHuman;
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
