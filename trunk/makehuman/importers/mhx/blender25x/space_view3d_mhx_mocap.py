@@ -1709,9 +1709,7 @@ def insertParentedIkKeyFrames(name, pb, anim, animReal, animFake, animCopy):
         offset = locAbs - headAbs
         mat = animReal.matrices[frame] * anim.matrixRest
         if pb.bone.use_local_location:
-            inv = mat.copy()
-            inv.invert()
-            loc = offset*inv
+            loc = mat.inverted() * offset
             pb.location = loc
         else:
             pb.location = offset
@@ -1778,7 +1776,7 @@ def insertRootIkKeyFrames(name, pb, anim, animFake, animCopy):
         locAbs = animFake.heads[frame] + animFake.matrices[frame]*offsetFake
         offset = locAbs - anim.headRest
         if pb.bone.use_local_location:
-            loc = offset * anim.inverseRest
+            loc = anim.inverseRest * offset
             pb.location = loc
         else:
             pb.location = offset
