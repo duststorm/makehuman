@@ -1773,24 +1773,35 @@ class TextEdit(View):
         if event.modifiers & events3d.KMOD_CTRL:
             View.onKeyDown(self, event)
             return
+            
+        # Normalize key
+        key = event.key
+        if key in xrange(events3d.SDLK_KP0, events3d.SDLK_KP9 + 1):
+            key = events3d.SDLK_0 + key - events3d.SDLK_KP0
+        elif key == events3d.SDLK_KP_PERIOD:
+            key = events3d.SDLK_PERIOD
+        elif key == events3d.SDLK_KP_MINUS:
+            key = events3d.SDLK_MINUS
+        elif key == events3d.SDLK_KP_PLUS:
+            key = events3d.SDLK_PLUS
 
-        if event.key == events3d.SDLK_BACKSPACE:
+        if key == events3d.SDLK_BACKSPACE:
             self.__delText()
-        elif event.key == events3d.SDLK_RETURN:
+        elif key == events3d.SDLK_RETURN:
             if len(self.text):
                 View.onKeyDown(self, event)
             return
-        elif event.key == events3d.SDLK_RIGHT:
+        elif key == events3d.SDLK_RIGHT:
             if self.__position<len(self.text)-1:
                 self.__hideCursor()
                 self.__position += 1
                 self.__showCursor()
-        elif event.key == events3d.SDLK_LEFT:
+        elif key == events3d.SDLK_LEFT:
             if self.__position > 0:
                 self.__hideCursor()
                 self.__position -= 1
                 self.__showCursor()
-        elif event.key < 256:
+        elif key < 256:
             self.__addText(event.character)
 
         self.__updateTextObject()
