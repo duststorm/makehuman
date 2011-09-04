@@ -563,7 +563,7 @@ def exportList(context, weights, name, fp):
     #    return
     if context.scene['MhxExportAsWeightFile']:
         if len(weights) > 0:
-            fp.write("\n# weights %s\n" % vg.name)
+            fp.write("\n# weights %s\n" % name)
             for (vn,w) in weights:
                 if w > 0.005:
                     fp.write("  %d %.3g\n" % (vn, w))
