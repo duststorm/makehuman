@@ -1569,12 +1569,10 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
             for (idtype, targ, boneTarg, ttype, flags) in targets:
                 if ttype[0:3] == 'LOC':
                     useLoc = True
-                local = boolString(flags & C_LOC)
                 fp.write(
 "          Target %s %s\n" % (targ, idtype) +
 "            transform_type '%s' ;\n" % ttype +
 "            bone_target '%s' ;\n" % boneTarg +
-"            use_local_space_transform %s ;\n" % local +
 "          end Target\n")
 
         elif typ == 'ROTATION_DIFF':
@@ -1583,7 +1581,6 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
                 fp.write(
 "          Target %s %s\n" % (targ, idtype) +
 "            bone_target '%s' ;\n" % boneTarg +
-"            use_local_space_transform False ; \n" +
 "          end Target\n")
 
         elif typ == 'SINGLE_PROP':
