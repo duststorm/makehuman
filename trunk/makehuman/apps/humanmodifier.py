@@ -85,7 +85,7 @@ class ModifierSlider(Slider):
     def __init__(self, parent, value=0.0, min=0.0, max=1.0, label=None,
         style=SliderStyle, thumbStyle=SliderThumbStyle, modifier=None):
         
-        Slider.__init__(self, parent, value, min, max, label)
+        Slider.__init__(self, parent, value, min, max, label, style, thumbStyle)
         self.modifier = modifier
         self.value = None
         
@@ -562,6 +562,49 @@ class GenderAgeAsymmetricModifier(GenderAgeModifier):
     def getFactors(self, human, value):
         
         factors = GenderAgeModifier.getFactors(self, human, value)
+        
+        factors.update({
+            self.left: -min(value, 0.0),
+            self.right: max(0.0, value)
+        })
+        
+        return factors
+    
+    def clampValue(self, value):
+        return max(-1.0, min(1.0, value))
+        
+class GenderAgeEthnicAsymmetricModifier(GenderAgeEthnicModifier2):
+    
+    def __init__(self, template, parameterName, left, right, always=True):
+        
+        self.parameterName = parameterName
+        self.left = left
+        self.right = right
+        self.always = always
+        GenderAgeEthnicModifier2.__init__(self, template)
+        
+    # overrides
+    def setValue(self, human, value):
+    
+        value = self.clampValue(value)
+        factors = self.getFactors(human, value)
+        
+        for target in self.targets:
+            human.setDetail(target[0], reduce(mul, [factors[factor] for factor in target[1]]))
+            #print target[0], human.getDetail(target[0])
+            
+    def expandTemplate(self, targets):
+        
+        targets = GenderAgeEthnicModifier2.expandTemplate(self, targets)
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute({self.parameterName:value}), target[1] + [value]) for target in targets for value in [self.left, self.right]]
+
+        return targets
+        
+    def getFactors(self, human, value):
+        
+        factors = GenderAgeEthnicModifier2.getFactors(self, human, value)
         
         factors.update({
             self.left: -min(value, 0.0),
