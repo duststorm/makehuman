@@ -579,8 +579,10 @@ def retargetMhxRig(context, srcRig, trgRig):
         srcFixes = None
     #debugOpen()
     nFrames = poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes)
-    poseTrgIkBones(context, trgRig, trgAnimations)
-    #new_retarget.poseTrgIkBones(context, trgRig, nFrames)
+    if scn['McpNewIkRetarget']:
+        new_retarget.poseTrgIkBones(context, trgRig, nFrames)
+    else:
+        poseTrgIkBones(context, trgRig, trgAnimations)
     #debugClose()
     utils.setInterpolation(trgRig)
     if onoff == 'OFF':
@@ -691,6 +693,7 @@ class OldRetargetPanel(bpy.types.Panel):
         ob = context.object
         layout.prop(scn, "McpDoSimplify")
         layout.prop(scn, "McpApplyFixes")
+        layout.prop(scn, "McpNewIkRetarget")
         layout.operator("mcp.old_retarget_mhx")
         layout.operator("mcp.old_load_retarget_simplify")
 

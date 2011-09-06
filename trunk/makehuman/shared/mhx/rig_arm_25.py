@@ -236,8 +236,6 @@ ArmHeadsTails = [
 
 	('ElbowPT_L',			'r-elbow-pt', ('r-elbow-pt', yunit)),
 	('ElbowPT_R',			'l-elbow-pt', ('l-elbow-pt', yunit)),
-	('ElbowPTFK_L',			'r-elbow-pt', ('r-elbow-pt', yunit)),
-	('ElbowPTFK_R',			'l-elbow-pt', ('l-elbow-pt', yunit)),
 	('ElbowLinkPT_L',		'r-elbow', 'r-elbow-pt'),
 	('ElbowLinkPT_R',		'l-elbow', 'l-elbow-pt'),
 ]
@@ -303,8 +301,6 @@ ArmArmature = [
 	# Pole target
 	('ElbowPT_L',		0.0, 'Shoulder_L', F_WIR, L_LARMIK, NoBB),
 	('ElbowPT_R',		0.0, 'Shoulder_R', F_WIR, L_RARMIK, NoBB),
-	('ElbowPTFK_L',		0.0, 'UpArm_L', 0, L_HELP, NoBB),
-	('ElbowPTFK_R',		0.0, 'UpArm_R', 0, L_HELP, NoBB),
 	('ElbowLinkPT_L',	0.0, 'UpArm_L', F_RES, L_LARMIK, NoBB),
 	('ElbowLinkPT_R',	0.0, 'UpArm_R', F_RES, L_RARMIK, NoBB),
 

@@ -70,6 +70,12 @@ def initInterface(context):
         description="Apply found fixes",
         default=True)
 
+    bpy.types.Scene.McpNewIkRetarget = BoolProperty(
+        name="New IK retarget", 
+        description="Use new retarget for IK bones",
+        default=False)
+
+
     # Subsample and rescale
     
     bpy.types.Scene.McpSubsample = BoolProperty(
@@ -235,6 +241,7 @@ def initInterface(context):
         scn["McpEndFrame"] = 32000
         scn["McpRot90Anim"] = True
         scn["McpDoSimplify"] = False
+        scn["McpNewIkRetarget"] = False
 
         # Subsample and rescale
         
