@@ -1,39 +1,39 @@
 import platform
-import sys
+import sys, os
 
 pyver = sys.version_info
 if platform.system() == "Windows":
     pyver = '%d%d' % (pyver[0], pyver[1])
 else:
     pyver = '%d.%d' % (pyver[0], pyver[1])
+   
+pydir = os.path.dirname(os.path.normpath(sys.executable))
 
-env = Environment(CPPPATH=[
-        'include',
-        '/usr/include/python' + pyver,
-        '/usr/include/GL',
-        '/usr/include/SDL'],
-    LIBPATH=[],
-    LIBS = [], CCFLAGS = '-O2')
+env = DefaultEnvironment(ENV=os.environ, CCFLAGS = '-O2')
 conf = Configure(env)
+
+env.Append(CPPPATH = ['include'])
 
 if not env.GetOption('clean'):
     
     # Append to CPPPATH and LIBPATH if on windows
     if platform.system() == "Windows":
         if 'msvc' in env['TOOLS']:
-            env.Append(CPPPATH = ['c:/python' + pyver + '/include', 'c:/sdl/include', 'c:/glew/include/GL'])
-            env.Append(LIBPATH = ['c:/python' + pyver + '/libs', 'c:/sdl/lib', 'c:/glew/lib'])
+            env.Append(CPPPATH = [os.path.join(pydir, 'include'), 'd:/sdl/include', 'd:/glew/include'])
+            env.Append(LIBPATH = [os.path.join(pydir, 'libs'), 'd:/sdl/lib', 'd:/glew/lib'])
         else:
             mingwinc = 'c:/mingw/include'
             mingwlib = 'c:/mingw/lib'
-            env.Append(CPPPATH = ['c:/python' + pyver + '/include', mingwinc, mingwinc + '/SDL'])
-            env.Append(LIBPATH = ['c:/python' + pyver + '/libs', mingwlib, mingwlib + '/SDL'])
+            env.Append(CPPPATH = [os.path.join(pydir, 'include'), mingwinc, mingwinc + '/SDL'])
+            env.Append(LIBPATH = [os.path.join(pydir, 'libs'), mingwlib, mingwlib + '/SDL'])
+    else:
+        env.Append(CPPPATH = ['/usr/include/python' + pyver, '/usr/include/GL', '/usr/include/SDL'])
             
     # Check for libs and headers
     if conf.CheckLib('m'):
         env.Append(LIBS = ['m']);
     if not (conf.CheckLib('python' + pyver, 'Py_Initialize') and conf.CheckHeader('Python.h')):
-        print "The Python " + pyver + " development libraries must be installed"
+        print "The Python" + pyver + " development libraries must be installed"
         exit(1)
     if platform.system() != "Windows":
         if not (conf.CheckLib('X11')):
