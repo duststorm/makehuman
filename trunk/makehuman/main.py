@@ -918,26 +918,26 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def frontView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman.mesh, self.selectedHuman.getRotation(), [0.0, 0.0, 0.0])])
+        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 0.0, 0.0])])
         
     def rightView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman.mesh, self.selectedHuman.getRotation(), [0.0, -90.0, 0.0])])
+        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, -90.0, 0.0])])
         
     def topView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman.mesh, self.selectedHuman.getRotation(), [90.0, 0.0, 0.0])])
+        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [90.0, 0.0, 0.0])])
         
     def backView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman.mesh, self.selectedHuman.getRotation(), [0.0, 180.0, 0.0])])
+        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 180.0, 0.0])])
         
     def leftView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman.mesh, self.selectedHuman.getRotation(), [0.0, 90.0, 0.0])])
+        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 90.0, 0.0])])
         
     def bottomView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman.mesh, self.selectedHuman.getRotation(), [-90.0, 0.0, 0.0])])
+        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [-90.0, 0.0, 0.0])])
         
     def resetView(self):
         cam = self.modelCamera
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman.mesh, self.selectedHuman.getRotation(), [0.0, 0.0, 0.0]),
+        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 0.0, 0.0]),
             animation3d.CameraAction(cam, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ],
             [cam.eyeX, cam.eyeY, 60.0, cam.focusX, cam.focusY, cam.focusZ])])
         

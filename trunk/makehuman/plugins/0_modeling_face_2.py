@@ -18,7 +18,7 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.show()
         
 class FaceSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, modifier, left, right):
+    def __init__(self, parent, modifier, left, right, view):
         
         humanmodifier.ModifierSlider.__init__(self, parent, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56))
         
@@ -27,6 +27,13 @@ class FaceSlider(humanmodifier.ModifierSlider):
         
         mesh = gui3d.RectangleMesh(self.style.width / 2, self.style.height, right)
         self.right = gui3d.Object(self, [self.style.left + self.style.width / 2, self.style.top, self.style.zIndex + 0.005], mesh)
+        
+        self.view = getattr(self.app, view)
+        
+    def onFocus(self, event):
+        
+        humanmodifier.ModifierSlider.onFocus(self, event)
+        self.view()
 
 class FaceTaskView(gui3d.TaskView):
 
@@ -34,13 +41,14 @@ class FaceTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Face2')
         
         features = [
-            ('eyes', [('data/targets/eyes/${ethnic}/${gender}_${age}/%s-${%s}.target' % (i[0], i[1]), i[0], i[1], i[2], i[3], 'data/targets/eyes/images/') for i in
-                [('eye-dist', 'eyedist', 'min', 'max'), ('eye-move', 'eyemove', 'down', 'up'), ('l-eye', 'leye', 'small', 'big'), ('l-eye-height1', 'leyeheight1', 'min', 'max'), ('l-eye-height2', 'leyeheight2', 'min', 'max'),
-                 ('l-eye-height3', 'leyeheight3', 'min', 'max'), ('l-eye-push', 'leyepush', 'in', 'out'), ('r-eye', 'reye', 'small', 'big'), ('r-eye-height1', 'reyeheight1', 'min', 'max'), ('r-eye-height2', 'reyeheight2', 'min', 'max'),
-                 ('r-eye-height3', 'reyeheight3', 'min', 'max'), ('r-eye-push', 'reyepush', 'in', 'out')]]),
-            ('nose', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${%s}.target' % (i[0], i[1]), i[0], i[1], i[2], i[3], 'data/targets/nose/images/') for i in
-                [('nose', 'nose', 'concave', 'convex'), ('nose-height', 'noseheight', 'min', 'max'), ('nose-nostrils', 'nosenostrils', 'down', 'up'), ('nose-nostril-width', 'nosenostrilwidth', 'min', 'max'),
-                ('nose-point', 'nosepoint', 'down', 'up'), ('nose', 'noselength', 'short', 'long'), ('nose-width', 'nosewidth', 'min', 'max')]]),
+            ('eyes', [('data/targets/eyes/${ethnic}/${gender}_${age}/%s-${%s}.target' % (i[0], i[1]), i[0], i[1], i[2], i[3], 'data/targets/eyes/images/', i[4]) for i in
+                [('eye-dist', 'eyedist', 'min', 'max', 'frontView'), ('eye-move', 'eyemove', 'down', 'up', 'frontView'), ('l-eye', 'leye', 'small', 'big', 'frontView'), ('l-eye-height1', 'leyeheight1', 'min', 'max', 'frontView'),
+                 ('l-eye-height2', 'leyeheight2', 'min', 'max', 'frontView'), ('l-eye-height3', 'leyeheight3', 'min', 'max', 'frontView'), ('l-eye-push', 'leyepush', 'in', 'out', 'frontView'), ('r-eye', 'reye', 'small', 'big', 'frontView'),
+                 ('r-eye-height1', 'reyeheight1', 'min', 'max', 'frontView'), ('r-eye-height2', 'reyeheight2', 'min', 'max', 'frontView'), ('r-eye-height3', 'reyeheight3', 'min', 'max', 'frontView'), ('r-eye-push', 'reyepush', 'in', 'out', 'frontView')]]),
+            ('nose', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${%s}.target' % (i[0], i[1]), i[0], i[1], i[2], i[3], 'data/targets/nose/images/', i[4]) for i in
+                [('nose', 'nose', 'concave', 'convex', 'rightView'), ('nose-height', 'noseheight', 'min', 'max', 'rightView'), ('nose-nostrils', 'nosenostrils', 'down', 'up', 'rightView'),
+                 ('nose-nostril-width', 'nosenostrilwidth', 'min', 'max', 'frontView'), ('nose-point', 'nosepoint', 'down', 'up', 'rightView'), ('nose', 'noselength', 'short', 'long', 'rightView'),
+                 ('nose-width', 'nosewidth', 'min', 'max', 'frontView')]]),
             ]
 
         y = 80
@@ -76,7 +84,7 @@ class FaceTaskView(gui3d.TaskView):
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], template[2], template[3], template[4], False)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
-                slider = FaceSlider(box, modifier, '%s%s-%s.png' % (template[5], template[1], template[3]), '%s%s-%s.png' % (template[5], template[1], template[4]))
+                slider = FaceSlider(box, modifier, '%s%s-%s.png' % (template[5], template[1], template[3]), '%s%s-%s.png' % (template[5], template[1], template[4]), template[6])
                 self.sliders.append(slider)
                 
         y += 16
