@@ -35,44 +35,58 @@ class FaceTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Face2')
         
         features = [
-            ('eyes', [('data/targets/eyes/${ethnic}/${gender}_${age}/%s-${%s}.target' % (i[0], i[1]), i[0], i[1], i[2], i[3], 'data/targets/eyes/images/', i[4]) for i in
+            ('eyes', [('data/targets/eyes/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/eyes/images/', i[3]) for i in
                 [   
-                    ('l-eye-height1', 'leyeheight1', 'min', 'max', 'frontView'),
-                    ('l-eye-height2', 'leyeheight2', 'min', 'max', 'frontView'),
-                    ('l-eye-height3', 'leyeheight3', 'min', 'max', 'frontView'),
-                    ('l-eye-push', 'leyepush', 'in1', 'out1', 'frontView'),
-                    ('l-eye-push', 'leyepush2', 'in2', 'out2', 'frontView'),
-                    ('l-eye-move', 'leyemove', 'in', 'out', 'frontView'),
-                    ('l-eye-move', 'leyemove2', 'up', 'down', 'frontView'),
-                    ('l-eye', 'leye3', 'small', 'big', 'frontView'),
+                    ('l-eye-height1', 'min', 'max', 'frontView'),
+                    ('l-eye-height2', 'min', 'max', 'frontView'),
+                    ('l-eye-height3', 'min', 'max', 'frontView'),
+                    ('l-eye-push', 'in1', 'out1', 'frontView'),
+                    ('l-eye-push', 'in2', 'out2', 'frontView'),
+                    ('l-eye-move', 'in', 'out', 'frontView'),
+                    ('l-eye-move', 'up', 'down', 'frontView'),
+                    ('l-eye', 'small', 'big', 'frontView'),
                     
-                    ('r-eye-height1', 'reyeheight1', 'min', 'max', 'frontView'),
-                    ('r-eye-height2', 'reyeheight2', 'min', 'max', 'frontView'),
-                    ('r-eye-height3', 'reyeheight3', 'min', 'max', 'frontView'),
-                    ('r-eye-push', 'reyepush', 'in1', 'out1', 'frontView'),
-                    ('r-eye-push', 'reyepush2', 'in2', 'out2', 'frontView'),
-                    ('r-eye-move', 'reyemove', 'in', 'out', 'frontView'),
-                    ('r-eye-move', 'reyemove2', 'up', 'down', 'frontView'),
-                    ('r-eye', 'reye3', 'small', 'big', 'frontView')
+                    ('r-eye-height1', 'min', 'max', 'frontView'),
+                    ('r-eye-height2', 'min', 'max', 'frontView'),
+                    ('r-eye-height3', 'min', 'max', 'frontView'),
+                    ('r-eye-push', 'in1', 'out1', 'frontView'),
+                    ('r-eye-push', 'in2', 'out2', 'frontView'),
+                    ('r-eye-move', 'in', 'out', 'frontView'),
+                    ('r-eye-move', 'up', 'down', 'frontView'),
+                    ('r-eye', 'small', 'big', 'frontView')
                 ]]),
-            ('nose', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${%s}.target' % (i[0], i[1]), i[0], i[1], i[2], i[3], 'data/targets/nose/images/', i[4]) for i in
+            ('nose', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
                 [   
-                    ('nose', 'nose', 'compress', 'uncompress', 'rightView'),
-                    ('nose', 'nose', 'convex', 'concave', 'rightView'),
-                    ('nose', 'nose', 'greek', 'ungreek', 'rightView'),
-                    ('nose-height', 'noseheight', 'min', 'max', 'rightView'),
-                    ('nose', 'nose', 'hump', 'unhump', 'rightView'),
-                    ('nose', 'nose', 'potato', 'point', 'rightView'),
-                    ('nose', 'nose', 'long', 'short', 'rightView'),
-                    ('nose-nostrils', 'nosenostrils', 'point', 'unpoint', 'frontView'),
-                    ('nose-nostrils', 'nosenostrils', 'up', 'down', 'rightView'),
-                    ('nose-nostril-width', 'nosenostrilwidth', 'min', 'max', 'frontView'),
-                    ('nose-point', 'nosepoint', 'up', 'down', 'rightView'),
-                    ('nose-width1', 'nosewidth1', 'min', 'max', 'frontView'),
-                    ('nose-width2', 'nosewidth2', 'min', 'max', 'frontView'),
-                    ('nose-width3', 'nosewidth3', 'min', 'max', 'frontView'),
-                    ('nose-width', 'nosewidth', 'min', 'max', 'frontView')
-                ]])    
+                    ('nose', 'compress', 'uncompress', 'rightView'),
+                    ('nose', 'convex', 'concave', 'rightView'),
+                    ('nose', 'greek', 'ungreek', 'rightView'),
+                    ('nose-height', 'min', 'max', 'rightView'),
+                    ('nose', 'hump', 'unhump', 'rightView'),
+                    ('nose', 'potato', 'point', 'rightView'),
+                    ('nose', 'long', 'short', 'rightView'),
+                    ('nose-nostrils', 'point', 'unpoint', 'frontView'),
+                    ('nose-nostrils', 'up', 'down', 'rightView'),
+                    ('nose-nostril-width', 'min', 'max', 'frontView'),
+                    ('nose-point', 'up', 'down', 'rightView'),
+                    ('nose-width1', 'min', 'max', 'frontView'),
+                    ('nose-width2', 'min', 'max', 'frontView'),
+                    ('nose-width3', 'min', 'max', 'frontView'),
+                    ('nose-width', 'min', 'max', 'frontView')
+                ]]),
+            ('mouth', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
+                [   
+                    ('mouth-lowerlip-ext', 'up', 'down', 'frontView'),
+                    ('mouth-lowerlip-height', 'min', 'max', 'frontView'),
+                    ('mouth-lowerlip-middle', 'up', 'down', 'frontView'),
+                    ('mouth-lowerlip-width', 'min', 'max', 'frontView'),
+                    ('mouth-philtrum', 'up', 'down', 'frontView'),
+                    ('mouth', 'up', 'down', 'frontView'),
+                    ('mouth-upperlip-ext', 'up', 'down', 'frontView'),
+                    ('mouth-upperlip-height', 'min', 'max', 'frontView'),
+                    ('mouth-upperlip-middle', 'up', 'down', 'frontView'),
+                    ('mouth-upperlip-width', 'min', 'max', 'frontView'),
+                    ('mouth-width', 'min', 'max', 'frontView'),
+                ]])  
             ]
 
         y = 80
@@ -106,9 +120,10 @@ class FaceTaskView(gui3d.TaskView):
                     y += 24
             
                 # Create sliders
-                modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], template[2], template[3], template[4], False)
+                modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], 'value', template[2], template[3], False)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
-                slider = FaceSlider(box, modifier, '%s%s-%s-%s.png' % (template[5], template[1], template[3], template[4]), template[6])
+                print template
+                slider = FaceSlider(box, modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5])
                 self.sliders.append(slider)
                 
         y += 16
