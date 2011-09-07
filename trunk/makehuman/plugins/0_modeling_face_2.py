@@ -54,7 +54,25 @@ class FaceTaskView(gui3d.TaskView):
                     ('r-eye-move', 'reyemove', 'in', 'out', 'frontView'),
                     ('r-eye-move', 'reyemove2', 'up', 'down', 'frontView'),
                     ('r-eye', 'reye3', 'small', 'big', 'frontView')
-                ]])
+                ]]),
+            ('nose', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${%s}.target' % (i[0], i[1]), i[0], i[1], i[2], i[3], 'data/targets/nose/images/', i[4]) for i in
+                [   
+                    ('nose', 'nose', 'compress', 'uncompress', 'rightView'),
+                    ('nose', 'nose', 'convex', 'concave', 'rightView'),
+                    ('nose', 'nose', 'greek', 'ungreek', 'rightView'),
+                    ('nose-height', 'noseheight', 'min', 'max', 'rightView'),
+                    ('nose', 'nose', 'hump', 'unhump', 'rightView'),
+                    ('nose', 'nose', 'potato', 'point', 'rightView'),
+                    ('nose', 'nose', 'long', 'short', 'rightView'),
+                    ('nose-nostrils', 'nosenostrils', 'point', 'unpoint', 'frontView'),
+                    ('nose-nostrils', 'nosenostrils', 'up', 'down', 'rightView'),
+                    ('nose-nostril-width', 'nosenostrilwidth', 'min', 'max', 'frontView'),
+                    ('nose-point', 'nosepoint', 'up', 'down', 'rightView'),
+                    ('nose-width1', 'nosewidth1', 'min', 'max', 'frontView'),
+                    ('nose-width2', 'nosewidth2', 'min', 'max', 'frontView'),
+                    ('nose-width3', 'nosewidth3', 'min', 'max', 'frontView'),
+                    ('nose-width', 'nosewidth', 'min', 'max', 'frontView')
+                ]])    
             ]
 
         y = 80
