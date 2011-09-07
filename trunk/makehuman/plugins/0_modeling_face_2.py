@@ -45,6 +45,8 @@ class FaceTaskView(gui3d.TaskView):
                     ('l-eye-move', 'in', 'out', 'frontView'),
                     ('l-eye-move', 'up', 'down', 'frontView'),
                     ('l-eye', 'small', 'big', 'frontView'),
+                    ('l-eye-corner1', 'up', 'down', 'frontView'),
+                    ('l-eye-corner2', 'up', 'down', 'frontView'),
                     
                     ('r-eye-height1', 'min', 'max', 'frontView'),
                     ('r-eye-height2', 'min', 'max', 'frontView'),
@@ -53,7 +55,9 @@ class FaceTaskView(gui3d.TaskView):
                     ('r-eye-push', 'in2', 'out2', 'frontView'),
                     ('r-eye-move', 'in', 'out', 'frontView'),
                     ('r-eye-move', 'up', 'down', 'frontView'),
-                    ('r-eye', 'small', 'big', 'frontView')
+                    ('r-eye', 'small', 'big', 'frontView'),
+                    ('r-eye-corner1', 'up', 'down', 'frontView'),
+                    ('r-eye-corner2', 'up', 'down', 'frontView')
                 ]]),
             ('nose', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
                 [   
@@ -122,7 +126,7 @@ class FaceTaskView(gui3d.TaskView):
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], 'value', template[2], template[3], False)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
-                print template
+
                 slider = FaceSlider(box, modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5])
                 self.sliders.append(slider)
                 
