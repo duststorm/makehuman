@@ -143,22 +143,22 @@ class FaceTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category', gui3d.GroupBoxStyle._replace(height=25+24*sum([(len(templates[1])/10 + (len(templates[1])%10>0)) for templates in features])+6))
+        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category')
         y += 25
         
         for name, templates in features:
             
             for index, template in enumerate(templates):
                 
-                if index % 6 == 0:
+                if index % 12 == 0:
                     
-                    if len(templates) <= 6:
+                    if len(templates) <= 12:
                         title = name.capitalize()
                     else:
-                        title = '%s %d' % (name.capitalize(), index / 6 + 1)
+                        title = '%s %d' % (name.capitalize(), index / 12 + 1)
                         
                     # Create box
-                    box = gui3d.GroupBox(self, [10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(height=25+36*min(len(templates)-index, 10)+6))
+                    box = gui3d.GroupBox(self, [10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(width=128+112+4))
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
