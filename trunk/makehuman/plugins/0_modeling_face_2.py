@@ -115,7 +115,15 @@ class FaceTaskView(gui3d.TaskView):
                     ('r-ear-width', 'max', 'min', 'rightView'),
                     ('r-ear', 'wing', 'nowing', 'frontView'),
                     ('r-ear', 'flap', 'unflap', 'frontView'),
-                ]])  
+                ]]),
+            ('cheek', [('data/targets/cheek/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/cheek/images/', i[3]) for i in
+                [   
+                    ('l-cheek', 'in', 'out', 'frontView'),
+                    ('l-cheek', 'bones', 'nobones', 'frontView'),
+                    ('r-cheek', 'in', 'out', 'frontView'),
+                    ('r-cheek', 'bones', 'nobones', 'frontView'),
+                    
+                ]])      
             ]
 
         y = 80
