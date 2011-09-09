@@ -90,6 +90,29 @@ class FaceTaskView(gui3d.TaskView):
                     ('mouth-upperlip-middle', 'up', 'down', 'frontView'),
                     ('mouth-upperlip-width', 'min', 'max', 'frontView'),
                     ('mouth-width', 'min', 'max', 'frontView'),
+                ]]),
+            ('ears', [('data/targets/ears/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/ears/images/', i[3]) for i in
+                [   
+                    ('l-ear', 'backward', 'forward', 'leftView'),
+                    ('l-ear', 'big', 'small', 'leftView'),
+                    ('l-ear', 'down', 'up', 'leftView'),
+                    ('l-ear-height', 'min', 'max', 'leftView'),
+                    ('l-ear-lobe', 'min', 'max', 'leftView'),
+                    ('l-ear', 'pointed', 'triangle', 'leftView'),
+                    ('l-ear-rot', 'backward', 'forward', 'leftView'),
+                    ('l-ear', 'square', 'round', 'leftView'),
+                    ('l-ear-width', 'max', 'min', 'leftView'),
+                    ('l-ear', 'wing', 'nowing', 'frontView'),
+                    ('r-ear', 'backward', 'forward', 'rightView'),
+                    ('r-ear', 'big', 'small', 'rightView'),
+                    ('r-ear', 'down', 'up', 'rightView'),
+                    ('r-ear-height', 'min', 'max', 'rightView'),
+                    ('r-ear-lobe', 'min', 'max', 'rightView'),
+                    ('r-ear', 'pointed', 'triangle', 'rightView'),
+                    ('r-ear-rot', 'backward', 'forward', 'rightView'),
+                    ('r-ear', 'square', 'round', 'rightView'),
+                    ('r-ear-width', 'max', 'min', 'rightView'),
+                    ('r-ear', 'wing', 'nowing', 'frontView'),
                 ]])  
             ]
 
