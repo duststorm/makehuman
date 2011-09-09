@@ -103,6 +103,7 @@ class FaceTaskView(gui3d.TaskView):
                     ('l-ear', 'square', 'round', 'leftView'),
                     ('l-ear-width', 'max', 'min', 'leftView'),
                     ('l-ear', 'wing', 'nowing', 'frontView'),
+                    ('l-ear', 'flap', 'unflap', 'frontView'),
                     ('r-ear', 'backward', 'forward', 'rightView'),
                     ('r-ear', 'big', 'small', 'rightView'),
                     ('r-ear', 'down', 'up', 'rightView'),
@@ -113,6 +114,7 @@ class FaceTaskView(gui3d.TaskView):
                     ('r-ear', 'square', 'round', 'rightView'),
                     ('r-ear-width', 'max', 'min', 'rightView'),
                     ('r-ear', 'wing', 'nowing', 'frontView'),
+                    ('r-ear', 'flap', 'unflap', 'frontView'),
                 ]])  
             ]
 
