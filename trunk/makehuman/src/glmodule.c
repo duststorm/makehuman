@@ -2115,13 +2115,6 @@ void mhEventLoop(void)
          * Window is opened. So if the ActiveWindow (focused Window) is not
          * the main window then cancel the SDL Event.
          */
-#ifdef __APPLE__
-        extern int isMainWindowActive(); // Defined in SDLMain.mm
-
-        // Consider this event only if the main window is active.
-        if (!isMainWindowActive())
-            continue;
-#endif /* __APPLE__ */
 
         switch (event.type)
         {
