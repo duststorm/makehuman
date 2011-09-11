@@ -131,7 +131,7 @@ BodyArmature = [
     ('DfmHead',            0.0, 'Neck', F_DEF+F_CON, L_DMAIN, NoBB),
 
     ('DfmRib',            0.0, 'Spine3', F_DEF, L_DMAIN, NoBB),
-    ('RibTarget',        0.0, 'Spine2', 0, L_TORSO, NoBB),
+    ('RibTarget',        0.0, 'Spine2', 0, L_HELP, NoBB),
     ('DfmStomach',        0.0, 'DfmRib', F_DEF+F_CON, L_DMAIN, NoBB),
     ('HipBone',            0.0, 'Hips', 0, L_HELP, NoBB),
 
@@ -139,8 +139,8 @@ BodyArmature = [
     ('Breast_R',        45*D, 'DfmRib', F_DEF, L_DEF, NoBB),
     ('Breathe',            0.0, 'DfmRib', F_WIR, L_TORSO, NoBB),
 
-    ('Penis',            0.0, 'Hips', F_DEF, L_DEF, (1,5,1) ),
-    ('Scrotum',            0.0, 'Hips', F_DEF, L_DEF, NoBB),
+    ('Penis',            0.0, 'Hips', F_DEF, L_TORSO, (1,5,1) ),
+    ('Scrotum',            0.0, 'Hips', F_DEF, L_TORSO, NoBB),
 ]
 
 #
