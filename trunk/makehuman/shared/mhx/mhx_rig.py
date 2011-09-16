@@ -1970,6 +1970,10 @@ def writeAllDrivers(fp):
         writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
         writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
         #rig_panel_25.FingerControlDrivers(fp)
+        if mh2mhx.theConfig.newshoulders:
+            writeMuscleDrivers(fp, rig_shoulder2_25.ShoulderDeformDrivers, mh2mhx.theHuman)
+        else:
+            writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mh2mhx.theHuman)
         writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
         writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman)
         rig_face_25.FaceDeformDrivers(fp)
