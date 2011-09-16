@@ -168,6 +168,11 @@ def newSetupJoints (obj, joints, headTails, moveOrigin):
             v = int(data[0])
             loc = obj.verts[v].co
             locations[key] = [loc[0]+float(data[1]), loc[1]+float(data[3]), loc[2]-float(data[2])]
+        elif typ == 'vl':
+            ((k1, v1), (k2, v2)) = data
+            loc1 = obj.verts[int(v1)].co
+            loc2 = obj.verts[int(v2)].co
+            locations[key] = vadd(vmul(loc1, k1), vmul(loc2, k2))
         elif typ == 'f':
             (raw, head, tail, offs) = data
             rloc = locations[raw]
@@ -1775,7 +1780,9 @@ def setupCircles(fp):
 #    writeAllDrivers(fp)    
 #
 
-import rig_joints_25, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
+import rig_joints_25, rig_body_25
+import rig_shoulder_25, rig_shoulder2_25, rig_arm_25, rig_finger_25
+import rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 #import blenrig_rig        
 import rigify_rig
 
@@ -1795,18 +1802,30 @@ def setupRig(obj):
         GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
                       "./shared/mhx/templates/panel_gizmo25.mhx",
                       "./shared/mhx/templates/gizmos25.mhx"]
-        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
-                            "./shared/mhx/templates/vertexgroups-bones25.mhx",
-                            #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
-                            "./shared/mhx/templates/vertexgroups-palm25.mhx"]
 
         ObjectProps = [("MhxRigType", '"MHX"')]
         ArmatureProps = []
         HeadName = 'Head'
+        
+        if mh2mhx.theConfig.newshoulders:
+            shoulderJoints = rig_shoulder2_25.ShoulderJoints
+            shoulderHeadsTails = rig_shoulder2_25.ShoulderHeadsTails
+            shoulderArmature = rig_shoulder2_25.ShoulderArmature
+            vgfile = "./shared/mhx/templates/vertexgroups2-bones25.mhx"
+        else:
+            shoulderJoints = rig_shoulder_25.ShoulderJoints
+            shoulderHeadsTails = rig_shoulder_25.ShoulderHeadsTails
+            shoulderArmature = rig_shoulder_25.ShoulderArmature
+            vgfile = "./shared/mhx/templates/vertexgroups-bones25.mhx"
 
+        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
+                            vgfile,
+                            #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
+                            "./shared/mhx/templates/vertexgroups-palm25.mhx"]
         Joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
+            shoulderJoints +
             rig_arm_25.ArmJoints +
             rig_finger_25.FingerJoints +
             rig_leg_25.LegJoints +
@@ -1817,6 +1836,7 @@ def setupRig(obj):
         
         HeadsTails = (
             rig_body_25.BodyHeadsTails +
+            shoulderHeadsTails +
             rig_arm_25.ArmHeadsTails +
             rig_finger_25.FingerHeadsTails +
             rig_leg_25.LegHeadsTails +
@@ -1827,7 +1847,8 @@ def setupRig(obj):
 
         Armature = (
             rig_body_25.BodyArmature +
-            rig_arm_25.ArmArmature +
+            shoulderArmature +
+            rig_arm_25.ArmArmature +            
             rig_finger_25.FingerArmature +
             rig_leg_25.LegArmature +
             #rig_toe_25.ToeArmature +
@@ -1916,6 +1937,10 @@ def writeControlPoses(fp):
     writeBoneGroups(fp)
     if mh2mhx.theConfig.useRig == 'mhx':            
         rig_body_25.BodyControlPoses(fp)
+        if mh2mhx.theConfig.newshoulders:
+            rig_shoulder2_25.ShoulderControlPoses(fp)
+        else:
+            rig_shoulder_25.ShoulderControlPoses(fp)
         rig_arm_25.ArmControlPoses(fp)
         rig_finger_25.FingerControlPoses(fp)
         rig_leg_25.LegControlPoses(fp)

@@ -139,6 +139,7 @@ class CProxyConfig:
         self.faceshapes = True
         self.bodyshapes = True
         self.cage = False
+        self.newshoulders = False
 
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
@@ -165,7 +166,7 @@ def proxyConfig(human, useHair, options=None):
         useProxy = options['useProxy']
         fp = 0
     else:    
-        fp = proxyFilePtr('proxy.cfg')
+        fp = proxyFilePtr('mh_export.config')
 
     if useHair and human.hairObj:
         words = human.hairObj.meshName.split('.')
@@ -193,7 +194,7 @@ def proxyConfig(human, useHair, options=None):
                     exec("cfg.%s = words[2:]" % key)
                 except:
                     pass
-            elif key in ['expressions', 'faceshapes', 'bodyshapes']:
+            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'newshoulders']:
                 try:
                     exec("cfg.%s = %s" % (key, words[2]))
                 except:
@@ -231,7 +232,7 @@ def proxyConfig(human, useHair, options=None):
                 typ = key.capitalize()
                 layer = int(words[2])
             else:
-                raise NameError('Unrecognized command %s in proxy.cfg' % words[1])
+                raise NameError('Unrecognized command %s in mh_export.config' % words[1])
         else:
             proxyFile = os.path.expanduser(words[0])
             if typ == 'Cage':

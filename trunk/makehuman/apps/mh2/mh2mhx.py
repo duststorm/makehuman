@@ -434,7 +434,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         fp.write("#endif\n")
             elif words[1] == 'group':
                 fp.write(
-"PostProcess %sMesh %s 0000003f 00080000 006a056b 0000c000 ;\n" % (theHuman, theHuman) + 
+"PostProcess %sMesh %s 0000003f 00080000 0068056b 0000c000 ;\n" % (theHuman, theHuman) + 
 "Group %s\n"  % theHuman +
 "  Objects\n" +
 "#if toggle&T_Armature\n" +
