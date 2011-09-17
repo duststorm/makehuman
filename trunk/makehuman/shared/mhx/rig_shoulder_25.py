@@ -25,11 +25,6 @@ from mhx_rig import *
 prcArmTrg    = 0.35
 
 ShoulderJoints = [
-    ('r-shoulder-in',       'v', 14160),
-    ('l-shoulder-in',       'v', 14382),
-    ('r-uparm0',            'l', ((2.0, 'r-shoulder-in'), (-1.0, 'r-shoulder'))),
-    ('l-uparm0',            'l', ((2.0, 'l-shoulder-in'), (-1.0, 'l-shoulder'))),
-
     ('r-uparm-front',        'v', 3440),
     ('r-uparm-back',        'v', 3438),
     ('r-uparm-over',        'v', 3014),
@@ -98,11 +93,6 @@ ShoulderHeadsTails = [
     ('DfmShoulder_R',        'l-clavicle', 'l-shoulder-tail'),
     ('DfmScapula_R',        'l-scapula-head', 'l-scapula-tail'),
 
-    ('ShoulderEnd_L',        'r-uparm0', ('r-uparm0', yunit)),
-    ('ShoulderEnd_R',        'l-uparm0', ('l-uparm0', yunit)),
-    ('ArmLoc_L',            'r-uparm0', ('r-uparm0', yunit)),
-    ('ArmLoc_R',            'l-uparm0', ('l-uparm0', yunit)),
-
     ('DfmShoulderTwist_L',    'r-shoulder-aim', 'r-uparm1'),
     ('DfmShoulderTwist_R',    'l-shoulder-aim', 'l-uparm1'),
 
@@ -128,11 +118,6 @@ ShoulderHeadsTails = [
     ('BendArmForward_R',    'l-uparm0', ('l-uparm0', (0,0,1))),
     ('BendArmBack_L',        'r-uparm0', ('r-uparm0', (0,0,-1))),
     ('BendArmBack_R',        'l-uparm0', ('l-uparm0', (0,0,-1))),
-
-    ('BendShoulderUp_L',    'r-shoulder-head', ('r-shoulder-head', (0,1,0))),
-    ('BendShoulderUp_R',    'l-shoulder-head', ('l-shoulder-head', (0,1,0))),
-    ('BendLoArmForward_L',    'r-elbow', ('r-elbow', (0,0,1))),
-    ('BendLoArmForward_R',    'l-elbow', ('l-elbow', (0,0,1))),
 ]
 
 #upArmRoll = 1.69297
@@ -153,10 +138,6 @@ ShoulderArmature = [
     # Shoulder
     ('Shoulder_L',            0.0, 'Sternum', F_WIR, L_LSHOULDER, NoBB),
     ('Shoulder_R',            0.0, 'Sternum', F_WIR, L_RSHOULDER, NoBB),
-    ('ShoulderEnd_L',        0.0, 'Shoulder_L', 0, L_HELP, NoBB),
-    ('ShoulderEnd_R',        0.0, 'Shoulder_R', 0, L_HELP, NoBB),
-    ('ArmLoc_L',            0.0, 'ShoulderEnd_L', F_NOROT, L_HELP, NoBB),
-    ('ArmLoc_R',            0.0, 'ShoulderEnd_R', F_NOROT, L_HELP, NoBB),
 
     # Rotation diffs
     ('BendArmDown_L',        90*D, 'Shoulder_L', 0, L_HELP, NoBB),

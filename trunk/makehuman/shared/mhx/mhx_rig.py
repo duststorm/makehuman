@@ -39,38 +39,40 @@ bbMarg = 0.05
 #    Bone layers
 #
 
-L_MAIN =     0x0001
+L_MAIN =    0x0001
+L_XPRT =    0x00010000
 
-L_SPINEFK =    0x0002
-L_SPINEIK =    0x00020000
+L_SPINEFK = 0x0002
+L_SPINEIK = 0x00020000
 
-L_LARMIK =    0x0004
-L_LARMFK =    0x0008
-L_LLEGIK =    0x0010
-L_LLEGFK =    0x0020
-L_LHANDIK =    0x0040
-L_LHANDFK =    0x0080
+L_LARMIK =  0x0004
+L_LARMFK =  0x0008
+L_LLEGIK =  0x0010
+L_LLEGFK =  0x0020
+L_LHANDIK = 0x0040
+L_LHANDFK = 0x0080
 
-L_RARMIK =    0x00040000
-L_RARMFK =    0x00080000
-L_RLEGIK =    0x00100000
-L_RLEGFK =    0x00200000
-L_RHANDIK =    0x00400000
-L_RHANDFK =    0x00800000
+L_RARMIK =  0x00040000
+L_RARMFK =  0x00080000
+L_RLEGIK =  0x00100000
+L_RLEGFK =  0x00200000
+L_RHANDIK = 0x00400000
+L_RHANDFK = 0x00800000
 
-L_PANEL    =    0x0100
-L_TORSO =    0x0200
-L_TOE =        0x0200
+L_PANEL =   0x0100
+L_TORSO =   0x0200
+L_TOE =     0x0200
 L_HEAD =    0x0400
 
-L_LPALM =    0x0800
-L_LEXTRA =   0x1000
-L_RPALM =    0x08000000
-L_REXTRA =   0x10000000
+L_LPALM =   0x0800
+L_LEXTRA =  0x1000
+L_RPALM =   0x08000000
+L_REXTRA =  0x10000000
 
-L_HELP    =    0x4000
-L_DEF =        0x8000
-L_DMAIN =     0x80000000
+L_HELP =    0x4000
+L_DEF =     0x8000
+L_MSCL =    0x40000000
+L_DMAIN =   0x80000000
 
 #
 #    Flags
@@ -1734,19 +1736,20 @@ def setupCylinder(fp, name, r, h, offs, mat):
         fp.write("    v %.3f %.3f %.3f ;\n" % (x,z,y))
     fp.write(
 "  end Verts\n" +
-"  Faces\n" +
-"    f 0 6 7 1 ;\n" +
-"    f 1 7 8 2 ;\n" +
-"    f 2 8 9 3 ;\n" +
-"    f 3 9 10 4 ;\n" +
-"    f 4 10 11 5 ;\n" +
-"    f 6 0 5 11 ;\n" +
-"    f 8 11 10 9 ;\n" +
-"    f 6 11 8 7 ;\n" +
-"    f 0 1 2 3 ;\n" +
-"    f 5 0 3 4 ;\n" +
-"    ftall 0 1 ;\n" +
-"  end Faces\n" +
+"  Edges\n" +
+"    e 5 7 ;\n" +
+"    e 0 1 ;\n" +
+"    e 6 7 ;\n" +
+"    e 3 7 ;\n" +
+"    e 0 2 ;\n" +
+"    e 1 3 ;\n" +
+"    e 4 5 ;\n" +
+"    e 1 5 ;\n" +
+"    e 4 6 ;\n" +
+"    e 2 3 ;\n" +
+"    e 2 6 ;\n" +
+"    e 0 4 ;\n" +
+"  end Edges\n" +
 "  Material %s ;\n" % mat +
 "end Mesh\n" +
 "Object %s MESH %s\n" % (name, name) +
@@ -1825,8 +1828,8 @@ def setupRig(obj):
         Joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
-            shoulderJoints +
             rig_arm_25.ArmJoints +
+            shoulderJoints +
             rig_finger_25.FingerJoints +
             rig_leg_25.LegJoints +
             #rig_toe_25.ToeJoints +

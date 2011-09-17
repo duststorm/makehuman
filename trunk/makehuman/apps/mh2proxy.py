@@ -139,7 +139,7 @@ class CProxyConfig:
         self.faceshapes = True
         self.bodyshapes = True
         self.cage = False
-        self.newshoulders = False
+        self.newshoulders = True
 
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
