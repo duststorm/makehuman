@@ -26,7 +26,7 @@
 """
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.6.1
+Version 1.7.0
 
 This script should be distributed with Blender.
 If not, place it in the .blender/scripts/addons dir
@@ -39,7 +39,7 @@ Alternatively, run the script in the script editor (Alt-P), and access from the 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 6, 1),
+    'version': (1, 7, 0),
     "blender": (2, 5, 8),
     "api": 37702,
     'location': "File > Import > MakeHuman (.mhx)",
@@ -51,8 +51,8 @@ bl_info = {
     'category': 'Import-Export'}
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 6
-SUB_VERSION = 1
+MINOR_VERSION = 7
+SUB_VERSION = 0
 BLENDER_VERSION = (2, 58, 0)
 
 #
@@ -404,11 +404,11 @@ def checkMhxVersion(major, minor):
 "You can disable this error message by deselecting the \n" +
 "Enforce version option when importing. \n" +
 "Alternatively, you can try to download the most recent \n" +
-"nightly build from www.makehuman.org. \n" +
-"The current version of the import script is located in the \n" +
-"importers/mhx/blender25x folder and is called import_scene_mhx.py. \n" +
-"The version distributed with Blender builds from \n" +
-"www.graphicall.org may be out of date.\n"
+"Blender build from www.graphicall.org. \n" +
+"The most up-to-date version of the import script is distributed\n" +
+"with Blender, but can also be downloaded from MakeHuman. \n" +
+"It is located in the importers/mhx/blender25x \n" +
+"folder and is called import_scene_mhx.py. \n"
 )
         if toggle & T_EnforceVersion:
             MyError(msg)
@@ -2229,15 +2229,33 @@ def applyTransform(objects, rig, parents):
 #    defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 #
 
+thePropTip = ""
+
 def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
-    global todo
+    global todo, thePropTip
 
     if ext == 'Property':
+        thePropTip = ""
         try:
-            expr = "%s['%s'] = %s" % (var, args[0], args[1])
+            expr = '%s["%s"] = %s' % (var, args[0], args[1])
         except:
             expr = None
         #print("Property", expr)
+        if expr:
+            exec(expr, glbals, lcals)
+            if len(args) > 2:
+                thePropTip =  '"description":"%s"' % args[2].replace("_", " ")
+        return
+    elif ext == 'PropKeys':
+        if len(args) < 2:
+            values = '{%s}' % thePropTip
+        else:
+            values = '{%s%s}' % (args[1], thePropTip)        
+        try:
+            expr = '%s["_RNA_UI"]["%s"] = %s' % (var, args[0], values)
+        except:
+            expr = None
+        #print("PropKeys", expr)
         if expr:
             exec(expr, glbals, lcals)
         return
@@ -2883,6 +2901,7 @@ def copyConstraint(cns1, pb1, pb2, mhx, rigify):
 class OBJECT_OT_RigifyMhxButton(bpy.types.Operator):
     bl_idname = "mhxrig.rigify_mhx"
     bl_label = "Rigify MHX rig"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         rigifyMhx(context, context.object.name)
@@ -2907,8 +2926,7 @@ class RigifyMhxPanel(bpy.types.Panel):
         return False
 
     def draw(self, context):
-        layout = self.layout
-        layout.operator("mhxrig.rigify_mhx")
+        self.layout.operator("mhxrig.rigify_mhx")
         return
 
 ###################################################################################
@@ -3000,6 +3018,7 @@ class ImportMhx(bpy.types.Operator, ImportHelper):
     bl_label = "Import MHX"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
+    bl_options = {'UNDO'}
 
     scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
     enums = []

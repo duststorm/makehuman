@@ -27,6 +27,57 @@ end Armature
   Property MhxScale theScale ;
   Property MhxRig 'Control' ;
   Property MhxVisemeSet 'BodyLanguage' ;
+  
+  Property _RNA_UI {} ;
+  
+  Property ArmFkIk_L 0.0 Left_arm_FK/IK ;
+  PropKeys ArmFkIk_L "min":0.0,"max":1.0, ;
+
+  Property ArmHinge_L 0.0 Left_arm_hinge ;
+  PropKeys ArmHinge_L "min":-1.0,"max":2.0, ;
+
+  Property ElbowPlant_L 0.0 Left_elbow_plant ;
+  PropKeys ElbowPlant_L "min":0.0,"max":1.0, ;
+
+  Property ForearmFkIk_L 0.0 Left_forearm_FK/IK ;
+  PropKeys ForearmFkIk_L "min":0.0,"max":1.0, ;
+
+  Property ArmStretch_L 0.0 Left_arm_stretch ;
+  PropKeys ArmStretch_L "min":0.0,"max":1.0, ;
+
+  Property HandFollowsWrist_L 0.0 Left_hand_follows_wrist ;
+  PropKeys HandFollowsWrist_L "min":0.0,"max":1.0, ;
+
+  Property LegFkIk_L 0.0 Left_leg_FK/IK ;
+  PropKeys LegFkIk_L "min":0.0,"max":1.0, ;
+
+  Property FingerControl_L True Left_fingers_controlled ;
+  PropKeys FingerControl_L ;
+
+  Property ArmFkIk_R 0.0 Right_arm_FK/IK ;
+  PropKeys ArmFkIk_R "min":0.0,"max":1.0, ;
+
+  Property ArmHinge_R 0.0 Right_arm_hinge ;
+  PropKeys ArmHinge_R "min":0.0,"max":1.0, ;
+
+  Property ElbowPlant_R 0.0 Right_elbow_plant ;
+  PropKeys ElbowPlant_R "min":0.0,"max":1.0, ;
+
+  Property ForearmFkIk_R 0.0 Right_forearm_FK/IK ;
+  PropKeys ForearmFkIk_R "min":0.0,"max":1.0, ;
+
+  Property ArmStretch_R 0.0 Right_arm_stretch ;
+  PropKeys ArmStretch_R "min":0.0,"max":1.0, ;
+
+  Property HandFollowsWrist_R 0.0 Right_hand_follows_wrist ;
+  PropKeys HandFollowsWrist_R "min":0.0,"max":1.0, ;
+
+  Property LegFkIk_R 0.0 Right_leg_FK/IK ;
+  PropKeys LegFkIk_R "min":0.0,"max":1.0, ;
+
+  Property FingerControl_R True Right_fingers_controlled ;
+  PropKeys FingerControl_R ;
+
   *** properties Object
 end Object
 
