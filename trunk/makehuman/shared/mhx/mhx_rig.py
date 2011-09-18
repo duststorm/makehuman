@@ -1403,6 +1403,8 @@ def writeFkIkSwitch(fp, drivers):
             writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (mx,-mx), [cnsData])
         for cnsName in cnsIK:
             writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,mx), [cnsData])
+            
+            
 
 #
 #    writeEnumDrivers(fp, drivers):
@@ -1420,6 +1422,7 @@ def writeEnumDrivers(fp, drivers):
 #    writePropDrivers(fp, drivers):
 #
 
+"""
 # Property types
 D_ENUM = 1
 D_INT = 2
@@ -1474,16 +1477,41 @@ def writePropDrivers(fp, drivers):
                     drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, prop1)]) )
                     n += 1
                 (cns1,expr) = cns
-                writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), -1, (0,1), drvVars)
+                writeDriver(fp, True, ('SCRIPTED', expr), "",
+                    "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), 
+                    -1, (0,1), drvVars)
             else:
                 drvVars = [("x", 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, prop)])]
                 if typ == D_ENUM:
                     (cns1,expr) = cns
-                    writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), -1, (0,1), drvVars)
+                    writeDriver(fp, True, ('SCRIPTED', expr), "",
+                        "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), 
+                        -1, (0,1), drvVars)
                 elif typ == D_BOOLINV:
-                    writeDriver(fp, True, 'AVERAGE', "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), -1, (1,-1), drvVars)
+                    writeDriver(fp, True, 'AVERAGE', "",
+                        "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), 
+                        -1, (1,-1), drvVars)
                 else:
-                    writeDriver(fp, True, 'AVERAGE', "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), -1, (0,1), drvVars)
+                    writeDriver(fp, True, 'AVERAGE', "",
+                        "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), 
+                        -1, (0,1), drvVars)
+"""
+#
+#
+#
+
+def writePropDrivers(fp, drivers, suffix):
+    for (bone, cns, props, expr) in drivers:
+        drvVars = []
+        n = 1
+        for prop in props:
+            drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, '["%s%s"]' % (prop,suffix))]) )
+            n += 1
+        writeDriver(fp, True, ('SCRIPTED', expr), "",
+            "pose.bones[\"%s%s\"].constraints[\"%s\"].influence" % (bone, suffix, cns), 
+            -1, (0,1), drvVars)
+    return            
+    
 
 #
 #    writeTextureDrivers(fp, drivers):
@@ -1991,9 +2019,19 @@ def writeAllActions(fp):
     return
 
 def writeAllDrivers(fp):
-    if mh2mhx.theConfig.useRig == 'mhx':            
-        writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
-        writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
+    if mh2mhx.theConfig.useRig == 'mhx':      
+        if mh2mhx.theConfig.propdrivers:
+            writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L")
+            writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R")
+            writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L")
+            writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R")
+            writePropDrivers(fp, rig_face_25.FacePropDrivers, "")
+            fingDrivers = rig_finger_25.getFingerPropDrivers()
+            writePropDrivers(fp, fingDrivers, "_L")            
+            writePropDrivers(fp, fingDrivers, "_R")            
+        else:
+            writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
+            writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
         #rig_panel_25.FingerControlDrivers(fp)
         if mh2mhx.theConfig.newshoulders:
             writeMuscleDrivers(fp, rig_shoulder2_25.ShoulderDeformDrivers, mh2mhx.theHuman)

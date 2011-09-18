@@ -454,7 +454,24 @@ ArmFKIKDrivers = [
     ("Hand_R", True, ["FreeIK"], ["WristLoc", "WristRot"], "PArmIK_R", "LOC_X", 1.0),
 ]
 
+#
+#   ArmPropLRDrivers
+#   (Bone, Name, Props, Expr)
+#
 
+ArmPropLRDrivers = [
+    ('UpArm', 'Elbow', ['ArmFkIk', 'ElbowPlant', 'ArmStretch'], 'max(x1*x2,x3)'),
+    ('Elbow', 'DistShoulder', ['ArmStretch'], '0'),
+    ('LoArm', 'ArmIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*(1-x2)*(1-x3)*(1-x4)'),
+    ('LoArm', 'Wrist', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*x3*(1-x4)+x4'),
+    ('Wrist', 'DistShoulder', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], '(1-x1)*(1-x2)*(1-x3)'),
+    ('Wrist', 'DistElbow', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*(1-x3)'),
+    ('Hand', 'FreeIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk'], '(1-x1)*(1-x2)*(1-x3)'),
+    ('Hand', 'WristLoc', ['ArmFkIk', 'ForearmFkIk'], '(1-(1-x1)*(1-x2))'),
+    ('Hand', 'WristRot', ['ArmFkIk', 'ForearmFkIk', 'HandFollowsWrist'], '(1-(1-x1)*(1-x2))*x3'),
+    ('ArmLoc', 'Shoulder', ['ArmHinge'], '1-x1'),
+    ('ArmLoc', 'Root', ['ArmHinge'], 'x1'),
+ ]
 
 #
 #    ArmDeformDrivers

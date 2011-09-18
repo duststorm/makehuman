@@ -129,4 +129,13 @@ def FaceDeformDrivers(fp):
 	writeDrivers(fp, True, drivers)
 	return
 
+#
+#   FacePropDrivers
+#   (Bone, Name, Props, Expr)
+#
+
+FacePropDrivers = [
+    ('Gaze', 'Head', ['GazeParent'], 'x1'),
+    ('Gaze', 'World', ['GazeParent'], '1-x1'),
+]
 
