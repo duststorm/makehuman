@@ -61,6 +61,7 @@ BodyHeadsTails = [
 
     ('Root',           'root-tail', 'spine3'),
     ('Shoulders',      'neck', ('neck', [0,0.5,0])),
+    ('BendRoot',       'spine3', ('spine3', yunit)),
 
     # Up spine
     ('Hips',           'spine3', 'root-tail'),
@@ -116,6 +117,7 @@ BodyArmature = [
 
     ('Root',               0, Master, F_WIR, L_UPSPN+L_DNSPNIK, NoBB),
     ('Shoulders',          0, Master, F_WIR, L_UPSPNIK+L_DNSPN, NoBB),
+    ('BendRoot',           0, 'Root', 0, L_HELP, NoBB),
 
     # Up spine
     ('Hips',               0, 'Root', F_WIR, L_UPSPN, NoBB),

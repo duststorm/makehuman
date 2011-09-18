@@ -22,7 +22,7 @@ Arm bone definitions
 import mhx_rig
 from mhx_rig import *
 
-prcArmTrg    = 0.35
+prcArmTrg    = 0.15
 
 ArmJoints = [
     ('r-shoulder-in',       'v', 14160),
@@ -289,25 +289,27 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'UpArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodUpArm, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)]),
-         ('StretchTo', 0, 0, ['Elbow', 'Elbow_L', 0]),
+         ('IK', 0, 0, ['Elbow', 'Elbow_L', 1, None, (True, False,True)]),
+         #('StretchTo', C_STRVOL, 0, ['Elbow', 'Elbow_L', 0]),
         ])
 
     addPoseBone(fp, 'Elbow_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), CmodLoArm, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_ONSURFACE']),
+        ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_ONSURFACE']),
         ])
 
     addPoseBone(fp, 'LoArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodLoArm,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)]),
          ('IK', 0, 0, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,True)]),
-         ('StretchTo', 0, 0, ['Wrist', 'Wrist_L', 0]),
+         ('IK', 0, 0, ['Wrist', 'Wrist_L', 1, None, (True, False,True)]),
+         #('StretchTo', C_STRVOL, 0, ['Wrist', 'Wrist_L', 0]),
         ])
 
     addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_L', (1,1,1), (1,1,1), (1,1,1)]),
-         ('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_INSIDE']),
+         ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_INSIDE']),
          ('LimitDist', 0, 0, ['DistElbow', 'Elbow_L', 'LIMITDIST_ONSURFACE']),
         ])
 
@@ -321,25 +323,27 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'UpArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodUpArm, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)]),
-         ('StretchTo', 0, 0, ['Elbow', 'Elbow_R', 0]),
+         #('StretchTo', C_STRVOL, 0, ['Elbow', 'Elbow_R', 0]),
+         ('IK', 0, 0, ['Elbow', 'Elbow_R', 1, None, (True, False,True)]),
         ])
 
     addPoseBone(fp, 'Elbow_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), CmodLoArm, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_ONSURFACE']),
+        ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_ONSURFACE']),
         ])
 
     addPoseBone(fp, 'LoArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodLoArm,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_R, (True, True, True)]),
          ('IK', 0, 0, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,True)]),
-         ('StretchTo', 0, 0, ['Wrist', 'Wrist_R', 0]),
+         ('IK', 0, 0, ['Wrist', 'Wrist_R', 1, None, (True, False,True)]),
+         #('StretchTo', C_STRVOL, 0, ['Wrist', 'Wrist_R', 0]),
         ])
 
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Shoulder_R', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 1, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_INSIDE']),
+        ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_INSIDE']),
         ('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),
         ])
 
@@ -460,15 +464,15 @@ ArmFKIKDrivers = [
 #
 
 ArmPropLRDrivers = [
-    ('UpArm', 'Elbow', ['ArmFkIk', 'ElbowPlant', 'ArmStretch'], 'max(x1*x2,x3)'),
-    ('Elbow', 'DistShoulder', ['ArmStretch'], '0'),
-    ('LoArm', 'ArmIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*(1-x2)*(1-x3)*(1-x4)'),
-    ('LoArm', 'Wrist', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*x3*(1-x4)+x4'),
-    ('Wrist', 'DistShoulder', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], '(1-x1)*(1-x2)*(1-x3)'),
-    ('Wrist', 'DistElbow', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*(1-x3)'),
-    ('Hand', 'FreeIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk'], '(1-x1)*(1-x2)*(1-x3)'),
-    ('Hand', 'WristLoc', ['ArmFkIk', 'ForearmFkIk'], '(1-(1-x1)*(1-x2))'),
-    ('Hand', 'WristRot', ['ArmFkIk', 'ForearmFkIk', 'HandFollowsWrist'], '(1-(1-x1)*(1-x2))*x3'),
+    ('UpArm', 'Elbow', ['ElbowPlant'], 'x1'),
+    #('Elbow', 'DistShoulder', ['ArmStretch'], '1-x1'),
+    ('LoArm', 'ArmIK', ['ArmFkIk', 'ElbowPlant'], 'x1*(1-x2)'),
+    ('LoArm', 'Wrist', ['ArmFkIk', 'ElbowPlant'], 'x1*x2'),
+    #('Wrist', 'DistShoulder', ['ElbowPlant'], '1-x1'),
+    #('Wrist', 'DistElbow', ['ElbowPlant'], 'x1'),
+    ('Hand', 'FreeIK', ['ArmFkIk', 'ElbowPlant'], '(1-x1)*(1-x2)'),
+    ('Hand', 'WristLoc', ['ArmFkIk'], 'x1'),
+    ('Hand', 'WristRot', ['ArmFkIk', 'HandFollowsWrist'], 'x1*x2'),
     ('ArmLoc', 'Shoulder', ['ArmHinge'], '1-x1'),
     ('ArmLoc', 'Root', ['ArmHinge'], 'x1'),
  ]

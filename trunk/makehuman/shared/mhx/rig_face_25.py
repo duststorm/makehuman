@@ -135,7 +135,7 @@ def FaceDeformDrivers(fp):
 #
 
 FacePropDrivers = [
-    ('Gaze', 'Head', ['GazeParent'], 'x1'),
-    ('Gaze', 'World', ['GazeParent'], '1-x1'),
+    ('Gaze', 'Head', ['GazeFollowsHead'], 'x1'),
+    ('Gaze', 'World', ['GazeFollowsHead'], '1-x1'),
 ]
 
