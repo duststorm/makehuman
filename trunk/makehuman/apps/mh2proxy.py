@@ -139,6 +139,7 @@ class CProxyConfig:
         self.faceshapes = True
         self.bodyshapes = True
         self.cage = False
+        self.breasts = False
         self.newshoulders = True
 
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
@@ -194,9 +195,9 @@ def proxyConfig(human, useHair, options=None):
                     exec("cfg.%s = words[2:]" % key)
                 except:
                     pass
-            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'newshoulders']:
+            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'newshoulders', 'breasts']:
                 try:
-                    exec("cfg.%s = %s" % (key, words[2]))
+                    exec("cfg.%s = %s" % (key, truthValue(words[2])))
                 except:
                     pass
             elif key == 'rig':
@@ -244,6 +245,14 @@ def proxyConfig(human, useHair, options=None):
         print "  ", elt
     return cfg
 
+#
+#   truthValue(word):
+#
+
+def truthValue(word):
+    if word.lower() in ['false', 'no', '0']:
+        return False
+    return True
     
 #
 #    readProxyFile(obj, proxyStuff):

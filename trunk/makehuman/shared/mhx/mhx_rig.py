@@ -1941,7 +1941,10 @@ def swapParentName(bones, old, new):
     return nbones
     
 def writeControlArmature(fp):
-    writeArmature(fp, Armature, True)
+    amt = Armature    
+    if mh2mhx.theConfig.breasts:
+        amt += rig_body_25.BreastArmature
+    writeArmature(fp, amt, True)
     return
 
 def writeDeformArmature(fp):
@@ -1972,6 +1975,9 @@ def writeControlPoses(fp):
         rigify_rig.RigifyWritePoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
+        
+    if mh2mhx.theConfig.breasts:
+        rig_body_25.BreastControlPoses(fp)
 
     return
 

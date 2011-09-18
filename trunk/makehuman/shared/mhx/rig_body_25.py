@@ -159,12 +159,15 @@ BodyArmature = [
     ('DfmStomach',         0, 'DfmHips', F_DEF, L_DMAIN, NoBB),
     #('HipBone',            0, 'DfmHips', 0, L_HELP, NoBB),
 
-    ('Breast_L',           -45*D, 'DfmRib', F_DEF, L_DEF, NoBB),
-    ('Breast_R',           45*D, 'DfmRib', F_DEF, L_DEF, NoBB),
     ('Breathe',            0, 'DfmRib', F_WIR, L_TORSO, NoBB),
 
     ('Penis',              0, 'DfmHips', F_DEF, L_TORSO, (1,5,1) ),
     ('Scrotum',            0, 'DfmHips', F_DEF, L_TORSO, NoBB),
+]
+
+BreastArmature = [
+    ('Breast_L',           -45*D, 'DfmRib', F_DEF+F_WIR, L_DEF+L_TORSO, NoBB),
+    ('Breast_R',           45*D, 'DfmRib', F_DEF+F_WIR, L_DEF+L_TORSO, NoBB),
 ]
 
 #
@@ -180,9 +183,6 @@ def copyHelp(fp, hlpBone, upBone, downBone):
 #
 #    BodyControlPoses(fp):
 #
-
-limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
-limBreastScale =  (0.8,1.25, 0.7,1.5, 0.8,1.25)
 
 limHips = (-50*D,40*D, -45*D,45*D, -16*D,16*D)
 limSpine1 = (-60*D,90*D, -60*D,60*D, -60*D,60*D)
@@ -273,18 +273,25 @@ def BodyControlPoses(fp):
     #addPoseBone(fp, 'HipBone', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
     addPoseBone(fp,  'Breathe', 'MHCube01', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp,  'Breast_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
-         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
-         ('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])    ])
-
-    addPoseBone(fp,  'Breast_R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
-         ('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])    ])
-
     addPoseBone(fp,  'Penis', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
     addPoseBone(fp,  'Scrotum', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
+    return
+    
+def BreastControlPoses(fp):
+    limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
+    limBreastScale =  (0.5,1.5, 0.2,2.0, 0.5,1.5)
+
+    addPoseBone(fp,  'Breast_L', 'MHEndCube01', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
+         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
+         #('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])
+         ])
+
+    addPoseBone(fp,  'Breast_R', 'MHEndCube01', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
+         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
+         #('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])
+         ])
     return
 
 #

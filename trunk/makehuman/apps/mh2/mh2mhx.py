@@ -427,6 +427,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                             weights = rig.weights                    
                         mh2proxy.writeRigWeights(fp, weights)
                     fp.write("#endif\n")
+                    if theConfig.breasts:
+	                    copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
                     copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
                     if theConfig.cage and not (proxy and proxy.cage):
                         fp.write("#if toggle&T_Cage\n")
