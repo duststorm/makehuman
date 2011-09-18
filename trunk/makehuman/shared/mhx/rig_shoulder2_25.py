@@ -122,11 +122,11 @@ ShoulderHeadsTails = [
     ('BendArmBack_R',        'l-uparm0', ('l-uparm0', (0,0,-1))),
 ]
 
-L_LSHOULDER = L_LARMFK+L_LARMIK+L_SPINEFK+L_SPINEIK
-L_RSHOULDER = L_RARMFK+L_RARMIK+L_SPINEFK+L_SPINEIK
+L_LSHOULDER = L_LARMFK+L_LARMIK+L_UPSPNFK+L_UPSPNIK
+L_RSHOULDER = L_RARMFK+L_RARMIK+L_UPSPNFK+L_UPSPNIK
 
 ShoulderArmature = [
-    ('Sternum',            0, 'Spine3', 0, L_HELP, NoBB),
+    ('Sternum',            0, 'DfmSpine3', 0, L_HELP, NoBB),
     ('SternumTarget',      0, 'Sternum', 0, L_HELP, NoBB),
 
     # Shoulder
@@ -149,25 +149,25 @@ ShoulderArmature = [
     ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF, L_MSCL, NoBB),
 
     # Muscles
-    ('DeltoidTrg2_L',      0, None, 0, L_HELP, NoBB ),
-    ('DeltoidTrg2_R',      0, None, 0, L_HELP, NoBB ),
+    ('DeltoidTrg2_L',      0, 'Shoulder_L', 0, L_HELP, NoBB ),
+    ('DeltoidTrg2_R',      0, 'Shoulder_R', 0, L_HELP, NoBB ),
     ('Deltoid_L',          pi, 'DeltoidTrg2_L', F_WIR, L_LARMFK+L_LARMIK, NoBB ),
     ('Deltoid_R',          0, 'DeltoidTrg2_R', F_WIR, L_RARMFK+L_RARMIK, NoBB ),
-    ('DfmDeltoid_L',       0, 'Spine3', F_DEF, L_MSCL, NoBB ),
-    ('DfmDeltoid_R',       0, 'Spine3', F_DEF, L_MSCL, NoBB ),
+    ('DfmDeltoid_L',       0, 'DfmShoulder_L', F_DEF, L_MSCL, NoBB ),
+    ('DfmDeltoid_R',       0, 'DfmShoulder_R', F_DEF, L_MSCL, NoBB ),
     
-    ('DfmPect1_L',         0, 'Spine3', F_DEF, L_MSCL, NoBB ),
-    ('DfmPect1_R',         0, 'Spine3', F_DEF, L_MSCL, NoBB ),
-    ('DfmPect2_L',         0, 'Spine2', F_DEF, L_MSCL, NoBB ),
-    ('DfmPect2_R',         0, 'Spine2', F_DEF, L_MSCL, NoBB ),
+    ('DfmPect1_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
+    ('DfmPect1_R',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
+    ('DfmPect2_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
+    ('DfmPect2_R',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
     
-    ('DfmTrap1_L',         0, 'Neck', F_DEF, L_MSCL, NoBB ),
-    ('DfmTrap1_R',         0, 'Neck', F_DEF, L_MSCL, NoBB ),
-    ('DfmTrap2_L',         0, 'Spine2', F_DEF, L_MSCL, NoBB ),
-    ('DfmTrap2_R',         0, 'Spine2', F_DEF, L_MSCL, NoBB ),
+    ('DfmTrap1_L',         0, 'DfmNeck', F_DEF, L_MSCL, NoBB ),
+    ('DfmTrap1_R',         0, 'DfmNeck', F_DEF, L_MSCL, NoBB ),
+    ('DfmTrap2_L',         0, 'DfmSpine2', F_DEF, L_MSCL, NoBB ),
+    ('DfmTrap2_R',         0, 'DfmSpine2', F_DEF, L_MSCL, NoBB ),
 
-    ('DfmLat_L',           0, 'Spine1', F_DEF, L_MSCL, NoBB ),
-    ('DfmLat_R',           0, 'Spine1', F_DEF, L_MSCL, NoBB ),
+    ('DfmLat_L',           0, 'DfmSpine1', F_DEF, L_MSCL, NoBB ),
+    ('DfmLat_R',           0, 'DfmSpine1', F_DEF, L_MSCL, NoBB ),
 
     # Rotation diffs
 

@@ -21,7 +21,7 @@ Limit angles from http://hippydrome.com/
 
 """
 
-import aljabr, mhxbones, mh2mhx, math, mhx_spine
+import aljabr, mhxbones, mh2mhx, math
 from aljabr import *
         
 pi = 3.14159
@@ -42,8 +42,8 @@ bbMarg = 0.05
 L_MAIN =    0x0001
 L_XPRT =    0x00010000
 
-L_SPINEFK = 0x0002
-L_SPINEIK = 0x00020000
+L_UPSPNFK = 0x0002
+L_UPSPNIK = 0x00020000
 
 L_LARMIK =  0x0004
 L_LARMFK =  0x0008
@@ -68,6 +68,9 @@ L_LPALM =   0x0800
 L_LEXTRA =  0x1000
 L_RPALM =   0x08000000
 L_REXTRA =  0x10000000
+
+L_DNSPNFK = 0x2000
+L_DNSPNIK = 0x20000000
 
 L_HELP =    0x4000
 L_DEF =     0x8000
@@ -139,14 +142,15 @@ C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
 
 # Fix for ChildOf bug
 
-#Master = 'MasterFloor'
-rootChildOfConstraints = [
-        ('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
-        ('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
-        ('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
-]
+Master = 'MasterFloor'
+rootChildOfConstraints = []
 
-Master = None
+#        ('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
+#        ('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
+#        ('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
+#]
+
+#Master = None
 Origin = [0,0,0]
 
 #
@@ -484,10 +488,6 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
     (lockLocX, lockLocY, lockLocZ) = lockLoc
     (lockRotX, lockRotY, lockRotZ) = lockRot
     (lockScaleX, lockScaleY, lockScaleZ) = lockScale
-    (ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof
-    ikLockX = 1-ik_dof_x
-    ikLockY = 1-ik_dof_y
-    ikLockZ = 1-ik_dof_z
 
     ikLin = boolString(flags & P_IKLIN)
     ikRot = boolString(flags & P_IKROT)
@@ -522,6 +522,19 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
         fp.write("\tend posebone\n")
         return
     
+    try:
+        (ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof
+        useStiff = False
+    except:
+        (ik_dof1, ik_stiff) = ik_dof
+        (ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof1
+        (ik_stiff_x, ik_stiff_y, ik_stiff_z) = ik_stiff
+        useStiff = True
+   
+    ikLockX = 1-ik_dof_x
+    ikLockY = 1-ik_dof_y
+    ikLockZ = 1-ik_dof_z
+
     fp.write(
 "    lock_ik_x %d ;\n" % ikLockX +
 "    lock_ik_y %d ;\n" % ikLockY +
@@ -529,10 +542,13 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 "    use_ik_limit_x %d ;\n" % usex +
 "    use_ik_limit_y %d ;\n" % usey +
 "    use_ik_limit_z %d ;\n" % usez +
-"    ik_stiffness Array 0.0 0.0 0.0  ; \n")
-    fp.write(
 "    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
 "    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
+
+    if useStiff:
+        fp.write("    ik_stiffness  Array %.4f %.4f %.4f ;\n" % (ik_stiff_x, ik_stiff_y, ik_stiff_z))
+    else:
+        fp.write("    ik_stiffness Array 0.0 0.0 0.0  ; \n")
 
     if customShape:
         fp.write("    custom_shape Refer Object %s ; \n" % customShape)
@@ -1932,8 +1948,8 @@ def writeDeformArmature(fp):
     return
 
 def writeAllCurves(fp):
-    for (name, hooks) in rig_body_25.BodySpines:
-        mhx_spine.addSpine(fp, name, hooks)
+    #for (name, hooks) in rig_body_25.BodySpines:
+    #    mhx_spine.addSpine(fp, name, hooks)
     return 
 
 def writeControlPoses(fp):
