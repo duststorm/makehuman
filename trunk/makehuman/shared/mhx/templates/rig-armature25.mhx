@@ -70,6 +70,9 @@ end Armature
   Property GazeFollowsHead 1.0 Gaze_follows_world_or_head ;
   PropKeys GazeFollowsHead "min":0.0,"max":1.0, ;
   
+  Property InvertSpine False Spine_from_shoulders_to_pelvis ;
+  PropKeys InvertSpine "min":0,"max":1, ;
+  
   *** properties Object
 end Object
 

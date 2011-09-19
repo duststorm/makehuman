@@ -130,6 +130,7 @@ C_OW_LOCPAR = 0x0200
 C_OW_POSE = 0x0300
 
 C_DEFRIG = 0x0400
+C_TAIL = 0x0800
 
 C_TG_MASK = 0x3000
 C_TG_WORLD = 0x0000
@@ -459,11 +460,11 @@ def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, cons
     if customShape:
         fp.write("    custom_shape Refer Object %s ; \n" % customShape)
     if copy & U_LOC:
-        addCopyLocConstraint(fp, '', 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), 0, False])
+        addCopyLocConstraint(fp, 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), 0, False])
     if copy & U_ROT:
-        addCopyRotConstraint(fp, '', 0, 1, ['Rot', cbone, channels, (0,0,0), False])
+        addCopyRotConstraint(fp, 0, 1, ['Rot', cbone, channels, (0,0,0), False])
     if copy & U_SCALE:
-        addCopyScaleConstraint(fp, '', 0, 1, ['Scale', cbone, (1,1,1), False])
+        addCopyScaleConstraint(fp, 0, 1, ['Scale', cbone, (1,1,1), False])
     addConstraints(fp, dbone, constraints, (1,1,1), (1,1,1))
     fp.write("  end Posebone\n")
     return
@@ -596,51 +597,46 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
         else:
             raise NameError("Switch in", bone)
 
-        #if cflags & C_DEFRIG:
-        #    rig = 'DeformRig'
-        #else:
-        rig = ''
-
         if typ == 'IK':
-            addIkConstraint(fp, rig, cflags, inf, data, lockLoc, lockRot)
+            addIkConstraint(fp, cflags, inf, data, lockLoc, lockRot)
         elif typ == 'Action':
-            addActionConstraint(fp, rig, cflags, inf, data)
+            addActionConstraint(fp, cflags, inf, data)
         elif typ == 'CopyLoc':
-            addCopyLocConstraint(fp, rig, cflags, inf, data)
+            addCopyLocConstraint(fp, cflags, inf, data)
         elif typ == 'CopyRot':
-            addCopyRotConstraint(fp, rig, cflags, inf, data)
+            addCopyRotConstraint(fp, cflags, inf, data)
         elif typ == 'CopyScale':
-            addCopyScaleConstraint(fp, rig, cflags, inf, data)
+            addCopyScaleConstraint(fp, cflags, inf, data)
         elif typ == 'CopyTrans':
-            addCopyTransConstraint(fp, rig, cflags, inf, data)
+            addCopyTransConstraint(fp, cflags, inf, data)
         elif typ == 'LimitRot':
-            addLimitRotConstraint(fp, rig, cflags, inf, data)
+            addLimitRotConstraint(fp, cflags, inf, data)
             (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
             mins = (xmin, ymin, zmin)
             maxs = (xmax, ymax, zmax)
             #uses = data[2]            
         elif typ == 'LimitLoc':
-            addLimitLocConstraint(fp, rig, cflags, inf, data)
+            addLimitLocConstraint(fp, cflags, inf, data)
         elif typ == 'LimitScale':
-            addLimitScaleConstraint(fp, rig, cflags, inf, data)
+            addLimitScaleConstraint(fp, cflags, inf, data)
         elif typ == 'Transform':
-            addTransformConstraint(fp, rig, cflags, inf, data)
+            addTransformConstraint(fp, cflags, inf, data)
         elif typ == 'LockedTrack':
-            addLockedTrackConstraint(fp, rig, cflags, inf, data)
+            addLockedTrackConstraint(fp, cflags, inf, data)
         elif typ == 'DampedTrack':
-            addDampedTrackConstraint(fp, rig, cflags, inf, data)
+            addDampedTrackConstraint(fp, cflags, inf, data)
         elif typ == 'StretchTo':
-            addStretchToConstraint(fp, rig, cflags, inf, data)
+            addStretchToConstraint(fp, cflags, inf, data)
         elif typ == 'TrackTo':
-            addTrackToConstraint(fp, rig, cflags, inf, data)
+            addTrackToConstraint(fp, cflags, inf, data)
         elif typ == 'LimitDist':
-            addLimitDistConstraint(fp, rig, cflags, inf, data)
+            addLimitDistConstraint(fp, cflags, inf, data)
         elif typ == 'ChildOf':
-            addChildOfConstraint(fp, rig, cflags, inf, data)
+            addChildOfConstraint(fp, cflags, inf, data)
         elif typ == 'SplineIK':
-            addSplineIkConstraint(fp, rig, cflags, inf, data)
+            addSplineIkConstraint(fp, cflags, inf, data)
         elif typ == 'Floor':
-            addFloorConstraint(fp, rig, cflags, inf, data)
+            addFloorConstraint(fp, cflags, inf, data)
         else:
             print(label)
             print(typ)
@@ -648,9 +644,9 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
     return (uses, mins, maxs)
 
 #
-#    addIkConstraint(fp, rig, flags, inf, data, lockLoc, lockRot)
+#    addIkConstraint(fp, flags, inf, data, lockLoc, lockRot)
 #
-def addIkConstraint(fp, rig, flags, inf, data, lockLoc, lockRot):
+def addIkConstraint(fp, flags, inf, data, lockLoc, lockRot):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -667,7 +663,7 @@ def addIkConstraint(fp, rig, flags, inf, data, lockLoc, lockRot):
 
         if subtar:
             fp.write(
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
 "      use_tail True ;\n" +
@@ -696,7 +692,7 @@ def addIkConstraint(fp, rig, flags, inf, data, lockLoc, lockRot):
             fp.write(
 "      pole_angle %.6g ;\n" % angle +
 "      pole_subtarget '%s' ;\n" % ptar +
-"      pole_target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig))
+"      pole_target Refer Object %s ;\n" % (mh2mhx.theHuman))
 
         fp.write(
 "      is_proxy_local False ;\n" +
@@ -717,9 +713,9 @@ def addIkConstraint(fp, rig, flags, inf, data, lockLoc, lockRot):
     return
 
 #
-#    addActionConstraint(fp, rig, flags, inf, data):
+#    addActionConstraint(fp, flags, inf, data):
 #
-def addActionConstraint(fp, rig, flags, inf, data):
+def addActionConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     action = data[1]
@@ -732,7 +728,7 @@ def addActionConstraint(fp, rig, flags, inf, data):
 
     fp.write(
 "    Constraint %s ACTION True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig)+
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman)+
 "      action Refer Action %s ; \n" % action+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -759,9 +755,9 @@ def addActionConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addCopyRotConstraint(fp, rig, flags, inf, data):
+#    addCopyRotConstraint(fp, flags, inf, data):
 #
-def addCopyRotConstraint(fp, rig, flags, inf, data):
+def addCopyRotConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -778,7 +774,7 @@ def addCopyRotConstraint(fp, rig, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s COPY_ROTATION True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig)+
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman)+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -802,9 +798,9 @@ def addCopyRotConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addCopyLocConstraint(fp, rig, flags, inf, data):
+#    addCopyLocConstraint(fp, flags, inf, data):
 #
-def addCopyLocConstraint(fp, rig, flags, inf, data):
+def addCopyLocConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -817,7 +813,7 @@ def addCopyLocConstraint(fp, rig, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s COPY_LOCATION True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig)+
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman)+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -840,9 +836,9 @@ def addCopyLocConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addCopyScaleConstraint(fp, rig, flags, inf, data):
+#    addCopyScaleConstraint(fp, flags, inf, data):
 #
-def addCopyScaleConstraint(fp, rig, flags, inf, data):
+def addCopyScaleConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -852,7 +848,7 @@ def addCopyScaleConstraint(fp, rig, flags, inf, data):
 
     fp.write(
 "    Constraint %s COPY_SCALE True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -866,9 +862,9 @@ def addCopyScaleConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addCopyTransConstraint(fp, rig, flags, inf, data):
+#    addCopyTransConstraint(fp, flags, inf, data):
 #
-def addCopyTransConstraint(fp, rig, flags, inf, data):
+def addCopyTransConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -877,7 +873,7 @@ def addCopyTransConstraint(fp, rig, flags, inf, data):
     
     fp.write(
 "    Constraint %s COPY_TRANSFORMS True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -890,9 +886,9 @@ def addCopyTransConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addLimitRotConstraint(fp, rig, flags, inf, data):
+#    addLimitRotConstraint(fp, flags, inf, data):
 #
-def addLimitRotConstraint(fp, rig, flags, inf, data):
+def addLimitRotConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
@@ -937,9 +933,9 @@ def addLimitRotConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addLimitLocConstraint(fp, rig, flags, inf, data):
+#    addLimitLocConstraint(fp, flags, inf, data):
 #
-def addLimitLocConstraint(fp, rig, flags, inf, data):
+def addLimitLocConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
@@ -987,9 +983,9 @@ def addLimitLocConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addLimitScaleConstraint(fp, rig, flags, inf, data):
+#    addLimitScaleConstraint(fp, flags, inf, data):
 #
-def addLimitScaleConstraint(fp, rig, flags, inf, data):
+def addLimitScaleConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
@@ -1022,9 +1018,9 @@ def addLimitScaleConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addTransformConstraint(fp, rig, flags, inf, data):
+#    addTransformConstraint(fp, flags, inf, data):
 #
-def addTransformConstraint(fp, rig, flags, inf, data):
+def addTransformConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -1039,7 +1035,7 @@ def addTransformConstraint(fp, rig, flags, inf, data):
 
     fp.write(
 "    Constraint %s TRANSFORM True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1069,9 +1065,9 @@ def addTransformConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addDampedTrackConstraint(fp, rig, flags, inf, data):
+#    addDampedTrackConstraint(fp, flags, inf, data):
 #
-def addDampedTrackConstraint(fp, rig, flags, inf, data):
+def addDampedTrackConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -1080,7 +1076,7 @@ def addDampedTrackConstraint(fp, rig, flags, inf, data):
 
     fp.write(
 "    Constraint %s DAMPED_TRACK True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1094,9 +1090,9 @@ def addDampedTrackConstraint(fp, rig, flags, inf, data):
 
 
 #
-#    addLockedTrackConstraint(fp, rig, flags, inf, data):
+#    addLockedTrackConstraint(fp, flags, inf, data):
 #
-def addLockedTrackConstraint(fp, rig, flags, inf, data):
+def addLockedTrackConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -1105,7 +1101,7 @@ def addLockedTrackConstraint(fp, rig, flags, inf, data):
 
     fp.write(
 "    Constraint %s LOCKED_TRACK True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1118,9 +1114,9 @@ def addLockedTrackConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addStretchToConstraint(fp, rig, flags, inf, data):
+#    addStretchToConstraint(fp, flags, inf, data):
 #
-def addStretchToConstraint(fp, rig, flags, inf, data):
+def addStretchToConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -1138,7 +1134,7 @@ def addStretchToConstraint(fp, rig, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s STRETCH_TO True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      bulge 1 ;\n" +
@@ -1162,9 +1158,9 @@ def addStretchToConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addTrackToConstraint(fp, rig, flags, inf, data):
+#    addTrackToConstraint(fp, flags, inf, data):
 #
-def addTrackToConstraint(fp, rig, flags, inf, data):
+def addTrackToConstraint(fp, flags, inf, data):
     name = data[0]
     subtar = data[1]
     head_tail = data[2]
@@ -1175,7 +1171,7 @@ def addTrackToConstraint(fp, rig, flags, inf, data):
 
     fp.write(
 "    Constraint %s TRACK_TO True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      head_tail %s ;\n" % head_tail +
@@ -1191,9 +1187,9 @@ def addTrackToConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addLimitDistConstraint(fp, rig, flags, inf, data):
+#    addLimitDistConstraint(fp, flags, inf, data):
 #
-def addLimitDistConstraint(fp, rig, flags, inf, data):
+def addLimitDistConstraint(fp, flags, inf, data):
     global Mhx25
     name = data[0]
     subtar = data[1]
@@ -1203,7 +1199,7 @@ def addLimitDistConstraint(fp, rig, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s LIMIT_DISTANCE True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1223,9 +1219,9 @@ def addLimitDistConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addChildOfConstraint(fp, rig, flags, inf, data):
+#    addChildOfConstraint(fp, flags, inf, data):
 #
-def addChildOfConstraint(fp, rig, flags, inf, data):
+def addChildOfConstraint(fp, flags, inf, data):
     global Mhx25
     # return
     name = data[0]
@@ -1241,7 +1237,7 @@ def addChildOfConstraint(fp, rig, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s CHILD_OF True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1263,11 +1259,11 @@ def addChildOfConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addSplineIkConstraint(fp, rig, flags, inf, data):
+#    addSplineIkConstraint(fp, flags, inf, data):
 #
 #"      joint_bindings Array 1.0 0.741504311562 0.483008384705 0.253476023674 -5.96046447754e-08  ;\n" +
 
-def addSplineIkConstraint(fp, rig, flags, inf, data):
+def addSplineIkConstraint(fp, flags, inf, data):
     global Mhx25, rigHead, rigTail
     # return
     name = data[0]
@@ -1293,10 +1289,10 @@ def addSplineIkConstraint(fp, rig, flags, inf, data):
     return
 
 #
-#    addFloorConstraint(fp, rig, flags, inf, data):
+#    addFloorConstraint(fp, flags, inf, data):
 #
 
-def addFloorConstraint(fp, rig, flags, inf, data):
+def addFloorConstraint(fp, flags, inf, data):
     name = data[0]
     subtar = data[1]
     floor_location = data[2]
@@ -1307,7 +1303,7 @@ def addFloorConstraint(fp, rig, flags, inf, data):
 
     fp.write(
 "    Constraint %s FLOOR True\n" % name +
-"      target Refer Object %s%s ;\n" % (mh2mhx.theHuman, rig) +
+"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -2025,6 +2021,7 @@ def writeAllDrivers(fp):
             writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R")
             writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L")
             writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R")
+            writePropDrivers(fp, rig_body_25.BodyPropDrivers, "")
             writePropDrivers(fp, rig_face_25.FacePropDrivers, "")
             fingDrivers = rig_finger_25.getFingerPropDrivers()
             writePropDrivers(fp, fingDrivers, "_L")            

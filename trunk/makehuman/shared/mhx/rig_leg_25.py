@@ -184,8 +184,8 @@ footCtrlRoll = 0.0
 
 LegArmature = [
     # Leg
-    #('Hip_L',          0, 'Hips', 0, L_HELP, NoBB),
-    ('UpLeg_L',         upLegRoll, 'Hips', F_WIR, L_LLEGFK, NoBB),
+    #('Hip_L',          0, 'DfmHips', 0, L_HELP, NoBB),
+    ('UpLeg_L',         upLegRoll, 'DfmHips', F_WIR, L_LLEGFK, NoBB),
     ('LoLeg_L',         loLegRoll, 'UpLeg_L', F_WIR, L_LLEGFK, NoBB),
     ('Foot_L',          footRoll, 'LoLeg_L', F_WIR+F_CON, L_LLEGFK, NoBB),
     ('Toe_L',           toeRoll, 'Foot_L', F_WIR, L_LLEGFK, NoBB),
@@ -195,8 +195,8 @@ LegArmature = [
     ('Ankle_L',         0, 'FootRev_L', 0, L_HELP, NoBB),
     ('LegFK_L',         footCtrlRoll, 'LoLeg_L', 0, L_HELP, NoBB),
 
-    #('Hip_R',          0, 'Hips', 0, L_HELP, NoBB),
-    ('UpLeg_R',         -upLegRoll, 'Hips', F_WIR, L_RLEGFK, NoBB),
+    #('Hip_R',          0, 'DfmHips', 0, L_HELP, NoBB),
+    ('UpLeg_R',         -upLegRoll, 'DfmHips', F_WIR, L_RLEGFK, NoBB),
     ('LoLeg_R',         -loLegRoll, 'UpLeg_R', F_WIR, L_RLEGFK, NoBB),
     ('Foot_R',          -footRoll, 'LoLeg_R', F_WIR+F_CON, L_RLEGFK, NoBB),
     ('Toe_R',           -toeRoll, 'Foot_R', F_WIR, L_RLEGFK, NoBB),
@@ -207,8 +207,8 @@ LegArmature = [
     ('LegFK_R',         footCtrlRoll, 'LoLeg_R', 0, L_HELP, NoBB),  
 
     # Pole targets
-    ('LegTrg_L',        0.0, 'Hips', 0, L_HELP, NoBB),
-    ('UpLegRot_L',      0.0, 'Hips', F_WIR, L_LLEGFK+L_LLEGIK, NoBB),
+    ('LegTrg_L',        0.0, 'DfmHips', 0, L_HELP, NoBB),
+    ('UpLegRot_L',      0.0, 'DfmHips', F_WIR, L_LLEGFK+L_LLEGIK, NoBB),
     ('UpLeg1PT_L',      0.0, 'UpLegRot_L', 0, L_HELP, NoBB),
     ('UpLeg2PT_L',      0.0, 'UpLeg_L', 0, L_HELP, NoBB),
     ('KneePT_L',        0.0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
@@ -216,8 +216,8 @@ LegArmature = [
     ('FootPT_L',        0.0, 'FootRev_L', 0, L_HELP, NoBB),
     ('ToePT_L',         0.0, 'ToeRev_L', 0, L_HELP, NoBB),
 
-    ('LegTrg_R',        0.0, 'Hips', 0, L_HELP, NoBB),
-    ('UpLegRot_R',      0.0, 'Hips', F_WIR, L_LLEGFK+L_LLEGIK, NoBB),
+    ('LegTrg_R',        0.0, 'DfmHips', 0, L_HELP, NoBB),
+    ('UpLegRot_R',      0.0, 'DfmHips', F_WIR, L_LLEGFK+L_LLEGIK, NoBB),
     ('UpLeg1PT_R',      0.0, 'UpLegRot_R', 0, L_HELP, NoBB),
     ('UpLeg2PT_R',      0.0, 'UpLeg_R', 0, L_HELP, NoBB),
     ('KneePT_R',        0.0, 'LegIK_R', F_WIR, L_LLEGIK, NoBB),
@@ -226,17 +226,17 @@ LegArmature = [
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
 
     # Rotation diffs
-    ('BendLegForward_L',    pi, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegBack_L',       0, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegUp_L',         0, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegDown_L',       0, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegOut_L',        -90*D, 'Hips', 0, L_HELP, NoBB),
+    ('BendLegForward_L',    pi, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegBack_L',       0, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegUp_L',         0, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegDown_L',       0, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegOut_L',        -90*D, 'DfmHips', 0, L_HELP, NoBB),
 
-    ('BendLegForward_R',    pi, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegBack_R',       0, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegUp_R',         0, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegDown_R',       0, 'Hips', 0, L_HELP, NoBB),
-    ('BendLegOut_R',        90*D, 'Hips', 0, L_HELP, NoBB),
+    ('BendLegForward_R',    pi, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegBack_R',       0, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegUp_R',         0, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegDown_R',       0, 'DfmHips', 0, L_HELP, NoBB),
+    ('BendLegOut_R',        90*D, 'DfmHips', 0, L_HELP, NoBB),
 
     # Deform
     ('DfmUpLeg1_L',         upLegRoll, 'DfmHips', F_DEF, L_DMAIN, NoBB),
@@ -337,13 +337,13 @@ def LegControlPoses(fp):
 
     addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
         mhx_rig.rootChildOfConstraints + [
-        ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hips', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 1, ['DistHip', 'Hips', 'LIMITDIST_INSIDE'])])
+        ('ChildOf', C_CHILDOF, 0, ['Hip', 'DfmHips', (1,1,1), (1,1,1), (1,1,1)]),
+        ('LimitDist', 0, 1, ['DistHip', 'DfmHips', 'LIMITDIST_INSIDE'])])
 
     addPoseBone(fp, 'LegIK_R', 'MHFootCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
         mhx_rig.rootChildOfConstraints + [
-        ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hips', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 1, ['DistHip', 'Hips', 'LIMITDIST_INSIDE'])])
+        ('ChildOf', C_CHILDOF, 0, ['Hip', 'DfmHips', (1,1,1), (1,1,1), (1,1,1)]),
+        ('LimitDist', 0, 1, ['DistHip', 'DfmHips', 'LIMITDIST_INSIDE'])])
 
     addPoseBone(fp, 'FootRev_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevFoot_L, (1,1,1)])])
