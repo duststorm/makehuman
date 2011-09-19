@@ -732,35 +732,17 @@ def writeEffects(obj, fp, stuff):
 '          </sampler2D>\n' +
 '        </newparam>\n' +
 '        <technique sid="common">\n' +
-'          <phong>\n' +
-'            <emission>\n' +
-'              <color>0 0 0 1</color>\n' +
-'            </emission>\n' +
-'            <ambient>\n' +
-'              <color>0 0 0 1</color>\n' +
-'            </ambient>\n' +
+'          <lambert>\n' +
 '            <diffuse>\n' +
 '              <texture texture="texture_tif-sampler" texcoord="UVTex"/>\n' +
 '            </diffuse>\n' +
-'            <specular>\n' +
-'              <texture texture="texture_ref_tif-sampler" texcoord="UVTex"/>\n' +
-'            </specular>\n' +
-'            <shininess>\n' +
-'              <float>2</float>\n' +
-'            </shininess>\n' +
-'            <reflective>\n' +
-'              <color>0 0 0 1</color>\n' +
-'            </reflective>\n' +
-'            <reflectivity>\n' +
-'              <float>0</float>\n' +
-'            </reflectivity>\n' +
 '            <transparency>\n' +
 '              <texture texture="texture_tif-sampler" texcoord="UVTex"/>\n' +
 '            </transparency>\n' +
 '            <index_of_refraction>\n' +
 '              <float>1</float>\n' +
 '            </index_of_refraction>\n' +
-'          </phong>\n' +
+'          </lambert>\n' +
 '        </technique>\n' +
 '      </profile_COMMON>\n' +
 '    </effect>\n')

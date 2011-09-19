@@ -23,8 +23,8 @@ import mhx_rig
 from mhx_rig import *
 
 ShoulderJoints = [
-    #('r-deltoidtrg',        'vl', ((0.5, 3617), (0.5, 3625))),
-    #('l-deltoidtrg',        'vl', ((0.5, 10167), (0.5, 10175))),
+    ('r-deltoidtrg',        'vl', ((0.5, 3617), (0.5, 3625))),
+    ('l-deltoidtrg',        'vl', ((0.5, 10167), (0.5, 10175))),
     ('r-deltoid',           'vl', ((0.5, 2914), (0.5, 3067))),
     ('l-deltoid',           'vl', ((0.5, 10671), (0.5, 10787))),
 
@@ -91,12 +91,12 @@ ShoulderHeadsTails = [
 
     # Muscles
     
-    ('DeltoidTrg2_L',        'r-armtrg', ('r-armtrg', yunit)),
-    ('DeltoidTrg2_R',        'l-armtrg', ('l-armtrg', yunit)),
-    ('Deltoid_L',            'r-armtrg', ('r-armtrg', yunit)),
-    ('Deltoid_R',            'l-armtrg', ('l-armtrg', yunit)),
-    ('DfmDeltoid_L',         'r-deltoid', 'r-armtrg'),
-    ('DfmDeltoid_R',         'l-deltoid', 'l-armtrg'),
+    ('DeltoidTrg2_L',        'r-deltoidtrg', ('r-deltoidtrg', yunit)),
+    ('DeltoidTrg2_R',        'l-deltoidtrg', ('l-deltoidtrg', yunit)),
+    ('Deltoid_L',            'r-deltoidtrg', ('r-deltoidtrg', yunit)),
+    ('Deltoid_R',            'l-deltoidtrg', ('l-deltoidtrg', yunit)),
+    ('DfmDeltoid_L',         'r-deltoid', 'r-deltoidtrg'),
+    ('DfmDeltoid_R',         'l-deltoid', 'l-deltoidtrg'),
 
     ('DfmPect1_L',           'r-pect1', 'r-armtrg'),
     ('DfmPect1_R',           'l-pect1', 'l-armtrg'),
@@ -145,8 +145,8 @@ ShoulderArmature = [
     ('ShoulderUp_R',       0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
     ('ShoulderAim_R',      0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
 
-    ('DfmScapula_L',       0, 'ShoulderAim_L', F_DEF, L_MSCL, NoBB),
-    ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF, L_MSCL, NoBB),
+    ('DfmScapula_L',       0, 'ShoulderAim_L', F_DEF, L_DMAIN, NoBB),
+    ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF, L_DMAIN, NoBB),
 
     # Muscles
     ('DeltoidTrg2_L',      0, 'Shoulder_L', 0, L_HELP, NoBB ),

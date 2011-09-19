@@ -158,8 +158,8 @@ ArmHeadsTails = [
     ('ElbowLinkPT_R',     'l-elbow', 'l-elbow-pt'),
     
     # Shoulder bone with arm parent
-    ('DeltoidTrg1_L',     'r-armtrg', ('r-armtrg', yunit)),
-    ('DeltoidTrg1_R',     'l-armtrg', ('l-armtrg', yunit)),
+    ('DeltoidTrg1_L',     'r-deltoidtrg', ('r-deltoidtrg', yunit)),
+    ('DeltoidTrg1_R',     'l-deltoidtrg', ('l-deltoidtrg', yunit)),
 ]
 
 #upArmRoll = 1.69297
