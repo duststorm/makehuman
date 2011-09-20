@@ -170,12 +170,12 @@ handRoll = 0.0
 ArmArmature = [
     # Arm
     ('UpArm_L',            upArmRoll, 'Shoulder_L', F_WIR, L_LARMFK, NoBB),
-    ('Elbow_L',            0, Master, F_WIR, L_LEXTRA, NoBB),
+    ('Elbow_L',            0, Master, F_WIR, L_LTWEAK, NoBB),
     ('LoArm_L',            loArmRoll, 'UpArm_L', F_WIR, L_LARMFK, NoBB),
     ('Wrist_L',            handRoll, Master, F_WIR, L_LARMIK, NoBB),
     ('Hand_L',             handRoll, 'LoArm_L', F_CON+F_WIR, L_LARMFK+L_LARMIK, NoBB),
     ('UpArm_R',            -upArmRoll, 'Shoulder_R', F_WIR, L_RARMFK, NoBB),
-    ('Elbow_R',            0, Master, F_WIR, L_REXTRA, NoBB),
+    ('Elbow_R',            0, Master, F_WIR, L_RTWEAK, NoBB),
     ('LoArm_R',            -loArmRoll, 'UpArm_R', F_WIR, L_RARMFK, NoBB),
     ('Wrist_R',            handRoll, Master, F_WIR, L_RARMIK, NoBB),
     ('Hand_R',             -handRoll, 'LoArm_R', F_CON+F_WIR, L_RARMFK+L_RARMIK, NoBB),
@@ -260,16 +260,6 @@ CmodHand = 0
 #
 
 def ArmControlPoses(fp):
-
-    # Arm root
-    
-    addPoseBone(fp, 'Shoulder_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_L', (1,1,1), (0,0,0), False]),
-         ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
-
-    addPoseBone(fp, 'Shoulder_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
-         ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 
     # Arm
     

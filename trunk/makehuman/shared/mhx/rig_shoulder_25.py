@@ -162,8 +162,8 @@ ShoulderArmature = [
     # Muscles
     ('DeltoidTrg2_L',      0, 'Clavicle_L', 0, L_HELP, NoBB ),
     ('DeltoidTrg2_R',      0, 'Clavicle_R', 0, L_HELP, NoBB ),
-    ('Deltoid_L',          pi, 'DeltoidTrg2_L', F_WIR, L_LARMFK+L_LARMIK, NoBB ),
-    ('Deltoid_R',          0, 'DeltoidTrg2_R', F_WIR, L_RARMFK+L_RARMIK, NoBB ),
+    ('Deltoid_L',          pi, 'DeltoidTrg2_L', F_WIR, L_LTWEAK, NoBB ),
+    ('Deltoid_R',          0, 'DeltoidTrg2_R', F_WIR, L_RTWEAK, NoBB ),
     ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF, L_MSCL, NoBB ),
     ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF, L_MSCL, NoBB ),
     
@@ -210,18 +210,27 @@ def ShoulderControlPoses(fp):
 
     addPoseBone(fp, 'SternumTarget', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-    # Shoulder
+    # Clavicle
     addPoseBone(fp, 'Clavicle_L', 'MHShoulder', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)])])
 
     addPoseBone(fp, 'Clavicle_R', 'MHShoulder', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)])])
 
-    # Deform
-
     copyDeform(fp, 'DfmClavicle_L', 'Clavicle_L', 0, U_LOC+U_ROT, None, [])
     copyDeform(fp, 'DfmClavicle_R', 'Clavicle_R', 0, U_LOC+U_ROT, None, [])
     
+
+    # Shoulder
+    
+    addPoseBone(fp, 'Shoulder_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_L', (1,1,1), (0,0,0), False]),
+         ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
+
+    addPoseBone(fp, 'Shoulder_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
+         ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
+
     # Muscles
     addPoseBone(fp, 'Deltoid_L', 'MHDeltoid', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
