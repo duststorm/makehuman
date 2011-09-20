@@ -525,9 +525,10 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
     
     try:
         (ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof
+        ik_stretch = None
         useStiff = False
     except:
-        (ik_dof1, ik_stiff) = ik_dof
+        (ik_dof1, ik_stiff, ik_stretch, more) = ik_dof
         (ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof1
         (ik_stiff_x, ik_stiff_y, ik_stiff_z) = ik_stiff
         useStiff = True
@@ -564,7 +565,9 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 "    ik_rotation_weight 0 ; \n" +
 "    hide %s ; \n" % hide)
     
-    if flags & P_STRETCH:
+    if ik_stretch:
+        fp.write("    ik_stretch %.3f ; \n" % ik_stretch)
+    elif flags & P_STRETCH:
         fp.write(
 "#if toggle&T_STRETCH\n" +
 "    ik_stretch 0.1 ; \n" +

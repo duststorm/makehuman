@@ -444,13 +444,13 @@ ArmFKIKDrivers = [
 ArmPropLRDrivers = [
     ('UpArm', 'Elbow', ['ElbowPlant'], 'x1'),
     #('Elbow', 'DistShoulder', ['ArmStretch'], '1-x1'),
-    ('LoArm', 'ArmIK', ['ArmFkIk', 'ElbowPlant'], 'x1*(1-x2)'),
-    ('LoArm', 'Wrist', ['ArmFkIk', 'ElbowPlant'], 'x1*x2'),
+    ('LoArm', 'ArmIK', ['ArmIk', 'ElbowPlant'], 'x1*(1-x2)'),
+    ('LoArm', 'Wrist', ['ArmIk', 'ElbowPlant'], 'x1*x2'),
     #('Wrist', 'DistShoulder', ['ElbowPlant'], '1-x1'),
     #('Wrist', 'DistElbow', ['ElbowPlant'], 'x1'),
-    ('Hand', 'FreeIK', ['ArmFkIk', 'ElbowPlant'], '(1-x1)*(1-x2)'),
-    ('Hand', 'WristLoc', ['ArmFkIk'], 'x1'),
-    ('Hand', 'WristRot', ['ArmFkIk', 'HandFollowsWrist'], 'x1*x2'),
+    ('Hand', 'FreeIK', ['ArmIk', 'ElbowPlant'], '(1-x1)*(1-x2)'),
+    ('Hand', 'WristLoc', ['ArmIk'], 'x1'),
+    ('Hand', 'WristRot', ['ArmIk', 'HandFollowsWrist'], 'x1*x2'),
     ('Shoulder', 'Shoulder', ['ArmHinge'], '1-x1'),
     ('Shoulder', 'Root', ['ArmHinge'], 'x1'),
  ]

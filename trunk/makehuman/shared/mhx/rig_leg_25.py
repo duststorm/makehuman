@@ -509,10 +509,10 @@ LegFKIKDrivers = [
 #
 
 LegPropLRDrivers = [
-    ('LoLeg', 'LegIK', ['LegFkIk'], 'x1'),
-    ('Foot', 'RevIK', ['LegFkIk'], 'x1'),
-    ('Foot', 'FreeIK', ['LegFkIk'], '1-x1'),
-    ('Toe', 'RevIK', ['LegFkIk'], 'x1'),
+    ('LoLeg', 'LegIK', ['LegIk'], 'x1'),
+    ('Foot', 'RevIK', ['LegIk'], 'x1'),
+    ('Foot', 'FreeIK', ['LegIk'], '1-x1'),
+    ('Toe', 'RevIK', ['LegIk'], 'x1'),
 ]
 
 #
