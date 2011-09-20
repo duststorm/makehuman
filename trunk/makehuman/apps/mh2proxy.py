@@ -141,7 +141,6 @@ class CProxyConfig:
         self.cage = False
         self.breasts = False
         self.propdrivers = False
-        self.newshoulders = True
 
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
@@ -196,7 +195,7 @@ def proxyConfig(human, useHair, options=None):
                     exec("cfg.%s = words[2:]" % key)
                 except:
                     pass
-            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'newshoulders', 'breasts', 'propdrivers']:
+            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'breasts', 'propdrivers']:
                 try:
                     exec("cfg.%s = %s" % (key, truthValue(words[2])))
                 except:

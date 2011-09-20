@@ -755,7 +755,8 @@ theFixesList = {
 #
 
 MhxFkBoneList = [
-    'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'Shoulders', 'LowerNeck', 'Neck', 'Head', 'Sternum',
+    'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', #'Shoulders', 
+    'LowerNeck', 'Neck', 'Head', 'Sternum',
     'Shoulder_L', 'ShoulderEnd_L', 'ArmLoc_L', 'UpArm_L', 'LoArm_L', 'Hand0_L', 'Hand_L',
     'Shoulder_R', 'ShoulderEnd_R', 'ArmLoc_R', 'UpArm_R', 'LoArm_R', 'Hand0_R', 'Hand_R',
     'Hip_L', 'LegLoc_L', 'UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'LegFK_L',
@@ -1478,7 +1479,15 @@ def insertAnimChild(name, animations, nFrames, rots):
         nFrames = len(rots)
     par = anim.parent
     #print("iAC", name, par)
-    animPar = animations[par]
+    if par[0:3] == 'Dfm':
+        par = par[3:]        
+    try:
+        animPar = animations[par]
+    except:
+        animPar = None
+    if not animPar:
+        raise NameError("Could not guess parent %s -> %s" % (name, par))
+
     anim.nFrames = nFrames
     quat = Quaternion()
     quat.identity()

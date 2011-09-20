@@ -1824,7 +1824,7 @@ def setupCircles(fp):
 #
 
 import rig_joints_25, rig_body_25
-import rig_shoulder_25, rig_shoulder2_25, rig_arm_25, rig_finger_25
+import rig_shoulder_25, rig_arm_25, rig_finger_25
 import rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 #import blenrig_rig        
 import rigify_rig
@@ -1850,26 +1850,15 @@ def setupRig(obj):
         ArmatureProps = []
         HeadName = 'Head'
         
-        if mh2mhx.theConfig.newshoulders:
-            shoulderJoints = rig_shoulder2_25.ShoulderJoints
-            shoulderHeadsTails = rig_shoulder2_25.ShoulderHeadsTails
-            shoulderArmature = rig_shoulder2_25.ShoulderArmature
-            vgfile = "./shared/mhx/templates/vertexgroups2-bones25.mhx"
-        else:
-            shoulderJoints = rig_shoulder_25.ShoulderJoints
-            shoulderHeadsTails = rig_shoulder_25.ShoulderHeadsTails
-            shoulderArmature = rig_shoulder_25.ShoulderArmature
-            vgfile = "./shared/mhx/templates/vertexgroups-bones25.mhx"
-
         VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
-                            vgfile,
+                            "./shared/mhx/templates/vertexgroups-bones25.mhx",
                             #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
         Joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
             rig_arm_25.ArmJoints +
-            shoulderJoints +
+            rig_shoulder_25.ShoulderJoints +
             rig_finger_25.FingerJoints +
             rig_leg_25.LegJoints +
             #rig_toe_25.ToeJoints +
@@ -1879,7 +1868,7 @@ def setupRig(obj):
         
         HeadsTails = (
             rig_body_25.BodyHeadsTails +
-            shoulderHeadsTails +
+            rig_shoulder_25.ShoulderHeadsTails +
             rig_arm_25.ArmHeadsTails +
             rig_finger_25.FingerHeadsTails +
             rig_leg_25.LegHeadsTails +
@@ -1890,7 +1879,7 @@ def setupRig(obj):
 
         Armature = (
             rig_body_25.BodyArmature +
-            shoulderArmature +
+            rig_shoulder_25.ShoulderArmature +
             rig_arm_25.ArmArmature +            
             rig_finger_25.FingerArmature +
             rig_leg_25.LegArmature +
@@ -1983,10 +1972,7 @@ def writeControlPoses(fp):
     writeBoneGroups(fp)
     if mh2mhx.theConfig.useRig == 'mhx':            
         rig_body_25.BodyControlPoses(fp)
-        if mh2mhx.theConfig.newshoulders:
-            rig_shoulder2_25.ShoulderControlPoses(fp)
-        else:
-            rig_shoulder_25.ShoulderControlPoses(fp)
+        rig_shoulder_25.ShoulderControlPoses(fp)
         rig_arm_25.ArmControlPoses(fp)
         rig_finger_25.FingerControlPoses(fp)
         rig_leg_25.LegControlPoses(fp)
@@ -2030,10 +2016,7 @@ def writeAllDrivers(fp):
             writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
             writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
         #rig_panel_25.FingerControlDrivers(fp)
-        if mh2mhx.theConfig.newshoulders:
-            writeMuscleDrivers(fp, rig_shoulder2_25.ShoulderDeformDrivers, mh2mhx.theHuman)
-        else:
-            writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mh2mhx.theHuman)
+        writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mh2mhx.theHuman)
         writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
         writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman)
         rig_face_25.FaceDeformDrivers(fp)
