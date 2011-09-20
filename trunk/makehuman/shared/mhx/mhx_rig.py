@@ -1891,6 +1891,10 @@ def setupRig(obj):
             rig_panel_25.PanelArmature
         )
 
+        if not mh2mhx.theConfig.propdrivers:
+            Joints += rig_panel_25.SwitchJoints
+            HeadsTails += rig_panel_25.SwitchHeadsTails
+            Armature += rig_panel_25.SwitchArmature
 
     elif mh2mhx.theConfig.useRig == "blenrig":
         BoneGroups = [('GEN', 'THEME13'),
@@ -1935,7 +1939,7 @@ def setupRig(obj):
             faceArmature +
             rig_panel_25.PanelArmature
         )
-            
+
         ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRigType", '"Rigify"')]
         ArmatureProps = rigify_rig.RigifyArmatureProps
 
@@ -1982,6 +1986,8 @@ def writeControlPoses(fp):
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
+        if not mh2mhx.theConfig.propdrivers:
+            rig_panel_25.SwitchControlPoses(fp)
     elif mh2mhx.theConfig.useRig == 'blenrig':
         blenrig_rig.BlenrigWritePoses(fp)
     elif mh2mhx.theConfig.useRig == 'rigify':

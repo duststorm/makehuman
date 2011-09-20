@@ -40,7 +40,7 @@ end Armature
   Property ElbowPlant_L 0.0 Left_elbow_plant ;
   PropKeys ElbowPlant_L "min":0.0,"max":1.0, ;
 
-  Property HandFollowsWrist_L 0.0 Left_hand_follows_wrist ;
+  Property HandFollowsWrist_L 1.0 Left_hand_follows_wrist ;
   PropKeys HandFollowsWrist_L "min":0.0,"max":1.0, ;
 
   Property LegIk_L 0.0 Left_leg_FK/IK ;
@@ -58,7 +58,7 @@ end Armature
   Property ElbowPlant_R 0.0 Right_elbow_plant ;
   PropKeys ElbowPlant_R "min":0.0,"max":1.0, ;
 
-  Property HandFollowsWrist_R 0.0 Right_hand_follows_wrist ;
+  Property HandFollowsWrist_R 1.0 Right_hand_follows_wrist ;
   PropKeys HandFollowsWrist_R "min":0.0,"max":1.0, ;
 
   Property LegIk_R 0.0 Right_leg_FK/IK ;
@@ -76,6 +76,21 @@ end Armature
   Property SpineIk 0.0 Spine_FK/IK ;
   PropKeys SpineIk "min":0.0,"max":1.0, ;
   
+  Property SpineStretch 0.2 Spine_stretch_amount ;
+  PropKeys SpineStretch "min":0.0,"max":1.0, ;
+  
+  Property ArmStretch_L 0.1 Left_arm_stretch_amount ;
+  PropKeys ArmStretch_L "min":0.0,"max":1.0, ;
+
+  Property LegStretch_L 0.1 Left_leg_stretch_amount ;
+  PropKeys LegStretch_L "min":0.0,"max":1.0, ;
+
+  Property ArmStretch_R 0.1 Right_arm_stretch_amount ;
+  PropKeys ArmStretch_R "min":0.0,"max":1.0, ;
+
+  Property LegStretch_R 0.1 Right_leg_stretch_amount ;
+  PropKeys LegStretch_R "min":0.0,"max":1.0, ;
+
   *** properties Object
 end Object
 

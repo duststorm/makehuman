@@ -86,6 +86,7 @@ BodyHeadsTails = [
     ('DownPT3',        ('spine1', [0,0,-1]), ('spine1', [0,0.5,-1])),
 
     # Deform spine
+    ('DfmRoot',        'root-tail', 'spine3'),
     ('DfmHips',        'spine3', 'root-tail'),
     ('DfmSpine1',      'spine3', 'spine2'),
     ('DfmSpine2',      'spine2', 'spine1'),
@@ -141,11 +142,12 @@ BodyArmature = [
     #('DownSpineLinkPT',    0, 'DownSpine2', F_RES, L_DNSPNIK, NoBB),
 
     # Deform spine    
-    ('DfmHips',            0, 'Root', F_DEF, L_DMAIN, NoBB),
-    ('DfmSpine1',          0, 'Root', F_DEF, L_DMAIN, (1,1,3) ),
-    ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-    ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
+    ('DfmRoot',            0, Master, F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmHips',            0, 'DfmRoot', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmSpine1',          0, 'DfmRoot', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
+    ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
+    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
+    ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
 
     # Head
     ('Head',               0, 'DfmNeck', F_WIR, L_UPSPN+L_DNSPN+L_HEAD, NoBB),
@@ -187,7 +189,7 @@ def BodyControlPoses(fp):
 
     addPoseBone(fp,  'Shoulders', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]),
-         ('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_ONSURFACE'])
+         ('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_INSIDE'])
         ])
 
     # Up spine
@@ -196,15 +198,15 @@ def BodyControlPoses(fp):
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limHips, (1,1,1)])])
 
     addPoseBone(fp,  'Spine1', 'GZM_CircleSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
-        ((1,1,1), (0.2,0.2,0.2), 0.3, None), 0, 
+        ((1,1,1), (0.2,0.2,0.2), 0.05, None), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine1, (1,1,1)])])
 
     addPoseBone(fp,  'Spine2', 'GZM_CircleSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
-        ((1,1,1), (0.2,0.2,0.2), 0.3, None), 0,
+        ((1,1,1), (0.2,0.2,0.2), 0.05, None), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine2, (1,1,1)])])
 
     addPoseBone(fp,  'Spine3', 'GZM_CircleChest', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
-        ((1,1,1), (0.96,0.96,0.96), 0.1, None), 0,
+        ((1,1,1), (0.96,0.96,0.96), 0.01, None), 0,
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine3, (1,1,1)]),
           ('IK', 0, 0, ['IK', 'Shoulders', 3, (-90*D, 'SpinePT'), (1,0,1)]),
          ])
@@ -238,17 +240,19 @@ def BodyControlPoses(fp):
     
    
     # Deform spine    
+    addDeformSpine(fp, 'DfmRoot', 'Root', 'DownHips', None, None, False, True, [])
+    
     addDeformSpine(fp, 'DfmHips', 'Hips', 'DownHips', None, None, False, True, [])
     
     addDeformSpine(fp, 'DfmSpine1', 'Spine1', 'DownSpine1', 'DownSpine1', 'DownPT1', True, True,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'Spine2', 0]) ])
+        [('StretchTo', 0, 1, ['Stretch', 'Spine2', 0]) ])
             
     addDeformSpine(fp, 'DfmSpine2', 'Spine2', 'DownSpine2', 'DownSpine2', 'DownPT2', True, False,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'Spine3', 0]) ])
+        [('StretchTo', 0, 1, ['Stretch', 'Spine3', 0]) ])
 
     addDeformSpine(fp, 'DfmSpine3', 'Spine3', 'DownSpine3', 'DownSpine3', 'DownPT3', True, False, [])
     
-    addDeformSpine(fp, 'DfmNeck', 'Neck', 'DownNeck', None, None, False, False, [])
+    addDeformSpine(fp, 'DfmNeck', 'Neck', 'DownNeck', None, None, False, True, [])
 
 #
 #   BodyPropDrivers
@@ -282,8 +286,8 @@ def BodyControlPoses(fp):
 
 def addDeformSpine(fp, dbone, uptrg, downtrg, downik, downpt, invert, cpyloc, cnss):
     if cpyloc:
-        cnss.append( ('CopyLoc', 0, 1, ['UpLoc', uptrg, (1,1,1), (0,0,0), 0, False]) )
-    cnss.append( ('CopyRot', 0, 1, ['UpRot', uptrg, (1,1,1), (0,0,0), False]) )
+        cnss.append( ('CopyLoc', 0, 1, ['UpLoc', uptrg, (1,1,1), (0,0,0), False, False]) )
+    cnss.append( ('CopyRot', 0, 0, ['UpRot', uptrg, (1,1,1), (0,0,0), False]) )        
     cnss.append( ('CopyLoc', 0, 0, ['DownLoc', downtrg, (1,1,1), (0,0,0), invert, False]) )
     if downik:
         cnss.append( ('IK', 0, 0, ['DownIK', downik, 1, (-90*D, downpt), (True, False,True)]) )
@@ -298,8 +302,13 @@ def addDeformSpine(fp, dbone, uptrg, downtrg, downik, downpt, invert, cpyloc, cn
 #
 
 BodyPropDrivers = [
-    ('DfmHips', 'UpLoc', ['InvertSpine'], '1-x1'),
+    ('DfmRoot', 'UpRot', ['InvertSpine'], '1-x1'),
+    ('DfmRoot', 'UpLoc', ['InvertSpine'], '1-x1'),
+    ('DfmRoot', 'DownLoc', ['InvertSpine'], 'x1'),
+    ('DfmRoot', 'DownRot', ['InvertSpine'], 'x1'),
+
     ('DfmHips', 'UpRot', ['InvertSpine'], '1-x1'),
+    ('DfmHips', 'UpLoc', ['InvertSpine'], '1-x1'),
     ('DfmHips', 'DownLoc', ['InvertSpine'], 'x1'),
     ('DfmHips', 'DownRot', ['InvertSpine'], 'x1'),
 
@@ -316,13 +325,14 @@ BodyPropDrivers = [
     ('DfmSpine3', 'DownLoc', ['InvertSpine'], 'x1'),
     ('DfmSpine3', 'DownIK', ['InvertSpine'], 'x1'),
 
+    ('DfmNeck', 'UpLoc', ['InvertSpine'], '1-x1'),
     ('DfmNeck', 'UpRot', ['InvertSpine'], '1-x1'),
     ('DfmNeck', 'DownLoc', ['InvertSpine'], 'x1'),
     ('DfmNeck', 'DownRot', ['InvertSpine'], 'x1'),
 
     ('Root', 'LimitRot', ['InvertSpine'], 'x1'),
     ('Shoulders', 'LimitRot', ['InvertSpine'], '1-x1'),
-    ('Shoulders', 'LimitDist', ['InvertSpine'], '0.8*(1-x1)'),
+    ('Shoulders', 'LimitDist', ['SpineStretch', 'InvertSpine'], '(1-x1)*(1-x2)'),
     
     ('Spine3', 'IK', ['SpineIk', 'InvertSpine'], 'x1*(1-x2)'),
 ]
