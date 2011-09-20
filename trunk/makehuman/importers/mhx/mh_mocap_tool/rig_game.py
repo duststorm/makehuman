@@ -33,12 +33,12 @@ Bones = [
     ('Neck',        'Neck'),
     ('Head',        'Head'),
 
-    ('Clavicle_L',    'Shoulder_L'),
+    ('Clavicle_L',    'Clavicle_L'),
     ('UpArm_L',        'UpArm_L'),
     ('LoArm_L',        'LoArm_L'),
     ('Hand_L',        'Hand_L'),
 
-    ('Clavicle_R',    'Shoulder_R'),
+    ('Clavicle_R',    'Clavicle_R'),
     ('UpArm_R',        'UpArm_R'),
     ('LoArm_R',        'LoArm_R'),
     ('Hand_R',        'Hand_R'),

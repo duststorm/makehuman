@@ -4,11 +4,11 @@ Spine2 -
 Spine3 Chest
 Neck Neck
 Head Head
-Shoulder_L Clavicle_L
+Clavicle_L Clavicle_L
 UpArm_L bicep_FK_L
 LoArm_L forearm_FK_L
 Hand_L palm_FK_L
-Shoulder_R Clavicle_R
+Clavicle_R Clavicle_R
 UpArm_R bicep_FK_R
 LoArm_R forearm_FK_R
 Hand_R palm_FK_R

@@ -79,12 +79,6 @@ ArmJoints = [
 ]
 
 ArmHeadsTails = [
-    # Arm root
-    ('ShoulderEnd_L',       'r-uparm0', ('r-uparm0', yunit)),
-    ('ShoulderEnd_R',       'l-uparm0', ('l-uparm0', yunit)),
-    ('ArmLoc_L',            'r-uparm0', ('r-uparm0', yunit)),
-    ('ArmLoc_R',            'l-uparm0', ('l-uparm0', yunit)),
-
     # Arm
     ('ArmTrg_L',            'r-uparm0', 'r-armtrg'),
     ('UpArm_L',             'r-uparm0', 'r-elbow'),
@@ -170,37 +164,31 @@ upArmRoll = 0.0
 loArmRoll = 0.0
 handRoll = 0.0
 
-L_LSHOULDER = L_LARMFK+L_LARMIK+L_UPSPNFK+L_UPSPNIK+L_DNSPNFK+L_DNSPNIK
-L_RSHOULDER = L_RARMFK+L_RARMIK+L_UPSPNFK+L_UPSPNIK+L_DNSPNFK+L_DNSPNIK
+#L_LSHOULDER = L_LARMFK+L_LARMIK+L_UPSPNFK+L_UPSPNIK+L_DNSPNFK+L_DNSPNIK
+#L_RSHOULDER = L_RARMFK+L_RARMIK+L_UPSPNFK+L_UPSPNIK+L_DNSPNFK+L_DNSPNIK
 
 ArmArmature = [
-    # Arm root    
-    ('ShoulderEnd_L',      0, 'Clavicle_L', 0, L_HELP, NoBB),
-    ('ShoulderEnd_R',      0, 'Clavicle_R', 0, L_HELP, NoBB),
-    ('ArmLoc_L',           0, 'ShoulderEnd_L', F_WIR+F_NOROT, L_LARMFK+L_LARMIK, NoBB),
-    ('ArmLoc_R',           0, 'ShoulderEnd_R', F_WIR+F_NOROT, L_RARMFK+L_RARMIK, NoBB),
-
     # Arm
-    ('UpArm_L',            upArmRoll, 'ArmLoc_L', F_WIR, L_LARMFK, NoBB),
+    ('UpArm_L',            upArmRoll, 'Shoulder_L', F_WIR, L_LARMFK, NoBB),
     ('Elbow_L',            0, Master, F_WIR, L_LEXTRA, NoBB),
     ('LoArm_L',            loArmRoll, 'UpArm_L', F_WIR, L_LARMFK, NoBB),
     ('Wrist_L',            handRoll, Master, F_WIR, L_LARMIK, NoBB),
     ('Hand_L',             handRoll, 'LoArm_L', F_CON+F_WIR, L_LARMFK+L_LARMIK, NoBB),
-    ('UpArm_R',            -upArmRoll, 'ArmLoc_R', F_WIR, L_RARMFK, NoBB),
+    ('UpArm_R',            -upArmRoll, 'Shoulder_R', F_WIR, L_RARMFK, NoBB),
     ('Elbow_R',            0, Master, F_WIR, L_REXTRA, NoBB),
     ('LoArm_R',            -loArmRoll, 'UpArm_R', F_WIR, L_RARMFK, NoBB),
     ('Wrist_R',            handRoll, Master, F_WIR, L_RARMIK, NoBB),
     ('Hand_R',             -handRoll, 'LoArm_R', F_CON+F_WIR, L_RARMFK+L_RARMIK, NoBB),
 
     #
-    ('ArmTrg_L',          0, 'ArmLoc_L', 0, L_HELP, NoBB),
-    ('UpArmRot_L',        0, 'ArmLoc_L', 0, L_DEF, NoBB),
+    ('ArmTrg_L',          0, 'Shoulder_L', 0, L_HELP, NoBB),
+    ('UpArmRot_L',        0, 'Shoulder_L', 0, L_DEF, NoBB),
     ('UpArm1PT_L',        0, 'UpArmRot_L', 0, L_HELP, NoBB),
     ('UpArm2PT_L',        0, 'UpArm_L', 0, L_HELP, NoBB),
     ('LoArmPT_L',         0, 'LoArm_L', 0, L_HELP, NoBB),
 
-    ('ArmTrg_R',          0, 'ArmLoc_R', 0, L_HELP, NoBB),
-    ('UpArmRot_R',        0, 'ArmLoc_R', 0, L_DEF, NoBB),
+    ('ArmTrg_R',          0, 'Shoulder_R', 0, L_HELP, NoBB),
+    ('UpArmRot_R',        0, 'Shoulder_R', 0, L_DEF, NoBB),
     ('UpArm1PT_R',        0, 'UpArmRot_R', 0, L_HELP, NoBB),
     ('UpArm2PT_R',        0, 'UpArm_R', 0, L_HELP, NoBB),
     ('LoArmPT_R',         0, 'LoArm_R', 0, L_HELP, NoBB),
@@ -212,7 +200,7 @@ ArmArmature = [
     ('ElbowLinkPT_R',     0, 'UpArm_R', F_RES, L_RARMIK, NoBB),
 
     # Arm deform
-    ('DfmUpArm1_L',       upArmRoll, 'ArmLoc_L', F_DEF, L_DMAIN, NoBB),
+    ('DfmUpArm1_L',       upArmRoll, 'Shoulder_L', F_DEF, L_DMAIN, NoBB),
     ('DfmUpArm2_L',       upArmRoll, 'DfmUpArm1_L', F_DEF+F_CON, L_DMAIN,(0,0,5) ),
     ('DfmUpArm3_L',       upArmRoll, 'DfmUpArm2_L', F_DEF+F_CON, L_DMAIN, NoBB),
     ('DfmLoArm1_L',       loArmRoll, 'DfmUpArm3_L', F_DEF, L_DMAIN, NoBB),
@@ -221,7 +209,7 @@ ArmArmature = [
     ('DfmLoArmFan_L',     loArmRoll, 'DfmUpArm3_L', F_DEF, L_DMAIN, NoBB),
     ('DfmHand_L',         handRoll, 'DfmLoArm3_L', F_DEF, L_DMAIN, NoBB),
 
-    ('DfmUpArm1_R',       upArmRoll, 'ArmLoc_R', F_DEF, L_DMAIN, NoBB),
+    ('DfmUpArm1_R',       upArmRoll, 'Shoulder_R', F_DEF, L_DMAIN, NoBB),
     ('DfmUpArm2_R',       upArmRoll, 'DfmUpArm1_R', F_DEF+F_CON, L_DMAIN,(0,0,5) ),
     ('DfmUpArm3_R',       upArmRoll, 'DfmUpArm2_R', F_DEF+F_CON, L_DMAIN, NoBB),
     ('DfmLoArm1_R',       loArmRoll, 'DfmUpArm3_R', F_DEF, L_DMAIN, NoBB),
@@ -275,11 +263,11 @@ def ArmControlPoses(fp):
 
     # Arm root
     
-    addPoseBone(fp, 'ArmLoc_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, 'Shoulder_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_L', (1,1,1), (0,0,0), False]),
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 
-    addPoseBone(fp, 'ArmLoc_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, 'Shoulder_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 
@@ -296,7 +284,7 @@ def ArmControlPoses(fp):
     addPoseBone(fp, 'Elbow_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), CmodLoArm, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_ONSURFACE']),
+        ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_L', 'LIMITDIST_ONSURFACE']),
         ])
 
     addPoseBone(fp, 'LoArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodLoArm,
@@ -309,7 +297,7 @@ def ArmControlPoses(fp):
     addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
-         ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_L', 'LIMITDIST_INSIDE']),
+         ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_L', 'LIMITDIST_INSIDE']),
          ('LimitDist', 0, 0, ['DistElbow', 'Elbow_L', 'LIMITDIST_ONSURFACE']),
         ])
 
@@ -330,7 +318,7 @@ def ArmControlPoses(fp):
     addPoseBone(fp, 'Elbow_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), CmodLoArm, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_ONSURFACE']),
+        ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_R', 'LIMITDIST_ONSURFACE']),
         ])
 
     addPoseBone(fp, 'LoArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), (1,1,1), CmodLoArm,
@@ -343,7 +331,7 @@ def ArmControlPoses(fp):
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
         mhx_rig.rootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 0, ['DistShoulder', 'ArmLoc_R', 'LIMITDIST_INSIDE']),
+        ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_R', 'LIMITDIST_INSIDE']),
         ('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),
         ])
 
@@ -473,8 +461,8 @@ ArmPropLRDrivers = [
     ('Hand', 'FreeIK', ['ArmFkIk', 'ElbowPlant'], '(1-x1)*(1-x2)'),
     ('Hand', 'WristLoc', ['ArmFkIk'], 'x1'),
     ('Hand', 'WristRot', ['ArmFkIk', 'HandFollowsWrist'], 'x1*x2'),
-    ('ArmLoc', 'Shoulder', ['ArmHinge'], '1-x1'),
-    ('ArmLoc', 'Root', ['ArmHinge'], 'x1'),
+    ('Shoulder', 'Shoulder', ['ArmHinge'], '1-x1'),
+    ('Shoulder', 'Root', ['ArmHinge'], 'x1'),
  ]
 
 #

@@ -265,8 +265,8 @@ def setupIkInfo(rig):
         infos.append(info)
         
     for (ikname, parname, fakepar) in [
-        ("ElbowPT_L", "Shoulder_L", "UpArm_L"), 
-        ("ElbowPT_R", "Shoulder_R", "UpArm_R"),
+        ("ElbowPT_L", "Clavicle_L", "UpArm_L"), 
+        ("ElbowPT_R", "Clavicle_R", "UpArm_R"),
         ("KneePT_L", "LegIK_L", "UpLeg_L"), 
         ("KneePT_R", "LegIK_R", "UpLeg_R")
         ]:
@@ -344,6 +344,7 @@ def poseTrgIkBones(context, rig, nFrames):
             info.empty = empty
     rig.data.pose_position = 'POSE'  
 
+    print("Copy animation to IK bones")
     for frame in range(nFrames):
         context.scene.frame_set(frame)
         for info in infos:

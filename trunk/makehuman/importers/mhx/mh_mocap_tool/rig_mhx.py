@@ -29,9 +29,10 @@
 #
 
 FkBoneList = [
-    'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', 'Shoulders', 'LowerNeck', 'Neck', 'Head', 'Sternum',
-    'Shoulder_L', 'ShoulderEnd_L', 'ArmLoc_L', 'UpArm_L', 'LoArm_L', 'Hand0_L', 'Hand_L',
-    'Shoulder_R', 'ShoulderEnd_R', 'ArmLoc_R', 'UpArm_R', 'LoArm_R', 'Hand0_R', 'Hand_R',
+    'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', #'Shoulders', 
+    'LowerNeck', 'Neck', 'Head', 'Sternum',
+    'Clavicle_L', 'ShoulderEnd_L', 'ArmLoc_L', 'UpArm_L', 'LoArm_L', 'Hand0_L', 'Hand_L',
+    'Clavicle_R', 'ShoulderEnd_R', 'ArmLoc_R', 'UpArm_R', 'LoArm_R', 'Hand0_R', 'Hand_R',
     'Hip_L', 'LegLoc_L', 'UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'LegFK_L',
     'Hip_R', 'LegLoc_R', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R', 'LegFK_R',
 ]
@@ -43,7 +44,7 @@ FkBoneList = [
 
 IkParents = {
     'Elbow_L' : (None, 'UpArm_L', None, False),
-    'ElbowPT_L' : ('Shoulder_L', 'UpArm_L', None, False),
+    'ElbowPT_L' : ('Clavicle_L', 'UpArm_L', None, False),
     'Wrist_L' : (None, 'LoArm_L', 'Hand_L', False),
     'LegIK_L' : (None, 'Toe_L', 'LegFK_L', False),
     'KneePT_L' : ('Hips', 'UpLeg_L', None, False),
@@ -52,7 +53,7 @@ IkParents = {
     'Ankle_L' : ('FootRev_L', 'LoLeg_L', None, False),
 
     'Elbow_R' : (None, 'UpArm_R', None, False),
-    'ElbowPT_R' : ('Shoulder_R', 'UpArm_R', None, False),
+    'ElbowPT_R' : ('Clavicle_R', 'UpArm_R', None, False),
     'Wrist_R' : (None, 'LoArm_R', 'Hand_R', False),
     'LegIK_R' : (None, 'Toe_R', 'LegFK_R', False),
     'KneePT_R' : ('Hips', 'UpLeg_R', None, False),

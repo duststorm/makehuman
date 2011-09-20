@@ -38,7 +38,7 @@ MegaArmature = {
     'left eye' : None,
     'right eye' : None,
 
-    'left collar' : 'Shoulder_L',
+    'left collar' : 'Clavicle_L',
     'left shoulder' : 'UpArm_L', 
     'left forearm' : 'LoArm_L',
     'left hand' : 'Hand_L',
@@ -58,7 +58,7 @@ MegaArmature = {
     'left pinky 2' : None, 
     'left pinky 3' : None, 
 
-    'right collar' : 'Shoulder_R',
+    'right collar' : 'Clavicle_R',
     'right shoulder' : 'UpArm_R', 
     'right forearm' : 'LoArm_R',
     'right hand' : 'Hand_R',

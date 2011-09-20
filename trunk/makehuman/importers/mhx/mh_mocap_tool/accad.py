@@ -38,12 +38,12 @@ AccadArmature = {
     'neck' : 'Neck', 
     'head' : 'Head', 
 
-    'leftshoulder' : 'Shoulder_L',
+    'leftshoulder' : 'Clavicle_L',
     'leftarm' : 'UpArm_L', 
     'leftforearm' : 'LoArm_L',
     'lefthand' : 'Hand_L', 
 
-    'rightshoulder' : 'Shoulder_R',
+    'rightshoulder' : 'Clavicle_R',
     'rightarm' : 'UpArm_R', 
     'rightforearm' : 'LoArm_R',
     'righthand' : 'Hand_R',

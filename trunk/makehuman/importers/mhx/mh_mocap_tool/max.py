@@ -47,7 +47,7 @@ MaxArmature = {
     'neck' : 'Neck',
     'head' : 'Head',
 
-    'leftcollar' : 'Shoulder_L',
+    'leftcollar' : 'Clavicle_L',
     'leftshoulder' : 'UpArm_L',
     'leftelbow' : 'LoArm_L',
     'leftwrist' : 'Hand_L',
@@ -55,7 +55,7 @@ MaxArmature = {
     'lfingers' : None,
     'lthumb' : None,
 
-    'rightcollar' : 'Shoulder_R',
+    'rightcollar' : 'Clavicle_R',
     'rightshoulder' : 'UpArm_R',
     'rightelbow' : 'LoArm_R',
     'rightwrist' : 'Hand_R',

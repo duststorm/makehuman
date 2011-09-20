@@ -38,7 +38,7 @@ MBArmature = {
     'neck1' : 'Head', 
     'head' : None,
 
-    'leftshoulder' : 'Shoulder_L',
+    'leftshoulder' : 'Clavicle_L',
     'leftarm' : 'UpArm_L', 
     'leftforearm' : 'LoArm_L',
     'lefthand' : 'Hand_L',
@@ -47,7 +47,7 @@ MBArmature = {
     'lfingers' : None,
     'lthumb' : None, 
 
-    'rightshoulder' : 'Shoulder_R', 
+    'rightshoulder' : 'Clavicle_R', 
     'rightarm' : 'UpArm_R', 
     'rightforearm' : 'LoArm_R',
     'righthand' : 'Hand_R',

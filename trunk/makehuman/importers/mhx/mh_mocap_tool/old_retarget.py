@@ -230,6 +230,26 @@ def insertAnimChildLoc(nameIK, name, animations, locs):
         animIK.heads[frame] = animPar.heads[frame] + anim.offsetRest * parmat
     return
 
+def fixParent(par, animations):
+    try:
+        animations[par]   
+        return par
+    except:
+        pass
+    if not par in animations.keys():
+        if par[0:3] == 'Dfm':
+            return par[3:]
+        elif par == 'Shoulder_L':
+            return 'Clavicle_L'
+        elif par == 'Clavicle_L':
+            return 'Shoulder_L'
+        elif par == 'Shoulder_R':
+            return 'Clavicle_R'
+        elif par == 'Clavicle_R':
+            return 'Shoulder_R'
+        else:
+            raise NameError("Could not guess parent %s -> %s" % (name, par))
+
 def insertAnimChild(name, animations, nFrames, times, rots):
     try:
         anim = animations[name]
@@ -237,9 +257,9 @@ def insertAnimChild(name, animations, nFrames, times, rots):
         return None
     if nFrames < 0:
         nFrames = len(rots)
-    par = anim.parent
+    par = fixParent(anim.parent, animations)
     #print("iAC", name, par)
-    animPar = animations[par]
+    animPar = animations[par]   
     anim.nFrames = nFrames
     quat = Quaternion()
     quat.identity()

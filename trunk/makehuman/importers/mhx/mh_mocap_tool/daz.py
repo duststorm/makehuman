@@ -36,7 +36,7 @@ DazArmature = {
     'righteye' : None,
     'figurehair' : None,
 
-    'lcollar' : 'Shoulder_L',
+    'lcollar' : 'Clavicle_L',
     'lshldr' : 'UpArm_L', 
     'lforearm' : 'LoArm_L',
     'lhand' : 'Hand_L',
@@ -56,7 +56,7 @@ DazArmature = {
     'lpinky2' : None, 
     'lpinky3' : None, 
 
-    'rcollar' : 'Shoulder_R',
+    'rcollar' : 'Clavicle_R',
     'rshldr' : 'UpArm_R', 
     'rforearm' : 'LoArm_R',
     'rhand' : 'Hand_R',

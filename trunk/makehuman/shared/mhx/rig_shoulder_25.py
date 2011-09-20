@@ -70,7 +70,7 @@ ShoulderHeadsTails = [
     ('Sternum',             'neck', 'sternum-tail'),
     ('SternumTarget',       'sternum-head', 'sternum-tail'),
     
-    # Shoulder
+    # Clavicle
 
     ('Clavicle_L',          'r-clavicle', 'r-clav-tail'),
     ('ShoulderPivot_L',     'r-clavicle', 'r-clav-tail'),
@@ -83,6 +83,12 @@ ShoulderHeadsTails = [
     ('ShoulderUp_R',        ('l-clav-tail', yunit), ('l-clav-tail', ybis)),
     ('ShoulderAim_R',       'l-clav-tail', 'l-clav-aim'),
     ('DfmClavicle_R',       'l-clavicle', 'l-clav-tail'),
+
+    # Shoulder
+    ('ShoulderEnd_L',       'r-uparm0', ('r-uparm0', yunit)),
+    ('ShoulderEnd_R',       'l-uparm0', ('l-uparm0', yunit)),
+    ('Shoulder_L',          'r-uparm0', ('r-uparm0', yunit)),
+    ('Shoulder_R',          'l-uparm0', ('l-uparm0', yunit)),
 
     # Scapula
     
@@ -129,13 +135,18 @@ ShoulderArmature = [
     ('Sternum',            0, 'DfmSpine3', 0, L_HELP, NoBB),
     ('SternumTarget',      0, 'Sternum', 0, L_HELP, NoBB),
 
-    # Shoulder
+    # Clavicle
     ('Clavicle_L',         0, 'Sternum', F_WIR, L_LSHOULDER, NoBB),
     ('Clavicle_R',         0, 'Sternum', F_WIR, L_RSHOULDER, NoBB),
-
     ('DfmClavicle_L',      0, 'Sternum', F_DEF, L_DMAIN, NoBB),
     ('DfmClavicle_R',      0, 'Sternum', F_DEF, L_DMAIN, NoBB),
     
+    # Shoulder    
+    ('ShoulderEnd_L',      0, 'Clavicle_L', 0, L_HELP, NoBB),
+    ('ShoulderEnd_R',      0, 'Clavicle_R', 0, L_HELP, NoBB),
+    ('Shoulder_L',         0, 'ShoulderEnd_L', F_WIR+F_NOROT, L_LARMFK+L_LARMIK, NoBB),
+    ('Shoulder_R',         0, 'ShoulderEnd_R', F_WIR+F_NOROT, L_RARMFK+L_RARMIK, NoBB),
+
     # Scapula
     ('ShoulderPivot_L',    0, 'Sternum', 0, L_HELP, NoBB),
     ('ShoulderUp_L',       0, 'ShoulderPivot_L', 0, L_HELP, NoBB),
