@@ -223,11 +223,11 @@ def ShoulderControlPoses(fp):
 
     # Shoulder
     
-    addPoseBone(fp, 'Shoulder_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, 'Shoulder_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_L', (1,1,1), (0,0,0), False]),
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 
-    addPoseBone(fp, 'Shoulder_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, 'Shoulder_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 

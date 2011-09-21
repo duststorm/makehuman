@@ -1849,7 +1849,7 @@ def setupRig(obj):
                       "./shared/mhx/templates/panel_gizmo25.mhx",
                       "./shared/mhx/templates/gizmos25.mhx"]
 
-        ObjectProps = [("MhxRigType", '"MHX"')]
+        ObjectProps = [("MhxRig", '"MHX"')]
         ArmatureProps = []
         HeadName = 'Head'
         
@@ -1908,7 +1908,7 @@ def setupRig(obj):
         Joints = blenrig_rig.BlenrigJoints
         HeadsTails = blenrig_rig.BlenrigHeadsTails
         Armature = blenrig_rig.BlenrigArmature
-        ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRigType", '"Blenrig"')]
+        ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRig", '"Blenrig"')]
         ArmatureProps = blenrig_rig.BlenrigArmatureProps
 
     elif mh2mhx.theConfig.useRig == "rigify":
@@ -1940,7 +1940,7 @@ def setupRig(obj):
             rig_panel_25.PanelArmature
         )
 
-        ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRigType", '"Rigify"')]
+        ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRig", '"Rigify"')]
         ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:

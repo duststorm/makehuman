@@ -26,7 +26,6 @@ end Armature
   show_x_ray True ;
   # draw_type 'WIRE' ;
   Property MhxScale theScale ;
-  Property MhxRig 'Control' ;
   Property MhxVisemeSet 'BodyLanguage' ;
 
   Property _RNA_UI {} ;
@@ -70,8 +69,8 @@ end Armature
   Property GazeFollowsHead 1.0 Gaze_follows_world_or_head ;
   PropKeys GazeFollowsHead "min":0.0,"max":1.0, ;
   
-  Property InvertSpine False Spine_from_shoulders_to_pelvis ;
-  PropKeys InvertSpine "min":0,"max":1, ;
+  Property SpineInvert False Spine_from_shoulders_to_pelvis ;
+  PropKeys SpineInvert "min":0,"max":1, ;
   
   Property SpineIk 0.0 Spine_FK/IK ;
   PropKeys SpineIk "min":0.0,"max":1.0, ;
