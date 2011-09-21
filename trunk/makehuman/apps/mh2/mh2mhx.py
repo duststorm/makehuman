@@ -31,14 +31,27 @@ splitLeftRight = True
 BODY_LANGUAGE = True
 theHuman = 'Human'
 
-import module3d, aljabr, mh, mh2bvh, os
+import module3d
+import aljabr
+import mh
+import mh2bvh
+import os
+import sys
+import time
 
-import sys, time
 mhxPath = os.path.realpath('./shared/mhx')
 if mhxPath not in sys.path:
     sys.path.append(mhxPath)
-import mh2proxy, mhxbones, mhx_rig, rig_panel_25, rig_arm_25, rig_leg_25, rig_body_25
-import read_expression, read_rig
+
+import mh2proxy
+import mhxbones 
+import mhx_rig
+import rig_panel_25
+import rig_arm_25
+import rig_leg_25
+import rig_body_25
+import read_expression
+import read_rig
 
 #
 #    exportMhx(human, filename, options=None):
@@ -428,7 +441,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         mh2proxy.writeRigWeights(fp, weights)
                     fp.write("#endif\n")
                     if theConfig.breasts:
-	                    copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
+                        copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
                     copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
                     if theConfig.cage and not (proxy and proxy.cage):
                         fp.write("#if toggle&T_Cage\n")
@@ -832,6 +845,11 @@ def writeShapeKeys(fp, human, rig, name, proxy):
                 mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers, None)
             else:
                 mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers, None)
+            fp.write("#endif\n")
+
+        if theConfig.expressions:
+            fp.write("#if toggle&T_Face\n")
+            mhx_rig.writeExpressionDrivers(fp, read_expression.Expressions)
             fp.write("#endif\n")
 
     fp.write(

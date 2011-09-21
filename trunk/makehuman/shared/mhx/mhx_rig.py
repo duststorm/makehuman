@@ -21,8 +21,12 @@ Limit angles from http://hippydrome.com/
 
 """
 
-import aljabr, mhxbones, mh2mhx, math
+import aljabr
 from aljabr import *
+import math
+import mhxbones
+import mh2mhx
+import read_expression
         
 pi = 3.14159
 D = pi/180
@@ -1402,101 +1406,21 @@ def writeFkIkSwitch(fp, drivers):
             writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (mx,-mx), [cnsData])
         for cnsName in cnsIK:
             writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,mx), [cnsData])
-            
-            
-
+                       
 #
 #    writeEnumDrivers(fp, drivers):
 #
-
+"""
 def writeEnumDrivers(fp, drivers):
     for (bone, cns, targ, channel) in drivers:
         drvVars = [("x", 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)])]
         for n, cnsName in enumerate(cns):
             expr = '(x>%.1f)*(x<%.1f)' % (n-0.5, n+0.5)
             writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), drvVars)
-
-#
-#    writeProperties(fp, props):
-#    writePropDrivers(fp, drivers):
-#
-
 """
-# Property types
-D_ENUM = 1
-D_INT = 2
-D_FLOAT = 3
-D_BOOL = 4
-D_BOOLINV = 5
-D_MULTIVAR = 6
 
-
-def defineProperties(fp, props):
-    for (prop, typ, values, options) in props:
-        if typ == D_ENUM:
-            #fp.write("DefineProperty %s Int min=1 max=%d ;\n" % (prop, len(values)))
-            #continue
-            fp.write("DefineProperty %s Enum " % prop)
-            c = 'items=['
-            for val in values:
-                fp.write("%s('%s','%s','%s')" % (c,val,val,val))
-                c = ','
-            fp.write("]")
-        elif typ == D_FLOAT:
-            fp.write("DefineProperty %s Float" % (prop))
-        elif typ == D_INT:
-            fp.write("DefineProperty %s Int" % (prop))
-        elif typ == D_BOOL:
-            fp.write("DefineProperty %s Bool" % (prop))
-        else:
-            raise NameError("Unknown property type %d", typ)
-        for option in options:
-            fp.write(" %s" % option)
-        fp.write(" ;\n")
-    return
-
-def writeProperties(fp, props):
-    for (prop, typ, values, options) in props:
-        if typ == D_ENUM:
-            #val = values[0]
-            #fp.write("  Property %s '%s' ;\n" % (prop, val))
-            fp.write("  Property %s 0 ;\n" % (prop))
-        else:
-            pass
-            fp.write("  Property %s %s ;\n" % (prop, values))
-    return
-
-def writePropDrivers(fp, drivers):
-    for (bone, prop, typ, constraints) in drivers:
-        for cns in constraints:
-            if typ == D_MULTIVAR:
-                n = 1
-                drvVars = []
-                for prop1 in prop:
-                    drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, prop1)]) )
-                    n += 1
-                (cns1,expr) = cns
-                writeDriver(fp, True, ('SCRIPTED', expr), "",
-                    "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), 
-                    -1, (0,1), drvVars)
-            else:
-                drvVars = [("x", 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, prop)])]
-                if typ == D_ENUM:
-                    (cns1,expr) = cns
-                    writeDriver(fp, True, ('SCRIPTED', expr), "",
-                        "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns1), 
-                        -1, (0,1), drvVars)
-                elif typ == D_BOOLINV:
-                    writeDriver(fp, True, 'AVERAGE', "",
-                        "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), 
-                        -1, (1,-1), drvVars)
-                else:
-                    writeDriver(fp, True, 'AVERAGE', "",
-                        "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cns), 
-                        -1, (0,1), drvVars)
-"""
 #
-#
+#   writePropDrivers(fp, drivers, suffix):
 #
 
 def writePropDrivers(fp, drivers, suffix):
@@ -1510,8 +1434,19 @@ def writePropDrivers(fp, drivers, suffix):
             "pose.bones[\"%s%s\"].constraints[\"%s\"].influence" % (bone, suffix, cns), 
             -1, (0,1), drvVars)
     return            
-    
 
+#
+#   writeExpressionDrivers(fp, skeys):
+#
+
+def writeExpressionDrivers(fp, skeys):
+    for skey in skeys:
+        drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, '["*%s"]' % (skey))])
+        writeDriver(fp, True, ('SCRIPTED', "x"), "",
+            "key_blocks[\"%s\"].value" % (skey), 
+            -1, (0,1), [drvVar])
+    return            
+    
 #
 #    writeTextureDrivers(fp, drivers):
 #
@@ -2033,16 +1968,22 @@ def writeAllDrivers(fp):
         drivers = blenrig_rig.getBlenrigDrivers()
         writeDrivers(fp, True, drivers)
     elif mh2mhx.theConfig.useRig == 'rigify':            
-        rig_face_25.FaceDeformDrivers(fp)
+        rig_face_25.FaceDeformDrivers(fp)        
     return
 
 def writeAllProperties(fp, typ):
-    if typ == 'Object':
-        props = ObjectProps
-    elif typ == 'Armature':
-        props = ArmatureProps
+    if typ != 'Object':
+        return
+    props = ObjectProps
     for (key, val) in props:
         fp.write("  Property %s %s ;\n" % (key, val))
+    if mh2mhx.theConfig.expressions:
+        fp.write("#if toggle&T_Face\n")
+        for skey in read_expression.Expressions:
+            fp.write(
+"  Property *%s 0.0 %s ;\n" % (skey, skey) +
+"  PropKeys *%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
+        fp.write("#endif\n")
     return
 
 #
